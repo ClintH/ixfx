@@ -1,0 +1,36 @@
+{
+  "name": "@clinth/ix",
+  "version": "0.0.1",
+  "description": "",
+  "module": "dist/bundle.min.mjs",
+  "unpkg": "dist/bundle.umd.min.js",
+  "exports": "./dist/bundle.mjs",
+  "type": "module",
+  "types": "dist/bundle.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "prepublish": "npm run build",
+    "build": "npm run clean && tsc && npm run bundle",
+    "develop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.13.8",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.4.0"
+  },
+  "repository": {
+    "url": "git@github.com:clinth/geometry.git"
+  },
+  "dependencies": {
+    "@types/bezier-js": "^4.1.0",
+    "bezier-js": "^4.1.1",
+    "live-server": "^1.2.1"
+  }
+}

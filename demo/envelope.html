@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>envelope demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <style>
+    #canvas {
+      border: 1px solid black;
+    }
+
+    #plot {
+      border: 1px solid red;
+    }
+  </style>
+  <button id="btnHold">Hold</button>
+  <button id="btnRelease">Release</button>
+  <button id="btnTrigger">Trigger</button>
+
+  <canvas id="canvas" width=800></canvas>
+  <canvas id="plot" width=800></canvas>
+  <script type="module" src="envelope.js"></script>
+
+</body>
+
+</html>
