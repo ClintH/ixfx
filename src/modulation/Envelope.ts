@@ -1,6 +1,6 @@
-import {pathEnvelope} from "./PathEnvelope";
+import {adsr} from "./AdsrEnvelope";
 
-export {pathEnvelope};
+export {adsr};
 
 export type StageOpts = {
   timerSource?: TimerSource

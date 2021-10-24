@@ -3,7 +3,7 @@ import * as Beziers from '../geometry/Bezier.js';
 import * as Lines from '../geometry/Line.js';
 import {clamp} from '../util.js';
 
-export type PathEnvelopeOpts = Envelopes.StageOpts & {
+export type AdsrEnvelopeOpts = Envelopes.StageOpts & {
   /**
    * Sustain level from 0-1
    *
@@ -15,7 +15,7 @@ export type PathEnvelopeOpts = Envelopes.StageOpts & {
   releaseBend?: number;
 }
 
-export const pathEnvelope = (opts: PathEnvelopeOpts): Readonly<Envelopes.Envelope> => {
+export const adsr = (opts: AdsrEnvelopeOpts): Readonly<Envelopes.Envelope> => {
   let {sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0} = opts;
   sustainLevel = clamp(sustainLevel);
 
@@ -34,6 +34,7 @@ export const pathEnvelope = (opts: PathEnvelopeOpts): Readonly<Envelopes.Envelop
     release
   ]
   return Object.freeze({
+    getBeziers: () => [attack, decay, sustain, release],
     trigger: () => {
       env.trigger()
     },
