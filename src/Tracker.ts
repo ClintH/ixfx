@@ -26,9 +26,10 @@ export const tracker = function (id: string | null) {
     min = Number.MAX_SAFE_INTEGER;
     max = Number.MIN_SAFE_INTEGER;
     resetAvg(newId);
-  }
+  };
 
   return {
+    id: () => id,
     seen: (sample: number) => {
       if (Number.isNaN(sample)) throw Error('Cannot add NaN');
       samples++;
@@ -39,14 +40,13 @@ export const tracker = function (id: string | null) {
     avg: () => total / samples,
     min: () => min,
     max: () => max,
-    getMinMaxAvg: () => {
-      return {
+    getMinMaxAvg: () => (
+      {
         min: min,
         max: max,
         avg: avg(),
-      }
-    },
+      }),
     resetAvg: resetAvg,
     reset: reset
-  }
-}
+  };
+};

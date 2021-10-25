@@ -1,11 +1,11 @@
 export class SlidingWindow {
   data: number[] = [];
-  index: number = 0;
+  index = 0;
   size: number;
-  length: number = 0;
-  wrapped: boolean = false;
+  length = 0;
+  wrapped = false;
 
-  constructor(size: number = 5) {
+  constructor(size = 5) {
     this.size = size;
     this.clear(size);
   }
@@ -30,7 +30,7 @@ export class SlidingWindow {
   push(v: number) {
     let idx = this.index;
     this.data[idx++] = v;
-    if (idx == this.size) {
+    if (idx === this.size) {
       this.wrapped = true;
       idx = 0;
     } else this.length++;
@@ -92,6 +92,6 @@ export class SlidingWindow {
       total += this.data[i];
       samples++;
     }
-    return {min: min, max: max, avg: total / samples}
+    return {min: min, max: max, avg: total / samples};
   }
 }
