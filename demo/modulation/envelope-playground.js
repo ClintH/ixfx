@@ -1,4 +1,4 @@
-import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from "../../dist/bundle.mjs";
+import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '../../dist/bundle.mjs';
 
 let env = Envelopes.adsr();
 
@@ -12,14 +12,13 @@ let envStage = document.getElementById('envStage');
 const setSlider = function (id, v) {
   if (id.endsWith('Amp')) v *= 100;
   document.getElementById(id).value = v;
-}
+};
 
 const setSliders = function (idBase, v) {
   if (idBase !== 'decay')
     setSlider(idBase + 'Amp', v[1]);
   setSlider(idBase + 'Period', v[0]);
-
-}
+};
 
 const setup = function () {
   draw = SVG().addTo('#envelope').size('100%', '100%');

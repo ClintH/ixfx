@@ -3,13 +3,43 @@ import {adsr} from "./AdsrEnvelope";
 export {adsr};
 
 export type StageOpts = {
+  /**
+   * Timing source for envelope
+   *
+   * @type {TimerSource}
+   */
   timerSource?: TimerSource
+  /**
+   * If true, envelope indefinately returns to attack stage after release
+   *
+   * @type {boolean}
+   */
   looping?: boolean
+  /**
+   * Duration for attack stage
+   * Unit depends on timer source
+   * @type {number}
+   */
   attackDuration?: number,
+  /**
+   * Duration for decay stage
+   * Unit depends on timer source
+   * @type {number}
+   */
   decayDuration?: number,
+  /**
+   * Duration for release stage
+   * Unit depends on timer source
+   * @type {number}
+   */
   releaseDuration?: number
 }
-
+/**
+ * Stage of envelope
+ *
+ * @export
+ * @enum {number}
+ */
 export enum EnvelopeStage {
   Stopped = 0,
   Attack = 1,
@@ -19,10 +49,34 @@ export enum EnvelopeStage {
 }
 
 export type Envelope = {
+  /**
+   * Trigger the envelope, with no hold
+   *
+   */
   trigger(): void
+
+  /**
+   * Resets the envelope, ready for hold() or trigger()
+   *
+   */
   reset(): void
+  /**
+   * Triggers the envelope and holds the sustain stage
+   *
+   */
   hold(): void
+
+  /**
+   * Releases the envelope if held
+   *
+   */
   release(): void
+
+  /**
+   * Computes the value of the envelope (0-1) and also returns the current stage
+   *
+   * @returns {[EnvelopeStage, number]}
+   */
   compute(): [EnvelopeStage, number]
 }
 
@@ -32,8 +86,12 @@ type Timer = {
 }
 
 type TimerSource = () => Timer;
-
-export const msRelativeTimer = function (): Timer {
+/**
+ * A timer that uses clock time
+ *
+ * @returns {Timer}
+ */
+const msRelativeTimer = function (): Timer {
   let start = performance.now();
   return {
     reset: () => {
@@ -45,7 +103,12 @@ export const msRelativeTimer = function (): Timer {
   }
 }
 
-export const tickRelativeTimer = function (): Timer {
+/**
+ * A timer that progresses with each call
+ *
+ * @returns {Timer}
+ */
+const tickRelativeTimer = function (): Timer {
   let start = 0;
   return {
     reset: () => {
@@ -56,8 +119,13 @@ export const tickRelativeTimer = function (): Timer {
     }
   }
 }
-
-export const stageToText = function (stage: EnvelopeStage): string {
+/**
+ * Returns a name for a given numerical envelope stage
+ *
+ * @param {EnvelopeStage} stage
+ * @returns {string} Name of stage
+ */
+const stageToText = function (stage: EnvelopeStage): string {
   switch (stage) {
     case EnvelopeStage.Attack:
       return 'Attack';
@@ -72,6 +140,12 @@ export const stageToText = function (stage: EnvelopeStage): string {
   }
 }
 
+/**
+ * Creates an envelope
+ *
+ * @param {StageOpts} [opts={}] Options
+ * @returns {Readonly<Envelope>} Envelope
+ */
 export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
   const {looping = false} = opts;
   const {timerSource = msRelativeTimer} = opts;
@@ -149,7 +223,6 @@ export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
 
   const release = () => {
     if (!isHeld) throw Error('Not being held');
-
     setStage(EnvelopeStage.Release);
   }
 

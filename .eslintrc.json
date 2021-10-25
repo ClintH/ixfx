@@ -1,0 +1,123 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2021,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "indent": [
+            "error",
+            2
+        ],
+        "linebreak-style": [
+            "error",
+            "windows"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "func-call-spacing": [
+            "error",
+            "never"
+        ],
+        "camelcase": [
+            "error",
+            {
+                "properties": "always"
+            }
+        ],
+        "curly": [
+            "error",
+            "multi-line"
+        ],
+        "eqeqeq": "error",
+        "no-var": "error",
+        "func-style": [
+            "error",
+            "expression"
+        ],
+        "prefer-arrow-callback": "error",
+        "no-confusing-arrow": [
+            "error",
+            {
+                "allowParens": true
+            }
+        ],
+        "no-useless-concat": "error",
+        "no-useless-constructor": "error",
+        "no-useless-return": "error",
+        "prefer-const": "error",
+        "comma-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "space-in-parens": [
+            "error",
+            "never"
+        ],
+        "capitalized-comments": [
+            "error"
+        ],
+        "space-before-blocks": "error",
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
+        "implicit-arrow-linebreak": [
+            "error",
+            "beside"
+        ],
+        "function-call-argument-newline": [
+            "error",
+            "never"
+        ],
+        "function-paren-newline": [
+            "error",
+            "never"
+        ],
+        "no-multiple-empty-lines": "error",
+        "arrow-body-style": [
+            "error",
+            "as-needed"
+        ],
+        "arrow-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
+        "rest-spread-spacing": [
+            "error",
+            "never"
+        ],
+        "block-spacing": "error",
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "always",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ]
+    }
+}
