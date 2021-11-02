@@ -1625,33 +1625,22 @@ var fromPaths = function(...paths2) {
 var Envelope_exports = {};
 __export(Envelope_exports, {
   EnvelopeStage: () => EnvelopeStage,
-  msRelativeTimer: () => msRelativeTimer,
-  pathEnvelope: () => pathEnvelope,
-  stageToText: () => stageToText,
-  stages: () => stages,
-  tickRelativeTimer: () => tickRelativeTimer
+  adsr: () => adsr,
+  stages: () => stages
 });
 
-// src/util.ts
-var clamp = function(v, min2 = 0, max2 = 1) {
-  if (v < min2)
-    return min2;
-  if (v > max2)
-    return max2;
-  return v;
-};
-
-// src/modulation/PathEnvelope.ts
-var pathEnvelope = (opts) => {
-  let { sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0 } = opts;
-  sustainLevel = clamp(sustainLevel);
-  let env = stages(opts);
-  let max2 = 1;
-  let attack = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
-  let decay = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
-  let sustain = fromPoints({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
-  let release = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
-  let paths2 = [
+// src/modulation/AdsrEnvelope.ts
+var adsr = (opts) => {
+  const { sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0 } = opts;
+  if (sustainLevel > 1 || sustainLevel < 0)
+    throw Error("sustainLevel must be between 0-1");
+  const env = stages(opts);
+  const max2 = 1;
+  const attack = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
+  const decay = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
+  const sustain = fromPoints({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
+  const release = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
+  const paths2 = [
     null,
     attack,
     decay,
@@ -1659,6 +1648,7 @@ var pathEnvelope = (opts) => {
     release
   ];
   return Object.freeze({
+    getBeziers: () => [attack, decay, sustain, release],
     trigger: () => {
       env.trigger();
     },
@@ -1672,9 +1662,9 @@ var pathEnvelope = (opts) => {
       env.hold();
     },
     compute: () => {
-      let [stage, amt] = env.compute();
-      let p = paths2[stage];
-      if (p == null)
+      const [stage, amt] = env.compute();
+      const p = paths2[stage];
+      if (p === null)
         return [stage, 0];
       return [stage, p.compute(amt).y];
     }
@@ -1700,31 +1690,6 @@ var msRelativeTimer = function() {
       return performance.now() - start;
     }
   };
-};
-var tickRelativeTimer = function() {
-  let start = 0;
-  return {
-    reset: () => {
-      start = 0;
-    },
-    elapsed: () => {
-      return start++;
-    }
-  };
-};
-var stageToText = function(stage) {
-  switch (stage) {
-    case 1:
-      return "Attack";
-    case 2:
-      return "Decay";
-    case 4:
-      return "Release";
-    case 0:
-      return "Stopped";
-    case 3:
-      return "Sustain";
-  }
 };
 var stages = function(opts = {}) {
   const { looping = false } = opts;
@@ -1812,55 +1777,59 @@ var stages = function(opts = {}) {
 // src/modulation/Easing.ts
 var Easing_exports = {};
 __export(Easing_exports, {
-  create: () => create,
+  getEasings: () => getEasings,
   tick: () => tick,
   timer: () => timer
 });
+
+// src/util.ts
+var clamp = function(v, min2 = 0, max2 = 1) {
+  if (v < min2)
+    return min2;
+  if (v > max2)
+    return max2;
+  return v;
+};
+
+// src/modulation/Easing.ts
 var sqrt3 = Math.sqrt;
 var pow2 = Math.pow;
+var cos3 = Math.cos;
+var PI = Math.PI;
+var sin3 = Math.sin;
 var msRelativeTimer2 = function(upperBound) {
   let start = performance.now();
   return {
     reset: () => {
       start = performance.now();
     },
-    elapsed: () => {
-      return clamp((performance.now() - start) / upperBound);
-    },
-    isDone: () => {
-      return performance.now() - start >= upperBound;
-    }
+    elapsed: () => clamp((performance.now() - start) / upperBound),
+    isDone: () => performance.now() - start >= upperBound
   };
 };
-var tickRelativeTimer2 = function(upperBound) {
+var tickRelativeTimer = function(upperBound) {
   let start = 0;
   return {
     reset: () => {
       start = 0;
     },
-    elapsed: () => {
-      return clamp(start++ / upperBound);
-    },
-    isDone: () => {
-      return start >= upperBound;
-    }
+    elapsed: () => clamp(start++ / upperBound),
+    isDone: () => start >= upperBound
   };
 };
 var timer = function(easingName, durationMs) {
   return create(easingName, durationMs, msRelativeTimer2);
 };
 var tick = function(easingName, durationTicks) {
-  return create(easingName, durationTicks, tickRelativeTimer2);
+  return create(easingName, durationTicks, tickRelativeTimer);
 };
 var create = function(easingName, duration, timerSource) {
-  let fn = resolveEasing(easingName);
-  let timer2 = timerSource(duration);
+  const fn = resolveEasing(easingName);
+  const timer2 = timerSource(duration);
   return {
-    isDone: () => {
-      return timer2.isDone();
-    },
+    isDone: () => timer2.isDone(),
     compute: () => {
-      let relative = timer2.elapsed();
+      const relative = timer2.elapsed();
       return fn(relative);
     },
     reset: () => {
@@ -1869,7 +1838,7 @@ var create = function(easingName, duration, timerSource) {
   };
 };
 var resolveEasing = function(easingName) {
-  let name = easingName.toLowerCase();
+  const name = easingName.toLowerCase();
   for (const [k, v] of Object.entries(easings)) {
     if (k.toLowerCase() === name) {
       console.log("Found: " + k);
@@ -1878,9 +1847,9 @@ var resolveEasing = function(easingName) {
   }
   throw Error(`Easing '${easingName}' not found.`);
 };
-var cos3 = Math.cos;
-var PI = Math.PI;
-var sin3 = Math.sin;
+var getEasings = function() {
+  return Array.from(Object.keys(easings));
+};
 var easeOutBounce = function(x) {
   const n1 = 7.5625;
   const d1 = 2.75;
@@ -1895,60 +1864,24 @@ var easeOutBounce = function(x) {
   }
 };
 var easings = {
-  easeInSine: (x) => {
-    return 1 - cos3(x * PI / 2);
-  },
-  easeOutSine: (x) => {
-    return sin3(x * PI / 2);
-  },
-  easeInQuad: (x) => {
-    return x * x;
-  },
-  easeOutQuad: (x) => {
-    return 1 - (1 - x) * (1 - x);
-  },
-  easeInOutSine: (x) => {
-    return -(cos3(PI * x) - 1) / 2;
-  },
-  easeInOutQuad: (x) => {
-    return x < 0.5 ? 2 * x * x : 1 - pow2(-2 * x + 2, 2) / 2;
-  },
-  easeInCubic: (x) => {
-    return x * x * x;
-  },
-  easeOutCubic: (x) => {
-    return 1 - pow2(1 - x, 3);
-  },
-  easeInQuart: (x) => {
-    return x * x * x * x;
-  },
-  easeOutQuart: (x) => {
-    return 1 - pow2(1 - x, 4);
-  },
-  easeInQuint: (x) => {
-    return x * x * x * x * x;
-  },
-  easeOutQuint: (x) => {
-    return 1 - pow2(1 - x, 5);
-  },
-  easeInExpo: (x) => {
-    return x === 0 ? 0 : pow2(2, 10 * x - 10);
-  },
-  easeOutExpo: (x) => {
-    return x === 1 ? 1 : 1 - pow2(2, -10 * x);
-  },
-  easeInOutQuint: (x) => {
-    return x < 0.5 ? 16 * x * x * x * x * x : 1 - pow2(-2 * x + 2, 5) / 2;
-  },
-  easeInOutExpo: (x) => {
-    return x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? pow2(2, 20 * x - 10) / 2 : (2 - pow2(2, -20 * x + 10)) / 2;
-  },
-  easeInCirc: (x) => {
-    return 1 - sqrt3(1 - pow2(x, 2));
-  },
-  easeOutCirc: (x) => {
-    return sqrt3(1 - pow2(x - 1, 2));
-  },
+  easeInSine: (x) => 1 - cos3(x * PI / 2),
+  easeOutSine: (x) => sin3(x * PI / 2),
+  easeInQuad: (x) => x * x,
+  easeOutQuad: (x) => 1 - (1 - x) * (1 - x),
+  easeInOutSine: (x) => -(cos3(PI * x) - 1) / 2,
+  easeInOutQuad: (x) => x < 0.5 ? 2 * x * x : 1 - pow2(-2 * x + 2, 2) / 2,
+  easeInCubic: (x) => x * x * x,
+  easeOutCubic: (x) => 1 - pow2(1 - x, 3),
+  easeInQuart: (x) => x * x * x * x,
+  easeOutQuart: (x) => 1 - pow2(1 - x, 4),
+  easeInQuint: (x) => x * x * x * x * x,
+  easeOutQuint: (x) => 1 - pow2(1 - x, 5),
+  easeInExpo: (x) => x === 0 ? 0 : pow2(2, 10 * x - 10),
+  easeOutExpo: (x) => x === 1 ? 1 : 1 - pow2(2, -10 * x),
+  easeInOutQuint: (x) => x < 0.5 ? 16 * x * x * x * x * x : 1 - pow2(-2 * x + 2, 5) / 2,
+  easeInOutExpo: (x) => x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? pow2(2, 20 * x - 10) / 2 : (2 - pow2(2, -20 * x + 10)) / 2,
+  easeInCirc: (x) => 1 - sqrt3(1 - pow2(x, 2)),
+  easeOutCirc: (x) => sqrt3(1 - pow2(x - 1, 2)),
   easeInBack: (x) => {
     const c1 = 1.70158;
     const c3 = c1 + 1;
@@ -1959,9 +1892,7 @@ var easings = {
     const c3 = c1 + 1;
     return 1 + c3 * pow2(x - 1, 3) + c1 * pow2(x - 1, 2);
   },
-  easeInOutCirc: (x) => {
-    return x < 0.5 ? (1 - sqrt3(1 - pow2(2 * x, 2))) / 2 : (sqrt3(1 - pow2(-2 * x + 2, 2)) + 1) / 2;
-  },
+  easeInOutCirc: (x) => x < 0.5 ? (1 - sqrt3(1 - pow2(2 * x, 2))) / 2 : (sqrt3(1 - pow2(-2 * x + 2, 2)) + 1) / 2,
   easeInOutBack: (x) => {
     const c1 = 1.70158;
     const c2 = c1 * 1.525;
@@ -1975,17 +1906,13 @@ var easings = {
     const c4 = 2 * PI / 3;
     return x === 0 ? 0 : x === 1 ? 1 : pow2(2, -10 * x) * sin3((x * 10 - 0.75) * c4) + 1;
   },
-  easeInBounce: (x) => {
-    return 1 - easeOutBounce(1 - x);
-  },
+  easeInBounce: (x) => 1 - easeOutBounce(1 - x),
   easeOutBounce,
   easeInOutElastic: (x) => {
     const c5 = 2 * PI / 4.5;
     return x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? -(pow2(2, 20 * x - 10) * sin3((20 * x - 11.125) * c5)) / 2 : pow2(2, -20 * x + 10) * sin3((20 * x - 11.125) * c5) / 2 + 1;
   },
-  easeInOutBounce: (x) => {
-    return x < 0.5 ? (1 - easeOutBounce(1 - 2 * x)) / 2 : (1 + easeOutBounce(2 * x - 1)) / 2;
-  }
+  easeInOutBounce: (x) => x < 0.5 ? (1 - easeOutBounce(1 - 2 * x)) / 2 : (1 + easeOutBounce(2 * x - 1)) / 2
 };
 
 // src/SlidingWindow.ts
@@ -2012,7 +1939,7 @@ var SlidingWindow = class {
   push(v) {
     let idx = this.index;
     this.data[idx++] = v;
-    if (idx == this.size) {
+    if (idx === this.size) {
       this.wrapped = true;
       idx = 0;
     } else
