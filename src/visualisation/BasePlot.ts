@@ -10,9 +10,9 @@ export class BasePlot {
   lastPaint: number;
   maxPaintMs: number;
   textHeight: number;
-  plotPadding: number = 10;
-  showMiddle: boolean = true;
-  showScale: boolean = true;
+  plotPadding = 10;
+  showMiddle = true;
+  showScale = true;
   drawLoop: () => void;
 
   constructor(canvasEl: HTMLCanvasElement) {
@@ -29,15 +29,17 @@ export class BasePlot {
     this.lastPaint = 0;
     this.maxPaintMs = 10; // Don't trigger paint within 10ms
 
-    canvasEl.addEventListener('pointerup', e => {
+    canvasEl.addEventListener('pointerup', () => {
       this.paused = !this.paused;
-      if (this.paused)
+      if (this.paused) {
         canvasEl.classList.add('paused');
-      else
+      } else {
         canvasEl.classList.remove('paused');
+      }
     });
-    const measure = this.canvasEl.getContext('2d')!.measureText('Xy');
-    this.textHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent;
+    const measure = this.canvasEl.getContext('2d')?.measureText('Xy');
+    if (measure === undefined) this.textHeight = 20;
+    else this.textHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent;
   }
 
   pushScale(min: number, max: number) {
@@ -84,7 +86,8 @@ export class BasePlot {
 
   baseDraw() {
     const c = this.canvasEl;
-    const g = c.getContext('2d')!;
+    const g = c.getContext('2d');
+    if (g === null) return;
     const canvasHeight = c.height;
     const canvasWidth = c.width;
 
@@ -111,14 +114,16 @@ export class BasePlot {
     this.lastPaint = performance.now();
   }
 
+  // eslint-disable-next-line
   draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number) {}
 
   repaint() {
     if (this.paused) return;
 
     const elapsed = performance.now() - this.lastPaint;
-    if (elapsed >= this.maxPaintMs)
+    if (elapsed >= this.maxPaintMs) {
       window.requestAnimationFrame(this.drawLoop);
+    }
   }
 
 }

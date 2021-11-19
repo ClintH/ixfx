@@ -5,6 +5,24 @@ var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
+var __accessCheck = (obj, member, msg) => {
+  if (!member.has(obj))
+    throw TypeError("Cannot " + msg);
+};
+var __privateGet = (obj, member, getter) => {
+  __accessCheck(obj, member, "read from private field");
+  return getter ? getter.call(obj) : member.get(obj);
+};
+var __privateAdd = (obj, member, value) => {
+  if (member.has(obj))
+    throw TypeError("Cannot add the same private member more than once");
+  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+};
+var __privateSet = (obj, member, value, setter) => {
+  __accessCheck(obj, member, "write to private field");
+  setter ? setter.call(obj, value) : member.set(obj, value);
+  return value;
+};
 
 // src/geometry/Line.ts
 var Line_exports = {};
@@ -1783,12 +1801,27 @@ __export(Easing_exports, {
 });
 
 // src/util.ts
-var clamp = function(v, min2 = 0, max2 = 1) {
+var clamp = (v, min2 = 0, max2 = 1) => {
   if (v < min2)
     return min2;
   if (v > max2)
     return max2;
   return v;
+};
+var getMinMaxAvg = (data) => {
+  let min2 = Number.MAX_SAFE_INTEGER;
+  let total = 0;
+  let samples = 0;
+  let max2 = Number.MIN_SAFE_INTEGER;
+  for (let i = 0; i < data.length; i++) {
+    if (Number.isNaN(data[i]))
+      continue;
+    min2 = Math.min(data[i], min2);
+    max2 = Math.max(data[i], max2);
+    total += data[i];
+    samples++;
+  }
+  return { min: min2, max: max2, avg: total / samples };
 };
 
 // src/modulation/Easing.ts
@@ -1841,7 +1874,6 @@ var resolveEasing = function(easingName) {
   const name = easingName.toLowerCase();
   for (const [k, v] of Object.entries(easings)) {
     if (k.toLowerCase() === name) {
-      console.log("Found: " + k);
       return v;
     }
   }
@@ -1915,89 +1947,113 @@ var easings = {
   easeInOutBounce: (x) => x < 0.5 ? (1 - easeOutBounce(1 - 2 * x)) / 2 : (1 + easeOutBounce(2 * x - 1)) / 2
 };
 
-// src/SlidingWindow.ts
-var SlidingWindow = class {
-  constructor(size = 5) {
-    this.data = [];
-    this.index = 0;
-    this.length = 0;
-    this.wrapped = false;
-    this.size = size;
-    this.clear(size);
+// src/Lists.ts
+var Lists_exports = {};
+__export(Lists_exports, {
+  Circular: () => Circular,
+  Fifo: () => Fifo,
+  Lifo: () => Lifo
+});
+var _capacity, _pointer;
+var _Circular = class extends Array {
+  constructor(capacity) {
+    super();
+    __privateAdd(this, _capacity, void 0);
+    __privateAdd(this, _pointer, void 0);
+    if (Number.isNaN(capacity))
+      throw Error("capacity is NaN");
+    if (capacity <= 0)
+      throw Error("capacity must be greater than zero");
+    __privateSet(this, _capacity, capacity);
+    __privateSet(this, _pointer, 0);
   }
-  clear(size) {
-    if (size === void 0)
-      size = this.size;
-    this.size = size;
-    this.index = 0;
-    this.length = 0;
-    this.wrapped = false;
-    for (let i = 0; i < size; i++) {
-      this.data[i] = NaN;
-    }
-  }
-  push(v) {
-    let idx = this.index;
-    this.data[idx++] = v;
-    if (idx === this.size) {
-      this.wrapped = true;
-      idx = 0;
-    } else
-      this.length++;
-    this.index = idx;
-  }
-  toArray() {
-    if (!this.wrapped) {
-      return this.data.slice(0, this.length - 1);
-    } else {
-      return this.data.slice();
-    }
-  }
-  average() {
-    let total = 0;
-    let samples = 0;
-    for (let i = 0; i < this.size; i++) {
-      if (isNaN(this.data[i]))
-        continue;
-      total += this.data[i];
-      samples++;
-    }
-    return total / samples;
-  }
-  max() {
-    let max2 = Number.MIN_SAFE_INTEGER;
-    for (let i = 0; i < this.size; i++) {
-      if (isNaN(this.data[i]))
-        continue;
-      max2 = Math.max(this.data[i], max2);
-    }
-    return max2;
-  }
-  min() {
-    let min2 = Number.MAX_SAFE_INTEGER;
-    for (let i = 0; i < this.size; i++) {
-      if (isNaN(this.data[i]))
-        continue;
-      min2 = Math.min(this.data[i], min2);
-    }
-    return min2;
-  }
-  getMinMaxAvg() {
-    let min2 = Number.MAX_SAFE_INTEGER;
-    let total = 0;
-    let samples = 0;
-    let max2 = Number.MIN_SAFE_INTEGER;
-    for (let i = 0; i < this.size; i++) {
-      if (isNaN(this.data[i]))
-        continue;
-      min2 = Math.min(this.data[i], min2);
-      max2 = Math.max(this.data[i], max2);
-      total += this.data[i];
-      samples++;
-    }
-    return { min: min2, max: max2, avg: total / samples };
+  add(thing) {
+    const ca = _Circular.from(this);
+    ca[__privateGet(this, _pointer)] = thing;
+    __privateSet(ca, _capacity, __privateGet(this, _capacity));
+    __privateSet(ca, _pointer, __privateGet(this, _pointer) + 1 === __privateGet(this, _capacity) ? 0 : __privateGet(this, _pointer) + 1);
+    return ca;
   }
 };
+var Circular = _Circular;
+_capacity = new WeakMap();
+_pointer = new WeakMap();
+var _capacity2;
+var _Lifo = class extends Array {
+  constructor(capacity = -1) {
+    super();
+    __privateAdd(this, _capacity2, void 0);
+    __privateSet(this, _capacity2, capacity);
+  }
+  add(thing) {
+    let size, len;
+    if (__privateGet(this, _capacity2) > 0 && this.length >= __privateGet(this, _capacity2)) {
+      size = __privateGet(this, _capacity2);
+      len = __privateGet(this, _capacity2) - 1;
+    } else {
+      size = this.length + 1;
+      len = this.length;
+    }
+    const t2 = Array(size);
+    t2[0] = thing;
+    for (let i = 1; i < len + 1; i++) {
+      t2[i] = this[i - 1];
+    }
+    const a = _Lifo.from(t2);
+    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
+    return a;
+  }
+  peek() {
+    return this[0];
+  }
+  removeLast() {
+    if (this.length === 0)
+      return this;
+    const a = _Lifo.from(this.slice(0, this.length - 1));
+    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
+    return a;
+  }
+  remove() {
+    if (this.length === 0)
+      return this;
+    const a = _Lifo.from(this.slice(1));
+    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
+    return a;
+  }
+};
+var Lifo = _Lifo;
+_capacity2 = new WeakMap();
+var _capacity3;
+var _Fifo = class extends Array {
+  constructor(capacity = -1) {
+    super();
+    __privateAdd(this, _capacity3, void 0);
+    __privateSet(this, _capacity3, capacity);
+  }
+  static create(capacity, data) {
+    const q = new _Fifo(capacity);
+    q.push(...data);
+    return q;
+  }
+  add(thing) {
+    const d = [...this, thing];
+    if (__privateGet(this, _capacity3) > 0 && d.length > __privateGet(this, _capacity3)) {
+      return _Fifo.create(__privateGet(this, _capacity3), d.slice(0, __privateGet(this, _capacity3)));
+    }
+    return _Fifo.create(__privateGet(this, _capacity3), d);
+  }
+  peek() {
+    return this[0];
+  }
+  remove() {
+    if (this.length === 0)
+      return this;
+    const d = this.slice(1);
+    return _Fifo.create(__privateGet(this, _capacity3), d);
+  }
+};
+var Fifo = _Fifo;
+_capacity3 = new WeakMap();
 
 // src/visualisation/BasePlot.ts
 var BasePlot = class {
@@ -2017,15 +2073,19 @@ var BasePlot = class {
     this.labelInset = 5;
     this.lastPaint = 0;
     this.maxPaintMs = 10;
-    canvasEl.addEventListener("pointerup", (e) => {
+    canvasEl.addEventListener("pointerup", () => {
       this.paused = !this.paused;
-      if (this.paused)
+      if (this.paused) {
         canvasEl.classList.add("paused");
-      else
+      } else {
         canvasEl.classList.remove("paused");
+      }
     });
-    const measure = this.canvasEl.getContext("2d").measureText("Xy");
-    this.textHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent;
+    const measure = this.canvasEl.getContext("2d")?.measureText("Xy");
+    if (measure === void 0)
+      this.textHeight = 20;
+    else
+      this.textHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent;
   }
   pushScale(min2, max2) {
     if (min2 > this.scaleMin && this.allowScaleDeflation)
@@ -2067,6 +2127,8 @@ var BasePlot = class {
   baseDraw() {
     const c = this.canvasEl;
     const g = c.getContext("2d");
+    if (g === null)
+      return;
     const canvasHeight = c.height;
     const canvasWidth = c.width;
     const plotHeight = canvasHeight - this.plotPadding - this.plotPadding;
@@ -2090,8 +2152,9 @@ var BasePlot = class {
     if (this.paused)
       return;
     const elapsed = performance.now() - this.lastPaint;
-    if (elapsed >= this.maxPaintMs)
+    if (elapsed >= this.maxPaintMs) {
       window.requestAnimationFrame(this.drawLoop);
+    }
   }
 };
 
@@ -2101,13 +2164,13 @@ var Plot = class extends BasePlot {
     super(canvasEl);
     this.color = "silver";
     this.lineWidth = 3;
-    this.buffer = new SlidingWindow(samples);
+    this.buffer = new Circular(samples);
     this.samples = samples;
   }
   draw(g, plotWidth, plotHeight) {
-    const d = this.buffer.toArray();
+    const d = this.buffer;
     const dataLength = d.length;
-    let { min: min2, max: max2, avg } = this.buffer.getMinMaxAvg();
+    const { min: min2, max: max2, avg } = getMinMaxAvg(d);
     const range = this.pushScale(min2, max2);
     const lineWidth = plotWidth / dataLength;
     let x = this.plotPadding;
@@ -2118,10 +2181,11 @@ var Plot = class extends BasePlot {
     g.strokeStyle = this.color;
     for (let i = 0; i < dataLength; i++) {
       const y = this.map(d[i], this.scaleMin, this.scaleMax, plotHeight, 0) + this.plotPadding;
-      if (i == 0)
+      if (i === 0) {
         g.moveTo(x, y);
-      else
+      } else {
         g.lineTo(x, y);
+      }
       x += lineWidth;
     }
     g.stroke();
@@ -2129,11 +2193,11 @@ var Plot = class extends BasePlot {
     this.drawScale(g, min2, max2, avg, range, plotWidth, plotHeight);
   }
   clear() {
-    this.buffer.clear(this.samples);
+    this.buffer = new Circular(this.samples);
     this.repaint();
   }
   push(v) {
-    this.buffer.push(v);
+    this.buffer = this.buffer.add(v);
     if (this.paused)
       return;
     this.repaint();
@@ -2256,11 +2320,11 @@ export {
   Easing_exports as Easings,
   Envelope_exports as Envelopes,
   Line_exports as Lines,
+  Lists_exports as Lists,
   MultiPath_exports as MultiPaths,
   Path_exports as Paths,
   Plot,
   Point_exports as Points,
-  Rect_exports as Rects,
-  SlidingWindow
+  Rect_exports as Rects
 };
 //# sourceMappingURL=bundle.mjs.map

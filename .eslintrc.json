@@ -74,9 +74,7 @@
             "error",
             "never"
         ],
-        "capitalized-comments": [
-            "error"
-        ],
+ 
         "space-before-blocks": "error",
         "array-bracket-spacing": [
             "error",

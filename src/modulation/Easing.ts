@@ -108,7 +108,6 @@ const resolveEasing = function (easingName: string): EasingFn {
   const name = easingName.toLowerCase();
   for (const [k, v] of Object.entries(easings)) {
     if (k.toLowerCase() === name) {
-      console.log('Found: ' + k);
       return v as EasingFn;
     }
   }

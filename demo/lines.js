@@ -1,4 +1,4 @@
-import {Lines, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from "../dist/bundle.mjs";
+import {Lines, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '../dist/bundle.mjs';
 
 const canvas = document.getElementById('lines');
 
@@ -14,26 +14,26 @@ let m = MultiPaths.fromPaths(l1, l2, b1, b2);
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext('2d');
 
-function clear() {
+const clear = () => {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
+};
 
-function drawCompute(line, where) {
+const drawCompute = (line, where) => {
   const p = Lines.compute(line.a, line.b, where);
   drawDot(p, 3);
-}
+};
 
-function drawDot(pos, size) {
+const drawDot = (pos, size) => {
   ctx.beginPath();
   ctx.fillStyle = 'red';
 
   // x&y for arc is the center of circle
   ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
   ctx.fill();
-}
+};
 
-function drawLine(line) {
+const drawLine = (line) => {
   ctx.strokeStyle = 'black';
   ctx.fillStyle = 'black';
 
@@ -45,16 +45,16 @@ function drawLine(line) {
   ctx.strokeStyle = 'silver';
   Drawing.points(ctx, bboxPts);
   Drawing.pointLabels(ctx, bboxPts);
-}
+};
 
-function drawPath(path, amt) {
+const drawPath = (path, amt) => {
   ctx.strokeStyle = 'black';
   ctx.fillStyle = 'black';
   Drawing.paths(ctx, ...path.segments);
 
   const p = path.compute(amt, true);
   drawDot(p, 3);
-}
+};
 
 
 let amt = 0;
@@ -65,7 +65,7 @@ const draw = function () {
   amt += 0.005;
   if (amt > 1) amt = 0;
   window.requestAnimationFrame(draw);
-}
+};
 window.requestAnimationFrame(draw);
 
 // function drawQuadratic(bezier) {

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lists test</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <script type="module">
+    import {Lists} from "../dist/bundle.mjs";
+
+    const check = (a, b) => {
+      if (a.length !== b.length) throw Error(`Different lengths. Expected ${b.length} Got: ${a.length}`);
+      for (let ai = 0; ai < a.length; ai++) {
+        if (a[ai] !== b[ai]) throw Error(`Index ${ai} expected: ${b[ai]} got: ${a[ai]}`);
+      }
+    }
+
+    const perfCircular = () => {
+      const items = 100 * 1000;
+      console.log(`Circular performance.Items: ${items}`);
+      let s = performance.mark('circular');
+
+      let a = new Lists.Circular(10);
+      for (let i = 0; i < items; i++) {
+        a = a.add('something');
+      }
+      console.log(performance.measure('circular').duration);
+    }
+
+    // circular: 320, fifo: 578
+
+    const perfFifo = () => {
+      const items = 100 * 1000;
+      console.log(`Fifo performance.Items: ${items}`);
+      let s = performance.mark('fifo');
+
+      let a = new Lists.Fifo(10);
+      for (let i = 0; i < items; i++) {
+        a = a.add('something');
+      }
+      console.log(performance.measure('fifo').duration);
+    }
+
+    const perfLifo = () => {
+      const items = 100 * 1000;
+      console.log(`Lifo performance.Items: ${items}`);
+      let s = performance.mark('lifo');
+
+      let a = new Lists.Lifo(10);
+      for (let i = 0; i < items; i++) {
+        a = a.add('something');
+      }
+      console.log(performance.measure('lifo').duration);
+    }
+
+
+    const testCircular = () => {
+      console.log('Circular');
+      let a = new Lists.Circular(5);
+      let b = a.add('test');
+      let c = b;
+      for (let i = 0; i < 15; i++) {
+        c = c.add('test' + i);
+      }
+
+      check(a, []);
+      check(b, ['test']);
+      check(c, ['test14', 'test10', 'test11', 'test12', 'test13']);
+
+      console.log('a', a); // Empty
+      console.log('b', b); //
+      console.log('c', c);
+    }
+
+    const testLifo = () => {
+      console.log('Lifo - Last in first out');
+      let a = new Lists.Lifo(5);
+      let b = a.add('test');
+      let c = b;
+      for (let i = 0; i < 15; i++) {
+        c = c.add('test' + i);
+      }
+      let d = c.remove().remove().add('new1').add('new2');
+
+      console.log('a', a);
+      console.log('b', b);
+      console.log('c', c);
+      console.log('d', d);
+
+
+      check(a, []);
+      check(b, ['test']);
+      check(c, ['test14', 'test13', 'test12', 'test11', 'test10']);
+      check(d, ['new2', 'new1', 'test12', 'test11', 'test10']);
+
+
+      console.log('Unbounded Lifo');
+      let a1 = new Lists.Lifo();
+      for (let i = 0; i < 15; i++) {
+        a1 = a1.add('test' + i);
+      }
+      console.log(a1);
+      check(a1, ['test14', 'test13', 'test12', 'test11', 'test10', 'test9', 'test8', 'test7', 'test6', 'test5', 'test4', 'test3', 'test2', 'test1', 'test0']);
+
+    }
+
+    const testFifo = () => {
+      console.log('Fifo - First in first out');
+      let a = new Lists.Fifo(5);
+      let b = a.add('test');
+      let c = b;
+      for (let i = 0; i < 15; i++) {
+        c = c.add('test' + i);
+      }
+
+      let d = c.remove().remove().add('new1').add('new2');
+      check(a, []);
+      check(b, ['test']);
+      check(c, ['test', 'test0', 'test1', 'test2', 'test3']);
+      check(d, ['test1', 'test2', 'test3', 'new1', 'new2']);
+      console.log('a', a);
+      console.log('b', b);
+      console.log('c', c);
+      console.log('d', d);
+
+
+      console.log('Unbounded fifo');
+      let a1 = new Lists.Fifo();
+      for (let i = 0; i < 15; i++) {
+        a1 = a1.add('test' + i);
+      }
+      check(a1, ['test0', 'test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11', 'test12', 'test13', 'test14']);
+      console.log(a1);
+    }
+
+    testCircular();
+    testLifo();
+    testFifo();
+
+    perfCircular();
+    perfFifo();
+    perfLifo();
+
+  </script>
+</body>
+
+</html>

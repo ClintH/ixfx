@@ -5,6 +5,7 @@
   "module": "dist/bundle.min.mjs",
   "unpkg": "dist/bundle.umd.min.js",
   "exports": "./dist/bundle.mjs",
+  "browsersList": [ ">2% and last 2 versions and not ie 6-11"],
   "type": "module",
   "types": "dist/bundle.d.ts",
   "files": [

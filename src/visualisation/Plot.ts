@@ -1,5 +1,6 @@
-import {SlidingWindow} from "../SlidingWindow.js"
-import {BasePlot} from "./BasePlot.js"
+import * as Lists from '../Lists.js';
+import {getMinMaxAvg} from '../util.js';
+import {BasePlot} from './BasePlot.js';
 
 /**
  * Usage:
@@ -11,21 +12,21 @@ import {BasePlot} from "./BasePlot.js"
  * @extends {BaseGraph}
  */
 export class Plot extends BasePlot {
-  buffer: SlidingWindow;
+  buffer: Lists.Circular<number>;
   samples: number;
-  color: string = 'silver';
-  lineWidth: number = 3;
+  color = 'silver';
+  lineWidth = 3;
 
   constructor(canvasEl: HTMLCanvasElement, samples = 10) {
     super(canvasEl);
-    this.buffer = new SlidingWindow(samples);
+    this.buffer = new Lists.Circular(samples);
     this.samples = samples;
   }
 
   draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number) {
-    const d = this.buffer.toArray(); // copy
+    const d = this.buffer;
     const dataLength = d.length;
-    let {min, max, avg} = this.buffer.getMinMaxAvg();
+    const {min, max, avg} = getMinMaxAvg(d);
 
     const range = this.pushScale(min, max);
     const lineWidth = plotWidth / dataLength;
@@ -37,10 +38,11 @@ export class Plot extends BasePlot {
     g.strokeStyle = this.color;
     for (let i = 0; i < dataLength; i++) {
       const y = this.map(d[i], this.scaleMin, this.scaleMax, plotHeight, 0) + this.plotPadding;
-      if (i == 0)
+      if (i === 0) {
         g.moveTo(x, y);
-      else
+      } else {
         g.lineTo(x, y);
+      }
       x += lineWidth;
     }
     g.stroke();
@@ -52,12 +54,12 @@ export class Plot extends BasePlot {
   }
 
   clear() {
-    this.buffer.clear(this.samples);
+    this.buffer = new Lists.Circular(this.samples);
     this.repaint();
   }
 
   push(v: number) {
-    this.buffer.push(v);
+    this.buffer = this.buffer.add(v);
     if (this.paused) return;
     this.repaint();
   }
