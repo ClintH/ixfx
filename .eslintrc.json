@@ -16,6 +16,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "no-inferrable-types": "never",
         "indent": [
             "error",
             2
