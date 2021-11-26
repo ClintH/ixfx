@@ -1,14 +1,14 @@
 //export type StateChangeCallback = (newState: string, priorState: string) => void;
-
 import {SimpleEventEmitter, Listener} from "./Events.js"
 
-export interface State {
-  [event: string]: string | Listener<StateMachineEventMap> | null;
+/*
+type MappedTypeWithNewProperties<Type> = {
+  [Properties in keyof Type as NewKeyType]: Type[Properties]
 }
-
-export interface Machine {
-  [key: string]: State;
-}
+*/
+// type MachineEventMap<M extends MachineDescription> = {
+//   [Properties in keyof M as ]
+// }
 
 export interface Options {
   debug?: boolean
@@ -25,40 +25,47 @@ export interface StopEvent {
   state: StateName;
 }
 
-interface StateMachineEventMap {
-  '_change': StateChangeEvent,
-  '_stop': StopEvent
+// type Paths<T> = T extends MachineDescription
+//   ? keyof T | {[K in keyof T]: Paths<T[K]['events']>}[keyof T]
+//   : never
+
+type StateMachineEventMap = {
+  'change': StateChangeEvent,
+  'stop': StopEvent
+};
+
+type ValidStates<M extends MachineDescription> = keyof M;
+
+export interface State {
+  [event: string]: string | Listener<StateMachineEventMap> | null;
 }
 
-type ValidStates<M extends Machine> = keyof M;
-
-export type StateEventCallback<M extends Machine> = (event: string, state: ValidStates<M>, params: any, machine: StateMachine<M>) => boolean;
-
-enum RunState {
-  Started,
-  Stopped
+interface MachineDescription {
+  [key: string]: State;
 }
 
-class StateMachine<M extends Machine> extends SimpleEventEmitter<StateMachineEventMap> {
+// export type StateEventCallback<M extends MachineDescription> = (event: string, state: ValidStates<M>, params: any, machine: StateMachine<M>) => boolean;
+
+class StateMachine<M extends MachineDescription> extends SimpleEventEmitter<StateMachineEventMap> {
   #stateName: ValidStates<M>;
   #state: State;
   #debug: boolean;
   #m: M;
-  #runState: RunState;
+  #isDone: boolean;
 
   constructor(initial: ValidStates<M>, m: M, opts: Options = {debug: false}) {
     super();
 
     if (m[initial] === undefined) throw Error(`Machine does not include initial state ${initial}`);
     this.#m = m;
-    this.#runState = RunState.Started;
+    this.#isDone = false;
     this.#debug = opts.debug ?? false;
     this.#stateName = initial as string;
     this.#state = m[initial];
   }
 
-  isStopped() {
-    return this.#runState == RunState.Stopped;
+  isDone() {
+    return this.#isDone;
   }
 
   #setState(newState: ValidStates<M>): boolean {
@@ -70,12 +77,10 @@ class StateMachine<M extends Machine> extends SimpleEventEmitter<StateMachineEve
     this.#stateName = newState;
     this.#state = this.#m[newState];
 
-    this.fireEvent('_change', {newState: newState, priorState: priorState});
+    this.fireEvent('change', {newState: newState, priorState: priorState});
     return true;
   }
 
-
-  //  fire(eventName: string, params?: any): boolean {
   fire(eventName: string, params?: any): boolean {
     let handler = this.#state[eventName];
     if (handler === undefined) {
@@ -86,14 +91,13 @@ class StateMachine<M extends Machine> extends SimpleEventEmitter<StateMachineEve
       // Strings are assumed to be the next state
       return this.#setState(handler as string);
     } else if (handler == null) {
-      this.#runState = RunState.Stopped;
-      this.fireEvent('_stop', {state: this.#stateName});
+      this.#isDone = true;
+      this.fireEvent('stop', {state: this.#stateName});
       return false;
     } else {
       // Call function
-      handler(params);
+      handler(params, this);
       return true;
-      //return (handler as StateEventCallback<M>)(eventName, this.#stateName, params, this);
     }
   }
 }
@@ -119,7 +123,6 @@ let demo = {
 interface ListMachineDefinition {
   [key: string]: State;
 }
-
 
 class ListStateMachine extends StateMachine<ListMachineDefinition> {
   constructor(initial: string, listMachineDef: ListMachineDefinition, opts?: Options) {
@@ -147,35 +150,24 @@ const createListMachine = (list: string[], opts?: Options): ListStateMachine => 
 }
 
 let m = new StateMachine<typeof demo>('delay', demo, {debug: true});
-m.addEventListener('_change', (event) => {
-  const evt = event as StateChangeEvent;
+m.addEventListener('change', (evt) => {
   console.log(`change event handler: ${evt.priorState} -> ${evt.newState}`);
 });
+
 for (let i = 0; i < 10; i++) {
-  console.log(`firing ${i} isStopped: ${m.isStopped()}`);
+  console.log(`firing ${i} isDone: ${m.isDone()}`);
   if (!m.fire('next')) {
     console.log(' -- cannot fire');
   }
 }
-/*
-TODO
-StateMachine events should be the events of the machine that is passed in
-
-Maybe these two are added if one wants to hook into the internals. But it shouldn't generally be necesary
-_change
- _stop
-
-*/
-
 
 let simpleTest = createListMachine(['a', 'b', 'c', 'd', 'e']);
-simpleTest.addEventListener('_change', (event) => {
-  const evt = event as StateChangeEvent;
+simpleTest.addEventListener('change', (evt) => {
   console.log(`change event handler2: ${evt.priorState} -> ${evt.newState}`);
 })
 
 for (let i = 0; i < 10; i++) {
-  console.log(`next ${i} isStopped: ${simpleTest.isStopped()}`);
+  console.log(`next ${i} isDone: ${simpleTest.isDone()}`);
   if (!simpleTest.next()) {
     console.log(' -- no more next');
   }

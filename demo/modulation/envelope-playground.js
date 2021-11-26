@@ -80,7 +80,7 @@ const envStatus = function () {
 
   let p = getPointAlongLine(polyline.array(), v);
   envIndicator.attr({cx: p[0], cy: p[1]});
-
+  window.addEventListener
   window.requestAnimationFrame(envStatus);
 }
 

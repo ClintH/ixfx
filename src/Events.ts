@@ -38,10 +38,10 @@ import {MapMulti} from "./collections/MapMulti.js";
 
 //export type Listener<K extends keyof Events, Events> = (this: any, ev: Events[K]) => any;
 
-type ValidEvents<Events> = keyof Events;
+//type ValidEvents<Events> = keyof Events;
 //type ValidStates<M extends Machine> = keyof M;
-type ValidEventArgs<Events> = Events[keyof Events];
-export type Listener<Events> = (this: any, ev: ValidEventArgs<Events>) => void;
+type ValidEventArgs<K extends keyof Events, Events> = Events[K];
+export type Listener<Events> = (ev: any, sender: SimpleEventEmitter<Events>,) => void;
 
 export class SimpleEventEmitter<Events> {
   #listeners = new MapMulti<Listener<Events>>();
@@ -50,7 +50,7 @@ export class SimpleEventEmitter<Events> {
     const listeners = this.#listeners.get(type);
     if (listeners === undefined) return;
     for (const l of listeners) {
-      l(args);
+      l(args, this);
     }
   }
 
@@ -62,9 +62,10 @@ export class SimpleEventEmitter<Events> {
    * @param {Listener<Events>} listener
    * @memberof SimpleEventEmitter
    */
-  addEventListener<K extends keyof Events>(type: K, listener: Listener<Events>): void {// (this: any, ev: Events[K]) => any): void {
+  addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void {// (this: any, ev: Events[K]) => any): void {
     this.#listeners.add(type, listener);
   }
+  //addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
 
   /**
    * Remove event listener
@@ -102,9 +103,9 @@ class TestEmitter extends SimpleEventEmitter<TestEventMap> {
 
   constructor() {
     super();
-    this.addEventListener('other', (e) => {
-
-    })
+    this.addEventListener('change', (e) => {
+      e.blah;
+    });
   }
 }
 
