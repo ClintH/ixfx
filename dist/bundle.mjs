@@ -1642,31 +1642,26 @@ var fromPaths = function(...paths2) {
 // src/modulation/Envelope.ts
 var Envelope_exports = {};
 __export(Envelope_exports, {
-  EnvelopeStage: () => EnvelopeStage,
-  adsr: () => adsr,
+  Stage: () => Stage,
+  dadsr: () => dadsr,
   stages: () => stages
 });
 
-// src/modulation/AdsrEnvelope.ts
-var adsr = (opts) => {
+// src/modulation/DadsrEnvelope.ts
+var dadsr = (opts) => {
   const { sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0 } = opts;
   if (sustainLevel > 1 || sustainLevel < 0)
     throw Error("sustainLevel must be between 0-1");
   const env = stages(opts);
   const max2 = 1;
-  const attack = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
-  const decay = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
-  const sustain = fromPoints({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
-  const release = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
-  const paths2 = [
-    null,
-    attack,
-    decay,
-    sustain,
-    release
-  ];
+  const paths2 = new Array(5);
+  paths2[Stage.Attack] = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
+  ;
+  paths2[Stage.Decay] = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
+  paths2[Stage.Sustain] = fromPoints({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
+  paths2[Stage.Release] = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
   return Object.freeze({
-    getBeziers: () => [attack, decay, sustain, release],
+    getBeziers: () => [...paths2],
     trigger: () => {
       env.trigger();
     },
@@ -1682,7 +1677,7 @@ var adsr = (opts) => {
     compute: () => {
       const [stage, amt] = env.compute();
       const p = paths2[stage];
-      if (p === null)
+      if (p === null || p === void 0)
         return [stage, 0];
       return [stage, p.compute(amt).y];
     }
@@ -1690,14 +1685,15 @@ var adsr = (opts) => {
 };
 
 // src/modulation/Envelope.ts
-var EnvelopeStage;
-(function(EnvelopeStage2) {
-  EnvelopeStage2[EnvelopeStage2["Stopped"] = 0] = "Stopped";
-  EnvelopeStage2[EnvelopeStage2["Attack"] = 1] = "Attack";
-  EnvelopeStage2[EnvelopeStage2["Decay"] = 2] = "Decay";
-  EnvelopeStage2[EnvelopeStage2["Sustain"] = 3] = "Sustain";
-  EnvelopeStage2[EnvelopeStage2["Release"] = 4] = "Release";
-})(EnvelopeStage || (EnvelopeStage = {}));
+var Stage;
+(function(Stage2) {
+  Stage2[Stage2["Stopped"] = 0] = "Stopped";
+  Stage2[Stage2["Delay"] = 1] = "Delay";
+  Stage2[Stage2["Attack"] = 2] = "Attack";
+  Stage2[Stage2["Decay"] = 3] = "Decay";
+  Stage2[Stage2["Sustain"] = 4] = "Sustain";
+  Stage2[Stage2["Release"] = 5] = "Release";
+})(Stage || (Stage = {}));
 var msRelativeTimer = function() {
   let start = performance.now();
   return {
@@ -1709,9 +1705,26 @@ var msRelativeTimer = function() {
     }
   };
 };
+var stageToText = function(stage) {
+  switch (stage) {
+    case 1:
+      return "Delay";
+    case 2:
+      return "Attack";
+    case 3:
+      return "Decay";
+    case 5:
+      return "Release";
+    case 0:
+      return "Stopped";
+    case 4:
+      return "Sustain";
+  }
+};
 var stages = function(opts = {}) {
   const { looping = false } = opts;
   const { timerSource = msRelativeTimer } = opts;
+  const { delayDuration = 0 } = opts;
   const { attackDuration = 300 } = opts;
   const { decayDuration = 500 } = opts;
   const { releaseDuration = 1e3 } = opts;
@@ -1721,10 +1734,11 @@ var stages = function(opts = {}) {
   const setStage = (newStage) => {
     if (stage == newStage)
       return;
+    console.log("Envelope stage " + stageToText(stage) + " -> " + stageToText(newStage));
     stage = newStage;
     if (stage == 1)
       timer2 = timerSource();
-    else if (stage == 4)
+    else if (stage == 5)
       timer2 = timerSource();
   };
   const compute2 = () => {
@@ -1732,10 +1746,10 @@ var stages = function(opts = {}) {
       return [0, 0];
     if (timer2 == null)
       throw Error("Bug: timer is null");
-    if (stage == 3)
+    if (stage == 4)
       return [stage, 1];
     let elapsed = timer2.elapsed();
-    if (stage == 4) {
+    if (stage == 5) {
       let relative = elapsed / releaseDuration;
       if (relative > 1) {
         if (looping) {
@@ -1747,17 +1761,19 @@ var stages = function(opts = {}) {
       }
       return [stage, relative];
     }
-    if (elapsed <= attackDuration) {
+    if (delayDuration > 0 && elapsed <= delayDuration) {
+      return [stage, elapsed / delayDuration];
+    } else if (elapsed <= attackDuration) {
       return [stage, elapsed / attackDuration];
     } else if (elapsed <= decayDuration + attackDuration) {
-      if (stage == 1)
-        setStage(2);
-      return [stage, (elapsed - attackDuration) / decayDuration];
-    } else {
       if (stage == 2)
         setStage(3);
-      if (!isHeld) {
+      return [stage, (elapsed - attackDuration) / decayDuration];
+    } else {
+      if (stage == 3)
         setStage(4);
+      if (!isHeld) {
+        setStage(5);
       }
       return [stage, 0];
     }
@@ -1771,13 +1787,13 @@ var stages = function(opts = {}) {
     if (stage == 0) {
       setStage(1);
     } else {
-      setStage(3);
+      setStage(4);
     }
   };
   const release = () => {
     if (!isHeld)
       throw Error("Not being held");
-    setStage(4);
+    setStage(5);
   };
   const reset = () => {
     setStage(0);

@@ -5,7 +5,9 @@
   "module": "dist/bundle.min.mjs",
   "unpkg": "dist/bundle.umd.min.js",
   "exports": "./dist/bundle.mjs",
-  "browsersList": [ ">2% and last 2 versions and not ie 6-11"],
+  "browsersList": [
+    ">2% and last 2 versions and not ie 6-11"
+  ],
   "type": "module",
   "types": "dist/bundle.d.ts",
   "files": [
@@ -15,7 +17,7 @@
     "watch": "tsc --watch",
     "clean": "rimraf dist",
     "prepublish": "npm run build",
-    "build": "npm run clean && tsc && npm run bundle",
+    "build": "tsc && npm run bundle",
     "bundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle",
     "develop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle --watch"
   },

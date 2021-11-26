@@ -3,7 +3,7 @@ import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rec
 const canvas = document.getElementById('canvas');
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext('2d');
-
+canvas.addEventListener
 let env = Envelopes.pathEnvelope({looping: false});
 //env.trigger();
 
@@ -25,13 +25,12 @@ const plot = new Plot(document.getElementById('plot'), 500);
 function clear() {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  window.addEventListener
 }
-
 
 const draw = function () {
   clear();
   let [stage, amt] = env.compute();
-
 
   plot.push(amt);
   ctx.fillStyle = 'black';

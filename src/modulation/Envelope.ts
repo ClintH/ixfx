@@ -1,6 +1,6 @@
-import {adsr} from "./AdsrEnvelope";
+import {dadsr} from "./DadsrEnvelope";
 
-export {adsr};
+export {dadsr};
 
 export type StageOpts = {
   /**
@@ -15,6 +15,13 @@ export type StageOpts = {
    * @type {boolean}
    */
   looping?: boolean
+
+  /**
+    * Duration for delay stage
+    * Unit depends on timer source
+    * @type {number}
+    */
+  delayDuration?: number,
   /**
    * Duration for attack stage
    * Unit depends on timer source
@@ -40,12 +47,13 @@ export type StageOpts = {
  * @export
  * @enum {number}
  */
-export enum EnvelopeStage {
+export enum Stage {
   Stopped = 0,
-  Attack = 1,
-  Decay = 2,
-  Sustain = 3,
-  Release = 4
+  Delay = 1,
+  Attack = 2,
+  Decay = 3,
+  Sustain = 4,
+  Release = 5
 }
 
 export type Envelope = {
@@ -75,9 +83,9 @@ export type Envelope = {
   /**
    * Computes the value of the envelope (0-1) and also returns the current stage
    *
-   * @returns {[EnvelopeStage, number]}
+   * @returns {[Stage, number]}
    */
-  compute(): [EnvelopeStage, number]
+  compute(): [Stage, number]
 }
 
 type Timer = {
@@ -122,20 +130,22 @@ const tickRelativeTimer = function (): Timer {
 /**
  * Returns a name for a given numerical envelope stage
  *
- * @param {EnvelopeStage} stage
+ * @param {Stage} stage
  * @returns {string} Name of stage
  */
-const stageToText = function (stage: EnvelopeStage): string {
+const stageToText = function (stage: Stage): string {
   switch (stage) {
-    case EnvelopeStage.Attack:
+    case Stage.Delay:
+      return 'Delay';
+    case Stage.Attack:
       return 'Attack';
-    case EnvelopeStage.Decay:
+    case Stage.Decay:
       return 'Decay';
-    case EnvelopeStage.Release:
+    case Stage.Release:
       return 'Release';
-    case EnvelopeStage.Stopped:
+    case Stage.Stopped:
       return 'Stopped';
-    case EnvelopeStage.Sustain:
+    case Stage.Sustain:
       return 'Sustain'
   }
 }
@@ -149,59 +159,62 @@ const stageToText = function (stage: EnvelopeStage): string {
 export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
   const {looping = false} = opts;
   const {timerSource = msRelativeTimer} = opts;
+  const {delayDuration = 0} = opts;
   const {attackDuration = 300} = opts;
   const {decayDuration = 500} = opts;
   const {releaseDuration = 1000} = opts;
 
-  let stage = EnvelopeStage.Stopped;
+  let stage = Stage.Stopped;
   let timer: Timer | null = null;
   let isHeld = false;
 
-  const setStage = (newStage: EnvelopeStage) => {
+  const setStage = (newStage: Stage) => {
     if (stage == newStage) return;
-    //console.log('Envelope stage ' + stageToText(stage) + ' -> ' + stageToText(newStage));
+    console.log('Envelope stage ' + stageToText(stage) + ' -> ' + stageToText(newStage));
     stage = newStage;
-    if (stage == EnvelopeStage.Attack)
+    if (stage == Stage.Delay)
       timer = timerSource();
-    else if (stage == EnvelopeStage.Release)
+    else if (stage == Stage.Release)
       timer = timerSource();
   }
 
-  const compute = (): [EnvelopeStage, number] => {
-    if (stage == EnvelopeStage.Stopped) return [0, 0];
+  const compute = (): [Stage, number] => {
+    if (stage == Stage.Stopped) return [0, 0];
     if (timer == null) throw Error('Bug: timer is null');
 
-    if (stage == EnvelopeStage.Sustain) return [stage, 1];
+    if (stage == Stage.Sustain) return [stage, 1];
 
     let elapsed = timer.elapsed();
 
-    if (stage == EnvelopeStage.Release) {
+    if (stage == Stage.Release) {
       let relative = elapsed / releaseDuration;
       if (relative > 1) {
         if (looping) {
           // Trigger, even if originally held
           trigger();
         } else {
-          setStage(EnvelopeStage.Stopped);
+          setStage(Stage.Stopped);
         }
         return [stage, 0];
       }
       return [stage, relative];
     }
 
-
-    if (elapsed <= attackDuration) {
+    if (delayDuration > 0 && elapsed <= delayDuration) {
+      // With delay
+      return [stage, elapsed / delayDuration];
+    } else if (elapsed <= attackDuration) {
       // Within attack
       return [stage, elapsed / attackDuration];
     } else if (elapsed <= decayDuration + attackDuration) {
       // Within decay
-      if (stage == EnvelopeStage.Attack) setStage(EnvelopeStage.Decay);
+      if (stage == Stage.Attack) setStage(Stage.Decay);
       return [stage, (elapsed - attackDuration) / decayDuration];
     } else {
       // Within sustain
-      if (stage == EnvelopeStage.Decay) setStage(EnvelopeStage.Sustain);
+      if (stage == Stage.Decay) setStage(Stage.Sustain);
       if (!isHeld) {
-        setStage(EnvelopeStage.Release);
+        setStage(Stage.Release);
       }
       return [stage, 0];
     }
@@ -209,25 +222,25 @@ export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
 
   const trigger = () => {
     isHeld = false;
-    setStage(EnvelopeStage.Attack);
+    setStage(Stage.Delay);
   }
 
   const hold = () => {
     isHeld = true;
-    if (stage == EnvelopeStage.Stopped) {
-      setStage(EnvelopeStage.Attack);
+    if (stage == Stage.Stopped) {
+      setStage(Stage.Delay);
     } else {
-      setStage(EnvelopeStage.Sustain);
+      setStage(Stage.Sustain);
     }
   }
 
   const release = () => {
     if (!isHeld) throw Error('Not being held');
-    setStage(EnvelopeStage.Release);
+    setStage(Stage.Release);
   }
 
   const reset = () => {
-    setStage(EnvelopeStage.Stopped);
+    setStage(Stage.Stopped);
   }
 
   reset();
