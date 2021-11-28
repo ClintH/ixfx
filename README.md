@@ -12,6 +12,11 @@ Continually rebuild and bundle Typescript sources into dist/bundle.mjs:
 npm run develop
 ```
 
+Build Typescript sources, running a single file with source map support:
+```
+npm run run -- build/StateMachine.js
+```
+
 # Credits
 
 Bundles

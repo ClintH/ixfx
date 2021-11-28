@@ -40,8 +40,9 @@ import {MapMulti} from "./collections/MapMulti.js";
 
 //type ValidEvents<Events> = keyof Events;
 //type ValidStates<M extends Machine> = keyof M;
-type ValidEventArgs<K extends keyof Events, Events> = Events[K];
-export type Listener<Events> = (ev: any, sender: SimpleEventEmitter<Events>,) => void;
+//type ValidEventArgs<K extends keyof Events, Events> = Events[K];
+
+export type Listener<Events> = (ev: any, sender: SimpleEventEmitter<Events>) => void;
 
 export class SimpleEventEmitter<Events> {
   #listeners = new MapMulti<Listener<Events>>();
@@ -73,8 +74,8 @@ export class SimpleEventEmitter<Events> {
    * @param {Listener<Events>} listener
    * @memberof SimpleEventEmitter
    */
-  removeEventListener(listener: Listener<Events>): void {
-    this.#listeners.deleteDeep(listener);
+  removeEventListener<K extends keyof Events>(type: K, listener: Listener<Events>): void {
+    this.#listeners.delete(type, listener);
   }
 
   /**

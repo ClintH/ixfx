@@ -18,3 +18,7 @@ export const getMinMaxAvg = (data: Array<any>): {min: number; max: number; avg: 
   }
   return {min: min, max: max, avg: total / samples};
 };
+
+export const sleep = (milliseconds: number): Promise<any> => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}

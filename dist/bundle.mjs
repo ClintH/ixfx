@@ -5,24 +5,6 @@ var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __accessCheck = (obj, member, msg) => {
-  if (!member.has(obj))
-    throw TypeError("Cannot " + msg);
-};
-var __privateGet = (obj, member, getter) => {
-  __accessCheck(obj, member, "read from private field");
-  return getter ? getter.call(obj) : member.get(obj);
-};
-var __privateAdd = (obj, member, value) => {
-  if (member.has(obj))
-    throw TypeError("Cannot add the same private member more than once");
-  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-};
-var __privateSet = (obj, member, value, setter) => {
-  __accessCheck(obj, member, "write to private field");
-  setter ? setter.call(obj, value) : member.set(obj, value);
-  return value;
-};
 
 // src/geometry/Line.ts
 var Line_exports = {};
@@ -1970,42 +1952,37 @@ __export(Lists_exports, {
   Fifo: () => Fifo,
   Lifo: () => Lifo
 });
-var _capacity, _pointer;
-var _Circular = class extends Array {
+var Circular = class extends Array {
+  #capacity;
+  #pointer;
   constructor(capacity) {
     super();
-    __privateAdd(this, _capacity, void 0);
-    __privateAdd(this, _pointer, void 0);
     if (Number.isNaN(capacity))
       throw Error("capacity is NaN");
     if (capacity <= 0)
       throw Error("capacity must be greater than zero");
-    __privateSet(this, _capacity, capacity);
-    __privateSet(this, _pointer, 0);
+    this.#capacity = capacity;
+    this.#pointer = 0;
   }
   add(thing) {
-    const ca = _Circular.from(this);
-    ca[__privateGet(this, _pointer)] = thing;
-    __privateSet(ca, _capacity, __privateGet(this, _capacity));
-    __privateSet(ca, _pointer, __privateGet(this, _pointer) + 1 === __privateGet(this, _capacity) ? 0 : __privateGet(this, _pointer) + 1);
+    const ca = Circular.from(this);
+    ca[this.#pointer] = thing;
+    ca.#capacity = this.#capacity;
+    ca.#pointer = this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
     return ca;
   }
 };
-var Circular = _Circular;
-_capacity = new WeakMap();
-_pointer = new WeakMap();
-var _capacity2;
-var _Lifo = class extends Array {
+var Lifo = class extends Array {
+  #capacity;
   constructor(capacity = -1) {
     super();
-    __privateAdd(this, _capacity2, void 0);
-    __privateSet(this, _capacity2, capacity);
+    this.#capacity = capacity;
   }
   add(thing) {
     let size, len;
-    if (__privateGet(this, _capacity2) > 0 && this.length >= __privateGet(this, _capacity2)) {
-      size = __privateGet(this, _capacity2);
-      len = __privateGet(this, _capacity2) - 1;
+    if (this.#capacity > 0 && this.length >= this.#capacity) {
+      size = this.#capacity;
+      len = this.#capacity - 1;
     } else {
       size = this.length + 1;
       len = this.length;
@@ -2015,8 +1992,8 @@ var _Lifo = class extends Array {
     for (let i = 1; i < len + 1; i++) {
       t2[i] = this[i - 1];
     }
-    const a = _Lifo.from(t2);
-    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
+    const a = Lifo.from(t2);
+    a.#capacity = this.#capacity;
     return a;
   }
   peek() {
@@ -2025,38 +2002,35 @@ var _Lifo = class extends Array {
   removeLast() {
     if (this.length === 0)
       return this;
-    const a = _Lifo.from(this.slice(0, this.length - 1));
-    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
+    const a = Lifo.from(this.slice(0, this.length - 1));
+    a.#capacity = this.#capacity;
     return a;
   }
   remove() {
     if (this.length === 0)
       return this;
-    const a = _Lifo.from(this.slice(1));
-    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
+    const a = Lifo.from(this.slice(1));
+    a.#capacity = this.#capacity;
     return a;
   }
 };
-var Lifo = _Lifo;
-_capacity2 = new WeakMap();
-var _capacity3;
-var _Fifo = class extends Array {
+var Fifo = class extends Array {
+  #capacity;
   constructor(capacity = -1) {
     super();
-    __privateAdd(this, _capacity3, void 0);
-    __privateSet(this, _capacity3, capacity);
+    this.#capacity = capacity;
   }
   static create(capacity, data) {
-    const q = new _Fifo(capacity);
+    const q = new Fifo(capacity);
     q.push(...data);
     return q;
   }
   add(thing) {
     const d = [...this, thing];
-    if (__privateGet(this, _capacity3) > 0 && d.length > __privateGet(this, _capacity3)) {
-      return _Fifo.create(__privateGet(this, _capacity3), d.slice(0, __privateGet(this, _capacity3)));
+    if (this.#capacity > 0 && d.length > this.#capacity) {
+      return Fifo.create(this.#capacity, d.slice(0, this.#capacity));
     }
-    return _Fifo.create(__privateGet(this, _capacity3), d);
+    return Fifo.create(this.#capacity, d);
   }
   peek() {
     return this[0];
@@ -2065,18 +2039,27 @@ var _Fifo = class extends Array {
     if (this.length === 0)
       return this;
     const d = this.slice(1);
-    return _Fifo.create(__privateGet(this, _capacity3), d);
+    return Fifo.create(this.#capacity, d);
   }
 };
-var Fifo = _Fifo;
-_capacity3 = new WeakMap();
 
 // src/visualisation/BasePlot.ts
 var BasePlot = class {
+  canvasEl;
+  precision;
+  paused;
+  scaleMin;
+  scaleMax;
+  allowScaleDeflation;
+  labelInset;
+  lastPaint;
+  maxPaintMs;
+  textHeight;
+  plotPadding = 10;
+  showMiddle = true;
+  showScale = true;
+  drawLoop;
   constructor(canvasEl) {
-    this.plotPadding = 10;
-    this.showMiddle = true;
-    this.showScale = true;
     if (canvasEl === void 0)
       throw Error("canvasEl undefined");
     this.canvasEl = canvasEl;
@@ -2176,10 +2159,12 @@ var BasePlot = class {
 
 // src/visualisation/Plot.ts
 var Plot = class extends BasePlot {
+  buffer;
+  samples;
+  color = "silver";
+  lineWidth = 3;
   constructor(canvasEl, samples = 10) {
     super(canvasEl);
-    this.color = "silver";
-    this.lineWidth = 3;
     this.buffer = new Circular(samples);
     this.samples = samples;
   }
