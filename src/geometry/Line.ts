@@ -1,6 +1,7 @@
 import * as Rects from './Rect.js';
 import {Point, pointToString} from './Point.js';
 import {guard as guardPoint} from './Point.js';
+import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 
 export type Line = Path & {
@@ -23,16 +24,9 @@ export function length(a: Point, b: Point): number {
 }
 
 
-function guardPercent(t: number, name = 'Parameter') {
-  if (isNaN(t)) throw Error(`${name} is NaN`);
-  if (t < 0) throw Error(`${name} must be above or equal to 0`);
-  if (t > 1) throw Error(`${name} must be below or equal to 1`);
-}
-
 export function compute(a: Point, b: Point, t: number): Point {
   guardPoint(a, 'a');
   guardPoint(b, 'b');
-  if (t > 1) debugger;
   guardPercent(t, 't');
 
   const d = length(a, b);
@@ -71,6 +65,8 @@ export function fromNumbers(x1: number, y1: number, x2: number, y2: number): Lin
 }
 
 export function fromPoints(a: Point, b: Point): Line {
+  guardPoint(a, 'a');
+  guardPoint(b, 'b');
   a = Object.freeze(a);
   b = Object.freeze(b);
   return Object.freeze({

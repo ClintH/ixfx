@@ -1,4 +1,4 @@
-import * as Lists from '../Lists.js';
+import * as Lists from '../collections/Lists.js';
 import {getMinMaxAvg} from '../util.js';
 import {BasePlot} from './BasePlot.js';
 

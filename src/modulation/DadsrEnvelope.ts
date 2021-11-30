@@ -36,9 +36,10 @@ export type DadsrEnvelopeOpts = Envelope.StageOpts & {
  * @param {DadsrEnvelopeOpts} opts Options for envelope
  * @returns {Readonly<Envelope.Envelope>} Envelope
  */
-export const dadsr = (opts: DadsrEnvelopeOpts): Readonly<Envelope.Envelope> => {
+export const dadsr = (opts: DadsrEnvelopeOpts = {}): Readonly<Envelope.Envelope> => {
 
   const {sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0} = opts;
+
   if (sustainLevel > 1 || sustainLevel < 0) throw Error('sustainLevel must be between 0-1');
 
   // Create envelope
@@ -71,6 +72,32 @@ export const dadsr = (opts: DadsrEnvelopeOpts): Readonly<Envelope.Envelope> => {
       const p = paths[stage];
       if (p === null || p === undefined) return [stage, 0];
       return [stage, p.compute(amt).y];
+    },
+    getStage: (stage: Envelope.Stage): {duration: number, amp: number} => {
+      let tmp = (stage === Envelope.Stage.Sustain) ? {duration: -1} : env.getStage(stage);
+      let s = {...tmp, amp: -1};
+
+      switch (stage) {
+        case Envelope.Stage.Attack:
+          s.amp = 1;
+          break;
+        case Envelope.Stage.Decay:
+          s.amp = 1;
+          break;
+        case Envelope.Stage.Delay:
+          s.amp = -1;
+          break;
+        case Envelope.Stage.Release:
+          s.amp = 0;
+          break;
+        case Envelope.Stage.Stopped:
+          s.amp = 0;
+          break;
+        case Envelope.Stage.Sustain:
+          s.amp = sustainLevel;
+          break;
+      }
+      return s;
     }
   });
 };

@@ -1,6 +1,6 @@
 import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '../../dist/bundle.mjs';
 
-let env = Envelopes.adsr();
+let env = Envelopes.dadsr();
 
 let draw = null;
 let polyline = null;
@@ -15,8 +15,10 @@ const setSlider = function (id, v) {
 };
 
 const setSliders = function (idBase, v) {
-  if (idBase !== 'decay')
+  // Update corresponding amp slider for stages that need it
+  if (idBase !== 'decay' && idBase !== 'delay')
     setSlider(idBase + 'Amp', v[1]);
+
   setSlider(idBase + 'Period', v[0]);
 };
 
@@ -26,10 +28,11 @@ const setup = function () {
   envIndicator = draw.circle(20);
 
   // Sync UI to start settings
-  setSliders('attack', env.get(EnvelopeGenerator.Stages.Attack));
-  setSliders('decay', env.get(EnvelopeGenerator.Stages.Decay));
-  setSliders('sustain', env.get(EnvelopeGenerator.Stages.Sustain));
-  setSliders('release', env.get(EnvelopeGenerator.Stages.Release));
+  setSliders('delay', env.get(Envelopes.Stage.Delay));
+  setSliders('attack', env.get(EnvelopeGenerator.Stage.Attack));
+  setSliders('decay', env.get(EnvelopeGenerator.Stage.Decay));
+  setSliders('sustain', env.get(EnvelopeGenerator.Stage.Sustain));
+  setSliders('release', env.get(EnvelopeGenerator.Stage.Release));
   document.getElementById('looping').checked = env.looping;
 
   // Redraw line on window resize
@@ -46,6 +49,10 @@ const setup = function () {
   // Listen for changes in widgets, update envelope and drawing
   document.getElementById('looping').addEventListener('input', (evt) => {
     env.looping = evt.target.checked;
+  });
+  document.getElementById('delaySliders').addEventListener('input', () => {
+    env.set(EnvelopeGenerator.Stages.Delay, getRange('delayPeriod'));
+    updateLine(polyline);
   });
   document.getElementById('attackSliders').addEventListener('input', () => {
     env.set(EnvelopeGenerator.Stages.Attack, getRange('attackAmp'), getRange('attackPeriod'));
@@ -171,13 +178,14 @@ const updateLine = function (l) {
 
 const dumpEnv = function (env) {
   let helper = {
-    attack: env.periods[0],
-    attackLevel: env.levels[0],
-    decay: env.periods[1],
-    sustain: env.periods[2],
-    sustainLevel: env.levels[2],
-    release: env.periods[3],
-    releaseLevel: env.levels[3],
+    delay: env.periods[0],
+    attack: env.periods[1],
+    attackLevel: env.levels[1],
+    decay: env.periods[2],
+    sustain: env.periods[3],
+    sustainLevel: env.levels[3],
+    release: env.periods[4],
+    releaseLevel: env.levels[4],
     looping: env.looping
   }
   console.log(helper);
@@ -185,6 +193,7 @@ const dumpEnv = function (env) {
 const createLine = function () {
   // Create a line with number of segments we need
   const l = draw.polyline([
+    [0, 0],
     [0, 0],
     [0, 0],
     [0, 0],

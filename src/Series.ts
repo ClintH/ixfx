@@ -42,13 +42,12 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    * @returns {Series<V>} A new series that wraps the iterator
    * @memberof Series
    */
-  static from<V>(vIter: Iterable<V> | AsyncIterable<V>, delayMs: number = 100, intervalMs: number = 10): Series<V> {
+  static fromIterable<V>(vIter: Iterable<V> | AsyncIterable<V>, delayMs: number = 100, intervalMs: number = 10): Series<V> {
     if (vIter === undefined) throw Error(`vIter is undefined`);
     if (delayMs < 0) throw Error(`delayMs must be at least zero`);
     if (intervalMs < 0) throw Error(`delayMs must be at least zero`);
 
     let s = new Series<V>();
-
     setTimeout(async () => {
       if (s.cancelled) return;
       try {
@@ -67,38 +66,39 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
   }
 
   /**
-   * Creates a series from an async iterable collection
+   * Creates a series from an event handler
    *
    * @static
-   * @template V
-   * @param {AsyncIterable<V>} vIter Asynchronous iterable collection
-   * @param {number} [delayMs=100] Delay in millis before data starts getting pulled from iterator
-   * @param {number} [intervalMs=10] Interval in millis between each attempt at pulling data from
-   * @returns {Series<V>}
+   * @param {EventTarget} source
+   * @param {string} eventType
+   * @returns
    * @memberof Series
    */
-
-  /*
-  static fromAsync<V>(vIter: AsyncIterable<V>, delayMs: number = 100, intervalMs: number = 10): Series<V> {
-    if (vIter === undefined) throw Error(`vIter is undefined`);
-    if (delayMs < 0) throw Error(`delayMs must be at least zero`);
-    if (intervalMs < 0) throw Error(`delayMs must be at least zero`);
-
-    let s = new Series<V>();
-
-    setTimeout(async () => {
-      if (s.cancelled) return;
-      for await (const v of vIter) {
-        if (s.cancelled) return;
-        s.push(v);
-        await sleep(intervalMs);
-      }
-      s.#setDone();
-    }, delayMs);
-
+  static fromEvent(source: EventTarget, eventType: string) {
+    const s = new Series<any>();
+    s.mergeEvent(source, eventType);
     return s;
   }
-  */
+
+  mergeEvent(source: EventTarget, eventType: string) {
+    if (source === undefined) throw Error('source is undefined');
+    if (eventType === undefined) throw Error('eventType is undefined');
+
+    const s = this;
+    const handler = (evt: any) => {
+      console.log(`Series.mergeEventSource: event ${eventType} sending: ${JSON.stringify(evt)}`);
+      s.push(evt);
+    };
+
+    source.addEventListener(eventType, handler);
+    s.addEventListener('cancel', () => {
+      try {
+        source.removeEventListener(eventType, handler);
+      } catch (err) {
+        console.log(err as string);
+      }
+    });
+  }
 
   /**
    * Sets the done state to true. Once 'done' no more data can be pushed 
@@ -188,7 +188,7 @@ const testFromIter = () => {
 
   let received = 0;
 
-  const series = Series.from<number>(numbers, delay, interval);
+  const series = Series.fromIterable<number>(numbers, delay, interval);
   series.addEventListener('data', (ev: number) => {
     console.log(` testFromIter event handler: ${ev}`);
     received++;

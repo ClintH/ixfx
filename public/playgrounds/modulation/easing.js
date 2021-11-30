@@ -1,4 +1,4 @@
-import {Plot, Easings} from '../../dist/bundle.mjs';
+import {Plot, Easings} from '../../../dist/bundle.mjs';
 
 const overviewEl = document.getElementById('overview');
 const timeInputEl = document.getElementById('timeInput');
@@ -13,7 +13,7 @@ focusPlotter.showMiddle = false;
 
 const easings = new Map();
 
-const setOverviewMode =(name) => {
+const setOverviewMode = (name) => {
   if (name === undefined) {
     overviewMode = true;
     focusEasing = null;
@@ -52,7 +52,7 @@ const setup = (time) => {
     const e = {
       plotter: plotter,
       name: name,
-      instance:Easings.timer(name, time)
+      instance: Easings.timer(name, time)
     };
     if (focusEasing !== null && name === focusEasing.name) focusEasing = e;
     easings.set(name, e);
@@ -60,7 +60,7 @@ const setup = (time) => {
     p.addEventListener('click', (e) => {
       setOverviewMode(name);
       e.stopPropagation();
-    });    
+    });
   }
 };
 
@@ -108,11 +108,11 @@ const loop = () => {
   if (!overviewMode) {
     const amt = focusEasing.instance.compute();
     const isDone = focusEasing.instance.isDone();
-    
+
     if (!isDone) focusPlotter.push(amt);
-    
+
     document.getElementById('easingColour').style.opacity = amt;
-    document.getElementById('thing').style.transform = `translate(${Math.floor(amt*380)}px)`;
+    document.getElementById('thing').style.transform = `translate(${Math.floor(amt * 380)}px)`;
   } else {
     for (const [name, ease] of easings) {
       const amt = ease.instance.compute();

@@ -18,5 +18,5 @@ import {Plot} from './visualisation/Plot.js';
 import * as Drawing from './visualisation/Drawing.js';
 export {Plot, Drawing};
 
-import * as Lists from './Lists.js';
+import * as Lists from './collections/Lists.js';
 export {Lists};

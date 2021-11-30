@@ -89,9 +89,13 @@ var pointToString = function(p) {
 };
 var guard = function(p, name = "Point") {
   if (p === void 0)
-    throw Error(`${name} is undefined`);
+    throw Error(`Parameter '${name}' is undefined. Expected {x,y}`);
   if (p === null)
-    throw Error(`${name} is null`);
+    throw Error(`Parameter '${name}' is null. Expected {x,y}`);
+  if (typeof p.x === "undefined")
+    throw Error(`Parameter '${name}.x' is undefined. Expected {x,y}`);
+  if (typeof p.y === "undefined")
+    throw Error(`Parameter '${name}.y' is undefined. Expected {x,y}`);
 };
 var toArray = function(p) {
   return [p.x, p.y];
@@ -103,6 +107,20 @@ var scale = function(a, x, y = void 0) {
   if (y === void 0)
     y = x;
   return { x: a.x * x, y: a.y * y };
+};
+
+// src/Guards.ts
+var percent = (t2, name = "?") => {
+  if (isNaN(t2))
+    throw Error(`Parameter '${name}' is NaN`);
+  if (t2 < 0)
+    throw Error(`Parameter '${name}' must be above or equal to 0`);
+  if (t2 > 1)
+    throw Error(`Parameter '${name}' must be below or equal to 1`);
+};
+var array = (t2, name = "?") => {
+  if (!Array.isArray(t2))
+    throw Error(`Parameter '${name}' is expected to be an array'`);
 };
 
 // src/geometry/Line.ts
@@ -118,29 +136,19 @@ function length(a, b) {
     return Math.hypot(x, y);
   }
 }
-function guardPercent(t2, name = "Parameter") {
-  if (isNaN(t2))
-    throw Error(`${name} is NaN`);
-  if (t2 < 0)
-    throw Error(`${name} must be above or equal to 0`);
-  if (t2 > 1)
-    throw Error(`${name} must be below or equal to 1`);
-}
 function compute(a, b, t2) {
   guard(a, "a");
   guard(b, "b");
-  if (t2 > 1)
-    debugger;
-  guardPercent(t2, "t");
+  percent(t2, "t");
   const d = length(a, b);
   const d2 = d * (1 - t2);
   const x = b.x - d2 * (b.x - a.x) / d;
   const y = b.y - d2 * (b.y - a.y) / d;
   return { x, y };
 }
-function bbox(...points2) {
-  const x = points2.map((p) => p.x);
-  const y = points2.map((p) => p.y);
+function bbox(...points) {
+  const x = points.map((p) => p.x);
+  const y = points.map((p) => p.y);
   const xMin = Math.min(...x);
   const xMax = Math.max(...x);
   const yMin = Math.min(...y);
@@ -156,6 +164,8 @@ function fromNumbers(x1, y1, x2, y2) {
   return fromPoints(a, b);
 }
 function fromPoints(a, b) {
+  guard(a, "a");
+  guard(b, "b");
   a = Object.freeze(a);
   b = Object.freeze(b);
   return Object.freeze({
@@ -249,21 +259,21 @@ var utils = {
     }
     return sqrt(l);
   },
-  compute: function(t2, points2, _3d) {
+  compute: function(t2, points, _3d) {
     if (t2 === 0) {
-      points2[0].t = 0;
-      return points2[0];
+      points[0].t = 0;
+      return points[0];
     }
-    const order = points2.length - 1;
+    const order = points.length - 1;
     if (t2 === 1) {
-      points2[order].t = 1;
-      return points2[order];
+      points[order].t = 1;
+      return points[order];
     }
     const mt = 1 - t2;
-    let p = points2;
+    let p = points;
     if (order === 0) {
-      points2[0].t = t2;
-      return points2[0];
+      points[0].t = t2;
+      return points[0];
     }
     if (order === 1) {
       const ret = {
@@ -299,7 +309,7 @@ var utils = {
       }
       return ret;
     }
-    const dCpts = JSON.parse(JSON.stringify(points2));
+    const dCpts = JSON.parse(JSON.stringify(points));
     while (dCpts.length > 1) {
       for (let i = 0; i < dCpts.length - 1; i++) {
         dCpts[i] = {
@@ -315,8 +325,8 @@ var utils = {
     dCpts[0].t = t2;
     return dCpts[0];
   },
-  computeWithRatios: function(t2, points2, ratios, _3d) {
-    const mt = 1 - t2, r = ratios, p = points2;
+  computeWithRatios: function(t2, points, ratios, _3d) {
+    const mt = 1 - t2, r = ratios, p = points;
     let f1 = r[0], f2 = r[1], f3 = r[2], f4 = r[3], d;
     f1 *= mt;
     f2 *= t2;
@@ -355,9 +365,9 @@ var utils = {
       };
     }
   },
-  derive: function(points2, _3d) {
+  derive: function(points, _3d) {
     const dpoints = [];
-    for (let p = points2, d = p.length, c = d - 1; d > 1; d--, c--) {
+    for (let p = points, d = p.length, c = d - 1; d > 1; d--, c--) {
       const list = [];
       for (let j = 0, dpt; j < c; j++) {
         dpt = {
@@ -410,8 +420,8 @@ var utils = {
     }
     return s;
   },
-  pointsToString: function(points2) {
-    return "[" + points2.map(utils.pointToString).join(", ") + "]";
+  pointsToString: function(points) {
+    return "[" + points.map(utils.pointToString).join(", ") + "]";
   },
   copy: function(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -563,19 +573,19 @@ var utils = {
     }
     return { min: min2, mid: (min2 + max2) / 2, max: max2, size: max2 - min2 };
   },
-  align: function(points2, line2) {
+  align: function(points, line2) {
     const tx = line2.p1.x, ty = line2.p1.y, a = -atan2(line2.p2.y - ty, line2.p2.x - tx), d = function(v) {
       return {
         x: (v.x - tx) * cos(a) - (v.y - ty) * sin(a),
         y: (v.x - tx) * sin(a) + (v.y - ty) * cos(a)
       };
     };
-    return points2.map(d);
+    return points.map(d);
   },
-  roots: function(points2, line2) {
+  roots: function(points, line2) {
     line2 = line2 || { p1: { x: 0, y: 0 }, p2: { x: 1, y: 0 } };
-    const order = points2.length - 1;
-    const aligned = utils.align(points2, line2);
+    const order = points.length - 1;
+    const aligned = utils.align(points, line2);
     const reduce = function(t2) {
       return 0 <= t2 && t2 <= 1;
     };
@@ -669,10 +679,10 @@ var utils = {
     }
     return { k, r, dk, adk };
   },
-  inflections: function(points2) {
-    if (points2.length < 4)
+  inflections: function(points) {
+    if (points.length < 4)
       return [];
-    const p = utils.align(points2, { p1: points2[0], p2: points2.slice(-1)[0] }), a = p[2].x * p[1].y, b = p[3].x * p[1].y, c = p[1].x * p[2].y, d = p[3].x * p[2].y, v1 = 18 * (-3 * a + 2 * b + 3 * c - d), v2 = 18 * (3 * a - b - 3 * c), v3 = 18 * (c - a);
+    const p = utils.align(points, { p1: points[0], p2: points.slice(-1)[0] }), a = p[2].x * p[1].y, b = p[3].x * p[1].y, c = p[1].x * p[2].y, d = p[3].x * p[2].y, v1 = 18 * (-3 * a + 2 * b + 3 * c - d), v2 = 18 * (3 * a - b - 3 * c), v3 = 18 * (c - a);
     if (utils.approximately(v1, 0)) {
       if (!utils.approximately(v2, 0)) {
         let t2 = -v3 / v2;
@@ -873,7 +883,7 @@ var Bezier = class {
       }
     }
     const _3d = this._3d = !higher && (len === 9 || len === 12) || coords && coords[0] && typeof coords[0].z !== "undefined";
-    const points2 = this.points = [];
+    const points = this.points = [];
     for (let idx = 0, step = _3d ? 3 : 2; idx < len; idx += step) {
       var point = {
         x: args[idx],
@@ -882,14 +892,14 @@ var Bezier = class {
       if (_3d) {
         point.z = args[idx + 2];
       }
-      points2.push(point);
+      points.push(point);
     }
-    const order = this.order = points2.length - 1;
+    const order = this.order = points.length - 1;
     const dims = this.dims = ["x", "y"];
     if (_3d)
       dims.push("z");
     this.dimlen = dims.length;
-    const aligned = utils.align(points2, { p1: points2[0], p2: points2[order] });
+    const aligned = utils.align(points, { p1: points[0], p2: points[order] });
     this._linear = !aligned.some((p) => abs2(p.y) > 1e-4);
     this._lut = [];
     this._t1 = 0;
@@ -975,8 +985,8 @@ var Bezier = class {
     this.computedirection();
   }
   computedirection() {
-    const points2 = this.points;
-    const angle = utils.angle(points2[0], points2[this.order], points2[1]);
+    const points = this.points;
+    const angle = utils.angle(points[0], points[this.order], points[1]);
     this.clockwise = angle > 0;
   }
   length() {
@@ -1314,14 +1324,14 @@ var Bezier = class {
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
     const v = [this.offset(0, 10), this.offset(1, 10)];
-    const points2 = this.points;
+    const points = this.points;
     const np = [];
     const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
     if (!o) {
       throw new Error("cannot scale this curve. Try reducing it first.");
     }
     [0, 1].forEach(function(t2) {
-      const p = np[t2 * order] = utils.copy(points2[t2 * order]);
+      const p = np[t2 * order] = utils.copy(points[t2 * order]);
       p.x += (t2 ? r2 : r1) * v[t2].n.x;
       p.y += (t2 ? r2 : r1) * v[t2].n.y;
     });
@@ -1332,14 +1342,14 @@ var Bezier = class {
         const p = np[t2 * order];
         const d2 = this.derivative(t2);
         const p2 = { x: p.x + d2.x, y: p.y + d2.y };
-        np[t2 + 1] = utils.lli4(p, p2, o, points2[t2 + 1]);
+        np[t2 + 1] = utils.lli4(p, p2, o, points[t2 + 1]);
       });
       return new Bezier(np);
     }
     [0, 1].forEach(function(t2) {
       if (order === 2 && !!t2)
         return;
-      var p = points2[t2 + 1];
+      var p = points[t2 + 1];
       var ov = {
         x: p.x - o.x,
         y: p.y - o.y
@@ -1569,21 +1579,35 @@ var getEnd = function(path) {
 var MultiPath_exports = {};
 __export(MultiPath_exports, {
   fromPaths: () => fromPaths,
-  setSegment: () => setSegment
+  guardContinuous: () => guardContinuous,
+  setSegment: () => setSegment,
+  toString: () => toString2
 });
-var setSegment = function(multiPath, index, path) {
+var setSegment = (multiPath, index, path) => {
   let existing = multiPath.segments;
   existing[index] = path;
   return fromPaths(...existing);
 };
-var fromPaths = function(...paths2) {
-  let lastPos = getEnd(paths2[0]);
-  for (let i = 1; i < paths2.length; i++) {
-    let start = getStart(paths2[i]);
-    if (!Point_exports.equals(start, lastPos))
-      throw Error("Path index " + i + " does not start at prior path end. Start: " + start.x + "," + start.y + " expected: " + lastPos.x + "," + lastPos.y + "");
-    lastPos = getEnd(paths2[i]);
+var compute2 = (paths2, t2, useWidth, dimensions) => {
+  if (dimensions === void 0) {
+    dimensions = computeDimensions(paths2);
   }
+  const expected = t2 * (useWidth ? dimensions.totalWidth : dimensions.totalLength);
+  let soFar = 0;
+  let l = useWidth ? dimensions.widths : dimensions.lengths;
+  for (let i = 0; i < l.length; i++) {
+    if (soFar + l[i] >= expected) {
+      let relative = expected - soFar;
+      let amt = relative / l[i];
+      if (amt > 1)
+        amt = 1;
+      return paths2[i].compute(amt);
+    } else
+      soFar += l[i];
+  }
+  return { x: 0, y: 0 };
+};
+var computeDimensions = (paths2) => {
   let widths = paths2.map((l) => l.bbox().width);
   let lengths = paths2.map((l) => l.length());
   let totalLength = 0;
@@ -1592,32 +1616,33 @@ var fromPaths = function(...paths2) {
     totalLength += lengths[i];
   for (let i = 0; i < widths.length; i++)
     totalWidth += widths[i];
+  return { totalLength, totalWidth, widths, lengths };
+};
+var boundingBox = (paths2) => {
+  throw Error("Not yet implemented");
+  return fromTopLeft({ x: 0, y: 0 }, 10, 10);
+};
+var toString2 = (paths2) => {
+  return paths2.map((p) => p.toString()).join(", ");
+};
+var guardContinuous = (paths2) => {
+  let lastPos = getEnd(paths2[0]);
+  for (let i = 1; i < paths2.length; i++) {
+    let start = getStart(paths2[i]);
+    if (!Point_exports.equals(start, lastPos))
+      throw Error("Path index " + i + " does not start at prior path end. Start: " + start.x + "," + start.y + " expected: " + lastPos.x + "," + lastPos.y + "");
+    lastPos = getEnd(paths2[i]);
+  }
+};
+var fromPaths = (...paths2) => {
+  guardContinuous(paths2);
+  const dims = computeDimensions(paths2);
   return Object.freeze({
     segments: paths2,
-    length: () => totalLength,
-    compute: (t2, useWidth = false) => {
-      const expected = t2 * (useWidth ? totalWidth : totalLength);
-      let soFar = 0;
-      let l = useWidth ? widths : lengths;
-      for (let i = 0; i < l.length; i++) {
-        if (soFar + l[i] >= expected) {
-          let relative = expected - soFar;
-          let amt = relative / l[i];
-          if (amt > 1)
-            amt = 1;
-          return paths2[i].compute(amt);
-        } else
-          soFar += l[i];
-      }
-      return { x: 0, y: 0 };
-    },
-    bbox: () => {
-      return fromTopLeft({ x: 0, y: 0 }, 10, 10);
-    },
-    toString: () => {
-      let s = paths2.map((p) => p.toString()).join(", ");
-      return s;
-    }
+    length: () => dims.totalLength,
+    compute: (t2, useWidth = false) => compute2(paths2, t2, useWidth, dims),
+    bbox: () => boundingBox(paths2),
+    toString: () => toString2(paths2)
   });
 };
 
@@ -1630,7 +1655,7 @@ __export(Envelope_exports, {
 });
 
 // src/modulation/DadsrEnvelope.ts
-var dadsr = (opts) => {
+var dadsr = (opts = {}) => {
   const { sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0 } = opts;
   if (sustainLevel > 1 || sustainLevel < 0)
     throw Error("sustainLevel must be between 0-1");
@@ -1662,6 +1687,31 @@ var dadsr = (opts) => {
       if (p === null || p === void 0)
         return [stage, 0];
       return [stage, p.compute(amt).y];
+    },
+    getStage: (stage) => {
+      let tmp = stage === Stage.Sustain ? { duration: -1 } : env.getStage(stage);
+      let s = { ...tmp, amp: -1 };
+      switch (stage) {
+        case Stage.Attack:
+          s.amp = 1;
+          break;
+        case Stage.Decay:
+          s.amp = 1;
+          break;
+        case Stage.Delay:
+          s.amp = -1;
+          break;
+        case Stage.Release:
+          s.amp = 0;
+          break;
+        case Stage.Stopped:
+          s.amp = 0;
+          break;
+        case Stage.Sustain:
+          s.amp = sustainLevel;
+          break;
+      }
+      return s;
     }
   });
 };
@@ -1723,7 +1773,21 @@ var stages = function(opts = {}) {
     else if (stage == 5)
       timer2 = timerSource();
   };
-  const compute2 = () => {
+  const getStage = (stage2) => {
+    switch (stage2) {
+      case 2:
+        return { duration: attackDuration };
+      case 3:
+        return { duration: decayDuration };
+      case 1:
+        return { duration: delayDuration };
+      case 5:
+        return { duration: releaseDuration };
+      default:
+        throw Error(`Cannot get unknown stage ${stage2}`);
+    }
+  };
+  const compute3 = () => {
     if (stage == 0)
       return [0, 0];
     if (timer2 == null)
@@ -1786,7 +1850,8 @@ var stages = function(opts = {}) {
     reset,
     release,
     hold,
-    compute: compute2
+    compute: compute3,
+    getStage
   });
 };
 
@@ -1945,7 +2010,7 @@ var easings = {
   easeInOutBounce: (x) => x < 0.5 ? (1 - easeOutBounce(1 - 2 * x)) / 2 : (1 + easeOutBounce(2 * x - 1)) / 2
 };
 
-// src/Lists.ts
+// src/collections/Lists.ts
 var Lists_exports = {};
 __export(Lists_exports, {
   Circular: () => Circular,
@@ -2208,31 +2273,28 @@ var Plot = class extends BasePlot {
 // src/visualisation/Drawing.ts
 var Drawing_exports = {};
 __export(Drawing_exports, {
+  connectedPoints: () => connectedPoints,
   line: () => line,
   paths: () => paths,
   pointLabels: () => pointLabels,
-  points: () => points,
-  pointsEnclosed: () => pointsEnclosed,
   quadraticBezier: () => quadraticBezier
 });
-function paths(ctx, ...pathsToDraw) {
+function paths(ctx, pathsToDraw, opts = {}) {
   guardCtx(ctx);
-  if (Array.isArray(pathsToDraw[0]))
-    return paths(ctx, ...pathsToDraw[0]);
   for (let i = 0; i < pathsToDraw.length; i++) {
     let p = pathsToDraw[i];
     if (p.a && p.b && p.quadratic)
-      quadraticBezier(p, ctx, true);
+      quadraticBezier(ctx, p, opts);
     else if (p.a && p.b)
-      line(p, ctx);
+      line(ctx, p, opts);
   }
 }
-function points(ctx, ...pts) {
+function connectedPoints(ctx, pts, opts = {}) {
   guardCtx(ctx);
+  array(pts);
+  const loop = opts.loop ?? false;
   if (pts.length == 0)
     return;
-  if (Array.isArray(pts[0]))
-    return points(ctx, ...pts[0]);
   for (let i = 0; i < pts.length; i++)
     guard(pts[i], "Index " + i);
   ctx.beginPath();
@@ -2240,32 +2302,20 @@ function points(ctx, ...pts) {
   for (let i = 1; i < pts.length; i++) {
     ctx.lineTo(pts[i].x, pts[i].y);
   }
+  if (loop)
+    ctx.lineTo(pts[0].x, pts[0].y);
+  if (opts.strokeStyle)
+    ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
 }
-function pointsEnclosed(ctx, ...pts) {
+function pointLabels(ctx, pts, opts = {}) {
   guardCtx(ctx);
   if (pts.length == 0)
     return;
-  if (Array.isArray(pts[0]))
-    return pointsEnclosed(ctx, ...pts[0]);
   for (let i = 0; i < pts.length; i++)
     guard(pts[i], "Index " + i);
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) {
-    ctx.lineTo(pts[i].x, pts[i].y);
-  }
-  ctx.lineTo(pts[0].x, pts[0].y);
-  ctx.stroke();
-}
-function pointLabels(ctx, ...pts) {
-  guardCtx(ctx);
-  if (pts.length == 0)
-    return;
-  if (Array.isArray(pts[0]))
-    return pointLabels(ctx, ...pts[0]);
-  for (let i = 0; i < pts.length; i++)
-    guard(pts[i], "Index " + i);
+  if (opts.fillStyle)
+    ctx.fillStyle = opts.fillStyle;
   for (let i = 0; i < pts.length; i++) {
     ctx.fillText(i.toString(), pts[i].x, pts[i].y);
   }
@@ -2274,35 +2324,52 @@ function guardCtx(ctx) {
   if (ctx === void 0)
     throw Error("ctx undefined");
 }
-function drawDot(pos, size, ctx, fillStyle = "red") {
+function drawDot(ctx, pos, opts) {
+  const size = opts.size ?? 10;
+  let filled = opts.filled ?? false;
+  const outlined = opts.outlined ?? false;
+  if (!filled && !outlined)
+    filled = true;
   ctx.beginPath();
-  ctx.strokeStyle = fillStyle;
   ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
-  ctx.stroke();
+  if (opts.fillStyle) {
+    ctx.fillStyle = opts.fillStyle;
+  }
+  if (filled)
+    ctx.fill();
+  if (opts.strokeStyle) {
+    ctx.strokeStyle = opts.strokeStyle;
+  }
+  if (outlined)
+    ctx.stroke();
 }
-function quadraticBezier(line2, ctx, debug = false) {
+function quadraticBezier(ctx, line2, opts) {
   guardCtx(ctx);
+  const debug = opts.debug ?? false;
   const h = line2.quadratic;
   const ss = ctx.strokeStyle;
   if (debug) {
-    ctx.strokeStyle = "whitesmoke";
-    points(ctx, line2.a, h, line2.b);
+    connectedPoints(ctx, [line2.a, h, line2.b], { strokeStyle: "silver" });
     ctx.strokeStyle = ss;
   }
   ctx.beginPath();
   ctx.moveTo(line2.a.x, line2.a.y);
   ctx.quadraticCurveTo(h.x, h.y, line2.b.x, line2.b.y);
+  if (opts.strokeStyle)
+    ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
   if (debug) {
+    ctx.fillStyle = "black";
     ctx.fillText("a", line2.a.x + 5, line2.a.y);
     ctx.fillText("b", line2.b.x + 5, line2.b.y);
     ctx.fillText("h", h.x + 5, h.y);
-    drawDot(h, 5, ctx);
-    drawDot(line2.a, 5, ctx, "black");
-    drawDot(line2.b, 5, ctx, "black");
+    drawDot(ctx, h, { size: 5 });
+    drawDot(ctx, line2.a, { size: 5, fillStyle: "black" });
+    drawDot(ctx, line2.b, { size: 5, fillStyle: "black" });
   }
 }
-function line(line2, ctx, debug = false) {
+function line(ctx, line2, opts = {}) {
+  const debug = opts.debug ?? false;
   guardCtx(ctx);
   ctx.beginPath();
   ctx.moveTo(line2.a.x, line2.a.y);
@@ -2310,8 +2377,8 @@ function line(line2, ctx, debug = false) {
   if (debug) {
     ctx.fillText("a", line2.a.x, line2.a.y);
     ctx.fillText("b", line2.b.x, line2.b.y);
-    drawDot(line2.a, 5, ctx, "black");
-    drawDot(line2.b, 5, ctx, "black");
+    drawDot(ctx, line2.a, { size: 5, strokeStyle: "black" });
+    drawDot(ctx, line2.b, { size: 5, strokeStyle: "black" });
   }
   ctx.stroke();
 }

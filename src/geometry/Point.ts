@@ -6,8 +6,10 @@ export const pointToString = function (p: Point): string {
 }
 
 export const guard = function (p: Point, name = 'Point') {
-  if (p === undefined) throw Error(`${name} is undefined`);
-  if (p === null) throw Error(`${name} is null`);
+  if (p === undefined) throw Error(`Parameter '${name}' is undefined. Expected {x,y}`);
+  if (p === null) throw Error(`Parameter '${name}' is null. Expected {x,y}`);
+  if (typeof (p.x) === "undefined") throw Error(`Parameter '${name}.x' is undefined. Expected {x,y}`);
+  if (typeof (p.y) === "undefined") throw Error(`Parameter '${name}.y' is undefined. Expected {x,y}`);
 }
 
 export const toArray = function (p: Point): number[] {

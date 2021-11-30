@@ -57,6 +57,8 @@ export enum Stage {
 }
 
 export type Envelope = {
+  getStage: (stage: Stage) => {duration: number}
+
   /**
    * Trigger the envelope, with no hold
    *
@@ -178,6 +180,21 @@ export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
       timer = timerSource();
   }
 
+  const getStage = (stage: Stage): {duration: number} => {
+    switch (stage) {
+      case Stage.Attack:
+        return {duration: attackDuration}
+      case Stage.Decay:
+        return {duration: decayDuration}
+      case Stage.Delay:
+        return {duration: delayDuration}
+      case Stage.Release:
+        return {duration: releaseDuration}
+      default:
+        throw Error(`Cannot get unknown stage ${stage}`);
+    }
+  }
+
   const compute = (): [Stage, number] => {
     if (stage == Stage.Stopped) return [0, 0];
     if (timer == null) throw Error('Bug: timer is null');
@@ -250,6 +267,7 @@ export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
     reset: reset,
     release: release,
     hold: hold,
-    compute: compute
+    compute: compute,
+    getStage: getStage
   });
 }

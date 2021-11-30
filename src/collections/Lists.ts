@@ -16,10 +16,10 @@
  * @template V
  */
 class Circular<V> extends Array {
-  #capacity:number;
-  #pointer:number;
- 
-  constructor(capacity:number) {
+  #capacity: number;
+  #pointer: number;
+
+  constructor(capacity: number) {
     super();
     if (Number.isNaN(capacity)) throw Error('capacity is NaN');
     if (capacity <= 0) throw Error('capacity must be greater than zero');
@@ -27,12 +27,12 @@ class Circular<V> extends Array {
     this.#pointer = 0;
   }
 
-  add(thing:V):Circular<V> {
+  add(thing: V): Circular<V> {
     const ca = Circular.from(this) as Circular<V>;
     ca[this.#pointer] = thing;
-    ca.#capacity= this.#capacity;
-    ca.#pointer = this.#pointer +1 === this.#capacity ? 0 : this.#pointer+1;
-    return ca;    
+    ca.#capacity = this.#capacity;
+    ca.#pointer = this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
+    return ca;
   }
 }
 
@@ -47,8 +47,8 @@ class Circular<V> extends Array {
  * @template V
  */
 class Lifo<V> extends Array {
-  #capacity:number;
-  
+  #capacity: number;
+
   /**
   * Create Lifo array.
   * @param {number} capacity Use <=0 for unlimited size
@@ -59,38 +59,38 @@ class Lifo<V> extends Array {
     this.#capacity = capacity;
   }
 
-  add(thing:V):Lifo<V> {
+  add(thing: V): Lifo<V> {
     let size, len;
     if (this.#capacity > 0 && this.length >= this.#capacity) {
       size = this.#capacity;
-      len = this.#capacity-1;
+      len = this.#capacity - 1;
     } else {
-      size = this.length +1;
+      size = this.length + 1;
       len = this.length;
     }
-    
+
     const t = Array(size);
     t[0] = thing;
-    for (let i=1;i<len+1;i++) {
-      t[i] = this[i-1];
+    for (let i = 1; i < len + 1; i++) {
+      t[i] = this[i - 1];
     }
     const a = Lifo.from(t) as Lifo<V>;
     a.#capacity = this.#capacity;
     return a;
   }
 
-  peek():V {
+  peek(): V {
     return this[0];
   }
 
-  removeLast():Lifo<V> { 
+  removeLast(): Lifo<V> {
     if (this.length === 0) return this;
-    const a = Lifo.from(this.slice(0, this.length-1)) as Lifo<V>;
+    const a = Lifo.from(this.slice(0, this.length - 1)) as Lifo<V>;
     a.#capacity = this.#capacity;
     return a;
   }
 
-  remove():Lifo<V> {
+  remove(): Lifo<V> {
     if (this.length === 0) return this;
     const a = Lifo.from(this.slice(1)) as Lifo<V>;
     a.#capacity = this.#capacity;
@@ -107,7 +107,7 @@ class Lifo<V> extends Array {
  * @template V
  */
 class Fifo<V> extends Array {
-  #capacity:number;
+  #capacity: number;
   /**
    * Create fifo.
    * @param {number} capacity Use <=0 for unlimited size
@@ -118,29 +118,28 @@ class Fifo<V> extends Array {
     this.#capacity = capacity;
   }
 
-  static create<V>(capacity:number, data:Array<V>):Fifo<V> {
+  static create<V>(capacity: number, data: Array<V>): Fifo<V> {
     const q = new Fifo<V>(capacity);
     q.push(...data);
     return q;
   }
 
-  add(thing:V):Fifo<V> {
+  add(thing: V): Fifo<V> {
     const d = [...this, thing];
     if (this.#capacity > 0 && d.length > this.#capacity) {
       return Fifo.create(this.#capacity, d.slice(0, this.#capacity));
     } return Fifo.create(this.#capacity, d);
   }
 
-  peek():V {
+  peek(): V {
     return this[0];
   }
 
-  remove():Fifo<V> {
+  remove(): Fifo<V> {
     if (this.length === 0) return this;
     const d = this.slice(1);
     return Fifo.create(this.#capacity, d);
   }
 }
-
 
 export {Circular, Lifo, Fifo};
