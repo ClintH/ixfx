@@ -1,5 +1,5 @@
 build
-
+build-tests
 # Logs
 logs
 *.log

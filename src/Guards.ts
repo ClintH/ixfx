@@ -7,3 +7,7 @@ export const percent = (t: number, name = '?'): void => {
 export const array = (t: any, name = '?'): void => {
   if (!Array.isArray(t)) throw Error(`Parameter '${name}' is expected to be an array'`);
 }
+
+export function defined<T>(argument: T | undefined): argument is T {
+  return argument !== undefined
+}

@@ -1,9 +1,34 @@
 var __defProp = Object.defineProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __export = (target, all) => {
-  __markAsModule(target);
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+var __accessCheck = (obj, member, msg) => {
+  if (!member.has(obj))
+    throw TypeError("Cannot " + msg);
+};
+var __privateGet = (obj, member, getter) => {
+  __accessCheck(obj, member, "read from private field");
+  return getter ? getter.call(obj) : member.get(obj);
+};
+var __privateAdd = (obj, member, value) => {
+  if (member.has(obj))
+    throw TypeError("Cannot add the same private member more than once");
+  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+};
+var __privateSet = (obj, member, value, setter) => {
+  __accessCheck(obj, member, "write to private field");
+  setter ? setter.call(obj, value) : member.set(obj, value);
+  return value;
+};
+var __privateMethod = (obj, member, method) => {
+  __accessCheck(obj, member, "access private method");
+  return method;
 };
 
 // src/geometry/Line.ts
@@ -20,65 +45,23 @@ __export(Line_exports, {
 // src/geometry/Rect.ts
 var Rect_exports = {};
 __export(Rect_exports, {
-  RectCorner: () => RectCorner,
   fromCenter: () => fromCenter,
   fromTopLeft: () => fromTopLeft,
-  rectFromPoints: () => rectFromPoints
+  getCenter: () => getCenter,
+  getCorners: () => getCorners,
+  guard: () => guard2
 });
-var RectCorner;
-(function(RectCorner2) {
-  RectCorner2[RectCorner2["TopLeft"] = 0] = "TopLeft";
-  RectCorner2[RectCorner2["TopRight"] = 1] = "TopRight";
-  RectCorner2[RectCorner2["BottomRight"] = 2] = "BottomRight";
-  RectCorner2[RectCorner2["BottomLeft"] = 3] = "BottomLeft";
-})(RectCorner || (RectCorner = {}));
-var rectFromPoints = function(...pts) {
-  if (pts.length != 4)
-    throw Error("Expected four points");
-  const width = Math.abs(pts[2].x - pts[3].x);
-  const height = Math.abs(pts[3].y - pts[0].y);
-  pts = pts.map((p) => Object.freeze(p));
-  return Object.freeze({
-    width,
-    height,
-    corners: pts
-  });
-};
-var fromCenter = function(origin, width, height) {
-  guardDim(width, "width");
-  guardDim(height, "height");
-  let halfW = width / 2;
-  let halfH = height / 2;
-  let pts = [];
-  pts.push({ x: origin.x - halfW, y: origin.y - halfH });
-  pts.push({ x: origin.x + halfW, y: origin.y - halfH });
-  pts.push({ x: origin.x + halfW, y: origin.y + halfH });
-  pts.push({ x: origin.x - halfW, y: origin.y + halfH });
-  return rectFromPoints(...pts);
-};
-var guardDim = function(d, name = "Dimension") {
-  if (isNaN(d))
-    throw Error(`${name} is NaN`);
-  if (d < 0)
-    throw Error(`${name} cannot be negative`);
-};
-var fromTopLeft = function(origin, width, height) {
-  guardDim(width, "width");
-  guardDim(height, "height");
-  let pts = [origin];
-  pts.push({ x: origin.x + width, y: origin.y });
-  pts.push({ x: origin.x + width, y: origin.y + height });
-  pts.push({ x: origin.x, y: origin.y + height });
-  return rectFromPoints(...pts);
-};
 
 // src/geometry/Point.ts
 var Point_exports = {};
 __export(Point_exports, {
+  diff: () => diff,
   equals: () => equals,
+  from: () => from,
   guard: () => guard,
+  multiply: () => multiply,
   pointToString: () => pointToString,
-  scale: () => scale,
+  sum: () => sum,
   toArray: () => toArray
 });
 var pointToString = function(p) {
@@ -96,17 +79,119 @@ var guard = function(p, name = "Point") {
     throw Error(`Parameter '${name}.x' is undefined. Expected {x,y}`);
   if (typeof p.y === "undefined")
     throw Error(`Parameter '${name}.y' is undefined. Expected {x,y}`);
+  if (Number.isNaN(p.x))
+    throw Error(`Parameter '${name}.x' is NaN`);
+  if (Number.isNaN(p.y))
+    throw Error(`Parameter '${name}.y' is NaN`);
 };
+function isPoint(p) {
+  if (p.x === void 0)
+    return false;
+  if (p.y === void 0)
+    return false;
+  return true;
+}
 var toArray = function(p) {
   return [p.x, p.y];
 };
 var equals = function(a, b) {
   return a.x == b.x && a.y == b.y;
 };
-var scale = function(a, x, y = void 0) {
-  if (y === void 0)
-    y = x;
-  return { x: a.x * x, y: a.y * y };
+function from(xOrArray, y) {
+  if (Array.isArray(xOrArray)) {
+    if (xOrArray.length !== 2)
+      throw Error("Expected array of length two, got " + xOrArray.length);
+    return {
+      x: xOrArray[0],
+      y: xOrArray[1]
+    };
+  } else {
+    if (y === void 0)
+      throw Error("y is undefined");
+    if (Number.isNaN(xOrArray))
+      throw Error("x is NaN");
+    if (Number.isNaN(y))
+      throw Error("y is NaN");
+    return { x: xOrArray, y };
+  }
+}
+var diff = function(a, b) {
+  guard(a, "a");
+  guard(b, "b");
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y
+  };
+};
+var sum = function(a, b) {
+  guard(a, "a");
+  guard(b, "b");
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y
+  };
+};
+function multiply(a, bOrX, y) {
+  guard(a, "a");
+  if (typeof bOrX == "number") {
+    if (typeof y === "undefined")
+      y = 1;
+    return { x: a.x * bOrX, y: a.y * y };
+  } else if (isPoint(bOrX)) {
+    guard(bOrX, "b");
+    return {
+      x: a.x * bOrX.x,
+      y: a.y * bOrX.y
+    };
+  } else
+    throw Error("Invalid arguments");
+}
+
+// src/geometry/Rect.ts
+var fromCenter = function(origin, width, height) {
+  guard(origin, "origin");
+  guardDim(width, "width");
+  guardDim(height, "height");
+  let halfW = width / 2;
+  let halfH = height / 2;
+  return { x: origin.x - halfW, y: origin.y - halfH, width, height };
+};
+var guardDim = function(d, name = "Dimension") {
+  if (d === void 0)
+    throw Error(`${name} is undefined`);
+  if (isNaN(d))
+    throw Error(`${name} is NaN`);
+  if (d < 0)
+    throw Error(`${name} cannot be negative`);
+};
+var guard2 = function(rect, name = "Rect") {
+  if (rect === void 0)
+    throw Error(`{$name} undefined`);
+  guardDim(rect.x, name + ".x");
+  guardDim(rect.y, name + ".y");
+  guardDim(rect.width, name + ".width");
+  guardDim(rect.height, name + ".height");
+};
+var fromTopLeft = function(origin, width, height) {
+  guardDim(width, "width");
+  guardDim(height, "height");
+  guard(origin, "origin");
+  return { x: origin.x, y: origin.y, width, height };
+};
+var getCorners = function(rect) {
+  guard2(rect);
+  let pts = [{ x: rect.x, y: rect.y }];
+  pts.push({ x: rect.x + rect.width, y: rect.y });
+  pts.push({ x: rect.x + rect.width, y: rect.y + rect.height });
+  pts.push({ x: rect.x, y: rect.y + rect.height });
+  return pts;
+};
+var getCenter = function(rect) {
+  guard2(rect);
+  return {
+    x: rect.x + rect.width / 2,
+    y: rect.y + rect.height / 2
+  };
 };
 
 // src/Guards.ts
@@ -122,6 +207,9 @@ var array = (t2, name = "?") => {
   if (!Array.isArray(t2))
     throw Error(`Parameter '${name}' is expected to be an array'`);
 };
+function defined(argument) {
+  return argument !== void 0;
+}
 
 // src/geometry/Line.ts
 function length(a, b) {
@@ -392,12 +480,12 @@ var utils = {
   },
   length: function(derivativeFn) {
     const z = 0.5, len = utils.Tvalues.length;
-    let sum = 0;
+    let sum2 = 0;
     for (let i = 0, t2; i < len; i++) {
       t2 = z * utils.Tvalues[i] + z;
-      sum += utils.Cvalues[i] * utils.arcfn(t2, derivativeFn);
+      sum2 += utils.Cvalues[i] * utils.arcfn(t2, derivativeFn);
     }
-    return z * sum;
+    return z * sum2;
   },
   map: function(v, ds, de, ts, te) {
     const d1 = de - ds, d2 = te - ts, v2 = v - ds, r = v2 / d1;
@@ -839,11 +927,11 @@ var PolyBezier = class {
     return bbox2;
   }
   offset(d) {
-    const offset = [];
+    const offset2 = [];
     this.curves.forEach(function(v) {
-      offset.push(...v.offset(d));
+      offset2.push(...v.offset(d));
     });
-    return new PolyBezier(offset);
+    return new PolyBezier(offset2);
   }
 };
 
@@ -1630,7 +1718,7 @@ var guardContinuous = (paths2) => {
   for (let i = 1; i < paths2.length; i++) {
     let start = getStart(paths2[i]);
     if (!Point_exports.equals(start, lastPos))
-      throw Error("Path index " + i + " does not start at prior path end. Start: " + start.x + "," + start.y + " expected: " + lastPos.x + "," + lastPos.y + "");
+      throw Error("Path index " + i + " does not start at prior path end. Start: " + start.x + "," + start.y + " expected: " + lastPos.x + "," + lastPos.y);
     lastPos = getEnd(paths2[i]);
   }
 };
@@ -1644,6 +1732,613 @@ var fromPaths = (...paths2) => {
     bbox: () => boundingBox(paths2),
     toString: () => toString2(paths2)
   });
+};
+
+// src/geometry/Grid.ts
+var Grid_exports = {};
+__export(Grid_exports, {
+  BoundsLogic: () => BoundsLogic,
+  CardinalDirection: () => CardinalDirection,
+  WrapLogic: () => WrapLogic,
+  cellCornerRect: () => cellCornerRect,
+  cellEquals: () => cellEquals,
+  cellKeyString: () => cellKeyString,
+  cellMiddle: () => cellMiddle,
+  getCell: () => getCell,
+  getLine: () => getLine,
+  getSquarePerimeter: () => getSquarePerimeter,
+  getVectorFromCardinal: () => getVectorFromCardinal,
+  guard: () => guard3,
+  neighbours: () => neighbours,
+  offset: () => offset,
+  offsetStepsByCol: () => offsetStepsByCol,
+  offsetStepsByRow: () => offsetStepsByRow,
+  simpleLine: () => simpleLine,
+  visitor: () => visitor,
+  visitorBreadth: () => visitorBreadth,
+  visitorDepth: () => visitorDepth,
+  visitorRandom: () => visitorRandom,
+  walkByCol: () => walkByCol,
+  walkByFn: () => walkByFn,
+  walkByRow: () => walkByRow
+});
+
+// src/util.ts
+var clamp = (v, min2 = 0, max2 = 1) => {
+  if (Number.isNaN(v))
+    throw "v parameter is NaN";
+  if (Number.isNaN(min2))
+    throw "min parameter is NaN";
+  if (Number.isNaN(max2))
+    throw "max parameter is NaN";
+  if (v < min2)
+    return min2;
+  if (v > max2)
+    return max2;
+  return v;
+};
+var clampZeroBounds = (v, length2) => {
+  if (!Number.isInteger(v))
+    throw "v parameter must be an integer";
+  if (!Number.isInteger(length2))
+    throw "length parameter must be an integer";
+  if (v < 0)
+    return 0;
+  if (v >= length2)
+    return length2 - 1;
+  return v;
+};
+var randomElement = (array2) => {
+  return array2[Math.floor(Math.random() * array2.length)];
+};
+var getMinMaxAvg = (data) => {
+  let min2 = Number.MAX_SAFE_INTEGER;
+  let total = 0;
+  let samples = 0;
+  let max2 = Number.MIN_SAFE_INTEGER;
+  for (let i = 0; i < data.length; i++) {
+    if (Number.isNaN(data[i]))
+      continue;
+    min2 = Math.min(data[i], min2);
+    max2 = Math.max(data[i], max2);
+    total += data[i];
+    samples++;
+  }
+  return { min: min2, max: max2, avg: total / samples };
+};
+var sleep = (milliseconds) => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+};
+
+// src/collections/Sets.ts
+var Sets_exports = {};
+__export(Sets_exports, {
+  MutableValueSet: () => MutableValueSet
+});
+
+// src/collections/MapMulti.ts
+var _map, __add, _add_fn;
+var MapMulti = class {
+  constructor() {
+    __privateAdd(this, __add);
+    __privateAdd(this, _map, /* @__PURE__ */ new Map());
+  }
+  isEmpty() {
+    return __privateGet(this, _map).size == 0;
+  }
+  clear() {
+    __privateGet(this, _map).clear();
+  }
+  has(key) {
+    return __privateGet(this, _map).has(key);
+  }
+  delete(key, value) {
+    const a = __privateGet(this, _map).get(key);
+    if (a === void 0)
+      return;
+    const filtered = a.filter((v) => v !== value);
+    __privateGet(this, _map).set(key, filtered);
+  }
+  deleteDeep(value) {
+    const keys = Array.from(__privateGet(this, _map).keys());
+    for (const key of keys) {
+      const a = __privateGet(this, _map).get(key);
+      if (a === void 0)
+        continue;
+      const b = a.filter((v) => v !== value);
+      __privateGet(this, _map).set(key, b);
+    }
+  }
+  add(key, ...value) {
+    for (const v of value) {
+      __privateMethod(this, __add, _add_fn).call(this, key, v);
+    }
+  }
+  findKey(value) {
+    const keys = Array.from(__privateGet(this, _map).keys());
+    for (const key of keys) {
+      const a = __privateGet(this, _map).get(key);
+      if (a === void 0)
+        continue;
+      if (a.includes(value))
+        return key;
+    }
+    return void 0;
+  }
+  count(key) {
+    let e = __privateGet(this, _map).get(key);
+    if (e !== void 0)
+      return e.length;
+    return 0;
+  }
+  get(key) {
+    return __privateGet(this, _map).get(key);
+  }
+  keys() {
+    return Array.from(__privateGet(this, _map).keys());
+  }
+  keysAndCounts() {
+    const keys = this.keys();
+    const r = keys.map((k) => [k, this.count(k)]);
+    return r;
+  }
+  merge(other) {
+    const keys = other.keys();
+    for (const key of keys) {
+      const data = other.get(key);
+      if (data !== void 0)
+        this.add(key, ...data);
+    }
+  }
+};
+_map = new WeakMap();
+__add = new WeakSet();
+_add_fn = function(key, value) {
+  if (!__privateGet(this, _map).has(key)) {
+    __privateGet(this, _map).set(key, []);
+  }
+  let e = __privateGet(this, _map).get(key);
+  e?.push(value);
+};
+
+// src/Events.ts
+var _listeners;
+var SimpleEventEmitter = class {
+  constructor() {
+    __privateAdd(this, _listeners, new MapMulti());
+  }
+  fireEvent(type, args) {
+    const listeners = __privateGet(this, _listeners).get(type);
+    if (listeners === void 0)
+      return;
+    for (const l of listeners) {
+      try {
+        l(args, this);
+      } catch (err) {
+        console.debug("Event listener error: ", err);
+      }
+    }
+  }
+  addEventListener(type, listener) {
+    __privateGet(this, _listeners).add(type, listener);
+  }
+  removeEventListener(type, listener) {
+    __privateGet(this, _listeners).delete(type, listener);
+  }
+  clearEventListeners() {
+    __privateGet(this, _listeners).clear();
+  }
+};
+_listeners = new WeakMap();
+
+// src/collections/Sets.ts
+var MutableValueSet = class extends SimpleEventEmitter {
+  constructor(keyString = void 0) {
+    super();
+    __publicField(this, "store", /* @__PURE__ */ new Map());
+    __publicField(this, "keyString");
+    if (keyString == void 0)
+      keyString = (a) => JSON.stringify(a);
+    this.keyString = keyString;
+  }
+  add(...v) {
+    for (let i = 0; i < v.length; i++) {
+      const updated = this.has(v[i]);
+      this.store.set(this.keyString(v[i]), v[i]);
+      super.fireEvent("add", { value: v[i], updated });
+    }
+  }
+  values() {
+    return this.store.values();
+  }
+  clear() {
+    this.store.clear();
+    super.fireEvent("clear", true);
+  }
+  delete(v) {
+    const deleted = this.store.delete(this.keyString(v));
+    if (deleted)
+      super.fireEvent("delete", v);
+    return deleted;
+  }
+  has(v) {
+    return this.store.has(this.keyString(v));
+  }
+  toArray() {
+    return Array.from(this.store.values());
+  }
+};
+
+// src/geometry/Grid.ts
+var CardinalDirection = /* @__PURE__ */ ((CardinalDirection2) => {
+  CardinalDirection2[CardinalDirection2["None"] = 0] = "None";
+  CardinalDirection2[CardinalDirection2["North"] = 1] = "North";
+  CardinalDirection2[CardinalDirection2["NorthEast"] = 2] = "NorthEast";
+  CardinalDirection2[CardinalDirection2["East"] = 3] = "East";
+  CardinalDirection2[CardinalDirection2["SouthEast"] = 4] = "SouthEast";
+  CardinalDirection2[CardinalDirection2["South"] = 5] = "South";
+  CardinalDirection2[CardinalDirection2["SouthWest"] = 6] = "SouthWest";
+  CardinalDirection2[CardinalDirection2["West"] = 7] = "West";
+  CardinalDirection2[CardinalDirection2["NorthWest"] = 8] = "NorthWest";
+  return CardinalDirection2;
+})(CardinalDirection || {});
+var WrapLogic = /* @__PURE__ */ ((WrapLogic2) => {
+  WrapLogic2[WrapLogic2["None"] = 0] = "None";
+  WrapLogic2[WrapLogic2["Wrap"] = 1] = "Wrap";
+  return WrapLogic2;
+})(WrapLogic || {});
+var cellKeyString = function(v) {
+  return `Cell{${v.x},${v.y}}`;
+};
+var cellEquals = function(a, b) {
+  if (b === void 0)
+    return false;
+  if (a === void 0)
+    return false;
+  return a.x === b.x && a.y === b.y;
+};
+var guard3 = function(a, paramName = "Param") {
+  if (a === void 0)
+    throw Error(paramName + " is undefined");
+  if (a.x === void 0)
+    throw Error(paramName + ".x is undefined");
+  if (a.y === void 0)
+    throw Error(paramName + ".y is undefined");
+  if (Number.isInteger(a.x) === void 0)
+    throw Error(paramName + ".x is non-integer");
+  if (Number.isInteger(a.y) === void 0)
+    throw Error(paramName + ".y is non-integer");
+};
+var cellCornerRect = function(cell, grid) {
+  guard3(cell);
+  const size = grid.size;
+  const x = cell.x * size;
+  const y = cell.y * size;
+  let r = fromTopLeft({ x, y }, size, size);
+  return r;
+};
+var getCell = function(position, grid) {
+  const size = grid.size;
+  if (position.x < 0 || position.y < 0)
+    return;
+  const x = Math.floor(position.x / size);
+  const y = Math.floor(position.y / size);
+  if (x >= grid.cols)
+    return;
+  if (y >= grid.rows)
+    return;
+  return { x, y };
+};
+var neighbours = function(grid, cell, bounds = BoundsLogic.Undefined) {
+  let directions = [
+    1 /* North */,
+    3 /* East */,
+    5 /* South */,
+    7 /* West */
+  ];
+  return directions.map((c) => offset(grid, getVectorFromCardinal(c), cell, bounds)).filter(defined);
+};
+var cellMiddle = function(cell, grid) {
+  guard3(cell);
+  const size = grid.size;
+  const x = cell.x * size;
+  const y = cell.y * size;
+  return { x: x + size / 2, y: y + size / 2 };
+};
+var getLine = function(start, end) {
+  guard3(start);
+  guard3(end);
+  let startX = start.x;
+  let startY = start.y;
+  let dx = Math.abs(end.x - startX);
+  let dy = Math.abs(end.y - startY);
+  let sx = startX < end.x ? 1 : -1;
+  let sy = startY < end.y ? 1 : -1;
+  let err = dx - dy;
+  let cells = [];
+  while (true) {
+    cells.push({ x: startX, y: startY });
+    if (startX === end.x && startY === end.y)
+      break;
+    let e2 = 2 * err;
+    if (e2 > -dy) {
+      err -= dy;
+      startX += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      startY += sy;
+    }
+  }
+  return cells;
+};
+var getSquarePerimeter = function(grid, steps, start = { x: 0, y: 0 }, bounds = BoundsLogic.Stop) {
+  if (bounds == BoundsLogic.Wrap)
+    throw Error("BoundsLogic Wrap not supported (only Stop and Unbound)");
+  if (bounds == BoundsLogic.Undefined)
+    throw Error("BoundsLogic Undefined not supported (only Stop and Unbound)");
+  if (Number.isNaN(steps))
+    throw Error("Steps is NaN");
+  if (steps < 0)
+    throw Error("Steps must be positive");
+  if (!Number.isInteger(steps))
+    throw Error("Steps must be a positive integer");
+  const cells = new MutableValueSet((c) => cellKeyString(c));
+  let directions = [
+    1 /* North */,
+    2 /* NorthEast */,
+    3 /* East */,
+    4 /* SouthEast */,
+    5 /* South */,
+    6 /* SouthWest */,
+    7 /* West */,
+    8 /* NorthWest */
+  ];
+  let directionCells = directions.map((d) => {
+    return offset(grid, getVectorFromCardinal(d, steps), start, bounds);
+  });
+  cells.add(...simpleLine(directionCells[7], directionCells[1], true));
+  cells.add(...simpleLine(directionCells[1], directionCells[3], true));
+  cells.add(...simpleLine(directionCells[5], directionCells[3], true));
+  cells.add(...simpleLine(directionCells[7], directionCells[5], true));
+  return cells.toArray();
+};
+var getVectorFromCardinal = function(cardinal, multiplier = 1) {
+  switch (cardinal) {
+    case 1 /* North */:
+      return { x: 0, y: -1 * multiplier };
+    case 2 /* NorthEast */:
+      return { x: 1 * multiplier, y: -1 * multiplier };
+    case 3 /* East */:
+      return { x: 1 * multiplier, y: 0 };
+    case 4 /* SouthEast */:
+      return { x: 1 * multiplier, y: 1 * multiplier };
+    case 5 /* South */:
+      return { x: 0, y: 1 * multiplier };
+    case 6 /* SouthWest */:
+      return { x: -1 * multiplier, y: 1 * multiplier };
+    case 7 /* West */:
+      return { x: -1 * multiplier, y: 0 };
+    case 8 /* NorthWest */:
+      return { x: -1 * multiplier, y: -1 * multiplier };
+    default:
+      return { x: 0, y: 0 };
+  }
+};
+var BoundsLogic = /* @__PURE__ */ ((BoundsLogic2) => {
+  BoundsLogic2[BoundsLogic2["Unbound"] = 0] = "Unbound";
+  BoundsLogic2[BoundsLogic2["Undefined"] = 1] = "Undefined";
+  BoundsLogic2[BoundsLogic2["Stop"] = 2] = "Stop";
+  BoundsLogic2[BoundsLogic2["Wrap"] = 3] = "Wrap";
+  return BoundsLogic2;
+})(BoundsLogic || {});
+var simpleLine = function(start, end, endInclusive = false) {
+  let cells = [];
+  if (start.x == end.x) {
+    let lastY = endInclusive ? end.y + 1 : end.y;
+    for (let y = start.y; y < lastY; y++) {
+      cells.push({ x: start.x, y });
+    }
+  } else if (start.y == end.y) {
+    let lastX = endInclusive ? end.x + 1 : end.x;
+    for (let x = start.x; x < lastX; x++) {
+      cells.push({ x, y: start.y });
+    }
+  } else {
+    throw Error(`Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`);
+  }
+  return cells;
+};
+var offset = function(grid, vector, start = { x: 0, y: 0 }, bounds = 1 /* Undefined */) {
+  guard3(start);
+  let x = start.x;
+  let y = start.y;
+  switch (bounds) {
+    case 3 /* Wrap */:
+      x += vector.x % grid.cols;
+      y += vector.y % grid.rows;
+      if (x < 0)
+        x = grid.cols + x;
+      else if (x >= grid.cols) {
+        x -= grid.cols;
+      }
+      if (y < 0)
+        y = grid.rows + y;
+      else if (y >= grid.rows) {
+        y -= grid.rows;
+      }
+      break;
+    case 2 /* Stop */:
+      x += vector.x;
+      y += vector.y;
+      x = clampZeroBounds(x, grid.cols);
+      y = clampZeroBounds(y, grid.rows);
+      break;
+    case 1 /* Undefined */:
+      x += vector.x;
+      y += vector.y;
+      if (x < 0 || y < 0)
+        return;
+      if (x >= grid.cols || y >= grid.rows)
+        return;
+      break;
+    case 0 /* Unbound */:
+      x += vector.x;
+      y += vector.y;
+      break;
+    default:
+      throw "Unknown BoundsLogic case";
+  }
+  return { x, y };
+};
+var offsetStepsByRow = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 /* Undefined */) {
+  if (!Number.isInteger(steps))
+    throw Error("Steps must be an integer");
+  guard3(start);
+  let stepsLeft = Math.abs(steps);
+  const dirForward = steps >= 0;
+  let x = start.x;
+  let y = start.y;
+  while (stepsLeft > 0) {
+    if (x == grid.cols - 1 && dirForward) {
+      if (y == grid.rows - 1 && bounds !== 0 /* Unbound */) {
+        if (bounds == 1 /* Undefined */)
+          return;
+        if (bounds == 2 /* Stop */)
+          return { x, y };
+        if (bounds == 3 /* Wrap */)
+          y = 0;
+      } else {
+        y++;
+      }
+      x = 0;
+      stepsLeft--;
+      continue;
+    }
+    if (x == 0 && !dirForward) {
+      if (y == 0 && bounds !== 0 /* Unbound */) {
+        if (bounds == 1 /* Undefined */)
+          return;
+        if (bounds == 2 /* Stop */)
+          return { x, y };
+        if (bounds == 3 /* Wrap */)
+          y = grid.rows - 1;
+      } else {
+        y--;
+      }
+      x = grid.cols - 1;
+      stepsLeft--;
+      continue;
+    }
+    if (dirForward) {
+      let chunk = Math.min(stepsLeft, grid.cols - x - 1);
+      x += chunk;
+      stepsLeft -= chunk;
+    } else {
+      let chunk = Math.min(stepsLeft, x);
+      x -= chunk;
+      stepsLeft -= chunk;
+    }
+  }
+  return { x, y };
+};
+var offsetStepsByCol = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 /* Undefined */) {
+  if (!Number.isInteger(steps))
+    throw Error("Steps must be an integer");
+  guard3(start);
+  let stepsLeft = Math.abs(steps);
+  const dirForward = steps >= 0;
+  let x = start.x;
+  let y = start.y;
+  while (stepsLeft > 0) {
+    if (y == grid.rows - 1 && dirForward) {
+      if (x == grid.cols - 1 && bounds !== 0 /* Unbound */) {
+        if (bounds == 1 /* Undefined */)
+          return;
+        if (bounds == 2 /* Stop */)
+          return { x, y };
+        if (bounds == 3 /* Wrap */)
+          x = 0;
+      } else {
+        x++;
+      }
+      y = 0;
+      stepsLeft--;
+      continue;
+    }
+    if (y == 0 && !dirForward) {
+      if (x == 0 && bounds !== 0 /* Unbound */) {
+        if (bounds == 1 /* Undefined */)
+          return;
+        if (bounds == 2 /* Stop */)
+          return { x, y };
+        if (bounds == 3 /* Wrap */)
+          x = grid.cols - 1;
+      } else {
+        x--;
+      }
+      y = grid.rows - 1;
+      stepsLeft--;
+      continue;
+    }
+    if (dirForward) {
+      let chunk = Math.min(stepsLeft, grid.rows - y - 1);
+      y += chunk;
+      stepsLeft -= chunk;
+    } else {
+      let chunk = Math.min(stepsLeft, y);
+      y -= chunk;
+      stepsLeft -= chunk;
+    }
+  }
+  return { x, y };
+};
+var walkByFn = function* (offsetFn, grid, start = { x: 0, y: 0 }, wrap = false) {
+  guard3(start);
+  let x = start.x;
+  let y = start.y;
+  let bounds = wrap ? 3 /* Wrap */ : 1 /* Undefined */;
+  while (true) {
+    yield { x, y };
+    let pos = offsetFn(grid, 1, { x, y }, bounds);
+    if (pos === void 0)
+      return;
+    x = pos.x;
+    y = pos.y;
+    if (x == start.x && y == start.y)
+      return;
+  }
+};
+var walkByRow = function(grid, start = { x: 0, y: 0 }, wrap = false) {
+  return walkByFn(offsetStepsByRow, grid, start, wrap);
+};
+var walkByCol = function(grid, start = { x: 0, y: 0 }, wrap = false) {
+  return walkByFn(offsetStepsByCol, grid, start, wrap);
+};
+var visitorDepth = function(queue) {
+  return queue[0];
+};
+var visitorBreadth = function(queue) {
+  return queue[queue.length - 1];
+};
+var visitorRandom = function(queue) {
+  return randomElement(queue);
+};
+var visitor = function* (visitFn, grid, start, visited) {
+  if (visited == void 0)
+    visited = new MutableValueSet((c) => cellKeyString(c));
+  let queue = [];
+  queue.push(start);
+  while (queue.length > 0) {
+    const next = visitFn(queue);
+    if (!visited.has(next)) {
+      visited.add(next);
+      yield next;
+    }
+    const nbos = neighbours(grid, next, 1 /* Undefined */);
+    queue.push(...nbos);
+    queue = queue.filter((c) => !visited?.has(c));
+  }
 };
 
 // src/modulation/Envelope.ts
@@ -1662,11 +2357,11 @@ var dadsr = (opts = {}) => {
   const env = stages(opts);
   const max2 = 1;
   const paths2 = new Array(5);
-  paths2[Stage.Attack] = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
+  paths2[2 /* Attack */] = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
   ;
-  paths2[Stage.Decay] = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
-  paths2[Stage.Sustain] = fromPoints({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
-  paths2[Stage.Release] = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
+  paths2[3 /* Decay */] = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
+  paths2[4 /* Sustain */] = fromPoints({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
+  paths2[5 /* Release */] = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
   return Object.freeze({
     getBeziers: () => [...paths2],
     trigger: () => {
@@ -1689,25 +2384,25 @@ var dadsr = (opts = {}) => {
       return [stage, p.compute(amt).y];
     },
     getStage: (stage) => {
-      let tmp = stage === Stage.Sustain ? { duration: -1 } : env.getStage(stage);
+      let tmp = stage === 4 /* Sustain */ ? { duration: -1 } : env.getStage(stage);
       let s = { ...tmp, amp: -1 };
       switch (stage) {
-        case Stage.Attack:
+        case 2 /* Attack */:
           s.amp = 1;
           break;
-        case Stage.Decay:
+        case 3 /* Decay */:
           s.amp = 1;
           break;
-        case Stage.Delay:
+        case 1 /* Delay */:
           s.amp = -1;
           break;
-        case Stage.Release:
+        case 5 /* Release */:
           s.amp = 0;
           break;
-        case Stage.Stopped:
+        case 0 /* Stopped */:
           s.amp = 0;
           break;
-        case Stage.Sustain:
+        case 4 /* Sustain */:
           s.amp = sustainLevel;
           break;
       }
@@ -1717,15 +2412,15 @@ var dadsr = (opts = {}) => {
 };
 
 // src/modulation/Envelope.ts
-var Stage;
-(function(Stage2) {
+var Stage = /* @__PURE__ */ ((Stage2) => {
   Stage2[Stage2["Stopped"] = 0] = "Stopped";
   Stage2[Stage2["Delay"] = 1] = "Delay";
   Stage2[Stage2["Attack"] = 2] = "Attack";
   Stage2[Stage2["Decay"] = 3] = "Decay";
   Stage2[Stage2["Sustain"] = 4] = "Sustain";
   Stage2[Stage2["Release"] = 5] = "Release";
-})(Stage || (Stage = {}));
+  return Stage2;
+})(Stage || {});
 var msRelativeTimer = function() {
   let start = performance.now();
   return {
@@ -1739,17 +2434,17 @@ var msRelativeTimer = function() {
 };
 var stageToText = function(stage) {
   switch (stage) {
-    case 1:
+    case 1 /* Delay */:
       return "Delay";
-    case 2:
+    case 2 /* Attack */:
       return "Attack";
-    case 3:
+    case 3 /* Decay */:
       return "Decay";
-    case 5:
+    case 5 /* Release */:
       return "Release";
-    case 0:
+    case 0 /* Stopped */:
       return "Stopped";
-    case 4:
+    case 4 /* Sustain */:
       return "Sustain";
   }
 };
@@ -1760,7 +2455,7 @@ var stages = function(opts = {}) {
   const { attackDuration = 300 } = opts;
   const { decayDuration = 500 } = opts;
   const { releaseDuration = 1e3 } = opts;
-  let stage = 0;
+  let stage = 0 /* Stopped */;
   let timer2 = null;
   let isHeld = false;
   const setStage = (newStage) => {
@@ -1768,40 +2463,40 @@ var stages = function(opts = {}) {
       return;
     console.log("Envelope stage " + stageToText(stage) + " -> " + stageToText(newStage));
     stage = newStage;
-    if (stage == 1)
+    if (stage == 1 /* Delay */)
       timer2 = timerSource();
-    else if (stage == 5)
+    else if (stage == 5 /* Release */)
       timer2 = timerSource();
   };
   const getStage = (stage2) => {
     switch (stage2) {
-      case 2:
+      case 2 /* Attack */:
         return { duration: attackDuration };
-      case 3:
+      case 3 /* Decay */:
         return { duration: decayDuration };
-      case 1:
+      case 1 /* Delay */:
         return { duration: delayDuration };
-      case 5:
+      case 5 /* Release */:
         return { duration: releaseDuration };
       default:
         throw Error(`Cannot get unknown stage ${stage2}`);
     }
   };
   const compute3 = () => {
-    if (stage == 0)
+    if (stage == 0 /* Stopped */)
       return [0, 0];
     if (timer2 == null)
       throw Error("Bug: timer is null");
-    if (stage == 4)
+    if (stage == 4 /* Sustain */)
       return [stage, 1];
     let elapsed = timer2.elapsed();
-    if (stage == 5) {
+    if (stage == 5 /* Release */) {
       let relative = elapsed / releaseDuration;
       if (relative > 1) {
         if (looping) {
           trigger();
         } else {
-          setStage(0);
+          setStage(0 /* Stopped */);
         }
         return [stage, 0];
       }
@@ -1812,37 +2507,37 @@ var stages = function(opts = {}) {
     } else if (elapsed <= attackDuration) {
       return [stage, elapsed / attackDuration];
     } else if (elapsed <= decayDuration + attackDuration) {
-      if (stage == 2)
-        setStage(3);
+      if (stage == 2 /* Attack */)
+        setStage(3 /* Decay */);
       return [stage, (elapsed - attackDuration) / decayDuration];
     } else {
-      if (stage == 3)
-        setStage(4);
+      if (stage == 3 /* Decay */)
+        setStage(4 /* Sustain */);
       if (!isHeld) {
-        setStage(5);
+        setStage(5 /* Release */);
       }
       return [stage, 0];
     }
   };
   const trigger = () => {
     isHeld = false;
-    setStage(1);
+    setStage(1 /* Delay */);
   };
   const hold = () => {
     isHeld = true;
-    if (stage == 0) {
-      setStage(1);
+    if (stage == 0 /* Stopped */) {
+      setStage(1 /* Delay */);
     } else {
-      setStage(4);
+      setStage(4 /* Sustain */);
     }
   };
   const release = () => {
     if (!isHeld)
       throw Error("Not being held");
-    setStage(5);
+    setStage(5 /* Release */);
   };
   const reset = () => {
-    setStage(0);
+    setStage(0 /* Stopped */);
   };
   reset();
   return Object.freeze({
@@ -1862,32 +2557,6 @@ __export(Easing_exports, {
   tick: () => tick,
   timer: () => timer
 });
-
-// src/util.ts
-var clamp = (v, min2 = 0, max2 = 1) => {
-  if (v < min2)
-    return min2;
-  if (v > max2)
-    return max2;
-  return v;
-};
-var getMinMaxAvg = (data) => {
-  let min2 = Number.MAX_SAFE_INTEGER;
-  let total = 0;
-  let samples = 0;
-  let max2 = Number.MIN_SAFE_INTEGER;
-  for (let i = 0; i < data.length; i++) {
-    if (Number.isNaN(data[i]))
-      continue;
-    min2 = Math.min(data[i], min2);
-    max2 = Math.max(data[i], max2);
-    total += data[i];
-    samples++;
-  }
-  return { min: min2, max: max2, avg: total / samples };
-};
-
-// src/modulation/Easing.ts
 var sqrt3 = Math.sqrt;
 var pow2 = Math.pow;
 var cos3 = Math.cos;
@@ -2017,37 +2686,42 @@ __export(Lists_exports, {
   Fifo: () => Fifo,
   Lifo: () => Lifo
 });
-var Circular = class extends Array {
-  #capacity;
-  #pointer;
+var _capacity, _pointer;
+var _Circular = class extends Array {
   constructor(capacity) {
     super();
+    __privateAdd(this, _capacity, void 0);
+    __privateAdd(this, _pointer, void 0);
     if (Number.isNaN(capacity))
       throw Error("capacity is NaN");
     if (capacity <= 0)
       throw Error("capacity must be greater than zero");
-    this.#capacity = capacity;
-    this.#pointer = 0;
+    __privateSet(this, _capacity, capacity);
+    __privateSet(this, _pointer, 0);
   }
   add(thing) {
-    const ca = Circular.from(this);
-    ca[this.#pointer] = thing;
-    ca.#capacity = this.#capacity;
-    ca.#pointer = this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
+    const ca = _Circular.from(this);
+    ca[__privateGet(this, _pointer)] = thing;
+    __privateSet(ca, _capacity, __privateGet(this, _capacity));
+    __privateSet(ca, _pointer, __privateGet(this, _pointer) + 1 === __privateGet(this, _capacity) ? 0 : __privateGet(this, _pointer) + 1);
     return ca;
   }
 };
-var Lifo = class extends Array {
-  #capacity;
+var Circular = _Circular;
+_capacity = new WeakMap();
+_pointer = new WeakMap();
+var _capacity2;
+var _Lifo = class extends Array {
   constructor(capacity = -1) {
     super();
-    this.#capacity = capacity;
+    __privateAdd(this, _capacity2, void 0);
+    __privateSet(this, _capacity2, capacity);
   }
   add(thing) {
     let size, len;
-    if (this.#capacity > 0 && this.length >= this.#capacity) {
-      size = this.#capacity;
-      len = this.#capacity - 1;
+    if (__privateGet(this, _capacity2) > 0 && this.length >= __privateGet(this, _capacity2)) {
+      size = __privateGet(this, _capacity2);
+      len = __privateGet(this, _capacity2) - 1;
     } else {
       size = this.length + 1;
       len = this.length;
@@ -2057,8 +2731,8 @@ var Lifo = class extends Array {
     for (let i = 1; i < len + 1; i++) {
       t2[i] = this[i - 1];
     }
-    const a = Lifo.from(t2);
-    a.#capacity = this.#capacity;
+    const a = _Lifo.from(t2);
+    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
     return a;
   }
   peek() {
@@ -2067,35 +2741,38 @@ var Lifo = class extends Array {
   removeLast() {
     if (this.length === 0)
       return this;
-    const a = Lifo.from(this.slice(0, this.length - 1));
-    a.#capacity = this.#capacity;
+    const a = _Lifo.from(this.slice(0, this.length - 1));
+    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
     return a;
   }
   remove() {
     if (this.length === 0)
       return this;
-    const a = Lifo.from(this.slice(1));
-    a.#capacity = this.#capacity;
+    const a = _Lifo.from(this.slice(1));
+    __privateSet(a, _capacity2, __privateGet(this, _capacity2));
     return a;
   }
 };
-var Fifo = class extends Array {
-  #capacity;
+var Lifo = _Lifo;
+_capacity2 = new WeakMap();
+var _capacity3;
+var _Fifo = class extends Array {
   constructor(capacity = -1) {
     super();
-    this.#capacity = capacity;
+    __privateAdd(this, _capacity3, void 0);
+    __privateSet(this, _capacity3, capacity);
   }
   static create(capacity, data) {
-    const q = new Fifo(capacity);
+    const q = new _Fifo(capacity);
     q.push(...data);
     return q;
   }
   add(thing) {
     const d = [...this, thing];
-    if (this.#capacity > 0 && d.length > this.#capacity) {
-      return Fifo.create(this.#capacity, d.slice(0, this.#capacity));
+    if (__privateGet(this, _capacity3) > 0 && d.length > __privateGet(this, _capacity3)) {
+      return _Fifo.create(__privateGet(this, _capacity3), d.slice(0, __privateGet(this, _capacity3)));
     }
-    return Fifo.create(this.#capacity, d);
+    return _Fifo.create(__privateGet(this, _capacity3), d);
   }
   peek() {
     return this[0];
@@ -2104,27 +2781,29 @@ var Fifo = class extends Array {
     if (this.length === 0)
       return this;
     const d = this.slice(1);
-    return Fifo.create(this.#capacity, d);
+    return _Fifo.create(__privateGet(this, _capacity3), d);
   }
 };
+var Fifo = _Fifo;
+_capacity3 = new WeakMap();
 
 // src/visualisation/BasePlot.ts
 var BasePlot = class {
-  canvasEl;
-  precision;
-  paused;
-  scaleMin;
-  scaleMax;
-  allowScaleDeflation;
-  labelInset;
-  lastPaint;
-  maxPaintMs;
-  textHeight;
-  plotPadding = 10;
-  showMiddle = true;
-  showScale = true;
-  drawLoop;
   constructor(canvasEl) {
+    __publicField(this, "canvasEl");
+    __publicField(this, "precision");
+    __publicField(this, "paused");
+    __publicField(this, "scaleMin");
+    __publicField(this, "scaleMax");
+    __publicField(this, "allowScaleDeflation");
+    __publicField(this, "labelInset");
+    __publicField(this, "lastPaint");
+    __publicField(this, "maxPaintMs");
+    __publicField(this, "textHeight");
+    __publicField(this, "plotPadding", 10);
+    __publicField(this, "showMiddle", true);
+    __publicField(this, "showScale", true);
+    __publicField(this, "drawLoop");
     if (canvasEl === void 0)
       throw Error("canvasEl undefined");
     this.canvasEl = canvasEl;
@@ -2224,12 +2903,12 @@ var BasePlot = class {
 
 // src/visualisation/Plot.ts
 var Plot = class extends BasePlot {
-  buffer;
-  samples;
-  color = "silver";
-  lineWidth = 3;
   constructor(canvasEl, samples = 10) {
     super(canvasEl);
+    __publicField(this, "buffer");
+    __publicField(this, "samples");
+    __publicField(this, "color", "silver");
+    __publicField(this, "lineWidth", 3);
     this.buffer = new Circular(samples);
     this.samples = samples;
   }
@@ -2382,17 +3061,249 @@ function line(ctx, line2, opts = {}) {
   }
   ctx.stroke();
 }
+
+// src/Producers.ts
+var Producers_exports = {};
+__export(Producers_exports, {
+  numericRange: () => numericRange,
+  rawNumericRange: () => rawNumericRange
+});
+var rawNumericRange = function* (interval, start = 0, end, repeating = false) {
+  if (interval <= 0)
+    throw Error(`Interval is expected to be above zero`);
+  if (end === void 0)
+    end = Number.MAX_SAFE_INTEGER;
+  let v = start;
+  do {
+    while (v < end) {
+      yield v;
+      v += interval;
+    }
+  } while (repeating);
+};
+var numericRange = function* (interval, start = 0, end, repeating = false, rounding) {
+  if (interval <= 0)
+    throw Error(`Interval is expected to be above zero`);
+  rounding = rounding ?? 1e3;
+  if (end === void 0)
+    end = Number.MAX_SAFE_INTEGER;
+  else
+    end *= rounding;
+  interval = interval * rounding;
+  do {
+    let v = start * rounding;
+    while (v <= end) {
+      yield v / rounding;
+      v += interval;
+    }
+  } while (repeating);
+};
+
+// src/Series.ts
+var Series_exports = {};
+__export(Series_exports, {
+  Series: () => Series,
+  fromEvent: () => fromEvent,
+  fromGenerator: () => fromGenerator,
+  fromTimedIterable: () => fromTimedIterable
+});
+
+// src/Iterable.ts
+var eventsToIterable = (eventSource, eventType) => {
+  const pullQueue = [];
+  const pushQueue = [];
+  let done = false;
+  const pushValue = async (args) => {
+    if (pullQueue.length !== 0) {
+      const resolver = pullQueue.shift();
+      resolver(...args);
+    } else {
+      pushQueue.push(args);
+    }
+  };
+  const pullValue = () => {
+    return new Promise((resolve) => {
+      if (pushQueue.length !== 0) {
+        const args = pushQueue.shift();
+        resolve(...args);
+      } else {
+        pullQueue.push(resolve);
+      }
+    });
+  };
+  const handler = (...args) => {
+    pushValue(args);
+  };
+  eventSource.addEventListener(eventType, handler);
+  const r = {
+    next: async () => {
+      if (done)
+        return { done: true, value: void 0 };
+      return {
+        done: false,
+        value: await pullValue()
+      };
+    },
+    return: async () => {
+      done = true;
+      eventSource.removeEventListener(eventType, handler);
+      return { done: true, value: void 0 };
+    },
+    throw: async (error) => {
+      done = true;
+      return {
+        done: true,
+        value: Promise.reject(error)
+      };
+    }
+  };
+  return r;
+};
+
+// src/Series.ts
+var fromGenerator = function(vGen) {
+  if (vGen === void 0)
+    throw Error(`vGen is undefined`);
+  let s = new Series();
+  let genResult = vGen.next();
+  s.onValueNeeded = () => {
+    genResult = vGen.next();
+    if (genResult.done) {
+      return void 0;
+    }
+    return genResult.value;
+  };
+  if (genResult.done) {
+    s._setDone();
+    return s;
+  }
+  s.push(genResult.value);
+  return s;
+};
+var fromTimedIterable = (vIter, delayMs = 100, intervalMs = 10) => {
+  if (vIter === void 0)
+    throw Error(`vIter is undefined`);
+  if (delayMs < 0)
+    throw Error(`delayMs must be at least zero`);
+  if (intervalMs < 0)
+    throw Error(`delayMs must be at least zero`);
+  let s = new Series();
+  setTimeout(async () => {
+    if (s.cancelled)
+      return;
+    try {
+      for await (const v of vIter) {
+        if (s.cancelled)
+          return;
+        s.push(v);
+        await sleep(intervalMs);
+      }
+      s._setDone();
+    } catch (err) {
+      s.cancel(err);
+    }
+  }, delayMs);
+  return s;
+};
+var fromEvent = (source, eventType) => {
+  const s = new Series();
+  s.mergeEvent(source, eventType);
+  return s;
+};
+var _cancelled, _lastValue, _done, _newValue;
+var Series = class extends SimpleEventEmitter {
+  constructor() {
+    super();
+    __privateAdd(this, _cancelled, false);
+    __privateAdd(this, _lastValue, void 0);
+    __privateAdd(this, _done, false);
+    __privateAdd(this, _newValue, false);
+    __publicField(this, "onValueNeeded");
+  }
+  [Symbol.asyncIterator]() {
+    return eventsToIterable(this, "data");
+  }
+  mergeEvent(source, eventType) {
+    if (source === void 0)
+      throw Error("source is undefined");
+    if (eventType === void 0)
+      throw Error("eventType is undefined");
+    const s = this;
+    const handler = (evt) => {
+      console.log(`Series.mergeEventSource: event ${eventType} sending: ${JSON.stringify(evt)}`);
+      s.push(evt);
+    };
+    source.addEventListener(eventType, handler);
+    s.addEventListener("done", () => {
+      try {
+        source.removeEventListener(eventType, handler);
+      } catch (err) {
+        console.log(err);
+      }
+    });
+  }
+  _setDone() {
+    if (__privateGet(this, _done))
+      return;
+    __privateSet(this, _done, true);
+    super.fireEvent("done", false);
+  }
+  push(v) {
+    if (__privateGet(this, _cancelled))
+      throw Error("Series cancelled");
+    if (__privateGet(this, _done))
+      throw Error("Series is marked as done");
+    __privateSet(this, _lastValue, v);
+    __privateSet(this, _newValue, true);
+    super.fireEvent("data", v);
+  }
+  cancel(cancelReason = "Cancelled") {
+    if (__privateGet(this, _done))
+      throw Error("Series cannot be cancelled, already marked done");
+    if (__privateGet(this, _cancelled))
+      return;
+    __privateSet(this, _cancelled, true);
+    __privateSet(this, _done, true);
+    super.fireEvent("cancel", cancelReason);
+    super.fireEvent("done", true);
+  }
+  get cancelled() {
+    return __privateGet(this, _cancelled);
+  }
+  get done() {
+    return __privateGet(this, _done);
+  }
+  get value() {
+    if (!__privateGet(this, _newValue) && this.onValueNeeded && !__privateGet(this, _done)) {
+      let v = this.onValueNeeded();
+      if (v)
+        this.push(v);
+      else if (v === void 0)
+        this._setDone();
+    }
+    __privateSet(this, _newValue, false);
+    return __privateGet(this, _lastValue);
+  }
+};
+_cancelled = new WeakMap();
+_lastValue = new WeakMap();
+_done = new WeakMap();
+_newValue = new WeakMap();
 export {
   Bezier_exports as Beziers,
   Drawing_exports as Drawing,
   Easing_exports as Easings,
   Envelope_exports as Envelopes,
+  Grid_exports as Grids,
   Line_exports as Lines,
   Lists_exports as Lists,
   MultiPath_exports as MultiPaths,
   Path_exports as Paths,
   Plot,
   Point_exports as Points,
-  Rect_exports as Rects
+  Producers_exports as Producers,
+  Rect_exports as Rects,
+  Series_exports as Series,
+  Sets_exports as Sets
 };
-//# sourceMappingURL=bundle.mjs.map
+//# sourceMappingURL=bundle.js.map

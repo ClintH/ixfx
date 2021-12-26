@@ -8,6 +8,89 @@ type SeriesEventMap<V> = {
   cancel: string
 }
 
+type SeriesValueNeeded<V> = () => V | undefined;
+/**
+ * Returns a series from a generator. This gives some minor syntactical benefits
+ * 
+ * Example usage:
+ *  let hueSeries = Series.fromGenerator(Producers.numericRange(1, 0, 360, true));
+ *  hueSeries.value; // Each time value is requested, we get a new number in range
+ * @template V Type
+ * @param {Generator<V>} vGen Generator
+ * @returns {Series<V>} Series from provided generator
+ */
+export const fromGenerator = function <V>(vGen: Generator<V>): Series<V> {
+  if (vGen === undefined) throw Error(`vGen is undefined`);
+
+  let s = new Series<V>();
+  let genResult = vGen.next();
+  s.onValueNeeded = () => {
+    //console.log('Series.fromGenerator - pulling new value');
+    genResult = vGen.next();
+    if (genResult.done) {
+      //console.log('Series.fromGenerator - turns out its done');
+      return undefined;
+    }
+    return genResult.value;
+  };
+
+  if (genResult.done) {
+    //console.log('Series.fromGenerator - generator done');
+    s._setDone();
+    return s;
+  }
+
+  s.push(genResult.value);
+  return s;
+}
+
+/**
+ * Creates a series from an iterable collection. 
+ * Items are emitted automatically with a set interval
+ *
+ * @template V
+ * @param {Iterable<V>} vIter Iterable collection of data
+ * @param {number} [delayMs=100] Delay in millis before data starts getting pulled from iterator
+ * @param {number} [intervalMs=10] Interval in millis between each attempt at pulling data from
+ * @returns {Series<V>} A new series that wraps the iterator
+ * @memberof Series
+ */
+export const fromTimedIterable = <V>(vIter: Iterable<V> | AsyncIterable<V>, delayMs: number = 100, intervalMs: number = 10): Series<V> => {
+  if (vIter === undefined) throw Error(`vIter is undefined`);
+  if (delayMs < 0) throw Error(`delayMs must be at least zero`);
+  if (intervalMs < 0) throw Error(`delayMs must be at least zero`);
+
+  let s = new Series<V>();
+  setTimeout(async () => {
+    if (s.cancelled) return;
+    try {
+      for await (const v of vIter) {
+        if (s.cancelled) return;
+        s.push(v);
+        await sleep(intervalMs);
+      }
+      s._setDone();
+    } catch (err) {
+      s.cancel(err as string);
+    }
+  }, delayMs);
+  return s;
+}
+
+/**
+ * Creates a series from an event handler
+ *
+ * @param {EventTarget} source
+ * @param {string} eventType
+ * @returns
+ * @memberof Series
+ */
+export const fromEvent = (source: EventTarget, eventType: string) => {
+  const s = new Series<any>();
+  s.mergeEvent(source, eventType);
+  return s;
+}
+
 /**
  * A Series produces an asynchronous series of data
  * It can be iterated over, or events can be used to subscribe to new data.
@@ -22,6 +105,16 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
   #cancelled: boolean = false;
   #lastValue: V | undefined;
   #done: boolean = false;
+  #newValue: boolean = false;
+
+  /**
+   * Callback to pull new data from a source is triggered when .value is queryed
+   * without new data having arrived
+   *
+   * @type {(SeriesValueNeeded<V> | undefined)}
+   * @memberof Series
+   */
+  onValueNeeded: SeriesValueNeeded<V> | undefined = undefined;
 
   constructor() {
     super();
@@ -32,54 +125,13 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
   }
 
   /**
-   * Creates a series from an iterable collection
+   * Merges event, all event firings are pushed to the series, and thus available under its own
+   * event handler or iteration.
    *
-   * @static
-   * @template V
-   * @param {Iterable<V>} vIter Iterable collection of data
-   * @param {number} [delayMs=100] Delay in millis before data starts getting pulled from iterator
-   * @param {number} [intervalMs=10] Interval in millis between each attempt at pulling data from
-   * @returns {Series<V>} A new series that wraps the iterator
-   * @memberof Series
-   */
-  static fromIterable<V>(vIter: Iterable<V> | AsyncIterable<V>, delayMs: number = 100, intervalMs: number = 10): Series<V> {
-    if (vIter === undefined) throw Error(`vIter is undefined`);
-    if (delayMs < 0) throw Error(`delayMs must be at least zero`);
-    if (intervalMs < 0) throw Error(`delayMs must be at least zero`);
-
-    let s = new Series<V>();
-    setTimeout(async () => {
-      if (s.cancelled) return;
-      try {
-        for await (const v of vIter) {
-          if (s.cancelled) return;
-          s.push(v);
-          await sleep(intervalMs);
-        }
-        s.#setDone();
-      } catch (err) {
-        s.cancel(err as string);
-      }
-    }, delayMs);
-
-    return s;
-  }
-
-  /**
-   * Creates a series from an event handler
-   *
-   * @static
    * @param {EventTarget} source
    * @param {string} eventType
-   * @returns
    * @memberof Series
    */
-  static fromEvent(source: EventTarget, eventType: string) {
-    const s = new Series<any>();
-    s.mergeEvent(source, eventType);
-    return s;
-  }
-
   mergeEvent(source: EventTarget, eventType: string) {
     if (source === undefined) throw Error('source is undefined');
     if (eventType === undefined) throw Error('eventType is undefined');
@@ -91,7 +143,7 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
     };
 
     source.addEventListener(eventType, handler);
-    s.addEventListener('cancel', () => {
+    s.addEventListener('done', () => {
       try {
         source.removeEventListener(eventType, handler);
       } catch (err) {
@@ -106,7 +158,7 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    * @returns
    * @memberof Series
    */
-  #setDone() {
+  _setDone() {
     if (this.#done) return;
     this.#done = true;
     super.fireEvent('done', false);
@@ -122,6 +174,7 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
     if (this.#cancelled) throw Error('Series cancelled');
     if (this.#done) throw Error('Series is marked as done');
     this.#lastValue = v;
+    this.#newValue = true;
     super.fireEvent('data', v);
   }
 
@@ -169,40 +222,18 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    * Returns the last value that flowed through series or undefined
    * if there has been no value
    *
+   * If the `onValueNeeded` callback is set and there's no new value, it will be called to pull data
    * @readonly
    * @type {(V|undefined)}
    * @memberof Series
    */
-  get lastValue(): V | undefined {
+  get value(): V | undefined {
+    if (!this.#newValue && this.onValueNeeded && !this.#done) {
+      let v = this.onValueNeeded();
+      if (v) this.push(v);
+      else if (v === undefined) this._setDone();
+    }
+    this.#newValue = false;
     return this.#lastValue;
   }
 }
-
-const testFromIter = () => {
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const testCancel = false;
-  const delay = 2000;
-  const interval = 1000;
-
-  console.log(`testFromIter start. Delay: ${delay} Interval: ${interval}`);
-
-  let received = 0;
-
-  const series = Series.fromIterable<number>(numbers, delay, interval);
-  series.addEventListener('data', (ev: number) => {
-    console.log(` testFromIter event handler: ${ev}`);
-    received++;
-  })
-  series.addEventListener('done', (wasCancelled: boolean) => {
-    console.log(` testFromIter done. Was cancelled: ${wasCancelled}`);
-    if (received !== numbers.length) throw Error('testFromIter did not get expected number of items');
-  });
-
-  if (testCancel) {
-    setTimeout(() => {
-      series.cancel();
-    }, delay + 500);
-  }
-}
-
-testFromIter();

@@ -17,6 +17,28 @@ Build Typescript sources, running a single file with source map support:
 npm run run -- build/StateMachine.js
 ```
 
+
+# Testing
+
+The `tests` folder contains Jest unit tests and manual tests. Manual tests are some HTML+JS to use the code and rely on the library being built. Manual tests are built to the `build-tests` folder.
+
+```
+// Continually build library
+npm run develop
+
+// Continually rebuild tests
+npm run develop-tests
+```
+
+Unit tests:
+
+```
+npm run tests
+
+// Or to run a single test:
+npx jest .\tests\geometry\grid.test.ts
+```
+
 # Credits
 
 Bundles

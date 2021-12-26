@@ -1,7 +1,8 @@
+import {SimpleEventEmitter} from "../Events";
 
 /**
  * The circular array grows to a fixed size. Once full, new
- * items replace the oldest item in the array
+ * items replace the oldest item in the array. Immutable.
  *
  * Add things using `add`, noting that it returns a new instance with the item added.
  * Like normal arrays, contents can be edited.
@@ -15,7 +16,7 @@
  * @extends {Array}
  * @template V
  */
-class Circular<V> extends Array {
+export class Circular<V> extends Array {
   #capacity: number;
   #pointer: number;
 
@@ -27,6 +28,13 @@ class Circular<V> extends Array {
     this.#pointer = 0;
   }
 
+  /**
+   * Returns a new Circular with item added
+   *
+   * @param {V} thing Thing to add
+   * @returns {Circular<V>} Circular with item added
+   * @memberof Circular
+   */
   add(thing: V): Circular<V> {
     const ca = Circular.from(this) as Circular<V>;
     ca[this.#pointer] = thing;
@@ -38,7 +46,7 @@ class Circular<V> extends Array {
 
 /**
  * Lifo (last-in-first-out) grows to capacity, with new items added at position 0 of array.
- * Once full, older items are removed. 
+ * Once full, older items are removed. Immutable.
  * `remove()` removes newest, while `removeLast()` removes oldest.
  * `peek()` returns the newest item
  *
@@ -46,7 +54,7 @@ class Circular<V> extends Array {
  * @extends {Array}
  * @template V
  */
-class Lifo<V> extends Array {
+export class Lifo<V> extends Array {
   #capacity: number;
 
   /**
@@ -58,7 +66,13 @@ class Lifo<V> extends Array {
     super();
     this.#capacity = capacity;
   }
-
+  /**
+   * Returns a new Lifo with item added
+   *
+   * @param {V} thing Thing to ad
+   * @returns {Lifo<V>} Lifo with item added
+   * @memberof Lifo
+   */
   add(thing: V): Lifo<V> {
     let size, len;
     if (this.#capacity > 0 && this.length >= this.#capacity) {
@@ -79,10 +93,21 @@ class Lifo<V> extends Array {
     return a;
   }
 
+  /**
+   * Returns most recently added item (last)
+   *
+   * @returns {V}
+   * @memberof Lifo
+   */
   peek(): V {
     return this[0];
   }
-
+  /**
+   * Returns a Lifo with last item removed
+   *
+   * @returns {Lifo<V>}
+   * @memberof Lifo
+   */
   removeLast(): Lifo<V> {
     if (this.length === 0) return this;
     const a = Lifo.from(this.slice(0, this.length - 1)) as Lifo<V>;
@@ -90,6 +115,12 @@ class Lifo<V> extends Array {
     return a;
   }
 
+  /**
+   * Returns a Lifo with first item removed
+   *
+   * @returns {Lifo<V>}
+   * @memberof Lifo
+   */
   remove(): Lifo<V> {
     if (this.length === 0) return this;
     const a = Lifo.from(this.slice(1)) as Lifo<V>;
@@ -100,13 +131,13 @@ class Lifo<V> extends Array {
 
 /**
  * Fifo (first-in-first-out) grows to capacity with new items being added to the end of the array
- * Once full, newer items are discarded.
+ * Once full, newer items are discarded. Immutable.
  *
  * @class Fifo
  * @extends {Array}
  * @template V
  */
-class Fifo<V> extends Array {
+export class Fifo<V> extends Array {
   #capacity: number;
   /**
    * Create fifo.
@@ -124,22 +155,38 @@ class Fifo<V> extends Array {
     return q;
   }
 
+  /**
+   * Returns a new Fifo with item added
+   *
+   * @param {V} thing
+   * @returns {Fifo<V>}
+   * @memberof Fifo
+   */
   add(thing: V): Fifo<V> {
     const d = [...this, thing];
     if (this.#capacity > 0 && d.length > this.#capacity) {
       return Fifo.create(this.#capacity, d.slice(0, this.#capacity));
     } return Fifo.create(this.#capacity, d);
   }
-
+  /**
+   * Returns oldest item (first)
+   *
+   * @returns {V}
+   * @memberof Fifo
+   */
   peek(): V {
     return this[0];
   }
 
+  /**
+   * Returns a list with oldest (first) item removed
+   *
+   * @returns {Fifo<V>}
+   * @memberof Fifo
+   */
   remove(): Fifo<V> {
     if (this.length === 0) return this;
     const d = this.slice(1);
     return Fifo.create(this.#capacity, d);
   }
 }
-
-export {Circular, Lifo, Fifo};

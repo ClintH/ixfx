@@ -51,7 +51,11 @@ export class SimpleEventEmitter<Events> {
     const listeners = this.#listeners.get(type);
     if (listeners === undefined) return;
     for (const l of listeners) {
-      l(args, this);
+      try {
+        l(args, this);
+      } catch (err) {
+        console.debug('Event listener error: ', err);
+      }
     }
   }
 

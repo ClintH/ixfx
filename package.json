@@ -8,31 +8,41 @@
   "browsersList": [
     ">2% and last 2 versions and not ie 6-11"
   ],
+  "main": "dist/bundle.js",
   "type": "module",
   "types": "dist/bundle.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
+    "test": "jest",
     "watch": "tsc --watch",
     "clean": "rimraf dist",
     "prepublish": "npm run build",
     "build": "tsc && npm run bundle",
     "run": "tsc && node -r source-map-support/register",
-    "bundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle",
-    "develop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle --watch"
+    "esbundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle",
+    "esdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle --watch",
+    "bundle": "tsup",
+    "develop": "tsup --watch",
+    "develop-tests": "npx snowpack --config snowpack-tests.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "esbuild": "^0.13.8",
     "eslint": "^8.1.0",
+    "jest": "^27.4.5",
     "rimraf": "^3.0.2",
+    "snowpack": "^3.8.8",
     "source-map-support": "^0.5.21",
-    "typescript": "^4.4.0"
+    "ts-jest": "^27.1.2",
+    "tsup": "^5.11.9",
+    "typescript": "^4.5.4"
   },
   "repository": {
     "url": "git@github.com:clinth/ix.git"
