@@ -1,11 +1,7 @@
-console.log('ahoy');
 import * as Grids from '../../src/geometry/Grid.js';
 import * as Series from '../../src/Series.js';
 import * as Producers from '../../src/Producers.js';
 import * as Sets from '../../src/collections/Sets.js';
-
-
-//, Producers, Series, Sets} from "../../dist/bundle.js";
 
 
 // ---------------------------------

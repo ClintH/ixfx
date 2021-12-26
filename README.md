@@ -22,11 +22,8 @@ npm run run -- build/StateMachine.js
 
 The `tests` folder contains Jest unit tests and manual tests. Manual tests are some HTML+JS to use the code and rely on the library being built. Manual tests are built to the `build-tests` folder.
 
+To start a dev server:
 ```
-// Continually build library
-npm run develop
-
-// Continually rebuild tests
 npm run develop-tests
 ```
 
