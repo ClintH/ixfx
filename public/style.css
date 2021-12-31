@@ -1,52 +1,4 @@
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
-html,
-body {
-  margin:0;
-  padding:0;
-}
-html {
-  box-sizing: border-box;
-  --spotLL: #FFEBE7;
-  --spotL: #FFC0BE;
-  --spot: #FF82A9;
-  --alt: #7F95D1;
-  --black: #12152B;
-  --white: #F4F1F0;
-}
 
-body {
-  background-color: var(--white);
-  width: 100vw;
-  padding: 1rem;
-  height: 100vh;
-  color: var(--black);
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
-}
-h1 {
-  color: var(--spot);
-}
-h2 {
-  color: var(--spot);
-}
-a,
-a:link,
-a:visited {
-  color: var(--alt);
-}
-a:hover {
-  color: black;
-  text-decoration: underline;
-}
-
-h1 > a:link,
-h1 > a:visited {
-  text-decoration: none;
-  color: var(--spotL);
-}
 
 #activity {
   opacity: 0.1;
@@ -66,4 +18,5 @@ h1 > a:visited {
 #activity>div {
   padding: 0.2em;
   border: 1px solid white;
+  
 }

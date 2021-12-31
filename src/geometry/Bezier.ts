@@ -51,18 +51,28 @@ export const quadraticSimple = function (start: Points.Point, end: Points.Point,
   return quadratic(start, end, handle);
 }
 
+export const quadraticToSvgString = function (start: Points.Point, end: Points.Point, handle: Points.Point): string {
+  //https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+  return `M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`
+}
+
 export const quadratic = function (start: Points.Point, end: Points.Point, handle: Points.Point): QuadraticBezier {
-  const b = new BezierLib(start, handle, end);
+  start = Object.freeze(start);
+  end = Object.freeze(end);
+  handle = Object.freeze(handle);
+
+  const bzr = new BezierLib(start, handle, end);
   return Object.freeze({
     a: start,
     b: end,
     quadratic: handle,
-    length: () => b.length(),
-    compute: (t: number) => b.compute(t),
+    length: () => bzr.length(),
+    compute: (t: number) => bzr.compute(t),
     bbox: () => {
-      const {x, y} = b.bbox();
+      const {x, y} = bzr.bbox();
       return Rects.fromTopLeft({x: x.min, y: y.min}, x.size!, y.size!);
     },
-    toString: () => b.toString()
+    toString: () => bzr.toString(),
+    toSvgString: () => quadraticToSvgString(start, end, handle)
   });
 }

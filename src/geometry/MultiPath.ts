@@ -28,7 +28,7 @@ export const setSegment = (multiPath: MultiPath, index: number, path: Paths.Path
  * @param {Dimensions} [dimensions] Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-const compute = (paths: Paths.Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
+export const compute = (paths: Paths.Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
@@ -83,7 +83,7 @@ type Dimensions = {
  * @param {Paths.Path[]} paths
  * @returns {Dimensions}
  */
-const computeDimensions = (paths: Paths.Path[]): Dimensions => {
+export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
   let widths = paths.map(l => l.bbox().width);
   let lengths = paths.map(l => l.length());
   let totalLength = 0;
@@ -127,6 +127,11 @@ export const guardContinuous = (paths: Paths.Path[]) => {
   }
 }
 
+export const toSvgString = (paths: Paths.Path[]): string => {
+  let svg = paths.map(p => p.toSvgString());
+  return svg.join(' ');
+}
+
 /**
  * Create a multipath from an array of paths.
  * All this does is verify they are connected, and precomputes dimensions
@@ -143,6 +148,7 @@ export const fromPaths = (...paths: Paths.Path[]): MultiPath => {
     length: () => dims.totalLength,
     compute: (t: number, useWidth: boolean = false) => compute(paths, t, useWidth, dims),
     bbox: () => boundingBox(paths),
-    toString: () => toString(paths)
+    toString: () => toString(paths),
+    toSvgString: () => toSvgString(paths)
   });
 }

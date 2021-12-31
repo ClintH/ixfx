@@ -1,6 +1,11 @@
-# ix
+# ixfx
 
-# Build scripts
+# Using
+
+
+# Development
+
+## Build scripts
 
 Clean dist folder, build Typescript sources and bundle into dist/bundle.mjs
 ```
@@ -17,17 +22,16 @@ Build Typescript sources, running a single file with source map support:
 npm run run -- build/StateMachine.js
 ```
 
+## Testing
 
-# Testing
-
-The `tests` folder contains Jest unit tests and manual tests. Manual tests are some HTML+JS to use the code and rely on the library being built. Manual tests are built to the `build-tests` folder.
+The `tests` folder contains Jest unit tests and manual tests. Manual tests are HTML+JS for quick testing of functionality. Snowpack is used to build the tests and run a dev server. 
 
 To start a dev server:
 ```
 npm run develop-tests
 ```
 
-Unit tests:
+Jest unit tests:
 
 ```
 npm run tests

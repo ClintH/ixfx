@@ -7,6 +7,7 @@ export type Path = {
   compute(t: number): Point
   bbox(): Rects.Rect
   toString(): string
+  toSvgString(): string
 }
 
 export const getStart = function (path: Path): Point {
@@ -19,4 +20,8 @@ export const getEnd = function (path: Path): Point {
   let p = path as any;
   if (p.a && p.b) return p.b as Point;
   throw Error('Cannot get end for path');
+}
+
+export type WithBeziers = {
+  getBeziers(): Path[]
 }

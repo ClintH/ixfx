@@ -3,40 +3,15 @@ import * as Bezier from '../geometry/Bezier.js';
 import * as Line from '../geometry/Line.js';
 import {Paths} from '../index.js';
 
-export type DadsrEnvelopeOpts = Envelope.StageOpts & {
 
-  /**
-   * Sustain level from 0-1
-   *
-   * @type {number}
-   */
-  sustainLevel?: number
-  /**
-   * Attack bezier 'bend'
-   *
-   * @type {number} Bend from -1 to 1. 0 for a straight line
-   */
-  attackBend?: number
-  /**
-   * Decay bezier 'bend'
-   *
-   * @type {number} Bend from -1 to 1. 0 for a straight line
-   */
-  decayBend?: number
-  /**
-   * Release bezier 'bend'
-   *
-   * @type {number} Bend from -1 to 1. 0 for a straight line
-   */
-  releaseBend?: number
-}
+
 /**
  * Create a 'dadsr' (delay, attack, decay, sustain, release) envelope
  *
  * @param {DadsrEnvelopeOpts} opts Options for envelope
  * @returns {Readonly<Envelope.Envelope>} Envelope
  */
-export const dadsr = (opts: DadsrEnvelopeOpts = {}): Readonly<Envelope.Envelope> => {
+export const dadsr = (opts: Envelope.DadsrEnvelopeOpts = {}): Readonly<Envelope.Envelope & Paths.WithBeziers> => {
 
   const {sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0} = opts;
 
@@ -66,6 +41,9 @@ export const dadsr = (opts: DadsrEnvelopeOpts = {}): Readonly<Envelope.Envelope>
     },
     hold: () => {
       env.hold();
+    },
+    getOpts: () => {
+      return opts
     },
     compute: (): [Envelope.Stage, number] => {
       const [stage, amt] = env.compute();

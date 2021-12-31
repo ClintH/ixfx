@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "module": "ES2020",
-    "target": "ESNext"
+    "target": "ESNext",
+    "allowJs": true,
+    "checkJs": true,
+    "traceResolution": false
   },
   "include": [
     "**/*",

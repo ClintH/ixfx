@@ -1,4 +1,32 @@
-import {dadsr} from "./DadsrEnvelope";
+import {dadsr} from './DadsrEnvelope.js';
+
+export type DadsrEnvelopeOpts = StageOpts & {
+
+  /**
+   * Sustain level from 0-1
+   *
+   * @type {number}
+   */
+  sustainLevel?: number
+  /**
+   * Attack bezier 'bend'
+   *
+   * @type {number} Bend from -1 to 1. 0 for a straight line
+   */
+  attackBend?: number
+  /**
+   * Decay bezier 'bend'
+   *
+   * @type {number} Bend from -1 to 1. 0 for a straight line
+   */
+  decayBend?: number
+  /**
+   * Release bezier 'bend'
+   *
+   * @type {number} Bend from -1 to 1. 0 for a straight line
+   */
+  releaseBend?: number
+}
 
 export {dadsr};
 
@@ -101,7 +129,7 @@ type TimerSource = () => Timer;
  *
  * @returns {Timer}
  */
-const msRelativeTimer = function (): Timer {
+export const msRelativeTimer = function (): Timer {
   let start = performance.now();
   return {
     reset: () => {
@@ -135,7 +163,7 @@ const tickRelativeTimer = function (): Timer {
  * @param {Stage} stage
  * @returns {string} Name of stage
  */
-const stageToText = function (stage: Stage): string {
+export const stageToText = function (stage: Stage): string {
   switch (stage) {
     case Stage.Delay:
       return 'Delay';
@@ -260,6 +288,10 @@ export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
     setStage(Stage.Stopped);
   }
 
+  const getOpts = () => {
+    return opts;
+  }
+
   reset();
 
   return Object.freeze({
@@ -268,6 +300,7 @@ export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
     release: release,
     hold: hold,
     compute: compute,
-    getStage: getStage
+    getStage: getStage,
+    getOpts: getOpts
   });
 }

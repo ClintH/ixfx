@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400');
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 100%;
+  box-sizing: border-box;
+  --spotLL: #FFEBE7;
+  --spotL: #FFC0BE;
+  --spot: #FF82A9;
+  --alt: #7F95D1;
+  --black: #12152B;
+  --white: #F4F1F0;
+  --greyL: hsl(0, 0%, 83%);
+  --size1: 3.052rem;
+  --size2: 2.441rem;
+  --size3: 1.953rem;
+  --size4: 1.563rem;
+  --size5: 1.25rem;
+  --size6: 1rem;
+  --size7: 0.8rem;
+  --size8: 0.64rem;
+  --size9: 0.512rem;
+}
+body {
+  font-family: , monospace;
+  font-weight: 400;
+  line-height: 1.7;
+  background-color: var(--white);
+  color: var(--black);
+  font-family: 'IBM Plex Mono', monospace; -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+}
+
+
+p {margin-bottom: 1rem;}
+
+h1, h2, h3, h4, h5 {
+  margin: 3rem 0 1.38rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 3.052rem;
+  color: var(--spot);
+}
+
+h2 {
+  color: var(--spot);
+  font-size: 2.441rem;
+}
+
+h3 {font-size: 1.953rem;}
+
+h4 {font-size: 1.563rem;}
+
+h5 {font-size: 1.25rem;}
+
+small, .text_small {font-size: 0.8rem;}
+
+a,
+a:link,
+a:visited {
+  color: var(--alt);
+}
+a:hover {
+  color: black;
+  text-decoration: underline;
+}
+
+h1 > a:link,
+h1 > a:visited {
+  text-decoration: none;
+  color: var(--spotL);
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cards header {
+  font-weight: 800;
+}
+.cards>article {
+  margin: var(--size9);
+  padding: var(--size5);
+  background-color: var(--greyL);
+  height: 10rem;
+  width: 15rem;
+
+}

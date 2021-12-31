@@ -1,4 +1,4 @@
-import {Lines, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '../../../dist/bundle.mjs';
+import {Lines, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '/dist/bundle.js';
 
 // Returns a drawing helper object bound to a given canvas element
 // It contains simple drawing primitives

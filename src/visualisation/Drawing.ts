@@ -5,9 +5,38 @@ import {array as guardArray} from '../Guards.js';
 
 import {Beziers} from '../index.js';
 
-// TODO: Would be nice to have a function that curries all these for a given ctx whilst still maintaining type safety
+// TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
+export function makeHelper(ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) {
+  if (ctxOrCanvasEl === undefined) throw Error('ctxOrCanvasEl undefined. Must be a 2d drawing context or Canvas element');
+  let ctx: CanvasRenderingContext2D;
+  if (ctxOrCanvasEl instanceof HTMLCanvasElement) {
+    ctx = ctxOrCanvasEl.getContext('2d')!;
+  } else ctx = ctxOrCanvasEl;
 
-export function paths(ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], opts: {debug?: boolean} = {}): void {
+
+  return {
+    paths(pathsToDraw: Paths.Path[], opts?: {strokeStyle?: string, debug?: boolean}): void {
+      paths(ctx, pathsToDraw, opts);
+    },
+    line(lineToDraw: Lines.Line, opts?: {strokeStyle?: string, debug?: boolean}): void {
+      line(ctx, lineToDraw, opts);
+    },
+    quadraticBezier(bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}): void {
+      quadraticBezier(ctx, bezierToDraw, opts);
+    },
+    connectedPoints(pts: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}): void {
+      connectedPoints(ctx, pts, opts);
+    },
+    pointLabels(pts: Points.Point[], opts: {fillStyle?: string} = {}): void {
+      pointLabels(ctx, pts, opts);
+    },
+    dot(pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}): void {
+      dot(ctx, pos, opts);
+    }
+  }
+}
+
+export function paths(ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], opts: {strokeStyle?: string, debug?: boolean} = {}): void {
   guardCtx(ctx);
 
   for (let i = 0; i < pathsToDraw.length; i++) {
@@ -69,8 +98,8 @@ function guardCtx(ctx: CanvasRenderingContext2D | any) {
   if (ctx === undefined) throw Error('ctx undefined');
 }
 
-function drawDot(ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {size: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}) {
-  const size = opts.size ?? 10;
+function dot(ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}) {
+  const radius = opts.radius ?? 10;
   let filled = opts.filled ?? false;
   const outlined = opts.outlined ?? false;
 
@@ -79,7 +108,7 @@ function drawDot(ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {size: 
   ctx.beginPath();
 
   // x&y for arc is the center of circle
-  ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
+  ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 
   if (opts.fillStyle) {
     ctx.fillStyle = opts.fillStyle;
@@ -93,45 +122,51 @@ function drawDot(ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {size: 
   if (outlined) ctx.stroke();
 }
 
-export function quadraticBezier(ctx: CanvasRenderingContext2D, line: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}) {
+export function quadraticBezier(ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}) {
   guardCtx(ctx);
   const debug = opts.debug ?? false;
-  const h = line.quadratic;
+  //const h = line.quadratic;
+
+  const {a, b, quadratic} = bezierToDraw;
   const ss = ctx.strokeStyle;
   if (debug) {
-    connectedPoints(ctx, [line.a, h, line.b], {strokeStyle: 'silver'});
+    connectedPoints(ctx, [a, quadratic, b], {strokeStyle: 'silver'});
     ctx.strokeStyle = ss;
   }
 
   ctx.beginPath();
-  ctx.moveTo(line.a.x, line.a.y);
-  ctx.quadraticCurveTo(h.x, h.y, line.b.x, line.b.y);
+  ctx.moveTo(a.x, a.y);
+  ctx.quadraticCurveTo(quadratic.x, quadratic.y, b.x, b.y);
   if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
 
   if (debug) {
     ctx.fillStyle = 'black';
-    ctx.fillText('a', line.a.x + 5, line.a.y);
-    ctx.fillText('b', line.b.x + 5, line.b.y);
-    ctx.fillText('h', h.x + 5, h.y);
-    drawDot(ctx, h, {size: 5});
-    drawDot(ctx, line.a, {size: 5, fillStyle: 'black'});
-    drawDot(ctx, line.b, {size: 5, fillStyle: 'black'});
+    ctx.fillText('a', a.x + 5, a.y);
+    ctx.fillText('b', b.x + 5, b.y);
+    ctx.fillText('h', quadratic.x + 5, quadratic.y);
+    dot(ctx, quadratic, {radius: 5});
+    dot(ctx, a, {radius: 5, fillStyle: 'black'});
+    dot(ctx, b, {radius: 5, fillStyle: 'black'});
   }
 }
 
-export function line(ctx: CanvasRenderingContext2D, line: Lines.Line, opts: {debug?: boolean} = {}) {
+export function line(ctx: CanvasRenderingContext2D, lineToDraw: Lines.Line, opts: {strokeStyle?: string, debug?: boolean} = {}) {
   const debug = opts.debug ?? false;
+  const {a, b} = lineToDraw;
 
+  let ss = ctx.strokeStyle;
   guardCtx(ctx);
   ctx.beginPath();
-  ctx.moveTo(line.a.x, line.a.y);
-  ctx.lineTo(line.b.x, line.b.y);
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
   if (debug) {
-    ctx.fillText('a', line.a.x, line.a.y);
-    ctx.fillText('b', line.b.x, line.b.y);
-    drawDot(ctx, line.a, {size: 5, strokeStyle: 'black'});
-    drawDot(ctx, line.b, {size: 5, strokeStyle: 'black'});
+    ctx.fillText('a', a.x, a.y);
+    ctx.fillText('b', b.x, b.y);
+    dot(ctx, a, {radius: 5, strokeStyle: 'black'});
+    dot(ctx, b, {radius: 5, strokeStyle: 'black'});
   }
+  if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
+  ctx.strokeStyle = ss;
 }

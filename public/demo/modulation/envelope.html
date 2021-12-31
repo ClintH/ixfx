@@ -5,27 +5,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>envelope demo</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../base.css">
+  <link rel="stylesheet" href="../demos.css">
+
 </head>
+<style>
+  #canvas {
+    border: 1px solid black;
+  }
+
+  #plot {
+    border: 1px solid red;
+  }
+</style>
 
 <body>
-  <style>
-    #canvas {
-      border: 1px solid black;
-    }
+  <main>
+    <h1>Envelope</h1>
+    <button id="btnHold">Hold</button>
+    <button id="btnRelease">Release</button>
+    <button id="btnTrigger">Trigger</button>
 
-    #plot {
-      border: 1px solid red;
-    }
-  </style>
-  <button id="btnHold">Hold</button>
-  <button id="btnRelease">Release</button>
-  <button id="btnTrigger">Trigger</button>
-
-  <canvas id="canvas" width=800></canvas>
-  <canvas id="plot" width=800></canvas>
-  <script type="module" src="envelope.js"></script>
-
+    <canvas id="canvas" width=800></canvas>
+    <canvas id="plot" width=800></canvas>
+    <script type="module" src="envelope.js"></script>
+  </main>
 </body>
 
 </html>

@@ -46,7 +46,6 @@ export function bbox(...points: Point[]): Rects.Rect {
   const yMin = Math.min(...y);
   const yMax = Math.max(...y);
 
-
   return Rects.fromTopLeft(
     {x: xMin, y: yMin},
     xMax - xMin,
@@ -59,12 +58,46 @@ export function toString(a: Point, b: Point): string {
 }
 
 export function fromNumbers(x1: number, y1: number, x2: number, y2: number): Line {
+  if (Number.isNaN(x1)) throw 'x1 is NaN';
+  if (Number.isNaN(x2)) throw 'x2 is NaN';
+  if (Number.isNaN(y1)) throw 'y1 is NaN';
+  if (Number.isNaN(y2)) throw 'y2 is NaN';
+
   const a = {x: x1, y: y1};
   const b = {x: x2, y: y2};
   return fromPoints(a, b);
 }
 
-export function fromPoints(a: Point, b: Point): Line {
+/**
+ * Returns an array representation of line: [a.x, a.y, b.x, b.y]
+ *
+ * @export
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number[]}
+ */
+export function toArray(a: Point, b: Point): number[] {
+  return [a.x, a.y, b.x, b.y];
+}
+
+export function toSvgString(a: Point, b: Point): string {
+  return `M${a.x} ${a.y} L ${b.x} ${b.y}`
+}
+
+export function fromArray(arr: number[]): Line {
+  if (!Array.isArray(arr)) throw 'arr parameter is not an array';
+  if (arr.length !== 4) throw 'array is expected to have length four';
+  return fromNumbers(arr[0], arr[1], arr[2], arr[3]);
+}
+
+export type LineInstance = Line & {
+  length: () => number,
+  toArray: () => number[],
+  bbox: () => Rects.Rect,
+  compute: (t: number) => Point
+}
+
+export function fromPoints(a: Point, b: Point): LineInstance {
   guardPoint(a, 'a');
   guardPoint(b, 'b');
   a = Object.freeze(a);
@@ -73,8 +106,10 @@ export function fromPoints(a: Point, b: Point): Line {
     a: a,
     b: b,
     length: () => length(a, b),
-    compute: (t) => compute(a, b, t),
+    compute: (t: number) => compute(a, b, t),
     bbox: () => bbox(a, b),
     toString: () => toString(a, b),
+    toArray: () => toArray(a, b),
+    toSvgString: () => toSvgString(a, b)
   });
 }

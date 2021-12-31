@@ -1,16 +1,42 @@
-import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '../../dist/bundle.mjs';
+//import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from '../../dist/bundle.js';
+import * as Envelopes from '../../../src/modulation/Envelope';
+import * as MultiPaths from '../../../src/geometry/MultiPath';
+import * as Paths from '../../../src/geometry/Path';
 
-let env = Envelopes.dadsr();
+/// <reference path="../../lib/svg.3.1.1.d.ts"/>
+import * as Svgjs from '../../lib/svg.esm';//@svgdotjs/svg.js';
 
+const SVG = Svgjs.SVG;
+
+let envOpts = {
+  sustainLevel: 0,
+  attackBend: 0,
+  decayBend: 0,
+  timerSource: Envelopes.msRelativeTimer,
+  looping: true,
+  delayDuration: 100,
+  attackDuration: 500,
+  decayDuration: 500,
+  releaseDuration: 1000
+}
+
+let env = Envelopes.dadsr(envOpts);
 let draw = null;
-let polyline = null;
+let svgLine = null;
 let envIndicator = null;
 let envValueVis = document.getElementById('envValueVis');
 let envValue = document.getElementById('envValue');
 let envStage = document.getElementById('envStage');
 
+const createEnvelope = function () {
+  let e = Envelopes.dadsr(envOpts);
+  updateLine(e, svgLine);
+  return e;
+}
+
 const setSlider = function (id, v) {
   if (id.endsWith('Amp')) v *= 100;
+  // @ts-ignore
   document.getElementById(id).value = v;
 };
 
@@ -24,20 +50,24 @@ const setSliders = function (idBase, v) {
 
 const setup = function () {
   draw = SVG().addTo('#envelope').size('100%', '100%');
-  polyline = createLine();
+  svgLine = createSvgLine();
+  env = createEnvelope();
+  createEnvelope();
+
   envIndicator = draw.circle(20);
 
   // Sync UI to start settings
-  setSliders('delay', env.get(Envelopes.Stage.Delay));
-  setSliders('attack', env.get(EnvelopeGenerator.Stage.Attack));
-  setSliders('decay', env.get(EnvelopeGenerator.Stage.Decay));
-  setSliders('sustain', env.get(EnvelopeGenerator.Stage.Sustain));
-  setSliders('release', env.get(EnvelopeGenerator.Stage.Release));
+  setSliders('delay', env.getStage(Envelopes.Stage.Delay));
+  setSliders('attack', env.getStage(Envelopes.Stage.Attack));
+  setSliders('decay', env.getStage(Envelopes.Stage.Decay));
+  setSliders('sustain', env.getStage(Envelopes.Stage.Sustain));
+  setSliders('release', env.getStage(Envelopes.Stage.Release));
+  // @ts-ignore
   document.getElementById('looping').checked = env.looping;
 
   // Redraw line on window resize
   window.addEventListener('resize', () => {
-    updateLine(polyline);
+    updateLine(svgLine);
   })
   document.getElementById('btnDump').addEventListener('click', () => {
     dumpEnv(env);
@@ -48,36 +78,37 @@ const setup = function () {
 
   // Listen for changes in widgets, update envelope and drawing
   document.getElementById('looping').addEventListener('input', (evt) => {
+    // @ts-ignore
     env.looping = evt.target.checked;
   });
   document.getElementById('delaySliders').addEventListener('input', () => {
-    env.set(EnvelopeGenerator.Stages.Delay, getRange('delayPeriod'));
-    updateLine(polyline);
+    envOpts.delayDuration = getRange('delayPeriod');
+    createEnvelope();
   });
-  document.getElementById('attackSliders').addEventListener('input', () => {
-    env.set(EnvelopeGenerator.Stages.Attack, getRange('attackAmp'), getRange('attackPeriod'));
-    updateLine(polyline);
-  });
-  document.getElementById('decaySliders').addEventListener('input', () => {
-    env.set(EnvelopeGenerator.Stages.Decay, 0, getRange('decayPeriod'));
-    updateLine(polyline);
-  });
-  document.getElementById('sustainSliders').addEventListener('input', () => {
-    env.set(EnvelopeGenerator.Stages.Sustain, getRange('sustainAmp'), getRange('sustainPeriod'));
-    updateLine(polyline);
-  });
-  document.getElementById('releaseSliders').addEventListener('input', () => {
-    env.set(EnvelopeGenerator.Stages.Release, getRange('releaseAmp'), getRange('releasePeriod'));
-    updateLine(polyline);
-  });
+  // document.getElementById('attackSliders').addEventListener('input', () => {
+  //   env.set(Envelopes.Stage.Attack, getRange('attackAmp'), getRange('attackPeriod'));
+  //   updateLine(polyline);
+  // });
+  // document.getElementById('decaySliders').addEventListener('input', () => {
+  //   env.set(Envelopes.Stage.Decay, 0, getRange('decayPeriod'));
+  //   updateLine(polyline);
+  // });
+  // document.getElementById('sustainSliders').addEventListener('input', () => {
+  //   env.set(Envelopes.Stage.Sustain, getRange('sustainAmp'), getRange('sustainPeriod'));
+  //   updateLine(polyline);
+  // });
+  // document.getElementById('releaseSliders').addEventListener('input', () => {
+  //   env.set(Envelopes.Stage.Release, getRange('releaseAmp'), getRange('releasePeriod'));
+  //   updateLine(polyline);
+  // });
 
   window.requestAnimationFrame(envStatus);
 }
 
 const envStatus = function () {
-  const v = env.calculate();
-  envValue.innerText = v;
-  envStage.innerText = env.getStage();
+  const [stage, v] = env.compute();
+  envValue.innerText = v.toFixed(2);
+  envStage.innerText = Envelopes.stageToText(stage);
   envValueVis.style.backgroundColor = `rgba(0,0,0,${v})`;
 
   //let lineLength = polyline.length();
@@ -98,7 +129,7 @@ const getRange = function (id) {
   return v;
 }
 
-
+/*
 const distanceBetweenPoints = function (a, b) {
   return Math.sqrt(Math.pow(b[0] - a[0], 2) + (Math.pow(b[1] - a[1], 2)));
 }
@@ -150,14 +181,27 @@ const getPointAlongPolyline = function (polyline, percentage) {
   }
   return null;
 }
+*/
 
 
-const updateLine = function (l) {
+/**
+ * Updates SVG line to match envelope properties
+ *
+ * @param {Readonly<Envelopes.Envelope & Paths.WithBeziers>} env
+ * @param {Envelopes.DadsrEnvelopeOpts} opts 
+ * @param {*} svgLine
+ */
+const updateLine = function (env, opts, svgLine) {
   const bounds = document.getElementById('envelope').getBoundingClientRect();
   const padding = 5;
-  const xScale = (bounds.width - (padding * 2)) / env.getTotalPeriod();
+
+  const paths = env.getBeziers();
+  const dimensions = MultiPaths.computeDimensions(paths);
+
+  const xScale = (bounds.width - (padding * 2)) / dimensions.totalLength;
   const yScale = (bounds.height - (padding * 2)) / 1.0;// env.getMaxLevel();
   let culmX = 0;
+
   const scale = ([unit, amp]) => {
     const result = [
       (unit * xScale) + culmX,
@@ -166,14 +210,13 @@ const updateLine = function (l) {
     culmX = result[0];
     return result;
   };
-  l.plot([
+  svgLine.plot([
     [padding, bounds.height - padding],
-    scale(env.get(EnvelopeGenerator.Stages.Attack)),
+    scale(opts.),
     scale(env.get(EnvelopeGenerator.Stages.Decay)),
     scale(env.get(EnvelopeGenerator.Stages.Sustain)),
     scale(env.get(EnvelopeGenerator.Stages.Release))
   ]);
-
 }
 
 const dumpEnv = function (env) {
@@ -190,8 +233,9 @@ const dumpEnv = function (env) {
   }
   console.log(helper);
 }
-const createLine = function () {
-  // Create a line with number of segments we need
+const createSvgLine = function () {
+
+  // Create a line with number of segments we need  
   const l = draw.polyline([
     [0, 0],
     [0, 0],
@@ -207,4 +251,3 @@ const createLine = function () {
 }
 
 setup();
-updateLine(polyline);
