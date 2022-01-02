@@ -38,10 +38,10 @@ const matches = <V>(filters: Iterable<MatchFunction<V>>, opts: {allValuesMustMat
       let filterCount = 0;
       for (const f of filters) {
         filterCount++;
-        let filterBasedFind = f(v);
+        const filterBasedFind = f(v);
         if (debug) console.log(`  filter #${filterCount} result = ${filterBasedFind}`);
         if (!filterBasedFind && (allValues && allFilters)) {
-          if (mismatchThrow) throw Error(`Filter #${filterCount} failed for value: ${v}`)
+          if (mismatchThrow) throw Error(`Filter #${filterCount} failed for value: ${v}`);
           return false;
         }
         if (filterBasedFind && !allFilters) {
@@ -69,8 +69,8 @@ const matches = <V>(filters: Iterable<MatchFunction<V>>, opts: {allValuesMustMat
       if (valueBasedFind) someMatch = true;
     }
     return someMatch;
-  }
-}
+  };
+};
 
 /**
  * Returns a function that filters a set of items by a set of filters
@@ -88,7 +88,7 @@ export const filter = <V>(filters: Iterable<MatchFunction<V>>, opts: {allFilters
       let matched = false;
 
       for (const f of filters) {
-        let matchedFilter = f(v);
+        const matchedFilter = f(v);
         if (matchedFilter && !allFilters) {
           // Don't need all filters to match
           matched = true;
@@ -103,9 +103,9 @@ export const filter = <V>(filters: Iterable<MatchFunction<V>>, opts: {allFilters
       }
       if (matched) yield v;
     }
-  }
+  };
   return r;
-}
+};
 
 /**
  * Tests that all-value-match and all-filter-match works
@@ -116,17 +116,17 @@ const testAllMatches = () => {
   const opts = {allValuesMustMatch: true, allFiltersMustMatch: true, mismatchThrow: false};
   console.log(`testAllMatches. dataSet: ${dataSet}`);
   let shouldNotMatch = matches([Filters.threshold(0.5), Filters.rangeInclusive(0.7, 1)], opts);
-  if (shouldNotMatch(dataSet)) throw Error('Unexpected match (1)');
+  if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (1)`);
 
   shouldNotMatch = matches([Filters.rangeInclusive(0.21, 0.41)], opts);
-  if (shouldNotMatch(dataSet)) throw Error('Unexpected match (2)');
+  if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (2)`);
 
   opts.mismatchThrow = true;
-  let shouldMatch = matches([Filters.rangeInclusive(0, 1)], opts);
-  if (!shouldMatch(dataSet)) throw Error('Unexpected mismatch');
+  const shouldMatch = matches([Filters.rangeInclusive(0, 1)], opts);
+  if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch`);
 
-  console.log('testAllMatches OK');
-}
+  console.log(`testAllMatches OK`);
+};
 
 /**
  * Tests that all-value-match and some-filter-match works
@@ -138,17 +138,17 @@ const testSomeFilterMatches = () => {
   console.log(`testSomeFilterMatches. dataSet: ${dataSet}`);
 
   let shouldNotMatch = matches([Filters.threshold(0.5), Filters.rangeInclusive(0.7, 1)], opts);
-  if (shouldNotMatch(dataSet)) throw Error('Unexpected match (1)');
+  if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (1)`);
 
   shouldNotMatch = matches([Filters.rangeInclusive(0.21, 0.41)], opts);
-  if (shouldNotMatch(dataSet)) throw Error('Unexpected match (2)');
+  if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (2)`);
 
   opts.mismatchThrow = true;
-  let shouldMatch = matches([Filters.rangeInclusive(0, 1)], opts);
-  if (!shouldMatch(dataSet)) throw Error('Unexpected mismatch');
+  const shouldMatch = matches([Filters.rangeInclusive(0, 1)], opts);
+  if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch`);
 
-  console.log('testSomeFilterMatches OK');
-}
+  console.log(`testSomeFilterMatches OK`);
+};
 
 /**
  * Tests that some-value-match and all-filter-match works
@@ -161,16 +161,16 @@ const testSomeValueMatches = () => {
   console.log(`testSomeValueMatches. dataSet: ${dataSet}`);
 
   let shouldMatch = matches([Filters.threshold(0.5), Filters.rangeInclusive(0.7, 1)], opts);
-  if (!shouldMatch(dataSet)) throw Error('Unexpected mismatch (1)');
+  if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch (1)`);
 
   shouldMatch = matches([Filters.rangeInclusive(0.21, 0.41)], opts);
-  if (!shouldMatch(dataSet)) throw Error('Unexpected mismatch (2)');
+  if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch (2)`);
 
-  let shouldNotMatch = matches([Filters.rangeInclusive(2, 3)], opts);
-  if (shouldNotMatch(dataSet)) throw Error('Unexpected match');
+  const shouldNotMatch = matches([Filters.rangeInclusive(2, 3)], opts);
+  if (shouldNotMatch(dataSet)) throw Error(`Unexpected match`);
 
-  console.log('testSomeValueMatches OK');
-}
+  console.log(`testSomeValueMatches OK`);
+};
 
 
 const testFind = () => {
@@ -181,10 +181,10 @@ const testFind = () => {
 
   f = filter([Filters.rangeInclusive(0, 0.1), Filters.rangeInclusive(0.9, 1)], {allFiltersMustMatch: false});
   fArray = Array.from(f(dataSet));
-  if (fArray.length !== 6) throw Error(`Expected 6 matched items, got ${fArray.length}`)
+  if (fArray.length !== 6) throw Error(`Expected 6 matched items, got ${fArray.length}`);
 
   console.log(`testFind OK`);
-}
+};
 
 testAllMatches();
 testSomeFilterMatches();

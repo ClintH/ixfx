@@ -6,11 +6,11 @@ import {array as guardArray} from '../Guards.js';
 import {Beziers} from '../index.js';
 
 // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
-export function makeHelper(ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) {
-  if (ctxOrCanvasEl === undefined) throw Error('ctxOrCanvasEl undefined. Must be a 2d drawing context or Canvas element');
+export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) => {
+  if (ctxOrCanvasEl === undefined) throw Error(`ctxOrCanvasEl undefined. Must be a 2d drawing context or Canvas element`);
   let ctx: CanvasRenderingContext2D;
   if (ctxOrCanvasEl instanceof HTMLCanvasElement) {
-    ctx = ctxOrCanvasEl.getContext('2d')!;
+    ctx = ctxOrCanvasEl.getContext(`2d`)!;
   } else ctx = ctxOrCanvasEl;
 
 
@@ -33,20 +33,20 @@ export function makeHelper(ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
     dot(pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}): void {
       dot(ctx, pos, opts);
     }
-  }
-}
+  };
+};
 
-export function paths(ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], opts: {strokeStyle?: string, debug?: boolean} = {}): void {
+export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], opts: {strokeStyle?: string, debug?: boolean} = {}) =>  {
   guardCtx(ctx);
 
   for (let i = 0; i < pathsToDraw.length; i++) {
-    let p = pathsToDraw[i] as any;
+    const p = pathsToDraw[i] as any;
 
     // Draw simple line
     if (p.a && p.b && p.quadratic) quadraticBezier(ctx, p, opts);
     else if (p.a && p.b) line(ctx, p, opts);
   }
-}
+};
 
 /**
  * Draws a line between all the given points.
@@ -56,16 +56,16 @@ export function paths(ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], 
  * @param {...Points.Point[]} pts
  * @returns {void}
  */
-export function connectedPoints(ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}): void {
+export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}) => {
   guardCtx(ctx);
   guardArray(pts);
 
   const loop = opts.loop ?? false;
 
-  if (pts.length == 0) return;
+  if (pts.length === 0) return;
 
   // Throw an error if any point is invalid
-  for (let i = 0; i < pts.length; i++) Points.guard(pts[i], 'Index ' + i);
+  for (let i = 0; i < pts.length; i++) Points.guard(pts[i], `Index ` + i);
 
   // Draw points
   ctx.beginPath();
@@ -77,28 +77,28 @@ export function connectedPoints(ctx: CanvasRenderingContext2D, pts: Points.Point
   if (loop) ctx.lineTo(pts[0].x, pts[0].y);
   if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
-}
+};
 
-export function pointLabels(ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {fillStyle?: string} = {}): void {
+export const pointLabels = (ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {fillStyle?: string} = {}) => {
   guardCtx(ctx);
 
-  if (pts.length == 0) return;
+  if (pts.length === 0) return;
 
   // Throw an error if any point is invalid
-  for (let i = 0; i < pts.length; i++) Points.guard(pts[i], 'Index ' + i);
+  for (let i = 0; i < pts.length; i++) Points.guard(pts[i], `Index ` + i);
 
   if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
 
   for (let i = 0; i < pts.length; i++) {
     ctx.fillText(i.toString(), pts[i].x, pts[i].y);
   }
-}
+};
 
-function guardCtx(ctx: CanvasRenderingContext2D | any) {
-  if (ctx === undefined) throw Error('ctx undefined');
-}
+const guardCtx = (ctx: CanvasRenderingContext2D | any) => {
+  if (ctx === undefined) throw Error(`ctx undefined`);
+};
 
-function dot(ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}) {
+const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean})  => {
   const radius = opts.radius ?? 10;
   let filled = opts.filled ?? false;
   const outlined = opts.outlined ?? false;
@@ -120,9 +120,9 @@ function dot(ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {radius: nu
     ctx.strokeStyle = opts.strokeStyle;
   }
   if (outlined) ctx.stroke();
-}
+};
 
-export function quadraticBezier(ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}) {
+export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}) => {
   guardCtx(ctx);
   const debug = opts.debug ?? false;
   //const h = line.quadratic;
@@ -130,7 +130,7 @@ export function quadraticBezier(ctx: CanvasRenderingContext2D, bezierToDraw: Bez
   const {a, b, quadratic} = bezierToDraw;
   const ss = ctx.strokeStyle;
   if (debug) {
-    connectedPoints(ctx, [a, quadratic, b], {strokeStyle: 'silver'});
+    connectedPoints(ctx, [a, quadratic, b], {strokeStyle: `silver`});
     ctx.strokeStyle = ss;
   }
 
@@ -141,32 +141,32 @@ export function quadraticBezier(ctx: CanvasRenderingContext2D, bezierToDraw: Bez
   ctx.stroke();
 
   if (debug) {
-    ctx.fillStyle = 'black';
-    ctx.fillText('a', a.x + 5, a.y);
-    ctx.fillText('b', b.x + 5, b.y);
-    ctx.fillText('h', quadratic.x + 5, quadratic.y);
+    ctx.fillStyle = `black`;
+    ctx.fillText(`a`, a.x + 5, a.y);
+    ctx.fillText(`b`, b.x + 5, b.y);
+    ctx.fillText(`h`, quadratic.x + 5, quadratic.y);
     dot(ctx, quadratic, {radius: 5});
-    dot(ctx, a, {radius: 5, fillStyle: 'black'});
-    dot(ctx, b, {radius: 5, fillStyle: 'black'});
+    dot(ctx, a, {radius: 5, fillStyle: `black`});
+    dot(ctx, b, {radius: 5, fillStyle: `black`});
   }
-}
+};
 
-export function line(ctx: CanvasRenderingContext2D, lineToDraw: Lines.Line, opts: {strokeStyle?: string, debug?: boolean} = {}) {
+export const line = (ctx: CanvasRenderingContext2D, lineToDraw: Lines.Line, opts: {strokeStyle?: string, debug?: boolean} = {}) => {
   const debug = opts.debug ?? false;
   const {a, b} = lineToDraw;
 
-  let ss = ctx.strokeStyle;
+  const ss = ctx.strokeStyle;
   guardCtx(ctx);
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
   ctx.lineTo(b.x, b.y);
   if (debug) {
-    ctx.fillText('a', a.x, a.y);
-    ctx.fillText('b', b.x, b.y);
-    dot(ctx, a, {radius: 5, strokeStyle: 'black'});
-    dot(ctx, b, {radius: 5, strokeStyle: 'black'});
+    ctx.fillText(`a`, a.x, a.y);
+    ctx.fillText(`b`, b.x, b.y);
+    dot(ctx, a, {radius: 5, strokeStyle: `black`});
+    dot(ctx, b, {radius: 5, strokeStyle: `black`});
   }
   if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
   ctx.strokeStyle = ss;
-}
+};

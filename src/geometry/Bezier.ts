@@ -18,9 +18,7 @@ export type QuadraticBezier = Paths.Path & {
  * @param {number} [bend=0] Bend amount, from -1 to 1
  * @returns {QuadraticBezier}
  */
-export const quadraticBend = function (b: QuadraticBezier, bend: number = 0): QuadraticBezier {
-  return quadraticSimple(b.a, b.b, bend);
-}
+export const quadraticBend = (b: QuadraticBezier, bend = 0): QuadraticBezier => quadraticSimple(b.a, b.b, bend);
 
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.
@@ -30,33 +28,31 @@ export const quadraticBend = function (b: QuadraticBezier, bend: number = 0): Qu
  * @param {number} [bend=0] Bend amount, -1 to 1
  * @returns {QuadraticBezier}
  */
-export const quadraticSimple = function (start: Points.Point, end: Points.Point, bend: number = 0): QuadraticBezier {
-  if (isNaN(bend)) throw Error('bend is NaN');
-  if (bend < -1 || bend > 1) throw Error('Expects bend range of -1 to 1');
+export const quadraticSimple = (start: Points.Point, end: Points.Point, bend = 0): QuadraticBezier => {
+  if (isNaN(bend)) throw Error(`bend is NaN`);
+  if (bend < -1 || bend > 1) throw Error(`Expects bend range of -1 to 1`);
 
-  let middle = Lines.compute(start, end, 0.5);
+  const middle = Lines.compute(start, end, 0.5);
   let target = middle;
   if (end.y < start.y) {
     // Upward slope
     target = bend > 0 ? {x: Math.min(start.x, end.x), y: Math.min(start.y, end.y)} :
-      {x: Math.max(start.x, end.x), y: Math.max(start.y, end.y)}
+      {x: Math.max(start.x, end.x), y: Math.max(start.y, end.y)};
   } else {
     // Downward slope
     target = bend > 0 ? {x: Math.max(start.x, end.x), y: Math.min(start.y, end.y)} :
-      {x: Math.min(start.x, end.x), y: Math.max(start.y, end.y)}
+      {x: Math.min(start.x, end.x), y: Math.max(start.y, end.y)};
   }
 
-  let handle = Lines.compute(middle, target, Math.abs(bend));
+  const handle = Lines.compute(middle, target, Math.abs(bend));
   //console.log(`bend: ${bend} middle: ${middle.x},${middle.y} handle: ${handle.x}, ${handle.y}`);
   return quadratic(start, end, handle);
-}
+};
 
-export const quadraticToSvgString = function (start: Points.Point, end: Points.Point, handle: Points.Point): string {
-  //https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
-  return `M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`
-}
+//https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+export const quadraticToSvgString = (start: Points.Point, end: Points.Point, handle: Points.Point): string => `M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`;
 
-export const quadratic = function (start: Points.Point, end: Points.Point, handle: Points.Point): QuadraticBezier {
+export const quadratic = (start: Points.Point, end: Points.Point, handle: Points.Point): QuadraticBezier => {
   start = Object.freeze(start);
   end = Object.freeze(end);
   handle = Object.freeze(handle);
@@ -75,4 +71,4 @@ export const quadratic = function (start: Points.Point, end: Points.Point, handl
     toString: () => bzr.toString(),
     toSvgString: () => quadraticToSvgString(start, end, handle)
   });
-}
+};

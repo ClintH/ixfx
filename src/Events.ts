@@ -54,7 +54,7 @@ export class SimpleEventEmitter<Events> {
       try {
         l(args, this);
       } catch (err) {
-        console.debug('Event listener error: ', err);
+        console.debug(`Event listener error: `, err);
       }
     }
   }
@@ -93,8 +93,8 @@ export class SimpleEventEmitter<Events> {
 }
 
 type TestEventMap = {
-  'change': TestEvent
-  'other': TestEvent2;
+  change: TestEvent
+  other: TestEvent2;
 }
 
 interface TestEvent2 {
@@ -108,7 +108,7 @@ class TestEmitter extends SimpleEventEmitter<TestEventMap> {
 
   constructor() {
     super();
-    this.addEventListener('change', (e) => {
+    this.addEventListener(`change`, (e) => {
       e.blah;
     });
   }

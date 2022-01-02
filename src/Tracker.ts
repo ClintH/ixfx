@@ -22,22 +22,22 @@ export class Tracker {
     this.id = id;
   }
 
-  get avg() {return this.total / this.samples;}
+  get avg() { return this.total / this.samples; }
 
   resetAvg(newId: string | null = null) {
     if (newId !== null) this.id = newId;
     this.total = 0;
     this.samples = 0;
-  };
+  }
 
   reset(newId: string | null = null) {
     this.min = Number.MAX_SAFE_INTEGER;
     this.max = Number.MIN_SAFE_INTEGER;
     this.resetAvg(newId);
-  };
+  }
 
   seen(sample: number) {
-    if (Number.isNaN(sample)) throw Error('Cannot add NaN');
+    if (Number.isNaN(sample)) throw Error(`Cannot add NaN`);
     this.samples++;
     this.total += sample;
     this.min = Math.min(sample, this.min);
@@ -65,9 +65,9 @@ export class IntervalTracker extends Tracker {
   perf;
   constructor(id: string | undefined = undefined) {
     super();
-    if (typeof performance === 'undefined') {
+    if (typeof performance === `undefined`) {
       try {
-        const p = require('perf_hooks');
+        const p = require(`perf_hooks`);
         this.perf = p.performance.now;
       } catch (err) {}
     } else {

@@ -8,9 +8,9 @@ type TriggerToTrigger = (trigger: boolean) => boolean;
 const createProbability = (probability: number): NumberToTrigger | TriggerToTrigger => {
   return (v: number | boolean): boolean => {
     const rando = Math.random();
-    return (rando <= probability)
-  }
-}
+    return (rando <= probability);
+  };
+};
 
 // const delay = (timeMs: number): TriggerToTrigger => {
 //   let p = new Promise<boolean>((resolve, reject) => {
@@ -22,8 +22,8 @@ const createProbability = (probability: number): NumberToTrigger | TriggerToTrig
 // }
 
 const produceWithInterval = <V>(intervalMs: number, produce: () => V): Series<V> => {
-  let series = new Series<V>();
-  let timer = setInterval(() => {
+  const series = new Series<V>();
+  const timer = setInterval(() => {
     if (series.cancelled) {
       clearInterval(timer);
       return;
@@ -31,22 +31,18 @@ const produceWithInterval = <V>(intervalMs: number, produce: () => V): Series<V>
     series.push(produce());
   }, intervalMs);
   return series;
-}
+};
 
 
-
-
-console.log('Start');
-let s = produceWithInterval(500, () => Math.random());
+console.log(`Start`);
+const s = produceWithInterval(500, () => Math.random());
 setTimeout(() => {
-  console.log('Killing');
+  console.log(`Killing`);
   s.cancel();
 }, 5000);
 
-let f = Filters.threshold(0.5);
-let f2 = Filters.rangeInclusive(0.7, 1);
-
-
+const f = Filters.threshold(0.5);
+const f2 = Filters.rangeInclusive(0.7, 1);
 
 
 // for await (let n of s) {

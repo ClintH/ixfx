@@ -19,10 +19,10 @@ type SeriesValueNeeded<V> = () => V | undefined;
  * @param {Generator<V>} vGen Generator
  * @returns {Series<V>} Series from provided generator
  */
-export const fromGenerator = function <V>(vGen: Generator<V>): Series<V> {
+export const fromGenerator = <V> (vGen: Generator<V>): Series<V> => {
   if (vGen === undefined) throw Error(`vGen is undefined`);
 
-  let s = new Series<V>();
+  const s = new Series<V>();
   let genResult = vGen.next();
   s.onValueNeeded = () => {
     //console.log('Series.fromGenerator - pulling new value');
@@ -42,7 +42,7 @@ export const fromGenerator = function <V>(vGen: Generator<V>): Series<V> {
 
   s.push(genResult.value);
   return s;
-}
+};
 
 /**
  * Creates a series from an iterable collection. 
@@ -60,7 +60,7 @@ export const fromTimedIterable = <V>(vIter: Iterable<V> | AsyncIterable<V>, dela
   if (delayMs < 0) throw Error(`delayMs must be at least zero`);
   if (intervalMs < 0) throw Error(`delayMs must be at least zero`);
 
-  let s = new Series<V>();
+  const s = new Series<V>();
   setTimeout(async () => {
     if (s.cancelled) return;
     try {
@@ -75,7 +75,7 @@ export const fromTimedIterable = <V>(vIter: Iterable<V> | AsyncIterable<V>, dela
     }
   }, delayMs);
   return s;
-}
+};
 
 /**
  * Creates a series from an event handler
@@ -89,7 +89,7 @@ export const fromEvent = (source: EventTarget, eventType: string) => {
   const s = new Series<any>();
   s.mergeEvent(source, eventType);
   return s;
-}
+};
 
 /**
  * A Series produces an asynchronous series of data
@@ -116,12 +116,8 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    */
   onValueNeeded: SeriesValueNeeded<V> | undefined = undefined;
 
-  constructor() {
-    super();
-  }
-
   [Symbol.asyncIterator]() {
-    return eventsToIterable(this, 'data');
+    return eventsToIterable(this, `data`);
   }
 
   /**
@@ -133,8 +129,8 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    * @memberof Series
    */
   mergeEvent(source: EventTarget, eventType: string) {
-    if (source === undefined) throw Error('source is undefined');
-    if (eventType === undefined) throw Error('eventType is undefined');
+    if (source === undefined) throw Error(`source is undefined`);
+    if (eventType === undefined) throw Error(`eventType is undefined`);
 
     const s = this;
     const handler = (evt: any) => {
@@ -143,7 +139,7 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
     };
 
     source.addEventListener(eventType, handler);
-    s.addEventListener('done', () => {
+    s.addEventListener(`done`, () => {
       try {
         source.removeEventListener(eventType, handler);
       } catch (err) {
@@ -161,7 +157,7 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
   _setDone() {
     if (this.#done) return;
     this.#done = true;
-    super.fireEvent('done', false);
+    super.fireEvent(`done`, false);
   }
 
   /**
@@ -171,11 +167,11 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    * @memberof Series
    */
   push(v: V) {
-    if (this.#cancelled) throw Error('Series cancelled');
-    if (this.#done) throw Error('Series is marked as done');
+    if (this.#cancelled) throw Error(`Series cancelled`);
+    if (this.#done) throw Error(`Series is marked as done`);
     this.#lastValue = v;
     this.#newValue = true;
-    super.fireEvent('data', v);
+    super.fireEvent(`data`, v);
   }
 
   /**
@@ -186,13 +182,13 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    * @returns
    * @memberof Series
    */
-  cancel(cancelReason: string = 'Cancelled') {
-    if (this.#done) throw Error('Series cannot be cancelled, already marked done');
+  cancel(cancelReason: string = `Cancelled`) {
+    if (this.#done) throw Error(`Series cannot be cancelled, already marked done`);
     if (this.#cancelled) return;
     this.#cancelled = true;
     this.#done = true;
-    super.fireEvent('cancel', cancelReason);
-    super.fireEvent('done', true);
+    super.fireEvent(`cancel`, cancelReason);
+    super.fireEvent(`done`, true);
   }
 
   /**
@@ -229,7 +225,7 @@ export class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements 
    */
   get value(): V | undefined {
     if (!this.#newValue && this.onValueNeeded && !this.#done) {
-      let v = this.onValueNeeded();
+      const v = this.onValueNeeded();
       if (v) this.push(v);
       else if (v === undefined) this._setDone();
     }

@@ -16,9 +16,9 @@
  * @returns Clamped value
  */
 export const clamp = (v: number, min = 0, max = 1) => {
-  if (Number.isNaN(v)) throw 'v parameter is NaN';
-  if (Number.isNaN(min)) throw 'min parameter is NaN';
-  if (Number.isNaN(max)) throw 'max parameter is NaN';
+  if (Number.isNaN(v)) throw new Error(`v parameter is NaN`);
+  if (Number.isNaN(min)) throw new Error(`min parameter is NaN`);
+  if (Number.isNaN(max)) throw new Error(`max parameter is NaN`);
 
   if (v < min) return min;
   if (v > max) return max;
@@ -34,17 +34,15 @@ export const clamp = (v: number, min = 0, max = 1) => {
  * @returns Clamped value
  */
 export const clampZeroBounds = (v: number, length: number) => {
-  if (!Number.isInteger(v)) throw 'v parameter must be an integer';
-  if (!Number.isInteger(length)) throw 'length parameter must be an integer';
+  if (!Number.isInteger(v)) throw new Error(`v parameter must be an integer`);
+  if (!Number.isInteger(length)) throw new Error(`length parameter must be an integer`);
 
   if (v < 0) return 0;
   if (v >= length) return length - 1;
   return v;
-}
+};
 
-export const randomElement = <V>(array: ArrayLike<V>): V => {
-  return array[Math.floor(Math.random() * array.length)];
-}
+export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Math.random() * array.length)];
 
 export const getMinMaxAvg = (data: Array<any>): {min: number; max: number; avg: number;} => {
   let min = Number.MAX_SAFE_INTEGER;
@@ -61,7 +59,5 @@ export const getMinMaxAvg = (data: Array<any>): {min: number; max: number; avg: 
   return {min: min, max: max, avg: total / samples};
 };
 
-export const sleep = (milliseconds: number): Promise<any> => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds));
-}
+export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
 

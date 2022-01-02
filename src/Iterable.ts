@@ -3,65 +3,62 @@ type WithEvents = {
   removeEventListener(type: string, callbackfn: any): void;
 }
 
-export const isAsyncIterable = (v: any): v is AsyncIterable<any> => {
-  return Symbol.asyncIterator in Object(v);
-}
+export const isAsyncIterable = (v: any): v is AsyncIterable<any> => Symbol.asyncIterator in Object(v);
 
-export const isIterable = (v: any): v is Iterable<any> => {
-  return Symbol.iterator in Object(v);
-}
+
+export const isIterable = (v: any): v is Iterable<any> => Symbol.iterator in Object(v);
 
 
 export const eventsToIterable = <V>(eventSource: WithEvents, eventType: string): AsyncIterator<any, any, undefined> => {
-  const pullQueue: any[] = []
-  const pushQueue: any[] = []
-  let done = false
+  const pullQueue: any[] = [];
+  const pushQueue: any[] = [];
+  let done = false;
   const pushValue = async (args: any) => {
     if (pullQueue.length !== 0) {
-      const resolver = pullQueue.shift()
-      resolver(...args)
+      const resolver = pullQueue.shift();
+      resolver(...args);
     } else {
-      pushQueue.push(args)
+      pushQueue.push(args);
     }
-  }
+  };
 
   const pullValue = (): Promise<V> => {
     return new Promise<V>((resolve) => {
       if (pushQueue.length !== 0) {
-        const args = pushQueue.shift()
+        const args = pushQueue.shift();
         // @ts-ignore
-        resolve(...args)
+        resolve(...args);
       } else {
-        pullQueue.push(resolve)
+        pullQueue.push(resolve);
       }
-    })
-  }
+    });
+  };
 
   const handler = (...args: any) => {
-    pushValue(args)
-  }
+    pushValue(args);
+  };
 
-  eventSource.addEventListener(eventType, handler)
+  eventSource.addEventListener(eventType, handler);
   const r = {
     next: async (): Promise<IteratorResult<V>> => {
       if (done) return {done: true, value: undefined};
       return {
         done: false,
         value: await pullValue()
-      }
+      };
     },
     return: async (): Promise<IteratorResult<V>> => {
-      done = true
-      eventSource.removeEventListener(eventType, handler)
-      return {done: true, value: undefined}
+      done = true;
+      eventSource.removeEventListener(eventType, handler);
+      return {done: true, value: undefined};
     },
     throw: async (error: any): Promise<IteratorResult<V>> => {
-      done = true
+      done = true;
       return {
         done: true,
         value: Promise.reject(error)
-      }
+      };
     }
-  }
+  };
   return r;
-}
+};

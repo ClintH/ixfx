@@ -1,5 +1,5 @@
-import {Points} from "../index.js";
-import * as Paths from "./Path.js";
+import {Points} from '../index.js';
+import * as Paths from './Path.js';
 import * as Rects from './Rect.js';
 
 export type MultiPath = Paths.Path & {
@@ -14,10 +14,10 @@ export type MultiPath = Paths.Path & {
  * @returns {MultiPath} New multipath
  */
 export const setSegment = (multiPath: MultiPath, index: number, path: Paths.Path): MultiPath => {
-  let existing = multiPath.segments;
+  const existing = multiPath.segments;
   existing[index] = path;
   return fromPaths(...existing);
-}
+};
 
 /**
  * Computes x,y point at a relative position along multipath
@@ -38,17 +38,17 @@ export const compute = (paths: Paths.Path[], t: number, useWidth?: boolean, dime
   let soFar = 0;
 
   // Use widths or lengths?
-  let l = useWidth ? dimensions.widths : dimensions.lengths;
+  const l = useWidth ? dimensions.widths : dimensions.lengths;
   for (let i = 0; i < l.length; i++) {
     if (soFar + l[i] >= expected) {
-      let relative = expected - soFar;
+      const relative = expected - soFar;
       let amt = relative / l[i];
       if (amt > 1) amt = 1;
       return paths[i].compute(amt);
     } else soFar += l[i];
   }
-  return {x: 0, y: 0}
-}
+  return {x: 0, y: 0};
+};
 
 type Dimensions = {
   /**
@@ -84,15 +84,15 @@ type Dimensions = {
  * @returns {Dimensions}
  */
 export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
-  let widths = paths.map(l => l.bbox().width);
-  let lengths = paths.map(l => l.length());
+  const widths = paths.map(l => l.bbox().width);
+  const lengths = paths.map(l => l.length());
   let totalLength = 0;
   let totalWidth = 0;
   for (let i = 0; i < lengths.length; i++) totalLength += lengths[i];
   for (let i = 0; i < widths.length; i++) totalWidth += widths[i];
 
   return {totalLength, totalWidth, widths, lengths};
-}
+};
 /**
  * Computes the bounding box that encloses entire multipath
  *
@@ -100,18 +100,16 @@ export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
  * @returns {Rects.Rect}
  */
 const boundingBox = (paths: Paths.Path[]): Rects.Rect => {
-  throw Error('Not yet implemented');
+  throw Error(`Not yet implemented`);
   return Rects.fromTopLeft({x: 0, y: 0}, 10, 10);
-}
+};
 /**
  * Produce a human-friendly representation of paths
  *
  * @param {Paths.Path[]} paths
  * @returns {string}
  */
-export const toString = (paths: Paths.Path[]): string => {
-  return paths.map(p => p.toString()).join(', ');
-}
+export const toString = (paths: Paths.Path[]): string => paths.map(p => p.toString()).join(`, `);
 /**
  * Throws an error if paths are not connected together, in order
  *
@@ -120,17 +118,16 @@ export const toString = (paths: Paths.Path[]): string => {
 export const guardContinuous = (paths: Paths.Path[]) => {
   let lastPos = Paths.getEnd(paths[0]);
   for (let i = 1; i < paths.length; i++) {
-    let start = Paths.getStart(paths[i]);
-    if (!Points.equals(start, lastPos))
-      throw Error('Path index ' + i + ' does not start at prior path end. Start: ' + start.x + ',' + start.y + ' expected: ' + lastPos.x + ',' + lastPos.y + '');
+    const start = Paths.getStart(paths[i]);
+    if (!Points.equals(start, lastPos)) throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);
     lastPos = Paths.getEnd(paths[i]);
   }
-}
+};
 
 export const toSvgString = (paths: Paths.Path[]): string => {
-  let svg = paths.map(p => p.toSvgString());
-  return svg.join(' ');
-}
+  const svg = paths.map(p => p.toSvgString());
+  return svg.join(` `);
+};
 
 /**
  * Create a multipath from an array of paths.
@@ -140,15 +137,15 @@ export const toSvgString = (paths: Paths.Path[]): string => {
  * @returns {MultiPath}
  */
 export const fromPaths = (...paths: Paths.Path[]): MultiPath => {
-  guardContinuous(paths) // Throws an error if paths are not connected
+  guardContinuous(paths); // Throws an error if paths are not connected
   const dims = computeDimensions(paths);
 
   return Object.freeze({
     segments: paths,
     length: () => dims.totalLength,
-    compute: (t: number, useWidth: boolean = false) => compute(paths, t, useWidth, dims),
+    compute: (t: number, useWidth = false) => compute(paths, t, useWidth, dims),
     bbox: () => boundingBox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths)
   });
-}
+};

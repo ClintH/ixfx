@@ -16,7 +16,13 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "no-inferrable-types": "never",
+        "no-throw-literal": [
+            "error"
+        ],
+        "@typescript-eslint/no-inferrable-types": [
+            "off",
+            "ignore-params"
+        ],
         "indent": [
             "error",
             2
@@ -27,7 +33,7 @@
         ],
         "quotes": [
             "error",
-            "single"
+            "backtick"
         ],
         "semi": [
             "error",
@@ -75,7 +81,6 @@
             "error",
             "never"
         ],
- 
         "space-before-blocks": "error",
         "array-bracket-spacing": [
             "error",
@@ -87,11 +92,11 @@
         ],
         "function-call-argument-newline": [
             "error",
-            "never"
+            "consistent"
         ],
         "function-paren-newline": [
             "error",
-            "never"
+            "consistent"
         ],
         "no-multiple-empty-lines": "error",
         "arrow-body-style": [

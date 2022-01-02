@@ -7,7 +7,7 @@
  * @param {number} [end] End (if undefined, range never ends)
  */
 export const rawNumericRange = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
-  if (interval <= 0) throw Error(`Interval is expected to be above zero`);
+  if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
   let v = start;
   do {
@@ -16,7 +16,7 @@ export const rawNumericRange = function* (interval: number, start: number = 0, e
       v += interval;
     }
   } while (repeating);
-}
+};
 
 /**
  * Generates a range of numbers, with a given interval. Numbers are rounded so they behave more expectedly.
@@ -55,7 +55,7 @@ export const numericRange = function* (interval: number, start: number = 0, end?
       v += interval;
     }
   } while (repeating);
-}
+};
 
 /**
  * Continually loops back and forth between 0 and 1 by a specified interval.
@@ -84,9 +84,9 @@ export const pingPongPercent = function (interval: number = 0.1, offset?: number
   if (offset === undefined && interval > 0) offset = 0;
   else if (offset === undefined && interval < 0) offset = 1;
   else offset = offset as number;
-  if (offset > 1 || offset < 0) throw new Error('offset must be between 0 and 1');
+  if (offset > 1 || offset < 0) throw new Error(`offset must be between 0 and 1`);
   return pingPong(interval, 0, 1, offset, rounding);
-}
+};
 
 
 /**
@@ -99,13 +99,13 @@ export const pingPongPercent = function (interval: number = 0.1, offset?: number
  * @param {number} [rounding=1] Rounding is off by default. Use say 1000 if interval is a fractional amount to avoid rounding errors.
  */
 export const pingPong = function* (interval: number, lower: number, upper: number, offset?: number, rounding: number = 1) {
-  if (Number.isNaN(interval)) throw new Error('interval parameter is NaN');
-  if (Number.isNaN(lower)) throw new Error('lower parameter is NaN');
-  if (Number.isNaN(upper)) throw new Error('upper parameter is NaN');
-  if (Number.isNaN(offset)) throw new Error('upper parameter is NaN');
+  if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);
+  if (Number.isNaN(lower)) throw new Error(`lower parameter is NaN`);
+  if (Number.isNaN(upper)) throw new Error(`upper parameter is NaN`);
+  if (Number.isNaN(offset)) throw new Error(`upper parameter is NaN`);
 
-  if (lower >= upper) throw new Error('lower must be less than upper');
-  if (interval == 0) throw new Error('Interval cannot be zero');
+  if (lower >= upper) throw new Error(`lower must be less than upper`);
+  if (interval === 0) throw new Error(`Interval cannot be zero`);
   const distance = upper - lower;
   if (Math.abs(interval) >= distance) throw new Error(`Interval should be between -${distance} and ${distance}`);
 
@@ -117,8 +117,8 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   interval = Math.floor(Math.abs(interval * rounding));
 
   if (offset === undefined) offset = lower;
-  else offset = Math.floor(offset * rounding)
-  if (offset > upper || offset < lower) throw new Error('Offset must be within lower and upper');
+  else offset = Math.floor(offset * rounding);
+  if (offset > upper || offset < lower) throw new Error(`Offset must be within lower and upper`);
 
   let v = offset;
   yield v / rounding;
@@ -128,14 +128,14 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
     if (incrementing && v >= upper) {
       incrementing = false;
       v = upper;
-      if (v == upper && firstLoop) {
+      if (v === upper && firstLoop) {
         // Edge case where we start at upper bound and increment
         v = lower; incrementing = true;
       }
     } else if (!incrementing && v <= lower) {
       incrementing = true;
       v = lower;
-      if (v == lower && firstLoop) {
+      if (v === lower && firstLoop) {
         // Edge case where we start at lower bound and decrement
         v = upper; incrementing = false;
       }
@@ -143,4 +143,4 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
     yield v / rounding;
     firstLoop = false;
   }
-}
+};

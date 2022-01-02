@@ -98,8 +98,8 @@ export const sum = function (a: Point, b: Point): Point {
   guard(a, 'a');
   guard(b, 'b');
   return {
-    x: a.x - b.x,
-    y: a.y - b.y
+    x: a.x + b.x,
+    y: a.y + b.y
   };
 }
 
