@@ -25,6 +25,9 @@ export const clamp = (v: number, min = 0, max = 1) => {
   return v;
 };
 
+
+export const lerp =(amt:number, a:number, b:number) => (1-amt) * a + amt * b;
+
 /**
  * Clamps integer `v` between 0 and length (exclusive)
  * This is useful for clamping an array range, because the largest allowed number will
@@ -44,7 +47,7 @@ export const clampZeroBounds = (v: number, length: number) => {
 
 export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Math.random() * array.length)];
 
-export const getMinMaxAvg = (data: Array<any>): {min: number; max: number; avg: number;} => {
+export const getMinMaxAvg = (data: number[]): {min: number; max: number; avg: number;} => {
   let min = Number.MAX_SAFE_INTEGER;
   let total = 0;
   let samples = 0;
@@ -59,5 +62,6 @@ export const getMinMaxAvg = (data: Array<any>): {min: number; max: number; avg: 
   return {min: min, max: max, avg: total / samples};
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
 

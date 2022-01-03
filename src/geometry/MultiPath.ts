@@ -93,16 +93,19 @@ export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
 
   return {totalLength, totalWidth, widths, lengths};
 };
+
 /**
  * Computes the bounding box that encloses entire multipath
  *
  * @param {Paths.Path[]} paths
+ * 
  * @returns {Rects.Rect}
  */
 const boundingBox = (paths: Paths.Path[]): Rects.Rect => {
-  throw Error(`Not yet implemented`);
+  throw new Error(`Not yet implemented`);
   return Rects.fromTopLeft({x: 0, y: 0}, 10, 10);
 };
+
 /**
  * Produce a human-friendly representation of paths
  *
@@ -110,6 +113,7 @@ const boundingBox = (paths: Paths.Path[]): Rects.Rect => {
  * @returns {string}
  */
 export const toString = (paths: Paths.Path[]): string => paths.map(p => p.toString()).join(`, `);
+
 /**
  * Throws an error if paths are not connected together, in order
  *
@@ -123,6 +127,7 @@ export const guardContinuous = (paths: Paths.Path[]) => {
     lastPos = Paths.getEnd(paths[i]);
   }
 };
+
 
 export const toSvgString = (paths: Paths.Path[]): string => {
   const svg = paths.map(p => p.toSvgString());

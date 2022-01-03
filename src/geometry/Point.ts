@@ -1,24 +1,25 @@
-export const pointToString = function (p: Point): string {
-  if (p.z !== undefined)
+export const pointToString = (p: Point): string => {
+  if (p.z !== undefined) {
     return `(${p.x},${p.y},${p.z})`;
-  else
+  } else {
     return `(${p.x},${p.y})`;
-}
+  }
+};
 
-export const guard = function (p: Point, name = 'Point') {
-  if (p === undefined) throw Error(`Parameter '${name}' is undefined. Expected {x,y}`);
-  if (p === null) throw Error(`Parameter '${name}' is null. Expected {x,y}`);
-  if (typeof (p.x) === 'undefined') throw Error(`Parameter '${name}.x' is undefined. Expected {x,y}`);
-  if (typeof (p.y) === 'undefined') throw Error(`Parameter '${name}.y' is undefined. Expected {x,y}`);
-  if (Number.isNaN(p.x)) throw Error(`Parameter '${name}.x' is NaN`);
-  if (Number.isNaN(p.y)) throw Error(`Parameter '${name}.y' is NaN`);
-}
+export const guard = (p: Point, name = `Point`) => {
+  if (p === undefined) throw new Error(`Parameter '${name}' is undefined. Expected {x,y}`);
+  if (p === null) throw new Error(`Parameter '${name}' is null. Expected {x,y}`);
+  if (p.x === undefined) throw new Error(`Parameter '${name}.x' is undefined. Expected {x,y}`);
+  if (p.y === undefined) throw new Error(`Parameter '${name}.y' is undefined. Expected {x,y}`);
+  if (Number.isNaN(p.x)) throw new Error(`Parameter '${name}.x' is NaN`);
+  if (Number.isNaN(p.y)) throw new Error(`Parameter '${name}.y' is NaN`);
+};
 
-function isPoint(p: any): p is Point {
+const isPoint = (p: Point): p is Point => {
   if (p.x === undefined) return false;
   if (p.y === undefined) return false;
   return true;
-}
+};
 
 /**
  * Returns point as an array in the form [x,y]
@@ -26,49 +27,37 @@ function isPoint(p: any): p is Point {
  * @param {Point} p
  * @returns {number[]}
  */
-export const toArray = function (p: Point): number[] {
-  return [p.x, p.y];
-}
+export const toArray = (p: Point): number[] => ([p.x, p.y]);
 
-export const equals = function (a: Point, b: Point): boolean {
-  return a.x == b.x && a.y == b.y;
-}
+export const equals = (a: Point, b: Point): boolean =>  a.x === b.x && a.y === b.y;
+
+
+export const lerp =(amt:number, a:Point, b:Point) => ({x: (1-amt) * a.x + amt * b.x, y:(1-amt) * a.y + amt * b.y });
+
 /**
- * Returns a point from two coordinates
- * 
- * ```
- * let p = from(10, 5); // yields {x:10, y:5}
- * ```
- * @param {number} x
- * @param {number} y
+ * Returns a point from two coordinates or an array of [x,y]
+* ```
+* let p = fromArray([10, 5]); // yields {x:10, y:5}
+* let p = from(10, 5);        // yields {x:10, y:5}
+* ```
+ * @param {(number | number[])} xOrArray
+ * @param {number} [y]
  * @returns {Point}
  */
-export function from(x: number, y: number): Point;
-
-/**
-* Returns a point from an array of [x,y]
-* ```
-* let p = fromArray([10, 5]); // yields {x: 10, y:5}
-* ```
-* @param {number[]} array
-* @returns {Point}
-*/
-export function from(array: number[]): Point;
-
-export function from(xOrArray: number | number[], y?: number): Point {
+export const from = (xOrArray: number | number[], y?: number): Point => {
   if (Array.isArray(xOrArray)) {
-    if (xOrArray.length !== 2) throw Error('Expected array of length two, got ' + xOrArray.length);
+    if (xOrArray.length !== 2) throw new Error(`Expected array of length two, got ` + xOrArray.length);
     return {
       x: xOrArray[0],
       y: xOrArray[1]
-    }
+    };
   } else {
-    if (y === undefined) throw Error('y is undefined');
-    if (Number.isNaN(xOrArray)) throw Error('x is NaN');
-    if (Number.isNaN(y)) throw Error('y is NaN');
+    if (y === undefined) throw new Error(`y is undefined`);
+    if (Number.isNaN(xOrArray)) throw new Error(`x is NaN`);
+    if (Number.isNaN(y)) throw new  Error(`y is NaN`);
     return {x: xOrArray, y: y};
   }
-}
+};
 
 
 /**
@@ -79,13 +68,13 @@ export function from(xOrArray: number | number[], y?: number): Point {
  * @returns {Point}
  */
 export const diff = function (a: Point, b: Point): Point {
-  guard(a, 'a');
-  guard(b, 'b');
+  guard(a, `a`);
+  guard(b, `b`);
   return {
     x: a.x - b.x,
     y: a.y - b.y
   };
-}
+};
 
 /**
  * Returns `a` minus `b`
@@ -95,13 +84,13 @@ export const diff = function (a: Point, b: Point): Point {
  * @returns {Point}
  */
 export const sum = function (a: Point, b: Point): Point {
-  guard(a, 'a');
-  guard(b, 'b');
+  guard(a, `a`);
+  guard(b, `b`);
   return {
     x: a.x + b.x,
     y: a.y + b.y
   };
-}
+};
 
 /**
  * Returns `a` multiplied by `b`
@@ -123,18 +112,19 @@ export function multiply(a: Point, b: Point): Point;
  */
 export function multiply(a: Point, x: number, y?: number): Point;
 
+/* eslint-disable func-style */
 export function multiply(a: Point, bOrX: Point | number, y?: number) {
-  guard(a, 'a');
-  if (typeof bOrX == 'number') {
-    if (typeof y === 'undefined') y = 1;
-    return {x: a.x * bOrX, y: a.y * y}
+  guard(a, `a`);
+  if (typeof bOrX === `number`) {
+    if (typeof y === `undefined`) y = 1;
+    return {x: a.x * bOrX, y: a.y * y};
   } else if (isPoint(bOrX)) {
-    guard(bOrX, 'b');
+    guard(bOrX, `b`);
     return {
       x: a.x * bOrX.x,
       y: a.y * bOrX.y
     };
-  } else throw Error('Invalid arguments');
+  } else throw new Error(`Invalid arguments`);
 }
 
 export type Point = {

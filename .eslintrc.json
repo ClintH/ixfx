@@ -16,6 +16,9 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "no-undef-init": [
+            "error"
+        ],
         "no-throw-literal": [
             "error"
         ],
