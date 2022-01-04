@@ -4,6 +4,7 @@ import {guard as guardPoint} from './Point.js';
 import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 
+
 export type Line = {
   readonly a: Point
   readonly b: Point
@@ -96,7 +97,13 @@ export const fromPoints = (a: Point, b: Point): Line => {
   });
 };
 
-export const toPath = (line:Line): Path => {
+export const fromPointsToPath = (a:Point, b:Point): LinePath => toPath(fromPoints(a, b));
+
+export type LinePath = Path & {
+  toFlatArray():number[]
+}
+
+export const toPath = (line:Line): LinePath => {
   const {a, b} = line;
   return Object.freeze({
     ...line,

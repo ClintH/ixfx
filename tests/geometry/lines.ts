@@ -38,10 +38,11 @@ const testLine = () => {
 
   // Define line by start & end points
   const line = Lines.fromPoints({x: 0, y: 0}, {x: 350, y: 120});
+  const path = Lines.toPath(line);
 
   // Use Svg.js to make SVG for the line
   const svg = SVG().addTo(svgEl).size(350, 120);
-  svg.line(line.toArray()).attr({stroke: lineColour});
+  svg.line(path.toFlatArray()).attr({stroke: lineColour});
   const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
   // Loop back and forth between 0 and 1
@@ -55,7 +56,7 @@ const testLine = () => {
     drawHelper.line(line, {strokeStyle: lineColour});
 
     // Calc x,y along long at a given amt and draw a dot there
-    const dotPos = line.compute(amt);
+    const dotPos = path.compute(amt);
     drawHelper.dot(dotPos, dotDrawOpts);
 
     // Move SVG dot, need to adjust so it's positioned by its center
@@ -115,8 +116,8 @@ const testMultiPath = () => {
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
   // Define two lines by their start & end points
-  const l3 = Lines.fromPoints({x: 0, y: 0}, {x: 100, y: 100});
-  const l4 = Lines.fromPoints({x: 100, y: 100}, {x: 200, y: 0});
+  const l3 = Lines.fromPointsToPath({x: 0, y: 0}, {x: 100, y: 100});
+  const l4 = Lines.fromPointsToPath({x: 100, y: 100}, {x: 200, y: 0});
 
   // Define two simple beziers. 
   // A simple bezier has a start, end and 'bend' amount. Bend ranges from -1 to 1.
