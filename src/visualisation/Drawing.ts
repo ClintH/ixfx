@@ -4,6 +4,7 @@ import * as Lines from '../geometry/Line.js';
 import {array as guardArray} from '../Guards.js';
 
 import {Beziers} from '../index.js';
+import {CirclePositioned} from '../geometry/Arc.js';
 
 // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
 export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) => {
@@ -24,16 +25,41 @@ export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
     quadraticBezier(bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}): void {
       quadraticBezier(ctx, bezierToDraw, opts);
     },
-    connectedPoints(pts: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}): void {
-      connectedPoints(ctx, pts, opts);
+    connectedPoints(pointsToDraw: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}): void {
+      connectedPoints(ctx, pointsToDraw, opts);
     },
-    pointLabels(pts: Points.Point[], opts: {fillStyle?: string} = {}): void {
-      pointLabels(ctx, pts, opts);
+    pointLabels(pointsToDraw: Points.Point[], opts: {fillStyle?: string} = {}): void {
+      pointLabels(ctx, pointsToDraw, opts);
     },
-    dot(pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}): void {
-      dot(ctx, pos, opts);
+    dot(dotPosition: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}): void {
+      dot(ctx, dotPosition, opts);
+    },
+    circle(circleToDraw:CirclePositioned, opts:DrawingOpts):void {
+      circle(ctx, circleToDraw, opts);
     }
   };
+};
+
+type DrawingOpts = {
+  strokeStyle?:string
+  fillStyle?:string
+  debug?:boolean
+};
+
+const PIPI = Math.PI * 2;
+
+const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts):void => {
+  guardCtx(ctx);
+  if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
+  if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
+};
+
+export const circle = (ctx:CanvasRenderingContext2D, circle:CirclePositioned, opts:DrawingOpts = {}) => {
+  applyOpts(ctx, opts);
+  ctx.beginPath();
+  ctx.arc(circle.x, circle.y, circle.radius, 0, PIPI);
+  ctx.stroke();
+  ctx.closePath();
 };
 
 export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], opts: {strokeStyle?: string, debug?: boolean} = {}) =>  {

@@ -8,16 +8,16 @@ import {SVG} from '@svgdotjs/svg.js';
 import {pingPongPercent} from '../../src/Producers';
 
 // Drawing properties
-const lineColour = '#11191f';
-const bgColour = '#edf0f3';
+const lineColour = `#11191f`;
+const bgColour = `#edf0f3`;
 const pingPongInterval = 0.01;
-const dotDrawOpts = {radius: 3, fillStyle: '#f516d0'};
+const dotDrawOpts = {radius: 3, fillStyle: `#f516d0`};
 
 const getElements = (idPrefix: string): [HTMLCanvasElement, HTMLElement] => {
-  const canvasEl = document.getElementById(idPrefix + 'Canvas') as HTMLCanvasElement;
-  const svgEl = document.getElementById(idPrefix + 'Svg');
-  if (canvasEl === undefined) throw Error('canvasEl is undefined');
-  if (svgEl === null) throw Error('svgEl is null');
+  const canvasEl = document.getElementById(idPrefix + `Canvas`) as HTMLCanvasElement;
+  const svgEl = document.getElementById(idPrefix + `Svg`);
+  if (canvasEl === undefined) throw Error(`canvasEl is undefined`);
+  if (svgEl === null) throw Error(`svgEl is null`);
   return [canvasEl, svgEl];
 };
 
@@ -31,8 +31,8 @@ const clear = (ctx: CanvasRenderingContext2D, canvasEl: HTMLCanvasElement) => {
 
 // --- Line
 const testLine = () => {
-  const [canvasEl, svgEl] = getElements('line');  // get lineCanvas and lineSvg elements
-  const ctx = canvasEl.getContext('2d');         // get drawing context
+  const [canvasEl, svgEl] = getElements(`line`);  // get lineCanvas and lineSvg elements
+  const ctx = canvasEl.getContext(`2d`);         // get drawing context
   const drawHelper = Drawing.makeHelper(ctx);// make a helper
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
@@ -70,8 +70,8 @@ const testLine = () => {
 
 // --- Bezier
 const testBezier = () => {
-  const [canvasEl, svgEl] = getElements('bezier');  // get lineCanvas and lineSvg elements
-  const ctx = canvasEl.getContext('2d');          // get drawing context
+  const [canvasEl, svgEl] = getElements(`bezier`);  // get lineCanvas and lineSvg elements
+  const ctx = canvasEl.getContext(`2d`);          // get drawing context
   const drawHelper = Drawing.makeHelper(ctx); // make a helper
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
@@ -80,7 +80,7 @@ const testBezier = () => {
 
   // Use Svg.js to make SVG for the line
   const svg = SVG().addTo(svgEl).size(350, 120);
-  svg.path(bezier.toSvgString()).attr({fill: 'transparent', stroke: lineColour});
+  svg.path(bezier.toSvgString()).attr({fill: `transparent`, stroke: lineColour});
   const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
   // Loop back and forth between 0 and 1
@@ -109,8 +109,8 @@ const testBezier = () => {
 
 // --- Path made up of multiple lines & beziers
 const testMultiPath = () => {
-  const [canvasEl, svgEl] = getElements('multiPath'); // get lineCanvas and lineSvg elements
-  const ctx = canvasEl.getContext('2d');          // get drawing context
+  const [canvasEl, svgEl] = getElements(`multiPath`); // get lineCanvas and lineSvg elements
+  const ctx = canvasEl.getContext(`2d`);          // get drawing context
   const drawHelper = Drawing.makeHelper(ctx); // Make a helper
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
@@ -128,7 +128,7 @@ const testMultiPath = () => {
 
   // Use Svg.js to make SVG for the line
   const svg = SVG().addTo(svgEl).size(400, 120);
-  svg.path(multiPath.toSvgString()).attr({fill: 'transparent', margin: '10px', stroke: lineColour});
+  svg.path(multiPath.toSvgString()).attr({fill: `transparent`, margin: `10px`, stroke: lineColour});
   const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
   // Loop back and forth between 0 and 1

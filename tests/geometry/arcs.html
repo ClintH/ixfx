@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circles & arcs test</title>
+  <link rel="stylesheet" href="../css/pico.fluid.classless.css">
+</head>
+<style>
+  #lines {
+    border: 1px solid black;
+  }
+
+  section {
+    display: flex;
+  }
+
+  section>div {
+    margin: 0.3em;
+    background-color: #edf0f3;
+    padding: 0.3em;
+  }
+
+  section h2 {
+    color: black;
+    font-size: 80%;
+    text-transform: uppercase;
+    margin-bottom: 0;
+  }
+
+  .svg {
+    padding: 5px;
+  }
+</style>
+
+<body>
+  <header>
+    <a href="../">ixfx</a> \ <a href="./">geometry</a>
+  </header>
+  <main>
+    <h1>Lines</h1>
+    <h2>Line</h2>
+    <section>
+      <div>
+        <h2>Canvas</h2>
+        <canvas id="lineCanvas" width=210 height=210></canvas>
+      </div>
+      <div>
+        <h2>SVG</h2>
+        <div class="svg" id="lineSvg"></div>
+      </div>
+    </section>
+
+    <!-- <h2>Bezier</h2>
+    <section>
+      <div>
+        <h2>Canvas</h2>
+        <canvas id="bezierCanvas" width=360 height=130></canvas>
+      </div>
+      <div>
+        <h2>SVG</h2>
+        <div class="svg" id="bezierSvg"></div>
+      </div>
+    </section>
+
+    <h2>MultiPath</h2>
+    <section>
+
+      <div>
+        <h2>Canvas</h2>
+        <canvas id="multiPathCanvas" width=410 height=120></canvas>
+      </div>
+      <div>
+        <h2>SVG</h2>
+        <div class="svg" id="multiPathSvg"></div>
+      </div>
+    </section> -->
+
+    <script type="module" src="arcs.js"></script>
+  </main>
+
+</body>
+
+</html>
