@@ -1,4 +1,4 @@
-import * as Rect from "./Rect"
+import * as Rect from "./Rect";
 import * as Point from './Point';
 import {clampZeroBounds, randomElement} from "../util";
 import {MutableValueSet} from "../collections/Sets";
@@ -42,8 +42,8 @@ export type Cell = {
  * @returns {string}
  */
 export const cellKeyString = function (v: Cell): string {
-  return `Cell{${v.x},${v.y}}`
-}
+  return `Cell{${v.x},${v.y}}`;
+};
 
 /**
  * Returns true if two cells equal. Returns false if either cell (or both) are undefined
@@ -57,24 +57,24 @@ export const cellEquals = function (a: Cell, b: Cell): boolean {
   if (b === undefined) return false;
   if (a === undefined) return false;
   return a.x === b.x && a.y === b.y;
-}
+};
 
-export const guard = function (a: Cell, paramName: string = 'Param') {
-  if (a === undefined) throw Error(paramName + ' is undefined');
-  if (a.x === undefined) throw Error(paramName + '.x is undefined');
-  if (a.y === undefined) throw Error(paramName + '.y is undefined');
-  if (Number.isInteger(a.x) === undefined) throw Error(paramName + '.x is non-integer');
-  if (Number.isInteger(a.y) === undefined) throw Error(paramName + '.y is non-integer');
-}
+export const guard = function (a: Cell, paramName: string = `Param`) {
+  if (a === undefined) throw new Error(paramName + ` is undefined`);
+  if (a.x === undefined) throw new Error(paramName + `.x is undefined`);
+  if (a.y === undefined) throw new Error(paramName + `.y is undefined`);
+  if (Number.isInteger(a.x) === undefined) throw new Error(paramName + `.x is non-integer`);
+  if (Number.isInteger(a.y) === undefined) throw new Error(paramName + `.y is non-integer`);
+};
 
 export const cellCornerRect = function (cell: Cell, grid: Grid & GridVisual): Rect.Rect {
   guard(cell);
   const size = grid.size;
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
   const y = cell.y * size;// + (grid.spacing ? cell.y * grid.spacing : 0);
-  let r = Rect.fromTopLeft({x: x, y: y}, size, size);
+  const r = Rect.fromTopLeft({x: x, y: y}, size, size);
   return r;
-}
+};
 
 export const getCell = function (position: Point.Point, grid: Grid & GridVisual): Cell | undefined {
   const size = grid.size;
@@ -83,21 +83,21 @@ export const getCell = function (position: Point.Point, grid: Grid & GridVisual)
   const y = Math.floor(position.y / size);
   if (x >= grid.cols) return;
   if (y >= grid.rows) return;
-  return {x, y}
-}
+  return {x, y};
+};
 
 export const neighbours = function (grid: Grid, cell: Cell, bounds: BoundsLogic = BoundsLogic.Undefined): Cell[] {
-  let directions = [
+  const directions = [
     CardinalDirection.North,
     CardinalDirection.East,
     CardinalDirection.South,
     CardinalDirection.West
-  ]
+  ];
 
   return directions
     .map(c => offset(grid, getVectorFromCardinal(c), cell, bounds))
     .filter(GuardIsDefined);
-}
+};
 
 export const cellMiddle = function (cell: Cell, grid: Grid & GridVisual): Point.Point {
   guard(cell);
@@ -106,7 +106,7 @@ export const cellMiddle = function (cell: Cell, grid: Grid & GridVisual): Point.
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
   const y = cell.y * size; // + (grid.spacing ? cell.y * grid.spacing : 0);
   return {x: x + size / 2, y: y + size / 2};
-}
+};
 
 /**
  * Returns the cells on the line of start and end, inclusive
@@ -122,17 +122,18 @@ export const getLine = function (start: Cell, end: Cell): Cell[] {
   // https://stackoverflow.com/a/4672319
   let startX = start.x;
   let startY = start.y;
-  let dx = Math.abs(end.x - startX);
-  let dy = Math.abs(end.y - startY);
-  let sx = (startX < end.x) ? 1 : -1;
-  let sy = (startY < end.y) ? 1 : -1;
+  const dx = Math.abs(end.x - startX);
+  const dy = Math.abs(end.y - startY);
+  const sx = (startX < end.x) ? 1 : -1;
+  const sy = (startY < end.y) ? 1 : -1;
   let err = dx - dy;
 
-  let cells = [];
+  const cells = [];
+  /* eslint-disable no-constant-condition */
   while (true) {
     cells.push({x: startX, y: startY});
     if (startX === end.x && startY === end.y) break;
-    let e2 = 2 * err;
+    const e2 = 2 * err;
     if (e2 > -dy) {
       err -= dy;
       startX += sx;
@@ -143,7 +144,7 @@ export const getLine = function (start: Cell, end: Cell): Cell[] {
     }
   }
   return cells;
-}
+};
 /**
  * Returns a list of cells that make up a simple square perimeter around
  * a point at a specified distance.
@@ -155,25 +156,23 @@ export const getLine = function (start: Cell, end: Cell): Cell[] {
  * @returns {Cell[]}
  */
 export const getSquarePerimeter = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Stop): Cell[] {
-  if (bounds == BoundsLogic.Wrap) throw Error('BoundsLogic Wrap not supported (only Stop and Unbound)');
-  if (bounds == BoundsLogic.Undefined) throw Error('BoundsLogic Undefined not supported (only Stop and Unbound)');
+  if (bounds === BoundsLogic.Wrap) throw new Error(`BoundsLogic Wrap not supported (only Stop and Unbound)`);
+  if (bounds === BoundsLogic.Undefined) throw new Error(`BoundsLogic Undefined not supported (only Stop and Unbound)`);
 
-  if (Number.isNaN(steps)) throw Error('Steps is NaN');
-  if (steps < 0) throw Error('Steps must be positive');
-  if (!Number.isInteger(steps)) throw Error('Steps must be a positive integer');
+  if (Number.isNaN(steps)) throw new Error(`Steps is NaN`);
+  if (steps < 0) throw new Error(`Steps must be positive`);
+  if (!Number.isInteger(steps)) throw new Error(`Steps must be a positive integer`);
 
   const cells = new MutableValueSet<Cell>(c => cellKeyString(c));
 
-  let directions = [
+  const directions = [
     CardinalDirection.North, CardinalDirection.NorthEast,
     CardinalDirection.East, CardinalDirection.SouthEast,
     CardinalDirection.South, CardinalDirection.SouthWest,
     CardinalDirection.West, CardinalDirection.NorthWest
   ];
 
-  let directionCells = directions.map(d => {
-    return offset(grid, getVectorFromCardinal(d, steps), start, bounds);
-  });
+  const directionCells = directions.map(d => offset(grid, getVectorFromCardinal(d, steps), start, bounds));
 
   // NW to NE
   cells.add(...simpleLine(directionCells[7]!, directionCells[1]!, true));
@@ -185,30 +184,30 @@ export const getSquarePerimeter = function (grid: Grid, steps: number, start: Ce
   cells.add(...simpleLine(directionCells[7]!, directionCells[5]!, true));
 
   return cells.toArray();
-}
+};
 
 export const getVectorFromCardinal = function (cardinal: CardinalDirection, multiplier: number = 1): Cell {
   switch (cardinal) {
-    case CardinalDirection.North:
-      return {x: 0, y: -1 * multiplier};
-    case CardinalDirection.NorthEast:
-      return {x: 1 * multiplier, y: -1 * multiplier};
-    case CardinalDirection.East:
-      return {x: 1 * multiplier, y: 0};
-    case CardinalDirection.SouthEast:
-      return {x: 1 * multiplier, y: 1 * multiplier};
-    case CardinalDirection.South:
-      return {x: 0, y: 1 * multiplier};
-    case CardinalDirection.SouthWest:
-      return {x: -1 * multiplier, y: 1 * multiplier};
-    case CardinalDirection.West:
-      return {x: -1 * multiplier, y: 0};
-    case CardinalDirection.NorthWest:
-      return {x: -1 * multiplier, y: -1 * multiplier};
-    default:
-      return {x: 0, y: 0};
+  case CardinalDirection.North:
+    return {x: 0, y: -1 * multiplier};
+  case CardinalDirection.NorthEast:
+    return {x: 1 * multiplier, y: -1 * multiplier};
+  case CardinalDirection.East:
+    return {x: 1 * multiplier, y: 0};
+  case CardinalDirection.SouthEast:
+    return {x: 1 * multiplier, y: 1 * multiplier};
+  case CardinalDirection.South:
+    return {x: 0, y: 1 * multiplier};
+  case CardinalDirection.SouthWest:
+    return {x: -1 * multiplier, y: 1 * multiplier};
+  case CardinalDirection.West:
+    return {x: -1 * multiplier, y: 0};
+  case CardinalDirection.NorthWest:
+    return {x: -1 * multiplier, y: -1 * multiplier};
+  default:
+    return {x: 0, y: 0};
   }
-}
+};
 
 export enum BoundsLogic {
   Unbound = 0,
@@ -219,24 +218,24 @@ export enum BoundsLogic {
 }
 
 export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolean = false): Cell[] {
-  let cells: Cell[] = [];
-  if (start.x == end.x) {
+  const cells: Cell[] = [];
+  if (start.x === end.x) {
     // Vertical
-    let lastY = endInclusive ? end.y + 1 : end.y;
+    const lastY = endInclusive ? end.y + 1 : end.y;
     for (let y = start.y; y < lastY; y++) {
       cells.push({x: start.x, y: y});
     }
-  } else if (start.y == end.y) {
+  } else if (start.y === end.y) {
     // Horizontal
-    let lastX = endInclusive ? end.x + 1 : end.x;
+    const lastX = endInclusive ? end.x + 1 : end.x;
     for (let x = start.x; x < lastX; x++) {
       cells.push({x: x, y: start.y});
     }
   } else {
-    throw Error(`Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`);
+    throw new Error(`Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`);
   }
   return cells;
-}
+};
 
 /**
  *
@@ -253,40 +252,40 @@ export const offset = function (grid: Grid, vector: Cell, start: Cell = {x: 0, y
   let x = start.x;
   let y = start.y;
   switch (bounds) {
-    case BoundsLogic.Wrap:
-      x += vector.x % grid.cols;
-      y += vector.y % grid.rows;
-      //console.log(`${x},${y} vector: ${vector.x},${vector.y} vectorMod: ${vector.x % grid.cols},${vector.y % grid.rows}`);
-      if (x < 0) x = grid.cols + x;
-      else if (x >= grid.cols) {
-        x -= grid.cols;
-      }
-      if (y < 0) y = grid.rows + y;
-      else if (y >= grid.rows) {
-        y -= grid.rows;
-      }
-      break;
-    case BoundsLogic.Stop:
-      x += vector.x;
-      y += vector.y;
-      x = clampZeroBounds(x, grid.cols);
-      y = clampZeroBounds(y, grid.rows);
-      break;
-    case BoundsLogic.Undefined:
-      x += vector.x;
-      y += vector.y;
-      if (x < 0 || y < 0) return;
-      if (x >= grid.cols || y >= grid.rows) return;
-      break;
-    case BoundsLogic.Unbound:
-      x += vector.x;
-      y += vector.y;
-      break;
-    default:
-      throw 'Unknown BoundsLogic case';
+  case BoundsLogic.Wrap:
+    x += vector.x % grid.cols;
+    y += vector.y % grid.rows;
+    //console.log(`${x},${y} vector: ${vector.x},${vector.y} vectorMod: ${vector.x % grid.cols},${vector.y % grid.rows}`);
+    if (x < 0) x = grid.cols + x;
+    else if (x >= grid.cols) {
+      x -= grid.cols;
+    }
+    if (y < 0) y = grid.rows + y;
+    else if (y >= grid.rows) {
+      y -= grid.rows;
+    }
+    break;
+  case BoundsLogic.Stop:
+    x += vector.x;
+    y += vector.y;
+    x = clampZeroBounds(x, grid.cols);
+    y = clampZeroBounds(y, grid.rows);
+    break;
+  case BoundsLogic.Undefined:
+    x += vector.x;
+    y += vector.y;
+    if (x < 0 || y < 0) return;
+    if (x >= grid.cols || y >= grid.rows) return;
+    break;
+  case BoundsLogic.Unbound:
+    x += vector.x;
+    y += vector.y;
+    break;
+  default:
+    throw new Error(`Unknown BoundsLogic case`);
   }
-  return {x, y}
-}
+  return {x, y};
+};
 /**
  * Walks the grid left-to-right, top-to-bottom. Negative steps reverse this.
  *
@@ -297,7 +296,7 @@ export const offset = function (grid: Grid, vector: Cell, start: Cell = {x: 0, y
  * @returns {(Cell | undefined)}
  */
 export const offsetStepsByRow = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Undefined): Cell | undefined {
-  if (!Number.isInteger(steps)) throw Error('Steps must be an integer');
+  if (!Number.isInteger(steps)) throw new Error(`Steps must be an integer`);
   guard(start);
 
   // Very naive implementation, but code is readable? 😅
@@ -307,12 +306,12 @@ export const offsetStepsByRow = function (grid: Grid, steps: number, start: Cell
   let y = start.y;
   while (stepsLeft > 0) {
     // Are we at the end of the row?
-    if (x == grid.cols - 1 && dirForward) {
-      if (y == grid.rows - 1 && bounds !== BoundsLogic.Unbound) {
+    if (x === grid.cols - 1 && dirForward) {
+      if (y === grid.rows - 1 && bounds !== BoundsLogic.Unbound) {
         // Reached bottom-right corner, end of grid and wanting to go forwards still
-        if (bounds == BoundsLogic.Undefined) return;
-        if (bounds == BoundsLogic.Stop) return {x, y};
-        if (bounds == BoundsLogic.Wrap) y = 0;
+        if (bounds === BoundsLogic.Undefined) return;
+        if (bounds === BoundsLogic.Stop) return {x, y};
+        if (bounds === BoundsLogic.Wrap) y = 0;
       } else {
         y++;
       }
@@ -322,12 +321,12 @@ export const offsetStepsByRow = function (grid: Grid, steps: number, start: Cell
     }
 
     // First cell and going backwards
-    if (x == 0 && !dirForward) {
-      if (y == 0 && bounds !== BoundsLogic.Unbound) {
+    if (x === 0 && !dirForward) {
+      if (y === 0 && bounds !== BoundsLogic.Unbound) {
         // Reached top-left corner, start of grid and wanting to go backwards
-        if (bounds == BoundsLogic.Undefined) return;
-        if (bounds == BoundsLogic.Stop) return {x, y};
-        if (bounds == BoundsLogic.Wrap) y = grid.rows - 1;
+        if (bounds === BoundsLogic.Undefined) return;
+        if (bounds === BoundsLogic.Stop) return {x, y};
+        if (bounds === BoundsLogic.Wrap) y = grid.rows - 1;
       } else {
         y--;
       }
@@ -338,22 +337,22 @@ export const offsetStepsByRow = function (grid: Grid, steps: number, start: Cell
 
     if (dirForward) {
       // Step forward to end of row
-      let chunk = Math.min(stepsLeft, grid.cols - x - 1);
+      const chunk = Math.min(stepsLeft, grid.cols - x - 1);
       x += chunk;
       stepsLeft -= chunk;
     } else {
       // Step back to start of row
-      let chunk = Math.min(stepsLeft, x);
+      const chunk = Math.min(stepsLeft, x);
       x -= chunk;
       stepsLeft -= chunk;
     }
   }
   return {x, y};
-}
+};
 
 
 export const offsetStepsByCol = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Undefined): Cell | undefined {
-  if (!Number.isInteger(steps)) throw Error('Steps must be an integer');
+  if (!Number.isInteger(steps)) throw new Error(`Steps must be an integer`);
   guard(start);
 
   // Very naive implementation, but code is readable? 😅
@@ -363,12 +362,12 @@ export const offsetStepsByCol = function (grid: Grid, steps: number, start: Cell
   let y = start.y;
   while (stepsLeft > 0) {
     // Are we at the end of the column?
-    if (y == grid.rows - 1 && dirForward) {
-      if (x == grid.cols - 1 && bounds !== BoundsLogic.Unbound) {
+    if (y === grid.rows - 1 && dirForward) {
+      if (x === grid.cols - 1 && bounds !== BoundsLogic.Unbound) {
         // Reached bottom-right corner, end of grid and wanting to go forwards still
-        if (bounds == BoundsLogic.Undefined) return;
-        if (bounds == BoundsLogic.Stop) return {x, y};
-        if (bounds == BoundsLogic.Wrap) x = 0;
+        if (bounds === BoundsLogic.Undefined) return;
+        if (bounds === BoundsLogic.Stop) return {x, y};
+        if (bounds === BoundsLogic.Wrap) x = 0;
       } else {
         x++;
       }
@@ -378,12 +377,12 @@ export const offsetStepsByCol = function (grid: Grid, steps: number, start: Cell
     }
 
     // First cell and going backwards
-    if (y == 0 && !dirForward) {
-      if (x == 0 && bounds !== BoundsLogic.Unbound) {
+    if (y === 0 && !dirForward) {
+      if (x === 0 && bounds !== BoundsLogic.Unbound) {
         // Reached top-left corner, start of grid and wanting to go backwards
-        if (bounds == BoundsLogic.Undefined) return;
-        if (bounds == BoundsLogic.Stop) return {x, y};
-        if (bounds == BoundsLogic.Wrap) x = grid.cols - 1;
+        if (bounds === BoundsLogic.Undefined) return;
+        if (bounds === BoundsLogic.Stop) return {x, y};
+        if (bounds === BoundsLogic.Wrap) x = grid.cols - 1;
       } else {
         x--;
       }
@@ -394,54 +393,54 @@ export const offsetStepsByCol = function (grid: Grid, steps: number, start: Cell
 
     if (dirForward) {
       // Step forward to end of row
-      let chunk = Math.min(stepsLeft, grid.rows - y - 1);
+      const chunk = Math.min(stepsLeft, grid.rows - y - 1);
       y += chunk;
       stepsLeft -= chunk;
     } else {
       // Step back to start of row
-      let chunk = Math.min(stepsLeft, y);
+      const chunk = Math.min(stepsLeft, y);
       y -= chunk;
       stepsLeft -= chunk;
     }
   }
   return {x, y};
-}
+};
 
 export const walkByFn = function* (offsetFn: (grid: Grid, steps: number, start: Cell, bounds: BoundsLogic) => Cell | undefined, grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
   guard(start);
 
   let x = start.x;
   let y = start.y;
-  let bounds = wrap ? BoundsLogic.Wrap : BoundsLogic.Undefined;
+  const bounds = wrap ? BoundsLogic.Wrap : BoundsLogic.Undefined;
   while (true) {
     yield {x: x, y: y};
-    let pos = offsetFn(grid, 1, {x, y}, bounds);
+    const pos = offsetFn(grid, 1, {x, y}, bounds);
     if (pos === undefined) return;
     x = pos.x;
     y = pos.y;
-    if (x == start.x && y == start.y) return;
+    if (x === start.x && y === start.y) return;
   }
-}
+};
 
 export const walkByRow = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
   return walkByFn(offsetStepsByRow, grid, start, wrap);
-}
+};
 
 export const walkByCol = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
   return walkByFn(offsetStepsByCol, grid, start, wrap);
-}
+};
 
 export const visitorDepth = function (queue: Cell[]): Cell {
   return queue[0];
-}
+};
 
 export const visitorBreadth = function (queue: Cell[]): Cell {
   return queue[queue.length - 1];
-}
+};
 
 export const visitorRandom = function (queue: Cell[]): Cell {
   return randomElement(queue);
-}
+};
 
 /**
  * Visits every cell in grid using supplied selection function
@@ -480,7 +479,7 @@ export const visitorRandom = function (queue: Cell[]): Cell {
  * @returns {Iterable<Cell>}
  */
 export const visitor = function* (visitFn: (nbos: Cell[]) => Cell, grid: Grid, start: Cell, visited?: MutableValueSet<Cell>): Iterable<Cell> {
-  if (visited == undefined) visited = new MutableValueSet<Cell>(c => cellKeyString(c));
+  if (visited === undefined) visited = new MutableValueSet<Cell>(c => cellKeyString(c));
   let queue: Cell[] = [];
   queue.push(start);
   while (queue.length > 0) {
@@ -493,4 +492,4 @@ export const visitor = function* (visitFn: (nbos: Cell[]) => Cell, grid: Grid, s
     queue.push(...nbos);
     queue = queue.filter(c => !visited?.has(c));
   }
-}
+};

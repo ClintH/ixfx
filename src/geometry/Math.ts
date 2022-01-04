@@ -11,9 +11,8 @@ export const radiansFromAxisX = (a:Point):number => Math.atan2(a.x, a.y);
 export const polarToCartesian = (center:Point, radius:number, angleRadians:number) => {
   guardPoint(center);
 
-  const a = a; //angleInRadians(angleInDegrees);
   return {
-    x: center.x + (radius * Math.cos(a)),
-    y: center.y + (radius * Math.sin(a)),
+    x: center.x + (radius * Math.cos(angleRadians)),
+    y: center.y + (radius * Math.sin(angleRadians)),
   };
 };

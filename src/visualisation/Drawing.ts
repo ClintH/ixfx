@@ -1,41 +1,52 @@
 import * as Points from '../geometry/Point.js';
 import * as Paths from '../geometry/Path.js';
 import * as Lines from '../geometry/Line.js';
+
 import {array as guardArray} from '../Guards.js';
 
-import {Beziers} from '../index.js';
-import {CirclePositioned} from '../geometry/Arc.js';
+import * as Circles from '../geometry/Arc.js';
+import * as Beziers from '../geometry/Bezier.js';
+import * as Rects from '../geometry/Rect.js';
+
 
 // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
 export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) => {
   if (ctxOrCanvasEl === undefined) throw Error(`ctxOrCanvasEl undefined. Must be a 2d drawing context or Canvas element`);
   let ctx: CanvasRenderingContext2D;
   if (ctxOrCanvasEl instanceof HTMLCanvasElement) {
-    ctx = ctxOrCanvasEl.getContext(`2d`)!;
+    const ctx_ = ctxOrCanvasEl.getContext(`2d`);
+    if (ctx_ === null) throw new Error(`Could not creating drawing context`);
+    ctx = ctx_;
   } else ctx = ctxOrCanvasEl;
 
 
   return {
-    paths(pathsToDraw: Paths.Path[], opts?: {strokeStyle?: string, debug?: boolean}): void {
+    paths(pathsToDraw: Paths.Path[], opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
     },
-    line(lineToDraw: Lines.Line, opts?: {strokeStyle?: string, debug?: boolean}): void {
+    line(lineToDraw: Lines.Line|Lines.Line[], opts?: DrawingOpts): void {
       line(ctx, lineToDraw, opts);
     },
-    quadraticBezier(bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}): void {
+    rect(rectsToDraw:Rects.Rect|Rects.Rect[], opts?:DrawingOpts & { filled?:boolean}): void {
+      rect(ctx, rectsToDraw, opts);
+    },
+    quadraticBezier(bezierToDraw: Beziers.QuadraticBezier, opts?:DrawingOpts): void {
       quadraticBezier(ctx, bezierToDraw, opts);
     },
-    connectedPoints(pointsToDraw: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}): void {
+    connectedPoints(pointsToDraw: Points.Point[], opts?: DrawingOpts & {loop?: boolean}): void {
       connectedPoints(ctx, pointsToDraw, opts);
     },
-    pointLabels(pointsToDraw: Points.Point[], opts: {fillStyle?: string} = {}): void {
+    pointLabels(pointsToDraw: Points.Point[], opts?:DrawingOpts): void {
       pointLabels(ctx, pointsToDraw, opts);
     },
-    dot(dotPosition: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean}): void {
+    dot(dotPosition: Points.Point|Points.Point[], opts?: DrawingOpts & {radius: number, outlined?: boolean, filled?: boolean}): void {
       dot(ctx, dotPosition, opts);
     },
-    circle(circleToDraw:CirclePositioned, opts:DrawingOpts):void {
-      circle(ctx, circleToDraw, opts);
+    circle(circlesToDraw:Circles.CirclePositioned|Circles.CirclePositioned[], opts:DrawingOpts):void {
+      circle(ctx, circlesToDraw, opts);
+    },
+    arc(arcsToDraw:Circles.ArcPositioned|Circles.ArcPositioned[], opts:DrawingOpts):void {
+      arc(ctx, arcsToDraw, opts);
     }
   };
 };
@@ -54,24 +65,46 @@ const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts):void => {
   if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
 };
 
-export const circle = (ctx:CanvasRenderingContext2D, circle:CirclePositioned, opts:DrawingOpts = {}) => {
+export const arc = (ctx:CanvasRenderingContext2D, arcs:Circles.ArcPositioned|Circles.ArcPositioned[], opts:DrawingOpts = {}) => {
   applyOpts(ctx, opts);
-  ctx.beginPath();
-  ctx.arc(circle.x, circle.y, circle.radius, 0, PIPI);
-  ctx.stroke();
-  ctx.closePath();
+
+  const draw = (arc:Circles.ArcPositioned) => {
+    ctx.beginPath();
+    ctx.arc(arc.x, arc.y, arc.radius, arc.startRadian, arc.endRadian);
+    ctx.stroke();
+  };
+
+  if (Array.isArray(arcs)) {
+    arcs.forEach(draw);
+  } else draw(arcs);
+
 };
 
-export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[], opts: {strokeStyle?: string, debug?: boolean} = {}) =>  {
-  guardCtx(ctx);
+export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.CirclePositioned|Circles.CirclePositioned[], opts:DrawingOpts = {}) => {
+  applyOpts(ctx, opts);
 
-  for (let i = 0; i < pathsToDraw.length; i++) {
-    const p = pathsToDraw[i] as any;
+  const draw = (c:Circles.CirclePositioned) => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.radius, 0, PIPI);
+    ctx.stroke();
+  };
+  if (Array.isArray(circlesToDraw)) circlesToDraw.forEach(draw);
+  else draw(circlesToDraw);
+};
 
-    // Draw simple line
-    if (p.a && p.b && p.quadratic) quadraticBezier(ctx, p, opts);
-    else if (p.a && p.b) line(ctx, p, opts);
-  }
+export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[]|Paths.Path, opts: {strokeStyle?: string, debug?: boolean} = {}) =>  {
+  applyOpts(ctx, opts);
+
+  const draw = (path:Paths.Path) => {
+
+    // Call appropriate drawing function depending on the type of path
+    if (Beziers.isQuadraticBezier(path)) quadraticBezier(ctx, path, opts);
+    else if (Lines.isLine(path)) line(ctx, path, opts);
+    else throw new Error(`Unknown path type ${JSON.stringify(path)}`);
+  };
+
+  if (Array.isArray(pathsToDraw)) pathsToDraw.forEach(draw);
+  else draw(pathsToDraw);
 };
 
 /**
@@ -120,36 +153,39 @@ export const pointLabels = (ctx: CanvasRenderingContext2D, pts: Points.Point[], 
   }
 };
 
-const guardCtx = (ctx: CanvasRenderingContext2D | any) => {
+const guardCtx = (ctx: CanvasRenderingContext2D) => {
   if (ctx === undefined) throw Error(`ctx undefined`);
 };
 
-const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point, opts: {radius: number, strokeStyle?: string, fillStyle?: string, outlined?: boolean, filled?: boolean})  => {
+const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|Points.Point[], opts?: DrawingOpts & {radius?: number, outlined?: boolean, filled?: boolean})  => {
+  if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
   let filled = opts.filled ?? false;
   const outlined = opts.outlined ?? false;
 
   if (!filled && !outlined) filled = true;
 
+  applyOpts(ctx, opts);
+
   ctx.beginPath();
 
   // x&y for arc is the center of circle
-  ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
-
-  if (opts.fillStyle) {
-    ctx.fillStyle = opts.fillStyle;
+  if (Array.isArray(pos)) {
+    for (let i=0;i<pos.length;i++) {
+      ctx.arc(pos[i].x, pos[i].y, radius, 0, 2 * Math.PI);
+    }
+  } else {
+    ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
   }
+
+
   if (filled) ctx.fill();
-
-
-  if (opts.strokeStyle) {
-    ctx.strokeStyle = opts.strokeStyle;
-  }
   if (outlined) ctx.stroke();
 };
 
-export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: {strokeStyle?: string, debug?: boolean}) => {
+export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts?: DrawingOpts) => {
   guardCtx(ctx);
+  if (opts === undefined) opts = {};
   const debug = opts.debug ?? false;
   //const h = line.quadratic;
 
@@ -177,22 +213,37 @@ export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Bez
   }
 };
 
-export const line = (ctx: CanvasRenderingContext2D, lineToDraw: Lines.Line, opts: {strokeStyle?: string, debug?: boolean} = {}) => {
-  const debug = opts.debug ?? false;
-  const {a, b} = lineToDraw;
+export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|Lines.Line[], opts: {strokeStyle?: string, debug?: boolean} = {}) => {
+  applyOpts(ctx, opts);
 
-  const ss = ctx.strokeStyle;
-  guardCtx(ctx);
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  if (debug) {
-    ctx.fillText(`a`, a.x, a.y);
-    ctx.fillText(`b`, b.x, b.y);
-    dot(ctx, a, {radius: 5, strokeStyle: `black`});
-    dot(ctx, b, {radius: 5, strokeStyle: `black`});
-  }
-  if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
-  ctx.stroke();
-  ctx.strokeStyle = ss;
+  const debug = opts.debug ?? false;
+
+  const draw = (d:Lines.Line) => {
+    const {a, b} = d;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    if (debug) {
+      ctx.fillText(`a`, a.x, a.y);
+      ctx.fillText(`b`, b.x, b.y);
+      dot(ctx, a, {radius: 5, strokeStyle: `black`});
+      dot(ctx, b, {radius: 5, strokeStyle: `black`});
+    }
+    ctx.stroke();
+  };
+
+  if (Array.isArray(toDraw)) toDraw.forEach(draw);
+  else draw(toDraw);
+};
+
+export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect|Rects.Rect[], opts: DrawingOpts & {filled?:boolean} = {}) => {
+  applyOpts(ctx, opts);
+
+  const draw = (d:Rects.Rect) => {
+    if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
+    ctx.strokeRect(d.x, d.y, d.width, d.height);
+  };
+
+  if (Array.isArray(toDraw)) toDraw.forEach(draw);
+  else draw(toDraw);
 };

@@ -17,6 +17,9 @@ export type CubicBezier = Paths.Path & {
   cubic2: Points.Point,
 }
 
+export const isQuadraticBezier = (path: Paths.Path | QuadraticBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
+export const isCubicBezier = (path: Paths.Path | CubicBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
+
 /**
  * Returns a new quadratic bezier with specified bend amount
  *
@@ -82,7 +85,8 @@ export const cubic = (start: Points.Point, end: Points.Point, handle1: Points.Po
       return Rects.fromTopLeft({x: x.min, y: y.min}, xSize, ySize);
     },
     toString: () => bzr.toString(),
-    toSvgString: () => `brrup`
+    toSvgString: () => `brrup`,
+    kind: `bezier/cubic`
   });
 };
 
@@ -107,7 +111,8 @@ export const quadratic = (start: Points.Point, end: Points.Point, handle: Points
       return Rects.fromTopLeft({x: x.min, y: y.min}, xSize, ySize);
     },
     toString: () => bzr.toString(),
-    toSvgString: () => quadraticToSvgString(start, end, handle)
+    toSvgString: () => quadraticToSvgString(start, end, handle),
+    kind: `bezier/quadratic`
   });
 };
 

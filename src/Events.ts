@@ -67,7 +67,7 @@ export class SimpleEventEmitter<Events> {
    * @param {Listener<Events>} listener
    * @memberof SimpleEventEmitter
    */
-  addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void {// (this: any, ev: Events[K]) => any): void {
+  addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void { // (this: any, ev: Events[K]) => any): void {
     this.#listeners.add(type, listener);
   }
   //addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;

@@ -1,9 +1,32 @@
+
+export type Point = {
+  readonly x: number
+  readonly y: number
+  readonly z?: number
+}
+
+
 export const pointToString = (p: Point): string => {
   if (p.z !== undefined) {
     return `(${p.x},${p.y},${p.z})`;
   } else {
     return `(${p.x},${p.y})`;
   }
+};
+
+export const compareTo = (compareFn:(a:Point, b:Point)=>Point, ...points:Point[]):Point => {
+  if (points.length === 0) throw new Error(`No points provided`);
+  let min = points[0];
+  points.forEach(p => {
+    min = compareFn(min, p);
+  });
+  return min;
+};
+
+export const distance = (a:Point, b:Point):number => {
+  guard(a, `a`);
+  guard(b, `b`);
+  return Math.hypot(b.x-a.x, b.y-a.y);
 };
 
 export const guard = (p: Point, name = `Point`) => {
@@ -15,7 +38,10 @@ export const guard = (p: Point, name = `Point`) => {
   if (Number.isNaN(p.y)) throw new Error(`Parameter '${name}.y' is NaN`);
 };
 
-const isPoint = (p: Point): p is Point => {
+//export const isPoint = (p: Point|any): p is Point => (p as Point).x !== undefined;
+
+
+export const isPoint = (p: Point): p is Point => {
   if (p.x === undefined) return false;
   if (p.y === undefined) return false;
   return true;
@@ -39,23 +65,26 @@ export const lerp =(amt:number, a:Point, b:Point) => ({x: (1-amt) * a.x + amt * 
 * ```
 * let p = fromArray([10, 5]); // yields {x:10, y:5}
 * let p = from(10, 5);        // yields {x:10, y:5}
+* let p = from(10);           // yields {x:10, y:0} 0 is used for default y
+* let p = from();             // yields {x:0, y:0} 0 used for default x & y
 * ```
  * @param {(number | number[])} xOrArray
  * @param {number} [y]
  * @returns {Point}
  */
-export const from = (xOrArray: number | number[], y?: number): Point => {
+export const from = (xOrArray?: number | number[], y?: number): Point => {
   if (Array.isArray(xOrArray)) {
     if (xOrArray.length !== 2) throw new Error(`Expected array of length two, got ` + xOrArray.length);
-    return {
+    return Object.freeze({
       x: xOrArray[0],
       y: xOrArray[1]
-    };
+    });
   } else {
-    if (y === undefined) throw new Error(`y is undefined`);
-    if (Number.isNaN(xOrArray)) throw new Error(`x is NaN`);
-    if (Number.isNaN(y)) throw new  Error(`y is NaN`);
-    return {x: xOrArray, y: y};
+    if (xOrArray === undefined) xOrArray =0;
+    else if (Number.isNaN(xOrArray)) throw new Error(`x is NaN`);
+    if (y === undefined) y = 0;
+    else if (Number.isNaN(y)) throw new  Error(`y is NaN`);
+    return Object.freeze({x: xOrArray, y: y});
   }
 };
 
@@ -127,8 +156,3 @@ export function multiply(a: Point, bOrX: Point | number, y?: number) {
   } else throw new Error(`Invalid arguments`);
 }
 
-export type Point = {
-  readonly x: number
-  readonly y: number
-  readonly z?: number
-}

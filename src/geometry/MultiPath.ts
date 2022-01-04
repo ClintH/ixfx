@@ -4,6 +4,7 @@ import * as Rects from './Rect.js';
 
 export type MultiPath = Paths.Path & {
   segments: Paths.Path[]
+  kind: `multipath`
 }
 /**
  * Returns a new multipath, replacing a path at a given index
@@ -151,6 +152,7 @@ export const fromPaths = (...paths: Paths.Path[]): MultiPath => {
     compute: (t: number, useWidth = false) => compute(paths, t, useWidth, dims),
     bbox: () => boundingBox(paths),
     toString: () => toString(paths),
-    toSvgString: () => toSvgString(paths)
+    toSvgString: () => toSvgString(paths),
+    kind: `multipath`
   });
 };
