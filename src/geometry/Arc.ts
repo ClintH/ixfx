@@ -6,9 +6,8 @@ import * as Rects from './Rect.js';
 import {Lines} from '../index.js';
 
 const isArc = (p: Circle | Arc): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
-
 const isCircle = (p: Circle | Points.Point): p is Circle => (p as Circle).radius !== undefined;
-//const isCirclePositioned = (p: Circle | Points.Point): p is CirclePositioned => (p as CirclePositioned).radius !== undefined && (p as CirclePositioned).x !== undefined && (p as CirclePositioned).y !== undefined;
+
 export const isPositioned = (p: Circle | Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 export type Circle = {
@@ -20,14 +19,12 @@ export type CircularPath = Circle & Path & {
   kind: `circular`
 };
 
-
 export type Arc = {
   readonly radius:number
   readonly startRadian:number
   readonly endRadian:number
   readonly counterClockwise?:boolean
 }
-
 
 export type ArcPositioned = Points.Point & Arc;
 
@@ -120,7 +117,7 @@ const guard = (circleOrArc:CirclePositioned|Circle|Arc|ArcPositioned) => {
 export const circleToPath = (circle:CirclePositioned): CircularPath => {
   guard(circle);
 
-  return {
+  return Object.freeze({
     ...circle,
     /**
      * Returns a relative (0.0-1.0) point on a circle. 0=3 o'clock, 0.25=6 o'clock, 0.5=9 o'clock, 0.75=12 o'clock etc.
@@ -129,10 +126,10 @@ export const circleToPath = (circle:CirclePositioned): CircularPath => {
      */
     compute: (t:number) => compute(circle, t),
     bbox:() => bbox(circle),
-    length: () => 0,
+    length: () => length(circle),
     toSvgString: () => `blerg`,
     kind: `circular`
-  };
+  });
 };
 
 export const compute = (circleOrArc:ArcPositioned|CirclePositioned, t:number):Points.Point => {
@@ -145,26 +142,29 @@ export const compute = (circleOrArc:ArcPositioned|CirclePositioned, t:number):Po
 export const arcToPath = (arc:ArcPositioned): Path => {
   guard(arc);
 
-  return {
+  return Object.freeze({
     ...arc,
     compute:(t:number) => compute(arc, t),
     bbox:() => bbox(arc),
-    length: () => 0,
+    length: () => length(arc),
     toSvgString:() => `blerg`,
     kind: `arc`
-  };
+  });
+};
 
+export const length = (circleOrArc:Circle|Arc):number => {
+  if (isArc(circleOrArc)) {
+    return PIPI*circleOrArc.radius*((circleOrArc.startRadian-circleOrArc.endRadian)/PIPI);
+  } else if (isCircle(circleOrArc)) {
+    return PIPI*circleOrArc.radius;
+  } else throw new Error(`Invalid parameter`);
 };
 
 export const bbox = (circleOrArc:CirclePositioned|ArcPositioned):Rects.Rect => {
   if (isArc(circleOrArc)) {
     const middle = compute(circleOrArc, 0.5);
     const asLine = toLine(circleOrArc);
-    const leftMost = Points.compareTo((a, b) => {
-      if (a.x < b.x) return a;
-      else return b;
-    }, middle, asLine.a, asLine.b);
-    return Rects.fromCenter(circleOrArc,  circleOrArc.radius*2, circleOrArc.radius*2);
+    return Points.bbox(middle, asLine.a, asLine.b);
   } else if (isCircle(circleOrArc)) {
     return Rects.fromCenter(circleOrArc, circleOrArc.radius*2, circleOrArc.radius*2);
   } else {
@@ -187,7 +187,7 @@ export const arcToSvg = (origin:Points.Point, radius:number, startAngle:number, 
   return d.join(` `);
 };
 
-export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number => Points.distance(a, b);
+export const distanceCenter = (a:CirclePositioned|ArcPositioned, b:CirclePositioned|ArcPositioned):number => Points.distance(a, b);
 
 /**
  * Returns true if the two objects have the same values
@@ -196,7 +196,7 @@ export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number =>
  * @param {CirclePositioned} b
  * @returns {boolean}
  */
-export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):boolean => {
+export const isEquals = (a:CirclePositioned|Circle|Arc|ArcPositioned, b:CirclePositioned|Circle|Arc|ArcPositioned):boolean => {
   if (a.radius !== b.radius) return false;
 
   if (isPositioned(a) && isPositioned(b)) {
@@ -204,7 +204,16 @@ export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):b
     if (a.y !== b.y) return false;
     if (a.z !== b.z) return false;
     return true;
-  }
+  } else if (!isPositioned(a) && !isPositioned(b)) {
+    // no-op
+  } else return false; // one is positioned one not
+
+  if (isArc(a) && isArc(b)) {
+    if (a.endRadian !== b.endRadian) return false;
+    if (a.startRadian !== b.startRadian) return false;
+  } else if (!isArc(a) && !isArc(b)) {
+    // no-op
+  } else return false; // one is an arc, one not
   return false;
 };
 

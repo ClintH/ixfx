@@ -1,3 +1,4 @@
+import {Rects} from "../index";
 
 export type Point = {
   readonly x: number
@@ -40,6 +41,31 @@ export const guard = (p: Point, name = `Point`) => {
 
 //export const isPoint = (p: Point|any): p is Point => (p as Point).x !== undefined;
 
+export const bbox = (...points:Point[]):Rects.Rect => {
+  const leftMost = compareTo((a, b) => {
+    if (a.x < b.x) return a;
+    else return b;
+  }, ...points);
+  const rightMost = compareTo((a, b) => {
+    if (a.x > b.x) return a;
+    else return b;
+  }, ...points);
+  const topMost = compareTo((a, b) => {
+    if (a.y < b.y) return a;
+    else return b;
+  }, ...points);
+  const bottomMost = compareTo((a, b) => {
+    if (a.y > b.y) return a;
+    else return b;
+  }, ...points);
+
+
+  const topLeft = {x:leftMost.x, y:topMost.y};
+  const topRight = {x:rightMost.x, y:topMost.y};
+  const bottomRight = {x:rightMost.x, y:bottomMost.y};
+  const bottomLeft = {x:leftMost.x, y:bottomMost.y};
+  return Rects.maxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
+};
 
 export const isPoint = (p: Point): p is Point => {
   if (p.x === undefined) return false;

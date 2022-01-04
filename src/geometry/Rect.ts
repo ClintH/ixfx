@@ -31,6 +31,24 @@ export const fromCenter = function (origin: Point.Point, width: number, height: 
   //return rectFromPoints(...pts);
 };
 
+export const maxFromCorners = (topLeft:Point.Point, topRight:Point.Point, bottomRight:Point.Point, bottomLeft: Point.Point):Rect => {
+  if (topLeft.y > bottomRight.y) throw new Error(`topLeft.y greater than bottomRight.y`);
+  if (topLeft.y > bottomLeft.y) throw new Error(`topLeft.y greater than bottomLeft.y`);
+
+  const w1  = topRight.x - topLeft.x;
+  const w2 = bottomRight.x - bottomLeft.x;
+  const h1 = Math.abs(bottomLeft.y - topLeft.y);
+  const h2 = Math.abs(bottomRight.y - topRight.y);
+
+
+  return {
+    x: Math.min(topLeft.x, bottomLeft.x),
+    y: Math.min(topRight.y, topLeft.y),
+    width: Math.max(w1, w2),
+    height: Math.max(h1, h2) 
+  };
+};
+
 const guardDim = function (d: number, name: string = `Dimension`) {
   if (d === undefined) throw Error(`${name} is undefined`);
   if (isNaN(d)) throw Error(`${name} is NaN`);

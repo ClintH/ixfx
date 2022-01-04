@@ -4,14 +4,17 @@ import * as MathUtil from '../../src/geometry/Math';
 import {checkbox} from '../../src/dom/Forms';
 import {SVG} from '@svgdotjs/svg.js';
 import {pingPongPercent} from '../../src/Producers';
+import * as Palette from '../../src/colour/Palette';
 
 // Drawing properties
-
-const bgColour = `#edf0f3`;
+const colours = new Palette.Palette();
+const bgColour = colours.get(`background-color`);
 const pingPongInterval = 0.01;
-const dotDrawOpts = {radius: 3, fillStyle: `#f516d0`};
-const arcDrawOpts = {strokeStyle: `#11191f`};
+const dotDrawOpts = {radius: 3, fillStyle: colours.get(`primary`)};
+const arcDrawOpts = {strokeStyle: colours.get(`muted-color`)};
+const boundingBoxColour = colours.get(`muted-border-color`);
 
+// Get reference to canvas and SVG parent DIV
 const getElements = (idPrefix: string): [HTMLCanvasElement, HTMLElement] => {
   const canvasEl = document.getElementById(idPrefix + `Canvas`) as HTMLCanvasElement;
   const svgEl = document.getElementById(idPrefix + `Svg`);
@@ -20,6 +23,7 @@ const getElements = (idPrefix: string): [HTMLCanvasElement, HTMLElement] => {
   return [canvasEl, svgEl];
 };
 
+// Clear a canvas
 const clear = (ctx: CanvasRenderingContext2D, canvasEl: HTMLCanvasElement) => {
   ctx.save();
   ctx.resetTransform();
@@ -94,7 +98,7 @@ const testIntersection = () => {
     if (bboxEnable.checked) {
       // Draw bounding box
       const bbox = Arcs.circleToPath(circleB).bbox();
-      drawHelper.rect(bbox, { strokeStyle: `yellow`});
+      drawHelper.rect(bbox, { strokeStyle: boundingBoxColour});
     }
   };
 
@@ -177,7 +181,7 @@ const testArc = () => {
       if (bboxEnable.checked) {
         // Draw bounding box
         const bbox = path.bbox();
-        drawHelper.rect(bbox, { strokeStyle: `yellow`});
+        drawHelper.rect(bbox, { strokeStyle: boundingBoxColour});
       }
 
       // Draw start and end

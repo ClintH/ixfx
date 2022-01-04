@@ -138,7 +138,7 @@ export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: Points.Point
   ctx.stroke();
 };
 
-export const pointLabels = (ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {fillStyle?: string} = {}) => {
+export const pointLabels = (ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {fillStyle?: string} = {}, labels?:string[]) => {
   guardCtx(ctx);
 
   if (pts.length === 0) return;
@@ -149,7 +149,12 @@ export const pointLabels = (ctx: CanvasRenderingContext2D, pts: Points.Point[], 
   if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
 
   for (let i = 0; i < pts.length; i++) {
-    ctx.fillText(i.toString(), pts[i].x, pts[i].y);
+    let label = i.toString();
+    if (labels !== undefined && i<labels.length) {
+      label =labels[i];
+    }
+    
+    ctx.fillText(label.toString(), pts[i].x, pts[i].y);
   }
 };
 
@@ -242,8 +247,13 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect|Rects.Rec
   const draw = (d:Rects.Rect) => {
     if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
     ctx.strokeRect(d.x, d.y, d.width, d.height);
+
+    if (opts.debug) {
+      pointLabels(ctx, Rects.getCorners(d), undefined, [`NW`, `NE`, `SE`, `SW`]);
+    }
   };
 
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
   else draw(toDraw);
+
 };
