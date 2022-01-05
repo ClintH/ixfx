@@ -1,6 +1,6 @@
 //export type StateChangeCallback = (newState: string, priorState: string) => void;
-import {SimpleEventEmitter, Listener} from "./Events.js";
-
+import {SimpleEventEmitter} from "./Events.js";
+import { isStringArray } from "./Guards.js";
 /*
 type MappedTypeWithNewProperties<Type> = {
   [Properties in keyof Type as NewKeyType]: Type[Properties]
@@ -50,16 +50,74 @@ interface MachineDescription {
 
 // export type StateEventCallback<M extends MachineDescription> = (event: string, state: ValidStates<M>, params: any, machine: StateMachine<M>) => boolean;
 
-class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
+/**
+ * State machine
+ *
+ * Machine description is a simple object of possible state names to allowed state(s). Eg. the following
+ * has four possible states (`wakeup, sleep, coffee, breakfast, bike`). `Sleep` can only transition to the `wakeup`
+ * state, while `wakeup` can transition to either `coffee` or `breakfast`. 
+ * 
+ * Use `null` to signify the final state. Multiple states can terminate the machine if desired.
+ * ```
+ * const description = { 
+ *  sleep: 'wakeup',
+ *  wakeup: ['coffee', 'breakfast'],
+ *  coffee: `bike`,
+ *  breakfast: `bike`,
+ *  bike: null
+ * }
+ * ```
+ * Create the machine with the starting state (`sleep`)
+ * ```
+ * const machine = new StateMachine(`sleep`, description);
+ * ```
+ * 
+ * Change the state by name:
+ * ```
+ * machine.state = `wakeup`
+ * ```
+ * 
+ * Or request an automatic transition (will use first state if there are several options)
+ * ```
+ * machine.next();
+ * ```
+ * 
+ * Check status
+ * ```
+ * if (machine.state === `coffee`) ...;
+ * if (machine.isDone()) ...
+ * ```
+ * 
+ * Listen for state changes
+ * ```
+ * machine.addEventListener(`change`, (evt) => {
+ *  const {priorState, newState} = evt;
+ *  console.log(`State change from ${priorState} -> ${newState}`);
+ * });
+ * ```
+ * @export
+ * @class StateMachine
+ * @extends {SimpleEventEmitter<StateMachineEventMap>}
+ */
+export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   #state: string;
   #debug: boolean;
   #m: MachineDescription;
   #isDone: boolean;
   #initial: string;
 
+  /**
+   * Create a state machine with initial state, description and options
+   * @param {string} initial Initial state
+   * @param {MachineDescription} m Machine description
+   * @param {Options} [opts={debug: false}] Options for machine
+   * @memberof StateMachine
+   */
   constructor(initial: string, m: MachineDescription, opts: Options = {debug: false}) {
     super();
-    if (m[initial] === undefined) throw Error(`Machine does not include initial state ${initial}`);
+    const [valid, errorMsg] = StateMachine.validate(initial, m);
+    if (!valid) throw new Error(errorMsg);
+
     this.#initial = initial;
     this.#m = m;
     this.#debug = opts.debug ?? false;
@@ -67,8 +125,47 @@ class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     this.#isDone = false;
   }
 
+  static validate(initial:string, m:MachineDescription):[boolean, string]  {
+    // Check that object is structured properly
+    const keys = Object.keys(m);
+    const finalStates:string[] = [];
+    const seenKeys = new Set();
+    const seenVals = new Set();
+
+    for (let i=0;i<keys.length;i++) {
+      const key = keys[i];
+      if (seenKeys.has(key)) return [false, `Key ${key} is already used`];
+      seenKeys.add(key);
+
+      if (typeof keys[i] !== `string`) return [false, `Key[${i}] is not a string`];
+      const val = m[key];
+      if (val === undefined) return [false, `Key ${key} value is undefined`];
+      if (typeof val === `string`) {
+        seenVals.add(val);
+        if (val === key) return [false, `Loop present for ${key}`];
+      } else if (Array.isArray(val)) {
+        if (!isStringArray(val)) return [false, `Key ${key} value is not an array of strings`];
+        val.forEach(v => seenVals.add(v));
+        if (val.find(v => v === key)) return [false, `Loop present for ${key}`];
+      } else if (val === null) {
+        finalStates.push(key);
+      } else {
+        return [false, `Key ${key} has a value that is neither null, string or array`];
+      }
+    }
+
+    // Check that all values have a top-level state
+    const seenValsArray = Array.from(seenVals);
+    const missing = seenValsArray.find(v => !seenKeys.has(v));
+    if (missing) return [false, `Potential state ${missing} does not exist as a top-level state`];
+
+    // Check machine contains intial state
+    if (m[initial] === undefined) return [false, `Initial state ${initial} not present`];
+    return [true, ``];
+  }
+
   /**
-   * Moves to the next state if possible. 
+   * Moves to the next state if possible. If multiple states are possible, it will use the first.
    * If machine is finalised, no error is thrown and null is returned.
    * 
    * @returns {(string|null)} Returns new state, or null if machine is finalised
@@ -83,37 +180,67 @@ class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     return this.state;
   }
 
+  /**
+   * Returns true if state machine is in its final state
+   *
+   * @returns
+   * @memberof StateMachine
+   */
   isDone() {
     return this.#isDone;
   }
 
+  /**
+   * Resets machine to initial state
+   *
+   * @memberof StateMachine
+   */
   reset() {
     this.#isDone = false;
     this.#state = this.#initial;
   }
 
-  get state(): string {
-    return this.#state;
+  /**
+   * Checks whether a state change is valid.
+   *
+   * @static
+   * @param {string} priorState From state
+   * @param {string} newState To state
+   * @param {MachineDescription} description Machine description
+   * @returns {[boolean, string]} If valid: [true,''], if invalid: [false, 'Error msg here']
+   * @memberof StateMachine
+   */
+  static isValid(priorState:string, newState:string, description:MachineDescription):[boolean, string] {
+    // Does state exist?
+    if (description[newState] === undefined) return [false, `Machine cannot change to non-existent state ${newState}`];
+
+    // Is transition allowed?
+    const rules = description[priorState];
+    if (Array.isArray(rules)) {
+      if (!rules.includes(newState)) return [false, `Machine cannot ${priorState} -> ${newState}. Allowed transitions: ${rules.join(`, `)}`];
+    } else {
+      if (newState !== rules && rules !== `*`) return [false, `Machine cannot ${priorState} -> ${newState}. Allowed transition: ${rules}`];
+    }
+    return [true, `ok`];
   }
 
+  /**
+   * Sets state. Throws an error if an invalid transition is attempted.
+   * Use `StateMachine.isValid` to check validity without changing.
+   *
+   * @memberof StateMachine
+   */
   set state(newState: string) {
     const priorState = this.#state;
 
-    // Does state exist?
-    if (this.#m[newState] === undefined) throw Error(`Machine cannot change to non-existent state ${newState}`);
+    const [allowed, errorMsg] = StateMachine.isValid(priorState, newState, this.#m);
 
-    // Is transition allowed?
-    let rules = this.#m[this.#state];
-    if (Array.isArray(rules)) {
-      if (!rules.includes(newState)) throw Error(`Machine cannot ${priorState} -> ${newState}. Allowed transitions: ${rules.join(`, `)}`);
-    } else {
-      if (newState !== rules && rules !== `*`) throw Error(`Machine cannot ${priorState} -> ${newState}. Allowed transition: ${rules}`);
-    }
+    if (!allowed) throw new Error(errorMsg);
 
     if (this.#debug) console.log(`StateMachine: ${priorState} -> ${newState}`);
-
     this.#state = newState;
 
+    let rules = this.#m[priorState];
     rules = this.#m[newState];
     if (rules === null) this.#isDone = true;
 
@@ -122,6 +249,15 @@ class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     }, 1);
   }
 
+  /**
+ * Return current state
+ *
+ * @type {string}
+ * @memberof StateMachine
+ */
+  get state(): string {
+    return this.#state;
+  }
   /*
   fire(eventName: string, params?: any): boolean {
     let handler = this.#state[eventName];
@@ -149,146 +285,6 @@ class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
 
 }
 
-const createAdsr = () => {
-  return {
-    attack: `decay`,
-    decay: `sustain`,
-    sustain: `release`,
-    release: null
-  };
-};
-
-const createMulti = () => {
-  return {
-    awake: [`breakfast`, `coffee`],
-    breakfast: `coffee`,
-    coffee: `brushTeeth`,
-    brushTeeth: null
-  };
-};
-
-// Tests that transitions defined as arrays can be navigated
-// Also tests .next() function for progressing
-const testPaths = () => {
-  const m = createMulti();
-  const debug = false;
-  let sm = new StateMachine(`awake`, m, {debug: debug});
-
-  try {
-    sm.state = `brushTeeth`;
-    throw Error(`testPaths illegal state change allowed`);
-  } catch (e) {};
-
-  sm.state = `coffee`;
-  sm.state = `brushTeeth`;
-
-  if (!sm.isDone()) throw Error(`Machine should be done`);
-
-  sm = new StateMachine(`awake`, m, {debug: debug});
-  sm.state = `breakfast`;
-  sm.state = `coffee`;
-  sm.state = `brushTeeth`;
-  if (!sm.isDone()) throw Error(`Machine should be done`);
-
-  sm = new StateMachine(`awake`, m, {debug: debug});
-  if (sm.isDone()) throw Error(`Finalised unexpectedly (1)`);
-  if (sm.next() !== `breakfast`) throw Error(`Did not choose expected state`);
-  if (sm.isDone()) throw Error(`Finalised unexpectedly (2)`);
-  if (sm.next() !== `coffee`) throw Error(`Did not choose expected state`);
-  if (sm.isDone()) throw Error(`Finalised unexpectedly (3)`);
-  if (sm.next() !== `brushTeeth`) throw Error(`Did not choose expected state`);
-  if (!sm.isDone()) throw Error(`Finalised unexpectedly (4)`);
-  if (sm.next() !== null) throw Error(`Did not finalise as expected (1)`);
-
-  if (!sm.isDone()) throw Error(`Machine should be done`);
-
-  console.log(`Test paths OK`);
-};
-
-// Test that machine throws an error for an unknown state
-const testUnknownState = () => {
-  const m = createAdsr();
-  let caught = false;
-  try {
-    new StateMachine(`blah`, m, {debug: false});
-  } catch (e) {
-    caught = true;
-  }
-  if (!caught) throw Error(`testCtorInitialState`);
-
-  const sm = new StateMachine(`attack`, m, {debug: false});
-  try {
-    // @ts-ignore
-    sm.state = undefined;
-  } catch (e) {
-    caught = true;
-  }
-  if (!caught) throw Error(`Undefined state was wrongly allowed (1)`);
-
-  try {
-    sm.state = `blah`;
-  } catch (e) {
-    caught = true;
-  }
-  if (!caught) throw Error(`Undefined state was wrongly allowed (2)`);
-
-  console.log(`testUnknownState OK`);
-};
-
-// Tests that machine finalises after all states transition
-const testFinalisation = () => {
-  const m = createAdsr();
-  const sm = new StateMachine(`attack`, m, {debug: false});
-  sm.state = `decay`;
-  sm.state = `sustain`;
-  sm.state = `release`; // Finalises
-  const states = Object.keys(m);
-  for (const state of states) {
-    if (state === `release`) continue;
-    try {
-      sm.state = state;
-      throw Error(`testFinalisation: did not prevent change from final state: ${state}`);
-    } catch (e) {
-    }
-  }
-  console.log(`testFinalisation OK`);
-};
-
-// Test that all event ransitions happen, and there are no unexpected transitions
-const testEvents = async () => {
-  const m = createAdsr();
-  const sm = new StateMachine(`attack`, m, {debug: false});
-
-  let expected = [`attack-decay`, `decay-sustain`, `sustain-release`];
-  sm.addEventListener(`change`, (evt) => {
-    const key = evt.priorState + `-` + evt.newState;
-    if (!expected.includes(key))
-      throw Error(`Unexpected transition: ${evt.priorState} -> ${evt.newState}`);
-
-    expected = expected.filter(k => k !== key);
-  });
-
-  sm.state = `decay`;
-  sm.state = `sustain`;
-  sm.state = `release`;
-
-  const p = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (expected.length > 0) {
-        throw Error(`Transitions did not occur: ${expected.join(`, `)}`);
-      }
-
-      console.log(`testEvents OK`);
-      resolve(`ok`);
-    }, 100);
-  });
-  return p;
-};
-
-testFinalisation();
-testUnknownState();
-await testEvents();
-testPaths();
 
 /*
 interface ListMachineDefinition {
@@ -315,30 +311,4 @@ const createListMachine = (list: string[], opts?: Options): ListStateMachine => 
   }
 
   return new ListStateMachine(list[0], map, opts);
-}
-
-let m = new StateMachine('delay', adsrDemo, {debug: true});
-m.addEventListener('change', (evt) => {
-  console.log(`change event handler: ${evt.priorState} -> ${evt.newState}`);
-});
-
-
-for (let i = 0; i < 10; i++) {
-  console.log(`firing ${i} isDone: ${m.isDone()}`);
-  m.fire('burp', {hello: 'Dave'});
-  if (!m.fire('next')) {
-    console.log(' -- cannot fire');
-  }
-}
-
-let simpleTest = createListMachine(['a', 'b', 'c', 'd', 'e']);
-simpleTest.addEventListener('change', (evt) => {
-  console.log(`change event handler2: ${evt.priorState} -> ${evt.newState}`);
-})
-
-for (let i = 0; i < 10; i++) {
-  console.log(`next ${i} isDone: ${simpleTest.isDone()}`);
-  if (!simpleTest.next()) {
-    console.log(' -- no more next');
-  }
 }*/

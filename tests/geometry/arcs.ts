@@ -9,10 +9,11 @@ import * as Palette from '../../src/colour/Palette';
 // Drawing properties
 const colours = new Palette.Palette();
 const bgColour = colours.get(`background-color`);
-const pingPongInterval = 0.01;
+const bboxDrawOpts = { strokeStyle: colours.get(`muted-border-color`)};
 const dotDrawOpts = {radius: 3, fillStyle: colours.get(`primary`)};
 const arcDrawOpts = {strokeStyle: colours.get(`muted-color`)};
-const boundingBoxColour = colours.get(`muted-border-color`);
+
+const pingPongInterval = 0.01;
 
 // Get reference to canvas and SVG parent DIV
 const getElements = (idPrefix: string): [HTMLCanvasElement, HTMLElement] => {
@@ -98,7 +99,7 @@ const testIntersection = () => {
     if (bboxEnable.checked) {
       // Draw bounding box
       const bbox = Arcs.circleToPath(circleB).bbox();
-      drawHelper.rect(bbox, { strokeStyle: boundingBoxColour});
+      drawHelper.rect(bbox, bboxDrawOpts);
     }
   };
 
@@ -181,7 +182,7 @@ const testArc = () => {
       if (bboxEnable.checked) {
         // Draw bounding box
         const bbox = path.bbox();
-        drawHelper.rect(bbox, { strokeStyle: boundingBoxColour});
+        drawHelper.rect(bbox, bboxDrawOpts);
       }
 
       // Draw start and end

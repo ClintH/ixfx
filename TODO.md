@@ -1,6 +1,5 @@
 # TODO
-
-* Lines compound path
+ 
 * Curves: cubic, bend, compound
 * Compound: math fns
 
