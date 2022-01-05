@@ -6,16 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lines test</title>
   <link rel="stylesheet" href="../css/pico.fluid.classless.css">
-  <link rel="stylesheet" href="geometry.css">
+  <link rel="stylesheet" href="./geometry.css">
+
 </head>
+
 
 <body>
   <header>
     <a href="../">ixfx</a> \ <a href="./">geometry</a>
   </header>
   <main>
-    <h1>Lines</h1>
-    <h2>Compute relative point</h2>
+    <h1>Curves</h1>
+    <h2>Cubic</h2>
     <section>
       <div>
         <h2>Canvas</h2>
@@ -27,26 +29,24 @@
       </div>
     </section>
 
-    <h2>Distances</h2>
-    <p>Find nearest point on line, calculate distance from point to anywhere on line, calculate whether point is within
-      vicinity of line</p>
-
-    <label>
-      <input type="checkbox" id="bboxDistances">
-      Bounding boxes
-    </label>
-    <section>
-      <div>
-        <canvas id="distancesCanvas" class="bordered" width=360 height=130></canvas>
-      </div>
-    </section>
-
-    <h2>Compound path</h2>
-    <p>Path made up of several lines</p>
+    <h2>Quadratic</h2>
     <section>
       <div>
         <h2>Canvas</h2>
-        <canvas id="multiPathCanvas" width=410 height=120></canvas>
+        <canvas id="quadraticCanvas"></canvas>
+      </div>
+      <div>
+        <h2>SVG</h2>
+        <div class="svg" id="quadraticSvg"></div>
+      </div>
+    </section>
+
+    <h2>Bend</h2>
+    <section>
+
+      <div>
+        <h2>Canvas</h2>
+        <canvas id="multiPathCanvas"></canvas>
       </div>
       <div>
         <h2>SVG</h2>
@@ -54,7 +54,7 @@
       </div>
     </section>
 
-    <script type="module" src="lines.js"></script>
+    <script type="module" src="curves.js"></script>
   </main>
 
 </body>

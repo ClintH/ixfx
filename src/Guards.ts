@@ -8,6 +8,4 @@ export const array = (t: any, name = `?`): void => {
   if (!Array.isArray(t)) throw new Error(`Parameter '${name}' is expected to be an array'`);
 };
 
-export function defined<T>(argument: T | undefined): argument is T {
-  return argument !== undefined;
-}
+export const defined = <T>(argument: T | undefined): argument is T => argument !== undefined;

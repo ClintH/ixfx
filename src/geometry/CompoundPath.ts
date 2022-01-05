@@ -2,26 +2,26 @@ import {Points} from '../index.js';
 import * as Paths from './Path.js';
 import * as Rects from './Rect.js';
 
-export type MultiPath = Paths.Path & {
+export type CompoundPath = Paths.Path & {
   segments: Paths.Path[]
-  kind: `multipath`
+  kind: `compound`
 }
 /**
- * Returns a new multipath, replacing a path at a given index
+ * Returns a new compoundpath, replacing a path at a given index
  *
- * @param {MultiPath} multiPath Existing multipath
+ * @param {CompoundPath} compoundPath Existing compoundpath
  * @param {number} index Index to replace at
  * @param {Paths.Path} path Path to substitute in
- * @returns {MultiPath} New multipath
+ * @returns {CompoundPath} New compoundpath
  */
-export const setSegment = (multiPath: MultiPath, index: number, path: Paths.Path): MultiPath => {
-  const existing = multiPath.segments;
+export const setSegment = (compoundPath: CompoundPath, index: number, path: Paths.Path): CompoundPath => {
+  const existing = compoundPath.segments;
   existing[index] = path;
   return fromPaths(...existing);
 };
 
 /**
- * Computes x,y point at a relative position along multipath
+ * Computes x,y point at a relative position along compoundpath
  *
  * @param {Paths.Path[]} paths Combined paths (assumes contiguous)
  * @param {number} t Position (given as a percentage from 0 to 1)
@@ -96,7 +96,7 @@ export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
 };
 
 /**
- * Computes the bounding box that encloses entire multipath
+ * Computes the bounding box that encloses entire compoundpath
  *
  * @param {Paths.Path[]} paths
  * 
@@ -136,13 +136,13 @@ export const toSvgString = (paths: Paths.Path[]): string => {
 };
 
 /**
- * Create a multipath from an array of paths.
+ * Create a compoundpath from an array of paths.
  * All this does is verify they are connected, and precomputes dimensions
  *
  * @param {...Paths.Path[]} paths
- * @returns {MultiPath}
+ * @returns {CompoundPath}
  */
-export const fromPaths = (...paths: Paths.Path[]): MultiPath => {
+export const fromPaths = (...paths: Paths.Path[]): CompoundPath => {
   guardContinuous(paths); // Throws an error if paths are not connected
   const dims = computeDimensions(paths);
 
@@ -153,6 +153,6 @@ export const fromPaths = (...paths: Paths.Path[]): MultiPath => {
     bbox: () => boundingBox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths),
-    kind: `multipath`
+    kind: `compound`
   });
 };

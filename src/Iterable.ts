@@ -5,9 +5,7 @@ type WithEvents = {
 
 export const isAsyncIterable = (v: any): v is AsyncIterable<any> => Symbol.asyncIterator in Object(v);
 
-
 export const isIterable = (v: any): v is Iterable<any> => Symbol.iterator in Object(v);
-
 
 export const eventsToIterable = <V>(eventSource: WithEvents, eventType: string): AsyncIterator<any, any, undefined> => {
   const pullQueue: any[] = [];

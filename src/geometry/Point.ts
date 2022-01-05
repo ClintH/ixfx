@@ -1,4 +1,4 @@
-import {Rects} from "../index";
+import * as Rects from "./Rect";
 
 export type Point = {
   readonly x: number
@@ -7,7 +7,7 @@ export type Point = {
 }
 
 
-export const pointToString = (p: Point): string => {
+export const toString = (p: Point): string => {
   if (p.z !== undefined) {
     return `(${p.x},${p.y},${p.z})`;
   } else {
@@ -31,10 +31,10 @@ export const distance = (a:Point, b:Point):number => {
 };
 
 export const guard = (p: Point, name = `Point`) => {
-  if (p === undefined) throw new Error(`Parameter '${name}' is undefined. Expected {x,y}`);
-  if (p === null) throw new Error(`Parameter '${name}' is null. Expected {x,y}`);
-  if (p.x === undefined) throw new Error(`Parameter '${name}.x' is undefined. Expected {x,y}`);
-  if (p.y === undefined) throw new Error(`Parameter '${name}.y' is undefined. Expected {x,y}`);
+  if (p === undefined) throw new Error(`Parameter '${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (p === null) throw new Error(`Parameter '${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (p.x === undefined) throw new Error(`Parameter '${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (p.y === undefined) throw new Error(`Parameter '${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
   if (Number.isNaN(p.x)) throw new Error(`Parameter '${name}.x' is NaN`);
   if (Number.isNaN(p.y)) throw new Error(`Parameter '${name}.y' is NaN`);
 };
@@ -67,7 +67,23 @@ export const bbox = (...points:Point[]):Rects.Rect => {
   return Rects.maxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
 };
 
-export const isPoint = (p: Point): p is Point => {
+// export const bbox = (...points: Point[]): Rects.Rect => {
+//   const x = points.map(p => p.x);
+//   const y = points.map(p => p.y);
+
+//   const xMin = Math.min(...x);
+//   const xMax = Math.max(...x);
+//   const yMin = Math.min(...y);
+//   const yMax = Math.max(...y);
+
+//   return Rects.fromTopLeft(
+//     {x: xMin, y: yMin},
+//     xMax - xMin,
+//     yMax - yMin
+//   );
+// };
+
+export const isPoint = (p: Point|any): p is Point => {
   if (p.x === undefined) return false;
   if (p.y === undefined) return false;
   return true;
@@ -81,8 +97,39 @@ export const isPoint = (p: Point): p is Point => {
  */
 export const toArray = (p: Point): number[] => ([p.x, p.y]);
 
+/**
+ * Returns true if the two points have identical values
+ *
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {boolean}
+ */
 export const equals = (a: Point, b: Point): boolean =>  a.x === b.x && a.y === b.y;
 
+/**
+ * Returns true if two points are within a specified range.
+ * Provide a point for the range to set different x/y range, or pass a number
+ * to use the same range for both axis.
+ *
+ * Examples:
+ * ```
+ * withinRange({x:100,y:100}, {x:101, y:101}, 1); // True
+ * withinRange({x:100,y:100}, {x:105, y:101}, {x:5, y:1}); // True 
+ * withinRange({x:100,y:100}, {x:105, y:105}, {x:5, y:1}); // False - y axis too far 
+ * ```
+ * @param {Point} a
+ * @param {Point} b
+ * @param {(Point|number)} maxRange
+ * @returns {boolean}
+ */
+export const withinRange = (a:Point, b:Point, maxRange:Point|number):boolean =>  {
+  if (typeof maxRange === `number`) {
+    maxRange = {x:maxRange, y:maxRange};
+  }
+  const x = Math.abs(b.x - a.x);
+  const y = Math.abs(b.y - a.y);
+  return (x <= maxRange.x && y<= maxRange.y);
+};
 
 export const lerp =(amt:number, a:Point, b:Point) => ({x: (1-amt) * a.x + amt * b.x, y:(1-amt) * a.y + amt * b.y });
 

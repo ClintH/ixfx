@@ -1,4 +1,4 @@
-import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, MultiPaths, Points, Rects} from "/dist/bundle.js";
+import {Lines, Plot, Envelopes, Paths, Beziers, Drawing, Compound, Points, Rects} from "/dist/bundle.js";
 
 const canvas = document.getElementById('canvas');
 /** @type {CanvasRenderingContext2D} */

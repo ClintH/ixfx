@@ -16,7 +16,7 @@ export type Path = {
   bbox(): Rects.Rect
   toString(): string
   toSvgString(): string
-  kind: `multipath` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
+  kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
 }
 
 export const getStart = function (path: Path): Point {

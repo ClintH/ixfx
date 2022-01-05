@@ -22,20 +22,21 @@ export const rawNumericRange = function* (interval: number, start: number = 0, e
  * Generates a range of numbers, with a given interval. Numbers are rounded so they behave more expectedly.
  *
  * For-loop example:
- * 
+ * ```
  * let loopForever = numericRange(0.1); // By default starts at 0 and continues forever
  * for (v of loopForever) {
  *  console.log(v);
  * }
- * 
+ * ```
  * If you want more control over when/where incrementing happens...
- * 
+ * ````
  * let percent = numericRange(0.1, 0, 1);
  * let percentResult = percent.next();
  * while (!percentResult.done) {
  *  let v = percentResult.value;
  *  percentResult = percent.next();
  * }
+ * ```
  * @param {number} interval Interval between numbers
  * @param {number} [start=0] Start
  * @param {number} [end] End (if undefined, range never ends)

@@ -3,9 +3,9 @@ import * as Rects from './geometry/Rect.js';
 import * as Points from './geometry/Point.js';
 import * as Beziers from './geometry/Bezier.js';
 import * as Paths from './geometry/Path.js';
-import * as MultiPaths from './geometry/MultiPath.js';
+import * as Compound from './geometry/CompoundPath.js';
 import * as Grids from './geometry/Grid.js';
-export {Lines, Rects, Points, Paths, Beziers, Grids, MultiPaths};
+export {Lines, Rects, Points, Paths, Beziers, Grids, Compound};
 
 
 import * as Envelopes from './modulation/Envelope.js';

@@ -1,17 +1,51 @@
 import * as Rects from './Rect.js';
-import {Point, pointToString} from './Point.js';
+import * as Points  from './Point.js';
 import {guard as guardPoint} from './Point.js';
 import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 
-
 export type Line = {
-  readonly a: Point
-  readonly b: Point
+  readonly a: Points.Point
+  readonly b: Points.Point
 }
-export const isLine = (p: Path | Line): p is Line => (p as Line).a !== undefined && (p as Line).b !== undefined;
 
-export const length = (a: Point, b: Point): number => {
+export const isLine = (p: Path | Line | Points.Point): p is Line => (p as Line).a !== undefined && (p as Line).b !== undefined;
+
+/**
+ * Returns true if the lines have the same value
+ *
+ * @param {Line} a
+ * @param {Line} b
+ * @returns {boolean}
+ */
+export const equals = (a:Line, b:Line):boolean =>  a.a === b.a && a.b === b.b;
+
+export const guard = (l:Line, paramName:string = `line`) => {
+  if (l === undefined) throw new Error(`${paramName} undefined`);
+  if (l.a === undefined) throw new Error(`${paramName}.a undefined. Expected {a:Point, b:Point}`);
+  if (l.b === undefined) throw new Error(`${paramName}.b undefined. Expected {a:Point, b:Point}`);
+};
+
+export const withinRange = (l:Line, p:Points.Point, maxRange:number):boolean =>  {
+  // if (typeof maxRange === `number`) {
+  //   maxRange = {x:maxRange, y:maxRange};
+  // }
+  const dist = distance(l, p);
+  return dist <= maxRange;
+  // const x = Math.abs(b.x - a.x);
+  // const y = Math.abs(b.y - a.y);
+  // return (x <= maxRange.x && y<= maxRange.y);
+};
+
+export const length = (aOrLine: Points.Point|Line, b?: Points.Point): number => {
+  let a;
+  if (isLine(aOrLine)) {
+    b = aOrLine.b;
+    a = aOrLine.a;
+  } else {
+    a = aOrLine;
+    if (b === undefined) throw new Error(`Requires both a and b parameters`);
+  }
   guardPoint(a, `a`);
   guardPoint(a, `b`);
 
@@ -25,8 +59,41 @@ export const length = (a: Point, b: Point): number => {
   }
 };
 
+export const nearest = (line:Line, p:Points.Point): Points.Point => {
+  const {a, b} = line;
+  const atob = { x: b.x - a.x, y: b.y - a.y };
+  const atop = { x: p.x - a.x, y: p.y - a.y };
+  const len = atob.x * atob.x + atob.y * atob.y;
+  let dot = atop.x * atob.x + atop.y * atob.y;
+  const t = Math.min(1, Math.max(0, dot / len));
+  dot = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+  return {x: a.x + atob.x * t, y: a.y + atob.y * t};
+};
 
-export const compute = (a: Point, b: Point, t: number): Point => {
+
+export const distance = (l:Line, p:Points.Point):number => {
+  guard(l, `l`);
+  guardPoint(p, `p`);
+
+  const lineLength = length(l);
+  if (lineLength === 0) {
+    // Line is really a point
+    return length(l.a, p);
+  }
+
+  const near = nearest(l, p);
+  return length(near, p);
+  
+  const {a, b} = l;
+  let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / lineLength;
+  t = Math.max(0, Math.min(1, t));
+  return length(p, {
+    x: a.x + t * (b.x - a.x),
+    y: a.y + t * (b.y - a.y)
+  });
+};
+
+export const compute = (a: Points.Point, b: Points.Point, t: number): Points.Point => {
   guardPoint(a, `a`);
   guardPoint(b, `b`);
   guardPercent(t, `t`);
@@ -39,23 +106,7 @@ export const compute = (a: Point, b: Point, t: number): Point => {
   return {x: x, y: y};
 };
 
-export const bbox = (...points: Point[]): Rects.Rect => {
-  const x = points.map(p => p.x);
-  const y = points.map(p => p.y);
-
-  const xMin = Math.min(...x);
-  const xMax = Math.max(...x);
-  const yMin = Math.min(...y);
-  const yMax = Math.max(...y);
-
-  return Rects.fromTopLeft(
-    {x: xMin, y: yMin},
-    xMax - xMin,
-    yMax - yMin
-  );
-};
-
-export const toString = (a: Point, b: Point): string => pointToString(a) + `-` + pointToString(b);
+export const toString = (a: Points.Point, b: Points.Point): string => Points.toString(a) + `-` + Points.toString(b);
 
 export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Line => {
   if (Number.isNaN(x1)) throw new Error(`x1 is NaN`);
@@ -76,9 +127,9 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  * @param {Point} b
  * @returns {number[]}
  */
-export const toFlatArray = (a: Point, b: Point): number[] =>  [a.x, a.y, b.x, b.y];
+export const toFlatArray = (a: Points.Point, b: Points.Point): number[] =>  [a.x, a.y, b.x, b.y];
 
-export const toSvgString = (a: Point, b: Point): string => `M${a.x} ${a.y} L ${b.x} ${b.y}`;
+export const toSvgString = (a: Points.Point, b: Points.Point): string => `M${a.x} ${a.y} L ${b.x} ${b.y}`;
 
 export const fromArray = (arr: number[]): Line => {
   if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);
@@ -86,7 +137,7 @@ export const fromArray = (arr: number[]): Line => {
   return fromNumbers(arr[0], arr[1], arr[2], arr[3]);
 };
 
-export const fromPoints = (a: Point, b: Point): Line => {
+export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   guardPoint(a, `a`);
   guardPoint(b, `b`);
   a = Object.freeze(a);
@@ -97,11 +148,22 @@ export const fromPoints = (a: Point, b: Point): Line => {
   });
 };
 
-export const fromPointsToPath = (a:Point, b:Point): LinePath => toPath(fromPoints(a, b));
+export const fromManyPoints = (...points:Points.Point[]): Line[] => {
+  if (!(points.length % 2 === 0)) throw new Error(`Points array should be even-numbered`);
+  const lines = [];
+  for (let i=0;i<points.length;i+2) {
+    lines.push(fromPoints(points[i], points[i+1]));
+  }
+  return lines;
+};
 
-export type LinePath = Path & {
+export const fromPointsToPath = (a:Points.Point, b:Points.Point): LinePath => toPath(fromPoints(a, b));
+
+export type LinePath = Line & Path & {
   toFlatArray():number[]
 }
+
+export const bbox = (line:Line):Rects.Rect =>  Points.bbox(line.a, line.b);
 
 export const toPath = (line:Line): LinePath => {
   const {a, b} = line;
@@ -109,7 +171,7 @@ export const toPath = (line:Line): LinePath => {
     ...line,
     length: () => length(a, b),
     compute: (t: number) => compute(a, b, t),
-    bbox: () => bbox(a, b),
+    bbox: () => bbox(line),
     toString: () => toString(a, b),
     toFlatArray: () => toFlatArray(a, b),
     toSvgString: () => toSvgString(a, b),

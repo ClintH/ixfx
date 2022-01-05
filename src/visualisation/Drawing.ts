@@ -1,13 +1,10 @@
 import * as Points from '../geometry/Point.js';
 import * as Paths from '../geometry/Path.js';
 import * as Lines from '../geometry/Line.js';
-
 import {array as guardArray} from '../Guards.js';
-
 import * as Circles from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
-
 
 // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
 export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) => {
@@ -47,6 +44,9 @@ export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
     },
     arc(arcsToDraw:Circles.ArcPositioned|Circles.ArcPositioned[], opts:DrawingOpts):void {
       arc(ctx, arcsToDraw, opts);
+    },
+    textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.Rect}):void {
+      textBlock(ctx, lines, opts);
     }
   };
 };
@@ -255,5 +255,41 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect|Rects.Rec
 
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
   else draw(toDraw);
+};
 
+export const textBlock = (ctx:CanvasRenderingContext2D, lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.Rect}) => {
+  applyOpts(ctx, opts);
+  const anchorPadding = opts.anchorPadding ?? 0;
+
+  const anchor = opts.anchor;
+  let {bounds} = opts;
+  if (bounds === undefined) bounds = {x:0, y:0, width:1000000, height:1000000};
+
+  // Measure each line
+  const blocks = lines.map(l => ctx.measureText(l));
+
+  // Get width and height
+  const widths = blocks.map(tm => tm.width);
+  const heights = blocks.map(tm => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent);
+
+  // Find extremes
+  const maxWidth = Math.max(...widths);
+  const totalHeight = heights.reduce((acc, val) => acc+val, 0);
+
+  let {x, y} = anchor;
+
+  if (anchor.x + maxWidth > bounds.width) x = bounds.width - (maxWidth + anchorPadding);
+  else x -= anchorPadding;
+  
+  if (x < bounds.x) x = bounds.x + anchorPadding;
+
+  if (anchor.y + totalHeight > bounds.height) y = bounds.height - (totalHeight + anchorPadding);
+  else y -= anchorPadding;
+
+  if (y < bounds.y) y = bounds.y + anchorPadding;
+
+  for (let i=0;i<lines.length;i++) {
+    ctx.fillText(lines[i], x, y);
+    y += heights[i];
+  }
 };

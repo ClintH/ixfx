@@ -26,6 +26,9 @@
             "off",
             "ignore-params"
         ],
+        "@typescript-eslint/ban-ts-comment": [
+            "off"
+        ],
         "indent": [
             "error",
             2
