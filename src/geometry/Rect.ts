@@ -97,4 +97,4 @@ export const getCenter = (rect: RectPositioned|Rect, origin?:Points.Point): Poin
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const getLines = (rect: RectPositioned|Rect, origin?:Points.Point): Lines.Line[] => Lines.fromManyPoints(...getCorners(rect, origin));
+export const getLines = (rect: RectPositioned|Rect, origin?:Points.Point): Lines.Line[] => Lines.joinPointsToLines(...getCorners(rect, origin));

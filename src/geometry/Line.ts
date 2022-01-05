@@ -148,14 +148,17 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   });
 };
 
-export const fromManyPoints = (...points:Points.Point[]): Line[] => {
-  if (!(points.length % 2 === 0)) throw new Error(`Points array should be even-numbered`);
+export const joinPointsToLines = (...points:Points.Point[]): Line[] => {
+  //if (!(points.length % 2 === 0)) throw new Error(`Points array should be even-numbered`);
   const lines = [];
-  for (let i=0;i<points.length;i+2) {
-    lines.push(fromPoints(points[i], points[i+1]));
+  let start = points[0];
+  for (let i=1;i<points.length;i++) {
+    lines.push(fromPoints(start, points[i]));
+    start = points[i];
   }
   return lines;
 };
+
 
 export const fromPointsToPath = (a:Points.Point, b:Points.Point): LinePath => toPath(fromPoints(a, b));
 

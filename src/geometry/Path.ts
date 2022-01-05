@@ -13,7 +13,7 @@ export type Path = {
    * @returns {Point} Point
    */
   compute(t: number): Point
-  bbox(): Rects.Rect
+  bbox(): Rects.RectPositioned
   toString(): string
   toSvgString(): string
   kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`

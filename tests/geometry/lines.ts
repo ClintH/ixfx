@@ -1,10 +1,11 @@
 import * as Lines from '../../src/geometry/Line';
 import * as Drawing from '../../src/visualisation/Drawing';
 import * as Compound from '../../src/geometry/CompoundPath';
+import * as Points from '../../src/geometry/Point';
 import {SVG, Svg} from '@svgdotjs/svg.js';
 import {pingPongPercent} from '../../src/Producers';
 import * as Palette from '../../src/colour/Palette';
-import {EventResponsive} from '../../src/dom/EventResponsive';
+import {dom} from '../../src/dom/EventResponsive';
 import {checkbox} from '../../src/dom/Forms';
 import {Rects} from '../../src';
 
@@ -12,11 +13,10 @@ import {Rects} from '../../src';
 const colours = new Palette.Palette();
 const bgColour = colours.get(`background-color`);
 const lineDrawOpts = {strokeStyle: colours.get(`muted-color`)};
+const bboxDrawOpts = { strokeStyle: colours.get(`muted-border-color`)};
 const dotDrawOpts = {radius: 3, fillStyle: colours.get(`primary`)};
 const pingPongInterval = 0.01;
 
-const events = new EventResponsive();
-  
 const getElements = (idPrefix: string, size:Rects.Rect): [HTMLCanvasElement, Svg|undefined] => {
   const canvasEl = document.getElementById(idPrefix + `Canvas`) as HTMLCanvasElement;
   if (canvasEl === undefined) throw Error(`canvasEl is undefined`);  
@@ -77,7 +77,7 @@ const testLine = () => {
 
 // --- Line functions
 const testDistances = () => {
-  const bounds = {x:0, y:0, width:400, height: 400};
+  const bounds = {x:0, y:0, width:400, height: 330};
   const [canvasEl] = getElements(`distances`, bounds);  // get lineCanvas and lineSvg elements
   const ctx = canvasEl.getContext(`2d`);         // get drawing context
   const drawHelper = Drawing.makeHelper(ctx);// make a helper
@@ -85,8 +85,11 @@ const testDistances = () => {
   const line = Lines.fromPointsToPath({x: 30, y: 300}, {x: 350, y:30});
  
   // Keep track of pointer
-  const eventTransform = (evt:PointerEvent) => ({x: evt.offsetX, y:evt.offsetY});
-  const pointerPos = events.add<PointerEvent>(canvasEl, `pointermove`, eventTransform).value;
+  const pointerPos = dom({
+    object: canvasEl, 
+    eventName:`pointermove`,
+    transform:(evt:PointerEvent) => ({x: evt.offsetX, y:evt.offsetY}),
+  }).value;
   const bboxEnable = checkbox(`bboxDistances`);
   
   const redraw = () => {
@@ -94,7 +97,7 @@ const testDistances = () => {
 
     if (bboxEnable.checked) {
       const bbox = Lines.bbox(line);
-      drawHelper.rect(bbox, lineDrawOpts);
+      drawHelper.rect(bbox, bboxDrawOpts);
     }
 
     // Draw the line
@@ -128,8 +131,53 @@ const testDistances = () => {
   return {redraw, update};
 };
 
+
+// --- Compound
+const testCompound = () => {
+  const [canvasEl, svg] = getElements(`compound`, {width:170, height: 160});
+  const ctx = canvasEl.getContext(`2d`);         // get drawing context
+  const drawHelper = Drawing.makeHelper(ctx);// make a helper
+  ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
+
+  const points = Points.fromNumbers([150, 0], [0, 100], [100, 150], [150, 50], [10, 30]);
+  const paths = Lines.joinPointsToLines(...points).map(l => Lines.toPath(l));
+  const compound = Compound.fromPaths(...paths);
+
+  svg.path(compound.toSvgString()).attr({fill: `transparent`, margin: `10px`, stroke: lineDrawOpts.strokeStyle});
+
+  const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
+
+  // Loop back and forth between 0 and 1
+  const progression = pingPongPercent(pingPongInterval);
+  let amt = 0;
+  const bboxEnable = checkbox(`bboxCompound`);
+
+  const redraw = () => {
+    clear(ctx, canvasEl);
+
+    if (bboxEnable.checked) {
+      const bbox = compound.bbox();
+      drawHelper.rect(bbox, bboxDrawOpts);
+    }
+
+    // Draw the line
+    drawHelper.paths(compound.segments, lineDrawOpts);
+
+    // Calc x,y along long at a given amt and draw a dot there
+    const dotPos = compound.compute(amt);
+    drawHelper.dot(dotPos, dotDrawOpts);
+
+    // Move SVG dot, need to adjust so it's positioned by its center
+    dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
+  };
+
+  const update = () => {
+    amt = progression.next().value;
+  };
+  return {redraw, update};
+};
 // Throw tests in an array to handle them together
-const tests = [testLine(), testDistances()];
+const tests = [testLine(), testDistances(), testCompound()];
 
 const loop = function () {
   tests.forEach(d => d.redraw());

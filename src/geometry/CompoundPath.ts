@@ -102,9 +102,11 @@ export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
  * 
  * @returns {Rects.Rect}
  */
-const boundingBox = (paths: Paths.Path[]): Rects.Rect => {
-  throw new Error(`Not yet implemented`);
-  return Rects.fromTopLeft({x: 0, y: 0}, 10, 10);
+export const bbox = (paths: Paths.Path[]): Rects.RectPositioned => {
+  const boxes = paths.map(p => p.bbox());
+  const corners = boxes.map(b => Rects.getCorners(b)).flat();
+  
+  return Points.bbox(...corners);
 };
 
 /**
@@ -150,7 +152,7 @@ export const fromPaths = (...paths: Paths.Path[]): CompoundPath => {
     segments: paths,
     length: () => dims.totalLength,
     compute: (t: number, useWidth = false) => compute(paths, t, useWidth, dims),
-    bbox: () => boundingBox(paths),
+    bbox: () => bbox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths),
     kind: `compound`

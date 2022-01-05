@@ -1,6 +1,15 @@
-const isDomElement = (d: HTMLElement): d is HTMLElement => ((d as HTMLElement).nodeType === 1 && typeof d.nodeName === `string`) || d instanceof HTMLElement;
+//const isDomElement = (d: HTMLElement): d is HTMLElement => ((d as HTMLElement).nodeType === 1 && typeof d.nodeName === `string`) || d instanceof HTMLElement;
+
+import {Debouncer, debounce} from "../Trigger";
 
 export type EventTransform<T extends Event> = (evt:T) => object;
+
+interface SubOptions<T extends Event> {
+  transform?:EventTransform<T>
+  autoClearMs?:number
+  eventName:string
+  object:HTMLElement
+}
 
 class DomSubscription<T extends Event> implements EventListenerObject {
   readonly eventName:string;
@@ -9,91 +18,51 @@ class DomSubscription<T extends Event> implements EventListenerObject {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   readonly value:any;
   debugEventFlow:boolean = false;
+  #debouncer:Debouncer|undefined = undefined;
 
-  constructor(el:HTMLElement, eventName:string, transformFn?:EventTransform<T>) {
-    this.#el = el;
-    this.eventName = eventName;
-    this.transform = transformFn;
+  constructor(opts:SubOptions<T>) {
+    this.#el = opts.object;
+    this.eventName = opts.eventName;
+    this.transform = opts.transform;
     this.#el.addEventListener(this.eventName, this);
     this.value = {};
+  
+    if (opts.autoClearMs) {
+      this.#debouncer = debounce(() => {
+        //console.log(`debounce has triggered clear!`);
+        this.clear();
+      }, opts.autoClearMs);
+    }
   }
 
   handleEvent(evt:T) {
-    if (this.debugEventFlow) console.log(evt);
+    if (this.debugEventFlow) console.log(`EventResponsive.handleEvent: ${JSON.stringify(evt)}`);
     if (this.transform) {
       Object.assign(this.value, this.transform(evt)); 
     } else {
       Object.assign(this.value, evt);
     }
+
+    if (this.#debouncer) this.#debouncer.reset();
   }
 
-  /// TODO: Ability to automatically clear triggered by some other event(s)
-
   clear() {
-    const keys = Object.keys(this);
-    console.log(`Keys to delete: ${keys}`);
+    const keys = Object.keys(this.value);
+    //console.log(`Keys to delete: ${keys}`);
     keys.forEach(key => {
       delete this.value[key];
     });
-
-    // const keys = Object.keys(this);
-    // console.log(`Keys to delete: ${keys}`);
-    // keys.forEach(key => {
-    //   if (key.startsWith(`_`)) return;
-    //   // @ts-ignore
-    //   delete this[key];
-    // });
   }
 
   dispose() {
+    console.log(`EventResponsive dispose`);
+
     if (this.#el === undefined) return;
     this.#el.removeEventListener(this.eventName, this);
-    this.#el = undefined;
     this.clear();
+    this.#el = undefined;
+    if (this.#debouncer) this.#debouncer.dispose();
   }
 }
 
-export class EventResponsive {
-  subs:DomSubscription<any>[] = [];
-
-  pluckedKeys(object:HTMLElement, eventName:string, ...keys:string[]) {
-    const transform = (evt:Event) => {
-      const ret = {};
-      keys.forEach(key => {
-        // @ts-ignore
-        ret[key] = evt[key];
-      });
-      return ret;
-    };
-
-    this.add(object, eventName, transform);
-  }
-
-  add<T extends Event>(object:HTMLElement, eventName:string, transformFn:EventTransform<T>) {
-    if (object === undefined) throw new Error(`object parameter undefined`);
-    if (isDomElement(object)) {
-      const sub = new DomSubscription<T>(object, eventName, transformFn);
-      this.subs.push(sub);
-      return sub;
-    } else throw new Error(`Only DOM elements supported`);
-  }
-
-  // add(object:HTMLElement, ...eventNames:string[]):DomSubscription[] {
-  //   if (object === undefined) throw new Error(`object parameter undefined`);
-  //   if (isDomElement(object)) {
-  //     const newSubs:DomSubscription[] = [];
-  //     eventNames.forEach(ev => {
-  //       const sub = new DomSubscription(object, ev);
-  //       this.subs.push(sub);
-  //       newSubs.push(sub);
-  //     });
-  //     return newSubs;
-  //   } else throw new Error(`Only DOM elements supported`);
-  // }
-
-  dispose() {
-    this.subs.forEach(s => s.dispose());
-    this.subs = [];
-  }
-}
-
+export const dom = <T extends Event>(opts:SubOptions<T>) => new DomSubscription<T>(opts);

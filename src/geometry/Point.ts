@@ -41,7 +41,7 @@ export const guard = (p: Point, name = `Point`) => {
 
 //export const isPoint = (p: Point|any): p is Point => (p as Point).x !== undefined;
 
-export const bbox = (...points:Point[]):Rects.Rect => {
+export const bbox = (...points:Point[]):Rects.RectPositioned => {
   const leftMost = compareTo((a, b) => {
     if (a.x < b.x) return a;
     else return b;
@@ -83,9 +83,10 @@ export const bbox = (...points:Point[]):Rects.Rect => {
 //   );
 // };
 
-export const isPoint = (p: Point|any): p is Point => {
-  if (p.x === undefined) return false;
-  if (p.y === undefined) return false;
+export const isPoint = (p: Point|Rects.RectPositioned|Rects.Rect): p is Point => {
+
+  if ((p as Point).x === undefined) return false;
+  if ((p as Point).y === undefined) return false;
   return true;
 };
 
@@ -161,6 +162,22 @@ export const from = (xOrArray?: number | number[], y?: number): Point => {
   }
 };
 
+export const fromNumbers = (...coords:number[][]|number[]): Point[] => {
+  const pts:Point[] = [];
+
+  if (Array.isArray(coords[0])) {
+    // [[x,y],[x,y]...]
+    (coords as number[][]).forEach(coord => {
+      if (!(coord.length % 2 === 0)) throw new Error(`coords array should be even-numbered`);
+      pts.push(Object.freeze({x: coord[0], y: coord[1]}));    
+    });
+  } else {
+    if (coords.length !== 2) throw new Error(`Expected two elements: [x,y]`);
+    // [x,y]
+    pts.push(Object.freeze({x: coords[0] as number, y: coords[1] as number}));
+  }
+  return pts;
+};
 
 /**
  * Returns `a` minus `b`
