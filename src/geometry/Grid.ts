@@ -1,7 +1,7 @@
 import * as Rect from "./Rect";
 import * as Point from './Point';
 import {clampZeroBounds, randomElement} from "../util";
-import {MutableValueSet} from "../collections/Sets";
+import {MutableValueSet} from "../collections/Set";
 import {defined as GuardIsDefined} from '../Guards';
 
 export enum CardinalDirection {

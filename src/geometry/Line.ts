@@ -166,7 +166,7 @@ export type LinePath = Line & Path & {
   toFlatArray():number[]
 }
 
-export const bbox = (line:Line):Rects.Rect =>  Points.bbox(line.a, line.b);
+export const bbox = (line:Line):Rects.RectPositioned =>  Points.bbox(line.a, line.b);
 
 export const toPath = (line:Line): LinePath => {
   const {a, b} = line;

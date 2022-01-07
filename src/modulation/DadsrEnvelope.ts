@@ -3,8 +3,6 @@ import * as Bezier from '../geometry/Bezier.js';
 import * as Line from '../geometry/Line.js';
 import {Paths} from '../index.js';
 
-
-
 /**
  * Create a 'dadsr' (delay, attack, decay, sustain, release) envelope
  *
@@ -15,7 +13,7 @@ export const dadsr = (opts: Envelope.DadsrEnvelopeOpts = {}): Readonly<Envelope.
 
   const {sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0} = opts;
 
-  if (sustainLevel > 1 || sustainLevel < 0) throw Error('sustainLevel must be between 0-1');
+  if (sustainLevel > 1 || sustainLevel < 0) throw Error(`sustainLevel must be between 0-1`);
 
   // Create envelope
   const env = Envelope.stages(opts);
@@ -23,9 +21,9 @@ export const dadsr = (opts: Envelope.DadsrEnvelopeOpts = {}): Readonly<Envelope.
 
   // Create and assign beziers for each bendable segment
   const paths: Paths.Path[] = new Array<Paths.Path>(5);
-  paths[Envelope.Stage.Attack] = Bezier.quadraticSimple({x: 0, y: 0}, {x: max, y: max}, attackBend);;
+  paths[Envelope.Stage.Attack] = Bezier.quadraticSimple({x: 0, y: 0}, {x: max, y: max}, attackBend);
   paths[Envelope.Stage.Decay] = Bezier.quadraticSimple({x: 0, y: max}, {x: max, y: sustainLevel}, decayBend);
-  paths[Envelope.Stage.Sustain] = Line.fromPoints({x: 0, y: sustainLevel}, {x: max, y: sustainLevel});
+  paths[Envelope.Stage.Sustain] = Line.fromPointsToPath({x: 0, y: sustainLevel}, {x: max, y: sustainLevel});
   paths[Envelope.Stage.Release] = Bezier.quadraticSimple({x: 0, y: sustainLevel}, {x: max, y: 0}, releaseBend);
 
   return Object.freeze({
@@ -42,9 +40,7 @@ export const dadsr = (opts: Envelope.DadsrEnvelopeOpts = {}): Readonly<Envelope.
     hold: () => {
       env.hold();
     },
-    getOpts: () => {
-      return opts
-    },
+    getOpts: () => (opts),
     compute: (): [Envelope.Stage, number] => {
       const [stage, amt] = env.compute();
       const p = paths[stage];
@@ -52,28 +48,28 @@ export const dadsr = (opts: Envelope.DadsrEnvelopeOpts = {}): Readonly<Envelope.
       return [stage, p.compute(amt).y];
     },
     getStage: (stage: Envelope.Stage): {duration: number, amp: number} => {
-      let tmp = (stage === Envelope.Stage.Sustain) ? {duration: -1} : env.getStage(stage);
-      let s = {...tmp, amp: -1};
+      const tmp = (stage === Envelope.Stage.Sustain) ? {duration: -1} : env.getStage(stage);
+      const s = {...tmp, amp: -1};
 
       switch (stage) {
-        case Envelope.Stage.Attack:
-          s.amp = 1;
-          break;
-        case Envelope.Stage.Decay:
-          s.amp = 1;
-          break;
-        case Envelope.Stage.Delay:
-          s.amp = -1;
-          break;
-        case Envelope.Stage.Release:
-          s.amp = 0;
-          break;
-        case Envelope.Stage.Stopped:
-          s.amp = 0;
-          break;
-        case Envelope.Stage.Sustain:
-          s.amp = sustainLevel;
-          break;
+      case Envelope.Stage.Attack:
+        s.amp = 1;
+        break;
+      case Envelope.Stage.Decay:
+        s.amp = 1;
+        break;
+      case Envelope.Stage.Delay:
+        s.amp = -1;
+        break;
+      case Envelope.Stage.Release:
+        s.amp = 0;
+        break;
+      case Envelope.Stage.Stopped:
+        s.amp = 0;
+        break;
+      case Envelope.Stage.Sustain:
+        s.amp = sustainLevel;
+        break;
       }
       return s;
     }

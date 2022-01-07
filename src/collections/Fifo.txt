@@ -1,0 +1,62 @@
+
+/**
+ * Fifo (first-in-first-out) grows to capacity with new items being added to the end of the array
+ * Once full, newer items are discarded. Immutable.
+ *
+ * @class Fifo
+ * @extends {Array}
+ * @template V
+ */
+export class Fifo<V> extends Array {
+  #capacity: number;
+  /**
+   * Create fifo.
+   * @param {number} capacity Use <=0 for unlimited size
+   * @memberof Fifo
+   */
+  constructor(capacity = -1) {
+    super();
+    this.#capacity = capacity;
+  }
+
+  static create<V>(capacity: number, data: Array<V>): Fifo<V> {
+    const q = new Fifo<V>(capacity);
+    q.push(...data);
+    return q;
+  }
+
+  /**
+   * Returns a new Fifo with item added
+   *
+   * @param {V} thing
+   * @returns {Fifo<V>}
+   * @memberof Fifo
+   */
+  add(thing: V): Fifo<V> {
+    const d = [...this, thing];
+    if (this.#capacity > 0 && d.length > this.#capacity) {
+      return Fifo.create(this.#capacity, d.slice(0, this.#capacity));
+    } return Fifo.create(this.#capacity, d);
+  }
+  /**
+   * Returns oldest item (first)
+   *
+   * @returns {V}
+   * @memberof Fifo
+   */
+  peek(): V {
+    return this[0];
+  }
+
+  /**
+   * Returns a list with oldest (first) item removed
+   *
+   * @returns {Fifo<V>}
+   * @memberof Fifo
+   */
+  remove(): Fifo<V> {
+    if (this.length === 0) return this;
+    const d = this.slice(1);
+    return Fifo.create(this.#capacity, d);
+  }
+}

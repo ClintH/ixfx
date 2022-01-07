@@ -2,9 +2,6 @@ type KeyType = String | Number | Symbol;
 
 export class WeakMapMulti<V> {
   #map = new WeakMap<KeyType, V[]>();
-  constructor() {
-
-  }
 
   #_add(key: KeyType, value: V) {
     if (!this.#map.has(key)) {

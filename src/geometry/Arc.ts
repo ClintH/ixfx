@@ -160,7 +160,7 @@ export const length = (circleOrArc:Circle|Arc):number => {
   } else throw new Error(`Invalid parameter`);
 };
 
-export const bbox = (circleOrArc:CirclePositioned|ArcPositioned):Rects.Rect => {
+export const bbox = (circleOrArc:CirclePositioned|ArcPositioned):Rects.RectPositioned => {
   if (isArc(circleOrArc)) {
     const middle = compute(circleOrArc, 0.5);
     const asLine = toLine(circleOrArc);

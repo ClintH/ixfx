@@ -1,6 +1,25 @@
-import {clamp, clampZeroBounds} from '../src/util.js';
+import {average, clamp, clampZeroBounds} from '../src/util.js';
 
-test('inclusivity', () => {
+
+test(`average`, () => {
+  const a = [1];
+  expect(average(...a)).toEqual(1);
+
+  const b =[1, 2, 3, 4, 5];
+  expect(average(...b)).toEqual(3);
+
+  const c = [-5, 5];
+  expect(average(...c)).toEqual(0);
+
+  const d = [1, 0, null, undefined, NaN];
+  // @ts-ignore
+  expect(average(...d)).toEqual(0.5);
+
+  const e = [1, 1.4, 0.9, 0.1];
+  expect(average(...e)).toEqual(0.85);
+});
+
+test(`inclusivity`, () => {
   expect(clamp(0, 0, 1)).toBe(0);
   expect(clamp(-1, 0, 1)).toBe(0);
 
@@ -8,7 +27,7 @@ test('inclusivity', () => {
   expect(clamp(1.1, 0, 1)).toBe(1);
 });
 
-test('range', () => {
+test(`range`, () => {
   expect(clamp(0.5, 0, 1)).toBe(0.5);
   expect(clamp(0.000000005, 0, 1)).toBe(0.000000005);
 
@@ -22,7 +41,7 @@ test('range', () => {
   expect(() => clamp(10, 0, NaN)).toThrow();
 });
 
-test('zero bounds', () => {
+test(`zero bounds`, () => {
   expect(clampZeroBounds(0, 5)).toBe(0);
   expect(clampZeroBounds(4, 5)).toBe(4);
   expect(clampZeroBounds(5, 5)).toBe(4);
@@ -33,5 +52,4 @@ test('zero bounds', () => {
   expect(() => clampZeroBounds(0.5, 5)).toThrow();
   expect(() => clampZeroBounds(NaN, 5)).toThrow();
   expect(() => clampZeroBounds(0, NaN)).toThrow();
-
 });

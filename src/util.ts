@@ -47,6 +47,35 @@ export const clampZeroBounds = (v: number, length: number) => {
 
 export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Math.random() * array.length)];
 
+
+/**
+ * Calculates the average of all numbers in an array.
+ * Array items which aren't a valid number are ignored and do not factor into averaging.
+ *
+ * Usage
+ * ```
+ * average(1, 1.4, 0.9, 0.1);
+ * 
+ * let data = [100,200];
+ * average(...data);
+ * ```
+ * @param {...number[]} data Data to average.
+ * @returns {number}
+ */
+export const average = (...data:number[]):number => {
+  if (data === undefined) throw new Error(`data parameter is undefined`);
+  
+  //const total = data.reduce((acc, v) => acc+v, 0);
+  let counted = 0;
+  let total =0;
+  for (let i=0;i<data.length;i++) {
+    if (typeof data[i] !== `number` || Number.isNaN(data[i])) continue;
+    total += data[i];
+    counted++;
+  }
+  return total / counted; 
+};
+
 export const getMinMaxAvg = (data: number[]): {min: number; max: number; avg: number;} => {
   let min = Number.MAX_SAFE_INTEGER;
   let total = 0;

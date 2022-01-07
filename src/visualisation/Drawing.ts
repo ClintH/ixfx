@@ -24,7 +24,7 @@ export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
     line(lineToDraw: Lines.Line|Lines.Line[], opts?: DrawingOpts): void {
       line(ctx, lineToDraw, opts);
     },
-    rect(rectsToDraw:Rects.Rect|Rects.Rect[], opts?:DrawingOpts & { filled?:boolean}): void {
+    rect(rectsToDraw:Rects.RectPositioned|Rects.RectPositioned[], opts?:DrawingOpts & { filled?:boolean}): void {
       rect(ctx, rectsToDraw, opts);
     },
     quadraticBezier(bezierToDraw: Beziers.QuadraticBezier, opts?:DrawingOpts): void {
@@ -45,7 +45,7 @@ export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
     arc(arcsToDraw:Circles.ArcPositioned|Circles.ArcPositioned[], opts:DrawingOpts):void {
       arc(ctx, arcsToDraw, opts);
     },
-    textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.Rect}):void {
+    textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.RectPositioned}):void {
       textBlock(ctx, lines, opts);
     }
   };
@@ -241,10 +241,10 @@ export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|Lines.Lin
   else draw(toDraw);
 };
 
-export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect|Rects.Rect[], opts: DrawingOpts & {filled?:boolean} = {}) => {
+export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned|Rects.RectPositioned[], opts: DrawingOpts & {filled?:boolean} = {}) => {
   applyOpts(ctx, opts);
 
-  const draw = (d:Rects.Rect) => {
+  const draw = (d:Rects.RectPositioned) => {
     if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
     ctx.strokeRect(d.x, d.y, d.width, d.height);
 
@@ -257,7 +257,7 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.Rect|Rects.Rec
   else draw(toDraw);
 };
 
-export const textBlock = (ctx:CanvasRenderingContext2D, lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.Rect}) => {
+export const textBlock = (ctx:CanvasRenderingContext2D, lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.RectPositioned}) => {
   applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;
 
