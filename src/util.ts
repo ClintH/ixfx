@@ -16,6 +16,7 @@
  * @returns Clamped value
  */
 export const clamp = (v: number, min = 0, max = 1) => {
+  // ✔ UNIT TESTED
   if (Number.isNaN(v)) throw new Error(`v parameter is NaN`);
   if (Number.isNaN(min)) throw new Error(`min parameter is NaN`);
   if (Number.isNaN(max)) throw new Error(`max parameter is NaN`);
@@ -37,6 +38,7 @@ export const lerp =(amt:number, a:number, b:number) => (1-amt) * a + amt * b;
  * @returns Clamped value
  */
 export const clampZeroBounds = (v: number, length: number) => {
+  // ✔ UNIT TESTED
   if (!Number.isInteger(v)) throw new Error(`v parameter must be an integer`);
   if (!Number.isInteger(length)) throw new Error(`length parameter must be an integer`);
 
@@ -63,6 +65,7 @@ export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Mat
  * @returns {number}
  */
 export const average = (...data:number[]):number => {
+  // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
   
   //const total = data.reduce((acc, v) => acc+v, 0);

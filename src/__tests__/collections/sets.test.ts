@@ -1,4 +1,4 @@
-import * as Sets from '../../src/collections/Set';
+import * as Sets from '../../collections/Set';
 
 test(`mutableValueSet`, () => {
   const barry = {name: `Barry`, city: `London`};

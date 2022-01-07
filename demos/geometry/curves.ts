@@ -41,27 +41,31 @@ const clear = (ctx: CanvasRenderingContext2D, bounds:Rects.Rect) => {
   ctx.restore(); // Restore padding
 };
 
-// --- Line
-const testLine = () => {
+// --- Cubic
+const testCubic = () => {
   const bounds = {width:350, height:120};
-  const [ctx, svg] = setup(`line`, bounds);  // get lineCanvas and lineSvg elements
+  const [ctx, svg] = setup(`cubic`, bounds);  // get lineCanvas and lineSvg elements
   const drawHelper = Drawing.makeHelper(ctx);// make a helper
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
-  // Define line by start & end points
-  const line = Lines.fromPoints({x: 0, y: 0}, {x: 350, y: 120});
-  const path = Lines.toPath(line);
+  // Define bezier's start (A), end (B) and handle (C) points:
+  const bezier = Beziers.cubic(
+    {x: 0, y: 0}, 
+    {x: 350, y: 120}, 
+    {x: 170, y: 20}, 
+    {x: 50, y: 50}
+  );
 
   // Use Svg.js to make SVG for the line
-  svg.line(path.toFlatArray()).attr({stroke: lineDrawOpts.strokeStyle});
-  const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
+  // svg.line(path.toFlatArray()).attr({stroke: lineDrawOpts.strokeStyle});
+  // const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
-  // Loop back and forth between 0 and 1
-  const progression = pingPongPercent(pingPongInterval);
+  
+  const progression = pingPongPercent(pingPongInterval); // Loop back and forth between 0 and 1
   let amt = 0;
 
   const redraw = () => {
-    clear(ctx, bounds);
+    clear(ctx, bounds); // Clear canvas
 
     // Draw the line
     drawHelper.line(line, lineDrawOpts);

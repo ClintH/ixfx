@@ -27,8 +27,8 @@ export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
     rect(rectsToDraw:Rects.RectPositioned|Rects.RectPositioned[], opts?:DrawingOpts & { filled?:boolean}): void {
       rect(ctx, rectsToDraw, opts);
     },
-    quadraticBezier(bezierToDraw: Beziers.QuadraticBezier, opts?:DrawingOpts): void {
-      quadraticBezier(ctx, bezierToDraw, opts);
+    bezier(bezierToDraw: Beziers.QuadraticBezier|Beziers.CubicBezier, opts?:DrawingOpts): void {
+      bezier(ctx, bezierToDraw, opts);
     },
     connectedPoints(pointsToDraw: Points.Point[], opts?: DrawingOpts & {loop?: boolean}): void {
       connectedPoints(ctx, pointsToDraw, opts);
@@ -188,15 +188,33 @@ const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|Points.Point[], op
   if (outlined) ctx.stroke();
 };
 
-export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts?: DrawingOpts) => {
-  guardCtx(ctx);
-  if (opts === undefined) opts = {};
-  const debug = opts.debug ?? false;
-  //const h = line.quadratic;
+export const bezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier|Beziers.CubicBezier, opts?: DrawingOpts) => {
+  if (Beziers.isQuadraticBezier(bezierToDraw)) {
+    quadraticBezier(ctx, bezierToDraw)
+  }
+}
 
-  const {a, b, quadratic} = bezierToDraw;
-  const ss = ctx.strokeStyle;
+const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicBezier, opts: DrawingOpts) => {
+  applyOpts(ctx, opts);
+
+  const {a, b, cubic1, cubic2} = bezierToDraw;
+  const debug = opts.debug ?? false;
+
   if (debug) {
+    const ss = ctx.strokeStyle;
+  }
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.bezierCurveTo(cubic1.x, cubic1.y, cubic2.x, cubic2.y, b.x, b.y);
+
+};
+
+const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: DrawingOpts) => {
+  applyOpts(ctx, opts);
+  const {a, b, quadratic} = bezierToDraw;
+  const debug = opts.debug ?? false;
+  if (debug) {
+    const ss = ctx.strokeStyle;
     connectedPoints(ctx, [a, quadratic, b], {strokeStyle: `silver`});
     ctx.strokeStyle = ss;
   }
@@ -204,10 +222,10 @@ export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Bez
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
   ctx.quadraticCurveTo(quadratic.x, quadratic.y, b.x, b.y);
-  if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
 
   if (debug) {
+    const fs = ctx.fillStyle;
     ctx.fillStyle = `black`;
     ctx.fillText(`a`, a.x + 5, a.y);
     ctx.fillText(`b`, b.x + 5, b.y);
@@ -215,6 +233,7 @@ export const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Bez
     dot(ctx, quadratic, {radius: 5});
     dot(ctx, a, {radius: 5, fillStyle: `black`});
     dot(ctx, b, {radius: 5, fillStyle: `black`});
+    ctx.fillStyle = fs;
   }
 };
 

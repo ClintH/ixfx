@@ -1,4 +1,4 @@
-import * as Lists from '../../src/collections/Lists';
+import * as Lists from '../../collections/Lists';
 
 /*
 test('perfCircular', () => {

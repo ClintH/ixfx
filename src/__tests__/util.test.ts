@@ -1,4 +1,4 @@
-import {average, clamp, clampZeroBounds} from '../src/util.js';
+import {average, clamp, clampZeroBounds} from '../util.js';
 
 
 test(`average`, () => {
@@ -19,7 +19,7 @@ test(`average`, () => {
   expect(average(...e)).toEqual(0.85);
 });
 
-test(`inclusivity`, () => {
+test(`clamp-inclusivity`, () => {
   expect(clamp(0, 0, 1)).toBe(0);
   expect(clamp(-1, 0, 1)).toBe(0);
 
@@ -27,7 +27,7 @@ test(`inclusivity`, () => {
   expect(clamp(1.1, 0, 1)).toBe(1);
 });
 
-test(`range`, () => {
+test(`clamp-range`, () => {
   expect(clamp(0.5, 0, 1)).toBe(0.5);
   expect(clamp(0.000000005, 0, 1)).toBe(0.000000005);
 
@@ -41,7 +41,7 @@ test(`range`, () => {
   expect(() => clamp(10, 0, NaN)).toThrow();
 });
 
-test(`zero bounds`, () => {
+test(`clamp-zero-bounds`, () => {
   expect(clampZeroBounds(0, 5)).toBe(0);
   expect(clampZeroBounds(4, 5)).toBe(4);
   expect(clampZeroBounds(5, 5)).toBe(4);

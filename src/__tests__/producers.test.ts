@@ -1,4 +1,4 @@
-import {pingPong, pingPongPercent} from '../src/Producers.js';
+import {pingPong, pingPongPercent} from '../Producers.js';
 
 function testNumeric(given: number[], expectedRange: number[]) {
   expect(given.length).toEqual(expectedRange.length);
