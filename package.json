@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "coverage": "jest --collectCoverage",
+    "test:coverage": "jest --collectCoverage",
     "test": "jest",
     "watch": "tsc --watch",
     "clean": "rimraf dist",
@@ -26,34 +26,35 @@
     "esdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle --watch",
     "bundle": "tsup",
     "develop": "tsup --watch",
-    "develop-tests": "snowpack dev --config ./snowpack-tests.config.js",
-    "develop-demos": "snowpack dev --config ./snowpack-demos.config.js",
-    "build-demos": "snowpack build --config ./snowpack-demos.config.js"
+    "dev:demos": "snowpack dev --config ./snowpack-demos.config.js",
+    "dev:demosAlt": "snowpack dev --config ./snowpack-demosAlt.config.js",
+    "build:demos": "snowpack build --config ./snowpack-demos.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@svgdotjs/svg.js": "^3.1.1",
-    "@types/jest": "^27.0.3",
-    "@typescript-eslint/eslint-plugin": "^5.2.0",
-    "@typescript-eslint/parser": "^5.2.0",
-    "esbuild": "^0.13.8",
-    "eslint": "^8.1.0",
-    "jest": "^27.4.5",
+    "@types/jest": "^27.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.9.0",
+    "@typescript-eslint/parser": "^5.9.0",
+    "esbuild": "^0.14.11",
+    "eslint": "^8.6.0",
+    "jest": "^27.4.7",
     "live-server": "^1.2.1",
     "rimraf": "^3.0.2",
     "snowpack": "^3.8.8",
     "source-map-support": "^0.5.21",
     "ts-jest": "^27.1.2",
-    "tsup": "^5.11.9",
-    "typescript": "^4.5.4"
+    "tsup": "^5.11.11",
+    "typescript": "^4.6.0-dev.20220109"
   },
   "repository": {
     "url": "git@github.com:clinth/ix.git"
   },
   "dependencies": {
     "@types/bezier-js": "^4.1.0",
-    "bezier-js": "^4.1.1"
+    "bezier-js": "^4.1.1",
+    "lit": "^2.1.1"
   }
 }

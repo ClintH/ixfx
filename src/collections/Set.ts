@@ -1,8 +1,8 @@
 // ✔ UNIT TESTED
-
+import { KeyString } from "../util";
 import {SimpleEventEmitter} from "../Events";
 
-type KeyString<V> = (itemToMakeKeyFor: V) => string;
+
 type MutableValueSetEventMap<V> = {
   add: {value: V, updated: boolean}
   clear: boolean
@@ -59,7 +59,15 @@ export class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventM
 
   constructor(keyString: KeyString<V> | undefined = undefined) {
     super();
-    if (keyString === undefined) keyString = (a) => JSON.stringify(a);
+    if (keyString === undefined) {
+      keyString = (a) => {
+        if (typeof a === `string`) { 
+          return a;
+        } else { 
+          return JSON.stringify(a);
+        }
+      };
+    }
     this.keyString = keyString;
   }
 

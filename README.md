@@ -28,16 +28,22 @@ The `tests` folder contains Jest unit tests and manual tests. Manual tests are H
 
 To start a dev server:
 ```
-npm run develop-tests
+npm run dev:demos
+npm run build:demos
 ```
 
 Jest unit tests:
 
 ```
-npm run tests
+npm run test
 
 // Or to run a single test:
 npx jest .\tests\geometry\grid.test.ts
+```
+
+Test coverage report:
+```
+npm run test:coverage
 ```
 
 # Credits

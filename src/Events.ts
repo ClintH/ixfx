@@ -48,7 +48,7 @@ export class SimpleEventEmitter<Events> {
   #listeners = new MapMulti<Listener<Events>>();
 
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
-    const listeners = this.#listeners.get(type);
+    const listeners = this.#listeners.get(type as string);
     if (listeners === undefined) return;
     for (const l of listeners) {
       try {
@@ -68,7 +68,7 @@ export class SimpleEventEmitter<Events> {
    * @memberof SimpleEventEmitter
    */
   addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void { // (this: any, ev: Events[K]) => any): void {
-    this.#listeners.add(type, listener);
+    this.#listeners.addKeyedValues(type as string, listener);
   }
   //addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
 
@@ -79,7 +79,7 @@ export class SimpleEventEmitter<Events> {
    * @memberof SimpleEventEmitter
    */
   removeEventListener<K extends keyof Events>(type: K, listener: Listener<Events>): void {
-    this.#listeners.delete(type, listener);
+    this.#listeners.deleteKeyedValue(type as string, listener);
   }
 
   /**

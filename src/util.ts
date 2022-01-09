@@ -97,3 +97,4 @@ export const getMinMaxAvg = (data: number[]): {min: number; max: number; avg: nu
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
 
+export type KeyString<V> = (itemToMakeKeyFor: V) => string;

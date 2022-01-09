@@ -1,7 +1,7 @@
 import * as Grids from '../../src/geometry/Grid.js';
 import * as Series from '../../src/Series.js';
 import * as Producers from '../../src/Producers.js';
-import * as Sets from '../../src/collections/Sets.js';
+import * as Sets from '../../src/collections/Set.js';
 
 
 // ---------------------------------

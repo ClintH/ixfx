@@ -1,11 +1,11 @@
-// Snowpack Configuration File
-// See all supported options: https://www.snowpack.dev/reference/configuration
+// DEMOS
+// https://www.snowpack.dev/reference/configuration
 
 /** @type {import("snowpack").SnowpackUserConfig } */
 export default {
   mode: "development",
   mount: {
-    tests: {url: '/'},
+    public: {url: '/'},
     src: {url: '/src'}
   },
   plugins: [
@@ -18,6 +18,6 @@ export default {
     /* ... */
   },
   buildOptions: {
-    /* ... */
+    out: "build-demos"
   },
 };

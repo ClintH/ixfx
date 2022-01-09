@@ -32,3 +32,6 @@ https://github.com/MikaelPorttila/rss/pull/16/commits/d9374ce335bfb7eeb7a3548472
 
 
 https://iamshishir.com/multiple-dividing-a-path-shape-into-multiple-parts-in-paperjs/
+
+
+https://github.com/jonaskello/eslint-plugin-functional

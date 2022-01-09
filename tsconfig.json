@@ -13,6 +13,8 @@
     "declaration": true,
     "sourceMap": true,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "nodenext",
     "removeComments": false,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },

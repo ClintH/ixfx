@@ -1,6 +1,5 @@
 // ✔ UNIT TESTED
 
-
 export enum OverflowPolicy {
   /**
    * Removes items front of the queue (ie older items are discarded)
