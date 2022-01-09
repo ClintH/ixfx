@@ -1,50 +1,28 @@
 # ixfx
 
+This is a framework for sketching and prototyping interactivity. It is designed for the beginning programmer, and is optimised for readability and safety over performance.
+
 # Using
 
+## Why ixfx?
 
-# Development
+There are many 'front end' frameworks, but these are typically meant for regular GUIs or document-based apps. They usually have idiosyncratic ways of structuring code, custom syntax, and elaborate build processes. Great though if you're doing that kind of thing often.
 
-## Build scripts
+There are also several 'creative coding' sandboxes. Many of these are better suited than front end frameworks for experimentation in interactivity, but again tend to be their own little ecosystem removed from the web platform. These tend to favour Canvas-based visuals, and seem largely ignorant of the wider web platform or modern coding practices.
 
-Clean dist folder, build Typescript sources and bundle into dist/bundle.mjs
-```
-npm run build
-``` 
+In both cases one spends a lot of time learning the particular framework and its way of doing things rather than the web platform itself. Learning Javascript as a language also gets lost in this. Having to ask "how do I do _x_ in React?" or "how do I do _x_ in P5.js?" is a sign the framework has eaten you.
 
-Continually rebuild and bundle Typescript sources into dist/bundle.mjs:
-```
-npm run develop
-```
+Some principles are:
+* No build process required
+* No sandbox lock-in: follow web platform conventions so that patterns learned can be applied elsewhere
+* Type definitions for improved editor experience (in VS Code at least)
+* Plain, immutable data over rich objects
+* Favour functional approaches over OOP
+* ...and especially w.r.t. to the last two points, the usability of the APIs takes precedence
 
-Build Typescript sources, running a single file with source map support:
-```
-npm run run -- build/StateMachine.js
-```
+# Building
 
-## Testing
-
-The `tests` folder contains Jest unit tests and manual tests. Manual tests are HTML+JS for quick testing of functionality. Snowpack is used to build the tests and run a dev server. 
-
-To start a dev server:
-```
-npm run dev:demos
-npm run build:demos
-```
-
-Jest unit tests:
-
-```
-npm run test
-
-// Or to run a single test:
-npx jest .\tests\geometry\grid.test.ts
-```
-
-Test coverage report:
-```
-npm run test:coverage
-```
+If you want to contribute to ixfx or build it yourself, please see [BUILDING.md](BUILDING.md).
 
 # Credits
 
