@@ -10,11 +10,38 @@ export type HistogramBar = {
   asPercentage?:number
 }
 
-/*
-Colour theming:
---histogram-bar-color
---histogram-label-color
-*/
+/**
+ * Usage in HTML:
+ * ```html
+ * <style>
+ * histogram-vis {
+ *  display: block;
+ *  height: 7em;
+ *  --histogram-bar-color: pink;
+ * }
+ * </style>
+ * <histogram-vis>
+ * [
+ *  ["apples", 5],
+ *  ["oranges", 3],
+ *  ["pineapple", 0],
+ *  ["limes", 9]
+ * ]
+ * </histogram-vis>
+ * ```
+ * 
+ * CSS colour theming:
+ * --histogram-bar-color
+ * --histogram-label-color
+ * 
+ * HTML tag attributes
+ * showXAxis (boolean)
+ * showDataLabels (boolean)
+ *
+ * @export
+ * @class HistogramVis
+ * @extends {LitElement}
+ **/
 @customElement(`histogram-vis`)
 export class HistogramVis extends LitElement {
   static styles = css`
@@ -64,6 +91,26 @@ export class HistogramVis extends LitElement {
   @property()
     data?:HistogramBar[] = [];
 
+  @property()
+    showDataLabels?:boolean = true;
+
+  @property()
+    height?:string = '100%';
+
+  @property()
+    showXAxis?:boolean = true;
+
+  @property({ converter: JsonData, type: Object })
+    json?:[key:string, count:number][] = undefined;
+
+
+  connectedCallback() {
+    if (!this.hasAttribute(`json`)) {
+      this.setAttribute(`json`, this.innerText);
+    }
+    super.connectedCallback();
+  }
+
   barTemplate(bar:HistogramBar, index:number, bars:number) {
     const {asPercentage,key, size} = bar;
 
@@ -72,39 +119,87 @@ export class HistogramVis extends LitElement {
     const rowEnd = 2;
     const colStart = index + 1;
     const colEnd = colStart +1;
+
+    const dataLabel = html`<div class="data">${size}</div>`;
+    const xAxis = html`${key}`
     return html`
     <div class="bar" style="grid-area: ${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}">
       <div class="barTrack" style="height: ${(asPercentage??0)*100}%"></div>
-      <div class="data">${size}</div>
+      ${this.showDataLabels ? dataLabel : `` }
     </div>
     <div class="xAxisLabels" style="grid-area: ${rowStart+2} / ${colStart} / ${rowEnd+2} / ${colEnd}">
-      ${key}
+      ${this.showXAxis ? xAxis : ``}
     </div>`
   }
 
   render() {
-    const d = this.data;
-    if (!d || d.length === 0) return html``;
+    let d = this.data;
+    if (d === undefined || d.length === 0) {
+      if (this.json !== undefined) {
+        d = this.json.map(inner=>({key: inner[0], size:inner[1]}));
+      } else return html``;
+    }
 
+    let length = d.length;
     let max = Math.max(...d.map(d=>d.size));
     d.forEach(d=>{
       d.asPercentage = d.size/max;
     });
 
+    let xAxis = html`<div class="xAxis" style="grid-area: 2 / 1 / 3 / ${d.length+1}"></div>`
+    let height = this.height ? `height: ${this.height};` : ``;
     let h = html`
     <style>
     div.chart {
       grid-template-columns: repeat(${d.length}, minmax(2px, 1fr));
     }
     </style>
-    <div class="container">
+    <div class="container" style="${height}">
       <div class="chart">
-      ${repeat(d, (data) => data.key, (data, index) => this.barTemplate(data, index, d.length))}
-        <div class="xAxis" style="grid-area: 2 / 1 / 3 / ${d.length+1}"></div>
+      ${repeat(d, (data) => data.key, (data, index) => this.barTemplate(data, index, length))}
+        ${this.showXAxis ? xAxis :  ``}
       </div>
     </div>`
     return h;
   }
+}
+
+
+function JsonData(obj:any) {
+  if (obj === null || obj === undefined) return;
+  try {
+      if (typeof obj === `string`) {
+        if (obj.length === 0) return;
+        let o = JSON.parse(obj);
+        if (!Array.isArray(o)) {
+          console.error(`Histogram innerText should be JSON array`);
+          return;
+        }
+        for (let i=0;i<o.length; i++) {
+          if (!Array.isArray(o[i])) {
+            console.error(`Histogram array should consist of inner arrays`);
+            return;
+          }
+          if (o[i].length !== 2) {
+            console.error(`Histogram inner arrays should consist of two elements`);
+            return;
+          }
+          if (typeof o[i][0] !== `string`) {
+            console.error(`First element of inner array should be a string (index ${i})`);
+            return;
+          }
+          if (typeof o[i][1] !== `number`) {
+            console.error(`Second element of inner array should be a number (index ${i})`);
+            return;
+          }
+        }
+        return o;
+      }
+  } catch (ex) {
+    console.log(obj);
+    console.error(ex);
+  }
+  return undefined;
 }
 
 declare global {

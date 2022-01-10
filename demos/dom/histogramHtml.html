@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Histogram-Vis</title>
+  <link rel="stylesheet" href="../css/pico.fluid.classless.css">
+  <link rel="stylesheet" href="../css/demos.css">
+  <script src="../../src/dom/Histogram.js" type="module"></script>
+</head>
+
+<body>
+  <header>
+    <a href="../">ixfx</a> \ <a href="./">dom</a>
+  </header>
+  <style>
+    histogram-vis {
+      display: block;
+      height: 7em;
+      --histogram-bar-color: pink;
+    }
+  </style>
+  <main>
+    <h1>Histogram-Vis</h1>
+    <p>Histogram-Vis demo using data embedded in HTML</p>
+    <histogram-vis>
+      [
+      ["apples", 5],
+      ["oranges", 3],
+      ["pineapple", 0],
+      ["limes", 9]
+      ]
+    </histogram-vis>
+    <p></p>
+    <p>Related: <a href="../freqHistogram.html">using the histogram to show frequencies</a></p>
+  </main>
+</body>
+
+</html>

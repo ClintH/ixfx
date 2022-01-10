@@ -1,0 +1,1 @@
+export const weighted = (min: number, max: number) => Math.round(max / (Math.random() * max + min));

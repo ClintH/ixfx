@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequency Histogram</title>
+  <link rel="stylesheet" href="../css/pico.fluid.classless.css">
+  <link rel="stylesheet" href="../demos.css">
+
+</head>
+
+<body>
+  <style>
+    .sxs {
+      display: flex;
+    }
+
+    .sxs>div {
+      height: 300px;
+      flex-grow: 1;
+    }
+
+    #dataStream {
+      overflow-y: scroll;
+    }
+  </style>
+  <header>
+    <a href="../">ixfx</a> \ <a href="./">dom</a>
+  </header>
+  <main>
+    <section>
+      <h1>Frequency Histogram</h1>
+      <p>
+        In the demo, a weighted distribution of random numbers is visualised with <a
+          href="dom/histogramHtml.html">HistogramVis</a>.
+      </p>
+      <div class="toolbar">
+        <button id="btnStart">Start</button>
+        <button id="btnStop">Stop</button>
+        <button id="btnClear">Clear</button>
+      </div>
+      <div class="sxs">
+        <div id="dataStream"></div>
+        <div id="dataPlot"></div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="freqHistogram.js"></script>
+  <script type="module" src="../../src/dom/Histogram.js"></script>
+</body>
+
+</html>
