@@ -50,17 +50,17 @@ const testCubic = () => {
 
   // Define bezier's start (A), end (B) and handle (C) points:
   const bezier = Beziers.cubic(
-    {x: 0, y: 0}, 
-    {x: 350, y: 120}, 
-    {x: 170, y: 20}, 
-    {x: 50, y: 50}
+    {x: 5, y: 5}, 
+    {x: 200, y: 100}, 
+    {x: 140, y: 20}, 
+    {x: 50, y: 70}
   );
+  const path = Beziers.toPath(bezier);
 
   // Use Svg.js to make SVG for the line
   // svg.line(path.toFlatArray()).attr({stroke: lineDrawOpts.strokeStyle});
   // const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
-  
   const progression = pingPongPercent(pingPongInterval); // Loop back and forth between 0 and 1
   let amt = 0;
 
@@ -68,14 +68,14 @@ const testCubic = () => {
     clear(ctx, bounds); // Clear canvas
 
     // Draw the line
-    drawHelper.line(line, lineDrawOpts);
+    drawHelper.bezier(bezier, {...lineDrawOpts, debug:true});
 
     // Calc x,y along long at a given amt and draw a dot there
     const dotPos = path.compute(amt);
     drawHelper.dot(dotPos, dotDrawOpts);
 
     // Move SVG dot, need to adjust so it's positioned by its center
-    dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
+    //dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
   };
 
   const update = () => {
@@ -93,11 +93,12 @@ const testQuadratic = () => {
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
   // Define bezier's start (A), end (B) and handle (C) points:
-  const bezier = Beziers.quadratic({x: 0, y: 0}, {x: 350, y: 120}, {x: 170, y: 20});
+  const bezier = Beziers.quadratic({x: 5, y: 10}, {x: 330, y: 100}, {x: 170, y: 20});
+  const path = Beziers.toPath(bezier);
 
   // Use Svg.js to make SVG for the line
-  svg.path(bezier.toSvgString()).attr({fill: `transparent`, stroke: lineDrawOpts.strokeStyle});
-  const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
+  svg.path(path.toSvgString()).attr({fill: `transparent`, stroke: lineDrawOpts.strokeStyle});
+  //const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
   // Loop back and forth between 0 and 1
   const progression = pingPongPercent(pingPongInterval);
@@ -107,14 +108,14 @@ const testQuadratic = () => {
     clear(ctx, bounds);
 
     // Draw bezier
-    drawHelper.quadraticBezier(bezier, lineDrawOpts);
+    drawHelper.bezier(bezier, {...lineDrawOpts, debug:true});
 
     // Calc x,y along long at a given amt and draw a dot there
-    const dotPos = bezier.compute(amt);
+    const dotPos = path.compute(amt);
     drawHelper.dot(dotPos, dotDrawOpts);
 
     // Move SVG dot. Since position is from top-left corner, we need to adjust
-    dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
+    //dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
   };
 
   const update = () => {
@@ -141,7 +142,7 @@ const testMultiPath = () => {
   const b2 = Beziers.quadraticSimple({x: 300, y: 100}, {x: 400, y: 0}, 1);  // Bend of 1... bulge
 
   // Create a compound from four separate paths
-  const multiPath = Compound.fromPaths(l3, l4, b1, b2);
+  const multiPath = Compound.fromPaths(l3, l4, Beziers.toPath(b1), Beziers.toPath(b2));
 
   // Use Svg.js to make SVG for the line
   svg.path(multiPath.toSvgString()).attr({fill: `transparent`, margin: `10px`, stroke: lineDrawOpts.strokeStyle});
@@ -171,7 +172,7 @@ const testMultiPath = () => {
 };
 
 // Throw tests in an array to handle them together
-const tests = [testLine(), testQuadratic(), testMultiPath()];
+const tests = [testCubic(), testQuadratic(), testMultiPath()];
 
 const loop = function () {
   tests.forEach(d => d.redraw());

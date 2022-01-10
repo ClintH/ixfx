@@ -117,7 +117,8 @@ const testDistances = () => {
     drawHelper.textBlock([`Distance: ${Math.floor(distance)}`], {
       anchor: pointerPos,
       bounds: bounds,
-      anchorPadding: 5
+      anchorPadding: 5,
+      fillStyle: lineDrawOpts.strokeStyle
     });
 
     // Draw pointer

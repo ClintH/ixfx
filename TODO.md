@@ -1,7 +1,11 @@
 # TODO
  
-* Curves: cubic, bend, compound
-* Compound: math fns
+## Demos
+* Curves - SVG: cubic, bend, compound
+* Compound
+  * math fns
+
+## Geometry
 
 * Point intersects with path (with some fuzzy threshold)
   * Bezier
@@ -13,16 +17,23 @@
 
 * Paths test to show the above
 
+## General
+
 * StateMachine unit tests
 * StateMachine visualisation
 
 * Tracker unit tests
 * Tracker visualisation/playground
 
+---
+
+## Demos
 
 * Draggable start/end points?
 * Curve editor?
 * Envelopes  
+
+## Geometry
 
 * Adding jitter to movement
 

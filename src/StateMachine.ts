@@ -44,7 +44,7 @@ export interface State {
   [event: string]: StateHandler;
 }
 
-interface MachineDescription {
+export interface MachineDescription {
   [key: string]: string | string[] | null;
 }
 
@@ -125,6 +125,10 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     this.#isDone = false;
   }
 
+  get states():string[] {
+    return Object.keys(this.#m);
+  }
+
   static validate(initial:string, m:MachineDescription):[boolean, string]  {
     // Check that object is structured properly
     const keys = Object.keys(m);
@@ -186,7 +190,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * @returns
    * @memberof StateMachine
    */
-  isDone() {
+  get isDone():boolean {
     return this.#isDone;
   }
 
@@ -224,6 +228,10 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     return [true, `ok`];
   }
 
+  isValid(newState:string):[boolean, string] {
+    return StateMachine.isValid(this.state, newState, this.#m);
+  }
+
   /**
    * Sets state. Throws an error if an invalid transition is attempted.
    * Use `StateMachine.isValid` to check validity without changing.
@@ -246,6 +254,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
 
     setTimeout(() => {
       this.fireEvent(`change`, {newState: newState, priorState: priorState});
+      if (this.isDone) this.fireEvent(`stop`, {state: newState });
     }, 1);
   }
 

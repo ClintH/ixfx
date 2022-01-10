@@ -10,7 +10,7 @@ export class Palette {
     let c = this.store.get(key);
     if (c === undefined) {
       const varName = `--` + key;
-      c = getComputedStyle(document.body).getPropertyValue(varName);
+      c = getComputedStyle(document.body).getPropertyValue(varName).trim();
       this.add(varName, c);
     }
     return c;

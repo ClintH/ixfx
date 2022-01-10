@@ -124,7 +124,7 @@ const isFull = <V>(opts: StackOpts, stack: V[]): boolean => {
  * @class Stack
  * @template V
  */
-class Stack<V> {
+export class Stack<V> {
   readonly opts: StackOpts;
   readonly data: V[];
 

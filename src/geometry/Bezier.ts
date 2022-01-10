@@ -4,21 +4,25 @@ import * as Points from './Point.js';
 import * as Rects from './Rect.js';
 import * as Lines from './Line.js';
 
-export type QuadraticBezier = Paths.Path & {
-  a: Points.Point,
-  b: Points.Point,
-  quadratic: Points.Point
+export type QuadraticBezier = {
+  readonly a: Points.Point,
+  readonly b: Points.Point,
+  readonly quadratic: Points.Point
 }
 
-export type CubicBezier = Paths.Path & {
-  a: Points.Point,
-  b: Points.Point,
-  cubic1: Points.Point,
-  cubic2: Points.Point,
+export type QuadraticBezierPath = Paths.Path & QuadraticBezier;
+export type CubicBezier = {
+  readonly a: Points.Point,
+  readonly b: Points.Point,
+  readonly cubic1: Points.Point,
+  readonly cubic2: Points.Point,
 }
 
-export const isQuadraticBezier = (path: Paths.Path | QuadraticBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
-export const isCubicBezier = (path: Paths.Path | CubicBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
+export type CubicBezierPath = Paths.Path & CubicBezier;
+
+
+export const isQuadraticBezier = (path: Paths.Path | QuadraticBezier | CubicBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
+export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
 
 /**
  * Returns a new quadratic bezier with specified bend amount
@@ -61,18 +65,30 @@ export const quadraticSimple = (start: Points.Point, end: Points.Point, bend = 0
 //https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
 export const quadraticToSvgString = (start: Points.Point, end: Points.Point, handle: Points.Point): string => `M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`;
 
-export const cubic = (start: Points.Point, end: Points.Point, handle1: Points.Point, handle2: Points.Point): CubicBezier => {
-  start = Object.freeze(start);
-  end = Object.freeze(end);
-  handle1 = Object.freeze(handle1);
-  handle2 = Object.freeze(handle2);
+export const toPath = (cubicOrQuadratic:CubicBezier|QuadraticBezier): CubicBezierPath|QuadraticBezierPath => {
+  if (isCubicBezier(cubicOrQuadratic)) {
+    return cubicToPath(cubicOrQuadratic);
+  } else if (isQuadraticBezier(cubicOrQuadratic)) {
+    return quadratictoPath(cubicOrQuadratic);
+  } else {
+    throw new Error(`Unknown bezier type`);
+  }
+};
 
-  const bzr = new BezierLib(start, handle1, end, handle2);
+export const cubic = (start:Points.Point, end:Points.Point, cubic1:Points.Point, cubic2:Points.Point): CubicBezier => (
+  {
+    a: Object.freeze(start),
+    b: Object.freeze(end),
+    cubic1: Object.freeze(cubic1),
+    cubic2: Object.freeze(cubic2) 
+  });
+
+const cubicToPath = (cubic:CubicBezier): CubicBezierPath => {
+  const {a, cubic1, cubic2, b} = cubic;
+
+  const bzr = new BezierLib(a, cubic1, cubic2, b);
   return Object.freeze({
-    a: start,
-    b: end,
-    cubic1: handle1,
-    cubic2: handle2,
+    ...cubic,
     length: () => bzr.length(),
     compute: (t: number) => bzr.compute(t),
     bbox: () => {
@@ -90,16 +106,18 @@ export const cubic = (start: Points.Point, end: Points.Point, handle1: Points.Po
   });
 };
 
-export const quadratic = (start: Points.Point, end: Points.Point, handle: Points.Point): QuadraticBezier => {
-  start = Object.freeze(start);
-  end = Object.freeze(end);
-  handle = Object.freeze(handle);
+export const quadratic = (start: Points.Point, end: Points.Point, handle: Points.Point): QuadraticBezier => ({
+  a: Object.freeze(start),
+  b: Object.freeze(end),
+  quadratic: Object.freeze(handle)
+});
 
-  const bzr = new BezierLib(start, handle, end);
+
+const quadratictoPath = (quadraticBezier:QuadraticBezier): QuadraticBezierPath => {
+  const {a, b, quadratic} = quadraticBezier;
+  const bzr = new BezierLib(a, quadratic, b);
   return Object.freeze({
-    a: start,
-    b: end,
-    quadratic: handle,
+    ...quadraticBezier,
     length: () => bzr.length(),
     compute: (t: number) => bzr.compute(t),
     bbox: () => {
@@ -111,7 +129,7 @@ export const quadratic = (start: Points.Point, end: Points.Point, handle: Points
       return Rects.fromTopLeft({x: x.min, y: y.min}, xSize, ySize);
     },
     toString: () => bzr.toString(),
-    toSvgString: () => quadraticToSvgString(start, end, handle),
+    toSvgString: () => quadraticToSvgString(a, b, quadratic),
     kind: `bezier/quadratic`
   });
 };
