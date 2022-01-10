@@ -11,6 +11,7 @@ export type DomLog = {
   error(msgOrError:string|Error):void
   log(msg?:string):void
   append(el:HTMLElement):void
+  dispose():void
 }
 
 /**
@@ -41,6 +42,7 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
   const empty = {
     log: (_: string) => { /* no-op */ },
     clear: () => { /* no-op */ },
+    dispose: () => { /* no-op */ },
     error: (_:string|Error) => { /* no-op */ },
     append: (_:HTMLElement) => { /* no-op */ }
   };
@@ -92,14 +94,36 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
 
   const error = (msgOrError: string | Error) => {
     const line = document.createElement(`div`);
-    line.innerHTML = msgOrError.toString();
+    if (typeof msgOrError === `string`) {
+      line.innerHTML = msgOrError;
+    } else {
+      const stack = msgOrError.stack;
+      if (stack === undefined) {
+        line.innerHTML = msgOrError.toString();
+      } else {
+        line.innerHTML = stack.toString();
+      }
+    }
     line.classList.add(`error`);
     append(line);
     lastLog = undefined;
     lastLogRepeats = 0;
   };
 
-  const log = (msg: string = ``) => {
+  const log = (whatToLog: unknown = ``) => {
+    let msg:string|undefined;
+    if (typeof whatToLog === `object`) {
+      msg = JSON.stringify(whatToLog);
+    } else if (whatToLog === undefined) {
+      msg = `(undefined)`;
+    } else if (whatToLog === null) {
+      msg = `(null)`;
+    } else if (typeof whatToLog === `number`) {
+      if (Number.isNaN(msg)) msg = `(NaN)`;
+      msg = whatToLog.toString();
+    } else {
+      msg = whatToLog as string;
+    }
     if (msg.length === 0) {
       const rule = document.createElement(`hr`);
       lastLog = undefined;
@@ -131,8 +155,8 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
 
       timestamp.innerText = new Date().toLocaleTimeString();
       wrapper.append(timestamp, line);
-      line.className = `msg`;
-      wrapper.className = `line`;
+      line.classList.add(`msg`);
+      wrapper.classList.add(`line`);
       line = wrapper;
     } else {
       line.classList.add(`line`, `msg`);
@@ -154,5 +178,9 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
     lastLogRepeats = 0;
   };
 
-  return {error, log, append, clear};
+  const dispose = () => {
+    el.remove();
+  };
+
+  return {error, log, append, clear, dispose};
 };

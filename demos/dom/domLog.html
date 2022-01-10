@@ -7,7 +7,8 @@
   <title>domLog</title>
   <link rel="stylesheet" href="../css/pico.fluid.classless.css">
   <link rel="stylesheet" href="../css/demos.css">
-  <script src="../../src/dom/Histogram.js" type="module"></script>
+  <script src="../../src/dom/DomLog.js" type="module"></script>
+  <script src="./domLog.js" type="module"></script>
 </head>
 
 <body>
@@ -15,25 +16,31 @@
     <a href="../">ixfx</a> \ <a href="./">dom</a>
   </header>
   <style>
-    histogram-vis {
-      display: block;
-      height: 7em;
-      --histogram-bar-color: pink;
+    #container {
+      border: 1px solid whitesmoke;
+      overflow-y: scroll;
+      height: 10em;
     }
   </style>
   <main>
     <h1>domLog</h1>
-    <p>Histogram-Vis demo using data embedded in HTML</p>
-    <histogram-vis>
-      [
-      ["apples", 5],
-      ["oranges", 3],
-      ["pineapple", 0],
-      ["limes", 9]
-      ]
-    </histogram-vis>
-    <p></p>
-    <p>Related: <a href="../freqHistogram.html">using the histogram to show frequencies</a></p>
+    <div class="toolbar">
+      <section>
+        <label>Auto-generate</label>
+        <button id="btnStart">Start</button>
+        <button id="btnStop">Stop</button>
+      </section>
+      <button id="btnClear">Clear</button>
+    </div>
+    <div class="toolbar">
+    </div>
+    <label>
+      <input type="checkbox" id="chkTimestamps" />
+      Timestamps
+    </label>
+    <div id="container">
+      <div id="log"></div>
+    </div>
   </main>
 </body>
 

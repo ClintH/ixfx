@@ -2,8 +2,16 @@
   display: flex;
 }
 
-.toolbar>button {
+.toolbar button {
   margin: calc(var(--grid-spacing-horizontal)/2);
+}
+
+.toolbar>section {
+  display: flex;
+  border-right: 1px solid rgba(255,255,255,0.2);
+  padding: calc(var(--grid-spacing-horizontal)/2);
+  align-items: center;
+  margin:0;
 }
 
 ul.nobullets li {
