@@ -23,3 +23,9 @@
 ul.nobullets li {
   list-style: none;
 }
+
+label,
+fieldset legend {
+  display: block;
+  margin-bottom: calc(var(--spacing) * 0.25);
+}

@@ -1,6 +1,6 @@
 //export type StateChangeCallback = (newState: string, priorState: string) => void;
-import {SimpleEventEmitter} from "./Events.js";
-import { isStringArray } from "./Guards.js";
+import {SimpleEventEmitter} from "./Events";
+import { isStringArray } from "./Guards";
 /*
 type MappedTypeWithNewProperties<Type> = {
   [Properties in keyof Type as NewKeyType]: Type[Properties]
@@ -161,7 +161,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     // Check that all values have a top-level state
     const seenValsArray = Array.from(seenVals);
     const missing = seenValsArray.find(v => !seenKeys.has(v));
-    if (missing) return [false, `Potential state ${missing} does not exist as a top-level state`];
+    if (missing) return [false, `Potential state '${missing}' does not exist as a top-level state`];
 
     // Check machine contains intial state
     if (m[initial] === undefined) return [false, `Initial state ${initial} not present`];

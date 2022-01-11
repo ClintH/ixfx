@@ -1,10 +1,11 @@
 /* eslint-disable */
-import {domLog} from '../src/dom/DomLog.js';
-import {demoRun} from './demos.js';
-import {checkbox, button, select} from '../src/dom/Forms.js';
+import {domLog} from '~/dom/DomLog';
+//import {domLog} from '../../../../../src/dom/DomLog';
 
-import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '../src/StateMachine.js';
-import {AutoSort, FrequencyHistogramPlot} from '../src/visualisation/FrequencyHistogramPlot';
+import {checkbox, button, select} from '~/dom/Forms';
+
+import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '~/StateMachine';
+import {AutoSort, FrequencyHistogramPlot} from '~/visualisation/FrequencyHistogramPlot';
 
 const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
 
@@ -26,25 +27,66 @@ const demoMachines = {
       tideGoesOut: `tideGoesIn`
     },
     initialState: `tideIn`
+  },
+  bread: {
+    description: {
+      plain: ["toasted", "buttered", "eaten"],
+      toasted: ["buttered", "eaten", "diced"],
+      buttered: ["eaten", "marmaladed"],
+      marmaladed: "eaten",
+      diced: "sprinkled-on-soup",
+      "sprinkled-on-soup": null,
+      eaten: null
+    },
+    initialState: `plain`
   }
 }
 const btnChangeState = document.getElementById(`btnChangeState`) as HTMLButtonElement;
+const descrValdate = document.getElementById(`descrValidate`);
 const txtDescr = document.getElementById(`jsonDescr`);
-const txtCurrentState = document.getElementById(`txtCurrentState`) as HTMLInputElement;
-const chkIsDone = checkbox(`chkIsDone`);
+txtDescr.addEventListener(`input`, () => {
+  console.log(txtDescr.innerText);
+  let [ok,msg] = parseDesc(txtDescr.innerText);
+  if (ok) {
+    msg = `✔ OK`;
+    descrValdate.classList.remove(`error`);
+  } else {
+    msg = msg;
+    descrValdate.classList.add(`error`);
+
+  }
+  descrValdate.innerHTML = msg;
+});
+const currentState = document.getElementById(`currentState`);
+//const isMachineDone = document.getElementById(`isMachineDone`);
 const selInitialStates = select(`selDescrInitial`);
 const selPossibleNext = select(`selPossibleNext`, undefined, { placeholderOpt: `-- Auto --`, autoSelectAfterChoice:0 });
 
+// Demo machine SELECT
 const selDemoMachines = select(`selDemoMachines`, (newVal:string) => {
+  // Machine selected. Set JSON text and initial state options
   let md = demoMachines[newVal];
   txtDescr.innerText = JSON.stringify(md.description, undefined, 2);
   selInitialStates.setOpts(Object.keys(md.description), md.initialState);
 }, { placeholderChoose:true, autoSelectAfterChoice:0 });
+
+// Assign list of demo machines
 selDemoMachines.setOpts(Object.keys(demoMachines));
+
+const parseDesc = (txt):[boolean, string] => {
+  try {
+    const description = JSON.parse(txt);
+    selInitialStates.setOpts(Object.keys(description));
+    return [true,``];
+  } catch (ex) {
+    return [false, ex.message];
+  }
+}
 
 const btnSetDescr = button(`btnSetDescr`, () => {
   try {
-    const description = JSON.parse(txtDescr.innerText);
+    let txt = txtDescr.innerText;
+    const description = JSON.parse(txt);
     const initial = selInitialStates.value;
     const sm = create(initial, description);
     if (currentSm) {
@@ -66,14 +108,14 @@ const update = (sm:StateMachine|undefined) => {
     btnChangeState.disabled = true;
     selPossibleNext.disabled = true;
   
-    txtCurrentState.value = `(invalid JSON)`;
-    chkIsDone.checked = true;
+    currentState.innerText = `(invalid JSON)`;
+    //isMachineDone.innerHTML = `Not loaded`;
     selPossibleNext.setOpts([]);
     return;
   }
 
-  txtCurrentState.value = sm.state;
-  chkIsDone.checked = sm.isDone;
+  currentState.innerText = `Current state: ${sm.state}`;
+  //isMachineDone.innerHTML = sm.isDone ? `Machine complete` : `Transition(s) possible`;
 
   // Update list of possible next state(s)
   selPossibleNext.setOpts(sm.states.filter(state => sm.isValid(state)[0]));

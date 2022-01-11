@@ -1,6 +1,12 @@
 {
   "compilerOptions": {
     "outDir": "./build",
+    "baseUrl": "./src",
+    "paths": {
+      "~/*": [
+        "src/*"
+      ]
+    },
     "lib": [
       "es2020",
       "dom"

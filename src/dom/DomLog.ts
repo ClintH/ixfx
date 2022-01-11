@@ -1,9 +1,10 @@
-import {addShadowCss} from "./ShadowDom.js";
+import {addShadowCss} from "./ShadowDom";
 
 export type DomLogOpts = {
   truncateEntries?: number,
   timestamp?: boolean,
-  collapseDuplicates?:boolean
+  collapseDuplicates?:boolean,
+  monospaced?:boolean
 }
 
 export type DomLog = {
@@ -37,7 +38,7 @@ export type DomLog = {
  * @returns {DomLog}
  */
 export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpts = {}):DomLog => {
-  const {truncateEntries = 0, timestamp = false, collapseDuplicates = true } = opts;
+  const {truncateEntries = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
 
   const empty = {
     log: (_: string) => { /* no-op */ },
@@ -60,7 +61,13 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
     parentEl = elOrId;
   } else return empty;
   
+  const fontFamily = monospaced ? `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", Monaco, "Courier New", Courier, monospace` : `normal`;
   const shadowRoot = addShadowCss(parentEl, `
+  .log {
+    font-family: ${fontFamily};
+    background-color: var(--code-background-color);
+    padding: var(--padding1, 0.2em);
+  }
   .timestamp {
     margin-right: 0.5em;
     opacity: 0.5;
@@ -69,6 +76,9 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
   }
   .line {
     display: flex;
+  }
+  .line:hover {
+    background-color: var(--primary-focus, whitesmoke);
   }
   .error {
     color: red;
