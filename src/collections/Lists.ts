@@ -1,5 +1,5 @@
-import {stack, stackMutable,  OverflowPolicy as StackOverflowPolicy} from './Stack';
-//import {queue, queueMutable, QueueOpts, OverflowPolicy as QueueOverflowPolicy} from './Queue';
+import {stack, stackMutable, StackOpts, OverflowPolicy as StackOverflowPolicy} from './Stack.js';
+import {queue, queueMutable, QueueOpts, OverflowPolicy as QueueOverflowPolicy} from './Queue.js';
 
 export {stack, stackMutable, StackOpts, StackOverflowPolicy};
 export {queue, queueMutable, QueueOpts, QueueOverflowPolicy};

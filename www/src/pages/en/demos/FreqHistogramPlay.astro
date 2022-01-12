@@ -1,0 +1,26 @@
+<link rel="stylesheet" href={Astro.resolve('../../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('./../../../../../src/dom/Histogram.ts')}></script>
+<script type="module" src={Astro.resolve('./freqHistogram.ts')}></script>
+<style>
+  .sxs {
+    display: flex;
+  }
+
+  .sxs>div {
+    height: 300px;
+    flex-grow: 1;
+  }
+
+  #dataStream {
+    overflow-y: scroll;
+  }
+</style>
+<div class="toolbar">
+  <button id="btnStart">Start</button>
+  <button id="btnStop">Stop</button>
+  <button id="btnClear">Clear</button>
+</div>
+<div class="sxs">
+  <div id="dataStream"></div>
+  <div id="dataPlot"></div>
+</div>

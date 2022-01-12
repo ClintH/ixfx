@@ -1,9 +1,10 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 export default {
   preset: `ts-jest/presets/default-esm`,
-  testEnvironment: `jsdom`,
-  setupFilesAfterEnv: [`./jest.setup.js`],
+  testEnvironment: `jest-environment-node`,
+  setupFilesAfterEnv: [`./jest.setup.js`, `jest-extended/all`],
   extensionsToTreatAsEsm: [`.ts`],
+  transform: {},
   collectCoverageFrom: [`./src/**/*.ts`],
   coverageThreshold: {
     global: {

@@ -42,7 +42,7 @@ npm run test
 
 Run a single test:
 ```
-npx jest .\tests\geometry\grid.test.ts
+npm run test grid.test.ts
 ```
 
 Test coverage report:

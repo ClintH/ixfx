@@ -1,0 +1,128 @@
+/* eslint-disable */
+
+import {LitElement, css, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {repeat} from 'lit/directives/repeat.js';
+
+export type HistogramBar = {
+  key: string
+  size: number
+  scaled?: number
+}
+
+@customElement(`histogram-vis`)
+export class HistogramVis extends LitElement {
+  static styles = css`
+    :host {
+      background-color: white;
+    }
+    div.groups {
+      display: flex;
+    }
+    div.group {
+      margin-left: 0.2rem;
+      margin-right: 0.2rem;
+      align-items: center;
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+      // margin: 0 auto;
+      border: 1px solid pink;
+    }
+    div.bar { 
+      background-color: yellow;
+      width: 100%;
+    }
+    div.barContainer {
+      display: flex;
+      align-items: flex-end;
+      align-self: stretch;
+      flex-grow: 1;
+    }
+    div.axisLabel {
+      justify-content: center;
+      writing-mode: vertical-rl;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    div.plotArea {
+      border-bottom: 1px solid white;
+      margin: 0.5rem;
+      border: 1px solid red;
+    }
+    div.xAxis {
+      border-top: 1px solid white;
+    }
+  `;
+
+  @property()
+  data?: HistogramBar[] = [];
+
+  // barTemplate(bar:HistogramBar) {
+  //   const {scaled,key} = bar;
+  //   return html`<div class="bar" style="height:${scaled*100}px"></div>`
+  //   //return html`key: ${bar.key} size: ${bar.size}`;
+  // }
+
+  barTemplate(bar: HistogramBar, index: number) {
+    const {scaled, key, size} = bar;
+    return html`
+    <div class="data group">
+      <div class="dataLabel">${size}</div>
+      <div class="barContainer"><div class="bar" title="${key}" style="height:${scaled * 100}px"></div></div>
+      <div class="axisLabel">${key}</div>
+    </div>`
+    //return html`key: ${bar.key} size: ${bar.size}`;
+  }
+
+
+  axisLabel(label: string, index: number) {
+    return html`<div class="group"><div class="axisLabel">${label}</div></div>`;
+  }
+
+
+  dataLabel(label: string) {
+    return html`<div class="label">Data: ${label}</div>`;
+  }
+
+  render() {
+    if (!this.data) return html`(undef)`;
+    if (this.data.length === 0) return html`(empty)`;
+
+    let max = Math.max(...this.data.map(d => d.size));
+    this.data.forEach(d => {
+      d.scaled = d.size / max;
+    });
+
+    const xLabels = this.data.map(d => d.key);
+    const dataLabels = this.data.map(d => d.size);
+
+    let h = html`<div class="caption">Caption</div>
+    <div class="data groups">
+    ${repeat(this.data, (data) => data.key, (data, index) => this.barTemplate(data, index))}
+    </div>`
+
+    // <div class="xAxis"></div>
+    // <div class="groups">
+    // ${repeat(xLabels, (data) => data, (data, index) => this.axisLabel(data, index))}
+
+    // </div>
+    // `
+
+    // let h = html`<div class="caption">Caption</div>
+    // <div class="plotArea">
+    //   <div class="labels">${repeat(dataLabels, (label) => label, (label, index) => html`${this.dataLabel(label.toString())}`)}</div>
+    //   <div class="bars">${repeat(this.data, (bar) => bar.key, (bar, index) => html`${this.barTemplate(bar)}`)}</div>
+    // </div>
+    // <div class="labels">${repeat(xLabels, (label) => label, (label, index) => html`${this.axisLabel(label)}`)}</div>`
+    return h;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    // eslint-disable-next-line quotes
+    "histogram-vis": HistogramVis
+  }
+}

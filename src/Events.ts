@@ -1,4 +1,4 @@
-import {MapMulti} from "./collections/MapMulti";
+import {MapMulti} from "./collections/MapMulti.js";
 
 // interface WindowEventMap extends GlobalEventHandlersEventMap, WindowEventHandlersEventMap {
 //   "devicemotion": DeviceMotionEvent;

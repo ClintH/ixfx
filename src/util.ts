@@ -94,6 +94,15 @@ export const getMinMaxAvg = (data: number[]): {min: number; max: number; avg: nu
   return {min: min, max: max, avg: total / samples};
 };
 
+export const shuffle = (dataToShuffle:Array<unknown>): Array<unknown> => {
+  const array = [...dataToShuffle];
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
 

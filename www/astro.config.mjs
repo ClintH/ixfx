@@ -3,7 +3,7 @@
 import { fileURLToPath } from 'url';
 import {resolve, dirname} from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
-
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 // @type-check enabled!
 // VSCode and other TypeScript-enabled text editors will provide auto-completion,
 // helpful tooltips, and warnings if your exported object is invalid.
@@ -16,13 +16,18 @@ export default /** @type {import('astro').AstroUserConfig} */ ({
     `@astrojs/renderer-preact`,
     // Enable the Preact renderer to support Preact JSX components.
     // Enable the React renderer, for the Algolia search component
-    `@astrojs/renderer-react`,
-
+    `@astrojs/renderer-react`
+    // `@astrojs/renderer-lit`
   ],
   vite: {
     // alias: {
     //   '~2': resolve(dirname(fileURLToPath(import.meta.url)), `../src/`)
     // },
-    // plugins: [tsconfigPaths({root: '../'})],
+    plugins: [
+      tsconfigPaths({root: `../`}), 
+      nodeResolve({
+        extensions: ['.js', '.ts']
+      })
+    ]
   }
 });

@@ -1,4 +1,4 @@
-import * as Lists from '../../collections/Lists';
+import * as Lists from '~/collections/Lists.js';
 
 /*
 test('perfCircular', () => {

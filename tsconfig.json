@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./build",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
       "~/*": [
         "src/*"
@@ -20,7 +20,7 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "removeComments": false,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },

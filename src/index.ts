@@ -33,3 +33,6 @@ export {Producers};
 
 import * as Series from './Series.js';
 export {Series};
+
+import { FrequencyHistogramPlot } from './visualisation/FrequencyHistogramPlot.js';
+export {FrequencyHistogramPlot};

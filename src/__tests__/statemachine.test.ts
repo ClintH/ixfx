@@ -29,24 +29,24 @@ const testPaths = () => {
   sm.state = `coffee`;
   sm.state = `brushTeeth`;
 
-  if (!sm.isDone()) throw Error(`Machine should be done`);
+  if (!sm.isDone) throw Error(`Machine should be done`);
 
   sm = new StateMachine(`awake`, m, {debug: debug});
   sm.state = `breakfast`;
   sm.state = `coffee`;
   sm.state = `brushTeeth`;
-  if (!sm.isDone()) throw Error(`Machine should be done`);
+  if (!sm.isDone) throw Error(`Machine should be done`);
 
   sm = new StateMachine(`awake`, m, {debug: debug});
-  if (sm.isDone()) throw Error(`Finalised unexpectedly (1)`);
+  if (sm.isDone) throw Error(`Finalised unexpectedly (1)`);
   if (sm.next() !== `breakfast`) throw Error(`Did not choose expected state`);
-  if (sm.isDone()) throw Error(`Finalised unexpectedly (2)`);
+  if (sm.isDone) throw Error(`Finalised unexpectedly (2)`);
   if (sm.next() !== `coffee`) throw Error(`Did not choose expected state`);
-  if (sm.isDone()) throw Error(`Finalised unexpectedly (3)`);
+  if (sm.isDone) throw Error(`Finalised unexpectedly (3)`);
   if (sm.next() !== `brushTeeth`) throw Error(`Did not choose expected state`);
-  if (!sm.isDone()) throw Error(`Finalised unexpectedly (4)`);
+  if (!sm.isDone) throw Error(`Finalised unexpectedly (4)`);
   if (sm.next() !== null) throw Error(`Did not finalise as expected (1)`);
-  if (!sm.isDone()) throw Error(`Machine should be done`);
+  if (!sm.isDone) throw Error(`Machine should be done`);
 
   console.log(`Test paths OK`);
 };

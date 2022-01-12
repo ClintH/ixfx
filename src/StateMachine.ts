@@ -1,6 +1,6 @@
 //export type StateChangeCallback = (newState: string, priorState: string) => void;
-import {SimpleEventEmitter} from "./Events";
-import { isStringArray } from "./Guards";
+import {SimpleEventEmitter} from "./Events.js";
+import { isStringArray } from "./Guards.js";
 /*
 type MappedTypeWithNewProperties<Type> = {
   [Properties in keyof Type as NewKeyType]: Type[Properties]

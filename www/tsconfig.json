@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2021",
+    "target": "esnext",
     "module": "esnext",
     "jsx": "preserve",
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "~/*": [

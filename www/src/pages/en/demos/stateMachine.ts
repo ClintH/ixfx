@@ -1,11 +1,7 @@
 /* eslint-disable */
 import {domLog} from '~/dom/DomLog';
-//import {domLog} from '../../../../../src/dom/DomLog';
-
-import {checkbox, button, select} from '~/dom/Forms';
-
+import {button, select} from '~/dom/Forms';
 import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '~/StateMachine';
-import {AutoSort, FrequencyHistogramPlot} from '~/visualisation/FrequencyHistogramPlot';
 
 const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
 

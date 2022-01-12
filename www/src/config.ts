@@ -39,5 +39,7 @@ export const SIDEBAR = {
 
 		{ text: 'Demos', header: true },
 		{ text: 'State Machine', link: 'en/demos/stateMachine' },
+		{ text: 'Frequency Histogram', link: 'en/demos/freqHistogram' },
+
 	],
 };
