@@ -1,4 +1,4 @@
-import {MapMulti} from "./collections/MapMulti.js";
+import {MutableMapMulti} from "./collections/MutableMapMulti.js";
 
 // interface WindowEventMap extends GlobalEventHandlersEventMap, WindowEventHandlersEventMap {
 //   "devicemotion": DeviceMotionEvent;
@@ -45,7 +45,7 @@ import {MapMulti} from "./collections/MapMulti.js";
 export type Listener<Events> = (ev: any, sender: SimpleEventEmitter<Events>) => void;
 
 export class SimpleEventEmitter<Events> {
-  #listeners = new MapMulti<Listener<Events>>();
+  #listeners = new MutableMapMulti<Listener<Events>>();
 
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
     const listeners = this.#listeners.get(type as string);

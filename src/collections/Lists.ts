@@ -4,8 +4,6 @@ import {queue, queueMutable, QueueOpts, OverflowPolicy as QueueOverflowPolicy} f
 export {stack, stackMutable, StackOpts, StackOverflowPolicy};
 export {queue, queueMutable, QueueOpts, QueueOverflowPolicy};
 
-// ✔ UNIT TESTED!
-
 /**
  * The circular array grows to a fixed size. Once full, new
  * items replace the oldest item in the array. Immutable.
@@ -20,6 +18,7 @@ export {queue, queueMutable, QueueOpts, QueueOverflowPolicy};
  * @template V
  */
 export class Circular<V> extends Array {
+  // ✔ Class is unit tested!
   #capacity: number;
   #pointer: number;
 

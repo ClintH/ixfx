@@ -1,5 +1,9 @@
 # TODO
- 
+
+## Tests
+
+MutableMapMulti
+
 ## Demos
 * Curves - SVG: cubic, bend, compound
 * Compound
@@ -20,7 +24,6 @@
 ## General
 
 * StateMachine unit tests
-* StateMachine visualisation
 
 * Tracker unit tests
 * Tracker visualisation/playground

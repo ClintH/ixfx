@@ -4,7 +4,7 @@ import { KeyString } from "../util";
 
 //type KeyType = String | Number | Symbol;
 
-export class MapMulti<V> {
+export class MutableMapMulti<V> {
   #map: Map<string, V[]> = new Map();
   readonly #keyString: KeyString<V>;
   
