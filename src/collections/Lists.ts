@@ -19,7 +19,9 @@ export {queue, queueMutable, QueueOpts, QueueOverflowPolicy};
  */
 export class Circular<V> extends Array {
   // ✔ Class is unit tested!
+  /* eslint-disable-next-line functional/prefer-readonly-type */
   #capacity: number;
+  /* eslint-disable-next-line functional/prefer-readonly-type */
   #pointer: number;
 
   constructor(capacity: number) {
@@ -39,8 +41,11 @@ export class Circular<V> extends Array {
    */
   add(thing: V): Circular<V> {
     const ca = Circular.from(this) as Circular<V>;
+    /* eslint-disable-next-line functional/immutable-data */
     ca[this.#pointer] = thing;
+    /* eslint-disable-next-line functional/immutable-data */
     ca.#capacity = this.#capacity;
+    /* eslint-disable-next-line functional/immutable-data */
     ca.#pointer = this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
     return ca;
   }

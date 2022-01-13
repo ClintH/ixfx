@@ -26,9 +26,6 @@ export const clamp = (v: number, min = 0, max = 1) => {
   return v;
 };
 
-
-export const lerp =(amt:number, a:number, b:number) => (1-amt) * a + amt * b;
-
 /**
  * Clamps integer `v` between 0 and length (exclusive)
  * This is useful for clamping an array range, because the largest allowed number will
@@ -49,6 +46,7 @@ export const clampZeroBounds = (v: number, length: number) => {
 
 export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Math.random() * array.length)];
 
+export const lerp =(amt:number, a:number, b:number) => (1-amt) * a + amt * b;
 
 /**
  * Calculates the average of all numbers in an array.
@@ -64,38 +62,30 @@ export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Mat
  * @param {...number[]} data Data to average.
  * @returns {number}
  */
-export const average = (...data:number[]):number => {
+export const average = (...data:readonly number[]):number => {
   // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
   
   //const total = data.reduce((acc, v) => acc+v, 0);
-  let counted = 0;
-  let total =0;
-  for (let i=0;i<data.length;i++) {
-    if (typeof data[i] !== `number` || Number.isNaN(data[i])) continue;
-    total += data[i];
-    counted++;
-  }
-  return total / counted; 
+  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
+  const total = validNumbers.reduce((acc, v) => acc+v, 0);
+  return total / validNumbers.length;
 };
 
-export const getMinMaxAvg = (data: number[]): {min: number; max: number; avg: number;} => {
-  let min = Number.MAX_SAFE_INTEGER;
-  let total = 0;
-  let samples = 0;
-  let max = Number.MIN_SAFE_INTEGER;
-  for (let i = 0; i < data.length; i++) {
-    if (Number.isNaN(data[i])) continue;
-    min = Math.min(data[i], min);
-    max = Math.max(data[i], max);
-    total += data[i];
-    samples++;
-  }
-  return {min: min, max: max, avg: total / samples};
+export const getMinMaxAvg = (data: readonly number[]): {readonly min: number; readonly total: number; readonly max: number; readonly avg: number;} => {
+  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
+  const total = validNumbers.reduce((acc, v) => acc+v, 0);
+  return {
+    total: total,
+    max: Math.max(...validNumbers),
+    min: Math.min(...validNumbers),
+    avg: total /  validNumbers.length
+  };
 };
 
-export const shuffle = (dataToShuffle:Array<unknown>): Array<unknown> => {
+export const shuffle = (dataToShuffle:ReadonlyArray<unknown>): ReadonlyArray<unknown> => {
   const array = [...dataToShuffle];
+  // eslint-disable-next-line functional/no-loop-statement, functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
@@ -106,4 +96,20 @@ export const shuffle = (dataToShuffle:Array<unknown>): Array<unknown> => {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
 
-export type KeyString<V> = (itemToMakeKeyFor: V) => string;
+export type ToString<V> = (itemToMakeStringFor: V) => string;
+export type IsEqual<V> = (a:V, b:V) => boolean;
+
+export const isEqualDefault = <V>(a:V, b:V):boolean => {
+  // ✔ UNIT TESTED
+  if (a === b) return true; // Object references are the same, or string values are the same
+  return toStringDefault(a) === toStringDefault(b); // String representations are the same
+};
+
+/**
+ * A default converter to string that uses JSON.stringify if its an object, or the thing itself if it's a string
+ * ✔ UNIT TESTED
+ * @template V
+ * @param {V} itemToMakeStringFor
+ * @returns {string}
+ */
+export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof itemToMakeStringFor === `string`) ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor));

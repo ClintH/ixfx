@@ -1,12 +1,11 @@
 // ✔ UNIT TESTED
-import { KeyString } from "../util";
+import { ToString } from "../util";
 import {SimpleEventEmitter} from "../Events";
 
-
 type MutableValueSetEventMap<V> = {
-  add: {value: V, updated: boolean}
-  clear: boolean
-  delete: V
+  readonly add: {readonly value: V, readonly updated: boolean}
+  readonly clear: boolean
+  readonly delete: V
 }
 
 /**
@@ -54,10 +53,11 @@ type MutableValueSetEventMap<V> = {
  */
 export class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
   // ✔ UNIT TESTED
+  /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();
-  keyString: KeyString<V>;
+  keyString: ToString<V>;
 
-  constructor(keyString: KeyString<V> | undefined = undefined) {
+  constructor(keyString: ToString<V> | undefined = undefined) {
     super();
     if (keyString === undefined) {
       keyString = (a) => {
@@ -71,12 +71,12 @@ export class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventM
     this.keyString = keyString;
   }
 
-  add(...v: V[]) {
-    for (let i = 0; i < v.length; i++) {
-      const updated = this.has(v[i]);
-      this.store.set(this.keyString(v[i]), v[i]);
-      super.fireEvent(`add`, {value: v[i], updated: updated});
-    }
+  add(...v: ReadonlyArray<V>) {
+    v.forEach(i => {
+      const isUpdated = this.has(i);
+      this.store.set(this.keyString(i), i);
+      super.fireEvent(`add`, { value: i, updated: isUpdated});
+    });
   }
 
   values() {

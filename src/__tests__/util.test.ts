@@ -1,5 +1,55 @@
-import {average, clamp, clampZeroBounds} from '../util.js';
+/* eslint-disable */
+import {average, clamp, clampZeroBounds, toStringDefault, isEqualDefault} from '../util.js';
 
+test(`toStringDefault`, () => {
+  const a = {
+    name: "Blah blah",
+    age: 30,
+    alive: true,
+    height: 192.4
+  }
+
+  const aa = {
+    name: "Blah blah",
+    age: 30,
+    alive: true,
+    height: 192.4
+  }
+
+  const b = "Blah blah";
+  const bb ="Blah blah";
+
+  expect(toStringDefault(a)).toEqual(toStringDefault(aa));
+  expect(toStringDefault(b)).toEqual(toStringDefault(bb));
+})
+
+test(`isEqualDefault`, () => {
+  const a = {
+    name: "Blah blah",
+    age: 30,
+    alive: true,
+    height: 192.4
+  }
+
+  const aa = {
+    name: "Blah blah",
+    age: 30,
+    alive: true,
+    height: 192.4
+  }
+
+  const b = "Blah blah";
+  const bb ="Blah blah";
+  const c = "BLAH BLAH";
+
+  expect(isEqualDefault(a,a)).toBeTruthy();
+  expect(isEqualDefault(a, b as any)).toBeFalsy();
+  expect(isEqualDefault(a,aa)).toBeTruthy();
+
+  expect(isEqualDefault(b, b)).toBeTruthy();
+  expect(isEqualDefault(b,bb)).toBeTruthy();
+  expect(isEqualDefault(b, c)).toBeFalsy();
+});
 
 test(`average`, () => {
   const a = [1];

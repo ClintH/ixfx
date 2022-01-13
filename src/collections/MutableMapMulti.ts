@@ -1,27 +1,25 @@
 /// TODO: NEEDS TESTING
+import { ToString, IsEqual, toStringDefault, isEqualDefault } from "../util";
 
-import { KeyString } from "../util";
+export type MapMultiOpts<V> = {
+  readonly valueComparer: IsEqual<V>|undefined
+  readonly stringifier: ToString<V>|undefined
+}
 
-//type KeyType = String | Number | Symbol;
 
 export class MutableMapMulti<V> {
+  /* eslint-disable-next-line functional/prefer-readonly-type */
   #map: Map<string, V[]> = new Map();
-  readonly #keyString: KeyString<V>;
   
-  constructor(keyString: KeyString<V> | undefined = undefined) {
-    if (keyString === undefined) {
-      keyString = (a) => {
-        if (typeof a === `string`) { 
-          return a;
-        } else { 
-          return JSON.stringify(a);
-        }
-      };
-    }
-    this.#keyString = keyString;
+  readonly valueComparer: IsEqual<V>;
+  readonly stringifier: ToString<V>;
+
+  constructor(opts:MapMultiOpts<V>) {
+    this.stringifier = opts.stringifier ?? toStringDefault;
+    this.valueComparer = opts.valueComparer ?? isEqualDefault;
   }
 
-  isEmpty() {
+  get isEmpty():boolean {
     return (this.#map.size === 0);
   }
 
@@ -30,30 +28,37 @@ export class MutableMapMulti<V> {
   }
 
   /**
-   * Adds several values with the same static key
+   * Adds several values with the same static key. Duplicate values are permitted.
    *
    * @param {string} key Key for values
    * @param {...V[]} value Values
    * @memberof MapMulti
    */
-  addKeyedValues(key: string, ...value: V[]) {
-    let set = this.#map.get(key);
+  addKeyedValues(key: string, ...value: ReadonlyArray<V>) {
+    const set = this.#map.get(key);
     if (set === undefined) {
-      set = [];
-      this.#map.set(key, set);
+      this.#map.set(key, [...value]);
+    } else {
+      set.push(...value);
     }
-    set.push(...value);
   }
 
-  add(v:V) {
-    this.addKeyedValues(this.#keyString(v), v);
+  addValue(v:V) {
+    this.addKeyedValues(this.stringifier(v), v);
   }
 
   hasKey(key: string): boolean {
     return this.#map.has(key);
   }
 
-  has(value:V):boolean {
+  hasValue(key:string, value:V):boolean {
+    const m = this.#map.get(key);
+    if (m === undefined) return false;
+    if (this.#valueEquality === undefined)
+      return m.includes(value);
+    else
+      // TODO value equality
+
     return this.hasKey(this.#keyString(value));
   }
 
@@ -75,12 +80,13 @@ export class MutableMapMulti<V> {
    */
   deleteDeep(value: V) {
     const keys = Array.from(this.#map.keys());
-    for (const key of keys) {
-      const a = this.#map.get(key);
-      if (a === undefined) continue;
+
+    keys.forEach(k => {
+      const a = this.#map.get(k);
+      if (a === undefined) return;
       const b = a.filter(v => v !== value);
-      this.#map.set(key, b);
-    }
+      this.#map.set(k, b);
+    });
   }
 
   /**
@@ -91,14 +97,13 @@ export class MutableMapMulti<V> {
    * @returns {(string | undefined)}
    * @memberof MapMulti
    */
-  findKey(value: V): string | undefined {
+  findKeyForValue(value: V): string | undefined {
     const keys = Array.from(this.#map.keys());
-    for (const key of keys) {
+    keys.forEach(key => {
       const a = this.#map.get(key);
-      if (a === undefined) continue;
-
+      if (a === undefined) return;
       if (a.includes(value)) return key;
-    }
+    });
     return undefined;
   }
 
@@ -108,32 +113,35 @@ export class MutableMapMulti<V> {
     return e.length;
   }
 
-  get(key: string): V[] | undefined {
+  get(key: string): readonly V[] | undefined {
     return this.#map.get(key);
   }
 
+  /* eslint-disable-next-line functional/prefer-readonly-type */
   keys(): string[] {
     return Array.from(this.#map.keys());
   }
 
-  keysAndCounts(): [string, number][] {
+  /* eslint-disable-next-line functional/prefer-readonly-type */
+  keysAndCounts(): Array<[string, number]> {
     const keys = this.keys();
-    const r = keys.map(k => [k, this.count(k)]) as [string, number][];
+    /* eslint-disable-next-line functional/prefer-readonly-type */
+    const r = keys.map(k => [k, this.count(k)]) as Array<[string, number]>;
     return r;
   }
 
-  merge(other: MapMulti<V>) {
+  merge(other: MutableMapMulti<V>) {
     const keys = other.keys();
-    for (const key of keys) {
+    keys.forEach(key => {
       const data = other.get(key);
       if (data !== undefined) this.addKeyedValues(key, ...data);
-    }
+    });
   }
 }
 
-export const sortByAlpha = <V>(map: MapMulti<V>): string[] =>  map.keys().sort();
+export const sortByAlpha = <V>(map: MutableMapMulti<V>): readonly string[] => map.keys().sort();
 
-export const sortBySize = <V>(map: MapMulti<V>): string[] => {
+export const sortBySize = <V>(map: MutableMapMulti<V>): readonly string[] => {
   const t = map.keysAndCounts();
   t.sort((aR, bR) => {
     const a = aR[1];

@@ -49,3 +49,9 @@ Test coverage report:
 ```
 npm run test:coverage
 ```
+
+# Coding conventions
+
+* Function names are in camel case (`thisIsAFunction`)
+* Class names in Pascal case (`ThisIsAClass`);
+* eslint rules enforce most other things

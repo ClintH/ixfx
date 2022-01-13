@@ -16,61 +16,57 @@ export enum OverflowPolicy {
 }
 
 export type StackOpts = {
-  debug?:boolean
-  capacity?: number
-  overflowPolicy?: OverflowPolicy
+  readonly debug?:boolean
+  readonly capacity?: number
+  readonly overflowPolicy?: OverflowPolicy
 }
 
+const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
+  const potentialLength = stack.length + toAdd.length;
+  const policy = opts.overflowPolicy ?? OverflowPolicy.DiscardAdditions;
+  const capacity = opts.capacity ?? potentialLength;
+  const toRemove = potentialLength - capacity;
+  if (opts.debug) console.log(`Stack.push: stackLen: ${stack.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
+
+  switch (policy) {
+  case OverflowPolicy.DiscardAdditions:
+    if (opts.debug) console.log(`Stack.push:DiscardAdditions: stackLen: ${stack.length} slice: ${potentialLength-capacity} toAddLen: ${toAdd.length}`);
+    if (stack.length === opts.capacity) {
+      return stack; // Completely full
+    } else {
+      // Only add some from the new array
+      return [...stack, ...toAdd.slice(0, toAdd.length-toRemove)];
+    }
+  case OverflowPolicy.DiscardNewer:
+    if (toRemove >= stack.length) {
+      // New items will completely flush out old
+      return toAdd.slice(Math.max(0, toAdd.length-capacity), Math.min(toAdd.length, capacity)+1);
+    } else {
+      // Keep some of the old (from 0)
+      if (opts.debug) console.log(` from orig: ${stack.slice(0, toRemove-1)}`);
+      return [...stack.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, capacity-toRemove+1))];    
+    }
+  case OverflowPolicy.DiscardOlder:
+    // Oldest item in stack is position 0
+    return [...stack, ...toAdd].slice(toRemove);
+  default:
+    throw new Error(`Unknown overflow policy ${policy}`);
+  }
+};
+
 // Add to top (last index)
-const push = <V>(opts: StackOpts, stack: V[], ...toAdd: V[]): V[] => {
+const push = <V>(opts: StackOpts, stack: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
   // If stack is A, B and toAdd is C, D this yields A, B, C, D
   //const mutated = [...stack, ...toAdd];
   const potentialLength = stack.length + toAdd.length;
 
-  if (opts.capacity && potentialLength > opts.capacity) {
-    const policy = opts.overflowPolicy ?? OverflowPolicy.DiscardAdditions;
-    const toRemove = potentialLength - opts.capacity;
-    if (opts.debug) console.log(`Stack.push: stackLen: ${stack.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
-
-    let toReturn:V[] = stack;
-    switch (policy) {
-    case OverflowPolicy.DiscardAdditions:
-      if (opts.debug) console.log(`Stack.push:DiscardAdditions: stackLen: ${stack.length} slice: ${potentialLength-opts.capacity} toAddLen: ${toAdd.length}`);
-      if (stack.length === opts.capacity) {
-        toReturn = stack; // Completely full
-      } else {
-        // Only add some from the new array
-        toReturn = [...stack, ...toAdd.slice(0, toAdd.length-toRemove)];
-      }
-      break;
-    case OverflowPolicy.DiscardNewer:
-      if (toRemove >= stack.length) {
-        // New items will completely flush out old
-        toReturn = toAdd.slice(Math.max(0, toAdd.length-opts.capacity), Math.min(toAdd.length, opts.capacity)+1);
-      } else {
-        // Keep some of the old (from 0)
-        if (opts.debug) console.log(` from orig: ${stack.slice(0, toRemove-1)}`);
-        toReturn = [...stack.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, opts.capacity-toRemove+1))];    
-      }
-      break;
-    case OverflowPolicy.DiscardOlder:
-      // Oldest item in stack is position 0
-      toReturn = [...stack, ...toAdd].slice(toRemove);
-      break;
-    default:
-      throw new Error(`Unknown overflow policy ${policy}`);
-    }
-
-    if (toReturn.length !== opts.capacity) throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity}`);
-    return toReturn;
-
-  } else {
-    return [...stack, ...toAdd];
-  }
+  const overSize = (opts.capacity && potentialLength > opts.capacity);
+  const toReturn  = overSize ? trimStack(opts, stack, toAdd) : [...stack, ...toAdd];
+  return toReturn;
 };
 
 // Remove from top (last index)
-const pop = <V>(opts: StackOpts, stack: V[]): V[] => {
+const pop = <V>(opts: StackOpts, stack: ReadonlyArray<V>): ReadonlyArray<V> => {
   if (stack.length === 0) throw new Error(`Stack is empty`);
   return stack.slice(0, stack.length - 1);
 };
@@ -83,11 +79,11 @@ const pop = <V>(opts: StackOpts, stack: V[]): V[] => {
  * @param {V[]} stack
  * @returns {(V | undefined)}
  */
-const peek = <V>(opts: StackOpts, stack: V[]): V | undefined => stack.at(stack.length - 1);
+const peek = <V>(opts: StackOpts, stack: ReadonlyArray<V>): V | undefined => stack[stack.length - 1];
 
-const isEmpty = <V>(opts: StackOpts, stack: V[]): boolean => stack.length === 0;
+const isEmpty = <V>(opts: StackOpts, stack: ReadonlyArray<V>): boolean => stack.length === 0;
 
-const isFull = <V>(opts: StackOpts, stack: V[]): boolean => {
+const isFull = <V>(opts: StackOpts, stack: ReadonlyArray<V>): boolean => {
   if (opts.capacity) {
     return stack.length >= opts.capacity;
   }
@@ -128,14 +124,15 @@ const isFull = <V>(opts: StackOpts, stack: V[]): boolean => {
  */
 export class Stack<V> {
   readonly opts: StackOpts;
-  readonly data: V[];
+  /* eslint-disable-next-line functional/prefer-readonly-type */
+  readonly data: ReadonlyArray<V>;
 
-  constructor(opts: StackOpts, data: V[]) {
+  constructor(opts: StackOpts, data: ReadonlyArray<V>) {
     this.opts = opts;
     this.data = data;
   }
 
-  push(...toAdd: V[]): Stack<V> {
+  push(...toAdd: ReadonlyArray<V>): Stack<V> {
     return new Stack<V>(this.opts, push(this.opts, this.data, ...toAdd));
   }
 
@@ -167,7 +164,7 @@ export class Stack<V> {
  * @param {...V[]} startingItems
  * @returns {Stack<V>}
  */
-export const stack = <V>(opts: StackOpts = {}, ...startingItems: V[]): Stack<V> => new Stack({...opts}, [...startingItems]);
+export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new Stack({...opts}, [...startingItems]);
 
 
 // -------------------------
@@ -203,15 +200,17 @@ export const stack = <V>(opts: StackOpts = {}, ...startingItems: V[]): Stack<V> 
  * @template V
  */
 class MutableStack<V> {
-  opts: StackOpts;
-  data: V[];
+  readonly opts: StackOpts;
+  /* eslint-disable-next-line functional/prefer-readonly-type */
+  data: ReadonlyArray<V>;
 
-  constructor(opts: StackOpts, data: V[]) {
+  constructor(opts: StackOpts, data: ReadonlyArray<V>) {
     this.opts = opts;
     this.data = data;
   }
 
-  push(...toAdd: V[]): number {
+  push(...toAdd: ReadonlyArray<V>): number {
+    /* eslint-disable-next-line functional/immutable-data */
     this.data = push(this.opts, this.data, ...toAdd);
     return this.data.length;
   }
@@ -247,4 +246,4 @@ class MutableStack<V> {
  * @param {...V[]} startingItems
  * @returns
  */
-export const stackMutable = <V>(opts: StackOpts, ...startingItems: V[]) =>  new MutableStack({...opts}, [...startingItems]);
+export const stackMutable = <V>(opts: StackOpts, ...startingItems: ReadonlyArray<V>) =>  new MutableStack({...opts}, [...startingItems]);

@@ -1,12 +1,12 @@
 /// TODO: NEEDS TESTING
 
 import {MutableMapMulti} from "./collections/MutableMapMulti";
-import { KeyString } from "./util";
+import { ToString } from "./util";
 
 export class MutableHistogram<V> {
   readonly #store:MutableMapMulti<V>;
   
-  constructor(keyString: KeyString<V> | undefined = undefined) {
+  constructor(keyString: ToString<V> | undefined = undefined) {
     this.#store = new MutableMapMulti<V>(keyString);
   }
 

@@ -17,15 +17,56 @@ export enum OverflowPolicy {
 
 
 export type QueueOpts = {
-  debug?:boolean
-  capacity?: number
+  readonly debug?:boolean
+  readonly capacity?: number
   /**
    * Default is DiscardAdditions, meaning new items are discarded
    *
    * @type {OverflowPolicy}
    */
-  overflowPolicy?: OverflowPolicy
+  readonly overflowPolicy?: OverflowPolicy
 }
+
+const debug = (opts: QueueOpts, msg:string):void => {
+  /* eslint-disable-next-line functional/no-expression-statement */
+  opts.debug ? console.log(`queue:${msg}`) : null;
+};
+
+const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
+  const potentialLength = queue.length + toAdd.length;
+  const capacity = opts.capacity ?? potentialLength;
+  const toRemove = potentialLength - capacity;
+  const policy = opts.overflowPolicy ?? OverflowPolicy.DiscardAdditions;
+  debug(opts, `queueLen: ${queue.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
+ 
+  switch (policy) {
+  // Only add what we can from toAdd
+  case OverflowPolicy.DiscardAdditions:
+    debug(opts, `enqueue:DiscardAdditions: queueLen: ${queue.length} slice: ${potentialLength-capacity} toAddLen: ${toAdd.length}`);
+    if (queue.length === opts.capacity) {
+      return queue; // Completely full
+    } else {
+      // Only add some from the new array (from the front)  
+      return [...queue, ...toAdd.slice(0, toRemove-1)];
+    }
+  // Remove from rear of queue (last index) before adding new things
+  case OverflowPolicy.DiscardNewer:
+    if (toRemove >= queue.length) {
+      // New items will completely flush out old
+      return toAdd.slice(Math.max(0, toAdd.length-capacity), Math.min(toAdd.length, capacity)+1);
+    } else {
+      // Keep some of the old
+      debug(opts, ` from orig: ${queue.slice(0, toRemove-1)}`);
+      return [...queue.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, capacity-toRemove+1))];    
+    }
+  // Remove from the front of the queue (0 index). ie. older items are discarded
+  case OverflowPolicy.DiscardOlder:
+    // If queue is A, B and toAdd is C, D this yields A, B, C, D
+    return [...queue, ...toAdd].slice(toRemove);
+  default:
+    throw new Error(`Unknown overflow policy ${policy}`);
+  }
+};
 
 /**
  * Adds to the back of the queue (last array index)
@@ -36,55 +77,17 @@ export type QueueOpts = {
  * @param {...V[]} toAdd
  * @returns {V[]}
  */
-const enqueue = <V>(opts: QueueOpts, queue: V[], ...toAdd: V[]): V[] => {
+const enqueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
   const potentialLength = queue.length + toAdd.length;
-  if (opts.capacity && potentialLength > opts.capacity) {
-    const toRemove = potentialLength - opts.capacity;
-    const policy = opts.overflowPolicy ?? OverflowPolicy.DiscardAdditions;
-    if (opts.debug) console.log(`enqueue: queueLen: ${queue.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
-    let toReturn:V[];
+  const overSize = opts.capacity && potentialLength > opts.capacity;
 
-    switch (policy) {
-    // Only add what we can from toAdd
-    case OverflowPolicy.DiscardAdditions:
-      if (opts.debug) console.log(`enqueue:DiscardAdditions: queueLen: ${queue.length} slice: ${potentialLength-opts.capacity} toAddLen: ${toAdd.length}`);
-      if (queue.length === opts.capacity) {
-        toReturn = queue; // Completely full
-      } else {
-        // Only add some from the new array (from the front)  
-        toReturn = [...queue, ...toAdd.slice(0, toRemove-1)];
-        //return [...queue, ...toAdd.slice(0, potentialLength-toAdd.length)];
-      }
-      break;
-    // Remove from rear of queue (last index) before adding new things
-    case OverflowPolicy.DiscardNewer:
-      if (toRemove >= queue.length) {
-        // New items will completely flush out old
-        toReturn = toAdd.slice(Math.max(0, toAdd.length-opts.capacity), Math.min(toAdd.length, opts.capacity)+1);
-      } else {
-        // Keep some of the old
-        if (opts.debug) console.log(` from orig: ${queue.slice(0, toRemove-1)}`);
-        toReturn = [...queue.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, opts.capacity-toRemove+1))];    
-      }
-      break;
-    // Remove from the front of the queue (0 index). ie. older items are discarded
-    case OverflowPolicy.DiscardOlder:
-      // If queue is A, B and toAdd is C, D this yields A, B, C, D
-      toReturn = [...queue, ...toAdd].slice(toRemove);
-      break;
-    default:
-      throw new Error(`Unknown overflow policy ${policy}`);
-    }
-
-    if (toReturn.length !== opts.capacity) throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity}`);
-    return toReturn;
-  } else {
-    return [...queue, ...toAdd];
-  }
+  const toReturn = overSize ? trimQueue(opts, queue, toAdd) : [...queue, ...toAdd];
+  if (toReturn.length !== opts.capacity) throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity}`);
+  return toReturn;
 };
 
 // Remove from front of queue (0 index)
-const dequeue = <V>(opts: QueueOpts, queue: V[]): V[] => {
+const dequeue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>): ReadonlyArray<V> => {
   if (queue.length === 0) throw new Error(`Queue is empty`);
   return queue.slice(1);
 };
@@ -97,11 +100,11 @@ const dequeue = <V>(opts: QueueOpts, queue: V[]): V[] => {
  * @param {V[]} queue
  * @returns {(V | undefined)}
  */
-const peek = <V>(opts: QueueOpts, queue: V[]): V | undefined => queue.at(0);
+const peek = <V>(opts: QueueOpts, queue: ReadonlyArray<V>): V | undefined => queue[0];
 
-const isEmpty = <V>(opts: QueueOpts, queue: V[]): boolean => queue.length === 0;
+const isEmpty = <V>(opts: QueueOpts, queue: ReadonlyArray<V>): boolean => queue.length === 0;
 
-const isFull = <V>(opts: QueueOpts, queue: V[]): boolean => {
+const isFull = <V>(opts: QueueOpts, queue: ReadonlyArray<V>): boolean => {
   if (opts.capacity) {
     return queue.length >= opts.capacity;
   }
@@ -113,7 +116,7 @@ const isFull = <V>(opts: QueueOpts, queue: V[]): boolean => {
 // -------------------------------
 class Queue<V> {
   readonly opts: QueueOpts;
-  readonly data: V[];
+  readonly data: ReadonlyArray<V>;
 
   /**
    * Creates an instance of Queue.
@@ -121,12 +124,12 @@ class Queue<V> {
    * @param {V[]} data Initial data. Index 0 is front of queue
    * @memberof Queue
    */
-  constructor(opts: QueueOpts, data: V[]) {
+  constructor(opts: QueueOpts, data: ReadonlyArray<V>) {
     this.opts = opts;
     this.data = data;
   }
 
-  enqueue(...toAdd: V[]): Queue<V> {
+  enqueue(...toAdd: ReadonlyArray<V>): Queue<V> {
     return new Queue<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
   }
 
@@ -166,7 +169,7 @@ class Queue<V> {
  * @param {...V[]} startingItems Index 0 is the front of the queue
  * @returns {Queue<V>} A new queue
  */
-export const queue = <V>(opts: QueueOpts = {}, ...startingItems: V[]): Queue<V> => {
+export const queue = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>): Queue<V> => {
   opts = {...opts}; // Make a copy of options
   return new Queue(opts, [...startingItems]); // Make a copy of array so it can't be modified
 };
@@ -175,21 +178,24 @@ export const queue = <V>(opts: QueueOpts = {}, ...startingItems: V[]): Queue<V> 
 // Mutable
 // -------------------------------
 class MutableQueue<V> {
-  opts: QueueOpts;
-  data: V[];
+  readonly opts: QueueOpts;
+  /* eslint-disable-next-line functional/prefer-readonly-type */
+  data: ReadonlyArray<V>;
 
-  constructor(opts:QueueOpts, data:V[]) {
+  constructor(opts:QueueOpts, data:ReadonlyArray<V>) {
     this.opts = opts;
     this.data = data;
   }
 
-  enqueue(...toAdd: V[]): number {
+  enqueue(...toAdd: ReadonlyArray<V>): number {
+    /* eslint-disable-next-line functional/immutable-data */
     this.data = enqueue(this.opts, this.data, ...toAdd);
     return this.data.length;
   }
 
   dequeue(): V|undefined {
     const v = peek(this.opts, this.data);
+    /* eslint-disable-next-line functional/immutable-data */
     this.data = dequeue(this.opts, this.data);
     return v;
   }
@@ -218,4 +224,4 @@ class MutableQueue<V> {
   }
 }
 
-export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: V[]) => new MutableQueue({...opts}, [...startingItems]);
+export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>) => new MutableQueue({...opts}, [...startingItems]);

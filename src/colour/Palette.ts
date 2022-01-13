@@ -6,9 +6,13 @@
  * @class Palette
  */
 export class Palette {
+  /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #store:Map<string, string> = new Map();
-  default = `rebeccapurple`;
+  readonly finalFallback:string;
 
+  constructor(finalFallback:string = `rebeccapurple`) {
+    this.finalFallback = finalFallback;
+  }
   /**
    * Adds a colour with a given name
    *
@@ -32,15 +36,15 @@ export class Palette {
    * @memberof Palette
    */
   get(key:string):string {
-    let c = this.#store.get(key);
-    if (c === undefined) {
-      const varName = `--` + key;
-      c = getComputedStyle(document.body).getPropertyValue(varName).trim();
-      if (c === undefined) return this.default;
+    const c = this.#store.get(key);
+    if (c !== undefined) return c;
 
-      // Cache CSS variable
-      this.add(varName, c);
-    }
-    return c;
+    const varName = `--` + key;
+    const fromCss = getComputedStyle(document.body).getPropertyValue(varName).trim();
+    if (fromCss === undefined) return this.finalFallback;
+
+    // Cache CSS variable
+    this.add(varName, fromCss);
+    return fromCss;
   }
 }

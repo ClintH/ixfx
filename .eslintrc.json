@@ -5,17 +5,41 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
+        "plugin:functional/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": 2021,
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "functional"
     ],
     "rules": {
+        "functional/functional-parameters": [
+            "off"
+        ],
+        "functional/no-this-expression": [
+            "off"
+        ],
+        "functional/no-conditional-statement": [
+            "off"
+        ],
+        "functional/no-throw-statement": [
+            "off"
+        ],
+        "functional/no-class": [
+            "off"
+        ],
+        "functional/no-expression-statement": [
+            "off"
+        ],
+        "functional/no-return-void": [
+            "off"
+        ],
         "no-undef-init": [
             "error"
         ],
@@ -61,6 +85,44 @@
             "error",
             {
                 "properties": "always"
+            }
+        ],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": [
+                    "variableLike",
+                    "function"
+                ],
+                "format": [
+                    "camelCase"
+                ]
+            },
+            {
+                "selector": [
+                    "typeLike",
+                    "class"
+                ],
+                "format": [
+                    "PascalCase"
+                ]
+            },
+            {
+                "selector": "variable",
+                "types": [
+                    "boolean"
+                ],
+                "format": [
+                    "PascalCase"
+                ],
+                "prefix": [
+                    "is",
+                    "should",
+                    "has",
+                    "can",
+                    "did",
+                    "will"
+                ]
             }
         ],
         "curly": [

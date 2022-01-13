@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {StateMachine} from '../StateMachine.js';
 
 const createAdsr = () => ({

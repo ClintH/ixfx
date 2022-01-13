@@ -1,9 +1,9 @@
 /// ✔ Unit tested!
 
-import { KeyString } from "./util.js";
+import { ToString } from "./util.js";
 import {SimpleEventEmitter} from "./Events.js";
 type MutableFreqHistogramEventMap = {
-  change:void;
+  readonly change:void;
 }
 /**
  * Mutable Frequency Histogram
@@ -37,9 +37,9 @@ type MutableFreqHistogramEventMap = {
  */
 export class MutableFreqHistogram<V> extends SimpleEventEmitter<MutableFreqHistogramEventMap> {
   readonly #store:Map<string, number>;
-  readonly #keyString: KeyString<V>;
+  readonly #keyString: ToString<V>;
 
-  constructor(keyString: KeyString<V> | undefined = undefined) {
+  constructor(keyString: ToString<V> | undefined = undefined) {
     super();
     this.#store = new Map();
 
