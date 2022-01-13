@@ -1,13 +1,12 @@
 /// <reference types="jest-extended" />
 
 /* eslint-disable */
-import {KeyValue, sortByKey, sortByValueNumber, sortByValueString} from '../KeyValue.js';
+import {KeyValue} from '../KeyValue.js';
 import {MutableFreqHistogram} from '../MutableFreqHistogram.js';
 import {shuffle} from '../util.js';
 import {jest} from '@jest/globals';
 
-test(`sorting`, () => {
-  
+test(`sorting`, () => {  
   const a: KeyValue[] = [
     [`apple`, 10],
     [`orange`, 2],
