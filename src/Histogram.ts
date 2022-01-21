@@ -1,20 +1,20 @@
 /// TODO: NEEDS TESTING
 
-import {MutableMapMulti} from "./collections/MutableMapMulti";
+import { mutableMapArray } from "./collections/MutableMap";
 import { ToString } from "./util";
 
 export class MutableHistogram<V> {
-  readonly #store:MutableMapMulti<V>;
+  readonly #store;
   
-  constructor(keyString: ToString<V> | undefined = undefined) {
-    this.#store = new MutableMapMulti<V>(keyString);
+  constructor(groupBy: ToString<V> | undefined = undefined) {
+    this.#store = mutableMapArray<V>({groupBy});
   }
 
   #addSingle(v:V) {
-    this.#store.add(v);
+    this.#store.addValue(v);
   }
 
-  add(...v: V[]) {
+  add(...v: readonly V[]) {
     v.forEach(this.#addSingle);
   }
 
@@ -27,11 +27,11 @@ export class MutableHistogram<V> {
   }
 
   delete(v: V) {
-    this.#store.delete(v);   
+    this.#store.deleteDeep(v);   
   }
 
-  has(v: V): boolean {
-    return this.#store.has(v);
-  }
+  // has(v: V): boolean {
+  //   return this.#store.hasKeyValue(v);
+  // }
 
 }

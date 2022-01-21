@@ -1,4 +1,5 @@
 import * as Sets from '../../collections/Set';
+import {jest} from '@jest/globals';
 
 test(`mutableValueSet`, () => {
   const barry = {name: `Barry`, city: `London`};
@@ -13,7 +14,7 @@ test(`mutableValueSet`, () => {
     {name: `Sally`, city: `Bristol`}
   ];
 
-  type Person = { name:string, city: string }
+  type Person = { readonly name: string, readonly city: string }
 
   // Test default JSON
   const set = new Sets.MutableValueSet();

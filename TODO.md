@@ -2,7 +2,7 @@
 
 ## Tests
 
-MutableMapMulti
+mutableMapSet
 
 ## Demos
 * Curves - SVG: cubic, bend, compound

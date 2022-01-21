@@ -1,4 +1,5 @@
 // ✔ UNIT TESTED
+
 import { ToString } from "../util";
 import {SimpleEventEmitter} from "../Events";
 
@@ -89,9 +90,9 @@ export class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventM
   }
 
   delete(v: V): boolean {
-    const deleted = this.store.delete(this.keyString(v));
-    if (deleted) super.fireEvent(`delete`, v);
-    return deleted;
+    const isDeleted = this.store.delete(this.keyString(v));
+    if (isDeleted) super.fireEvent(`delete`, v);
+    return isDeleted;
   }
 
   has(v: V): boolean {

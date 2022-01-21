@@ -99,7 +99,10 @@ export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve
 export type ToString<V> = (itemToMakeStringFor: V) => string;
 export type IsEqual<V> = (a:V, b:V) => boolean;
 
-export const isEqualDefault = <V>(a:V, b:V):boolean => {
+
+export const isEqualDefault = <V>(a:V, b:V):boolean => a === b;
+
+export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
   // ✔ UNIT TESTED
   if (a === b) return true; // Object references are the same, or string values are the same
   return toStringDefault(a) === toStringDefault(b); // String representations are the same

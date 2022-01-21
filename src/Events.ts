@@ -1,4 +1,4 @@
-import {MutableMapMulti} from "./collections/MutableMapMulti.js";
+
 
 // interface WindowEventMap extends GlobalEventHandlersEventMap, WindowEventHandlersEventMap {
 //   "devicemotion": DeviceMotionEvent;
@@ -42,21 +42,22 @@ import {MutableMapMulti} from "./collections/MutableMapMulti.js";
 //type ValidStates<M extends Machine> = keyof M;
 //type ValidEventArgs<K extends keyof Events, Events> = Events[K];
 
-export type Listener<Events> = (ev: any, sender: SimpleEventEmitter<Events>) => void;
+export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>) => void;
 
 export class SimpleEventEmitter<Events> {
-  #listeners = new MutableMapMulti<Listener<Events>>();
+  readonly #listeners = new SimpleMutableMapArray<Listener<Events>>();
 
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
     const listeners = this.#listeners.get(type as string);
     if (listeners === undefined) return;
-    for (const l of listeners) {
+    listeners.forEach(l => {
+      // eslint-disable-next-line functional/no-try-statement
       try {
         l(args, this);
       } catch (err) {
         console.debug(`Event listener error: `, err);
       }
-    }
+    });
   }
 
   /**
@@ -68,7 +69,7 @@ export class SimpleEventEmitter<Events> {
    * @memberof SimpleEventEmitter
    */
   addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void { // (this: any, ev: Events[K]) => any): void {
-    this.#listeners.addKeyedValues(type as string, listener);
+    this.#listeners.add(type as string, listener as Listener<Events>);
   }
   //addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
 
@@ -79,7 +80,7 @@ export class SimpleEventEmitter<Events> {
    * @memberof SimpleEventEmitter
    */
   removeEventListener<K extends keyof Events>(type: K, listener: Listener<Events>): void {
-    this.#listeners.deleteKeyedValue(type as string, listener);
+    this.#listeners.delete(type as string, listener);
   }
 
   /**
@@ -92,27 +93,26 @@ export class SimpleEventEmitter<Events> {
   }
 }
 
-type TestEventMap = {
-  change: TestEvent
-  other: TestEvent2;
-}
+// type TestEventMap = {
+//   readonly change: TestEvent
+//   readonly other: TestEvent2;
+// }
 
-interface TestEvent2 {
-  something: string;
-}
-interface TestEvent {
-  blah: boolean;
-}
+// interface TestEvent2 {
+//   readonly something: string;
+// }
+// interface TestEvent {
+//   readonly blah: boolean;
+// }
 
-class TestEmitter extends SimpleEventEmitter<TestEventMap> {
-
-  constructor() {
-    super();
-    this.addEventListener(`change`, (e) => {
-      e.blah;
-    });
-  }
-}
+// class TestEmitter extends SimpleEventEmitter<TestEventMap> {
+//   constructor() {
+//     super();
+//     this.addEventListener(`change`, (e) => {
+//       e.blah;
+//     });
+//   }
+// }
 
 /*
 export class Event {
@@ -158,3 +158,52 @@ export interface WebSocketEventListenerMap {
   open: (event: Event) => void | {handleEvent: (event: Event) => void};
 }
 */
+
+/**
+ * A simple mutable map of arrays, without events
+ *
+ * @export
+ * @class SimpleMutableMapArray
+ * @template V
+ */
+export class SimpleMutableMapArray<V> {
+  /* eslint-disable-next-line functional/prefer-readonly-type */
+  readonly #map: Map<string, ReadonlyArray<V>> = new Map();
+ 
+  add(key:string, ...values:ReadonlyArray<V>) {
+    const existing = this.#map.get(key);
+    if (existing === undefined) {
+      this.#map.set(key, values);
+    } else {
+      this.#map.set(key, [...existing, ...values]);
+    }
+  }
+
+  debugString(): string {
+    // eslint-disable-next-line functional/no-let
+    let r = ``;
+    const keys = Array.from(this.#map.keys());
+    keys.every(k => {
+      const v = this.#map.get(k);
+      if (v === undefined) return;
+      r += k + ` (${v.length}) = ${JSON.stringify(v)}\r\n`;
+    });
+    return r;
+  }
+
+  get(key:string):ReadonlyArray<V>|undefined {
+    return this.#map.get(key);
+  }
+
+  delete(key:string, v:V):boolean {
+    const existing = this.#map.get(key);
+    if (existing === undefined) return false;
+    const without = existing.filter(i => i !== v);
+    this.#map.set(key, without);
+    return without.length < existing.length;
+  }
+
+  clear() {
+    this.#map.clear();
+  }
+}

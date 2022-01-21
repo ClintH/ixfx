@@ -7,7 +7,7 @@ import { reverse as reverseOrd, contramap } from 'fp-ts/Ord';
 /// ✔ Sorting functions are unit tested
 
 type Primitive = string | number;
-export type KeyValue = [key: string, value: Primitive];
+export type KeyValue = readonly [key: string, value: Primitive];
 
 const byKey = (reverse:boolean = false) => pipe(
   reverse ? reverseOrd(S.Ord) : S.Ord, 
@@ -28,4 +28,4 @@ export const sortByKey = (reverse:boolean = false) => sort<KeyValue>(byKey(rever
 export const sortByValueString = (reverse:boolean = false) => sort<KeyValue>(byValueString(reverse));
 export const sortByValueNumber = (reverse:boolean = false) => sort<KeyValue>(byValueNumber(reverse));
 
-export type sortingFn = (data:KeyValue[]) => KeyValue[];
+export type SortingFn = (data:ReadonlyArray<KeyValue>) => readonly KeyValue[];
