@@ -3,7 +3,7 @@ import * as Drawing from '../../src/visualisation/Drawing';
 import * as MathUtil from '../../src/geometry/Math';
 import {checkbox} from '../../src/dom/Forms';
 import {SVG} from '@svgdotjs/svg.js';
-import {pingPongPercent} from '../../src/Producers';
+import {pingPongPercent} from '../../src/Generators';
 import * as Palette from '../../src/colour/Palette';
 
 // Drawing properties

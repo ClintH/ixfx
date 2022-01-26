@@ -1,5 +1,5 @@
-import { HistogramVis } from '~/dom/Histogram.js';
-import * as KeyValueUtil from '~/KeyValue.js';
+import { HistogramVis } from '../dom/Histogram.js';
+import * as KeyValueUtil from '../KeyValue.js';
 
 /**
  * Creates and drives a HistogramVis instance.
@@ -25,8 +25,10 @@ import * as KeyValueUtil from '~/KeyValue.js';
  */
 export class FrequencyHistogramPlot {
   readonly parentEl:HTMLElement;
+  // eslint-disable-next-line functional/prefer-readonly-type
   el:HistogramVis|undefined;
-  #sorter:KeyValueUtil.sortingFn|undefined;
+  // eslint-disable-next-line functional/prefer-readonly-type
+  #sorter:KeyValueUtil.SortingFn|undefined;
 
   constructor(parentEl: HTMLElement) {
     console.log(`FreqHistoPlot`);
@@ -37,15 +39,19 @@ export class FrequencyHistogramPlot {
   setAutoSort(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):void {
     switch (sortStyle) {
     case `value`:
+      // eslint-disable-next-line functional/immutable-data
       this.#sorter = KeyValueUtil.sortByValueNumber(false);
       break;
     case `valueReverse`:
+      // eslint-disable-next-line functional/immutable-data
       this.#sorter = KeyValueUtil.sortByValueNumber(true);
       break;
     case `key`:
+      // eslint-disable-next-line functional/immutable-data
       this.#sorter = KeyValueUtil.sortByKey(false);
       break;
     case `keyReverse`:
+      // eslint-disable-next-line functional/immutable-data
       this.#sorter = KeyValueUtil.sortByKey(true);
       break;
     default:
@@ -55,11 +61,13 @@ export class FrequencyHistogramPlot {
 
   clear() {
     if (this.el === undefined) return;
+    // eslint-disable-next-line functional/immutable-data
     this.el.data = [];
   }
 
   init() {
     if (this.el !== undefined) return; // already inited
+    // eslint-disable-next-line functional/immutable-data
     this.el = document.createElement(`histogram-vis`);
     this.parentEl.appendChild(this.el);
   }
@@ -70,11 +78,13 @@ export class FrequencyHistogramPlot {
     el.remove();
   }
 
-  update(data:[key:string, count:number][]) {
+  update(data:ReadonlyArray<readonly [key:string, count:number]>) {
     if (this.el === undefined) return;
     if (this.#sorter !== undefined) {
-      this.el.data = this.#sorter(data); // makes a copy
+      // eslint-disable-next-line functional/immutable-data, functional/prefer-readonly-type
+      this.el.data = this.#sorter(data as KeyValueUtil.KeyValue[]);
     } else {
+      // eslint-disable-next-line functional/immutable-data
       this.el.data  = [...data];
     }
   }

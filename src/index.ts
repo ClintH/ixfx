@@ -28,11 +28,11 @@ import * as Sets from './collections/Set.js';
 export {Sets};
 
 
-import * as Producers from './Producers.js';
+import * as Producers from './Generators.js';
 export {Producers};
 
-import * as Series from './Series.js';
-export {Series};
+// import * as Series from './Series.js';
+// export {Series};
 
 import { FrequencyHistogramPlot } from './visualisation/FrequencyHistogramPlot.js';
 export {FrequencyHistogramPlot};

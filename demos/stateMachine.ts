@@ -4,7 +4,7 @@ import {demoRun} from './demos.js';
 import {checkbox, button, select} from '../src/dom/Forms.js';
 
 import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '../src/StateMachine.js';
-import {AutoSort, FrequencyHistogramPlot} from '../src/visualisation/FrequencyHistogramPlot';
+import { FrequencyHistogramPlot} from '../src/visualisation/FrequencyHistogramPlot';
 
 const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
 
@@ -31,18 +31,18 @@ const demoMachines = {
 const btnChangeState = document.getElementById(`btnChangeState`) as HTMLButtonElement;
 const txtDescr = document.getElementById(`jsonDescr`);
 const txtCurrentState = document.getElementById(`txtCurrentState`) as HTMLInputElement;
-const chkIsDone = checkbox(`chkIsDone`);
-const selInitialStates = select(`selDescrInitial`);
-const selPossibleNext = select(`selPossibleNext`, undefined, { placeholderOpt: `-- Auto --`, autoSelectAfterChoice:0 });
+const chkIsDone = checkbox(`#chkIsDone`);
+const selInitialStates = select(`#selDescrInitial`);
+const selPossibleNext = select(`#selPossibleNext`, undefined, { placeholderOpt: `-- Auto --`, autoSelectAfterChoice:0 });
 
-const selDemoMachines = select(`selDemoMachines`, (newVal:string) => {
+const selDemoMachines = select(`#selDemoMachines`, (newVal:string) => {
   let md = demoMachines[newVal];
   txtDescr.innerText = JSON.stringify(md.description, undefined, 2);
   selInitialStates.setOpts(Object.keys(md.description), md.initialState);
 }, { placeholderChoose:true, autoSelectAfterChoice:0 });
 selDemoMachines.setOpts(Object.keys(demoMachines));
 
-const btnSetDescr = button(`btnSetDescr`, () => {
+const btnSetDescr = button(`#btnSetDescr`, () => {
   try {
     const description = JSON.parse(txtDescr.innerText);
     const initial = selInitialStates.value;

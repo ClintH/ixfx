@@ -6,7 +6,7 @@ import * as Compound from '../../src/geometry/CompoundPath';
 // /// <reference path="../../public/lib/svg.3.1.1.d.ts"/>
 // import * as Svgjs from '../../public/lib/svg.esm';
 import {SVG, Svg} from '@svgdotjs/svg.js';
-import {pingPongPercent} from '../../src/Producers';
+import {pingPongPercent} from '../../src/Generators';
 import * as Palette from '../../src/colour/Palette';
 
 // Drawing properties

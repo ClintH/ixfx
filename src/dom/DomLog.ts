@@ -1,19 +1,20 @@
+import {resolveEl} from "./Forms";
 import {addShadowCss} from "./ShadowDom";
 
 export type DomLogOpts = {
-  truncateEntries?: number,
-  timestamp?: boolean,
-  collapseDuplicates?:boolean,
-  monospaced?:boolean
+  readonly truncateEntries?: number,
+  readonly timestamp?: boolean,
+  readonly collapseDuplicates?:boolean,
+  readonly monospaced?:boolean
 }
 
-export type DomLog = {
+export type DomLog = Readonly<{
   clear():void
   error(msgOrError:string|Error):void
   log(msg?:string):void
   append(el:HTMLElement):void
   dispose():void
-}
+}>
 
 /**
  * Allows writing to a DOM element in console.log style. Element grows in size, so use
@@ -37,30 +38,41 @@ export type DomLog = {
  * @param {DomLogOpts} opts
  * @returns {DomLog}
  */
-export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpts = {}):DomLog => {
+export const domLog = (elOrId: HTMLElement | string, opts: DomLogOpts = {}):DomLog => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const {truncateEntries = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
 
-  const empty = {
-    log: (_: string) => { /* no-op */ },
-    clear: () => { /* no-op */ },
-    dispose: () => { /* no-op */ },
-    error: (_:string|Error) => { /* no-op */ },
-    append: (_:HTMLElement) => { /* no-op */ }
-  };
+  // const empty = {
+  //   log: (_: string) => { /* no-op */ },
+  //   clear: () => { /* no-op */ },
+  //   dispose: () => { /* no-op */ },
+  //   error: (_:string|Error) => { /* no-op */ },
+  //   append: (_:HTMLElement) => { /* no-op */ }
+  // };
 
-  let parentEl:HTMLElement;
+  // eslint-disable-next-line functional/no-let
   let added = 0;
+  // eslint-disable-next-line functional/no-let
   let lastLog:string|undefined;
+  // eslint-disable-next-line functional/no-let
   let lastLogRepeats = 0;
 
-  if (typeof elOrId === `string`) {
-    const sought = document.getElementById(elOrId);
-    if (sought === null) return empty;
-    parentEl = sought;
-  } else if (elOrId !== undefined) {
-    parentEl = elOrId;
-  } else return empty;
-  
+  const parentEl = resolveEl<HTMLElement>(elOrId);
+
+  // if (typeof elOrId === `string`) {
+  //   const sought = document.getElementById(elOrId);
+  //   if (sought === null) {
+  //     console.warn(`domLog element id not found ${elOrId}`);
+  //     return empty;
+  //   }
+  //   parentEl = sought;
+  // } else if (elOrId !== undefined) {
+  //   parentEl = elOrId;
+  // } else {
+  //   console.warn(`domLog element not found`);
+  //   return empty;
+  // }
+
   const fontFamily = monospaced ? `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", Monaco, "Courier New", Courier, monospace` : `normal`;
   const shadowRoot = addShadowCss(parentEl, `
   .log {
@@ -78,7 +90,7 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
     display: flex;
   }
   .line:hover {
-    background-color: var(--primary-focus, whitesmoke);
+    background-color: var(--theme-bg-hover, whitesmoke);
   }
   .error {
     color: red;
@@ -99,18 +111,22 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
   `);
   
   const el = document.createElement(`div`);
+  // eslint-disable-next-line functional/immutable-data
   el.className = `log`;
   shadowRoot.append(el);
 
   const error = (msgOrError: string | Error) => {
     const line = document.createElement(`div`);
     if (typeof msgOrError === `string`) {
+      // eslint-disable-next-line functional/immutable-data
       line.innerHTML = msgOrError;
     } else {
       const stack = msgOrError.stack;
       if (stack === undefined) {
+        // eslint-disable-next-line functional/immutable-data
         line.innerHTML = msgOrError.toString();
       } else {
+        // eslint-disable-next-line functional/immutable-data
         line.innerHTML = stack.toString();
       }
     }
@@ -121,6 +137,7 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
   };
 
   const log = (whatToLog: unknown = ``) => {
+    // eslint-disable-next-line functional/no-let
     let msg:string|undefined;
     if (typeof whatToLog === `object`) {
       msg = JSON.stringify(whatToLog);
@@ -140,17 +157,21 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
       append(rule);
     } else if (msg === lastLog && collapseDuplicates) {
       const lastEl = el.firstElementChild as HTMLElement;
+      // eslint-disable-next-line functional/no-let
       let lastBadge = lastEl.querySelector(`.badge`);
       if (lastBadge === null) {
         lastBadge = document.createElement(`div`);
+        // eslint-disable-next-line functional/immutable-data
         lastBadge.className = `badge`;
         lastEl.insertAdjacentElement(`beforeend`, lastBadge);
       }
       if (lastEl !== null) {
+        // eslint-disable-next-line functional/immutable-data
         lastBadge.textContent = (++lastLogRepeats).toString();
       }
     } else {
       const line = document.createElement(`div`);
+      // eslint-disable-next-line functional/immutable-data
       line.innerHTML = msg;
       append(line);
       lastLog = msg;
@@ -161,8 +182,9 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
     if (timestamp) {
       const wrapper = document.createElement(`div`);
       const timestamp = document.createElement(`div`);
+      // eslint-disable-next-line functional/immutable-data
       timestamp.className = `timestamp`;
-
+      // eslint-disable-next-line functional/immutable-data
       timestamp.innerText = new Date().toLocaleTimeString();
       wrapper.append(timestamp, line);
       line.classList.add(`msg`);
@@ -174,6 +196,7 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
     el.insertBefore(line, el.firstChild);
 
     if (truncateEntries > 0 && (++added > truncateEntries * 2)) {
+      // eslint-disable-next-line functional/no-loop-statement
       while (added > truncateEntries) {
         el.lastChild?.remove();
         added--;
@@ -183,6 +206,7 @@ export const domLog = (elOrId: HTMLElement | string | undefined, opts: DomLogOpt
   };
 
   const clear = () => {
+    // eslint-disable-next-line functional/immutable-data
     el.innerHTML = ``;
     lastLog = undefined;
     lastLogRepeats = 0;

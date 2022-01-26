@@ -16,7 +16,7 @@ export enum OverflowPolicy {
 }
 
 
-export type QueueOpts = {
+export interface QueueOpts  {
   readonly debug?:boolean
   readonly capacity?: number
   /**
@@ -78,11 +78,15 @@ const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyA
  * @returns {V[]}
  */
 const enqueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
+  if (opts === undefined) throw new Error(`opts parameter undefined`);
+
   const potentialLength = queue.length + toAdd.length;
   const overSize = opts.capacity && potentialLength > opts.capacity;
 
   const toReturn = overSize ? trimQueue(opts, queue, toAdd) : [...queue, ...toAdd];
-  if (toReturn.length !== opts.capacity) throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity}`);
+  if (opts.capacity && toReturn.length !== opts.capacity && overSize) throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity} opts: ${JSON.stringify(opts)}`);
+  if (!opts.capacity && toReturn.length !== potentialLength) throw new Error(`Bug! Return length not expected. Return len: ${toReturn.length} expected: ${potentialLength} opts: ${JSON.stringify(opts)}`);
+  
   return toReturn;
 };
 
@@ -125,6 +129,8 @@ class Queue<V> {
    * @memberof Queue
    */
   constructor(opts: QueueOpts, data: ReadonlyArray<V>) {
+    if (opts === undefined) throw new Error(`opts parameter undefined`);
+
     this.opts = opts;
     this.data = data;
   }
@@ -164,6 +170,12 @@ class Queue<V> {
 /**
  * Returns an immutable queue
  *
+ * ```usage
+ * let q = queue();           // Create
+ * q = q.enqueue(`a`, `b`);   // Add two strings
+ * const front = q.peek();    // `a` is at the front of queue (oldest)
+ * q = q.dequeue();           // q now just consists of `b`  
+ * ```
  * @template V
  * @param {QueueOpts} [opts={}] Options
  * @param {...V[]} startingItems Index 0 is the front of the queue
@@ -179,10 +191,11 @@ export const queue = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V
 // -------------------------------
 class MutableQueue<V> {
   readonly opts: QueueOpts;
-  /* eslint-disable-next-line functional/prefer-readonly-type */
+  // eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V>;
 
   constructor(opts:QueueOpts, data:ReadonlyArray<V>) {
+    if (opts === undefined) throw new Error(`opts parameter undefined`);
     this.opts = opts;
     this.data = data;
   }
@@ -224,4 +237,17 @@ class MutableQueue<V> {
   }
 }
 
+/**
+ * Returns a mutable queue
+ * 
+ * ```usage
+ * const q = queue();       // Create
+ * q.enqueue(`a`, `b`);     // Add two strings
+ * const front = q.dequeue();  // `a` is at the front of queue (oldest)
+ * ```
+ *
+ * @template V
+ * @param {QueueOpts} [opts={}]
+ * @param {...ReadonlyArray<V>} startingItems
+ */
 export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>) => new MutableQueue({...opts}, [...startingItems]);

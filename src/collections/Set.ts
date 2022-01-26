@@ -9,6 +9,16 @@ type MutableValueSetEventMap<V> = {
   readonly delete: V
 }
 
+export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFunc: ToString<V>, ...values:readonly V[]) => {
+  const s = set === undefined ? new Map() : new Map(set);
+  values.forEach(v => {
+    const vStr = hashFunc(v);
+    if (s.has(vStr)) return;
+    s.set(vStr, v);
+  });
+  return s;
+};
+
 /**
  * A mutable set that stores unique items by their value, rather
  * than object reference.
@@ -48,11 +58,12 @@ type MutableValueSetEventMap<V> = {
  *  console.log(`New item added: ${newItem}`);
  * });
  * ```
+ * 
  * @export
  * @class MutableValueSet
  * @template V
  */
-export class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
+export class MutableStringSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
   // ✔ UNIT TESTED
   /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();
@@ -60,6 +71,7 @@ export class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventM
 
   constructor(keyString: ToString<V> | undefined = undefined) {
     super();
+    
     if (keyString === undefined) {
       keyString = (a) => {
         if (typeof a === `string`) { 

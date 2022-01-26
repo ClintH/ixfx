@@ -1,306 +1,286 @@
-import {dadsr} from './DadsrEnvelope.js';
+/* eslint-disable */
+import {SimpleEventEmitter} from "../Events.js";
+import {msRelativeTimer, Timer, TimerSource} from "../Timer.js";
+import { StateMachine, fromList as descriptionFromList } from "../StateMachine.js";
+import {Path} from "~/geometry/Path.js";
+import * as Bezier from '../geometry/Bezier.js';
 
-export type DadsrEnvelopeOpts = StageOpts & {
+export const defaultAdsrOpts = ():AdsrOpts => ({
+  attackBend: 0,
+  decayBend: 0,
+  releaseBend: 0,
+  peakLevel: 1,
+  initialLevel: 0,
+  sustainLevel: 0.75,
+  releaseLevel: 0,
+  attackDuration: 100,
+  decayDuration: 200,
+  releaseDuration: 500
+});
 
-  /**
-   * Sustain level from 0-1
-   *
-   * @type {number}
-   */
-  sustainLevel?: number
+export type AdsrOpts = AdsrBaseOpts & {
   /**
    * Attack bezier 'bend'
    *
    * @type {number} Bend from -1 to 1. 0 for a straight line
    */
-  attackBend?: number
+   readonly attackBend?: number
   /**
    * Decay bezier 'bend'
    *
    * @type {number} Bend from -1 to 1. 0 for a straight line
    */
-  decayBend?: number
+   readonly decayBend?: number
   /**
    * Release bezier 'bend'
    *
    * @type {number} Bend from -1 to 1. 0 for a straight line
    */
-  releaseBend?: number
+   readonly releaseBend?: number
+
+   readonly peakLevel?:number
+
+   readonly initialLevel?:number
+ 
+   readonly sustainLevel?:number
+
+   readonly releaseLevel?:number
 }
 
-export {dadsr};
-
-export type StageOpts = {
-  /**
-   * Timing source for envelope
-   *
-   * @type {TimerSource}
-   */
-  timerSource?: TimerSource
+export type AdsrBaseOpts = {
   /**
    * If true, envelope indefinately returns to attack stage after release
    *
    * @type {boolean}
    */
-  looping?: boolean
+  readonly shouldLoop?: boolean
 
   /**
     * Duration for delay stage
     * Unit depends on timer source
     * @type {number}
     */
-  delayDuration?: number,
+  readonly delayDuration?: number,
   /**
    * Duration for attack stage
    * Unit depends on timer source
    * @type {number}
    */
-  attackDuration?: number,
+  readonly attackDuration?: number,
   /**
    * Duration for decay stage
    * Unit depends on timer source
    * @type {number}
    */
-  decayDuration?: number,
+  readonly decayDuration?: number,
   /**
    * Duration for release stage
    * Unit depends on timer source
    * @type {number}
    */
-  releaseDuration?: number
-}
-/**
- * Stage of envelope
- *
- * @export
- * @enum {number}
- */
-export enum Stage {
-  Stopped = 0,
-  Delay = 1,
-  Attack = 2,
-  Decay = 3,
-  Sustain = 4,
-  Release = 5
+  readonly releaseDuration?: number
 }
 
-export type Envelope = {
-  getStage: (stage: Stage) => {duration: number}
-
-  /**
-   * Trigger the envelope, with no hold
-   *
-   */
-  trigger(): void
-
-  /**
-   * Resets the envelope, ready for hold() or trigger()
-   *
-   */
-  reset(): void
-  /**
-   * Triggers the envelope and holds the sustain stage
-   *
-   */
-  hold(): void
-
-  /**
-   * Releases the envelope if held
-   *
-   */
-  release(): void
-
-  /**
-   * Computes the value of the envelope (0-1) and also returns the current stage
-   *
-   * @returns {[Stage, number]}
-   */
-  compute(): [Stage, number]
+export interface StateChangeEvent {
+  readonly newState: string,
+  readonly priorState: string
 }
 
-type Timer = {
-  reset(): void
-  elapsed(): number
+export interface CompleteEvent {
+
 }
 
-type TimerSource = () => Timer;
-/**
- * A timer that uses clock time
- *
- * @returns {Timer}
- */
-export const msRelativeTimer = function (): Timer {
-  let start = performance.now();
-  return {
-    reset: () => {
-      start = performance.now();
-    },
-    elapsed: () => {
-      return (performance.now() - start);
-    }
-  }
-}
+type Events = {
+  readonly change: StateChangeEvent
+  readonly complete: CompleteEvent
+};
 
-/**
- * A timer that progresses with each call
- *
- * @returns {Timer}
- */
-const tickRelativeTimer = function (): Timer {
-  let start = 0;
-  return {
-    reset: () => {
-      start = 0;
-    },
-    elapsed: () => {
-      return start++;
-    }
-  }
-}
-/**
- * Returns a name for a given numerical envelope stage
- *
- * @param {Stage} stage
- * @returns {string} Name of stage
- */
-export const stageToText = function (stage: Stage): string {
-  switch (stage) {
-    case Stage.Delay:
-      return 'Delay';
-    case Stage.Attack:
-      return 'Attack';
-    case Stage.Decay:
-      return 'Decay';
-    case Stage.Release:
-      return 'Release';
-    case Stage.Stopped:
-      return 'Stopped';
-    case Stage.Sustain:
-      return 'Sustain'
-  }
-}
 
-/**
- * Creates an envelope
- *
- * @param {StageOpts} [opts={}] Options
- * @returns {Readonly<Envelope>} Envelope
- */
-export const stages = function (opts: StageOpts = {}): Readonly<Envelope> {
-  const {looping = false} = opts;
-  const {timerSource = msRelativeTimer} = opts;
-  const {delayDuration = 0} = opts;
-  const {attackDuration = 300} = opts;
-  const {decayDuration = 500} = opts;
-  const {releaseDuration = 1000} = opts;
 
-  let stage = Stage.Stopped;
-  let timer: Timer | null = null;
-  let isHeld = false;
+class AdsrBase extends SimpleEventEmitter<Events> {
+  readonly #sm:StateMachine;
+  readonly #timeSource:TimerSource;
+  #timer:Timer|undefined;
 
-  const setStage = (newStage: Stage) => {
-    if (stage == newStage) return;
-    console.log('Envelope stage ' + stageToText(stage) + ' -> ' + stageToText(newStage));
-    stage = newStage;
-    if (stage == Stage.Delay)
-      timer = timerSource();
-    else if (stage == Stage.Release)
-      timer = timerSource();
+  #holding:boolean;
+  #holdingInitial:boolean;
+
+  attackDuration:number;
+  decayDuration:number;
+  releaseDuration:number;
+  decayDurationTotal:number;
+  shouldLoop:boolean;
+
+  constructor(opts:AdsrBaseOpts) {
+    super();
+    
+    this.attackDuration = opts.attackDuration ?? 300;
+    this.decayDuration = opts.decayDuration ?? 500;
+    this.releaseDuration = opts.releaseDuration ?? 1000;
+    this.shouldLoop = opts.shouldLoop ?? false;
+
+    const descr = descriptionFromList(`attack`, `decay`, `sustain`, `release`, `complete`);
+    this.#sm = new StateMachine(`attack`, descr);
+    this.#sm.addEventListener(`change`, (ev => {
+      super.fireEvent(`change`, ev);
+    }));
+    this.#sm.addEventListener(`stop`, (ev => {
+      super.fireEvent(`complete`, ev);
+    }));
+    
+    this.#timeSource = msRelativeTimer;
+    this.#holding = this.#holdingInitial = false;
+
+    this.decayDurationTotal = this.attackDuration + this.decayDuration;
   }
 
-  const getStage = (stage: Stage): {duration: number} => {
-    switch (stage) {
-      case Stage.Attack:
-        return {duration: attackDuration}
-      case Stage.Decay:
-        return {duration: decayDuration}
-      case Stage.Delay:
-        return {duration: delayDuration}
-      case Stage.Release:
-        return {duration: releaseDuration}
-      default:
-        throw Error(`Cannot get unknown stage ${stage}`);
-    }
-  }
+  switchState() {
+    if (this.#timer === undefined) return;
+    let elapsed = this.#timer.elapsed();
 
-  const compute = (): [Stage, number] => {
-    if (stage == Stage.Stopped) return [0, 0];
-    if (timer == null) throw Error('Bug: timer is null');
-
-    if (stage == Stage.Sustain) return [stage, 1];
-
-    let elapsed = timer.elapsed();
-
-    if (stage == Stage.Release) {
-      let relative = elapsed / releaseDuration;
-      if (relative > 1) {
-        if (looping) {
-          // Trigger, even if originally held
-          trigger();
-        } else {
-          setStage(Stage.Stopped);
+    // Change through states for as long as needed
+    let changed = false;
+    do {
+      changed = false;
+      switch (this.#sm.state) {
+      case `attack`:
+        if (elapsed > this.attackDuration) {
+          this.#sm.next();
+          changed = true;
         }
-        return [stage, 0];
+        break;
+      case `decay`:
+        if (elapsed > this.decayDurationTotal) {
+          this.#sm.next();
+          changed = true;
+        }
+        break;
+      case `sustain`:
+        if (!this.#holding) {
+          elapsed = 0;
+          this.#timer?.reset();
+          this.#sm.next();
+          changed = true;
+        }
+        break;
+      case `release`:
+        if (elapsed > this.releaseDuration) {
+          this.#sm.next();
+          changed = true;
+        }      
+      case `complete`:
+        if (this.shouldLoop) {
+          this.trigger(this.#holdingInitial);
+        }
       }
-      return [stage, relative];
+    } while (changed); 
+  }
+
+  computeRaw():[stage:string|undefined,amount:number] {
+    if (this.#timer === undefined) return [undefined, 0];
+  
+    
+    // Change state if necessary based on elapsed time
+    this.switchState();
+    let elapsed = this.#timer.elapsed();
+    
+    let relative = 0;
+    const state = this.#sm.state;
+    switch (state) {
+    case `attack`:
+      relative = elapsed / this.attackDuration;
+      break;
+    case `decay`:
+      relative = (elapsed - this.attackDuration) / this.decayDuration;
+      break;
+    case `sustain`:
+      relative = 1;
+      break;
+    case `release`:
+      relative = elapsed / this.releaseDuration;
+      break;
+    case `complete`:
+      return [undefined, 0];
+    default:
+      throw new Error(`State machine in unknown state: ${state}`);
     }
-
-    if (delayDuration > 0 && elapsed <= delayDuration) {
-      // With delay
-      return [stage, elapsed / delayDuration];
-    } else if (elapsed <= attackDuration) {
-      // Within attack
-      return [stage, elapsed / attackDuration];
-    } else if (elapsed <= decayDuration + attackDuration) {
-      // Within decay
-      if (stage == Stage.Attack) setStage(Stage.Decay);
-      return [stage, (elapsed - attackDuration) / decayDuration];
-    } else {
-      // Within sustain
-      if (stage == Stage.Decay) setStage(Stage.Sustain);
-      if (!isHeld) {
-        setStage(Stage.Release);
-      }
-      return [stage, 0];
-    }
+    return [state, relative];
   }
 
-  const trigger = () => {
-    isHeld = false;
-    setStage(Stage.Delay);
+  get isDone():boolean {
+    return this.#sm.isDone;
   }
 
-  const hold = () => {
-    isHeld = true;
-    if (stage == Stage.Stopped) {
-      setStage(Stage.Delay);
-    } else {
-      setStage(Stage.Sustain);
-    }
+  trigger(hold:boolean = false) {
+    this.#sm.reset();
+    this.#timer = this.#timeSource();
+    this.#holding = hold;
+    this.#holdingInitial = hold;
   }
 
-  const release = () => {
-    if (!isHeld) throw Error('Not being held');
-    setStage(Stage.Release);
+  release() {
+    this.#holding = false;
   }
-
-  const reset = () => {
-    setStage(Stage.Stopped);
-  }
-
-  const getOpts = () => {
-    return opts;
-  }
-
-  reset();
-
-  return Object.freeze({
-    trigger: trigger,
-    reset: reset,
-    release: release,
-    hold: hold,
-    compute: compute,
-    getStage: getStage,
-    getOpts: getOpts
-  });
 }
+
+class Adsr extends AdsrBase {
+  readonly attackPath:Path;
+  readonly decayPath:Path;
+  readonly releasePath:Path;
+
+  readonly initialLevel;
+  readonly peakLevel;
+  readonly releaseLevel;
+  readonly sustainLevel;
+
+  readonly attackBend;
+  readonly decayBend;
+  readonly releaseBend;
+
+  constructor(opts:AdsrOpts) {
+    super(opts);
+
+    this.initialLevel = opts.initialLevel ?? 0;
+    this.peakLevel = opts.peakLevel ?? 1;
+    this.releaseLevel = opts.releaseLevel ?? 0;
+    this.sustainLevel = opts.sustainLevel ?? 0.75;
+
+    this.attackBend = opts.attackBend ?? 0;
+    this.releaseBend = opts.releaseBend ?? 0;
+    this.decayBend = opts.decayBend ?? 0;
+
+    const max = 1;
+    this.attackPath = Bezier.toPath(Bezier.quadraticSimple({x: 0, y: this.initialLevel}, {x: max, y: this.peakLevel}, this.attackBend));
+    this.decayPath = Bezier.toPath(Bezier.quadraticSimple({x: 0, y: this.peakLevel}, {x: max, y: this.sustainLevel}, this.decayBend));
+    this.releasePath = Bezier.toPath(Bezier.quadraticSimple({x: 0, y: this.sustainLevel}, {x: max, y: 0}, this.releaseBend));
+  }
+
+  compute():[stage:string|undefined, scaled:number, raw:number] {
+    const [stage, amt] = super.computeRaw();
+    if (stage === undefined) return [undefined, NaN, NaN];
+    let v;
+    switch (stage) {
+      case `attack`:
+        v = this.attackPath.compute(amt);
+        break;
+      case `decay`:
+        v = this.decayPath.compute(amt);
+        break;
+      case `sustain`:
+        v = {x:1, y:this.sustainLevel};
+        break;
+      case `release`:
+        v = this.releasePath.compute(amt);
+        break;
+      case `complete`:
+        v = {x:1, y: this.releaseLevel};
+        break;
+      default:
+        throw new Error(`Unknown state: ${stage}`);
+    }
+
+    return [stage, v.y, amt];
+  }
+}
+
+export const adsr = (opts:AdsrOpts):Adsr => new Adsr(opts);

@@ -1,16 +1,18 @@
 // ✔ UNIT TESTED
 import {SimpleEventEmitter} from "../Events.js";
-import {KeyValue} from "../KeyValue.js";
 import { ToString, IsEqual, toStringDefault, isEqualDefault } from "../util.js";
+import { addUniqueByHash } from "./Set.js";
+import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter} from './Map.js';
+import { Circular, without } from './Lists.js';
 
 export type MapMultiOpts<V> = {
-
   /**
    * Returns true if two values should be considered equal.
    * 
    * @type {(IsEqual<V>|undefined)}
    */
-  readonly valueComparer?: IsEqual<V>|undefined
+ // readonly valueComparer?: IsEqual<V>|undefined
+
  /**
   * Returns a group for values added via `addValue`. Eg. maybe you want to 
   * group values in the shape `{name: 'Samantha' city: 'Copenhagen'}` by city:
@@ -34,10 +36,12 @@ type MutableMapArrayEvents<V> = {
 }
 
 export type MultiValue<V, M> = Readonly<{
+  has(source:M, value:V): boolean
   add(destination:M|undefined, values:ReadonlyArray<V>):M
   toArray(source:M): ReadonlyArray<V>|undefined
   find(source:M, predicate:(v:V) => boolean): V|unknown
   filter(source:M, predicate:(v:V) => boolean): ReadonlyArray<V>
+  without(source:M, value:V): ReadonlyArray<V>
   count(source:M): number
 }>;
 
@@ -54,7 +58,7 @@ export type MultiValue<V, M> = Readonly<{
 export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvents<V>> {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #map: Map<string, M> = new Map();
-  readonly valueComparer: IsEqual<V>;
+  //readonly valueComparer: IsEqual<V>;
   readonly groupBy: ToString<V>;
   readonly type: MultiValue<V, M>;
 
@@ -70,7 +74,7 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     super();
     this.type = type;
     this.groupBy = opts.groupBy ?? toStringDefault;
-    this.valueComparer = opts.valueComparer ?? isEqualDefault;
+    // this.valueComparer = opts.valueComparer ?? isEqualDefault;
   }
 
   debugString(): string {
@@ -80,7 +84,10 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     keys.forEach(k => {
       const v = this.#map.get(k);
       if (v !== undefined) {
-        r += ` - ${k} (${this.type.count(v)}) = ${JSON.stringify(v)}\r\n`;
+        const asArray = this.type.toArray(v);
+        if (asArray !== undefined) {
+          r += ` - ${k} (${this.type.count(v)}) = ${JSON.stringify(asArray)}\r\n`;
+        }
       } else r += ` - ${k} (undefined)\r\n`;
     });
     return r;
@@ -106,7 +113,6 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     this.#map.clear();
     super.fireEvent(`clear`, true);
   }
-
 
   /**
    * Adds several values under the same key. Duplicate values are permitted.
@@ -141,7 +147,7 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
   }
 
   /**
-   * Returns true if the given value existed under the given key
+   * Returns true if `value` is stored under `key`.
    *
    * By default values are compared by value, not reference.
    * 
@@ -152,31 +158,12 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
    */
   hasKeyValue(key:string, value:V):boolean {    
     const m = this.#map.get(key);
-    if (m === undefined) {
-      //console.log(`Key ${key} does not exist`);
-      return false;
-    }
-    const foundVal = this.type.find(m, (v) => this.valueComparer(value, v));
-    // if (foundVal === undefined) {
-    //   console.log(`Key ${key} exists, but value not found: ${JSON.stringify(value)}`);
-    // }
-    return foundVal !== undefined;
+    if (m === undefined) return false;    
+    return this.type.has(m, value);
   }
 
-  /**
-   * Returns true if the given key exists, or the given 
-   * key-value exists.
-   * @param {(string|KeyValue)} keyOrKv
-   * @return {*}  {boolean}
-   * @memberof MutableMapArray
-   */
-  has(keyOrKv:string|KeyValue):boolean {
-    if (typeof keyOrKv === `string`) {
-      return this.#map.has(keyOrKv);
-    } else {
-      const [key, value] = keyOrKv;
-      return this.hasKeyValue(key, (value as unknown) as V);
-    }
+  has(key:string):boolean {
+    return this.#map.has(key);
   }
 
   /**
@@ -190,7 +177,7 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
   deleteKeyValue(key: string, value: V) {
     const a = this.#map.get(key);
     if (a === undefined) return;
-    const filtered = this.type.filter(a, v => !this.valueComparer(v, value));
+    const filtered = this.type.without(a, value);// this.type.filter(a, v => !this.valueComparer(v, value));
     this.#map.set(key, this.type.add(undefined, filtered));
   }
 
@@ -208,20 +195,20 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
    * @param {V} value
    * @memberof MapMulti
    */
-  deleteDeep(value: V) {
-    const keys = Array.from(this.#map.keys());
+  // deleteDeep(value: V) {
+  //   const keys = Array.from(this.#map.keys());
 
-    keys.forEach(k => {
-      const a = this.#map.get(k);
-      if (a === undefined) return;
-      const b = this.type.filter(a, v => !this.valueComparer(v, value));
-      this.#map.set(k, this.type.add(undefined, b));
-    });
-  }
+  //   keys.forEach(k => {
+  //     const a = this.#map.get(k);
+  //     if (a === undefined) return;
+  //     const b = this.type.filter(a, v => !this.valueComparer(v, value));
+  //     this.#map.set(k, this.type.add(undefined, b));
+  //   });
+  // }
 
   /**
    * Finds the first key where value is stored. 
-   * Note that value could be stored in multiple keys
+   * Note: value could be stored in multiple keys
    *
    * @param {V} value
    * @returns {(string | undefined)}
@@ -232,7 +219,8 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     const found = keys.find(key => {
       const a = this.#map.get(key);
       if (a === undefined) throw Error(`Bug: map could not be accessed`);
-      if (this.type.find(a, (v) => this.valueComparer(value, v)) !== undefined) return key;
+      if (this.type.has(a, value)) return true;
+      return false;
     });
     return found;
   }
@@ -264,6 +252,10 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     return this.type.toArray(m);
   }
 
+  getSource(key:string): M|undefined {
+    return this.#map.get(key);
+  }
+
   /* eslint-disable-next-line functional/prefer-readonly-type */
   keys(): string[] {
     return Array.from(this.#map.keys());
@@ -286,8 +278,18 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
   }
 }
 
+export type MapArrayOpts<V> = MapMultiOpts<V> & {
+  readonly comparer?:IsEqual<V>
+  readonly toString?:ToString<V>
+}
+
 // ✔ UNIT TESTED
-export const mutableMapArray = <V>(opts?:MapMultiOpts<V>) => {
+export const mutableMapArray = <V>(opts:MapArrayOpts<V> = {}) => {
+  const comparer = opts.comparer === undefined ?
+    opts.toString === undefined ? (a:V, b:V) => opts.toString(a) === opts.toString(b) :
+      isEqualDefault
+    : opts.comparer;
+    
   const t:MultiValue<V, ReadonlyArray<V>> = {
     add:(dest, values) => {
       if (dest === undefined) return [...values];
@@ -296,41 +298,53 @@ export const mutableMapArray = <V>(opts?:MapMultiOpts<V>) => {
     count: (source) => source.length,
     find: (source, predicate) => source.find(predicate),
     filter: (source, predicate) => source.filter(predicate),
-    toArray: (source) => source
+    toArray: (source) => source,
+    has: (source, value) => source.find(v => comparer(v, value)) !== undefined,
+    without: (source, value) => source.filter(v => !comparer(v, value))
   };
-  const m = new MutableMapOf(t, opts);
+  const m = new MutableMapOf<V, ReadonlyArray<V>>(t, opts);
   return m;
 };
 
-export const mutableMapSet = <V>(opts?:MapMultiOpts<V>) => {
-  const t:MultiValue<V, ReadonlySet<V>> = {
-    add:(dest, values) => {
-      if (dest === undefined) return new Set(values);
-      const s = new Set(dest);
-      values.forEach(v => s.add(v));
-      return s;
-    },
+export type MapSetOpts<V> = MapMultiOpts<V> & {
+  readonly hash:ToString<V>
+};
+
+export const mutableMapSet = <V>(opts?:MapSetOpts<V>) => {
+  const hash = opts?.hash ?? toStringDefault;
+  const comparer = (a:V, b:V) => hash(a) === hash(b);
+
+  const t:MultiValue<V, ReadonlyMap<string, V>> = {
+    add:(dest, values) => addUniqueByHash(dest, hash, ...values),
     count: (source) => source.size,
-    find: (source, predicate) => {
-      // eslint-disable-next-line functional/no-let
-      let found:V|undefined;
-      source.forEach(v => {
-        if (found !== undefined) return;
-        if (predicate(v)) { found = v; }
-      }); 
-      return found;
-    },
-    filter: (source, predicate) => {
-      // eslint-disable-next-line functional/prefer-readonly-type
-      const newSet:V[] = [];
-      source.forEach(v => {
-        // eslint-disable-next-line functional/immutable-data
-        if (predicate(v)) newSet.push(v);
-      });
-      return newSet;
-    },
-    toArray: (source) => Array.from(source.values())
+    find: (source, predicate) => mapFind(source, predicate),
+    filter: (source, predicate) => mapFilter(source, predicate),
+    toArray: (source) => mapToArray(source),
+    has: (source, value) => mapHasAnyValue(source, value, comparer),
+    without: (source, value) => without(mapToArray(source), value, comparer)
   };
-  const m = new MutableMapOf(t, opts);
+  const m = new MutableMapOf<V, ReadonlyMap<string, V>>(t, opts);
   return m;
+};
+
+export type MapCircularOpts<V> = MapMultiOpts<V> & {
+  readonly capacity:number
+}
+export const mutableMapCircular = <V>(opts:MapCircularOpts<V>) => {
+  const comparer = isEqualDefault;
+
+  const t:MultiValue<V, Circular<V>> = {
+    add:(dest, values) => {
+      if (dest === undefined) dest = new Circular(opts.capacity);
+      values.forEach(v => dest = dest?.add(v));
+      return dest;
+    },
+    count: (source) => source.length,
+    find: (source, predicate) => source.find(predicate),
+    filter: (source, predicate) => source.filter(predicate),
+    toArray: (source) => source,
+    has: (source, value) => source.find(v => comparer(v, value)) !== undefined,
+    without: (source, value) => source.filter(v => !comparer(v, value))
+  };
+  return new MutableMapOf<V, Circular<V>>(t, opts);
 };

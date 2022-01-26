@@ -1,7 +1,27 @@
+import {IsEqual} from "~/util";
+
 // ✔ UNIT TESTED!
 type ArrayKeys<K, V> = ReadonlyArray<readonly [key:K, value:V]>;
 type ObjKeys<K, V> = ReadonlyArray<{readonly key: K, readonly value: V}>;
 type EitherKey<K, V> = ArrayKeys<K, V> | ObjKeys<K, V>;
+
+export const has = <K, V>(map:ReadonlyMap<K, V>, key:K):boolean => map.has(key);
+export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, comparer:IsEqual<V>):boolean => {
+  if (!map.has(key)) return false;
+  const values = Array.from(map.values());
+  return values.some(v => comparer(v, value));
+};
+
+export const hasAnyValue = <K, V>(map:ReadonlyMap<K, V>, value:V, comparer:IsEqual<V>):boolean => {
+  const entries = Array.from(map.entries());
+  return entries.some(kv => comparer(kv[1], value));
+};
+
+
+export const filter = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):ReadonlyArray<V> => Array.from(map.values()).filter(predicate);
+export const toArray = <V>(map:ReadonlyMap<string, V>):ReadonlyArray<V> => Array.from(map.values());
+export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):V|undefined =>  Array.from(map.values()).find(vv => predicate(vv));
+
 
 const addArray = <K, V>(map: ReadonlyMap<K, V>, data:ArrayKeys<K, V>): ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
@@ -86,7 +106,9 @@ export const map = <K, V>(dataOrMap?: ReadonlyMap<K, V>|EitherKey<K, V>):Immutab
   };
 };
 
-export const has = <K, V>(map:ReadonlyMap<K, V>, key:K):boolean => map.has(key);
+// export const without = <V>(map:ReadonlyMap<string, V>, value:V): ReadonlyMap<string,V> => {
+//   source.toArray().filter(v => hash(v) !== hash(value))
+// }
 
 export const mutableMap = <K, V>(...data:EitherKey<K, V>): MutableMap<K, V> => {
   // eslint-disable-next-line functional/no-let

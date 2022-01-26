@@ -1,49 +1,62 @@
+/* eslint-disable */
 import * as Grids from '../../src/geometry/Grid.js';
 import * as Series from '../../src/Series.js';
-import * as Producers from '../../src/Producers.js';
+import * as Producers from '../../src/Generators.js';
 import * as Sets from '../../src/collections/Set.js';
 
 
 // ---------------------------------
 // Walk
-const walkGrid = {rows: 10, cols: 10, size: 15};
-let walkHoverCell = {x: 0, y: 0};
 let cellEquals = Grids.cellEquals;
-const walkTest = 'byCol';
-document.getElementById('walkTestCanvas').addEventListener('pointermove', (evt) => {
-  const cell = Grids.getCell({x: evt.offsetX, y: evt.offsetY}, walkGrid);
-  walkHoverCell = cell;
-  testWalk(walkTest, walkGrid);
-});
-const testWalk = function (walkerName: string, grid: Grids.Grid & Grids.GridVisual) {
-  let walker = null;
-  if (walkerName == 'byRow')
-    walker = Grids.walkByRow(grid, {x: 5, y: 5}, true);
-  else if (walkerName == 'byCol')
-    walker = Grids.walkByCol(grid, {x: 5, y: 5}, true);
-  else throw Error('Unknown walkerName');
 
-  let c = (document.getElementById('walkTestCanvas') as HTMLCanvasElement).getContext('2d');
-  let hueSeries = Series.fromGenerator(Producers.numericRange(1, 0, 360, true));
-
-  for (const cell of walker) {
-    //console.log(`${cell.x}, ${cell.y}`);
-
-    let r = Grids.cellCornerRect(cell, grid);
-    c.moveTo(cell.x, cell.y);
-    let hue = hueSeries.value;
-    c.fillStyle = `hsl(${hue}, 50%,50%)`;
-    if (cellEquals(cell, walkHoverCell))
-      c.fillStyle = 'black';
-
-    c.fillRect(r.x, r.y, r.width, r.height);
-
-    let mid = Grids.cellMiddle(cell, grid);
-    c.fillStyle = 'white';
-    c.fillRect(mid.x, mid.y, 1, 1);
+const testWalk = function (walkerName: string, canvasId:string) {
+  const grid = {rows: 10, cols: 10, size: 15};
+  let walkHoverCell = {x: 0, y: 0};
+  let walkStart = {x:5, y:5};
+  let canvasEl = document.getElementById(canvasId) as HTMLCanvasElement;
+  if (canvasEl === null) { 
+    console.log(`Canvas element not found ${canvasId}`);
+    return;
   }
+  let c = (canvasEl as HTMLCanvasElement).getContext('2d');
+  
+  canvasEl.addEventListener('pointermove', (evt) => {
+    const cell = Grids.getCell({x: evt.offsetX, y: evt.offsetY}, grid);
+    walkHoverCell = cell;
+    if (cell !== undefined) walkStart = cell;
+    runAndDraw();
+  });
+
+  const runAndDraw = () => {
+    let hueSeries = Series.fromGenerator(Producers.numericRange(1, 0, 360, true));
+    let walker = null;
+    if (walkerName == 'byRow')
+      walker = Grids.walkByRow(grid, walkStart, true);
+    else if (walkerName == 'byCol')
+      walker = Grids.walkByCol(grid, walkStart, true);
+    else throw Error('Unknown walkerName');
+
+    for (const cell of walker) {
+      // Draw coloured rect for cell
+      let r = Grids.cellCornerRect(cell, grid);
+      c.moveTo(cell.x, cell.y);
+      let hue = hueSeries.value; // Magically moves along hue with each call
+      c.fillStyle = `hsl(${hue}, 50%,50%)`;
+      if (cellEquals(cell, walkHoverCell))
+        c.fillStyle = 'black';
+      c.fillRect(r.x, r.y, r.width, r.height);
+
+      // Draw a dot in the middle
+      let middle = Grids.cellMiddle(cell, grid);
+      c.fillStyle = 'white';
+      c.fillRect(middle.x, middle.y, 1, 1);
+    }
+  }
+
+  runAndDraw();
 }
-testWalk(walkTest, walkGrid);
+testWalk(`byCol`,`walkByCol`);
+testWalk(`byRow`,`walkByRow`);
 
 // -----------------------------
 // Square perimeter & Neighbours
@@ -58,8 +71,8 @@ const testPerimeter = function () {
   let c = (document.getElementById('ringTestCanvas') as HTMLCanvasElement).getContext('2d');
   let walker = Grids.walkByRow(perimGrid);
 
-  let start = selectedRingCell === undefined ? {x: 5, y: 5} : selectedRingCell;
-  let perim: Grids.Cell[] = Grids.getSquarePerimeter(perimGrid, perimDistance, start, Grids.BoundsLogic.Stop);
+  const start = selectedRingCell === undefined ? {x: 5, y: 5} : selectedRingCell;
+  const perim = Grids.getSquarePerimeter(perimGrid, perimDistance, start, Grids.BoundsLogic.Stop);
 
   let neighbours = Grids.neighbours(perimGrid, start, Grids.BoundsLogic.Wrap);
 
@@ -94,7 +107,7 @@ const testLine = function () {
   let start = {x: 10, y: 10}
   let end = lineEndCell === undefined ? {x: 0, y: 0} : lineEndCell;
 
-  let line: Grids.Cell[] = Grids.getLine(start, end);
+  const line = Grids.getLine(start, end);
   for (const cell of walker) {
     let r = Grids.cellCornerRect(cell, lineGrid);
     c.moveTo(cell.x, cell.y);
@@ -111,14 +124,28 @@ testLine();
 // ------------------
 // Visitor
 let visitorGrid = {rows: 40, cols: 40, size: 4};
-let visitorStart = undefined;
 const delayMs = 10;
-const testVisitor = function () {
-  let start = visitorStart ?? {x: 20, y: 20}
-  let c = (document.getElementById('visitorTestCanvas') as HTMLCanvasElement).getContext('2d');
-  let visited = new Sets.MutableValueSet<Grids.Cell>(c => Grids.cellKeyString(c));
-  let v = Grids.visitor(Grids.visitorDepth, visitorGrid, start, visited);
 
+const testVisitor = (visitorFn, canvasId) => {  
+  const canvasEl = (document.getElementById(canvasId) as HTMLCanvasElement);
+  if (canvasEl === null) {
+    console.log(`Canvas not found: ${canvasId}`);
+    return;
+  }
+  const c = canvasEl.getContext('2d');
+  canvasEl.addEventListener(`click`, (evt) => {
+    const clicked = Grids.getCell({x: evt.offsetX, y: evt.offsetY}, visitorGrid);
+    visitorStart = clicked;
+    reset();
+  });
+
+  const visited = new Sets.MutableStringSet<Grids.Cell>(c => Grids.cellKeyString(c));
+  let visitorStart = {x: 20, y: 20};
+  let start = visitorStart;
+  let startedTime = window.performance.now();
+  let v;
+  let isRunning = false;
+ 
   const draw = () => {
     for (const cell of Grids.walkByRow(visitorGrid)) {
       let r = Grids.cellCornerRect(cell, visitorGrid);
@@ -128,16 +155,27 @@ const testVisitor = function () {
       c.fillRect(r.x, r.y, r.width, r.height);
     }
   }
-  const run = () => {
 
-    let cell = v.next().value;
-    if (cell == undefined) {
-      console.log('Generator done?')
+  const reset = () => {
+    start = visitorStart ?? {x: 20, y: 20}
+    visited.clear();
+    v = Grids.visitor(visitorFn, visitorGrid, start, visited);
+    if (!isRunning) setTimeout(run, delayMs);
+  }
+
+  const run = () => {
+    const {cell, done} = v.next();
+    if (done) {
+      isRunning = false;
       return;
     }
     draw();
-    if (!v.done) setTimeout(run, delayMs);
+    setTimeout(run, delayMs);
   }
-  setTimeout(run, delayMs);
+  reset();  
 }
-testVisitor();
+testVisitor(Grids.visitorDepth, `visitorDepth`);
+testVisitor(Grids.visitorBreadth,  `visitorBreadth`);
+testVisitor(Grids.visitorRandom, `visitorRandom`);
+
+

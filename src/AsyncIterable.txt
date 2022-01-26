@@ -1,0 +1,31 @@
+//Source: https://github.com/WorldMaker/xstream-extra-factories/blob/master/async-iterable.ts
+
+import xs, {Listener, Producer} from 'xstream';
+
+export class AsyncIterableProducer<T> implements Producer<T> {
+  private cancel = false;
+
+  constructor(private readonly iterable: AsyncIterable<T>) {}
+
+  async start(listener: Listener<T>) {
+    // eslint-disable-next-line functional/no-try-statement
+    try {
+      // eslint-disable-next-line functional/no-loop-statement
+      for await (const item of this.iterable) {
+        listener.next(item);
+        if (this.cancel) {
+          break;
+        }
+      }
+      listener.complete();
+    } catch (err) {
+      listener.error(err);
+    }
+  }
+
+  stop() {
+    this.cancel = true;
+  }
+}
+
+export const fromAsyncIterable = <T>(iterable: AsyncIterable<T>) => xs.create(new AsyncIterableProducer(iterable));

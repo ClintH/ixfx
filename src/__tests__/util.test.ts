@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {average, clamp, clampZeroBounds, toStringDefault, isEqualDefault} from '../util.js';
+import {average, clamp, clampZeroBounds, toStringDefault, isEqualDefault, isEqualValueDefault} from '../util.js';
 
 test(`toStringDefault`, () => {
   const a = {
@@ -23,6 +23,7 @@ test(`toStringDefault`, () => {
   expect(toStringDefault(b)).toEqual(toStringDefault(bb));
 })
 
+// Default isEqual tests by reference
 test(`isEqualDefault`, () => {
   const a = {
     name: "Blah blah",
@@ -44,11 +45,41 @@ test(`isEqualDefault`, () => {
 
   expect(isEqualDefault(a,a)).toBeTruthy();
   expect(isEqualDefault(a, b as any)).toBeFalsy();
-  expect(isEqualDefault(a,aa)).toBeTruthy();
+  expect(isEqualDefault(a,aa)).toBeFalsy(); // Same content but different references, false
 
   expect(isEqualDefault(b, b)).toBeTruthy();
-  expect(isEqualDefault(b,bb)).toBeTruthy();
+  expect(isEqualDefault(b,bb)).toBeTruthy(); // Strings work by value using ===
   expect(isEqualDefault(b, c)).toBeFalsy();
+});
+
+
+// Test by value
+test(`isEqualValueDefault`, () => {
+  const a = {
+    name: "Blah blah",
+    age: 30,
+    alive: true,
+    height: 192.4
+  }
+
+  const aa = {
+    name: "Blah blah",
+    age: 30,
+    alive: true,
+    height: 192.4
+  }
+
+  const b = "Blah blah";
+  const bb ="Blah blah";
+  const c = "BLAH BLAH";
+
+  expect(isEqualValueDefault(a,a)).toBeTruthy();
+  expect(isEqualValueDefault(a, b as any)).toBeFalsy();
+  expect(isEqualValueDefault(a,aa)).toBeTruthy();
+
+  expect(isEqualValueDefault(b, b)).toBeTruthy();
+  expect(isEqualValueDefault(b,bb)).toBeTruthy();
+  expect(isEqualValueDefault(b, c)).toBeFalsy();
 });
 
 test(`average`, () => {

@@ -1,3 +1,7 @@
+import * as lit_html from 'lit-html';
+import * as lit from 'lit';
+import { LitElement } from 'lit';
+
 declare type Point = {
     readonly x: number;
     readonly y: number;
@@ -239,7 +243,7 @@ declare type LinePath = Line & Path & {
     toFlatArray(): number[];
 };
 declare const bbox$1: (line: Line) => RectPositioned;
-declare const toPath: (line: Line) => LinePath;
+declare const toPath$1: (line: Line) => LinePath;
 
 type Line$1_Line = Line;
 declare const Line$1_isLine: typeof isLine;
@@ -255,7 +259,6 @@ declare const Line$1_fromPoints: typeof fromPoints;
 declare const Line$1_joinPointsToLines: typeof joinPointsToLines;
 declare const Line$1_fromPointsToPath: typeof fromPointsToPath;
 type Line$1_LinePath = LinePath;
-declare const Line$1_toPath: typeof toPath;
 declare namespace Line$1 {
   export {
     Line$1_Line as Line,
@@ -277,23 +280,25 @@ declare namespace Line$1 {
     Line$1_fromPointsToPath as fromPointsToPath,
     Line$1_LinePath as LinePath,
     bbox$1 as bbox,
-    Line$1_toPath as toPath,
+    toPath$1 as toPath,
   };
 }
 
-declare type QuadraticBezier = Path & {
-    a: Point;
-    b: Point;
-    quadratic: Point;
+declare type QuadraticBezier = {
+    readonly a: Point;
+    readonly b: Point;
+    readonly quadratic: Point;
 };
-declare type CubicBezier = Path & {
-    a: Point;
-    b: Point;
-    cubic1: Point;
-    cubic2: Point;
+declare type QuadraticBezierPath = Path & QuadraticBezier;
+declare type CubicBezier = {
+    readonly a: Point;
+    readonly b: Point;
+    readonly cubic1: Point;
+    readonly cubic2: Point;
 };
-declare const isQuadraticBezier: (path: Path | QuadraticBezier) => path is QuadraticBezier;
-declare const isCubicBezier: (path: Path | CubicBezier) => path is CubicBezier;
+declare type CubicBezierPath = Path & CubicBezier;
+declare const isQuadraticBezier: (path: Path | QuadraticBezier | CubicBezier) => path is QuadraticBezier;
+declare const isCubicBezier: (path: Path | CubicBezier | QuadraticBezier) => path is CubicBezier;
 /**
  * Returns a new quadratic bezier with specified bend amount
  *
@@ -312,27 +317,34 @@ declare const quadraticBend: (b: QuadraticBezier, bend?: number) => QuadraticBez
  */
 declare const quadraticSimple: (start: Point, end: Point, bend?: number) => QuadraticBezier;
 declare const quadraticToSvgString: (start: Point, end: Point, handle: Point) => string;
-declare const cubic: (start: Point, end: Point, handle1: Point, handle2: Point) => CubicBezier;
+declare const toPath: (cubicOrQuadratic: CubicBezier | QuadraticBezier) => CubicBezierPath | QuadraticBezierPath;
+declare const cubic: (start: Point, end: Point, cubic1: Point, cubic2: Point) => CubicBezier;
 declare const quadratic: (start: Point, end: Point, handle: Point) => QuadraticBezier;
 
 type Bezier_QuadraticBezier = QuadraticBezier;
+type Bezier_QuadraticBezierPath = QuadraticBezierPath;
 type Bezier_CubicBezier = CubicBezier;
+type Bezier_CubicBezierPath = CubicBezierPath;
 declare const Bezier_isQuadraticBezier: typeof isQuadraticBezier;
 declare const Bezier_isCubicBezier: typeof isCubicBezier;
 declare const Bezier_quadraticBend: typeof quadraticBend;
 declare const Bezier_quadraticSimple: typeof quadraticSimple;
 declare const Bezier_quadraticToSvgString: typeof quadraticToSvgString;
+declare const Bezier_toPath: typeof toPath;
 declare const Bezier_cubic: typeof cubic;
 declare const Bezier_quadratic: typeof quadratic;
 declare namespace Bezier {
   export {
     Bezier_QuadraticBezier as QuadraticBezier,
+    Bezier_QuadraticBezierPath as QuadraticBezierPath,
     Bezier_CubicBezier as CubicBezier,
+    Bezier_CubicBezierPath as CubicBezierPath,
     Bezier_isQuadraticBezier as isQuadraticBezier,
     Bezier_isCubicBezier as isCubicBezier,
     Bezier_quadraticBend as quadraticBend,
     Bezier_quadraticSimple as quadraticSimple,
     Bezier_quadraticToSvgString as quadraticToSvgString,
+    Bezier_toPath as toPath,
     Bezier_cubic as cubic,
     Bezier_quadratic as quadratic,
   };
@@ -448,7 +460,10 @@ declare namespace CompoundPath$1 {
   };
 }
 
-declare type Listener<Events> = (ev: any, sender: SimpleEventEmitter<Events>) => void;
+declare type ToString<V> = (itemToMakeStringFor: V) => string;
+declare type IsEqual<V> = (a: V, b: V) => boolean;
+
+declare type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>) => void;
 declare class SimpleEventEmitter<Events> {
     #private;
     protected fireEvent<K extends keyof Events>(type: K, args: Events[K]): void;
@@ -476,15 +491,15 @@ declare class SimpleEventEmitter<Events> {
     clearEventListeners(): void;
 }
 
-declare type KeyString<V> = (itemToMakeKeyFor: V) => string;
 declare type MutableValueSetEventMap<V> = {
-    add: {
-        value: V;
-        updated: boolean;
+    readonly add: {
+        readonly value: V;
+        readonly updated: boolean;
     };
-    clear: boolean;
-    delete: V;
+    readonly clear: boolean;
+    readonly delete: V;
 };
+declare const addUniqueByHash: <V>(set: ReadonlyMap<string, V> | undefined, hashFunc: ToString<V>, ...values: readonly V[]) => Map<any, any>;
 /**
  * A mutable set that stores unique items by their value, rather
  * than object reference.
@@ -524,15 +539,16 @@ declare type MutableValueSetEventMap<V> = {
  *  console.log(`New item added: ${newItem}`);
  * });
  * ```
+ *
  * @export
  * @class MutableValueSet
  * @template V
  */
-declare class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
+declare class MutableStringSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
     store: Map<string, V>;
-    keyString: KeyString<V>;
-    constructor(keyString?: KeyString<V> | undefined);
-    add(...v: V[]): void;
+    keyString: ToString<V>;
+    constructor(keyString?: ToString<V> | undefined);
+    add(...v: ReadonlyArray<V>): void;
     values(): IterableIterator<V>;
     clear(): void;
     delete(v: V): boolean;
@@ -540,11 +556,13 @@ declare class MutableValueSet<V> extends SimpleEventEmitter<MutableValueSetEvent
     toArray(): V[];
 }
 
-type Set_MutableValueSet<V> = MutableValueSet<V>;
-declare const Set_MutableValueSet: typeof MutableValueSet;
+declare const Set_addUniqueByHash: typeof addUniqueByHash;
+type Set_MutableStringSet<V> = MutableStringSet<V>;
+declare const Set_MutableStringSet: typeof MutableStringSet;
 declare namespace Set {
   export {
-    Set_MutableValueSet as MutableValueSet,
+    Set_addUniqueByHash as addUniqueByHash,
+    Set_MutableStringSet as MutableStringSet,
   };
 }
 
@@ -563,17 +581,17 @@ declare enum WrapLogic {
     None = 0,
     Wrap = 1
 }
-declare type GridVisual = {
-    size: number;
-};
-declare type Grid = {
-    rows: number;
-    cols: number;
-};
-declare type Cell = {
-    x: number;
-    y: number;
-};
+declare type GridVisual = Readonly<{
+    readonly size: number;
+}>;
+declare type Grid = Readonly<{
+    readonly rows: number;
+    readonly cols: number;
+}>;
+declare type Cell = Readonly<{
+    readonly x: number;
+    readonly y: number;
+}>;
 /**
  * Returns a key string for a cell instance
  * A key string allows comparison of instances by value rather than reference
@@ -592,7 +610,7 @@ declare const cellEquals: (a: Cell, b: Cell) => boolean;
 declare const guard: (a: Cell, paramName?: string) => void;
 declare const cellCornerRect: (cell: Cell, grid: Grid & GridVisual) => Rect;
 declare const getCell: (position: Point, grid: Grid & GridVisual) => Cell | undefined;
-declare const neighbours: (grid: Grid, cell: Cell, bounds?: BoundsLogic) => Cell[];
+declare const neighbours: (grid: Grid, cell: Cell, bounds?: BoundsLogic) => ReadonlyArray<Cell>;
 declare const cellMiddle: (cell: Cell, grid: Grid & GridVisual) => Point;
 /**
  * Returns the cells on the line of start and end, inclusive
@@ -601,7 +619,7 @@ declare const cellMiddle: (cell: Cell, grid: Grid & GridVisual) => Point;
  * @param {Cell} end End cell
  * @returns {Cell[]}
  */
-declare const getLine: (start: Cell, end: Cell) => Cell[];
+declare const getLine: (start: Cell, end: Cell) => ReadonlyArray<Cell>;
 /**
  * Returns a list of cells that make up a simple square perimeter around
  * a point at a specified distance.
@@ -612,7 +630,7 @@ declare const getLine: (start: Cell, end: Cell) => Cell[];
  * @param {BoundsLogic} [bounds=BoundsLogic.Stop]
  * @returns {Cell[]}
  */
-declare const getSquarePerimeter: (grid: Grid, steps: number, start?: Cell, bounds?: BoundsLogic) => Cell[];
+declare const getSquarePerimeter: (grid: Grid, steps: number, start?: Cell, bounds?: BoundsLogic) => ReadonlyArray<Cell>;
 declare const getVectorFromCardinal: (cardinal: CardinalDirection, multiplier?: number) => Cell;
 declare enum BoundsLogic {
     Unbound = 0,
@@ -620,7 +638,7 @@ declare enum BoundsLogic {
     Stop = 2,
     Wrap = 3
 }
-declare const simpleLine: (start: Cell, end: Cell, endInclusive?: boolean) => Cell[];
+declare const simpleLine: (start: Cell, end: Cell, endInclusive?: boolean) => ReadonlyArray<Cell>;
 /**
  *
  * Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift down a line
@@ -645,9 +663,9 @@ declare const offsetStepsByCol: (grid: Grid, steps: number, start?: Cell, bounds
 declare const walkByFn: (offsetFn: (grid: Grid, steps: number, start: Cell, bounds: BoundsLogic) => Cell | undefined, grid: Grid, start?: Cell, wrap?: boolean) => Iterable<Cell>;
 declare const walkByRow: (grid: Grid, start?: Cell, wrap?: boolean) => Iterable<Cell>;
 declare const walkByCol: (grid: Grid, start?: Cell, wrap?: boolean) => Iterable<Cell>;
-declare const visitorDepth: (queue: Cell[]) => Cell;
-declare const visitorBreadth: (queue: Cell[]) => Cell;
-declare const visitorRandom: (queue: Cell[]) => Cell;
+declare const visitorDepth: (queue: ReadonlyArray<Cell>) => Cell;
+declare const visitorBreadth: (queue: ReadonlyArray<Cell>) => Cell;
+declare const visitorRandom: (queue: ReadonlyArray<Cell>) => Cell;
 /**
  * Visits every cell in grid using supplied selection function
  * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom
@@ -681,10 +699,13 @@ declare const visitorRandom: (queue: Cell[]) => Cell;
  * @param {(nbos: Cell[]) => Cell} visitFn Visitor function
  * @param {Grid} grid Grid to visit
  * @param {Cell} start Starting cell
- * @param {MutableValueSet<Cell>} [visited] Optional tracker of visited cells
+ * @param {MutableStringSet<Cell>} [visited] Optional tracker of visited cells
  * @returns {Iterable<Cell>}
  */
-declare const visitor: (visitFn: (nbos: Cell[]) => Cell, grid: Grid, start: Cell, visited?: MutableValueSet<Cell> | undefined) => Iterable<Cell>;
+declare const visitor: (visitFn: (nbos: ReadonlyArray<Cell>) => Cell, grid: Grid, start: Cell, visited?: MutableStringSet<Readonly<{
+    readonly x: number;
+    readonly y: number;
+}>> | undefined) => Iterable<Cell>;
 
 type Grid$1_CardinalDirection = CardinalDirection;
 declare const Grid$1_CardinalDirection: typeof CardinalDirection;
@@ -758,29 +779,26 @@ declare const dadsr: (opts?: DadsrEnvelopeOpts) => Readonly<Envelope & WithBezie
 
 declare type DadsrEnvelopeOpts = StageOpts & {
     /**
-     * Sustain level from 0-1
-     *
-     * @type {number}
-     */
-    sustainLevel?: number;
-    /**
      * Attack bezier 'bend'
      *
      * @type {number} Bend from -1 to 1. 0 for a straight line
      */
-    attackBend?: number;
+    readonly attackBend?: number;
     /**
      * Decay bezier 'bend'
      *
      * @type {number} Bend from -1 to 1. 0 for a straight line
      */
-    decayBend?: number;
+    readonly decayBend?: number;
     /**
      * Release bezier 'bend'
      *
      * @type {number} Bend from -1 to 1. 0 for a straight line
      */
-    releaseBend?: number;
+    readonly releaseBend?: number;
+    readonly peakLevel?: number;
+    readonly initialLevel?: number;
+    readonly sustainLevel?: number;
 };
 
 declare type StageOpts = {
@@ -789,37 +807,37 @@ declare type StageOpts = {
      *
      * @type {TimerSource}
      */
-    timerSource?: TimerSource;
+    readonly timerSource?: TimerSource;
     /**
      * If true, envelope indefinately returns to attack stage after release
      *
      * @type {boolean}
      */
-    looping?: boolean;
+    readonly shouldLoop?: boolean;
     /**
       * Duration for delay stage
       * Unit depends on timer source
       * @type {number}
       */
-    delayDuration?: number;
+    readonly delayDuration?: number;
     /**
      * Duration for attack stage
      * Unit depends on timer source
      * @type {number}
      */
-    attackDuration?: number;
+    readonly attackDuration?: number;
     /**
      * Duration for decay stage
      * Unit depends on timer source
      * @type {number}
      */
-    decayDuration?: number;
+    readonly decayDuration?: number;
     /**
      * Duration for release stage
      * Unit depends on timer source
      * @type {number}
      */
-    releaseDuration?: number;
+    readonly releaseDuration?: number;
 };
 /**
  * Stage of envelope
@@ -836,8 +854,8 @@ declare enum Stage {
     Release = 5
 }
 declare type Envelope = {
-    getStage: (stage: Stage) => {
-        duration: number;
+    readonly getStage: (stage: Stage) => {
+        readonly duration: number;
     };
     /**
      * Trigger the envelope, with no hold
@@ -864,7 +882,7 @@ declare type Envelope = {
      *
      * @returns {[Stage, number]}
      */
-    compute(): [Stage, number];
+    compute(): readonly [Stage, number];
 };
 declare type Timer = {
     reset(): void;
@@ -984,9 +1002,9 @@ declare enum OverflowPolicy$1 {
     DiscardAdditions = 2
 }
 declare type StackOpts = {
-    debug?: boolean;
-    capacity?: number;
-    overflowPolicy?: OverflowPolicy$1;
+    readonly debug?: boolean;
+    readonly capacity?: number;
+    readonly overflowPolicy?: OverflowPolicy$1;
 };
 /**
  * Immutable stack
@@ -1018,9 +1036,9 @@ declare type StackOpts = {
  */
 declare class Stack<V> {
     readonly opts: StackOpts;
-    readonly data: V[];
-    constructor(opts: StackOpts, data: V[]);
-    push(...toAdd: V[]): Stack<V>;
+    readonly data: ReadonlyArray<V>;
+    constructor(opts: StackOpts, data: ReadonlyArray<V>);
+    push(...toAdd: ReadonlyArray<V>): Stack<V>;
     pop(): Stack<V>;
     get isEmpty(): boolean;
     get isFull(): boolean;
@@ -1035,7 +1053,7 @@ declare class Stack<V> {
  * @param {...V[]} startingItems
  * @returns {Stack<V>}
  */
-declare const stack: <V>(opts?: StackOpts, ...startingItems: V[]) => Stack<V>;
+declare const stack: <V>(opts?: StackOpts, ...startingItems: readonly V[]) => Stack<V>;
 /**
  * Mutable stack
  *
@@ -1064,10 +1082,10 @@ declare const stack: <V>(opts?: StackOpts, ...startingItems: V[]) => Stack<V>;
  * @template V
  */
 declare class MutableStack<V> {
-    opts: StackOpts;
-    data: V[];
-    constructor(opts: StackOpts, data: V[]);
-    push(...toAdd: V[]): number;
+    readonly opts: StackOpts;
+    data: ReadonlyArray<V>;
+    constructor(opts: StackOpts, data: ReadonlyArray<V>);
+    push(...toAdd: ReadonlyArray<V>): number;
     pop(): V | undefined;
     get isEmpty(): boolean;
     get isFull(): boolean;
@@ -1082,7 +1100,7 @@ declare class MutableStack<V> {
  * @param {...V[]} startingItems
  * @returns
  */
-declare const stackMutable: <V>(opts: StackOpts, ...startingItems: V[]) => MutableStack<V>;
+declare const stackMutable: <V>(opts: StackOpts, ...startingItems: readonly V[]) => MutableStack<V>;
 
 declare enum OverflowPolicy {
     /**
@@ -1099,26 +1117,26 @@ declare enum OverflowPolicy {
     DiscardAdditions = 2
 }
 declare type QueueOpts = {
-    debug?: boolean;
-    capacity?: number;
+    readonly debug?: boolean;
+    readonly capacity?: number;
     /**
      * Default is DiscardAdditions, meaning new items are discarded
      *
      * @type {OverflowPolicy}
      */
-    overflowPolicy?: OverflowPolicy;
+    readonly overflowPolicy?: OverflowPolicy;
 };
 declare class Queue<V> {
     readonly opts: QueueOpts;
-    readonly data: V[];
+    readonly data: ReadonlyArray<V>;
     /**
      * Creates an instance of Queue.
      * @param {QueueOpts} opts Options foor queue
      * @param {V[]} data Initial data. Index 0 is front of queue
      * @memberof Queue
      */
-    constructor(opts: QueueOpts, data: V[]);
-    enqueue(...toAdd: V[]): Queue<V>;
+    constructor(opts: QueueOpts, data: ReadonlyArray<V>);
+    enqueue(...toAdd: ReadonlyArray<V>): Queue<V>;
     dequeue(): Queue<V>;
     get isEmpty(): boolean;
     get isFull(): boolean;
@@ -1135,17 +1153,23 @@ declare class Queue<V> {
 /**
  * Returns an immutable queue
  *
+ * ```usage
+ * let q = queue();           // Create
+ * q = q.enqueue(`a`, `b`);   // Add two strings
+ * const front = q.peek();    // `a` is at the front of queue (oldest)
+ * q = q.dequeue();           // q now just consists of `b`
+ * ```
  * @template V
  * @param {QueueOpts} [opts={}] Options
  * @param {...V[]} startingItems Index 0 is the front of the queue
  * @returns {Queue<V>} A new queue
  */
-declare const queue: <V>(opts?: QueueOpts, ...startingItems: V[]) => Queue<V>;
+declare const queue: <V>(opts?: QueueOpts, ...startingItems: readonly V[]) => Queue<V>;
 declare class MutableQueue<V> {
-    opts: QueueOpts;
-    data: V[];
-    constructor(opts: QueueOpts, data: V[]);
-    enqueue(...toAdd: V[]): number;
+    readonly opts: QueueOpts;
+    data: ReadonlyArray<V>;
+    constructor(opts: QueueOpts, data: ReadonlyArray<V>);
+    enqueue(...toAdd: ReadonlyArray<V>): number;
     dequeue(): V | undefined;
     get isEmpty(): boolean;
     get isFull(): boolean;
@@ -1159,14 +1183,37 @@ declare class MutableQueue<V> {
      */
     get peek(): V | undefined;
 }
-declare const queueMutable: <V>(opts?: QueueOpts, ...startingItems: V[]) => MutableQueue<V>;
+/**
+ * Returns a mutable queue
+ *
+ * ```usage
+ * const q = queue();       // Create
+ * q.enqueue(`a`, `b`);     // Add two strings
+ * const front = q.dequeue();  // `a` is at the front of queue (oldest)
+ * ```
+ *
+ * @template V
+ * @param {QueueOpts} [opts={}]
+ * @param {...ReadonlyArray<V>} startingItems
+ */
+declare const queueMutable: <V>(opts?: QueueOpts, ...startingItems: readonly V[]) => MutableQueue<V>;
 
+declare const randomElement: <V>(array: ArrayLike<V>) => V;
+declare const shuffle: (dataToShuffle: ReadonlyArray<unknown>) => ReadonlyArray<unknown>;
+/**
+ * Returns an array with a value omitted.
+ * Value checking is completed via the provided `comparer` function, or by default checking whether `a === b`.
+ *
+ * @template V
+ * @param {ReadonlyArray<V>} data
+ * @param {V} value
+ * @param {IsEqual<V>} [comparer=isEqualDefault]
+ * @return {*}  {ReadonlyArray<V>}
+ */
+declare const without: <V>(data: readonly V[], value: V, comparer?: IsEqual<V>) => readonly V[];
 /**
  * The circular array grows to a fixed size. Once full, new
  * items replace the oldest item in the array. Immutable.
- *
- * Add things using `add`, noting that it returns a new instance with the item added.
- * Like normal arrays, contents can be edited.
  *
  * Usage:
  * ```
@@ -1188,6 +1235,7 @@ declare class Circular<V> extends Array {
      * @memberof Circular
      */
     add(thing: V): Circular<V>;
+    get isFull(): boolean;
 }
 
 declare const Lists_stack: typeof stack;
@@ -1196,6 +1244,9 @@ type Lists_StackOpts = StackOpts;
 declare const Lists_queue: typeof queue;
 declare const Lists_queueMutable: typeof queueMutable;
 type Lists_QueueOpts = QueueOpts;
+declare const Lists_randomElement: typeof randomElement;
+declare const Lists_shuffle: typeof shuffle;
+declare const Lists_without: typeof without;
 type Lists_Circular<V> = Circular<V>;
 declare const Lists_Circular: typeof Circular;
 declare namespace Lists {
@@ -1208,6 +1259,9 @@ declare namespace Lists {
     Lists_queueMutable as queueMutable,
     Lists_QueueOpts as QueueOpts,
     OverflowPolicy as QueueOverflowPolicy,
+    Lists_randomElement as randomElement,
+    Lists_shuffle as shuffle,
+    Lists_without as without,
     Lists_Circular as Circular,
   };
 }
@@ -1269,13 +1323,13 @@ declare type Arc = {
 };
 declare type ArcPositioned = Point & Arc;
 
-declare const makeHelper: (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement) => {
+declare const makeHelper: (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement, canvasBounds?: Rect | undefined) => {
     paths(pathsToDraw: Path[], opts?: DrawingOpts | undefined): void;
     line(lineToDraw: Line | Line[], opts?: DrawingOpts | undefined): void;
     rect(rectsToDraw: RectPositioned | RectPositioned[], opts?: (DrawingOpts & {
         filled?: boolean | undefined;
     }) | undefined): void;
-    quadraticBezier(bezierToDraw: QuadraticBezier, opts?: DrawingOpts | undefined): void;
+    bezier(bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts | undefined): void;
     connectedPoints(pointsToDraw: Point[], opts?: (DrawingOpts & {
         loop?: boolean | undefined;
     }) | undefined): void;
@@ -1299,6 +1353,16 @@ declare type DrawingOpts = {
     debug?: boolean;
 };
 declare const arc: (ctx: CanvasRenderingContext2D, arcs: ArcPositioned | ArcPositioned[], opts?: DrawingOpts) => void;
+declare type StackOp = {
+    apply(ctx: CanvasRenderingContext2D): void;
+    remove(ctx: CanvasRenderingContext2D): void;
+};
+declare type DrawingStack = {
+    push(op: StackOp): DrawingStack;
+    pop(): DrawingStack;
+    clear(): void;
+};
+declare const drawingStack: (ctx: CanvasRenderingContext2D, stk?: Stack<StackOp> | undefined) => DrawingStack;
 declare const circle: (ctx: CanvasRenderingContext2D, circlesToDraw: CirclePositioned | CirclePositioned[], opts?: DrawingOpts) => void;
 declare const paths: (ctx: CanvasRenderingContext2D, pathsToDraw: Path[] | Path, opts?: {
     strokeStyle?: string;
@@ -1319,7 +1383,7 @@ declare const connectedPoints: (ctx: CanvasRenderingContext2D, pts: Point[], opt
 declare const pointLabels: (ctx: CanvasRenderingContext2D, pts: Point[], opts?: {
     fillStyle?: string;
 }, labels?: string[] | undefined) => void;
-declare const quadraticBezier: (ctx: CanvasRenderingContext2D, bezierToDraw: QuadraticBezier, opts?: DrawingOpts | undefined) => void;
+declare const bezier: (ctx: CanvasRenderingContext2D, bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts | undefined) => void;
 declare const line: (ctx: CanvasRenderingContext2D, toDraw: Line | Line[], opts?: {
     strokeStyle?: string;
     debug?: boolean;
@@ -1335,11 +1399,12 @@ declare const textBlock: (ctx: CanvasRenderingContext2D, lines: string[], opts: 
 
 declare const Drawing_makeHelper: typeof makeHelper;
 declare const Drawing_arc: typeof arc;
+declare const Drawing_drawingStack: typeof drawingStack;
 declare const Drawing_circle: typeof circle;
 declare const Drawing_paths: typeof paths;
 declare const Drawing_connectedPoints: typeof connectedPoints;
 declare const Drawing_pointLabels: typeof pointLabels;
-declare const Drawing_quadraticBezier: typeof quadraticBezier;
+declare const Drawing_bezier: typeof bezier;
 declare const Drawing_line: typeof line;
 declare const Drawing_rect: typeof rect;
 declare const Drawing_textBlock: typeof textBlock;
@@ -1347,11 +1412,12 @@ declare namespace Drawing {
   export {
     Drawing_makeHelper as makeHelper,
     Drawing_arc as arc,
+    Drawing_drawingStack as drawingStack,
     Drawing_circle as circle,
     Drawing_paths as paths,
     Drawing_connectedPoints as connectedPoints,
     Drawing_pointLabels as pointLabels,
-    Drawing_quadraticBezier as quadraticBezier,
+    Drawing_bezier as bezier,
     Drawing_line as line,
     Drawing_rect as rect,
     Drawing_textBlock as textBlock,
@@ -1670,4 +1736,95 @@ declare namespace Series$1 {
   };
 }
 
-export { Bezier as Beziers, CompoundPath$1 as Compound, Drawing, Easing$1 as Easings, Envelope$1 as Envelopes, Grid$1 as Grids, Line$1 as Lines, Lists, Path$1 as Paths, Plot, Point$1 as Points, Producers, Rect$1 as Rects, Series$1 as Series, Set as Sets };
+declare type Primitive = string | number;
+declare type KeyValue = readonly [key: string, value: Primitive];
+
+declare type Bar = {
+    readonly percentage: number;
+    readonly data: KeyValue;
+};
+/**
+ * Usage in HTML:
+ * ```html
+ * <style>
+ * histogram-vis {
+ *  display: block;
+ *  height: 7em;
+ *  --histogram-bar-color: pink;
+ * }
+ * </style>
+ * <histogram-vis>
+ * [
+ *  ["apples", 5],
+ *  ["oranges", 3],
+ *  ["pineapple", 0],
+ *  ["limes", 9]
+ * ]
+ * </histogram-vis>
+ * ```
+ *
+ * CSS colour theming:
+ * --histogram-bar-color
+ * --histogram-label-color
+ *
+ * HTML tag attributes
+ * showXAxis (boolean)
+ * showDataLabels (boolean)
+ *
+ * @export
+ * @class HistogramVis
+ * @extends {LitElement}
+ **/
+declare class HistogramVis extends LitElement {
+    static readonly styles: lit.CSSResult;
+    data: readonly KeyValue[];
+    showDataLabels: boolean;
+    height: string;
+    showXAxis: boolean;
+    json: readonly KeyValue[] | undefined;
+    constructor();
+    connectedCallback(): void;
+    barTemplate(bar: Bar, index: number, _totalBars: number): lit_html.TemplateResult<1>;
+    render(): lit_html.TemplateResult<1>;
+}
+declare global {
+    interface HTMLElementTagNameMap {
+        readonly "histogram-vis": HistogramVis;
+    }
+}
+
+/**
+ * Creates and drives a HistogramVis instance.
+ * Data should be an outer array containing two-element arrays for each
+ * data point. The first element of the inner array is expected to be the key, the second the frequency.
+ * For example,  `[`apples`, 2]` means the key `apples` was counted twice.
+ *
+ * Usage:
+ * .sortBy() automatically sorts prior to visualisation. By default off.
+ * .update(data) full set of data to plot
+ * .clear() empties plot - same as calling `update([])`
+ * .el - The `HistogramVis` instance, or undefined if not created/disposed
+ *
+ * ```
+ * const plot = new FrequencyHistogramPlot(document.getElementById('histogram'));
+ * plot.sortBy('key'); // Automatically sort by key
+ * ...
+ * plot.update([[`apples`, 2], [`oranges', 0], [`bananas`, 5]])
+ * ```
+ *
+ * @export
+ * @class FrequencyHistogramPlot
+ */
+declare class FrequencyHistogramPlot {
+    #private;
+    readonly parentEl: HTMLElement;
+    el: HistogramVis | undefined;
+    constructor(parentEl: HTMLElement);
+    setAutoSort(sortStyle: `value` | `valueReverse` | `key` | `keyReverse`): void;
+    clear(): void;
+    init(): void;
+    dispose(): void;
+    update(data: ReadonlyArray<readonly [key: string, count: number]>): void;
+}
+
+export { Bezier as Beziers, CompoundPath$1 as Compound, Drawing, Easing$1 as Easings, Envelope$1 as Envelopes, FrequencyHistogramPlot, Grid$1 as Grids, Line$1 as Lines, Lists, Path$1 as Paths, Plot, Point$1 as Points, Producers, Rect$1 as Rects, Series$1 as Series, Set as Sets };

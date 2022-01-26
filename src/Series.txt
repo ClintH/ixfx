@@ -3,39 +3,12 @@ import {eventsToIterable} from "./Iterable.js";
 import {sleep} from "./util.js";
 
 type SeriesEventMap<V> = {
-  data: V
-  done: boolean
-  cancel: string
+  readonly data: V
+  readonly done: boolean
+  readonly cancel: string
 }
 
 type SeriesValueNeeded<V> = () => V | undefined;
-
-
-/**
- * Returns a series that produces values according to a time interval
- * 
- * Eg produce a random number every 500ms
- * ```
- * const rando = interval(500, () => Math.random());
- * ```
- *
- * @template V
- * @param {number} intervalMs
- * @param {() => V} produce
- * @returns {Series<V>}
- */
-export const atInterval = <V>(intervalMs: number, produce: () => V): Series<V> => {
-  const series = new Series<V>();
-  const timer = setInterval(() => {
-    if (series.cancelled) {
-      clearInterval(timer);
-      return;
-    }
-    series.push(produce());
-  }, intervalMs);
-  return series;
-};
-
 
 /**
  * Returns a series from a generator. This gives minor syntactical benefits over using the generator directly.
@@ -53,6 +26,7 @@ export const fromGenerator = <V> (vGen: Generator<V>): Series<V> => {
   if (vGen === undefined) throw Error(`vGen is undefined`);
 
   const s = new Series<V>();
+  // eslint-disable-next-line functional/no-let
   let genResult = vGen.next();
   s.onValueNeeded = () => {
     //console.log('Series.fromGenerator - pulling new value');
@@ -85,7 +59,7 @@ export const fromGenerator = <V> (vGen: Generator<V>): Series<V> => {
  * @returns {Series<V>} A new series that wraps the iterator
  * @memberof Series
  */
-export const fromTimedIterable = <V>(vIter: Iterable<V> | AsyncIterable<V>, delayMs: number = 100, intervalMs: number = 10): Series<V> => {
+export const fromTimedIterable = <V>(vIter: Iterable<V> | AsyncIterable<V>, intervalMs: number = 10, delayMs: number = 100): Series<V> => {
   if (vIter === undefined) throw Error(`vIter is undefined`);
   if (delayMs < 0) throw Error(`delayMs must be at least zero`);
   if (intervalMs < 0) throw Error(`delayMs must be at least zero`);
@@ -353,8 +327,8 @@ export class TriggerSeries extends Series<boolean> {
   }
 
   get value(): boolean {
-    const v = super.value;
-    if (v === undefined) return this.#undefinedValue;
-    return v;
+    const has = super.value;
+    if (has === undefined) return this.#undefinedValue;
+    return has;
   }
 }

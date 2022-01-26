@@ -26,10 +26,6 @@ var __privateSet = (obj, member, value, setter) => {
   setter ? setter.call(obj, value) : member.set(obj, value);
   return value;
 };
-var __privateMethod = (obj, member, method) => {
-  __accessCheck(obj, member, "access private method");
-  return method;
-};
 
 // src/geometry/Line.ts
 var Line_exports = {};
@@ -172,10 +168,10 @@ var compareTo = (compareFn, ...points) => {
   });
   return min2;
 };
-var distance = (a, b) => {
-  guard(a, `a`);
+var distance = (a2, b) => {
+  guard(a2, `a`);
   guard(b, `b`);
-  return Math.hypot(b.x - a.x, b.y - a.y);
+  return Math.hypot(b.x - a2.x, b.y - a2.y);
 };
 var guard = (p, name = `Point`) => {
   if (p === void 0)
@@ -192,27 +188,27 @@ var guard = (p, name = `Point`) => {
     throw new Error(`Parameter '${name}.y' is NaN`);
 };
 var bbox = (...points) => {
-  const leftMost = compareTo((a, b) => {
-    if (a.x < b.x)
-      return a;
+  const leftMost = compareTo((a2, b) => {
+    if (a2.x < b.x)
+      return a2;
     else
       return b;
   }, ...points);
-  const rightMost = compareTo((a, b) => {
-    if (a.x > b.x)
-      return a;
+  const rightMost = compareTo((a2, b) => {
+    if (a2.x > b.x)
+      return a2;
     else
       return b;
   }, ...points);
-  const topMost = compareTo((a, b) => {
-    if (a.y < b.y)
-      return a;
+  const topMost = compareTo((a2, b) => {
+    if (a2.y < b.y)
+      return a2;
     else
       return b;
   }, ...points);
-  const bottomMost = compareTo((a, b) => {
-    if (a.y > b.y)
-      return a;
+  const bottomMost = compareTo((a2, b) => {
+    if (a2.y > b.y)
+      return a2;
     else
       return b;
   }, ...points);
@@ -230,16 +226,16 @@ var isPoint = (p) => {
   return true;
 };
 var toArray = (p) => [p.x, p.y];
-var equals = (a, b) => a.x === b.x && a.y === b.y;
-var withinRange = (a, b, maxRange) => {
+var equals = (a2, b) => a2.x === b.x && a2.y === b.y;
+var withinRange = (a2, b, maxRange) => {
   if (typeof maxRange === `number`) {
     maxRange = { x: maxRange, y: maxRange };
   }
-  const x = Math.abs(b.x - a.x);
-  const y = Math.abs(b.y - a.y);
+  const x = Math.abs(b.x - a2.x);
+  const y = Math.abs(b.y - a2.y);
   return x <= maxRange.x && y <= maxRange.y;
 };
-var lerp = (amt, a, b) => ({ x: (1 - amt) * a.x + amt * b.x, y: (1 - amt) * a.y + amt * b.y });
+var lerp = (amt, a2, b) => ({ x: (1 - amt) * a2.x + amt * b.x, y: (1 - amt) * a2.y + amt * b.y });
 var from = (xOrArray, y) => {
   if (Array.isArray(xOrArray)) {
     if (xOrArray.length !== 2)
@@ -275,127 +271,132 @@ var fromNumbers = (...coords) => {
   }
   return pts;
 };
-var diff = function(a, b) {
-  guard(a, `a`);
+var diff = function(a2, b) {
+  guard(a2, `a`);
   guard(b, `b`);
   return {
-    x: a.x - b.x,
-    y: a.y - b.y
+    x: a2.x - b.x,
+    y: a2.y - b.y
   };
 };
-var sum = function(a, b) {
-  guard(a, `a`);
+var sum = function(a2, b) {
+  guard(a2, `a`);
   guard(b, `b`);
   return {
-    x: a.x + b.x,
-    y: a.y + b.y
+    x: a2.x + b.x,
+    y: a2.y + b.y
   };
 };
-function multiply(a, bOrX, y) {
-  guard(a, `a`);
+function multiply(a2, bOrX, y) {
+  guard(a2, `a`);
   if (typeof bOrX === `number`) {
     if (typeof y === `undefined`)
       y = 1;
-    return { x: a.x * bOrX, y: a.y * y };
+    return { x: a2.x * bOrX, y: a2.y * y };
   } else if (isPoint(bOrX)) {
     guard(bOrX, `b`);
     return {
-      x: a.x * bOrX.x,
-      y: a.y * bOrX.y
+      x: a2.x * bOrX.x,
+      y: a2.y * bOrX.y
     };
   } else
     throw new Error(`Invalid arguments`);
 }
 
 // src/Guards.ts
-var percent = (t2, name = `?`) => {
-  if (isNaN(t2))
+var percent = (t3, name = `?`) => {
+  if (isNaN(t3))
     throw new Error(`Parameter '${name}' is NaN`);
-  if (t2 < 0)
+  if (t3 < 0)
     throw new Error(`Parameter '${name}' must be above or equal to 0`);
-  if (t2 > 1)
+  if (t3 > 1)
     throw new Error(`Parameter '${name}' must be below or equal to 1`);
 };
-var array = (t2, name = `?`) => {
-  if (!Array.isArray(t2))
+var notNegative = (t3, name = `?`) => {
+  if (t3 < 0)
+    throw new Error(`Parameter ${name} must be at least zero`);
+  return true;
+};
+var array = (t3, name = `?`) => {
+  if (!Array.isArray(t3))
     throw new Error(`Parameter '${name}' is expected to be an array'`);
 };
 var defined = (argument) => argument !== void 0;
 
 // src/geometry/Line.ts
 var isLine = (p) => p.a !== void 0 && p.b !== void 0;
-var equals2 = (a, b) => a.a === b.a && a.b === b.b;
-var guard3 = (l, paramName = `line`) => {
-  if (l === void 0)
+var equals2 = (a2, b) => a2.a === b.a && a2.b === b.b;
+var guard3 = (l2, paramName = `line`) => {
+  if (l2 === void 0)
     throw new Error(`${paramName} undefined`);
-  if (l.a === void 0)
+  if (l2.a === void 0)
     throw new Error(`${paramName}.a undefined. Expected {a:Point, b:Point}`);
-  if (l.b === void 0)
+  if (l2.b === void 0)
     throw new Error(`${paramName}.b undefined. Expected {a:Point, b:Point}`);
 };
-var withinRange2 = (l, p, maxRange) => {
-  const dist = distance2(l, p);
+var withinRange2 = (l2, p, maxRange) => {
+  const dist = distance2(l2, p);
   return dist <= maxRange;
 };
 var length = (aOrLine, b) => {
-  let a;
+  let a2;
   if (isLine(aOrLine)) {
     b = aOrLine.b;
-    a = aOrLine.a;
+    a2 = aOrLine.a;
   } else {
-    a = aOrLine;
+    a2 = aOrLine;
     if (b === void 0)
       throw new Error(`Requires both a and b parameters`);
   }
-  guard(a, `a`);
-  guard(a, `b`);
-  const x = b.x - a.x;
-  const y = b.y - a.y;
-  if (a.z !== void 0 && b.z !== void 0) {
-    const z = b.z - a.z;
+  guard(a2, `a`);
+  guard(a2, `b`);
+  const x = b.x - a2.x;
+  const y = b.y - a2.y;
+  if (a2.z !== void 0 && b.z !== void 0) {
+    const z = b.z - a2.z;
     return Math.hypot(x, y, z);
   } else {
     return Math.hypot(x, y);
   }
 };
 var nearest = (line2, p) => {
-  const { a, b } = line2;
-  const atob = { x: b.x - a.x, y: b.y - a.y };
-  const atop = { x: p.x - a.x, y: p.y - a.y };
+  const { a: a2, b } = line2;
+  const atob = { x: b.x - a2.x, y: b.y - a2.y };
+  const atop = { x: p.x - a2.x, y: p.y - a2.y };
   const len = atob.x * atob.x + atob.y * atob.y;
   let dot2 = atop.x * atob.x + atop.y * atob.y;
-  const t2 = Math.min(1, Math.max(0, dot2 / len));
-  dot2 = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
-  return { x: a.x + atob.x * t2, y: a.y + atob.y * t2 };
+  const t3 = Math.min(1, Math.max(0, dot2 / len));
+  dot2 = (b.x - a2.x) * (p.y - a2.y) - (b.y - a2.y) * (p.x - a2.x);
+  return { x: a2.x + atob.x * t3, y: a2.y + atob.y * t3 };
 };
-var distance2 = (l, p) => {
-  guard3(l, `l`);
+var distance2 = (l2, p) => {
+  guard3(l2, `l`);
   guard(p, `p`);
-  const lineLength = length(l);
+  const lineLength = length(l2);
   if (lineLength === 0) {
-    return length(l.a, p);
+    return length(l2.a, p);
   }
-  const near = nearest(l, p);
+  const near = nearest(l2, p);
   return length(near, p);
-  const { a, b } = l;
-  let t2 = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / lineLength;
-  t2 = Math.max(0, Math.min(1, t2));
+  const { a: a2, b } = l2;
+  let t3 = ((p.x - a2.x) * (b.x - a2.x) + (p.y - a2.y) * (b.y - a2.y)) / lineLength;
+  t3 = Math.max(0, Math.min(1, t3));
   return length(p, {
-    x: a.x + t2 * (b.x - a.x),
-    y: a.y + t2 * (b.y - a.y)
+    x: a2.x + t3 * (b.x - a2.x),
+    y: a2.y + t3 * (b.y - a2.y)
   });
 };
-var compute = (a, b, t2) => {
-  guard(a, `a`);
+var compute = (a2, b, t3) => {
+  guard(a2, `a`);
   guard(b, `b`);
-  percent(t2, `t`);
-  const d = length(a, b);
-  const d2 = d * (1 - t2);
-  const x = b.x - d2 * (b.x - a.x) / d;
-  const y = b.y - d2 * (b.y - a.y) / d;
+  percent(t3, `t`);
+  const d = length(a2, b);
+  const d2 = d * (1 - t3);
+  const x = b.x - d2 * (b.x - a2.x) / d;
+  const y = b.y - d2 * (b.y - a2.y) / d;
   return { x, y };
 };
-var toString2 = (a, b) => toString(a) + `-` + toString(b);
+var toString2 = (a2, b) => toString(a2) + `-` + toString(b);
 var fromNumbers2 = (x1, y1, x2, y2) => {
   if (Number.isNaN(x1))
     throw new Error(`x1 is NaN`);
@@ -405,12 +406,12 @@ var fromNumbers2 = (x1, y1, x2, y2) => {
     throw new Error(`y1 is NaN`);
   if (Number.isNaN(y2))
     throw new Error(`y2 is NaN`);
-  const a = { x: x1, y: y1 };
+  const a2 = { x: x1, y: y1 };
   const b = { x: x2, y: y2 };
-  return fromPoints(a, b);
+  return fromPoints(a2, b);
 };
-var toFlatArray = (a, b) => [a.x, a.y, b.x, b.y];
-var toSvgString = (a, b) => `M${a.x} ${a.y} L ${b.x} ${b.y}`;
+var toFlatArray = (a2, b) => [a2.x, a2.y, b.x, b.y];
+var toSvgString = (a2, b) => `M${a2.x} ${a2.y} L ${b.x} ${b.y}`;
 var fromArray = (arr) => {
   if (!Array.isArray(arr))
     throw new Error(`arr parameter is not an array`);
@@ -418,38 +419,38 @@ var fromArray = (arr) => {
     throw new Error(`array is expected to have length four`);
   return fromNumbers2(arr[0], arr[1], arr[2], arr[3]);
 };
-var fromPoints = (a, b) => {
-  guard(a, `a`);
+var fromPoints = (a2, b) => {
+  guard(a2, `a`);
   guard(b, `b`);
-  a = Object.freeze(a);
+  a2 = Object.freeze(a2);
   b = Object.freeze(b);
   return Object.freeze({
-    a,
+    a: a2,
     b
   });
 };
 var joinPointsToLines = (...points) => {
   const lines = [];
   let start = points[0];
-  for (let i = 1; i < points.length; i++) {
-    lines.push(fromPoints(start, points[i]));
-    start = points[i];
+  for (let i2 = 1; i2 < points.length; i2++) {
+    lines.push(fromPoints(start, points[i2]));
+    start = points[i2];
   }
   return lines;
 };
-var fromPointsToPath = (a, b) => toPath(fromPoints(a, b));
+var fromPointsToPath = (a2, b) => toPath(fromPoints(a2, b));
 var bbox2 = (line2) => bbox(line2.a, line2.b);
 var toPath = (line2) => {
-  const { a, b } = line2;
+  const { a: a2, b } = line2;
   return Object.freeze({
     ...line2,
-    length: () => length(a, b),
-    compute: (t2) => compute(a, b, t2),
+    length: () => length(a2, b),
+    compute: (t3) => compute(a2, b, t3),
     bbox: () => bbox2(line2),
-    toString: () => toString2(a, b),
-    toFlatArray: () => toFlatArray(a, b),
-    toSvgString: () => toSvgString(a, b),
-    toPoints: () => [a, b],
+    toString: () => toString2(a2, b),
+    toFlatArray: () => toFlatArray(a2, b),
+    toSvgString: () => toSvgString(a2, b),
+    toPoints: () => [a2, b],
     kind: `line`
   });
 };
@@ -463,13 +464,14 @@ __export(Bezier_exports, {
   quadratic: () => quadratic,
   quadraticBend: () => quadraticBend,
   quadraticSimple: () => quadraticSimple,
-  quadraticToSvgString: () => quadraticToSvgString
+  quadraticToSvgString: () => quadraticToSvgString,
+  toPath: () => toPath2
 });
 
 // node_modules/bezier-js/src/utils.js
 var { abs, cos, sin, acos, atan2, sqrt, pow } = Math;
-function crt(v) {
-  return v < 0 ? -pow(-v, 1 / 3) : pow(v, 1 / 3);
+function crt(v2) {
+  return v2 < 0 ? -pow(-v2, 1 / 3) : pow(v2, 1 / 3);
 }
 var pi = Math.PI;
 var tau = 2 * pi;
@@ -531,131 +533,131 @@ var utils = {
     0.0123412297999872,
     0.0123412297999872
   ],
-  arcfn: function(t2, derivativeFn) {
-    const d = derivativeFn(t2);
-    let l = d.x * d.x + d.y * d.y;
+  arcfn: function(t3, derivativeFn) {
+    const d = derivativeFn(t3);
+    let l2 = d.x * d.x + d.y * d.y;
     if (typeof d.z !== "undefined") {
-      l += d.z * d.z;
+      l2 += d.z * d.z;
     }
-    return sqrt(l);
+    return sqrt(l2);
   },
-  compute: function(t2, points, _3d) {
-    if (t2 === 0) {
+  compute: function(t3, points, _3d) {
+    if (t3 === 0) {
       points[0].t = 0;
       return points[0];
     }
     const order = points.length - 1;
-    if (t2 === 1) {
+    if (t3 === 1) {
       points[order].t = 1;
       return points[order];
     }
-    const mt = 1 - t2;
+    const mt = 1 - t3;
     let p = points;
     if (order === 0) {
-      points[0].t = t2;
+      points[0].t = t3;
       return points[0];
     }
     if (order === 1) {
       const ret = {
-        x: mt * p[0].x + t2 * p[1].x,
-        y: mt * p[0].y + t2 * p[1].y,
-        t: t2
+        x: mt * p[0].x + t3 * p[1].x,
+        y: mt * p[0].y + t3 * p[1].y,
+        t: t3
       };
       if (_3d) {
-        ret.z = mt * p[0].z + t2 * p[1].z;
+        ret.z = mt * p[0].z + t3 * p[1].z;
       }
       return ret;
     }
     if (order < 4) {
-      let mt2 = mt * mt, t22 = t2 * t2, a, b, c, d = 0;
+      let mt2 = mt * mt, t22 = t3 * t3, a2, b, c2, d = 0;
       if (order === 2) {
         p = [p[0], p[1], p[2], ZERO];
-        a = mt2;
-        b = mt * t2 * 2;
-        c = t22;
+        a2 = mt2;
+        b = mt * t3 * 2;
+        c2 = t22;
       } else if (order === 3) {
-        a = mt2 * mt;
-        b = mt2 * t2 * 3;
-        c = mt * t22 * 3;
-        d = t2 * t22;
+        a2 = mt2 * mt;
+        b = mt2 * t3 * 3;
+        c2 = mt * t22 * 3;
+        d = t3 * t22;
       }
       const ret = {
-        x: a * p[0].x + b * p[1].x + c * p[2].x + d * p[3].x,
-        y: a * p[0].y + b * p[1].y + c * p[2].y + d * p[3].y,
-        t: t2
+        x: a2 * p[0].x + b * p[1].x + c2 * p[2].x + d * p[3].x,
+        y: a2 * p[0].y + b * p[1].y + c2 * p[2].y + d * p[3].y,
+        t: t3
       };
       if (_3d) {
-        ret.z = a * p[0].z + b * p[1].z + c * p[2].z + d * p[3].z;
+        ret.z = a2 * p[0].z + b * p[1].z + c2 * p[2].z + d * p[3].z;
       }
       return ret;
     }
     const dCpts = JSON.parse(JSON.stringify(points));
     while (dCpts.length > 1) {
-      for (let i = 0; i < dCpts.length - 1; i++) {
-        dCpts[i] = {
-          x: dCpts[i].x + (dCpts[i + 1].x - dCpts[i].x) * t2,
-          y: dCpts[i].y + (dCpts[i + 1].y - dCpts[i].y) * t2
+      for (let i2 = 0; i2 < dCpts.length - 1; i2++) {
+        dCpts[i2] = {
+          x: dCpts[i2].x + (dCpts[i2 + 1].x - dCpts[i2].x) * t3,
+          y: dCpts[i2].y + (dCpts[i2 + 1].y - dCpts[i2].y) * t3
         };
-        if (typeof dCpts[i].z !== "undefined") {
-          dCpts[i] = dCpts[i].z + (dCpts[i + 1].z - dCpts[i].z) * t2;
+        if (typeof dCpts[i2].z !== "undefined") {
+          dCpts[i2] = dCpts[i2].z + (dCpts[i2 + 1].z - dCpts[i2].z) * t3;
         }
       }
       dCpts.splice(dCpts.length - 1, 1);
     }
-    dCpts[0].t = t2;
+    dCpts[0].t = t3;
     return dCpts[0];
   },
-  computeWithRatios: function(t2, points, ratios, _3d) {
-    const mt = 1 - t2, r = ratios, p = points;
-    let f1 = r[0], f2 = r[1], f3 = r[2], f4 = r[3], d;
+  computeWithRatios: function(t3, points, ratios, _3d) {
+    const mt = 1 - t3, r2 = ratios, p = points;
+    let f1 = r2[0], f2 = r2[1], f3 = r2[2], f4 = r2[3], d;
     f1 *= mt;
-    f2 *= t2;
+    f2 *= t3;
     if (p.length === 2) {
       d = f1 + f2;
       return {
         x: (f1 * p[0].x + f2 * p[1].x) / d,
         y: (f1 * p[0].y + f2 * p[1].y) / d,
         z: !_3d ? false : (f1 * p[0].z + f2 * p[1].z) / d,
-        t: t2
+        t: t3
       };
     }
     f1 *= mt;
     f2 *= 2 * mt;
-    f3 *= t2 * t2;
+    f3 *= t3 * t3;
     if (p.length === 3) {
       d = f1 + f2 + f3;
       return {
         x: (f1 * p[0].x + f2 * p[1].x + f3 * p[2].x) / d,
         y: (f1 * p[0].y + f2 * p[1].y + f3 * p[2].y) / d,
         z: !_3d ? false : (f1 * p[0].z + f2 * p[1].z + f3 * p[2].z) / d,
-        t: t2
+        t: t3
       };
     }
     f1 *= mt;
     f2 *= 1.5 * mt;
     f3 *= 3 * mt;
-    f4 *= t2 * t2 * t2;
+    f4 *= t3 * t3 * t3;
     if (p.length === 4) {
       d = f1 + f2 + f3 + f4;
       return {
         x: (f1 * p[0].x + f2 * p[1].x + f3 * p[2].x + f4 * p[3].x) / d,
         y: (f1 * p[0].y + f2 * p[1].y + f3 * p[2].y + f4 * p[3].y) / d,
         z: !_3d ? false : (f1 * p[0].z + f2 * p[1].z + f3 * p[2].z + f4 * p[3].z) / d,
-        t: t2
+        t: t3
       };
     }
   },
   derive: function(points, _3d) {
     const dpoints = [];
-    for (let p = points, d = p.length, c = d - 1; d > 1; d--, c--) {
+    for (let p = points, d = p.length, c2 = d - 1; d > 1; d--, c2--) {
       const list = [];
-      for (let j = 0, dpt; j < c; j++) {
+      for (let j = 0, dpt; j < c2; j++) {
         dpt = {
-          x: c * (p[j + 1].x - p[j].x),
-          y: c * (p[j + 1].y - p[j].y)
+          x: c2 * (p[j + 1].x - p[j].x),
+          y: c2 * (p[j + 1].y - p[j].y)
         };
         if (_3d) {
-          dpt.z = c * (p[j + 1].z - p[j].z);
+          dpt.z = c2 * (p[j + 1].z - p[j].z);
         }
         list.push(dpt);
       }
@@ -664,41 +666,41 @@ var utils = {
     }
     return dpoints;
   },
-  between: function(v, m, M) {
-    return m <= v && v <= M || utils.approximately(v, m) || utils.approximately(v, M);
+  between: function(v2, m2, M) {
+    return m2 <= v2 && v2 <= M || utils.approximately(v2, m2) || utils.approximately(v2, M);
   },
-  approximately: function(a, b, precision) {
-    return abs(a - b) <= (precision || epsilon);
+  approximately: function(a2, b, precision) {
+    return abs(a2 - b) <= (precision || epsilon);
   },
   length: function(derivativeFn) {
     const z = 0.5, len = utils.Tvalues.length;
     let sum2 = 0;
-    for (let i = 0, t2; i < len; i++) {
-      t2 = z * utils.Tvalues[i] + z;
-      sum2 += utils.Cvalues[i] * utils.arcfn(t2, derivativeFn);
+    for (let i2 = 0, t3; i2 < len; i2++) {
+      t3 = z * utils.Tvalues[i2] + z;
+      sum2 += utils.Cvalues[i2] * utils.arcfn(t3, derivativeFn);
     }
     return z * sum2;
   },
-  map: function(v, ds, de, ts, te) {
-    const d1 = de - ds, d2 = te - ts, v2 = v - ds, r = v2 / d1;
-    return ts + d2 * r;
+  map: function(v2, ds, de, ts, te) {
+    const d1 = de - ds, d2 = te - ts, v22 = v2 - ds, r2 = v22 / d1;
+    return ts + d2 * r2;
   },
-  lerp: function(r, v1, v2) {
+  lerp: function(r2, v1, v2) {
     const ret = {
-      x: v1.x + r * (v2.x - v1.x),
-      y: v1.y + r * (v2.y - v1.y)
+      x: v1.x + r2 * (v2.x - v1.x),
+      y: v1.y + r2 * (v2.y - v1.y)
     };
     if (v1.z !== void 0 && v2.z !== void 0) {
-      ret.z = v1.z + r * (v2.z - v1.z);
+      ret.z = v1.z + r2 * (v2.z - v1.z);
     }
     return ret;
   },
   pointToString: function(p) {
-    let s = p.x + "/" + p.y;
+    let s2 = p.x + "/" + p.y;
     if (typeof p.z !== "undefined") {
-      s += "/" + p.z;
+      s2 += "/" + p.z;
     }
-    return s;
+    return s2;
   },
   pointsToString: function(points) {
     return "[" + points.map(utils.pointToString).join(", ") + "]";
@@ -706,14 +708,14 @@ var utils = {
   copy: function(obj) {
     return JSON.parse(JSON.stringify(obj));
   },
-  angle: function(o, v1, v2) {
-    const dx1 = v1.x - o.x, dy1 = v1.y - o.y, dx2 = v2.x - o.x, dy2 = v2.y - o.y, cross = dx1 * dy2 - dy1 * dx2, dot2 = dx1 * dx2 + dy1 * dy2;
+  angle: function(o2, v1, v2) {
+    const dx1 = v1.x - o2.x, dy1 = v1.y - o2.y, dx2 = v2.x - o2.x, dy2 = v2.y - o2.y, cross = dx1 * dy2 - dy1 * dx2, dot2 = dx1 * dx2 + dy1 * dy2;
     return atan2(cross, dot2);
   },
-  round: function(v, d) {
-    const s = "" + v;
-    const pos = s.indexOf(".");
-    return parseFloat(s.substring(0, pos + 1 + d));
+  round: function(v2, d) {
+    const s2 = "" + v2;
+    const pos = s2.indexOf(".");
+    return parseFloat(s2.substring(0, pos + 1 + d));
   },
   dist: function(p1, p2) {
     const dx = p1.x - p2.x, dy = p1.y - p2.y;
@@ -730,28 +732,28 @@ var utils = {
     });
     return { mdist, mpos };
   },
-  abcratio: function(t2, n) {
-    if (n !== 2 && n !== 3) {
+  abcratio: function(t3, n2) {
+    if (n2 !== 2 && n2 !== 3) {
       return false;
     }
-    if (typeof t2 === "undefined") {
-      t2 = 0.5;
-    } else if (t2 === 0 || t2 === 1) {
-      return t2;
+    if (typeof t3 === "undefined") {
+      t3 = 0.5;
+    } else if (t3 === 0 || t3 === 1) {
+      return t3;
     }
-    const bottom = pow(t2, n) + pow(1 - t2, n), top = bottom - 1;
+    const bottom = pow(t3, n2) + pow(1 - t3, n2), top = bottom - 1;
     return abs(top / bottom);
   },
-  projectionratio: function(t2, n) {
-    if (n !== 2 && n !== 3) {
+  projectionratio: function(t3, n2) {
+    if (n2 !== 2 && n2 !== 3) {
       return false;
     }
-    if (typeof t2 === "undefined") {
-      t2 = 0.5;
-    } else if (t2 === 0 || t2 === 1) {
-      return t2;
+    if (typeof t3 === "undefined") {
+      t3 = 0.5;
+    } else if (t3 === 0 || t3 === 1) {
+      return t3;
     }
-    const top = pow(1 - t2, n), bottom = pow(t2, n) + top;
+    const top = pow(1 - t3, n2), bottom = pow(t3, n2) + top;
     return top / bottom;
   },
   lli8: function(x1, y1, x2, y2, x3, y3, x4, y4) {
@@ -774,8 +776,8 @@ var utils = {
   },
   findbbox: function(sections) {
     let mx = nMax, my = nMax, MX = nMin, MY = nMin;
-    sections.forEach(function(s) {
-      const bbox4 = s.bbox();
+    sections.forEach(function(s2) {
+      const bbox4 = s2.bbox();
       if (mx > bbox4.x.min)
         mx = bbox4.x.min;
       if (my > bbox4.y.min)
@@ -834,30 +836,30 @@ var utils = {
   getminmax: function(curve, d, list) {
     if (!list)
       return { min: 0, max: 0 };
-    let min2 = nMax, max2 = nMin, t2, c;
+    let min2 = nMax, max2 = nMin, t3, c2;
     if (list.indexOf(0) === -1) {
       list = [0].concat(list);
     }
     if (list.indexOf(1) === -1) {
       list.push(1);
     }
-    for (let i = 0, len = list.length; i < len; i++) {
-      t2 = list[i];
-      c = curve.get(t2);
-      if (c[d] < min2) {
-        min2 = c[d];
+    for (let i2 = 0, len = list.length; i2 < len; i2++) {
+      t3 = list[i2];
+      c2 = curve.get(t3);
+      if (c2[d] < min2) {
+        min2 = c2[d];
       }
-      if (c[d] > max2) {
-        max2 = c[d];
+      if (c2[d] > max2) {
+        max2 = c2[d];
       }
     }
     return { min: min2, mid: (min2 + max2) / 2, max: max2, size: max2 - min2 };
   },
   align: function(points, line2) {
-    const tx = line2.p1.x, ty = line2.p1.y, a = -atan2(line2.p2.y - ty, line2.p2.x - tx), d = function(v) {
+    const tx = line2.p1.x, ty = line2.p1.y, a2 = -atan2(line2.p2.y - ty, line2.p2.x - tx), d = function(v2) {
       return {
-        x: (v.x - tx) * cos(a) - (v.y - ty) * sin(a),
-        y: (v.x - tx) * sin(a) + (v.y - ty) * cos(a)
+        x: (v2.x - tx) * cos(a2) - (v2.y - ty) * sin(a2),
+        y: (v2.x - tx) * sin(a2) + (v2.y - ty) * cos(a2)
       };
     };
     return points.map(d);
@@ -866,78 +868,78 @@ var utils = {
     line2 = line2 || { p1: { x: 0, y: 0 }, p2: { x: 1, y: 0 } };
     const order = points.length - 1;
     const aligned = utils.align(points, line2);
-    const reduce = function(t2) {
-      return 0 <= t2 && t2 <= 1;
+    const reduce3 = function(t3) {
+      return 0 <= t3 && t3 <= 1;
     };
     if (order === 2) {
-      const a2 = aligned[0].y, b2 = aligned[1].y, c2 = aligned[2].y, d2 = a2 - 2 * b2 + c2;
+      const a3 = aligned[0].y, b2 = aligned[1].y, c3 = aligned[2].y, d2 = a3 - 2 * b2 + c3;
       if (d2 !== 0) {
-        const m1 = -sqrt(b2 * b2 - a2 * c2), m2 = -a2 + b2, v12 = -(m1 + m2) / d2, v2 = -(-m1 + m2) / d2;
-        return [v12, v2].filter(reduce);
-      } else if (b2 !== c2 && d2 === 0) {
-        return [(2 * b2 - c2) / (2 * b2 - 2 * c2)].filter(reduce);
+        const m1 = -sqrt(b2 * b2 - a3 * c3), m2 = -a3 + b2, v12 = -(m1 + m2) / d2, v2 = -(-m1 + m2) / d2;
+        return [v12, v2].filter(reduce3);
+      } else if (b2 !== c3 && d2 === 0) {
+        return [(2 * b2 - c3) / (2 * b2 - 2 * c3)].filter(reduce3);
       }
       return [];
     }
     const pa = aligned[0].y, pb = aligned[1].y, pc = aligned[2].y, pd = aligned[3].y;
-    let d = -pa + 3 * pb - 3 * pc + pd, a = 3 * pa - 6 * pb + 3 * pc, b = -3 * pa + 3 * pb, c = pa;
+    let d = -pa + 3 * pb - 3 * pc + pd, a2 = 3 * pa - 6 * pb + 3 * pc, b = -3 * pa + 3 * pb, c2 = pa;
     if (utils.approximately(d, 0)) {
-      if (utils.approximately(a, 0)) {
+      if (utils.approximately(a2, 0)) {
         if (utils.approximately(b, 0)) {
           return [];
         }
-        return [-c / b].filter(reduce);
+        return [-c2 / b].filter(reduce3);
       }
-      const q3 = sqrt(b * b - 4 * a * c), a2 = 2 * a;
-      return [(q3 - b) / a2, (-b - q3) / a2].filter(reduce);
+      const q3 = sqrt(b * b - 4 * a2 * c2), a22 = 2 * a2;
+      return [(q3 - b) / a22, (-b - q3) / a22].filter(reduce3);
     }
-    a /= d;
+    a2 /= d;
     b /= d;
-    c /= d;
-    const p = (3 * b - a * a) / 3, p3 = p / 3, q = (2 * a * a * a - 9 * a * b + 27 * c) / 27, q2 = q / 2, discriminant = q2 * q2 + p3 * p3 * p3;
+    c2 /= d;
+    const p = (3 * b - a2 * a2) / 3, p3 = p / 3, q = (2 * a2 * a2 * a2 - 9 * a2 * b + 27 * c2) / 27, q2 = q / 2, discriminant = q2 * q2 + p3 * p3 * p3;
     let u1, v1, x1, x2, x3;
     if (discriminant < 0) {
-      const mp3 = -p / 3, mp33 = mp3 * mp3 * mp3, r = sqrt(mp33), t2 = -q / (2 * r), cosphi = t2 < -1 ? -1 : t2 > 1 ? 1 : t2, phi = acos(cosphi), crtr = crt(r), t1 = 2 * crtr;
-      x1 = t1 * cos(phi / 3) - a / 3;
-      x2 = t1 * cos((phi + tau) / 3) - a / 3;
-      x3 = t1 * cos((phi + 2 * tau) / 3) - a / 3;
-      return [x1, x2, x3].filter(reduce);
+      const mp3 = -p / 3, mp33 = mp3 * mp3 * mp3, r2 = sqrt(mp33), t3 = -q / (2 * r2), cosphi = t3 < -1 ? -1 : t3 > 1 ? 1 : t3, phi = acos(cosphi), crtr = crt(r2), t1 = 2 * crtr;
+      x1 = t1 * cos(phi / 3) - a2 / 3;
+      x2 = t1 * cos((phi + tau) / 3) - a2 / 3;
+      x3 = t1 * cos((phi + 2 * tau) / 3) - a2 / 3;
+      return [x1, x2, x3].filter(reduce3);
     } else if (discriminant === 0) {
       u1 = q2 < 0 ? crt(-q2) : -crt(q2);
-      x1 = 2 * u1 - a / 3;
-      x2 = -u1 - a / 3;
-      return [x1, x2].filter(reduce);
+      x1 = 2 * u1 - a2 / 3;
+      x2 = -u1 - a2 / 3;
+      return [x1, x2].filter(reduce3);
     } else {
       const sd = sqrt(discriminant);
       u1 = crt(-q2 + sd);
       v1 = crt(q2 + sd);
-      return [u1 - v1 - a / 3].filter(reduce);
+      return [u1 - v1 - a2 / 3].filter(reduce3);
     }
   },
   droots: function(p) {
     if (p.length === 3) {
-      const a = p[0], b = p[1], c = p[2], d = a - 2 * b + c;
+      const a2 = p[0], b = p[1], c2 = p[2], d = a2 - 2 * b + c2;
       if (d !== 0) {
-        const m1 = -sqrt(b * b - a * c), m2 = -a + b, v1 = -(m1 + m2) / d, v2 = -(-m1 + m2) / d;
+        const m1 = -sqrt(b * b - a2 * c2), m2 = -a2 + b, v1 = -(m1 + m2) / d, v2 = -(-m1 + m2) / d;
         return [v1, v2];
-      } else if (b !== c && d === 0) {
-        return [(2 * b - c) / (2 * (b - c))];
+      } else if (b !== c2 && d === 0) {
+        return [(2 * b - c2) / (2 * (b - c2))];
       }
       return [];
     }
     if (p.length === 2) {
-      const a = p[0], b = p[1];
-      if (a !== b) {
-        return [a / (a - b)];
+      const a2 = p[0], b = p[1];
+      if (a2 !== b) {
+        return [a2 / (a2 - b)];
       }
       return [];
     }
     return [];
   },
-  curvature: function(t2, d1, d2, _3d, kOnly) {
-    let num, dnm, adk, dk, k = 0, r = 0;
-    const d = utils.compute(t2, d1);
-    const dd = utils.compute(t2, d2);
+  curvature: function(t3, d1, d2, _3d, kOnly) {
+    let num, dnm, adk, dk, k = 0, r2 = 0;
+    const d = utils.compute(t3, d1);
+    const dd = utils.compute(t3, d2);
     const qdsum = d.x * d.x + d.y * d.y;
     if (_3d) {
       num = sqrt(pow(d.y * dd.z - dd.y * d.z, 2) + pow(d.z * dd.x - dd.z * d.x, 2) + pow(d.x * dd.y - dd.x * d.y, 2));
@@ -950,42 +952,42 @@ var utils = {
       return { k: 0, r: 0 };
     }
     k = num / dnm;
-    r = dnm / num;
+    r2 = dnm / num;
     if (!kOnly) {
-      const pk = utils.curvature(t2 - 1e-3, d1, d2, _3d, true).k;
-      const nk = utils.curvature(t2 + 1e-3, d1, d2, _3d, true).k;
+      const pk = utils.curvature(t3 - 1e-3, d1, d2, _3d, true).k;
+      const nk = utils.curvature(t3 + 1e-3, d1, d2, _3d, true).k;
       dk = (nk - k + (k - pk)) / 2;
       adk = (abs(nk - k) + abs(k - pk)) / 2;
     }
-    return { k, r, dk, adk };
+    return { k, r: r2, dk, adk };
   },
   inflections: function(points) {
     if (points.length < 4)
       return [];
-    const p = utils.align(points, { p1: points[0], p2: points.slice(-1)[0] }), a = p[2].x * p[1].y, b = p[3].x * p[1].y, c = p[1].x * p[2].y, d = p[3].x * p[2].y, v1 = 18 * (-3 * a + 2 * b + 3 * c - d), v2 = 18 * (3 * a - b - 3 * c), v3 = 18 * (c - a);
+    const p = utils.align(points, { p1: points[0], p2: points.slice(-1)[0] }), a2 = p[2].x * p[1].y, b = p[3].x * p[1].y, c2 = p[1].x * p[2].y, d = p[3].x * p[2].y, v1 = 18 * (-3 * a2 + 2 * b + 3 * c2 - d), v2 = 18 * (3 * a2 - b - 3 * c2), v3 = 18 * (c2 - a2);
     if (utils.approximately(v1, 0)) {
       if (!utils.approximately(v2, 0)) {
-        let t2 = -v3 / v2;
-        if (0 <= t2 && t2 <= 1)
-          return [t2];
+        let t3 = -v3 / v2;
+        if (0 <= t3 && t3 <= 1)
+          return [t3];
       }
       return [];
     }
     const trm = v2 * v2 - 4 * v1 * v3, sq = Math.sqrt(trm), d2 = 2 * v1;
     if (utils.approximately(d2, 0))
       return [];
-    return [(sq - v2) / d2, -(v2 + sq) / d2].filter(function(r) {
-      return 0 <= r && r <= 1;
+    return [(sq - v2) / d2, -(v2 + sq) / d2].filter(function(r2) {
+      return 0 <= r2 && r2 <= 1;
     });
   },
   bboxoverlap: function(b1, b2) {
     const dims = ["x", "y"], len = dims.length;
-    for (let i = 0, dim, l, t2, d; i < len; i++) {
-      dim = dims[i];
-      l = b1[dim].mid;
-      t2 = b2[dim].mid;
+    for (let i2 = 0, dim, l2, t3, d; i2 < len; i2++) {
+      dim = dims[i2];
+      l2 = b1[dim].mid;
+      t3 = b2[dim].mid;
       d = (b1[dim].size + b2[dim].size) / 2;
-      if (abs(l - t2) >= d)
+      if (abs(l2 - t3) >= d)
         return false;
     }
     return true;
@@ -1021,10 +1023,10 @@ var utils = {
     }
   },
   pairiteration: function(c1, c2, curveIntersectionThreshold) {
-    const c1b = c1.bbox(), c2b = c2.bbox(), r = 1e5, threshold = curveIntersectionThreshold || 0.5;
+    const c1b = c1.bbox(), c2b = c2.bbox(), r2 = 1e5, threshold = curveIntersectionThreshold || 0.5;
     if (c1b.x.size + c1b.y.size < threshold && c2b.x.size + c2b.y.size < threshold) {
       return [
-        (r * (c1._t1 + c1._t2) / 2 | 0) / r + "/" + (r * (c2._t1 + c2._t2) / 2 | 0) / r
+        (r2 * (c1._t1 + c1._t2) / 2 | 0) / r2 + "/" + (r2 * (c2._t1 + c2._t2) / 2 | 0) / r2
       ];
     }
     let cc1 = c1.split(0.5), cc2 = c2.split(0.5), pairs = [
@@ -1042,39 +1044,39 @@ var utils = {
     pairs.forEach(function(pair) {
       results = results.concat(utils.pairiteration(pair.left, pair.right, threshold));
     });
-    results = results.filter(function(v, i) {
-      return results.indexOf(v) === i;
+    results = results.filter(function(v2, i2) {
+      return results.indexOf(v2) === i2;
     });
     return results;
   },
   getccenter: function(p1, p2, p3) {
-    const dx1 = p2.x - p1.x, dy1 = p2.y - p1.y, dx2 = p3.x - p2.x, dy2 = p3.y - p2.y, dx1p = dx1 * cos(quart) - dy1 * sin(quart), dy1p = dx1 * sin(quart) + dy1 * cos(quart), dx2p = dx2 * cos(quart) - dy2 * sin(quart), dy2p = dx2 * sin(quart) + dy2 * cos(quart), mx1 = (p1.x + p2.x) / 2, my1 = (p1.y + p2.y) / 2, mx2 = (p2.x + p3.x) / 2, my2 = (p2.y + p3.y) / 2, mx1n = mx1 + dx1p, my1n = my1 + dy1p, mx2n = mx2 + dx2p, my2n = my2 + dy2p, arc2 = utils.lli8(mx1, my1, mx1n, my1n, mx2, my2, mx2n, my2n), r = utils.dist(arc2, p1);
-    let s = atan2(p1.y - arc2.y, p1.x - arc2.x), m = atan2(p2.y - arc2.y, p2.x - arc2.x), e = atan2(p3.y - arc2.y, p3.x - arc2.x), _;
-    if (s < e) {
-      if (s > m || m > e) {
-        s += tau;
+    const dx1 = p2.x - p1.x, dy1 = p2.y - p1.y, dx2 = p3.x - p2.x, dy2 = p3.y - p2.y, dx1p = dx1 * cos(quart) - dy1 * sin(quart), dy1p = dx1 * sin(quart) + dy1 * cos(quart), dx2p = dx2 * cos(quart) - dy2 * sin(quart), dy2p = dx2 * sin(quart) + dy2 * cos(quart), mx1 = (p1.x + p2.x) / 2, my1 = (p1.y + p2.y) / 2, mx2 = (p2.x + p3.x) / 2, my2 = (p2.y + p3.y) / 2, mx1n = mx1 + dx1p, my1n = my1 + dy1p, mx2n = mx2 + dx2p, my2n = my2 + dy2p, arc2 = utils.lli8(mx1, my1, mx1n, my1n, mx2, my2, mx2n, my2n), r2 = utils.dist(arc2, p1);
+    let s2 = atan2(p1.y - arc2.y, p1.x - arc2.x), m2 = atan2(p2.y - arc2.y, p2.x - arc2.x), e2 = atan2(p3.y - arc2.y, p3.x - arc2.x), _2;
+    if (s2 < e2) {
+      if (s2 > m2 || m2 > e2) {
+        s2 += tau;
       }
-      if (s > e) {
-        _ = e;
-        e = s;
-        s = _;
+      if (s2 > e2) {
+        _2 = e2;
+        e2 = s2;
+        s2 = _2;
       }
     } else {
-      if (e < m && m < s) {
-        _ = e;
-        e = s;
-        s = _;
+      if (e2 < m2 && m2 < s2) {
+        _2 = e2;
+        e2 = s2;
+        s2 = _2;
       } else {
-        e += tau;
+        e2 += tau;
       }
     }
-    arc2.s = s;
-    arc2.e = e;
-    arc2.r = r;
+    arc2.s = s2;
+    arc2.e = e2;
+    arc2.r = r2;
     return arc2;
   },
-  numberSort: function(a, b) {
-    return a - b;
+  numberSort: function(a2, b) {
+    return a2 - b;
   }
 };
 
@@ -1101,27 +1103,27 @@ var PolyBezier = class {
     this._3d = this._3d || curve._3d;
   }
   length() {
-    return this.curves.map(function(v) {
-      return v.length();
-    }).reduce(function(a, b) {
-      return a + b;
+    return this.curves.map(function(v2) {
+      return v2.length();
+    }).reduce(function(a2, b) {
+      return a2 + b;
     });
   }
   curve(idx) {
     return this.curves[idx];
   }
   bbox() {
-    const c = this.curves;
-    var bbox4 = c[0].bbox();
-    for (var i = 1; i < c.length; i++) {
-      utils.expandbox(bbox4, c[i].bbox());
+    const c2 = this.curves;
+    var bbox4 = c2[0].bbox();
+    for (var i2 = 1; i2 < c2.length; i2++) {
+      utils.expandbox(bbox4, c2[i2].bbox());
     }
     return bbox4;
   }
   offset(d) {
     const offset2 = [];
-    this.curves.forEach(function(v) {
-      offset2.push(...v.offset(d));
+    this.curves.forEach(function(v2) {
+      offset2.push(...v2.offset(d));
     });
     return new PolyBezier(offset2);
   }
@@ -1186,32 +1188,32 @@ var Bezier = class {
     this._t2 = 1;
     this.update();
   }
-  static quadraticFromPoints(p1, p2, p3, t2) {
-    if (typeof t2 === "undefined") {
-      t2 = 0.5;
+  static quadraticFromPoints(p1, p2, p3, t3) {
+    if (typeof t3 === "undefined") {
+      t3 = 0.5;
     }
-    if (t2 === 0) {
+    if (t3 === 0) {
       return new Bezier(p2, p2, p3);
     }
-    if (t2 === 1) {
+    if (t3 === 1) {
       return new Bezier(p1, p2, p2);
     }
-    const abc = Bezier.getABC(2, p1, p2, p3, t2);
+    const abc = Bezier.getABC(2, p1, p2, p3, t3);
     return new Bezier(p1, abc.A, p3);
   }
-  static cubicFromPoints(S, B, E, t2, d1) {
-    if (typeof t2 === "undefined") {
-      t2 = 0.5;
+  static cubicFromPoints(S, B, E, t3, d1) {
+    if (typeof t3 === "undefined") {
+      t3 = 0.5;
     }
-    const abc = Bezier.getABC(3, S, B, E, t2);
+    const abc = Bezier.getABC(3, S, B, E, t3);
     if (typeof d1 === "undefined") {
       d1 = utils.dist(B, abc.C);
     }
-    const d2 = d1 * (1 - t2) / t2;
+    const d2 = d1 * (1 - t3) / t3;
     const selen = utils.dist(S, E), lx = (E.x - S.x) / selen, ly = (E.y - S.y) / selen, bx1 = d1 * lx, by1 = d1 * ly, bx2 = d2 * lx, by2 = d2 * ly;
-    const e1 = { x: B.x - bx1, y: B.y - by1 }, e2 = { x: B.x + bx2, y: B.y + by2 }, A = abc.A, v1 = { x: A.x + (e1.x - A.x) / (1 - t2), y: A.y + (e1.y - A.y) / (1 - t2) }, v2 = { x: A.x + (e2.x - A.x) / t2, y: A.y + (e2.y - A.y) / t2 }, nc1 = { x: S.x + (v1.x - S.x) / t2, y: S.y + (v1.y - S.y) / t2 }, nc2 = {
-      x: E.x + (v2.x - E.x) / (1 - t2),
-      y: E.y + (v2.y - E.y) / (1 - t2)
+    const e1 = { x: B.x - bx1, y: B.y - by1 }, e2 = { x: B.x + bx2, y: B.y + by2 }, A = abc.A, v1 = { x: A.x + (e1.x - A.x) / (1 - t3), y: A.y + (e1.y - A.y) / (1 - t3) }, v2 = { x: A.x + (e2.x - A.x) / t3, y: A.y + (e2.y - A.y) / t3 }, nc1 = { x: S.x + (v1.x - S.x) / t3, y: S.y + (v1.y - S.y) / t3 }, nc2 = {
+      x: E.x + (v2.x - E.x) / (1 - t3),
+      y: E.y + (v2.y - E.y) / (1 - t3)
     };
     return new Bezier(S, nc1, nc2, E);
   }
@@ -1233,12 +1235,12 @@ var Bezier = class {
   toSVG() {
     if (this._3d)
       return false;
-    const p = this.points, x = p[0].x, y = p[0].y, s = ["M", x, y, this.order === 2 ? "Q" : "C"];
-    for (let i = 1, last = p.length; i < last; i++) {
-      s.push(p[i].x);
-      s.push(p[i].y);
+    const p = this.points, x = p[0].x, y = p[0].y, s2 = ["M", x, y, this.order === 2 ? "Q" : "C"];
+    for (let i2 = 1, last4 = p.length; i2 < last4; i2++) {
+      s2.push(p[i2].x);
+      s2.push(p[i2].y);
     }
-    return s.join(" ");
+    return s2.join(" ");
   }
   setRatios(ratios) {
     if (ratios.length !== this.points.length) {
@@ -1255,8 +1257,8 @@ var Bezier = class {
     }
   }
   coordDigest() {
-    return this.points.map(function(c, pos) {
-      return "" + pos + c.x + c.y + (c.z ? c.z : 0);
+    return this.points.map(function(c2, pos) {
+      return "" + pos + c2.x + c2.y + (c2.z ? c2.z : 0);
     }).join("");
   }
   update() {
@@ -1272,21 +1274,21 @@ var Bezier = class {
   length() {
     return utils.length(this.derivative.bind(this));
   }
-  static getABC(order = 2, S, B, E, t2 = 0.5) {
-    const u = utils.projectionratio(t2, order), um = 1 - u, C = {
-      x: u * S.x + um * E.x,
-      y: u * S.y + um * E.y
-    }, s = utils.abcratio(t2, order), A = {
-      x: B.x + (B.x - C.x) / s,
-      y: B.y + (B.y - C.y) / s
+  static getABC(order = 2, S, B, E, t3 = 0.5) {
+    const u2 = utils.projectionratio(t3, order), um = 1 - u2, C = {
+      x: u2 * S.x + um * E.x,
+      y: u2 * S.y + um * E.y
+    }, s2 = utils.abcratio(t3, order), A = {
+      x: B.x + (B.x - C.x) / s2,
+      y: B.y + (B.y - C.y) / s2
     };
     return { A, B, C, S, E };
   }
-  getABC(t2, B) {
-    B = B || this.get(t2);
+  getABC(t3, B) {
+    B = B || this.get(t3);
     let S = this.points[0];
     let E = this.points[this.order];
-    return Bezier.getABC(this.order, S, B, E, t2);
+    return Bezier.getABC(this.order, S, B, E, t3);
   }
   getLUT(steps) {
     this.verify();
@@ -1296,10 +1298,10 @@ var Bezier = class {
     }
     this._lut = [];
     steps--;
-    for (let i = 0, p, t2; i < steps; i++) {
-      t2 = i / (steps - 1);
-      p = this.compute(t2);
-      p.t = t2;
+    for (let i2 = 0, p, t3; i2 < steps; i2++) {
+      t3 = i2 / (steps - 1);
+      p = this.compute(t3);
+      p.t = t3;
       this._lut.push(p);
     }
     return this._lut;
@@ -1307,11 +1309,11 @@ var Bezier = class {
   on(point, error) {
     error = error || 5;
     const lut = this.getLUT(), hits = [];
-    for (let i = 0, c, t2 = 0; i < lut.length; i++) {
-      c = lut[i];
-      if (utils.dist(c, point) < error) {
-        hits.push(c);
-        t2 += i / lut.length;
+    for (let i2 = 0, c2, t3 = 0; i2 < lut.length; i2++) {
+      c2 = lut[i2];
+      if (utils.dist(c2, point) < error) {
+        hits.push(c2);
+        t3 += i2 / lut.length;
       }
     }
     if (!hits.length)
@@ -1319,10 +1321,10 @@ var Bezier = class {
     return t /= hits.length;
   }
   project(point) {
-    const LUT = this.getLUT(), l = LUT.length - 1, closest = utils.closest(LUT, point), mpos = closest.mpos, t1 = (mpos - 1) / l, t2 = (mpos + 1) / l, step = 0.1 / l;
+    const LUT = this.getLUT(), l2 = LUT.length - 1, closest = utils.closest(LUT, point), mpos = closest.mpos, t1 = (mpos - 1) / l2, t22 = (mpos + 1) / l2, step = 0.1 / l2;
     let mdist = closest.mdist, t3 = t1, ft = t3, p;
     mdist += 1;
-    for (let d; t3 < t2 + step; t3 += step) {
+    for (let d; t3 < t22 + step; t3 += step) {
       p = this.compute(t3);
       d = utils.dist(point, p);
       if (d < mdist) {
@@ -1336,91 +1338,91 @@ var Bezier = class {
     p.d = mdist;
     return p;
   }
-  get(t2) {
-    return this.compute(t2);
+  get(t3) {
+    return this.compute(t3);
   }
   point(idx) {
     return this.points[idx];
   }
-  compute(t2) {
+  compute(t3) {
     if (this.ratios) {
-      return utils.computeWithRatios(t2, this.points, this.ratios, this._3d);
+      return utils.computeWithRatios(t3, this.points, this.ratios, this._3d);
     }
-    return utils.compute(t2, this.points, this._3d, this.ratios);
+    return utils.compute(t3, this.points, this._3d, this.ratios);
   }
   raise() {
     const p = this.points, np = [p[0]], k = p.length;
-    for (let i = 1, pi3, pim; i < k; i++) {
-      pi3 = p[i];
-      pim = p[i - 1];
-      np[i] = {
-        x: (k - i) / k * pi3.x + i / k * pim.x,
-        y: (k - i) / k * pi3.y + i / k * pim.y
+    for (let i2 = 1, pi3, pim; i2 < k; i2++) {
+      pi3 = p[i2];
+      pim = p[i2 - 1];
+      np[i2] = {
+        x: (k - i2) / k * pi3.x + i2 / k * pim.x,
+        y: (k - i2) / k * pi3.y + i2 / k * pim.y
       };
     }
     np[k] = p[k - 1];
     return new Bezier(np);
   }
-  derivative(t2) {
-    return utils.compute(t2, this.dpoints[0], this._3d);
+  derivative(t3) {
+    return utils.compute(t3, this.dpoints[0], this._3d);
   }
-  dderivative(t2) {
-    return utils.compute(t2, this.dpoints[1], this._3d);
+  dderivative(t3) {
+    return utils.compute(t3, this.dpoints[1], this._3d);
   }
   align() {
     let p = this.points;
     return new Bezier(utils.align(p, { p1: p[0], p2: p[p.length - 1] }));
   }
-  curvature(t2) {
-    return utils.curvature(t2, this.dpoints[0], this.dpoints[1], this._3d);
+  curvature(t3) {
+    return utils.curvature(t3, this.dpoints[0], this.dpoints[1], this._3d);
   }
   inflections() {
     return utils.inflections(this.points);
   }
-  normal(t2) {
-    return this._3d ? this.__normal3(t2) : this.__normal2(t2);
+  normal(t3) {
+    return this._3d ? this.__normal3(t3) : this.__normal2(t3);
   }
-  __normal2(t2) {
-    const d = this.derivative(t2);
+  __normal2(t3) {
+    const d = this.derivative(t3);
     const q = sqrt2(d.x * d.x + d.y * d.y);
     return { x: -d.y / q, y: d.x / q };
   }
-  __normal3(t2) {
-    const r1 = this.derivative(t2), r2 = this.derivative(t2 + 0.01), q1 = sqrt2(r1.x * r1.x + r1.y * r1.y + r1.z * r1.z), q2 = sqrt2(r2.x * r2.x + r2.y * r2.y + r2.z * r2.z);
+  __normal3(t3) {
+    const r1 = this.derivative(t3), r2 = this.derivative(t3 + 0.01), q1 = sqrt2(r1.x * r1.x + r1.y * r1.y + r1.z * r1.z), q2 = sqrt2(r2.x * r2.x + r2.y * r2.y + r2.z * r2.z);
     r1.x /= q1;
     r1.y /= q1;
     r1.z /= q1;
     r2.x /= q2;
     r2.y /= q2;
     r2.z /= q2;
-    const c = {
+    const c2 = {
       x: r2.y * r1.z - r2.z * r1.y,
       y: r2.z * r1.x - r2.x * r1.z,
       z: r2.x * r1.y - r2.y * r1.x
     };
-    const m = sqrt2(c.x * c.x + c.y * c.y + c.z * c.z);
-    c.x /= m;
-    c.y /= m;
-    c.z /= m;
+    const m2 = sqrt2(c2.x * c2.x + c2.y * c2.y + c2.z * c2.z);
+    c2.x /= m2;
+    c2.y /= m2;
+    c2.z /= m2;
     const R = [
-      c.x * c.x,
-      c.x * c.y - c.z,
-      c.x * c.z + c.y,
-      c.x * c.y + c.z,
-      c.y * c.y,
-      c.y * c.z - c.x,
-      c.x * c.z - c.y,
-      c.y * c.z + c.x,
-      c.z * c.z
+      c2.x * c2.x,
+      c2.x * c2.y - c2.z,
+      c2.x * c2.z + c2.y,
+      c2.x * c2.y + c2.z,
+      c2.y * c2.y,
+      c2.y * c2.z - c2.x,
+      c2.x * c2.z - c2.y,
+      c2.y * c2.z + c2.x,
+      c2.z * c2.z
     ];
-    const n = {
+    const n2 = {
       x: R[0] * r1.x + R[1] * r1.y + R[2] * r1.z,
       y: R[3] * r1.x + R[4] * r1.y + R[5] * r1.z,
       z: R[6] * r1.x + R[7] * r1.y + R[8] * r1.z
     };
-    return n;
+    return n2;
   }
-  hull(t2) {
+  hull(t3) {
     let p = this.points, _p = [], q = [], idx = 0;
     q[idx++] = p[0];
     q[idx++] = p[1];
@@ -1430,8 +1432,8 @@ var Bezier = class {
     }
     while (p.length > 1) {
       _p = [];
-      for (let i = 0, pt, l = p.length - 1; i < l; i++) {
-        pt = utils.lerp(t2, p[i], p[i + 1]);
+      for (let i2 = 0, pt, l2 = p.length - 1; i2 < l2; i2++) {
+        pt = utils.lerp(t3, p[i2], p[i2 + 1]);
         q[idx++] = pt;
         _p.push(pt);
       }
@@ -1439,11 +1441,11 @@ var Bezier = class {
     }
     return q;
   }
-  split(t1, t2) {
-    if (t1 === 0 && !!t2) {
-      return this.split(t2).left;
+  split(t1, t22) {
+    if (t1 === 0 && !!t22) {
+      return this.split(t22).left;
     }
-    if (t2 === 1) {
+    if (t22 === 1) {
       return this.split(t1).right;
     }
     const q = this.hull(t1);
@@ -1456,18 +1458,18 @@ var Bezier = class {
     result.left._t2 = utils.map(t1, 0, 1, this._t1, this._t2);
     result.right._t1 = utils.map(t1, 0, 1, this._t1, this._t2);
     result.right._t2 = utils.map(1, 0, 1, this._t1, this._t2);
-    if (!t2) {
+    if (!t22) {
       return result;
     }
-    t2 = utils.map(t2, t1, 1, 0, 1);
-    return result.right.split(t2).left;
+    t22 = utils.map(t22, t1, 1, 0, 1);
+    return result.right.split(t22).left;
   }
   extrema() {
     const result = {};
     let roots = [];
     this.dims.forEach(function(dim) {
-      let mfn = function(v) {
-        return v[dim];
+      let mfn = function(v2) {
+        return v2[dim];
       };
       let p = this.dpoints[0].map(mfn);
       result[dim] = utils.droots(p);
@@ -1475,13 +1477,13 @@ var Bezier = class {
         p = this.dpoints[1].map(mfn);
         result[dim] = result[dim].concat(utils.droots(p));
       }
-      result[dim] = result[dim].filter(function(t2) {
-        return t2 >= 0 && t2 <= 1;
+      result[dim] = result[dim].filter(function(t3) {
+        return t3 >= 0 && t3 <= 1;
       });
       roots = roots.concat(result[dim].sort(utils.numberSort));
     }.bind(this));
-    result.values = roots.sort(utils.numberSort).filter(function(v, idx) {
-      return roots.indexOf(v) === idx;
+    result.values = roots.sort(utils.numberSort).filter(function(v2, idx) {
+      return roots.indexOf(v2) === idx;
     });
     return result;
   }
@@ -1496,38 +1498,38 @@ var Bezier = class {
     const lbbox = this.bbox(), tbbox = curve.bbox();
     return utils.bboxoverlap(lbbox, tbbox);
   }
-  offset(t2, d) {
+  offset(t3, d) {
     if (typeof d !== "undefined") {
-      const c = this.get(t2), n = this.normal(t2);
+      const c2 = this.get(t3), n2 = this.normal(t3);
       const ret = {
-        c,
-        n,
-        x: c.x + n.x * d,
-        y: c.y + n.y * d
+        c: c2,
+        n: n2,
+        x: c2.x + n2.x * d,
+        y: c2.y + n2.y * d
       };
       if (this._3d) {
-        ret.z = c.z + n.z * d;
+        ret.z = c2.z + n2.z * d;
       }
       return ret;
     }
     if (this._linear) {
       const nv = this.normal(0), coords = this.points.map(function(p) {
         const ret = {
-          x: p.x + t2 * nv.x,
-          y: p.y + t2 * nv.y
+          x: p.x + t3 * nv.x,
+          y: p.y + t3 * nv.y
         };
         if (p.z && nv.z) {
-          ret.z = p.z + t2 * nv.z;
+          ret.z = p.z + t3 * nv.z;
         }
         return ret;
       });
       return [new Bezier(coords)];
     }
-    return this.reduce().map(function(s) {
-      if (s._linear) {
-        return s.offset(t2)[0];
+    return this.reduce().map(function(s2) {
+      if (s2._linear) {
+        return s2.offset(t3)[0];
       }
-      return s.scale(t2);
+      return s2.scale(t3);
     });
   }
   simple() {
@@ -1539,14 +1541,14 @@ var Bezier = class {
     }
     const n1 = this.normal(0);
     const n2 = this.normal(1);
-    let s = n1.x * n2.x + n1.y * n2.y;
+    let s2 = n1.x * n2.x + n1.y * n2.y;
     if (this._3d) {
-      s += n1.z * n2.z;
+      s2 += n1.z * n2.z;
     }
-    return abs2(acos2(s)) < pi2 / 3;
+    return abs2(acos2(s2)) < pi2 / 3;
   }
   reduce() {
-    let i, t1 = 0, t2 = 0, step = 0.01, segment, pass1 = [], pass2 = [];
+    let i2, t1 = 0, t22 = 0, step = 0.01, segment, pass1 = [], pass2 = [];
     let extrema = this.extrema().values;
     if (extrema.indexOf(0) === -1) {
       extrema = [0].concat(extrema);
@@ -1554,30 +1556,30 @@ var Bezier = class {
     if (extrema.indexOf(1) === -1) {
       extrema.push(1);
     }
-    for (t1 = extrema[0], i = 1; i < extrema.length; i++) {
-      t2 = extrema[i];
-      segment = this.split(t1, t2);
+    for (t1 = extrema[0], i2 = 1; i2 < extrema.length; i2++) {
+      t22 = extrema[i2];
+      segment = this.split(t1, t22);
       segment._t1 = t1;
-      segment._t2 = t2;
+      segment._t2 = t22;
       pass1.push(segment);
-      t1 = t2;
+      t1 = t22;
     }
     pass1.forEach(function(p1) {
       t1 = 0;
-      t2 = 0;
-      while (t2 <= 1) {
-        for (t2 = t1 + step; t2 <= 1 + step; t2 += step) {
-          segment = p1.split(t1, t2);
+      t22 = 0;
+      while (t22 <= 1) {
+        for (t22 = t1 + step; t22 <= 1 + step; t22 += step) {
+          segment = p1.split(t1, t22);
           if (!segment.simple()) {
-            t2 -= step;
-            if (abs2(t1 - t2) < step) {
+            t22 -= step;
+            if (abs2(t1 - t22) < step) {
               return [];
             }
-            segment = p1.split(t1, t2);
+            segment = p1.split(t1, t22);
             segment._t1 = utils.map(t1, 0, 1, p1._t1, p1._t2);
-            segment._t2 = utils.map(t2, 0, 1, p1._t1, p1._t2);
+            segment._t2 = utils.map(t22, 0, 1, p1._t1, p1._t2);
             pass2.push(segment);
-            t1 = t2;
+            t1 = t22;
             break;
           }
         }
@@ -1603,44 +1605,44 @@ var Bezier = class {
     const clockwise = this.clockwise;
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
-    const v = [this.offset(0, 10), this.offset(1, 10)];
+    const v2 = [this.offset(0, 10), this.offset(1, 10)];
     const points = this.points;
     const np = [];
-    const o = utils.lli4(v[0], v[0].c, v[1], v[1].c);
-    if (!o) {
+    const o2 = utils.lli4(v2[0], v2[0].c, v2[1], v2[1].c);
+    if (!o2) {
       throw new Error("cannot scale this curve. Try reducing it first.");
     }
-    [0, 1].forEach(function(t2) {
-      const p = np[t2 * order] = utils.copy(points[t2 * order]);
-      p.x += (t2 ? r2 : r1) * v[t2].n.x;
-      p.y += (t2 ? r2 : r1) * v[t2].n.y;
+    [0, 1].forEach(function(t3) {
+      const p = np[t3 * order] = utils.copy(points[t3 * order]);
+      p.x += (t3 ? r2 : r1) * v2[t3].n.x;
+      p.y += (t3 ? r2 : r1) * v2[t3].n.y;
     });
     if (!distanceFn) {
-      [0, 1].forEach((t2) => {
-        if (order === 2 && !!t2)
+      [0, 1].forEach((t3) => {
+        if (order === 2 && !!t3)
           return;
-        const p = np[t2 * order];
-        const d2 = this.derivative(t2);
+        const p = np[t3 * order];
+        const d2 = this.derivative(t3);
         const p2 = { x: p.x + d2.x, y: p.y + d2.y };
-        np[t2 + 1] = utils.lli4(p, p2, o, points[t2 + 1]);
+        np[t3 + 1] = utils.lli4(p, p2, o2, points[t3 + 1]);
       });
       return new Bezier(np);
     }
-    [0, 1].forEach(function(t2) {
-      if (order === 2 && !!t2)
+    [0, 1].forEach(function(t3) {
+      if (order === 2 && !!t3)
         return;
-      var p = points[t2 + 1];
+      var p = points[t3 + 1];
       var ov = {
-        x: p.x - o.x,
-        y: p.y - o.y
+        x: p.x - o2.x,
+        y: p.y - o2.y
       };
-      var rc = distanceFn ? distanceFn((t2 + 1) / order) : d;
+      var rc = distanceFn ? distanceFn((t3 + 1) / order) : d;
       if (distanceFn && !clockwise)
         rc = -rc;
-      var m = sqrt2(ov.x * ov.x + ov.y * ov.y);
-      ov.x /= m;
-      ov.y /= m;
-      np[t2 + 1] = {
+      var m2 = sqrt2(ov.x * ov.x + ov.y * ov.y);
+      ov.x /= m2;
+      ov.y /= m2;
+      np[t3 + 1] = {
         x: p.x + rc * ov.x,
         y: p.y + rc * ov.y
       };
@@ -1652,10 +1654,10 @@ var Bezier = class {
     const reduced = this.reduce(), len = reduced.length, fcurves = [];
     let bcurves = [], p, alen = 0, tlen = this.length();
     const graduated = typeof d3 !== "undefined" && typeof d4 !== "undefined";
-    function linearDistanceFunction(s, e, tlen2, alen2, slen2) {
-      return function(v) {
-        const f1 = alen2 / tlen2, f2 = (alen2 + slen2) / tlen2, d = e - s;
-        return utils.map(v, 0, 1, s + f1 * d, s + f2 * d);
+    function linearDistanceFunction(s2, e2, tlen2, alen2, slen2) {
+      return function(v2) {
+        const f1 = alen2 / tlen2, f2 = (alen2 + slen2) / tlen2, d = e2 - s2;
+        return utils.map(v2, 0, 1, s2 + f1 * d, s2 + f2 * d);
       };
     }
     reduced.forEach(function(segment) {
@@ -1669,14 +1671,14 @@ var Bezier = class {
       }
       alen += slen2;
     });
-    bcurves = bcurves.map(function(s) {
-      p = s.points;
+    bcurves = bcurves.map(function(s2) {
+      p = s2.points;
       if (p[3]) {
-        s.points = [p[3], p[2], p[1], p[0]];
+        s2.points = [p[3], p[2], p[1], p[0]];
       } else {
-        s.points = [p[2], p[1], p[0]];
+        s2.points = [p[2], p[1], p[0]];
       }
-      return s;
+      return s2;
     }).reverse();
     const fs = fcurves[0].points[0], fe = fcurves[len - 1].points[fcurves[len - 1].points.length - 1], bs = bcurves[len - 1].points[bcurves[len - 1].points.length - 1], be = bcurves[0].points[0], ls = utils.makeline(bs, fs), le = utils.makeline(fe, be), segments = [ls].concat(fcurves).concat([le]).concat(bcurves), slen = segments.length;
     return new PolyBezier(segments);
@@ -1685,10 +1687,10 @@ var Bezier = class {
     d2 = d2 || d1;
     const outline = this.outline(d1, d2).curves;
     const shapes = [];
-    for (let i = 1, len = outline.length; i < len / 2; i++) {
-      const shape = utils.makeshape(outline[i], outline[len - i], curveIntersectionThreshold);
-      shape.startcap.virtual = i > 1;
-      shape.endcap.virtual = i < len / 2 - 1;
+    for (let i2 = 1, len = outline.length; i2 < len / 2; i2++) {
+      const shape = utils.makeshape(outline[i2], outline[len - i2], curveIntersectionThreshold);
+      shape.startcap.virtual = i2 > 1;
+      shape.endcap.virtual = i2 < len / 2 - 1;
       shapes.push(shape);
     }
     return shapes;
@@ -1706,16 +1708,16 @@ var Bezier = class {
   }
   lineIntersects(line2) {
     const mx = min(line2.p1.x, line2.p2.x), my = min(line2.p1.y, line2.p2.y), MX = max(line2.p1.x, line2.p2.x), MY = max(line2.p1.y, line2.p2.y);
-    return utils.roots(this.points, line2).filter((t2) => {
-      var p = this.get(t2);
+    return utils.roots(this.points, line2).filter((t3) => {
+      var p = this.get(t3);
       return utils.between(p.x, mx, MX) && utils.between(p.y, my, MY);
     });
   }
   selfintersects(curveIntersectionThreshold) {
     const reduced = this.reduce(), len = reduced.length - 2, results = [];
-    for (let i = 0, result, left, right; i < len; i++) {
-      left = reduced.slice(i, i + 1);
-      right = reduced.slice(i + 2);
+    for (let i2 = 0, result, left, right; i2 < len; i2++) {
+      left = reduced.slice(i2, i2 + 1);
+      right = reduced.slice(i2 + 2);
       result = this.curveintersects(left, right, curveIntersectionThreshold);
       results.push(...result);
     }
@@ -1723,10 +1725,10 @@ var Bezier = class {
   }
   curveintersects(c1, c2, curveIntersectionThreshold) {
     const pairs = [];
-    c1.forEach(function(l) {
-      c2.forEach(function(r) {
-        if (l.overlaps(r)) {
-          pairs.push({ left: l, right: r });
+    c1.forEach(function(l2) {
+      c2.forEach(function(r2) {
+        if (l2.overlaps(r2)) {
+          pairs.push({ left: l2, right: r2 });
         }
       });
     });
@@ -1743,8 +1745,8 @@ var Bezier = class {
     errorThreshold = errorThreshold || 0.5;
     return this._iterate(errorThreshold, []);
   }
-  _error(pc, np1, s, e) {
-    const q = (e - s) / 4, c1 = this.get(s + q), c2 = this.get(e - q), ref = utils.dist(pc, np1), d1 = utils.dist(pc, c1), d2 = utils.dist(pc, c2);
+  _error(pc, np1, s2, e2) {
+    const q = (e2 - s2) / 4, c1 = this.get(s2 + q), c2 = this.get(e2 - q), ref = utils.dist(pc, np1), d1 = utils.dist(pc, c1), d2 = utils.dist(pc, c2);
     return abs2(d1 - ref) + abs2(d2 - ref);
   }
   _iterate(errorThreshold, circles) {
@@ -1821,19 +1823,28 @@ var quadraticSimple = (start, end, bend = 0) => {
   return quadratic(start, end, handle);
 };
 var quadraticToSvgString = (start, end, handle) => `M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`;
-var cubic = (start, end, handle1, handle2) => {
-  start = Object.freeze(start);
-  end = Object.freeze(end);
-  handle1 = Object.freeze(handle1);
-  handle2 = Object.freeze(handle2);
-  const bzr = new Bezier(start, handle1, end, handle2);
+var toPath2 = (cubicOrQuadratic) => {
+  if (isCubicBezier(cubicOrQuadratic)) {
+    return cubicToPath(cubicOrQuadratic);
+  } else if (isQuadraticBezier(cubicOrQuadratic)) {
+    return quadratictoPath(cubicOrQuadratic);
+  } else {
+    throw new Error(`Unknown bezier type`);
+  }
+};
+var cubic = (start, end, cubic1, cubic2) => ({
+  a: Object.freeze(start),
+  b: Object.freeze(end),
+  cubic1: Object.freeze(cubic1),
+  cubic2: Object.freeze(cubic2)
+});
+var cubicToPath = (cubic2) => {
+  const { a: a2, cubic1, cubic2: cubic22, b } = cubic2;
+  const bzr = new Bezier(a2, cubic1, cubic22, b);
   return Object.freeze({
-    a: start,
-    b: end,
-    cubic1: handle1,
-    cubic2: handle2,
+    ...cubic2,
     length: () => bzr.length(),
-    compute: (t2) => bzr.compute(t2),
+    compute: (t3) => bzr.compute(t3),
     bbox: () => {
       const { x, y } = bzr.bbox();
       const xSize = x.size;
@@ -1849,17 +1860,18 @@ var cubic = (start, end, handle1, handle2) => {
     kind: `bezier/cubic`
   });
 };
-var quadratic = (start, end, handle) => {
-  start = Object.freeze(start);
-  end = Object.freeze(end);
-  handle = Object.freeze(handle);
-  const bzr = new Bezier(start, handle, end);
+var quadratic = (start, end, handle) => ({
+  a: Object.freeze(start),
+  b: Object.freeze(end),
+  quadratic: Object.freeze(handle)
+});
+var quadratictoPath = (quadraticBezier2) => {
+  const { a: a2, b, quadratic: quadratic2 } = quadraticBezier2;
+  const bzr = new Bezier(a2, quadratic2, b);
   return Object.freeze({
-    a: start,
-    b: end,
-    quadratic: handle,
+    ...quadraticBezier2,
     length: () => bzr.length(),
-    compute: (t2) => bzr.compute(t2),
+    compute: (t3) => bzr.compute(t3),
     bbox: () => {
       const { x, y } = bzr.bbox();
       const xSize = x.size;
@@ -1871,7 +1883,7 @@ var quadratic = (start, end, handle) => {
       return fromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
     },
     toString: () => bzr.toString(),
-    toSvgString: () => quadraticToSvgString(start, end, handle),
+    toSvgString: () => quadraticToSvgString(a2, b, quadratic2),
     kind: `bezier/quadratic`
   });
 };
@@ -1916,34 +1928,34 @@ var setSegment = (compoundPath, index, path) => {
   existing[index] = path;
   return fromPaths(...existing);
 };
-var compute2 = (paths2, t2, useWidth, dimensions) => {
+var compute2 = (paths2, t3, useWidth, dimensions) => {
   if (dimensions === void 0) {
     dimensions = computeDimensions(paths2);
   }
-  const expected = t2 * (useWidth ? dimensions.totalWidth : dimensions.totalLength);
+  const expected = t3 * (useWidth ? dimensions.totalWidth : dimensions.totalLength);
   let soFar = 0;
-  const l = useWidth ? dimensions.widths : dimensions.lengths;
-  for (let i = 0; i < l.length; i++) {
-    if (soFar + l[i] >= expected) {
+  const l2 = useWidth ? dimensions.widths : dimensions.lengths;
+  for (let i2 = 0; i2 < l2.length; i2++) {
+    if (soFar + l2[i2] >= expected) {
       const relative = expected - soFar;
-      let amt = relative / l[i];
+      let amt = relative / l2[i2];
       if (amt > 1)
         amt = 1;
-      return paths2[i].compute(amt);
+      return paths2[i2].compute(amt);
     } else
-      soFar += l[i];
+      soFar += l2[i2];
   }
   return { x: 0, y: 0 };
 };
 var computeDimensions = (paths2) => {
-  const widths = paths2.map((l) => l.bbox().width);
-  const lengths = paths2.map((l) => l.length());
+  const widths = paths2.map((l2) => l2.bbox().width);
+  const lengths = paths2.map((l2) => l2.length());
   let totalLength = 0;
   let totalWidth = 0;
-  for (let i = 0; i < lengths.length; i++)
-    totalLength += lengths[i];
-  for (let i = 0; i < widths.length; i++)
-    totalWidth += widths[i];
+  for (let i2 = 0; i2 < lengths.length; i2++)
+    totalLength += lengths[i2];
+  for (let i2 = 0; i2 < widths.length; i2++)
+    totalWidth += widths[i2];
   return { totalLength, totalWidth, widths, lengths };
 };
 var bbox3 = (paths2) => {
@@ -1954,11 +1966,11 @@ var bbox3 = (paths2) => {
 var toString3 = (paths2) => paths2.map((p) => p.toString()).join(`, `);
 var guardContinuous = (paths2) => {
   let lastPos = getEnd(paths2[0]);
-  for (let i = 1; i < paths2.length; i++) {
-    const start = getStart(paths2[i]);
+  for (let i2 = 1; i2 < paths2.length; i2++) {
+    const start = getStart(paths2[i2]);
     if (!Point_exports.equals(start, lastPos))
-      throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y);
-    lastPos = getEnd(paths2[i]);
+      throw new Error(`Path index ` + i2 + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y);
+    lastPos = getEnd(paths2[i2]);
   }
 };
 var toSvgString2 = (paths2) => {
@@ -1971,7 +1983,7 @@ var fromPaths = (...paths2) => {
   return Object.freeze({
     segments: paths2,
     length: () => dims.totalLength,
-    compute: (t2, useWidth = false) => compute2(paths2, t2, useWidth, dims),
+    compute: (t3, useWidth = false) => compute2(paths2, t3, useWidth, dims),
     bbox: () => bbox3(paths2),
     toString: () => toString3(paths2),
     toSvgString: () => toSvgString2(paths2),
@@ -2009,156 +2021,406 @@ __export(Grid_exports, {
 });
 
 // src/util.ts
-var clamp = (v, min2 = 0, max2 = 1) => {
-  if (Number.isNaN(v))
+var clamp = (v2, min2 = 0, max2 = 1) => {
+  if (Number.isNaN(v2))
     throw new Error(`v parameter is NaN`);
   if (Number.isNaN(min2))
     throw new Error(`min parameter is NaN`);
   if (Number.isNaN(max2))
     throw new Error(`max parameter is NaN`);
-  if (v < min2)
+  if (v2 < min2)
     return min2;
-  if (v > max2)
+  if (v2 > max2)
     return max2;
-  return v;
+  return v2;
 };
-var clampZeroBounds = (v, length2) => {
-  if (!Number.isInteger(v))
+var clampZeroBounds = (v2, length2) => {
+  if (!Number.isInteger(v2))
     throw new Error(`v parameter must be an integer`);
   if (!Number.isInteger(length2))
     throw new Error(`length parameter must be an integer`);
-  if (v < 0)
+  v2 = Math.round(v2);
+  if (v2 < 0)
     return 0;
-  if (v >= length2)
+  if (v2 >= length2)
     return length2 - 1;
-  return v;
+  return v2;
 };
-var randomElement = (array2) => array2[Math.floor(Math.random() * array2.length)];
 var getMinMaxAvg = (data) => {
-  let min2 = Number.MAX_SAFE_INTEGER;
-  let total = 0;
-  let samples = 0;
-  let max2 = Number.MIN_SAFE_INTEGER;
-  for (let i = 0; i < data.length; i++) {
-    if (Number.isNaN(data[i]))
-      continue;
-    min2 = Math.min(data[i], min2);
-    max2 = Math.max(data[i], max2);
-    total += data[i];
-    samples++;
-  }
-  return { min: min2, max: max2, avg: total / samples };
+  const validNumbers = data.filter((d) => typeof d === `number` && !Number.isNaN(d));
+  const total = validNumbers.reduce((acc, v2) => acc + v2, 0);
+  return {
+    total,
+    max: Math.max(...validNumbers),
+    min: Math.min(...validNumbers),
+    avg: total / validNumbers.length
+  };
 };
 var sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+var isEqualDefault = (a2, b) => a2 === b;
+
+// src/collections/Lists.ts
+var Lists_exports = {};
+__export(Lists_exports, {
+  Circular: () => Circular,
+  QueueOverflowPolicy: () => OverflowPolicy2,
+  StackOverflowPolicy: () => OverflowPolicy,
+  queue: () => queue,
+  queueMutable: () => queueMutable,
+  randomElement: () => randomElement,
+  shuffle: () => shuffle,
+  stack: () => stack,
+  stackMutable: () => stackMutable,
+  without: () => without
+});
+
+// src/collections/Stack.ts
+var OverflowPolicy = /* @__PURE__ */ ((OverflowPolicy3) => {
+  OverflowPolicy3[OverflowPolicy3["DiscardOlder"] = 0] = "DiscardOlder";
+  OverflowPolicy3[OverflowPolicy3["DiscardNewer"] = 1] = "DiscardNewer";
+  OverflowPolicy3[OverflowPolicy3["DiscardAdditions"] = 2] = "DiscardAdditions";
+  return OverflowPolicy3;
+})(OverflowPolicy || {});
+var trimStack = (opts, stack2, toAdd) => {
+  const potentialLength = stack2.length + toAdd.length;
+  const policy = opts.overflowPolicy ?? 2 /* DiscardAdditions */;
+  const capacity = opts.capacity ?? potentialLength;
+  const toRemove = potentialLength - capacity;
+  if (opts.debug)
+    console.log(`Stack.push: stackLen: ${stack2.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
+  switch (policy) {
+    case 2 /* DiscardAdditions */:
+      if (opts.debug)
+        console.log(`Stack.push:DiscardAdditions: stackLen: ${stack2.length} slice: ${potentialLength - capacity} toAddLen: ${toAdd.length}`);
+      if (stack2.length === opts.capacity) {
+        return stack2;
+      } else {
+        return [...stack2, ...toAdd.slice(0, toAdd.length - toRemove)];
+      }
+    case 1 /* DiscardNewer */:
+      if (toRemove >= stack2.length) {
+        return toAdd.slice(Math.max(0, toAdd.length - capacity), Math.min(toAdd.length, capacity) + 1);
+      } else {
+        if (opts.debug)
+          console.log(` from orig: ${stack2.slice(0, toRemove - 1)}`);
+        return [...stack2.slice(0, toRemove - 1), ...toAdd.slice(0, Math.min(toAdd.length, capacity - toRemove + 1))];
+      }
+    case 0 /* DiscardOlder */:
+      return [...stack2, ...toAdd].slice(toRemove);
+    default:
+      throw new Error(`Unknown overflow policy ${policy}`);
+  }
+};
+var push = (opts, stack2, ...toAdd) => {
+  const potentialLength = stack2.length + toAdd.length;
+  const overSize = opts.capacity && potentialLength > opts.capacity;
+  const toReturn = overSize ? trimStack(opts, stack2, toAdd) : [...stack2, ...toAdd];
+  return toReturn;
+};
+var pop = (opts, stack2) => {
+  if (stack2.length === 0)
+    throw new Error(`Stack is empty`);
+  return stack2.slice(0, stack2.length - 1);
+};
+var peek = (opts, stack2) => stack2[stack2.length - 1];
+var isEmpty = (opts, stack2) => stack2.length === 0;
+var isFull = (opts, stack2) => {
+  if (opts.capacity) {
+    return stack2.length >= opts.capacity;
+  }
+  return false;
+};
+var Stack = class {
+  constructor(opts, data) {
+    __publicField(this, "opts");
+    __publicField(this, "data");
+    this.opts = opts;
+    this.data = data;
+  }
+  push(...toAdd) {
+    return new Stack(this.opts, push(this.opts, this.data, ...toAdd));
+  }
+  pop() {
+    return new Stack(this.opts, pop(this.opts, this.data));
+  }
+  get isEmpty() {
+    return isEmpty(this.opts, this.data);
+  }
+  get isFull() {
+    return isFull(this.opts, this.data);
+  }
+  get peek() {
+    return peek(this.opts, this.data);
+  }
+  get length() {
+    return this.data.length;
+  }
+};
+var stack = (opts = {}, ...startingItems) => new Stack({ ...opts }, [...startingItems]);
+var MutableStack = class {
+  constructor(opts, data) {
+    __publicField(this, "opts");
+    __publicField(this, "data");
+    this.opts = opts;
+    this.data = data;
+  }
+  push(...toAdd) {
+    this.data = push(this.opts, this.data, ...toAdd);
+    return this.data.length;
+  }
+  pop() {
+    const v2 = peek(this.opts, this.data);
+    pop(this.opts, this.data);
+    return v2;
+  }
+  get isEmpty() {
+    return isEmpty(this.opts, this.data);
+  }
+  get isFull() {
+    return isFull(this.opts, this.data);
+  }
+  get peek() {
+    return peek(this.opts, this.data);
+  }
+  get length() {
+    return this.data.length;
+  }
+};
+var stackMutable = (opts, ...startingItems) => new MutableStack({ ...opts }, [...startingItems]);
+
+// src/collections/Queue.ts
+var OverflowPolicy2 = /* @__PURE__ */ ((OverflowPolicy3) => {
+  OverflowPolicy3[OverflowPolicy3["DiscardOlder"] = 0] = "DiscardOlder";
+  OverflowPolicy3[OverflowPolicy3["DiscardNewer"] = 1] = "DiscardNewer";
+  OverflowPolicy3[OverflowPolicy3["DiscardAdditions"] = 2] = "DiscardAdditions";
+  return OverflowPolicy3;
+})(OverflowPolicy2 || {});
+var debug = (opts, msg) => {
+  opts.debug ? console.log(`queue:${msg}`) : null;
+};
+var trimQueue = (opts, queue2, toAdd) => {
+  const potentialLength = queue2.length + toAdd.length;
+  const capacity = opts.capacity ?? potentialLength;
+  const toRemove = potentialLength - capacity;
+  const policy = opts.overflowPolicy ?? 2 /* DiscardAdditions */;
+  debug(opts, `queueLen: ${queue2.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy2[policy]}`);
+  switch (policy) {
+    case 2 /* DiscardAdditions */:
+      debug(opts, `enqueue:DiscardAdditions: queueLen: ${queue2.length} slice: ${potentialLength - capacity} toAddLen: ${toAdd.length}`);
+      if (queue2.length === opts.capacity) {
+        return queue2;
+      } else {
+        return [...queue2, ...toAdd.slice(0, toRemove - 1)];
+      }
+    case 1 /* DiscardNewer */:
+      if (toRemove >= queue2.length) {
+        return toAdd.slice(Math.max(0, toAdd.length - capacity), Math.min(toAdd.length, capacity) + 1);
+      } else {
+        debug(opts, ` from orig: ${queue2.slice(0, toRemove - 1)}`);
+        return [...queue2.slice(0, toRemove - 1), ...toAdd.slice(0, Math.min(toAdd.length, capacity - toRemove + 1))];
+      }
+    case 0 /* DiscardOlder */:
+      return [...queue2, ...toAdd].slice(toRemove);
+    default:
+      throw new Error(`Unknown overflow policy ${policy}`);
+  }
+};
+var enqueue = (opts, queue2, ...toAdd) => {
+  if (opts === void 0)
+    throw new Error(`opts parameter undefined`);
+  const potentialLength = queue2.length + toAdd.length;
+  const overSize = opts.capacity && potentialLength > opts.capacity;
+  const toReturn = overSize ? trimQueue(opts, queue2, toAdd) : [...queue2, ...toAdd];
+  if (opts.capacity && toReturn.length !== opts.capacity && overSize)
+    throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity} opts: ${JSON.stringify(opts)}`);
+  if (!opts.capacity && toReturn.length !== potentialLength)
+    throw new Error(`Bug! Return length not expected. Return len: ${toReturn.length} expected: ${potentialLength} opts: ${JSON.stringify(opts)}`);
+  return toReturn;
+};
+var dequeue = (opts, queue2) => {
+  if (queue2.length === 0)
+    throw new Error(`Queue is empty`);
+  return queue2.slice(1);
+};
+var peek2 = (opts, queue2) => queue2[0];
+var isEmpty2 = (opts, queue2) => queue2.length === 0;
+var isFull2 = (opts, queue2) => {
+  if (opts.capacity) {
+    return queue2.length >= opts.capacity;
+  }
+  return false;
+};
+var Queue = class {
+  constructor(opts, data) {
+    __publicField(this, "opts");
+    __publicField(this, "data");
+    if (opts === void 0)
+      throw new Error(`opts parameter undefined`);
+    this.opts = opts;
+    this.data = data;
+  }
+  enqueue(...toAdd) {
+    return new Queue(this.opts, enqueue(this.opts, this.data, ...toAdd));
+  }
+  dequeue() {
+    return new Queue(this.opts, dequeue(this.opts, this.data));
+  }
+  get isEmpty() {
+    return isEmpty2(this.opts, this.data);
+  }
+  get isFull() {
+    return isFull2(this.opts, this.data);
+  }
+  get length() {
+    return this.data.length;
+  }
+  get peek() {
+    return peek2(this.opts, this.data);
+  }
+};
+var queue = (opts = {}, ...startingItems) => {
+  opts = { ...opts };
+  return new Queue(opts, [...startingItems]);
+};
+var MutableQueue = class {
+  constructor(opts, data) {
+    __publicField(this, "opts");
+    __publicField(this, "data");
+    if (opts === void 0)
+      throw new Error(`opts parameter undefined`);
+    this.opts = opts;
+    this.data = data;
+  }
+  enqueue(...toAdd) {
+    this.data = enqueue(this.opts, this.data, ...toAdd);
+    return this.data.length;
+  }
+  dequeue() {
+    const v2 = peek2(this.opts, this.data);
+    this.data = dequeue(this.opts, this.data);
+    return v2;
+  }
+  get isEmpty() {
+    return isEmpty2(this.opts, this.data);
+  }
+  get isFull() {
+    return isFull2(this.opts, this.data);
+  }
+  get length() {
+    return this.data.length;
+  }
+  get peek() {
+    return peek2(this.opts, this.data);
+  }
+};
+var queueMutable = (opts = {}, ...startingItems) => new MutableQueue({ ...opts }, [...startingItems]);
+
+// src/collections/Lists.ts
+var randomElement = (array2) => array2[Math.floor(Math.random() * array2.length)];
+var shuffle = (dataToShuffle) => {
+  const array2 = [...dataToShuffle];
+  for (let i2 = array2.length - 1; i2 > 0; i2--) {
+    const j = Math.floor(Math.random() * (i2 + 1));
+    [array2[i2], array2[j]] = [array2[j], array2[i2]];
+  }
+  return array2;
+};
+var without = (data, value, comparer = isEqualDefault) => data.filter((v2) => !comparer(v2, value));
+var _capacity, _pointer;
+var _Circular = class extends Array {
+  constructor(capacity) {
+    super();
+    __privateAdd(this, _capacity, void 0);
+    __privateAdd(this, _pointer, void 0);
+    if (Number.isNaN(capacity))
+      throw Error(`capacity is NaN`);
+    if (capacity <= 0)
+      throw Error(`capacity must be greater than zero`);
+    __privateSet(this, _capacity, capacity);
+    __privateSet(this, _pointer, 0);
+  }
+  add(thing) {
+    const ca = _Circular.from(this);
+    ca[__privateGet(this, _pointer)] = thing;
+    __privateSet(ca, _capacity, __privateGet(this, _capacity));
+    __privateSet(ca, _pointer, __privateGet(this, _pointer) + 1 === __privateGet(this, _capacity) ? 0 : __privateGet(this, _pointer) + 1);
+    return ca;
+  }
+  get isFull() {
+    return this.length === __privateGet(this, _capacity);
+  }
+};
+var Circular = _Circular;
+_capacity = new WeakMap();
+_pointer = new WeakMap();
 
 // src/collections/Set.ts
 var Set_exports = {};
 __export(Set_exports, {
-  MutableValueSet: () => MutableValueSet
+  MutableStringSet: () => MutableStringSet,
+  addUniqueByHash: () => addUniqueByHash
 });
 
-// src/collections/MapMulti.ts
-var _map, __add, _add_fn;
-var MapMulti = class {
+// src/collections/SimpleMutableMapArray.ts
+var _map;
+var SimpleMutableMapArray = class {
   constructor() {
-    __privateAdd(this, __add);
     __privateAdd(this, _map, /* @__PURE__ */ new Map());
   }
-  isEmpty() {
-    return __privateGet(this, _map).size == 0;
+  add(key, ...values) {
+    const existing = __privateGet(this, _map).get(key);
+    if (existing === void 0) {
+      __privateGet(this, _map).set(key, values);
+    } else {
+      __privateGet(this, _map).set(key, [...existing, ...values]);
+    }
   }
-  clear() {
-    __privateGet(this, _map).clear();
-  }
-  has(key) {
-    return __privateGet(this, _map).has(key);
-  }
-  delete(key, value) {
-    const a = __privateGet(this, _map).get(key);
-    if (a === void 0)
-      return;
-    const filtered = a.filter((v) => v !== value);
-    __privateGet(this, _map).set(key, filtered);
-  }
-  deleteDeep(value) {
+  debugString() {
+    let r2 = ``;
     const keys = Array.from(__privateGet(this, _map).keys());
-    for (const key of keys) {
-      const a = __privateGet(this, _map).get(key);
-      if (a === void 0)
-        continue;
-      const b = a.filter((v) => v !== value);
-      __privateGet(this, _map).set(key, b);
-    }
-  }
-  add(key, ...value) {
-    for (const v of value) {
-      __privateMethod(this, __add, _add_fn).call(this, key, v);
-    }
-  }
-  findKey(value) {
-    const keys = Array.from(__privateGet(this, _map).keys());
-    for (const key of keys) {
-      const a = __privateGet(this, _map).get(key);
-      if (a === void 0)
-        continue;
-      if (a.includes(value))
-        return key;
-    }
-    return void 0;
-  }
-  count(key) {
-    let e = __privateGet(this, _map).get(key);
-    if (e !== void 0)
-      return e.length;
-    return 0;
+    keys.every((k) => {
+      const v2 = __privateGet(this, _map).get(k);
+      if (v2 === void 0)
+        return;
+      r2 += k + ` (${v2.length}) = ${JSON.stringify(v2)}\r
+`;
+    });
+    return r2;
   }
   get(key) {
     return __privateGet(this, _map).get(key);
   }
-  keys() {
-    return Array.from(__privateGet(this, _map).keys());
+  delete(key, v2) {
+    const existing = __privateGet(this, _map).get(key);
+    if (existing === void 0)
+      return false;
+    const without2 = existing.filter((i2) => i2 !== v2);
+    __privateGet(this, _map).set(key, without2);
+    return without2.length < existing.length;
   }
-  keysAndCounts() {
-    const keys = this.keys();
-    const r = keys.map((k) => [k, this.count(k)]);
-    return r;
-  }
-  merge(other) {
-    const keys = other.keys();
-    for (const key of keys) {
-      const data = other.get(key);
-      if (data !== void 0)
-        this.add(key, ...data);
-    }
+  clear() {
+    __privateGet(this, _map).clear();
   }
 };
 _map = new WeakMap();
-__add = new WeakSet();
-_add_fn = function(key, value) {
-  if (!__privateGet(this, _map).has(key)) {
-    __privateGet(this, _map).set(key, []);
-  }
-  let e = __privateGet(this, _map).get(key);
-  e?.push(value);
-};
 
 // src/Events.ts
 var _listeners;
 var SimpleEventEmitter = class {
   constructor() {
-    __privateAdd(this, _listeners, new MapMulti());
+    __privateAdd(this, _listeners, new SimpleMutableMapArray());
   }
   fireEvent(type, args) {
     const listeners = __privateGet(this, _listeners).get(type);
     if (listeners === void 0)
       return;
-    for (const l of listeners) {
+    listeners.forEach((l2) => {
       try {
-        l(args, this);
+        l2(args, this);
       } catch (err) {
         console.debug(`Event listener error: `, err);
       }
-    }
+    });
   }
   addEventListener(type, listener) {
     __privateGet(this, _listeners).add(type, listener);
@@ -2173,21 +2435,38 @@ var SimpleEventEmitter = class {
 _listeners = new WeakMap();
 
 // src/collections/Set.ts
-var MutableValueSet = class extends SimpleEventEmitter {
+var addUniqueByHash = (set, hashFunc, ...values) => {
+  const s2 = set === void 0 ? /* @__PURE__ */ new Map() : new Map(set);
+  values.forEach((v2) => {
+    const vStr = hashFunc(v2);
+    if (s2.has(vStr))
+      return;
+    s2.set(vStr, v2);
+  });
+  return s2;
+};
+var MutableStringSet = class extends SimpleEventEmitter {
   constructor(keyString = void 0) {
     super();
     __publicField(this, "store", /* @__PURE__ */ new Map());
     __publicField(this, "keyString");
-    if (keyString === void 0)
-      keyString = (a) => JSON.stringify(a);
+    if (keyString === void 0) {
+      keyString = (a2) => {
+        if (typeof a2 === `string`) {
+          return a2;
+        } else {
+          return JSON.stringify(a2);
+        }
+      };
+    }
     this.keyString = keyString;
   }
-  add(...v) {
-    for (let i = 0; i < v.length; i++) {
-      const updated = this.has(v[i]);
-      this.store.set(this.keyString(v[i]), v[i]);
-      super.fireEvent(`add`, { value: v[i], updated });
-    }
+  add(...v2) {
+    v2.forEach((i2) => {
+      const isUpdated = this.has(i2);
+      this.store.set(this.keyString(i2), i2);
+      super.fireEvent(`add`, { value: i2, updated: isUpdated });
+    });
   }
   values() {
     return this.store.values();
@@ -2196,14 +2475,14 @@ var MutableValueSet = class extends SimpleEventEmitter {
     this.store.clear();
     super.fireEvent(`clear`, true);
   }
-  delete(v) {
-    const deleted = this.store.delete(this.keyString(v));
-    if (deleted)
-      super.fireEvent(`delete`, v);
-    return deleted;
+  delete(v2) {
+    const isDeleted = this.store.delete(this.keyString(v2));
+    if (isDeleted)
+      super.fireEvent(`delete`, v2);
+    return isDeleted;
   }
-  has(v) {
-    return this.store.has(this.keyString(v));
+  has(v2) {
+    return this.store.has(this.keyString(v2));
   }
   toArray() {
     return Array.from(this.store.values());
@@ -2228,26 +2507,26 @@ var WrapLogic = /* @__PURE__ */ ((WrapLogic2) => {
   WrapLogic2[WrapLogic2["Wrap"] = 1] = "Wrap";
   return WrapLogic2;
 })(WrapLogic || {});
-var cellKeyString = function(v) {
-  return `Cell{${v.x},${v.y}}`;
+var cellKeyString = function(v2) {
+  return `Cell{${v2.x},${v2.y}}`;
 };
-var cellEquals = function(a, b) {
+var cellEquals = function(a2, b) {
   if (b === void 0)
     return false;
-  if (a === void 0)
+  if (a2 === void 0)
     return false;
-  return a.x === b.x && a.y === b.y;
+  return a2.x === b.x && a2.y === b.y;
 };
-var guard4 = function(a, paramName = `Param`) {
-  if (a === void 0)
+var guard4 = function(a2, paramName = `Param`) {
+  if (a2 === void 0)
     throw new Error(paramName + ` is undefined`);
-  if (a.x === void 0)
+  if (a2.x === void 0)
     throw new Error(paramName + `.x is undefined`);
-  if (a.y === void 0)
+  if (a2.y === void 0)
     throw new Error(paramName + `.y is undefined`);
-  if (Number.isInteger(a.x) === void 0)
+  if (Number.isInteger(a2.x) === void 0)
     throw new Error(paramName + `.x is non-integer`);
-  if (Number.isInteger(a.y) === void 0)
+  if (Number.isInteger(a2.y) === void 0)
     throw new Error(paramName + `.y is non-integer`);
 };
 var cellCornerRect = function(cell, grid) {
@@ -2255,8 +2534,8 @@ var cellCornerRect = function(cell, grid) {
   const size = grid.size;
   const x = cell.x * size;
   const y = cell.y * size;
-  const r = fromTopLeft({ x, y }, size, size);
-  return r;
+  const r2 = fromTopLeft({ x, y }, size, size);
+  return r2;
 };
 var getCell = function(position, grid) {
   const size = grid.size;
@@ -2277,7 +2556,7 @@ var neighbours = function(grid, cell, bounds = BoundsLogic.Undefined) {
     5 /* South */,
     7 /* West */
   ];
-  return directions.map((c) => offset(grid, getVectorFromCardinal(c), cell, bounds)).filter(defined);
+  return directions.map((c2) => offset(grid, getVectorFromCardinal(c2), cell, bounds)).filter(defined);
 };
 var cellMiddle = function(cell, grid) {
   guard4(cell);
@@ -2324,7 +2603,7 @@ var getSquarePerimeter = function(grid, steps, start = { x: 0, y: 0 }, bounds = 
     throw new Error(`Steps must be positive`);
   if (!Number.isInteger(steps))
     throw new Error(`Steps must be a positive integer`);
-  const cells = new MutableValueSet((c) => cellKeyString(c));
+  const cells = new MutableStringSet((c2) => cellKeyString(c2));
   const directions = [
     1 /* North */,
     2 /* NorthEast */,
@@ -2435,11 +2714,11 @@ var offsetStepsByRow = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 
     throw new Error(`Steps must be an integer`);
   guard4(start);
   let stepsLeft = Math.abs(steps);
-  const dirForward = steps >= 0;
+  const isDirForward = steps >= 0;
   let x = start.x;
   let y = start.y;
   while (stepsLeft > 0) {
-    if (x === grid.cols - 1 && dirForward) {
+    if (x === grid.cols - 1 && isDirForward) {
       if (y === grid.rows - 1 && bounds !== 0 /* Unbound */) {
         if (bounds === 1 /* Undefined */)
           return;
@@ -2454,7 +2733,7 @@ var offsetStepsByRow = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 
       stepsLeft--;
       continue;
     }
-    if (x === 0 && !dirForward) {
+    if (x === 0 && !isDirForward) {
       if (y === 0 && bounds !== 0 /* Unbound */) {
         if (bounds === 1 /* Undefined */)
           return;
@@ -2469,7 +2748,7 @@ var offsetStepsByRow = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 
       stepsLeft--;
       continue;
     }
-    if (dirForward) {
+    if (isDirForward) {
       const chunk = Math.min(stepsLeft, grid.cols - x - 1);
       x += chunk;
       stepsLeft -= chunk;
@@ -2486,11 +2765,11 @@ var offsetStepsByCol = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 
     throw new Error(`Steps must be an integer`);
   guard4(start);
   let stepsLeft = Math.abs(steps);
-  const dirForward = steps >= 0;
+  const isDirForward = steps >= 0;
   let x = start.x;
   let y = start.y;
   while (stepsLeft > 0) {
-    if (y === grid.rows - 1 && dirForward) {
+    if (y === grid.rows - 1 && isDirForward) {
       if (x === grid.cols - 1 && bounds !== 0 /* Unbound */) {
         if (bounds === 1 /* Undefined */)
           return;
@@ -2505,7 +2784,7 @@ var offsetStepsByCol = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 
       stepsLeft--;
       continue;
     }
-    if (y === 0 && !dirForward) {
+    if (y === 0 && !isDirForward) {
       if (x === 0 && bounds !== 0 /* Unbound */) {
         if (bounds === 1 /* Undefined */)
           return;
@@ -2520,7 +2799,7 @@ var offsetStepsByCol = function(grid, steps, start = { x: 0, y: 0 }, bounds = 1 
       stepsLeft--;
       continue;
     }
-    if (dirForward) {
+    if (isDirForward) {
       const chunk = Math.min(stepsLeft, grid.rows - y - 1);
       y += chunk;
       stepsLeft -= chunk;
@@ -2565,7 +2844,7 @@ var visitorRandom = function(queue2) {
 };
 var visitor = function* (visitFn, grid, start, visited) {
   if (visited === void 0)
-    visited = new MutableValueSet((c) => cellKeyString(c));
+    visited = new MutableStringSet((c2) => cellKeyString(c2));
   let queue2 = [];
   queue2.push(start);
   while (queue2.length > 0) {
@@ -2576,7 +2855,7 @@ var visitor = function* (visitFn, grid, start, visited) {
     }
     const nbos = neighbours(grid, next, 1 /* Undefined */);
     queue2.push(...nbos);
-    queue2 = queue2.filter((c) => !visited?.has(c));
+    queue2 = queue2.filter((c2) => !visited?.has(c2));
   }
 };
 
@@ -2592,16 +2871,17 @@ __export(Envelope_exports, {
 
 // src/modulation/DadsrEnvelope.ts
 var dadsr = (opts = {}) => {
-  const { sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0 } = opts;
-  if (sustainLevel > 1 || sustainLevel < 0)
-    throw Error(`sustainLevel must be between 0-1`);
+  const { initialLevel = 0, peakLevel = 1, sustainLevel = 0.5, attackBend = 0, decayBend = 0, releaseBend = 0 } = opts;
+  notNegative(initialLevel, `initialLevel`);
+  notNegative(peakLevel, `peakLevel`);
+  notNegative(sustainLevel, `sustainLevel`);
   const env = stages(opts);
   const max2 = 1;
   const paths2 = new Array(5);
-  paths2[2 /* Attack */] = quadraticSimple({ x: 0, y: 0 }, { x: max2, y: max2 }, attackBend);
-  paths2[3 /* Decay */] = quadraticSimple({ x: 0, y: max2 }, { x: max2, y: sustainLevel }, decayBend);
+  paths2[2 /* Attack */] = toPath2(quadraticSimple({ x: 0, y: initialLevel }, { x: max2, y: peakLevel }, attackBend));
+  paths2[3 /* Decay */] = toPath2(quadraticSimple({ x: 0, y: peakLevel }, { x: max2, y: sustainLevel }, decayBend));
   paths2[4 /* Sustain */] = fromPointsToPath({ x: 0, y: sustainLevel }, { x: max2, y: sustainLevel });
-  paths2[5 /* Release */] = quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend);
+  paths2[5 /* Release */] = toPath2(quadraticSimple({ x: 0, y: sustainLevel }, { x: max2, y: 0 }, releaseBend));
   return Object.freeze({
     getBeziers: () => [...paths2],
     trigger: () => {
@@ -2626,28 +2906,28 @@ var dadsr = (opts = {}) => {
     },
     getStage: (stage) => {
       const tmp = stage === 4 /* Sustain */ ? { duration: -1 } : env.getStage(stage);
-      const s = { ...tmp, amp: -1 };
+      const s2 = { ...tmp, amp: -1 };
       switch (stage) {
+        case 1 /* Delay */:
+          s2.amp = -1;
+          break;
         case 2 /* Attack */:
-          s.amp = 1;
+          s2.amp = 1;
           break;
         case 3 /* Decay */:
-          s.amp = 1;
-          break;
-        case 1 /* Delay */:
-          s.amp = -1;
+          s2.amp = 1;
           break;
         case 5 /* Release */:
-          s.amp = 0;
+          s2.amp = 0;
           break;
         case 0 /* Stopped */:
-          s.amp = 0;
+          s2.amp = 0;
           break;
         case 4 /* Sustain */:
-          s.amp = sustainLevel;
+          s2.amp = sustainLevel;
           break;
       }
-      return s;
+      return s2;
     }
   });
 };
@@ -2668,29 +2948,27 @@ var msRelativeTimer = function() {
     reset: () => {
       start = performance.now();
     },
-    elapsed: () => {
-      return performance.now() - start;
-    }
+    elapsed: () => performance.now() - start
   };
 };
 var stageToText = function(stage) {
   switch (stage) {
     case 1 /* Delay */:
-      return "Delay";
+      return `Delay`;
     case 2 /* Attack */:
-      return "Attack";
+      return `Attack`;
     case 3 /* Decay */:
-      return "Decay";
+      return `Decay`;
     case 5 /* Release */:
-      return "Release";
+      return `Release`;
     case 0 /* Stopped */:
-      return "Stopped";
+      return `Stopped`;
     case 4 /* Sustain */:
-      return "Sustain";
+      return `Sustain`;
   }
 };
 var stages = function(opts = {}) {
-  const { looping = false } = opts;
+  const { shouldLoop = false } = opts;
   const { timerSource = msRelativeTimer } = opts;
   const { delayDuration = 0 } = opts;
   const { attackDuration = 300 } = opts;
@@ -2700,14 +2978,15 @@ var stages = function(opts = {}) {
   let timer2 = null;
   let isHeld = false;
   const setStage = (newStage) => {
-    if (stage == newStage)
+    if (stage === newStage)
       return;
-    console.log("Envelope stage " + stageToText(stage) + " -> " + stageToText(newStage));
+    console.log(`Envelope stage ` + stageToText(stage) + ` -> ` + stageToText(newStage));
     stage = newStage;
-    if (stage == 1 /* Delay */)
+    if (stage === 1 /* Delay */) {
       timer2 = timerSource();
-    else if (stage == 5 /* Release */)
+    } else if (stage === 5 /* Release */) {
       timer2 = timerSource();
+    }
   };
   const getStage = (stage2) => {
     switch (stage2) {
@@ -2724,17 +3003,17 @@ var stages = function(opts = {}) {
     }
   };
   const compute3 = () => {
-    if (stage == 0 /* Stopped */)
+    if (stage === 0 /* Stopped */)
       return [0, 0];
-    if (timer2 == null)
-      throw Error("Bug: timer is null");
-    if (stage == 4 /* Sustain */)
+    if (timer2 === null)
+      throw Error(`Bug: timer is null`);
+    if (stage === 4 /* Sustain */)
       return [stage, 1];
-    let elapsed = timer2.elapsed();
-    if (stage == 5 /* Release */) {
-      let relative = elapsed / releaseDuration;
+    const elapsed = timer2.elapsed();
+    if (stage === 5 /* Release */) {
+      const relative = elapsed / releaseDuration;
       if (relative > 1) {
-        if (looping) {
+        if (shouldLoop) {
           trigger();
         } else {
           setStage(0 /* Stopped */);
@@ -2748,11 +3027,11 @@ var stages = function(opts = {}) {
     } else if (elapsed <= attackDuration) {
       return [stage, elapsed / attackDuration];
     } else if (elapsed <= decayDuration + attackDuration) {
-      if (stage == 2 /* Attack */)
+      if (stage === 2 /* Attack */)
         setStage(3 /* Decay */);
       return [stage, (elapsed - attackDuration) / decayDuration];
     } else {
-      if (stage == 3 /* Decay */)
+      if (stage === 3 /* Decay */)
         setStage(4 /* Sustain */);
       if (!isHeld) {
         setStage(5 /* Release */);
@@ -2766,7 +3045,7 @@ var stages = function(opts = {}) {
   };
   const hold = () => {
     isHeld = true;
-    if (stage == 0 /* Stopped */) {
+    if (stage === 0 /* Stopped */) {
       setStage(1 /* Delay */);
     } else {
       setStage(4 /* Sustain */);
@@ -2774,15 +3053,11 @@ var stages = function(opts = {}) {
   };
   const release = () => {
     if (!isHeld)
-      throw Error("Not being held");
+      throw Error(`Not being held`);
     setStage(5 /* Release */);
   };
-  const reset = () => {
-    setStage(0 /* Stopped */);
-  };
-  const getOpts = () => {
-    return opts;
-  };
+  const reset = () => setStage(0 /* Stopped */);
+  const getOpts = () => opts;
   reset();
   return Object.freeze({
     trigger,
@@ -2849,9 +3124,9 @@ var create = function(easingName, duration, timerSource) {
 };
 var resolveEasing = function(easingName) {
   const name = easingName.toLowerCase();
-  for (const [k, v] of Object.entries(easings)) {
+  for (const [k, v2] of Object.entries(easings)) {
     if (k.toLowerCase() === name) {
-      return v;
+      return v2;
     }
   }
   throw Error(`Easing '${easingName}' not found.`);
@@ -2924,283 +3199,6 @@ var easings = {
   easeInOutBounce: (x) => x < 0.5 ? (1 - easeOutBounce(1 - 2 * x)) / 2 : (1 + easeOutBounce(2 * x - 1)) / 2
 };
 
-// src/collections/Lists.ts
-var Lists_exports = {};
-__export(Lists_exports, {
-  Circular: () => Circular,
-  QueueOverflowPolicy: () => OverflowPolicy2,
-  StackOverflowPolicy: () => OverflowPolicy,
-  queue: () => queue,
-  queueMutable: () => queueMutable,
-  stack: () => stack,
-  stackMutable: () => stackMutable
-});
-
-// src/collections/Stack.ts
-var OverflowPolicy = /* @__PURE__ */ ((OverflowPolicy3) => {
-  OverflowPolicy3[OverflowPolicy3["DiscardOlder"] = 0] = "DiscardOlder";
-  OverflowPolicy3[OverflowPolicy3["DiscardNewer"] = 1] = "DiscardNewer";
-  OverflowPolicy3[OverflowPolicy3["DiscardAdditions"] = 2] = "DiscardAdditions";
-  return OverflowPolicy3;
-})(OverflowPolicy || {});
-var push = (opts, stack2, ...toAdd) => {
-  const potentialLength = stack2.length + toAdd.length;
-  if (opts.capacity && potentialLength > opts.capacity) {
-    const policy = opts.overflowPolicy ?? 2 /* DiscardAdditions */;
-    const toRemove = potentialLength - opts.capacity;
-    if (opts.debug)
-      console.log(`Stack.push: stackLen: ${stack2.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
-    let toReturn = stack2;
-    switch (policy) {
-      case 2 /* DiscardAdditions */:
-        if (opts.debug)
-          console.log(`Stack.push:DiscardAdditions: stackLen: ${stack2.length} slice: ${potentialLength - opts.capacity} toAddLen: ${toAdd.length}`);
-        if (stack2.length === opts.capacity) {
-          toReturn = stack2;
-        } else {
-          toReturn = [...stack2, ...toAdd.slice(0, toAdd.length - toRemove)];
-        }
-        break;
-      case 1 /* DiscardNewer */:
-        if (toRemove >= stack2.length) {
-          toReturn = toAdd.slice(Math.max(0, toAdd.length - opts.capacity), Math.min(toAdd.length, opts.capacity) + 1);
-        } else {
-          if (opts.debug)
-            console.log(` from orig: ${stack2.slice(0, toRemove - 1)}`);
-          toReturn = [...stack2.slice(0, toRemove - 1), ...toAdd.slice(0, Math.min(toAdd.length, opts.capacity - toRemove + 1))];
-        }
-        break;
-      case 0 /* DiscardOlder */:
-        toReturn = [...stack2, ...toAdd].slice(toRemove);
-        break;
-      default:
-        throw new Error(`Unknown overflow policy ${policy}`);
-    }
-    if (toReturn.length !== opts.capacity)
-      throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity}`);
-    return toReturn;
-  } else {
-    return [...stack2, ...toAdd];
-  }
-};
-var pop = (opts, stack2) => {
-  if (stack2.length === 0)
-    throw new Error(`Stack is empty`);
-  return stack2.slice(0, stack2.length - 1);
-};
-var peek = (opts, stack2) => stack2.at(stack2.length - 1);
-var isEmpty = (opts, stack2) => stack2.length === 0;
-var isFull = (opts, stack2) => {
-  if (opts.capacity) {
-    return stack2.length >= opts.capacity;
-  }
-  return false;
-};
-var Stack = class {
-  constructor(opts, data) {
-    __publicField(this, "opts");
-    __publicField(this, "data");
-    this.opts = opts;
-    this.data = data;
-  }
-  push(...toAdd) {
-    return new Stack(this.opts, push(this.opts, this.data, ...toAdd));
-  }
-  pop() {
-    return new Stack(this.opts, pop(this.opts, this.data));
-  }
-  get isEmpty() {
-    return isEmpty(this.opts, this.data);
-  }
-  get isFull() {
-    return isFull(this.opts, this.data);
-  }
-  get peek() {
-    return peek(this.opts, this.data);
-  }
-  get length() {
-    return this.data.length;
-  }
-};
-var stack = (opts = {}, ...startingItems) => new Stack({ ...opts }, [...startingItems]);
-var MutableStack = class {
-  constructor(opts, data) {
-    __publicField(this, "opts");
-    __publicField(this, "data");
-    this.opts = opts;
-    this.data = data;
-  }
-  push(...toAdd) {
-    this.data = push(this.opts, this.data, ...toAdd);
-    return this.data.length;
-  }
-  pop() {
-    const v = peek(this.opts, this.data);
-    pop(this.opts, this.data);
-    return v;
-  }
-  get isEmpty() {
-    return isEmpty(this.opts, this.data);
-  }
-  get isFull() {
-    return isFull(this.opts, this.data);
-  }
-  get peek() {
-    return peek(this.opts, this.data);
-  }
-  get length() {
-    return this.data.length;
-  }
-};
-var stackMutable = (opts, ...startingItems) => new MutableStack({ ...opts }, [...startingItems]);
-
-// src/collections/Queue.ts
-var OverflowPolicy2 = /* @__PURE__ */ ((OverflowPolicy3) => {
-  OverflowPolicy3[OverflowPolicy3["DiscardOlder"] = 0] = "DiscardOlder";
-  OverflowPolicy3[OverflowPolicy3["DiscardNewer"] = 1] = "DiscardNewer";
-  OverflowPolicy3[OverflowPolicy3["DiscardAdditions"] = 2] = "DiscardAdditions";
-  return OverflowPolicy3;
-})(OverflowPolicy2 || {});
-var enqueue = (opts, queue2, ...toAdd) => {
-  const potentialLength = queue2.length + toAdd.length;
-  if (opts.capacity && potentialLength > opts.capacity) {
-    const toRemove = potentialLength - opts.capacity;
-    const policy = opts.overflowPolicy ?? 2 /* DiscardAdditions */;
-    if (opts.debug)
-      console.log(`enqueue: queueLen: ${queue2.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy2[policy]}`);
-    let toReturn;
-    switch (policy) {
-      case 2 /* DiscardAdditions */:
-        if (opts.debug)
-          console.log(`enqueue:DiscardAdditions: queueLen: ${queue2.length} slice: ${potentialLength - opts.capacity} toAddLen: ${toAdd.length}`);
-        if (queue2.length === opts.capacity) {
-          toReturn = queue2;
-        } else {
-          toReturn = [...queue2, ...toAdd.slice(0, toRemove - 1)];
-        }
-        break;
-      case 1 /* DiscardNewer */:
-        if (toRemove >= queue2.length) {
-          toReturn = toAdd.slice(Math.max(0, toAdd.length - opts.capacity), Math.min(toAdd.length, opts.capacity) + 1);
-        } else {
-          if (opts.debug)
-            console.log(` from orig: ${queue2.slice(0, toRemove - 1)}`);
-          toReturn = [...queue2.slice(0, toRemove - 1), ...toAdd.slice(0, Math.min(toAdd.length, opts.capacity - toRemove + 1))];
-        }
-        break;
-      case 0 /* DiscardOlder */:
-        toReturn = [...queue2, ...toAdd].slice(toRemove);
-        break;
-      default:
-        throw new Error(`Unknown overflow policy ${policy}`);
-    }
-    if (toReturn.length !== opts.capacity)
-      throw new Error(`Bug! Expected return to be at capacity. Return len: ${toReturn.length} capacity: ${opts.capacity}`);
-    return toReturn;
-  } else {
-    return [...queue2, ...toAdd];
-  }
-};
-var dequeue = (opts, queue2) => {
-  if (queue2.length === 0)
-    throw new Error(`Queue is empty`);
-  return queue2.slice(1);
-};
-var peek2 = (opts, queue2) => queue2.at(0);
-var isEmpty2 = (opts, queue2) => queue2.length === 0;
-var isFull2 = (opts, queue2) => {
-  if (opts.capacity) {
-    return queue2.length >= opts.capacity;
-  }
-  return false;
-};
-var Queue = class {
-  constructor(opts, data) {
-    __publicField(this, "opts");
-    __publicField(this, "data");
-    this.opts = opts;
-    this.data = data;
-  }
-  enqueue(...toAdd) {
-    return new Queue(this.opts, enqueue(this.opts, this.data, ...toAdd));
-  }
-  dequeue() {
-    return new Queue(this.opts, dequeue(this.opts, this.data));
-  }
-  get isEmpty() {
-    return isEmpty2(this.opts, this.data);
-  }
-  get isFull() {
-    return isFull2(this.opts, this.data);
-  }
-  get length() {
-    return this.data.length;
-  }
-  get peek() {
-    return peek2(this.opts, this.data);
-  }
-};
-var queue = (opts = {}, ...startingItems) => {
-  opts = { ...opts };
-  return new Queue(opts, [...startingItems]);
-};
-var MutableQueue = class {
-  constructor(opts, data) {
-    __publicField(this, "opts");
-    __publicField(this, "data");
-    this.opts = opts;
-    this.data = data;
-  }
-  enqueue(...toAdd) {
-    this.data = enqueue(this.opts, this.data, ...toAdd);
-    return this.data.length;
-  }
-  dequeue() {
-    const v = peek2(this.opts, this.data);
-    this.data = dequeue(this.opts, this.data);
-    return v;
-  }
-  get isEmpty() {
-    return isEmpty2(this.opts, this.data);
-  }
-  get isFull() {
-    return isFull2(this.opts, this.data);
-  }
-  get length() {
-    return this.data.length;
-  }
-  get peek() {
-    return peek2(this.opts, this.data);
-  }
-};
-var queueMutable = (opts = {}, ...startingItems) => new MutableQueue({ ...opts }, [...startingItems]);
-
-// src/collections/Lists.ts
-var _capacity, _pointer;
-var _Circular = class extends Array {
-  constructor(capacity) {
-    super();
-    __privateAdd(this, _capacity, void 0);
-    __privateAdd(this, _pointer, void 0);
-    if (Number.isNaN(capacity))
-      throw Error(`capacity is NaN`);
-    if (capacity <= 0)
-      throw Error(`capacity must be greater than zero`);
-    __privateSet(this, _capacity, capacity);
-    __privateSet(this, _pointer, 0);
-  }
-  add(thing) {
-    const ca = _Circular.from(this);
-    ca[__privateGet(this, _pointer)] = thing;
-    __privateSet(ca, _capacity, __privateGet(this, _capacity));
-    __privateSet(ca, _pointer, __privateGet(this, _pointer) + 1 === __privateGet(this, _capacity) ? 0 : __privateGet(this, _pointer) + 1);
-    return ca;
-  }
-};
-var Circular = _Circular;
-_capacity = new WeakMap();
-_pointer = new WeakMap();
-
 // src/visualisation/BasePlot.ts
 var BasePlot = class {
   constructor(canvasEl) {
@@ -3253,18 +3251,18 @@ var BasePlot = class {
       this.scaleMax = max2;
     else
       this.scaleMax = Math.max(max2, this.scaleMax);
-    const range = this.scaleMax - this.scaleMin;
-    return range;
+    const range3 = this.scaleMax - this.scaleMin;
+    return range3;
   }
   map(value, x1, y1, x2, y2) {
     return (value - x1) * (y2 - x2) / (y1 - x1) + x2;
   }
-  scaleNumber(v) {
-    if (Math.abs(v) > 50)
-      return Math.floor(v).toString();
-    return v.toFixed(this.precision);
+  scaleNumber(v2) {
+    if (Math.abs(v2) > 50)
+      return Math.floor(v2).toString();
+    return v2.toFixed(this.precision);
   }
-  drawScale(g, min2, max2, avg, range, plotWidth, plotHeight) {
+  drawScale(g, min2, max2, avg, range3, plotWidth, plotHeight) {
     if (!this.showScale)
       return;
     const labelInset = this.labelInset;
@@ -3275,19 +3273,19 @@ var BasePlot = class {
     const middleY = this.plotPadding + plotHeight / 2 + textHalf;
     const topY = this.plotPadding + textHalf;
     g.fillText(this.scaleNumber(this.scaleMin), labelInset, bottomY);
-    g.fillText(this.scaleNumber(range / 2 + this.scaleMin), labelInset, middleY);
+    g.fillText(this.scaleNumber(range3 / 2 + this.scaleMin), labelInset, middleY);
     g.fillText(this.scaleNumber(this.scaleMax), labelInset, topY);
     g.fillText(this.scaleNumber(min2), rightJustif, bottomY);
     g.fillText(`Avg: ${this.scaleNumber(avg)}`, rightJustif, middleY);
     g.fillText(this.scaleNumber(max2), rightJustif, topY);
   }
   baseDraw() {
-    const c = this.canvasEl;
-    const g = c.getContext("2d");
+    const c2 = this.canvasEl;
+    const g = c2.getContext("2d");
     if (g === null)
       return;
-    const canvasHeight = c.height;
-    const canvasWidth = c.width;
+    const canvasHeight = c2.height;
+    const canvasWidth = c2.width;
     const plotHeight = canvasHeight - this.plotPadding - this.plotPadding;
     const plotWidth = canvasWidth - this.plotPadding - this.plotPadding;
     g.fillStyle = "white";
@@ -3330,7 +3328,7 @@ var Plot = class extends BasePlot {
     const d = this.buffer;
     const dataLength = d.length;
     const { min: min2, max: max2, avg } = getMinMaxAvg(d);
-    const range = this.pushScale(min2, max2);
+    const range3 = this.pushScale(min2, max2);
     const lineWidth = plotWidth / dataLength;
     let x = this.plotPadding;
     if (this.showScale)
@@ -3338,9 +3336,9 @@ var Plot = class extends BasePlot {
     g.beginPath();
     g.lineWidth = lineWidth;
     g.strokeStyle = this.color;
-    for (let i = 0; i < dataLength; i++) {
-      const y = this.map(d[i], this.scaleMin, this.scaleMax, plotHeight, 0) + this.plotPadding;
-      if (i === 0) {
+    for (let i2 = 0; i2 < dataLength; i2++) {
+      const y = this.map(d[i2], this.scaleMin, this.scaleMax, plotHeight, 0) + this.plotPadding;
+      if (i2 === 0) {
         g.moveTo(x, y);
       } else {
         g.lineTo(x, y);
@@ -3349,14 +3347,14 @@ var Plot = class extends BasePlot {
     }
     g.stroke();
     g.fillStyle = "black";
-    this.drawScale(g, min2, max2, avg, range, plotWidth, plotHeight);
+    this.drawScale(g, min2, max2, avg, range3, plotWidth, plotHeight);
   }
   clear() {
     this.buffer = new Circular(this.samples);
     this.repaint();
   }
-  push(v) {
-    this.buffer = this.buffer.add(v);
+  push(v2) {
+    this.buffer = this.buffer.add(v2);
     if (this.paused)
       return;
     this.repaint();
@@ -3367,17 +3365,106 @@ var Plot = class extends BasePlot {
 var Drawing_exports = {};
 __export(Drawing_exports, {
   arc: () => arc,
+  bezier: () => bezier,
   circle: () => circle,
   connectedPoints: () => connectedPoints,
+  drawingStack: () => drawingStack,
   line: () => line,
   makeHelper: () => makeHelper,
   paths: () => paths,
   pointLabels: () => pointLabels,
-  quadraticBezier: () => quadraticBezier,
   rect: () => rect,
   textBlock: () => textBlock
 });
-var makeHelper = (ctxOrCanvasEl) => {
+
+// node_modules/color2k/dist/index.module.js
+function t2(t3, n2, r2) {
+  return Math.min(Math.max(t3, r2), n2);
+}
+var n = class extends Error {
+  constructor(t3) {
+    super(`Failed to parse color: "${t3}"`);
+  }
+};
+function r(r2) {
+  if (typeof r2 != "string")
+    throw new n(r2);
+  if (r2.trim().toLowerCase() === "transparent")
+    return [0, 0, 0, 0];
+  let e2 = r2.trim();
+  e2 = u.test(r2) ? function(t3) {
+    const r3 = t3.toLowerCase().trim(), e3 = o[function(t4) {
+      let n2 = 5381, r4 = t4.length;
+      for (; r4; )
+        n2 = 33 * n2 ^ t4.charCodeAt(--r4);
+      return (n2 >>> 0) % 2341;
+    }(r3)];
+    if (!e3)
+      throw new n(t3);
+    return `#${e3}`;
+  }(r2) : r2;
+  const f2 = s.exec(e2);
+  if (f2) {
+    const t3 = Array.from(f2).slice(1);
+    return [...t3.slice(0, 3).map((t4) => parseInt(_(t4, 2), 16)), parseInt(_(t3[3] || "f", 2), 16) / 255];
+  }
+  const p = i.exec(e2);
+  if (p) {
+    const t3 = Array.from(p).slice(1);
+    return [...t3.slice(0, 3).map((t4) => parseInt(t4, 16)), parseInt(t3[3] || "ff", 16) / 255];
+  }
+  const z = a.exec(e2);
+  if (z) {
+    const t3 = Array.from(z).slice(1);
+    return [...t3.slice(0, 3).map((t4) => parseInt(t4, 10)), parseFloat(t3[3] || "1")];
+  }
+  const h = c.exec(e2);
+  if (h) {
+    const [e3, o2, _2, s2] = Array.from(h).slice(1).map(parseFloat);
+    if (t2(0, 100, o2) !== o2)
+      throw new n(r2);
+    if (t2(0, 100, _2) !== _2)
+      throw new n(r2);
+    return [...l(e3, o2, _2), s2 || 1];
+  }
+  throw new n(r2);
+}
+var e = (t3) => parseInt(t3.replace(/_/g, ""), 36);
+var o = "1q29ehhb 1n09sgk7 1kl1ekf_ _yl4zsno 16z9eiv3 1p29lhp8 _bd9zg04 17u0____ _iw9zhe5 _to73___ _r45e31e _7l6g016 _jh8ouiv _zn3qba8 1jy4zshs 11u87k0u 1ro9yvyo 1aj3xael 1gz9zjz0 _3w8l4xo 1bf1ekf_ _ke3v___ _4rrkb__ 13j776yz _646mbhl _nrjr4__ _le6mbhl 1n37ehkb _m75f91n _qj3bzfz 1939yygw 11i5z6x8 _1k5f8xs 1509441m 15t5lwgf _ae2th1n _tg1ugcv 1lp1ugcv 16e14up_ _h55rw7n _ny9yavn _7a11xb_ 1ih442g9 _pv442g9 1mv16xof 14e6y7tu 1oo9zkds 17d1cisi _4v9y70f _y98m8kc 1019pq0v 12o9zda8 _348j4f4 1et50i2o _8epa8__ _ts6senj 1o350i2o 1mi9eiuo 1259yrp0 1ln80gnw _632xcoy 1cn9zldc _f29edu4 1n490c8q _9f9ziet 1b94vk74 _m49zkct 1kz6s73a 1eu9dtog _q58s1rz 1dy9sjiq __u89jo3 _aj5nkwg _ld89jo3 13h9z6wx _qa9z2ii _l119xgq _bs5arju 1hj4nwk9 1qt4nwk9 1ge6wau6 14j9zlcw 11p1edc_ _ms1zcxe _439shk6 _jt9y70f _754zsow 1la40eju _oq5p___ _x279qkz 1fa5r3rv _yd2d9ip _424tcku _8y1di2_ _zi2uabw _yy7rn9h 12yz980_ __39ljp6 1b59zg0x _n39zfzp 1fy9zest _b33k___ _hp9wq92 1il50hz4 _io472ub _lj9z3eo 19z9ykg0 _8t8iu3a 12b9bl4a 1ak5yw0o _896v4ku _tb8k8lv _s59zi6t _c09ze0p 1lg80oqn 1id9z8wb _238nba5 1kq6wgdi _154zssg _tn3zk49 _da9y6tc 1sg7cv4f _r12jvtt 1gq5fmkz 1cs9rvci _lp9jn1c _xw1tdnb 13f9zje6 16f6973h _vo7ir40 _bt5arjf _rc45e4t _hr4e100 10v4e100 _hc9zke2 _w91egv_ _sj2r1kk 13c87yx8 _vqpds__ _ni8ggk8 _tj9yqfb 1ia2j4r4 _7x9b10u 1fc9ld4j 1eq9zldr _5j9lhpx _ez9zl6o _md61fzm".split(" ").reduce((t3, n2) => {
+  const r2 = e(n2.substring(0, 3)), o2 = e(n2.substring(3)).toString(16);
+  let _2 = "";
+  for (let t4 = 0; t4 < 6 - o2.length; t4++)
+    _2 += "0";
+  return t3[r2] = `${_2}${o2}`, t3;
+}, {});
+var _ = (t3, n2) => Array.from(Array(n2)).map(() => t3).join("");
+var s = new RegExp(`^#${_("([a-f0-9])", 3)}([a-f0-9])?$`, "i");
+var i = new RegExp(`^#${_("([a-f0-9]{2})", 3)}([a-f0-9]{2})?$`, "i");
+var a = new RegExp(`^rgba?\\(\\s*(\\d+)\\s*${_(",\\s*(\\d+)\\s*", 2)}(?:,\\s*([\\d.]+))?\\s*\\)$`, "i");
+var c = /^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)$/i;
+var u = /^[a-z]+$/i;
+var f = (t3) => Math.round(255 * t3);
+var l = (t3, n2, r2) => {
+  let e2 = r2 / 100;
+  if (n2 === 0)
+    return [e2, e2, e2].map(f);
+  const o2 = (t3 % 360 + 360) % 360 / 60, _2 = (1 - Math.abs(2 * e2 - 1)) * (n2 / 100), s2 = _2 * (1 - Math.abs(o2 % 2 - 1));
+  let i2 = 0, a2 = 0, c2 = 0;
+  o2 >= 0 && o2 < 1 ? (i2 = _2, a2 = s2) : o2 >= 1 && o2 < 2 ? (i2 = s2, a2 = _2) : o2 >= 2 && o2 < 3 ? (a2 = _2, c2 = s2) : o2 >= 3 && o2 < 4 ? (a2 = s2, c2 = _2) : o2 >= 4 && o2 < 5 ? (i2 = s2, c2 = _2) : o2 >= 5 && o2 < 6 && (i2 = _2, c2 = s2);
+  const u2 = e2 - _2 / 2;
+  return [i2 + u2, a2 + u2, c2 + u2].map(f);
+};
+function m(n2, r2, e2, o2) {
+  return `rgba(${t2(0, 255, n2).toFixed()}, ${t2(0, 255, r2).toFixed()}, ${t2(0, 255, e2).toFixed()}, ${parseFloat(t2(0, 1, o2).toFixed(3))})`;
+}
+function v(t3, n2) {
+  const [e2, o2, _2, s2] = r(t3);
+  return m(e2, o2, _2, s2 - n2);
+}
+
+// src/visualisation/Drawing.ts
+var PIPI = Math.PI * 2;
+var makeHelper = (ctxOrCanvasEl, canvasBounds) => {
   if (ctxOrCanvasEl === void 0)
     throw Error(`ctxOrCanvasEl undefined. Must be a 2d drawing context or Canvas element`);
   let ctx;
@@ -3398,8 +3485,8 @@ var makeHelper = (ctxOrCanvasEl) => {
     rect(rectsToDraw, opts) {
       rect(ctx, rectsToDraw, opts);
     },
-    quadraticBezier(bezierToDraw, opts) {
-      quadraticBezier(ctx, bezierToDraw, opts);
+    bezier(bezierToDraw, opts) {
+      bezier(ctx, bezierToDraw, opts);
     },
     connectedPoints(pointsToDraw, opts) {
       connectedPoints(ctx, pointsToDraw, opts);
@@ -3417,17 +3504,17 @@ var makeHelper = (ctxOrCanvasEl) => {
       arc(ctx, arcsToDraw, opts);
     },
     textBlock(lines, opts) {
+      if (opts.bounds === void 0 && canvasBounds !== void 0)
+        opts.bounds = { ...canvasBounds, x: 0, y: 0 };
       textBlock(ctx, lines, opts);
     }
   };
 };
-var PIPI = Math.PI * 2;
-var applyOpts = (ctx, opts) => {
-  guardCtx(ctx);
-  if (opts.strokeStyle)
-    ctx.strokeStyle = opts.strokeStyle;
-  if (opts.fillStyle)
-    ctx.fillStyle = opts.fillStyle;
+var optsOp = (opts) => coloringOp(opts.strokeStyle, opts.fillStyle);
+var applyOpts = (ctx, opts = {}) => {
+  if (ctx === void 0)
+    throw Error(`ctx undefined`);
+  return drawingStack(ctx).push(optsOp(opts));
 };
 var arc = (ctx, arcs, opts = {}) => {
   applyOpts(ctx, opts);
@@ -3441,17 +3528,65 @@ var arc = (ctx, arcs, opts = {}) => {
   } else
     draw(arcs);
 };
+var coloringOp = (strokeStyle, fillStyle) => {
+  let prevSs;
+  let prevFs;
+  const apply = (ctx) => {
+    prevFs = ctx.fillStyle;
+    prevSs = ctx.strokeStyle;
+    if (fillStyle)
+      ctx.fillStyle = fillStyle;
+    if (strokeStyle)
+      ctx.strokeStyle = strokeStyle;
+  };
+  const remove = (ctx) => {
+    if (prevFs && fillStyle)
+      ctx.fillStyle = prevFs;
+    if (prevSs && strokeStyle)
+      ctx.strokeStyle = prevSs;
+  };
+  return { apply, remove };
+};
+var drawingStack = (ctx, stk) => {
+  if (stk === void 0)
+    stk = stack();
+  const push2 = (op) => {
+    const s2 = stk?.push(op);
+    op.apply(ctx);
+    return drawingStack(ctx, s2);
+  };
+  const pop2 = () => {
+    const op = stk?.peek;
+    if (op !== void 0) {
+      op.remove(ctx);
+    }
+    const s2 = stk?.pop();
+    return drawingStack(ctx, s2);
+  };
+  const clear = () => {
+    if (stk === void 0)
+      return;
+    let op = stk.peek;
+    while (op !== void 0) {
+      op.remove(ctx);
+      stk = stk?.pop();
+      op = stk.peek;
+    }
+  };
+  return { push: push2, pop: pop2, clear };
+};
 var circle = (ctx, circlesToDraw, opts = {}) => {
-  applyOpts(ctx, opts);
-  const draw = (c) => {
+  const ds = applyOpts(ctx, opts);
+  const draw = (c2) => {
     ctx.beginPath();
-    ctx.arc(c.x, c.y, c.radius, 0, PIPI);
+    ctx.arc(c2.x, c2.y, c2.radius, 0, PIPI);
     ctx.stroke();
   };
   if (Array.isArray(circlesToDraw))
     circlesToDraw.forEach(draw);
   else
     draw(circlesToDraw);
+  ds.clear();
 };
 var paths = (ctx, pathsToDraw, opts = {}) => {
   applyOpts(ctx, opts);
@@ -3469,57 +3604,51 @@ var paths = (ctx, pathsToDraw, opts = {}) => {
     draw(pathsToDraw);
 };
 var connectedPoints = (ctx, pts, opts = {}) => {
-  guardCtx(ctx);
-  array(pts);
   const loop = opts.loop ?? false;
+  array(pts);
   if (pts.length === 0)
     return;
-  for (let i = 0; i < pts.length; i++)
-    guard(pts[i], `Index ` + i);
+  for (let i2 = 0; i2 < pts.length; i2++)
+    guard(pts[i2], `Index ` + i2);
+  const ds = applyOpts(ctx, opts);
   ctx.beginPath();
   ctx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) {
-    ctx.lineTo(pts[i].x, pts[i].y);
+  for (let i2 = 1; i2 < pts.length; i2++) {
+    ctx.lineTo(pts[i2].x, pts[i2].y);
   }
   if (loop)
     ctx.lineTo(pts[0].x, pts[0].y);
-  if (opts.strokeStyle)
-    ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
+  ds.clear();
 };
 var pointLabels = (ctx, pts, opts = {}, labels) => {
-  guardCtx(ctx);
   if (pts.length === 0)
     return;
-  for (let i = 0; i < pts.length; i++)
-    guard(pts[i], `Index ` + i);
-  if (opts.fillStyle)
-    ctx.fillStyle = opts.fillStyle;
-  for (let i = 0; i < pts.length; i++) {
-    let label = i.toString();
-    if (labels !== void 0 && i < labels.length) {
-      label = labels[i];
+  for (let i2 = 0; i2 < pts.length; i2++)
+    guard(pts[i2], `Index ` + i2);
+  const ds = applyOpts(ctx, opts);
+  for (let i2 = 0; i2 < pts.length; i2++) {
+    let label = i2.toString();
+    if (labels !== void 0 && i2 < labels.length) {
+      label = labels[i2];
     }
-    ctx.fillText(label.toString(), pts[i].x, pts[i].y);
+    ctx.fillText(label.toString(), pts[i2].x, pts[i2].y);
   }
-};
-var guardCtx = (ctx) => {
-  if (ctx === void 0)
-    throw Error(`ctx undefined`);
+  ds.clear();
 };
 var dot = (ctx, pos, opts) => {
   if (opts === void 0)
     opts = {};
   const radius = opts.radius ?? 10;
-  let filled = opts.filled ?? false;
   const outlined = opts.outlined ?? false;
+  let filled = opts.filled ?? false;
   if (!filled && !outlined)
     filled = true;
-  applyOpts(ctx, opts);
+  const ds = applyOpts(ctx, opts);
   ctx.beginPath();
   if (Array.isArray(pos)) {
-    for (let i = 0; i < pos.length; i++) {
-      ctx.arc(pos[i].x, pos[i].y, radius, 0, 2 * Math.PI);
+    for (let i2 = 0; i2 < pos.length; i2++) {
+      ctx.arc(pos[i2].x, pos[i2].y, radius, 0, 2 * Math.PI);
     }
   } else {
     ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
@@ -3528,46 +3657,86 @@ var dot = (ctx, pos, opts) => {
     ctx.fill();
   if (outlined)
     ctx.stroke();
+  ds.clear();
 };
-var quadraticBezier = (ctx, bezierToDraw, opts) => {
-  guardCtx(ctx);
-  if (opts === void 0)
-    opts = {};
-  const debug = opts.debug ?? false;
-  const { a, b, quadratic: quadratic2 } = bezierToDraw;
-  const ss = ctx.strokeStyle;
-  if (debug) {
-    connectedPoints(ctx, [a, quadratic2, b], { strokeStyle: `silver` });
-    ctx.strokeStyle = ss;
+var bezier = (ctx, bezierToDraw, opts) => {
+  if (isQuadraticBezier(bezierToDraw)) {
+    quadraticBezier(ctx, bezierToDraw, opts);
+  } else if (isCubicBezier(bezierToDraw)) {
+    cubicBezier(ctx, bezierToDraw, opts);
+  }
+};
+var cubicBezier = (ctx, bezierToDraw, opts = {}) => {
+  let ds = applyOpts(ctx, opts);
+  const { a: a2, b, cubic1, cubic2 } = bezierToDraw;
+  const debug2 = opts.debug ?? false;
+  if (debug2) {
   }
   ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.quadraticCurveTo(quadratic2.x, quadratic2.y, b.x, b.y);
-  if (opts.strokeStyle)
-    ctx.strokeStyle = opts.strokeStyle;
+  ctx.moveTo(a2.x, a2.y);
+  ctx.bezierCurveTo(cubic1.x, cubic1.y, cubic2.x, cubic2.y, b.x, b.y);
   ctx.stroke();
-  if (debug) {
-    ctx.fillStyle = `black`;
-    ctx.fillText(`a`, a.x + 5, a.y);
+  if (debug2) {
+    ds = ds.push(optsOp({
+      ...opts,
+      strokeStyle: v(opts.strokeStyle ?? `silver`, 0.6),
+      fillStyle: v(opts.fillStyle ?? `yellow`, 0.4)
+    }));
+    ctx.moveTo(a2.x, a2.y);
+    ctx.lineTo(cubic1.x, cubic1.y);
+    ctx.stroke();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(cubic2.x, cubic2.y);
+    ctx.stroke();
+    ctx.fillText(`a`, a2.x + 5, a2.y);
+    ctx.fillText(`b`, b.x + 5, b.y);
+    ctx.fillText(`c1`, cubic1.x + 5, cubic1.y);
+    ctx.fillText(`c2`, cubic2.x + 5, cubic2.y);
+    dot(ctx, cubic1, { radius: 3 });
+    dot(ctx, cubic2, { radius: 3 });
+    dot(ctx, a2, { radius: 3 });
+    dot(ctx, b, { radius: 3 });
+    ds = ds.pop();
+  }
+  ds.clear();
+};
+var quadraticBezier = (ctx, bezierToDraw, opts = {}) => {
+  const { a: a2, b, quadratic: quadratic2 } = bezierToDraw;
+  const debug2 = opts.debug ?? false;
+  let ds = applyOpts(ctx, opts);
+  ctx.beginPath();
+  ctx.moveTo(a2.x, a2.y);
+  ctx.quadraticCurveTo(quadratic2.x, quadratic2.y, b.x, b.y);
+  ctx.stroke();
+  if (debug2) {
+    ds = ds.push(optsOp({
+      ...opts,
+      strokeStyle: v(opts.strokeStyle ?? `silver`, 0.6),
+      fillStyle: v(opts.fillStyle ?? `yellow`, 0.4)
+    }));
+    connectedPoints(ctx, [a2, quadratic2, b]);
+    ctx.fillText(`a`, a2.x + 5, a2.y);
     ctx.fillText(`b`, b.x + 5, b.y);
     ctx.fillText(`h`, quadratic2.x + 5, quadratic2.y);
-    dot(ctx, quadratic2, { radius: 5 });
-    dot(ctx, a, { radius: 5, fillStyle: `black` });
-    dot(ctx, b, { radius: 5, fillStyle: `black` });
+    dot(ctx, quadratic2, { radius: 3 });
+    dot(ctx, a2, { radius: 3 });
+    dot(ctx, b, { radius: 3 });
+    ds = ds.pop();
   }
+  ds.clear();
 };
 var line = (ctx, toDraw, opts = {}) => {
-  applyOpts(ctx, opts);
-  const debug = opts.debug ?? false;
+  const debug2 = opts.debug ?? false;
+  const ds = applyOpts(ctx, opts);
   const draw = (d) => {
-    const { a, b } = d;
+    const { a: a2, b } = d;
     ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
+    ctx.moveTo(a2.x, a2.y);
     ctx.lineTo(b.x, b.y);
-    if (debug) {
-      ctx.fillText(`a`, a.x, a.y);
+    if (debug2) {
+      ctx.fillText(`a`, a2.x, a2.y);
       ctx.fillText(`b`, b.x, b.y);
-      dot(ctx, a, { radius: 5, strokeStyle: `black` });
+      dot(ctx, a2, { radius: 5, strokeStyle: `black` });
       dot(ctx, b, { radius: 5, strokeStyle: `black` });
     }
     ctx.stroke();
@@ -3576,9 +3745,10 @@ var line = (ctx, toDraw, opts = {}) => {
     toDraw.forEach(draw);
   else
     draw(toDraw);
+  ds.clear();
 };
 var rect = (ctx, toDraw, opts = {}) => {
-  applyOpts(ctx, opts);
+  const ds = applyOpts(ctx, opts);
   const draw = (d) => {
     if (opts.filled)
       ctx.fillRect(d.x, d.y, d.width, d.height);
@@ -3591,15 +3761,16 @@ var rect = (ctx, toDraw, opts = {}) => {
     toDraw.forEach(draw);
   else
     draw(toDraw);
+  ds.clear();
 };
 var textBlock = (ctx, lines, opts) => {
-  applyOpts(ctx, opts);
+  const ds = applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;
   const anchor = opts.anchor;
   let { bounds } = opts;
   if (bounds === void 0)
     bounds = { x: 0, y: 0, width: 1e6, height: 1e6 };
-  const blocks = lines.map((l) => ctx.measureText(l));
+  const blocks = lines.map((l2) => ctx.measureText(l2));
   const widths = blocks.map((tm) => tm.width);
   const heights = blocks.map((tm) => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent);
   const maxWidth = Math.max(...widths);
@@ -3617,10 +3788,11 @@ var textBlock = (ctx, lines, opts) => {
     y -= anchorPadding;
   if (y < bounds.y)
     y = bounds.y + anchorPadding;
-  for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], x, y);
-    y += heights[i];
+  for (let i2 = 0; i2 < lines.length; i2++) {
+    ctx.fillText(lines[i2], x, y);
+    y += heights[i2];
   }
+  ds.clear();
 };
 
 // src/Producers.ts
@@ -3636,11 +3808,11 @@ var rawNumericRange = function* (interval, start = 0, end, repeating = false) {
     throw new Error(`Interval is expected to be above zero`);
   if (end === void 0)
     end = Number.MAX_SAFE_INTEGER;
-  let v = start;
+  let v2 = start;
   do {
-    while (v < end) {
-      yield v;
-      v += interval;
+    while (v2 < end) {
+      yield v2;
+      v2 += interval;
     }
   } while (repeating);
 };
@@ -3654,10 +3826,10 @@ var numericRange = function* (interval, start = 0, end, repeating = false, round
     end *= rounding;
   interval = interval * rounding;
   do {
-    let v = start * rounding;
-    while (v <= end) {
-      yield v / rounding;
-      v += interval;
+    let v2 = start * rounding;
+    while (v2 <= end) {
+      yield v2 / rounding;
+      v2 += interval;
     }
   } while (repeating);
 };
@@ -3698,27 +3870,27 @@ var pingPong = function* (interval, lower, upper, offset2, rounding = 1) {
     offset2 = Math.floor(offset2 * rounding);
   if (offset2 > upper || offset2 < lower)
     throw new Error(`Offset must be within lower and upper`);
-  let v = offset2;
-  yield v / rounding;
+  let v2 = offset2;
+  yield v2 / rounding;
   let firstLoop = true;
   while (true) {
-    v = v + (incrementing ? interval : -interval);
-    if (incrementing && v >= upper) {
+    v2 = v2 + (incrementing ? interval : -interval);
+    if (incrementing && v2 >= upper) {
       incrementing = false;
-      v = upper;
-      if (v === upper && firstLoop) {
-        v = lower;
+      v2 = upper;
+      if (v2 === upper && firstLoop) {
+        v2 = lower;
         incrementing = true;
       }
-    } else if (!incrementing && v <= lower) {
+    } else if (!incrementing && v2 <= lower) {
       incrementing = true;
-      v = lower;
-      if (v === lower && firstLoop) {
-        v = upper;
+      v2 = lower;
+      if (v2 === lower && firstLoop) {
+        v2 = upper;
         incrementing = false;
       }
     }
-    yield v / rounding;
+    yield v2 / rounding;
     firstLoop = false;
   }
 };
@@ -3761,7 +3933,7 @@ var eventsToIterable = (eventSource, eventType) => {
     pushValue(args);
   };
   eventSource.addEventListener(eventType, handler);
-  const r = {
+  const r2 = {
     next: async () => {
       if (done)
         return { done: true, value: void 0 };
@@ -3783,7 +3955,7 @@ var eventsToIterable = (eventSource, eventType) => {
       };
     }
   };
-  return r;
+  return r2;
 };
 
 // src/Series.ts
@@ -3801,9 +3973,9 @@ var atInterval = (intervalMs, produce) => {
 var fromGenerator = (vGen) => {
   if (vGen === void 0)
     throw Error(`vGen is undefined`);
-  const s = new Series();
+  const s2 = new Series();
   let genResult = vGen.next();
-  s.onValueNeeded = () => {
+  s2.onValueNeeded = () => {
     genResult = vGen.next();
     if (genResult.done) {
       return void 0;
@@ -3811,11 +3983,11 @@ var fromGenerator = (vGen) => {
     return genResult.value;
   };
   if (genResult.done) {
-    s._setDone();
-    return s;
+    s2._setDone();
+    return s2;
   }
-  s.push(genResult.value);
-  return s;
+  s2.push(genResult.value);
+  return s2;
 };
 var fromTimedIterable = (vIter, delayMs = 100, intervalMs = 10) => {
   if (vIter === void 0)
@@ -3824,28 +3996,28 @@ var fromTimedIterable = (vIter, delayMs = 100, intervalMs = 10) => {
     throw Error(`delayMs must be at least zero`);
   if (intervalMs < 0)
     throw Error(`delayMs must be at least zero`);
-  const s = new Series();
+  const s2 = new Series();
   setTimeout(async () => {
-    if (s.cancelled)
+    if (s2.cancelled)
       return;
     try {
-      for await (const v of vIter) {
-        if (s.cancelled)
+      for await (const v2 of vIter) {
+        if (s2.cancelled)
           return;
-        s.push(v);
+        s2.push(v2);
         await sleep(intervalMs);
       }
-      s._setDone();
+      s2._setDone();
     } catch (err) {
-      s.cancel(err);
+      s2.cancel(err);
     }
   }, delayMs);
-  return s;
+  return s2;
 };
 var fromEvent = (source, eventType) => {
-  const s = new Series();
-  s.mergeEvent(source, eventType);
-  return s;
+  const s2 = new Series();
+  s2.mergeEvent(source, eventType);
+  return s2;
 };
 var _cancelled, _lastValue, _done, _newValue;
 var Series = class extends SimpleEventEmitter {
@@ -3884,14 +4056,14 @@ var Series = class extends SimpleEventEmitter {
     __privateSet(this, _done, true);
     super.fireEvent(`done`, false);
   }
-  push(v) {
+  push(v2) {
     if (__privateGet(this, _cancelled))
       throw Error(`Series has been cancelled, cannot push data`);
     if (__privateGet(this, _done))
       throw Error(`Series is marked as done, cannot push data`);
-    __privateSet(this, _lastValue, v);
+    __privateSet(this, _lastValue, v2);
     __privateSet(this, _newValue, true);
-    super.fireEvent(`data`, v);
+    super.fireEvent(`data`, v2);
   }
   cancel(cancelReason = `Cancelled`) {
     if (__privateGet(this, _done))
@@ -3911,10 +4083,10 @@ var Series = class extends SimpleEventEmitter {
   }
   get value() {
     if (!__privateGet(this, _newValue) && this.onValueNeeded && !__privateGet(this, _done)) {
-      const v = this.onValueNeeded();
-      if (v)
-        this.push(v);
-      else if (v === void 0)
+      const v2 = this.onValueNeeded();
+      if (v2)
+        this.push(v2);
+      else if (v2 === void 0)
         this._setDone();
     }
     __privateSet(this, _newValue, false);
@@ -3940,19 +4112,576 @@ var TriggerSeries = class extends Series {
     __privateSet(this, _undefinedValue, undefinedValue);
   }
   get value() {
-    const v = super.value;
-    if (v === void 0)
+    const v2 = super.value;
+    if (v2 === void 0)
       return __privateGet(this, _undefinedValue);
-    return v;
+    return v2;
   }
 };
 _undefinedValue = new WeakMap();
+
+// node_modules/fp-ts/es6/function.js
+function identity(a2) {
+  return a2;
+}
+function pipe(a2, ab, bc, cd, de, ef, fg, gh, hi) {
+  switch (arguments.length) {
+    case 1:
+      return a2;
+    case 2:
+      return ab(a2);
+    case 3:
+      return bc(ab(a2));
+    case 4:
+      return cd(bc(ab(a2)));
+    case 5:
+      return de(cd(bc(ab(a2))));
+    case 6:
+      return ef(de(cd(bc(ab(a2)))));
+    case 7:
+      return fg(ef(de(cd(bc(ab(a2))))));
+    case 8:
+      return gh(fg(ef(de(cd(bc(ab(a2)))))));
+    case 9:
+      return hi(gh(fg(ef(de(cd(bc(ab(a2))))))));
+    default:
+      var ret = arguments[0];
+      for (var i2 = 1; i2 < arguments.length; i2++) {
+        ret = arguments[i2](ret);
+      }
+      return ret;
+  }
+}
+
+// node_modules/fp-ts/es6/internal.js
+var isSome = function(fa) {
+  return fa._tag === "Some";
+};
+var emptyReadonlyArray = [];
+
+// node_modules/fp-ts/es6/Eq.js
+var eqStrict = {
+  equals: function(a2, b) {
+    return a2 === b;
+  }
+};
+var strictEqual = eqStrict.equals;
+
+// node_modules/fp-ts/es6/Ord.js
+var equalsDefault = function(compare2) {
+  return function(first, second) {
+    return first === second || compare2(first, second) === 0;
+  };
+};
+var fromCompare = function(compare2) {
+  return {
+    equals: equalsDefault(compare2),
+    compare: function(first, second) {
+      return first === second ? 0 : compare2(first, second);
+    }
+  };
+};
+var reverse = function(O) {
+  return fromCompare(function(first, second) {
+    return O.compare(second, first);
+  });
+};
+var contramap = function(f2) {
+  return function(fa) {
+    return fromCompare(function(first, second) {
+      return fa.compare(f2(first), f2(second));
+    });
+  };
+};
+function compare(first, second) {
+  return first < second ? -1 : first > second ? 1 : 0;
+}
+var strictOrd = {
+  equals: eqStrict.equals,
+  compare
+};
+
+// node_modules/fp-ts/es6/ReadonlyNonEmptyArray.js
+var __spreadArray = function(to, from2) {
+  for (var i2 = 0, il = from2.length, j = to.length; i2 < il; i2++, j++)
+    to[j] = from2[i2];
+  return to;
+};
+var empty = emptyReadonlyArray;
+var appendW = function(end) {
+  return function(init3) {
+    return __spreadArray(__spreadArray([], init3), [end]);
+  };
+};
+var append = appendW;
+
+// node_modules/fp-ts/es6/NonEmptyArray.js
+var __spreadArray2 = function(to, from2) {
+  for (var i2 = 0, il = from2.length, j = to.length; i2 < il; i2++, j++)
+    to[j] = from2[i2];
+  return to;
+};
+var appendW2 = function(end) {
+  return function(init3) {
+    return __spreadArray2(__spreadArray2([], init3), [end]);
+  };
+};
+var append2 = appendW2;
+
+// node_modules/fp-ts/es6/number.js
+var Eq = {
+  equals: function(first, second) {
+    return first === second;
+  }
+};
+var Ord = {
+  equals: Eq.equals,
+  compare: function(first, second) {
+    return first < second ? -1 : first > second ? 1 : 0;
+  }
+};
+var Bounded = {
+  equals: Eq.equals,
+  compare: Ord.compare,
+  top: Infinity,
+  bottom: -Infinity
+};
+var MagmaSub = {
+  concat: function(first, second) {
+    return first - second;
+  }
+};
+var SemigroupSum = {
+  concat: function(first, second) {
+    return first + second;
+  }
+};
+var SemigroupProduct = {
+  concat: function(first, second) {
+    return first * second;
+  }
+};
+var MonoidSum = {
+  concat: SemigroupSum.concat,
+  empty: 0
+};
+var MonoidProduct = {
+  concat: SemigroupProduct.concat,
+  empty: 1
+};
+var Field = {
+  add: SemigroupSum.concat,
+  zero: 0,
+  mul: SemigroupProduct.concat,
+  one: 1,
+  sub: MagmaSub.concat,
+  degree: function(_2) {
+    return 1;
+  },
+  div: function(first, second) {
+    return first / second;
+  },
+  mod: function(first, second) {
+    return first % second;
+  }
+};
+
+// node_modules/fp-ts/es6/Separated.js
+var separated = function(left, right) {
+  return { left, right };
+};
+
+// node_modules/fp-ts/es6/Witherable.js
+function wiltDefault(T, C) {
+  return function(F) {
+    var traverseF = T.traverse(F);
+    return function(wa, f2) {
+      return F.map(traverseF(wa, f2), C.separate);
+    };
+  };
+}
+function witherDefault(T, C) {
+  return function(F) {
+    var traverseF = T.traverse(F);
+    return function(wa, f2) {
+      return F.map(traverseF(wa, f2), C.compact);
+    };
+  };
+}
+
+// node_modules/fp-ts/es6/ReadonlyArray.js
+var append3 = append;
+var _map2 = function(fa, f2) {
+  return pipe(fa, map(f2));
+};
+var _reduce = function(fa, b, f2) {
+  return pipe(fa, reduce(b, f2));
+};
+var _foldMap = function(M) {
+  var foldMapM = foldMap(M);
+  return function(fa, f2) {
+    return pipe(fa, foldMapM(f2));
+  };
+};
+var _reduceRight = function(fa, b, f2) {
+  return pipe(fa, reduceRight(b, f2));
+};
+var _traverse = function(F) {
+  var traverseF = traverse(F);
+  return function(ta, f2) {
+    return pipe(ta, traverseF(f2));
+  };
+};
+var zero = function() {
+  return empty2;
+};
+var map = function(f2) {
+  return function(fa) {
+    return fa.map(function(a2) {
+      return f2(a2);
+    });
+  };
+};
+var separate = function(fa) {
+  var left = [];
+  var right = [];
+  for (var _i = 0, fa_1 = fa; _i < fa_1.length; _i++) {
+    var e2 = fa_1[_i];
+    if (e2._tag === "Left") {
+      left.push(e2.left);
+    } else {
+      right.push(e2.right);
+    }
+  }
+  return separated(left, right);
+};
+var filterMapWithIndex = function(f2) {
+  return function(fa) {
+    var out = [];
+    for (var i2 = 0; i2 < fa.length; i2++) {
+      var optionB = f2(i2, fa[i2]);
+      if (isSome(optionB)) {
+        out.push(optionB.value);
+      }
+    }
+    return out;
+  };
+};
+var filterMap = function(f2) {
+  return filterMapWithIndex(function(_2, a2) {
+    return f2(a2);
+  });
+};
+var compact = /* @__PURE__ */ filterMap(identity);
+var foldMapWithIndex = function(M) {
+  return function(f2) {
+    return function(fa) {
+      return fa.reduce(function(b, a2, i2) {
+        return M.concat(b, f2(i2, a2));
+      }, M.empty);
+    };
+  };
+};
+var reduce = function(b, f2) {
+  return reduceWithIndex(b, function(_2, b2, a2) {
+    return f2(b2, a2);
+  });
+};
+var foldMap = function(M) {
+  var foldMapWithIndexM = foldMapWithIndex(M);
+  return function(f2) {
+    return foldMapWithIndexM(function(_2, a2) {
+      return f2(a2);
+    });
+  };
+};
+var reduceWithIndex = function(b, f2) {
+  return function(fa) {
+    var len = fa.length;
+    var out = b;
+    for (var i2 = 0; i2 < len; i2++) {
+      out = f2(i2, out, fa[i2]);
+    }
+    return out;
+  };
+};
+var reduceRight = function(b, f2) {
+  return reduceRightWithIndex(b, function(_2, a2, b2) {
+    return f2(a2, b2);
+  });
+};
+var reduceRightWithIndex = function(b, f2) {
+  return function(fa) {
+    return fa.reduceRight(function(b2, a2, i2) {
+      return f2(i2, a2, b2);
+    }, b);
+  };
+};
+var traverse = function(F) {
+  var traverseWithIndexF = traverseWithIndex(F);
+  return function(f2) {
+    return traverseWithIndexF(function(_2, a2) {
+      return f2(a2);
+    });
+  };
+};
+var sequence = function(F) {
+  return function(ta) {
+    return _reduce(ta, F.of(zero()), function(fas, fa) {
+      return F.ap(F.map(fas, function(as) {
+        return function(a2) {
+          return pipe(as, append3(a2));
+        };
+      }), fa);
+    });
+  };
+};
+var traverseWithIndex = function(F) {
+  return function(f2) {
+    return reduceWithIndex(F.of(zero()), function(i2, fbs, a2) {
+      return F.ap(F.map(fbs, function(bs) {
+        return function(b) {
+          return pipe(bs, append3(b));
+        };
+      }), f2(i2, a2));
+    });
+  };
+};
+var URI = "ReadonlyArray";
+var Compactable = {
+  URI,
+  compact,
+  separate
+};
+var Traversable = {
+  URI,
+  map: _map2,
+  reduce: _reduce,
+  foldMap: _foldMap,
+  reduceRight: _reduceRight,
+  traverse: _traverse,
+  sequence
+};
+var _wither = witherDefault(Traversable, Compactable);
+var _wilt = wiltDefault(Traversable, Compactable);
+var empty2 = empty;
+
+// node_modules/fp-ts/es6/Array.js
+var append4 = append2;
+var copy = function(as) {
+  return as.slice();
+};
+var sort = function(O) {
+  return function(as) {
+    return as.length <= 1 ? copy(as) : as.slice().sort(O.compare);
+  };
+};
+var _map3 = function(fa, f2) {
+  return pipe(fa, map2(f2));
+};
+var _reduce2 = function(fa, b, f2) {
+  return pipe(fa, reduce2(b, f2));
+};
+var _foldMap2 = function(M) {
+  var foldMapM = foldMap2(M);
+  return function(fa, f2) {
+    return pipe(fa, foldMapM(f2));
+  };
+};
+var _reduceRight2 = function(fa, b, f2) {
+  return pipe(fa, reduceRight2(b, f2));
+};
+var _traverse2 = function(F) {
+  var traverseF = traverse2(F);
+  return function(ta, f2) {
+    return pipe(ta, traverseF(f2));
+  };
+};
+var zero2 = function() {
+  return [];
+};
+var map2 = function(f2) {
+  return function(fa) {
+    return fa.map(function(a2) {
+      return f2(a2);
+    });
+  };
+};
+var filterMapWithIndex2 = function(f2) {
+  return function(fa) {
+    var out = [];
+    for (var i2 = 0; i2 < fa.length; i2++) {
+      var optionB = f2(i2, fa[i2]);
+      if (isSome(optionB)) {
+        out.push(optionB.value);
+      }
+    }
+    return out;
+  };
+};
+var filterMap2 = function(f2) {
+  return filterMapWithIndex2(function(_2, a2) {
+    return f2(a2);
+  });
+};
+var compact2 = /* @__PURE__ */ filterMap2(identity);
+var separate2 = function(fa) {
+  var left = [];
+  var right = [];
+  for (var _i = 0, fa_1 = fa; _i < fa_1.length; _i++) {
+    var e2 = fa_1[_i];
+    if (e2._tag === "Left") {
+      left.push(e2.left);
+    } else {
+      right.push(e2.right);
+    }
+  }
+  return separated(left, right);
+};
+var foldMap2 = foldMap;
+var reduce2 = reduce;
+var reduceWithIndex2 = reduceWithIndex;
+var reduceRight2 = reduceRight;
+var traverse2 = function(F) {
+  var traverseWithIndexF = traverseWithIndex2(F);
+  return function(f2) {
+    return traverseWithIndexF(function(_2, a2) {
+      return f2(a2);
+    });
+  };
+};
+var sequence2 = function(F) {
+  return function(ta) {
+    return _reduce2(ta, F.of(zero2()), function(fas, fa) {
+      return F.ap(F.map(fas, function(as) {
+        return function(a2) {
+          return pipe(as, append4(a2));
+        };
+      }), fa);
+    });
+  };
+};
+var traverseWithIndex2 = function(F) {
+  return function(f2) {
+    return reduceWithIndex2(F.of(zero2()), function(i2, fbs, a2) {
+      return F.ap(F.map(fbs, function(bs) {
+        return function(b) {
+          return pipe(bs, append4(b));
+        };
+      }), f2(i2, a2));
+    });
+  };
+};
+var URI2 = "Array";
+var Compactable2 = {
+  URI: URI2,
+  compact: compact2,
+  separate: separate2
+};
+var Traversable2 = {
+  URI: URI2,
+  map: _map3,
+  reduce: _reduce2,
+  foldMap: _foldMap2,
+  reduceRight: _reduceRight2,
+  traverse: _traverse2,
+  sequence: sequence2
+};
+var _wither2 = witherDefault(Traversable2, Compactable2);
+var _wilt2 = wiltDefault(Traversable2, Compactable2);
+
+// node_modules/fp-ts/es6/string.js
+var Eq2 = {
+  equals: function(first, second) {
+    return first === second;
+  }
+};
+var Semigroup = {
+  concat: function(first, second) {
+    return first + second;
+  }
+};
+var Monoid = {
+  concat: Semigroup.concat,
+  empty: ""
+};
+var Ord2 = {
+  equals: Eq2.equals,
+  compare: function(first, second) {
+    return first < second ? -1 : first > second ? 1 : 0;
+  }
+};
+
+// src/KeyValue.ts
+var byKey = (reverse2 = false) => pipe(reverse2 ? reverse(Ord2) : Ord2, contramap((v2) => v2[0]));
+var byValueNumber = (reverse2 = false) => pipe(reverse2 ? reverse(Ord) : Ord, contramap((v2) => v2[1]));
+var sortByKey = (reverse2 = false) => sort(byKey(reverse2));
+var sortByValueNumber = (reverse2 = false) => sort(byValueNumber(reverse2));
+
+// src/visualisation/FrequencyHistogramPlot.ts
+var _sorter;
+var FrequencyHistogramPlot = class {
+  constructor(parentEl) {
+    __publicField(this, "parentEl");
+    __publicField(this, "el");
+    __privateAdd(this, _sorter, void 0);
+    console.log(`FreqHistoPlot`);
+    this.parentEl = parentEl;
+    this.init();
+  }
+  setAutoSort(sortStyle) {
+    switch (sortStyle) {
+      case `value`:
+        __privateSet(this, _sorter, sortByValueNumber(false));
+        break;
+      case `valueReverse`:
+        __privateSet(this, _sorter, sortByValueNumber(true));
+        break;
+      case `key`:
+        __privateSet(this, _sorter, sortByKey(false));
+        break;
+      case `keyReverse`:
+        __privateSet(this, _sorter, sortByKey(true));
+        break;
+      default:
+        throw new Error(`Unknown sorting value '${sortStyle}'. Expecting: value, valueReverse, key or keyReverse`);
+    }
+  }
+  clear() {
+    if (this.el === void 0)
+      return;
+    this.el.data = [];
+  }
+  init() {
+    if (this.el !== void 0)
+      return;
+    this.el = document.createElement(`histogram-vis`);
+    this.parentEl.appendChild(this.el);
+  }
+  dispose() {
+    const el = this.el;
+    if (el === void 0)
+      return;
+    el.remove();
+  }
+  update(data) {
+    if (this.el === void 0)
+      return;
+    if (__privateGet(this, _sorter) !== void 0) {
+      this.el.data = __privateGet(this, _sorter).call(this, data);
+    } else {
+      this.el.data = [...data];
+    }
+  }
+};
+_sorter = new WeakMap();
 export {
   Bezier_exports as Beziers,
   CompoundPath_exports as Compound,
   Drawing_exports as Drawing,
   Easing_exports as Easings,
   Envelope_exports as Envelopes,
+  FrequencyHistogramPlot,
   Grid_exports as Grids,
   Line_exports as Lines,
   Lists_exports as Lists,

@@ -55,11 +55,11 @@ txtDescr.addEventListener(`input`, () => {
 });
 const currentState = document.getElementById(`currentState`);
 //const isMachineDone = document.getElementById(`isMachineDone`);
-const selInitialStates = select(`selDescrInitial`);
-const selPossibleNext = select(`selPossibleNext`, undefined, { placeholderOpt: `-- Auto --`, autoSelectAfterChoice:0 });
+const selInitialStates = select(`#selDescrInitial`);
+const selPossibleNext = select(`#selPossibleNext`, undefined, { placeholderOpt: `-- Auto --`, autoSelectAfterChoice:0 });
 
 // Demo machine SELECT
-const selDemoMachines = select(`selDemoMachines`, (newVal:string) => {
+const selDemoMachines = select(`#selDemoMachines`, (newVal:string) => {
   // Machine selected. Set JSON text and initial state options
   let md = demoMachines[newVal];
   txtDescr.innerText = JSON.stringify(md.description, undefined, 2);
@@ -79,7 +79,7 @@ const parseDesc = (txt):[boolean, string] => {
   }
 }
 
-const btnSetDescr = button(`btnSetDescr`, () => {
+const btnSetDescr = button(`#btnSetDescr`, () => {
   try {
     let txt = txtDescr.innerText;
     const description = JSON.parse(txt);

@@ -33,26 +33,26 @@ export const checkbox = (domIdOrEl: string | HTMLInputElement, onChanged?:(curre
   };
 };
 
-const resolveEl = <V extends HTMLElement>(domIdOrEl:string|V):V => {
-  if (typeof domIdOrEl === `string`) {
-    const d = document.getElementById(domIdOrEl);
-    if (d === null) throw new Error(`Id ${domIdOrEl} not found`);
-    domIdOrEl = d as V;
-  } else if (domIdOrEl === null) throw new Error(`domIdOrEl is null`);
-  else if (domIdOrEl === undefined) throw new Error(`domIdOrEl is undefined`);
+export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
+  if (typeof domQueryOrEl === `string`) {
+    const d = document.querySelector(domQueryOrEl);
+    if (d === null) throw new Error(`Id ${domQueryOrEl} not found`);
+    domQueryOrEl = d as V;
+  } else if (domQueryOrEl === null) throw new Error(`domQueryOrEl ${domQueryOrEl} is null`);
+  else if (domQueryOrEl === undefined) throw new Error(`domQueryOrEl ${domQueryOrEl} is undefined`);
   
-  const el = domIdOrEl as V;
+  const el = domQueryOrEl as V;
   return el;
 };
 
 type SelectOpts = {
-  placeholderOpt?:string
-  placeholderChoose?:boolean
-  autoSelectAfterChoice?:number
+  readonly placeholderOpt?:string
+  readonly placeholderChoose?:boolean
+  readonly autoSelectAfterChoice?:number
 }
 
-export const button = (domIdOrEl:string|HTMLButtonElement, onClick?:() => void) => {
-  const el = resolveEl(domIdOrEl) as HTMLButtonElement;
+export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => void) => {
+  const el = resolveEl(domQueryOrEl) as HTMLButtonElement;
 
   if (onClick) {
     el.addEventListener(`click`, (_ev) => {
@@ -63,6 +63,14 @@ export const button = (domIdOrEl:string|HTMLButtonElement, onClick?:() => void) 
   return {
     click() {
       if (onClick) onClick();
+    },
+    disable() {
+      // eslint-disable-next-line functional/immutable-data
+      el.disabled = true;
+    },
+    enable(value = true) {
+      // eslint-disable-next-line functional/immutable-data
+      el.disabled = !value;
     }
   };
 };

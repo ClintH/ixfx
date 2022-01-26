@@ -19,6 +19,21 @@
         "functional"
     ],
     "rules": {
+        "functional/prefer-readonly-type": [
+            "error",
+            {
+                "allowLocalMutation": true,
+                "ignorePattern": "^_",
+                "ignoreClass": true
+            }
+        ],
+        "functional/immutable-data": [
+            "error",
+            {
+                "ignorePattern": "^_",
+                "ignoreClass": true
+            }
+        ],
         "functional/functional-parameters": [
             "off"
         ],
@@ -46,6 +61,7 @@
         "no-throw-literal": [
             "error"
         ],
+        "@typescript-eslint/no-useless-constructor": "error",
         "@typescript-eslint/no-inferrable-types": [
             "off",
             "ignore-params"
@@ -100,6 +116,15 @@
             },
             {
                 "selector": [
+                    "parameter"
+                ],
+                "leadingUnderscore": "allow",
+                "format": [
+                    "camelCase"
+                ]
+            },
+            {
+                "selector": [
                     "typeLike",
                     "class"
                 ],
@@ -143,7 +168,7 @@
             }
         ],
         "no-useless-concat": "error",
-        "no-useless-constructor": "error",
+        "no-useless-constructor": "off",
         "no-useless-return": "error",
         "prefer-const": "error",
         "comma-spacing": [

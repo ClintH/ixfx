@@ -6,7 +6,7 @@ import * as Compound from '../../src/geometry/CompoundPath';
 // /// <reference path="../../public/lib/svg.3.1.1.d.ts"/>
 // import * as Svgjs from '../../public/lib/svg.esm';
 import {SVG,Svg} from '@svgdotjs/svg.js';
-import {pingPongPercent} from '../../src/Producers';
+import {pingPongPercent} from '../../src/Generators';
 import * as Palette from '../../src/colour/Palette';
 
 // Drawing properties
@@ -56,7 +56,7 @@ const testCompound = () => {
   const b2 = Beziers.quadraticSimple({x: 300, y: 100}, {x: 400, y: 0}, 1);  // Bend of 1... bulge
 
   // Create a compound from four separate paths
-  const multiPath = Compound.fromPaths(l3, l4, b1, b2);
+  const multiPath = Compound.fromPaths(l3, l4, Beziers.toPath(b1), Beziers.toPath(b2));
 
   // Use Svg.js to make SVG for the line
   svg.path(multiPath.toSvgString()).attr({fill: `transparent`, margin: `10px`, stroke: lineDrawOpts.strokeStyle});

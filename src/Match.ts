@@ -1,5 +1,5 @@
 import * as Filters from "./Filters.js";
-import * as Producers from "./Producers.js";
+import * as Producers from "./Generators.js";
 
 type MatchFunction<V> = {
   (v: V, index?: number, array?: V[]): boolean

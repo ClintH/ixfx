@@ -31,7 +31,8 @@ export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier):
  * @param {number} [bend=0] Bend amount, from -1 to 1
  * @returns {QuadraticBezier}
  */
-export const quadraticBend = (b: QuadraticBezier, bend = 0): QuadraticBezier => quadraticSimple(b.a, b.b, bend);
+ export const quadraticBend = (a:Points.Point, b: Points.Point, bend = 0): QuadraticBezier => quadraticSimple(a, b, bend);
+ //export const quadraticBend = (b: QuadraticBezier, bend = 0): QuadraticBezier => quadraticSimple(b.a, b.b, bend);
 
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.
@@ -46,6 +47,7 @@ export const quadraticSimple = (start: Points.Point, end: Points.Point, bend = 0
   if (bend < -1 || bend > 1) throw Error(`Expects bend range of -1 to 1`);
 
   const middle = Lines.compute(start, end, 0.5);
+  // eslint-disable-next-line functional/no-let
   let target = middle;
   if (end.y < start.y) {
     // Upward slope

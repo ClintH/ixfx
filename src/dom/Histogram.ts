@@ -4,12 +4,13 @@ import {repeat} from 'lit/directives/repeat.js';
 import {KeyValue} from '~/KeyValue.js';
 
 type Bar = {
-  percentage:number
-  data:KeyValue
-}
+  readonly percentage:number
+  readonly data:KeyValue
+};
 
 const jsonData = (obj:unknown) => {
   if (obj === null || obj === undefined) return;
+  // eslint-disable-next-line functional/no-try-statement
   try {
     if (typeof obj === `string`) {
       if (obj.length === 0) return;
@@ -18,6 +19,8 @@ const jsonData = (obj:unknown) => {
         console.error(`Histogram innerText should be JSON array`);
         return;
       }
+      
+      // eslint-disable-next-line functional/no-loop-statement, functional/no-let
       for (let i=0;i<o.length; i++) {
         if (!Array.isArray(o[i])) {
           console.error(`Histogram array should consist of inner arrays`);
@@ -79,7 +82,7 @@ const jsonData = (obj:unknown) => {
  **/
 @customElement(`histogram-vis`)
 export class HistogramVis extends LitElement {
-  static styles = css`
+  static readonly styles = css`
     :host {
     }
     div.container {
@@ -127,20 +130,26 @@ export class HistogramVis extends LitElement {
   //   showXAxis: { attribute: false}
   // };
 
+  
+  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
-  declare data:KeyValue[];
+  declare data:readonly KeyValue[];
 
+  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare showDataLabels:boolean;
 
+  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare height:string;
 
+  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare showXAxis:boolean;
 
+  // eslint-disable-next-line functional/prefer-readonly-type
   @property({ converter: jsonData, type: Object })
-  declare json:KeyValue[]|undefined;
+  declare json:readonly KeyValue[]|undefined;
 
   constructor() {
     super();
@@ -209,6 +218,6 @@ export class HistogramVis extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     // eslint-disable-next-line quotes
-    "histogram-vis": HistogramVis
+    readonly "histogram-vis": HistogramVis
   }
 }

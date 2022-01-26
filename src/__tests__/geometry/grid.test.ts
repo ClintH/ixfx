@@ -1,4 +1,4 @@
-import * as Grid from '../../src/geometry/Grid.js';
+import * as Grid from '../../geometry/Grid.js';
 
 test('getVectorFromCardinal', () => {
   expect(Grid.getVectorFromCardinal(Grid.CardinalDirection.East)).toEqual({x: 1, y: 0});

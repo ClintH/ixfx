@@ -4,6 +4,7 @@ import * as S from 'fp-ts/string';
 import * as N from 'fp-ts/number';
 import { reverse as reverseOrd, contramap } from 'fp-ts/Ord';
 
+
 /// ✔ Sorting functions are unit tested
 
 type Primitive = string | number;
@@ -28,4 +29,6 @@ export const sortByKey = (reverse:boolean = false) => sort<KeyValue>(byKey(rever
 export const sortByValueString = (reverse:boolean = false) => sort<KeyValue>(byValueString(reverse));
 export const sortByValueNumber = (reverse:boolean = false) => sort<KeyValue>(byValueNumber(reverse));
 
-export type SortingFn = (data:ReadonlyArray<KeyValue>) => readonly KeyValue[];
+// eslint-disable-next-line functional/prefer-readonly-type
+export type SortingFn = (data:KeyValue[]) => KeyValue[];
+

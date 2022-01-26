@@ -7,11 +7,14 @@ setup: |
 
 ---
 
-A _state machine_ allows for a controlled change from one state to another. It is defined in advance with what states are possible for the machine, and what transitions are possible. 
+A _state machine_ allows for a controlled change from one state to another. It sets up a well-defined set of possible states and what transitions are possible between them. It's up to you to 'drive' the machine, telling it when to transition. 
 
-A state machine is preferred over having various variables tracking state because of the strictness it enforces. It can help you catch errors in your coding and makes coding simpler when you know there are a fixed number of well-defined states to handle.
+State machines can be defined using a plain object, with keys the list of possible states, and the values state(s) that are possible to change to, or null if no further changes are possible.
+
+## Example definitions
 
 A simple state machine is a light switch, it has two states: _on_ and _off_. When the light is _on_, the only other state is _off_. And vice-versa:
+
 ```js
 {
   "on": "off",
@@ -21,7 +24,7 @@ A simple state machine is a light switch, it has two states: _on_ and _off_. Whe
 
 With this machine description, it would be illegal to have a state `dimmed`, or to turn it `off` when it is already `off`. In this case, the machine never reaches a final state, it can always oscillate between `on/off`. Note too that we can safely automatically advance the state of the machine, because it knows what the next state will always be.
 
-More complicated paths of transition are possible as well. Maybe even a state has multiple options it can transition to:
+It's possible to have several possible next states by using a string array:
 
 ```js
 {
@@ -44,6 +47,12 @@ The example below starts with `plain` bread and there are many subsequent states
   "eaten": null
 }
 ```
+
+## Why?
+
+Behaving according to a current state is a common pattern in programming interactivity. This is often solved by using different variables track state. The downside is that you have to be mindful what variables contribute to state, when and where to enforce rules about state changes. It can also be hard to keep track of all possible states.
+
+A state machine therefore can help you catch errors and makes coding simpler when you know there are a fixed number of well-defined states to handle.
 
 ## Playground
 
@@ -90,7 +99,7 @@ Or request an automatic transition (will use first state if there are several op
 machine.next();
 ```
 
-Rest the machine back to its initial state:
+Reset the machine back to its initial state:
 
 ```js
 machine.reset();

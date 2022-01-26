@@ -4,6 +4,11 @@ export const percent = (t: number, name = `?`): void => {
   if (t > 1) throw new Error(`Parameter '${name}' must be below or equal to 1`);
 };
 
+export const notNegative = (t:number, name = `?`):boolean => {
+  if (t < 0) throw new Error(`Parameter ${name} must be at least zero`);
+  return true;
+}
+
 export const isStringArray = (t:any):boolean => {
   if (!Array.isArray(t)) return false;
   for (let i=0;i<t.length;i++) {

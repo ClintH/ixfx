@@ -1,5 +1,5 @@
 /* eslint-disable */
-import * as Lists from '~/collections/Lists.js';
+import * as Lists from '../../collections/Lists.js';
 
 test(`circular`, () => {
   const a = new Lists.Circular(5);

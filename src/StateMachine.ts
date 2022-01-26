@@ -1,4 +1,4 @@
-//export type StateChangeCallback = (newState: string, priorState: string) => void;
+
 import {SimpleEventEmitter} from "./Events.js";
 import { isStringArray } from "./Guards.js";
 /*
@@ -11,18 +11,18 @@ type MappedTypeWithNewProperties<Type> = {
 // }
 
 export interface Options {
-  debug?: boolean
+  readonly debug?: boolean
 }
 
 //type StateName = string | number | Symbol;
 
 export interface StateChangeEvent {
-  newState: string,
-  priorState: string
+  readonly newState: string,
+  readonly priorState: string
 }
 
 export interface StopEvent {
-  state: string;
+  readonly state: string;
 }
 
 // type Paths<T> = T extends MachineDescription
@@ -30,23 +30,53 @@ export interface StopEvent {
 //   : never
 
 type StateMachineEventMap = {
-  change: StateChangeEvent
-  stop: StopEvent
+  readonly change: StateChangeEvent
+  readonly stop: StopEvent
 };
 
 //type ValidStates<M extends MachineDescription> = keyof M & string;
 
 
-type StateEvent = (args: any, sender: StateMachine) => string | any;
+type StateEvent = (args: unknown, sender: StateMachine) => void;
 type StateHandler = string | StateEvent | null;
 
 export interface State {
-  [event: string]: StateHandler;
+  readonly [event: string]: StateHandler;
 }
 
 export interface MachineDescription {
-  [key: string]: string | string[] | null;
+  readonly [key: string]: string | readonly string[] | null;
 }
+
+/**
+ * Returns a machine description based on a list of strings. The final string is the final
+ * state.
+ * 
+ * ```usage
+ * const states = [`one`, `two`, `three`];
+ * const sm = new StateMachine(states[0], fromList(states));
+ * ```
+ * @param {...readonly} states
+ * @param {*} string
+ * @param {*} []
+ * @return {*}  {MachineDescription}
+ */
+export const fromList = (...states:readonly string[]):MachineDescription => {
+  const t = {};
+  // eslint-disable-next-line functional/no-loop-statement, functional/no-let
+  for (let i=0;i<states.length; i++) {
+    if (i === states.length - 1) {
+      /** @ts-ignore */
+      // eslint-disable-next-line functional/immutable-data 
+      t[states[i]] = null;
+    } else {
+      /** @ts-ignore */
+      // eslint-disable-next-line functional/immutable-data
+      t[states[i]] = states[i+1];
+    }
+  }
+  return t;
+};
 
 // export type StateEventCallback<M extends MachineDescription> = (event: string, state: ValidStates<M>, params: any, machine: StateMachine<M>) => boolean;
 
@@ -100,10 +130,15 @@ export interface MachineDescription {
  * @extends {SimpleEventEmitter<StateMachineEventMap>}
  */
 export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
+  // eslint-disable-next-line functional/prefer-readonly-type
   #state: string;
+  // eslint-disable-next-line functional/prefer-readonly-type
   #debug: boolean;
+  // eslint-disable-next-line functional/prefer-readonly-type
   #m: MachineDescription;
+  // eslint-disable-next-line functional/prefer-readonly-type
   #isDone: boolean;
+  // eslint-disable-next-line functional/prefer-readonly-type
   #initial: string;
 
   /**
@@ -115,8 +150,8 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    */
   constructor(initial: string, m: MachineDescription, opts: Options = {debug: false}) {
     super();
-    const [valid, errorMsg] = StateMachine.validate(initial, m);
-    if (!valid) throw new Error(errorMsg);
+    const [isValid, errorMsg] = StateMachine.validate(initial, m);
+    if (!isValid) throw new Error(errorMsg);
 
     this.#initial = initial;
     this.#m = m;
@@ -125,17 +160,19 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     this.#isDone = false;
   }
 
-  get states():string[] {
+  get states():readonly string[] {
     return Object.keys(this.#m);
   }
 
-  static validate(initial:string, m:MachineDescription):[boolean, string]  {
+  static validate(initial:string, m:MachineDescription):readonly [boolean, string]  {
     // Check that object is structured properly
     const keys = Object.keys(m);
+    // eslint-disable-next-line functional/prefer-readonly-type
     const finalStates:string[] = [];
     const seenKeys = new Set();
     const seenVals = new Set();
 
+    // eslint-disable-next-line functional/no-loop-statement, functional/no-let
     for (let i=0;i<keys.length;i++) {
       const key = keys[i];
       if (seenKeys.has(key)) return [false, `Key ${key} is already used`];
@@ -152,6 +189,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
         val.forEach(v => seenVals.add(v));
         if (val.find(v => v === key)) return [false, `Loop present for ${key}`];
       } else if (val === null) {
+        // eslint-disable-next-line functional/immutable-data
         finalStates.push(key);
       } else {
         return [false, `Key ${key} has a value that is neither null, string or array`];
@@ -176,11 +214,19 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * @memberof StateMachine
    */
   next(): string | null {
+    // Get possible transitions for current state
     const r = this.#m[this.#state];
-    if (r === null) return null;
+    if (r === null) return null; // At the end
 
-    if (Array.isArray(r)) this.state = r[0];
-    else this.state = r;
+    // If there are multiple options, use the first
+    if (Array.isArray(r)) {
+      // eslint-disable-next-line functional/immutable-data
+      if (typeof r[0] === `string`) this.state = r[0];
+      else throw new Error(`Error in machine description. Potential state array does not contain strings`);
+    } else if (typeof r === `string`) {
+      // eslint-disable-next-line functional/immutable-data
+      this.state = r; // Just one option
+    } else throw new Error(`Error in machine description. Potential state is neither array nor string`);
     return this.state;
   }
 
@@ -200,7 +246,9 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * @memberof StateMachine
    */
   reset() {
+    // eslint-disable-next-line functional/immutable-data
     this.#isDone = false;
+    // eslint-disable-next-line functional/immutable-data
     this.#state = this.#initial;
   }
 
@@ -214,7 +262,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * @returns {[boolean, string]} If valid: [true,''], if invalid: [false, 'Error msg here']
    * @memberof StateMachine
    */
-  static isValid(priorState:string, newState:string, description:MachineDescription):[boolean, string] {
+  static isValid(priorState:string, newState:string, description:MachineDescription):readonly [boolean, string] {
     // Does state exist?
     if (description[newState] === undefined) return [false, `Machine cannot change to non-existent state ${newState}`];
 
@@ -228,7 +276,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     return [true, `ok`];
   }
 
-  isValid(newState:string):[boolean, string] {
+  isValid(newState:string):readonly [boolean, string] {
     return StateMachine.isValid(this.state, newState, this.#m);
   }
 
@@ -241,17 +289,21 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   set state(newState: string) {
     const priorState = this.#state;
 
-    const [allowed, errorMsg] = StateMachine.isValid(priorState, newState, this.#m);
+    const [isValid, errorMsg] = StateMachine.isValid(priorState, newState, this.#m);
 
-    if (!allowed) throw new Error(errorMsg);
+    if (!isValid) throw new Error(errorMsg);
 
     if (this.#debug) console.log(`StateMachine: ${priorState} -> ${newState}`);
+
+    // eslint-disable-next-line functional/immutable-data
     this.#state = newState;
 
-    let rules = this.#m[priorState];
-    rules = this.#m[newState];
-    if (rules === null) this.#isDone = true;
-
+    //const priorRules = this.#m[priorState];
+    const rules = this.#m[newState];
+    if (rules === null) {
+      // eslint-disable-next-line functional/immutable-data
+      this.#isDone = true;
+    }
     setTimeout(() => {
       this.fireEvent(`change`, {newState: newState, priorState: priorState});
       if (this.isDone) this.fireEvent(`stop`, {state: newState });

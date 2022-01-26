@@ -27,24 +27,31 @@ export const clamp = (v: number, min = 0, max = 1) => {
 };
 
 /**
- * Clamps integer `v` between 0 and length (exclusive)
+ * Clamps integer `v` between 0 (inclusive) and length (exclusive)
  * This is useful for clamping an array range, because the largest allowed number will
  * be one less than length
+ * 
+ * ```usage
+ * const myArray = [`a`, `b`, `c`, `d`];
+ * clampZeroBounds(0, myArray.length); // 0
+ * clampZeroBounds(1.2, myArray.length); // 1
+ * clampZeroBounds(4, myArray.length); // 4
+ * clampZeroBounds(5, myArray.length); // 4
+ * clampZeroBounds(-1, myArray.length); // 0 
+ * ```
  * @param {number} v Integer value to clamp
  * @param {number} length Length of bounds
- * @returns Clamped value
+ * @returns Clamped value, minimum will be 0, maximum will be one less than `length`.
  */
 export const clampZeroBounds = (v: number, length: number) => {
   // ✔ UNIT TESTED
   if (!Number.isInteger(v)) throw new Error(`v parameter must be an integer`);
   if (!Number.isInteger(length)) throw new Error(`length parameter must be an integer`);
-
+  v = Math.round(v);
   if (v < 0) return 0;
   if (v >= length) return length - 1;
   return v;
 };
-
-export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Math.random() * array.length)];
 
 export const lerp =(amt:number, a:number, b:number) => (1-amt) * a + amt * b;
 
@@ -83,25 +90,59 @@ export const getMinMaxAvg = (data: readonly number[]): {readonly min: number; re
   };
 };
 
-export const shuffle = (dataToShuffle:ReadonlyArray<unknown>): ReadonlyArray<unknown> => {
-  const array = [...dataToShuffle];
-  // eslint-disable-next-line functional/no-loop-statement, functional/no-let
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Pauses execution
+ * ```usage
+ * console.log(`Hello`);
+ * await sleep(1000);
+ * console.log(`There`); // Prints one second after
+ * ```
+ *
+ * @param {number} milliseconds
+ * @return {*}  {Promise<any>}
+ */
 export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+/**
+ * Calls provided function after a delay
+ *
+ * ```usage
+ * const result = await delay(async () => Math.random(), 1000);
+ * console.log(result); // Prints out result after one second
+ * ```
+ * @template V
+ * @param {() => Promise<V>} call
+ * @param {number} milliseconds
+ * @return {*}  {Promise<any>}
+ */
+export const delay = async <V>(call:() => Promise<V>, milliseconds: number): Promise<any> =>  {
+  await sleep(milliseconds);
+  return Promise.resolve(await call());
+};
 
 export type ToString<V> = (itemToMakeStringFor: V) => string;
 export type IsEqual<V> = (a:V, b:V) => boolean;
 
-
+/**
+ * Default comparer function is equiv to checking `a === b`
+ * ✔ UNIT TESTED
+ * @template V
+ * @param {V} a
+ * @param {V} b
+ * @return {*}  {boolean}
+ */
 export const isEqualDefault = <V>(a:V, b:V):boolean => a === b;
 
+/**
+ * Comparer returns true if string representation of `a` and `b` are equal.
+ * Uses `toStringDefault` to generate a string representation (`JSON.stringify`)
+ *
+ * @template V
+ * @param {V} a
+ * @param {V} b
+ * @return {*}  {boolean} True if the contents of `a` and `b` are equal
+ */
 export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
   // ✔ UNIT TESTED
   if (a === b) return true; // Object references are the same, or string values are the same
@@ -116,3 +157,4 @@ export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
  * @returns {string}
  */
 export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof itemToMakeStringFor === `string`) ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor));
+

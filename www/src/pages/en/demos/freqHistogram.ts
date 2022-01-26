@@ -2,7 +2,7 @@
 import {MutableFreqHistogram} from '~/MutableFreqHistogram';
 import {domLog} from '~/dom/DomLog';
 import {weighted} from '~/Random';
-import {AutoSort, FrequencyHistogramPlot} from '~/visualisation/FrequencyHistogramPlot';
+import { FrequencyHistogramPlot} from '~/visualisation/FrequencyHistogramPlot';
 
 const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
 const freq = new MutableFreqHistogram<string>();
@@ -10,13 +10,13 @@ const plot = new FrequencyHistogramPlot(document.getElementById('dataPlot'));
 // plot.el.showDataLabels = false;
 // plot.el.showXAxis = false;
 
-plot.sortBy(AutoSort.ValueReverse);
+plot.setAutoSort(`valueReverse`);
 let itemsLeft = 200;
 
 plot.init();
 
 let producerId = 0;
-freq.addEventListener(`changed`, () => {
+freq.addEventListener(`change`, () => {
   plot.update(freq.toArray());
 });
 

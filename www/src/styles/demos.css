@@ -9,13 +9,14 @@
 }
 
 .toolbar button {
-  margin: calc(var(--grid-spacing-horizontal)/2);
+  margin-right: 0.3em;
+  margin-left: 0.3em;
 }
 
 .toolbar>section {
   display: flex;
-  border-right: 1px solid rgba(255,255,255,0.2);
-  padding: calc(var(--grid-spacing-horizontal)/2);
+  border-right: 2px solid var(--theme-bg-hover);
+  padding: 0.3em;
   align-items: center;
   margin:0;
 }

@@ -1,13 +1,9 @@
 /* eslint-disable */
-import {StateMachine} from '../StateMachine.js';
+import {StateMachine, fromList} from '../StateMachine.js';
+import {jest} from '@jest/globals';
 
-const createAdsr = () => ({
-  attack: `decay`,
-  decay: `sustain`,
-  sustain: `release`,
-  release: null
-});
 
+const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);
 const createMulti = () => ({
   awake: [`breakfast`, `coffee`],
   breakfast: `coffee`,
@@ -17,123 +13,135 @@ const createMulti = () => ({
 
 // Tests that transitions defined as arrays can be navigated
 // Also tests .next() function for progressing
-const testPaths = () => {
+test( `paths`, () => {
   const m = createMulti();
   const debug = false;
   let sm = new StateMachine(`awake`, m, {debug: debug});
 
-  try {
-    sm.state = `brushTeeth`;
-    throw Error(`testPaths illegal state change allowed`);
-  } catch (e) { /* noop */ }
+  // Try one path
+  expect(() => { sm.state = `brushTeeth`}).toThrow();
+  expect(() => { sm.state = `coffee`}).not.toThrow();
+  expect(() => { sm.state = `brushTeeth`}).not.toThrow();
+  expect(sm.isDone).toBeTruthy();
 
-  sm.state = `coffee`;
-  sm.state = `brushTeeth`;
-
-  if (!sm.isDone) throw Error(`Machine should be done`);
-
+  // Try a different valid path
   sm = new StateMachine(`awake`, m, {debug: debug});
-  sm.state = `breakfast`;
-  sm.state = `coffee`;
-  sm.state = `brushTeeth`;
-  if (!sm.isDone) throw Error(`Machine should be done`);
-
+  expect(() => { sm.state = `breakfast`}).not.toThrow();
+  expect(() => { sm.state = `coffee`}).not.toThrow();
+  expect(() => { sm.state = `brushTeeth`}).not.toThrow();
+  expect(sm.isDone).toBeTruthy();
+  
+  // Try auto-progression
   sm = new StateMachine(`awake`, m, {debug: debug});
-  if (sm.isDone) throw Error(`Finalised unexpectedly (1)`);
-  if (sm.next() !== `breakfast`) throw Error(`Did not choose expected state`);
-  if (sm.isDone) throw Error(`Finalised unexpectedly (2)`);
-  if (sm.next() !== `coffee`) throw Error(`Did not choose expected state`);
-  if (sm.isDone) throw Error(`Finalised unexpectedly (3)`);
-  if (sm.next() !== `brushTeeth`) throw Error(`Did not choose expected state`);
-  if (!sm.isDone) throw Error(`Finalised unexpectedly (4)`);
-  if (sm.next() !== null) throw Error(`Did not finalise as expected (1)`);
-  if (!sm.isDone) throw Error(`Machine should be done`);
+  expect(sm.isDone).toBeFalsy();
+  
+  expect(sm.next()).toEqual(`breakfast`);
+  expect(sm.isDone).toBeFalsy();
 
-  console.log(`Test paths OK`);
-};
+  expect(sm.next()).toEqual(`coffee`);
+  expect(sm.isDone).toBeFalsy();
+
+  expect(sm.next()).toEqual(`brushTeeth`);
+  expect(sm.isDone).toBeTruthy();
+
+  expect(sm.next()).toBeNull();
+  expect(sm.isDone).toBeTruthy();
+  
+});
 
 // Test that machine throws an error for an unknown state
-const testUnknownState = () => {
+test(`transitions`, () => {
   const m = createAdsr();
-  let caught = false;
-  try {
+
+  // Should throw creating a machine with invalid initial state
+  expect( () => {
     new StateMachine(`blah`, m, {debug: false});
-  } catch (e) {
-    caught = true;
-  }
-  if (!caught) throw Error(`testCtorInitialState`);
+  }).toThrowError();
 
   const sm = new StateMachine(`attack`, m, {debug: false});
-  try {
+  
+  // Shouldn't be possible to set to undefined
+  expect(() => {
     // @ts-ignore
-    sm.state = undefined;
-  } catch (e) {
-    caught = true;
-  }
-  if (!caught) throw Error(`Undefined state was wrongly allowed (1)`);
+    sm.state = undefined
+  }).toThrowError();
 
-  try {
-    sm.state = `blah`;
-  } catch (e) {
-    caught = true;
-  }
-  if (!caught) throw Error(`Undefined state was wrongly allowed (2)`);
+  expect(() => {
+    // @ts-ignore
+    sm.state = null
+  }).toThrowError();
+  
+  // Invalid state
+  expect(() => {
+    sm.state = `blah`
+  }).toThrowError();
 
-  console.log(`testUnknownState OK`);
-};
+  // State is defined, but invalid from intial state of attack
+  expect(() => {
+    sm.state = `release`
+  }).toThrowError();
+  
+});
 
 // Tests that machine finalises after all states transition
-const testFinalisation = () => {
+test(`finalisation`, () => {
   const m = createAdsr();
   const sm = new StateMachine(`attack`, m, {debug: false});
   sm.state = `decay`;
   sm.state = `sustain`;
   sm.state = `release`; // Finalises
+  expect(sm.isDone).toBeTruthy();
+
+  // Test that we can't transition out of final state
   const states = Object.keys(m);
   for (const state of states) {
     if (state === `release`) continue;
-    try {
-      sm.state = state;
-      throw Error(`testFinalisation: did not prevent change from final state: ${state}`);
-    } catch (e) { /* no op */ }
+    expect(() => {
+      sm.state = state; // Should throw
+    }).toThrowError();
   }
-  console.log(`testFinalisation OK`);
+});
+
+// const waitForSpy = async (spy: jest.SpyInstance<Promise<unknown>>) => {
+//   expect(spy).toHaveBeenCalledTimes(1)
+//   await spy.mock.instances[0]
+// }
+
+const eventPromise = (obj:any, event:string, exec:()=>void) => {
+  return new Promise((resolve, reject) => {
+    let handler = (data:any) => {
+      obj.removeEventListener(handler);
+      resolve(data);
+    }; 
+    obj.addEventListener(event, handler);
+    exec();
+  });
 };
 
+
 // Test that all event ransitions happen, and there are no unexpected transitions
-const testEvents = async () => {
+test( `events`, async () => {
   const m = createAdsr();
   const sm = new StateMachine(`attack`, m, {debug: false});
 
-  let expected = [`attack-decay`, `decay-sustain`, `sustain-release`];
-  sm.addEventListener(`change`, (evt) => {
-    const key = evt.priorState + `-` + evt.newState;
-    if (!expected.includes(key)) throw Error(`Unexpected transition: ${evt.priorState} -> ${evt.newState}`);
+  const onStopped = jest.fn();
+  sm.addEventListener(`stop`, onStopped);
 
-    expected = expected.filter(k => k !== key);
+  expect(await eventPromise(sm, `change`, () => sm.state = `decay`)).toMatchObject({
+    priorState: `attack`, newState: `decay`
   });
 
-  sm.state = `decay`;
-  sm.state = `sustain`;
-  sm.state = `release`;
 
-  const p = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (expected.length > 0) {
-        throw Error(`Transitions did not occur: ${expected.join(`, `)}`);
-      }
-
-      console.log(`testEvents OK`);
-      resolve(`ok`);
-    }, 100);
+  expect(await eventPromise(sm, `change`, () => sm.state = `sustain`)).toMatchObject({
+    priorState: `decay`, newState: `sustain`
   });
-  return p;
-};
 
-testFinalisation();
-testUnknownState();
-await testEvents();
-testPaths();
+  expect(await eventPromise(sm, `change`, () => sm.state = `release`)).toMatchObject({
+    priorState: `sustain`, newState: `release`
+  });
+
+  expect(onStopped).toBeCalled();
+});
 
 /* 
 let m = new StateMachine('delay', adsrDemo, {debug: true});

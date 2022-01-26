@@ -1,3 +1,43 @@
+/* eslint-disable */
+
+import {sleep} from "./util";
+
+
+// const sleep = async function*(timeoutMs:number) {
+//   yield new Promise((resolve, reject) => {
+//     setTimeout(() => resolve(undefined), timeoutMs);
+//   });
+// }
+
+/**
+ * Returns a series that produces values according to a time interval
+ * 
+ * Eg produce a random number every 500ms
+ * ```
+ * const randomGenerator = atInterval(() => Math.random(), 1000);
+ * for await (const r of randomGenerator) {
+ *  // use random value...
+ * }
+ * ```
+ *
+ * @template V
+ * @param {number} intervalMs
+ * @param {() => V} produce
+ * @returns {Series<V>}
+ */
+ export const atInterval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
+  let cancelled = false;
+  try {
+    while (!cancelled) {
+      await sleep(intervalMs);
+      if (cancelled) return;
+      yield await produce();
+    }
+  } finally {
+    cancelled = true;
+  }
+};
+
 
 /**
  * Generates a range of numbers, with a given interval.
@@ -6,7 +46,7 @@
  * @param {number} [start=0] Start
  * @param {number} [end] End (if undefined, range never ends)
  */
-export const rawNumericRange = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
+ export const numericRangeRaw = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
   let v = start;
@@ -19,15 +59,16 @@ export const rawNumericRange = function* (interval: number, start: number = 0, e
 };
 
 /**
- * Generates a range of numbers, with a given interval. Numbers are rounded so they behave more expectedly.
+ * Generates a range of numbers, with a given interval.
  *
  * For-loop example:
  * ```
- * let loopForever = numericRange(0.1); // By default starts at 0 and continues forever
+ * let loopForever = numericRange(0.1); // By default starts at 0 and counts upwards forever
  * for (v of loopForever) {
  *  console.log(v);
  * }
  * ```
+ * 
  * If you want more control over when/where incrementing happens...
  * ````
  * let percent = numericRange(0.1, 0, 1);
@@ -37,6 +78,10 @@ export const rawNumericRange = function* (interval: number, start: number = 0, e
  *  percentResult = percent.next();
  * }
  * ```
+ * 
+ * Note that computations are internally rounded to avoid floating point math issues. So if the `interval` is very small (eg thousandths), specify a higher rounding
+ * number.
+ * 
  * @param {number} interval Interval between numbers
  * @param {number} [start=0] Start
  * @param {number} [end] End (if undefined, range never ends)

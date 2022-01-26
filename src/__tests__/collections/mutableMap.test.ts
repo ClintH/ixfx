@@ -1,10 +1,27 @@
 /// <reference types="jest-extended" />
 /* eslint-disable */
-import {MapMultiOpts, mutableMapArray} from "../../collections/MutableMap.js";
+import {MapArrayOpts, MapMultiOpts, MapSetOpts, mutableMapArray, mutableMapSet} from "../../collections/MutableMapMulti.js";
 import {jest} from '@jest/globals'
 
-describe(`mutableMapSet`, () => {
+test(`mutableMapSet`, () => {
+  const m = mutableMapSet<string>();
+  m.addKeyedValues(`a`, `aa`, `ab`, `ac`, `aa`, `ab`);
+  expect(m.count(`a`)).toEqual(3); // duplicate values should be dropped
 
+  type Person = { readonly name: string, readonly city: string }
+
+  const opts:MapSetOpts<Person> = {
+    groupBy:(p) => p.city,
+    hash: (p) => `${p.name}-${p.city}`
+  }
+
+  const barry = {name: `Barry`, city: `London`};
+  const barryClone = {name: `Barry`, city: `London`};
+
+  const m2 = mutableMapSet<Person>(opts);
+  expect(m2.count(`London`)).toEqual(0);
+  m2.addValue(barry, barryClone);
+  expect(m2.count(`London`)).toEqual(1);
 });
 
 describe(`mutableMapArray`, () => {
@@ -19,9 +36,9 @@ describe(`mutableMapArray`, () => {
     const sallyOther = {name: `Sally`, city: `Manchester`};
     const sallyMoreProps = {name: `Sally`, city: `Bristol`, age: 27};
     
-    const opts:MapMultiOpts<Person> = {
+    const opts:MapArrayOpts<Person> = {
       groupBy:(p) => p.city,
-      valueComparer:(a, b) => a.name == b.name && a.city == b.city 
+      comparer:(a, b) => a.name === b.name && a.city === b.city
     }
 
     const m = mutableMapArray<Person>(opts);

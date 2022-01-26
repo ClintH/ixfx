@@ -34,8 +34,9 @@ export const SIDEBAR = {
 		{ text: '', header: true },
 		{ text: 'Section Header', header: true },
 		{ text: 'Introduction', link: 'en/introduction' },
-		{ text: 'Page 2', link: 'en/page-2' },
-		{ text: 'Page 3', link: 'en/page-3' },
+		{ text: 'Modulation', header: true },
+		{ text: 'Introduction', link: 'en/modulation/' },
+		{ text: 'Envelope', link: 'en/modulation/envelope' },
 
 		{ text: 'Demos', header: true },
 		{ text: 'State Machine', link: 'en/demos/stateMachine' },

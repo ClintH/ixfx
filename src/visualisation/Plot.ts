@@ -13,12 +13,13 @@ import {BasePlot} from './BasePlot.js';
  */
 export class Plot extends BasePlot {
   buffer: Lists.Circular<number>;
-  samples: number;
-  color = 'silver';
+  readonly samples: number;
+  color = `silver`;
   lineWidth = 3;
 
   constructor(canvasEl: HTMLCanvasElement, samples = 10) {
     super(canvasEl);
+    if (samples <= 0) throw new Error(`samples must be greater than zero`);
     this.buffer = new Lists.Circular(samples);
     this.samples = samples;
   }
@@ -47,7 +48,7 @@ export class Plot extends BasePlot {
     }
     g.stroke();
 
-    g.fillStyle = 'black';
+    g.fillStyle = `black`;
 
     this.drawScale(g, min, max, avg, range, plotWidth, plotHeight);
 

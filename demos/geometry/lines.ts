@@ -1,9 +1,10 @@
+/* eslint-disable */
 import * as Lines from '../../src/geometry/Line';
 import * as Drawing from '../../src/visualisation/Drawing';
 import * as Compound from '../../src/geometry/CompoundPath';
 import * as Points from '../../src/geometry/Point';
 import {SVG, Svg} from '@svgdotjs/svg.js';
-import {pingPongPercent} from '../../src/Producers';
+import {pingPongPercent} from '../../src/Generators';
 import * as Palette from '../../src/colour/Palette';
 import {dom} from '../../src/dom/EventResponsive';
 import {checkbox} from '../../src/dom/Forms';
