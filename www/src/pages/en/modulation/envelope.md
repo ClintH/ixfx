@@ -6,7 +6,7 @@ setup: |
   import EnvelopePlay from './Envelope.astro';
 ---
 
-The idea of an envelope is borrowed from [sound synthesis](https://en.wikipedia.org/wiki/Envelope_(music)). Envelopes are useful for modulating a value over time, allowing for more complex dynamics than a simple decay function might provide.
+The idea of an envelope is borrowed from [sound synthesis](https://en.wikipedia.org/wiki/Envelope_(music)). Envelopes are useful for modulating a value over time, allowing for more complex dynamics than a simple decay function.
 
 ## Concept
 

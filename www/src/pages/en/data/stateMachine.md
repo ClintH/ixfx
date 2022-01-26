@@ -11,7 +11,7 @@ A _state machine_ allows for a controlled change from one state to another. It s
 
 State machines can be defined using a plain object, with keys the list of possible states, and the values state(s) that are possible to change to, or null if no further changes are possible.
 
-## Example definitions
+## Machine definition
 
 A simple state machine is a light switch, it has two states: _on_ and _off_. When the light is _on_, the only other state is _off_. And vice-versa:
 
@@ -22,7 +22,7 @@ A simple state machine is a light switch, it has two states: _on_ and _off_. Whe
 }
 ```
 
-With this machine description, it would be illegal to have a state `dimmed`, or to turn it `off` when it is already `off`. In this case, the machine never reaches a final state, it can always oscillate between `on/off`. Note too that we can safely automatically advance the state of the machine, because it knows what the next state will always be.
+With this machine definition, it would be illegal to have a state `dimmed`, or to turn it `off` when it is already `off`. In this case, the machine never reaches a final state, it can always oscillate between `on/off`. Note too that we can safely automatically advance the state of the machine, because it knows what the next state will always be.
 
 It's possible to have several possible next states by using a string array:
 

@@ -5,6 +5,9 @@ import {SimpleEventEmitter} from "./Events.js";
 type MutableFreqHistogramEventMap = {
   readonly change:void;
 }
+
+export const mutableFreqHistogram = <V>(keyString:ToString<V>|undefined) => new MutableFreqHistogram<V>(keyString);
+
 /**
  * Mutable Frequency Histogram
  *
@@ -73,9 +76,10 @@ export class MutableFreqHistogram<V> extends SimpleEventEmitter<MutableFreqHisto
     return Array.from(this.#store.entries());
   }
 
-  frequencyOf(value:V):number|undefined {
-    const key = this.#keyString(value);
+  frequencyOf(value:V|string):number|undefined {
+    if (typeof value === `string`) return this.#store.get(value);
 
+    const key = this.#keyString(value);
     return this.#store.get(key);
   }
 
@@ -86,8 +90,8 @@ export class MutableFreqHistogram<V> extends SimpleEventEmitter<MutableFreqHisto
     
     //const key = this.#keyString(value);
     keys.forEach(key => {
-      let score = this.#store.get(key) ?? 0;
-      this.#store.set(key, ++score);  
+      const score = this.#store.get(key) ?? 0;
+      this.#store.set(key, score+1);  
     });
     this.fireEvent(`change`, undefined);
   }
