@@ -3,7 +3,7 @@ import {domLog} from '~/dom/DomLog';
 import {button, select} from '~/dom/Forms';
 import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '~/StateMachine';
 
-const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
+const log = domLog(`#dataStream`, {truncateEntries: 8, timestamp: false});
 
 let currentSm:StateMachine|undefined;
 const demoMachines = {

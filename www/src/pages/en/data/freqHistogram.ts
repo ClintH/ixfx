@@ -4,7 +4,7 @@ import {domLog} from '~/dom/DomLog';
 import {weighted} from '~/Random';
 import { FrequencyHistogramPlot} from '~/visualisation/FrequencyHistogramPlot';
 
-const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
+const log = domLog(`#dataStream`, {truncateEntries: 8, timestamp: false});
 const freq = new MutableFreqHistogram<string>();
 const plot = new FrequencyHistogramPlot(document.getElementById('dataPlot'));
 // plot.el.showDataLabels = false;

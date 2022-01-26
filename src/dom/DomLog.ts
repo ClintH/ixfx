@@ -38,7 +38,7 @@ export type DomLog = Readonly<{
  * @param {DomLogOpts} opts
  * @returns {DomLog}
  */
-export const domLog = (elOrId: HTMLElement | string, opts: DomLogOpts = {}):DomLog => {
+export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}):DomLog => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const {truncateEntries = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
 
@@ -57,7 +57,7 @@ export const domLog = (elOrId: HTMLElement | string, opts: DomLogOpts = {}):DomL
   // eslint-disable-next-line functional/no-let
   let lastLogRepeats = 0;
 
-  const parentEl = resolveEl<HTMLElement>(elOrId);
+  const parentEl = resolveEl<HTMLElement>(domQueryOrEl);
 
   // if (typeof elOrId === `string`) {
   //   const sought = document.getElementById(elOrId);

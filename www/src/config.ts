@@ -38,9 +38,9 @@ export const SIDEBAR = {
 		{ text: 'Introduction', link: 'en/modulation/' },
 		{ text: 'Envelope', link: 'en/modulation/envelope' },
 
-		{ text: 'Demos', header: true },
-		{ text: 'State Machine', link: 'en/demos/stateMachine' },
-		{ text: 'Frequency Histogram', link: 'en/demos/freqHistogram' },
+		{ text: 'Data', header: true },
+		{ text: 'State Machine', link: 'en/data/stateMachine' },
+		{ text: 'Frequency Histogram', link: 'en/data/freqHistogram' },
 
 	],
 };

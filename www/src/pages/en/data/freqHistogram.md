@@ -13,3 +13,6 @@ In the demo below, a weighted distribution of random numbers is produced, adding
 <FreqHistogramPlay />
 
 For example, perhaps every time the pointer moves, you want to record its rough angular direction: up, down, left or right. If you log this to the FreqHisto, at any point you can find out the most frequently occurring direction, or, say, the proportion of upward moves compared to downward. 
+
+
+_Todo..._

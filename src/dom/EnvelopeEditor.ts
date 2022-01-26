@@ -80,7 +80,6 @@ export class EnvelopeEditor extends LitElement {
       this.data = {...this.data, releaseDuration: valNumber};
       break;
     }
-    console.log(val);
   }
 
   private _bendInput(e:Event) {
@@ -97,9 +96,7 @@ export class EnvelopeEditor extends LitElement {
     case `releaseBend`:
       this.data = {...this.data, releaseBend: valNumber};
     }
-
-    console.log(valNumber);
-  }
+}
 
   private _valueInput(e:Event) {
     const src = e.target as HTMLInputElement;
@@ -120,7 +117,6 @@ export class EnvelopeEditor extends LitElement {
       this.data ={...this.data, releaseLevel: valNumber};
       break;
     }
-    console.log(`valueInput ${valNumber} id: '${id}' peak: ${this.data.peakLevel}`);
   }
 
   renderPreviews() {
