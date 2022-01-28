@@ -1,9 +1,8 @@
 /* eslint-disable */
 import * as Grids from '../../src/geometry/Grid.js';
-import * as Series from '../../src/Series.js';
 import * as Producers from '../../src/Generators.js';
 import * as Sets from '../../src/collections/Set.js';
-
+import * as Drawing from '../../src/visualisation/Drawing.js';
 
 // ---------------------------------
 // Walk
@@ -132,7 +131,7 @@ const testVisitor = (visitorFn, canvasId) => {
     console.log(`Canvas not found: ${canvasId}`);
     return;
   }
-  const c = canvasEl.getContext('2d');
+  const c = Drawing.getCtx(canvasEl)
   canvasEl.addEventListener(`click`, (evt) => {
     const clicked = Grids.getCell({x: evt.offsetX, y: evt.offsetY}, visitorGrid);
     visitorStart = clicked;

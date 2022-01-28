@@ -28,6 +28,7 @@ export const checkbox = (domIdOrEl: string | HTMLInputElement, onChanged?:(curre
       return el.checked;
     },
     set checked(val:boolean) {
+      // eslint-disable-next-line functional/immutable-data
       el.checked = val;
     }
   };
@@ -47,7 +48,12 @@ export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
 
 type SelectOpts = {
   readonly placeholderOpt?:string
-  readonly placeholderChoose?:boolean
+  /**
+   * If true, a placeholder option 'Choose' is added to the list
+   *
+   * @type {boolean}
+   */
+  readonly shouldAddChoosePlaceholder?:boolean
   readonly autoSelectAfterChoice?:number
 }
 
@@ -64,23 +70,62 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
     click() {
       if (onClick) onClick();
     },
-    disable() {
+    set disabled(val:boolean) {
       // eslint-disable-next-line functional/immutable-data
-      el.disabled = true;
+      el.disabled = val;
     },
-    enable(value = true) {
-      // eslint-disable-next-line functional/immutable-data
-      el.disabled = !value;
-    }
   };
 };
 
+
+/**
+ * Convienence wrapper for a SELECT element.
+ * 
+ * Handle changes in value:
+ * ```
+ * const mySelect = select(`#mySelect`, (newValue) => {
+ *  console.log(`Value is now ${newValue}`);
+ * });
+ * ```
+ *
+ * Enable/disable:
+ * ```
+ * mySelect.disabled = true / false;
+ * ```
+ * 
+ * Get currently selected index or value:
+ * ```
+ * mySelect.value / mySelect.index
+ * ```
+ * 
+ * Is the currently selected value a placeholder?
+ * ```
+ * mySelect.isSelectedPlaceholder
+ * ```
+ * 
+ * Set list of options
+ * ```
+ * // Adds options, preselecting `opt2`.
+ * mySelect.setOpts([`opt1`, `opt2 ...], `opt2`);
+ * ```
+ * 
+ * Select an element
+ * ```
+ * mySelect.select(1); // Select second item
+ * mySelect.select(1, true); // If true is added, change handler fires as well
+ * ```
+ * @param {(string|HTMLSelectElement)} domIdOrEl
+ * @param {(currentVal:string) => void} [onChanged]
+ * @param {SelectOpts} [opts={}]
+ * @return {*} 
+ */
 export const select = (domIdOrEl:string|HTMLSelectElement, onChanged?:(currentVal:string) => void, opts:SelectOpts = {}) => {
   const el = resolveEl(domIdOrEl) as HTMLSelectElement;
-  const {placeholderOpt, placeholderChoose = false, autoSelectAfterChoice = -1} = opts;
+  const {placeholderOpt, shouldAddChoosePlaceholder = false, autoSelectAfterChoice = -1} = opts;
 
   const change = () => {
     if (onChanged !== undefined) onChanged(el.value);
+    // eslint-disable-next-line functional/immutable-data
     if (autoSelectAfterChoice >= 0) el.selectedIndex = autoSelectAfterChoice;
   };
 
@@ -91,6 +136,7 @@ export const select = (domIdOrEl:string|HTMLSelectElement, onChanged?:(currentVa
   }
   return {
     set disabled(val:boolean) {
+      // eslint-disable-next-line functional/immutable-data
       el.disabled = val;
     },
     get value():string {
@@ -100,25 +146,31 @@ export const select = (domIdOrEl:string|HTMLSelectElement, onChanged?:(currentVa
       return el.selectedIndex;
     },
     get isSelectedPlaceholder():boolean {
-      return ((opts.placeholderChoose || opts.placeholderOpt !== undefined) && el.selectedIndex === 0);
+      return ((shouldAddChoosePlaceholder || opts.placeholderOpt !== undefined) && el.selectedIndex === 0);
     },
     setOpts(opts:string[], preSelect?:string):void {
+      // eslint-disable-next-line functional/immutable-data
       el.options.length = 0;
       
-      if (placeholderChoose) opts = [`-- Choose --`, ...opts];
+      if (shouldAddChoosePlaceholder) opts = [`-- Choose --`, ...opts];
       else if (placeholderOpt !== undefined) opts = [placeholderOpt, ...opts];
+      // eslint-disable-next-line functional/no-let
       let toSelect = 0;
       
       opts.forEach((o, index) => {
         const optEl = document.createElement(`option`);
+        // eslint-disable-next-line functional/immutable-data
         optEl.value = o;
+        // eslint-disable-next-line functional/immutable-data
         optEl.innerHTML = o;
         if (preSelect !== undefined && o === preSelect) toSelect = index;
         el.options.add(optEl);
       });
+      // eslint-disable-next-line functional/immutable-data
       el.selectedIndex = toSelect;
     },
     select(index:number = 0, trigger:boolean = false):void {
+      // eslint-disable-next-line functional/immutable-data
       el.selectedIndex = index;
       if (trigger && onChanged) {
         change();

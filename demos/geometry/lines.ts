@@ -3,12 +3,12 @@ import * as Lines from '../../src/geometry/Line';
 import * as Drawing from '../../src/visualisation/Drawing';
 import * as Compound from '../../src/geometry/CompoundPath';
 import * as Points from '../../src/geometry/Point';
-import {SVG, Svg} from '@svgdotjs/svg.js';
+import {SVG, Svg, Circle as SvgCircle} from '@svgdotjs/svg.js';
 import {pingPongPercent} from '../../src/Generators';
 import * as Palette from '../../src/colour/Palette';
-import {dom} from '../../src/dom/EventResponsive';
 import {checkbox} from '../../src/dom/Forms';
 import {Rects} from '../../src';
+import {domRx} from '../../src/dom/DomRx';
 
 // Drawing properties
 const colours = new Palette.Palette();
@@ -42,15 +42,19 @@ const clear = (ctx: CanvasRenderingContext2D, canvasEl: HTMLCanvasElement) => {
 // --- Line
 const testLine = () => {
   const [canvasEl, svg] = getElements(`line`, {width:350, height: 120});  // get lineCanvas and lineSvg elements
-  const ctx = canvasEl.getContext(`2d`);         // get drawing context
+
+  const ctx = Drawing.getCtx(canvasEl);         // get drawing context
   const drawHelper = Drawing.makeHelper(ctx);// make a helper
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
   // Define line by start & end points
   const line = Lines.fromPointsToPath({x: 0, y: 0}, {x: 350, y: 120});
  
-  svg.line(line.toFlatArray()).attr({stroke: lineDrawOpts.strokeStyle});
-  const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
+  let dotSvg:SvgCircle|undefined;
+  if (svg !== undefined) {
+    svg.line(line.toFlatArray()).attr({stroke: lineDrawOpts.strokeStyle});
+    dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
+  }
 
   // Loop back and forth between 0 and 1
   const progression = pingPongPercent(pingPongInterval);
@@ -67,7 +71,7 @@ const testLine = () => {
     drawHelper.dot(dotPos, dotDrawOpts);
 
     // Move SVG dot, need to adjust so it's positioned by its center
-    dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
+    dotSvg?.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
   };
 
   const update = () => {
@@ -80,17 +84,16 @@ const testLine = () => {
 const testDistances = () => {
   const bounds = {x:0, y:0, width:400, height: 330};
   const [canvasEl] = getElements(`distances`, bounds);  // get lineCanvas and lineSvg elements
-  const ctx = canvasEl.getContext(`2d`);         // get drawing context
+  const ctx = Drawing.getCtx(canvasEl);                  // get drawing context
   const drawHelper = Drawing.makeHelper(ctx);// make a helper
  
   const line = Lines.fromPointsToPath({x: 30, y: 300}, {x: 350, y:30});
  
   // Keep track of pointer
-  const pointerPos = dom({
-    object: canvasEl, 
-    eventName:`pointermove`,
-    transform:(evt:PointerEvent) => ({x: evt.offsetX, y:evt.offsetY}),
-  }).value;
+  const pointerPos = domRx<{x:number,y:number}>(
+    canvasEl, 
+    `pointermove`,
+    {transform:(evt:PointerEvent) => ({x: evt.offsetX, y:evt.offsetY})}).value;
   const bboxEnable = checkbox(`bboxDistances`);
   
   const redraw = () => {
@@ -137,7 +140,7 @@ const testDistances = () => {
 // --- Compound
 const testCompound = () => {
   const [canvasEl, svg] = getElements(`compound`, {width:170, height: 160});
-  const ctx = canvasEl.getContext(`2d`);         // get drawing context
+  const ctx = Drawing.getCtx(canvasEl);                  // get drawing context
   const drawHelper = Drawing.makeHelper(ctx);// make a helper
   ctx.translate(5, 5); // Shift drawing in a little to avoid being cut off
 
@@ -145,10 +148,12 @@ const testCompound = () => {
   const paths = Lines.joinPointsToLines(...points).map(l => Lines.toPath(l));
   const compound = Compound.fromPaths(...paths);
 
-  svg.path(compound.toSvgString()).attr({fill: `transparent`, margin: `10px`, stroke: lineDrawOpts.strokeStyle});
-
-  const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
-
+  let dotSvg:SvgCircle|undefined;
+  if (svg !== undefined) {
+    svg.path(compound.toSvgString()).attr({fill: `transparent`, margin: `10px`, stroke: lineDrawOpts.strokeStyle});
+    dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
+  }
+  
   // Loop back and forth between 0 and 1
   const progression = pingPongPercent(pingPongInterval);
   let amt = 0;
@@ -170,7 +175,7 @@ const testCompound = () => {
     drawHelper.dot(dotPos, dotDrawOpts);
 
     // Move SVG dot, need to adjust so it's positioned by its center
-    dotSvg.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
+    dotSvg?.move(dotPos.x - dotDrawOpts.radius, dotPos.y - dotDrawOpts.radius);
   };
 
   const update = () => {

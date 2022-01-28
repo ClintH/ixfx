@@ -2,15 +2,16 @@ import {resolveEl} from "./Forms";
 import {addShadowCss} from "./ShadowDom";
 
 export type DomLogOpts = {
-  readonly truncateEntries?: number,
+  readonly capacity?: number,
   readonly timestamp?: boolean,
   readonly collapseDuplicates?:boolean,
-  readonly monospaced?:boolean
+  readonly monospaced?:boolean,
+  readonly minIntervalMs?:number
 }
 
 export type DomLog = Readonly<{
   clear():void
-  error(msgOrError:string|Error):void
+  error(msgOrError:string|Error|unknown):void
   log(msg?:string):void
   append(el:HTMLElement):void
   dispose():void
@@ -21,7 +22,7 @@ export type DomLog = Readonly<{
  * something like `overflow-y: scroll` on its parent
  * 
  * ```
- * const l = domLog(`dataStream`); // Assumes HTML element with id `dataStream` exists 
+ * const l = domLog(`#dataStream`); // Assumes HTML element with id `dataStream` exists 
  * l.log(`Hi`);
  * l.log(); // Displays a horizontal rule
  * 
@@ -31,7 +32,15 @@ export type DomLog = Readonly<{
  * });
  * l.log(`Hi`);
  * l.error(`Some error`); // Adds class `error` to line
+ * ```
  * 
+ * For logging high-throughput streams:
+ * ```
+ * // Silently drop log if it was less than 5ms since the last
+ * const l = domLog(`#dataStream`, { minIntervalMs: 5 });
+ * 
+ * // Only the last 100 entries are kept
+ * const l = domLog(`#dataStream`, { capacity: 100 });
  * ```
  *
  * @param {(HTMLElement | string | undefined)} elOrId Element or id of element
@@ -40,15 +49,7 @@ export type DomLog = Readonly<{
  */
 export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}):DomLog => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const {truncateEntries = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
-
-  // const empty = {
-  //   log: (_: string) => { /* no-op */ },
-  //   clear: () => { /* no-op */ },
-  //   dispose: () => { /* no-op */ },
-  //   error: (_:string|Error) => { /* no-op */ },
-  //   append: (_:HTMLElement) => { /* no-op */ }
-  // };
+  const {capacity = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
 
   // eslint-disable-next-line functional/no-let
   let added = 0;
@@ -58,21 +59,6 @@ export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}
   let lastLogRepeats = 0;
 
   const parentEl = resolveEl<HTMLElement>(domQueryOrEl);
-
-  // if (typeof elOrId === `string`) {
-  //   const sought = document.getElementById(elOrId);
-  //   if (sought === null) {
-  //     console.warn(`domLog element id not found ${elOrId}`);
-  //     return empty;
-  //   }
-  //   parentEl = sought;
-  // } else if (elOrId !== undefined) {
-  //   parentEl = elOrId;
-  // } else {
-  //   console.warn(`domLog element not found`);
-  //   return empty;
-  // }
-
   const fontFamily = monospaced ? `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", Monaco, "Courier New", Courier, monospace` : `normal`;
   const shadowRoot = addShadowCss(parentEl, `
   .log {
@@ -115,12 +101,13 @@ export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}
   el.className = `log`;
   shadowRoot.append(el);
 
-  const error = (msgOrError: string | Error) => {
+  const error = (msgOrError: string | Error | unknown) => {
     const line = document.createElement(`div`);
+    
     if (typeof msgOrError === `string`) {
       // eslint-disable-next-line functional/immutable-data
       line.innerHTML = msgOrError;
-    } else {
+    } else if (msgOrError instanceof Error) {
       const stack = msgOrError.stack;
       if (stack === undefined) {
         // eslint-disable-next-line functional/immutable-data
@@ -129,6 +116,9 @@ export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}
         // eslint-disable-next-line functional/immutable-data
         line.innerHTML = stack.toString();
       }
+    } else {
+      // eslint-disable-next-line functional/immutable-data
+      line.innerHTML = msgOrError as string;
     }
     line.classList.add(`error`);
     append(line);
@@ -136,9 +126,14 @@ export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}
     lastLogRepeats = 0;
   };
 
+  let lastLogTime = 0;
   const log = (whatToLog: unknown = ``) => {
     // eslint-disable-next-line functional/no-let
     let msg:string|undefined;
+    let interval = window.performance.now() - lastLogTime;
+    if (opts.minIntervalMs && interval < opts.minIntervalMs) return;
+    lastLogTime = window.performance.now();
+
     if (typeof whatToLog === `object`) {
       msg = JSON.stringify(whatToLog);
     } else if (whatToLog === undefined) {
@@ -195,9 +190,9 @@ export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}
     }
     el.insertBefore(line, el.firstChild);
 
-    if (truncateEntries > 0 && (++added > truncateEntries * 2)) {
+    if (capacity > 0 && (++added > capacity * 2)) {
       // eslint-disable-next-line functional/no-loop-statement
-      while (added > truncateEntries) {
+      while (added > capacity) {
         el.lastChild?.remove();
         added--;
       }

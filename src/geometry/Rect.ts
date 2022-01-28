@@ -7,6 +7,10 @@ export type Rect = {
 }
 export type RectPositioned = Points.Point & Rect;
 
+export const fromElement = (el:HTMLElement): Rect => ({width: el.clientWidth, height: el.clientHeight});
+
+export const isEqual = (a:Rect, b:Rect):boolean => a.width === b.width && a.height === b.height;
+
 export const fromCenter = (origin: Points.Point, width: number, height: number): RectPositioned => {
   Points.guard(origin, `origin`);
 
@@ -65,7 +69,7 @@ export const fromTopLeft = (origin: Points.Point, width: number, height: number)
   // return rectFromPoints(...pts);
 };
 
-export const getCorners = (rect: RectPositioned|Rect, origin?:Points.Point): Points.Point[] => {
+export const getCorners = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Points.Point[] => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
   else if (origin === undefined) throw new Error(`Unpositioned rect needs origin param`);
@@ -97,4 +101,4 @@ export const getCenter = (rect: RectPositioned|Rect, origin?:Points.Point): Poin
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const getLines = (rect: RectPositioned|Rect, origin?:Points.Point): Lines.Line[] => Lines.joinPointsToLines(...getCorners(rect, origin));
+export const getLines = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...getCorners(rect, origin));

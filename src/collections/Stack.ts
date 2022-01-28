@@ -140,6 +140,20 @@ export class Stack<V> {
     return new Stack<V>(this.opts, pop(this.opts, this.data));
   }
 
+  /**
+   * Enumerates stack from bottom-to-top
+   *
+   * @param {(v:V) => void} fn
+   * @memberof Stack
+   */
+  forEach(fn:(v:V) => void): void {
+    this.data.forEach(fn);
+  }
+
+  forEachFromTop(fn:(v:V) => void): void {
+    [...this.data].reverse().forEach(fn);
+  }
+
   get isEmpty(): boolean {
     return isEmpty(this.opts, this.data);
   }

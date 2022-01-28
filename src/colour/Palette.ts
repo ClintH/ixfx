@@ -69,8 +69,9 @@ export class Palette {
   }
 }
 
-export const getCssVariable = (name:string, fallbackColour:string = `black`) => {
-  const fromCss = getComputedStyle(document.body).getPropertyValue(`--${name}`).trim();
+export const getCssVariable = (name:string, fallbackColour:string = `black`, root?:HTMLElement) => {
+  if (root === undefined) root = document.body;
+  const fromCss = getComputedStyle(root).getPropertyValue(`--${name}`).trim();
   if (fromCss === undefined || fromCss.length === 0) return fallbackColour;
   return fromCss;
 };

@@ -1,21 +1,42 @@
 /* eslint-disable */
 import * as Envelopes from '~/modulation/Envelope';
-import {button} from '~/dom/Forms';
+import {button, checkbox, resolveEl, select} from '~/dom/Forms';
 import {plot2} from '~/visualisation/Plot2';
 import {domLog} from '~/dom/DomLog';
 import {Palette} from '~/colour/Palette';
+import {fromEvent, debounceTime} from 'rxjs';
+import {map } from  'rxjs/operators';
 
-const envDataLog = domLog(`#envDataStream`);
+// Setup data logger
+const envDataLog = domLog(`#envDataStream`, {
+  minIntervalMs: 20,
+  capacity: 150
+});
 
-const opts: Envelopes.AdsrOpts = {
+// Setup plot
+const palette = new Palette();
+palette.add(`scaled`, `yellow`);
+palette.add('scaled-axis', 'whitesmoke');
+
+const envData = plot2(`#envData`, {
+  capacity: 300,
+  showYAxis: true,
+  palette: palette,
+  lineWidth: 3
+});
+
+// Setup envelope
+let opts: Envelopes.AdsrOpts = {
+  ...Envelopes.defaultAdsrOpts(),
   attackBend: 1,
   decayBend: -1,
   releaseBend: 1
-}
-const env = Envelopes.adsr(opts);
+};
+let shouldLoop = false;
+let env = Envelopes.adsr({...opts, shouldLoop});
 
 env.addEventListener(`change`, ev => {
-  button(`#btnRelease`).enable(ev.newState === `sustain`);
+  button(`#btnRelease`).disabled = ev.newState !== `sustain`;
 });
 
 button(`#btnTriggerHold`, () => {
@@ -32,18 +53,42 @@ button(`#btnTrigger`, () => {
   startDrawing();
 });
 
-const palette = new Palette();
-palette.add(`scaled`, `yellow`);
-palette.add('scaled-axis', 'whitesmoke');
-
-//const envData =  new Plot(document.getElementById(`envData`) as HTMLCanvasElement, 500);
-const envData = plot2(`#envData`, {
-  capacity: 300,
-  showYAxis: true,
-  yAxes: 'scaled',
-  palette: palette,
-  lineWidth: 3
+const selectShow = select(`#selectShow`, (val) => {
+  envData.clear();
+  envDataLog.log()
+  startDrawing();
 });
+
+// Update playground if envelope is changed
+fromEvent(resolveEl(`#envEditor`), `change`)
+  .pipe(
+    map((v:CustomEvent) => v.detail as Envelopes.AdsrOpts),
+    debounceTime(1000))
+  .subscribe( v => {
+    opts = v;
+    console.log('hello')
+    updateEnvelope();
+});
+
+
+const updateEnvelope = () => {
+  try {
+    env = Envelopes.adsr({...opts, shouldLoop});
+    env.trigger();
+    envDataLog.clear();
+    envData.clear();
+    startDrawing();
+  } catch (err) {
+    envDataLog.error(err);
+  }
+}
+
+checkbox(`#chkLooping`, (newVal) => {
+  shouldLoop = newVal;
+  updateEnvelope();
+});
+
+
 
 let isDrawing = false;
 
@@ -56,13 +101,11 @@ const startDrawing = () => {
       return;
     }
 
-    // Plot data
-    envData.add(amt, `amt`, true);
-    envData.add(scaled, `scaled`);
-    // Log numeric
-    envDataLog.log(`${stage} scaled: ${scaled.toFixed(3)} raw: ${amt.toFixed(3)}`);
-
-
+    // Plot & log data
+    const what = selectShow.value === `raw` ? amt : scaled; 
+    envData.add(what);
+    envDataLog.log(`${stage} ${what.toFixed(3)}`);
+    
     if (!env.isDone) {
       isDrawing = true;
       window.requestAnimationFrame(draw);
@@ -74,3 +117,5 @@ const startDrawing = () => {
   window.requestAnimationFrame(draw);
 }
 
+
+updateEnvelope();

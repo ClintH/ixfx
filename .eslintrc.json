@@ -12,7 +12,10 @@
     "parserOptions": {
         "ecmaVersion": 2021,
         "sourceType": "module",
-        "project": "./tsconfig.json"
+        "project": [
+            "./tsconfig.json",
+            "./www/tsconfig.json"
+        ]
     },
     "plugins": [
         "@typescript-eslint",

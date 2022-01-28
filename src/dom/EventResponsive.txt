@@ -1,14 +1,16 @@
 //const isDomElement = (d: HTMLElement): d is HTMLElement => ((d as HTMLElement).nodeType === 1 && typeof d.nodeName === `string`) || d instanceof HTMLElement;
 
-import {Debouncer, debounce} from "../Trigger";
+//import {Debouncer, debounce} from "../Trigger";
+import { fromEvent, interval, Observable } from 'rxjs';
+import {scan, debounce} from 'rxjs/operators';
 
 export type EventTransform<T extends Event> = (evt:T) => object;
 
 interface SubOptions<T extends Event> {
-  transform?:EventTransform<T>
-  autoClearMs?:number
-  eventName:string
-  object:HTMLElement
+  readonly transform?:EventTransform<T>
+  readonly autoClearMs?:number
+  readonly eventName:string
+  readonly object:HTMLElement
 }
 
 class DomSubscription<T extends Event> implements EventListenerObject {
@@ -16,15 +18,19 @@ class DomSubscription<T extends Event> implements EventListenerObject {
   #el:HTMLElement|undefined;
   readonly transform:EventTransform<T>|undefined;
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  readonly value:any;
+   
   debugEventFlow:boolean = false;
-  #debouncer:Debouncer|undefined = undefined;
+  //#debouncer:Debouncer|undefined = undefined;
+  #event:Observable<Event>;
 
   constructor(opts:SubOptions<T>) {
     this.#el = opts.object;
     this.eventName = opts.eventName;
     this.transform = opts.transform;
-    this.#el.addEventListener(this.eventName, this);
+  
+    this.#event = fromEvent(this.#el, this.eventName);
+
+    //this.#el.addEventListener(this.eventName, this);
     this.value = {};
   
     if (opts.autoClearMs) {

@@ -36,6 +36,20 @@ export type Cell = Readonly<{
   readonly y: number
 }>;
 
+export const isEqual = (a:Grid|GridVisual, b:Grid|GridVisual):boolean => {
+  if (`rows` in a && `cols` in a) {
+    if (`rows` in b && `cols` in b) {
+      if (a.rows !== b.rows || a.cols !== b.cols) return false;
+    } else return false;
+  }
+  if (`size` in a) {
+    if (`size` in b) {
+      if (a.size !== b.size) return false;
+    } else return false;
+  }
+  return true;
+};
+
 /**
  * Returns a key string for a cell instance
  * A key string allows comparison of instances by value rather than reference
@@ -75,7 +89,7 @@ export const guard = function (a: Cell, paramName: string = `Param`) {
  * @param {(Grid & GridVisual)} grid
  * @return {*}  {Rect.RectPositioned}
  */
-export const cellCornerRect = function (cell: Cell, grid: Grid & GridVisual): Rect.RectPositioned {
+export const rectangleForCell = function (cell: Cell, grid: Grid & GridVisual): Rect.RectPositioned {
   guard(cell);
   const size = grid.size;
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
@@ -84,7 +98,14 @@ export const cellCornerRect = function (cell: Cell, grid: Grid & GridVisual): Re
   return r;
 };
 
-export const getCell = function (position: Point.Point, grid: Grid & GridVisual): Cell | undefined {
+/**
+ * Returns the cell at a specified visual coordinate
+ *
+ * @param {Point.Point} position Position, eg in pixels
+ * @param {(Grid & GridVisual)} grid Grid
+ * @return {*}  {(Cell | undefined)} Cell at position or undefined if outside of the grid
+ */
+export const cellAtPoint = function (position: Point.Point, grid: Grid & GridVisual): Cell | undefined {
   const size = grid.size;
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
@@ -94,6 +115,14 @@ export const getCell = function (position: Point.Point, grid: Grid & GridVisual)
   return {x, y};
 };
 
+/**
+ * Returns, in order the neighbours at directions N, E, S, W
+ *
+ * @param {Grid} grid
+ * @param {Cell} cell
+ * @param {BoundsLogic} [bounds=BoundsLogic.Undefined]
+ * @return {*}  {ReadonlyArray<Cell>}
+ */
 export const neighbours = function (grid: Grid, cell: Cell, bounds: BoundsLogic = BoundsLogic.Undefined): ReadonlyArray<Cell> {
   const directions = [
     CardinalDirection.North,
@@ -175,7 +204,7 @@ export const getLine = function (start: Cell, end: Cell): ReadonlyArray<Cell> {
  * @returns {Cell[]}
  */
 export const getSquarePerimeter = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Stop): ReadonlyArray<Cell> {
-  if (bounds === BoundsLogic.Wrap) throw new Error(`BoundsLogic Wrap not supported (only Stop and Unbound)`);
+  //if (bounds === BoundsLogic.Wrap) throw new Error(`BoundsLogic Wrap not supported (only Stop and Unbound)`);
   if (bounds === BoundsLogic.Undefined) throw new Error(`BoundsLogic Undefined not supported (only Stop and Unbound)`);
 
   if (Number.isNaN(steps)) throw new Error(`Steps is NaN`);
@@ -193,7 +222,7 @@ export const getSquarePerimeter = function (grid: Grid, steps: number, start: Ce
 
   const directionCells = directions.map(d => offset(grid, getVectorFromCardinal(d, steps), start, bounds));
 
-  
+  console.log(directionCells);
   // NW to NE
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   cells.add(...simpleLine(directionCells[7]!, directionCells[1]!, true));
@@ -333,143 +362,143 @@ export const offset = function (grid: Grid, vector: Cell, start: Cell = {x: 0, y
  * @param {BoundsLogic} [bounds=BoundsLogic.Undefined]
  * @returns {(Cell | undefined)}
  */
-export const offsetStepsByRow = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Undefined): Cell | undefined {
-  if (!Number.isInteger(steps)) throw new Error(`Steps must be an integer`);
-  guard(start);
+// export const offsetStepsByRow = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Undefined): Cell | undefined {
+//   if (!Number.isInteger(steps)) throw new Error(`Steps must be an integer`);
+//   guard(start);
 
-  // Very naive implementation, but code is readable? 😅
-  // eslint-disable-next-line functional/no-let
-  let stepsLeft = Math.abs(steps);
-  const isDirForward = steps >= 0;
-  // eslint-disable-next-line functional/no-let
-  let x = start.x;
-  // eslint-disable-next-line functional/no-let
-  let y = start.y;
-  // eslint-disable-next-line functional/no-loop-statement
-  while (stepsLeft > 0) {
-    // Are we at the end of the row?
-    if (x === grid.cols - 1 && isDirForward) {
-      if (y === grid.rows - 1 && bounds !== BoundsLogic.Unbound) {
-        // Reached bottom-right corner, end of grid and wanting to go forwards still
-        if (bounds === BoundsLogic.Undefined) return;
-        if (bounds === BoundsLogic.Stop) return {x, y};
-        if (bounds === BoundsLogic.Wrap) y = 0;
-      } else {
-        y++;
-      }
-      x = 0;
-      stepsLeft--;
-      continue;
-    }
+//   // Very naive implementation, but code is readable? 😅
+//   // eslint-disable-next-line functional/no-let
+//   let stepsLeft = Math.abs(steps);
+//   const isDirForward = steps >= 0;
+//   // eslint-disable-next-line functional/no-let
+//   let x = start.x;
+//   // eslint-disable-next-line functional/no-let
+//   let y = start.y;
+//   // eslint-disable-next-line functional/no-loop-statement
+//   while (stepsLeft > 0) {
+//     // Are we at the end of the row?
+//     if (x === grid.cols - 1 && isDirForward) {
+//       if (y === grid.rows - 1 && bounds !== BoundsLogic.Unbound) {
+//         // Reached bottom-right corner, end of grid and wanting to go forwards still
+//         if (bounds === BoundsLogic.Undefined) return;
+//         if (bounds === BoundsLogic.Stop) return {x, y};
+//         if (bounds === BoundsLogic.Wrap) y = 0;
+//       } else {
+//         y++;
+//       }
+//       x = 0;
+//       stepsLeft--;
+//       continue;
+//     }
 
-    // First cell and going backwards
-    if (x === 0 && !isDirForward) {
-      if (y === 0 && bounds !== BoundsLogic.Unbound) {
-        // Reached top-left corner, start of grid and wanting to go backwards
-        if (bounds === BoundsLogic.Undefined) return;
-        if (bounds === BoundsLogic.Stop) return {x, y};
-        if (bounds === BoundsLogic.Wrap) y = grid.rows - 1;
-      } else {
-        y--;
-      }
-      x = grid.cols - 1;
-      stepsLeft--;
-      continue;
-    }
+//     // First cell and going backwards
+//     if (x === 0 && !isDirForward) {
+//       if (y === 0 && bounds !== BoundsLogic.Unbound) {
+//         // Reached top-left corner, start of grid and wanting to go backwards
+//         if (bounds === BoundsLogic.Undefined) return;
+//         if (bounds === BoundsLogic.Stop) return {x, y};
+//         if (bounds === BoundsLogic.Wrap) y = grid.rows - 1;
+//       } else {
+//         y--;
+//       }
+//       x = grid.cols - 1;
+//       stepsLeft--;
+//       continue;
+//     }
 
-    if (isDirForward) {
-      // Step forward to end of row
-      const chunk = Math.min(stepsLeft, grid.cols - x - 1);
-      x += chunk;
-      stepsLeft -= chunk;
-    } else {
-      // Step back to start of row
-      const chunk = Math.min(stepsLeft, x);
-      x -= chunk;
-      stepsLeft -= chunk;
-    }
-  }
-  return {x, y};
-};
-
-
-export const offsetStepsByCol = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Undefined): Cell | undefined {
-  if (!Number.isInteger(steps)) throw new Error(`Steps must be an integer`);
-  guard(start);
-
-  // Very naive implementation, but code is readable? 😅
-  // eslint-disable-next-line functional/no-let
-  let stepsLeft = Math.abs(steps);
-  const isDirForward = steps >= 0;
-  // eslint-disable-next-line functional/no-let
-  let x = start.x;
-  // eslint-disable-next-line functional/no-let
-  let y = start.y;
-  // eslint-disable-next-line functional/no-loop-statement
-  while (stepsLeft > 0) {
-    // Are we at the end of the column?
-    if (y === grid.rows - 1 && isDirForward) {
-      if (x === grid.cols - 1 && bounds !== BoundsLogic.Unbound) {
-        // Reached bottom-right corner, end of grid and wanting to go forwards still
-        if (bounds === BoundsLogic.Undefined) return;
-        if (bounds === BoundsLogic.Stop) return {x, y};
-        if (bounds === BoundsLogic.Wrap) x = 0;
-      } else {
-        x++;
-      }
-      y = 0;
-      stepsLeft--;
-      continue;
-    }
-
-    // First cell and going backwards
-    if (y === 0 && !isDirForward) {
-      if (x === 0 && bounds !== BoundsLogic.Unbound) {
-        // Reached top-left corner, start of grid and wanting to go backwards
-        if (bounds === BoundsLogic.Undefined) return;
-        if (bounds === BoundsLogic.Stop) return {x, y};
-        if (bounds === BoundsLogic.Wrap) x = grid.cols - 1;
-      } else {
-        x--;
-      }
-      y = grid.rows - 1;
-      stepsLeft--;
-      continue;
-    }
-
-    if (isDirForward) {
-      // Step forward to end of row
-      const chunk = Math.min(stepsLeft, grid.rows - y - 1);
-      y += chunk;
-      stepsLeft -= chunk;
-    } else {
-      // Step back to start of row
-      const chunk = Math.min(stepsLeft, y);
-      y -= chunk;
-      stepsLeft -= chunk;
-    }
-  }
-  return {x, y};
-};
+//     if (isDirForward) {
+//       // Step forward to end of row
+//       const chunk = Math.min(stepsLeft, grid.cols - x - 1);
+//       x += chunk;
+//       stepsLeft -= chunk;
+//     } else {
+//       // Step back to start of row
+//       const chunk = Math.min(stepsLeft, x);
+//       x -= chunk;
+//       stepsLeft -= chunk;
+//     }
+//   }
+//   return {x, y};
+// };
 
 
-export const walkByFn = function* (offsetFn: (grid: Grid, steps: number, start: Cell, bounds: BoundsLogic) => Cell | undefined, grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
-  guard(start);
-  // eslint-disable-next-line functional/no-let
-  let x = start.x;
-  // eslint-disable-next-line functional/no-let
-  let y = start.y;
-  const bounds = wrap ? BoundsLogic.Wrap : BoundsLogic.Undefined;
-  // eslint-disable-next-line functional/no-loop-statement
-  while (true) {
-    yield {x: x, y: y};
-    const pos = offsetFn(grid, 1, {x, y}, bounds);
-    if (pos === undefined) return;
-    x = pos.x;
-    y = pos.y;
-    if (x === start.x && y === start.y) return;
-  }
-};
+// export const offsetStepsByCol = function (grid: Grid, steps: number, start: Cell = {x: 0, y: 0}, bounds: BoundsLogic = BoundsLogic.Undefined): Cell | undefined {
+//   if (!Number.isInteger(steps)) throw new Error(`Steps must be an integer`);
+//   guard(start);
+
+//   // Very naive implementation, but code is readable? 😅
+//   // eslint-disable-next-line functional/no-let
+//   let stepsLeft = Math.abs(steps);
+//   const isDirForward = steps >= 0;
+//   // eslint-disable-next-line functional/no-let
+//   let x = start.x;
+//   // eslint-disable-next-line functional/no-let
+//   let y = start.y;
+//   // eslint-disable-next-line functional/no-loop-statement
+//   while (stepsLeft > 0) {
+//     // Are we at the end of the column?
+//     if (y === grid.rows - 1 && isDirForward) {
+//       if (x === grid.cols - 1 && bounds !== BoundsLogic.Unbound) {
+//         // Reached bottom-right corner, end of grid and wanting to go forwards still
+//         if (bounds === BoundsLogic.Undefined) return;
+//         if (bounds === BoundsLogic.Stop) return {x, y};
+//         if (bounds === BoundsLogic.Wrap) x = 0;
+//       } else {
+//         x++;
+//       }
+//       y = 0;
+//       stepsLeft--;
+//       continue;
+//     }
+
+//     // First cell and going backwards
+//     if (y === 0 && !isDirForward) {
+//       if (x === 0 && bounds !== BoundsLogic.Unbound) {
+//         // Reached top-left corner, start of grid and wanting to go backwards
+//         if (bounds === BoundsLogic.Undefined) return;
+//         if (bounds === BoundsLogic.Stop) return {x, y};
+//         if (bounds === BoundsLogic.Wrap) x = grid.cols - 1;
+//       } else {
+//         x--;
+//       }
+//       y = grid.rows - 1;
+//       stepsLeft--;
+//       continue;
+//     }
+
+//     if (isDirForward) {
+//       // Step forward to end of row
+//       const chunk = Math.min(stepsLeft, grid.rows - y - 1);
+//       y += chunk;
+//       stepsLeft -= chunk;
+//     } else {
+//       // Step back to start of row
+//       const chunk = Math.min(stepsLeft, y);
+//       y -= chunk;
+//       stepsLeft -= chunk;
+//     }
+//   }
+//   return {x, y};
+// };
+
+
+// export const walkByFn = function* (offsetFn: (grid: Grid, steps: number, start: Cell, bounds: BoundsLogic) => Cell | undefined, grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
+//   guard(start);
+//   // eslint-disable-next-line functional/no-let
+//   let x = start.x;
+//   // eslint-disable-next-line functional/no-let
+//   let y = start.y;
+//   const bounds = wrap ? BoundsLogic.Wrap : BoundsLogic.Undefined;
+//   // eslint-disable-next-line functional/no-loop-statement
+//   while (true) {
+//     yield {x: x, y: y};
+//     const pos = offsetFn(grid, 1, {x, y}, bounds);
+//     if (pos === undefined) return;
+//     x = pos.x;
+//     y = pos.y;
+//     if (x === start.x && y === start.y) return;
+//   }
+// };
 /**
  * Traverses grid by row, top-to-bottom, left-to-right
  *
@@ -478,9 +507,9 @@ export const walkByFn = function* (offsetFn: (grid: Grid, steps: number, start: 
  * @param {boolean} [wrap=false]
  * @return {*}  {Iterable<Cell>}
  */
-export const walkByRow = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
-  return walkByFn(offsetStepsByRow, grid, start, wrap);
-};
+// export const walkByRow = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
+//   return walkByFn(offsetStepsByRow, grid, start, wrap);
+// };
 
 /**
  * Traverses grid by column left-to-right, bottom-to-top
@@ -490,21 +519,11 @@ export const walkByRow = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap:
  * @param {boolean} [wrap=false]
  * @return {*}  {Iterable<Cell>}
  */
-export const walkByCol = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
-  return walkByFn(offsetStepsByCol, grid, start, wrap);
-};
+// export const walkByCol = function (grid: Grid, start: Cell = {x: 0, y: 0}, wrap: boolean = false): Iterable<Cell> {
+//   return walkByFn(offsetStepsByCol, grid, start, wrap);
+// };
 
-export const visitorDepth = function (queue: ReadonlyArray<Cell>): Cell {
-  return queue[0];
-};
-
-export const visitorBreadth = function (queue: ReadonlyArray<Cell>): Cell {
-  return queue[queue.length - 1];
-};
-
-export const visitorRandom = function (queue: ReadonlyArray<Cell>): Cell {
-  return randomElement(queue);
-};
+type VisitorOptions = (grid: Grid, cell: Cell, bounds: BoundsLogic) => ReadonlyArray<Cell>;
 
 /**
  * Visits every cell in grid using supplied selection function
@@ -536,13 +555,13 @@ export const visitorRandom = function (queue: ReadonlyArray<Cell>): Cell {
  *  }
  *  setTimeout(run, delayMs);
  * ```
- * @param {(nbos: Cell[]) => Cell} visitFn Visitor function
+ * @param {(nextSelector: Cell[]) => Cell} visitFn Visitor function
  * @param {Grid} grid Grid to visit
  * @param {Cell} start Starting cell
  * @param {MutableStringSet<Cell>} [visited] Optional tracker of visited cells
  * @returns {Iterable<Cell>}
  */
-export const visitor = function* (visitFn: (nbos: ReadonlyArray<Cell>) => Cell, grid: Grid, start: Cell, visited?: MutableStringSet<Cell>) {
+export const visitor = function* (visitFn: (nextSelector: ReadonlyArray<Cell>) => Cell, grid: Grid, start: Cell, options:VisitorOptions, visited?: MutableStringSet<Cell>) {
   if (visited === undefined) visited = new MutableStringSet<Cell>(c => cellKeyString(c));
   // eslint-disable-next-line functional/no-let, functional/prefer-readonly-type
   let queue: Cell[] = [];
@@ -555,9 +574,81 @@ export const visitor = function* (visitFn: (nbos: ReadonlyArray<Cell>) => Cell, 
       visited.add(next);
       yield next;
     }
-    const nbos = neighbours(grid, next, BoundsLogic.Undefined);
+    const nbos = options(grid, next, BoundsLogic.Undefined);
     // eslint-disable-next-line functional/immutable-data
     queue.push(...nbos);
     queue = queue.filter(c => !visited?.has(c));
   }
+};
+
+
+const visitorDepthNext = function (queue: ReadonlyArray<Cell>): Cell {
+  return queue[0];
+};
+
+const visitorBreadthNext = function (queue: ReadonlyArray<Cell>): Cell {
+  return queue[queue.length - 1];
+};
+
+const visitorRandomNext = function (queue: ReadonlyArray<Cell>): Cell {
+  return randomElement(queue);
+};
+
+export const visitorDepth = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor(visitorDepthNext, grid, start, neighbours, visited);
+export const visitorBreadth = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor(visitorBreadthNext, grid, start, neighbours, visited);
+export const visitorRandom = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor(visitorRandomNext, grid, start, neighbours, visited);
+
+export const visitorRow = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor((queue) => queue[0], grid, start, (grid, cell, _bounds) => {
+  //eslint-disable-next-line functional/no-let
+  let c = offset(grid, {x:1, y:0}, cell, BoundsLogic.Undefined);
+  if (c === undefined) {
+    // console.log(`${cell.x}, ${cell.y}`);
+    if (cell.y < grid.cols - 1) {
+      // Try moving to next row
+      // console.log(`  moving to next col. ${cell.x}, ${cell.y}`);
+      c = {x: 0, y: cell.y + 1};
+    } else {
+      //console.log(`resetting to origin`);
+      c = {x:0, y:0};
+    }
+  }
+  return [c];
+}, visited);
+
+export const visitorColumn = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor((queue) => queue[0], grid, start, (grid, cell, _bounds) => {
+  //eslint-disable-next-line functional/no-let
+  let c = offset(grid, {x:0, y:1}, cell, BoundsLogic.Undefined);
+  if (c === undefined) {
+    // console.log(`${cell.x}, ${cell.y}`);
+    if (cell.x < grid.rows - 1) {
+      // Try moving to next col
+      // console.log(`  moving to next col. ${cell.x}, ${cell.y}`);
+      c = {x: cell.x + 1, y: 0};
+    } else {
+      // console.log(`resetting to origin`);
+      c = {x:0, y:0};
+    }
+  }
+  return [c];
+}, visited);
+
+export const cells = function* (grid:Grid, start:Cell = {x:0, y:0}) {
+  //eslint-disable-next-line functional/no-let
+  let {x, y} = start;
+  //eslint-disable-next-line functional/no-let
+  let canMove = true;
+  //eslint-disable-next-line functional/no-loop-statement
+  do {
+    yield {x, y};
+    x++;
+    if (x  === grid.cols) {
+      y++;
+      x = 0;
+    }
+    if (y  === grid.rows) {
+      y = 0;
+      x = 0;
+    }
+    if (x === start.x && y === start.y) canMove = false; // Complete
+  } while (canMove);
 };

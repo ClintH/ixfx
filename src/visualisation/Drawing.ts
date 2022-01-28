@@ -7,19 +7,41 @@ import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
 import * as color2k from 'color2k';
 import {stack, Stack} from '../collections/Stack.js';
+import {resolveEl} from '../dom/Forms.js';
+import { resizeObservable } from '../dom/index.js';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 
-// TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
-export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement, canvasBounds?:Rects.Rect) => {
-  if (ctxOrCanvasEl === undefined) throw Error(`ctxOrCanvasEl undefined. Must be a 2d drawing context or Canvas element`);
-  let ctx: CanvasRenderingContext2D;
-  if (ctxOrCanvasEl instanceof HTMLCanvasElement) {
-    const ctx_ = ctxOrCanvasEl.getContext(`2d`);
-    if (ctx_ === null) throw new Error(`Could not creating drawing context`);
-    ctx = ctx_;
-  } else ctx = ctxOrCanvasEl;
+export const autoSizeCanvas = (canvasEl:HTMLCanvasElement, callback:() => void, timeoutMs:number = 1000) => {
+  const ro = resizeObservable(canvasEl, timeoutMs).subscribe((entries:readonly ResizeObserverEntry[]) => {
+    const e = entries.find(v => v.target === canvasEl);
+    if (e === undefined) return;
+    // eslint-disable-next-line functional/immutable-data
+    canvasEl.width = e.contentRect.width;
+    // eslint-disable-next-line functional/immutable-data
+    canvasEl.height = e.contentRect.height;
+    callback();
+  });
+  return ro;
+};
 
+type CanvasCtxQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
+export const getCtx = (canvasElCtxOrQuery:CanvasCtxQuery): CanvasRenderingContext2D => {
+  if (canvasElCtxOrQuery === null) throw Error(`canvasElCtxOrQuery null. Must be a 2d drawing context or Canvas element`);
+  if (canvasElCtxOrQuery === undefined) throw Error(`canvasElCtxOrQuery undefined. Must be a 2d drawing context or Canvas element`);
+  
+  const ctx = (canvasElCtxOrQuery instanceof CanvasRenderingContext2D) ?
+    canvasElCtxOrQuery : (canvasElCtxOrQuery instanceof HTMLCanvasElement) ?
+      canvasElCtxOrQuery.getContext(`2d`) : (typeof canvasElCtxOrQuery === `string`) ?
+        resolveEl<HTMLCanvasElement>(canvasElCtxOrQuery).getContext(`2d`): canvasElCtxOrQuery;
+  if (ctx === null) throw new Error(`Could not create 2d context for canvas`);
+  return ctx;
+};
+
+// TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
+export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rect) => {
+  const ctx = getCtx(ctxOrCanvasEl);
   return {
     paths(pathsToDraw: Paths.Path[], opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
@@ -49,16 +71,16 @@ export const makeHelper = (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasE
       arc(ctx, arcsToDraw, opts);
     },
     textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.RectPositioned}):void {
-      if (opts.bounds === undefined && canvasBounds !== undefined) opts.bounds = {...canvasBounds, x:0, y:0};
+      if (opts.bounds === undefined && canvasBounds !== undefined) opts = {...opts, bounds: {...canvasBounds, x:0, y:0 }};
       textBlock(ctx, lines, opts);
     }
   };
 };
 
 type DrawingOpts = {
-  strokeStyle?:string
-  fillStyle?:string
-  debug?:boolean
+  readonly strokeStyle?:string
+  readonly fillStyle?:string
+  readonly debug?:boolean
 };
 
 const optsOp = (opts:DrawingOpts):StackOp => coloringOp(opts.strokeStyle, opts.fillStyle);
@@ -67,15 +89,14 @@ const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts = {}):DrawingS
   if (ctx === undefined) throw Error(`ctx undefined`);
 
   // Create a drawing stack, pushing an op generated from drawing options
-  return drawingStack(ctx).push(optsOp(opts));
-  //stk = stk.push(coloringOp(opts.strokeStyle, opts.fillStyle));
-
-  //if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
-  //if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
-  //return stk;
+  const stack = drawingStack(ctx).push(optsOp(opts));
+  
+  // Apply stack to context
+  stack.apply();
+  return stack;
 };
 
-export const arc = (ctx:CanvasRenderingContext2D, arcs:Circles.ArcPositioned|Circles.ArcPositioned[], opts:DrawingOpts = {}) => {
+export const arc = (ctx:CanvasRenderingContext2D, arcs:Circles.ArcPositioned|ReadonlyArray<Circles.ArcPositioned>, opts:DrawingOpts = {}) => {
   applyOpts(ctx, opts);
 
   const draw = (arc:Circles.ArcPositioned) => {
@@ -86,73 +107,56 @@ export const arc = (ctx:CanvasRenderingContext2D, arcs:Circles.ArcPositioned|Cir
 
   if (Array.isArray(arcs)) {
     arcs.forEach(draw);
-  } else draw(arcs);
+  } else draw(arcs as Circles.ArcPositioned);
 };
 
-type StackOp = {
-  apply(ctx:CanvasRenderingContext2D):void
-  remove(ctx:CanvasRenderingContext2D):void
-}
+type StackOp = (ctx:CanvasRenderingContext2D) => void
+//apply(ctx:CanvasRenderingContext2D):void
+//remove(ctx:CanvasRenderingContext2D):void
 
-type DrawingStack = {
+type DrawingStack = Readonly<{
   push(op:StackOp):DrawingStack
   pop():DrawingStack
-  clear():void
-}
+  apply():DrawingStack
+}>
 
 const coloringOp = (strokeStyle:string|CanvasGradient|CanvasPattern|undefined, fillStyle:string|CanvasGradient|CanvasPattern|undefined):StackOp => {
-  let prevSs:string|CanvasGradient|CanvasPattern|undefined;
-  let prevFs:string|CanvasGradient|CanvasPattern|undefined;
 
   const apply = (ctx:CanvasRenderingContext2D) => {
-    //console.log(`coloringOp fill ${fillStyle} stroke ${strokeStyle}`);
-    prevFs = ctx.fillStyle;
-    prevSs = ctx.strokeStyle;
+    // eslint-disable-next-line functional/immutable-data
     if (fillStyle) ctx.fillStyle = fillStyle;
+    // eslint-disable-next-line functional/immutable-data
     if (strokeStyle) ctx.strokeStyle = strokeStyle;
   };
-
-  const remove = (ctx:CanvasRenderingContext2D) => {
-    //console.log(`coloringOp resettign fill ${prevFs} stroke ${prevSs}`);
-    if (prevFs && fillStyle) ctx.fillStyle = prevFs;
-    if (prevSs && strokeStyle) ctx.strokeStyle = prevSs;
-  };
-  return {apply, remove};
+  return apply;
 };
 
 export const drawingStack = (ctx:CanvasRenderingContext2D, stk?:Stack<StackOp>):DrawingStack => {
   if (stk === undefined) stk = stack<StackOp>();
 
   const push = (op:StackOp):DrawingStack => {
-    const s = stk?.push(op);
-    op.apply(ctx);
+    if (stk === undefined) stk = stack<StackOp>();
+    const s = stk.push(op);
+    op(ctx);
     return drawingStack(ctx, s);
   };
 
   const pop = ():DrawingStack => {
-    const op = stk?.peek;
-    if (op !== undefined) {
-      op.remove(ctx);
-    }
     const s = stk?.pop();
     return drawingStack(ctx, s);
   };
 
-  const clear = ():void => {
-    //console.log(`drawing stack clear`);
-    if (stk === undefined) return;
-    let op = stk.peek;
-    while (op !== undefined) {
-      op.remove(ctx);
-      stk = stk?.pop();
-      op = stk.peek;
-    }
+  const apply = ():DrawingStack => {
+    if (stk === undefined) return drawingStack(ctx);
+    stk.forEach(op => op(ctx));
+    return drawingStack(ctx, stk);
   };
-  return {push, pop, clear};
+
+  return {push, pop, apply};
 };
 
-export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.CirclePositioned|Circles.CirclePositioned[], opts:DrawingOpts = {}) => {
-  const ds = applyOpts(ctx, opts);
+export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.CirclePositioned|readonly Circles.CirclePositioned[], opts:DrawingOpts = {}) => {
+  applyOpts(ctx, opts);
 
   const draw = (c:Circles.CirclePositioned) => {
     ctx.beginPath();
@@ -160,12 +164,10 @@ export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.Circl
     ctx.stroke();
   };
   if (Array.isArray(circlesToDraw)) circlesToDraw.forEach(draw);
-  else draw(circlesToDraw);
-
-  ds.clear();
+  else draw(circlesToDraw as Circles.CirclePositioned);
 };
 
-export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[]|Paths.Path, opts: {strokeStyle?: string, debug?: boolean} = {}) =>  {
+export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths.Path[]|Paths.Path, opts: Readonly<{readonly strokeStyle?: string, readonly debug?: boolean}> = {}) =>  {
   applyOpts(ctx, opts);
 
   const draw = (path:Paths.Path) => {
@@ -176,7 +178,7 @@ export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[]|P
   };
 
   if (Array.isArray(pathsToDraw)) pathsToDraw.forEach(draw);
-  else draw(pathsToDraw);
+  else draw(pathsToDraw as Paths.Path);
 };
 
 /**
@@ -187,80 +189,63 @@ export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: Paths.Path[]|P
  * @param {...Points.Point[]} pts
  * @returns {void}
  */
-export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {loop?: boolean, strokeStyle?: string} = {}) => {
-  const loop = opts.loop ?? false;
+export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly loop?: boolean, readonly strokeStyle?: string} = {}) => {
+  const shouldLoop = opts.loop ?? false;
 
   guardArray(pts);
   if (pts.length === 0) return;
 
   // Throw an error if any point is invalid
-  for (let i = 0; i < pts.length; i++) Points.guard(pts[i], `Index ` + i);
+  pts.forEach((pt, i) => Points.guard(pt, `Index ${i}`));
 
-  const ds = applyOpts(ctx, opts);
+  applyOpts(ctx, opts);
 
   // Draw points
   ctx.beginPath();
   ctx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) {
-    ctx.lineTo(pts[i].x, pts[i].y);
-  }
+  pts.forEach((pt) => ctx.lineTo(pt.x, pt.y));
 
-  if (loop) ctx.lineTo(pts[0].x, pts[0].y);
+  if (shouldLoop) ctx.lineTo(pts[0].x, pts[0].y);
   //if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
-  ds.clear();
 };
 
-export const pointLabels = (ctx: CanvasRenderingContext2D, pts: Points.Point[], opts: {fillStyle?: string} = {}, labels?:string[]) => {
+export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly fillStyle?:string} = {}, labels?:readonly string[]) => {
   if (pts.length === 0) return;
 
   // Throw an error if any point is invalid
-  for (let i = 0; i < pts.length; i++) Points.guard(pts[i], `Index ` + i);
+  pts.forEach((pt, i) => Points.guard(pt, `Index ${i}`));
 
-  const ds = applyOpts(ctx, opts);
+  applyOpts(ctx, opts);
 
-  //if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
-
-  for (let i = 0; i < pts.length; i++) {
-    let label = i.toString();
-    if (labels !== undefined && i<labels.length) {
-      label =labels[i];
-    }
-    
-    ctx.fillText(label.toString(), pts[i].x, pts[i].y);
-  }
-  ds.clear();
+  pts.forEach((pt, i) => {
+    const label = (labels !== undefined && i<labels.length) ? labels[i] : i.toString();
+    ctx.fillText(label.toString(), pt.x, pt.y);    
+  });
 };
 
-// const guardCtx = (ctx: CanvasRenderingContext2D) => {
-//   if (ctx === undefined) throw Error(`ctx undefined`);
-// };
 
-const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|Points.Point[], opts?: DrawingOpts & {radius?: number, outlined?: boolean, filled?: boolean})  => {
+const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Points.Point[], opts?: DrawingOpts & {readonly radius?: number, readonly outlined?: boolean, readonly filled?: boolean})  => {
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
-  const outlined = opts.outlined ?? false;
   
-  let filled = opts.filled ?? false;  
-  if (!filled && !outlined) filled = true;
-
-  const ds = applyOpts(ctx, opts);
+  applyOpts(ctx, opts);
 
   ctx.beginPath();
 
   // x&y for arc is the center of circle
   if (Array.isArray(pos)) {
-    for (let i=0;i<pos.length;i++) {
-      ctx.arc(pos[i].x, pos[i].y, radius, 0, 2 * Math.PI);
-    }
+    pos.forEach(p => {
+      ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
+    });
   } else {
-    ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+    const p = pos as Points.Point;
+    ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
   }
 
-  if (filled) ctx.fill();
-  if (outlined) ctx.stroke();
+  if (opts.filled || !opts.outlined) ctx.fill();
+  if (opts.outlined) ctx.stroke();
 
-  ds.clear();
 };
 
 export const bezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier|Beziers.CubicBezier, opts?: DrawingOpts) => {
@@ -272,12 +257,13 @@ export const bezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Quad
 };
 
 const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicBezier, opts: DrawingOpts = {}) => {
-  let ds = applyOpts(ctx, opts);
+  // eslint-disable-next-line functional/no-let
+  let stack = applyOpts(ctx, opts);
 
   const {a, b, cubic1, cubic2} = bezierToDraw;
-  const debug = opts.debug ?? false;
+  const isDebug = opts.debug ?? false;
 
-  if (debug) {
+  if (isDebug) {
     // const ss = ctx.strokeStyle;
     // ctx.strokeStyle = ss;
   }
@@ -286,11 +272,12 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
   ctx.bezierCurveTo(cubic1.x, cubic1.y, cubic2.x, cubic2.y, b.x, b.y);
   ctx.stroke();
 
-  if (debug) {
-    ds = ds.push(optsOp({...opts, 
+  if (isDebug) {
+    stack = stack.push(optsOp({...opts, 
       strokeStyle: color2k.transparentize(opts.strokeStyle ?? `silver`, 0.6),
       fillStyle: color2k.transparentize(opts.fillStyle ?? `yellow`, 0.4)}));
 
+    stack.apply();
     ctx.moveTo(a.x, a.y);
     ctx.lineTo(cubic1.x, cubic1.y);
     ctx.stroke();
@@ -298,10 +285,6 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
     ctx.lineTo(cubic2.x, cubic2.y);
     ctx.stroke();
 
-    //const fs = ctx.fillStyle;
-    //const ss = ctx.strokeStyle;
-    //ctx.fillStyle = opts.strokeStyle ?? `gray`;
-    //ctx.strokeStyle = opts.strokeStyle ?? `gray`;
     ctx.fillText(`a`, a.x + 5, a.y);
     ctx.fillText(`b`, b.x + 5, b.y);
     ctx.fillText(`c1`, cubic1.x + 5, cubic1.y);
@@ -311,32 +294,29 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
     dot(ctx, cubic2, {radius: 3});
     dot(ctx, a, {radius: 3});
     dot(ctx, b, {radius: 3});
-    ds = ds.pop();
-
-    //ctx.fillStyle = fs;
-    //ctx.strokeStyle = ss;
+    stack = stack.pop();
+    stack.apply();
   }
 
-  ds.clear();
 };
 
 const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: DrawingOpts = {}) => {
   const {a, b, quadratic} = bezierToDraw;
-  const debug = opts.debug ?? false;
-
-  let ds = applyOpts(ctx, opts);
+  const isDebug = opts.debug ?? false;
+  // eslint-disable-next-line functional/no-let
+  let stack = applyOpts(ctx, opts);
 
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
   ctx.quadraticCurveTo(quadratic.x, quadratic.y, b.x, b.y);
   ctx.stroke();
 
-  if (debug) {
+  if (isDebug) {
     // const fs = ctx.fillStyle;
     // const ss = ctx.strokeStyle;
     // ctx.fillStyle = opts.strokeStyle ?? `gray`;
     // ctx.strokeStyle = opts.strokeStyle ?? `gray`;
-    ds = ds.push(optsOp({...opts, 
+    stack = stack.push(optsOp({...opts, 
       strokeStyle: color2k.transparentize(opts.strokeStyle ?? `silver`, 0.6),
       fillStyle: color2k.transparentize(opts.fillStyle ?? `yellow`, 0.4)}));
     connectedPoints(ctx, [a, quadratic, b]);
@@ -349,23 +329,23 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
     dot(ctx, b, {radius: 3});
     // ctx.fillStyle = fs;
     // ctx.strokeStyle = ss;
-    ds = ds.pop();
+    stack = stack.pop();
+    stack.apply();
   }
 
-  ds.clear();
 };
 
-export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|Lines.Line[], opts: {strokeStyle?: string, debug?: boolean} = {}) => {
-  const debug = opts.debug ?? false;
+export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly Lines.Line[], opts: {readonly strokeStyle?: string, readonly debug?: boolean} = {}) => {
+  const isDebug = opts.debug ?? false;
 
-  const ds = applyOpts(ctx, opts);
+  applyOpts(ctx, opts);
 
   const draw = (d:Lines.Line) => {
     const {a, b} = d;
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);
     ctx.lineTo(b.x, b.y);
-    if (debug) { 
+    if (isDebug) { 
       ctx.fillText(`a`, a.x, a.y);
       ctx.fillText(`b`, b.x, b.y);
       dot(ctx, a, {radius: 5, strokeStyle: `black`});
@@ -375,13 +355,12 @@ export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|Lines.Lin
   };
 
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
-  else draw(toDraw);
+  else draw(toDraw as Lines.Line);
 
-  ds.clear();
 };
 
-export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned|Rects.RectPositioned[], opts: DrawingOpts & {filled?:boolean} = {}) => {
-  const ds = applyOpts(ctx, opts);
+export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned|readonly Rects.RectPositioned[], opts: DrawingOpts & {readonly filled?:boolean} = {}) => {
+  applyOpts(ctx, opts);
 
   const draw = (d:Rects.RectPositioned) => {
     if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
@@ -393,18 +372,15 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned
   };
 
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
-  else draw(toDraw);
-
-  ds.clear();
+  else draw(toDraw as Rects.RectPositioned);
 };
 
-export const textBlock = (ctx:CanvasRenderingContext2D, lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.RectPositioned}) => {
-  const ds = applyOpts(ctx, opts);
+export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[], opts:DrawingOpts & {readonly anchor:Points.Point, readonly anchorPadding?:number, readonly bounds?: Rects.RectPositioned}) => {
+  applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;
 
   const anchor = opts.anchor;
-  let {bounds} = opts;
-  if (bounds === undefined) bounds = {x:0, y:0, width:1000000, height:1000000};
+  const bounds = opts.bounds ?? {x:0, y:0, width:1000000, height:1000000};
 
   // Measure each line
   const blocks = lines.map(l => ctx.measureText(l));
@@ -417,6 +393,7 @@ export const textBlock = (ctx:CanvasRenderingContext2D, lines:string[], opts:Dra
   const maxWidth = Math.max(...widths);
   const totalHeight = heights.reduce((acc, val) => acc+val, 0);
 
+  // eslint-disable-next-line functional/no-let
   let {x, y} = anchor;
 
   if (anchor.x + maxWidth > bounds.width) x = bounds.width - (maxWidth + anchorPadding);
@@ -429,10 +406,8 @@ export const textBlock = (ctx:CanvasRenderingContext2D, lines:string[], opts:Dra
 
   if (y < bounds.y) y = bounds.y + anchorPadding;
 
-  for (let i=0;i<lines.length;i++) {
-    ctx.fillText(lines[i], x, y);
+  lines.forEach((line, i) => {
+    ctx.fillText(line, x, y);
     y += heights[i];
-  }
-
-  ds.clear();
+  });
 };

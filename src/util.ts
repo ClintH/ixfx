@@ -45,8 +45,8 @@ export const clamp = (v: number, min = 0, max = 1) => {
  */
 export const clampZeroBounds = (v: number, length: number) => {
   // ✔ UNIT TESTED
-  if (!Number.isInteger(v)) throw new Error(`v parameter must be an integer`);
-  if (!Number.isInteger(length)) throw new Error(`length parameter must be an integer`);
+  if (!Number.isInteger(v)) throw new Error(`v parameter must be an integer (${v})`);
+  if (!Number.isInteger(length)) throw new Error(`length parameter must be an integer (${length}, ${typeof length})`);
   v = Math.round(v);
   if (v < 0) return 0;
   if (v >= length) return length - 1;

@@ -3,7 +3,8 @@ import {SimpleEventEmitter} from "../Events.js";
 import { ToString, IsEqual, toStringDefault, isEqualDefault } from "../util.js";
 import { addUniqueByHash } from "./Set.js";
 import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter} from './Map.js';
-import { Circular, without } from './Lists.js';
+import {  without } from './Lists.js';
+import {MutableCircularArray, mutableCircularArray} from './MutableCircularArray.js';
 
 export type MapMultiOpts<V> = {
   /**
@@ -333,9 +334,9 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
 export const mutableMapCircular = <V>(opts:MapCircularOpts<V>) => {
   const comparer = isEqualDefault;
 
-  const t:MultiValue<V, Circular<V>> = {
+  const t:MultiValue<V, MutableCircularArray<V>> = {
     add:(dest, values) => {
-      if (dest === undefined) dest = new Circular(opts.capacity);
+      if (dest === undefined) dest = mutableCircularArray<V>(opts.capacity);
       values.forEach(v => dest = dest?.add(v));
       return dest;
     },
@@ -346,5 +347,5 @@ export const mutableMapCircular = <V>(opts:MapCircularOpts<V>) => {
     has: (source, value) => source.find(v => comparer(v, value)) !== undefined,
     without: (source, value) => source.filter(v => !comparer(v, value))
   };
-  return new MutableMapOf<V, Circular<V>>(t, opts);
+  return new MutableMapOf<V, MutableCircularArray<V>>(t, opts);
 };

@@ -42,5 +42,8 @@ export const SIDEBAR = {
 		{ text: 'State Machine', link: 'en/data/stateMachine' },
 		{ text: 'Frequency Histogram', link: 'en/data/freqHistogram' },
 
+		{ text: 'Geometry', header: true },
+		{ text: 'Grid', link: 'en/geometry/grid' },
+
 	],
 };

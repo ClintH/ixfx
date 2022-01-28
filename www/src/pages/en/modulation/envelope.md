@@ -6,30 +6,30 @@ setup: |
   import EnvelopePlay from './Envelope.astro';
 ---
 
-The idea of an envelope is borrowed from [sound synthesis](https://en.wikipedia.org/wiki/Envelope_(music)). Envelopes are useful for modulating a value over time, allowing for more complex dynamics than a simple decay function.
+The notion of an _envelope_ is borrowed from [sound synthesis](https://en.wikipedia.org/wiki/Envelope_(music)). They are useful for modulating a value after an initial trigger, with simple means for describing the shape of the modulation.
 
-## Concept
+## Stages
 
 The envelope consists of a series of stages, typically _attack, decay, sustain_ and _release_. 
-* All stages have an associated _level_ or _amplitude_
-* All of the stages except _sustain_ have a _duration_, how long they run for.
+* All stages have an associated _level_ or _amplitude_. Attack's level is also known as the _initial level_, and decay's level is also known as the _peak level_.
+* All stages except _sustain_ have a _duration_, how long they run for in milliseconds.
 
-When a synth key is pressed, the _attack_ stage runs for its specified duration, after which the _decay_ stage runs. The _sustain_ stage runs for as long as the key is held. At any point when the key is released, the _release_ stage runs.
+When a trigger happens (eg a synth key is pressed), the _attack_ stage runs for its specified duration, after which the _decay_ stage runs. The _sustain_ stage runs for as long as the trigger is held. At any point when the key is released, the _release_ stage runs.
 
-As a stage progresses, it is essentially interpolating from the the starting level to its own. For example, during the attack stage, it might interpolate from 0 (off) to 1 (full on). 
+As a stage progresses, it is essentially interpolating from its start to end point. Internally, each stage is modelled as running from 0 to 1, but this is scaled according to the levels you define. 
 
-In ixfx, interpolation for each stage happens using a curve, allowing for more expressive progressions.
+Envelopes can also loop through the attack, decay and release stages whilst being triggered. In this case, the sustain stage is skipped.
 
-<envelope-editor />
+In ixfx, interpolation for each stage happens using a simple curve, allowing for more expressive progressions with the _bend_ parameter.
+
+<envelope-editor id="envEditor" />
 
 ## Why?
 
 ## Playground
 
-In the playground, you can _trigger_ the envelope, which will then run through its stages. Use _Trigger & Hold_ if you want to have the envelope stop and run the sustain stage. _Release_ will then allow envelope to decay. 
+The playground uses the settings from the envelope editor above. You can _trigger_ the envelope, which will then run through its stages. Use _Trigger & Hold_ if you want to have the envelope hold at the sustain stage. _Release_ allows a held envelope to continue on to the release stage. 
 
 <EnvelopePlay />
-
-In the visualisation above, progress through each stage is shown in red. Progress starts at 0 and runs through to 1. The same number is shown in the log as the 'raw' value. In yellow the computed scaled value of the envelope is shown. This would be the value you'd normally use.
 
 ## Usage 

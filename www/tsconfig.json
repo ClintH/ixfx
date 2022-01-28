@@ -4,12 +4,12 @@
     "module": "esnext",
     "jsx": "preserve",
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "~/*": [
         "../src/*"
       ]
     }
-  },
-  "moduleResolution": "node"
+  }
 }

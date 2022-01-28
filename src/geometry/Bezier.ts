@@ -37,8 +37,8 @@ export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier):
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.
  * Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve
- * @param {Points.Point} start Start of curbe
- * @param {Points.Point} end End of curbe
+ * @param {Points.Point} start Start of curve
+ * @param {Points.Point} end End of curve
  * @param {number} [bend=0] Bend amount, -1 to 1
  * @returns {QuadraticBezier}
  */

@@ -1,4 +1,4 @@
-import * as Lists from '../collections/Lists.js';
+import { MutableCircularArray } from '../collections/MutableCircularArray.js';
 import {getMinMaxAvg} from '../util.js';
 import {BasePlot} from './BasePlot.js';
 
@@ -12,7 +12,7 @@ import {BasePlot} from './BasePlot.js';
  * @extends {BaseGraph}
  */
 export class Plot extends BasePlot {
-  buffer: Lists.Circular<number>;
+  buffer: MutableCircularArray<number>;
   readonly samples: number;
   color = `silver`;
   lineWidth = 3;
@@ -20,7 +20,7 @@ export class Plot extends BasePlot {
   constructor(canvasEl: HTMLCanvasElement, samples = 10) {
     super(canvasEl);
     if (samples <= 0) throw new Error(`samples must be greater than zero`);
-    this.buffer = new Lists.Circular(samples);
+    this.buffer = new MutableCircularArray<number>(samples);
     this.samples = samples;
   }
 
@@ -32,11 +32,14 @@ export class Plot extends BasePlot {
     const range = this.pushScale(min, max);
     const lineWidth = plotWidth / dataLength;
 
+    // eslint-disable-next-line functional/no-let
     let x = this.plotPadding;
     if (this.showScale) x += 25;
     g.beginPath();
     g.lineWidth = lineWidth;
     g.strokeStyle = this.color;
+
+    // eslint-disable-next-line functional/no-loop-statement, functional/no-let
     for (let i = 0; i < dataLength; i++) {
       const y = this.map(d[i], this.scaleMin, this.scaleMax, plotHeight, 0) + this.plotPadding;
       if (i === 0) {
@@ -55,7 +58,7 @@ export class Plot extends BasePlot {
   }
 
   clear() {
-    this.buffer = new Lists.Circular(this.samples);
+    this.buffer = new MutableCircularArray<number>(this.samples);
     this.repaint();
   }
 

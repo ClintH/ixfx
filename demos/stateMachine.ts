@@ -6,7 +6,7 @@ import {checkbox, button, select} from '../src/dom/Forms.js';
 import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '../src/StateMachine.js';
 import { FrequencyHistogramPlot} from '../src/visualisation/FrequencyHistogramPlot';
 
-const log = domLog(`dataStream`, {truncateEntries: 8, timestamp: false});
+const log = domLog(`dataStream`, {capacity: 8, timestamp: false});
 
 let currentSm:StateMachine|undefined;
 const demoMachines = {
@@ -36,15 +36,15 @@ const selInitialStates = select(`#selDescrInitial`);
 const selPossibleNext = select(`#selPossibleNext`, undefined, { placeholderOpt: `-- Auto --`, autoSelectAfterChoice:0 });
 
 const selDemoMachines = select(`#selDemoMachines`, (newVal:string) => {
-  let md = demoMachines[newVal];
-  txtDescr.innerText = JSON.stringify(md.description, undefined, 2);
+  let md = (demoMachines as any)[newVal];
+  if (txtDescr !== null) txtDescr.innerText = JSON.stringify(md.description, undefined, 2);
   selInitialStates.setOpts(Object.keys(md.description), md.initialState);
-}, { placeholderChoose:true, autoSelectAfterChoice:0 });
+}, { shouldAddChoosePlaceholder:true, autoSelectAfterChoice:0 });
 selDemoMachines.setOpts(Object.keys(demoMachines));
 
 const btnSetDescr = button(`#btnSetDescr`, () => {
   try {
-    const description = JSON.parse(txtDescr.innerText);
+    const description = txtDescr == null ? {} : JSON.parse(txtDescr.innerText!);
     const initial = selInitialStates.value;
     const sm = create(initial, description);
     if (currentSm) {
@@ -55,7 +55,7 @@ const btnSetDescr = button(`#btnSetDescr`, () => {
     log.clear();
   } catch (ex) {
     console.error(ex);
-    log.error(ex.message);
+    log.error(ex);
     update(undefined);
   }
 });

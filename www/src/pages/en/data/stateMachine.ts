@@ -3,7 +3,7 @@ import {domLog} from '~/dom/DomLog';
 import {button, select} from '~/dom/Forms';
 import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '~/StateMachine';
 
-const log = domLog(`#dataStream`, {truncateEntries: 8, timestamp: false});
+const log = domLog(`#dataStream`, {capacity: 8, timestamp: false});
 
 let currentSm:StateMachine|undefined;
 const demoMachines = {
@@ -64,7 +64,7 @@ const selDemoMachines = select(`#selDemoMachines`, (newVal:string) => {
   let md = demoMachines[newVal];
   txtDescr.innerText = JSON.stringify(md.description, undefined, 2);
   selInitialStates.setOpts(Object.keys(md.description), md.initialState);
-}, { placeholderChoose:true, autoSelectAfterChoice:0 });
+}, { shouldAddChoosePlaceholder:true, autoSelectAfterChoice:0 });
 
 // Assign list of demo machines
 selDemoMachines.setOpts(Object.keys(demoMachines));

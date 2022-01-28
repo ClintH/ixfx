@@ -1,8 +1,8 @@
 /* eslint-disable */
-import * as Lists from '../../collections/Lists.js';
+import {mutableCircularArray}  from '../../collections/MutableCircularArray.js';
 
 test(`circular`, () => {
-  const a = new Lists.Circular(5);
+  const a = mutableCircularArray(5);
   const b = a.add(`test`);
   let c = b;
   for (let i = 0; i < 15; i++) {

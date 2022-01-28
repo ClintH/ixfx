@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {SimpleEventEmitter} from "../Events.js";
 import {msRelativeTimer, Timer, TimerSource} from "../Timer.js";
 import { StateMachine, fromList as descriptionFromList } from "../StateMachine.js";
@@ -6,16 +5,17 @@ import {Path} from "~/geometry/Path.js";
 import * as Bezier from '../geometry/Bezier.js';
 
 export const defaultAdsrOpts = ():AdsrOpts => ({
-  attackBend: 0,
-  decayBend: 0,
-  releaseBend: 0,
+  attackBend: -1,
+  decayBend: -.3,
+  releaseBend: -.3,
   peakLevel: 1,
   initialLevel: 0,
-  sustainLevel: 0.75,
+  sustainLevel: 0.6,
   releaseLevel: 0,
-  attackDuration: 100,
+  attackDuration: 600,
   decayDuration: 200,
-  releaseDuration: 500
+  releaseDuration: 800,
+  shouldLoop: false
 });
 
 export type AdsrOpts = AdsrBaseOpts & {
@@ -24,27 +24,27 @@ export type AdsrOpts = AdsrBaseOpts & {
    *
    * @type {number} Bend from -1 to 1. 0 for a straight line
    */
-   readonly attackBend?: number
+   readonly attackBend: number
   /**
    * Decay bezier 'bend'
    *
    * @type {number} Bend from -1 to 1. 0 for a straight line
    */
-   readonly decayBend?: number
+   readonly decayBend: number
   /**
    * Release bezier 'bend'
    *
    * @type {number} Bend from -1 to 1. 0 for a straight line
    */
-   readonly releaseBend?: number
+   readonly releaseBend: number
 
-   readonly peakLevel?:number
+   readonly peakLevel:number
 
-   readonly initialLevel?:number
+   readonly initialLevel:number
  
-   readonly sustainLevel?:number
+   readonly sustainLevel:number
 
-   readonly releaseLevel?:number
+   readonly releaseLevel:number
 }
 
 export type AdsrBaseOpts = {
@@ -53,32 +53,26 @@ export type AdsrBaseOpts = {
    *
    * @type {boolean}
    */
-  readonly shouldLoop?: boolean
+  readonly shouldLoop: boolean
 
-  /**
-    * Duration for delay stage
-    * Unit depends on timer source
-    * @type {number}
-    */
-  readonly delayDuration?: number,
   /**
    * Duration for attack stage
    * Unit depends on timer source
    * @type {number}
    */
-  readonly attackDuration?: number,
+  readonly attackDuration: number,
   /**
    * Duration for decay stage
    * Unit depends on timer source
    * @type {number}
    */
-  readonly decayDuration?: number,
+  readonly decayDuration: number,
   /**
    * Duration for release stage
    * Unit depends on timer source
    * @type {number}
    */
-  readonly releaseDuration?: number
+  readonly releaseDuration: number
 }
 
 export interface StateChangeEvent {
@@ -86,16 +80,13 @@ export interface StateChangeEvent {
   readonly priorState: string
 }
 
-export interface CompleteEvent {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CompleteEvent { /* no-op */}
 
 type Events = {
   readonly change: StateChangeEvent
   readonly complete: CompleteEvent
 };
-
-
 
 class AdsrBase extends SimpleEventEmitter<Events> {
   readonly #sm:StateMachine;
@@ -136,23 +127,26 @@ class AdsrBase extends SimpleEventEmitter<Events> {
 
   switchState() {
     if (this.#timer === undefined) return;
+    // eslint-disable-next-line functional/no-let
     let elapsed = this.#timer.elapsed();
 
     // Change through states for as long as needed
-    let changed = false;
+    // eslint-disable-next-line functional/no-let
+    let hasChanged = false;
+    // eslint-disable-next-line functional/no-loop-statement
     do {
-      changed = false;
+      hasChanged = false;
       switch (this.#sm.state) {
       case `attack`:
         if (elapsed > this.attackDuration) {
           this.#sm.next();
-          changed = true;
+          hasChanged = true;
         }
         break;
       case `decay`:
         if (elapsed > this.decayDurationTotal) {
           this.#sm.next();
-          changed = true;
+          hasChanged = true;
         }
         break;
       case `sustain`:
@@ -160,30 +154,31 @@ class AdsrBase extends SimpleEventEmitter<Events> {
           elapsed = 0;
           this.#timer?.reset();
           this.#sm.next();
-          changed = true;
+          hasChanged = true;
         }
         break;
       case `release`:
         if (elapsed > this.releaseDuration) {
           this.#sm.next();
-          changed = true;
-        }      
+          hasChanged = true;
+        }
+        break;
       case `complete`:
         if (this.shouldLoop) {
           this.trigger(this.#holdingInitial);
         }
       }
-    } while (changed); 
+    } while (hasChanged); 
   }
 
-  computeRaw():[stage:string|undefined,amount:number] {
+  computeRaw():[stage:string|undefined, amount:number] {
     if (this.#timer === undefined) return [undefined, 0];
   
-    
     // Change state if necessary based on elapsed time
     this.switchState();
-    let elapsed = this.#timer.elapsed();
     
+    const elapsed = this.#timer.elapsed();
+    // eslint-disable-next-line functional/no-let
     let relative = 0;
     const state = this.#sm.state;
     switch (state) {
@@ -250,33 +245,46 @@ class Adsr extends AdsrBase {
     this.decayBend = opts.decayBend ?? 0;
 
     const max = 1;
-    this.attackPath = Bezier.toPath(Bezier.quadraticSimple({x: 0, y: this.initialLevel}, {x: max, y: this.peakLevel}, this.attackBend));
-    this.decayPath = Bezier.toPath(Bezier.quadraticSimple({x: 0, y: this.peakLevel}, {x: max, y: this.sustainLevel}, this.decayBend));
-    this.releasePath = Bezier.toPath(Bezier.quadraticSimple({x: 0, y: this.sustainLevel}, {x: max, y: 0}, this.releaseBend));
+    this.attackPath = Bezier.toPath(Bezier.quadraticSimple(
+      {x: 0, y: this.initialLevel}, 
+      {x: max, y: this.peakLevel}, 
+      -this.attackBend
+    ));
+    this.decayPath = Bezier.toPath(Bezier.quadraticSimple(
+      {x: 0, y: this.peakLevel}, 
+      {x: max, y: this.sustainLevel}, 
+      -this.decayBend
+    ));
+    this.releasePath = Bezier.toPath(Bezier.quadraticSimple(
+      {x: 0, y: this.sustainLevel},
+      {x: max, y: this.releaseLevel}, 
+      -this.releaseBend
+    ));
   }
 
   compute():[stage:string|undefined, scaled:number, raw:number] {
     const [stage, amt] = super.computeRaw();
     if (stage === undefined) return [undefined, NaN, NaN];
+    // eslint-disable-next-line functional/no-let
     let v;
     switch (stage) {
-      case `attack`:
-        v = this.attackPath.compute(amt);
-        break;
-      case `decay`:
-        v = this.decayPath.compute(amt);
-        break;
-      case `sustain`:
-        v = {x:1, y:this.sustainLevel};
-        break;
-      case `release`:
-        v = this.releasePath.compute(amt);
-        break;
-      case `complete`:
-        v = {x:1, y: this.releaseLevel};
-        break;
-      default:
-        throw new Error(`Unknown state: ${stage}`);
+    case `attack`:
+      v = this.attackPath.compute(amt);
+      break;
+    case `decay`:
+      v = this.decayPath.compute(amt);
+      break;
+    case `sustain`:
+      v = {x:1, y:this.sustainLevel};
+      break;
+    case `release`:
+      v = this.releasePath.compute(amt);
+      break;
+    case `complete`:
+      v = {x:1, y: this.releaseLevel};
+      break;
+    default:
+      throw new Error(`Unknown state: ${stage}`);
     }
 
     return [stage, v.y, amt];

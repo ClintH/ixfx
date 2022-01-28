@@ -19,15 +19,17 @@ import {Palette} from '../../src/colour/Palette.js';
 
 const envDataLog = domLog(`envDataStream`);
 
-const opts:Envelopes.AdsrOpts = {
+const opts:Envelopes.AdsrOpts =  {
+  ...Envelopes.defaultAdsrOpts(),
   attackBend: 1,
   decayBend: -1,
-  releaseBend: 1
+  releaseBend: 1,
+
 }
 const env = Envelopes.adsr(opts);
 
 env.addEventListener(`change`, ev => {
-  button(`#btnRelease`).enable(ev.newState === `sustain`);
+  button(`#btnRelease`).disabled = ev.newState !== `sustain`;
 });
 // type EventSource = {
 //   addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
