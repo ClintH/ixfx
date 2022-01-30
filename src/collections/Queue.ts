@@ -186,10 +186,17 @@ export const queue = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V
   return new Queue(opts, [...startingItems]); // Make a copy of array so it can't be modified
 };
 
+export type MutableQueue<V> = {
+  //eslint-disable-next-line functional/no-method-signature
+  get isEmpty ():boolean
+  readonly dequeue: () => V|undefined
+  readonly enqueue: (...toAdd:ReadonlyArray<V>) => number
+}
+
 // -------------------------------
 // Mutable
 // -------------------------------
-class MutableQueue<V> {
+class MutableQueueImpl<V> implements MutableQueue<V> {
   readonly opts: QueueOpts;
   // eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V>;
@@ -250,4 +257,4 @@ class MutableQueue<V> {
  * @param {QueueOpts} [opts={}]
  * @param {...ReadonlyArray<V>} startingItems
  */
-export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>) => new MutableQueue({...opts}, [...startingItems]);
+export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>):MutableQueue<V> => new MutableQueueImpl({...opts}, [...startingItems]);

@@ -38,12 +38,31 @@ export const SIDEBAR = {
 		{ text: 'Introduction', link: 'en/modulation/' },
 		{ text: 'Envelope', link: 'en/modulation/envelope' },
 
+		{ text: 'Collections', header: true },
+		{ text: 'Circular Array', link: 'en/data/circularArray' },
+		{ text: 'Set', link: 'en/data/circularArray' },
+		{ text: 'Queue', link: 'en/data/circularArray' },
+		{ text: 'Stack', link: 'en/data/circularArray' },
+		{ text: 'MapOf', link: 'en/data/circularArray' },
+
+		
 		{ text: 'Data', header: true },
 		{ text: 'State Machine', link: 'en/data/stateMachine' },
 		{ text: 'Frequency Histogram', link: 'en/data/freqHistogram' },
 
 		{ text: 'Geometry', header: true },
+		{ text: 'Point', link: 'en/geometry/point' },
+		{ text: 'Line', link: 'en/geometry/line' },
+		{ text: 'Arcs & Circles', link: 'en/geometry/circle' },
+		{ text: 'Rectangle', link: 'en/geometry/rectangle' },
+		{ text: 'Curve', link: 'en/geometry/curve' },
+		{ text: 'Paths', link: 'en/geometry/compound' },
 		{ text: 'Grid', link: 'en/geometry/grid' },
+
+		{ text: 'Visualisation', header: true },
+		{ text: 'Drawing', link: 'en/visualisation/drawing' },
+		{ text: 'Plot', link: 'en/visualisation/drawing' },
+
 
 	],
 };

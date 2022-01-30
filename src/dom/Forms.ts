@@ -34,6 +34,27 @@ export const checkbox = (domIdOrEl: string | HTMLInputElement, onChanged?:(curre
   };
 };
 
+
+export const numeric = (domIdOrEl: string | HTMLInputElement, onChanged?:(currentVal:number) => void) => {
+  const el = resolveEl<HTMLInputElement>(domIdOrEl) as HTMLInputElement;
+
+  if (onChanged) {
+    el.addEventListener(`change`, () => {
+      onChanged(parseInt(el.value));
+    });
+  }
+  return {
+    get value():number  {
+      return parseInt(el.value);
+    },
+    set checked(val:number) {
+      // eslint-disable-next-line functional/immutable-data
+      el.value = val.toString();
+    }
+  };
+};
+
+
 export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);

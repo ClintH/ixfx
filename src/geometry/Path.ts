@@ -4,6 +4,7 @@ import * as Rects from './Rect.js';
 import * as Beziers from './Bezier.js';
 import * as Lines from  './Line.js';
 
+//eslint-disable-next-line  functional/no-mixed-type
 export type Path = {
   length(): number
   /**
@@ -16,27 +17,33 @@ export type Path = {
   bbox(): Rects.RectPositioned
   toString(): string
   toSvgString(): string
-  kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
+  readonly kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
 }
-
+/**
+ * Return the start point of a path
+ *
+ * @param {Path} path
+ * @return {*}  {Point}
+ */
 export const getStart = function (path: Path): Point {
   if (Beziers.isQuadraticBezier(path)) return path.a;
   else if (Lines.isLine(path)) return path.a;
   else throw new Error(`Unknown path type ${JSON.stringify(path)}`);
 };
 
-
+/**
+ * Return the end point of a path
+ *
+ * @param {Path} path
+ * @return {*}  {Point}
+ */
 export const getEnd = function (path: Path): Point {
   if (Beziers.isQuadraticBezier(path)) return path.b;
   else if (Lines.isLine(path)) return path.b;
   else throw new Error(`Unknown path type ${JSON.stringify(path)}`);
 };
-// export const getEnd = function (path: Path): Point {
-//   const p = path as any;
-//   if (p.a && p.b) return p.b as Point;
-//   throw Error(`Cannot get end for path`);
-// };
 
 export type WithBeziers = {
-  getBeziers(): Path[]
+  //eslint-disable-next-line  functional/no-method-signature
+  getBeziers(): readonly Path[]
 };

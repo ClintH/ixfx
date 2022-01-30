@@ -1,5 +1,3 @@
-
-
 //#region Functions by Kees C. Bakker
 
 // Functions by Kees C. Bakker
@@ -10,6 +8,23 @@ export const transformMap = <K, V, R>(
 ) => new Map(
     Array.from(source, v => [v[0], transformer(v[1], v[0])])
   );
+
+/**
+ * Zips together an array of keys and values into an object:
+ * ```js
+ * const o = zipKeyValue([`a`, `b`, `c`], [0, 1, 2])
+ * // Yields: { a: 0, b: 1, c: 2}
+ *```
+  * @template V
+  * @param {Array<string>} keys
+  * @param {ArrayLike<V>} values
+  * @return {*} 
+  */
+export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|undefined>) => {
+  if (keys.length !== values.length) throw new Error(`Keys and values arrays should be same length`);
+  return Object.fromEntries(keys.map((k, i) => [k, values[i]]));
+};
+
 export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {
   const key = grouper(item);
   const val = store.get(key);

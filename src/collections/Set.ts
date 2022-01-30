@@ -19,6 +19,13 @@ export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFun
   return s;
 };
 
+export const mutableStringSet = <V>(keyString: ToString<V> | undefined = undefined) => new MutableStringSetImpl(keyString);
+
+export type MutableStringSet<V> = {
+  readonly add: (item:V) => void
+  readonly has: (item:V) => boolean
+}
+
 /**
  * A mutable set that stores unique items by their value, rather
  * than object reference.
@@ -44,7 +51,7 @@ export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFun
  *  {name: `Barry`, city: `London`}
  *  {name: `Sally`, city: `Bristol`}
  * ];
- * const set = new MutableValueSet(person => {
+ * const set = mutableValueSet(person => {
  *  // Key person objects by name and city (assi)
  *  return `${person.name}-${person.city}`
  * });
@@ -63,7 +70,7 @@ export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFun
  * @class MutableValueSet
  * @template V
  */
-export class MutableStringSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
+class MutableStringSetImpl<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
   // ✔ UNIT TESTED
   /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();

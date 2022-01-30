@@ -1,4 +1,4 @@
-import * as Sets from '../../collections/Set';
+import {mutableStringSet} from '../../collections/Set';
 import {jest} from '@jest/globals';
 
 test(`mutableValueSet`, () => {
@@ -17,7 +17,7 @@ test(`mutableValueSet`, () => {
   type Person = { readonly name: string, readonly city: string }
 
   // Test default JSON
-  const set = new Sets.MutableStringSet();
+  const set = mutableStringSet();
   set.add(...people);
   expect(set.has(barry)).toBeTruthy();
   expect(set.has(sally)).toBeTruthy();
@@ -31,7 +31,7 @@ test(`mutableValueSet`, () => {
   expect(set.delete(sallyMoreProps)).toBeFalsy();
 
   // Test custom key generator
-  const set2 = new Sets.MutableStringSet<Person>(item => (item.name.toLocaleUpperCase() + `-` + item.city.toLocaleUpperCase()));
+  const set2 = mutableStringSet<Person>(item => (item.name.toLocaleUpperCase() + `-` + item.city.toLocaleUpperCase()));
   set2.add(...people);
   expect(set2.has(barry)).toBeTruthy();
   expect(set2.has(sally)).toBeTruthy();
@@ -45,7 +45,7 @@ test(`mutableValueSet`, () => {
   expect(set2.delete(sallyMoreProps)).toBeTruthy();
   
   // Test events
-  const set3 = new Sets.MutableStringSet<string>();
+  const set3 = mutableStringSet<string>();
   const addHandler = jest.fn();
   const clearHandler = jest.fn();
   const deleteHandler = jest.fn();

@@ -5,7 +5,7 @@ setup: |
   import Layout from '../../../layouts/MainLayout.astro';
   import GridVisitorPlay from './GridVisitorPlay.astro';
   import GridDataPlay from './GridDataPlay.astro';
-  import GridSpatialPlay from './GridSpatialPlay.astro';
+  import GridOffsetsPlay from './GridOffsetsPlay.astro';
 ---
 
 A _grid_ is a rectangular area divided by rows and columns into cells of equal size. A bit like a table or spreadsheet. Each cell has an _x,y_ location with _0,0_ being the top-left corner.
@@ -54,7 +54,7 @@ For a given starting cell, it's possible to _visit_ all cells once and only once
 
 <GridVisitorPlay />
 
-Provided visitor functions are: `visitorDepth, visitorBreadth, visitorRandom, visitorRow,` and `visitorColumn`.
+Provided visitor functions are: `visitorDepth, visitorBreadth, visitorRandom, visitorContiguous, visitorRow,` and `visitorColumn`.
 
 ### Usage
 
@@ -69,28 +69,36 @@ for (let cell of visitor) {
 }
 ```
 
-Or for more flexibility, you can manually progress the visitor:
+Or for more flexibility, you can manually progress the visitor using `.next. In the below example, each step through the grid takes 500ms.
+
 ```js
 import { Grids } from 'ixfx/geometry'
-const visitor = Grids.visitorBreadth(shape, {x: 5, y: 5});
 
-// At some other place in your code, call .next whenever you want to move the visitor
-const [cell,done] = visitor.next();
-if (done) { 
-  // Visitor has visited all the cells
-  return;
-} else {
-  // Use cell
-  return cell;
+// Set up visitor once
+const visitor = Grids.visitorBreadth(shape, {x: 5, y: 5});
+const visitorDelayMs = 500;
+
+// Function to call via timeout
+const visit = () => {
+  const [cell,done] = visitor.next();
+  if (done) { 
+    return; // All cells visited
+  } else {
+    // TODO: Do something with `cell`...
+  }
+
+  // Run again after the delay
+  setTimeout(visit, visitorDelayMs);
 }
+setTimeout(visit, visitorDelayMs);
 ```
 
-The visitor can have a map passed in to track what cells have been visited. This is useful if you want to check the status of cells during the visitor's journey.
+The visitor can have an instance of `MutableStringSet` passed in to track what cells have been visited. This is useful if you want to check the status of cells during the visitor's journey.
 
 ```js
-import { Grids } from 'ixfx/geometry'
+import { Grids } from 'ixfx/geometry';
 import { MutableStringSet } from 'ixfx/collections';
-const visited = new MutableStringSet();
+const visited = mutableStringSet();
 const visitor = Grids.visitorRandom(shape, {x: 5, y: 5}, visited);
 
 ...
@@ -99,11 +107,11 @@ if (visited.has(cell)) {
 }
 ```
 
-In the interactive demo above, this technique is used to colour cells differently depending on whether they've been visited or not.
+In the interactive demo above, this technique is used to colour cells differently depending on whether they've been visited.
 
 ## Iterating cells
 
-The `cells` iterator is a simple alternative to the _visitor_ technique if you don't care about how the grid is traversed. This has a lower overhead than the visitor, because it can traverse the grid without having to keep track of every cell it has visited.
+The `cells` iterator is a simple alternative to the _visitor_ technique if you don't care about how the grid is traversed. It has a lower overhead than the visitor because it does not need to keep track of every cell it has visited.
 
 ```js
 for (let cell of Grids.cells(shape)) {
@@ -111,9 +119,57 @@ for (let cell of Grids.cells(shape)) {
 }
 ```
 
-## Spatial relations
+## Offsets
 
-<GridSpatialPlay />
+You can calculate the coordinates of each compass cardinal direction using `offsetCardinals`. It has the following signature:
+
+```js
+offsetCardinals(shape:Grid, origin:Cell, distance:number, boundsLogic:`unbounded` | `undefined`| `stop` | `wrap`): Neighbours
+```
+
+`distance` is how many cells away from origin you want to calculate.
+
+`boundsLogic` determines how coordinates should wrap in the grid. Allowed values are: 
+*  `wrap`: coordinates wrap around the edges of grid to opposite edge
+*  `stop`: coordinates clamp to edge
+*  `undefined`: out-of-grid coordinates are returned as `undefined`
+*  `unbounded`: coordinates are returned without bounds checking
+
+```js
+import { Grids } from 'ixfx/geometry';
+const shape = { rows: 10, cols: 10 };
+const origin = { x: 4, y: 4 };
+const distance = 2;
+const offsets = Grids.offsetCardinals(shape, origin, distance, `wrap`);
+
+// Returns: {
+//  n: {x,y}, ne: {x, y}, nw: {x,y}
+//  s: {x,y}, se: {x,y}, sw: {x,y}
+//  e: {x,y}, w: {x,y}
+//}
+
+const cellAbove = offsets.n // eg. get cell `distance` to the north of `origin`
+```
+
+
+For reference, the `Neighbours` type it returns is:
+
+```typescript
+export type Neighbours = Readonly<{
+  n: Cell|undefined,
+  e: Cell|undefined,
+  s: Cell|undefined,
+  w: Cell|undefined,
+  ne: Cell|undefined,
+  nw: Cell|undefined,
+  se: Cell|undefined,
+  sw: Cell|undefined
+}>
+```
+
+Try different bounds logic and distances:
+
+<GridOffsetsPlay />
 
 ## Mapping to data
 
@@ -171,7 +227,7 @@ Drawing the grid is pretty simple:
 ```js
 import { Grids } from 'ixfx/geometry'
 const ctx = document.getElementById(`myCanvas`).getContext(`2d`);
-const shape = {rows: 100, cols: 100, size: 5};
+const shape = { rows: 100, cols: 100, size: 5 };
 
 for (const cell of Grids.cells(shape)) {
   let rect = Grids.rectangleForCell(cell, shape);
@@ -181,22 +237,22 @@ for (const cell of Grids.cells(shape)) {
 
 To map a grid to pixel coordinates, the cell size (assumed pixels) needs to be provided:
 ```js
-const shape = {rows: 10, cols: 10, size: 5};
+const shape = { rows: 100, cols: 100, size: 5 };
 ```
 
 To get the position and rectangle for a cell:
 
 ```js
-const shape = { rows: 10, cols: 10, size: 10 };
+const shape = { rows: 100, cols: 100, size: 5 };
 
-// Get rectangle for cell at position 5,5
-const rect = rectangleForCell({x: 5, y: 5}, shape); 
-//> { x: 100, y: 100, width: 10, height: 10}
+// Returns { x, y, width, height } for cell at position 5,5
+const rect = rectangleForCell({ x: 5, y: 5 }, shape); 
 ```
 
 Or to go from coordinate to cell:
 
 ```js
+// Convert pointer position to cell coordinate
 const cell = cellAtPoint({evt.offsetX, evt.offsetY}, shape);
 ```
 

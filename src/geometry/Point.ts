@@ -1,22 +1,15 @@
 import * as Rects from "./Rect";
 
-export type Point = {
+export type Point = Readonly<{
   readonly x: number
   readonly y: number
   readonly z?: number
-}
+}>
 
 
-export const toString = (p: Point): string => {
-  if (p.z !== undefined) {
-    return `(${p.x},${p.y},${p.z})`;
-  } else {
-    return `(${p.x},${p.y})`;
-  }
-};
-
-export const compareTo = (compareFn:(a:Point, b:Point)=>Point, ...points:Point[]):Point => {
+export const compareTo = (compareFn:(a:Point, b:Point)=>Point, ...points:readonly Point[]):Point => {
   if (points.length === 0) throw new Error(`No points provided`);
+  //eslint-disable-next-line functional/no-let
   let min = points[0];
   points.forEach(p => {
     min = compareFn(min, p);
@@ -39,9 +32,7 @@ export const guard = (p: Point, name = `Point`) => {
   if (Number.isNaN(p.y)) throw new Error(`Parameter '${name}.y' is NaN`);
 };
 
-//export const isPoint = (p: Point|any): p is Point => (p as Point).x !== undefined;
-
-export const bbox = (...points:Point[]):Rects.RectPositioned => {
+export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {
   const leftMost = compareTo((a, b) => {
     if (a.x < b.x) return a;
     else return b;
@@ -67,24 +58,7 @@ export const bbox = (...points:Point[]):Rects.RectPositioned => {
   return Rects.maxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
 };
 
-// export const bbox = (...points: Point[]): Rects.Rect => {
-//   const x = points.map(p => p.x);
-//   const y = points.map(p => p.y);
-
-//   const xMin = Math.min(...x);
-//   const xMax = Math.max(...x);
-//   const yMin = Math.min(...y);
-//   const yMax = Math.max(...y);
-
-//   return Rects.fromTopLeft(
-//     {x: xMin, y: yMin},
-//     xMax - xMin,
-//     yMax - yMin
-//   );
-// };
-
 export const isPoint = (p: Point|Rects.RectPositioned|Rects.Rect): p is Point => {
-
   if ((p as Point).x === undefined) return false;
   if ((p as Point).y === undefined) return false;
   return true;
@@ -96,7 +70,16 @@ export const isPoint = (p: Point|Rects.RectPositioned|Rects.Rect): p is Point =>
  * @param {Point} p
  * @returns {number[]}
  */
-export const toArray = (p: Point): number[] => ([p.x, p.y]);
+export const toArray = (p: Point): readonly number[] => ([p.x, p.y]);
+
+export const toString = (p: Point): string => {
+  if (p.z !== undefined) {
+    return `(${p.x},${p.y},${p.z})`;
+  } else {
+    return `(${p.x},${p.y})`;
+  }
+};
+
 
 /**
  * Returns true if the two points have identical values
@@ -146,7 +129,7 @@ export const lerp =(amt:number, a:Point, b:Point) => ({x: (1-amt) * a.x + amt * 
  * @param {number} [y]
  * @returns {Point}
  */
-export const from = (xOrArray?: number | number[], y?: number): Point => {
+export const from = (xOrArray?: number | readonly number[], y?: number): Point => {
   if (Array.isArray(xOrArray)) {
     if (xOrArray.length !== 2) throw new Error(`Expected array of length two, got ` + xOrArray.length);
     return Object.freeze({
@@ -154,26 +137,28 @@ export const from = (xOrArray?: number | number[], y?: number): Point => {
       y: xOrArray[1]
     });
   } else {
-    if (xOrArray === undefined) xOrArray =0;
+    if (xOrArray === undefined) xOrArray = 0;
     else if (Number.isNaN(xOrArray)) throw new Error(`x is NaN`);
     if (y === undefined) y = 0;
     else if (Number.isNaN(y)) throw new  Error(`y is NaN`);
-    return Object.freeze({x: xOrArray, y: y});
+    return Object.freeze({x: xOrArray as number, y: y});
   }
 };
 
-export const fromNumbers = (...coords:number[][]|number[]): Point[] => {
+export const fromNumbers = (...coords:readonly ReadonlyArray<number>[]|readonly number[]): readonly Point[] => {
   const pts:Point[] = [];
 
   if (Array.isArray(coords[0])) {
     // [[x,y],[x,y]...]
     (coords as number[][]).forEach(coord => {
       if (!(coord.length % 2 === 0)) throw new Error(`coords array should be even-numbered`);
+      //eslint-disable-next-line  functional/immutable-data
       pts.push(Object.freeze({x: coord[0], y: coord[1]}));    
     });
   } else {
     if (coords.length !== 2) throw new Error(`Expected two elements: [x,y]`);
     // [x,y]
+    //eslint-disable-next-line  functional/immutable-data
     pts.push(Object.freeze({x: coords[0] as number, y: coords[1] as number}));
   }
   return pts;
