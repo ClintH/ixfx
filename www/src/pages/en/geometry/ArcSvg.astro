@@ -1,0 +1,12 @@
+---
+export interface Props {
+  id: string;
+}
+
+const {id} = Astro.props;
+console.log(`testing! ${id}`);
+---
+<link rel="stylesheet" href={Astro.resolve('../../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('./arcSvg.ts')}></script>
+
+<div id={id}>ArcSvg?</div>

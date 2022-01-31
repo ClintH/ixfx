@@ -15,6 +15,9 @@
    *
    */
 
+	--theme-hit-color-light: hsl(350, 70%, 83%);
+	--theme-hit-color: hsl(350, 100%, 83%);
+	
 	--color-base-white: 0, 0%;
 	--color-base-black: 240, 100%;
 	--color-base-gray: 215, 14%;

@@ -16,8 +16,8 @@ export default /** @type {import('astro').AstroUserConfig} */ ({
     `@astrojs/renderer-preact`,
     // Enable the Preact renderer to support Preact JSX components.
     // Enable the React renderer, for the Algolia search component
-    `@astrojs/renderer-react`
-    // `@astrojs/renderer-lit`
+    //`@astrojs/renderer-react`,
+    `@astrojs/renderer-lit`
   ],
   vite: {
     // alias: {
@@ -26,7 +26,7 @@ export default /** @type {import('astro').AstroUserConfig} */ ({
     plugins: [
       tsconfigPaths({root: `../`}), 
       nodeResolve({
-        extensions: ['.js', '.ts']
+        extensions: [`.js`, `.ts`]
       })
     ]
   }

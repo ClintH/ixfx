@@ -1,5 +1,36 @@
 import { Observable, throttleTime } from 'rxjs';
 
+export const createAfter = (sibling:HTMLElement, tagName:string) :HTMLElement => {
+  const el = document.createElement(tagName);
+  sibling.parentElement?.insertBefore(el, sibling.nextSibling);
+  return el;
+};
+
+export const createIn = (parent:HTMLElement, tagName:string) :HTMLElement => {
+  const el = document.createElement(tagName);
+  parent.appendChild(el);
+  return el;
+};
+
+export const themeChangeObservable = (): Observable<readonly MutationRecord[]> => {
+  const o = new Observable<MutationRecord[]>(subscriber => {
+    const ro = new MutationObserver(entries => {
+      subscriber.next(entries);
+    });
+
+    const opts:MutationObserverInit = {
+      attributeFilter: [`class`],
+      attributes: true,      
+    };
+   
+    ro.observe(document.documentElement, opts);
+    return function unsubscribe() {
+      ro.disconnect();
+    };
+  });
+  return o;
+};
+
 export const resizeObservable = (elem: HTMLElement, timeoutMs:number = 1000): Observable<readonly ResizeObserverEntry[]> => {
   const o = new Observable<ResizeObserverEntry[]>(subscriber => {
     const ro = new ResizeObserver(entries => {

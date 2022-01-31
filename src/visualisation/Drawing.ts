@@ -2,7 +2,8 @@ import * as Points from '../geometry/Point.js';
 import * as Paths from '../geometry/Path.js';
 import * as Lines from '../geometry/Line.js';
 import {array as guardArray} from '../Guards.js';
-import * as Circles from '../geometry/Arc.js';
+import * as Circles from '../geometry/Circle.js';
+import * as Arcs from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
 import * as color2k from 'color2k';
@@ -67,7 +68,7 @@ export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rec
     circle(circlesToDraw:Circles.CirclePositioned|Circles.CirclePositioned[], opts:DrawingOpts):void {
       circle(ctx, circlesToDraw, opts);
     },
-    arc(arcsToDraw:Circles.ArcPositioned|Circles.ArcPositioned[], opts:DrawingOpts):void {
+    arc(arcsToDraw:Arcs.ArcPositioned|Arcs.ArcPositioned[], opts:DrawingOpts):void {
       arc(ctx, arcsToDraw, opts);
     },
     textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.RectPositioned}):void {
@@ -96,10 +97,10 @@ const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts = {}):DrawingS
   return stack;
 };
 
-export const arc = (ctx:CanvasRenderingContext2D, arcs:Circles.ArcPositioned|ReadonlyArray<Circles.ArcPositioned>, opts:DrawingOpts = {}) => {
+export const arc = (ctx:CanvasRenderingContext2D, arcs:Arcs.ArcPositioned|ReadonlyArray<Arcs.ArcPositioned>, opts:DrawingOpts = {}) => {
   applyOpts(ctx, opts);
 
-  const draw = (arc:Circles.ArcPositioned) => {
+  const draw = (arc:Arcs.ArcPositioned) => {
     ctx.beginPath();
     ctx.arc(arc.x, arc.y, arc.radius, arc.startRadian, arc.endRadian);
     ctx.stroke();
@@ -107,7 +108,7 @@ export const arc = (ctx:CanvasRenderingContext2D, arcs:Circles.ArcPositioned|Rea
 
   if (Array.isArray(arcs)) {
     arcs.forEach(draw);
-  } else draw(arcs as Circles.ArcPositioned);
+  } else draw(arcs as Arcs.ArcPositioned);
 };
 
 type StackOp = (ctx:CanvasRenderingContext2D) => void

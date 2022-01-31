@@ -4,20 +4,11 @@ import * as MathUtil from './Math.js';
 import {Path} from './Path.js';
 import * as Rects from './Rect.js';
 import {Lines} from '../index.js';
+export const isArc = (p: Arc|number): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 
-const isArc = (p: Circle | Arc): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
-const isCircle = (p: Circle | Points.Point): p is Circle => (p as Circle).radius !== undefined;
-
-export const isPositioned = (p: Circle | Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
-
-export type Circle = {
-  readonly radius: number
-}
-
-export type CirclePositioned = Points.Point & Circle;
-export type CircularPath = Circle & Path & {
-  kind: `circular`
-};
+//const isArc = (p: Circle | Arc): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
+export const isPositioned = (p: Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
+//export const isPositioned = (p: Circle | Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 export type Arc = {
   readonly radius:number
@@ -28,7 +19,7 @@ export type Arc = {
 
 export type ArcPositioned = Points.Point & Arc;
 
-const PIPI = Math.PI *2;
+const piPi = Math.PI *2;
 
 export const arcFrom = (radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point): Arc|ArcPositioned => {
   const a = {
@@ -46,26 +37,7 @@ export const arcFrom = (radius:number, startDegrees:number, endDegrees:number, o
   } else return Object.freeze(a);
 };
 
-/**
- * Returns a point on a circle at a specified angle in radians
- * @param {(Circle|CirclePositioned)} circle
- * @param {number} angleRadian Angle in radians
- * @param {Point} [origin] Origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
- * @returns {Point}
- */
-export const pointOnCircle = (circle:Circle|CirclePositioned, angleRadian:number, origin?:Points.Point): Points.Point => {
-  if (origin === undefined) {
-    if (isPositioned(circle)) {
-      origin = circle;
-    } else {
-      origin = {x:0, y:0};
-    }
-  }
-  return {
-    x: (Math.cos(angleRadian) * circle.radius) + origin.x,
-    y: (Math.sin(angleRadian) * circle.radius) + origin.y
-  };
-};
+
 /**
  * Returns a Line from start to end point of arc
  *
@@ -95,85 +67,97 @@ export const pointOnArc = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Po
 };
 
 
-const guard = (circleOrArc:CirclePositioned|Circle|Arc|ArcPositioned) => {
-  if (isPositioned(circleOrArc)) {
-    guardPoint(circleOrArc, `circleOrArc`);
+export const guard = (arc:Arc|ArcPositioned) => {
+  if (isPositioned(arc)) {
+    guardPoint(arc, `arc`);
   }
-
-  if (Number.isNaN(circleOrArc.radius)) throw new Error(`Radius is NaN`);
-  if (circleOrArc.radius <= 0) throw new Error(`Radius must be greater than zero`);
-
-  if (isArc(circleOrArc)) {
-    if(circleOrArc.startRadian >= circleOrArc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
-  }
+  if (typeof arc.radius !== `number`) throw new Error(`Radius must be a number`);
+  if (Number.isNaN(arc.radius)) throw new Error(`Radius is NaN`);
+  if (arc.radius <= 0) throw new Error(`Radius must be greater than zero`);
+  if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
 };
 
-/**
- * Returns a `CircularPath` representation of a circle
- *
- * @param {CirclePositioned} circle
- * @returns {CircularPath}
- */
-export const circleToPath = (circle:CirclePositioned): CircularPath => {
-  guard(circle);
+// const guard = (circleOrArc:CirclePositioned|Circle|Arc|ArcPositioned) => {
+//   if (isPositioned(circleOrArc)) {
+//     guardPoint(circleOrArc, `circleOrArc`);
+//   }
 
-  return Object.freeze({
-    ...circle,
-    /**
-     * Returns a relative (0.0-1.0) point on a circle. 0=3 o'clock, 0.25=6 o'clock, 0.5=9 o'clock, 0.75=12 o'clock etc.
-     * @param {t} Relative (0.0-1.0) point
-     * @returns {Point} X,y
-     */
-    compute: (t:number) => compute(circle, t),
-    bbox:() => bbox(circle),
-    length: () => length(circle),
-    toSvgString: () => `blerg`,
-    kind: `circular`
-  });
-};
+//   if (Number.isNaN(circleOrArc.radius)) throw new Error(`Radius is NaN`);
+//   if (circleOrArc.radius <= 0) throw new Error(`Radius must be greater than zero`);
 
-export const compute = (circleOrArc:ArcPositioned|CirclePositioned, t:number):Points.Point => {
-  if (isArc(circleOrArc)) {
-    return pointOnArc(circleOrArc, circleOrArc.startRadian + ((circleOrArc.endRadian-circleOrArc.startRadian)*t));
-  } else if (isCircle(circleOrArc)) {
-    return pointOnCircle(circleOrArc, t*PIPI);
-  } else throw new Error(`Parameter invalid`);
-};
+//   if (isArc(circleOrArc)) {
+//     if(circleOrArc.startRadian >= circleOrArc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
+//   }
+// };
+
+export const compute = (arc:ArcPositioned, t:number):Points.Point => pointOnArc(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t));
+
+// export const compute = (circleOrArc:ArcPositioned|CirclePositioned, t:number):Points.Point => {
+//   if (isArc(circleOrArc)) {
+//     return pointOnArc(circleOrArc, circleOrArc.startRadian + ((circleOrArc.endRadian-circleOrArc.startRadian)*t));
+//   } else if (isCircle(circleOrArc)) {
+//     return pointOnCircle(circleOrArc, t*PIPI);
+//   } else throw new Error(`Parameter invalid`);
+// };
+
 export const arcToPath = (arc:ArcPositioned): Path => {
   guard(arc);
 
   return Object.freeze({
     ...arc,
     compute:(t:number) => compute(arc, t),
-    bbox:() => bbox(arc),
+    bbox:() => bbox(arc) as Rects.RectPositioned,
     length: () => length(arc),
     toSvgString:() => `blerg`,
     kind: `arc`
   });
 };
 
-export const length = (circleOrArc:Circle|Arc):number => {
-  if (isArc(circleOrArc)) {
-    return PIPI*circleOrArc.radius*((circleOrArc.startRadian-circleOrArc.endRadian)/PIPI);
-  } else if (isCircle(circleOrArc)) {
-    return PIPI*circleOrArc.radius;
-  } else throw new Error(`Invalid parameter`);
-};
+// export const length = (circleOrArc:Circle|Arc):number => {
+//   if (isArc(circleOrArc)) {
+//     return PIPI*circleOrArc.radius*((circleOrArc.startRadian-circleOrArc.endRadian)/PIPI);
+//   } else if (isCircle(circleOrArc)) {
+//     return PIPI*circleOrArc.radius;
+//   } else throw new Error(`Invalid parameter`);
+// };
 
-export const bbox = (circleOrArc:CirclePositioned|ArcPositioned):Rects.RectPositioned => {
-  if (isArc(circleOrArc)) {
-    const middle = compute(circleOrArc, 0.5);
-    const asLine = toLine(circleOrArc);
+export const length = (arc:Arc):number =>  piPi*arc.radius*((arc.startRadian-arc.endRadian)/piPi);
+
+export const bbox = (arc:ArcPositioned|Arc):Rects.RectPositioned|Rects.Rect => {
+  if (isPositioned(arc)) {
+    const middle = compute(arc, 0.5);
+    const asLine = toLine(arc);
     return Points.bbox(middle, asLine.a, asLine.b);
-  } else if (isCircle(circleOrArc)) {
-    return Rects.fromCenter(circleOrArc, circleOrArc.radius*2, circleOrArc.radius*2);
   } else {
-    throw new Error(`Invalid parameter`);
+    return {
+      width: arc.radius*2,
+      height: arc.radius*2
+    };
   }
 };
 
-export const arcToSvg = (origin:Points.Point, radius:number, startAngle:number, endAngle:number) => {
-  const fullCircle = endAngle - startAngle === 360;
+
+// export const bbox = (circleOrArc:CirclePositioned|ArcPositioned):Rects.RectPositioned => {
+//   if (isArc(circleOrArc)) {
+//     const middle = compute(circleOrArc, 0.5);
+//     const asLine = toLine(circleOrArc);
+//     return Points.bbox(middle, asLine.a, asLine.b);
+//   } else if (isCircle(circleOrArc)) {
+//     return Rects.fromCenter(circleOrArc, circleOrArc.radius*2, circleOrArc.radius*2);
+//   } else {
+//     throw new Error(`Invalid parameter`);
+//   }
+// };
+
+export const toSvg = (origin:Points.Point, radiusOrArc:number|Arc, startAngle?:number, endAngle?:number) => {
+  if (isArc(radiusOrArc)) return toSvgFull(origin, radiusOrArc.radius, radiusOrArc.startRadian, radiusOrArc.endRadian);
+  if (startAngle === undefined) throw new Error(`startAngle undefined`);
+  if (endAngle === undefined) throw new Error(`endAngle undefined`);
+  return toSvgFull(origin, radiusOrArc, startAngle, endAngle);
+};
+
+const toSvgFull = (origin:Points.Point, radius:number, startAngle:number, endAngle:number) => {
+  const isFullCircle = endAngle - startAngle === 360;
   const start = MathUtil.polarToCartesian(origin, radius, endAngle - 0.01);
   const end = MathUtil.polarToCartesian(origin, radius, startAngle);
   const arcSweep = endAngle - startAngle <= 180 ? `0` : `1`;
@@ -183,11 +167,14 @@ export const arcToSvg = (origin:Points.Point, radius:number, startAngle:number, 
     `A`, radius, radius, 0, arcSweep, 0, end.x, end.y,
   ];
 
-  if (fullCircle) d.push(`z`);
-  return d.join(` `);
+  //eslint-disable-next-line functional/immutable-data
+  if (isFullCircle) d.push(`z`);
+
+  return d.map(x => x.toString()).join(` `).trim();
 };
 
-export const distanceCenter = (a:CirclePositioned|ArcPositioned, b:CirclePositioned|ArcPositioned):number => Points.distance(a, b);
+//export const distanceCenter = (a:CirclePositioned|ArcPositioned, b:CirclePositioned|ArcPositioned):number => Points.distance(a, b);
+export const distanceCenter = (a:ArcPositioned, b:ArcPositioned):number => Points.distance(a, b);
 
 /**
  * Returns true if the two objects have the same values
@@ -196,7 +183,7 @@ export const distanceCenter = (a:CirclePositioned|ArcPositioned, b:CirclePositio
  * @param {CirclePositioned} b
  * @returns {boolean}
  */
-export const isEquals = (a:CirclePositioned|Circle|Arc|ArcPositioned, b:CirclePositioned|Circle|Arc|ArcPositioned):boolean => {
+export const isEquals = (a:Arc|ArcPositioned, b:Arc|ArcPositioned):boolean => {
   if (a.radius !== b.radius) return false;
 
   if (isPositioned(a) && isPositioned(b)) {
@@ -208,78 +195,8 @@ export const isEquals = (a:CirclePositioned|Circle|Arc|ArcPositioned, b:CirclePo
     // no-op
   } else return false; // one is positioned one not
 
-  if (isArc(a) && isArc(b)) {
-    if (a.endRadian !== b.endRadian) return false;
-    if (a.startRadian !== b.startRadian) return false;
-  } else if (!isArc(a) && !isArc(b)) {
-    // no-op
-  } else return false; // one is an arc, one not
-  return false;
+  if (a.endRadian !== b.endRadian) return false;
+  if (a.startRadian !== b.startRadian) return false;
+  return true;
 };
 
-/**
- * Returns true if `b` is contained by `a`
- *
- * @param {CirclePositioned} a
- * @param {CirclePositioned} b
- * @returns {boolean}
- */
-export const isContainedBy = (a:CirclePositioned, b:CirclePositioned):boolean => {
-  const d = distanceCenter(a, b);
-  return (d < Math.abs(a.radius - b.radius));
-};
-
-/**
- * Returns true if a or b overlap or are equal
- * 
- * Use `intersections` to find the points of intersection
- *
- * @param {CirclePositioned} a
- * @param {CirclePositioned} b
- * @returns {boolean}
- */
-export const isIntersecting = (a:CirclePositioned, b:CirclePositioned):boolean => {
-  if (isEquals(a, b)) return true;
-  if (isContainedBy(a, b)) return true;
-  return intersections(a, b).length === 2;
-};
-
-/**
- * Returns the points of intersection betweeen `a` and `b`.
- * 
- * Returns an empty array if circles are equal, one contains the other or if they don't touch at all.
- *
- * @param {CirclePositioned} a Circle
- * @param {CirclePositioned} b Circle
- * @returns {Points.Point[]} Points of intersection, or an empty list if there are none
- */
-export const intersections = (a:CirclePositioned, b:CirclePositioned):Points.Point[] => {
-  const vector = Points.diff(b, a);
-  const centerD = Math.sqrt((vector.y*vector.y) + (vector.x*vector.x));
-
-  // Do not intersect
-  if (centerD > a.radius + b.radius) return [];
-
-  // Circle contains another
-  if (centerD < Math.abs(a.radius - b.radius)) return [];
-
-  // Circles are the same
-  if (isEquals(a, b)) return [];
-
-  const centroidD = ((a.radius*a.radius) - (b.radius*b.radius) + (centerD*centerD)) / (2.0 * centerD);
-  const centroid = {
-    x: a.x + (vector.x * centroidD / centerD),
-    y: a.y + (vector.y * centroidD / centerD)
-  };
-
-  const centroidIntersectionD = Math.sqrt((a.radius*a.radius) - (centroidD*centroidD));
-
-  const intersection =  {
-    x: -vector.y * (centroidIntersectionD/centerD),
-    y: vector.x * (centroidIntersectionD/centerD)
-  };
-  return [
-    Points.sum(centroid, intersection),
-    Points.diff(centroid, intersection)
-  ];
-};

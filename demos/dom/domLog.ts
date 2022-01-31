@@ -1,12 +1,13 @@
-import { domLog, DomLogOpts } from "../../src/dom/DomLog";
+/* eslint-disable */
+import { DomLog, domLog, DomLogOpts } from "../../src/dom/DomLog";
 import {checkbox} from '../../src/dom/Forms';
 
-let logger;
+let logger:DomLog;
 let intervalId = 0;
 
 const create = (opts:DomLogOpts) => {
   if (logger !== undefined) logger.dispose();
-  opts.truncateEntries = 10;
+  opts = {...opts, capacity: 10};
   return domLog(`log`, opts);
 };
 logger = create({});
@@ -47,9 +48,9 @@ const clear = () => {
 };
 
 
-document.getElementById(`btnStart`).addEventListener(`click`, start);
-document.getElementById(`btnStop`).addEventListener(`click`, stop);
-document.getElementById(`btnClear`).addEventListener(`click`, clear);
+document.getElementById(`btnStart`)?.addEventListener(`click`, start);
+document.getElementById(`btnStop`)?.addEventListener(`click`, stop);
+document.getElementById(`btnClear`)?.addEventListener(`click`, clear);
 checkbox(`chkTimestamps`, (val) => {
   logger = create({timestamp: val});
 });

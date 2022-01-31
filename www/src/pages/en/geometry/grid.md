@@ -255,6 +255,3 @@ Or to go from coordinate to cell:
 // Convert pointer position to cell coordinate
 const cell = cellAtPoint({evt.offsetX, evt.offsetY}, shape);
 ```
-
-
-

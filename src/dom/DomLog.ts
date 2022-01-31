@@ -12,7 +12,7 @@ export type DomLogOpts = {
 export type DomLog = Readonly<{
   clear():void
   error(msgOrError:string|Error|unknown):void
-  log(msg?:string):void
+  log(msg?:string|object|number):void
   append(el:HTMLElement):void
   dispose():void
 }>
@@ -126,11 +126,12 @@ export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}
     lastLogRepeats = 0;
   };
 
+  //eslint-disable-next-line functional/no-let
   let lastLogTime = 0;
   const log = (whatToLog: unknown = ``) => {
     // eslint-disable-next-line functional/no-let
     let msg:string|undefined;
-    let interval = window.performance.now() - lastLogTime;
+    const interval = window.performance.now() - lastLogTime;
     if (opts.minIntervalMs && interval < opts.minIntervalMs) return;
     lastLogTime = window.performance.now();
 

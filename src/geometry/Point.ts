@@ -24,12 +24,15 @@ export const distance = (a:Point, b:Point):number => {
 };
 
 export const guard = (p: Point, name = `Point`) => {
-  if (p === undefined) throw new Error(`Parameter '${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-  if (p === null) throw new Error(`Parameter '${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
-  if (p.x === undefined) throw new Error(`Parameter '${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-  if (p.y === undefined) throw new Error(`Parameter '${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-  if (Number.isNaN(p.x)) throw new Error(`Parameter '${name}.x' is NaN`);
-  if (Number.isNaN(p.y)) throw new Error(`Parameter '${name}.y' is NaN`);
+  if (p === undefined) throw new Error(`'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (p === null) throw new Error(`'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (p.x === undefined) throw new Error(`'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (p.y === undefined) throw new Error(`'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
+  if (typeof p.x !== `number`) throw new Error(`'${name}.x' must be a number`);
+  if (typeof p.y !== `number`) throw new Error(`'${name}.y' must be a number`);
+ 
+  if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
+  if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
 };
 
 export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {

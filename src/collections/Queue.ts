@@ -191,6 +191,14 @@ export type MutableQueue<V> = {
   get isEmpty ():boolean
   readonly dequeue: () => V|undefined
   readonly enqueue: (...toAdd:ReadonlyArray<V>) => number
+  //eslint-disable-next-line functional/no-method-signature
+  get peek():V|undefined
+  //eslint-disable-next-line functional/no-method-signature
+  get length():number
+  //eslint-disable-next-line functional/no-method-signature
+  get isFull():boolean
+  //eslint-disable-next-line functional/no-method-signature
+  get data():readonly V[]
 }
 
 // -------------------------------

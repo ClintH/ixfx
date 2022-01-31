@@ -26,6 +26,19 @@ export const guard = (l:Line, paramName:string = `line`) => {
   if (l.b === undefined) throw new Error(`${paramName}.b undefined. Expected {a:Point, b:Point}`);
 };
 
+export const angleRadian = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => {
+  //eslint-disable-next-line functional/no-let
+  let a:Points.Point;
+  if (isLine(lineOrPoint)) {
+    a = lineOrPoint.a;
+    b = lineOrPoint.b;
+  } else {
+    a = lineOrPoint;
+    if (b === undefined) throw new Error(`b point must be provided`);
+  }
+  return Math.atan2(b.y - a.y, b.x - a.x);
+};
+
 export const withinRange = (l:Line, p:Points.Point, maxRange:number):boolean =>  {
   // if (typeof maxRange === `number`) {
   //   maxRange = {x:maxRange, y:maxRange};
@@ -38,6 +51,7 @@ export const withinRange = (l:Line, p:Points.Point, maxRange:number):boolean => 
 };
 
 export const length = (aOrLine: Points.Point|Line, b?: Points.Point): number => {
+  //eslint-disable-next-line functional/no-let
   let a;
   if (isLine(aOrLine)) {
     b = aOrLine.b;
@@ -64,12 +78,53 @@ export const nearest = (line:Line, p:Points.Point): Points.Point => {
   const atob = { x: b.x - a.x, y: b.y - a.y };
   const atop = { x: p.x - a.x, y: p.y - a.y };
   const len = atob.x * atob.x + atob.y * atob.y;
+  //eslint-disable-next-line functional/no-let
   let dot = atop.x * atob.x + atop.y * atob.y;
   const t = Math.min(1, Math.max(0, dot / len));
   dot = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
   return {x: a.x + atob.x * t, y: a.y + atob.y * t};
 };
 
+export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => {
+  //eslint-disable-next-line functional/no-let
+  let a:Points.Point;
+  if (isLine(lineOrPoint)) {
+    //eslint-disable-next-line functional/no-let
+    a = lineOrPoint.a;
+  } else {
+    a = lineOrPoint;
+    if (b === undefined) throw new Error(`b parameter required`);
+  }
+  return (b!.y - a.y) / (b!.x - a.x);
+};
+
+export const extendX = (line:Line, xIntersection:number):Points.Point => {
+  const y = line.a.y + (xIntersection - line.a.x) * slope(line);
+  return {x: xIntersection, y};
+};
+
+/**
+ * Returns a line extended from it's start (`a`) by a specified distance
+ *
+ * ```js
+ * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
+ * const extended = extendFromStart(line, 2);
+ * ```
+ * @param {Line} line
+ * @param {number} distance
+ * @return {*}  {Line}
+ */
+export const extendFromStart = (line:Line, distance:number):Line => {
+  const len = length(line);
+  return Object.freeze({
+    a: line.a,
+    b: Object.freeze({
+      x: line.b.x + (line.b.x - line.a.x) / len * distance,
+      y: line.b.y + (line.b.y - line.a.y) / len * distance,
+    })
+  })
+  ;
+};
 
 export const distance = (l:Line, p:Points.Point):number => {
   guard(l, `l`);
@@ -83,14 +138,6 @@ export const distance = (l:Line, p:Points.Point):number => {
 
   const near = nearest(l, p);
   return length(near, p);
-  
-  const {a, b} = l;
-  let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / lineLength;
-  t = Math.max(0, Math.min(1, t));
-  return length(p, {
-    x: a.x + t * (b.x - a.x),
-    y: a.y + t * (b.y - a.y)
-  });
 };
 
 export const compute = (a: Points.Point, b: Points.Point, t: number): Points.Point => {
@@ -127,11 +174,11 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  * @param {Point} b
  * @returns {number[]}
  */
-export const toFlatArray = (a: Points.Point, b: Points.Point): number[] =>  [a.x, a.y, b.x, b.y];
+export const toFlatArray = (a: Points.Point, b: Points.Point): readonly number[] =>  [a.x, a.y, b.x, b.y];
 
 export const toSvgString = (a: Points.Point, b: Points.Point): string => `M${a.x} ${a.y} L ${b.x} ${b.y}`;
 
-export const fromArray = (arr: number[]): Line => {
+export const fromArray = (arr: readonly number[]): Line => {
   if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);
   if (arr.length !== 4) throw new Error(`array is expected to have length four`);
   return fromNumbers(arr[0], arr[1], arr[2], arr[3]);
@@ -148,11 +195,14 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   });
 };
 
-export const joinPointsToLines = (...points:Points.Point[]): Line[] => {
+export const joinPointsToLines = (...points:readonly Points.Point[]): readonly Line[] => {
   //if (!(points.length % 2 === 0)) throw new Error(`Points array should be even-numbered`);
   const lines = [];
+  //eslint-disable-next-line functional/no-let
   let start = points[0];
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i=1;i<points.length;i++) {
+    //eslint-disable-next-line functional/immutable-data
     lines.push(fromPoints(start, points[i]));
     start = points[i];
   }
@@ -163,7 +213,7 @@ export const joinPointsToLines = (...points:Points.Point[]): Line[] => {
 export const fromPointsToPath = (a:Points.Point, b:Points.Point): LinePath => toPath(fromPoints(a, b));
 
 export type LinePath = Line & Path & {
-  toFlatArray():number[]
+  toFlatArray():readonly number[]
 }
 
 export const bbox = (line:Line):Rects.RectPositioned =>  Points.bbox(line.a, line.b);

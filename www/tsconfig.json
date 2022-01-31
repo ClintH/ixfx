@@ -5,6 +5,7 @@
     "jsx": "preserve",
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
       "~/*": [

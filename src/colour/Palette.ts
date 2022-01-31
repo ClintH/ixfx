@@ -14,10 +14,19 @@ export class Palette {
   readonly fallbacks:string[];
   #lastFallback = 0;
 
+  #elementBase:Element;
+
   constructor(fallbacks?:string[]) {
     if (fallbacks !== undefined) this.fallbacks = fallbacks;
     else this.fallbacks = [`red`, `blue`, `green`, `orange`];
+    this.#elementBase = document.body;
+
   }
+
+  setElementBase(el:Element) {
+    this.#elementBase = el;
+  }
+
   /**
    * Adds a colour with a given name
    *
@@ -43,7 +52,7 @@ export class Palette {
    * @returns {string}
    * @memberof Palette
    */
-  get(key:string):string {
+  get(key:string, fallback?:string):string {
     const alias =  this.#aliases.get(key);
     if (alias !== undefined) key = alias;
   
@@ -52,15 +61,15 @@ export class Palette {
 
     const varName = `--` + key;
     // eslint-disable-next-line functional/no-let
-    let fromCss = getComputedStyle(document.body).getPropertyValue(varName).trim();
+    let fromCss = getComputedStyle(this.#elementBase).getPropertyValue(varName).trim();
 
+    // Not found
     if (fromCss === undefined || fromCss.length === 0) {
+      if (fallback !== undefined) return fallback;
       fromCss = this.fallbacks[this.#lastFallback];
       this.#lastFallback++;
       if (this.#lastFallback === this.fallbacks.length) this.#lastFallback = 0;
     }
-    // Cache CSS variable
-    this.add(key, fromCss);
     return fromCss;
   }
 
