@@ -1,4 +1,4 @@
-import {Point, guard as guardPoint} from "./Point";
+import {Point, guard as guardPoint} from "./Point.js";
 
 export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees - 90) * (Math.PI / 180.0);
 

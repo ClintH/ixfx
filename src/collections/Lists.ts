@@ -5,9 +5,18 @@ import {IsEqual, isEqualDefault} from '../util.js';
 export {stack, stackMutable, StackOverflowPolicy};
 export {queue, queueMutable, QueueOverflowPolicy};
 
+export const guardArray = (array:ArrayLike<V>, paramName:string = `?`) => {
+  if (array === undefined) throw new Error(`Param '${paramName}' is undefined. Expected array.`);
+  if (array === null) throw new Error(`Param '${paramName}' is null. Expected array.`);
+  if (!Array.isArray(array)) throw new Error(`Param '${paramName}' not an array as expected`);
+};
+
 export const randomIndex = <V>(array: ArrayLike<V>): number => Math.floor(Math.random() * array.length);
 
-export const randomElement = <V>(array: ArrayLike<V>): V => array[Math.floor(Math.random() * array.length)];
+export const randomElement = <V>(array: ArrayLike<V>): V => {
+  guardArray(array, `array`);
+  return array[Math.floor(Math.random() * array.length)];
+};
 
 /**
  * Removes a random item from an array, returning both the item and the new array as a result.

@@ -12,9 +12,9 @@ export const OPEN_GRAPH = {
   twitter: `astrodotbuild`,
 };
 
-export const KNOWN_LANGUAGES = {
-  English: `en`,
-};
+// export const KNOWN_LANGUAGES = {
+//   English: `en`,
+// };
 
 // Uncomment this to add an "Edit this page" button to every page of documentation.
 // export const GITHUB_EDIT_URL = `https://github.com/withastro/astro/blob/main/docs/`;
@@ -29,42 +29,38 @@ export const KNOWN_LANGUAGES = {
 //   apiKey: 'XXXXXXXXXX',
 // }
 
-export const SIDEBAR = {
-  en: [
+export const SIDEBAR = 
+   [
     { text: ``, header: true },
-    { text: `Section Header`, header: true },
-    { text: `Introduction`, link: `en/introduction` },
+    { text: `Docs`, header: true },
+    { text: `Introduction`, link: `introduction` },
     { text: `Modulation`, header: true },
-    { text: `Introduction`, link: `en/modulation/` },
-    { text: `Envelope`, link: `en/modulation/envelope` },
+    { text: `Envelope`, link: `modulation/envelope` },
 
-    { text: `Collections`, header: true },
-    { text: `Circular Array`, link: `en/data/circularArray` },
-    { text: `Set`, link: `en/data/circularArray` },
-    { text: `Queue`, link: `en/data/circularArray` },
-    { text: `Stack`, link: `en/data/circularArray` },
-    { text: `MapOf`, link: `en/data/circularArray` },
+    // { text: `Collections`, header: true },
+    // { text: `Circular Array`, link: `data/circularArray` },
+    // { text: `Set`, link: `data/circularArray` },
+    // { text: `Queue`, link: `data/circularArray` },
+    // { text: `Stack`, link: `data/circularArray` },
+    // { text: `MapOf`, link: `data/circularArray` },
 
-		
+
     { text: `Data`, header: true },
-    { text: `State Machine`, link: `en/data/stateMachine` },
-    { text: `Frequency Histogram`, link: `en/data/freqHistogram` },
+    { text: `State Machine`, link: `data/stateMachine` },
+    { text: `Frequency Histogram`, link: `data/freqHistogram` },
 
     { text: `Geometry`, header: true },
-    { text: `Units`, link: `en/geometry/units` },
-    { text: `Point`, link: `en/geometry/point` },
-    { text: `Line`, link: `en/geometry/line` },
-    { text: `Arc`, link: `en/geometry/arc` },
-    { text: `Circle`, link: `en/geometry/circle` },
-    { text: `Rectangle`, link: `en/geometry/rectangle` },
-    { text: `Curve`, link: `en/geometry/curve` },
-    { text: `Paths`, link: `en/geometry/compound` },
-    { text: `Grid`, link: `en/geometry/grid` },
+    { text: `Units`, link: `geometry/units` },
+    // { text: `Point`, link: `geometry/point` },
+    // { text: `Line`, link: `geometry/line` },
+    { text: `Arc`, link: `geometry/arc` },
+    { text: `Circle`, link: `geometry/circle` },
+    // { text: `Rectangle`, link: `geometry/rectangle` },
+    // { text: `Curve`, link: `geometry/curve` },
+    // { text: `Paths`, link: `geometry/compound` },
+    { text: `Grid`, link: `geometry/grid` },
 
-    { text: `Visualisation`, header: true },
-    { text: `Drawing`, link: `en/visualisation/drawing` },
-    { text: `Plot`, link: `en/visualisation/drawing` },
-
-
-  ],
-};
+    // { text: `Visualisation`, header: true },
+    // { text: `Drawing`, link: `visualisation/drawing` },
+    // { text: `Plot`, link: `visualisation/drawing` },
+  ];

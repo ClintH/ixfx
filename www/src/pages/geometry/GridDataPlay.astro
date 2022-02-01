@@ -1,0 +1,26 @@
+<link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('../../components/GridEditor.ts')}></script>
+<script type="module" src={Astro.resolve('./grid.ts')}></script>
+<style>
+  #dataGrid {
+    --grid-color:var(--theme-divider);
+    --hover-color: var(--theme-bg-hover);
+  }
+  #dataGridSection {
+    display: flex;
+    background-color: aliceblue;
+    border: 2px solid black;
+    flex-direction: column;
+    color: black;
+    padding: 1em;
+    max-width: 350px;
+    margin: 0 auto;
+    align-items: center;
+  }
+</style>
+
+<section id="dataGridSection">
+  <grid-editor rows="15" cols="15" pixelSize="20" id="dataGrid" />
+  <button id="btnDataRandom">Randomise</button>
+  <div id="dataGridRead">&nbsp;</div>
+</section>

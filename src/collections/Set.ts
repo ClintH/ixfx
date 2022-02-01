@@ -1,7 +1,7 @@
 // ✔ UNIT TESTED
 
-import { ToString } from "../util";
-import {SimpleEventEmitter} from "../Events";
+import { ToString } from "../util.js";
+import {SimpleEventEmitter} from "../Events.js";
 
 type MutableValueSetEventMap<V> = {
   readonly add: {readonly value: V, readonly updated: boolean}

@@ -1,4 +1,4 @@
-import { SimpleMutableMapArray } from "./collections/SimpleMutableMapArray";
+import { SimpleMutableMapArray } from "./collections/SimpleMutableMapArray.js";
 export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>) => void;
 
 type FlowSource = {

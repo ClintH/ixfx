@@ -1,4 +1,4 @@
-import {mutableStringSet} from '../../collections/Set';
+import {mutableStringSet} from '../../collections/Set.js';
 import {jest} from '@jest/globals';
 
 test(`mutableValueSet`, () => {

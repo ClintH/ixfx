@@ -1,0 +1,29 @@
+<link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('../../components/GridEditor.ts')}></script>
+<script type="module" src={Astro.resolve('./grid.ts')}></script>
+<style>
+  #visGrid {
+    --grid-color:var(--theme-divider);
+    --hover-color: var(--theme-bg-hover);
+  }
+</style>
+<div class="toolbar">
+  <section>
+    <button id="btnVisStart">Start</button>
+    <button id="btnVisStop">Stop</button>
+  </section>
+  <section>
+    <label>Function:</label>
+    <select id="selVisTechnique">
+      <option>Depth</option>
+      <option>Breadth</option>
+      <option>Row</option>
+      <option>Column</option>
+      <option>Random Contiguous</option>
+      <option>Random</option>
+    </select>
+  </section>
+</div>
+<div>
+  <grid-editor rows="5" cols="5" pixelSize="20" id="visGrid" />
+</div>

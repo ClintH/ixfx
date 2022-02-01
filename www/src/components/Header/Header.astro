@@ -1,5 +1,6 @@
 ---
-import { getLanguageFromURL, KNOWN_LANGUAGE_CODES } from '../../languages.ts';
+//import { getLanguageFromURL, KNOWN_LANGUAGE_CODES } from '../../languages.ts';
+
 import * as CONFIG from '../../config.ts';
 import AstroLogo from './AstroLogo.astro';
 import SkipToContent from './SkipToContent.astro';
@@ -8,7 +9,7 @@ import SidebarToggle from './SidebarToggle.tsx';
 //import Search from './Search.tsx';
 
 const { currentPage } = Astro.props;
-const lang = currentPage && getLanguageFromURL(currentPage);
+//const lang = currentPage && getLanguageFromURL(currentPage);
 ---
 
 <header>

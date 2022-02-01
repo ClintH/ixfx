@@ -1,0 +1,53 @@
+<link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('../../components/EnvelopeEditor.ts')}></script>
+<!-- <script type="module" src={Astro.resolve('../../../../../../../../src/modulation/Envelope.ts')}></script> -->
+<script type="module" src={Astro.resolve('./envelope.ts')}></script>
+<style>
+  .sxs {
+    display: flex;
+  }
+
+  .sxs>div {
+    height: 300px;
+    flex-grow: 1;
+  }
+
+  .stacked {
+    display:flex;
+  }
+  .stacked label {
+    width: 5em;
+    border: 1px solid yellow;
+  }
+  #envDataStream {
+    overflow-y: scroll;
+  }
+</style>
+<div class="toolbar">
+  <section>
+    <button id="btnTrigger">Trigger</button>
+  </section>
+  <section>
+    <button id="btnTriggerHold">Trigger & Hold</button>
+    <button id="btnRelease">Release</button>
+  </section>
+  <section>
+    <label>
+      <input type="checkbox" id="chkLooping">
+      Looping
+    </label>
+  </section>
+  <section>
+    <label>
+      Show
+      <select id="selectShow">
+        <option value="scaled">Scaled</option>
+        <option value="raw">Raw</option>
+      </select>
+    </label>
+  </section>
+</div>
+<div class="sxs">
+  <div id="envData"></div>
+  <div id="envDataStream"></div>
+</div>

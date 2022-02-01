@@ -1,4 +1,4 @@
-import {IsEqual} from "~/util";
+import {IsEqual} from "~/util.js";
 
 // ✔ UNIT TESTED!
 type ArrayKeys<K, V> = ReadonlyArray<readonly [key:K, value:V]>;

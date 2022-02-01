@@ -1,0 +1,26 @@
+<link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('../../components/GridEditor.ts')}></script>
+<script type="module" src={Astro.resolve('./grid.ts')}></script>
+<style>
+  #offsetsGrid {
+    --grid-color:var(--theme-divider);
+    --hover-color: var(--theme-bg-hover);
+  }
+</style>
+<div class="toolbar">
+  <section>
+    <label>Bounds:</label>
+    <select id="selOffsetsWrap" title="How should coordinate wrapping behave?">
+      <option>stop</option>
+      <option>wrap</option>
+      <option>undefined</option>
+    </select>
+  </section>
+  <section>
+    <label>Distance:</label>
+    <input title="Coordinate distance" type="range" id="rangeOffsetsDistance" value="2" min="1" max="5">
+  </section>
+</div>
+<div>
+  <grid-editor rows="10" cols="10" pixelSize="30" id="offsetsGrid" />
+</div>

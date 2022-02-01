@@ -1,0 +1,93 @@
+<link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} />
+<script type="module" src={Astro.resolve('./stateMachine.ts')}></script>
+
+<style>
+  .sxs {
+    display: flex;
+  }
+
+  .sxs>section {
+    flex-grow: 1;
+    margin-right: 0rem;
+  }
+
+  .sxs>section>section {
+    padding: var(--padding2);
+  }
+
+  section.withDivider {
+    border-right: 0.2rem solid var(--muted-border-color);
+  }
+
+  hr {
+    border-top: 2px solid var(--muted-border-color);
+  }
+
+  #jsonDescr {
+    padding: var(--padding3);
+  }
+
+  h2 {
+    font-size: 90%;
+    text-transform: uppercase;
+    color: var(--muted-color);
+  }
+  #descrValidate {
+    font-size: 80%;
+  }
+  #descrValidate.error {
+    color:hsl(6,73%,50%);
+  }
+  #currentState {
+    margin: 10px;
+    font-size: 80%;
+  }
+</style>
+<div class="sxs">
+  <section id="dataDescr" class="withDivider">
+    <section>
+      <h2>Machine description</h2>
+      <pre contenteditable id="jsonDescr">
+      </pre>
+      <div id="descrValidate"></div>
+      <p>&nbsp;</p>
+      <label>
+        Initial state:
+        <select id="selDescrInitial">
+          <option></option>
+        </select>
+      </label>
+      <div class="toolbar">
+        <button id="btnSetDescr">1. Set</button>
+      </div>
+    </section>
+    <section>
+      <label>
+        Load demo:
+        <select id="selDemoMachines">
+          <option>one</option>
+        </select>
+      </label>
+    </section>
+  </section>
+  <section >
+    <section>
+      <h2>Control</h2>
+      <select disabled size=3 id="selPossibleNext">
+        <option></option>
+      </select>
+      <div class="toolbar">
+        <button disabled id="btnChangeState">2. Change state</button>
+      </div>
+   
+      <div id="currentState"></div>
+
+    </section>
+    <section>
+      <hr />
+
+      <div id="dataStream"></div>
+    </section>
+  </section>
+  
+</div>

@@ -1,4 +1,4 @@
-import {MutableStringSet, mutableStringSet} from './Set';
+import {MutableStringSet, mutableStringSet} from './Set.js';
 
 export {MutableStringSet};
 export {mutableStringSet};

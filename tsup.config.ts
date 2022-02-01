@@ -2,11 +2,11 @@ import {defineConfig} from 'tsup';
 
 export default defineConfig({
   entry: {
-    bundle: `src/index.ts`
+    ixfx: `./src/index.ts`
   },
   sourcemap: true,
   dts: true,
-  noExternal: [`bezier-js`, `color2k`],
+  noExternal: [`bezier-js`, `color2k`,  `rxjs`],
   platform: `browser`,
   target: `es2020`,
   format: [

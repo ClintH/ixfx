@@ -1,44 +1,55 @@
 {
   "name": "ixfx",
-  "version": "0.0.1",
-  "description": "",
-  "module": "dist/bundle.min.mjs",
-  "unpkg": "dist/bundle.umd.min.js",
-  "exports": "./dist/bundle.mjs",
+  "version": "0.0.2",
+  "description": "A framework for programming interactivity",
+  "homepage": "https://github.com/clinth/ix/",
+  "keywords": [
+    "interactivity"
+  ],
+  "author": "Clint Heyer",
+  "license": "MIT",
+  "repository": {
+    "url": "git@github.com:clinth/ix.git"
+  },
+  "module": "dist/ixfx.js",
+  "exports": "./dist/ixfx.js",
   "browsersList": [
     ">2% and last 2 versions and not ie 6-11"
   ],
-  "main": "dist/bundle.js",
   "type": "module",
-  "types": "dist/bundle.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "test:coverage": "jest --collectCoverage",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:coverage": "jest --collectCoverage --config config/jest.config.js",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js",
     "watch": "tsc --watch",
     "clean": "rimraf dist",
-    "prepublish": "npm run build",
+    "prepublish": "npm run build:pkg",
     "build": "tsc && npm run bundle",
-    "run": "tsc && node -r source-map-support/register",
-    "esbundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle",
-    "esdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/bundle.mjs --bundle --watch",
     "bundle": "tsup",
     "develop": "tsup --watch",
-    "dev:demos": "snowpack dev --config ./snowpack-demos.config.js",
-    "dev:demosAlt": "snowpack dev --config ./snowpack-demosAlt.config.js",
-    "build:demos": "snowpack build --config ./snowpack-demos.config.js"
+    "run": "tsc && node -r source-map-support/register",
+    "pkg": "npm run pkg:bundle",
+    "pkg:typings": "tsc --project config/tsconfig.pkg.json",
+    "pkg:bundle": "tsup",
+    "esbundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/ixfx.js --bundle",
+    "esdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/index.js --bundle --watch",
+    "dev:demos": "snowpack dev --config ./config/snowpack-demos.config.js",
+    "dev:demosAlt": "snowpack dev --config ./config/snowpack-demosAlt.config.js",
+    "build:demos": "snowpack build --config ./config/snowpack-demos.config.js",
+    "copyForDemos": "copyfiles ./dist/* ../ixfx-demos/node_modules/ixfx/",
+    "docs:build": "grok ./etc/build/index.d.ts --config ./config/grok.config.cjs --outDir ./etc/docs",
+    "lint": "eslint src/**"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@svgdotjs/svg.js": "^3.1.1",
     "@types/jest": "^27.4.0",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.9.1",
+    "@ui-js/grok": "^1.3.0",
     "color2k": "^1.2.5",
+    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "esbuild": "^0.14.11",
     "eslint": "^8.6.0",
@@ -54,15 +65,16 @@
     "ts-jest": "^27.1.2",
     "tsup": "^5.11.11",
     "tsutils": "^3.21.0",
+    "typedoc": "^0.22.11",
+    "typedoc-plugin-markdown": "^3.11.12",
     "typescript": "^4.6.0-dev.20220109"
-  },
-  "repository": {
-    "url": "git@github.com:clinth/ix.git"
   },
   "dependencies": {
     "@types/bezier-js": "^4.1.0",
     "bezier-js": "^4.1.1",
-    "lit": "^2.1.1",
     "rxjs": "^7.5.2"
+  },
+  "engines": {
+    "node": ">=17.0.1"
   }
 }

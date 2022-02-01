@@ -1,5 +1,5 @@
-import {resolveEl} from "./Forms";
-import {addShadowCss} from "./ShadowDom";
+import {resolveEl} from "./Forms.js";
+import {addShadowCss} from "./ShadowDom.js";
 
 export type DomLogOpts = {
   readonly capacity?: number,

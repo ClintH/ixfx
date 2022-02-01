@@ -1,5 +1,5 @@
 // Easings from https://easings.net/
-import {clamp} from '../util';
+import {clamp} from '../util.js';
 
 const sqrt = Math.sqrt;
 const pow = Math.pow;

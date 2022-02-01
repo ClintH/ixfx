@@ -1,29 +1,34 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir": "./etc/build",
     "baseUrl": ".",
     "paths": {
       "~/*": [
         "src/*"
-      ]
+      ],
+      "fp-ts/*": [
+        "node_modules/fp-ts/es6/*"
+      ],
+      // "rxjs/*": [
+      //   "node_modules/rxjs/dist/esm/*"
+      // ]
     },
     "lib": [
-      "es2020",
+      "esnext",
       "dom"
     ],
-    "target": "esnext", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', 'ES2021', or 'ESNEXT'. */
-    "module": "esnext",
-    "alwaysStrict": true, /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
-    "strict": true,
-    "skipLibCheck": true, /* Skip type checking of declaration files. */
-    "declaration": true,
-    "sourceMap": true,
+    "target": "esnext",
+    "module": "ES2020",
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "alwaysStrict": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
     "removeComments": false,
-    "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "./src",

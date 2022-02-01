@@ -1,6 +1,5 @@
 /* eslint-disable */
-
-import {sleep} from "./util";
+import {sleep} from "./util.js";
 
 
 // const sleep = async function*(timeoutMs:number) {

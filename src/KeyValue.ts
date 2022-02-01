@@ -1,8 +1,8 @@
-import { sort } from 'fp-ts/Array';
-import { pipe } from 'fp-ts/function';
-import * as S from 'fp-ts/string';
-import * as N from 'fp-ts/number';
-import { reverse as reverseOrd, contramap } from 'fp-ts/Ord';
+import { sort } from 'fp-ts/Array.js';
+import { pipe } from 'fp-ts/function.js';
+import * as S from 'fp-ts/string.js';
+import * as N from 'fp-ts/number.js';
+import { reverse as reverseOrd, contramap } from 'fp-ts/Ord.js';
 
 
 /// ✔ Sorting functions are unit tested

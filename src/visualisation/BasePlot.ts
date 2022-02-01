@@ -16,7 +16,7 @@ export class BasePlot {
   drawLoop: () => void;
 
   constructor(canvasEl: HTMLCanvasElement) {
-    if (canvasEl === undefined) throw Error('canvasEl undefined');
+    if (canvasEl === undefined) throw Error(`canvasEl undefined`);
     this.canvasEl = canvasEl;
     this.drawLoop = this.baseDraw.bind(this);
     this.precision = 3;
@@ -29,15 +29,15 @@ export class BasePlot {
     this.lastPaint = 0;
     this.maxPaintMs = 10; // Don't trigger paint within 10ms
 
-    canvasEl.addEventListener('pointerup', () => {
+    canvasEl.addEventListener(`pointerup`, () => {
       this.paused = !this.paused;
       if (this.paused) {
-        canvasEl.classList.add('paused');
+        canvasEl.classList.add(`paused`);
       } else {
-        canvasEl.classList.remove('paused');
+        canvasEl.classList.remove(`paused`);
       }
     });
-    const measure = this.canvasEl.getContext('2d')?.measureText('Xy');
+    const measure = this.canvasEl.getContext(`2d`)?.measureText(`Xy`);
     if (measure === undefined) this.textHeight = 20;
     else this.textHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent;
   }
@@ -67,7 +67,7 @@ export class BasePlot {
     const textHalf = this.textHeight / 3;
     const rightJustif = plotWidth - 40;
 
-    g.fillStyle = 'black';
+    g.fillStyle = `black`;
 
     const bottomY = this.plotPadding + plotHeight + textHalf;
     const middleY = this.plotPadding + (plotHeight / 2) + textHalf;
@@ -86,7 +86,7 @@ export class BasePlot {
 
   baseDraw() {
     const c = this.canvasEl;
-    const g = c.getContext('2d');
+    const g = c.getContext(`2d`);
     if (g === null) return;
     const canvasHeight = c.height;
     const canvasWidth = c.width;
@@ -95,14 +95,14 @@ export class BasePlot {
     const plotWidth = canvasWidth - this.plotPadding - this.plotPadding;
 
     // Clear background
-    g.fillStyle = 'white';
+    g.fillStyle = `white`;
     g.fillRect(0, 0, canvasWidth, canvasHeight);
 
     // Draw middle line
     if (this.showMiddle) {
       g.lineWidth = 2;
       g.beginPath();
-      g.strokeStyle = 'whitesmoke';
+      g.strokeStyle = `whitesmoke`;
       g.moveTo(this.plotPadding, plotHeight / 2 + this.plotPadding);
       g.lineTo(plotWidth, plotHeight / 2 + this.plotPadding);
       g.stroke();

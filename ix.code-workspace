@@ -5,6 +5,12 @@
 		}
 	],
 	"settings": {
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/etc": true,
+			"**/dist": true,
+			"**/build": true
+		},
 		"typescript.tsdk": "./node_modules/typescript/lib"
 	}
 }

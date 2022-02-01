@@ -13,8 +13,6 @@ import * as Envelopes from './modulation/Envelope.js';
 import * as Easings from './modulation/Easing.js';
 export {Easings, Envelopes};
 
-// import {SlidingWindow} from './SlidingWindow.js';
-// export {SlidingWindow};
 
 import {Plot} from './visualisation/Plot.js';
 import * as Drawing from './visualisation/Drawing.js';
@@ -27,12 +25,11 @@ export {Lists};
 import * as Sets from './collections/Set.js';
 export {Sets};
 
-
 import * as Producers from './Generators.js';
 export {Producers};
 
-// import * as Series from './Series.js';
-// export {Series};
-
 import { FrequencyHistogramPlot } from './visualisation/FrequencyHistogramPlot.js';
 export {FrequencyHistogramPlot};
+
+import * as Dom from './dom/index.js';
+export {Dom};

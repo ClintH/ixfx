@@ -1,4 +1,5 @@
 import { Observable, throttleTime } from 'rxjs';
+export * from './DomLog.js';
 
 export const createAfter = (sibling:HTMLElement, tagName:string) :HTMLElement => {
   const el = document.createElement(tagName);

@@ -5,10 +5,9 @@
  * for his interactive web version (dblodorn/sanzo-wada). In this fork, I've fixed some incorrect 
  * data from the original, used a more perceptual CMYK to RGB conversion, and encapsulated the dataset 
  * as a standalone and distributed project." - mattdesl's README.md
-
 */
-import {randomElement} from '~/collections/Lists';
-import * as data from './DictionaryOfColourCombinations.json';
+import {randomElement} from '../collections/Lists.js';
+import {data} from './DictionaryOfColourCombinationsData.js';
 
 type Cmyk = readonly [number, number, number, number];
 type Lab = readonly [number, number, number];
@@ -40,7 +39,7 @@ export const check = () => {
 
 export const randomPalette = (minColours:number = 3):readonly DictColour[] => {
   // @ts-ignore
-  const d = data.default as DictColour[];
+  const d = data as DictColour[];
   
   // Get a random colour
   const c = randomElement(d);

@@ -112,8 +112,10 @@ export const arc = (ctx:CanvasRenderingContext2D, arcs:Arcs.ArcPositioned|Readon
 };
 
 type StackOp = (ctx:CanvasRenderingContext2D) => void
-//apply(ctx:CanvasRenderingContext2D):void
-//remove(ctx:CanvasRenderingContext2D):void
+/*
+ * apply(ctx:CanvasRenderingContext2D):void
+ * remove(ctx:CanvasRenderingContext2D):void
+ */
 
 type DrawingStack = Readonly<{
   push(op:StackOp):DrawingStack
@@ -207,7 +209,7 @@ export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Poi
   pts.forEach((pt) => ctx.lineTo(pt.x, pt.y));
 
   if (shouldLoop) ctx.lineTo(pts[0].x, pts[0].y);
-  //if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
+  // if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
   ctx.stroke();
 };
 
@@ -265,8 +267,10 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
   const isDebug = opts.debug ?? false;
 
   if (isDebug) {
-    // const ss = ctx.strokeStyle;
-    // ctx.strokeStyle = ss;
+    /*
+     * const ss = ctx.strokeStyle;
+     * ctx.strokeStyle = ss;
+     */
   }
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
@@ -313,10 +317,12 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
   ctx.stroke();
 
   if (isDebug) {
-    // const fs = ctx.fillStyle;
-    // const ss = ctx.strokeStyle;
-    // ctx.fillStyle = opts.strokeStyle ?? `gray`;
-    // ctx.strokeStyle = opts.strokeStyle ?? `gray`;
+    /*
+     * const fs = ctx.fillStyle;
+     * const ss = ctx.strokeStyle;
+     * ctx.fillStyle = opts.strokeStyle ?? `gray`;
+     * ctx.strokeStyle = opts.strokeStyle ?? `gray`;
+     */
     stack = stack.push(optsOp({...opts, 
       strokeStyle: color2k.transparentize(opts.strokeStyle ?? `silver`, 0.6),
       fillStyle: color2k.transparentize(opts.fillStyle ?? `yellow`, 0.4)}));
@@ -328,8 +334,10 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
     dot(ctx, quadratic, {radius: 3});
     dot(ctx, a, {radius: 3});
     dot(ctx, b, {radius: 3});
-    // ctx.fillStyle = fs;
-    // ctx.strokeStyle = ss;
+    /*
+     * ctx.fillStyle = fs;
+     * ctx.strokeStyle = ss;
+     */
     stack = stack.pop();
     stack.apply();
   }

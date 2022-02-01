@@ -1,6 +1,6 @@
-import {CirclePositioned} from "~/geometry/Circle";
-import {Line} from "~/geometry/Line";
-import {Point} from "~/geometry/Point";
+import {CirclePositioned} from "~/geometry/Circle.js";
+import {Line} from "~/geometry/Line.js";
+import {Point} from "~/geometry/Point.js";
 
 export type DrawingOpts = {
   readonly strokeStyle?:string

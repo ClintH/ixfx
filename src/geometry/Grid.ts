@@ -1,6 +1,6 @@
-import * as Rect from "./Rect";
-import * as Point from './Point';
-import {integer as guardInteger} from '../Guards';
+import * as Rect from "./Rect.js";
+import * as Point from './Point.js';
+import {integer as guardInteger} from '../Guards.js';
 import {clampZeroBounds} from "../util.js";
 import {randomElement } from  '../collections/Lists.js';
 import {mutableStringSet, MutableStringSet} from "../collections/Set.js";
@@ -189,9 +189,11 @@ export const crossDirections = Object.freeze([`n`, `e`, `s`,  `w`]) as ReadonlyA
 
 export const neighbours = (grid: Grid, cell: Cell, bounds: BoundsLogic = `undefined`, directions?:ReadonlyArray<CardinalDirection>): Neighbours => {
   const dirs = directions ?? allDirections;
-  // return directions
-  //   .map(c => offset(grid, getVectorFromCardinal(c), cell, bounds))
-  //   .filter(GuardIsDefined);
+  /*
+   * return directions
+   *   .map(c => offset(grid, getVectorFromCardinal(c), cell, bounds))
+   *   .filter(GuardIsDefined);
+   */
   const points = dirs.map(c => offset(grid, cell, getVectorFromCardinal(c), bounds));
   return zipKeyValue<Cell>(dirs, points) as Neighbours;
 };
@@ -290,7 +292,7 @@ export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds:B
  * @returns Signed vector in the form of {x,y}
  */
 export const getVectorFromCardinal = (cardinal: CardinalDirection, multiplier: number = 1): Cell => {
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let v;
   switch (cardinal) {
   case `n`:
@@ -462,7 +464,7 @@ const neighbourList = (grid:Grid, cell:Cell, directions:ReadonlyArray<CardinalDi
  * @param {MutableStringSet<Cell>} [visited] Optional tracker of visited cells
  * @returns {Iterable<Cell>}
  */
-//eslint-disable-next-line functional/prefer-readonly-type
+// eslint-disable-next-line functional/prefer-readonly-type
 export const visitor = function* (
   logic:VisitorLogic, 
   grid: Grid, 
@@ -479,21 +481,21 @@ export const visitor = function* (
 
   if (!isCell(start)) throw new Error(`'start' parameter is undefined or not a cell`);
 
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let cellQueue:Cell[] = [start]; 
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let moveQueue:Neighbour[] = [];
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let current:Cell|null = null;
 
-  //eslint-disable-next-line functional/no-loop-statement
+  // eslint-disable-next-line functional/no-loop-statement
   while (cellQueue.length > 0) {
-    //console.log(`cell queue: ${cellQueue.length} move queue: ${moveQueue.length} current: ${JSON.stringify(current)}` );
+    // console.log(`cell queue: ${cellQueue.length} move queue: ${moveQueue.length} current: ${JSON.stringify(current)}` );
     if (current === null) {
-      //eslint-disable-next-line functional/immutable-data
+      // eslint-disable-next-line functional/immutable-data
       const nv = cellQueue.pop();
       if (nv === undefined) {
-        //console.log(`cellQueue drained`);
+        // console.log(`cellQueue drained`);
         break;
       }
       current = nv;
@@ -512,7 +514,7 @@ export const visitor = function* (
           cellQueue = cellQueue.filter(cq => cellEquals(cq, current as Cell));
         }
       } else {
-        //eslint-disable-next-line functional/immutable-data
+        // eslint-disable-next-line functional/immutable-data
         moveQueue.push(...nextSteps);
       }
     }
@@ -521,13 +523,13 @@ export const visitor = function* (
     moveQueue = moveQueue.filter(step => !v.has(step[1]));
 
     if (moveQueue.length === 0) {
-      //console.log(`moveQueue empty`);
+      // console.log(`moveQueue empty`);
       current = null;
     } else {
       // Pick move
       const potential = logic.select(moveQueue);
       if (potential !== undefined) {
-        //eslint-disable-next-line functional/immutable-data
+        // eslint-disable-next-line functional/immutable-data
         cellQueue.push(potential[1]);
         current = potential[1];
       }
@@ -547,7 +549,7 @@ grid,
 start,
 opts);
 
-const randomNeighbour = (nbos: readonly Neighbour[]) => randomElement(nbos); //.filter(isNeighbour));
+const randomNeighbour = (nbos: readonly Neighbour[]) => randomElement(nbos); // .filter(isNeighbour));
 
 export const visitorRandomContiguous = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
   select: randomNeighbour},
@@ -558,9 +560,9 @@ opts);
 export const visitorRandom = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
   options: (grid, cell) => {
     const t:Neighbour[] = [];
-    //eslint-disable-next-line functional/no-loop-statement
+    // eslint-disable-next-line functional/no-loop-statement
     for (const c of cells(grid, cell)) {
-      //eslint-disable-next-line functional/immutable-data
+      // eslint-disable-next-line functional/immutable-data
       t.push([`n`, c]);
     }
     return t;
@@ -593,8 +595,10 @@ export const visitorRow =(grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
         }
       }
     } else {
-      // WALKING FORWARD ALONG ROWS
-      // console.log(`${cell.x}, ${cell.y}`);
+      /*
+       * WALKING FORWARD ALONG ROWS
+       * console.log(`${cell.x}, ${cell.y}`);
+       */
       if (cell.x < grid.rows - 1) {
         // All fine, step to the right
         cell = {x: cell.x + 1, y: cell.y};
@@ -628,16 +632,16 @@ export const visitFor = (grid:Grid, start:Cell, steps:number, visitor:Visitor):C
   };
   steps = Math.abs(steps);
 
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let c = start;
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let v = visitor(grid, start, opts);
   v.next(); // Burn up starting cell
   
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let stepsMade = 0;
   
-  //eslint-disable-next-line functional/no-loop-statement
+  // eslint-disable-next-line functional/no-loop-statement
   while (stepsMade < steps) {
     stepsMade++;
     const {value} = v.next();
@@ -709,11 +713,11 @@ export const cells = function* (grid:Grid, start:Cell = {x:0, y:0}) {
   guardGrid(grid, `grid`);
   guard(start, `start`, grid);
 
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let {x, y} = start;
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line functional/no-let
   let canMove = true;
-  //eslint-disable-next-line functional/no-loop-statement
+  // eslint-disable-next-line functional/no-loop-statement
   do {
     yield {x, y};
     x++;
