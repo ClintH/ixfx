@@ -1,25 +1,30 @@
+import * as rxjs from 'rxjs';
 import * as lit_html from 'lit-html';
 import * as lit from 'lit';
 import { LitElement } from 'lit';
 
-declare type Point = {
+declare type Point = Readonly<{
     readonly x: number;
     readonly y: number;
     readonly z?: number;
-};
-declare const toString$2: (p: Point) => string;
-declare const compareTo: (compareFn: (a: Point, b: Point) => Point, ...points: Point[]) => Point;
+}>;
+declare const compareTo: (compareFn: (a: Point, b: Point) => Point, ...points: readonly Point[]) => Point;
 declare const distance$1: (a: Point, b: Point) => number;
 declare const guard$3: (p: Point, name?: string) => void;
-declare const bbox$2: (...points: Point[]) => RectPositioned;
-declare const isPoint: (p: Point | RectPositioned | Rect) => p is Point;
+declare const bbox$2: (...points: readonly Point[]) => RectPositioned;
+declare const isPoint: (p: Point | RectPositioned | Rect) => p is Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}>;
 /**
  * Returns point as an array in the form [x,y]
  * let a = toArray({x:10, y:5}); // yields [10,5]
  * @param {Point} p
  * @returns {number[]}
  */
-declare const toArray: (p: Point) => number[];
+declare const toArray: (p: Point) => readonly number[];
+declare const toString$2: (p: Point) => string;
 /**
  * Returns true if the two points have identical values
  *
@@ -61,8 +66,8 @@ declare const lerp: (amt: number, a: Point, b: Point) => {
  * @param {number} [y]
  * @returns {Point}
  */
-declare const from: (xOrArray?: number | number[] | undefined, y?: number | undefined) => Point;
-declare const fromNumbers$1: (...coords: number[][] | number[]) => Point[];
+declare const from: (xOrArray?: number | readonly number[] | undefined, y?: number | undefined) => Point;
+declare const fromNumbers$1: (...coords: readonly ReadonlyArray<number>[] | readonly number[]) => readonly Point[];
 /**
  * Returns `a` minus `b`
  *
@@ -110,13 +115,13 @@ declare const Point$1_multiply: typeof multiply;
 declare namespace Point$1 {
   export {
     Point$1_Point as Point,
-    toString$2 as toString,
     Point$1_compareTo as compareTo,
     distance$1 as distance,
     guard$3 as guard,
     bbox$2 as bbox,
     Point$1_isPoint as isPoint,
     Point$1_toArray as toArray,
+    toString$2 as toString,
     equals$1 as equals,
     withinRange$1 as withinRange,
     Point$1_lerp as lerp,
@@ -133,12 +138,22 @@ declare type Rect = {
     readonly height: number;
 };
 declare type RectPositioned = Point & Rect;
+declare const fromElement: (el: HTMLElement) => Rect;
+declare const isEqual$1: (a: Rect, b: Rect) => boolean;
 declare const fromCenter: (origin: Point, width: number, height: number) => RectPositioned;
 declare const maxFromCorners: (topLeft: Point, topRight: Point, bottomRight: Point, bottomLeft: Point) => RectPositioned;
 declare const guard$2: (rect: Rect, name?: string) => void;
 declare const fromTopLeft: (origin: Point, width: number, height: number) => RectPositioned;
-declare const getCorners: (rect: RectPositioned | Rect, origin?: Point | undefined) => Point[];
-declare const getCenter: (rect: RectPositioned | Rect, origin?: Point | undefined) => Point;
+declare const getCorners: (rect: RectPositioned | Rect, origin?: Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}> | undefined) => readonly Point[];
+declare const getCenter: (rect: RectPositioned | Rect, origin?: Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}> | undefined) => Point;
 /**
  * Returns four lines based on each corner.
  * Lines are given in order: top, right, bottom, left
@@ -147,10 +162,15 @@ declare const getCenter: (rect: RectPositioned | Rect, origin?: Point | undefine
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-declare const getLines: (rect: RectPositioned | Rect, origin?: Point | undefined) => Line[];
+declare const getLines: (rect: RectPositioned | Rect, origin?: Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}> | undefined) => readonly Line[];
 
 type Rect$1_Rect = Rect;
 type Rect$1_RectPositioned = RectPositioned;
+declare const Rect$1_fromElement: typeof fromElement;
 declare const Rect$1_fromCenter: typeof fromCenter;
 declare const Rect$1_maxFromCorners: typeof maxFromCorners;
 declare const Rect$1_fromTopLeft: typeof fromTopLeft;
@@ -161,6 +181,8 @@ declare namespace Rect$1 {
   export {
     Rect$1_Rect as Rect,
     Rect$1_RectPositioned as RectPositioned,
+    Rect$1_fromElement as fromElement,
+    isEqual$1 as isEqual,
     Rect$1_fromCenter as fromCenter,
     Rect$1_maxFromCorners as maxFromCorners,
     guard$2 as guard,
@@ -183,12 +205,24 @@ declare type Path = {
     bbox(): RectPositioned;
     toString(): string;
     toSvgString(): string;
-    kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`;
+    readonly kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`;
 };
+/**
+ * Return the start point of a path
+ *
+ * @param {Path} path
+ * @return {*}  {Point}
+ */
 declare const getStart: (path: Path) => Point;
+/**
+ * Return the end point of a path
+ *
+ * @param {Path} path
+ * @return {*}  {Point}
+ */
 declare const getEnd: (path: Path) => Point;
 declare type WithBeziers = {
-    getBeziers(): Path[];
+    getBeziers(): readonly Path[];
 };
 
 type Path$1_Path = Path;
@@ -218,9 +252,36 @@ declare const isLine: (p: Path | Line | Point) => p is Line;
  */
 declare const equals: (a: Line, b: Line) => boolean;
 declare const guard$1: (l: Line, paramName?: string) => void;
+declare const angleRadian: (lineOrPoint: Line | Point, b?: Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}> | undefined) => number;
 declare const withinRange: (l: Line, p: Point, maxRange: number) => boolean;
-declare const length: (aOrLine: Point | Line, b?: Point | undefined) => number;
+declare const length: (aOrLine: Point | Line, b?: Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}> | undefined) => number;
 declare const nearest: (line: Line, p: Point) => Point;
+declare const slope: (lineOrPoint: Line | Point, b?: Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}> | undefined) => number;
+declare const extendX: (line: Line, xIntersection: number) => Point;
+/**
+ * Returns a line extended from it's start (`a`) by a specified distance
+ *
+ * ```js
+ * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
+ * const extended = extendFromStart(line, 2);
+ * ```
+ * @param {Line} line
+ * @param {number} distance
+ * @return {*}  {Line}
+ */
+declare const extendFromStart: (line: Line, distance: number) => Line;
 declare const distance: (l: Line, p: Point) => number;
 declare const compute$1: (a: Point, b: Point, t: number) => Point;
 declare const toString$1: (a: Point, b: Point) => string;
@@ -233,14 +294,14 @@ declare const fromNumbers: (x1: number, y1: number, x2: number, y2: number) => L
  * @param {Point} b
  * @returns {number[]}
  */
-declare const toFlatArray: (a: Point, b: Point) => number[];
+declare const toFlatArray: (a: Point, b: Point) => readonly number[];
 declare const toSvgString$1: (a: Point, b: Point) => string;
-declare const fromArray: (arr: number[]) => Line;
+declare const fromArray: (arr: readonly number[]) => Line;
 declare const fromPoints: (a: Point, b: Point) => Line;
-declare const joinPointsToLines: (...points: Point[]) => Line[];
+declare const joinPointsToLines: (...points: readonly Point[]) => readonly Line[];
 declare const fromPointsToPath: (a: Point, b: Point) => LinePath;
 declare type LinePath = Line & Path & {
-    toFlatArray(): number[];
+    toFlatArray(): readonly number[];
 };
 declare const bbox$1: (line: Line) => RectPositioned;
 declare const toPath$1: (line: Line) => LinePath;
@@ -248,9 +309,13 @@ declare const toPath$1: (line: Line) => LinePath;
 type Line$1_Line = Line;
 declare const Line$1_isLine: typeof isLine;
 declare const Line$1_equals: typeof equals;
+declare const Line$1_angleRadian: typeof angleRadian;
 declare const Line$1_withinRange: typeof withinRange;
 declare const Line$1_length: typeof length;
 declare const Line$1_nearest: typeof nearest;
+declare const Line$1_slope: typeof slope;
+declare const Line$1_extendX: typeof extendX;
+declare const Line$1_extendFromStart: typeof extendFromStart;
 declare const Line$1_distance: typeof distance;
 declare const Line$1_fromNumbers: typeof fromNumbers;
 declare const Line$1_toFlatArray: typeof toFlatArray;
@@ -265,9 +330,13 @@ declare namespace Line$1 {
     Line$1_isLine as isLine,
     Line$1_equals as equals,
     guard$1 as guard,
+    Line$1_angleRadian as angleRadian,
     Line$1_withinRange as withinRange,
     Line$1_length as length,
     Line$1_nearest as nearest,
+    Line$1_slope as slope,
+    Line$1_extendX as extendX,
+    Line$1_extendFromStart as extendFromStart,
     Line$1_distance as distance,
     compute$1 as compute,
     toString$1 as toString,
@@ -306,12 +375,12 @@ declare const isCubicBezier: (path: Path | CubicBezier | QuadraticBezier) => pat
  * @param {number} [bend=0] Bend amount, from -1 to 1
  * @returns {QuadraticBezier}
  */
-declare const quadraticBend: (b: QuadraticBezier, bend?: number) => QuadraticBezier;
+declare const quadraticBend: (a: Point, b: Point, bend?: number) => QuadraticBezier;
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.
  * Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve
- * @param {Points.Point} start Start of curbe
- * @param {Points.Point} end End of curbe
+ * @param {Points.Point} start Start of curve
+ * @param {Points.Point} end End of curve
  * @param {number} [bend=0] Bend amount, -1 to 1
  * @returns {QuadraticBezier}
  */
@@ -372,7 +441,11 @@ declare const setSegment: (compoundPath: CompoundPath, index: number, path: Path
  * @param {Dimensions} [dimensions] Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-declare const compute: (paths: Path[], t: number, useWidth?: boolean | undefined, dimensions?: Dimensions | undefined) => Point;
+declare const compute: (paths: Path[], t: number, useWidth?: boolean | undefined, dimensions?: Dimensions | undefined) => Readonly<{
+    readonly x: number;
+    readonly y: number;
+    readonly z?: number | undefined;
+}>;
 declare type Dimensions = {
     /**
      * Width of each path (based on bounding box)
@@ -500,6 +573,11 @@ declare type MutableValueSetEventMap<V> = {
     readonly delete: V;
 };
 declare const addUniqueByHash: <V>(set: ReadonlyMap<string, V> | undefined, hashFunc: ToString<V>, ...values: readonly V[]) => Map<any, any>;
+declare const mutableStringSet: <V>(keyString?: ToString<V> | undefined) => MutableStringSetImpl<V>;
+declare type MutableStringSet<V> = {
+    readonly add: (item: V) => void;
+    readonly has: (item: V) => boolean;
+};
 /**
  * A mutable set that stores unique items by their value, rather
  * than object reference.
@@ -525,7 +603,7 @@ declare const addUniqueByHash: <V>(set: ReadonlyMap<string, V> | undefined, hash
  *  {name: `Barry`, city: `London`}
  *  {name: `Sally`, city: `Bristol`}
  * ];
- * const set = new MutableValueSet(person => {
+ * const set = mutableValueSet(person => {
  *  // Key person objects by name and city (assi)
  *  return `${person.name}-${person.city}`
  * });
@@ -544,7 +622,7 @@ declare const addUniqueByHash: <V>(set: ReadonlyMap<string, V> | undefined, hash
  * @class MutableValueSet
  * @template V
  */
-declare class MutableStringSet<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
+declare class MutableStringSetImpl<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
     store: Map<string, V>;
     keyString: ToString<V>;
     constructor(keyString?: ToString<V> | undefined);
@@ -557,30 +635,16 @@ declare class MutableStringSet<V> extends SimpleEventEmitter<MutableValueSetEven
 }
 
 declare const Set_addUniqueByHash: typeof addUniqueByHash;
+declare const Set_mutableStringSet: typeof mutableStringSet;
 type Set_MutableStringSet<V> = MutableStringSet<V>;
-declare const Set_MutableStringSet: typeof MutableStringSet;
 declare namespace Set {
   export {
     Set_addUniqueByHash as addUniqueByHash,
+    Set_mutableStringSet as mutableStringSet,
     Set_MutableStringSet as MutableStringSet,
   };
 }
 
-declare enum CardinalDirection {
-    None = 0,
-    North = 1,
-    NorthEast = 2,
-    East = 3,
-    SouthEast = 4,
-    South = 5,
-    SouthWest = 6,
-    West = 7,
-    NorthWest = 8
-}
-declare enum WrapLogic {
-    None = 0,
-    Wrap = 1
-}
 declare type GridVisual = Readonly<{
     readonly size: number;
 }>;
@@ -592,6 +656,41 @@ declare type Cell = Readonly<{
     readonly x: number;
     readonly y: number;
 }>;
+declare type Neighbours = Readonly<{
+    readonly n: Cell | undefined;
+    readonly e: Cell | undefined;
+    readonly s: Cell | undefined;
+    readonly w: Cell | undefined;
+    readonly ne: Cell | undefined;
+    readonly nw: Cell | undefined;
+    readonly se: Cell | undefined;
+    readonly sw: Cell | undefined;
+}>;
+declare type CardinalDirection = `` | `n` | `ne` | `e` | `se` | `s` | `sw` | `w` | `nw`;
+declare type BoundsLogic = `unbounded` | `undefined` | `stop` | `wrap`;
+declare type VisitorLogic = {
+    readonly options?: IdentifyNeighbours;
+    readonly select: NeighbourSelector;
+};
+declare type VisitGenerator = Generator<Readonly<Cell>, void, unknown>;
+declare type VisitorOpts = {
+    readonly visited?: MutableStringSet<Cell>;
+    readonly reversed?: boolean;
+    readonly debug?: boolean;
+};
+declare type Visitor = (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare type NeighbourMaybe = readonly [keyof Neighbours, Cell | undefined];
+declare type Neighbour = readonly [keyof Neighbours, Cell];
+declare type NeighbourSelector = (neighbours: ReadonlyArray<Neighbour>) => Neighbour | undefined;
+declare type IdentifyNeighbours = (grid: Grid, origin: Cell) => ReadonlyArray<Neighbour>;
+/**
+ * Returns true if grids `a` and `b` are equal in value
+ *
+ * @param {(Grid|GridVisual)} a
+ * @param {(Grid|GridVisual)} b
+ * @return {*}  {boolean}
+ */
+declare const isEqual: (a: Grid | GridVisual, b: Grid | GridVisual) => boolean;
 /**
  * Returns a key string for a cell instance
  * A key string allows comparison of instances by value rather than reference
@@ -607,10 +706,44 @@ declare const cellKeyString: (v: Cell) => string;
  * @returns {boolean}
  */
 declare const cellEquals: (a: Cell, b: Cell) => boolean;
-declare const guard: (a: Cell, paramName?: string) => void;
-declare const cellCornerRect: (cell: Cell, grid: Grid & GridVisual) => Rect;
-declare const getCell: (position: Point, grid: Grid & GridVisual) => Cell | undefined;
-declare const neighbours: (grid: Grid, cell: Cell, bounds?: BoundsLogic) => ReadonlyArray<Cell>;
+declare const guard: (a: Cell, paramName?: string, grid?: Readonly<{
+    readonly rows: number;
+    readonly cols: number;
+}> | undefined) => void;
+/**
+ * Returns true if cell coordinates are above zero and within bounds of grid
+ *
+ * @param {Grid} grid
+ * @param {Cell} cell
+ * @return {*}  {boolean}
+ */
+declare const inside: (grid: Grid, cell: Cell) => boolean;
+/**
+ * Returns a rect of the cell, positioned from the top-left corner
+ *
+ * @param {Cell} cell
+ * @param {(Grid & GridVisual)} grid
+ * @return {*}  {Rect.RectPositioned}
+ */
+declare const rectangleForCell: (cell: Cell, grid: Grid & GridVisual) => RectPositioned;
+/**
+ * Returns the cell at a specified visual coordinate
+ *
+ * @param {Point.Point} position Position, eg in pixels
+ * @param {(Grid & GridVisual)} grid Grid
+ * @return {*}  {(Cell | undefined)} Cell at position or undefined if outside of the grid
+ */
+declare const cellAtPoint: (position: Point, grid: Grid & GridVisual) => Cell | undefined;
+declare const allDirections: readonly CardinalDirection[];
+declare const crossDirections: readonly CardinalDirection[];
+declare const neighbours: (grid: Grid, cell: Cell, bounds?: BoundsLogic, directions?: readonly CardinalDirection[] | undefined) => Neighbours;
+/**
+ * Returns the pixel midpoint of a cell
+ *
+ * @param {Cell} cell
+ * @param {(Grid & GridVisual)} grid
+ * @return {*}  {Point.Point}
+ */
 declare const cellMiddle: (cell: Cell, grid: Grid & GridVisual) => Point;
 /**
  * Returns the cells on the line of start and end, inclusive
@@ -621,51 +754,57 @@ declare const cellMiddle: (cell: Cell, grid: Grid & GridVisual) => Point;
  */
 declare const getLine: (start: Cell, end: Cell) => ReadonlyArray<Cell>;
 /**
- * Returns a list of cells that make up a simple square perimeter around
- * a point at a specified distance.
+ * Returns cells that correspond to the cardinal directions at a specified distance
  *
- * @param {Grid} grid
- * @param {number} steps
- * @param {Cell} [start={x: 0, y: 0}]
- * @param {BoundsLogic} [bounds=BoundsLogic.Stop]
- * @returns {Cell[]}
+ * @param grid Griod
+ * @param steps Distance
+ * @param start Start poiint
+ * @param bound Logic for if bounds of grid are exceeded
+ * @returns Cells corresponding to cardinals
  */
-declare const getSquarePerimeter: (grid: Grid, steps: number, start?: Cell, bounds?: BoundsLogic) => ReadonlyArray<Cell>;
+declare const offsetCardinals: (grid: Grid, start: Cell, steps: number, bounds?: BoundsLogic) => Neighbours;
+/**
+ * Returns an {x,y} signed vector corresponding to the provided cardinal direction.
+ * ```
+ * const n = getVectorFromCardinal(`n`); // {x: 0, y: -1}
+ * ```
+ * Optional `multiplier` can be applied to vector
+ * ```
+ * const n = getVectorFromCardinal(`n`, 10); // {x: 0, y: -10}
+ * ```
+ *
+ * Blank direction returns {x: 0, y: 0}
+ * @param cardinal Direction
+ * @param multiplier Multipler
+ * @returns Signed vector in the form of {x,y}
+ */
 declare const getVectorFromCardinal: (cardinal: CardinalDirection, multiplier?: number) => Cell;
-declare enum BoundsLogic {
-    Unbound = 0,
-    Undefined = 1,
-    Stop = 2,
-    Wrap = 3
-}
+/**
+ * Returns a list of cells from `start` to `end`.
+ *
+ * Throws an error if start and end are not on same row or column.
+ *
+ * @param start Start cell
+ * @param end end clel
+ * @param endInclusive
+ * @return {*}  {ReadonlyArray<Cell>}
+ */
 declare const simpleLine: (start: Cell, end: Cell, endInclusive?: boolean) => ReadonlyArray<Cell>;
 /**
  *
- * Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift down a line
- * @param {Grid} grid
- * @param {Cell} vector
- * @param {Cell} [start={x: 0, y: 0}]
- * @param {BoundsLogic} [bounds=BoundsLogic.Undefined]
- * @returns {(Cell | undefined)}
- */
-declare const offset: (grid: Grid, vector: Cell, start?: Cell, bounds?: BoundsLogic) => Cell | undefined;
-/**
- * Walks the grid left-to-right, top-to-bottom. Negative steps reverse this.
+ * Returns a coordinate offset from `start` by `vector` amount.
  *
+ * Different behaviour can be specified for how to handle when coordinates exceed the bounds of the grid
+ *
+ *
+ * Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift down a line
  * @param {Grid} grid Grid to traverse
- * @param {number} steps Number of steps
- * @param {Cell} [start={x: 0, y: 0}] Start cell
- * @param {BoundsLogic} [bounds=BoundsLogic.Undefined]
+ * @param {Cell} vector Offset in x/y
+ * @param {Cell} start Start point
+ * @param {BoundsLogic} [bounds=`undefined`]
  * @returns {(Cell | undefined)}
  */
-declare const offsetStepsByRow: (grid: Grid, steps: number, start?: Cell, bounds?: BoundsLogic) => Cell | undefined;
-declare const offsetStepsByCol: (grid: Grid, steps: number, start?: Cell, bounds?: BoundsLogic) => Cell | undefined;
-declare const walkByFn: (offsetFn: (grid: Grid, steps: number, start: Cell, bounds: BoundsLogic) => Cell | undefined, grid: Grid, start?: Cell, wrap?: boolean) => Iterable<Cell>;
-declare const walkByRow: (grid: Grid, start?: Cell, wrap?: boolean) => Iterable<Cell>;
-declare const walkByCol: (grid: Grid, start?: Cell, wrap?: boolean) => Iterable<Cell>;
-declare const visitorDepth: (queue: ReadonlyArray<Cell>) => Cell;
-declare const visitorBreadth: (queue: ReadonlyArray<Cell>) => Cell;
-declare const visitorRandom: (queue: ReadonlyArray<Cell>) => Cell;
+declare const offset: (grid: Grid, start: Cell, vector: Cell, bounds?: BoundsLogic) => Cell | undefined;
 /**
  * Visits every cell in grid using supplied selection function
  * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom
@@ -681,7 +820,7 @@ declare const visitorRandom: (queue: ReadonlyArray<Cell>) => Cell;
  * If you want to keep tabs on the visitor, pass in a MutableValueSet. This is
  * updated with visited cells (and is used internally anyway)
  * ```js
- *  let visited = new Sets.MutableValueSet<Grids.Cell>(c => Grids.cellKeyString(c));
+ *  let visited = new mutableValueSet<Grids.Cell>(c => Grids.cellKeyString(c));
  *  let visitor = Grids.visitor(Grids.visitorRandom, grid, startCell, visited);
  * ```
  *
@@ -696,239 +835,213 @@ declare const visitorRandom: (queue: ReadonlyArray<Cell>) => Cell;
  *  }
  *  setTimeout(run, delayMs);
  * ```
- * @param {(nbos: Cell[]) => Cell} visitFn Visitor function
+ * @param {(neighbourSelect: NeighbourSelector} neighbourSelect Select neighbour to visit
  * @param {Grid} grid Grid to visit
  * @param {Cell} start Starting cell
  * @param {MutableStringSet<Cell>} [visited] Optional tracker of visited cells
  * @returns {Iterable<Cell>}
  */
-declare const visitor: (visitFn: (nbos: ReadonlyArray<Cell>) => Cell, grid: Grid, start: Cell, visited?: MutableStringSet<Readonly<{
-    readonly x: number;
-    readonly y: number;
-}>> | undefined) => Iterable<Cell>;
+declare const visitor: (logic: VisitorLogic, grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare const visitorDepth: (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare const visitorBreadth: (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare const visitorRandomContiguous: (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare const visitorRandom: (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare const visitorRow: (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+declare const visitFor: (grid: Grid, start: Cell, steps: number, visitor: Visitor) => Cell;
+declare const visitorColumn: (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+/**
+ * Enumerate all cells in an efficient manner. If end of grid is reached, iterator will wrap to ensure all are visited.
+ *
+ * @param {Grid} grid
+ * @param {Cell} [start={x:0, y:0}]
+ */
+declare const cells: (grid: Grid, start?: Cell) => Generator<{
+    x: number;
+    y: number;
+}, void, unknown>;
 
-type Grid$1_CardinalDirection = CardinalDirection;
-declare const Grid$1_CardinalDirection: typeof CardinalDirection;
-type Grid$1_WrapLogic = WrapLogic;
-declare const Grid$1_WrapLogic: typeof WrapLogic;
 type Grid$1_GridVisual = GridVisual;
 type Grid$1_Grid = Grid;
 type Grid$1_Cell = Cell;
+type Grid$1_Neighbours = Neighbours;
+type Grid$1_CardinalDirection = CardinalDirection;
+type Grid$1_BoundsLogic = BoundsLogic;
+type Grid$1_VisitGenerator = VisitGenerator;
+type Grid$1_VisitorOpts = VisitorOpts;
+type Grid$1_Visitor = Visitor;
+type Grid$1_NeighbourMaybe = NeighbourMaybe;
+type Grid$1_Neighbour = Neighbour;
+declare const Grid$1_isEqual: typeof isEqual;
 declare const Grid$1_cellKeyString: typeof cellKeyString;
 declare const Grid$1_cellEquals: typeof cellEquals;
 declare const Grid$1_guard: typeof guard;
-declare const Grid$1_cellCornerRect: typeof cellCornerRect;
-declare const Grid$1_getCell: typeof getCell;
+declare const Grid$1_inside: typeof inside;
+declare const Grid$1_rectangleForCell: typeof rectangleForCell;
+declare const Grid$1_cellAtPoint: typeof cellAtPoint;
+declare const Grid$1_allDirections: typeof allDirections;
+declare const Grid$1_crossDirections: typeof crossDirections;
 declare const Grid$1_neighbours: typeof neighbours;
 declare const Grid$1_cellMiddle: typeof cellMiddle;
 declare const Grid$1_getLine: typeof getLine;
-declare const Grid$1_getSquarePerimeter: typeof getSquarePerimeter;
+declare const Grid$1_offsetCardinals: typeof offsetCardinals;
 declare const Grid$1_getVectorFromCardinal: typeof getVectorFromCardinal;
-type Grid$1_BoundsLogic = BoundsLogic;
-declare const Grid$1_BoundsLogic: typeof BoundsLogic;
 declare const Grid$1_simpleLine: typeof simpleLine;
 declare const Grid$1_offset: typeof offset;
-declare const Grid$1_offsetStepsByRow: typeof offsetStepsByRow;
-declare const Grid$1_offsetStepsByCol: typeof offsetStepsByCol;
-declare const Grid$1_walkByFn: typeof walkByFn;
-declare const Grid$1_walkByRow: typeof walkByRow;
-declare const Grid$1_walkByCol: typeof walkByCol;
+declare const Grid$1_visitor: typeof visitor;
 declare const Grid$1_visitorDepth: typeof visitorDepth;
 declare const Grid$1_visitorBreadth: typeof visitorBreadth;
+declare const Grid$1_visitorRandomContiguous: typeof visitorRandomContiguous;
 declare const Grid$1_visitorRandom: typeof visitorRandom;
-declare const Grid$1_visitor: typeof visitor;
+declare const Grid$1_visitorRow: typeof visitorRow;
+declare const Grid$1_visitFor: typeof visitFor;
+declare const Grid$1_visitorColumn: typeof visitorColumn;
+declare const Grid$1_cells: typeof cells;
 declare namespace Grid$1 {
   export {
-    Grid$1_CardinalDirection as CardinalDirection,
-    Grid$1_WrapLogic as WrapLogic,
     Grid$1_GridVisual as GridVisual,
     Grid$1_Grid as Grid,
     Grid$1_Cell as Cell,
+    Grid$1_Neighbours as Neighbours,
+    Grid$1_CardinalDirection as CardinalDirection,
+    Grid$1_BoundsLogic as BoundsLogic,
+    Grid$1_VisitGenerator as VisitGenerator,
+    Grid$1_VisitorOpts as VisitorOpts,
+    Grid$1_Visitor as Visitor,
+    Grid$1_NeighbourMaybe as NeighbourMaybe,
+    Grid$1_Neighbour as Neighbour,
+    Grid$1_isEqual as isEqual,
     Grid$1_cellKeyString as cellKeyString,
     Grid$1_cellEquals as cellEquals,
     Grid$1_guard as guard,
-    Grid$1_cellCornerRect as cellCornerRect,
-    Grid$1_getCell as getCell,
+    Grid$1_inside as inside,
+    Grid$1_rectangleForCell as rectangleForCell,
+    Grid$1_cellAtPoint as cellAtPoint,
+    Grid$1_allDirections as allDirections,
+    Grid$1_crossDirections as crossDirections,
     Grid$1_neighbours as neighbours,
     Grid$1_cellMiddle as cellMiddle,
     Grid$1_getLine as getLine,
-    Grid$1_getSquarePerimeter as getSquarePerimeter,
+    Grid$1_offsetCardinals as offsetCardinals,
     Grid$1_getVectorFromCardinal as getVectorFromCardinal,
-    Grid$1_BoundsLogic as BoundsLogic,
     Grid$1_simpleLine as simpleLine,
     Grid$1_offset as offset,
-    Grid$1_offsetStepsByRow as offsetStepsByRow,
-    Grid$1_offsetStepsByCol as offsetStepsByCol,
-    Grid$1_walkByFn as walkByFn,
-    Grid$1_walkByRow as walkByRow,
-    Grid$1_walkByCol as walkByCol,
+    Grid$1_visitor as visitor,
     Grid$1_visitorDepth as visitorDepth,
     Grid$1_visitorBreadth as visitorBreadth,
+    Grid$1_visitorRandomContiguous as visitorRandomContiguous,
     Grid$1_visitorRandom as visitorRandom,
-    Grid$1_visitor as visitor,
+    Grid$1_visitorRow as visitorRow,
+    Grid$1_visitFor as visitFor,
+    Grid$1_visitorColumn as visitorColumn,
+    Grid$1_cells as cells,
   };
 }
 
-/**
- * Create a 'dadsr' (delay, attack, decay, sustain, release) envelope
- *
- * @param {DadsrEnvelopeOpts} opts Options for envelope
- * @returns {Readonly<Envelope.Envelope>} Envelope
- */
-declare const dadsr: (opts?: DadsrEnvelopeOpts) => Readonly<Envelope & WithBeziers>;
-
-declare type DadsrEnvelopeOpts = StageOpts & {
+declare const defaultAdsrOpts: () => AdsrOpts;
+declare type AdsrOpts = AdsrBaseOpts & {
     /**
      * Attack bezier 'bend'
      *
      * @type {number} Bend from -1 to 1. 0 for a straight line
      */
-    readonly attackBend?: number;
+    readonly attackBend: number;
     /**
      * Decay bezier 'bend'
      *
      * @type {number} Bend from -1 to 1. 0 for a straight line
      */
-    readonly decayBend?: number;
+    readonly decayBend: number;
     /**
      * Release bezier 'bend'
      *
      * @type {number} Bend from -1 to 1. 0 for a straight line
      */
-    readonly releaseBend?: number;
-    readonly peakLevel?: number;
-    readonly initialLevel?: number;
-    readonly sustainLevel?: number;
+    readonly releaseBend: number;
+    readonly peakLevel: number;
+    readonly initialLevel: number;
+    readonly sustainLevel: number;
+    readonly releaseLevel: number;
 };
-
-declare type StageOpts = {
-    /**
-     * Timing source for envelope
-     *
-     * @type {TimerSource}
-     */
-    readonly timerSource?: TimerSource;
+declare type AdsrBaseOpts = {
     /**
      * If true, envelope indefinately returns to attack stage after release
      *
      * @type {boolean}
      */
-    readonly shouldLoop?: boolean;
-    /**
-      * Duration for delay stage
-      * Unit depends on timer source
-      * @type {number}
-      */
-    readonly delayDuration?: number;
+    readonly shouldLoop: boolean;
     /**
      * Duration for attack stage
      * Unit depends on timer source
      * @type {number}
      */
-    readonly attackDuration?: number;
+    readonly attackDuration: number;
     /**
      * Duration for decay stage
      * Unit depends on timer source
      * @type {number}
      */
-    readonly decayDuration?: number;
+    readonly decayDuration: number;
     /**
      * Duration for release stage
      * Unit depends on timer source
      * @type {number}
      */
-    readonly releaseDuration?: number;
+    readonly releaseDuration: number;
 };
-/**
- * Stage of envelope
- *
- * @export
- * @enum {number}
- */
-declare enum Stage {
-    Stopped = 0,
-    Delay = 1,
-    Attack = 2,
-    Decay = 3,
-    Sustain = 4,
-    Release = 5
+interface StateChangeEvent {
+    readonly newState: string;
+    readonly priorState: string;
 }
-declare type Envelope = {
-    readonly getStage: (stage: Stage) => {
-        readonly duration: number;
-    };
-    /**
-     * Trigger the envelope, with no hold
-     *
-     */
-    trigger(): void;
-    /**
-     * Resets the envelope, ready for hold() or trigger()
-     *
-     */
-    reset(): void;
-    /**
-     * Triggers the envelope and holds the sustain stage
-     *
-     */
-    hold(): void;
-    /**
-     * Releases the envelope if held
-     *
-     */
+interface CompleteEvent {
+}
+declare type Events = {
+    readonly change: StateChangeEvent;
+    readonly complete: CompleteEvent;
+};
+declare class AdsrBase extends SimpleEventEmitter<Events> {
+    #private;
+    attackDuration: number;
+    decayDuration: number;
+    releaseDuration: number;
+    decayDurationTotal: number;
+    shouldLoop: boolean;
+    constructor(opts: AdsrBaseOpts);
+    switchState(): void;
+    computeRaw(): [stage: string | undefined, amount: number];
+    get isDone(): boolean;
+    trigger(hold?: boolean): void;
     release(): void;
-    /**
-     * Computes the value of the envelope (0-1) and also returns the current stage
-     *
-     * @returns {[Stage, number]}
-     */
-    compute(): readonly [Stage, number];
-};
-declare type Timer = {
-    reset(): void;
-    elapsed(): number;
-};
-declare type TimerSource = () => Timer;
-/**
- * A timer that uses clock time
- *
- * @returns {Timer}
- */
-declare const msRelativeTimer: () => Timer;
-/**
- * Returns a name for a given numerical envelope stage
- *
- * @param {Stage} stage
- * @returns {string} Name of stage
- */
-declare const stageToText: (stage: Stage) => string;
-/**
- * Creates an envelope
- *
- * @param {StageOpts} [opts={}] Options
- * @returns {Readonly<Envelope>} Envelope
- */
-declare const stages: (opts?: StageOpts) => Readonly<Envelope>;
+}
+declare class Adsr extends AdsrBase {
+    readonly attackPath: Path;
+    readonly decayPath: Path;
+    readonly releasePath: Path;
+    readonly initialLevel: number;
+    readonly peakLevel: number;
+    readonly releaseLevel: number;
+    readonly sustainLevel: number;
+    readonly attackBend: number;
+    readonly decayBend: number;
+    readonly releaseBend: number;
+    constructor(opts: AdsrOpts);
+    compute(): [stage: string | undefined, scaled: number, raw: number];
+}
+declare const adsr: (opts: AdsrOpts) => Adsr;
 
-declare const Envelope$1_dadsr: typeof dadsr;
-type Envelope$1_DadsrEnvelopeOpts = DadsrEnvelopeOpts;
-type Envelope$1_StageOpts = StageOpts;
-type Envelope$1_Stage = Stage;
-declare const Envelope$1_Stage: typeof Stage;
-type Envelope$1_Envelope = Envelope;
-declare const Envelope$1_msRelativeTimer: typeof msRelativeTimer;
-declare const Envelope$1_stageToText: typeof stageToText;
-declare const Envelope$1_stages: typeof stages;
-declare namespace Envelope$1 {
+declare const Envelope_defaultAdsrOpts: typeof defaultAdsrOpts;
+type Envelope_AdsrOpts = AdsrOpts;
+type Envelope_AdsrBaseOpts = AdsrBaseOpts;
+type Envelope_StateChangeEvent = StateChangeEvent;
+type Envelope_CompleteEvent = CompleteEvent;
+declare const Envelope_adsr: typeof adsr;
+declare namespace Envelope {
   export {
-    Envelope$1_dadsr as dadsr,
-    Envelope$1_DadsrEnvelopeOpts as DadsrEnvelopeOpts,
-    Envelope$1_StageOpts as StageOpts,
-    Envelope$1_Stage as Stage,
-    Envelope$1_Envelope as Envelope,
-    Envelope$1_msRelativeTimer as msRelativeTimer,
-    Envelope$1_stageToText as stageToText,
-    Envelope$1_stages as stages,
+    Envelope_defaultAdsrOpts as defaultAdsrOpts,
+    Envelope_AdsrOpts as AdsrOpts,
+    Envelope_AdsrBaseOpts as AdsrBaseOpts,
+    Envelope_StateChangeEvent as StateChangeEvent,
+    Envelope_CompleteEvent as CompleteEvent,
+    Envelope_adsr as adsr,
   };
 }
 
@@ -987,6 +1100,92 @@ declare namespace Easing$1 {
   };
 }
 
+/**
+ * The circular array grows to a fixed size. Once full, new
+ * items replace the oldest item in the array. Immutable.
+ *
+ * Usage:
+ * ```
+ * let a = new Circular(10);
+ * let b = a.add(something);
+ * ```
+ * @class CircularArray
+ * @extends {Array}
+ * @template V
+ */
+declare class MutableCircularArray<V> extends Array {
+    #private;
+    constructor(capacity: number);
+    /**
+     * Returns a new Circular with item added
+     *
+     * @param {V} thing Thing to add
+     * @returns {Circular<V>} Circular with item added
+     * @memberof Circular
+     */
+    add(thing: V): MutableCircularArray<V>;
+    get pointer(): number;
+    get isFull(): boolean;
+}
+
+declare class BasePlot {
+    canvasEl: HTMLCanvasElement;
+    precision: number;
+    paused: boolean;
+    scaleMin: number;
+    scaleMax: number;
+    allowScaleDeflation: boolean;
+    labelInset: number;
+    lastPaint: number;
+    maxPaintMs: number;
+    textHeight: number;
+    plotPadding: number;
+    showMiddle: boolean;
+    showScale: boolean;
+    drawLoop: () => void;
+    constructor(canvasEl: HTMLCanvasElement);
+    pushScale(min: number, max: number): number;
+    map(value: number, x1: number, y1: number, x2: number, y2: number): number;
+    scaleNumber(v: number): string;
+    drawScale(g: CanvasRenderingContext2D, min: number, max: number, avg: number, range: number, plotWidth: number, plotHeight: number): void;
+    baseDraw(): void;
+    draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number): void;
+    repaint(): void;
+}
+
+/**
+ * Usage:
+ * let plot = new Plot(plotCanvasEl)
+ * plot.push(value)
+ *
+ * @export
+ * @class Plot
+ * @extends {BaseGraph}
+ */
+declare class Plot extends BasePlot {
+    buffer: MutableCircularArray<number>;
+    readonly samples: number;
+    color: string;
+    lineWidth: number;
+    constructor(canvasEl: HTMLCanvasElement, samples?: number);
+    draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number): void;
+    clear(): void;
+    push(v: number): void;
+}
+
+declare type Circle = {
+    readonly radius: number;
+};
+declare type CirclePositioned = Point & Circle;
+
+declare type Arc = {
+    readonly radius: number;
+    readonly startRadian: number;
+    readonly endRadian: number;
+    readonly counterClockwise?: boolean;
+};
+declare type ArcPositioned = Point & Arc;
+
 declare enum OverflowPolicy$1 {
     /**
      * Removes items front of the queue (ie older items are discarded)
@@ -1040,6 +1239,14 @@ declare class Stack<V> {
     constructor(opts: StackOpts, data: ReadonlyArray<V>);
     push(...toAdd: ReadonlyArray<V>): Stack<V>;
     pop(): Stack<V>;
+    /**
+     * Enumerates stack from bottom-to-top
+     *
+     * @param {(v:V) => void} fn
+     * @memberof Stack
+     */
+    forEach(fn: (v: V) => void): void;
+    forEachFromTop(fn: (v: V) => void): void;
     get isEmpty(): boolean;
     get isFull(): boolean;
     get peek(): V | undefined;
@@ -1102,6 +1309,111 @@ declare class MutableStack<V> {
  */
 declare const stackMutable: <V>(opts: StackOpts, ...startingItems: readonly V[]) => MutableStack<V>;
 
+declare const autoSizeCanvas: (canvasEl: HTMLCanvasElement, callback: () => void, timeoutMs?: number) => rxjs.Subscription;
+declare type CanvasCtxQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
+declare const getCtx: (canvasElCtxOrQuery: CanvasCtxQuery) => CanvasRenderingContext2D;
+declare const makeHelper: (ctxOrCanvasEl: CanvasCtxQuery, canvasBounds?: Rect | undefined) => {
+    paths(pathsToDraw: Path[], opts?: DrawingOpts | undefined): void;
+    line(lineToDraw: Line | Line[], opts?: DrawingOpts | undefined): void;
+    rect(rectsToDraw: RectPositioned | RectPositioned[], opts?: (DrawingOpts & {
+        filled?: boolean | undefined;
+    }) | undefined): void;
+    bezier(bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts | undefined): void;
+    connectedPoints(pointsToDraw: Point[], opts?: (DrawingOpts & {
+        loop?: boolean | undefined;
+    }) | undefined): void;
+    pointLabels(pointsToDraw: Point[], opts?: DrawingOpts | undefined): void;
+    dot(dotPosition: Point | Point[], opts?: (DrawingOpts & {
+        radius: number;
+        outlined?: boolean | undefined;
+        filled?: boolean | undefined;
+    }) | undefined): void;
+    circle(circlesToDraw: CirclePositioned | CirclePositioned[], opts: DrawingOpts): void;
+    arc(arcsToDraw: ArcPositioned | ArcPositioned[], opts: DrawingOpts): void;
+    textBlock(lines: string[], opts: DrawingOpts & {
+        anchor: Point;
+        anchorPadding?: number;
+        bounds?: RectPositioned;
+    }): void;
+};
+declare type DrawingOpts = {
+    readonly strokeStyle?: string;
+    readonly fillStyle?: string;
+    readonly debug?: boolean;
+};
+declare const arc: (ctx: CanvasRenderingContext2D, arcs: ArcPositioned | ReadonlyArray<ArcPositioned>, opts?: DrawingOpts) => void;
+declare type StackOp = (ctx: CanvasRenderingContext2D) => void;
+declare type DrawingStack = Readonly<{
+    push(op: StackOp): DrawingStack;
+    pop(): DrawingStack;
+    apply(): DrawingStack;
+}>;
+declare const drawingStack: (ctx: CanvasRenderingContext2D, stk?: Stack<StackOp> | undefined) => DrawingStack;
+declare const circle: (ctx: CanvasRenderingContext2D, circlesToDraw: CirclePositioned | readonly CirclePositioned[], opts?: DrawingOpts) => void;
+declare const paths: (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Path[] | Path, opts?: Readonly<{
+    readonly strokeStyle?: string;
+    readonly debug?: boolean;
+}>) => void;
+/**
+ * Draws a line between all the given points.
+ *
+ * @export
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {...Points.Point[]} pts
+ * @returns {void}
+ */
+declare const connectedPoints: (ctx: CanvasRenderingContext2D, pts: readonly Point[], opts?: {
+    readonly loop?: boolean;
+    readonly strokeStyle?: string;
+}) => void;
+declare const pointLabels: (ctx: CanvasRenderingContext2D, pts: readonly Point[], opts?: {
+    readonly fillStyle?: string;
+}, labels?: readonly string[] | undefined) => void;
+declare const bezier: (ctx: CanvasRenderingContext2D, bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts | undefined) => void;
+declare const line: (ctx: CanvasRenderingContext2D, toDraw: Line | readonly Line[], opts?: {
+    readonly strokeStyle?: string;
+    readonly debug?: boolean;
+}) => void;
+declare const rect: (ctx: CanvasRenderingContext2D, toDraw: RectPositioned | readonly RectPositioned[], opts?: DrawingOpts & {
+    readonly filled?: boolean;
+}) => void;
+declare const textBlock: (ctx: CanvasRenderingContext2D, lines: readonly string[], opts: DrawingOpts & {
+    readonly anchor: Point;
+    readonly anchorPadding?: number;
+    readonly bounds?: RectPositioned;
+}) => void;
+
+declare const Drawing_autoSizeCanvas: typeof autoSizeCanvas;
+declare const Drawing_getCtx: typeof getCtx;
+declare const Drawing_makeHelper: typeof makeHelper;
+declare const Drawing_arc: typeof arc;
+declare const Drawing_drawingStack: typeof drawingStack;
+declare const Drawing_circle: typeof circle;
+declare const Drawing_paths: typeof paths;
+declare const Drawing_connectedPoints: typeof connectedPoints;
+declare const Drawing_pointLabels: typeof pointLabels;
+declare const Drawing_bezier: typeof bezier;
+declare const Drawing_line: typeof line;
+declare const Drawing_rect: typeof rect;
+declare const Drawing_textBlock: typeof textBlock;
+declare namespace Drawing {
+  export {
+    Drawing_autoSizeCanvas as autoSizeCanvas,
+    Drawing_getCtx as getCtx,
+    Drawing_makeHelper as makeHelper,
+    Drawing_arc as arc,
+    Drawing_drawingStack as drawingStack,
+    Drawing_circle as circle,
+    Drawing_paths as paths,
+    Drawing_connectedPoints as connectedPoints,
+    Drawing_pointLabels as pointLabels,
+    Drawing_bezier as bezier,
+    Drawing_line as line,
+    Drawing_rect as rect,
+    Drawing_textBlock as textBlock,
+  };
+}
+
 declare enum OverflowPolicy {
     /**
      * Removes items front of the queue (ie older items are discarded)
@@ -1116,7 +1428,7 @@ declare enum OverflowPolicy {
      */
     DiscardAdditions = 2
 }
-declare type QueueOpts = {
+interface QueueOpts {
     readonly debug?: boolean;
     readonly capacity?: number;
     /**
@@ -1125,7 +1437,7 @@ declare type QueueOpts = {
      * @type {OverflowPolicy}
      */
     readonly overflowPolicy?: OverflowPolicy;
-};
+}
 declare class Queue<V> {
     readonly opts: QueueOpts;
     readonly data: ReadonlyArray<V>;
@@ -1165,24 +1477,15 @@ declare class Queue<V> {
  * @returns {Queue<V>} A new queue
  */
 declare const queue: <V>(opts?: QueueOpts, ...startingItems: readonly V[]) => Queue<V>;
-declare class MutableQueue<V> {
-    readonly opts: QueueOpts;
-    data: ReadonlyArray<V>;
-    constructor(opts: QueueOpts, data: ReadonlyArray<V>);
-    enqueue(...toAdd: ReadonlyArray<V>): number;
-    dequeue(): V | undefined;
+declare type MutableQueue<V> = {
     get isEmpty(): boolean;
-    get isFull(): boolean;
-    get length(): number;
-    /**
-     * Returns front of queue (oldest item), or undefined if queue is empty
-     *
-     * @readonly
-     * @type {(V | undefined)}
-     * @memberof Queue
-     */
+    readonly dequeue: () => V | undefined;
+    readonly enqueue: (...toAdd: ReadonlyArray<V>) => number;
     get peek(): V | undefined;
-}
+    get length(): number;
+    get isFull(): boolean;
+    get data(): readonly V[];
+};
 /**
  * Returns a mutable queue
  *
@@ -1198,7 +1501,22 @@ declare class MutableQueue<V> {
  */
 declare const queueMutable: <V>(opts?: QueueOpts, ...startingItems: readonly V[]) => MutableQueue<V>;
 
+declare const randomIndex: <V>(array: ArrayLike<V>) => number;
 declare const randomElement: <V>(array: ArrayLike<V>) => V;
+/**
+ * Removes a random item from an array, returning both the item and the new array as a result.
+ * Does not modify the original array unless `mutate` parameter is true
+ *
+ * @template V
+ * @param {readonly} array Array to pluck item from
+ * @param {*} V
+ * @param {*} []
+ * @return {*}  {({readonly value:V|undefined, readonly array:ReadonlyArray<V> })}
+ */
+declare const randomPluck: <V>(array: readonly V[], mutate?: boolean) => {
+    readonly value: V | undefined;
+    readonly array: V[];
+};
 declare const shuffle: (dataToShuffle: ReadonlyArray<unknown>) => ReadonlyArray<unknown>;
 /**
  * Returns an array with a value omitted.
@@ -1211,219 +1529,49 @@ declare const shuffle: (dataToShuffle: ReadonlyArray<unknown>) => ReadonlyArray<
  * @return {*}  {ReadonlyArray<V>}
  */
 declare const without: <V>(data: readonly V[], value: V, comparer?: IsEqual<V>) => readonly V[];
-/**
- * The circular array grows to a fixed size. Once full, new
- * items replace the oldest item in the array. Immutable.
- *
- * Usage:
- * ```
- * let a = new Circular(10);
- * let b = a.add(something);
- * ```
- * @class CircularArray
- * @extends {Array}
- * @template V
- */
-declare class Circular<V> extends Array {
-    #private;
-    constructor(capacity: number);
-    /**
-     * Returns a new Circular with item added
-     *
-     * @param {V} thing Thing to add
-     * @returns {Circular<V>} Circular with item added
-     * @memberof Circular
-     */
-    add(thing: V): Circular<V>;
-    get isFull(): boolean;
-}
 
 declare const Lists_stack: typeof stack;
 declare const Lists_stackMutable: typeof stackMutable;
-type Lists_StackOpts = StackOpts;
 declare const Lists_queue: typeof queue;
 declare const Lists_queueMutable: typeof queueMutable;
-type Lists_QueueOpts = QueueOpts;
+declare const Lists_randomIndex: typeof randomIndex;
 declare const Lists_randomElement: typeof randomElement;
+declare const Lists_randomPluck: typeof randomPluck;
 declare const Lists_shuffle: typeof shuffle;
 declare const Lists_without: typeof without;
-type Lists_Circular<V> = Circular<V>;
-declare const Lists_Circular: typeof Circular;
 declare namespace Lists {
   export {
     Lists_stack as stack,
     Lists_stackMutable as stackMutable,
-    Lists_StackOpts as StackOpts,
     OverflowPolicy$1 as StackOverflowPolicy,
     Lists_queue as queue,
     Lists_queueMutable as queueMutable,
-    Lists_QueueOpts as QueueOpts,
     OverflowPolicy as QueueOverflowPolicy,
+    Lists_randomIndex as randomIndex,
     Lists_randomElement as randomElement,
+    Lists_randomPluck as randomPluck,
     Lists_shuffle as shuffle,
     Lists_without as without,
-    Lists_Circular as Circular,
   };
 }
 
-declare class BasePlot {
-    canvasEl: HTMLCanvasElement;
-    precision: number;
-    paused: boolean;
-    scaleMin: number;
-    scaleMax: number;
-    allowScaleDeflation: boolean;
-    labelInset: number;
-    lastPaint: number;
-    maxPaintMs: number;
-    textHeight: number;
-    plotPadding: number;
-    showMiddle: boolean;
-    showScale: boolean;
-    drawLoop: () => void;
-    constructor(canvasEl: HTMLCanvasElement);
-    pushScale(min: number, max: number): number;
-    map(value: number, x1: number, y1: number, x2: number, y2: number): number;
-    scaleNumber(v: number): string;
-    drawScale(g: CanvasRenderingContext2D, min: number, max: number, avg: number, range: number, plotWidth: number, plotHeight: number): void;
-    baseDraw(): void;
-    draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number): void;
-    repaint(): void;
-}
-
 /**
- * Usage:
- * let plot = new Plot(plotCanvasEl)
- * plot.push(value)
+ * Returns a series that produces values according to a time interval
  *
- * @export
- * @class Plot
- * @extends {BaseGraph}
- */
-declare class Plot extends BasePlot {
-    buffer: Circular<number>;
-    samples: number;
-    color: string;
-    lineWidth: number;
-    constructor(canvasEl: HTMLCanvasElement, samples?: number);
-    draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number): void;
-    clear(): void;
-    push(v: number): void;
-}
-
-declare type Circle = {
-    readonly radius: number;
-};
-declare type CirclePositioned = Point & Circle;
-declare type Arc = {
-    readonly radius: number;
-    readonly startRadian: number;
-    readonly endRadian: number;
-    readonly counterClockwise?: boolean;
-};
-declare type ArcPositioned = Point & Arc;
-
-declare const makeHelper: (ctxOrCanvasEl: CanvasRenderingContext2D | HTMLCanvasElement, canvasBounds?: Rect | undefined) => {
-    paths(pathsToDraw: Path[], opts?: DrawingOpts | undefined): void;
-    line(lineToDraw: Line | Line[], opts?: DrawingOpts | undefined): void;
-    rect(rectsToDraw: RectPositioned | RectPositioned[], opts?: (DrawingOpts & {
-        filled?: boolean | undefined;
-    }) | undefined): void;
-    bezier(bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts | undefined): void;
-    connectedPoints(pointsToDraw: Point[], opts?: (DrawingOpts & {
-        loop?: boolean | undefined;
-    }) | undefined): void;
-    pointLabels(pointsToDraw: Point[], opts?: DrawingOpts | undefined): void;
-    dot(dotPosition: Point | Point[], opts?: (DrawingOpts & {
-        radius: number;
-        outlined?: boolean | undefined;
-        filled?: boolean | undefined;
-    }) | undefined): void;
-    circle(circlesToDraw: CirclePositioned | CirclePositioned[], opts: DrawingOpts): void;
-    arc(arcsToDraw: ArcPositioned | ArcPositioned[], opts: DrawingOpts): void;
-    textBlock(lines: string[], opts: DrawingOpts & {
-        anchor: Point;
-        anchorPadding?: number;
-        bounds?: RectPositioned;
-    }): void;
-};
-declare type DrawingOpts = {
-    strokeStyle?: string;
-    fillStyle?: string;
-    debug?: boolean;
-};
-declare const arc: (ctx: CanvasRenderingContext2D, arcs: ArcPositioned | ArcPositioned[], opts?: DrawingOpts) => void;
-declare type StackOp = {
-    apply(ctx: CanvasRenderingContext2D): void;
-    remove(ctx: CanvasRenderingContext2D): void;
-};
-declare type DrawingStack = {
-    push(op: StackOp): DrawingStack;
-    pop(): DrawingStack;
-    clear(): void;
-};
-declare const drawingStack: (ctx: CanvasRenderingContext2D, stk?: Stack<StackOp> | undefined) => DrawingStack;
-declare const circle: (ctx: CanvasRenderingContext2D, circlesToDraw: CirclePositioned | CirclePositioned[], opts?: DrawingOpts) => void;
-declare const paths: (ctx: CanvasRenderingContext2D, pathsToDraw: Path[] | Path, opts?: {
-    strokeStyle?: string;
-    debug?: boolean;
-}) => void;
-/**
- * Draws a line between all the given points.
+ * Eg produce a random number every 500ms
+ * ```
+ * const randomGenerator = atInterval(() => Math.random(), 1000);
+ * for await (const r of randomGenerator) {
+ *  // use random value...
+ * }
+ * ```
  *
- * @export
- * @param {CanvasRenderingContext2D} ctx
- * @param {...Points.Point[]} pts
- * @returns {void}
+ * @template V
+ * @param {number} intervalMs
+ * @param {() => V} produce
+ * @returns {Series<V>}
  */
-declare const connectedPoints: (ctx: CanvasRenderingContext2D, pts: Point[], opts?: {
-    loop?: boolean;
-    strokeStyle?: string;
-}) => void;
-declare const pointLabels: (ctx: CanvasRenderingContext2D, pts: Point[], opts?: {
-    fillStyle?: string;
-}, labels?: string[] | undefined) => void;
-declare const bezier: (ctx: CanvasRenderingContext2D, bezierToDraw: QuadraticBezier | CubicBezier, opts?: DrawingOpts | undefined) => void;
-declare const line: (ctx: CanvasRenderingContext2D, toDraw: Line | Line[], opts?: {
-    strokeStyle?: string;
-    debug?: boolean;
-}) => void;
-declare const rect: (ctx: CanvasRenderingContext2D, toDraw: RectPositioned | RectPositioned[], opts?: DrawingOpts & {
-    filled?: boolean;
-}) => void;
-declare const textBlock: (ctx: CanvasRenderingContext2D, lines: string[], opts: DrawingOpts & {
-    anchor: Point;
-    anchorPadding?: number;
-    bounds?: RectPositioned;
-}) => void;
-
-declare const Drawing_makeHelper: typeof makeHelper;
-declare const Drawing_arc: typeof arc;
-declare const Drawing_drawingStack: typeof drawingStack;
-declare const Drawing_circle: typeof circle;
-declare const Drawing_paths: typeof paths;
-declare const Drawing_connectedPoints: typeof connectedPoints;
-declare const Drawing_pointLabels: typeof pointLabels;
-declare const Drawing_bezier: typeof bezier;
-declare const Drawing_line: typeof line;
-declare const Drawing_rect: typeof rect;
-declare const Drawing_textBlock: typeof textBlock;
-declare namespace Drawing {
-  export {
-    Drawing_makeHelper as makeHelper,
-    Drawing_arc as arc,
-    Drawing_drawingStack as drawingStack,
-    Drawing_circle as circle,
-    Drawing_paths as paths,
-    Drawing_connectedPoints as connectedPoints,
-    Drawing_pointLabels as pointLabels,
-    Drawing_bezier as bezier,
-    Drawing_line as line,
-    Drawing_rect as rect,
-    Drawing_textBlock as textBlock,
-  };
-}
-
+declare const atInterval: <V>(produce: () => Promise<V>, intervalMs: number) => AsyncGenerator<Awaited<V>, void, unknown>;
 /**
  * Generates a range of numbers, with a given interval.
  * Unlike numericRange, numbers might contain rounding errors
@@ -1431,17 +1579,18 @@ declare namespace Drawing {
  * @param {number} [start=0] Start
  * @param {number} [end] End (if undefined, range never ends)
  */
-declare const rawNumericRange: (interval: number, start?: number, end?: number | undefined, repeating?: boolean) => Generator<number, void, unknown>;
+declare const numericRangeRaw: (interval: number, start?: number, end?: number | undefined, repeating?: boolean) => Generator<number, void, unknown>;
 /**
- * Generates a range of numbers, with a given interval. Numbers are rounded so they behave more expectedly.
+ * Generates a range of numbers, with a given interval.
  *
  * For-loop example:
  * ```
- * let loopForever = numericRange(0.1); // By default starts at 0 and continues forever
+ * let loopForever = numericRange(0.1); // By default starts at 0 and counts upwards forever
  * for (v of loopForever) {
  *  console.log(v);
  * }
  * ```
+ *
  * If you want more control over when/where incrementing happens...
  * ````
  * let percent = numericRange(0.1, 0, 1);
@@ -1451,6 +1600,10 @@ declare const rawNumericRange: (interval: number, start?: number, end?: number |
  *  percentResult = percent.next();
  * }
  * ```
+ *
+ * Note that computations are internally rounded to avoid floating point math issues. So if the `interval` is very small (eg thousandths), specify a higher rounding
+ * number.
+ *
  * @param {number} interval Interval between numbers
  * @param {number} [start=0] Start
  * @param {number} [end] End (if undefined, range never ends)
@@ -1492,247 +1645,18 @@ declare const pingPongPercent: (interval?: number, offset?: number | undefined, 
  */
 declare const pingPong: (interval: number, lower: number, upper: number, offset?: number | undefined, rounding?: number) => Generator<number, never, unknown>;
 
-declare const Producers_rawNumericRange: typeof rawNumericRange;
-declare const Producers_numericRange: typeof numericRange;
-declare const Producers_pingPongPercent: typeof pingPongPercent;
-declare const Producers_pingPong: typeof pingPong;
-declare namespace Producers {
+declare const Generators_atInterval: typeof atInterval;
+declare const Generators_numericRangeRaw: typeof numericRangeRaw;
+declare const Generators_numericRange: typeof numericRange;
+declare const Generators_pingPongPercent: typeof pingPongPercent;
+declare const Generators_pingPong: typeof pingPong;
+declare namespace Generators {
   export {
-    Producers_rawNumericRange as rawNumericRange,
-    Producers_numericRange as numericRange,
-    Producers_pingPongPercent as pingPongPercent,
-    Producers_pingPong as pingPong,
-  };
-}
-
-declare type SeriesEventMap<V> = {
-    data: V;
-    done: boolean;
-    cancel: string;
-};
-declare type SeriesValueNeeded<V> = () => V | undefined;
-/**
- * Returns a series that produces values according to a time interval
- *
- * Eg produce a random number every 500ms
- * ```
- * const rando = interval(500, () => Math.random());
- * ```
- *
- * @template V
- * @param {number} intervalMs
- * @param {() => V} produce
- * @returns {Series<V>}
- */
-declare const atInterval: <V>(intervalMs: number, produce: () => V) => Series<V>;
-/**
- * Returns a series from a generator. This gives minor syntactical benefits over using the generator directly.
- *
- * Example usage:
- * ```
- * let hueSeries = Series.fromGenerator(Producers.numericRange(1, 0, 360, true));
- * hueSeries.value; // Each time value is requested, we get a new number in range
- * ```
- * @template V Type
- * @param {Generator<V>} vGen Generator
- * @returns {Series<V>} Series from provided generator
- */
-declare const fromGenerator: <V>(vGen: Generator<V, any, unknown>) => Series<V>;
-/**
- * Creates a series from an iterable collection.
- * Items are emitted automatically with a set interval until done
- *
- * @template V
- * @param {Iterable<V>} vIter Iterable collection of data
- * @param {number} [delayMs=100] Delay in millis before data starts getting pulled from iterator
- * @param {number} [intervalMs=10] Interval in millis between each attempt at pulling data from
- * @returns {Series<V>} A new series that wraps the iterator
- * @memberof Series
- */
-declare const fromTimedIterable: <V>(vIter: Iterable<V> | AsyncIterable<V>, delayMs?: number, intervalMs?: number) => Series<V>;
-/**
- * Creates a series from an event handler.
- *
- * Create
- * ```
- * const click = fromEvent(buttonEl, `click`);
- * ```
- *
- * Consuming using iteration
- * ```
- * for await (let evt of click) {
- *  console.log(`click event ${evt}`);
- * }
- * ```
- *
- * Consuming using event
- * ```
- * click.addEventListener(`data`, (evt) => {
- *  console.log(`click event ${evt}`);
- * })
- * ```
- *
- * Consuming using field:
- * ```
- * bool wasClicked = click.hasValue(); // True when click event has happened
- * click.clearValue();                 // Forget last event
- * wasClicked = click.hasValue();      // Will be false if there has not been a subsequent click.
- * ```
- * @param {EventTarget} source
- * @param {string} eventType
- * @returns
- * @memberof Series
- */
-declare const fromEvent: (source: EventTarget, eventType: string) => Series<any>;
-/**
- * A Series produces an asynchronous series of data
- * It can be iterated over, or events can be used to subscribe to new data.
- *
- * Examples of using data from a series. Assuming variable `series` is a Series instance...
- * ```
- * for await (let value of series) {
- *  // Value will provide new values as they come in. Make sure to `break` to end infinite series
- * }
- *
- * // Grab the latest value.
- * let v = series.value;
- *
- * // Since the empty value is undefined (falsy) use hasValue() to check for boolean data
- * if (series.hasValue()) ...
- *
- * series.clearValue(); // Set value to undefined
- * ```
- *
- * Example of manually controlling a series:
- * ```
- * const series = new Series(); // Create
- * series.push(`some value`);   // Push data to listeners/subscribers
- *
- * series.onValueNeeded = () => Math.random(); // Provide a random value when ever a new value is needed
- * series.cancel(`manual cancel`);  // Close series, causing .done and .cancelled to be true
- *
- * if (series.done) console.log(`series done`); // Series is complete or cancelled
- * if (series.cancelled) console.log(`series cancelled`); // Cancelled but maybe was not done
- * ```
- * @export
- * @class Series
- * @extends {SimpleEventEmitter<SeriesEventMap<V>>}
- * @implements {AsyncIterable<V>}
- * @template V
- */
-declare class Series<V> extends SimpleEventEmitter<SeriesEventMap<V>> implements AsyncIterable<V> {
-    #private;
-    /**
-     * Callback to pull new data from a source is triggered when .value is queryed
-     * without new data having arrived
-     *
-     * If the function returns `undefined`, the series is marked as done.
-     * @type {(SeriesValueNeeded<V> | undefined)}
-     * @memberof Series
-     */
-    onValueNeeded: SeriesValueNeeded<V> | undefined;
-    [Symbol.asyncIterator](): AsyncIterator<any, any, undefined>;
-    /**
-     * Merges an event, meaning that all event data from the source will be pushed to the series.
-     *
-     * Event listener is removed if Series is done/cancelled
-     * @param {EventTarget} source
-     * @param {string} eventType
-     * @memberof Series
-     */
-    mergeEvent(source: EventTarget, eventType: string): void;
-    /**
-     * Sets the done state to true. Once 'done' no more data can be pushed
-     *
-     * @returns
-     * @memberof Series
-     */
-    _setDone(): void;
-    /**
-     * Push a value to the series, firing the 'data' event
-     *
-     * @param {V} v Value to push
-     * @memberof Series
-     */
-    push(v: V): void;
-    /**
-     * Cancels the series. Fires both 'cancel' and 'done' events,
-     * series cannot push data subsequently.
-     *
-     * @param {string} [cancelReason='Cancelled']
-     * @returns
-     * @memberof Series
-     */
-    cancel(cancelReason?: string): void;
-    /**
-     * Returns true if series has been cancelled
-     *
-     * @readonly
-     * @type {boolean}
-     * @memberof Series
-     */
-    get cancelled(): boolean;
-    /**
-     * Returns true if series has been marked 'done'
-     * Series will be 'done' if cancelled as well.
-     *
-     * @readonly
-     * @type {boolean}
-     * @memberof Series
-     */
-    get done(): boolean;
-    /**
-     * Returns the last value that flowed through series or undefined if there is no value.
-     *
-     * Warning: Calling has side-effects. If no new value has been pushed to the series after the last
-     * call to `.value` _and_ the `onValueNeeded` handler is set _and_ series is not marked as done,
-     * the handler will be used to pull a new value. If the return result is `undefined`, series will
-     * then be marked as done.
-     *
-     * @readonly
-     * @type {(V|undefined)}
-     * @memberof Series
-     */
-    get value(): V | undefined;
-    /**
-     * Clears the last value. This may result in the next call to `.value` pulling a new value.
-     * `hasValue()` will return false until a new value arrives.
-     *
-     * @memberof Series
-     */
-    clearLastValue(): void;
-    /**
-     * Returns true if series has a last value.
-     * This means at least one value has been received since creation or `clearLastValue()` invocation.
-     *
-     * Does not trigger pulling a new value, unlike `.value`
-     * @returns
-     * @memberof Series
-     */
-    hasValue(): boolean;
-}
-declare class TriggerSeries extends Series<boolean> {
-    #private;
-    constructor(undefinedValue?: boolean);
-    get value(): boolean;
-}
-
-declare const Series$1_atInterval: typeof atInterval;
-declare const Series$1_fromGenerator: typeof fromGenerator;
-declare const Series$1_fromTimedIterable: typeof fromTimedIterable;
-declare const Series$1_fromEvent: typeof fromEvent;
-type Series$1_Series<V> = Series<V>;
-declare const Series$1_Series: typeof Series;
-type Series$1_TriggerSeries = TriggerSeries;
-declare const Series$1_TriggerSeries: typeof TriggerSeries;
-declare namespace Series$1 {
-  export {
-    Series$1_atInterval as atInterval,
-    Series$1_fromGenerator as fromGenerator,
-    Series$1_fromTimedIterable as fromTimedIterable,
-    Series$1_fromEvent as fromEvent,
-    Series$1_Series as Series,
-    Series$1_TriggerSeries as TriggerSeries,
+    Generators_atInterval as atInterval,
+    Generators_numericRangeRaw as numericRangeRaw,
+    Generators_numericRange as numericRange,
+    Generators_pingPongPercent as pingPongPercent,
+    Generators_pingPong as pingPong,
   };
 }
 
@@ -1827,4 +1751,4 @@ declare class FrequencyHistogramPlot {
     update(data: ReadonlyArray<readonly [key: string, count: number]>): void;
 }
 
-export { Bezier as Beziers, CompoundPath$1 as Compound, Drawing, Easing$1 as Easings, Envelope$1 as Envelopes, FrequencyHistogramPlot, Grid$1 as Grids, Line$1 as Lines, Lists, Path$1 as Paths, Plot, Point$1 as Points, Producers, Rect$1 as Rects, Series$1 as Series, Set as Sets };
+export { Bezier as Beziers, CompoundPath$1 as Compound, Drawing, Easing$1 as Easings, Envelope as Envelopes, FrequencyHistogramPlot, Grid$1 as Grids, Line$1 as Lines, Lists, Path$1 as Paths, Plot, Point$1 as Points, Generators as Producers, Rect$1 as Rects, Set as Sets };

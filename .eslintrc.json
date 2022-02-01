@@ -136,7 +136,13 @@
                 ]
             },
             {
-                "selector": "variable",
+                "selector": [
+                    "variable"
+                ],
+                "modifiers": [
+                    "const",
+                    "exported"
+                ],
                 "types": [
                     "boolean"
                 ],

@@ -76,7 +76,6 @@ export class GridEditor extends LitElement {
     this.cols = 5;
     this.showToolbar = false;
     this.pixelSize = 15;
-    //this.grid = {rows:5, cols:5, size: 15};
   }
 
   private onChanged() {
@@ -180,7 +179,7 @@ export class GridEditor extends LitElement {
   }
 
   render() {
-   const d = this.getGrid();
+
    const h = html`
       <div class="container">
         ${this.renderToolbar()}

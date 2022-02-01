@@ -1,5 +1,5 @@
 {
-  "name": "@clinth/ix",
+  "name": "ixfx",
   "version": "0.0.1",
   "description": "",
   "module": "dist/bundle.min.mjs",

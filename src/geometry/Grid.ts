@@ -31,26 +31,27 @@ export type Neighbours = Readonly<{
   readonly sw: Cell|undefined
 }>
 
-export type CardinalDirection =`` | `n` | `ne` | `e` | `se` | `s` | `sw` | `w` | `nw`;
 
-// export enum WrapLogic {
-//   None = 0,
-//   Wrap = 1
-// }
+export type CardinalDirection = `` | `n` | `ne` | `e` | `se` | `s` | `sw` | `w` | `nw`;
 
 export type BoundsLogic = `unbounded` | `undefined`| `stop` | `wrap`;
-//eslint-disable-next-line functional/prefer-readonly-type
-//type NextCell = (grid:Grid, current:Cell, queue:readonly Cell[]) => Cell|undefined;
 
 type VisitorLogic = {
-  readonly possibleNeighbours?:(grid:Grid, origin:Cell) => ReadonlyArray<Neighbour>;
-  readonly shouldExhaustNeighbours:boolean,
-  readonly neighbourSelect:NeighbourSelector
+  readonly options?:IdentifyNeighbours;
+  readonly select:NeighbourSelector
 }
+export type VisitGenerator = Generator<Readonly<Cell>, void, unknown>
+export type VisitorOpts = {
+  readonly visited?:MutableStringSet<Cell>
+  readonly reversed?:boolean
+  readonly debug?:boolean
+}
+export type Visitor = (grid:Grid, start:Cell, opts?:VisitorOpts) => VisitGenerator;
 
 export type NeighbourMaybe = readonly [keyof Neighbours, Cell|undefined];
 export type Neighbour = readonly [keyof Neighbours, Cell];
 type NeighbourSelector =  (neighbours: ReadonlyArray<Neighbour>) => Neighbour|undefined;
+type IdentifyNeighbours = (grid:Grid, origin:Cell) => ReadonlyArray<Neighbour>;
 
 /**
  * Returns true if `c` parameter is a cell with x,y fields.
@@ -183,11 +184,6 @@ export const cellAtPoint = (position: Point.Point, grid: Grid & GridVisual): Cel
   return {x, y};
 };
 
-export const offsetStepsByRow = (grid:Grid, origin:Cell, steps:number, bounds:BoundsLogic = `undefined`):Cell|undefined => offset(grid, origin, {x:0, y:steps}, bounds);
-
-export const offsetStepsByCol = (grid:Grid, origin:Cell, steps:number, bounds:BoundsLogic = `undefined`):Cell|undefined => offset(grid, origin, {x:steps, y:0}, bounds);
-
-
 export const allDirections = Object.freeze([`n`, `ne`, `nw`, `e`, `s`, `se`, `sw`, `w`]) as ReadonlyArray<CardinalDirection>;
 export const crossDirections = Object.freeze([`n`, `e`, `s`,  `w`]) as ReadonlyArray<CardinalDirection>;
 
@@ -201,7 +197,7 @@ export const neighbours = (grid: Grid, cell: Cell, bounds: BoundsLogic = `undefi
 };
 
 /**
- * Returns the mid-point of a cell
+ * Returns the pixel midpoint of a cell
  *
  * @param {Cell} cell
  * @param {(Grid & GridVisual)} grid
@@ -224,10 +220,10 @@ export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Point.Point => 
  * @returns {Cell[]}
  */
 export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
+  // https://stackoverflow.com/a/4672319
   guard(start);
   guard(end);
 
-  // https://stackoverflow.com/a/4672319
   // eslint-disable-next-line functional/no-let
   let startX = start.x;
   // eslint-disable-next-line functional/no-let
@@ -257,14 +253,15 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
   }
   return cells;
 };
+
 /**
  * Returns cells that correspond to the cardinal directions at a specified distance
  *
- * @param {Grid} grid
- * @param {number} steps Distance
- * @param {Cell} [start={x: 0, y: 0}]
- * @param {BoundsLogic} [bounds=BoundsLogic.Stop]
- * @returns {Neighbours}
+ * @param grid Griod
+ * @param steps Distance
+ * @param start Start poiint
+ * @param bound Logic for if bounds of grid are exceeded
+ * @returns Cells corresponding to cardinals
  */
 export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds:BoundsLogic = `stop`): Neighbours => {
   guardInteger(steps, `steps`, true);
@@ -277,6 +274,21 @@ export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds:B
   return zipKeyValue(directions, cells) as Neighbours;
 };
 
+/**
+ * Returns an {x,y} signed vector corresponding to the provided cardinal direction.
+ * ```
+ * const n = getVectorFromCardinal(`n`); // {x: 0, y: -1}
+ * ```
+ * Optional `multiplier` can be applied to vector
+ * ```
+ * const n = getVectorFromCardinal(`n`, 10); // {x: 0, y: -10}
+ * ```
+ * 
+ * Blank direction returns {x: 0, y: 0}
+ * @param cardinal Direction
+ * @param multiplier Multipler
+ * @returns Signed vector in the form of {x,y}
+ */
 export const getVectorFromCardinal = (cardinal: CardinalDirection, multiplier: number = 1): Cell => {
   //eslint-disable-next-line functional/no-let
   let v;
@@ -312,11 +324,13 @@ export const getVectorFromCardinal = (cardinal: CardinalDirection, multiplier: n
 };
 
 /**
- * Returns a list of cells from `start` to `end`, but only if they lay on the same row or column
+ * Returns a list of cells from `start` to `end`.
+ * 
+ * Throws an error if start and end are not on same row or column.
  *
- * @param {Cell} start
- * @param {Cell} end
- * @param {boolean} [endInclusive=false]
+ * @param start Start cell
+ * @param end end clel
+ * @param endInclusive
  * @return {*}  {ReadonlyArray<Cell>}
  */
 export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolean = false): ReadonlyArray<Cell> {
@@ -411,6 +425,7 @@ const neighbourList = (grid:Grid, cell:Cell, directions:ReadonlyArray<CardinalDi
   return (entries as Array<NeighbourMaybe>).filter(isNeighbour);
 };
 
+
 /**
  * Visits every cell in grid using supplied selection function
  * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom
@@ -452,14 +467,15 @@ export const visitor = function* (
   logic:VisitorLogic, 
   grid: Grid, 
   start: Cell, 
-  visited?: MutableStringSet<Cell>
-) {
+  opts: VisitorOpts = {}
+):VisitGenerator {
   
   guardGrid(grid, `grid`);
   guard(start, `start`, grid);
   
-  const v = visited ?? mutableStringSet<Cell>(c => cellKeyString(c));
-  const possibleNeighbours = logic.possibleNeighbours ? logic.possibleNeighbours : (g:Grid, c:Cell) => neighbourList(g, c, crossDirections, `undefined`);
+
+  const v = opts.visited ?? mutableStringSet<Cell>(c => cellKeyString(c));
+  const possibleNeighbours = logic.options ? logic.options : (g:Grid, c:Cell) => neighbourList(g, c, crossDirections, `undefined`);
 
   if (!isCell(start)) throw new Error(`'start' parameter is undefined or not a cell`);
 
@@ -509,7 +525,7 @@ export const visitor = function* (
       current = null;
     } else {
       // Pick move
-      const potential = logic.neighbourSelect(moveQueue);
+      const potential = logic.select(moveQueue);
       if (potential !== undefined) {
         //eslint-disable-next-line functional/immutable-data
         cellQueue.push(potential[1]);
@@ -519,32 +535,28 @@ export const visitor = function* (
   }
 };
 
-export const visitorDepth = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor({
-  shouldExhaustNeighbours: false,
-  neighbourSelect: (nbos) => nbos[nbos.length-1]},
+export const visitorDepth = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
+  select: (nbos) => nbos[nbos.length-1]},
 grid,
 start,
-visited);
+opts);
 
-export const visitorBreadth = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor({
-  shouldExhaustNeighbours: false,
-  neighbourSelect: (nbos) => nbos[0]},
+export const visitorBreadth = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
+  select: (nbos) => nbos[0]},
 grid,
 start,
-visited);
+opts);
 
 const randomNeighbour = (nbos: readonly Neighbour[]) => randomElement(nbos); //.filter(isNeighbour));
 
-export const visitorRandomContiguous = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor({
-  shouldExhaustNeighbours: false,
-  neighbourSelect: randomNeighbour},
+export const visitorRandomContiguous = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
+  select: randomNeighbour},
 grid,
 start,
-visited);
+opts);
 
-export const visitorRandom = (grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor({
-  shouldExhaustNeighbours: false,
-  possibleNeighbours: (grid, cell) => {
+export const visitorRandom = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
+  options: (grid, cell) => {
     const t:Neighbour[] = [];
     //eslint-disable-next-line functional/no-loop-statement
     for (const c of cells(grid, cell)) {
@@ -553,50 +565,139 @@ export const visitorRandom = (grid:Grid, start:Cell, visited?:MutableStringSet<C
     }
     return t;
   },
-  neighbourSelect: randomNeighbour},
+  select: randomNeighbour},
 grid,
 start,
-visited);
+opts);
   
-export const visitorRow =(grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor({
-  shouldExhaustNeighbours: true,
-  neighbourSelect: (nbos) => nbos.find(n => n[0] === `e`),
-  possibleNeighbours: (grid, cell) => {
-    // console.log(`${cell.x}, ${cell.y}`);
-    if (cell.x < grid.rows - 1) {
-      // Try moving to next col
-      // console.log(`  moving to next col. ${cell.x}, ${cell.y}`);
-      cell = {x: cell.x + 1, y: cell.y};
-    } else {
-      console.log(`Wrapping: y: ${cell.y}`);
-      if (cell.y < grid.rows) {
-        cell = {x:0, y: cell.y + 1};
-      } else {
-        cell = {x:0, y: 0};
-      }
-    }
-    return [[`e`, cell]];
-  }
-}, grid, start, visited);
 
-export const visitorColumn =(grid:Grid, start:Cell, visited?:MutableStringSet<Cell>) => visitor({
-  shouldExhaustNeighbours: true,
-  neighbourSelect: (nbos) => nbos.find(n => n[0] === `e`),
-  possibleNeighbours: (grid, cell) => {
-    // console.log(`${cell.x}, ${cell.y}`);
-    if (cell.y < grid.cols - 1) {
-      // Try moving to next row
-      cell = {x: cell.x, y: cell.y + 1};
-    } else {
-      if (cell.x < grid.cols) {
-        cell = {x:cell.x+1, y:0};
+export const visitorRow =(grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
+  const { reversed = false } = opts;
+
+  const neighbourSelect = (nbos:readonly Neighbour[]) => nbos.find(n => n[0] === (reversed ? `w` : `e`));
+
+  const possibleNeighbours = (grid:Grid, cell:Cell):ReadonlyArray<Neighbour> => {
+    if (reversed) {
+      // WALKING BACKWARD ALONG RONG
+      if (cell.x > 0) {
+        // All fine, step to the left
+        cell = {x: cell.x - 1, y: cell.y};
       } else {
-        cell = {x:0, y:0};
+        // At the beginning of a row
+        if (cell.y > 0) {
+          // Wrap to next row up
+          cell = {x: grid.cols-1, y: cell.y - 1};
+        } else {
+          // Wrap to end of grid
+          cell = {x: grid.cols-1, y: grid.rows-1};
+        }
+      }
+    } else {
+      // WALKING FORWARD ALONG ROWS
+      // console.log(`${cell.x}, ${cell.y}`);
+      if (cell.x < grid.rows - 1) {
+        // All fine, step to the right
+        cell = {x: cell.x + 1, y: cell.y};
+      } else {
+        // At the end of a row
+        if (cell.y < grid.rows - 1) {
+          // More rows available, wrap to next row down
+          cell = {x:0, y: cell.y + 1};
+        } else {
+          // No more rows available, wrap to start of the grid
+          cell = {x:0, y: 0};
+        }
       }
     }
-    return [[`e`, cell]];
-  }
-}, grid, start, visited);
+    return [[(reversed ? `w` : `e`), cell]];
+  };
+
+  const logic:VisitorLogic = {
+    select: neighbourSelect,
+    options: possibleNeighbours
+  };
+
+  return visitor(logic, grid, start, opts);
+};
+
+export const visitFor = (grid:Grid, start:Cell, steps:number, visitor:Visitor):Cell => {
+  guardInteger(steps, `steps`);
+
+  const opts:VisitorOpts = {
+    reversed: steps < 0
+  };
+  steps = Math.abs(steps);
+
+  //eslint-disable-next-line functional/no-let
+  let c = start;
+  //eslint-disable-next-line functional/no-let
+  let v = visitor(grid, start, opts);
+  v.next(); // Burn up starting cell
+  
+  //eslint-disable-next-line functional/no-let
+  let stepsMade = 0;
+  
+  //eslint-disable-next-line functional/no-loop-statement
+  while (stepsMade < steps) {
+    stepsMade++;
+    const {value} = v.next();
+    if (value) {
+      c = value;
+      if (opts.debug) console.log(`stepsMade: ${stepsMade} cell: ${c.x}, ${c.y} reverse: ${opts.reversed}`);
+    } else {
+      if (steps >= grid.cols * grid.rows) {
+        steps -= grid.cols * grid.rows;
+        stepsMade = 0;
+        v = visitor(grid, start, opts);
+        v.next();
+        c = start;
+        if (opts.debug) console.log(`resetting visitor to ${steps}`);
+      } else throw new Error(`Value not received by visitor`);
+    }
+  } 
+  return c;
+};
+
+export const visitorColumn =(grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
+  const { reversed = false } = opts;
+  const logic:VisitorLogic = {
+    select: (nbos) => nbos.find(n => n[0] === (reversed ? `n`:`s`)),
+    options: (grid, cell):ReadonlyArray<Neighbour> => {
+      if (reversed) {
+        // WALK UP COLUMN, RIGHT-TO-LEFT
+        if (cell.y > 0) {
+          // Easy case
+          cell = {x: cell.x, y: cell.y - 1};
+        } else {
+          // Top of column
+          if (cell.x === 0) {
+            // Top-left corner, need to wrap
+            cell = {x:grid.cols-1, y:grid.rows-1};
+          } else {
+            cell = {x:cell.x-1, y:grid.rows-1};
+          }
+        }
+      } else {
+        // WALK DOWN COLUMNS, LEFT-TO-RIGHT
+        if (cell.y < grid.rows - 1) {
+          // Easy case, move down by one
+          cell = {x: cell.x, y: cell.y + 1};
+        } else {
+          // End of column
+          if (cell.x < grid.cols - 1) {
+            // Move to next column and start at top
+            cell = {x:cell.x+1, y:0};
+          } else {
+            // Move to start of grid
+            cell = {x:0, y:0};
+          }
+        }
+      }
+      return [[reversed ? `n`:`s`, cell]];
+    }
+  };
+  return visitor(logic, grid, start, opts);
+};
 
 /**
  * Enumerate all cells in an efficient manner. If end of grid is reached, iterator will wrap to ensure all are visited.

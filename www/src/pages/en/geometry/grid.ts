@@ -2,7 +2,7 @@
 
 import { mutableStringSet } from '~/collections/Set';
 import * as Grids from '~/geometry/Grid'
-import {GridEditor} from '~/dom/GridEditor';
+import {GridEditor} from 'src/components/GridEditor';
 import {button, numeric, resolveEl, select} from '~/dom/Forms';
 import {randomPalette} from '~/colour/DictionaryOfColourCombinations';
 import {randomElement} from '~/collections/Lists';
@@ -77,23 +77,22 @@ const offsetsGrid = resolveEl(`#offsetsGrid`) as GridEditor;
 offsetsGrid.selectedCell = {x:0, y:0};
 
 const offsets = () => {
-  const shape = offsetsGrid.getGrid();
+  const grid = offsetsGrid.getGrid();
   const distance = offsetsDistance.value;
   const selected = offsetsGrid.selectedCell;
   
-  const offsets = Grids.offsetCardinals(shape, selected, distance, offsetsWrapSel.value as Grids.BoundsLogic);
+  const offsets = Grids.offsetCardinals(grid, selected, distance, offsetsWrapSel.value as Grids.BoundsLogic);
   offsetsGrid.cellRenderer = (cell, rect, ctx) => {
     const kv = Object.entries(offsets).find(t => Grids.cellEquals(t[1], cell));
-
-    //if (perim.find(v => Grids.cellEquals(v, cell))) {
     if (kv === undefined) return false;
 
+    if (kv[0] === `s`) console.log(kv[0] +  ' ' +JSON.stringify(kv[1]));
     ctx.fillStyle = getCssVariable(`theme-bg-hover`, `yellow`);
     //ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     ctx.fillStyle =`white`;
     ctx.textBaseline = `top`;
 
-    const yOffset = 5; //kv[0].startsWith(`n`) ? 10 : 5;
+    const yOffset = kv[0].startsWith(`n`) ? 20 : 5;
     ctx.fillText(kv[0], rect.x + 5, rect.y + yOffset);
 
     return true;
@@ -162,26 +161,26 @@ const visStart = () => {
   const sel = select(`#selVisTechnique`);
   const grid = visGrid.getGrid();
   const visited = mutableStringSet<Grids.Cell>(c => Grids.cellKeyString(c));
-
+  const visitOpts = { visited};
   let visitor;
   switch (sel.value) {
   case `Depth`:
-    visitor = Grids.visitorDepth(grid, visLastClicked, visited);
+    visitor = Grids.visitorDepth(grid, visLastClicked, visitOpts);
     break;
   case `Breadth`:
-    visitor = Grids.visitorBreadth(grid, visLastClicked, visited);
+    visitor = Grids.visitorBreadth(grid, visLastClicked, visitOpts);
     break;
   case `Row`:
-    visitor = Grids.visitorRow(grid, visLastClicked, visited);
+    visitor = Grids.visitorRow(grid, visLastClicked, visitOpts);
     break;
   case `Column`:
-    visitor = Grids.visitorColumn(grid, visLastClicked, visited);
+    visitor = Grids.visitorColumn(grid, visLastClicked, visitOpts);
     break;
   case `Random Contiguous`:
-    visitor = Grids.visitorRandomContiguous(grid, visLastClicked, visited);
+    visitor = Grids.visitorRandomContiguous(grid, visLastClicked, visitOpts);
     break;
   default:
-    visitor = Grids.visitorRandom(grid, visLastClicked, visited);
+    visitor = Grids.visitorRandom(grid, visLastClicked, visitOpts);
   }
   //const visitor = Grids.visitor(visitorFn, grid, visLastClicked, Grids.neighbours, visited);
  
