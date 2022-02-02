@@ -10,8 +10,8 @@ import * as Points from './Point.js';
 import * as Rects from './Rect.js';
 export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Math};
 
-import {Grid, Cell} from '~/geometry/Grid.js';
-import {Path} from './Path.js';
-import {Line} from './Line.js';
-import {Point} from './Point.js';
-export {Grid, Line, Cell, Path, Point};
+// import {Grid, Cell} from './Grid.js';
+// import {Path} from './Path.js';
+// import {Line} from './Line.js';
+// import {Point} from './Point.js';
+// export {Grid, Line, Cell, Path, Point};

@@ -1,9 +1,9 @@
 /* eslint-disable */
-import {domLog} from '~/dom/DomLog';
+import {log} from '~/dom/Log';
 import {button, select} from '~/dom/Forms';
 import {StateMachine, MachineDescription, Options as StateMachineOpts, StateChangeEvent, StopEvent} from '~/StateMachine';
 
-const log = domLog(`#dataStream`, {capacity: 8, timestamp: false});
+const logger = log(`#dataStream`, {capacity: 8, timestamp: false});
 
 let currentSm:StateMachine|undefined;
 const demoMachines = {
@@ -90,10 +90,10 @@ const btnSetDescr = button(`#btnSetDescr`, () => {
     }
     currentSm = sm;
     update(sm);
-    log.clear();
+    logger.clear();
   } catch (ex) {
     console.error(ex);
-    log.error(ex.message);
+    logger.error(ex.message);
     update(undefined);
   }
 });
@@ -128,19 +128,19 @@ const create = (initial:string, description:MachineDescription):StateMachine => 
   
   // State machine has changed state
   sm.addEventListener(`change`, (evt:StateChangeEvent) => {
-    log.log(`'${evt.priorState}' -> '${evt.newState}'`);
+    logger.log(`'${evt.priorState}' -> '${evt.newState}'`);
     update(sm);
   });
   
   sm.addEventListener(`stop`, (ev:StopEvent) => {
-    log.log(`Completed. Final state: '${ev.state}'`);
+    logger.log(`Completed. Final state: '${ev.state}'`);
   })
   return sm;
 }
 
 btnChangeState.addEventListener(`click`, () => {
   if (currentSm === undefined) {
-    log.log(`No machine set`);
+    logger.log(`No machine set`);
     return;
   }
 

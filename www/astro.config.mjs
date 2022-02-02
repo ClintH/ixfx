@@ -11,6 +11,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 // @ts-check
 export default /** @type {import('astro').AstroUserConfig} */ ({
+  dist: `../docs/`,
   renderers: [
     // Enable the Preact renderer to support Preact JSX components.
     `@astrojs/renderer-preact`,

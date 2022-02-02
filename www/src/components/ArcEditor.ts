@@ -2,7 +2,7 @@
 import { LitElement, html, css } from 'lit';
 import { property } from 'lit/decorators.js';
 import * as Arcs from '~/geometry/Arc';
-import * as Svg from '~/dom/Svg';
+import * as Svg from '~/visual/Svg';
 
 export const tagName = `arc-editor`;
 

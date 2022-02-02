@@ -6,10 +6,9 @@ export const SITE = {
 
 export const OPEN_GRAPH = {
   image: {
-    src: `https://github.com/withastro/astro/blob/main/assets/social/banner.jpg?raw=true`,
-    alt: `astro logo on a starry expanse of space,` + ` with a purple saturn-like planet floating in the right foreground`,
-  },
-  twitter: `astrodotbuild`,
+    src: `https://github.com/clinth/ixfx/blob/main/assets/social/banner.jpg?raw=true`,
+    alt: `ixfx`,
+  }
 };
 
 // export const KNOWN_LANGUAGES = {
@@ -31,36 +30,31 @@ export const OPEN_GRAPH = {
 
 export const SIDEBAR = 
    [
-    { text: ``, header: true },
-    { text: `Docs`, header: true },
-    { text: `Introduction`, link: `introduction` },
-    { text: `Modulation`, header: true },
-    { text: `Envelope`, link: `modulation/envelope` },
-
-    // { text: `Collections`, header: true },
-    // { text: `Circular Array`, link: `data/circularArray` },
-    // { text: `Set`, link: `data/circularArray` },
-    // { text: `Queue`, link: `data/circularArray` },
-    // { text: `Stack`, link: `data/circularArray` },
-    // { text: `MapOf`, link: `data/circularArray` },
-
-
-    { text: `Data`, header: true },
-    { text: `State Machine`, link: `data/stateMachine` },
-    { text: `Frequency Histogram`, link: `data/freqHistogram` },
-
-    { text: `Geometry`, header: true },
-    { text: `Units`, link: `geometry/units` },
-    // { text: `Point`, link: `geometry/point` },
-    // { text: `Line`, link: `geometry/line` },
-    { text: `Arc`, link: `geometry/arc` },
-    { text: `Circle`, link: `geometry/circle` },
-    // { text: `Rectangle`, link: `geometry/rectangle` },
-    // { text: `Curve`, link: `geometry/curve` },
-    // { text: `Paths`, link: `geometry/compound` },
-    { text: `Grid`, link: `geometry/grid` },
-
-    // { text: `Visualisation`, header: true },
-    // { text: `Drawing`, link: `visualisation/drawing` },
-    // { text: `Plot`, link: `visualisation/drawing` },
-  ];
+     { text: ``, header: true },
+     { text: `Docs`, header: true },
+     { text: `Introduction`, link: `introduction` },
+     { text: `Modulation`, header: true },
+     { text: `Envelope`, link: `modulation/envelope` },
+     // { text: `Collections`, header: true },
+     // { text: `Circular Array`, link: `data/circularArray` },
+     // { text: `Set`, link: `data/circularArray` },
+     // { text: `Queue`, link: `data/circularArray` },
+     // { text: `Stack`, link: `data/circularArray` },
+     // { text: `MapOf`, link: `data/circularArray` },
+     { text: `Data`, header: true },
+     { text: `State Machine`, link: `data/stateMachine` },
+     { text: `Frequency Histogram`, link: `data/freqHistogram` },
+     { text: `Geometry`, header: true },
+     { text: `Units`, link: `geometry/units` },
+     { text: `Point`, link: `geometry/point` },
+     // { text: `Line`, link: `geometry/line` },
+     { text: `Arc`, link: `geometry/arc` },
+     { text: `Circle`, link: `geometry/circle` },
+     // { text: `Rectangle`, link: `geometry/rectangle` },
+     // { text: `Curve`, link: `geometry/curve` },
+     // { text: `Paths`, link: `geometry/compound` },
+     { text: `Grid`, link: `geometry/grid` },
+     // { text: `Visualisation`, header: true },
+     // { text: `Drawing`, link: `visualisation/drawing` },
+     // { text: `Plot`, link: `visualisation/drawing` },
+   ];

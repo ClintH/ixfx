@@ -1,7 +1,7 @@
 /* eslint-disable */
 import {fromEvent, debounceTime} from 'rxjs';
 import {map } from  'rxjs/operators';
-import {ArcEditor} from '../../../components/ArcEditor';
+import {ArcEditor} from '../../components/ArcEditor';
 import * as Arcs from '~/geometry/Arc';
 import {createAfter, createIn} from '~/dom';
 import json5 from 'json5';

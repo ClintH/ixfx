@@ -4,9 +4,7 @@ import {Path} from './Path.js';
 import {Lines, Points, Rects} from './index.js';
 export const isArc = (p: Arc|number): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 
-//const isArc = (p: Circle | Arc): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 export const isPositioned = (p: Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
-//export const isPositioned = (p: Circle | Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 export type Arc = {
   readonly radius:number
@@ -34,7 +32,6 @@ export const fromDegrees = (radius:number, startDegrees:number, endDegrees:numbe
     });
   } else return Object.freeze(a);
 };
-
 
 /**
  * Returns a Line from start to end point of arc
@@ -71,7 +68,6 @@ export const pointOnArc = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Po
   };
 };
 
-
 export const guard = (arc:Arc|ArcPositioned) => {
   if (arc === undefined) throw new Error(`Arc is undefined`);
   if (isPositioned(arc)) {
@@ -90,31 +86,10 @@ export const guard = (arc:Arc|ArcPositioned) => {
   if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
 };
 
-// const guard = (circleOrArc:CirclePositioned|Circle|Arc|ArcPositioned) => {
-//   if (isPositioned(circleOrArc)) {
-//     guardPoint(circleOrArc, `circleOrArc`);
-//   }
-
-//   if (Number.isNaN(circleOrArc.radius)) throw new Error(`Radius is NaN`);
-//   if (circleOrArc.radius <= 0) throw new Error(`Radius must be greater than zero`);
-
-//   if (isArc(circleOrArc)) {
-//     if(circleOrArc.startRadian >= circleOrArc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
-//   }
-// };
-
 export const compute = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
   guard(arc);
   return pointOnArc(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t), origin);
 };
-
-// export const compute = (circleOrArc:ArcPositioned|CirclePositioned, t:number):Points.Point => {
-//   if (isArc(circleOrArc)) {
-//     return pointOnArc(circleOrArc, circleOrArc.startRadian + ((circleOrArc.endRadian-circleOrArc.startRadian)*t));
-//   } else if (isCircle(circleOrArc)) {
-//     return pointOnCircle(circleOrArc, t*PIPI);
-//   } else throw new Error(`Parameter invalid`);
-// };
 
 export const arcToPath = (arc:ArcPositioned): Path => {
   guard(arc);
@@ -128,14 +103,6 @@ export const arcToPath = (arc:ArcPositioned): Path => {
     kind: `arc`
   });
 };
-
-// export const length = (circleOrArc:Circle|Arc):number => {
-//   if (isArc(circleOrArc)) {
-//     return PIPI*circleOrArc.radius*((circleOrArc.startRadian-circleOrArc.endRadian)/PIPI);
-//   } else if (isCircle(circleOrArc)) {
-//     return PIPI*circleOrArc.radius;
-//   } else throw new Error(`Invalid parameter`);
-// };
 
 export const length = (arc:Arc):number =>  piPi*arc.radius*((arc.startRadian-arc.endRadian)/piPi);
 
@@ -151,19 +118,6 @@ export const bbox = (arc:ArcPositioned|Arc):Rects.RectPositioned|Rects.Rect => {
     };
   }
 };
-
-
-// export const bbox = (circleOrArc:CirclePositioned|ArcPositioned):Rects.RectPositioned => {
-//   if (isArc(circleOrArc)) {
-//     const middle = compute(circleOrArc, 0.5);
-//     const asLine = toLine(circleOrArc);
-//     return Points.bbox(middle, asLine.a, asLine.b);
-//   } else if (isCircle(circleOrArc)) {
-//     return Rects.fromCenter(circleOrArc, circleOrArc.radius*2, circleOrArc.radius*2);
-//   } else {
-//     throw new Error(`Invalid parameter`);
-//   }
-// };
 
 export const toSvg = (origin:Points.Point, radiusOrArc:number|Arc, startAngle?:number, endAngle?:number) => {
   if (isArc(radiusOrArc)) return toSvgFull(origin, radiusOrArc.radius, radiusOrArc.startRadian, radiusOrArc.endRadian);
@@ -189,7 +143,6 @@ const toSvgFull = (origin:Points.Point, radius:number, startAngle:number, endAng
   return d.map(x => x.toString()).join(` `).trim();
 };
 
-//export const distanceCenter = (a:CirclePositioned|ArcPositioned, b:CirclePositioned|ArcPositioned):number => Points.distance(a, b);
 export const distanceCenter = (a:ArcPositioned, b:ArcPositioned):number => Points.distance(a, b);
 
 /**
@@ -215,4 +168,3 @@ export const isEquals = (a:Arc|ArcPositioned, b:Arc|ArcPositioned):boolean => {
   if (a.startRadian !== b.startRadian) return false;
   return true;
 };
-

@@ -2,7 +2,7 @@
 import {LitElement, html, css} from 'lit';
 import {property} from 'lit/decorators.js';
 import * as Circles from '~/geometry/Circle';
-import * as Svg from '~/dom/Svg';
+import * as Svg from '~/visual/Svg';
 import {Palette} from '~/visual/Palette';
 import * as Lines from '~/geometry/Line';
 import * as MathUtil from '~/geometry/Math';

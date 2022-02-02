@@ -27,12 +27,11 @@
     "run": "tsc && node -r source-map-support/register",
     "bundle": "tsup",
     "bundle:watch": "tsup --watch",
-    "_bundle:geometry": "tsup ./src/geometry/index.ts --out-dir=./dist/geometry",
     "prepublish": "npm run clean && npm run pkg",
     "pkg": "npm run bundle",
     "pkg:typings": "tsc --project config/tsconfig.pkg.json",
     "copyForDemos": "copyfiles ./dist/* ../ixfx-demos/node_modules/ixfx/",
-    "docs:build": "grok ./etc/build/index.d.ts --config ./config/grok.config.cjs --outDir ./etc/docs",
+    "docs": "grok ./etc/build/index.d.ts --config ./config/grok.config.cjs --outDir ./docs/api",
     "lint": "eslint src/**",
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js"

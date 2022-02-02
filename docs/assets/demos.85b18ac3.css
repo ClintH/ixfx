@@ -1,0 +1,1 @@
+:root{--padding1: .3em;--padding2: 1em;--padding3: 1.3em}.toolbar{display:flex}.toolbar button{margin-right:.3em;margin-left:.3em}.toolbar>section{display:flex;border-right:2px solid var(--theme-bg-hover);padding:.3em;align-items:center;margin:0;flex-wrap:wrap}ul.nobullets li{list-style:none}label,fieldset legend{display:block;margin-bottom:calc(var(--spacing) * .25)}

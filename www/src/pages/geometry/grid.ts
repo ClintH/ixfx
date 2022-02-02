@@ -1,7 +1,6 @@
 /* eslint-disable */
-
 import { mutableStringSet } from '~/collections/Set';
-import * as Grids from '~/geometry/Grid'
+import * as Grids from '~/geometry/Grid';
 import {GridEditor} from 'src/components/GridEditor';
 import {button, numeric, resolveEl, select} from '~/dom/Forms';
 import {randomPalette} from '~/visual/DictionaryOfColourCombinations';

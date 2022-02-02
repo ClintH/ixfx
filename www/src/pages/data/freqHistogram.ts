@@ -1,10 +1,10 @@
 /* eslint-disable */
 import {MutableFreqHistogram} from '~/MutableFreqHistogram';
-import {domLog} from '~/dom/DomLog';
+import {log} from '~/dom/log';
 import {weighted} from '~/Random';
-import { FrequencyHistogramPlot} from '~/visual/FrequencyHistogramPlot';
+import { FrequencyHistogramPlot} from '~/components/FrequencyHistogramPlot';
 
-const log = domLog(`#dataStream`, {capacity: 8, timestamp: false});
+const logger = log(`#dataStream`, {capacity: 8, timestamp: false});
 const freq = new MutableFreqHistogram<string>();
 const plot = new FrequencyHistogramPlot(document.getElementById('dataPlot'));
 // plot.el.showDataLabels = false;
@@ -21,14 +21,14 @@ freq.addEventListener(`change`, () => {
 });
 
 const start = () => {
-  log.log(`Start`);
-  log.log();
+  logger.log(`Start`);
+  logger.log();
   producerId = window.setInterval(() => {
     itemsLeft--;
     //const r = `something really long ` +  Math.floor(Math.random()*100);// weightedRandom(1, 100);
     const r = weighted(1, 100).toString();
     freq.add(r);
-    log.log(r.toString());
+    logger.log(r.toString());
 
     if (itemsLeft <= 0) stop();
   }, 1000);
@@ -36,15 +36,15 @@ const start = () => {
 
 const stop = () => {
   if (producerId === 0) return;
-  log.log(`Stop`);
-  log.log();
+  logger.log(`Stop`);
+  logger.log();
   itemsLeft = 200;
   window.clearInterval(producerId);
 }
 
 const clear = () => {
   freq.clear();
-  log.log();
+  logger.log();
 }
 
 document.getElementById(`btnStart`).addEventListener(`click`, start);

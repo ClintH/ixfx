@@ -1,4 +1,4 @@
-import {Lines, Beziers, Rects, Point} from './index.js';
+import {Lines, Beziers, Rects, Points} from './index.js';
 
 //eslint-disable-next-line  functional/no-mixed-type
 export type Path = {
@@ -9,7 +9,7 @@ export type Path = {
    * @param {number} t Relative position (0.0-1.0)
    * @returns {Point} Point
    */
-  compute(t: number): Point
+  compute(t: number): Points.Point
   bbox(): Rects.RectPositioned
   toString(): string
   toSvgString(): string
@@ -21,7 +21,7 @@ export type Path = {
  * @param {Path} path
  * @return {*}  {Point}
  */
-export const getStart = function (path: Path): Point {
+export const getStart = function (path: Path): Points.Point {
   if (Beziers.isQuadraticBezier(path)) return path.a;
   else if (Lines.isLine(path)) return path.a;
   else throw new Error(`Unknown path type ${JSON.stringify(path)}`);
@@ -33,7 +33,7 @@ export const getStart = function (path: Path): Point {
  * @param {Path} path
  * @return {*}  {Point}
  */
-export const getEnd = function (path: Path): Point {
+export const getEnd = function (path: Path): Points.Point {
   if (Beziers.isQuadraticBezier(path)) return path.b;
   else if (Lines.isLine(path)) return path.b;
   else throw new Error(`Unknown path type ${JSON.stringify(path)}`);

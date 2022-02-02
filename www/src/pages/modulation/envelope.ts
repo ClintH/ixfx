@@ -2,13 +2,13 @@
 import * as Envelopes from '~/modulation/Envelope';
 import {button, checkbox, resolveEl, select} from '~/dom/Forms';
 import {plot2} from '~/visual/Plot2';
-import {domLog} from '~/dom/DomLog';
+import {log} from '~/dom/log';
 import {Palette} from '~/visual/Palette';
 import {fromEvent, debounceTime} from 'rxjs';
 import {map } from  'rxjs/operators';
 
 // Setup data logger
-const envDataLog = domLog(`#envDataStream`, {
+const envDataLog = log(`#envDataStream`, {
   minIntervalMs: 20,
   capacity: 150
 });

@@ -6,7 +6,6 @@ export type Point = Readonly<{
   readonly z?: number
 }>
 
-
 export const compareTo = (compareFn:(a:Point, b:Point)=>Point, ...points:readonly Point[]):Point => {
   if (points.length === 0) throw new Error(`No points provided`);
   //eslint-disable-next-line functional/no-let
@@ -53,7 +52,6 @@ export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {
     else return b;
   }, ...points);
 
-
   const topLeft = {x:leftMost.x, y:topMost.y};
   const topRight = {x:rightMost.x, y:topMost.y};
   const bottomRight = {x:rightMost.x, y:bottomMost.y};
@@ -82,7 +80,6 @@ export const toString = (p: Point): string => {
     return `(${p.x},${p.y})`;
   }
 };
-
 
 /**
  * Returns true if the two points have identical values
@@ -233,4 +230,3 @@ export function multiply(a: Point, bOrX: Point | number, y?: number) {
     };
   } else throw new Error(`Invalid arguments`);
 }
-
