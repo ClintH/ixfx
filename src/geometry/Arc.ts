@@ -1,9 +1,7 @@
-import * as Points from './Point.js';
-import {guard as guardPoint} from './Point.js';
 import * as MathUtil from './Math.js';
+import {guard as guardPoint} from './Point.js';
 import {Path} from './Path.js';
-import * as Rects from './Rect.js';
-import {Lines} from '../index.js';
+import {Lines, Points, Rects} from './index.js';
 export const isArc = (p: Arc|number): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 
 //const isArc = (p: Circle | Arc): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
@@ -21,7 +19,7 @@ export type ArcPositioned = Points.Point & Arc;
 
 const piPi = Math.PI *2;
 
-export const arcFrom = (radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point): Arc|ArcPositioned => {
+export const fromDegrees = (radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point): Arc|ArcPositioned => {
   const a = {
     radius,
     startRadian:MathUtil.degreeToRadian(startDegrees),
@@ -49,6 +47,13 @@ export const toLine = (arc:ArcPositioned):Lines.Line => Lines.fromPoints(
   pointOnArc(arc, arc.endRadian)
 );
 
+/**
+ * Calculates a coordinate on an arc, based on an angle
+ * @param arc Arc
+ * @param angleRadian Angle of desired coordinate 
+ * @param origin Origin of arc (0,0 used by default)
+ * @returns Coordinate
+ */
 export const pointOnArc = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.Point): Points.Point => {
   if (angleRadian > arc.endRadian) throw new Error(`angleRadian beyond end angle of arc`);
   if (angleRadian < arc.startRadian) throw new Error(`angleRadian beyond start angle of arc`);
@@ -68,12 +73,19 @@ export const pointOnArc = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Po
 
 
 export const guard = (arc:Arc|ArcPositioned) => {
+  if (arc === undefined) throw new Error(`Arc is undefined`);
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);
   }
   if (typeof arc.radius !== `number`) throw new Error(`Radius must be a number`);
   if (Number.isNaN(arc.radius)) throw new Error(`Radius is NaN`);
   if (arc.radius <= 0) throw new Error(`Radius must be greater than zero`);
+
+  if (!(arc.startRadian in arc)) throw new Error(`Arc is missing 'startRadian' field`);
+  if (!(arc.endRadian in arc)) throw new Error(`Arc is missing 'startRadian' field`);
+  if (Number.isNaN(arc.endRadian)) throw new Error(`Arc endRadian is NaN`);
+  if (Number.isNaN(arc.startRadian)) throw new Error(`Arc endRadian is NaN`);
+
   if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
 };
 
@@ -90,7 +102,10 @@ export const guard = (arc:Arc|ArcPositioned) => {
 //   }
 // };
 
-export const compute = (arc:ArcPositioned, t:number):Points.Point => pointOnArc(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t));
+export const compute = (arc:ArcPositioned, t:number, origin?:Points.Point):Points.Point => {
+  guard(arc);
+  return pointOnArc(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t), origin);
+};
 
 // export const compute = (circleOrArc:ArcPositioned|CirclePositioned, t:number):Points.Point => {
 //   if (isArc(circleOrArc)) {

@@ -1,7 +1,7 @@
 import {resolveEl} from "./Forms.js";
 import {addShadowCss} from "./ShadowDom.js";
 
-export type DomLogOpts = {
+export type LogOpts = {
   readonly capacity?: number,
   readonly timestamp?: boolean,
   readonly collapseDuplicates?:boolean,
@@ -9,7 +9,7 @@ export type DomLogOpts = {
   readonly minIntervalMs?:number
 }
 
-export type DomLog = Readonly<{
+export type Log = Readonly<{
   clear():void
   error(msgOrError:string|Error|unknown):void
   log(msg?:string|object|number):void
@@ -22,11 +22,11 @@ export type DomLog = Readonly<{
  * something like `overflow-y: scroll` on its parent
  * 
  * ```
- * const l = domLog(`#dataStream`); // Assumes HTML element with id `dataStream` exists 
+ * const l = log(`#dataStream`); // Assumes HTML element with id `dataStream` exists 
  * l.log(`Hi`);
  * l.log(); // Displays a horizontal rule
  * 
- * const l = domLog(document.getElementById(`dataStream`), {
+ * const l = log(document.getElementById(`dataStream`), {
  *  timestamp: true,
  *  truncateEntries: 20
  * });
@@ -37,17 +37,17 @@ export type DomLog = Readonly<{
  * For logging high-throughput streams:
  * ```
  * // Silently drop log if it was less than 5ms since the last
- * const l = domLog(`#dataStream`, { minIntervalMs: 5 });
+ * const l = log(`#dataStream`, { minIntervalMs: 5 });
  * 
  * // Only the last 100 entries are kept
- * const l = domLog(`#dataStream`, { capacity: 100 });
+ * const l = log(`#dataStream`, { capacity: 100 });
  * ```
  *
  * @param {(HTMLElement | string | undefined)} elOrId Element or id of element
- * @param {DomLogOpts} opts
- * @returns {DomLog}
+ * @param {LogOpts} opts
+ * @returns {Log}
  */
-export const domLog = (domQueryOrEl: HTMLElement | string, opts: DomLogOpts = {}):DomLog => {
+export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const {capacity = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
 

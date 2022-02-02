@@ -1,11 +1,10 @@
-import {Points} from '../index.js';
-import * as Paths from './Path.js';
-import * as Rects from './Rect.js';
+import {Points, Paths, Rects} from './index.js';
 
 export type CompoundPath = Paths.Path & {
   segments: Paths.Path[]
   kind: `compound`
-}
+};
+
 /**
  * Returns a new compoundpath, replacing a path at a given index
  *

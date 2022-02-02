@@ -11,8 +11,8 @@
   "repository": {
     "url": "git@github.com:clinth/ix.git"
   },
-  "module": "dist/ixfx.js",
-  "exports": "./dist/ixfx.js",
+  "module": "dist/index.js",
+  "exports": "./dist/index.js",
   "browsersList": [
     ">2% and last 2 versions and not ie 6-11"
   ],
@@ -21,26 +21,28 @@
     "dist"
   ],
   "scripts": {
-    "test:coverage": "jest --collectCoverage --config config/jest.config.js",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js",
-    "watch": "tsc --watch",
-    "clean": "rimraf dist",
-    "prepublish": "npm run build:pkg",
-    "build": "tsc && npm run bundle",
-    "bundle": "tsup",
-    "develop": "tsup --watch",
+    "build": "tsc",
+    "develop": "tsc --watch",
+    "clean": "rimraf dist && rimraf etc",
     "run": "tsc && node -r source-map-support/register",
-    "pkg": "npm run pkg:bundle",
+    "bundle": "tsup",
+    "bundle:watch": "tsup --watch",
+    "_bundle:geometry": "tsup ./src/geometry/index.ts --out-dir=./dist/geometry",
+    "prepublish": "npm run clean && npm run pkg",
+    "pkg": "npm run bundle",
     "pkg:typings": "tsc --project config/tsconfig.pkg.json",
-    "pkg:bundle": "tsup",
-    "esbundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/ixfx.js --bundle",
-    "esdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/index.js --bundle --watch",
-    "dev:demos": "snowpack dev --config ./config/snowpack-demos.config.js",
-    "dev:demosAlt": "snowpack dev --config ./config/snowpack-demosAlt.config.js",
-    "build:demos": "snowpack build --config ./config/snowpack-demos.config.js",
     "copyForDemos": "copyfiles ./dist/* ../ixfx-demos/node_modules/ixfx/",
     "docs:build": "grok ./etc/build/index.d.ts --config ./config/grok.config.cjs --outDir ./etc/docs",
-    "lint": "eslint src/**"
+    "lint": "eslint src/**",
+    "test:coverage": "jest --collectCoverage --config config/jest.config.js",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js"
+  },
+  "legacyScripts": {
+    "legacyesbundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/ixfx.js --bundle",
+    "legacyesdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/index.js --bundle --watch",
+    "legacydev:demos": "snowpack dev --config ./config/snowpack-demos.config.js",
+    "legacydev:demosAlt": "snowpack dev --config ./config/snowpack-demosAlt.config.js",
+    "legacybuild:demos": "snowpack build --config ./config/snowpack-demos.config.js"
   },
   "devDependencies": {
     "@svgdotjs/svg.js": "^3.1.1",
@@ -60,7 +62,6 @@
     "live-server": "^1.2.1",
     "npm-check-updates": "^12.1.0",
     "rimraf": "^3.0.2",
-    "snowpack": "^3.8.8",
     "source-map-support": "^0.5.21",
     "ts-jest": "^27.1.2",
     "tsup": "^5.11.11",
@@ -72,6 +73,7 @@
   "dependencies": {
     "@types/bezier-js": "^4.1.0",
     "bezier-js": "^4.1.1",
+    "lit": "^2.1.2",
     "rxjs": "^7.5.2"
   },
   "engines": {

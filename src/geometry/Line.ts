@@ -1,8 +1,7 @@
-import * as Rects from './Rect.js';
-import * as Points  from './Point.js';
 import {guard as guardPoint} from './Point.js';
 import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
+import { Rects, Points} from './index.js';
 
 export type Line = {
   readonly a: Points.Point

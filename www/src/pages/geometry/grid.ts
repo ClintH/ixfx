@@ -4,9 +4,9 @@ import { mutableStringSet } from '~/collections/Set';
 import * as Grids from '~/geometry/Grid'
 import {GridEditor} from 'src/components/GridEditor';
 import {button, numeric, resolveEl, select} from '~/dom/Forms';
-import {randomPalette} from '~/colour/DictionaryOfColourCombinations';
+import {randomPalette} from '~/visual/DictionaryOfColourCombinations';
 import {randomElement} from '~/collections/Lists';
-import {getCssVariable} from '~/colour/Palette';
+import {getCssVariable} from '~/visual/Palette';
 
 // -----------------------------
 // Square perimeter & Neighbours

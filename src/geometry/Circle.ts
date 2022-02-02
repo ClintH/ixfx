@@ -1,8 +1,8 @@
-import {Line} from './Line.js';
-import {Path} from './Path.js';
-import * as Points from './Point.js';
 import {guard as guardPoint} from './Point.js';
-import * as Rects from './Rect.js';
+import {Path} from './Path.js';
+import {Line} from './Line.js';
+import {Points, Rects} from  './index.js';
+
 const piPi = Math.PI *2;
 
 //const isCircle = (p: Circle | Points.Point): p is Circle => (p as Circle).radius !== undefined;

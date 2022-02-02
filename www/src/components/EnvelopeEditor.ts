@@ -1,9 +1,9 @@
 import {LitElement, css, html} from 'lit';
 import {customElement, property, query} from 'lit/decorators.js';
-import * as Drawing from '~/visualisation/Drawing';
+import * as Drawing from '~/visual/Drawing';
 import {AdsrOpts, defaultAdsrOpts} from '~/modulation/Envelope';
 import * as Beziers from '~/geometry/Bezier';
-import {getCssVariable} from '~/colour/Palette';
+import {getCssVariable} from '~/visual/Palette';
 import {copyToClipboard} from '~/dom/index';
 
 const jsonData = (obj: unknown) => {

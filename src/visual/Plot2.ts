@@ -3,7 +3,7 @@
 import {getMinMaxAvg} from "../util.js";
 import {MutableCircularArray} from "../collections/MutableCircularArray.js"
 import {mutableMapCircular, MutableMapOf} from "../collections/MutableMapMulti.js"
-import {Palette} from "../colour/Palette.js";
+import {Palette} from "./Palette.js";
 import {Point} from "../geometry/Point.js";
 import {resolveEl} from "../dom/Forms.js";
 import {autoSizeCanvas} from "./Drawing.js";

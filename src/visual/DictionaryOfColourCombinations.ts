@@ -23,7 +23,7 @@ export type DictColour = {
   readonly hex: string
 };
 
-export const check = () => {
+const check = () => {
   // @ts-ignore
   const d = data.default;
   //eslint-disable-next-line  functional/no-loop-statement

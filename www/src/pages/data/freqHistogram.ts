@@ -2,7 +2,7 @@
 import {MutableFreqHistogram} from '~/MutableFreqHistogram';
 import {domLog} from '~/dom/DomLog';
 import {weighted} from '~/Random';
-import { FrequencyHistogramPlot} from '~/visualisation/FrequencyHistogramPlot';
+import { FrequencyHistogramPlot} from '~/visual/FrequencyHistogramPlot';
 
 const log = domLog(`#dataStream`, {capacity: 8, timestamp: false});
 const freq = new MutableFreqHistogram<string>();

@@ -1,6 +1,6 @@
 import {LitElement, css, html} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
-import {repeat} from 'lit/directives/repeat.js';
+import {customElement, property} from 'lit/decorators';
+import {repeat} from 'lit/directives/repeat';
 import {KeyValue} from '~/KeyValue.js';
 
 type Bar = {

@@ -1,11 +1,8 @@
 /* eslint-disable */
 import { LitElement, html, css } from 'lit';
-import { unsafeHTML } from  'lit/directives/unsafe-html.js';
 import { property } from 'lit/decorators.js';
 import * as Arcs from '~/geometry/Arc';
-import * as Drawing from '~/visualisation/Drawing';
 import * as Svg from '~/dom/Svg';
-import * as Rects from '~/geometry/Rect';
 
 export const tagName = `arc-editor`;
 

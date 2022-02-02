@@ -1,9 +1,9 @@
 /* eslint-disable */
 import * as Envelopes from '~/modulation/Envelope';
 import {button, checkbox, resolveEl, select} from '~/dom/Forms';
-import {plot2} from '~/visualisation/Plot2';
+import {plot2} from '~/visual/Plot2';
 import {domLog} from '~/dom/DomLog';
-import {Palette} from '~/colour/Palette';
+import {Palette} from '~/visual/Palette';
 import {fromEvent, debounceTime} from 'rxjs';
 import {map } from  'rxjs/operators';
 

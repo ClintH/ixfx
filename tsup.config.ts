@@ -2,7 +2,14 @@ import {defineConfig} from 'tsup';
 
 export default defineConfig({
   entry: {
-    ixfx: `./src/index.ts`
+    bundle: `./src/index.ts`,
+    geometry: `./src/geometry/index.ts`,
+    visual: `./src/visual/index.ts`,
+    dom: `./src/dom/index.ts`,
+    modulation: `./src/modulation/index.ts`,
+    collections: `./src/collections/index.ts`,
+    generators: `./src/Generators.ts`,
+    components: `./src/components/index.ts`
   },
   sourcemap: true,
   dts: true,

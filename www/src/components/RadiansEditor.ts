@@ -1,12 +1,9 @@
 /* eslint-disable */
 import {LitElement, html, css} from 'lit';
 import {property} from 'lit/decorators.js';
-import * as Arcs from '~/geometry/Arc';
 import * as Circles from '~/geometry/Circle';
-import * as Drawing from '~/visualisation/Drawing';
 import * as Svg from '~/dom/Svg';
-import {Palette} from '~/colour/Palette';
-import * as Rects from '~/geometry/Rect';
+import {Palette} from '~/visual/Palette';
 import * as Lines from '~/geometry/Line';
 import * as MathUtil from '~/geometry/Math';
 import {themeChangeObservable} from '~/dom';

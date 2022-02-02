@@ -1,7 +1,7 @@
 /* eslint-disable */
 import {LitElement, css, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {getCssVariable} from '~/colour/Palette';
+import {getCssVariable} from '~/visual/Palette';
 import * as Grids from '~/geometry/Grid';
 import * as Rects from '~/geometry/Rect';
 

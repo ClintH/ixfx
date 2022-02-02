@@ -1,5 +1,4 @@
-import * as Points from './Point.js';
-import * as Lines from './Line.js';
+import {Points, Lines} from './index.js';
 
 export type Rect = {
   readonly width: number,

@@ -1,4 +1,4 @@
-import { HistogramVis } from '../dom/Histogram.js';
+import { HistogramVis } from './HistogramVis.js';
 import * as KeyValueUtil from '../KeyValue.js';
 
 /**

@@ -1,8 +1,5 @@
 import {Bezier as BezierLib} from 'bezier-js';
-import * as Paths from './Path.js';
-import * as Points from './Point.js';
-import * as Rects from './Rect.js';
-import * as Lines from './Line.js';
+import {Paths, Points, Rects, Lines} from './index.js';
 
 export type QuadraticBezier = {
   readonly a: Points.Point,
@@ -20,7 +17,6 @@ export type CubicBezier = {
 
 export type CubicBezierPath = Paths.Path & CubicBezier;
 
-
 export const isQuadraticBezier = (path: Paths.Path | QuadraticBezier | CubicBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
 export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
 
@@ -31,8 +27,8 @@ export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier):
  * @param {number} [bend=0] Bend amount, from -1 to 1
  * @returns {QuadraticBezier}
  */
- export const quadraticBend = (a:Points.Point, b: Points.Point, bend = 0): QuadraticBezier => quadraticSimple(a, b, bend);
- //export const quadraticBend = (b: QuadraticBezier, bend = 0): QuadraticBezier => quadraticSimple(b.a, b.b, bend);
+export const quadraticBend = (a:Points.Point, b: Points.Point, bend = 0): QuadraticBezier => quadraticSimple(a, b, bend);
+//export const quadraticBend = (b: QuadraticBezier, bend = 0): QuadraticBezier => quadraticSimple(b.a, b.b, bend);
 
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.

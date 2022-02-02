@@ -1,4 +1,4 @@
-import * as Rects from "./Rect.js";
+import {Rects} from "./index.js";
 
 export type Point = Readonly<{
   readonly x: number

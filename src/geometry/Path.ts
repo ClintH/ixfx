@@ -1,8 +1,4 @@
-
-import {Point} from './Point.js';
-import * as Rects from './Rect.js';
-import * as Beziers from './Bezier.js';
-import * as Lines from  './Line.js';
+import {Lines, Beziers, Rects, Point} from './index.js';
 
 //eslint-disable-next-line  functional/no-mixed-type
 export type Path = {

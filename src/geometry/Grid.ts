@@ -1,5 +1,4 @@
-import * as Rect from "./Rect.js";
-import * as Point from './Point.js';
+import {Rects, Points} from './index.js';
 import {integer as guardInteger} from '../Guards.js';
 import {clampZeroBounds} from "../util.js";
 import {randomElement } from  '../collections/Lists.js';
@@ -158,12 +157,12 @@ export const inside = (grid:Grid, cell:Cell):boolean => {
  * @param {(Grid & GridVisual)} grid
  * @return {*}  {Rect.RectPositioned}
  */
-export const rectangleForCell = (cell: Cell, grid: Grid & GridVisual): Rect.RectPositioned => {
+export const rectangleForCell = (cell: Cell, grid: Grid & GridVisual): Rects.RectPositioned => {
   guard(cell);
   const size = grid.size;
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
   const y = cell.y * size;// + (grid.spacing ? cell.y * grid.spacing : 0);
-  const r = Rect.fromTopLeft({x: x, y: y}, size, size);
+  const r = Rects.fromTopLeft({x: x, y: y}, size, size);
   return r;
 };
 
@@ -174,7 +173,7 @@ export const rectangleForCell = (cell: Cell, grid: Grid & GridVisual): Rect.Rect
  * @param {(Grid & GridVisual)} grid Grid
  * @return {*}  {(Cell | undefined)} Cell at position or undefined if outside of the grid
  */
-export const cellAtPoint = (position: Point.Point, grid: Grid & GridVisual): Cell | undefined => {
+export const cellAtPoint = (position: Points.Point, grid: Grid & GridVisual): Cell | undefined => {
   const size = grid.size;
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
@@ -205,7 +204,7 @@ export const neighbours = (grid: Grid, cell: Cell, bounds: BoundsLogic = `undefi
  * @param {(Grid & GridVisual)} grid
  * @return {*}  {Point.Point}
  */
-export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Point.Point => {
+export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Points.Point => {
   guard(cell);
 
   const size = grid.size;
