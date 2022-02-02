@@ -117,7 +117,7 @@ export class RadiansEditor extends LitElement {
   
     const addRadian = (rad:number, label?:string, opts:Svg.TextDrawingOpts = labelStyle) => {
       if (label === undefined) label = rad.toString();
-      const pt = Circles.pointOnCircle(labelC, rad);
+      const pt = Circles.point(labelC, rad);
       svg.text({x:pt.x, y:pt.y}, label, opts );
     }
 

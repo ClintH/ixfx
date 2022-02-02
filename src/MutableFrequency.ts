@@ -2,16 +2,18 @@
 
 import { ToString } from "./util.js";
 import {SimpleEventEmitter} from "./Events.js";
-type MutableFreqHistogramEventMap = {
+import * as KeyValueUtil from './KeyValue.js';
+
+type MutableFrequencyEventMap = {
   readonly change:void;
 }
 
-export const mutableFreqHistogram = <V>(keyString:ToString<V>|undefined) => new MutableFreqHistogram<V>(keyString);
+export const mutableFrequency = <V>(keyString?:ToString<V>|undefined) => new MutableFrequency<V>(keyString);
 
 /**
- * Mutable Frequency Histogram
+ * Mutable Frequency
  *
- * Usage:
+ * @example
  * ```
  * .add(value)  - adds a value
  * .clear()     - clears all data
@@ -19,9 +21,9 @@ export const mutableFreqHistogram = <V>(keyString:ToString<V>|undefined) => new 
  * .toArray()   - returns an array of data in the shape [[key,freq],[key,freq]...]
  * ```
  * 
- * Example
+ * @example
  * ```
- * const fh = new MutableFreqHistogram();
+ * const fh = new MutableFrequency();
  * fh.add(`apples`); // Count an occurence of `apples`
  * fh.add(`oranges)`;
  * fh.add(`apples`);
@@ -34,11 +36,11 @@ export const mutableFreqHistogram = <V>(keyString:ToString<V>|undefined) => new 
  * ```
  * 
  * @export
- * @class MutableFreqHistogram
- * @extends {SimpleEventEmitter<MutableFreqHistogramEventMap>}
+ * @class MutableFrequency
+ * @extends {SimpleEventEmitter<MutableFrequencyEventMap>}
  * @template V
  */
-export class MutableFreqHistogram<V> extends SimpleEventEmitter<MutableFreqHistogramEventMap> {
+export class MutableFrequency<V> extends SimpleEventEmitter<MutableFrequencyEventMap> {
   readonly #store:Map<string, number>;
   readonly #keyString: ToString<V>;
 
@@ -81,6 +83,15 @@ export class MutableFreqHistogram<V> extends SimpleEventEmitter<MutableFreqHisto
 
     const key = this.#keyString(value);
     return this.#store.get(key);
+  }
+
+  entries():Array<KeyValueUtil.KeyValue> {
+    return Array.from(this.#store.entries());
+  }
+  
+  entriesSorted(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`) {
+    const s = KeyValueUtil.getSorter(sortStyle);
+    return s(this.entries());
   }
 
   add(...values:V[]) {

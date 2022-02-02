@@ -24,16 +24,15 @@ import * as KeyValueUtil from '../KeyValue.js';
  * @class FrequencyHistogramPlot
  */
 export class FrequencyHistogramPlot {
-  readonly parentEl:HTMLElement;
+  //readonly parentEl:HTMLElement;
   // eslint-disable-next-line functional/prefer-readonly-type
-  el:HistogramVis|undefined;
+  
+  readonly el:HistogramVis|undefined;
   // eslint-disable-next-line functional/prefer-readonly-type
   #sorter:KeyValueUtil.SortingFn|undefined;
 
-  constructor(parentEl: HTMLElement) {
-    console.log(`FreqHistoPlot`);
-    this.parentEl = parentEl;
-    this.init();
+  constructor(el: HistogramVis) {
+    this.el = el;
   }
 
   setAutoSort(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):void {
@@ -65,12 +64,12 @@ export class FrequencyHistogramPlot {
     this.el.data = [];
   }
 
-  init() {
-    if (this.el !== undefined) return; // already inited
-    // eslint-disable-next-line functional/immutable-data
-    this.el = document.createElement(`histogram-vis`);
-    this.parentEl.appendChild(this.el);
-  }
+  // init() {
+  //   if (this.el !== undefined) return; // already inited
+  //   // eslint-disable-next-line functional/immutable-data
+  //   this.el = document.createElement(`histogram-vis`);
+  //   this.parentEl.appendChild(this.el);
+  // }
 
   dispose() {
     const el = this.el;
@@ -79,7 +78,11 @@ export class FrequencyHistogramPlot {
   }
 
   update(data:ReadonlyArray<readonly [key:string, count:number]>) {
-    if (this.el === undefined) return;
+    if (this.el === undefined) {
+      console.warn(`FrequencyHistogramPlot this.el undefined`);
+      return;
+    }
+
     if (this.#sorter !== undefined) {
       // eslint-disable-next-line functional/immutable-data, functional/prefer-readonly-type
       this.el.data = this.#sorter(data as KeyValueUtil.KeyValue[]);

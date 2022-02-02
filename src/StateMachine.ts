@@ -52,7 +52,7 @@ export interface MachineDescription {
  * Returns a machine description based on a list of strings. The final string is the final
  * state.
  * 
- * ```usage
+ * ```js
  * const states = [`one`, `two`, `three`];
  * const sm = new StateMachine(states[0], fromList(states));
  * ```

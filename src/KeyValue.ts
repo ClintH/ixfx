@@ -1,4 +1,4 @@
-import { sort } from 'fp-ts/Array.js';
+import { sort } from 'fp-ts/Array';
 import { pipe } from 'fp-ts/function.js';
 import * as S from 'fp-ts/string.js';
 import * as N from 'fp-ts/number.js';
@@ -32,3 +32,17 @@ export const sortByValueNumber = (reverse:boolean = false) => sort<KeyValue>(byV
 // eslint-disable-next-line functional/prefer-readonly-type
 export type SortingFn = (data:KeyValue[]) => KeyValue[];
 
+export const getSorter = (sortStyle:`value` | `valueReverse` | `key` | `keyReverse`) => {
+  switch (sortStyle) {
+  case `value`:
+    return sortByValueNumber(false);
+  case `valueReverse`:
+    return sortByValueNumber(true);
+  case `key`:
+    return sortByKey(false);
+  case `keyReverse`:
+    return sortByKey(true);
+  default:
+    throw new Error(`Unknown sorting value '${sortStyle}'. Expecting: value, valueReverse, key or keyReverse`);
+  }
+};

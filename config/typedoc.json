@@ -1,0 +1,13 @@
+{
+  "entryPoints": [
+    "../src/index.ts"
+  ],
+  "name": "ixfx",
+  "disableSources": true,
+  "hideGenerator": true,
+  "out": "../docs/api",
+  "cleanOutputDir": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "exclude": "**/*+(.test).ts"
+}

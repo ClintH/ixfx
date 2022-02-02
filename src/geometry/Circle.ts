@@ -5,26 +5,38 @@ import {Points, Rects} from  './index.js';
 
 const piPi = Math.PI *2;
 
-//const isCircle = (p: Circle | Points.Point): p is Circle => (p as Circle).radius !== undefined;
+/**
+ * A circle
+ */
 export type Circle = {
   readonly radius: number
 }
 
+/**
+ * A {@link Circle} with position
+ */
 export type CirclePositioned = Points.Point & Circle;
+
+
 export type CircularPath = Circle & Path & {
   readonly kind: `circular`
 };
 
+/**
+ * Returns true if parameter has x,y
+ * @param p Circle or point
+ * @returns 
+ */
 export const isPositioned = (p: Circle | Points.Point): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 /**
  * Returns a point on a circle at a specified angle in radians
- * @param {(Circle|CirclePositioned)} circle
- * @param {number} angleRadian Angle in radians
- * @param {Point} [origin] Origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
- * @returns {Point}
+ * @param circle
+ * @param angleRadian Angle in radians
+ * @param Origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
+ * @returns Point oo circle
  */
-export const pointOnCircle = (circle:Circle|CirclePositioned, angleRadian:number, origin?:Points.Point): Points.Point => {
+export const point = (circle:Circle|CirclePositioned, angleRadian:number, origin?:Points.Point): Points.Point => {
   if (origin === undefined) {
     if (isPositioned(circle)) {
       origin = circle;
@@ -47,18 +59,41 @@ const guard = (circle:CirclePositioned|Circle) => {
   if (circle.radius <= 0) throw new Error(`Radius must be greater than zero`);
 };
 
-export const compute = (circle:CirclePositioned, t:number):Points.Point => pointOnCircle(circle, t*piPi);
-
-export const length = (circle:Circle):number => piPi*circle.radius;
-
-export const bbox = (circle:CirclePositioned):Rects.RectPositioned => Rects.fromCenter(circle, circle.radius*2, circle.radius*2);
 
 /**
- * Returns true if `b` is contained by `a`
+ * Computes relative position along circle
+ * @param circle 
+ * @param t Position, 0-1
+ * @returns 
+ */
+export const compute = (circle:CirclePositioned, t:number):Points.Point => point(circle, t*piPi);
+
+/**
+ * Returns circumference of circle
+ * @param circle 
+ * @returns 
+ */
+export const length = (circle:Circle):number => piPi*circle.radius;
+
+/**
+ * Computes a bounding box that encloses circle
+ * @param circle
+ * @returns 
+ */
+export const bbox = (circle:CirclePositioned|Circle):Rects.RectPositioned|Rects.Rect => {
+  if (isPositioned(circle)) {
+    return Rects.fromCenter(circle, circle.radius*2, circle.radius*2);
+  } else {
+    return {width: circle.radius*2, height: circle.radius*2};
+  }
+};
+
+/**
+ * Returns true if `b` is completely contained by `a`
  *
- * @param {CirclePositioned} a
- * @param {CirclePositioned} b
- * @returns {boolean}
+ * @param a
+ * @param b
+ * @returns
  */
 export const isContainedBy = (a:CirclePositioned, b:CirclePositioned):boolean => {
   const d = distanceCenter(a, b);
@@ -70,9 +105,9 @@ export const isContainedBy = (a:CirclePositioned, b:CirclePositioned):boolean =>
  * 
  * Use `intersections` to find the points of intersection
  *
- * @param {CirclePositioned} a
- * @param {CirclePositioned} b
- * @returns {boolean}
+ * @param a
+ * @param b
+ * @returns True if circle overlap
  */
 export const isIntersecting = (a:CirclePositioned, b:CirclePositioned):boolean => {
   if (isEquals(a, b)) return true;
@@ -85,9 +120,9 @@ export const isIntersecting = (a:CirclePositioned, b:CirclePositioned):boolean =
  * 
  * Returns an empty array if circles are equal, one contains the other or if they don't touch at all.
  *
- * @param {CirclePositioned} a Circle
- * @param {CirclePositioned} b Circle
- * @returns {Points.Point[]} Points of intersection, or an empty list if there are none
+ * @param a Circle
+ * @param b Circle
+ * @returns Points of intersection, or an empty list if there are none
  */
 export const intersections = (a:CirclePositioned, b:CirclePositioned):readonly Points.Point[] => {
   const vector = Points.diff(b, a);
@@ -123,9 +158,9 @@ export const intersections = (a:CirclePositioned, b:CirclePositioned):readonly P
 /**
  * Returns true if the two objects have the same values
  *
- * @param {CirclePositioned} a
- * @param {CirclePositioned} b
- * @returns {boolean}
+ * @param a
+ * @param b
+ * @returns
  */
 export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):boolean => {
   if (a.radius !== b.radius) return false;
@@ -142,8 +177,13 @@ export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):b
   return false;
 };
 
+/**
+ * Returns the distance between two circle centers
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number => Points.distance(a, b);
-
 
 /**
  * Returns a `CircularPath` representation of a circle
@@ -151,7 +191,7 @@ export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number =>
  * @param {CirclePositioned} circle
  * @returns {CircularPath}
  */
-export const circleToPath = (circle:CirclePositioned): CircularPath => {
+export const toPath = (circle:CirclePositioned): CircularPath => {
   guard(circle);
 
   return Object.freeze({
@@ -162,16 +202,20 @@ export const circleToPath = (circle:CirclePositioned): CircularPath => {
      * @returns {Point} X,y
      */
     compute: (t:number) => compute(circle, t),
-    bbox:() => bbox(circle),
+    bbox:() => bbox(circle) as Rects.RectPositioned,
     length: () => length(circle),
     toSvgString: () => ``,
     kind: `circular`
   });
 };
 
-
+/**
+ * Returns the point(s) of intersection between a circle and line.
+ * @param circle 
+ * @param line 
+ * @returns Point(s) of intersection, or empty array
+ */
 export const intersectionLine = (circle:CirclePositioned, line:Line): readonly Points.Point[] => {
-  
   const v1 = {
     x: line.b.x - line.a.x,
     y: line.b.y - line.a.y

@@ -61,7 +61,6 @@ Provided visitor functions are: `visitorDepth, visitorBreadth, visitorRandom, vi
 The visitor can be used in a `for .. of` loop
 
 ```js
-import { Grids } from 'ixfx/geometry'
 // Start visitor at 5,5
 const visitor = Grids.visitorDepth(shape, {x: 5, y: 5});
 for (let cell of visitor) {
@@ -72,8 +71,6 @@ for (let cell of visitor) {
 Or for more flexibility, you can manually progress the visitor using `.next. In the below example, each step through the grid takes 500ms.
 
 ```js
-import { Grids } from 'ixfx/geometry'
-
 // Set up visitor once
 const visitor = Grids.visitorBreadth(shape, {x: 5, y: 5});
 const visitorDelayMs = 500;
@@ -96,8 +93,6 @@ setTimeout(visit, visitorDelayMs);
 The visitor can have an instance of `MutableStringSet` passed in to track what cells have been visited. This is useful if you want to check the status of cells during the visitor's journey.
 
 ```js
-import { Grids } from 'ixfx/geometry';
-import { MutableStringSet } from 'ixfx/collections';
 const visited = mutableStringSet();
 const visitor = Grids.visitorRandom(shape, {x: 5, y: 5}, visited);
 
@@ -136,7 +131,6 @@ offsetCardinals(shape:Grid, origin:Cell, distance:number, boundsLogic:`unbounded
 *  `unbounded`: coordinates are returned without bounds checking
 
 ```js
-import { Grids } from 'ixfx/geometry';
 const shape = { rows: 10, cols: 10 };
 const origin = { x: 4, y: 4 };
 const distance = 2;
@@ -202,7 +196,6 @@ const cellData = data.get(key({x:0, y:0}));
 As a complete example, we can associate a random colour and number to every cell.
 
 ```js
-import { Grids } from 'ixfx/geometry'
 const key = (cell) => `${cell.x}-${cell.y}`;
 const store = new Map();
 const shape = { rows: 10, cols: 10 };
@@ -222,10 +215,15 @@ const val = store.get(key({x:5, y:5}));
 
 Although the grid is not meant to be a literal visual grid, it can be used as such.
 
-Drawing the grid is pretty simple:
+To map a grid to pixel coordinates, the cell size (assumed pixels) needs to be provided:
 
 ```js
-import { Grids } from 'ixfx/geometry'
+const shape = { rows: 100, cols: 100, size: 5 };
+```
+
+Draw the grid by iterating over its cells:
+
+```js
 const ctx = document.getElementById(`myCanvas`).getContext(`2d`);
 const shape = { rows: 100, cols: 100, size: 5 };
 
@@ -235,12 +233,7 @@ for (const cell of Grids.cells(shape)) {
 }
 ```
 
-To map a grid to pixel coordinates, the cell size (assumed pixels) needs to be provided:
-```js
-const shape = { rows: 100, cols: 100, size: 5 };
-```
-
-To get the position and rectangle for a cell:
+To get the visual bounds for a given:
 
 ```js
 const shape = { rows: 100, cols: 100, size: 5 };
@@ -249,7 +242,7 @@ const shape = { rows: 100, cols: 100, size: 5 };
 const rect = rectangleForCell({ x: 5, y: 5 }, shape); 
 ```
 
-Or to go from coordinate to cell:
+Or to go from coordinate (eg. mouse pointer) to cell:
 
 ```js
 // Convert pointer position to cell coordinate

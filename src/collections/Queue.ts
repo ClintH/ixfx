@@ -170,7 +170,7 @@ class Queue<V> {
 /**
  * Returns an immutable queue
  *
- * ```usage
+ * ```js
  * let q = queue();           // Create
  * q = q.enqueue(`a`, `b`);   // Add two strings
  * const front = q.peek();    // `a` is at the front of queue (oldest)
@@ -255,7 +255,7 @@ class MutableQueueImpl<V> implements MutableQueue<V> {
 /**
  * Returns a mutable queue
  * 
- * ```usage
+ * ```js
  * const q = queue();       // Create
  * q.enqueue(`a`, `b`);     // Add two strings
  * const front = q.dequeue();  // `a` is at the front of queue (oldest)

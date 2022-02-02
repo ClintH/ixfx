@@ -1,6 +1,6 @@
-<link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} />
-<script type="module" src={Astro.resolve('/components/HistogramVis.ts')}></script>
-<script type="module" src={Astro.resolve('./freqHistogram.ts')}></script>
+<!-- <link rel="stylesheet" href={Astro.resolve('../../styles/demos.css')} /> -->
+<script type="module" src={Astro.resolve('../../components/HistogramVis.ts')}></script> 
+<script type="module" src={Astro.resolve('./freqWeighted.ts')}></script>
 <style>
   .sxs {
     display: flex;
@@ -22,5 +22,7 @@
 </div>
 <div class="sxs">
   <div id="dataStream"></div>
-  <div id="dataPlot"></div>
+  <div>
+    <histogram-vis id="dataPlot"></histogram-vis>
+  </div>
 </div>

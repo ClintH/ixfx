@@ -1,19 +1,21 @@
 /* eslint-disable */
-import {MutableFreqHistogram} from '~/MutableFreqHistogram';
+import { MutableFrequency} from '~/MutableFrequency';
 import {log} from '~/dom/log';
+import { HistogramVis } from '~/components/HistogramVis';
 import {weighted} from '~/Random';
 import { FrequencyHistogramPlot} from '~/components/FrequencyHistogramPlot';
 
+//customElements.define(`histogram-vis2`, HistogramVis);
+
 const logger = log(`#dataStream`, {capacity: 8, timestamp: false});
-const freq = new MutableFreqHistogram<string>();
-const plot = new FrequencyHistogramPlot(document.getElementById('dataPlot'));
+const freq = new MutableFrequency<string>();
+const plot = new FrequencyHistogramPlot(document.getElementById('dataPlot') as HistogramVis);
 // plot.el.showDataLabels = false;
 // plot.el.showXAxis = false;
 
 plot.setAutoSort(`valueReverse`);
 let itemsLeft = 200;
 
-plot.init();
 
 let producerId = 0;
 freq.addEventListener(`change`, () => {

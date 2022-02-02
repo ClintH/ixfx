@@ -10,7 +10,7 @@ type Bar = {
 };
 
 const jsonData = (obj: unknown) => {
-  if (obj === null || obj === undefined) return;
+  if (obj === null || obj === undefined || obj === `undefined`) return;
   // eslint-disable-next-line functional/no-try-statement
   try {
     if (typeof obj === `string`) {

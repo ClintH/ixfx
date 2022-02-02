@@ -1,23 +1,23 @@
 ---
-title: Frequency Histogram
+title: Frequency
 setup: |
   import { Markdown } from 'astro/components';
   import Layout from '../../layouts/MainLayout.astro';
-  import FreqHistogramPlay from './FreqHistogramPlay.astro';
+  import FreqLetters from './FreqLetters.ts';
+  import FreqWeighted from './FreqWeighted.astro';
 ---
 
-A _frequency histogram_ keeps track of the number of times a certain value is 'seen'.
-
-
-## Demos
-
-In the demo below, a weighted distribution of random numbers is produced, adding the each number to the histogram. The histogram is visualised using the `Histogram` component.
-
-<FreqHistogramPlay />
-
-For example, perhaps every time the pointer moves, you want to record its rough angular direction: up, down, left or right. If you log this to the FreqHisto, at any point you can find out the most frequently occurring direction, or, say, the proportion of upward moves compared to downward. 
+The `Frequency` class keeps track of the number of times a certain value is 'seen'.
 
 ## Why?
+
+In some scenarios it can be useful to aggregate data over time, rather than looking at a single event or snapshot-in-time. It allows you to do some fuzzy logic, for example using the value that _mostly_ occurs.
+
+## Demo
+
+In the demo below, a weighted distribution of random numbers is produced. In this case, lower numbers will occur more often than higher numbers. The `Frequency` is used to count how many times each number appears, and for visualisation purposes shown as a histogram.
+
+<FreqWeighted />
 
 ## Usage
 
@@ -25,7 +25,7 @@ The provided frequency histogram is _mutable_, meaning that the object reference
 
 ```js
 // Create an instance
-const freq = mutableFreqHistogram();
+const freq = mutableFrequency();
 
 // Add string or numeric data...
 freq.add(`apples`);
@@ -77,16 +77,28 @@ const cars = [
 ]
 
 // Count cars by make
-const freq = mutableFreqHistogram(car => car.make);
+const freq = mutableFrequency(car => car.make);
 
 // Add array of cars
 freq.add(...cars);
 
-// Request count by string key
+// Count a group
 freq.frequencyOf(`Toyota`); // 1
 
 // Or by object, which uses the same stringify function
 freq.frequencyOf(cars[1]); // 1
 ```
 
-_Todo..._
+## Examples
+
+Count occurrence of letters in a string
+
+```js
+const msg = `Hello there! - Obiwan Kenobi`;
+const freq = mutableFreq();
+for (let i=0; i<msg.length; i++) {
+  freq.add(msg[i]);
+}
+```
+
+<freq-letters client:visible />

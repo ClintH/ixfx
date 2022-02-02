@@ -31,7 +31,7 @@ export const clamp = (v: number, min = 0, max = 1) => {
  * This is useful for clamping an array range, because the largest allowed number will
  * be one less than length
  * 
- * ```usage
+ * ```js
  * const myArray = [`a`, `b`, `c`, `d`];
  * clampZeroBounds(0, myArray.length); // 0
  * clampZeroBounds(1.2, myArray.length); // 1
@@ -93,7 +93,7 @@ export const getMinMaxAvg = (data: readonly number[]): {readonly min: number; re
 
 /**
  * Pauses execution
- * ```usage
+ * ```js
  * console.log(`Hello`);
  * await sleep(1000);
  * console.log(`There`); // Prints one second after
@@ -107,7 +107,7 @@ export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve
 /**
  * Calls provided function after a delay
  *
- * ```usage
+ * ```js
  * const result = await delay(async () => Math.random(), 1000);
  * console.log(result); // Prints out result after one second
  * ```

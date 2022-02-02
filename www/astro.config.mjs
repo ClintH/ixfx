@@ -21,9 +21,9 @@ export default /** @type {import('astro').AstroUserConfig} */ ({
     `@astrojs/renderer-lit`
   ],
   vite: {
-    // alias: {
-    //   '~2': resolve(dirname(fileURLToPath(import.meta.url)), `../src/`)
-    // },
+    alias: {
+      '~2': resolve(dirname(fileURLToPath(import.meta.url)), `../src/`)
+    },
     plugins: [
       tsconfigPaths({root: `../`}), 
       nodeResolve({
