@@ -77,12 +77,13 @@ export const guard = (arc:Arc|ArcPositioned) => {
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);
   }
+  if (arc.radius === undefined) throw new Error(`Radius undefined`);
   if (typeof arc.radius !== `number`) throw new Error(`Radius must be a number`);
   if (Number.isNaN(arc.radius)) throw new Error(`Radius is NaN`);
   if (arc.radius <= 0) throw new Error(`Radius must be greater than zero`);
 
-  if (!(arc.startRadian in arc)) throw new Error(`Arc is missing 'startRadian' field`);
-  if (!(arc.endRadian in arc)) throw new Error(`Arc is missing 'startRadian' field`);
+  if (arc.startRadian === undefined) throw new Error(`Arc is missing 'startRadian' field`);
+  if (arc.endRadian === undefined) throw new Error(`Arc is missing 'startRadian' field`);
   if (Number.isNaN(arc.endRadian)) throw new Error(`Arc endRadian is NaN`);
   if (Number.isNaN(arc.startRadian)) throw new Error(`Arc endRadian is NaN`);
 
@@ -102,7 +103,7 @@ export const guard = (arc:Arc|ArcPositioned) => {
 //   }
 // };
 
-export const compute = (arc:ArcPositioned, t:number, origin?:Points.Point):Points.Point => {
+export const compute = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
   guard(arc);
   return pointOnArc(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t), origin);
 };
