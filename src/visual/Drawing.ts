@@ -8,7 +8,7 @@ import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
 import * as color2k from 'color2k';
 import {stack, Stack} from '../collections/Stack.js';
-import {resolveEl} from '../dom/Forms.js';
+import {resolveEl} from '../dom/Util.js';
 import { resizeObservable } from '../dom/index.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -1,4 +1,4 @@
-import {resolveEl} from "./Forms.js";
+import {resolveEl} from "./Util.js";
 import {addShadowCss} from "./ShadowDom.js";
 
 export type LogOpts = {

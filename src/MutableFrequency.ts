@@ -3,6 +3,7 @@
 import { ToString } from "./util.js";
 import {SimpleEventEmitter} from "./Events.js";
 import * as KeyValueUtil from './KeyValue.js';
+import {KeyValues} from "./index.js";
 
 type MutableFrequencyEventMap = {
   readonly change:void;
@@ -85,11 +86,27 @@ export class MutableFrequency<V> extends SimpleEventEmitter<MutableFrequencyEven
     return this.#store.get(key);
   }
 
+  relativeFrequencyOf(value:V|string):number|undefined {
+    if (typeof value === `string`) return this.#store.get(value);
+
+    const key = this.#keyString(value);
+    const freq = this.#store.get(key);
+    if (freq === undefined) return;
+
+    const mma = this.minMaxAvg();
+    return freq / mma.total;
+  }
+
   entries():Array<KeyValueUtil.KeyValue> {
     return Array.from(this.#store.entries());
   }
   
-  entriesSorted(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`) {
+  minMaxAvg() {
+    return KeyValues.minMaxAvg(this.entries());
+  
+  }
+
+  entriesSorted(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):ReadonlyArray<KeyValues.KeyValue> {
     const s = KeyValueUtil.getSorter(sortStyle);
     return s(this.entries());
   }

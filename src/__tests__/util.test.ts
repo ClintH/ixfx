@@ -1,5 +1,6 @@
 /* eslint-disable */
-import {average, clamp, clampZeroBounds, toStringDefault, isEqualDefault, isEqualValueDefault} from '../util.js';
+import {average} from '../collections/NumericArrays.js';
+import {clamp, clampZeroBounds, toStringDefault, isEqualDefault, isEqualValueDefault} from '../util.js';
 
 test(`toStringDefault`, () => {
   const a = {

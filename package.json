@@ -2,17 +2,20 @@
   "name": "ixfx",
   "version": "0.0.2",
   "description": "A framework for programming interactivity",
-  "homepage": "https://github.com/clinth/ix/",
+  "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
     "interactivity"
   ],
   "author": "Clint Heyer",
   "license": "MIT",
   "repository": {
-    "url": "git@github.com:clinth/ix.git"
+    "url": "git@github.com:clinth/ixfx.git"
   },
-  "module": "dist/index.js",
-  "exports": "./dist/index.js",
+  "module": "./dist/bundle.js",
+  "exports": {
+    ".": "./dist/bundle.js",
+    "./lib/*": "./dist/*.js"
+  },
   "browsersList": [
     ">2% and last 2 versions and not ie 6-11"
   ],
@@ -31,6 +34,7 @@
     "pkg": "npm run bundle",
     "pkg:typings": "tsc --project config/tsconfig.pkg.json",
     "copyForDemos": "copyfiles ./dist/* ../ixfx-demos/node_modules/ixfx/",
+    "copyApiDocs": "copyfiles --up 1 ./etc/api/**/*.* ../ixfx-docs/docs/",
     "docs": "typedoc --options ./config/typedoc.json",
     "lint": "eslint src/**",
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",

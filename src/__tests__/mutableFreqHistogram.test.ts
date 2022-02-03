@@ -3,7 +3,7 @@
 /* eslint-disable */
 import {KeyValue} from '../KeyValue.js';
 import {MutableFrequency} from '../MutableFrequency.js';
-import {shuffle} from '../collections/Lists.js';
+import {shuffle} from '../collections/Arrays.js';
 import {jest} from '@jest/globals';
 
 test(`sorting`, () => {  

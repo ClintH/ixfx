@@ -1,9 +1,9 @@
-import {stack, stackMutable,  OverflowPolicy as StackOverflowPolicy} from './Stack.js';
-import {queue, queueMutable, OverflowPolicy as QueueOverflowPolicy} from './Queue.js';
-import {IsEqual, isEqualDefault} from '../util.js';
+/**
+ * Functions for working with primitive arrays, regardless of type
+ * See Also: NumericArrays.ts
+ */
 
-export {stack, stackMutable, StackOverflowPolicy};
-export {queue, queueMutable, QueueOverflowPolicy};
+import {IsEqual, isEqualDefault} from '../util.js';
 
 export const guardArray = <V>(array:ArrayLike<V>, paramName:string = `?`) => {
   if (array === undefined) throw new Error(`Param '${paramName}' is undefined. Expected array.`);

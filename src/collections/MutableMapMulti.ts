@@ -3,7 +3,7 @@ import {SimpleEventEmitter} from "../Events.js";
 import { ToString, IsEqual, toStringDefault, isEqualDefault } from "../util.js";
 import { addUniqueByHash } from "./Set.js";
 import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter} from './Map.js';
-import {  without } from './Lists.js';
+import {  without } from './Arrays.js';
 import {MutableCircularArray, mutableCircularArray} from './MutableCircularArray.js';
 
 export type MapMultiOpts<V> = {

@@ -6,7 +6,7 @@
  * data from the original, used a more perceptual CMYK to RGB conversion, and encapsulated the dataset 
  * as a standalone and distributed project." - mattdesl's README.md
 */
-import {randomElement} from '../collections/Lists.js';
+import {randomElement} from '../collections/Arrays.js';
 import {data} from './DictionaryOfColourCombinationsData.js';
 
 type Cmyk = readonly [number, number, number, number];

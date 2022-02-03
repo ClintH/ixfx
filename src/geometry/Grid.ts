@@ -1,9 +1,9 @@
 import {Rects, Points} from './index.js';
 import {integer as guardInteger} from '../Guards.js';
 import {clampZeroBounds} from "../util.js";
-import {randomElement } from  '../collections/Lists.js';
+import {randomElement } from  '../collections/Arrays.js';
 import {mutableStringSet, MutableStringSet} from "../collections/Set.js";
-import {zipKeyValue} from "../collections/util.js";
+import {zipKeyValue} from "../collections/Map.js";
 
 export type GridVisual = Readonly<{
   readonly size: number,

@@ -1,22 +1,34 @@
 
+export type Palette = {
+  //eslint-disable-next-line functional/no-method-signature
+  setElementBase(el:Element):void
+  //eslint-disable-next-line functional/no-method-signature
+  has(key:string):boolean
+  //eslint-disable-next-line functional/no-method-signature
+  get(key:string, fallback?:string):string
+  add(key:string, value:string):void
+};
+
+export const create = (fallbacks?:readonly string[]):Palette => new PaletteImpl(fallbacks);
+
 /**
  * Manage a set of colours. Uses CSS variables as a fallback if colour is not added
  *
  * @export
  * @class Palette
  */
-export class Palette {
+class PaletteImpl {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #store:Map<string, string> = new Map();
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #aliases:Map<string, string> = new Map();
 
-  readonly fallbacks:string[];
+  readonly fallbacks:readonly string[];
   #lastFallback = 0;
 
   #elementBase:Element;
 
-  constructor(fallbacks?:string[]) {
+  constructor(fallbacks?:readonly string[]) {
     if (fallbacks !== undefined) this.fallbacks = fallbacks;
     else this.fallbacks = [`red`, `blue`, `green`, `orange`];
     this.#elementBase = document.body;

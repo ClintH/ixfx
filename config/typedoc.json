@@ -5,7 +5,7 @@
   "name": "ixfx",
   "disableSources": true,
   "hideGenerator": true,
-  "out": "../docs/api",
+  "out": "../etc/api",
   "cleanOutputDir": true,
   "excludePrivate": true,
   "excludeInternal": true,

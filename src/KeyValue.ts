@@ -1,9 +1,9 @@
 import { sort } from 'fp-ts/Array';
-import { pipe } from 'fp-ts/function.js';
-import * as S from 'fp-ts/string.js';
-import * as N from 'fp-ts/number.js';
-import { reverse as reverseOrd, contramap } from 'fp-ts/Ord.js';
-
+import { pipe } from 'fp-ts/function';
+import * as S from 'fp-ts/string';
+import * as N from 'fp-ts/number';
+import { reverse as reverseOrd, contramap } from 'fp-ts/Ord';
+import {getMinMaxAvg as arrayMinMaxAg} from './collections';
 
 /// ✔ Sorting functions are unit tested
 
@@ -32,6 +32,7 @@ export const sortByValueNumber = (reverse:boolean = false) => sort<KeyValue>(byV
 // eslint-disable-next-line functional/prefer-readonly-type
 export type SortingFn = (data:KeyValue[]) => KeyValue[];
 
+
 export const getSorter = (sortStyle:`value` | `valueReverse` | `key` | `keyReverse`) => {
   switch (sortStyle) {
   case `value`:
@@ -45,4 +46,11 @@ export const getSorter = (sortStyle:`value` | `valueReverse` | `key` | `keyRever
   default:
     throw new Error(`Unknown sorting value '${sortStyle}'. Expecting: value, valueReverse, key or keyReverse`);
   }
+};
+
+
+export const minMaxAvg = (entries:readonly KeyValue[], conversionFn?:(v:KeyValue) => number) => {
+  if (conversionFn === undefined) conversionFn = (v:KeyValue) => v[1] as number;
+  const values = entries.map<number>(conversionFn);
+  return arrayMinMaxAg(values);
 };

@@ -1,9 +1,0 @@
-<script type="module" src={Astro.resolve('../../components/HistogramVis.ts')}></script> 
-<script type="module" src={Astro.resolve('./freqLetters.ts')}></script>
-
-<div>
-  <input type="text" id="txtLetters" value="Hello there! - Obiwan Kenobi">
-</div>
-<div>
-  <histogram-vis id="dataPlot"></histogram-vis>
-</div>  

@@ -1,6 +1,6 @@
 import {fromEvent, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {resolveEl} from './Forms.js';
+import {resolveEl} from './Util.js';
 
 // eslint-disable-next-line functional/no-mixed-type
 // export type DomRxOpts = {

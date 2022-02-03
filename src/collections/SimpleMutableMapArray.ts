@@ -46,3 +46,5 @@ export class SimpleMutableMapArray<V> {
     this.#map.clear();
   }
 }
+
+export const simpleMutableMapArray = () => new SimpleMutableMapArray();

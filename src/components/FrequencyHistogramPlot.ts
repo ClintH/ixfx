@@ -36,26 +36,8 @@ export class FrequencyHistogramPlot {
   }
 
   setAutoSort(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):void {
-    switch (sortStyle) {
-    case `value`:
-      // eslint-disable-next-line functional/immutable-data
-      this.#sorter = KeyValueUtil.sortByValueNumber(false);
-      break;
-    case `valueReverse`:
-      // eslint-disable-next-line functional/immutable-data
-      this.#sorter = KeyValueUtil.sortByValueNumber(true);
-      break;
-    case `key`:
-      // eslint-disable-next-line functional/immutable-data
-      this.#sorter = KeyValueUtil.sortByKey(false);
-      break;
-    case `keyReverse`:
-      // eslint-disable-next-line functional/immutable-data
-      this.#sorter = KeyValueUtil.sortByKey(true);
-      break;
-    default:
-      throw new Error(`Unknown sorting value '${sortStyle}'. Expecting: value, valueReverse, key or keyReverse`);
-    }
+    // eslint-disable-next-line functional/immutable-data
+    this.#sorter = KeyValueUtil.getSorter(sortStyle);
   }
 
   clear() {

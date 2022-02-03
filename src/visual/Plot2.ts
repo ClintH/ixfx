@@ -1,11 +1,11 @@
 /* eslint-disable */
 
-import {getMinMaxAvg} from "../util.js";
+import {getMinMaxAvg} from '../collections/NumericArrays.js';
 import {MutableCircularArray} from "../collections/MutableCircularArray.js"
 import {mutableMapCircular, MutableMapOf} from "../collections/MutableMapMulti.js"
-import {Palette} from "./Palette.js";
+import * as Palette from "./Palette.js";
 import {Point} from "../geometry/Point.js";
-import {resolveEl} from "../dom/Forms.js";
+import {resolveEl} from "../dom/Util.js";
 import {autoSizeCanvas} from "./Drawing.js";
 
 type Series = {
@@ -21,14 +21,14 @@ type DrawingOpts = PlotOpts & {
   height: number
   dataXScale?: number
   yLabelWidth: number
-  palette: Palette
+  palette: Palette.Palette
   textHeight: number
   capacity:number
   coalesce:boolean
 }
 
 type PlotOpts = {
-  palette?: Palette
+  palette?: Palette.Palette
   capacity?:number
   showYAxis?:boolean
   yAxes?: string[]|string
@@ -207,7 +207,7 @@ export const plot2 = (parentElOrQuery:string|HTMLElement, opts:PlotOpts) => {
     ...opts,
     capacity, coalesce,
     textHeight: opts.textHeight ?? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
-    palette: opts.palette ?? new Palette(),
+    palette: opts.palette ?? Palette.create(),
     width: canvasEl.width,
     height: canvasEl.height,
     ctx: ctx,

@@ -1,5 +1,5 @@
 import { MutableCircularArray } from '../collections/MutableCircularArray.js';
-import {getMinMaxAvg} from '../util.js';
+import {getMinMaxAvg} from '../collections/NumericArrays.js';
 import {BasePlot} from './BasePlot.js';
 
 /**
