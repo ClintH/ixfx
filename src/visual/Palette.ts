@@ -6,6 +6,7 @@ export type Palette = {
   has(key:string):boolean
   //eslint-disable-next-line functional/no-method-signature
   get(key:string, fallback?:string):string
+  getOrAdd(key: string, fallback?:string):string
   add(key:string, value:string):void
 };
 
@@ -83,6 +84,13 @@ class PaletteImpl {
       if (this.#lastFallback === this.fallbacks.length) this.#lastFallback = 0;
     }
     return fromCss;
+  }
+
+  getOrAdd(key:string, fallback?:string):string {
+    if (this.has(key)) return this.get(key);
+    const c = this.get(key, fallback);
+    this.add(key, c);
+    return c;
   }
 
   has(key:string):boolean {

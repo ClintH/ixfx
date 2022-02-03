@@ -1,33 +1,19 @@
-import * as Geometry from './geometry/index.js';
-export {Geometry};
+// Major modules
+export * as Geometry from './geometry/index.js';
+export * as Visual from './visual/index.js';
+export * as Dom from './dom/index.js';
+export * as Modulation from './modulation/index.js';
+export * as Collections from './collections/index.js';
 
-import * as Visual from './visual/index.js';
-export {Visual};
+// Minor modules
+export * as Generators from './Generators.js';
+export * as Random from './Random.js';
+export * as KeyValues from './KeyValue.js';
 
-import * as Dom from './dom/index.js';
-export {Dom};
+// Loose functions
+export * from './util.js';
 
-// import * as Envelopes from './modulation/Envelope.js';
-// import * as Easings from './modulation/Easing.js';
-// export {Easings, Envelopes};
-
-import * as Modulation from './modulation/index.js';
-export {Modulation};
-
-import * as Collections from './collections/index.js';
-export {Collections};
-
-import * as Generators from './Generators.js';
-export {Generators};
-
-import * as KeyValues from './KeyValue.js';
-import { KeyValue } from './KeyValue.js';
-export {KeyValues, KeyValue};
-
-import {mutableFrequency} from './MutableFrequency.js';
-export {mutableFrequency};
-
-import * as Random from './Random.js';
-export {Random};
-
+// Classes
+export { KeyValue } from './KeyValue.js';
+export {mutableFrequency, MutableFrequency} from './MutableFrequency.js';
 export {StateMachine} from './StateMachine.js';

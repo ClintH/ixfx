@@ -74,3 +74,40 @@ export const shuffle = (dataToShuffle:ReadonlyArray<unknown>): ReadonlyArray<unk
  */
 export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));
 
+/**
+ * Groups data by a grouper function, returning data as a map with string
+ * keys and array values.
+ * 
+ * @example
+ * ```js
+ * const data = [
+ *  { age: 39, city: `London` }
+ *  { age: 14, city: `Copenhagen` }
+ *  { age: 23, city: `Stockholm` }
+ *  { age: 56, city: `London` }
+ * ];
+ * const map = groupBy(data, item => data.city); 
+ * ```
+ * 
+ * Returns a map:
+ * ```js
+ * London: [{ age: 39, city: `London` }, { age: 56, city: `London` }]
+ * Stockhom: [{ age: 23, city: `Stockholm` }]
+ * Copenhagen: [{ age: 14, city: `Copenhagen` }]
+ * ```
+ * @param array Data to group
+ * @param grouper Function that returns a key for a given item
+ * @returns Map 
+ */
+ export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {
+  const key = grouper(item);
+  const val = store.get(key);
+  if (val === undefined) {
+    store.set(key, [item]);
+  } else {
+    // eslint-disable-next-line functional/immutable-data
+    val.push(item);
+  }
+  return store;
+  /* eslint-disable-next-line functional/prefer-readonly-type */
+}, new Map<K, V[]>());

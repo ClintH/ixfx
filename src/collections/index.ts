@@ -15,6 +15,7 @@ export {queue, queueMutable} from './Queue.js';
 export * from './Arrays.js';
 export * from './NumericArrays.js';
 export * from './Map.js';
+export * from  './Interfaces.js';
 
 export * as Sets from './Set.js';
 export * as Queues from './Queue.js';

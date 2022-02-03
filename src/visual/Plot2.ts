@@ -110,7 +110,7 @@ export const drawSeriesAxis = (series:Series, drawing:DrawingOpts) => {
   if (palette.has(series.name +'-axis'))
     ctx.fillStyle = palette.get(series.name + '-axis');
   else
-    ctx.fillStyle = palette.get(series.name);
+    ctx.fillStyle = palette.getOrAdd(series.name);
 
   // ctx.lineWidth = 1;
   // ctx.beginPath();
@@ -136,7 +136,7 @@ export const drawSeries = (series:Series, values:MutableCircularArray<number>, d
   let leadingEdge:Point|undefined;
   ctx.beginPath();
   ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = drawing.palette.get(series.name);
+  ctx.strokeStyle = drawing.palette.getOrAdd(series.name);
 
   const incrementBy = drawing.coalesce ? 
     drawing.dataXScale! < 0 ? Math.floor((1/drawing.dataXScale!)) : 1
