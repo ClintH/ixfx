@@ -1,8 +1,14 @@
 # ixfx
 
-This is a framework for sketching and prototyping interactivity. It is designed for the beginning programmer, and is optimised for readability and safety over performance.
+ixfx is a framework for sketching and prototyping interactivity. It is designed for the beginning programmer, and is optimised for readability and safety over performance.
 
-# Using
+* [Demos](https://clinth.github.io/ixfx-demos/)
+* [Documentation](https://clinth.github.io/ixfx-docs/)
+* [API Documentation](https://clinth.github.io/ixfx-docs/api/)
+
+## Using
+
+_TODO_
 
 ## Why ixfx?
 
@@ -20,11 +26,11 @@ Some principles are:
 * Favour functional approaches over OOP
 * ...and especially w.r.t. to the last two points, the usability of the APIs takes precedence
 
-# Building
+## Building
 
 If you want to contribute to ixfx or build it yourself, please see [BUILDING.md](BUILDING.md).
 
-# Credits
+## Credits
 
 Bundles
 * Easing functions by [Andrey Sitnik and Ivan Solovev](https://easings.net/)

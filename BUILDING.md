@@ -1,15 +1,12 @@
 # Development
 
-# Build scripts
+## Build scripts
 
-Clean dist folder, build Typescript sources and bundle into dist/bundle.mjs
+Typecheck and compile to `./etc/build/`
+
 ```
 npm run build
-``` 
-
-Continually rebuild and bundle Typescript sources into dist/bundle.mjs:
-```
-npm run develop
+npm run develop // continually rebuild
 ```
 
 Build Typescript sources, running a single file with source map support:
@@ -17,21 +14,49 @@ Build Typescript sources, running a single file with source map support:
 npm run run -- build/StateMachine.js
 ```
 
-# Demos
+## Using a local copy of ixfx
 
-`demos` folder contains demos and quasi-tests, runnable in the browser. Snowpack is used to build the demos and run a dev server.
+If you're working in other repositories, but want to use live-updated sources:
 
-Run live-updating dev server
 ```
-npm run dev:demos
+(in ixfx repo)
+npm link
+npm bundle:watch   // continually rebuilds dist bundle
+
+(in remote repo)
+npm link ../ixfx
 ```
 
-Build demos
+In remote repo, it should be possible to consume the library:
 ```
-npm run build:demos
+import {Geometry} from 'ixfx/lib/geometry';
 ```
 
-# Testing
+## Deploying
+
+Uses `tsc` and `tsup` to build library and type definitions to `./dist`
+
+```
+npm run pkg
+```
+
+Publishing to NPM will trigger the same script, but cleaning `./dist` and `./etc` first.
+
+## Docs
+
+Generate API docs to `./etc/api`:
+
+```
+npm run docs
+```
+
+To copy into `../ixfx-docs/api`, ready for deploying `ixfx-docs`:
+
+```
+npm run copyApiDocs
+```
+
+## Testing
 
 The `tests` folder contains Jest unit tests.
 
@@ -50,8 +75,12 @@ Test coverage report:
 npm run test:coverage
 ```
 
-# Coding conventions
+ESLint report:
 
-* Function names are in camel case (`thisIsAFunction`)
-* Class names in Pascal case (`ThisIsAClass`);
-* eslint rules enforce most other things
+```
+npm run lint
+```
+
+## Coding conventions
+
+ESLint rules enforce most conventions.
