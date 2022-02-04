@@ -1,6 +1,7 @@
 import {SimpleEventEmitter} from "../Events.js";
-import {msRelativeTimer, Timer, TimerSource} from "../Timer.js";
-import { StateMachine, fromList as descriptionFromList } from "../StateMachine.js";
+import { msRelativeTimer, TimerSource} from "../Timer.js";
+import { Timer } from "../Interfaces.js";
+import { StateMachine } from "../StateMachine.js";
 import {Path} from "~/geometry/Path.js";
 import * as Bezier from '../geometry/Bezier.js';
 
@@ -110,9 +111,19 @@ class AdsrBase extends SimpleEventEmitter<Events> {
     this.releaseDuration = opts.releaseDuration ?? 1000;
     this.shouldLoop = opts.shouldLoop ?? false;
 
-    const descr = descriptionFromList(`attack`, `decay`, `sustain`, `release`, `complete`);
+    const descr ={
+      attack: [`decay`, `release`],
+      decay: [`sustain`, `release`],
+      sustain: [`release`],
+      release: [`complete`],
+      complete: null
+    }
     this.#sm = new StateMachine(`attack`, descr);
     this.#sm.addEventListener(`change`, (ev => {
+      // Reset timer on release
+      if (ev.newState === `release`) {
+        this.#timer?.reset();
+      }
       super.fireEvent(`change`, ev);
     }));
     this.#sm.addEventListener(`stop`, (ev => {
@@ -152,7 +163,6 @@ class AdsrBase extends SimpleEventEmitter<Events> {
       case `sustain`:
         if (!this.#holding) {
           elapsed = 0;
-          this.#timer?.reset();
           this.#sm.next();
           hasChanged = true;
         }
@@ -215,6 +225,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
 
   release() {
     this.#holding = false;
+    if (this.#holdingInitial) this.#sm.state = `release`;
   }
 }
 

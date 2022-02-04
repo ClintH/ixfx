@@ -265,9 +265,8 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
  * @returns Cells corresponding to cardinals
  */
 export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds:BoundsLogic = `stop`): Neighbours => {
-  guardInteger(steps, `steps`, true);
-  if (steps < 1) throw new Error(`steps should be above zero`);
-
+  guardInteger(steps, `aboveZero`, `steps`);
+  
   const directions = allDirections;
   const vectors = directions.map(d => getVectorFromCardinal(d, steps));
   const cells = directions.map((d, i) => offset(grid, start, vectors[i], bounds));
@@ -624,7 +623,7 @@ export const visitorRow =(grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
 };
 
 export const visitFor = (grid:Grid, start:Cell, steps:number, visitor:Visitor):Cell => {
-  guardInteger(steps, `steps`);
+  guardInteger(steps, `positive`, `steps`);
 
   const opts:VisitorOpts = {
     reversed: steps < 0

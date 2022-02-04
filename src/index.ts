@@ -12,6 +12,10 @@ export * as KeyValues from './KeyValue.js';
 
 // Loose functions
 export * from './util.js';
+export * from './Timer.js';
+
+// Types and interfaces
+export * from './Interfaces.js';
 
 // Classes
 export { KeyValue } from './KeyValue.js';

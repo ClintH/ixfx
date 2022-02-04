@@ -1,14 +1,7 @@
+// ✔ UNIT TESTED
 
 import {SimpleEventEmitter} from "./Events.js";
 import { isStringArray } from "./Guards.js";
-/*
-type MappedTypeWithNewProperties<Type> = {
-  [Properties in keyof Type as NewKeyType]: Type[Properties]
-}
-*/
-// type MachineEventMap<M extends MachineDescription> = {
-//   [Properties in keyof M as ]
-// }
 
 export interface Options {
   readonly debug?: boolean
@@ -25,17 +18,10 @@ export interface StopEvent {
   readonly state: string;
 }
 
-// type Paths<T> = T extends MachineDescription
-//   ? keyof T | {[K in keyof T]: Paths<T[K]['events']>}[keyof T]
-//   : never
-
 type StateMachineEventMap = {
   readonly change: StateChangeEvent
   readonly stop: StopEvent
 };
-
-//type ValidStates<M extends MachineDescription> = keyof M & string;
-
 
 type StateEvent = (args: unknown, sender: StateMachine) => void;
 type StateHandler = string | StateEvent | null;
@@ -77,8 +63,6 @@ export const fromList = (...states:readonly string[]):MachineDescription => {
   }
   return t;
 };
-
-// export type StateEventCallback<M extends MachineDescription> = (event: string, state: ValidStates<M>, params: any, machine: StateMachine<M>) => boolean;
 
 /**
  * State machine
@@ -298,7 +282,6 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     // eslint-disable-next-line functional/immutable-data
     this.#state = newState;
 
-    //const priorRules = this.#m[priorState];
     const rules = this.#m[newState];
     if (rules === null) {
       // eslint-disable-next-line functional/immutable-data
@@ -319,57 +302,4 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   get state(): string {
     return this.#state;
   }
-  /*
-  fire(eventName: string, params?: any): boolean {
-    let handler = this.#state[eventName];
-    if (handler === undefined) {
-      if (this.#debug) console.log(`StateMachine: state '${this.#stateName}' has no handler for event '${eventName}'.`);
-      return false; // Event is not handled in this state
-    }
-    if (typeof (handler) === 'string') {
-      // Strings are assumed to be the next state
-      return this.#setState(handler)
-    } else if (handler == null) {
-      this.#isDone = true;
-      this.fireEvent('stop', {state: this.#stateName});
-      return false;
-    } else {
-      // Call function
-      let state = handler(params, this);
-      if (state !== undefined && typeof state === 'string') {
-        // If handler returns string, assume it's a new state
-        this.#setState(state);
-      }
-      return true;
-    }
-  }*/
-
 }
-
-
-/*
-interface ListMachineDefinition {
-  [key: string]: State;
-}
-
-class ListStateMachine extends StateMachine {
-  constructor(initial: string, listMachineDef: ListMachineDefinition, opts?: Options) {
-    super(initial, listMachineDef, opts)
-  }
-
-  next(params?: any): boolean {
-    return this.fire('next', params);
-  }
-}
-
-const createListMachine = (list: string[], opts?: Options): ListStateMachine => {
-  let map = {};
-  for (let i = 0; i < list.length; i++) {
-    let next = i < list.length - 1 ? list[i + 1] : null;
-    let state = {next}
-    // @ts-ignore
-    map[list[i]] = state;
-  }
-
-  return new ListStateMachine(list[0], map, opts);
-}*/

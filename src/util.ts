@@ -54,35 +54,6 @@ export const clampZeroBounds = (v: number, length: number) => {
 };
 
 export const lerp =(amt:number, a:number, b:number) => (1-amt) * a + amt * b;
-/**
- * Pauses execution
- * ```js
- * console.log(`Hello`);
- * await sleep(1000);
- * console.log(`There`); // Prints one second after
- * ```
- *
- * @param {number} milliseconds
- * @return {*}  {Promise<any>}
- */
-export const sleep = (milliseconds: number): Promise<any> => new Promise(resolve => setTimeout(resolve, milliseconds));
-
-/**
- * Calls provided function after a delay
- *
- * ```js
- * const result = await delay(async () => Math.random(), 1000);
- * console.log(result); // Prints out result after one second
- * ```
- * @template V
- * @param {() => Promise<V>} call
- * @param {number} milliseconds
- * @return {*}  {Promise<any>}
- */
-export const delay = async <V>(call:() => Promise<V>, milliseconds: number): Promise<any> =>  {
-  await sleep(milliseconds);
-  return Promise.resolve(await call());
-};
 
 export type ToString<V> = (itemToMakeStringFor: V) => string;
 export type IsEqual<V> = (a:V, b:V) => boolean;

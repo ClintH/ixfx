@@ -1,10 +1,12 @@
 # TODO
 
+Envelope: pickup mode
+
 ## Tests
 
-mutableMapSet
 
 ## Demos
+
 * Curves - SVG: cubic, bend, compound
 * Compound
   * math fns
@@ -22,8 +24,6 @@ mutableMapSet
 * Paths test to show the above
 
 ## General
-
-* StateMachine unit tests
 
 * Tracker unit tests
 * Tracker visualisation/playground
