@@ -5,14 +5,31 @@
 
 import {IsEqual, isEqualDefault} from '../util.js';
 
+export * from './NumericArrays.js';
+
+/**
+ * Throws an error if `array` parameter is not a valid array
+ * @param array 
+ * @param paramName 
+ */
 export const guardArray = <V>(array:ArrayLike<V>, paramName:string = `?`) => {
   if (array === undefined) throw new Error(`Param '${paramName}' is undefined. Expected array.`);
   if (array === null) throw new Error(`Param '${paramName}' is null. Expected array.`);
   if (!Array.isArray(array)) throw new Error(`Param '${paramName}' not an array as expected`);
 };
 
+/**
+ * Returns a random array index
+ * @param array
+ * @returns 
+ */
 export const randomIndex = <V>(array: ArrayLike<V>): number => Math.floor(Math.random() * array.length);
 
+/**
+ * Returns random element
+ * @param array
+ * @returns 
+ */
 export const randomElement = <V>(array: ArrayLike<V>): V => {
   guardArray(array, `array`);
   return array[Math.floor(Math.random() * array.length)];
@@ -20,13 +37,26 @@ export const randomElement = <V>(array: ArrayLike<V>): V => {
 
 /**
  * Removes a random item from an array, returning both the item and the new array as a result.
- * Does not modify the original array unless `mutate` parameter is true
+ * Does not modify the original array unless `mutate` parameter is true.
+ * 
+ * @example Without changing source
+ * ```js
+ * const data = [100, 20, 40];
+ * const {value, array} = randomPluck(data);
+ * // value: 20, array: [100, 40], data: [100, 20, 40];
+ * ```
  *
- * @template V
- * @param {readonly} array Array to pluck item from
- * @param {*} V 
- * @param {*} []
- * @return {*}  {({readonly value:V|undefined, readonly array:ReadonlyArray<V> })}
+ * @example Mutating source
+ * ```js
+ * const data = [100, 20, 40];
+ * const {value} = randomPluck(data, true);
+ * // value: 20, data: [100, 40];
+ * ```
+ * 
+ * @template V Type of array
+ * @param array Array to pluck item from
+ * @param mutate If _true_, changes input array. _False_ by default.
+ * @return Returns an object `{value:V|undefined, array:V[]}`
  */
 //eslint-disable-next-line functional/prefer-readonly-type
 export const randomPluck = <V>(array:readonly V[], mutate = false):{readonly value:V|undefined, readonly array:Array<V> } => {
@@ -52,7 +82,19 @@ export const randomPluck = <V>(array:readonly V[], mutate = false):{readonly val
   }
 };
 
-export const shuffle = (dataToShuffle:ReadonlyArray<unknown>): ReadonlyArray<unknown> => {
+/**
+ * Returns a shuffled copy of the input array.
+ * @example
+ * ```js
+ * const d = [1, 2, 3, 4];
+ * const s = shuffle(d);
+ * // d: [1, 2, 3, 4], s: [3, 1, 2, 4]
+ * ```
+ * @param dataToShuffle 
+ * @returns Copy with items moved around randomly
+ * @template V Type of array items
+ */
+export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>): ReadonlyArray<V> => {
   const array = [...dataToShuffle];
   // eslint-disable-next-line functional/no-loop-statement, functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
@@ -63,14 +105,19 @@ export const shuffle = (dataToShuffle:ReadonlyArray<unknown>): ReadonlyArray<unk
 };
 
 /**
- * Returns an array with a value omitted.
+ * Returns an array with a value omitted. If value is not found, result will be a copy of input.
  * Value checking is completed via the provided `comparer` function, or by default checking whether `a === b`.
  *
- * @template V
- * @param {ReadonlyArray<V>} data
- * @param {V} value
- * @param {IsEqual<V>} [comparer=isEqualDefault]
- * @return {*}  {ReadonlyArray<V>}
+ * @example
+ * ```js
+ * const data = [100, 20, 40];
+ * const filtered = without(data, 20); // [100, 40]
+ * ```
+ * @template V Type of array items
+ * @param data Source array
+ * @param value Value to remove
+ * @param comparer Comparison function. If not provided {@link isEqualDefault} is used, which compares using `===`
+ * @return Copy of array without value.
  */
 export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));
 
@@ -87,16 +134,17 @@ export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> =
  *  { age: 56, city: `London` }
  * ];
  * const map = groupBy(data, item => data.city); 
- * ```
  * 
- * Returns a map:
+ * // Returns a map 
  * ```js
  * London: [{ age: 39, city: `London` }, { age: 56, city: `London` }]
  * Stockhom: [{ age: 23, city: `Stockholm` }]
  * Copenhagen: [{ age: 14, city: `Copenhagen` }]
  * ```
- * @param array Data to group
+ * @param array Array to group
  * @param grouper Function that returns a key for a given item
+ * @template K Type of key to group by. Typically string.
+ * @template V Type of values
  * @returns Map 
  */
  export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {

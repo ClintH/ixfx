@@ -1,81 +1,21 @@
 // ✔ UNIT TESTED
-import {SimpleEventEmitter} from "../Events.js";
-import { ToString, IsEqual, toStringDefault, isEqualDefault } from "../util.js";
-import { addUniqueByHash } from "./Set.js";
-import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter} from './Map.js';
-import {  without } from './Arrays.js';
-import {MutableCircularArray, mutableCircularArray} from './MutableCircularArray.js';
+import { SimpleEventEmitter } from "../Events.js";
+import { ToString, toStringDefault, isEqualDefault } from "../util.js";
+import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter, addUniqueByHash} from './Map.js';
+import { without } from './Arrays.js';
+import { circularArray } from './CircularArray.js';
+import {CircularArray, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutable, MapSetOpts, MultiValue} from "./Interfaces.js";
 
-export type MapMultiOpts<V> = {
-  /**
-   * Returns true if two values should be considered equal.
-   * 
-   * @type {(IsEqual<V>|undefined)}
-   */
- // readonly valueComparer?: IsEqual<V>|undefined
-
- /**
-  * Returns a group for values added via `addValue`. Eg. maybe you want to 
-  * group values in the shape `{name: 'Samantha' city: 'Copenhagen'}` by city:
-  * 
-  * ```
-  * const opts = {
-  *  groupBy: (v) => v.city
-  * }
-  * ```
-  *
-  * @type {(ToString<V>|undefined)}
-  */
- readonly groupBy?: ToString<V>|undefined
-}
-
-type MutableMapArrayEvents<V> = {
-  readonly addedValues: {readonly values: ReadonlyArray<V>}
-  readonly addedKey: {readonly key: string }
-  readonly clear: boolean
-  readonly deleteKey: {readonly key: string}
-}
-
-export type MultiValue<V, M> = Readonly<{
-  has(source:M, value:V): boolean
-  add(destination:M|undefined, values:ReadonlyArray<V>):M
-  toArray(source:M): ReadonlyArray<V>|undefined
-  find(source:M, predicate:(v:V) => boolean): V|unknown
-  filter(source:M, predicate:(v:V) => boolean): ReadonlyArray<V>
-  without(source:M, value:V): ReadonlyArray<V>
-  count(source:M): number
-}>;
-
-/**
- * Like a `Map` but multiple values can be stored for each key. 
- * Duplicate values can be added to the same or even a several keys.
- * 
- * By default, equality is based on value rather than reference.
- *
- * @export
- * @class MutableMapMulti
- * @template V
- */
-export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvents<V>> {
+class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #map: Map<string, M> = new Map();
-  //readonly valueComparer: IsEqual<V>;
   readonly groupBy: ToString<V>;
   readonly type: MultiValue<V, M>;
 
-  /**
-   * Constructor.
-   * 
-   * By default it will group by the string representation of values and use
-   * reference matching for values.
-   * @param {MapMultiOpts<V>} [opts={}]
-   * @memberof MutableMapMulti
-   */
   constructor(type:MultiValue<V, M>, opts:MapMultiOpts<V> = {}) {
     super();
     this.type = type;
     this.groupBy = opts.groupBy ?? toStringDefault;
-    // this.valueComparer = opts.valueComparer ?? isEqualDefault;
   }
 
   debugString(): string {
@@ -94,34 +34,15 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     return r;
   }
 
-  /**
-   * Returns true if the map is empty
-   *
-   * @readonly
-   * @type {boolean}
-   * @memberof MutableMapMulti
-   */
   get isEmpty():boolean {
     return (this.#map.size === 0);
   }
 
-  /**
-   * Clears the map
-   *
-   * @memberof MutableMapMulti
-   */
   clear() {
     this.#map.clear();
     super.fireEvent(`clear`, true);
   }
 
-  /**
-   * Adds several values under the same key. Duplicate values are permitted.
-   *
-   * @param {string} key Key for values
-   * @param {...V[]} value Values
-   * @memberof MapMulti
-   */
   addKeyedValues(key: string, ...values: ReadonlyArray<V>) {
     const set = this.#map.get(key);
     //console.log(`addKeyedValues: key: ${key} values: ${JSON.stringify(values)}`);
@@ -136,27 +57,10 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     }
   }
 
-  /**
-   * Adds a value, automatically extracting a key via the
-   * `groupBy` function assigned in the constructor options.
-   *
-   * @param {V} values
-   * @memberof MutableMapArray
-   */
   addValue(...values:ReadonlyArray<V>) {
     values.forEach(v => this.addKeyedValues(this.groupBy(v), v));
   }
 
-  /**
-   * Returns true if `value` is stored under `key`.
-   *
-   * By default values are compared by value, not reference.
-   * 
-   * @param {string} key
-   * @param {V} value
-   * @return {*}  {boolean}
-   * @memberof MutableMapArray
-   */
   hasKeyValue(key:string, value:V):boolean {    
     const m = this.#map.get(key);
     if (m === undefined) return false;    
@@ -167,19 +71,15 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     return this.#map.has(key);
   }
 
-  /**
-   * Deletes all values under the specified key that match the given value.
-   *
-   * @param {string} key
-   * @param {V} value
-   * @return {*} 
-   * @memberof MutableMapArray
-   */
-  deleteKeyValue(key: string, value: V) {
+  deleteKeyValue(key: string, value: V):boolean {
     const a = this.#map.get(key);
-    if (a === undefined) return;
+    if (a === undefined) return false;
+    const preCount = this.type.count(a);
+
     const filtered = this.type.without(a, value);// this.type.filter(a, v => !this.valueComparer(v, value));
+    const postCount = filtered.length;
     this.#map.set(key, this.type.add(undefined, filtered));
+    return preCount > postCount;
   }
 
   delete(key:string): boolean {
@@ -190,31 +90,6 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     return true;
   }
 
-  /**
-   * Deletes all occurences of `value` regardless of key
-   *
-   * @param {V} value
-   * @memberof MapMulti
-   */
-  // deleteDeep(value: V) {
-  //   const keys = Array.from(this.#map.keys());
-
-  //   keys.forEach(k => {
-  //     const a = this.#map.get(k);
-  //     if (a === undefined) return;
-  //     const b = this.type.filter(a, v => !this.valueComparer(v, value));
-  //     this.#map.set(k, this.type.add(undefined, b));
-  //   });
-  // }
-
-  /**
-   * Finds the first key where value is stored. 
-   * Note: value could be stored in multiple keys
-   *
-   * @param {V} value
-   * @returns {(string | undefined)}
-   * @memberof MapMulti
-   */
   findKeyForValue(value: V): string | undefined {
     const keys = Array.from(this.#map.keys());
     const found = keys.find(key => {
@@ -226,13 +101,6 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     return found;
   }
 
-  /**
-   * Returns the number of values stored under `key`, or 0 if key is not present.
-   *
-   * @param {string} key
-   * @return {*}  {number}
-   * @memberof MutableMapArray
-   */
   count(key: string): number {
     const e = this.#map.get(key);
     if (e === undefined) return 0;
@@ -270,7 +138,7 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
     return r;
   }
 
-  merge(other: MutableMapOf<V, M>) {
+  merge(other: MapOfMutable<V, M>) {
     const keys = other.keys();
     keys.forEach(key => {
       const data = other.get(key);
@@ -279,13 +147,33 @@ export class MutableMapOf<V, M>  extends SimpleEventEmitter<MutableMapArrayEvent
   }
 }
 
-export type MapArrayOpts<V> = MapMultiOpts<V> & {
-  readonly comparer?:IsEqual<V>
-  readonly toString?:ToString<V>
-}
-
 // ✔ UNIT TESTED
-export const mutableMapArray = <V>(opts:MapArrayOpts<V> = {}) => {
+/**
+ * Returns a {@link MapOfMutable} to allow storing multiple values under a key, unlike a regular Map.
+ * @example
+ * ```js
+ * const map = mapArray();
+ * map.add(`hello`, [1,2,3,4]); // Adds series of numbers under key `hello`
+ * 
+ * const hello = map.get(`hello`); // Get back values
+ * ```
+ * 
+ * Takes options { comparer: {@link IsEqual}, toString: {@link ToString}}
+ * 
+ * A custom {@link ToString} function can be provided which is used when checking value equality (`has`, `without`)
+ * ```js
+ * const map = mapArray({toString:(v) => v.name}); // Compare values based on their `name` field;
+ * ``` 
+ * 
+ * Alternatively, a {@link IsEqual} function can be used:
+ * ```js
+ * const map = mapArray({comparer: (a, b) => a.name === b.name });
+ * ```
+ * @param opts 
+ * @template V Data type of items 
+ * @returns {@link MapOfMutable}
+ */
+export const mapArray = <V>(opts:MapArrayOpts<V> = {}) => {
   const comparer = opts.comparer === undefined ?
     opts.toString === undefined ? (a:V, b:V) => opts.toString(a) === opts.toString(b) :
       isEqualDefault
@@ -303,15 +191,37 @@ export const mutableMapArray = <V>(opts:MapArrayOpts<V> = {}) => {
     has: (source, value) => source.find(v => comparer(v, value)) !== undefined,
     without: (source, value) => source.filter(v => !comparer(v, value))
   };
-  const m = new MutableMapOf<V, ReadonlyArray<V>>(t, opts);
+  const m = new MapOfMutableImpl<V, ReadonlyArray<V>>(t, opts);
   return m;
 };
 
-export type MapSetOpts<V> = MapMultiOpts<V> & {
-  readonly hash:ToString<V>
-};
-
-export const mutableMapSet = <V>(opts?:MapSetOpts<V>) => {
+/**
+ * Returns a {@link MapOfMutable} that uses a set to hold values.
+ * This means that only unique values are stored under each key. By default it
+ * uses the JSON representation to compare items. 
+ * 
+ * Options: { hash: {@link ToString} }
+ * 
+ * @example Only storing the newest three items per key
+ * ```js
+ * const map = mapSetMutable();
+ * map.add(`hello`, [1, 2, 3, 1, 2, 3]);
+ * const hello = map.get(`hello`); // [1, 2, 3]
+ * ```
+ * 
+ * Provide a {@link ToString} function for custom equality checking
+ * 
+ * @example
+ * ```js
+ * const hash = (v) => v.name; // Use name as the key
+ * const map = mapSetMutable(hash);
+ * map.add(`hello`, {age:40, name: `Mary`});
+ * map.add(`hello`, {age:29, name: `Mary`}); // Value ignored as same name exists
+ * ```
+ * @param opts 
+ * @returns {@link MapOfMutable}
+ */
+export const mapSet = <V>(opts?:MapSetOpts<V>) => {
   const hash = opts?.hash ?? toStringDefault;
   const comparer = (a:V, b:V) => hash(a) === hash(b);
 
@@ -324,19 +234,32 @@ export const mutableMapSet = <V>(opts?:MapSetOpts<V>) => {
     has: (source, value) => mapHasAnyValue(source, value, comparer),
     without: (source, value) => without(mapToArray(source), value, comparer)
   };
-  const m = new MutableMapOf<V, ReadonlyMap<string, V>>(t, opts);
+  const m = new MapOfMutableImpl<V, ReadonlyMap<string, V>>(t, opts);
   return m;
 };
 
-export type MapCircularOpts<V> = MapMultiOpts<V> & {
-  readonly capacity:number
-}
-export const mutableMapCircular = <V>(opts:MapCircularOpts<V>) => {
+/**
+ * Returns a {@link MapOfMutable} that uses a {@link CircularArray} to hold values.
+ * This means that the number of values stored under each key will be limited to the defined
+ * capacity.
+ * 
+ * Requires options: { capacity: number}
+ * 
+ * @example Only storing the newest three items per key
+ * ```js
+ * const map = mapCircular({capacity: 3});
+ * map.add(`hello`, [1, 2, 3, 4, 5]);
+ * const hello = map.get(`hello`); // [3, 4, 5]
+ * ```
+ * @param opts 
+ * @returns
+ */
+export const mapCircular = <V>(opts:MapCircularOpts<V>):MapOfMutable<V, CircularArray<V>> => {
   const comparer = isEqualDefault;
 
-  const t:MultiValue<V, MutableCircularArray<V>> = {
+  const t:MultiValue<V, CircularArray<V>> = {
     add:(dest, values) => {
-      if (dest === undefined) dest = mutableCircularArray<V>(opts.capacity);
+      if (dest === undefined) dest = circularArray<V>(opts.capacity);
       values.forEach(v => dest = dest?.add(v));
       return dest;
     },
@@ -347,5 +270,5 @@ export const mutableMapCircular = <V>(opts:MapCircularOpts<V>) => {
     has: (source, value) => source.find(v => comparer(v, value)) !== undefined,
     without: (source, value) => source.filter(v => !comparer(v, value))
   };
-  return new MutableMapOf<V, MutableCircularArray<V>>(t, opts);
+  return new MapOfMutableImpl<V, CircularArray<V>>(t, opts);
 };

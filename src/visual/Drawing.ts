@@ -7,7 +7,7 @@ import * as Arcs from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
 import * as color2k from 'color2k';
-import {stack, Stack} from '../collections/Stack.js';
+import {stack, Stack} from '../collections/index.js';
 import {resolveEl} from '../dom/Util.js';
 import { resizeObservable } from '../dom/index.js';
 

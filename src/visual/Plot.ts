@@ -1,6 +1,7 @@
-import { MutableCircularArray } from '../collections/MutableCircularArray.js';
-import {getMinMaxAvg} from '../collections/NumericArrays.js';
-import {BasePlot} from './BasePlot.js';
+import { circularArray } from '../collections/CircularArray.js';
+import { CircularArray } from '../collections/Interfaces.js';
+import { minMaxAvg } from '../collections/NumericArrays.js';
+import { BasePlot } from './BasePlot.js';
 
 /**
  * Usage:
@@ -12,7 +13,7 @@ import {BasePlot} from './BasePlot.js';
  * @extends {BaseGraph}
  */
 export class Plot extends BasePlot {
-  buffer: MutableCircularArray<number>;
+  buffer: CircularArray<number>;
   readonly samples: number;
   color = `silver`;
   lineWidth = 3;
@@ -20,14 +21,14 @@ export class Plot extends BasePlot {
   constructor(canvasEl: HTMLCanvasElement, samples = 10) {
     super(canvasEl);
     if (samples <= 0) throw new Error(`samples must be greater than zero`);
-    this.buffer = new MutableCircularArray<number>(samples);
+    this.buffer = circularArray<number>(samples);
     this.samples = samples;
   }
 
   draw(g: CanvasRenderingContext2D, plotWidth: number, plotHeight: number) {
     const d = this.buffer;
     const dataLength = d.length;
-    const {min, max, avg} = getMinMaxAvg(d);
+    const {min, max, avg} = minMaxAvg(d);
 
     const range = this.pushScale(min, max);
     const lineWidth = plotWidth / dataLength;
@@ -58,7 +59,7 @@ export class Plot extends BasePlot {
   }
 
   clear() {
-    this.buffer = new MutableCircularArray<number>(this.samples);
+    this.buffer = circularArray<number>(this.samples);
     this.repaint();
   }
 

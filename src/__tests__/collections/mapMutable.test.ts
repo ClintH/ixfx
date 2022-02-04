@@ -1,10 +1,11 @@
 /// <reference types="jest-extended" />
 /* eslint-disable */
-import {MapArrayOpts, MapMultiOpts, MapSetOpts, mutableMapArray, mutableMapSet} from "../../collections/MutableMapMulti.js";
+import {MapArrayOpts, MapSetOpts} from  '../../collections/Interfaces.js'
+import { mapArray, mapSet} from "../../collections/MapMultiMutable.js";
 import {jest} from '@jest/globals'
 
 test(`mutableMapSet`, () => {
-  const m = mutableMapSet<string>();
+  const m = mapSet<string>();
   m.addKeyedValues(`a`, `aa`, `ab`, `ac`, `aa`, `ab`);
   expect(m.count(`a`)).toEqual(3); // duplicate values should be dropped
 
@@ -18,7 +19,7 @@ test(`mutableMapSet`, () => {
   const barry = {name: `Barry`, city: `London`};
   const barryClone = {name: `Barry`, city: `London`};
 
-  const m2 = mutableMapSet<Person>(opts);
+  const m2 = mapSet<Person>(opts);
   expect(m2.count(`London`)).toEqual(0);
   m2.addValue(barry, barryClone);
   expect(m2.count(`London`)).toEqual(1);
@@ -41,7 +42,7 @@ describe(`mutableMapArray`, () => {
       comparer:(a, b) => a.name === b.name && a.city === b.city
     }
 
-    const m = mutableMapArray<Person>(opts);
+    const m = mapArray<Person>(opts);
     
     m.addValue(barry, barryOther, barryCase, sally, sallyOther, sallyMoreProps);
    
@@ -66,7 +67,7 @@ describe(`mutableMapArray`, () => {
   });
 
   test(`events`, () =>{
-    const m = mutableMapArray<string>();
+    const m = mapArray<string>();
     
     const addKeyHandler = jest.fn();
     const addValueHandler = jest.fn();
@@ -97,7 +98,7 @@ describe(`mutableMapArray`, () => {
   });
 
   test(`defaultOpts`, () => {
-    const m = mutableMapArray<string>();
+    const m = mapArray<string>();
     expect(m.isEmpty).toBeTrue();
     m.addKeyedValues(`apples`, `a` );
     m.addKeyedValues(`oranges`, `d`, `e`)

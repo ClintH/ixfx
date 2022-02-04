@@ -1,12 +1,13 @@
 /* eslint-disable */
 
-import {getMinMaxAvg} from '../collections/NumericArrays.js';
-import {MutableCircularArray} from "../collections/MutableCircularArray.js"
-import {mutableMapCircular, MutableMapOf} from "../collections/MutableMapMulti.js"
+import { minMaxAvg } from '../collections/NumericArrays.js';
+import { circularArray } from "../collections/CircularArray.js"
+import { CircularArray, MapOfMutable } from '../collections/Interfaces.js';
+import { mapCircular} from "../collections/MapMultiMutable.js"
 import * as Palette from "./Palette.js";
-import {Point} from "../geometry/Point.js";
-import {resolveEl} from "../dom/Util.js";
-import {autoSizeCanvas} from "./Drawing.js";
+import { Point} from "../geometry/Point.js";
+import { resolveEl} from "../dom/Util.js";
+import { autoSizeCanvas} from "./Drawing.js";
 
 type Series = {
   min:number,
@@ -37,14 +38,14 @@ type PlotOpts = {
   coalesce?:boolean
 }
 
-export const createScales = (buffer:MutableMapOf<number, MutableCircularArray<number>>) => {
+export const createScales = (buffer:MapOfMutable<number, CircularArray<number>>) => {
   const seriesNames = buffer.keys();
   const scales:Series[] = [];
   seriesNames.forEach(s => {
     const series = buffer.get(s);
     if (series === undefined) return;
 
-    let {min,max} = getMinMaxAvg(series);
+    let {min,max} = minMaxAvg(series);
     let range = max -min;
     
     if (range === 0) {
@@ -60,11 +61,11 @@ export const createScales = (buffer:MutableMapOf<number, MutableCircularArray<nu
   return scales;
 }
 
-export const add = (buffer:MutableMapOf<number, MutableCircularArray<number>>, value:number, series:string = "") => {
+export const add = (buffer:MapOfMutable<number, CircularArray<number>>, value:number, series:string = "") => {
   buffer.addKeyedValues(series, value);
 }
 
-export const draw = (buffer:MutableMapOf<number, MutableCircularArray<number>>, drawing:DrawingOpts) => {
+export const draw = (buffer:MapOfMutable<number, CircularArray<number>>, drawing:DrawingOpts) => {
   const {ctx, yLabelWidth, width, height} = drawing;
   const showYAxis = drawing.showYAxis ?? true;
   const series = createScales(buffer);
@@ -130,7 +131,7 @@ export const drawSeriesAxis = (series:Series, drawing:DrawingOpts) => {
 
 }
 
-export const drawSeries = (series:Series, values:MutableCircularArray<number>, drawing:DrawingOpts) => {
+export const drawSeries = (series:Series, values:CircularArray<number>, drawing:DrawingOpts) => {
   const {ctx, height, width, dataXScale = 1, lineWidth = 2} = drawing;
   let x = 0;
   let leadingEdge:Point|undefined;
@@ -200,7 +201,7 @@ export const plot2 = (parentElOrQuery:string|HTMLElement, opts:PlotOpts) => {
   
   const ctx = canvasEl.getContext(`2d`)!;
   const capacity = opts.capacity ?? 10;
-  const buffer = mutableMapCircular<number>({ capacity });
+  const buffer = mapCircular<number>({ capacity });
   const metrics = ctx.measureText('Xy');
   const coalesce = opts.coalesce ?? true;
   let drawingOpts = {

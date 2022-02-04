@@ -18,9 +18,9 @@ import {sleep} from "./Timer.js";
  * ```
  *
  * @template V
- * @param {number} intervalMs
- * @param {() => V} produce
- * @returns {Series<V>}
+ * @param intervalMs
+ * @param produce
+ * @returns
  */
  export const atInterval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
   let cancelled = false;
@@ -39,9 +39,9 @@ import {sleep} from "./Timer.js";
 /**
  * Generates a range of numbers, with a given interval.
  * Unlike numericRange, numbers might contain rounding errors
- * @param {number} interval Interval between numbers
- * @param {number} [start=0] Start
- * @param {number} [end] End (if undefined, range never ends)
+ * @param interval Interval between numbers
+ * @param start Start
+ * @param end End (if undefined, range never ends)
  */
  export const numericRangeRaw = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
@@ -58,7 +58,7 @@ import {sleep} from "./Timer.js";
 /**
  * Generates a range of numbers, with a given interval.
  *
- * For-loop example:
+ * @example For-loop
  * ```
  * let loopForever = numericRange(0.1); // By default starts at 0 and counts upwards forever
  * for (v of loopForever) {
@@ -66,8 +66,8 @@ import {sleep} from "./Timer.js";
  * }
  * ```
  * 
- * If you want more control over when/where incrementing happens...
- * ````
+ * @example If you want more control over when/where incrementing happens...
+ * ```js
  * let percent = numericRange(0.1, 0, 1);
  * let percentResult = percent.next();
  * while (!percentResult.done) {
@@ -79,10 +79,10 @@ import {sleep} from "./Timer.js";
  * Note that computations are internally rounded to avoid floating point math issues. So if the `interval` is very small (eg thousandths), specify a higher rounding
  * number.
  * 
- * @param {number} interval Interval between numbers
- * @param {number} [start=0] Start
- * @param {number} [end] End (if undefined, range never ends)
- * @param {number} [rounding] A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
+ * @param interval Interval between numbers
+ * @param start Start
+ * @param end End (if undefined, range never ends)
+ * @param rounding A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
  */
 export const numericRange = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false, rounding?: number) {
   if (interval <= 0) throw Error(`Interval is expected to be above zero`);
@@ -104,15 +104,15 @@ export const numericRange = function* (interval: number, start: number = 0, end?
  * Continually loops back and forth between 0 and 1 by a specified interval.
  * Looping returns start value, and is inclusive of 0 and 1.
  * 
- * Usage
- * ```
+ * @example Usage
+ * ```js
  * for (let v of percentPingPong(0.1)) {
  *  // v will go up and down. Make sure you have a break somewhere because it is infinite
  * }
  * ```
  * 
- * Alternative:
- * ```
+ * @example Alternative:
+ * ```js
  * let pp = percentPingPong(0.1, 0.5); // Setup generator one time
  * let v = pp.next().value; // Call .next().value whenever a new value is needed
  * ```
@@ -135,11 +135,11 @@ export const pingPongPercent = function (interval: number = 0.1, offset?: number
 /**
  * Ping-pongs continually between `start` and `end` with a given `interval`. Use `pingPongPercent` for 0-1 ping-ponging
  *
- * @param {number} interval Amount to increment by. Use negative numbers to start counting down
- * @param {number} lower Lower bound (inclusive)
- * @param {number} upper Upper bound (inclusive, must be greater than start)
- * @param {number} offset Starting point within bounds (defaults to `lower`)
- * @param {number} [rounding=1] Rounding is off by default. Use say 1000 if interval is a fractional amount to avoid rounding errors.
+ * @param interval Amount to increment by. Use negative numbers to start counting down
+ * @param lower Lower bound (inclusive)
+ * @param upper Upper bound (inclusive, must be greater than start)
+ * @param offset Starting point within bounds (defaults to `lower`)
+ * @param rounding Rounding is off by default. Use say 1000 if interval is a fractional amount to avoid rounding errors.
  */
 export const pingPong = function* (interval: number, lower: number, upper: number, offset?: number, rounding: number = 1) {
   if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);

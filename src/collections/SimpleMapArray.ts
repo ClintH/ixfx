@@ -1,11 +1,6 @@
-/**
- * A simple mutable map of arrays, without events
- *
- * @export
- * @class SimpleMutableMapArray
- * @template V
- */
-export class SimpleMutableMapArray<V> {
+import {SimpleMapArrayMutable} from "./Interfaces.js";
+
+class SimpleMapArrayMutableImpl<V> {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #map: Map<string, ReadonlyArray<V>> = new Map();
 
@@ -47,4 +42,4 @@ export class SimpleMutableMapArray<V> {
   }
 }
 
-export const simpleMutableMapArray = () => new SimpleMutableMapArray();
+export const simpleMapArrayMutable = <V>():SimpleMapArrayMutable<V> => new SimpleMapArrayMutableImpl();

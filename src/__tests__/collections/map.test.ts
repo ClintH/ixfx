@@ -1,6 +1,7 @@
 /// <reference types="jest-extended" />
 /* eslint-disable */
-import {map, mutableMap} from '../../collections/Map.js';
+import {mapMutable} from '../../collections/MapMutable.js';
+import {map} from '../../collections/MapImmutable.js';
 
 test(`immutableMap`, () => {
   const m = map();
@@ -43,7 +44,7 @@ test(`immutableMap`, () => {
 });
 
 test(`mutableMap`, () => {
-  const m = mutableMap();
+  const m = mapMutable();
   expect(m.isEmpty()).toBeTruthy();
   m.add([`apples`, 10], [`oranges`, 9]);
   expect(m.isEmpty()).toBeFalsy();

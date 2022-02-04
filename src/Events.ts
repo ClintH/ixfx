@@ -1,4 +1,5 @@
-import { SimpleMutableMapArray } from "./collections/SimpleMutableMapArray.js";
+/* eslint-disable */
+import { simpleMapArrayMutable } from "./collections/SimpleMapArray.js";
 export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>) => void;
 
 type FlowSource = {
@@ -53,8 +54,15 @@ export const debounce = (triggered:()=>void, timeoutMs:number):Debouncer => {
 };
 
 export class SimpleEventEmitter<Events> {
-  readonly #listeners = new SimpleMutableMapArray<Listener<Events>>();
+  readonly #listeners = simpleMapArrayMutable<Listener<Events>>();
 
+  /**
+   * Fire event
+   * @private
+   * @param type Type of event 
+   * @param args Arguments for event
+   * @returns
+   */
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
     const listeners = this.#listeners.get(type as string);
     if (listeners === undefined) return;
@@ -79,8 +87,7 @@ export class SimpleEventEmitter<Events> {
   addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void { // (this: any, ev: Events[K]) => any): void {
     this.#listeners.add(type as string, listener as Listener<Events>);
   }
-  //addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-
+  
   /**
    * Remove event listener
    *
@@ -93,7 +100,7 @@ export class SimpleEventEmitter<Events> {
 
   /**
    * Clear all event listeners
-   *
+   * @private
    * @memberof SimpleEventEmitter
    */
   clearEventListeners() {

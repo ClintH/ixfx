@@ -1,35 +1,22 @@
 // ✔ Unit tested!
-
-export enum OverflowPolicy {
-  /**
-   * Removes items front of the queue (ie older items are discarded)
-   */
-  DiscardOlder,
-  /**
-   * Remove from rear of queue to make space for new items (ie newer items are discarded)
-   */
-  DiscardNewer,
-  /**
-   * Only adds new items that there are room for (ie. brand new items are discarded)
-   */
-  DiscardAdditions
-}
+import {DiscardPolicy, Stack} from "./Interfaces.js";
+import {StackMutable} from './Interfaces.js';
 
 export type StackOpts = {
   readonly debug?:boolean
   readonly capacity?: number
-  readonly overflowPolicy?: OverflowPolicy
+  readonly overflowPolicy?: DiscardPolicy
 }
 
 const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
   const potentialLength = stack.length + toAdd.length;
-  const policy = opts.overflowPolicy ?? OverflowPolicy.DiscardAdditions;
+  const policy = opts.overflowPolicy ?? `additions`;
   const capacity = opts.capacity ?? potentialLength;
   const toRemove = potentialLength - capacity;
-  if (opts.debug) console.log(`Stack.push: stackLen: ${stack.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
+  if (opts.debug) console.log(`Stack.push: stackLen: ${stack.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${policy}`);
 
   switch (policy) {
-  case OverflowPolicy.DiscardAdditions:
+  case `additions`:
     if (opts.debug) console.log(`Stack.push:DiscardAdditions: stackLen: ${stack.length} slice: ${potentialLength-capacity} toAddLen: ${toAdd.length}`);
     if (stack.length === opts.capacity) {
       return stack; // Completely full
@@ -37,7 +24,7 @@ const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyA
       // Only add some from the new array
       return [...stack, ...toAdd.slice(0, toAdd.length-toRemove)];
     }
-  case OverflowPolicy.DiscardNewer:
+  case `newer`:
     if (toRemove >= stack.length) {
       // New items will completely flush out old
       return toAdd.slice(Math.max(0, toAdd.length-capacity), Math.min(toAdd.length, capacity)+1);
@@ -46,7 +33,7 @@ const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyA
       if (opts.debug) console.log(` from orig: ${stack.slice(0, toRemove-1)}`);
       return [...stack.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, capacity-toRemove+1))];    
     }
-  case OverflowPolicy.DiscardOlder:
+  case `older`:
     // Oldest item in stack is position 0
     return [...stack, ...toAdd].slice(toRemove);
   default:
@@ -93,36 +80,7 @@ const isFull = <V>(opts: StackOpts, stack: ReadonlyArray<V>): boolean => {
 // -------------------------
 // Immutable
 // -------------------------
-
-/**
- * Immutable stack
- * `Push` & `pop` both return a new instance, the original is never modified.
- * 
- * Usage:
- * ```
- * push(item);  // Return a new stack with item(s) added
- * pop();       // Return a new stack with top-most item removed (ie. newest)
- * .peek;       // Return what is at the top of the stack or undefined if empty
- * .isEmpty/.isFull;
- * .length;     // How many items in stack
- * .data;       // Get the underlying array
- * ```
- * 
- * Example
- * ```
- * let sanga = new Stack();
- * sanga = sanga.push(`bread`, `tomato`, `cheese`);
- * sanga.peek;  // `cheese`
- * sanga = sanga.pop(); // removes `cheese`
- * sanga.peek;  // `tomato`
- * const sangaAlt = sanga.push(`lettuce`, `cheese`); // sanga stays [`bread`, `tomato`], while sangaAlt is [`bread`, `tomato`, `lettuce`, `cheese`]
- * ```
- *
- * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
- * @class Stack
- * @template V
- */
-export class Stack<V> {
+class StackImpl<V> {
   readonly opts: StackOpts;
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly data: ReadonlyArray<V>;
@@ -133,19 +91,13 @@ export class Stack<V> {
   }
 
   push(...toAdd: ReadonlyArray<V>): Stack<V> {
-    return new Stack<V>(this.opts, push(this.opts, this.data, ...toAdd));
+    return new StackImpl<V>(this.opts, push(this.opts, this.data, ...toAdd));
   }
 
   pop(): Stack<V> {
-    return new Stack<V>(this.opts, pop(this.opts, this.data));
+    return new StackImpl<V>(this.opts, pop(this.opts, this.data));
   }
 
-  /**
-   * Enumerates stack from bottom-to-top
-   *
-   * @param {(v:V) => void} fn
-   * @memberof Stack
-   */
   forEach(fn:(v:V) => void): void {
     this.data.forEach(fn);
   }
@@ -170,50 +122,11 @@ export class Stack<V> {
     return this.data.length;
   }
 }
-/**
- * Returns an immutable stack
- *
- * @template V
- * @param {StackOpts} [opts={}]
- * @param {...V[]} startingItems
- * @returns {Stack<V>}
- */
-export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new Stack({...opts}, [...startingItems]);
-
 
 // -------------------------
 // Mutable
 // -------------------------
-
-
-/**
- * Mutable stack
- * 
- * Usage:
- * ```
- * push(item); // Add one or more items to the top of the stack
- * pop(); // Removes and retiurns the item at the top of the stack (ie the newest thing)
- * .peek; // Return what is at the top of the stack or undefined if empty
- * .isEmpty/.isFull;
- * .length; // How many items in stack
- * .data; // Get the underlying array
- * ```
- * 
- * Example
- * ```
- * const sanga = new MutableStack();
- * sanga.push(`bread`, `tomato`, `cheese`);
- * sanga.peek;  // `cheese`
- * sanga.pop(); // removes `cheese`
- * sanga.peek;  // `tomato`
- * sanga.push(`lettuce`, `cheese`); // Stack is now [`bread`, `tomato`, `lettuce`, `cheese`]
- * ```
- *
- * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
- * @class MutableStack
- * @template V
- */
-class MutableStack<V> {
+class StackMutableImpl<V> {
   readonly opts: StackOpts;
   /* eslint-disable-next-line functional/prefer-readonly-type */
   data: ReadonlyArray<V>;
@@ -227,6 +140,14 @@ class MutableStack<V> {
     /* eslint-disable-next-line functional/immutable-data */
     this.data = push(this.opts, this.data, ...toAdd);
     return this.data.length;
+  }
+
+  forEach(fn:(v:V) => void): void {
+    this.data.forEach(fn);
+  }
+
+  forEachFromTop(fn:(v:V) => void): void {
+    [...this.data].reverse().forEach(fn);
   }
 
   pop(): V|undefined {
@@ -253,11 +174,37 @@ class MutableStack<V> {
 }
 
 /**
- * Creates a mutable stack
- *
+ * Returns stack (immutable). Use {@link stackMutable} for a mutable one.
+ * @example
+ * ```js
+ * let s = stack();
+ * s = s.push(1, 2, 3, 4);
+ * s.peek; // 4
+ * s = s.pop();
+ * s.peek; // 3
+ * ```
+ * @template V
+ * @param {StackOpts} [opts={}]
+ * @param {...V[]} startingItems
+ * @returns {Stack<V>}
+ */
+ export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new StackImpl({...opts}, [...startingItems]);
+
+
+/**
+ * Creates a stack (mutable). Use {@link stack} for an immutable one.
+ * 
+ * @example
+ * ```js
+ * const s = stackMutable();
+ * s.push(1, 2, 3, 4);
+ * s.peek;  // 4
+ * s.pop;   // 4
+ * s.peek;  // 3
+ * ```
  * @template V
  * @param {StackOpts} opts
  * @param {...V[]} startingItems
  * @returns
  */
-export const stackMutable = <V>(opts: StackOpts, ...startingItems: ReadonlyArray<V>) =>  new MutableStack({...opts}, [...startingItems]);
+export const stackMutable = <V>(opts: StackOpts, ...startingItems: ReadonlyArray<V>):StackMutable<V> =>  new StackMutableImpl({...opts}, [...startingItems]);

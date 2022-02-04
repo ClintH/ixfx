@@ -2,7 +2,8 @@ import {Rects, Points} from './index.js';
 import {integer as guardInteger} from '../Guards.js';
 import {clampZeroBounds} from "../util.js";
 import {randomElement } from  '../collections/Arrays.js';
-import {mutableStringSet, MutableStringSet} from "../collections/Set.js";
+import { SetMutable } from '../collections/Interfaces.js';
+import {setMutable, } from "../collections/Set.js";
 import {zipKeyValue} from "../collections/Map.js";
 
 export type GridVisual = Readonly<{
@@ -41,7 +42,7 @@ type VisitorLogic = {
 }
 export type VisitGenerator = Generator<Readonly<Cell>, void, unknown>
 export type VisitorOpts = {
-  readonly visited?:MutableStringSet<Cell>
+  readonly visited?:SetMutable<Cell>
   readonly reversed?:boolean
   readonly debug?:boolean
 }
@@ -474,7 +475,7 @@ export const visitor = function* (
   guard(start, `start`, grid);
   
 
-  const v = opts.visited ?? mutableStringSet<Cell>(c => cellKeyString(c));
+  const v = opts.visited ?? setMutable<Cell>(c => cellKeyString(c));
   const possibleNeighbours = logic.options ? logic.options : (g:Grid, c:Cell) => neighbourList(g, c, crossDirections, `undefined`);
 
   if (!isCell(start)) throw new Error(`'start' parameter is undefined or not a cell`);

@@ -1,8 +1,8 @@
 /* eslint-disable */
-import {mutableCircularArray}  from '../../collections/MutableCircularArray.js';
+import {circularArray}  from '../../collections/CircularArray.js';
 
 test(`circular`, () => {
-  const a = mutableCircularArray(5);
+  const a = circularArray(5);
   const b = a.add(`test`);
   let c = b;
   for (let i = 0; i < 15; i++) {

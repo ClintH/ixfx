@@ -44,13 +44,15 @@ Publishing to NPM will trigger the same script, but cleaning `./dist` and `./etc
 
 ## Docs
 
-Generate API docs to `./etc/api`:
+Generate API docs to `./docs` so they are picked up by GH pages.
 
 ```
 npm run docs
+npm run docs:watch // Auto-rebuilt as source changes
 ```
 
-To copy into `../ixfx-docs/api`, ready for deploying `ixfx-docs`:
+
+Assuming you have the `ixfx-docs` repository as a sibling directory, you can copy API docs to their right place:
 
 ```
 npm run copyApiDocs

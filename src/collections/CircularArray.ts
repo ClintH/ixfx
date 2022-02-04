@@ -1,17 +1,7 @@
-/**
- * The circular array grows to a fixed size. Once full, new
- * items replace the oldest item in the array. Immutable.
- *
- * Usage:
- * ```
- * let a = new Circular(10);
- * let b = a.add(something);
- * ```
- * @class CircularArray
- * @extends {Array}
- * @template V
- */
-export class MutableCircularArray<V> extends Array {
+import {CircularArray} from "./Interfaces";
+
+
+class CircularArrayImpl<V> extends Array {
   // ✔ Class is unit tested!
   /* eslint-disable-next-line functional/prefer-readonly-type */
   #capacity: number;
@@ -27,15 +17,8 @@ export class MutableCircularArray<V> extends Array {
     this.#pointer = 0;
   }
 
-  /**
-   * Returns a new Circular with item added
-   *
-   * @param {V} thing Thing to add
-   * @returns {Circular<V>} Circular with item added
-   * @memberof Circular
-   */
-  add(thing: V): MutableCircularArray<V> {
-    const ca = MutableCircularArray.from(this) as MutableCircularArray<V>;
+  add(thing: V): CircularArrayImpl<V> {
+    const ca = CircularArrayImpl.from(this) as CircularArrayImpl<V>;
     /* eslint-disable-next-line functional/immutable-data */
     ca[this.#pointer] = thing;
     /* eslint-disable-next-line functional/immutable-data */
@@ -57,10 +40,20 @@ export class MutableCircularArray<V> extends Array {
 
 
 /**
- * Returns a new mutable circular array
- *
- * @template V
- * @param {number} capacity
+ * Returns a new circular array. Immutable. A circular array only keeps up to `capacity` items.
+ * Old items are overridden with new items.
+ * 
+ * `CircularArray` extends the regular JS array. Only use `add` to change the array if you want
+ * to keep the `CircularArray` behaviour.
+ * @example
+ * ```js
+ * let a = circularArray(10);
+ * a = a.add(`hello`); // Because it's immutable, capture the return result of `add`
+ * a.isFull;  // True if circular array is full
+ * a.pointer; // The current position in array it will write to
+ * ```
+ * @template V Value of array items
+ * @param {number} capacity Capacity.
  * @return {*}  {CircularArray<V>}
  */
-export const mutableCircularArray = <V>(capacity:number): MutableCircularArray<V> => new MutableCircularArray<V>(capacity);
+export const circularArray = <V>(capacity:number): CircularArray<V> => new CircularArrayImpl<V>(capacity);

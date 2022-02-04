@@ -2,75 +2,17 @@
 
 import { ToString } from "../util.js";
 import {SimpleEventEmitter} from "../Events.js";
-
-type MutableValueSetEventMap<V> = {
-  readonly add: {readonly value: V, readonly updated: boolean}
-  readonly clear: boolean
-  readonly delete: V
-}
-
-export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFunc: ToString<V>, ...values:readonly V[]) => {
-  const s = set === undefined ? new Map() : new Map(set);
-  values.forEach(v => {
-    const vStr = hashFunc(v);
-    if (s.has(vStr)) return;
-    s.set(vStr, v);
-  });
-  return s;
-};
-
-export const mutableStringSet = <V>(keyString: ToString<V> | undefined = undefined) => new MutableStringSetImpl(keyString);
-
-export type MutableStringSet<V> = {
-  readonly add: (item:V) => void
-  readonly has: (item:V) => boolean
-}
+import {SetMutable, ValueSetEventMap} from "./Interfaces.js";
 
 /**
- * A mutable set that stores unique items by their value, rather
- * than object reference.
+ * Returns a {@link SetMutable}. Sets are useful when you want to ignore duplicate values.
  * 
- * By default the JSON.stringify() representation is used to compare
- * objects. Alternatively, pass a function into the constructor
- *
- * It also fires `add`, `clear` and `delete` events.
- * 
- * Usage
- * ```
- * .add(item);    // Add one or more items. Items with same key are overriden.
- * .has(item);    // Returns true if item *value* is present
- * .clear();      // Remove everything
- * .delete(item); // Delete item by value
- * .toArray();    // Returns values as an array
- * .values();     // Returns an iterator over values
- * ```
- * 
- * Example
- * ```
- * const people = [
- *  {name: `Barry`, city: `London`}
- *  {name: `Sally`, city: `Bristol`}
- * ];
- * const set = mutableValueSet(person => {
- *  // Key person objects by name and city (assi)
- *  return `${person.name}-${person.city}`
- * });
- * set.add(...people);
- * 
- * set.has({name:`Barry`, city:`Manchester`})); // False, key is different (Barry-Manchester)
- * set.has({name:`Barry`, city:`London`}));     // True, we have Barry-London as a key
- * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
- * 
- * set.addEventListener(`add`, newItem => {
- *  console.log(`New item added: ${newItem}`);
- * });
- * ```
- * 
- * @export
- * @class MutableValueSet
- * @template V
+ * @param keyString Function that produces a key for items. If unspecified uses JSON.stringify
+ * @returns 
  */
-class MutableStringSetImpl<V> extends SimpleEventEmitter<MutableValueSetEventMap<V>> {
+export const setMutable = <V>(keyString: ToString<V> | undefined = undefined):SetMutable<V> => new MutableStringSetImpl(keyString);
+
+class MutableStringSetImpl<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
   // ✔ UNIT TESTED
   /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();

@@ -1,30 +1,35 @@
 // ✔ UNIT TESTED
 
-export enum OverflowPolicy {
-  /**
-   * Removes items front of the queue (ie older items are discarded)
-   */
-  DiscardOlder,
-  /**
-   * Remove from rear of queue to make space for new items (ie newer items are discarded)
-   */
-  DiscardNewer,
-  /**
-   * Only adds new items that there are room for (ie. brand new items are discarded)
-   */
-  DiscardAdditions
-}
+import {QueueMutable, Queue, DiscardPolicy} from "./Interfaces.js";
 
-
-export interface QueueOpts  {
+/**
+ * Queue options.
+ * 
+ * @example Cap size to 5 items, throwing away newest items already in queue.
+ * ```js
+ * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * ```
+ */
+export type QueueOpts =  {
+  /**
+   * @private
+   */
   readonly debug?:boolean
+  /**
+   * Capcity limit
+   */
   readonly capacity?: number
   /**
-   * Default is DiscardAdditions, meaning new items are discarded
+   * Default is `additions`, meaning new items are discarded.
+   * 
+   * `older`: Removes items front of the queue (ie older items are discarded)
+   * 
+   * `newer`: Remove from rear of queue to make space for new items (ie newer items are discarded)
+   * 
+   * `additions`: Only adds new items that there are room for (ie. brand new items are discarded)
    *
-   * @type {OverflowPolicy}
    */
-  readonly overflowPolicy?: OverflowPolicy
+  readonly discardPolicy?: DiscardPolicy
 }
 
 const debug = (opts: QueueOpts, msg:string):void => {
@@ -36,12 +41,12 @@ const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyA
   const potentialLength = queue.length + toAdd.length;
   const capacity = opts.capacity ?? potentialLength;
   const toRemove = potentialLength - capacity;
-  const policy = opts.overflowPolicy ?? OverflowPolicy.DiscardAdditions;
-  debug(opts, `queueLen: ${queue.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${OverflowPolicy[policy]}`);
+  const policy = opts.discardPolicy ?? `additions`;
+  debug(opts, `queueLen: ${queue.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${policy}`);
  
   switch (policy) {
   // Only add what we can from toAdd
-  case OverflowPolicy.DiscardAdditions:
+  case `additions`:
     debug(opts, `enqueue:DiscardAdditions: queueLen: ${queue.length} slice: ${potentialLength-capacity} toAddLen: ${toAdd.length}`);
     if (queue.length === opts.capacity) {
       return queue; // Completely full
@@ -50,7 +55,7 @@ const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyA
       return [...queue, ...toAdd.slice(0, toRemove-1)];
     }
   // Remove from rear of queue (last index) before adding new things
-  case OverflowPolicy.DiscardNewer:
+  case `newer`:
     if (toRemove >= queue.length) {
       // New items will completely flush out old
       return toAdd.slice(Math.max(0, toAdd.length-capacity), Math.min(toAdd.length, capacity)+1);
@@ -60,7 +65,7 @@ const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyA
       return [...queue.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, capacity-toRemove+1))];    
     }
   // Remove from the front of the queue (0 index). ie. older items are discarded
-  case OverflowPolicy.DiscardOlder:
+  case `older`:
     // If queue is A, B and toAdd is C, D this yields A, B, C, D
     return [...queue, ...toAdd].slice(toRemove);
   default:
@@ -118,7 +123,7 @@ const isFull = <V>(opts: QueueOpts, queue: ReadonlyArray<V>): boolean => {
 // -------------------------------
 // Immutable
 // -------------------------------
-class Queue<V> {
+class QueueImpl<V> {
   readonly opts: QueueOpts;
   readonly data: ReadonlyArray<V>;
 
@@ -135,12 +140,12 @@ class Queue<V> {
     this.data = data;
   }
 
-  enqueue(...toAdd: ReadonlyArray<V>): Queue<V> {
-    return new Queue<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
+  enqueue(...toAdd: ReadonlyArray<V>): QueueImpl<V> {
+    return new QueueImpl<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
   }
 
-  dequeue(): Queue<V> {
-    return new Queue<V>(this.opts, dequeue(this.opts, this.data));
+  dequeue(): QueueImpl<V> {
+    return new QueueImpl<V>(this.opts, dequeue(this.opts, this.data));
   }
 
   get isEmpty(): boolean {
@@ -155,56 +160,15 @@ class Queue<V> {
     return this.data.length;
   }
 
-  /**
-   * Returns front of queue (oldest item), or undefined if queue is empty
-   *
-   * @readonly
-   * @type {(V | undefined)}
-   * @memberof Queue
-   */
   get peek(): V | undefined {
     return peek(this.opts, this.data);
   }
 }
 
-/**
- * Returns an immutable queue
- *
- * ```js
- * let q = queue();           // Create
- * q = q.enqueue(`a`, `b`);   // Add two strings
- * const front = q.peek();    // `a` is at the front of queue (oldest)
- * q = q.dequeue();           // q now just consists of `b`  
- * ```
- * @template V
- * @param {QueueOpts} [opts={}] Options
- * @param {...V[]} startingItems Index 0 is the front of the queue
- * @returns {Queue<V>} A new queue
- */
-export const queue = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>): Queue<V> => {
-  opts = {...opts}; // Make a copy of options
-  return new Queue(opts, [...startingItems]); // Make a copy of array so it can't be modified
-};
-
-export type MutableQueue<V> = {
-  //eslint-disable-next-line functional/no-method-signature
-  get isEmpty ():boolean
-  readonly dequeue: () => V|undefined
-  readonly enqueue: (...toAdd:ReadonlyArray<V>) => number
-  //eslint-disable-next-line functional/no-method-signature
-  get peek():V|undefined
-  //eslint-disable-next-line functional/no-method-signature
-  get length():number
-  //eslint-disable-next-line functional/no-method-signature
-  get isFull():boolean
-  //eslint-disable-next-line functional/no-method-signature
-  get data():readonly V[]
-}
-
 // -------------------------------
 // Mutable
 // -------------------------------
-class MutableQueueImpl<V> implements MutableQueue<V> {
+class QueueMutableImpl<V> implements QueueMutable<V> {
   readonly opts: QueueOpts;
   // eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V>;
@@ -240,20 +204,41 @@ class MutableQueueImpl<V> implements MutableQueue<V> {
     return this.data.length;
   }
 
-  /**
-   * Returns front of queue (oldest item), or undefined if queue is empty
-   *
-   * @readonly
-   * @type {(V | undefined)}
-   * @memberof Queue
-   */
   get peek(): V | undefined {
     return peek(this.opts, this.data);
   }
 }
 
 /**
- * Returns a mutable queue
+ * Returns an immutable queue. Queues are useful if you want to treat 'older' or 'newer'
+ * items differently. _Enqueing_ adds items at the back of the queue, while
+ * _dequeing_ removes items from the front (ie. the oldest).
+ *
+ * ```js
+ * let q = queue();           // Create
+ * q = q.enqueue(`a`, `b`);   // Add two strings
+ * const front = q.peek();    // `a` is at the front of queue (oldest)
+ * q = q.dequeue();           // q now just consists of `b`  
+ * ```
+ * @example Cap size to 5 items, throwing away newest items already in queue.
+ * ```js
+ * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * ```
+ * 
+ * @template V Data type of items
+ * @param opts
+ * @param startingItems Index 0 is the front of the queue
+ * @returns A new queue
+ */
+export const queue = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>): Queue<V> => {
+  opts = {...opts}; // Make a copy of options
+  return new QueueImpl(opts, [...startingItems]); // Make a copy of array so it can't be modified
+};
+
+/**
+ * Returns a mutable queue. Queues are useful if you want to treat 'older' or 'newer'
+ * items differently. _Enqueing_ adds items at the back of the queue, while
+ * _dequeing_ removes items from the front (ie. the oldest).
  * 
  * ```js
  * const q = queue();       // Create
@@ -261,8 +246,13 @@ class MutableQueueImpl<V> implements MutableQueue<V> {
  * const front = q.dequeue();  // `a` is at the front of queue (oldest)
  * ```
  *
- * @template V
- * @param {QueueOpts} [opts={}]
- * @param {...ReadonlyArray<V>} startingItems
+ * @example Cap size to 5 items, throwing away newest items already in queue.
+ * ```js
+ * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * ```
+ * 
+ * @template V Data type of items
+ * @param opts
+ * @param startingItems Items are added in array order. So first item will be at the front of the queue.
  */
-export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>):MutableQueue<V> => new MutableQueueImpl({...opts}, [...startingItems]);
+export const queueMutable = <V>(opts: QueueOpts = {}, ...startingItems: ReadonlyArray<V>): QueueMutable<V> => new QueueMutableImpl({...opts}, [...startingItems]);
