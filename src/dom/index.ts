@@ -1,6 +1,11 @@
 
 export * from './Log.js';
-export * as Forms from './Forms.js';
+
 export * from './DomRx.js';
 export * from './Util.js';
+
+/**
+ * Functions for working with DOM elements
+ */
+export * as Forms from './Forms.js';
 

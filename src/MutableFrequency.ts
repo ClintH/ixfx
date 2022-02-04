@@ -5,11 +5,11 @@ import {SimpleEventEmitter} from "./Events.js";
 import * as KeyValueUtil from './KeyValue.js';
 import {KeyValues} from "./index.js";
 
-type MutableFrequencyEventMap = {
+type FrequencyEventMap = {
   readonly change:void;
 }
 
-export const mutableFrequency = <V>(keyString?:ToString<V>|undefined) => new MutableFrequency<V>(keyString);
+export const frequencyMutable = <V>(keyString?:ToString<V>|undefined) => new FrequencyMutable<V>(keyString);
 
 /**
  * Mutable Frequency
@@ -38,10 +38,10 @@ export const mutableFrequency = <V>(keyString?:ToString<V>|undefined) => new Mut
  * 
  * @export
  * @class MutableFrequency
- * @extends {SimpleEventEmitter<MutableFrequencyEventMap>}
+ * @extends {SimpleEventEmitter<FrequencyEventMap>}
  * @template V
  */
-export class MutableFrequency<V> extends SimpleEventEmitter<MutableFrequencyEventMap> {
+export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   readonly #store:Map<string, number>;
   readonly #keyString: ToString<V>;
 
@@ -103,7 +103,6 @@ export class MutableFrequency<V> extends SimpleEventEmitter<MutableFrequencyEven
   
   minMaxAvg() {
     return KeyValues.minMaxAvg(this.entries());
-  
   }
 
   entriesSorted(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):ReadonlyArray<KeyValues.KeyValue> {

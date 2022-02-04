@@ -9,7 +9,6 @@ export {queue, queueMutable} from './Queue.js';
 export {map} from './MapImmutable.js';
 export {mapMutable} from './MapMutable.js';
 
-
 /**
  * Stacks store items in order. 
  * 
@@ -40,7 +39,6 @@ export * as Stacks from './Stack.js';
  * Changing the shape: {@link groupBy}
  */
 export * as Arrays from './Arrays.js';
-
 
 /**
  * Sets store unique items. 
@@ -74,3 +72,4 @@ export * as Queues from './Queue.js';
  * ixfx also includes {@link MapMutable}, {@link MapImmutable}
  */
 export * as Maps from './Map.js';
+

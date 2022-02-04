@@ -32,7 +32,6 @@ export const sortByValueNumber = (reverse:boolean = false) => sort<KeyValue>(byV
 // eslint-disable-next-line functional/prefer-readonly-type
 export type SortingFn = (data:KeyValue[]) => KeyValue[];
 
-
 export const getSorter = (sortStyle:`value` | `valueReverse` | `key` | `keyReverse`) => {
   switch (sortStyle) {
   case `value`:

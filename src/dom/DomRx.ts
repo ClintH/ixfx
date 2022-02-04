@@ -2,23 +2,32 @@ import {fromEvent, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {resolveEl} from './Util.js';
 
-// eslint-disable-next-line functional/no-mixed-type
-// export type DomRxOpts = {
-//   readonly elOrQuery:HTMLElement|string,
-//   readonly event: string,
-// }
-
+/**
+ * @private
+ */
 export type PluckOpts =  {
   readonly pluck: string
 }
 
+/**
+ * @private
+ */
 export type TransformOpts = {
   transform(ev:Event):any
 }
 
+/**
+ * Responsive value
+ */
 // eslint-disable-next-line functional/no-mixed-type
-export type DomRx<V> = {
+export type Rx<V> = {
+  /**
+   * Last value
+   */
   readonly value: V,
+  /**
+   * Clears last value
+   */
   readonly clear: () => void
 }
 
@@ -28,22 +37,22 @@ export type DomRxOpts = PluckOpts | TransformOpts;
  * Keeps track of last event data
  * 
  * ```js
- * const pointer = domRx<PointerEvent>(`#myDiv`, `pointermove`).value;
+ * const pointer = rx(`#myDiv`, `pointermove`).value;
  * 
  * if (pointer.clientX > ...)
  * ``` 
  * 
  * Pluck a field:
  * ```js
- * const pointerX = domRx<PointerEvent>(`#myDiv`, `pointermove`, {pluck: `clientX`}).value;
+ * const pointerX = rx(`#myDiv`, `pointermove`, {pluck: `clientX`}).value;
  * 
  * if (pointerX > ...)
  * ```
- * @template V
- * @param {DomRxPluckOpts} opts
- * @return {*}  {DomRx<V>}
+ * @template V Event type
+ * @param opts
+ * @return
  */
-export const domRx = <V>(elOrQuery:HTMLElement|string, event:string, opts?:DomRxOpts):DomRx<V> => {
+export const rx = <V>(elOrQuery:HTMLElement|string, event:string, opts?:DomRxOpts):Rx<V> => {
   const el = resolveEl<HTMLElement>(elOrQuery);
   const ev = fromEvent(el, event);
   // @ts-ignore
@@ -57,7 +66,7 @@ export const domRx = <V>(elOrQuery:HTMLElement|string, event:string, opts?:DomRx
     });
   };
 
-  const setup = (sub:Observable<Event>):DomRx<V> => {
+  const setup = (sub:Observable<Event>):Rx<V> => {
     sub.subscribe({
       next: (newValue) => {
         // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-explicit-any

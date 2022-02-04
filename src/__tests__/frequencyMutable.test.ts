@@ -2,7 +2,7 @@
 
 /* eslint-disable */
 import {KeyValue} from '../KeyValue.js';
-import {MutableFrequency} from '../MutableFrequency.js';
+import {FrequencyMutable} from '../MutableFrequency.js';
 import {shuffle} from '../collections/Arrays.js';
 import {jest} from '@jest/globals';
 
@@ -19,7 +19,7 @@ test(`sorting`, () => {
   const aSeries = shuffle(a.flatMap(kv => Array(kv[1]).fill(kv[0])));
  
   // Test it can count properly
-  const h = new MutableFrequency();
+  const h = new FrequencyMutable();
   aSeries.forEach(d => {
     h.add(d);
   })
@@ -49,7 +49,7 @@ test(`sorting`, () => {
   const changeHandler = jest.fn();
 
   // Test events are firing
-  const h2 = new MutableFrequency();
+  const h2 = new FrequencyMutable();
   h2.addEventListener(`change`, changeHandler);
 
   // Only one event when adding as a batch

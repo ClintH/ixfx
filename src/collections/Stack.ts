@@ -188,7 +188,7 @@ class StackMutableImpl<V> {
  * @param {...V[]} startingItems
  * @returns {Stack<V>}
  */
- export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new StackImpl({...opts}, [...startingItems]);
+export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new StackImpl({...opts}, [...startingItems]);
 
 
 /**

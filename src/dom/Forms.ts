@@ -6,13 +6,13 @@ import {resolveEl} from "./Util.js";
  * supplied, it will be called when the checkbox changes value.
  * 
  * ```
- * const opt = checkbox(`chkMate`);
- * opt.checked; // Returns current state
+ * const opt = checkbox(`#chkMate`);
+ * opt.checked; // Gets/sets
  * 
- * const opt = checkbox(document.getElementById(`chkMate`), (newVal) => {
+ * const opt = checkbox(document.getElementById(`#chkMate`), newVal => {
  *  if (newVal) ...
  * });
- *
+ * ```
  * @param {(string | HTMLInputElement)} domIdOrEl
  * @param {(currentVal:boolean) => void} [onChanged]
  * @returns
@@ -36,12 +36,29 @@ export const checkbox = (domIdOrEl: string | HTMLInputElement, onChanged?:(curre
   };
 };
 
-
-export const numeric = (domIdOrEl: string | HTMLInputElement, onChanged?:(currentVal:number) => void) => {
+/**
+ * Numeric INPUT
+ * 
+ * ```
+ * const el = numeric(`#num`, (currentValue) => {
+ *  // Called when input changes
+ * })
+ * ```
+ * 
+ * Get/set value
+ * ```
+ * el.value = 10;
+ * ```
+ * @param domIdOrEl 
+ * @param onChanged 
+ * @param live If true, event handler fires based on `input` event, rather than `change`
+ * @returns 
+ */
+export const numeric = (domIdOrEl: string | HTMLInputElement, onChanged?:(currentVal:number) => void, live?:boolean) => {
   const el = resolveEl<HTMLInputElement>(domIdOrEl) as HTMLInputElement;
-
+  const evt = live ? `change` : `input`;
   if (onChanged) {
-    el.addEventListener(`change`, () => {
+    el.addEventListener(evt, () => {
       onChanged(parseInt(el.value));
     });
   }
@@ -49,24 +66,48 @@ export const numeric = (domIdOrEl: string | HTMLInputElement, onChanged?:(curren
     get value():number  {
       return parseInt(el.value);
     },
-    set checked(val:number) {
+    set value(val:number) {
       // eslint-disable-next-line functional/immutable-data
       el.value = val.toString();
     }
   };
 };
 
-type SelectOpts = {
+/**
+ * SELECT options
+ */
+export type SelectOpts = {
+  /**
+   * Placeholder item
+   */
   readonly placeholderOpt?:string
   /**
    * If true, a placeholder option 'Choose' is added to the list
-   *
-   * @type {boolean}
    */
   readonly shouldAddChoosePlaceholder?:boolean
+  /**
+   * Item to choose after a selection is made
+   */
   readonly autoSelectAfterChoice?:number
 }
 
+/**
+ * Button
+ * 
+ * ```
+ * const b = button(`#myButton`, () => {
+ *  console.log(`Button clicked`);
+ * });
+ * ```
+ * 
+ * ```
+ * b.click(); // Call the click handler
+ * b.disabled = true / false;
+ * ```
+ * @param domQueryOrEl Query string or element instance
+ * @param onClick Callback when button is clicked 
+ * @returns 
+ */
 export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => void) => {
   const el = resolveEl(domQueryOrEl) as HTMLButtonElement;
 
@@ -75,7 +116,6 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
       onClick();
     });
   }
-
   return {
     click() {
       if (onClick) onClick();
@@ -87,9 +127,46 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
   };
 };
 
+/**
+ * SELECT handler
+ */
+export interface SelectHandler {
+  /** 
+   * Sets disabled
+   */
+  set disabled(value:boolean);
+ /** 
+  * Gets disabled
+  */
+  get disabled():boolean;
+/**
+ * Gets value
+ */
+  get value():string;
+/**
+ * Sets selected index
+ */
+  get index():number;
+/**
+ * _True_ if currently selected item is the placeholder
+ */
+  get isSelectedPlaceholder():boolean;
+/**
+ * Set options
+ * @param opts Options
+ * @param preSelect Item to preselect
+ */
+  setOpts(opts:readonly string[], preSelect?:string):void;
+/**
+ * Select item by index 
+ * @param index Index
+ * @param trigger If true, triggers change event
+ */
+  select(index?:number, trigger?:boolean):void
+}
 
 /**
- * Convienence wrapper for a SELECT element.
+ * SELECT element.
  * 
  * Handle changes in value:
  * ```
@@ -129,7 +206,7 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
  * @param {SelectOpts} [opts={}]
  * @return {*} 
  */
-export const select = (domIdOrEl:string|HTMLSelectElement, onChanged?:(currentVal:string) => void, opts:SelectOpts = {}) => {
+export const select = (domIdOrEl:string|HTMLSelectElement, onChanged?:(currentVal:string) => void, opts:SelectOpts = {}):SelectHandler => {
   const el = resolveEl(domIdOrEl) as HTMLSelectElement;
   const {placeholderOpt, shouldAddChoosePlaceholder = false, autoSelectAfterChoice = -1} = opts;
 

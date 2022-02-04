@@ -1,28 +1,23 @@
 import {sleep} from "./Timer.js";
 
-// const sleep = async function*(timeoutMs:number) {
-//   yield new Promise((resolve, reject) => {
-//     setTimeout(() => resolve(undefined), timeoutMs);
-//   });
-// }
-
 /**
- * Returns a series that produces values according to a time interval
+ * Generates values from `produce` with `intervalMs` time delay
  * 
- * Eg produce a random number every 500ms
+ * @example Produce a random number every 500ms:
  * ```
  * const randomGenerator = atInterval(() => Math.random(), 1000);
  * for await (const r of randomGenerator) {
- *  // use random value...
+ *  // Random value every 1 second
  * }
  * ```
  *
  * @template V
- * @param intervalMs
- * @param produce
+ * @param intervalMs Interval between execution
+ * @param produce Function to call
+ * @template V Data type
  * @returns
  */
- export const atInterval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
+ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
   let cancelled = false;
   try {
     while (!cancelled) {
@@ -35,15 +30,22 @@ import {sleep} from "./Timer.js";
   }
 };
 
-
 /**
- * Generates a range of numbers, with a given interval.
+ * Generates a range of numbers, starting from `start` and coutnting by `interval`.
+ * If `end` is provided, generator stops when reached.
+ * 
  * Unlike numericRange, numbers might contain rounding errors
+ * 
+ * ```js
+ * for (const c of numericRangeRaw(10, 100)) {
+ *  // 100, 110, 120 ...
+ * }
+ * ```
  * @param interval Interval between numbers
  * @param start Start
  * @param end End (if undefined, range never ends)
  */
- export const numericRangeRaw = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
+export const numericRangeRaw = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
   let v = start;
@@ -69,11 +71,8 @@ import {sleep} from "./Timer.js";
  * @example If you want more control over when/where incrementing happens...
  * ```js
  * let percent = numericRange(0.1, 0, 1);
- * let percentResult = percent.next();
- * while (!percentResult.done) {
- *  let v = percentResult.value;
- *  percentResult = percent.next();
- * }
+ * 
+ * let percentResult = percent.next().value;
  * ```
  * 
  * Note that computations are internally rounded to avoid floating point math issues. So if the `interval` is very small (eg thousandths), specify a higher rounding
@@ -131,10 +130,21 @@ export const pingPongPercent = function (interval: number = 0.1, offset?: number
   return pingPong(interval, 0, 1, offset, rounding);
 };
 
-
 /**
  * Ping-pongs continually between `start` and `end` with a given `interval`. Use `pingPongPercent` for 0-1 ping-ponging
  *
+ * In a loop:
+ * ```
+ * for (const c of pingPong(10, 0, 100)) {
+ *  // 0, 10, 20 .. 100, 90, 80, 70 ...
+ * }
+ * ```
+ * 
+ * Manual:
+ * ```
+ * const pp = pingPong(10, 0, 100);
+ * let v = pp.next().value; // Call .next().value whenever a new value is needed
+ * ```
  * @param interval Amount to increment by. Use negative numbers to start counting down
  * @param lower Lower bound (inclusive)
  * @param upper Upper bound (inclusive, must be greater than start)

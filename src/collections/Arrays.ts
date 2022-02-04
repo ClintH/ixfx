@@ -9,6 +9,7 @@ export * from './NumericArrays.js';
 
 /**
  * Throws an error if `array` parameter is not a valid array
+ * @private
  * @param array 
  * @param paramName 
  */
@@ -134,20 +135,21 @@ export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> =
  *  { age: 56, city: `London` }
  * ];
  * const map = groupBy(data, item => data.city); 
+ * ```
  * 
- * // Returns a map 
- * ```js
+ * Returns a map: 
+ * 
  * London: [{ age: 39, city: `London` }, { age: 56, city: `London` }]
  * Stockhom: [{ age: 23, city: `Stockholm` }]
  * Copenhagen: [{ age: 14, city: `Copenhagen` }]
- * ```
+ * 
  * @param array Array to group
  * @param grouper Function that returns a key for a given item
  * @template K Type of key to group by. Typically string.
  * @template V Type of values
  * @returns Map 
  */
- export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {
+export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {
   const key = grouper(item);
   const val = store.get(key);
   if (val === undefined) {

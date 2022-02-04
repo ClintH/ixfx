@@ -42,4 +42,22 @@ class SimpleMapArrayMutableImpl<V> {
   }
 }
 
+/**
+ * A simple mutable map of arrays, without events. It can store multiple values
+ * under the same key.
+ * 
+ * For a fancier approaches, consider {@link mapArray}, {@link mapCircular} or {@link mapSet}.
+ * 
+ * @example
+ * ```js
+ * const m = simpleMapArrayMutable();
+ * m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
+ * m.delete(`hello`);       // Deletes everything under `hello`
+ * 
+ * const hellos = m.get(`hello`); // Get list of items under `hello`
+ * ```
+ *
+ * @template V Type of items
+ * @returns New instance
+ */
 export const simpleMapArrayMutable = <V>():SimpleMapArrayMutable<V> => new SimpleMapArrayMutableImpl();

@@ -4,13 +4,9 @@ import { Observable, throttleTime } from 'rxjs';
  * Resolves either a string or HTML element to an element.
  * Useful when an argument is either an HTML element or query.
  * 
- * ```js
- * const t = (elOrString:string|HTMLElement) => {
- *  const el = resolveEl(elOrString); // throws if not resolved
- * }
- * 
- * t(`#someId`);
- * t(someElement);
+ * ```js 
+ * resolveEl(`#someId`);
+ * resolveEl(someElement);
  * ```
  * @param domQueryOrEl 
  * @returns 
@@ -33,18 +29,47 @@ export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
   return el;
 };
 
+/**
+ * Creates an element after `sibling`
+ * ```
+ * const el = createAfter(siblingEl, `DIV`);
+ * ```
+ * @param sibling Element
+ * @param tagName Element to create
+ * @returns New element
+ */
 export const createAfter = (sibling: HTMLElement, tagName: string): HTMLElement => {
   const el = document.createElement(tagName);
   sibling.parentElement?.insertBefore(el, sibling.nextSibling);
   return el;
 };
 
+/**
+ * Creates an element inside of `parent`
+ * ```
+ * const newEl = createIn(parentEl, `DIV`);
+ * ```
+ * @param parent Parent element
+ * @param tagName Tag to create
+ * @returns New element
+ */
 export const createIn = (parent: HTMLElement, tagName: string): HTMLElement => {
   const el = document.createElement(tagName);
   parent.appendChild(el);
   return el;
 };
 
+/**
+ * Observer when document's class changes
+ * 
+ * ```js
+ * const c = themeChangeObservable();
+ * c.subscribe(() => {
+ *  // Class has changed...
+ * });
+ * ```
+ * @returns 
+ */
 export const themeChangeObservable = (): Observable<readonly MutationRecord[]> => {
   const o = new Observable<MutationRecord[]>(subscriber => {
     const ro = new MutationObserver(entries => {
@@ -64,6 +89,19 @@ export const themeChangeObservable = (): Observable<readonly MutationRecord[]> =
   return o;
 };
 
+/**
+ * Observer when element resizes. Specify `timeoutMs` to debounce.
+ * 
+ * ```
+ * const o = resizeObservable(myEl, 500);
+ * o.subscribe(() => {
+ *  // called 500ms after last resize
+ * });
+ * ```
+ * @param elem 
+ * @param timeoutMs Tiemout before event gets triggered
+ * @returns 
+ */
 export const resizeObservable = (elem: HTMLElement, timeoutMs: number = 1000): Observable<readonly ResizeObserverEntry[]> => {
   const o = new Observable<ResizeObserverEntry[]>(subscriber => {
     const ro = new ResizeObserver(entries => {
@@ -78,6 +116,11 @@ export const resizeObservable = (elem: HTMLElement, timeoutMs: number = 1000): O
   return o.pipe(throttleTime(timeoutMs));
 };
 
+/**
+ * Copies string representation of object to clipboard
+ * @param obj 
+ * @returns Promise
+ */
 export const copyToClipboard = (obj: any) => {
   const p = new Promise((resolve, reject) => {
     const json = JSON.stringify(obj, null, 2);

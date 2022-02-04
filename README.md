@@ -4,7 +4,7 @@ ixfx is a framework for sketching and prototyping interactivity. It is designed 
 
 * [Demos](https://clinth.github.io/ixfx-demos/)
 * [Documentation](https://clinth.github.io/ixfx-docs/)
-* [API Documentation](https://clinth.github.io/ixfx-docs/api/)
+* [API Documentation](https://clinth.github.io/ixfx/)
 
 ## Using
 
