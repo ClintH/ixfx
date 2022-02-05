@@ -36,7 +36,6 @@
     "copyForDemos": "copyfiles --up 1 ./dist/* ../ixfx-demos/ixfx/",
     "docs": "typedoc --customCss ./config/custom.css --options ./config/typedoc.json && npm run copyIcons",
     "docs:watch": "typedoc --customCss ./config/custom.css --watch --options ./config/typedoc.json",
-    "copyApiDocs": "copyfiles --up 1 ./docs/**/*.* ../ixfx-docs/docs/api",
     "copyIcons": "copyfiles --up 1 ./config/*.png ./docs/assets/",
     "lint": "eslint src/**",
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",

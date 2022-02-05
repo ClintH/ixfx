@@ -52,12 +52,6 @@ npm run docs:watch // Auto-rebuilt as source changes
 ```
 
 
-Assuming you have the `ixfx-docs` repository as a sibling directory, you can copy API docs to their right place:
-
-```
-npm run copyApiDocs
-```
-
 ## Testing
 
 The `tests` folder contains Jest unit tests.

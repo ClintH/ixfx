@@ -1,9 +1,34 @@
 import {integer as guardInteger} from './Guards.js';
-import {ResettableTimeout, Continuously, Timer, HasCompletion} from './Interfaces.js';
+
 import {clamp} from './util.js';
 
 /**
- * Returns a {@link ResettableTimeout} that can be triggered or cancelled.
+ * A timer instance
+ * @private
+ */
+export type Timer = {
+  reset(): void
+  get elapsed(): number
+}
+
+/**
+ * @private
+ */
+export type HasCompletion = {
+  get isDone(): boolean;
+}
+
+/**
+ * A resettable timeout, returned by {@link timeout}
+ */
+export type Timeout = HasCompletion & {
+  start(altTimeoutMs?: number): void;
+  cancel(): void;
+  get isDone(): boolean;
+}
+
+/**
+ * Returns a {@link Timeout} that can be triggered, cancelled and reset
  *  
  * Once `start()` is called, `callback` will be scheduled to execute after `timeoutMs`.
  * If `start()` is called again, the waiting period will be reset to `timeoutMs`.
@@ -13,7 +38,7 @@ import {clamp} from './util.js';
  * const fn = () => {
  *  console.log(`Executed`);
  * };
- * const t = resettableTimeout(fn, 60*1000); 
+ * const t = timeout(fn, 60*1000); 
  * t.start();   // After 1 minute `fn` will run, printing to the console
  * ```
  * 
@@ -27,9 +52,9 @@ import {clamp} from './util.js';
  * 
  * @param callback 
  * @param timeoutMs 
- * @returns {@link ResettableTimeout}
+ * @returns {@link Timeout}
  */
-export const resettableTimeout = (callback:()=>void, timeoutMs:number):ResettableTimeout => {
+export const timeout = (callback:()=>void, timeoutMs:number):Timeout => {
   if (callback === undefined) throw new Error(`callback parameter is undefined`);
   guardInteger(timeoutMs, `aboveZero`, `timeoutMs`);
 
@@ -58,6 +83,16 @@ export const resettableTimeout = (callback:()=>void, timeoutMs:number):Resettabl
     },
   };
 };
+
+/**
+ * Runs a function continuously, returned by {@link Continuously}
+ */
+ export type Continuously = HasCompletion & {
+  start(): void
+  get ticks(): number
+  get isDone(): boolean
+  cancel(): void
+}
 
 /**
  * Returns a {@link Continuously} that continuously executes `callback`. Call `start` to begin.
@@ -174,8 +209,25 @@ export const delay = async <V>(callback:() => Promise<V>, timeoutMs: number): Pr
   return Promise.resolve(await callback());
 };
 
+/**
+ * Creates a timer
+ * @private
+ */
 export type TimerSource = () => Timer;
 
+/**
+ * Wraps a timer, returning a relative elapsed value.
+ * 
+ * ```js
+ * let t = relativeTimer(1000, msElapsedTimer());
+ * ```
+ * 
+ * @private
+ * @param total 
+ * @param timer 
+ * @param clampValue 
+ * @returns 
+ */
 export const relativeTimer = (total:number, timer: Timer, clampValue = true):Timer & HasCompletion => {
   //eslint-disable-next-line functional/no-let
   let done = false;
@@ -194,12 +246,12 @@ export const relativeTimer = (total:number, timer: Timer, clampValue = true):Tim
       if (v >= 1) done = true;
       return v;
     }
-  }
+  };
 };
 
 /**
  * A timer that uses clock time
- *
+ * @private
  * @returns {Timer}
  */
 export const msElapsedTimer = (): Timer => {
@@ -217,7 +269,7 @@ export const msElapsedTimer = (): Timer => {
 
 /**
  * A timer that progresses with each call
- *
+ * @private
  * @returns {Timer}
  */
 export const ticksElapsedTimer = (): Timer => {

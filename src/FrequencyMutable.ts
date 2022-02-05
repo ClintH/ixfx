@@ -9,22 +9,25 @@ type FrequencyEventMap = {
   readonly change:void;
 }
 
-export const frequencyMutable = <V>(keyString?:ToString<V>|undefined) => new FrequencyMutable<V>(keyString);
-
 /**
- * Mutable Frequency
+ * Frequency keeps track of how many times a particular value is seen, but
+ * unlike a {@link Maps|Map} it does not store the data. By default compares
+ * items by value (via JSON.stringify).
+ *  
+ * Fires `change` event when items are added or it is cleared.
  *
- * @example
+ * @example Overview
  * ```
- * .add(value)  - adds a value
- * .clear()     - clears all data
- * .keys() / .values()  - returns an iterator for keys and values
- * .toArray()   - returns an array of data in the shape [[key,freq],[key,freq]...]
+ * const fh = frequencyMutable();
+ * fh.add(value)  - adds a value
+ * fh.clear()     - clears all data
+ * fh.keys() / .values()  - returns an iterator for keys and values
+ * fh.toArray()   - returns an array of data in the shape [[key,freq],[key,freq]...]
  * ```
  * 
- * @example
+ * @example Usage
  * ```
- * const fh = new MutableFrequency();
+ * const fh = frequencyMutable();
  * fh.add(`apples`); // Count an occurence of `apples`
  * fh.add(`oranges)`;
  * fh.add(`apples`);
@@ -36,15 +39,22 @@ export const frequencyMutable = <V>(keyString?:ToString<V>|undefined) => new Fre
  * })
  * ```
  * 
- * @export
- * @class MutableFrequency
- * @extends {SimpleEventEmitter<FrequencyEventMap>}
- * @template V
+ * @example Custom key string
+ * ```
+ * const fh = frequencyMutable( person => person.name);
+ * // All people with name `Samantha` will be counted in same group
+ * fh.add({name:`Samantha`, city:`Brisbane`});
+ * ```
+ * @template V Type of items
  */
 export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   readonly #store:Map<string, number>;
   readonly #keyString: ToString<V>;
 
+  /**
+   * Constructor
+   * @param keyString Function to key items. Uses JSON.stringify by default
+   */
   constructor(keyString: ToString<V> | undefined = undefined) {
     super();
     this.#store = new Map();
@@ -62,23 +72,40 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
     this.#keyString = keyString;
   }
 
+  /**
+   * Clear data. Fires `change` event
+   */
   clear() {
     this.#store.clear();
     this.fireEvent(`change`, undefined);
   }
   
+  /**
+   * @returns Iterator over keys (ie. groups)
+   */
   keys():IterableIterator<string> {
     return this.#store.keys();
   }
 
+  /**
+   * @returns Iterator over frequency counts
+   */
   values():IterableIterator<number> {
     return this.#store.values();
   }
 
+  /**
+   * @returns Copy of entries as an array of `[key, count]`
+   */
   toArray():[key:string, count:number][] {
     return Array.from(this.#store.entries());
   }
 
+  /**
+   * 
+   * @param value Value to count
+   * @returns Frequency of value, or _undefined_ if it does not exist
+   */
   frequencyOf(value:V|string):number|undefined {
     if (typeof value === `string`) return this.#store.get(value);
 
@@ -86,6 +113,11 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
     return this.#store.get(key);
   }
 
+  /**
+   * 
+   * @param value Value to count
+   * @returns Relative frequency of `value`, or _undefined_ if it does not exist
+   */
   relativeFrequencyOf(value:V|string):number|undefined {
     if (typeof value === `string`) return this.#store.get(value);
 
@@ -97,19 +129,35 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
     return freq / mma.total;
   }
 
+  /**
+   * @returns Copy of entries as an array 
+   */
   entries():Array<KeyValueUtil.KeyValue> {
     return Array.from(this.#store.entries());
   }
   
+  /**
+   * 
+   * @returns Returns `{min,max,avg,total}`
+   */
   minMaxAvg() {
     return KeyValues.minMaxAvg(this.entries());
   }
 
-  entriesSorted(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):ReadonlyArray<KeyValues.KeyValue> {
+  /**
+   * 
+   * @param sortStyle Sorting style (default: _value_, ie. count)
+   * @returns Sorted array of [key,frequency]
+   */
+  entriesSorted(sortStyle:`value` | `valueReverse` | `key` | `keyReverse` = `value`):ReadonlyArray<KeyValues.KeyValue> {
     const s = KeyValueUtil.getSorter(sortStyle);
     return s(this.entries());
   }
 
+  /**
+   * 
+   * @param values Values to add. Fires _change_ event after adding item(s)
+   */
   add(...values:V[]) {
     if (values === undefined) throw new Error(`value parameter is undefined`);
     
@@ -124,3 +172,11 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   }
 }
 
+/**
+ * Creates a FrequencyMutable
+ * @inheritdoc FrequencyMutable
+ * @template V Data type of items
+ * @param keyString Function to generate keys for items. If not specified, uses JSON.stringify 
+ * @returns 
+ */
+ export const frequencyMutable = <V>(keyString?:ToString<V>|undefined) => new FrequencyMutable<V>(keyString);

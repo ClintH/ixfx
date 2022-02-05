@@ -58,13 +58,22 @@ export * as Random from './Random.js';
 export * as KeyValues from './KeyValue.js';
 
 // Loose functions
+
 export * from './util.js';
+
+/**
+ * Run code at intervals or with a delay
+ * 
+ * Overview:
+ * * {@link continuously} Run code in a loop, as fast as possible or with a delay between each execution
+ * * {@link timeout} Run code after a specified time delay
+ * * {@link sleep} Using `async await`, delay execution for a period
+ * * {@link delay} Using `async await`, run a given callback after a period
+ */
 export * as Timers from './Timer.js';
 
-// Types and interfaces
-export * from './Interfaces.js';
 
 // Classes
 export { KeyValue } from './KeyValue.js';
-export {frequencyMutable, FrequencyMutable} from './MutableFrequency.js';
+export {frequencyMutable, FrequencyMutable} from './FrequencyMutable.js';
 export {StateMachine} from './StateMachine.js';

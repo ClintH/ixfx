@@ -1,6 +1,5 @@
 // Easings from https://easings.net/
-import {HasCompletion} from '~/Interfaces.js';
-import {msElapsedTimer, relativeTimer, ticksElapsedTimer, TimerSource} from '~/Timer.js';
+import {msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource} from '~/Timer.js';
 
 const sqrt = Math.sqrt;
 const pow = Math.pow;

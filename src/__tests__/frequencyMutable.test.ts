@@ -2,7 +2,7 @@
 
 /* eslint-disable */
 import {KeyValue} from '../KeyValue.js';
-import {FrequencyMutable} from '../MutableFrequency.js';
+import {FrequencyMutable} from '../FrequencyMutable.js';
 import {shuffle} from '../collections/Arrays.js';
 import {jest} from '@jest/globals';
 
