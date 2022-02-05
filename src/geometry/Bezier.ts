@@ -56,8 +56,21 @@ export const quadraticSimple = (start: Points.Point, end: Points.Point, bend = 0
   }
 
   const handle = Lines.compute(middle, target, Math.abs(bend));
-  //console.log(`quadraticSimple: bend: ${bend} middle: ${middle.x},${middle.y} handle: ${handle.x},${handle.y}`);
   return quadratic(start, end, handle);
+};
+
+/**
+ * Returns a relative point on a simple quadratic 
+ * @param start Start
+ * @param end  End
+ * @param bend Bend (-1 to 1)
+ * @param amt Amount
+ * @returns Point
+ */
+export const computeQuadraticSimple = (start: Points.Point, end: Points.Point, bend: number, amt:number):Points.Point => {
+  const q = quadraticSimple(start, end, bend);
+  const bzr = new BezierLib(q.a, q.quadratic, q.b);
+  return bzr.compute(amt);
 };
 
 //https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths

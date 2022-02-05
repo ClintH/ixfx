@@ -13,6 +13,25 @@ export * as Visual from './visual/index.js';
  * 
  */
 export * as Dom from './dom/index.js';
+
+
+/**
+ * The Modulation module contains functions for, well, modulating data.
+ * 
+ * Overview:
+ * * {@link adsr}: Modulate over a series of ADSR stages.
+ * * {@link easeOverTime}: Ease from `0` to `1` over a specified duration.
+ * 
+ * @example Import examples
+ * ```
+ * // If library is stored two directories up under `ixfx/`
+ * import {adsr, defaultAdsrOpts} from '../../ixfx/modulation.js';
+ * 
+ * // Import from web
+ * import {adsr, defaultAdsrOpts} from 'TODO'
+ * ```
+ * 
+ */
 export * as Modulation from './modulation/index.js';
 
 /**

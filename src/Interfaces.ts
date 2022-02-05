@@ -2,13 +2,17 @@
 
 export type Timer = {
   reset(): void
-  elapsed(): number
+  get elapsed(): number
+}
+
+export type HasCompletion = {
+  get isDone(): boolean;
 }
 
 /**
  * A resettable timeout, returned by {@link resettableTimeout}
  */
-export interface ResettableTimeout {
+export type  ResettableTimeout = HasCompletion & {
   start(altTimeoutMs?: number): void;
   cancel(): void;
   get isDone(): boolean;
@@ -17,7 +21,7 @@ export interface ResettableTimeout {
 /**
  * Runs a function continuously, returned by {@link Continuously}
  */
-export interface Continuously {
+export type Continuously = HasCompletion & {
   start(): void
   get ticks(): number
   get isDone(): boolean

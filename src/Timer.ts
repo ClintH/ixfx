@@ -1,5 +1,6 @@
 import {integer as guardInteger} from './Guards.js';
-import {ResettableTimeout, Continuously, Timer} from './Interfaces.js';
+import {ResettableTimeout, Continuously, Timer, HasCompletion} from './Interfaces.js';
+import {clamp} from './util.js';
 
 /**
  * Returns a {@link ResettableTimeout} that can be triggered or cancelled.
@@ -174,19 +175,43 @@ export const delay = async <V>(callback:() => Promise<V>, timeoutMs: number): Pr
 };
 
 export type TimerSource = () => Timer;
+
+export const relativeTimer = (total:number, timer: Timer, clampValue = true):Timer & HasCompletion => {
+  //eslint-disable-next-line functional/no-let
+  let done = false;
+  return {
+    get isDone() {
+      return done;
+    },
+    reset:() => {
+      done =false;
+      timer.reset();
+    },
+    get elapsed() {
+      //eslint-disable-next-line functional/no-let
+      let v = timer.elapsed / total;
+      if (clampValue) v = clamp(v);
+      if (v >= 1) done = true;
+      return v;
+    }
+  }
+};
+
 /**
  * A timer that uses clock time
  *
  * @returns {Timer}
  */
-export const msRelativeTimer = (): Timer => {
+export const msElapsedTimer = (): Timer => {
   // eslint-disable-next-line functional/no-let
   let start = window.performance.now();
   return {
     reset: () => {
       start = window.performance.now();
     },
-    elapsed: () => (window.performance.now() - start)
+    get elapsed() {
+      return window.performance.now() - start;
+    }
   };
 };
 
@@ -195,13 +220,13 @@ export const msRelativeTimer = (): Timer => {
  *
  * @returns {Timer}
  */
-export const tickRelativeTimer = (): Timer => {
+export const ticksElapsedTimer = (): Timer => {
   // eslint-disable-next-line functional/no-let
   let start = 0;
   return {
     reset: () => {
       start = 0;
     },
-    elapsed: () => start++
+    get elapsed() { return start++; }
   };
 };

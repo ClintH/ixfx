@@ -22,6 +22,9 @@
         "functional"
     ],
     "rules": {
+        "functional/no-method-signature": [
+            "off"
+        ],
         "functional/prefer-readonly-type": [
             "error",
             {
@@ -113,6 +116,7 @@
                     "variableLike",
                     "function"
                 ],
+                "leadingUnderscore": "allow",
                 "format": [
                     "camelCase"
                 ]

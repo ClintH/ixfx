@@ -33,7 +33,7 @@
     "prepublish": "npm run clean && npm run pkg",
     "pkg": "npm run bundle",
     "pkg:typings": "tsc --project config/tsconfig.pkg.json",
-    "copyForDemos": "copyfiles ./dist/* ../ixfx-demos/node_modules/ixfx/",
+    "copyForDemos": "copyfiles --up 1 ./dist/* ../ixfx-demos/ixfx/",
     "docs": "typedoc --customCss ./config/custom.css --options ./config/typedoc.json && npm run copyIcons",
     "docs:watch": "typedoc --customCss ./config/custom.css --watch --options ./config/typedoc.json",
     "copyApiDocs": "copyfiles --up 1 ./docs/**/*.* ../ixfx-docs/docs/api",

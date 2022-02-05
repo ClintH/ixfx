@@ -1,12 +1,14 @@
 // Easings from https://easings.net/
-import {clamp} from '../util.js';
+import {HasCompletion} from '~/Interfaces.js';
+import {msElapsedTimer, relativeTimer, ticksElapsedTimer, TimerSource} from '~/Timer.js';
 
 const sqrt = Math.sqrt;
 const pow = Math.pow;
 const cos = Math.cos;
-const PI = Math.PI;
+//eslint-disable-next-line @typescript-eslint/naming-convention
+const pi = Math.PI;
 const sin = Math.sin;
-
+/*
 type RelativeTimer = {
   reset(): void
   elapsed(): number
@@ -36,66 +38,98 @@ const tickRelativeTimer = function (upperBound: number): RelativeTimer {
     isDone: () => start >= upperBound,
   };
 };
+*/
 
 type EasingFn = (x: number) => number;
+
 /**
  * Creates an easing based on clock time
- *
- * @param {string} easingName Name of easing
- * @param {number} durationMs Duration in milliseconds
+ * @inheritdoc Easing
+ * @example Time based easing
+ * ```
+ * const t = timer(`easeIn`, 5*1000); // Will take 5 seconds to complete
+ * ...
+ * t.compute(); // Get current value of easing
+ * t.reset();   // Reset to 0
+ * t.isDone;    // _True_ if finished
+ * ```
+ * @param name Name of easing
+ * @param durationMs Duration in milliseconds
  * @returns Easing
  */
-export const timer = function (easingName: string, durationMs: number):Easing {
-  return create(easingName, durationMs, msRelativeTimer);
+export const easeOverTime = function (name: EasingName, durationMs: number):Easing {
+  return create(name, durationMs, msElapsedTimer);
 };
+
 /**
  * Creates an easing based on ticks
- *
- * @param {string} easingName Name of easing
- * @param {number} durationTicks Duration in ticks
- * @returns {Easing}
+ * 
+ * @inheritdoc Easing
+ * @example Tick-based easing
+ * ```
+ * const t = tick(`easeOut`, 1000);   // Will take 1000 ticks to complete
+ * t.compute(); // Each call to `compute` progresses the tick count
+ * t.reset();   // Reset to 0
+ * t.isDone;    // _True_ if finished
+ * ```
+ * @param name Name of easing
+ * @param durationTicks Duration in ticks
+ * @returns Easing
  */
-export const tick = function (easingName: string, durationTicks: number):Easing {
-  return create(easingName, durationTicks, tickRelativeTimer);
+export const easeOverTicks = function (name: EasingName, durationTicks: number):Easing {
+  return create(name, durationTicks, ticksElapsedTimer);
 };
 
-export type Easing = {
-  /**
-   * Computes the current value of the easing
-   *
-   * @returns {number}
-   */
+/**
+ * 'Ease' from `0` to `1` over a delicious curve. Used commonly for animation
+ * and basic modelling of phyical motion. 
+ * 
+ * Create via {@link easeOverTicks} or {@link easeOverTime}, call `compute` to calculate the next
+ * value in the progression, until you reach `1` or `isDone` returns true.
+ * 
+ * For [demos of functions](https://easings.net/)
+ * 
+ */
+export type Easing = HasCompletion & {
+/**
+ * Computes the current value of the easing
+ *
+ * @returns {number}
+ */
   compute(): number
 
-  /**
-   * Reset the easing
-   *
-   */
+/**
+ * Reset the easing
+ */
   reset(): void
-  /**
-   * Returns true if the easing is complete
-   *
-   * @returns {boolean}
-   */
-  isDone(): boolean
+/**
+ * Returns true if the easing is complete
+ *
+ * @returns {boolean}
+ */
+  get isDone(): boolean
 };
 
 /**
  * Creates a new easing by name
  *
- * @param {string} easingName Name of easing
- * @param {number} duration Duration (meaning depends on timer source)
- * @param {TimerSource} timerSource Timer source: use timer() or tick()
- * @returns {Easing}
+ * @param name Name of easing
+ * @param duration Duration (meaning depends on timer source)
+ * @param timerSource Timer source. Eg {@link tickRelativeTimer}, {@link msRelativeTimer}
+ * @returns
  */
-const create = function (easingName: string, duration: number, timerSource: TimerSource): Easing {
-  const fn = resolveEasing(easingName);
-  const timer = timerSource(duration);
+const create = function (name: EasingName, duration: number, timerSource: TimerSource): Easing {
+  const fn = resolveEasing(name);
+
+  // Get a relative version of timer
+  const timer = relativeTimer(duration, timerSource(), true);
 
   return {
-    isDone: () => timer.isDone(),
+    get isDone() {
+      return timer.isDone;
+    },
     compute: () => {
-      const relative = timer.elapsed();
+      const relative = timer.elapsed;
       return fn(relative);
     },
     reset: () => {
@@ -104,21 +138,23 @@ const create = function (easingName: string, duration: number, timerSource: Time
   };
 };
 
-const resolveEasing = function (easingName: string): EasingFn {
-  const name = easingName.toLowerCase();
-  for (const [k, v] of Object.entries(easings)) {
-    if (k.toLowerCase() === name) {
-      return v as EasingFn;
-    }
-  }
-  throw Error(`Easing '${easingName}' not found.`);
+export type EasingName = keyof typeof easings;
+
+const resolveEasing = function (name: string): EasingFn {
+  name = name.toLocaleLowerCase();
+  const found = Object
+    .entries(easings)
+    .find(([k, _v]) => k.toLocaleLowerCase() === name);
+
+  if (found === undefined) throw new Error(`Easing '${name}' not found.`);
+  return found[1];
 };
+
 /**
- * Return list of available easings
- *
- * @returns {string[]}
+ * @private
+ * @returns Returns list of available easing names
  */
-export const getEasings = function ():string[] {
+export const getEasings = function ():readonly string[] {
   return Array.from(Object.keys(easings));
 };
 
@@ -138,11 +174,11 @@ const easeOutBounce = function (x:number): number {
 };
 
 const easings = {
-  easeInSine: (x: number): number => 1 - cos((x * PI) / 2),
-  easeOutSine: (x: number): number => sin((x * PI) / 2),
+  easeInSine: (x: number): number => 1 - cos((x * pi) / 2),
+  easeOutSine: (x: number): number => sin((x * pi) / 2),
   easeInQuad: (x: number): number => x * x,
   easeOutQuad: (x: number): number => 1 - (1 - x) * (1 - x),
-  easeInOutSine: (x: number): number => -(cos(PI * x) - 1) / 2,
+  easeInOutSine: (x: number): number => -(cos(pi * x) - 1) / 2,
   easeInOutQuad: (x: number): number => (x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2),
   easeInCubic: (x: number): number => x * x * x,
   easeOutCubic: (x: number): number => 1 - pow(1 - x, 3),
@@ -185,7 +221,7 @@ const easings = {
       : (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
   },
   easeInElastic: (x: number): number => {
-    const c4 = (2 * PI) / 3;
+    const c4 = (2 * pi) / 3;
 
     return x === 0
       ? 0
@@ -194,7 +230,7 @@ const easings = {
         : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
   },
   easeOutElastic: (x: number): number => {
-    const c4 = (2 * PI) / 3;
+    const c4 = (2 * pi) / 3;
 
     return x === 0
       ? 0
@@ -205,7 +241,7 @@ const easings = {
   easeInBounce: (x: number): number => 1 - easeOutBounce(1 - x),
   easeOutBounce: easeOutBounce,
   easeInOutElastic: (x: number): number => {
-    const c5 = (2 * PI) / 4.5;
+    const c5 = (2 * pi) / 4.5;
 
     return x === 0
       ? 0
