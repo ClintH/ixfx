@@ -72,4 +72,3 @@ export * as Queues from './Queue.js';
  * ixfx also includes {@link MapMutable}, {@link MapImmutable}
  */
 export * as Maps from './Map.js';
-

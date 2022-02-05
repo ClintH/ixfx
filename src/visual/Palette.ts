@@ -1,23 +1,46 @@
-
+/**
+ * Manage a set of colours. Uses CSS variables as a fallback if colour is not added
+ *
+ */
 export type Palette = {
   //eslint-disable-next-line functional/no-method-signature
   setElementBase(el:Element):void
   //eslint-disable-next-line functional/no-method-signature
   has(key:string):boolean
+
+  /**
+   * Returns a colour by name. 
+   * 
+   * If the colour is not found:
+   *  1. Try to use a CSS variable `--key`, or
+   *  2. The next fallback colour is used (array cycles)
+   *
+   * @param key
+   * @returns
+   */
   //eslint-disable-next-line functional/no-method-signature
   get(key:string, fallback?:string):string
+
+  /**
+   * Gets a colour by key, adding and returning fallback if not present
+   * @param key Key of colour
+   * @param fallback Fallback colour if key is not found
+   */
+  //eslint-disable-next-line functional/no-method-signature
   getOrAdd(key: string, fallback?:string):string
+
+  /**
+   * Adds a colour with a given key
+   *
+   * @param key
+   * @param colour
+   */
+  //eslint-disable-next-line functional/no-method-signature
   add(key:string, value:string):void
 };
 
 export const create = (fallbacks?:readonly string[]):Palette => new PaletteImpl(fallbacks);
 
-/**
- * Manage a set of colours. Uses CSS variables as a fallback if colour is not added
- *
- * @export
- * @class Palette
- */
 class PaletteImpl {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #store:Map<string, string> = new Map();
@@ -33,20 +56,12 @@ class PaletteImpl {
     if (fallbacks !== undefined) this.fallbacks = fallbacks;
     else this.fallbacks = [`red`, `blue`, `green`, `orange`];
     this.#elementBase = document.body;
-
   }
 
   setElementBase(el:Element) {
     this.#elementBase = el;
   }
 
-  /**
-   * Adds a colour with a given name
-   *
-   * @param {string} key
-   * @param {string} colour
-   * @memberof Palette
-   */
   add(key:string, colour:string) {
     this.#store.set(key, colour);
   }
@@ -54,17 +69,7 @@ class PaletteImpl {
   alias(from:string, to:string) {
     this.#aliases.set(from, to);
   }
-  /**
-   * Returns a colour by name. 
-   * 
-   * If the colour is not found:
-   *  1. Try to use a CSS variable, or
-   *  2. Fallback to default value (`rebeccapurple`).
-   *
-   * @param {string} key
-   * @returns {string}
-   * @memberof Palette
-   */
+
   get(key:string, fallback?:string):string {
     const alias =  this.#aliases.get(key);
     if (alias !== undefined) key = alias;
@@ -98,6 +103,17 @@ class PaletteImpl {
   }
 }
 
+/**
+ * Gets a CSS variable.
+ * @example Fetch --accent variable, or use `yellow` if not found.
+ * ```
+ * getCssVariable(`accent`, `yellow`);
+ * ```
+ * @param name Name of variable. Do not starting `--`
+ * @param fallbackColour Fallback colour if not found
+ * @param root  Element to search variable from
+ * @returns Colour or fallback.
+ */
 export const getCssVariable = (name:string, fallbackColour:string = `black`, root?:HTMLElement) => {
   if (root === undefined) root = document.body;
   const fromCss = getComputedStyle(root).getPropertyValue(`--${name}`).trim();

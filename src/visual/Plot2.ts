@@ -108,10 +108,11 @@ export const draw = (buffer:MapOfMutable<number, CircularArray<number>>, drawing
 export const drawSeriesAxis = (series:Series, drawing:DrawingOpts) => {
   const {ctx, height, palette, width} = drawing;
 
-  if (palette.has(series.name +'-axis'))
-    ctx.fillStyle = palette.get(series.name + '-axis');
+  // Use axis colour if defined, or otherwise series
+  if (palette.has(`series-${series.name}-axis`))
+    ctx.fillStyle = palette.get(`series-${series.name}-axis`);
   else
-    ctx.fillStyle = palette.getOrAdd(series.name);
+    ctx.fillStyle = palette.getOrAdd(`series-${series.name}`);
 
   // ctx.lineWidth = 1;
   // ctx.beginPath();
@@ -137,7 +138,7 @@ export const drawSeries = (series:Series, values:CircularArray<number>, drawing:
   let leadingEdge:Point|undefined;
   ctx.beginPath();
   ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = drawing.palette.getOrAdd(series.name);
+  ctx.strokeStyle = drawing.palette.getOrAdd(`series-${series.name}`);
 
   const incrementBy = drawing.coalesce ? 
     drawing.dataXScale! < 0 ? Math.floor((1/drawing.dataXScale!)) : 1
@@ -185,6 +186,8 @@ export const drawSeries = (series:Series, values:CircularArray<number>, drawing:
  *  coalesce: true,    // If true, sub-pixel data points are skipped, improving performance for dense plots at the expense of plot precision
  * });
  * ```
+ * 
+ * By default, will attempt to use CSS variable `--series[seriesName]` for axis colours. -axis for titles. 
  * @param {string} parentElOrQuery
  * @param {PlotOpts} opts
  * @return {*} 
