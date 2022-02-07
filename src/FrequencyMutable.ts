@@ -13,19 +13,21 @@ type FrequencyEventMap = {
  * Frequency keeps track of how many times a particular value is seen, but
  * unlike a {@link Maps|Map} it does not store the data. By default compares
  * items by value (via JSON.stringify).
- *  
+ * 
+ * Create with {@link frequencyMutable}.
+ * 
  * Fires `change` event when items are added or it is cleared.
  *
- * @example Overview
+ * Overview
  * ```
  * const fh = frequencyMutable();
- * fh.add(value)  - adds a value
- * fh.clear()     - clears all data
- * fh.keys() / .values()  - returns an iterator for keys and values
- * fh.toArray()   - returns an array of data in the shape [[key,freq],[key,freq]...]
+ * fh.add(value); // adds a value
+ * fh.clear();    // clears all data
+ * fh.keys() / .values() // returns an iterator for keys and values
+ * fh.toArray();  //  returns an array of data in the shape [[key,freq],[key,freq]...]
  * ```
  * 
- * @example Usage
+ * Usage
  * ```
  * const fh = frequencyMutable();
  * fh.add(`apples`); // Count an occurence of `apples`
@@ -39,7 +41,7 @@ type FrequencyEventMap = {
  * })
  * ```
  * 
- * @example Custom key string
+ * Custom key string
  * ```
  * const fh = frequencyMutable( person => person.name);
  * // All people with name `Samantha` will be counted in same group

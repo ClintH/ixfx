@@ -195,25 +195,26 @@ export interface QueueMutable<V> {
 }
 
 /**
- * A mutable set that stores unique items by their value, rather
- * than object reference.
+ * A set which stores unique items, determined by their value, rather
+ * than object reference. Create with {@link setMutable}. Mutable.
  * 
  * By default the JSON.stringify() representation is used to compare
- * objects. Alternatively, pass a function into the constructor
+ * objects.
  *
  * It fires `add`, `clear` and `delete` events.
  * 
- * @example Overview of functions
+ * Overview of functions
  * ```js
- * .add(item);    // Add one or more items. Items with same key are overriden.
- * .has(item);    // Returns true if item *value* is present
- * .clear();      // Remove everything
- * .delete(item); // Delete item by value
- * .toArray();    // Returns values as an array
- * .values();     // Returns an iterator over values
+ * const s = setMutable();
+ * s.add(item);    // Add one or more items. Items with same key are overriden.
+ * s.has(item);    // Returns true if item *value* is present
+ * s.clear();      // Remove everything
+ * s.delete(item); // Delete item by value
+ * s.toArray();    // Returns values as an array
+ * s.values();     // Returns an iterator over values
  * ```
  * 
- * @example Usage
+ * Usage
  * ```js
  * const people = [
  *  {name: `Barry`, city: `London`}
@@ -230,7 +231,7 @@ export interface QueueMutable<V> {
  * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
  * ```
  * 
- * @example Events
+ * Events
  * ```js
  * set.addEventListener(`add`, ev => {
  *  console.log(`New item added: ${ev.value}`);

@@ -16,9 +16,9 @@ export default defineConfig({
     components: `./src/components/index.ts`,
     random: `./src/Random.ts`,
     stateMachine: `./src/StateMachine.ts`,
-    keyValues: `./src/KeyValue.ts`
+    keyValues: `./src/KeyValue.ts`,
+    timers: `./src/Timer.ts`
   },
-  sourcemap: true,
   dts: true,
   noExternal: [`bezier-js`, `color2k`,  `rxjs`],
   platform: `browser`,

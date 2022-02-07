@@ -162,6 +162,7 @@ export type IsEqual<V> = (a:V, b:V) => boolean;
 
 /**
  * Default comparer function is equiv to checking `a === b`
+ * @private
  * @template V
  * @param {V} a
  * @param {V} b
@@ -172,7 +173,7 @@ export const isEqualDefault = <V>(a:V, b:V):boolean => a === b;
 /**
  * Comparer returns true if string representation of `a` and `b` are equal.
  * Uses `toStringDefault` to generate a string representation (`JSON.stringify`)
- *
+ * @private
  * @template V
  * @param {V} a
  * @param {V} b
@@ -186,6 +187,7 @@ export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
 
 /**
  * A default converter to string that uses JSON.stringify if its an object, or the thing itself if it's a string
+ * @private
  * @template V
  * @param {V} itemToMakeStringFor
  * @returns {string}

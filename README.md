@@ -8,7 +8,7 @@ ixfx is a framework for sketching and prototyping interactivity. It is designed 
 
 ## Using
 
-_TODO_
+Please see [the documentation](https://clinth.github.io/ixfx-docs/) for how to get up and running.
 
 ## Why ixfx?
 

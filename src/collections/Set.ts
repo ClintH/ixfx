@@ -5,14 +5,13 @@ import {SimpleEventEmitter} from "../Events.js";
 import {SetMutable, ValueSetEventMap} from "./Interfaces.js";
 
 /**
- * Returns a {@link SetMutable}. Sets are useful when you want to ignore duplicate values.
- * 
+ * @inheritdoc SetMutable
  * @param keyString Function that produces a key for items. If unspecified uses JSON.stringify
  * @returns 
  */
 export const setMutable = <V>(keyString: ToString<V> | undefined = undefined):SetMutable<V> => new MutableStringSetImpl(keyString);
 
-class MutableStringSetImpl<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
+class MutableStringSetImpl<V> extends SimpleEventEmitter<ValueSetEventMap<V>> implements SetMutable<V> {
   // ✔ UNIT TESTED
   /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();

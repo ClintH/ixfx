@@ -15,6 +15,7 @@ export type Log = Readonly<{
   log(msg?:string|object|number):void
   append(el:HTMLElement):void
   dispose():void
+  readonly isEmpty:boolean
 }>
 
 /**
@@ -206,11 +207,17 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
     el.innerHTML = ``;
     lastLog = undefined;
     lastLogRepeats = 0;
+    added = 0;
   };
 
   const dispose = () => {
     el.remove();
   };
 
-  return {error, log, append, clear, dispose};
+  return {
+    error, log, append, clear, dispose,
+    get isEmpty() {
+      return added === 0;
+    }
+  };
 };
