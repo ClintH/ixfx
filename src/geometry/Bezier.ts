@@ -74,7 +74,7 @@ export const computeQuadraticSimple = (start: Points.Point, end: Points.Point, b
 };
 
 //https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
-export const quadraticToSvgString = (start: Points.Point, end: Points.Point, handle: Points.Point): string => `M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`;
+export const quadraticToSvgString = (start: Points.Point, end: Points.Point, handle: Points.Point): readonly string[] => [`M ${start.x} ${start.y} Q ${handle.x} ${handle.y} ${end.x} ${end.y}`];
 
 export const toPath = (cubicOrQuadratic:CubicBezier|QuadraticBezier): CubicBezierPath|QuadraticBezierPath => {
   if (isCubicBezier(cubicOrQuadratic)) {
@@ -112,7 +112,7 @@ const cubicToPath = (cubic:CubicBezier): CubicBezierPath => {
       return Rects.fromTopLeft({x: x.min, y: y.min}, xSize, ySize);
     },
     toString: () => bzr.toString(),
-    toSvgString: () => `brrup`,
+    toSvgString: () => [`brrup`],
     kind: `bezier/cubic`
   });
 };

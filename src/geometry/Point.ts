@@ -102,7 +102,7 @@ export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {
  * @param p 
  * @returns 
  */
-export const isPoint = (p: Point|Rects.RectPositioned|Rects.Rect): p is Point => {
+export const isPoint = (p: number|unknown): p is Point => {
   if ((p as Point).x === undefined) return false;
   if ((p as Point).y === undefined) return false;
   return true;

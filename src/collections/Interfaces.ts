@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {SimpleEventEmitter} from "../Events.js";
-import {ToString, IsEqual} from "../util.js";
+import {ToString, IsEqual} from "../Util.js";
 
 /**
  * @private

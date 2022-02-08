@@ -2,7 +2,7 @@
 
 ## Build scripts
 
-Typecheck and compile to `./etc/build/`
+Type-check and compile to `./etc/build/`
 
 ```
 npm run build
@@ -16,12 +16,11 @@ npm run run -- build/StateMachine.js
 
 ## Using a local copy of ixfx
 
-If you're working in other repositories, but want to use live-updated sources:
+If you're working in other repositories, but want to use local copy of `ixfx`. 
 
 ```
 (in ixfx repo)
 npm link
-npm bundle:watch   // continually rebuilds dist bundle
 
 (in remote repo)
 npm link ../ixfx
@@ -32,15 +31,20 @@ In remote repo, it should be possible to consume the library:
 import {Geometry} from 'ixfx/lib/geometry';
 ```
 
+To build and deploy to `ixfx-demos` in same parent folder as `ixfx` repo:
+```
+npm run demos
+```
+
 ## Deploying
 
-Uses `tsc` and `tsup` to build library and type definitions to `./dist`
+Cleans and builds for packaging:
 
 ```
-npm run pkg
+npm run publishNpm
+npm run publishGh
 ```
 
-Publishing to NPM will trigger the same script, but cleaning `./dist` and `./etc` first.
 
 ## Docs
 
@@ -50,7 +54,6 @@ Generate API docs to `./docs` so they are picked up by GH pages.
 npm run docs
 npm run docs:watch // Auto-rebuilt as source changes
 ```
-
 
 ## Testing
 

@@ -175,7 +175,7 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  */
 export const toFlatArray = (a: Points.Point, b: Points.Point): readonly number[] =>  [a.x, a.y, b.x, b.y];
 
-export const toSvgString = (a: Points.Point, b: Points.Point): string => `M${a.x} ${a.y} L ${b.x} ${b.y}`;
+export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[] => [`M${a.x} ${a.y} L ${b.x} ${b.y}`];
 
 export const fromArray = (arr: readonly number[]): Line => {
   if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);

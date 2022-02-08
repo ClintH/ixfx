@@ -3,7 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
-import {IsEqual, isEqualDefault} from '../util.js';
+import {IsEqual, isEqualDefault} from '../Util.js';
 
 export * from './NumericArrays.js';
 

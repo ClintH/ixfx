@@ -1,6 +1,6 @@
 // ✔ UNIT TESTED
 import { SimpleEventEmitter } from "../Events.js";
-import { ToString, toStringDefault, isEqualDefault } from "../util.js";
+import { ToString, toStringDefault, isEqualDefault } from "../Util.js";
 import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter, addUniqueByHash} from './Map.js';
 import { without } from './Arrays.js';
 import { circularArray } from './CircularArray.js';

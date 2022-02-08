@@ -31,6 +31,7 @@
     "bundle": "tsup --sourcemap && npm run typings",
     "prepublish": "npm run clean && tsup && npm run typings",
     "typings": "tsc --project config/tsconfig.pkg.json",
+    "demos": "npm run bundle && npm run copyForDemos",
     "copyForDemos": "copyfiles --up 1 ./dist/* ../ixfx-demos/ixfx/",
     "docs": "typedoc --customCss ./config/custom.css --options ./config/typedoc.json && npm run copyIcons",
     "docs:watch": "typedoc --customCss ./config/custom.css --watch --options ./config/typedoc.json",

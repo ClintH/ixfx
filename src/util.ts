@@ -1,3 +1,4 @@
+import { number as guardNumber} from "./Guards.js";
 
 /**
  * Clamps a value between min and max (both inclusive)
@@ -75,24 +76,38 @@ export const clamp = (v: number, min = 0, max = 1) => {
 //   };
 
 /**
- * Maps `v` from an input range to an output range.
+ * Scales `v` from an input range to an output range.
  * For example, if a sensor's useful range is 100-500, you could
- * easily map it to a percentage:
+ * easily scale it to a percentage:
  * ```js
- * map(sensorReading, 100, 500, 0, 1);
+ * scale(sensorReading, 100, 500, 0, 1);
  * ```
- * @param v Value to map
+ * @param v Value to scale
  * @param inMin Input minimum
  * @param inMax Input maximum
  * @param outMin Output minimum
  * @param outMax Output maximum
- * @returns Mapped value
+ * @returns Scaled value
  */
-export const map = (
+export const scale = (
   v:number, 
   inMin:number, inMax:number, 
   outMin:number, outMax:number
 ) => (v - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+
+/**
+ * Scales a full input percentage range to a diminished output range
+ * @param v 
+ * @param outMin 
+ * @param outMax 
+ * @returns 
+ */
+export const scalePercentOutput = (v:number, outMin:number, outMax:number = 1) => {
+  guardNumber(v, `percentage`, `v`);
+  guardNumber(outMin, `percentage`, `outMin`);
+  guardNumber(outMax, `percentage`, `outMax`);
+  return scale(v, 0, 1, outMin, outMax);
+};
 
 /**
  * Clamps integer `v` between 0 (inclusive) and length (exclusive). This is useful

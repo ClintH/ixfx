@@ -130,11 +130,7 @@ export const guardContinuous = (paths: Paths.Path[]) => {
   }
 };
 
-
-export const toSvgString = (paths: Paths.Path[]): string => {
-  const svg = paths.map(p => p.toSvgString());
-  return svg.join(` `);
-};
+export const toSvgString = (paths: Paths.Path[]): readonly string[] => paths.flatMap(p => p.toSvgString());
 
 /**
  * Create a compoundpath from an array of paths.

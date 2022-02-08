@@ -6,8 +6,7 @@ import { CircularArray, MapOfMutable } from '../collections/Interfaces.js';
 import { mapCircular} from "../collections/MapMultiMutable.js"
 import * as Palette from "./Palette.js";
 import { Point} from "../geometry/Point.js";
-import { resolveEl} from "../dom/Util.js";
-import { autoSizeCanvas} from "./Drawing.js";
+import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
 
 type Series = {
   min:number,
@@ -218,8 +217,9 @@ export const plot2 = (parentElOrQuery:string|HTMLElement, opts:PlotOpts) => {
     yLabelWidth: 25
   };
 
-  autoSizeCanvas(canvasEl, () => {
-    drawingOpts = {...drawingOpts, width: canvasEl.width, height: canvasEl.height};
+  parentSizeCanvas(canvasEl, (args) => {
+    const bounds = args.bounds;
+    drawingOpts = {...drawingOpts, width: bounds.width, height: bounds.height};
     draw(buffer, drawingOpts);
   });
 

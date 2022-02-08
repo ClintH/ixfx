@@ -1,6 +1,6 @@
 /// ✔ Unit tested!
 
-import { ToString } from "./util.js";
+import { ToString } from "./Util.js";
 import {SimpleEventEmitter} from "./Events.js";
 import * as KeyValueUtil from './KeyValue.js';
 import {KeyValues} from "./index.js";

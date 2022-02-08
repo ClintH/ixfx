@@ -29,6 +29,9 @@ export type CircularPath = Circle & Path & {
  */
 export const isPositioned = (p: Circle | Points.Point): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
+export const isCircle = (p: any): p is Circle => p.radius !== undefined;
+
+
 /**
  * Returns a point on a circle at a specified angle in radians
  * @param circle
@@ -185,6 +188,47 @@ export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):b
  */
 export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number => Points.distance(a, b);
 
+type ToSvg = {
+  (radius:number, sweep:boolean, origin:Points.Point): readonly string[];
+  (circle:Circle, sweep:boolean, origin:Points.Point): readonly string[];
+  (circle:CirclePositioned, sweep:boolean): readonly string[];
+};
+
+
+/**
+ * Creates a SVG path segment.
+ * @param a Circle or radius
+ * @param sweep If true, path is 'outward'
+ * @param origin Origin of path. Required if first parameter is just a radius or circle is non-positioned
+ * @returns 
+ */
+export const toSvg:ToSvg = (a:CirclePositioned|number|Circle, sweep:boolean, origin?:Points.Point):readonly string[] => {
+  if (isCircle(a)) {
+    if (origin !== undefined) {
+      return toSvgFull(a.radius, origin, sweep);
+    }
+    if (isPositioned(a)) {
+      return toSvgFull(a.radius, a, sweep);
+    } else throw new Error(`origin parameter needed for non-positioned circle`);
+  } else {
+    if (origin !== undefined) {
+      return toSvgFull(a, origin, sweep);
+    } else throw new Error(`origin parameter needed`);
+  }  
+};
+
+const toSvgFull = (radius:number, origin:Points.Point, sweep:boolean):readonly string[] => {
+  // https://stackoverflow.com/questions/5737975/circle-drawing-with-svgs-arc-path
+  const {x, y} = origin;
+  const s = sweep ? `1` :`0`;
+  return `
+    M ${x}, ${y}
+    m -${radius}, 0
+    a ${radius},${radius} 0 1,${s} ${radius*2},0
+    a ${radius},${radius} 0 1,${s} -${radius*2},0
+  `.split(`\n`);
+};
+
 /**
  * Returns a `CircularPath` representation of a circle
  *
@@ -204,7 +248,7 @@ export const toPath = (circle:CirclePositioned): CircularPath => {
     compute: (t:number) => compute(circle, t),
     bbox:() => bbox(circle) as Rects.RectPositioned,
     length: () => length(circle),
-    toSvgString: () => ``,
+    toSvgString: (sweep = true) => toSvg(circle, sweep),
     kind: `circular`
   });
 };

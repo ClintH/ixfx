@@ -1,4 +1,4 @@
-import {IsEqual, ToString} from "../util.js";
+import {IsEqual, ToString} from "../Util.js";
 
 // ✔ UNIT TESTED!
 

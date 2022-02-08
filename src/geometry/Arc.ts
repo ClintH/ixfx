@@ -1,5 +1,5 @@
 import * as MathUtil from './Math.js';
-import {guard as guardPoint} from './Point.js';
+import {guard as guardPoint, isPoint} from './Point.js';
 import {Path} from './Path.js';
 import {Lines, Points, Rects} from './index.js';
 
@@ -8,7 +8,7 @@ import {Lines, Points, Rects} from './index.js';
  * @param p Arc or number
  * @returns 
  */
-export const isArc = (p: Arc|number): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
+export const isArc = (p: Arc|number|unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 
 /**
  * Returns true if parameter has a positioned (x,y) 
@@ -54,21 +54,28 @@ const piPi = Math.PI *2;
  * @param origin Optional center of arc
  * @returns Arc
  */
-export const fromDegrees = (radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point): Arc|ArcPositioned => {
-  const a = {
+export function fromDegrees(radius:number, startDegrees:number, endDegrees:number):Arc;
+export function fromDegrees(radius:number, startDegrees:number, endDegrees:number, origin:Points.Point):ArcPositioned
+
+//eslint-disable-next-line func-style
+export function fromDegrees(radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point):Arc|ArcPositioned  {
+  const a:Arc = {
     radius,
     startRadian:MathUtil.degreeToRadian(startDegrees),
     endRadian:MathUtil.degreeToRadian(endDegrees)
   };
-  if (origin !== undefined) {
+  if (isPoint(origin)) {
     guardPoint(origin);
-    return Object.freeze({
+    const ap:ArcPositioned = {
       ...a,
       x: origin.x,
       y: origin.y
-    });
-  } else return Object.freeze(a);
-};
+    };
+    return Object.freeze(ap);
+  } else {
+    return Object.freeze(a);
+  }
+}
 
 /**
  * Returns a {@link Line} linking the start and end points of an {@link ArcPositioned}.
@@ -127,6 +134,12 @@ export const guard = (arc:Arc|ArcPositioned) => {
   if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
 };
 
+
+type Compute = {
+  (arc:Arc, t:number, origin:Points.Point):Points.Point;
+  (arc:ArcPositioned, t:number):Points.Point;
+};
+
 /**
  * Compute relative position on arc
  * @param arc Arc
@@ -134,7 +147,7 @@ export const guard = (arc:Arc|ArcPositioned) => {
  * @param origin If arc is not positioned, pass in an origin
  * @returns 
  */
-export const compute = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
+export const compute:Compute = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
   guard(arc);
   return point(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t), origin);
 };
@@ -152,7 +165,7 @@ export const toPath = (arc:ArcPositioned): Path => {
     compute:(t:number) => compute(arc, t),
     bbox:() => bbox(arc) as Rects.RectPositioned,
     length: () => length(arc),
-    toSvgString:() => toSvg({x: arc.x, y: arc.y}, arc),
+    toSvgString:() => toSvg(arc),
     kind: `arc`
   });
 };
@@ -182,22 +195,63 @@ export const bbox = (arc:ArcPositioned|Arc):Rects.RectPositioned|Rects.Rect => {
   }
 };
 
+
+type ToSvg = {
+  /**
+   * SVG path for arc description
+   * @param origin Origin of arc
+   * @param radius Radius
+   * @param startRadian Start
+   * @param endRadian End
+   */
+  (origin:Points.Point, radius:number, startRadian:number, endRadian:number): readonly string[];
+  /**
+   * SVG path for non-positioned arc
+   */
+  (arc:Arc, origin:Points.Point): readonly string[];
 /**
- * Returns SVG string for an arc, suitable for Svg.js
- * @param origin Origin
- * @param radiusOrArc Radius, or {@link Arc} instance
- * @param startRadian Start radian
- * @param endRadian End radian
- * @returns Svg string
+ * SVG path for positioned arc
  */
-export const toSvg = (origin:Points.Point, radiusOrArc:number|Arc, startRadian?:number, endRadian?:number) => {
-  if (isArc(radiusOrArc)) return toSvgFull(origin, radiusOrArc.radius, radiusOrArc.startRadian, radiusOrArc.endRadian);
-  if (startRadian === undefined) throw new Error(`startAngle undefined`);
-  if (endRadian === undefined) throw new Error(`endAngle undefined`);
-  return toSvgFull(origin, radiusOrArc, startRadian, endRadian);
+  (arc:ArcPositioned): readonly string[];
 };
 
-const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRadian:number) => {
+
+/**
+ * Creates an SV path snippet for arc
+ * @param originOrArc 
+ * @param radiusOrOrigin 
+ * @param startRadian 
+ * @param endRadian 
+ * @returns 
+ */
+export const toSvg:ToSvg = (originOrArc:Points.Point|Arc|ArcPositioned, radiusOrOrigin?:number|Points.Point, startRadian?:number, endRadian?:number) => {
+  if (isArc(originOrArc)) {
+    if (isPositioned(originOrArc)) {
+      return toSvgFull(originOrArc, originOrArc.radius, originOrArc.startRadian, originOrArc.endRadian);
+    } else {
+      if (isPoint(radiusOrOrigin)) {
+        return toSvgFull(radiusOrOrigin, originOrArc.radius, originOrArc.startRadian, originOrArc.endRadian);
+      } else {
+        return toSvgFull({x: 0, y:0}, originOrArc.radius, originOrArc.startRadian, originOrArc.endRadian);
+      }
+    }
+  } else {
+    if (startRadian === undefined) throw new Error(`startAngle undefined`);
+    if (endRadian === undefined) throw new Error(`endAngle undefined`);
+   
+    if (isPoint(originOrArc)) {
+      if (typeof radiusOrOrigin === `number`) {
+        return toSvgFull(originOrArc, radiusOrOrigin, startRadian, endRadian);
+      } else {
+        throw new Error(`Expected second parameter to be radius (number)`);
+      }
+    } else {
+      throw new Error(`Expected Point, Arc or ArcPositioned as first parameter`);
+    }
+  } 
+};
+
+const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRadian:number):readonly string[] => {
   const isFullCircle = endRadian - startRadian === 360;
   const start = MathUtil.polarToCartesian(origin, radius, endRadian - 0.01);
   const end = MathUtil.polarToCartesian(origin, radius, startRadian);
@@ -211,7 +265,7 @@ const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRa
   //eslint-disable-next-line functional/immutable-data
   if (isFullCircle) d.push(`z`);
 
-  return d.map(x => x.toString()).join(` `).trim();
+  return d.map(x => x.toString()); //.join(` `).trim();
 };
 
 /**

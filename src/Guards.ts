@@ -1,5 +1,5 @@
 
-export type NumberGuardRange = `` | `positive` | `negative` | `aboveZero` | `belowZero` | `percentage` | `bipolar`;
+export type NumberGuardRange = `` | `nonZero` | `positive` | `negative` | `aboveZero` | `belowZero` | `percentage` | `bipolar`;
 
 /**
  * Throws an error if `t` is not a number or within specified range
@@ -26,6 +26,9 @@ export const number = (t:number, range:NumberGuardRange = ``, name = `?`):boolea
     break;
   case `percentage`:
     if (t > 1 || t < 0) throw new Error(`Parameter ${name} must be in percentage range (0 to 1)`);
+    break;
+  case `nonZero`:
+    if (t === 0) throw new Error(`Parameter ${name} must non-zero.`);
     break;
   case `bipolar`:
     if (t > 1 || t < -1) throw new Error(`Parameter ${name} must be in bipolar percentage range (-1 to 1)`);

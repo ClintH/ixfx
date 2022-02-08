@@ -1,5 +1,5 @@
 import {sleep} from "./Timer.js";
-
+import {number as guardNumber} from "./Guards.js";
 /**
  * Generates values from `produce` with `intervalMs` time delay
  * 
@@ -17,9 +17,12 @@ import {sleep} from "./Timer.js";
  * @template V Data type
  * @returns
  */
- export const interval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
+export const interval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
+  //eslint-disable-next-line functional/no-let
   let cancelled = false;
+  //eslint-disable-next-line functional/no-try-statement
   try {
+    //eslint-disable-next-line functional/no-loop-statement
     while (!cancelled) {
       await sleep(intervalMs);
       if (cancelled) return;
@@ -48,8 +51,11 @@ import {sleep} from "./Timer.js";
 export const numericRangeRaw = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
+  //eslint-disable-next-line functional/no-let
   let v = start;
+  //eslint-disable-next-line functional/no-loop-statement
   do {
+    //eslint-disable-next-line functional/no-loop-statement
     while (v < end) {
       yield v;
       v += interval;
@@ -81,26 +87,55 @@ export const numericRangeRaw = function* (interval: number, start: number = 0, e
  * @param interval Interval between numbers
  * @param start Start
  * @param end End (if undefined, range never ends)
+ * @param repeating If true, range loops from start indefinately
  * @param rounding A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
  */
 export const numericRange = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false, rounding?: number) {
-  if (interval <= 0) throw Error(`Interval is expected to be above zero`);
+  guardNumber(interval,  `nonZero`);
+  
+  const negativeInterval = interval < 0;
+  if (end === undefined) {
+    /* no op */
+  } else {
+    if (negativeInterval && start < end) throw new Error(`Interval of ${interval} will never go from ${start} to ${end}`);
+    if (!negativeInterval && start > end) throw new Error(`Interval of ${interval} will never go from ${start} to ${end}`);
+  }
+
   rounding = rounding ?? 1000;
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
   else end *= rounding;
   interval = interval * rounding;
 
+  //eslint-disable-next-line functional/no-loop-statement
   do {
+    //eslint-disable-next-line functional/no-let
     let v = start * rounding;
-    while (v <= end) {
+    //eslint-disable-next-line functional/no-loop-statement
+    while ((!negativeInterval && v <= end) || (negativeInterval && v >= end)) {
       yield v / rounding;
       v += interval;
     }
+
   } while (repeating);
 };
 
 /**
- * Continually loops back and forth between 0 and 1 by a specified interval.
+ * Returns a number range between 0.0-1.0. By default it loops back to 0 after reaching 1
+ * @param interval Interval (defaults to 0.01 or 1%)
+ * @param repeating Whether generator should loop
+ * @param start Start
+ * @param end End
+ * @returns 
+ */
+export const rangePercent = function (interval:number = 0.01, repeating:boolean = true, start:number = 0, end = 1) {
+  guardNumber(interval, `percentage`, `interval`);
+  guardNumber(start, `percentage`, `start`);
+  guardNumber(end, `percentage`, `end`);
+  return numericRange(interval, start, end, repeating);
+};
+
+/**
+ * Continually loops up and down between 0 and 1 by a specified interval.
  * Looping returns start value, and is inclusive of 0 and 1.
  * 
  * @example Usage
@@ -118,20 +153,26 @@ export const numericRange = function* (interval: number, start: number = 0, end?
  * 
  * Because limits are capped to 0 and 1, using large intervals can produce uneven distribution. Eg an interval of 0.8 yields 0, 0.8, 1
  *
- * @param {number} interval Amount to increment by. Defaults to 10%
- * @param {number} offset Starting point. Defaults to 0 using a positive interval or 1 for negative intervals
- * @param {number} rounding Rounding to apply. Defaults to 1000. This avoids floating-point rounding errors.
+ * @param interval Amount to increment by. Defaults to 10%
+ * @param offset Starting point within range. Defaults to 0 using a positive interval or 1 for negative intervals
+ * @param rounding Rounding to apply. Defaults to 1000. This avoids floating-point rounding errors.
  */
-export const pingPongPercent = function (interval: number = 0.1, offset?: number, rounding: number = 1000) {
-  if (offset === undefined && interval > 0) offset = 0;
-  else if (offset === undefined && interval < 0) offset = 1;
-  else offset = offset as number;
-  if (offset > 1 || offset < 0) throw new Error(`offset must be between 0 and 1`);
-  return pingPong(interval, 0, 1, offset, rounding);
+export const pingPongPercent = function (interval: number = 0.1, start: number = 0, end:number = 1, offset:number = 0, rounding: number = 1000) {
+  // if (offset === undefined && interval > 0) offset = 0;
+  // else if (offset === undefined && interval < 0) offset = 1;
+  // else offset = offset as number;
+  // if (offset > 1 || offset < 0) throw new Error(`offset must be between 0 and 1`);
+
+  guardNumber(interval, `bipolar`, `interval`);
+  guardNumber(end, `bipolar`, `end`);
+  guardNumber(offset, `bipolar`, `offset`);
+  guardNumber(start, `bipolar`, `start`);
+  
+  return pingPong(interval, start, end, offset, rounding);
 };
 
 /**
- * Ping-pongs continually between `start` and `end` with a given `interval`. Use `pingPongPercent` for 0-1 ping-ponging
+ * Ping-pongs continually back and forth `start` and `end` with a given `interval`. Use `pingPongPercent` for 0-1 ping-ponging
  *
  * In a loop:
  * ```
@@ -162,6 +203,7 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   const distance = upper - lower;
   if (Math.abs(interval) >= distance) throw new Error(`Interval should be between -${distance} and ${distance}`);
 
+  //eslint-disable-next-line functional/no-let
   let incrementing = interval > 0;
 
   // Scale up values by rounding factor
@@ -173,9 +215,12 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   else offset = Math.floor(offset * rounding);
   if (offset > upper || offset < lower) throw new Error(`Offset must be within lower and upper`);
 
+  //eslint-disable-next-line functional/no-let
   let v = offset;
   yield v / rounding;
+  //eslint-disable-next-line functional/no-let
   let firstLoop = true;
+  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     v = v + (incrementing ? interval : -interval);
     if (incrementing && v >= upper) {

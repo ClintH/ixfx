@@ -1,6 +1,6 @@
 import {Rects, Points} from './index.js';
 import {integer as guardInteger} from '../Guards.js';
-import {clampZeroBounds} from "../util.js";
+import {clampZeroBounds} from "../Util.js";
 import {randomElement } from  '../collections/Arrays.js';
 import { SetMutable } from '../collections/Interfaces.js';
 import {setMutable, } from "../collections/Set.js";

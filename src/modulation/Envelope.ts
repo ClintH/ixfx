@@ -4,7 +4,7 @@ import { Timer } from "../Timer.js";
 import { StateMachine } from "../StateMachine.js";
 import {Path} from "~/geometry/Path.js";
 import * as Bezier from '../geometry/Bezier.js';
-import {map} from "~/util.js";
+import {scale} from "../Util.js";
 
 /**
  * @returns Returns a full set of default ADSR options
@@ -452,7 +452,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
     case `attack`:
       v = this.attackPath.compute(amt).y;
       if (this.initialLevelOverride !== undefined) {
-        v = map(v, 0, this.initialLevel, this.initialLevelOverride, this.initialLevel);
+        v = scale(v, 0, this.initialLevel, this.initialLevelOverride, this.initialLevel);
       }
       this.releasedAt = v;
       break;
@@ -469,7 +469,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
       v = this.releasePath.compute(amt).y;
       // Bound release level to the amp level that we released at.
       // ie. when release happens before a stage completes
-      if (this.releasedAt !== undefined) v = map(v, 0, this.sustainLevel, 0, this.releasedAt);
+      if (this.releasedAt !== undefined) v = scale(v, 0, this.sustainLevel, 0, this.releasedAt);
       break;
     case `complete`:
       v = this.releaseLevel;

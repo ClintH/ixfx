@@ -9,25 +9,18 @@ import * as Rects from '../geometry/Rect.js';
 import * as color2k from 'color2k';
 import {stack, Stack} from '../collections/index.js';
 import {resolveEl} from '../dom/Util.js';
-import { resizeObservable } from '../dom/index.js';
+
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 
-export const autoSizeCanvas = (canvasEl:HTMLCanvasElement, callback:() => void, timeoutMs:number = 1000) => {
-  const ro = resizeObservable(canvasEl, timeoutMs).subscribe((entries:readonly ResizeObserverEntry[]) => {
-    const e = entries.find(v => v.target === canvasEl);
-    if (e === undefined) return;
-    // eslint-disable-next-line functional/immutable-data
-    canvasEl.width = e.contentRect.width;
-    // eslint-disable-next-line functional/immutable-data
-    canvasEl.height = e.contentRect.height;
-    callback();
-  });
-  return ro;
-};
-
 type CanvasCtxQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
+
+/**
+ * Gets a 2d drawing context from canvas element or query, or throws an error
+ * @param canvasElCtxOrQuery Canvas element reference or DOM query
+ * @returns Drawing context.
+ */
 export const getCtx = (canvasElCtxOrQuery:CanvasCtxQuery): CanvasRenderingContext2D => {
   if (canvasElCtxOrQuery === null) throw Error(`canvasElCtxOrQuery null. Must be a 2d drawing context or Canvas element`);
   if (canvasElCtxOrQuery === undefined) throw Error(`canvasElCtxOrQuery undefined. Must be a 2d drawing context or Canvas element`);
@@ -40,8 +33,14 @@ export const getCtx = (canvasElCtxOrQuery:CanvasCtxQuery): CanvasRenderingContex
   return ctx;
 };
 
-// TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
+/**
+ * Makes a helper object that wraps together a bunch of drawing functions that all use the same drawing context
+ * @param ctxOrCanvasEl Drawing context or canvs element reference
+ * @param canvasBounds Bounds of drawing (optional). Used for limiting `textBlock`
+ * @returns 
+ */
 export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rect) => {
+  // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
   const ctx = getCtx(ctxOrCanvasEl);
   return {
     paths(pathsToDraw: Paths.Path[], opts?: DrawingOpts): void {
@@ -78,14 +77,37 @@ export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rec
   };
 };
 
+/**
+ * Drawing options
+ */
 type DrawingOpts = {
+  /**
+   * Stroke style
+   */
   readonly strokeStyle?:string
+  /**
+   * Fill style
+   */
   readonly fillStyle?:string
+  /**
+   * If true, diagnostic helpers will be drawn
+   */
   readonly debug?:boolean
 };
 
+/**
+ * Creates a drawing op to apply provided options
+ * @param opts Drawing options that apply
+ * @returns Stack
+ */
 const optsOp = (opts:DrawingOpts):StackOp => coloringOp(opts.strokeStyle, opts.fillStyle);
 
+/**
+ * Applies drawing options to `ctx`, returning a {@link DrawingStack}
+ * @param ctx Context
+ * @param opts Options
+ * @returns 
+ */
 const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts = {}):DrawingStack => {
   if (ctx === undefined) throw Error(`ctx undefined`);
 
@@ -97,6 +119,12 @@ const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts = {}):DrawingS
   return stack;
 };
 
+/**
+ * Draws one or more arcs.
+ * @param ctx 
+ * @param arcs 
+ * @param opts 
+ */
 export const arc = (ctx:CanvasRenderingContext2D, arcs:Arcs.ArcPositioned|ReadonlyArray<Arcs.ArcPositioned>, opts:DrawingOpts = {}) => {
   applyOpts(ctx, opts);
 
@@ -111,18 +139,38 @@ export const arc = (ctx:CanvasRenderingContext2D, arcs:Arcs.ArcPositioned|Readon
   } else draw(arcs as Arcs.ArcPositioned);
 };
 
-type StackOp = (ctx:CanvasRenderingContext2D) => void
-/*
- * apply(ctx:CanvasRenderingContext2D):void
- * remove(ctx:CanvasRenderingContext2D):void
+/**
+ * A drawing stack operation
  */
+type StackOp = (ctx:CanvasRenderingContext2D) => void;
 
+/**
+ * A drawing stack (immutable)
+ */
 type DrawingStack = Readonly<{
+  /**
+   * Push a new drawing op
+   * @param op Operation to add
+   * @returns stack with added op
+   */
   push(op:StackOp):DrawingStack
+  /**
+   * Pops an operatiomn
+   * @returns Drawing stack with item popped
+   */
   pop():DrawingStack
+  /**
+   * Applies drawing stack
+   */
   apply():DrawingStack
 }>
 
+/**
+ * Colouring drawing op. Applies `fillStyle` and `strokeStyle`
+ * @param strokeStyle 
+ * @param fillStyle 
+ * @returns 
+ */
 const coloringOp = (strokeStyle:string|CanvasGradient|CanvasPattern|undefined, fillStyle:string|CanvasGradient|CanvasPattern|undefined):StackOp => {
 
   const apply = (ctx:CanvasRenderingContext2D) => {
@@ -134,6 +182,12 @@ const coloringOp = (strokeStyle:string|CanvasGradient|CanvasPattern|undefined, f
   return apply;
 };
 
+/**
+ * Creates and returns an immutable drawing stack for a context
+ * @param ctx Context
+ * @param stk Initial stack operations
+ * @returns 
+ */
 export const drawingStack = (ctx:CanvasRenderingContext2D, stk?:Stack<StackOp>):DrawingStack => {
   if (stk === undefined) stk = stack<StackOp>();
 
@@ -158,6 +212,12 @@ export const drawingStack = (ctx:CanvasRenderingContext2D, stk?:Stack<StackOp>):
   return {push, pop, apply};
 };
 
+/**
+ * Draws one or more circles
+ * @param ctx 
+ * @param circlesToDraw 
+ * @param opts 
+ */
 export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.CirclePositioned|readonly Circles.CirclePositioned[], opts:DrawingOpts = {}) => {
   applyOpts(ctx, opts);
 
@@ -170,6 +230,13 @@ export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.Circl
   else draw(circlesToDraw as Circles.CirclePositioned);
 };
 
+/**
+ * Draws one or more paths.
+ * supported paths are quadratic beziers and lines.
+ * @param ctx
+ * @param pathsToDraw 
+ * @param opts 
+ */
 export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths.Path[]|Paths.Path, opts: Readonly<{readonly strokeStyle?: string, readonly debug?: boolean}> = {}) =>  {
   applyOpts(ctx, opts);
 
@@ -187,10 +254,8 @@ export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths
 /**
  * Draws a line between all the given points.
  *
- * @export
- * @param {CanvasRenderingContext2D} ctx
- * @param {...Points.Point[]} pts
- * @returns {void}
+ * @param ctx
+ * @param pts
  */
 export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly loop?: boolean, readonly strokeStyle?: string} = {}) => {
   const shouldLoop = opts.loop ?? false;
@@ -213,6 +278,13 @@ export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Poi
   ctx.stroke();
 };
 
+/**
+ * Draws labels for a set of points
+ * @param ctx 
+ * @param pts Points to draw
+ * @param opts 
+ * @param labels Labels for points
+ */
 export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly fillStyle?:string} = {}, labels?:readonly string[]) => {
   if (pts.length === 0) return;
 
@@ -227,7 +299,12 @@ export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.
   });
 };
 
-
+/**
+ * Draws filled circle(s) at provided point(s)
+ * @param ctx
+ * @param pos 
+ * @param opts 
+ */
 const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Points.Point[], opts?: DrawingOpts & {readonly radius?: number, readonly outlined?: boolean, readonly filled?: boolean})  => {
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
@@ -248,9 +325,15 @@ const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Points.Po
 
   if (opts.filled || !opts.outlined) ctx.fill();
   if (opts.outlined) ctx.stroke();
-
 };
 
+
+/**
+ * Draws a cubic or quadratic bezier
+ * @param ctx 
+ * @param bezierToDraw 
+ * @param opts 
+ */
 export const bezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier|Beziers.CubicBezier, opts?: DrawingOpts) => {
   if (Beziers.isQuadraticBezier(bezierToDraw)) {
     quadraticBezier(ctx, bezierToDraw, opts);
@@ -302,7 +385,6 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
     stack = stack.pop();
     stack.apply();
   }
-
 };
 
 const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: DrawingOpts = {}) => {
@@ -341,9 +423,14 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
     stack = stack.pop();
     stack.apply();
   }
-
 };
 
+/**
+ * Draws one or more lines
+ * @param ctx
+ * @param toDraw 
+ * @param opts 
+ */
 export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly Lines.Line[], opts: {readonly strokeStyle?: string, readonly debug?: boolean} = {}) => {
   const isDebug = opts.debug ?? false;
 
@@ -365,9 +452,14 @@ export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly 
 
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
   else draw(toDraw as Lines.Line);
-
 };
 
+/**
+ * Draws one or more rectangles
+ * @param ctx
+ * @param toDraw 
+ * @param opts 
+ */
 export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned|readonly Rects.RectPositioned[], opts: DrawingOpts & {readonly filled?:boolean} = {}) => {
   applyOpts(ctx, opts);
 
@@ -384,6 +476,12 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned
   else draw(toDraw as Rects.RectPositioned);
 };
 
+/**
+ * Draws a block of text. Each array item is considered a line.
+ * @param ctx
+ * @param lines 
+ * @param opts 
+ */
 export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[], opts:DrawingOpts & {readonly anchor:Points.Point, readonly anchorPadding?:number, readonly bounds?: Rects.RectPositioned}) => {
   applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;

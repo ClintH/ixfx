@@ -1,6 +1,6 @@
 // ✔ UNIT TESTED
 
-import { ToString } from "../util.js";
+import { ToString } from "../Util.js";
 import {SimpleEventEmitter} from "../Events.js";
 import {SetMutable, ValueSetEventMap} from "./Interfaces.js";
 

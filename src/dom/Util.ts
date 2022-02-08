@@ -1,4 +1,147 @@
-import { Observable, throttleTime } from 'rxjs';
+import { Observable,  debounceTime, fromEvent } from 'rxjs';
+import {Points} from '~/geometry';
+
+type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
+  readonly el:V
+  readonly bounds: {
+    readonly width:number,
+    readonly height:number
+    readonly center:Points.Point
+  }
+}
+
+type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
+  readonly ctx:CanvasRenderingContext2D
+}
+
+/**
+ * Resizes given canvas element to match window size. To resize canvas to match its parent, use {@link parentSizeCanvas}.
+ * 
+ * To make the canvas appear propery, it sets the following CSS:
+ * ```css
+ * {
+ *  top: 0;
+ *  left: 0;
+ *  zIndex: -1;
+ *  position: fixed;
+ * }
+ * ```
+ * Pass _true_ for `skipCss` to avoid this.
+ * 
+ * Provide a callback for when resize happens.
+ * @param domQueryOrEl Query string or reference to canvas element
+ * @param onResized Callback for when resize happens, eg for redrawing canvas
+ * @param skipCss if true, style are not added
+ * @returns Observable
+ */
+export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResized?:(args:CanvasResizeArgs)=>void, skipCss = false) => {
+  const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
+  if (el.nodeName !== `CANVAS`) throw new Error(`Expected HTML element with node name CANVAS, not ${el.nodeName}`);
+
+  const ctx = el.getContext(`2d`);
+  if (ctx === null) throw new Error(`Could not create drawing context`);
+
+  const update = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    //eslint-disable-next-line functional/immutable-data
+    el.width = width;
+    //eslint-disable-next-line functional/immutable-data
+    el.height = height;
+
+    const bounds = {width, height, center: {x: width/2, y:height/2}};
+    if (onResized !== undefined) onResized({ctx, el, bounds});
+  };
+
+  // Setup
+  if (!skipCss) {
+    //eslint-disable-next-line functional/immutable-data
+    el.style.top = `0`;
+    //eslint-disable-next-line functional/immutable-data
+    el.style.left = `0`;
+    //eslint-disable-next-line functional/immutable-data
+    el.style.zIndex = `-100`;
+    //eslint-disable-next-line functional/immutable-data
+    el.style.position = `fixed`;
+  }
+
+  const r = windowResize();
+  r.subscribe(update);
+  
+  update();
+  return r;
+};
+
+/**
+ * Sets width/height atributes on the given element according to the size of its parent.
+ * @param domQueryOrEl Elememnt to resize
+ * @param onResized Callback when resize happens
+ * @param timeoutMs Timeout for debouncing events
+ * @returns 
+ */
+export const parentSize = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>)=>void, timeoutMs:number = 100) => {
+  const el = resolveEl<V>(domQueryOrEl);
+  const parent = el.parentElement;
+  if (parent === null) throw new Error(`Element has no parent`);
+
+  const ro = resizeObservable(parent, timeoutMs).subscribe((entries:readonly ResizeObserverEntry[]) => {
+    const e = entries.find(v => v.target === parent);
+    if (e === undefined) return;
+
+    const width = e.contentRect.width;
+    const height = e.contentRect.height;
+
+    el.setAttribute(`width`, width + `px`);
+    el.setAttribute(`height`, height + `px`);
+    const bounds = {width, height, center: {x: width/2, y:height/2}};
+    if (onResized !== undefined) onResized({ el, bounds});
+  });
+
+  return ro;
+};
+
+/**
+ * Resizes given canvas element to its parent element. To resize canvas to match the viewport, use {@link fullSizeCanvas}.
+ * 
+ * Provide a callback for when resize happens.
+ * @param domQueryOrEl Query string or reference to canvas element
+ * @param onResized Callback for when resize happens, eg for redrawing canvas
+ * @returns Observable
+ */
+export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResized?:(args:CanvasResizeArgs)=>void, timeoutMs:number = 100) => {
+  const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
+  if (el.nodeName !== `CANVAS`) throw new Error(`Expected HTML element with node name CANVAS, not ${el.nodeName}`);
+
+  const parent = el.parentElement;
+  if (parent === null) throw new Error(`Element has no parent`);
+
+
+  const ctx = (el as HTMLCanvasElement).getContext(`2d`);
+  if (ctx === null) throw new Error(`Could not create drawing context`);
+
+  const ro = resizeObservable(parent, timeoutMs).subscribe((entries:readonly ResizeObserverEntry[]) => {
+    const e = entries.find(v => v.target === parent);
+    if (e === undefined) return;
+
+    const width = e.contentRect.width;
+    const height = e.contentRect.height;
+
+    el.setAttribute(`width`, width + `px`);
+    el.setAttribute(`height`, height + `px`);
+    const bounds = {width, height, center: {x: width/2, y:height/2}};
+    if (onResized !== undefined) onResized({ctx, el, bounds});
+  });
+
+  return ro;
+};
+
+/**
+ * Returns an Observable for window resize. Default 100ms debounce.
+ * @param timeoutMs 
+ * @returns 
+ */
+export const windowResize = (timeoutMs:number = 100) => fromEvent(window, `resize`).pipe(debounceTime(timeoutMs));
 
 /**
  * Resolves either a string or HTML element to an element.
@@ -11,7 +154,7 @@ import { Observable, throttleTime } from 'rxjs';
  * @param domQueryOrEl 
  * @returns 
  */
-export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
+export const resolveEl = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:string|V):V => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {
@@ -102,7 +245,10 @@ export const themeChangeObservable = (): Observable<readonly MutationRecord[]> =
  * @param timeoutMs Tiemout before event gets triggered
  * @returns 
  */
-export const resizeObservable = (elem: HTMLElement, timeoutMs: number = 1000): Observable<readonly ResizeObserverEntry[]> => {
+export const resizeObservable = (elem: Element, timeoutMs: number = 1000): Observable<readonly ResizeObserverEntry[]> => {
+  if (elem === null) throw new Error(`elem parameter is null. Expected element to observe`);
+  if (elem === undefined) throw new Error(`elem parameter is undefined. Expected element to observe`);
+  
   const o = new Observable<ResizeObserverEntry[]>(subscriber => {
     const ro = new ResizeObserver(entries => {
       subscriber.next(entries);
@@ -113,7 +259,7 @@ export const resizeObservable = (elem: HTMLElement, timeoutMs: number = 1000): O
       ro.unobserve(elem);
     };
   });
-  return o.pipe(throttleTime(timeoutMs));
+  return o.pipe(debounceTime(timeoutMs));
 };
 
 /**
@@ -121,7 +267,7 @@ export const resizeObservable = (elem: HTMLElement, timeoutMs: number = 1000): O
  * @param obj 
  * @returns Promise
  */
-export const copyToClipboard = (obj: any) => {
+export const copyToClipboard = (obj: object) => {
   const p = new Promise((resolve, reject) => {
     const json = JSON.stringify(obj, null, 2);
     const cleaned = json.replace(/^[\t ]*"[^:\n\r]+(?<!\\)":/gm, (match) => match.replace(/"/g, ``));

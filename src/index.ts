@@ -1,5 +1,10 @@
-// Major modules
 export * as Geometry from './geometry/index.js';
+
+/**
+ * Canvas drawing functions.
+ */
+export * as Drawing from './visual/Drawing.js';
+
 export * as Visual from './visual/index.js';
 
 /**
@@ -59,7 +64,7 @@ export * as KeyValues from './KeyValue.js';
 
 // Loose functions
 
-export * from './util.js';
+export * from './Util.js';
 
 /**
  * Run code at intervals or with a delay

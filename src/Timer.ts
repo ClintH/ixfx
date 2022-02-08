@@ -1,6 +1,6 @@
 import {integer as guardInteger} from './Guards.js';
 
-import {clamp} from './util.js';
+import {clamp} from './Util.js';
 
 /**
  * A timer instance
