@@ -1,4 +1,5 @@
 export * as Geometry from './geometry/index.js';
+export * as Flow from './flow/index.js';
 
 /**
  * Canvas drawing functions.
@@ -81,4 +82,3 @@ export * as Timers from './Timer.js';
 // Classes
 export { KeyValue } from './KeyValue.js';
 export {frequencyMutable, FrequencyMutable} from './FrequencyMutable.js';
-export {StateMachine} from './StateMachine.js';

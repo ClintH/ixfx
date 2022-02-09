@@ -10,6 +10,12 @@ export type Point = {
 };
 
 /**
+ * An empty point of {x:0, y:0}
+ */
+//eslint-disable-next-line @typescript-eslint/naming-convention
+export const Empty = Object.freeze({ x:0, y: 0});
+
+/**
  * Returns the 'minimum' point from an array of points, using a comparison function.
  * 
  * @example Find point closest to a coordinate
@@ -66,6 +72,17 @@ export const guard = (p: Point, name = `Point`) => {
   if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
   if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
 };
+
+/**
+ * Returns the angle in radians between a and b.
+ * Eg if a is the origin, and b is another point,
+ * in degrees one would get 0 to -180 when `b` was above `a`. -180 would be `b` in line with `a`.
+ * Same for under `a`.
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const angleBetween = (a: Point, b: Point) => Math.atan2(b.y - a.y, b.x - a.x);
 
 /**
  * Returns the minimum rectangle that can enclose all provided points
@@ -255,21 +272,64 @@ export const diff = function (a: Point, b: Point): Point {
   };
 };
 
+
+type Sum = {
+  /**
+   * Adds two sets of coordinates
+   */
+  (aX:number, aY:number, bX:number, bY:number):Point;
+  /**
+   * Add x,y to a
+   */
+  (a:Point, x:number, y?:number):Point;
+  /**
+   * Add two points
+   */
+  (a:Point, b?:Point):Point;
+};
+
 /**
  * Returns `a` plus `b`
- *
- * @param a
- * @param b
- * @returns
  */
-export const sum = function (a: Point, b: Point): Point {
-  guard(a, `a`);
-  guard(b, `b`);
+export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:number, d?:number): Point {
+  //eslint-disable-next-line functional/no-let
+  let ptA:Point|undefined;
+  //eslint-disable-next-line functional/no-let
+  let ptB:Point|undefined;
+  if (isPoint(a)) {
+    ptA = a;
+    if (b === undefined) b = Empty;
+    if (isPoint(b)) {
+      ptB = b;
+    } else {
+      if (b === undefined) throw new Error(`Expects x coordinate`);
+      ptB = {x: b, y: (c === undefined ? 0 : c)};    
+    }
+  } else if (!isPoint(b)) {
+    // Neither of first two params are points
+    if (b === undefined) throw new Error(`Expected number as second param`);
+    ptA = {x: a, y: b};
+    if (c === undefined) throw new Error(`Expects x coordiante`);
+    ptB = {x: c, y: (d === undefined ? 0 : d)};    
+  }
+
+  if (ptA === undefined) throw new Error(`ptA missing`);
+  if (ptB === undefined) throw new Error(`ptB missing`);
+  guard(ptA, `a`);
+  guard(ptB, `b`);
   return {
-    x: a.x + b.x,
-    y: a.y + b.y
+    x: ptA.x + ptB.x,
+    y: ptA.y + ptB.y
   };
 };
+
+/**
+ * @returns `a` - `b`
+ */
+export const subtract = (a:Point, b:Point):Point => ({
+  x: a.x - b.x,
+  y: a.y - b.y
+});
 
 /**
  * Returns `a` multiplied by `b`

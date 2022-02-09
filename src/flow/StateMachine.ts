@@ -1,13 +1,11 @@
 // ✔ UNIT TESTED
 
-import {SimpleEventEmitter} from "./Events.js";
-import { isStringArray } from "./Guards.js";
+import {SimpleEventEmitter} from "../Events.js";
+import { isStringArray } from "../Guards.js";
 
 export interface Options {
   readonly debug?: boolean
 }
-
-//type StateName = string | number | Symbol;
 
 export interface StateChangeEvent {
   readonly newState: string,

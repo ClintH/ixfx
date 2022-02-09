@@ -1,4 +1,4 @@
-import * as MathUtil from './Math.js';
+import {degreeToRadian, Polar} from './index.js';
 import {guard as guardPoint, isPoint} from './Point.js';
 import {Path} from './Path.js';
 import {Lines, Points, Rects} from './index.js';
@@ -61,8 +61,8 @@ export function fromDegrees(radius:number, startDegrees:number, endDegrees:numbe
 export function fromDegrees(radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point):Arc|ArcPositioned  {
   const a:Arc = {
     radius,
-    startRadian:MathUtil.degreeToRadian(startDegrees),
-    endRadian:MathUtil.degreeToRadian(endDegrees)
+    startRadian:degreeToRadian(startDegrees),
+    endRadian:degreeToRadian(endDegrees)
   };
   if (isPoint(origin)) {
     guardPoint(origin);
@@ -204,68 +204,86 @@ type ToSvg = {
    * @param startRadian Start
    * @param endRadian End
    */
-  (origin:Points.Point, radius:number, startRadian:number, endRadian:number): readonly string[];
+  (origin:Points.Point, radius:number, startRadian:number, endRadian:number, opts?:SvgOpts): readonly string[];
   /**
    * SVG path for non-positioned arc
    */
-  (arc:Arc, origin:Points.Point): readonly string[];
+  (arc:Arc, origin:Points.Point, opts?:SvgOpts): readonly string[];
 /**
  * SVG path for positioned arc
  */
-  (arc:ArcPositioned): readonly string[];
+  (arc:ArcPositioned, opts?:SvgOpts): readonly string[];
 };
 
 
 /**
  * Creates an SV path snippet for arc
- * @param originOrArc 
- * @param radiusOrOrigin 
- * @param startRadian 
- * @param endRadian 
  * @returns 
  */
-export const toSvg:ToSvg = (originOrArc:Points.Point|Arc|ArcPositioned, radiusOrOrigin?:number|Points.Point, startRadian?:number, endRadian?:number) => {
-  if (isArc(originOrArc)) {
-    if (isPositioned(originOrArc)) {
-      return toSvgFull(originOrArc, originOrArc.radius, originOrArc.startRadian, originOrArc.endRadian);
+export const toSvg:ToSvg = (a:Points.Point|Arc|ArcPositioned, b?:number|Points.Point|SvgOpts, c?:number|SvgOpts, d?:number, e?:SvgOpts) => {
+  if (isArc(a)) {
+    if (isPositioned(a)) {
+      return toSvgFull(a, a.radius, a.startRadian, a.endRadian, b as SvgOpts);
     } else {
-      if (isPoint(radiusOrOrigin)) {
-        return toSvgFull(radiusOrOrigin, originOrArc.radius, originOrArc.startRadian, originOrArc.endRadian);
+      if (isPoint(b)) {
+        return toSvgFull(b, a.radius, a.startRadian, a.endRadian, c as SvgOpts);
       } else {
-        return toSvgFull({x: 0, y:0}, originOrArc.radius, originOrArc.startRadian, originOrArc.endRadian);
+        return toSvgFull({x: 0, y: 0 }, a.radius, a.startRadian, a.endRadian);
       }
     }
   } else {
-    if (startRadian === undefined) throw new Error(`startAngle undefined`);
-    if (endRadian === undefined) throw new Error(`endAngle undefined`);
+    if (c === undefined) throw new Error(`startAngle undefined`);
+    if (d === undefined) throw new Error(`endAngle undefined`);
    
-    if (isPoint(originOrArc)) {
-      if (typeof radiusOrOrigin === `number`) {
-        return toSvgFull(originOrArc, radiusOrOrigin, startRadian, endRadian);
+    if (isPoint(a)) {
+      if (typeof b === `number` && typeof c ===  `number` && typeof d === `number`) {
+        return toSvgFull(a, b, c, d, e);
       } else {
-        throw new Error(`Expected second parameter to be radius (number)`);
+        throw new Error(`Expected (point, number, number, number). Missing a number param.`);
       }
     } else {
-      throw new Error(`Expected Point, Arc or ArcPositioned as first parameter`);
+      throw new Error(`Expected (point, number, number, number). Missing first point.`);
     }
   } 
 };
 
-const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRadian:number):readonly string[] => {
-  const isFullCircle = endRadian - startRadian === 360;
-  const start = MathUtil.polarToCartesian(origin, radius, endRadian - 0.01);
-  const end = MathUtil.polarToCartesian(origin, radius, startRadian);
-  const arcSweep = endRadian - startRadian <= 180 ? `0` : `1`;
+type SvgOpts = {
+  
+  /**
+   * "If the arc should be greater or less than 180 degrees"
+   * ie. tries to maximise arc length
+   */
+  readonly largeArc?:boolean
+  
+  /**
+   * "If the arc should begin moving at positive angles"
+   * ie. the kind of bend it makes to reach end point
+   */
+  readonly sweep?:boolean
+}
 
-  const d = [
-    `M`, start.x, start.y,
-    `A`, radius, radius, 0, arcSweep, 0, end.x, end.y,
-  ];
+const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRadian:number, opts?:SvgOpts):readonly string[] => {
+  // https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+  // A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+  // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
+
+  if (opts === undefined || typeof opts !== `object`) opts = {};
+
+  const isFullCircle = endRadian - startRadian === 360;
+  const start = Polar.toCartesian(radius, endRadian - 0.01, origin);
+  const end = Polar.toCartesian(radius, startRadian, origin);
+  
+  const {largeArc = false, sweep = false} = opts;
+
+  const d = [`
+    M ${start.x} ${start.y}
+    A ${radius} ${radius} 0 ${largeArc ? `1` : `0`} ${sweep ? `1` : `0`} ${end.x} ${end.y},
+  `];
 
   //eslint-disable-next-line functional/immutable-data
   if (isFullCircle) d.push(`z`);
 
-  return d.map(x => x.toString()); //.join(` `).trim();
+  return d;
 };
 
 /**

@@ -4,14 +4,16 @@ import * as Circles from './Circle.js';
 import * as Compound from './CompoundPath.js';
 import * as Grids from './Grid.js';
 import * as Lines from './Line.js';
-import * as Math from './Math.js';
 import * as Paths from './Path.js';
 import * as Points from './Point.js';
 import * as Rects from './Rect.js';
-export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Math};
 
-// import {Grid, Cell} from './Grid.js';
-// import {Path} from './Path.js';
-// import {Line} from './Line.js';
-// import {Point} from './Point.js';
-// export {Grid, Line, Cell, Path, Point};
+export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound};
+
+export * as Polar from './Polar.js';
+
+export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees - 90) * (Math.PI / 180.0);
+
+export const radianToDegree = (angleInRadians:number) => angleInRadians * 180 / Math.PI;
+
+export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.x, point.y);
