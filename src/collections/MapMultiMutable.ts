@@ -18,6 +18,19 @@ class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
     this.groupBy = opts.groupBy ?? toStringDefault;
   }
 
+  /**
+   * Returns the length of the longest child list
+   */
+  get lengthMax() {
+    //eslint-disable-next-line functional/no-let
+    let m = 0;
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const v of this.#map.values()) {
+      m = Math.max(m, this.type.count(v));
+    }
+    return m;
+  }
+
   debugString(): string {
     const keys = Array.from(this.#map.keys());
     // eslint-disable-next-line functional/no-let

@@ -8,11 +8,10 @@ class CircularArrayImpl<V> extends Array {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   #pointer: number;
 
-  constructor(capacity: number) {
+  constructor(capacity: number = 0) {
     super();
     if (Number.isNaN(capacity)) throw Error(`capacity is NaN`);
     // Can't throw because .filter won't use ctor proprly
-    //if (capacity <= 0) throw Error(`capacity must be greater than zero (${capacity})`);
     this.#capacity = capacity;
     this.#pointer = 0;
   }
@@ -23,8 +22,13 @@ class CircularArrayImpl<V> extends Array {
     ca[this.#pointer] = thing;
     /* eslint-disable-next-line functional/immutable-data */
     ca.#capacity = this.#capacity;
-    /* eslint-disable-next-line functional/immutable-data */
-    ca.#pointer = this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
+    if (this.#capacity > 0) {
+      /* eslint-disable-next-line functional/immutable-data */
+      ca.#pointer = this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
+    } else {
+      /* eslint-disable-next-line functional/immutable-data */
+      ca.#pointer = this.#pointer + 1;
+    }
     return ca;
   }
 

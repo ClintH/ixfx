@@ -57,7 +57,7 @@ export const distance = (a:Point, b:Point):number => {
 };
 
 /**
- * Throws an error if point parameter is invalid
+ * Throws an error if point is invalid
  * @param p 
  * @param name 
  */
@@ -74,9 +74,10 @@ export const guard = (p: Point, name = `Point`) => {
 };
 
 /**
- * Returns the angle in radians between a and b.
- * Eg if a is the origin, and b is another point,
- * in degrees one would get 0 to -180 when `b` was above `a`. -180 would be `b` in line with `a`.
+ * Returns the angle in radians between `a` and `b`.
+ * Eg if `a` is the origin, and `b` is another point,
+ * in degrees one would get 0 to -180 when `b` was above `a`.
+ *  -180 would be `b` in line with `a`.
  * Same for under `a`.
  * @param a 
  * @param b 
@@ -115,7 +116,7 @@ export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {
 };
 
 /**
- * Returns true if the parameter has x and y
+ * Returns _true_ if the parameter has x and y fields
  * @param p 
  * @returns 
  */
@@ -152,11 +153,17 @@ export const toString = (p: Point): string => {
 };
 
 /**
- * Returns true if the two points have identical values
- *
+ * Returns _true_ if the two points have identical values
+ * 
+ * ```js
+ * const a = {x: 10, y: 10};
+ * const b = {x: 10, y: 10;};
+ * a === b        // False, because a and be are different objects
+ * equals(a, b)   // True, because a and b are same value
+ * ```
  * @param a
  * @param b
- * @returns
+ * @returns _True_ if points are equal
  */
 export const equals = (a: Point, b: Point): boolean =>  a.x === b.x && a.y === b.y;
 
@@ -187,6 +194,9 @@ export const withinRange = (a:Point, b:Point, maxRange:Point|number):boolean => 
 
 /**
  * Returns a relative point between two points
+ * ```js
+ * lerp(a, b, 0.5); // Halfway point between a and b
+ * ```
  * @param amt Relative amount, 0-1
  * @param a 
  * @param b 
@@ -225,6 +235,7 @@ export const from = (xOrArray?: number | readonly number[], y?: number): Point =
 
 /**
  * Returns an array of points from an array of numbers. 
+ * 
  * Array can be a continuous series of x, y values:
  * ```
  * [1,2,3,4] would yield: [{x:1, y:2}, {x:3, y:4}]
@@ -258,12 +269,19 @@ export const fromNumbers = (...coords:readonly ReadonlyArray<number>[]|readonly 
 
 /**
  * Returns `a` minus `b`
- *
+ * 
+ * ie.
+ * ```js
+ * return {
+ *   x: a.x - b.x,
+ *   y: a.y - b.y
+ * };
+ * ```
  * @param a
  * @param b
  * @returns Point
  */
-export const diff = function (a: Point, b: Point): Point {
+export const subtract = function (a: Point, b: Point): Point {
   guard(a, `a`);
   guard(b, `b`);
   return {
@@ -290,6 +308,13 @@ type Sum = {
 
 /**
  * Returns `a` plus `b`
+ * ie.
+ * ```js
+ * return {
+ *   x: a.x + b.x,
+ *   y: a.y + b.y
+ * };
+ * ```
  */
 export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:number, d?:number): Point {
   //eslint-disable-next-line functional/no-let
@@ -324,16 +349,15 @@ export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:
 };
 
 /**
- * @returns `a` - `b`
- */
-export const subtract = (a:Point, b:Point):Point => ({
-  x: a.x - b.x,
-  y: a.y - b.y
-});
-
-/**
  * Returns `a` multiplied by `b`
- *
+ * 
+ * ie.
+ * ```js
+ * return {
+ *  x: a.x * b.x,
+*   y: a.y * b.y
+ * }
+ * ```
  * @param a
  * @param b
  * @returns
@@ -342,7 +366,14 @@ export function multiply(a: Point, b: Point): Point;
 
 /**
  * Returns `a` multipled by some x and/or y scaling factor
- *
+ * 
+ * ie.
+ * ```js
+ * return {
+ *  x: a.x * x
+*   y: a.y * y
+ * }
+ * ```
  * @export
  * @parama Point to scale
  * @param x Scale factor for x axis
@@ -353,6 +384,13 @@ export function multiply(a: Point, x: number, y?: number): Point;
 
 /**
  * Returns `a` multiplied by `b` point, or given x and y.
+ * ie.
+ * ```js
+ * return {
+ *   x: a.x * b.x,
+ *   y: a.y * b.y
+ * };
+ * ```
  * @param a 
  * @param bOrX 
  * @param y 

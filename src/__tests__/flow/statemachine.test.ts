@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {StateMachine, fromList} from '../flow/StateMachine.js';
+import {StateMachine, fromList} from '../../flow/StateMachine.js';
 import {jest} from '@jest/globals';
 
 

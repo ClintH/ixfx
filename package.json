@@ -1,6 +1,6 @@
 {
-  "name": "@clinth/ixfx",
-  "version": "0.0.4",
+  "name": "ixfx",
+  "version": "0.0.5",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [

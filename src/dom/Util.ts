@@ -116,9 +116,10 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
   const parent = el.parentElement;
   if (parent === null) throw new Error(`Element has no parent`);
 
-
   const ctx = (el as HTMLCanvasElement).getContext(`2d`);
   if (ctx === null) throw new Error(`Could not create drawing context`);
+  
+  const safetyMargin = 0;
 
   const ro = resizeObservable(parent, timeoutMs).subscribe((entries:readonly ResizeObserverEntry[]) => {
     const e = entries.find(v => v.target === parent);
@@ -126,9 +127,9 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
 
     const width = e.contentRect.width;
     const height = e.contentRect.height;
-
-    el.setAttribute(`width`, width + `px`);
-    el.setAttribute(`height`, height + `px`);
+    console.log(`contentH: ${e.contentRect.height} current: ${el.getBoundingClientRect().height}`);
+    el.setAttribute(`width`, width-safetyMargin + `px`);
+    el.setAttribute(`height`, height-safetyMargin + `px`);
     const bounds = {width, height, center: {x: width/2, y:height/2}};
     if (onResized !== undefined) onResized({ctx, el, bounds});
   });

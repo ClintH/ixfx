@@ -1,7 +1,12 @@
 import {integer as guardInteger} from './Guards.js';
-
 import {clamp} from './Util.js';
 
+/**
+ * Creates a timer
+ * @private
+ */
+export type TimerSource = () => Timer;
+ 
 /**
  * A timer instance
  * @private
@@ -11,6 +16,9 @@ export type Timer = {
   get elapsed(): number
 }
 
+export type ModTimer = Timer & {
+  mod(amt:number):void
+}
 /**
  * @private
  */
@@ -26,6 +34,45 @@ export type Timeout = HasCompletion & {
   cancel(): void;
   get isDone(): boolean;
 }
+
+export const debounce = (callback:()=> void, timeoutMs:number) => {
+  const t = timeout(callback, timeoutMs);
+  return () => t.start();
+};
+
+
+/**
+ * Generates values from `produce` with `intervalMs` time delay
+ * 
+ * @example Produce a random number every 500ms:
+ * ```
+ * const randomGenerator = interval(() => Math.random(), 1000);
+ * for await (const r of randomGenerator) {
+ *  // Random value every 1 second
+ * }
+ * ```
+ *
+ * @template V
+ * @param intervalMs Interval between execution
+ * @param produce Function to call
+ * @template V Data type
+ * @returns
+ */
+export const interval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
+  //eslint-disable-next-line functional/no-let
+  let cancelled = false;
+  //eslint-disable-next-line functional/no-try-statement
+  try {
+    //eslint-disable-next-line functional/no-loop-statement
+    while (!cancelled) {
+      await sleep(intervalMs);
+      if (cancelled) return;
+      yield await produce();
+    }
+  } finally {
+    cancelled = true;
+  }
+};
 
 /**
  * Returns a {@link Timeout} that can be triggered, cancelled and reset
@@ -63,7 +110,7 @@ export const timeout = (callback:()=>void, timeoutMs:number):Timeout => {
 
   const start = (altTimeoutMs:number = timeoutMs) => {
     guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
-    if (timer !== 0) stop();
+    if (timer !== 0) cancel();
     timer = window.setTimeout(() => {
       callback();
       timer = 0;
@@ -87,12 +134,15 @@ export const timeout = (callback:()=>void, timeoutMs:number):Timeout => {
 /**
  * Runs a function continuously, returned by {@link Continuously}
  */
- export type Continuously = HasCompletion & {
+export type Continuously = HasCompletion & {
   start(): void
+  get elapsed(): number
   get ticks(): number
   get isDone(): boolean
+
   cancel(): void
 }
+
 
 /**
  * Returns a {@link Continuously} that continuously executes `callback`. Call `start` to begin.
@@ -120,15 +170,16 @@ export const timeout = (callback:()=>void, timeoutMs:number):Timeout => {
  * @param intervalMs 
  * @returns 
  */
-export const continuously = (callback:(ticks?:number)=>boolean|void, intervalMs?:number, resetCallback?:((ticks?:number) => boolean|void)):Continuously => {
-  if (intervalMs !== undefined) guardInteger(intervalMs, `aboveZero`, `intervalMs`);
+export const continuously = (callback:(ticks?:number, totalElapsed?:number)=>boolean|void, intervalMs?:number, resetCallback?:((ticks?:number) => boolean|void)):Continuously => {
+  if (intervalMs !== undefined) guardInteger(intervalMs, `positive`, `intervalMs`);
 
   //eslint-disable-next-line functional/no-let
   let running = false;
   //eslint-disable-next-line functional/no-let
   let ticks = 0;
-  
-  const schedule = intervalMs === undefined ? (cb:()=>void) => window.requestAnimationFrame(cb) : (cb:()=>void) => window.setTimeout(cb, intervalMs);
+  //eslint-disable-next-line functional/no-let
+  let startedAt = performance.now();
+  const schedule = (intervalMs === undefined || intervalMs === 0) ? (cb:()=>void) => window.requestAnimationFrame(cb) : (cb:()=>void) => window.setTimeout(cb, intervalMs);
   const cancel = () => {
     if (!running) return;
     running = false;
@@ -136,8 +187,9 @@ export const continuously = (callback:(ticks?:number)=>boolean|void, intervalMs?
   };
 
   const loop = () => {
+    //console.log(`loop`);
     if (!running) return;
-    const r = callback(ticks++);
+    const r = callback(ticks++, performance.now() - startedAt);
     if (r !== undefined && !r) {
       cancel();
       return;
@@ -149,6 +201,7 @@ export const continuously = (callback:(ticks?:number)=>boolean|void, intervalMs?
   const start = () => {
     // Already running, but theres a resetCallback to check if we should keep going
     if (running && resetCallback !== undefined) {
+      startedAt = performance.now();
       const r = resetCallback(ticks);
       if (r !== undefined && !r) {
         // Reset callback tells us to stop
@@ -171,6 +224,9 @@ export const continuously = (callback:(ticks?:number)=>boolean|void, intervalMs?
     },
     get ticks() {
       return ticks;
+    },
+    get elapsed() {
+      return performance.now() - startedAt;
     },
     cancel
   };
@@ -209,11 +265,6 @@ export const delay = async <V>(callback:() => Promise<V>, timeoutMs: number): Pr
   return Promise.resolve(await callback());
 };
 
-/**
- * Creates a timer
- * @private
- */
-export type TimerSource = () => Timer;
 
 /**
  * Wraps a timer, returning a relative elapsed value.
@@ -225,26 +276,59 @@ export type TimerSource = () => Timer;
  * @private
  * @param total 
  * @param timer 
- * @param clampValue 
+ * @param clampValue If true, returned value never exceeds 1.0 
  * @returns 
  */
-export const relativeTimer = (total:number, timer: Timer, clampValue = true):Timer & HasCompletion => {
+export const relativeTimer = (total:number, timer: Timer, clampValue = true):ModTimer & HasCompletion => {
   //eslint-disable-next-line functional/no-let
   let done = false;
+  //eslint-disable-next-line functional/no-let
+  let modAmt = 1;
+
   return {
+    mod(amt:number) {
+      modAmt = amt;
+    },
     get isDone() {
       return done;
     },
     reset:() => {
-      done =false;
+      done = false;
       timer.reset();
     },
     get elapsed() {
       //eslint-disable-next-line functional/no-let
-      let v = timer.elapsed / total;
+      let v = timer.elapsed / (total * modAmt);
       if (clampValue) v = clamp(v);
       if (v >= 1) done = true;
       return v;
+    }
+  };
+};
+
+
+export const frequencyTimerSource = (frequency:number):TimerSource => () => frequencyTimer(frequency, msElapsedTimer());
+  
+export const frequencyTimer = (frequency:number, timer:Timer = msElapsedTimer()):ModTimer => {
+  const cyclesPerSecond = frequency/1000;
+  //eslint-disable-next-line functional/no-let
+  let modAmt = 1;
+  return {
+    mod:(amt:number) => {
+      modAmt = amt;
+    },
+    reset:() => {
+      timer.reset();
+    },
+    get elapsed() {
+      // Get position in a cycle
+      const v = timer.elapsed * (cyclesPerSecond  *modAmt);
+
+      // Get fractional part
+      const f = v - Math.floor(v);
+      if (f < 0) throw new Error(`Unexpected cycle fraction less than 0. Elapsed: ${v} f: ${f}`);
+      if (f > 1) throw new Error(`Unexpected cycle fraction more than 1. Elapsed: ${v} f: ${f}`);
+      return f;
     }
   };
 };
@@ -256,13 +340,13 @@ export const relativeTimer = (total:number, timer: Timer, clampValue = true):Tim
  */
 export const msElapsedTimer = (): Timer => {
   // eslint-disable-next-line functional/no-let
-  let start = window.performance.now();
+  let start = performance.now();
   return {
     reset: () => {
-      start = window.performance.now();
+      start = performance.now();
     },
     get elapsed() {
-      return window.performance.now() - start;
+      return performance.now() - start;
     }
   };
 };

@@ -212,6 +212,26 @@ export const drawingStack = (ctx:CanvasRenderingContext2D, stk?:Stack<StackOp>):
   return {push, pop, apply};
 };
 
+export const lineThroughPoints = (ctx:CanvasRenderingContext2D, points:readonly Points.Point[], opts?:DrawingOpts):void => {
+  applyOpts(ctx, opts);
+  
+  // https://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+  ctx.moveTo((points[0].x), points[0].y);
+
+  points.forEach((p, index) => {
+    if (index + 2 >= points.length) return;
+    const pNext = points[index+1];
+    const mid = {
+      x: (p.x + pNext.x) / 2,
+      y: (p.y + pNext.y) / 2
+    };
+    const cpX1 = (mid.x + p.x) / 2;
+    const cpX2 = (mid.x + pNext.x) / 2;
+    ctx.quadraticCurveTo(cpX1, pNext.y, mid.x, mid.y);
+    ctx.quadraticCurveTo(cpX2, pNext.y, pNext.x, pNext.y);
+  });
+};
+
 /**
  * Draws one or more circles
  * @param ctx 

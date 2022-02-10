@@ -27,7 +27,9 @@ type DrawingOpts = PlotOpts & {
   coalesce:boolean
 }
 
-type PlotOpts = {
+export type PlotOpts = {
+  autoSizeCanvas?:boolean
+  style?:`connected` | `dots`
   palette?: Palette.Palette
   capacity?:number
   showYAxis?:boolean
@@ -35,7 +37,11 @@ type PlotOpts = {
   textHeight?: number
   lineWidth?:number
   coalesce?:boolean
+  fixedRange?:[number,number]
+  dataXScale?:number
 }
+
+const piPi = Math.PI *2;
 
 export const createScales = (buffer:MapOfMutable<number, CircularArray<number>>) => {
   const seriesNames = buffer.keys();
@@ -45,7 +51,7 @@ export const createScales = (buffer:MapOfMutable<number, CircularArray<number>>)
     if (series === undefined) return;
 
     let {min,max} = minMaxAvg(series);
-    let range = max -min;
+    let range = max - min;
     
     if (range === 0) {
       range = min;
@@ -65,11 +71,16 @@ export const add = (buffer:MapOfMutable<number, CircularArray<number>>, value:nu
 }
 
 export const draw = (buffer:MapOfMutable<number, CircularArray<number>>, drawing:DrawingOpts) => {
-  const {ctx, yLabelWidth, width, height} = drawing;
+  const {fixedRange, ctx, yLabelWidth, width, height} = drawing;
   const showYAxis = drawing.showYAxis ?? true;
-  const series = createScales(buffer);
   const margin = 10;
-  
+  const cap = drawing.capacity === 0 ? buffer.lengthMax : drawing.capacity;
+  let series = createScales(buffer);
+
+  if (fixedRange !== undefined) {
+    series = series.map((s) => ({...s, range: fixedRange[1] - fixedRange[0], min: fixedRange[0], max: fixedRange[1]}));
+  }
+
   ctx.clearRect(0,0,width,height);
   ctx.translate(margin, 0);
 
@@ -80,17 +91,19 @@ export const draw = (buffer:MapOfMutable<number, CircularArray<number>>, drawing
         if (typeof drawing.yAxes === `string` && s.name !== drawing.yAxes) return;
         if (!drawing.yAxes.includes(s.name)) return;
       }
+
       drawSeriesAxis(s, drawing);
       ctx.translate(yLabelWidth + 3, 0);
     });
   }
 
   // Apply margin
-  const plotDrawing =  { ...drawing,
+  const plotDrawing =  { 
+    ...drawing,
     width: width - margin - margin - (showYAxis ? yLabelWidth : 0), 
     height: height - margin - margin,
   }
-  plotDrawing.dataXScale = plotDrawing.width / drawing.capacity,
+  if (plotDrawing.dataXScale === undefined) plotDrawing.dataXScale = plotDrawing.width / cap,
   ctx.translate(0, margin);
 
   // Draw data for each series
@@ -105,7 +118,7 @@ export const draw = (buffer:MapOfMutable<number, CircularArray<number>>, drawing
 }
 
 export const drawSeriesAxis = (series:Series, drawing:DrawingOpts) => {
-  const {ctx, height, palette, width} = drawing;
+  const {ctx, height, palette} = drawing;
 
   // Use axis colour if defined, or otherwise series
   if (palette.has(`series-${series.name}-axis`))
@@ -128,29 +141,40 @@ export const drawSeriesAxis = (series:Series, drawing:DrawingOpts) => {
   ctx.fillText(series.min.toFixed(2), 0, height - drawing.textHeight - y);
   ctx.fillText(series.max.toFixed(2), 0, halfHeight);
   ctx.fillText(mid.toFixed(2), 0, height/2 - halfHeight);
-
 }
 
 export const drawSeries = (series:Series, values:CircularArray<number>, drawing:DrawingOpts) => {
-  const {ctx, height, width, dataXScale = 1, lineWidth = 2} = drawing;
+  const {ctx, height, dataXScale = 1, lineWidth = 2, fixedRange} = drawing;
   let x = 0;
   let leadingEdge:Point|undefined;
-  ctx.beginPath();
-  ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = drawing.palette.getOrAdd(`series-${series.name}`);
+  
+  const style = drawing.style ?? `connected`;
+  if(style === `dots`) { 
+    ctx.fillStyle = drawing.palette.getOrAdd(`series-${series.name}`);
+  } else {
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = drawing.palette.getOrAdd(`series-${series.name}`);
+  } 
 
   const incrementBy = drawing.coalesce ? 
     drawing.dataXScale! < 0 ? Math.floor((1/drawing.dataXScale!)) : 1
     : 1;
   for (let i=0; i<values.length; i += incrementBy) {
-    let y = (1- (values[i] - series.min) / series.range) * height;
-    if (i == 0) ctx.moveTo(x, y);
-    ctx.lineTo(x, y);
-    x += dataXScale;
-
+    let y = (1 - (values[i] - series.min) / series.range) * height + 5;
+    
+    if (style === `dots`) {
+      ctx.beginPath();
+      ctx.arc(x, y, lineWidth, 0, piPi);
+      ctx.fill();
+    } else  {
+      if (i == 0) ctx.moveTo(x, y);
+      ctx.lineTo(x, y);
+    }
     if (i +1 == values.pointer) {
       leadingEdge = {x, y}
     }
+    x += dataXScale;
   }
   ctx.stroke();
   
@@ -191,15 +215,23 @@ export const drawSeries = (series:Series, values:CircularArray<number>, drawing:
  * @param {PlotOpts} opts
  * @return {*} 
  */
-export const plot2 = (parentElOrQuery:string|HTMLElement, opts:PlotOpts) => {
+export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter => {
   const parentEl = resolveEl(parentElOrQuery);
-  if (parentEl.nodeName === `CANVAS`) throw new Error(`Parent element should be a container, not a CANVAS`);
-  
-  // Create a CANVAS that fills parent
-  const canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
-  canvasEl.style.width = '100%';
-  canvasEl.style.height = '100%';
-  parentEl.append(canvasEl);
+  let canvasEl:HTMLCanvasElement;
+  let destroyCanvasEl = true;
+  if (parentEl.nodeName === `CANVAS`)  {
+    // Use provided canvas
+    canvasEl = parentEl as HTMLCanvasElement;  
+    destroyCanvasEl = false;
+  } else {
+    // Create a CANVAS that fills parent
+    console.log('not reusing');
+    canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
+    // canvasEl.style.width = '100%';
+    // canvasEl.style.height = '100%';
+    parentEl.append(canvasEl);
+  }
+
   
   const ctx = canvasEl.getContext(`2d`)!;
   const capacity = opts.capacity ?? 10;
@@ -211,19 +243,25 @@ export const plot2 = (parentElOrQuery:string|HTMLElement, opts:PlotOpts) => {
     capacity, coalesce,
     textHeight: opts.textHeight ?? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
     palette: opts.palette ?? Palette.create(),
+    style: opts.style ?? `connected`,
     width: canvasEl.width,
     height: canvasEl.height,
     ctx: ctx,
     yLabelWidth: 25
   };
 
-  parentSizeCanvas(canvasEl, (args) => {
-    const bounds = args.bounds;
-    drawingOpts = {...drawingOpts, width: bounds.width, height: bounds.height};
-    draw(buffer, drawingOpts);
-  });
+  if (opts.autoSizeCanvas) {
+    parentSizeCanvas(canvasEl, (args) => {
+      const bounds = args.bounds;
+      drawingOpts = {...drawingOpts, width: bounds.width, height: bounds.height};
+      draw(buffer, drawingOpts);
+    });
+  }
 
   return {
+    dispose: () => {
+      if (destroyCanvasEl) canvasEl.remove();
+    },
     add: (value:number, series = "", skipDrawing = false) => {
       add(buffer, value, series);
       if (skipDrawing) return;
@@ -233,4 +271,10 @@ export const plot2 = (parentElOrQuery:string|HTMLElement, opts:PlotOpts) => {
       buffer.clear();
     }
   }
+}
+
+export type Plotter = {
+  add(value:number, series?:string, skipDrawing?:boolean):void
+  clear():void
+  dispose():void
 }

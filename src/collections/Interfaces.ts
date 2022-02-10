@@ -300,7 +300,8 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
  * @template M Type of data structure managing values
  */
  export interface MapOfMutable<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
-/**
+
+  /**
  * Returns a human-readable rendering of contents 
  */
   debugString():string
@@ -370,6 +371,10 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
  */
   get isEmpty():boolean
 
+  /**
+   * REturns the length of the longest child item
+   */
+  get lengthMax():number; 
 /**
  * Finds the first key where value is stored. 
  * Note: value could be stored in multiple keys

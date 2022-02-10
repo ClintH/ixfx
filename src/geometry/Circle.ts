@@ -128,7 +128,7 @@ export const isIntersecting = (a:CirclePositioned, b:CirclePositioned):boolean =
  * @returns Points of intersection, or an empty list if there are none
  */
 export const intersections = (a:CirclePositioned, b:CirclePositioned):readonly Points.Point[] => {
-  const vector = Points.diff(b, a);
+  const vector = Points.subtract(b, a);
   const centerD = Math.sqrt((vector.y*vector.y) + (vector.x*vector.x));
 
   // Do not intersect
@@ -154,7 +154,7 @@ export const intersections = (a:CirclePositioned, b:CirclePositioned):readonly P
   };
   return [
     Points.sum(centroid, intersection),
-    Points.diff(centroid, intersection)
+    Points.subtract(centroid, intersection)
   ];
 };
 

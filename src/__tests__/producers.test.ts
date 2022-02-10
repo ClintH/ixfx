@@ -1,4 +1,4 @@
-import {pingPong, pingPongPercent} from '../Generators.js';
+import {pingPong, pingPongPercent} from '../modulation/PingPong.js';
 
 const testNumeric = (given: number[], expectedRange: number[]) => {
   expect(given.length).toEqual(expectedRange.length);

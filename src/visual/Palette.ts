@@ -37,6 +37,8 @@ export type Palette = {
    */
   //eslint-disable-next-line functional/no-method-signature
   add(key:string, value:string):void
+
+  alias(from:string, to:string):void
 };
 
 export const create = (fallbacks?:readonly string[]):Palette => new PaletteImpl(fallbacks);

@@ -3,3 +3,4 @@
 // export {Easing, Envelope};
 export * from './Easing.js';
 export * from './Envelope.js';
+export * as Oscillators from './Oscillator.js';

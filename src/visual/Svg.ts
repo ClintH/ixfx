@@ -1,8 +1,9 @@
 
 import {CirclePositioned} from "~/geometry/Circle.js";
-import {Line} from "~/geometry/Line.js";
+import * as Lines from "~/geometry/Line.js";
 import {Path} from "~/geometry/Path";
-import {Point} from "~/geometry/Point.js";
+import * as Points from "~/geometry/Point.js";
+import {Palette} from ".";
 
 export type DrawingOpts = {
   readonly strokeStyle?:string
@@ -91,7 +92,7 @@ const createOrResolve = <V extends SVGElement>(parent:SVGElement, type:string, q
   return existing as V;
 };
 
-export const lineEl = (line:Line, parent:SVGElement, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement): SVGLineElement => {
+export const lineEl = (line:Lines.Line, parent:SVGElement, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement): SVGLineElement => {
   const lineEl = createOrResolve<SVGLineElement>(parent, `line`, queryOrExisting);
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, line.a.y.toString());
@@ -232,7 +233,7 @@ export const textPathEl = (pathRef:string, text:string, parent:SVGElement, opts?
   return p;
 };
 
-export const textElUpdate = (el:SVGTextElement, pos?:Point, text?:string, opts?:TextDrawingOpts) => {
+export const textElUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, opts?:TextDrawingOpts) => {
   if (pos) {
     el.setAttributeNS(null, `x`, pos.x.toString());
     el.setAttributeNS(null, `y`, pos.y.toString());  
@@ -243,7 +244,7 @@ export const textElUpdate = (el:SVGTextElement, pos?:Point, text?:string, opts?:
   }
 };
 
-export const textEl = (pos:Point, text:string, parent:SVGElement, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement): SVGTextElement => {
+export const textEl = (pos:Points.Point, text:string, parent:SVGElement, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement): SVGTextElement => {
   const p = createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting);
   
   textElUpdate(p, pos, text, opts);
@@ -273,8 +274,8 @@ export const applyOpts = (elem:SVGElement, opts:DrawingOpts) => {
 export const svg = (parent:SVGElement, opts?:DrawingOpts) => {
   if (opts) applyOpts(parent, opts);
   const o = {
-    text:(pos:Point, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => textEl(pos, text, parent, opts, queryOrExisting),
-    line:(line:Line, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement) => lineEl(line, parent, opts, queryOrExisting),
+    text:(pos:Points.Point, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => textEl(pos, text, parent, opts, queryOrExisting),
+    line:(line:Lines.Line, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement) => lineEl(line, parent, opts, queryOrExisting),
     circle:(circle:CirclePositioned, opts?:DrawingOpts, queryOrExisting?:string|SVGCircleElement) => circleEl(circle, parent, opts,  queryOrExisting),
     path:(svgStr:string|readonly string[], opts?:DrawingOpts, queryOrExisting?:string|SVGPathElement) => pathEl(svgStr, parent, opts, queryOrExisting),
     query:<V extends SVGElement>(selectors:string):V|null => parent.querySelector(selectors),
@@ -285,6 +286,9 @@ export const svg = (parent:SVGElement, opts?:DrawingOpts) => {
     },
     set width(width:number) {
       parent.setAttributeNS(null, `width`, width.toString());
+    },
+    get parent():SVGElement {
+      return parent;
     },
     get height():number {
       const w = parent.getAttributeNS(null, `height`);
@@ -302,4 +306,34 @@ export const svg = (parent:SVGElement, opts?:DrawingOpts) => {
     }
   };
   return o;
+};
+
+export const grid = (parent:SVGElement, center: Points.Point, spacing: number, width: number, height: number, opts:LineDrawingOpts = {}) => {
+  if (!opts.strokeStyle) opts = {...opts, strokeStyle: Palette.getCssVariable(`bg-dim`, `silver`) };
+  if (!opts.strokeWidth) opts = {...opts, strokeWidth: 1};
+  
+  // Horizontals
+
+  const g = createEl(`g`);
+  applyOpts(g, opts);
+
+  //eslint-disable-next-line functional/no-let
+  let y = 0;
+  //eslint-disable-next-line functional/no-loop-statement
+  while (y < height) {
+    const horiz = Lines.fromNumbers(0, y, width, y);
+    lineEl(horiz, g);
+    y += spacing;
+  }
+
+  // Verticals
+  //eslint-disable-next-line functional/no-let
+  let x = 0;
+  //eslint-disable-next-line functional/no-loop-statement
+  while (x < width) {
+    const vert = Lines.fromNumbers(x, 0, x, height);
+    lineEl(vert, g);
+    x += spacing;
+  }
+  parent.appendChild(g);
 };
