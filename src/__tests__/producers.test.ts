@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {pingPong, pingPongPercent} from '../modulation/PingPong.js';
 
 const testNumeric = (given: number[], expectedRange: number[]) => {
@@ -79,7 +80,7 @@ test(`pingPongPercent`, () => {
   expect(() => pingPongPercent(2).next()).toThrow();
   expect(() => pingPongPercent(-2).next()).toThrow();
   expect(() => pingPongPercent(0).next()).toThrow();
-  expect(() => pingPongPercent(0.1, -1).next()).toThrow();
+  expect(() => pingPongPercent(0.1, -2).next()).toThrow();
   expect(() => pingPongPercent(0.1, 2).next()).toThrow();
 
   // Test counting up to 1
@@ -98,7 +99,7 @@ test(`pingPongPercent`, () => {
   expectedRange = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0];
   given = [];
   count = 11;
-  for (const v of pingPongPercent(-0.1)) {
+  for (const v of pingPongPercent(-0.1, 0, 1, 1)) {
     expect(v).not.toBeUndefined();
     // @ts-ignore
     given.push(v);

@@ -6,7 +6,10 @@ import * as Circles from '../geometry/Circle.js';
 import * as Arcs from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
-import * as color2k from 'color2k';
+import * as Colours from '../visual/Colour.js';
+
+//import * as color2k from 'color2k';
+
 import {stack, Stack} from '../collections/index.js';
 import {resolveEl} from '../dom/Util.js';
 
@@ -382,8 +385,8 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
 
   if (isDebug) {
     stack = stack.push(optsOp({...opts, 
-      strokeStyle: color2k.transparentize(opts.strokeStyle ?? `silver`, 0.6),
-      fillStyle: color2k.transparentize(opts.fillStyle ?? `yellow`, 0.4)}));
+      strokeStyle: Colours.opacity(opts.strokeStyle ?? `silver`, 0.6),
+      fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4)}));
 
     stack.apply();
     ctx.moveTo(a.x, a.y);
@@ -426,8 +429,8 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
      * ctx.strokeStyle = opts.strokeStyle ?? `gray`;
      */
     stack = stack.push(optsOp({...opts, 
-      strokeStyle: color2k.transparentize(opts.strokeStyle ?? `silver`, 0.6),
-      fillStyle: color2k.transparentize(opts.fillStyle ?? `yellow`, 0.4)}));
+      strokeStyle: Colours.opacity(opts.strokeStyle ?? `silver`, 0.6),
+      fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4)}));
     connectedPoints(ctx, [a, quadratic, b]);
 
     ctx.fillText(`a`, a.x + 5, a.y);

@@ -3,8 +3,7 @@ import * as Svg from './Svg.js';
 import * as Plot from './Plot.js';
 import * as DictionaryOfColourCombinations from './DictionaryOfColourCombinations';
 import * as Palette from  './Palette';
-
 export {Palette, Drawing, Svg, Plot, DictionaryOfColourCombinations};
 
-//import {Palette} from './Palette';
-//export {Palette};
+export * as Colour from './Colour.js';
+

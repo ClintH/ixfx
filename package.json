@@ -25,7 +25,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "develop": "tsc --watch",
+    "develop_": "tsc --watch",
+    "dev": "tsup --watch",
     "clean": "rimraf dist && rimraf etc",
     "run": "tsc && node -r source-map-support/register",
     "bundle": "tsup --sourcemap && npm run typings",
@@ -55,7 +56,6 @@
     "@types/jest": "^27.4.0",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
-    "color2k": "^1.2.5",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "esbuild": "^0.14.17",

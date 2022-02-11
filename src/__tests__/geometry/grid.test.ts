@@ -1,16 +1,39 @@
-import * as Grid from '../../geometry/Grid.js';
+
+import * as Grids from '../../geometry/Grid.js';
+
+test(`cells`, () => {
+  const g = {rows: 3, cols: 3};
+  const expected = [
+    {x: 0, y: 0}, {x: 1, y: 0}, {x:2, y:0},
+    {x: 0, y: 1}, {x: 1, y: 1}, {x:2, y:1},
+    {x: 0, y: 2}, {x: 1, y: 2}, {x:2, y:2}
+  ];
+  const r = [...Grids.cells(g, {x:0, y:0})];
+  expect(r).toEqual(expected);
+});
+
+test(`rows`, () => {
+  const g = {rows: 3, cols: 3};
+  const expected = [
+    [{x: 0, y: 0}, {x: 1, y: 0}, {x:2, y:0}],
+    [{x: 0, y: 1}, {x: 1, y: 1}, {x:2, y:1}],
+    [{x: 0, y: 2}, {x: 1, y: 2}, {x:2, y:2}]
+  ];
+  const r = [...Grids.rows(g, {x:0, y:0})];
+  expect(r).toEqual(expected);
+});
 
 test(`getVectorFromCardinal`, () => {
-  expect(Grid.getVectorFromCardinal(`e`)).toEqual({x: 1, y: 0});
-  expect(Grid.getVectorFromCardinal(``)).toEqual({x: 0, y: 0});
-  expect(Grid.getVectorFromCardinal(`ne`)).toEqual({x: 1, y: -1});
+  expect(Grids.getVectorFromCardinal(`e`)).toEqual({x: 1, y: 0});
+  expect(Grids.getVectorFromCardinal(``)).toEqual({x: 0, y: 0});
+  expect(Grids.getVectorFromCardinal(`ne`)).toEqual({x: 1, y: -1});
 });
 
 // test(`offsetCardinal`, () => {
-//   const grid: Grid.Grid = {cols: 10, rows: 10};
+//   const grid: Grids.Grid = {cols: 10, rows: 10};
 
 //   // Middle of last row.
-//   expect(Grid.offsetCardinals(grid, {x: 5, y: 9}, 5, `wrap`)).toEqual({
+//   expect(Grids.offsetCardinals(grid, {x: 5, y: 9}, 5, `wrap`)).toEqual({
 //     e: {x: 0, y: 9},
 //     w: {x: 0, y: 9},
 //     ne: {x: 0, y: 4},
@@ -23,45 +46,45 @@ test(`getVectorFromCardinal`, () => {
 // });
 
 test(`offset`, () => {
-  const grid: Grid.Grid = {cols: 5, rows: 5};
+  const grid: Grids.Grid = {cols: 5, rows: 5};
   const start = {x: 2, y: 2};
 
-  expect(Grid.offset(grid, start, {x: 1, y: 1})).toEqual({x: 3, y: 3});
-  expect(Grid.offset(grid, start, {x: -1, y: -1})).toEqual({x: 1, y: 1});
-  expect(Grid.offset(grid, start, {x: 0, y: 0})).toEqual({x: 2, y: 2});
+  expect(Grids.offset(grid, start, {x: 1, y: 1})).toEqual({x: 3, y: 3});
+  expect(Grids.offset(grid, start, {x: -1, y: -1})).toEqual({x: 1, y: 1});
+  expect(Grids.offset(grid, start, {x: 0, y: 0})).toEqual({x: 2, y: 2});
 
   // Wrap from top left corner to bottom-right
-  expect(Grid.offset(grid, {x: 0, y: 0}, {x: -1, y: -1},  `wrap`)).toEqual({x: 4, y: 4});
-  expect(Grid.offset(grid, {x: 0, y: 0}, {x: -5, y: -5},  `wrap`)).toEqual({x: 0, y: 0});
+  expect(Grids.offset(grid, {x: 0, y: 0}, {x: -1, y: -1},  `wrap`)).toEqual({x: 4, y: 4});
+  expect(Grids.offset(grid, {x: 0, y: 0}, {x: -5, y: -5},  `wrap`)).toEqual({x: 0, y: 0});
 
   // Wrap from bottom right to top-left
-  expect(Grid.offset(grid, {x: 4, y: 4}, {x: 1, y: 1}, `wrap`)).toEqual({x: 0, y: 0});
-  expect(Grid.offset(grid, {x: 4, y: 4}, {x: 10, y: 10},  `wrap`)).toEqual({x: 4, y: 4});
+  expect(Grids.offset(grid, {x: 4, y: 4}, {x: 1, y: 1}, `wrap`)).toEqual({x: 0, y: 0});
+  expect(Grids.offset(grid, {x: 4, y: 4}, {x: 10, y: 10},  `wrap`)).toEqual({x: 4, y: 4});
 
   // Wrap along horizontal & vertical axis
-  expect(Grid.offset(grid, start, {x: -5, y: 0},  `wrap`)).toEqual({x: 2, y: 2});
-  expect(Grid.offset(grid, start, {x: 0, y: -10},  `wrap`)).toEqual({x: 2, y: 2});
+  expect(Grids.offset(grid, start, {x: -5, y: 0},  `wrap`)).toEqual({x: 2, y: 2});
+  expect(Grids.offset(grid, start, {x: 0, y: -10},  `wrap`)).toEqual({x: 2, y: 2});
 
   // Stop at edge
-  expect(Grid.offset(grid, start, {x: -5, y: 0},  `stop`)).toEqual({x: 0, y: 2});
-  expect(Grid.offset(grid, start, {x: 0, y: 5},  `stop`)).toEqual({x: 2, y: 4});
-  expect(Grid.offset(grid, start, {x: -5, y: -5},  `stop`)).toEqual({x: 0, y: 0});
+  expect(Grids.offset(grid, start, {x: -5, y: 0},  `stop`)).toEqual({x: 0, y: 2});
+  expect(Grids.offset(grid, start, {x: 0, y: 5},  `stop`)).toEqual({x: 2, y: 4});
+  expect(Grids.offset(grid, start, {x: -5, y: -5},  `stop`)).toEqual({x: 0, y: 0});
 
 
   // Undefined
-  expect(Grid.offset(grid, start, {x: -5, y: 0},  `undefined`)).toBeUndefined();
-  expect(Grid.offset(grid, start, {x: 0, y: 5},  `undefined`)).toBeUndefined();
-  expect(Grid.offset(grid, start, {x: -5, y: -5},  `undefined`)).toBeUndefined();
+  expect(Grids.offset(grid, start, {x: -5, y: 0},  `undefined`)).toBeUndefined();
+  expect(Grids.offset(grid, start, {x: 0, y: 5},  `undefined`)).toBeUndefined();
+  expect(Grids.offset(grid, start, {x: -5, y: -5},  `undefined`)).toBeUndefined();
 
 });
 
 test(`visitForRow`, () => {
-  const grid: Grid.Grid = {cols: 5, rows: 5};
+  const grid: Grids.Grid = {cols: 5, rows: 5};
   const start = {x: 2, y: 2};
 
-  const visitor = Grid.visitorRow;
+  const visitor = Grids.visitorRow;
 
-  const visitorSteps = (steps:number) => Grid.visitFor(grid, start, steps, visitor);
+  const visitorSteps = (steps:number) => Grids.visitFor(grid, start, steps, visitor);
 
   expect(() => visitorSteps(0.5)).toThrow();
   expect(() => visitorSteps(NaN)).toThrow();
@@ -94,12 +117,12 @@ test(`visitForRow`, () => {
 });
 
 test(`visitForCol`, () => {
-  const grid: Grid.Grid = {cols: 5, rows: 5};
+  const grid: Grids.Grid = {cols: 5, rows: 5};
   const start = {x: 2, y: 2};
 
-  const visitor = Grid.visitorColumn;
+  const visitor = Grids.visitorColumn;
 
-  const visitorSteps = (steps:number) => Grid.visitFor(grid, start, steps, visitor);
+  const visitorSteps = (steps:number) => Grids.visitFor(grid, start, steps, visitor);
 
   expect(() => visitorSteps(0.5)).toThrow();
   expect(() => visitorSteps(NaN)).toThrow();

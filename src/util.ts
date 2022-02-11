@@ -1,5 +1,7 @@
 import { number as guardNumber} from "./Guards.js";
 
+export const startsEnds = (v:string, start:string, end:string):boolean => v.startsWith(start) && v.endsWith(end);
+
 /**
  * Clamps a value between min and max (both inclusive)
  * Defaults to a 0-1 range, useful for percentages.

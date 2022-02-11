@@ -1,9 +1,20 @@
 
-import {CirclePositioned} from "~/geometry/Circle.js";
-import * as Lines from "~/geometry/Line.js";
-import {Path} from "~/geometry/Path";
-import * as Points from "~/geometry/Point.js";
-import {Palette} from ".";
+import {CirclePositioned} from "../geometry/Circle.js";
+import {markerPrebuilt} from "./SvgMarkers.js";
+import * as Lines from "../geometry/Line.js";
+import * as Points from "../geometry/Point.js";
+
+import * as Elements from "./SvgElements.js";
+
+export type MarkerOpts = DrawingOpts & {
+  readonly id: string,
+  readonly markerWidth?: number,
+  readonly markerHeight?: number,
+  readonly orient?: string,
+  readonly viewBox?: string,
+  readonly refX?: number,
+  readonly refY?: number
+}
 
 export type DrawingOpts = {
   readonly strokeStyle?:string
@@ -34,46 +45,14 @@ export type TextPathDrawingOpts = TextDrawingOpts & {
 }
 
 /**
- * Creates and adds an SVG path element
- * @example
- * ```js
- * const paths = [
- *  `M300,200`,
- *  `a25,25 -30 0,1 50, -25 l 50,-25`
- * ]
- * createPath(paths, parentEl);
- * ```
- * @param svgOrArray Path syntax, or array of paths
- * @param parent SVG parent 
- * @param opts Options
+ * Creates and appends a SVG element. 
+ * If `queryOrExisting` is specified, element will be returned if it already exists.
+ * @param parent Parent element
+ * @param type Type of SVG element
+ * @param queryOrExisting Query, eg `#id`
  * @returns 
  */
-export const pathEl = (svgOrArray: string|readonly string[], parent: SVGElement, opts?:DrawingOpts, queryOrExisting?:string|SVGPathElement): SVGPathElement => {
-  //const p = document.createElementNS(`http://www.w3.org/2000/svg`, `path`);
-  const p = createOrResolve<SVGPathElement>(parent, `path`, queryOrExisting);
-
-  const svg = typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
-
-  p.setAttributeNS(null, `d`, svg);
-  parent.appendChild(p);
-  if (opts) applyOpts(p, opts);
-  return p;
-};
-
-export const circleUpdate = (el:SVGCircleElement, circle:CirclePositioned, opts?:DrawingOpts) => {
-  el.setAttributeNS(null, `cx`, circle.x.toString());
-  el.setAttributeNS(null, `cy`, circle.y.toString());
-  el.setAttributeNS(null, `r`, circle.radius.toString());
-  if (opts) applyOpts(el, opts);
-};
-
-export const circleEl = (circle:CirclePositioned, parent:SVGElement, opts?:DrawingOpts, queryOrExisting?:string|SVGCircleElement): SVGCircleElement => {
-  const p = createOrResolve<SVGCircleElement>(parent, `circle`, queryOrExisting);
-  circleUpdate(p, circle, opts);
-  return p;
-};
-
-const createOrResolve = <V extends SVGElement>(parent:SVGElement, type:string, queryOrExisting?:string|V):V => {
+export const createOrResolve = <V extends SVGElement>(parent:SVGElement, type:string, queryOrExisting?:string|V):V => {
   //eslint-disable-next-line functional/no-let
   let existing = null;
   if (queryOrExisting !== undefined) {
@@ -92,22 +71,6 @@ const createOrResolve = <V extends SVGElement>(parent:SVGElement, type:string, q
   return existing as V;
 };
 
-export const lineEl = (line:Lines.Line, parent:SVGElement, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement): SVGLineElement => {
-  const lineEl = createOrResolve<SVGLineElement>(parent, `line`, queryOrExisting);
-  lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
-  lineEl.setAttributeNS(null, `y1`, line.a.y.toString());
-  lineEl.setAttributeNS(null, `x2`, line.b.x.toString());
-  lineEl.setAttributeNS(null, `y2`, line.b.y.toString());
-  if (opts) applyOpts(lineEl, opts);
-  if (opts) applyPathOpts(lineEl, opts);
-  return lineEl;
-};
-
-const numOrPerctange = (v:number):string => {
-  if (v >= 0 && v <= 1) return (v*100) + `%`;
-  return v.toString();
-};
-
 /**
  * Adds definition if it doesn't already exist
  * @param parent 
@@ -115,62 +78,19 @@ const numOrPerctange = (v:number):string => {
  * @param creator 
  * @returns 
  */
-export const getOrCreateDef = (parent:SVGElement, id:string, creator:()=>SVGElement|undefined):SVGElement => {
-
+export const getOrCreateDefX = (parent:SVGElement, id:string, creator:()=>SVGElement|undefined):SVGElement => {
   const created = creator();
   if (created === undefined) throw new Error(`Could not create def ${id}`);
   return created;
 };
 
-const markerPrebuilt = (elem:SVGElement|null, opts:MarkerOpts, context:DrawingOpts):string => {
-  if (elem === null) return `(elem null)`;
-
-  const parent = elem.ownerSVGElement;
-  if (parent === null) throw new Error(`parent for elem is null`);
-  const defsEl = createOrResolve<SVGDefsElement>(parent, `defs`, `defs`);
-  
-  //eslint-disable-next-line functional/no-let
-  let defEl = defsEl.querySelector(`#${opts.id}`) as SVGElement|null;
-
-  if (defEl !== null) {
-    return `url(${opts.id})`;
-  }
-
-  if (opts.id === `triangle`) {
-    opts = {...opts, strokeStyle: `transparent`};
-    if (!opts.markerHeight) opts =  {...opts, markerHeight: 6};
-    if (!opts.markerWidth) opts =  {...opts, markerWidth: 6};
-    if (!opts.refX) opts = {...opts, refX: opts.markerWidth};
-    if (!opts.refY) opts = {...opts, refY: opts.markerHeight};
-    if (!opts.fillStyle || opts.fillStyle === `none`) opts = {...opts, fillStyle: `black`};
-    if (!opts.viewBox) opts = {...opts, viewBox: `0 0 10 10`};
-
-    defEl = createMarker(opts.id, opts, () => {
-      const tri = createEl<SVGPathElement>(`path`);
-      tri.setAttribute(`d`, `M 0 0 L 10 5 L 0 10 z`);
-      if (opts) applyOpts(tri, opts);
-      return tri;
-    });
-  } else throw new Error(`Do not know how to make ${opts.id}`);
-
-  //eslint-disable-next-line functional/immutable-data
-  defEl.id = opts.id;
-  defsEl.appendChild(defEl);
-  
-  return `url(#${opts.id})`;
-};
-
-type MarkerOpts = DrawingOpts & {
-  readonly id:string,
-  readonly markerWidth?:number,
-  readonly markerHeight?:number,
-  readonly orient?:string,
-  readonly viewBox?:string,
-  readonly refX?:number,
-  readonly refY?:number
-}
-
-const createEl = <V extends SVGElement>(type:string, id?:string):V => {
+/**
+ * Creates an element of `type` and with `id` (if specified)
+ * @param type Element type, eg `circle` 
+ * @param id Optional id to assign to element
+ * @returns Element
+ */
+export const createEl = <V extends SVGElement>(type:string, id?:string):V => {
   const m = document.createElementNS(`http://www.w3.org/2000/svg`, type) as V;
   if (id) {
     //eslint-disable-next-line functional/immutable-data
@@ -179,82 +99,10 @@ const createEl = <V extends SVGElement>(type:string, id?:string):V => {
   return m;
 };
 
-const createMarker = (id:string, opts:MarkerOpts, childCreator?:()=>SVGElement):SVGMarkerElement => {
-  const m = createEl<SVGMarkerElement>(`marker`, id);
-  
-  if (opts.markerWidth) m.setAttribute(`markerWidth`, opts.markerWidth?.toString());
-  if (opts.markerHeight) m.setAttribute(`markerHeight`, opts.markerHeight?.toString());
-  if (opts.orient) m.setAttribute(`orient`, opts.orient.toString());
-  else m.setAttribute(`orient`, `auto-start-reverse`);
-
-  if (opts.viewBox) m.setAttribute(`viewBox`, opts.viewBox.toString());
-  if (opts.refX) m.setAttribute(`refX`, opts.refX.toString());
-  if (opts.refY) m.setAttribute(`refY`, opts.refY.toString());
-
-  if (childCreator) {
-    const c = childCreator();
-    m.appendChild(c);
-  }
-  return m;
-};
-
-const applyPathOpts = (elem:SVGElement, opts:PathDrawingOpts) => {
-  if (opts.markerEnd) {
-    elem.setAttribute(`marker-end`, markerPrebuilt(elem, opts.markerEnd, opts as DrawingOpts));
-  }
+export const applyPathOpts = (elem:SVGElement, opts:PathDrawingOpts) => {
+  if (opts.markerEnd) elem.setAttribute(`marker-end`, markerPrebuilt(elem, opts.markerEnd, opts as DrawingOpts));
   if (opts.markerStart) elem.setAttribute(`marker-end`, markerPrebuilt(elem, opts.markerStart, opts as DrawingOpts));
   if (opts.markerMid) elem.setAttribute(`marker-end`, markerPrebuilt(elem, opts.markerMid, opts as DrawingOpts));
-};
-
-export const textPathUpdate = (el:SVGTextPathElement, text?:string, opts?:TextPathDrawingOpts) => {
-  if (opts?.method) el.setAttributeNS(null, `method`, opts.method);
-  if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
-  if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
-  if (opts?.startOffset) {
-    el.setAttributeNS(null, `startOffset`, numOrPerctange(opts.startOffset));
-  }
-  if (opts?.textLength) el.setAttributeNS(null, `textLength`, numOrPerctange(opts.textLength));
-  
-  if (text) {
-    //eslint-disable-next-line functional/immutable-data
-    el.textContent = text;
-  }
-};
-
-export const textPathEl = (pathRef:string, text:string, parent:SVGElement, opts?:TextPathDrawingOpts, queryOrExisting?:string):SVGTextPathElement => {
-  const textEl = createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting+`-text`);
-  // Update text properties, but don't pass in position or text
-  textElUpdate(textEl, undefined, undefined, opts);
-  
-  const p = createOrResolve<SVGTextPathElement>(textEl, `textPath`, queryOrExisting);
-  p.setAttributeNS(null, `href`, pathRef);
-  textPathUpdate(p, text, opts);
-  if (opts) applyOpts(p, opts);
-  return p;
-};
-
-export const textElUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, opts?:TextDrawingOpts) => {
-  if (pos) {
-    el.setAttributeNS(null, `x`, pos.x.toString());
-    el.setAttributeNS(null, `y`, pos.y.toString());  
-  }
-  if (text) {
-    //eslint-disable-next-line functional/immutable-data
-    el.textContent = text;
-  }
-};
-
-export const textEl = (pos:Points.Point, text:string, parent:SVGElement, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement): SVGTextElement => {
-  const p = createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting);
-  
-  textElUpdate(p, pos, text, opts);
-
-  if (opts) {
-    applyOpts(p, opts);
-    if (opts.anchor) p.setAttributeNS(null, `text-anchor`, opts.anchor);
-    if (opts.align) p.setAttributeNS(null, `alignment-baseline`, opts.align);
-  }
-  return p;
 };
 
 /**
@@ -271,13 +119,15 @@ export const applyOpts = (elem:SVGElement, opts:DrawingOpts) => {
   if (opts.strokeDash) elem.setAttribute(`stroke-dasharray`, opts.strokeDash);
 };
 
-export const svg = (parent:SVGElement, opts?:DrawingOpts) => {
-  if (opts) applyOpts(parent, opts);
+export const svg = (parent:SVGElement, parentOpts?:DrawingOpts) => {
+  if (parentOpts) applyOpts(parent, parentOpts);
   const o = {
-    text:(pos:Points.Point, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => textEl(pos, text, parent, opts, queryOrExisting),
-    line:(line:Lines.Line, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement) => lineEl(line, parent, opts, queryOrExisting),
-    circle:(circle:CirclePositioned, opts?:DrawingOpts, queryOrExisting?:string|SVGCircleElement) => circleEl(circle, parent, opts,  queryOrExisting),
-    path:(svgStr:string|readonly string[], opts?:DrawingOpts, queryOrExisting?:string|SVGPathElement) => pathEl(svgStr, parent, opts, queryOrExisting),
+    text:(text:string, pos:Points.Point, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => Elements.textEl(text, parent, pos, opts, queryOrExisting),
+    textPath:(pathRef:string, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextPathElement) => Elements.textPathEl(pathRef, text, parent, opts, queryOrExisting),
+    line:(line:Lines.Line, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement) => Elements.lineEl(line, parent, opts, queryOrExisting),
+    circle:(circle:CirclePositioned, opts?:DrawingOpts, queryOrExisting?:string|SVGCircleElement) => Elements.circleEl(circle, parent, opts,  queryOrExisting),
+    path:(svgStr:string|readonly string[], opts?:DrawingOpts, queryOrExisting?:string|SVGPathElement) => Elements.pathEl(svgStr, parent, opts, queryOrExisting),
+    grid:(center:Points.Point, spacing:number, width:number, height:number, opts?:DrawingOpts) => Elements.grid(parent, center, spacing, width, height, opts),
     query:<V extends SVGElement>(selectors:string):V|null => parent.querySelector(selectors),
     get width():number {
       const w = parent.getAttributeNS(null, `width`);
@@ -308,32 +158,3 @@ export const svg = (parent:SVGElement, opts?:DrawingOpts) => {
   return o;
 };
 
-export const grid = (parent:SVGElement, center: Points.Point, spacing: number, width: number, height: number, opts:LineDrawingOpts = {}) => {
-  if (!opts.strokeStyle) opts = {...opts, strokeStyle: Palette.getCssVariable(`bg-dim`, `silver`) };
-  if (!opts.strokeWidth) opts = {...opts, strokeWidth: 1};
-  
-  // Horizontals
-
-  const g = createEl(`g`);
-  applyOpts(g, opts);
-
-  //eslint-disable-next-line functional/no-let
-  let y = 0;
-  //eslint-disable-next-line functional/no-loop-statement
-  while (y < height) {
-    const horiz = Lines.fromNumbers(0, y, width, y);
-    lineEl(horiz, g);
-    y += spacing;
-  }
-
-  // Verticals
-  //eslint-disable-next-line functional/no-let
-  let x = 0;
-  //eslint-disable-next-line functional/no-loop-statement
-  while (x < width) {
-    const vert = Lines.fromNumbers(x, 0, x, height);
-    lineEl(vert, g);
-    x += spacing;
-  }
-  parent.appendChild(g);
-};
