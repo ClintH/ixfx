@@ -1,4 +1,5 @@
-import {Rects} from "./index.js";
+import { Rects} from "./index.js";
+import {interpolate as lineInterpolate} from './Line';
 
 /**
  * A point, consisting of x, y and maybe z fields.
@@ -195,14 +196,16 @@ export const withinRange = (a:Point, b:Point, maxRange:Point|number):boolean => 
 /**
  * Returns a relative point between two points
  * ```js
- * lerp(a, b, 0.5); // Halfway point between a and b
+ * interpolate(a, b, 0.5); // Halfway point between a and b
  * ```
- * @param amt Relative amount, 0-1
+ * 
+ * Alias for Lines.interpolate(amount, a, b);
+ * @param amount Relative amount, 0-1
  * @param a 
  * @param b 
  * @returns {@link Point}
  */
-export const lerp =(a:Point, b:Point, amt:number):Point => ({x: (1-amt) * a.x + amt * b.x, y:(1-amt) * a.y + amt * b.y });
+export const interpolate =(amount:number, a:Point, b:Point):Point => lineInterpolate(amount, a, b); //({x: (1-amt) * a.x + amt * b.x, y:(1-amt) * a.y + amt * b.y });
 
 /**
  * Returns a point from two coordinates or an array of [x,y]

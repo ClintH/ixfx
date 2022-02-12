@@ -9,7 +9,7 @@ export type Path = {
    * @param {number} t Relative position (0.0-1.0)
    * @returns {Point} Point
    */
-  compute(t: number): Points.Point
+  interpolate(t: number): Points.Point
   bbox(): Rects.RectPositioned
   toString(): string
   toSvgString(): readonly string[]

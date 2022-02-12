@@ -84,6 +84,17 @@ export const nearest = (line:Line, p:Points.Point): Points.Point => {
   return {x: a.x + atob.x * t, y: a.y + atob.y * t};
 };
 
+/**
+ * Calculates slope of line
+ * @example
+ * ```js
+ * slope(line);
+ * slope(ptA, ptB)
+ * ```
+ * @param lineOrPoint Line or point. If point is provided, second point must be given too
+ * @param b Second point if needed
+ * @returns 
+ */
 export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => {
   //eslint-disable-next-line functional/no-let
   let a:Points.Point;
@@ -109,9 +120,9 @@ export const extendX = (line:Line, xIntersection:number):Points.Point => {
  * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
  * const extended = extendFromStart(line, 2);
  * ```
- * @param {Line} line
- * @param {number} distance
- * @return {*}  {Line}
+ * @param ine
+ * @param distance
+ * @return Newly extended line
  */
 export const extendFromStart = (line:Line, distance:number):Line => {
   const len = length(line);
@@ -139,13 +150,20 @@ export const distance = (l:Line, p:Points.Point):number => {
   return length(near, p);
 };
 
-export const compute = (a: Points.Point, b: Points.Point, t: number): Points.Point => {
+/**
+ * Calculates a point in-between a and b
+ * @param amount Relative position, 0 being at a, 0.5 being halfway, 1 being at b
+ * @param a Start
+ * @param b End
+ * @returns Point between a and b
+ */
+export const interpolate = (amount: number, a: Points.Point, b: Points.Point): Points.Point => {
   guardPoint(a, `a`);
   guardPoint(b, `b`);
-  guardPercent(t, `t`);
+  guardPercent(amount, `t`);
 
   const d = length(a, b);
-  const d2 = d * (1 - t);
+  const d2 = d * (1 - amount);
 
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
@@ -177,6 +195,11 @@ export const toFlatArray = (a: Points.Point, b: Points.Point): readonly number[]
 
 export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[] => [`M${a.x} ${a.y} L ${b.x} ${b.y}`];
 
+/**
+ * Returns a line from four numbers [x1,y1,x2,y2]
+ * @param arr Array in the form [x1,y1,x2,y2]
+ * @returns Line
+ */
 export const fromArray = (arr: readonly number[]): Line => {
   if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);
   if (arr.length !== 4) throw new Error(`array is expected to have length four`);
@@ -222,7 +245,7 @@ export const toPath = (line:Line): LinePath => {
   return Object.freeze({
     ...line,
     length: () => length(a, b),
-    compute: (t: number) => compute(a, b, t),
+    interpolate: (amount: number) => interpolate(amount, a, b),
     bbox: () => bbox(line),
     toString: () => toString(a, b),
     toFlatArray: () => toFlatArray(a, b),

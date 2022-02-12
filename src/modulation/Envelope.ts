@@ -325,7 +325,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * 
  * ...normally you'd just want:
  * ```js
- * const value = env.compute()[1]; // Get scaled 
+ * const value = env.value; // Get scaled 
  * ```
  * 
  * @example Hold & release
@@ -352,14 +352,17 @@ export interface Adsr extends SimpleEventEmitter<Events> {
   /**
    * Compute value of envelope at this point in time.
    * 
-   * Returns an array of [stage, scaled, raw]. Most likely you want the scaled value:
-   * ```
-   * const v = env.compute()[1];
-   * ```
+   * Returns an array of [stage, scaled, raw]. Most likely you want to use {@link value} to just get the scaled value.
    * @param allowStateChange If true (default) envelope will be allowed to change state if necessary before returning value
    */
   //eslint-disable-next-line functional/no-method-signature
   compute(allowStateChange?:boolean):readonly [stage:string|undefined, scaled:number, raw:number]
+
+  /**
+   * Returns the scaled value
+   * Same as .compute()[1]
+   */
+  get value():number;
  /**
   * Releases a held envelope. Has no effect if envelope was not held or is complete.
   */
@@ -443,6 +446,10 @@ class AdsrImpl extends AdsrBase implements Adsr {
     }
   }
 
+  get value():number {
+    return this.compute(true)[1];
+  }
+
   compute(allowStateChange = true):[stage:string|undefined, scaled:number, raw:number] {
     const [stage, amt] = super.computeRaw(allowStateChange);
     if (stage === undefined) return [undefined, NaN, NaN];
@@ -450,7 +457,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
     let v;
     switch (stage) {
     case `attack`:
-      v = this.attackPath.compute(amt).y;
+      v = this.attackPath.interpolate(amt).y;
       if (this.initialLevelOverride !== undefined) {
         v = scale(v, 0, this.initialLevel, this.initialLevelOverride, this.initialLevel);
       }
@@ -458,7 +465,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
       break;
     case `decay`:
       //Bezier.computeQuadraticSimple(start, end, bend, amt);
-      v = this.decayPath.compute(amt).y;
+      v = this.decayPath.interpolate(amt).y;
       this.releasedAt = v;
       break;
     case `sustain`:
@@ -466,7 +473,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
       this.releasedAt = v;
       break;
     case `release`:
-      v = this.releasePath.compute(amt).y;
+      v = this.releasePath.interpolate(amt).y;
       // Bound release level to the amp level that we released at.
       // ie. when release happens before a stage completes
       if (this.releasedAt !== undefined) v = scale(v, 0, this.sustainLevel, 0, this.releasedAt);

@@ -69,7 +69,7 @@ const guard = (circle:CirclePositioned|Circle) => {
  * @param t Position, 0-1
  * @returns 
  */
-export const compute = (circle:CirclePositioned, t:number):Points.Point => point(circle, t*piPi);
+export const interpolate = (circle:CirclePositioned, t:number):Points.Point => point(circle, t*piPi);
 
 /**
  * Returns circumference of circle
@@ -245,7 +245,7 @@ export const toPath = (circle:CirclePositioned): CircularPath => {
      * @param {t} Relative (0.0-1.0) point
      * @returns {Point} X,y
      */
-    compute: (t:number) => compute(circle, t),
+    interpolate: (t:number) => interpolate(circle, t),
     bbox:() => bbox(circle) as Rects.RectPositioned,
     length: () => length(circle),
     toSvgString: (sweep = true) => toSvg(circle, sweep),

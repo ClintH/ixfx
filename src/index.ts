@@ -6,6 +6,15 @@ export * as Flow from './flow/index.js';
  */
 export * as Drawing from './visual/Drawing.js';
 
+/**
+ * Visuals
+ * 
+ * Overview:
+ * * {@link Colour}: Colour interpolation, scale generation and parsing
+ * * {@link Palette}: Colour palette managment
+ * * {@link Svg}: SVG helper
+ * * {@link Drawing}: Canvas drawing helper
+ */
 export * as Visual from './visual/index.js';
 
 /**

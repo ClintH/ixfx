@@ -42,7 +42,7 @@ export const quadraticSimple = (start: Points.Point, end: Points.Point, bend = 0
   if (isNaN(bend)) throw Error(`bend is NaN`);
   if (bend < -1 || bend > 1) throw Error(`Expects bend range of -1 to 1`);
 
-  const middle = Lines.compute(start, end, 0.5);
+  const middle = Lines.interpolate(0.5, start, end);
   // eslint-disable-next-line functional/no-let
   let target = middle;
   if (end.y < start.y) {
@@ -55,7 +55,7 @@ export const quadraticSimple = (start: Points.Point, end: Points.Point, bend = 0
       {x: Math.min(start.x, end.x), y: Math.max(start.y, end.y)};
   }
 
-  const handle = Lines.compute(middle, target, Math.abs(bend));
+  const handle = Lines.interpolate(Math.abs(bend), middle, target,);
   return quadratic(start, end, handle);
 };
 
@@ -101,7 +101,7 @@ const cubicToPath = (cubic:CubicBezier): CubicBezierPath => {
   return Object.freeze({
     ...cubic,
     length: () => bzr.length(),
-    compute: (t: number) => bzr.compute(t),
+    interpolate: (t: number) => bzr.compute(t),
     bbox: () => {
       const {x, y} = bzr.bbox();
       const xSize = x.size;
@@ -130,7 +130,7 @@ const quadratictoPath = (quadraticBezier:QuadraticBezier): QuadraticBezierPath =
   return Object.freeze({
     ...quadraticBezier,
     length: () => bzr.length(),
-    compute: (t: number) => bzr.compute(t),
+    interpolate: (t: number) => bzr.compute(t),
     bbox: () => {
       const {x, y} = bzr.bbox();
       const xSize = x.size;

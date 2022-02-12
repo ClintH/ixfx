@@ -30,16 +30,62 @@ export type HasCompletion = {
  * A resettable timeout, returned by {@link timeout}
  */
 export type Timeout = HasCompletion & {
-  start(altTimeoutMs?: number): void;
+  start(altTimeoutMs?: number, args?:readonly unknown[]): void;
   cancel(): void;
   get isDone(): boolean;
 }
 
+/**
+ * Creates a debounce function
+ * ```js
+ * // Create
+ * const d = debounce(fn, 1000);
+ * 
+ * // Use
+ * d(); // Only calls fn after 1000s
+ * ```
+ * 
+ * @example Handle most recent pointermove event after 1000ms
+ * ```js
+ * // Set up debounced handler
+ * const moveDebounced = debounce((evt) => {
+ *    // Handle event
+ * }, 500);
+ * 
+ * // Wire up event
+ * el.addEventListener(`pointermove`, moveDebounced);
+ * ```
+ * @param callback 
+ * @param timeoutMs 
+ * @returns 
+ */
 export const debounce = (callback:()=> void, timeoutMs:number) => {
   const t = timeout(callback, timeoutMs);
-  return () => t.start();
+  return (...args:unknown[]) => t.start(undefined, args);
 };
 
+/***
+ * Throttles an function. Callback only triggered after minimum of `intervalMinMs`.
+ * 
+ * @example Only handle move event every 500ms
+ * ```js
+ * const moveThrottled = throttle(args => {
+ *  // Handle
+ * }, 500);
+ * el.addEventListener(`pointermove`, moveThrottled)
+ * ```
+ */
+export const throttle = (callback:(...args:readonly unknown[]) => void, intervalMinMs:number) => {
+  //eslint-disable-next-line functional/no-let
+  let trigger = 0;
+
+  return (...args:unknown[]) => {
+    if (performance.now()-trigger >= intervalMinMs) {
+      callback(args);
+      trigger = performance.now();
+    }
+  };
+};
 
 /**
  * Generates values from `produce` with `intervalMs` time delay
@@ -89,7 +135,7 @@ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs
  * t.start();   // After 1 minute `fn` will run, printing to the console
  * ```
  * 
- * @example More functionality
+ * @example Control execution functionality
  * ```
  * t.cancel();  // Cancel it from running
  * t.start();   // Schedule again after 1 minute
@@ -97,28 +143,43 @@ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs
  * t.isDone;    // True if a scheduled event is pending
  * ```
  * 
+ * Callback function receives any additional parameters passed in from start.
+ * This can be useful for passing through event data:
+ * 
+ * @example
+ * ```js
+ * const t = timeout( (elapsedMs, ...args) => {
+ *  // args contains event data
+ * }, 1000);
+ * el.addEventListener(`click`, t.start);
+ * ```
+ * 
  * @param callback 
  * @param timeoutMs 
  * @returns {@link Timeout}
  */
-export const timeout = (callback:()=>void, timeoutMs:number):Timeout => {
+export const timeout = (callback:(elapsedMs?:number, ...args:readonly unknown[])=>void, timeoutMs:number):Timeout => {
   if (callback === undefined) throw new Error(`callback parameter is undefined`);
   guardInteger(timeoutMs, `aboveZero`, `timeoutMs`);
 
   //eslint-disable-next-line functional/no-let
   let timer = 0;
+  //eslint-disable-next-line functional/no-let
+  let startedAt = 0;
 
-  const start = (altTimeoutMs:number = timeoutMs) => {
+  const start = (altTimeoutMs:number = timeoutMs, ...args:unknown[]) => {
+    startedAt = performance.now();
     guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
     if (timer !== 0) cancel();
     timer = window.setTimeout(() => {
-      callback();
+      callback(performance.now() - startedAt, ...args);
       timer = 0;
     }, altTimeoutMs);
   };
 
   const cancel = () => {
     if (timer === 0) return;
+    startedAt = 0;
     window.clearTimeout(timer);
   };
 
@@ -135,17 +196,33 @@ export const timeout = (callback:()=>void, timeoutMs:number):Timeout => {
  * Runs a function continuously, returned by {@link Continuously}
  */
 export type Continuously = HasCompletion & {
+  /**
+   * Starts loop. If already running, it is reset
+   */
   start(): void
-  get elapsed(): number
+  /**
+   * How many milliseconds since start() was last called
+   */
+  get elapsedMs(): number
+  /**
+   * How many iterations of the loop since start() was last called
+   */
   get ticks(): number
+  /**
+   * Whether loop has finished
+   */
   get isDone(): boolean
-
+  /**
+   * Stops loop
+   */
   cancel(): void
 }
 
 
 /**
- * Returns a {@link Continuously} that continuously executes `callback`. Call `start` to begin.
+ * Returns a {@link Continuously} that continuously executes `callback`. If callback returns _false_, loop exits.
+ * 
+ * Call `start` to begin/reset loop. `cancel` stops loop.
  * 
  * @example Animation loop
  * ```js
@@ -164,13 +241,17 @@ export type Continuously = HasCompletion & {
  * c.start(); // Runs `fn` every minute
  * ```
  * 
- * @example With res
- * @param callback 
- * @param resetCallback 
+ * ```js
+ * c.cancel();
+ * c.elapsedMs;  // How many milliseconds have elapsed since start
+ * c.ticks;      // How many iterations of loop since start
+ * ```
+ * @param callback Function to run. If it returns false, loop exits.
+ * @param resetCallback Callback when/if loop is reset. If it returns false, loop exits
  * @param intervalMs 
  * @returns 
  */
-export const continuously = (callback:(ticks?:number, totalElapsed?:number)=>boolean|void, intervalMs?:number, resetCallback?:((ticks?:number) => boolean|void)):Continuously => {
+export const continuously = (callback:(ticks?:number, elapsedMs?:number)=>boolean|void, intervalMs?:number, resetCallback?:((ticks?:number, elapsedMs?:number) => boolean|void)):Continuously => {
   if (intervalMs !== undefined) guardInteger(intervalMs, `positive`, `intervalMs`);
 
   //eslint-disable-next-line functional/no-let
@@ -201,8 +282,8 @@ export const continuously = (callback:(ticks?:number, totalElapsed?:number)=>boo
   const start = () => {
     // Already running, but theres a resetCallback to check if we should keep going
     if (running && resetCallback !== undefined) {
+      const r = resetCallback(ticks, performance.now() - startedAt);
       startedAt = performance.now();
-      const r = resetCallback(ticks);
       if (r !== undefined && !r) {
         // Reset callback tells us to stop
         cancel();
@@ -225,7 +306,7 @@ export const continuously = (callback:(ticks?:number, totalElapsed?:number)=>boo
     get ticks() {
       return ticks;
     },
-    get elapsed() {
+    get elapsedMs() {
       return performance.now() - startedAt;
     },
     cancel

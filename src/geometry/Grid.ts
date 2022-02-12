@@ -569,25 +569,25 @@ export const visitor = function* (
 export const visitorDepth = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
   select: (nbos) => nbos[nbos.length - 1]
 },
-  grid,
-  start,
-  opts);
+grid,
+start,
+opts);
 
 export const visitorBreadth = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
   select: (nbos) => nbos[0]
 },
-  grid,
-  start,
-  opts);
+grid,
+start,
+opts);
 
 const randomNeighbour = (nbos: readonly Neighbour[]) => randomElement(nbos); // .filter(isNeighbour));
 
 export const visitorRandomContiguous = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
   select: randomNeighbour
 },
-  grid,
-  start,
-  opts);
+grid,
+start,
+opts);
 
 export const visitorRandom = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
   options: (grid, cell) => {
@@ -601,10 +601,9 @@ export const visitorRandom = (grid: Grid, start: Cell, opts: VisitorOpts = {}) =
   },
   select: randomNeighbour
 },
-  grid,
-  start,
-  opts);
-
+grid,
+start,
+opts);
 
 export const visitorRow = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => {
   const {reversed = false} = opts;
@@ -747,19 +746,23 @@ export const visitorColumn = (grid: Grid, start: Cell, opts: VisitorOpts = {}) =
  * @param start 
  */
 export const rows = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
+  //eslint-disable-next-line functional/no-let
   let row = start.y;
+  //eslint-disable-next-line functional/no-let
   let rowCells: Cell[] = [];
+  //eslint-disable-next-line functional/no-loop-statement
   for (const c of cells(grid, start)) {
     if (c.y !== row) {
       yield rowCells;
       rowCells = [c];
       row = c.y;
     } else {
+      //eslint-disable-next-line functional/immutable-data
       rowCells.push(c);
     }
   }
   if (rowCells.length > 0) yield rowCells;
-}
+};
 
 /**
  * Enumerate all cells in an efficient manner. Runs left-to-right, top-to-bottom.

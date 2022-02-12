@@ -3,7 +3,9 @@ import {CirclePositioned} from "../geometry/Circle.js";
 import * as Lines from "../geometry/Line.js";
 import * as Points from "../geometry/Point.js";
 import * as Svg from "./Svg.js";
-import {Palette} from ".";
+import { getCssVariable } from "./Colour.js";
+//import {Palette} from ".";
+
 
 const numOrPercentage = (v:number):string => {
   if (v >= 0 && v <= 1) return (v*100) + `%`;
@@ -132,7 +134,7 @@ export const textEl = (text:string, parent:SVGElement, pos?:Points.Point, opts?:
  * @param opts 
  */
 export const grid = (parent:SVGElement, center: Points.Point, spacing: number, width: number, height: number, opts:Svg.LineDrawingOpts = {}) => {
-  if (!opts.strokeStyle) opts = {...opts, strokeStyle: Palette.getCssVariable(`bg-dim`, `silver`) };
+  if (!opts.strokeStyle) opts = {...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
   if (!opts.strokeWidth) opts = {...opts, strokeWidth: 1};
 
   const g = Svg.createEl(`g`);

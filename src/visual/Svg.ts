@@ -1,10 +1,11 @@
-
 import {CirclePositioned} from "../geometry/Circle.js";
 import {markerPrebuilt} from "./SvgMarkers.js";
 import * as Lines from "../geometry/Line.js";
 import * as Points from "../geometry/Point.js";
-
+//import * as Grids from "../geometry/Grid.js";
 import * as Elements from "./SvgElements.js";
+
+export {Elements};
 
 export type MarkerOpts = DrawingOpts & {
   readonly id: string,

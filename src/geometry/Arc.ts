@@ -135,7 +135,7 @@ export const guard = (arc:Arc|ArcPositioned) => {
 };
 
 
-type Compute = {
+type Interpolate = {
   (arc:Arc, t:number, origin:Points.Point):Points.Point;
   (arc:ArcPositioned, t:number):Points.Point;
 };
@@ -147,7 +147,7 @@ type Compute = {
  * @param origin If arc is not positioned, pass in an origin
  * @returns 
  */
-export const compute:Compute = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
+export const interpolate:Interpolate = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
   guard(arc);
   return point(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t), origin);
 };
@@ -162,7 +162,7 @@ export const toPath = (arc:ArcPositioned): Path => {
 
   return Object.freeze({
     ...arc,
-    compute:(t:number) => compute(arc, t),
+    interpolate:(t:number) => interpolate(arc, t),
     bbox:() => bbox(arc) as Rects.RectPositioned,
     length: () => length(arc),
     toSvgString:() => toSvg(arc),
@@ -184,7 +184,7 @@ export const length = (arc:Arc):number =>  piPi*arc.radius*((arc.startRadian-arc
  */
 export const bbox = (arc:ArcPositioned|Arc):Rects.RectPositioned|Rects.Rect => {
   if (isPositioned(arc)) {
-    const middle = compute(arc, 0.5);
+    const middle = interpolate(arc, 0.5);
     const asLine = toLine(arc);
     return Points.bbox(middle, asLine.a, asLine.b);
   } else {

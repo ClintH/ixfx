@@ -33,6 +33,7 @@ If you want to contribute to ixfx or build it yourself, please see [BUILDING.md]
 ## Credits
 
 Bundles
+* [d3-interpolate](https://github.com/d3/d3-interpolate), [d3-color](https://github.com/d3/d3-color/) by Mike Bostock
 * Easing functions by [Andrey Sitnik and Ivan Solovev](https://easings.net/)
 * [Bezier.js](https://github.com/Pomax/bezierjs)
 * [parse-color](https://github.com/substack/parse-color) by [James Halliday](https://substack.net/) (MIT License)

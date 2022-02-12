@@ -3,7 +3,19 @@ import * as Svg from './Svg.js';
 import * as Plot from './Plot.js';
 import * as DictionaryOfColourCombinations from './DictionaryOfColourCombinations';
 import * as Palette from  './Palette';
-export {Palette, Drawing, Svg, Plot, DictionaryOfColourCombinations};
+import * as Colour from './Colour.js';
 
-export * as Colour from './Colour.js';
+/**
+ * Colour interpolation, scale generation and parsing
+ * 
+ * Overview
+ * * {@link interpolate}: Blend colours
+ * * {@link scale}: Produce colour scale
+ */
+export {Colour};
 
+export {Palette,  Drawing, Svg, Plot, DictionaryOfColourCombinations};
+
+// @ts-ignore
+//eslint-disable-next-line functional/immutable-data
+if (window !== undefined) window.ixfx = {Drawing, Svg, Plot, Palette, Colour};

@@ -1,8 +1,8 @@
 import {Points, Paths, Rects} from './index.js';
 
 export type CompoundPath = Paths.Path & {
-  segments: Paths.Path[]
-  kind: `compound`
+  readonly segments: readonly Paths.Path[]
+  readonly kind: `compound`
 };
 
 /**
@@ -14,7 +14,8 @@ export type CompoundPath = Paths.Path & {
  * @returns {CompoundPath} New compoundpath
  */
 export const setSegment = (compoundPath: CompoundPath, index: number, path: Paths.Path): CompoundPath => {
-  const existing = compoundPath.segments;
+  const existing = [...compoundPath.segments];
+  //eslint-disable-next-line functional/prefer-readonly-type,functional/immutable-data
   existing[index] = path;
   return fromPaths(...existing);
 };
@@ -28,23 +29,27 @@ export const setSegment = (compoundPath: CompoundPath, index: number, path: Path
  * @param {Dimensions} [dimensions] Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-export const compute = (paths: Paths.Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
+export const interpolate = (paths: readonly Paths.Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
 
   // Expected value to land on
   const expected = t * (useWidth ? dimensions.totalWidth : dimensions.totalLength);
+  //eslint-disable-next-line functional/no-let
   let soFar = 0;
 
   // Use widths or lengths?
   const l = useWidth ? dimensions.widths : dimensions.lengths;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i = 0; i < l.length; i++) {
     if (soFar + l[i] >= expected) {
       const relative = expected - soFar;
+      //eslint-disable-next-line functional/no-let
       let amt = relative / l[i];
+      //eslint-disable-next-line functional/no-let
       if (amt > 1) amt = 1;
-      return paths[i].compute(amt);
+      return paths[i].interpolate(amt);
     } else soFar += l[i];
   }
   return {x: 0, y: 0};
@@ -56,26 +61,26 @@ type Dimensions = {
    *
    * @type {number[]}
    */
-  widths: number[],
+  readonly widths: readonly number[],
   /**
    * Length of each path
    *
    * @type {number[]}
    */
-  lengths: number[],
+   readonly lengths: readonly number[],
 
   /**
    * Total length of all paths
    *
    * @type {number}
    */
-  totalLength: number,
+   readonly totalLength: number,
   /**
    * Total width of all paths
    *
    * @type {number}
    */
-  totalWidth: number
+   readonly totalWidth: number
 }
 /**
  * Computes the widths and lengths of all paths, adding them up as well
@@ -83,12 +88,16 @@ type Dimensions = {
  * @param {Paths.Path[]} paths
  * @returns {Dimensions}
  */
-export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
+export const computeDimensions = (paths: readonly Paths.Path[]): Dimensions => {
   const widths = paths.map(l => l.bbox().width);
   const lengths = paths.map(l => l.length());
+  //eslint-disable-next-line functional/no-let
   let totalLength = 0;
+  //eslint-disable-next-line functional/no-let
   let totalWidth = 0;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i = 0; i < lengths.length; i++) totalLength += lengths[i];
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i = 0; i < widths.length; i++) totalWidth += widths[i];
 
   return {totalLength, totalWidth, widths, lengths};
@@ -101,7 +110,7 @@ export const computeDimensions = (paths: Paths.Path[]): Dimensions => {
  * 
  * @returns {Rects.Rect}
  */
-export const bbox = (paths: Paths.Path[]): Rects.RectPositioned => {
+export const bbox = (paths: readonly Paths.Path[]): Rects.RectPositioned => {
   const boxes = paths.map(p => p.bbox());
   const corners = boxes.map(b => Rects.getCorners(b)).flat();
   
@@ -114,15 +123,17 @@ export const bbox = (paths: Paths.Path[]): Rects.RectPositioned => {
  * @param {Paths.Path[]} paths
  * @returns {string}
  */
-export const toString = (paths: Paths.Path[]): string => paths.map(p => p.toString()).join(`, `);
+export const toString = (paths: readonly Paths.Path[]): string => paths.map(p => p.toString()).join(`, `);
 
 /**
  * Throws an error if paths are not connected together, in order
  *
  * @param {Paths.Path[]} paths
  */
-export const guardContinuous = (paths: Paths.Path[]) => {
+export const guardContinuous = (paths: readonly Paths.Path[]) => {
+  //eslint-disable-next-line functional/no-let
   let lastPos = Paths.getEnd(paths[0]);
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i = 1; i < paths.length; i++) {
     const start = Paths.getStart(paths[i]);
     if (!Points.equals(start, lastPos)) throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);
@@ -130,7 +141,7 @@ export const guardContinuous = (paths: Paths.Path[]) => {
   }
 };
 
-export const toSvgString = (paths: Paths.Path[]): readonly string[] => paths.flatMap(p => p.toSvgString());
+export const toSvgString = (paths: readonly Paths.Path[]): readonly string[] => paths.flatMap(p => p.toSvgString());
 
 /**
  * Create a compoundpath from an array of paths.
@@ -139,14 +150,14 @@ export const toSvgString = (paths: Paths.Path[]): readonly string[] => paths.fla
  * @param {...Paths.Path[]} paths
  * @returns {CompoundPath}
  */
-export const fromPaths = (...paths: Paths.Path[]): CompoundPath => {
+export const fromPaths = (...paths: readonly Paths.Path[]): CompoundPath => {
   guardContinuous(paths); // Throws an error if paths are not connected
   const dims = computeDimensions(paths);
 
   return Object.freeze({
     segments: paths,
     length: () => dims.totalLength,
-    compute: (t: number, useWidth = false) => compute(paths, t, useWidth, dims),
+    interpolate: (t: number, useWidth = false) => interpolate(paths, t, useWidth, dims),
     bbox: () => bbox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths),

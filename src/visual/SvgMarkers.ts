@@ -31,7 +31,7 @@ export const markerPrebuilt = (elem: SVGElement | null, opts: MarkerOpts, _conte
   let defEl = defsEl.querySelector(`#${opts.id}`) as SVGElement | null;
 
   if (defEl !== null) {
-    return `url(${opts.id})`;
+    return `url(#${opts.id})`;
   }
 
   if (opts.id === `triangle`) {
