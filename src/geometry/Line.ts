@@ -105,7 +105,9 @@ export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => 
     a = lineOrPoint;
     if (b === undefined) throw new Error(`b parameter required`);
   }
-  return (b!.y - a.y) / (b!.x - a.x);
+  if (b !== undefined) {
+    return (b.y - a.y) / (b.x - a.x);
+  } else throw Error(`Second point missing`);
 };
 
 export const extendX = (line:Line, xIntersection:number):Points.Point => {

@@ -2,79 +2,91 @@
 export type NumberGuardRange = `` | `nonZero` | `positive` | `negative` | `aboveZero` | `belowZero` | `percentage` | `bipolar`;
 
 /**
- * Throws an error if `t` is not a number or within specified range
- * @param t Value to check
- * @param name Name of parameter (for more helpful exception messages)
+ * Throws an error if `t` is not a number or within specified range. 
+ * Alternatives: {@link integer} for additional integer check, {@link percentage}.
+ * 
+ * positive: must be at least zero
+ * negative: must be zero or lower
+ * aboveZero: must be above zero
+ * belowZero: must be below zero
+ * percentage: must be within 0-1, inclusive
+ * nonZero: can be anything except zero
+ * bipolar: can be -1 to 1, inclusive
+ * @param value Value to check
+ * @param paramName Name of parameter (for more helpful exception messages)
  * @param range Range to enforce
  * @returns 
  */
-export const number = (t:number, range:NumberGuardRange = ``, name = `?`):boolean => {
-  if (Number.isNaN(t)) throw new Error(`Parameter '${name}' is NaN`);
-  if (typeof t !== `number`) throw new Error(`Parameter '${name}' does not have type of number (${t})`);
+export const number = (value:number, range:NumberGuardRange = ``, paramName = `?`):boolean => {
+  if (Number.isNaN(value)) throw new Error(`Parameter '${paramName}' is NaN`);
+  if (typeof value !== `number`) throw new Error(`Parameter '${paramName}' does not have type of number (${value})`);
   switch (range) {
   case `positive`:
-    if (t < 0) throw new Error(`Parameter ${name} must be at least zero (${t})`);
+    if (value < 0) throw new Error(`Parameter ${paramName} must be at least zero (${value})`);
     break;
   case `negative`:
-    if (t > 0) throw new Error(`Parameter ${name} must be zero or lower (${t})`);
+    if (value > 0) throw new Error(`Parameter ${paramName} must be zero or lower (${value})`);
     break;
   case `aboveZero`:
-    if (t <= 0) throw new Error(`Parameter ${name} must be above zero (${t})`);
+    if (value <= 0) throw new Error(`Parameter ${paramName} must be above zero (${value})`);
     break;
   case `belowZero`:
-    if (t >= 0) throw new Error(`Parameter ${name} must be below zero (${t})`);
+    if (value >= 0) throw new Error(`Parameter ${paramName} must be below zero (${value})`);
     break;
   case `percentage`:
-    if (t > 1 || t < 0) throw new Error(`Parameter ${name} must be in percentage range (0 to 1). (${t})`);
+    if (value > 1 || value < 0) throw new Error(`Parameter ${paramName} must be in percentage range (0 to 1). (${value})`);
     break;
   case `nonZero`:
-    if (t === 0) throw new Error(`Parameter ${name} must non-zero. (${t})`);
+    if (value === 0) throw new Error(`Parameter ${paramName} must non-zero. (${value})`);
     break;
   case `bipolar`:
-    if (t > 1 || t < -1) throw new Error(`Parameter ${name} must be in bipolar percentage range (-1 to 1). (${t})`);
+    if (value > 1 || value < -1) throw new Error(`Parameter ${paramName} must be in bipolar percentage range (-1 to 1). (${value})`);
     break;
   }
   return true;
 };
 
 /**
- * Throws an error if `t` is not in the range of 0-1.
+ * Throws an error if `value` is not in the range of 0-1.
+ * Equiv to `number(value, `percentage`);`
  * 
  * This is the same as calling ```number(t, `percentage`)```
- * @param t 
- * @param name 
+ * @param value Value to check
+ * @param paramName Param name for customising exception message
  * @returns 
  */
-export const percent = (t: number, name = `?`) => number(t, `percentage`, name);
+export const percent = (value: number, paramName = `?`) => number(value, `percentage`, paramName);
 
 /**
- * Throws an error if `t` is not an integer
- * @param t 
- * @param name 
- * @param range 
+ * Throws an error if `value` is not an integer, or does not meet guard criteria.
+ * See {@link number} for guard details, or use that if integer checking is not required.
+ * @param value Value to check
+ * @param paramName Param name for customising exception message
+ * @param range Guard specifier.
  */
-export const integer = (t:number, range:NumberGuardRange = ``, name = `?`) => {
-  number(t, range, name);
-  if (!Number.isInteger(t)) throw new Error(`Paramter ${name} is not an integer`);
+export const integer = (value:number, range:NumberGuardRange = ``, paramName = `?`) => {
+  // Unit tested
+  number(value, range, paramName);
+  if (!Number.isInteger(value)) throw new Error(`Paramter ${paramName} is not an integer`);
 };
 
 /**
  * Returns true if parameter is an array of strings
- * @param t 
+ * @param value 
  * @returns 
  */
-export const isStringArray = (t:unknown):boolean => {
-  if (!Array.isArray(t)) return false;
-  return t.find(v => typeof v !== `string`) === undefined;
+export const isStringArray = (value:unknown):boolean => {
+  if (!Array.isArray(value)) return false;
+  return value.find(v => typeof v !== `string`) === undefined;
 };
 
 /**
  * Throws an error if parameter is not an array
- * @param t
- * @param name 
+ * @param value
+ * @param paramName 
  */
-export const array = (t: unknown, name = `?`): void => {
-  if (!Array.isArray(t)) throw new Error(`Parameter '${name}' is expected to be an array'`);
+export const array = (value: unknown, paramName = `?`): void => {
+  if (!Array.isArray(value)) throw new Error(`Parameter '${paramName}' is expected to be an array'`);
 };
 
 /** Throws an error if parameter is not defined */

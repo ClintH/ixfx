@@ -121,7 +121,7 @@ export const guard = (arc:Arc|ArcPositioned) => {
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);
   }
-  if (arc.radius === undefined) throw new Error(`Radius undefined`);
+  if (arc.radius === undefined) throw new Error(`Arc radius is undefined (${JSON.stringify(arc)})`);
   if (typeof arc.radius !== `number`) throw new Error(`Radius must be a number`);
   if (Number.isNaN(arc.radius)) throw new Error(`Radius is NaN`);
   if (arc.radius <= 0) throw new Error(`Radius must be greater than zero`);
@@ -136,20 +136,20 @@ export const guard = (arc:Arc|ArcPositioned) => {
 
 
 type Interpolate = {
-  (arc:Arc, t:number, origin:Points.Point):Points.Point;
-  (arc:ArcPositioned, t:number):Points.Point;
+  (amount:number, arc:Arc, origin:Points.Point):Points.Point;
+  (amount:number, arc:ArcPositioned):Points.Point;
 };
 
 /**
  * Compute relative position on arc
  * @param arc Arc
- * @param t Relative position 0-1
+ * @param amount Relative position 0-1
  * @param origin If arc is not positioned, pass in an origin
  * @returns 
  */
-export const interpolate:Interpolate = (arc:ArcPositioned|Arc, t:number, origin?:Points.Point):Points.Point => {
+export const interpolate:Interpolate = (amount:number, arc:ArcPositioned|Arc, origin?:Points.Point):Points.Point => {
   guard(arc);
-  return point(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*t), origin);
+  return point(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*amount), origin);
 };
 
 /**
@@ -162,7 +162,7 @@ export const toPath = (arc:ArcPositioned): Path => {
 
   return Object.freeze({
     ...arc,
-    interpolate:(t:number) => interpolate(arc, t),
+    interpolate:(amount:number) => interpolate(amount, arc),
     bbox:() => bbox(arc) as Rects.RectPositioned,
     length: () => length(arc),
     toSvgString:() => toSvg(arc),
@@ -184,7 +184,7 @@ export const length = (arc:Arc):number =>  piPi*arc.radius*((arc.startRadian-arc
  */
 export const bbox = (arc:ArcPositioned|Arc):Rects.RectPositioned|Rects.Rect => {
   if (isPositioned(arc)) {
-    const middle = interpolate(arc, 0.5);
+    const middle = interpolate(0.5, arc);
     const asLine = toLine(arc);
     return Points.bbox(middle, asLine.a, asLine.b);
   } else {

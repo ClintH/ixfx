@@ -29,7 +29,7 @@ export type CircularPath = Circle & Path & {
  */
 export const isPositioned = (p: Circle | Points.Point): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
-export const isCircle = (p: any): p is Circle => p.radius !== undefined;
+export const isCircle = (p: Circle|CirclePositioned|number): p is Circle => (p as Circle).radius !== undefined;
 
 
 /**

@@ -1,5 +1,5 @@
 // import {sleep} from "./Timer.js";
-import {number as guardNumber} from "./Guards.js";
+import {number as guardNumber, integer as guardInteger} from "./Guards.js";
 export {pingPong, pingPongPercent} from './modulation/PingPong.js';
 
 /**
@@ -30,6 +30,25 @@ export const numericRangeRaw = function* (interval: number, start: number = 0, e
       v += interval;
     }
   } while (repeating);
+};
+
+/**
+ * Iterates over `iterator`, calling `fn` for each value.
+ * If `fn` returns _false_, iterator cancels
+ * @example
+ * ```js
+ * forEach(count(5), () => console.log(`Hi`)); // Prints `Hi` 5x
+ * forEach(count(5), (i) => console.log(i));   // Prints 0 1 2 3 4
+ * ```
+ * @param iterator 
+ * @param fn 
+ */
+export const forEach = <V>(iterator:IterableIterator<V>, fn:(v?:V)=>boolean|void) => {
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const x of iterator) {
+    const r = fn(x);
+    if (typeof r === `boolean` && !r) break;
+  }
 };
 
 /**
@@ -86,6 +105,37 @@ export const numericRange = function* (interval: number, start: number = 0, end?
     }
 
   } while (repeating);
+};
+
+/**
+ * Yields `amount` integers, counting by one from zero. If a negative amount is used,
+ * count decreases. If `offset` is provided, this is added to the return result.
+ * @example
+ * ```js
+ * const a = [...count(5)]; // Yields five numbers: [0,1,2,3,4]
+ * const b = [...count(-5)]; // Yields five numbers: [0,-1,-2,-3,-4]
+ * for (const v of count(5, 5)) {
+ *  // Yields: 5, 6, 7, 8, 9
+ * }
+ * const c = [...count(5,1)]; // Yields [1,2,3,4,5]
+ * ```
+ * @param amount Number of integers to yield 
+ * @param offset Added to result
+ */
+export const count = function* (amount:number, offset:number = 0) {
+  // Unit tested.
+  guardInteger(amount, ``, `amount`);
+  guardInteger(offset, ``, `offset`);
+
+  if (amount === 0) return;
+
+  //eslint-disable-next-line functional/no-let
+  let i = 0;
+  //eslint-disable-next-line functional/no-loop-statement
+  do {
+    if (amount < 0) yield -i + offset;
+    else yield i + offset;
+  } while (i++ < Math.abs(amount) - 1);
 };
 
 /**

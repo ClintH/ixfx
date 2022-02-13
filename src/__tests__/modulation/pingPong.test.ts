@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {pingPong, pingPongPercent} from '../modulation/PingPong.js';
+import {pingPong, pingPongPercent} from '../../modulation/PingPong.js';
 
 const testNumeric = (given: number[], expectedRange: number[]) => {
   expect(given.length).toEqual(expectedRange.length);
@@ -7,6 +7,8 @@ const testNumeric = (given: number[], expectedRange: number[]) => {
     expect(given[i]).toBeCloseTo(expectedRange[i]);
   }
 };
+
+
 
 test(`pingPong`, () => {
   expect(() => pingPong(20, 2, 10).next()).toThrow();    // Interval too large

@@ -80,7 +80,7 @@ export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResized?
  * @param timeoutMs Timeout for debouncing events
  * @returns 
  */
-export const parentSize = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>)=>void, timeoutMs:number = 100) => {
+export const parentSize = <V extends HTMLElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>)=>void, timeoutMs:number = 100) => {
   const el = resolveEl<V>(domQueryOrEl);
   const parent = el.parentElement;
   if (parent === null) throw new Error(`Element has no parent`);
@@ -155,7 +155,7 @@ export const windowResize = (timeoutMs:number = 100) => fromEvent(window, `resiz
  * @param domQueryOrEl 
  * @returns 
  */
-export const resolveEl = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:string|V):V => {
+export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {

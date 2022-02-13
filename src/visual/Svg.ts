@@ -123,11 +123,11 @@ export const applyOpts = (elem:SVGElement, opts:DrawingOpts) => {
 export const svg = (parent:SVGElement, parentOpts?:DrawingOpts) => {
   if (parentOpts) applyOpts(parent, parentOpts);
   const o = {
-    text:(text:string, pos:Points.Point, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => Elements.textEl(text, parent, pos, opts, queryOrExisting),
-    textPath:(pathRef:string, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextPathElement) => Elements.textPathEl(pathRef, text, parent, opts, queryOrExisting),
-    line:(line:Lines.Line, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement) => Elements.lineEl(line, parent, opts, queryOrExisting),
-    circle:(circle:CirclePositioned, opts?:DrawingOpts, queryOrExisting?:string|SVGCircleElement) => Elements.circleEl(circle, parent, opts,  queryOrExisting),
-    path:(svgStr:string|readonly string[], opts?:DrawingOpts, queryOrExisting?:string|SVGPathElement) => Elements.pathEl(svgStr, parent, opts, queryOrExisting),
+    text:(text:string, pos:Points.Point, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => Elements.text(text, parent, pos, opts, queryOrExisting),
+    textPath:(pathRef:string, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextPathElement) => Elements.textPath(pathRef, text, parent, opts, queryOrExisting),
+    line:(line:Lines.Line, opts?:LineDrawingOpts, queryOrExisting?:string|SVGLineElement) => Elements.line(line, parent, opts, queryOrExisting),
+    circle:(circle:CirclePositioned, opts?:DrawingOpts, queryOrExisting?:string|SVGCircleElement) => Elements.circle(circle, parent, opts,  queryOrExisting),
+    path:(svgStr:string|readonly string[], opts?:DrawingOpts, queryOrExisting?:string|SVGPathElement) => Elements.path(svgStr, parent, opts, queryOrExisting),
     grid:(center:Points.Point, spacing:number, width:number, height:number, opts?:DrawingOpts) => Elements.grid(parent, center, spacing, width, height, opts),
     query:<V extends SVGElement>(selectors:string):V|null => parent.querySelector(selectors),
     get width():number {
