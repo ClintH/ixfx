@@ -403,7 +403,7 @@ export const frequencyTimer = (frequency:number, timer:Timer = msElapsedTimer())
     },
     get elapsed() {
       // Get position in a cycle
-      const v = timer.elapsed * (cyclesPerSecond  *modAmt);
+      const v = timer.elapsed * (cyclesPerSecond * modAmt);
 
       // Get fractional part
       const f = v - Math.floor(v);
