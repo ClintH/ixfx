@@ -3,7 +3,13 @@
 import * as Timers from '../flow/Timer.js';
 
 /**
- * Oscillator.
+ * Sine oscillator.
+ * 
+ * ```js
+ * const osc = sine(Timers.frequencyTimer(10));
+ * const osc = sine(0.1);
+ * osc.next().value;
+ * ```
  * 
  * // Saw/tri pinch
  * ```js
@@ -17,29 +23,45 @@ import * as Timers from '../flow/Timer.js';
  * 
  */
 //eslint-disable-next-line func-style
-export function* sine(timer:Timers.Timer) {
+export function* sine(timerOrFreq:Timers.Timer|number) {
+  if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
+  
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     // Rather than -1 to 1, we want 0 to 1
-    yield (Math.sin(timer.elapsed*Math.PI*2) + 1) / 2;
+    yield (Math.sin(timerOrFreq.elapsed*Math.PI*2) + 1) / 2;
   }
 }
 
+/**
+ * Bipolar sine (-1 to 1)
+ * @param timerOrFreq 
+ */
 //eslint-disable-next-line func-style
-export function* sineBipolar(timer:Timers.Timer) {
+export function* sineBipolar(timerOrFreq:Timers.Timer|number) {
+  if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
-    yield Math.sin(timer.elapsed*Math.PI*2);
+    yield Math.sin(timerOrFreq.elapsed*Math.PI*2);
   }
 }
 
+/**
+ * Triangle oscillator
+ * ```js
+ * const osc = triangle(Timers.frequencyTimer(0.1));
+ * const osc = triangle(0.1);
+ * osc.next().value;
+ * ```
+ */
 //eslint-disable-next-line func-style
-export function* triangle(timer:Timers.Timer) {
+export function* triangle(timerOrFreq:Timers.Timer|number) {
+  if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     // elapsed is repeatedly 0->1
     //eslint-disable-next-line functional/no-let
-    let v = timer.elapsed; 
+    let v = timerOrFreq.elapsed; 
     // /2 = 0->0.5
     if (v < 0.5) {
       // Upward
@@ -52,18 +74,36 @@ export function* triangle(timer:Timers.Timer) {
   }
 }
 
+/**
+ * Saw oscillator
+ * ```js
+ * const osc = saw(Timers.frequencyTimer(0.1));
+ * const osc = saw(0.1);
+ * osc.next().value;
+ * ```
+ */
 //eslint-disable-next-line func-style
-export function* saw(timer:Timers.Timer) {
+export function* saw(timerOrFreq:Timers.Timer) {
+  if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
-    yield timer.elapsed;
+    yield timerOrFreq.elapsed;
   }
 }
 
+/**
+ * Square oscillator
+ * ```js
+ * const osc = square(Timers.frequencyTimer(0.1));
+ * const osc = square(0.1);
+ * osc.next().value;
+ * ```
+ */
 //eslint-disable-next-line func-style
-export function* square(timer:Timers.Timer) {
+export function* square(timerOrFreq:Timers.Timer) {
+  if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {   
-    yield (timer.elapsed < 0.5) ? 0 : 1;
+    yield (timerOrFreq.elapsed < 0.5) ? 0 : 1;
   }
 }
