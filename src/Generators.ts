@@ -128,7 +128,7 @@ export const count = function* (amount:number, offset:number = 0) {
   guardInteger(offset, ``, `offset`);
 
   if (amount === 0) return;
-
+  
   //eslint-disable-next-line functional/no-let
   let i = 0;
   //eslint-disable-next-line functional/no-loop-statement

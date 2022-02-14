@@ -1,6 +1,6 @@
 import {SimpleEventEmitter} from "../Events.js";
-import { msElapsedTimer, TimerSource} from "../Timer.js";
-import { Timer } from "../Timer.js";
+import { msElapsedTimer, TimerSource} from "../flow/Timer.js";
+import { Timer } from "../flow/Timer.js";
 import { StateMachine } from "../flow/StateMachine.js";
 import {Path} from "~/geometry/Path.js";
 import * as Bezier from '../geometry/Bezier.js';

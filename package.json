@@ -43,14 +43,6 @@
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js"
   },
-  "legacyScripts": {
-    "docs:grok": "grok ./etc/buildForApiDocs/ --config ./config/grok.config.cjs --outDir ./docs/api",
-    "legacyesbundle": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/ixfx.js --bundle",
-    "legacyesdevelop": "esbuild src/index.ts --sourcemap --format=esm --outfile=dist/index.js --bundle --watch",
-    "legacydev:demos": "snowpack dev --config ./config/snowpack-demos.config.js",
-    "legacydev:demosAlt": "snowpack dev --config ./config/snowpack-demosAlt.config.js",
-    "legacybuild:demos": "snowpack build --config ./config/snowpack-demos.config.js"
-  },
   "devDependencies": {
     "@svgdotjs/svg.js": "^3.1.2",
     "@types/d3-color": "^3.0.2",

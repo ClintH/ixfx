@@ -1,6 +1,6 @@
 import {Rects, Points} from './index.js';
 import {integer as guardInteger} from '../Guards.js';
-import {clampZeroBounds} from "../Util.js";
+import {clampIndex} from "../Util.js";
 import {randomElement} from '../collections/Arrays.js';
 import {SetMutable} from '../collections/Interfaces.js';
 import {setMutable, } from "../collections/Set.js";
@@ -429,8 +429,8 @@ export const offset = function (grid: Grid, start: Cell, vector: Cell, bounds: B
   case `stop`:
     x += vector.x;
     y += vector.y;
-    x = clampZeroBounds(x, grid.cols);
-    y = clampZeroBounds(y, grid.rows);
+    x = clampIndex(x, grid.cols);
+    y = clampIndex(y, grid.rows);
     break;
   case `undefined`:
     x += vector.x;

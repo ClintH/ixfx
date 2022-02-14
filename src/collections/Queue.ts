@@ -140,6 +140,18 @@ class QueueImpl<V> {
     this.data = data;
   }
 
+  forEach(fn:(v:V) => void) {
+    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    for (let i=this.data.length-1; i>=0; i--) {
+      fn(this.data[i]);
+    }  
+  }
+
+  forEachFromFront(fn:(v:V) => void) {
+    // From front of queue
+    this.data.forEach(vv => fn(vv));
+  }
+
   enqueue(...toAdd: ReadonlyArray<V>): QueueImpl<V> {
     return new QueueImpl<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
   }

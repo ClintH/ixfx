@@ -137,7 +137,7 @@ export const grid = (parent:SVGElement, center: Points.Point, spacing: number, w
   if (!opts.strokeStyle) opts = {...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
   if (!opts.strokeWidth) opts = {...opts, strokeWidth: 1};
 
-  const g = Svg.createEl(`g`);
+  const g = Svg.createEl<SVGGElement>(`g`);
   Svg.applyOpts(g, opts);
 
   // Horizontals
@@ -160,4 +160,5 @@ export const grid = (parent:SVGElement, center: Points.Point, spacing: number, w
     x += spacing;
   }
   parent.appendChild(g);
+  return g;
 };

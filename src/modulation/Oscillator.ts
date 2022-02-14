@@ -1,6 +1,6 @@
 //import {number as guardNumber} from "../Guards.js";
 
-import * as Timers from '../Timer.js';
+import * as Timers from '../flow/Timer.js';
 
 /**
  * Oscillator.

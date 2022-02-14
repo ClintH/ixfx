@@ -1,13 +1,21 @@
 /* eslint-disable */
 import {average} from '../collections/NumericArrays.js';
-import {wrap, wrapDegrees, clamp, clampZeroBounds, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import {wrap,startsEnds, wrapDegrees, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
+test(`startsEnds`, () => {
+  expect(startsEnds(`test`, `t`)).toBeTruthy();
+  expect(startsEnds(`test`, `T`)).toBeFalsy();
+  expect(startsEnds(`This is a test`, `This`, `test`)).toBeTruthy();
+  expect(startsEnds(`This is a test`, `this`, `Test`)).toBeFalsy();
+  expect(startsEnds(`This is a test`, `This`, `not`)).toBeFalsy();
+
+});
 test(`wrap`, () => {
   expect(wrap(361, 0, 360)).toEqual(1);
   expect(wrap(360, 0, 360)).toEqual(360);
   expect(wrap(0, 0, 360)).toEqual(0);
   expect(wrap(150, 0, 360)).toEqual(150);
-  expect(wrap(-20, 0, 360)).toEqual(350);
+  expect(wrap(-20, 0, 360)).toEqual(340);
   expect(wrap(360*3, 0, 360)).toEqual(0);
   expect(wrap(150 - 360, 0, 360)).toEqual(150);
   expect(wrap(150 - (360*2), 0, 360)).toEqual(150);
@@ -16,7 +24,7 @@ test(`wrap`, () => {
   expect(wrapDegrees(360)).toEqual(360);
   expect(wrapDegrees(0)).toEqual(0);
   expect(wrapDegrees(150)).toEqual(150);
-  expect(wrapDegrees(-20)).toEqual(350);
+  expect(wrapDegrees(-20)).toEqual(340);
   expect(wrapDegrees(360*3)).toEqual(0);
   expect(wrapDegrees(150 - 360)).toEqual(150);
   expect(wrapDegrees(150 - (360*2))).toEqual(150);
@@ -153,14 +161,14 @@ test(`clamp-range`, () => {
 });
 
 test(`clamp-zero-bounds`, () => {
-  expect(clampZeroBounds(0, 5)).toBe(0);
-  expect(clampZeroBounds(4, 5)).toBe(4);
-  expect(clampZeroBounds(5, 5)).toBe(4);
-  expect(clampZeroBounds(-5, 5)).toBe(0);
+  expect(clampIndex(0, 5)).toBe(0);
+  expect(clampIndex(4, 5)).toBe(4);
+  expect(clampIndex(5, 5)).toBe(4);
+  expect(clampIndex(-5, 5)).toBe(0);
 
   // test throwing for non-ints
-  expect(() => clampZeroBounds(0, 5.5)).toThrow();
-  expect(() => clampZeroBounds(0.5, 5)).toThrow();
-  expect(() => clampZeroBounds(NaN, 5)).toThrow();
-  expect(() => clampZeroBounds(0, NaN)).toThrow();
+  expect(() => clampIndex(0, 5.5)).toThrow();
+  expect(() => clampIndex(0.5, 5)).toThrow();
+  expect(() => clampIndex(NaN, 5)).toThrow();
+  expect(() => clampIndex(0, NaN)).toThrow();
 });

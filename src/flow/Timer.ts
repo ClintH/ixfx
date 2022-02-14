@@ -1,5 +1,5 @@
-import {integer as guardInteger} from './Guards.js';
-import {clamp} from './Util.js';
+import {integer as guardInteger} from '../Guards.js';
+import {clamp} from '../Util.js';
 
 /**
  * Creates a timer
@@ -69,19 +69,20 @@ export const debounce = (callback:()=> void, timeoutMs:number) => {
  * 
  * @example Only handle move event every 500ms
  * ```js
- * const moveThrottled = throttle(args => {
- *  // Handle
+ * const moveThrottled = throttle( (elapsedMs, args) => {
+ *  // Handle ar
  * }, 500);
  * el.addEventListener(`pointermove`, moveThrottled)
  * ```
  */
-export const throttle = (callback:(...args:readonly unknown[]) => void, intervalMinMs:number) => {
+export const throttle = (callback:(elapsedMs:number, ...args:readonly unknown[]) => void, intervalMinMs:number) => {
   //eslint-disable-next-line functional/no-let
   let trigger = 0;
 
   return (...args:unknown[]) => {
-    if (performance.now()-trigger >= intervalMinMs) {
-      callback(args);
+    const elapsed = performance.now()-trigger; 
+    if (elapsed >= intervalMinMs) {
+      callback(elapsed, ...args);
       trigger = performance.now();
     }
   };

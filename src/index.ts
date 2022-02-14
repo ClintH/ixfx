@@ -1,10 +1,16 @@
 export * as Geometry from './geometry/index.js';
-export * as Flow from './flow/index.js';
 
 /**
- * Canvas drawing functions.
+ * Control execution
+ * 
+ * Overview:
+ * * {@link continuously} Run code in a loop, as fast as possible or with a delay between each execution
+ * * {@link timeout} Run code after a specified time delay
+ * * {@link sleep} Using `async await`, delay execution for a period
+ * * {@link delay} Using `async await`, run a given callback after a period
+ * * {@link StateMachine} Manage state transitions
  */
-export * as Drawing from './visual/Drawing.js';
+export * as Flow from './flow/index.js';
 
 /**
  * Visuals
@@ -76,16 +82,8 @@ export * as KeyValues from './KeyValue.js';
 
 export * from './Util.js';
 
-/**
- * Run code at intervals or with a delay
- * 
- * Overview:
- * * {@link continuously} Run code in a loop, as fast as possible or with a delay between each execution
- * * {@link timeout} Run code after a specified time delay
- * * {@link sleep} Using `async await`, delay execution for a period
- * * {@link delay} Using `async await`, run a given callback after a period
- */
-export * as Timers from './Timer.js';
+
+//export * as Timers from './flow/Timer.js';
 
 
 // Classes

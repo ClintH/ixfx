@@ -93,7 +93,7 @@ export type DiscardPolicy = `older` | `newer` | `additions`;
  * ```js
  * let q = queue();           // Create
  * q = q.enqueue(`a`, `b`);   // Add two strings
- * const front = q.peek();    // `a` is at the front of queue (oldest)
+ * const front = q.peek;      // `a` is at the front of queue (oldest)
  * q = q.dequeue();           // q now just consists of `b`  
  * ```
  * @example Cap size to 5 items, throwing away newest items already in queue.
@@ -103,6 +103,19 @@ export type DiscardPolicy = `older` | `newer` | `additions`;
  * 
  */
 export interface Queue<V> {
+  /**
+   * Enumerates queue from back-to-front
+   *
+  */
+   forEach(fn:(v:V) => void): void
+
+
+   /**
+    * Enumerates queue from front-to-back
+    * @param fn 
+    */
+   forEachFromFront(fn:(v:V) => void): void
+
   /**
    * Returns a new queue with items added
    * @param toAdd Items to add

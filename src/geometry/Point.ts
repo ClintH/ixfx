@@ -200,6 +200,7 @@ export const withinRange = (a:Point, b:Point, maxRange:Point|number):boolean => 
  * ```
  * 
  * Alias for Lines.interpolate(amount, a, b);
+ * 
  * @param amount Relative amount, 0-1
  * @param a 
  * @param b 
