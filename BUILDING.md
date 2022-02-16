@@ -36,6 +36,8 @@ To build and deploy to `ixfx-demos` in same parent folder as `ixfx` repo:
 npm run demos
 ```
 
+This assumes you have already cloned the `ixfx-demos` repo. Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos are always using the latest changes to the library.
+
 ## Deploying
 
 Cleans and builds for packaging:
@@ -44,7 +46,6 @@ Cleans and builds for packaging:
 npm run publishNpm
 npm run publishGh
 ```
-
 
 ## Docs
 
