@@ -31,7 +31,6 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "./src",
-    // "./demos"
+    "./src"
   ]
 }
