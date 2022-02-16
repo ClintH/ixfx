@@ -55,17 +55,29 @@ export type Timeout = HasCompletion & {
  * // Wire up event
  * el.addEventListener(`pointermove`, moveDebounced);
  * ```
+ * 
+ * Debounced function can be awaited:
+ * ```js
+ * const d = debounce(fn, 1000);
+ * await d();
+ * ```
  * @param callback 
  * @param timeoutMs 
  * @returns 
  */
-export const debounce = (callback:()=> void, timeoutMs:number) => {
+export const debounce = (callback:()=> void|Promise<any>, timeoutMs:number):DebouncedFunction => {
   const t = timeout(callback, timeoutMs);
   return (...args:unknown[]) => t.start(undefined, args);
 };
 
+/**
+ * Debounced function
+ * @private
+ */
+export type DebouncedFunction = (...args:unknown[]) =>void
+
 /***
- * Throttles an function. Callback only triggered after minimum of `intervalMinMs`.
+ * Throttles a function. Callback only allowed to run after minimum of `intervalMinMs`.
  * 
  * @example Only handle move event every 500ms
  * ```js
@@ -74,15 +86,31 @@ export const debounce = (callback:()=> void, timeoutMs:number) => {
  * }, 500);
  * el.addEventListener(`pointermove`, moveThrottled)
  * ```
+ * 
+ * Note that `throttle` does not schedule invocations, but rather acts as a filter that
+ * sometimes allows follow-through to `callback`, sometimes not. There is an expectation then
+ * that the return function from `throttle` is repeatedly called, such as the case for handling
+ * a stream of data/events.
+ * 
+ * @example Manual trigger
+ * ```js
+ * // Set up once
+ * const t = throttle( (elapsedMs, args) => { ... }, 5000);
+ * 
+ * // Later, trigger throttle. Sometimes the callback will run,
+ * // with data passed in to args[0]
+ * t(data);
+ * ```
  */
-export const throttle = (callback:(elapsedMs:number, ...args:readonly unknown[]) => void, intervalMinMs:number) => {
+export const throttle = (callback:(elapsedMs:number, ...args:readonly unknown[]) => void|Promise<any>, intervalMinMs:number) => {
   //eslint-disable-next-line functional/no-let
   let trigger = 0;
 
-  return (...args:unknown[]) => {
+  return async (...args:unknown[]) => {
     const elapsed = performance.now()-trigger; 
     if (elapsed >= intervalMinMs) {
-      callback(elapsed, ...args);
+      const r = callback(elapsed, ...args);
+      if (typeof r === `object`) await r;
       trigger = performance.now();
     }
   };
@@ -121,8 +149,8 @@ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs
   }
 };
 
-export type TimeoutSyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => boolean|void
-export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => Promise<boolean|void>
+export type TimeoutSyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => void
+export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => Promise<void>
 
 /**
  * Returns a {@link Timeout} that can be triggered, cancelled and reset
@@ -162,6 +190,7 @@ export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[
  * ```js
  * timeout(async () => {...}, 100);
  * ```
+ * 
  * @param callback 
  * @param timeoutMs 
  * @returns {@link Timeout}
@@ -174,15 +203,23 @@ export const timeout = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeo
   let timer = 0;
   //eslint-disable-next-line functional/no-let
   let startedAt = 0;
-
-  const start = (altTimeoutMs:number = timeoutMs, ...args:unknown[]) => {
-    startedAt = performance.now();
-    guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
-    if (timer !== 0) cancel();
-    timer = window.setTimeout(async() => {
-      callback(performance.now() - startedAt, ...args);
-      timer = 0;
-    }, altTimeoutMs);
+  const start = async (altTimeoutMs:number = timeoutMs, ...args:unknown[]):Promise<void> => {
+    const p = new Promise<void>((resolve, reject) => {
+      startedAt = performance.now();
+      try {
+        guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
+      } catch (e) {
+        reject(e);
+        return;
+      }
+      if (timer !== 0) cancel();
+      timer = window.setTimeout(async() => {
+        await callback(performance.now() - startedAt, ...args);
+        timer = 0;
+        resolve(undefined); 
+      }, altTimeoutMs);
+    });
+    return p;
   };
 
   const cancel = () => {
@@ -467,3 +504,67 @@ export const ticksElapsedTimer = (): Timer => {
     get elapsed() { return start++; }
   };
 };
+
+export type UpdateFailPolicy = `fast` | `slow` | `backoff`; 
+/**
+ * Calls the async `fn` to generate a value if there is no prior value or
+ * `intervalMs` has elapsed since value was last generated.
+ * @example
+ * ```js
+ * const f = updateOutdated(async () => {
+ *  const r = await fetch(`blah`);
+ *  return await r.json();
+ * }, 60*1000);
+ * 
+ * // Result will be JSON from fetch. If fetch happened already in the
+ * // last 60s, return cached result. Otherwise it will fetch data
+ * const result = await f();
+ * ```
+ * 
+ * Callback `fn` is passed how many milliseconds have elapsed since last update. It's
+ * minimum value will be `intervalMs`.
+ * 
+ * ```js
+ * const f = updateOutdated(async elapsedMs => {
+ *  // Do something with elapsedMs?
+ * }, 60*1000;
+ * ```
+ * 
+ * There are different policies for what to happen if `fn` fails. `slow` is the default.
+ * * `fast`: Invocation will happen immediately on next attempt
+ * * `slow`: Next invocation will wait `intervalMs` as if it was successful
+ * * `backoff`: Attempts will get slower and slower until next success. Interval is multipled by 1.2 each time.
+ * 
+ * @param fn Async function to call. Must return a value.
+ * @param intervalMs Maximum age of cached result
+ * @param updateFail `slow` by default
+ * @returns Value
+ */
+export const updateOutdated = <V>(fn:(elapsedMs?:number)=>Promise<V>, intervalMs:number, updateFail:UpdateFailPolicy = `slow`):()=>Promise<V> => {
+  let lastRun = 0;
+  let lastValue:V|undefined;
+  let intervalMsCurrent = intervalMs;
+
+  return () => {
+    return new Promise(async (resolve, reject) => {
+      const elapsed = performance.now() - lastRun;
+      if (lastValue === undefined || elapsed > intervalMsCurrent) {
+        try {
+          lastRun = performance.now();
+          lastValue = await fn(elapsed);
+          intervalMsCurrent = intervalMs;
+        } catch (ex) {
+          if (updateFail === `fast`) {
+            lastValue = undefined;
+            lastRun = 0;
+          } else if (updateFail === `backoff`) {
+            intervalMsCurrent = Math.floor(intervalMsCurrent*1.2);
+          }
+          reject(ex);
+        }
+      } 
+      resolve(lastValue!);
+    });
+  }
+}
+
