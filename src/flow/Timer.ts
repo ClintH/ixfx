@@ -121,6 +121,9 @@ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs
   }
 };
 
+export type TimeoutSyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => boolean|void
+export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => Promise<boolean|void>
+
 /**
  * Returns a {@link Timeout} that can be triggered, cancelled and reset
  *  
@@ -155,11 +158,15 @@ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs
  * el.addEventListener(`click`, t.start);
  * ```
  * 
+ * Asynchronous callbacks can be used as well:
+ * ```js
+ * timeout(async () => {...}, 100);
+ * ```
  * @param callback 
  * @param timeoutMs 
  * @returns {@link Timeout}
  */
-export const timeout = (callback:(elapsedMs?:number, ...args:readonly unknown[])=>void, timeoutMs:number):Timeout => {
+export const timeout = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeoutMs:number):Timeout => {
   if (callback === undefined) throw new Error(`callback parameter is undefined`);
   guardInteger(timeoutMs, `aboveZero`, `timeoutMs`);
 
@@ -172,7 +179,7 @@ export const timeout = (callback:(elapsedMs?:number, ...args:readonly unknown[])
     startedAt = performance.now();
     guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
     if (timer !== 0) cancel();
-    timer = window.setTimeout(() => {
+    timer = window.setTimeout(async() => {
       callback(performance.now() - startedAt, ...args);
       timer = 0;
     }, altTimeoutMs);
@@ -219,6 +226,8 @@ export type Continuously = HasCompletion & {
   cancel(): void
 }
 
+export type ContinuouslySyncCallback = (ticks?:number, elapsedMs?:number) => boolean|void
+export type ContinuouslyAsyncCallback = (ticks?:number, elapsedMs?:number) => Promise<boolean|void>
 
 /**
  * Returns a {@link Continuously} that continuously executes `callback`. If callback returns _false_, loop exits.
@@ -247,12 +256,17 @@ export type Continuously = HasCompletion & {
  * c.elapsedMs;  // How many milliseconds have elapsed since start
  * c.ticks;      // How many iterations of loop since start
  * ```
+ * 
+ * Asynchronous callback functions are supported too:
+ * ```js
+ * continuously(async () => { ..});
+ * ```
  * @param callback Function to run. If it returns false, loop exits.
  * @param resetCallback Callback when/if loop is reset. If it returns false, loop exits
  * @param intervalMs 
  * @returns 
  */
-export const continuously = (callback:(ticks?:number, elapsedMs?:number)=>boolean|void, intervalMs?:number, resetCallback?:((ticks?:number, elapsedMs?:number) => boolean|void)):Continuously => {
+export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySyncCallback, intervalMs?:number, resetCallback?:((ticks?:number, elapsedMs?:number) => boolean|void)):Continuously => {
   if (intervalMs !== undefined) guardInteger(intervalMs, `positive`, `intervalMs`);
 
   //eslint-disable-next-line functional/no-let
@@ -268,11 +282,16 @@ export const continuously = (callback:(ticks?:number, elapsedMs?:number)=>boolea
     ticks = 0;
   };
 
-  const loop = () => {
-    //console.log(`loop`);
+  const loop = async () => {
     if (!running) return;
-    const r = callback(ticks++, performance.now() - startedAt);
-    if (r !== undefined && !r) {
+    const valOrPromise = callback(ticks++, performance.now() - startedAt);
+    let val = undefined;
+    if (typeof valOrPromise === `object`) {
+      val = await valOrPromise;
+    } else {
+      val = valOrPromise;
+    }
+    if (val !== undefined && !val) {
       cancel();
       return;
     }

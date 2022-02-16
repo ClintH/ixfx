@@ -271,8 +271,16 @@ export const resizeObservable = (elem: Element, timeoutMs: number = 1000): Obser
 export const copyToClipboard = (obj: object) => {
   const p = new Promise((resolve, reject) => {
     const json = JSON.stringify(obj, null, 2);
-    const cleaned = json.replace(/^[\t ]*"[^:\n\r]+(?<!\\)":/gm, (match) => match.replace(/"/g, ``));
-
+    //eslint-disable-next-line functional/no-let
+    let cleaned = json;
+    //eslint-disable-next-line functional/no-try-statement
+    try {
+      cleaned = json.replace(/^[\t ]*"[^:\n\r]+(?<!\\)":/gm, (match) => match.replace(/"/g, ``));
+    } catch (ex) {
+      // TODO: when possible, need to find fix for Safari
+      // Via LL: https://stackoverflow.com/questions/51568821/works-in-chrome-but-breaks-in-safari-invalid-regular-expression-invalid-group
+      console.log(ex);
+    }
     navigator.clipboard.writeText(JSON.stringify(cleaned)).then(
       () => {
         resolve(true);
