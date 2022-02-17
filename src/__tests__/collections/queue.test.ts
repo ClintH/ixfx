@@ -109,4 +109,9 @@ test(`queue`, () => {
   g = g.enqueue(`test3`, `test4`, `test5`);
   expect(g.data).toEqual([`test3`, `test4`, `test5`]);
 
+  // One item past capacity with newer 
+  g = queue<string>({capacity:3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  g = g.enqueue(`test3`);
+  expect(g.data).toEqual([`test0`, `test1`, `test3`]);
+
 });

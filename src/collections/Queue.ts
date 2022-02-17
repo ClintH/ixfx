@@ -47,7 +47,7 @@ const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyA
   switch (policy) {
   // Only add what we can from toAdd
   case `additions`:
-    debug(opts, `enqueue:DiscardAdditions: queueLen: ${queue.length} slice: ${potentialLength-capacity} toAddLen: ${toAdd.length}`);
+    debug(opts, `trimQueue:DiscardAdditions: queueLen: ${queue.length} slice: ${potentialLength-capacity} toAddLen: ${toAdd.length}`);
     if (queue.length === opts.capacity) {
       return queue; // Completely full
     } else {
@@ -61,8 +61,12 @@ const trimQueue = <V>(opts: QueueOpts, queue: ReadonlyArray<V>, toAdd: ReadonlyA
       return toAdd.slice(Math.max(0, toAdd.length-capacity), Math.min(toAdd.length, capacity)+1);
     } else {
       // Keep some of the old
-      debug(opts, ` from orig: ${queue.slice(0, toRemove-1)}`);
-      return [...queue.slice(0, toRemove-1), ...toAdd.slice(0, Math.min(toAdd.length, capacity-toRemove+1))];    
+      const toAddFinal = toAdd.slice(0, Math.min(toAdd.length, capacity-toRemove+1));
+      const toKeep =  queue.slice(0, queue.length-toRemove);
+      debug(opts, `trimQueue: toRemove: ${toRemove} keeping: ${JSON.stringify(toKeep)} from orig: ${JSON.stringify(queue)} toAddFinal: ${JSON.stringify(toAddFinal)}`);
+      const t=  [...toKeep, ...toAddFinal];    
+      debug(opts, `final: ${JSON.stringify(t)}`);
+      return t;
     }
   // Remove from the front of the queue (0 index). ie. older items are discarded
   case `older`:
