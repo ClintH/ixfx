@@ -127,7 +127,7 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
 
     const width = e.contentRect.width;
     const height = e.contentRect.height;
-    console.log(`contentH: ${e.contentRect.height} current: ${el.getBoundingClientRect().height}`);
+    //console.log(`contentH: ${e.contentRect.height} current: ${el.getBoundingClientRect().height}`);
     el.setAttribute(`width`, width-safetyMargin + `px`);
     el.setAttribute(`height`, height-safetyMargin + `px`);
     const bounds = {width, height, center: {x: width/2, y:height/2}};

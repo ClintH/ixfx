@@ -62,6 +62,8 @@ export const clamp = (v: number, min = 0, max = 1) => {
  * ```js
  * scale(sensorReading, 100, 500);
  * ```
+ * 
+ * If inMin and inMax are equal, outMax will be returned.
  * @param v Value to scale
  * @param inMin Input minimum
  * @param inMax Input maximum
@@ -75,8 +77,9 @@ export const scale = (
   outMin?:number, outMax?:number
 ):number => {
   if (outMax === undefined) outMax = 1;
-  if(outMin === undefined) outMin = 0;
-
+  if (outMin === undefined) outMin = 0;
+  if (inMin === inMax) return outMax;
+  //console.log(`v: ${v} in: ${inMin}-${inMax} out: ${outMin}-${outMax}`);
   return (v - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 };
 
@@ -95,6 +98,11 @@ export const scale = (
  * safety is useful for catching bugs. Otherwise, you could just as well call
  * `scale(percentage, 0, 1, outMin, outMax)`.
  * 
+ * If you want to scale some input range to percentage output range, just use `scale`:
+ * ```js
+ * // Yields 0.5
+ * scale(2.5, 0, 5);
+ * ```
  * @param percentage Input value, within percentage range
  * @param outMin Output minimum, between 0-1
  * @param outMax Output maximum, between 0-1
@@ -108,7 +116,7 @@ export const scalePercentages = (percentage:number, outMin:number, outMax:number
 };
 
 /**
- * Scales an input percentage value  to an output range
+ * Scales an input percentage value to an output range
  * If you have an input percentage (0-1), `scalePercent` maps it to an output range of `outMin`-`outMax`.
  * ```js
  * scalePercent(0.5, 10, 20); // 15
@@ -336,4 +344,61 @@ export const wrapRange = (min:number, max:number, fn:(distance:number)=>number, 
     }
   }
   return wrap(r, min, max); 
+};
+
+export type RepeatPredicate = (repeats:number, valuesProduced:number)=>boolean;
+/**
+ * Runs `fn` a certain number of times, accumulating result into return array.
+ * If `fn` returns undefined, it is skipped.
+ * 
+ * ```js
+ * // Results will be an array with five random numbers
+ * const results = repeat(5, () => Math.random());
+ * ```
+ * 
+ * Repeats can be specified as an integer (eg 5 for five repeats), or a function
+ * that gives _false_ when repeating should stop.
+ * 
+ * ```js
+ * // Keep running `fn` until we've accumulated 10 values
+ * // Useful if `fn` sometimes returns _undefined_
+ * const results = repeat((repeats, valuesProduced) => valuesProduced < 10, fn);
+ * ```
+ * 
+ * If you don't need to accumulate return values, consider {@link Generators.count} with {@link Generators.forEach}.
+ * 
+ * @param countOrPredicate Number of repeats or function returning false when to stop 
+ * @param fn Function to run, must return a value to accumulate into array or _undefined_
+ * @returns Array of accumulated results
+ */
+export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|undefined):readonly V[] => {
+  // Unit tested: expected return array length
+  //eslint-disable-next-line functional/no-let
+  let repeats, valuesProduced;
+  repeats = valuesProduced = 0;
+  const ret = [];
+
+  if (typeof countOrPredicate === `number`) {
+    guardNumber(countOrPredicate, `positive`, `countOrPredicate`);
+    //eslint-disable-next-line functional/no-loop-statement
+    while (countOrPredicate-- > 0) {
+      repeats++;
+      const v = fn();
+      if (v === undefined) continue;
+      //eslint-disable-next-line functional/immutable-data
+      ret.push(v);
+      valuesProduced++;
+    }
+  } else {
+    //eslint-disable-next-line functional/no-loop-statement
+    while (countOrPredicate(repeats, valuesProduced)) {
+      repeats++;
+      const v = fn();
+      if (v === undefined) continue;
+      //eslint-disable-next-line functional/immutable-data
+      ret.push(v);
+      valuesProduced++;
+    }
+  }
+  return ret;
 };

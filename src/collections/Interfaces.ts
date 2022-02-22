@@ -35,6 +35,7 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
  * @private
  */
 export type MultiValue<V, M> = Readonly<{
+  get name():string
   has(source:M, value:V): boolean
   add(destination:M|undefined, values:ReadonlyArray<V>):M
   toArray(source:M): ReadonlyArray<V>|undefined
@@ -315,6 +316,11 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
  export interface MapOfMutable<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
 
   /**
+   * Returns the type name. For in-built implementations, it will be one of: array, set or circular
+   */
+  get typeName():string;
+
+/**
  * Returns a human-readable rendering of contents 
  */
   debugString():string

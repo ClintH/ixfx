@@ -541,3 +541,32 @@ export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[],
     y += heights[i];
   });
 };
+
+export const textBlockCentered = (ctx:CanvasRenderingContext2D, lines:readonly string[], opts:DrawingOpts & { readonly bounds: Rects.RectPositioned}) => {
+  const {bounds} = opts;
+  applyOpts(ctx, opts);
+
+  ctx.save();
+  ctx.translate(bounds.x, bounds.y);
+  //eslint-disable-next-line functional/immutable-data
+  ctx.textAlign = `left`;
+  //eslint-disable-next-line functional/immutable-data
+  ctx.textBaseline = `top`;
+  const middleX = bounds.width / 2;
+  const middleY = bounds.height / 2;
+
+  // Measure each line
+  const blocks = lines.map(l => ctx.measureText(l));
+  const heights = blocks.map(tm => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent);
+  const totalHeight = heights.reduce((acc, val) => acc+val, 0);
+  
+  //eslint-disable-next-line functional/no-let
+  let y = middleY - totalHeight /2;
+  lines.forEach((line, i) => {
+    const x = middleX - blocks[i].width / 2;
+    ctx.fillText(lines[i], x, y);
+    y += heights[i];
+  });
+
+  ctx.restore();
+};

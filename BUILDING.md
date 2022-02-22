@@ -11,7 +11,7 @@ npm run develop // continually rebuild
 
 Build Typescript sources, running a single file with source map support:
 ```
-npm run run -- build/StateMachine.js
+npm run run -- ./etc/build/StateMachine.js
 ```
 
 ## Using a local copy of ixfx

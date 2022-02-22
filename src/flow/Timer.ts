@@ -65,7 +65,7 @@ export type Timeout = HasCompletion & {
  * @param timeoutMs 
  * @returns 
  */
-export const debounce = (callback:()=> void|Promise<any>, timeoutMs:number):DebouncedFunction => {
+export const debounce = (callback:()=> void|Promise<unknown>, timeoutMs:number):DebouncedFunction => {
   const t = timeout(callback, timeoutMs);
   return (...args:unknown[]) => t.start(undefined, args);
 };
@@ -74,7 +74,7 @@ export const debounce = (callback:()=> void|Promise<any>, timeoutMs:number):Debo
  * Debounced function
  * @private
  */
-export type DebouncedFunction = (...args:unknown[]) =>void
+export type DebouncedFunction = (...args:readonly unknown[]) =>void
 
 /***
  * Throttles a function. Callback only allowed to run after minimum of `intervalMinMs`.
@@ -102,7 +102,7 @@ export type DebouncedFunction = (...args:unknown[]) =>void
  * t(data);
  * ```
  */
-export const throttle = (callback:(elapsedMs:number, ...args:readonly unknown[]) => void|Promise<any>, intervalMinMs:number) => {
+export const throttle = (callback:(elapsedMs:number, ...args:readonly unknown[]) => void|Promise<unknown>, intervalMinMs:number) => {
   //eslint-disable-next-line functional/no-let
   let trigger = 0;
 
@@ -116,24 +116,35 @@ export const throttle = (callback:(elapsedMs:number, ...args:readonly unknown[])
   };
 };
 
+export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
 /**
- * Generates values from `produce` with `intervalMs` time delay
+ * Generates values from `produce` with `intervalMs` time delay. 
+ * `produce` can be a simple function that returns a value, an async function, or a generator.
  * 
  * @example Produce a random number every 500ms:
  * ```
  * const randomGenerator = interval(() => Math.random(), 1000);
  * for await (const r of randomGenerator) {
  *  // Random value every 1 second
+ *  // Warning: does not end by itself, a `break` statement is needed
  * }
  * ```
  *
- * @template V
+ * @example Return values from a generator every 500ms:
+ * ```const
+ * // Make a generator that counts to 10
+ * const counter = count(10);
+ * for await (const v of interval(counter, 1000)) {
+ *  // Do something with `v`
+ * }
+ * ```
+ * @template V Returns value of `produce` function
  * @param intervalMs Interval between execution
  * @param produce Function to call
  * @template V Data type
  * @returns
  */
-export const interval = async function*<V>(produce: () => Promise<V>, intervalMs: number) {
+export const interval = async function*<V>(produce: IntervalAsync<V>, intervalMs: number) {
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
   //eslint-disable-next-line functional/no-try-statement
@@ -142,7 +153,22 @@ export const interval = async function*<V>(produce: () => Promise<V>, intervalMs
     while (!cancelled) {
       await sleep(intervalMs);
       if (cancelled) return;
-      yield await produce();
+      if (typeof produce === `function`) {
+        // Returns V or Promise<V>
+        const result = await produce();
+        yield result;
+      } else if (typeof produce === `object`) {
+        // Generator, perhaps?
+        if (`next` in produce && `return` in produce && `throw` in produce) {
+          const result = await produce.next();
+          if (result.done) return;
+          yield result.value; 
+        } else {
+          throw new Error(`interval: produce param does not seem to be a generator?`);
+        }
+      } else {
+        throw new Error(`produce param does not seem to return a value/Promise and is not a generator?`);
+      }
     }
   } finally {
     cancelled = true;
@@ -206,6 +232,7 @@ export const timeout = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeo
   const start = async (altTimeoutMs:number = timeoutMs, ...args:unknown[]):Promise<void> => {
     const p = new Promise<void>((resolve, reject) => {
       startedAt = performance.now();
+      //eslint-disable-next-line functional/no-try-statement
       try {
         guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
       } catch (e) {
@@ -213,7 +240,7 @@ export const timeout = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeo
         return;
       }
       if (timer !== 0) cancel();
-      timer = window.setTimeout(async() => {
+      timer = window.setTimeout(async () => {
         await callback(performance.now() - startedAt, ...args);
         timer = 0;
         resolve(undefined); 
@@ -322,7 +349,8 @@ export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySync
   const loop = async () => {
     if (!running) return;
     const valOrPromise = callback(ticks++, performance.now() - startedAt);
-    let val = undefined;
+    //eslint-disable-next-line functional/no-let
+    let val;
     if (typeof valOrPromise === `object`) {
       val = await valOrPromise;
     } else {
@@ -541,30 +569,41 @@ export type UpdateFailPolicy = `fast` | `slow` | `backoff`;
  * @returns Value
  */
 export const updateOutdated = <V>(fn:(elapsedMs?:number)=>Promise<V>, intervalMs:number, updateFail:UpdateFailPolicy = `slow`):()=>Promise<V> => {
+  //eslint-disable-next-line functional/no-let
   let lastRun = 0;
+  //eslint-disable-next-line functional/no-let
   let lastValue:V|undefined;
+  //eslint-disable-next-line functional/no-let
   let intervalMsCurrent = intervalMs;
 
-  return () => {
-    return new Promise(async (resolve, reject) => {
-      const elapsed = performance.now() - lastRun;
-      if (lastValue === undefined || elapsed > intervalMsCurrent) {
-        try {
-          lastRun = performance.now();
-          lastValue = await fn(elapsed);
-          intervalMsCurrent = intervalMs;
-        } catch (ex) {
-          if (updateFail === `fast`) {
-            lastValue = undefined;
-            lastRun = 0;
-          } else if (updateFail === `backoff`) {
-            intervalMsCurrent = Math.floor(intervalMsCurrent*1.2);
-          }
-          reject(ex);
+  return () => (new Promise(async (resolve, reject) => {
+    const elapsed = performance.now() - lastRun;
+    if (lastValue === undefined || elapsed > intervalMsCurrent) {
+      //eslint-disable-next-line functional/no-try-statement
+      try {
+        lastRun = performance.now();
+        lastValue = await fn(elapsed);
+        intervalMsCurrent = intervalMs;
+      } catch (ex) {
+        if (updateFail === `fast`) {
+          lastValue = undefined;
+          lastRun = 0;
+        } else if (updateFail === `backoff`) {
+          intervalMsCurrent = Math.floor(intervalMsCurrent*1.2);
         }
-      } 
-      resolve(lastValue!);
-    });
-  }
-}
+        reject(ex);
+        return;
+      }
+    } 
+    resolve(lastValue);
+  }));
+};
 
+// const counterG = count(5);
+// const inter = interval(counterG, 1000);
+// let loops = 0;
+// for await (const r of inter) {
+//   console.log(r);
+//   loops++;
+//   if (loops === 5) break;
+// }

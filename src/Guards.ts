@@ -1,17 +1,34 @@
 
-export type NumberGuardRange = `` | `nonZero` | `positive` | `negative` | `aboveZero` | `belowZero` | `percentage` | `bipolar`;
+export type NumberGuardRange = 
+/**
+ * No range checking
+ */
+  `` | 
+  /**
+   * Can be any number, except zero
+   */
+  `nonZero` | 
+  `positive` | 
+  `negative` | 
+  /**
+   * Must be above zero
+   */
+  `aboveZero` | 
+  `belowZero` | 
+  `percentage` | 
+  `bipolar`;
 
 /**
  * Throws an error if `t` is not a number or within specified range. 
  * Alternatives: {@link integer} for additional integer check, {@link percentage}.
  * 
- * positive: must be at least zero
- * negative: must be zero or lower
- * aboveZero: must be above zero
- * belowZero: must be below zero
- * percentage: must be within 0-1, inclusive
- * nonZero: can be anything except zero
- * bipolar: can be -1 to 1, inclusive
+ * * positive: must be at least zero
+ * * negative: must be zero or lower
+ * * aboveZero: must be above zero
+ * * belowZero: must be below zero
+ * * percentage: must be within 0-1, inclusive
+ * * nonZero: can be anything except zero
+ * * bipolar: can be -1 to 1, inclusive
  * @param value Value to check
  * @param paramName Name of parameter (for more helpful exception messages)
  * @param range Range to enforce

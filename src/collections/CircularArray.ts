@@ -1,5 +1,5 @@
-import {CircularArray} from "./Interfaces";
-
+import {CircularArray} from "./Interfaces.js";
+import { integer as guardInteger } from "../Guards.js";
 
 class CircularArrayImpl<V> extends Array {
   // ✔ Class is unit tested!
@@ -10,7 +10,9 @@ class CircularArrayImpl<V> extends Array {
 
   constructor(capacity: number = 0) {
     super();
-    if (Number.isNaN(capacity)) throw Error(`capacity is NaN`);
+    // Allowed to create with capacity zero
+    guardInteger(capacity, `positive`, `capacity`);
+
     // Can't throw because .filter won't use ctor proprly
     this.#capacity = capacity;
     this.#pointer = 0;

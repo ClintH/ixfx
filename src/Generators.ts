@@ -73,9 +73,9 @@ export const forEach = <V>(iterator:IterableIterator<V>, fn:(v?:V)=>boolean|void
  * number.
  * 
  * @param interval Interval between numbers
- * @param start Start
+ * @param start Start. Defaults to 0
  * @param end End (if undefined, range never ends)
- * @param repeating If true, range loops from start indefinately
+ * @param repeating Range loops from start indefinately. Default _false_
  * @param rounding A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
  */
 export const numericRange = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false, rounding?: number) {
@@ -119,6 +119,15 @@ export const numericRange = function* (interval: number, start: number = 0, end?
  * }
  * const c = [...count(5,1)]; // Yields [1,2,3,4,5]
  * ```
+ * 
+ * @example Used with forEach
+ * ```js
+ * // Prints `Hi` 5x
+ * forEach(count(5), () => console.log(`Hi`));
+ * ```
+ * 
+ * If you want to accumulate return values, consider using
+ * {@link repeat}.
  * @param amount Number of integers to yield 
  * @param offset Added to result
  */
@@ -139,11 +148,13 @@ export const count = function* (amount:number, offset:number = 0) {
 };
 
 /**
- * Returns a number range between 0.0-1.0. By default it loops back to 0 after reaching 1
- * @param interval Interval (defaults to 0.01 or 1%)
- * @param repeating Whether generator should loop (default false)
- * @param start Start
- * @param end End
+ * Returns a non-repeating number range between 0.0-1.0. 
+ * 
+ * If `repeating` is true, it loops back to 0 after reaching 1
+ * @param interval Interval (default: 0.01, ie. 1%)
+ * @param repeating Whether generator should loop (default: false)
+ * @param start Start (default: 0)
+ * @param end End (default: 1)
  * @returns 
  */
 export const rangePercent = function (interval:number = 0.01, repeating:boolean = false, start:number = 0, end = 1) {

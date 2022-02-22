@@ -118,8 +118,8 @@ export type Easing = HasCompletion & {
  * @returns
  */
 const create = function (name: EasingName, duration: number, timerSource: TimerSource): Easing {
-  const fn = resolveEasing(name);
-
+  const fn = get(name);
+  if (fn === undefined) throw new Error(`Easing function not found: ${name}`);
   // Get a relative version of timer
   const timer = relativeTimer(duration, timerSource(), true);
 
@@ -137,15 +137,22 @@ const create = function (name: EasingName, duration: number, timerSource: TimerS
   };
 };
 
-export type EasingName = keyof typeof easings;
+export type EasingName = keyof typeof functions;
 
-const resolveEasing = function (name: string): EasingFn {
-  name = name.toLocaleLowerCase();
+/**
+ * Returns an easing function by name, or _undefined_ if not found.
+ * @param easingName
+ * @returns 
+ */
+export const get = function (easingName: EasingName): EasingFn|undefined {
+  if (easingName === null) throw new Error(`easingName is null`);
+  if (easingName === undefined) throw new Error(`easingName is undefined`);
+  const name = easingName.toLocaleLowerCase();
   const found = Object
-    .entries(easings)
+    .entries(functions)
     .find(([k, _v]) => k.toLocaleLowerCase() === name);
 
-  if (found === undefined) throw new Error(`Easing '${name}' not found.`);
+  if (found === undefined) return found;
   return found[1];
 };
 
@@ -154,7 +161,7 @@ const resolveEasing = function (name: string): EasingFn {
  * @returns Returns list of available easing names
  */
 export const getEasings = function ():readonly string[] {
-  return Array.from(Object.keys(easings));
+  return Array.from(Object.keys(functions));
 };
 
 const easeOutBounce = function (x:number): number {
@@ -172,7 +179,7 @@ const easeOutBounce = function (x:number): number {
   }
 };
 
-const easings = {
+export const functions = {
   easeInSine: (x: number): number => 1 - cos((x * pi) / 2),
   easeOutSine: (x: number): number => sin((x * pi) / 2),
   easeInQuad: (x: number): number => x * x,

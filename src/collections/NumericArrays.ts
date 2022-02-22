@@ -27,6 +27,28 @@ export const average = (...data: readonly number[]): number => {
 };
 
 /**
+ * Returns the minimum number out of `data`.
+ * Undefined and non-numbers are silently ignored.
+ * @param data
+ * @returns Minimum number
+ */
+export const min = (...data:readonly number[]):number => {
+  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
+  return Math.min(...validNumbers);
+};
+
+/**
+ * Returns the minimum number out of `data`.
+ * Undefined and non-numbers are silently ignored.
+ * @param data
+ * @returns Minimum number
+ */
+export const max = (...data:readonly number[]):number => {
+  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
+  return Math.max(...validNumbers);
+};
+
+/**
  * Returns the min, max, avg and total of the array.
  * Any values that are invalid are silently skipped over.
  * 

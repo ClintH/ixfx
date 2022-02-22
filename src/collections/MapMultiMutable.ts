@@ -19,6 +19,13 @@ class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
   }
 
   /**
+   * Returns the type name. For in-built implementations, it will be one of: array, set or circular
+   */
+  get typeName() {
+    return this.type.name;
+  }
+
+  /**
    * Returns the length of the longest child list
    */
   get lengthMax() {
@@ -186,13 +193,16 @@ class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
  * @template V Data type of items 
  * @returns {@link MapOfMutable}
  */
-export const mapArray = <V>(opts:MapArrayOpts<V> = {}) => {
+export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyArray<V>> => {
   const comparer = opts.comparer === undefined ?
     opts.toString === undefined ? (a:V, b:V) => opts.toString(a) === opts.toString(b) :
       isEqualDefault
     : opts.comparer;
     
   const t:MultiValue<V, ReadonlyArray<V>> = {
+    get name()  {
+      return `array`;
+    },
     add:(dest, values) => {
       if (dest === undefined) return [...values];
       return [...dest, ...values];
@@ -239,6 +249,9 @@ export const mapSet = <V>(opts?:MapSetOpts<V>) => {
   const comparer = (a:V, b:V) => hash(a) === hash(b);
 
   const t:MultiValue<V, ReadonlyMap<string, V>> = {
+    get name()  {
+      return `set`;
+    },
     add:(dest, values) => addUniqueByHash(dest, hash, ...values),
     count: (source) => source.size,
     find: (source, predicate) => mapFind(source, predicate),
@@ -269,8 +282,11 @@ export const mapSet = <V>(opts?:MapSetOpts<V>) => {
  */
 export const mapCircular = <V>(opts:MapCircularOpts<V>):MapOfMutable<V, CircularArray<V>> => {
   const comparer = isEqualDefault;
-
+  
   const t:MultiValue<V, CircularArray<V>> = {
+    get name()  {
+      return `circular`;
+    },
     add:(dest, values) => {
       if (dest === undefined) dest = circularArray<V>(opts.capacity);
       values.forEach(v => dest = dest?.add(v));

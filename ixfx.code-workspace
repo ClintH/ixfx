@@ -9,7 +9,8 @@
 			"**/node_modules": true,
 			"**/etc": true,
 			"**/dist": true,
-			"**/build": true
+			"**/build": true,
+			"**/docs": true
 		},
 		"typescript.tsdk": "./node_modules/typescript/lib",
 		"liveServer.settings.port": 5501
