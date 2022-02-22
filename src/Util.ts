@@ -171,7 +171,7 @@ export const clampIndex = (v: number, arrayOrLength: number|readonly any[]):numb
  * @example Get the halfway point between 30 and 60
  * ```js
  * interpolate(0.5, 30, 60);
- * ````
+ * ```
  * 
  * Interpolation is often used for animation. In that case, `amount`
  * would start at 0 and you would keep interpolating up to `1`
@@ -182,8 +182,8 @@ export const clampIndex = (v: number, arrayOrLength: number|readonly any[]):numb
  * continuously(() => {
  *  // Get position in ping-pong
  *  const amt = pp.next().value;
- *  // interpolate between xStart and xEnd
- *  let v = interpolate(amt, xStart, xEnd); 
+ *  // interpolate between Math.PI and Math.PI*2
+ *  const v = interpolate(amt, Math.PI, Math.PI*2); 
  *  // do something with v...
  * }).start();
  * ```
@@ -245,30 +245,37 @@ export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
 export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof itemToMakeStringFor === `string`) ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor));
 
 /**
- * Wraps a number within a specified range.
- * See {@link wrapDegrees} to wrap within 0-360.
+ * Wraps a number within a specified range, defaulting to degrees (0-360)
  * 
  * This is useful for calculations involving degree angles and hue, which wrap from 0-360.
  * Eg: to add 200 to 200, we don't want 400, but 40. 
  * ```js
- * const v = wrapped(200+200, 0, 360); // 40
+ * const v = wrap(200+200, 0, 360); // 40
  * ```
  * 
  * Or if we minus 100 from 10, we don't want -90 but 270
  * ```js
- * const v = wrapped(10-100, 0, 360); // 270
+ * const v = wrap(10-100, 0, 360); // 270
+ * ```
+ * 
+ * `wrap` uses 0-360 as a default range, so both of these
+ * examples could just as well be:
+ * 
+ * ```js
+ * wrap(200+200);  // 40
+ * wrap(10-100);  // 270
  * ```
  * 
  * Non-zero starting points can be used. A range of 20-70: 
  * ```js
- * const v = wrapped(-20, 20, 70); // 50 
+ * const v = wrap(-20, 20, 70); // 50 
  * ```
  * @param v Value to wrap
- * @param min Minimum of range
- * @param max Maximum of range
+ * @param min Minimum of range (default: 0)
+ * @param max Maximum of range (default: 360)
  * @returns 
  */
-export const wrap = (v:number, min:number, max:number) => {
+export const wrap = (v:number, min:number = 0, max:number = 360) => {
   if (v === min) return min;
   if (v === max) return max;
   v -= min; 
@@ -277,19 +284,6 @@ export const wrap = (v:number, min:number, max:number) => {
   if (v < 0) v = max - Math.abs(v) + min;
   return v + min;
 };
-
-/**
- * Wraps the given `degrees` to within 0-360, using {@link wrap}.
- * 
- * Eg
- * ```
- * wrapDegrees(150); // 150 - fine, within range
- * wrapDegrees(400); // 40  - wraps around
- * wrapDegrees(-20); // 340 - wraps around
- * @param v
- * @returns 
- */
-export const wrapDegrees = (degrees:number) => wrap(degrees, 0, 360);
 
 /**
  * Performs a calculation within a wrapping number range. This is a lower-level function.

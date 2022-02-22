@@ -196,7 +196,7 @@ export const withinRange = (a:Point, b:Point, maxRange:Point|number):boolean => 
 /**
  * Returns a relative point between two points
  * ```js
- * interpolate(a, b, 0.5); // Halfway point between a and b
+ * interpolate(0.5, a, b); // Halfway point between a and b
  * ```
  * 
  * Alias for Lines.interpolate(amount, a, b);

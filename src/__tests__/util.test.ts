@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {average} from '../collections/NumericArrays.js';
-import {repeat, wrap,startsEnds, wrapDegrees, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import {repeat, wrap,startsEnds, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
 test(`repeat`, () => {
   const test1 = repeat(5, () => 1);
@@ -45,23 +45,21 @@ test(`wrap`, () => {
   expect(wrap(150 - 360, 0, 360)).toEqual(150);
   expect(wrap(150 - (360*2), 0, 360)).toEqual(150);
 
-  expect(wrapDegrees(361)).toEqual(1);
-  expect(wrapDegrees(360)).toEqual(360);
-  expect(wrapDegrees(0)).toEqual(0);
-  expect(wrapDegrees(150)).toEqual(150);
-  expect(wrapDegrees(-20)).toEqual(340);
-  expect(wrapDegrees(360*3)).toEqual(0);
-  expect(wrapDegrees(150 - 360)).toEqual(150);
-  expect(wrapDegrees(150 - (360*2))).toEqual(150);
-
+  // Test default 0-360 range
+  expect(wrap(361)).toEqual(1);
+  expect(wrap(360)).toEqual(360);
+  expect(wrap(0)).toEqual(0);
+  expect(wrap(150)).toEqual(150);
+  expect(wrap(-20)).toEqual(340);
+  expect(wrap(360*3)).toEqual(0);
+  expect(wrap(150 - 360)).toEqual(150);
+  expect(wrap(150 - (360*2))).toEqual(150);
 
   // Non-zero min 
   expect(wrap(20, 20, 70)).toEqual(20);
   expect(wrap(70, 20, 70)).toEqual(70);
   expect(wrap(80, 20, 70)).toEqual(30);
   expect(wrap(-20, 20, 70)).toEqual(50);
-
-
 });
 
 test(`toStringDefault`, () => {
