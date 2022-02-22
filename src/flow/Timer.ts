@@ -131,7 +131,7 @@ export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
  * ```
  *
  * @example Return values from a generator every 500ms:
- * ```const
+ * ```js
  * // Make a generator that counts to 10
  * const counter = count(10);
  * for await (const v of interval(counter, 1000)) {

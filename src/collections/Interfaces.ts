@@ -355,6 +355,11 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
   hasKeyValue(key:string, value:V):boolean
 
   /**
+   * Returns _true_ if `key` is stored
+   * @param key 
+   */
+  has(key:string):boolean
+  /**
  * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
  * @param key
  * @param values
