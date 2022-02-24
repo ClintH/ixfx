@@ -46,7 +46,7 @@ type EasingFn = (x: number) => number;
  * @inheritdoc Easing
  * @example Time based easing
  * ```
- * const t = timer(`easeIn`, 5*1000); // Will take 5 seconds to complete
+ * const t = time(`quintIn`, 5*1000); // Will take 5 seconds to complete
  * ...
  * t.compute(); // Get current value of easing
  * t.reset();   // Reset to 0
@@ -56,7 +56,7 @@ type EasingFn = (x: number) => number;
  * @param durationMs Duration in milliseconds
  * @returns Easing
  */
-export const easeOverTime = function (name: EasingName, durationMs: number):Easing {
+export const time = function (name: EasingName, durationMs: number):Easing {
   return create(name, durationMs, msElapsedTimer);
 };
 
@@ -66,7 +66,7 @@ export const easeOverTime = function (name: EasingName, durationMs: number):Easi
  * @inheritdoc Easing
  * @example Tick-based easing
  * ```
- * const t = tick(`easeOut`, 1000);   // Will take 1000 ticks to complete
+ * const t = tick(`sineIn`, 1000);   // Will take 1000 ticks to complete
  * t.compute(); // Each call to `compute` progresses the tick count
  * t.reset();   // Reset to 0
  * t.isDone;    // _True_ if finished
@@ -75,18 +75,16 @@ export const easeOverTime = function (name: EasingName, durationMs: number):Easi
  * @param durationTicks Duration in ticks
  * @returns Easing
  */
-export const easeOverTicks = function (name: EasingName, durationTicks: number):Easing {
+export const tick = function (name: EasingName, durationTicks: number):Easing {
   return create(name, durationTicks, ticksElapsedTimer);
 };
 
 /**
- * 'Ease' from `0` to `1` over a delicious curve. Used commonly for animation
+ * 'Ease' from `0` to `1` over a delicious curve. Commonly used for animation
  * and basic modelling of phyical motion. 
  * 
- * Create via {@link easeOverTicks} or {@link easeOverTime}, call `compute` to calculate the next
+ * Create via {@link tick} or {@link time}, call `compute` to calculate the next
  * value in the progression, until you reach `1` or `isDone` returns true.
- * 
- * For [demos of functions](https://easings.net/)
  * 
  */
 export type Easing = HasCompletion & {
@@ -137,12 +135,23 @@ const create = function (name: EasingName, duration: number, timerSource: TimerS
   };
 };
 
+/**
+ * @private
+ */
 export type EasingName = keyof typeof functions;
 
 /**
  * Returns an easing function by name, or _undefined_ if not found.
- * @param easingName
- * @returns 
+ * This is a manual way of working with easing functions. If you want to
+ * ease over time or ticks, use {@link time} or {@link ticks}.
+ * 
+ * ```js
+ * const fn = Easings.get(`sineIn`);
+ * // Returns 'eased' transformation of 0.5
+ * fn(0.5); 
+ * ```
+ * @param easingName eg `sineIn`
+ * @returns Easing function
  */
 export const get = function (easingName: EasingName): EasingFn|undefined {
   if (easingName === null) throw new Error(`easingName is null`);
@@ -164,7 +173,7 @@ export const getEasings = function ():readonly string[] {
   return Array.from(Object.keys(functions));
 };
 
-const easeOutBounce = function (x:number): number {
+const bounceOut = function (x:number): number {
   const n1 = 7.5625;
   const d1 = 2.75;
 
@@ -180,45 +189,45 @@ const easeOutBounce = function (x:number): number {
 };
 
 export const functions = {
-  easeInSine: (x: number): number => 1 - cos((x * pi) / 2),
-  easeOutSine: (x: number): number => sin((x * pi) / 2),
-  easeInQuad: (x: number): number => x * x,
-  easeOutQuad: (x: number): number => 1 - (1 - x) * (1 - x),
-  easeInOutSine: (x: number): number => -(cos(pi * x) - 1) / 2,
-  easeInOutQuad: (x: number): number => (x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2),
-  easeInCubic: (x: number): number => x * x * x,
-  easeOutCubic: (x: number): number => 1 - pow(1 - x, 3),
-  easeInQuart: (x: number): number => x * x * x * x,
-  easeOutQuart: (x: number): number => 1 - pow(1 - x, 4),
-  easeInQuint: (x: number): number => x * x * x * x * x,
-  easeOutQuint: (x: number): number => 1 - pow(1 - x, 5),
-  easeInExpo: (x: number): number => (x === 0 ? 0 : pow(2, 10 * x - 10)),
-  easeOutExpo: (x: number): number => (x === 1 ? 1 : 1 - pow(2, -10 * x)),
-  easeInOutQuint: (x: number): number => (x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2),
-  easeInOutExpo: (x: number): number => (x === 0
+  sineIn: (x: number): number => 1 - cos((x * pi) / 2),
+  sineOut: (x: number): number => sin((x * pi) / 2),
+  quadIn: (x: number): number => x * x,
+  quadOut: (x: number): number => 1 - (1 - x) * (1 - x),
+  sineInOut: (x: number): number => -(cos(pi * x) - 1) / 2,
+  quadInOut: (x: number): number => (x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2),
+  cubicIn: (x: number): number => x * x * x,
+  cubicOut: (x: number): number => 1 - pow(1 - x, 3),
+  quartIn: (x: number): number => x * x * x * x,
+  quartOut: (x: number): number => 1 - pow(1 - x, 4),
+  quintIn: (x: number): number => x * x * x * x * x,
+  quintOut: (x: number): number => 1 - pow(1 - x, 5),
+  expoIn: (x: number): number => (x === 0 ? 0 : pow(2, 10 * x - 10)),
+  expoOut: (x: number): number => (x === 1 ? 1 : 1 - pow(2, -10 * x)),
+  quintInOut: (x: number): number => (x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2),
+  expoInOut: (x: number): number => (x === 0
     ? 0
     : x === 1
       ? 1
       : x < 0.5 ? pow(2, 20 * x - 10) / 2
         : (2 - pow(2, -20 * x + 10)) / 2),
-  easeInCirc: (x: number): number => 1 - sqrt(1 - pow(x, 2)),
-  easeOutCirc: (x: number): number => sqrt(1 - pow(x - 1, 2)),
-  easeInBack: (x: number): number => {
+  circIn: (x: number): number => 1 - sqrt(1 - pow(x, 2)),
+  circOut: (x: number): number => sqrt(1 - pow(x - 1, 2)),
+  backIn: (x: number): number => {
     const c1 = 1.70158;
     const c3 = c1 + 1;
 
     return c3 * x * x * x - c1 * x * x;
   },
-  easeOutBack: (x: number): number => {
+  backOut: (x: number): number => {
     const c1 = 1.70158;
     const c3 = c1 + 1;
 
     return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
   },
-  easeInOutCirc: (x: number): number => (x < 0.5
+  circInOut: (x: number): number => (x < 0.5
     ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
     : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2),
-  easeInOutBack: (x: number): number => {
+  backInOut: (x: number): number => {
     const c1 = 1.70158;
     const c2 = c1 * 1.525;
 
@@ -226,7 +235,7 @@ export const functions = {
       ? (pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
       : (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
   },
-  easeInElastic: (x: number): number => {
+  elasticIn: (x: number): number => {
     const c4 = (2 * pi) / 3;
 
     return x === 0
@@ -235,7 +244,7 @@ export const functions = {
         ? 1
         : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
   },
-  easeOutElastic: (x: number): number => {
+  elasticOut: (x: number): number => {
     const c4 = (2 * pi) / 3;
 
     return x === 0
@@ -244,9 +253,9 @@ export const functions = {
         ? 1
         : pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1;
   },
-  easeInBounce: (x: number): number => 1 - easeOutBounce(1 - x),
-  easeOutBounce: easeOutBounce,
-  easeInOutElastic: (x: number): number => {
+  bounceIn: (x: number): number => 1 - bounceOut(1 - x),
+  bounceOut: bounceOut,
+  elasticInOut: (x: number): number => {
     const c5 = (2 * pi) / 4.5;
 
     return x === 0
@@ -257,7 +266,7 @@ export const functions = {
           ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2
           : (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1;
   },
-  easeInOutBounce: (x: number): number => (x < 0.5
-    ? (1 - easeOutBounce(1 - 2 * x)) / 2
-    : (1 + easeOutBounce(2 * x - 1)) / 2)
+  bounceInOut: (x: number): number => (x < 0.5
+    ? (1 - bounceOut(1 - 2 * x)) / 2
+    : (1 + bounceOut(2 * x - 1)) / 2)
 };

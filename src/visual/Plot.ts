@@ -7,10 +7,12 @@ import * as Palette from "./Palette.js";
 import {number as guardNumber} from '../Guards.js';
 import { Point} from "../geometry/Point.js";
 import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
-import {Rect} from '~/geometry/Rect.js';
+import {Rect, RectPositioned} from '~/geometry/Rect.js';
+import {Colour} from './index.js';
 
 export type Plotter = {
   add(value:number, series?:string, skipDrawing?:boolean):void
+  drawValue(index:number):void
   clear():void
   dispose():void
 }
@@ -19,39 +21,103 @@ type Series = {
   min:number,
   max:number,
   range:number,
-  name:string
+  name:string,
+  colour:string
 };
 
 type DrawingOpts = PlotOpts & {
+  x:Axis,
+  y:Axis,
   ctx: CanvasRenderingContext2D
-  dataXScale?: number
-  yLabelWidth: number
-  palette: Palette.Palette
+  //dataXScale?: number
+  //yLabelWidth: number
+  //palette: Palette.Palette
   textHeight: number
   capacity:number
   coalesce:boolean
-  showYAxis:boolean
-  showXAxis:boolean
+  //showYAxis:boolean
+  //showXAxis:boolean
   margin:number
   canvasSize:Rect
+  clearCanvas:boolean
+  translucentPlot?:boolean
+  highlightIndex?:number
+  leadingEdgeDot:boolean
+  debug:boolean
 }
+
+/**
+ * Properties for an axis
+ */
+export type Axis = {
+  allowedSeries?:string[]
+  /**
+   * Name of axis, eg `x`
+   */
+  name:string,
+  /**
+   * Colour to use for axis labels
+   */
+  colour?:string,
+  /**
+   * Forced scale for values
+   */
+  scaleRange?:[number,number],
+  /**
+   * Forced range for labelling, by default
+   * uses scaleRange
+   */
+  labelRange?:[number,number],
+  /**
+   * Width of axis line
+   */
+  lineWidth:number,
+  /**
+   * How line ends
+   */
+  endWith: `none` | `arrow`,
+  /**
+   * Where to place the name of the axis
+   */
+  namePosition: `none` | `end` | `side`,
+  /**
+   * Width for y axis, height for x axis
+   */
+  textSize: number,
+  /**
+   * If true, axis labels (ie numeric scale) are shown. Default: true
+   */
+  showLabels:boolean,
+  /**
+   * If true, a line is drawn to represent axis. Default: true
+   */
+  showLine:boolean
+}
+
+export type SeriesColours = {
+  [id:string]: string|undefined
+};
 
 /**
  * Plotter options
  */
 export type PlotOpts = {
+  debug?:boolean,
+  seriesColours?:SeriesColours,
+  x?:Axis,
+  y?:Axis,
   plotSize?:Rect
   autoSizeCanvas?:boolean
-  style?:`connected` | `dots`
-  palette?: Palette.Palette
+  style?:`connected` | `dots` | `none`
+  //palette?: Palette.Palette
   /**
    * Number of items to keep in the circular array
    * Default: 10
    */
   capacity?:number
-  showYAxis?:boolean
-  showXAxis?:boolean
-  yAxes?: string[]|string
+  //showYAxis?:boolean
+  //showXAxis?:boolean
+  //yAxes?: string[]|string
   textHeight?: number
   /**
    * Width of plotted line
@@ -61,17 +127,31 @@ export type PlotOpts = {
    * If true, sub-pixel data points are ignored
    */
   coalesce?:boolean
-  fixedRange?:[number,number]
+  /**
+   * Fixed range to scale Y values. By default normalises values
+   * as they come in. This will also determine the y-axis labels and drawing
+   */
+  //fixedRange?:[number,number]
   /**
    * How many horizontal pixels per data point. If unspecified,
    * it will scale based on width of canvas and capacity.
    */
-  dataXScale?:number
+  //dataXScale?:number
 }
 
 const piPi = Math.PI *2;
 
-export const createScales = (buffer:BufferType) => {
+export const defaultAxis = (name:string):Axis => ({
+  endWith: `none`,
+  lineWidth: 1,
+  namePosition: 'none',
+  name: name,
+  showLabels: name === `y`,
+  showLine: true,
+  textSize: 20
+ });
+
+export const calcScale = (buffer:BufferType, seriesColours?:SeriesColours) => {
   const seriesNames = buffer.keys();
   const scales:Series[] = [];
   seriesNames.forEach(s => {
@@ -81,6 +161,12 @@ export const createScales = (buffer:BufferType) => {
     let {min,max} = minMaxAvg(series);
     let range = max - min;
     
+    let colour;
+    if (seriesColours !== undefined) {
+      colour = seriesColours[s];
+    }
+    if (colour == undefined) colour = Colour.getCssVariable(`yellow`, `white`);
+     
     if (range === 0) {
       range = min;
       min = min - range/2;
@@ -88,7 +174,8 @@ export const createScales = (buffer:BufferType) => {
     }
     scales.push({
       min, max, range,
-      name: s
+      name: s,
+      colour: colour
     })
   });
   return scales;
@@ -100,76 +187,93 @@ export const add = (buffer:BufferType, value:number, series:string = "") => {
 
 type BufferType = MapOfMutable<number, CircularArray<number>> | MapOfMutable<number, ReadonlyArray<number>>;
 
+export const drawValue = (index:number, buffer:BufferType, drawing:DrawingOpts) => {
+  const c =
+  drawing =  {
+    ...drawing,
+    translucentPlot: true,
+    leadingEdgeDot: false
+  };
+  draw(buffer, drawing);
+  
+  drawing =  {
+    ...drawing,
+    highlightIndex: index,
+    leadingEdgeDot: true,
+    translucentPlot: false,
+    style: `none`,
+    clearCanvas: false
+  };
+  draw(buffer, drawing);
+};
+
+const scaleWithFixedRange = (buffer:BufferType, range:[number,number], drawing:DrawingOpts) => calcScale(buffer, drawing.seriesColours).map((s) => ({...s, range: range[1] - range[0], min: range[0], max: range[1]}));
+
+/**
+ * Draws a `buffer` of data with `drawing` options.
+ * 
+ * @param buffer 
+ * @param drawing 
+ */
 export const draw = (buffer:BufferType, drawing:DrawingOpts) => {
-  const {fixedRange, ctx, yLabelWidth, canvasSize} = drawing;
+  const {x:xAxis, y:yAxis, ctx, canvasSize} = drawing;
   const margin = drawing.margin;
   const cap = drawing.capacity === 0 ? buffer.lengthMax : drawing.capacity;
-  const axisLineWidth = 1;
-  let series = createScales(buffer);
+  const series = drawing.y.scaleRange ? scaleWithFixedRange(buffer, drawing.y.scaleRange, drawing) : calcScale(buffer, drawing.seriesColours);
 
-  // Calculate series ranges
-  if (fixedRange !== undefined) {
-    series = series.map((s) => ({...s, range: fixedRange[1] - fixedRange[0], min: fixedRange[0], max: fixedRange[1]}));
-  }
-
-  ctx.clearRect(0,0,canvasSize.width,canvasSize.height);
+  if (drawing.clearCanvas) ctx.clearRect(0,0,canvasSize.width,canvasSize.height);
   
-  // ctx.strokeStyle = `orange`;
-  // ctx.strokeRect(0,0,canvasSize.width, canvasSize.height);
-
-  // For everything
+  // if (drawing.debug) {
+  //   ctx.strokeStyle = `orange`;
+  //   ctx.strokeRect(0,0,canvasSize.width, canvasSize.height); 
+  // }
+  
+  // Move in for margin
   ctx.translate(margin, margin);
 
   // Calculate/use plot area
-  const plotSize = drawing.plotSize ?? plotSizeFromBounds(canvasSize, drawing); 
-  //console.log(`Plot size: ${plotSize.width} x ${plotSize.height}`);
+  const plotSize = drawing.plotSize ?? plotSizeFromBounds(canvasSize, drawing);
 
   // Draw vertical axes
   const axisSize = {height: plotSize.height + margin + margin, width:plotSize.width};
-  if (drawing.showYAxis) {
+
+  if (yAxis.showLabels || yAxis.showLine) {
+    // Draw the labels for each series
     series.forEach(s => {
-      if (drawing.yAxes !== undefined) {
-        if (typeof drawing.yAxes === `string` && s.name !== drawing.yAxes) return;
-        if (!drawing.yAxes.includes(s.name)) return;
+      if (yAxis.allowedSeries !== undefined) {
+        if (!yAxis.allowedSeries.includes(s.name)) return;
       }
-
-      drawVerticalAxis(s, axisSize, drawing);
-      ctx.translate(yLabelWidth +axisLineWidth, 0);
+      drawYSeriesScale(s, axisSize, drawing);
     });
-  }
-  if (drawing.showXAxis) {
-    drawHorizontalAxis(axisSize, drawing)
+
+    // Draw vertical line
+    drawYLine(axisSize, series[0], drawing);
   }
 
-  // Apply margin for plot area
-  ctx.translate(0, margin);
-
-  // Debug: Draw plot area
-  // ctx.strokeStyle = `yellow`;
-  // ctx.strokeRect(0,0,plotSize.width, plotSize.height);
+  // Draw x/horizontal axis if needed
+  if (xAxis.showLabels || xAxis.showLine) {
+    const yPos = yAxis.labelRange ? yAxis.labelRange[0] : series[0].min;
+    drawXAxis(plotSize.width, calcYForValue(yPos, series[0], plotSize.height)+margin + xAxis.lineWidth, drawing);
+  }
 
   const plotDrawing = {
     ...drawing,
-    plotSize,
-    dataXScale: drawing.dataXScale ?? plotSize.width / (cap -1)
-  };
-  // const plotDrawing =  { 
-  //   ...drawing,
-  //   width: width - margin - margin - (showYAxis ? yLabelWidth : 0), 
-  //   height: height - margin - margin,
-  // }
-  //if (plotDrawing.dataXScale === undefined) plotDrawing.dataXScale = plotSize.width / (cap -1);
-
-  // Apply margin for plot area compared to series title
-  //ctx.translate(0, margin);
+    plotSize}
+    //,
+    //dataXScale: drawing.dataXScale ?? plotSize.width / (cap -1)
+  //};
 
   // Draw data for each series
   series.forEach(s => {
     const data = buffer.getSource(s.name);
     if (data === undefined) return;
-    //console.log(`draw ${s.name} min: ${s.min} max: ${s.max} range: ${s.range}`);
-    const leadingEdgeIndex = (buffer.typeName === `circular`)  ? (data as CircularArray<number>).pointer - 1: data.length -1;
+    
+    let leadingEdgeIndex = (buffer.typeName === `circular`)  ? (data as CircularArray<number>).pointer - 1: data.length -1;
+    if (drawing.highlightIndex !== undefined) leadingEdgeIndex = drawing.highlightIndex; 
+    ctx.save();
+    ctx.translate(0, margin + margin);
     drawSeriesData(s, data, plotSize, plotDrawing, leadingEdgeIndex);
+    ctx.restore();
   });
 
   ctx.resetTransform();
@@ -181,51 +285,78 @@ export const draw = (buffer:BufferType, drawing:DrawingOpts) => {
  * @param height 
  * @param drawing 
  */
-const drawVerticalAxis = (series:Series, plotSize:Rect, drawing:DrawingOpts) => {
-  const {ctx, palette, yLabelWidth} = drawing;
+const drawYSeriesScale = (series:Series, plotSize:Rect, drawing:DrawingOpts) => {
+  const {ctx, y, margin} = drawing;
   const {width, height} = plotSize;
 
-  // ctx.strokeStyle = `green`;
-  // ctx.strokeRect(0,0, drawing.yLabelWidth, height);
+  if (drawing.debug) {
+    ctx.strokeStyle = `green`;
+    ctx.strokeRect(0,0, y.textSize, height + margin);  
+  }
   
-  // Use axis colour if defined, or otherwise series
-  if (palette.has(`series${series.name}-axis`))
-    ctx.fillStyle = palette.get(`series${series.name}-axis`);
-  else
-    ctx.fillStyle = palette.getOrAdd(`series${series.name}`);
+  ctx.fillStyle = series.colour.length > 0 ? series.colour : `white`;
 
-  // Draw line
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(yLabelWidth ,0);
-  ctx.lineTo(yLabelWidth, height);
-  ctx.strokeStyle = ctx.fillStyle;
-  ctx.stroke();
+  // Override colour with axis-defined colour
+  if (y.colour) ctx.fillStyle = y.colour;
 
   // Draw labels
-  const mid = series.min + (series.range / 2)
+  const min = y.labelRange ? y.labelRange[0] : series.min;
+  const max = y.labelRange ? y.labelRange[1] : series.max;
+  const range = y.labelRange ? max - min : series.range;
+  const mid = min + (range / 2)
   const halfHeight = drawing.textHeight / 2;
+
   ctx.textBaseline = `top`;
-  ctx.fillText(series.min.toFixed(2), 0, height - drawing.textHeight);
-  ctx.fillText(series.max.toFixed(2), 0, 0);
-  ctx.fillText(mid.toFixed(2), 0, height/2 - halfHeight);
+  ctx.fillText(min.toFixed(2), 0, calcYForValue(min, series, height)-halfHeight);
+  ctx.fillText(mid.toFixed(2), 0, calcYForValue(mid, series, height)-halfHeight);
+  ctx.fillText(max.toFixed(2), 0, calcYForValue(max, series, height)-halfHeight);
+
+  // ctx.fillText(min.toFixed(2), 0, height - drawing.textHeight + margin);
+  // ctx.fillText(max.toFixed(2), 0, 0);
+  // ctx.fillText(mid.toFixed(2), 0, height/2 - halfHeight);
+  ctx.translate(y.textSize + margin, 0);
 }
 
-const drawHorizontalAxis = (plotSize:Rect, drawing:DrawingOpts) => {
+const drawYLine = (plotSize:Rect, series:Series, drawing:DrawingOpts) => {
+  const {ctx, y} = drawing;
   const {width, height} = plotSize;
+  
+  const min = y.labelRange ? y.labelRange[0] : series.min;
+  const max = y.labelRange ? y.labelRange[1] : series.max;
 
-  const {ctx, palette, yLabelWidth} = drawing;
+  const minPos = calcYForValue(min, series, height);
+  const maxPos = calcYForValue(max, series, height);
+
+  // Draw line
+  ctx.translate(y.lineWidth, 0);
+  ctx.lineWidth = y.lineWidth;
+  ctx.beginPath();
+  ctx.moveTo(0, minPos);
+  ctx.lineTo(0, maxPos);
+  ctx.strokeStyle = series.colour;
+  if (y.colour) ctx.strokeStyle = y.colour;
+  ctx.stroke();
+  ctx.translate(y.lineWidth, 0);
+};
+
+const drawXAxis = (width:number, yPos:number, drawing:DrawingOpts) => {
+  //const {width, height} = plotSize;
+  const {ctx, x, y} = drawing;
+
+  if (!x.showLine) return;
 
   // Use axis colour if defined, or otherwise series
-  if (palette.has(`series-axis`))
-    ctx.strokeStyle = palette.get(`series-axis`);
-  else
-    ctx.strokeStyle = palette.getOrAdd(`series`);
-
-  ctx.lineWidth = 1;
+  // if (palette.has(`series-axis`))
+  //   ctx.strokeStyle = palette.get(`series-axis`);
+  // else
+  //   ctx.strokeStyle = palette.getOrAdd(`series`);
+  if (x.colour) ctx.strokeStyle = x.colour;
+  ctx.lineWidth = x.lineWidth;
   ctx.beginPath();
-  ctx.moveTo(0, height-1);
-  ctx.lineTo(width, height -1);
+
+  // Assumes ctx is translated after drawing Y axis
+  ctx.moveTo(0, yPos);//height-1);
+  ctx.lineTo(width, yPos);//height -1);
   ctx.stroke();
 }
 
@@ -237,74 +368,117 @@ const drawHorizontalAxis = (plotSize:Rect, drawing:DrawingOpts) => {
  * @param drawing 
  */
 const drawSeriesData = (series:Series, values:ArrayLike<number>, plotSize:Rect, drawing:DrawingOpts, leadingEdgeIndex:number) => {
-  const {ctx, dataXScale = 1, lineWidth = 2} = drawing;
+  const {ctx, lineWidth = 2, translucentPlot = false, margin, x:xAxis} = drawing;
   const style = drawing.style ?? `connected`;
+  const height = plotSize.height - margin;
+
+  let dataXScale = 1;
+  if (xAxis.scaleRange) {
+    const xAxisRange = xAxis.scaleRange[1] - xAxis.scaleRange[0];
+    dataXScale = plotSize.width / xAxisRange;
+  } else {
+    if (drawing.capacity === 0) dataXScale = plotSize.width / values.length;
+    else dataXScale = plotSize.width / drawing.capacity;
+  }
+
+  // Step through data faster if per-pixel density is above one
+  const incrementBy = drawing.coalesce ? 
+    dataXScale! < 0 ? Math.floor((1/dataXScale!)) : 1
+    : 1;
 
   let x = 0;
   let leadingEdge:Point|undefined;
   
+  // if (drawing.debug) {
+  //   ctx.strokeStyle = `green`;
+  //   ctx.strokeRect(0,0, plotSize.width, plotSize.height);
+  // }
+
+  const colourTransform = (c:string) => {
+    if (translucentPlot) return Colour.opacity(c, 0.2);
+    return c;
+  }
+
   if (style === `dots`) { 
-    ctx.fillStyle = drawing.palette.getOrAdd(`series${series.name}`);
+    ctx.fillStyle = colourTransform(series.colour);// colourTransform(drawing.palette.getOrAdd(`series${series.name}`));
+  } else if (style === `none`) {
   } else {
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = drawing.palette.getOrAdd(`series${series.name}`);
+    ctx.strokeStyle = colourTransform(series.colour); //colourTransform(drawing.palette.getOrAdd(`series${series.name}`));
   } 
 
-  const height = plotSize.height;
-  const incrementBy = drawing.coalesce ? 
-    drawing.dataXScale! < 0 ? Math.floor((1/drawing.dataXScale!)) : 1
-    : 1;
   for (let i=0; i<values.length; i += incrementBy) {
-    let y = (1 - (values[i] - series.min) / series.range) * height;
+    let y = calcYForValue(values[i], series, height);// (1 - (values[i] - series.min) / series.range) * height;
     
     if (style === `dots`) {
       ctx.beginPath();
       ctx.arc(x, y, lineWidth, 0, piPi);
       ctx.fill();
+    } else if (style === `none`) {
     } else  {
       if (i == 0) ctx.moveTo(x, y);
       ctx.lineTo(x, y);
     }
-    //if (i +1 == values.pointer) {
+    
     if (i === leadingEdgeIndex) {
       leadingEdge = {x, y}
     }
     x += dataXScale;
   }
-  ctx.stroke();
+
+  if (style === `connected`) {
+    ctx.stroke();
+  }
 
   // Draw a circle at latest data point
-  if (leadingEdge !== undefined) {
+  if (leadingEdge !== undefined && drawing.leadingEdgeDot) {
     ctx.beginPath();
+    ctx.fillStyle = colourTransform(series.colour);// drawing.palette.getOrAdd(`series${series.name}`));
     ctx.arc(leadingEdge.x, leadingEdge.y, 3, 0, 2 * Math.PI);
     ctx.fill();
   }
 }
 
+const calcYForValue = (v:number, series:Series, height:number) => (1 - (v - series.min) / series.range) * height;
 
-const plotSizeFromBounds = (bounds:Rect, opts:{showYAxis:boolean, margin:number, yLabelWidth:number}):Rect => {
-  const showYAxis = opts.showYAxis;
-  const margin = opts.margin;
-  const width = bounds.width;
-  const height = bounds.height;
-  const yLabelWidth = opts.yLabelWidth;
+const calcSizing = (margin:number, x:Axis, y:Axis) => {
+  let fromLeft = margin;
+  if (y.showLabels) fromLeft += y.textSize;
+  if (y.showLine) fromLeft += y.lineWidth;
+  if (y.showLabels || y.showLine) fromLeft += margin + margin;
+  let fromRight = margin;
+
+  let fromTop = margin + margin;
+  let fromBottom = margin + margin;
+  if (x.showLabels) fromBottom += x.textSize;
+  if (x.showLine) fromBottom += x.lineWidth;
+  if (x.showLabels || x.showLine) fromBottom += margin;
+
   return {
-    width: width - (4*margin) - (showYAxis ? yLabelWidth : 0), 
-    height: height - (4 * margin)
+    left: fromLeft,
+    right: fromRight,
+    top: fromTop,
+    bottom: fromBottom
+  };
+}
+
+const plotSizeFromBounds = (bounds:Rect, opts:{margin:number, y:Axis, x:Axis}):Rect => {
+  const { width, height } = bounds;
+  const sizing = calcSizing(opts.margin, opts.x, opts.y);
+  return {
+    width: width - sizing.left - sizing.right, 
+    height: height - sizing.top - sizing.bottom
   }
 };
 
-const canvasSizeFromPlot = (plot:Rect, opts:{showYAxis:boolean, margin:number, yLabelWidth:number}):Rect => {
-  const showYAxis = opts.showYAxis;
-  const margin = opts.margin;
-  const width = plot.width;
-  const height = plot.height;
-  const yLabelWidth = opts.yLabelWidth;
+const canvasSizeFromPlot = (plot:Rect, opts:{margin:number, y:Axis, x:Axis}):Rect => {
+  const { width, height } = plot;
+  const sizing = calcSizing(opts.margin, opts.x, opts.y);
   return {
-    width: width + margin + margin + margin + margin + (showYAxis ? yLabelWidth : 0),
-    height: height + margin + margin + margin
-  }
+    width: plot.width + sizing.left + sizing.right,
+    height: plot.height + sizing.top + sizing.bottom
+  };
 };
 
 /**
@@ -340,7 +514,7 @@ const canvasSizeFromPlot = (plot:Rect, opts:{showYAxis:boolean, margin:number, y
  * it will use `--series` and `--series-axis`.
  * @param parentElOrQuery
  * @param opts
- * @return PLotter instance
+ * @return Plotter instance
  */
 export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter => {
   if (parentElOrQuery === null) throw new Error(`parentElOrQuery is null. Expected string or element`);
@@ -373,27 +547,40 @@ export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter 
   // Sanity-check
   if (ctx === null) throw new Error(`Drawing context not available`);
 
+  const xAxis = opts.x ?? defaultAxis(`x`);
+  let yAxis = opts.y ?? defaultAxis(`y`);
+
   let drawingOpts = {
     ...opts,
+    y: yAxis,
+    x: xAxis,
+
     capacity, coalesce, plotSize, canvasSize, ctx,
     textHeight: opts.textHeight ?? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
-    palette: opts.palette ?? Palette.create(),
+    // palette: opts.palette ?? Palette.create(),
     style: opts.style ?? `connected`,
-    showYAxis: opts.showYAxis ?? true,
-    showXAxis: opts.showXAxis ?? false,
     margin: 3,
-    yLabelWidth: 25
+    yLabelWidth: 25,
+    clearCanvas:true,
+    leadingEdgeDot:true,
+    debug: opts.debug ?? false
   };
 
   if (plotSize) {
     // Size canvas based on given plot size
+    //console.log(`Canvas size from plot`);
     const canvasSize = canvasSizeFromPlot(plotSize, drawingOpts);
     canvasEl.width = canvasSize.width;
     canvasEl.height = canvasSize.height;
+    //console.log(`Canvas size from plot: ${canvasSize.width},${canvasSize.height} plot: ${plotSize.width}, ${plotSize.height}`);
+    drawingOpts.canvasSize = canvasSize;
+  } else {
+    //console.log(`Assuming canvas is sized`);
   }
 
   //console.log(drawingOpts);
   if (opts.autoSizeCanvas) {
+    console.log(`autoSizeCanvas`);
     parentSizeCanvas(canvasEl, (args) => {
       const bounds = args.bounds;
       drawingOpts = {
@@ -407,6 +594,9 @@ export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter 
   }
 
   return {
+    drawValue: (index:number) => {
+      drawValue(index, buffer, drawingOpts);
+    },
     dispose: () => {
       if (destroyCanvasEl) canvasEl.remove();
     },

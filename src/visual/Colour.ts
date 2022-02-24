@@ -129,8 +129,8 @@ export const opacity = (colour:Colourish, amt:number):string => {
  */
 export const interpolate = (amount:number, from:Colourish, to:Colourish, optsOrSpace?:string|InterpolationOpts):string => {
   guardNumber(amount, `percentage`, `amount`);
-  if (typeof from === `string`) throw new Error(`Expected string for 'from' param`);
-  if (typeof to === `string`) throw new Error(`Expected string for 'to' param`);
+  if (typeof from !== `string`) throw new Error(`Expected string for 'from' param`);
+  if (typeof to !== `string`) throw new Error(`Expected string for 'to' param`);
 
   let opts:InterpolationOpts;
   if (typeof optsOrSpace === `undefined`) opts = {};

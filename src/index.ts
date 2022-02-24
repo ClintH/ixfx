@@ -41,7 +41,7 @@ export * as Dom from './dom/index.js';
  * 
  * Overview:
  * * {@link adsr}: Modulate over a series of ADSR stages.
- * * {@link easeOverTime}: Ease from `0` to `1` over a specified duration.
+ * * {@link Easings}: Ease from `0` to `1` over a specified duration.
  * 
  * @example Import examples
  * ```
@@ -49,7 +49,7 @@ export * as Dom from './dom/index.js';
  * import {adsr, defaultAdsrOpts} from '../../ixfx/modulation.js';
  * 
  * // Import from web
- * import {adsr, defaultAdsrOpts} from 'TODO'
+ * import {adsr, defaultAdsrOpts} from 'https://unpkg.com/ixfx/modulation.js'
  * ```
  * 
  */

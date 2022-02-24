@@ -44,7 +44,7 @@ export const weighted2 = (min: number, max: number) => {
  * 
  * @param max Maximum (exclusive)
  * @param min Minimum number (inclusive), 0 by default
- * @param easing Easing to use, uses `easeInQuad` by default
+ * @param easing Easing to use, uses `quadIn` by default
  * @returns 
  */
 export const weightedInteger = (minOrMax:number, maxOrEasing?:number|Easings.EasingName, easing?:Easings.EasingName) => {
@@ -53,7 +53,7 @@ export const weightedInteger = (minOrMax:number, maxOrEasing?:number|Easings.Eas
   guardNumber(minOrMax);
   //eslint-disable-next-line functional/no-let
   let min, max, easingName;
-  easingName = `easeInQuad`;
+  easingName = `quadIn`;
   min = 0;
 
   if (maxOrEasing === undefined) {

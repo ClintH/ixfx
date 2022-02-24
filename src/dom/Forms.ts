@@ -201,13 +201,13 @@ export interface SelectHandler {
  * mySelect.select(1); // Select second item
  * mySelect.select(1, true); // If true is added, change handler fires as well
  * ```
- * @param {(string|HTMLSelectElement)} domIdOrEl
- * @param {(currentVal:string) => void} [onChanged]
- * @param {SelectOpts} [opts={}]
- * @return {*} 
+ * @param domQueryOrEl Query (eg `#id`) or element
+ * @param onChanged Callback when a selection is made
+ * @param opts Options
+ * @return  
  */
-export const select = (domIdOrEl:string|HTMLSelectElement, onChanged?:(currentVal:string) => void, opts:SelectOpts = {}):SelectHandler => {
-  const el = resolveEl(domIdOrEl) as HTMLSelectElement;
+export const select = (domQueryOrEl:string|HTMLSelectElement, onChanged?:(currentVal:string) => void, opts:SelectOpts = {}):SelectHandler => {
+  const el = resolveEl(domQueryOrEl) as HTMLSelectElement;
   const {placeholderOpt, shouldAddChoosePlaceholder = false, autoSelectAfterChoice = -1} = opts;
 
   const change = () => {

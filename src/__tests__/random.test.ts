@@ -24,7 +24,7 @@ test(`weightedInteger`, () => {
   const test2 = repeat(1000, () => weightedInteger(10, 20));
   expect(inBounds(test2, 0, 20)).toBeTruthy();
 
-  const test3 = repeat(1000, () => weightedInteger(20, `easeInBack`));
+  const test3 = repeat(1000, () => weightedInteger(20, `backIn`));
   expect(inBounds(test3, 0, 20)).toBeTruthy();
 
   // Error: max is greater than min
@@ -34,7 +34,7 @@ test(`weightedInteger`, () => {
   // @ts-ignore
   expect(()=>weightedInteger(10, `madeUpEasing`)).toThrow();
 
-  // Error: wrong param for second type
+  // Error: wrong param for second types
   // @ts-ignore
   expect(()=>weightedInteger(0,false)).toThrow();
 
