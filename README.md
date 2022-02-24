@@ -12,19 +12,26 @@ Please see [the documentation](https://clinth.github.io/ixfx-docs/) for how to g
 
 ## Why ixfx?
 
-There are many 'front end' frameworks, but these are typically meant for regular GUIs or document-based apps. They usually have idiosyncratic ways of structuring code, custom syntax, and elaborate build processes. Great though if you're doing that kind of thing often.
+There are many 'front-end' frameworks, but these are typically meant for regular GUIs or document-based apps. They usually have idiosyncratic ways of structuring code, custom syntax, and elaborate build processes. Great though if you're doing that kind of thing often.
 
-There are also several 'creative coding' sandboxes. Many of these are better suited than front end frameworks for experimentation in interactivity, but again tend to be their own little ecosystem removed from the web platform. These tend to favour Canvas-based visuals, and seem largely ignorant of the wider web platform or modern coding practices.
+There are also several 'creative coding' sandboxes. These are better suited than front-end frameworks for experimentation in interactivity, but again tend to be their own little ecosystem removed from the web platform. They favour Canvas-based visuals, and seem largely ignorant of the wider web platform or modern coding practices.
 
 In both cases one spends a lot of time learning the particular framework and its way of doing things rather than the web platform itself. Learning Javascript as a language also gets lost in this. Having to ask "how do I do _x_ in React?" or "how do I do _x_ in P5.js?" is a sign the framework has eaten you.
 
 Some principles are:
 * No build process required
 * No sandbox lock-in: follow web platform conventions so that patterns learned can be applied elsewhere
-* Type definitions for improved editor experience (in VS Code at least)
+* Good type definitions and documentation for improved editor experience (in VS Code at least)
 * Plain, immutable data over rich objects
 * Favour functional approaches over OOP
-* ...and especially w.r.t. to the last two points, the usability of the APIs takes precedence
+
+## Features
+
+ixfx offers:
+* Flow: state machine, time-based delay/intervals, debounce, throttling
+* Modulation: ADSR envelope, oscillators, easing functions
+* Data: generators, frequency-tracking, stack and queue collections, colour functions
+* Geometry: primitives for Cartesian & polar coordinates, points, lines, arcs, circles and grid layouts.
 
 ## Building
 
