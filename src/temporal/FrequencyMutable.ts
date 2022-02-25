@@ -1,9 +1,9 @@
 /// ✔ Unit tested!
 
-import { ToString } from "./Util.js";
-import {SimpleEventEmitter} from "./Events.js";
-import * as KeyValueUtil from './KeyValue.js';
-import {KeyValues} from "./index.js";
+import { ToString } from "../Util.js";
+import {SimpleEventEmitter} from "../Events.js";
+import * as KeyValueUtil from '../KeyValue.js';
+import {KeyValues} from "../index.js";
 
 type FrequencyEventMap = {
   readonly change:void;
@@ -181,4 +181,4 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
  * @param keyString Function to generate keys for items. If not specified, uses JSON.stringify 
  * @returns 
  */
- export const frequencyMutable = <V>(keyString?:ToString<V>|undefined) => new FrequencyMutable<V>(keyString);
+export const frequencyMutable = <V>(keyString?:ToString<V>|undefined) => new FrequencyMutable<V>(keyString);

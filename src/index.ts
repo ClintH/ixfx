@@ -1,4 +1,7 @@
+export * as Temporal from './temporal/index.js';
+
 export * as Geometry from './geometry/index.js';
+
 
 /**
  * Control execution
@@ -82,10 +85,5 @@ export * as KeyValues from './KeyValue.js';
 
 export * from './Util.js';
 
-
-//export * as Timers from './flow/Timer.js';
-
-
 // Classes
 export { KeyValue } from './KeyValue.js';
-export {frequencyMutable, FrequencyMutable} from './FrequencyMutable.js';

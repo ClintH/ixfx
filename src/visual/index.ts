@@ -11,6 +11,7 @@ import * as Colour from './Colour.js';
  * Overview
  * * {@link interpolate}: Blend colours
  * * {@link scale}: Produce colour scale
+ * * {@link opacity}: Give a colour opacity
  */
 export {Colour};
 

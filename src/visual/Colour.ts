@@ -10,6 +10,10 @@ export type Spaces = `hsl` | `rgb` | `lab` | `hcl` | `cubehelix`;
  * @private
  */
 export type Colour = d3Colour.RGBColor | d3Colour.HSLColor;
+
+/**
+ * A representation of colour. Eg: `blue`, `rgb(255,0,0)`, `hsl(20,100%,50%)`
+ */
 export type Colourish = string|d3Colour.ColorCommonInstance;
 
 /**
@@ -80,11 +84,17 @@ export const toHex = (colour:Colourish):string => {
  * Returns a variation of colour with its opacity multiplied by `amt`.
  * 
  * ```js
+ * // Return a colour string for blue that is 50% opaque
  * opacity(`blue`, 0.5);
+ * // eg: `rgba(0,0,255,0.5)`
+ * 
+ * // Returns a colour string that is 50% more opaque
+ * opacity(`hsla(200,100%,50%,50%`, 0.5);
+ * // eg: `hsla(200,100%,50%,25%)` 
  * ```
- * @param colour
- * @param amt 
- * @returns 
+ * @param colour A valid CSS colour
+ * @param amt Amount to multiply opacity by
+ * @returns String representation of colour
  */
 export const opacity = (colour:Colourish, amt:number):string => {
   const c = resolveColour(colour);

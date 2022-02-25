@@ -26,8 +26,8 @@ type Series = {
 };
 
 type DrawingOpts = PlotOpts & {
-  x:Axis,
-  y:Axis,
+  x:Axis
+  y:Axis
   ctx: CanvasRenderingContext2D
   //dataXScale?: number
   //yLabelWidth: number
@@ -44,6 +44,8 @@ type DrawingOpts = PlotOpts & {
   highlightIndex?:number
   leadingEdgeDot:boolean
   debug:boolean
+  digitsPrecision:number
+  lineWidth:number
 }
 
 /**
@@ -104,6 +106,10 @@ export type SeriesColours = {
 export type PlotOpts = {
   debug?:boolean,
   seriesColours?:SeriesColours,
+  /**
+   * Default: 2
+   */
+  digitsPrecision?:number,
   x?:Axis,
   y?:Axis,
   plotSize?:Rect
@@ -223,10 +229,10 @@ export const draw = (buffer:BufferType, drawing:DrawingOpts) => {
 
   if (drawing.clearCanvas) ctx.clearRect(0,0,canvasSize.width,canvasSize.height);
   
-  // if (drawing.debug) {
-  //   ctx.strokeStyle = `orange`;
-  //   ctx.strokeRect(0,0,canvasSize.width, canvasSize.height); 
-  // }
+  if (drawing.debug) {
+    ctx.strokeStyle = `orange`;
+    ctx.strokeRect(0,0,canvasSize.width, canvasSize.height); 
+  }
   
   // Move in for margin
   ctx.translate(margin, margin);
@@ -247,7 +253,7 @@ export const draw = (buffer:BufferType, drawing:DrawingOpts) => {
     });
 
     // Draw vertical line
-    drawYLine(axisSize, series[0], drawing);
+    if (yAxis.showLine) drawYLine(axisSize, series[0], drawing);
   }
 
   // Draw x/horizontal axis if needed
@@ -286,11 +292,11 @@ export const draw = (buffer:BufferType, drawing:DrawingOpts) => {
  * @param drawing 
  */
 const drawYSeriesScale = (series:Series, plotSize:Rect, drawing:DrawingOpts) => {
-  const {ctx, y, margin} = drawing;
+  const {ctx, y, digitsPrecision, margin} = drawing;
   const {width, height} = plotSize;
 
   if (drawing.debug) {
-    ctx.strokeStyle = `green`;
+    ctx.strokeStyle = `purple`;
     ctx.strokeRect(0,0, y.textSize, height + margin);  
   }
   
@@ -307,13 +313,10 @@ const drawYSeriesScale = (series:Series, plotSize:Rect, drawing:DrawingOpts) => 
   const halfHeight = drawing.textHeight / 2;
 
   ctx.textBaseline = `top`;
-  ctx.fillText(min.toFixed(2), 0, calcYForValue(min, series, height)-halfHeight);
-  ctx.fillText(mid.toFixed(2), 0, calcYForValue(mid, series, height)-halfHeight);
-  ctx.fillText(max.toFixed(2), 0, calcYForValue(max, series, height)-halfHeight);
+  ctx.fillText(min.toFixed(digitsPrecision), 0, calcYForValue(min, series, height)-halfHeight);
+  ctx.fillText(mid.toFixed(digitsPrecision), 0, calcYForValue(mid, series, height)-halfHeight);
+  ctx.fillText(max.toFixed(digitsPrecision), 0, calcYForValue(max, series, height) - margin);
 
-  // ctx.fillText(min.toFixed(2), 0, height - drawing.textHeight + margin);
-  // ctx.fillText(max.toFixed(2), 0, 0);
-  // ctx.fillText(mid.toFixed(2), 0, height/2 - halfHeight);
   ctx.translate(y.textSize + margin, 0);
 }
 
@@ -340,16 +343,10 @@ const drawYLine = (plotSize:Rect, series:Series, drawing:DrawingOpts) => {
 };
 
 const drawXAxis = (width:number, yPos:number, drawing:DrawingOpts) => {
-  //const {width, height} = plotSize;
   const {ctx, x, y} = drawing;
 
   if (!x.showLine) return;
 
-  // Use axis colour if defined, or otherwise series
-  // if (palette.has(`series-axis`))
-  //   ctx.strokeStyle = palette.get(`series-axis`);
-  // else
-  //   ctx.strokeStyle = palette.getOrAdd(`series`);
   if (x.colour) ctx.strokeStyle = x.colour;
   ctx.lineWidth = x.lineWidth;
   ctx.beginPath();
@@ -368,7 +365,7 @@ const drawXAxis = (width:number, yPos:number, drawing:DrawingOpts) => {
  * @param drawing 
  */
 const drawSeriesData = (series:Series, values:ArrayLike<number>, plotSize:Rect, drawing:DrawingOpts, leadingEdgeIndex:number) => {
-  const {ctx, lineWidth = 2, translucentPlot = false, margin, x:xAxis} = drawing;
+  const {ctx, lineWidth, translucentPlot = false, margin, x:xAxis} = drawing;
   const style = drawing.style ?? `connected`;
   const height = plotSize.height - margin;
 
@@ -389,10 +386,10 @@ const drawSeriesData = (series:Series, values:ArrayLike<number>, plotSize:Rect, 
   let x = 0;
   let leadingEdge:Point|undefined;
   
-  // if (drawing.debug) {
-  //   ctx.strokeStyle = `green`;
-  //   ctx.strokeRect(0,0, plotSize.width, plotSize.height);
-  // }
+  if (drawing.debug) {
+    ctx.strokeStyle = `green`;
+    ctx.strokeRect(0,0, plotSize.width, plotSize.height);
+  }
 
   const colourTransform = (c:string) => {
     if (translucentPlot) return Colour.opacity(c, 0.2);
@@ -409,7 +406,7 @@ const drawSeriesData = (series:Series, values:ArrayLike<number>, plotSize:Rect, 
   } 
 
   for (let i=0; i<values.length; i += incrementBy) {
-    let y = calcYForValue(values[i], series, height);// (1 - (values[i] - series.min) / series.range) * height;
+    let y = calcYForValue(values[i], series, height) -1;// (1 - (values[i] - series.min) / series.range) * height;
     
     if (style === `dots`) {
       ctx.beginPath();
@@ -440,7 +437,7 @@ const drawSeriesData = (series:Series, values:ArrayLike<number>, plotSize:Rect, 
   }
 }
 
-const calcYForValue = (v:number, series:Series, height:number) => (1 - (v - series.min) / series.range) * height;
+const calcYForValue = (v:number, series:Series, height:number) => (1 - (v - series.min) / series.range) * height ;
 
 const calcSizing = (margin:number, x:Axis, y:Axis) => {
   let fromLeft = margin;
@@ -452,6 +449,7 @@ const calcSizing = (margin:number, x:Axis, y:Axis) => {
   let fromTop = margin + margin;
   let fromBottom = margin + margin;
   if (x.showLabels) fromBottom += x.textSize;
+  else fromBottom += margin;
   if (x.showLine) fromBottom += x.lineWidth;
   if (x.showLabels || x.showLine) fromBottom += margin;
 
@@ -563,7 +561,9 @@ export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter 
     yLabelWidth: 25,
     clearCanvas:true,
     leadingEdgeDot:true,
-    debug: opts.debug ?? false
+    debug: opts.debug ?? false,
+    digitsPrecision: opts.digitsPrecision ?? 2,
+    lineWidth: opts.lineWidth ?? 2
   };
 
   if (plotSize) {

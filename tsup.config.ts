@@ -18,6 +18,7 @@ export default defineConfig({
     sets: `./src/collections/Set.ts`,
     stateMachine: `./src/flow/StateMachine.ts`,
     svg: `./src/visual/Svg.ts`,
+    temporal: `./src/temporal/index.ts`,
     util: `./src/Util.ts`,
     visual: `./src/visual/index.ts`,
   },

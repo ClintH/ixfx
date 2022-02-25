@@ -1,5 +1,5 @@
-import {minMaxAvg} from "./collections/NumericArrays.js";
-import {clamp, scale} from "./Util.js";
+import {minMaxAvg} from "../collections/NumericArrays.js";
+import {clamp, scale} from "../Util.js";
 
 /**
  * Normalises numbers, adjusting min/max as new values are processed.
@@ -48,6 +48,7 @@ export const stream = (minDefault?:number, maxDefault?:number) => {
 /**
  * Normalises an array. By default uses the actual min/max of the array
  * as the normalisation range.
+ * 
  * ```js
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
  * array([5,1,0,9,10]);
