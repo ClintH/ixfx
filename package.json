@@ -1,6 +1,6 @@
 {
-  "name": "ixfx",
-  "version": "0.0.6",
+  "name": "@clinth/ixfx",
+  "version": "0.0.7",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -30,7 +30,7 @@
     "clean": "rimraf dist && rimraf etc",
     "run": "tsc && node -r source-map-support/register",
     "bundle": "tsup --sourcemap && npm run typings",
-    "prepublish": "npm run clean && tsup && npm run typings",
+    "prepublish": "npm run clean && npm run bundle",
     "typings": "tsc --project config/tsconfig.pkg.json",
     "typings:watch": "tsc --watch --project config/tsconfig.pkg.json",
     "demos": "npm run bundle && npm run copyForDemos",
@@ -39,8 +39,8 @@
     "docs": "typedoc --customCss ./config/custom.css --options ./config/typedoc.json && npm run copyIcons",
     "docs:watch": "typedoc --customCss ./config/custom.css --watch --options ./config/typedoc.json",
     "copyIcons": "copyfiles --up 1 ./config/*.png ./docs/assets/",
-    "publishNpm": "npm config set @clinth/registry=https://registry.npmjs.org && npm set name=ixfx && npm publish",
-    "publishGh": "npm config set registry=https://npm.pkg.github.com && npm set name=@clinth/ixfx && npm publish",
+    "publishNpm": "npm config set registry https://registry.npmjs.org && npm set name ixfx && npm publish",
+    "publishGh": "npm config set registry https://npm.pkg.github.com && npm set name @clinth/ixfx && npm publish",
     "lint": "eslint src/**",
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js"
