@@ -36,7 +36,7 @@ export type NumberGuardRange =
  */
 export const number = (value:number, range:NumberGuardRange = ``, paramName = `?`):boolean => {
   if (Number.isNaN(value)) throw new Error(`Parameter '${paramName}' is NaN`);
-  if (typeof value !== `number`) throw new Error(`Parameter '${paramName}' does not have type of number (${value})`);
+  if (typeof value !== `number`) throw new Error(`Parameter '${paramName}' is not a number (${value})`);
   switch (range) {
   case `positive`:
     if (value < 0) throw new Error(`Parameter ${paramName} must be at least zero (${value})`);

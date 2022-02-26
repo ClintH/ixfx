@@ -125,7 +125,7 @@ export const cellEquals = (a: Cell, b: Cell): boolean => {
  * @param paramName 
  * @param grid 
  */
-export const guard = (cell: Cell, paramName: string = `Param`, grid?: Grid) => {
+export const guardCell = (cell: Cell, paramName: string = `Param`, grid?: Grid) => {
   if (cell === undefined) throw new Error(paramName + ` is undefined. Expecting {x,y}`);
   if (cell.x === undefined) throw new Error(paramName + `.x is undefined`);
   if (cell.y === undefined) throw new Error(paramName + `.y is undefined`);
@@ -170,7 +170,7 @@ export const inside = (grid: Grid, cell: Cell): boolean => {
  * @return
  */
 export const rectangleForCell = (cell: Cell, grid: Grid & GridVisual): Rects.RectPositioned => {
-  guard(cell);
+  guardCell(cell);
   const size = grid.size;
   const x = cell.x * size;
   const y = cell.y * size;
@@ -236,7 +236,7 @@ export const neighbours = (grid: Grid, cell: Cell, bounds: BoundsLogic = `undefi
  * @return 
  */
 export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Points.Point => {
-  guard(cell);
+  guardCell(cell);
 
   const size = grid.size;
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
@@ -247,14 +247,20 @@ export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Points.Point =>
 /**
  * Returns the cells on the line of start and end, inclusive
  *
+ * ```js
+ * // Get cells that connect 0,0 and 10,10
+ * const cells = getLine({x:0,y:0}, {x:10,y:10});
+ * ```
+ * 
+ * This function does not handle wrapped coordinates.
  * @param start Starting cell
  * @param end End cell
  * @returns
  */
 export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
   // https://stackoverflow.com/a/4672319
-  guard(start);
-  guard(end);
+  guardCell(start);
+  guardCell(end);
 
   // eslint-disable-next-line functional/no-let
   let startX = start.x;
@@ -296,6 +302,8 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
  * @returns Cells corresponding to cardinals
  */
 export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds: BoundsLogic = `stop`): Neighbours => {
+  guardGrid(grid, `grid`);
+  guardCell(start, `start`);
   guardInteger(steps, `aboveZero`, `steps`);
 
   const directions = allDirections;
@@ -405,8 +413,8 @@ export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolea
  * @returns Cell
  */
 export const offset = function (grid: Grid, start: Cell, vector: Cell, bounds: BoundsLogic = `undefined`): Cell | undefined {
-  guard(start, `start`, grid);
-  guard(vector);
+  guardCell(start, `start`, grid);
+  guardCell(vector);
   guardGrid(grid, `grid`);
 
   // eslint-disable-next-line functional/no-let
@@ -459,7 +467,8 @@ const neighbourList = (grid: Grid, cell: Cell, directions: ReadonlyArray<Cardina
 
 /**
  * Visits every cell in grid using supplied selection function
- * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom
+ * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom,
+ * visitorColumn, visitorRow.
  * 
  * Usage example:
  * ```js
@@ -502,7 +511,7 @@ export const visitor = function* (
 ): VisitGenerator {
 
   guardGrid(grid, `grid`);
-  guard(start, `start`, grid);
+  guardCell(start, `start`, grid);
 
 
   const v = opts.visited ?? setMutable<Cell>(c => cellKeyString(c));
@@ -656,6 +665,19 @@ export const visitorRow = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => {
   return visitor(logic, grid, start, opts);
 };
 
+/**
+ * Runs the provided `visitor` for `steps`, returning the cell we end at
+ * 
+ * ```js
+ * // Get a cell 10 steps away (row-wise) from start
+ * const cell = visitFor(grid, start, 10, visitorRow);
+ * ```
+ * @param grid Grid to traverse
+ * @param start Start point
+ * @param steps Number of steps
+ * @param visitor Visitor function
+ * @returns 
+ */
 export const visitFor = (grid: Grid, start: Cell, steps: number, visitor: Visitor): Cell => {
   guardInteger(steps, ``, `steps`);
 
@@ -694,7 +716,14 @@ export const visitFor = (grid: Grid, start: Cell, steps: number, visitor: Visito
   return c;
 };
 
-export const visitorColumn = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => {
+/**
+ * Visits cells running down columns, left-to-right.
+ * @param grid Grid to traverse
+ * @param start Start cell
+ * @param opts Options
+ * @returns Visitor generator
+ */
+export const visitorColumn = (grid: Grid, start: Cell, opts: VisitorOpts = {}):VisitGenerator => {
   const {reversed = false} = opts;
   const logic: VisitorLogic = {
     select: (nbos) => nbos.find(n => n[0] === (reversed ? `n` : `s`)),
@@ -773,7 +802,7 @@ export const rows = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
  */
 export const cells = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
   guardGrid(grid, `grid`);
-  guard(start, `start`, grid);
+  guardCell(start, `start`, grid);
 
   // eslint-disable-next-line functional/no-let
   let {x, y} = start;

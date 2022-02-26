@@ -542,8 +542,21 @@ export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[],
   });
 };
 
-export const textBlockCentered = (ctx:CanvasRenderingContext2D, lines:readonly string[], opts:DrawingOpts & { readonly bounds: Rects.RectPositioned}) => {
+export type HorizAlign = `left` | `right` | `center`;
+export type VertAlign = `top` | `center` | `bottom`;
+
+/**
+ * Draws an aligned text block
+ */
+export const textBlockAligned = (ctx:CanvasRenderingContext2D, text:readonly string[]|string, opts:DrawingOpts & { readonly bounds: Rects.RectPositioned, readonly horiz?: HorizAlign, readonly vert?:VertAlign}) => {
   const {bounds} = opts;
+  const {horiz = `left`, vert = `top`} = opts;
+
+  //eslint-disable-next-line functional/no-let
+  let lines:readonly string[];
+  if (typeof text === `string`) lines = [text];
+  else lines = text;
+
   applyOpts(ctx, opts);
 
   ctx.save();
@@ -561,9 +574,17 @@ export const textBlockCentered = (ctx:CanvasRenderingContext2D, lines:readonly s
   const totalHeight = heights.reduce((acc, val) => acc+val, 0);
   
   //eslint-disable-next-line functional/no-let
-  let y = middleY - totalHeight /2;
+  let y = 0;
+  if (vert === `center`) y = middleY - totalHeight /2;
+  else if (vert === `bottom`) {
+    y = bounds.height - totalHeight;
+  } 
+
   lines.forEach((line, i) => {
-    const x = middleX - blocks[i].width / 2;
+    //eslint-disable-next-line functional/no-let
+    let x = 0;
+    if (horiz === `center`) x  = middleX - blocks[i].width / 2;
+    else if (horiz === `right`) x = bounds.width - blocks[i].width;
     ctx.fillText(lines[i], x, y);
     y += heights[i];
   });
