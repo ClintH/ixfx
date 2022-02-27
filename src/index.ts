@@ -2,6 +2,7 @@ export * as Temporal from './temporal/index.js';
 
 export * as Geometry from './geometry/index.js';
 
+export * as Text from './Text.js';
 
 /**
  * Control execution

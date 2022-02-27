@@ -176,6 +176,7 @@ export const interval = async function*<V>(produce: IntervalAsync<V>, intervalMs
 };
 
 export type TimeoutSyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => void
+
 export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => Promise<void>
 
 /**

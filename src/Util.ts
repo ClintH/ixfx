@@ -1,20 +1,5 @@
 import { number as guardNumber} from "./Guards.js";
 
-/**
- * Returns _true_ if `source` starts and ends with `start` and `end`. Case-sensitive.
- * If _end_ is omitted, the the `start` value will be used.
- * 
- * ```js
- * startsEnds(`This is a string`, `This`, `string`); // True
- * startsEnds(`This is a string`, `is`, `a`); // False
- * starsEnds(`test`, `t`); // True, starts and ends with 't'
- * ```
- * @param source String to search within 
- * @param start Start
- * @param end End (if omitted, start will be looked for at end as well)
- * @returns True if source starts and ends with provided values.
- */
-export const startsEnds = (source:string, start:string, end:string = start):boolean => source.startsWith(start) && source.endsWith(end);
 
 /**
  * Clamps a value between min and max (both inclusive)

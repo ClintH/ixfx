@@ -1,6 +1,7 @@
 /* eslint-disable */
 import {average} from '../collections/NumericArrays.js';
-import {repeat, wrap,startsEnds, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import { startsEnds } from '../Text.js';
+import {repeat, wrap, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
 test(`repeat`, () => {
   const test1 = repeat(5, () => 1);
