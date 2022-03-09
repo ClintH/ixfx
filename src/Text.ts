@@ -1,14 +1,197 @@
+/**
+ * Returns source text that is between `start` and `end` match strings.
+ * @param source Source text 
+ * @param start Start match
+ * @param end If undefined, `start` will be used instead
+ * @param lastEndMatch If true, looks for the last match of `end` (default). If false, looks for the first match.
+ * @returns 
+ */
 export const between = (source: string, start: string, end?: string, lastEndMatch = true): string | undefined => {
   const startPos = source.indexOf(start);
   if (startPos < 0) return;
 
   if (end === undefined) end = start;
 
-  const endPos =(lastEndMatch) ? source.lastIndexOf(end) : source.indexOf(end, startPos+1);
+  const endPos = lastEndMatch ? source.lastIndexOf(end) : source.indexOf(end, startPos+1);
   if (endPos < 0) return;
 
   return source.substring(startPos+1, endPos);
 
+};
+
+/**
+ * 'Unwraps' a string, removing one or more 'wrapper' strings that it starts and ends with.
+ * ```js
+ * unwrap("'hello'", "'");        // hello
+ * unwrap("apple", "a");          // apple
+ * unwrap("wow", "w");            // o
+ * unwrap(`"'blah'"`, '"', "'");  // blah
+ * ```
+ * @param source 
+ * @param wrappers 
+ * @returns 
+ */
+export const unwrap = (source: string, ...wrappers: readonly string[]): string => {
+  //eslint-disable-next-line functional/no-let
+  let matched = false;
+  //eslint-disable-next-line functional/no-loop-statement
+  do {
+    matched = false;
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const w of wrappers) {
+      if (source.startsWith(w) && source.endsWith(w)) {
+        source = source.substring(w.length, source.length - (w.length * 2) + 1);
+        matched = true;
+      }
+    }
+  } while (matched);
+
+  return source;
+};
+
+/**
+ * A range
+ */
+export type Range = {
+  /**
+   * Text of range
+   */
+  readonly text: string
+  /**
+   * Start position, with respect to source text
+   */
+   readonly start: number
+  /**
+   * End position, with respect to source text
+   */
+   readonly end: number
+  /**
+   * Index of range. First range is 0
+   */
+   readonly index: number
+}
+
+export type LineSpan = {
+  readonly start: number
+  readonly end: number
+  readonly length: number
+}
+
+/**
+ * Calculates the span, defined in {@link Range} indexes, that includes `start` through to `end` character positions.
+ * 
+ * After using {@link splitRanges} to split text, `lineSpan` is used to associate some text coordinates with ranges.
+ * 
+ * @param ranges Ranges
+ * @param start Start character position, in source text reference
+ * @param end End character position, in source text reference
+ * @returns Span
+ */
+export const lineSpan = (ranges: readonly Range[], start: number, end: number): LineSpan => {
+  //eslint-disable-next-line functional/no-let
+  let s = -1;
+  //eslint-disable-next-line functional/no-let
+  let e = -1;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i = 0; i < ranges.length; i++) {
+    const r = ranges[i];
+    s = i;
+    if (r.text.length === 0) continue;
+    if (start < r.end) {
+      break;
+    }
+  }
+
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i = s; i < ranges.length; i++) {
+    const r = ranges[i];
+    e = i;
+    if (end === r.end) {
+      e = i + 1;
+      break;
+    }
+    if (end < r.end) {
+      break;
+    }
+  }
+  return {length: e - s, start: s, end: e};
+};
+
+/**
+ * Splits a source string into ranges:
+ * ```js
+ * const ranges = splitRanges("hello;there;fella", ";");
+ * ```
+ * 
+ * Each range consists of:
+ * ```js
+ * { 
+ *  text: string  - the text of range
+ *  start: number - start pos of range, wrt to source
+ *  end: number   - end pos of range, wrt to source
+ *  index: number - index of range (starting at 0)
+ * }
+ * ```
+ * @param source 
+ * @param split 
+ * @returns 
+ */
+export const splitRanges = (source: string, split: string):readonly Range[] => {
+  //eslint-disable-next-line functional/no-let
+  let start = 0;
+  //eslint-disable-next-line functional/no-let
+  let text = ``;
+  const ranges: Range[] = [];
+  //eslint-disable-next-line functional/no-let
+  let index = 0;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i = 0; i < source.length; i++) {
+    if (source.indexOf(split, i) === i) {
+      //eslint-disable-next-line functional/no-let
+      const end = i;
+      //eslint-disable-next-line functional/immutable-data
+      ranges.push({
+        text, start, end, index
+      });
+      start = end + 1;
+      text = ``;
+      index++;
+    } else {
+      text += source.charAt(i);
+    }
+  }
+  if (start < source.length) {
+    //eslint-disable-next-line functional/immutable-data
+    ranges.push({text, start, index, end: source.length});
+  }
+  return ranges;
+};
+
+/**
+ * Counts the number of times one of `chars` appears at the front of
+ * a string, contiguously.
+ * 
+ * ```js
+ * countCharsFromStart(`  hi`, ` `); // 2
+ * countCharsFromStart(`hi  `, ` `); // 0
+ * countCharsFromStart(`  hi  `, ` `); // 2
+ * ```
+ * @param source 
+ * @param chars 
+ * @returns 
+ */
+export const countCharsFromStart = (source: string, ...chars: readonly string[]): number => {
+  //eslint-disable-next-line functional/no-let
+  let counted = 0;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i = 0; i < source.length; i++) {
+    if (chars.includes(source.charAt(i))) {
+      counted++;
+    } else {
+      break;
+    }
+  }
+  return counted;
 };
 
 /**
