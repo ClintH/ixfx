@@ -20,6 +20,21 @@ export const between = (source: string, start: string, end?: string, lastEndMatc
 };
 
 /**
+ * Returns the `source` string up until (and excluding) `match`. If match is not
+ * found, all of `source` is returned.
+ * @param source 
+ * @param match 
+ * @param startPos If provided, gives the starting offset. Default 0
+ */
+export const untilMatch = (source:string, match:string, startPos = 0):string => {
+  if (startPos > source.length) throw new Error(`startPos should be less than length`);
+  const m = source.indexOf(match, startPos);
+  
+  if (m < 0) return source;
+  return source.substring(startPos, m);
+};
+
+/**
  * 'Unwraps' a string, removing one or more 'wrapper' strings that it starts and ends with.
  * ```js
  * unwrap("'hello'", "'");        // hello

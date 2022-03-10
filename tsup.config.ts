@@ -19,7 +19,7 @@ export default defineConfig({
     stateMachine: `./src/flow/StateMachine.ts`,
     svg: `./src/visual/Svg.ts`,
     temporal: `./src/temporal/index.ts`,
-    text: `./src/text.ts`,
+    text: `./src/Text.ts`,
     util: `./src/Util.ts`,
     visual: `./src/visual/index.ts`,
   },

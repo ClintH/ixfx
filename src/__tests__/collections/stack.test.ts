@@ -62,47 +62,47 @@ describe(`stack`, () => {
   test(`bounded`, () => {
     // Test different overflow logic for bounded stacks
     // Discard additions: let something in
-    let e = stack<string>({capacity: 3, overflowPolicy: `additions`}, `test0`, `test1`);
+    let e = stack<string>({capacity: 3, discardPolicy: `additions`}, `test0`, `test1`);
     e = e.push(`test2`, `test3`, `test4`); // Only test2 should make it in
     expect(e.data).toEqual([`test0`, `test1`, `test2`]);
 
     // Discard additions: already full
-    e = stack<string>({capacity: 3, overflowPolicy: `additions`}, `test0`, `test1`, `test2`);
+    e = stack<string>({capacity: 3, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
     e = e.push(`test3`, `test4`, `test5`); // Nothing can get in
     expect(e.data).toEqual([`test0`, `test1`, `test2`]);
 
     // Discard additions: let everything in 
-    e = stack<string>({capacity: 6, overflowPolicy: `additions`}, `test0`, `test1`, `test2`);
+    e = stack<string>({capacity: 6, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
     e = e.push(`test3`, `test4`, `test5`);
     expect(e.data).toEqual([`test0`, `test1`, `test2`, `test3`, `test4`, `test5`]);
 
     // Older items are discarded - partial flush
-    let f = stack<string>({capacity: 4, overflowPolicy: `older`}, `test0`, `test1`, `test2`);
+    let f = stack<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`);
     expect(f.data).toEqual([`test2`, `test3`, `test4`, `test5`]);
 
     // Older items are discarded - complete flush
-    f = stack<string>({capacity: 4, overflowPolicy: `older`}, `test0`, `test1`, `test2`);
+    f = stack<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`, `test6`, `test7`);
     expect(f.data).toEqual([`test4`, `test5`, `test6`, `test7`]);
 
     // Older items are discarded  - exact flush
-    f = stack<string>({capacity: 3, overflowPolicy: `older`}, `test0`, `test1`, `test2`);
+    f = stack<string>({capacity: 3, discardPolicy: `older`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`);
     expect(f.data).toEqual([`test3`, `test4`, `test5`]);
 
     // Newer items are discarded - partial flush
-    f = stack<string>({capacity: 4, overflowPolicy: `newer`}, `test0`, `test1`, `test2`);
+    f = stack<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`);
     expect(f.data).toEqual([`test0`, `test3`, `test4`, `test5`]);
 
     // Newer items are discarded - complete flush
-    f = stack<string>({capacity: 4, overflowPolicy: `newer`}, `test0`, `test1`, `test2`);
+    f = stack<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`, `test6`, `test7`);
     expect(f.data).toEqual([`test4`, `test5`, `test6`, `test7`]);
 
     // Newer items are discarded - exact flush
-    f = stack<string>({capacity: 3, overflowPolicy: `newer`}, `test0`, `test1`, `test2`);
+    f = stack<string>({capacity: 3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`);
     expect(f.data).toEqual([`test3`, `test4`, `test5`]);
   });

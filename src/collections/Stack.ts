@@ -5,12 +5,12 @@ import {StackMutable} from './Interfaces.js';
 export type StackOpts = {
   readonly debug?:boolean
   readonly capacity?: number
-  readonly overflowPolicy?: DiscardPolicy
+  readonly discardPolicy?: DiscardPolicy
 }
 
 const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
   const potentialLength = stack.length + toAdd.length;
-  const policy = opts.overflowPolicy ?? `additions`;
+  const policy = opts.discardPolicy ?? `additions`;
   const capacity = opts.capacity ?? potentialLength;
   const toRemove = potentialLength - capacity;
   if (opts.debug) console.log(`Stack.push: stackLen: ${stack.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${policy}`);
@@ -37,7 +37,7 @@ const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyA
     // Oldest item in stack is position 0
     return [...stack, ...toAdd].slice(toRemove);
   default:
-    throw new Error(`Unknown overflow policy ${policy}`);
+    throw new Error(`Unknown discard policy ${policy}`);
   }
 };
 

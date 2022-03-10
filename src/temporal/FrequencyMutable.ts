@@ -102,6 +102,21 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   toArray():[key:string, count:number][] {
     return Array.from(this.#store.entries());
   }
+  
+  /**
+   * Returns a string with keys and counts, useful for debugging.
+   * @returns 
+   */
+  debugString():string {
+    //eslint-disable-next-line functional/no-let
+    let t = ``;
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const [key, count] of this.#store.entries()) {
+      t += `${key}: ${count}, `;
+    }
+    if (t.endsWith(`, `)) return t.substring(0, t.length-2);
+    return t;
+  }
 
   /**
    * 
@@ -121,10 +136,12 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * @returns Relative frequency of `value`, or _undefined_ if it does not exist
    */
   relativeFrequencyOf(value:V|string):number|undefined {
-    if (typeof value === `string`) return this.#store.get(value);
-
-    const key = this.#keyString(value);
-    const freq = this.#store.get(key);
+    let freq:number|undefined;
+    if (typeof value === `string`) freq = this.#store.get(value);
+    else {
+      const key = this.#keyString(value);
+      freq = this.#store.get(key);
+    }
     if (freq === undefined) return;
 
     const mma = this.minMaxAvg();
