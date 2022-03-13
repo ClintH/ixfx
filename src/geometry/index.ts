@@ -7,12 +7,13 @@ import * as Lines from './Line.js';
 import * as Paths from './Path.js';
 import * as Points from './Point.js';
 import * as Rects from './Rect.js';
+import * as Ellipses from './Ellipse.js';
 
-export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound};
+export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses};
 
 export * as Polar from './Polar.js';
 
-export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees - 90) * (Math.PI / 180.0);
+export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees) * (Math.PI / 180.0);
 
 export const radianToDegree = (angleInRadians:number) => angleInRadians * 180 / Math.PI;
 

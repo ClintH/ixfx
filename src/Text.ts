@@ -1,5 +1,10 @@
 /**
- * Returns source text that is between `start` and `end` match strings.
+ * Returns source text that is between `start` and `end` match strings. Returns _undefined_ if start/end is not found.
+ * 
+ * ```js
+ * // Yields ` orange `;
+ * between(`apple orange melon`, `apple`, `melon`);
+ * ```
  * @param source Source text 
  * @param start Start match
  * @param end If undefined, `start` will be used instead
@@ -16,12 +21,16 @@ export const between = (source: string, start: string, end?: string, lastEndMatc
   if (endPos < 0) return;
 
   return source.substring(startPos+1, endPos);
-
 };
 
 /**
  * Returns the `source` string up until (and excluding) `match`. If match is not
  * found, all of `source` is returned.
+ * 
+ * ```js
+ * // Yields `apple `
+ * untilMarch(`apple orange melon`, `orange`);
+ * ```
  * @param source 
  * @param match 
  * @param startPos If provided, gives the starting offset. Default 0

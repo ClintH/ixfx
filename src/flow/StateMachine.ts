@@ -38,14 +38,14 @@ export interface MachineDescription {
  * 
  * ```js
  * const states = [`one`, `two`, `three`];
- * const sm = new StateMachine(states[0], fromList(states));
+ * const sm = StateMachine.create(states[0], descriptionFromList(states));
  * ```
  * @param {...readonly} states
  * @param {*} string
  * @param {*} []
  * @return {*}  {MachineDescription}
  */
-export const fromList = (...states:readonly string[]):MachineDescription => {
+export const descriptionFromList = (...states:readonly string[]):MachineDescription => {
   const t = {};
   // eslint-disable-next-line functional/no-loop-statement, functional/no-let
   for (let i=0;i<states.length; i++) {
@@ -61,6 +61,26 @@ export const fromList = (...states:readonly string[]):MachineDescription => {
   }
   return t;
 };
+
+/**
+ * Returns a state machine based on a list of strings. The first string is used as the initial state,
+ * the last string is considered the final. To just generate a description, use {@link descriptionFromList}.
+ * 
+ * ```js
+ * const states = [`one`, `two`, `three`];
+ * const sm = StateMachine.fromList(states);
+ * ```
+ */
+export const fromList = (...states:readonly string[]):StateMachine => new StateMachine(states[0], descriptionFromList(...states));
+
+/**
+ * Creates a new state machine
+ * @param initial Initial state
+ * @param m Machine description
+ * @param opts Options
+ * @returns State machine instance
+ */
+export const create = (initial: string, m: MachineDescription, opts: Options = {debug: false}):StateMachine =>  new StateMachine(initial, m, opts);
 
 /**
  * State machine
@@ -81,7 +101,7 @@ export const fromList = (...states:readonly string[]):MachineDescription => {
  * ```
  * Create the machine with the starting state (`sleep`)
  * ```
- * const machine = new StateMachine(`sleep`, description);
+ * const machine = StateMachine.create(`sleep`, description);
  * ```
  * 
  * Change the state by name:
@@ -251,9 +271,9 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     // Is transition allowed?
     const rules = description[priorState];
     if (Array.isArray(rules)) {
-      if (!rules.includes(newState)) return [false, `Machine cannot ${priorState} -> ${newState}. Allowed transitions: ${rules.join(`, `)}`];
+      if (!rules.includes(newState)) return [false, `Machine cannot change '${priorState} -> ${newState}'. Allowed transitions: ${rules.join(`, `)}`];
     } else {
-      if (newState !== rules && rules !== `*`) return [false, `Machine cannot ${priorState} -> ${newState}. Allowed transition: ${rules}`];
+      if (newState !== rules && rules !== `*`) return [false, `Machine cannot '${priorState} -> ${newState}'. Allowed transition: ${rules}`];
     }
     return [true, `ok`];
   }

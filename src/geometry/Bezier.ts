@@ -28,7 +28,6 @@ export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier):
  * @returns {QuadraticBezier}
  */
 export const quadraticBend = (a:Points.Point, b: Points.Point, bend = 0): QuadraticBezier => quadraticSimple(a, b, bend);
-//export const quadraticBend = (b: QuadraticBezier, bend = 0): QuadraticBezier => quadraticSimple(b.a, b.b, bend);
 
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.

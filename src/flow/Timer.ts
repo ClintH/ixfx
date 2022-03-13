@@ -48,7 +48,7 @@ export type Timeout = HasCompletion & {
  * @example Handle most recent pointermove event after 1000ms
  * ```js
  * // Set up debounced handler
- * const moveDebounced = debounce((evt) => {
+ * const moveDebounced = debounce((elapsedMs, evt) => {
  *    // Handle event
  * }, 500);
  * 
@@ -65,7 +65,7 @@ export type Timeout = HasCompletion & {
  * @param timeoutMs 
  * @returns 
  */
-export const debounce = (callback:()=> void|Promise<unknown>, timeoutMs:number):DebouncedFunction => {
+export const debounce = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeoutMs:number):DebouncedFunction => {
   const t = timeout(callback, timeoutMs);
   return (...args:unknown[]) => t.start(undefined, args);
 };
@@ -230,7 +230,8 @@ export const timeout = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeo
   let timer = 0;
   //eslint-disable-next-line functional/no-let
   let startedAt = 0;
-  const start = async (altTimeoutMs:number = timeoutMs, ...args:unknown[]):Promise<void> => {
+  const start = async (altTimeoutMs:number = timeoutMs, args:unknown[]):Promise<void> => {
+    
     const p = new Promise<void>((resolve, reject) => {
       startedAt = performance.now();
       //eslint-disable-next-line functional/no-try-statement

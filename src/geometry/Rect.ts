@@ -27,6 +27,17 @@ export const fromCenter = (origin: Points.Point, width: number, height: number):
   //return rectFromPoints(...pts);
 };
 
+/**
+ * Returns a rectangle based on provided four corners.
+ * 
+ * To create a rectangle that contains an arbitary set of points, use {@links Points.bbox}.
+ * 
+ * Does some sanity checking such as:
+ *  - x will be smallest of topLeft/bottomLeft
+ *  - y will be smallest of topRight/topLeft
+ *  - width will be largest between top/bottom left and right
+ *  - height will be largest between left and right top/bottom
+ */
 export const maxFromCorners = (topLeft:Points.Point, topRight:Points.Point, bottomRight:Points.Point, bottomLeft: Points.Point):RectPositioned => {
   if (topLeft.y > bottomRight.y) throw new Error(`topLeft.y greater than bottomRight.y`);
   if (topLeft.y > bottomLeft.y) throw new Error(`topLeft.y greater than bottomLeft.y`);

@@ -13,7 +13,7 @@ export type Path = {
   bbox(): Rects.RectPositioned
   toString(): string
   toSvgString(): readonly string[]
-  readonly kind: `compound` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
+  readonly kind: `compound` | `elliptical` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
 }
 /**
  * Return the start point of a path

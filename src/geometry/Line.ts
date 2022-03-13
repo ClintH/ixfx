@@ -101,6 +101,7 @@ export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => 
   if (isLine(lineOrPoint)) {
     //eslint-disable-next-line functional/no-let
     a = lineOrPoint.a;
+    b = lineOrPoint.b;
   } else {
     a = lineOrPoint;
     if (b === undefined) throw new Error(`b parameter required`);

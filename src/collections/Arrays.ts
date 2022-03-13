@@ -3,6 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
+import {defaultRandom, RandomSource} from '~/Random.js';
 import {IsEqual, isEqualDefault} from '../Util.js';
 
 export * from './NumericArrays.js';
@@ -22,18 +23,20 @@ export const guardArray = <V>(array:ArrayLike<V>, paramName:string = `?`) => {
 /**
  * Returns a random array index
  * @param array
+ * @param rand Random generator. `Math.random` by default.
  * @returns 
  */
-export const randomIndex = <V>(array: ArrayLike<V>): number => Math.floor(Math.random() * array.length);
+export const randomIndex = <V>(array: ArrayLike<V>, rand:RandomSource = defaultRandom): number => Math.floor(rand() * array.length);
 
 /**
  * Returns random element
  * @param array
+ * @params rand Random generator. `Math.random` by default.
  * @returns 
  */
-export const randomElement = <V>(array: ArrayLike<V>): V => {
+export const randomElement = <V>(array: ArrayLike<V>, rand:RandomSource = defaultRandom): V => {
   guardArray(array, `array`);
-  return array[Math.floor(Math.random() * array.length)];
+  return array[Math.floor(rand() * array.length)];
 };
 
 /**
@@ -57,14 +60,16 @@ export const randomElement = <V>(array: ArrayLike<V>): V => {
  * @template V Type of array
  * @param array Array to pluck item from
  * @param mutate If _true_, changes input array. _False_ by default.
+ * @param random Random generatr. `Math.random` by default.
  * @return Returns an object `{value:V|undefined, array:V[]}`
+ * 
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const randomPluck = <V>(array:readonly V[], mutate = false):{readonly value:V|undefined, readonly array:Array<V> } => {
+export const randomPluck = <V>(array:readonly V[], mutate = false, rand:RandomSource = defaultRandom):{readonly value:V|undefined, readonly array:Array<V> } => {
   if (array === undefined) throw new Error(`array is undefined`);
   if (!Array.isArray(array)) throw new Error(`'array' param is not an array`);
   if (array.length === 0) return {value: undefined, array: []};
-  const index = randomIndex(array);
+  const index = randomIndex(array, rand);
   if (mutate) {
     return {
       value: array[index],
@@ -92,14 +97,15 @@ export const randomPluck = <V>(array:readonly V[], mutate = false):{readonly val
  * // d: [1, 2, 3, 4], s: [3, 1, 2, 4]
  * ```
  * @param dataToShuffle 
+ * @param rand Random generator. `Math.random` by default.
  * @returns Copy with items moved around randomly
  * @template V Type of array items
  */
-export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>): ReadonlyArray<V> => {
+export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = defaultRandom): ReadonlyArray<V> => {
   const array = [...dataToShuffle];
   // eslint-disable-next-line functional/no-loop-statement, functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rand() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;

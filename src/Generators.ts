@@ -163,3 +163,21 @@ export const rangePercent = function (interval:number = 0.01, repeating:boolean 
   guardNumber(end, `percentage`, `end`);
   return numericRange(interval, start, end, repeating);
 };
+
+
+// export const gaussian = function*(mean:number, std:number, stepLength:number = 0.1) {
+//   const a = 1/Math.sqrt(2*Math.PI);
+
+//   const get = (x:number) => {
+//     var f = a / std;
+//     var p = -1/2;
+//     var c = (x-mean)/std;
+//     c *= c;
+//     p *= c;
+//     return f * Math.pow(Math.E, p);
+//   }
+
+//   for (let i=-1;i<1;i+=stepLength) {
+//     yield(get(i));
+//   }
+// }

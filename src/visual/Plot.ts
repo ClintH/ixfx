@@ -3,11 +3,9 @@ import { minMaxAvg } from '../collections/NumericArrays.js';
 import { CircularArray, MapOfMutable } from '../collections/Interfaces.js';
 import { mapCircular, mapArray} from "../collections/MapMultiMutable.js"
 
-import * as Palette from "./Palette.js";
-import {number as guardNumber} from '../Guards.js';
 import { Point} from "../geometry/Point.js";
 import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
-import {Rect, RectPositioned} from '~/geometry/Rect.js';
+import {Rect} from '~/geometry/Rect.js';
 import {Colour} from './index.js';
 
 export type Plotter = {
@@ -29,14 +27,9 @@ type DrawingOpts = PlotOpts & {
   x:Axis
   y:Axis
   ctx: CanvasRenderingContext2D
-  //dataXScale?: number
-  //yLabelWidth: number
-  //palette: Palette.Palette
   textHeight: number
   capacity:number
   coalesce:boolean
-  //showYAxis:boolean
-  //showXAxis:boolean
   margin:number
   canvasSize:Rect
   clearCanvas:boolean

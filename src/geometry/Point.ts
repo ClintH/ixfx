@@ -1,6 +1,8 @@
 import { Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line';
 
+//const piPi =Math.PI*2;
+
 /**
  * A point, consisting of x, y and maybe z fields.
  */
@@ -122,6 +124,7 @@ export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {
  * @returns 
  */
 export const isPoint = (p: number|unknown): p is Point => {
+  if (p === undefined) return false;
   if ((p as Point).x === undefined) return false;
   if ((p as Point).y === undefined) return false;
   return true;

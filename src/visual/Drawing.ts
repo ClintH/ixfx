@@ -6,6 +6,7 @@ import * as Circles from '../geometry/Circle.js';
 import * as Arcs from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
+import * as Ellipses from'../geometry/Ellipse.js';
 import * as Colours from '../visual/Colour.js';
 
 //import * as color2k from 'color2k';
@@ -236,7 +237,8 @@ export const lineThroughPoints = (ctx:CanvasRenderingContext2D, points:readonly 
 };
 
 /**
- * Draws one or more circles
+ * Draws one or more circles. Will draw outline/fill depending on
+ * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
  * @param ctx 
  * @param circlesToDraw 
  * @param opts 
@@ -247,10 +249,34 @@ export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.Circl
   const draw = (c:Circles.CirclePositioned) => {
     ctx.beginPath();
     ctx.arc(c.x, c.y, c.radius, 0, PIPI);
-    ctx.stroke();
+    if (opts.strokeStyle) ctx.stroke();
+    if (opts.fillStyle) ctx.fill();
   };
   if (Array.isArray(circlesToDraw)) circlesToDraw.forEach(draw);
   else draw(circlesToDraw as Circles.CirclePositioned);
+};
+
+/**
+ * Draws one or more ellipses. Will draw outline/fill depending on
+ * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
+ * @param ctx 
+ * @param ellipsesToDraw 
+ * @param opts 
+ */
+export const ellipse = (ctx:CanvasRenderingContext2D, ellipsesToDraw:Ellipses.EllipsePositioned|readonly Ellipses.EllipsePositioned[], opts:DrawingOpts = {}) => {
+  applyOpts(ctx, opts);
+
+  const draw = (e:Ellipses.EllipsePositioned) => {
+    ctx.beginPath();
+    const rotation = e.rotation ?? 0;
+    const startAngle =e.startAngle ?? 0;
+    const endAngle = e.endAngle ?? PIPI;
+    ctx.ellipse(e.x, e.y, e.radiusX, e.radiusY, rotation, startAngle, endAngle);
+    if (opts.strokeStyle) ctx.stroke();
+    if (opts.fillStyle) ctx.fill();
+  };
+  if (Array.isArray(ellipsesToDraw)) ellipsesToDraw.forEach(draw);
+  else draw(ellipsesToDraw as Ellipses.EllipsePositioned);
 };
 
 /**
@@ -328,7 +354,7 @@ export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.
  * @param pos 
  * @param opts 
  */
-const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Points.Point[], opts?: DrawingOpts & {readonly radius?: number, readonly outlined?: boolean, readonly filled?: boolean})  => {
+export const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Points.Point[], opts?: DrawingOpts & {readonly radius?: number, readonly outlined?: boolean, readonly filled?: boolean})  => {
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
   

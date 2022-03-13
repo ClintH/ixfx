@@ -1,9 +1,9 @@
 /* eslint-disable */
-import {StateMachine, fromList} from '../../flow/StateMachine.js';
+import {StateMachine, descriptionFromList} from '../../flow/StateMachine.js';
 import {jest} from '@jest/globals';
 
 
-const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);
+const createAdsr = () => descriptionFromList(`attack`, `decay`, `sustain`, `release`);
 const createMulti = () => ({
   awake: [`breakfast`, `coffee`],
   breakfast: `coffee`,

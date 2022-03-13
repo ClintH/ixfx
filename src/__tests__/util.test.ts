@@ -1,31 +1,13 @@
 /* eslint-disable */
 import {average} from '../collections/NumericArrays.js';
 import { startsEnds } from '../Text.js';
-import {repeat, wrap, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import { wrap, scale, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
-test(`repeat`, () => {
-  const test1 = repeat(5, () => 1);
-  expect(test1.length).toEqual(5);
+test(`scale`, () => {
+  expect(scale(50, 0, 100, 0, 1)).toEqual(0.5);
+  expect(scale(100, 0, 100, 0, 1)).toEqual(1);
+  expect(scale(0, 0, 100, 0, 1)).toEqual(0);
 
-  const test2 = repeat(0, () => 1);
-  expect(test2.length).toEqual(0);
-
-  // Error: not a number
-  // @ts-ignore
-  expect(() => repeat(undefined, () => 10)).toThrow();
-
-  // Test using predicate
-  const test3 = repeat((repeats):boolean => {
-    if (repeats >= 5) return false;
-    return true;
-  }, () => 1);
-  expect(test3.length).toEqual(5);
-
-  const test4 = repeat((repeats, valuesProduced):boolean => {
-    if (valuesProduced >= 20) return false;
-    return true;
-  }, () => 1);
-  expect(test4.length).toEqual(20);
 });
 
 test(`startsEnds`, () => {
@@ -37,8 +19,13 @@ test(`startsEnds`, () => {
 
 });
 test(`wrap`, () => {
+
+  expect(() => wrap(0.5,0,360)).toThrow();
+  expect(() => wrap(10,0.5,360)).toThrow();
+  expect(() => wrap(10,0,20.5)).toThrow();
+
   expect(wrap(361, 0, 360)).toEqual(1);
-  expect(wrap(360, 0, 360)).toEqual(360);
+  expect(wrap(360, 0, 360)).toEqual(0);
   expect(wrap(0, 0, 360)).toEqual(0);
   expect(wrap(150, 0, 360)).toEqual(150);
   expect(wrap(-20, 0, 360)).toEqual(340);
@@ -48,7 +35,7 @@ test(`wrap`, () => {
 
   // Test default 0-360 range
   expect(wrap(361)).toEqual(1);
-  expect(wrap(360)).toEqual(360);
+  expect(wrap(360)).toEqual(0);
   expect(wrap(0)).toEqual(0);
   expect(wrap(150)).toEqual(150);
   expect(wrap(-20)).toEqual(340);
@@ -58,9 +45,18 @@ test(`wrap`, () => {
 
   // Non-zero min 
   expect(wrap(20, 20, 70)).toEqual(20);
-  expect(wrap(70, 20, 70)).toEqual(70);
+  expect(wrap(70, 20, 70)).toEqual(20);
   expect(wrap(80, 20, 70)).toEqual(30);
   expect(wrap(-20, 20, 70)).toEqual(50);
+
+  expect(wrap(20, 20, 30)).toEqual(20);
+  expect(wrap(22, 20, 30)).toEqual(22);
+  expect(wrap(5, 20, 30)).toEqual(25);
+  expect(wrap(30, 20, 30)).toEqual(20);
+  expect(wrap(31, 20, 30)).toEqual(21);
+  expect(wrap(40, 20, 30)).toEqual(20);
+
+
 });
 
 test(`toStringDefault`, () => {

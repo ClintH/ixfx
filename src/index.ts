@@ -44,16 +44,18 @@ export * as Dom from './dom/index.js';
  * The Modulation module contains functions for, well, modulating data.
  * 
  * Overview:
- * * {@link adsr}: Modulate over a series of ADSR stages.
- * * {@link Easings}: Ease from `0` to `1` over a specified duration.
+ * * {@link adsr} - Modulate over a series of ADSR stages.
+ * * {@link Easings} - Ease from `0` to `1` over a specified duration.
+ * * {@link jitter} - Jitter a value
+ * * {@link Oscillators} - Waveforms
  * 
- * @example Import examples
+ * @example Importing
  * ```
  * // If library is stored two directories up under `ixfx/`
- * import {adsr, defaultAdsrOpts} from '../../ixfx/modulation.js';
+ * import {adsr, defaultAdsrOpts} from '../../ixfx/dist/modulation.js';
  * 
  * // Import from web
- * import {adsr, defaultAdsrOpts} from 'https://unpkg.com/ixfx/modulation.js'
+ * import {adsr, defaultAdsrOpts} from 'https://unpkg.com/ixfx/dist/modulation.js'
  * ```
  * 
  */

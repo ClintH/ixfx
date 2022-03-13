@@ -44,7 +44,6 @@ export const toCartesian:ToCartesian = (a:Coord|number, b?:Points.Point|number, 
     }
   }
 };
-  
 
 /**
  * Produces an Archimedean spiral

@@ -1,4 +1,5 @@
 // Easings from https://easings.net/
+import {interpolate} from '~/Util.js';
 import {msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource} from '../flow/Timer.js';
 
 const sqrt = Math.sqrt;
@@ -52,12 +53,12 @@ type EasingFn = (x: number) => number;
  * t.reset();   // Reset to 0
  * t.isDone;    // _True_ if finished
  * ```
- * @param name Name of easing
+ * @param nameOrFn Name of easing, or an easing function
  * @param durationMs Duration in milliseconds
  * @returns Easing
  */
-export const time = function (name: EasingName, durationMs: number):Easing {
-  return create(name, durationMs, msElapsedTimer);
+export const time = function (nameOrFn: EasingName|EasingFn, durationMs: number):Easing {
+  return create(nameOrFn, durationMs, msElapsedTimer);
 };
 
 /**
@@ -71,12 +72,12 @@ export const time = function (name: EasingName, durationMs: number):Easing {
  * t.reset();   // Reset to 0
  * t.isDone;    // _True_ if finished
  * ```
- * @param name Name of easing
+ * @param nameOrFn Name of easing, or an easing function
  * @param durationTicks Duration in ticks
  * @returns Easing
  */
-export const tick = function (name: EasingName, durationTicks: number):Easing {
-  return create(name, durationTicks, ticksElapsedTimer);
+export const tick = function (nameOrFn: EasingName|EasingFn, durationTicks: number):Easing {
+  return create(nameOrFn, durationTicks, ticksElapsedTimer);
 };
 
 /**
@@ -110,14 +111,18 @@ export type Easing = HasCompletion & {
 /**
  * Creates a new easing by name
  *
- * @param name Name of easing
+ * @param nameOrFn Name of easing, or an easing function
  * @param duration Duration (meaning depends on timer source)
  * @param timerSource Timer source. Eg {@link tickRelativeTimer}, {@link msRelativeTimer}
  * @returns
  */
-const create = function (name: EasingName, duration: number, timerSource: TimerSource): Easing {
-  const fn = get(name);
-  if (fn === undefined) throw new Error(`Easing function not found: ${name}`);
+const create = function (nameOrFn: EasingName|EasingFn, duration: number, timerSource: TimerSource): Easing {
+  //eslint-disable-next-line functional/no-let
+  let fn:EasingFn|undefined;
+  if (typeof nameOrFn === `function`) fn = nameOrFn;
+  else fn = get(nameOrFn);
+  if (fn === undefined) throw new Error(`Easing function not found: ${nameOrFn}`);
+
   // Get a relative version of timer
   const timer = relativeTimer(duration, timerSource(), true);
 
@@ -127,7 +132,7 @@ const create = function (name: EasingName, duration: number, timerSource: TimerS
     },
     compute: () => {
       const relative = timer.elapsed;
-      return fn(relative);
+      return fn!(relative);
     },
     reset: () => {
       timer.reset();
@@ -135,6 +140,49 @@ const create = function (name: EasingName, duration: number, timerSource: TimerS
   };
 };
 
+/**
+ * Creates an easing function using a simple cubic bezier defined by two points.
+ * 
+ * Eg: https://cubic-bezier.com/#0,1.33,1,-1.25
+ *  a:0, b: 1.33, c: 1, d: -1.25
+ * 
+ * ```js
+ * // Time-based easing using bezier
+ * const e = Easings.time(fromCubicBezier(1.33, -1.25), 1000);
+ * e.compute();
+ * ```
+ * @param b
+ * @param d 
+ * @param t 
+ * @returns Value
+ */
+export const fromCubicBezier = (b:number, d:number):EasingFn => (t:number) => {
+  const s = 1-t;
+  const s2 = s*s;
+  const t2 = t*t;
+  const t3 = t2*t;
+  return (3*b*s2*t) + (3*d*s*t2) + (t3);
+};
+
+/**
+ * Returns a mix of two easing functions.
+ * 
+ * ```js
+ * // Get a 50/50 mix of two easing functions at t=0.25
+ * mix(0.5, 0.25, sineIn, sineOut);
+ * 
+ * // 10% of sineIn, 90% of sineOut
+ * mix(0.90, 0.25, sineIn, sineOut);
+ * ```
+ * @param amt 
+ * @param balance 
+ * @param easingA 
+ * @param easingB 
+ * @returns 
+ */
+export const mix = (amt:number, balance:number, easingA:EasingFn, easingB:EasingFn) => interpolate(balance, easingA(amt), easingB(amt));
+
+export const crossfade = (amt:number, easingA:EasingFn, easingB:EasingFn) => mix(amt, amt, easingA, easingB);
 /**
  * @private
  */
@@ -173,6 +221,34 @@ export const getEasings = function ():readonly string[] {
   return Array.from(Object.keys(functions));
 };
 
+/**
+ * Returns a roughly gaussian easing function
+ * @param stdDev 
+ * @returns 
+ */
+export const gaussian = (stdDev:number = 0.4):EasingFn => {
+  const a = 1/sqrt(2*pi);
+  const mean = 0.5;
+  
+  return (t:number) => {
+    const f = a / stdDev;
+    // p:-8 pinched
+    //eslint-disable-next-line functional/no-let
+    let p = -2.5;// -1/1.25;
+    //eslint-disable-next-line functional/no-let
+    let c = (t-mean)/stdDev;
+    c *= c;
+    p *= c;
+    const v = f * pow(Math.E, p);// * (2/pi);//0.62;
+    if (v > 1) return 1;
+    if (v < 0) return 0;
+
+    //if (v >1) console.log(v);
+    //if (v < 0) console.log(v);
+    return v;
+  };
+};
+
 const bounceOut = function (x:number): number {
   const n1 = 7.5625;
   const d1 = 2.75;
@@ -188,7 +264,13 @@ const bounceOut = function (x:number): number {
   }
 };
 
+const quintIn = (x:number):number => x * x * x * x * x;
+const quintOut = (x:number):number => 1 - pow(1 - x, 5);
+const arch = (x:number):number => (x * (1-x) * 4);
+
 export const functions = {
+  arch,
+  bell: gaussian(),
   sineIn: (x: number): number => 1 - cos((x * pi) / 2),
   sineOut: (x: number): number => sin((x * pi) / 2),
   quadIn: (x: number): number => x * x,
@@ -199,8 +281,8 @@ export const functions = {
   cubicOut: (x: number): number => 1 - pow(1 - x, 3),
   quartIn: (x: number): number => x * x * x * x,
   quartOut: (x: number): number => 1 - pow(1 - x, 4),
-  quintIn: (x: number): number => x * x * x * x * x,
-  quintOut: (x: number): number => 1 - pow(1 - x, 5),
+  quintIn,
+  quintOut, //: (x: number): number => 1 - pow(1 - x, 5),
   expoIn: (x: number): number => (x === 0 ? 0 : pow(2, 10 * x - 10)),
   expoOut: (x: number): number => (x === 1 ? 1 : 1 - pow(2, -10 * x)),
   quintInOut: (x: number): number => (x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2),
