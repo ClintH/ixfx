@@ -58,14 +58,15 @@ export type JitterOpts = {
  * @param jitter Absolute amount to jitter by
  * @param opts Jitter options
  * @param rand Source of random numbers, Math.random by default.
- * @returns Jittered value on 0..1 scale
+ * @returns Jittered value
  */
 export const jitter = (value:number, jitter:number, opts:JitterOpts = {}, rand:RandomSource = defaultRandom) => {
-  guardNumber(value, `percentage`, `value`);
-  guardNumber(jitter, `percentage`, `jitter`);
-
+ 
   const type = opts.type ?? `abs`;
   const clamped = opts.clamped ?? true;
+
+  guardNumber(value, clamped ? `percentage` : `bipolar`, `value`);
+  guardNumber(jitter, clamped ? `percentage` :`bipolar`, `jitter`);
 
   //eslint-disable-next-line functional/no-let
   let v:number;

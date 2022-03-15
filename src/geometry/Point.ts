@@ -1,5 +1,7 @@
 import { Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line';
+import {number as guardNumber} from '../Guards';
+import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util';
 
 //const piPi =Math.PI*2;
 
@@ -75,6 +77,19 @@ export const guard = (p: Point, name = `Point`) => {
   if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
   if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
 };
+
+/**
+ * Throws if parameter is not a valid point, or either x or y is 0
+ * @param pt
+ * @returns 
+ */
+export const guardNonZeroPoint = (pt: Point, name = `pt`) => {
+  guard(pt, name);
+  guardNumber(pt.x, `nonZero`, `${name}.x`);
+  guardNumber(pt.y, `nonZero`, `${name}.y`);
+  return true;
+};
+
 
 /**
  * Returns the angle in radians between `a` and `b`.
@@ -324,6 +339,8 @@ type Sum = {
  * ```
  */
 export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:number, d?:number): Point {
+  // ✔️ Unit tested
+
   //eslint-disable-next-line functional/no-let
   let ptA:Point|undefined;
   //eslint-disable-next-line functional/no-let
@@ -404,10 +421,15 @@ export function multiply(a: Point, x: number, y?: number): Point;
  * @returns 
  */
 /* eslint-disable func-style */
-export function multiply(a: Point, bOrX: Point | number, y?: number) {
+export function multiply(a: Point, bOrX: Point | number, y?: number):Point {
+  // ✔️ Unit tested
+
   guard(a, `a`);
   if (typeof bOrX === `number`) {
     if (typeof y === `undefined`) y = 1;
+    guardNumber(y, ``, `y`);
+    guardNumber(bOrX, ``, `x`);
+
     return {x: a.x * bOrX, y: a.y * y};
   } else if (isPoint(bOrX)) {
     guard(bOrX, `b`);
@@ -416,4 +438,179 @@ export function multiply(a: Point, bOrX: Point | number, y?: number) {
       y: a.y * bOrX.y
     };
   } else throw new Error(`Invalid arguments`);
+}
+
+/**
+ * Divides a / b
+ * @param a 
+ * @param b 
+ */
+export function divide(a: Point, b:Point):Point;
+
+/**
+ * Divides a point by x,y.
+ * ie: a.x / x, b.y / y
+ * @param a Point
+ * @param x X divisor
+ * @param y Y divisor
+ */
+export function divide(a:Point, x:number, y:number):Point;
+export function divide(x1:number, y1:number, x2?:number, y2?:number):Point;
+
+export function divide(a: Point|number, b: Point | number, c?: number, d?:number):Point {
+  // ✔️ Unit tested
+
+  if (isPoint(a)) {
+    if (isPoint(b)) {
+      guardNonZeroPoint(a);
+      guardNonZeroPoint(b);
+      
+      return {
+        x: a.x / b.x,
+        y: a.y / b.y
+      };
+    } else {
+      if (c === undefined) c = 1;
+      guardNonZeroPoint(a);
+      guardNumber(b, `nonZero`, `x`);
+      guardNumber(c, `nonZero`, `y`);
+      return {
+        x: a.x / b,
+        y: a.y / c
+      };
+    }
+  } else {
+    if (typeof b !== `number`) throw new Error(`expected second parameter to be y1 coord`);
+    guardNumber(a, `nonZero`, `x1`);
+    guardNumber(b, `nonZero`, `y1`);
+    if (c === undefined) c = 1;
+    if (d === undefined) d = 1;
+    guardNumber(c, `nonZero`, `x2`);
+    guardNumber(d, `nonZero`, `y2`);
+
+    return {
+      x: a / c,
+      y: b / d
+    };
+  }
+}
+
+/**
+ * Normalises a point by a given width and height
+ * @param pt Point
+ * @param width Width
+ * @param height Height
+ */
+export function normalise(pt:Point, width:number, height:number):Point;
+
+/**
+ * Normalises x,y by width and height so it is on a 0..1 scale
+ * @param x 
+ * @param y 
+ * @param width 
+ * @param height 
+ */
+export function normalise(x:number, y:number, width:number, height:number):Point;
+
+/**
+ * Normalises a point so it is on a 0..1 scale
+ * @param a Point, or x
+ * @param b y coord or width
+ * @param c height or width
+ * @param d height
+ * @returns Point
+ */
+export function normalise(a:Point|number, b:number, c:number, d?:number):Point {
+  // ✔️ Unit tested
+  if (isPoint(a)) {
+    guardNumber(b, `positive`, `width`);
+    guardNumber(c, `positive`, `height`);
+    return {
+      x: a.x / b,
+      y: a.y / c
+    };
+  } else {
+    guardNumber(a, `positive`, `x`);
+    guardNumber(b, `positive`, `y`);
+    guardNumber(c, `positive`, `width`);
+    if (d === undefined) throw new Error(`Expected height parameter`);
+    guardNumber(d, `positive`, `height`);
+    return {
+      x: a / c,
+      y: b / d
+    };
+  }
+}
+
+/**
+ * Wraps a point to be within `ptMin` and `ptMax`.
+ * Note that max values are _exclusive_, meaning the return value will always be one less.
+ * 
+ * Eg, if a view port is 100x100 pixels, wrapping the point 150,100 yields 50,99.
+ * 
+ * ```js
+ * // Wraps 150,100 to on 0,0 -100,100 range
+ * wrap({x:150,y:100}, {x:100,y:100});
+ * ```
+ * 
+ * If `ptMin` is not specified, {x:0,y:0} is used.
+ * @param pt Point to wrap
+ * @param ptMax Maximum value
+ * @param ptMin Minimum value, or {x:0, y:0} by default
+ * @returns Wrapped point
+ */
+export const wrap = (pt:Point, ptMax:Point, ptMin:Point = {x:0, y:0}):Point => {
+  // ✔️ Unit tested
+  guard(pt, `pt`);
+  guard(ptMax, `ptMax`);
+  guard(ptMin, `ptMin`);
+  
+  return {
+    x: wrapNumber(pt.x, ptMin.x, ptMax.x),
+    y: wrapNumber(pt.y, ptMin.y, ptMax.y)
+  };
+};
+
+/**
+ * Clamps a point to be between `min` and `max` (0 & 1 by default)
+ * @param pt Point
+ * @param min Minimum value (0 by default)
+ * @param max Maximum value (1 by default)
+ */
+export function clamp(pt:Point, min?:number, max?:number):Point;
+
+/**
+ * Clamps an x,y pair to be between `min` and `max` (0 & 1 by default)
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param min Minimum value (0 by default)
+ * @param max Maximum value (1 by default)
+ */
+export function clamp(x:number, y:number, min?:number, max?:number):Point;
+export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
+  // ✔️ Unit tested
+
+  if (isPoint(a)) {
+    if (b === undefined) b = 0;
+    if (c === undefined) c = 1;
+    guardNumber(b, ``, `min`);
+    guardNumber(c, ``, `max`);
+    return {
+      x: clampNumber(a.x, b, c),
+      y: clampNumber(a.y, b, c)
+    };
+  } else {
+    if (b === undefined) throw new Error(`Expected y coordinate`);
+    if (c === undefined) c = 0;
+    if (d === undefined) d = 1;
+    guardNumber(a, ``, `x`);
+    guardNumber(b, ``, `y`);
+    guardNumber(c, ``, `min`);
+    guardNumber(d, ``, `max`);
+
+    return {
+      x: clampNumber(a, c, d),
+      y: clampNumber(b, c, d)
+    };
+  }
 }

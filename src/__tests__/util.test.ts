@@ -1,7 +1,7 @@
 /* eslint-disable */
 import {average} from '../collections/NumericArrays.js';
 import { startsEnds } from '../Text.js';
-import { wrap, scale, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import { wrapInteger, wrap, scale, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
 test(`scale`, () => {
   expect(scale(50, 0, 100, 0, 1)).toEqual(0.5);
@@ -18,43 +18,56 @@ test(`startsEnds`, () => {
   expect(startsEnds(`This is a test`, `This`, `not`)).toBeFalsy();
 
 });
+
 test(`wrap`, () => {
+  expect(wrap(10.5, 5, 10)).toEqual(5.5);
+  expect(wrap(4, 5, 9)).toEqual(8);
+  expect(wrap(5, 5, 9)).toEqual(5);
+  expect(wrap(9, 5, 9)).toEqual(5);
+  expect(wrap(4.5, 5, 9)).toEqual(8.5);
 
-  expect(() => wrap(0.5,0,360)).toThrow();
-  expect(() => wrap(10,0.5,360)).toThrow();
-  expect(() => wrap(10,0,20.5)).toThrow();
 
-  expect(wrap(361, 0, 360)).toEqual(1);
-  expect(wrap(360, 0, 360)).toEqual(0);
-  expect(wrap(0, 0, 360)).toEqual(0);
-  expect(wrap(150, 0, 360)).toEqual(150);
-  expect(wrap(-20, 0, 360)).toEqual(340);
-  expect(wrap(360*3, 0, 360)).toEqual(0);
-  expect(wrap(150 - 360, 0, 360)).toEqual(150);
-  expect(wrap(150 - (360*2), 0, 360)).toEqual(150);
+
+});
+
+test(`wrapInteger`, () => {
+
+  // Test for non-integers
+  expect(() => wrapInteger(0.5,0,360)).toThrow();
+  expect(() => wrapInteger(10,0.5,360)).toThrow();
+  expect(() => wrapInteger(10,0,20.5)).toThrow();
+
+  expect(wrapInteger(361, 0, 360)).toEqual(1);
+  expect(wrapInteger(360, 0, 360)).toEqual(0);
+  expect(wrapInteger(0, 0, 360)).toEqual(0);
+  expect(wrapInteger(150, 0, 360)).toEqual(150);
+  expect(wrapInteger(-20, 0, 360)).toEqual(340);
+  expect(wrapInteger(360*3, 0, 360)).toEqual(0);
+  expect(wrapInteger(150 - 360, 0, 360)).toEqual(150);
+  expect(wrapInteger(150 - (360*2), 0, 360)).toEqual(150);
 
   // Test default 0-360 range
-  expect(wrap(361)).toEqual(1);
-  expect(wrap(360)).toEqual(0);
-  expect(wrap(0)).toEqual(0);
-  expect(wrap(150)).toEqual(150);
-  expect(wrap(-20)).toEqual(340);
-  expect(wrap(360*3)).toEqual(0);
-  expect(wrap(150 - 360)).toEqual(150);
-  expect(wrap(150 - (360*2))).toEqual(150);
+  expect(wrapInteger(361)).toEqual(1);
+  expect(wrapInteger(360)).toEqual(0);
+  expect(wrapInteger(0)).toEqual(0);
+  expect(wrapInteger(150)).toEqual(150);
+  expect(wrapInteger(-20)).toEqual(340);
+  expect(wrapInteger(360*3)).toEqual(0);
+  expect(wrapInteger(150 - 360)).toEqual(150);
+  expect(wrapInteger(150 - (360*2))).toEqual(150);
 
   // Non-zero min 
-  expect(wrap(20, 20, 70)).toEqual(20);
-  expect(wrap(70, 20, 70)).toEqual(20);
-  expect(wrap(80, 20, 70)).toEqual(30);
-  expect(wrap(-20, 20, 70)).toEqual(50);
+  expect(wrapInteger(20, 20, 70)).toEqual(20);
+  expect(wrapInteger(70, 20, 70)).toEqual(20);
+  expect(wrapInteger(80, 20, 70)).toEqual(30);
+  expect(wrapInteger(-20, 20, 70)).toEqual(50);
 
-  expect(wrap(20, 20, 30)).toEqual(20);
-  expect(wrap(22, 20, 30)).toEqual(22);
-  expect(wrap(5, 20, 30)).toEqual(25);
-  expect(wrap(30, 20, 30)).toEqual(20);
-  expect(wrap(31, 20, 30)).toEqual(21);
-  expect(wrap(40, 20, 30)).toEqual(20);
+  expect(wrapInteger(20, 20, 30)).toEqual(20);
+  expect(wrapInteger(22, 20, 30)).toEqual(22);
+  expect(wrapInteger(5, 20, 30)).toEqual(25);
+  expect(wrapInteger(30, 20, 30)).toEqual(20);
+  expect(wrapInteger(31, 20, 30)).toEqual(21);
+  expect(wrapInteger(40, 20, 30)).toEqual(20);
 
 
 });

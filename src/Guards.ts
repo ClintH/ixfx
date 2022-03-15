@@ -39,25 +39,25 @@ export const number = (value:number, range:NumberGuardRange = ``, paramName = `?
   if (typeof value !== `number`) throw new Error(`Parameter '${paramName}' is not a number (${value})`);
   switch (range) {
   case `positive`:
-    if (value < 0) throw new Error(`Parameter ${paramName} must be at least zero (${value})`);
+    if (value < 0) throw new Error(`Parameter '${paramName}' must be at least zero (${value})`);
     break;
   case `negative`:
-    if (value > 0) throw new Error(`Parameter ${paramName} must be zero or lower (${value})`);
+    if (value > 0) throw new Error(`Parameter '${paramName}' must be zero or lower (${value})`);
     break;
   case `aboveZero`:
-    if (value <= 0) throw new Error(`Parameter ${paramName} must be above zero (${value})`);
+    if (value <= 0) throw new Error(`Parameter '${paramName}' must be above zero (${value})`);
     break;
   case `belowZero`:
-    if (value >= 0) throw new Error(`Parameter ${paramName} must be below zero (${value})`);
+    if (value >= 0) throw new Error(`Parameter '${paramName}' must be below zero (${value})`);
     break;
   case `percentage`:
-    if (value > 1 || value < 0) throw new Error(`Parameter ${paramName} must be in percentage range (0 to 1). (${value})`);
+    if (value > 1 || value < 0) throw new Error(`Parameter '${paramName}' must be in percentage range (0 to 1). (${value})`);
     break;
   case `nonZero`:
-    if (value === 0) throw new Error(`Parameter ${paramName} must non-zero. (${value})`);
+    if (value === 0) throw new Error(`Parameter '${paramName}' must non-zero. (${value})`);
     break;
   case `bipolar`:
-    if (value > 1 || value < -1) throw new Error(`Parameter ${paramName} must be in bipolar percentage range (-1 to 1). (${value})`);
+    if (value > 1 || value < -1) throw new Error(`Parameter '${paramName}' must be in bipolar percentage range (-1 to 1). (${value})`);
     break;
   }
   return true;

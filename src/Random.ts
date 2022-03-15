@@ -115,7 +115,6 @@ export const weightedInteger = (minOrMax:number, maxOrEasing?:number|Easings.Eas
   return Math.floor(r * (max-min)) + min;
 };
 
-
 /**
  * Returns a random number with gaussian (ie bell-curved) distribution
  * ```js

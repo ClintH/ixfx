@@ -3,7 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
-import {defaultRandom, RandomSource} from '~/Random.js';
+import {defaultRandom, RandomSource} from '../Random.js';
 import {IsEqual, isEqualDefault} from '../Util.js';
 
 export * from './NumericArrays.js';

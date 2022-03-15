@@ -16,7 +16,8 @@ import { number as guardNumber, integer as guardInteger} from "./Guards.js";
  * clamp(50, 0, 50);   
  * ```
  * 
- * For clamping integer ranges, consider `clampZeroBounds`
+ * For clamping integer ranges, consider {@link clampZeroBounds}
+ * For clamping {x,y} points, consider `Points.clamp`.
  * 
  * @param v Value to clamp
  * @param Minimum value (inclusive)
@@ -329,7 +330,7 @@ export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof ite
  * @param max Integer maximum of range (default: 360). Exlusive
  * @returns 
  */
-export const wrap = (v:number, min:number = 0, max:number = 360) => {
+export const wrapInteger = (v:number, min:number = 0, max:number = 360) => {
   guardInteger(v, undefined, `v`);
   guardInteger(min, undefined, `min`);
   guardInteger(max, undefined, `max`);
@@ -347,8 +348,36 @@ export const wrap = (v:number, min:number = 0, max:number = 360) => {
 };
 
 /**
+ * Wraps floating point numbers. Defaults to a 0..1 scale.
+ * @param v 
+ * @param min 
+ * @param max 
+ * @returns 
+ */
+export const wrap = (v:number, min: number = 0, max:number = 1) => {
+  guardNumber(v, ``, `min`);
+  guardNumber(min, ``, `min`);
+  guardNumber(max, ``, `max`);
+
+  if (v === min) return min;
+  if (v === max) return min; // Wraps
+
+  //eslint-disable-next-line functional/no-loop-statement
+  while (v <= min || v >= max) {
+    if (v === max) break;
+    if (v === min) break;
+    if (v > max) {
+      v = min + (v-max);
+    } else if (v < min) {
+      v = max - (min-v);
+    }
+  }
+  return v;
+};
+
+/**
  * Performs a calculation within a wrapping number range. This is a lower-level function.
- * See also: {@link wrap} for simple wrapping within a range.
+ * See also: {@link wrapInteger} for simple wrapping within a range.
  * 
  * `min` and `max` define the start and end of the valid range, inclusive. Eg for hue degrees it'd be 0, 360.
  * `a` and `b` is the range you want to work in. 
@@ -398,5 +427,5 @@ export const wrapRange = (min:number, max:number, fn:(distance:number)=>number, 
       r = a + fn(distMin);
     }
   }
-  return wrap(r, min, max); 
+  return wrapInteger(r, min, max); 
 };
