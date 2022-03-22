@@ -1,3 +1,4 @@
+import {degreeToRadian} from "./index.js";
 import * as Points from "./Point.js";
 
 export type Coord = {
@@ -19,12 +20,12 @@ export const isCoord = (p: number|unknown): p is Coord => {
 export const fromCartesian = (point: Points.Point, origin: Points.Point): Coord => {
   point = Points.subtract(point, origin);
   //eslint-disable-next-line functional/no-let
-  let a =  Math.atan2(point.y, point.x);
-  if (a < 0) a = Math.abs(a);
-  else a = Math.PI + (Math.PI - a);
+  //let a =  Math.atan2(point.y, point.x);
+  //if (a < 0) a = Math.abs(a);
+  //else a = Math.PI + (Math.PI - a);
 
   return {
-    angleRadian: a,
+    angleRadian: Math.atan2(point.y, point.x),
     distance: Math.sqrt(point.x * point.x + point.y * point.y)
   };
 };
@@ -76,6 +77,16 @@ export function* spiral(smoothness:number, zoom:number): IterableIterator<Coord 
     };
   }
 }
+
+export const rotate = (c:Coord, amountRadian:number): Coord => ({
+  ...c,
+  angleRadian: c.angleRadian + amountRadian
+});
+
+export const rotateDegrees = (c:Coord, amountDeg:number):Coord => ({
+  ...c,
+  angleRadian: c.angleRadian + degreeToRadian(amountDeg)
+});
 
 /**
  * Produces an Archimedian spiral with manual stepping.
