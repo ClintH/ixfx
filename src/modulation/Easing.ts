@@ -40,7 +40,7 @@ const tickRelativeTimer = function (upperBound: number): RelativeTimer {
 };
 */
 
-type EasingFn = (x: number) => number;
+export type EasingFn = (x: number) => number;
 
 /**
  * Creates an easing based on clock time

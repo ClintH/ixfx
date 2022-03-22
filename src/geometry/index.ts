@@ -13,8 +13,18 @@ export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, El
 
 export * as Polar from './Polar.js';
 
+/**
+ * Convert angle in degrees to angle in radians.
+ * @param angleInDegrees 
+ * @returns 
+ */
 export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees) * (Math.PI / 180.0);
 
+/**
+ * Convert angle in radians to angle in degrees
+ * @param angleInRadians
+ * @returns 
+ */
 export const radianToDegree = (angleInRadians:number) => angleInRadians * 180 / Math.PI;
 
 export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.x, point.y);
