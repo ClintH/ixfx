@@ -1,4 +1,4 @@
-import { Rects} from "./index.js";
+import { Polar, Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line';
 import {number as guardNumber} from '../Guards';
 import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util';
@@ -299,19 +299,83 @@ export const fromNumbers = (...coords:readonly ReadonlyArray<number>[]|readonly 
  *   y: a.y - b.y
  * };
  * ```
- * @param a
- * @param b
+ * @param a Point a
+ * @param b Point b
  * @returns Point
  */
-export const subtract = function (a: Point, b: Point): Point {
-  guard(a, `a`);
-  guard(b, `b`);
-  return {
-    x: a.x - b.x,
-    y: a.y - b.y
-  };
-};
+export function subtract(a: Point, b: Point): Point;
 
+/**
+ * Returns `a` minus the given coordinates.
+ * 
+ * ie:
+ * ```js
+ * return {
+ *  x: a.x - x,
+ *  y: a.y - y
+ * }
+ * ```
+ * @param a Point
+ * @param x X coordinate
+ * @param y Y coordinate
+ */
+export function subtract (a:Point, x:number, y:number):Point;
+
+/**
+ * Subtracts two sets of x,y pairs
+ * @param x1 
+ * @param y1 
+ * @param x2 
+ * @param y2 
+ */
+export function subtract (x1:number, y1:number, x2:number, y2:number):Point;
+
+//eslint-disable-next-line func-style
+export function subtract(a:Point|number, b:Point|number, c?:number, d?:number):Point {
+  if (isPoint(a)) {
+    guard(a, `a`);
+    if (isPoint(b)) {
+      guard(b, `b`);
+      return {
+        x: a.x - b.x,
+        y: a.y - b.y
+      };
+    } else {
+      if (c === undefined) c = 0;
+      return {
+        x: a.x - b,
+        y: a.y - c
+      };
+    }
+  } else {
+    guardNumber(a, ``, `a`);
+    if (typeof b !== `number`) throw new Error(`Second parameter is expected to by y value`);
+    guardNumber(b, ``, `b`);
+    if (c === undefined) c = 0;
+    if (d === undefined) d = 0;
+    return {
+      x: a - c,
+      y: b - d
+    };
+  }
+}
+
+/**
+ * Applies `fn` on `x` and `y` fields, returning all other fields as well
+ * ```js
+ * const p = {x:1.234, y:4.9};
+ * const p2 = apply(p, Math.round);
+ * // Yields: {x:1, y:5}
+ * ```
+ * @param pt 
+ * @param fn 
+ * @returns 
+ */
+export const apply = (pt:Point, fn:(v:number)=>number):Point => ({
+  ...pt,
+  x: fn(pt.x),
+  y: fn(pt.y)
+});
 
 type Sum = {
   /**
@@ -462,7 +526,7 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
 
   if (isPoint(a)) {
     if (isPoint(b)) {
-      guardNonZeroPoint(a);
+      guard(a);
       guardNonZeroPoint(b);
       
       return {
@@ -471,7 +535,7 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
       };
     } else {
       if (c === undefined) c = 1;
-      guardNonZeroPoint(a);
+      guard(a);
       guardNumber(b, `nonZero`, `x`);
       guardNumber(c, `nonZero`, `y`);
       return {
@@ -481,8 +545,8 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
     }
   } else {
     if (typeof b !== `number`) throw new Error(`expected second parameter to be y1 coord`);
-    guardNumber(a, `nonZero`, `x1`);
-    guardNumber(b, `nonZero`, `y1`);
+    guardNumber(a, `positive`, `x1`);
+    guardNumber(b, `positive`, `y1`);
     if (c === undefined) c = 1;
     if (d === undefined) d = 1;
     guardNumber(c, `nonZero`, `x2`);
@@ -494,6 +558,16 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
     };
   }
 }
+
+export const rotate = (pt:Point, amountRadian:number, origin?:Point):Point => {
+  if (origin === undefined) origin = {x:0, y:0};
+  guard(origin, `origin`);
+  guard(pt, `pt`);
+  guardNumber(amountRadian, ``, `amountRadian`);
+  const p = Polar.fromCartesian(pt, origin);
+  const pp = Polar.rotate(p, amountRadian);
+  return Polar.toCartesian(pp, origin);
+};
 
 /**
  * Normalises a point by a given width and height
