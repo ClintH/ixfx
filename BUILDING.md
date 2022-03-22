@@ -9,7 +9,8 @@ npm run build
 npm run develop // continually rebuild
 ```
 
-Build Typescript sources, running a single file with source map support:
+Build Typescript sources, running a single file with source map support. Note that the path is the intermediate build path, rather than the `./src/` path, and the `JS` extension is used.
+
 ```
 npm run run -- ./etc/build/StateMachine.js
 ```
@@ -44,8 +45,7 @@ Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos a
 Cleans and builds for packaging:
 
 ```
-npm run publishNpm
-npm run publishGh
+npm run publish:npm
 ```
 
 ## Docs

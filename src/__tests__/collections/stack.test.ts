@@ -105,6 +105,11 @@ describe(`stack`, () => {
     f = stack<string>({capacity: 3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
     f = f.push(`test3`, `test4`, `test5`);
     expect(f.data).toEqual([`test3`, `test4`, `test5`]);
+
+    // New items are discarded - Full, add one extra item
+    f = stack<string>({capacity: 3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+    f = f.push(`test3`);
+    expect(f.data).toEqual([`test0`, `test1`, `test3`]);
   });
 
 });
