@@ -1,3 +1,41 @@
+import {zip} from './Arrays.js';
+import * as Easings from "../modulation/Easing.js";
+
+/**
+ * Applies a function to the elements of an array, weighting them based on their relative position.
+ * 
+ * ```js
+ * // Six items
+ * weight([1,1,1,1,1,1], Easings.gaussian());
+ * 
+ * // Yields:
+ * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
+ * ```
+ * 
+ * Function is expected to map (0..1) => (0..1), such as an {@link Easings.EasingFn}. The input to the
+ * function is the relative position of an element, so the first element will use fn(0), the middle (0.5) and so on.
+ * The output of the function s then multiplied by the original value.
+ * 
+ * In the below example (which is also the default if `fn` is not specified), it is just the
+ * position which is used to proportion the contents.
+ * 
+ * ```js
+ * weight([1,1,1,1,1,1], (relativePos) => relativePos);
+ * // Yields:
+ * // [0, 0.2, 0.4, 0.6, 0.8, 1]
+ * ```
+ * 
+ * Non-numbers in `data` will be silently ignored.
+ * @param data Data to process. Assumed to be an array of numbers
+ * @param fn Function (number)=>number. Returns a weighting based on the given relative position. If unspecified (x) => x is used.
+ */
+export const weight = (data:readonly number[], fn?:(relativePos:number)=>number):readonly number[] => {
+  const f = (fn === undefined) ? (x:number) => x : fn;
+  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
+  return validNumbers.map((v:number, index:number) => v*f(index/(validNumbers.length-1)));
+};
+
+
 /**
  * Calculates the average of all numbers in an array.
  * Array items which aren't a valid number are ignored and do not factor into averaging.
@@ -19,11 +57,48 @@
 export const average = (...data: readonly number[]): number => {
   // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
-
-  //const total = data.reduce((acc, v) => acc+v, 0);
   const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
   const total = validNumbers.reduce((acc, v) => acc + v, 0);
   return total / validNumbers.length;
+};
+
+/**
+ * Computes an average of an array with a set of weights applied.
+ * 
+ * Weights can be provided as an array, expected to be on 0..1 scale, with indexes
+ * matched up to input data. Ie. data at index 2 will be weighed by index 2 in the weightings array.
+ * 
+ * ```js
+ * // All items weighted evenly
+ * averageWeighted([1,2,3], [1,1,1]); // 2
+ * 
+ * // First item has full weight, second half, third quarter
+ * averageWeighted([1,2,3], [1, 0.5, 0.25]); // 1.57
+ * 
+ * // With reversed weighting of [0.25,0.5,1] value is 2.42
+ * ```
+ * 
+ * A function can alternatively be provided to compute the weighting based on array index, via {@link weight}.
+ * 
+ * ```js
+ * averageWeighted[1,2,3], Easings.gaussian()); // 2.0
+ * ```
+ * 
+ * This is the same as:
+ * ```js
+ * const data = [1,2,3];
+ * const w = weight(data, Easings.gaussian());
+ * const avg = averageWeighted(data, w); // 2.0
+ * ```
+ * @param data Data to average
+ * @param weightings Array of weightings that match up to data array, or an easing function 
+ */
+export const averageWeighted = (data:readonly number[], weightings:(readonly number[])|Easings.EasingFn):number => {
+  if (typeof weightings === `function`) weightings = weight(data, weightings);
+
+  const ww = zip(data, weightings);
+  const [totalV, totalW] = ww.reduce((acc, v:number[]) => [acc[0] + (v[0]*v[1]), acc[1] + v[1]], [0, 0]);
+  return totalV/totalW;
 };
 
 /**
