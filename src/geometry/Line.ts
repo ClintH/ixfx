@@ -8,7 +8,10 @@ export type Line = {
   readonly b: Points.Point
 }
 
-export const isLine = (p: Path | Line | Points.Point): p is Line => (p as Line).a !== undefined && (p as Line).b !== undefined;
+export const isLine = (p: Path | Line | Points.Point): p is Line => {
+  if (p === undefined) return false;
+  return (p as Line).a !== undefined && (p as Line).b !== undefined;
+};
 
 /**
  * Returns true if the lines have the same value
@@ -19,12 +22,59 @@ export const isLine = (p: Path | Line | Points.Point): p is Line => (p as Line).
  */
 export const equals = (a:Line, b:Line):boolean =>  a.a === b.a && a.b === b.b;
 
-export const guard = (l:Line, paramName:string = `line`) => {
-  if (l === undefined) throw new Error(`${paramName} undefined`);
-  if (l.a === undefined) throw new Error(`${paramName}.a undefined. Expected {a:Point, b:Point}`);
-  if (l.b === undefined) throw new Error(`${paramName}.b undefined. Expected {a:Point, b:Point}`);
+/**
+ * Applies `fn` to both start and end points.
+ * 
+ * ```js
+ * // Line 10,10 -> 20,20
+ * const line = Lines.fromNumbers(10,10, 20,20);
+ * 
+ * // Applies randomisation to x&y
+ * const rand = (p) => ({
+ *  x: p.x * Math.random(),
+ *  y: p.y * Math.random()
+ * });
+ * 
+ * // Applies our randomisation function
+ * const line2 = apply(line, rand);
+ * ```
+ * @param line Line
+ * @param fn Function that takes a point and returns a point
+ * @returns 
+ */
+export const apply = (line:Line, fn:(p:Points.Point) => Points.Point) => (
+  {
+    ...line,
+    a: fn(line.a),
+    b: fn(line.b)
+  }
+);
+
+/**
+ * Throws an exception if:
+ * * line is undefined
+ * * a or b parameters are missing
+ * 
+ * Does not validate points
+ * @param line 
+ * @param paramName 
+ */
+export const guard = (line:Line, paramName:string = `line`) => {
+  if (line === undefined) throw new Error(`${paramName} undefined`);
+  if (line.a === undefined) throw new Error(`${paramName}.a undefined. Expected {a:Point, b:Point}`);
+  if (line.b === undefined) throw new Error(`${paramName}.b undefined. Expected {a:Point, b:Point}`);
 };
 
+/**
+ * Returns the angle in radians of a line, or two points
+ * ```js
+ * angleRadian(line);
+ * angleRadian(ptA, ptB);
+ * ```
+ * @param lineOrPoint 
+ * @param b 
+ * @returns 
+ */
 export const angleRadian = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => {
   //eslint-disable-next-line functional/no-let
   let a:Points.Point;
@@ -38,17 +88,49 @@ export const angleRadian = (lineOrPoint:Line|Points.Point, b?:Points.Point):numb
   return Math.atan2(b.y - a.y, b.x - a.x);
 };
 
-export const withinRange = (l:Line, p:Points.Point, maxRange:number):boolean =>  {
-  // if (typeof maxRange === `number`) {
-  //   maxRange = {x:maxRange, y:maxRange};
-  // }
-  const dist = distance(l, p);
+/**
+ * Multiplies start and end of line by x,y given in `p`.
+ * ```js
+ * // Line 1,1 -> 10,10
+ * const l = fromNumbers(1,1,10,10);
+ * const ll = multiply(l, {x:2, y:3});
+ * // Yields: 2,20 -> 3,30
+ * ```
+ * @param line 
+ * @param point 
+ * @returns 
+ */
+export const multiply = (line:Line, point:Points.Point):Line => ({ 
+  a: Points.multiply(line.a, point),
+  b: Points.multiply(line.b, point)
+});
+
+/**
+ * Returns true if `point` is within `maxRange` of `line`.
+ * ```js
+ * const line = Lines.fromNumbers(0,20,20,20);
+ * Lines.withinRange(line, {x:0,y:21}, 1); // True
+ * ```
+ * @param line
+ * @param point
+ * @param maxRange 
+ * @returns True if point is within range
+ */
+export const withinRange = (line:Line, point:Points.Point, maxRange:number):boolean =>  {
+  const dist = distance(line, point);
   return dist <= maxRange;
-  // const x = Math.abs(b.x - a.x);
-  // const y = Math.abs(b.y - a.y);
-  // return (x <= maxRange.x && y<= maxRange.y);
 };
 
+/**
+ * Returns the length of a line or length between two points
+ * ```js
+ * length(line);
+ * length(ptA, ptB);
+ * ```
+ * @param aOrLine Line or first point
+ * @param b Second point
+ * @returns 
+ */
 export const length = (aOrLine: Points.Point|Line, b?: Points.Point): number => {
   //eslint-disable-next-line functional/no-let
   let a;
@@ -72,15 +154,24 @@ export const length = (aOrLine: Points.Point|Line, b?: Points.Point): number => 
   }
 };
 
-export const nearest = (line:Line, p:Points.Point): Points.Point => {
+/**
+ * Returns the nearest point on `line` closest to `point`.
+ * ```js
+ * nearest(line, {x:10,y:10});
+ * ```
+ * @param line
+ * @param point
+ * @returns Point {x,y}
+ */
+export const nearest = (line:Line, point:Points.Point): Points.Point => {
   const {a, b} = line;
   const atob = { x: b.x - a.x, y: b.y - a.y };
-  const atop = { x: p.x - a.x, y: p.y - a.y };
+  const atop = { x: point.x - a.x, y: point.y - a.y };
   const len = atob.x * atob.x + atob.y * atob.y;
   //eslint-disable-next-line functional/no-let
   let dot = atop.x * atob.x + atop.y * atob.y;
   const t = Math.min(1, Math.max(0, dot / len));
-  dot = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+  dot = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
   return {x: a.x + atob.x * t, y: a.y + atob.y * t};
 };
 
@@ -111,6 +202,11 @@ export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => 
   } else throw Error(`Second point missing`);
 };
 
+/**
+ * Extends a line to intersection the x-axis at a specified location
+ * @param line Line to extend
+ * @param xIntersection Intersection of x-axis.
+ */
 export const extendX = (line:Line, xIntersection:number):Points.Point => {
   const y = line.a.y + (xIntersection - line.a.x) * slope(line);
   return {x: xIntersection, y};
@@ -139,31 +235,62 @@ export const extendFromStart = (line:Line, distance:number):Line => {
   ;
 };
 
-export const distance = (l:Line, p:Points.Point):number => {
-  guard(l, `l`);
-  guardPoint(p, `p`);
+/**
+ * Returns the distance of `point` to the 
+ * nearest point on `line`.
+ * 
+ * ```js
+ * distance(line, {x:10,y:10});
+ * ```
+ * @param line
+ * @param point
+ * @returns 
+ */
+export const distance = (line:Line, point:Points.Point):number => {
+  guard(line, `line`);
+  guardPoint(point, `point`);
 
-  const lineLength = length(l);
+  const lineLength = length(line);
   if (lineLength === 0) {
     // Line is really a point
-    return length(l.a, p);
+    return length(line.a, point);
   }
 
-  const near = nearest(l, p);
-  return length(near, p);
+  const near = nearest(line, point);
+  return length(near, point);
 };
 
 /**
- * Calculates a point in-between a and b
+ * Calculates a point in-between `a` and `b`.
+ * 
+ * ```js
+ * // Get {x,y} at 50% along line
+ * interpolate(0.5, line);
+ * 
+ * // Get {x,y} at 80% between point A and B
+ * interpolate(0.8, ptA, ptB);
+ * ```
  * @param amount Relative position, 0 being at a, 0.5 being halfway, 1 being at b
  * @param a Start
  * @param b End
  * @returns Point between a and b
  */
-export const interpolate = (amount: number, a: Points.Point, b: Points.Point): Points.Point => {
+export  function interpolate(amount: number, a: Points.Point, b: Points.Point): Points.Point;
+export  function interpolate(amount: number, line:Line): Points.Point;
+
+//eslint-disable-next-line func-style
+export function interpolate(amount:number, a:Points.Point|Line, b?:Points.Point): Points.Point {
+  guardPercent(amount, `amount`);
+  if (isLine(a)) {
+    b = a.b;
+    a = a.a;
+  }
+
+  if (!Points.isPoint(a)) throw new Error(`Expected point`);
+  if (!Points.isPoint(b)) throw new Error(`Expected point`);
+
   guardPoint(a, `a`);
   guardPoint(b, `b`);
-  guardPercent(amount, `t`);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
@@ -171,10 +298,40 @@ export const interpolate = (amount: number, a: Points.Point, b: Points.Point): P
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
   return {x: x, y: y};
-};
+}
 
-export const toString = (a: Points.Point, b: Points.Point): string => Points.toString(a) + `-` + Points.toString(b);
+/**
+ * Returns a string representation of line, or two points
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export function toString (a: Points.Point, b: Points.Point): string;
 
+export function toString(line:Line):string;
+
+//eslint-disable-next-line func-style
+export function toString(a:Points.Point|Line, b?:Points.Point):string {
+  if (isLine(a)) {
+    guard(a, `a`);
+    b = a.b;
+    a = a.a;
+  } else if (b === undefined) throw new Error(`Expect second point if first is a point`);
+  return Points.toString(a) + `-` + Points.toString(b);
+}
+
+/**
+ * Returns a line from a basis of coordinates
+ * ```js
+ * // Line from 0,1 -> 10,15
+ * fromNumbers(0,1,10,15);
+ * ```
+ * @param x1 
+ * @param y1 
+ * @param x2 
+ * @param y2 
+ * @returns 
+ */
 export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Line => {
   if (Number.isNaN(x1)) throw new Error(`x1 is NaN`);
   if (Number.isNaN(x2)) throw new Error(`x2 is NaN`);
@@ -209,6 +366,16 @@ export const fromArray = (arr: readonly number[]): Line => {
   return fromNumbers(arr[0], arr[1], arr[2], arr[3]);
 };
 
+/**
+ * Returns a line from two points
+ * ```js
+ * // Line from 0,1 to 10,15
+ * fromPoints({x:0,y:1}, {x:10,y:15});
+ * ```
+ * @param a Start point
+ * @param b End point
+ * @returns 
+ */
 export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   guardPoint(a, `a`);
   guardPoint(b, `b`);
@@ -220,8 +387,14 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   });
 };
 
+/**
+ * Returns an array of lines that connects provided points.
+ * 
+ * Eg, if points a,b,c are provided, two lines are provided: a->b and b->c
+ * @param points 
+ * @returns 
+ */
 export const joinPointsToLines = (...points:readonly Points.Point[]): readonly Line[] => {
-  //if (!(points.length % 2 === 0)) throw new Error(`Points array should be even-numbered`);
   const lines = [];
   //eslint-disable-next-line functional/no-let
   let start = points[0];
@@ -241,6 +414,9 @@ export type LinePath = Line & Path & {
   toFlatArray():readonly number[]
 }
 
+/**
+ * Returns a rectangle that encompasses dimension of line
+ */
 export const bbox = (line:Line):Rects.RectPositioned =>  Points.bbox(line.a, line.b);
 
 export const toPath = (line:Line): LinePath => {
@@ -254,6 +430,40 @@ export const toPath = (line:Line): LinePath => {
     toFlatArray: () => toFlatArray(a, b),
     toSvgString: () => toSvgString(a, b),
     toPoints: () => [a, b],
+    rotate: () => (amountRadian:number, origin:Points.Point) => rotate(line, amountRadian, origin),
     kind: `line`
   });
+};
+
+/**
+ * Returns a line that is rotated by `angleRad`. By default it rotates
+ * around its center, but an arbitrary `origin` point can be provided.
+ * If `origin` is a number, it's presumed to be a 0..1 percentage of the line.
+ * 
+ * ```js
+ * // Rotates line by 0.1 radians around point 10,10
+ * rotate(line, 0.1, {x:10,y:10});
+ * 
+ * // Rotate line by 5 degrees around its center
+ * rotate(line, degreeToRadian(5));
+ * 
+ * // Rotate line by 5 degres around its end point
+ * rotate(line, degreeToRadian(5), line.b);
+ * ```
+ * @param line Line to rotate
+ * @param amountRadian Angle in radians to rotate by
+ * @param origin Point to rotate around. If undefined, middle of line will be used
+ * @returns 
+ */
+export const rotate = (line:Line, amountRadian?:number, origin?:Points.Point|number):Line => {
+  if (amountRadian === undefined || amountRadian === 0) return line;
+  if (origin === undefined) origin = 0.5;
+  if (typeof origin === `number`) {
+    guardPercent(origin, `origin`);
+    origin = interpolate(origin, line.a, line.b);
+  }
+  return {
+    a: Points.rotate(line.a, amountRadian, origin),
+    b: Points.rotate(line.b, amountRadian, origin)
+  };
 };
