@@ -3,6 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
+import {integer as guardInteger} from '~/Guards.js';
 import {defaultRandom, RandomSource} from '../Random.js';
 import {IsEqual, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
@@ -18,6 +19,18 @@ export const guardArray = <V>(array:ArrayLike<V>, paramName:string = `?`) => {
   if (array === undefined) throw new Error(`Param '${paramName}' is undefined. Expected array.`);
   if (array === null) throw new Error(`Param '${paramName}' is null. Expected array.`);
   if (!Array.isArray(array)) throw new Error(`Param '${paramName}' not an array as expected`);
+};
+
+/**
+ * Throws if `index` is an invalid array index for `array`, and if
+ * `array` itself is not a valid array.
+ * @param array 
+ * @param index 
+ */
+export const guardIndex = <V>(array:ReadonlyArray<V>, index:number, paramName:string = `index`) => {
+  guardArray(array);
+  guardInteger(index, `positive`, paramName);
+  if (index > array.length -1) throw new Error(`'${paramName}' ${index} beyond array max of ${array.length-1}`);
 };
 
 /**
@@ -126,6 +139,29 @@ export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`un
   return d;
 };
 
+
+/**
+ * Return elements from `array` that match a given `predicate`, and moreover are between the given `startIndex` and `endIndex`.
+ * 
+ * While this can be done with in the in-built `array.filter` function, it will needless iterate through the whole array. It also
+ * avoids another alternative of slicing the array before using `filter`.
+ * @param array 
+ * @param predicate 
+ * @param startIndex 
+ * @param endIndex 
+ */
+export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, index: number, array: ReadonlyArray<V>) => boolean, startIndex:number, endIndex:number):readonly V[] => {
+  guardIndex(array, startIndex, `startIndex`);
+  guardIndex(array, endIndex, `endIndex`);
+
+  const t:V[] = [];
+  //eslint-disable-next-line functional/no-let,functional/no-loop-statement
+  for (let i=startIndex;i<=endIndex;i++) {
+    //eslint-disable-next-line functional/immutable-data
+    if (predicate(array[i], i, array)) t.push(array[i]);
+  }
+  return t;
+};
 /**
  * Returns a random array index
  * @param array
