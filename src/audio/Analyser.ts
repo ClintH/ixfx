@@ -5,6 +5,15 @@ import {isPowerOfTwo} from "~/Util.js";
 
 /**
  * Options for audio processing
+ * 
+ * fftSize: Must be a power of 2, from 32 - 32768. Higher number means
+ * more precision and higher CPU overhead
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize
+ * 
+ * smoothingTimeConstant: Range from 0-1, default is 0.8.
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/smoothingTimeConstant
+ * 
+ * debug: If true, additonal console logging will happen
  */
 export type Opts = Readonly<{
   readonly showVis?:boolean
@@ -24,10 +33,8 @@ export type Opts = Readonly<{
 
 export type DataAnalyser = (node:AnalyserNode, analyser:Analyser) => void;
 
-export type BasicAnalyserHandler = (freq:Float32Array, wave:Float32Array, analyser:Analyser) => void;
-
 /**
- * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link freq} if you just want FFT results.
+ * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link peakLevel} if you want sound level, or {@link freq} if you just want FFT results.
  * 
  * ```js
  * const onData = (freq, wave, analyser) => {
@@ -40,7 +47,7 @@ export type BasicAnalyserHandler = (freq:Float32Array, wave:Float32Array, analys
  * basic(onData, {fftSize: 512});
  * ```
  * 
- * {@link Analyser} instance is returned and can be controlled:
+ * An `Analyser` instance is returned and can be controlled:
  * ```js
  * const analyser = basic(onData);
  * analyser.paused = true;
@@ -52,7 +59,7 @@ export type BasicAnalyserHandler = (freq:Float32Array, wave:Float32Array, analys
  * @param opts Options
  * @returns Analyser instance
  */
-export const basic = (onData:BasicAnalyserHandler, opts:Opts = {}) => new Analyser((node, analyser) => {
+export const basic = (onData:(freq:Float32Array, wave:Float32Array, analyser:Analyser) => void, opts:Opts = {}):Analyser => new Analyser((node, analyser) => {
   // Get frequency and amplitude data
   const freq = new Float32Array(node.frequencyBinCount);
   const wave = new Float32Array(node.fftSize);
@@ -66,7 +73,7 @@ export const basic = (onData:BasicAnalyserHandler, opts:Opts = {}) => new Analys
 }, opts);
 
 /**
- * Basic audio analyser. Returns FFT analysis. Use {@link basic} if you also want the waveform.
+ * Basic audio analyser. Returns FFT analysis. Use {@link peakLevel} if you want the sound level, or {@link basic} if you also want the waveform.
  * 
  * ```js
  * const onData = (freq, analyser) => {
@@ -85,7 +92,7 @@ export const basic = (onData:BasicAnalyserHandler, opts:Opts = {}) => new Analys
  * @param opts 
  * @returns 
  */
-export const freq = (onData:(freq:Float32Array, analyser:Analyser)=>void, opts:Opts={}) => new Analyser((node, analyser) => {
+export const freq = (onData:(freq:Float32Array, analyser:Analyser)=>void, opts:Opts={}):Analyser => new Analyser((node, analyser) => {
   const freq = new Float32Array(node.frequencyBinCount);
   node.getFloatFrequencyData(freq);
   onData(freq, analyser);
@@ -95,7 +102,7 @@ export const freq = (onData:(freq:Float32Array, analyser:Analyser)=>void, opts:O
  * Basic audio analyser which reports the peak sound level.
  * 
  * ```js
- * peak(level => {
+ * peakLevel(level => {
  *  console.log(level);
  * });
  * ```
@@ -105,7 +112,7 @@ export const freq = (onData:(freq:Float32Array, analyser:Analyser)=>void, opts:O
  * @param opts 
  * @returns 
  */
-export const peakLevel = (onData:(level:number, analyser:Analyser)=>void, opts:Opts={}) => new Analyser((node, analyser) => {
+export const peakLevel = (onData:(level:number, analyser:Analyser)=>void, opts:Opts={}):Analyser => new Analyser((node, analyser) => {
   const wave = new Float32Array(node.fftSize);
   node.getFloatTimeDomainData(wave);
   onData(Arrays.maxFast(wave), analyser);
@@ -132,7 +139,7 @@ export const peakLevel = (onData:(level:number, analyser:Analyser)=>void, opts:O
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
  *
  */
-export default class Analyser {
+export class Analyser {
   showVis:boolean;
   fftSize:number;
   smoothingTimeConstant:number;

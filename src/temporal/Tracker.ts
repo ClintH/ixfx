@@ -68,14 +68,18 @@ export class IntervalTracker extends Tracker {
   lastMark = 0;
   perf;
   constructor(id: string | undefined = undefined) {
-    super();
+    super(id);
     if (typeof performance === `undefined`) {
+      //eslint-disable-next-line functional/no-try-statement
       try {
+        //eslint-disable-next-line @typescript-eslint/no-var-requires
         const p = require(`perf_hooks`);
         this.perf = p.performance.now;
-      } catch (err) {}
+      } catch (err) {
+        // no-op
+      }
     } else {
-      this.perf = performance.now;
+      this.perf = window.performance.now;
     }
   }
 
@@ -86,3 +90,26 @@ export class IntervalTracker extends Tracker {
     this.lastMark = this.perf();
   }
 }
+
+/**
+ * Returns a new {@link IntervalTracker} instance. IntervalTracker
+ * records the interval between each call to `mark`.
+ * 
+ * ```js
+ * const t = intervalTracker();
+ * 
+ * // Call `mark` to record an interval
+ * t.mark();
+ * ...
+ * t.mark();
+ * 
+ * // Get average time in milliseconds between calls to `mark`
+ * t.avg;
+ * 
+ * // Longest and shortest times are available too...
+ * t.min; t.max
+ * ```
+ * @param id Optional id of instance
+ * @returns New interval tracker
+ */
+export const intervalTracker = (id?:string) => new IntervalTracker(id);

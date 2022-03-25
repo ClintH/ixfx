@@ -13,8 +13,8 @@
 
 import {Arrays} from '~/collections/index.js';
 import {Points} from '../geometry/index.js';
-import {Tracker} from '../Tracker.js';
-import Analyser from './Analyser.js';
+import {Tracker} from '../temporal/Tracker.js';
+import {Analyser} from './Analyser.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class Visualiser {
