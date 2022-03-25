@@ -173,7 +173,7 @@ export const minMaxAvg = (data: readonly number[], startIndex?:number, endIndex?
   if (!Array.isArray(data)) throw new Error(`'data' parameter is not an array`);
   
   if (startIndex === undefined) startIndex = 0;
-  if (endIndex === undefined) endIndex = data.length;
+  if (endIndex === undefined) endIndex = data.length - 1;
 
   const validNumbers = filterBetween<number>(data, d => typeof d === `number` && !Number.isNaN(d), startIndex, endIndex);
   const total = validNumbers.reduce((acc, v) => acc + v, 0);
