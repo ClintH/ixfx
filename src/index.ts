@@ -39,6 +39,7 @@ export * as Visual from './visual/index.js';
  */
 export * as Dom from './dom/index.js';
 
+export * as Audio from './audio/index.js';
 
 /**
  * The Modulation module contains functions for, well, modulating data.

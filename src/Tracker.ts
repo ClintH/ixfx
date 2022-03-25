@@ -1,14 +1,16 @@
 /**
- * Keeps track of the min, max and avg in a stream of values.
+ * Keeps track of the min, max and avg in a stream of values without actually storing them.
  * 
  * Usage:
- * ```
+ * 
+ * ```js
  *  const t = tracker(); 
- *  t.seen(10)
+ *  t.seen(10);
  * 
  *  t.avg / t.min/ t.max / t.getMinMax()
  * ```
- * Use `reset()` to clear everything, or `resetAvg()` to just reset averaging calculation
+ * 
+ * Use `reset()` to clear everything, or `resetAvg()` to only reset averaging calculation
  * @class Tracker
  */
 export class Tracker {
@@ -52,6 +54,8 @@ export class Tracker {
     };
   }
 }
+
+export const tracker = (id?:string) => new Tracker(id);
 
 /**
  * A `Tracker` that tracks interval between calls to `mark()`

@@ -2,6 +2,7 @@ import {defineConfig} from 'tsup';
 
 export default defineConfig({
   entry: {
+    audio: './src/audio/index.ts',
     bundle: `./src/index.ts`,
     arrays: `./src/collections/Arrays.ts`,
     components: `./src/components/index.ts`,
