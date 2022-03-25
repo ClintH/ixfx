@@ -429,3 +429,5 @@ export const wrapRange = (min:number, max:number, fn:(distance:number)=>number, 
   }
   return wrapInteger(r, min, max); 
 };
+
+export const isPowerOfTwo = (x:number) => Math.log2(x) % 1 === 0;
