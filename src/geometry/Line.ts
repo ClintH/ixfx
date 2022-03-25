@@ -1,4 +1,4 @@
-import {guard as guardPoint} from './Point.js';
+import {guard as guardPoint, Point} from './Point.js';
 import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 import { Rects, Points} from './index.js';
@@ -42,13 +42,14 @@ export const equals = (a:Line, b:Line):boolean =>  a.a === b.a && a.b === b.b;
  * @param fn Function that takes a point and returns a point
  * @returns 
  */
-export const apply = (line:Line, fn:(p:Points.Point) => Points.Point) => (
+export const apply = (line:Line, fn:(p:Points.Point) => Points.Point) => Object.freeze(
   {
     ...line,
     a: fn(line.a),
     b: fn(line.b)
   }
 );
+
 
 /**
  * Throws an exception if:
@@ -100,9 +101,84 @@ export const angleRadian = (lineOrPoint:Line|Points.Point, b?:Points.Point):numb
  * @param point 
  * @returns 
  */
-export const multiply = (line:Line, point:Points.Point):Line => ({ 
+export const multiply = (line:Line, point:Points.Point):Line => (Object.freeze({
+  ...line,
   a: Points.multiply(line.a, point),
   b: Points.multiply(line.b, point)
+}));
+
+/**
+ * Divides both start and end points by given x,y
+ * ```js
+ * // Line 1,1 -> 10,10
+ * const l = fromNumbers(1,1,10,10);
+ * const ll = divide(l, {x:2, y:4});
+ * // Yields: 0.5,0.25 -> 5,2.5
+ * ```
+ * @param line 
+ * @param point 
+ * @returns 
+ */
+export const divide = (line:Line, point:Points.Point):Line => Object.freeze({
+  ...line,
+  a: Points.divide(line.a, point),
+  b: Points.divide(line.b, point)
+});
+
+/**
+ * Adds both start and end points by given x,y
+ * ```js
+ * // Line 1,1 -> 10,10
+ * const l = fromNumbers(1,1,10,10);
+ * const ll = sum(l, {x:2, y:4});
+ * // Yields: 3,5 -> 12,14
+ * ```
+ * @param line 
+ * @param point 
+ * @returns 
+ */
+export const sum = (line:Line, point:Points.Point):Line => Object.freeze({
+  ...line,
+  a: Points.sum(line.a, point),
+  b: Points.sum(line.b, point)
+});
+
+/**
+ * Subtracts both start and end points by given x,y
+ * ```js
+ * // Line 1,1 -> 10,10
+ * const l = fromNumbers(1,1,10,10);
+ * const ll = subtract(l, {x:2, y:4});
+ * // Yields: -1,-3 -> 8,6
+ * ```
+ * @param line 
+ * @param point 
+ * @returns 
+ */
+export const subtract = (line:Line, point:Points.Point):Line => Object.freeze({
+  ...line,
+  a: Points.subtract(line.a, point),
+  b: Points.subtract(line.b, point)
+});
+
+/**
+ * Normalises start and end points by given width and height. Useful
+ * for converting an absolutely-defined line to a relative one.
+ * ```js
+ * // Line 1,1 -> 10,10
+ * const l = fromNumbers(1,1,10,10);
+ * const ll = normalise(l, 10, 10);
+ * // Yields: 0.1,0.1 -> 1,1
+ * ```
+ * @param line 
+ * @param width
+ * @param height 
+ * @returns 
+ */
+export const normalise = (line:Line, width:number, height:number):Line => Object.freeze({
+  ...line,
+  a: Points.normalise(line.a, width, height),
+  b: Points.normalise(line.b, width, height)
 });
 
 /**
@@ -172,11 +248,12 @@ export const nearest = (line:Line, point:Points.Point): Points.Point => {
   let dot = atop.x * atob.x + atop.y * atob.y;
   const t = Math.min(1, Math.max(0, dot / len));
   dot = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
-  return {x: a.x + atob.x * t, y: a.y + atob.y * t};
+  return Object.freeze({x: a.x + atob.x * t, y: a.y + atob.y * t});
 };
 
 /**
- * Calculates slope of line
+ * Calculates [slope](https://en.wikipedia.org/wiki/Slope) of line.
+ * 
  * @example
  * ```js
  * slope(line);
@@ -209,7 +286,7 @@ export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => 
  */
 export const extendX = (line:Line, xIntersection:number):Points.Point => {
   const y = line.a.y + (xIntersection - line.a.x) * slope(line);
-  return {x: xIntersection, y};
+  return Object.freeze({x: xIntersection, y});
 };
 
 /**
@@ -226,6 +303,7 @@ export const extendX = (line:Line, xIntersection:number):Points.Point => {
 export const extendFromStart = (line:Line, distance:number):Line => {
   const len = length(line);
   return Object.freeze({
+    ...line,
     a: line.a,
     b: Object.freeze({
       x: line.b.x + (line.b.x - line.a.x) / len * distance,
@@ -275,8 +353,8 @@ export const distance = (line:Line, point:Points.Point):number => {
  * @param b End
  * @returns Point between a and b
  */
-export  function interpolate(amount: number, a: Points.Point, b: Points.Point): Points.Point;
-export  function interpolate(amount: number, line:Line): Points.Point;
+export function interpolate(amount: number, a: Points.Point, b: Points.Point): Points.Point;
+export function interpolate(amount: number, line:Line): Points.Point;
 
 //eslint-disable-next-line func-style
 export function interpolate(amount:number, a:Points.Point|Line, b?:Points.Point): Points.Point {
@@ -297,7 +375,7 @@ export function interpolate(amount:number, a:Points.Point|Line, b?:Points.Point)
 
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
-  return {x: x, y: y};
+  return Object.freeze({x: x, y: y});
 }
 
 /**
@@ -379,8 +457,8 @@ export const fromArray = (arr: readonly number[]): Line => {
 export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   guardPoint(a, `a`);
   guardPoint(b, `b`);
-  a = Object.freeze(a);
-  b = Object.freeze(b);
+  a = Object.freeze({...a});
+  b = Object.freeze({...b});
   return Object.freeze({
     a: a,
     b: b
@@ -410,15 +488,31 @@ export const joinPointsToLines = (...points:readonly Points.Point[]): readonly L
 
 export const fromPointsToPath = (a:Points.Point, b:Points.Point): LinePath => toPath(fromPoints(a, b));
 
-export type LinePath = Line & Path & {
-  toFlatArray():readonly number[]
-}
-
 /**
  * Returns a rectangle that encompasses dimension of line
  */
 export const bbox = (line:Line):Rects.RectPositioned =>  Points.bbox(line.a, line.b);
 
+/**
+ * Returns a path wrapper around a line instance. This is useful if there are a series
+ * of operations you want to do with the same line because you don't have to pass it
+ * in as an argument to each function.
+ * 
+ * Note that the line is immutable, so a function like `sum` returns a new LinePath,
+ * wrapping the result of `sum`.
+ * 
+ * ```js
+ * // Create a path
+ * const l = toPath(fromNumbers(0,0,10,10));
+ * l.length();
+ * 
+ * // Mutate functions return a new path
+ * const ll = l.sum({x:10,y:10});
+ * ll.length();
+ * ```
+ * @param line 
+ * @returns 
+ */
 export const toPath = (line:Line): LinePath => {
   const {a, b} = line;
   return Object.freeze({
@@ -430,10 +524,26 @@ export const toPath = (line:Line): LinePath => {
     toFlatArray: () => toFlatArray(a, b),
     toSvgString: () => toSvgString(a, b),
     toPoints: () => [a, b],
-    rotate: () => (amountRadian:number, origin:Points.Point) => rotate(line, amountRadian, origin),
+    rotate: (amountRadian:number, origin:Points.Point) => toPath(rotate(line, amountRadian, origin)),
+    sum:(point:Points.Point) => toPath(sum(line, point)),
+    divide:(point:Points.Point) => toPath(divide(line, point)),
+    multiply:(point:Point) => toPath(multiply(line, point)),
+    subtract:(point:Point) => toPath(subtract(line, point)),
+    apply:(fn:(point:Points.Point) => Points.Point) => toPath(apply(line, fn)),
     kind: `line`
   });
 };
+
+export type LinePath = Line & Path & {
+  toFlatArray():readonly number[]
+  toPoints():readonly Points.Point[]
+  rotate(amountRadian:number, origin:Points.Point):LinePath
+  sum(point:Points.Point):LinePath
+  divide(point:Points.Point):LinePath
+  multiply(point:Points.Point):LinePath
+  subtract(point:Points.Point):LinePath
+  apply(fn:(point:Points.Point) => Points.Point):LinePath
+}
 
 /**
  * Returns a line that is rotated by `angleRad`. By default it rotates
@@ -462,8 +572,9 @@ export const rotate = (line:Line, amountRadian?:number, origin?:Points.Point|num
     guardPercent(origin, `origin`);
     origin = interpolate(origin, line.a, line.b);
   }
-  return {
+  return Object.freeze({
+    ...line,
     a: Points.rotate(line.a, amountRadian, origin),
     b: Points.rotate(line.b, amountRadian, origin)
-  };
+  });
 };
