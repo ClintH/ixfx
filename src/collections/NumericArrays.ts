@@ -1,4 +1,4 @@
-import {zip} from './Arrays.js';
+import {zip, filterBetween} from './Arrays.js';
 import * as Easings from "../modulation/Easing.js";
 
 /**
@@ -113,14 +113,31 @@ export const min = (...data:readonly number[]):number => {
 };
 
 /**
- * Returns the minimum number out of `data`.
+ * Returns the maximum number out of `data`.
  * Undefined and non-numbers are silently ignored.
  * @param data
- * @returns Minimum number
+ * @returns Maximum number
  */
 export const max = (...data:readonly number[]):number => {
   const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
   return Math.max(...validNumbers);
+};
+
+/**
+ * Returns the maximum out of `data` without additional processing for speed.
+ * 
+ * For most uses, {@link max} should suffice.
+ * @param data 
+ * @returns Maximum
+ */
+export const maxFast = (data:readonly number[]|Float32Array):number => {
+  //eslint-disable-next-line functional/no-let
+  let m = Number.MIN_SAFE_INTEGER;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=0;i<data.length;i++) {
+    m = Math.max(m, data[i]);
+  }
+  return m;
 };
 
 /**
@@ -129,10 +146,12 @@ export const max = (...data:readonly number[]):number => {
  * 
  * Use {@link average} if you only need average
  * 
- * @param data 
+ * @param data
+ * @param startIndex If provided, starting index to do calculations (defaults full range)
+ * @param endIndex If provided, the end index to do calculations (defaults full range)
  * @returns `{min, max, avg, total}`
  */
-export const minMaxAvg = (data: readonly number[]): {
+export const minMaxAvg = (data: readonly number[], startIndex?:number, endIndex?:number): {
   /**
    * Smallest value in array
    */
@@ -149,7 +168,14 @@ export const minMaxAvg = (data: readonly number[]): {
    * Average value in array
    */
   readonly avg: number;} => {
-  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
+
+  if(data === undefined) throw new Error(`'data' is undefined`);
+  if (!Array.isArray(data)) throw new Error(`'data' parameter is not an array`);
+  
+  if (startIndex === undefined) startIndex = 0;
+  if (endIndex === undefined) endIndex = data.length;
+
+  const validNumbers = filterBetween<number>(data, d => typeof d === `number` && !Number.isNaN(d), startIndex, endIndex);
   const total = validNumbers.reduce((acc, v) => acc + v, 0);
   return {
     total: total,
