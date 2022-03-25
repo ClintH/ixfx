@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -27,7 +27,7 @@
     "typecheck": "tsc",
     "develop_": "tsc --watch",
     "dev": "tsup --watch",
-    "clean": "rimraf dist && rimraf etc",
+    "clean": "rimraf dist && rimraf etc && rimraf docs",
     "run": "tsc && node -r source-map-support/register",
     "build": "tsup --sourcemap && npm run typings",
     "prepublish": "npm run clean && npm run build",
