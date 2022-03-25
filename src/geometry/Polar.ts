@@ -1,22 +1,40 @@
 import {degreeToRadian} from "./index.js";
 import * as Points from "./Point.js";
 
+/**
+ * Polar coordinate, made up of a distance and angle in radians.
+ * Most computations involving Coords require an `origin` as well.
+ */
 export type Coord = {
   readonly distance: number,
   readonly angleRadian: number
 }
 
+/**
+ * Converts to Cartesian coordiantes
+ */
 type ToCartesian = {
   (point:Coord, origin?:Points.Point) :Points.Point
   (distance:number, angleRadians:number, origin?:Points.Point) :Points.Point
 }
 
+/**
+ * Returns true if `p` seems to be a {@link Coord} (ie has both distance & angleRadian fields)
+ * @param p 
+ * @returns True if `p` seems to be a Coord
+ */
 export const isCoord = (p: number|unknown): p is Coord => {
   if ((p as Coord).distance === undefined) return false;
   if ((p as Coord).angleRadian === undefined) return false;
   return true;
 };
 
+/**
+ * Converts a Cartesian coordinate to polar
+ * @param point Point
+ * @param origin Origin
+ * @returns 
+ */
 export const fromCartesian = (point: Points.Point, origin: Points.Point): Coord => {
   point = Points.subtract(point, origin);
   //eslint-disable-next-line functional/no-let
@@ -24,12 +42,25 @@ export const fromCartesian = (point: Points.Point, origin: Points.Point): Coord 
   //if (a < 0) a = Math.abs(a);
   //else a = Math.PI + (Math.PI - a);
 
-  return {
-    angleRadian: Math.atan2(point.y, point.x),
+  const angle = Math.atan2(point.y, point.x);
+  //if (point.x < 0 && point.y > 0) angle += 180;
+  //if (point.x > 0 && point.y < 0) angle += 360;
+  //if (point.x < 0 && point.y < 0) angle += 180;
+  
+  return Object.freeze({
+    ...point,
+    angleRadian: angle,
     distance: Math.sqrt(point.x * point.x + point.y * point.y)
-  };
+  });
 };
 
+/**
+ * Converts a polar coordinate to a Cartesian one
+ * @param a
+ * @param b 
+ * @param c 
+ * @returns 
+ */
 export const toCartesian:ToCartesian = (a:Coord|number, b?:Points.Point|number, c?:Points.Point): Points.Point => {
   if (isCoord(a)) {
     if (b === undefined) b = Points.Empty;
@@ -47,11 +78,9 @@ export const toCartesian:ToCartesian = (a:Coord|number, b?:Points.Point|number, 
 };
 
 /**
- * Produces an Archimedean spiral
+ * Produces an Archimedean spiral. It's a generator.
  * 
- * 
- * This is a generator:
- * ```
+ * ```js
  * const s = spiral(0.1, 1);
  * for (const coord of s) {
  *  // Use Polar coord...
@@ -78,12 +107,24 @@ export function* spiral(smoothness:number, zoom:number): IterableIterator<Coord 
   }
 }
 
-export const rotate = (c:Coord, amountRadian:number): Coord => ({
+/**
+ * Returns a rotated coordiante
+ * @param c Coordinate
+ * @param amountRadian Amount to rotate, in radians 
+ * @returns 
+ */
+export const rotate = (c:Coord, amountRadian:number): Coord => Object.freeze({
   ...c,
   angleRadian: c.angleRadian + amountRadian
 });
 
-export const rotateDegrees = (c:Coord, amountDeg:number):Coord => ({
+/**
+ * Returns a rotated coordinate
+ * @param c Coordinate
+ * @param amountDeg Amount to rotate, in degrees
+ * @returns 
+ */
+export const rotateDegrees = (c:Coord, amountDeg:number):Coord => Object.freeze({
   ...c,
   angleRadian: c.angleRadian + degreeToRadian(amountDeg)
 });
@@ -97,18 +138,25 @@ export const rotateDegrees = (c:Coord, amountDeg:number):Coord => ({
  */
 export const spiralRaw = (step:number, smoothness:number, zoom:number):Coord => {
   const a = smoothness * step;
-  return {
+  return Object.freeze({
     distance: zoom * a,
     angleRadian: a
-  };
+  });
 };
 
+/**
+ * Converts a polar coordiante to Cartesian
+ * @param distance Distance
+ * @param angleRadians Angle in radians
+ * @param origin Origin
+ * @returns 
+ */
 const polarToCartesian = (distance:number, angleRadians:number, origin:Points.Point):Points.Point => {
   Points.guard(origin);
-  return {
+  return Object.freeze({
     x: origin.x + (distance * Math.cos(angleRadians)),
     y: origin.y + (distance * Math.sin(angleRadians)),
-  };
+  });
 };
 
 

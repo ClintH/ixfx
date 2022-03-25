@@ -367,14 +367,24 @@ export function subtract(a:Point|number, b:Point|number, c?:number, d?:number):P
  * const p2 = apply(p, Math.round);
  * // Yields: {x:1, y:5}
  * ```
+ * 
+ * The name of the field is provided as well. Here we only round the `x` field:
+ * 
+ * ```js
+ * const p = {x:1.234, y:4.9};
+ * const p2 = apply(p, (v, field) => {
+ *  if (field === `x`) return Math.round(v);
+ *  return v;
+ * });
+ * ```
  * @param pt 
  * @param fn 
  * @returns 
  */
-export const apply = (pt:Point, fn:(v:number)=>number):Point => ({
+export const apply = (pt:Point, fn:(v:number, field?:string)=>number):Point => ({
   ...pt,
-  x: fn(pt.x),
-  y: fn(pt.y)
+  x: fn(pt.x, `x`),
+  y: fn(pt.y, `y`)
 });
 
 type Sum = {
