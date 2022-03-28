@@ -10,11 +10,11 @@ const nordicRx = `6e400003-b5a3-f393-e0a9-e50e24dcca9e`;
 const chunkSize = 20;
 
 export class Nordic {
-
   states:StateMachine;
   codec:Codec;
   rx:BluetoothRemoteGATTCharacteristic|undefined;
   tx:BluetoothRemoteGATTCharacteristic|undefined;
+  verboseLogging = false;
 
   rxBuffer:StringReceiveBuffer;
   txBuffer:StringWriteBuffer;
@@ -25,7 +25,7 @@ export class Nordic {
     }, chunkSize);
 
     this.rxBuffer = new StringReceiveBuffer(line => {
-      this.log(`Line: ${line}`);
+      this.verbose(`Line: ${line}`);
     });
 
     this.codec = new Codec();
@@ -45,7 +45,7 @@ export class Nordic {
       this.states.state = `closed`;
     });
 
-    this.log(`ctor ${device.name} ${device.id}`);
+    this.verbose(`ctor ${device.name} ${device.id}`);
   }
 
   write(txt:string) {
@@ -65,12 +65,12 @@ export class Nordic {
 
     this.log(`connect`);
     const gatt = this.device.gatt;
-    if (gatt === undefined) throw new Error(`Cannot connect with device.gatt`);
+    if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
     const server = await gatt.connect();
-    this.log(`Getting primary service`);
+    this.verbose(`Getting primary service`);
     const service = await server.getPrimaryService(nordicService);
-    this.log(`Getting characteristics`);
+    this.verbose(`Getting characteristics`);
     const rx = await service.getCharacteristic(nordicRx);
     const tx = await service.getCharacteristic(nordicTx);
 
@@ -99,12 +99,12 @@ export class Nordic {
 
     // Remove if found
     if (plzStart && plzStop < plzStart) {
-      this.log(`Tx plz start`);
+      this.verbose(`Tx plz start`);
       str = omitChars(str, plzStart, 1);
       this.txBuffer.paused = false;
     }
     if (plzStop && plzStop > plzStart) {
-      this.log(`Tx plz stop`);
+      this.verbose(`Tx plz stop`);
       str = omitChars(str, plzStop, 1);
       this.txBuffer.paused = true;
     }
@@ -112,7 +112,11 @@ export class Nordic {
     this.rxBuffer.add(str);
   }
 
-  log(m:string) {
+  private verbose(m:string) {
+    if (this.verboseLogging) console.info(`BtDevice `, m);
+  }
+
+  private log(m:string) {
     console.log(`BtDevice `, m);
   }
 }
