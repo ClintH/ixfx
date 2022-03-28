@@ -15,6 +15,7 @@ export default defineConfig({
     keyValues: `./src/KeyValue.ts`,
     modulation: `./src/modulation/index.ts`,
     maps: `./src/collections/Map.ts`,
+    io: './src/io/index.ts',
     random: `./src/Random.ts`,
     sets: `./src/collections/Set.ts`,
     stateMachine: `./src/flow/StateMachine.ts`,

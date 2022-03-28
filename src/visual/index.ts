@@ -1,7 +1,6 @@
 import * as Drawing from './Drawing.js';
 import * as Svg from './Svg.js';
 import * as Plot from './Plot.js';
-import * as DictionaryOfColourCombinations from './DictionaryOfColourCombinations';
 import * as Palette from  './Palette';
 import * as Colour from './Colour.js';
 
@@ -15,7 +14,7 @@ import * as Colour from './Colour.js';
  */
 export {Colour};
 
-export {Palette,  Drawing, Svg, Plot, DictionaryOfColourCombinations};
+export {Palette,  Drawing, Svg, Plot};
 
 // @ts-ignore
 //eslint-disable-next-line functional/immutable-data

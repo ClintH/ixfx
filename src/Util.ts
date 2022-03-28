@@ -16,8 +16,8 @@ import { number as guardNumber, integer as guardInteger} from "./Guards.js";
  * clamp(50, 0, 50);   
  * ```
  * 
- * For clamping integer ranges, consider {@link clampZeroBounds}
- * For clamping {x,y} points, consider `Points.clamp`.
+ * For clamping integer ranges, consider {@link clampIndex}
+ * For clamping {x,y} points, consider {@link Points.clamp}.
  * 
  * @param v Value to clamp
  * @param Minimum value (inclusive)
@@ -48,13 +48,23 @@ export const clamp = (v: number, min = 0, max = 1) => {
  * scale(sensorReading, 100, 500);
  * ```
  * 
+ * If `v` is outside of the input range, it will likewise be outside of the output range.
+ * Use {@clamp} to ensure output range is maintained.
+ * 
  * If inMin and inMax are equal, outMax will be returned.
+ * 
+ * An easing function can be provided for non-linear scaling. In this case
+ * the input value is 'pre scaled' using the function before it is applied to the
+ * output range.
+ * ```js
+ * scale(sensorReading, 100, 500, 0, 1, Easings.gaussian());
+ * ```
  * @param v Value to scale
  * @param inMin Input minimum
  * @param inMax Input maximum
  * @param outMin Output minimum. If not specified, 0
  * @param outMax Output maximum. If not specified, 1
- * @param easing Easing function to use
+ * @param easing Easing function
  * @returns Scaled value
  */
 export const scale = (
@@ -96,9 +106,9 @@ export const flip = (v:number|NumberFunction) => {
 };
 
 /**
- * Scales a percentage-scale number `v * t`.
+ * Scales a percentage-scale number, ie: `v * t`.
  * The utility of this function is that it sanity-checks that
- *  both parameters are in 0..1 scale
+ *  both parameters are in the 0..1 scale.
  * @param v Value
  * @param t Scale amount
  * @returns Scaled value
@@ -112,21 +122,6 @@ export const proportion = (v:number|NumberFunction, t:number|NumberFunction) => 
   return v * t;
 };
 
-/**
- * Scales a percentage-scale number but reversed: `(1-v) * t`
- * The utility of this function is that it sanity-checks that
- *  both parameters are in 0..1 scale
- * @param v 
- * @param t 
- * @returns 
- */
-export const proportionReverse = (v:number|NumberFunction, t:number|NumberFunction) => {
-  if (typeof v === `function`) v = v();
-  if (typeof t === `function`) t = t();
-  guardNumber(v, `percentage`, `v`);
-  guardNumber(t, `percentage`, `t`);
-  return flip(v) * t;
-};
 
 /**
  * Scales an input percentage to a new percentage range.
@@ -430,4 +425,21 @@ export const wrapRange = (min:number, max:number, fn:(distance:number)=>number, 
   return wrapInteger(r, min, max); 
 };
 
+/**
+ * Returns true if `x` is a power of two
+ * @param x 
+ * @returns True if `x` is a power of two
+ */
 export const isPowerOfTwo = (x:number) => Math.log2(x) % 1 === 0;
+
+
+export const runningiOS = () => [
+  `iPad Simulator`,
+  `iPhone Simulator`,
+  `iPod Simulator`,
+  `iPad`,
+  `iPhone`,
+  `iPod`
+].includes(navigator.platform)
+  // iPad on iOS 13 detection
+  || (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
