@@ -23,6 +23,14 @@ export const between = (source: string, start: string, end?: string, lastEndMatc
   return source.substring(startPos+1, endPos);
 };
 
+/**
+ * Returns first position of the given character code, or -1 if not found.
+ * @param source Source string
+ * @param code Code to seek
+ * @param start Start index, 0 by default
+ * @param end End index (inclusive), source.length-1 by default
+ * @returns Found position, or -1 if not found
+ */
 export const indexOfCharCode = (source:string, code:number, start = 0, end = source.length-1):number => {
   //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i=start;i<=end;i++) {
