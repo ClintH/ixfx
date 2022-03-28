@@ -23,6 +23,57 @@ export const between = (source: string, start: string, end?: string, lastEndMatc
   return source.substring(startPos+1, endPos);
 };
 
+export const indexOfCharCode = (source:string, code:number, start = 0, end = source.length-1):number => {
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=start;i<=end;i++) {
+    if (source.charCodeAt(i) === code) return i;
+  }
+  return -1;
+};
+
+/**
+ * Returns `source` with chars removed at `removeStart` position
+ * ```js
+ * omitChars(`hello there`, 1, 3);
+ * // Yields: `ho there`
+ * ```
+ * @param source 
+ * @param removeStart Start point to remove
+ * @param removeLength Number of characters to remove 
+ * @returns 
+ */
+export const omitChars = (source:string, removeStart:number, removeLength:number) =>  source.substring(0, removeStart) + source.substring(removeStart+removeLength);
+
+/**
+ * Splits a string into `length`-size chunks.
+ * 
+ * If `length` is greater than the length of `source`, a single element array is returned with source.
+ * The final array element may be smaller if we ran out of characters.
+ * 
+ * ```js
+ * splitByLength(`hello there`, 2);
+ * // Yields:
+ * // [`he`, `ll`, `o `, `th`, `er`, `e`]
+ * ```
+ * @param source Source string
+ * @param length Length of each chunk
+ * @returns 
+ */
+export const splitByLength = (source:string, length:number):readonly string[] => {
+  const chunks = Math.ceil(source.length/length);
+  const ret:string[] = [];
+  //eslint-disable-next-line functional/no-let
+  let start = 0;
+
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let  
+  for (let c=0;c<chunks;c++) {
+    //eslint-disable-next-line functional/immutable-data
+    ret.push(source.substring(start, start+length));
+    start += length;
+  }
+  return ret;
+};
+
 /**
  * Returns the `source` string up until (and excluding) `match`. If match is not
  * found, all of `source` is returned.
