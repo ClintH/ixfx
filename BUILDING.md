@@ -6,7 +6,8 @@ Type-check and compile to `./etc/build/`
 
 ```
 npm run build
-npm run develop // continually rebuild
+npm run develop // continually rebuild just with tsc
+npm run dev     // continually rebuild & bundle with tsup
 ```
 
 Build Typescript sources, running a single file with source map support. Note that the path is the intermediate build path, rather than the `./src/` path, and the `JS` extension is used.
@@ -45,7 +46,7 @@ Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos a
 Cleans and builds for packaging:
 
 ```
-npm run publish:npm
+npm run publish
 ```
 
 ## Docs
