@@ -109,9 +109,43 @@ export const toArray = <V>(map:ReadonlyMap<string, V>):ReadonlyArray<V> => Array
  */
 export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):V|undefined =>  Array.from(map.values()).find(vv => predicate(vv));
 
+/**
+ * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link mapToObj}.
+ * 
+ * @param m
+ * @param valueTransform 
+ * @returns 
+ */
+export const mapToObjTransform = <T, K>(m: ReadonlyMap<string, T>, valueTransform: (value: T) => K): {readonly [key: string]: K} => Array.from(m).reduce((obj: any, [key, value]) => {
+  const t = valueTransform(value);
+  /* eslint-disable-next-line functional/immutable-data */
+  obj[key] = t;
+  return obj;
+}, {});
+
 // export const without = <V>(map:ReadonlyMap<string, V>, value:V): ReadonlyMap<string,V> => {
 //   source.toArray().filter(v => hash(v) !== hash(value))
 // }
+
+/**
+ * Zips together an array of keys and values into an object. Requires that 
+ * `keys` and `values` are the same length.
+ * 
+ * @example
+ * ```js
+ * const o = zipKeyValue([`a`, `b`, `c`], [0, 1, 2])
+ * Yields: { a: 0, b: 1, c: 2}
+ *```
+  * @template V
+  * @param keys
+  * @param values
+  * @return 
+  */
+ export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|undefined>) => {
+  if (keys.length !== values.length) throw new Error(`Keys and values arrays should be same length`);
+  return Object.fromEntries(keys.map((k, i) => [k, values[i]]));
+};
+
 
 //#region Functions by Kees C. Bakker
 // Functions by Kees C. Bakker
@@ -136,24 +170,6 @@ export const transformMap = <K, V, R>(
     Array.from(source, v => [v[0], transformer(v[1], v[0])])
   );
 
-/**
- * Zips together an array of keys and values into an object. Requires that 
- * `keys` and `values` are the same length.
- * 
- * @example
- * ```js
- * const o = zipKeyValue([`a`, `b`, `c`], [0, 1, 2])
- * Yields: { a: 0, b: 1, c: 2}
- *```
-  * @template V
-  * @param keys
-  * @param values
-  * @return 
-  */
-export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|undefined>) => {
-  if (keys.length !== values.length) throw new Error(`Keys and values arrays should be same length`);
-  return Object.fromEntries(keys.map((k, i) => [k, values[i]]));
-};
 
 /**
  * Converts a `Map` to a plain object, useful for serializing to JSON
@@ -181,6 +197,17 @@ export const mapToObj = <T>(m: ReadonlyMap<string, T>): { readonly [key: string]
  * map.add(person.name, person);
  * const ages = mapToArray<string, People, number>(map, (key, person) => person.age);
  * // [29, ...]
+ * ```
+ * 
+ * In the above example, the `transformer` function returns a single value, but it could
+ * just as well return an object:
+ * ```js
+ * mapToArray(map, (key, person) => ({
+ *  height: Math.random(),
+ *  name: person.name.toUpperCase();
+ * }))
+ * // Yields:
+ * // [{height: 0.12, name: "JOHN"}, ...]
  * ```
  * @param m 
  * @param transformer 
