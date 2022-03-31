@@ -147,7 +147,6 @@ export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
 export const interval = async function*<V>(produce: IntervalAsync<V>, intervalMs: number) {
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
-  //eslint-disable-next-line functional/no-try-statement
   try {
     //eslint-disable-next-line functional/no-loop-statement
     while (!cancelled) {
@@ -234,7 +233,6 @@ export const timeout = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, timeo
     
     const p = new Promise<void>((resolve, reject) => {
       startedAt = performance.now();
-      //eslint-disable-next-line functional/no-try-statement
       try {
         guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
       } catch (e) {
@@ -581,7 +579,6 @@ export const updateOutdated = <V>(fn:(elapsedMs?:number)=>Promise<V>, intervalMs
   return () => (new Promise(async (resolve, reject) => {
     const elapsed = performance.now() - lastRun;
     if (lastValue === undefined || elapsed > intervalMsCurrent) {
-      //eslint-disable-next-line functional/no-try-statement
       try {
         lastRun = performance.now();
         lastValue = await fn(elapsed);
@@ -599,6 +596,64 @@ export const updateOutdated = <V>(fn:(elapsedMs?:number)=>Promise<V>, intervalMs
     } 
     resolve(lastValue);
   }));
+};
+
+
+/**
+ * Helper function for calling code that should fail after a timeout.
+ * 
+ * ```js
+ * const onAborted = (reason:string) => {
+ *  // 'reason' is a string describing why it has aborted.
+ *  // ie: due to timeout or because done() was called with an error
+ * };
+ * const onComplete = (success:boolean) => {
+ *  // Called if we were aborted or finished succesfully.
+ *  // onComplete will be called after onAborted, if it was an error case
+ * }
+ * const done = waitFor(1000, onAborted, onComplete);
+ * 
+ * // Call done if your code completed successfully:
+ * done();
+ * 
+ * // Or if there was an error
+ * done(`Some error`);
+ * ```
+ * 
+ * The completion handler is used for removing event handlers.
+ * 
+ * @param timeoutMs 
+ * @param onAborted 
+ * @param onComplete 
+ * @returns 
+ */
+export const waitFor = (timeoutMs:number, onAborted:(reason:string)=>void, onComplete?:(success:boolean)=>void) => {
+  //eslint-disable-next-line functional/no-let
+  let success = false;
+  const done = (error?:string) => {
+    if (t !== 0) {
+      window.clearTimeout(t);
+      t = 0;
+    }
+    if (error) {
+      onAborted(error); 
+    } else {
+      success = true;
+    }
+    if (onComplete !== undefined) onComplete(success);
+  };
+  
+  //eslint-disable-next-line functional/no-let
+  let t = window.setTimeout(() => {
+    t = 0;
+    try {
+      onAborted(`Timeout after ${timeoutMs}ms`);
+    } finally {
+      if (onComplete !== undefined) onComplete(success);
+    }
+  }, timeoutMs);
+
+  return done;
 };
 
 // const counterG = count(5);
