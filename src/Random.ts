@@ -183,3 +183,14 @@ export const gaussian = (skew = 1) => {
  * @returns 
  */
 export const gaussianSkewed = (skew:number) => () => gaussian(skew);
+
+/**
+ * Returns a string of random letters and numbers of a given `length`.
+ * 
+ * ```js
+ * string(4); // eg. `4afd`
+ * ```
+ * @param length Length of random string
+ * @returns Random string
+ */
+export const string = (length:number) => Math.random().toString(36).substring(2, length+2);
