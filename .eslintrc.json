@@ -13,10 +13,12 @@
         "ecmaVersion": 2021,
         "sourceType": "module",
         "project": [
-            "./tsconfig.json",
-            "./www/tsconfig.json"
+            "./tsconfig.json"
         ]
     },
+    "ignorePatterns": [
+        "scratch/**"
+    ],
     "plugins": [
         "@typescript-eslint",
         "functional"
@@ -59,6 +61,9 @@
             "off"
         ],
         "functional/no-return-void": [
+            "off"
+        ],
+        "functional/no-try-statement": [
             "off"
         ],
         "no-undef-init": [

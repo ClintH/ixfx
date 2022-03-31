@@ -273,7 +273,6 @@ export const copyToClipboard = (obj: object) => {
     const json = JSON.stringify(obj, null, 2);
     //eslint-disable-next-line functional/no-let
     let cleaned = json;
-    //eslint-disable-next-line functional/no-try-statement
     try {
       cleaned = json.replace(/^[\t ]*"[^:\n\r]+(?<!\\)":/gm, (match) => match.replace(/"/g, ``));
     } catch (ex) {

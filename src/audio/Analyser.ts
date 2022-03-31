@@ -232,7 +232,6 @@ export class Analyser {
 
   // Microphone successfully initalised, now have access to audio data
   private onMicSuccess(stream:MediaStream) {
-    //eslint-disable-next-line functional/no-try-statement
     try {
       const audioCtx = new AudioContext();
 
@@ -263,7 +262,6 @@ export class Analyser {
       return;
     }
 
-    //eslint-disable-next-line functional/no-try-statement
     try {
       // Perform analysis
       this.analyse(a, this);

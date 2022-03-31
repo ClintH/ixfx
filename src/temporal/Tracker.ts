@@ -70,7 +70,6 @@ export class IntervalTracker extends Tracker {
   constructor(id: string | undefined = undefined) {
     super(id);
     if (typeof performance === `undefined`) {
-      //eslint-disable-next-line functional/no-try-statement
       try {
         //eslint-disable-next-line @typescript-eslint/no-var-requires
         const p = require(`perf_hooks`);
