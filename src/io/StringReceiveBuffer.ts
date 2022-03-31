@@ -5,6 +5,10 @@ export class StringReceiveBuffer {
 
   }
 
+  clear() {
+    this.buffer = ``;
+  }
+  
   add(str: string) {
     if (str.length === 0) return;
 

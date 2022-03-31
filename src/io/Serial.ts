@@ -58,7 +58,7 @@
 //       //eslint-disable-next-line functional/immutable-data
 //       const line = lines.pop();
 //       if (line !== undefined) {
-//         //eslint-disable-next-line functional/no-try-statement
+//         
 //         try {
 //           callback(JSON.parse(line.trim()));
 //         } catch (error) {

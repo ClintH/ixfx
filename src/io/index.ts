@@ -1,1 +1,2 @@
-export * as Bluetooth from './BtDevice.js';
+export * as Bluetooth from './NordicBleDevice.js';
+export * as Espruino from './Espruino.js';

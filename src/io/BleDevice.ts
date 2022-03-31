@@ -1,31 +1,45 @@
-import {StateMachine} from "../flow/StateMachine";
-import {indexOfCharCode, omitChars } from "../Text";
+import {SimpleEventEmitter} from "../Events.js";
+import {StateChangeEvent, StateMachine} from "../flow/StateMachine";
+import {indexOfCharCode, omitChars} from "../Text";
 import {Codec} from "./Codec";
 import {StringReceiveBuffer} from "./StringReceiveBuffer";
 import {StringWriteBuffer} from "./StringWriteBuffer";
 
-const nordicService = `6e400001-b5a3-f393-e0a9-e50e24dcca9e`;
-const nordicTx  = `6e400002-b5a3-f393-e0a9-e50e24dcca9e`;
-const nordicRx = `6e400003-b5a3-f393-e0a9-e50e24dcca9e`;
-const chunkSize = 20;
+export type Opts = {
+  readonly service:string
+  readonly rxGattCharacteristic:string
+  readonly txGattCharacteristic:string
+  readonly chunkSize:number
+  readonly name:string
+}
 
-export class Nordic {
-  states:StateMachine;
-  codec:Codec;
-  rx:BluetoothRemoteGATTCharacteristic|undefined;
-  tx:BluetoothRemoteGATTCharacteristic|undefined;
-  verboseLogging = false;
+export type DataEvent = {
+  readonly data:string
+}
 
-  rxBuffer:StringReceiveBuffer;
-  txBuffer:StringWriteBuffer;
+type Events = {
+  readonly data: DataEvent
+  readonly change: StateChangeEvent
+};
 
-  constructor(private device: BluetoothDevice) {
+export class BleDevice extends SimpleEventEmitter<Events> {
+  states: StateMachine;
+  codec: Codec;
+  rx: BluetoothRemoteGATTCharacteristic | undefined;
+  tx: BluetoothRemoteGATTCharacteristic | undefined;
+  verboseLogging = true;
+
+  rxBuffer: StringReceiveBuffer;
+  txBuffer: StringWriteBuffer;
+
+  constructor(private device: BluetoothDevice, private config:Opts) {
+    super();
     this.txBuffer = new StringWriteBuffer(async data => {
       await this.writeInternal(data);
-    }, chunkSize);
+    }, config.chunkSize);
 
     this.rxBuffer = new StringReceiveBuffer(line => {
-      this.verbose(`Line: ${line}`);
+      this.fireEvent(`data`, { data:line });
     });
 
     this.codec = new Codec();
@@ -37,7 +51,13 @@ export class Nordic {
     });
 
     this.states.addEventListener(`change`, evt => {
-      this.log(`${evt.priorState} -> ${evt.newState}`);
+      this.fireEvent(`change`, evt);
+      this.verbose(`${evt.priorState} -> ${evt.newState}`);
+      if (evt.priorState === `connected`) {
+        // Clear out buffers
+        this.rxBuffer.clear();
+        this.txBuffer.clear();
+      }
     });
 
     device.addEventListener(`gattserverdisconnected`, () => {
@@ -48,16 +68,20 @@ export class Nordic {
     this.verbose(`ctor ${device.name} ${device.id}`);
   }
 
-  write(txt:string) {
+  write(txt: string) {
     if (this.states.state !== `connected`) throw new Error(`Cannot write while state is ${this.states.state}`);
     this.txBuffer.add(txt);
   }
 
-  private async writeInternal(txt:string) {
+  private async writeInternal(txt: string) {
     this.log(`writeInternal ${txt}`);
     const tx = this.tx;
     if (tx === undefined) throw new Error(`Unexpectedly without tx characteristic`);
-    await tx.writeValue(this.codec.toBuffer(txt));
+    try {
+      await tx.writeValue(this.codec.toBuffer(txt));
+    } catch (ex:unknown) {
+      this.warn(ex);
+    }
   }
 
   async connect() {
@@ -69,10 +93,10 @@ export class Nordic {
 
     const server = await gatt.connect();
     this.verbose(`Getting primary service`);
-    const service = await server.getPrimaryService(nordicService);
+    const service = await server.getPrimaryService(this.config.service);
     this.verbose(`Getting characteristics`);
-    const rx = await service.getCharacteristic(nordicRx);
-    const tx = await service.getCharacteristic(nordicTx);
+    const rx = await service.getCharacteristic(this.config.rxGattCharacteristic);
+    const tx = await service.getCharacteristic(this.config.txGattCharacteristic);
 
     rx.addEventListener(`characteristicvaluechanged`, (evt) => this.onRx(evt));
     this.rx = rx;
@@ -82,7 +106,7 @@ export class Nordic {
     await rx.startNotifications();
   }
 
-  onRx(evt:Event) {
+  onRx(evt: Event) {
     const rx = this.rx;
     if (rx === undefined) return;
 
@@ -112,29 +136,16 @@ export class Nordic {
     this.rxBuffer.add(str);
   }
 
-  private verbose(m:string) {
-    if (this.verboseLogging) console.info(`BtDevice `, m);
+  protected verbose(m: string) {
+    if (this.verboseLogging) console.info(`${this.config.name} `, m);
   }
 
-  private log(m:string) {
-    console.log(`BtDevice `, m);
+  protected log(m: string) {
+    console.log(`${this.config.name} `, m);
+  }
+
+  protected warn(m:unknown) {
+    console.warn(`${this.config.name} `, m);
   }
 }
 
-export const puck = async () => {
-  const device = await navigator.bluetooth.requestDevice({
-    filters: [
-      {namePrefix: `Puck.js`},
-      // {namePrefix: 'Pixl.js'},
-      // {namePrefix: 'MDBT42Q'},
-      // {namePrefix: 'RuuviTag'},
-      // {namePrefix: 'iTracker'},
-      // {namePrefix: 'Thingy'},
-      // {namePrefix: 'Espruino'},
-      {services: [nordicService]}
-    ], optionalServices: [nordicService]
-  });
-  const d = new Nordic(device);
-  await d.connect();
-  return d;
-};

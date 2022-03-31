@@ -14,14 +14,18 @@ export class StringWriteBuffer {
     this.writer = continuously(() => this.onWrite(), this.intervalMs);
   }
 
+  clear() {
+    this.queue = queueMutable<string>();
+  }
+
   async onWrite(): Promise<boolean> {
     if (this.queue.isEmpty) {
-      console.log(`WriteBuffer.onWrite: queue empty`);
+      console.debug(`WriteBuffer.onWrite: queue empty`);
       return false; // Stop continuously
     }
 
     if (this.paused) {
-      console.log(`WriteBuffer.onWrite: paused...`);
+      console.debug(`WriteBuffer.onWrite: paused...`);
       return true; // Keep going tho
     }
 
