@@ -2,56 +2,56 @@
 import { simpleMapArrayMutable } from "./collections/SimpleMapArray.js";
 export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>) => void;
 
-type FlowSource = {
-  name:string,
-  dispose():void,
-  input:FlowSink,
-};
+// type FlowSource = {
+//   name:string,
+//   dispose():void,
+//   input:FlowSink,
+// };
 
-type FlowHandler = (args?:any) => void;
+// type FlowHandler = (args?:any) => void;
 
-interface FlowSink {
- [key:string]: FlowHandler;
-}
+// interface FlowSink {
+//  [key:string]: FlowHandler;
+// }
 
-export type Debouncer = {
-  reset:()=>void
-  dispose:()=>void
-}
+// export type Debouncer = {
+//   reset:()=>void
+//   dispose:()=>void
+// }
 
-const sinkify = (handler:FlowHandler): FlowSink => ({ '*': handler });
+// const sinkify = (handler:FlowHandler): FlowSink => ({ '*': handler });
 
-export const debounceFactory = (sink:FlowSink, opts:{timeoutMs:number}): FlowSource => {
-  let timer:number|undefined;
+// export const debounceFactory = (sink:FlowSink, opts:{timeoutMs:number}): FlowSource => {
+//   let timer:number|undefined;
 
-  const input = sinkify(() => {
-    //console.log(`debounce reset`);
-    if (timer) window.clearTimeout(timer);
-    timer = window.setTimeout(() => { sink[`*`](null); }, opts.timeoutMs);
-  });
+//   const input = sinkify(() => {
+//     //console.log(`debounce reset`);
+//     if (timer) window.clearTimeout(timer);
+//     timer = window.setTimeout(() => { sink[`*`](null); }, opts.timeoutMs);
+//   });
 
-  const dispose = () => {
-    if (timer) window.clearTimeout(timer);
-    timer = undefined;
-  };
+//   const dispose = () => {
+//     if (timer) window.clearTimeout(timer);
+//     timer = undefined;
+//   };
 
-  return { input, dispose, name:`debounce` };
-};
+//   return { input, dispose, name:`debounce` };
+// };
 
-export const debounce = (triggered:()=>void, timeoutMs:number):Debouncer => {
-  const opts = { timeoutMs: timeoutMs};
+// export const debounce = (triggered:()=>void, timeoutMs:number):Debouncer => {
+//   const opts = { timeoutMs: timeoutMs};
   
-  const sink:FlowSink = {
-    '*': () => {
-      triggered();
-    }
-  };
-  const source = debounceFactory(sink, opts);
-  const reset = () => {
-    source.input[`*`](null);
-  };
-  return {...source, reset};
-};
+//   const sink:FlowSink = {
+//     '*': () => {
+//       triggered();
+//     }
+//   };
+//   const source = debounceFactory(sink, opts);
+//   const reset = () => {
+//     source.input[`*`](null);
+//   };
+//   return {...source, reset};
+// };
 
 export class SimpleEventEmitter<Events> {
   readonly #listeners = simpleMapArrayMutable<Listener<Events>>();
@@ -67,7 +67,6 @@ export class SimpleEventEmitter<Events> {
     const listeners = this.#listeners.get(type as string);
     if (listeners === undefined) return;
     listeners.forEach(l => {
-      // eslint-disable-next-line functional/no-try-statement
       try {
         l(args, this);
       } catch (err) {
@@ -94,8 +93,8 @@ export class SimpleEventEmitter<Events> {
    * @param {Listener<Events>} listener
    * @memberof SimpleEventEmitter
    */
-  removeEventListener<K extends keyof Events>(type: K, listener: Listener<Events>): void {
-    this.#listeners.delete(type as string, listener);
+  removeEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void) { // listener: Listener<Events>): void {
+    this.#listeners.delete(type as string, listener as Listener<Events>);
   }
 
   /**
