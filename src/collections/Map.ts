@@ -141,7 +141,7 @@ export const mapToObjTransform = <T, K>(m: ReadonlyMap<string, T>, valueTransfor
   * @param values
   * @return 
   */
- export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|undefined>) => {
+export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|undefined>) => {
   if (keys.length !== values.length) throw new Error(`Keys and values arrays should be same length`);
   return Object.fromEntries(keys.map((k, i) => [k, values[i]]));
 };

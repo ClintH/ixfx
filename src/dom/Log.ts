@@ -2,17 +2,19 @@ import {resolveEl} from "./Util.js";
 import {addShadowCss} from "./ShadowDom.js";
 
 export type LogOpts = {
-  readonly capacity?: number,
-  readonly timestamp?: boolean,
-  readonly collapseDuplicates?:boolean,
-  readonly monospaced?:boolean,
+  readonly reverse?:boolean
+  readonly capacity?: number
+  readonly timestamp?: boolean
+  readonly collapseDuplicates?:boolean
+  readonly monospaced?:boolean
   readonly minIntervalMs?:number
+  readonly css?:string
 }
 
 export type Log = Readonly<{
   clear():void
   error(msgOrError:string|Error|unknown):void
-  log(msg?:string|object|number):void
+  log(msg?:string|object|number):HTMLElement|undefined
   append(el:HTMLElement):void
   dispose():void
   readonly isEmpty:boolean
@@ -50,7 +52,7 @@ export type Log = Readonly<{
  */
 export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const {capacity = 0, monospaced = true, timestamp = false, collapseDuplicates = true } = opts;
+  const {capacity = 0, monospaced = true, timestamp = false, collapseDuplicates = true, css =  `` } = opts;
 
   // eslint-disable-next-line functional/no-let
   let added = 0;
@@ -66,6 +68,8 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
     font-family: ${fontFamily};
     background-color: var(--code-background-color);
     padding: var(--padding1, 0.2em);
+    overflow-y: auto;
+    height:100%;
   }
   .timestamp {
     margin-right: 0.5em;
@@ -95,6 +99,7 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
   .msg {
     flex: 1;
   }
+  ${css}
   `);
   
   const el = document.createElement(`div`);
@@ -129,7 +134,8 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
 
   //eslint-disable-next-line functional/no-let
   let lastLogTime = 0;
-  const log = (whatToLog: unknown = ``) => {
+
+  const log = (whatToLog: unknown = ``):HTMLElement|undefined => {
     // eslint-disable-next-line functional/no-let
     let msg:string|undefined;
     const interval = window.performance.now() - lastLogTime;
@@ -148,6 +154,7 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
     } else {
       msg = whatToLog as string;
     }
+   
     if (msg.length === 0) {
       const rule = document.createElement(`hr`);
       lastLog = undefined;
@@ -166,12 +173,14 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
         // eslint-disable-next-line functional/immutable-data
         lastBadge.textContent = (++lastLogRepeats).toString();
       }
+      return lastEl;
     } else {
       const line = document.createElement(`div`);
       // eslint-disable-next-line functional/immutable-data
-      line.innerHTML = msg;
+      line.innerText = msg;
       append(line);
       lastLog = msg;
+      return line;
     }
   };
 
@@ -190,7 +199,12 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
     } else {
       line.classList.add(`line`, `msg`);
     }
-    el.insertBefore(line, el.firstChild);
+
+    if (opts.reverse) {
+      el.appendChild(line);
+    } else {
+      el.insertBefore(line, el.firstChild);
+    }
 
     if (capacity > 0 && (++added > capacity * 2)) {
       // eslint-disable-next-line functional/no-loop-statement
@@ -198,6 +212,12 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
         el.lastChild?.remove();
         added--;
       }
+    }
+
+    if (opts.reverse) {
+      // Scroll to bottom
+      //eslint-disable-next-line functional/immutable-data
+      el.scrollTop = el.scrollHeight;
     }
     lastLogRepeats = 0;
   };

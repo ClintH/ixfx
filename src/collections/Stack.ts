@@ -208,4 +208,4 @@ export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V
  * @param {...V[]} startingItems
  * @returns
  */
-export const stackMutable = <V>(opts: StackOpts, ...startingItems: ReadonlyArray<V>):StackMutable<V> =>  new StackMutableImpl({...opts}, [...startingItems]);
+export const stackMutable = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>):StackMutable<V> =>  new StackMutableImpl({...opts}, [...startingItems]);
