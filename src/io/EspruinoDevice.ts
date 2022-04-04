@@ -4,14 +4,32 @@ import {string as randomString} from "../Random.js";
 import * as BleDevice from "./BleDevice.js";
 import {defaultOpts as NordicDefaults, NordicBleDevice} from "./NordicBleDevice.js";
 
+/**
+ * Options for device
+ */
 export type Options = {
+  /**
+   * Default milliseconds to wait before giving up on a well-formed reply. 5 seconds is the default.
+   */
   readonly evalTimeoutMs?:number;
+  /**
+   * Name of device. Only used for printing log mesages to the console
+   */
   readonly name?:string;
 }
 
-
+/**
+ * Options for code evaluation
+ */
 export type EvalOpts = {
+  /**
+   * Milliseconds to wait before giving up on well-formed reply. 5 seconds is the default.
+   */
   readonly timeoutMs?:number
+  /**
+   * If true (default), it assumes that anything received from the board
+   * is a response to the eval
+   */
   readonly assumeExclusive?:boolean
 };
 
@@ -28,7 +46,7 @@ export type EvalOpts = {
  * Listen for events:
  * ```js
  * // Received something
- * e.addEventLister(`data`, d => console.log(d.data));
+ * e.addEventListener(`data`, d => console.log(d.data));
  * // Monitor connection state
  * e.addEventListener(`change`, c => console.log(`${d.priorState} -> ${d.newState}`));
  * ```
@@ -45,7 +63,7 @@ export type EvalOpts = {
  * const result = await e.eval(`2+2\n`);
  * ```
  */
-class Espruino extends NordicBleDevice {
+export class EspruinoDevice extends NordicBleDevice {
   evalTimeoutMs:number;
 
   /**
@@ -78,13 +96,13 @@ class Espruino extends NordicBleDevice {
    * 
    * Options:
    *  timeoutMs: Timeout for execution. 5 seconds by default
-   *  assumeExclusive If true, eval assumes all replies from controller are in response to eval. False by default
+   *  assumeExclusive If true, eval assumes all replies from controller are in response to eval. True by default
    * @param code Code to run on the Espruino.
    * @param opts Options
    */
   async eval(code:string, opts:EvalOpts = {}):Promise<string> {
     const timeoutMs = opts.timeoutMs ?? this.evalTimeoutMs;
-    const assumeExclusive = opts.assumeExclusive ?? false;
+    const assumeExclusive = opts.assumeExclusive ?? true;
 
     if (typeof code !== `string`) throw new Error(`code parameter should be a string`);
       
@@ -144,8 +162,8 @@ class Espruino extends NordicBleDevice {
 
 
 /**
- * @inheritdoc Espruino
- * @returns 
+ * @inheritdoc EspruinoDevice
+ * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
 export const puck = async () => {
   const device = await navigator.bluetooth.requestDevice({
@@ -160,14 +178,14 @@ export const puck = async () => {
       {services: [NordicDefaults.service]}
     ], optionalServices: [NordicDefaults.service]
   });
-  const d = new Espruino(device, {name:`Puck`});
+  const d = new EspruinoDevice(device, {name:`Puck`});
   await d.connect();
   return d;
 };
 
 /**
- * @inheritdoc Espruino
- * @returns 
+ * @inheritdoc EspruinoDevice
+ * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
 export const connect = async () => {
   const device = await navigator.bluetooth.requestDevice({
@@ -182,7 +200,7 @@ export const connect = async () => {
       {services: [NordicDefaults.service]}
     ], optionalServices: [NordicDefaults.service]
   });
-  const d = new Espruino(device, {name:`Espruino`});
+  const d = new EspruinoDevice(device, {name:`Espruino`});
   await d.connect();
   return d;
 };
