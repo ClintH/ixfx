@@ -1,4 +1,5 @@
 // import {sleep} from "./Timer.js";
+import {sleep} from "./flow/Timer.js";
 import {number as guardNumber, integer as guardInteger} from "./Guards.js";
 export {pingPong, pingPongPercent} from './modulation/PingPong.js';
 
@@ -33,23 +34,61 @@ export const numericRangeRaw = function* (interval: number, start: number = 0, e
 };
 
 /**
- * Iterates over `iterator`, calling `fn` for each value.
- * If `fn` returns _false_, iterator cancels
+ * Iterates over `iterator` (iterable/array), calling `fn` for each value.
+ * If `fn` returns _false_, iterator cancels. 
+ * 
  * @example
  * ```js
- * forEach(count(5), () => console.log(`Hi`)); // Prints `Hi` 5x
- * forEach(count(5), (i) => console.log(i));   // Prints 0 1 2 3 4
+ * forEach(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
+ * forEach(count(5), i => console.log(i));      // Prints 0 1 2 3 4
+ * forEach([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4
  * ```
- * @param iterator 
- * @param fn 
+ * 
+ * Use `forEachAsync` if you want to use an async `iterator` and async `fn`.
+ * @param iterator Iterable or array
+ * @param fn Function to call for each item. If function returns false, iteration cancels
  */
-export const forEach = <V>(iterator:IterableIterator<V>, fn:(v?:V)=>boolean|void) => {
+export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>boolean|void) => {
   //eslint-disable-next-line functional/no-loop-statement
   for (const x of iterator) {
     const r = fn(x);
     if (typeof r === `boolean` && !r) break;
   }
 };
+
+/**
+ * Iterates over an async iterable, calling `fn` for each value, with optional
+ * interval between each loop. If the async `fn` returns _false_, iterator cancels.
+ * 
+ * Use `forEach` for a synchronous version.
+ * 
+ * ```js
+ * // Prints items from array evry second
+ * await forEachAsync([0,1,2,3], i => console.log(i), 1000);
+ * ```
+ * @param iterator 
+ * @param fn 
+ */
+export const forEachAsync = async function <V> (iterator:AsyncIterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>Promise<boolean>|void, intervalMs?:number) {
+  if (Array.isArray(iterator)) {
+    // Handle array
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const x of iterator) {
+      const r = await fn(x);
+      if (intervalMs) await sleep(intervalMs);
+      if (typeof r === `boolean` && !r) break;
+    }
+  } else {
+    // Handle an async iterator
+    //eslint-disable-next-line functional/no-loop-statement
+    for await (const x of iterator) {
+      const r = await fn(x);
+      if (intervalMs) await sleep(intervalMs);
+      if (typeof r === `boolean` && !r) break;
+    }
+  }
+};
+
 
 /**
  * Generates a range of numbers, with a given interval.
