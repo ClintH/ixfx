@@ -11,11 +11,13 @@ export const defaultOpts = {
   txGattCharacteristic: `6e400002-b5a3-f393-e0a9-e50e24dcca9e`,
   rxGattCharacteristic: `6e400003-b5a3-f393-e0a9-e50e24dcca9e`,
   name: `NordicDevice`,
+  connectAttempts: 5
 };
 
 type Opts = {
-  readonly chunkSize?:number,
+  readonly chunkSize?:number
   readonly name?:string
+  readonly connectAttempts?:number
 }
 
 export class NordicBleDevice extends BleDevice  {

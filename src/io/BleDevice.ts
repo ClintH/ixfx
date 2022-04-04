@@ -4,6 +4,7 @@ import {indexOfCharCode, omitChars} from "../Text";
 import {Codec} from "./Codec";
 import {StringReceiveBuffer} from "./StringReceiveBuffer";
 import {StringWriteBuffer} from "./StringWriteBuffer";
+import {retry} from "../flow/Timer.js";
 
 export type Opts = {
   readonly service:string
@@ -11,6 +12,7 @@ export type Opts = {
   readonly txGattCharacteristic:string
   readonly chunkSize:number
   readonly name:string
+  readonly connectAttempts:number
 }
 
 export type DataEvent = {
@@ -27,7 +29,8 @@ export class BleDevice extends SimpleEventEmitter<Events> {
   codec: Codec;
   rx: BluetoothRemoteGATTCharacteristic | undefined;
   tx: BluetoothRemoteGATTCharacteristic | undefined;
-  verboseLogging = true;
+  gatt: BluetoothRemoteGATTServer | undefined;
+  verboseLogging = false;
 
   rxBuffer: StringReceiveBuffer;
   txBuffer: StringWriteBuffer;
@@ -61,11 +64,20 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     });
 
     device.addEventListener(`gattserverdisconnected`, () => {
-      this.log(`GATT server disconnected`);
+      if (this.isClosed) return;
+      this.verbose(`GATT server disconnected`);
       this.states.state = `closed`;
     });
 
     this.verbose(`ctor ${device.name} ${device.id}`);
+  }
+
+  get isConnected():boolean {
+    return this.states.state === `connected`;
+  }
+
+  get isClosed():boolean {
+    return this.states.state === `closed`;
   }
 
   write(txt: string) {
@@ -74,7 +86,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
   }
 
   private async writeInternal(txt: string) {
-    this.log(`writeInternal ${txt}`);
+    this.verbose(`writeInternal ${txt}`);
     const tx = this.tx;
     if (tx === undefined) throw new Error(`Unexpectedly without tx characteristic`);
     try {
@@ -84,26 +96,36 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     }
   }
 
+  disconnect() {
+    if (this.states.state !== `connected`) return;
+    this.gatt?.disconnect();
+  }
+
   async connect() {
+    const attempts = this.config.connectAttempts ?? 3;
+
     this.states.state = `connecting`;
 
-    this.log(`connect`);
+    this.verbose(`connect`);
     const gatt = this.device.gatt;
     if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
-    const server = await gatt.connect();
-    this.verbose(`Getting primary service`);
-    const service = await server.getPrimaryService(this.config.service);
-    this.verbose(`Getting characteristics`);
-    const rx = await service.getCharacteristic(this.config.rxGattCharacteristic);
-    const tx = await service.getCharacteristic(this.config.txGattCharacteristic);
-
-    rx.addEventListener(`characteristicvaluechanged`, (evt) => this.onRx(evt));
-    this.rx = rx;
-    this.tx = tx;
-    this.states.state = `connected`;
-
-    await rx.startNotifications();
+    retry(async () => {
+      const server = await gatt.connect();
+      this.verbose(`Getting primary service`);
+      const service = await server.getPrimaryService(this.config.service);
+      this.verbose(`Getting characteristics`);
+      const rx = await service.getCharacteristic(this.config.rxGattCharacteristic);
+      const tx = await service.getCharacteristic(this.config.txGattCharacteristic);
+  
+      rx.addEventListener(`characteristicvaluechanged`, (evt) => this.onRx(evt));
+      this.rx = rx;
+      this.tx = tx;
+      this.gatt = gatt;
+      this.states.state = `connected`;
+  
+      await rx.startNotifications();
+    }, attempts, 200);
   }
 
   onRx(evt: Event) {
