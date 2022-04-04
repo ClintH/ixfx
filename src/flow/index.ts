@@ -1,20 +1,89 @@
 import { number as guardNumber} from "../Guards.js";
+import {sleep} from "./Timer.js";
 
 export * as StateMachine from './StateMachine.js';
 export * from './Timer.js';
 
+/**
+ * Iterates over `iterator` (iterable/array), calling `fn` for each value.
+ * If `fn` returns _false_, iterator cancels. 
+ * 
+ * @example
+ * ```js
+ * forEach(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
+ * forEach(count(5), i => console.log(i));      // Prints 0 1 2 3 4
+ * forEach([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4
+ * ```
+ * 
+ * Use {@link forEachAsync} if you want to use an async `iterator` and async `fn`.
+ * @param iterator Iterable or array
+ * @param fn Function to call for each item. If function returns false, iteration cancels
+ */
+export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>boolean|void) => {
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const x of iterator) {
+    const r = fn(x);
+    if (typeof r === `boolean` && !r) break;
+  }
+};
+
+/**
+ * Iterates over an async iterable or array, calling `fn` for each value, with optional
+ * interval between each loop. If the async `fn` returns _false_, iterator cancels.
+ * 
+ * Use {@link forEach} for a synchronous version.
+ * 
+ * ```
+ * // Prints items from array every second
+ * await forEachAsync([0,1,2,3], i => console.log(i), 1000);
+ * ```
+ * 
+ * @example Retry `doSomething` up to five times, with 5 seconds between each attempt
+ * ```
+ * await forEachAsync(count(5), i=> {
+ *  try {
+ *    await doSomething();
+ *    return false; // Succeeded, exit early
+ *  } catch (ex) {
+ *    console.log(ex);
+ *    return true; // Keep trying
+ *  }
+ * }, 5000);
+ * ```
+ * @param iterator 
+ * @param fn 
+ */
+export const forEachAsync = async function <V> (iterator:AsyncIterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>Promise<boolean>|Promise<void>, intervalMs?:number) {
+  if (Array.isArray(iterator)) {
+    // Handle array
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const x of iterator) {
+      const r = await fn(x);
+      if (intervalMs) await sleep(intervalMs);
+      if (typeof r === `boolean` && !r) break;
+    }
+  } else {
+    // Handle an async iterator
+    //eslint-disable-next-line functional/no-loop-statement
+    for await (const x of iterator) {
+      const r = await fn(x);
+      if (intervalMs) await sleep(intervalMs);
+      if (typeof r === `boolean` && !r) break;
+    }
+  }
+};
 
 export type RepeatPredicate = (repeats:number, valuesProduced:number)=>boolean;
 /**
- * Runs `fn` a certain number of times, accumulating result into return array.
- * If `fn` returns undefined, it is skipped.
+ * Runs `fn` a certain number of times, accumulating result into an array.
+ * If `fn` returns undefined, the result is ignored.
  * 
  * ```js
  * // Results will be an array with five random numbers
  * const results = repeat(5, () => Math.random());
  * ```
  * 
- * Repeats can be specified as an integer (eg 5 for five repeats), or a function
+ * Repeats can be specified as an integer (eg. 5 for five repeats), or a function
  * that gives _false_ when repeating should stop.
  * 
  * ```js

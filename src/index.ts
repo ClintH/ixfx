@@ -27,9 +27,22 @@ export * as Io from './io/index.js';
  * * {@link timeout} Run code after a specified time delay
  * * {@link sleep} Using `async await`, delay execution for a period
  * * {@link delay} Using `async await`, run a given callback after a period
+ * * {@link forEach} / {@link forEachAsync} Loop over an iterable or array, with the possibility of early exit
  * * {@link StateMachine} Manage state transitions
  */
 export * as Flow from './flow/index.js';
+
+/**
+ * Generators produce values on demand.
+ * 
+ * Overview
+ * * {@link count} Generate a set numbers, counting by one
+ * * {@link numericPercent} Generate a range of numbers on the percentage scale of 0-1
+ * * {@link numericRange} Generate a range of numbers
+ * * {@link pingPong} / {@link pingPongPercent} Generate numbers that repeat up and down between the set limits
+ * 
+ */
+export * as Generators from './Generators.js';
 
 /**
  * Visuals
@@ -93,10 +106,7 @@ export * as Collections from './collections/index.js';
 // Minor modules
 // -----------------------------
 
-/**
- * Generators produce values on demand.
- */
-export * as Generators from './Generators.js';
+
 export * as Random from './Random.js';
 export * as KeyValues from './KeyValue.js';
 

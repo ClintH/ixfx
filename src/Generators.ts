@@ -1,13 +1,12 @@
-// import {sleep} from "./Timer.js";
-import {sleep} from "./flow/Timer.js";
 import {number as guardNumber, integer as guardInteger} from "./Guards.js";
 export {pingPong, pingPongPercent} from './modulation/PingPong.js';
 
+
 /**
- * Generates a range of numbers, starting from `start` and coutnting by `interval`.
+ * Generates a range of numbers, starting from `start` and counting by `interval`.
  * If `end` is provided, generator stops when reached.
  * 
- * Unlike numericRange, numbers might contain rounding errors
+ * Unlike {@link numericRange}, numbers might contain rounding errors
  * 
  * ```js
  * for (const c of numericRangeRaw(10, 100)) {
@@ -32,63 +31,6 @@ export const numericRangeRaw = function* (interval: number, start: number = 0, e
     }
   } while (repeating);
 };
-
-/**
- * Iterates over `iterator` (iterable/array), calling `fn` for each value.
- * If `fn` returns _false_, iterator cancels. 
- * 
- * @example
- * ```js
- * forEach(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
- * forEach(count(5), i => console.log(i));      // Prints 0 1 2 3 4
- * forEach([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4
- * ```
- * 
- * Use `forEachAsync` if you want to use an async `iterator` and async `fn`.
- * @param iterator Iterable or array
- * @param fn Function to call for each item. If function returns false, iteration cancels
- */
-export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>boolean|void) => {
-  //eslint-disable-next-line functional/no-loop-statement
-  for (const x of iterator) {
-    const r = fn(x);
-    if (typeof r === `boolean` && !r) break;
-  }
-};
-
-/**
- * Iterates over an async iterable, calling `fn` for each value, with optional
- * interval between each loop. If the async `fn` returns _false_, iterator cancels.
- * 
- * Use `forEach` for a synchronous version.
- * 
- * ```js
- * // Prints items from array evry second
- * await forEachAsync([0,1,2,3], i => console.log(i), 1000);
- * ```
- * @param iterator 
- * @param fn 
- */
-export const forEachAsync = async function <V> (iterator:AsyncIterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>Promise<boolean>|void, intervalMs?:number) {
-  if (Array.isArray(iterator)) {
-    // Handle array
-    //eslint-disable-next-line functional/no-loop-statement
-    for (const x of iterator) {
-      const r = await fn(x);
-      if (intervalMs) await sleep(intervalMs);
-      if (typeof r === `boolean` && !r) break;
-    }
-  } else {
-    // Handle an async iterator
-    //eslint-disable-next-line functional/no-loop-statement
-    for await (const x of iterator) {
-      const r = await fn(x);
-      if (intervalMs) await sleep(intervalMs);
-      if (typeof r === `boolean` && !r) break;
-    }
-  }
-};
-
 
 /**
  * Generates a range of numbers, with a given interval.
@@ -166,7 +108,7 @@ export const numericRange = function* (interval: number, start: number = 0, end?
  * ```
  * 
  * If you want to accumulate return values, consider using
- * {@link repeat}.
+ * {@link Flow.repeat}.
  * @param amount Number of integers to yield 
  * @param offset Added to result
  */
@@ -187,7 +129,17 @@ export const count = function* (amount:number, offset:number = 0) {
 };
 
 /**
- * Returns a non-repeating number range between 0.0-1.0. 
+ * Returns a number range between 0.0-1.0. 
+ * 
+ * ```
+ * // Yields: [0, 0.2, 0.4, 0.6, 0.8, 1]
+ * const a = [...numericPercent(0.2)];
+ * 
+ * // Repeating flag set to true:
+ * for (const v of numericPercent(0.2, true)) {
+ *  // Infinite loop. V loops back to 0 after hitting 1
+ * }
+ * ```
  * 
  * If `repeating` is true, it loops back to 0 after reaching 1
  * @param interval Interval (default: 0.01, ie. 1%)
@@ -196,27 +148,9 @@ export const count = function* (amount:number, offset:number = 0) {
  * @param end End (default: 1)
  * @returns 
  */
-export const rangePercent = function (interval:number = 0.01, repeating:boolean = false, start:number = 0, end = 1) {
+export const numericPercent = function (interval:number = 0.01, repeating:boolean = false, start:number = 0, end = 1) {
   guardNumber(interval, `percentage`, `interval`);
   guardNumber(start, `percentage`, `start`);
   guardNumber(end, `percentage`, `end`);
   return numericRange(interval, start, end, repeating);
 };
-
-
-// export const gaussian = function*(mean:number, std:number, stepLength:number = 0.1) {
-//   const a = 1/Math.sqrt(2*Math.PI);
-
-//   const get = (x:number) => {
-//     var f = a / std;
-//     var p = -1/2;
-//     var c = (x-mean)/std;
-//     c *= c;
-//     p *= c;
-//     return f * Math.pow(Math.E, p);
-//   }
-
-//   for (let i=-1;i<1;i+=stepLength) {
-//     yield(get(i));
-//   }
-// }
