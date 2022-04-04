@@ -292,3 +292,6 @@ export const countCharsFromStart = (source: string, ...chars: readonly string[])
  * @returns True if source starts and ends with provided values.
  */
 export const startsEnds = (source:string, start:string, end:string = start):boolean => source.startsWith(start) && source.endsWith(end);
+
+//eslint-disable-next-line no-useless-escape
+export const htmlEntities = (source:string):string => source.replace(/[\u00A0-\u9999<>\&]/g, i => `&#${i.charCodeAt(0)};`);
