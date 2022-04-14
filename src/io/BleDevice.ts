@@ -13,6 +13,7 @@ export type Opts = {
   readonly chunkSize:number
   readonly name:string
   readonly connectAttempts:number
+  readonly debug:boolean
 }
 
 export type DataEvent = {
@@ -37,6 +38,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
 
   constructor(private device: BluetoothDevice, private config:Opts) {
     super();
+    this.verboseLogging = config.debug;
     this.txBuffer = new StringWriteBuffer(async data => {
       await this.writeInternal(data);
     }, config.chunkSize);
@@ -110,7 +112,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     const gatt = this.device.gatt;
     if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
-    retry(async () => {
+    await retry(async () => {
       const server = await gatt.connect();
       this.verbose(`Getting primary service`);
       const service = await server.getPrimaryService(this.config.service);
@@ -128,7 +130,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     }, attempts, 200);
   }
 
-  onRx(evt: Event) {
+  private onRx(evt: Event) {
     const rx = this.rx;
     if (rx === undefined) return;
 

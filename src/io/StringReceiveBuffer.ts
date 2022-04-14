@@ -22,8 +22,12 @@ export class StringReceiveBuffer {
 
     // Found! Trigger callback for existing buffer and part of new string
     const part = str.substring(0, pos);
-    this.onData(this.buffer + part);
-
+    try {
+      this.onData(this.buffer + part);
+    } catch (ex) {
+      console.warn(ex);
+    }
+    
     // Clear buffer
     this.buffer = ``;
 

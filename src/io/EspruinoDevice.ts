@@ -16,6 +16,11 @@ export type Options = {
    * Name of device. Only used for printing log mesages to the console
    */
   readonly name?:string;
+
+  /**
+   * If true, additional logging information is printed
+   */
+  readonly debug?:boolean;
 }
 
 /**
@@ -74,6 +79,26 @@ export class EspruinoDevice extends NordicBleDevice {
   constructor(device:BluetoothDevice, opts:Options = {}) {
     super(device, opts);
     this.evalTimeoutMs = opts.evalTimeoutMs ?? 5*1000;
+  }
+
+  /**
+   * Writes a script to Espruino.
+   * 
+   * It will first send a CTRL+C to cancel any previous input, `reset()` to clear the board,
+   * and then the provided `code` followed by a new line.
+   * @param code Code to send. A new line is added automatically.
+   * 
+   * ```js
+   * // Eg from https://www.espruino.com/Web+Bluetooth
+   * writeScript(`
+   * setInterval(() => Bluetooth.println(E.getTemperature()), 1000);
+   * NRF.on('disconnect',()=>reset());
+   * `);
+   * ```
+   */
+  async writeScript(code:string) {
+    this.write(`\x03\x10reset();\n`);
+    this.write(`\x10${code}\n`);
   }
 
   /**
@@ -165,7 +190,10 @@ export class EspruinoDevice extends NordicBleDevice {
  * @inheritdoc EspruinoDevice
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
-export const puck = async () => {
+export const puck = async (opts:{readonly name?:string, readonly debug?:boolean} = {}) => {
+  const name = opts.name ?? `Puck`;
+  const debug = opts.debug ?? false;
+
   const device = await navigator.bluetooth.requestDevice({
     filters: [
       {namePrefix: `Puck.js`},
@@ -178,7 +206,7 @@ export const puck = async () => {
       {services: [NordicDefaults.service]}
     ], optionalServices: [NordicDefaults.service]
   });
-  const d = new EspruinoDevice(device, {name:`Puck`});
+  const d = new EspruinoDevice(device, {name, debug});
   await d.connect();
   return d;
 };
