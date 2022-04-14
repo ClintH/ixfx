@@ -3,7 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
-import {integer as guardInteger} from '~/Guards.js';
+import {integer as guardInteger} from '../Guards.js';
 import {defaultRandom, RandomSource} from '../Random.js';
 import {IsEqual, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
