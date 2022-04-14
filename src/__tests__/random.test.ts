@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {weightedInteger} from '../Random.js';
+import {weightedInteger, integer} from '../Random.js';
 
 const inBounds = (ar:number[], minInclusive:number, maxExclusive:number):boolean => {
   for (let i=0;i<ar.length;i++) {
@@ -16,6 +16,35 @@ const repeat = <V>(count:number, fn:()=>V):V[] => {
   }
   return ret;
 }
+
+const testRange = (runs:number, upper:number, lower:number, test:()=>number) => {
+  let lowerBounds = Number.MAX_SAFE_INTEGER;
+  let upperBounds = Number.MIN_SAFE_INTEGER;
+
+  for (let i=0;i<runs;i++) {
+    const r = test();
+    lowerBounds = Math.min(lowerBounds, r);
+    upperBounds = Math.max(upperBounds, r);
+    expect(Math.abs(r) % 1).toEqual(0); // Check for whole number
+    expect(r).toBeGreaterThanOrEqual(lower);
+    expect(r).toBeLessThanOrEqual(upper);
+
+  }
+  expect(upperBounds).toEqual(upper);
+  expect(lowerBounds).toEqual(lower);
+ 
+}
+
+test(`integer`, () => {
+  testRange(10*1000, 4, 0, () => integer(5));
+
+  testRange(10*1000, 9, 5,() => integer(5, 10));
+
+  testRange(10*1000, -0, -4,() => integer(-5));
+  
+  testRange(10*1000, -6, -10,() => integer(-5, -10));
+
+});
 
 test(`weightedInteger`, () => {
   const test1 = repeat(1000, () => weightedInteger(10));

@@ -8,22 +8,6 @@ export {randomElement as arrayElement};
 export const defaultRandom = Math.random;
 export type RandomSource = () => number;
 
-/**
- * Returns a random number between `min-max` weighted such that values closer to `min`
- * occur more frequently
- * @param min 
- * @param max 
- * @returns 
- */
-// export const weighted2 = (min: number, max: number) => {
-//   const r = Math.random() * max;// + min;
-//   const x = Math.round(max/r);
-//   if (x > max) {
-//     console.log(`r: ${r} x: ${x} min: ${min} max: ${max}`);
-//   }
-//   return x;
-// };
-
 /***
  * Returns a random number, 0..1, weighted by a given easing function. 
  * Default easing is `quadIn`, which skews towards zero.
@@ -183,6 +167,45 @@ export const gaussian = (skew = 1) => {
  * @returns 
  */
 export const gaussianSkewed = (skew:number) => () => gaussian(skew);
+
+/**
+ * Returns a random integer between `max` (exclusive) and `min` (inclusive)
+ * If `min` is not specified, 0 is used.
+ * 
+ * ```js
+ * integer(10);    // Random number 0-9
+ * integer(5, 10); // Random number 5-9
+ * integer(-5);       // Random number from -4 to 0
+ * integer(-5, -10); // Random number from -10 to -6
+ * ```
+ * @param max 
+ * @param min 
+ * @returns 
+ */
+export const integer = (max:number, min?:number) => {
+  //eslint-disable-next-line functional/no-let
+  let reverse = false;
+  if (min === undefined) {
+    if (max < 0) {
+      max = Math.abs(max);
+      reverse = true;
+    }
+    min = 0;
+  }
+  const amt = max - min;
+  const r = Math.floor(Math.random() * amt) + min;
+  if (reverse) return -r;
+  return r;
+};
+
+/**
+ * Random a random float between `max` (exclusive) and `min` (inclusive).
+ * If `min` is not specified, 0 is used.
+ * @param max 
+ * @param min 
+ * @returns 
+ */
+export const float = (max:number, min:number = 0) => Math.random() * (max - min) + min;
 
 /**
  * Returns a string of random letters and numbers of a given `length`.
