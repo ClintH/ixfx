@@ -386,7 +386,7 @@ export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySync
   return {
     start,
     get isDone() {
-      return running;
+      return !running;
     },
     get ticks() {
       return ticks;
