@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -33,7 +33,7 @@
     "prepublishOnly": "npm run clean && npm run build",
     "typings": "tsc --project config/tsconfig.pkg.json",
     "typings:watch": "tsc --watch --project config/tsconfig.pkg.json",
-    "demos": "npm run build && npm run demos:copy",
+    "demos": "rimraf dist && npm run build && npm run demos:copy",
     "demos:watch": "concurrently \"npm run dev\"  \"npm run typings:watch\"",
     "demos:copy": "copyfiles --up 1 ./dist/* ../ixfx-demos/ixfx/",
     "docs": "typedoc --customCss ./config/custom.css --options ./config/typedoc.json && npm run docs:copyIcons",
