@@ -79,9 +79,11 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
   }
   .line {
     display: flex;
+    padding-bottom: 0.1em;
+    padding-top: 0.1em;
   }
   .line:hover {
-    background-color: var(--theme-bg-hover, whitesmoke);
+  
   }
   .error {
     color: red;
@@ -98,6 +100,8 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
   }
   .msg {
     flex: 1;
+    word-break: break-all;
+
   }
   ${css}
   `);
