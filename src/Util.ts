@@ -1,4 +1,5 @@
 import { number as guardNumber, integer as guardInteger} from "./Guards.js";
+import {untilMatch} from "./Text.js";
 
 /**
  * Clamps a value between min and max (both inclusive)
@@ -33,6 +34,88 @@ export const clamp = (v: number, min = 0, max = 1) => {
   if (v < min) return min;
   if (v > max) return max;
   return v;
+};
+
+
+/**
+ * Returns a field on object `o` by a dotted path.
+ * ```
+ * const d = {
+ *  accel: {x: 1, y: 2, z: 3},
+ *  gyro:  {x: 4, y: 5, z: 6}
+ * };
+ * getFieldByPath(d, `accel.x`); // 1
+ * getFieldByPath(d, `gyro.z`);  // 6
+ * getFieldByPath(d, `gyro`);    // {x:4, y:5, z:6}
+ * getFieldByPath(d, ``);        // Returns d
+ * ```
+ * 
+ * If a field does not exist, `undefined` is returned.
+ * Use {@link getFieldPaths} to get a list of paths.
+ * @param o 
+ * @param path 
+ * @returns 
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFieldByPath = (o:any, path:string = ``):any|undefined => {
+  if (path.length === 0) return o;
+  if (path in o) {
+    return o[path];
+  } else {
+    const start = untilMatch(path, `.`);
+    if (start in o) {
+      return getFieldByPath(o[start], path.substring(start.length+1));
+    } else {
+      return undefined;
+    }
+  }
+};
+
+/**
+ * Returns a list of paths for all the fields on `o`
+ * ```
+ * const d = {
+ *  accel: {x: 1, y: 2, z: 3},
+ *  gyro:  {x: 4, y: 5, z: 6}
+ * };
+ * const paths = getFieldPaths(d); 
+ * // Yields [ `accel.x`, `accel.y`,`accel.z`,`gyro.x`,`gyro.y`,`gyro.z` ]
+ * ```
+ * @param o 
+ * @returns 
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getFieldPaths = (o:any):readonly string[] => {
+  const paths:string[] = [];
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const probe = (o:any, prefix = ``) => {
+    if (typeof o === `object`) {
+      const keys = Object.keys(o);
+      if (prefix.length > 0) prefix += `.`;
+      keys.forEach(k => probe(o[k], prefix + k));
+    } else {
+      //eslint-disable-next-line functional/immutable-data
+      paths.push(prefix);
+    }
+  };
+  probe(o);
+  return paths;
+};
+
+/**
+ * Rounds `v` up to the nearest multiple of `multiple`
+ * ```
+ * roundMultiple(19, 20); // 20
+ * roundMultiple(21, 20); // 40
+ * ```
+ * @param v 
+ * @param multiple 
+ * @returns 
+ */
+export const roundUpToMultiple = (v:number, multiple:number):number => {
+  guardNumber(v, `nonZero`, `v`);
+  guardNumber(multiple, `nonZero`, `muliple`);
+  return Math.ceil(v/multiple)*multiple;
 };
 
 /**
