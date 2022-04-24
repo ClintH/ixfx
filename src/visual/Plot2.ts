@@ -25,7 +25,7 @@ export type Opts = {
    */
   autoSize?:boolean
   /**
-   * Colour for axis lines
+   * Colour for axis lines & labels
    */
   axisColour?:string
   /**
@@ -242,6 +242,10 @@ class PlotArea extends Sg.CanvasBox {
 
   }
 
+  protected onClick(p: Points.Point): void {
+    this.plot.frozen = !this.plot.frozen;    
+  }
+
   protected onPointerLeave(): void {
     const series = [...this.plot.series.values()];
     series.forEach(series => {
@@ -282,7 +286,7 @@ class PlotArea extends Sg.CanvasBox {
   }
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
-
+    if (this.plot.frozen) return;
     const series = [...this.plot.series.values()];
     ctx.clearRect(0, 0, this.visual.width, this.visual.height);
 
@@ -641,7 +645,8 @@ export class Plot extends Sg.CanvasBox {
   axisColour:string;
   axisWidth:number;
   series:Map<string,Series>;
-  
+  private _frozen = false;
+
   constructor(canvasEl:HTMLCanvasElement, opts:Opts = {}) {
       
     if (canvasEl === undefined) throw new Error(`canvasEl undefined`);
@@ -664,6 +669,14 @@ export class Plot extends Sg.CanvasBox {
     this.debugLayout = false;
   }
 
+
+  get frozen():boolean {
+    return this._frozen;
+  }
+
+  set frozen(v:boolean) {
+    this._frozen = v;
+  }
 
   seriesArray():Series[] {
     return [...this.series.values()];
@@ -691,8 +704,10 @@ export class Plot extends Sg.CanvasBox {
       const v = o[key];
       if (typeof v === `object`) {
         return this.createSeriesFromObject(v, key +'.');
-      } else {
+      } else if (typeof v === `number`) {
         return [this.createSeries(key, `stream`)];
+      } else {
+        return [];
       }
     }
     return keys.flatMap(create);
@@ -703,7 +718,7 @@ export class Plot extends Sg.CanvasBox {
 
     if (name === undefined) name = `series-${len}`;
     if (this.series.has(name)) throw new Error(`Series name '${name}' already in use`);
-    console.log(name);
+ 
     const opts:SeriesOpts = {
       colour: `hsl(${len*20 % 360}, 80%,50%)`
     }

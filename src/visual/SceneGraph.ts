@@ -335,6 +335,22 @@ export class CanvasBox extends Box {
     this.canvasEl.addEventListener(`pointerleave`, evt => {
       this.notifyPointerLeave();    
     })
+
+    this.canvasEl.addEventListener(`click`, evt => {
+      const p = {x:evt.offsetX, y:evt.offsetY};
+      this.notifyClick(p);
+    })
+  }
+
+  protected onClick(p:Points.Point) {}
+
+  private notifyClick(p:Points.Point) {
+    if (Rects.isPlaceholder(this.visual)) return;
+    if (Rects.intersectsPoint(this.visual, p)) {
+      const pp = Points.subtract(p, this.visual.x, this.visual.y);
+      this.onClick(pp);
+      this.children.forEach(c=> (c as CanvasBox).notifyClick(pp));
+    }
   }
 
   private notifyPointerLeave() {
