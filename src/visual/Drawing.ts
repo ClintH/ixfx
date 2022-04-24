@@ -349,6 +349,20 @@ export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.
 };
 
 /**
+ * Returns `point` with the canvas's translation matrix applied
+ * @param ctx 
+ * @param point 
+ * @returns 
+ */
+export const translatePoint = (ctx:CanvasRenderingContext2D, point: Points.Point): Points.Point => {
+  const m = ctx.getTransform();
+  return {
+    x: point.x * m.a + point.y * m.c + m.e,
+    y: point.x * m.b + point.y * m.d + m.f
+  };
+};
+
+/**
  * Draws filled circle(s) at provided point(s)
  * @param ctx
  * @param pos 
