@@ -1,4 +1,4 @@
-import { Polar, Rects} from "./index.js";
+import { Circles, Lines, Polar, Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line';
 import {number as guardNumber} from '../Guards';
 import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util';
@@ -60,6 +60,59 @@ export const distance = (a:Point, b:Point):number => {
   guard(b, `b`);
   return Math.hypot(b.x-a.x, b.y-a.y);
 };
+
+/**
+ * Returns the distance from point `a` to the exterior of `shape`.
+ * 
+ * @example Distance from point to rectangle
+ * ```
+ * const distance = distanceToExterior(
+ *  {x: 50, y: 50},
+ *  {x: 100, y: 100, width: 20, height: 20}
+ * );
+ * ```
+ * 
+ * @example Find closest shape to point
+ * ```
+ * import {minIndex} from '../collections/arrays.js';
+ * const shapes = [ some shapes... ]; // Shapes to compare against
+ * const pt = { x: 10, y: 10 };       // Comparison point
+ * const distances = shapes.map(v => distanceToExterior(pt, v));
+ * const closest = shapes[minIndex(...distances)];
+ * ```
+ * @param a Point
+ * @param shape Point, or a positioned Rect or Circle.
+ * @returns 
+ */
+export const distanceToExterior = (a:Point, shape:PointCalculableShape):number => {
+  if (Rects.isRectPositioned(shape)) {
+    return Rects.distanceFromExterior(shape, a);
+  }
+  if (Circles.isCirclePositioned(shape)) {
+    return Circles.distanceFromExterior(shape, a);
+  }
+  if (isPoint(shape)) return distance(a, shape);
+  throw new Error(`Unknown shape`);
+};
+
+/**
+ * Returns the distance from point `a` to the center of `shape`.
+ * @param a Point
+ * @param shape Point, or a positioned Rect or Circle.
+ * @returns 
+ */
+export const distanceToCenter = (a:Point, shape:PointCalculableShape):number => {
+  if (Rects.isRectPositioned(shape)) {
+    return Rects.distanceFromExterior(shape, a);
+  }
+  if (Circles.isCirclePositioned(shape)) {
+    return Circles.distanceFromExterior(shape, a);
+  }
+  if (isPoint(shape)) return distance(a, shape);
+  throw new Error(`Unknown shape`);
+};
+
+export type PointCalculableShape =  Lines.PolyLine | Lines.Line | Rects.RectPositioned | Point | Circles.CirclePositioned
 
 /**
  * Throws an error if point is invalid
