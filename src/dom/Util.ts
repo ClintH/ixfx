@@ -119,7 +119,13 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
   const ctx = (el as HTMLCanvasElement).getContext(`2d`);
   if (ctx === null) throw new Error(`Could not create drawing context`);
   
-  const safetyMargin = 0;
+  //const safetyMargin = 4;
+
+  el.style.width = `100%`;
+  el.style.height = `100%`;
+
+  //console.log('parent height: ' + parent.getBoundingClientRect().height);
+  //console.log(`parent offset Height: ${parent.offsetHeight}`);
 
   const ro = resizeObservable(parent, timeoutMs).subscribe((entries:readonly ResizeObserverEntry[]) => {
     const e = entries.find(v => v.target === parent);
@@ -128,8 +134,12 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
     const width = e.contentRect.width;
     const height = e.contentRect.height;
     //console.log(`contentH: ${e.contentRect.height} current: ${el.getBoundingClientRect().height}`);
-    el.setAttribute(`width`, width-safetyMargin + `px`);
-    el.setAttribute(`height`, height-safetyMargin + `px`);
+
+    // el.setAttribute(`width`, width-safetyMargin + `px`);
+    // el.setAttribute(`height`, height-safetyMargin + `px`);
+    el.setAttribute(`width`, el.offsetWidth + `px`);
+    el.setAttribute(`height`, el.offsetHeight + `px`);
+    
     const bounds = {width, height, center: {x: width/2, y:height/2}};
     if (onResized !== undefined) onResized({ctx, el, bounds});
   });
