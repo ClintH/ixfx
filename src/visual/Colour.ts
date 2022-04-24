@@ -1,6 +1,7 @@
 /* eslint-disable */
 import * as d3Colour from 'd3-color';
 import * as d3Interpolate from 'd3-interpolate';
+import {defaultRandom, RandomSource} from '../Random.js';
 import {number as guardNumber} from '../Guards.js'
 
 export type Hsl = {h:number, s:number, l:number, opacity?:number};
@@ -46,6 +47,11 @@ export const toHsl = (colour:Colourish):Hsl => {
   if (rgb.opacity) return {...hsl, opacity: rgb.opacity};
   else return hsl;
 }
+
+export const randomHue = (rand:RandomSource = defaultRandom): number => {
+  const r = rand();
+  return r * 360;
+};
 
 /**
  * Parses colour to {r,g,b}. `opacity` field is added if it exists on source.

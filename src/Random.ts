@@ -5,6 +5,8 @@ import {clamp} from "./Util.js";
 export {randomIndex as arrayIndex};
 export {randomElement as arrayElement};
 
+export {randomHue as hue} from './visual/Colour.js';
+
 export const defaultRandom = Math.random;
 export type RandomSource = () => number;
 
@@ -28,10 +30,6 @@ export const weighted = (easingName:Easings.EasingName = `quadIn`, rand:RandomSo
   return easingFn(r);
 };
 
-export const hue = (rand:RandomSource = defaultRandom): number => {
-  const r = rand();
-  return r * 360;
-};
 
 /**
  * Random integer, weighted according to an easing function.
