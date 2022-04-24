@@ -13,6 +13,7 @@ import * as Colours from '../visual/Colour.js';
 
 import {stack, Stack} from '../collections/index.js';
 import {resolveEl} from '../dom/Util.js';
+import {roundUpToMultiple} from '~/Util.js';
 
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -537,6 +538,21 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned
 
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
   else draw(toDraw as Rects.RectPositioned);
+};
+
+/**
+ * Returns the width of `text`. Rounds number up to nearest multiple if provided. If
+ * text is empty or undefined, 0 is returned.
+ * @param ctx 
+ * @param text 
+ * @param widthMultiple 
+ * @returns 
+ */
+export const textWidth = (ctx:CanvasRenderingContext2D, text?:string|null, padding = 0, widthMultiple?:number):number => {
+  if (text === undefined || text === null || text.length === 0) return 0;
+  const m = ctx.measureText(text);
+  if (widthMultiple) return roundUpToMultiple(m.width, widthMultiple) + padding;
+  return m.width + padding;
 };
 
 /**
