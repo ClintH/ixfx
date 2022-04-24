@@ -60,6 +60,10 @@ export const pingPongPercent = function (interval: number = 0.1, lower?: number,
  * @param rounding Rounding is off by default. Use say 1000 if interval is a fractional amount to avoid rounding errors.
  */
 export const pingPong = function* (interval: number, lower: number, upper: number, start?: number, rounding: number = 1) {
+  if (lower === undefined) throw new Error(`Parameter 'lower' is undefined`);
+  if (interval === undefined) throw new Error(`Parameter 'interval' is undefined`);
+  if (upper === undefined) throw new Error(`Parameter 'upper' is undefined`);
+
   if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);
   if (Number.isNaN(lower)) throw new Error(`lower parameter is NaN`);
   if (Number.isNaN(upper)) throw new Error(`upper parameter is NaN`);
