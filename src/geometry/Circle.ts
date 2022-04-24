@@ -23,14 +23,15 @@ export type CircularPath = Circle & Path & {
 };
 
 /**
- * Returns true if parameter has x,y
+ * Returns true if parameter has x,y. Does not verify if parameter is a circle or not
  * @param p Circle or point
  * @returns 
  */
 export const isPositioned = (p: Circle | Points.Point): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
-
-export const isCircle = (p: Circle|CirclePositioned|number): p is Circle => (p as Circle).radius !== undefined;
-
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isCircle = (p: Circle|CirclePositioned|any): p is Circle => (p as Circle).radius !== undefined;
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isCirclePositioned = (p:Circle|CirclePositioned|any): p is CirclePositioned => isCircle(p) && isPositioned(p);
 
 /**
  * Returns a point on a circle at a specified angle in radians
@@ -53,15 +54,30 @@ export const point = (circle:Circle|CirclePositioned, angleRadian:number, origin
   };
 };
 
-const guard = (circle:CirclePositioned|Circle) => {
+/**
+ * Throws if radius is out of range. If x,y is present, these will be validated too.
+ * @param circle 
+ * @param paramName 
+ */
+const guard = (circle:CirclePositioned|Circle, paramName =`circle`) => {
   if (isPositioned(circle)) {
     guardPoint(circle, `circle`);
   }
 
-  if (Number.isNaN(circle.radius)) throw new Error(`Radius is NaN`);
-  if (circle.radius <= 0) throw new Error(`Radius must be greater than zero`);
+  if (Number.isNaN(circle.radius)) throw new Error(`${paramName}.radius is NaN`);
+  if (circle.radius <= 0) throw new Error(`${paramName}.radius must be greater than zero`);
 };
 
+/**
+ * Throws if `circle` is not positioned or has dodgy fields
+ * @param circle 
+ * @param paramName 
+ * @returns 
+ */
+const guardPositioned = (circle:CirclePositioned, paramName = `circle`) => {
+  if (!isPositioned(circle)) throw new Error(`Expected a positioned circle with x,y`);
+  return guard(circle, paramName);
+};
 
 /**
  * Computes relative position along circle
@@ -181,12 +197,33 @@ export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):b
 };
 
 /**
- * Returns the distance between two circle centers
+ * Returns the distance between two circle centers.
+ * 
+ * Throws an error if either is lacking position.
  * @param a 
  * @param b 
- * @returns 
+ * @returns Distance
  */
-export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number => Points.distance(a, b);
+export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number => {
+  guardPositioned(a, `a`);
+  guardPositioned(a, `b`);
+  return Points.distance(a, b);
+};
+
+/**
+ * Returns the distance between the exterior of two circles, or between the exterior of a circle and point.
+ * If `b` overlaps or is enclosed by `a`, distance is 0.
+ * @param a
+ * @param b 
+ */
+export const distanceFromExterior = (a:CirclePositioned, b:CirclePositioned|Points.Point):number => {
+  guardPositioned(a, `a`);
+  if (isCirclePositioned(b)) {
+    return Math.max(0, distanceCenter(a, b) - a.radius - b.radius);
+  } else if (Points.isPoint(b)) {
+    return Math.max(0, Points.distance(a, b));
+  } else throw new Error(`Second parameter invalid type`);
+};
 
 type ToSvg = {
   (radius:number, sweep:boolean, origin:Points.Point): readonly string[];
