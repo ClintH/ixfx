@@ -113,6 +113,20 @@ export const min = (...data:readonly number[]):number => {
 };
 
 /**
+ * Returns the index of the largest value
+ * @param data 
+ * @returns 
+ */
+export const maxIndex = (...data:readonly number[]):number => data.reduce((bestIndex, value, index, arr) => (value > arr[bestIndex] ? index : bestIndex), 0);
+
+/**
+ * Returns the index of the smallest value
+ * @param data 
+ * @returns 
+ */
+export const minIndex = (...data:readonly number[]):number => data.reduce((bestIndex, value, index, arr) => (value < arr[bestIndex] ? index : bestIndex), 0);
+
+/**
  * Returns the maximum number out of `data`.
  * Undefined and non-numbers are silently ignored.
  * @param data
@@ -124,7 +138,7 @@ export const max = (...data:readonly number[]):number => {
 };
 
 /**
- * Returns the maximum out of `data` without additional processing for speed.
+ * Returns the maximum out of `data` without pre-filtering for speed.
  * 
  * For most uses, {@link max} should suffice.
  * @param data 
@@ -140,6 +154,43 @@ export const maxFast = (data:readonly number[]|Float32Array):number => {
   return m;
 };
 
+
+/**
+ * Returns the maximum out of `data` without pre-filtering for speed.
+ * 
+ * For most uses, {@link max} should suffice.
+ * @param data 
+ * @returns Maximum
+ */
+export const minFast = (data:readonly number[]|Float32Array):number => {
+  //eslint-disable-next-line functional/no-let
+  let m = Number.MIN_SAFE_INTEGER;
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=0;i<data.length;i++) {
+    m = Math.min(m, data[i]);
+  }
+  return m;
+};
+
+export type MinMaxAvgTotal = {
+  /**
+   * Smallest value in array
+   */
+  readonly min: number 
+  /**
+   * Total of all items
+   */
+  readonly total: number 
+  /**
+   * Largest value in array
+   */
+  readonly max: number
+  /**
+   * Average value in array
+   */
+  readonly avg: number
+};
+
 /**
  * Returns the min, max, avg and total of the array.
  * Any values that are invalid are silently skipped over.
@@ -151,27 +202,19 @@ export const maxFast = (data:readonly number[]|Float32Array):number => {
  * @param endIndex If provided, the end index to do calculations (defaults full range)
  * @returns `{min, max, avg, total}`
  */
-export const minMaxAvg = (data: readonly number[], startIndex?:number, endIndex?:number): {
-  /**
-   * Smallest value in array
-   */
-  readonly min: number; 
-  /**
-   * Total of all items
-   */
-  readonly total: number; 
-  /**
-   * Largest value in array
-   */
-  readonly max: number; 
-  /**
-   * Average value in array
-   */
-  readonly avg: number;} => {
+export const minMaxAvg = (data: readonly number[], startIndex?:number, endIndex?:number):MinMaxAvgTotal  => {
 
   if(data === undefined) throw new Error(`'data' is undefined`);
   if (!Array.isArray(data)) throw new Error(`'data' parameter is not an array`);
   
+  if (data.length === 0) {
+    return {
+      total: 0,
+      min: 0,
+      max: 0,
+      avg: 0
+    };
+  }
   if (startIndex === undefined) startIndex = 0;
   if (endIndex === undefined) endIndex = data.length - 1;
 
