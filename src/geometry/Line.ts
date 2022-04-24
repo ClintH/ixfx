@@ -2,15 +2,29 @@ import {guard as guardPoint, Point} from './Point.js';
 import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 import { Rects, Points} from './index.js';
+import {minFast} from '~/collections/NumericArrays.js';
 
 export type Line = {
   readonly a: Points.Point
   readonly b: Points.Point
 }
 
+export type PolyLine = ReadonlyArray<Line>;
+
 export const isLine = (p: Path | Line | Points.Point): p is Line => {
   if (p === undefined) return false;
   return (p as Line).a !== undefined && (p as Line).b !== undefined;
+};
+
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isPolyLine = (p: any): p is PolyLine => {
+  if (!Array.isArray(p)) return false;
+
+  const valid = p.some(v => {
+    if (!isLine(v)) return false;
+    return true;
+  });
+  return valid;
 };
 
 /**
@@ -320,11 +334,22 @@ export const extendFromStart = (line:Line, distance:number):Line => {
  * ```js
  * distance(line, {x:10,y:10});
  * ```
- * @param line
- * @param point
- * @returns 
+ * 
+ * If an array of lines is provided, the shortest distance is returned.
+ * @param line Line (or array of lines)
+ * @param point Point to check against
+ * @returns Distance
  */
-export const distance = (line:Line, point:Points.Point):number => {
+export const distance = (line:Line|ReadonlyArray<Line>, point:Points.Point):number => {
+  if (Array.isArray(line)) {
+    const distances = line.map(l => distanceSingleLine(l, point));
+    return minFast(distances);
+  } else {
+    return distanceSingleLine(line as Line, point);
+  }
+};
+
+const distanceSingleLine = (line:Line, point:Points.Point):number => {
   guard(line, `line`);
   guardPoint(point, `point`);
 
@@ -472,7 +497,8 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
  * @param points 
  * @returns 
  */
-export const joinPointsToLines = (...points:readonly Points.Point[]): readonly Line[] => {
+export const joinPointsToLines = (...points:readonly Points.Point[]): PolyLine => {
+  
   const lines = [];
   //eslint-disable-next-line functional/no-let
   let start = points[0];
