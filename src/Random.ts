@@ -28,6 +28,11 @@ export const weighted = (easingName:Easings.EasingName = `quadIn`, rand:RandomSo
   return easingFn(r);
 };
 
+export const hue = (rand:RandomSource = defaultRandom): number => {
+  const r = rand();
+  return r * 360;
+};
+
 /**
  * Random integer, weighted according to an easing function.
  * Number will be inclusive of `min` and below `max`.
