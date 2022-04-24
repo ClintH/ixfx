@@ -1,8 +1,11 @@
 import * as Drawing from './Drawing.js';
 import * as Svg from './Svg.js';
 import * as Plot from './Plot.js';
+import * as Plot2 from './Plot2.js';
+
 import * as Palette from  './Palette';
 import * as Colour from './Colour.js';
+import * as SceneGraph from './SceneGraph.js';
 
 /**
  * Colour interpolation, scale generation and parsing
@@ -14,7 +17,7 @@ import * as Colour from './Colour.js';
  */
 export {Colour};
 
-export {Palette,  Drawing, Svg, Plot};
+export {Palette,  Drawing, Svg, Plot, Plot2, SceneGraph};
 
 // @ts-ignore
 //eslint-disable-next-line functional/immutable-data
