@@ -1,6 +1,38 @@
 import {resolveEl} from "./Util.js";
 
 /**
+ * Adds tab and shift+tab to TEXTAREA
+ * @param el 
+ */
+export const textAreaKeyboard = (el:HTMLTextAreaElement) => {
+
+  el.addEventListener(`keydown`, evt => {
+    const val = el.value;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+
+    if (evt.key === `Tab` && evt.shiftKey) {
+      if (el.value.substring(start - 2, start) === `  `) {
+        //eslint-disable-next-line functional/immutable-data
+        el.value = val.substring(0, start - 2) + val.substring(end);
+      }
+      //eslint-disable-next-line functional/immutable-data
+      el.selectionStart = el.selectionEnd = start - 2;
+      evt.preventDefault();
+      return false;
+    } else if (evt.key === `Tab`) {
+      //eslint-disable-next-line functional/immutable-data
+      el.value = val.substring(0, start) + `  ` + val.substring(end);
+      //eslint-disable-next-line functional/immutable-data
+      el.selectionStart = el.selectionEnd = start + 2;
+      evt.preventDefault();
+      return false;
+    }
+  
+  });
+};
+
+/**
  * Quick access to <input type="checkbox"> value.
  * Provide a checkbox by string id or object reference. If a callback is
  * supplied, it will be called when the checkbox changes value.
