@@ -3,9 +3,11 @@ import {minIndex} from '~/collections/NumericArrays.js';
 import {PointCalculableShape} from '~/geometry/Point.js';
 import {Arrays} from '../collections/index.js';
 import { Points, Rects} from '../geometry/index.js';
-import {flip, scale} from '../Util.js';
+import {clamp, flip, getFieldByPath, getFieldPaths, roundUpToMultiple, scale} from '../Util.js';
 import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
 import * as Sg from './SceneGraph.js';
+import {untilMatch} from '~/Text.js';
+import {textWidth} from './Drawing.js';
 
 interface DataSource {
   dirty:boolean
@@ -14,16 +16,43 @@ interface DataSource {
   add(value:number):void
 }
 
+/**
+ * Plot options
+ */
 export type Opts = {
+  /**
+   * If true, Canvas will be resized to fit parent
+   */
   autoSize?:boolean
+  /**
+   * Colour for axis lines
+   */
   axisColour?:string
+  /**
+   * Width for axis lines
+   */
   axisWidth?:number
 }
 
+/**
+ * Series options
+ */
 export type SeriesOpts = {
+  /**
+   * Colour for series
+   */
   colour:string
+  /**
+   * Visual width/height (depends on drawingStyle)
+   */
   width?:number
+  /**
+   * How series should be rendered
+   */
   drawingStyle?: `line`|`dotted`|`bar`
+  /**
+   * Preferred data range
+   */
   axisRange?:DataRange
   /**
    * If true, range will stay at min/max, rather than continuously adapting
@@ -182,6 +211,7 @@ class PlotArea extends Sg.CanvasBox {
   // If pointer is more than this distance away from a data point, it's ignored
   pointerDistanceThreshold = 20;
   lastRangeChange = 0;
+  pointer:Points.Point|undefined;
 
   constructor(private plot:Plot) {
     super(plot, plot.canvasEl, `PlotArea`);
@@ -208,30 +238,51 @@ class PlotArea extends Sg.CanvasBox {
 
   protected onNotify(msg: string, source: Sg.Box): void {
     if (msg === `measureApplied` && source === this.plot.axisY) this._needsLayout = true;  
+    if (msg === `measureApplied` && source === this.plot.legend) this._needsLayout = true;  
+
   }
 
   protected onPointerLeave(): void {
     const series = [...this.plot.series.values()];
     series.forEach(series => {
       series.tooltip = undefined;
-    });    
+    });
+    this.pointer = undefined;
     this.plot.legend.onLayoutNeeded();
 
   }
 
   protected onPointerMove(p: Points.Point): void {
+    this.pointer = p;
+    this.plot.legend.onLayoutNeeded();
+  }
+
+  protected measurePreflight(): void {
+    this.updateTooltip();
+      
+  }
+
+  updateTooltip() {
+    const p = this.pointer;
+    if (p === undefined) return;
     const series = [...this.plot.series.values()];
     series.forEach(series => {
+      if (p === undefined) { 
+        series.tooltip = undefined;
+        return;
+      }
       if (series.dataHitPoint === undefined) return;
       const v = series.dataHitPoint(p);
       if (v[0] === undefined) return;
       if (v[1] > this.pointerDistanceThreshold) return; // too far away
       series.tooltip = series.formatValue(v[0].value);
-      this.plot.legend.onLayoutNeeded();
+      //this.plot.legend.onLayoutNeeded();
     });
+    this.plot.legend.needsDrawing = true;
   }
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
+
     const series = [...this.plot.series.values()];
     ctx.clearRect(0, 0, this.visual.width, this.visual.height);
 
@@ -253,7 +304,7 @@ class PlotArea extends Sg.CanvasBox {
 
   drawDataSet(series:Series, d:number[], ctx:CanvasRenderingContext2D): void {
     const padding = this.paddingPx + series.width;
-    const v = Rects.subtract(this.visual, padding*2, padding*2);
+    const v = Rects.subtract(this.visual, padding*2, padding*3.5);
     const pxPerPt = v.width/ d.length;
     
     series.lastPxPerPt = pxPerPt;
@@ -276,13 +327,15 @@ class PlotArea extends Sg.CanvasBox {
       ctx.beginPath();
 
       for (let i=0;i<d.length;i++) {
-        const scaled = series.scaleValue(d[i]);
+        const scaled = clamp(series.scaleValue(d[i]));
+     
         y = padding + this.paddingPx + (v.height * flip(scaled));
         shapes.push({x, y, index:i, value:d[i]});
 
         if (i == 0) ctx.moveTo(x+pxPerPt/2, y);
         else ctx.lineTo(x+pxPerPt/2,y);
        
+        if (y>this.visual.height) console.log(y + ' h: ' + this.visual.height);
         x += pxPerPt;
       }
       ctx.strokeStyle = series.colour;
@@ -324,32 +377,52 @@ class PlotArea extends Sg.CanvasBox {
 class Legend extends Sg.CanvasBox {
   sampleSize = {width:10, height: 10};
   padding = 3;
-  constructor(plot:Plot) {
+  widthSnapping = 20;
+
+  constructor(private plot:Plot) {
     super(plot, plot.canvasEl, `Legend`);
     this.debugLayout = false;
   }
 
   protected measureSelf(opts: Sg.MeasureState, parent?: Sg.Measurement): Rects.Rect | Rects.RectPositioned | undefined {
     const yAxis = opts.measurements.get(`AxisY`);
+    const sample = this.sampleSize;
+    const widthSnapping= this.widthSnapping;
+    const padding = this.padding;
+    const ctx = (opts as Sg.CanvasMeasureState).ctx;
     if (yAxis === undefined) return;
-    const h = this.sampleSize.height + this.padding + this.padding;
+
+    const usableWidth = opts.bounds.width - yAxis.size.width;
+
+    const series = this.plot.seriesArray();
+    let width = padding;
+    for (let i=0;i<series.length;i++) {
+      width += sample.width + padding;
+      width += textWidth(ctx, series[i].name, padding, widthSnapping);
+      width += textWidth(ctx, series[i].tooltip, padding, widthSnapping);
+     }
+
+    const rows = Math.max(1, Math.ceil(width / usableWidth));
+    const h = rows * (this.sampleSize.height + this.padding + this.padding);
     return {
       x: yAxis.size.width,
       y: opts.bounds.height - h,
-      width: opts.bounds.width - yAxis.size.width,
+      width: usableWidth,
       height: h
     };
   }
     
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
-    const plot = this._parent as Plot;
-    const series = plot.seriesArray();
+    const series = this.plot.seriesArray();
     const sample = this.sampleSize;
     const padding = this.padding;
+    const widthSnapping= this.widthSnapping;
+
     let x = padding;
     let y = padding;
     
     ctx.clearRect(0, 0, this.visual.width, this.visual.height);
+
     for (let i=0;i<series.length;i++) {
       const s = series[i];
       ctx.fillStyle = s.colour;
@@ -358,16 +431,18 @@ class Legend extends Sg.CanvasBox {
       ctx.textBaseline = `middle`;
       
       ctx.fillText(s.name, x, y + (sample.height/2));
-      const labelSize = ctx.measureText(s.name);
-      x += labelSize.width + padding;
-
+      x += textWidth(ctx, s.name, padding, widthSnapping);
+      
       if (s.tooltip) {
-        ctx.fillStyle = plot.axisColour;
+        ctx.fillStyle = this.plot.axisColour;
         ctx.fillText(s.tooltip, x, y+ (sample.height/2));
-        const tooltipSize = ctx.measureText(s.tooltip);
-        x += tooltipSize.width + padding;
+        x += textWidth(ctx, s.tooltip, padding, widthSnapping);
       }
       x += padding;
+      if (x > this.visual.width - 100) {
+        x = padding;
+        y += sample.height + padding + padding;
+      }
     }
   }
 
@@ -380,17 +455,20 @@ class AxisX extends Sg.CanvasBox {
   paddingPx = 2;
   colour?:string;
 
-  constructor(plot:Plot) {
+  constructor(private plot:Plot) {
     super(plot, plot.canvasEl,`AxisX`);
     this.debugLayout = false;
   }
 
   protected onNotify(msg: string, source: Sg.Box): void {
-    if (msg === `measureApplied` && source === (this._parent as Plot).axisY) this._needsLayout = true;  
+    if (msg === `measureApplied` && source === this.plot.axisY) this._needsLayout = true;  
+    if (msg === `measureApplied` && source === this.plot.legend) {
+      this.onLayoutNeeded();
+    }  
   }
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
-    const plot = this._parent as Plot;
+    const plot = this.plot;
     const v = this.visual;
     const width = plot.axisWidth;
 
@@ -406,7 +484,7 @@ class AxisX extends Sg.CanvasBox {
   }
 
   protected measureSelf(opts: Sg.MeasureState, parent?: Sg.Measurement): Rects.Rect | Rects.RectPositioned | undefined {
-    const plot = this._parent as Plot;
+    const plot = this.plot;
     
     const yAxis = opts.measurements.get(`AxisY`);
     if (yAxis === undefined) return;
@@ -428,14 +506,14 @@ const isRangeEqual = (a:DataRange, b:DataRange) =>  a.max === b.max && a.min ===
 
 class AxisY extends Sg.CanvasBox {
   seriesToShow:string|undefined;
-  //precision = 2;
   maxDigits = 1;
   paddingPx = 2;
   colour?:string;
   
   lastRange:DataRange;
+  lastPlotAreaHeight = 0;
 
-  constructor(plot:Plot) {
+  constructor(private plot:Plot) {
     super(plot, plot.canvasEl, `AxisY`);
     this.debugLayout = false;
     this.lastRange = {min:0,max:0};
@@ -446,10 +524,18 @@ class AxisY extends Sg.CanvasBox {
     if (series !== undefined && !isRangeEqual(series.visualRange, this.lastRange)) {
       this._needsLayout = true;
       this.needsDrawing = true;
-    }  
+    }
   }
 
-
+  protected onNotify(msg: string, source: Sg.Box): void {
+    const pa = this.plot.plotArea;
+    if (msg === `measureApplied` && source === pa) {
+      if (pa.visual.height !== this.lastPlotAreaHeight) {
+        this.lastPlotAreaHeight = pa.visual.height;
+        this.needsDrawing = true;  
+      }
+    }  
+  }
   protected measureSelf(opts: Sg.MeasureState): Rects.RectPositioned {
     //this.debugLog(`measureSelf. needsLayout: ${this._needsLayout} needsDrawing: ${this.needsDrawing}`);
     
@@ -458,7 +544,7 @@ class AxisY extends Sg.CanvasBox {
 
     const textToMeasure = `9`.repeat(this.maxDigits);
     const text = copts.ctx.measureText(textToMeasure);
-    const textWidth = paddingPx + text.width + paddingPx + (this._parent as Plot).axisWidth + paddingPx;  
+    const textWidth = paddingPx + text.width + paddingPx + this.plot.axisWidth + paddingPx;  
     const w = opts.resolveToPx(this.desiredSize?.width, textWidth);
     return {
       x:0,
@@ -471,22 +557,24 @@ class AxisY extends Sg.CanvasBox {
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
     const s = this.getSeries();
     if (s !== undefined) this.seriesAxis(s, ctx);
-    else console.warn(`Plot AxisY series '${this.seriesToShow}' is missing.`);
+    else {
+      if (this.seriesToShow === undefined) return;
+      console.warn(`Plot AxisY series '${this.seriesToShow}' is missing.`);
+    }  
   }
 
   getSeries():Series|undefined {
-    const plot = this._parent as Plot;
     if (this.seriesToShow === undefined) {
       // Pick first series
-      return plot.seriesArray()[0];
+      return this.plot.seriesArray()[0];
     } else {
       // Try designated series name
-      return plot.series.get(this.seriesToShow);
+      return this.plot.series.get(this.seriesToShow);
     }
   }
 
   seriesAxis(series:Series, ctx:CanvasRenderingContext2D) {
-    const plot = this._parent as Plot;
+    const plot = this.plot;
     const plotArea = plot.plotArea;
     const v = this.visual;
     const paddingPx = this.paddingPx;
@@ -528,7 +616,23 @@ const drawText = (ctx:CanvasRenderingContext2D, text:string, position:(size:Text
   ctx.fillText(text, xy[0], xy[1]);
 }
 
-
+/**
+ * Canvas-based data plotter.
+ * 
+ * ```
+ * const p = new Plot(document.getElementById(`myCanvas`), opts);
+ * 
+ * // Plot 1-5 as series  test'
+ * p.createSeries(`test`, `array`, [1,2,3,4,5]);
+ * 
+ * // Create a streaming series, add a random number
+ * const s = p.createSeries(`test2`, `stream`);
+ * s.add(Math.random());
+ * ```
+ * 
+ * 
+ * `createSeries` returns the {@link Series} instance with properties for fine-tuning
+ */
 export class Plot extends Sg.CanvasBox {
   plotArea:PlotArea;
   legend:Legend;
@@ -560,6 +664,7 @@ export class Plot extends Sg.CanvasBox {
     this.debugLayout = false;
   }
 
+
   seriesArray():Series[] {
     return [...this.series.values()];
   }
@@ -568,11 +673,37 @@ export class Plot extends Sg.CanvasBox {
     return this.series.size;
   }
 
+  plot(o:any) {
+    const paths = getFieldPaths(o);
+    paths.forEach(p => {
+      let s = this.series.get(p);
+      if (s === undefined) {
+        s = this.createSeries(p, `stream`);
+        s.drawingStyle = `line`;
+      }
+      s.add(getFieldByPath(o, p));
+    })
+  }
+
+  createSeriesFromObject(o:any, prefix:string = ``):Series[] {
+    const keys = Object.keys(o);
+    const create = (key:string):Series[] => {
+      const v = o[key];
+      if (typeof v === `object`) {
+        return this.createSeriesFromObject(v, key +'.');
+      } else {
+        return [this.createSeries(key, `stream`)];
+      }
+    }
+    return keys.flatMap(create);
+  }
+
   createSeries(name?:string, type:`stream`|`array` = `array`, initialData?:number[]):Series {
     const len = this.seriesLength;
+
     if (name === undefined) name = `series-${len}`;
     if (this.series.has(name)) throw new Error(`Series name '${name}' already in use`);
-
+    console.log(name);
     const opts:SeriesOpts = {
       colour: `hsl(${len*20 % 360}, 80%,50%)`
     }

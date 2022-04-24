@@ -320,6 +320,7 @@ export class CanvasBox extends Box {
   constructor(parent:CanvasBox|undefined, canvasEl:HTMLCanvasElement, id:string) {
     super(parent, id);
     if (canvasEl === undefined) throw new Error(`canvasEl undefined`);
+    if (canvasEl === null) throw new Error(`canvasEl null`);
     this.canvasEl = canvasEl;
 
     if (parent === undefined) this.designateRoot();
@@ -342,6 +343,7 @@ export class CanvasBox extends Box {
   }
 
   private notifyPointerMove(p:Points.Point) {
+    if (Rects.isPlaceholder(this.visual)) return;
     if (Rects.intersectsPoint(this.visual, p)) {
       const pp = Points.subtract(p, this.visual.x, this.visual.y);
       this.onPointerMove(pp);
