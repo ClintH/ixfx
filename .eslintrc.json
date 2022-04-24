@@ -17,7 +17,8 @@
         ]
     },
     "ignorePatterns": [
-        "scratch/**"
+        "scratch/**",
+        "tests/**"
     ],
     "plugins": [
         "@typescript-eslint",
