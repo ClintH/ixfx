@@ -189,6 +189,17 @@ export const flip = (v:number|NumberFunction) => {
 };
 
 /**
+ * Returns `fallback` if `v` is NaN, otherwise returns `v`
+ * @param v
+ * @param fallback 
+ * @returns 
+ */
+export const ifNaN = (v:number, fallback:number):number => {
+  if (Number.isNaN(v)) return fallback;
+  return v;
+};
+
+/**
  * Scales a percentage-scale number, ie: `v * t`.
  * The utility of this function is that it sanity-checks that
  *  both parameters are in the 0..1 scale.

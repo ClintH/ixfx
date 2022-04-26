@@ -3,10 +3,10 @@ import {minIndex} from '~/collections/NumericArrays.js';
 import {PointCalculableShape} from '~/geometry/Point.js';
 import {Arrays} from '../collections/index.js';
 import { Points, Rects} from '../geometry/index.js';
-import {clamp, flip, getFieldByPath, getFieldPaths, roundUpToMultiple, scale} from '../Util.js';
-import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
+import {clamp, flip, getFieldByPath, getFieldPaths, ifNaN, roundUpToMultiple, scale} from '../Util.js';
+import { parentSizeCanvas } from "../dom/Util.js";
 import * as Sg from './SceneGraph.js';
-import {untilMatch} from '~/Text.js';
+
 import {textWidth} from './Drawing.js';
 
 interface DataSource {
@@ -153,7 +153,7 @@ class Series {
     this.drawingStyle = opts.drawingStyle ?? `line`;
     this.colour = opts.colour;
     this.width = opts.width ?? 3;
-    this._visualRange = opts.axisRange ?? {min:0,max:0};
+    this._visualRange = opts.axisRange ?? {min:Number.NaN,max:Number.NaN};
     this._visualRangeStretch = opts.visualRangeStretch ?? true;
 
     if(sourceType === `array`) {
@@ -174,8 +174,8 @@ class Series {
     if (sourceRange.changed) { 
       if (this._visualRangeStretch) {
         // Stretch range to lowest/highest-seen min/max
-        const rmin = Math.min(vr.min, sourceRange.min);
-        const rmax = Math.max(vr.max, sourceRange.max);
+        const rmin = Math.min(ifNaN(vr.min, sourceRange.min), sourceRange.min);
+        const rmax = Math.max(ifNaN(vr.max, sourceRange.max), sourceRange.max);
         if (rmin !== vr.min || rmax !== vr.max) {
           // Changed
           vr = {min:rmin, max:rmax};
@@ -196,6 +196,10 @@ class Series {
   scaleValue(value:number): number {
     if (this.source === undefined) return value;
     const r = this.visualRange;
+    if (r.min == r.max) {
+      // No real scale - only received the same value for this series
+      return 0.5;
+    }
     return scale(value, r.min, r.max);
   }
 
@@ -215,9 +219,13 @@ class PlotArea extends Sg.CanvasBox {
 
   constructor(private plot:Plot) {
     super(plot, plot.canvasEl, `PlotArea`);
-    this.debugLayout = false;
   }
   
+  clear() {
+    this.lastRangeChange = 0;
+    this.pointer = undefined;
+  }
+
   protected measureSelf(opts: Sg.MeasureState, parent?: Sg.Measurement): Rects.Rect | Rects.RectPositioned | undefined {
     const axisY = opts.getSize(`AxisY`);
     if (axisY === undefined) return;
@@ -242,9 +250,9 @@ class PlotArea extends Sg.CanvasBox {
 
   }
 
-  protected onClick(p: Points.Point): void {
-    this.plot.frozen = !this.plot.frozen;    
-  }
+  // protected onClick(p: Points.Point): void {
+  //   this.plot.frozen = !this.plot.frozen;    
+  // }
 
   protected onPointerLeave(): void {
     const series = [...this.plot.series.values()];
@@ -385,7 +393,9 @@ class Legend extends Sg.CanvasBox {
 
   constructor(private plot:Plot) {
     super(plot, plot.canvasEl, `Legend`);
-    this.debugLayout = false;
+  }
+
+  clear() {
   }
 
   protected measureSelf(opts: Sg.MeasureState, parent?: Sg.Measurement): Rects.Rect | Rects.RectPositioned | undefined {
@@ -461,7 +471,9 @@ class AxisX extends Sg.CanvasBox {
 
   constructor(private plot:Plot) {
     super(plot, plot.canvasEl,`AxisX`);
-    this.debugLayout = false;
+  }
+
+  clear() {
   }
 
   protected onNotify(msg: string, source: Sg.Box): void {
@@ -507,10 +519,13 @@ class AxisX extends Sg.CanvasBox {
 }
 
 const isRangeEqual = (a:DataRange, b:DataRange) =>  a.max === b.max && a.min === b.min;
+const isRangeSinglePoint = (a:DataRange) => a.max === a.min;
 
 class AxisY extends Sg.CanvasBox {
+  // Number of digits axis will be expected to show as a data legend
+  private _maxDigits = 1;
+
   seriesToShow:string|undefined;
-  maxDigits = 1;
   paddingPx = 2;
   colour?:string;
   
@@ -519,8 +534,12 @@ class AxisY extends Sg.CanvasBox {
 
   constructor(private plot:Plot) {
     super(plot, plot.canvasEl, `AxisY`);
-    this.debugLayout = false;
     this.lastRange = {min:0,max:0};
+  }
+
+  clear() {
+    this.lastRange = {min:0,max:0};
+    this.lastPlotAreaHeight = 0;
   }
 
   protected measurePreflight(): void {
@@ -540,16 +559,23 @@ class AxisY extends Sg.CanvasBox {
       }
     }  
   }
+
   protected measureSelf(opts: Sg.MeasureState): Rects.RectPositioned {
     //this.debugLog(`measureSelf. needsLayout: ${this._needsLayout} needsDrawing: ${this.needsDrawing}`);
     
     const copts = opts as Sg.CanvasMeasureState;
     const paddingPx = this.paddingPx;
+    let width = this.plot.axisWidth + paddingPx;
 
-    const textToMeasure = `9`.repeat(this.maxDigits);
-    const text = copts.ctx.measureText(textToMeasure);
-    const textWidth = paddingPx + text.width + paddingPx + this.plot.axisWidth + paddingPx;  
-    const w = opts.resolveToPx(this.desiredSize?.width, textWidth);
+    const series = this.getSeries();
+    if (series !== undefined) {
+      const r = series.visualRange;
+      this._maxDigits = Math.ceil(r.max).toString().length + series.precision + 1;
+
+      const textToMeasure = `9`.repeat(this._maxDigits);
+      width += textWidth(copts.ctx, textToMeasure, paddingPx*2);
+    }
+    const w = opts.resolveToPx(this.desiredSize?.width, width);
     return {
       x:0,
       y:0,
@@ -589,9 +615,8 @@ class AxisY extends Sg.CanvasBox {
     ctx.strokeStyle = colour;
     ctx.fillStyle = colour;
 
-    if (r.min === 0 && r.max === 0) return; // Empty
+    if (Number.isNaN(r.min)  && Number.isNaN(r.max)) return; // Empty
     this.lastRange = r;
-    this.maxDigits = Math.ceil(r.max).toString().length + series.precision + 1;
     ctx.clearRect(0,0,v.width, v.height);
  
     ctx.beginPath();
@@ -603,14 +628,23 @@ class AxisY extends Sg.CanvasBox {
 
     ctx.textBaseline = `top`;
     const fromRight = v.width - (paddingPx *4);
-    drawText(ctx, series.formatValue(r.max), size => [
-      fromRight-size.width, 
-      plotArea.computeY(series, r.max) + (width/2)
-    ]);
-    drawText(ctx, series.formatValue(r.min), size => [
-      fromRight-size.width,
-      plotArea.computeY(series, r.min) - 5
-    ]);
+
+    if (isRangeSinglePoint(r)) {
+      drawText(ctx, series.formatValue(r.max), size => [
+        fromRight-size.width, 
+        plotArea.computeY(series, r.max) - (paddingPx*4)
+      ]);
+    } else {
+      // Draw min/max data labels
+      drawText(ctx, series.formatValue(r.max), size => [
+        fromRight-size.width, 
+        plotArea.computeY(series, r.max) + (width/2)
+      ]);
+      drawText(ctx, series.formatValue(r.min), size => [
+        fromRight-size.width,
+        plotArea.computeY(series, r.min) - 5
+      ]);
+    }
   }
 }
 
@@ -647,6 +681,7 @@ export class Plot extends Sg.CanvasBox {
   series:Map<string,Series>;
   private _frozen = false;
 
+  defaultSeriesOpts?:SeriesOpts;
   constructor(canvasEl:HTMLCanvasElement, opts:Opts = {}) {
       
     if (canvasEl === undefined) throw new Error(`canvasEl undefined`);
@@ -665,10 +700,16 @@ export class Plot extends Sg.CanvasBox {
     this.legend = new Legend(this);
     this.axisX = new AxisX(this);
     this.axisY = new AxisY(this);
-
-    this.debugLayout = false;
   }
 
+  clear() {
+    this.series = new Map();
+    this.plotArea.clear();
+    this.legend.clear();
+    this.axisX.clear();
+    this.axisY.clear();
+    this.update(true);
+  }
 
   get frozen():boolean {
     return this._frozen;
@@ -676,6 +717,13 @@ export class Plot extends Sg.CanvasBox {
 
   set frozen(v:boolean) {
     this._frozen = v;
+    if (v) {
+      this.canvasEl.classList.add(`frozen`);
+      this.canvasEl.title = `Plot frozen. Tap to unfreeze`;
+    } else {
+      this.canvasEl.title = ``;
+      this.canvasEl.classList.remove(`frozen`);
+    } 
   }
 
   seriesArray():Series[] {
@@ -703,7 +751,7 @@ export class Plot extends Sg.CanvasBox {
     const create = (key:string):Series[] => {
       const v = o[key];
       if (typeof v === `object`) {
-        return this.createSeriesFromObject(v, key +'.');
+        return this.createSeriesFromObject(v, prefix + key +'.');
       } else if (typeof v === `number`) {
         return [this.createSeries(key, `stream`)];
       } else {
@@ -719,9 +767,11 @@ export class Plot extends Sg.CanvasBox {
     if (name === undefined) name = `series-${len}`;
     if (this.series.has(name)) throw new Error(`Series name '${name}' already in use`);
  
-    const opts:SeriesOpts = {
-      colour: `hsl(${len*20 % 360}, 80%,50%)`
+    let opts:SeriesOpts = {
+      colour: `hsl(${len*25 % 360}, 70%,50%)`
     }
+    if (this.defaultSeriesOpts) opts = {...this.defaultSeriesOpts, ...opts};
+    
     const s = new Series(name, type, this, opts);
     if (type === `array` && initialData !== undefined) {
       (s.source as ArrayDataSource).set(initialData);

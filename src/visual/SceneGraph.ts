@@ -85,7 +85,7 @@ export abstract class Box {
   protected readonly _parent:Box|undefined;
   private _idMap: Map<string,Box> = new Map();
 
-  debugLayout = true;
+  debugLayout = false;
   
   private _visible = true;
   protected _ready = true;
@@ -400,7 +400,7 @@ export class CanvasBox extends Box {
     
     if (this.debugLayout) {
       
-      ctx.clearRect(0,0,v.width,v.height);
+      //ctx.clearRect(0,0,v.width,v.height);
       
       ctx.lineWidth = 1;
       ctx.strokeStyle = `hsl(${this.debugHue}, 100%, 50%)`;
