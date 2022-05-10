@@ -364,6 +364,25 @@ export const translatePoint = (ctx:CanvasRenderingContext2D, point: Points.Point
 };
 
 /**
+ * Creates a new HTML IMG element with a snapshot of the
+ * canvas. Element will need to be inserted into the document.
+ * 
+ * ```
+ * const myCanvas = document.getElementById('someCanvas');
+ * const el = copyToImg(myCanvas);
+ * document.getElementById('images').appendChild(el);
+ * ```
+ * @param canvasEl 
+ * @returns 
+ */
+export const copyToImg = (canvasEl:HTMLCanvasElement): HTMLImageElement => {
+  const img = document.createElement(`img`);
+  //eslint-disable-next-line functional/immutable-data
+  img.src = canvasEl.toDataURL(`image/jpeg`);
+  return img;
+};
+
+/**
  * Draws filled circle(s) at provided point(s)
  * @param ctx
  * @param pos 
