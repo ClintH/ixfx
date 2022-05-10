@@ -11,3 +11,5 @@ export * as Bluetooth from './NordicBleDevice.js';
  * * {@link connect}: Connect to a generic Espruino
  */
 export * as Espruino from './EspruinoDevice.js';
+
+export * as Camera from './Camera.js';
