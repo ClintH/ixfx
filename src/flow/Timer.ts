@@ -138,6 +138,8 @@ export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
  *  // Do something with `v`
  * }
  * ```
+ * 
+ * If you just want to loop at a ceratin speed, consider using {@link continuously} instead.
  * @template V Returns value of `produce` function
  * @param intervalMs Interval between execution
  * @param produce Function to call
@@ -325,6 +327,9 @@ export type ContinuouslyAsyncCallback = (ticks?:number, elapsedMs?:number) => Pr
  * ```js
  * continuously(async () => { ..});
  * ```
+ * 
+ * Use `continuously` if you need a loop you can start and stop at will. 
+ * Alternatives: {@link yieldAnimationRate}
  * @param callback Function to run. If it returns false, loop exits.
  * @param resetCallback Callback when/if loop is reset. If it returns false, loop exits
  * @param intervalMs 
@@ -399,18 +404,39 @@ export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySync
 };
 
 /**
- * Pauses execution for `timeoutMs`.
+ * Returns after `timeoutMs`. 
  * 
- * @example
+ * @example In an async function
  * ```js
  * console.log(`Hello`);
  * await sleep(1000);
  * console.log(`There`); // Prints one second after
  * ```
+ * 
+ * @example As a promise
+ * ```js
+ * console.log(`Hello`);
+ * sleep(1000)
+ *  .then(() => console.log(`There`)); // Prints one second after
+ * ```
+ * 
+ * If a timeout of 0 is given, `requestAnimationFrame` is used instead of `setTimeout`.
+ * 
+ * {@link delay} and {@link sleep} are similar. `delay()` takes a parameter of what code to execute after the timeout, while `sleep()` just resolves after the timeout.
+ * 
  * @param timeoutMs
  * @return
  */
-export const sleep = <V>(timeoutMs: number): Promise<V> => new Promise<V>(resolve => setTimeout(resolve, timeoutMs));
+export const sleep = <V>(timeoutMs: number, value?:V): Promise<V|undefined> => {
+  guardInteger(timeoutMs, `positive`, `timeoutMs`);
+  if (timeoutMs === 0) {
+    return new Promise<V|undefined>(resolve => requestAnimationFrame(_ => {
+      resolve(value);
+    }));
+  } else {
+    return new Promise<V|undefined>(resolve => setTimeout(() => resolve(value), timeoutMs));
+  }
+};
 
 /**
  * Pauses execution for `timeoutMs` after which the asynchronous `callback` is executed and awaited.
@@ -420,13 +446,15 @@ export const sleep = <V>(timeoutMs: number): Promise<V> => new Promise<V>(resolv
  * const result = await delay(async () => Math.random(), 1000);
  * console.log(result); // Prints out result after one second
  * ```
+ * 
+ * {@link delay} and {@link sleep} are similar. `delay()` takes a parameter of what code to execute after the timeout, while `sleep()` just resolves after the timeout.
+ * 
  * @template V
- * @param callback
- * @param timeoutMs
- * @return
+ * @param callback What to run after `timeoutMs`
+ * @param timeoutMs How long to delay
+ * @return Returns result of `callback`.
  */
 export const delay = async <V>(callback:() => Promise<V>, timeoutMs: number): Promise<V> =>  {
-  guardInteger(timeoutMs, `aboveZero`, `timeoutMs`);
   await sleep(timeoutMs);
   return Promise.resolve(await callback());
 };
@@ -625,6 +653,7 @@ export const updateOutdated = <V>(fn:(elapsedMs?:number)=>Promise<V>, intervalMs
   //eslint-disable-next-line functional/no-let
   let intervalMsCurrent = intervalMs;
 
+  //eslint-disable-next-line no-async-promise-executor
   return () => (new Promise(async (resolve, reject) => {
     const elapsed = performance.now() - lastRun;
     if (lastValue === undefined || elapsed > intervalMsCurrent) {
@@ -704,6 +733,109 @@ export const waitFor = (timeoutMs:number, onAborted:(reason:string)=>void, onCom
 
   return done;
 };
+
+/**
+ * Async generator that loops via `requestAnimationFrame`.
+ * 
+ * ```
+ * // Loop forever 
+ * (async () => {
+ *  const loop = delayAnimationLoop();
+ *  while (true) {
+ *    await loop.next();
+ * 
+ *    // Do something...
+ *    // Warning: loops forever
+ *  }
+ * })();
+ * ```
+ * 
+ * ```
+ * const loop = delayAnimationLoop();
+ * for await (const o of loop) {
+ *  // Do something...
+ *  // Warning: loops forever
+ * }
+ * ```
+ */
+//eslint-disable-next-line func-style
+async function* delayAnimationLoop() {
+  //eslint-disable-next-line functional/no-let,@typescript-eslint/no-explicit-any
+  let resolve:any;
+  //eslint-disable-next-line functional/no-let
+  let p = new Promise<undefined>(r => resolve = r);
+  //eslint-disable-next-line functional/no-let
+  let timer = 0;
+  const callback = () => {
+    resolve();
+    p = new Promise<undefined>(r => resolve = r);
+  };
+
+  try {
+    //eslint-disable-next-line functional/no-loop-statement
+    while (true) {
+      timer = window.requestAnimationFrame(callback);
+      yield await p;
+    }
+  } finally {
+    resolve();
+    window.cancelAnimationFrame(timer);
+  }
+}
+
+/**
+ * Async generator that loops at a given `timeoutMs`.
+ * 
+ * @example Loop runs every second
+ * ```
+ * // Loop forever 
+ * (async () => {
+ *  const loop = delayLoop(1000);
+ *  while (true) {
+ *    await loop.next();
+ * 
+ *    // Do something...
+ *    // Warning: loops forever
+ *  }
+ * })();
+ * ```
+ * 
+ * @example For Await loop every second
+ * ```
+ * const loop = delayLoop(1000);
+ * for await (const o of loop) {
+ *  // Do something...
+ *  // Warning: loops forever
+ * }
+ * ```
+ * @param timeoutMs Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
+ */
+//eslint-disable-next-line func-style
+export async function* delayLoop(timeoutMs:number) {
+  if (timeoutMs === 0) return yield* delayAnimationLoop();
+
+  //eslint-disable-next-line functional/no-let,@typescript-eslint/no-explicit-any
+  let resolve:any;
+  //eslint-disable-next-line functional/no-let
+  let p = new Promise<undefined>(r => resolve = r);
+  //eslint-disable-next-line functional/no-let
+  let timer = 0;
+  const callback = () => {
+    resolve();
+    p = new Promise<undefined>(r => resolve = r);
+  };
+
+  try {
+    //eslint-disable-next-line functional/no-loop-statement
+    while (true) {
+      timer = window.setTimeout(callback, timeoutMs);
+      yield await p;
+    }
+  } finally {
+    resolve();
+    window.clearTimeout(timer);
+  }
+}
 
 // const counterG = count(5);
 // const inter = interval(counterG, 1000);
