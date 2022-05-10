@@ -10,7 +10,13 @@
  *  t.avg / t.min/ t.max / t.getMinMax()
  * ```
  * 
- * Use `reset()` to clear everything, or `resetAvg()` to only reset averaging calculation
+ * Use `reset()` to clear everything, or `resetAvg()` to only reset averaging calculation.
+ * 
+ * Trackers can automatically reset after a given number of samples
+ * ```
+ * // reset after 100 samples
+ * const t = tracker(`something`, 100);
+ * ```
  * @class Tracker
  */
 export class Tracker {
@@ -19,9 +25,11 @@ export class Tracker {
   min = 0;
   max = 0;
   id: string | undefined;
+  resetAfterSamples?:number;
 
-  constructor(id: string | undefined = undefined) {
+  constructor(id: string | undefined = undefined, resetAfterSamples?:number) {
     this.id = id;
+    this.resetAfterSamples = resetAfterSamples;
   }
 
   get avg() { return this.total / this.samples; }
@@ -40,6 +48,7 @@ export class Tracker {
 
   seen(sample: number) {
     if (Number.isNaN(sample)) throw Error(`Cannot add NaN`);
+    if (this.resetAfterSamples !== undefined && this.samples > this.resetAfterSamples) this.reset();
     this.samples++;
     this.total += sample;
     this.min = Math.min(sample, this.min);
@@ -55,7 +64,7 @@ export class Tracker {
   }
 }
 
-export const tracker = (id?:string) => new Tracker(id);
+export const tracker = (id?:string, resetAfterSamples?:number) => new Tracker(id, resetAfterSamples);
 
 /**
  * A `Tracker` that tracks interval between calls to `mark()`
@@ -66,27 +75,27 @@ export const tracker = (id?:string) => new Tracker(id);
  */
 export class IntervalTracker extends Tracker {
   lastMark = 0;
-  perf;
-  constructor(id: string | undefined = undefined) {
-    super(id);
-    if (typeof performance === `undefined`) {
-      try {
-        //eslint-disable-next-line @typescript-eslint/no-var-requires
-        const p = require(`perf_hooks`);
-        this.perf = p.performance.now;
-      } catch (err) {
-        // no-op
-      }
-    } else {
-      this.perf = window.performance.now;
-    }
+  //perf;
+  constructor(id: string | undefined = undefined, resetAfterSamples?:number) {
+    super(id, resetAfterSamples);
+    // if (typeof window.performance === `undefined`) {
+    //   try {
+    //     //eslint-disable-next-line @typescript-eslint/no-var-requires
+    //     const p = require(`perf_hooks`);
+    //     this.perf = p.performance.now;
+    //   } catch (err) {
+    //     // no-op
+    //   }
+    // } else {
+    //   this.perf = window.performance.now;
+    // }
   }
 
   mark() {
     if (this.lastMark > 0) {
-      this.seen(this.perf() - this.lastMark);
+      this.seen(window.performance.now() - this.lastMark);
     }
-    this.lastMark = this.perf();
+    this.lastMark = window.performance.now();
   }
 }
 
@@ -108,7 +117,13 @@ export class IntervalTracker extends Tracker {
  * // Longest and shortest times are available too...
  * t.min; t.max
  * ```
+ * 
+ * Interval tracker can automatically reset after a given number of samples:
+ * ```
+ * // Reset after 100 samples
+ * const t = intervalTracker(`tracker`, 100);
+ * ```
  * @param id Optional id of instance
  * @returns New interval tracker
  */
-export const intervalTracker = (id?:string) => new IntervalTracker(id);
+export const intervalTracker = (id?:string, resetAfterSamples?:number) => new IntervalTracker(id, resetAfterSamples);
