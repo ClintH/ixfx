@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -14,7 +14,28 @@
   "module": "./dist/bundle.js",
   "exports": {
     ".": "./dist/bundle.js",
-    "./lib/*": "./dist/*.js"
+    "./lib/*": "./dist/*.js",
+    "./collections.js": "./dist/collections.js",
+    "./audio.js": "./dist/audio.js",
+    "./arrays.js": "./dist/arrays.js",
+    "./components.js": "./dist/components.js",
+    "./forms.js": "./dist/forms.js",
+    "./dom.js": "./dist/dom.js",
+    "./flow.js": "./dist/flow.js",
+    "./geometry.js": "./dist/geometry.js",
+    "./generators.js": "./dist/generators.js",
+    "./keyValues.js": "./dist/keyValues.js",
+    "./modulation.js": "./dist/modulation.js",
+    "./maps.js": "./dist/maps.js",
+    "./io.js": "./dist/io/js",
+    "./random.js": "./dist/random.js",
+    "./sets.js": "./dist/sets.js",
+    "./stateMachine.js": "./dist/stateMachine.js",
+    "./svg.js": "./dist/svg.js",
+    "./temporal.js": "./dist/temporal.js",
+    "./text.js": "./dist/text.js",
+    "./util.js": "./dist/util.js",
+    "./visual.js": "./dist/visual.js"
   },
   "browsersList": [
     ">2% and last 2 versions and not ie 6-11"

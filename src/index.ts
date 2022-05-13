@@ -69,6 +69,8 @@ export * as Dom from './dom/index.js';
 
 export * as Audio from './audio/index.js';
 
+export * as Events from './Events.js';
+
 /**
  * The Modulation module contains functions for, well, modulating data.
  * 

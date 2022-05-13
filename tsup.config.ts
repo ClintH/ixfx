@@ -9,6 +9,7 @@ export default defineConfig({
     collections: `./src/collections/index.ts`,
     forms: `./src/dom/Forms.ts`,
     dom: `./src/dom/index.ts`,
+    events: `./src/Events.ts`,
     flow: './src/flow/index.ts',
     geometry: `./src/geometry/index.ts`,
     generators: `./src/Generators.ts`,
