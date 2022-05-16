@@ -508,6 +508,9 @@ export interface CircularArray<V> extends Array<V> {
    * Removes all data
    */
   clear():void
+
+  
+  keys():IterableIterator<string>;
 }
 
 /**

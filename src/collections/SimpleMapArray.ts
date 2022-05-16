@@ -13,6 +13,11 @@ class SimpleMapArrayMutableImpl<V> {
     }
   }
 
+  keys():IterableIterator<string> {
+    return this.#map.keys();
+  }
+
+  
   debugString(): string {
     // eslint-disable-next-line functional/no-let
     let r = ``;
