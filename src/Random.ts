@@ -220,3 +220,12 @@ export const float = (max:number, min:number = 0) => Math.random() * (max - min)
  * @returns Random string
  */
 export const string = (length:number) => Math.random().toString(36).substring(2, length+2);
+
+export const shortGuid = () => {
+  // Via Stackoverflow...
+  const firstPart = (Math.random() * 46656) | 0;
+  const secondPart = (Math.random() * 46656) | 0;
+  const firstPartStr = `000${firstPart.toString(36)}`.slice(-3);
+  const secondPartStr = `000${secondPart.toString(36)}`.slice(-3);
+  return firstPartStr + secondPartStr;
+};
