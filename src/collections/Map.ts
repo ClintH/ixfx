@@ -25,6 +25,49 @@ export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, compare
 };
 
 /**
+ * Returns a function that fetches a value from a map, or generates and sets it if not present.
+ * Undefined is never returned, because if `fn` yields that, an error is thrown.
+ * 
+ * See {@link getOrGenerateSync} for a synchronous version.
+ * 
+ * ```
+ * const m = getOrGenerate(new Map(), (key) => {
+ *  return key.toUppercase();
+ * });
+ * 
+ * // Not contained in map, so it will run the uppercase function
+ * const v = await m(`hello`);
+ * const v1 = await m(`hello`); // Value exists, so it is returned.
+ * ```
+ */
+//eslint-disable-next-line functional/prefer-readonly-type
+export const getOrGenerate = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>Promise<V>|V) => async (key:K, args?:Z):Promise<V> => {
+  //eslint-disable-next-line functional/no-let
+  let value = map.get(key);
+  if (value !== undefined) return Promise.resolve(value);
+  value = await fn(key, args);
+  if (value === undefined) throw new Error(`fn returned undefined`);
+  map.set(key, value);
+  return value;
+};
+
+/**
+ * @inheritdoc getOrGenerate
+ * @param map 
+ * @param fn 
+ * @returns 
+ */
+//eslint-disable-next-line functional/prefer-readonly-type
+export const getOrGenerateSync = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>V) => (key:K, args?:Z):V => {
+  //eslint-disable-next-line functional/no-let
+  let value = map.get(key);
+  if (value !== undefined) return value;
+  value = fn(key, args);
+  map.set(key, value);
+  return value;
+};
+
+/**
  * Adds items to a map only if their key doesn't already exist 
  * 
  * Uses provided {@link ToString} function to create keys for items. Item is only added if it doesn't already exist.
