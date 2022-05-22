@@ -22,6 +22,8 @@ export {Palette,  Drawing, Svg, Plot, Plot2, SceneGraph};
 
 export * as Video from './Video.js';
 
-// @ts-ignore
-//eslint-disable-next-line functional/immutable-data
-if (window !== undefined) window.ixfx = {Drawing, Svg, Plot, Palette, Colour};
+try {
+  // @ts-ignore
+  //eslint-disable-next-line functional/immutable-data
+  if (typeof window !== `undefined`) window.ixfx = {Drawing, Svg, Plot, Palette, Colour};
+} catch {}
