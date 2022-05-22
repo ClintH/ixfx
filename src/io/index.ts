@@ -14,4 +14,11 @@ export * as Espruino from './EspruinoDevice.js';
 
 export * as Camera from './Camera.js';
 
+/**
+ * Microcontrollers such as Arduinos connected via USB serial
+ * 
+ * Overview
+ * * {@link Serial.Device}
+ * 
+ */
 export * as Serial from './Serial.js';
