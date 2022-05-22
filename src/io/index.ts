@@ -13,3 +13,5 @@ export * as Bluetooth from './NordicBleDevice.js';
 export * as Espruino from './EspruinoDevice.js';
 
 export * as Camera from './Camera.js';
+
+export * as Serial from './Serial.js';

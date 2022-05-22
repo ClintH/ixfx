@@ -7,6 +7,7 @@ export class StringWriteBuffer {
   queue: QueueMutable<string>;
   writer: Continuously;
   intervalMs: number;
+  stream:WritableStream<string>|undefined;
 
   constructor(private onData: (data: string) => Promise<void>, private chunkSize = -1) {
     this.intervalMs = 10;
@@ -18,14 +19,32 @@ export class StringWriteBuffer {
     this.queue = queueMutable<string>();
   }
 
+  writable() {
+    if (this.stream === undefined) this.stream = this.createWritable();
+    return this.stream;
+  }
+
+  private createWritable() {
+    //eslint-disable-next-line @typescript-eslint/no-this-alias
+    const b = this;
+    return new WritableStream<string>({
+      write(chunk) {
+        b.add(chunk);
+      },
+      close() {
+        b.clear();
+      }
+    });
+  }
+
   async onWrite(): Promise<boolean> {
     if (this.queue.isEmpty) {
-      console.debug(`WriteBuffer.onWrite: queue empty`);
+      //console.warn(`WriteBuffer.onWrite: queue empty`);
       return false; // Stop continuously
     }
 
     if (this.paused) {
-      console.debug(`WriteBuffer.onWrite: paused...`);
+      console.warn(`WriteBuffer.onWrite: paused...`);
       return true; // Keep going tho
     }
 
@@ -39,7 +58,7 @@ export class StringWriteBuffer {
 
   add(str: string) {
     // Add whole string or chunked string
-    if (this.chunkSize) {
+    if (this.chunkSize > 0) {
       this.queue.enqueue(...splitByLength(str, this.chunkSize));
     } else {
       this.queue.enqueue(str);

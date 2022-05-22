@@ -1,70 +1,112 @@
-// Source: Love Lagerkvist (https://github.com/motform)
-// https://gist.githubusercontent.com/motform/41f3c573e54f9373107ac070ec05afea/raw/7b112fed0a6479e8ec5b3b3a9fce75f94b2f605b/webSerialRead.js
-//  Partially adapted from https://github.com/svendahlstrand/web-serial-api and https://web.dev/serial/
+import {JsonDevice, Opts as JsonDeviceOpts} from "./JsonDevice.js";
 
-// const guard = (port:SerialPort) => {
-//   if (port === undefined) throw new Error(`port undefined`);
-//   if (port === null) throw new Error(`port null`);
-// };
+export type Opts = JsonDeviceOpts & {
+  readonly filters?:ReadonlyArray<SerialPortFilter>
+  readonly baudRate?:number;
+}
 
 /**
- * Reads from a serial port in a line-by-line fashion. 
- * Assumes \n as a line separator.
+ * Serial device. Assumes data is sent with new line characters (\r\n) between messages.
  * 
- * @example
- * ```js
- * document.querySelector(`btnStart`).addEventListener(`click`, async () => {
- *  const port = await navigator.serial.requestPort();
- *  await port.open({baudRate: 9600});
- *  read(port, line => {
- *    // Do something with line (string)
- *  });
+ * ```
+ * const s = new Device();
+ * s.addEventListener(`change`, evt => {
+ *  console.log(`State change ${evt.priorState} -> ${evt.newState}`);
+ *  if (evt.newState === `connected`) {
+ *    // Do something when connected...
+ *  }
+ * });
+ * 
+ * // In a UI event handler...
+ * s.connect();
+ * ```
+ * 
+ * Reading incoming data:
+ * ```
+ * // Parse incoming data as JSON
+ * s.addEventListener(`data`, evt => {
+ *  try {
+ *    const o = JSON.parse(evt.data);
+ *    // If we get this far, JSON is legit 
+ *  } catch (ex) {
+ *  }
  * });
  * ```
- * @param port Opened port to read from
- * @param separator Line separator `\n` by default 
- * @param callback Callback for each line read
+ * 
+ * Writing to the microcontroller
+ * ```
+ * s.write(JSON.stringify({msg:"hello"}));
+ * ```
  */
-// export const read = async (port:SerialPort, callback:(line:string)=>void, separator = `\n`) => {
-//   guard(port);
+export class Device extends JsonDevice {
+  port:SerialPort|undefined;
+  tx:WritableStreamDefaultWriter<string>|undefined;
 
-//   const textDecoder = new TextDecoderStream();
-//   const readable = port.readable;
-  
-//   if (readable === null) throw new Error(`Could not open readable stream from port`);
-//   readable.pipeTo(textDecoder.writable);
-  
-//   const reader = textDecoder.readable.getReader();
-  
-//   //eslint-disable-next-line functional/no-let
-//   let lineBuffer = ``;
+  baudRate:number;
 
-//   // Listen to data coming from the serial device.
-//   //eslint-disable-next-line functional/no-loop-statement,no-constant-condition
-//   while (true) {
-//     const {done, value} = await reader.read();
+  constructor(private config:Opts = {}) {
+    super(config);
+    this.baudRate = config.baudRate ?? 9600;
+    if (config.name === undefined) super.name = `Serial.Device`;
 
-//     if (done) {
-//       reader.releaseLock();
-//       break;
-//     }
+    // Serial.println on microcontroller == \r\n
+    this.rxBuffer.separator = `\r\n`;
+  }
 
-//     lineBuffer += value;
-//     const lines = lineBuffer.split(separator);
-//     //eslint-disable-next-line functional/no-loop-statement
-//     while (lines.length > 1) {
-//       //eslint-disable-next-line functional/immutable-data
-//       lineBuffer = lines.pop() as string;
-//       //eslint-disable-next-line functional/immutable-data
-//       const line = lines.pop();
-//       if (line !== undefined) {
-//         
-//         try {
-//           callback(JSON.parse(line.trim()));
-//         } catch (error) {
-//           console.warn(`Discarding malformed JSON: ${line}`);
-//         }
-//       }
-//     }
-//   }
-// };
+  /**
+   * Writes text collected in buffer
+   * @param txt 
+   */
+  protected async writeInternal(txt: string) {
+    if (this.tx === undefined) throw new Error(`tx not ready`);
+    try {
+      this.tx.write(txt);
+    } catch (ex:unknown) {
+      this.warn(ex);
+    }
+  }
+
+  onClosed(): void {
+    try {
+      this.port?.close();
+    } catch (ex) {
+      this.warn(ex);
+    }
+    this.states.state = `closed`; 
+  }
+
+  onPreConnect(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  async onConnectAttempt(): Promise<void> {
+    //eslint-disable-next-line functional/no-let
+    let reqOpts:SerialPortRequestOptions = { };
+    const openOpts:SerialOptions = {
+      baudRate: this.baudRate
+    };
+
+    if (this.config.filters) reqOpts = { filters: [...this.config.filters] };
+    this.port = await navigator.serial.requestPort(reqOpts);
+
+    this.port.addEventListener(`disconnect`, _ => {
+      this.close();
+    });
+
+    await this.port.open(openOpts);
+
+    const txW = this.port.writable;
+    const txText = new TextEncoderStream();
+    if (txW !== null) {
+      txText.readable.pipeTo(txW);
+      this.tx = txText.writable.getWriter();
+    }
+
+    const rxR = this.port.readable;
+    const rxText = new TextDecoderStream();
+    if (rxR !== null) {
+      rxR.pipeTo(rxText.writable);
+      rxText.readable.pipeTo(this.rxBuffer.writable());
+    }
+  }
+}

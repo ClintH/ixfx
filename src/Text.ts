@@ -23,6 +23,7 @@ export const between = (source: string, start: string, end?: string, lastEndMatc
   return source.substring(startPos+1, endPos);
 };
 
+
 /**
  * Returns first position of the given character code, or -1 if not found.
  * @param source Source string

@@ -1,0 +1,167 @@
+import {SimpleEventEmitter} from "../Events.js";
+import {StateChangeEvent, StateMachine} from "../flow/StateMachine";
+import {indexOfCharCode, omitChars} from "../Text";
+import {Codec} from "./Codec";
+import {StringReceiveBuffer} from "./StringReceiveBuffer";
+import {StringWriteBuffer} from "./StringWriteBuffer";
+import {retry} from "../flow/Timer.js";
+
+export type Opts = {
+  readonly chunkSize?: number
+  readonly name?: string
+  readonly connectAttempts?: number
+  readonly debug?: boolean
+}
+
+export type DataEvent = {
+  readonly data: string
+}
+
+type Events = {
+  readonly data: DataEvent
+  readonly change: StateChangeEvent
+};
+
+export abstract class JsonDevice extends SimpleEventEmitter<Events> {
+  states: StateMachine;
+  codec: Codec;
+
+  verboseLogging = false;
+  name:string;
+  connectAttempts:number;
+  chunkSize:number;
+
+  rxBuffer: StringReceiveBuffer;
+  txBuffer: StringWriteBuffer;
+
+  constructor(config: Opts = {}) {
+    super();
+
+    // Init
+    this.verboseLogging = config.debug ?? false;
+    this.chunkSize = config.chunkSize ?? 1024;
+    this.connectAttempts = config.connectAttempts ?? 3;
+    this.name = config.name ?? `JsonDevice`;
+
+    // Transmit buffer
+    this.txBuffer = new StringWriteBuffer(async data => {
+      // When we have data to actually write to device
+      await this.writeInternal(data);
+    }, config.chunkSize);
+
+    // Receive buffer
+    this.rxBuffer = new StringReceiveBuffer(line => {
+      this.fireEvent(`data`, {data: line});
+    });
+
+    this.codec = new Codec();
+    this.states = new StateMachine(`ready`, {
+      ready: `connecting`,
+      connecting: [`connected`, `closed`],
+      connected: [`closed`],
+      closed: `connecting`
+    });
+
+    this.states.addEventListener(`change`, evt => {
+      this.fireEvent(`change`, evt);
+      this.verbose(`${evt.priorState} -> ${evt.newState}`);
+      if (evt.priorState === `connected`) {
+        // Clear out buffers
+        this.rxBuffer.clear();
+        this.txBuffer.clear();
+      }
+    });
+  }
+
+  get isConnected(): boolean {
+    return this.states.state === `connected`;
+  }
+
+  get isClosed(): boolean {
+    return this.states.state === `closed`;
+  }
+
+  write(txt: string) {
+    if (this.states.state !== `connected`) throw new Error(`Cannot write while state is ${this.states.state}`);
+    this.txBuffer.add(txt);
+  }
+
+  /**
+   * Writes text to output device
+   * @param txt 
+   */
+  protected abstract writeInternal(txt: string):void;
+
+  close() {
+    if (this.states.state !== `connected`) return;
+    
+    this.onClosed();
+  }
+
+  /**
+   * Must change state
+   */
+  abstract onClosed():void;
+
+  abstract onPreConnect():Promise<void>;
+
+  async connect() {
+    const attempts = this.connectAttempts;
+
+    this.states.state = `connecting`;
+    await this.onPreConnect();
+    
+    await retry(async () => {
+      await this.onConnectAttempt();   
+      this.states.state = `connected`;
+    }, attempts, 200);
+  }
+
+  /**
+   * Should throw if did not succeed.
+   */
+  abstract onConnectAttempt():Promise<void>;
+
+  private onRx(evt: Event) {
+    //const rx = this.rx;
+    //if (rx === undefined) return;
+
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const view = (evt.target as any).value as DataView;
+    if (view === undefined) return;
+
+    //eslint-disable-next-line functional/no-let
+    let str = this.codec.fromBuffer(view.buffer);
+
+    // Check for flow control chars
+    const plzStop = indexOfCharCode(str, 19);
+    const plzStart = indexOfCharCode(str, 17);
+
+    // Remove if found
+    if (plzStart && plzStop < plzStart) {
+      this.verbose(`Tx plz start`);
+      str = omitChars(str, plzStart, 1);
+      this.txBuffer.paused = false;
+    }
+    if (plzStop && plzStop > plzStart) {
+      this.verbose(`Tx plz stop`);
+      str = omitChars(str, plzStop, 1);
+      this.txBuffer.paused = true;
+    }
+
+    this.rxBuffer.add(str);
+  }
+
+  protected verbose(m: string) {
+    if (this.verboseLogging) console.info(`${this.name} `, m);
+  }
+
+  protected log(m: string) {
+    console.log(`${this.name} `, m);
+  }
+
+  protected warn(m: unknown) {
+    console.warn(`${this.name} `, m);
+  }
+}
+

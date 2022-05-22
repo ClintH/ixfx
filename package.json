@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -21,6 +21,7 @@
     "./components.js": "./dist/components.js",
     "./forms.js": "./dist/forms.js",
     "./dom.js": "./dist/dom.js",
+    "./events.js": "./dist/events.js",
     "./flow.js": "./dist/flow.js",
     "./geometry.js": "./dist/geometry.js",
     "./generators.js": "./dist/generators.js",
