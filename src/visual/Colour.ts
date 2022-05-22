@@ -48,6 +48,45 @@ export const toHsl = (colour:Colourish):Hsl => {
   else return hsl;
 }
 
+
+/**
+ * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
+ * It's useful for generating perceptually different shades as the index increments.
+ * 
+ * ```
+ * el.style.backgroundColor = goldenAgeColour(10);
+ * ```
+ * 
+ * Saturation and lightness can be specified, as numeric ranges of 0-1.
+ * 
+ * @param saturation Saturation (0-1), defaults to 0.5
+ * @param lightness Lightness (0-1), defaults to 0.75
+ * @returns HSL colour string eg `hsl(20,50%,75%)`
+ */
+export const goldenAngleColour = (index: number, saturation = 0.5, lightness = 0.75) => {
+  guardNumber(index, `positive`, `index`);
+  guardNumber(saturation, `percentage`, `saturation`);
+  guardNumber(lightness, `percentage`, `lightness`);
+
+  // Via Stackoverflow
+  const hue = index * 137.508; // use golden angle approximation
+  return `hsl(${hue},${saturation*100}%,${lightness*100}%)`;
+}
+
+/**
+ * Returns a random hue component
+ * ```
+ * // Generate hue
+ * const h =randomHue(); // 0-359
+ * 
+ * // Generate hue and assign as part of a HSL string
+ * el.style.backgroundColor = `hsl(${randomHue(), 50%, 75%})`;
+ * ```
+ * 
+ * 
+ * @param rand 
+ * @returns 
+ */
 export const randomHue = (rand:RandomSource = defaultRandom): number => {
   const r = rand();
   return r * 360;
@@ -250,7 +289,6 @@ const isRgb = (p: Colour|d3Colour.ColorCommonInstance|Rgb): p is Rgb => {
   if ((p as Rgb).b === undefined) return false;
   return true;
 };
-
 
 const rgbToHsl = (r:number, g:number, b:number):Hsl => {
   r /= 255;
