@@ -102,6 +102,55 @@ export const parentSize = <V extends HTMLElement>(domQueryOrEl:string|V, onResiz
 };
 
 /**
+ * Source: https://zellwk.com/blog/translate-in-javascript
+ * @param domQueryOrEl 
+ */
+export const getTranslation = (domQueryOrEl:string|HTMLElement): Points.Point => {
+  // Source:
+  // https://raw.githubusercontent.com/zellwk/javascript/master/src/browser/dom/translate-values.js
+
+  const el = resolveEl<HTMLElement>(domQueryOrEl);
+  const style = window.getComputedStyle(el);
+  const matrix = style.transform;
+
+  // No transform property. Simply return 0 values.
+  if (matrix === `none` || typeof matrix === `undefined`) {
+    return {
+      x: 0,
+      y: 0,
+      z: 0
+    };
+  }
+
+  // Can either be 2d or 3d transform
+  const matrixType = matrix.includes(`3d`) ? `3d` : `2d`;
+  // @ts-ignore
+  const matrixValues = matrix.match(/matrix.*\((.+)\)/)[1].split(`, `);
+
+  // 2d Matrixes have 6 values
+  // Last 2 values are X and Y.
+  // 2d Matrixes does not have Z value.
+  if (matrixType === `2d`) {
+    return {
+      x: parseFloat(matrixValues[4]),
+      y: parseFloat(matrixValues[5]),
+      z: 0
+    };
+  }
+
+  // 3d Matrixes have 16 values
+  // The 13th, 14th, and 15th values are X, Y, and Z
+  if (matrixType === `3d`) {
+    return {
+      x: parseFloat(matrixValues[12]),
+      y: parseFloat(matrixValues[13]),
+      z: parseFloat(matrixValues[14])
+    };
+  }
+
+  return {x: 0, y: 0, z:0};
+};
+/**
  * Resizes given canvas element to its parent element. To resize canvas to match the viewport, use {@link fullSizeCanvas}.
  * 
  * Provide a callback for when resize happens.
@@ -121,7 +170,9 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
   
   //const safetyMargin = 4;
 
+  //eslint-disable-next-line functional/immutable-data
   el.style.width = `100%`;
+  //eslint-disable-next-line functional/immutable-data
   el.style.height = `100%`;
 
   //console.log('parent height: ' + parent.getBoundingClientRect().height);
