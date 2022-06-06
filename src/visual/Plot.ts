@@ -179,7 +179,7 @@ export const calcScale = (buffer:BufferType, drawingOpts:DrawingOpts, seriesColo
       colour = seriesColours[s];
     }
     if (colour == undefined) {
-      if (drawingOpts.defaultSeriesVariable) colour = Colour.getCssVariable(`yellow`, drawingOpts.defaultSeriesColour);
+      if (drawingOpts.defaultSeriesVariable) colour = Colour.getCssVariable(`accent`, drawingOpts.defaultSeriesColour);
       else colour = drawingOpts.defaultSeriesColour;
     }
 
@@ -278,7 +278,7 @@ export const draw = (buffer:BufferType, drawing:DrawingOpts) => {
   };
   
   const ptr = Drawing.translatePoint(ctx, drawing.pointer);
-  console.log(ptr);
+  //console.log(ptr);
 
   // Draw data for each series
   series.forEach(s => {
@@ -627,7 +627,7 @@ export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter 
     capacity, coalesce, plotSize, canvasSize, ctx,
     textHeight: opts.textHeight ?? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
     style: opts.style ?? `connected`,
-    defaultSeriesColour: opts.defaultSeriesColour ?? `black`,
+    defaultSeriesColour: opts.defaultSeriesColour ?? `yellow`,
     margin: 3,
     clearCanvas:true,
     leadingEdgeDot:true,

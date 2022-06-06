@@ -4,6 +4,7 @@ import {clamp, scale} from "../Util.js";
 /**
  * Normalises numbers, adjusting min/max as new values are processed.
  * Normalised return values will be in the range of 0-1 (inclusive).
+ * [Read more in the docs]{@link https://clinth.github.io/ixfx-docs/temporal/normalising/}
  * 
  * @example
  * ```js
@@ -47,7 +48,7 @@ export const stream = (minDefault?:number, maxDefault?:number) => {
 
 /**
  * Normalises an array. By default uses the actual min/max of the array
- * as the normalisation range.
+ * as the normalisation range. [Read more in the docs]{@link https://clinth.github.io/ixfx-docs/temporal/normalising/}
  * 
  * ```js
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]

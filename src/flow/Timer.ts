@@ -36,7 +36,8 @@ export type Timeout = HasCompletion & {
 }
 
 /**
- * Creates a debounce function
+ * Creates a debounce function.
+ * 
  * ```js
  * // Create
  * const d = debounce(fn, 1000);
@@ -139,7 +140,7 @@ export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
  * }
  * ```
  * 
- * If you just want to loop at a ceratin speed, consider using {@link continuously} instead.
+ * If you just want to loop at a certain speed, consider using {@link continuously} instead.
  * @template V Returns value of `produce` function
  * @param intervalMs Interval between execution
  * @param produce Function to call
@@ -689,16 +690,19 @@ export const updateOutdated = <V>(fn:(elapsedMs?:number)=>Promise<V>, intervalMs
  *  // Called if we were aborted or finished succesfully.
  *  // onComplete will be called after onAborted, if it was an error case
  * }
+ * 
+ * // If done() is not called after 1000, onAborted will be called
+ * // if done() is called or there was a timeout, onComplete is called
  * const done = waitFor(1000, onAborted, onComplete);
  * 
- * // Call done if your code completed successfully:
+ * // Signal completed successfully (thus calling onComplete(true))
  * done();
  * 
- * // Or if there was an error
+ * // Signal there was an error (thus calling onAborted and onComplete(false))
  * done(`Some error`);
  * ```
  * 
- * The completion handler is used for removing event handlers.
+ * The completion handler is useful for removing event handlers.
  * 
  * @param timeoutMs 
  * @param onAborted 

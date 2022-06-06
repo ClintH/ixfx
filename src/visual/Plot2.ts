@@ -14,6 +14,7 @@ interface DataSource {
   type: string
   get range():DataRange
   add(value:number):void
+  clear():void
 }
 
 /**
@@ -83,6 +84,10 @@ class ArrayDataSource implements DataSource {
     this.series = series;
     this.data = [];
     this.dirty = true;
+  }
+
+  clear() {
+    this.set([]);
   }
 
   set(data:number[]) {
@@ -161,6 +166,7 @@ class Series {
     } else if (sourceType === `stream`) {
       this.source = new StreamingDataSource(this);
     } else throw new Error(`Unknown sourceType. Expected array|stream`);
+
   }
 
   formatValue(v:number) {
@@ -205,6 +211,11 @@ class Series {
 
   add(value:number) {
     this.source.add(value);
+    this.plot.plotArea.needsDrawing = true;
+  }
+
+  clear() {
+    this.source.clear();
     this.plot.plotArea.needsDrawing = true;
   }
 }
@@ -295,7 +306,7 @@ class PlotArea extends Sg.CanvasBox {
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
     if (this.plot.frozen) return;
-    const series = [...this.plot.series.values()];
+    const series = this.plot.seriesArray();// [...this.plot.series.values()];
     ctx.clearRect(0, 0, this.visual.width, this.visual.height);
 
     series.forEach(series => {      
@@ -340,14 +351,13 @@ class PlotArea extends Sg.CanvasBox {
 
       for (let i=0;i<d.length;i++) {
         const scaled = clamp(series.scaleValue(d[i]));
-     
         y = padding + this.paddingPx + (v.height * flip(scaled));
         shapes.push({x, y, index:i, value:d[i]});
 
         if (i == 0) ctx.moveTo(x+pxPerPt/2, y);
         else ctx.lineTo(x+pxPerPt/2,y);
        
-        if (y>this.visual.height) console.log(y + ' h: ' + this.visual.height);
+        if (y>this.visual.height) console.warn(y + ' h: ' + this.visual.height);
         x += pxPerPt;
       }
       ctx.strokeStyle = series.colour;
@@ -683,7 +693,6 @@ export class Plot extends Sg.CanvasBox {
 
   defaultSeriesOpts?:SeriesOpts;
   constructor(canvasEl:HTMLCanvasElement, opts:Opts = {}) {
-      
     if (canvasEl === undefined) throw new Error(`canvasEl undefined`);
     super(undefined, canvasEl, `Plot`);
   
@@ -761,21 +770,22 @@ export class Plot extends Sg.CanvasBox {
     return keys.flatMap(create);
   }
 
-  createSeries(name?:string, type:`stream`|`array` = `array`, initialData?:number[]):Series {
+  createSeries(name?:string, type:`stream`|`array` = `array`, seriesOpts?:SeriesOpts):Series {
     const len = this.seriesLength;
 
     if (name === undefined) name = `series-${len}`;
     if (this.series.has(name)) throw new Error(`Series name '${name}' already in use`);
  
     let opts:SeriesOpts = {
-      colour: `hsl(${len*25 % 360}, 70%,50%)`
-    }
+      colour: `hsl(${len*25 % 360}, 70%,50%)`,
+      ...seriesOpts
+    };
     if (this.defaultSeriesOpts) opts = {...this.defaultSeriesOpts, ...opts};
     
     const s = new Series(name, type, this, opts);
-    if (type === `array` && initialData !== undefined) {
-      (s.source as ArrayDataSource).set(initialData);
-    }
+    // if (type === `array` && initialData !== undefined) {
+    //   (s.source as ArrayDataSource).set(initialData);
+    // }
     
     this.series.set(name, s);
     this.setReady(true, true);

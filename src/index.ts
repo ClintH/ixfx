@@ -1,5 +1,10 @@
 /**
- * Processing streams of data
+ * Processing streams of data. [Read more in the docs]{@link https://clinth.github.io/ixfx-docs/temporal/normalising/}
+ * 
+ * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
+ * * {@link frequencyMutable}: Count occurences of a value
+ * * {@link Normalise.stream}: Normalises a stream of values
+ * * {@link Normalise.array}: Normalises an array of values
  */
 export * as Temporal from './temporal/index.js';
 

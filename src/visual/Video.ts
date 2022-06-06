@@ -111,7 +111,7 @@ export async function* frames(sourceVideoEl:HTMLVideoElement, opts:FramesOpts = 
 /**
  * Captures frames from a video element. It can send pixel data to a function or post to a worker script.
  * 
- * ```@example Using a function
+ * ```js @example Using a function
  * capture(sourceVideoEl, {
  *  onFrame(imageData => {
  *    // Do something with pixels...
@@ -119,7 +119,7 @@ export async function* frames(sourceVideoEl:HTMLVideoElement, opts:FramesOpts = 
  * });
  * ```
  * 
- * ```@example Using a worker
+ * ```js @example Using a worker
  * capture(sourceVideoEl, {
  *  workerScript: `./frameProcessor.js`
  * });
