@@ -1,59 +1,55 @@
 import {parentSizeCanvas} from '../../../dist/dom.js';
 import {Drawing} from '../../../dist/visual.js';
-import {Polar, Lines} from '../../../dist/geometry.js';
-import {Shapes} from '../../../dist/geometry.js';
+import {Lines, Shapes, Triangles} from '../../../dist/geometry.js';
 
 const canvasEl = document.getElementById(`plot`);
 parentSizeCanvas('#plot', (args) => {
-  console.log('resize');
-  draw();
+  drawLine();
 });
 
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvasEl.getContext(`2d`);
 
-// /**
-//  * 
-//  * @param {number} points 
-//  * @param {number} inner 
-//  * @param {number} outer 
-//  * @param {{x:number, y:number}} origin
-//  */
-// const starburst = (points, inner, outer, origin) => {
-//   Drawing.circle(ctx, {...origin, radius: inner}, {strokeStyle: `black`});
-//   Drawing.circle(ctx, {...origin, radius: outer}, {strokeStyle: `brown`});
-
-//   const angle = Math.PI * 2 / points;
-//   const angleHalf = angle / 2;
-//   let a = 0;
-
-//   let pts = [];
-//   for (let i = 0; i < points; i++) {
-//     const peak = Polar.toCartesian(outer, a, origin);
-
-//     Drawing.dot(ctx, peak, {fillStyle: `black`});
-
-//     const left = Polar.toCartesian(inner, a - angleHalf, origin);
-//     const right = Polar.toCartesian(inner, a + angleHalf, origin);
-//     Drawing.dot(ctx, left, {fillStyle: `yellow`});
-//     Drawing.dot(ctx, right, {fillStyle: `orange`});
-
-
-//     //lines.push(...Lines.joinPointsToLines(left, peak, right));
-//     pts.push(left);
-//     pts.push(peak);
-//     if (i + 1 < points) pts.push(right);
-
-//     a += angle;
-
-//   }
-
-//   //Drawing.line(ctx, lines, {strokeStyle: `purple`, fillStyle: `pink`});
-//   Drawing.connectedPoints(ctx, pts, {loop: true, strokeStyle: `red`, fillStyle: `orange`});
-// }
-
-const draw = () => {
-  const pts = Shapes.starburst(300, 1000000, 150, {x: canvasEl.width / 2, y: canvasEl.height / 2}, {rotate: true});
+const drawStarburst = () => {
+  const pts = Shapes.starburst(300, 10, 140, {x: canvasEl.width / 2, y: canvasEl.height / 2});
   Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
-  console.log(`wtf`)
 }
+
+const drawTriangle = () => {
+  const origin = {x: 200, y: 200};
+  const t = Triangles.equilateralFromOrigin(origin, 100, {initialAngleRadian: -Math.PI / 2});
+  Drawing.triangle(ctx, t, {strokeStyle: `blue`, fillStyle: `silver`, debug: true});
+  Drawing.dot(ctx, origin, {fillStyle: `blue`});
+
+  const c = Triangles.centroid(t);
+  Drawing.dot(ctx, c, {fillStyle: `yellow`});
+
+  const innerCircle = Triangles.innerCircle(t);
+  Drawing.circle(ctx, innerCircle, {strokeStyle: `purple`});
+
+  const outerCircle = Triangles.outerCircle(t);
+  Drawing.circle(ctx, outerCircle, {strokeStyle: `purple`});
+
+}
+
+const drawLine = () => {
+  const a = {x: 100, y: 100};
+  const b = {x: 300, y: 150};
+  const line = {a, b};
+  const p = Lines.perpendicularPoint(line, -50, 0.5);
+
+  console.log(p);
+  Drawing.line(ctx, line, {strokeStyle: `black`});
+  Drawing.dot(ctx, p, {radius: 2, fillStyle: `black`});
+
+  const para = Lines.parallel(line, 50);
+  Drawing.line(ctx, para, {strokeStyle: `red`});
+  console.log(`Para length: ${Lines.length(para)}`);
+
+  const scaled = Lines.scaleFromMidpoint(para, 0.5);
+  Drawing.line(ctx, scaled, {strokeStyle: `blue`});
+  console.log(`Scaled length: ${Lines.length(scaled)}`);
+
+
+}
+
