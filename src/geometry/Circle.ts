@@ -88,11 +88,31 @@ const guardPositioned = (circle:CirclePositioned, paramName = `circle`) => {
 export const interpolate = (circle:CirclePositioned, t:number):Points.Point => point(circle, t*piPi);
 
 /**
- * Returns circumference of circle
+ * Returns circumference of `circle` (alias of {@link circumference})
  * @param circle 
  * @returns 
  */
-export const length = (circle:Circle):number => piPi*circle.radius;
+export const length = (circle:Circle):number => circumference(circle);
+
+/**
+ * Returns circumference of `circle` (alias of {@link length})
+ * @param circle 
+ * @returns 
+ */
+export const circumference = (circle:Circle):number => {
+  guard(circle);
+  return piPi*circle.radius;
+};
+
+/**
+ * Returns the area of `circle`.
+ * @param circle 
+ * @returns 
+ */
+export const area = (circle:Circle) => {
+  guard(circle);
+  return Math.PI * circle.radius * circle.radius;
+};
 
 /**
  * Computes a bounding box that encloses circle
