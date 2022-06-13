@@ -2,28 +2,46 @@ import {guard as guardPoint, Point} from './Point.js';
 import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 import { Rects, Points} from './index.js';
-import {minFast} from '~/collections/NumericArrays.js';
+import {minFast} from '../collections/NumericArrays.js';
 
+/**
+ * A line, which consists of an `a` and `b` {@link Point}.
+ */
 export type Line = {
   readonly a: Points.Point
   readonly b: Points.Point
 }
 
+/**
+ * A PolyLine, consisting of more than one line.
+ */
 export type PolyLine = ReadonlyArray<Line>;
 
+/**
+ * Returns true if `p` is a valid line, containing `a` and `b` Points.
+ * @param p Value to check
+ * @returns True if a valid line.
+ */
 export const isLine = (p: Path | Line | Points.Point): p is Line => {
   if (p === undefined) return false;
-  return (p as Line).a !== undefined && (p as Line).b !== undefined;
+  if ((p as Line).a === undefined) return false;
+  if ((p as Line).b === undefined) return false;
+  if (!Points.isPoint((p as Line).a)) return false;
+  if (!Points.isPoint((p as Line).b)) return false;
+  return true;
 };
 
+/**
+ * Returns true if `p` is a {@link PolyLine}, ie. an array of {@link Line}s.
+ * Validates all items in array.
+ * @param p 
+ * @returns
+ */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isPolyLine = (p: any): p is PolyLine => {
   if (!Array.isArray(p)) return false;
 
-  const valid = p.some(v => {
-    if (!isLine(v)) return false;
-    return true;
-  });
+  const valid = !p.some(v => !isLine(v));
   return valid;
 };
 
@@ -304,7 +322,7 @@ export const extendX = (line:Line, xIntersection:number):Points.Point => {
 };
 
 /**
- * Returns a line extended from it's start (`a`) by a specified distance
+ * Returns a line extended from its start (`a`) by a specified distance
  *
  * ```js
  * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
@@ -404,15 +422,25 @@ export function interpolate(amount:number, a:Points.Point|Line, b?:Points.Point)
 }
 
 /**
- * Returns a string representation of line, or two points
+ * Returns a string representation of two points
  * @param a 
  * @param b 
  * @returns 
  */
 export function toString (a: Points.Point, b: Points.Point): string;
 
+/**
+ * Returns a string representation of a line 
+ * @param line 
+ */
 export function toString(line:Line):string;
 
+/**
+ * Returns a string representation of a line or two points.
+ * @param a
+ * @param b 
+ * @returns 
+ */
 //eslint-disable-next-line func-style
 export function toString(a:Points.Point|Line, b?:Points.Point):string {
   if (isLine(a)) {
@@ -448,6 +476,8 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
 
 /**
  * Returns an array representation of line: [a.x, a.y, b.x, b.y]
+ * 
+ * See {@link fromArray} to create a line _from_ this representation.
  *
  * @export
  * @param {Point} a
@@ -456,14 +486,23 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  */
 export const toFlatArray = (a: Points.Point, b: Points.Point): readonly number[] =>  [a.x, a.y, b.x, b.y];
 
+/**
+ * Returns an SVG description of line
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[] => [`M${a.x} ${a.y} L ${b.x} ${b.y}`];
 
 /**
- * Returns a line from four numbers [x1,y1,x2,y2]
+ * Returns a line from four numbers [x1,y1,x2,y2].
+ * 
+ * See {@link toFlatArray} to create an array from a line.
+ * 
  * @param arr Array in the form [x1,y1,x2,y2]
  * @returns Line
  */
-export const fromArray = (arr: readonly number[]): Line => {
+export const fromFlatArray = (arr: readonly number[]): Line => {
   if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);
   if (arr.length !== 4) throw new Error(`array is expected to have length four`);
   return fromNumbers(arr[0], arr[1], arr[2], arr[3]);
@@ -511,7 +550,12 @@ export const joinPointsToLines = (...points:readonly Points.Point[]): PolyLine =
   return lines;
 };
 
-
+/**
+ * Returns a {@link LinePath} from two points
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const fromPointsToPath = (a:Points.Point, b:Points.Point): LinePath => toPath(fromPoints(a, b));
 
 /**
