@@ -74,7 +74,7 @@ export const equals = (a:Line, b:Line):boolean =>  a.a === b.a && a.b === b.b;
  * @param fn Function that takes a point and returns a point
  * @returns 
  */
-export const apply = (line:Line, fn:(p:Points.Point) => Points.Point) => Object.freeze(
+export const apply = (line:Line, fn:(p:Points.Point) => Points.Point) => Object.freeze<Line>(
   {
     ...line,
     a: fn(line.a),
@@ -199,7 +199,7 @@ export const subtract = (line:Line, point:Points.Point):Line => Object.freeze({
  * ```js
  * // Line 1,1 -> 10,10
  * const l = fromNumbers(1,1,10,10);
- * const ll = normalise(l, 10, 10);
+ * const ll = normaliseByRect(l, 10, 10);
  * // Yields: 0.1,0.1 -> 1,1
  * ```
  * @param line 
@@ -207,11 +207,12 @@ export const subtract = (line:Line, point:Points.Point):Line => Object.freeze({
  * @param height 
  * @returns 
  */
-export const normalise = (line:Line, width:number, height:number):Line => Object.freeze({
+export const normaliseByRect = (line:Line, width:number, height:number):Line => Object.freeze({
   ...line,
-  a: Points.normalise(line.a, width, height),
-  b: Points.normalise(line.b, width, height)
+  a: Points.normaliseByRect(line.a, width, height),
+  b: Points.normaliseByRect(line.b, width, height)
 });
+
 
 /**
  * Returns true if `point` is within `maxRange` of `line`.
@@ -239,7 +240,36 @@ export const withinRange = (line:Line, point:Points.Point, maxRange:number):bool
  * @param b Second point
  * @returns 
  */
-export const length = (aOrLine: Points.Point|Line, b?: Points.Point): number => {
+export const length = (aOrLine: Points.Point|Line, pointB?: Points.Point): number => {
+  //eslint-disable-next-line functional/no-let
+  // let a;
+  // if (isLine(aOrLine)) {
+  //   b = aOrLine.b;
+  //   a = aOrLine.a;
+  // } else {
+  //   a = aOrLine;
+  //   if (b === undefined) throw new Error(`Requires both a and b parameters`);
+  // }
+  // guardPoint(a, `a`);
+  // guardPoint(a, `b`);
+  const [a, b] = points(aOrLine, pointB);
+
+  const x = b.x - a.x;
+  const y = b.y - a.y;
+  if (a.z !== undefined && b.z !== undefined) {
+    const z = b.z - a.z;
+    return Math.hypot(x, y, z);
+  } else {
+    return Math.hypot(x, y);
+  }
+};
+
+export const midpoint =(aOrLine: Points.Point|Line, pointB?: Points.Point):Points.Point => {
+  const [a, b] = points(aOrLine, pointB);
+  return interpolate(0.5, a, b);
+};
+
+export const points = (aOrLine: Points.Point|Line, b?: Points.Point): readonly [Points.Point, Points.Point] => {
   //eslint-disable-next-line functional/no-let
   let a;
   if (isLine(aOrLine)) {
@@ -252,14 +282,7 @@ export const length = (aOrLine: Points.Point|Line, b?: Points.Point): number => 
   guardPoint(a, `a`);
   guardPoint(a, `b`);
 
-  const x = b.x - a.x;
-  const y = b.y - a.y;
-  if (a.z !== undefined && b.z !== undefined) {
-    const z = b.z - a.z;
-    return Math.hypot(x, y, z);
-  } else {
-    return Math.hypot(x, y);
-  }
+  return [a, b];
 };
 
 /**
@@ -311,6 +334,80 @@ export const slope = (lineOrPoint:Line|Points.Point, b?:Points.Point):number => 
   } else throw Error(`Second point missing`);
 };
 
+const directionVector = (line:Line):Points.Point => ({
+  x: line.b.x-line.a.x,
+  y: line.b.y-line.a.y
+});
+
+const directionVectorNormalised = (line:Line):Points.Point => {
+  const l = length(line);
+  const v = directionVector(line);
+  return {
+    x: v.x / l,
+    y: v.y / l
+  };
+};
+
+/**
+ * Returns a point perpendicular to `line` at a specified `distance`. Use negative
+ * distances for the other side of line.
+ * ```
+ * // Project a point 100 units away from line, at its midpoint.
+ * const pt = perpendicularPoint(line, 100, 0.5);
+ * ```
+ * @param line Line
+ * @param distance Distance from line. Use negatives to flip side
+ * @param amount Relative place on line to project point from. 0 projects from A, 0.5 from the middle, 1 from B.
+ */
+export const perpendicularPoint = (line:Line, distance:number, amount:number = 0) => {
+  const origin = interpolate(amount, line);
+  const dvn = directionVectorNormalised(line);
+  return {
+    x: origin.x  - dvn.y * distance,
+    y: origin.y  + dvn.x * distance
+  };
+};
+
+/**
+ * Returns a parallel line to `line` at `distance`.
+ * @param line
+ * @param distance 
+ */
+export const parallel = (line:Line, distance:number):Line => {
+  const dv = directionVector(line);
+  const dvn = directionVectorNormalised(line);
+  const a = {
+    x: line.a.x - dvn.y * distance,
+    y: line.a.y + dvn.x * distance
+  };
+  return {
+    a,
+    b: {
+      x: a.x + dv.x,
+      y: a.y + dv.y 
+    }
+  };
+};
+
+/**
+ * Scales a line from its midpoint
+ * 
+ * @example Shorten by 50%, anchored at the midpoint
+ * ```js
+ * const l = {
+ *  a: {x:50, y:50}, b: {x: 100, y: 90}
+ * }
+ * const l2 = scaleFromMidpoint(l, 0.5);
+ * ```
+ * @param line
+ * @param factor 
+ */
+export const scaleFromMidpoint = (line:Line, factor:number):Line => {
+  const a = interpolate(factor/2, line);
+  const b = interpolate(0.5 + factor/2, line);
+  return {a, b};
+};
+
 /**
  * Extends a line to intersection the x-axis at a specified location
  * @param line Line to extend
@@ -322,7 +419,7 @@ export const extendX = (line:Line, xIntersection:number):Points.Point => {
 };
 
 /**
- * Returns a line extended from its start (`a`) by a specified distance
+ * Returns a line extended from its `a` point by a specified distance
  *
  * ```js
  * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
@@ -332,7 +429,7 @@ export const extendX = (line:Line, xIntersection:number):Points.Point => {
  * @param distance
  * @return Newly extended line
  */
-export const extendFromStart = (line:Line, distance:number):Line => {
+export const extendFromA = (line:Line, distance:number):Line => {
   const len = length(line);
   return Object.freeze({
     ...line,
@@ -396,22 +493,25 @@ const distanceSingleLine = (line:Line, point:Points.Point):number => {
  * @param b End
  * @returns Point between a and b
  */
-export function interpolate(amount: number, a: Points.Point, b: Points.Point): Points.Point;
+export function interpolate(amount: number, a: Points.Point, pointB: Points.Point): Points.Point;
 export function interpolate(amount: number, line:Line): Points.Point;
 
 //eslint-disable-next-line func-style
-export function interpolate(amount:number, a:Points.Point|Line, b?:Points.Point): Points.Point {
+export function interpolate(amount:number, aOrLine:Points.Point|Line, pointB?:Points.Point): Points.Point {
+
+  const [a, b] = points(aOrLine, pointB);
+
   guardPercent(amount, `amount`);
-  if (isLine(a)) {
-    b = a.b;
-    a = a.a;
-  }
+  // if (isLine(a)) {
+  //   b = a.b;
+  //   a = a.a;
+  // }
 
-  if (!Points.isPoint(a)) throw new Error(`Expected point`);
-  if (!Points.isPoint(b)) throw new Error(`Expected point`);
+  // if (!Points.isPoint(a)) throw new Error(`Expected point`);
+  // if (!Points.isPoint(b)) throw new Error(`Expected point`);
 
-  guardPoint(a, `a`);
-  guardPoint(b, `b`);
+  // guardPoint(a, `a`);
+  // guardPoint(b, `b`);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);

@@ -17,6 +17,13 @@ export type Point = {
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Empty = Object.freeze({ x:0, y: 0});
+//eslint-disable-next-line @typescript-eslint/naming-convention
+export const Placeholder = Object.freeze({x:NaN, y:NaN});
+
+export const isEmpty = (p:Point) => p.x === 0 && p.y === 0;
+
+export const isPlaceholder = (p:Point) => Number.isNaN(p.x) && Number.isNaN(p.y);
+
 
 /**
  * Returns the 'minimum' point from an array of points, using a comparison function.
@@ -223,19 +230,31 @@ export const toString = (p: Point): string => {
 };
 
 /**
- * Returns _true_ if the two points have identical values
+ * Returns _true_ if the points have identical values
  * 
  * ```js
  * const a = {x: 10, y: 10};
  * const b = {x: 10, y: 10;};
  * a === b        // False, because a and be are different objects
- * equals(a, b)   // True, because a and b are same value
+ * isEqual(a, b)   // True, because a and b are same value
  * ```
  * @param a
  * @param b
  * @returns _True_ if points are equal
  */
-export const equals = (a: Point, b: Point): boolean =>  a.x === b.x && a.y === b.y;
+export const isEqual = (...p:readonly Point[]):boolean => {
+  if (p === undefined) throw new Error(`parameter 'p' is undefined`);
+  if (p.length < 2) return true;
+
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=1;i<p.length;i++) {
+    if (p[i].x !== p[0].x) return false;
+    if (p[i].y !== p[0].y) return false;
+  }
+  return true;
+};
+
+//export const isEqual = (a: Point, b: Point): boolean =>  a.x === b.x && a.y === b.y;
 
 /**
  * Returns true if two points are within a specified range.
@@ -432,11 +451,34 @@ export function subtract(a:Point|number, b:Point|number, c?:number, d?:number):P
  * @param fn 
  * @returns 
  */
-export const apply = (pt:Point, fn:(v:number, field?:string)=>number):Point => ({
+export const apply = (pt:Point, fn:(v:number, field?:string)=>number):Point => (Object.freeze<Point>({
   ...pt,
   x: fn(pt.x, `x`),
   y: fn(pt.y, `y`)
-});
+}));
+
+/**
+ * Reduces over points, treating x,y separately.
+ * 
+ * ```
+ * // Sum x and y valuse
+ * const total = reduce(points, (p, acc) => {
+ *  return {x: p.x + acc.x, y: p.y + acc.y}
+ * });
+ * ```
+ * @param pts Points to reduce
+ * @param fn Reducer
+ * @param initial Initial value, uses {x:0,y:0} by default
+ * @returns 
+ */
+export const reduce = (pts:readonly Point[], fn:(p:Point, accumulated:Point) => Point, initial:Point = {x:0, y:0}):Point => {
+  //eslint-disable-next-line functional/no-let
+  let acc = initial;
+  pts.forEach(p => {
+    acc = fn(p, acc);
+  });
+  return acc;
+};
 
 type Sum = {
   /**
@@ -672,13 +714,44 @@ export const rotatePointArray = (v:ReadonlyArray<readonly number[]>, amountRadia
   return result;
 };
 
+const length = (ptOrX:Point|number, y?:number): number => {
+  if (isPoint(ptOrX)) {
+    y = ptOrX.y;
+    ptOrX = ptOrX.x;
+  }
+  if (y === undefined) throw new Error(`Expected y`);
+  return Math.sqrt(ptOrX*ptOrX + y*y);
+};
+
+/**
+ * Normalise point as a unit vector
+ * 
+ * @param ptOrX 
+ * @param y 
+ * @returns 
+ */
+export const normalise = (ptOrX:Point|number, y?:number): Point => {
+  if (isPoint(ptOrX)) {
+    y = ptOrX.y;
+    ptOrX = ptOrX.x;
+  }
+  if (y === undefined) throw new Error(`Expected y`);
+  const l = length(ptOrX, y);
+  return Object.freeze({
+    x: ptOrX / l,
+    y: y / l
+  });
+};
+
 /**
  * Normalises a point by a given width and height
  * @param pt Point
  * @param width Width
  * @param height Height
  */
-export function normalise(pt:Point, width:number, height:number):Point;
+export function normaliseByRect(pt:Point, width:number, height:number):Point;
+
+export function normaliseByRect(pt:Point, rect:Rects.Rect):Point;
 
 /**
  * Normalises x,y by width and height so it is on a 0..1 scale
@@ -687,7 +760,7 @@ export function normalise(pt:Point, width:number, height:number):Point;
  * @param width 
  * @param height 
  */
-export function normalise(x:number, y:number, width:number, height:number):Point;
+export function normaliseByRect(x:number, y:number, width:number, height:number):Point;
 
 /**
  * Normalises a point so it is on a 0..1 scale
@@ -697,17 +770,26 @@ export function normalise(x:number, y:number, width:number, height:number):Point
  * @param d height
  * @returns Point
  */
-export function normalise(a:Point|number, b:number, c:number, d?:number):Point {
+export function normaliseByRect(a:Point|number, b:number|Rects.Rect, c?:number, d?:number):Point {
   // ✔️ Unit tested
   if (isPoint(a)) {
-    guardNumber(b, `positive`, `width`);
-    guardNumber(c, `positive`, `height`);
+    if (typeof b === `number` && c !== undefined) {
+      guardNumber(b, `positive`, `width`);
+      guardNumber(c, `positive`, `height`);
+    } else {
+      if (!Rects.isRect(b)) throw new Error(`Expected second parameter to be a rect`);
+      c = b.height;
+      b = b.width;
+    }
     return {
       x: a.x / b,
       y: a.y / c
     };
   } else {
     guardNumber(a, `positive`, `x`);
+    if (typeof b !== `number`) throw new Error(`Expecting second parameter to be a number (width)`);
+    if (typeof c !== `number`) throw new Error(`Expecting third parameter to be a number (height)`);
+
     guardNumber(b, `positive`, `y`);
     guardNumber(c, `positive`, `width`);
     if (d === undefined) throw new Error(`Expected height parameter`);
