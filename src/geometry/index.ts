@@ -14,6 +14,7 @@ export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, El
 export * as Polar from './Polar.js';
 
 export * as Shapes from './Shape.js';
+export * as Triangles from './Triangle.js';
  
 /**
  * Convert angle in degrees to angle in radians.
@@ -27,6 +28,18 @@ export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees) * (Mat
  * @param angleInRadians
  * @returns 
  */
-export const radianToDegree = (angleInRadians:number) => angleInRadians * 180 / Math.PI;
+export function radianToDegree(angleInRadians:number):number;
+export function radianToDegree(angleInRadians:readonly number[]):readonly number[];
+
+//eslint-disable-next-line func-style
+export function radianToDegree(angleInRadians:number|readonly number[]):number| readonly number[] {
+  if (Array.isArray(angleInRadians)) {
+    return angleInRadians.map(v => v * 180 / Math.PI);
+  } else {
+    return (angleInRadians as number) * 180 / Math.PI;
+  }
+}
+
+//export const radianToDegree = (angleInRadians:number) => angleInRadians * 180 / Math.PI;
 
 export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.x, point.y);
