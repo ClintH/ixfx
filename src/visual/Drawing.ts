@@ -240,9 +240,20 @@ export const lineThroughPoints = (ctx:CanvasRenderingContext2D, points:readonly 
 /**
  * Draws one or more circles. Will draw outline/fill depending on
  * whether `strokeStyle` or `fillStyle` params are present in the drawing options.
- * @param ctx 
- * @param circlesToDraw 
- * @param opts 
+ * 
+ * ```js
+ * // Draw a circle with radius of 10 at 0,0
+ * circle(ctx, {radius:10});
+ * 
+ * // Draw a circle of radius 10 at 100,100
+ * circle(ctx, {radius: 10, x: 100, y: 100});
+ * 
+ * // Draw two blue outlined circles
+ * circle(ctx, [ {radius: 5}, {radius: 10} ], {strokeStyle:`blue`});
+ * ```
+ * @param ctx Drawing context
+ * @param circlesToDraw Circle(s) to draw
+ * @param opts Drawing options
  */
 export const circle = (ctx:CanvasRenderingContext2D, circlesToDraw:Circles.CirclePositioned|readonly Circles.CirclePositioned[], opts:DrawingOpts = {}) => {
   applyOpts(ctx, opts);
@@ -303,11 +314,15 @@ export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths
 
 /**
  * Draws a line between all the given points.
+ * If a fillStyle is specified, it will be filled.
+ * 
+ * See also: 
+ * * {@link line}: Draw one or more lines 
  *
  * @param ctx
  * @param pts
  */
-export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly loop?: boolean, readonly strokeStyle?: string} = {}) => {
+export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly loop?: boolean, readonly fillStyle?:string, readonly strokeStyle?: string} = {}) => {
   const shouldLoop = opts.loop ?? false;
 
   guardArray(pts);
@@ -324,8 +339,14 @@ export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Poi
   pts.forEach((pt) => ctx.lineTo(pt.x, pt.y));
 
   if (shouldLoop) ctx.lineTo(pts[0].x, pts[0].y);
+  
   // if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
-  ctx.stroke();
+  if (opts.strokeStyle || (opts.strokeStyle === undefined && opts.fillStyle === undefined)) {
+    ctx.stroke();
+  }
+  if (opts.fillStyle) {
+    ctx.fill();
+  }
 };
 
 /**
@@ -509,7 +530,12 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
 };
 
 /**
- * Draws one or more lines
+ * Draws one or more lines. 
+ * 
+ * Each line is drawn independently, ie it's not assumed lines are connected.
+ * 
+ * See also:
+ * * {@link connectedPoints}: Draw a series of connected points
  * @param ctx
  * @param toDraw 
  * @param opts 
