@@ -13,6 +13,8 @@ export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, El
 
 export * as Polar from './Polar.js';
 
+export * as Shapes from './Shape.js';
+ 
 /**
  * Convert angle in degrees to angle in radians.
  * @param angleInDegrees 
