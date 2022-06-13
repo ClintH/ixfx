@@ -3,7 +3,7 @@ import {integer as guardInteger} from "../Guards.js";
 import {Point} from "./Point.js";
 
 /**
- * Generates a starburst shape, returning an array of points.
+ * Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
  * 
  * ```
  * // Generate a starburst with four spikes
@@ -21,21 +21,26 @@ import {Point} from "./Point.js";
  * const points = starburst(4, 100, 200);
  * Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
  * ```
+ * 
+ * Options:
+ * * initialAngleRadian: angle offset to begin from. This overrides the `-Math.PI/2` default.
+ * 
  * @param points Number of points in the starburst. Defaults to five, which produces a typical star
  * @param innerRadius Inner radius. A proportionally smaller inner radius makes for sharper spikes. If unspecified, 50% of the outer radius is used.
  * @param outerRadius Outer radius. Maximum radius of a spike to origin
+ * @param opts Options
  * @param origin Origin, or {x:0:y:0} by default.
  */
-export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Point = {x:0, y:0}, opts?:{readonly rotation:number}):readonly Point[] => {
+export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Point = {x:0, y:0}, opts?:{readonly initialAngleRadian?:number}):readonly Point[] => {
   guardInteger(points, `positive`, `points`);
   const angle = Math.PI * 2 / points;
   const angleHalf = angle / 2;
 
-  const rotation = opts?.rotation ?? 0;
+  const initialAngle = opts?.initialAngleRadian ?? -Math.PI/2;
   if (innerRadius === undefined) innerRadius = outerRadius/2;
 
   //eslint-disable-next-line functional/no-let
-  let a = rotation;
+  let a = initialAngle;
   const pts = [];
   
   //eslint-disable-next-line functional/no-loop-statement,functional/no-let
