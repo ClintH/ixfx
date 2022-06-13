@@ -5,7 +5,7 @@ import * as Polar from '../../geometry/Polar.js';
 const closeEnough = (a:Points.Point, b:Points.Point):boolean => {
   a = Points.apply(a, Math.round);
   b = Points.apply(b, Math.round);
-  const v = (Points.equals(a, b));
+  const v = (Points.isEqual(a, b));
   if (!v) {
     console.log(`a: ${JSON.stringify(a)}`);
     console.log(`b: ${JSON.stringify(b)}`);

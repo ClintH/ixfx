@@ -67,20 +67,20 @@ type Dimensions = {
    *
    * @type {number[]}
    */
-   readonly lengths: readonly number[],
+  readonly lengths: readonly number[],
 
   /**
    * Total length of all paths
    *
    * @type {number}
    */
-   readonly totalLength: number,
+  readonly totalLength: number,
   /**
    * Total width of all paths
    *
    * @type {number}
    */
-   readonly totalWidth: number
+  readonly totalWidth: number
 }
 /**
  * Computes the widths and lengths of all paths, adding them up as well
@@ -112,8 +112,8 @@ export const computeDimensions = (paths: readonly Paths.Path[]): Dimensions => {
  */
 export const bbox = (paths: readonly Paths.Path[]): Rects.RectPositioned => {
   const boxes = paths.map(p => p.bbox());
-  const corners = boxes.map(b => Rects.getCorners(b)).flat();
-  
+  const corners = boxes.map(b => Rects.corners(b)).flat();
+
   return Points.bbox(...corners);
 };
 
@@ -136,7 +136,7 @@ export const guardContinuous = (paths: readonly Paths.Path[]) => {
   //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i = 1; i < paths.length; i++) {
     const start = Paths.getStart(paths[i]);
-    if (!Points.equals(start, lastPos)) throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);
+    if (!Points.isEqual(start, lastPos)) throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);
     lastPos = Paths.getEnd(paths[i]);
   }
 };
