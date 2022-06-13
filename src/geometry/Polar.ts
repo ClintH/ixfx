@@ -72,7 +72,7 @@ export const toCartesian:ToCartesian = (a:Coord|number, b?:Points.Point|number, 
       if (!Points.isPoint(c)) throw new Error(`Expecting (number, number, Point). Point param wrong type`);
       return polarToCartesian(a, b, c);
     } else {
-      throw new Error(`Expecting (number, number)`);
+      throw new Error(`Expecting parameters of (number, number). Got: (${typeof(a)}, ${typeof(b)}, ${typeof(c)}). a: ${JSON.stringify(a)}`);
     }
   }
 };
