@@ -46,7 +46,7 @@ export const isEqualSize = (a:Rect, b:Rect):boolean => {
 
 export const isEqual = (a:Rect|RectPositioned, b:Rect|RectPositioned):boolean => {
   if (isPositioned(a) && isPositioned(b)) {
-    if (!Points.equals(a, b)) return false;
+    if (!Points.isEqual(a, b)) return false;
     return a.width === b.width && a.height === b.height;
 
   } else if (!isPositioned(a) && !isPositioned(b)) {
@@ -240,7 +240,7 @@ export const fromTopLeft = (origin: Points.Point, width: number, height: number)
   // return rectFromPoints(...pts);
 };
 
-export const getCorners = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Points.Point[] => {
+export const corners = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Points.Point[] => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
   else if (origin === undefined) throw new Error(`Unpositioned rect needs origin param`);
@@ -265,6 +265,16 @@ export const getCenter = (rect: RectPositioned|Rect, origin?:Points.Point): Poin
 };
 
 /**
+ * Returns the length of each side of the rectangle (top, right, bottom, left)
+ * @param rect 
+ * @returns 
+ */
+export const lengths = (rect:RectPositioned):readonly number[] => {
+  guardPositioned(rect, `rect`);
+  return lines(rect).map(l => Lines.length(l));
+};
+
+/**
  * Returns four lines based on each corner.
  * Lines are given in order: top, right, bottom, left
  *
@@ -272,4 +282,4 @@ export const getCenter = (rect: RectPositioned|Rect, origin?:Points.Point): Poin
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const getLines = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...getCorners(rect, origin));
+export const lines = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...corners(rect, origin));
