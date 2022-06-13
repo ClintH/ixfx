@@ -1,6 +1,7 @@
 import * as Points from '../geometry/Point.js';
 import * as Paths from '../geometry/Path.js';
 import * as Lines from '../geometry/Line.js';
+import * as Triangles from '../geometry/Triangle.js';
 import {array as guardArray} from '../Guards.js';
 import * as Circles from '../geometry/Circle.js';
 import * as Arcs from '../geometry/Arc.js';
@@ -564,6 +565,27 @@ export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly 
 };
 
 /**
+ * Draws one or more triangles
+ * @param ctx
+ * @param toDraw 
+ * @param opts 
+ */
+export const triangle = (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triangle|readonly Triangles.Triangle[], opts: DrawingOpts & {readonly filled?:boolean} = {}) => {
+  applyOpts(ctx, opts);
+
+  const draw = (t:Triangles.Triangle) => {
+    connectedPoints(ctx, Triangles.corners(t), opts);
+    
+    if (opts.debug) {
+      pointLabels(ctx, Triangles.corners(t), undefined, [`a`, `b`, `c`]);
+    }
+  };
+
+  if (Array.isArray(toDraw)) toDraw.forEach(draw);
+  else draw(toDraw as Triangles.Triangle);
+};
+
+/**
  * Draws one or more rectangles
  * @param ctx
  * @param toDraw 
@@ -577,7 +599,7 @@ export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned
     ctx.strokeRect(d.x, d.y, d.width, d.height);
 
     if (opts.debug) {
-      pointLabels(ctx, Rects.getCorners(d), undefined, [`NW`, `NE`, `SE`, `SW`]);
+      pointLabels(ctx, Rects.corners(d), undefined, [`NW`, `NE`, `SE`, `SW`]);
     }
   };
 
