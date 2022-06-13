@@ -1,9 +1,7 @@
 import { Circles, Lines, Polar, Rects} from "./index.js";
-import {interpolate as lineInterpolate} from './Line';
-import {number as guardNumber} from '../Guards';
-import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util';
-
-//const piPi =Math.PI*2;
+import {interpolate as lineInterpolate} from './Line.js';
+import { number as guardNumber} from '../Guards.js';
+import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util.js';
 
 /**
  * A point, consisting of x, y and maybe z fields.
@@ -622,14 +620,56 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
   }
 }
 
-export const rotate = (pt:Point, amountRadian:number, origin?:Point):Point => {
+/**
+ * Rotate a single point by a given amount in radians
+ * @param pt 
+ * @param amountRadian 
+ * @param origin 
+ */
+export function rotate(pt:Point, amountRadian:number, origin?:Point):Point;
+
+/**
+ * Rotate several points by a given amount in radians
+ * @param pt Points
+ * @param amountRadian Amount to rotate in radians 
+ * @param origin Origin to rotate around. Defaults to 0,0
+ */
+export function rotate(pt:ReadonlyArray<Point>, amountRadian:number, origin?:Point):ReadonlyArray<Point>;
+
+export function rotate(pt:Point|ReadonlyArray<Point>, amountRadian:number, origin?:Point):Point|ReadonlyArray<Point> {
   if (origin === undefined) origin = {x:0, y:0};
   guard(origin, `origin`);
-  guard(pt, `pt`);
   guardNumber(amountRadian, ``, `amountRadian`);
-  const p = Polar.fromCartesian(pt, origin);
-  const pp = Polar.rotate(p, amountRadian);
-  return Polar.toCartesian(pp, origin);
+  const arrayInput = Array.isArray(pt);
+
+  if (!arrayInput) {
+    pt = [pt as Point];
+  }
+  const ptAr = pt as ReadonlyArray<Point>;
+  ptAr.forEach((p, index) => guard(p, `pt[${index}]`));
+  
+  //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const asPolar = ptAr.map(p => Polar.fromCartesian(p, origin!));
+  const rotated = asPolar.map(p => Polar.rotate(p, amountRadian));
+  const asCartesisan = rotated.map(p => Polar.toCartesian(p, origin));
+  if (arrayInput) return asCartesisan;
+  else return asCartesisan[0];
+
+  //const p = Polar.fromCartesian(pt, origin);
+  //const pp = Polar.rotate(p, amountRadian);
+  //return Polar.toCartesian(pp, origin);
+}
+
+//eslint-disable-next-line functional/prefer-readonly-type
+export const rotatePointArray = (v:ReadonlyArray<readonly number[]>, amountRadian:number): number[][] => {
+  const mat = [[Math.cos(amountRadian), -Math.sin(amountRadian)], [Math.sin(amountRadian), Math.cos(amountRadian)]];
+  const result = [];
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=0; i < v.length; ++i) {
+    //eslint-disable-next-line functional/immutable-data
+    result[i] = [mat[0][0]*v[i][0] + mat[0][1]*v[i][1], mat[1][0]*v[i][0] + mat[1][1]*v[i][1]];
+  }
+  return result;
 };
 
 /**
