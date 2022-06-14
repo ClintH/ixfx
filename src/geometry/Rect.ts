@@ -271,7 +271,7 @@ export const getCenter = (rect: RectPositioned|Rect, origin?:Points.Point): Poin
  */
 export const lengths = (rect:RectPositioned):readonly number[] => {
   guardPositioned(rect, `rect`);
-  return lines(rect).map(l => Lines.length(l));
+  return edges(rect).map(l => Lines.length(l));
 };
 
 /**
@@ -282,4 +282,24 @@ export const lengths = (rect:RectPositioned):readonly number[] => {
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const lines = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...corners(rect, origin));
+export const edges = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...corners(rect, origin));
+
+/**
+ * Returns the perimeter of `rect` (ie. sum of all edges)
+ * @param rect 
+ * @returns 
+ */
+export const perimeter = (rect:Rect):number => {
+  guard(rect);
+  return rect.height + rect.height + rect.width + rect.width;
+};
+
+/**
+ * Returns the area of `rect`
+ * @param rect 
+ * @returns 
+ */
+export const area = (rect:Rect):number => {
+  guard(rect);
+  return rect.height*rect.width;
+};
