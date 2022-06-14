@@ -14,6 +14,15 @@ export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, El
 export * as Polar from './Polar.js';
 
 export * as Shapes from './Shape.js';
+
+/**
+ * Triangle processing.
+ * 
+ * Helpers for creating:
+ * - {@link Triangles.fromFlatArray}: Create from [x1, y1, x2, y2, x3, y3]
+ * - {@link Triangles.fromPoints}: Create from three {x,y} sets
+ * - {@link Triangles.fromRadius}: Equilateral triangle of a given radius and center
+ */
 export * as Triangles from './Triangle.js';
  
 /**
@@ -21,7 +30,21 @@ export * as Triangles from './Triangle.js';
  * @param angleInDegrees 
  * @returns 
  */
-export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees) * (Math.PI / 180.0);
+export function degreeToRadian(angleInDegrees:number):number;
+
+/**
+ * Convert angles in degrees to angles in radians
+ * @param angleInDegrees 
+ */
+export function degreeToRadian(angleInDegrees:readonly number[]):readonly number[];
+
+export function degreeToRadian(angleInDegrees:number|readonly number[]):number|readonly number[] {
+  if (Array.isArray(angleInDegrees)) {
+    return angleInDegrees.map(v => v * (Math.PI / 180.0));
+  } else {
+    return (angleInDegrees as number) * (Math.PI / 180.0);
+  }
+}
 
 /**
  * Convert angle in radians to angle in degrees
@@ -29,6 +52,11 @@ export const degreeToRadian = (angleInDegrees:number) => (angleInDegrees) * (Mat
  * @returns 
  */
 export function radianToDegree(angleInRadians:number):number;
+
+/**
+ * Convert angles in radians to angles in degrees
+ * @param angleInRadians 
+ */
 export function radianToDegree(angleInRadians:readonly number[]):readonly number[];
 
 //eslint-disable-next-line func-style
@@ -40,6 +68,9 @@ export function radianToDegree(angleInRadians:number|readonly number[]):number| 
   }
 }
 
-//export const radianToDegree = (angleInRadians:number) => angleInRadians * 180 / Math.PI;
-
+/**
+ * Angle from x-axis to point (ie. `Math.atan2`)
+ * @param point 
+ * @returns 
+ */
 export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.x, point.y);

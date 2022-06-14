@@ -574,7 +574,7 @@ export const triangle = (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triang
   applyOpts(ctx, opts);
 
   const draw = (t:Triangles.Triangle) => {
-    connectedPoints(ctx, Triangles.corners(t), opts);
+    connectedPoints(ctx, Triangles.corners(t), {...opts, loop: true});
     
     if (opts.debug) {
       pointLabels(ctx, Triangles.corners(t), undefined, [`a`, `b`, `c`]);

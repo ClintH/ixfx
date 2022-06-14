@@ -9,7 +9,6 @@
 export * as Temporal from './temporal/index.js';
 
 /**
- * Geometry
  * Functions for different shapes, paths and coordinate spaces
  */
 export * as Geometry from './geometry/index.js';
