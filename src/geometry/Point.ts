@@ -1,7 +1,8 @@
-import { Circles, Lines, Polar, Rects} from "./index.js";
+import { Circles, Lines, Points, Polar, Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line.js';
 import { number as guardNumber} from '../Guards.js';
 import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util.js';
+import {Arrays} from "~/collections/index.js";
 
 /**
  * A point, consisting of x, y and maybe z fields.
@@ -10,6 +11,28 @@ export type Point = {
   readonly x: number
   readonly y: number
   readonly z?: number
+};
+
+/**
+ * 
+ * @ignore
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const getPointParam = (a:Point|number, b?:number):Point => {
+  if (Points.isPoint(a)) {
+    return a;
+  } else if (typeof a !== `number` || typeof b !== `number`) {
+    throw new Error(`Expected point or x,y as parameters`);
+  } else {
+    return {x: a, y: b};
+  }
+};
+
+export const dotProduct = (...pts:readonly Point[]):number => {
+  const a = pts.map(p => Points.toArray(p));
+  return Arrays.dotProduct(a);
 };
 
 /**
@@ -351,10 +374,13 @@ export const fromNumbers = (...coords:readonly ReadonlyArray<number>[]|readonly 
       pts.push(Object.freeze({x: coord[0], y: coord[1]}));    
     });
   } else {
-    if (coords.length !== 2) throw new Error(`Expected two elements: [x,y]`);
-    // [x,y]
-    //eslint-disable-next-line  functional/immutable-data
-    pts.push(Object.freeze({x: coords[0] as number, y: coords[1] as number}));
+    // [x,y,x,y,x,y]
+    if (coords.length % 2 !== 0) throw new Error(`Expected even number of elements: [x,y,x,y...]`);
+    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    for (let i=0;i<coords.length;i+=2) {
+      //eslint-disable-next-line  functional/immutable-data
+      pts.push(Object.freeze({x: coords[i] as number, y: coords[i+1] as number}));
+    }
   }
   return pts;
 };
