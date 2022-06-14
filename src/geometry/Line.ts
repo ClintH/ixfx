@@ -3,6 +3,7 @@ import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 import { Rects, Points} from './index.js';
 import {minFast} from '../collections/NumericArrays.js';
+import {Arrays} from '~/collections/index.js';
 
 /**
  * A line, which consists of an `a` and `b` {@link Point}.
@@ -287,23 +288,38 @@ export const points = (aOrLine: Points.Point|Line, b?: Points.Point): readonly [
 
 /**
  * Returns the nearest point on `line` closest to `point`.
+ * 
  * ```js
- * nearest(line, {x:10,y:10});
+ * const pt = nearest(line, {x:10,y:10});
  * ```
- * @param line
+ * 
+ * If an array of lines is provided, it will be the closest point amongst all the lines
+ * @param line Line or array of lines
  * @param point
  * @returns Point {x,y}
  */
-export const nearest = (line:Line, point:Points.Point): Points.Point => {
-  const {a, b} = line;
-  const atob = { x: b.x - a.x, y: b.y - a.y };
-  const atop = { x: point.x - a.x, y: point.y - a.y };
-  const len = atob.x * atob.x + atob.y * atob.y;
-  //eslint-disable-next-line functional/no-let
-  let dot = atop.x * atob.x + atop.y * atob.y;
-  const t = Math.min(1, Math.max(0, dot / len));
-  dot = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
-  return Object.freeze({x: a.x + atob.x * t, y: a.y + atob.y * t});
+export const nearest = (line:Line|readonly Line[], point:Points.Point): Points.Point => {
+  
+  const n = (line:Line):Points.Point => {
+    const {a, b} = line;
+    const atob = { x: b.x - a.x, y: b.y - a.y };
+    const atop = { x: point.x - a.x, y: point.y - a.y };
+    const len = atob.x * atob.x + atob.y * atob.y;
+
+    //eslint-disable-next-line functional/no-let
+    let dot = atop.x * atob.x + atop.y * atob.y;
+    const t = Math.min(1, Math.max(0, dot / len));
+    dot = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
+    return {x: a.x + atob.x * t, y: a.y + atob.y * t};
+  };
+
+  if (Array.isArray(line)) {
+    const pts = line.map(l => n(l));
+    const dists = pts.map(p => Points.distance(p, point));
+    return Object.freeze<Points.Point>(pts[Arrays.minIndex(...dists)]);
+  } else {
+    return Object.freeze<Points.Point>(n(line as Line));
+  }
 };
 
 /**
@@ -447,7 +463,7 @@ export const extendFromA = (line:Line, distance:number):Line => {
  * nearest point on `line`.
  * 
  * ```js
- * distance(line, {x:10,y:10});
+ * const d = distance(line, {x:10,y:10});
  * ```
  * 
  * If an array of lines is provided, the shortest distance is returned.
@@ -498,26 +514,16 @@ export function interpolate(amount: number, line:Line): Points.Point;
 
 //eslint-disable-next-line func-style
 export function interpolate(amount:number, aOrLine:Points.Point|Line, pointB?:Points.Point): Points.Point {
+  guardPercent(amount, `amount`);
 
   const [a, b] = points(aOrLine, pointB);
-
-  guardPercent(amount, `amount`);
-  // if (isLine(a)) {
-  //   b = a.b;
-  //   a = a.a;
-  // }
-
-  // if (!Points.isPoint(a)) throw new Error(`Expected point`);
-  // if (!Points.isPoint(b)) throw new Error(`Expected point`);
-
-  // guardPoint(a, `a`);
-  // guardPoint(b, `b`);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
 
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
+
   return Object.freeze({x: x, y: y});
 }
 
@@ -729,6 +735,10 @@ export type LinePath = Line & Path & {
  * 
  * // Rotate line by 5 degres around its end point
  * rotate(line, degreeToRadian(5), line.b);
+ * 
+ * // Rotate by 90 degrees at the 80% position
+ * rotated = rotate(line, Math.PI / 2, 0.8);
+ * 
  * ```
  * @param line Line to rotate
  * @param amountRadian Angle in radians to rotate by
@@ -739,7 +749,6 @@ export const rotate = (line:Line, amountRadian?:number, origin?:Points.Point|num
   if (amountRadian === undefined || amountRadian === 0) return line;
   if (origin === undefined) origin = 0.5;
   if (typeof origin === `number`) {
-    guardPercent(origin, `origin`);
     origin = interpolate(origin, line.a, line.b);
   }
   return Object.freeze({
