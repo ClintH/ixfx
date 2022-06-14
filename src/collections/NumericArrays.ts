@@ -35,6 +35,32 @@ export const weight = (data:readonly number[], fn?:(relativePos:number)=>number)
   return validNumbers.map((v:number, index:number) => v*f(index/(validNumbers.length-1)));
 };
 
+/**
+ * Returns the dot product of two arbitrary-sized arrays. Assumed they are of the same length.
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const dotProduct = (values:ReadonlyArray<readonly number[]>):number => {
+  //eslint-disable-next-line functional/no-let
+  let r = 0;
+  const len = values[0].length;
+
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=0;i<len;i++) {
+    //eslint-disable-next-line functional/no-let
+    let t = 0;
+    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    for (let p=0;p<values.length;p++) {
+      if (p === 0) t = values[p][i];
+      else {
+        t *= values[p][i];
+      }
+    }
+    r += t;
+  }
+  return r;
+};
 
 /**
  * Calculates the average of all numbers in an array.
