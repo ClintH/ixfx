@@ -31,7 +31,7 @@ export type Opts = Readonly<{
   readonly debug?:boolean
 }>;
 
-export type DataAnalyser = (node:AnalyserNode, analyser:Analyser) => void;
+export type DataAnalyser = (node:AnalyserNode, analyser:AudioAnalyser) => void;
 
 /**
  * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link peakLevel} if you want sound level, or {@link freq} if you just want FFT results.
@@ -59,7 +59,7 @@ export type DataAnalyser = (node:AnalyserNode, analyser:Analyser) => void;
  * @param opts Options
  * @returns Analyser instance
  */
-export const basic = (onData:(freq:Float32Array, wave:Float32Array, analyser:Analyser) => void, opts:Opts = {}):Analyser => new Analyser((node, analyser) => {
+export const basic = (onData:(freq:Float32Array, wave:Float32Array, analyser:AudioAnalyser) => void, opts:Opts = {}):AudioAnalyser => new AudioAnalyser((node, analyser) => {
   // Get frequency and amplitude data
   const freq = new Float32Array(node.frequencyBinCount);
   const wave = new Float32Array(node.fftSize);
@@ -92,7 +92,7 @@ export const basic = (onData:(freq:Float32Array, wave:Float32Array, analyser:Ana
  * @param opts 
  * @returns 
  */
-export const freq = (onData:(freq:Float32Array, analyser:Analyser)=>void, opts:Opts={}):Analyser => new Analyser((node, analyser) => {
+export const freq = (onData:(freq:Float32Array, analyser:AudioAnalyser)=>void, opts:Opts={}):AudioAnalyser => new AudioAnalyser((node, analyser) => {
   const freq = new Float32Array(node.frequencyBinCount);
   node.getFloatFrequencyData(freq);
   onData(freq, analyser);
@@ -112,7 +112,7 @@ export const freq = (onData:(freq:Float32Array, analyser:Analyser)=>void, opts:O
  * @param opts 
  * @returns 
  */
-export const peakLevel = (onData:(level:number, analyser:Analyser)=>void, opts:Opts={}):Analyser => new Analyser((node, analyser) => {
+export const peakLevel = (onData:(level:number, analyser:AudioAnalyser)=>void, opts:Opts={}):AudioAnalyser => new AudioAnalyser((node, analyser) => {
   const wave = new Float32Array(node.fftSize);
   node.getFloatTimeDomainData(wave);
   onData(Arrays.maxFast(wave), analyser);
@@ -139,7 +139,7 @@ export const peakLevel = (onData:(level:number, analyser:Analyser)=>void, opts:O
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
  *
  */
-export class Analyser {
+export class AudioAnalyser {
   showVis:boolean;
   fftSize:number;
   smoothingTimeConstant:number;

@@ -71,8 +71,6 @@ export * as Visual from './visual/index.js';
  */
 export * as Dom from './dom/index.js';
 
-export * as Audio from './audio/index.js';
-
 export * as Events from './Events.js';
 
 /**

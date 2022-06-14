@@ -14,12 +14,12 @@
 import {Arrays} from '~/collections/index.js';
 import {Points} from '../geometry/index.js';
 import {Tracker} from '../temporal/Tracker.js';
-import {Analyser} from './Analyser.js';
+import {AudioAnalyser} from './AudioAnalyser.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
-export default class Visualiser {
+export default class AudioVisualiser {
   freqMaxRange = 200;
-  audio:Analyser;
+  audio:AudioAnalyser;
   parent:HTMLElement;
  
   lastPointer:Points.Point = {x:0, y:0};
@@ -32,7 +32,7 @@ export default class Visualiser {
   freqTracker:Tracker;
   el:HTMLElement;
 
-  constructor(parentElem:HTMLElement, audio:Analyser) {
+  constructor(parentElem:HTMLElement, audio:AudioAnalyser) {
     this.audio = audio;
     this.parent = parentElem;
     this.waveTracker = new Tracker(`wave`);

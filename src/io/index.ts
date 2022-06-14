@@ -3,6 +3,9 @@
  */
 export * as Bluetooth from './NordicBleDevice.js';
 
+export * as AudioAnalysers from '../io/AudioAnalyser.js';
+export * as AudioVisualisers from '../io/AudioVisualiser.js';
+
 /**
  * Espruino-based devices connected via Bluetooth LE
  * 

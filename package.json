@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -16,7 +16,6 @@
     ".": "./dist/bundle.js",
     "./lib/*": "./dist/*.js",
     "./collections.js": "./dist/collections.js",
-    "./audio.js": "./dist/audio.js",
     "./arrays.js": "./dist/arrays.js",
     "./components.js": "./dist/components.js",
     "./forms.js": "./dist/forms.js",
