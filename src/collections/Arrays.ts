@@ -255,17 +255,37 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
 
 /**
  * Returns an array with a value omitted. If value is not found, result will be a copy of input.
- * Value checking is completed via the provided `comparer` function, or by default checking whether `a === b`.
+ * Value checking is completed via the provided `comparer` function. By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
  *
  * @example
  * ```js
  * const data = [100, 20, 40];
  * const filtered = without(data, 20); // [100, 40]
  * ```
+ * 
+ * @example Using value-based comparison
+ * ```js
+ * const data = [{name: `Alice`}, {name:`Sam`}];
+ * 
+ * // This wouldn't work as expected, because the default comparer uses instance,
+ * // not value:
+ * without(data, {name: `Alice`});
+ * 
+ * // So instead we can use a value comparer:
+ * without(data, {name:`Alice`}, isEqualValueDefault);
+ * ```
+ * 
+ * @example Use a function
+ * ```js
+ * const data = [{name: `Alice`}, {name:`Sam`}];
+ * without(data, {name:`ALICE`}, (a, b) => {
+ *  return (a.name.toLowerCase() === b.name.toLowerCase());
+ * });
+ * ```
  * @template V Type of array items
  * @param data Source array
  * @param value Value to remove
- * @param comparer Comparison function. If not provided {@link isEqualDefault} is used, which compares using `===`
+ * @param comparer Comparison function. If not provided `Util.isEqualDefault` is used, which compares using `===`
  * @return Copy of array without value.
  */
 export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));

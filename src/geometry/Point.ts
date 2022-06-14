@@ -20,7 +20,9 @@ export type Point = {
  * @param b 
  * @returns 
  */
-export const getPointParam = (a:Point|number, b?:number):Point => {
+export const getPointParam = (a?:Point|number, b?:number):Point => {
+  if (a === undefined) return {x:0, y:0};
+
   if (Points.isPoint(a)) {
     return a;
   } else if (typeof a !== `number` || typeof b !== `number`) {
@@ -77,16 +79,22 @@ export const findMinimum = (compareFn:(a:Point, b:Point)=>Point, ...points:reado
   return min;
 };
 
+export function distance(a:Point, b:Point):number;
+export function distance(a:Point, x:number, y:number):number;
+export function distance(a:Point):number;
+
 /**
  * Calculate distance between two points
  * @param a 
  * @param b 
  * @returns 
  */
-export const distance = (a:Point, b:Point):number => {
-  guard(a, `a`);
-  guard(b, `b`);
-  return Math.hypot(b.x-a.x, b.y-a.y);
+export function distance(a:Point, xOrB?:Point|number, y?:number):number {
+  const pt = getPointParam(xOrB, y);
+  guard(a , `a`);
+  guard(pt);
+  
+  return Math.hypot(pt.x-a.x, pt.y-a.y);
 };
 
 /**
