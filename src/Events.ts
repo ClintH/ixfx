@@ -53,7 +53,12 @@ export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>)
 //   return {...source, reset};
 // };
 
-export class SimpleEventEmitter<Events> {
+export interface ISimpleEventEmitter<Events> {
+  addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void;
+  removeEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void):void;
+};
+
+export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   readonly #listeners = simpleMapArrayMutable<Listener<Events>>();
 
   /**

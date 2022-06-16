@@ -1,42 +1,5 @@
-import {StateChangeEvent} from "~/flow/StateMachine.js";
-import {waitFor} from "../flow/Timer.js";
-import {string as randomString} from "../Random.js";
-import * as BleDevice from "./BleDevice.js";
-import {defaultOpts as NordicDefaults, NordicBleDevice} from "./NordicBleDevice.js";
-
-/**
- * Options for device
- */
-export type Options = {
-  /**
-   * Default milliseconds to wait before giving up on a well-formed reply. 5 seconds is the default.
-   */
-  readonly evalTimeoutMs?:number;
-  /**
-   * Name of device. Only used for printing log mesages to the console
-   */
-  readonly name?:string;
-
-  /**
-   * If true, additional logging information is printed
-   */
-  readonly debug?:boolean;
-}
-
-/**
- * Options for code evaluation
- */
-export type EvalOpts = {
-  /**
-   * Milliseconds to wait before giving up on well-formed reply. 5 seconds is the default.
-   */
-  readonly timeoutMs?:number
-  /**
-   * If true (default), it assumes that anything received from the board
-   * is a response to the eval
-   */
-  readonly assumeExclusive?:boolean
-};
+import {EvalOpts, Options,  deviceEval} from "./Espruino.js";
+import {NordicBleDevice} from "./NordicBleDevice.js";
 
 /**
  * An Espruino BLE-connection
@@ -68,8 +31,9 @@ export type EvalOpts = {
  * const result = await e.eval(`2+2\n`);
  * ```
  */
-export class EspruinoDevice extends NordicBleDevice {
+export class EspruinoBleDevice extends NordicBleDevice {
   evalTimeoutMs:number;
+  evalReplyBluetooth = true;
 
   /**
    * Creates instance. You probably would rather use {@link puck} to create.
@@ -86,15 +50,18 @@ export class EspruinoDevice extends NordicBleDevice {
    * 
    * It will first send a CTRL+C to cancel any previous input, `reset()` to clear the board,
    * and then the provided `code` followed by a new line.
-   * @param code Code to send. A new line is added automatically.
+   * 
+   * Use {@link eval} instead to execute remote code and get the result back.
    * 
    * ```js
    * // Eg from https://www.espruino.com/Web+Bluetooth
    * writeScript(`
-   * setInterval(() => Bluetooth.println(E.getTemperature()), 1000);
-   * NRF.on('disconnect',()=>reset());
+   *  setInterval(() => Bluetooth.println(E.getTemperature()), 1000);
+   *  NRF.on('disconnect',()=>reset());
    * `);
    * ```
+   * 
+   * @param code Code to send. A new line is added automatically.
    */
   async writeScript(code:string) {
     this.write(`\x03\x10reset();\n`);
@@ -126,6 +93,11 @@ export class EspruinoDevice extends NordicBleDevice {
    * @param opts Options
    */
   async eval(code:string, opts:EvalOpts = {}):Promise<string> {
+    return deviceEval(code, opts, this, `Bluetooth.println`, false, (msg) => {
+      this.warn(msg);
+    });
+  }
+  /*
     const timeoutMs = opts.timeoutMs ?? this.evalTimeoutMs;
     const assumeExclusive = opts.assumeExclusive ?? true;
 
@@ -135,7 +107,7 @@ export class EspruinoDevice extends NordicBleDevice {
       // Generate a random id so reply can be matched up with this request
       const id = randomString(5);
 
-      const onData = (d:BleDevice.DataEvent) => {
+      const onData = (d:DataEvent) => {
         try {
           // Parse reply, expecting JSON.
           const dd = JSON.parse(d.data);
@@ -182,53 +154,6 @@ export class EspruinoDevice extends NordicBleDevice {
 
       this.write(`\x10Bluetooth.println(JSON.stringify({reply:"${id}", result:JSON.stringify(${code})}))\n`);
     });
-  }
+  */
 }
 
-
-/**
- * @inheritdoc EspruinoDevice
- * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
- */
-export const puck = async (opts:{readonly name?:string, readonly debug?:boolean} = {}) => {
-  const name = opts.name ?? `Puck`;
-  const debug = opts.debug ?? false;
-
-  const device = await navigator.bluetooth.requestDevice({
-    filters: [
-      {namePrefix: `Puck.js`},
-      // {namePrefix: 'Pixl.js'},
-      // {namePrefix: 'MDBT42Q'},
-      // {namePrefix: 'RuuviTag'},
-      // {namePrefix: 'iTracker'},
-      // {namePrefix: 'Thingy'},
-      // {namePrefix: 'Espruino'},
-      {services: [NordicDefaults.service]}
-    ], optionalServices: [NordicDefaults.service]
-  });
-  const d = new EspruinoDevice(device, {name, debug});
-  await d.connect();
-  return d;
-};
-
-/**
- * @inheritdoc EspruinoDevice
- * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
- */
-export const connect = async () => {
-  const device = await navigator.bluetooth.requestDevice({
-    filters: [
-      {namePrefix: `Puck.js`},
-      {namePrefix: `Pixl.js`},
-      {namePrefix: `MDBT42Q`},
-      {namePrefix: `RuuviTag`},
-      {namePrefix: `iTracker`},
-      {namePrefix: `Thingy`},
-      {namePrefix: `Espruino`},
-      {services: [NordicDefaults.service]}
-    ], optionalServices: [NordicDefaults.service]
-  });
-  const d = new EspruinoDevice(device, {name:`Espruino`});
-  await d.connect();
-  return d;
-};

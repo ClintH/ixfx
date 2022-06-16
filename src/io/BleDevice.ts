@@ -1,10 +1,11 @@
 import {SimpleEventEmitter} from "../Events.js";
-import {StateChangeEvent, StateMachine} from "../flow/StateMachine";
+import { StateMachine} from "../flow/StateMachine.js";
 import {indexOfCharCode, omitChars} from "../Text";
 import {Codec} from "./Codec";
 import {StringReceiveBuffer} from "./StringReceiveBuffer";
 import {StringWriteBuffer} from "./StringWriteBuffer";
 import {retry} from "../flow/Timer.js";
+import {Events} from "./Espruino.js";
 
 export type Opts = {
   readonly service:string
@@ -15,15 +16,6 @@ export type Opts = {
   readonly connectAttempts:number
   readonly debug:boolean
 }
-
-export type DataEvent = {
-  readonly data:string
-}
-
-type Events = {
-  readonly data: DataEvent
-  readonly change: StateChangeEvent
-};
 
 export class BleDevice extends SimpleEventEmitter<Events> {
   states: StateMachine;

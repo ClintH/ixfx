@@ -120,7 +120,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<Events> {
   /**
    * Should throw if did not succeed.
    */
-  abstract onConnectAttempt():Promise<void>;
+  protected abstract onConnectAttempt():Promise<void>;
 
   private onRx(evt: Event) {
     //const rx = this.rx;

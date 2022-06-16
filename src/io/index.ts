@@ -10,10 +10,10 @@ export * as AudioVisualisers from '../io/AudioVisualiser.js';
  * Espruino-based devices connected via Bluetooth LE
  * 
  * Overview:
- * * {@link puck}: Connect to a Puck.js
+ * * {@link puck}: Connect ./EspruinoBleDevice.js
  * * {@link connect}: Connect to a generic Espruino
  */
-export * as Espruino from './EspruinoDevice.js';
+export * as Espruino from './Espruino.js';
 
 export * as Camera from './Camera.js';
 
