@@ -1,5 +1,5 @@
 import {SimpleEventEmitter} from "../Events.js";
-import { msElapsedTimer, TimerSource} from "../flow/Timer.js";
+import { continuously, msElapsedTimer, TimerSource} from "../flow/Timer.js";
 import { Timer } from "../flow/Timer.js";
 import { StateMachine } from "../flow/StateMachine.js";
 import {Path} from "~/geometry/Path.js";
@@ -186,23 +186,18 @@ class AdsrBase extends SimpleEventEmitter<Events> {
       hasChanged = false;
       switch (this.#sm.state) {
       case `attack`:
-        // console.log(`switchState - attack ${wasHeld}`);
-
         if (elapsed > this.attackDuration || wasHeld) {
           this.#sm.next();
           hasChanged = true;
         }
         break;
       case `decay`:
-        // console.log(`switchState - decay ${wasHeld}`);
-
         if (elapsed > this.decayDurationTotal || wasHeld) {
           this.#sm.next();
           hasChanged = true;
         }
         break;
       case `sustain`:
-        // console.log(`switchState - sustain ${wasHeld}`);
         if (!this.#holding || wasHeld) {
           elapsed = 0;
           this.#sm.next();
@@ -211,7 +206,6 @@ class AdsrBase extends SimpleEventEmitter<Events> {
         }
         break;
       case `release`:
-        // console.log(`switchState - release`);
         if (elapsed > this.releaseDuration) {
           this.#sm.next();
           hasChanged = true;
@@ -464,7 +458,6 @@ class AdsrImpl extends AdsrBase implements Adsr {
       this.releasedAt = v;
       break;
     case `decay`:
-      //Bezier.computeQuadraticSimple(start, end, bend, amt);
       v = this.decayPath.interpolate(amt).y;
       this.releasedAt = v;
       break;
@@ -495,3 +488,39 @@ class AdsrImpl extends AdsrBase implements Adsr {
  * @returns New {@link Adsr} Envelope
  */
 export const adsr = (opts:EnvelopeOpts):Adsr => new AdsrImpl(opts);
+
+/**
+ * Creates and runs an envelope, sampling its values at `sampleRateMs`.
+ * ```
+ * // Sample an envelope every 5ms
+ * const values = adsrSample(opts, 5);
+ * ```
+ * @param opts Envelope options
+ * @param sampleRateMs Sample rate
+ * @returns 
+ */
+export const adsrSample = (opts:EnvelopeOpts, sampleRateMs:number):Promise<readonly number[]> => {
+  if (opts.shouldLoop) throw new Error(`Cannot sample a looping envelope`);
+  
+  const env = adsr(opts);
+  const data:number[] = [];
+  //eslint-disable-next-line functional/no-let
+  let started = false;
+
+  return new Promise<number[]>((resolve, _reject) => {
+    continuously(() => {
+      if (!started) {
+        started = true;
+        env.trigger();
+      }
+
+      //eslint-disable-next-line functional/immutable-data
+      const v = env.value;
+      if (!Number.isNaN(v)) data.push(env.value);
+      if (env.isDone) {
+        resolve(data);
+        return false;
+      }
+    }, sampleRateMs).start();
+  });
+};
