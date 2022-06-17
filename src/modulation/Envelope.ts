@@ -514,8 +514,8 @@ export const adsrSample = (opts:EnvelopeOpts, sampleRateMs:number):Promise<reado
         env.trigger();
       }
 
-      //eslint-disable-next-line functional/immutable-data
       const v = env.value;
+      //eslint-disable-next-line functional/immutable-data
       if (!Number.isNaN(v)) data.push(env.value);
       if (env.isDone) {
         resolve(data);
