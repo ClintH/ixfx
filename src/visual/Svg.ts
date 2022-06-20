@@ -3,7 +3,7 @@ import {markerPrebuilt} from "./SvgMarkers.js";
 import * as Lines from "../geometry/Line.js";
 import * as Points from "../geometry/Point.js";
 import * as Elements from "./SvgElements.js";
-import * as Rects from "~/geometry/Rect.js";
+import * as Rects from "../geometry/Rect.js";
 
 export {Elements};
 
@@ -138,6 +138,16 @@ export const remove = <V extends SVGElement>(parent:SVGElement, queryOrExisting:
     e.remove();
   } else {
     queryOrExisting.remove();
+  }
+};
+
+export const clear = (parent:SVGElement) => {
+  //eslint-disable-next-line functional/no-let
+  let c = parent.lastElementChild;
+  //eslint-disable-next-line functional/no-loop-statement
+  while (c) {
+    parent.removeChild(c);
+    c = parent.lastElementChild;
   }
 };
 
