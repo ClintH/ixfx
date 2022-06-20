@@ -232,29 +232,42 @@ export const withinRange = (line:Line, point:Points.Point, maxRange:number):bool
 };
 
 /**
- * Returns the length of a line or length between two points
+ * Returns the length between two points
  * ```js
- * length(line);
  * length(ptA, ptB);
  * ```
- * @param aOrLine Line or first point
+ * @param a First point
  * @param b Second point
  * @returns 
  */
-export const length = (aOrLine: Points.Point|Line, pointB?: Points.Point): number => {
-  //eslint-disable-next-line functional/no-let
-  // let a;
-  // if (isLine(aOrLine)) {
-  //   b = aOrLine.b;
-  //   a = aOrLine.a;
-  // } else {
-  //   a = aOrLine;
-  //   if (b === undefined) throw new Error(`Requires both a and b parameters`);
-  // }
-  // guardPoint(a, `a`);
-  // guardPoint(a, `b`);
-  const [a, b] = points(aOrLine, pointB);
+export function length(a: Points.Point, b: Points.Point): number;
 
+/**
+ * Returns length of line. If a polyline (array of lines) is provided,
+ * it is the sum total that is returned.
+ * 
+ * ```js
+ * length(a: {x:0, y:0}, b: {x: 100, y:100});
+ * length(lines);
+ * ```
+ * @param line Line
+ */
+export function length(line: Line|PolyLine): number;
+
+/**
+ * Returns length of line, polyline or between two points
+ * @param aOrLine Point A, line or polyline (array of lines)
+ * @param pointB Point B, if first parameter is a point
+ * @returns Length (total accumulated length for arrays)
+ */
+//eslint-disable-next-line func-style
+export function length(aOrLine: Points.Point|Line|PolyLine, pointB?: Points.Point): number  {
+  if (isPolyLine(aOrLine)) {
+    const sum = aOrLine.reduce((acc, v) => length(v) + acc, 0);
+    return sum;
+  }
+
+  const [a, b] = getPointsParam(aOrLine, pointB);
   const x = b.x - a.x;
   const y = b.y - a.y;
   if (a.z !== undefined && b.z !== undefined) {
@@ -263,14 +276,23 @@ export const length = (aOrLine: Points.Point|Line, pointB?: Points.Point): numbe
   } else {
     return Math.hypot(x, y);
   }
-};
+}
 
 export const midpoint =(aOrLine: Points.Point|Line, pointB?: Points.Point):Points.Point => {
-  const [a, b] = points(aOrLine, pointB);
+  const [a, b] = getPointsParam(aOrLine, pointB);
   return interpolate(0.5, a, b);
 };
 
-export const points = (aOrLine: Points.Point|Line, b?: Points.Point): readonly [Points.Point, Points.Point] => {
+/**
+ * Returns [a,b] points from either a line parameter, or two points.
+ * It additionally applies the guardPoint function to ensure validity.
+ * This supports function overloading.
+ * @ignore
+ * @param aOrLine 
+ * @param b 
+ * @returns 
+ */
+export const getPointsParam = (aOrLine: Points.Point|Line, b?: Points.Point): readonly [Points.Point, Points.Point] => {
   //eslint-disable-next-line functional/no-let
   let a;
   if (isLine(aOrLine)) {
@@ -516,7 +538,7 @@ export function interpolate(amount: number, line:Line): Points.Point;
 export function interpolate(amount:number, aOrLine:Points.Point|Line, pointB?:Points.Point): Points.Point {
   guardPercent(amount, `amount`);
 
-  const [a, b] = points(aOrLine, pointB);
+  const [a, b] = getPointsParam(aOrLine, pointB);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
@@ -636,9 +658,9 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
 };
 
 /**
- * Returns an array of lines that connects provided points.
+ * Returns an array of lines that connects provided points. Note that line is not closed.
  * 
- * Eg, if points a,b,c are provided, two lines are provided: a->b and b->c
+ * Eg, if points a,b,c are provided, two lines are provided: a->b and b->c.
  * @param points 
  * @returns 
  */
