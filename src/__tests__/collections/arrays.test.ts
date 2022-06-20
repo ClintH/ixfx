@@ -1,5 +1,18 @@
 /* eslint-disable */
-import {zip,areValuesIdentical,ensureLength} from '../../collections/Arrays.js';
+import {zip,areValuesIdentical,ensureLength,remove} from '../../collections/Arrays.js';
+
+test(`remove`, () => {
+  expect(remove([1,2,3], 2)).toEqual([1,2]);
+  expect(remove([1,2,3], 0)).toEqual([2,3]);
+  expect(remove([1,2,3], 1)).toEqual([1,3]);
+
+  // Index past length
+  expect(() => remove([1,2,3], 3)).toThrow();
+  // Not an array
+  // @ts-ignore
+  expect(() => remove(10, 3)).toThrow();
+
+});
 
 test(`ensureLength`, () => {
   expect(ensureLength([1,2,3], 2)).toEqual([1,2]);

@@ -290,6 +290,13 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
  */
 export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));
 
+export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V> => {
+  // ✔️ Unit tested
+  if (!Array.isArray(data)) throw new Error(`'data' parameter should be an array`);
+  guardIndex(data, index, `index`);
+  return [...data.slice(0, index), ...data.slice(index+1)]; 
+};
+
 /**
  * Groups data by a grouper function, returning data as a map with string
  * keys and array values.
