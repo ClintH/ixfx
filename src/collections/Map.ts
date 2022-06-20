@@ -24,6 +24,8 @@ export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, compare
   return values.some(v => comparer(v, value));
 };
 
+export type GetOrGenerate<K, V, Z> = (key:K, args?:Z) => Promise<V>;
+
 /**
  * Returns a function that fetches a value from a map, or generates and sets it if not present.
  * Undefined is never returned, because if `fn` yields that, an error is thrown.
@@ -39,9 +41,10 @@ export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, compare
  * const v = await m(`hello`);
  * const v1 = await m(`hello`); // Value exists, so it is returned.
  * ```
+ * 
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const getOrGenerate = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>Promise<V>|V) => async (key:K, args?:Z):Promise<V> => {
+export const getOrGenerate = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>Promise<V>|V):GetOrGenerate<K, V, Z> => async (key:K, args?:Z):Promise<V> => {
   //eslint-disable-next-line functional/no-let
   let value = map.get(key);
   if (value !== undefined) return Promise.resolve(value);
