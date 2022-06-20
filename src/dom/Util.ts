@@ -1,5 +1,6 @@
 import { Observable,  debounceTime, fromEvent } from 'rxjs';
-import {Points} from '~/geometry';
+import * as Points from '../geometry/Point';
+
 
 type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
   readonly el:V
@@ -265,6 +266,20 @@ export const createIn = (parent: HTMLElement, tagName: string): HTMLElement => {
 };
 
 /**
+ * Remove all child nodes from `parent`
+ * @param parent 
+ */
+export const clear = (parent:HTMLElement) => {
+  //eslint-disable-next-line functional/no-let
+  let c = parent.lastElementChild;
+  //eslint-disable-next-line functional/no-loop-statement
+  while (c) {
+    parent.removeChild(c);
+    c = parent.lastElementChild;
+  }
+};
+
+/**
  * Observer when document's class changes
  * 
  * ```js
@@ -353,4 +368,39 @@ export const copyToClipboard = (obj: object) => {
     );
   });
   return p;
+};
+
+export type CreateUpdateElement<V> = (item:V, el:HTMLElement|null) => HTMLElement;
+
+export const reconcileChildren = <V>(parentEl:HTMLElement, list:ReadonlyMap<string, V>, createUpdate:CreateUpdateElement<V>) => {
+  if (parentEl === null) throw new Error(`parentEl is null`);
+  if (parentEl === undefined) throw new Error(`parentEl is undefined`);
+  
+  const seen = new Set<string>();
+  
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const [key, value] of list) {
+    const id = `c-${key}`;
+    const el = parentEl.querySelector(`#${id}`) as HTMLElement;
+    const finalEl = createUpdate(value, el);
+    //eslint-disable-next-line functional/immutable-data
+    if (el !== finalEl) {
+      //eslint-disable-next-line functional/immutable-data
+      finalEl.id = id;
+      parentEl.append(finalEl);
+    }
+    seen.add(id);
+  }
+
+  const prune:HTMLElement[] = [];
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=0;i<parentEl.children.length;i++) {
+    const c = parentEl.children[i] as HTMLElement;
+    if (!seen.has(c.id)) {
+      //eslint-disable-next-line functional/immutable-data
+      prune.push(c);
+    }
+  }
+
+  prune.forEach(p => p.remove());
 };
