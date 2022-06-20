@@ -89,13 +89,14 @@ export function distance(a:Point):number;
  * @param b 
  * @returns 
  */
+//eslint-disable-next-line func-style
 export function distance(a:Point, xOrB?:Point|number, y?:number):number {
   const pt = getPointParam(xOrB, y);
-  guard(a , `a`);
+  guard(a, `a`);
   guard(pt);
   
   return Math.hypot(pt.x-a.x, pt.y-a.y);
-};
+}
 
 /**
  * Returns the distance from point `a` to the exterior of `shape`.
@@ -191,6 +192,38 @@ export const guardNonZeroPoint = (pt: Point, name = `pt`) => {
  * @returns 
  */
 export const angleBetween = (a: Point, b: Point) => Math.atan2(b.y - a.y, b.x - a.x);
+
+/**
+ * Calculates the centroid of a set of points
+ * 
+ * As per {@link https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points}
+ * 
+ * ```js
+ * // Find centroid of a list of points
+ * const c1 = centroid(p1, p2, p3, ...);
+ * 
+ * // Find centroid of an array of points
+ * const c2 = centroid(...pointsArray);
+ * ```
+ * @param points 
+ * @returns A single point
+ */
+export const centroid = (...points:readonly Point[]):Point => {
+  if (!Array.isArray(points)) throw new Error(`Expected list of points`); 
+  const sum = points.reduce((prev, p) => {
+    if (Array.isArray(p)) throw new Error(`'points' list contains an array. Did you mean: centroid(...myPoints)?`);
+    if (!isPoint(p)) throw new Error(`'points' contains something which is not a point: ${JSON.stringify(p)}`);
+    return {
+      x: prev.x + p.x,
+      y: prev.y + p.y
+    };
+  }, {x:0, y:0});
+
+  return {
+    x: sum.x / points.length,
+    y: sum.y / points.length
+  };
+};
 
 /**
  * Returns the minimum rectangle that can enclose all provided points
@@ -697,6 +730,64 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
 }
 
 /**
+ * Simple convex hull impementation. Returns a set of points which
+ * enclose `pts`.
+ * 
+ * For a more power, see something like [Hull.js](https://github.com/AndriiHeonia/hull)
+ * @param pts 
+ * @returns 
+ */
+export const convexHull = (...pts:readonly Point[]):readonly Point[] => {
+  const sorted = [...pts].sort(compareByX);
+  if (sorted.length === 1) return sorted;
+
+  const x = (points:Point[]) => {
+    const v:Point[] = [];
+    points.forEach(p => {
+      //eslint-disable-next-line functional/no-loop-statement
+      while (v.length >= 2) {
+        const q = v[v.length-1];
+        const r = v[v.length-2];
+        if ((q.x - r.x) * (p.y - r.y) >= (q.y - r.y) * (p.x - r.x)) {
+          //eslint-disable-next-line functional/immutable-data
+          v.pop();
+        } else break;
+      }
+      //eslint-disable-next-line functional/immutable-data
+      v.push(p);
+    });
+    //eslint-disable-next-line functional/immutable-data
+    v.pop();
+    return v;
+  };
+
+  const upper = x(sorted);
+  //eslint-disable-next-line functional/immutable-data
+  const lower = x(sorted.reverse());
+
+  if (upper.length === 1 && lower.length === 1 && isEqual(lower[0], upper[0])) return upper;
+  return upper.concat(lower);
+};
+
+/**
+ * Returns -1 if either x/y of a is less than b's x/y
+ * Returns 1 if either x/y of a is greater than b's x/y
+ * Returns 0 if x/y of a and b are equal
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const compare = (a: Point, b:Point):number => {
+  if (a.x < b.x || a.y < b.y) return -1;
+  if (a.x > b.x || a.y > b.y) return 1;
+  return 0;
+};
+
+
+export const compareByX = (a:Point, b:Point):number =>  a.x - b.x || a.y - b.y;
+
+
+/**
  * Rotate a single point by a given amount in radians
  * @param pt 
  * @param amountRadian 
@@ -907,3 +998,36 @@ export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
     };
   }
 }
+
+/**
+ * Tracks the relation between two points
+ * 
+ * ```js
+ * // Start point: 50,50
+ * const t = track({x:50,y:50});
+ * 
+ * // Compare to a 0,0
+ * const {angle, distance, centroid} = t({x:0,y:0});
+ * ```
+ * 
+ * X,y coordinates can also be used as parameters:
+ * ```js
+ * const t = track(50, 50);
+ * const {angle, distance, centroid} = t(0, 0);
+ * ```
+ * @param start 
+ * @returns 
+ */
+export const relation = (a:Point|number, b?:number) => {
+  const start = getPointParam(a, b);
+  const update = (aa:Point|number, bb?:number) => {
+    const p = getPointParam(aa, bb);
+    return {
+      angle: angleBetween(p, start),
+      distance: distance(p, start),
+      centroid: centroid(p, start)
+    };
+  };
+
+  return update;
+};
