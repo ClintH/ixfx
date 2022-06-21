@@ -9,3 +9,4 @@ export * from './Util.js';
  */
 export * as Forms from './Forms.js';
 
+export * from './PointerVisualise.js';
