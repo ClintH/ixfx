@@ -15,8 +15,33 @@ type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
   readonly ctx:CanvasRenderingContext2D
 }
 
+
+export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>) => void) => {
+  const el = resolveEl<V>(domQueryOrEl);
+
+  const r = windowResize();
+  const update = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    el.setAttribute(`width`, width.toString());
+    el.setAttribute(`height`, height.toString());
+
+    const bounds = {width, height, center: {x: width/2, y:height/2}};
+    if (onResized !== undefined) onResized({el, bounds});
+
+  };
+  r.subscribe(update);
+  
+  update();
+  return r;
+};
+
+/// TODO: MAke fullSizeCanvas use fullSizeElement
+
 /**
- * Resizes given canvas element to match window size. To resize canvas to match its parent, use {@link parentSizeCanvas}.
+ * Resizes given canvas element to match window size. 
+ * To resize canvas to match its parent, use {@link parentSizeCanvas}.
  * 
  * To make the canvas appear propery, it sets the following CSS:
  * ```css
@@ -152,7 +177,8 @@ export const getTranslation = (domQueryOrEl:string|HTMLElement): Points.Point =>
   return {x: 0, y: 0, z:0};
 };
 /**
- * Resizes given canvas element to its parent element. To resize canvas to match the viewport, use {@link fullSizeCanvas}.
+ * Resizes given canvas or SVG element to its parent element. 
+ * To resize canvas to match the viewport, use {@link fullSizeCanvas}.
  * 
  * Provide a callback for when resize happens.
  * @param domQueryOrEl Query string or reference to canvas element
@@ -217,7 +243,7 @@ export const windowResize = (timeoutMs:number = 100) => fromEvent(window, `resiz
  * @param domQueryOrEl 
  * @returns 
  */
-export const resolveEl = <V extends HTMLElement>(domQueryOrEl:string|V):V => {
+export const resolveEl = <V extends Element>(domQueryOrEl:string|V):V => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {
@@ -263,6 +289,91 @@ export const createIn = (parent: HTMLElement, tagName: string): HTMLElement => {
   const el = document.createElement(tagName);
   parent.appendChild(el);
   return el;
+};
+
+export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap<string, object>): (data:ReadonlyMap<string, object>) => void => {
+  const parent = resolveEl(parentOrQuery);
+
+  const update = (data:ReadonlyMap<string, object>) => {
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const [key, value] of data) {
+      const tKey = `table-${key}`;
+      //eslint-disable-next-line functional/no-let
+      let t = parent.querySelector(`#${tKey}`);
+      if (t === null) {
+        t = document.createElement(`table`);
+        //eslint-disable-next-line functional/immutable-data
+        t.id = tKey;
+        parent.append(t);
+      }
+
+      updateDataTable(t as HTMLTableElement, value);
+    }
+  };
+
+  if (data) update(data);
+
+  return (d:ReadonlyMap<string, object>) => {
+    update(d);
+  };
+  
+};
+
+const updateDataTable = (t:HTMLTableElement, data:object) => {
+  if (data === undefined) {
+    //eslint-disable-next-line functional/immutable-data
+    t.innerHTML = ``;
+    return;
+  }
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const [key, value] of Object.entries(data)) {
+    const domKey = `row-${key}`;
+    //eslint-disable-next-line functional/no-let
+    let rowEl = t.querySelector(`#${domKey}`);
+    if (rowEl === null) {
+      rowEl = document.createElement(`tr`);
+      t.append(rowEl);
+      //eslint-disable-next-line functional/immutable-data
+      rowEl.id = domKey;
+
+      const keyEl = document.createElement(`td`);
+      //eslint-disable-next-line functional/immutable-data
+      keyEl.innerText = key;
+      rowEl.append(keyEl);
+    }
+
+    //eslint-disable-next-line functional/no-let
+    let valEl = rowEl.querySelector(`#${domKey}-val`);
+    if (valEl === null) {
+      valEl = document.createElement(`td`);
+      rowEl.append(valEl);
+    }
+    //eslint-disable-next-line functional/immutable-data
+    (valEl as HTMLElement).innerText = (value as object).toString();
+  }
+};
+
+/**
+ * Creates a HTML table where each row is a key-value pair from `data`.
+ * First column is the key, second column data.
+ * 
+ * ```js
+ * const dt = dataTable(`#hostDiv`);
+ * dt({
+ *  name: `Blerg`,
+ *  height: 120
+ * });
+ * ```
+ */
+export const dataTable = (parentOrQuery:HTMLElement|string, data?:object): (data:object) => void => {
+  const parent = resolveEl(parentOrQuery);
+  const t = document.createElement(`table`);
+  parent.append(t);
+  
+  if (data) updateDataTable(t, data);
+  return (d:object) => {
+    updateDataTable(t, d);
+  };
 };
 
 /**
