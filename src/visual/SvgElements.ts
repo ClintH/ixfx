@@ -69,7 +69,7 @@ export const circleUpdate = (elem: SVGCircleElement, circle: CirclePositioned, o
  * @param queryOrExisting 
  * @returns 
  */
-export const circle = (circle: CirclePositioned, parent: SVGElement, opts?: Svg.DrawingOpts, queryOrExisting?: string | SVGCircleElement): SVGCircleElement => {
+export const circle = (circle: CirclePositioned, parent: SVGElement, opts?: Svg.CircleDrawingOpts, queryOrExisting?: string | SVGCircleElement): SVGCircleElement => {
   const p = Svg.createOrResolve<SVGCircleElement>(parent, `circle`, queryOrExisting);
   return circleUpdate(p, circle, opts);
 };

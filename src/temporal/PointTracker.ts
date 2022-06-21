@@ -7,6 +7,7 @@ export type SeenInfo = {
   readonly centroid:Points.Point
   readonly angle:number
   readonly speed:number
+  readonly points:readonly Points.Point[]
 };
 
 export type TimestampedPoint = Points.Point & {
@@ -22,9 +23,9 @@ export class TrackedPoint {
   lastPoint:TimestampedPoint;
 
   constructor(readonly id:string, start:Points.Point, readonly storePoints:boolean) {
-    const s = {...start, at:Date.now()};
+    const s = {x:start.x, y:start.y, at:Date.now()};
     this.relation = Points.relation(s);
-    this.lastPoint = {...start, at:Date.now()};
+    this.lastPoint = {x: start.x, y:start.y, at:Date.now()};
     this.points = [s];
   }
 
@@ -53,7 +54,8 @@ export class TrackedPoint {
   seen(...p:Points.Point[]|TimestampedPoint[]):SeenInfo {
     // Make sure points have a timestamp
     const ts = p.map(v => ((`at` in v) ? v : {
-      ...v,
+      x: v.x,
+      y: v.y,
       at: Date.now()
     }));
 
@@ -64,9 +66,10 @@ export class TrackedPoint {
     // Get basic geometric relation from start to the last provided point
     const rel = this.relation(last);
     
-    const r = {
+    const r:SeenInfo = {
       ...rel,
-      speed: Line.length(last, this.lastPoint) / (last.at - this.lastPoint.at)
+      points: this.points,
+      speed: Line.length(last, this.lastPoint) / (last.at - this.lastPoint.at),
     };
 
     this.lastPoint = last;
@@ -134,6 +137,10 @@ export class PointTracker  {
    */
   get size() {
     return this.store.size;
+  }
+
+  has(id:string) {
+    return this.store.has(id);
   }
 
   /**

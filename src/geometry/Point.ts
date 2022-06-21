@@ -26,7 +26,7 @@ export const getPointParam = (a?:Point|number, b?:number):Point => {
   if (Points.isPoint(a)) {
     return a;
   } else if (typeof a !== `number` || typeof b !== `number`) {
-    throw new Error(`Expected point or x,y as parameters`);
+    throw new Error(`Expected point or x,y as parameters. Got: a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
   } else {
     return {x: a, y: b};
   }
