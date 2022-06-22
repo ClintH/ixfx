@@ -1,47 +1,36 @@
 import * as Points from "../geometry/Point.js";
-import {getOrGenerate, GetOrGenerate} from "../collections/Map.js";
 import * as Line from "~/geometry/Line.js";
+import {Timestamped, ObjectTracker, TrackedValueMap, Opts as TrackOpts} from "./TrackedValue.js";
 
-export type SeenInfo = {
+export type PointSeenInfo = {
   readonly distance:number
   readonly centroid:Points.Point
   readonly angle:number
   readonly speed:number
-  readonly points:readonly Points.Point[]
-};
-
-export type TimestampedPoint = Points.Point & {
-  readonly at:number
+  readonly values:readonly Points.Point[]
 };
 
 /**
  * A tracked point
  */
-export class TrackedPoint {
-  relation;
-  points:TimestampedPoint[];
-  lastPoint:TimestampedPoint;
+export class PointTracker extends ObjectTracker<Points.Point> {
+  relation:Points.PointRelation|undefined;
 
-  constructor(readonly id:string, start:Points.Point, readonly storePoints:boolean) {
-    const s = {x:start.x, y:start.y, at:Date.now()};
-    this.relation = Points.relation(s);
-    this.lastPoint = {x: start.x, y:start.y, at:Date.now()};
-    this.points = [s];
+  constructor(readonly id:string, readonly opts:TrackOpts) {
+    super(id, opts);
   }
 
   get x() {
-    return this.lastPoint.x;
+    return this.last.x;
   }
 
   get y() {
-    return this.lastPoint.y;
+    return this.last.y;
   }
 
-  /**
-   * Returns number of saved points (including start)
-   */
-  get size() {
-    return this.points.length;
+  onReset(): void {
+    super.onReset();
+    this.relation = undefined;
   }
 
   /**
@@ -51,28 +40,24 @@ export class TrackedPoint {
    * If multiple points are given, it's relation to the last point that is returned.
    * @param p Point
    */
-  seen(...p:Points.Point[]|TimestampedPoint[]):SeenInfo {
-    // Make sure points have a timestamp
-    const ts = p.map(v => ((`at` in v) ? v : {
-      x: v.x,
-      y: v.y,
-      at: Date.now()
-    }));
+  seen(...p:Points.Point[]|Timestamped<Points.Point>[]):PointSeenInfo {
+    const currentLast = this.last;
+    super.seen(...p);
+    const newLast = this.last;
 
-    const last = ts[p.length-1];
-  
-    if (this.storePoints) this.points.push(...ts);
-  
+    if (this.relation === undefined) {
+      this.relation = Points.relation(newLast);
+    }
     // Get basic geometric relation from start to the last provided point
-    const rel = this.relation(last);
+    const rel = this.relation(newLast);
     
-    const r:SeenInfo = {
+
+    const r:PointSeenInfo = {
       ...rel,
-      points: this.points,
-      speed: Line.length(last, this.lastPoint) / (last.at - this.lastPoint.at),
+      values: this.values,
+      speed: this.values.length < 2 ? 0 : Line.length(currentLast, newLast) / (newLast.at - currentLast.at),
     };
 
-    this.lastPoint = last;
     return r;
   }
 
@@ -81,8 +66,31 @@ export class TrackedPoint {
    * Returns an empty array if points were not saved, or there's only one.
    */
   get line():Line.PolyLine {
-    if (this.points.length === 1) return [];
-    return Line.joinPointsToLines(...this.points);
+    if (this.values.length === 1) return [];
+    return Line.joinPointsToLines(...this.values);
+  }
+
+  /**
+   * Returns distance from latest point to initial point.
+   * If there are less than two points, zero is returned.
+   * @returns 
+   */
+  distanceFromStart():number {
+    if (this.values.length >= 2) {
+      return Points.distance(this.initial!, this.last);
+    } else {
+      return 0;
+    }
+  }
+  /**
+   * Returns angle from latest point to the initial point
+   * If there are less than two points, undefined is return.
+   * @returns 
+   */
+  angleFromStart():number|undefined {
+    if (this.values.length > 2) {
+      return Points.angleBetween(this.initial!, this.last);
+    }
   }
 
   /**
@@ -90,155 +98,40 @@ export class TrackedPoint {
    * Returns 0 if points were not saved, or there's only one
    */
   get length():number {
-    if (this.points.length === 1) return 0;
+    if (this.values.length === 1) return 0;
     const l = this.line;
     return Line.length(l);
   }
-
-  /**
-   * Returns the elapsed time, in milliseconds since the instance was created
-   */
-  get elapsed():number {
-    return Date.now() - this.points[0].at;
-  }
 }
 
-/**
- * Options for PointTracker
- */
-export type Opts = {
-  /**
-   * If true, intermediate points are stored
-   */
-  readonly trackIntermediatePoints?:boolean
-}
 
-export const pointTracker = (opts:Opts):PointTracker => new PointTracker(opts);
-
-/**
- * PointTracker. Mutable.
- */
-export class PointTracker  {
-  store:Map<string, TrackedPoint>;
-  gog:GetOrGenerate<string, TrackedPoint, Points.Point>;
-
-  constructor(opts:Opts = {}) {
-    const trackIntermediatePoints = opts.trackIntermediatePoints ?? false;
-
-    this.store = new Map();
-    this.gog = getOrGenerate<string, TrackedPoint, Points.Point>(this.store, (key, start) => {
+export class TrackedPointMap extends TrackedValueMap<Points.Point> {
+  constructor(opts:TrackOpts) {
+    super((key, start) => {
       if (start === undefined) throw new Error(`Requires start point`);
-      return new TrackedPoint(key, start, trackIntermediatePoints);
+      const p = new PointTracker(key, opts);
+      p.seen(start);
+      return p;
     });
   }
 
-  /**
-   * Return number of named points being tracked
-   */
-  get size() {
-    return this.store.size;
-  }
-
-  has(id:string) {
-    return this.store.has(id);
-  }
-
-  /**
-   * For a given id, note that we have seen one or more points.
-   * @param id Id
-   * @param points Point(s)
-   * @returns Information about start to last point
-   */
-  async seen(id:string, ...points:Points.Point[]) {
-    if (id === null) throw new Error(`id parameter cannot be null`);
-    if (id === undefined) throw new Error(`id parameter cannot be undefined`);
-
-    // Create or recall TrackedPoint by id
-    const trackedPoint = await this.gog(id, points[0]);
-
-    // Pass it over to the TrackedPoint
-    return trackedPoint.seen(...points);
-  }
-
-  /**
-   * Remove a tracked point by id.
-   * Use {@link reset} to clear them all.
-   * @param id
-   */
-  delete(id:string) {
-    this.store.delete(id);
-  }
-
-  /**
-   * Remove all tracked points.
-   * Use {@link delete} to remove a single point by id.
-   */
-  reset() {
-    this.store = new Map();
-  }
-
-  /**
-   * Enumerate ids
-   */
-  *ids() {
-    yield* this.store.keys();
-  }
-
-  /**
-   * Enumerate tracked points
-   */
-  *trackedPoints() {
-    yield* this.store.values();
-  }
-
-  /**
-   * Returns TrackedPoints ordered with oldest first
-   * @returns 
-   */
-  getTrackedPointsByAge():readonly TrackedPoint[] {
-    const tp = Array.from(this.store.values());
-    tp.sort((a, b) => {
-      const aa =a.elapsed;
-      const bb = b.elapsed;
-      if (aa === bb) return 0;
-      if (aa > bb) return -1;
-      return 1;
-    });
-    return tp;
-  }
-
-  /**
-   * Enumerate last received points
-   * 
-   * @example Calculate centroid of latest-received points
-   * ```js
-   * const c = Points.centroid(...Array.from(pointers.lastPoints()));
-   * ```
-   */
-  *lastPoints() {
-    //eslint-disable-next-line functional/no-loop-statement
-    for (const p of this.store.values()) {
-      yield p.lastPoint;
-    }
-  }
-
-  /**
-   * Enumerate starting points
-   */
-  *startPoints() {
-    //eslint-disable-next-line functional/no-loop-statement
-    for (const p of this.store.values()) {
-      yield p.points[0];
-    }
-  }
-
-  /**
-   * Returns a tracked point by id, or undefined if not found
-   * @param id 
-   * @returns 
-   */
-  get(id:string):TrackedPoint|undefined {
-    return this.store.get(id);
-  }
-  
+  // async seen(id:string, ...values:Points.Point[]) {
+  //   const trackedValue = await this.getTrackedValue(id, ...values) as TrackedPoint;
+  //   return trackedValue.seen(...values);
+  // }
 }
+
+/**
+ * Track several named points
+ * @param opts 
+ * @returns 
+ */
+export const pointsTracker = (opts:TrackOpts) => new TrackedPointMap(opts);
+
+/**
+ * Track a single point
+ * @param id 
+ * @param opts 
+ * @returns 
+ */
+export const pointTracker = (id?:string, opts:TrackOpts = {}) => new PointTracker(id ?? ``, opts);
