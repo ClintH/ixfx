@@ -1,5 +1,5 @@
 /* eslint-disable functional/immutable-data */
-import {pointTracker} from "../temporal/PointTracker.js";
+import {PointSeenInfo, pointsTracker} from "../temporal/PointTracker.js";
 import {fullSizeElement, resolveEl} from "./Util.js";
 import * as Svg from "../visual/Svg.js";
 
@@ -36,8 +36,8 @@ export const pointerVisualise = (elOrQuery: HTMLElement | string, opts:Opts = {}
   let currentHue = hue;
 
   const el = resolveEl(elOrQuery);
-  const tracker = pointTracker({
-    trackIntermediatePoints:trace
+  const tracker = pointsTracker({
+    storeIntermediate:trace
   });  
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,10 +75,10 @@ export const pointerVisualise = (elOrQuery: HTMLElement | string, opts:Opts = {}
 
     if (ev.type ===`pointermove` && !tracker.has(id)) return;
 
-    const info = await tracker.seen(id, pt);
+    const info = await tracker.seen(id, pt) as PointSeenInfo;
 
-    if (info.points.length === 1) {
-      Svg.Elements.circle({...info.points[0], radius: (type === `touch` ? touchRadius : mouseRadius)}, svg, {
+    if (info.values.length === 1) {
+      Svg.Elements.circle({...info.values[0], radius: (type === `touch` ? touchRadius : mouseRadius)}, svg, {
         fillStyle: startFillStyle,
       }, `#pv-start-${id}`);
     }
@@ -87,9 +87,9 @@ export const pointerVisualise = (elOrQuery: HTMLElement | string, opts:Opts = {}
     
     Svg.Elements.circle({...pt, radius: (type === `touch` ? touchRadius : mouseRadius)}, svg, {
       fillStyle: progressFillStyle
-    }, `#pv-progress-${id}-${info.points.length}`);
+    }, `#pv-progress-${id}-${info.values.length}`);
     currentHue +=1;
-    pointerCount = info.points.length;
+    pointerCount = info.values.length;
   };
 
   document.body.appendChild(svg);

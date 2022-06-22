@@ -291,13 +291,24 @@ export const createIn = (parent: HTMLElement, tagName: string): HTMLElement => {
   return el;
 };
 
+/**
+ * Creates a table based on a list of objects
+ * ```
+ * const t = dataTableList(parentEl, map);
+ * 
+ * t(newMap)
+ * ```
+ */
 export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap<string, object>): (data:ReadonlyMap<string, object>) => void => {
   const parent = resolveEl(parentOrQuery);
 
   const update = (data:ReadonlyMap<string, object>) => {
+    const seenTables = new Set();
+
     //eslint-disable-next-line functional/no-loop-statement
     for (const [key, value] of data) {
       const tKey = `table-${key}`;
+      seenTables.add(tKey);
       //eslint-disable-next-line functional/no-let
       let t = parent.querySelector(`#${tKey}`);
       if (t === null) {
@@ -309,6 +320,14 @@ export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap
 
       updateDataTable(t as HTMLTableElement, value);
     }
+
+    // Remove tables that aren't present in map
+    const tables = Array.from(parent.querySelectorAll(`table`));
+    tables.forEach(t => {
+      if (!seenTables.has(t.id)) {
+        t.remove();
+      }
+    });
   };
 
   if (data) update(data);
@@ -319,15 +338,24 @@ export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap
   
 };
 
+/**
+ * Updates a TABLE elment based on `data`'s key-object pairs
+ * @param t 
+ * @param data 
+ * @returns 
+ */
 const updateDataTable = (t:HTMLTableElement, data:object) => {
   if (data === undefined) {
     //eslint-disable-next-line functional/immutable-data
     t.innerHTML = ``;
     return;
   }
+  const seenRows = new Set();
   //eslint-disable-next-line functional/no-loop-statement
   for (const [key, value] of Object.entries(data)) {
     const domKey = `row-${key}`;
+    seenRows.add(domKey);
+
     //eslint-disable-next-line functional/no-let
     let rowEl = t.querySelector(`#${domKey}`);
     if (rowEl === null) {
@@ -344,13 +372,25 @@ const updateDataTable = (t:HTMLTableElement, data:object) => {
 
     //eslint-disable-next-line functional/no-let
     let valEl = rowEl.querySelector(`#${domKey}-val`);
+    
     if (valEl === null) {
       valEl = document.createElement(`td`);
+      //eslint-disable-next-line functional/immutable-data
+      valEl.id = `${domKey}-val`;
       rowEl.append(valEl);
     }
     //eslint-disable-next-line functional/immutable-data
     (valEl as HTMLElement).innerText = (value as object).toString();
   }
+
+  // Remove rows that aren't present in data
+  const rows = Array.from(t.querySelectorAll(`tr`));
+  rows.forEach(r => {
+    if (!seenRows.has(r.id)) {
+      r.remove();
+    }
+  });
+
 };
 
 /**
