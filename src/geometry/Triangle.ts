@@ -1,4 +1,4 @@
-import {Points, Lines,  radianToDegree, Polar, Circles, Triangles, Rects} from './index.js';
+import {Points, Lines,  radianToDegree, Polar, Circles, Rects} from './index.js';
 import {number as guardNumber} from '../Guards.js';
 
 const piPi = Math.PI*2;
@@ -247,6 +247,8 @@ export const perimeter = (t:Triangle):number => {
  * @returns 
  */
 export const area = (t:Triangle):number => {
+  guard(t, `t`);
+
   // Get length of edges
   const e = edges(t).map(l => Lines.length(l));
 

@@ -300,7 +300,7 @@ export const getPointsParam = (aOrLine: Points.Point|Line, b?: Points.Point): re
     a = aOrLine.a;
   } else {
     a = aOrLine;
-    if (b === undefined) throw new Error(`Requires both a and b parameters`);
+    if (b === undefined) throw new Error(`Since first parameter is not a line, two points are expected. Got a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
   }
   guardPoint(a, `a`);
   guardPoint(a, `b`);

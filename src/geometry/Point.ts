@@ -92,7 +92,6 @@ export function distance(a:Point):number;
 //eslint-disable-next-line func-style
 export function distance(a:Point, xOrB?:Point|number, y?:number):number {
   const pt = getPointParam(xOrB, y);
-  guard(a, `a`);
   guard(pt);
   
   return Math.hypot(pt.x-a.x, pt.y-a.y);
@@ -999,6 +998,12 @@ export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
   }
 }
 
+export type PointRelation = (a:Point|number, b?:number) => {
+  readonly angle:number
+  readonly distance:number
+  readonly centroid:Point
+}
+
 /**
  * Tracks the relation between two points
  * 
@@ -1018,7 +1023,7 @@ export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
  * @param start 
  * @returns 
  */
-export const relation = (a:Point|number, b?:number) => {
+export const relation = (a:Point|number, b?:number):PointRelation => {
   const start = getPointParam(a, b);
   const update = (aa:Point|number, bb?:number) => {
     const p = getPointParam(aa, bb);
