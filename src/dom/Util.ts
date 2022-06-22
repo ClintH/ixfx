@@ -176,6 +176,7 @@ export const getTranslation = (domQueryOrEl:string|HTMLElement): Points.Point =>
 
   return {x: 0, y: 0, z:0};
 };
+
 /**
  * Resizes given canvas or SVG element to its parent element. 
  * To resize canvas to match the viewport, use {@link fullSizeCanvas}.
