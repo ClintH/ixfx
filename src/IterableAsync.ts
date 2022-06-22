@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * 
  * ```js
@@ -7,10 +8,10 @@
  * @param it 
  * @param size 
  */
-async function* chunks(it, size) {
+async function* chunks<V>(it:Iterable<V>, size:number) {
   // Source: https://surma.github.io/underdash/
   let buffer = [];
-  for await (let v of it) {
+  for await (const v of it) {
     buffer.push(v);
     if (buffer.length === size) {
       yield buffer;
@@ -20,29 +21,29 @@ async function* chunks(it, size) {
   if (buffer.length > 0) yield buffer;
 }
 
-async function* concat(...its) {
+async function* concat<V>(...its:readonly Iterable<V>[]) {
   // Source: https://surma.github.io/underdash/
 
-  for await (let it of its) yield* it;
+  for await (const it of its) yield* it;
 }
 
-async function* dropWhile(it, f) {
+async function* dropWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  it = it[Symbol.iterator]();
-  for await (let v of it)
-    if (!f(v)) {
-      yield v;
-      break;
-    }
+  //const iit = it[Symbol.asyncIterator]();
+  for await (const v of it)
+  { if (!f(v)) {
+    yield v;
+    break;
+  } }
   yield* it;
 }
 
-async function equals(it1, it2) {
+async function equals<V>(it1:Iterable<V>, it2:Iterable<V>) {
   // https://surma.github.io/underdash/
-  it1 = it1[Symbol.iterator]();
-  it2 = it2[Symbol.iterator]();
+  const iit1 = it1[Symbol.iterator]();
+  const iit2 = it2[Symbol.iterator]();
   while (true) {
-    let i1 = await it1.next(), i2 = await it2.next();
+    const i1 = await iit1.next(), i2 = await iit2.next();
     if (i1.value !== i2.value) return false;
     if (i1.done || i2.done) return i1.done && i2.done;
   }
@@ -55,10 +56,10 @@ async function equals(it1, it2) {
  * @param f 
  * @returns 
  */
-async function every(it, f) {
+async function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   let ok = true;
-  for await (let v of it) ok = ok && f(v);
+  for await (const v of it) ok = ok && f(v);
   return ok;
 }
 
@@ -72,9 +73,9 @@ async function every(it, f) {
  * @param it 
  * @param v 
  */
-async function* fill(it, v) {
+async function* fill<V>(it:AsyncIterable<V>, v:V) {
   // https://surma.github.io/underdash/
-  for await (let _ of it) yield v;
+  for await (const _ of it) yield v;
 }
 
 /**
@@ -85,9 +86,9 @@ async function* fill(it, v) {
  * @param it 
  * @param f 
  */
-async function* filter(it, f) {
+async function* filter<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  for await (let v of it) {
+  for await (const v of it) {
     if (!f(v)) continue;
     yield v;
   }
@@ -103,10 +104,10 @@ async function* filter(it, f) {
  * @param f 
  * @returns 
  */
-async function find(it, f) {
+async function find<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  for await (let v of it)
-    if (f(v)) return v; 
+  for await (const v of it)
+  { if (f(v)) return v; } 
 }
 
 /**
@@ -116,13 +117,15 @@ async function find(it, f) {
  * ```
  * @param it 
  */
-async function* flatten(it) {
+async function* flatten<V>(it:AsyncIterable<V>) {
   // https://surma.github.io/underdash/
-  for await (let v of it) {
-    if (v[Symbol.iterator])
+  for await (const v of it) {
+    if (Symbol.asyncIterator in v) { 
+      // @ts-ignore
       yield* v;
-    else
+    } else {
       yield v;
+    }
   }
 }
 
@@ -131,21 +134,21 @@ async function* flatten(it) {
  * @param it 
  * @param f 
  */
-async function forEach(it, f) {
+async function forEach<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  for await (let v of it) f(v);
+  for await (const v of it) f(v);
 }
 
-async function* map(it, f) {
+async function* map<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  for await (let v of it) 
-    yield f(v);
+  for await (const v of it) 
+  { yield f(v); }
 }
 
-async function max(it, gt = (a,b) => a > b) {
+async function max<V>(it:AsyncIterable<V>, gt = (a:V, b:V) => a > b) {
   // https://surma.github.io/underdash/
-  let max = undefined;
-  for await (let v of it) {
+  let max;
+  for await (const v of it) {
     if(!max) {
       max = v;
       continue;
@@ -155,10 +158,10 @@ async function max(it, gt = (a,b) => a > b) {
   return max;
 }
 
-async function min(it, gt = (a, b) => a > b) {
+async function min<V>(it:AsyncIterable<V>, gt = (a:V, b:V) => a > b) {
   // https://surma.github.io/underdash/
-  let min = undefined;
-  for await (let v of it) {
+  let min;
+  for await (const v of it) {
     if(!min) {
       min = v;
       continue;
@@ -177,47 +180,50 @@ async function min(it, gt = (a, b) => a > b) {
  * @param start 
  * @param len 
  */
-async function* range(start, len) {
+async function* range(start:number, len:number) {
   // https://surma.github.io/underdash/
-  for await (;len > 0; len--) yield start++;
+  for (let i=0;i<len;i++) {
+    yield start++;
+  }
+  //for (let i=len;len > 0; len--) yield start++;
 }
 
-async function reduce(it, f, v0) {
+async function reduce<V>(it:AsyncIterable<V>, f:(acc:V, current:V) => V, start:V) {
   // https://surma.github.io/underdash/
-  for await (let v of it) v0 = f(v0, v);
-  return v0;
+  for await (const v of it) start = f(start, v);
+  return start;
 }
 
-function* slice(it, start = 0, end = Number.POSITIVE_INFINITY) {
+async function* slice<V>(it:AsyncIterable<V>, start = 0, end = Number.POSITIVE_INFINITY) {
   // https://surma.github.io/underdash/
-  it = it[Symbol.iterator]();
-  for(; start > 0; start--, end--) await it.next();
-  for await (let v of it) 
-    if(end-- > 0)
-      yield v;
-    else
-      break;
+  const iit = it[Symbol.asyncIterator]();
+  for(; start > 0; start--, end--) await iit.next();
+  for await (const v of it) 
+  { if(end-- > 0)
+  { yield v; }
+  else
+  { break; } }
 }
 
-async function some(it, f) {
+async function some<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  for await (let v of it) 
-    if(f(v)) return true;
+  for await (const v of it) 
+  { if(f(v)) return true; }
   return false;
 }
 
-async function* takeWhile(it, f) {
+async function* takeWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  for await (let v of it) {
+  for await (const v of it) {
     if (!f(v)) return;
     yield v;
   }
 }
 
-async function* unique(it, f = id => id) {
+async function* unique<V>(it:AsyncIterable<V>, f:((id:V) => V) = id => id) {
   // https://surma.github.io/underdash/
   const buffer = [];
-  for await (let v of it) {
+  for await (const v of it) {
     const fv = f(v);
     if (buffer.indexOf(fv) !== -1) continue;
     buffer.push(fv);
@@ -225,11 +231,11 @@ async function* unique(it, f = id => id) {
   }
 }
 
-async function* zip(...its) {
+async function* zip<V>(...its:AsyncIterable<V>[]) {
   // https://surma.github.io/underdash/
-  its = its.map(it => it[Symbol.iterator]());
+  const iits = its.map(it => it[Symbol.asyncIterator]());
   while(true) {
-    const vs = await Promise.all(its.map(it => it.next()));
+    const vs = await Promise.all(iits.map(it => it.next()));
     if (vs.some(v => v.done)) return;
     yield vs.map(v => v.value);
   }
