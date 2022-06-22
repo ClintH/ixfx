@@ -13,7 +13,7 @@
 
 import {Arrays} from '~/collections/index.js';
 import {Points} from '../geometry/index.js';
-import {Tracker} from '../temporal/Tracker.js';
+import {numberTracker} from '../temporal/NumberTracker.js';
 import {AudioAnalyser} from './AudioAnalyser.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
@@ -28,15 +28,15 @@ export default class AudioVisualiser {
   pointerClickDelayMs = 100;
   pointerDelaying = false;
 
-  waveTracker:Tracker;
-  freqTracker:Tracker;
+  waveTracker;
+  freqTracker;
   el:HTMLElement;
 
   constructor(parentElem:HTMLElement, audio:AudioAnalyser) {
     this.audio = audio;
     this.parent = parentElem;
-    this.waveTracker = new Tracker(`wave`);
-    this.freqTracker = new Tracker(`freq`);
+    this.waveTracker = numberTracker();
+    this.freqTracker = numberTracker();
    
     // Add HTML
     parentElem.innerHTML = `
@@ -124,7 +124,7 @@ export default class AudioVisualiser {
       if (pointer.y > 0 && pointer.y <= canvasHeight && pointer.x >= left && pointer.x <= left + width) {
         // Keep track of data
         if (this.freqTracker.id !== i.toString()) {
-          this.freqTracker.reset(i.toString());
+          this.freqTracker = numberTracker(i.toString());
         }
         this.freqTracker.seen(freq[i]);
 
