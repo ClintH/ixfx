@@ -3,7 +3,7 @@ import {percent as guardPercent} from '../Guards.js';
 import {Path} from './Path.js';
 import { Rects, Points} from './index.js';
 import {minFast} from '../collections/NumericArrays.js';
-import {Arrays} from '~/collections/index.js';
+import {Arrays} from '../collections/index.js';
 
 /**
  * A line, which consists of an `a` and `b` {@link Point}.

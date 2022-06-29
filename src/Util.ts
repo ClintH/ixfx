@@ -381,7 +381,7 @@ export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
 export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof itemToMakeStringFor === `string`) ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor));
 
 /**
- * Wraps a number within a specified range, defaulting to degrees (0-360)
+ * Wraps am integer number within a specified range, defaulting to degrees (0-360)
  * 
  * This is useful for calculations involving degree angles and hue, which wrap from 0-360.
  * Eg: to add 200 to 200, we don't want 400, but 40.

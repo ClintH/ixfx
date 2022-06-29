@@ -8,6 +8,13 @@ export {randomElement as arrayElement};
 export {randomHue as hue} from './visual/Colour.js';
 
 export const defaultRandom = Math.random;
+
+
+/**
+ * A random source.
+ * 
+ * Predefined sources: {@link defaultRandom}, {@link gaussianSkewed}, {@link weightedSkewed}
+ */
 export type RandomSource = () => number;
 
 /***
@@ -19,6 +26,7 @@ export type RandomSource = () => number;
  * weighted(`quadOut`); // quadOut favours high values
  * ```
  * 
+ * Use {@link weighedSkewed} for a curried version that can be used as a {@link RandomSource}.
  * @param easingName Easing name. `quadIn` by default.
  * @param rand Source random generator. `Math.random` by default.
  * @returns Random number (0-1)
@@ -30,6 +38,7 @@ export const weighted = (easingName:Easings.EasingName = `quadIn`, rand:RandomSo
   return easingFn(r);
 };
 
+export const weightedSkewed = (easingName:Easings.EasingName = `quadIn`, rand:RandomSource = defaultRandom):RandomSource => () => weighted(easingName, rand);
 
 /**
  * Random integer, weighted according to an easing function.

@@ -8,6 +8,10 @@ export type PointSeenInfo = {
   readonly angle:number
   readonly speed:number
   readonly values:readonly Points.Point[]
+  /**
+   * Average of all points seen
+   */
+  readonly average:Points.Point
 };
 
 /**
@@ -15,6 +19,7 @@ export type PointSeenInfo = {
  */
 export class PointTracker extends ObjectTracker<Points.Point> {
   relation:Points.PointRelation|undefined;
+  lastInfo:PointSeenInfo|undefined;
 
   constructor(readonly id:string, readonly opts:TrackOpts) {
     super(id, opts);
@@ -30,6 +35,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
 
   onReset(): void {
     super.onReset();
+    this.lastInfo = undefined;
     this.relation = undefined;
   }
 
@@ -48,16 +54,15 @@ export class PointTracker extends ObjectTracker<Points.Point> {
     if (this.relation === undefined) {
       this.relation = Points.relation(newLast);
     }
+
     // Get basic geometric relation from start to the last provided point
     const rel = this.relation(newLast);
-    
-
     const r:PointSeenInfo = {
       ...rel,
       values: this.values,
       speed: this.values.length < 2 ? 0 : Line.length(currentLast, newLast) / (newLast.at - currentLast.at),
     };
-
+    this.lastInfo = r;
     return r;
   }
 
@@ -73,23 +78,25 @@ export class PointTracker extends ObjectTracker<Points.Point> {
   /**
    * Returns distance from latest point to initial point.
    * If there are less than two points, zero is returned.
-   * @returns 
+   * @returns Distance
    */
   distanceFromStart():number {
-    if (this.values.length >= 2) {
-      return Points.distance(this.initial!, this.last);
+    const initial = this.initial;
+    if (this.values.length >= 2 && initial !== undefined) {
+      return Points.distance(initial, this.last);
     } else {
       return 0;
     }
   }
   /**
-   * Returns angle from latest point to the initial point
+   * Returns angle (in radians) from latest point to the initial point
    * If there are less than two points, undefined is return.
-   * @returns 
+   * @returns Angle in radians
    */
   angleFromStart():number|undefined {
-    if (this.values.length > 2) {
-      return Points.angleBetween(this.initial!, this.last);
+    const initial = this.initial;
+    if (initial !== undefined && this.values.length > 2) {
+      return Points.angle(initial, this.last);
     }
   }
 
