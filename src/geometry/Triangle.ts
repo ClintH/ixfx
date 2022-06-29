@@ -1,4 +1,6 @@
-import {Points, Lines,  radianToDegree, Polar, Circles, Rects} from './index.js';
+import { Lines,  radianToDegree, Polar, Circles, Rects} from './index.js';
+import * as Points from './Point.js';
+
 import {number as guardNumber} from '../Guards.js';
 
 const piPi = Math.PI*2;
@@ -21,13 +23,13 @@ export type Triangle = {
  * A triangle consisting of three empty points (Points.Empty)
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
-export const Empty = Object.freeze({a: Points.Empty, b:Points.Empty, c:Points.Empty});
+export const Empty = Object.freeze({a: {x:0, y:0}, b:{x:0, y:0}, c:{x:0, y:0}});
 
 /**
  * A triangle consisting of three placeholder points (Points.Placeholder)
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
-export const Placeholder = Object.freeze({a: Points.Placeholder, b:Points.Placeholder, c:Points.Placeholder});
+export const Placeholder = Object.freeze({a: {x:NaN, y:NaN}, b:{x:NaN, y:NaN}, c:{x:NaN, y:NaN}});
 
 /**
  * Returns true if triangle is empty
@@ -145,9 +147,9 @@ export const lengths = (t:Triangle):readonly number[] => {
 export const angles = (t:Triangle):readonly number[] => {
   guard(t);
   return [
-    Points.angleBetween(t.a, t.b),
-    Points.angleBetween(t.b, t.c),
-    Points.angleBetween(t.c, t.a)
+    Points.angle(t.a, t.b),
+    Points.angle(t.b, t.c),
+    Points.angle(t.c, t.a)
   ];
 };
 
