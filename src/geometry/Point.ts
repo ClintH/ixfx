@@ -1,9 +1,10 @@
 import { Circles, Lines, Points, Polar, Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line.js';
 import { number as guardNumber} from '../Guards.js';
-import {clamp as clampNumber, wrapInteger as wrapNumber} from '../Util.js';
-import {Arrays} from "~/collections/index.js";
-
+import {clamp as clampNumber, wrap as wrapNumber} from '../Util.js';
+import {Arrays} from "../collections/index.js";
+import { RandomSource, defaultRandom } from "../Random.js";
+import {isRect} from "./Rect.js";
 /**
  * A point, consisting of x, y and maybe z fields.
  */
@@ -11,6 +12,10 @@ export type Point = {
   readonly x: number
   readonly y: number
   readonly z?: number
+};
+
+export type Point3d = Point & {
+  readonly z:number
 };
 
 /**
@@ -49,6 +54,16 @@ export const isEmpty = (p:Point) => p.x === 0 && p.y === 0;
 
 export const isPlaceholder = (p:Point) => Number.isNaN(p.x) && Number.isNaN(p.y);
 
+
+export const center = (shape?:Rects.Rect):Point => {
+  if (shape === undefined) {
+    return Object.freeze({x:0.5, y:0.5});
+  } else if (Rects.isRect(shape)) {
+    return Rects.center(shape as Rects.Rect);
+  } else {
+    throw new Error(`Unknown shape: ${JSON.stringify(shape)}`);
+  }
+};
 
 /**
  * Returns the 'minimum' point from an array of points, using a comparison function.
@@ -160,8 +175,8 @@ export const guard = (p: Point, name = `Point`) => {
   if (p === null) throw new Error(`'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`);
   if (p.x === undefined) throw new Error(`'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
   if (p.y === undefined) throw new Error(`'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`);
-  if (typeof p.x !== `number`) throw new Error(`'${name}.x' must be a number`);
-  if (typeof p.y !== `number`) throw new Error(`'${name}.y' must be a number`);
+  if (typeof p.x !== `number`) throw new Error(`'${name}.x' must be a number. Got ${p.x}`);
+  if (typeof p.y !== `number`) throw new Error(`'${name}.y' must be a number. Got ${p.y}`);
  
   if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
   if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
@@ -190,7 +205,12 @@ export const guardNonZeroPoint = (pt: Point, name = `pt`) => {
  * @param b 
  * @returns 
  */
-export const angleBetween = (a: Point, b: Point) => Math.atan2(b.y - a.y, b.x - a.x);
+export const angle = (a: Point, b?: Point) => {
+  if (b === undefined) {
+    return Math.atan2(a.y, a.x);
+  }
+  return Math.atan2(b.y - a.y, b.x - a.x);
+};
 
 /**
  * Calculates the centroid of a set of points
@@ -218,10 +238,10 @@ export const centroid = (...points:readonly Point[]):Point => {
     };
   }, {x:0, y:0});
 
-  return {
+  return Object.freeze({
     x: sum.x / points.length,
     y: sum.y / points.length
-  };
+  });
 };
 
 /**
@@ -261,8 +281,18 @@ export const bbox = (...points:readonly Point[]):Rects.RectPositioned => {
  */
 export const isPoint = (p: number|unknown): p is Point => {
   if (p === undefined) return false;
+  if (p === null) return false;
   if ((p as Point).x === undefined) return false;
   if ((p as Point).y === undefined) return false;
+  return true;
+};
+
+export const isPoint3d = (p:Point|unknown): p is Point3d => {
+  if (p === undefined) return false;
+  if (p === null) return false;
+  if ((p as Point3d).x === undefined) return false;
+  if ((p as Point3d).y === undefined) return false;
+  if ((p as Point3d).z === undefined) return false;
   return true;
 };
 
@@ -285,6 +315,8 @@ export const toArray = (p: Point): readonly number[] => ([p.x, p.y]);
  * @returns 
  */
 export const toString = (p: Point): string => {
+  if (p === undefined) return `(undefined)`;
+  if (p === null) return `(null)`;
   if (p.z !== undefined) {
     return `(${p.x},${p.y},${p.z})`;
   } else {
@@ -317,12 +349,12 @@ export const isEqual = (...p:readonly Point[]):boolean => {
   return true;
 };
 
-//export const isEqual = (a: Point, b: Point): boolean =>  a.x === b.x && a.y === b.y;
-
 /**
  * Returns true if two points are within a specified range.
  * Provide a point for the range to set different x/y range, or pass a number
  * to use the same range for both axis.
+ * 
+ * Note this simply compares x,y values it does not calcuate distance.
  *
  * @example
  * ```js
@@ -453,9 +485,9 @@ export function subtract(a: Point, b: Point): Point;
  * ```
  * @param a Point
  * @param x X coordinate
- * @param y Y coordinate
+ * @param y Y coordinate (if omitted, x is used as well)
  */
-export function subtract (a:Point, x:number, y:number):Point;
+export function subtract (a:Point, x:number, y?:number):Point;
 
 /**
  * Subtracts two sets of x,y pairs
@@ -472,27 +504,31 @@ export function subtract(a:Point|number, b:Point|number, c?:number, d?:number):P
     guard(a, `a`);
     if (isPoint(b)) {
       guard(b, `b`);
-      return {
+      return Object.freeze({
         x: a.x - b.x,
         y: a.y - b.y
-      };
+      });
     } else {
-      if (c === undefined) c = 0;
-      return {
+      if (c === undefined) c = b;
+      return Object.freeze({
         x: a.x - b,
         y: a.y - c
-      };
+      });
     }
   } else {
     guardNumber(a, ``, `a`);
     if (typeof b !== `number`) throw new Error(`Second parameter is expected to by y value`);
     guardNumber(b, ``, `b`);
+
+    if (Number.isNaN(c)) throw new Error(`Third parameter is NaN`);
+    if (Number.isNaN(d)) throw new Error(`Fourth parameter is NaN`);
+
     if (c === undefined) c = 0;
     if (d === undefined) d = 0;
-    return {
+    return Object.freeze({
       x: a - c,
       y: b - d
-    };
+    });
   }
 }
 
@@ -523,6 +559,29 @@ export const apply = (pt:Point, fn:(v:number, field?:string)=>number):Point => (
   y: fn(pt.y, `y`)
 }));
 
+
+/**
+ * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
+ * ```js
+ * const p = transform(somePoint, Points.normalise, Points.invert);
+ * ```
+ * @param pt 
+ * @param pipeline 
+ * @returns 
+ */
+export const pipelineApply = (pt:Point, ...pipelineFns:readonly ((pt:Point)=>Point)[]):Point => pipeline(...pipelineFns)(pt); // pipeline.reduce((prev, curr) => curr(prev), pt);
+
+/**
+ * Returns a pipeline function that takes a point to be transformed through a series of functions
+ * ```js
+ * const p = pipeline(Points.normalise, Points.invert);
+ * p(somePoint); // run `somePoint` through normalise and then invert
+ * ```
+ * @param pipeline Pipeline of functions
+ * @returns
+ */
+export const pipeline = (...pipeline:readonly ((pt:Point)=>Point)[]) => (pt:Point) => pipeline.reduce((prev, curr) => curr(prev), pt);
+
 /**
  * Reduces over points, treating x,y separately.
  * 
@@ -548,7 +607,7 @@ export const reduce = (pts:readonly Point[], fn:(p:Point, accumulated:Point) => 
 
 type Sum = {
   /**
-   * Adds two sets of coordinates
+   * Adds two sets of coordinates. If y is omitted, the parameter for x is added to both x and y
    */
   (aX:number, aY:number, bX:number, bY:number):Point;
   /**
@@ -562,18 +621,28 @@ type Sum = {
 };
 
 /**
- * Returns `a` plus `b`
- * ie.
+ * Returns a Point of `a` plus `b`. ie:
+ * 
  * ```js
  * return {
  *   x: a.x + b.x,
  *   y: a.y + b.y
  * };
  * ```
+ * 
+ * Usage:
+ * 
+ * ```js
+ * sum(ptA, ptB);
+ * sum(x1, y1, x2, y2);
+ * sum(ptA, x2, y2);
+ * sum(ptA, xAndY);
+ * ```
  */
 export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:number, d?:number): Point {
   // ✔️ Unit tested
-
+  if (a === undefined) throw new Error(`a missing. a: ${a}`);
+  
   //eslint-disable-next-line functional/no-let
   let ptA:Point|undefined;
   //eslint-disable-next-line functional/no-let
@@ -585,7 +654,7 @@ export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:
       ptB = b;
     } else {
       if (b === undefined) throw new Error(`Expects x coordinate`);
-      ptB = {x: b, y: (c === undefined ? 0 : c)};    
+      ptB = {x: b, y: (c === undefined ? b : c)};    
     }
   } else if (!isPoint(b)) {
     // Neither of first two params are points
@@ -595,14 +664,14 @@ export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:
     ptB = {x: c, y: (d === undefined ? 0 : d)};    
   }
 
-  if (ptA === undefined) throw new Error(`ptA missing`);
-  if (ptB === undefined) throw new Error(`ptB missing`);
+  if (ptA === undefined) throw new Error(`ptA missing. a: ${a}`);
+  if (ptB === undefined) throw new Error(`ptB missing. b: ${b}`);
   guard(ptA, `a`);
   guard(ptB, `b`);
-  return {
+  return Object.freeze({
     x: ptA.x + ptB.x,
     y: ptA.y + ptB.y
-  };
+  });
 };
 
 /**
@@ -622,6 +691,19 @@ export const sum:Sum = function (a: Point|number, b: Point|number|undefined, c?:
 export function multiply(a: Point, b: Point): Point;
 
 /**
+ * Multiply by a width,height:
+ * ```
+ * return { 
+ *  x: a.x * rect.width,
+ *  y: a.y * rect.height
+ * };
+ * ```
+ * @param a 
+ * @param rect 
+ */
+export function multiply(a: Point, rect: Rects.Rect): Point;
+
+/**
  * Returns `a` multipled by some x and/or y scaling factor
  * 
  * ie.
@@ -631,10 +713,16 @@ export function multiply(a: Point, b: Point): Point;
 *   y: a.y * y
  * }
  * ```
+ * 
+ * Usage:
+ * ```js
+ * multiply(pt, 10, 100); // Scale pt by x:10, y:100
+ * multiply(pt, Math.min(window.innerWidth, window.innerHeight)); // Scale both x,y by viewport with or height, whichever is smaller
+ * ```
  * @export
  * @parama Point to scale
  * @param x Scale factor for x axis
- * @param [y] Scale factor for y axis (defaults to no scaling)
+ * @param [y] Scale factor for y axis (if not specified, the x value is used)
  * @returns Scaled point
  */
 export function multiply(a: Point, x: number, y?: number): Point;
@@ -654,77 +742,133 @@ export function multiply(a: Point, x: number, y?: number): Point;
  * @returns 
  */
 /* eslint-disable func-style */
-export function multiply(a: Point, bOrX: Point | number, y?: number):Point {
+export function multiply(a: Point, bOrX: Rects.Rect| Point | number, y?: number):Point {
   // ✔️ Unit tested
 
   guard(a, `a`);
   if (typeof bOrX === `number`) {
-    if (typeof y === `undefined`) y = 1;
+    if (typeof y === `undefined`) y = bOrX;
     guardNumber(y, ``, `y`);
     guardNumber(bOrX, ``, `x`);
-
-    return {x: a.x * bOrX, y: a.y * y};
+    return Object.freeze({x: a.x * bOrX, y: a.y * y});
   } else if (isPoint(bOrX)) {
     guard(bOrX, `b`);
-    return {
+    return Object.freeze({
       x: a.x * bOrX.x,
       y: a.y * bOrX.y
-    };
-  } else throw new Error(`Invalid arguments`);
+    });
+  } else if (Rects.isRect(bOrX)) {
+    Rects.guard(bOrX, `rect`);
+    return Object.freeze({
+      x: a.x * bOrX.width,
+      y: a.y * bOrX.height
+    });
+  } else throw new Error(`Invalid arguments. a: ${JSON.stringify(a)} b: ${JSON.stringify(bOrX)}`);
 }
 
 /**
- * Divides a / b
+ * Divides a / b:
+ * ```js
+ * return {
+ *  x: a.x / b.x,
+ *  y: a.y / b.y
+ * }
+ * ```
  * @param a 
  * @param b 
  */
 export function divide(a: Point, b:Point):Point;
 
 /**
+ * Divides point a by rectangle:
+ * ```js
+ * return {
+ *  x: a.x / rect.width,
+ *  y: a.y / rect.hight
+ * };
+ * ```
+ * @param a 
+ * @param Rect 
+ */
+export function divide(a: Point, rect:Rects.Rect):Point;
+
+/**
  * Divides a point by x,y.
- * ie: a.x / x, b.y / y
+ * ```js
+ * return {
+ *  x: a.x / x,
+ *  y: b.y / y
+ * };
+ * ```
  * @param a Point
  * @param x X divisor
- * @param y Y divisor
+ * @param y Y divisor. If unspecified, x divisor is used.
  */
-export function divide(a:Point, x:number, y:number):Point;
+export function divide(a:Point, x:number, y?:number):Point;
+
+/**
+ * Divides two sets of points:
+ * ```js
+ * return {
+ *  x: x1 / x2,
+ *  y: y1 / y2
+ * };
+ * ```
+ * @param x1 
+ * @param y1 
+ * @param x2 
+ * @param y2 
+ */
 export function divide(x1:number, y1:number, x2?:number, y2?:number):Point;
 
-export function divide(a: Point|number, b: Point | number, c?: number, d?:number):Point {
+/**
+ * Devides a from b. If a contains a zero, that axis will be returned as zero
+ * @param a
+ * @param b
+ * @param c 
+ * @param d 
+ * @returns 
+ */
+export function divide(a: Point|number, b: Rects.Rect|Point | number, c?: number, d?:number):Point {
   // ✔️ Unit tested
 
   if (isPoint(a)) {
+    guard(a, `a`);
     if (isPoint(b)) {
-      guard(a);
       guardNonZeroPoint(b);
-      
-      return {
+      return Object.freeze({
         x: a.x / b.x,
         y: a.y / b.y
-      };
-    } else {
-      if (c === undefined) c = 1;
+      });
+    } else if (isRect(b)) {
+      Rects.guard(b, `rect`);
+      return Object.freeze({
+        x: a.x / b.width,
+        y: a.y / b.height
+      });
+    }else {
+      if (c === undefined) c = b;
       guard(a);
       guardNumber(b, `nonZero`, `x`);
       guardNumber(c, `nonZero`, `y`);
-      return {
+      return Object.freeze({
         x: a.x / b,
         y: a.y / c
-      };
+      });
     }
   } else {
     if (typeof b !== `number`) throw new Error(`expected second parameter to be y1 coord`);
     guardNumber(a, `positive`, `x1`);
     guardNumber(b, `positive`, `y1`);
     if (c === undefined) c = 1;
-    if (d === undefined) d = 1;
+    if (d === undefined) d = c;
     guardNumber(c, `nonZero`, `x2`);
     guardNumber(d, `nonZero`, `y2`);
 
-    return {
+    return Object.freeze({
       x: a / c,
       y: b / d
-    };
+    });
   }
 }
 
@@ -732,7 +876,7 @@ export function divide(a: Point|number, b: Point | number, c?: number, d?:number
  * Simple convex hull impementation. Returns a set of points which
  * enclose `pts`.
  * 
- * For a more power, see something like [Hull.js](https://github.com/AndriiHeonia/hull)
+ * For more power, see something like [Hull.js](https://github.com/AndriiHeonia/hull)
  * @param pts 
  * @returns 
  */
@@ -848,22 +992,23 @@ const length = (ptOrX:Point|number, y?:number): number => {
 };
 
 /**
- * Normalise point as a unit vector
+ * Normalise point as a unit vector.
  * 
- * @param ptOrX 
- * @param y 
+ * ```js
+ * normalise({x:10, y:20});
+ * normalise(10, 20);
+ * ```
+ * @param ptOrX Point, or x value
+ * @param y y value if first param is x
  * @returns 
  */
 export const normalise = (ptOrX:Point|number, y?:number): Point => {
-  if (isPoint(ptOrX)) {
-    y = ptOrX.y;
-    ptOrX = ptOrX.x;
-  }
-  if (y === undefined) throw new Error(`Expected y`);
-  const l = length(ptOrX, y);
+  const pt = getPointParam(ptOrX, y);
+  const l = length(pt);
+  if (l === 0) return Points.Empty;
   return Object.freeze({
-    x: ptOrX / l,
-    y: y / l
+    x: pt.x / l,
+    y: pt.y / l
   });
 };
 
@@ -905,10 +1050,10 @@ export function normaliseByRect(a:Point|number, b:number|Rects.Rect, c?:number, 
       c = b.height;
       b = b.width;
     }
-    return {
+    return Object.freeze({
       x: a.x / b,
       y: a.y / c
-    };
+    });
   } else {
     guardNumber(a, `positive`, `x`);
     if (typeof b !== `number`) throw new Error(`Expecting second parameter to be a number (width)`);
@@ -918,12 +1063,34 @@ export function normaliseByRect(a:Point|number, b:number|Rects.Rect, c?:number, 
     guardNumber(c, `positive`, `width`);
     if (d === undefined) throw new Error(`Expected height parameter`);
     guardNumber(d, `positive`, `height`);
-    return {
+    return Object.freeze({
       x: a / c,
       y: b / d
-    };
+    });
   }
 }
+
+/**
+ * Returns a random point on a 0..1 scale.
+ * ```js
+ * const pt = random(); // eg {x: 0.2549012, y:0.859301}
+ * ```
+ * 
+ * A custom source of randomness can be provided:
+ * ```js
+ * const pt = random(weightedSkewed(`quadIn`));
+ * ```
+ * @param rando 
+ * @returns 
+ */
+export const random = (rando?:RandomSource):Point => {
+  if (rando === undefined) rando = defaultRandom;
+
+  return {
+    x: rando(),
+    y: rando()
+  };
+};
 
 /**
  * Wraps a point to be within `ptMin` and `ptMax`.
@@ -936,23 +1103,113 @@ export function normaliseByRect(a:Point|number, b:number|Rects.Rect, c?:number, 
  * wrap({x:150,y:100}, {x:100,y:100});
  * ```
  * 
- * If `ptMin` is not specified, {x:0,y:0} is used.
+ * Wrap normalised point:
+ * ```js
+ * wrap({x:1.2, y:1.5}); // Yields: {x:0.2, y:0.5}
+ * ```
  * @param pt Point to wrap
- * @param ptMax Maximum value
+ * @param ptMax Maximum value, or {x:1, y:1} by default
  * @param ptMin Minimum value, or {x:0, y:0} by default
  * @returns Wrapped point
  */
-export const wrap = (pt:Point, ptMax:Point, ptMin:Point = {x:0, y:0}):Point => {
+export const wrap = (pt:Point, ptMax:Point = {x:1, y:1}, ptMin:Point = {x:0, y:0}):Point => {
   // ✔️ Unit tested
   guard(pt, `pt`);
   guard(ptMax, `ptMax`);
   guard(ptMin, `ptMin`);
   
-  return {
+  return Object.freeze({
     x: wrapNumber(pt.x, ptMin.x, ptMax.x),
     y: wrapNumber(pt.y, ptMin.y, ptMax.y)
-  };
+  });
 };
+
+/**
+ * Inverts one or more axis of a point
+ * ```js
+ * invert({x:10, y:10}); // Yields: {x:-10, y:-10}
+ * invert({x:10, y:10}, `x`); // Yields: {x:-10, y:10}
+ * ``` 
+ * @param pt Point to invert
+ * @param what Which axis. If unspecified, both axies are inverted
+ * @returns 
+ */
+export const invert = (pt:Point|Point3d, what:`both`|`x`|`y`|`z` = `both`):Point => {
+  switch (what) {
+  case `both`:
+    if (isPoint3d(pt)) {
+      return Object.freeze({
+        ...pt,
+        x: pt.x * -1,
+        y: pt.y * -1,
+        z: pt.z * -1
+      });
+    } else {
+      return Object.freeze({
+        ...pt,
+        x: pt.x * -1,
+        y: pt.y * -1,
+      });
+    }
+  case `x`:
+    return Object.freeze({
+      ...pt,
+      x: pt.x * -1
+    });
+  case `y`:
+    return Object.freeze({
+      ...pt,
+      y: pt.y * -1
+    });
+  case `z`:
+    if (isPoint3d(pt)) {
+      return Object.freeze({
+        ...pt,
+        z: pt.z * -1
+      });
+    } else throw new Error(`pt parameter is missing z`);
+  default:
+    throw new Error(`Unknown what parameter. Expecting 'both', 'x' or 'y'`);
+  }
+};
+
+/**
+ * Returns a point with rounded x,y coordinates. By default uses `Math.round` to round.
+ * ```js
+ * toIntegerValues({x:1.234, y:5.567}); // Yields: {x:1, y:6}
+ * ```
+ * 
+ * ```js
+ * toIntegerValues(pt, Math.ceil); // Use Math.ceil to round x,y of `pt`.
+ * ```
+ * @param pt Point to round
+ * @param rounder Rounding function, or Math.round by default
+ * @returns 
+ */
+export const toIntegerValues = (pt:Point, rounder: (x:number) => number = Math.round):Point => {
+  guard(pt, `pt`);
+  return Object.freeze({
+    x: rounder(pt.x),
+    y: rounder(pt.y)
+  });
+};
+
+/**
+ * Clamps the magnitude of a point.
+ * This is useful when using a Point as a vector, to limit forces.
+ * @param pt 
+ * @param m 
+ * @returns 
+ */
+export const clampMagnitude = (pt:Point, m:number):Point => {
+  const length = distance(pt);
+  if (length > m) {
+    const ratio =  m / length;
+    return multiply(pt, ratio, ratio);
+  }
+  return pt;
+};
+
 
 /**
  * Clamps a point to be between `min` and `max` (0 & 1 by default)
@@ -978,10 +1235,10 @@ export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
     if (c === undefined) c = 1;
     guardNumber(b, ``, `min`);
     guardNumber(c, ``, `max`);
-    return {
+    return Object.freeze({
       x: clampNumber(a.x, b, c),
       y: clampNumber(a.y, b, c)
-    };
+    });
   } else {
     if (b === undefined) throw new Error(`Expected y coordinate`);
     if (c === undefined) c = 0;
@@ -991,17 +1248,31 @@ export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
     guardNumber(c, ``, `min`);
     guardNumber(d, ``, `max`);
 
-    return {
+    return Object.freeze({
       x: clampNumber(a, c, d),
       y: clampNumber(b, c, d)
-    };
+    });
   }
 }
 
 export type PointRelation = (a:Point|number, b?:number) => {
+  /**
+   * Angle from start
+   */
   readonly angle:number
+  /**
+   * Distance from start
+   */
   readonly distance:number
+  /**
+   * Center point from start
+   */
   readonly centroid:Point
+  /**
+   * Average of all points seen
+   * This is calculated by summing x,y and dividing by total points
+   */
+  readonly average:Point
 }
 
 /**
@@ -1025,13 +1296,27 @@ export type PointRelation = (a:Point|number, b?:number) => {
  */
 export const relation = (a:Point|number, b?:number):PointRelation => {
   const start = getPointParam(a, b);
+  //eslint-disable-next-line functional/no-let
+  let totalX = 0;
+  //eslint-disable-next-line functional/no-let
+  let totalY = 0;
+  //eslint-disable-next-line functional/no-let
+  let count = 0;
+
   const update = (aa:Point|number, bb?:number) => {
     const p = getPointParam(aa, bb);
-    return {
-      angle: angleBetween(p, start),
+    totalX += p.x;
+    totalY += p.y;
+    count++;
+    return Object.freeze({
+      angle: angle(p, start),
       distance: distance(p, start),
-      centroid: centroid(p, start)
-    };
+      centroid: centroid(p, start),
+      average: {
+        x: totalX/count,
+        y: totalY/count
+      }
+    });
   };
 
   return update;
