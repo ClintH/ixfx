@@ -179,7 +179,7 @@ export const distanceFromExterior = (rect:RectPositioned, pt:Points.Point):numbe
   return Math.sqrt(dx*dx + dy*dy);
 };
 
-export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number => Points.distance(getCenter(rect), pt);
+export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number => Points.distance(center(rect), pt);
 
 
 /**
@@ -253,15 +253,131 @@ export const corners = (rect: RectPositioned|Rect, origin?:Points.Point): readon
   ];
 };
 
-export const getCenter = (rect: RectPositioned|Rect, origin?:Points.Point): Points.Point => {
+/**
+ * Returns a point on the edge of rectangle
+ * ```js
+ * const r1 = {x: 10, y: 10, width: 100, height: 50};
+ * getEdgeX(r1, `right`);  // Yields: 110
+ * getEdgeX(r1, `bottom`); // Yields: 60
+ * 
+ * const r2 = {width: 100, height: 50};
+ * getEdgeX(r2, `right`);  // Yields: 100
+ * getEdgeX(r2, `bottom`); // Yields: 50
+ * ```
+ * @param rect 
+ * @param edge Which edge: right, left, bottom, top
+ * @returns 
+ */
+export const getEdgeX = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`): number => {
+  guard(rect);
+  switch (edge) {
+  case `top`:
+    return (Points.isPoint(rect)) ? rect.x  : 0;
+  case `bottom`:
+    return (Points.isPoint(rect)) ? rect.x  : 0;
+  case `left`:
+    return (Points.isPoint(rect)) ? rect.y  : 0;
+  case `right`:
+    return (Points.isPoint(rect)) ? rect.x + rect.width  : rect.width;
+  }
+};
+
+export const getEdgeY = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`): number => {
+  guard(rect);
+  switch (edge) {
+  case `top`:
+    return (Points.isPoint(rect)) ? rect.y  : 0;
+  case `bottom`:
+    return (Points.isPoint(rect)) ? rect.y + rect.height : rect.height;
+  case `left`:
+    return (Points.isPoint(rect)) ? rect.y  : 0;
+  case `right`:
+    return (Points.isPoint(rect)) ? rect.y  : 0;
+  }
+};
+
+/**
+ * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
+ * 
+ * ```js
+ * // Normalised rectangle of width 50%, height 50%
+ * const r = {width: 0.5, height: 0.5};
+ * 
+ * // Map to window:
+ * const rr = multiply(r, window.innerWidth, window.innerHeight);
+ * ```
+ * 
+ * ```js
+ * // Returns {width: someRect.width * someOtherRect.width ...}
+ * multiply(someRect, someOtherRect);
+ * 
+ * // Returns {width: someRect.width * 100, height: someRect.height * 200}
+ * multiply(someRect, 100, 200);
+ * ```
+ * 
+ * Multiplication applies to the first parameter's x/y fields, if present.
+ */
+export const multiply = (a:RectPositioned|Rect, b:Rect|number, c?:number):RectPositioned|Rect => {
+  guard(a, `a`);
+  if (isRect(b)) {
+    if (isRectPositioned(a)) {
+      return {
+        ...a,
+        x: a.x * b.width,
+        y: a.y * b.height,
+        width: a.width * b.width,
+        height: a.width * b.height
+      };
+    } else {
+      return {
+        ...a,
+        width: a.width * b.width,
+        height: a.width * b.height
+      };
+    }
+  } else {
+    if (typeof b !== `number`) throw new Error(`Expected second parameter of type Rect or number. Got ${JSON.stringify(b)}`);
+    if (c === undefined) c = b;
+
+    if (isRectPositioned(a)) {
+      return {
+        ...a,
+        x: a.x * b,
+        y: a.y * c,
+        width: a.width * b,
+        height: a.width * c
+      };
+    } else {
+      return {
+        ...a,
+        width: a.width * b,
+        height: a.width * c
+      };
+    }
+  }
+};
+
+/**
+ * Returns the center of a rectangle as a {@link Point}.
+ *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
+ * 
+ * ```js
+ * const p = center({x:10, y:20, width:100, height:50});
+ * const p2 = center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
+ * ```
+ * @param rect Rectangle
+ * @param origin Optional origin. Overrides `rect` position if available. If no position is available 0,0 is used by default.
+ * @returns 
+ */
+export const center = (rect: RectPositioned|Rect, origin?:Points.Point): Points.Point => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
-  else if (origin === undefined) throw new Error(`Unpositioned rect needs origin param`);
+  else if (origin === undefined) origin = {x:0, y:0}; // throw new Error(`Unpositioned rect needs origin param`);
 
-  return {
+  return Object.freeze({
     x: origin.x + rect.width / 2,
     y: origin.y + rect.height / 2
-  };
+  });
 };
 
 /**
