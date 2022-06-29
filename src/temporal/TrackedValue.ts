@@ -11,9 +11,19 @@ export type Opts = {
 }
 
 export abstract class TrackerBase<V> {
+  /**
+   * @ignore
+   */
   seenCount:number;
 
+  /**
+  * @ignore
+  */
   protected storeIntermediate:boolean;
+  
+  /**
+  * @ignore
+  */
   protected resetAfterSamples:number;
 
   constructor(readonly id:string, opts:Opts = {}) {
@@ -22,6 +32,9 @@ export abstract class TrackerBase<V> {
     this.seenCount = 0;
   }
 
+  /**
+   * Reset tracker
+   */
   reset() {
     this.seenCount = 0;
     this.onReset();
@@ -38,17 +51,34 @@ export abstract class TrackerBase<V> {
     this.onSeen(t);
   }
 
+  /**
+   * @ignore
+   * @param p 
+   */
   abstract seenImpl(p:V[]):V[];
 
   abstract get last():V|undefined;
+
+  /**
+   * Returns the initial value, or undefined
+   */
   abstract get initial():V|undefined;
 
+  /**
+   * Returns the elapsed milliseconds since the initial value
+   */
   abstract get elapsed():number;
 
+  /**
+   * @ignore
+   */
   //eslint-disable-next-line @typescript-eslint/no-empty-function
   onSeen(_p:V[]) {
-
   }
+
+  /**
+   * @ignore
+   */
   abstract onReset():void;
 } 
 
@@ -134,6 +164,7 @@ export class ObjectTracker<V> extends TrackerBase<V> {
 
   /**
    * Allows sub-classes to be notified when a reset happens
+   * @ignore
    */
   onReset() {
     this.values = []; //this.values.slice(1);
@@ -141,6 +172,7 @@ export class ObjectTracker<V> extends TrackerBase<V> {
 
   /**
    * Tracks a value
+   * @ignore
    */
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   seenImpl(p:V[]|Timestamped<V>[]):Timestamped<V>[] {
@@ -177,19 +209,22 @@ export class ObjectTracker<V> extends TrackerBase<V> {
     return this.values.at(-1)!;
   }
 
+  /**
+   * Returns the initial value
+   */
   get initial() {
     return this.values.at(0);
   }
   
   /**
-   * Returns number of recorded values (this can include the initial value)
+   * Returns number of recorded values (includes the initial value in the count)
    */
   get size() {
     return this.values.length;
   }
 
   /**
-   * Returns the elapsed time, in milliseconds since the instance was created
+   * Returns the elapsed time, in milliseconds since the initial value
    */
   get elapsed():number {
     return Date.now() - this.values[0].at;

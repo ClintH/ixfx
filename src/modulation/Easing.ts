@@ -174,15 +174,30 @@ export const fromCubicBezier = (b:number, d:number):EasingFn => (t:number) => {
  * // 10% of sineIn, 90% of sineOut
  * mix(0.90, 0.25, sineIn, sineOut);
  * ```
- * @param amt 
- * @param balance 
+ * @param amt 'Progress' value passed to the easing functions
+ * @param balance Mix between a and b
  * @param easingA 
  * @param easingB 
- * @returns 
+ * @returns Numeric value
  */
 export const mix = (amt:number, balance:number, easingA:EasingFn, easingB:EasingFn) => interpolate(balance, easingA(amt), easingB(amt));
 
+/**
+ * Returns a 'crossfade' of two easing functions, synchronised with the progress through the easing. That is:
+ * * 0.0 will yield 100% of easingA at its `easing(0)` value.
+ * * 0.2 will yield 80% of a, 20% of b, with both at their `easing(0.2)` values
+ * * 0.5 will yield 50% of both functions both at their `easing(0.5)` values
+ * * 0.8 will yield 20% of a, 80% of a, with both at their `easing(0.8)` values
+ * * 1.0 will yield 100% of easingB at its `easing(1)` value.
+ * 
+ * So easingB will only ever kick in at higher `amt` values and `easingA` will only be present in lower valus.
+ * @param amt
+ * @param easingA
+ * @param easingB 
+ * @returns Numeric value
+ */
 export const crossfade = (amt:number, easingA:EasingFn, easingB:EasingFn) => mix(amt, amt, easingA, easingB);
+
 /**
  * @private
  */

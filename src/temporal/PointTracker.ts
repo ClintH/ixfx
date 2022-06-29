@@ -15,24 +15,67 @@ export type PointSeenInfo = {
 };
 
 /**
- * A tracked point
+ * A tracked point. Create via {@link pointTracker}. Useful for monitoring how
+ * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
+ * track the pointer as it moves until pointerup.
+ * 
+ * ```js
+ * // Create a tracker
+ * const t = pointTracker(`pointer-0`);
+ * 
+ * // ...and later, tell it when a point is seen
+ * const nfo = t.seen({x: evt.x, y:evt.y});
+ * // nfo gives us some details on the relation between the seen point, the start, and points in-between
+ * // nfo.angle, nfo.centroid, nfo.speed etc.
+ * ```
+ * 
+ * Compute based on last seen point
+ * ```js
+ * t.angleFromStart();
+ * t.distanceFromStart();
+ * t.x / t.y
+ * t.length; // Total length of accumulated points
+ * t.elapsed; // Total duration since start
+ * t.lastInfo; // The {@link PointSeenInfo} for last seen point
+ * ```
+ * 
+ * Housekeeping
+ * ```js
+ * t.reset(); // Reset tracker
+ * ```
  */
 export class PointTracker extends ObjectTracker<Points.Point> {
+  /**
+   * Function that yields the relation from initial point
+   */
   relation:Points.PointRelation|undefined;
+  
+  /**
+   * Info on last seen point
+   */
   lastInfo:PointSeenInfo|undefined;
 
-  constructor(readonly id:string, readonly opts:TrackOpts) {
+  constructor(readonly id:string, opts:TrackOpts) {
     super(id, opts);
   }
 
+  /**
+   * Returns the last x coord
+   */
   get x() {
     return this.last.x;
   }
 
+  /**
+   * Returns the last y coord
+   */
   get y() {
     return this.last.y;
   }
 
+  /**
+   * @ignore
+   */
   onReset(): void {
     super.onReset();
     this.lastInfo = undefined;
@@ -136,9 +179,14 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
 export const pointsTracker = (opts:TrackOpts) => new TrackedPointMap(opts);
 
 /**
- * Track a single point
+ * Track a single point.
+ * 
+ * ```js
+ * const t = pointTracker(pointer.id);
+ * t.
+ * ```
  * @param id 
  * @param opts 
- * @returns 
+ * @returns {@link PointTracker} instance
  */
 export const pointTracker = (id?:string, opts:TrackOpts = {}) => new PointTracker(id ?? ``, opts);

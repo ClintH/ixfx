@@ -9,6 +9,20 @@ import {number as guardNumber} from '../Guards.js';
  * * {@link Easings.time} - Ease by time
  * * {@link Easings.tick} - Ease by tick
  * * {@link Easings.get}  - Get an easing function by name
+ * * {@link Easings.crossfade} - Mix two synchronised easing functions (a slight shortcut over `mix`)
+ * * {@link Easings.crossfade} - Mix two easing functions
+ * * {@link Easings.gaussian} - Gaussian distribution (rough bell curve)
+ * 
+ * @example Importing
+ * ```js
+ * // If library is stored two directories up under `ixfx/`
+ * import {Easings} from '../../ixfx/dist/modulation.js';
+ * Easings.time(...);
+ * 
+ * // Import from web
+ * import {Easings} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * Easings.time(...);
+ * ```
  */
 export * as Easings from './Easing.js';
 
@@ -18,7 +32,42 @@ export * as Easings from './Easing.js';
 export * from './Envelope.js';
 
 /**
- * Oscillator
+ * Forces module can help to compute basic physical forces like gravity, friction, springs etc.
+ * 
+ * @example Importing
+ * ```js
+ * // If library is stored two directories up under `ixfx/`
+ * import {Forces} from '../../ixfx/dist/modulation.js';
+ * Forces.attractionForce(...);
+ * 
+ * // Import from web
+ * import {Forces} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * Forces.attractionForce(...);
+ * ```
+ * 
+ */
+export * as Forces from './Forces.js';
+
+/**
+ * Oscillators module has waveshapes for producing values with a specified frequency.
+ * 
+ * Overview
+ * * {@link Oscillators.saw}
+ * * {@link Oscillators.sine}
+ * * {@link Oscillators.square}
+ * * {@link Oscillators.triangle}
+ * 
+ * @example Importing
+ * ```js
+ * // If library is stored two directories up under `ixfx/`
+ * import {Oscillators} from '../../ixfx/dist/modulation.js';
+ * Oscillators.saw(...);
+ * 
+ * // Import from web
+ * import {Oscillators} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * Oscillators.saw(...);
+ * ```
+ * 
  */
 export * as Oscillators from './Oscillator.js';
 
@@ -29,14 +78,16 @@ export type JitterOpts = {
 
 /**
  * Jitters `value` by the absolute `jitter` amount.
- * All values should be on a 0..1 scale, and return value by default clamped to 0..1
+ * All values should be on a 0..1 scale, and the return value is by default clamped to 0..1
  * 
  * ```js
+ * import {jitter} from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * 
  * // Jitter 0.5 by 10% (absolute)
  * // yields range of 0.4-0.6
  * jitter(0.5, 0.1);
  * 
- * // Jitter 0.5 by 10% (relative)
+ * // Jitter 0.5 by 10% (relative, 10% of 0.5)
  * // yields range of 0.45-0.55
  * jitter(0.5, 0.1, {type:`rel`});
  * ```

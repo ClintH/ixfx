@@ -6,17 +6,20 @@ import * as Timers from '../flow/Timer.js';
  * Sine oscillator.
  * 
  * ```js
+ * // Setup
  * const osc = sine(Timers.frequencyTimer(10));
  * const osc = sine(0.1);
- * osc.next().value;
+ * 
+ * // Call whenever a value is needed
+ * const v = osc.next().value;
  * ```
  * 
- * // Saw/tri pinch
+ * @example Saw/tri pinch
  * ```js
  * const v = Math.pow(osc.value, 2);
  * ```
  * 
- * // Saw/tri bulge
+ * @example Saw/tri bulge
  * ```js
  * const v = Math.pow(osc.value, 0.5);
  * ```
@@ -48,10 +51,14 @@ export function* sineBipolar(timerOrFreq:Timers.Timer|number) {
 
 /**
  * Triangle oscillator
+ * 
  * ```js
+ * // Setup
  * const osc = triangle(Timers.frequencyTimer(0.1));
  * const osc = triangle(0.1);
- * osc.next().value;
+ * 
+ * // Call whenver a value is needed
+ * const v = osc.next().value;
  * ```
  */
 //eslint-disable-next-line func-style
@@ -76,10 +83,14 @@ export function* triangle(timerOrFreq:Timers.Timer|number) {
 
 /**
  * Saw oscillator
+ * 
  * ```js
+ * // Setup
  * const osc = saw(Timers.frequencyTimer(0.1));
  * const osc = saw(0.1);
- * osc.next().value;
+ * 
+ * // Call whenever a value is needed
+ * const v = osc.next().value;
  * ```
  */
 //eslint-disable-next-line func-style
@@ -93,9 +104,13 @@ export function* saw(timerOrFreq:Timers.Timer) {
 
 /**
  * Square oscillator
+ * 
  * ```js
+ * // Setup
  * const osc = square(Timers.frequencyTimer(0.1));
  * const osc = square(0.1);
+ * 
+ * // Call whenever a value is needed
  * osc.next().value;
  * ```
  */
