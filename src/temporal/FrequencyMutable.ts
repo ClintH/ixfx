@@ -5,13 +5,13 @@ import {SimpleEventEmitter} from "../Events.js";
 import * as KeyValueUtil from '../KeyValue.js';
 import {KeyValues} from "../index.js";
 
-type FrequencyEventMap = {
+export type FrequencyEventMap = {
   readonly change:void;
 }
 
 /**
  * Frequency keeps track of how many times a particular value is seen, but
- * unlike a {@link Maps|Map} it does not store the data. By default compares
+ * unlike a Map it does not store the data. By default compares
  * items by value (via JSON.stringify).
  * 
  * Create with {@link frequencyMutable}.

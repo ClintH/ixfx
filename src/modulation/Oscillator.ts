@@ -2,6 +2,7 @@
 
 import * as Timers from '../flow/Timer.js';
 
+const piPi = Math.PI*2;
 /**
  * Sine oscillator.
  * 
@@ -32,7 +33,7 @@ export function* sine(timerOrFreq:Timers.Timer|number) {
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     // Rather than -1 to 1, we want 0 to 1
-    yield (Math.sin(timerOrFreq.elapsed*Math.PI*2) + 1) / 2;
+    yield (Math.sin(timerOrFreq.elapsed*piPi) + 1) / 2;
   }
 }
 
@@ -45,7 +46,7 @@ export function* sineBipolar(timerOrFreq:Timers.Timer|number) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
-    yield Math.sin(timerOrFreq.elapsed*Math.PI*2);
+    yield Math.sin(timerOrFreq.elapsed*piPi);
   }
 }
 

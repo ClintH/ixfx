@@ -6,23 +6,53 @@ import {StringReceiveBuffer} from "./StringReceiveBuffer";
 import {StringWriteBuffer} from "./StringWriteBuffer";
 import {retry} from "../flow/Timer.js";
 
-export type Opts = {
+/**
+ * Options for JsonDevice
+ */
+export type JsonDeviceOpts = {
+  /**
+   * How much data to transfer at a time
+   */
   readonly chunkSize?: number
+  /**
+   * Name of device. This is only used for assisting the console.log output
+   */
   readonly name?: string
+  /**
+   * Number of times to automatically try to reconnect
+   */
   readonly connectAttempts?: number
+  /**
+   * If true, additional logging will be done
+   */
   readonly debug?: boolean
 }
 
-export type DataEvent = {
+/**
+ * Data received event
+ */
+export type JsonDataEvent = {
+  /**
+   * Data received
+   */
   readonly data: string
 }
 
-type Events = {
-  readonly data: DataEvent
+/**
+ * Events emitted by JsonDevice
+ */
+export type JsonDeviceEvents = {
+  /**
+   * Data received
+   */
+  readonly data: JsonDataEvent
+  /**
+   * State changed
+   */
   readonly change: StateChangeEvent
 };
 
-export abstract class JsonDevice extends SimpleEventEmitter<Events> {
+export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   states: StateMachine;
   codec: Codec;
 
@@ -34,7 +64,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<Events> {
   rxBuffer: StringReceiveBuffer;
   txBuffer: StringWriteBuffer;
 
-  constructor(config: Opts = {}) {
+  constructor(config: JsonDeviceOpts = {}) {
     super();
 
     // Init

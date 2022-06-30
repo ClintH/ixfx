@@ -107,20 +107,17 @@ export type AdsrTimingOpts = {
 }
 
 /**
- * @private
+ * State change event
  */
 export interface StateChangeEvent {
   readonly newState: string,
   readonly priorState: string
 }
 
-/**
- * @private
- */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface CompleteEvent { /* no-op */}
 
-type Events = {
+export type Events = {
   readonly change: StateChangeEvent
   readonly complete: CompleteEvent
 };
@@ -313,11 +310,12 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * const [state, scaled, raw] = env.compute();
  * ```
  * 
- * * `state` is string: `attack`, `decay`, `sustain`, `release`, `complete 
+ * * `state` is string: `attack`, `decay`, `sustain`, `release`, `complete` 
  * * `scaled` is a value scaled according to stage _levels_
  * * `raw` is the progress from 0 to 1 within a stage
  * 
  * ...normally you'd just want:
+ * 
  * ```js
  * const value = env.value; // Get scaled 
  * ```
@@ -330,6 +328,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * ```
  * 
  * Check if it's done:
+ * 
  * ```js
  * env.isDone; // True if envelope is completed
  * ```

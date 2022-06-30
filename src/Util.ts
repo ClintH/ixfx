@@ -1,6 +1,8 @@
 import { number as guardNumber, integer as guardInteger} from "./Guards.js";
 import {untilMatch} from "./Text.js";
 
+const piPi = Math.PI*2;
+
 /**
  * Clamps a value between min and max (both inclusive)
  * Defaults to a 0-1 range, useful for percentages.
@@ -335,14 +337,15 @@ export const interpolate =(amount:number, a:number, b:number):number => {
   return v;
 };
 
+export const interpolateAngle = (amount:number, angleA:number, angleB:number):number => {
+  const t = wrap(angleB-angleA, 0, piPi);
+  return interpolate(amount, angleA, angleA + (t > Math.PI ? t - piPi : t));
+};
 
-/**
- * @private
- */
 export type ToString<V> = (itemToMakeStringFor: V) => string;
 
 /**
- * @private
+ * Function that returns true if `a` and `b` are considered equal
  */
 export type IsEqual<V> = (a:V, b:V) => boolean;
 
@@ -557,3 +560,11 @@ export const runningiOS = () => [
 ].includes(navigator.platform)
   // iPad on iOS 13 detection
   || (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
+
+
+try {
+  if (typeof window !== `undefined`) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (window as any).ixfx = {...(window as any).ixfx, clamp, clampIndex, flip, getFieldByPath, getFieldPaths, interpolate, interpolateAngle, proportion, relativeDifference, scale, scalePercent, wrap, wrapInteger, wrapRange};
+  }
+} catch { /* no-op */ }

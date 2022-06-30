@@ -6,7 +6,7 @@ import {minFast} from '../collections/NumericArrays.js';
 import {Arrays} from '../collections/index.js';
 
 /**
- * A line, which consists of an `a` and `b` {@link Point}.
+ * A line, which consists of an `a` and `b` {@link Points.Point}.
  */
 export type Line = {
   readonly a: Points.Point

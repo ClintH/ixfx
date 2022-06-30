@@ -2,31 +2,17 @@
 import {SimpleEventEmitter} from "../Events.js";
 import {ToString, IsEqual} from "../Util.js";
 
-/**
- * @private
- */
 export type ArrayKeys<K, V> = ReadonlyArray<readonly [key:K, value:V]>;
 
-/**
- * @private
- */
 export type ObjKeys<K, V> = ReadonlyArray<{readonly key: K, readonly value: V}>;
 
-/**
- * @private
- */
 export type EitherKey<K, V> = ArrayKeys<K, V> | ObjKeys<K, V>;
 
-/**
- * @private
- */
 export type MapSetOpts<V> = MapMultiOpts<V> & {
   readonly hash:ToString<V>
 };
 
-/**
- * @private
- */
+
 export type MapCircularOpts<V> = MapMultiOpts<V> & {
   readonly capacity:number
 }
@@ -45,9 +31,6 @@ export type MultiValue<V, M> = Readonly<{
   count(source:M): number
 }>;
 
-/**
- * @private
- */
 export type MapMultiOpts<V> = {
   /**
    * Returns a group for values added via `addValue`. Eg. maybe you want to 
@@ -64,17 +47,11 @@ export type MapMultiOpts<V> = {
   readonly groupBy?: ToString<V>|undefined
 }
 
-/**
- * @private
- */
 export type MapArrayOpts<V> = MapMultiOpts<V> & {
   readonly comparer?:IsEqual<V>
   readonly toString?:ToString<V>
 }
 
-/**
- * @private
- */
 export type ValueSetEventMap<V> = {
   readonly add: {readonly value: V, readonly updated: boolean}
   readonly clear: boolean
@@ -413,9 +390,6 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
   count(key: string): number
 }
 
-/**
- * @private
- */
 export type MapArrayEvents<V> = {
   readonly addedValues: {readonly values: ReadonlyArray<V>}
   readonly addedKey: {readonly key: string }
@@ -513,9 +487,6 @@ export interface CircularArray<V> extends Array<V> {
   keys():IterableIterator<string>;
 }
 
-/**
- * A mutable Set that compares by value
- */
 export interface SetMutable<V> {
   /**
    * Add item
@@ -614,7 +585,7 @@ export interface MapMutable<K, V> {
   /**
    * Adds one or more items to map
    * 
-   * Can add items in the form of [key,value] or {key, value}.
+   * Can add items in the form of [key,value] or `{key, value}`.
    * @example These all produce the same result
    * ```js
    * map.set(`hello`, `samantha`);
@@ -776,7 +747,7 @@ export interface StackBase<V> {
   get isFull(): boolean 
 
   /** 
-   * Get the item at the top of the stack without removing it (like {@link pop} would do)
+   * Get the item at the top of the stack without removing it (like `pop` would do)
    * @returns Item at the top of the stack, or _undefined_ if empty.
    */
   get peek(): V | undefined

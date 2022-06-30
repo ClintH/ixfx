@@ -2,7 +2,7 @@ import { Observable,  debounceTime, fromEvent } from 'rxjs';
 import * as Points from '../geometry/Point';
 
 
-type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
+export type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
   readonly el:V
   readonly bounds: {
     readonly width:number,
@@ -11,7 +11,7 @@ type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
   }
 }
 
-type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
+export type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
   readonly ctx:CanvasRenderingContext2D
 }
 

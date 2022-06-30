@@ -4,7 +4,9 @@ import {StateChangeEvent} from "../flow/StateMachine.js";
 import {ISimpleEventEmitter} from "../Events.js";
 import {string as randomString} from "../Random.js";
 import {waitFor} from "../flow/Timer.js";
-import {EspruinoSerialDevice} from "./EspruinoSerialDevice";
+import {EspruinoSerialDevice, EspruinoSerialDeviceOpts} from "./EspruinoSerialDevice.js";
+
+export {EspruinoBleDevice, EspruinoSerialDevice, EspruinoSerialDeviceOpts};
 
 export type DataEvent = {
   readonly data:string

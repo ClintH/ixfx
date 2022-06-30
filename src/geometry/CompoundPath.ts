@@ -55,7 +55,7 @@ export const interpolate = (paths: readonly Paths.Path[], t: number, useWidth?: 
   return {x: 0, y: 0};
 };
 
-type Dimensions = {
+export type Dimensions = {
   /**
    * Width of each path (based on bounding box)
    *

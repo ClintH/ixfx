@@ -164,12 +164,10 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
  */
 export interface SelectHandler {
   /** 
-   * Sets disabled
+   * Gets/Sets disabled
    */
   set disabled(value:boolean);
- /** 
-  * Gets disabled
-  */
+
   get disabled():boolean;
 /**
  * Gets value

@@ -19,7 +19,10 @@ export type Plotter = {
   dispose():void
 }
 
-type Series = {
+/**
+ * Series
+ */
+export type Series = {
   min:number,
   max:number,
   range:number,
@@ -29,7 +32,10 @@ type Series = {
   hoverValue?:number
 };
 
-type DrawingOpts = PlotOpts & {
+/**
+ * Drawing options
+ */
+export type DrawingOpts = PlotOpts & {
   x:Axis
   y:Axis
   ctx: CanvasRenderingContext2D
@@ -201,7 +207,7 @@ export const add = (buffer:BufferType, value:number, series:string = "") => {
   buffer.addKeyedValues(series, value);
 }
 
-type BufferType = MapOfMutable<number, CircularArray<number>> | MapOfMutable<number, ReadonlyArray<number>>;
+export type BufferType = MapOfMutable<number, CircularArray<number>> | MapOfMutable<number, ReadonlyArray<number>>;
 
 export const drawValue = (index:number, buffer:BufferType, drawing:DrawingOpts) => {
   const c = {

@@ -3,13 +3,11 @@ import {clamp} from '../Util.js';
 
 /**
  * Creates a timer
- * @private
  */
 export type TimerSource = () => Timer;
  
 /**
  * A timer instance
- * @private
  */
 export type Timer = {
   reset(): void
@@ -19,9 +17,7 @@ export type Timer = {
 export type ModTimer = Timer & {
   mod(amt:number):void
 }
-/**
- * @private
- */
+
 export type HasCompletion = {
   get isDone(): boolean;
 }
@@ -73,7 +69,6 @@ export const debounce = (callback:TimeoutSyncCallback|TimeoutAsyncCallback, time
 
 /**
  * Debounced function
- * @private
  */
 export type DebouncedFunction = (...args:readonly unknown[]) =>void
 

@@ -9,7 +9,10 @@ import * as Sg from './SceneGraph.js';
 
 import {textWidth} from './Drawing.js';
 
-interface DataSource {
+/**
+ * A data source
+ */
+export interface DataSource {
   dirty:boolean
   type: string
   get range():DataRange
@@ -62,14 +65,14 @@ export type SeriesOpts = {
   visualRangeStretch?:boolean
 };
 
-type DataPoint = {
+export type DataPoint = {
   value:number
   index:number
   title?:string
 };
 
 
-type DataHitPoint = (pt:Points.Point) => [point: DataPoint|undefined, distance: number];
+export type DataHitPoint = (pt:Points.Point) => [point: DataPoint|undefined, distance: number];
 
 
 class ArrayDataSource implements DataSource {
@@ -130,13 +133,13 @@ class StreamingDataSource extends ArrayDataSource {
   }
 }
 
-type DataRange = {
+export type DataRange = {
   min:number,
   max:number,
   changed?:boolean
 }
 
-class Series {
+export class Series {
   name:string;
   colour:string;
   source: DataSource
@@ -220,7 +223,7 @@ class Series {
   }
 }
 
-class PlotArea extends Sg.CanvasBox {
+export class PlotArea extends Sg.CanvasBox {
   paddingPx = 3;
   piPi = Math.PI*2;
   // If pointer is more than this distance away from a data point, it's ignored
@@ -396,7 +399,7 @@ class PlotArea extends Sg.CanvasBox {
   }
 }
 
-class Legend extends Sg.CanvasBox {
+export class Legend extends Sg.CanvasBox {
   sampleSize = {width:10, height: 10};
   padding = 3;
   widthSnapping = 20;
@@ -475,7 +478,7 @@ class Legend extends Sg.CanvasBox {
   }
 }
 
-class AxisX extends Sg.CanvasBox {
+export class AxisX extends Sg.CanvasBox {
   paddingPx = 2;
   colour?:string;
 
@@ -531,7 +534,7 @@ class AxisX extends Sg.CanvasBox {
 const isRangeEqual = (a:DataRange, b:DataRange) =>  a.max === b.max && a.min === b.min;
 const isRangeSinglePoint = (a:DataRange) => a.max === a.min;
 
-class AxisY extends Sg.CanvasBox {
+export class AxisY extends Sg.CanvasBox {
   // Number of digits axis will be expected to show as a data legend
   private _maxDigits = 1;
 

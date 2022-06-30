@@ -4,9 +4,12 @@ import { ToString, toStringDefault, isEqualDefault } from "../Util.js";
 import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter, addUniqueByHash} from './Map.js';
 import { without } from './Arrays.js';
 import { circularArray } from './CircularArray.js';
-import {CircularArray, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts, MapOfMutable, MapSetOpts, MultiValue} from "./Interfaces.js";
+import {CircularArray, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts,  MapOfMutable, MapSetOpts, MultiValue} from "./Interfaces.js";
 
-class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
+/**
+ * @internal
+ */
+export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #map: Map<string, M> = new Map();
   readonly groupBy: ToString<V>;
@@ -130,10 +133,6 @@ class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
   /**
    * Returns the array of values stored under `key`
    * or undefined if key does not exist
-   *
-   * @param {string} key
-   * @return {*}  {readonly}
-   * @memberof MutableMapArray
    */
   get(key: string): readonly V[] | undefined {
     const m = this.#map.get(key);
@@ -244,7 +243,7 @@ export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyA
  * @param opts 
  * @returns {@link MapOfMutable}
  */
-export const mapSet = <V>(opts?:MapSetOpts<V>) => {
+export const mapSet = <V>(opts?:MapSetOpts<V>):MapOfMutable<V, ReadonlyMap<string, V>> => {
   const hash = opts?.hash ?? toStringDefault;
   const comparer = (a:V, b:V) => hash(a) === hash(b);
 

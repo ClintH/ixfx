@@ -16,13 +16,13 @@ export interface StopEvent {
   readonly state: string;
 }
 
-type StateMachineEventMap = {
+export type StateMachineEventMap = {
   readonly change: StateChangeEvent
   readonly stop: StopEvent
 };
 
-type StateEvent = (args: unknown, sender: StateMachine) => void;
-type StateHandler = string | StateEvent | null;
+export type StateEvent = (args: unknown, sender: StateMachine) => void;
+export type StateHandler = string | StateEvent | null;
 
 export interface State {
   readonly [event: string]: StateHandler;
@@ -145,9 +145,9 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
 
   /**
    * Create a state machine with initial state, description and options
-   * @param {string} initial Initial state
-   * @param {MachineDescription} m Machine description
-   * @param {Options} [opts={debug: false}] Options for machine
+   * @param string initial Initial state
+   * @param MachineDescription m Machine description
+   * @param Options Options for machine (defaults to `{debug:false}`)
    * @memberof StateMachine
    */
   constructor(initial: string, m: MachineDescription, opts: Options = {debug: false}) {
@@ -283,7 +283,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   }
 
   /**
-   * Sets state. Throws an error if an invalid transition is attempted.
+   * Gets or sets state. Throws an error if an invalid transition is attempted.
    * Use `StateMachine.isValid` to check validity without changing.
    *
    * @memberof StateMachine
@@ -311,12 +311,6 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     }, 1);
   }
 
-  /**
- * Return current state
- *
- * @type {string}
- * @memberof StateMachine
- */
   get state(): string {
     return this.#state;
   }

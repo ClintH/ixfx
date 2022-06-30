@@ -6,7 +6,19 @@ import * as Plot2 from './Plot2.js';
 import * as Palette from  './Palette';
 import * as Colour from './Colour.js';
 import * as SceneGraph from './SceneGraph.js';
+import * as Video from './Video.js';
 
+/**
+ * @module
+ * 
+ * XVisuals
+ * 
+ * Overview:
+ * * {@link Colour}: Colour interpolation, scale generation and parsing
+ * * {@link Palette}: Colour palette managment
+ * * {@link Svg}: SVG helper
+ * * {@link Drawing}: Canvas drawing helper
+ */
 
 /**
  * Colour interpolation, scale generation and parsing
@@ -18,12 +30,11 @@ import * as SceneGraph from './SceneGraph.js';
  */
 export {Colour};
 
-export {Palette,  Drawing, Svg, Plot, Plot2, SceneGraph};
-
-export * as Video from './Video.js';
+export {Palette, Video,  Drawing, Svg, Plot, Plot2, SceneGraph};
 
 try {
-  // @ts-ignore
-  //eslint-disable-next-line functional/immutable-data
-  if (typeof window !== `undefined`) window.ixfx = {Drawing, Svg, Plot, Palette, Colour};
-} catch {}
+  if (typeof window !== `undefined`) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (window as any).ixfx = {...(window as any).ixfx, Visuals: {SceneGraph, Plot2, Drawing, Svg, Plot, Palette, Colour, Video}};
+  }
+} catch { /* no-op */ }

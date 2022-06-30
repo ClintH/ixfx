@@ -35,7 +35,7 @@ export type CardinalDirection = `` | `n` | `ne` | `e` | `se` | `s` | `sw` | `w` 
 
 export type BoundsLogic = `unbounded` | `undefined` | `stop` | `wrap`;
 
-type VisitorLogic = {
+export type VisitorLogic = {
   readonly options?: IdentifyNeighbours;
   readonly select: NeighbourSelector
 }
@@ -49,8 +49,16 @@ export type Visitor = (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGene
 
 export type NeighbourMaybe = readonly [keyof Neighbours, Cell | undefined];
 export type Neighbour = readonly [keyof Neighbours, Cell];
-type NeighbourSelector = (neighbours: ReadonlyArray<Neighbour>) => Neighbour | undefined;
-type IdentifyNeighbours = (grid: Grid, origin: Cell) => ReadonlyArray<Neighbour>;
+
+/**
+ * Neighbour selector logic. For a given set of `neighbours` pick one to visit next.
+ */
+export type NeighbourSelector = (neighbours: ReadonlyArray<Neighbour>) => Neighbour | undefined;
+
+/**
+ * Identify neighbours logic. For a given `grid` and `origin`, return a list of neighbours
+ */
+export type IdentifyNeighbours = (grid: Grid, origin: Cell) => ReadonlyArray<Neighbour>;
 
 /**
  * Returns true if `cell` parameter is a cell with x,y fields.

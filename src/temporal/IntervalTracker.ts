@@ -1,5 +1,5 @@
 import {NumberTracker} from "./NumberTracker.js";
-import {Opts as TrackOpts} from "./TrackedValue.js";
+import {TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
 
 /**
  * A `Tracker` that tracks interval between calls to `mark()`

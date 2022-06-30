@@ -8,6 +8,7 @@ export {stack, stackMutable} from './Stack.js';
 export {queue, queueMutable} from './Queue.js';
 export {map} from './MapImmutable.js';
 export {mapMutable} from './MapMutable.js';
+export {MapOfMutableImpl} from './MapMultiMutable.js';
 
 /**
  * Stacks store items in order. 
@@ -22,6 +23,7 @@ export {mapMutable} from './MapMutable.js';
  * 
  * The ixfx implementation allow you to set a capacity limit with three {@link DiscardPolicy |policies} for
  * how items are evicted.
+ * 
  */
 export * as Stacks from './Stack.js';
 

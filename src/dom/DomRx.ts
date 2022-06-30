@@ -2,16 +2,10 @@ import {fromEvent, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {resolveEl} from './Util.js';
 
-/**
- * @private
- */
 export type PluckOpts =  {
   readonly pluck: string
 }
 
-/**
- * @private
- */
 export type TransformOpts = {
   transform(ev:Event):any
 }

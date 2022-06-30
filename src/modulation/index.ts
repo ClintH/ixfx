@@ -24,11 +24,13 @@ import {number as guardNumber} from '../Guards.js';
  * Easings.time(...);
  * ```
  */
-export * as Easings from './Easing.js';
+import * as Easings from './Easing.js';
+export {Easings};
 
 /**
  * Envelope
  */
+import * as Envelopes from './Envelope.js';
 export * from './Envelope.js';
 
 /**
@@ -46,7 +48,9 @@ export * from './Envelope.js';
  * ```
  * 
  */
-export * as Forces from './Forces.js';
+import * as Forces from './Forces.js';
+export {Forces};
+
 
 /**
  * Oscillators module has waveshapes for producing values with a specified frequency.
@@ -69,7 +73,8 @@ export * as Forces from './Forces.js';
  * ```
  * 
  */
-export * as Oscillators from './Oscillator.js';
+import * as Oscillators from './Oscillator.js';
+export {Oscillators};
 
 export type JitterOpts = {
   readonly type?: `rel`|`abs`,
@@ -134,3 +139,10 @@ export const jitter = (value:number, jitter:number, opts:JitterOpts = {}, rand:R
   if (clamped) return clamp(v);
   return v;
 };
+
+try {
+  if (typeof window !== `undefined`) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (window as any).ixfx = {...(window as any).ixfx, Modulation: {Forces, jitter, Envelopes, Oscillators, Easings}};
+  }
+} catch { /* no-op */ }

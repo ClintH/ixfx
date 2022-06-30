@@ -5,8 +5,17 @@ export type Timestamped<V> = V & {
   readonly at:number
 };
 
-export type Opts = {
+/**
+ * Options
+ */
+export type TrackedValueOpts = {
+  /**
+   * If true, intermediate points are stored. False by default
+   */
   readonly storeIntermediate?:boolean
+  /**
+   * If above zero, tracker will reset after this many samples
+   */
   readonly resetAfterSamples?:number
 }
 
@@ -26,7 +35,7 @@ export abstract class TrackerBase<V> {
   */
   protected resetAfterSamples:number;
 
-  constructor(readonly id:string, opts:Opts = {}) {
+  constructor(readonly id:string, opts:TrackedValueOpts = {}) {
     this.storeIntermediate = opts.storeIntermediate ?? false;
     this.resetAfterSamples = opts.resetAfterSamples ?? -1;
     this.seenCount = 0;
@@ -86,7 +95,7 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
   values:V[];
   timestamps:number[];
 
-  constructor(id:string, opts:Opts) {
+  constructor(id:string, opts:TrackedValueOpts) {
     super(id, opts);
     this.values = [];
     this.timestamps = [];
@@ -157,7 +166,7 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
 export class ObjectTracker<V> extends TrackerBase<V> {
   values:Timestamped<V>[];
 
-  constructor(id:string, opts:Opts) {
+  constructor(id:string, opts:TrackedValueOpts) {
     super(id, opts);
     this.values = [];
   }

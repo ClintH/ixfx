@@ -15,12 +15,13 @@ import * as Colours from '../visual/Colour.js';
 import {stack, Stack} from '../collections/index.js';
 import {resolveEl} from '../dom/Util.js';
 import {roundUpToMultiple} from '~/Util.js';
+import {Drawing} from './index.js';
 
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 
-type CanvasCtxQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
+export type CanvasCtxQuery = null | string | CanvasRenderingContext2D | HTMLCanvasElement;
 
 /**
  * Gets a 2d drawing context from canvas element or query, or throws an error
@@ -86,7 +87,7 @@ export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rec
 /**
  * Drawing options
  */
-type DrawingOpts = {
+export type DrawingOpts = {
   /**
    * Stroke style
    */
@@ -101,6 +102,12 @@ type DrawingOpts = {
   readonly debug?:boolean
 };
 
+export type LineOpts = {
+  readonly lineWidth?:number
+  readonly lineCap?:CanvasLineCap
+  readonly lineJoin?:CanvasLineJoin
+}
+
 /**
  * Creates a drawing op to apply provided options
  * @param opts Drawing options that apply
@@ -114,11 +121,12 @@ const optsOp = (opts:DrawingOpts):StackOp => coloringOp(opts.strokeStyle, opts.f
  * @param opts Options
  * @returns 
  */
-const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts = {}):DrawingStack => {
+const applyOpts = (ctx:CanvasRenderingContext2D, opts:DrawingOpts = {}, ...additionalOps:readonly StackOp[]):DrawingStack => {
   if (ctx === undefined) throw Error(`ctx undefined`);
 
   // Create a drawing stack, pushing an op generated from drawing options
-  const stack = drawingStack(ctx).push(optsOp(opts));
+  const stack = drawingStack(ctx).push(optsOp(opts), ...additionalOps);
+  
   
   // Apply stack to context
   stack.apply();
@@ -148,18 +156,18 @@ export const arc = (ctx:CanvasRenderingContext2D, arcs:Arcs.ArcPositioned|Readon
 /**
  * A drawing stack operation
  */
-type StackOp = (ctx:CanvasRenderingContext2D) => void;
+export type StackOp = (ctx:CanvasRenderingContext2D) => void;
 
 /**
  * A drawing stack (immutable)
  */
-type DrawingStack = Readonly<{
+export type DrawingStack = Readonly<{
   /**
    * Push a new drawing op
    * @param op Operation to add
    * @returns stack with added op
    */
-  push(op:StackOp):DrawingStack
+  push(...ops:readonly StackOp[]):DrawingStack
   /**
    * Pops an operatiomn
    * @returns Drawing stack with item popped
@@ -178,12 +186,24 @@ type DrawingStack = Readonly<{
  * @returns 
  */
 const coloringOp = (strokeStyle:string|CanvasGradient|CanvasPattern|undefined, fillStyle:string|CanvasGradient|CanvasPattern|undefined):StackOp => {
-
   const apply = (ctx:CanvasRenderingContext2D) => {
     // eslint-disable-next-line functional/immutable-data
     if (fillStyle) ctx.fillStyle = fillStyle;
     // eslint-disable-next-line functional/immutable-data
     if (strokeStyle) ctx.strokeStyle = strokeStyle;
+  };
+  return apply;
+};
+
+const lineOp = (lineWidth:number|undefined, lineJoin:CanvasLineJoin|undefined, lineCap:CanvasLineCap|undefined):StackOp => {
+  const apply = (ctx:CanvasRenderingContext2D) => {
+    // eslint-disable-next-line functional/immutable-data
+    if (lineWidth) ctx.lineWidth = lineWidth;
+    // eslint-disable-next-line functional/immutable-data
+    if (lineJoin) ctx.lineJoin = lineJoin;
+    // eslint-disable-next-line functional/immutable-data
+    if (lineCap) ctx.lineCap = lineCap;
+
   };
   return apply;
 };
@@ -197,10 +217,10 @@ const coloringOp = (strokeStyle:string|CanvasGradient|CanvasPattern|undefined, f
 export const drawingStack = (ctx:CanvasRenderingContext2D, stk?:Stack<StackOp>):DrawingStack => {
   if (stk === undefined) stk = stack<StackOp>();
 
-  const push = (op:StackOp):DrawingStack => {
+  const push = (...ops:StackOp[]):DrawingStack => {
     if (stk === undefined) stk = stack<StackOp>();
-    const s = stk.push(op);
-    op(ctx);
+    const s = stk.push(...ops);
+    ops.forEach(o => o(ctx));
     return drawingStack(ctx, s);
   };
 
@@ -541,10 +561,10 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
  * @param toDraw 
  * @param opts 
  */
-export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly Lines.Line[], opts: {readonly strokeStyle?: string, readonly debug?: boolean} = {}) => {
+export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly Lines.Line[], opts: LineOpts & DrawingOpts = {}) => {
   const isDebug = opts.debug ?? false;
-
-  applyOpts(ctx, opts);
+  const o = lineOp(opts.lineWidth, opts.lineJoin, opts.lineCap);
+  applyOpts(ctx, opts, o);
 
   const draw = (d:Lines.Line) => {
     const {a, b} = d;
@@ -584,6 +604,15 @@ export const triangle = (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triang
   if (Array.isArray(toDraw)) toDraw.forEach(draw);
   else draw(toDraw as Triangles.Triangle);
 };
+
+// export const arrowFromTip = (ctx:CanvasRenderingContext2D, tipPos: Points.Point, tailLength:number, opts:DrawingOpts) => {
+//   if (opts.fillStyle) ctx.fillStyle = opts.fillStyle;
+//   if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
+
+//   ctx.save();
+//   ctx.translate 
+//   ctx.restore();
+// }
 
 /**
  * Draws one or more rectangles

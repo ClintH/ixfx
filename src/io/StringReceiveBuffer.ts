@@ -1,4 +1,7 @@
 
+/**
+ * Receives text
+ */
 export class StringReceiveBuffer {
   buffer: string = ``;
   stream:WritableStream<string>|undefined;

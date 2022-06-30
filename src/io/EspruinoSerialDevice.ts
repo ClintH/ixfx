@@ -1,7 +1,7 @@
 import { deviceEval, EvalOpts} from "./Espruino.js";
-import {Device as SerialDevice, Opts as SerialOpts} from "./Serial.js";
+import {Device as SerialDevice, SerialOpts} from "./Serial.js";
 
-export type Opts = SerialOpts & {
+export type EspruinoSerialDeviceOpts = SerialOpts & {
   readonly evalTimeoutMs?:number
 };
 
@@ -9,7 +9,7 @@ export class EspruinoSerialDevice extends SerialDevice {
   evalTimeoutMs:number;
   evalReplyBluetooth = false;
 
-  constructor(opts?:Opts) {
+  constructor(opts?:EspruinoSerialDeviceOpts) {
     super(opts);
 
     if (opts === undefined) opts = {};

@@ -1,6 +1,6 @@
 import * as Points from "../geometry/Point.js";
 import * as Line from "~/geometry/Line.js";
-import {Timestamped, ObjectTracker, TrackedValueMap, Opts as TrackOpts} from "./TrackedValue.js";
+import {Timestamped, ObjectTracker, TrackedValueMap, TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
 
 export type PointSeenInfo = {
   readonly distance:number
@@ -36,7 +36,7 @@ export type PointSeenInfo = {
  * t.x / t.y
  * t.length; // Total length of accumulated points
  * t.elapsed; // Total duration since start
- * t.lastInfo; // The {@link PointSeenInfo} for last seen point
+ * t.lastInfo; // The PointSeenInfo for last seen point
  * ```
  * 
  * Housekeeping
@@ -179,14 +179,9 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
 export const pointsTracker = (opts:TrackOpts) => new TrackedPointMap(opts);
 
 /**
- * Track a single point.
- * 
- * ```js
- * const t = pointTracker(pointer.id);
- * t.
- * ```
- * @param id 
- * @param opts 
- * @returns {@link PointTracker} instance
+ * @inheritDoc PointTracker
+ * @param id Id for tracker (optional)
+ * @param opts Options for tracker (optional)
+ * @returns New tracker
  */
 export const pointTracker = (id?:string, opts:TrackOpts = {}) => new PointTracker(id ?? ``, opts);

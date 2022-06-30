@@ -10,7 +10,7 @@ export const defaultOpts = {
   debug: false
 };
 
-type Opts = {
+export type Opts = {
   readonly chunkSize?:number
   readonly name?:string
   readonly connectAttempts?:number

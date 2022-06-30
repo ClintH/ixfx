@@ -1,4 +1,4 @@
-import { Opts as TrackOpts, Timestamped, PrimitiveTracker} from "./TrackedValue.js";
+import { TrackedValueOpts as TrackOpts, Timestamped, PrimitiveTracker} from "./TrackedValue.js";
 
 /**
  * Keeps track of the min, max and avg in a stream of values without actually storing them.

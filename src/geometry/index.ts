@@ -8,12 +8,11 @@ import * as Paths from './Path.js';
 import * as Points from './Point.js';
 import * as Rects from './Rect.js';
 import * as Ellipses from './Ellipse.js';
+import * as Polar from './Polar.js';
+import * as Shapes from './Shape.js';
 
-export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses};
+export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes};
 
-export * as Polar from './Polar.js';
-
-export * as Shapes from './Shape.js';
 
 /**
  * Triangle processing.
@@ -38,6 +37,7 @@ export function degreeToRadian(angleInDegrees:number):number;
  */
 export function degreeToRadian(angleInDegrees:readonly number[]):readonly number[];
 
+//eslint-disable-next-line func-style
 export function degreeToRadian(angleInDegrees:number|readonly number[]):number|readonly number[] {
   if (Array.isArray(angleInDegrees)) {
     return angleInDegrees.map(v => v * (Math.PI / 180.0));
@@ -74,3 +74,10 @@ export function radianToDegree(angleInRadians:number|readonly number[]):number| 
  * @returns 
  */
 export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.x, point.y);
+
+try {
+  if (typeof window !== `undefined`) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (window as any).ixfx = {...(window as any).ixfx, Geometry: {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, radiansFromAxisX, radianToDegree, degreeToRadian}};
+  }
+} catch { /* no-op */ }

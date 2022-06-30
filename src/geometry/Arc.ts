@@ -247,7 +247,7 @@ export const toSvg:ToSvg = (a:Points.Point|Arc|ArcPositioned, b?:number|Points.P
   } 
 };
 
-type SvgOpts = {
+export type SvgOpts = {
   
   /**
    * "If the arc should be greater or less than 180 degrees"

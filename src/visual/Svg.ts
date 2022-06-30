@@ -254,24 +254,18 @@ export type SvgHelper = {
    */
   query<V extends SVGElement>(selectors:string):V|null
   /**
-   * Gets the width of the parent
+   * Gets/sets the width of the parent
    */
   get width():number 
-  /**
-   * Sets the width of the parent
-   */
   set width(width:number) 
   /**
    * Gets the parent
    */
   get parent():SVGElement
   /**
-   * Gets the height of the parent
+   * Gets/sets the height of the parent
    */ 
   get height():number 
-  /**
-   * Sets the height of the parent
-   */
   set height(height:number) 
   /**
    * Deletes all child elements

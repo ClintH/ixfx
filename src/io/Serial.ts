@@ -1,6 +1,8 @@
-import {JsonDevice, Opts as JsonDeviceOpts} from "./JsonDevice.js";
+import {JsonDevice, JsonDeviceOpts, JsonDeviceEvents, JsonDataEvent} from "./JsonDevice.js";
 
-export type Opts = JsonDeviceOpts & {
+export {JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent};
+
+export type SerialOpts = JsonDeviceOpts & {
   readonly filters?:ReadonlyArray<SerialPortFilter>
   readonly baudRate?:number;
 }
@@ -44,7 +46,7 @@ export class Device extends JsonDevice {
 
   baudRate:number;
 
-  constructor(private config:Opts = {}) {
+  constructor(private config:SerialOpts = {}) {
     super(config);
     this.baudRate = config.baudRate ?? 9600;
     if (config.name === undefined) super.name = `Serial.Device`;

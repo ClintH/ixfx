@@ -7,7 +7,7 @@ import {minMaxAvg as arrayMinMaxAg} from './collections/Arrays.js';
 
 /// ✔ Sorting functions are unit tested
 
-type Primitive = string | number;
+export type Primitive = string | number;
 export type KeyValue = readonly [key: string, value: Primitive];
 
 const byKey = (reverse:boolean = false) => pipe(

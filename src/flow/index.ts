@@ -1,7 +1,10 @@
 import { number as guardNumber} from "../Guards.js";
 import {sleep} from "./Timer.js";
 
-export * as StateMachine from './StateMachine.js';
+import * as StateMachine from './StateMachine.js';
+import * as Timer from './Timer.js';
+
+export {StateMachine};
 export * from './Timer.js';
 
 /**
@@ -129,3 +132,11 @@ export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|unde
   }
   return ret;
 };
+
+
+try {
+  if (typeof window !== `undefined`) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (window as any).ixfx = {...(window as any).ixfx, Flow: {StateMachine, Timer, forEach, forEachAsync, repeat}};
+  }
+} catch { /* no-op */ }
