@@ -49,6 +49,7 @@ export * as Flow from './flow/index.js';
 export * as Generators from './Generators.js';
 
 /**
+ * @module
  * Visuals
  * 
  * Overview:
@@ -56,6 +57,7 @@ export * as Generators from './Generators.js';
  * * {@link Palette}: Colour palette managment
  * * {@link Svg}: SVG helper
  * * {@link Drawing}: Canvas drawing helper
+ * 
  */
 export * as Visual from './visual/index.js';
 
@@ -81,6 +83,7 @@ export * as Events from './Events.js';
  * * {@link Easings} - Ease from `0` to `1` over a specified duration.
  * * {@link jitter} - Jitter a value
  * * {@link Oscillators} - Waveforms
+ * * {@link Forces} - Forces such as bouncing, gravity, attraction/repulsion, springs
  * 
  * @example Importing
  * ```
@@ -117,6 +120,7 @@ export * as KeyValues from './KeyValue.js';
 // Loose functions
 
 export * from './Util.js';
+import * as Util from './Util.js';
 
 // Classes
 export { KeyValue } from './KeyValue.js';
