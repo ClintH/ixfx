@@ -1,6 +1,6 @@
 import {toCartesian} from "./Polar.js";
 import {integer as guardInteger} from "../Guards.js";
-import {Point} from "./Point.js";
+import {Triangles, Points, Rects} from "./index.js";
 
 /**
  * Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
@@ -31,7 +31,7 @@ import {Point} from "./Point.js";
  * @param opts Options
  * @param origin Origin, or {x:0:y:0} by default.
  */
-export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Point = {x:0, y:0}, opts?:{readonly initialAngleRadian?:number}):readonly Point[] => {
+export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Points.Point = {x:0, y:0}, opts?:{readonly initialAngleRadian?:number}):readonly Points.Point[] => {
   guardInteger(points, `positive`, `points`);
   const angle = Math.PI * 2 / points;
   const angleHalf = angle / 2;
@@ -56,4 +56,70 @@ export const starburst = (outerRadius:number, points:number = 5, innerRadius?:nu
     a += angle;
   }
   return pts;
+};
+
+
+export type ArrowOpts = {
+  readonly arrowSize?:number
+  readonly tailLength?:number
+  readonly tailThickness?:number
+  readonly angleRadian?:number
+}
+
+/**
+ * Returns the points forming an arrow
+ * 
+ * @example Create an arrow anchored by its tip at 100,100
+ * ```js
+ * const opts = {
+ *  tailLength: 10,
+ *  arrowSize: 20,
+ *  tailThickness: 5,
+ *  angleRadian: degreeToRadian(45)
+ * }
+ * const arrow = Shapes.arrow({x:100, y:100}, `tip`, opts); // Yields an array of points
+ * 
+ * // Eg: draw points
+ * Drawing.connectedPoints(ctx, arrow, {strokeStyle: `red`, loop: true});
+ * ```
+ * 
+ * @param origin Origin of arrow 
+ * @param from Does origin describe the tip or tail?
+ * @param opts Options for arrow 
+ * @returns 
+ */
+export const arrow = (origin:Points.Point,  from:`tip`|`tail`, opts:ArrowOpts = {}):readonly Points.Point[] => {
+  const tailLength = opts.tailLength ?? 10;
+  const tailThickness = opts.tailThickness ?? Math.max(tailLength/5, 5);
+  const angleRadian = opts.angleRadian ?? 0;
+  const arrowSize = opts.arrowSize ?? Math.max(tailLength/5, 15);
+
+  const triAngle = Math.PI/2;
+
+  //eslint-disable-next-line functional/no-let
+  let tri:Triangles.Triangle;
+  //eslint-disable-next-line functional/no-let
+  let tailPoints:readonly Points.Point[];
+
+  if (from === `tip`) {
+    tri = Triangles.equilateralFromVertex(origin, arrowSize, triAngle);
+    tailPoints = Rects.corners(Rects.fromTopLeft(
+      {x: tri.a.x - tailLength, y: origin.y - tailThickness / 2},
+      tailLength,
+      tailThickness
+    ));  
+  } else {
+    //const midY = origin.y - tailThickness/2;
+    tailPoints = Rects.corners(Rects.fromTopLeft({x: origin.x, y: origin.y - tailThickness/2}, tailLength, tailThickness));
+    tri = Triangles.equilateralFromVertex({x: origin.x + tailLength + arrowSize*0.7, y: origin.y}, arrowSize, triAngle);
+  }
+
+  const arrow = Points.rotate([
+    tailPoints[0], tailPoints[1], tri.a,
+    tri.b,
+    tri.c, tailPoints[2], tailPoints[3]
+  ], angleRadian, origin);
+
+  
+  return arrow;
 };
