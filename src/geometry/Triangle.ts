@@ -10,7 +10,7 @@ const piPi = Math.PI*2;
  * 
  * Helpers for creating:
  *  - {@link fromFlatArray}: Create from [x1, y1, x2, y2, x3, y3]
- *  - {@link fromPoints}: Create from three {x,y} sets
+ *  - {@link fromPoints}: Create from three `{x,y}` sets
  *  - {@link fromRadius}: Equilateral triangle of a given radius and center
  */
 export type Triangle = {
@@ -291,10 +291,10 @@ export const outerCircle = (t:Triangle):Circles.CirclePositioned => {
  * 
  * ```js
  * // Create a triangle at 100,100 with radius of 60
- * const tri = equilateralFromOrigin({x:100,y:100}, 60);
+ * const tri = fromRadius({x:100,y:100}, 60);
  * 
  * // Triangle with point A upwards, B to the right, C to the left
- * constr tri2 = equilateralFromOrigin({x:100,y:100}, 60, {initialAngleRadian: -Math.PI / 2});
+ * constr tri2 = fromRadius({x:100,y:100}, 60, {initialAngleRadian: -Math.PI / 2});
  * ```
  * 
  * 
@@ -312,6 +312,33 @@ export const fromRadius = (origin:Points.Point, radius:number, opts:{readonly in
   return fromPoints(points);
 };
 
+/**
+ * Rotates the vertices of the triangle around one point (by default, `b`).
+ * @param triangle Triangle
+ * @param vertex Name of vertex: a, b or c.
+ */
+export const rotateByVertex = (triangle:Triangle, amountRadian:number, vertex:`a`|`b`|`c` = `b`):Triangle => {
+  const origin = vertex === `a` ? triangle.a : vertex === `b` ? triangle.b : triangle.c;
+  return Object.freeze({
+    a: Points.rotate(triangle.a, amountRadian, origin),
+    b: Points.rotate(triangle.b, amountRadian, origin),
+    c: Points.rotate(triangle.c, amountRadian, origin)
+  });
+};
+
+/**
+ * Returns a triangle anchored at `origin` with a given `length` and `angleRadian`.
+ * The origin will be point `b` of the triangle, and the angle will be the angle for b.
+ * @param origin Origin
+ * @param length Length
+ * @param angleRadian Angle
+ * @returns 
+ */
+export const equilateralFromVertex = (origin:Points.Point = {x:0, y:0}, length:number = 10, angleRadian:number = Math.PI/2):Triangle => {  
+  const a = Points.project(origin, length, (Math.PI - (-angleRadian / 2)));
+  const c = Points.project(origin, length, (Math.PI - (angleRadian / 2)));
+  return {a, b:origin, c};
+};
 
 /**
  * Returns the coordinates of triangle in a flat array form:
