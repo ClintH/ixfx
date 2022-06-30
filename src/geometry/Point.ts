@@ -43,7 +43,7 @@ export const dotProduct = (...pts:readonly Point[]):number => {
 };
 
 /**
- * An empty point of {x:0, y:0}
+ * An empty point of `{x:0, y:0}`
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Empty = Object.freeze({ x:0, y: 0});
@@ -929,6 +929,29 @@ export const compare = (a: Point, b:Point):number => {
 
 export const compareByX = (a:Point, b:Point):number =>  a.x - b.x || a.y - b.y;
 
+/**
+ * Project `origin` by `distance` and `angle` (radians).
+ * 
+ * To figure out rotation, imagine a horizontal line running through `origin`.
+ * * Rotation = 0 deg puts the point on the irhgt of origin, on same y-axis
+ * * Rotation = 90 deg/3:00 puts the point below origin, on the same x-axis
+ * * Rotation = 180 deg/6:00 puts the point on the left of origin on the same y-axis
+ * * Rotation = 270 deg/12:00 puts the point above the origin, on the same x-axis
+ * 
+ * ```js
+ * // Yields a point 100 units away from 10,20 with 10 degrees rotation (ie slightlydown) 
+ * const a = Points.project({x:10, y:20}, 100, degreeToRadian(10));
+ * ```
+ * @param origin 
+ * @param distance 
+ * @param angle 
+ * @returns 
+ */
+export const project = (origin:Point, distance:number, angle:number) => {
+  const x = (Math.cos(angle) * distance) + origin.x;
+  const y =  (Math.sin(angle) * distance) + origin.y;
+  return {x, y};
+};
 
 /**
  * Rotate a single point by a given amount in radians
@@ -941,7 +964,7 @@ export function rotate(pt:Point, amountRadian:number, origin?:Point):Point;
 /**
  * Rotate several points by a given amount in radians
  * @param pt Points
- * @param amountRadian Amount to rotate in radians 
+ * @param amountRadian Amount to rotate in radians. If 0 is given, a copy of the input array is returned
  * @param origin Origin to rotate around. Defaults to 0,0
  */
 export function rotate(pt:ReadonlyArray<Point>, amountRadian:number, origin?:Point):ReadonlyArray<Point>;
@@ -952,9 +975,13 @@ export function rotate(pt:Point|ReadonlyArray<Point>, amountRadian:number, origi
   guardNumber(amountRadian, ``, `amountRadian`);
   const arrayInput = Array.isArray(pt);
 
+  // no-op
+  if (amountRadian === 0)  return pt;
+    
   if (!arrayInput) {
     pt = [pt as Point];
   }
+
   const ptAr = pt as ReadonlyArray<Point>;
   ptAr.forEach((p, index) => guard(p, `pt[${index}]`));
   
