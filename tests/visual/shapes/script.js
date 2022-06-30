@@ -1,9 +1,10 @@
 import {parentSizeCanvas} from '../../../dist/dom.js';
 import {Drawing} from '../../../dist/visual.js';
-import {degreeToRadian, Lines, Shapes, Triangles} from '../../../dist/geometry.js';
+import {degreeToRadian, Points, Lines, Shapes, Triangles, Rects} from '../../../dist/geometry.js';
 import {dotProduct} from '../../../dist/arrays.js';
 
 let ptr = {x: 0, y: 0};
+let ptrClick = {x: 300, y: 200};
 
 const canvasEl = document.getElementById(`plot`);
 parentSizeCanvas('#plot', (args) => {
@@ -36,7 +37,7 @@ const drawStarburst = () => {
 
 const drawTriangle = () => {
   const origin = {x: 200, y: 200};
-  const t = Triangles.equilateralFromOrigin(origin, 100, {initialAngleRadian: -Math.PI / 2});
+  const t = Triangles.fromRadius(origin, 100, {initialAngleRadian: -Math.PI / 2});
   Drawing.triangle(ctx, t, {strokeStyle: `blue`, fillStyle: `silver`, debug: true});
   Drawing.dot(ctx, origin, {fillStyle: `blue`});
 
@@ -76,8 +77,20 @@ const drawLine = () => {
 
 }
 
+const drawArrow = () => {
+
+  const opts = {
+    angleRadian: degreeToRadian(45),
+    tailThickness: 50,
+    tailLength: 150,
+    arrowSize: 200
+  }
+  const arrow = Shapes.arrow(ptrClick, `tail`, opts);
+  Drawing.connectedPoints(ctx, arrow, {strokeStyle: `red`, loop: true});
+}
+
 const draw = () => {
-  drawTriangle();
+  drawArrow();
 }
 
 document.addEventListener(`pointermove`, evt => {
@@ -87,5 +100,15 @@ document.addEventListener(`pointermove`, evt => {
   };
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
   draw();
-})
+});
+
+document.addEventListener(`pointerup`, evt => {
+  ptrClick = {
+    x: evt.x,
+    y: evt.y
+  };
+  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  draw();
+
+});
 
