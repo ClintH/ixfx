@@ -213,9 +213,7 @@ export const angle = (a: Point, b?: Point) => {
 };
 
 /**
- * Calculates the centroid of a set of points
- * 
- * As per {@link https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points}
+ * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
  * 
  * ```js
  * // Find centroid of a list of points
@@ -593,7 +591,7 @@ export const pipeline = (...pipeline:readonly ((pt:Point)=>Point)[]) => (pt:Poin
  * ```
  * @param pts Points to reduce
  * @param fn Reducer
- * @param initial Initial value, uses {x:0,y:0} by default
+ * @param initial Initial value, uses `{ x:0, y:0 }` by default
  * @returns 
  */
 export const reduce = (pts:readonly Point[], fn:(p:Point, accumulated:Point) => Point, initial:Point = {x:0, y:0}):Point => {
@@ -1135,8 +1133,8 @@ export const random = (rando?:RandomSource):Point => {
  * wrap({x:1.2, y:1.5}); // Yields: {x:0.2, y:0.5}
  * ```
  * @param pt Point to wrap
- * @param ptMax Maximum value, or {x:1, y:1} by default
- * @param ptMin Minimum value, or {x:0, y:0} by default
+ * @param ptMax Maximum value, or `{ x:1, y:1 }` by default
+ * @param ptMin Minimum value, or `{ x:0, y:0 }` by default
  * @returns Wrapped point
  */
 export const wrap = (pt:Point, ptMax:Point = {x:1, y:1}, ptMin:Point = {x:0, y:0}):Point => {

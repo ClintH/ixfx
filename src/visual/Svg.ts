@@ -297,7 +297,7 @@ export const setBounds = (svg:SVGElement, bounds:Rects.Rect):void => {
 };
 
 /**
- * @inheritdoc SvgHelper
+ * Creates a {@link SvgHelper} for the creating and management of SVG elements.
  * @param parent 
  * @param parentOpts 
  * @returns 
@@ -308,7 +308,7 @@ export const makeHelper = (parent:SVGElement, parentOpts?:DrawingOpts & StrokeOp
     applyStrokeOpts(parent, parentOpts);
   }
   
-  const o = {
+  const o:SvgHelper = {
     remove:(queryOrExisting:string|SVGElement) => remove(parent, queryOrExisting),
     text:(text:string, pos:Points.Point, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextElement) => Elements.text(text, parent, pos, opts, queryOrExisting),
     textPath:(pathRef:string, text:string, opts?:TextDrawingOpts, queryOrExisting?:string|SVGTextPathElement) => Elements.textPath(pathRef, text, parent, opts, queryOrExisting),

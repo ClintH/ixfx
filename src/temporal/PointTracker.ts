@@ -179,7 +179,7 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
 export const pointsTracker = (opts:TrackOpts) => new TrackedPointMap(opts);
 
 /**
- * @inheritDoc PointTracker
+ * Creates a {@link PointTracker}.
  * @param id Id for tracker (optional)
  * @param opts Options for tracker (optional)
  * @returns New tracker

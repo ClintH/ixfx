@@ -53,7 +53,7 @@ export type EvalOpts = {
 
 
 /**
- * @inheritdoc EspruinoBleDevice
+ * Instantiates a Puck.js. See {@link EspruinoBleDevice} for more info.
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
 export const puck = async (opts:{readonly name?:string, readonly debug?:boolean} = {}) => {
@@ -78,7 +78,7 @@ export const puck = async (opts:{readonly name?:string, readonly debug?:boolean}
 };
 
 /**
- * @inheritdoc EspruinoSerialDevice
+ * Create a serial-connected Espruino device. See {@link EspruinoSerialDevice} for more info.
  * @param opts 
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
@@ -90,7 +90,8 @@ export const serial = async (opts:{readonly name?:string, readonly debug?:boolea
 
 
 /**
- * @inheritdoc EspruinoDevice
+ * Connects to a generic Espruino BLE device. See  {@link EspruinoBleDevice} for more info.
+ * Use {@link puck} if you're connecting to a Puck.js
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
 export const connectBle = async () => {

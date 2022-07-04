@@ -37,7 +37,7 @@ export type InterpolationOpts = {
 }
 
 /**
- * Parses colour to {h,s,l}. `opacity` field is added if it exists on source.
+ * Parses colour to `{ h, s, l }`. `opacity` field is added if it exists on source.
  * @param colour 
  * @returns 
  */
@@ -93,7 +93,7 @@ export const randomHue = (rand:RandomSource = defaultRandom): number => {
 };
 
 /**
- * Parses colour to {r,g,b}. `opacity` field is added if it exists on source.
+ * Parses colour to `{ r, g, b }`. `opacity` field is added if it exists on source.
  * @param colour 
  * @returns 
  */

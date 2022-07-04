@@ -5,7 +5,7 @@ import {SimpleEventEmitter} from "../Events.js";
 import {SetMutable, ValueSetEventMap} from "./Interfaces.js";
 
 /**
- * @inheritdoc SetMutable
+ * Creates a {@link SetMutable}.
  * @param keyString Function that produces a key for items. If unspecified uses JSON.stringify
  * @returns 
  */

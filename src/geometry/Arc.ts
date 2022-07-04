@@ -40,7 +40,7 @@ export type Arc = {
 }
 
 /**
- * An {@link Arc} that also has a position, given in x, y
+ * An {@link Geometry.Arcs.Arc} that also has a position, given in x, y
  */
 export type ArcPositioned = Points.Point & Arc;
 
@@ -78,7 +78,7 @@ export function fromDegrees(radius:number, startDegrees:number, endDegrees:numbe
 }
 
 /**
- * Returns a {@link Line} linking the start and end points of an {@link ArcPositioned}.
+ * Returns a {@link Geometry.Lines.Line} linking the start and end points of an {@link ArcPositioned}.
  *
  * @param arc
  * @returns Line from start to end of arc
@@ -153,7 +153,7 @@ export const interpolate:Interpolate = (amount:number, arc:ArcPositioned|Arc, or
 };
 
 /**
- * Creates a {@link Path} instance from the arc. This wraps up some functions for convienence.
+ * Creates a {@link Geometry.Paths.Path} instance from the arc. This wraps up some functions for convienence.
  * @param arc 
  * @returns Path
  */
@@ -178,7 +178,7 @@ export const toPath = (arc:ArcPositioned): Path => {
 export const length = (arc:Arc):number =>  piPi*arc.radius*((arc.startRadian-arc.endRadian)/piPi);
 
 /**
- * Calculates a {@link Rects.Rect|Rect} bounding box for arc.
+ * Calculates a {@link Geometry.Rects.Rect | Rect} bounding box for arc.
  * @param arc 
  * @returns Rectangle encompassing arc.
  */

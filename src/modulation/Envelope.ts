@@ -482,7 +482,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
 }
 
 /**
- * @inheritdoc Adsr
+ * Creates an {@link Adsr} envelope.
  * @param opts 
  * @returns New {@link Adsr} Envelope
  */

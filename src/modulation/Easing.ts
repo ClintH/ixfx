@@ -44,7 +44,6 @@ export type EasingFn = (x: number) => number;
 
 /**
  * Creates an easing based on clock time
- * @inheritdoc Easing
  * @example Time based easing
  * ```
  * const t = time(`quintIn`, 5*1000); // Will take 5 seconds to complete
@@ -64,7 +63,6 @@ export const time = function (nameOrFn: EasingName|EasingFn, durationMs: number)
 /**
  * Creates an easing based on ticks
  * 
- * @inheritdoc Easing
  * @example Tick-based easing
  * ```
  * const t = tick(`sineIn`, 1000);   // Will take 1000 ticks to complete
@@ -206,7 +204,7 @@ export type EasingName = keyof typeof functions;
 /**
  * Returns an easing function by name, or _undefined_ if not found.
  * This is a manual way of working with easing functions. If you want to
- * ease over time or ticks, use {@link time} or {@link ticks}.
+ * ease over time or ticks, use {@link Flow.msElapsedTimer} or {@link Flow.ticksElapsedTimer}.
  * 
  * ```js
  * const fn = Easings.get(`sineIn`);

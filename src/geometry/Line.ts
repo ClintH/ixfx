@@ -318,7 +318,7 @@ export const getPointsParam = (aOrLine: Points.Point|Line, b?: Points.Point): re
  * If an array of lines is provided, it will be the closest point amongst all the lines
  * @param line Line or array of lines
  * @param point
- * @returns Point {x,y}
+ * @returns Point `{ x, y }`
  */
 export const nearest = (line:Line|readonly Line[], point:Points.Point): Points.Point => {
   
@@ -605,7 +605,7 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
 /**
  * Returns an array representation of line: [a.x, a.y, b.x, b.y]
  * 
- * See {@link fromArray} to create a line _from_ this representation.
+ * See {@link fromFlatArray} to create a line _from_ this representation.
  *
  * @export
  * @param {Point} a

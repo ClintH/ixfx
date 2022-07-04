@@ -46,7 +46,7 @@ export type StartResult = {
  * Be sure to call the dispose() function to stop the video stream and remove the created VIDEO element.
  * 
  * @param constraints 
- * @returns Returns {videoEl,dispose}, where videoEl is the created VIDEO element, and dispose is a function for removing the element and stopping the video.
+ * @returns Returns `{ videoEl, dispose }`, where `videoEl` is the created VIDEO element, and `dispose` is a function for removing the element and stopping the video.
  */
 export const start = async (constraints:Constraints = {}): Promise<StartResult|undefined> => {
   const videoEl = document.createElement(`VIDEO`) as HTMLVideoElement;

@@ -185,7 +185,7 @@ export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number
 /**
  * Returns a rectangle based on provided four corners.
  * 
- * To create a rectangle that contains an arbitary set of points, use {@links Points.bbox}.
+ * To create a rectangle that contains an arbitary set of points, use {@link Geometry.Points.bbox | Geometry.Points.bbox}.
  * 
  * Does some sanity checking such as:
  *  - x will be smallest of topLeft/bottomLeft
@@ -358,7 +358,7 @@ export const multiply = (a:RectPositioned|Rect, b:Rect|number, c?:number):RectPo
 };
 
 /**
- * Returns the center of a rectangle as a {@link Point}.
+ * Returns the center of a rectangle as a {@link Geometry.Points.Point}.
  *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
  * 
  * ```js

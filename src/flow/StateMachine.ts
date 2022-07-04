@@ -40,10 +40,8 @@ export interface MachineDescription {
  * const states = [`one`, `two`, `three`];
  * const sm = StateMachine.create(states[0], descriptionFromList(states));
  * ```
- * @param {...readonly} states
- * @param {*} string
- * @param {*} []
- * @return {*}  {MachineDescription}
+ * @param states List of states
+ * @return MachineDescription
  */
 export const descriptionFromList = (...states:readonly string[]):MachineDescription => {
   const t = {};
@@ -258,10 +256,10 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * Checks whether a state change is valid.
    *
    * @static
-   * @param {string} priorState From state
-   * @param {string} newState To state
-   * @param {MachineDescription} description Machine description
-   * @returns {[boolean, string]} If valid: [true,''], if invalid: [false, 'Error msg here']
+   * @param priorState From state
+   * @param newState To state
+   * @param description Machine description
+   * @returns If valid: [true,''], if invalid: [false, 'Error msg here']
    * @memberof StateMachine
    */
   static isValid(priorState:string, newState:string, description:MachineDescription):readonly [boolean, string] {

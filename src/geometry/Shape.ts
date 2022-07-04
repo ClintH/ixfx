@@ -29,7 +29,7 @@ import {Triangles, Points, Rects} from "./index.js";
  * @param innerRadius Inner radius. A proportionally smaller inner radius makes for sharper spikes. If unspecified, 50% of the outer radius is used.
  * @param outerRadius Outer radius. Maximum radius of a spike to origin
  * @param opts Options
- * @param origin Origin, or {x:0:y:0} by default.
+ * @param origin Origin, or `{ x:0, y:0 }` by default.
  */
 export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Points.Point = {x:0, y:0}, opts?:{readonly initialAngleRadian?:number}):readonly Points.Point[] => {
   guardInteger(points, `positive`, `points`);

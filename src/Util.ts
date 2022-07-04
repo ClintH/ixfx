@@ -19,8 +19,8 @@ const piPi = Math.PI*2;
  * clamp(50, 0, 50);   
  * ```
  * 
- * For clamping integer ranges, consider {@link clampIndex}
- * For clamping {x,y} points, consider {@link Points.clamp}.
+ * For clamping integer ranges, consider {@link clampIndex }
+ * For clamping {x,y} points, consider {@link Geometry.Points.clamp | Geometry.Points.clamp}.
  * 
  * @param v Value to clamp
  * @param Minimum value (inclusive)
@@ -136,7 +136,7 @@ export const roundUpToMultiple = (v:number, multiple:number):number => {
  * ```
  * 
  * If `v` is outside of the input range, it will likewise be outside of the output range.
- * Use {@clamp} to ensure output range is maintained.
+ * Use {@link clamp} to ensure output range is maintained.
  * 
  * If inMin and inMax are equal, outMax will be returned.
  * 
@@ -326,7 +326,7 @@ export const clampIndex = (v: number, arrayOrLength: number|readonly any[]):numb
  * }).start();
  * ```
  * 
- * See also {@link Colour.interpolate}, {@link Points.interpolate}.
+ * See also {@link Visual.Colour.interpolate | Visual.Colour.interpolate }, {@link Geometry.Points.interpolate | Geometry.Points.interpolate}.
  * @param amount Interpolation amount, between 0 and 1 inclusive
  * @param a Start (ie when `amt` is 0)
  * @param b End (ie. when `amt` is 1)

@@ -26,7 +26,12 @@ export type RandomSource = () => number;
  * weighted(`quadOut`); // quadOut favours high values
  * ```
  * 
- * Use {@link weighedSkewed} for a curried version that can be used as a {@link RandomSource}.
+ * Use {@link weightedSkewed} for a curried version that can be used as a {@link RandomSource}:
+ * 
+ * ```js
+ * const w = weightedSkewed(`quadIn`);
+ * w(); // Produce a random number
+ * ```
  * @param easingName Easing name. `quadIn` by default.
  * @param rand Source random generator. `Math.random` by default.
  * @returns Random number (0-1)
@@ -38,6 +43,17 @@ export const weighted = (easingName:Easings.EasingName = `quadIn`, rand:RandomSo
   return easingFn(r);
 };
 
+/**
+ * Returns a curried version of {@link weighted}.
+ * 
+ * ```js
+ * const w = weightedSkewed(`quadIn`);   // Returns a function
+ * w(); // Produce a random number
+ * ```
+ * @param easingName 
+ * @param rand 
+ * @returns 
+ */
 export const weightedSkewed = (easingName:Easings.EasingName = `quadIn`, rand:RandomSource = defaultRandom):RandomSource => () => weighted(easingName, rand);
 
 /**

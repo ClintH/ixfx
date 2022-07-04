@@ -95,7 +95,7 @@ export type RepeatPredicate = (repeats:number, valuesProduced:number)=>boolean;
  * const results = repeat((repeats, valuesProduced) => valuesProduced < 10, fn);
  * ```
  * 
- * If you don't need to accumulate return values, consider {@link Generators.count} with {@link Generators.forEach}.
+ * If you don't need to accumulate return values, consider {@link Generators.count | Generators.count} with {@link Flow.forEach | Flow.forEach}.
  * 
  * @param countOrPredicate Number of repeats or function returning false when to stop 
  * @param fn Function to run, must return a value to accumulate into array or _undefined_

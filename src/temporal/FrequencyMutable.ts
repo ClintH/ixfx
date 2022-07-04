@@ -192,8 +192,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
 }
 
 /**
- * Creates a FrequencyMutable
- * @inheritdoc FrequencyMutable
+ * Creates a {@link FrequencyMutable} instance.
  * @template V Data type of items
  * @param keyString Function to generate keys for items. If not specified, uses JSON.stringify 
  * @returns 

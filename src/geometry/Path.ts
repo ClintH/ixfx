@@ -3,7 +3,7 @@ import {Lines, Beziers, Rects, Points} from './index.js';
 //eslint-disable-next-line  functional/no-mixed-type
 export type Path = {
   length(): number
-  /**
+/**
    * Returns a point at a relative (0.0-1.0) position along the path
    *
    * @param {number} t Relative position (0.0-1.0)
@@ -18,8 +18,8 @@ export type Path = {
 /**
  * Return the start point of a path
  *
- * @param {Path} path
- * @return {*}  {Point}
+ * @param path
+ * @return Point
  */
 export const getStart = function (path: Path): Points.Point {
   if (Beziers.isQuadraticBezier(path)) return path.a;
@@ -30,8 +30,8 @@ export const getStart = function (path: Path): Points.Point {
 /**
  * Return the end point of a path
  *
- * @param {Path} path
- * @return {*}  {Point}
+ * @param path
+ * @return Point
  */
 export const getEnd = function (path: Path): Points.Point {
   if (Beziers.isQuadraticBezier(path)) return path.b;

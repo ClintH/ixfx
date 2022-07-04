@@ -322,7 +322,7 @@ export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds: 
 };
 
 /**
- * Returns an {x,y} signed vector corresponding to the provided cardinal direction.
+ * Returns an `{ x, y }` signed vector corresponding to the provided cardinal direction.
  * ```js
  * const n = getVectorFromCardinal(`n`); // {x: 0, y: -1}
  * ```
@@ -332,10 +332,10 @@ export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds: 
  * const n = getVectorFromCardinal(`n`, 10); // {x: 0, y: -10}
  * ```
  * 
- * Blank direction returns {x: 0, y: 0}
+ * Blank direction returns `{ x: 0, y: 0 }`
  * @param cardinal Direction
  * @param multiplier Multipler
- * @returns Signed vector in the form of {x,y}
+ * @returns Signed vector in the form of `{ x, y }`
  */
 export const getVectorFromCardinal = (cardinal: CardinalDirection, multiplier: number = 1): Cell => {
   // eslint-disable-next-line functional/no-let
@@ -504,11 +504,11 @@ const neighbourList = (grid: Grid, cell: Cell, directions: ReadonlyArray<Cardina
  *  }
  *  setTimeout(run, delayMs);
  * ```
- * @param {(neighbourSelect: NeighbourSelector} neighbourSelect Select neighbour to visit
- * @param {Grid} grid Grid to visit
- * @param {Cell} start Starting cell
- * @param {MutableStringSet<Cell>} [visited] Optional tracker of visited cells
- * @returns {Iterable<Cell>}
+ * @param neighbourSelect Select neighbour to visit
+ * @param grid Grid to visit
+ * @param start Starting cell
+ * @param visited Optional tracker of visited cells
+ * @returns Cells
  */
 // eslint-disable-next-line functional/prefer-readonly-type
 export const visitor = function* (
@@ -805,8 +805,8 @@ export const rows = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
  * Enumerate all cells in an efficient manner. Runs left-to-right, top-to-bottom.
  * If end of grid is reached, iterator will wrap to ensure all are visited.
  *
- * @param {Grid} grid
- * @param {Cell} [start={x:0, y:0}]
+ * @param grid
+ * @param start
  */
 export const cells = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
   guardGrid(grid, `grid`);

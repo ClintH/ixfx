@@ -12,7 +12,7 @@ import * as Easings from "../modulation/Easing.js";
  * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
  * ```
  * 
- * Function is expected to map (0..1) => (0..1), such as an {@link Easings.EasingFn}. The input to the
+ * Function is expected to map (0..1) => (0..1), such as an {@link Modulation.Easings.EasingFn}. The input to the
  * function is the relative position of an element, so the first element will use fn(0), the middle (0.5) and so on.
  * The output of the function s then multiplied by the original value.
  * 

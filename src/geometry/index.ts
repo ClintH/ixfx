@@ -18,8 +18,8 @@ export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, El
  * Triangle processing.
  * 
  * Helpers for creating:
- * - {@link Triangles.fromFlatArray}: Create from [x1, y1, x2, y2, x3, y3]
- * - {@link Triangles.fromPoints}: Create from three {x,y} sets
+ * - {@link Triangles.fromFlatArray}: Create from `[ x1, y1, x2, y2, x3, y3 ]`
+ * - {@link Triangles.fromPoints}: Create from three `{ x, y }` sets
  * - {@link Triangles.fromRadius}: Equilateral triangle of a given radius and center
  */
 export * as Triangles from './Triangle.js';

@@ -55,7 +55,7 @@ export const getOrGenerate = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>Promi
 };
 
 /**
- * @inheritdoc getOrGenerate
+ * @inheritDoc getOrGenerate
  * @param map 
  * @param fn 
  * @returns 

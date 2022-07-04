@@ -325,7 +325,6 @@ export type ContinuouslyAsyncCallback = (ticks?:number, elapsedMs?:number) => Pr
  * ```
  * 
  * Use `continuously` if you need a loop you can start and stop at will. 
- * Alternatives: {@link yieldAnimationRate}
  * @param callback Function to run. If it returns false, loop exits.
  * @param resetCallback Callback when/if loop is reset. If it returns false, loop exits
  * @param intervalMs 

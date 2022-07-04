@@ -412,8 +412,8 @@ export type BarycentricCoord = {
 }
 
 /**
- * Returns the Barycentric coordinate of a point within a triangle
- * {@link https://en.wikipedia.org/wiki/Barycentric_coordinate_system}
+ * Returns the [Barycentric coordinate](https://en.wikipedia.org/wiki/Barycentric_coordinate_system) of a point within a triangle
+ * 
  * @param t 
  * @param a 
  * @param b 

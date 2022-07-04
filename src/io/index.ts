@@ -15,7 +15,7 @@ export {Codec} from './Codec.js';
  * 
  * Overview:
  * * {@link puck}: Connect ./EspruinoBleDevice.js
- * * {@link connect}: Connect to a generic Espruino
+ * * {@link Espruino.connectBle}: Connect to a generic Espruino via BLE
  */
 export * as Espruino from './Espruino.js';
 
