@@ -142,6 +142,22 @@ h3 {
   line-height: 1.4em;
 }
 
+.tsd-type-parameters h4,
+.tsd-type-parameters .tsd-comment,
+.tsd-type-parameters .tsd-comment p {
+  display: inline;
+}
+
+.tsd-type-parameters li {
+  margin: 1em 0 0.5em 0;
+}
+
+ul.tsd-type-parameters {
+  list-style: square;
+  margin: 0;
+  padding-left: 20px;
+}
+
 li.tsd-kind-namespace.tsd-parent-kind-namespace {
   display: none;
 }
