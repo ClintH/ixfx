@@ -1,5 +1,5 @@
-import {RandomSource, defaultRandom} from '~/Random.js';
-import {clamp} from '~/Util.js';
+import {RandomSource, defaultRandom} from '../Random.js';
+import {clamp} from '../Util.js';
 import {number as guardNumber} from '../Guards.js';
 
 

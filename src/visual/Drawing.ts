@@ -14,8 +14,7 @@ import * as Colours from '../visual/Colour.js';
 
 import {stack, Stack} from '../collections/index.js';
 import {resolveEl} from '../dom/Util.js';
-import {roundUpToMultiple} from '~/Util.js';
-import {Drawing} from './index.js';
+import {roundUpToMultiple} from '../Util.js';
 
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

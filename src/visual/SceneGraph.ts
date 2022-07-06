@@ -1,7 +1,6 @@
 /* eslint-disable */
-import {asapScheduler} from 'rxjs';
-import {Arrays} from '~/collections/index.js';
-import {Points} from '~/geometry/index.js';
+import {Arrays} from '../collections/index.js';
+import {Points} from '../geometry/index.js';
 import * as Rects from '../geometry/Rect.js';
 import {hue as randomHue} from  '../Random.js';
 

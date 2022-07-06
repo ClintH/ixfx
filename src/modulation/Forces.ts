@@ -1,9 +1,9 @@
 /**
  * Acknowledgements: much of the work here is an adapation from Daniel Shiffman's excellent _The Nature of Code_ website.
  */
-import {Points, Polar} from '~/geometry/index.js';
-import {angle, Point} from '~/geometry/Point.js';
-import {clamp, interpolateAngle} from '~/Util.js';
+import {Points, Polar} from '../geometry/index.js';
+import { Point} from '../geometry/Point.js';
+import {clamp, interpolateAngle} from '../Util.js';
 import {Rect, getEdgeX, getEdgeY} from '../geometry/Rect.js';
 
 /**

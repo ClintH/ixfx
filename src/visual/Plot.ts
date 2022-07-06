@@ -5,7 +5,7 @@ import { mapCircularMutable, mapArray} from "../collections/MapMultiMutable.js"
 
 import { Point, subtract as pointSubtract} from "../geometry/Point.js";
 import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
-import {Rect} from '~/geometry/Rect.js';
+import {Rect} from '../geometry/Rect.js';
 import {Colour, Drawing} from './index.js';
 
 export type Plotter = {

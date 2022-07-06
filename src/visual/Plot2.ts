@@ -1,6 +1,6 @@
 /* eslint-disable */
-import {minIndex} from '~/collections/NumericArrays.js';
-import {PointCalculableShape} from '~/geometry/Point.js';
+import {minIndex} from '../collections/NumericArrays.js';
+import {PointCalculableShape} from '../geometry/Point.js';
 import {Arrays} from '../collections/index.js';
 import { Points, Rects} from '../geometry/index.js';
 import {clamp, flip, getFieldByPath, getFieldPaths, ifNaN, roundUpToMultiple, scale} from '../Util.js';

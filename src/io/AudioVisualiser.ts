@@ -11,7 +11,7 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import {Arrays} from '~/collections/index.js';
+import {Arrays} from '../collections/index.js';
 import {Points} from '../geometry/index.js';
 import {numberTracker} from '../temporal/NumberTracker.js';
 import {AudioAnalyser} from './AudioAnalyser.js';

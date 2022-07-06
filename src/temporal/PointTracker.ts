@@ -1,5 +1,5 @@
 import * as Points from "../geometry/Point.js";
-import * as Line from "~/geometry/Line.js";
+import * as Line from "../geometry/Line.js";
 import {Timestamped, ObjectTracker, TrackedValueMap, TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
 
 export type PointSeenInfo = {

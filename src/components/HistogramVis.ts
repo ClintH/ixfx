@@ -2,7 +2,7 @@ import {LitElement, css, html} from 'lit';
 import {customElement} from 'lit/decorators/custom-element.js';
 import {property} from 'lit/decorators/property.js';
 import {repeat} from 'lit/directives/repeat.js';
-import {KeyValue} from '~/KeyValue.js';
+import {KeyValue} from '../KeyValue.js';
 
 type Bar = {
   readonly percentage: number

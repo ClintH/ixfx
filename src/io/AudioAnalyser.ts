@@ -1,7 +1,7 @@
 import {Arrays} from "../collections/index.js";
 import AudioVisualiser from "./AudioVisualiser.js";
 import {number as guardNumber, integer as guardInteger} from "../Guards.js";
-import {isPowerOfTwo} from "~/Util.js";
+import {isPowerOfTwo} from "../Util.js";
 
 /**
  * Options for audio processing

@@ -1,9 +1,9 @@
 // /* eslint-disable */
-// import * as Colour from '../visual/Colour.js';
+import * as Colour from '../visual/Colour.js';
 
-// test(`opacity`, () => {
-//   expect(Colour.opacity(`hsl(0,100%,50%)`, 0.5)).toEqual(`hsla(0, 100%, 50%, 50%)`);
-// });
+test(`opacity`, () => {
+  expect(Colour.opacity(`hsl(0,100%,50%)`, 0.5)).toEqual(`rgba(255, 0, 0, 0.5)`);
+});
 
 // test(`parse`, () => {
 //   expect(Colour.parseToHsla(`hsl(0,0,0)`)).toEqual([0,0,0, 1]);
