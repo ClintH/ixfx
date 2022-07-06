@@ -2,6 +2,9 @@ import {number as guardNumber, integer as guardInteger} from "./Guards.js";
 export {pingPong, pingPongPercent} from './modulation/PingPong.js';
 
 
+export {interval} from './flow/Interval.js';
+export {delayLoop} from './flow/Delay.js';
+
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
  * If `end` is provided, generator stops when reached.

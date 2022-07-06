@@ -51,7 +51,7 @@ class SimpleMapArrayMutableImpl<V> {
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
  * 
- * For a fancier approaches, consider {@link mapArray}, {@link mapCircular} or {@link mapSet}.
+ * For a fancier approaches, consider {@link mapArray}, {@link mapCircularMutable} or {@link mapSet}.
  * 
  * @example
  * ```js

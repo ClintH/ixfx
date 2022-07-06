@@ -20,7 +20,7 @@ const piPi = Math.PI*2;
  * ```
  * 
  * For clamping integer ranges, consider {@link clampIndex }
- * For clamping {x,y} points, consider {@link Geometry.Points.clamp | Geometry.Points.clamp}.
+ * For clamping `{ x, y }` points, consider {@link Geometry.Points.clamp | Geometry.Points.clamp}.
  * 
  * @param v Value to clamp
  * @param Minimum value (inclusive)
@@ -351,22 +351,13 @@ export type IsEqual<V> = (a:V, b:V) => boolean;
 
 /**
  * Default comparer function is equiv to checking `a === b`
- * @private
- * @template V
- * @param {V} a
- * @param {V} b
- * @return {*}  {boolean}
  */
 export const isEqualDefault = <V>(a:V, b:V):boolean => a === b;
 
 /**
  * Comparer returns true if string representation of `a` and `b` are equal.
  * Uses `toStringDefault` to generate a string representation (`JSON.stringify`)
- * @private
- * @template V
- * @param {V} a
- * @param {V} b
- * @return {*}  {boolean} True if the contents of `a` and `b` are equal
+ * @returns True if the contents of `a` and `b` are equal
  */
 export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
   // ✔ UNIT TESTED
@@ -376,10 +367,6 @@ export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
 
 /**
  * A default converter to string that uses JSON.stringify if its an object, or the thing itself if it's a string
- * @private
- * @template V
- * @param {V} itemToMakeStringFor
- * @returns {string}
  */
 export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof itemToMakeStringFor === `string`) ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor));
 

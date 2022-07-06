@@ -1,26 +1,6 @@
 import { TrackedValueOpts as TrackOpts, Timestamped, PrimitiveTracker} from "./TrackedValue.js";
 
-/**
- * Keeps track of the min, max and avg in a stream of values without actually storing them.
- * 
- * Usage:
- * 
- * ```js
- *  const t = numberTracker(); 
- *  t.seen(10);
- * 
- *  t.avg / t.min/ t.max / t.getMinMax()
- * ```
- * 
- * Use `reset()` to clear everything, or `resetAvg()` to only reset averaging calculation.
- * 
- * Trackers can automatically reset after a given number of samples
- * ```
- * // reset after 100 samples
- * const t = numberTracker(`something`, 100);
- * ```
- * @class NumberTracker
- */
+
 export class NumberTracker extends PrimitiveTracker<number> {
   //samples = 0;
   total = 0;
@@ -82,5 +62,26 @@ export class NumberTracker extends PrimitiveTracker<number> {
   }
 }
 
+/**
+ * Keeps track of the min, max and avg in a stream of values without actually storing them.
+ * 
+ * Usage:
+ * 
+ * ```js
+ *  const t = numberTracker(); 
+ *  t.seen(10);
+ * 
+ *  t.avg / t.min/ t.max / t.getMinMax()
+ * ```
+ * 
+ * Use `reset()` to clear everything, or `resetAvg()` to only reset averaging calculation.
+ * 
+ * Trackers can automatically reset after a given number of samples
+ * ```
+ * // reset after 100 samples
+ * const t = numberTracker(`something`, 100);
+ * ```
+ * @class NumberTracker
+ */
 export const numberTracker = (id?:string, opts?:TrackOpts) => new NumberTracker(id ?? ``, opts ?? {});
 

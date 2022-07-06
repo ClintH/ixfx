@@ -2,11 +2,14 @@ import { randomIndex, randomElement } from "./collections/Arrays.js";
 import {number as guardNumber} from './Guards.js';
 import * as Easings from "./modulation/Easing.js";
 import {clamp} from "./Util.js";
+
 export {randomIndex as arrayIndex};
 export {randomElement as arrayElement};
-
 export {randomHue as hue} from './visual/Colour.js';
 
+/**
+ * Default random number generator: `Math.random`.
+ */
 export const defaultRandom = Math.random;
 
 
@@ -150,7 +153,7 @@ export const weightedInteger = (minOrMax:number, maxOrEasing?:number|Easings.Eas
  * // Eg:
  * shuffle(gaussianSkewed(10));
  * ```
- * @param skew 
+ * @param skew Skew factor. Defaults to 1, no skewing. Above 1 will skew to left, below 1 will skew to right
  * @returns 
  */
 export const gaussian = (skew = 1) => {
@@ -181,8 +184,9 @@ export const gaussian = (skew = 1) => {
 /**
  * Returns a function of skewed gaussian values.
  * 
- * This 'curried' function is useful when be
+ * This 'curried' function is useful when passing to other functions
  * ```js
+ * // Curry
  * const g = gaussianSkewed(10);
  * 
  * // Now it can be called without parameters
@@ -191,10 +195,10 @@ export const gaussian = (skew = 1) => {
  * // Eg:
  * shuffle(gaussianSkewed(10));
  * ```
- * @param skew 
+ * @param skew Skew factor. Defaults to 1, no skewing. Above 1 will skew to left, below 1 will skew to right
  * @returns 
  */
-export const gaussianSkewed = (skew:number) => () => gaussian(skew);
+export const gaussianSkewed = (skew:number = 1) => () => gaussian(skew);
 
 /**
  * Returns a random integer between `max` (exclusive) and `min` (inclusive)
@@ -228,12 +232,22 @@ export const integer = (max:number, min?:number) => {
 
 /**
  * Random a random float between `max` (exclusive) and `min` (inclusive).
- * If `min` is not specified, 0 is used.
+ * 1 and 0 are used as default max and min, respectively.
+ * 
+ * ```js
+ * // Random number between 0..1 (but not including 1)
+ * // (this would be identical to Math.random())
+ * const v = float();
+ * // Random float between 0..100 (but not including 100)
+ * const v = float(100);
+ * // Random float between 20..40 (possibily including 20, but always lower than 40)
+ * const v = float(20, 40);
+ * ```
  * @param max 
  * @param min 
  * @returns 
  */
-export const float = (max:number, min:number = 0) => Math.random() * (max - min) + min;
+export const float = (max:number = 1, min:number = 0) => Math.random() * (max - min) + min;
 
 /**
  * Returns a string of random letters and numbers of a given `length`.

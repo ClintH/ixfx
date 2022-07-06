@@ -35,8 +35,11 @@ export type FramesOpts = {
 }
 
 /**
- * Generator that yields frames from a video element as ImageData.
- * ```
+ * Generator that yields frames from a video element as [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
+ * 
+ * ```js
+ * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * 
  * const ctx = canvasEl.getContext(`2d`); 
  * for await (const frame of Video.frames(videoEl)) {
  *   // TODO: Some processing of pixels
@@ -49,6 +52,10 @@ export type FramesOpts = {
  * Under the hood it creates a hidden canvas where frames are drawn to. This is necessary
  * to read back pixel data. An existing canvas can be used if it is passed in as an option.
  * 
+ * Options:
+ * * `canvasEl`: CANVAS element to use as a buffer (optional)
+ * * `maxIntervalMs`: Max frame rate (0 by default, ie runs as fast as possible)
+ * * `showCanvas`: Whether buffer canvas will be shown (false by default)
  * @param sourceVideoEl 
  * @param opts 
  */
@@ -111,26 +118,57 @@ export async function* frames(sourceVideoEl:HTMLVideoElement, opts:FramesOpts = 
 /**
  * Captures frames from a video element. It can send pixel data to a function or post to a worker script.
  * 
- * ```js @example Using a function
- * capture(sourceVideoEl, {
+ * @example Using a function
+ * ```js
+ * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * 
+ * // Capture from a VIDEO element, handling frame data
+ * // imageData is ImageData type: https://developer.mozilla.org/en-US/docs/Web/API/ImageData
+ * Video.capture(sourceVideoEl, {
  *  onFrame(imageData => {
  *    // Do something with pixels...
  *  });
  * });
  * ```
  * 
- * ```js @example Using a worker
- * capture(sourceVideoEl, {
+ * @example Using a worker
+ * ```js
+ * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * 
+ * Video.capture(sourceVideoEl, {
  *  workerScript: `./frameProcessor.js`
  * });
- * 
- * // In frameProcessor.js...
  * ```
+ * 
+ * In frameProcessor.js:
+ * ```
+ * const process = (frame) => {
+ *  // ...process frame
+ * 
+ *  // Send image back?
+ *  self.postMessage({frame});
+ * };
+ * 
+ * self.addEventListener(`message`, evt => {
+ *   const {pixels, width, height} = evt.data;
+ *   const frame = new ImageData(new Uint8ClampedArray(pixels),
+ *     width, height);
+ *
+ *   // Process it
+ *   process(frame);
+ * });
+ * ```
+ * 
+ * Options:
+ * * `canvasEl`: CANVAS element to use as a buffer (optional)
+ * * `maxIntervalMs`: Max frame rate (0 by default, ie runs as fast as possible)
+ * * `showCanvas`: Whether buffer canvas will be shown (false by default)
+ * * `workerScript`: If this specified, this URL will be loaded as a Worker, and frame data will be automatically posted to it
  * 
  * Implementation: frames are captured using a animation-speed loop to a hidden canvas. From there
  * the pixel data is extracted and sent to either destination. In future the intermediate drawing to a
  * canvas could be skipped if it becomes possible to get pixel data from an ImageBitmap.
- * @param sourceVideoEl 
+ * @param sourceVideoEl Source VIDEO element
  * @param opts 
  * @returns 
  */

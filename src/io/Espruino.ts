@@ -3,7 +3,7 @@ import {defaultOpts as NordicDefaults } from "./NordicBleDevice.js";
 import {StateChangeEvent} from "../flow/StateMachine.js";
 import {ISimpleEventEmitter} from "../Events.js";
 import {string as randomString} from "../Random.js";
-import {waitFor} from "../flow/Timer.js";
+import {waitFor} from "../flow/WaitFor.js";
 import {EspruinoSerialDevice, EspruinoSerialDeviceOpts} from "./EspruinoSerialDevice.js";
 
 export {EspruinoBleDevice, EspruinoSerialDevice, EspruinoSerialDeviceOpts};

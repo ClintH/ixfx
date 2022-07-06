@@ -9,7 +9,8 @@ import {clamp, scale} from "../Util.js";
  * 
  * @example
  * ```js
- * const s = stream();
+ * import {Normalise} from 'https://unpkg.com/ixfx/dist/temporal.js'
+ * const s = Normalise.stream();
  * s(2);    // 1 (because 2 is highest seen)
  * s(1);    // 0 (because 1 is the lowest so far)
  * s(1.5);  // 0.5 (50% of range 1-2)
@@ -23,11 +24,11 @@ import {clamp, scale} from "../Util.js";
  * If you already know what to expect of the number range, passingin `minDefault` 
  * and `maxDefault` primes the normalisation.
  * ```js
- * const s = stream();
+ * const s = Normalise.stream();
  * s(5); // 1, because it's the highest seen
  * 
  * // With priming:
- * const s = stream(0, 10);
+ * const s = Normalise.stream(0, 10);
  * s(5); // 0.5, because we're expecting range 0-10
  * ```
  * 
@@ -52,8 +53,9 @@ export const stream = (minDefault?:number, maxDefault?:number) => {
  * as the normalisation range. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
  * 
  * ```js
+ * import {Normalise} from 'https://unpkg.com/ixfx/dist/temporal.js'
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
- * array([5,1,0,9,10]);
+ * Normalise.array([5,1,0,9,10]);
  * ```
  * 
  * `minForced` and/or `maxForced` can
@@ -61,7 +63,7 @@ export const stream = (minDefault?:number, maxDefault?:number) => {
  * ```js
  * // Forced range 0-100
  * // Yields: [0.05, 0.01, 0.0, 0.09, 0.10]
- * array([5,1,0,9,10], 0, 100);
+ * Normalise.array([5,1,0,9,10], 0, 100);
  * ```
  * 
  * Return values are clamped to always be 0-1, inclusive.

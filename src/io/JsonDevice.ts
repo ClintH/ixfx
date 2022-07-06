@@ -4,7 +4,7 @@ import {indexOfCharCode, omitChars} from "../Text";
 import {Codec} from "./Codec";
 import {StringReceiveBuffer} from "./StringReceiveBuffer";
 import {StringWriteBuffer} from "./StringWriteBuffer";
-import {retry} from "../flow/Timer.js";
+import {retry} from "../flow/Retry.js";
 
 /**
  * Options for JsonDevice

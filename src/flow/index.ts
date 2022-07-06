@@ -1,5 +1,5 @@
 import { number as guardNumber} from "../Guards.js";
-import {sleep} from "./Timer.js";
+import {sleep} from "./Sleep.js";
 
 import * as StateMachine from './StateMachine.js';
 import * as Timer from './Timer.js';
@@ -7,9 +7,26 @@ import * as Timer from './Timer.js';
 export {StateMachine};
 export * from './Timer.js';
 
+export * from './Interval.js';
+export * from './Timeout.js';
+export * from './UpdateOutdated.js';
+export * from './Continuously.js';
+export * from './Debounce.js';
+export * from './Throttle.js';
+export * from './Sleep.js';
+export * from './WaitFor.js';
+export * from './Delay.js';
+
+export type HasCompletion = {
+  get isDone(): boolean;
+}
+
 /**
  * Iterates over `iterator` (iterable/array), calling `fn` for each value.
  * If `fn` returns _false_, iterator cancels. 
+ * 
+ * Over the default JS `forEach` function, this one allows you to exit the
+ * iteration early.
  * 
  * @example
  * ```js
@@ -20,7 +37,8 @@ export * from './Timer.js';
  * 
  * Use {@link forEachAsync} if you want to use an async `iterator` and async `fn`.
  * @param iterator Iterable or array
- * @param fn Function to call for each item. If function returns false, iteration cancels
+ * @typeParam V Type of iterable
+ * @param fn Function to call for each item. If function returns _false_, iteration cancels
  */
 export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>boolean|void) => {
   //eslint-disable-next-line functional/no-loop-statement
@@ -53,8 +71,9 @@ export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?
  *  }
  * }, 5000);
  * ```
- * @param iterator 
- * @param fn 
+ * @param iterator Iterable thing to loop over
+ * @param fn Function to invoke on each item. If it returns _false_ loop ends.
+ * @typeParam V Type of iterable
  */
 export const forEachAsync = async function <V> (iterator:AsyncIterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>Promise<boolean>|Promise<void>, intervalMs?:number) {
   if (Array.isArray(iterator)) {

@@ -1,10 +1,10 @@
 import {SimpleEventEmitter} from "../Events.js";
 import { StateMachine} from "../flow/StateMachine.js";
-import {indexOfCharCode, omitChars} from "../Text";
-import {Codec} from "./Codec";
-import {StringReceiveBuffer} from "./StringReceiveBuffer";
-import {StringWriteBuffer} from "./StringWriteBuffer";
-import {retry} from "../flow/Timer.js";
+import {indexOfCharCode, omitChars} from "../Text.js";
+import {Codec} from "./Codec.js";
+import {StringReceiveBuffer} from "./StringReceiveBuffer.js";
+import {StringWriteBuffer} from "./StringWriteBuffer.js";
+import {retry} from "../flow/Retry.js";
 import {Events} from "./Espruino.js";
 
 export type Opts = {

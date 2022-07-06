@@ -5,8 +5,20 @@ import { EitherKey, MapMutable } from "./Interfaces";
  * Returns a {@link MapMutable} (which just wraps the in-built Map)
  * Use {@link map} for the immutable alternative.
  * 
- * @param data Optional initial data in the form of an array of {key:value} or [key,value]
- * @returns {@link MapMutable}
+ * @example Basic usage
+ * ```js
+ * const m = mapMutable();
+ * // Add one or more entries
+ * m.add(["name", "sally"]);
+ * // Alternatively:
+ * m.set("name", "sally");
+ * // Recall
+ * m.get("name");           // "sally"
+ * m.delete("name");
+ * m.isEmpty; // True
+ * m.clear();
+ * ```
+ * @param data Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
 export const mapMutable = <K, V>(...data: EitherKey<K, V>): MapMutable<K, V> => {
   // eslint-disable-next-line functional/no-let

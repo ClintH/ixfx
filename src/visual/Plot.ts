@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { minMaxAvg } from '../collections/NumericArrays.js';
 import { CircularArray, MapOfMutable } from '../collections/Interfaces.js';
-import { mapCircular, mapArray} from "../collections/MapMultiMutable.js"
+import { mapCircularMutable, mapArray} from "../collections/MapMultiMutable.js"
 
 import { Point, subtract as pointSubtract} from "../geometry/Point.js";
 import { resolveEl, parentSizeCanvas } from "../dom/Util.js";
@@ -613,7 +613,7 @@ export const plot = (parentElOrQuery:string|HTMLElement, opts:PlotOpts):Plotter 
   const ctx = canvasEl.getContext(`2d`)!;
 
   const capacity = opts.capacity ?? 10;
-  const buffer = capacity > 0 ? mapCircular<number>({ capacity }) : mapArray<number>();
+  const buffer = capacity > 0 ? mapCircularMutable<number>({ capacity }) : mapArray<number>();
   const metrics = ctx.measureText('Xy');
   const coalesce = opts.coalesce ?? true;
 

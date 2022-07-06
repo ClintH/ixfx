@@ -175,37 +175,48 @@ class StackMutableImpl<V> {
 }
 
 /**
- * Returns stack (immutable). Use {@link stackMutable} for a mutable one.
- * @example
+ * Returns a stack. Immutable. Use {@link stackMutable} for a mutable alternative.
+ * 
+ * The basic usage is `push`/`pop` to add/remove, returning the modified stack. Use the
+ * property `peek` to see what's on top.
+ * 
+ * @example Basic usage
  * ```js
+ * // Create
  * let s = stack();
+ * // Add one or more items
  * s = s.push(1, 2, 3, 4);
- * s.peek; // 4
+ * // See what's at the top of the stack
+ * s.peek;      // 4
+ * 
+ * // Remove from the top of the stack, returning
+ * // a new stack without item
  * s = s.pop();
- * s.peek; // 3
+ * s.peek;        // 3
  * ```
- * @template V
- * @param {StackOpts} [opts={}]
- * @param {...V[]} startingItems
- * @returns {Stack<V>}
+ * @param opts Options
+ * @param startingItems List of items to add to stack. Items will be pushed 'left to right', ie array index 0 will be bottom of the stack.
  */
 export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new StackImpl({...opts}, [...startingItems]);
 
-
 /**
- * Creates a stack (mutable). Use {@link stack} for an immutable one.
+ * Creates a stack. Mutable. Use {@link stack} for an immutable alternative.
  * 
- * @example
+ * @example Basic usage
  * ```js
+ * // Create
  * const s = stackMutable();
+ * // Add one or more items
  * s.push(1, 2, 3, 4);
+ * 
+ * // See what's on top
  * s.peek;  // 4
- * s.pop;   // 4
+ * 
+ * // Remove the top-most, and return it
+ * s.pop();   // 4
+ * 
+ * // Now there's a new top-most element
  * s.peek;  // 3
  * ```
- * @template V
- * @param {StackOpts} opts
- * @param {...V[]} startingItems
- * @returns
  */
 export const stackMutable = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>):StackMutable<V> =>  new StackMutableImpl({...opts}, [...startingItems]);

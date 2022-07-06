@@ -37,9 +37,10 @@ export type GetOrGenerate<K, V, Z> = (key:K, args?:Z) => Promise<V>;
  *  return key.toUppercase();
  * });
  * 
- * // Not contained in map, so it will run the uppercase function
- * const v = await m(`hello`);
- * const v1 = await m(`hello`); // Value exists, so it is returned.
+ * // Not contained in map, so it will run the uppercase function,
+ * // setting the value to the key 'hello'.
+ * const v = await m(`hello`);  // Yields 'HELLO'
+ * const v1 = await m(`hello`); // Value exists, so it is returned ('HELLO')
  * ```
  * 
  */
@@ -104,13 +105,16 @@ export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFun
  * if you only want to find a value under a certain key.
  * 
  * Having a comparer function is useful to check by value rather than object reference.
- * @example Finds value `samantha`, using string equality to match
+ * @example Finds value where name is 'samantha', regardless of other properties
  * ```js
- * hasAnyValue(map, `samantha`, (a, b) => a === b);
+ * hasAnyValue(map, {name:`samantha`}, (a, b) => a.name === b.name);
  * ```
+ * 
+ * Works by comparing `value` against all values contained in `map` for equality using the provided `comparer`.
+ * 
  * @param map Map to search
  * @param value Value to find
- * @param comparer Function that determines matching
+ * @param comparer Function that determines matching. Should return true if `a` and `b` are considered equal.
  * @returns True if value is found
  */
 export const hasAnyValue = <K, V>(map:ReadonlyMap<K, V>, value:V, comparer:IsEqual<V>):boolean => {
@@ -119,19 +123,32 @@ export const hasAnyValue = <K, V>(map:ReadonlyMap<K, V>, value:V, comparer:IsEqu
 };
 
 /**
- * Returns items where `predicate` returns true.
+ * Returns values where `predicate` returns true.
  * 
  * If you just want the first match, use `find`
  * 
  * @example All people over thirty
  * ```js
- * const overThirty = filter(people, person => person.age > 30);
+ * // for-of loop
+ * for (const v of filter(people, person => person.age > 30)) {
+ * 
+ * }
+ * // If you want an array
+ * const overThirty = Array.from(filter(people, person => person.age > 30));
  * ```
  * @param map Map
  * @param predicate Filtering predicate 
  * @returns Values that match predicate
  */
-export const filter = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):ReadonlyArray<V> => Array.from(map.values()).filter(predicate);
+//eslint-disable-next-line func-style
+export function * filter<V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean) {
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const v of map.values()) {
+    if (predicate(v)) yield v;
+  }
+}
+
+//export const filter = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):ReadonlyArray<V> => Array.from(map.values()).filter(predicate);
 
 /**
  * Copies data to an array
@@ -141,37 +158,50 @@ export const filter = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean
 export const toArray = <V>(map:ReadonlyMap<string, V>):ReadonlyArray<V> => Array.from(map.values());
 
 /**
- * Returns the first found item that matches `predicate` or undefined.
+ * Returns the first found item that matches `predicate` or _undefined_.
  * 
- * If you want all matches, use `filter`.
+ * If you want all matches, use {@link filter}.
  * 
  * @example First person over thirty
  * ```js
  * const overThirty = find(people, person => person.age > 30);
  * ```
- * @param map 
- * @param predicate 
- * @returns Found item or undefined
+ * @param map Map to search
+ * @param predicate Function that returns true for a matching item
+ * @returns Found item or _undefined_
  */
 export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):V|undefined =>  Array.from(map.values()).find(vv => predicate(vv));
 
 /**
  * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link mapToObj}.
  * 
+ * ```js
+ * const map = new Map();
+ * map.set(`name`, `Alice`);
+ * map.set(`pet`, `dog`);
+ * 
+ * const o = mapToObjTransform(map, v => {
+ *  ...v,
+ *  registered: true
+ * });
+ * 
+ * // Yields: { name: `Alice`, pet: `dog`, registered: true }
+ * ```
+ * 
+ * If the goal is to create a new map with transformed values, use {@link transformMap}.
  * @param m
  * @param valueTransform 
+ * @typeParam T Value type of input map
+ * @typeParam K Value type of destination map
  * @returns 
  */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mapToObjTransform = <T, K>(m: ReadonlyMap<string, T>, valueTransform: (value: T) => K): {readonly [key: string]: K} => Array.from(m).reduce((obj: any, [key, value]) => {
   const t = valueTransform(value);
   /* eslint-disable-next-line functional/immutable-data */
   obj[key] = t;
   return obj;
 }, {});
-
-// export const without = <V>(map:ReadonlyMap<string, V>, value:V): ReadonlyMap<string,V> => {
-//   source.toArray().filter(v => hash(v) !== hash(value))
-// }
 
 /**
  * Zips together an array of keys and values into an object. Requires that 
@@ -182,10 +212,10 @@ export const mapToObjTransform = <T, K>(m: ReadonlyMap<string, T>, valueTransfor
  * const o = zipKeyValue([`a`, `b`, `c`], [0, 1, 2])
  * Yields: { a: 0, b: 1, c: 2}
  *```
-  * @template V
-  * @param keys
-  * @param values
-  * @return 
+  * @param keys String keys
+  * @param values Values
+  * @typeParam V Type of values
+  * @return Object with keys and values
   */
 export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|undefined>) => {
   if (keys.length !== values.length) throw new Error(`Keys and values arrays should be same length`);
@@ -198,15 +228,26 @@ export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|un
 // https://keestalkstech.com/2021/10/having-fun-grouping-arrays-into-maps-with-typescript/
 
 /**
- * Like `Array.map`, but for a Map. Transforms from Map<K,V> to Map<K,R>
+ * Like `Array.map`, but for a Map. Transforms from Map<K,V> to Map<K,R>, returning as a new Map.
  * 
  * @example
  * ```js
+ * const mapOfStrings = new Map();
+ * mapOfStrings.set(`a`, `10`);
+ * mapOfStrings.get(`a`); // Yields `10` (a string)
+ * 
  * // Convert a map of string->string to string->number
- * transformMap<string, string, number>(mapOfStrings, (value, key) => parseInt(value));
+ * const mapOfInts = transformMap(mapOfStrings, (value, key) => parseInt(value));
+ * 
+ * mapOfInts.get(`a`); // Yields 10 (a proper number)
  * ```
+ * 
+ * If you want to combine values into a single object, consider instead  {@link mapToObjTransform}.
  * @param source 
  * @param transformer 
+ * @typeParam K Type of keys (generally a string)
+ * @typeParam V Type of input map values
+ * @typeParam R Type of output map values
  * @returns 
  */
 export const transformMap = <K, V, R>(
@@ -235,28 +276,33 @@ export const mapToObj = <T>(m: ReadonlyMap<string, T>): { readonly [key: string]
 }, {});
 
 /**
- * Converts Map<K,V> to Array<R> with a provided `transformer`
+ * Converts Map to Array with a provided `transformer` function. Useful for plucking out certain properties
+ * from contained values and for creating a new map based on transformed values from an input map.
  * 
- * @example Get a list of ages from a map of Person objects
+ * @example Get an array of ages from a map of Person objects
  * ```js
  * let person = { age: 29, name: `John`};
  * map.add(person.name, person);
- * const ages = mapToArray<string, People, number>(map, (key, person) => person.age);
+ * 
+ * const ages = mapToArray(map, (key, person) => person.age);
  * // [29, ...]
  * ```
  * 
- * In the above example, the `transformer` function returns a single value, but it could
- * just as well return an object:
+ * In the above example, the `transformer` function returns a number, but it could
+ * just as well return a transformed version of the input:
+ * 
  * ```js
+ * // Return with random heights and uppercased name
  * mapToArray(map, (key, person) => ({
+ *  ...person,
  *  height: Math.random(),
  *  name: person.name.toUpperCase();
  * }))
  * // Yields:
- * // [{height: 0.12, name: "JOHN"}, ...]
+ * // [{height: 0.12, age: 29, name: "JOHN"}, ...]
  * ```
  * @param m 
- * @param transformer 
+ * @param transformer A function that takes a key and item, returning a new item.
  * @returns 
  */
 export const mapToArray = <K, V, R>(

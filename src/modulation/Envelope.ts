@@ -1,5 +1,5 @@
 import {SimpleEventEmitter} from "../Events.js";
-import { continuously, msElapsedTimer, TimerSource} from "../flow/Timer.js";
+import { continuously, msElapsedTimer, TimerSource} from "../flow/index.js";
 import { Timer } from "../flow/Timer.js";
 import { StateMachine } from "../flow/StateMachine.js";
 import {Path} from "~/geometry/Path.js";
@@ -293,6 +293,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * 
  * @example Setup
  * ```js
+ * import {adsr, defaultAdsrOpts} from 'https://unpkg.com/ixfx/dist/modulation.js'
  * const opts = {
  *  ...defaultAdsrOpts(),
  *  attackDuration: 1000,
@@ -304,27 +305,27 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * 
  * @example Using
  * ```js
- * env.trigger(); // Start envelop
+ * env.trigger(); // Start envelope
  * ...
  * // Get current value of envelope
  * const [state, scaled, raw] = env.compute();
  * ```
  * 
- * * `state` is string: `attack`, `decay`, `sustain`, `release`, `complete` 
- * * `scaled` is a value scaled according to stage _levels_
- * * `raw` is the progress from 0 to 1 within a stage
+ * * `state` is a string, one of the following: 'attack', 'decay', 'sustain', 'release', 'complete' 
+ * * `scaled` is a value scaled according to the stage's _levels_
+ * * `raw` is the progress from 0 to 1 within a stage. ie. 0.5 means we're halfway through a stage.
  * 
- * ...normally you'd just want:
+ * Instead of `compute()`, most usage of the envelope is just fetching the `value` property, which returns the same scaled value of `compute()`:
  * 
  * ```js
- * const value = env.value; // Get scaled 
+ * const value = env.value; // Get scaled number
  * ```
  * 
  * @example Hold & release
  * ```js
- * env.trigger(true); // Pass in true to hold
+ * env.trigger(true);   // Pass in true to hold
  * ...envelope will stop at sustain stage...
- * env.relese();      // Release into decay
+ * env.release();      // Release into decay
  * ```
  * 
  * Check if it's done:
@@ -333,7 +334,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * env.isDone; // True if envelope is completed
  * ```
  * 
- * Envelope has events to track activity: `change` and `complete`:
+ * Envelope has events to track activity: 'change' and 'complete':
  * 
  * ```
  * env.addEventListener(`change`, ev => {

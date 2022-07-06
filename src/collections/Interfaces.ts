@@ -26,7 +26,7 @@ export type MultiValue<V, M> = Readonly<{
   add(destination:M|undefined, values:ReadonlyArray<V>):M
   toArray(source:M): ReadonlyArray<V>|undefined
   find(source:M, predicate:(v:V) => boolean): V|unknown
-  filter(source:M, predicate:(v:V) => boolean): ReadonlyArray<V>
+  filter(source:M, predicate:(v:V) => boolean): Iterable<V>// ReadonlyArray<V>
   without(source:M, value:V): ReadonlyArray<V>
   count(source:M): number
 }>;
@@ -186,43 +186,51 @@ export interface QueueMutable<V> {
 }
 
 /**
- * A set which stores unique items, determined by their value, rather
- * than object reference. Create with {@link setMutable}. Mutable.
+ * A Set which stores unique items determined by their value, rather
+ * than object reference (unlike the default JS Set). Create with {@link setMutable}. Mutable.
  * 
- * By default the JSON.stringify() representation is used to compare
- * objects.
+ * By default the `JSON.stringify()` representation is considered the 'key' for an object.
+ * Pass in a function to `setMutable` to define your own way of creating keys for values. The principle should
+ * be that objects that you consider identical should have the same string key value.
  *
- * It fires `add`, `clear` and `delete` events.
+ * SetMutable fires `add`, `clear` and `delete` events.
  * 
- * Overview of functions
+ * @example Overview of functions
  * ```js
  * const s = setMutable();
  * s.add(item);    // Add one or more items. Items with same key are overriden.
- * s.has(item);    // Returns true if item *value* is present
+ * s.has(item);    // Returns true if item value is present
  * s.clear();      // Remove everything
  * s.delete(item); // Delete item by value
  * s.toArray();    // Returns values as an array
  * s.values();     // Returns an iterator over values
  * ```
  * 
- * Usage
+ * @example Example usage
  * ```js
+ * // Data to add
  * const people = [
  *  {name: `Barry`, city: `London`}
  *  {name: `Sally`, city: `Bristol`}
  * ];
+ * 
+ * // Create a set, defining how keys will be generated
  * const set = setMutable(person => {
- *  // Key person objects by name and city (assi)
- *  return `${person.name}-${person.city}`
+ *    // Key person objects by name and city.
+ *    // ie. Generated keys will be: `Barry-London`, `Sally-Bristol`
+ *    return `${person.name}-${person.city}`
  * });
+ * 
+ * // Add list
  * set.add(...people);
  * 
+ * // Demo:
  * set.has({name:`Barry`, city:`Manchester`})); // False, key is different (Barry-Manchester)
  * set.has({name:`Barry`, city:`London`}));     // True, we have Barry-London as a key
  * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
  * ```
  * 
- * Events
+ * @example Events
  * ```js
  * set.addEventListener(`add`, ev => {
  *  console.log(`New item added: ${ev.value}`);
@@ -233,30 +241,37 @@ export interface QueueMutable<V> {
  */
 export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
   /**
-   * Add `values` to set
-   * @param v 
+   * Add `values` to set. 
+   * Corresponding keys will be generated according to the
+   * function provided to `setMutable`, or `JSON.stringify` by default.
+   * @param v Value(s) to add
    */
   add(...values: ReadonlyArray<V>):void
+
   /**
    * Iterate over values
    * ```js
    * for (let value of set.values()) {
-   *  // use value...
+   *    // use value...
    * }
    * ```
    */
   values():IterableIterator<V>
+
   /**
    * Clears set
    */
   clear():void
+
 /**
- * Deletes specified `value`
+ * Deletes specified value, if present.
  * @param value
+ * @returns True if value was found
  */
   delete(value: V): boolean
+
 /**
- * Returns _true_ if `value` is contained
+ * Returns _true_ if _value_ is contained in Set
  * @param v 
  */
   has(value: V): boolean 
@@ -272,15 +287,56 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
  * Duplicate values can be added to the same or even a several keys.
  *
  * Three pre-defined MapOf's are available:
- * * {@link mapArray} - Map of mutable arrays
- * * {@link mapSet} - Map of mutable sets
- * * {@link mapCircular} - Map of immutable circular arrays
+ * * {@link mapArray} - Map of arrays
+ * * {@link mapSet} - Map of unique items
+ * * {@link mapCircularMutable} - Hold a limited set of values per key
  * 
- * Several events can be listened to via `addEventListener`
- * * addedKey, addedValue - when a new key is added, or when a new value is added
- * * clear - when contents are cleared
- * * deleteKey - when a key is deleted
+ * Adding
+ * ```js
+ * // Add one or more values using the predefined key function to generate a key
+ * map.addValue(value1, value2, ...);  
+ * // Add one or more values under a specified key
+ * map.addKeyedValues(key, value1, value2, ...);
+ * ```
  * 
+ * Finding/accessing
+ * ```js
+ * // Returns all values stored under key
+ * map.get(key);  
+ * // Returns the first key where value is found, or _undefined_ if not found
+ * map.findKeyForValue(value);  
+ * // Returns _true_  if value is stored under key
+ * map.hasKeyValue(key, value);
+ * // Returns _true_ if map contains key 
+ * map.has(key);  
+ * ```
+ * 
+ * Removing
+ * ```js
+ * // Removes everything
+ * map.clear();
+ * // Delete values under key. Returns _true_ if key was found.
+ * map.delete(key); 
+ * // Deletes specified value under key. Returns _true_ if found.
+ * map.deleteKeyValue(key, value);
+ * ```
+ * 
+ * Metadata about the map:
+ * ```js
+ * map.isEmpty;         // True/false
+ * map.lengthMax;       // Largest count of items under any key
+ * map.count(key);      // Count of items stored under key, or 0 if key is not present.
+ * map.keys();          // Returns a string array of keys
+ * map.keysAndCounts(); // Returns an array of [string,number] for all keys and number of values for each key
+ * map.debugString();   // Returns a human-readable string dump of the contents
+ * ```
+ * 
+ * Events can be listened to via `addEventListener`
+ * * `addedKey`, `addedValue` - when a new key is added, or when a new value is added
+ * * `clear` - when contents are cleared
+ * * `deleteKey` - when a key is deleted
+ * 
+ * @example Event example
  * ```js
  * map.addEventLister(`addedKey`, ev => {
  *  console.log(`New key ${evt.key} seen.`);
@@ -444,7 +500,7 @@ export interface CircularArray<V> extends Array<V> {
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
  * 
- * For a fancier approaches, consider {@link mapArray}, {@link mapCircular} or {@link mapSet}.
+ * For a fancier approaches, consider {@link mapArray}, {@link mapCircularMutable} or {@link mapSet}.
  * 
  * @example
  * ```js
@@ -487,16 +543,16 @@ export interface CircularArray<V> extends Array<V> {
   keys():IterableIterator<string>;
 }
 
-export interface SetMutable<V> {
-  /**
-   * Add item
-   */
-  add (item:V): void
-  /**
-   * Retuns true if set contains item
-   */
-  has(item:V): boolean
-}
+// export interface SetMutable<V> {
+//   /**
+//    * Add item
+//    */
+//   add (item:V): void
+//   /**
+//    * Retuns true if set contains item
+//    */
+//   has(item:V): boolean
+// }
 
 /**
  * An immutable map. Rather than changing the map, functions like `add` and `delete` 

@@ -1,6 +1,6 @@
 // Easings from https://easings.net/
 import {interpolate} from '../Util.js';
-import {msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource} from '../flow/Timer.js';
+import {msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource} from '../flow/index.js';
 
 const sqrt = Math.sqrt;
 const pow = Math.pow;
@@ -130,6 +130,7 @@ const create = function (nameOrFn: EasingName|EasingFn, duration: number, timerS
     },
     compute: () => {
       const relative = timer.elapsed;
+      //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return fn!(relative);
     },
     reset: () => {
@@ -204,7 +205,7 @@ export type EasingName = keyof typeof functions;
 /**
  * Returns an easing function by name, or _undefined_ if not found.
  * This is a manual way of working with easing functions. If you want to
- * ease over time or ticks, use {@link Flow.msElapsedTimer} or {@link Flow.ticksElapsedTimer}.
+ * ease over time or ticks, use `Flow.Timer.msElapsedTimer` or `Flow.Timer.ticksElapsedTimer`.
  * 
  * ```js
  * const fn = Easings.get(`sineIn`);

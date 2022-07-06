@@ -98,10 +98,42 @@ export const del = <K, V>(map: ReadonlyMap<K, V>, key: K): ReadonlyMap<K, V> => 
 
 /**
  * Returns an {@link MapImmutable}.
- * Use {@link mapMutable} as an alternatve.
+ * Use {@link mapMutable} as a mutable alternatve.
  * 
- * @param dataOrMap Optional initial data in the form of an array of {key:value} or [key,value]
- * @returns {@link MapImmutable}
+ * @example Basic usage
+ * ```js
+ * // Creating
+ * let m = map();
+ * // Add
+ * m = m.add(["name", "sally"]);
+ * // Recall
+ * m.get("name");
+ * ```
+ * 
+ * @example Enumerating
+ * ```js
+ * for (const [key, value] of map.entries()) {
+ *  console.log(`${key} = ${value}`);
+ * }
+ * ```
+ * 
+ * @example Overview
+ * ```js
+ * // Create
+ * let m = map();
+ * // Add
+ * m = m.add(["name" , "sally"]);
+ * m.get("name");   // "sally";
+ * m.has("age");    // false
+ * m.has("name");   // true
+ * m.isEmpty;       // false
+ * m = m.delete("name");
+ * m.entries();     // Iterator of key value pairs
+ * ```
+ * 
+ * Since it is immutable, `add()`, `delete()` and `clear()` return a new version with change.
+ * 
+ * @param dataOrMap Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
 export const map = <K, V>(dataOrMap?: ReadonlyMap<K, V>|EitherKey<K, V>):MapImmutable<K, V> => {
   if (dataOrMap === undefined) return map([]);

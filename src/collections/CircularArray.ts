@@ -51,15 +51,23 @@ class CircularArrayImpl<V> extends Array {
  * 
  * `CircularArray` extends the regular JS array. Only use `add` to change the array if you want
  * to keep the `CircularArray` behaviour.
- * @example
+ * 
+ * @example Basic functions
  * ```js
  * let a = circularArray(10);
- * a = a.add(`hello`); // Because it's immutable, capture the return result of `add`
- * a.isFull;  // True if circular array is full
- * a.pointer; // The current position in array it will write to
+ * a = a.add(`hello`);  // Because it's immutable, capture the return result of `add`
+ * a.isFull;            // True if circular array is full
+ * a.pointer;           // The current position in array it will write to
  * ```
- * @template V Value of array items
- * @param {number} capacity Capacity.
- * @return {*}  {CircularArray<V>}
+ * 
+ * Since it extends the regular JS array, you can access items as usual:
+ * @example Accessing
+ * ```js
+ * let a = circularArray(10);
+ * ... add some stuff ..
+ * a.forEach(item => console.log(item)); 
+ * ```
+ * @param capacity Maximum capacity before recycling array entries
+ * @return Circular array
  */
 export const circularArray = <V>(capacity:number): CircularArray<V> => new CircularArrayImpl<V>(capacity);

@@ -34,7 +34,24 @@ export const guardIndex = <V>(array:ReadonlyArray<V>, index:number, paramName:st
 };
 
 /**
- * Returns _true_ if all the contents of the array are identical
+ * Returns _true_ if all the contents of the array are identical.
+ * 
+ * @example Uses default equality function:
+ * ```js
+ * const a1 = [10, 10, 10];
+ * areValuesIdentical(a1); // True
+ * 
+ * const a2 = [ {name:`Jane`}, {name:`John} ];
+ * areValuesIdentical(a2); // True, because JSON version captures value
+ * ```
+ * 
+ * If we want to compare by value for objects that aren't readily
+ * converted to JSON, you need to provide a function:
+ * ```js
+ * areValuesIdentical(someArray, (a, b) => {
+ *  return (a.eventType === b.eventType);
+ * });
+ * ```
  * @param array Array
  * @param equality Equality checker. Uses string-conversion checking by default
  * @returns 
@@ -91,13 +108,15 @@ export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
 
 /**
  * Returns an copy of `data` with specified length.
- * If the input array is too long, it is truncated. 
- * If the input array is too short, it will the expanded based on the `expand` strategy
- *  - undefined: fill with `undefined`
- *  - repeat: repeat array elements from position 0
- *  - first: continually use first element
- *  - last: continually use last element
+ * If the input array is too long, it is truncated.
+ *  
+ * If the input array is too short, it will be expanded based on the `expand` strategy:
+ *  - 'undefined': fill with `undefined`
+ *  - 'repeat': repeat array elements, starting from position 0
+ *  - 'first': continually use first element
+ *  - 'last': continually use last element
  * 
+ * @example
  * ```js
  * ensureLength([1,2,3], 2); // [1,2]
  * ensureLength([1,2,3], 5, `undefined`); // [1,2,3,undefined,undefined]
@@ -105,8 +124,10 @@ export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
  * ensureLength([1,2,3], 5, `first`);     // [1,2,3,1,1]
  * ensureLength([1,2,3], 5, `last`);      // [1,2,3,3,3] 
  * ```
- * @param data 
- * @param length 
+ * @param data Input array to expand
+ * @param length Desired length
+ * @param expand Expand strategy
+ * @typeParam V Type of array 
  */
 export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`undefined`|`repeat`|`first`|`last` = `undefined`):ReadonlyArray<V> => {
   // Unit tested
@@ -141,16 +162,26 @@ export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`un
 
 
 /**
- * Return elements from `array` that match a given `predicate`, and moreover are between the given `startIndex` and `endIndex`.
+ * Return elements from `array` that match a given `predicate`, and moreover are between
+ * the given `startIndex` and `endIndex` (both inclusive).
  * 
- * While this can be done with in the in-built `array.filter` function, it will needless iterate through the whole array. It also
- * avoids another alternative of slicing the array before using `filter`.
- * @param array 
- * @param predicate 
- * @param startIndex 
- * @param endIndex 
+ * While this can be done with in the in-built `array.filter` function, it will
+ * needlessly iterate through the whole array. It also avoids another alternative 
+ * of slicing the array before using `filter`.
+ * 
+ * ```js
+ * // Return 'registered' people between and including array indexes 5-10
+ * const filtered = filterBetween(people, person => person.registered, 5, 10);
+ * ```
+ * @param array Array to filter 
+ * @param predicate Filter function
+ * @param startIndex Start index (defaults to 0)
+ * @param endIndex End index (defaults to last index)
  */
-export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, index: number, array: ReadonlyArray<V>) => boolean, startIndex:number, endIndex:number):readonly V[] => {
+export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, index: number, array: ReadonlyArray<V>) => boolean, startIndex?:number, endIndex?:number):readonly V[] => {
+  guardArray(array);
+  if (typeof startIndex === `undefined`) startIndex = 0;
+  if (typeof endIndex === `undefined`) endIndex = array.length-1;
   guardIndex(array, startIndex, `startIndex`);
   guardIndex(array, endIndex, `endIndex`);
 
@@ -163,15 +194,30 @@ export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, i
   return t;
 };
 /**
- * Returns a random array index
- * @param array
+ * Returns a random array index.
+ * 
+ * ```js
+ * const v = [`blue`, `red`, `orange`];
+ * randomIndex(v); // Yields 0, 1 or 2
+ * ```
+ * 
+ * Use {@link randomElement} if you want a value from `array`, not index.
+ * 
+ * @param array Array
  * @param rand Random generator. `Math.random` by default.
  * @returns 
  */
 export const randomIndex = <V>(array: ArrayLike<V>, rand:RandomSource = defaultRandom): number => Math.floor(rand() * array.length);
 
 /**
- * Returns random element
+ * Returns random element.
+ * ```js
+ * const v = [`blue`, `red`, `orange`];
+ * randomElement(v); // Yields `blue`, `red` or `orange`
+ * ```
+ * 
+ * Use {@link randomIndex} if you want a random index within `array`.
+ * 
  * @param array
  * @params rand Random generator. `Math.random` by default.
  * @returns 
@@ -255,7 +301,8 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
 
 /**
  * Returns an array with a value omitted. If value is not found, result will be a copy of input.
- * Value checking is completed via the provided `comparer` function. By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
+ * Value checking is completed via the provided `comparer` function. 
+ * By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
  *
  * @example
  * ```js
@@ -282,6 +329,9 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
  *  return (a.name.toLowerCase() === b.name.toLowerCase());
  * });
  * ```
+ * 
+ * Consider {@link remove} to remove an item by index.
+ * 
  * @template V Type of array items
  * @param data Source array
  * @param value Value to remove
@@ -290,6 +340,26 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
  */
 export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));
 
+/**
+ * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
+ * 
+ * ```js
+ * const v = [ 100, 20, 50 ];
+ * const vv = remove(2);
+ * 
+ * Yields:
+ *  v: [ 100, 20, 50 ]
+ * vv: [ 100, 20 ] 
+ * ```
+ * 
+ * Consider {@link without} if you want to remove an item by value.
+ * 
+ * Throws an exception if `index` is outside the range of `data` array.
+ * @param data Input array
+ * @param index Index to remove
+ * @typeParam V Type of array
+ * @returns 
+ */
 export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V> => {
   // ✔️ Unit tested
   if (!Array.isArray(data)) throw new Error(`'data' parameter should be an array`);
@@ -298,8 +368,10 @@ export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V
 };
 
 /**
- * Groups data by a grouper function, returning data as a map with string
- * keys and array values.
+ * Groups data by a function `grouper`, returning data as a map with string
+ * keys and array values. Multiple values can be assigned to the same group.
+ * 
+ * `grouper` must yield a string designated group for a given item.
  * 
  * @example
  * ```js
@@ -309,10 +381,14 @@ export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V
  *  { age: 23, city: `Stockholm` }
  *  { age: 56, city: `London` }
  * ];
+ * 
+ * // Whatever the function returns will be the designated group
+ * // for an item
  * const map = groupBy(data, item => data.city); 
  * ```
  * 
- * Returns a map: 
+ * This yields a Map with keys London, Stockholm and Copenhagen, and the corresponding values.
+ * 
  * ```
  * London: [{ age: 39, city: `London` }, { age: 56, city: `London` }]
  * Stockhom: [{ age: 23, city: `Stockholm` }]
@@ -320,8 +396,8 @@ export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V
  * ```
  * @param array Array to group
  * @param grouper Function that returns a key for a given item
- * @template K Type of key to group by. Typically string.
- * @template V Type of values
+ * @typeParam K Type of key to group by. Typically string.
+ * @typeParam V Type of values
  * @returns Map 
  */
 export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {

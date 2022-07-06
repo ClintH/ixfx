@@ -2,16 +2,19 @@ import {RandomSource, defaultRandom} from '~/Random.js';
 import {clamp} from '~/Util.js';
 import {number as guardNumber} from '../Guards.js';
 
+
+import * as Easings from './Easing.js';
+
 /**
  * Easings module
  * 
  * Overview:
- * * {@link Easings.time} - Ease by time
- * * {@link Easings.tick} - Ease by tick
- * * {@link Easings.get}  - Get an easing function by name
- * * {@link Easings.crossfade} - Mix two synchronised easing functions (a slight shortcut over `mix`)
- * * {@link Easings.crossfade} - Mix two easing functions
- * * {@link Easings.gaussian} - Gaussian distribution (rough bell curve)
+ * * {@link Easings.time}: Ease by time
+ * * {@link Easings.tick}: Ease by tick
+ * * {@link Easings.get}: Get an easing function by name
+ * * {@link Easings.crossfade}: Mix two synchronised easing functions (a slight shortcut over `mix`)
+ * * {@link Easings.mix}: Mix two easing functions
+ * * {@link Easings.gaussian}: Gaussian distribution (rough bell curve)
  * 
  * @example Importing
  * ```js
@@ -24,7 +27,6 @@ import {number as guardNumber} from '../Guards.js';
  * Easings.time(...);
  * ```
  */
-import * as Easings from './Easing.js';
 export {Easings};
 
 /**
@@ -52,14 +54,26 @@ import * as Forces from './Forces.js';
 export {Forces};
 
 
+import * as Oscillators from './Oscillator.js';
+
 /**
  * Oscillators module has waveshapes for producing values with a specified frequency.
  * 
  * Overview
- * * {@link Oscillators.saw}
- * * {@link Oscillators.sine}
- * * {@link Oscillators.square}
- * * {@link Oscillators.triangle}
+ * * {@link Oscillators.saw}: 'Sawtooth' wave
+ * * {@link Oscillators.sine}: Sine wave
+ * * {@link Oscillators.sineBipolar}: Sine wave with range of -1 to 1
+ * * {@link Oscillators.square}: Square wave
+ * * {@link Oscillators.triangle}: Triangle wave
+ * 
+ * @example On-demand sampling
+ * ```js
+ * // Saw wave with frequency of 0.10hZ
+ * const osc = Oscillators.saw(0.1);
+ * 
+ * // Whever we need to sample from the oscillator...
+ * const v = osc.next().value;
+ * ```
  * 
  * @example Importing
  * ```js
@@ -73,7 +87,6 @@ export {Forces};
  * ```
  * 
  */
-import * as Oscillators from './Oscillator.js';
 export {Oscillators};
 
 export type JitterOpts = {

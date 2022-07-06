@@ -14,36 +14,7 @@ export type PointSeenInfo = {
   readonly average:Points.Point
 };
 
-/**
- * A tracked point. Create via {@link pointTracker}. Useful for monitoring how
- * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
- * track the pointer as it moves until pointerup.
- * 
- * ```js
- * // Create a tracker
- * const t = pointTracker(`pointer-0`);
- * 
- * // ...and later, tell it when a point is seen
- * const nfo = t.seen({x: evt.x, y:evt.y});
- * // nfo gives us some details on the relation between the seen point, the start, and points in-between
- * // nfo.angle, nfo.centroid, nfo.speed etc.
- * ```
- * 
- * Compute based on last seen point
- * ```js
- * t.angleFromStart();
- * t.distanceFromStart();
- * t.x / t.y
- * t.length; // Total length of accumulated points
- * t.elapsed; // Total duration since start
- * t.lastInfo; // The PointSeenInfo for last seen point
- * ```
- * 
- * Housekeeping
- * ```js
- * t.reset(); // Reset tracker
- * ```
- */
+
 export class PointTracker extends ObjectTracker<Points.Point> {
   /**
    * Function that yields the relation from initial point
@@ -164,24 +135,85 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
       return p;
     });
   }
-
-  // async seen(id:string, ...values:Points.Point[]) {
-  //   const trackedValue = await this.getTrackedValue(id, ...values) as TrackedPoint;
-  //   return trackedValue.seen(...values);
-  // }
 }
 
 /**
- * Track several named points
+ * Track several named points. Call `seen()` to track a point. Mutable.
+ * 
+ * Basic usage
+ * ```js
+ * const pt = pointsTracker();
+ * 
+ * // Track a point under a given id
+ * document.addEventListener(`pointermove`, e => {
+ *  const info = await pt.seen(e.pointerId, { x: e.x, y: e.y });
+ *  // Yields some info on relation of the point to initial value
+ * });
+ * ```
+ * 
+ * Do something with last values for all points
+ * ```js
+ * const c = Points.centroid(...Array.from(pointers.last()));
+ * ```
+ * 
+ * More functions...
+ * ```js
+ * pt.size; // How many named points are being tracked
+ * pt.delete(id);  // Delete named point
+ * pt.reset();
+ * ```
+ * 
+ * Accessors:
+ * ```js
+ * pt.get(id);  // Get named point (or _undefined_)
+ * pt.has(id); // Returns true if id exists
+ * pt.trackedByAge(); // Returns array of tracked points, sorted by age
+ * pt.valuesByAge(); // Returns array of tracked values, sorted by age
+ * ```
+ 
+* Iterators:
+ * ```js
+ * pt.values(); // Tracked values
+ * pt.ids(); // Iterator over ids
+ * pt.last(); // Last received value for each point
+ * pt.initialValues(); // Iterator over initial values for each point
+ * ```
+ * Options:
+ * * `storeIntermediate`: if true, all points are stored internally
+ * * `resetAfterSamples`: If set above 0, it will automatically reset after the given number of samples have been seen
  * @param opts 
  * @returns 
  */
 export const pointsTracker = (opts:TrackOpts) => new TrackedPointMap(opts);
 
 /**
- * Creates a {@link PointTracker}.
- * @param id Id for tracker (optional)
- * @param opts Options for tracker (optional)
- * @returns New tracker
+ * A tracked point. Create via {@link pointTracker}. Mutable. Useful for monitoring how
+ * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
+ * track the pointer as it moves until pointerup.
+ * 
+ * ```js
+ * // Create a tracker
+ * const t = pointTracker(`pointer-0`);
+ * 
+ * // ...and later, tell it when a point is seen
+ * const nfo = t.seen({x: evt.x, y:evt.y});
+ * // nfo gives us some details on the relation between the seen point, the start, and points in-between
+ * // nfo.angle, nfo.centroid, nfo.speed etc.
+ * ```
+ * 
+ * Compute based on last seen point
+ * ```js
+ * t.angleFromStart();
+ * t.distanceFromStart();
+ * t.x / t.y
+ * t.length; // Total length of accumulated points
+ * t.elapsed; // Total duration since start
+ * t.lastInfo; // The PointSeenInfo for last seen point
+ * ```
+ * 
+ * Housekeeping
+ * ```js
+ * t.reset(); // Reset tracker
+ * ```
  */
 export const pointTracker = (id?:string, opts:TrackOpts = {}) => new PointTracker(id ?? ``, opts);

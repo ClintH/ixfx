@@ -352,7 +352,7 @@ const massApplyAccel = (v:Points.Point, t:ForceAffected, mass: MassApplication) 
 
 /**
  * A force based on the square of the thing's velocity.
- * It's like {@link frictionForce}, but here the velocity has a bigger impact.
+ * It's like {@link velocityForce}, but here the velocity has a bigger impact.
  * 
  * ```js
  * const thing = {

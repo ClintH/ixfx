@@ -177,7 +177,9 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
  * const hello = map.get(`hello`); // Get back values
  * ```
  * 
- * Takes options { comparer: {@link IsEqual}, toString: {@link ToString}}
+ * Takes options:
+ * * `comparer`: {@link IsEqual}
+ * * `toString`: {@link ToString}
  * 
  * A custom {@link ToString} function can be provided which is used when checking value equality (`has`, `without`)
  * ```js
@@ -222,7 +224,10 @@ export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyA
  * This means that only unique values are stored under each key. By default it
  * uses the JSON representation to compare items. 
  * 
- * Options: { hash: {@link ToString} }
+ * Options: `{ hash: toStringFn } }`
+ * 
+ * `hash` is a {@link ToString} function: `(object) => string`. By default it uses
+ * `JSON.stringify`.
  * 
  * @example Only storing the newest three items per key
  * ```js
@@ -230,8 +235,6 @@ export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyA
  * map.add(`hello`, [1, 2, 3, 1, 2, 3]);
  * const hello = map.get(`hello`); // [1, 2, 3]
  * ```
- * 
- * Provide a {@link ToString} function for custom equality checking
  * 
  * @example
  * ```js
@@ -241,7 +244,7 @@ export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyA
  * map.add(`hello`, {age:29, name: `Mary`}); // Value ignored as same name exists
  * ```
  * @param opts 
- * @returns {@link MapOfMutable}
+ * @returns
  */
 export const mapSet = <V>(opts?:MapSetOpts<V>):MapOfMutable<V, ReadonlyMap<string, V>> => {
   const hash = opts?.hash ?? toStringDefault;
@@ -264,22 +267,25 @@ export const mapSet = <V>(opts?:MapSetOpts<V>):MapOfMutable<V, ReadonlyMap<strin
 };
 
 /**
- * Returns a {@link MapOfMutable} that uses a {@link CircularArray} to hold values.
+ * Returns a {@link MapOfMutable} that uses a {@link CircularArray} to hold values. Mutable.
  * This means that the number of values stored under each key will be limited to the defined
  * capacity.
  * 
- * Requires options: { capacity: number}
+ * Required option:
+ * * `capacity`: how many items to hold
  * 
- * @example Only storing the newest three items per key
+ * @example Only store the most recent three items per key
  * ```js
- * const map = mapCircular({capacity: 3});
+ * const map = mapCircularMutable({capacity: 3});
  * map.add(`hello`, [1, 2, 3, 4, 5]);
  * const hello = map.get(`hello`); // [3, 4, 5]
  * ```
+ * 
+ * 
  * @param opts 
  * @returns
  */
-export const mapCircular = <V>(opts:MapCircularOpts<V>):MapOfMutable<V, CircularArray<V>> => {
+export const mapCircularMutable = <V>(opts:MapCircularOpts<V>):MapOfMutable<V, CircularArray<V>> => {
   const comparer = isEqualDefault;
   
   const t:MultiValue<V, CircularArray<V>> = {
