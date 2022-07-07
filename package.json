@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.1.00",
+  "version": "0.2.00",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -32,7 +32,7 @@
     "./sets.js": "./dist/sets.js",
     "./stateMachine.js": "./dist/stateMachine.js",
     "./svg.js": "./dist/svg.js",
-    "./temporal.js": "./dist/temporal.js",
+    "./data.js": "./dist/data.js",
     "./text.js": "./dist/text.js",
     "./util.js": "./dist/util.js",
     "./visual.js": "./dist/visual.js"

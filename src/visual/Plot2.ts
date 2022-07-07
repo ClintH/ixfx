@@ -3,11 +3,12 @@ import {minIndex} from '../collections/NumericArrays.js';
 import {PointCalculableShape} from '../geometry/Point.js';
 import {Arrays} from '../collections/index.js';
 import { Points, Rects} from '../geometry/index.js';
-import {clamp, flip, getFieldByPath, getFieldPaths, ifNaN, roundUpToMultiple, scale} from '../Util.js';
+import {clamp, flip,  scale} from '../data/index.js';
 import { parentSizeCanvas } from "../dom/Util.js";
 import * as Sg from './SceneGraph.js';
 
 import {textWidth} from './Drawing.js';
+import {getFieldPaths, getFieldByPath, ifNaN} from '../Util.js';
 
 /**
  * A data source

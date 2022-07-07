@@ -1,8 +1,6 @@
 import {RandomSource, defaultRandom} from '../Random.js';
-import {clamp} from '../Util.js';
+import {clamp} from '../data/Clamp.js';
 import {number as guardNumber} from '../Guards.js';
-
-
 import * as Easings from './Easing.js';
 
 /**

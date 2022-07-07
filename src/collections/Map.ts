@@ -74,7 +74,7 @@ export const getOrGenerateSync = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>V
 /**
  * Adds items to a map only if their key doesn't already exist 
  * 
- * Uses provided {@link ToString} function to create keys for items. Item is only added if it doesn't already exist.
+ * Uses provided {@link Util.ToString} function to create keys for items. Item is only added if it doesn't already exist.
  * Thus the older item wins out, versus normal `Map.set` where the newest wins.
  * 
  * 

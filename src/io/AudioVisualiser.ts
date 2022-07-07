@@ -13,7 +13,7 @@
 
 import {Arrays} from '../collections/index.js';
 import {Points} from '../geometry/index.js';
-import {numberTracker} from '../temporal/NumberTracker.js';
+import {numberTracker} from '../data/NumberTracker.js';
 import {AudioAnalyser} from './AudioAnalyser.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further

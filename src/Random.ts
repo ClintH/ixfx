@@ -1,7 +1,7 @@
 import { randomIndex, randomElement } from "./collections/Arrays.js";
 import {number as guardNumber} from './Guards.js';
 import * as Easings from "./modulation/Easing.js";
-import {clamp} from "./Util.js";
+import {clamp} from './data/Clamp.js';
 
 export {randomIndex as arrayIndex};
 export {randomElement as arrayElement};

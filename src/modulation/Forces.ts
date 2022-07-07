@@ -3,7 +3,8 @@
  */
 import {Points, Polar} from '../geometry/index.js';
 import { Point} from '../geometry/Point.js';
-import {clamp, interpolateAngle} from '../Util.js';
+import {clamp} from '../data/Clamp.js';
+import {interpolateAngle} from '../data/Interpolate.js';
 import {Rect, getEdgeX, getEdgeY} from '../geometry/Rect.js';
 
 /**

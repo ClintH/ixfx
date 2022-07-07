@@ -1,5 +1,6 @@
 import {minMaxAvg} from "../collections/NumericArrays.js";
-import {clamp, scale} from "../Util.js";
+import {clamp} from "./Clamp.js";
+import {scale} from "./Scale.js";
 
 /**
  * Normalises numbers, adjusting min/max as new values are processed.

@@ -1,7 +1,8 @@
 /* eslint-disable */
 import {average} from '../collections/NumericArrays.js';
 import { startsEnds } from '../Text.js';
-import { wrapInteger, wrap, scale, clamp, clampIndex, toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import { wrapInteger, wrap, scale, clamp, clampIndex } from '../data/index.js';
+import { toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 import {degreeToRadian, radianToDegree} from '../geometry/index.js';
 
 test(`degreeToRadian`, () => {

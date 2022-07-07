@@ -1,4 +1,4 @@
-import {numberTracker} from '../../temporal/NumberTracker.js';
+import {numberTracker} from '../../data/NumberTracker.js';
 
 test(`numberTracker`, () => {
 

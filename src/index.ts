@@ -1,8 +1,37 @@
 /**
+ * Select a namespace below for more
+ * 
+ * * {@link Collections}: Working with lists, sets, maps
+ * * {@link Data}: Scaling, clamping, interpolating, averaging data
+ * * {@link Dom}: DOM manipulation
+ * * {@link Flow}: Delays, loops, State Machine, deboucing, throttling, timers
+ * * {@link Generators}: Generate data
+ * * {@link Geometry}: Working with various kinds of shapes and spatial calcuations
+ * * {@link Io}: Connect to Espruino, Arduino, sound and video inputs
+ * * {@link Modulation}: Envelopes, Oscillators, jittering
+ * * {@link Random}: Compute various forms of random numbers
+ * * {@link Text}: A few string processing functions
+ * * {@link Visual}: Colour, drawing, SVG and video
+ * @module
+ */
+
+/**
  * Processing streams of data. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
  * 
+ * * {@link clamp}: Restrict a number to a given range
+ * * {@link clampIndex}: Restrict a number to be within the size of an array
+ * * {@link flip}: Invert a relative number
+ * * {@link interpolate}: Mix between two numbers by an amount
+ * * {@link interpolateAngle}: Mix between two angles by an amount
+ * * {@link scale}: Scale a value from an input range to an output range
+ * * {@link wrap}: Wraps a value to be within a range
+ * * {@link wrapInteger}: Wraps an integer to be within a range
+ * 
+ * ### Averaging
  * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
  * * {@link frequencyMutable}: Count occurences of a value
+ * 
+ * ### Normalise sub-modukle
  * * {@link Normalise.stream | Normalise.stream}: Normalises a stream of values
  * * {@link Normalise.array | Normalise.array}: Normalises an array of values
  * 
@@ -16,12 +45,12 @@
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
- * import {movingAverage} from '../../ixfx/dist/temporal.js';
+ * import {movingAverage} from '../../ixfx/dist/data.js';
  * // Import from web
- * import {movingAverage} from 'https://unpkg.com/ixfx/dist/temporal.js'
+ * import {movingAverage} from 'https://unpkg.com/ixfx/dist/data.js'
  * ```
  */
-export * as Temporal from './temporal/index.js';
+export * as Data from './data/index.js';
 
 /**
  * Functions for different shapes, paths and coordinate spaces
@@ -285,9 +314,4 @@ export * as Collections from './collections/index.js';
 export * as Random from './Random.js';
 export * as KeyValues from './KeyValue.js';
 
-// Loose functions
-
-export * from './Util.js';
-
-// Classes
-export { KeyValue } from './KeyValue.js';
+export * as Util from './Util.js';

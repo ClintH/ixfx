@@ -1,5 +1,5 @@
 /* eslint-disable functional/immutable-data */
-import {PointSeenInfo, pointsTracker} from "../temporal/PointTracker.js";
+import {PointSeenInfo, pointsTracker} from "../data/PointTracker.js";
 import {fullSizeElement, resolveEl} from "./Util.js";
 import * as Svg from "../visual/Svg.js";
 

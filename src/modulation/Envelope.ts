@@ -4,7 +4,7 @@ import { Timer } from "../flow/Timer.js";
 import { StateMachine } from "../flow/StateMachine.js";
 import {Path} from "../geometry/Path.js";
 import * as Bezier from '../geometry/Bezier.js';
-import {scale} from "../Util.js";
+import {scale} from "../data/Scale.js";
 
 /**
  * @returns Returns a full set of default ADSR options

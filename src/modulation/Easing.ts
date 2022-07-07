@@ -1,5 +1,5 @@
 // Easings from https://easings.net/
-import {interpolate} from '../Util.js';
+import {interpolate} from '../data/Interpolate.js';
 import {msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource} from '../flow/index.js';
 
 const sqrt = Math.sqrt;

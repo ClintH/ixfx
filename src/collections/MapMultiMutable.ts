@@ -178,15 +178,15 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
  * ```
  * 
  * Takes options:
- * * `comparer`: {@link IsEqual}
- * * `toString`: {@link ToString}
+ * * `comparer`: {@link Util.IsEqual}
+ * * `toString`: {@link Util.ToString}
  * 
- * A custom {@link ToString} function can be provided which is used when checking value equality (`has`, `without`)
+ * A custom {@link Util.ToString} function can be provided which is used when checking value equality (`has`, `without`)
  * ```js
  * const map = mapArray({toString:(v) => v.name}); // Compare values based on their `name` field;
  * ``` 
  * 
- * Alternatively, a {@link IsEqual} function can be used:
+ * Alternatively, a {@link Util.IsEqual} function can be used:
  * ```js
  * const map = mapArray({comparer: (a, b) => a.name === b.name });
  * ```
@@ -226,7 +226,7 @@ export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyA
  * 
  * Options: `{ hash: toStringFn } }`
  * 
- * `hash` is a {@link ToString} function: `(object) => string`. By default it uses
+ * `hash` is a {@link Util.ToString} function: `(object) => string`. By default it uses
  * `JSON.stringify`.
  * 
  * @example Only storing the newest three items per key

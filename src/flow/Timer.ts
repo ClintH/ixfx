@@ -1,7 +1,5 @@
-import {clamp} from '../Util.js';
+import {clamp} from '../data/Clamp.js';
 import {HasCompletion} from './index.js';
-
-
 /**
  * Creates a timer
  */

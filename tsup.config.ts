@@ -20,7 +20,7 @@ export default defineConfig({
     sets: `./src/collections/Set.ts`,
     stateMachine: `./src/flow/StateMachine.ts`,
     svg: `./src/visual/Svg.ts`,
-    temporal: `./src/temporal/index.ts`,
+    data: `./src/data/index.ts`,
     text: `./src/Text.ts`,
     util: `./src/Util.ts`,
     visual: `./src/visual/index.ts`,

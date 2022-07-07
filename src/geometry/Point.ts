@@ -1,7 +1,7 @@
 import { Circles, Lines, Points, Polar, Rects} from "./index.js";
 import {interpolate as lineInterpolate} from './Line.js';
 import { number as guardNumber} from '../Guards.js';
-import {clamp as clampNumber, wrap as wrapNumber} from '../Util.js';
+import {clamp as clampNumber, wrap as wrapNumber} from '../data/index.js';
 import {Arrays} from "../collections/index.js";
 import { RandomSource, defaultRandom } from "../Random.js";
 import {isRect} from "./Rect.js";
