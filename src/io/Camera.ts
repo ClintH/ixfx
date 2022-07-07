@@ -73,14 +73,14 @@ export const start = async (constraints:Constraints = {}): Promise<StartResult|u
     // Attempt to start video
     const r = await startWithVideoEl(videoEl, constraints);
     stopVideo = r.dispose;
-  } catch (err) {
+    return  {videoEl, dispose};
+  } catch (ex) {
     // If it didn't work, delete the created element 
-    console.error(err);
+    console.error(ex);
     dispose();
-    return;
+    throw ex;
   }
 
-  return  {videoEl, dispose};
 };
 
 /**
