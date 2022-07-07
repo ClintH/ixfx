@@ -17,7 +17,7 @@
 <h1>Function hasKeyValue</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-<li class="tsd-signature" id="hasKeyValue">has<wbr/>Key<wbr/>Value<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>map<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span>, comparer<span class="tsd-signature-symbol">: </span><a href="../types/IsEqual.html" class="tsd-signature-type" data-tsd-kind="Type alias">IsEqual</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li></ul>
+<li class="tsd-signature" id="hasKeyValue">has<wbr/>Key<wbr/>Value<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>map<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span>, comparer<span class="tsd-signature-symbol">: </span><a href="../types/Util.IsEqual.html" class="tsd-signature-type" data-tsd-kind="Type alias">IsEqual</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li></ul>
 <ul class="tsd-descriptions">
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns true if map contains <code>value</code> under <code>key</code>, using <code>comparer</code> function. Use <a href="Collections.Maps.hasAnyValue.html">hasAnyValue</a> if you don&#39;t care
@@ -53,7 +53,7 @@ what key value might be under.</p>
 <div class="tsd-comment tsd-typography"><p>Value to search</p>
 </div></li>
 <li>
-<h5>comparer: <a href="../types/IsEqual.html" class="tsd-signature-type" data-tsd-kind="Type alias">IsEqual</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h5>
+<h5>comparer: <a href="../types/Util.IsEqual.html" class="tsd-signature-type" data-tsd-kind="Type alias">IsEqual</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h5>
 <div class="tsd-comment tsd-typography"><p>Function to determine match</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4></li></ul></section></div>
@@ -84,6 +84,9 @@ what key value might be under.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Queues.html">Queues</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Sets.html">Sets</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
+<li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Dom.html">Dom</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.Forms.html">Forms</a></li></ul></li>
@@ -122,10 +125,8 @@ what key value might be under.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Modulation.Forces.html">Forces</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Modulation.Oscillators.html">Oscillators</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Random.html">Random</a></li>
-<li class="tsd-kind-namespace"><a href="../modules/Temporal.html">Temporal</a>
-<ul>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Temporal.Normalise.html">Normalise</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Text.html">Text</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/Util.html">Util</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Visual.html">Visual</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
