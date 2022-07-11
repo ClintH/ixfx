@@ -62,7 +62,7 @@ export const equals = (a:Line, b:Line):boolean =>  a.a === b.a && a.b === b.b;
  * // Line 10,10 -> 20,20
  * const line = Lines.fromNumbers(10,10, 20,20);
  * 
- * // Applies randomisation to x&y
+ * // Applies randomisation to both x and y.
  * const rand = (p) => ({
  *  x: p.x * Math.random(),
  *  y: p.y * Math.random()
@@ -123,10 +123,11 @@ export const angleRadian = (lineOrPoint:Line|Points.Point, b?:Points.Point):numb
 };
 
 /**
- * Multiplies start and end of line by x,y given in `p`.
+ * Multiplies start and end of line by point.x, point.y.
+ * 
  * ```js
  * // Line 1,1 -> 10,10
- * const l = fromNumbers(1,1,10,10);
+ * const l = fromNumbers(1, 1, 10, 10);
  * const ll = multiply(l, {x:2, y:3});
  * // Yields: 2,20 -> 3,30
  * ```
@@ -481,6 +482,56 @@ export const extendFromA = (line:Line, distance:number):Line => {
 };
 
 /**
+ * Yields every integer point along `line`. 
+ * 
+ * @example Basic usage
+ * ```js
+ * const l = { a: {x: 0, y: 0}, b: {x: 100, y: 100} };
+ * for (const p of pointsOf(l)) {
+ *  // Do something with point `p`...
+ * }
+ * ```
+ * 
+ * Some precision is lost as start and end
+ * point is also returned as an integer.
+ * 
+ * Uses [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
+ * @param line Line
+ */
+//eslint-disable-next-line func-style
+export function* pointsOf(line:Line):Generator<Points.Point>  {
+  // Via https://play.ertdfgcvb.xyz/#/src/demos/dyna
+  const {a, b} = line;
+  //eslint-disable-next-line functional/no-let
+  let x0 = Math.floor(a.x);
+  //eslint-disable-next-line functional/no-let
+  let y0 = Math.floor(a.y);
+  const x1 = Math.floor(b.x);
+  const y1 = Math.floor(b.y);
+  const dx = Math.abs(x1 - x0);
+  const dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  //eslint-disable-next-line functional/no-let
+  let err = dx + dy;
+
+  //eslint-disable-next-line functional/no-loop-statement
+  while (true) {
+    yield {x:x0, y:y0};
+    if (x0 === x1 && y0 === y1) break;
+    const e2 = 2 * err;
+    if (e2 >= dy) {
+      err += dy;
+      x0 += sx;
+    }
+    if (e2 <= dx) {
+      err += dx;
+      y0 += sy;
+    }
+  }
+}
+
+/**
  * Returns the distance of `point` to the 
  * nearest point on `line`.
  * 
@@ -502,12 +553,17 @@ export const distance = (line:Line|ReadonlyArray<Line>, point:Points.Point):numb
   }
 };
 
+/**
+ * Returns the distance of `point` to the nearest point on `line`
+ * @param line Line
+ * @param point Target point
+ * @returns 
+ */
 const distanceSingleLine = (line:Line, point:Points.Point):number => {
   guard(line, `line`);
   guardPoint(point, `point`);
 
-  const lineLength = length(line);
-  if (lineLength === 0) {
+  if (length(line) === 0) {
     // Line is really a point
     return length(line.a, point);
   }
@@ -532,6 +588,17 @@ const distanceSingleLine = (line:Line, point:Points.Point):number => {
  * @returns Point between a and b
  */
 export function interpolate(amount: number, a: Points.Point, pointB: Points.Point): Points.Point;
+
+/**
+ * Calculates a point in-between `line`'s start and end points.
+ * 
+ * ```js
+ * // Get {x, y } at 50% along line
+ * interpolate(0.5, line);
+ * ```
+ * @param amount 0..1 
+ * @param line Line
+ */
 export function interpolate(amount: number, line:Line): Points.Point;
 
 //eslint-disable-next-line func-style
@@ -760,7 +827,6 @@ export type LinePath = Line & Path & {
  * 
  * // Rotate by 90 degrees at the 80% position
  * rotated = rotate(line, Math.PI / 2, 0.8);
- * 
  * ```
  * @param line Line to rotate
  * @param amountRadian Angle in radians to rotate by
