@@ -1,5 +1,5 @@
 import {SimpleEventEmitter} from "../Events.js";
-import { continuously, msElapsedTimer, TimerSource} from "../flow/index.js";
+import {  msElapsedTimer, sleep, TimerSource} from "../flow/index.js";
 import { Timer } from "../flow/Timer.js";
 import { StateMachine } from "../flow/StateMachine.js";
 import {Path} from "../geometry/Path.js";
@@ -491,36 +491,71 @@ export const adsr = (opts:EnvelopeOpts):Adsr => new AdsrImpl(opts);
 
 /**
  * Creates and runs an envelope, sampling its values at `sampleRateMs`.
+ * 
  * ```
- * // Sample an envelope every 5ms
- * const values = adsrSample(opts, 5);
+ * import {adsrSample, defaultAdsrOpts} from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import {IterableAsync} from  'https://unpkg.com/ixfx/dist/util.js';
+ * 
+ * const opts = {
+ *  ...defaultAdsrOpts(),
+ *  attackDuration: 1000,
+ *  releaseDuration: 1000,
+ *  sustainLevel: 1,
+ *  attackBend: 1,
+ *  decayBend: -1
+ * };
+ * 
+ * // Sample an envelope every 5ms into an array
+ * const data = await IterableAsync.toArray(adsrSample(opts, 20));
+ * 
+ * // Work with values as sampled
+ * for await (const v of adsrSample(opts, 5)) {
+ *  // Work with envelope value `v`...
+ * }
  * ```
  * @param opts Envelope options
  * @param sampleRateMs Sample rate
  * @returns 
  */
-export const adsrSample = (opts:EnvelopeOpts, sampleRateMs:number):Promise<readonly number[]> => {
+//eslint-disable-next-line func-style
+export async function* adsrSample(opts:EnvelopeOpts, sampleRateMs:number) {
   if (opts.shouldLoop) throw new Error(`Cannot sample a looping envelope`);
   
   const env = adsr(opts);
-  const data:number[] = [];
-  //eslint-disable-next-line functional/no-let
-  let started = false;
 
-  return new Promise<number[]>((resolve, _reject) => {
-    continuously(() => {
-      if (!started) {
-        started = true;
-        env.trigger();
-      }
+  env.trigger();
 
-      const v = env.value;
-      //eslint-disable-next-line functional/immutable-data
-      if (!Number.isNaN(v)) data.push(env.value);
-      if (env.isDone) {
-        resolve(data);
-        return false;
-      }
-    }, sampleRateMs).start();
-  });
-};
+  //eslint-disable-next-line functional/no-loop-statement
+  while (true) {
+    await sleep(sampleRateMs);
+    const v = env.value;
+    if (env.isDone) return;
+    yield v;
+  }
+}
+// export function* adsrSample (opts:EnvelopeOpts, sampleRateMs:number) {
+//   if (opts.shouldLoop) throw new Error(`Cannot sample a looping envelope`);
+  
+//   const env = adsr(opts);
+//   //const data:number[] = [];
+
+//   //eslint-disable-next-line functional/no-let
+//   let started = false;
+
+//   return new Promise<number[]>((resolve, _reject) => {
+//     continuously(() => {
+//       if (!started) {
+//         started = true;
+//         env.trigger();
+//       }
+
+//       const v = env.value;
+//       //eslint-disable-next-line functional/immutable-data
+//       if (!Number.isNaN(v)) yield env.value;// data.push(env.value);
+//       if (env.isDone) {
+//         resolve(data);
+//         return false;
+//       }
+//     }, sampleRateMs).start();
+//   });
+// };
