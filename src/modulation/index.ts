@@ -94,7 +94,8 @@ export type JitterOpts = {
 
 /**
  * Jitters `value` by the absolute `jitter` amount.
- * All values should be on a 0..1 scale, and the return value is by default clamped to 0..1
+ * All values should be on a 0..1 scale, and the return value is by default clamped to 0..1. Pass `clamped:false` as an option
+ * to allow for arbitary ranges.
  * 
  * ```js
  * import {jitter} from 'https://unpkg.com/ixfx/dist/modulation.js';
@@ -121,6 +122,12 @@ export type JitterOpts = {
  * import {weighted} from 'https://unpkg.com/ixfx/dist/random.js';
  * jitter(0.5, 0.1, {}, weighted);
  * ```
+ * 
+ * Options
+ * * clamped: If false, `value`s out of percentage range can be used and return value may
+ *    beyond percentage range. True by default
+ * * type: if `rel`, `jitter` is considered to be a percentage relative to `value`
+ *         if `abs`, `jitter` is considered to be an absolute value (default)
  * @param value Value to jitter
  * @param jitter Absolute amount to jitter by
  * @param opts Jitter options
