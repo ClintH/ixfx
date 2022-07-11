@@ -20,7 +20,8 @@
 <ul class="tsd-descriptions">
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Jitters <code>value</code> by the absolute <code>jitter</code> amount.
-All values should be on a 0..1 scale, and the return value is by default clamped to 0..1</p>
+All values should be on a 0..1 scale, and the return value is by default clamped to 0..1. Pass <code>clamped:false</code> as an option
+to allow for arbitary ranges.</p>
 <pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> {</span><span class="hl-3">jitter</span><span class="hl-2">} </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/modulation.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Jitter 0.5 by 10% (absolute)</span><br/><span class="hl-0">// yields range of 0.4-0.6</span><br/><span class="hl-8">jitter</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">, </span><span class="hl-7">0.1</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Jitter 0.5 by 10% (relative, 10% of 0.5)</span><br/><span class="hl-0">// yields range of 0.45-0.55</span><br/><span class="hl-8">jitter</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">, </span><span class="hl-7">0.1</span><span class="hl-2">, {</span><span class="hl-3">type:</span><span class="hl-4">`rel`</span><span class="hl-2">});</span>
 </code></pre>
 <p>You can also opt not to clamp values:</p>
@@ -30,6 +31,13 @@ All values should be on a 0..1 scale, and the return value is by default clamped
 random number generator:</p>
 <pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> {</span><span class="hl-3">weighted</span><span class="hl-2">} </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/random.js&#39;</span><span class="hl-2">;</span><br/><span class="hl-8">jitter</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">, </span><span class="hl-7">0.1</span><span class="hl-2">, {}, </span><span class="hl-3">weighted</span><span class="hl-2">);</span>
 </code></pre>
+<p>Options</p>
+<ul>
+<li>clamped: If false, <code>value</code>s out of percentage range can be used and return value may
+ beyond percentage range. True by default</li>
+<li>type: if <code>rel</code>, <code>jitter</code> is considered to be a percentage relative to <code>value</code>
+  if <code>abs</code>, <code>jitter</code> is considered to be an absolute value (default)</li>
+</ul>
 
 <h3>Returns</h3><p>Jittered value</p>
 </div>
@@ -90,7 +98,9 @@ random number generator:</p>
 <li class="tsd-kind-namespace"><a href="../modules/Flow.html">Flow</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Flow.StateMachine.html">State<wbr/>Machine</a></li></ul></li>
-<li class="tsd-kind-namespace"><a href="../modules/Generators.html">Generators</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/Generators.html">Generators</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Generators.IterableAsync.html">Iterable<wbr/>Async</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Geometry.html">Geometry</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Arcs.html">Arcs</a></li>
