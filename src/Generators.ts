@@ -1,6 +1,6 @@
 import {number as guardNumber, integer as guardInteger} from "./Guards.js";
 export {pingPong, pingPongPercent} from './modulation/PingPong.js';
-
+export * as IterableAsync from './IterableAsync.js';
 
 export {interval} from './flow/Interval.js';
 export {delayLoop} from './flow/Delay.js';
