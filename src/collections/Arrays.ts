@@ -107,6 +107,37 @@ export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
 };
 
 /**
+ * Returns an interleaving of two or more arrays. All arrays must be the same length.
+ * 
+ * ```js
+ * const a = [`a`, `b`, `c`];
+ * const b = [`1`, `2`, `3`];
+ * const c = interleave(a, b);
+ * // Yields:
+ * // [`a`, `1`, `b`, `2`, `c`, `3`]
+ * ```
+ * @param arrays 
+ * @returns 
+ */
+export const interleave = <V>(...arrays:ReadonlyArray<readonly V[]>):ReadonlyArray<V> => {
+  if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
+  const lengths = arrays.map(a => a.length);
+  if (!areValuesIdentical(lengths)) throw new Error(`Arrays must be of same length`);
+
+  const ret = [];
+  const len = lengths[0];
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  for (let i=0;i<len;i++) {
+    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    for (let p=0;p<arrays.length;p++) {
+      //eslint-disable-next-line functional/immutable-data
+      ret.push(arrays[p][i]);
+    }
+  }
+  return ret;
+};
+
+/**
  * Returns an copy of `data` with specified length.
  * If the input array is too long, it is truncated.
  *  
