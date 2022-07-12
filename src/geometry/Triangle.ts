@@ -3,6 +3,16 @@ import * as Points from './Point.js';
 
 import {number as guardNumber} from '../Guards.js';
 
+/**
+ * Functions for working with equilateral triangles, defined by length
+ */
+export * as Equilateral from './TriangleEquilateral.js';
+
+/**
+ * Functions for working with right-angled triangles, defined by two of three edges
+ */
+export * as Right from './TriangleRight.js';
+
 const piPi = Math.PI*2;
 
 /**
@@ -339,6 +349,7 @@ export const equilateralFromVertex = (origin:Points.Point = {x:0, y:0}, length:n
   const c = Points.project(origin, length, (Math.PI - (angleRadian / 2)));
   return {a, b:origin, c};
 };
+
 
 /**
  * Returns the coordinates of triangle in a flat array form:

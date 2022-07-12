@@ -21,9 +21,13 @@ export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, El
  * - {@link Triangles.fromFlatArray}: Create from `[ x1, y1, x2, y2, x3, y3 ]`
  * - {@link Triangles.fromPoints}: Create from three `{ x, y }` sets
  * - {@link Triangles.fromRadius}: Equilateral triangle of a given radius and center
+ * 
+ * There are two sub-modules for dealing with particular triangles:
+ * - {@link Triangles.Equilateral}: Equilateral triangls
+ * - {@link Triangles.Right}: Right-angled triangles
  */
 export * as Triangles from './Triangle.js';
- 
+
 /**
  * Convert angle in degrees to angle in radians.
  * @param angleInDegrees 
