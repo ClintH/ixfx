@@ -17,8 +17,7 @@
 <h1>Function plot</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-<li class="tsd-signature" id="plot">plot<span class="tsd-signature-symbol">(</span>parentElOrQuery<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLElement</span>, opts<span class="tsd-signature-symbol">: </span><a href="../types/Visual.Plot.PlotOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">PlotOpts</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Visual.Plot.Plotter.html" class="tsd-signature-type" data-tsd-kind="Type alias">Plotter</a></li></ul>
-<ul class="tsd-descriptions">
+<li class="tsd-signature tsd-anchor-link" id="plot">plot<span class="tsd-signature-symbol">(</span>parentElOrQuery<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLElement</span>, opts<span class="tsd-signature-symbol">: </span><a href="../types/Visual.Plot.PlotOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">PlotOpts</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Visual.Plot.Plotter.html" class="tsd-signature-type" data-tsd-kind="Type alias">Plotter</a><a href="#plot" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Creates a simple horizontal data plot within a DIV.</p>
 <pre><code><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">p</span><span class="hl-2"> = </span><span class="hl-8">plot</span><span class="hl-2">(</span><span class="hl-4">`#parentDiv`</span><span class="hl-2">);</span><br/><span class="hl-3">p</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(</span><span class="hl-7">10</span><span class="hl-2">);</span><br/><span class="hl-3">p</span><span class="hl-2">.</span><span class="hl-8">clear</span><span class="hl-2">();</span><br/><br/><span class="hl-0">// Plot data using series</span><br/><span class="hl-3">p</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(-</span><span class="hl-7">1</span><span class="hl-2">, </span><span class="hl-4">`temp`</span><span class="hl-2">);</span><br/><span class="hl-3">p</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(</span><span class="hl-7">0.4</span><span class="hl-2">, </span><span class="hl-4">`humidty`</span><span class="hl-2">);</span>
@@ -96,7 +95,10 @@ it will use <code>--series</code> and <code>--series-axis</code>.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.html">Triangles</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.html">Triangles</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Io.html">Io</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.AudioAnalysers.html">Audio<wbr/>Analysers</a></li>
