@@ -218,7 +218,7 @@ export const medians = (t:Right):readonly [a:number, b:number, c:number] => {
  * @param t 
  * @returns 
  */
-export const circmcircle = (t:Right):Circle => {
+export const circumcircle = (t:Right):Circle => {
   const tt = resolveLengths(t);
   return { radius: tt.hypotenuse / 2};
 };

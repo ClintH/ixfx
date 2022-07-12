@@ -13,6 +13,8 @@ export * as Equilateral from './TriangleEquilateral.js';
  */
 export * as Right from './TriangleRight.js';
 
+export * as Isosceles from './TriangleIsosceles.js';
+
 const piPi = Math.PI*2;
 
 /**

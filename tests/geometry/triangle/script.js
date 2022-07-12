@@ -54,22 +54,35 @@ const drawTriangleR = () => {
   Drawing.triangle(ctx,
     Triangles.Right.fromC(rt, origin),
     {strokeStyle: `orange`, debug: true});
-
-  // const originFromA = Triangles.Equilateral.centerFromA(eq, origin);
-  // Drawing.triangle(ctx,
-  //   Triangles.Equilateral.fromCenter(eq, originFromA), {strokeStyle: `red`, debug: true});
-
-  // const originFromB = Triangles.Equilateral.centerFromB(eq, origin);
-  // Drawing.triangle(ctx, Triangles.Equilateral.fromCenter(eq, originFromB), {strokeStyle: `green`, debug: true});
-
-  // const originFromC = Triangles.Equilateral.centerFromC(eq, origin);
-  // Drawing.triangle(ctx, Triangles.Equilateral.fromCenter(eq, originFromC), {strokeStyle: `orange`, debug: true});
-
 }
 
+const drawTriangleIsos = () => {
+  const origin = ptrClick;
+
+  ctx.fillStyle = `black`;
+  ctx.fillText(`Right triangles`, 100, 100);
+  const rt = {legs: 200, base: 100};
+
+
+  Drawing.triangle(ctx,
+    Triangles.Isosceles.fromCenter(rt, origin),
+    {strokeStyle: `black`, debug: true});
+
+  Drawing.triangle(ctx,
+    Triangles.Isosceles.fromA(rt, origin),
+    {strokeStyle: `blue`, debug: true});
+
+  Drawing.triangle(ctx,
+    Triangles.Isosceles.fromB(rt, origin),
+    {strokeStyle: `red`, debug: true});
+
+  Drawing.triangle(ctx,
+    Triangles.Isosceles.fromC(rt, origin),
+    {strokeStyle: `orange`, debug: true});
+}
 
 const draw = () => {
-  drawTriangleR();
+  drawTriangleIsos();
 }
 
 document.addEventListener(`pointermove`, evt => {
