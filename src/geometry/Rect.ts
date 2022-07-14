@@ -44,6 +44,38 @@ export const isEqualSize = (a:Rect, b:Rect):boolean => {
   return a.width === b.width && a.height === b.height;
 };
 
+/**
+ * Returns a rectangle from width, height
+ * @param width 
+ * @param height 
+ */
+export function fromNumbers(width:number, height:number):Rect;
+
+/**
+ * Returns a rectangle from x,y,width,height
+ * @param x 
+ * @param y 
+ * @param width 
+ * @param height 
+ */
+export function fromNumbers(x:number, y:number, width:number, height:number):RectPositioned;
+
+//eslint-disable-next-line func-style
+export function fromNumbers(xOrWidth:number, yOrHeight:number, width?: number, height?:number):Rect|RectPositioned {
+
+  if (width === undefined || height === undefined) {
+    if (typeof xOrWidth !== `number`) throw new Error(`width is not an number`);
+    if (typeof yOrHeight !== `number`) throw new Error(`height is not an number`);
+    return Object.freeze({width:xOrWidth, height:yOrHeight});
+  }
+  if (typeof xOrWidth !== `number`) throw new Error(`x is not an number`);
+  if (typeof yOrHeight !== `number`) throw new Error(`y is not an number`);
+  if (typeof width !== `number`) throw new Error(`width is not an number`);
+  if (typeof height !== `number`) throw new Error(`height is not an number`);
+
+  return Object.freeze({x:xOrWidth, y:yOrHeight, width, height});
+}
+
 export const isEqual = (a:Rect|RectPositioned, b:Rect|RectPositioned):boolean => {
   if (isPositioned(a) && isPositioned(b)) {
     if (!Points.isEqual(a, b)) return false;
@@ -293,6 +325,58 @@ export const getEdgeY = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|
     return (Points.isPoint(rect)) ? rect.y  : 0;
   case `right`:
     return (Points.isPoint(rect)) ? rect.y  : 0;
+  }
+};
+
+/**
+ * Returns `rect` divided by the width,height of `normaliseBy`. This can be useful for
+ * normalising based on camera frame.
+ * ```js
+ * const frameSize = {width: 640, height: 320};
+ * const object = { x: 320, y: 160, width: 64, height: 32};
+ * 
+ * const n = normaliseByRect(object, frameSize);
+ * // Yields: {x: 0.5, y: 0.5, width: 0.1, height: 0.1}
+ * ```
+ * 
+ * Height and width can be supplied instead of a rectangle too:
+ * ```js
+ * const n = normaliseByRect(object, 640, 320);
+ * ```
+ * @param rect 
+ * @param normaliseBy 
+ * @returns 
+ */
+export const normaliseByRect = (rect:Rect|RectPositioned, normaliseByOrWidth:Rect|number, height?:number):Rect|RectPositioned => {
+  //eslint-disable-next-line functional/no-let
+  let width;
+  if (height === undefined) {
+    if (isRect(normaliseByOrWidth)) {
+      height = normaliseByOrWidth.height;
+      width = normaliseByOrWidth.width;
+    } else {
+      throw new Error(`Expects rectangle or width and height parameters for normaliseBy`);
+    }
+  } else {
+    if (typeof normaliseByOrWidth === `number`) {
+      width = normaliseByOrWidth;
+    } else {
+      throw new Error(`Expects rectangle or width and height parameters for normaliseBy`);
+    }
+  }
+
+  if (isPositioned(rect)) {
+    return Object.freeze({
+      x: rect.x / width,
+      y: rect.y / height,
+      width: rect.width / width,
+      height: rect.height / height
+    });
+  } else {
+    return Object.freeze({
+      width: rect.width / width,
+      height: rect.height / height
+    });
   }
 };
 
