@@ -52,6 +52,8 @@ export const start = async (constraints:Constraints = {}): Promise<StartResult|u
   const videoEl = document.createElement(`VIDEO`) as HTMLVideoElement;
   //eslint-disable-next-line functional/immutable-data
   videoEl.style.display = `none`;
+  videoEl.classList.add(`ixfx-camera`);
+  
   document.body.appendChild(videoEl);
   
   //eslint-disable-next-line functional/no-let

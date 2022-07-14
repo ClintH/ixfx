@@ -9,12 +9,23 @@ export type Capturer = {
 }
 
 //eslint-disable-next-line functional/no-mixed-type
+export type ManualCapturer = {
+  capture():ImageData;
+  readonly canvasEl:HTMLCanvasElement;
+  dispose():void;
+};
+
+//eslint-disable-next-line functional/no-mixed-type
 export type CaptureOpts = {
   readonly maxIntervalMs?:number;
   readonly showCanvas?:boolean;
   readonly workerScript?:string;
   readonly onFrame?:(pixels:ImageData) => void;
 };
+
+export type ManualCaptureOpts = {
+  readonly showCanvas?:boolean
+}
 
 /**
  * Options for frames generator
@@ -75,6 +86,7 @@ export async function* frames(sourceVideoEl:HTMLVideoElement, opts:FramesOpts = 
   // Create & setup canvas
   if (canvasEl === undefined) {
     canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
+    canvasEl.classList.add(`ixfx-frames`);
     if (!showCanvas) {
       canvasEl.style.display = `none`;
     }
@@ -183,6 +195,8 @@ export const capture = (sourceVideoEl: HTMLVideoElement, opts:CaptureOpts = {}):
 
   // Create canvas
   const canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
+  canvasEl.classList.add(`ixfx-capture`);
+  
   if (!showCanvas) {
     canvasEl.style.display = `none`;
   }
@@ -242,4 +256,52 @@ export const capture = (sourceVideoEl: HTMLVideoElement, opts:CaptureOpts = {}):
     cancel: () => loop.cancel(),
     canvasEl
   };
+};
+
+
+export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCaptureOpts = {}):ManualCapturer => {
+  const showCanvas = opts.showCanvas ?? false;
+    
+  // Ideally use OffscreenCanvas when it has support?
+  const w = sourceVideoEl.videoWidth;
+  const h = sourceVideoEl.videoHeight;
+  
+  // Create canvas
+  const canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
+  canvasEl.classList.add(`ixfx-capture`);
+  
+  if (!showCanvas) canvasEl.style.display = `none`;
+  
+  canvasEl.width = w;
+  canvasEl.height = h;
+
+  const capture = ():ImageData => {
+    //eslint-disable-next-line functional/no-let
+    let c:CanvasRenderingContext2D|null = null;
+
+    // Draw current frame from video element to hidden canvas
+    if (c === null) c = canvasEl.getContext(`2d`);
+    if (c === null) throw new Error(`Could not create graphics context`);
+    c.drawImage(sourceVideoEl, 0, 0, w, h);
+    //eslint-disable-next-line functional/no-let
+    const pixels=  c.getImageData(
+      0, 0, w, h
+    );
+    return pixels;
+  };
+
+  const dispose = ():void => {
+    try {
+      canvasEl.remove();
+    } catch (_) {
+      // no-op
+    }
+  };
+
+  const c:ManualCapturer = {
+    canvasEl,
+    capture,
+    dispose
+  };
+  return c;
 };
