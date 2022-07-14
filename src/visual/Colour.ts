@@ -61,16 +61,19 @@ export const toHsl = (colour:Colourish):Hsl => {
  * 
  * @param saturation Saturation (0-1), defaults to 0.5
  * @param lightness Lightness (0-1), defaults to 0.75
+ * @param alpha Opacity (0-1), defaults to 1.0
  * @returns HSL colour string eg `hsl(20,50%,75%)`
  */
-export const goldenAngleColour = (index: number, saturation = 0.5, lightness = 0.75) => {
+export const goldenAngleColour = (index: number, saturation = 0.5, lightness = 0.75, alpha = 1.0) => {
   guardNumber(index, `positive`, `index`);
   guardNumber(saturation, `percentage`, `saturation`);
   guardNumber(lightness, `percentage`, `lightness`);
+  guardNumber(alpha, `percentage`, `alpha`);
 
   // Via Stackoverflow
   const hue = index * 137.508; // use golden angle approximation
-  return `hsl(${hue},${saturation*100}%,${lightness*100}%)`;
+  if (alpha === 1) return `hsl(${hue},${saturation*100}%,${lightness*100}%)`;
+  else  `hsl(${hue},${saturation*100}%,${lightness*100}%,${alpha*100}%)`
 }
 
 /**

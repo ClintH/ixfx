@@ -23,8 +23,20 @@ export type CaptureOpts = {
   readonly onFrame?:(pixels:ImageData) => void;
 };
 
+//eslint-disable-next-line functional/no-mixed-type
 export type ManualCaptureOpts = {
+  /**
+   * If true, the intermediate canvas is shown
+   * The intermediate canvas is where captures from the source are put in order
+   * to get the ImageData
+   */
   readonly showCanvas?:boolean
+  /**
+   * If specified, this function will be called after ImageData is captured
+   * from the intermediate canvs. This allows for drawing on top of the
+   * captured image.
+   */
+  readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
 }
 
 /**
@@ -269,7 +281,8 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
   // Create canvas
   const canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
   canvasEl.classList.add(`ixfx-capture`);
-  
+  document.body.append(canvasEl);
+
   if (!showCanvas) canvasEl.style.display = `none`;
   
   canvasEl.width = w;
@@ -287,6 +300,8 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
     const pixels=  c.getImageData(
       0, 0, w, h
     );
+
+    if (opts.postCaptureDraw) opts.postCaptureDraw(c, w, h);
     return pixels;
   };
 
