@@ -25,6 +25,9 @@ export type Continuously = HasCompletion & {
    * Stops loop
    */
   cancel(): void
+
+  set intervalMs(ms:number);
+  get intervalMs():number
 }
 
 export type ContinuouslySyncCallback = (ticks?:number, elapsedMs?:number) => boolean|void
@@ -96,7 +99,10 @@ export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySync
   let ticks = 0;
   //eslint-disable-next-line functional/no-let
   let startedAt = performance.now();
-  const schedule = (intervalMs === undefined || intervalMs === 0) ? (cb:()=>void) => window.requestAnimationFrame(cb) : (cb:()=>void) => window.setTimeout(cb, intervalMs);
+  //eslint-disable-next-line functional/no-let
+  let iMs = (intervalMs === undefined) ? 0 : intervalMs;
+  const schedule = (iMs === 0) ? (cb:()=>void) => window.requestAnimationFrame(cb) : (cb:()=>void) => window.setTimeout(cb, iMs);
+  
   const cancel = () => {
     if (!running) return;
     running = false;
@@ -142,6 +148,13 @@ export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySync
 
   return {
     start,
+    get intervalMs() {
+      return iMs;
+    },
+    set intervalMs(ms:number) {
+      guardInteger(ms, `positive`, `ms`);
+      iMs = ms;
+    },
     get isDone() {
       return !running;
     },
