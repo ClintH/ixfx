@@ -5,7 +5,7 @@ import * as Video from '../visual/Video.js';
 type State = `ready`|`initialised`|`disposed`;
 
 //eslint-disable-next-line functional/no-mixed-type
-export type Opts = {
+export type FrameProcessorOpts = {
   readonly showCanvas?:boolean
   readonly showPreview?:boolean
   /**
@@ -30,7 +30,7 @@ export class FrameProcessor {
   private _postCaptureDraw;
   private _timer:number;
 
-  constructor(opts:Opts = {}) {
+  constructor(opts:FrameProcessorOpts = {}) {
     this._state = `ready`;
     this._source = ``;
     this._timer = performance.now();
