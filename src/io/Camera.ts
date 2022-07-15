@@ -8,6 +8,7 @@ export const dumpDevices = async (filterKind = `videoinput`) => {
   const devices = await navigator.mediaDevices.enumerateDevices();
 
   devices.forEach(d => {
+    
     if (d.kind !== filterKind) return;
     console.log(d.label);
     console.log(` Kind: ${d.kind}`);
@@ -31,6 +32,14 @@ export type Constraints = {
    * Minimum resolution
    */
   readonly min?:Rects.Rect
+  /**
+   * Ideal resolution
+   */
+  readonly ideal?:Rects.Rect
+  /**
+   * If specified, will try to use this media device id
+   */
+  readonly deviceId?:string
 }
 
 /**
@@ -133,44 +142,77 @@ const startWithVideoEl = async (videoEl:HTMLVideoElement, constraints:Constraint
   if (videoEl === undefined) throw new Error(`videoEl undefined`);
   if (videoEl === null) throw new Error(`videoEl null`);
 
-  const facingMode = constraints.facingMode ?? `user`;
   const maxRes = constraints.max;
   const minRes = constraints.min;
+  const idealRes = constraints.ideal;
 
   // Setup constraints
   const c = {
     audio: false,
     video: {
-      facingMode,
       width: {},
       height: {}
     }
   };
 
+  // Just in case some intuitive values are passed in...
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((constraints as any).facingMode === `front`) constraints = {...constraints, facingMode: `user`};
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((constraints as any).facingMode === `back`) constraints = {...constraints, facingMode: `environment`};
+
+
+  if (constraints.facingMode) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (c.video as any).facingMode = constraints.facingMode;
+  }
+
+  if (constraints.deviceId) {
+    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+    (c.video as any).deviceId = constraints.deviceId;
+  }
+
+  if (idealRes) {
+    //eslint-disable-next-line functional/immutable-data
+    c.video.width = {
+      ...c.video.width,
+      ideal: idealRes.width
+    };
+    //eslint-disable-next-line functional/immutable-data
+    c.video.height = {
+      ...c.video.height,
+      ideal: idealRes.height
+    };
+  } 
+
   if (maxRes) {
     //eslint-disable-next-line functional/immutable-data
     c.video.width = {
+      ...c.video.width,
       max: maxRes.width
     };
     //eslint-disable-next-line functional/immutable-data
     c.video.height = {
+      ...c.video.height,
       max: maxRes.height
     };
   }
+
   if (minRes) {
     //eslint-disable-next-line functional/immutable-data
     c.video.width = {
+      ...c.video.width,
       min: minRes.width
     };
     //eslint-disable-next-line functional/immutable-data
     c.video.height = {
+      ...c.video.height,
       min: minRes.height
     };
   }
 
   // Clean-up function
   const dispose = () => {
-    console.log(`Camera:dispose`);
     videoEl.pause();
     const t = stream.getTracks();
     t.forEach(track => track.stop());
