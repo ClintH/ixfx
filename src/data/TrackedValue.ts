@@ -166,7 +166,7 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
 export class ObjectTracker<V> extends TrackerBase<V> {
   values:Timestamped<V>[];
 
-  constructor(id:string, opts:TrackedValueOpts) {
+  constructor(id:string, opts:TrackedValueOpts = {}) {
     super(id, opts);
     this.values = [];
   }

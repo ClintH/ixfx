@@ -26,7 +26,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
    */
   lastInfo:PointSeenInfo|undefined;
 
-  constructor(readonly id:string, opts:TrackOpts) {
+  constructor(readonly id:string, opts:TrackOpts = {}) {
     super(id, opts);
   }
 
@@ -127,7 +127,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
 
 
 export class TrackedPointMap extends TrackedValueMap<Points.Point> {
-  constructor(opts:TrackOpts) {
+  constructor(opts:TrackOpts = {}) {
     super((key, start) => {
       if (start === undefined) throw new Error(`Requires start point`);
       const p = new PointTracker(key, opts);
@@ -184,7 +184,7 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
  * @param opts 
  * @returns 
  */
-export const pointsTracker = (opts:TrackOpts) => new TrackedPointMap(opts);
+export const pointsTracker = (opts:TrackOpts = {}) => new TrackedPointMap(opts);
 
 /**
  * A tracked point. Create via {@link pointTracker}. Mutable. Useful for monitoring how
