@@ -6,6 +6,7 @@ import {number as guardNumber} from "../Guards.js";
  * 
  * @example Usage
  * ```js
+ * import {percentPingPong} from 'https://unpkg.com/ixfx/dist/modulation.js';
  * for (const v of percentPingPong(0.1)) {
  *  // v will go up and down. Make sure you have a break somewhere because it is infinite
  * }

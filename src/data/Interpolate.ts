@@ -6,6 +6,7 @@ import {wrap} from "./Wrap.js";
  * 
  * @example Get the halfway point between 30 and 60
  * ```js
+ * import {interpolate} from 'https://unpkg.com/ixfx/dist/data.js';
  * interpolate(0.5, 30, 60);
  * ```
  * 
@@ -13,6 +14,9 @@ import {wrap} from "./Wrap.js";
  * would start at 0 and you would keep interpolating up to `1`
  * @example
  * ```js
+ * import {interpolate} from 'https://unpkg.com/ixfx/dist/data.js';
+ * import {percentPingPong} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * 
  * // Go back and forth between 0 and 1 by 0.1
  * let pp = percentPingPong(0.1);
  * continuously(() => {

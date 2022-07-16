@@ -596,6 +596,8 @@ export function interpolate(amount: number, a: Points.Point, pointB: Points.Poin
  * // Get {x, y } at 50% along line
  * interpolate(0.5, line);
  * ```
+ * 
+ * Any additional properties from `b`  are returned on the result as well.
  * @param amount 0..1 
  * @param line Line
  */
@@ -613,7 +615,11 @@ export function interpolate(amount:number, aOrLine:Points.Point|Line, pointB?:Po
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
 
-  return Object.freeze({x: x, y: y});
+  return Object.freeze({
+    ...b,
+    x: x, 
+    y: y
+  });
 }
 
 /**
