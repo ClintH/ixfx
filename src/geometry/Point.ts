@@ -94,6 +94,39 @@ export const findMinimum = (compareFn:(a:Point, b:Point)=>Point, ...points:reado
   return min;
 };
 
+/**
+ * Returns the left-most of the provided points.
+ * 
+ * Same as: 
+ * ```js
+ * findMinimum((a, b) => {
+ *  if (a.x <= b.x) return a;
+ *  return b;
+ *}, ...points)
+ * ```
+ * 
+ * @param points 
+ * @returns 
+ */
+export const leftmost = (...points:readonly Point[]):Point => findMinimum((a, b) => ((a.x <= b.x)  ?  a :  b), ...points);
+
+/**
+ * Returns the right-most of the provided points.
+ * 
+ * Same as: 
+ * ```js
+ * findMinimum((a, b) => {
+ *  if (a.x >= b.x) return a;
+ *  return b;
+ *}, ...points)
+ * ```
+ * 
+ * @param points 
+ * @returns 
+ */
+export const rightmost = (...points:readonly Point[]):Point => findMinimum((a, b) => ((a.x >= b.x) ? a : b), ...points);
+
+
 export function distance(a:Point, b:Point):number;
 export function distance(a:Point, x:number, y:number):number;
 export function distance(a:Point):number;
@@ -197,17 +230,23 @@ export const guardNonZeroPoint = (pt: Point, name = `pt`) => {
 
 /**
  * Returns the angle in radians between `a` and `b`.
+ * 
  * Eg if `a` is the origin, and `b` is another point,
  * in degrees one would get 0 to -180 when `b` was above `a`.
  *  -180 would be `b` in line with `a`.
  * Same for under `a`.
+ * 
+ * Providing a third point `c` gives the interior angle, where `b` is the middle point.
  * @param a 
  * @param b 
+ * @param c
  * @returns 
  */
-export const angle = (a: Point, b?: Point) => {
+export const angle = (a: Point, b?: Point, c?:Point) => {
   if (b === undefined) {
     return Math.atan2(a.y, a.x);
+  } else if (c !== undefined) {
+    return Math.atan2(b.y - a.y, b.x - a.x) - Math.atan2(c.y - a.y, c.x - a.x);
   }
   return Math.atan2(b.y - a.y, b.x - a.x);
 };

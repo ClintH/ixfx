@@ -14,6 +14,8 @@ export type FrameProcessorOpts = {
    * captured image.
    */
    readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
+
+   readonly cameraConstraints?:Camera.Constraints;
 }
 
 export class FrameProcessor {
@@ -36,6 +38,7 @@ export class FrameProcessor {
     this._timer = performance.now();
     this._showCanvas = opts.showCanvas ?? false;
     this._showPreview = opts.showPreview ?? false;
+    this._cameraConstraints = opts.cameraConstraints ?? undefined;
     this._postCaptureDraw = opts.postCaptureDraw;
   }
 
@@ -81,7 +84,7 @@ export class FrameProcessor {
 
     this._source  = `camera`;
     if (this._teardownNeeded) this.teardown();
-    this._cameraConstraints = constraints;
+    if (constraints) this._cameraConstraints;
     await this.init();
   }
 
