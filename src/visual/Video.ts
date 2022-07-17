@@ -296,10 +296,13 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
     if (c === null) c = canvasEl.getContext(`2d`);
     if (c === null) throw new Error(`Could not create graphics context`);
     c.drawImage(sourceVideoEl, 0, 0, w, h);
+    
     //eslint-disable-next-line functional/no-let
-    const pixels=  c.getImageData(
+    const pixels =  c.getImageData(
       0, 0, w, h
     );
+
+    (pixels as any).currentTime = sourceVideoEl.currentTime;
 
     if (opts.postCaptureDraw) opts.postCaptureDraw(c, w, h);
     return pixels;
