@@ -95,7 +95,7 @@ export type StartResult = {
  * @param constraints 
  * @returns Returns `{ videoEl, dispose }`, where `videoEl` is the created VIDEO element, and `dispose` is a function for removing the element and stopping the video.
  */
-export const start = async (constraints:Constraints = {}): Promise<StartResult|undefined> => {
+export const start = async (constraints:Constraints = {}): Promise<StartResult> => {
   const videoEl = document.createElement(`VIDEO`) as HTMLVideoElement;
   //eslint-disable-next-line functional/immutable-data
   videoEl.style.display = `none`;

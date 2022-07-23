@@ -21,7 +21,6 @@ export type MarkerOpts = StrokeOpts & DrawingOpts & {
  * Drawing options
  */
 export type DrawingOpts = {
-
   /**
    * Style for fill. Eg `black`.
    * @see [fill](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill)
@@ -31,7 +30,6 @@ export type DrawingOpts = {
    * If true, debug helpers are drawn
    */
   readonly debug?:boolean
-
 };
 
 export type StrokeOpts = {
@@ -180,7 +178,7 @@ export const applyPathOpts = (elem:SVGElement, opts:PathDrawingOpts) => {
 
 /**
  * Applies drawing options to given SVG element.
- * Applies: fillStyle, strokeStyle, strokeWidth, strokeDash
+ * Applies: fillStyle
  * @param elem Element
  * @param opts Drawing options
  */
@@ -188,6 +186,12 @@ export const applyOpts = (elem:SVGElement, opts:DrawingOpts) => {
   if (opts.fillStyle) elem.setAttributeNS(null, `fill`, opts.fillStyle);
 };
 
+/**
+ * Applies drawing options to given SVG element.
+ * Applies: strokeStyle, strokeWidth, strokeDash, strokeLineCap
+ * @param elem Element
+ * @param opts 
+ */
 export const applyStrokeOpts = (elem:SVGElement, opts:StrokeOpts) => {
   if (opts.strokeStyle) elem.setAttributeNS(null, `stroke`, opts.strokeStyle);
   if (opts.strokeWidth) elem.setAttributeNS(null, `stroke-width`, opts.strokeWidth.toString());

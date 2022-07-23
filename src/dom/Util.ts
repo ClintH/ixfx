@@ -60,7 +60,8 @@ export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, on
  * @param skipCss if true, style are not added
  * @returns Observable
  */
-export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResized?:(args:CanvasResizeArgs)=>void, skipCss = false) => {
+export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement|undefined|null, onResized?:(args:CanvasResizeArgs)=>void, skipCss = false) => {
+  if (domQueryOrEl === null || domQueryOrEl === undefined) throw new Error(`domQueryOrEl is null or undefined`);
   const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
   if (el.nodeName !== `CANVAS`) throw new Error(`Expected HTML element with node name CANVAS, not ${el.nodeName}`);
 
@@ -106,7 +107,7 @@ export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResized?
  * @param timeoutMs Timeout for debouncing events
  * @returns 
  */
-export const parentSize = <V extends HTMLElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>)=>void, timeoutMs:number = 100) => {
+export const parentSize = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>)=>void, timeoutMs:number = 100) => {
   const el = resolveEl<V>(domQueryOrEl);
   const parent = el.parentElement;
   if (parent === null) throw new Error(`Element has no parent`);
@@ -178,7 +179,7 @@ export const getTranslation = (domQueryOrEl:string|HTMLElement): Points.Point =>
 };
 
 /**
- * Resizes given canvas or SVG element to its parent element. 
+ * Resizes given canvas to its parent element. 
  * To resize canvas to match the viewport, use {@link fullSizeCanvas}.
  * 
  * Provide a callback for when resize happens.
