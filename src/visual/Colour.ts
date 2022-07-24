@@ -156,7 +156,7 @@ export const opacity = (colour:Colourish, amt:number):string => {
  * ```
  * getCssVariable(`accent`, `yellow`);
  * ```
- * @param name Name of variable. Do not starting `--`
+ * @param name Name of variable. Omit the `--`
  * @param fallbackColour Fallback colour if not found
  * @param root  Element to search variable from
  * @returns Colour or fallback.
