@@ -1,3 +1,4 @@
+import {waitFor} from '~/flow/WaitFor.js';
 import * as Rects from '../geometry/Rect.js';
 
 /**
@@ -40,7 +41,15 @@ export type Constraints = {
    * If specified, will try to use this media device id
    */
   readonly deviceId?:string
+
+  /**
+   * Number of milliseconds to wait on `getUserMedia` before giving up.
+   * Defaults to 30seconds
+   */
+  readonly startTimeoutMs?:number
 }
+
+const startTimeoutMs = 10000;
 
 /**
  * Result from starting a camera
@@ -119,7 +128,7 @@ export const start = async (constraints:Constraints = {}): Promise<StartResult> 
   };
 
   try {
-    // Attempt to start video
+    // Attempt to start video 
     const r = await startWithVideoEl(videoEl, constraints);
     stopVideo = r.dispose;
     return  {videoEl, dispose};
@@ -160,7 +169,6 @@ const startWithVideoEl = async (videoEl:HTMLVideoElement, constraints:Constraint
   if ((constraints as any).facingMode === `front`) constraints = {...constraints, facingMode: `user`};
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((constraints as any).facingMode === `back`) constraints = {...constraints, facingMode: `environment`};
-
 
   if (constraints.facingMode) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
@@ -211,29 +219,42 @@ const startWithVideoEl = async (videoEl:HTMLVideoElement, constraints:Constraint
     };
   }
 
-  // Clean-up function
-  const dispose = () => {
-    videoEl.pause();
-    const t = stream.getTracks();
-    t.forEach(track => track.stop());
-  };
-
   // Request stream
-  const stream = await navigator.mediaDevices.getUserMedia(c);
+  const done = waitFor(constraints.startTimeoutMs ?? startTimeoutMs, 
+    (reason) => {
+      throw new Error(`Camera getUserMedia failed: ${reason}`);
+    });
 
-  // Assign to VIDEO element
-  //eslint-disable-next-line functional/immutable-data
-  videoEl.srcObject = stream;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(c);
 
-  const ret = {videoEl, dispose};
-  const p = new Promise<StartResult>((resolve, reject) => {
-    videoEl.addEventListener(`loadedmetadata`,  () => {
-      videoEl.play().then(() => {
-        resolve(ret);
-      }).catch((ex) => {
-        reject(ex);
+    // Clean-up function
+    const dispose = () => {
+      videoEl.pause();
+      const t = stream.getTracks();
+      t.forEach(track => track.stop());
+    };
+
+    // Assign to VIDEO element
+    //eslint-disable-next-line functional/immutable-data
+    videoEl.srcObject = stream;
+    done();
+
+    const ret = {videoEl, dispose};
+    const p = new Promise<StartResult>((resolve, reject) => {
+      videoEl.addEventListener(`loadedmetadata`,  () => {
+        videoEl.play().then(() => {
+          resolve(ret);
+        }).catch((ex) => {
+          reject(ex);
+        });
       });
     });
-  });
-  return p;
+    return p;
+  } catch (ex) {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    done((ex as any).toString());
+    throw ex;
+  }
+
 };
