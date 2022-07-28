@@ -46,6 +46,13 @@ export const isEqualSize = (a:Rect, b:Rect):boolean => {
 
 /**
  * Returns a rectangle from width, height
+ * ```js
+ * const r = Rects.fromNumbers(100, 200);
+ * // {width: 100, height: 200}
+ * ```
+ * 
+ * Use {@link toArray} for the opposite conversion.
+ * 
  * @param width 
  * @param height 
  */
@@ -53,6 +60,18 @@ export function fromNumbers(width:number, height:number):Rect;
 
 /**
  * Returns a rectangle from x,y,width,height
+ * ```js
+ * const r = Rects.fromNumbers(10, 20, 100, 200);
+ * // {x: 10, y: 20, width: 100, height: 200}
+ * ```
+ * 
+ * Use the spread operator (...) if the source is an array:
+ * ```js
+ * const r3 = Rects.fromNumbers(...[10, 20, 100, 200]);
+ * ```
+ * 
+ * Use {@link toArray} for the opposite conversion.
+ * 
  * @param x 
  * @param y 
  * @param width 
@@ -60,6 +79,30 @@ export function fromNumbers(width:number, height:number):Rect;
  */
 export function fromNumbers(x:number, y:number, width:number, height:number):RectPositioned;
 
+/**
+ * Returns a rectangle from a series of numbers: x, y, width, height OR width, height
+ * ```js
+ * const r1 = Rects.fromNumbers(100, 200);
+ * // {width: 100, height: 200}
+ * 
+ * const r2 = Rects.fromNumbers(10, 20, 100, 200);
+ * // {x: 10, y: 20, width: 100, height: 200}
+ * ```
+ * Use the spread operator (...) if the source is an array:
+ * 
+ * ```js
+ * const r3 = Rects.fromNumbers(...[10, 20, 100, 200]);
+ * ```
+ * 
+ * Use {@link toArray} for the opposite conversion.
+ * 
+ * @see toArray
+ * @param xOrWidth 
+ * @param yOrHeight 
+ * @param width 
+ * @param height 
+ * @returns 
+ */
 //eslint-disable-next-line func-style
 export function fromNumbers(xOrWidth:number, yOrHeight:number, width?: number, height?:number):Rect|RectPositioned {
 
@@ -74,6 +117,59 @@ export function fromNumbers(xOrWidth:number, yOrHeight:number, width?: number, h
   if (typeof height !== `number`) throw new Error(`height is not an number`);
 
   return Object.freeze({x:xOrWidth, y:yOrHeight, width, height});
+}
+
+type RectArray = readonly [width:number, height:number];
+type RectPositionedArray = readonly [x:number, y:number, width:number, height:number];
+
+
+/**
+ * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
+ * 
+ * ```js
+ * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
+ * // [10, 20, 100, 200]
+ * const r2 = Rects.toArray({ width: 100, height: 200 });
+ * // [100, 200]
+ * ```
+ * @param rect 
+ * @see fromNumbers
+ */
+export function toArray (rect:Rect): RectArray;
+
+/**
+ * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
+ * 
+ * ```js
+ * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
+ * // [10, 20, 100, 200]
+ * const r2 = Rects.toArray({ width: 100, height: 200 });
+ * // [100, 200]
+ * ```
+ * @param rect 
+ * @see fromNumbers
+ */
+export function toArray(rect:RectPositioned): RectPositionedArray;
+
+/**
+ * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
+ * 
+ * ```js
+ * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
+ * // [10, 20, 100, 200]
+ * const r2 = Rects.toArray({ width: 100, height: 200 });
+ * // [100, 200]
+ * ```
+ * @param rect 
+ * @see fromNumbers
+ */
+// eslint-disable-next-line func-style
+export function toArray(rect:Rect|RectPositioned):RectArray|RectPositionedArray {
+  if (isPositioned(rect)) {
+    return [rect.x, rect.y, rect.width, rect.height];
+  } else if (isRect(rect)) {
+    return [rect.width, rect.height];
+  } else throw new Error(`rect param is not a rectangle. Got: ${JSON.stringify(rect)}`);
 }
 
 export const isEqual = (a:Rect|RectPositioned, b:Rect|RectPositioned):boolean => {
