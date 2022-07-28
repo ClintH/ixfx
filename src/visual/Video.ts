@@ -302,6 +302,7 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
       0, 0, w, h
     );
 
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     (pixels as any).currentTime = sourceVideoEl.currentTime;
 
     if (opts.postCaptureDraw) opts.postCaptureDraw(c, w, h);

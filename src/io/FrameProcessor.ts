@@ -82,9 +82,10 @@ export class FrameProcessor {
   async useCamera(constraints?:Camera.Constraints) {
     if (this._state === `disposed`) throw new Error(`Disposed`);
 
-    this._source  = `camera`;
+    this._source = `camera`;
     if (this._teardownNeeded) this.teardown();
     if (constraints) this._cameraConstraints;
+  
     await this.init();
   }
 
