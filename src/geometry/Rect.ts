@@ -119,9 +119,15 @@ export function fromNumbers(xOrWidth:number, yOrHeight:number, width?: number, h
   return Object.freeze({x:xOrWidth, y:yOrHeight, width, height});
 }
 
-type RectArray = readonly [width:number, height:number];
-type RectPositionedArray = readonly [x:number, y:number, width:number, height:number];
+/**
+ * Rectangle as array
+ */
+export type RectArray = readonly [width:number, height:number];
 
+/**
+ * Positioned rectangle as array
+ */
+export type RectPositionedArray = readonly [x:number, y:number, width:number, height:number];
 
 /**
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
