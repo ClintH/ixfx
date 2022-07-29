@@ -135,6 +135,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
   releaseDuration:number;
   decayDurationTotal:number;
   shouldLoop:boolean;
+
   constructor(opts:AdsrTimingOpts) {
     super();
     
@@ -434,7 +435,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
     if (!this.retrigger) {      
       const [_stage, scaled, _raw] = this.compute();
       if (!Number.isNaN(scaled) && scaled > 0) {
-        console.log(`Retrigger. Last value was: ${scaled}`);
+        //console.log(`Retrigger. Last value was: ${scaled}`);
         this.initialLevelOverride = scaled;
       }
     }
@@ -453,7 +454,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
     case `attack`:
       v = this.attackPath.interpolate(amt).y;
       if (this.initialLevelOverride !== undefined) {
-        v = scale(v, 0, this.initialLevel, this.initialLevelOverride, this.initialLevel);
+        v = scale(v, 0, 1, this.initialLevelOverride, 1);
       }
       this.releasedAt = v;
       break;
