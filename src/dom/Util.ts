@@ -1,6 +1,6 @@
 import { Observable,  debounceTime, fromEvent } from 'rxjs';
 import * as Points from '../geometry/Point';
-
+import JSON5 from 'json5';
 
 export type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
   readonly el:V
@@ -499,23 +499,15 @@ export const resizeObservable = (elem: Element, timeoutMs: number = 1000): Obser
  */
 export const copyToClipboard = (obj: object) => {
   const p = new Promise((resolve, reject) => {
-    const json = JSON.stringify(obj, null, 2);
-    //eslint-disable-next-line functional/no-let
-    let cleaned = json;
-    try {
-      cleaned = json.replace(/^[\t ]*"[^:\n\r]+(?<!\\)":/gm, (match) => match.replace(/"/g, ``));
-    } catch (ex) {
-      // TODO: when possible, need to find fix for Safari
-      // Via LL: https://stackoverflow.com/questions/51568821/works-in-chrome-but-breaks-in-safari-invalid-regular-expression-invalid-group
-      console.log(ex);
-    }
-    navigator.clipboard.writeText(JSON.stringify(cleaned)).then(
+    //const json = JSON.stringify(obj, null, 2);
+    const str = JSON5.stringify(obj);
+    navigator.clipboard.writeText(JSON.stringify(str)).then(
       () => {
         resolve(true);
       },
       (_err) => {
         console.warn(`Could not copy to clipboard`);
-        console.log(cleaned);
+        console.log(str);
         reject(_err);
       }
     );
@@ -554,6 +546,6 @@ export const reconcileChildren = <V>(parentEl:HTMLElement, list:ReadonlyMap<stri
       prune.push(c);
     }
   }
-
+  
   prune.forEach(p => p.remove());
 };

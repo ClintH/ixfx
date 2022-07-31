@@ -96,6 +96,7 @@
     "@types/web-bluetooth": "^0.0.14",
     "bezier-js": "^6.1.0",
     "d3-color": "^3.1.0",
+    "json5": "^2.2.1",
     "lit": "^2.2.7",
     "rxjs": "^7.5.6"
   },

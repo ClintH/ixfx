@@ -26,7 +26,7 @@ export default defineConfig({
     visual: `./src/visual/index.ts`,
   },
   dts: true,
-  noExternal: [`bezier-js`, `d3-color`, `d3-interpolate`, `rxjs`],
+  noExternal: [`bezier-js`, `d3-color`, `d3-interpolate`, `rxjs`, `json5`],
   platform: `browser`,
   target: `es2020`,
   format: [
