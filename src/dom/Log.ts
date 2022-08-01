@@ -100,8 +100,7 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
   }
   .msg {
     flex: 1;
-    word-break: break-all;
-
+    word-break: break-word;
   }
   ${css}
   `);
