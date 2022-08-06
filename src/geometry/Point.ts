@@ -4,7 +4,7 @@ import { number as guardNumber} from '../Guards.js';
 import {clamp as clampNumber, wrap as wrapNumber} from '../data/index.js';
 import {Arrays} from "../collections/index.js";
 import { RandomSource, defaultRandom } from "../Random.js";
-import {isRect} from "./Rect.js";
+
 /**
  * A point, consisting of x, y and maybe z fields.
  */
@@ -43,27 +43,45 @@ export const dotProduct = (...pts:readonly Point[]):number => {
 };
 
 /**
- * An empty point of `{x:0, y:0}`
+ * An empty point of `{ x:0, y:0 }`.
+ * 
+ * Use `isEmpty` to check if a point is empty.
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Empty = Object.freeze({ x:0, y: 0});
+
+/**
+ * Placeholder point, where x and y is `NaN`.
+ * Use `isPlaceholder` to check if a point is a placeholder.
+ */
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Placeholder = Object.freeze({x:NaN, y:NaN});
 
+/**
+ * Returns true if both x and y is 0.
+ * Use `Points.Empty` to return an empty point.
+ * @param p 
+ * @returns 
+ */
 export const isEmpty = (p:Point) => p.x === 0 && p.y === 0;
 
+/**
+ * Returns true if point is a placeholder, where both x and y
+ * are `NaN`.
+ * 
+ * Use Points.Placeholder to return a placeholder point.
+ * @param p 
+ * @returns 
+ */
 export const isPlaceholder = (p:Point) => Number.isNaN(p.x) && Number.isNaN(p.y);
 
+/**
+ * Returns true if p.x and p.y === null
+ * @param p 
+ * @returns 
+ */
+export const isNull = (p:Point) => p.x === null && p.y === null;
 
-export const center = (shape?:Rects.Rect):Point => {
-  if (shape === undefined) {
-    return Object.freeze({x:0.5, y:0.5});
-  } else if (Rects.isRect(shape)) {
-    return Rects.center(shape as Rects.Rect);
-  } else {
-    throw new Error(`Unknown shape: ${JSON.stringify(shape)}`);
-  }
-};
 
 /**
  * Returns the 'minimum' point from an array of points, using a comparison function.
@@ -211,6 +229,9 @@ export const guard = (p: Point, name = `Point`) => {
   if (typeof p.x !== `number`) throw new Error(`'${name}.x' must be a number. Got ${p.x}`);
   if (typeof p.y !== `number`) throw new Error(`'${name}.y' must be a number. Got ${p.y}`);
  
+  if (p.x === null) throw new Error(`'${name}.x' is null`);
+  if (p.y === null) throw new Error(`'${name}.y' is null`);
+  
   if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
   if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
 };
@@ -424,9 +445,10 @@ export const withinRange = (a:Point, b:Point, maxRange:Point|number):boolean => 
  * @param amount Relative amount, 0-1
  * @param a 
  * @param b 
+ * @param allowOverflow If true, length of line can be exceeded for `amount` of below 0 and above `1`.
  * @returns {@link Point}
  */
-export const interpolate =(amount:number, a:Point, b:Point):Point => lineInterpolate(amount, a, b); //({x: (1-amt) * a.x + amt * b.x, y:(1-amt) * a.y + amt * b.y });
+export const interpolate = (amount:number, a:Point, b:Point, allowOverflow = false):Point => lineInterpolate(amount, a, b, allowOverflow); //({x: (1-amt) * a.x + amt * b.x, y:(1-amt) * a.y + amt * b.y });
 
 /**
  * Returns a point from two coordinates or an array of [x,y]
@@ -877,7 +899,7 @@ export function divide(a: Point|number, b: Rects.Rect|Point | number, c?: number
         x: a.x / b.x,
         y: a.y / b.y
       });
-    } else if (isRect(b)) {
+    } else if (Rects.isRect(b)) {
       Rects.guard(b, `rect`);
       return Object.freeze({
         x: a.x / b.width,
