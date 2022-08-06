@@ -503,7 +503,54 @@ export const normaliseByRect = (rect:Rect|RectPositioned, normaliseByOrWidth:Rec
  * 
  * Multiplication applies to the first parameter's x/y fields, if present.
  */
-export const multiply = (a:RectPositioned|Rect, b:Rect|number, c?:number):RectPositioned|Rect => {
+export function multiply(a:RectPositioned, b:Rect|number, c?:number):RectPositioned;
+
+/**
+ * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
+ * 
+ * ```js
+ * // Normalised rectangle of width 50%, height 50%
+ * const r = {width: 0.5, height: 0.5};
+ * 
+ * // Map to window:
+ * const rr = multiply(r, window.innerWidth, window.innerHeight);
+ * ```
+ * 
+ * ```js
+ * // Returns {width: someRect.width * someOtherRect.width ...}
+ * multiply(someRect, someOtherRect);
+ * 
+ * // Returns {width: someRect.width * 100, height: someRect.height * 200}
+ * multiply(someRect, 100, 200);
+ * ```
+ * 
+ * Multiplication applies to the first parameter's x/y fields, if present.
+ */
+export function multiply(a:Rect, b:Rect|number, c?:number):Rect;
+
+/**
+ * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
+ * 
+ * ```js
+ * // Normalised rectangle of width 50%, height 50%
+ * const r = {width: 0.5, height: 0.5};
+ * 
+ * // Map to window:
+ * const rr = multiply(r, window.innerWidth, window.innerHeight);
+ * ```
+ * 
+ * ```js
+ * // Returns {width: someRect.width * someOtherRect.width ...}
+ * multiply(someRect, someOtherRect);
+ * 
+ * // Returns {width: someRect.width * 100, height: someRect.height * 200}
+ * multiply(someRect, 100, 200);
+ * ```
+ * 
+ * Multiplication applies to the first parameter's x/y fields, if present.
+ */
+//eslint-disable-next-line func-style
+export function multiply(a:RectPositioned|Rect, b:Rect|number, c?:number):RectPositioned|Rect {
   guard(a, `a`);
   if (isRect(b)) {
     if (isRectPositioned(a)) {
@@ -541,7 +588,7 @@ export const multiply = (a:RectPositioned|Rect, b:Rect|number, c?:number):RectPo
       };
     }
   }
-};
+}
 
 /**
  * Returns the center of a rectangle as a {@link Geometry.Points.Point}.
