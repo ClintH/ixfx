@@ -17,6 +17,10 @@
       "esnext",
       "dom"
     ],
+    "types": [
+      "@types/web-bluetooth",
+      "@types/w3c-web-serial"
+    ],
     "target": "esnext",
     "module": "ES2022",
     "esModuleInterop": true,
@@ -25,6 +29,7 @@
     "alwaysStrict": true,
     "strict": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "removeComments": false,

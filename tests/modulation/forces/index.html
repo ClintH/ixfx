@@ -13,6 +13,11 @@
       box-sizing: border-box;
     }
 
+    body {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
     canvas {
       border: 4px solid whitesmoke;
     }
@@ -27,7 +32,12 @@
   <canvas width="500" height="200" id="attractRepulse"></canvas>
 
   <h2>pendulum & spring</h2>
-  <canvas width="500" height="200" id="pendulum"></canvas>
+  <canvas width="300" height="300" id="pendulum"></canvas>
+
+  <h2>particles</h2>
+  <canvas width="500" height="200" id="particles"></canvas>
+  <p></p>
+  <p></p>
 
   <script type="module" src="script.js"></script>
 </body>

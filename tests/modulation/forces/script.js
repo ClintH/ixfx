@@ -1,7 +1,8 @@
 import {Forces} from '../../../dist/modulation.js';
-import {Drawing} from '../../../dist/visual.js';
-import {continuously, repeat} from '../../../dist/flow.js';
+import {Drawing, Colour} from '../../../dist/visual.js';
+import {continuously, repeat, throttle} from '../../../dist/flow.js';
 import {Triangles, Lines, Points, Rects, Shapes} from '../../../dist/geometry.js';
+import { Oscillators } from '../../../dist/modulation.js';
 
 const circle = (a, ctx, bounds, radius = 10, fillStyle = `black`) => {
   if (a === undefined) throw new Error(`a is undefined`);
@@ -87,7 +88,6 @@ const attractionTest = () => {
       ...attractor,
       position: Points.divide({x: ev.offsetX, y: ev.offsetY}, bounds),
     };
-    console.log(attractor);
   });
 };
 
@@ -165,15 +165,15 @@ const pendulumTest = () => {
   /** @type {CanvasRenderingContext2D} */
   const ctx = el.getContext(`2d`);
 
-  const bounds = {width: 500, height: 200};
+  const bounds = {width: 300, height: 300};
   const thing = {
     position: {x: 1, y: 0.5},
     mass: 0.1
   };
   const pinnedAt = {x: 0.5, y: 0.5};
 
-  const pendulumForce = Forces.pendulumForce(pinnedAt, 0.4);
-  const springForce = Forces.springForce(pinnedAt, 0.4);
+  const pendulumForce = Forces.pendulumForce(pinnedAt);
+  const springForce = Forces.springForce(pinnedAt, 0.2);
 
   let pause = false;
   let t = thing;
@@ -183,8 +183,9 @@ const pendulumTest = () => {
 
     if (!pause) {
       t = Forces.apply(t,
-        //pendulumForce,
-        springForce
+        springForce,
+        pendulumForce,
+        
       );
     }
 
@@ -203,10 +204,7 @@ const pendulumTest = () => {
     ctx.beginPath();
     ctx.ellipse(pt2.x, pt2.y, 5, 5, 0, 0, Math.PI * 2);
     ctx.fill();
-
-
-
-  }, 10).start();
+  }, 2).start();
 
   el.addEventListener(`pointermove`, (ev) => {
     if (ev.buttons === 0) return;
@@ -230,6 +228,85 @@ const pendulumTest = () => {
   });
 };
 
+const particleTest = () => {
+  const agingRate = 0.98;
+  const aliveThreshold = 0.001;
+  const maxParticles = 100;
+  const hue = 200;
+  const radiusMax = 30;
+  const el = document.getElementById(`particles`);
+  /** @type {CanvasRenderingContext2D} */
+  const ctx = el.getContext(`2d`);
+
+  const bounds = {width: 500, height: 200};
+  let pointer = { x:0.5, y: 0.5 };
+
+  const create = () => {
+    return {
+      life: 1,
+      acceleration: Points.multiply(Points.random(), -0.001, -0.01),
+      position: pointer,
+      mass: Math.random()
+    };
+  };
+
+  const spawn = throttle(() => {
+    if (particles.length < maxParticles) {
+      particles.push(create());
+    }
+  }, 30);
+
+  let particles = [create()];
+  const windForce = Forces.accelerationForce({x: 0.00001, y: 0}, `dampen`);
+  const gravityForce = Forces.accelerationForce({x: 0, y: 0.0001}, `multiply`);
+  const frictionForce = Forces.velocityForce(0.01, `multiply`);
+
+  continuously(() => {
+    ctx.fillStyle = `hsl(${hue}, 20%, 80%)`;
+    ctx.fillRect(0, 0, bounds.width, bounds.height);
+
+    // Apply simulation to all particles
+    particles = particles.map(p => {
+      const withForces = Forces.apply(p,
+        windForce,
+        gravityForce,
+        frictionForce
+      );
+      return {
+        ...withForces,
+        life: p.life * agingRate
+      }
+    });
+
+    // Delete particles that are too old
+    particles = particles.filter(p => p.life >= aliveThreshold);
+  
+    // Draw particles
+    particles.forEach(p => {
+      const pt = Points.multiply(p.position, bounds);
+      
+      ctx.save();
+      ctx.translate(pt.x, pt.y);
+      ctx.beginPath();
+
+      ctx.ellipse(0, 0, radiusMax*p.mass, radiusMax*p.mass, 0, 0, Math.PI * 2);
+      ctx.fillStyle = Colour.opacity(Colour.interpolate(p.life, `Red`, `Yellow`), p.life);
+      ctx.fill();
+      ctx.restore();
+    });
+
+  }, 2).start();
+
+  el.addEventListener(`pointermove`, (ev) => {
+    if (ev.buttons === 0) return;
+    ev.preventDefault();
+    pointer = Points.divide({x: ev.offsetX, y: ev.offsetY}, bounds);
+    spawn();
+  });
+};
+
 pendulumTest();
 basicTest();
 attractionTest();
+
+particleTest();
