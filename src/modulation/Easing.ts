@@ -163,6 +163,7 @@ export const fromCubicBezier = (b:number, d:number):EasingFn => (t:number) => {
   return (3*b*s2*t) + (3*d*s*t2) + (t3);
 };
 
+
 /**
  * Returns a mix of two easing functions.
  * 
