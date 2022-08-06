@@ -1,6 +1,26 @@
 import {toCartesian} from "./Polar.js";
 import {integer as guardInteger} from "../Guards.js";
-import {Triangles, Points, Rects} from "./index.js";
+import {Triangles, Points, Rects, Circles} from "./index.js";
+
+/**
+ * Returns the center of a shape
+ * Shape can be: rectangle, triangle, circle
+ * @param shape 
+ * @returns 
+ */
+export const center = (shape?:Rects.Rect|Triangles.Triangle|Circles.Circle):Points.Point => {
+  if (shape === undefined) {
+    return Object.freeze({x:0.5, y:0.5});
+  } else if (Rects.isRect(shape)) {
+    return Rects.center(shape as Rects.Rect);
+  } else if (Triangles.isTriangle(shape)) {
+    return Triangles.centroid(shape);
+  } else if (Circles.isCircle(shape)) {
+    return Circles.center(shape);
+  } else {
+    throw new Error(`Unknown shape: ${JSON.stringify(shape)}`);
+  }
+};
 
 /**
  * Generates a starburst shape, returning an array of points. By default, initial point is top and horizontally-centred.
