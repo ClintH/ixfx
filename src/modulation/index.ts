@@ -3,6 +3,7 @@ import {clamp} from '../data/Clamp.js';
 import {number as guardNumber} from '../Guards.js';
 import * as Easings from './Easing.js';
 
+export * from './PingPong.js';
 /**
  * Easings module
  * 
@@ -50,7 +51,6 @@ export * from './Envelope.js';
  */
 import * as Forces from './Forces.js';
 export {Forces};
-
 
 import * as Oscillators from './Oscillator.js';
 
