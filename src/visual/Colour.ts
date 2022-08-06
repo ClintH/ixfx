@@ -85,8 +85,6 @@ export const goldenAngleColour = (index: number, saturation = 0.5, lightness = 0
  * // Generate hue and assign as part of a HSL string
  * el.style.backgroundColor = `hsl(${randomHue(), 50%, 75%})`;
  * ```
- * 
- * 
  * @param rand 
  * @returns 
  */
@@ -97,6 +95,7 @@ export const randomHue = (rand:RandomSource = defaultRandom): number => {
 
 /**
  * Parses colour to `{ r, g, b }`. `opacity` field is added if it exists on source.
+ * [Named colours](https://html-color-codes.info/color-names/)
  * @param colour 
  * @returns 
  */
@@ -140,6 +139,8 @@ export const toHex = (colour:Colourish):string => {
  * opacity(`hsla(200,100%,50%,50%`, 0.5);
  * // eg: `hsla(200,100%,50%,25%)` 
  * ```
+ * 
+ * [Named colours](https://html-color-codes.info/color-names/)
  * @param colour A valid CSS colour
  * @param amt Amount to multiply opacity by
  * @returns String representation of colour
@@ -169,7 +170,7 @@ export const opacity = (colour:Colourish, amt:number):string => {
 };
 
 /**
- * Interpolates between two colours, returning a string
+ * Interpolates between two colours, returning a string in the form `rgb(r,g,b)`
  * 
  * @example
  * ```js
@@ -179,11 +180,13 @@ export const opacity = (colour:Colourish, amt:number):string => {
  * // Get midway point, with specified colour space
  * interpolate(0.5, `hsl(200, 100%, 50%)`, `pink`, {space: `hcl`});
  * ```
+ * 
+ * [Named colours](https://html-color-codes.info/color-names/)
  * @param amount Amount (0 = from, 0.5 halfway, 1= to)
  * @param from Starting colour
  * @param to Final colour
  * @param optsOrSpace Options for interpolation, or string name for colour space, eg `hsl`.
- * @returns String representation of colour, eg. `rgb(x,x,x)`
+ * @returns String representation of colour, eg. `rgb(r,g,b)`
  */
 export const interpolate = (amount:number, from:Colourish, to:Colourish, optsOrSpace?:string|InterpolationOpts):string => {
   guardNumber(amount, `percentage`, `amount`);
