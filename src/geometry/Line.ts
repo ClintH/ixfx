@@ -1,5 +1,5 @@
 import {guard as guardPoint, Point} from './Point.js';
-import {percent as guardPercent} from '../Guards.js';
+import {percent as guardPercent, number as guardNumber} from '../Guards.js';
 import {Path} from './Path.js';
 import { Rects, Points} from './index.js';
 import {minFast} from '../collections/NumericArrays.js';
@@ -20,6 +20,10 @@ export type PolyLine = ReadonlyArray<Line>;
 
 /**
  * Returns true if `p` is a valid line, containing `a` and `b` Points.
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.isLine(l);
+ * ```
  * @param p Value to check
  * @returns True if a valid line.
  */
@@ -47,18 +51,29 @@ export const isPolyLine = (p: any): p is PolyLine => {
 };
 
 /**
- * Returns true if the lines have the same value
- *
+ * Returns true if the lines have the same value. Note that only
+ * the line start and end points are compared. So the lines might
+ * be different in other properties, and `equals` will still return
+ * true.
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const a = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
+ * const b = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
+ * a === b; // false, because they are different objects
+ * Lines.equals(a, b); // true, because they have the same value
+ * ```
  * @param {Line} a
  * @param {Line} b
  * @returns {boolean}
  */
-export const equals = (a:Line, b:Line):boolean =>  a.a === b.a && a.b === b.b;
+export const equals = (a:Line, b:Line):boolean => Points.isEqual(a.a, b.a) && Points.isEqual(a.b, b.b);
 
 /**
  * Applies `fn` to both start and end points.
  * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Line 10,10 -> 20,20
  * const line = Lines.fromNumbers(10,10, 20,20);
  * 
@@ -102,8 +117,9 @@ export const guard = (line:Line, paramName:string = `line`) => {
 /**
  * Returns the angle in radians of a line, or two points
  * ```js
- * angleRadian(line);
- * angleRadian(ptA, ptB);
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.angleRadian(line);
+ * Lines.angleRadian(ptA, ptB);
  * ```
  * @param lineOrPoint 
  * @param b 
@@ -126,9 +142,11 @@ export const angleRadian = (lineOrPoint:Line|Points.Point, b?:Points.Point):numb
  * Multiplies start and end of line by point.x, point.y.
  * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Line 1,1 -> 10,10
- * const l = fromNumbers(1, 1, 10, 10);
- * const ll = multiply(l, {x:2, y:3});
+ * const l = Lines.fromNumbers(1, 1, 10, 10);
+ * const ll = Lines.multiply(l, {x:2, y:3});
  * // Yields: 2,20 -> 3,30
  * ```
  * @param line 
@@ -144,9 +162,11 @@ export const multiply = (line:Line, point:Points.Point):Line => (Object.freeze({
 /**
  * Divides both start and end points by given x,y
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Line 1,1 -> 10,10
- * const l = fromNumbers(1,1,10,10);
- * const ll = divide(l, {x:2, y:4});
+ * const l = Lines.fromNumbers(1,1,10,10);
+ * const ll = Lines.divide(l, {x:2, y:4});
  * // Yields: 0.5,0.25 -> 5,2.5
  * ```
  * @param line 
@@ -162,9 +182,10 @@ export const divide = (line:Line, point:Points.Point):Line => Object.freeze({
 /**
  * Adds both start and end points by given x,y
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Line 1,1 -> 10,10
- * const l = fromNumbers(1,1,10,10);
- * const ll = sum(l, {x:2, y:4});
+ * const l = Lines.fromNumbers(1,1,10,10);
+ * const ll = Lines.sum(l, {x:2, y:4});
  * // Yields: 3,5 -> 12,14
  * ```
  * @param line 
@@ -180,9 +201,11 @@ export const sum = (line:Line, point:Points.Point):Line => Object.freeze({
 /**
  * Subtracts both start and end points by given x,y
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Line 1,1 -> 10,10
- * const l = fromNumbers(1,1,10,10);
- * const ll = subtract(l, {x:2, y:4});
+ * const l = Lines.fromNumbers(1,1,10,10);
+ * const ll = Lines.subtract(l, {x:2, y:4});
  * // Yields: -1,-3 -> 8,6
  * ```
  * @param line 
@@ -198,10 +221,13 @@ export const subtract = (line:Line, point:Points.Point):Line => Object.freeze({
 /**
  * Normalises start and end points by given width and height. Useful
  * for converting an absolutely-defined line to a relative one.
+ * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Line 1,1 -> 10,10
- * const l = fromNumbers(1,1,10,10);
- * const ll = normaliseByRect(l, 10, 10);
+ * const l = Lines.fromNumbers(1,1,10,10);
+ * const ll = Lines.normaliseByRect(l, 10, 10);
  * // Yields: 0.1,0.1 -> 1,1
  * ```
  * @param line 
@@ -218,7 +244,9 @@ export const normaliseByRect = (line:Line, width:number, height:number):Line => 
 
 /**
  * Returns true if `point` is within `maxRange` of `line`.
+ * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const line = Lines.fromNumbers(0,20,20,20);
  * Lines.withinRange(line, {x:0,y:21}, 1); // True
  * ```
@@ -235,7 +263,8 @@ export const withinRange = (line:Line, point:Points.Point, maxRange:number):bool
 /**
  * Returns the length between two points
  * ```js
- * length(ptA, ptB);
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.length(ptA, ptB);
  * ```
  * @param a First point
  * @param b Second point
@@ -248,8 +277,9 @@ export function length(a: Points.Point, b: Points.Point): number;
  * it is the sum total that is returned.
  * 
  * ```js
- * length(a: {x:0, y:0}, b: {x: 100, y:100});
- * length(lines);
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.length(a: {x:0, y:0}, b: {x: 100, y:100});
+ * Lines.length(lines);
  * ```
  * @param line Line
  */
@@ -257,6 +287,7 @@ export function length(line: Line|PolyLine): number;
 
 /**
  * Returns length of line, polyline or between two points
+ * 
  * @param aOrLine Point A, line or polyline (array of lines)
  * @param pointB Point B, if first parameter is a point
  * @returns Length (total accumulated length for arrays)
@@ -279,6 +310,17 @@ export function length(aOrLine: Points.Point|Line|PolyLine, pointB?: Points.Poin
   }
 }
 
+/**
+ * Returns the mid-point of a line (same as `interpolate` with an amount of 0.5)
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.midpoint(line); // Returns {x, y}
+ * ```
+ * @param aOrLine 
+ * @param pointB 
+ * @returns 
+ */
 export const midpoint =(aOrLine: Points.Point|Line, pointB?: Points.Point):Points.Point => {
   const [a, b] = getPointsParam(aOrLine, pointB);
   return interpolate(0.5, a, b);
@@ -313,7 +355,8 @@ export const getPointsParam = (aOrLine: Points.Point|Line, b?: Points.Point): re
  * Returns the nearest point on `line` closest to `point`.
  * 
  * ```js
- * const pt = nearest(line, {x:10,y:10});
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const pt = Linesnearest(line, {x:10,y:10});
  * ```
  * 
  * If an array of lines is provided, it will be the closest point amongst all the lines
@@ -350,8 +393,9 @@ export const nearest = (line:Line|readonly Line[], point:Points.Point): Points.P
  * 
  * @example
  * ```js
- * slope(line);
- * slope(ptA, ptB)
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.slope(line);
+ * Lines.slope(ptA, ptB)
  * ```
  * @param lineOrPoint Line or point. If point is provided, second point must be given too
  * @param b Second point if needed
@@ -391,8 +435,9 @@ const directionVectorNormalised = (line:Line):Points.Point => {
  * Returns a point perpendicular to `line` at a specified `distance`. Use negative
  * distances for the other side of line.
  * ```
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Project a point 100 units away from line, at its midpoint.
- * const pt = perpendicularPoint(line, 100, 0.5);
+ * const pt = Lines.perpendicularPoint(line, 100, 0.5);
  * ```
  * @param line Line
  * @param distance Distance from line. Use negatives to flip side
@@ -409,6 +454,11 @@ export const perpendicularPoint = (line:Line, distance:number, amount:number = 0
 
 /**
  * Returns a parallel line to `line` at `distance`.
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const l = Lines.parallel(line, 10);
+ * ```
  * @param line
  * @param distance 
  */
@@ -433,10 +483,11 @@ export const parallel = (line:Line, distance:number):Line => {
  * 
  * @example Shorten by 50%, anchored at the midpoint
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const l = {
  *  a: {x:50, y:50}, b: {x: 100, y: 90}
  * }
- * const l2 = scaleFromMidpoint(l, 0.5);
+ * const l2 = Lines.scaleFromMidpoint(l, 0.5);
  * ```
  * @param line
  * @param factor 
@@ -448,23 +499,24 @@ export const scaleFromMidpoint = (line:Line, factor:number):Line => {
 };
 
 /**
- * Extends a line to intersection the x-axis at a specified location
+ * Calculates `y` where `line` intersects `x`.
  * @param line Line to extend
- * @param xIntersection Intersection of x-axis.
+ * @param x Intersection of x-axis.
  */
-export const extendX = (line:Line, xIntersection:number):Points.Point => {
-  const y = line.a.y + (xIntersection - line.a.x) * slope(line);
-  return Object.freeze({x: xIntersection, y});
+export const pointAtX = (line:Line, x:number):Points.Point => {
+  const y = line.a.y + (x - line.a.x) * slope(line);
+  return Object.freeze({x: x, y});
 };
 
 /**
  * Returns a line extended from its `a` point by a specified distance
  *
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
- * const extended = extendFromStart(line, 2);
+ * const extended = Lines.extendFromA(line, 2);
  * ```
- * @param ine
+ * @param line
  * @param distance
  * @return Newly extended line
  */
@@ -486,8 +538,9 @@ export const extendFromA = (line:Line, distance:number):Line => {
  * 
  * @example Basic usage
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const l = { a: {x: 0, y: 0}, b: {x: 100, y: 100} };
- * for (const p of pointsOf(l)) {
+ * for (const p of Lines.pointsOf(l)) {
  *  // Do something with point `p`...
  * }
  * ```
@@ -536,7 +589,8 @@ export function* pointsOf(line:Line):Generator<Points.Point>  {
  * nearest point on `line`.
  * 
  * ```js
- * const d = distance(line, {x:10,y:10});
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const d = Lines.distance(line, {x:10,y:10});
  * ```
  * 
  * If an array of lines is provided, the shortest distance is returned.
@@ -555,6 +609,11 @@ export const distance = (line:Line|ReadonlyArray<Line>, point:Points.Point):numb
 
 /**
  * Returns the distance of `point` to the nearest point on `line`
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const distance = Lines.distanceSingleLine(line, pt);
+ * ```
  * @param line Line
  * @param point Target point
  * @returns 
@@ -575,39 +634,65 @@ const distanceSingleLine = (line:Line, point:Points.Point):number => {
 /**
  * Calculates a point in-between `a` and `b`.
  * 
+ * If an interpolation amount below 0 or above 1 is given, _and_
+ * `allowOverflow_ is true, a point will be returned that is extended
+ * past `line`. This is useful for easing functions which might
+ * briefly go past the limits.
+ * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Get {x,y} at 50% along line
- * interpolate(0.5, line);
+ * Lines.interpolate(0.5, line);
  * 
  * // Get {x,y} at 80% between point A and B
- * interpolate(0.8, ptA, ptB);
+ * Lines.interpolate(0.8, ptA, ptB);
  * ```
  * @param amount Relative position, 0 being at a, 0.5 being halfway, 1 being at b
  * @param a Start
  * @param b End
  * @returns Point between a and b
  */
-export function interpolate(amount: number, a: Points.Point, pointB: Points.Point): Points.Point;
+export function interpolate(amount: number, a: Points.Point, pointB: Points.Point, allowOverflow?:boolean): Points.Point;
 
 /**
  * Calculates a point in-between `line`'s start and end points.
  * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Get {x, y } at 50% along line
- * interpolate(0.5, line);
+ * Lines.interpolate(0.5, line);
  * ```
  * 
  * Any additional properties from `b`  are returned on the result as well.
  * @param amount 0..1 
  * @param line Line
+ * @param allowOverflow If true, interpolation amount is permitted to exceed 0..1, extending the line
  */
-export function interpolate(amount: number, line:Line): Points.Point;
+export function interpolate(amount: number, line:Line, allowOverflow?:boolean): Points.Point;
 
+/**
+ * Calculates a point in-between a line's start and end points.
+ * 
+ * @param amount Interpolation amount
+ * @param aOrLine Line, or first point
+ * @param pointBOrAllowOverflow Second point (if needed) or allowOverflow.
+ * @param allowOverflow If true, interpolation amount is permitted to exceed 0..1, extending the line.
+ * @returns 
+ */
 //eslint-disable-next-line func-style
-export function interpolate(amount:number, aOrLine:Points.Point|Line, pointB?:Points.Point): Points.Point {
-  guardPercent(amount, `amount`);
+export function interpolate(amount:number, aOrLine:Points.Point|Line, pointBOrAllowOverflow?:Points.Point|boolean, allowOverflow?:boolean): Points.Point {
+  
+  if (typeof pointBOrAllowOverflow === `boolean`) {
+    allowOverflow = pointBOrAllowOverflow;
+    pointBOrAllowOverflow = undefined;
+  }
+  
+  if (!allowOverflow) guardPercent(amount, `amount`);
+  else guardNumber(amount, ``, `amount`);
 
-  const [a, b] = getPointsParam(aOrLine, pointB);
+  const [a, b] = getPointsParam(aOrLine, pointBOrAllowOverflow);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
@@ -624,6 +709,10 @@ export function interpolate(amount:number, aOrLine:Points.Point|Line, pointB?:Po
 
 /**
  * Returns a string representation of two points
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * console.log(Lines.toString(a, b)));
+ * ```
  * @param a 
  * @param b 
  * @returns 
@@ -632,6 +721,10 @@ export function toString (a: Points.Point, b: Points.Point): string;
 
 /**
  * Returns a string representation of a line 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.toString(line);
+ * ```
  * @param line 
  */
 export function toString(line:Line):string;
@@ -653,10 +746,12 @@ export function toString(a:Points.Point|Line, b?:Points.Point):string {
 }
 
 /**
- * Returns a line from a basis of coordinates
+ * Returns a line from a basis of coordinates (x1, y1, x2, y2)
+ * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Line from 0,1 -> 10,15
- * fromNumbers(0,1,10,15);
+ * Lines.fromNumbers(0, 1, 10, 15);
  * ```
  * @param x1 
  * @param y1 
@@ -680,15 +775,32 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  * 
  * See {@link fromFlatArray} to create a line _from_ this representation.
  *
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * Lines.toFlatArray(line);
+ * Lines.toFlatArray(pointA, pointB);
+ * ```
  * @export
  * @param {Point} a
  * @param {Point} b
  * @returns {number[]}
  */
-export const toFlatArray = (a: Points.Point, b: Points.Point): readonly number[] =>  [a.x, a.y, b.x, b.y];
+export const toFlatArray = (a: Points.Point|Line, b: Points.Point): readonly number[] =>  {
+  if (isLine(a)) {
+    return [a.a.x, a.a.y, a.b.x, a.b.y];
+  } else if (Points.isPoint(a) && Points.isPoint(b)) {
+    return [a.x, a.y, b.x, b.y];
+  } else {
+    throw new Error(`Expected single line parameter, or a and b points`);
+  }
+};
 
 /**
  * Returns an SVG description of line
+ * ```
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js';
+ * Lines.toSvgString(ptA, ptB);
+ * ```
  * @param a 
  * @param b 
  * @returns 
@@ -700,6 +812,11 @@ export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[]
  * 
  * See {@link toFlatArray} to create an array from a line.
  * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const line = Lines.fromFlatArray(...[0, 0, 100, 100]);
+ * // line is {a: { x:0, y:0 }, b: { x: 100, y: 100 } }
+ * ```
  * @param arr Array in the form [x1,y1,x2,y2]
  * @returns Line
  */
@@ -711,9 +828,12 @@ export const fromFlatArray = (arr: readonly number[]): Line => {
 
 /**
  * Returns a line from two points
+ * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Line from 0,1 to 10,15
- * fromPoints({x:0,y:1}, {x:10,y:15});
+ * const line = Lines.fromPoints( { x:0, y:1 }, { x:10, y:15 });
+ * // line is: { a: { x: 0, y: 1}, b: { x: 10, y: 15 } };
  * ```
  * @param a Start point
  * @param b End point
@@ -734,11 +854,16 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
  * Returns an array of lines that connects provided points. Note that line is not closed.
  * 
  * Eg, if points a,b,c are provided, two lines are provided: a->b and b->c.
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const lines = Lines.joinPointsToLines(ptA, ptB, ptC);
+ * // lines is an array of, well, lines
+ * ```
  * @param points 
  * @returns 
  */
 export const joinPointsToLines = (...points:readonly Points.Point[]): PolyLine => {
-  
   const lines = [];
   //eslint-disable-next-line functional/no-let
   let start = points[0];
@@ -753,6 +878,11 @@ export const joinPointsToLines = (...points:readonly Points.Point[]): PolyLine =
 
 /**
  * Returns a {@link LinePath} from two points
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const path = Lines.fromPointsToPath(ptA, ptB);
+ * ```
  * @param a 
  * @param b 
  * @returns 
@@ -761,6 +891,11 @@ export const fromPointsToPath = (a:Points.Point, b:Points.Point): LinePath => to
 
 /**
  * Returns a rectangle that encompasses dimension of line
+ * 
+ * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js';
+ * const rect = Lines.bbox(line);
+ * ```
  */
 export const bbox = (line:Line):Rects.RectPositioned =>  Points.bbox(line.a, line.b);
 
@@ -773,8 +908,11 @@ export const bbox = (line:Line):Rects.RectPositioned =>  Points.bbox(line.a, lin
  * wrapping the result of `sum`.
  * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Create a path
- * const l = toPath(fromNumbers(0,0,10,10));
+ * const l = Lines.toPath(fromNumbers(0,0,10,10));
+ * 
+ * // Now we can use it...
  * l.length();
  * 
  * // Mutate functions return a new path
@@ -800,6 +938,13 @@ export const toPath = (line:Line): LinePath => {
     divide:(point:Points.Point) => toPath(divide(line, point)),
     multiply:(point:Point) => toPath(multiply(line, point)),
     subtract:(point:Point) => toPath(subtract(line, point)),
+    midpoint: () => midpoint(a, b),
+    distance: (point:Point) => distanceSingleLine(line, point),
+    parallel: (distance:number) => parallel(line, distance),
+    perpendicularPoint: (distance: number, amount?:number) => perpendicularPoint(line, distance, amount),
+    slope: () => slope(line),
+    withinRange: (point:Point, maxRange:number) => withinRange(line, point, maxRange),
+    equals: (otherLine:Line) => equals(line, otherLine),
     apply:(fn:(point:Points.Point) => Points.Point) => toPath(apply(line, fn)),
     kind: `line`
   });
@@ -814,6 +959,13 @@ export type LinePath = Line & Path & {
   multiply(point:Points.Point):LinePath
   subtract(point:Points.Point):LinePath
   apply(fn:(point:Points.Point) => Points.Point):LinePath
+  midpoint():Point
+  distance(point:Point):number
+  parallel(distance:number):Line
+  perpendicularPoint(distance: number, amount?:number):Point
+  slope():number
+  withinRange(point:Point, maxRange:number):boolean
+  equals(otherLine:Line):boolean
 }
 
 /**
@@ -822,17 +974,19 @@ export type LinePath = Line & Path & {
  * If `origin` is a number, it's presumed to be a 0..1 percentage of the line.
  * 
  * ```js
+ * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * 
  * // Rotates line by 0.1 radians around point 10,10
- * rotate(line, 0.1, {x:10,y:10});
+ * const r = Lines.rotate(line, 0.1, {x:10,y:10});
  * 
  * // Rotate line by 5 degrees around its center
- * rotate(line, degreeToRadian(5));
+ * const r = Lines.rotate(line, degreeToRadian(5));
  * 
  * // Rotate line by 5 degres around its end point
- * rotate(line, degreeToRadian(5), line.b);
+ * const r = Lines.rotate(line, degreeToRadian(5), line.b);
  * 
  * // Rotate by 90 degrees at the 80% position
- * rotated = rotate(line, Math.PI / 2, 0.8);
+ * const r = Lines.rotated = rotate(line, Math.PI / 2, 0.8);
  * ```
  * @param line Line to rotate
  * @param amountRadian Angle in radians to rotate by
