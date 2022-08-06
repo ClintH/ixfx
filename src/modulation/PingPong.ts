@@ -64,7 +64,7 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   if (lower === undefined) throw new Error(`Parameter 'lower' is undefined`);
   if (interval === undefined) throw new Error(`Parameter 'interval' is undefined`);
   if (upper === undefined) throw new Error(`Parameter 'upper' is undefined`);
-
+  if (interval < 1 && interval > 0 && rounding === 1) rounding = 1000;
   if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);
   if (Number.isNaN(lower)) throw new Error(`lower parameter is NaN`);
   if (Number.isNaN(upper)) throw new Error(`upper parameter is NaN`);
@@ -83,6 +83,7 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   lower = Math.floor(lower * rounding);
   interval = Math.floor(Math.abs(interval * rounding));
 
+  if (interval === 0) throw new Error(`Interval is zero (rounding: ${rounding})`);
   if (start === undefined) start = lower;
   else start = Math.floor(start * rounding);
   if (start > upper || start < lower) throw new Error(`Start (${start/rounding}) must be within lower (${lower/rounding}) and upper (${upper/rounding})`);
@@ -94,6 +95,7 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   let firstLoop = true;
   //eslint-disable-next-line functional/no-loop-statement
   while (true) {
+    //console.log(`v: ${v} incrementing: ${incrementing} interval: ${interval}`);
     v = v + (incrementing ? interval : -interval);
     if (incrementing && v >= upper) {
       incrementing = false;
