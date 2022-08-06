@@ -80,6 +80,17 @@ const guardPositioned = (circle:CirclePositioned, paramName = `circle`) => {
 };
 
 /**
+ * Returns the center of a circle
+ * If the circle has an x,y, that is the center.
+ * If not, `radius` is used as the x and y.
+ * @param circle 
+ * @returns Center of circle
+ */
+export const center = (circle:CirclePositioned|Circle) => {
+  if (isPositioned(circle)) return Object.freeze({x: circle.x, y: circle.y});
+  else return Object.freeze({x: circle.radius, y: circle.radius});
+};
+/**
  * Computes relative position along circle
  * @param circle 
  * @param t Position, 0-1
