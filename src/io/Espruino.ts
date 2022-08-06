@@ -114,6 +114,8 @@ export const connectBle = async () => {
 
 export interface EspruinoDevice extends ISimpleEventEmitter<Events> {
   write(m:string):void
+  writeScript(code:string):void
+  disconnect():void
   get evalTimeoutMs():number
 }
 

@@ -16,6 +16,10 @@ export class EspruinoSerialDevice extends SerialDevice {
     this.evalTimeoutMs = opts.evalTimeoutMs ?? 5*1000;  
   }
 
+  disconnect() {
+    super.close();
+  }
+
   /**
    * Writes a script to Espruino.
    * 
