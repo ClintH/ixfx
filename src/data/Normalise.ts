@@ -10,7 +10,7 @@ import {scale} from "./Scale.js";
  * 
  * @example
  * ```js
- * import {Normalise} from 'https://unpkg.com/ixfx/dist/temporal.js'
+ * import {Normalise} from 'https://unpkg.com/ixfx/dist/data.js'
  * const s = Normalise.stream();
  * s(2);    // 1 (because 2 is highest seen)
  * s(1);    // 0 (because 1 is the lowest so far)
@@ -51,10 +51,10 @@ export const stream = (minDefault?:number, maxDefault?:number) => {
 
 /**
  * Normalises an array. By default uses the actual min/max of the array
- * as the normalisation range. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
+ * as the normalisation range. [Read more in the docs](https://clinth.github.io/ixfx-docs/data/normalising/)
  * 
  * ```js
- * import {Normalise} from 'https://unpkg.com/ixfx/dist/temporal.js'
+ * import {Normalise} from 'https://unpkg.com/ixfx/dist/data.js'
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
  * Normalise.array([5,1,0,9,10]);
  * ```
