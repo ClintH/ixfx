@@ -2,6 +2,9 @@ import {RandomSource, defaultRandom} from '../Random.js';
 import {clamp} from '../data/Clamp.js';
 import {number as guardNumber} from '../Guards.js';
 import * as Easings from './Easing.js';
+import * as Envelopes from './Envelope.js';
+import * as Forces from './Forces.js';
+import * as Oscillators from './Oscillator.js';
 
 export * from './PingPong.js';
 /**
@@ -31,7 +34,6 @@ export {Easings};
 /**
  * Envelope
  */
-import * as Envelopes from './Envelope.js';
 export * from './Envelope.js';
 
 /**
@@ -49,10 +51,7 @@ export * from './Envelope.js';
  * ```
  * 
  */
-import * as Forces from './Forces.js';
 export {Forces};
-
-import * as Oscillators from './Oscillator.js';
 
 /**
  * Oscillators module has waveshapes for producing values with a specified frequency.
