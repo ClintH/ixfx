@@ -232,6 +232,7 @@ export const computeAttractionForce = (attractor:ForceAffected, attractee:ForceA
   return Points.multiply(f, (gravity * (attractor.mass ?? 1) * (attractee.mass ?? 1)) / (d * d));
 };
 
+
 /**
  * Returns `pt` with x and y set to `setpoint` if either's absolute value is below `v`
  * @param pt 
@@ -409,6 +410,7 @@ export const magnitudeForce = (force:number, mass:MassApplication):ForceFn =>  (
     acceleration: massApplyAccel(vv, t, mass)
   });
 };
+
 
 /**
  * Null force does nothing
@@ -657,3 +659,27 @@ export const computePositionFromVelocity = (position:Points.Point, velocity:Poin
  * @returns Point
  */
 export const computePositionFromAngle = (distance:number, angleRadians:number, origin:Points.Point) => Polar.toCartesian(distance, angleRadians, origin);
+
+const _angularForce = angularForce();
+const _angleFromAccelerationForce = angleFromAccelerationForce();
+
+/**
+ * A force that orients things according to direction of travel.
+ * 
+ * Under the hood, it applies:
+ * * angularForce,
+ * * angleFromAccelerationForce, and
+ * * angleFromVelocityForce
+ * @param interpolationAmt 
+ * @returns 
+ */
+export const orientationForce = (interpolationAmt = 0.5):ForceFn => {
+  const angleFromVel = angleFromVelocityForce(interpolationAmt);
+
+  return (t:ForceAffected) => {
+    t = _angularForce(t);
+    t = _angleFromAccelerationForce(t);
+    t = angleFromVel(t);
+    return t;
+  };
+};
