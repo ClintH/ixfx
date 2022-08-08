@@ -87,7 +87,7 @@ export type ArrowOpts = {
 }
 
 /**
- * Returns the points forming an arrow
+ * Returns the points forming an arrow.
  * 
  * @example Create an arrow anchored by its tip at 100,100
  * ```js
@@ -104,11 +104,11 @@ export type ArrowOpts = {
  * ```
  * 
  * @param origin Origin of arrow 
- * @param from Does origin describe the tip or tail?
+ * @param from Does origin describe the tip, tail or middle?
  * @param opts Options for arrow 
  * @returns 
  */
-export const arrow = (origin:Points.Point,  from:`tip`|`tail`, opts:ArrowOpts = {}):readonly Points.Point[] => {
+export const arrow = (origin:Points.Point, from:`tip`|`tail`|`middle`, opts:ArrowOpts = {}):readonly Points.Point[] => {
   const tailLength = opts.tailLength ?? 10;
   const tailThickness = opts.tailThickness ?? Math.max(tailLength/5, 5);
   const angleRadian = opts.angleRadian ?? 0;
@@ -127,7 +127,20 @@ export const arrow = (origin:Points.Point,  from:`tip`|`tail`, opts:ArrowOpts = 
       {x: tri.a.x - tailLength, y: origin.y - tailThickness / 2},
       tailLength,
       tailThickness
-    ));  
+    ));
+  } else if (from === `middle`) {
+    const midX = tailLength + arrowSize / 2;
+    const midY = tailThickness / 2;
+    tri = Triangles.equilateralFromVertex({
+      x: origin.x + arrowSize*1.2,
+      y: origin.y 
+    }, arrowSize, triAngle);
+
+    tailPoints = Rects.corners(Rects.fromTopLeft(
+      {x: origin.x - midX, y: origin.y - midY},
+      tailLength + arrowSize,
+      tailThickness
+    ));
   } else {
     //const midY = origin.y - tailThickness/2;
     tailPoints = Rects.corners(Rects.fromTopLeft({x: origin.x, y: origin.y - tailThickness/2}, tailLength, tailThickness));
@@ -140,6 +153,5 @@ export const arrow = (origin:Points.Point,  from:`tip`|`tail`, opts:ArrowOpts = 
     tri.c, tailPoints[2], tailPoints[3]
   ], angleRadian, origin);
 
-  
   return arrow;
 };
