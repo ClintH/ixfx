@@ -18,11 +18,11 @@ export * from './PingPong.js';
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
- * import {Easings} from '../../ixfx/dist/modulation.js';
+ * import { Easings } from '../../ixfx/dist/modulation.js';
  * Easings.time(...);
  * 
  * // Import from web
- * import {Easings} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import { Easings } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * Easings.time(...);
  * ```
  */
@@ -40,11 +40,11 @@ export * from './Envelope.js';
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
- * import {Forces} from '../../ixfx/dist/modulation.js';
+ * import { Forces } from '../../ixfx/dist/modulation.js';
  * Forces.attractionForce(...);
  * 
  * // Import from web
- * import {Forces} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import { Forces } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * Forces.attractionForce(...);
  * ```
  * 
@@ -76,11 +76,11 @@ import * as Oscillators from './Oscillator.js';
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
- * import {Oscillators} from '../../ixfx/dist/modulation.js';
+ * import { Oscillators } from '../../ixfx/dist/modulation.js';
  * Oscillators.saw(...);
  * 
  * // Import from web
- * import {Oscillators} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import { Oscillators } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * Oscillators.saw(...);
  * ```
  * 
@@ -121,7 +121,7 @@ export type JitterOpts = {
  * random number generator:
  * 
  * ```js
- * import {weighted} from 'https://unpkg.com/ixfx/dist/random.js';
+ * import { weighted } from 'https://unpkg.com/ixfx/dist/random.js';
  * jitter(0.5, 0.1, { random: weighted };
  * ```
  * 
