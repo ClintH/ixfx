@@ -368,17 +368,23 @@ export const isPoint3d = (p:Point|unknown): p is Point3d => {
 export const toArray = (p: Point): readonly number[] => ([p.x, p.y]);
 
 /**
- * Returns a human-friendly string representation `(x, y)`
+ * Returns a human-friendly string representation `(x, y)`.
+ * If `precision` is supplied, this will be the number of significant digits.
  * @param p
  * @returns 
  */
-export const toString = (p: Point): string => {
+export const toString = (p: Point, precision?:number): string => {
   if (p === undefined) return `(undefined)`;
   if (p === null) return `(null)`;
+
+  const x = precision ? p.x.toPrecision(precision) : p.x;
+  const y = precision ? p.y.toPrecision(precision) : p.y;
+
   if (p.z !== undefined) {
-    return `(${p.x},${p.y},${p.z})`;
+    const z = precision ? p.z.toPrecision(precision) : p.z;
+    return `(${x},${y},${z})`;
   } else {
-    return `(${p.x},${p.y})`;
+    return `(${x},${y})`;
   }
 };
 
@@ -622,8 +628,10 @@ export const apply = (pt:Point, fn:(v:number, field?:string)=>number):Point => (
 /**
  * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
  * ```js
- * const p = transform(somePoint, Points.normalise, Points.invert);
+ * const p = pipelineApply(somePoint, Points.normalise, Points.invert);
  * ```
+ * 
+ * If you want to make a reusable pipeline of functions, consider {@link pipeline} instead.
  * @param pt 
  * @param pipeline 
  * @returns 
@@ -633,19 +641,25 @@ export const pipelineApply = (pt:Point, ...pipelineFns:readonly ((pt:Point)=>Poi
 /**
  * Returns a pipeline function that takes a point to be transformed through a series of functions
  * ```js
+ * // Create pipeline
  * const p = pipeline(Points.normalise, Points.invert);
- * p(somePoint); // run `somePoint` through normalise and then invert
+ * 
+ * // Now run it on `somePoint`.
+ * // First we normalised, and then invert
+ * const changedPoint = p(somePoint);
  * ```
+ * 
+ * If you don't want to create a pipeline, use {@link pipelineApply}.
  * @param pipeline Pipeline of functions
  * @returns
  */
 export const pipeline = (...pipeline:readonly ((pt:Point)=>Point)[]) => (pt:Point) => pipeline.reduce((prev, curr) => curr(prev), pt);
 
 /**
- * Reduces over points, treating x,y separately.
+ * Reduces over points, treating _x_ and _y_ separately.
  * 
  * ```
- * // Sum x and y valuse
+ * // Sum x and y values
  * const total = reduce(points, (p, acc) => {
  *  return {x: p.x + acc.x, y: p.y + acc.y}
  * });
@@ -992,13 +1006,13 @@ export const compareByX = (a:Point, b:Point):number =>  a.x - b.x || a.y - b.y;
  * Project `origin` by `distance` and `angle` (radians).
  * 
  * To figure out rotation, imagine a horizontal line running through `origin`.
- * * Rotation = 0 deg puts the point on the irhgt of origin, on same y-axis
+ * * Rotation = 0 deg puts the point on the right of origin, on same y-axis
  * * Rotation = 90 deg/3:00 puts the point below origin, on the same x-axis
  * * Rotation = 180 deg/6:00 puts the point on the left of origin on the same y-axis
  * * Rotation = 270 deg/12:00 puts the point above the origin, on the same x-axis
  * 
  * ```js
- * // Yields a point 100 units away from 10,20 with 10 degrees rotation (ie slightlydown) 
+ * // Yields a point 100 units away from 10,20 with 10 degrees rotation (ie slightly down) 
  * const a = Points.project({x:10, y:20}, 100, degreeToRadian(10));
  * ```
  * @param origin 
@@ -1159,12 +1173,15 @@ export function normaliseByRect(a:Point|number, b:number|Rects.Rect, c?:number, 
 /**
  * Returns a random point on a 0..1 scale.
  * ```js
- * const pt = random(); // eg {x: 0.2549012, y:0.859301}
+ * import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const pt = Points.random(); // eg {x: 0.2549012, y:0.859301}
  * ```
  * 
  * A custom source of randomness can be provided:
  * ```js
- * const pt = random(weightedSkewed(`quadIn`));
+ * import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * import { weightedSkewed } from "https://unpkg.com/ixfx/dist/random.js"
+ * const pt = Points.random(weightedSkewed(`quadIn`));
  * ```
  * @param rando 
  * @returns 
@@ -1341,40 +1358,44 @@ export function clamp(a:Point|number, b?:number, c?:number, d?:number):Point {
   }
 }
 
-export type PointRelation = (a:Point|number, b?:number) => {
+export type PointRelation = (a:Point|number, b?:number) => PointRelationResult;
+
+export type PointRelationResult = {
   /**
    * Angle from start
    */
   readonly angle:number
   /**
-   * Distance from start
-   */
+  * Distance from start
+  */
   readonly distance:number
   /**
-   * Center point from start
-   */
+  * Center point from start
+  */
   readonly centroid:Point
   /**
-   * Average of all points seen
-   * This is calculated by summing x,y and dividing by total points
-   */
+  * Average of all points seen
+  * This is calculated by summing x,y and dividing by total points
+  */
   readonly average:Point
-}
+};
 
 /**
  * Tracks the relation between two points
  * 
  * ```js
+ * import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * // Start point: 50,50
- * const t = track({x:50,y:50});
+ * const t = Points.relation({x:50,y:50});
  * 
  * // Compare to a 0,0
- * const {angle, distance, centroid} = t({x:0,y:0});
+ * const {angle, distance, average, centroid} = t({x:0,y:0});
  * ```
  * 
  * X,y coordinates can also be used as parameters:
  * ```js
- * const t = track(50, 50);
+ * const t = Points.relation(50, 50);
  * const {angle, distance, centroid} = t(0, 0);
  * ```
  * @param start 
