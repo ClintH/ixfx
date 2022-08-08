@@ -6,7 +6,7 @@
  */
 import {Camera} from '../../../dist/io.js';
 import {Video} from '../../../dist/visual.js';
-import {intervalTracker} from '../../../dist/temporal.js';
+import {intervalTracker} from '../../../dist/data.js';
 
 const settings = {
   canvasEl: document.getElementById(`canvas`),
