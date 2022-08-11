@@ -4,7 +4,11 @@ export {JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent};
 
 export type SerialOpts = JsonDeviceOpts & {
   readonly filters?:ReadonlyArray<SerialPortFilter>
-  readonly baudRate?:number;
+  readonly baudRate?:number
+  /**
+   * End-of-line string sequence. \r\n by default.
+   */
+  readonly eol?:string
 }
 
 /**
@@ -48,11 +52,14 @@ export class Device extends JsonDevice {
 
   constructor(private config:SerialOpts = {}) {
     super(config);
+
+    const eol = config.eol ?? `\r\n`;
+
     this.baudRate = config.baudRate ?? 9600;
     if (config.name === undefined) super.name = `Serial.Device`;
 
     // Serial.println on microcontroller == \r\n
-    this.rxBuffer.separator = `\r\n`;
+    this.rxBuffer.separator = eol;
   }
 
   /**
