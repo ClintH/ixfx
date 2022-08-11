@@ -232,6 +232,37 @@ export const computeAttractionForce = (attractor:ForceAffected, attractee:ForceA
   return Points.multiply(f, (gravity * (attractor.mass ?? 1) * (attractee.mass ?? 1)) / (d * d));
 };
 
+export type TargetOpts = {
+  /**
+   * Acceleration scaling. Defaults to 0.001
+   */
+  readonly diminishBy?: number,
+  /**
+   * If distance is less than this range, don't move.
+   * If undefined (default), will try to get an exact position
+   */
+  readonly range?: Points.Point
+}
+/**
+ * A force that moves a thing toward `targetPos`.
+ * 
+ * ```js
+ * const t = Forces.apply(t, Forces.targetForce(targetPos));
+ * ```
+ * @param targetPos 
+ * @param diminishBy Scales acceleration. Defaults to 0.001.
+ * @returns 
+ */
+export const targetForce = (targetPos:Points.Point, opts:TargetOpts = {}) => {
+  const fn = (t:ForceAffected):ForceAffected =>  {
+    const accel = computeAccelerationToTarget(targetPos, t.position ?? { x: 0.5, y: 0.5}, opts);
+    return {
+      ...t,
+      acceleration: Points.sum(t.acceleration ?? Points.Empty, accel)
+    };
+  };
+  return fn;
+};
 
 /**
  * Returns `pt` with x and y set to `setpoint` if either's absolute value is below `v`
@@ -301,7 +332,7 @@ export const apply = (t:ForceAffected, ...accelForces:readonly ForceKind[]):Forc
   // Compute position
   const pos = computePositionFromVelocity(t.position ?? Points.Empty, velo);
 
-  const ff:ForceAffected= {
+  const ff:ForceAffected = {
     ...t,
     position: pos,
     velocity: velo,
@@ -329,7 +360,7 @@ export const apply = (t:ForceAffected, ...accelForces:readonly ForceKind[]):Forc
  * @param vector 
  * @returns Force function
  */
-export const accelerationForce = (vector:Points.Point, mass:MassApplication):ForceFn => (t:ForceAffected) => Object.freeze({
+export const accelerationForce = (vector:Points.Point, mass:MassApplication = `ignored`):ForceFn => (t:ForceAffected) => Object.freeze({
   ...t,
   acceleration: massApplyAccel(vector, t, mass) //Points.sum(t.acceleration ?? Points.Empty, op(t.mass ?? 1))
 });
@@ -399,7 +430,7 @@ const massApplyAccel = (vector:Points.Point, thing:ForceAffected, mass: MassAppl
  * @param mass How to factor in mass 
  * @returns Function that computes force
  */
-export const magnitudeForce = (force:number, mass:MassApplication):ForceFn =>  (t:ForceAffected):ForceAffected => {
+export const magnitudeForce = (force:number, mass:MassApplication = `ignored`):ForceFn =>  (t:ForceAffected):ForceAffected => {
   if (t.velocity === undefined) return t;
 
   const mag = Points.distance(Points.normalise(t.velocity));
@@ -639,9 +670,52 @@ export const pendulumForce = (pinnedAt:Points.Point = {x:0.5, y:0}, opts:Pendulu
  * Compute velocity based on acceleration and current velocity
  * @param acceleration Acceleration
  * @param velocity Velocity
+ * @param velocityMax If specified, velocity will be capped at this value
  * @returns 
  */
-export const computeVelocity = (acceleration:Points.Point, velocity:Points.Point):Points.Point => Points.sum(velocity, acceleration);
+export const computeVelocity = (acceleration:Points.Point, velocity:Points.Point, velocityMax?:number):Points.Point => {
+  const p = Points.sum(velocity, acceleration);
+  if (velocityMax !== undefined) return Points.clampMagnitude(p, velocityMax);
+  else return p;
+};
+
+/**
+ * Returns the acceleration to get from `currentPos` to `targetPos`.
+ * 
+ * @example Barebones usage:
+ * ```js
+ * const accel = Forces.computeAccelerationToTarget(targetPos, currentPos);
+ * const vel = Forces.computeVelocity(accel, currentVelocity);
+ * 
+ * // New position:
+ * const pos = Points.sum(currentPos, vel);
+ * ```
+ * 
+ * @example Implementation:
+ * ```js
+ * const direction = Points.subtract(targetPos, currentPos);
+ * const accel = Points.multiply(direction, diminishBy);
+ * ```
+ * @param currentPos Current position
+ * @param targetPos Target position
+ * @param opts Options
+ * @returns 
+ */
+export const computeAccelerationToTarget = (targetPos:Points.Point, currentPos:Points.Point, opts:TargetOpts = {}) => {
+
+  const diminishBy = opts.diminishBy ?? 0.001;
+
+  // Compare to current position of thing to get vector direction
+  const direction = Points.subtract(targetPos, currentPos);
+
+  if (opts.range) {
+    // If direction is less than range, return { x: 0, y: 0}
+    if (Points.compare(Points.abs(direction), opts.range) === -2) return Points.Empty;
+  }
+
+  // Diminish vector to make a meaningful acceleration
+  return Points.multiply(direction, diminishBy); 
+};
 
 /**
  * Compute a new position based on existing position and velocity vector
