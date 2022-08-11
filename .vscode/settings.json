@@ -7,5 +7,6 @@
     "**/dist": true,
     "**/build": true,
     "**/docs": true
-  }
+  },
+  "files.eol": "\n"
 }
