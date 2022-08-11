@@ -248,6 +248,21 @@ export const guardNonZeroPoint = (pt: Point, name = `pt`) => {
   return true;
 };
 
+/**
+ * Returns a point with Math.abs applied to x and y.
+ * ```ks
+ * Points.abs({ x:1,  y:1  }); // { x: 1, y: 1 }
+ * Points.abs({ x:-1, y:1  }); // { x: 1, y: 1 }
+ * Points.abs({ x:-1, y:-1 }); // { x: 1, y: 1 }
+ * ```
+ * @param pt 
+ * @returns 
+ */
+export const abs = (pt:Point) => ({
+  ...pt,
+  x: Math.abs(pt.x),
+  y: Math.abs(pt.y)
+});
 
 /**
  * Returns the angle in radians between `a` and `b`.
@@ -986,19 +1001,25 @@ export const convexHull = (...pts:readonly Point[]):readonly Point[] => {
 };
 
 /**
- * Returns -1 if either x/y of a is less than b's x/y
+ * Returns -2 if both x & y of a is less than b
+ * Returns -1 if either x/y of a is less than b
+ * 
+ * Returns 2 if both x & y of a is greater than b
  * Returns 1 if either x/y of a is greater than b's x/y
+ * 
  * Returns 0 if x/y of a and b are equal
  * @param a 
  * @param b 
  * @returns 
  */
 export const compare = (a: Point, b:Point):number => {
+  if (a.x < b.x && a.y < b.y) return -2;
+  if (a.x > b.x && a.y > b.y) return 2;
   if (a.x < b.x || a.y < b.y) return -1;
   if (a.x > b.x || a.y > b.y) return 1;
-  return 0;
+  if (a.x === b.x && a.x === b.y) return 0;
+  return NaN;
 };
-
 
 export const compareByX = (a:Point, b:Point):number =>  a.x - b.x || a.y - b.y;
 
