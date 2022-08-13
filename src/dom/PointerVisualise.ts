@@ -1,5 +1,5 @@
 /* eslint-disable functional/immutable-data */
-import {PointSeenInfo, pointsTracker} from "../data/PointTracker.js";
+import { PointTrackerResults, pointsTracker} from "../data/PointTracker.js";
 import {fullSizeElement, resolveEl} from "./Util.js";
 import * as Svg from "../visual/Svg.js";
 
@@ -87,7 +87,7 @@ export const pointerVisualise = (elOrQuery: HTMLElement | string, opts:Opts = {}
     if (ev.type ===`pointermove` && !tracker.has(id)) {
       return;
     }
-    const info = await tracker.seen(id, pt) as PointSeenInfo;
+    const info = await tracker.seen(id, pt) as PointTrackerResults;
 
     if (info.values.length === 1) {
       const el = Svg.Elements.circle({...info.values[0], radius: (type === `touch` ? touchRadius : mouseRadius)}, svg, {
