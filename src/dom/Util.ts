@@ -341,12 +341,20 @@ export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap
 };
 
 /**
+ * Format data. Return _undefined_ to signal that
+ * data was not handled.
+ */
+export type DataFormatter = (data:object, path:string) => string|undefined;
+
+/**
  * Updates a TABLE elment based on `data`'s key-object pairs
  * @param t 
  * @param data 
  * @returns 
  */
-const updateDataTable = (t:HTMLTableElement, data:object) => {
+const updateDataTable = (t:HTMLTableElement, data:object, opts:DataTableOpts = {}) => {
+  const precision = opts.precision ?? 2;
+ 
   if (data === undefined) {
     //eslint-disable-next-line functional/immutable-data
     t.innerHTML = ``;
@@ -381,8 +389,29 @@ const updateDataTable = (t:HTMLTableElement, data:object) => {
       valEl.id = `${domKey}-val`;
       rowEl.append(valEl);
     }
+
+    //eslint-disable-next-line functional/no-let
+    let valueHTML:string|undefined;
+    if (opts.formatter) {
+      valueHTML = opts.formatter(value, key);
+    }
+
+    // If there's no formatter, or not handled...
+    if (valueHTML === undefined) {
+      if (typeof value === `object`) {
+        valueHTML = JSON5.stringify(value);
+      } else if (typeof value === `number`) {
+        if (opts.roundNumbers) {
+          valueHTML = Math.round(value).toString();
+        } else {
+          valueHTML = value.toFixed(precision);
+        }
+      } else {
+        valueHTML = (value as object).toString();
+      }
+    }
     //eslint-disable-next-line functional/immutable-data
-    (valEl as HTMLElement).innerText = (value as object).toString();
+    (valEl as HTMLElement).innerHTML = valueHTML;
   }
 
   // Remove rows that aren't present in data
@@ -395,6 +424,11 @@ const updateDataTable = (t:HTMLTableElement, data:object) => {
 
 };
 
+export type DataTableOpts = {
+  readonly formatter?:DataFormatter
+  readonly precision?:number
+  readonly roundNumbers?:boolean
+}
 /**
  * Creates a HTML table where each row is a key-value pair from `data`.
  * First column is the key, second column data.
@@ -407,14 +441,14 @@ const updateDataTable = (t:HTMLTableElement, data:object) => {
  * });
  * ```
  */
-export const dataTable = (parentOrQuery:HTMLElement|string, data?:object): (data:object) => void => {
+export const dataTable = (parentOrQuery:HTMLElement|string, data?:object, opts?:DataTableOpts): (data:object) => void => {
   const parent = resolveEl(parentOrQuery);
   const t = document.createElement(`table`);
   parent.append(t);
   
-  if (data) updateDataTable(t, data);
+  if (data) updateDataTable(t, data, opts);
   return (d:object) => {
-    updateDataTable(t, d);
+    updateDataTable(t, d, opts);
   };
 };
 
