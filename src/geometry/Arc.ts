@@ -297,11 +297,17 @@ export const distanceCenter = (a:ArcPositioned, b:ArcPositioned):number => Point
 /**
  * Returns true if the two arcs have the same values
  *
+ * ```js
+ * const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
+ * const arcA = { radius: 5, endRadian: 0, startRadian: 1 };
+ * arcA === arcB; // false, because object identities are different
+ * Arcs.isEqual(arcA, arcB); // true, because values are identical
+ * ```
  * @param a
  * @param b
  * @returns {boolean}
  */
-export const isEquals = (a:Arc|ArcPositioned, b:Arc|ArcPositioned):boolean => {
+export const isEqual = (a:Arc|ArcPositioned, b:Arc|ArcPositioned):boolean => {
   if (a.radius !== b.radius) return false;
 
   if (isPositioned(a) && isPositioned(b)) {
