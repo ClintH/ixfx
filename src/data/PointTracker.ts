@@ -2,29 +2,46 @@ import * as Points from "../geometry/Point.js";
 import * as Line from "../geometry/Line.js";
 import {Timestamped, ObjectTracker, TrackedValueMap, TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
 
-export type PointSeenInfo = {
-  readonly distance:number
-  readonly centroid:Points.Point
-  readonly angle:number
+/**
+ * Information about seen points
+ */
+export type PointTrack = Points.PointRelationResult & {
+  /**
+   * Distance
+   */
+  //readonly distance:number
+  /**
+   * Centroid
+   */
+  //readonly centroid:Points.Point
+  //readonly angle:number
+
+  /**
+   * Units/millisecond
+   */
   readonly speed:number
-  readonly values:readonly Points.Point[]
   /**
    * Average of all points seen
    */
-  readonly average:Points.Point
+  //readonly average:Points.Point
 };
 
+export type PointTrackerResults = {
+  readonly fromLast: PointTrack
+  readonly fromInitial: PointTrack
+  readonly values:readonly Points.Point[]
+}
 
 export class PointTracker extends ObjectTracker<Points.Point> {
   /**
    * Function that yields the relation from initial point
    */
-  relation:Points.PointRelation|undefined;
+  initialRelation:Points.PointRelation|undefined;
   
   /**
-   * Info on last seen point
+   * Last result
    */
-  lastInfo:PointSeenInfo|undefined;
+  lastResult:PointTrackerResults|undefined;
 
   constructor(readonly id:string, opts:TrackOpts = {}) {
     super(id, opts);
@@ -49,34 +66,45 @@ export class PointTracker extends ObjectTracker<Points.Point> {
    */
   onReset(): void {
     super.onReset();
-    this.lastInfo = undefined;
-    this.relation = undefined;
+    this.lastResult = undefined;
+    this.initialRelation = undefined;
   }
 
   /**
-   * Tracks a point, returning information on the relation between it
-   * and the start point.
-   * 
-   * If multiple points are given, it's relation to the last point that is returned.
+   * Tracks a point, returning data on its relation to the
+   * initial point and the last received point.
    * @param p Point
    */
-  seen(...p:Points.Point[]|Timestamped<Points.Point>[]):PointSeenInfo {
+  seen(...p:Points.Point[]|Timestamped<Points.Point>[]):PointTrackerResults {
     const currentLast = this.last;
     super.seen(...p);
     const newLast = this.last;
-
-    if (this.relation === undefined) {
-      this.relation = Points.relation(newLast);
+  
+    // Don't yet have an initial relation function
+    if (this.initialRelation === undefined && this.initial) {
+      this.initialRelation = Points.relation(this.initial);
+    } else if (this.initialRelation === undefined) {
+      throw new Error(`Bug: No initialRelation, and this.inital is undefined?`);
     }
 
+    const lastRelation = Points.relation(currentLast);
+
     // Get basic geometric relation from start to the last provided point
-    const rel = this.relation(newLast);
-    const r:PointSeenInfo = {
-      ...rel,
-      values: this.values,
+    const initialRel:PointTrack = {
+      ...this.initialRelation(newLast),
+      speed: this.values.length < 2 ? 0 : Line.length(this.initial!, newLast) / (newLast.at - this.initial!.at),
+    };
+    const lastRel:PointTrack = {
+      ...lastRelation(newLast),
       speed: this.values.length < 2 ? 0 : Line.length(currentLast, newLast) / (newLast.at - currentLast.at),
     };
-    this.lastInfo = r;
+    
+    const r:PointTrackerResults = {
+      fromInitial: initialRel,
+      fromLast: lastRel,
+      values: [...this.values]
+    };
+    this.lastResult = r;
     return r;
   }
 
@@ -92,6 +120,8 @@ export class PointTracker extends ObjectTracker<Points.Point> {
   /**
    * Returns distance from latest point to initial point.
    * If there are less than two points, zero is returned.
+   * 
+   * This is the direct distance, not the accumulated length.
    * @returns Distance
    */
   distanceFromStart():number {
@@ -102,6 +132,22 @@ export class PointTracker extends ObjectTracker<Points.Point> {
       return 0;
     }
   }
+
+  /**
+   * Difference between last point and the initial point, calculated
+   * as a simple subtraction of x & y.
+   * 
+   * `Points.Placeholder` is returned if there's only one point so far.
+   */
+  difference():Points.Point {
+    const initial = this.initial;
+    if (this.values.length >= 2 && initial !== undefined) {
+      return Points.subtract(this.last, initial);
+    } else {
+      return Points.Placeholder;
+    }
+  }
+
   /**
    * Returns angle (in radians) from latest point to the initial point
    * If there are less than two points, undefined is return.
