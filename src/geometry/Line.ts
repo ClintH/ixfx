@@ -53,7 +53,7 @@ export const isPolyLine = (p: any): p is PolyLine => {
 /**
  * Returns true if the lines have the same value. Note that only
  * the line start and end points are compared. So the lines might
- * be different in other properties, and `equals` will still return
+ * be different in other properties, and `isEqual` will still return
  * true.
  * 
  * ```js
@@ -61,13 +61,13 @@ export const isPolyLine = (p: any): p is PolyLine => {
  * const a = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
  * const b = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
  * a === b; // false, because they are different objects
- * Lines.equals(a, b); // true, because they have the same value
+ * Lines.isEqual(a, b); // true, because they have the same value
  * ```
  * @param {Line} a
  * @param {Line} b
  * @returns {boolean}
  */
-export const equals = (a:Line, b:Line):boolean => Points.isEqual(a.a, b.a) && Points.isEqual(a.b, b.b);
+export const isEqual = (a:Line, b:Line):boolean => Points.isEqual(a.a, b.a) && Points.isEqual(a.b, b.b);
 
 /**
  * Applies `fn` to both start and end points.
@@ -944,7 +944,7 @@ export const toPath = (line:Line): LinePath => {
     perpendicularPoint: (distance: number, amount?:number) => perpendicularPoint(line, distance, amount),
     slope: () => slope(line),
     withinRange: (point:Point, maxRange:number) => withinRange(line, point, maxRange),
-    equals: (otherLine:Line) => equals(line, otherLine),
+    isEqual: (otherLine:Line) => isEqual(line, otherLine),
     apply:(fn:(point:Points.Point) => Points.Point) => toPath(apply(line, fn)),
     kind: `line`
   });
@@ -965,7 +965,7 @@ export type LinePath = Line & Path & {
   perpendicularPoint(distance: number, amount?:number):Point
   slope():number
   withinRange(point:Point, maxRange:number):boolean
-  equals(otherLine:Line):boolean
+  isEqual(otherLine:Line):boolean
 }
 
 /**
