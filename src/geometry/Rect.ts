@@ -14,13 +14,19 @@ export const placeholderPositioned = Object.freeze({x: Number.NaN, y:Number.NaN,
 
 export const isEmpty = (rect:Rect):boolean => rect.width === 0 && rect.height === 0;
 export const isPlaceholder = (rect:Rect):boolean => Number.isNaN(rect.width) && Number.isNaN(rect.height);
+
 /**
- * Returns true if parameter has a positioned (x,y) 
+ * Returns _true_ if `p` has a position (x,y) 
  * @param p Point, Rect or RectPositiond
  * @returns 
  */
 export const isPositioned = (p: Points.Point | Rect | RectPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
+/**
+ * Returns _true_ if `p` has width and height.
+ * @param p
+ * @returns 
+ */
 export const isRect = (p: number|unknown): p is Rect => {
   if (p === undefined) return false;
   if ((p as Rect).width === undefined) return false;
@@ -29,15 +35,44 @@ export const isRect = (p: number|unknown): p is Rect => {
 };
 
 /**
- * Returns true if `p` is a positioned rectangle
+ * Returns _true_ if `p` is a positioned rectangle
+ * Having width, height, x and y properties.
  * @param p 
  * @returns 
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isRectPositioned = (p:Rect|RectPositioned|any): p is RectPositioned => isRect(p) && isPositioned(p);
 
+/**
+ * Initialise a rectangle based on the width and height of a HTML element.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * Rects.fromElement(document.querySelector(`body`));
+ * ```
+ * @param el 
+ * @returns 
+ */
 export const fromElement = (el:HTMLElement): Rect => ({width: el.clientWidth, height: el.clientHeight});
 
+/**
+ * Returns _true_ if the width & height of the two rectangles is the same.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rectA = { width: 10, height: 10, x: 10, y: 10 };
+ * const rectB = { width: 10, height: 10, x: 20, y: 20 };
+ * 
+ * // True, even though x,y are different
+ * Rects.isEqualSize(rectA, rectB);
+ * 
+ * // False, because coordinates are different
+ * Rects.isEqual(rectA, rectB)
+ * ```
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const isEqualSize = (a:Rect, b:Rect):boolean => {
   if (a === undefined) throw new Error(`a undefined`);
   if (b === undefined) throw new Error(`b undefined`);
@@ -60,7 +95,9 @@ export function fromNumbers(width:number, height:number):Rect;
 
 /**
  * Returns a rectangle from x,y,width,height
+ * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r = Rects.fromNumbers(10, 20, 100, 200);
  * // {x: 10, y: 20, width: 100, height: 200}
  * ```
@@ -81,7 +118,9 @@ export function fromNumbers(x:number, y:number, width:number, height:number):Rec
 
 /**
  * Returns a rectangle from a series of numbers: x, y, width, height OR width, height
+ * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r1 = Rects.fromNumbers(100, 200);
  * // {width: 100, height: 200}
  * 
@@ -120,12 +159,12 @@ export function fromNumbers(xOrWidth:number, yOrHeight:number, width?: number, h
 }
 
 /**
- * Rectangle as array
+ * Rectangle as array: `[width, height]`
  */
 export type RectArray = readonly [width:number, height:number];
 
 /**
- * Positioned rectangle as array
+ * Positioned rectangle as array: `[x, y, width, height]`
  */
 export type RectPositionedArray = readonly [x:number, y:number, width:number, height:number];
 
@@ -133,6 +172,8 @@ export type RectPositionedArray = readonly [x:number, y:number, width:number, he
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
  * // [10, 20, 100, 200]
  * const r2 = Rects.toArray({ width: 100, height: 200 });
@@ -147,6 +188,8 @@ export function toArray (rect:Rect): RectArray;
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ *
  * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
  * // [10, 20, 100, 200]
  * const r2 = Rects.toArray({ width: 100, height: 200 });
@@ -161,6 +204,7 @@ export function toArray(rect:RectPositioned): RectPositionedArray;
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
  * // [10, 20, 100, 200]
  * const r2 = Rects.toArray({ width: 100, height: 200 });
@@ -178,6 +222,25 @@ export function toArray(rect:Rect|RectPositioned):RectArray|RectPositionedArray 
   } else throw new Error(`rect param is not a rectangle. Got: ${JSON.stringify(rect)}`);
 }
 
+/**
+ * Returns _true_ if two rectangles have identical values.
+ * Both rectangles must be positioned or not.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rectA = { width: 10, height: 10, x: 10, y: 10 };
+ * const rectB = { width: 10, height: 10, x: 20, y: 20 };
+ * 
+ * // False, because coordinates are different
+ * Rects.isEqual(rectA, rectB)
+ * 
+ * // True, even though x,y are different
+ * Rects.isEqualSize(rectA, rectB);
+ * ```
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const isEqual = (a:Rect|RectPositioned, b:Rect|RectPositioned):boolean => {
   if (isPositioned(a) && isPositioned(b)) {
     if (!Points.isEqual(a, b)) return false;
@@ -193,16 +256,27 @@ export const isEqual = (a:Rect|RectPositioned, b:Rect|RectPositioned):boolean =>
 
 /**
  * Subtracts width/height of `b` from `a` (ie: a - b), returning result.
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rectA = { width: 100, height: 100 };
+ * const rectB = { width: 200, height: 200 };
  * 
- * x,y coords from `a` will be unchanged
+ * // Yields: { width: -100, height: -100 }
+ * Rects.subtract(rectA, rectB);
+ * ```
  * @param a 
  * @param b 
  */
 export function subtract (a:Rect, b:Rect):Rect;
 /**
  * Subtracts a width/height from `a`, returning result.
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100 };
  * 
- * x,y coords from a will be unchanged
+ * // Yields: { width: -100, height: -100 }
+ * Rects.subtract(rect, 200, 200);
+ * ```
  * @param a 
  * @param width 
  * @param height 
@@ -212,7 +286,15 @@ export function subtract (a:Rect, width:number, height?:number):Rect;
 /**
  * Subtracts width/height from `a`.
  * 
- * x,y coords from a will be unchanged.
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rectA = { width: 100, height: 100 };
+ * const rectB = { width: 200, height: 200 };
+ * 
+ * // Yields: { width: -100, height: -100 }
+ * Rects.subtract(rectA, rectB);
+ * Rects.subtract(rectA, 200, 200);
+ * ```
  * @param a 
  * @param b 
  * @param c 
@@ -237,14 +319,90 @@ export function subtract(a:Rect, b:Rect|number, c?:number):Rect {
   }
 }
 
+
 /**
- * Returns true if `point` is within, or on boundary of `rect`.
+ * Sums width/height of `b` with `a` (ie: a + b), returning result.
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rectA = { width: 100, height: 100 };
+ * const rectB = { width: 200, height: 200 };
+ * 
+ * // Yields: { width: 300, height: 300 }
+ * Rects.sum(rectA, rectB);
+ * ```
+ * @param a 
+ * @param b 
+ */
+export function sum (a:Rect, b:Rect):Rect;
+/**
+  * Sums width/height of `b` with `a` (ie: a + b), returning result.
+  * ```js
+  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+  * const rect = { width: 100, height: 100 };
+  * 
+  * // Yields: { width: 300, height: 300 }
+  * Rects.subtract(rect, 200, 200);
+  * ```
+  * @param a 
+  * @param width 
+  * @param height 
+  */
+export function sum (a:Rect, width:number, height?:number):Rect;
+ 
+/**
+  * Sums width/height of `b` with `a` (ie: a + b), returning result.
+  * 
+  * ```js
+  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+  * const rectA = { width: 100, height: 100 };
+  * const rectB = { width: 200, height: 200 };
+  * 
+  * // Yields: { width: 300, height: 300 }
+  * Rects.sum(rectA, rectB);
+  * Rects.sum(rectA, 200, 200);
+  * ```
+  * @param a 
+  * @param b 
+  * @param c 
+  * @returns 
+  */
+//eslint-disable-next-line func-style
+export function sum(a:Rect, b:Rect|number, c?:number):Rect {
+  if (a === undefined) throw new Error(`First parameter undefined`);
+  if (typeof b === `number`) {
+    const height = c === undefined ? 0 : c;
+    return Object.freeze({
+      ...a,
+      width: a.width + b,
+      height: a.height + height
+    });
+  } else {
+    return Object.freeze({
+      ...a,
+      width: a.width + b.width,
+      height: a.height + b.height
+    });
+  }
+}
+
+/**
+ * Returns _true_ if `point` is within, or on boundary of `rect`.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * Rects.intersectsPoint(rect, { x: 100, y: 100});
+ * ```
  * @param rect 
  * @param point 
  */
 export function intersectsPoint (rect:Rect|RectPositioned, point:Points.Point):boolean;
+
 /**
  * Returns true if x,y coordinate is within, or on boundary of `rect`.
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * Rects.intersectsPoint(rect, 100, 100);
+ * ```
  * @param rect
  * @param x 
  * @param y 
@@ -253,6 +411,12 @@ export function intersectsPoint (rect:Rect|RectPositioned, x:number, y:number):b
 
 /**
  * Returns true if point is within or on boundary of `rect`.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * Rects.intersectsPoint(rect, { x: 100, y: 100});
+ * Rects.intersectsPoint(rect, 100, 100);
+ * ```
  * @param rect 
  * @param a 
  * @param b 
@@ -284,6 +448,20 @@ export function intersectsPoint(rect:Rect|RectPositioned, a:Points.Point|number,
   return true;
 }
 
+/**
+ * Initialises a rectangle based on its center, a width and height
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
+ * // Rectangle with center at 50,50, width 100 height 200
+ * Rects.fromCenter({x: 50, y:50}, 100, 200);
+ * ```
+ * @param origin 
+ * @param width 
+ * @param height 
+ * @returns 
+ */
 export const fromCenter = (origin: Points.Point, width: number, height: number): RectPositioned => {
   Points.guard(origin, `origin`);
 
@@ -300,6 +478,12 @@ export const fromCenter = (origin: Points.Point, width: number, height: number):
  * If the point is within the rectangle, 0 is returned.
  * 
  * If `rect` does not have an x,y it's assumed to be 0,0
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 0, y: 0 };
+ * Rects.distanceFromExterior(rect, { x: 20, y: 20 });
+ * ```
  * @param rect Rectangle
  * @param pt Point
  * @returns Distance
@@ -313,6 +497,18 @@ export const distanceFromExterior = (rect:RectPositioned, pt:Points.Point):numbe
   return Math.sqrt(dx*dx + dy*dy);
 };
 
+/**
+ * Return the distance of `pt` to the center of `rect`.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 0, y: 0 };
+ * Rects.distanceFromCenter(rect, { x: 20, y: 20 });
+ * ```
+ * @param rect 
+ * @param pt 
+ * @returns 
+ */
 export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number => Points.distance(center(rect), pt);
 
 
@@ -326,6 +522,7 @@ export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number
  *  - y will be smallest of topRight/topLeft
  *  - width will be largest between top/bottom left and right
  *  - height will be largest between left and right top/bottom
+ * 
  */
 export const maxFromCorners = (topLeft:Points.Point, topRight:Points.Point, bottomRight:Points.Point, bottomLeft: Points.Point):RectPositioned => {
   if (topLeft.y > bottomRight.y) throw new Error(`topLeft.y greater than bottomRight.y`);
@@ -349,6 +546,12 @@ const guardDim = (d: number, name: string = `Dimension`) => {
   if (d < 0) throw Error(`${name} cannot be negative`);
 };
 
+/**
+ * Throws an error if rectangle is missing fields or they
+ * are not valid.
+ * @param rect 
+ * @param name 
+ */
 export const guard = (rect: Rect, name: string = `rect`) => {
   if (rect === undefined) throw Error(`{$name} undefined`);
   if (isPositioned(rect)) Points.guard(rect, name);
@@ -361,19 +564,42 @@ const guardPositioned = (rect:RectPositioned, name:string = `rect`) => {
   guard(rect, name);
 };
 
+/**
+ * Creates a rectangle from its top-left coordinate, a width and height.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
+ * // Rectangle at 50,50 with width of 100, height of 200.
+ * const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
+ * ```
+ * @param origin 
+ * @param width 
+ * @param height 
+ * @returns 
+ */
 export const fromTopLeft = (origin: Points.Point, width: number, height: number): RectPositioned => {
   guardDim(width, `width`);
   guardDim(height, `height`);
   Points.guard(origin, `origin`);
 
   return {x: origin.x, y: origin.y, width: width, height: height};
-  // let pts = [origin];
-  // pts.push({x: origin.x + width, y: origin.y});
-  // pts.push({x: origin.x + width, y: origin.y + height});
-  // pts.push({x: origin.x, y: origin.y + height});
-  // return rectFromPoints(...pts);
 };
 
+/**
+ * Returns the four corners of a rectangle as an array of Points.
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 0, y: 0};
+ * const pts = Rects.corners(rect);
+ * ```
+ * 
+ * If the rectangle is not positioned, is origin can be provided.
+ * @param rect 
+ * @param origin 
+ * @returns 
+ */
 export const corners = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Points.Point[] => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
@@ -390,13 +616,15 @@ export const corners = (rect: RectPositioned|Rect, origin?:Points.Point): readon
 /**
  * Returns a point on the edge of rectangle
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * const r1 = {x: 10, y: 10, width: 100, height: 50};
- * getEdgeX(r1, `right`);  // Yields: 110
- * getEdgeX(r1, `bottom`); // Yields: 60
+ * Rects.getEdgeX(r1, `right`);  // Yields: 110
+ * Rects.getEdgeX(r1, `bottom`); // Yields: 10
  * 
  * const r2 = {width: 100, height: 50};
- * getEdgeX(r2, `right`);  // Yields: 100
- * getEdgeX(r2, `bottom`); // Yields: 50
+ * Rects.getEdgeX(r2, `right`);  // Yields: 100
+ * Rects.getEdgeX(r2, `bottom`); // Yields: 0
  * ```
  * @param rect 
  * @param edge Which edge: right, left, bottom, top
@@ -416,6 +644,24 @@ export const getEdgeX = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|
   }
 };
 
+/**
+ * Returns a point on the edge of rectangle
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
+ * const r1 = {x: 10, y: 10, width: 100, height: 50};
+ * Rects.getEdgeY(r1, `right`);  // Yields: 10
+ * Rects.getEdgeY(r1, `bottom`); // Yields: 60
+ * 
+ * const r2 = {width: 100, height: 50};
+ * Rects.getEdgeY(r2, `right`);  // Yields: 0
+ * Rects.getEdgeY(r2, `bottom`); // Yields: 50
+ * ```
+ * @param rect 
+ * @param edge Which edge: right, left, bottom, top
+ * @returns 
+ */
 export const getEdgeY = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`): number => {
   guard(rect);
   switch (edge) {
@@ -431,19 +677,22 @@ export const getEdgeY = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|
 };
 
 /**
- * Returns `rect` divided by the width,height of `normaliseBy`. This can be useful for
- * normalising based on camera frame.
+ * Returns `rect` divided by the width,height of `normaliseBy`. 
+ * This can be useful for normalising based on camera frame.
+ * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * const frameSize = {width: 640, height: 320};
  * const object = { x: 320, y: 160, width: 64, height: 32};
  * 
- * const n = normaliseByRect(object, frameSize);
+ * const n = Rects.normaliseByRect(object, frameSize);
  * // Yields: {x: 0.5, y: 0.5, width: 0.1, height: 0.1}
  * ```
  * 
  * Height and width can be supplied instead of a rectangle too:
  * ```js
- * const n = normaliseByRect(object, 640, 320);
+ * const n = Rects.normaliseByRect(object, 640, 320);
  * ```
  * @param rect 
  * @param normaliseBy 
@@ -486,19 +735,21 @@ export const normaliseByRect = (rect:Rect|RectPositioned, normaliseByOrWidth:Rec
  * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
  * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * // Normalised rectangle of width 50%, height 50%
  * const r = {width: 0.5, height: 0.5};
  * 
  * // Map to window:
- * const rr = multiply(r, window.innerWidth, window.innerHeight);
+ * const rr = Rects.multiply(r, window.innerWidth, window.innerHeight);
  * ```
  * 
  * ```js
  * // Returns {width: someRect.width * someOtherRect.width ...}
- * multiply(someRect, someOtherRect);
+ * Rects.multiply(someRect, someOtherRect);
  * 
  * // Returns {width: someRect.width * 100, height: someRect.height * 200}
- * multiply(someRect, 100, 200);
+ * Rects.multiply(someRect, 100, 200);
  * ```
  * 
  * Multiplication applies to the first parameter's x/y fields, if present.
@@ -509,19 +760,21 @@ export function multiply(a:RectPositioned, b:Rect|number, c?:number):RectPositio
  * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
  * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * // Normalised rectangle of width 50%, height 50%
  * const r = {width: 0.5, height: 0.5};
  * 
  * // Map to window:
- * const rr = multiply(r, window.innerWidth, window.innerHeight);
+ * const rr = Rects.multiply(r, window.innerWidth, window.innerHeight);
  * ```
  * 
  * ```js
  * // Returns {width: someRect.width * someOtherRect.width ...}
- * multiply(someRect, someOtherRect);
+ * Rects.multiply(someRect, someOtherRect);
  * 
  * // Returns {width: someRect.width * 100, height: someRect.height * 200}
- * multiply(someRect, 100, 200);
+ * Rects.multiply(someRect, 100, 200);
  * ```
  * 
  * Multiplication applies to the first parameter's x/y fields, if present.
@@ -532,19 +785,21 @@ export function multiply(a:Rect, b:Rect|number, c?:number):Rect;
  * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
  * 
  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
  * // Normalised rectangle of width 50%, height 50%
  * const r = {width: 0.5, height: 0.5};
  * 
  * // Map to window:
- * const rr = multiply(r, window.innerWidth, window.innerHeight);
+ * const rr = Rects.multiply(r, window.innerWidth, window.innerHeight);
  * ```
  * 
  * ```js
  * // Returns {width: someRect.width * someOtherRect.width ...}
- * multiply(someRect, someOtherRect);
+ * Rects.multiply(someRect, someOtherRect);
  * 
  * // Returns {width: someRect.width * 100, height: someRect.height * 200}
- * multiply(someRect, 100, 200);
+ * Rects.multiply(someRect, 100, 200);
  * ```
  * 
  * Multiplication applies to the first parameter's x/y fields, if present.
@@ -595,8 +850,10 @@ export function multiply(a:RectPositioned|Rect, b:Rect|number, c?:number):RectPo
  *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
  * 
  * ```js
- * const p = center({x:10, y:20, width:100, height:50});
- * const p2 = center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * 
+ * const p = Rects.center({x:10, y:20, width:100, height:50});
+ * const p2 = Rects.center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
  * ```
  * @param rect Rectangle
  * @param origin Optional origin. Overrides `rect` position if available. If no position is available 0,0 is used by default.
@@ -615,6 +872,13 @@ export const center = (rect: RectPositioned|Rect, origin?:Points.Point): Points.
 
 /**
  * Returns the length of each side of the rectangle (top, right, bottom, left)
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 100, y: 100 };
+ * // Yields: array of length four
+ * const lengths = Rects.lengths(rect);
+ * ```
  * @param rect 
  * @returns 
  */
@@ -626,15 +890,27 @@ export const lengths = (rect:RectPositioned):readonly number[] => {
 /**
  * Returns four lines based on each corner.
  * Lines are given in order: top, right, bottom, left
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 100, y: 100 };
+ * // Yields: array of length four
+ * const lines = Rects.lines(rect);
+ * ```
  *
  * @param {(RectPositioned|Rect)} rect
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const edges = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...corners(rect, origin));
+export const edges = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...corners(rect, origin), origin ?? Points.Empty);
 
 /**
  * Returns the perimeter of `rect` (ie. sum of all edges)
+ *  * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 100, y: 100 };
+ * Rects.perimeter(rect);
+ * ```
  * @param rect 
  * @returns 
  */
@@ -645,6 +921,12 @@ export const perimeter = (rect:Rect):number => {
 
 /**
  * Returns the area of `rect`
+ * 
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const rect = { width: 100, height: 100, x: 100, y: 100 };
+ * Rects.area(rect);
+ * ```
  * @param rect 
  * @returns 
  */
