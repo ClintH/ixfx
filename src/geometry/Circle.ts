@@ -17,14 +17,23 @@ export type Circle = {
  */
 export type CirclePositioned = Points.Point & Circle;
 
-
 export type CircularPath = Circle & Path & {
   readonly kind: `circular`
 };
 
 /**
  * Returns true if parameter has x,y. Does not verify if parameter is a circle or not
- * @param p Circle or point
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * 
+ * const circleA = { radius: 5 };
+ * Circles.isPositioned(circle); // false
+ * 
+ * const circleB = { radius: 5, x: 10, y: 10 }
+ * Circles.isPositioned(circle); // true
+ * ```
+ * @param p Circle
  * @returns 
  */
 export const isPositioned = (p: Circle | Points.Point): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
@@ -35,6 +44,20 @@ export const isCirclePositioned = (p:Circle|CirclePositioned|any): p is CirclePo
 
 /**
  * Returns a point on a circle at a specified angle in radians
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * 
+ * // Circle without position
+ * const circleA = { radius: 5 };
+ * 
+ * // Get point at angle Math.PI, passing in a origin coordinate
+ * const ptA = Circles.point(circleA, Math.PI, {x: 10, y: 10 });
+ * 
+ * // Point on circle with position
+ * const circleB = { radius: 5, x: 10, y: 10};
+ * const ptB = Circles.point(circleB, Math.PI);
+ * ```
  * @param circle
  * @param angleRadian Angle in radians
  * @param Origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
@@ -81,8 +104,19 @@ const guardPositioned = (circle:CirclePositioned, paramName = `circle`) => {
 
 /**
  * Returns the center of a circle
+ * 
  * If the circle has an x,y, that is the center.
  * If not, `radius` is used as the x and y.
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * const circle = { radius: 5, x: 10, y: 10};
+ * 
+ * // Yields: { x: 5, y: 10 }
+ * Circles.center(circle);
+ * ```
+ * 
+ * It's a trivial function, but can make for more understandable code
  * @param circle 
  * @returns Center of circle
  */
@@ -92,6 +126,15 @@ export const center = (circle:CirclePositioned|Circle) => {
 };
 /**
  * Computes relative position along circle
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * const circle = { radius: 100, x: 100, y: 100 };
+ * 
+ * // Get a point halfway around circle
+ * // Yields { x, y }
+ * const pt = Circles.interpolate(circle, 0.5);
+ * ```
  * @param circle 
  * @param t Position, 0-1
  * @returns 
@@ -160,7 +203,7 @@ export const isContainedBy = (a:CirclePositioned, b:CirclePositioned):boolean =>
  * @returns True if circle overlap
  */
 export const isIntersecting = (a:CirclePositioned, b:CirclePositioned):boolean => {
-  if (isEquals(a, b)) return true;
+  if (isEqual(a, b)) return true;
   if (isContainedBy(a, b)) return true;
   return intersections(a, b).length === 2;
 };
@@ -185,7 +228,7 @@ export const intersections = (a:CirclePositioned, b:CirclePositioned):readonly P
   if (centerD < Math.abs(a.radius - b.radius)) return [];
 
   // Circles are the same
-  if (isEquals(a, b)) return [];
+  if (isEqual(a, b)) return [];
 
   const centroidD = ((a.radius*a.radius) - (b.radius*b.radius) + (centerD*centerD)) / (2.0 * centerD);
   const centroid = {
@@ -208,11 +251,20 @@ export const intersections = (a:CirclePositioned, b:CirclePositioned):readonly P
 /**
  * Returns true if the two objects have the same values
  *
+ * ```js
+ * const circleA = { radius: 10, x: 5, y: 5 };
+ * const circleB = { radius: 10, x: 5, y: 5 };
+ * 
+ * circleA === circleB; // false, because identity of objects is different
+ * Circles.isEqual(circleA, circleB); // true, because values are the same
+ * ```
+ * 
+ * Circles must both be positioned or not.
  * @param a
  * @param b
  * @returns
  */
-export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):boolean => {
+export const isEqual = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):boolean => {
   if (a.radius !== b.radius) return false;
 
   if (isPositioned(a) && isPositioned(b)) {
@@ -230,6 +282,12 @@ export const isEquals = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):b
 /**
  * Returns the distance between two circle centers.
  * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * const circleA = { radius: 5, x: 5, y: 5 }
+ * const circleB = { radius: 10, x: 20, y: 20 }
+ * const distance = Circles.distanceCenter(circleA, circleB);
+ * ```
  * Throws an error if either is lacking position.
  * @param a 
  * @param b 
@@ -244,6 +302,13 @@ export const distanceCenter = (a:CirclePositioned, b:CirclePositioned):number =>
 /**
  * Returns the distance between the exterior of two circles, or between the exterior of a circle and point.
  * If `b` overlaps or is enclosed by `a`, distance is 0.
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * const circleA = { radius: 5, x: 5, y: 5 }
+ * const circleB = { radius: 10, x: 20, y: 20 }
+ * const distance = Circles.distanceCenter(circleA, circleB);
+ * ```
  * @param a
  * @param b 
  */
@@ -323,6 +388,13 @@ export const toPath = (circle:CirclePositioned): CircularPath => {
 
 /**
  * Returns the point(s) of intersection between a circle and line.
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * const circle = { radius: 5, x: 5, y: 5 };
+ * const line = { a: { x: 0, y: 0 }, b: { x: 10, y: 10 } };
+ * const pts = Circles.intersectionLine(circle, line);
+ * ```
  * @param circle 
  * @param line 
  * @returns Point(s) of intersection, or empty array
