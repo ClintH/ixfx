@@ -5,8 +5,10 @@ import * as Easings from "../modulation/Easing.js";
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
  * 
  * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * // Six items
- * weight([1,1,1,1,1,1], Easings.gaussian());
+ * Arrays.weight([1,1,1,1,1,1], Easings.gaussian());
  * 
  * // Yields:
  * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
@@ -20,7 +22,7 @@ import * as Easings from "../modulation/Easing.js";
  * how values are weighted:
  * 
  * ```js
- * weight([1,1,1,1,1,1], (relativePos) => relativePos);
+ * Arrays.weight([1,1,1,1,1,1], (relativePos) => relativePos);
  * // Yields:
  * // [0, 0.2, 0.4, 0.6, 0.8, 1]
  * ```
@@ -71,12 +73,14 @@ export const dotProduct = (values:ReadonlyArray<readonly number[]>):number => {
  * 
  * @example
  * ```
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * // Average of a list
- * const avg = average(1, 1.4, 0.9, 0.1);
+ * const avg = Arrays.average(1, 1.4, 0.9, 0.1);
  * 
  * // Average of a variable
  * let data = [100,200];
- * average(...data);
+ * Arrays.average(...data);
  * ```
  * @param data Data to average.
  * @returns Average of array
@@ -96,11 +100,12 @@ export const average = (...data: readonly number[]): number => {
  * matched up to input data. Ie. data at index 2 will be weighed by index 2 in the weightings array.
  * 
  * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  * // All items weighted evenly
- * averageWeighted([1,2,3], [1,1,1]); // 2
+ * Arrays.averageWeighted([1,2,3], [1,1,1]); // 2
  * 
  * // First item has full weight, second half, third quarter
- * averageWeighted([1,2,3], [1, 0.5, 0.25]); // 1.57
+ * Arrays.averageWeighted([1,2,3], [1, 0.5, 0.25]); // 1.57
  * 
  * // With reversed weighting of [0.25,0.5,1] value is 2.42
  * ```
@@ -108,14 +113,16 @@ export const average = (...data: readonly number[]): number => {
  * A function can alternatively be provided to compute the weighting based on array index, via {@link weight}.
  * 
  * ```js
- * averageWeighted[1,2,3], Easings.gaussian()); // 2.0
+ * Arrays.averageWeighted[1,2,3], Easings.gaussian()); // 2.0
  * ```
  * 
  * This is the same as:
+ * 
  * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  * const data = [1,2,3];
- * const w = weight(data, Easings.gaussian());
- * const avg = averageWeighted(data, w); // 2.0
+ * const w = Arrays.weight(data, Easings.gaussian());
+ * const avg = Arrays.averageWeighted(data, w); // 2.0
  * ```
  * @param data Data to average
  * @param weightings Array of weightings that match up to data array, or an easing function 
@@ -131,6 +138,11 @@ export const averageWeighted = (data:readonly number[], weightings:(readonly num
 /**
  * Returns the minimum number out of `data`.
  * Undefined and non-numbers are silently ignored.
+ * 
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * Arrays.min(10, 20, 0); // Yields 0
+ * ```
  * @param data
  * @returns Minimum number
  */
@@ -142,8 +154,9 @@ export const min = (...data:readonly number[]):number => {
 /**
  * Returns the index of the largest value.
  * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  * const v = [ 10, 40, 5 ];
- * maxIndex(v); // Yields 1
+ * Arrays.maxIndex(v); // Yields 1
  * ```
  * @param data Array of numbers 
  * @returns Index of largest value
@@ -154,8 +167,9 @@ export const maxIndex = (...data:readonly number[]):number => data.reduce((bestI
  * Returns the index of the smallest value.
  * 
  * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  * const v = [ 10, 40, 5 ];
- * minIndex(v); // Yields 2
+ * Arrays.minIndex(v); // Yields 2
  * ```
  * @param data Array of numbers 
  * @returns Index of smallest value
@@ -165,6 +179,11 @@ export const minIndex = (...data:readonly number[]):number => data.reduce((bestI
 /**
  * Returns the maximum number out of `data`.
  * Undefined and non-numbers are silently ignored.
+ * 
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * Arrays.max(100, 200, 50); // 200
+ * ```
  * @param data List of numbers
  * @returns Maximum number
  */
@@ -175,7 +194,12 @@ export const max = (...data:readonly number[]):number => {
 
 /**
  * Returns the total of `data`.
- * Undefined and non-numbers are silently ignored
+ * Undefined and non-numbers are silently ignored.
+ * 
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * Arrays.total(1, 2, 3); // 6
+ * ```
  * @param data Array of numbers
  * @returns Total
  */
@@ -190,6 +214,11 @@ export const total = (...data:readonly number[]):number => data.reduce((prev, cu
  * Returns the maximum out of `data` without pre-filtering for speed.
  * 
  * For most uses, {@link max} should suffice.
+ * 
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * Arrays.maxFast([ 10, 0, 4 ]); // 10
+ * ```
  * @param data 
  * @returns Maximum
  */
@@ -208,6 +237,11 @@ export const maxFast = (data:readonly number[]|Float32Array):number => {
  * Returns the maximum out of `data` without pre-filtering for speed.
  * 
  * For most uses, {@link max} should suffice.
+ * 
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * Arrays.minFast([ 10, 0, 100 ]); // 0
+ * ```
  * @param data 
  * @returns Maximum
  */
@@ -245,8 +279,10 @@ export type MinMaxAvgTotal = {
  * Any values that are invalid are silently skipped over.
  * 
  * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * const v = [10, 2, 4.2, 99];
- * const mma = minMaxAvg(v);
+ * const mma = Arrays.minMaxAvg(v);
  * Yields: { min: 2, max: 99, total: 115.2, avg: 28.8 }
  * ```
  * 

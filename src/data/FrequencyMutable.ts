@@ -9,7 +9,6 @@ export type FrequencyEventMap = {
   readonly change:void;
 }
 
-
 export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   readonly #store:Map<string, number>;
   readonly #keyString: ToString<V>;
@@ -97,6 +96,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * @returns Relative frequency of `value`, or _undefined_ if it does not exist
    */
   relativeFrequencyOf(value:V|string):number|undefined {
+    //eslint-disable-next-line functional/no-let
     let freq:number|undefined;
     if (typeof value === `string`) freq = this.#store.get(value);
     else {

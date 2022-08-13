@@ -20,7 +20,7 @@
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Scales <code>v</code> from an input range to an output range (aka <code>map</code>)</p>
 <p>For example, if a sensor&#39;s useful range is 100-500, scale it to a percentage:</p>
-<pre><code class="language-js"><span class="hl-8">scale</span><span class="hl-2">(</span><span class="hl-3">sensorReading</span><span class="hl-2">, </span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-7">500</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">1</span><span class="hl-2">);</span>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">scale</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-8">scale</span><span class="hl-2">(</span><span class="hl-3">sensorReading</span><span class="hl-2">, </span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-7">500</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">1</span><span class="hl-2">);</span>
 </code></pre>
 <p><code>scale</code> defaults to a percentage-range output, so you can get away with:</p>
 <pre><code class="language-js"><span class="hl-8">scale</span><span class="hl-2">(</span><span class="hl-3">sensorReading</span><span class="hl-2">, </span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-7">500</span><span class="hl-2">);</span>

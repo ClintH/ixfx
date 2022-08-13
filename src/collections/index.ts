@@ -53,6 +53,7 @@ export * as Stacks from './Stack.js';
  * Changing the shape
  * * {@link ensureLength}: Returns a copy of array with designated length, either padding it out or truncating as necessary
  * * {@link groupBy}: Groups data into a new Map
+ * * {@link interleave}: Flattens several arrays into one, interleaving their values.
  * * {@link remove}: Remove an item by index
  * * {@link without}: Returns an array with specified value omitted
  * * {@link zip}: Groups together elements from several arrays based on their index

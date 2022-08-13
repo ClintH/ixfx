@@ -6,7 +6,7 @@ import {scale} from "./Scale.js";
  * Normalises numbers, adjusting min/max as new values are processed.
  * Normalised return values will be in the range of 0-1 (inclusive).
  * 
- * [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
+ * [Read more in the docs](https://clinth.github.io/ixfx-docs/data/normalising/)
  * 
  * @example
  * ```js

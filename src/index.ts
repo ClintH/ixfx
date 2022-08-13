@@ -29,9 +29,8 @@
  * 
  * ### Averaging
  * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
- * * {@link frequencyMutable}: Count occurences of a value
  * 
- * ### Normalise sub-modukle
+ * ### Normalise sub-module
  * * {@link Normalise.stream | Normalise.stream}: Normalises a stream of values
  * * {@link Normalise.array | Normalise.array}: Normalises an array of values
  * 
@@ -41,6 +40,8 @@
  * * {@link intervalTracker}: Tracks min, max and average time interval between events
  * * {@link pointTracker}: Tracks the spatial change of x,y coordinates. Useful for tracking a mouse cursor, for example.
  * * {@link pointsTracker}: Tracks changes in multiple x,y coordinates. Useful for tracking each finger touch on a screen, for example.
+ * * {@link frequencyMutable}: Count occurences of a value
+ * 
  * 
  * @example Importing
  * ```js

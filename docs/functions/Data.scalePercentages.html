@@ -21,13 +21,13 @@
 <div class="tsd-comment tsd-typography"><p>Scales an input percentage to a new percentage range.</p>
 <p>If you have an input percentage (0-1), <code>scalePercentageOutput</code> maps it to an
 <em>output</em> percentage of <code>outMin</code>-<code>outMax</code>.</p>
-<pre><code class="language-js"><span class="hl-0">// Scales 50% to a range of 0-10%</span><br/><span class="hl-8">scalePercentages</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">0.10</span><span class="hl-2">); </span><span class="hl-0">// 0.05 - 5%</span>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">scalePercentages</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Scales 50% to a range of 0-10%</span><br/><span class="hl-8">scalePercentages</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">0.10</span><span class="hl-2">); </span><span class="hl-0">// 0.05 - 5%</span>
 </code></pre>
 <p>An error is thrown if any parameter is outside of percentage range. This added
 safety is useful for catching bugs. Otherwise, you could just as well call
 <code>scale(percentage, 0, 1, outMin, outMax)</code>.</p>
 <p>If you want to scale some input range to percentage output range, just use <code>scale</code>:</p>
-<pre><code class="language-js"><span class="hl-0">// Yields 0.5</span><br/><span class="hl-8">scale</span><span class="hl-2">(</span><span class="hl-7">2.5</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">5</span><span class="hl-2">);</span>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">scale</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Yields 0.5</span><br/><span class="hl-8">scale</span><span class="hl-2">(</span><span class="hl-7">2.5</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">5</span><span class="hl-2">);</span>
 </code></pre>
 
 <h3>Returns</h3><p>Scaled value between outMin-outMax.</p>

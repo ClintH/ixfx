@@ -4,7 +4,10 @@ import { number as guardNumber} from "../Guards.js";
  * Scales `v` from an input range to an output range (aka `map`)
  * 
  * For example, if a sensor's useful range is 100-500, scale it to a percentage:
+ * 
  * ```js
+ * import { scale } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * scale(sensorReading, 100, 500, 0, 1);
  * ```
  * 
@@ -21,6 +24,7 @@ import { number as guardNumber} from "../Guards.js";
  * An easing function can be provided for non-linear scaling. In this case
  * the input value is 'pre scaled' using the function before it is applied to the
  * output range.
+ * 
  * ```js
  * scale(sensorReading, 100, 500, 0, 1, Easings.gaussian());
  * ```
@@ -56,6 +60,8 @@ export const scale = (
  * _output_ percentage of `outMin`-`outMax`.
  * 
  * ```js
+ * import { scalePercentages } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * // Scales 50% to a range of 0-10%
  * scalePercentages(0.5, 0, 0.10); // 0.05 - 5%
  * ```
@@ -66,6 +72,8 @@ export const scale = (
  * 
  * If you want to scale some input range to percentage output range, just use `scale`:
  * ```js
+ * import { scale } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * // Yields 0.5
  * scale(2.5, 0, 5);
  * ```
@@ -86,6 +94,7 @@ export const scalePercentages = (percentage:number, outMin:number, outMax:number
  * Scales an input percentage value to an output range
  * If you have an input percentage (0-1), `scalePercent` maps it to an output range of `outMin`-`outMax`.
  * ```js
+ * import { scalePercent } from 'https://unpkg.com/ixfx/dist/data.js';
  * scalePercent(0.5, 10, 20); // 15
  * ```
  * 

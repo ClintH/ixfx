@@ -31,6 +31,15 @@ export const isCoord = (p: number|unknown): p is Coord => {
 
 /**
  * Converts a Cartesian coordinate to polar
+ * 
+ * ```js
+ * import { Polar } from 'https://unpkg.com/ixfx/dist/geometry.js';
+ * 
+ * // Yields: { angleRadian, distance }
+ * const polar = Polar.fromCartesian({x: 50, y: 50}, origin);
+ * ```
+ * 
+ * Any additional properties of `point` are copied to object.
  * @param point Point
  * @param origin Origin
  * @returns 
@@ -55,7 +64,23 @@ export const fromCartesian = (point: Points.Point, origin: Points.Point): Coord 
 };
 
 /**
- * Converts a polar coordinate to a Cartesian one
+ * Converts to Cartesian coordinate from polar.
+ * 
+ * ```js
+ * import { Polar } from 'https://unpkg.com/ixfx/dist/geometry.js';
+ * 
+ * const origin = { x: 50, y: 50}; // Polar origin
+ * // Yields: { x, y }
+ * const polar = Polar.toCartesian({ distance: 10, angleRadian: 0 }, origin);
+ * ```
+ * 
+ * Distance and angle can be provided as numbers intead:
+ * 
+ * ```
+ * // Yields: { x, y }
+ * const polar = Polar.toCartesian(10, 0, origin);
+ * ```
+ * 
  * @param a
  * @param b 
  * @param c 

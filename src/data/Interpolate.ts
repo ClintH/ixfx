@@ -14,8 +14,8 @@ import {wrap} from "./Wrap.js";
  * would start at 0 and you would keep interpolating up to `1`
  * @example
  * ```js
- * import {interpolate} from 'https://unpkg.com/ixfx/dist/data.js';
- * import {percentPingPong} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { percentPingPong } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * 
  * // Go back and forth between 0 and 1 by 0.1
  * let pp = percentPingPong(0.1);
@@ -39,7 +39,19 @@ export const interpolate =(amount:number, a:number, b:number):number => {
   return v;
 };
 
-export const interpolateAngle = (amount:number, angleA:number, angleB:number):number => {
-  const t = wrap(angleB-angleA, 0, piPi);
-  return interpolate(amount, angleA, angleA + (t > Math.PI ? t - piPi : t));
+/**
+ * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
+ * 
+ * ```js
+ * import { interpolateAngle } from 'https://unpkg.com/ixfx/dist/data.js';
+ * interpolateAngle(0.5, Math.PI, Math.PI/2);
+ * ```
+ * @param amount 
+ * @param aRadians 
+ * @param bRadians 
+ * @returns 
+ */
+export const interpolateAngle = (amount:number, aRadians:number, bRadians:number):number => {
+  const t = wrap(bRadians-aRadians, 0, piPi);
+  return interpolate(amount, aRadians, aRadians + (t > Math.PI ? t - piPi : t));
 };

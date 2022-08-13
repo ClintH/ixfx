@@ -1,39 +1,39 @@
 import { number as guardNumber, integer as guardInteger} from "../Guards.js";
 
 /**
- * Wraps am integer number within a specified range, defaulting to degrees (0-360)
+ * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
  * 
  * This is useful for calculations involving degree angles and hue, which wrap from 0-360.
  * Eg: to add 200 to 200, we don't want 400, but 40.
  * 
  * ```js
- * const v = wrap(200+200, 0, 360); // 40
+ * const v = wrapInteger(200+200, 0, 360); // 40
  * ```
  * 
  * Or if we minus 100 from 10, we don't want -90 but 270
  * ```js
- * const v = wrap(10-100, 0, 360); // 270
+ * const v = wrapInteger(10-100, 0, 360); // 270
  * ```
  * 
- * `wrap` uses 0-360 as a default range, so both of these
+ * `wrapInteger` uses 0-360 as a default range, so both of these
  * examples could just as well be:
  * 
  * ```js
- * wrap(200+200);  // 40
- * wrap(10-100);  // 270
+ * wrapInteger(200+200);  // 40
+ * wrapInteger(10-100);  // 270
  * ```
  * 
  * Non-zero starting points can be used. A range of 20-70: 
  * ```js
- * const v = wrap(-20, 20, 70); // 50 
+ * const v = wrapInteger(-20, 20, 70); // 50 
  * ```
  * 
  * Note that the minimum value is inclusive, while the maximum is _exclusive_.
  * So with the default range of 0-360, 360 is never reached:
  * 
  * ```js
- * wrap(360); // 0
- * wrap(361); // 1
+ * wrapInteger(360); // 0
+ * wrapInteger(361); // 1
  * ```
  * 
  * If you just want to lock values to a range without wrapping, consider {@link clamp}.
@@ -61,7 +61,7 @@ export const wrapInteger = (v:number, min:number = 0, max:number = 360) => {
 };
 
 /**
- * Wraps floating point numbers to be within a range (default: 0..1).
+ * Wraps floating point numbers to be within a range (default: 0..1). Use {@link wrapInteger} if you want to wrap integer values.
  * 
  * This logic makes sense for some things like rotation angle.
  * 
