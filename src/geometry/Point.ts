@@ -250,7 +250,7 @@ export const guardNonZeroPoint = (pt: Point, name = `pt`) => {
 
 /**
  * Returns a point with Math.abs applied to x and y.
- * ```ks
+ * ```js
  * Points.abs({ x:1,  y:1  }); // { x: 1, y: 1 }
  * Points.abs({ x:-1, y:1  }); // { x: 1, y: 1 }
  * Points.abs({ x:-1, y:-1 }); // { x: 1, y: 1 }
@@ -388,15 +388,15 @@ export const toArray = (p: Point): readonly number[] => ([p.x, p.y]);
  * @param p
  * @returns 
  */
-export const toString = (p: Point, precision?:number): string => {
+export const toString = (p: Point, digits?:number): string => {
   if (p === undefined) return `(undefined)`;
   if (p === null) return `(null)`;
 
-  const x = precision ? p.x.toPrecision(precision) : p.x;
-  const y = precision ? p.y.toPrecision(precision) : p.y;
+  const x = digits ? p.x.toFixed(digits) : p.x;
+  const y = digits ? p.y.toFixed(digits) : p.y;
 
   if (p.z !== undefined) {
-    const z = precision ? p.z.toPrecision(precision) : p.z;
+    const z = digits ? p.z.toFixed(digits) : p.z;
     return `(${x},${y},${z})`;
   } else {
     return `(${x},${y})`;
