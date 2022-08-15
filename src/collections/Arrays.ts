@@ -11,6 +11,11 @@ export * from './NumericArrays.js';
 
 /**
  * Throws an error if `array` parameter is not a valid array
+ * 
+ * ```js
+ * import { guardArray } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * guardArray(someVariable);
+ * ```
  * @private
  * @param array 
  * @param paramName 
@@ -38,6 +43,8 @@ export const guardIndex = <V>(array:ReadonlyArray<V>, index:number, paramName:st
  * 
  * @example Uses default equality function:
  * ```js
+ * import { areValuesIdentical } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const a1 = [10, 10, 10];
  * areValuesIdentical(a1); // True
  * 
@@ -47,6 +54,7 @@ export const guardIndex = <V>(array:ReadonlyArray<V>, index:number, paramName:st
  * 
  * If we want to compare by value for objects that aren't readily
  * converted to JSON, you need to provide a function:
+ * 
  * ```js
  * areValuesIdentical(someArray, (a, b) => {
  *  return (a.eventType === b.eventType);
@@ -69,9 +77,36 @@ export const areValuesIdentical = <V>(array:ReadonlyArray<V>, equality?:IsEqual<
 };
 
 /**
+ * Returns the _intersection_ of two arrays: the elements that are in common.
+ * 
+ * ```js
+ * intersection([1, 2, 3], [2, 4, 6]);
+// returns [2]
+ * ```
+ * @param a1 
+ * @param a2 
+ * @param equality 
+ * @returns 
+ */
+export const intersection = <V>(a1:ReadonlyArray<V>, a2:ReadonlyArray<V>, equality:IsEqual<V> = isEqualDefault) => a1.filter(e1 => a2.some(e2 => equality(e1, e2)));
+
+/**
+ * Returns a 'flattened' copy of array, un-nesting arrays one level
+ * ```js
+ * flatten([1, [2, 3], [[4]]] ]);
+ * // Yields: [ 1, 2, 3, [4]];
+ * ```
+ * @param array 
+ * @returns 
+ */
+export const flatten = <V>(array:ReadonlyArray<V>) => Array<V>.prototype.concat.apply([], [...array]);
+
+/**
  * Zip ombines the elements of two or more arrays based on their index.
  * 
  * ```js
+ * import { zip } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const a = [1,2,3];
  * const b = [`red`, `blue`, `green`];
  * 
@@ -110,6 +145,8 @@ export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
  * 
  * ```js
+ * import { interleave } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const a = [`a`, `b`, `c`];
  * const b = [`1`, `2`, `3`];
  * const c = interleave(a, b);
@@ -147,8 +184,9 @@ export const interleave = <V>(...arrays:ReadonlyArray<readonly V[]>):ReadonlyArr
  *  - 'first': continually use first element
  *  - 'last': continually use last element
  * 
- * @example
  * ```js
+ * import { ensureLength } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * ensureLength([1,2,3], 2); // [1,2]
  * ensureLength([1,2,3], 5, `undefined`); // [1,2,3,undefined,undefined]
  * ensureLength([1,2,3], 5, `repeat`);    // [1,2,3,1,2]
@@ -201,6 +239,8 @@ export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`un
  * of slicing the array before using `filter`.
  * 
  * ```js
+ * import { filterBetween } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * // Return 'registered' people between and including array indexes 5-10
  * const filtered = filterBetween(people, person => person.registered, 5, 10);
  * ```
@@ -228,6 +268,8 @@ export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, i
  * Returns a random array index.
  * 
  * ```js
+ * import { randomIndex } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const v = [`blue`, `red`, `orange`];
  * randomIndex(v); // Yields 0, 1 or 2
  * ```
@@ -242,7 +284,10 @@ export const randomIndex = <V>(array: ArrayLike<V>, rand:RandomSource = defaultR
 
 /**
  * Returns random element.
+ * 
  * ```js
+ * import { randomElement } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const v = [`blue`, `red`, `orange`];
  * randomElement(v); // Yields `blue`, `red` or `orange`
  * ```
@@ -264,6 +309,8 @@ export const randomElement = <V>(array: ArrayLike<V>, rand:RandomSource = defaul
  * 
  * @example Without changing source
  * ```js
+ * import { randomPluck } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const data = [100, 20, 40];
  * const {value, array} = randomPluck(data);
  * // value: 20, array: [100, 40], data: [100, 20, 40];
@@ -271,6 +318,8 @@ export const randomElement = <V>(array: ArrayLike<V>, rand:RandomSource = defaul
  *
  * @example Mutating source
  * ```js
+ * import { randomPluck } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const data = [100, 20, 40];
  * const {value} = randomPluck(data, true);
  * // value: 20, data: [100, 40];
@@ -311,6 +360,8 @@ export const randomPluck = <V>(array:readonly V[], mutate = false, rand:RandomSo
  * Returns a shuffled copy of the input array.
  * @example
  * ```js
+ * import { shuffle } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const d = [1, 2, 3, 4];
  * const s = shuffle(d);
  * // d: [1, 2, 3, 4], s: [3, 1, 2, 4]
@@ -337,12 +388,16 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
  *
  * @example
  * ```js
+ * import { without } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const data = [100, 20, 40];
  * const filtered = without(data, 20); // [100, 40]
  * ```
  * 
  * @example Using value-based comparison
  * ```js
+ * import { without } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const data = [{name: `Alice`}, {name:`Sam`}];
  * 
  * // This wouldn't work as expected, because the default comparer uses instance,
@@ -355,6 +410,8 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
  * 
  * @example Use a function
  * ```js
+ * import { without } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const data = [{name: `Alice`}, {name:`Sam`}];
  * without(data, {name:`ALICE`}, (a, b) => {
  *  return (a.name.toLowerCase() === b.name.toLowerCase());
@@ -375,6 +432,8 @@ export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> =
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  * 
  * ```js
+ * import { remove } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const v = [ 100, 20, 50 ];
  * const vv = remove(2);
  * 
@@ -406,6 +465,8 @@ export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V
  * 
  * @example
  * ```js
+ * import { groupBy } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const data = [
  *  { age: 39, city: `London` }
  *  { age: 14, city: `Copenhagen` }
@@ -449,14 +510,17 @@ export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) 
  * 
  * @example By percentage - get half of the items
  * ```
+ * import { sample } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const list = [1,2,3,4,5,6,7,8,9,10];
  * const sub = sample(list, 0.5);
- * // Yields:
- * // [2, 4, 6, 8, 10]
+ * // Yields: [2, 4, 6, 8, 10]
  * ```
  * 
  * @example By steps - every third
  * ```
+ * import { sample } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * 
  * const list = [1,2,3,4,5,6,7,8,9,10];
  * const sub = sample(list, 3);
  * // Yields:
@@ -489,3 +553,26 @@ export const sample = <V>(array: ReadonlyArray<V>, amount:number):ReadonlyArray<
   }
   return r;
 };
+
+/**
+ * Return `arr` broken up into chunks of `size`
+ * 
+ * ```js
+ * chunks([1,2,3,4,5,6,7,8,9,10], 3);
+ * // Yields: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
+ * ```
+ * @param arr 
+ * @param size 
+ * @returns 
+ */
+//eslint-disable-next-line func-style
+export function chunks<V>(arr:ReadonlyArray<V>, size:number) {
+  // https://surma.github.io/underdash/
+  const output = [];
+  //eslint-disable-next-line functional/no-loop-statement, functional/no-let
+  for (let i = 0; i < arr.length; i += size) {
+    //eslint-disable-next-line functional/immutable-data
+    output.push(arr.slice(i, i + size));
+  }
+  return output;
+}
