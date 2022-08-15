@@ -1,3 +1,15 @@
+/**
+ * Return `it` broken up into chunks of `size`
+ * 
+ * ```js
+ * chunks([1,2,3,4,5,6,7,8,9,10], 3);
+ * // Yields: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
+ * ```
+ * @param it 
+ * @param size 
+ * @returns 
+ */
+
 import {IsEqual} from "./Util";
 
 /**
@@ -10,12 +22,11 @@ import {IsEqual} from "./Util";
  * @param size 
  */
 //eslint-disable-next-line func-style
-export async function* chunks<V>(it:Iterable<V>, size:number) {
-  // Source: https://surma.github.io/underdash/
+export function* chunks<V>(it:Iterable<V>, size:number) {
   //eslint-disable-next-line functional/no-let
   let buffer = [];
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
+  for (const v of it) {
     //eslint-disable-next-line functional/immutable-data
     buffer.push(v);
     if (buffer.length === size) {
@@ -31,10 +42,9 @@ export async function* chunks<V>(it:Iterable<V>, size:number) {
  * @param its 
  */
 //eslint-disable-next-line func-style
-export async function* concat<V>(...its:readonly Iterable<V>[]) {
-  // Source: https://surma.github.io/underdash/
+export function* concat<V>(...its:readonly Iterable<V>[]) {
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const it of its) yield* it;
+  for (const it of its) yield* it;
 }
 
 /**
@@ -47,11 +57,9 @@ export async function* concat<V>(...its:readonly Iterable<V>[]) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* dropWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
-  // https://surma.github.io/underdash/
-  //const iit = it[Symbol.asyncIterator]();
+export function* dropWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) { 
+  for (const v of it) { 
     if (!f(v)) {
       yield v;
       break;
@@ -69,13 +77,12 @@ export async function* dropWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function equals<V>(it1:Iterable<V>, it2:Iterable<V>, equality?:IsEqual<V>) {
-  // https://surma.github.io/underdash/
-  const iit1 = it1[Symbol.iterator]();
-  const iit2 = it2[Symbol.iterator]();
+export function equals<V>(it1:IterableIterator<V>, it2:IterableIterator<V>, equality?:IsEqual<V>) {
+  //it1 = it1[Symbol.iterator]();
+  //it2 = it2[Symbol.iterator]();
   //eslint-disable-next-line functional/no-loop-statement,no-constant-condition
   while (true) {
-    const i1 = await iit1.next(), i2 = await iit2.next();
+    const i1 = it1.next(), i2 = it2.next();
     if (equality !== undefined) {
       if (!equality(i1.value, i2.value)) return false;
     } else if (i1.value !== i2.value) return false;
@@ -84,19 +91,19 @@ export async function equals<V>(it1:Iterable<V>, it2:Iterable<V>, equality?:IsEq
 }
 
 /**
- * Returns _true_ if `f` returns _true_ for 
+ * Returns true if `f` returns true for 
  * every item in iterable
  * @param it 
  * @param f 
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let ok = true;
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) ok = ok && f(v);
+  for (const v of it) ok = ok && f(v);
   return ok;
 }
 
@@ -111,15 +118,25 @@ export async function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
  * @param v 
  */
 //eslint-disable-next-line func-style
-export async function* fill<V>(it:AsyncIterable<V>, v:V) {
+export function* fill<V>(it:Iterable<V>, v:V) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const _ of it) yield v;
+  for (const _ of it) yield v;
 }
 
 /**
- * Filters an iterable, returning items which match `f`.
- * 
+ * Execute function `f` for each item in iterable
+ * @param it 
+ * @param f 
+ */
+//eslint-disable-next-line func-style
+export function forEach<V>(it:Iterable<V>, f:(v:V) => boolean) {
+  // https://surma.github.io/underdash/
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const v of it) f(v);
+}
+
+/**
  * ```js
  * filter([1, 2, 3, 4], e => e % 2 == 0);
  * returns [2, 4]
@@ -128,10 +145,10 @@ export async function* fill<V>(it:AsyncIterable<V>, v:V) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* filter<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export function* filter<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
+  for (const v of it) {
     if (!f(v)) continue;
     yield v;
   }
@@ -148,10 +165,10 @@ export async function* filter<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function find<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export  function find<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) { 
+  for (const v of it) { 
     if (f(v)) return v;
   } 
 }
@@ -165,29 +182,17 @@ export async function find<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @param it 
  */
 //eslint-disable-next-line func-style
-export async function* flatten<V>(it:AsyncIterable<V>) {
+export function* flatten<V>(it:Iterable<V>) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
-    if (Symbol.asyncIterator in v) { 
+  for (const v of it) {
+    if (Symbol.iterator in v) { 
       // @ts-ignore
       yield* v;
     } else {
       yield v;
     }
   }
-}
-
-/**
- * Execute function `f` for each item in iterable
- * @param it 
- * @param f 
- */
-//eslint-disable-next-line func-style
-export async function forEach<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
-  // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) f(v);
 }
 
 /**
@@ -200,10 +205,10 @@ export async function forEach<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* map<V, X>(it:AsyncIterable<V>, f:(v:V) => X) {
+export function* map<V, X>(it:Iterable<V>, f:(v:V) => X) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) { 
+  for (const v of it) { 
     yield f(v);
   }
 }
@@ -223,13 +228,12 @@ export async function* map<V, X>(it:AsyncIterable<V>, f:(v:V) => X) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function max<V>(it:AsyncIterable<V>, gt = (a:V, b:V) => a > b) {
+export function max<V>(it:Iterable<V>, gt = (a:V, b:V) => a > b) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
   //eslint-disable-next-line functional/no-let
   let max;
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
+  for (const v of it) {
     if(!max) {
       max = v;
       continue;
@@ -254,12 +258,12 @@ export async function max<V>(it:AsyncIterable<V>, gt = (a:V, b:V) => a > b) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function min<V>(it:AsyncIterable<V>, gt = (a:V, b:V) => a > b) {
+export function min<V>(it:Iterable<V>, gt = (a:V, b:V) => a > b) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let min;
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
+  for (const v of it) {
     if(!min) {
       min = v;
       continue;
@@ -279,9 +283,9 @@ export async function min<V>(it:AsyncIterable<V>, gt = (a:V, b:V) => a > b) {
  * @param len 
  */
 //eslint-disable-next-line func-style
-export async function* range(start:number, len:number) {
+export function* range(start:number, len:number) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-let,functional/no-loop-statement
+  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
   for (let i=0;i<len;i++) {
     yield start++;
   }
@@ -300,10 +304,10 @@ export async function* range(start:number, len:number) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function reduce<V>(it:AsyncIterable<V>, f:(acc:V, current:V) => V, start:V) {
+export function reduce<V>(it:Iterable<V>, f:(acc:V, current:V) => V, start:V) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) start = f(start, v);
+  for (const v of it) start = f(start, v);
   return start;
 }
 
@@ -314,13 +318,13 @@ export async function reduce<V>(it:AsyncIterable<V>, f:(acc:V, current:V) => V, 
  * @param end End index (or until completion)
  */
 //eslint-disable-next-line func-style
-export async function* slice<V>(it:AsyncIterable<V>, start = 0, end = Number.POSITIVE_INFINITY) {
+export function* slice<V>(it:Iterable<V>, start = 0, end = Number.POSITIVE_INFINITY) {
   // https://surma.github.io/underdash/
-  const iit = it[Symbol.asyncIterator]();
+  const iit = it[Symbol.iterator]();
   //eslint-disable-next-line functional/no-loop-statement
-  for(; start > 0; start--, end--) await iit.next();
+  for(; start > 0; start--, end--) iit.next();
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) { 
+  for (const v of it) { 
     if (end-- > 0) { 
       yield v;
     } else { 
@@ -341,10 +345,10 @@ export async function* slice<V>(it:AsyncIterable<V>, start = 0, end = Number.POS
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function some<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export function some<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) { 
+  for (const v of it) { 
     if (f(v)) return true;
   }
   return false;
@@ -361,60 +365,30 @@ export async function some<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function* takeWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export function* takeWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
+  for (const v of it) {
     if (!f(v)) return;
     yield v;
   }
 }
 
 /**
- * Returns an array of values from an iterator.
- * 
- * ```js
- * const data = await toArray(adsrSample(opts, 10));
- * ```
- * 
- * Note: If the iterator is infinite, be sure to provide a `count` or the function
- * will never return.
- * 
- * @param it Asynchronous iterable
- * @param count Number of items to return, by default all.
- * @returns 
- */
-//eslint-disable-next-line func-style
-export async function toArray<V>(it:AsyncIterable<V>, count = Infinity):Promise<readonly V[]> {
-  // https://2ality.com/2016/10/asynchronous-iteration.html
-  const result = [];
-  const iterator = it[Symbol.asyncIterator]();
-  //eslint-disable-next-line functional/no-loop-statement
-  while (result.length < count) {
-    const {value, done} = await iterator.next();
-    if (done) break;
-    //eslint-disable-next-line functional/immutable-data
-    result.push(value);
-  }
-  return result;
-
-}
-
-
-/**
- * Returns unique items from iterables, given a particular key function
+ * Returns unique items from several iterables
  * ```js
  * unique([{i:0,v:2},{i:1,v:3},{i:2,v:2}], e => e.v);
- * Yields:  [{i:0,v:2},{i:1,v:3}]
+ * Yields: returns [{i:0,v:2},{i:1,v:3}]
+ *
  * @param it 
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* unique<V>(it:AsyncIterable<V>, f:((id:V) => V) = id => id) {
+export function* unique<V>(it:Iterable<V>, f:((id:V) => V) = id => id) {
   // https://surma.github.io/underdash/
   const buffer = [];
   //eslint-disable-next-line functional/no-loop-statement
-  for await (const v of it) {
+  for (const v of it) {
     const fv = f(v);
     if (buffer.indexOf(fv) !== -1) continue;
     //eslint-disable-next-line functional/immutable-data
@@ -433,12 +407,13 @@ export async function* unique<V>(it:AsyncIterable<V>, f:((id:V) => V) = id => id
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function* zip<V>(...its:readonly AsyncIterable<V>[]) {
+export function* zip<V>(...its:readonly Iterable<V>[]) {
   // https://surma.github.io/underdash/
-  const iits = its.map(it => it[Symbol.asyncIterator]());
+  const iits = its.map(it => it[Symbol.iterator]());
+
   //eslint-disable-next-line functional/no-loop-statement
   while(true) {
-    const vs = await Promise.all(iits.map(it => it.next()));
+    const vs = iits.map(it => it.next());
     if (vs.some(v => v.done)) return;
     yield vs.map(v => v.value);
   }
