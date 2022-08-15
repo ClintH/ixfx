@@ -188,6 +188,8 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
  * 
  * Basic usage
  * ```js
+ * import { pointsTracker } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * const pt = pointsTracker();
  * 
  * // Track a point under a given id
@@ -199,7 +201,7 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
  * 
  * Do something with last values for all points
  * ```js
- * const c = Points.centroid(...Array.from(pointers.last()));
+ * const c = Points.centroid(...Array.from(pt.last()));
  * ```
  * 
  * More functions...
@@ -209,21 +211,34 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point> {
  * pt.reset();
  * ```
  * 
- * Accessors:
+ * Accessing data:
+ * 
  * ```js
  * pt.get(id);  // Get named point (or _undefined_)
  * pt.has(id); // Returns true if id exists
- * pt.trackedByAge(); // Returns array of tracked points, sorted by age
- * pt.valuesByAge(); // Returns array of tracked values, sorted by age
+ * pt.trackedByAge(); // Iterates over tracked points, sorted by age (oldest first)
+ * 
  * ```
  
 * Iterators:
+ * 
  * ```js
- * pt.values(); // Tracked values
+ * pt.tracked(); // Tracked values
  * pt.ids(); // Iterator over ids
- * pt.last(); // Last received value for each point
+ * 
+ * // Last received value for each named point
+ * pt.last(); 
+ * 
  * pt.initialValues(); // Iterator over initial values for each point
  * ```
+ * 
+ * You can work with 'most recently updated' points:
+ * 
+ * ```js
+ * // Iterates over points, sorted by age (oldest first)
+ * pt.valuesByAge(); 
+ * ```
+ * 
  * Options:
  * * `storeIntermediate`: if true, all points are stored internally
  * * `resetAfterSamples`: If set above 0, it will automatically reset after the given number of samples have been seen
@@ -237,7 +252,11 @@ export const pointsTracker = (opts:TrackOpts = {}) => new TrackedPointMap(opts);
  * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
  * track the pointer as it moves until pointerup.
  * 
+ * [See the point tracker playground](https://clinth.github.io/ixfx-demos/playgrounds/data/point-tracker/)
+ * 
  * ```js
+* import { pointTracker } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * // Create a tracker
  * const t = pointTracker(`pointer-0`);
  * 

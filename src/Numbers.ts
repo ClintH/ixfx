@@ -1,4 +1,6 @@
 import * as NumericArrays from './collections/NumericArrays.js';
+import {numberTracker} from './data/NumberTracker.js';
+import {TrackedValueOpts} from './data/TrackedValue.js';
 import {Easings} from './modulation/index.js';
 
 /**
@@ -82,6 +84,11 @@ export const isValid = (possibleNumber:number|unknown) => {
   if (Number.isNaN(possibleNumber)) return false;
   return true;
 }; 
+
+/**
+ * Alias for [Data.numberTracker](Data.numberTracker.html) 
+ */
+export const tracker = (id?:string, opts?:TrackedValueOpts) => numberTracker(id, opts);
 
 /**
  * Filters an iterator of values, only yielding

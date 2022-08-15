@@ -63,23 +63,52 @@ export class NumberTracker extends PrimitiveTracker<number> {
 }
 
 /**
- * Keeps track of the min, max and avg in a stream of values without actually storing them.
+ * Keeps track of the total, min, max and avg in a stream of values. By default values
+ * are not stored.
  * 
  * Usage:
  * 
  * ```js
- *  const t = numberTracker(); 
- *  t.seen(10);
+ * import { numberTracker } from 'https://unpkg.com/ixfx/dist/data.js';
  * 
- *  t.avg / t.min/ t.max / t.getMinMax()
+ * const t = numberTracker(); 
+ * t.seen(10);
+ * 
+ * t.avg / t.min/ t.max
+ * t.initial; // initial value
+ * t.size;    // number of seen values
+ * t.elapsed; // milliseconds since intialisation
+ * t.last;    // last value
  * ```
  * 
- * Use `reset()` to clear everything, or `resetAvg()` to only reset averaging calculation.
+ * To get `{ avg, min, max, total }`
+ * ```
+ * t.getMinMax()
+ * ```
+ * 
+ * Use `t.reset()` to clear everything.
  * 
  * Trackers can automatically reset after a given number of samples
  * ```
  * // reset after 100 samples
- * const t = numberTracker(`something`, 100);
+ * const t = numberTracker(`something`, { resetAfterSamples: 100 });
+ * ```
+ * 
+ * To store values, use the `storeIntermediate` option:
+ * 
+ * ```js
+ * const t = numberTracker(`something`, { storeIntermediate: true });
+ * ```
+ * 
+ * Difference between last value and initial value:
+ * ```js
+ * t.relativeDifference();
+ * ```
+ * 
+ * Get raw data (if it is being stored):
+ * ```js
+ * t.values; // array of numbers
+ * t.timestampes; // array of millisecond times, indexes correspond to t.values
  * ```
  * @class NumberTracker
  */

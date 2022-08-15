@@ -250,7 +250,7 @@ export class TrackedValueMap<V>  {
   }
 
   /**
-   * Return number of named points being tracked
+   * Return number of named values being tracked
    */
   get size() {
     return this.store.size;
@@ -321,15 +321,15 @@ export class TrackedValueMap<V>  {
   /**
    * Enumerate tracked values
    */
-  *values() {
+  *tracked() {
     yield* this.store.values();
   }
 
   /**
-   * Returns TrackedValues ordered with oldest first
+   * Iterates TrackedValues ordered with oldest first
    * @returns 
    */
-  trackedByAge():readonly TrackerBase<V>[] {
+  *trackedByAge() {
     const tp = Array.from(this.store.values());
     tp.sort((a, b) => {
       const aa = a.elapsed;
@@ -338,13 +338,23 @@ export class TrackedValueMap<V>  {
       if (aa > bb) return -1;
       return 1;
     });
-    return tp;
+
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const t of tp) {
+      yield t;
+    }
   }
 
-  valuesByAge():readonly V[] {
-    const tb = this.trackedByAge();
-    // @ts-ignore
-    return tb.map(t => t.last);
+  /**
+   * Iterates underlying values, ordered by age (oldest first)
+   * First the named values are sorted by their `elapsed` value, and then
+   * we return the last value for that group.
+   */
+  *valuesByAge() {
+    //eslint-disable-next-line functional/no-loop-statement
+    for (const tb of this.trackedByAge()) {
+      yield tb.last;
+    }
   }
 
   /**
