@@ -796,6 +796,26 @@ export const toFlatArray = (a: Points.Point|Line, b: Points.Point): readonly num
 };
 
 /**
+ * Yields all the points of all the lines.
+ * 
+ * ```js
+ * const lines = [ ..some array of lines.. ];
+ * for (const pt of Lines.asPoints(lines)) {
+ *  // Yields a and then b of each point sequentially
+ * }
+ * ```
+ * @param lines 
+ */
+//eslint-disable-next-line func-style
+export function* asPoints(lines:Iterable<Line>) {
+  //eslint-disable-next-line functional/no-loop-statement
+  for (const l of lines) {
+    yield l.a;
+    yield l.b;
+  }
+}
+
+/**
  * Returns an SVG description of line
  * ```
  * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js';

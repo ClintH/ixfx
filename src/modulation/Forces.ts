@@ -348,8 +348,9 @@ export const apply = (t:ForceAffected, ...accelForces:readonly ForceKind[]):Forc
  * It returns a function which can later be applied to a thing.
  * 
  * ```js
+ * import { Forces } from "https://unpkg.com/ixfx/dist/modulation.js"
  * // Acceleration vector of (0.1, 0), ie moving straight on horizontal axis
- * const f = accelerationForce({ x:0.1, y:0 }, `dampen`);
+ * const f = Forces.accelerationForce({ x:0.1, y:0 }, `dampen`);
  * 
  * // Thing to move
  * let t = { position: ..., acceleration: ... }

@@ -26,12 +26,13 @@ import {number as guardNumber} from "../Guards.js";
  * ```
  * @param interval Amount to increment by. Defaults to 10%
  * @param start Starting point within range. Defaults to 0 using a positive interval or 1 for negative intervals
- * @param rounding Rounding to apply. Defaults to 1000. This avoids floating-point rounding errors.
+ * @param rounding Rounding to apply. This avoids floating-point rounding errors.
  */
-export const pingPongPercent = function (interval: number = 0.1, lower?: number, upper?: number, start?: number, rounding: number = 1000) {
+export const pingPongPercent = function (interval: number = 0.1, lower?: number, upper?: number, start?: number, rounding?: number) {
   if (lower === undefined) lower = 0;
   if (upper === undefined) upper = 1;
   if (start === undefined) start = lower;
+
   guardNumber(interval, `bipolar`, `interval`);
   guardNumber(upper, `bipolar`, `end`);
   guardNumber(start, `bipolar`, `offset`);
@@ -60,11 +61,14 @@ export const pingPongPercent = function (interval: number = 0.1, lower?: number,
  * @param start Starting point within bounds (defaults to `lower`)
  * @param rounding Rounding is off by default. Use say 1000 if interval is a fractional amount to avoid rounding errors.
  */
-export const pingPong = function* (interval: number, lower: number, upper: number, start?: number, rounding: number = 1) {
+export const pingPong = function* (interval: number, lower: number, upper: number, start?: number, rounding?: number) {
   if (lower === undefined) throw new Error(`Parameter 'lower' is undefined`);
   if (interval === undefined) throw new Error(`Parameter 'interval' is undefined`);
   if (upper === undefined) throw new Error(`Parameter 'upper' is undefined`);
-  if (interval < 1 && interval > 0 && rounding === 1) rounding = 1000;
+
+  if (rounding === undefined && (interval <=1 && interval >= 0)) rounding = 10 / interval;
+  else if (rounding === undefined) rounding = 1234;
+
   if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);
   if (Number.isNaN(lower)) throw new Error(`lower parameter is NaN`);
   if (Number.isNaN(upper)) throw new Error(`upper parameter is NaN`);

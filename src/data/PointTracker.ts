@@ -273,7 +273,7 @@ export const pointsTracker = (opts:TrackOpts = {}) => new TrackedPointMap(opts);
  * t.x / t.y
  * t.length; // Total length of accumulated points
  * t.elapsed; // Total duration since start
- * t.lastInfo; // The PointSeenInfo for last seen point
+ * t.lastResult; // The PointSeenInfo for last seen point
  * ```
  * 
  * Housekeeping

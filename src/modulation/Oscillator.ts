@@ -1,5 +1,3 @@
-//import {number as guardNumber} from "../Guards.js";
-
 import * as Timers from '../flow/Timer.js';
 
 const piPi = Math.PI*2;
@@ -22,7 +20,15 @@ export type SpringOpts = {
    */
 	readonly soft?: boolean; // = false
 
+  /**
+   * Default: 0.1
+   */
   readonly velocity?:number
+
+  /**
+   * How many iterations to wait for spring settling (default: 10)
+   */
+  readonly countdown?:number
 }
 
 const springRaw = (opts: SpringOpts = {}, from: number = 0, to: number = 1) => {
@@ -50,6 +56,7 @@ const springRaw = (opts: SpringOpts = {}, from: number = 0, to: number = 1) => {
  * Spring-style oscillation
  * 
  * ```js
+ * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
  * const spring = Oscillators.spring();
  * 
  * continuously(() => {
@@ -76,9 +83,9 @@ export function* spring(opts:SpringOpts = {}, timerOrFreq:Timers.Timer|undefined
   
   const fn = springRaw(opts, 0, 1);
 
-  // Give it 100 iterations to settle
+  // Give it some iterations to settle
   //eslint-disable-next-line functional/no-let
-  let doneCountdown = 100;
+  let doneCountdown = opts.countdown ?? 10;
 
   //eslint-disable-next-line functional/no-loop-statement
   while (doneCountdown > 0) {
@@ -96,9 +103,11 @@ export function* spring(opts:SpringOpts = {}, timerOrFreq:Timers.Timer|undefined
  * Sine oscillator.
  * 
  * ```js
+ * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * 
  * // Setup
- * const osc = sine(Timers.frequencyTimer(10));
- * const osc = sine(0.1);
+ * const osc = Oscillators.sine(Timers.frequencyTimer(10));
+ * const osc = Oscillators.sine(0.1);
  * 
  * // Call whenever a value is needed
  * const v = osc.next().value;
@@ -175,9 +184,13 @@ export function* triangle(timerOrFreq:Timers.Timer|number) {
  * Saw oscillator
  * 
  * ```js
+ * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * 
  * // Setup
- * const osc = saw(Timers.frequencyTimer(0.1));
- * const osc = saw(0.1);
+ * const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
+ * 
+ * // Or
+ * const osc = Oscillators.saw(0.1);
  * 
  * // Call whenever a value is needed
  * const v = osc.next().value;
@@ -196,9 +209,11 @@ export function* saw(timerOrFreq:Timers.Timer) {
  * Square oscillator
  * 
  * ```js
+ * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * 
  * // Setup
- * const osc = square(Timers.frequencyTimer(0.1));
- * const osc = square(0.1);
+ * const osc = Oscillators.square(Timers.frequencyTimer(0.1));
+ * const osc = Oscillators.square(0.1);
  * 
  * // Call whenever a value is needed
  * osc.next().value;

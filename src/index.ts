@@ -8,7 +8,7 @@
  * * {@link Generators}: Generate data
  * * {@link Geometry}: Working with various kinds of shapes and spatial calcuations
  * * {@link Io}: Connect to Espruino, Arduino, sound and video inputs
- * * {@link Modulation}: Envelopes, Oscillators, jittering
+ * * {@link Modulation}: Envelopes, oscillators, jittering, forces
  * * {@link Numbers}: A few number-processing functions
  * * {@link Random}: Compute various forms of random numbers
  * * {@link Text}: A few string processing functions

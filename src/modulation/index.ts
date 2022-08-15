@@ -64,6 +64,7 @@ export {Forces};
  * * {@link Oscillators.sineBipolar}: Sine wave with range of -1 to 1
  * * {@link Oscillators.square}: Square wave
  * * {@link Oscillators.triangle}: Triangle wave
+ * * {@link Oscillators.spring}: Spring oscillator
  * 
  * @example On-demand sampling
  * ```js

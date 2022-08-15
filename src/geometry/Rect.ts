@@ -902,7 +902,12 @@ export const lengths = (rect:RectPositioned):readonly number[] => {
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const edges = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => Lines.joinPointsToLines(...corners(rect, origin), origin ?? Points.Empty);
+export const edges = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => {
+  const c = corners(rect, origin);
+
+  // Connect all the corners, back to first corner again
+  return Lines.joinPointsToLines(...c, c[0]);
+};
 
 /**
  * Returns the perimeter of `rect` (ie. sum of all edges)
