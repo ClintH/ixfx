@@ -1,3 +1,4 @@
+/* eslint-disable */
 type WithEvents = {
   addEventListener(type: string, callbackfn: any): void;
   removeEventListener(type: string, callbackfn: any): void;
@@ -10,6 +11,7 @@ export const isIterable = (v: any): v is Iterable<any> => Symbol.iterator in Obj
 export const eventsToIterable = <V>(eventSource: WithEvents, eventType: string): AsyncIterator<any, any, undefined> => {
   const pullQueue: any[] = [];
   const pushQueue: any[] = [];
+  //eslint-disable-next-line functional/no-let
   let done = false;
   const pushValue = async (args: any) => {
     if (pullQueue.length !== 0) {
@@ -20,17 +22,15 @@ export const eventsToIterable = <V>(eventSource: WithEvents, eventType: string):
     }
   };
 
-  const pullValue = (): Promise<V> => {
-    return new Promise<V>((resolve) => {
-      if (pushQueue.length !== 0) {
-        const args = pushQueue.shift();
-        // @ts-ignore
-        resolve(...args);
-      } else {
-        pullQueue.push(resolve);
-      }
-    });
-  };
+  const pullValue = (): Promise<V> => new Promise<V>((resolve) => {
+    if (pushQueue.length !== 0) {
+      const args = pushQueue.shift();
+      // @ts-ignore
+      resolve(...args);
+    } else {
+      pullQueue.push(resolve);
+    }
+  });
 
   const handler = (...args: any) => {
     pushValue(args);

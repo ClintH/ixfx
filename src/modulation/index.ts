@@ -10,6 +10,8 @@ export * from './PingPong.js';
 /**
  * Easings module
  * 
+ * [See the guide](https://clinth.github.io/ixfx-docs/modulation/easing/)
+ * 
  * Overview:
  * * {@link Easings.time}: Ease by time
  * * {@link Easings.tick}: Ease by tick
