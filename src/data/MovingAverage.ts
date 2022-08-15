@@ -103,7 +103,7 @@ export const movingAverage = (samples = 100, weightingFn?:(v:number)=>number):Mo
 
   const compute = () => {
     if (weightingFn === undefined) {
-      return Arrays.average(...q.data);
+      return Arrays.average(q.data);
     } else {
       return Arrays.averageWeighted(q.data, weightingFn);
     }
