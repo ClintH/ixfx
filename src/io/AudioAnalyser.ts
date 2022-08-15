@@ -284,7 +284,7 @@ export class AudioAnalyser {
    */
   getFrequencyRangeMax(lowFreq:number, highFreq:number, freqData:readonly number[]):number {
     const samples = this.sliceByFrequency(lowFreq, highFreq, freqData);
-    return Arrays.max(...samples);
+    return Arrays.max(samples);
   }
 
   /**

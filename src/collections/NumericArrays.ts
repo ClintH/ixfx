@@ -34,9 +34,16 @@ import * as Easings from "../modulation/Easing.js";
  */
 export const weight = (data:readonly number[], fn?:(relativePos:number)=>number):readonly number[] => {
   const f = (fn === undefined) ? (x:number) => x : fn;
-  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
-  return validNumbers.map((v:number, index:number) => v*f(index/(validNumbers.length-1)));
+  return validNumbers(data).map((v:number, index:number) => v*f(index/(validNumbers.length-1)));
 };
+
+/**
+ * Returns an array of all valid numbers from `data`
+ * 
+ * @param data 
+ * @returns 
+ */
+export const validNumbers = (data:readonly number[]) => data.filter(d => typeof d === `number` && !Number.isNaN(d));
 
 /**
  * Returns the dot product of two arbitrary-sized arrays. Assumed they are of the same length.
@@ -83,16 +90,16 @@ export const dotProduct = (values:ReadonlyArray<readonly number[]>):number => {
  * Arrays.average(data);
  * ```
  * 
- * See also: {@link Numbers.average} which takes a list of parameters
+ * See also: [Numbers.average](Numbers.average.html) which takes a list of parameters
  * @param data Data to average.
  * @returns Average of array
  */
 export const average = (data: readonly number[]): number => {
   // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
-  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
-  const total = validNumbers.reduce((acc, v) => acc + v, 0);
-  return total / validNumbers.length;
+  const valid = validNumbers(data);
+  const total = valid.reduce((acc, v) => acc + v, 0);
+  return total / valid.length;
 };
 
 /**
@@ -145,15 +152,12 @@ export const averageWeighted = (data:readonly number[], weightings:(readonly num
  * 
  * ```js
  * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.min(10, 20, 0); // Yields 0
+ * Arrays.min([10, 20, 0]); // Yields 0
  * ```
  * @param data
  * @returns Minimum number
  */
-export const min = (...data:readonly number[]):number => {
-  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
-  return Math.min(...validNumbers);
-};
+export const min = (data:readonly number[]):number => Math.min(...validNumbers(data));
 
 /**
  * Returns the index of the largest value.
@@ -165,7 +169,7 @@ export const min = (...data:readonly number[]):number => {
  * @param data Array of numbers 
  * @returns Index of largest value
  */
-export const maxIndex = (...data:readonly number[]):number => data.reduce((bestIndex, value, index, arr) => (value > arr[bestIndex] ? index : bestIndex), 0);
+export const maxIndex = (data:readonly number[]):number => data.reduce((bestIndex, value, index, arr) => (value > arr[bestIndex] ? index : bestIndex), 0);
 
 /**
  * Returns the index of the smallest value.
@@ -191,10 +195,7 @@ export const minIndex = (...data:readonly number[]):number => data.reduce((bestI
  * @param data List of numbers
  * @returns Maximum number
  */
-export const max = (...data:readonly number[]):number => {
-  const validNumbers = data.filter(d => typeof d === `number` && !Number.isNaN(d));
-  return Math.max(...validNumbers);
-};
+export const max = (data:readonly number[]):number => Math.max(...validNumbers(data));
 
 /**
  * Returns the total of `data`.
@@ -202,12 +203,12 @@ export const max = (...data:readonly number[]):number => {
  * 
  * ```js
  * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.total(1, 2, 3); // 6
+ * Arrays.total([1, 2, 3]); // 6
  * ```
  * @param data Array of numbers
  * @returns Total
  */
-export const total = (...data:readonly number[]):number => data.reduce((prev, curr) => {
+export const total = (data:readonly number[]):number => data.reduce((prev, curr) => {
   if (typeof curr !== `number`) return prev;
   if (Number.isNaN(curr)) return prev;
   if (Number.isFinite(curr)) return prev;

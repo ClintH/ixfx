@@ -27,13 +27,13 @@ changes in data.</p>
 the rate at which new data is added to the moving average.</p>
 <p><code>add</code> adds a number and returns the computed average. Call <code>compute</code> to 
 get the average without adding a new value.</p>
-<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">ma</span><span class="hl-2"> = </span><span class="hl-8">movingAverage</span><span class="hl-2">(</span><span class="hl-7">10</span><span class="hl-2">);</span><br/><span class="hl-3">ma</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(</span><span class="hl-7">10</span><span class="hl-2">); </span><span class="hl-0">// 10</span><br/><span class="hl-3">ma</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">);  </span><span class="hl-0">// 7.5</span>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">movingAverage</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">ma</span><span class="hl-2"> = </span><span class="hl-8">movingAverage</span><span class="hl-2">(</span><span class="hl-7">10</span><span class="hl-2">);</span><br/><span class="hl-3">ma</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(</span><span class="hl-7">10</span><span class="hl-2">); </span><span class="hl-0">// 10</span><br/><span class="hl-3">ma</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">);  </span><span class="hl-0">// 7.5</span>
 </code></pre>
 <p><code>clear</code> clears the average.</p>
 <p>A weighting function can be provided to shape how the average is
 calculated - eg privileging the most recent data over older data.
 It uses <code>Arrays.averageWeighted</code> under the hood.</p>
-<pre><code class="language-js"><span class="hl-0">// Give more weight to data in middle of sampling window</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">ma</span><span class="hl-2"> = </span><span class="hl-8">movingAverage</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-3">Easings</span><span class="hl-2">.</span><span class="hl-8">gaussian</span><span class="hl-2">());</span>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">movingAverage</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Give more weight to data in middle of sampling window</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">ma</span><span class="hl-2"> = </span><span class="hl-8">movingAverage</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-3">Easings</span><span class="hl-2">.</span><span class="hl-8">gaussian</span><span class="hl-2">());</span>
 </code></pre>
 <p>Because it keeps track of <code>samples</code> previous data, there is a memory impact. A lighter version is <a href="Data.movingAverageLight.html">movingAverageLight</a> which does not keep a buffer of prior data, but can&#39;t be as easily fine-tuned.</p>
 
@@ -135,6 +135,7 @@ It uses <code>Arrays.averageWeighted</code> under the hood.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Modulation.Easings.html">Easings</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Modulation.Forces.html">Forces</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Modulation.Oscillators.html">Oscillators</a></li></ul></li>
+<li class="tsd-kind-namespace"><a href="../modules/Numbers.html">Numbers</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Random.html">Random</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Text.html">Text</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Util.html">Util</a></li>

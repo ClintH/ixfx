@@ -9,6 +9,7 @@
  * * {@link Geometry}: Working with various kinds of shapes and spatial calcuations
  * * {@link Io}: Connect to Espruino, Arduino, sound and video inputs
  * * {@link Modulation}: Envelopes, Oscillators, jittering
+ * * {@link Numbers}: A few number-processing functions
  * * {@link Random}: Compute various forms of random numbers
  * * {@link Text}: A few string processing functions
  * * {@link Visual}: Colour, drawing, SVG and video
@@ -86,6 +87,16 @@ export * as Geometry from './geometry/index.js';
  * ```
  */
 export * as Text from './Text.js';
+
+/**
+ * Number processing
+ * 
+ * Note though that 'number processing' is all over the place. This is
+ * added mostly as a semantic aliasing where it makes sense.
+ * Overview
+ * * {@link average}: Average numbers
+ */
+export * as Numbers from './Numbers.js';
 
 /**
  * Input and output to devices, sensors and actuators

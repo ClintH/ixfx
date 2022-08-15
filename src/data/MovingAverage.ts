@@ -65,6 +65,8 @@ export const movingAverageLight = (scaling:number = 3):MovingAverage => {
  * get the average without adding a new value.
  * 
  * ```js
+ * import { movingAverage } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * const ma = movingAverage(10);
  * ma.add(10); // 10
  * ma.add(5);  // 7.5
@@ -77,6 +79,8 @@ export const movingAverageLight = (scaling:number = 3):MovingAverage => {
  * It uses `Arrays.averageWeighted` under the hood.
  * 
  * ```js
+ * import { movingAverage } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
  * // Give more weight to data in middle of sampling window
  * const ma = movingAverage(100, Easings.gaussian());
  * ```
