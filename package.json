@@ -27,6 +27,7 @@
     "./keyValues.js": "./dist/keyValues.js",
     "./modulation.js": "./dist/modulation.js",
     "./maps.js": "./dist/maps.js",
+    "./numbers.js": "./dist/numbers.js",
     "./io.js": "./dist/io/js",
     "./random.js": "./dist/random.js",
     "./sets.js": "./dist/sets.js",

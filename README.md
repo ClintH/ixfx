@@ -43,3 +43,4 @@ Bundles
 * [d3-interpolate](https://github.com/d3/d3-interpolate), [d3-color](https://github.com/d3/d3-color/) by Mike Bostock
 * Easing functions by [Andrey Sitnik and Ivan Solovev](https://easings.net/)
 * [Bezier.js](https://github.com/Pomax/bezierjs)
+* [Underdash](https://surma.github.io/underdash/) by Surma
