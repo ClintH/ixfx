@@ -16,7 +16,7 @@ export abstract class TrackerBase<V> {
   */
   protected resetAfterSamples:number;
 
-  constructor(readonly id:string, opts:TrackedValueOpts = {}) {
+  constructor(readonly id:string = `TrackerBase`, opts:TrackedValueOpts = {}) {
     this.storeIntermediate = opts.storeIntermediate ?? false;
     this.resetAfterSamples = opts.resetAfterSamples ?? -1;
     this.seenCount = 0;

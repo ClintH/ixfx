@@ -7,7 +7,7 @@ import {ObjectTracker} from "./ObjectTracker.js";
  * Information about seen points
  */
 export type PointTrack = Points.PointRelationResult & {
-  readonly speed:number
+  // readonly speedFromInitial:number
 };
 
 export type PointTrackerResults = {
@@ -76,7 +76,6 @@ export class PointTracker extends ObjectTracker<Points.Point> {
     // Get basic geometric relation from start to the last provided point
     const initialRel:PointTrack = {
       ...this.initialRelation(newLast),
-      speed: this.values.length < 2 ? 0 : Line.length(this.initial ?? Points.Empty, newLast) / (newLast.at - (this.initial ? this.initial.at : 0)),
     };
     const lastRel:PointTrack = {
       ...lastRelation(newLast),

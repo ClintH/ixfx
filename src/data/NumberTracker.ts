@@ -12,13 +12,6 @@ export class NumberTracker extends PrimitiveTracker<number> {
     return this.total / this.seenCount;
   }
 
-  // resetAvg(newId: string | null = null) {
-  //   if (newId !== null) this.id = newId;
-  //   this.total = 0;
-  //   this.samples = 0;
-  // }
-
-
   /**
    * Difference between last value and initial.
    * Eg. if last value was 10 and initial value was 5, 5 is returned (10 - 5)
