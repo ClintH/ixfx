@@ -1400,6 +1400,11 @@ export type PointRelationResult = {
   * This is calculated by summing x,y and dividing by total points
   */
   readonly average:Point
+
+  /**
+   * Speed. Distance/millisecond from one sample to the next.
+   */
+  readonly speed:number
 };
 
 /**
@@ -1412,13 +1417,14 @@ export type PointRelationResult = {
  * const t = Points.relation({x:50,y:50});
  * 
  * // Compare to a 0,0
- * const {angle, distance, average, centroid} = t({x:0,y:0});
+ * const { angle, distance, average, centroid, speed } = t({x:0,y:0});
  * ```
  * 
  * X,y coordinates can also be used as parameters:
  * ```js
  * const t = Points.relation(50, 50);
- * const {angle, distance, centroid} = t(0, 0);
+ * const result = t(0, 0);
+ * // result.speed, result.angle ...
  * ```
  * @param start 
  * @returns 
@@ -1432,14 +1438,26 @@ export const relation = (a:Point|number, b?:number):PointRelation => {
   //eslint-disable-next-line functional/no-let
   let count = 0;
 
+  //eslint-disable-next-line functional/no-let
+  let lastUpdate = performance.now();
+  
   const update = (aa:Point|number, bb?:number) => {
     const p = getPointParam(aa, bb);
     totalX += p.x;
     totalY += p.y;
     count++;
+    
+    const dist = distance(p, start);
+
+    // Track speed
+    const now = performance.now();
+    const speed = dist / ((now - lastUpdate));
+    lastUpdate = now;
+   
     return Object.freeze({
       angle: angle(p, start),
-      distance: distance(p, start),
+      distance: dist,
+      speed,
       centroid: centroid(p, start),
       average: {
         x: totalX/count,
