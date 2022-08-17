@@ -99,7 +99,8 @@ export const intersection = <V>(a1:ReadonlyArray<V>, a2:ReadonlyArray<V>, equali
  * @param array 
  * @returns 
  */
-export const flatten = <V>(array:ReadonlyArray<V>) => Array<V>.prototype.concat.apply([], [...array]);
+export const flatten = <V>(array:ReadonlyArray<V|readonly V[]>):readonly V[] => Array.prototype.concat.apply([], [...array]);
+
 
 /**
  * Zip ombines the elements of two or more arrays based on their index.
