@@ -300,9 +300,10 @@ export const angle = (a: Point, b?: Point, c?:Point) => {
  * @param points 
  * @returns A single point
  */
-export const centroid = (...points:readonly Point[]):Point => {
+export const centroid = (...points:readonly (Point|undefined)[]):Point => {
   if (!Array.isArray(points)) throw new Error(`Expected list of points`); 
   const sum = points.reduce((prev, p) => {
+    if (p === undefined) return prev; // Ignore undefined
     if (Array.isArray(p)) throw new Error(`'points' list contains an array. Did you mean: centroid(...myPoints)?`);
     if (!isPoint(p)) throw new Error(`'points' contains something which is not a point: ${JSON.stringify(p)}`);
     return {
