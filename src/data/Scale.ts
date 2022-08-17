@@ -1,3 +1,4 @@
+import {clamp} from "./Clamp.js";
 import { number as guardNumber} from "../Guards.js";
 
 /**
@@ -17,7 +18,7 @@ import { number as guardNumber} from "../Guards.js";
  * ```
  * 
  * If `v` is outside of the input range, it will likewise be outside of the output range.
- * Use {@link clamp} to ensure output range is maintained.
+ * Use {@link scaleClamped} to clip value to range.
  * 
  * If inMin and inMax are equal, outMax will be returned.
  * 
@@ -45,12 +46,37 @@ export const scale = (
   if (outMax === undefined) outMax = 1;
   if (outMin === undefined) outMin = 0;
   if (inMin === inMax) return outMax;
-  //console.log(`v: ${v} in: ${inMin}-${inMax} out: ${outMin}-${outMax}`);
+
   //eslint-disable-next-line functional/no-let
   let a = (v - inMin) / (inMax - inMin);
   if (easing !== undefined) a = easing(a);
   return a * (outMax - outMin) + outMin;
-  //return (v - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+};
+
+/**
+ * As {@link scale}, but result is clamped to be
+ * within `outMin` and `outMax`.
+ * @param v 
+ * @param inMin 
+ * @param inMax 
+ * @param outMin 
+ * @param outMax 
+ * @param easing 
+ * @returns 
+ */
+export const scaleClamped = (
+  v:number, 
+  inMin:number, inMax:number, 
+  outMin?:number, outMax?:number,
+  easing?:(v:number)=>number
+):number => {
+
+  if (outMax === undefined) outMax = 1;
+  if (outMin === undefined) outMin = 0;
+  if (inMin === inMax) return outMax;
+  
+  const x = scale(v, inMin, inMax, outMin, outMax, easing);
+  return clamp(x, outMin, outMax);
 };
 
 /**
