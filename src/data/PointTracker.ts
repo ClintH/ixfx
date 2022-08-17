@@ -1,29 +1,13 @@
 import * as Points from "../geometry/Point.js";
 import * as Line from "../geometry/Line.js";
-import {Timestamped, ObjectTracker, TrackedValueMap, TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
+import {Timestamped,  TrackedValueMap, TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
+import {ObjectTracker} from "./ObjectTracker.js";
 
 /**
  * Information about seen points
  */
 export type PointTrack = Points.PointRelationResult & {
-  /**
-   * Distance
-   */
-  //readonly distance:number
-  /**
-   * Centroid
-   */
-  //readonly centroid:Points.Point
-  //readonly angle:number
-
-  /**
-   * Units/millisecond
-   */
   readonly speed:number
-  /**
-   * Average of all points seen
-   */
-  //readonly average:Points.Point
 };
 
 export type PointTrackerResults = {
@@ -92,7 +76,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
     // Get basic geometric relation from start to the last provided point
     const initialRel:PointTrack = {
       ...this.initialRelation(newLast),
-      speed: this.values.length < 2 ? 0 : Line.length(this.initial!, newLast) / (newLast.at - this.initial!.at),
+      speed: this.values.length < 2 ? 0 : Line.length(this.initial ?? Points.Empty, newLast) / (newLast.at - (this.initial ? this.initial.at : 0)),
     };
     const lastRel:PointTrack = {
       ...lastRelation(newLast),
@@ -172,7 +156,11 @@ export class PointTracker extends ObjectTracker<Points.Point> {
 }
 
 
-export class TrackedPointMap extends TrackedValueMap<Points.Point> {
+/**
+ * A {@link TrackedValueMap} for points. Uses {@link PointTracker} to
+ * track added values.
+ */
+export class TrackedPointMap extends TrackedValueMap<Points.Point, PointTracker> {
   constructor(opts:TrackOpts = {}) {
     super((key, start) => {
       if (start === undefined) throw new Error(`Requires start point`);

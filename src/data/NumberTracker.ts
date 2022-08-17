@@ -1,4 +1,5 @@
-import { TrackedValueOpts as TrackOpts, Timestamped, PrimitiveTracker} from "./TrackedValue.js";
+import {PrimitiveTracker} from "./PrimitiveTracker.js";
+import { TrackedValueOpts as TrackOpts, Timestamped} from "./TrackedValue.js";
 
 
 export class NumberTracker extends PrimitiveTracker<number> {

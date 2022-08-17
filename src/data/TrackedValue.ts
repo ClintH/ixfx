@@ -1,5 +1,5 @@
-import {repeat} from "../flow/index.js";
 import {GetOrGenerate, getOrGenerate} from "../collections/Map.js";
+import {TrackerBase} from "./TrackerBase.js";
 
 export type Timestamped<V> = V & {
   readonly at:number
@@ -19,245 +19,46 @@ export type TrackedValueOpts = {
   readonly resetAfterSamples?:number
 }
 
-export abstract class TrackerBase<V> {
-  /**
-   * @ignore
-   */
-  seenCount:number;
-
-  /**
-  * @ignore
-  */
-  protected storeIntermediate:boolean;
-  
-  /**
-  * @ignore
-  */
-  protected resetAfterSamples:number;
-
-  constructor(readonly id:string, opts:TrackedValueOpts = {}) {
-    this.storeIntermediate = opts.storeIntermediate ?? false;
-    this.resetAfterSamples = opts.resetAfterSamples ?? -1;
-    this.seenCount = 0;
-  }
-
-  /**
-   * Reset tracker
-   */
-  reset() {
-    this.seenCount = 0;
-    this.onReset();
-  }
-
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seen(...p:V[]):any {    
-    if (this.resetAfterSamples > 0 && this.seenCount > this.resetAfterSamples) {
-      this.reset();
-    }
-
-    this.seenCount += p.length;
-    const t = this.seenImpl(p);
-    this.onSeen(t);
-  }
-
-  /**
-   * @ignore
-   * @param p 
-   */
-  abstract seenImpl(p:V[]):V[];
-
-  abstract get last():V|undefined;
-
-  /**
-   * Returns the initial value, or undefined
-   */
-  abstract get initial():V|undefined;
-
-  /**
-   * Returns the elapsed milliseconds since the initial value
-   */
-  abstract get elapsed():number;
-
-  /**
-   * @ignore
-   */
-  //eslint-disable-next-line @typescript-eslint/no-empty-function
-  onSeen(_p:V[]) {
-  }
-
-  /**
-   * @ignore
-   */
-  abstract onReset():void;
-} 
-
-export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
-  values:V[];
-  timestamps:number[];
-
-  constructor(id:string, opts:TrackedValueOpts) {
-    super(id, opts);
-    this.values = [];
-    this.timestamps = [];
-  }
-
-  get last():V|undefined {
-    return this.values.at(-1);
-  }
-
-  get initial():V|undefined {
-    return this.values.at(0);
-  }
-
-  /**
- * Returns number of recorded values (this can include the initial value)
- */
-  get size() {
-    return this.values.length;
-  }
-  
-  /**
-   * Returns the elapsed time, in milliseconds since the instance was created
-   */
-  get elapsed():number {
-    if (this.values.length < 0) throw new Error(`No values seen yet`);
-    return Date.now() - this.timestamps[0];
-  }
-
-  onReset() {
-    this.values = [];
-    this.timestamps = [];
-  }
-
-  /**
-   * Tracks a value
-   */
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seenImpl(p:V[]):V[] {
-    const last = p.at(-1) as Timestamped<V>;
-    const now = Date.now();
-    if (this.storeIntermediate) {
-      this.values.push(...p);
-      this.timestamps.push(...repeat(p.length, () => now));
-    } else if (this.values.length === 0) {
-      // Add as initial value
-      this.values.push(last);
-      this.timestamps.push(now);
-    }
-    else if (this.values.length === 2) {
-      // Replace last value
-      this.values[1] = last;
-      this.timestamps[1] = now;
-    } else if (this.values.length === 1) {
-      // Add last value
-      this.values.push(last);
-      this.timestamps.push(now);
-    }
-
-    return p;
-  }
-
-}
-
-
 /**
- * A tracked value of type `V`.
+ * Keeps track of keyed values of type `V` (eg Point) It stores occurences in type `T`, which
+ * must extend from `TrackerBase<V>`, eg `PointTracker`.
+ * 
+ * The `creator` function passed in to the constructor is responsible for instantiating
+ * the appropriate `TrackerBase` sub-class.
+ * 
+ * @example Sub-class
+ * ```js
+ * export class TrackedPointMap extends TrackedValueMap<Points.Point> {
+ *  constructor(opts:TrackOpts = {}) {
+ *   super((key, start) => {
+ *    if (start === undefined) throw new Error(`Requires start point`);
+ *    const p = new PointTracker(key, opts);
+ *    p.seen(start);
+ *    return p;
+ *   });
+ *  }
+ * }
+ * ```
+ * 
  */
-export class ObjectTracker<V> extends TrackerBase<V> {
-  values:Timestamped<V>[];
+export class TrackedValueMap<V, T extends TrackerBase<V>>  {
+  store:Map<string, T>;
+  gog:GetOrGenerate<string, T, V>;
 
-  constructor(id:string, opts:TrackedValueOpts = {}) {
-    super(id, opts);
-    this.values = [];
-  }
-
-  /**
-   * Allows sub-classes to be notified when a reset happens
-   * @ignore
-   */
-  onReset() {
-    this.values = []; //this.values.slice(1);
-  }
-
-  /**
-   * Tracks a value
-   * @ignore
-   */
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seenImpl(p:V[]|Timestamped<V>[]):Timestamped<V>[] {
-    // Make sure values have a timestamp
-    const ts = p.map(v => ((`at` in v) ? v : {
-      ...v,
-      at: Date.now()
-    }));
-
-    const last = ts.at(-1) as Timestamped<V>;
-  
-    if (this.storeIntermediate) this.values.push(...ts);
-    else if (this.values.length === 0) {
-      // Add as initial value
-      this.values.push(last);
-    }
-    else if (this.values.length === 2) {
-      // Replace last value
-      this.values[1] = last;
-    } else if (this.values.length === 1) {
-      // Add last value
-      this.values.push(last);
-    }
-
-    return ts;
-  }
-
-  /**
-   * Last seen value. If no values have been added, it will return the initial value
-   */
-  get last() {
-    if (this.values.length === 1) return this.values[0];
-    //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.values.at(-1)!;
-  }
-
-  /**
-   * Returns the initial value
-   */
-  get initial() {
-    return this.values.at(0);
-  }
-  
-  /**
-   * Returns number of recorded values (includes the initial value in the count)
-   */
-  get size() {
-    return this.values.length;
-  }
-
-  /**
-   * Returns the elapsed time, in milliseconds since the initial value
-   */
-  get elapsed():number {
-    return Date.now() - this.values[0].at;
-  }
-}
-
-export class TrackedValueMap<V>  {
-  store:Map<string, TrackerBase<V>>;
-  gog:GetOrGenerate<string, TrackerBase<V>, V>;
-
-  constructor(creator:(key:string, start:V|undefined) => TrackerBase<V>) {
+  constructor(creator:(key:string, start:V|undefined) => T) {
     this.store = new Map();
-    this.gog = getOrGenerate<string, TrackerBase<V>, V>(this.store, creator);
+    this.gog = getOrGenerate<string, T, V>(this.store, creator);
   }
 
   /**
-   * Return number of named values being tracked
+   * Number of named values being tracked
    */
   get size() {
     return this.store.size;
   }
 
   /**
-   * Returns true if `id` is stored
+   * Returns _true_ if `id` is stored
    * @param id 
    * @returns 
    */
