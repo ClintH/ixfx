@@ -37,6 +37,11 @@ export type ManualCaptureOpts = {
    * captured image.
    */
   readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
+
+  /**
+   * If specified, this is the canvas captured to
+   */
+  readonly canvasEl?:HTMLCanvasElement
 }
 
 /**
@@ -278,23 +283,27 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
   const w = sourceVideoEl.videoWidth;
   const h = sourceVideoEl.videoHeight;
   
-  // Create canvas
-  const canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
-  canvasEl.classList.add(`ixfx-capture`);
-  document.body.append(canvasEl);
-
-  if (!showCanvas) canvasEl.style.display = `none`;
+  // Create canvas if necessary
+  const definedCanvasEl = opts.canvasEl !== undefined;
+  //eslint-disable-next-line functional/no-let
+  let canvasEl = opts.canvasEl;
+  if (!canvasEl) {
+    canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
+    canvasEl.classList.add(`ixfx-capture`);
+    document.body.append(canvasEl);
+    if (!showCanvas) canvasEl.style.display = `none`;
+  }
   
   canvasEl.width = w;
   canvasEl.height = h;
 
   const capture = ():ImageData => {
     //eslint-disable-next-line functional/no-let
-    let c:CanvasRenderingContext2D|null = null;
+    let c:CanvasRenderingContext2D|undefined|null;
 
-    // Draw current frame from video element to hidden canvas
-    if (c === null) c = canvasEl.getContext(`2d`);
-    if (c === null) throw new Error(`Could not create graphics context`);
+    // Draw current frame from video element to canvas
+    if (!c) c = canvasEl?.getContext(`2d`);
+    if (!c) throw new Error(`Could not create graphics context`);
     c.drawImage(sourceVideoEl, 0, 0, w, h);
     
     //eslint-disable-next-line functional/no-let
@@ -310,8 +319,9 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
   };
 
   const dispose = ():void => {
+    if (definedCanvasEl) return; // we didn't create it
     try {
-      canvasEl.remove();
+      canvasEl?.remove();
     } catch (_) {
       // no-op
     }

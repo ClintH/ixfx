@@ -16,6 +16,11 @@ export type FrameProcessorOpts = {
    readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
 
    readonly cameraConstraints?:Camera.Constraints;
+
+   /**
+    * If specified, this canvas will be used for capturing frames to
+    */
+   readonly captureCanvasEl?:HTMLCanvasElement;
 }
 
 export class FrameProcessor {
@@ -31,6 +36,7 @@ export class FrameProcessor {
   private _showPreview:boolean;
   private _postCaptureDraw;
   private _timer:number;
+  private _captureCanvasEl?:HTMLCanvasElement;
 
   constructor(opts:FrameProcessorOpts = {}) {
     this._state = `ready`;
@@ -39,6 +45,7 @@ export class FrameProcessor {
     this._showCanvas = opts.showCanvas ?? false;
     this._showPreview = opts.showPreview ?? false;
     this._cameraConstraints = opts.cameraConstraints ?? undefined;
+    this._captureCanvasEl = opts.captureCanvasEl ?? undefined;
     this._postCaptureDraw = opts.postCaptureDraw;
   }
 
@@ -98,7 +105,8 @@ export class FrameProcessor {
     // Set up manual capturer
     this._cameraCapture = Video.manualCapture(r.videoEl, {
       postCaptureDraw:this._postCaptureDraw,
-      showCanvas: this._showCanvas
+      showCanvas: this._showCanvas,
+      canvasEl: this._captureCanvasEl
     });
 
     this._cameraStartResult = r;
