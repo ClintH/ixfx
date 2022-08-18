@@ -1,5 +1,8 @@
 import { TrackedValueOpts } from "./TrackedValue.js";
 
+/**
+ * Base tracker class
+ */
 export abstract class TrackerBase<V> {
   /**
    * @ignore

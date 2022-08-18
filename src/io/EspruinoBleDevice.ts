@@ -4,6 +4,8 @@ import {NordicBleDevice} from "./NordicBleDevice.js";
 /**
  * An Espruino BLE-connection
  * 
+ * See [online demos](https://clinth.github.io/ixfx-demos/io/)
+ * 
  * Use the `puck` function to initialise and connect to a Puck.js.
  * It must be called in a UI event handler for browser security reasons.
  * 

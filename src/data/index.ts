@@ -5,6 +5,8 @@ export * from './NumberTracker.js';
 export * from './IntervalTracker.js';
 export * from './PointTracker.js';
 export * from './TrackedValue.js';
+export * from './TrackerBase.js';
+
 
 export * from './Clamp.js';
 export * from './Scale.js';

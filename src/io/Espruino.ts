@@ -54,6 +54,7 @@ export type EvalOpts = {
 
 /**
  * Instantiates a Puck.js. See {@link EspruinoBleDevice} for more info.
+ * [Online demos](https://clinth.github.io/ixfx-demos/io/)
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
 export const puck = async (opts:{readonly name?:string, readonly debug?:boolean} = {}) => {
