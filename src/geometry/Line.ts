@@ -1,9 +1,9 @@
-import {guard as guardPoint, Point} from './Point.js';
-import {percent as guardPercent, number as guardNumber} from '../Guards.js';
-import {Path} from './Path.js';
-import { Rects, Points} from './index.js';
-import {minFast} from '../collections/NumericArrays.js';
 import {Arrays} from '../collections/index.js';
+import {minFast} from '../collections/NumericArrays.js';
+import {number as guardNumber, percent as guardPercent} from '../Guards.js';
+import {Points, Rects} from './index.js';
+import {Path} from './Path.js';
+import {guard as guardPoint, Point} from './Point.js';
 
 /**
  * A line, which consists of an `a` and `b` {@link Points.Point}.
@@ -696,6 +696,9 @@ export function interpolate(amount:number, aOrLine:Points.Point|Line, pointBOrAl
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
+
+  // Points are identical, return a copy of b
+  if (d === 0 && d2 === 0) return Object.freeze({...b});
 
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
