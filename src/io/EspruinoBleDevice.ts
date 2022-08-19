@@ -13,6 +13,11 @@ import {NordicBleDevice} from "./NordicBleDevice.js";
  * const e = await puck();
  * ```
  * 
+ * To connect to a particular device:
+ * ```js
+ * const e = await puck({name:`Puck.js a123`});
+ * ```
+ *
  * Listen for events:
  * ```js
  * // Received something

@@ -52,27 +52,58 @@ export type EvalOpts = {
 };
 
 
+export type EspruinoBleOpts = {
+  /**
+   * If the name is specified, this value is used
+   * for filtering Bluetooth devices
+   */
+  readonly name?:string,
+  /**
+   * If true, additional logging messages are
+   * displayed on the console
+   */
+  readonly debug?:boolean
+  /**
+   * If specified, these filtering options are used instead
+   */
+  readonly filters?: readonly BluetoothLEScanFilter[]
+}
+
 /**
  * Instantiates a Puck.js. See {@link EspruinoBleDevice} for more info.
  * [Online demos](https://clinth.github.io/ixfx-demos/io/)
+ * 
+ * If `opts.name` is specified, this will the the Bluetooth device sought.
+ * 
+ * ```js
+ * const e = await puck({ name:`Puck.js a123` });
+ * ```
+ * 
+ * If no name is specified, a list of all devices starting with `Puck.js` are shown.
+ * 
+ * To get more control over filtering, pass in `opts.filter`. `opts.name` is not used as a filter in this scenario.
+ * 
+ * ```js
+ * const filters = [
+ *  { namePrefix: `Puck.js` },
+ *  { namePrefix: `Pixl.js` },
+ *  {services: [NordicDefaults.service] }
+ * ]
+ * const e = await puck({ filters });
+ * ```
+ * 
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
-export const puck = async (opts:{readonly name?:string, readonly debug?:boolean} = {}) => {
+export const puck = async (opts:EspruinoBleOpts = {}) => {
   const name = opts.name ?? `Puck`;
   const debug = opts.debug ?? false;
 
   const device = await navigator.bluetooth.requestDevice({
-    filters: [
-      {namePrefix: `Puck.js`},
-      // {namePrefix: 'Pixl.js'},
-      // {namePrefix: 'MDBT42Q'},
-      // {namePrefix: 'RuuviTag'},
-      // {namePrefix: 'iTracker'},
-      // {namePrefix: 'Thingy'},
-      // {namePrefix: 'Espruino'},
-      {services: [NordicDefaults.service]}
-    ], optionalServices: [NordicDefaults.service]
+    filters:getFilters(opts), 
+    optionalServices: [NordicDefaults.service]
   });
+
+  console.log(device.name);
   const d = new EspruinoBleDevice(device, {name, debug});
   await d.connect();
   return d;
@@ -89,24 +120,65 @@ export const serial = async (opts:{readonly name?:string, readonly debug?:boolea
   return d;
 };
 
+/**
+ * Returns a list of BLE scan filters, given the
+ * connect options.
+ * @param opts 
+ * @returns 
+ */
+const getFilters = (opts:EspruinoBleOpts) => {
+  //eslint-disable-next-line functional/no-let
+  const filters:BluetoothLEScanFilter[] = [];
 
+  if (opts.filters) {
+    //eslint-disable-next-line functional/immutable-data
+    filters.push(...opts.filters);
+  } else if (opts.name) {
+    // Name filter
+    //eslint-disable-next-line functional/immutable-data
+    filters.push({ name: opts.name });
+    console.info(`Filtering Bluetooth devices by name '${opts.name}'`); 
+  } else {
+    // Default filter
+    //eslint-disable-next-line functional/immutable-data
+    filters.push({namePrefix: `Puck.js`});
+  }
+  // {namePrefix: 'Pixl.js'},
+  // {namePrefix: 'MDBT42Q'},
+  // {namePrefix: 'RuuviTag'},
+  // {namePrefix: 'iTracker'},
+  // {namePrefix: 'Thingy'},
+  // {namePrefix: 'Espruino'},
+  //{services: [NordicDefaults.service]}
+
+  return filters;
+};
 /**
  * Connects to a generic Espruino BLE device. See  {@link EspruinoBleDevice} for more info.
  * Use {@link puck} if you're connecting to a Puck.js
+ * 
+ * If `opts.name` is specified, only this BLE device will be shown.
+ * ```js
+ * const e = await connectBle({ name: `Puck.js a123` });
+ * ```
+ * 
+ * `opts.filters` overrides and sets arbitary filters.
+ * 
+ * ```js
+ * const filters = [
+ *  { namePrefix: `Puck.js` },
+ *  { namePrefix: `Pixl.js` },
+ *  {services: [NordicDefaults.service] }
+ * ]
+ * const e = await connectBle({ filters });
+ * ```
+ * 
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
-export const connectBle = async () => {
+export const connectBle = async (opts:EspruinoBleOpts = {}) => {
   const device = await navigator.bluetooth.requestDevice({
-    filters: [
-      {namePrefix: `Puck.js`},
-      {namePrefix: `Pixl.js`},
-      {namePrefix: `MDBT42Q`},
-      {namePrefix: `RuuviTag`},
-      {namePrefix: `iTracker`},
-      {namePrefix: `Thingy`},
-      {namePrefix: `Espruino`},
-      {services: [NordicDefaults.service]}
-    ], optionalServices: [NordicDefaults.service]
+    filters: getFilters(opts),
+    optionalServices: [NordicDefaults.service]
   });
   const d = new EspruinoBleDevice(device, {name:`Espruino`});
   await d.connect();
