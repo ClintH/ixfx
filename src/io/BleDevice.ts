@@ -17,6 +17,34 @@ export type Opts = {
   readonly debug:boolean
 }
 
+const reconnect = async () => {
+  console.log(`Connect?`);
+  if (!(`bluetooth` in navigator)) return false;
+  if (!(`getDevices` in navigator.bluetooth)) return false;
+
+  const devices = await navigator.bluetooth.getDevices();
+  console.log(devices);
+
+  for (const device of devices) {
+    console.log(device);
+    // Start a scan for each device before connecting to check that they're in
+    // range.
+    const abortController = new AbortController();
+    await device.watchAdvertisements({ signal: abortController.signal });
+    device.addEventListener(`advertisementreceived`, async (evt) => {
+      console.log(evt);
+      // Stop the scan to conserve power on mobile devices.
+      abortController.abort();
+   
+   
+      // At this point, we know that the device is in range, and we can attempt
+      // to connect to it.
+      await evt.device.gatt?.connect();
+      console.log(`Connected!`);
+    });
+  }
+};
+
 export class BleDevice extends SimpleEventEmitter<Events> {
   states: StateMachine;
   codec: Codec;
