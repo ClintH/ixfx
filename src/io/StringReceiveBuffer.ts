@@ -56,7 +56,6 @@ export class StringReceiveBuffer {
   }
 
   add(str:string) {
-    //eslint-disable-next-line functional/no-loop-statement
     while (str.length > 0) {
       str = this.addImpl(str);
     }

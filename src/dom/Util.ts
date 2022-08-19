@@ -307,7 +307,6 @@ export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap
   const update = (data:ReadonlyMap<string, object>) => {
     const seenTables = new Set();
 
-    //eslint-disable-next-line functional/no-loop-statement
     for (const [key, value] of data) {
       const tKey = `table-${key}`;
       seenTables.add(tKey);
@@ -361,7 +360,7 @@ const updateDataTable = (t:HTMLTableElement, data:object, opts:DataTableOpts = {
     return;
   }
   const seenRows = new Set();
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const [key, value] of Object.entries(data)) {
     const domKey = `row-${key}`;
     seenRows.add(domKey);
@@ -459,7 +458,7 @@ export const dataTable = (parentOrQuery:HTMLElement|string, data?:object, opts?:
 export const clear = (parent:HTMLElement) => {
   //eslint-disable-next-line functional/no-let
   let c = parent.lastElementChild;
-  //eslint-disable-next-line functional/no-loop-statement
+  
   while (c) {
     parent.removeChild(c);
     c = parent.lastElementChild;
@@ -557,7 +556,6 @@ export const reconcileChildren = <V>(parentEl:HTMLElement, list:ReadonlyMap<stri
   
   const seen = new Set<string>();
   
-  //eslint-disable-next-line functional/no-loop-statement
   for (const [key, value] of list) {
     const id = `c-${key}`;
     const el = parentEl.querySelector(`#${id}`) as HTMLElement;
@@ -572,7 +570,7 @@ export const reconcileChildren = <V>(parentEl:HTMLElement, list:ReadonlyMap<stri
   }
 
   const prune:HTMLElement[] = [];
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<parentEl.children.length;i++) {
     const c = parentEl.children[i] as HTMLElement;
     if (!seen.has(c.id)) {

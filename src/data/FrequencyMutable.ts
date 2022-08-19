@@ -70,7 +70,6 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   debugString():string {
     //eslint-disable-next-line functional/no-let
     let t = ``;
-    //eslint-disable-next-line functional/no-loop-statement
     for (const [key, count] of this.#store.entries()) {
       t += `${key}: ${count}, `;
     }

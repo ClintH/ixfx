@@ -140,7 +140,6 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
       return 1;
     });
 
-    //eslint-disable-next-line functional/no-loop-statement
     for (const t of tp) {
       yield t;
     }
@@ -152,7 +151,6 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
    * we return the last value for that group.
    */
   *valuesByAge() {
-    //eslint-disable-next-line functional/no-loop-statement
     for (const tb of this.trackedByAge()) {
       yield tb.last;
     }
@@ -168,7 +166,6 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
    * ```
    */
   *last() {
-    //eslint-disable-next-line functional/no-loop-statement
     for (const p of this.store.values()) {
       yield p.last;
     }
@@ -178,7 +175,6 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
    * Enumerate starting values
    */
   *initialValues() {
-    //eslint-disable-next-line functional/no-loop-statement
     for (const p of this.store.values()) {
       yield p.initial;
     }

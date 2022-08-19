@@ -20,7 +20,7 @@ const jsonData = (obj: unknown) => {
         return;
       }
 
-      // eslint-disable-next-line functional/no-loop-statement, functional/no-let
+      // eslint-disable-next-line functional/no-let
       for (let i = 0; i < o.length; i++) {
         if (!Array.isArray(o[i])) {
           console.error(`Histogram array should consist of inner arrays`);

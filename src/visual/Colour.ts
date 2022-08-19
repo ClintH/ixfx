@@ -272,7 +272,7 @@ export const scale = (steps:number, opts:InterpolationOpts|string, ...colours:Co
   const r = [];
   //eslint-disable-next-line functional/no-let
   let amt = 0;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0; i<steps; i++) {
     //eslint-disable-next-line functional/immutable-data
     r.push(inter(amt));

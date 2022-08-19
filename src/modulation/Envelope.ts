@@ -179,7 +179,6 @@ class AdsrBase extends SimpleEventEmitter<Events> {
     // Change through states for as long as needed
     // eslint-disable-next-line functional/no-let
     let hasChanged = false;
-    // eslint-disable-next-line functional/no-loop-statement
     do {
       hasChanged = false;
       switch (this.#sm.state) {
@@ -526,7 +525,6 @@ export async function* adsrSample(opts:EnvelopeOpts, sampleRateMs:number) {
 
   env.trigger();
 
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     await sleep(sampleRateMs);
     const v = env.value;

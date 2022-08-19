@@ -56,11 +56,11 @@ export const dotProduct = (values:ReadonlyArray<readonly number[]>):number => {
   let r = 0;
   const len = values[0].length;
 
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<len;i++) {
     //eslint-disable-next-line functional/no-let
     let t = 0;
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let p=0;p<values.length;p++) {
       if (p === 0) t = values[p][i];
       else {
@@ -230,7 +230,7 @@ export const total = (data:readonly number[]):number => data.reduce((prev, curr)
 export const maxFast = (data:readonly number[]|Float32Array):number => {
   //eslint-disable-next-line functional/no-let
   let m = Number.MIN_SAFE_INTEGER;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<data.length;i++) {
     m = Math.max(m, data[i]);
   }
@@ -253,7 +253,7 @@ export const maxFast = (data:readonly number[]|Float32Array):number => {
 export const minFast = (data:readonly number[]|Float32Array):number => {
   //eslint-disable-next-line functional/no-let
   let m = Number.MIN_SAFE_INTEGER;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<data.length;i++) {
     m = Math.min(m, data[i]);
   }

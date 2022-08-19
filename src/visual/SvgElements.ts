@@ -217,7 +217,6 @@ export const grid = (parent:SVGElement, center: Points.Point, spacing: number, w
   // Horizontals
   //eslint-disable-next-line functional/no-let
   let y = 0;
-  //eslint-disable-next-line functional/no-loop-statement
   while (y < height) {
     const horiz = Lines.fromNumbers(0, y, width, y);
     line(horiz, g);
@@ -227,7 +226,6 @@ export const grid = (parent:SVGElement, center: Points.Point, spacing: number, w
   // Verticals
   //eslint-disable-next-line functional/no-let
   let x = 0;
-  //eslint-disable-next-line functional/no-loop-statement
   while (x < width) {
     const vert = Lines.fromNumbers(x, 0, x, height);
     line(vert, g);

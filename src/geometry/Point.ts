@@ -421,7 +421,7 @@ export const isEqual = (...p:readonly Point[]):boolean => {
   if (p === undefined) throw new Error(`parameter 'p' is undefined`);
   if (p.length < 2) return true;
 
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=1;i<p.length;i++) {
     if (p[i].x !== p[0].x) return false;
     if (p[i].y !== p[0].y) return false;
@@ -529,7 +529,7 @@ export const fromNumbers = (...coords:readonly ReadonlyArray<number>[]|readonly 
   } else {
     // [x,y,x,y,x,y]
     if (coords.length % 2 !== 0) throw new Error(`Expected even number of elements: [x,y,x,y...]`);
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let i=0;i<coords.length;i+=2) {
       //eslint-disable-next-line  functional/immutable-data
       pts.push(Object.freeze({x: coords[i] as number, y: coords[i+1] as number}));
@@ -976,7 +976,6 @@ export const convexHull = (...pts:readonly Point[]):readonly Point[] => {
   const x = (points:Point[]) => {
     const v:Point[] = [];
     points.forEach(p => {
-      //eslint-disable-next-line functional/no-loop-statement
       while (v.length >= 2) {
         const q = v[v.length-1];
         const r = v[v.length-2];
@@ -1096,7 +1095,7 @@ export function rotate(pt:Point|ReadonlyArray<Point>, amountRadian:number, origi
 export const rotatePointArray = (v:ReadonlyArray<readonly number[]>, amountRadian:number): number[][] => {
   const mat = [[Math.cos(amountRadian), -Math.sin(amountRadian)], [Math.sin(amountRadian), Math.cos(amountRadian)]];
   const result = [];
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0; i < v.length; ++i) {
     //eslint-disable-next-line functional/immutable-data
     result[i] = [mat[0][0]*v[i][0] + mat[0][1]*v[i][1], mat[1][0]*v[i][0] + mat[1][1]*v[i][1]];

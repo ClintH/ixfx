@@ -25,7 +25,7 @@ import {IsEqual} from "./Util";
 export function* chunks<V>(it:Iterable<V>, size:number) {
   //eslint-disable-next-line functional/no-let
   let buffer = [];
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     //eslint-disable-next-line functional/immutable-data
     buffer.push(v);
@@ -43,7 +43,7 @@ export function* chunks<V>(it:Iterable<V>, size:number) {
  */
 //eslint-disable-next-line func-style
 export function* concat<V>(...its:readonly Iterable<V>[]) {
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const it of its) yield* it;
 }
 
@@ -58,7 +58,7 @@ export function* concat<V>(...its:readonly Iterable<V>[]) {
  */
 //eslint-disable-next-line func-style
 export function* dropWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) { 
     if (!f(v)) {
       yield v;
@@ -80,7 +80,7 @@ export function* dropWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
 export function equals<V>(it1:IterableIterator<V>, it2:IterableIterator<V>, equality?:IsEqual<V>) {
   //it1 = it1[Symbol.iterator]();
   //it2 = it2[Symbol.iterator]();
-  //eslint-disable-next-line functional/no-loop-statement,no-constant-condition
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const i1 = it1.next(), i2 = it2.next();
     if (equality !== undefined) {
@@ -102,7 +102,7 @@ export function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let ok = true;
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) ok = ok && f(v);
   return ok;
 }
@@ -120,7 +120,7 @@ export function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
 //eslint-disable-next-line func-style
 export function* fill<V>(it:Iterable<V>, v:V) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const _ of it) yield v;
 }
 
@@ -132,7 +132,7 @@ export function* fill<V>(it:Iterable<V>, v:V) {
 //eslint-disable-next-line func-style
 export function forEach<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) f(v);
 }
 
@@ -147,7 +147,7 @@ export function forEach<V>(it:Iterable<V>, f:(v:V) => boolean) {
 //eslint-disable-next-line func-style
 export function* filter<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     if (!f(v)) continue;
     yield v;
@@ -167,7 +167,7 @@ export function* filter<V>(it:Iterable<V>, f:(v:V) => boolean) {
 //eslint-disable-next-line func-style
 export  function find<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) { 
     if (f(v)) return v;
   } 
@@ -184,7 +184,7 @@ export  function find<V>(it:Iterable<V>, f:(v:V) => boolean) {
 //eslint-disable-next-line func-style
 export function* flatten<V>(it:Iterable<V>) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     if (Symbol.iterator in v) { 
       // @ts-ignore
@@ -207,7 +207,7 @@ export function* flatten<V>(it:Iterable<V>) {
 //eslint-disable-next-line func-style
 export function* map<V, X>(it:Iterable<V>, f:(v:V) => X) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) { 
     yield f(v);
   }
@@ -232,7 +232,7 @@ export function max<V>(it:Iterable<V>, gt = (a:V, b:V) => a > b) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let max;
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     if(!max) {
       max = v;
@@ -262,7 +262,7 @@ export function min<V>(it:Iterable<V>, gt = (a:V, b:V) => a > b) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let min;
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     if(!min) {
       min = v;
@@ -285,7 +285,7 @@ export function min<V>(it:Iterable<V>, gt = (a:V, b:V) => a > b) {
 //eslint-disable-next-line func-style
 export function* range(start:number, len:number) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<len;i++) {
     yield start++;
   }
@@ -306,7 +306,7 @@ export function* range(start:number, len:number) {
 //eslint-disable-next-line func-style
 export function reduce<V>(it:Iterable<V>, f:(acc:V, current:V) => V, start:V) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) start = f(start, v);
   return start;
 }
@@ -321,9 +321,9 @@ export function reduce<V>(it:Iterable<V>, f:(acc:V, current:V) => V, start:V) {
 export function* slice<V>(it:Iterable<V>, start = 0, end = Number.POSITIVE_INFINITY) {
   // https://surma.github.io/underdash/
   const iit = it[Symbol.iterator]();
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for(; start > 0; start--, end--) iit.next();
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) { 
     if (end-- > 0) { 
       yield v;
@@ -347,7 +347,7 @@ export function* slice<V>(it:Iterable<V>, start = 0, end = Number.POSITIVE_INFIN
 //eslint-disable-next-line func-style
 export function some<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) { 
     if (f(v)) return true;
   }
@@ -367,7 +367,7 @@ export function some<V>(it:Iterable<V>, f:(v:V) => boolean) {
 //eslint-disable-next-line func-style
 export function* takeWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
   // https://surma.github.io/underdash/
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     if (!f(v)) return;
     yield v;
@@ -387,7 +387,7 @@ export function* takeWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
 export function* unique<V>(it:Iterable<V>, f:((id:V) => V) = id => id) {
   // https://surma.github.io/underdash/
   const buffer = [];
-  //eslint-disable-next-line functional/no-loop-statement
+  
   for (const v of it) {
     const fv = f(v);
     if (buffer.indexOf(fv) !== -1) continue;
@@ -411,7 +411,7 @@ export function* zip<V>(...its:readonly Iterable<V>[]) {
   // https://surma.github.io/underdash/
   const iits = its.map(it => it[Symbol.iterator]());
 
-  //eslint-disable-next-line functional/no-loop-statement
+  
   while(true) {
     const vs = iits.map(it => it.next());
     if (vs.some(v => v.done)) return;

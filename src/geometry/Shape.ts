@@ -63,7 +63,7 @@ export const starburst = (outerRadius:number, points:number = 5, innerRadius?:nu
   let a = initialAngle;
   const pts = [];
   
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < points; i++) {
     const peak = toCartesian(outerRadius, a, origin);
     const left = toCartesian(innerRadius, a - angleHalf, origin);

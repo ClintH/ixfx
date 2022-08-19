@@ -163,9 +163,7 @@ export const gaussian = (skew = 1) => {
   
   //eslint-disable-next-line functional/no-let
   let u = 0, v = 0;
-  //eslint-disable-next-line functional/no-loop-statement
   while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-  //eslint-disable-next-line functional/no-loop-statement
   while(v === 0) v = Math.random();
   //eslint-disable-next-line functional/no-let
   let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);

@@ -123,7 +123,6 @@ export async function* frames(sourceVideoEl:HTMLVideoElement, opts:FramesOpts = 
   let c:CanvasRenderingContext2D|null = null;
 
   const looper = delayLoop(maxIntervalMs);
-  //eslint-disable-next-line functional/no-loop-statement
   for await (const _ of looper) {
     // If we don't yet have the size of video, get it
     if (w === 0 || h === 0) updateSize();

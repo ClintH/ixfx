@@ -107,7 +107,7 @@ export default class AudioVisualiser {
     const width = (canvasWidth / bins);
     const minMax = Arrays.minMaxAvg(freq);
 
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let i = 0; i < bins; i++) {
       if (!Number.isFinite(freq[i])) continue;
 
@@ -221,7 +221,7 @@ export default class AudioVisualiser {
     //eslint-disable-next-line functional/no-let
     let x = 0;
 
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let i = 0; i < bins; i++) {
       const height = wave[i] * canvasHeight;
       const y = bipolar ? (canvasHeight / 2) - height : canvasHeight - height;

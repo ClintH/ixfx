@@ -67,6 +67,9 @@
         "functional/no-try-statement": [
             "off"
         ],
+        "functional/no-loop-statement": [
+            "off"
+        ],
         "no-undef-init": [
             "error"
         ],

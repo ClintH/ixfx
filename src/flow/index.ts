@@ -41,7 +41,6 @@ export type HasCompletion = {
  * @param fn Function to call for each item. If function returns _false_, iteration cancels
  */
 export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>boolean|void) => {
-  //eslint-disable-next-line functional/no-loop-statement
   for (const x of iterator) {
     const r = fn(x);
     if (typeof r === `boolean` && !r) break;
@@ -78,7 +77,6 @@ export const forEach = <V>(iterator:IterableIterator<V>|ReadonlyArray<V>, fn:(v?
 export const forEachAsync = async function <V> (iterator:AsyncIterableIterator<V>|ReadonlyArray<V>, fn:(v?:V)=>Promise<boolean>|Promise<void>, intervalMs?:number) {
   if (Array.isArray(iterator)) {
     // Handle array
-    //eslint-disable-next-line functional/no-loop-statement
     for (const x of iterator) {
       const r = await fn(x);
       if (intervalMs) await sleep(intervalMs);
@@ -86,7 +84,6 @@ export const forEachAsync = async function <V> (iterator:AsyncIterableIterator<V
     }
   } else {
     // Handle an async iterator
-    //eslint-disable-next-line functional/no-loop-statement
     for await (const x of iterator) {
       const r = await fn(x);
       if (intervalMs) await sleep(intervalMs);
@@ -129,7 +126,6 @@ export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|unde
 
   if (typeof countOrPredicate === `number`) {
     guardNumber(countOrPredicate, `positive`, `countOrPredicate`);
-    //eslint-disable-next-line functional/no-loop-statement
     while (countOrPredicate-- > 0) {
       repeats++;
       const v = fn();
@@ -139,7 +135,6 @@ export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|unde
       valuesProduced++;
     }
   } else {
-    //eslint-disable-next-line functional/no-loop-statement
     while (countOrPredicate(repeats, valuesProduced)) {
       repeats++;
       const v = fn();

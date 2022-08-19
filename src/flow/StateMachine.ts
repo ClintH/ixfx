@@ -45,7 +45,7 @@ export interface MachineDescription {
  */
 export const descriptionFromList = (...states:readonly string[]):MachineDescription => {
   const t = {};
-  // eslint-disable-next-line functional/no-loop-statement, functional/no-let
+  // eslint-disable-next-line functional/no-let
   for (let i=0;i<states.length; i++) {
     if (i === states.length - 1) {
       /** @ts-ignore */
@@ -172,7 +172,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     const seenKeys = new Set();
     const seenVals = new Set();
 
-    // eslint-disable-next-line functional/no-loop-statement, functional/no-let
+    // eslint-disable-next-line functional/no-let
     for (let i=0;i<keys.length;i++) {
       const key = keys[i];
       if (seenKeys.has(key)) return [false, `Key ${key} is already used`];

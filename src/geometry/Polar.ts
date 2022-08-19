@@ -120,7 +120,7 @@ export const toCartesian:ToCartesian = (a:Coord|number, b?:Points.Point|number, 
 export function* spiral(smoothness:number, zoom:number): IterableIterator<Coord & {readonly step:number}> {
   //eslint-disable-next-line functional/no-let
   let step = 0;
-  //eslint-disable-next-line functional/no-loop-statement
+  
   while (true) {
     //eslint-disable-next-line functional/no-let
     const a = smoothness * step++;

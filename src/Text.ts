@@ -33,7 +33,7 @@ export const between = (source: string, start: string, end?: string, lastEndMatc
  * @returns Found position, or -1 if not found
  */
 export const indexOfCharCode = (source:string, code:number, start = 0, end = source.length-1):number => {
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=start;i<=end;i++) {
     if (source.charCodeAt(i) === code) return i;
   }
@@ -74,7 +74,7 @@ export const splitByLength = (source:string, length:number):readonly string[] =>
   //eslint-disable-next-line functional/no-let
   let start = 0;
 
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let  
+  //eslint-disable-next-line functional/no-let  
   for (let c=0;c<chunks;c++) {
     //eslint-disable-next-line functional/immutable-data
     ret.push(source.substring(start, start+length));
@@ -118,10 +118,8 @@ export const untilMatch = (source:string, match:string, startPos = 0):string => 
 export const unwrap = (source: string, ...wrappers: readonly string[]): string => {
   //eslint-disable-next-line functional/no-let
   let matched = false;
-  //eslint-disable-next-line functional/no-loop-statement
   do {
     matched = false;
-    //eslint-disable-next-line functional/no-loop-statement
     for (const w of wrappers) {
       if (source.startsWith(w) && source.endsWith(w)) {
         source = source.substring(w.length, source.length - (w.length * 2) + 1);
@@ -176,7 +174,7 @@ export const lineSpan = (ranges: readonly Range[], start: number, end: number): 
   let s = -1;
   //eslint-disable-next-line functional/no-let
   let e = -1;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < ranges.length; i++) {
     const r = ranges[i];
     s = i;
@@ -186,7 +184,7 @@ export const lineSpan = (ranges: readonly Range[], start: number, end: number): 
     }
   }
 
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = s; i < ranges.length; i++) {
     const r = ranges[i];
     e = i;
@@ -228,7 +226,7 @@ export const splitRanges = (source: string, split: string):readonly Range[] => {
   const ranges: Range[] = [];
   //eslint-disable-next-line functional/no-let
   let index = 0;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < source.length; i++) {
     if (source.indexOf(split, i) === i) {
       //eslint-disable-next-line functional/no-let
@@ -267,7 +265,7 @@ export const splitRanges = (source: string, split: string):readonly Range[] => {
 export const countCharsFromStart = (source: string, ...chars: readonly string[]): number => {
   //eslint-disable-next-line functional/no-let
   let counted = 0;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < source.length; i++) {
     if (chars.includes(source.charAt(i))) {
       counted++;

@@ -145,7 +145,7 @@ class QueueImpl<V> {
   }
 
   forEach(fn:(v:V) => void) {
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let i=this.data.length-1; i>=0; i--) {
       fn(this.data[i]);
     }  

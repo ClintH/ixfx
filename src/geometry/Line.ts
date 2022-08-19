@@ -568,7 +568,6 @@ export function* pointsOf(line:Line):Generator<Points.Point>  {
   //eslint-disable-next-line functional/no-let
   let err = dx + dy;
 
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     yield {x:x0, y:y0};
     if (x0 === x1 && y0 === y1) break;
@@ -811,7 +810,6 @@ export const toFlatArray = (a: Points.Point|Line, b: Points.Point): readonly num
  */
 //eslint-disable-next-line func-style
 export function* asPoints(lines:Iterable<Line>) {
-  //eslint-disable-next-line functional/no-loop-statement
   for (const l of lines) {
     yield l.a;
     yield l.b;
@@ -890,7 +888,7 @@ export const joinPointsToLines = (...points:readonly Points.Point[]): PolyLine =
   const lines = [];
   //eslint-disable-next-line functional/no-let
   let start = points[0];
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=1;i<points.length;i++) {
     //eslint-disable-next-line functional/immutable-data
     lines.push(fromPoints(start, points[i]));

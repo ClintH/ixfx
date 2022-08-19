@@ -72,7 +72,7 @@ export const pointerVisualise = (elOrQuery: HTMLElement | string, opts:Opts = {}
     currentHue = hue;
     svg.querySelector(`#pv-start-${id}`)?.remove();
 
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let i=0;i<pointerCount+10;i++) {
       svg.querySelector(`#pv-progress-${id}-${i}`)?.remove();
     }

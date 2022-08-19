@@ -41,7 +41,7 @@ export const interpolate = (paths: readonly Paths.Path[], t: number, useWidth?: 
 
   // Use widths or lengths?
   const l = useWidth ? dimensions.widths : dimensions.lengths;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < l.length; i++) {
     if (soFar + l[i] >= expected) {
       const relative = expected - soFar;
@@ -95,9 +95,9 @@ export const computeDimensions = (paths: readonly Paths.Path[]): Dimensions => {
   let totalLength = 0;
   //eslint-disable-next-line functional/no-let
   let totalWidth = 0;
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < lengths.length; i++) totalLength += lengths[i];
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 0; i < widths.length; i++) totalWidth += widths[i];
 
   return {totalLength, totalWidth, widths, lengths};
@@ -133,7 +133,7 @@ export const toString = (paths: readonly Paths.Path[]): string => paths.map(p =>
 export const guardContinuous = (paths: readonly Paths.Path[]) => {
   //eslint-disable-next-line functional/no-let
   let lastPos = Paths.getEnd(paths[0]);
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i = 1; i < paths.length; i++) {
     const start = Paths.getStart(paths[i]);
     if (!Points.isEqual(start, lastPos)) throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);

@@ -210,7 +210,6 @@ export const log = (domQueryOrEl: HTMLElement | string, opts: LogOpts = {}):Log 
     }
 
     if (capacity > 0 && (++added > capacity * 2)) {
-      // eslint-disable-next-line functional/no-loop-statement
       while (added > capacity) {
         el.lastChild?.remove();
         added--;

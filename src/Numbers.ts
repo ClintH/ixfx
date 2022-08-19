@@ -106,7 +106,6 @@ export const tracker = (id?:string, opts?:TrackedValueOpts) => numberTracker(id,
  */
 //eslint-disable-next-line func-style
 export function* filter(it:Iterable<unknown>) {
-  //eslint-disable-next-line functional/no-loop-statement
   for (const v of it) {
     if (isValid(v)) yield v;
   }

@@ -97,7 +97,6 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   yield v / rounding;
   //eslint-disable-next-line functional/no-let
   let firstLoop = true;
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     //console.log(`v: ${v} incrementing: ${incrementing} interval: ${interval}`);
     v = v + (incrementing ? interval : -interval);

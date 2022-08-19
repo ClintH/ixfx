@@ -134,7 +134,7 @@ export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
   if (!areValuesIdentical(lengths)) throw new Error(`Arrays must be of same length`);
   const ret = [];
   const len = lengths[0];
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<len;i++) {
     //eslint-disable-next-line functional/immutable-data
     ret.push(arrays.map(a => a[i]));
@@ -164,9 +164,9 @@ export const interleave = <V>(...arrays:ReadonlyArray<readonly V[]>):ReadonlyArr
 
   const ret = [];
   const len = lengths[0];
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<len;i++) {
-    //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    //eslint-disable-next-line functional/no-let
     for (let p=0;p<arrays.length;p++) {
       //eslint-disable-next-line functional/immutable-data
       ret.push(arrays[p][i]);
@@ -210,7 +210,7 @@ export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`un
   const d = [...data];
   const add = length - d.length;
   
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=0;i<add;i++) {
     //eslint-disable-next-line functional/immutable-data
     if (expand === `undefined`) {
@@ -258,7 +258,8 @@ export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, i
   guardIndex(array, endIndex, `endIndex`);
 
   const t:V[] = [];
-  //eslint-disable-next-line functional/no-let,functional/no-loop-statement
+  
+  //eslint-disable-next-line functional/no-let
   for (let i=startIndex;i<=endIndex;i++) {
     //eslint-disable-next-line functional/immutable-data
     if (predicate(array[i], i, array)) t.push(array[i]);
@@ -374,7 +375,7 @@ export const randomPluck = <V>(array:readonly V[], mutate = false, rand:RandomSo
  */
 export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = defaultRandom): ReadonlyArray<V> => {
   const array = [...dataToShuffle];
-  // eslint-disable-next-line functional/no-loop-statement, functional/no-let
+  // eslint-disable-next-line  functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
@@ -547,7 +548,7 @@ export const sample = <V>(array: ReadonlyArray<V>, amount:number):ReadonlyArray<
   
   const r:V[] = [];
   
-  //eslint-disable-next-line functional/no-loop-statement,functional/no-let
+  //eslint-disable-next-line functional/no-let
   for (let i=subsampleSteps-1;i<array.length;i+=subsampleSteps) {
     //eslint-disable-next-line functional/immutable-data
     r.push(array[i]);
@@ -570,7 +571,7 @@ export const sample = <V>(array: ReadonlyArray<V>, amount:number):ReadonlyArray<
 export function chunks<V>(arr:ReadonlyArray<V>, size:number) {
   // https://surma.github.io/underdash/
   const output = [];
-  //eslint-disable-next-line functional/no-loop-statement, functional/no-let
+  //eslint-disable-next-line  functional/no-let
   for (let i = 0; i < arr.length; i += size) {
     //eslint-disable-next-line functional/immutable-data
     output.push(arr.slice(i, i + size));

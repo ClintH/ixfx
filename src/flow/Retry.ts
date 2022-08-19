@@ -31,7 +31,6 @@ export const retry = async <V>(callback:() => Promise<V>, attempts:number = 5, s
   let timeout = startingTimeoutMs;
   //eslint-disable-next-line functional/no-let
   let totalSlept = 0;
-  //eslint-disable-next-line functional/no-loop-statement
   while (attempts > 0) {
     try {
       return await callback();

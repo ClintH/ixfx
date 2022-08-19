@@ -282,7 +282,7 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
   let err = dx - dy;
 
   const cells = [];
-  // eslint-disable-next-line functional/no-loop-statement,no-constant-condition
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     // eslint-disable-next-line functional/immutable-data
     cells.push(Object.freeze({x: startX, y: startY}));
@@ -387,7 +387,7 @@ export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolea
   if (start.x === end.x) {
     // Vertical
     const lastY = endInclusive ? end.y + 1 : end.y;
-    // eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    // eslint-disable-next-line functional/no-let
     for (let y = start.y; y < lastY; y++) {
       // eslint-disable-next-line functional/immutable-data
       cells.push({x: start.x, y: y});
@@ -395,7 +395,7 @@ export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolea
   } else if (start.y === end.y) {
     // Horizontal
     const lastX = endInclusive ? end.x + 1 : end.x;
-    // eslint-disable-next-line functional/no-loop-statement,functional/no-let
+    // eslint-disable-next-line functional/no-let
     for (let x = start.x; x < lastX; x++) {
       // eslint-disable-next-line functional/immutable-data
       cells.push({x: x, y: start.y});
@@ -534,7 +534,6 @@ export const visitor = function* (
   // eslint-disable-next-line functional/no-let
   let current: Cell | null = null;
 
-  // eslint-disable-next-line functional/no-loop-statement
   while (cellQueue.length > 0) {
     // console.log(`cell queue: ${cellQueue.length} move queue: ${moveQueue.length} current: ${JSON.stringify(current)}` );
     if (current === null) {
@@ -609,7 +608,6 @@ opts);
 export const visitorRandom = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
   options: (grid, cell) => {
     const t: Neighbour[] = [];
-    // eslint-disable-next-line functional/no-loop-statement
     for (const c of cells(grid, cell)) {
       // eslint-disable-next-line functional/immutable-data
       t.push([`n`, c]);
@@ -703,7 +701,6 @@ export const visitFor = (grid: Grid, start: Cell, steps: number, visitor: Visito
   // eslint-disable-next-line functional/no-let
   let stepsMade = 0;
 
-  // eslint-disable-next-line functional/no-loop-statement
   while (stepsMade < steps) {
     stepsMade++;
     const {value} = v.next();
@@ -787,7 +784,7 @@ export const rows = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
   let row = start.y;
   //eslint-disable-next-line functional/no-let
   let rowCells: Cell[] = [];
-  //eslint-disable-next-line functional/no-loop-statement
+ 
   for (const c of cells(grid, start)) {
     if (c.y !== row) {
       yield rowCells;
@@ -816,7 +813,6 @@ export const cells = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
   let {x, y} = start;
   // eslint-disable-next-line functional/no-let
   let canMove = true;
-  // eslint-disable-next-line functional/no-loop-statement
   do {
     yield {x, y};
     x++;

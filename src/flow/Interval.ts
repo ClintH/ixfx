@@ -34,7 +34,6 @@ export const interval = async function*<V>(produce: IntervalAsync<V>, intervalMs
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
   try {
-    //eslint-disable-next-line functional/no-loop-statement
     while (!cancelled) {
       await sleep(intervalMs);
       if (cancelled) return;

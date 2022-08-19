@@ -142,7 +142,6 @@ export const hasAnyValue = <K, V>(map:ReadonlyMap<K, V>, value:V, comparer:IsEqu
  */
 //eslint-disable-next-line func-style
 export function * filter<V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean) {
-  //eslint-disable-next-line functional/no-loop-statement
   for (const v of map.values()) {
     if (predicate(v)) yield v;
   }

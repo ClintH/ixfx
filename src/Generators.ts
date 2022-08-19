@@ -26,9 +26,7 @@ export const numericRangeRaw = function* (interval: number, start: number = 0, e
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
   //eslint-disable-next-line functional/no-let
   let v = start;
-  //eslint-disable-next-line functional/no-loop-statement
   do {
-    //eslint-disable-next-line functional/no-loop-statement
     while (v < end) {
       yield v;
       v += interval;
@@ -79,11 +77,9 @@ export const numericRange = function* (interval: number, start: number = 0, end?
   else end *= rounding;
   interval = interval * rounding;
 
-  //eslint-disable-next-line functional/no-loop-statement
   do {
     //eslint-disable-next-line functional/no-let
     let v = start * rounding;
-    //eslint-disable-next-line functional/no-loop-statement
     while ((!negativeInterval && v <= end) || (negativeInterval && v >= end)) {
       yield v / rounding;
       v += interval;
@@ -125,7 +121,6 @@ export const count = function* (amount:number, offset:number = 0) {
   
   //eslint-disable-next-line functional/no-let
   let i = 0;
-  //eslint-disable-next-line functional/no-loop-statement
   do {
     if (amount < 0) yield -i + offset;
     else yield i + offset;

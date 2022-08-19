@@ -34,7 +34,6 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
   get lengthMax() {
     //eslint-disable-next-line functional/no-let
     let m = 0;
-    //eslint-disable-next-line functional/no-loop-statement
     for (const v of this.#map.values()) {
       m = Math.max(m, this.type.count(v));
     }

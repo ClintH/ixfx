@@ -87,7 +87,6 @@ export function* spring(opts:SpringOpts = {}, timerOrFreq:Timers.Timer|undefined
   //eslint-disable-next-line functional/no-let
   let doneCountdown = opts.countdown ?? 10;
 
-  //eslint-disable-next-line functional/no-loop-statement
   while (doneCountdown > 0) {
     const s = fn(timerOrFreq.elapsed/1000);
     yield s;
@@ -128,7 +127,6 @@ export function* spring(opts:SpringOpts = {}, timerOrFreq:Timers.Timer|undefined
 export function* sine(timerOrFreq:Timers.Timer|number) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     // Rather than -1 to 1, we want 0 to 1
     yield (Math.sin(timerOrFreq.elapsed*piPi) + 1) / 2;
@@ -142,7 +140,6 @@ export function* sine(timerOrFreq:Timers.Timer|number) {
 //eslint-disable-next-line func-style
 export function* sineBipolar(timerOrFreq:Timers.Timer|number) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     yield Math.sin(timerOrFreq.elapsed*piPi);
   }
@@ -163,7 +160,6 @@ export function* sineBipolar(timerOrFreq:Timers.Timer|number) {
 //eslint-disable-next-line func-style
 export function* triangle(timerOrFreq:Timers.Timer|number) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     // elapsed is repeatedly 0->1
     //eslint-disable-next-line functional/no-let
@@ -199,7 +195,6 @@ export function* triangle(timerOrFreq:Timers.Timer|number) {
 //eslint-disable-next-line func-style
 export function* saw(timerOrFreq:Timers.Timer) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {
     yield timerOrFreq.elapsed;
   }
@@ -222,7 +217,6 @@ export function* saw(timerOrFreq:Timers.Timer) {
 //eslint-disable-next-line func-style
 export function* square(timerOrFreq:Timers.Timer) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
-  //eslint-disable-next-line functional/no-loop-statement
   while (true) {   
     yield (timerOrFreq.elapsed < 0.5) ? 0 : 1;
   }

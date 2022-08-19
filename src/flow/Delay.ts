@@ -73,7 +73,6 @@ async function* delayAnimationLoop() {
   };
 
   try {
-    //eslint-disable-next-line functional/no-loop-statement
     while (true) {
       timer = window.requestAnimationFrame(callback);
       yield await p;
@@ -127,7 +126,6 @@ export async function* delayLoop(timeoutMs:number) {
   };
 
   try {
-    //eslint-disable-next-line functional/no-loop-statement
     while (true) {
       timer = window.setTimeout(callback, timeoutMs);
       yield await p;

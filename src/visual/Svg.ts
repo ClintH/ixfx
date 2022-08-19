@@ -142,7 +142,6 @@ export const remove = <V extends SVGElement>(parent:SVGElement, queryOrExisting:
 export const clear = (parent:SVGElement) => {
   //eslint-disable-next-line functional/no-let
   let c = parent.lastElementChild;
-  //eslint-disable-next-line functional/no-loop-statement
   while (c) {
     parent.removeChild(c);
     c = parent.lastElementChild;
@@ -341,7 +340,6 @@ export const makeHelper = (parent:SVGElement, parentOpts?:DrawingOpts & StrokeOp
       parent.setAttributeNS(null, `height`, height.toString());
     },
     clear: () => {
-      //eslint-disable-next-line functional/no-loop-statement
       while (parent.firstChild) {
         parent.removeChild(parent.lastChild as HTMLElement);
       }
