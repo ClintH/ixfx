@@ -33,6 +33,8 @@ export type Continuously = HasCompletion & {
 export type ContinuouslySyncCallback = (ticks?:number, elapsedMs?:number) => boolean|void
 export type ContinuouslyAsyncCallback = (ticks?:number, elapsedMs?:number) => Promise<boolean|void>
 
+const raf = typeof window !== `undefined` ? (cb:()=>void) => window.requestAnimationFrame(cb) : (cb:()=>void) => setTimeout(cb, 1);
+
 /**
  * Returns a {@link Continuously} that continuously executes `callback`. 
  * If callback returns _false_, loop exits.
@@ -101,7 +103,8 @@ export const continuously = (callback:ContinuouslyAsyncCallback|ContinuouslySync
   let startedAt = performance.now();
   //eslint-disable-next-line functional/no-let
   let iMs = (intervalMs === undefined) ? 0 : intervalMs;
-  const schedule = (iMs === 0) ? (cb:()=>void) => window.requestAnimationFrame(cb) : (cb:()=>void) => window.setTimeout(cb, iMs);
+
+  const schedule = (iMs === 0) ? raf : (cb:()=>void) => setTimeout(cb, iMs);
   
   const cancel = () => {
     if (!running) return;
