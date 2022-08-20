@@ -20,7 +20,7 @@ export type NumberGuardRange =
 
 /**
  * Throws an error if `t` is not a number or within specified range. 
- * Alternatives: {@link integer} for additional integer check, {@link percentage}.
+ * Alternatives: {@link integer} for additional integer check, {@link percent} for percentage-range.
  * 
  * * positive: must be at least zero
  * * negative: must be zero or lower

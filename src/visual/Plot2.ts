@@ -9,6 +9,7 @@ import * as Sg from './SceneGraph.js';
 
 import {textWidth} from './Drawing.js';
 import {getFieldPaths, getFieldByPath, ifNaN} from '../Util.js';
+import {number as guardNumber} from '~/Guards.js';
 
 /**
  * A data source
@@ -75,7 +76,6 @@ export type DataPoint = {
 
 export type DataHitPoint = (pt:Points.Point) => [point: DataPoint|undefined, distance: number];
 
-
 class ArrayDataSource implements DataSource {
   data:number[];
   series:Series;
@@ -92,6 +92,7 @@ class ArrayDataSource implements DataSource {
 
   clear() {
     this.set([]);
+    this._range = undefined;
   }
 
   set(data:number[]) {
@@ -149,6 +150,8 @@ export class Series {
   dataHitPoint: DataHitPoint|undefined;
   tooltip?:string;
   precision = 2;
+  
+  readonly axisRange:DataRange
 
   // How many pixels wide per data point on last draw
   lastPxPerPt = -1;
@@ -162,15 +165,15 @@ export class Series {
     this.drawingStyle = opts.drawingStyle ?? `line`;
     this.colour = opts.colour;
     this.width = opts.width ?? 3;
-    this._visualRange = opts.axisRange ?? {min:Number.NaN,max:Number.NaN};
+    this.axisRange = opts.axisRange ?? {min:Number.NaN,max:Number.NaN};
+    this._visualRange = {...this.axisRange};
     this._visualRangeStretch = opts.visualRangeStretch ?? true;
 
-    if(sourceType === `array`) {
+    if (sourceType === `array`) {
       this.source = new ArrayDataSource(this);
     } else if (sourceType === `stream`) {
       this.source = new StreamingDataSource(this);
     } else throw new Error(`Unknown sourceType. Expected array|stream`);
-
   }
 
   formatValue(v:number) {
@@ -181,6 +184,7 @@ export class Series {
     let vr = this._visualRange;
     const sourceRange = this.source.range;
     let changed = false;
+    
     if (sourceRange.changed) { 
       if (this._visualRangeStretch) {
         // Stretch range to lowest/highest-seen min/max
@@ -214,12 +218,18 @@ export class Series {
   }
 
   add(value:number) {
+    guardNumber(value, ``, `value`);
     this.source.add(value);
     this.plot.plotArea.needsDrawing = true;
   }
 
+  /**
+   * Clears the underlying source
+   * and sets a flag that the plot area needs redrawing
+   */
   clear() {
     this.source.clear();
+    this._visualRange = {...this.axisRange};
     this.plot.plotArea.needsDrawing = true;
   }
 }
@@ -715,6 +725,19 @@ export class Plot extends Sg.CanvasBox {
     this.axisY = new AxisY(this);
   }
 
+  /**
+   * Calls 'clear()' on each of the series
+   */
+  clearSeries() {
+    for (const series of this.series.values()) {
+      series.clear();
+    }
+  }
+
+  /**
+   * Removes all series, plot, legend
+   * and axis data.
+   */
   clear() {
     this.series = new Map();
     this.plotArea.clear();

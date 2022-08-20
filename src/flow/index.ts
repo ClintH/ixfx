@@ -4,6 +4,10 @@ import {sleep} from "./Sleep.js";
 import * as StateMachine from './StateMachine.js';
 import * as Timer from './Timer.js';
 
+/**
+ * State Machine
+ * See [here for usage](Flow.StateMachine.StateMachine.html).
+ */
 export {StateMachine};
 export * from './Timer.js';
 
@@ -146,7 +150,6 @@ export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|unde
   }
   return ret;
 };
-
 
 try {
   if (typeof window !== `undefined`) {
