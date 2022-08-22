@@ -6,7 +6,7 @@ import * as Timer from './Timer.js';
 
 /**
  * State Machine
- * See [here for usage](Flow.StateMachine.StateMachine.html).
+ * See [here for usage](../classes/Flow.StateMachine.StateMachine.html).
  */
 export {StateMachine};
 export * from './Timer.js';
