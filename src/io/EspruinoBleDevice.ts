@@ -10,12 +10,15 @@ import {NordicBleDevice} from "./NordicBleDevice.js";
  * It must be called in a UI event handler for browser security reasons.
  * 
  * ```js
- * const e = await puck();
+ * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * const e = await Espruino.puck();
  * ```
  * 
  * To connect to a particular device:
+ * 
  * ```js
- * const e = await puck({name:`Puck.js a123`});
+ * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * const e = await Espruino.puck({name:`Puck.js a123`});
  * ```
  *
  * Listen for events:
