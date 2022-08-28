@@ -33,13 +33,23 @@ export const movingAverageLight = (scaling:number = 3):MovingAverage => {
   //eslint-disable-next-line functional/no-let
   let count = 0;
 
+  //eslint-disable-next-line functional/no-let
+  let disposed = false;
   const ma:MovingAverage = {
+    dispose() {
+      disposed = true;
+    },
+    get isDisposed() {
+      return disposed;
+    },
     add(v:number) {
+      if (disposed) throw new Error(`MovingAverage disposed, cannot add`);
       count++;
       average = average + (v - average) / Math.min(count, scaling);
       return average;
     },
     clear() {
+      if (disposed) throw new Error(`MovingAverage disposed, cannot clear`);
       average = 0;
       count = 0;
     },
@@ -47,6 +57,60 @@ export const movingAverageLight = (scaling:number = 3):MovingAverage => {
       return average;
     }
   };
+  return ma;
+};
+
+/**
+ * Uses the same algorithm as {@link movingAverageLight}, but adds values automatically if
+ * nothing has been manually added.
+ * 
+ * This is useful if you are averaging something based on events. For example calculating the
+ * average speed of the pointer. If there is no speed, there is no pointer move event. Using
+ * this function, `value` is added at a rate of `updateRateMs`. This timer is reset
+ * every time a value is added, a bit like the `debounce` function.
+ * @param updateRateMs 
+ * @param value 
+ * @param scaling 
+ * @returns 
+ */
+export const movingAverageTimed = (updateRateMs:number = 200, value:number = 0, scaling:number = 3):MovingAverage => {
+  guardInteger(scaling, `aboveZero`, `scaling`);
+  guardInteger(updateRateMs, `aboveZero`, `decayRateMs`);
+  
+  const mal = movingAverageLight(scaling);
+
+  //eslint-disable-next-line functional/no-let
+  let timer = 0;
+
+  const reschedule = () => {
+    if (timer !== 0) clearTimeout(timer);
+    // @ts-ignore
+    timer = setTimeout(decay, updateRateMs) as number;
+  };
+  
+  const decay = () => {
+    mal.add(value);
+    if (!mal.isDisposed) setTimeout(decay, updateRateMs);
+  };
+
+  const ma:MovingAverage = {
+    add(v: number) {
+      reschedule();
+      return mal.add(v);
+    },
+
+    dispose() {
+      mal.dispose();
+    },
+    clear: function (): void {
+      mal.clear();
+    },
+    compute: function (): number {
+      return mal.compute();
+    },
+    isDisposed: false
+  };
+
   return ma;
 };
 
@@ -93,6 +157,9 @@ export const movingAverageLight = (scaling:number = 3):MovingAverage => {
 export const movingAverage = (samples = 100, weightingFn?:(v:number)=>number):MovingAverage => {
   
   //eslint-disable-next-line functional/no-let
+  let disposed = false;
+
+  //eslint-disable-next-line functional/no-let
   let q = queueMutable<number>({
     capacity: samples,
     discardPolicy: `older`
@@ -118,7 +185,11 @@ export const movingAverage = (samples = 100, weightingFn?:(v:number)=>number):Mo
     return compute();
   };
 
-  return { add, compute, clear };
+  const dispose = () => {
+    disposed = true;
+  };
+
+  return { add, compute, clear, dispose, isDisposed:disposed };
 };
 
 /**
@@ -139,4 +210,7 @@ export type MovingAverage = {
    * @param v Value to add
    */
   add(v:number):number
+
+  dispose():void;
+  get isDisposed():boolean;
 }
