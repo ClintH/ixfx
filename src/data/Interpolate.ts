@@ -4,6 +4,8 @@ import {wrap} from "./Wrap.js";
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
  * 
+ * [ixfx Guide](https://clinth.github.io/ixfx-docs/modulation/interpolate/)
+ * 
  * @example Get the halfway point between 30 and 60
  * ```js
  * import {interpolate} from 'https://unpkg.com/ixfx/dist/data.js';
