@@ -6,9 +6,10 @@ export default defineConfig({
   },
   dts: true,
   noExternal: [`bezier-js`, `d3-color`, `d3-interpolate`, `rxjs`, `json5`],
-  platform: `browser`,
+  platform:'node',
   target: `es5`,
-  minify: true,
+  sourcemap: false,
+  minify: false,
   legacyOutput: true,
   outDir: `espruino`,
   format: [

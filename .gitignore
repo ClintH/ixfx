@@ -9,3 +9,4 @@ dist
 npm-debug.log*
 node_modules/
 .DS_Store
+espruino/__tests__/
