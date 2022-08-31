@@ -175,7 +175,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
     // eslint-disable-next-line functional/no-let
     let elapsed = this.#timer.elapsed;
     const wasHeld = this.#holdingInitial && !this.#holding;
-
+   
     // Change through states for as long as needed
     // eslint-disable-next-line functional/no-let
     let hasChanged = false;
@@ -287,9 +287,9 @@ class AdsrBase extends SimpleEventEmitter<Events> {
 
 /**
  * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,
- * usually in response to an intial trigger.
+ * usually in response to an intial trigger. 
  * 
- * Created with the {@link adsr} function.
+ * Created with the {@link adsr} function. [See the ixfx Guide on Envelopes](https://clinth.github.io/ixfx-docs/modulation/envelope/).
  * 
  * @example Setup
  * ```js
@@ -302,6 +302,28 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * }
  * const env = adsr(opts);
  * ```
+ * 
+ * [Options for envelope](https://clinth.github.io/ixfx/types/Modulation.EnvelopeOpts.html) are as follows:
+ * 
+ * ```js
+ * initialLevel?: number
+ * attackBend: number
+ * attackDuration: number
+ * decayBend: number
+ * decayDuration:number
+ * sustainLevel: number
+ * releaseBend: number
+ * releaseDuration: number
+ * releaseLevel?: number
+ * peakLevel: number
+ * retrigger?: boolean
+ * shouldLoop: boolean
+ * ```
+ * 
+ * If `retrigger` is false, re-triggers will continue at current level
+ * rather than resetting to `initialLevel`.
+ * 
+ * If `shouldLoop` is true, envelope loops until `release()` is called.
  * 
  * @example Using
  * ```js
@@ -434,7 +456,6 @@ class AdsrImpl extends AdsrBase implements Adsr {
     if (!this.retrigger) {      
       const [_stage, scaled, _raw] = this.compute();
       if (!Number.isNaN(scaled) && scaled > 0) {
-        //console.log(`Retrigger. Last value was: ${scaled}`);
         this.initialLevelOverride = scaled;
       }
     }
