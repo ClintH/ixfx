@@ -4,7 +4,7 @@ import { number as guardNumber} from '../Guards.js';
 import {clamp as clampNumber, wrap as wrapNumber} from '../data/index.js';
 import {Arrays} from "../collections/index.js";
 import { RandomSource, defaultRandom } from "../Random.js";
-
+import { quantiseEvery as quantiseEveryNumber } from "../Numbers.js";
 /**
  * A point, consisting of x, y and maybe z fields.
  */
@@ -961,6 +961,10 @@ export function divide(a: Point|number, b: Rects.Rect|Point | number, c?: number
   }
 }
 
+export const quantiseEvery = (pt:Point, snap:Point, middleRoundsUp = true) => Object.freeze({
+  x: quantiseEveryNumber(pt.x, snap.x, middleRoundsUp),
+  y: quantiseEveryNumber(pt.y, snap.y, middleRoundsUp)
+});
 /**
  * Simple convex hull impementation. Returns a set of points which
  * enclose `pts`.

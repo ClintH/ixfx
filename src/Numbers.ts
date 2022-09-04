@@ -111,3 +111,27 @@ export function* filter(it:Iterable<unknown>) {
   }
 }
 
+/**
+ * Rounds `v` by `every`.
+ * 
+ * ```js
+ * quantiseEvery(11, 10);  // 10
+ * quantiseEvery(25, 10);  // 30
+ * quantiseEvery(0, 10);   // 0
+ * quantiseEvery(4, 10);   // 0
+ * quantiseEvery(100, 10); // 100
+ * ```
+ * @param v 
+ * @param every 
+ * @param middleRoundsUp 
+ * @returns 
+ */
+export const quantiseEvery = (v:number, every:number, middleRoundsUp = true) => {
+  //eslint-disable-next-line functional/no-let
+  let div = v / every;
+  const divMod = div % 1;
+  div = Math.floor(div);
+  if (divMod === 0.5 && middleRoundsUp || divMod > 0.5) div++;
+  return every * div;
+};
+
