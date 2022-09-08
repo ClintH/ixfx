@@ -60,7 +60,36 @@ export const relativeTimer = (total:number, timer: Timer, clampValue = true):Mod
   };
 };
 
-  
+/**
+ * A timer based on frequency: cycles per unit of time. These timers return a number from
+ * 0..1 indicating position with a cycle.
+ * 
+ * In practice, timers are used to 'drive' something like an Oscillator.
+ * 
+ * @example Init a spring oscillator, with a half a cycle per second
+ * ```js
+ * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { frequencyTimer } from "https://unpkg.com/ixfx/dist/flow.js"
+ * Oscillators.spring({}, frequencyTimer(0.5));
+ * ```
+ * 
+ * By default it uses elapsed clock time as a basis for frequency. ie., cycles per second.
+ * 
+ * It returns a `ModTimer`, which allows for a modulation amount to be continually applied
+ * to the calculation of the 'position' within a cycle.
+ * 
+ * @example Prints around 0/0.5 each second, as timer is half a cycle per second
+ * ```js
+ * import { frequencyTimer } from "https://unpkg.com/ixfx/dist/flow.js"
+ * const t = frequencyTimer(0.5);
+ * setInterval(() => {
+ *  console.log(t.elapsed);
+ * }, 1000);
+ * ```
+ * @param frequency 
+ * @param timer 
+ * @returns 
+ */
 export const frequencyTimer = (frequency:number, timer:Timer = msElapsedTimer()):ModTimer => {
   const cyclesPerSecond = frequency/1000;
   //eslint-disable-next-line functional/no-let

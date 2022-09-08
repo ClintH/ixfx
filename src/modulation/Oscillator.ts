@@ -74,13 +74,14 @@ const springRaw = (opts: SpringOpts = {}, from: number = 0, to: number = 1) => {
  *  stiffness: 100
  * });
  * ```
- * @param opts 
- * @param timerOrFreq 
+ * @param opts Options for spring
+ * @param timerOrFreq Timer to use, or frequency
  */
 //eslint-disable-next-line func-style
-export function* spring(opts:SpringOpts = {}, timerOrFreq:Timers.Timer|undefined) {
+export function* spring(opts:SpringOpts = {}, timerOrFreq:Timers.Timer|number|undefined) {
   if (timerOrFreq === undefined) timerOrFreq = Timers.msElapsedTimer();
-  
+  else if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
+
   const fn = springRaw(opts, 0, 1);
 
   // Give it some iterations to settle
@@ -193,7 +194,7 @@ export function* triangle(timerOrFreq:Timers.Timer|number) {
  * ```
  */
 //eslint-disable-next-line func-style
-export function* saw(timerOrFreq:Timers.Timer) {
+export function* saw(timerOrFreq:Timers.Timer|number) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   while (true) {
     yield timerOrFreq.elapsed;
@@ -215,7 +216,7 @@ export function* saw(timerOrFreq:Timers.Timer) {
  * ```
  */
 //eslint-disable-next-line func-style
-export function* square(timerOrFreq:Timers.Timer) {
+export function* square(timerOrFreq:Timers.Timer|number) {
   if (typeof timerOrFreq === `number`) timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   while (true) {   
     yield (timerOrFreq.elapsed < 0.5) ? 0 : 1;
