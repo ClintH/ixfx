@@ -513,7 +513,8 @@ export const adsr = (opts:EnvelopeOpts):Adsr => new AdsrImpl(opts);
 /**
  * Creates and runs an envelope, sampling its values at `sampleRateMs`.
  * 
- * ```
+ * @example Init
+ * ```js
  * import {adsrSample, defaultAdsrOpts} from 'https://unpkg.com/ixfx/dist/modulation.js';
  * import {IterableAsync} from  'https://unpkg.com/ixfx/dist/util.js';
  * 
@@ -525,10 +526,16 @@ export const adsr = (opts:EnvelopeOpts):Adsr => new AdsrImpl(opts);
  *  attackBend: 1,
  *  decayBend: -1
  * };
+ * ```
  * 
+ * @example Add data to array
+ * ```js
  * // Sample an envelope every 5ms into an array
  * const data = await IterableAsync.toArray(adsrSample(opts, 20));
+ * ```
  * 
+ * @example Looping
+ * ```js
  * // Work with values as sampled
  * for await (const v of adsrSample(opts, 5)) {
  *  // Work with envelope value `v`...
