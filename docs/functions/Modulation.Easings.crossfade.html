@@ -28,6 +28,8 @@
 <li>1.0 will yield 100% of easingB at its <code>easing(1)</code> value.</li>
 </ul>
 <p>So easingB will only ever kick in at higher <code>amt</code> values and <code>easingA</code> will only be present in lower valus.</p>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">Easings</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&quot;https://unpkg.com/ixfx/dist/modulation.js&quot;</span><span class="hl-2">;</span><br/><span class="hl-3">Easings</span><span class="hl-2">.</span><span class="hl-8">crossFade</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">, </span><span class="hl-3">Easings</span><span class="hl-2">.</span><span class="hl-3">functions</span><span class="hl-2">.</span><span class="hl-3">sineIn</span><span class="hl-2">, </span><span class="hl-3">Easings</span><span class="hl-2">.</span><span class="hl-3">functions</span><span class="hl-2">.</span><span class="hl-3">sineOut</span><span class="hl-2">);</span>
+</code></pre>
 
 <h3>Returns</h3><p>Numeric value</p>
 </div>
