@@ -101,6 +101,39 @@ export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement|undefined|n
 };
 
 /**
+ * Given an array of class class names, this will cycle between them each time
+ * it is called.
+ * 
+ * Eg, assume `list` is: [ `a`, `b`, `c` ]
+ * 
+ * If `el` already has the class `a`, the first time it is called, class `a`
+ * is removed, and `b` added. The next time `b` is swapped for `c`. Once again,
+ * `c` will swap with `a` and so on.
+ * 
+ * If `el` is undefined or null, function silently returns.
+ * @param el Element
+ * @param list List of class names
+ * @returns 
+ */
+export const cycleCssClass = (el:HTMLElement, list:readonly string[]) => {
+  if (el === null || !el) return;
+  if (!Array.isArray(list)) throw new Error(`List should be an array of strings`);
+  //eslint-disable-next-line functional/no-let
+  for (let i=0;i<list.length;i++) {
+    if (el.classList.contains(list[i])) {
+      el.classList.remove(list[i]);
+      if (i +1 < list.length) {
+        el.classList.add(list[i+1]);
+      } else {
+        el.classList.add(list[0]);
+      }
+      return;
+    }
+  }
+  el.classList.add(list[0]);
+};
+
+/**
  * Sets width/height atributes on the given element according to the size of its parent.
  * @param domQueryOrEl Elememnt to resize
  * @param onResized Callback when resize happens
