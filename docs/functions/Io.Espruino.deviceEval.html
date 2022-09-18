@@ -19,21 +19,47 @@
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
 <li class="tsd-signature tsd-anchor-link" id="deviceEval">device<wbr/>Eval<span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, opts<span class="tsd-signature-symbol">?: </span><a href="../types/Io.Espruino.EvalOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">EvalOpts</a>, device<span class="tsd-signature-symbol">: </span><a href="../interfaces/Io.Espruino.EspruinoDevice.html" class="tsd-signature-type" data-tsd-kind="Interface">EspruinoDevice</a>, evalReplyPrefix<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, debug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, warn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>m<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#deviceEval" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Evaluates some code on an Espruino device.</p>
+<p>Options:</p>
+<ul>
+<li>timeoutMs: how many millis to wait before assuming code failed. If not specified, <code>device.evalTimeoutMs</code> is used as a default.</li>
+<li>assumeExlusive: assume device is not producing any other output than for our evaluation</li>
+</ul>
+<p>A random string is created to pair eval requests and responses. <code>code</code> will be run on the device, with the result
+wrapped in JSON, and in turn wrapped in a object that is sent back.</p>
+<p>The actual code that gets sent to the device is then:
+<code>\x10${evalReplyPrefix}(JSON.stringify({reply:&quot;${id}&quot;, result:JSON.stringify(${code})}))\n</code></p>
+<p>For example, it might end up being:
+<code>\x10Bluetooth.println(JSON.stringify({reply: &quot;a35gP&quot;, result: &quot;{ &#39;x&#39;: &#39;10&#39; }&quot; }))\n</code></p>
+
+<h3>Returns</h3></div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>code: <span class="tsd-signature-type">string</span></h5></li>
+<h5>code: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>Code to evaluation</p>
+</div></li>
 <li>
-<h5>opts: <a href="../types/Io.Espruino.EvalOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">EvalOpts</a><span class="tsd-signature-symbol"> = {}</span></h5></li>
+<h5>opts: <a href="../types/Io.Espruino.EvalOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">EvalOpts</a><span class="tsd-signature-symbol"> = {}</span></h5>
+<div class="tsd-comment tsd-typography"><p>Options for evaluation</p>
+</div></li>
 <li>
-<h5>device: <a href="../interfaces/Io.Espruino.EspruinoDevice.html" class="tsd-signature-type" data-tsd-kind="Interface">EspruinoDevice</a></h5></li>
+<h5>device: <a href="../interfaces/Io.Espruino.EspruinoDevice.html" class="tsd-signature-type" data-tsd-kind="Interface">EspruinoDevice</a></h5>
+<div class="tsd-comment tsd-typography"><p>Device to execute on</p>
+</div></li>
 <li>
-<h5>evalReplyPrefix: <span class="tsd-signature-type">string</span></h5></li>
+<h5>evalReplyPrefix: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>How to send code back (eg <code>Bluetooth.println</code>, <code>console.log</code>)</p>
+</div></li>
 <li>
-<h5>debug: <span class="tsd-signature-type">boolean</span></h5></li>
+<h5>debug: <span class="tsd-signature-type">boolean</span></h5>
+<div class="tsd-comment tsd-typography"><p>If true, the full evaled code is printed locally to the console</p>
+</div></li>
 <li>
 <h5>warn: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>m<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></h5>
+<div class="tsd-comment tsd-typography"><p>Callback to display warnings</p>
+</div>
 <ul class="tsd-parameters">
 <li class="tsd-parameter-signature">
 <ul class="tsd-signatures tsd-kind-type-literal">
