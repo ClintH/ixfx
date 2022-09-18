@@ -99,13 +99,17 @@ export class EspruinoBleDevice extends NordicBleDevice {
    * Options:
    *  timeoutMs: Timeout for execution. 5 seconds by default
    *  assumeExclusive If true, eval assumes all replies from controller are in response to eval. True by default
+   *  debug: If true, execution is traced via `warn` callback
    * @param code Code to run on the Espruino.
    * @param opts Options
+   * @param warn Function to pass warning/trace messages to. If undefined, this.warn is used, printing to console.
    */
-  async eval(code:string, opts:EvalOpts = {}):Promise<string> {
-    return deviceEval(code, opts, this, `Bluetooth.println`, false, (msg) => {
-      this.warn(msg);
-    });
+  async eval(code:string, opts:EvalOpts = {}, warn?:(msg:string) => void):Promise<string> {
+    const debug = opts.debug ?? false;
+    const warnCb = warn ?? ((m) => this.warn(m));
+
+
+    return deviceEval(code, opts, this, `Bluetooth.println`, debug, warnCb);
   }
   /*
     const timeoutMs = opts.timeoutMs ?? this.evalTimeoutMs;
