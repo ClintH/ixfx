@@ -73,6 +73,6 @@ export class EspruinoSerialDevice extends SerialDevice {
     const debug = opts.debug ?? false;
     const warnCb = warn ?? ((m) => this.warn(m));
 
-    return deviceEval(code, opts, this, `console.log`, debug, warnCb);
+    return deviceEval(code, opts, this, `USB.println`, debug, warnCb);
   }
 }
