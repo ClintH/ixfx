@@ -2,6 +2,8 @@ A rough changelog between NPM releases
 
 # 0.6.2 22.09.18
 
+* Bug fix for Espruino eval
+
 # 0.6.1 22.09.14
 
 dom/Util - cycleCssClass
