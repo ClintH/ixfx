@@ -47,11 +47,13 @@ export type SerialOpts = JsonDeviceOpts & {
 export class Device extends JsonDevice {
   port:SerialPort|undefined;
   tx:WritableStreamDefaultWriter<string>|undefined;
-
+  abort:AbortController;
   baudRate:number;
 
   constructor(private config:SerialOpts = {}) {
     super(config);
+
+    this.abort = new AbortController();
 
     const eol = config.eol ?? `\r\n`;
 
@@ -76,11 +78,14 @@ export class Device extends JsonDevice {
   }
 
   onClosed(): void {
-    try {
-      this.port?.close();
-    } catch (ex) {
-      this.warn(ex);
-    }
+    this.tx?.releaseLock();
+
+    this.abort.abort(`closing port`);
+    // try {
+    //   this.port?.close();
+    // } catch (ex) {
+    //   this.warn(ex);
+    // }
     this.states.state = `closed`; 
   }
 
@@ -107,15 +112,29 @@ export class Device extends JsonDevice {
     const txW = this.port.writable;
     const txText = new TextEncoderStream();
     if (txW !== null) {
-      txText.readable.pipeTo(txW);
+      txText.readable.pipeTo(txW, { signal: this.abort.signal }).catch(err => {
+        console.log(`Serial.onConnectAttempt txText pipe:`);
+        console.log(err);
+      });
       this.tx = txText.writable.getWriter();
     }
 
     const rxR = this.port.readable;
-    const rxText = new TextDecoderStream();
+    const rxText = new TextDecoderStream(); 
     if (rxR !== null) {
-      rxR.pipeTo(rxText.writable);
-      rxText.readable.pipeTo(this.rxBuffer.writable());
+      rxR.pipeTo(rxText.writable, { signal: this.abort.signal }).catch(err => {
+        console.log(`Serial.onConnectAttempt rxR pipe:`);
+        console.log(err);
+      });
+      rxText.readable.pipeTo(this.rxBuffer.writable(), { signal: this.abort.signal }).catch(err => {
+        console.log(`Serial.onConnectAttempt rxText pipe:`);
+        console.log(err);
+        try {
+          this.port?.close();
+        } catch (ex) {
+          console.log(ex);
+        }
+      });
     }
   }
 }

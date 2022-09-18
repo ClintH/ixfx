@@ -15,6 +15,12 @@ export class StringWriteBuffer {
     this.writer = continuously(() => this.onWrite(), this.intervalMs);
   }
 
+  async close() {
+    const w = this.stream?.getWriter();
+    w?.releaseLock();
+    await w?.close();
+  }
+
   clear() {
     this.queue = queueMutable<string>();
   }

@@ -10,6 +10,14 @@ export class StringReceiveBuffer {
 
   }
 
+  async close() {
+    const s= this.stream;
+    if (!s) return;
+    await s.abort();
+
+    await s.close();
+  }
+
   clear() {
     this.buffer = ``;
   }
