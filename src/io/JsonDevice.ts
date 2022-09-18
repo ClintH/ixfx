@@ -122,8 +122,24 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
    */
   protected abstract writeInternal(txt: string):void;
 
-  close() {
+  async close() {
     if (this.states.state !== `connected`) return;
+    
+    // console.log(`rxBuffer closing`);
+    // try {
+    //   await this.rxBuffer.close();
+    // } catch (e) {
+    //   console.warn(e);
+    // }
+
+    // console.log(`txBuffer closing`);
+    // try {
+    //   await this.txBuffer.close();
+    // } catch (e) {
+    //   console.warn(e);
+    // }
+
+    // console.log(`calling onClose`);
     
     this.onClosed();
   }
