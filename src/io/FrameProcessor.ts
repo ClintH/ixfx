@@ -4,9 +4,18 @@ import * as Video from '../visual/Video.js';
 
 type State = `ready`|`initialised`|`disposed`;
 
+/**
+ * Frame procesor options
+ */
 //eslint-disable-next-line functional/no-mixed-type
 export type FrameProcessorOpts = {
+  /**
+   * If true, capture canvas will be shown
+   */
   readonly showCanvas?:boolean
+  /**
+   * If true, raw source will be shown
+   */
   readonly showPreview?:boolean
   /**
    * If specified, this function will be called after ImageData is captured
@@ -15,6 +24,9 @@ export type FrameProcessorOpts = {
    */
    readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
 
+   /**
+    * Default constraints to use for the camera source
+    */
    readonly cameraConstraints?:Camera.Constraints;
 
    /**
@@ -23,6 +35,10 @@ export type FrameProcessorOpts = {
    readonly captureCanvasEl?:HTMLCanvasElement;
 }
 
+/**
+ * Frame Processor
+ * Simplifies grabbing frames from a source
+ */
 export class FrameProcessor {
   private _source:Sources;
   private _state:State;
@@ -38,6 +54,10 @@ export class FrameProcessor {
   private _timer:number;
   private _captureCanvasEl?:HTMLCanvasElement;
 
+  /**
+   * Create a new frame processor
+   * @param opts 
+   */
   constructor(opts:FrameProcessorOpts = {}) {
     this._state = `ready`;
     this._source = ``;
@@ -49,6 +69,10 @@ export class FrameProcessor {
     this._postCaptureDraw = opts.postCaptureDraw;
   }
 
+  /**
+   * Hides or shows the raw source in the DOM
+   * @param enabled Preview enabled
+   */
   showPreview(enabled:boolean) {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     //eslint-disable-next-line functional/no-let
@@ -64,6 +88,10 @@ export class FrameProcessor {
     this._showPreview = enabled;
   }
 
+  /**
+   * Shows or hides the Canvas we're capturing to
+   * @param enabled 
+   */
   showCanvas(enabled:boolean) {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     //eslint-disable-next-line functional/no-let
@@ -78,6 +106,10 @@ export class FrameProcessor {
     this._showCanvas = enabled;
   }
 
+  /**
+   * Returns the current capturer instance
+   * @returns 
+   */
   getCapturer():Video.ManualCapturer|undefined {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     switch (this._source) {
@@ -86,6 +118,15 @@ export class FrameProcessor {
     }
   }
 
+  /**
+   * Grab frames from a video camera source and initialises
+   * frame processor.
+   * 
+   * If `constraints` are not specified, it will use the ones
+   * provided when creating the class, or defaults.
+   * 
+   * @param constraints Override of constraints when requesting camera access
+   */
   async useCamera(constraints?:Camera.Constraints) {
     if (this._state === `disposed`) throw new Error(`Disposed`);
 
@@ -96,6 +137,9 @@ export class FrameProcessor {
     await this.init();
   }
 
+  /**
+   * Initialises camera
+   */
   private async initCamera() {
     const r = await Camera.start(this._cameraConstraints);
     if (r === undefined) throw new Error(`Could not start camera`);
@@ -114,6 +158,11 @@ export class FrameProcessor {
     this._cameraStartResult = r;
   }
 
+  /**
+   * Closes down connections and removes created elements.
+   * Once disposed, the frame processor cannot be used
+   * @returns 
+   */
   dispose() {
     if (this._state === `disposed`) return;
     this.teardown();
@@ -136,12 +185,15 @@ export class FrameProcessor {
     case `camera`:
       this._cameraCapture?.dispose();
       this._cameraStartResult?.dispose();
-
       break;
     }
     this._teardownNeeded = false;
   }
 
+  /**
+   * Get the last frame
+   * @returns 
+   */
   getFrame():ImageData|undefined {
     if (this._state === `disposed`) throw new Error(`Disposed`);
 
@@ -151,6 +203,10 @@ export class FrameProcessor {
     }
   }
 
+  /**
+   * Get the timestamp of the processor (elapsed time since starting)
+   * @returns 
+   */
   getTimestamp():number {
     return performance.now() - this._timer;
   }

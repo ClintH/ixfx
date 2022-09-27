@@ -691,9 +691,10 @@ const drawText = (ctx:CanvasRenderingContext2D, text:string, position:(size:Text
  * const s = p.createSeries(`test2`, `stream`);
  * s.add(Math.random());
  * ```
- * 
- * 
  * `createSeries` returns the {@link Series} instance with properties for fine-tuning
+ * 
+ * For simple usage, use `plot(someData)` which automatically creates
+ * series for the properties of an object.
  */
 export class Plot extends Sg.CanvasBox {
   plotArea:PlotArea;
@@ -770,6 +771,13 @@ export class Plot extends Sg.CanvasBox {
     return this.series.size;
   }
 
+  /**
+   * Plots a simple object, eg `{ x: 10, y: 20, z: 300 }`
+   * Series are automatically created for each property of `o`
+   * 
+   * Be sure to call `update()` to visually refresh.
+   * @param o 
+   */
   plot(o:any) {
     const paths = getFieldPaths(o);
     paths.forEach(p => {
