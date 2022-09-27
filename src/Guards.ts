@@ -34,7 +34,8 @@ export type NumberGuardRange =
  * @param range Range to enforce
  * @returns 
  */
-export const number = (value:number, range:NumberGuardRange = ``, paramName = `?`):boolean => {
+export const number = (value?:number, range:NumberGuardRange = ``, paramName = `?`):boolean => {
+  if (typeof value === `undefined`) throw new Error(`Parameter ${paramName} is undefined`);
   if (Number.isNaN(value)) throw new Error(`Parameter '${paramName}' is NaN`);
   if (typeof value !== `number`) throw new Error(`Parameter '${paramName}' is not a number (${value})`);
   switch (range) {
