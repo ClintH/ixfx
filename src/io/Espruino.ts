@@ -17,6 +17,8 @@ export type Events = {
   readonly change: StateChangeEvent
 };
 
+export type EspruinoStates = `ready`|`connecting`|`connected`|`closed`|`closing`|`connecting`;
+
 /**
  * Options for device
  */

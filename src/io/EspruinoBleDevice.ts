@@ -107,8 +107,6 @@ export class EspruinoBleDevice extends NordicBleDevice {
   async eval(code:string, opts:EvalOpts = {}, warn?:(msg:string) => void):Promise<string> {
     const debug = opts.debug ?? false;
     const warnCb = warn ?? ((m) => this.warn(m));
-
-
     return deviceEval(code, opts, this, `Bluetooth.println`, debug, warnCb);
   }
   /*
