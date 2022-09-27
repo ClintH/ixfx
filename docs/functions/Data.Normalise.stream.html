@@ -32,7 +32,9 @@ at a later time.</p>
 and <code>maxDefault</code> primes the normalisation.</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">s</span><span class="hl-2"> = </span><span class="hl-3">Normalise</span><span class="hl-2">.</span><span class="hl-8">stream</span><span class="hl-2">();</span><br/><span class="hl-8">s</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">); </span><span class="hl-0">// 1, because it&#39;s the highest seen</span><br/><br/><span class="hl-0">// With priming:</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">s</span><span class="hl-2"> = </span><span class="hl-3">Normalise</span><span class="hl-2">.</span><span class="hl-8">stream</span><span class="hl-2">(</span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">);</span><br/><span class="hl-8">s</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">); </span><span class="hl-0">// 0.5, because we&#39;re expecting range 0-10</span>
 </code></pre>
-<p>Note that if a value exceeds the default range, normalisation adjusts.</p>
+<p>Note that if a value exceeds the default range, normalisation adjusts.
+Errors are thrown if min/max defaults are NaN or if one attempts to
+normalise NaN.</p>
 
 <h3>Returns</h3></div>
 <div class="tsd-parameters">
