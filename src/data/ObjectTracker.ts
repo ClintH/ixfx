@@ -1,5 +1,5 @@
-import {Timestamped, TrackedValueOpts} from "./TrackedValue";
-import {TrackerBase} from "./TrackerBase";
+import {Timestamped, TrackedValueOpts} from "./TrackedValue.js";
+import {TrackerBase} from "./TrackerBase.js";
 
 /**
  * A tracked value of type `V`.

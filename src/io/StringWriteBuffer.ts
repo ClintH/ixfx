@@ -1,6 +1,6 @@
-import {QueueMutable, queueMutable} from "../collections";
-import {Continuously, continuously} from "../flow";
-import {splitByLength} from "../Text";
+import {QueueMutable, queueMutable} from "../collections/index.js";
+import {Continuously, continuously} from "../flow/index.js";
+import {splitByLength} from "../Text.js";
 
 export class StringWriteBuffer {
   paused = false;

@@ -1,4 +1,4 @@
-import {EspruinoBleDevice} from "./EspruinoBleDevice";
+import {EspruinoBleDevice} from "./EspruinoBleDevice.js";
 import {defaultOpts as NordicDefaults } from "./NordicBleDevice.js";
 import {StateChangeEvent} from "../flow/StateMachine.js";
 import {ISimpleEventEmitter} from "../Events.js";

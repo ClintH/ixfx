@@ -9,7 +9,7 @@ import * as Sg from './SceneGraph.js';
 
 import {textWidth} from './Drawing.js';
 import {getFieldPaths, getFieldByPath, ifNaN} from '../Util.js';
-import {number as guardNumber} from '~/Guards.js';
+import {number as guardNumber} from '../Guards.js';
 
 /**
  * A data source

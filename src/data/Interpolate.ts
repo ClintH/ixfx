@@ -1,4 +1,4 @@
-import {piPi} from ".";
+import {piPi} from "./index.js";
 import {wrap} from "./Wrap.js";
 
 /**

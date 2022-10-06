@@ -1,8 +1,8 @@
-import { sort } from 'fp-ts/Array';
-import { pipe } from 'fp-ts/function';
-import * as S from 'fp-ts/string';
-import * as N from 'fp-ts/number';
-import { reverse as reverseOrd, contramap } from 'fp-ts/Ord';
+import { sort } from 'fp-ts/lib/Array.js';
+import { pipe } from 'fp-ts/lib/function.js';
+import * as S from 'fp-ts/lib/string.js';
+import * as N from 'fp-ts/lib/number.js';
+import { reverse as reverseOrd, contramap } from 'fp-ts/lib/Ord.js';
 import {minMaxAvg as arrayMinMaxAg} from './collections/Arrays.js';
 
 /// ✔ Sorting functions are unit tested

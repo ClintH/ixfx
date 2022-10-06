@@ -1,4 +1,4 @@
-import {waitFor} from '~/flow/WaitFor.js';
+import {waitFor} from '../flow/WaitFor.js';
 import * as Rects from '../geometry/Rect.js';
 
 /**
