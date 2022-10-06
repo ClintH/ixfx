@@ -237,6 +237,10 @@
             "error",
             "never"
         ],
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ],
         "block-spacing": "error",
         "space-before-function-paren": [
             "error",

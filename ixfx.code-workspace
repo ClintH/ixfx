@@ -12,12 +12,32 @@
 			"**/build": true,
 			"**/docs": true
 		},
+		"[javascript]": {
+			"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+		},
+		"[typescript]": {
+			"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+		},
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": true
+		},
+		"eslint.workingDirectories": [
+			{
+				"mode": "auto"
+			}
+		],
+		"eslint.codeActionsOnSave.mode": "problems",
+		"eslint.format.enable": true,
 		"typescript.tsdk": "./node_modules/typescript/lib",
 		"liveServer.settings.port": 5501,
 		"spellright.language": [],
 		"spellright.documentTypes": [
 			"latex",
 			"plaintext"
-		]
+		],
+		"[jsonc]": {
+			"editor.defaultFormatter": "vscode.json-language-features"
+		}
 	}
 }
