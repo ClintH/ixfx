@@ -1,4 +1,3 @@
-
 export * from './Log.js';
 
 export * from './DomRx.js';
@@ -12,3 +11,5 @@ export * as Forms from './Forms.js';
 export * from './PointerVisualise.js';
 
 export * from './ErrorHandler.js';
+
+export { draggable } from './DragDrop.js';
