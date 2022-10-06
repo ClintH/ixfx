@@ -1,5 +1,5 @@
 
-import {CirclePositioned} from "../geometry/Circle.js";
+import { CirclePositioned } from "../geometry/Circle.js";
 import * as Lines from "../geometry/Line.js";
 import * as Points from "../geometry/Point.js";
 import * as Svg from "./Svg.js";
@@ -7,8 +7,8 @@ import { getCssVariable } from "./Colour.js";
 //import {Palette} from ".";
 
 
-const numOrPercentage = (v:number):string => {
-  if (v >= 0 && v <= 1) return (v*100) + `%`;
+const numOrPercentage = (v: number): string => {
+  if (v >= 0 && v <= 1) return (v * 100) + `%`;
   return v.toString();
 };
 
@@ -36,7 +36,7 @@ export const path = (svgOrArray: string | readonly string[], parent: SVGElement,
   return pathUpdate(elem, opts);
 };
 
-export const pathUpdate = (elem:SVGPathElement, opts?:Svg.PathDrawingOpts) => {
+export const pathUpdate = (elem: SVGPathElement, opts?: Svg.PathDrawingOpts) => {
   if (opts) Svg.applyOpts(elem, opts);
   if (opts) Svg.applyStrokeOpts(elem, opts);
   return elem;
@@ -75,6 +75,30 @@ export const circle = (circle: CirclePositioned, parent: SVGElement, opts?: Svg.
 };
 
 /**
+ * Creates or resuses a `SVGGElement` (group)
+ * 
+ * To update an existing elemnet, use `groupUpdate`
+ * @param children 
+ * @param parent 
+ * @param queryOrExisting 
+ * @returns 
+ */
+export const group = (children: readonly SVGElement[], parent: SVGElement, queryOrExisting?: string | SVGGElement): SVGGElement => {
+  const p = Svg.createOrResolve<SVGGElement>(parent, `g`, queryOrExisting);
+  return groupUpdate(p, children);
+};
+
+export const groupUpdate = (elem: SVGGElement, children: readonly SVGElement[]) => {
+  for (const c of children) {
+    if (c.parentNode !== elem) {
+      elem.appendChild(c);
+    }
+  }
+
+  return elem;
+};
+
+/**
  * Creates or reuses a SVGLineElement.
  * 
  * @param line 
@@ -95,7 +119,7 @@ export const line = (line: Lines.Line, parent: SVGElement, opts?: Svg.LineDrawin
  * @param opts 
  * @returns 
  */
-export const lineUpdate = (lineEl:SVGLineElement, line:Lines.Line, opts?:Svg.LineDrawingOpts) => {
+export const lineUpdate = (lineEl: SVGLineElement, line: Lines.Line, opts?: Svg.LineDrawingOpts) => {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, line.a.y.toString());
   lineEl.setAttributeNS(null, `x2`, line.b.x.toString());
@@ -113,7 +137,7 @@ export const lineUpdate = (lineEl:SVGLineElement, line:Lines.Line, opts?:Svg.Lin
  * @param opts 
  * @returns 
  */
-export const textPathUpdate = (el:SVGTextPathElement, text?:string, opts?:Svg.TextPathDrawingOpts) => {
+export const textPathUpdate = (el: SVGTextPathElement, text?: string, opts?: Svg.TextPathDrawingOpts) => {
   if (opts?.method) el.setAttributeNS(null, `method`, opts.method);
   if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
   if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
@@ -121,7 +145,7 @@ export const textPathUpdate = (el:SVGTextPathElement, text?:string, opts?:Svg.Te
     el.setAttributeNS(null, `startOffset`, numOrPercentage(opts.startOffset));
   }
   if (opts?.textLength) el.setAttributeNS(null, `textLength`, numOrPercentage(opts.textLength));
-  
+
   if (text) {
     //eslint-disable-next-line functional/immutable-data
     el.textContent = text;
@@ -140,11 +164,11 @@ export const textPathUpdate = (el:SVGTextPathElement, text?:string, opts?:Svg.Te
  * @param queryOrExisting 
  * @returns 
  */
-export const textPath = (pathRef:string, text:string, parent:SVGElement, opts?:Svg.TextPathDrawingOpts, queryOrExisting?:string|SVGTextPathElement):SVGTextPathElement => {
-  const textEl = Svg.createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting+`-text`);
+export const textPath = (pathRef: string, text: string, parent: SVGElement, opts?: Svg.TextPathDrawingOpts, queryOrExisting?: string | SVGTextPathElement): SVGTextPathElement => {
+  const textEl = Svg.createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting + `-text`);
   // Update text properties, but don't pass in position or text
   textUpdate(textEl, undefined, undefined, opts);
-  
+
   const p = Svg.createOrResolve<SVGTextPathElement>(textEl, `textPath`, queryOrExisting);
   p.setAttributeNS(null, `href`, pathRef);
   return textPathUpdate(p, text, opts);
@@ -158,10 +182,10 @@ export const textPath = (pathRef:string, text:string, parent:SVGElement, opts?:S
  * @param opts 
  * @returns 
  */
-export const textUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, opts?:Svg.TextDrawingOpts) => {
+export const textUpdate = (el: SVGTextElement, pos?: Points.Point, text?: string, opts?: Svg.TextDrawingOpts) => {
   if (pos) {
     el.setAttributeNS(null, `x`, pos.x.toString());
-    el.setAttributeNS(null, `y`, pos.y.toString());  
+    el.setAttributeNS(null, `y`, pos.y.toString());
   }
   if (text) {
     //eslint-disable-next-line functional/immutable-data
@@ -174,6 +198,15 @@ export const textUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, o
 
     if (opts.anchor) el.setAttributeNS(null, `text-anchor`, opts.anchor);
     if (opts.align) el.setAttributeNS(null, `alignment-baseline`, opts.align);
+
+    const userSelect = opts.userSelect ?? true;
+
+    if (!userSelect) {
+      //eslint-disable-next-line functional/immutable-data
+      el.style.userSelect = `none`;
+      //eslint-disable-next-line functional/immutable-data
+      el.style.webkitUserSelect = `none`;
+    }
   }
   return el;
 };
@@ -187,9 +220,9 @@ export const textUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, o
  * @param queryOrExisting 
  * @returns 
  */
-export const text = (text:string, parent:SVGElement, pos?:Points.Point, opts?:Svg.TextDrawingOpts, queryOrExisting?:string|SVGTextElement): SVGTextElement => {
+export const text = (text: string, parent: SVGElement, pos?: Points.Point, opts?: Svg.TextDrawingOpts, queryOrExisting?: string | SVGTextElement): SVGTextElement => {
   const p = Svg.createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting);
-  return textUpdate(p, pos, text, opts);  
+  return textUpdate(p, pos, text, opts);
 };
 
 /**
@@ -205,9 +238,9 @@ export const text = (text:string, parent:SVGElement, pos?:Points.Point, opts?:Sv
  * @param height How high grid should be
  * @param opts 
  */
-export const grid = (parent:SVGElement, center: Points.Point, spacing: number, width: number, height: number, opts:Svg.LineDrawingOpts = {}) => {
-  if (!opts.strokeStyle) opts = {...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
-  if (!opts.strokeWidth) opts = {...opts, strokeWidth: 1};
+export const grid = (parent: SVGElement, center: Points.Point, spacing: number, width: number, height: number, opts: Svg.LineDrawingOpts = {}) => {
+  if (!opts.strokeStyle) opts = { ...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
+  if (!opts.strokeWidth) opts = { ...opts, strokeWidth: 1 };
 
   const g = Svg.createEl<SVGGElement>(`g`);
   Svg.applyOpts(g, opts);
