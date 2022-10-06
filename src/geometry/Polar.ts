@@ -1,4 +1,4 @@
-import {degreeToRadian} from "./index.js";
+import { degreeToRadian } from "./index.js";
 import * as Points from "./Point.js";
 
 /**

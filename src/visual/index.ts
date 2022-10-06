@@ -3,7 +3,7 @@ import * as Svg from './Svg.js';
 import * as Plot from './Plot.js';
 import * as Plot2 from './Plot2.js';
 
-import * as Palette from  './Palette';
+import * as Palette from  './Palette.js';
 import * as Colour from './Colour.js';
 import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';

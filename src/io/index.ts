@@ -23,7 +23,7 @@ export * as Espruino from './Espruino.js';
 
 export * as Camera from './Camera.js';
 
-export {FrameProcessor, FrameProcessorOpts} from './FrameProcessor';
+export {FrameProcessor, FrameProcessorOpts} from './FrameProcessor.js';
 
 /**
  * Microcontrollers such as Arduinos connected via USB serial
