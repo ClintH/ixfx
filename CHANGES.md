@@ -1,5 +1,18 @@
 A rough changelog between NPM releases
 
+# 0.6.3 22.10.09
+
+* Flow.StateMachine.drive: 'driver' for changing states somewhat automatically. Each state has a set of handler(s) which are executed whilst the machine is in that state. If multiple handlers are provided, there are some options for how to handle this: either the first valid response is used, the highest-rating or lowest-rating. In additional there are some fallback handlers.
+* Dom.DragDrop: generic drag and drop handler
+* Flow.Timer.hasElapsedMs / completionMs: returns functions that yield whether a timer is done, or the percentage done
+* Geometry.Polar: additional functions for handling polar coordinates
+* Geometry.Vector: wrapper for Points.Point and Polar.Coords for vector (magnitude/direction) processing
+
+# 0.6.3 22.09.27
+
+* Added type guards for Normalise.stream
+* EspruinoSerialDevice: Use USB.println instead of Serial.println for reporting eval results
+
 # 0.6.2 22.09.18
 
 * Bug fix for Espruino eval
