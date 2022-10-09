@@ -76,6 +76,13 @@
         "no-throw-literal": [
             "error"
         ],
+        "@typescript-eslint/type-annotation-spacing": [
+            "warn",
+            {
+                "before": false,
+                "after": false
+            }
+        ],
         "@typescript-eslint/no-useless-constructor": "error",
         "@typescript-eslint/no-inferrable-types": [
             "off",
@@ -178,10 +185,6 @@
         ],
         "eqeqeq": "error",
         "no-var": "error",
-        "func-style": [
-            "error",
-            "expression"
-        ],
         "prefer-arrow-callback": "error",
         "no-confusing-arrow": [
             "error",
