@@ -1,4 +1,4 @@
-import {zip, filterBetween} from './Arrays.js';
+import { zip, filterBetween } from './Arrays.js';
 import * as Easings from "../modulation/Easing.js";
 
 /**
@@ -94,7 +94,7 @@ export const dotProduct = (values:ReadonlyArray<readonly number[]>):number => {
  * @param data Data to average.
  * @returns Average of array
  */
-export const average = (data: readonly number[]): number => {
+export const average = (data:readonly number[]):number => {
   // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
   const valid = validNumbers(data);
@@ -237,6 +237,27 @@ export const maxFast = (data:readonly number[]|Float32Array):number => {
   return m;
 };
 
+/**
+ * Returns the total of `data` without pre-filtering for speed.
+ * 
+ * For most uses, {@link total} should suffice.
+ * 
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * Arrays.totalFast([ 10, 0, 4 ]); // 14
+ * ```
+ * @param data 
+ * @returns Maximum
+ */
+export const totalFast = (data:readonly number[]|Float32Array):number => {
+  //eslint-disable-next-line functional/no-let
+  let m = 0;
+  //eslint-disable-next-line functional/no-let
+  for (let i=0;i<data.length;i++) {
+    m += data[i];
+  }
+  return m;
+};
 
 /**
  * Returns the maximum out of `data` without pre-filtering for speed.
@@ -264,19 +285,19 @@ export type MinMaxAvgTotal = {
   /**
    * Smallest value in array
    */
-  readonly min: number 
+  readonly min:number 
   /**
    * Total of all items
    */
-  readonly total: number 
+  readonly total:number 
   /**
    * Largest value in array
    */
-  readonly max: number
+  readonly max:number
   /**
    * Average value in array
    */
-  readonly avg: number
+  readonly avg:number
 };
 
 /**
@@ -301,7 +322,7 @@ export type MinMaxAvgTotal = {
  * @param endIndex If provided, the end index to do calculations (defaults full range)
  * @returns `{min, max, avg, total}`
  */
-export const minMaxAvg = (data: readonly number[], startIndex?:number, endIndex?:number):MinMaxAvgTotal  => {
+export const minMaxAvg = (data:readonly number[], startIndex?:number, endIndex?:number):MinMaxAvgTotal  => {
   if (data === undefined) throw new Error(`'data' is undefined`);
   if (!Array.isArray(data)) throw new Error(`'data' parameter is not an array`);
   
