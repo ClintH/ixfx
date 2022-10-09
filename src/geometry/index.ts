@@ -10,8 +10,9 @@ import * as Rects from './Rect.js';
 import * as Ellipses from './Ellipse.js';
 import * as Polar from './Polar.js';
 import * as Shapes from './Shape.js';
+import * as Vectors from './Vector.js';
 
-export {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes};
+export { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, Vectors };
 
 
 /**
@@ -82,6 +83,6 @@ export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = {...(window as any).ixfx, Geometry: {Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, radiansFromAxisX, radianToDegree, degreeToRadian}};
+    (window as any).ixfx = { ...(window as any).ixfx, Geometry: { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, radiansFromAxisX, radianToDegree, degreeToRadian } };
   }
 } catch { /* no-op */ }
