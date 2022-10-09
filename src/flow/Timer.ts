@@ -1,22 +1,55 @@
-import {clamp} from '../data/Clamp.js';
-import {HasCompletion} from './index.js';
+import { clamp } from '../data/Clamp.js';
+import { HasCompletion } from './index.js';
 /**
  * Creates a timer
  */
-export type TimerSource = () => Timer;
+export type TimerSource = ()=>Timer;
  
 /**
  * A timer instance
  */
 export type Timer = {
-  reset(): void
-  get elapsed(): number
+  reset():void
+  get elapsed():number
 }
 
 export type ModTimer = Timer & {
   mod(amt:number):void
 }
 
+/**
+ * Returns a function that returns true if timer is complete
+ * 
+ * ```js
+ * const timer = hasElapsedMs(1000);
+ * timer(); // Returns true if timer is done
+ * ```
+ * 
+ * See also {@link completionMs}.
+ * @param totalMs 
+ * @returns 
+ */
+export function hasElapsedMs(totalMs:number):()=>boolean {
+  const t = relativeTimer(totalMs, msElapsedTimer());
+  return () => t.isDone;
+}
+
+/**
+ * Returns a function that returns the percentage of timer completion
+ * 
+ * ```js
+ * const timer = completionMs(1000);
+ * timer(); // Returns 0..1
+ * ```
+ * 
+ * See also {@link hasElapsedMs}.
+ * @param totalMs 
+ * @returns 
+ */
+export function completionMs(totalMs:number):()=>number {
+  const t = relativeTimer(totalMs, msElapsedTimer());
+  return () => t.elapsed;
+}
 
 export const frequencyTimerSource = (frequency:number):TimerSource => () => frequencyTimer(frequency, msElapsedTimer());
 
@@ -25,15 +58,20 @@ export const frequencyTimerSource = (frequency:number):TimerSource => () => freq
  * 
  * ```js
  * let t = relativeTimer(1000, msElapsedTimer());
+ * 
+ * t.isDone;  // true if total has elapsed
+ * t.reset(); // reset timer to 0
+ * t.elapsed; // 0..1 scale of how close to completion
  * ```
  * 
+ * Use `relativeTimerMs` if you want to have a millisecond-based total
  * @private
- * @param total 
- * @param timer 
+ * @param total Total
+ * @param timer Timer
  * @param clampValue If true, returned value never exceeds 1.0 
- * @returns 
+ * @returns Timer
  */
-export const relativeTimer = (total:number, timer: Timer, clampValue = true):ModTimer & HasCompletion => {
+export const relativeTimer = (total:number, timer:Timer, clampValue = true):ModTimer & HasCompletion => {
   //eslint-disable-next-line functional/no-let
   let done = false;
   //eslint-disable-next-line functional/no-let
@@ -59,6 +97,23 @@ export const relativeTimer = (total:number, timer: Timer, clampValue = true):Mod
     }
   };
 };
+
+/**
+ * Wraps a timer, returning a relative elapsed value.
+ * 
+ * ```js
+ * let t = relativeTimerMs(1000);
+ * 
+ * t.isDone;  // true if total milliseconds has elapsed
+ * t.reset(); // reset timer to 0
+ * t.elapsed; // 0..1 scale of how close to completion
+ * ```
+ * @param total Total
+ * @param timer Timer
+ * @param clampValue If true, returned value never exceeds 1.0 
+ * @returns Timer
+ */
+export const relativeTimerMs = (total:number, clampValue = true) => relativeTimer(total, msElapsedTimer(), clampValue);
 
 /**
  * A timer based on frequency: cycles per unit of time. These timers return a number from
@@ -119,7 +174,7 @@ export const frequencyTimer = (frequency:number, timer:Timer = msElapsedTimer())
  * @private
  * @returns {Timer}
  */
-export const msElapsedTimer = (): Timer => {
+export const msElapsedTimer = ():Timer => {
   // eslint-disable-next-line functional/no-let
   let start = performance.now();
   return {
@@ -137,7 +192,7 @@ export const msElapsedTimer = (): Timer => {
  * @private
  * @returns {Timer}
  */
-export const ticksElapsedTimer = (): Timer => {
+export const ticksElapsedTimer = ():Timer => {
   // eslint-disable-next-line functional/no-let
   let start = 0;
   return {
