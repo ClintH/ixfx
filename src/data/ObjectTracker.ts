@@ -1,5 +1,5 @@
-import {Timestamped, TrackedValueOpts} from "./TrackedValue.js";
-import {TrackerBase} from "./TrackerBase.js";
+import { Timestamped, TrackedValueOpts } from "./TrackedValue.js";
+import { TrackerBase } from "./TrackerBase.js";
 
 /**
  * A tracked value of type `V`.
@@ -12,12 +12,28 @@ export class ObjectTracker<V> extends TrackerBase<V> {
     this.values = [];
   }
 
+
+  onTrimmed() {
+    // no-op
+  }
+
+  /**
+   * Reduces size of value store to `limit`. Returns
+   * number of remaining items
+   * @param limit 
+   */
+  trimStore(limit:number):number {
+    if (limit >= this.values.length) return this.values.length;
+    this.values = this.values.slice(-limit);
+    return this.values.length;
+  }
+
   /**
    * Allows sub-classes to be notified when a reset happens
    * @ignore
    */
   onReset() {
-    this.values = []; //this.values.slice(1);
+    this.values = [];
   }
 
   /**

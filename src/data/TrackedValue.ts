@@ -1,5 +1,5 @@
-import {GetOrGenerate, getOrGenerate} from "../collections/Map.js";
-import {TrackerBase} from "./TrackerBase.js";
+import { GetOrGenerate, getOrGenerate } from "../collections/Map.js";
+import { TrackerBase } from "./TrackerBase.js";
 
 export type Timestamped<V> = V & {
   readonly at:number
@@ -17,6 +17,15 @@ export type TrackedValueOpts = {
    * If above zero, tracker will reset after this many samples
    */
   readonly resetAfterSamples?:number
+  
+  /**
+   * If above zero, there will be a limit to intermediate values kept.
+   * 
+   * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
+   * to `sampleLimit`. We only do this when the values are double the size so that
+   * the collections do not need to be trimmed repeatedly whilst we are at the limit.
+   */
+  readonly sampleLimit?:number
 }
 
 /**
@@ -45,7 +54,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
   store:Map<string, T>;
   gog:GetOrGenerate<string, T, V>;
 
-  constructor(creator:(key:string, start:V|undefined) => T) {
+  constructor(creator:(key:string, start:V|undefined)=>T) {
     this.store = new Map();
     this.gog = getOrGenerate<string, T, V>(this.store, creator);
   }

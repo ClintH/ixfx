@@ -1,6 +1,7 @@
-import {repeat} from "../flow/index.js";
-import {TrackedValueOpts, Timestamped} from "./TrackedValue.js";
-import {TrackerBase} from "./TrackerBase.js";
+import { repeat } from "../flow/index.js";
+import { TrackedValueOpts, Timestamped } from "./TrackedValue.js";
+import { TrackerBase } from "./TrackerBase.js";
+
 export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
   values:V[];
   timestamps:number[];
@@ -11,6 +12,23 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
     this.timestamps = [];
   }
 
+  /**
+   * Reduces size of value store to `limit`. Returns
+   * number of remaining items
+   * @param limit 
+   */
+  trimStore(limit:number):number {
+    if (limit >= this.values.length) return this.values.length;
+    this.values = this.values.slice(-limit);
+    this.timestamps = this.timestamps.slice(-limit);
+    return this.values.length;
+  }
+
+  onTrimmed() {
+    // no-op
+  }
+  
+    
   get last():V|undefined {
     return this.values.at(-1);
   }

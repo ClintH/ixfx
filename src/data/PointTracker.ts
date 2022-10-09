@@ -1,7 +1,7 @@
 import * as Points from "../geometry/Point.js";
 import * as Line from "../geometry/Line.js";
-import {Timestamped,  TrackedValueMap, TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
-import {ObjectTracker} from "./ObjectTracker.js";
+import { Timestamped,  TrackedValueMap, TrackedValueOpts as TrackOpts } from "./TrackedValue.js";
+import { ObjectTracker } from "./ObjectTracker.js";
 
 /**
  * Information about seen points
@@ -11,8 +11,8 @@ export type PointTrack = Points.PointRelationResult & {
 };
 
 export type PointTrackerResults = {
-  readonly fromLast: PointTrack
-  readonly fromInitial: PointTrack
+  readonly fromLast:PointTrack
+  readonly fromInitial:PointTrack
   readonly values:readonly Points.Point[]
 }
 
@@ -29,6 +29,11 @@ export class PointTracker extends ObjectTracker<Points.Point> {
 
   constructor(readonly id:string, opts:TrackOpts = {}) {
     super(id, opts);
+  }
+
+  onTrimmed():void {
+    // Force new relation calculations
+    this.initialRelation = undefined;
   }
 
   /**
@@ -48,11 +53,12 @@ export class PointTracker extends ObjectTracker<Points.Point> {
   /**
    * @ignore
    */
-  onReset(): void {
+  onReset():void {
     super.onReset();
     this.lastResult = undefined;
     this.initialRelation = undefined;
   }
+
 
   /**
    * Tracks a point, returning data on its relation to the
@@ -171,7 +177,9 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point, PointTracker>
 }
 
 /**
- * Track several named points. Call `seen()` to track a point. Mutable.
+ * Track several named points over time, eg a TensorFlow body pose point.
+ * Call `seen()` to track a point. Mutable. If you want to compare
+ * a single coordinate with a reference coordinate, [Geometry.Points.relation](Geometry.Points.relation.html) may be a better choice.
  * 
  * Basic usage
  * ```js
@@ -193,25 +201,24 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point, PointTracker>
  * 
  * More functions...
  * ```js
- * pt.size; // How many named points are being tracked
+ * pt.size;         // How many named points are being tracked
  * pt.delete(id);  // Delete named point
- * pt.reset();
+ * pt.reset();     // Clear data
  * ```
  * 
- * Accessing data:
+ * Accessing by id:
  * 
  * ```js
  * pt.get(id);  // Get named point (or _undefined_)
- * pt.has(id); // Returns true if id exists
- * pt.trackedByAge(); // Iterates over tracked points, sorted by age (oldest first)
- * 
+ * pt.has(id);  // Returns true if id exists
  * ```
- 
-* Iterators:
+ *
+ * Iterating over data
  * 
  * ```js
- * pt.tracked(); // Tracked values
- * pt.ids(); // Iterator over ids
+ * pt.trackedByAge();   // Iterates over tracked points, sorted by age (oldest first) 
+ * pt.tracked();  // Tracked values
+ * pt.ids();      // Iterator over ids
  * 
  * // Last received value for each named point
  * pt.last(); 

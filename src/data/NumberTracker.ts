@@ -1,9 +1,8 @@
-import {PrimitiveTracker} from "./PrimitiveTracker.js";
-import { TrackedValueOpts as TrackOpts, Timestamped} from "./TrackedValue.js";
-
+import { PrimitiveTracker } from "./PrimitiveTracker.js";
+import { TrackedValueOpts as TrackOpts, Timestamped } from "./TrackedValue.js";
+import { minFast, maxFast, totalFast } from "../collections/NumericArrays";
 
 export class NumberTracker extends PrimitiveTracker<number> {
-  //samples = 0;
   total = 0;
   min = Number.MAX_SAFE_INTEGER;
   max = Number.MIN_SAFE_INTEGER;
@@ -38,6 +37,12 @@ export class NumberTracker extends PrimitiveTracker<number> {
     this.max = Number.MIN_SAFE_INTEGER;
     this.total = 0;
     super.onReset();
+  }
+
+  onTrimmed() {
+    this.min = minFast(this.values);
+    this.max = maxFast(this.values);
+    this.total = totalFast(this.values);
   }
 
   onSeen(values:Timestamped<number>[]) {

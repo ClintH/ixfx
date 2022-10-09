@@ -19,9 +19,15 @@ export abstract class TrackerBase<V> {
   */
   protected resetAfterSamples:number;
 
+  /**
+   * @ignore
+   */
+  protected sampleLimit:number;
+
   constructor(readonly id:string = `TrackerBase`, opts:TrackedValueOpts = {}) {
     this.storeIntermediate = opts.storeIntermediate ?? false;
     this.resetAfterSamples = opts.resetAfterSamples ?? -1;
+    this.sampleLimit = opts.sampleLimit ?? -1;
     this.seenCount = 0;
   }
 
@@ -33,10 +39,12 @@ export abstract class TrackerBase<V> {
     this.onReset();
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seen(...p:V[]):any {    
+  seen(...p:V[]) {    
     if (this.resetAfterSamples > 0 && this.seenCount > this.resetAfterSamples) {
       this.reset();
+    } else if (this.sampleLimit > 0 && this.seenCount > this.sampleLimit * 2) {
+      this.seenCount = this.trimStore(this.sampleLimit);
+      this.onTrimmed();
     }
 
     this.seenCount += p.length;
@@ -73,4 +81,7 @@ export abstract class TrackerBase<V> {
    * @ignore
    */
   abstract onReset():void;
+
+  abstract onTrimmed():void;
+  abstract trimStore(limit:number):number;
 } 
