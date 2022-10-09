@@ -16,7 +16,7 @@
 <h1>Interface SetMutable&lt;V&gt;</h1></div>
 <section class="tsd-panel tsd-comment">
 <div class="tsd-comment tsd-typography"><p>A Set which stores unique items determined by their value, rather
-than object reference (unlike the default JS Set). Create with <a href="../functions/Collections.setMutable.html">setMutable</a>. Mutable.</p>
+than object reference (unlike the default JS Set). Create with <a href="../functions/Collections.setMutable-1.html">setMutable</a>. Mutable.</p>
 <p>By default the <code>JSON.stringify()</code> representation is considered the &#39;key&#39; for an object.
 Pass in a function to <code>setMutable</code> to define your own way of creating keys for values. The principle should
 be that objects that you consider identical should have the same string key value.</p>
@@ -27,20 +27,20 @@ be that objects that you consider identical should have the same string key valu
 </code></pre>
 
 <h3>Example</h3><p>Example usage</p>
-<pre><code class="language-js"><span class="hl-0">// Data to add</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">people</span><span class="hl-2"> = [</span><br/><span class="hl-2"> {</span><span class="hl-3">name:</span><span class="hl-2"> </span><span class="hl-4">`Barry`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-2"> </span><span class="hl-4">`London`</span><span class="hl-2">}</span><br/><span class="hl-2"> {</span><span class="hl-3">name:</span><span class="hl-2"> </span><span class="hl-4">`Sally`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-2"> </span><span class="hl-4">`Bristol`</span><span class="hl-2">}</span><br/><span class="hl-2">];</span><br/><br/><span class="hl-0">// Create a set, defining how keys will be generated</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">set</span><span class="hl-2"> = </span><span class="hl-8">setMutable</span><span class="hl-2">(</span><span class="hl-3">person</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> {</span><br/><span class="hl-2">   </span><span class="hl-0">// Key person objects by name and city.</span><br/><span class="hl-2">   </span><span class="hl-0">// ie. Generated keys will be: `Barry-London`, `Sally-Bristol`</span><br/><span class="hl-2">   </span><span class="hl-1">return</span><span class="hl-2"> </span><span class="hl-4">`</span><span class="hl-5">${</span><span class="hl-3">person</span><span class="hl-11">.</span><span class="hl-3">name</span><span class="hl-5">}</span><span class="hl-4">-</span><span class="hl-5">${</span><span class="hl-3">person</span><span class="hl-11">.</span><span class="hl-3">city</span><span class="hl-5">}</span><span class="hl-4">`</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-0">// Add list</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(...</span><span class="hl-3">people</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Demo:</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">has</span><span class="hl-2">({</span><span class="hl-3">name:</span><span class="hl-4">`Barry`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-4">`Manchester`</span><span class="hl-2">})); </span><span class="hl-0">// False, key is different (Barry-Manchester)</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">has</span><span class="hl-2">({</span><span class="hl-3">name:</span><span class="hl-4">`Barry`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-4">`London`</span><span class="hl-2">}));     </span><span class="hl-0">// True, we have Barry-London as a key</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">has</span><span class="hl-2">(</span><span class="hl-3">people</span><span class="hl-2">[</span><span class="hl-7">1</span><span class="hl-2">]);   </span><span class="hl-0">// True, key of object is found (Sally-Bristol)</span>
+<pre><code class="language-js"><span class="hl-0">// Data to add</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">people</span><span class="hl-2"> = [</span><br/><span class="hl-2"> {</span><span class="hl-3">name:</span><span class="hl-2"> </span><span class="hl-4">`Barry`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-2"> </span><span class="hl-4">`London`</span><span class="hl-2">}</span><br/><span class="hl-2"> {</span><span class="hl-3">name:</span><span class="hl-2"> </span><span class="hl-4">`Sally`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-2"> </span><span class="hl-4">`Bristol`</span><span class="hl-2">}</span><br/><span class="hl-2">];</span><br/><br/><span class="hl-0">// Create a set, defining how keys will be generated</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">set</span><span class="hl-2"> = </span><span class="hl-8">setMutable</span><span class="hl-2">(</span><span class="hl-3">person</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> {</span><br/><span class="hl-2">   </span><span class="hl-0">// Key person objects by name and city.</span><br/><span class="hl-2">   </span><span class="hl-0">// ie. Generated keys will be: `Barry-London`, `Sally-Bristol`</span><br/><span class="hl-2">   </span><span class="hl-1">return</span><span class="hl-2"> </span><span class="hl-4">`</span><span class="hl-5">${</span><span class="hl-3">person</span><span class="hl-10">.</span><span class="hl-3">name</span><span class="hl-5">}</span><span class="hl-4">-</span><span class="hl-5">${</span><span class="hl-3">person</span><span class="hl-10">.</span><span class="hl-3">city</span><span class="hl-5">}</span><span class="hl-4">`</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-0">// Add list</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">add</span><span class="hl-2">(...</span><span class="hl-3">people</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Demo:</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">has</span><span class="hl-2">({</span><span class="hl-3">name:</span><span class="hl-4">`Barry`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-4">`Manchester`</span><span class="hl-2">})); </span><span class="hl-0">// False, key is different (Barry-Manchester)</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">has</span><span class="hl-2">({</span><span class="hl-3">name:</span><span class="hl-4">`Barry`</span><span class="hl-2">, </span><span class="hl-3">city:</span><span class="hl-4">`London`</span><span class="hl-2">}));     </span><span class="hl-0">// True, we have Barry-London as a key</span><br/><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">has</span><span class="hl-2">(</span><span class="hl-3">people</span><span class="hl-2">[</span><span class="hl-7">1</span><span class="hl-2">]);   </span><span class="hl-0">// True, key of object is found (Sally-Bristol)</span>
 </code></pre>
 
 <h3>Example</h3><p>Events</p>
-<pre><code class="language-js"><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">addEventListener</span><span class="hl-2">(</span><span class="hl-4">`add`</span><span class="hl-2">, </span><span class="hl-3">ev</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> {</span><br/><span class="hl-2"> </span><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-4">`New item added: </span><span class="hl-5">${</span><span class="hl-3">ev</span><span class="hl-11">.</span><span class="hl-3">value</span><span class="hl-5">}</span><span class="hl-4">`</span><span class="hl-2">);</span><br/><span class="hl-2">});</span>
+<pre><code class="language-js"><span class="hl-3">set</span><span class="hl-2">.</span><span class="hl-8">addEventListener</span><span class="hl-2">(</span><span class="hl-4">`add`</span><span class="hl-2">, </span><span class="hl-3">ev</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> {</span><br/><span class="hl-2"> </span><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-4">`New item added: </span><span class="hl-5">${</span><span class="hl-3">ev</span><span class="hl-10">.</span><span class="hl-3">value</span><span class="hl-5">}</span><span class="hl-4">`</span><span class="hl-2">);</span><br/><span class="hl-2">});</span>
 </code></pre>
-</div></section>
+</div></section> 
 <section class="tsd-panel tsd-type-parameters">
 <h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
 <li>
 <h4>V</h4>
 <div class="tsd-comment tsd-typography"><p>Type of data stored</p>
-</div></li></ul></section>
+</div></li></ul></section> 
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -89,11 +89,11 @@ function provided to <code>setMutable</code>, or <code>JSON.stringify</code> by 
 
 <h3>Memberof</h3><p>SimpleEventEmitter</p>
 </div>
-<div class="tsd-type-parameters">
-<h4 class="tsd-type-parameters-title">Type Parameters</h4>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
 <li>
-<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../types/Collections.ValueSetEventMap.html" class="tsd-signature-type" data-tsd-kind="Type alias">ValueSetEventMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></div>
+<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../types/Collections.ValueSetEventMap.html" class="tsd-signature-type" data-tsd-kind="Type alias">ValueSetEventMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -161,11 +161,11 @@ function provided to <code>setMutable</code>, or <code>JSON.stringify</code> by 
 
 <h3>Memberof</h3><p>SimpleEventEmitter</p>
 </div>
-<div class="tsd-type-parameters">
-<h4 class="tsd-type-parameters-title">Type Parameters</h4>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
 <li>
-<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../types/Collections.ValueSetEventMap.html" class="tsd-signature-type" data-tsd-kind="Type alias">ValueSetEventMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></div>
+<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../types/Collections.ValueSetEventMap.html" class="tsd-signature-type" data-tsd-kind="Type alias">ValueSetEventMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -238,6 +238,7 @@ function provided to <code>setMutable</code>, or <code>JSON.stringify</code> by 
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Dom.html">Dom</a>
 <ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.DragDrop.html">Drag<wbr/>Drop</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.Forms.html">Forms</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Events.html">Events</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Flow.html">Flow</a>
@@ -265,7 +266,8 @@ function provided to <code>setMutable</code>, or <code>JSON.stringify</code> by 
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Isosceles.html">Isosceles</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Io.html">Io</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.AudioAnalysers.html">Audio<wbr/>Analysers</a></li>

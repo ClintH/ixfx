@@ -17,7 +17,7 @@
 <h1>Function ensureLength</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-<li class="tsd-signature tsd-anchor-link" id="ensureLength">ensure<wbr/>Length<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span>, length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, expand<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;undefined&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;repeat&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;first&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;last&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span><a href="#ensureLength" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="ensureLength">ensure<wbr/>Length<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span>, length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, expand<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;undefined&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;first&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;repeat&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;last&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span><a href="#ensureLength" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns an copy of <code>data</code> with specified length.
 If the input array is too long, it is truncated.</p>
@@ -31,13 +31,13 @@ If the input array is too long, it is truncated.</p>
 <pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">ensureLength</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/arrays.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-8">ensureLength</span><span class="hl-2">([</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">2</span><span class="hl-2">,</span><span class="hl-7">3</span><span class="hl-2">], </span><span class="hl-7">2</span><span class="hl-2">); </span><span class="hl-0">// [1,2]</span><br/><span class="hl-8">ensureLength</span><span class="hl-2">([</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">2</span><span class="hl-2">,</span><span class="hl-7">3</span><span class="hl-2">], </span><span class="hl-7">5</span><span class="hl-2">, </span><span class="hl-4">`undefined`</span><span class="hl-2">); </span><span class="hl-0">// [1,2,3,undefined,undefined]</span><br/><span class="hl-8">ensureLength</span><span class="hl-2">([</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">2</span><span class="hl-2">,</span><span class="hl-7">3</span><span class="hl-2">], </span><span class="hl-7">5</span><span class="hl-2">, </span><span class="hl-4">`repeat`</span><span class="hl-2">);    </span><span class="hl-0">// [1,2,3,1,2]</span><br/><span class="hl-8">ensureLength</span><span class="hl-2">([</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">2</span><span class="hl-2">,</span><span class="hl-7">3</span><span class="hl-2">], </span><span class="hl-7">5</span><span class="hl-2">, </span><span class="hl-4">`first`</span><span class="hl-2">);     </span><span class="hl-0">// [1,2,3,1,1]</span><br/><span class="hl-8">ensureLength</span><span class="hl-2">([</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">2</span><span class="hl-2">,</span><span class="hl-7">3</span><span class="hl-2">], </span><span class="hl-7">5</span><span class="hl-2">, </span><span class="hl-4">`last`</span><span class="hl-2">);      </span><span class="hl-0">// [1,2,3,3,3] </span>
 </code></pre>
 </div>
-<div class="tsd-type-parameters">
-<h4 class="tsd-type-parameters-title">Type Parameters</h4>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
 <li>
 <h4>V</h4>
 <div class="tsd-comment tsd-typography"><p>Type of array</p>
-</div></li></ul></div>
+</div></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -50,7 +50,7 @@ If the input array is too long, it is truncated.</p>
 <div class="tsd-comment tsd-typography"><p>Desired length</p>
 </div></li>
 <li>
-<h5>expand: <span class="tsd-signature-type">&quot;undefined&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;repeat&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;first&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;last&quot;</span><span class="tsd-signature-symbol"> = ...</span></h5>
+<h5>expand: <span class="tsd-signature-type">&quot;undefined&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;first&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;repeat&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;last&quot;</span><span class="tsd-signature-symbol"> = ...</span></h5>
 <div class="tsd-comment tsd-typography"><p>Expand strategy</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span></h4></li></ul></section></div>
@@ -86,6 +86,7 @@ If the input array is too long, it is truncated.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Dom.html">Dom</a>
 <ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.DragDrop.html">Drag<wbr/>Drop</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.Forms.html">Forms</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Events.html">Events</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Flow.html">Flow</a>
@@ -113,7 +114,8 @@ If the input array is too long, it is truncated.</p>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Isosceles.html">Isosceles</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Io.html">Io</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.AudioAnalysers.html">Audio<wbr/>Analysers</a></li>
@@ -173,6 +175,7 @@ If the input array is too long, it is truncated.</p>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.sample.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>sample</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.shuffle.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>shuffle</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.total.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>total</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.totalFast.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>total<wbr/>Fast</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.validNumbers.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>valid<wbr/>Numbers</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.weight.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>weight</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Collections.Arrays.without.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>without</a></li>

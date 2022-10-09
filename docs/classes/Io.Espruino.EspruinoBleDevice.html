@@ -26,7 +26,7 @@ It must be called in a UI event handler for browser security reasons.</p>
 <pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">Espruino</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/io.js&#39;</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">e</span><span class="hl-2"> = </span><span class="hl-1">await</span><span class="hl-2"> </span><span class="hl-3">Espruino</span><span class="hl-2">.</span><span class="hl-8">puck</span><span class="hl-2">({</span><span class="hl-3">name:</span><span class="hl-4">`Puck.js a123`</span><span class="hl-2">});</span>
 </code></pre>
 <p>Listen for events:</p>
-<pre><code class="language-js"><span class="hl-0">// Received something</span><br/><span class="hl-3">e</span><span class="hl-2">.</span><span class="hl-8">addEventListener</span><span class="hl-2">(</span><span class="hl-4">`data`</span><span class="hl-2">, </span><span class="hl-3">d</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-3">d</span><span class="hl-2">.</span><span class="hl-3">data</span><span class="hl-2">));</span><br/><span class="hl-0">// Monitor connection state</span><br/><span class="hl-3">e</span><span class="hl-2">.</span><span class="hl-8">addEventListener</span><span class="hl-2">(</span><span class="hl-4">`change`</span><span class="hl-2">, </span><span class="hl-3">c</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-4">`</span><span class="hl-5">${</span><span class="hl-3">d</span><span class="hl-11">.</span><span class="hl-3">priorState</span><span class="hl-5">}</span><span class="hl-4"> -&gt; </span><span class="hl-5">${</span><span class="hl-3">d</span><span class="hl-11">.</span><span class="hl-3">newState</span><span class="hl-5">}</span><span class="hl-4">`</span><span class="hl-2">));</span>
+<pre><code class="language-js"><span class="hl-0">// Received something</span><br/><span class="hl-3">e</span><span class="hl-2">.</span><span class="hl-8">addEventListener</span><span class="hl-2">(</span><span class="hl-4">`data`</span><span class="hl-2">, </span><span class="hl-3">d</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-3">d</span><span class="hl-2">.</span><span class="hl-3">data</span><span class="hl-2">));</span><br/><span class="hl-0">// Monitor connection state</span><br/><span class="hl-3">e</span><span class="hl-2">.</span><span class="hl-8">addEventListener</span><span class="hl-2">(</span><span class="hl-4">`change`</span><span class="hl-2">, </span><span class="hl-3">c</span><span class="hl-2"> </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-4">`</span><span class="hl-5">${</span><span class="hl-3">d</span><span class="hl-10">.</span><span class="hl-3">priorState</span><span class="hl-5">}</span><span class="hl-4"> -&gt; </span><span class="hl-5">${</span><span class="hl-3">d</span><span class="hl-10">.</span><span class="hl-3">newState</span><span class="hl-5">}</span><span class="hl-4">`</span><span class="hl-2">));</span>
 </code></pre>
 <p>Write to the device (note the \n for a new line at the end of the string). This will
 execute the code on the Espruino.</p>
@@ -167,11 +167,11 @@ execute the code on the Espruino.</p>
 
 <h3>Memberof</h3><p>SimpleEventEmitter</p>
 </div>
-<div class="tsd-type-parameters">
-<h4 class="tsd-type-parameters-title">Type Parameters</h4>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
 <li>
-<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/Io.html" class="tsd-signature-type" data-tsd-kind="Namespace">Io</a><span class="tsd-signature-symbol">.</span><a href="../modules/Io.Espruino.html" class="tsd-signature-type" data-tsd-kind="Namespace">Espruino</a><span class="tsd-signature-symbol">.</span><a href="../types/Io.Espruino.Events.html" class="tsd-signature-type" data-tsd-kind="Type alias">Events</a></h4></li></ul></div>
+<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/Io.html" class="tsd-signature-type" data-tsd-kind="Namespace">Io</a><span class="tsd-signature-symbol">.</span><a href="../modules/Io.Espruino.html" class="tsd-signature-type" data-tsd-kind="Namespace">Espruino</a><span class="tsd-signature-symbol">.</span><a href="../types/Io.Espruino.Events.html" class="tsd-signature-type" data-tsd-kind="Type alias">Events</a></h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -278,11 +278,11 @@ or too slowly. A default timeout can be given when creating the class.</p>
 
 <h3>Memberof</h3><p>SimpleEventEmitter</p>
 </div>
-<div class="tsd-type-parameters">
-<h4 class="tsd-type-parameters-title">Type Parameters</h4>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
 <li>
-<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/Io.html" class="tsd-signature-type" data-tsd-kind="Namespace">Io</a><span class="tsd-signature-symbol">.</span><a href="../modules/Io.Espruino.html" class="tsd-signature-type" data-tsd-kind="Namespace">Espruino</a><span class="tsd-signature-symbol">.</span><a href="../types/Io.Espruino.Events.html" class="tsd-signature-type" data-tsd-kind="Type alias">Events</a></h4></li></ul></div>
+<h4>K<span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/Io.html" class="tsd-signature-type" data-tsd-kind="Namespace">Io</a><span class="tsd-signature-symbol">.</span><a href="../modules/Io.Espruino.html" class="tsd-signature-type" data-tsd-kind="Namespace">Espruino</a><span class="tsd-signature-symbol">.</span><a href="../types/Io.Espruino.Events.html" class="tsd-signature-type" data-tsd-kind="Type alias">Events</a></h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -393,6 +393,7 @@ and then the provided <code>code</code> followed by a new line.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Dom.html">Dom</a>
 <ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.DragDrop.html">Drag<wbr/>Drop</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.Forms.html">Forms</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Events.html">Events</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Flow.html">Flow</a>
@@ -420,7 +421,8 @@ and then the provided <code>code</code> followed by a new line.</p>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Isosceles.html">Isosceles</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li></ul></li>
 <li class="current tsd-kind-namespace"><a href="../modules/Io.html">Io</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.AudioAnalysers.html">Audio<wbr/>Analysers</a></li>
