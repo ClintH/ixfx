@@ -1,27 +1,27 @@
 import { Points } from "../geometry/index.js";
 
 export type DragState = {
-  readonly token?: object
-  readonly initial: Points.Point
-  readonly delta: Points.Point
+  readonly token?:object
+  readonly initial:Points.Point
+  readonly delta:Points.Point
 }
 
-type DragStart = {
-  readonly allow: boolean
-  readonly token: object
+export type DragStart = {
+  readonly allow:boolean
+  readonly token:object
 }
 export type DragListener = {
-  readonly start?: () => DragStart
-  readonly progress?: (state: DragState) => boolean
-  readonly abort?: (reason: string, state: DragState) => void
-  readonly success?: (state: DragState) => void
+  readonly start?:()=>DragStart
+  readonly progress?:(state:DragState)=>boolean
+  readonly abort?:(reason:string, state:DragState)=>void
+  readonly success?:(state:DragState)=>void
 }
 
-export const draggable = (elem: SVGElement, listener: DragListener) => {
+export const draggable = (elem:SVGElement, listener:DragListener) => {
   //eslint-disable-next-line functional/no-let
   let initial = Points.Placeholder;
   //eslint-disable-next-line functional/no-let
-  let token: object;
+  let token:object;
 
   // De-select if there's a click elsewhere
   const onParentClick = () => {
@@ -32,7 +32,7 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
   };
 
   // Click to select
-  const onElementClick = (evt: MouseEvent) => {
+  const onElementClick = (evt:MouseEvent) => {
     const selected = elem.classList.contains(`drag-sel`);
     if (selected) {
       elem.classList.remove(`drag-sel`);
@@ -66,7 +66,7 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
   };
 
   // Dragging
-  const onPointerMove = (e: PointerEvent) => {
+  const onPointerMove = (e:PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -74,7 +74,7 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
       x: e.x - initial.x,
       y: e.y - initial.y
     };
-    const state: DragState = {
+    const state:DragState = {
       delta: offset,
       initial: initial,
       token
@@ -85,13 +85,13 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
   };
 
   // Done dragging
-  const onPointerUp = (e: PointerEvent) => {
+  const onPointerUp = (e:PointerEvent) => {
     dragCleanup();
     const offset = {
       x: e.x - initial.x,
       y: e.y - initial.y
     };
-    const state: DragState = {
+    const state:DragState = {
       initial: initial,
       token,
       delta: offset
@@ -102,9 +102,9 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
   };
 
   // Drag is cancelled
-  const onDragCancel = (evt: PointerEvent | MouseEvent | null, reason: string = `pointercancel`) => {
+  const onDragCancel = (evt:PointerEvent | MouseEvent | null, reason:string = `pointercancel`) => {
     dragCleanup();
-    const state: DragState = {
+    const state:DragState = {
       token,
       initial: initial,
       delta: { x: -1, y: -1 }

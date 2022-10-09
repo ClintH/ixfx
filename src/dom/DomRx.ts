@@ -1,12 +1,13 @@
-import {fromEvent, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {resolveEl} from './Util.js';
+import { fromEvent, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { resolveEl } from './Util.js';
 
 export type PluckOpts =  {
-  readonly pluck: string
+  readonly pluck:string
 }
 
 export type TransformOpts = {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   transform(ev:Event):any
 }
 
@@ -18,11 +19,11 @@ export type Rx<V> = {
   /**
    * Last value
    */
-  readonly value: V,
+  readonly value:V,
   /**
    * Clears last value
    */
-  readonly clear: () => void
+  readonly clear:()=>void
 }
 
 export type DomRxOpts = PluckOpts | TransformOpts;
@@ -38,7 +39,7 @@ export type DomRxOpts = PluckOpts | TransformOpts;
  * 
  * Pluck a field:
  * ```js
- * const pointerX = rx(`#myDiv`, `pointermove`, {pluck: `clientX`}).value;
+ * const pointerX = rx(`#myDiv`, `pointermove`, { pluck: `clientX` }).value;
  * 
  * if (pointerX > ...)
  * ```
@@ -46,7 +47,7 @@ export type DomRxOpts = PluckOpts | TransformOpts;
  * @param opts
  * @return
  */
-export const rx = <V>(elOrQuery:HTMLElement|string, event:string, opts?:DomRxOpts):Rx<V> => {
+export const rx = <V extends object>(elOrQuery:HTMLElement|string, event:string, opts?:DomRxOpts):Rx<V> => {
   const el = resolveEl<HTMLElement>(elOrQuery);
   const ev = fromEvent(el, event);
   // @ts-ignore
