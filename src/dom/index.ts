@@ -12,4 +12,4 @@ export * from './PointerVisualise.js';
 
 export * from './ErrorHandler.js';
 
-export { draggable } from './DragDrop.js';
+export * as DragDrop from './DragDrop.js';
