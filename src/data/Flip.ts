@@ -1,5 +1,5 @@
-import {NumberFunction} from ".";
-import { number as guardNumber} from "../Guards.js";
+import { NumberFunction } from ".";
+import { number as guardNumber } from "../Guards.js";
 
 /**
  * Flips a percentage-scale number: `1 - v`.

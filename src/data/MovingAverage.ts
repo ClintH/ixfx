@@ -1,5 +1,5 @@
-import {Arrays, queueMutable} from '../collections/index.js';
-import {integer as guardInteger} from '../Guards.js';
+import { Arrays, queueMutable } from '../collections/index.js';
+import { integer as guardInteger } from '../Guards.js';
 
 /**
  * A moving average calculator (exponential weighted moving average) which does not keep track of
@@ -94,7 +94,7 @@ export const movingAverageTimed = (updateRateMs:number = 200, value:number = 0, 
   };
 
   const ma:MovingAverage = {
-    add(v: number) {
+    add(v:number) {
       reschedule();
       return mal.add(v);
     },
@@ -102,10 +102,10 @@ export const movingAverageTimed = (updateRateMs:number = 200, value:number = 0, 
     dispose() {
       mal.dispose();
     },
-    clear: function (): void {
+    clear: function ():void {
       mal.clear();
     },
-    compute: function (): number {
+    compute: function ():number {
       return mal.compute();
     },
     isDisposed: false
