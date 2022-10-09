@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals';
 /* eslint-disable */
 import * as Lines from '../../geometry/Line.js';
 

@@ -1,5 +1,6 @@
 
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {KeyValue, sortByKey, sortByValueNumber, sortByValueString} from '../KeyValue.js';
 
 test(`sorting`, () => {

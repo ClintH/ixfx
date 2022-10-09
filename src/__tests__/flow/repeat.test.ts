@@ -1,4 +1,5 @@
-import {repeat} from '../../flow/index.js';
+import { expect, test } from '@jest/globals';
+import { repeat } from '../../flow/index.js';
 
 test(`repeat`, () => {
   const test1 = repeat(5, () => 1);

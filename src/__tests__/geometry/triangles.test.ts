@@ -1,7 +1,8 @@
+import { expect, test } from '@jest/globals';
 import * as Teq from '../../geometry/TriangleEquilateral';
 import * as Tra from '../../geometry/TriangleRight.js';
 import * as Tis from '../../geometry/TriangleIsosceles.js';
-import {degreeToRadian} from '../../geometry/index.js';
+import { degreeToRadian } from '../../geometry/index.js';
 
 test(`equilateral`, () => {
   const t:Teq.TriangleEquilateral = {

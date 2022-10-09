@@ -1,5 +1,5 @@
 /* eslint-disable */
-
+import { expect, describe, test } from '@jest/globals';
 import {stack} from '../../collections/Stack.js';
 
 describe(`stack`, () => {

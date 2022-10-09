@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {weightedInteger, integer} from '../Random.js';
 
 const inBounds = (ar:number[], minInclusive:number, maxExclusive:number):boolean => {

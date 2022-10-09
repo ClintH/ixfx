@@ -1,5 +1,8 @@
-/// <reference types="jest-extended" />
 /* eslint-disable */
+// @ts-nocheck
+/// <reference types="jest-extended" />
+import "jest-extended"
+import { expect, test } from '@jest/globals';
 import {mapMutable} from '../../collections/MapMutable.js';
 import {map} from '../../collections/MapImmutable.js';
 

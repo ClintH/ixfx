@@ -1,5 +1,5 @@
-import {numberTracker} from '../../data/NumberTracker.js';
-
+import { numberTracker } from '../../data/NumberTracker.js';
+import { expect, test } from '@jest/globals';
 test(`numberTracker`, () => {
 
   const a = numberTracker(`test`);

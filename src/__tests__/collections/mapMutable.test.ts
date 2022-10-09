@@ -1,5 +1,7 @@
 /// <reference types="jest-extended" />
 /* eslint-disable */
+// @ts-nocheck
+import { expect, test, describe } from '@jest/globals';
 import {MapArrayOpts, MapSetOpts} from  '../../collections/Interfaces.js'
 import { mapArray, mapSet} from "../../collections/MapMultiMutable.js";
 import {jest} from '@jest/globals'

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {pingPong, pingPongPercent} from '../../modulation/PingPong.js';
-
+import { expect, test } from '@jest/globals';
 const testNumeric = (given: number[], expectedRange: number[]) => {
   expect(given.length).toEqual(expectedRange.length);
   for (let i = 0; i < given.length; i++) {

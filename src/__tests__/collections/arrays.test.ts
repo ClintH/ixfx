@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {zip,areValuesIdentical,ensureLength,remove} from '../../collections/Arrays.js';
 
 test(`remove`, () => {

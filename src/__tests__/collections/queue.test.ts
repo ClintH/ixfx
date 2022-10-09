@@ -1,5 +1,5 @@
 /* eslint-disable */
-
+import { expect, test } from '@jest/globals';
 import {queue, queueMutable} from '../../collections/Queue.js';
 
 test(`queue-mutable`, () => {

@@ -1,4 +1,5 @@
-import {degreeToRadian, radianToDegree} from '../../geometry/index.js';
+import { expect, test } from '@jest/globals';
+import { degreeToRadian, radianToDegree } from '../../geometry/index.js';
 /* eslint-disable */
 
 test(`degreeToRadian`, () => {

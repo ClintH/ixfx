@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {average} from '../../collections/NumericArrays.js';
 
 test(`average`, () => {

@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import { startsEnds } from '../Text.js';
 
 test(`startsEnds`, () => {

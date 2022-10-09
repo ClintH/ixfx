@@ -1,6 +1,6 @@
-/// <reference types="jest-extended" />
-
+// @ts-nocheck
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {KeyValue} from '../KeyValue.js';
 import {FrequencyMutable} from '../data/FrequencyMutable.js';
 import {shuffle} from '../collections/Arrays.js';

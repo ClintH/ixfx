@@ -1,5 +1,5 @@
 /* eslint-disable */
-
+import { expect, test } from '@jest/globals';
 import { wrapInteger, wrap, scale, clamp, clampIndex } from '../../data/index.js';
 test(`scale`, () => {
   expect(scale(50, 0, 100, 0, 1)).toEqual(0.5);

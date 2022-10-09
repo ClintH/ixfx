@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {average} from '../Numbers.js';
 test(`average`, () => {
   const a = [1];

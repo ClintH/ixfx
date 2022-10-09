@@ -1,10 +1,27 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+import "jest-extended"
 export default {
   preset: `ts-jest/presets/default-esm`,
   testEnvironment: `jest-environment-node`,
-  setupFilesAfterEnv: [`./jest.setup.js`, `jest-extended/all`],
+  setupFilesAfterEnv: [`jest-extended/all`],
+  globals: {
+    // See reference: https://kulshekhar.github.io/ts-jest/docs/getting-started/options/tsconfig
+    "ts-jest": {
+        tsconfig: "tsconfig.jest.json"
+    }
+  },
   extensionsToTreatAsEsm: [`.ts`],
-  transform: {},
+  transform: {
+        // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+    // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        // ts-jest configuration goes here
+        useESM: true
+      },
+    ],
+  },
   coverageDirectory:  `../etc/`,
   collectCoverageFrom: [`../src/**/*.ts`],
   coverageThreshold: {
@@ -18,11 +35,6 @@ export default {
   roots: [
     `../src/`
   ],
-  globals: {
-    'ts-jest': {
-      useESM: true,
-    },
-  },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': `$1`,
   },

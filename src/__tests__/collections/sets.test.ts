@@ -1,20 +1,21 @@
-import {setMutable} from '../../collections/Set.js';
-import {jest} from '@jest/globals';
+import { expect, test } from '@jest/globals';
+import { setMutable } from '../../collections/Set.js';
+import { jest } from '@jest/globals';
 
 test(`mutableValueSet`, () => {
-  const barry = {name: `Barry`, city: `London`};
-  const barryOther = {name: `Barry`, city: `Manchester`};
-  const barryCase = {name: `BARRY`, city: `London`}; 
-  const sally = {name: `Sally`, city: `Bristol`};
-  const sallyOther = {name: `Sally`, city: `Manchester`};
-  const sallyMoreProps = {name: `Sally`, city: `Bristol`, age: 27};
+  const barry = { name: `Barry`, city: `London` };
+  const barryOther = { name: `Barry`, city: `Manchester` };
+  const barryCase = { name: `BARRY`, city: `London` }; 
+  const sally = { name: `Sally`, city: `Bristol` };
+  const sallyOther = { name: `Sally`, city: `Manchester` };
+  const sallyMoreProps = { name: `Sally`, city: `Bristol`, age: 27 };
   
   const people = [
-    {name: `Barry`, city: `London`},
-    {name: `Sally`, city: `Bristol`}
+    { name: `Barry`, city: `London` },
+    { name: `Sally`, city: `Bristol` }
   ];
 
-  type Person = { readonly name: string, readonly city: string }
+  type Person = { readonly name:string, readonly city:string }
 
   // Test default JSON
   const set = setMutable();

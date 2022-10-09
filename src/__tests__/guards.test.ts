@@ -1,5 +1,5 @@
 /* eslint-disable */
-
+import { expect, test } from '@jest/globals';
 import {integer, percent} from '../Guards';
 
 test (`percent`, () => {

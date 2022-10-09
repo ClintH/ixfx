@@ -1,5 +1,5 @@
 /* eslint-disable */
-
+import { expect, test } from '@jest/globals';
 import { toStringDefault, isEqualDefault, isEqualValueDefault} from '../Util.js';
 
 test(`toStringDefault`, () => {

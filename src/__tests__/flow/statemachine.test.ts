@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { expect, test } from '@jest/globals';
 import {StateMachine, descriptionFromList} from '../../flow/StateMachine.js';
 import {jest} from '@jest/globals';
 

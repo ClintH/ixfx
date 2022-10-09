@@ -1,6 +1,6 @@
 // /* eslint-disable */
 import * as Colour from '../visual/Colour.js';
-
+import { expect, test } from '@jest/globals';
 test(`opacity`, () => {
   expect(Colour.opacity(`hsl(0,100%,50%)`, 0.5)).toEqual(`rgba(255, 0, 0, 0.5)`);
 });
