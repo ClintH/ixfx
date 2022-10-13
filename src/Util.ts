@@ -1,5 +1,5 @@
 import { number as guardNumber } from "./Guards.js";
-import {untilMatch} from "./Text.js";
+import { untilMatch } from "./Text.js";
 
 export * as IterableAsync from './IterableAsync.js';
 //export { KeyValue } from './KeyValue.js';
@@ -131,12 +131,12 @@ export const roundUpToMultiple = (v:number, multiple:number):number => {
   return Math.ceil(v/multiple)*multiple;
 };
 
-export type ToString<V> = (itemToMakeStringFor: V) => string;
+export type ToString<V> = (itemToMakeStringFor:V)=>string;
 
 /**
  * Function that returns true if `a` and `b` are considered equal
  */
-export type IsEqual<V> = (a:V, b:V) => boolean;
+export type IsEqual<V> = (a:V, b:V)=>boolean;
 
 /**
  * Default comparer function is equiv to checking `a === b`
@@ -174,6 +174,6 @@ export const runningiOS = () => [
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = {...(window as any).ixfx,  getFieldByPath, getFieldPaths };
+    (window as any).ixfx = { ...(window as any).ixfx,  getFieldByPath, getFieldPaths };
   }
 } catch { /* no-op */ }

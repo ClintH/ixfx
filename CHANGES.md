@@ -1,5 +1,9 @@
 A rough changelog between NPM releases
 
+# 0.6.5 22.10.13
+
+* Bug fix for accessing camera on iOS
+
 # 0.6.3 22.10.09
 
 * Flow.StateMachine.drive: 'driver' for changing states somewhat automatically. Each state has a set of handler(s) which are executed whilst the machine is in that state. If multiple handlers are provided, there are some options for how to handle this: either the first valid response is used, the highest-rating or lowest-rating. In additional there are some fallback handlers.

@@ -1,4 +1,4 @@
-import {waitFor} from '../flow/WaitFor.js';
+import { waitFor } from '../flow/WaitFor.js';
 import * as Rects from '../geometry/Rect.js';
 
 /**
@@ -24,7 +24,7 @@ export type Constraints = {
   /**
    * Camera facing: user is front-facing, environment is a rear camera
    */
-  readonly facingMode?: `user`|`environment`,
+  readonly facingMode?:`user`|`environment`,
   /**
    * Maximum resolution
    */
@@ -60,7 +60,7 @@ export type StartResult = {
    * Call dispose to stop the camera feed and remove any created resources, 
    * such as a VIDEO element
    */
-  readonly dispose:() => void;
+  readonly dispose:()=>void;
   /**
    * Video element camera is connected to
    */
@@ -104,10 +104,15 @@ export type StartResult = {
  * @param constraints 
  * @returns Returns `{ videoEl, dispose }`, where `videoEl` is the created VIDEO element, and `dispose` is a function for removing the element and stopping the video.
  */
-export const start = async (constraints:Constraints = {}): Promise<StartResult> => {
+export const start = async (constraints:Constraints = {}):Promise<StartResult> => {
   const videoEl = document.createElement(`VIDEO`) as HTMLVideoElement;
   //eslint-disable-next-line functional/immutable-data
   videoEl.style.display = `none`;
+  //eslint-disable-next-line functional/immutable-data
+  videoEl.playsInline = true;
+  //eslint-disable-next-line functional/immutable-data
+  videoEl.muted = true;
+  
   videoEl.classList.add(`ixfx-camera`);
   
   document.body.appendChild(videoEl);
@@ -131,7 +136,7 @@ export const start = async (constraints:Constraints = {}): Promise<StartResult> 
     // Attempt to start video 
     const r = await startWithVideoEl(videoEl, constraints);
     stopVideo = r.dispose;
-    return  {videoEl, dispose};
+    return  { videoEl, dispose };
   } catch (ex) {
     // If it didn't work, delete the created element 
     console.error(ex);
@@ -166,9 +171,9 @@ const startWithVideoEl = async (videoEl:HTMLVideoElement, constraints:Constraint
 
   // Just in case some intuitive values are passed in...
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((constraints as any).facingMode === `front`) constraints = {...constraints, facingMode: `user`};
+  if ((constraints as any).facingMode === `front`) constraints = { ...constraints, facingMode: `user` };
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((constraints as any).facingMode === `back`) constraints = {...constraints, facingMode: `environment`};
+  if ((constraints as any).facingMode === `back`) constraints = { ...constraints, facingMode: `environment` };
 
   if (constraints.facingMode) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
@@ -240,7 +245,7 @@ const startWithVideoEl = async (videoEl:HTMLVideoElement, constraints:Constraint
     videoEl.srcObject = stream;
     done();
 
-    const ret = {videoEl, dispose};
+    const ret = { videoEl, dispose };
     const p = new Promise<StartResult>((resolve, reject) => {
       videoEl.addEventListener(`loadedmetadata`,  () => {
         videoEl.play().then(() => {
