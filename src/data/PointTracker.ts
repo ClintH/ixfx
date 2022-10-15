@@ -1,7 +1,7 @@
 import * as Points from "../geometry/Point.js";
-import * as Line from "../geometry/Line.js";
 import { Timestamped,  TrackedValueMap, TrackedValueOpts as TrackOpts } from "./TrackedValue.js";
 import { ObjectTracker } from "./ObjectTracker.js";
+import { Lines, Polar, Vectors } from "../geometry/index.js";
 
 /**
  * Information about seen points
@@ -16,6 +16,10 @@ export type PointTrackerResults = {
   readonly values:readonly Points.Point[]
 }
 
+/**
+ * Point tracker. Create via `pointTracker()`.
+ * 
+ */
 export class PointTracker extends ObjectTracker<Points.Point> {
   /**
    * Function that yields the relation from initial point
@@ -27,8 +31,8 @@ export class PointTracker extends ObjectTracker<Points.Point> {
    */
   lastResult:PointTrackerResults|undefined;
 
-  constructor(readonly id:string, opts:TrackOpts = {}) {
-    super(id, opts);
+  constructor(opts:TrackOpts = {}) {
+    super(opts);
   }
 
   onTrimmed():void {
@@ -85,7 +89,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
     };
     const lastRel:PointTrack = {
       ...lastRelation(newLast),
-      speed: this.values.length < 2 ? 0 : Line.length(currentLast, newLast) / (newLast.at - currentLast.at),
+      speed: this.values.length < 2 ? 0 : Lines.length(currentLast, newLast) / (newLast.at - currentLast.at),
     };
     
     const r:PointTrackerResults = {
@@ -101,9 +105,39 @@ export class PointTracker extends ObjectTracker<Points.Point> {
    * Returns a polyline representation of stored points.
    * Returns an empty array if points were not saved, or there's only one.
    */
-  get line():Line.PolyLine {
+  get line():Lines.PolyLine {
     if (this.values.length === 1) return [];
-    return Line.joinPointsToLines(...this.values);
+    return Lines.joinPointsToLines(...this.values);
+  }
+
+  /**
+   * Returns a vector of the initial/last points of the tracker.
+   * Returns as a polar coordinate
+   */
+  get vectorPolar():Polar.Coord {
+    return Vectors.fromLinePolar(this.lineStartEnd);
+  }
+
+  /**
+   * Returns a vector of the initial/last points of the tracker.
+   * Returns as a Cartesian coordinate
+   */
+  get vectorCartesian():Points.Point {
+    return Vectors.fromLineCartesian(this.lineStartEnd);
+  }
+
+  /**
+   * Returns a line from initial point to last point.
+   * 
+   * If there are less than two points, Lines.Empty is returned
+   */
+  get lineStartEnd():Lines.Line {
+    const initial = this.initial;
+    if (this.values.length < 2 || !initial) return Lines.Empty;
+    return {
+      a: initial,
+      b: this.last
+    };
   }
 
   /**
@@ -156,7 +190,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
   get length():number {
     if (this.values.length === 1) return 0;
     const l = this.line;
-    return Line.length(l);
+    return Lines.length(l);
   }
 }
 
@@ -169,7 +203,10 @@ export class TrackedPointMap extends TrackedValueMap<Points.Point, PointTracker>
   constructor(opts:TrackOpts = {}) {
     super((key, start) => {
       if (start === undefined) throw new Error(`Requires start point`);
-      const p = new PointTracker(key, opts);
+      const p = new PointTracker({
+        ...opts,
+        id: key
+      });
       p.seen(start);
       return p;
     });
@@ -252,7 +289,7 @@ export const pointsTracker = (opts:TrackOpts = {}) => new TrackedPointMap(opts);
 * import { pointTracker } from 'https://unpkg.com/ixfx/dist/data.js';
  * 
  * // Create a tracker
- * const t = pointTracker(`pointer-0`);
+ * const t = pointTracker();
  * 
  * // ...and later, tell it when a point is seen
  * const nfo = t.seen({x: evt.x, y:evt.y});
@@ -274,5 +311,29 @@ export const pointsTracker = (opts:TrackOpts = {}) => new TrackedPointMap(opts);
  * ```js
  * t.reset(); // Reset tracker
  * ```
+ * 
+ * By default, the tracker only keeps track of the initial point and
+ * does not store intermediate 'seen' points. To use the tracker as a buffer.
+ * 
+ * ```js
+ * // Keep only the last 10 points
+ * const t = pointTracker({
+ *  sampleLimit: 10
+ * });
+ * 
+ * // Store all 'seen' points
+ * const t = pointTracker({
+ *  storeIntermediate: true
+ * });
+ * 
+ * // In this case, the whole tracker is automatically
+ * // reset after 10 samples
+ * const t = pointTracker({
+ *  resetAfterSamples: 10
+ * })
+ * ```
+ * 
+ * When using a limited buffer, the 'initial' point will be the oldest in the
+ * buffer, not actually the very first point seen.
  */
-export const pointTracker = (id?:string, opts:TrackOpts = {}) => new PointTracker(id ?? ``, opts);
+export const pointTracker = (opts:TrackOpts = {}) => new PointTracker(opts);
