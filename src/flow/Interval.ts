@@ -1,6 +1,6 @@
-import {sleep} from "./Sleep.js";
+import { sleep } from "./Sleep.js";
 
-export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
+export type IntervalAsync<V> = (()=>V|Promise<V>) | Generator<V>;
 /**
  * Generates values from `produce` with `intervalMs` time delay. 
  * `produce` can be a simple function that returns a value, an async function, or a generator.
@@ -30,7 +30,7 @@ export type IntervalAsync<V> = (() => V|Promise<V>) | Generator<V>;
  * @template V Data type
  * @returns
  */
-export const interval = async function*<V>(produce: IntervalAsync<V>, intervalMs: number) {
+export const interval = async function*<V>(produce:IntervalAsync<V>, intervalMs:number) {
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
   try {
