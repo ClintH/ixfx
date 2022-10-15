@@ -6,8 +6,8 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
   values:V[];
   timestamps:number[];
 
-  constructor(id?:string, opts?:TrackedValueOpts) {
-    super(id, opts);
+  constructor(opts?:TrackedValueOpts) {
+    super(opts);
     this.values = [];
     this.timestamps = [];
   }
