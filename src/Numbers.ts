@@ -1,7 +1,7 @@
 import * as NumericArrays from './collections/NumericArrays.js';
-import {numberTracker} from './data/NumberTracker.js';
-import {TrackedValueOpts} from './data/TrackedValue.js';
-import {Easings} from './modulation/index.js';
+import { numberTracker } from './data/NumberTracker.js';
+import { TrackedValueOpts } from './data/TrackedValue.js';
+import { Easings } from './modulation/index.js';
 
 /**
  * Calculates the average of all numbers in an array.
@@ -88,7 +88,7 @@ export const isValid = (possibleNumber:number|unknown) => {
 /**
  * Alias for [Data.numberTracker](Data.numberTracker.html) 
  */
-export const tracker = (id?:string, opts?:TrackedValueOpts) => numberTracker(id, opts);
+export const tracker = (opts?:TrackedValueOpts) => numberTracker(opts);
 
 /**
  * Filters an iterator of values, only yielding
