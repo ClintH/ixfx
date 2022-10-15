@@ -458,7 +458,7 @@ const sortResults = (arr:readonly (DriverResult|undefined)[] = []):readonly Driv
 // console.log(sortResults(sortTest));
 
 /**
- * Drive a state machine.
+ * Drive a state machine. [Demo sketch](https://github.com/ClintH/ixfx-demos/tree/main/flow/statemachine-regions)
  * 
  * A description can be provided with functions to invoke for each named state. 
  * The driver will invoke the function(s) corresponding to the current state of the machine.
@@ -510,11 +510,12 @@ const sortResults = (arr:readonly (DriverResult|undefined)[] = []):readonly Driv
  * When multiple functions are provided, by default the first that returns a result
  * and the result can be executed is used.
  * 
- * It's also possible to use the highest and lowest scoring result. To do so, results
+ * It's also possible to use the highest or lowest scoring result. To do so, results
  * must have a `score` property, as shown below. Extra syntax also has to be provided
- * instead of a bare array of functions.
+ * instead of a bare array of functions. This is how the logic for selecting results can be
+ * set.
  * 
- *  * ```js
+ * ```js
  * StateMachine.drive(stateMachine, {
  *   init: {
  *    select: `highest`,
@@ -532,7 +533,9 @@ const sortResults = (arr:readonly (DriverResult|undefined)[] = []):readonly Driv
  * });
  * ```
  * 
- * The score results shouldn't be hardcoded as in the above example.
+ * The score results likely should not be hardcoded as in the above example,
+ * but rather based on some other dynamic values influencing what action to take.
+ * 
  * @param sm 
  * @param driver 
  * @returns 

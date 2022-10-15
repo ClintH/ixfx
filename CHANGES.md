@@ -4,6 +4,7 @@ A rough changelog between NPM releases
 
 * data/Correlate: Attempts to correlate two data sets by id and a supplied similarity function. Used for matching pose data from TensorFlow.js
 * flow/Timer.relativeTimerTicks: compute progression based on ticks instead of time
+* flow/everyNth: returns true every nth invocation.
 * Refactor of trackers. Rather than `id` being a first parameter, its an optional part of the options object. Intermediate storage turned on automatically if one of the buffering options is set (resetAfterSample or sampleLimit)
 * PointTracker.lineStartEnd: return line from initial to last point
 * PointTracker.vectorPolar / vectorCartesian: return vector from initial to last point
