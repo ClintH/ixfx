@@ -11,10 +11,10 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import {Arrays} from '../collections/index.js';
-import {Points} from '../geometry/index.js';
-import {numberTracker} from '../data/NumberTracker.js';
-import {AudioAnalyser} from './AudioAnalyser.js';
+import { Arrays } from '../collections/index.js';
+import { Points } from '../geometry/index.js';
+import { numberTracker } from '../data/NumberTracker.js';
+import { AudioAnalyser } from './AudioAnalyser.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {
@@ -22,7 +22,7 @@ export default class AudioVisualiser {
   audio:AudioAnalyser;
   parent:HTMLElement;
  
-  lastPointer:Points.Point = {x:0, y:0};
+  lastPointer:Points.Point = { x:0, y:0 };
   pointerDown = false;
   pointerClicking = false;
   pointerClickDelayMs = 100;
@@ -124,7 +124,7 @@ export default class AudioVisualiser {
       if (pointer.y > 0 && pointer.y <= canvasHeight && pointer.x >= left && pointer.x <= left + width) {
         // Keep track of data
         if (this.freqTracker.id !== i.toString()) {
-          this.freqTracker = numberTracker(i.toString());
+          this.freqTracker = numberTracker({ id: i.toString() });
         }
         this.freqTracker.seen(freq[i]);
 

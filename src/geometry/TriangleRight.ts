@@ -1,16 +1,16 @@
-import { Points, Triangles} from "./index.js";
-import {Circle} from "./Circle";
+import { Points, Triangles } from "./index.js";
+import { Circle } from "./Circle";
 
 export type Right = {
-  readonly adjacent?: number
-  readonly hypotenuse?: number
-  readonly opposite?: number
+  readonly adjacent?:number
+  readonly hypotenuse?:number
+  readonly opposite?:number
 }
 
 export type DefinedRight = {
-  readonly adjacent: number
-  readonly hypotenuse: number
-  readonly opposite: number
+  readonly adjacent:number
+  readonly hypotenuse:number
+  readonly opposite:number
 }
 
 /**
@@ -28,14 +28,14 @@ export type DefinedRight = {
  * @param origin 
  * @returns 
  */
-export const fromA = (t:Right, origin:Points.Point = {x:0, y:0}):Triangles.Triangle => {
+export const fromA = (t:Right, origin:Points.Point = { x:0, y:0 }):Triangles.Triangle => {
   const tt = resolveLengths(t);
   const seg = hypotenuseSegments(t);
   const h = height(t);
-  const a = {x: origin.x, y:origin.y};
-  const b = {x: origin.x + tt.hypotenuse, y: origin.y};
-  const c = {x: origin.x + seg[1], y: origin.y - h};
-  return {a, b, c};
+  const a = { x: origin.x, y:origin.y };
+  const b = { x: origin.x + tt.hypotenuse, y: origin.y };
+  const c = { x: origin.x + seg[1], y: origin.y - h };
+  return { a, b, c };
 };
 
 /**
@@ -53,14 +53,14 @@ export const fromA = (t:Right, origin:Points.Point = {x:0, y:0}):Triangles.Trian
  * @param origin 
  * @returns 
  */
-export const fromB = (t:Right, origin:Points.Point = {x:0, y:0}):Triangles.Triangle => {
+export const fromB = (t:Right, origin:Points.Point = { x:0, y:0 }):Triangles.Triangle => {
   const tt = resolveLengths(t);
   const seg = hypotenuseSegments(t);
   const h = height(t);
-  const b = {x: origin.x, y:origin.y};
-  const a = {x: origin.x - tt.hypotenuse, y: origin.y};
-  const c = {x: origin.x - seg[0], y: origin.y - h};
-  return {a, b, c};
+  const b = { x: origin.x, y:origin.y };
+  const a = { x: origin.x - tt.hypotenuse, y: origin.y };
+  const c = { x: origin.x - seg[0], y: origin.y - h };
+  return { a, b, c };
 };
 
 /**
@@ -78,13 +78,13 @@ export const fromB = (t:Right, origin:Points.Point = {x:0, y:0}):Triangles.Trian
  * @param origin 
  * @returns 
  */
-export const fromC = (t:Right, origin:Points.Point = {x:0, y:0}):Triangles.Triangle => {
+export const fromC = (t:Right, origin:Points.Point = { x:0, y:0 }):Triangles.Triangle => {
   const seg = hypotenuseSegments(t);
   const h = height(t);
-  const c = {x: origin.x, y:origin.y};
-  const a = {x: origin.x - seg[1], y: origin.y + h};
-  const b = {x: origin.x + seg[0], y: origin.y + h};
-  return {a, b, c};
+  const c = { x: origin.x, y:origin.y };
+  const a = { x: origin.x - seg[1], y: origin.y + h };
+  const b = { x: origin.x + seg[0], y: origin.y + h };
+  return { a, b, c };
 };
 
 /**
@@ -184,7 +184,6 @@ export const angleAtPointA = (t:Right):number => {
  */
 export const angleAtPointB = (t:Right):number => {
   const tt = resolveLengths(t);
-  console.log(tt);
   return Math.acos(
     (tt.opposite*tt.opposite + tt.hypotenuse*tt.hypotenuse - tt.adjacent*tt.adjacent)
     / 
@@ -220,7 +219,7 @@ export const medians = (t:Right):readonly [a:number, b:number, c:number] => {
  */
 export const circumcircle = (t:Right):Circle => {
   const tt = resolveLengths(t);
-  return { radius: tt.hypotenuse / 2};
+  return { radius: tt.hypotenuse / 2 };
 };
 
 /**
@@ -254,7 +253,7 @@ export const incircle = (t:Right):Circle => {
  * @param adjacent 
  * @returns 
  */
-export const oppositeFromAdjacent = (angleRad:number, adjacent:number): number => Math.tan(angleRad) * adjacent;
+export const oppositeFromAdjacent = (angleRad:number, adjacent:number):number => Math.tan(angleRad) * adjacent;
 
 /**
  * Returns the opposite length of a right-angle triangle,
@@ -274,7 +273,7 @@ export const oppositeFromAdjacent = (angleRad:number, adjacent:number): number =
  * @param hypotenuse 
  * @returns 
  */
-export const oppositeFromHypotenuse = (angleRad:number, hypotenuse:number): number => Math.sin(angleRad) * hypotenuse;
+export const oppositeFromHypotenuse = (angleRad:number, hypotenuse:number):number => Math.sin(angleRad) * hypotenuse;
 
 
 /**
