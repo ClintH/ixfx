@@ -1,10 +1,19 @@
 A rough changelog between NPM releases
 
+# 0.6.6
+
+* data/Correlate: Attempts to correlate two data sets by id and a supplied similarity function. Used for matching pose data from TensorFlow.js
+* flow/Timer.relativeTimerTicks: compute progression based on ticks instead of time
+* Refactor of trackers. Rather than `id` being a first parameter, its an optional part of the options object. Intermediate storage turned on automatically if one of the buffering options is set (resetAfterSample or sampleLimit)
+* PointTracker.lineStartEnd: return line from initial to last point
+* PointTracker.vectorPolar / vectorCartesian: return vector from initial to last point
+* Arrays.until Returns all items in source array until predicate returns true
+
 # 0.6.5 22.10.13
 
 * Bug fix for accessing camera on iOS
 
-# 0.6.3 22.10.09
+# 0.6.4 22.10.09
 
 * Flow.StateMachine.drive: 'driver' for changing states somewhat automatically. Each state has a set of handler(s) which are executed whilst the machine is in that state. If multiple handlers are provided, there are some options for how to handle this: either the first valid response is used, the highest-rating or lowest-rating. In additional there are some fallback handlers.
 * Dom.DragDrop: generic drag and drop handler
