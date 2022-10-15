@@ -3,9 +3,9 @@
  * See Also: NumericArrays.ts
  */
 
-import {integer as guardInteger} from '../Guards.js';
-import {defaultRandom, RandomSource} from '../Random.js';
-import {IsEqual, isEqualDefault, isEqualValueDefault} from '../Util.js';
+import { integer as guardInteger } from '../Guards.js';
+import { defaultRandom, RandomSource } from '../Random.js';
+import { IsEqual, isEqualDefault, isEqualValueDefault } from '../Util.js';
 
 export * from './NumericArrays.js';
 
@@ -250,7 +250,7 @@ export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`un
  * @param startIndex Start index (defaults to 0)
  * @param endIndex End index (defaults to last index)
  */
-export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, index: number, array: ReadonlyArray<V>) => boolean, startIndex?:number, endIndex?:number):readonly V[] => {
+export const filterBetween = <V>(array:ReadonlyArray<V>, predicate:(value:V, index:number, array:ReadonlyArray<V>)=>boolean, startIndex?:number, endIndex?:number):readonly V[] => {
   guardArray(array);
   if (typeof startIndex === `undefined`) startIndex = 0;
   if (typeof endIndex === `undefined`) endIndex = array.length-1;
@@ -282,7 +282,7 @@ export const filterBetween = <V>(array:ReadonlyArray<V>, predicate: (value: V, i
  * @param rand Random generator. `Math.random` by default.
  * @returns 
  */
-export const randomIndex = <V>(array: ArrayLike<V>, rand:RandomSource = defaultRandom): number => Math.floor(rand() * array.length);
+export const randomIndex = <V>(array:ArrayLike<V>, rand:RandomSource = defaultRandom):number => Math.floor(rand() * array.length);
 
 /**
  * Returns random element.
@@ -300,7 +300,7 @@ export const randomIndex = <V>(array: ArrayLike<V>, rand:RandomSource = defaultR
  * @params rand Random generator. `Math.random` by default.
  * @returns 
  */
-export const randomElement = <V>(array: ArrayLike<V>, rand:RandomSource = defaultRandom): V => {
+export const randomElement = <V>(array:ArrayLike<V>, rand:RandomSource = defaultRandom):V => {
   guardArray(array, `array`);
   return array[Math.floor(rand() * array.length)];
 };
@@ -338,7 +338,7 @@ export const randomElement = <V>(array: ArrayLike<V>, rand:RandomSource = defaul
 export const randomPluck = <V>(array:readonly V[], mutate = false, rand:RandomSource = defaultRandom):{readonly value:V|undefined, readonly array:Array<V> } => {
   if (array === undefined) throw new Error(`array is undefined`);
   if (!Array.isArray(array)) throw new Error(`'array' param is not an array`);
-  if (array.length === 0) return {value: undefined, array: []};
+  if (array.length === 0) return { value: undefined, array: [] };
   const index = randomIndex(array, rand);
   if (mutate) {
     return {
@@ -373,7 +373,7 @@ export const randomPluck = <V>(array:readonly V[], mutate = false, rand:RandomSo
  * @returns Copy with items moved around randomly
  * @template V Type of array items
  */
-export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = defaultRandom): ReadonlyArray<V> => {
+export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = defaultRandom):ReadonlyArray<V> => {
   const array = [...dataToShuffle];
   // eslint-disable-next-line  functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
@@ -431,6 +431,29 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
 export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));
 
 /**
+ * Returns all items in `data` for as long as `predicate` returns true
+ * @param data 
+ * @param predicate 
+ * @returns 
+ */
+export const until = <V, A>(data:ReadonlyArray<V>, predicate:(v:V, acc:A)=>readonly [stop:boolean, acc:A], initial:A):readonly V[] => {
+  const ret = [];
+  //eslint-disable-next-line functional/no-let
+  let total = initial;
+  //eslint-disable-next-line functional/no-let
+  for (let i=0;i<data.length;i++) {
+    const [stop, acc] = predicate(data[i], total);
+    if (stop) break;
+
+    total = acc;
+    
+    //eslint-disable-next-line functional/immutable-data
+    ret.push(data[i]);
+  }
+  return ret;
+};
+
+/**
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  * 
  * ```js
@@ -452,7 +475,7 @@ export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> =
  * @typeParam V Type of array
  * @returns 
  */
-export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V> => {
+export const remove = <V>(data:ReadonlyArray<V>, index:number):ReadonlyArray<V> => {
   // ✔️ Unit tested
   if (!Array.isArray(data)) throw new Error(`'data' parameter should be an array`);
   guardIndex(data, index, `index`);
@@ -494,7 +517,7 @@ export const remove = <V>(data:ReadonlyArray<V>, index:number) : ReadonlyArray<V
  * @typeParam V Type of values
  * @returns Map 
  */
-export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) => array.reduce((store, item) => {
+export const groupBy = <K, V>(array:ReadonlyArray<V>, grouper:(item:V)=>K) => array.reduce((store, item) => {
   const key = grouper(item);
   const val = store.get(key);
   if (val === undefined) {
@@ -532,7 +555,7 @@ export const groupBy = <K, V>(array: ReadonlyArray<V>, grouper: (item: V) => K) 
  * @param amount Amount, given as a percentage (0..1) or the number of interval (ie 3 for every third item)
  * @returns 
  */
-export const sample = <V>(array: ReadonlyArray<V>, amount:number):ReadonlyArray<V> => {
+export const sample = <V>(array:ReadonlyArray<V>, amount:number):ReadonlyArray<V> => {
   //eslint-disable-next-line functional/no-let
   let subsampleSteps = 1;
   if (amount <= 1) {
