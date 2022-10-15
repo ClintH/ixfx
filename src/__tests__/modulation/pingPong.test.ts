@@ -1,14 +1,13 @@
 /* eslint-disable */
 import {pingPong, pingPongPercent} from '../../modulation/PingPong.js';
 import { expect, test } from '@jest/globals';
+
 const testNumeric = (given: number[], expectedRange: number[]) => {
   expect(given.length).toEqual(expectedRange.length);
   for (let i = 0; i < given.length; i++) {
-    expect(given[i]).toBeCloseTo(expectedRange[i]);
+    expect(given[i]).toBeCloseTo(expectedRange[i], 1);
   }
 };
-
-
 
 test(`pingPong`, () => {
   expect(() => pingPong(20, 2, 10).next()).toThrow();    // Interval too large
@@ -77,13 +76,16 @@ test(`pingPong`, () => {
 });
 
 
-test(`pingPongPercent`, () => {
+test(`pingPongPercent-1`, () => {
   // Test out of range catching
   expect(() => pingPongPercent(2).next()).toThrow();
   expect(() => pingPongPercent(-2).next()).toThrow();
   expect(() => pingPongPercent(0).next()).toThrow();
   expect(() => pingPongPercent(0.1, -2).next()).toThrow();
   expect(() => pingPongPercent(0.1, 2).next()).toThrow();
+});
+
+test(`pingPongPercent-2`, () => {
 
   // Test counting up to 1
   let expectedRange = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
@@ -96,11 +98,14 @@ test(`pingPongPercent`, () => {
     if (--count === 0) break;
   }
   testNumeric(given, expectedRange);
+});
+
+test(`pingPongPercent-3`, () => {
 
   // Test counting down to 0
-  expectedRange = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0];
-  given = [];
-  count = 11;
+  let expectedRange = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0];
+  let given = [];
+  let count = 11;
   for (const v of pingPongPercent(-0.1, 0, 1, 1)) {
     expect(v).not.toBeUndefined();
     // @ts-ignore
@@ -108,12 +113,15 @@ test(`pingPongPercent`, () => {
     if (--count === 0) break;
   }
   testNumeric(given, expectedRange);
+});
+
+test(`pingPongPercent-4`, () => {
 
   // Test ping-pong
-  expectedRange = [0, 0.2, 0.4, 0.6, 0.8, 1, 0.8, 0.6, 0.4, 0.2];
+  let expectedRange = [0, 0.2, 0.4, 0.6, 0.8, 1, 0.8, 0.6, 0.4, 0.2];
   expectedRange = [...expectedRange, ...expectedRange];
-  given = [];
-  count = 20;
+  let given = [];
+  let count = 20;
   for (const v of pingPongPercent(0.2)) {
     expect(v).not.toBeUndefined();
     // @ts-ignore
@@ -121,17 +129,21 @@ test(`pingPongPercent`, () => {
     if (--count === 0) break;
   }
   testNumeric(given, expectedRange);
+});
+
+test(`pingPongPercent-5`, () => {
 
   // Test big interval
-  expectedRange = [0, 0.8, 1, 0.2, 0];
-  given = [];
-  count = 5;
+  let expectedRange = [0, 0.8, 1, 0.2, 0];
+  let given = [];
+  let count = 5;
   for (const v of pingPongPercent(0.8)) {
     expect(v).not.toBeUndefined();
     // @ts-ignore
     given.push(v);
     if (--count === 0) break;
   }
+  console.log(given);
   testNumeric(given, expectedRange);
 
   // Test alternate style and start

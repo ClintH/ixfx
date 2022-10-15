@@ -2,7 +2,7 @@ import { numberTracker } from '../../data/NumberTracker.js';
 import { expect, test } from '@jest/globals';
 test(`numberTracker`, () => {
 
-  const a = numberTracker(`test`);
+  const a = numberTracker({ id:`test` });
   expect(a.id).toEqual(`test`);
   expect(a.total).toEqual(0);
   
