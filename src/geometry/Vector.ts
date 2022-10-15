@@ -57,6 +57,7 @@ export const fromLineCartesian = (line:Lines.Line):Points.Point => Points.subtra
  * @returns 
  */
 export const fromLinePolar = (line:Lines.Line):Polar.Coord => {
+  Lines.guard(line, `line`);
   const pt = Points.subtract(line.b, line.a);
   return fromPointPolar(pt);
 };
