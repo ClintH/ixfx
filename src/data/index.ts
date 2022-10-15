@@ -13,6 +13,7 @@ export * from './Scale.js';
 export * from './Flip.js';
 export * from './Interpolate.js';
 export * from './Wrap.js';
+export * as Correlate from './Correlate.js';
 
 export const piPi = Math.PI*2;
-export type NumberFunction = () => number;
+export type NumberFunction = ()=>number;
