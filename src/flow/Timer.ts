@@ -102,6 +102,7 @@ export const relativeTimer = (total:number, timer:Timer, clampValue = true):ModT
  * Wraps a timer, returning a relative elapsed value.
  * 
  * ```js
+ * // Timer that counts to 1,000 milliseconds
  * let t = relativeTimerMs(1000);
  * 
  * t.isDone;  // true if total milliseconds has elapsed
@@ -114,6 +115,33 @@ export const relativeTimer = (total:number, timer:Timer, clampValue = true):ModT
  * @returns Timer
  */
 export const relativeTimerMs = (total:number, clampValue = true) => relativeTimer(total, msElapsedTimer(), clampValue);
+
+/**
+ * Wraps a tick-based 'timer', returning a relative value (0..1).
+ * A value of 1 indicates the timer has completed.
+ * 
+ * ```js
+ * // Timer that counts 20 ticks
+ * let t = relativeTimerTicks(20);
+ * 
+ * t.isDone;  // true if total ticks has elapsed
+ * t.reset(); // reset timer to 0
+ * t.elapsed; // 0..1 scale of how close to completion
+ * ```
+ * 
+ * Example:
+ * ```js
+ * const t = relativeTimerTicks(10);
+ * while (!t.isDone) {
+ *  const progress = t.elapsed; 
+ *  // Yields: 0.1, 0.2, ... 1
+ * }
+ * ```
+ * @param total 
+ * @param clampValue 
+ * @returns 
+ */
+export const relativeTimerTicks = (total:number, clampValue = true) => relativeTimer(total, ticksElapsedTimer(), clampValue);
 
 /**
  * A timer based on frequency: cycles per unit of time. These timers return a number from
@@ -188,7 +216,9 @@ export const msElapsedTimer = ():Timer => {
 };
 
 /**
- * A timer that progresses with each call
+ * A timer that progresses with each call to `elapsed`.
+ * 
+ * The first call to elapsed will return 1.
  * @private
  * @returns {Timer}
  */
@@ -199,6 +229,7 @@ export const ticksElapsedTimer = ():Timer => {
     reset: () => {
       start = 0;
     },
-    get elapsed() { return start++; }
+    get elapsed() { return ++start; }
   };
 };
+
