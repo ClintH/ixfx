@@ -1,5 +1,5 @@
-import { number as guardNumber} from "../Guards.js";
-import {sleep} from "./Sleep.js";
+import { number as guardNumber } from "../Guards.js";
+import { sleep } from "./Sleep.js";
 
 import * as StateMachine from './StateMachine.js';
 import * as Timer from './Timer.js';
@@ -8,7 +8,7 @@ import * as Timer from './Timer.js';
  * State Machine
  * See [here for usage](../classes/Flow.StateMachine.StateMachine.html).
  */
-export {StateMachine};
+export { StateMachine };
 export * from './Timer.js';
 
 export * from './Interval.js';
@@ -20,9 +20,10 @@ export * from './Throttle.js';
 export * from './Sleep.js';
 export * from './WaitFor.js';
 export * from './Delay.js';
+export * from './Every.js';
 
 export type HasCompletion = {
-  get isDone(): boolean;
+  get isDone():boolean;
 }
 
 /**
@@ -154,6 +155,6 @@ export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|unde
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = {...(window as any).ixfx, Flow: {StateMachine, Timer, forEach, forEachAsync, repeat}};
+    (window as any).ixfx = { ...(window as any).ixfx, Flow: { StateMachine, Timer, forEach, forEachAsync, repeat } };
   }
 } catch { /* no-op */ }
