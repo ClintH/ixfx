@@ -14,6 +14,9 @@
 <li><a href="../modules/Data.html">Data</a></li>
 <li><a href="Data.PointTracker.html">PointTracker</a></li></ul>
 <h1>Class PointTracker</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>Point tracker. Create via <code>pointTracker()</code>.</p>
+</div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -43,7 +46,10 @@
 <a href="Data.PointTracker.html#last" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>last</span></a>
 <a href="Data.PointTracker.html#length" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>length</span></a>
 <a href="Data.PointTracker.html#line" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>line</span></a>
+<a href="Data.PointTracker.html#lineStartEnd" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>line<wbr/>Start<wbr/>End</span></a>
 <a href="Data.PointTracker.html#size" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>size</span></a>
+<a href="Data.PointTracker.html#vectorCartesian" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>vector<wbr/>Cartesian</span></a>
+<a href="Data.PointTracker.html#vectorPolar" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>vector<wbr/>Polar</span></a>
 <a href="Data.PointTracker.html#x" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>x</span></a>
 <a href="Data.PointTracker.html#y" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg><span>y</span></a>
 </div></section>
@@ -138,6 +144,15 @@ Returns 0 if points were not saved, or there&#39;s only one</p>
 Returns an empty array if points were not saved, or there&#39;s only one.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Lines.PolyLine.html" class="tsd-signature-type" data-tsd-kind="Type alias">PolyLine</a></h4></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class"><a id="lineStartEnd" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>line<wbr/>Start<wbr/>End</span><a href="#lineStartEnd" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+<li class="tsd-signature" id="lineStartEnd.lineStartEnd-1"><span class="tsd-signature-symbol">get</span> lineStartEnd<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Lines.Line.html" class="tsd-signature-type" data-tsd-kind="Type alias">Line</a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a line from initial point to last point.</p>
+<p>If there are less than two points, Lines.Empty is returned</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Lines.Line.html" class="tsd-signature-type" data-tsd-kind="Type alias">Line</a></h4></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a id="size" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>size</span><a href="#size" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
@@ -147,6 +162,24 @@ Returns an empty array if points were not saved, or there&#39;s only one.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <p>Inherited from ObjectTracker.size</p></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class"><a id="vectorCartesian" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>vector<wbr/>Cartesian</span><a href="#vectorCartesian" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+<li class="tsd-signature" id="vectorCartesian.vectorCartesian-1"><span class="tsd-signature-symbol">get</span> vectorCartesian<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a vector of the initial/last points of the tracker.
+Returns as a Cartesian coordinate</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a></h4></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class"><a id="vectorPolar" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>vector<wbr/>Polar</span><a href="#vectorPolar" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+<li class="tsd-signature" id="vectorPolar.vectorPolar-1"><span class="tsd-signature-symbol">get</span> vectorPolar<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Polar.Coord.html" class="tsd-signature-type" data-tsd-kind="Type alias">Coord</a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns a vector of the initial/last points of the tracker.
+Returns as a polar coordinate</p>
+</div>
+<h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Polar.Coord.html" class="tsd-signature-type" data-tsd-kind="Type alias">Coord</a></h4></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class"><a id="x" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>x</span><a href="#x" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
@@ -275,6 +308,7 @@ number of remaining items</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
 <li class="current tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Dom.html">Dom</a>
 <ul>
@@ -352,7 +386,10 @@ number of remaining items</p>
 <li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="Data.PointTracker.html#last" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>last</a></li>
 <li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#length" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>length</a></li>
 <li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#line" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>line</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#lineStartEnd" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>line<wbr/>Start<wbr/>End</a></li>
 <li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><a href="Data.PointTracker.html#size" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>size</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#vectorCartesian" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>vector<wbr/>Cartesian</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#vectorPolar" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>vector<wbr/>Polar</a></li>
 <li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#x" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>x</a></li>
 <li class="tsd-kind-accessor tsd-parent-kind-class"><a href="Data.PointTracker.html#y" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>y</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="Data.PointTracker.html#angleFromStart" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>angle<wbr/>From<wbr/>Start</a></li>
