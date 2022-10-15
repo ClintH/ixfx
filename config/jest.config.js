@@ -7,7 +7,7 @@ export default {
   globals: {
     // See reference: https://kulshekhar.github.io/ts-jest/docs/getting-started/options/tsconfig
     "ts-jest": {
-        tsconfig: "tsconfig.jest.json"
+        tsconfig: "config/tsconfig.jest.json"
     }
   },
   extensionsToTreatAsEsm: [`.ts`],
