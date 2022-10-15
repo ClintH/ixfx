@@ -7,8 +7,8 @@ import { TrackerBase } from "./TrackerBase.js";
 export class ObjectTracker<V> extends TrackerBase<V> {
   values:Timestamped<V>[];
 
-  constructor(id:string, opts:TrackedValueOpts = {}) {
-    super(id, opts);
+  constructor(opts:TrackedValueOpts = {}) {
+    super(opts);
     this.values = [];
   }
 
