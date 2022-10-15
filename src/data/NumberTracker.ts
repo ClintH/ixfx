@@ -1,6 +1,6 @@
 import { PrimitiveTracker } from "./PrimitiveTracker.js";
 import { TrackedValueOpts as TrackOpts, Timestamped } from "./TrackedValue.js";
-import { minFast, maxFast, totalFast } from "../collections/NumericArrays";
+import { minFast, maxFast, totalFast } from "../collections/NumericArrays.js";
 
 export class NumberTracker extends PrimitiveTracker<number> {
   total = 0;
@@ -90,13 +90,13 @@ export class NumberTracker extends PrimitiveTracker<number> {
  * Trackers can automatically reset after a given number of samples
  * ```
  * // reset after 100 samples
- * const t = numberTracker(`something`, { resetAfterSamples: 100 });
+ * const t = numberTracker({ resetAfterSamples: 100 });
  * ```
  * 
  * To store values, use the `storeIntermediate` option:
  * 
  * ```js
- * const t = numberTracker(`something`, { storeIntermediate: true });
+ * const t = numberTracker({ storeIntermediate: true });
  * ```
  * 
  * Difference between last value and initial value:
@@ -111,5 +111,5 @@ export class NumberTracker extends PrimitiveTracker<number> {
  * ```
  * @class NumberTracker
  */
-export const numberTracker = (id?:string, opts?:TrackOpts) => new NumberTracker(id ?? ``, opts ?? {});
+export const numberTracker = (opts:TrackOpts = {}) => new NumberTracker(opts);
 

@@ -1,5 +1,5 @@
-import {NumberTracker} from "./NumberTracker.js";
-import {TrackedValueOpts as TrackOpts} from "./TrackedValue.js";
+import { NumberTracker } from "./NumberTracker.js";
+import { TrackedValueOpts as TrackOpts } from "./TrackedValue.js";
 
 /**
  * A `Tracker` that tracks interval between calls to `mark()`
@@ -44,9 +44,9 @@ export class IntervalTracker extends NumberTracker {
  * 
  * ```
  * // Reset after 100 samples
- * const t = intervalTracker(`tracker`, { resetAfterSamples: 100} );
+ * const t = intervalTracker({ resetAfterSamples: 100} );
  * ```
- * @param id Optional id of instance
+ * @param opts Options for tracker
  * @returns New interval tracker
  */
-export const intervalTracker = (id?:string, opts?:TrackOpts) => new IntervalTracker(id, opts);
+export const intervalTracker = (opts?:TrackOpts) => new IntervalTracker(opts);
