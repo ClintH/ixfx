@@ -14,12 +14,14 @@
 <li><a href="../modules/Data.html">Data</a></li>
 <li><a href="Data.TrackedValueOpts.html">TrackedValueOpts</a></li></ul>
 <h1>Type alias TrackedValueOpts</h1></div>
-<div class="tsd-signature">Tracked<wbr/>Value<wbr/>Opts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>resetAfterSamples<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>sampleLimit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>storeIntermediate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></div>
+<div class="tsd-signature">Tracked<wbr/>Value<wbr/>Opts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>resetAfterSamples<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>sampleLimit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>storeIntermediate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></div>
 <div class="tsd-comment tsd-typography"><p>Options</p>
 </div>
 <div class="tsd-type-declaration">
 <h4>Type declaration</h4>
 <ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> id<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> reset<wbr/>After<wbr/>Samples<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
 <div class="tsd-comment tsd-typography"><p>If above zero, tracker will reset after this many samples</p>
@@ -30,6 +32,7 @@
 <p>When the seen values is twice <code>sampleLimit</code>, the stored values will be trimmed down
 to <code>sampleLimit</code>. We only do this when the values are double the size so that
 the collections do not need to be trimmed repeatedly whilst we are at the limit.</p>
+<p>Automatically implies storeIntermediate</p>
 </div></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> store<wbr/>Intermediate<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
