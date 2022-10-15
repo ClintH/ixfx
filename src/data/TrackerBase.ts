@@ -24,10 +24,14 @@ export abstract class TrackerBase<V> {
    */
   protected sampleLimit:number;
 
-  constructor(readonly id:string = `TrackerBase`, opts:TrackedValueOpts = {}) {
-    this.storeIntermediate = opts.storeIntermediate ?? false;
-    this.resetAfterSamples = opts.resetAfterSamples ?? -1;
+  public readonly id:string;
+
+  constructor(opts:TrackedValueOpts = {}) {
+    this.id = opts.id ?? `tracker`;
     this.sampleLimit = opts.sampleLimit ?? -1;
+    this.resetAfterSamples = opts.resetAfterSamples ?? -1;
+
+    this.storeIntermediate = opts.storeIntermediate ?? (this.sampleLimit>-1 || this.resetAfterSamples > -1);
     this.seenCount = 0;
   }
 
