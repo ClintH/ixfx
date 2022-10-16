@@ -1,4 +1,4 @@
-import {IsEqual, ToString} from "../Util.js";
+import { IsEqual, ToString } from "../Util.js";
 
 // ✔ UNIT TESTED!
 
@@ -24,7 +24,7 @@ export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, compare
   return values.some(v => comparer(v, value));
 };
 
-export type GetOrGenerate<K, V, Z> = (key:K, args?:Z) => Promise<V>;
+export type GetOrGenerate<K, V, Z> = (key:K, args?:Z)=>Promise<V>;
 
 /**
  * Returns a function that fetches a value from a map, or generates and sets it if not present.
@@ -89,7 +89,7 @@ export const getOrGenerateSync = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>V
  * @param values 
  * @returns 
  */
-export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFunc: ToString<V>, ...values:readonly V[]) => {
+export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFunc:ToString<V>, ...values:readonly V[]) => {
   const s = set === undefined ? new Map() : new Map(set);
   values.forEach(v => {
     const vStr = hashFunc(v);
@@ -141,7 +141,7 @@ export const hasAnyValue = <K, V>(map:ReadonlyMap<K, V>, value:V, comparer:IsEqu
  * @returns Values that match predicate
  */
 //eslint-disable-next-line func-style
-export function * filter<V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean) {
+export function * filter<V>(map:ReadonlyMap<string, V>, predicate:(v:V)=>boolean) {
   for (const v of map.values()) {
     if (predicate(v)) yield v;
   }
@@ -157,6 +157,23 @@ export function * filter<V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boole
 export const toArray = <V>(map:ReadonlyMap<string, V>):ReadonlyArray<V> => Array.from(map.values());
 
 /**
+ * Returns a Map from an iterable
+ * @param data Input data
+ * @param keyFn Function which returns a string id
+ * @param allowOverwrites If true, items with same id will silently overwrite each other, with last write wins
+ * @returns 
+ */
+export const fromIterable = <V>(data:Iterable<V>, keyFn:(v:V)=>string, allowOverwrites = false):ReadonlyMap<string, V> => {
+  const m = new Map<string, V>();
+  for (const d of data) {
+    const id = keyFn(d);
+    if (m.has(id) && !allowOverwrites) throw new Error(`id ${id} is already used and new data will overwrite it. `);
+    m.set(id, d);
+  }
+  return m;
+};
+
+/**
  * Returns the first found item that matches `predicate` or _undefined_.
  * 
  * If you want all matches, use {@link filter}.
@@ -169,7 +186,7 @@ export const toArray = <V>(map:ReadonlyMap<string, V>):ReadonlyArray<V> => Array
  * @param predicate Function that returns true for a matching item
  * @returns Found item or _undefined_
  */
-export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):V|undefined =>  Array.from(map.values()).find(vv => predicate(vv));
+export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V)=>boolean):V|undefined =>  Array.from(map.values()).find(vv => predicate(vv));
 
 /**
  * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link mapToObj}.
@@ -195,7 +212,7 @@ export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V) => boolean):
  * @returns 
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const mapToObjTransform = <T, K>(m: ReadonlyMap<string, T>, valueTransform: (value: T) => K): {readonly [key: string]: K} => Array.from(m).reduce((obj: any, [key, value]) => {
+export const mapToObjTransform = <T, K>(m:ReadonlyMap<string, T>, valueTransform:(value:T)=>K):{readonly [key:string]:K} => Array.from(m).reduce((obj:any, [key, value]) => {
   const t = valueTransform(value);
   /* eslint-disable-next-line functional/immutable-data */
   obj[key] = t;
@@ -250,8 +267,8 @@ export const zipKeyValue = <V>(keys:ReadonlyArray<string>, values:ArrayLike<V|un
  * @returns 
  */
 export const transformMap = <K, V, R>(
-  source: ReadonlyMap<K, V>,
-  transformer: (value: V, key: K) => R
+  source:ReadonlyMap<K, V>,
+  transformer:(value:V, key:K)=>R
 ) => new Map(
     Array.from(source, v => [v[0], transformer(v[1], v[0])])
   );
@@ -268,7 +285,7 @@ export const transformMap = <K, V, R>(
  * @returns 
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const mapToObj = <T>(m: ReadonlyMap<string, T>): { readonly [key: string]: T} => Array.from(m).reduce((obj: any, [key, value]) => {
+export const mapToObj = <T>(m:ReadonlyMap<string, T>):{ readonly [key:string]:T} => Array.from(m).reduce((obj:any, [key, value]) => {
   /* eslint-disable-next-line functional/immutable-data */
   obj[key] = value;
   return obj;
@@ -305,8 +322,66 @@ export const mapToObj = <T>(m: ReadonlyMap<string, T>): { readonly [key: string]
  * @returns 
  */
 export const mapToArray = <K, V, R>(
-  m: ReadonlyMap<K, V>,
-  transformer: (key: K, item: V) => R
+  m:ReadonlyMap<K, V>,
+  transformer:(key:K, item:V)=>R
 ):readonly R[] => Array.from(m.entries()).map(x => transformer(x[0], x[1]));
 // End Functions by Kees C. Bakker
 //#endregion
+
+/**
+ * Returns a result of a merged into b.
+ * B is always the 'newer' data that takes
+ * precedence.
+ */
+export type MergeReconcile<V> = (a:V, b:V)=>V;
+
+/**
+ * Merges maps left to right, using the provided
+ * `reconcile` function to choose a winner when keys overlap.
+ * 
+ * There's also [Arrays.mergeByKey](functions/Collections.Arrays.mergeByKey.html) if you don't already have a map.
+ * 
+ * For example, if we have the map A:
+ * 1 => `A-1`, 2 => `A-2`, 3 => `A-3`
+ * 
+ * And map B:
+ * 2 => `B-1`, 2 => `B-2`, 4 => `B-4`
+ * 
+ * If they are merged with the reconile function:
+ * ```js
+ * const reconcile = (a, b) => b.replace(`-`, `!`);
+ * const output = mergeByKey(reconcile, mapA, mapB);
+ * ```
+ * 
+ * The final result will be:
+ * 
+ * 1 => `B!1`, 2 => `B!2`, 3 => `A-3`, 4 => `B-4`
+ * 
+ * In this toy example, it's obvious how the reconciler transforms
+ * data where the keys overlap. For the keys that do not overlap -
+ * 3 and 4 in this example - they are copied unaltered.
+ * 
+ * A practical use for `mergeByKey` has been in smoothing keypoints
+ * from a TensorFlow pose. In this case, we want to smooth new keypoints
+ * with older keypoints. But if a keypoint is not present, for it to be 
+ * passed through.
+ * 
+ * @param reconcile 
+ * @param maps 
+ */
+export const mergeByKey = <K, V>(reconcile:MergeReconcile<V>, ...maps:readonly ReadonlyMap<K, V>[]):ReadonlyMap<K, V> => {
+  const result = new Map<K, V>();
+  for (const m of maps) {
+    for (const [mk, mv] of m) {
+      //eslint-disable-next-line functional/no-let
+      let v = result.get(mk);
+      if (v) {
+        v = reconcile(v, mv);
+      } else {
+        v = mv;
+      }
+      result.set(mk, v);
+    }
+  }
+  return result;
+};
