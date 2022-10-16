@@ -2,6 +2,10 @@ A rough changelog between NPM releases
 
 # 0.6.6
 
+* Arrays.mergeByKey: merge two arrays with a custom key-generation function and reconciler.
+* Arrays.reducePairwise: reduce-style function but pairwise
+* Maps.fromIterable: create a map from an iterable, such as an array
+* Maps.mergeByKey: merge two maps using a reconcile function
 * data/Correlate: Attempts to correlate two data sets by id and a supplied similarity function. Used for matching pose data from TensorFlow.js
 * flow/Timer.relativeTimerTicks: compute progression based on ticks instead of time
 * flow/everyNth: returns true every nth invocation.
