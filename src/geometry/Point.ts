@@ -1025,6 +1025,15 @@ export const compare = (a:Point, b:Point):number => {
   return NaN;
 };
 
+/**
+ * Compares points based on x value.
+ * Returns above 0 if a.x > b.x (to the right)
+ * Returns 0 if a.x === b.x
+ * Returns below 0 if a.x < b.x (to the left)
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const compareByX = (a:Point, b:Point):number =>  a.x - b.x || a.y - b.y;
 
 /**

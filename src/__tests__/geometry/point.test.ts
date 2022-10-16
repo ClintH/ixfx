@@ -18,6 +18,16 @@ test(`subtract`, () => {
   expect(() => Points.subtract(1, 2, 0, NaN)).toThrow();
 });
 
+test(`compareByX`, () => {
+  expect(Points.compareByX({ x:100, y:0 }, { x:50, y:0 })).toBeGreaterThan(0);
+  expect(Points.compareByX({ x:10, y:0 }, { x:10, y:0 })).toEqual(0);
+  expect(Points.compareByX({ x:60, y:0 }, { x:50, y:0 })).toBeGreaterThan(0);
+  expect(Points.compareByX({ x:-100, y:0 }, { x:50, y:0 })).toBeLessThan(0);
+  expect(Points.compareByX({ x:0, y:0 }, { x:50, y:0 })).toBeLessThan(0);
+
+
+});
+
 test(`sum`, () => {
   expect(Points.sum({ x:5, y:10 }, 1)).toEqual({ x: 6, y: 11 });
 
