@@ -5,7 +5,7 @@
 
 import { integer as guardInteger } from '../Guards.js';
 import { defaultRandom, RandomSource } from '../Random.js';
-import { IsEqual, isEqualDefault, isEqualValueDefault } from '../Util.js';
+import { IsEqual, isEqualDefault, isEqualValueDefault, ToString } from '../Util.js';
 
 export * from './NumericArrays.js';
 
@@ -601,3 +601,103 @@ export function chunks<V>(arr:ReadonlyArray<V>, size:number) {
   }
   return output;
 }
+
+/**
+ * Returns a result of a merged into b.
+ * B is always the 'newer' data that takes
+ * precedence.
+ */
+export type MergeReconcile<V> = (a:V, b:V)=>V;
+
+/**
+ * Merges arrays left to right, using the provided
+ * `reconcile` function to choose a winner when keys overlap.
+ * 
+ * There's also [Maps.mergeByKey](functions/Collections.Maps.mergeByKey.html) if the input data is in Map form.
+ * 
+ * For example, if we have the array A:
+ * [`A-1`, `A-2`, `A-3`]
+ * 
+ * And array B:
+ * [`B-1`, `B-2`, `B-4`]
+ * 
+ * And with the key function:
+ * ```js
+ * // Make a key for value based on last char
+ * const keyFn = (v) => v.substr(-1, 1);
+ * ```
+ * 
+ * If they are merged with the reconile function:
+ * ```js
+ * const reconcile = (a, b) => b.replace(`-`, `!`);
+ * const output = mergeByKey(keyFn, reconcile, arrayA, arrayB);
+ * ```
+ * 
+ * The final result will be:
+ * 
+ * [`B!1`, `B!2`, `A-3`, `B-4`]
+ * 
+ * In this toy example, it's obvious how the reconciler transforms
+ * data where the keys overlap. For the keys that do not overlap -
+ * 3 and 4 in this example - they are copied unaltered.
+ * 
+ * A practical use for `mergeByKey` has been in smoothing keypoints
+ * from a TensorFlow pose. In this case, we want to smooth new keypoints
+ * with older keypoints. But if a keypoint is not present, for it to be 
+ * passed through.
+ * 
+ * @param keyFn Function to generate a unique key for data
+ * @param reconcile Returns value to decide 'winner' when keys conflict.
+ * @param arrays Arrays of data to merge 
+ */
+export const mergeByKey = <V>(keyFn:ToString<V>, reconcile:MergeReconcile<V>, ...arrays:readonly ReadonlyArray<V>[]):ReadonlyArray<V> => {
+  const result = new Map<string, V>();
+  for (const m of arrays) {
+    for (const mv of m) {
+      const mk = keyFn(mv);
+      //eslint-disable-next-line functional/no-let
+      let v = result.get(mk);
+      if (v) {
+        v = reconcile(v, mv);
+      } else {
+        v = mv;
+      }
+      result.set(mk, v);
+    }
+  }
+  return [...result.values()];
+};
+
+/**
+ * Reduces in a pairwise fashion.
+ * 
+ * Eg, if we have input array of [1, 2, 3, 4, 5], the
+ * `reducer` fn will run with 1,2 as parameters, then 2,3, then 3,4 etc. 
+ * ```js
+ * const values = [1, 2, 3, 4, 5]
+ * reducePairwise(values, (acc, a, b) => {
+ *  return acc + (b - a);
+ * }, 0);
+ * ```
+ * 
+ * If input array has less than two elements, the initial value is returned.
+ * 
+ * ```js
+ * const reducer = (acc:string, a:string, b:string) => acc + `[${a}-${b}]`;
+ * const result = reducePairwise(`a b c d e f g`.split(` `), reducer, `!`);
+ * Yields: `![a-b][b-c][c-d][d-e][e-f][f-g]`
+ * ```
+ * @param arr 
+ * @param reducer 
+ * @param initial 
+ * @returns 
+ */
+export const reducePairwise = <V, X>(arr:readonly V[], reducer:(acc:X, a:V, b:V)=>X, initial:X) => {
+  guardArray(arr, `arr`);
+  if (arr.length < 2) return initial;
+  //eslint-disable-next-line functional/no-let
+  for (let i=0;i<arr.length-1;i++) {
+    initial = reducer(initial, arr[i], arr[i+1]);
+  }
+  return initial;
+};

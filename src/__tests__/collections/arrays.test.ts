@@ -1,6 +1,65 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import {zip,areValuesIdentical,ensureLength,remove} from '../../collections/Arrays.js';
+import {reducePairwise,mergeByKey,zip,areValuesIdentical,ensureLength,remove} from '../../collections/Arrays.js';
+
+test(`array-reducePairwise`, () => {
+
+  const reducer = (acc:string, a:string, b:string) => {
+    return acc + `[${a}-${b}]`;
+  };
+
+  const t1 = reducePairwise(`a b c d e f g`.split(` `), reducer, `!`);
+  expect(t1).toEqual(`![a-b][b-c][c-d][d-e][e-f][f-g]`);
+
+  const t2 = reducePairwise(`a b c d e f`.split(` `), reducer, `!`);
+  expect(t2).toEqual(`![a-b][b-c][c-d][d-e][e-f]`);
+  
+  const t3 = reducePairwise([], reducer, `!`);
+  expect(t3).toEqual(`!`);
+  
+  const t4 = reducePairwise([`a`], reducer, `!`);
+  expect(t4).toEqual(`!`);
+  
+  // @ts-ignore
+  expect(() => reducePairwise(`hello`, reducer, ``)).toThrow();
+
+});
+
+test(`array-mergeByKey`, () => {
+  const a1 = [`1-1`,`1-2`,`1-3`,`1-4`];
+  const a2 = [`2-1`,`2-2`,`2-3`,`2-5`];
+
+  const keyFn = (v:string) => v.substr(-1,1);
+  const reconcileFn = (a:string, b:string) => {
+    return b.replace(`-`, `!`);
+  };
+
+  const t1 = mergeByKey(keyFn,reconcileFn, a1, a2);
+
+  expect(t1.length).toEqual(5);
+  expect(t1).toContainEqual(`2!1`);
+  expect(t1).toContainEqual(`2!2`);
+  expect(t1).toContainEqual(`2!3`);
+  expect(t1).toContainEqual(`1-4`);
+  expect(t1).toContainEqual(`2-5`);
+
+  // Test with empty second param
+  const a4:string[] = [];
+  const t2 = mergeByKey(keyFn, reconcileFn, a1, a4);
+  expect(t2.length).toEqual(4);
+  expect(t2).toContainEqual(`1-1`);
+  expect(t2).toContainEqual(`1-2`);
+  expect(t2).toContainEqual(`1-3`);
+  expect(t2).toContainEqual(`1-4`);
+
+  // Test with empty first param
+  const t3 = mergeByKey(keyFn, reconcileFn, a4, a1);
+  expect(t3.length).toEqual(4);
+  expect(t3).toContainEqual(`1-1`);
+  expect(t3).toContainEqual(`1-2`);
+  expect(t3).toContainEqual(`1-3`);
+  expect(t3).toContainEqual(`1-4`);
+});
 
 test(`remove`, () => {
   expect(remove([1,2,3], 2)).toEqual([1,2]);
