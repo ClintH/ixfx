@@ -10,7 +10,9 @@ npm run develop // continually rebuild just with tsc
 npm run dev     // continually rebuild & bundle with tsup
 ```
 
-Build Typescript sources, running a single file with source map support. Note that the path is the intermediate build path, rather than the `./src/` path, and the `JS` extension is used.
+Build Typescript sources, running a single file with source map support. Note
+that the path is the intermediate build path, rather than the `./src/` path, and
+the `JS` extension is used.
 
 ```
 npm run run -- ./etc/build/StateMachine.js
@@ -18,7 +20,7 @@ npm run run -- ./etc/build/StateMachine.js
 
 ## Using a local copy of ixfx
 
-If you're working in other repositories, but want to use a local copy of `ixfx`. 
+If you're working in other repositories, but want to use a local copy of `ixfx`.
 
 ```
 (in ixfx repo)
@@ -29,17 +31,21 @@ npm link ixfx
 ```
 
 In remote repo, it should be possible to consume the library:
+
 ```
-import {Geometry} from 'ixfx/lib/geometry';
+import { Geometry } from 'ixfx/lib/geometry';
 ```
 
-If you're working on [demos](https://github.com/ClintH/ixfx-demos), you can build & copy files, assuming `ixfx-demos` is cloned in the same parent folder as `ixfx`:
+If you're working on [demos](https://github.com/ClintH/ixfx-demos), you can
+build & copy files, assuming `ixfx-demos` is cloned in the same parent folder as
+`ixfx`:
 
 ```
 npm run demos
 ```
 
-Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos are always using the latest changes to the library.
+Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos
+are always using the latest changes to the library.
 
 ## Deploying
 
@@ -63,16 +69,19 @@ npm run docs:watch // Auto-rebuilt as source changes
 The `tests` folder contains Jest unit tests.
 
 Run all tests:
+
 ```
 npm run test
 ```
 
 Run a single test:
+
 ```
 npm run test grid.test.ts
 ```
 
 Test coverage report:
+
 ```
 npm run test:coverage
 ```

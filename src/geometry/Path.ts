@@ -11,6 +11,11 @@ export type Path = {
    */
   interpolate(t:number):Points.Point
   bbox():Rects.RectPositioned
+  /**
+   * Returns the nearest point on path to `point`
+   * @param point 
+   */
+  nearest(point:Points.Point):Points.Point
   toString():string
   toSvgString():readonly string[]
   readonly kind:`compound` | `elliptical` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
