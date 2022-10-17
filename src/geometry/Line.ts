@@ -378,7 +378,7 @@ export const getPointsParam = (aOrLine:Points.Point|Line, b?:Points.Point):reado
  * 
  * ```js
  * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
- * const pt = Linesnearest(line, {x:10,y:10});
+ * const pt = Lines.nearest(line, {x:10,y:10});
  * ```
  * 
  * If an array of lines is provided, it will be the closest point amongst all the lines
@@ -977,6 +977,7 @@ export const toPath = (line:Line):LinePath => {
     toSvgString: () => toSvgString(a, b),
     toPoints: () => [a, b],
     rotate: (amountRadian:number, origin:Points.Point) => toPath(rotate(line, amountRadian, origin)),
+    nearest:(point:Point) => nearest(line, point),
     sum:(point:Points.Point) => toPath(sum(line, point)),
     divide:(point:Points.Point) => toPath(divide(line, point)),
     multiply:(point:Point) => toPath(multiply(line, point)),
