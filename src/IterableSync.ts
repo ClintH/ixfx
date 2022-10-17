@@ -10,7 +10,39 @@
  * @returns 
  */
 
-import {IsEqual} from "./Util";
+import { IsEqual } from "./Util";
+
+/**
+ * Yields chunks of the iterable `it` such that the end of a chunk is the
+ * start of the next chunk.
+ * 
+ * Eg, with the input [1,2,3,4,5] and a size of 2, we would get back
+ * [1,2], [2,3], [3,4], [4,5].
+ * 
+ * 
+ * @param it 
+ * @param size 
+ * @returns 
+ */
+export function* chunksOverlapping<V>(it:Iterable<V>, size:number) {
+  if (size <= 1) throw new Error(`Size should be at least 2`);
+
+  //eslint-disable-next-line functional/no-let
+  let buffer:V[] = [];
+  
+  for (const v of it) {
+    //eslint-disable-next-line functional/immutable-data
+    buffer.push(v);
+    if (buffer.length === size) {
+      yield buffer;
+      //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      buffer = [buffer.at(-1)!];
+    }
+  }
+  if (buffer.length <= 1) return;
+
+  if (buffer.length > 0) yield buffer;
+}
 
 /**
  * Breaks an iterable into array chunks
@@ -57,7 +89,7 @@ export function* concat<V>(...its:readonly Iterable<V>[]) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export function* dropWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function* dropWhile<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   
   for (const v of it) { 
     if (!f(v)) {
@@ -98,7 +130,7 @@ export function equals<V>(it1:IterableIterator<V>, it2:IterableIterator<V>, equa
  * @returns 
  */
 //eslint-disable-next-line func-style
-export function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function every<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let ok = true;
@@ -130,7 +162,7 @@ export function* fill<V>(it:Iterable<V>, v:V) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export function forEach<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function forEach<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for (const v of it) f(v);
@@ -145,7 +177,7 @@ export function forEach<V>(it:Iterable<V>, f:(v:V) => boolean) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export function* filter<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function* filter<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for (const v of it) {
@@ -165,7 +197,7 @@ export function* filter<V>(it:Iterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export  function find<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export  function find<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for (const v of it) { 
@@ -205,7 +237,7 @@ export function* flatten<V>(it:Iterable<V>) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export function* map<V, X>(it:Iterable<V>, f:(v:V) => X) {
+export function* map<V, X>(it:Iterable<V>, f:(v:V)=>X) {
   // https://surma.github.io/underdash/
   
   for (const v of it) { 
@@ -304,7 +336,7 @@ export function* range(start:number, len:number) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export function reduce<V>(it:Iterable<V>, f:(acc:V, current:V) => V, start:V) {
+export function reduce<V>(it:Iterable<V>, f:(acc:V, current:V)=>V, start:V) {
   // https://surma.github.io/underdash/
   
   for (const v of it) start = f(start, v);
@@ -345,7 +377,7 @@ export function* slice<V>(it:Iterable<V>, start = 0, end = Number.POSITIVE_INFIN
  * @returns 
  */
 //eslint-disable-next-line func-style
-export function some<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function some<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for (const v of it) { 
@@ -365,7 +397,7 @@ export function some<V>(it:Iterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export function* takeWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export function* takeWhile<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for (const v of it) {
@@ -384,7 +416,7 @@ export function* takeWhile<V>(it:Iterable<V>, f:(v:V) => boolean) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export function* unique<V>(it:Iterable<V>, f:((id:V) => V) = id => id) {
+export function* unique<V>(it:Iterable<V>, f:((id:V)=>V) = id => id) {
   // https://surma.github.io/underdash/
   const buffer = [];
   
