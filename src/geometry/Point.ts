@@ -19,22 +19,27 @@ export type Point3d = Point & {
 };
 
 /**
- * Returns a Point form of either a point, or pair of x,y
+ * Returns a Point form of either a point, x,y params or x,y,z params
  * @ignore
  * @param a 
  * @param b 
  * @returns 
  */
-export function getPointParam(a?:Point|number, b?:number|boolean):Point {
+export function getPointParam(a?:Point|number, b?:number|boolean, c?:number):Point|Point3d {
   if (a === undefined) return { x:0, y:0 };
 
   if (Points.isPoint(a)) {
     return a;
   } else if (typeof a !== `number` || typeof b !== `number`) {
     throw new Error(`Expected point or x,y as parameters. Got: a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
-  } else {
-    return Object.freeze({ x: a, y: b });
   }
+  
+  // x,y,z
+  if (typeof c === `number`) {
+    return Object.freeze({ x: a, y: b, z:c });
+  } 
+  // x,y
+  return Object.freeze({ x: a, y: b });
 }
 
 export const dotProduct = (...pts:readonly Point[]):number => {
@@ -82,7 +87,10 @@ export const isPlaceholder = (p:Point) => Number.isNaN(p.x) && Number.isNaN(p.y)
  */
 export const isNull = (p:Point) => p.x === null && p.y === null;
 
-
+/***
+ * Returns true if p.x or p.y isNaN
+ */
+export const isNaN = (p:Point) => Number.isNaN(p.x) || Number.isNaN(p.y);
 /**
  * Returns the 'minimum' point from an array of points, using a comparison function.
  * 
@@ -150,17 +158,37 @@ export function distance(a:Point, x:number, y:number):number;
 export function distance(a:Point):number;
 
 /**
- * Calculate distance between two points
- * @param a 
- * @param b 
+ * Calculate distance between two points.
+ * 
+ * ```js`
+ * // Distance between two points
+ * const ptA = { x: 0.5, y:0.8 };
+ * const ptB = { x: 1, y: 0.4 };
+ * distance(ptA, ptB);
+ * // Or, provide x,y as parameters
+ * distance(ptA, 0.4, 0.9);
+ * 
+ * // Distance from ptA to x: 0.5, y:0.8, z: 0.1
+ * const ptC = { x: 0.5, y:0.5, z: 0.3 };
+ * // With x,y,z as parameters:
+ * distance(ptC, 0.5, 0.8, 0.1);
+ * ``
+ * @param a First point
+ * @param xOrB Second point, or x coord
+ * @param y y coord, if x coord is given
+ * @param z Optional z coord, if x and y are given.
  * @returns 
  */
 //eslint-disable-next-line func-style
-export function distance(a:Point, xOrB?:Point|number, y?:number):number {
-  const pt = getPointParam(xOrB, y);
+export function distance(a:Point|Point3d, xOrB?:Point|Point3d|number, y?:number, z?:number):number {
+  const pt = getPointParam(xOrB, y, z);
   guard(pt);
   
-  return Math.hypot(pt.x-a.x, pt.y-a.y);
+  if (isPoint3d(pt) && isPoint3d(a)) {
+    return Math.hypot(pt.x-a.x, pt.y-a.y, pt.z-a.z);
+  }else {
+    return Math.hypot(pt.x-a.x, pt.y-a.y);
+  }
 }
 
 /**
@@ -1498,6 +1526,20 @@ export const relation = (a:Point|number, b?:number):PointRelation => {
   return update;
 };
 
+export const progressBetween = (currentPos:Points.Point|Points.Point3d, from:Points.Point|Points.Point3d, to:Points.Point|Points.Point3d) => {
+  // Via: https://www.habrador.com/tutorials/math/2-passed-waypoint/?s=09
+  // from -> current
+  const a = Points.subtract(currentPos, from);
+  
+  // from -> to
+  const b = Points.subtract(to, from);
+
+  if (Points.isPoint3d(a) && Points.isPoint3d(b)) {
+    return (a.x*b.x + a.y*b.y + a.z * b.z) / (b.x * b.x + b.y * b.y + b.z*b.z);
+  } else {
+    return (a.x*b.x + a.y*b.y) / (b.x * b.x + b.y * b.y);
+  }
+};
 // const p = { x: 100, y: 100 };
 // console.log(`distance: ` + distance(p));
 // const pp = clampMagnitude(p, 10);
