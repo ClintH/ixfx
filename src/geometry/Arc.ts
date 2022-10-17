@@ -1,21 +1,21 @@
-import {degreeToRadian, Polar} from './index.js';
-import {guard as guardPoint, isPoint} from './Point.js';
-import {Path} from './Path.js';
-import {Lines, Points, Rects} from './index.js';
+import { degreeToRadian, Polar } from './index.js';
+import { guard as guardPoint, isPoint } from './Point.js';
+import { Path } from './Path.js';
+import { Lines, Points, Rects } from './index.js';
 
 /**
  * Returns true if parameter is an arc
  * @param p Arc or number
  * @returns 
  */
-export const isArc = (p: Arc|number|unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
+export const isArc = (p:Arc|number|unknown):p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 
 /**
  * Returns true if parameter has a positioned (x,y) 
  * @param p Point, Arc or ArcPositiond
  * @returns 
  */
-export const isPositioned = (p: Points.Point | Arc| ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
+export const isPositioned = (p:Points.Point | Arc| ArcPositioned):p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 /**
  * Arc, defined by radius, start and end point in radians, and whether it is counter-clockwise.
@@ -95,7 +95,7 @@ export const toLine = (arc:ArcPositioned):Lines.Line => Lines.fromPoints(
  * @param origin Origin of arc (0,0 used by default)
  * @returns Coordinate
  */
-export const point = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.Point): Points.Point => {
+export const point = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.Point):Points.Point => {
   if (angleRadian > arc.endRadian) throw new Error(`angleRadian beyond end angle of arc`);
   if (angleRadian < arc.startRadian) throw new Error(`angleRadian beyond start angle of arc`);
 
@@ -103,7 +103,7 @@ export const point = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.
     if (isPositioned(arc)) {
       origin = arc;
     } else {
-      origin = {x:0, y:0};
+      origin = { x:0, y:0 };
     }
   }
   return {
@@ -157,11 +157,12 @@ export const interpolate:Interpolate = (amount:number, arc:ArcPositioned|Arc, or
  * @param arc 
  * @returns Path
  */
-export const toPath = (arc:ArcPositioned): Path => {
+export const toPath = (arc:ArcPositioned):Path => {
   guard(arc);
 
   return Object.freeze({
     ...arc,
+    nearest:(point:Points.Point) => { throw new Error(`not implemented`); },
     interpolate:(amount:number) => interpolate(amount, arc),
     bbox:() => bbox(arc) as Rects.RectPositioned,
     length: () => length(arc),
@@ -204,15 +205,15 @@ type ToSvg = {
    * @param startRadian Start
    * @param endRadian End
    */
-  (origin:Points.Point, radius:number, startRadian:number, endRadian:number, opts?:SvgOpts): readonly string[];
+  (origin:Points.Point, radius:number, startRadian:number, endRadian:number, opts?:SvgOpts):readonly string[];
   /**
    * SVG path for non-positioned arc
    */
-  (arc:Arc, origin:Points.Point, opts?:SvgOpts): readonly string[];
+  (arc:Arc, origin:Points.Point, opts?:SvgOpts):readonly string[];
 /**
  * SVG path for positioned arc
  */
-  (arc:ArcPositioned, opts?:SvgOpts): readonly string[];
+  (arc:ArcPositioned, opts?:SvgOpts):readonly string[];
 };
 
 
@@ -228,7 +229,7 @@ export const toSvg:ToSvg = (a:Points.Point|Arc|ArcPositioned, b?:number|Points.P
       if (isPoint(b)) {
         return toSvgFull(b, a.radius, a.startRadian, a.endRadian, c as SvgOpts);
       } else {
-        return toSvgFull({x: 0, y: 0 }, a.radius, a.startRadian, a.endRadian);
+        return toSvgFull({ x: 0, y: 0 }, a.radius, a.startRadian, a.endRadian);
       }
     }
   } else {
@@ -273,7 +274,7 @@ const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRa
   const start = Polar.toCartesian(radius, endRadian - 0.01, origin);
   const end = Polar.toCartesian(radius, startRadian, origin);
   
-  const {largeArc = false, sweep = false} = opts;
+  const { largeArc = false, sweep = false } = opts;
 
   const d = [`
     M ${start.x} ${start.y}

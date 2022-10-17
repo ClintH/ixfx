@@ -16,6 +16,7 @@ const pi = Math.PI;
 
 export type Vector = Points.Point | Polar.Coord;
 
+
 /**
  * Create a vector from a point
  * 

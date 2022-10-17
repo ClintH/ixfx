@@ -1,16 +1,16 @@
-import {Points, Lines} from './index.js';
+import { Points, Lines } from './index.js';
 
 export type Rect = {
-  readonly width: number,
-  readonly height: number,
+  readonly width:number,
+  readonly height:number,
 }
 export type RectPositioned = Points.Point & Rect;
 
-export const empty = Object.freeze({width:0, height: 0});
-export const emptyPositioned = Object.freeze({x:0, y:0, width:0, height: 0});
+export const empty = Object.freeze({ width:0, height: 0 });
+export const emptyPositioned = Object.freeze({ x:0, y:0, width:0, height: 0 });
 
-export const placeholder = Object.freeze({width: Number.NaN, height: Number.NaN});
-export const placeholderPositioned = Object.freeze({x: Number.NaN, y:Number.NaN, width: Number.NaN, height: Number.NaN});
+export const placeholder = Object.freeze({ width: Number.NaN, height: Number.NaN });
+export const placeholderPositioned = Object.freeze({ x: Number.NaN, y:Number.NaN, width: Number.NaN, height: Number.NaN });
 
 export const isEmpty = (rect:Rect):boolean => rect.width === 0 && rect.height === 0;
 export const isPlaceholder = (rect:Rect):boolean => Number.isNaN(rect.width) && Number.isNaN(rect.height);
@@ -20,14 +20,14 @@ export const isPlaceholder = (rect:Rect):boolean => Number.isNaN(rect.width) && 
  * @param p Point, Rect or RectPositiond
  * @returns 
  */
-export const isPositioned = (p: Points.Point | Rect | RectPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
+export const isPositioned = (p:Points.Point | Rect | RectPositioned):p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 /**
  * Returns _true_ if `p` has width and height.
  * @param p
  * @returns 
  */
-export const isRect = (p: number|unknown): p is Rect => {
+export const isRect = (p:number|unknown):p is Rect => {
   if (p === undefined) return false;
   if ((p as Rect).width === undefined) return false;
   if ((p as Rect).height === undefined) return false;
@@ -41,7 +41,7 @@ export const isRect = (p: number|unknown): p is Rect => {
  * @returns 
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const isRectPositioned = (p:Rect|RectPositioned|any): p is RectPositioned => isRect(p) && isPositioned(p);
+export const isRectPositioned = (p:Rect|RectPositioned|any):p is RectPositioned => isRect(p) && isPositioned(p);
 
 /**
  * Initialise a rectangle based on the width and height of a HTML element.
@@ -53,7 +53,7 @@ export const isRectPositioned = (p:Rect|RectPositioned|any): p is RectPositioned
  * @param el 
  * @returns 
  */
-export const fromElement = (el:HTMLElement): Rect => ({width: el.clientWidth, height: el.clientHeight});
+export const fromElement = (el:HTMLElement):Rect => ({ width: el.clientWidth, height: el.clientHeight });
 
 /**
  * Returns _true_ if the width & height of the two rectangles is the same.
@@ -143,19 +143,19 @@ export function fromNumbers(x:number, y:number, width:number, height:number):Rec
  * @returns 
  */
 //eslint-disable-next-line func-style
-export function fromNumbers(xOrWidth:number, yOrHeight:number, width?: number, height?:number):Rect|RectPositioned {
+export function fromNumbers(xOrWidth:number, yOrHeight:number, width?:number, height?:number):Rect|RectPositioned {
 
   if (width === undefined || height === undefined) {
     if (typeof xOrWidth !== `number`) throw new Error(`width is not an number`);
     if (typeof yOrHeight !== `number`) throw new Error(`height is not an number`);
-    return Object.freeze({width:xOrWidth, height:yOrHeight});
+    return Object.freeze({ width:xOrWidth, height:yOrHeight });
   }
   if (typeof xOrWidth !== `number`) throw new Error(`x is not an number`);
   if (typeof yOrHeight !== `number`) throw new Error(`y is not an number`);
   if (typeof width !== `number`) throw new Error(`width is not an number`);
   if (typeof height !== `number`) throw new Error(`height is not an number`);
 
-  return Object.freeze({x:xOrWidth, y:yOrHeight, width, height});
+  return Object.freeze({ x:xOrWidth, y:yOrHeight, width, height });
 }
 
 /**
@@ -182,7 +182,7 @@ export type RectPositionedArray = readonly [x:number, y:number, width:number, he
  * @param rect 
  * @see fromNumbers
  */
-export function toArray (rect:Rect): RectArray;
+export function toArray (rect:Rect):RectArray;
 
 /**
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
@@ -198,7 +198,7 @@ export function toArray (rect:Rect): RectArray;
  * @param rect 
  * @see fromNumbers
  */
-export function toArray(rect:RectPositioned): RectPositionedArray;
+export function toArray(rect:RectPositioned):RectPositionedArray;
 
 /**
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
@@ -462,7 +462,7 @@ export function intersectsPoint(rect:Rect|RectPositioned, a:Points.Point|number,
  * @param height 
  * @returns 
  */
-export const fromCenter = (origin: Points.Point, width: number, height: number): RectPositioned => {
+export const fromCenter = (origin:Points.Point, width:number, height:number):RectPositioned => {
   Points.guard(origin, `origin`);
 
   guardDim(width, `width`);
@@ -470,7 +470,7 @@ export const fromCenter = (origin: Points.Point, width: number, height: number):
 
   const halfW = width / 2;
   const halfH = height / 2;
-  return {x: origin.x - halfW, y: origin.y - halfH, width: width, height: height};
+  return { x: origin.x - halfW, y: origin.y - halfH, width: width, height: height };
 };
 
 /**
@@ -509,7 +509,7 @@ export const distanceFromExterior = (rect:RectPositioned, pt:Points.Point):numbe
  * @param pt 
  * @returns 
  */
-export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number => Points.distance(center(rect), pt);
+export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point):number => Points.distance(center(rect), pt);
 
 
 /**
@@ -524,7 +524,7 @@ export const distanceFromCenter = (rect:RectPositioned, pt:Points.Point): number
  *  - height will be largest between left and right top/bottom
  * 
  */
-export const maxFromCorners = (topLeft:Points.Point, topRight:Points.Point, bottomRight:Points.Point, bottomLeft: Points.Point):RectPositioned => {
+export const maxFromCorners = (topLeft:Points.Point, topRight:Points.Point, bottomRight:Points.Point, bottomLeft:Points.Point):RectPositioned => {
   if (topLeft.y > bottomRight.y) throw new Error(`topLeft.y greater than bottomRight.y`);
   if (topLeft.y > bottomLeft.y) throw new Error(`topLeft.y greater than bottomLeft.y`);
 
@@ -540,7 +540,7 @@ export const maxFromCorners = (topLeft:Points.Point, topRight:Points.Point, bott
   };
 };
 
-const guardDim = (d: number, name: string = `Dimension`) => {
+const guardDim = (d:number, name:string = `Dimension`) => {
   if (d === undefined) throw Error(`${name} is undefined`);
   if (isNaN(d)) throw Error(`${name} is NaN`);
   if (d < 0) throw Error(`${name} cannot be negative`);
@@ -552,7 +552,7 @@ const guardDim = (d: number, name: string = `Dimension`) => {
  * @param rect 
  * @param name 
  */
-export const guard = (rect: Rect, name: string = `rect`) => {
+export const guard = (rect:Rect, name:string = `rect`) => {
   if (rect === undefined) throw Error(`{$name} undefined`);
   if (isPositioned(rect)) Points.guard(rect, name);
   guardDim(rect.width, name + `.width`);
@@ -578,12 +578,12 @@ const guardPositioned = (rect:RectPositioned, name:string = `rect`) => {
  * @param height 
  * @returns 
  */
-export const fromTopLeft = (origin: Points.Point, width: number, height: number): RectPositioned => {
+export const fromTopLeft = (origin:Points.Point, width:number, height:number):RectPositioned => {
   guardDim(width, `width`);
   guardDim(height, `height`);
   Points.guard(origin, `origin`);
 
-  return {x: origin.x, y: origin.y, width: width, height: height};
+  return { x: origin.x, y: origin.y, width: width, height: height };
 };
 
 /**
@@ -600,16 +600,16 @@ export const fromTopLeft = (origin: Points.Point, width: number, height: number)
  * @param origin 
  * @returns 
  */
-export const corners = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Points.Point[] => {
+export const corners = (rect:RectPositioned|Rect, origin?:Points.Point):readonly Points.Point[] => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
   else if (origin === undefined) throw new Error(`Unpositioned rect needs origin param`);
 
   return [
-    {x: origin.x, y: origin.y},
-    {x: origin.x + rect.width, y: origin.y},
-    {x: origin.x + rect.width, y: origin.y + rect.height},
-    {x: origin.x, y: origin.y + rect.height}
+    { x: origin.x, y: origin.y },
+    { x: origin.x + rect.width, y: origin.y },
+    { x: origin.x + rect.width, y: origin.y + rect.height },
+    { x: origin.x, y: origin.y + rect.height }
   ];
 };
 
@@ -630,7 +630,7 @@ export const corners = (rect: RectPositioned|Rect, origin?:Points.Point): readon
  * @param edge Which edge: right, left, bottom, top
  * @returns 
  */
-export const getEdgeX = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`): number => {
+export const getEdgeX = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`):number => {
   guard(rect);
   switch (edge) {
   case `top`:
@@ -662,7 +662,7 @@ export const getEdgeX = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|
  * @param edge Which edge: right, left, bottom, top
  * @returns 
  */
-export const getEdgeY = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`): number => {
+export const getEdgeY = (rect:RectPositioned|Rect, edge:`right`|`bottom`|`left`|`top`):number => {
   guard(rect);
   switch (edge) {
   case `top`:
@@ -859,10 +859,10 @@ export function multiply(a:RectPositioned|Rect, b:Rect|number, c?:number):RectPo
  * @param origin Optional origin. Overrides `rect` position if available. If no position is available 0,0 is used by default.
  * @returns 
  */
-export const center = (rect: RectPositioned|Rect, origin?:Points.Point): Points.Point => {
+export const center = (rect:RectPositioned|Rect, origin?:Points.Point):Points.Point => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
-  else if (origin === undefined) origin = {x:0, y:0}; // throw new Error(`Unpositioned rect needs origin param`);
+  else if (origin === undefined) origin = { x:0, y:0 }; // throw new Error(`Unpositioned rect needs origin param`);
 
   return Object.freeze({
     x: origin.x + rect.width / 2,
@@ -902,7 +902,7 @@ export const lengths = (rect:RectPositioned):readonly number[] => {
  * @param {Points.Point} [origin]
  * @returns {Lines.Line[]}
  */
-export const edges = (rect: RectPositioned|Rect, origin?:Points.Point): readonly Lines.Line[] => {
+export const edges = (rect:RectPositioned|Rect, origin?:Points.Point):readonly Lines.Line[] => {
   const c = corners(rect, origin);
 
   // Connect all the corners, back to first corner again
