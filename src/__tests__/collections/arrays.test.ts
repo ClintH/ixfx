@@ -1,6 +1,19 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import {reducePairwise,mergeByKey,zip,areValuesIdentical,ensureLength,remove} from '../../collections/Arrays.js';
+import {sortByNumericProperty,reducePairwise,mergeByKey,zip,areValuesIdentical,ensureLength,remove} from '../../collections/Arrays.js';
+
+test(`array-sort`, () => {
+  const data = [ { size: 10, colour: `red` }, { size: 20, colour: `blue` }, { size: 5, colour: `pink` }, { size: 10, colour: `orange`}];
+
+  const t1 = sortByNumericProperty(data, `size`);
+console.log(t1);
+  expect(t1).toEqual([
+    { size: 5, colour: `pink` },
+     { size: 10, colour: `red` },
+     { size: 10, colour: `orange`},
+      { size: 20, colour: `blue` }])
+
+});
 
 test(`array-reducePairwise`, () => {
 

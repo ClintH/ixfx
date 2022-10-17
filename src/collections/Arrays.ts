@@ -384,6 +384,28 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
 };
 
 /**
+ * Sorts an array of objects by the given property name, assuming its a number.
+ * 
+ * ```js`
+ * const data = [ { size: 10, colour: `red` }, { size: 20, colour: `blue` }, { size: 5, colour: `pink` }];
+ * const sorted = Arrays.sortByNumericProperty(data, `size`);
+ * 
+ * Yields items ascending order:
+ * [ { size: 5, colour: `pink` }, { size: 10, colour: `red` }, { size: 20, colour: `blue` } ]
+ * ```
+ * @param data 
+ * @param propertyName 
+ */
+export const sortByNumericProperty = <V, K extends keyof V>(data:ReadonlyArray<V>, propertyName:K) => [...data].sort((a, b) => {
+  guardArray(data, `data`);
+  const av = a[propertyName];
+  const bv = b[propertyName];
+  if (av < bv) return -1;
+  if (av > bv) return 1;
+  return 0;
+});
+
+/**
  * Returns an array with a value omitted. If value is not found, result will be a copy of input.
  * Value checking is completed via the provided `comparer` function. 
  * By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
