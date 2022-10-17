@@ -1,8 +1,8 @@
 import { guard as guardPoint } from './Point.js';
 import { Path } from './Path.js';
 import { Line } from './Line.js';
-import { Points, Rects } from  './index.js';
-
+import { Points, Rects, Vectors } from  './index.js';
+import { Arrays } from '../collections/index.js';
 const piPi = Math.PI *2;
 
 /**
@@ -184,28 +184,46 @@ export const bbox = (circle:CirclePositioned|Circle):Rects.RectPositioned|Rects.
 /**
  * Returns true if `b` is completely contained by `a`
  *
- * @param a
- * @param b
+ * @param a Circle
+ * @param b Circle or point to compare to
  * @returns
  */
-export const isContainedBy = (a:CirclePositioned, b:CirclePositioned):boolean => {
+export const isContainedBy = (a:CirclePositioned, b:CirclePositioned|Points.Point):boolean => {
   const d = distanceCenter(a, b);
-  return (d < Math.abs(a.radius - b.radius));
+  if (isCircle(b)) {
+    return (d < Math.abs(a.radius - b.radius));
+  } else {
+    return d <= a.radius;
+  }
 };
 
+/***
+ * Returns true if radius, x or y are NaN
+ */
+export const isNaN = (a:Circle|CirclePositioned):boolean => {
+  if (Number.isNaN(a.radius)) return true;
+  if (isPositioned(a)) {
+    if (Number.isNaN(a.x)) return true;
+    if (Number.isNaN(a.y)) return true;
+  }
+  return false;
+};
 /**
  * Returns true if a or b overlap or are equal
  * 
  * Use `intersections` to find the points of intersection
  *
- * @param a
- * @param b
+ * @param a Circle
+ * @param b Circle or point to test
  * @returns True if circle overlap
  */
-export const isIntersecting = (a:CirclePositioned, b:CirclePositioned):boolean => {
-  if (isEqual(a, b)) return true;
+export const isIntersecting = (a:CirclePositioned, b:CirclePositioned|Points.Point):boolean => {
+  if (Points.isEqual(a, b)) return true;
   if (isContainedBy(a, b)) return true;
-  return intersections(a, b).length === 2;
+  if (isCircle(b)) {
+    return intersections(a, b).length === 2;
+  } 
+  return false;
 };
 
 /**
@@ -367,6 +385,36 @@ const toSvgFull = (radius:number, origin:Points.Point, sweep:boolean):readonly s
 };
 
 /**
+ * Returns the nearest point on `circle` closest to `point`.
+ * 
+ * ```js
+ * import { Circles } from 'https://unpkg.com/ixfx/dist/geometry.js'
+ * const pt = Circles.nearest(circle, {x:10,y:10});
+ * ```
+ * 
+ * If an array of circles is provided, it will be the closest point amongst all the circles
+ * @param circle Circle or array of circles
+ * @param point
+ * @returns Point `{ x, y }`
+ */
+export const nearest = (circle:CirclePositioned|readonly CirclePositioned[], b:Points.Point):Points.Point => {
+  const n = (a:CirclePositioned):Points.Point => {
+    const l = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y-a.y, 2));
+    const x = a.x + (a.radius * ((b.x - a.x) / l));
+    const y = a.y + (a.radius * ((b.y - a.y) / l));
+    return { x, y };
+  };
+
+  if (Array.isArray(circle)) {
+    const pts = circle.map(l => n(l));
+    const dists = pts.map(p => Points.distance(p, b));
+    return Object.freeze<Points.Point>(pts[Arrays.minIndex(...dists)]);
+  } else {
+    return Object.freeze<Points.Point>(n(circle as CirclePositioned));
+  }
+};
+
+/**
  * Returns a `CircularPath` representation of a circle
  *
  * @param {CirclePositioned} circle
@@ -377,6 +425,7 @@ export const toPath = (circle:CirclePositioned):CircularPath => {
 
   return Object.freeze({
     ...circle,
+    nearest: (point:Points.Point) => nearest(circle, point),
     /**
      * Returns a relative (0.0-1.0) point on a circle. 0=3 o'clock, 0.25=6 o'clock, 0.5=9 o'clock, 0.75=12 o'clock etc.
      * @param {t} Relative (0.0-1.0) point
@@ -417,7 +466,7 @@ export const intersectionLine = (circle:CirclePositioned, line:Line):readonly Po
   const c = 2 * (v1.x * v1.x + v1.y * v1.y);
   
   const d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - circle.radius * circle.radius));
-  if(isNaN(d)) return []; // no intercept
+  if (Number.isNaN(d)) return []; // no intercept
 
   const u1 = (b - d) / c;  // these represent the unit distance of point one and two on the line
   const u2 = (b + d) / c;    
