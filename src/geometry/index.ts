@@ -11,8 +11,9 @@ import * as Ellipses from './Ellipse.js';
 import * as Polar from './Polar.js';
 import * as Shapes from './Shape.js';
 import * as Vectors from './Vector.js';
+import * as Waypoints from './Waypoint.js';
 
-export { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, Vectors };
+export { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, Vectors, Waypoints };
 
 
 /**
