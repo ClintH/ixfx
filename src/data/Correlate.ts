@@ -95,6 +95,13 @@ export const align = <V>(fn:Similarity<V>, lastData:readonly DataWithId<V>[]|und
     // Which of the old data does the new data match up to best?
     const r = Array.from(lastMap.values()).map(last => ({ id: last.id, score: last === null ? -1 : fn(last, newD), last }
     ));
+
+    if (r.length === 0) {
+      if (debug) console.debug(`align() no valid last values id: ${newD.id}`);
+      //eslint-disable-next-line functional/immutable-data
+      newThings.push(newD);
+      continue;
+    }
     //eslint-disable-next-line functional/immutable-data
     r.sort(orderScore);
 

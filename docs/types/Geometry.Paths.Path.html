@@ -15,7 +15,7 @@
 <li><a href="../modules/Geometry.Paths.html">Paths</a></li>
 <li><a href="Geometry.Paths.Path.html">Path</a></li></ul>
 <h1>Type alias Path</h1></div>
-<div class="tsd-signature">Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;compound&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;elliptical&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;circular&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;arc&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;bezier/cubic&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;bezier/quadratic&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;line&quot;</span><span class="tsd-signature-symbol">; </span>bbox<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>interpolate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>toString<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>toSvgString<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
+<div class="tsd-signature">Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;compound&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;elliptical&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;circular&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;arc&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;bezier/cubic&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;bezier/quadratic&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;line&quot;</span><span class="tsd-signature-symbol">; </span>bbox<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>interpolate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>nearest<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>toString<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>toSvgString<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
 <div class="tsd-type-declaration">
 <h4>Type declaration</h4>
 <ul class="tsd-parameters">
@@ -50,6 +50,19 @@
 <li class="tsd-signature tsd-anchor-link" id="__type.length.length-1">length<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#__type.length.length-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4></li></ul></li>
+<li class="tsd-parameter">
+<h5>nearest<span class="tsd-signature-symbol">:</span>function</h5>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-type-literal">
+<li class="tsd-signature tsd-anchor-link" id="__type.nearest.nearest-1">nearest<span class="tsd-signature-symbol">(</span>point<span class="tsd-signature-symbol">: </span><a href="Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><a href="#__type.nearest.nearest-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns the nearest point on path to <code>point</code></p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>point: <a href="Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a></h4></li></ul></li>
 <li class="tsd-parameter">
 <h5>to<wbr/>String<span class="tsd-signature-symbol">:</span>function</h5>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-type-literal">
@@ -124,7 +137,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Isosceles.html">Isosceles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Waypoints.html">Waypoints</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Io.html">Io</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.AudioAnalysers.html">Audio<wbr/>Analysers</a></li>

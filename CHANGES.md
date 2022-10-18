@@ -1,6 +1,10 @@
 A rough changelog between NPM releases
 
-# 0.6.6
+# 0.6.7 22.10.18
+
+* Bug fix for Correlate.align
+
+# 0.6.6 22.10.17
 
 * Arrays.mergeByKey: merge two arrays with a custom key-generation function and reconciler.
 * Arrays.reducePairwise: reduce-style function but pairwise

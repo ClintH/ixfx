@@ -19,9 +19,25 @@
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
 <li class="tsd-signature tsd-anchor-link" id="distance">distance<span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a>, b<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Calculate distance between two points</p>
-
-<h3>Returns</h3></div>
+<div class="tsd-comment tsd-typography"><p>Calculate distance between two points.</p>
+<p>```js`
+// Distance between two points
+const ptA = { x: 0.5, y:0.8 };
+const ptB = { x: 1, y: 0.4 };
+distance(ptA, ptB);
+// Or, provide x,y as parameters
+distance(ptA, 0.4, 0.9);</p>
+<p>// Distance from ptA to x: 0.5, y:0.8, z: 0.1
+const ptC = { x: 0.5, y:0.5, z: 0.3 };
+// With x,y,z as parameters:
+distance(ptC, 0.5, 0.8, 0.1);
+``
+@param a First point
+@param xOrB Second point, or x coord
+@param y y coord, if x coord is given
+@param z Optional z coord, if x and y are given.
+@returns</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -32,9 +48,25 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4></li>
 <li class="tsd-signature tsd-anchor-link" id="distance-1">distance<span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Calculate distance between two points</p>
-
-<h3>Returns</h3></div>
+<div class="tsd-comment tsd-typography"><p>Calculate distance between two points.</p>
+<p>```js`
+// Distance between two points
+const ptA = { x: 0.5, y:0.8 };
+const ptB = { x: 1, y: 0.4 };
+distance(ptA, ptB);
+// Or, provide x,y as parameters
+distance(ptA, 0.4, 0.9);</p>
+<p>// Distance from ptA to x: 0.5, y:0.8, z: 0.1
+const ptC = { x: 0.5, y:0.5, z: 0.3 };
+// With x,y,z as parameters:
+distance(ptC, 0.5, 0.8, 0.1);
+``
+@param a First point
+@param xOrB Second point, or x coord
+@param y y coord, if x coord is given
+@param z Optional z coord, if x and y are given.
+@returns</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -47,9 +79,25 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4></li>
 <li class="tsd-signature tsd-anchor-link" id="distance-2">distance<span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Calculate distance between two points</p>
-
-<h3>Returns</h3></div>
+<div class="tsd-comment tsd-typography"><p>Calculate distance between two points.</p>
+<p>```js`
+// Distance between two points
+const ptA = { x: 0.5, y:0.8 };
+const ptB = { x: 1, y: 0.4 };
+distance(ptA, ptB);
+// Or, provide x,y as parameters
+distance(ptA, 0.4, 0.9);</p>
+<p>// Distance from ptA to x: 0.5, y:0.8, z: 0.1
+const ptC = { x: 0.5, y:0.5, z: 0.3 };
+// With x,y,z as parameters:
+distance(ptC, 0.5, 0.8, 0.1);
+``
+@param a First point
+@param xOrB Second point, or x coord
+@param y y coord, if x coord is given
+@param z Optional z coord, if x and y are given.
+@returns</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -118,7 +166,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Isosceles.html">Isosceles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Right.html">Right</a></li></ul></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Vectors.html">Vectors</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Waypoints.html">Waypoints</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Io.html">Io</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.AudioAnalysers.html">Audio<wbr/>Analysers</a></li>
@@ -182,6 +231,7 @@
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.invert.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>invert</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isEmpty.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Empty</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isEqual.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Equal</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isNaN.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>NaN</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isNull.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Null</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isPlaceholder.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Placeholder</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isPoint.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Point</a></li>
@@ -192,6 +242,7 @@
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.normaliseByRect.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>normalise<wbr/>By<wbr/>Rect</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.pipeline.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>pipeline</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.pipelineApply.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>pipeline<wbr/>Apply</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.progressBetween.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>progress<wbr/>Between</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.project.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>project</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.quantiseEvery.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>quantise<wbr/>Every</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.random.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>random</a></li>
