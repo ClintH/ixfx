@@ -152,6 +152,46 @@ export const repeat = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|unde
   return ret;
 };
 
+/**
+ * Repeatedly calls `fn`, reducing via `reduce`.
+ * 
+ * ```js
+ * repeatReduce(10, () => 1, (acc, v) => acc + v);
+ * // Yields: 10
+ * 
+ * // Multiplies random values against eachother 10 times
+ * repeatReduce(10, () => Math.random(), (acc, v) => acc * v);
+ * // Yields a single number
+ * ```
+ * @param countOrPredicate 
+ * @param fn 
+ * @param initial 
+ * @param reduce 
+ * @returns 
+ */
+export const repeatReduce = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>V|undefined, initial:V, reduce:(acc:V, value:V)=>V):V => {
+  if (typeof countOrPredicate === `number`) {
+    guardNumber(countOrPredicate, `positive`, `countOrPredicate`);
+    while (countOrPredicate-- > 0) {
+      const v = fn();
+      if (v === undefined) continue;
+      initial = reduce(initial, v);    
+    }
+  } else {
+    //eslint-disable-next-line functional/no-let
+    let repeats, valuesProduced;
+    repeats = valuesProduced = 0;
+    while (countOrPredicate(repeats, valuesProduced)) {
+      repeats++;
+      const v = fn();
+      if (v === undefined) continue;
+      initial = reduce(initial, v);
+      valuesProduced++;
+    }
+  }
+  return initial;
+};
+
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
