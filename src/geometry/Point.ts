@@ -884,6 +884,31 @@ export function multiply(a:Point, bOrX:Rects.Rect| Point | number, y?:number):Po
 }
 
 /**
+ * Multiplies all components by `v`.
+ * 
+ * ```js
+ * multiplyScalar({ x:2, y:4 }, 2);
+ * // Yields: { x:4, y:8 }
+ * ```
+ * @param pt Point
+ * @param v Value to multiply by
+ * @returns 
+ */
+export const multiplyScalar = (pt:Point|Point3d, v:number):Point|Point3d => {
+  if (isPoint3d(pt)) {
+    return Object.freeze({
+      x: pt.x * v,
+      y: pt.y * v,
+      z: pt.z * v
+    });
+  } else {
+    return Object.freeze({
+      x: pt.x * v,
+      y: pt.y * v
+    });
+  }
+};
+/**
  * Divides a / b:
  * ```js
  * return {
@@ -1031,6 +1056,7 @@ export const convexHull = (...pts:readonly Point[]):readonly Point[] => {
   if (upper.length === 1 && lower.length === 1 && isEqual(lower[0], upper[0])) return upper;
   return upper.concat(lower);
 };
+
 
 /**
  * Returns -2 if both x & y of a is less than b
