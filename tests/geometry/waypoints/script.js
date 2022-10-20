@@ -12,12 +12,16 @@ const settings = Object.freeze({
   waypoints: [
     { x:0.1, y:0.1 },
     { x:0.3, y:0.3 },
-    { x:0.5, y:0.5 }
+    { x:0.5, y:0.4 }
   ]
 });
 
 // Initial state - properties that change as code runs
 let state = Object.freeze({
+  /**
+   * @type {CanvasRenderingContext2D}
+   */
+  ctx:undefined,
   waypointTracker: Waypoints.fromPoints(settings.waypoints),
   bounds: {
     width: 0,
@@ -36,7 +40,8 @@ let state = Object.freeze({
   progresses: []
 });
 
-const relToAbs = (point) => Points.multiply(point, state.bounds);
+const relToAbs = (point) => Points.multiply(point, state.scaleBy,state.scaleBy);
+const absToRel = (point) => Points.divide(point, state.scaleBy,state.scaleBy);
 
 const tick = () => {
   const { pointer, waypointTracker } = state;
@@ -65,12 +70,12 @@ const tick = () => {
  */
 const drawState = () => {
   const { waypoints } = settings;
-  const {  progresses } = state;
+  const {  progresses, ctx } = state;
 
   /** @type HTMLCanvasElement|null */
-  const canvasEl = document.querySelector(`#canvas`);
-  const ctx = canvasEl?.getContext(`2d`);
-  if (!ctx || !canvasEl) return;
+  // const canvasEl = document.querySelector(`#canvas`);
+  // const ctx = canvasEl?.getContext(`2d`);
+  // if (!ctx || !canvasEl) return;
 
   // Clear canvas
   clear(ctx);
@@ -78,6 +83,11 @@ const drawState = () => {
   // Draw lines between wayoints
   ctx.fillStyle = `white`;
   ctx.strokeStyle = `silver`;
+
+  const corner1 = {x:0, y:0};
+  const corner2 = {x:1, y:1};
+
+  drawLine(ctx, corner1, corner2);
 
   // waypointLines.forEach((line, index) => {
   //   const p = progresses.find(p=>p.index === index);
@@ -95,8 +105,18 @@ const drawState = () => {
 
     drawLabelledPoint(ctx, wp, `yellow`, index.toString());
   });
-
 };
+
+const drawLine = (ctx, a, b) => {
+  a = relToAbs(a);
+  b = relToAbs(b);
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.strokeStyle = `white`;
+  ctx.stroke();
+
+}
 
 /**
  * Draws a labelled line
@@ -139,8 +159,7 @@ const clear = (ctx) => {
 };
 
 const onPointerMove = (evt) => {
-  const rel = Points.divide(evt, state.bounds);
-  updateState({ pointer: rel });
+  updateState({ pointer: absToRel(evt) });
 };
 
 /**
@@ -153,6 +172,7 @@ const setup = () => {
     // Update state with new size of canvas
     updateState({ 
       bounds: args.bounds,
+      ctx: args.ctx,
       scaleBy: Math.min(args.bounds.width, args.bounds.height)
     });
   });
