@@ -1,11 +1,11 @@
 import { randomIndex, randomElement } from "./collections/Arrays.js";
-import {number as guardNumber} from './Guards.js';
+import { number as guardNumber } from './Guards.js';
 import * as Easings from "./modulation/Easing.js";
-import {clamp} from './data/Clamp.js';
+import { clamp } from './data/Clamp.js';
 
-export {randomIndex as arrayIndex};
-export {randomElement as arrayElement};
-export {randomHue as hue} from './visual/Colour.js';
+export { randomIndex as arrayIndex };
+export { randomElement as arrayElement };
+export { randomHue as hue } from './visual/Colour.js';
 
 /**
  * Default random number generator: `Math.random`.
@@ -18,7 +18,7 @@ export const defaultRandom = Math.random;
  * 
  * Predefined sources: {@link defaultRandom}, {@link gaussianSkewed}, {@link weightedSkewed}
  */
-export type RandomSource = () => number;
+export type RandomSource = ()=>number;
 
 /***
  * Returns a random number, 0..1, weighted by a given easing function. 
