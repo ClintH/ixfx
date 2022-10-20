@@ -15,6 +15,7 @@ import * as Waypoints from './Waypoint.js';
 
 export { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, Vectors, Waypoints };
 
+export * as Scaler from './Scaler.js';
 
 /**
  * Triangle processing.
