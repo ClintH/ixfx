@@ -1,7 +1,7 @@
 import { guard as guardPoint } from './Point.js';
 import { Path } from './Path.js';
 import { Line } from './Line.js';
-import { Points, Rects, Vectors } from  './index.js';
+import { Points, Rects } from  './index.js';
 import { Arrays } from '../collections/index.js';
 const piPi = Math.PI *2;
 
@@ -296,6 +296,39 @@ export const isEqual = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):bo
 
   return false;
 };
+
+
+export function multiplyScalar(a:CirclePositioned, value:number):CirclePositioned;
+
+export function multiplyScalar(a:Circle, value:number):Circle;
+
+/**
+ * Multiplies a circle's radius and position (if provided) by `value`.
+ * 
+ * ```js
+ * multiplyScalar({ radius: 5 }, 5);
+ * // Yields: { radius: 25 }
+ * 
+ * multiplyScalar({ radius: 5, x: 10, y: 20 }, 5);
+ * // Yields: { radius: 25, x: 50, y: 100 }
+ * ```
+ */
+export function multiplyScalar(a:Circle|CirclePositioned, value:number):Circle|CirclePositioned {
+  if (isPositioned(a)) {
+    const pt = Points.multiplyScalar(a, value);
+    return Object.freeze({
+      ...a,
+      ...pt,
+      radius: a.radius * value
+    });
+  } else {
+    return Object.freeze({
+      ...a,
+      radius: a.radius * value
+    });
+  }
+}
+
 
 /**
  * Returns the distance between two circle centers.
