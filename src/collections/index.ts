@@ -1,14 +1,14 @@
 export * from  './Interfaces.js';
 
-export {mapSet, mapCircularMutable, mapArray} from './MapMultiMutable.js';
-export {circularArray} from './CircularArray.js';
-export {simpleMapArrayMutable} from './SimpleMapArray.js';
-export {setMutable} from './Set.js';
-export {stack, stackMutable} from './Stack.js';
-export {queue, queueMutable} from './Queue.js';
-export {map} from './MapImmutable.js';
-export {mapMutable} from './MapMutable.js';
-export {MapOfMutableImpl} from './MapMultiMutable.js';
+export { mapSet, mapCircularMutable, mapArray } from './MapMultiMutable.js';
+export { circularArray } from './CircularArray.js';
+export { simpleMapArrayMutable } from './SimpleMapArray.js';
+export { setMutable } from './Set.js';
+export { stack, stackMutable } from './Stack.js';
+export { queue, queueMutable } from './Queue.js';
+export { map } from './MapImmutable.js';
+export { mapMutable } from './MapMutable.js';
+export { MapOfMutableImpl } from './MapMultiMutable.js';
 
 /**
  * Stacks store items in order. 
@@ -84,6 +84,8 @@ export * as Sets from './Set.js';
  * Create queues with {@link queue} or {@link queueMutable}. These return a {@link Queue} or {@link QueueMutable} respectively.
  */
 export * as Queues from './Queue.js';
+
+export { ExpiringMap, ExpiringMapEvent, Opts as ExpiringMapOpts } from './ExpiringMap.js';
 
 /**
  * Maps associate keys with values. Several helper functions are provided
