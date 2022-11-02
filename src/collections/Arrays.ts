@@ -676,6 +676,7 @@ export const mergeByKey = <V>(keyFn:ToString<V>, reconcile:MergeReconcile<V>, ..
   const result = new Map<string, V>();
   for (const m of arrays) {
     for (const mv of m) {
+      if (mv === undefined) continue;
       const mk = keyFn(mv);
       //eslint-disable-next-line functional/no-let
       let v = result.get(mk);
