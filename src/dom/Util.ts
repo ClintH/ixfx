@@ -1,10 +1,11 @@
 import { Observable,  debounceTime, fromEvent } from 'rxjs';
 import * as Points from '../geometry/Point';
 import JSON5 from 'json5';
+import { Rects, Scaler } from '../geometry/index.js';
 
 export type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
   readonly el:V
-  readonly bounds: {
+  readonly bounds:{
     readonly width:number,
     readonly height:number
     readonly center:Points.Point
@@ -16,7 +17,7 @@ export type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
 }
 
 
-export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>) => void) => {
+export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, onResized?:(args:ElementResizeArgs<V>)=>void) => {
   const el = resolveEl<V>(domQueryOrEl);
 
   const r = windowResize();
@@ -27,8 +28,8 @@ export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, on
     el.setAttribute(`width`, width.toString());
     el.setAttribute(`height`, height.toString());
 
-    const bounds = {width, height, center: {x: width/2, y:height/2}};
-    if (onResized !== undefined) onResized({el, bounds});
+    const bounds = { width, height, center: { x: width/2, y:height/2 } };
+    if (onResized !== undefined) onResized({ el, bounds });
 
   };
   r.subscribe(update);
@@ -37,7 +38,69 @@ export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, on
   return r;
 };
 
-/// TODO: MAke fullSizeCanvas use fullSizeElement
+export type CanvasOpts = {
+  readonly skipCss?:boolean
+  readonly fullSize?:boolean
+  readonly scaleBy?:`both`|`width`|`height`|`min`|`max`;
+}
+
+export const canvasHelper = (domQueryOrEl:string|HTMLCanvasElement|undefined|null, opts:CanvasOpts) => {
+  if (!domQueryOrEl) throw new Error(`domQueryOrEl is null or undefined`);
+  const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
+  if (el.nodeName !== `CANVAS`) throw new Error(`Expected CANVAS HTML element. Got: ${el.nodeName}`);
+
+  const fullSize = opts.fullSize ?? true;
+  const ratio = Math.round(window.devicePixelRatio) || 1;
+  const scaleBy = opts.scaleBy ?? `both`;
+
+  //eslint-disable-next-line functional/no-let
+  let scaler:Scaler.Scaler = Scaler.scaler(`both`);
+
+  const updateDimensions = (rect:Rects.Rect) => {
+    // Create a new scaler
+    scaler = Scaler.scaler(scaleBy, rect);
+
+    const pixelScaled = Rects.multiply(rect, ratio, ratio);
+
+    //eslint-disable-next-line functional/immutable-data
+    el.width = pixelScaled.width;
+    //eslint-disable-next-line functional/immutable-data
+    el.height = pixelScaled.height;
+
+    //eslint-disable-next-line functional/immutable-data
+    el.style.width = rect.width + `px`;
+    //eslint-disable-next-line functional/immutable-data
+    el.style.height = rect.height +`px`;
+  };
+
+  // Window has resized
+  const onWindowResize = () => {
+    const innerWindow = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    };
+    updateDimensions(innerWindow);
+  };
+
+  const getContext = () => {
+    const ctx = el.getContext(`2d`);
+    if (ctx === null) throw new Error(`Could not create drawing context`);
+
+    ctx.scale(ratio, ratio);
+  };
+
+  if (fullSize) {
+    const r = windowResize();
+    r.subscribe(onWindowResize);
+  }
+
+  return {
+    abs: scaler.abs,
+    rel: scaler.rel,
+    getContext
+  };
+};
+
 
 /**
  * Resizes given canvas element to match window size. 
@@ -77,8 +140,9 @@ export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement|undefined|n
     //eslint-disable-next-line functional/immutable-data
     el.height = height;
 
-    const bounds = {width, height, center: {x: width/2, y:height/2}};
-    if (onResized !== undefined) onResized({ctx, el, bounds});
+    
+    const bounds = { width, height, center: { x: width/2, y:height/2 } };
+    if (onResized !== undefined) onResized({ ctx, el, bounds });
   };
 
   // Setup
@@ -154,8 +218,8 @@ export const parentSize = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:str
 
     el.setAttribute(`width`, width + `px`);
     el.setAttribute(`height`, height + `px`);
-    const bounds = {width, height, center: {x: width/2, y:height/2}};
-    if (onResized !== undefined) onResized({ el, bounds});
+    const bounds = { width, height, center: { x: width/2, y:height/2 } };
+    if (onResized !== undefined) onResized({ el, bounds });
   });
 
   return ro;
@@ -165,7 +229,7 @@ export const parentSize = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:str
  * Source: https://zellwk.com/blog/translate-in-javascript
  * @param domQueryOrEl 
  */
-export const getTranslation = (domQueryOrEl:string|HTMLElement): Points.Point => {
+export const getTranslation = (domQueryOrEl:string|HTMLElement):Points.Point => {
   // Source:
   // https://raw.githubusercontent.com/zellwk/javascript/master/src/browser/dom/translate-values.js
 
@@ -208,7 +272,7 @@ export const getTranslation = (domQueryOrEl:string|HTMLElement): Points.Point =>
     };
   }
 
-  return {x: 0, y: 0, z:0};
+  return { x: 0, y: 0, z:0 };
 };
 
 /**
@@ -253,8 +317,8 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
     el.setAttribute(`width`, el.offsetWidth + `px`);
     el.setAttribute(`height`, el.offsetHeight + `px`);
     
-    const bounds = {width, height, center: {x: width/2, y:height/2}};
-    if (onResized !== undefined) onResized({ctx, el, bounds});
+    const bounds = { width, height, center: { x: width/2, y:height/2 } };
+    if (onResized !== undefined) onResized({ ctx, el, bounds });
   });
 
   return ro;
@@ -305,7 +369,7 @@ export const resolveEl = <V extends Element>(domQueryOrEl:string|V):V => {
  * @param tagName Element to create
  * @returns New element
  */
-export const createAfter = (sibling: HTMLElement, tagName: string): HTMLElement => {
+export const createAfter = (sibling:HTMLElement, tagName:string):HTMLElement => {
   const el = document.createElement(tagName);
   sibling.parentElement?.insertBefore(el, sibling.nextSibling);
   return el;
@@ -320,7 +384,7 @@ export const createAfter = (sibling: HTMLElement, tagName: string): HTMLElement 
  * @param tagName Tag to create
  * @returns New element
  */
-export const createIn = (parent: HTMLElement, tagName: string): HTMLElement => {
+export const createIn = (parent:HTMLElement, tagName:string):HTMLElement => {
   const el = document.createElement(tagName);
   parent.appendChild(el);
   return el;
@@ -334,7 +398,7 @@ export const createIn = (parent: HTMLElement, tagName: string): HTMLElement => {
  * t(newMap)
  * ```
  */
-export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap<string, object>): (data:ReadonlyMap<string, object>) => void => {
+export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap<string, object>):(data:ReadonlyMap<string, object>)=>void => {
   const parent = resolveEl(parentOrQuery);
 
   const update = (data:ReadonlyMap<string, object>) => {
@@ -376,7 +440,7 @@ export const dataTableList = (parentOrQuery:HTMLElement|string, data:ReadonlyMap
  * Format data. Return _undefined_ to signal that
  * data was not handled.
  */
-export type DataFormatter = (data:object, path:string) => string|undefined;
+export type DataFormatter = (data:object, path:string)=>string|undefined;
 
 /**
  * Updates a TABLE elment based on `data`'s key-object pairs
@@ -473,7 +537,7 @@ export type DataTableOpts = {
  * });
  * ```
  */
-export const dataTable = (parentOrQuery:HTMLElement|string, data?:object, opts?:DataTableOpts): (data:object) => void => {
+export const dataTable = (parentOrQuery:HTMLElement|string, data?:object, opts?:DataTableOpts):(data:object)=>void => {
   const parent = resolveEl(parentOrQuery);
   const t = document.createElement(`table`);
   parent.append(t);
@@ -509,13 +573,13 @@ export const clear = (parent:HTMLElement) => {
  * ```
  * @returns 
  */
-export const themeChangeObservable = (): Observable<readonly MutationRecord[]> => {
+export const themeChangeObservable = ():Observable<readonly MutationRecord[]> => {
   const o = new Observable<MutationRecord[]>(subscriber => {
     const ro = new MutationObserver(entries => {
       subscriber.next(entries);
     });
 
-    const opts: MutationObserverInit = {
+    const opts:MutationObserverInit = {
       attributeFilter: [`class`],
       attributes: true,
     };
@@ -541,7 +605,7 @@ export const themeChangeObservable = (): Observable<readonly MutationRecord[]> =
  * @param timeoutMs Tiemout before event gets triggered
  * @returns 
  */
-export const resizeObservable = (elem: Element, timeoutMs: number = 1000): Observable<readonly ResizeObserverEntry[]> => {
+export const resizeObservable = (elem:Element, timeoutMs:number = 1000):Observable<readonly ResizeObserverEntry[]> => {
   if (elem === null) throw new Error(`elem parameter is null. Expected element to observe`);
   if (elem === undefined) throw new Error(`elem parameter is undefined. Expected element to observe`);
   
@@ -563,7 +627,7 @@ export const resizeObservable = (elem: Element, timeoutMs: number = 1000): Obser
  * @param obj 
  * @returns Promise
  */
-export const copyToClipboard = (obj: object) => {
+export const copyToClipboard = (obj:object) => {
   const p = new Promise((resolve, reject) => {
     //const json = JSON.stringify(obj, null, 2);
     const str = JSON5.stringify(obj);
@@ -581,7 +645,7 @@ export const copyToClipboard = (obj: object) => {
   return p;
 };
 
-export type CreateUpdateElement<V> = (item:V, el:HTMLElement|null) => HTMLElement;
+export type CreateUpdateElement<V> = (item:V, el:HTMLElement|null)=>HTMLElement;
 
 export const reconcileChildren = <V>(parentEl:HTMLElement, list:ReadonlyMap<string, V>, createUpdate:CreateUpdateElement<V>) => {
   if (parentEl === null) throw new Error(`parentEl is null`);
