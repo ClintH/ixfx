@@ -73,11 +73,14 @@ export const number = (value?:number, range:NumberGuardRange = ``, paramName = `
  * @param paramName Param name for customising exception message
  * @returns 
  */
-export const percent = (value: number, paramName = `?`) => number(value, `percentage`, paramName);
+export const percent = (value:number, paramName = `?`) => number(value, `percentage`, paramName);
 
 /**
  * Throws an error if `value` is not an integer, or does not meet guard criteria.
  * See {@link number} for guard details, or use that if integer checking is not required.
+ * 
+ * Note:
+ * * `bipolar` will mean -1, 0 or 1.
  * @param value Value to check
  * @param paramName Param name for customising exception message
  * @param range Guard specifier.
@@ -85,7 +88,7 @@ export const percent = (value: number, paramName = `?`) => number(value, `percen
 export const integer = (value:number, range:NumberGuardRange = ``, paramName = `?`) => {
   // Unit tested
   number(value, range, paramName);
-  if (!Number.isInteger(value)) throw new Error(`Paramter ${paramName} is not an integer`);
+  if (!Number.isInteger(value)) throw new Error(`Parameter ${paramName} is not an integer`);
 };
 
 /**
@@ -103,9 +106,9 @@ export const isStringArray = (value:unknown):boolean => {
  * @param value
  * @param paramName 
  */
-export const array = (value: unknown, paramName = `?`): void => {
+export const array = (value:unknown, paramName = `?`):void => {
   if (!Array.isArray(value)) throw new Error(`Parameter '${paramName}' is expected to be an array'`);
 };
 
 /** Throws an error if parameter is not defined */
-export const defined = <T>(argument: T | undefined): argument is T => argument !== undefined;
+export const defined = <T>(argument:T | undefined):argument is T => argument !== undefined;
