@@ -1,6 +1,6 @@
 // Easings from https://easings.net/
-import {interpolate} from '../data/Interpolate.js';
-import {msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource} from '../flow/index.js';
+import { interpolate } from '../data/Interpolate.js';
+import { msElapsedTimer, HasCompletion, relativeTimer, ticksElapsedTimer, TimerSource } from '../flow/index.js';
 
 const sqrt = Math.sqrt;
 const pow = Math.pow;
@@ -40,7 +40,7 @@ const tickRelativeTimer = function (upperBound: number): RelativeTimer {
 };
 */
 
-export type EasingFn = (x: number) => number;
+export type EasingFn = (x:number)=>number;
 
 /**
  * Creates an easing based on clock time. Time
@@ -58,7 +58,7 @@ export type EasingFn = (x: number) => number;
  * @param durationMs Duration in milliseconds
  * @returns Easing
  */
-export const time = function (nameOrFn: EasingName|EasingFn, durationMs: number):Easing {
+export const time = function (nameOrFn:EasingName|EasingFn, durationMs:number):Easing {
   return create(nameOrFn, durationMs, msElapsedTimer);
 };
 
@@ -77,7 +77,7 @@ export const time = function (nameOrFn: EasingName|EasingFn, durationMs: number)
  * @param durationTicks Duration in ticks
  * @returns Easing
  */
-export const tick = function (nameOrFn: EasingName|EasingFn, durationTicks: number):Easing {
+export const tick = function (nameOrFn:EasingName|EasingFn, durationTicks:number):Easing {
   return create(nameOrFn, durationTicks, ticksElapsedTimer);
 };
 
@@ -95,18 +95,18 @@ export type Easing = HasCompletion & {
  *
  * @returns {number}
  */
-  compute(): number
+  compute():number
 
 /**
  * Reset the easing
  */
-  reset(): void
+  reset():void
 /**
  * Returns true if the easing is complete
  *
  * @returns {boolean}
  */
-  get isDone(): boolean
+  get isDone():boolean
 };
 
 /**
@@ -121,7 +121,7 @@ export type Easing = HasCompletion & {
  * @param timerSource Timer source. Eg {@link tickRelativeTimer}, {@link msRelativeTimer}
  * @returns
  */
-const create = function (nameOrFn: EasingName|EasingFn, duration: number, timerSource: TimerSource): Easing {
+const create = function (nameOrFn:EasingName|EasingFn, duration:number, timerSource:TimerSource):Easing {
   //eslint-disable-next-line functional/no-let
   let fn:EasingFn|undefined;
   if (typeof nameOrFn === `function`) fn = nameOrFn;
@@ -234,7 +234,7 @@ export type EasingName = keyof typeof functions;
  * @param easingName eg `sineIn`
  * @returns Easing function
  */
-export const get = function (easingName: EasingName): EasingFn|undefined {
+export const get = function (easingName:EasingName):EasingFn|undefined {
   if (easingName === null) throw new Error(`easingName is null`);
   if (easingName === undefined) throw new Error(`easingName is undefined`);
   const name = easingName.toLocaleLowerCase();
@@ -290,7 +290,7 @@ export const gaussian = (stdDev:number = 0.4):EasingFn => {
   };
 };
 
-const bounceOut = function (x:number): number {
+const bounceOut = function (x:number):number {
   const n1 = 7.5625;
   const d1 = 2.75;
 
@@ -312,45 +312,45 @@ const arch = (x:number):number => (x * (1-x) * 4);
 export const functions = {
   arch,
   bell: gaussian(),
-  sineIn: (x: number): number => 1 - cos((x * pi) / 2),
-  sineOut: (x: number): number => sin((x * pi) / 2),
-  quadIn: (x: number): number => x * x,
-  quadOut: (x: number): number => 1 - (1 - x) * (1 - x),
-  sineInOut: (x: number): number => -(cos(pi * x) - 1) / 2,
-  quadInOut: (x: number): number => (x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2),
-  cubicIn: (x: number): number => x * x * x,
-  cubicOut: (x: number): number => 1 - pow(1 - x, 3),
-  quartIn: (x: number): number => x * x * x * x,
-  quartOut: (x: number): number => 1 - pow(1 - x, 4),
+  sineIn: (x:number):number => 1 - cos((x * pi) / 2),
+  sineOut: (x:number):number => sin((x * pi) / 2),
+  quadIn: (x:number):number => x * x,
+  quadOut: (x:number):number => 1 - (1 - x) * (1 - x),
+  sineInOut: (x:number):number => -(cos(pi * x) - 1) / 2,
+  quadInOut: (x:number):number => (x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2),
+  cubicIn: (x:number):number => x * x * x,
+  cubicOut: (x:number):number => 1 - pow(1 - x, 3),
+  quartIn: (x:number):number => x * x * x * x,
+  quartOut: (x:number):number => 1 - pow(1 - x, 4),
   quintIn,
   quintOut, //: (x: number): number => 1 - pow(1 - x, 5),
-  expoIn: (x: number): number => (x === 0 ? 0 : pow(2, 10 * x - 10)),
-  expoOut: (x: number): number => (x === 1 ? 1 : 1 - pow(2, -10 * x)),
-  quintInOut: (x: number): number => (x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2),
-  expoInOut: (x: number): number => (x === 0
+  expoIn: (x:number):number => (x === 0 ? 0 : pow(2, 10 * x - 10)),
+  expoOut: (x:number):number => (x === 1 ? 1 : 1 - pow(2, -10 * x)),
+  quintInOut: (x:number):number => (x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2),
+  expoInOut: (x:number):number => (x === 0
     ? 0
     : x === 1
       ? 1
       : x < 0.5 ? pow(2, 20 * x - 10) / 2
         : (2 - pow(2, -20 * x + 10)) / 2),
-  circIn: (x: number): number => 1 - sqrt(1 - pow(x, 2)),
-  circOut: (x: number): number => sqrt(1 - pow(x - 1, 2)),
-  backIn: (x: number): number => {
+  circIn: (x:number):number => 1 - sqrt(1 - pow(x, 2)),
+  circOut: (x:number):number => sqrt(1 - pow(x - 1, 2)),
+  backIn: (x:number):number => {
     const c1 = 1.70158;
     const c3 = c1 + 1;
 
     return c3 * x * x * x - c1 * x * x;
   },
-  backOut: (x: number): number => {
+  backOut: (x:number):number => {
     const c1 = 1.70158;
     const c3 = c1 + 1;
 
     return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
   },
-  circInOut: (x: number): number => (x < 0.5
+  circInOut: (x:number):number => (x < 0.5
     ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
     : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2),
-  backInOut: (x: number): number => {
+  backInOut: (x:number):number => {
     const c1 = 1.70158;
     const c2 = c1 * 1.525;
 
@@ -358,7 +358,7 @@ export const functions = {
       ? (pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
       : (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
   },
-  elasticIn: (x: number): number => {
+  elasticIn: (x:number):number => {
     const c4 = (2 * pi) / 3;
 
     return x === 0
@@ -367,7 +367,7 @@ export const functions = {
         ? 1
         : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
   },
-  elasticOut: (x: number): number => {
+  elasticOut: (x:number):number => {
     const c4 = (2 * pi) / 3;
 
     return x === 0
@@ -376,9 +376,9 @@ export const functions = {
         ? 1
         : pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1;
   },
-  bounceIn: (x: number): number => 1 - bounceOut(1 - x),
+  bounceIn: (x:number):number => 1 - bounceOut(1 - x),
   bounceOut: bounceOut,
-  elasticInOut: (x: number): number => {
+  elasticInOut: (x:number):number => {
     const c5 = (2 * pi) / 4.5;
 
     return x === 0
@@ -389,7 +389,7 @@ export const functions = {
           ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2
           : (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1;
   },
-  bounceInOut: (x: number): number => (x < 0.5
+  bounceInOut: (x:number):number => (x < 0.5
     ? (1 - bounceOut(1 - 2 * x)) / 2
     : (1 + bounceOut(2 * x - 1)) / 2)
 };

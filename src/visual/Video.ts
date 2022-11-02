@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion,functional/immutable-data */
-import {continuously, delayLoop } from "../flow/index.js";
+import { continuously, delayLoop } from "../flow/index.js";
 
 //eslint-disable-next-line functional/no-mixed-type
 export type Capturer = {
@@ -20,7 +20,7 @@ export type CaptureOpts = {
   readonly maxIntervalMs?:number;
   readonly showCanvas?:boolean;
   readonly workerScript?:string;
-  readonly onFrame?:(pixels:ImageData) => void;
+  readonly onFrame?:(pixels:ImageData)=>void;
 };
 
 //eslint-disable-next-line functional/no-mixed-type
@@ -36,7 +36,7 @@ export type ManualCaptureOpts = {
    * from the intermediate canvs. This allows for drawing on top of the
    * captured image.
    */
-  readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
+  readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number)=>void
 
   /**
    * If specified, this is the canvas captured to
@@ -200,7 +200,7 @@ export async function* frames(sourceVideoEl:HTMLVideoElement, opts:FramesOpts = 
  * @param opts 
  * @returns 
  */
-export const capture = (sourceVideoEl: HTMLVideoElement, opts:CaptureOpts = {}):Capturer => {
+export const capture = (sourceVideoEl:HTMLVideoElement, opts:CaptureOpts = {}):Capturer => {
   const maxIntervalMs = opts.maxIntervalMs ?? 0;
   const showCanvas = opts.showCanvas ?? false;
   const onFrame = opts.onFrame;
@@ -275,7 +275,7 @@ export const capture = (sourceVideoEl: HTMLVideoElement, opts:CaptureOpts = {}):
 };
 
 
-export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCaptureOpts = {}):ManualCapturer => {
+export const manualCapture =(sourceVideoEl:HTMLVideoElement, opts:ManualCaptureOpts = {}):ManualCapturer => {
   const showCanvas = opts.showCanvas ?? false;
     
   // Ideally use OffscreenCanvas when it has support?
@@ -301,7 +301,7 @@ export const manualCapture =(sourceVideoEl: HTMLVideoElement, opts:ManualCapture
     let c:CanvasRenderingContext2D|undefined|null;
 
     // Draw current frame from video element to canvas
-    if (!c) c = canvasEl?.getContext(`2d`);
+    if (!c) c = canvasEl?.getContext(`2d`, { willReadFrequently: true });
     if (!c) throw new Error(`Could not create graphics context`);
     c.drawImage(sourceVideoEl, 0, 0, w, h);
     
