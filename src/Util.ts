@@ -170,6 +170,37 @@ export const runningiOS = () => [
   // iPad on iOS 13 detection
   || (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
 
+/**
+ * Default sort comparer, following same sematics as Array.sort
+ * @param x 
+ * @param y 
+ * @returns 
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const defaultComparer = (x:any, y:any) => {
+  // Via https://stackoverflow.com/questions/47334234/how-to-implement-array-prototype-sort-default-compare-function
+  if (x === undefined && y === undefined) return 0;
+  if (x === undefined) return 1;
+  if (y === undefined) return -1;
+
+  const xString = defaultToString(x);
+  const yString = defaultToString(y);
+
+  if (xString < yString) return -1;
+  if(xString > yString) return 1;
+  return 0;
+};
+
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+const defaultToString = (obj:any) => {
+  //ECMA specification: http://www.ecma-international.org/ecma-262/6.0/#sec-tostring
+  if (obj === null) return `null`;
+  if (typeof obj === `boolean` ||  typeof obj === `number`) return (obj).toString();
+
+  if (typeof obj === `string`) return obj;
+  if (typeof obj === `symbol`) throw new TypeError();
+  return (obj).toString();
+};
 
 try {
   if (typeof window !== `undefined`) {
