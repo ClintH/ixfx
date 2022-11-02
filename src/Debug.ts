@@ -1,9 +1,10 @@
-import {getOrGenerateSync} from "./collections/Map";
-import {goldenAngleColour} from "./visual/Colour";
+import { getOrGenerateSync } from "./collections/Map";
+import { goldenAngleColour } from "./visual/Colour";
 
 //eslint-disable-next-line functional/no-let
 let logColourCount = 0;
 const logColours = getOrGenerateSync(new Map<string, string>(), () => goldenAngleColour(++logColourCount));
+
 
 /**
  * Returns a bundled collection of {@link logger}s
@@ -17,11 +18,31 @@ const logColours = getOrGenerateSync(new Map<string, string>(), () => goldenAngl
  * @param prefix 
  * @returns 
  */
-export const logSet = (prefix:string) => ({
-  log: logger(prefix, `log`),
-  warn: logger(prefix, `warn`),
-  error: logger(prefix, `error`)
-});
+export const logSet = (prefix:string, verbose = true) => {
+  if (verbose) {
+    return {
+      log: logger(prefix, `log`),
+      warn: logger(prefix, `warn`),
+      error: logger(prefix, `error`)
+    };
+  } else {
+    return {
+      //eslint-disable-next-line @typescript-eslint/no-explicit-any
+      log: (_:any) => { /** no-op */ },
+      warn: logger(prefix, `warn`),
+      error: logger(prefix, `error`)
+    };
+  }
+
+};
+
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Logger = (m:any)=>void;
+export type LogSet = {
+  readonly log:Logger,
+  readonly warn:Logger,
+  readonly error:Logger
+};
 
 /**
  * Returns a console logging function which prefixes messages. This is
@@ -46,7 +67,7 @@ export const logSet = (prefix:string) => ({
  * @returns 
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const logger = (prefix: string, kind: `log` | `warn` | `error` = `log`) => (m: any) => {
+export const logger = (prefix:string, kind:`log` | `warn` | `error` = `log`):Logger => (m:any) => {
   if (m === undefined) {
     m = `(undefined)`;
   } else if (typeof m === `object`) {
