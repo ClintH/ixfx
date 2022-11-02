@@ -317,6 +317,7 @@ export const angle = (a:Point, b?:Point, c?:Point) => {
 
 /**
  * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
+ * Undefined values are skipped over.
  * 
  * ```js
  * // Find centroid of a list of points
@@ -599,7 +600,10 @@ export function subtract(a:Point, b:Point):Point;
 export function subtract (a:Point, x:number, y?:number):Point;
 
 /**
- * Subtracts two sets of x,y pairs
+ * Subtracts two sets of x,y pairs.
+ * 
+ * If first parameter is a Point, any additional properties of it 
+ * are included in returned Point.
  * @param x1 
  * @param y1 
  * @param x2 
@@ -614,12 +618,14 @@ export function subtract(a:Point|number, b:Point|number, c?:number, d?:number):P
     if (isPoint(b)) {
       guard(b, `b`);
       return Object.freeze({
+        ...a,
         x: a.x - b.x,
         y: a.y - b.y
       });
     } else {
       if (c === undefined) c = b;
       return Object.freeze({
+        ...a,
         x: a.x - b,
         y: a.y - c
       });
@@ -885,6 +891,7 @@ export function multiply(a:Point, bOrX:Rects.Rect| Point | number, y?:number):Po
 
 /**
  * Multiplies all components by `v`.
+ * Existing properties of `pt` are maintained.
  * 
  * ```js
  * multiplyScalar({ x:2, y:4 }, 2);
@@ -897,12 +904,14 @@ export function multiply(a:Point, bOrX:Rects.Rect| Point | number, y?:number):Po
 export const multiplyScalar = (pt:Point|Point3d, v:number):Point|Point3d => {
   if (isPoint3d(pt)) {
     return Object.freeze({
+      ...pt,
       x: pt.x * v,
       y: pt.y * v,
       z: pt.z * v
     });
   } else {
     return Object.freeze({
+      ...pt,
       x: pt.x * v,
       y: pt.y * v
     });
@@ -1084,6 +1093,11 @@ export const compare = (a:Point, b:Point):number => {
  * Returns above 0 if a.x > b.x (to the right)
  * Returns 0 if a.x === b.x
  * Returns below 0 if a.x < b.x (to the left)
+ * 
+ * @example Sorting by x
+ * ```js
+ * arrayOfPoints.sort(Points.compareByX);
+ * ```
  * @param a 
  * @param b 
  * @returns 
