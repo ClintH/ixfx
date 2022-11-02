@@ -1,3 +1,7 @@
+import { string as random } from './Random.js';
+
+export { random };
+
 /**
  * Returns source text that is between `start` and `end` match strings. Returns _undefined_ if start/end is not found.
  * 
@@ -11,7 +15,7 @@
  * @param lastEndMatch If true, looks for the last match of `end` (default). If false, looks for the first match.
  * @returns 
  */
-export const between = (source: string, start: string, end?: string, lastEndMatch = true): string | undefined => {
+export const between = (source:string, start:string, end?:string, lastEndMatch = true):string | undefined => {
   const startPos = source.indexOf(start);
   if (startPos < 0) return;
 
@@ -115,7 +119,7 @@ export const untilMatch = (source:string, match:string, startPos = 0):string => 
  * @param wrappers 
  * @returns 
  */
-export const unwrap = (source: string, ...wrappers: readonly string[]): string => {
+export const unwrap = (source:string, ...wrappers:readonly string[]):string => {
   //eslint-disable-next-line functional/no-let
   let matched = false;
   do {
@@ -138,25 +142,25 @@ export type Range = {
   /**
    * Text of range
    */
-  readonly text: string
+  readonly text:string
   /**
    * Start position, with respect to source text
    */
-   readonly start: number
+   readonly start:number
   /**
    * End position, with respect to source text
    */
-   readonly end: number
+   readonly end:number
   /**
    * Index of range. First range is 0
    */
-   readonly index: number
+   readonly index:number
 }
 
 export type LineSpan = {
-  readonly start: number
-  readonly end: number
-  readonly length: number
+  readonly start:number
+  readonly end:number
+  readonly length:number
 }
 
 /**
@@ -169,7 +173,7 @@ export type LineSpan = {
  * @param end End character position, in source text reference
  * @returns Span
  */
-export const lineSpan = (ranges: readonly Range[], start: number, end: number): LineSpan => {
+export const lineSpan = (ranges:readonly Range[], start:number, end:number):LineSpan => {
   //eslint-disable-next-line functional/no-let
   let s = -1;
   //eslint-disable-next-line functional/no-let
@@ -196,7 +200,7 @@ export const lineSpan = (ranges: readonly Range[], start: number, end: number): 
       break;
     }
   }
-  return {length: e - s, start: s, end: e};
+  return { length: e - s, start: s, end: e };
 };
 
 /**
@@ -218,12 +222,12 @@ export const lineSpan = (ranges: readonly Range[], start: number, end: number): 
  * @param split 
  * @returns 
  */
-export const splitRanges = (source: string, split: string):readonly Range[] => {
+export const splitRanges = (source:string, split:string):readonly Range[] => {
   //eslint-disable-next-line functional/no-let
   let start = 0;
   //eslint-disable-next-line functional/no-let
   let text = ``;
-  const ranges: Range[] = [];
+  const ranges:Range[] = [];
   //eslint-disable-next-line functional/no-let
   let index = 0;
   //eslint-disable-next-line functional/no-let
@@ -244,7 +248,7 @@ export const splitRanges = (source: string, split: string):readonly Range[] => {
   }
   if (start < source.length) {
     //eslint-disable-next-line functional/immutable-data
-    ranges.push({text, start, index, end: source.length});
+    ranges.push({ text, start, index, end: source.length });
   }
   return ranges;
 };
@@ -262,7 +266,7 @@ export const splitRanges = (source: string, split: string):readonly Range[] => {
  * @param chars 
  * @returns 
  */
-export const countCharsFromStart = (source: string, ...chars: readonly string[]): number => {
+export const countCharsFromStart = (source:string, ...chars:readonly string[]):number => {
   //eslint-disable-next-line functional/no-let
   let counted = 0;
   //eslint-disable-next-line functional/no-let
