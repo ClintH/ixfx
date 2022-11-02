@@ -1,4 +1,4 @@
-import { IsEqual, ToString } from "../Util.js";
+import { defaultComparer, IsEqual, isEqualDefault, ToString } from "../Util.js";
 
 // ✔ UNIT TESTED!
 
@@ -24,7 +24,28 @@ export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, compare
   return values.some(v => comparer(v, value));
 };
 
+/**
+ * Deletes all key/values from map where value matches `value`,
+ * with optional comparer. Mutates map.
+ * @param map 
+ * @param value 
+ * @param comparer 
+ */
+export const deleteByValue = <K, V>(map:ReadonlyMap<K, V>, value:V, comparer:IsEqual<V> = isEqualDefault) => {
+  for (const e of Object.entries(map)) {
+    if (comparer(e[1], value)) {
+      // @ts-ignore
+      map.delete(e[0]);
+    }
+  }
+};
+
 export type GetOrGenerate<K, V, Z> = (key:K, args?:Z)=>Promise<V>;
+
+export interface Mappish<K, V> {
+  get(key:K):V|undefined;
+  set(key:K, value:V):void;
+}
 
 /**
  * Returns a function that fetches a value from a map, or generates and sets it if not present.
@@ -45,7 +66,7 @@ export type GetOrGenerate<K, V, Z> = (key:K, args?:Z)=>Promise<V>;
  * 
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const getOrGenerate = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>Promise<V>|V):GetOrGenerate<K, V, Z> => async (key:K, args?:Z):Promise<V> => {
+export const getOrGenerate = <K, V, Z>(map:Mappish<K, V>, fn:(key:K, args?:Z)=>Promise<V>|V):GetOrGenerate<K, V, Z> => async (key:K, args?:Z):Promise<V> => {
   //eslint-disable-next-line functional/no-let
   let value = map.get(key);
   if (value !== undefined) return Promise.resolve(value);
@@ -62,7 +83,7 @@ export const getOrGenerate = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>Promi
  * @returns 
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const getOrGenerateSync = <K, V, Z>(map:Map<K, V>, fn:(key:K, args?:Z)=>V) => (key:K, args?:Z):V => {
+export const getOrGenerateSync = <K, V, Z>(map:Mappish<K, V>, fn:(key:K, args?:Z)=>V) => (key:K, args?:Z):V => {
   //eslint-disable-next-line functional/no-let
   let value = map.get(key);
   if (value !== undefined) return value;
@@ -99,7 +120,43 @@ export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFun
   return s;
 };
 
+/**
+ * Returns a array of entries from a map, sorted by value
+ * 
+ * ```js
+ * const m = new Map();
+ * m.set(`4491`, { name: `Bob` });
+ * m.set(`2319`, { name: `Alice` });
+ * const sorted = Maps.sortByValue(m, defaultComparer);
+ * ```
+ * @param map 
+ * @param compareFn 
+ * @returns 
+ */
+export const sortByValue = <K, V>(map:ReadonlyMap<K, V>, compareFn:(a:V, b:V)=>number) => [...map.entries()].sort((a, b) => compareFn(a[1], b[1]));
 
+/**
+ * Returns an array of entries from a map, sorted by a property of the value
+ * 
+ * ```js
+ * cosnt m = new Map();
+ * m.set(`4491`, { name: `Bob` });
+ * m.set(`2319`, { name: `Alice` });
+ * const sorted = Maps.sortByValue(m, `name`);
+ * ```
+ * @param map Map to sort
+ * @param prop Property of value
+ * @param compareFn Comparer. If unspecified, uses a default.
+ */
+export const sortByValueProperty = <K, V, Z>(map:ReadonlyMap<K, V>, prop:string, compareFn?:(a:Z, b:Z)=>number) => {
+  const cfn = (typeof compareFn === `undefined`) ? defaultComparer : compareFn;
+  return [...map.entries()].sort((aE, bE) => {
+    const a = aE[1];
+    const b = bE[1];
+    // @ts-ignore
+    return cfn(a[prop], b[prop]);
+  });
+};
 /**
  * Returns true if _any_ key contains `value`, based on the provided `comparer` function. Use {@link hasKeyValue}
  * if you only want to find a value under a certain key.
