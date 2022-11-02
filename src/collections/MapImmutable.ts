@@ -1,5 +1,5 @@
 
-import {ArrayKeys, EitherKey, ObjKeys, MapImmutable } from "./Interfaces";
+import { ArrayKeys, EitherKey, ObjKeys, MapImmutable } from "./Interfaces";
 
 /**
  * Adds an array o [k,v] to the map, returning a new instance
@@ -7,7 +7,7 @@ import {ArrayKeys, EitherKey, ObjKeys, MapImmutable } from "./Interfaces";
  * @param data Data to add
  * @returns New map with data added
  */
-const addArray = <K, V>(map: ReadonlyMap<K, V>, data:ArrayKeys<K, V>): ReadonlyMap<K, V> => {
+const addArray = <K, V>(map:ReadonlyMap<K, V>, data:ArrayKeys<K, V>):ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
   data.forEach(d => {
     if (d[0] === undefined) throw new Error(`key cannot be undefined`);
@@ -23,7 +23,7 @@ const addArray = <K, V>(map: ReadonlyMap<K, V>, data:ArrayKeys<K, V>): ReadonlyM
  * @param data Data to add
  * @returns A new map with data added
  */
-const addObjects = <K, V>(map: ReadonlyMap<K, V>, data:ObjKeys<K, V>): ReadonlyMap<K, V> => {
+const addObjects = <K, V>(map:ReadonlyMap<K, V>, data:ObjKeys<K, V>):ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
   data.forEach(d => {
     if (d.key === undefined) throw new Error(`key cannot be undefined`);
@@ -45,7 +45,7 @@ const addObjects = <K, V>(map: ReadonlyMap<K, V>, data:ObjKeys<K, V>): ReadonlyM
  * @param key Key to find
  * @returns True if map contains key
  */
-export const has = <K, V>(map: ReadonlyMap<K, V>, key: K): boolean => map.has(key);
+export const has = <K, V>(map:ReadonlyMap<K, V>, key:K):boolean => map.has(key);
 
 /**
  * Adds data to a map, returning the new map.
@@ -61,7 +61,7 @@ export const has = <K, V>(map: ReadonlyMap<K, V>, key: K): boolean => map.has(ke
  * @param data One or more data to add in the form of [key,value] or {key, value} 
  * @returns New map with data added
  */
-export const add = <K, V>(map: ReadonlyMap<K, V>, ...data:EitherKey<K, V>): ReadonlyMap<K, V> => {
+export const add = <K, V>(map:ReadonlyMap<K, V>, ...data:EitherKey<K, V>):ReadonlyMap<K, V> => {
   if (map === undefined) throw new Error(`map parameter is undefined`);
   if (data === undefined) throw new Error(`data parameter i.s undefined`);
   if (data.length === 0) return map;
@@ -78,7 +78,7 @@ export const add = <K, V>(map: ReadonlyMap<K, V>, ...data:EitherKey<K, V>): Read
  * @param value Value to  set
  * @returns New map with data set
  */
-export const set = <K, V>(map: ReadonlyMap<K, V>, key:K, value:V) => {
+export const set = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V) => {
   const x = new Map<K, V>(map.entries());
   x.set(key, value);
   return x;
@@ -90,7 +90,7 @@ export const set = <K, V>(map: ReadonlyMap<K, V>, key:K, value:V) => {
  * @param key 
  * @returns New map with data deleted
  */
-export const del = <K, V>(map: ReadonlyMap<K, V>, key: K): ReadonlyMap<K, V> => {
+export const del = <K, V>(map:ReadonlyMap<K, V>, key:K):ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
   x.delete(key);
   return x;
@@ -135,7 +135,7 @@ export const del = <K, V>(map: ReadonlyMap<K, V>, key: K): ReadonlyMap<K, V> => 
  * 
  * @param dataOrMap Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
-export const map = <K, V>(dataOrMap?: ReadonlyMap<K, V>|EitherKey<K, V>):MapImmutable<K, V> => {
+export const map = <K, V>(dataOrMap?:ReadonlyMap<K, V>|EitherKey<K, V>):MapImmutable<K, V> => {
   if (dataOrMap === undefined) return map([]);
   if (Array.isArray(dataOrMap)) return map(add(new Map(), ...dataOrMap));
   const data = dataOrMap as ReadonlyMap<K, V>;
