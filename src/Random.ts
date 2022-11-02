@@ -258,6 +258,10 @@ export const float = (max:number = 1, min:number = 0) => Math.random() * (max - 
  */
 export const string = (length:number) => Math.random().toString(36).substring(2, length+2);
 
+/**
+ * Generates a short roughly unique id
+ * @returns 
+ */
 export const shortGuid = () => {
   // Via Stackoverflow...
   const firstPart = (Math.random() * 46656) | 0;
