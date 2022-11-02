@@ -780,6 +780,7 @@ export function multiply(a:RectPositioned, b:Rect|number, c?:number):RectPositio
  * Multiplication applies to the first parameter's x/y fields, if present.
  */
 export function multiply(a:Rect, b:Rect|number, c?:number):Rect;
+export function multiply(a:RectPositioned, b:Rect):RectPositioned;
 
 /**
  * Multiplies `a` by rectangle or width/height. Useful for denormalising a value.
@@ -809,39 +810,74 @@ export function multiply(a:RectPositioned|Rect, b:Rect|number, c?:number):RectPo
   guard(a, `a`);
   if (isRect(b)) {
     if (isRectPositioned(a)) {
-      return {
+      return Object.freeze({
         ...a,
         x: a.x * b.width,
         y: a.y * b.height,
         width: a.width * b.width,
-        height: a.width * b.height
-      };
+        height: a.height * b.height
+      });
     } else {
-      return {
+      return Object.freeze({
         ...a,
         width: a.width * b.width,
-        height: a.width * b.height
-      };
+        height: a.height * b.height
+      });
     }
   } else {
     if (typeof b !== `number`) throw new Error(`Expected second parameter of type Rect or number. Got ${JSON.stringify(b)}`);
     if (c === undefined) c = b;
 
     if (isRectPositioned(a)) {
-      return {
+      return Object.freeze({
         ...a,
         x: a.x * b,
         y: a.y * c,
         width: a.width * b,
-        height: a.width * c
-      };
+        height: a.height * c
+      });
     } else {
-      return {
+      return Object.freeze({
         ...a,
         width: a.width * b,
-        height: a.width * c
-      };
+        height: a.height * c
+      });
     }
+  }
+}
+
+/**
+ * Multiplies all components of `rect` by `amount`
+ * @param rect 
+ * @param amount 
+ */
+export function multiplyScalar(rect:Rect, amount:number):Rect;
+/**
+ * Multiplies all components of `rect` by `amount`
+ * @param rect 
+ * @param amount 
+ */
+export function multiplyScalar(rect:RectPositioned, amount:number):RectPositioned;
+/**
+ * Multiplies all components of `rect` by `amount`
+ * @param rect 
+ * @param amount 
+ */
+export function multiplyScalar(rect:Rect|RectPositioned, amount:number):Rect|RectPositioned {
+  if (isPositioned(rect)) {
+    return Object.freeze({
+      ...rect,
+      x: rect.x * amount,
+      y: rect.y * amount,
+      width: rect.width * amount,
+      height: rect.height * amount
+    });
+  } else {
+    return Object.freeze({
+      ...rect,
+      width: rect.width * amount,
+      height: rect.height * amount
+    });
   }
 }
 
