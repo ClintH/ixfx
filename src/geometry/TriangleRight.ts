@@ -74,6 +74,12 @@ export const fromB = (t:Right, origin:Points.Point = { x:0, y:0 }):Triangles.Tri
  *    .           .
  * a .............. b
  * ```
+ * 
+ * 
+ * ```js
+ * // Triangle pointing up to 0,0 with sides of 15
+ * Triangles.Right.fromC({ adjacent: 15, opposite:15 }, { x: 0, y: 0 });
+ * ```
  * @param t 
  * @param origin 
  * @returns 
