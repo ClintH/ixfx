@@ -1,6 +1,8 @@
 import { waitFor } from '../flow/WaitFor.js';
 import * as Rects from '../geometry/Rect.js';
 
+const startTimeoutMs = 10000;
+
 /**
  * Print available media devices to console
  * @param filterKind Defaults `videoinput`
@@ -49,8 +51,6 @@ export type Constraints = {
   readonly startTimeoutMs?:number
 }
 
-const startTimeoutMs = 10000;
-
 /**
  * Result from starting a camera
  */
@@ -66,6 +66,7 @@ export type StartResult = {
    */
   readonly videoEl:HTMLVideoElement;
 }
+
 /**
  * Attempts to start a video-only stream from a camera into a hidden
  * VIDEO element for frame capture. The VIDEO element is created automatically.
