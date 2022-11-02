@@ -24,6 +24,10 @@ Returns above 0 if a.x &gt; b.x (to the right)
 Returns 0 if a.x === b.x
 Returns below 0 if a.x &lt; b.x (to the left)</p>
 
+<h3>Example</h3><p>Sorting by x</p>
+<pre><code class="language-js"><span class="hl-3">arrayOfPoints</span><span class="hl-2">.</span><span class="hl-8">sort</span><span class="hl-2">(</span><span class="hl-3">Points</span><span class="hl-2">.</span><span class="hl-3">compareByX</span><span class="hl-2">);</span>
+</code></pre>
+
 <h3>Returns</h3></div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -63,7 +67,8 @@ Returns below 0 if a.x &lt; b.x (to the left)</p>
 <li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Normalise.html">Normalise</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Pool.html">Pool</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Dom.html">Dom</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Dom.DragDrop.html">Drag<wbr/>Drop</a></li>
@@ -89,6 +94,7 @@ Returns below 0 if a.x &lt; b.x (to the left)</p>
 <li class="current tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Points.html">Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.html">Triangles</a>
 <ul>
@@ -104,7 +110,8 @@ Returns below 0 if a.x &lt; b.x (to the left)</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.Bluetooth.html">Bluetooth</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.Camera.html">Camera</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.Espruino.html">Espruino</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.Serial.html">Serial</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.Serial.html">Serial</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Io.VideoFile.html">Video<wbr/>File</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/KeyValues.html">Key<wbr/>Values</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Modulation.html">Modulation</a>
 <ul>
@@ -114,7 +121,9 @@ Returns below 0 if a.x &lt; b.x (to the left)</p>
 <li class="tsd-kind-namespace"><a href="../modules/Numbers.html">Numbers</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Random.html">Random</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/Text.html">Text</a></li>
-<li class="tsd-kind-namespace"><a href="../modules/Util.html">Util</a></li>
+<li class="tsd-kind-namespace"><a href="../modules/Util.html">Util</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Util.Debug.html">Debug</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Visual.html">Visual</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
@@ -167,6 +176,7 @@ Returns below 0 if a.x &lt; b.x (to the left)</p>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.isPoint3d.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Point3d</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.leftmost.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>leftmost</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.multiply.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>multiply</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.multiplyScalar.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>multiply<wbr/>Scalar</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.normalise.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>normalise</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.normaliseByRect.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>normalise<wbr/>By<wbr/>Rect</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Points.pipeline.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>pipeline</a></li>

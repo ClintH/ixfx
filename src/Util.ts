@@ -2,6 +2,8 @@ import { number as guardNumber } from "./Guards.js";
 import { untilMatch } from "./Text.js";
 
 export * as IterableAsync from './IterableAsync.js';
+export * as Debug from './Debug.js';
+
 //export { KeyValue } from './KeyValue.js';
 
 /**

@@ -3,14 +3,16 @@ import { Point, isPoint } from './Point.js';
 import { Rect, isRect, placeholder as PlaceholderRect } from './Rect.js';
 
 /**
- * A scale function that takes an input value to scale. Input can be in the form of {x,y} or two number parameters.
+ * A scale function that takes an input value to scale. 
+ * Input can be in the form of `{ x, y }` or two number parameters.
  *  
  * ```js
  * scale(10, 20);
- * scale({x:10, y:20});
+ * scale({ x:10, y:20 });
  * ```
  * 
- * Output range can be specified as a {width,height} or two number parameters. If omitted, the default range
+ * Output range can be specified as a `{ width, height }` or two number parameters. 
+ * If omitted, the default range
  * is used.
  * 
  * ```js

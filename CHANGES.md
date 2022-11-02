@@ -1,5 +1,18 @@
 A rough changelog between NPM releases
 
+# 0.7.0 22.11.02
+
+* Collections.ExpiringMap: a map which can automatically drop elements which aren't updated/set after some period
+* Data.Pool: Manage a pool of resources
+* Io.VideoFile: Use a video file as a source for a frame grabber
+* Io.FrameProcessor: Update to support VideoFile
+* Collections.Maps.sortByValue/sortByValueProperty: return entries sorted by values, or property of values
+* Collections.Maps.deleteByValue: delete by value rather than key
+* Geometry.Scaler: convert to and from relative/absolute Cartesian coordinates easily
+* Circle/Rects/Points.multiplyScalar / Points.multiplyScalar: multiply all components by a value
+* Flow.repeatReduce: call a function repeatedly, reducing down to a single value
+* Util.defaultComparer: follow default semantics for Array.sort
+
 # 0.6.7 22.10.18
 
 * Bug fix for Correlate.align
