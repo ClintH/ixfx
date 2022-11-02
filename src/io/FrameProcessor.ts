@@ -1,5 +1,6 @@
-export type Sources = ``| `camera`;
+export type Sources = ``| `camera` | `video`;
 import * as Camera from './Camera.js';
+import * as VideoFile from './VideoFile.js';
 import * as Video from '../visual/Video.js';
 
 type State = `ready`|`initialised`|`disposed`;
@@ -22,7 +23,7 @@ export type FrameProcessorOpts = {
    * from the intermediate canvs. This allows for drawing on top of the
    * captured image.
    */
-   readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number) => void
+   readonly postCaptureDraw?:(ctx:CanvasRenderingContext2D, width:number, height:number)=>void
 
    /**
     * Default constraints to use for the camera source
@@ -46,7 +47,10 @@ export class FrameProcessor {
   
   private _cameraConstraints:Camera.Constraints|undefined;
   private _cameraStartResult:Camera.StartResult|undefined;
-  private _cameraCapture:Video.ManualCapturer|undefined;
+  private _videoSourceCapture:Video.ManualCapturer|undefined;
+
+  private _videoFile:File|undefined;
+  private _videoStartResult:VideoFile.StartResult|undefined;
 
   private _showCanvas:boolean;
   private _showPreview:boolean;
@@ -96,12 +100,12 @@ export class FrameProcessor {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     //eslint-disable-next-line functional/no-let
     let el:HTMLElement|undefined;
-    switch (this._source) {
-    case `camera`:
-      el = this._cameraCapture?.canvasEl;
+
+    if (this._source === `camera` || this._source ===`video`) {
+      el = this._videoSourceCapture?.canvasEl;
       if (el !== undefined) el.style.display = enabled ? `block` : `none`;  
-      break;
-    }  
+      
+    } else throw new Error(`Source not implemented: ${this._source}`);
 
     this._showCanvas = enabled;
   }
@@ -112,10 +116,10 @@ export class FrameProcessor {
    */
   getCapturer():Video.ManualCapturer|undefined {
     if (this._state === `disposed`) throw new Error(`Disposed`);
-    switch (this._source) {
-    case `camera`:
-      return this._cameraCapture;
+    if (this._source ===`camera` || this._source === `video`) {
+      return this._videoSourceCapture;
     }
+    throw new Error(`Source kind not supported ${this._source}`);
   }
 
   /**
@@ -137,23 +141,43 @@ export class FrameProcessor {
     await this.init();
   }
 
+  async useVideo(file:File) {
+    if (this._state === `disposed`) throw new Error(`Disposed`);
+    this._source = `video`;
+    if (this._teardownNeeded) this.teardown();
+    this._videoFile = file;
+    await this.init();
+  }
+
   /**
    * Initialises camera
    */
   private async initCamera() {
     const r = await Camera.start(this._cameraConstraints);
     if (r === undefined) throw new Error(`Could not start camera`);
+    this._cameraStartResult = r;
+    this.postInit(r);
 
+  }
+
+  private async initVideo() {
+    if (!this._videoFile) throw new Error(`Video file not defined`);
+    const r = await VideoFile.start(this._videoFile);  
+    this._videoStartResult = r;
+
+    this.postInit(r);
+  }
+
+  private async postInit(r:Camera.StartResult|VideoFile.StartResult) {
     if (this._showPreview) r.videoEl.style.display = `block`;
 
     // Set up manual capturer
-    this._cameraCapture = Video.manualCapture(r.videoEl, {
+    this._videoSourceCapture = Video.manualCapture(r.videoEl, {
       postCaptureDraw:this._postCaptureDraw,
       showCanvas: this._showCanvas,
       canvasEl: this._captureCanvasEl
     });
 
-    this._cameraStartResult = r;
     this._teardownNeeded = true;
     this._cameraStartResult = r;
   }
@@ -175,16 +199,25 @@ export class FrameProcessor {
     case `camera`:
       await this.initCamera();
       break;
+    case `video`:
+      await this.initVideo();
+      break;
     }
     this._state = `initialised`;
   }
 
   private teardown() {
     if (!this._teardownNeeded) return;
+    if (this._source === `camera` || this._source ===`video`) {
+      this._videoSourceCapture?.dispose();
+
+    }
     switch (this._source) {
     case `camera`:
-      this._cameraCapture?.dispose();
       this._cameraStartResult?.dispose();
+      break;
+    case `video`:
+      this._videoStartResult?.dispose();
       break;
     }
     this._teardownNeeded = false;
@@ -200,6 +233,10 @@ export class FrameProcessor {
     switch (this._source) {
     case `camera`:
       return this.getFrameCamera();
+    case `video`:
+      return this.getFrameCamera();
+    default:
+      throw new Error(`source type unhandled ${this._source}`);
     }
   }
 
@@ -212,6 +249,6 @@ export class FrameProcessor {
   }
 
   private getFrameCamera():ImageData|undefined {
-    return this._cameraCapture?.capture();
+    return this._videoSourceCapture?.capture();
   }
 } 
