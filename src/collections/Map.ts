@@ -27,6 +27,16 @@ export const hasKeyValue = <K, V>(map:ReadonlyMap<K, V>, key:K, value:V, compare
 /**
  * Deletes all key/values from map where value matches `value`,
  * with optional comparer. Mutates map.
+ * 
+ * ```js
+ * import { Maps } from "https://unpkg.com/ixfx/dist/collections.js"
+ * 
+ * // Compare fruits based on their colour property
+ * const colourComparer = (a, b) => a.colour === b.colour;
+ * 
+ * // Deletes all values where .colour = `red`
+ * Maps.deleteByValue(map, { colour: `red` }, colourComparer);
+ * ```
  * @param map 
  * @param value 
  * @param comparer 
@@ -101,16 +111,17 @@ export const getOrGenerateSync = <K, V, Z>(map:Mappish<K, V>, fn:(key:K, args?:Z
  * 
  * @example
  * ```js
+ * import { Maps } from "https://unpkg.com/ixfx/dist/collections.js";
  * const map = new Map();
  * const peopleArray = [ _some people objects..._];
- * addUniqueByHash(map, p => p.name, ...peopleArray);
+ * Maps.addKeepingExisting(map, p => p.name, ...peopleArray);
  * ```
  * @param set 
  * @param hashFunc 
  * @param values 
  * @returns 
  */
-export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFunc:ToString<V>, ...values:readonly V[]) => {
+export const addKeepingExisting = <V>(set:ReadonlyMap<string, V>|undefined, hashFunc:ToString<V>, ...values:readonly V[]) => {
   const s = set === undefined ? new Map() : new Map(set);
   values.forEach(v => {
     const vStr = hashFunc(v);
@@ -121,19 +132,29 @@ export const addUniqueByHash = <V>(set:ReadonlyMap<string, V>|undefined, hashFun
 };
 
 /**
- * Returns a array of entries from a map, sorted by value
+ * Returns a array of entries from a map, sorted by value.
  * 
  * ```js
  * const m = new Map();
  * m.set(`4491`, { name: `Bob` });
  * m.set(`2319`, { name: `Alice` });
- * const sorted = Maps.sortByValue(m, defaultComparer);
+ * 
+ * // Compare by name
+ * const comparer = (a, b) => defaultComparer(a.name, b.name);
+ * 
+ * // Get sorted values
+ * const sorted = Maps.sortByValue(m, comparer);
  * ```
+ * 
+ * `sortByValue` takes a comparison function that should return -1, 0 or 1 to indicate order of `a` to `b`. If not provided, {@link defaultComparer} is used.
  * @param map 
  * @param compareFn 
  * @returns 
  */
-export const sortByValue = <K, V>(map:ReadonlyMap<K, V>, compareFn:(a:V, b:V)=>number) => [...map.entries()].sort((a, b) => compareFn(a[1], b[1]));
+export const sortByValue = <K, V>(map:ReadonlyMap<K, V>, compareFn?:(a:V, b:V)=>number) => {
+  const f = compareFn ?? defaultComparer;
+  [...map.entries()].sort((a, b) => f(a[1], b[1]));
+};
 
 /**
  * Returns an array of entries from a map, sorted by a property of the value
@@ -215,6 +236,14 @@ export const toArray = <V>(map:ReadonlyMap<string, V>):ReadonlyArray<V> => Array
 
 /**
  * Returns a Map from an iterable
+ * 
+ * ```js
+ * const data = [ 
+ *  { fruit: `granny-smith`, family: `apple`, colour: `green` }
+ *  { fruit: `mango`, family: `stone-fruit`, colour: `orange` }
+ * ];
+ * const map = Maps.fromIterable(data, v => v.fruit);
+ * ```
  * @param data Input data
  * @param keyFn Function which returns a string id
  * @param allowOverwrites If true, items with same id will silently overwrite each other, with last write wins
@@ -231,6 +260,61 @@ export const fromIterable = <V>(data:Iterable<V>, keyFn:(v:V)=>string, allowOver
 };
 
 /**
+ * Returns a Map from an object, or array of objects.
+ * Assumes the top-level properties of the object is the key.
+ * 
+ * ```js
+ * const data = {
+ *  Sally: { name: `Sally`, colour: `red` },
+ *  Bob: { name: `Bob`, colour: `pink` }
+ * };
+ * const map = Maps.fromObject(data);
+ * map.get(`Sally`); // { name: `Sally`, colour: `red` }
+ * ```
+ * 
+ * To add an object to an existing map, use {@link addObject}.
+ * @param data 
+ * @returns 
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-readonly-type
+export const fromObject = <V>(data:any):ReadonlyMap<string, V> => {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-readonly-type
+  const map = new Map<string, V>();
+  if (Array.isArray(data)) {
+    data.forEach(d => addObject<V>(map, d));
+  } else {
+    addObject<V>(map, data);
+  }
+  return map;
+};
+
+/**
+ * Adds an object to an existing map. It assumes a structure where
+ * each top-level property is a key:
+ * 
+ * ```js
+ * const data = {
+ *  Sally: { name: `Sally`, colour: `red` },
+ *  Bob: { name: `Bob`, colour: `pink` }
+ * };
+ * const map = new Map();
+ * Maps.addObject(map, data);
+ * 
+ * map.get(`Sally`); // { name: `Sally`, colour: `red` }
+ * ```
+ * 
+ * To create a new map from an object, use {@link fromObject} instead.
+ * @param map 
+ * @param data 
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-readonly-type
+export const addObject = <V>(map:Map<string, V>, data:any) => {
+  const entries = Object.entries(data);
+  for (const [key, value] of entries) {
+    map.set(key, value as V);
+  }
+};
+/**
  * Returns the first found item that matches `predicate` or _undefined_.
  * 
  * If you want all matches, use {@link filter}.
@@ -246,7 +330,7 @@ export const fromIterable = <V>(data:Iterable<V>, keyFn:(v:V)=>string, allowOver
 export const find = <V>(map:ReadonlyMap<string, V>, predicate:(v:V)=>boolean):V|undefined =>  Array.from(map.values()).find(vv => predicate(vv));
 
 /**
- * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link mapToObj}.
+ * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link toObject}.
  * 
  * ```js
  * const map = new Map();
@@ -332,17 +416,26 @@ export const transformMap = <K, V, R>(
 
 
 /**
- * Converts a `Map` to a plain object, useful for serializing to JSON
+ * Converts a `Map` to a plain object, useful for serializing to JSON.
+ * To convert back to a map use {@link fromObject}.
  * 
  * @example
  * ```js
- * const str = JSON.stringify(mapToObj(map));
+ * const map = new Map();
+ * map.set(`Sally`, { name: `Sally`, colour: `red` });
+ * map.set(`Bob`, { name: `Bob`, colour: `pink });
+ * 
+ * const objects = Maps.toObject(map);
+ * // Yields: {
+* //  Sally: { name: `Sally`, colour: `red` },
+* //  Bob: { name: `Bob`, colour: `pink` }
+* // }
  * ```
  * @param m 
  * @returns 
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const mapToObj = <T>(m:ReadonlyMap<string, T>):{ readonly [key:string]:T} => Array.from(m).reduce((obj:any, [key, value]) => {
+export const toObject = <T>(m:ReadonlyMap<string, T>):{ readonly [key:string]:T} => Array.from(m).reduce((obj:any, [key, value]) => {
   /* eslint-disable-next-line functional/immutable-data */
   obj[key] = value;
   return obj;
