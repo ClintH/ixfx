@@ -1,19 +1,19 @@
 // ✔ UNIT TESTED
 import { SimpleEventEmitter } from "../Events.js";
 import { ToString, toStringDefault, isEqualDefault } from "../Util.js";
-import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter, addUniqueByHash} from './Map.js';
+import { hasAnyValue as mapHasAnyValue,  toArray as mapToArray, find as mapFind, filter as mapFilter, addKeepingExisting } from './Map.js';
 import { without } from './Arrays.js';
 import { circularArray } from './CircularArray.js';
-import {CircularArray, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts,  MapOfMutable, MapSetOpts, MultiValue} from "./Interfaces.js";
+import { CircularArray, MapArrayEvents, MapArrayOpts, MapCircularOpts, MapMultiOpts,  MapOfMutable, MapSetOpts, MultiValue } from "./Interfaces.js";
 
 /**
  * @internal
  */
 export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>> {
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  readonly #map: Map<string, M> = new Map();
-  readonly groupBy: ToString<V>;
-  readonly type: MultiValue<V, M>;
+  readonly #map:Map<string, M> = new Map();
+  readonly groupBy:ToString<V>;
+  readonly type:MultiValue<V, M>;
 
   constructor(type:MultiValue<V, M>, opts:MapMultiOpts<V> = {}) {
     super();
@@ -40,7 +40,7 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     return m;
   }
 
-  debugString(): string {
+  debugString():string {
     const keys = Array.from(this.#map.keys());
     // eslint-disable-next-line functional/no-let
     let r = `Keys: ${keys.join(`, `)}\r\n`;
@@ -65,17 +65,17 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     super.fireEvent(`clear`, true);
   }
 
-  addKeyedValues(key: string, ...values: ReadonlyArray<V>) {
+  addKeyedValues(key:string, ...values:ReadonlyArray<V>) {
     const set = this.#map.get(key);
     //console.log(`addKeyedValues: key: ${key} values: ${JSON.stringify(values)}`);
     if (set === undefined) {
       this.#map.set(key, this.type.add(undefined, values));
-      super.fireEvent(`addedKey`, {key:key});
-      super.fireEvent(`addedValues`, {values: values});
+      super.fireEvent(`addedKey`, { key:key });
+      super.fireEvent(`addedValues`, { values: values });
     } else {
       // eslint-disable-next-line functional/immutable-data
       this.#map.set(key, this.type.add(set, values));
-      super.fireEvent(`addedValues`, {values: values});
+      super.fireEvent(`addedValues`, { values: values });
     }
   }
 
@@ -93,7 +93,7 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     return this.#map.has(key);
   }
 
-  deleteKeyValue(key: string, value: V):boolean {
+  deleteKeyValue(key:string, value:V):boolean {
     const a = this.#map.get(key);
     if (a === undefined) return false;
     const preCount = this.type.count(a);
@@ -104,15 +104,15 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     return preCount > postCount;
   }
 
-  delete(key:string): boolean {
+  delete(key:string):boolean {
     const a = this.#map.get(key);
     if (a === undefined) return false;
     this.#map.delete(key);
-    this.fireEvent(`deleteKey`, {key: key});
+    this.fireEvent(`deleteKey`, { key: key });
     return true;
   }
 
-  findKeyForValue(value: V): string | undefined {
+  findKeyForValue(value:V):string | undefined {
     const keys = Array.from(this.#map.keys());
     const found = keys.find(key => {
       const a = this.#map.get(key);
@@ -123,7 +123,7 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     return found;
   }
 
-  count(key: string): number {
+  count(key:string):number {
     const e = this.#map.get(key);
     if (e === undefined) return 0;
     return this.type.count(e);
@@ -133,30 +133,30 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
    * Returns the array of values stored under `key`
    * or undefined if key does not exist
    */
-  get(key: string): readonly V[] | undefined {
+  get(key:string):readonly V[] | undefined {
     const m = this.#map.get(key);
     if (m === undefined) return undefined;
     return this.type.toArray(m);
   }
 
-  getSource(key:string): M|undefined {
+  getSource(key:string):M|undefined {
     return this.#map.get(key);
   }
 
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  keys(): string[] {
+  keys():string[] {
     return Array.from(this.#map.keys());
   }
 
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  keysAndCounts(): Array<[string, number]> {
+  keysAndCounts():Array<[string, number]> {
     const keys = this.keys();
     /* eslint-disable-next-line functional/prefer-readonly-type */
     const r = keys.map(k => [k, this.count(k)]) as Array<[string, number]>;
     return r;
   }
 
-  merge(other: MapOfMutable<V, M>) {
+  merge(other:MapOfMutable<V, M>) {
     const keys = other.keys();
     keys.forEach(key => {
       const data = other.get(key);
@@ -253,7 +253,7 @@ export const mapSet = <V>(opts?:MapSetOpts<V>):MapOfMutable<V, ReadonlyMap<strin
     get name()  {
       return `set`;
     },
-    add:(dest, values) => addUniqueByHash(dest, hash, ...values),
+    add:(dest, values) => addKeepingExisting(dest, hash, ...values),
     count: (source) => source.size,
     find: (source, predicate) => mapFind(source, predicate),
     filter: (source, predicate) => mapFilter(source, predicate),
