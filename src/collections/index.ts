@@ -63,9 +63,9 @@ export * as Arrays from './Arrays.js';
 /**
  * Sets store unique items. 
  * 
- * ixfx's {@link SetMutable} compares items by value rather than reference, unlike the default JS implementation.
+ * ixfx's {@link SetImmutable} (or {@link SetMutable}) compares items by value rather than reference, unlike the default JS implementation.
  * 
- * Create using {@link setMutable}
+ * Create using {@link set} or {@link setMutable}
  */
 export * as Sets from './Set.js';
 
@@ -102,7 +102,7 @@ export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOp
  * Transformations:
  * * {@link toArray}: Returns the values of the map as an array
  * * {@link mapToArray}: Applies a function to convert a map's values to an array
- * * {@link mapToObj}: Coverts a Map to a plain object, useful for JSON serialising.
+ * * {@link toObject}: Coverts a Map to a plain object, useful for JSON serialising.
  * * {@link mapToObjTransform}: Converts a map to a plain object, but applying a function to values
  * * {@link transformMap}: Like `Array.map`, but for Maps. Useful for generating a map as a transform of an input map.
  * * {@link zipKeyValue}: Given an array of keys and values, combines them together into a map
