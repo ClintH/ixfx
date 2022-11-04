@@ -1291,10 +1291,10 @@ export function normaliseByRect(a:Point|number, b:number|Rects.Rect, c?:number, 
 export const random = (rando?:RandomSource):Point => {
   if (rando === undefined) rando = defaultRandom;
 
-  return {
+  return Object.freeze({
     x: rando(),
     y: rando()
-  };
+  });
 };
 
 /**
