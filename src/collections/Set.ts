@@ -3,6 +3,7 @@ import { ToString } from "../Util.js";
 import { SimpleEventEmitter } from "../Events.js";
 import { SetMutable, SetImmutable, ValueSetEventMap } from "./Interfaces.js";
 
+
 class StringSetImpl<V> implements SetImmutable<V> {
   private store:Map<string, V>;
   private keyString;
