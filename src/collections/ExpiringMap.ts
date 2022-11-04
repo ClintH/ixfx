@@ -2,10 +2,28 @@ import { SimpleEventEmitter } from "../Events.js";
 import { sortByValueProperty } from "./Map.js";
 import { integer as guardInteger } from '../Guards.js';
 
+/**
+ * Expiring map options
+ */
 export type Opts = {
+  /**
+   * Capacity limit
+   */
   readonly capacity?:number
-  readonly evictPolicy?:`none`|`oldestAccess`|`oldestSet`
-  readonly autoDeletePolicy?:`none`|`access`|`set`
+  /**
+   * Policy for evicting items if capacity is reached
+   */
+  readonly evictPolicy?:`none`|`oldestGet`|`oldestSet`
+  /**
+   * Automatic deletion policy.
+   * none: no automatic deletion (default)
+   * get/set: interval based on last get/set
+   * either: if either interval has elapsed
+   */
+  readonly autoDeletePolicy?:`none`|`get`|`set`|`either`
+  /**
+   * Automatic deletion interval
+   */
   readonly autoDeleteElapsedMs?:number;
 }
 
@@ -15,6 +33,9 @@ type Item<V> = {
   readonly lastGet:number
 }
 
+/**
+ * Event from the ExpiringMap
+ */
 export type ExpiringMapEvent<K, V> = {
   readonly key:K
   readonly value:V
@@ -38,20 +59,63 @@ export type ExpiringMapEvents<K, V> = {
   readonly removed:ExpiringMapEvent<K, V>
 }
 
+/**
+ * Create a ExpiringMap instance
+ * @param opts 
+ * @returns 
+ */
+export const create = <K, V>(opts:Opts = {}):ExpiringMap<K, V> => new ExpiringMap(opts);
 /***
- * A map that can have a capacity limit.
+ * A map that can have a capacity limit. The elapsed time for each get/set
+ * operation is maintained allowing for items to be automatically removed.
+ * `has()` does not affect the last access time.
  * 
  * By default, it uses the `none` eviction policy, meaning that when full
  * an error will be thrown if attempting to add new keys.
  * 
  * Eviction policies:
- * `oldestAccess` removes the item that hasn't been accessed the longest,
+ * `oldestGet` removes the item that hasn't been accessed the longest,
  * `oldestSet` removes the item that hasn't been updated the longest.
+ * 
+ * ```js
+ * const map = new ExpiringMap();
+ * map.set(`fruit`, `apple`);
+ * 
+ * // Remove all entries that were set more than 100ms ago
+ * map.deleteWithElapsed(100, `set`);
+ * // Remove all entries that were last accessed more than 100ms ago
+ * map.deleteWithElapsed(100, `get`);
+ * // Returns the elapsed time since `fruit` was last accessed
+ * map.elapsedGet(`fruit`); 
+ * // Returns the elapsed time since `fruit` was last set
+ * map.elapsedSet(`fruit`);
+ * ```
+ * 
+ * Last set/get time for a key can be manually reset using `touch(key)`.
+ * 
  * 
  * Events:
  * * `expired`: when an item is automatically removed.
  * * `removed`: when an item is manually or automatically removed.
  * * `newKey`: when a new key is added
+ * 
+ * The map can automatically remove items based on elapsed intervals.
+ * 
+ * @example Automatically delete items that haven't been accessed for one second
+ * ```js
+ * const map = new ExpiringMap({
+ *  autoDeleteElapsed: 1000,
+ *  autoDeletePolicy: `get`
+ * });
+ * ```
+ * 
+ * @example Automatically delete the oldest item if we reach a capacity limit
+ * ```
+ * const map = new ExpiringMap({
+ *  capacity: 5,
+ *  evictPolicy: `oldestSet`
+ * });
+ * ```
  */
 export class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, V>> {
   private capacity:number;
@@ -62,7 +126,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, V
   private autoDeleteElapsedMs:number;
   private autoDeletePolicy;
 
-  constructor(opts:Opts) {
+  constructor(opts:Opts = {}) {
     super();
     this.capacity = opts.capacity ?? -1;
 
@@ -191,7 +255,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, V
     if (this.evictPolicy === `none`) return null;
     //eslint-disable-next-line functional/no-let
     let sortBy = ``;
-    if (this.evictPolicy === `oldestAccess`) sortBy = `lastGet`;
+    if (this.evictPolicy === `oldestGet`) sortBy = `lastGet`;
     else if (this.evictPolicy === `oldestSet`) sortBy = `lastSet`;
     else throw Error(`Unknown eviction policy ${this.evictPolicy}`);
     const sorted = sortByValueProperty(this.store, sortBy);
@@ -204,18 +268,22 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, V
   }
 
   /**
-   * Deletes all values where the the time since
-   * last access is greater than `time`.
+   * Deletes all values where elapsed time has past
+   * for get/set or either.
    * 
    * Remove items are returned
    * @param time 
+   * @param prop get/set/either
    */
-  deleteWithElapsed(time:number, prop:`access`|`set`):[k:K, v:V][] {
+  deleteWithElapsed(time:number, prop:`get`|`set`|`either`):[k:K, v:V][] {
     const entries = [...this.store.entries()];
     const prune:[k:K, v:V][] = [];
     const now = Date.now();
     for (const e of entries) {
-      const elapsed = now - (prop === `access` ? e[1].lastGet : e[1].lastSet);
+      const elapsedGet = now - e[1].lastGet;
+      const elapsedSet = now - e[1].lastSet;
+      const elapsed = prop === `get` ? elapsedGet :
+        prop === `set` ? elapsedSet : Math.max(elapsedGet, elapsedSet);
       if (elapsed >= time) {
         prune.push([e[0], e[1].value]);
       }
@@ -249,7 +317,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<ExpiringMapEvents<K, V
     const existing = this.store.get(key);
 
     if (existing) {
-      // Update access time
+      // Update set time
       this.store.set(key, {
         ...existing,
         lastSet: performance.now()
