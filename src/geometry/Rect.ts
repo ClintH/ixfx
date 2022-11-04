@@ -1,5 +1,5 @@
 import { Points, Lines } from './index.js';
-
+import { RandomSource, defaultRandom } from "../Random.js";
 export type Rect = {
   readonly width:number,
   readonly height:number,
@@ -974,4 +974,31 @@ export const perimeter = (rect:Rect):number => {
 export const area = (rect:Rect):number => {
   guard(rect);
   return rect.height*rect.width;
+};
+
+/**
+ * Returns a random positioned Rect on a 0..1 scale.
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * const r = Rects.random(); // eg {x: 0.2549012, y:0.859301, width: 0.5212, height: 0.1423 }
+ * ```
+ * 
+ * A custom source of randomness can be provided:
+ * ```js
+ * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * import { weightedSkewed } from "https://unpkg.com/ixfx/dist/random.js"
+ * const r = Rects.random(weightedSkewed(`quadIn`));
+ * ```
+ * @param rando 
+ * @returns 
+ */
+export const random = (rando?:RandomSource):RectPositioned => {
+  if (rando === undefined) rando = defaultRandom;
+
+  return Object.freeze({
+    x: rando(),
+    y: rando(),
+    width: rando(),
+    height: rando()
+  });
 };
