@@ -1,6 +1,13 @@
+import { SimpleEventEmitter } from "~/Events.js";
 import * as Debug from "../Debug.js";
+/**
+ * Policy for when the pool is fully used
+ */
 export type FullPolicy = `error`|`evictOldestUser`
 
+/**
+ * Pool options
+ */
 //eslint-disable-next-line functional/no-mixed-type
 export type Opts<V> = {
   /**
@@ -17,7 +24,7 @@ export type Opts<V> = {
    */
   readonly resourcesWithoutUserExpireAfterMs?:number
   /**
-   * Maximum number of users per resource. Defaults to 0
+   * Maximum number of users per resource. Defaults to 1
    */
   readonly capacityPerResource?:number
   /**
@@ -38,53 +45,63 @@ export type Opts<V> = {
   readonly free?:(v:V)=>void
 }
 
-export type InitPoolItem = <V>(id:string)=>V;
+/**
+ * Function that initialises a pool item
+ */
+//export type InitPoolItem_ = <V>(id:string)=>V;
+
+/**
+ * State of pool
+ */
 export type PoolState = `idle`|`active`|`disposed`;
 
-export class PoolUser<V> {
-  private lastUpdate:number;
-  private pool:Pool<V>;
-  private state:PoolState;
-  private userExpireAfterMs:number;
+export type PoolUserEventMap<V> = {
+  readonly disposed:{ readonly data:V, readonly reason:string }
+  readonly released:{ readonly data:V, readonly reason:string }
+};
 
+/**
+ * A use of a pool resource
+ * 
+ * Has two events, _disposed_ and _released_.
+ */
+export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
+  private _lastUpdate:number;
+  private _pool:Pool<V>;
+  private _state:PoolState;
+  private _userExpireAfterMs:number;
+
+  /**
+   * Constructor
+   * @param key User key
+   * @param resource Resource being used
+   */
   constructor(readonly key:string, readonly resource:Resource<V>) {
-    this.lastUpdate = performance.now();
-    this.pool = resource.pool;
-    this.userExpireAfterMs = this.pool.userExpireAfterMs;
-    this.state = `idle`;
-    this.pool.log.log(`PoolUser ctor key: ${this.key}`);
+    super();
+    this._lastUpdate = performance.now();
+    this._pool = resource.pool;
+    this._userExpireAfterMs = this._pool.userExpireAfterMs;
+    this._state = `idle`;
+    this._pool.log.log(`PoolUser ctor key: ${this.key}`);
   }
 
-  get elapsed() {
-    return performance.now() - this.lastUpdate;
-  }
-
+  /**
+   * Returns a human readable debug string
+   * @returns 
+   */
   toString() {
     if (this.isDisposed) return `PoolUser. State: disposed`;
 
-    return `PoolUser. State: ${this.state} Elapsed: ${performance.now()-this.lastUpdate} Data: ${JSON.stringify(this.resource.data)}`;
+    return `PoolUser. State: ${this._state} Elapsed: ${performance.now()-this._lastUpdate} Data: ${JSON.stringify(this.resource.data)}`;
   }
 
-  get isExpired() {
-    if (this.userExpireAfterMs > 0) {
-      return performance.now() > (this.lastUpdate + this.userExpireAfterMs);
-    }
-    return false;
-  }
-
-  get isDisposed() {
-    return this.state === `disposed`;
-  }
-
-  get isValid() {
-    if (this.isDisposed || this.isExpired) return false;
-    if (this.resource.isDisposed) return false;
-    return true;
-  }
-
+  /**
+   * Resets countdown for instance expiry.
+   * Throws an error if instance is disposed.
+   */
   keepAlive() {
-    if (this.state === `disposed`) throw new Error(`PoolItem disposed`);
-    this.lastUpdate = performance.now();
+    if (this._state === `disposed`) throw new Error(`PoolItem disposed`);
+    this._lastUpdate = performance.now();
   }
 
   /**
@@ -93,18 +110,75 @@ export class PoolUser<V> {
    * @returns 
    */
   _dispose(reason:string) {
-    if (this.state ===`disposed`) return;
-    this.state = `disposed`;
-    this.resource._release(this);
-    this.pool.log.log(`PoolUser dispose key: ${this.key} reason: ${reason}`);
+    if (this._state ===`disposed`) return;
+    const resource = this.resource;
+    const data = resource.data;
+    this._state = `disposed`;
+    resource._release(this);
+    this._pool.log.log(`PoolUser dispose key: ${this.key} reason: ${reason}`);
+    this.fireEvent(`disposed`, { data, reason });
+    super.clearEventListeners();
   }
 
+  /**
+   * Release this instance
+   * @param reason 
+   */
   release(reason:string) {
-    this.pool.log.log(`PoolUser release key: ${this.key} reason: ${reason}`);
+    if (this.isDisposed) throw new Error(`User disposed`);
+    const resource = this.resource;
+    const data = resource.data;
+    this._pool.log.log(`PoolUser release key: ${this.key} reason: ${reason}`);
+    this.fireEvent(`released`, { data, reason });
     this._dispose(`release-${reason}`);
   }
+
+  // #region Properties
+  get data():V {
+    if (this.isDisposed) throw new Error(`User disposed`);
+    return this.resource.data;
+  }
+
+  /**
+   * Returns true if this instance has expired.
+   * Expiry counts if elapsed time is greater than `userExpireAfterMs` 
+   */
+  get isExpired() {
+    if (this._userExpireAfterMs > 0) {
+      return performance.now() > (this._lastUpdate + this._userExpireAfterMs);
+    }
+    return false;
+  }
+
+  /**
+   * Returns elapsed time since last 'update'
+   */
+  get elapsed() {
+    return performance.now() - this._lastUpdate;
+  }
+
+  /**
+   * Returns true if instance is disposed
+   */
+  get isDisposed() {
+    return this._state === `disposed`;
+  }
+
+  /**
+   * Returns true if instance is neither disposed nor expired
+   */
+  get isValid() {
+    if (this.isDisposed || this.isExpired) return false;
+    if (this.resource.isDisposed) return false;
+    return true;
+  }
+  // #endregion
+
 }
 
+/**
+ * A resource allocated in the Pool
+ */
 export class Resource<V> {
   private state:PoolState;
   private readonly _data:V;
@@ -113,6 +187,11 @@ export class Resource<V> {
   private readonly resourcesWithoutUserExpireAfterMs;
   private lastUsersChange:number;
 
+  /**
+   * Constructor.
+   * @param pool Pool
+   * @param data Data
+   */
   constructor(readonly pool:Pool<V>, data:V) {
     this._data = data;
     this.lastUsersChange = 0;
@@ -122,17 +201,25 @@ export class Resource<V> {
     this.state = `idle`;
   }
 
-
+  /**
+   * Gets data associated with resource.
+   * Throws an error if disposed
+   */
   get data() {
     if (this.state === `disposed`) throw new Error(`Resource disposed`);
     return this._data;
   }
 
+  /**
+   * Returns a human-readable debug string for resource
+   * @returns
+   */
   toString() {
     return `Resource (expired: ${this.isExpiredFromUsers} users: ${this.users.length}, state: ${this.state}) data: ${JSON.stringify(this.data)}`;
   }
 
   /**
+   * Assigns a user to this resource.
    * @internal
    * @param user 
    */
@@ -144,6 +231,7 @@ export class Resource<V> {
   }
 
   /**
+   * Releases a user from this resource
    * @internal
    * @param user 
    */
@@ -153,11 +241,16 @@ export class Resource<V> {
     this.lastUsersChange = performance.now();
   }
 
+  /**
+   * Returns true if resource can have additional users allocated
+   */
   get hasUserCapacity() {
-    //console.log(`hasUserCapcity: ${this.usersCount} cap: ${this.capacityPerResource}`);
     return this.usersCount < this.capacityPerResource;
   }
 
+  /**
+   * Returns number of uses of the resource
+   */
   get usersCount() {
     return this.users.length;
   }
@@ -172,12 +265,22 @@ export class Resource<V> {
     return performance.now() > this.resourcesWithoutUserExpireAfterMs + this.lastUsersChange;
   }
 
+  /**
+   * Returns true if instance is disposed
+   */
   get isDisposed() {
     return (this.state ===`disposed`);
   }
 
+  /**
+   * Disposes the resource.
+   * If it is already disposed, it does nothing.
+   * @param reason
+   * @returns 
+   */
   dispose(reason:string) {
     if (this.state ===`disposed`) return;
+    const data = this._data;
     this.state = `disposed`;
     this.pool.log.log(`Resource disposed (${reason})`);
     for (const u of this.users) {
@@ -187,11 +290,14 @@ export class Resource<V> {
     this.lastUsersChange = performance.now();
     this.pool._releaseResource(this, reason); 
 
-    if (this.pool.freeResource) this.pool.freeResource(this.data);
-
+    if (this.pool.freeResource) this.pool.freeResource(data);
+    
   }
 }
 
+/**
+ * Resource pool
+ */
 export class Pool<V> {
   private _resources:Resource<V>[];
   private _users:Map<string, PoolUser<V>>;
@@ -202,15 +308,23 @@ export class Pool<V> {
 
   readonly capacityPerResource:number;
   readonly fullPolicy:FullPolicy;
-  readonly generateResource?:()=>V;
+  private generateResource?:()=>V;
   readonly freeResource?:(v:V)=>void;
 
   readonly log:Debug.LogSet;
 
-  constructor(opts:Opts<V>) {
+  /**
+   * Constructor.
+   * 
+   * By default, no capacity limit, one user per resource
+   * @param opts Pool options
+   */
+  constructor(opts:Opts<V> = {}) {
     this.capacity = opts.capacity ??  -1;
     this.fullPolicy = opts.fullPolicy ?? `error`;
     this.capacityPerResource = opts.capacityPerResource ?? 1;
+    this.userExpireAfterMs = opts.userExpireAfterMs ?? -1;
+    this.resourcesWithoutUserExpireAfterMs = opts.resourcesWithoutUserExpireAfterMs ?? -1;
     
     this.generateResource = opts.generate;
     this.freeResource = opts.free;
@@ -218,17 +332,28 @@ export class Pool<V> {
     this._users = new Map();
     this._resources = [];
 
-    this.userExpireAfterMs = opts.userExpireAfterMs ?? -1;
-    this.resourcesWithoutUserExpireAfterMs = opts.resourcesWithoutUserExpireAfterMs ?? -1;
     this.log = Debug.logSet(`Pool`, opts.debug ?? false);
+
+    // If we have a time-based expiry, set an interval to
+    // automatically do the housekeeping
+    const timer = Math.max(this.userExpireAfterMs, this.resourcesWithoutUserExpireAfterMs);
+    if (timer > 0) {
+      setInterval(() => {
+        this.maintain();
+      }, timer*1.1);
+    }
   }
 
+  /**
+   * Returns a debug string of Pool state
+   * @returns 
+   */
   dumpToString() {
     //eslint-disable-next-line functional/no-let
     let r = 
     `Pool
     capacity: ${this.capacity} userExpireAfterMs: ${this.userExpireAfterMs} capacityPerResource: ${this.capacityPerResource}
-    resources count: ${this.resources.length}`;
+    resources count: ${this._resources.length}`;
 
     const res = this._resources.map(r => r.toString()).join(`\r\n\t`);
     r +=`\r\nResources:\r\n\t` + res;
@@ -240,6 +365,10 @@ export class Pool<V> {
     return r;
   }
 
+  /**
+   * Sorts users by longest elapsed time since update
+   * @returns 
+   */
   getUsersByLongestElapsed() {
     return [...this._users.values()].sort((a, b) => {
       const aa = a.elapsed;
@@ -262,7 +391,16 @@ export class Pool<V> {
     });
   }
 
+  /**
+   * Adds a resource to the pool.
+   * Throws an error if the capacity limit is reached.
+   * @param resource
+   * @returns 
+   */
   addResource(resource:V) {
+    if (resource === undefined) throw new Error(`Cannot add undefined resource`);
+    if (resource === null) throw new Error(`Cannot add null resource`);
+
     if (this.capacity > 0 && this._resources.length === this.capacity) throw new Error(`Capacity limit (${this.capacity}) reached. Cannot add more.`);
 
     this.log.log(`Adding resource: ${JSON.stringify(resource)}`);
@@ -271,7 +409,10 @@ export class Pool<V> {
     return pi;
   }
 
-
+  /**
+ * Performs maintenance, removing disposed/expired resources & users.
+ * This is called automatically when using a resource.
+ */
   maintain() {
     //eslint-disable-next-line functional/no-let
     let changed = false;
@@ -314,7 +455,7 @@ export class Pool<V> {
     }
 
     if (changed) {
-      this.log.log(`End: resource len: ${this.resources.length} users: ${this.usersLength}`);
+      this.log.log(`End: resource len: ${this._resources.length} users: ${this.usersLength}`);
     }
   }
 
@@ -371,11 +512,21 @@ export class Pool<V> {
     this._resources = this._resources.filter(v => v !== resource);
   }
 
+  /**
+   * Returns true if `v` has an associted resource in the pool
+   * @param res 
+   * @returns 
+   */
   hasResource(res:V):boolean {
     const found =  this._resources.find(v => v.data === res);
     return found !== undefined;
   }
 
+  /**
+   * Returns true if a given `userKey` is in use.
+   * @param userKey 
+   * @returns 
+   */
   hasUser(userKey:string):boolean {
     return this._users.has(userKey);
   }
@@ -398,7 +549,7 @@ export class Pool<V> {
    * @param userKey 
    * @returns 
    */
-  private _find(userKey:string):Resource<V>|undefined {
+  private _findUser(userKey:string):PoolUser<V>|undefined {
     // Sort items by number of users per pool item
     const sorted = this.getResourcesSortedByUse();
     //eslint-disable-next-line functional/no-let
@@ -409,24 +560,33 @@ export class Pool<V> {
       // No problem, resource has capacity
       this.log.log(`resource has capacity: ${sorted[0].data}`);
       const u = this._assign(userKey, sorted[0]);
-      return u.resource;
+      return u;
     }
   
     // If resource count is below capacity, can we generate more?
-    if (this.generateResource && (this.capacity < 0  || this.resources.length < this.capacity)) {
+    if (this.generateResource && (this.capacity < 0  || this._resources.length < this.capacity)) {
+      this.log.log(`capacity: ${this.capacity} resources: ${this._resources.length}`);
       const newResource = this.addResource(this.generateResource());
-      this._assign(userKey, newResource);
-      return newResource;
+      const u = this._assign(userKey, newResource);
+      return u;
     }
   }
 
+  /**
+   * Return the number of users
+   */
   get usersLength() {
     return [...this._users.values()].length;
   }
 
+  /**
+   * 'Uses' a resource, returning the value
+   * @param userKey 
+   * @returns 
+   */
   useValue(userKey:string):V {
     const res = this.use(userKey);
-    return res.data;
+    return res.resource.data;
   }
 
   /**
@@ -436,16 +596,16 @@ export class Pool<V> {
    * @param userKey 
    * @returns 
    */
-  use(userKey:string):Resource<V> {
+  use(userKey:string):PoolUser<V> {
     const pi = this._users.get(userKey);
     if (pi) {
       pi.keepAlive();
-      return pi.resource;
+      return pi;
     }
     
     this.maintain();
 
-    const match = this._find(userKey);
+    const match = this._findUser(userKey);
     if (match) return match;
 
     // Throw an error if all items are being used
@@ -459,7 +619,7 @@ export class Pool<V> {
       if (users.length > 0) {
         this.release(users[0].key, `evictedOldestUser`);
 
-        const match2 = this._find(userKey);
+        const match2 = this._findUser(userKey);
         if (match2) return match2;
       }
     }
@@ -471,3 +631,9 @@ export class Pool<V> {
   }
 }
 
+/**
+ * Creates an instance of a Pool
+ * @param opts 
+ * @returns 
+ */
+export const create = <V>(opts:Opts<V> = {}):Pool<V> => new Pool<V>(opts);
