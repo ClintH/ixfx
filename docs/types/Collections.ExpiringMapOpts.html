@@ -14,18 +14,31 @@
 <li><a href="../modules/Collections.html">Collections</a></li>
 <li><a href="Collections.ExpiringMapOpts.html">ExpiringMapOpts</a></li></ul>
 <h1>Type alias ExpiringMapOpts</h1></div>
-<div class="tsd-signature">Expiring<wbr/>Map<wbr/>Opts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>autoDeleteElapsedMs<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>autoDeletePolicy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;access&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol">; </span>capacity<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>evictPolicy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestAccess&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestSet&quot;</span><span class="tsd-signature-symbol"> }</span></div>
+<div class="tsd-signature">Expiring<wbr/>Map<wbr/>Opts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>autoDeleteElapsedMs<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>autoDeletePolicy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;get&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;either&quot;</span><span class="tsd-signature-symbol">; </span>capacity<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>evictPolicy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestGet&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestSet&quot;</span><span class="tsd-signature-symbol"> }</span></div>
+<div class="tsd-comment tsd-typography"><p>Expiring map options</p>
+</div>
 <div class="tsd-type-declaration">
 <h4>Type declaration</h4>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> auto<wbr/>Delete<wbr/>Elapsed<wbr/>Ms<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5></li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> auto<wbr/>Delete<wbr/>Elapsed<wbr/>Ms<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Automatic deletion interval</p>
+</div></li>
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> auto<wbr/>Delete<wbr/>Policy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;access&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;set&quot;</span></h5></li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> auto<wbr/>Delete<wbr/>Policy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;get&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;either&quot;</span></h5>
+<div class="tsd-comment tsd-typography"><p>Automatic deletion policy.
+none: no automatic deletion (default)
+get/set: interval based on last get/set
+either: if either interval has elapsed</p>
+</div></li>
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> capacity<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5></li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> capacity<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Capacity limit</p>
+</div></li>
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> evict<wbr/>Policy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestAccess&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestSet&quot;</span></h5></li></ul></div></div>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> evict<wbr/>Policy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestGet&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;oldestSet&quot;</span></h5>
+<div class="tsd-comment tsd-typography"><p>Policy for evicting items if capacity is reached</p>
+</div></li></ul></div></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -134,6 +147,7 @@
 <li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.MapOfMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Map<wbr/>Of<wbr/>Mutable</a></li>
 <li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.Queue.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Queue</a></li>
 <li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.QueueMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Queue<wbr/>Mutable</a></li>
+<li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.SetImmutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Set<wbr/>Immutable</a></li>
 <li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.SetMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Set<wbr/>Mutable</a></li>
 <li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.SimpleMapArrayMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Simple<wbr/>Map<wbr/>Array<wbr/>Mutable</a></li>
 <li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/Collections.Stack.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Stack</a></li>

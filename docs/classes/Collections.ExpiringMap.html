@@ -15,18 +15,32 @@
 <li><a href="Collections.ExpiringMap.html">ExpiringMap</a></li></ul>
 <h1>Class ExpiringMap&lt;K, V&gt;</h1></div>
 <section class="tsd-panel tsd-comment">
-<div class="tsd-comment tsd-typography"><p>A map that can have a capacity limit.</p>
+<div class="tsd-comment tsd-typography"><p>A map that can have a capacity limit. The elapsed time for each get/set
+operation is maintained allowing for items to be automatically removed.
+<code>has()</code> does not affect the last access time.</p>
 <p>By default, it uses the <code>none</code> eviction policy, meaning that when full
 an error will be thrown if attempting to add new keys.</p>
 <p>Eviction policies:
-<code>oldestAccess</code> removes the item that hasn&#39;t been accessed the longest,
+<code>oldestGet</code> removes the item that hasn&#39;t been accessed the longest,
 <code>oldestSet</code> removes the item that hasn&#39;t been updated the longest.</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">map</span><span class="hl-2"> = </span><span class="hl-5">new</span><span class="hl-2"> </span><span class="hl-8">ExpiringMap</span><span class="hl-2">();</span><br/><span class="hl-3">map</span><span class="hl-2">.</span><span class="hl-8">set</span><span class="hl-2">(</span><span class="hl-4">`fruit`</span><span class="hl-2">, </span><span class="hl-4">`apple`</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Remove all entries that were set more than 100ms ago</span><br/><span class="hl-3">map</span><span class="hl-2">.</span><span class="hl-8">deleteWithElapsed</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-4">`set`</span><span class="hl-2">);</span><br/><span class="hl-0">// Remove all entries that were last accessed more than 100ms ago</span><br/><span class="hl-3">map</span><span class="hl-2">.</span><span class="hl-8">deleteWithElapsed</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-4">`get`</span><span class="hl-2">);</span><br/><span class="hl-0">// Returns the elapsed time since `fruit` was last accessed</span><br/><span class="hl-3">map</span><span class="hl-2">.</span><span class="hl-8">elapsedGet</span><span class="hl-2">(</span><span class="hl-4">`fruit`</span><span class="hl-2">); </span><br/><span class="hl-0">// Returns the elapsed time since `fruit` was last set</span><br/><span class="hl-3">map</span><span class="hl-2">.</span><span class="hl-8">elapsedSet</span><span class="hl-2">(</span><span class="hl-4">`fruit`</span><span class="hl-2">);</span>
+</code></pre>
+<p>Last set/get time for a key can be manually reset using <code>touch(key)</code>.</p>
 <p>Events:</p>
 <ul>
 <li><code>expired</code>: when an item is automatically removed.</li>
 <li><code>removed</code>: when an item is manually or automatically removed.</li>
 <li><code>newKey</code>: when a new key is added</li>
 </ul>
+<p>The map can automatically remove items based on elapsed intervals.</p>
+
+<h3>Example</h3><p>Automatically delete items that haven&#39;t been accessed for one second</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">map</span><span class="hl-2"> = </span><span class="hl-5">new</span><span class="hl-2"> </span><span class="hl-8">ExpiringMap</span><span class="hl-2">({</span><br/><span class="hl-2"> </span><span class="hl-3">autoDeleteElapsed:</span><span class="hl-2"> </span><span class="hl-7">1000</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-3">autoDeletePolicy:</span><span class="hl-2"> </span><span class="hl-4">`get`</span><br/><span class="hl-2">});</span>
+</code></pre>
+
+<h3>Example</h3><p>Automatically delete the oldest item if we reach a capacity limit</p>
+<pre><code><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">map</span><span class="hl-2"> = </span><span class="hl-5">new</span><span class="hl-2"> </span><span class="hl-8">ExpiringMap</span><span class="hl-2">({</span><br/><span class="hl-2"> </span><span class="hl-3">capacity:</span><span class="hl-2"> </span><span class="hl-7">5</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-3">evictPolicy:</span><span class="hl-2"> </span><span class="hl-4">`oldestSet`</span><br/><span class="hl-2">});</span>
+</code></pre>
 </div></section> 
 <section class="tsd-panel tsd-type-parameters">
 <h4>Type Parameters</h4>
@@ -75,7 +89,7 @@ an error will be thrown if attempting to add new keys.</p>
 <section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_ExpiringMap">new <wbr/>Expiring<wbr/>Map<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>opts<span class="tsd-signature-symbol">: </span><a href="../types/Collections.ExpiringMapOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">ExpiringMapOpts</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="Collections.ExpiringMap.html" class="tsd-signature-type" data-tsd-kind="Class">ExpiringMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><a href="#constructor.new_ExpiringMap" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_ExpiringMap">new <wbr/>Expiring<wbr/>Map<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>opts<span class="tsd-signature-symbol">?: </span><a href="../types/Collections.ExpiringMapOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">ExpiringMapOpts</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="Collections.ExpiringMap.html" class="tsd-signature-type" data-tsd-kind="Class">ExpiringMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span><a href="#constructor.new_ExpiringMap" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <section class="tsd-panel tsd-type-parameters">
 <h4>Type Parameters</h4>
@@ -88,7 +102,7 @@ an error will be thrown if attempting to add new keys.</p>
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>opts: <a href="../types/Collections.ExpiringMapOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">ExpiringMapOpts</a></h5></li></ul></div>
+<h5>opts: <a href="../types/Collections.ExpiringMapOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">ExpiringMapOpts</a><span class="tsd-signature-symbol"> = {}</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="Collections.ExpiringMap.html" class="tsd-signature-type" data-tsd-kind="Class">ExpiringMap</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Overrides <a href="Events.SimpleEventEmitter.html">SimpleEventEmitter</a>.<a href="Events.SimpleEventEmitter.html#constructor">constructor</a></p></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -157,10 +171,10 @@ an error will be thrown if attempting to add new keys.</p>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="deleteWithElapsed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>delete<wbr/>With<wbr/>Elapsed</span><a href="#deleteWithElapsed" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="deleteWithElapsed.deleteWithElapsed-1">delete<wbr/>With<wbr/>Elapsed<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, prop<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;access&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span>k<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><a href="#deleteWithElapsed.deleteWithElapsed-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="deleteWithElapsed.deleteWithElapsed-1">delete<wbr/>With<wbr/>Elapsed<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, prop<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;get&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;either&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span>k<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><a href="#deleteWithElapsed.deleteWithElapsed-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Deletes all values where the the time since
-last access is greater than <code>time</code>.</p>
+<div class="tsd-comment tsd-typography"><p>Deletes all values where elapsed time has past
+for get/set or either.</p>
 <p>Remove items are returned</p>
 </div>
 <div class="tsd-parameters">
@@ -169,7 +183,9 @@ last access is greater than <code>time</code>.</p>
 <li>
 <h5>time: <span class="tsd-signature-type">number</span></h5></li>
 <li>
-<h5>prop: <span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;access&quot;</span></h5></li></ul></div>
+<h5>prop: <span class="tsd-signature-type">&quot;set&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;get&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;either&quot;</span></h5>
+<div class="tsd-comment tsd-typography"><p>get/set/either</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">[</span>k<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">, </span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></h4></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="elapsedGet" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>elapsed<wbr/>Get</span><a href="#elapsedGet" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
