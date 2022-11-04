@@ -271,6 +271,10 @@ export * as Modulation from './modulation/index.js';
  * 
  * * Create with {@link map} or {@link mapMutable}
  * 
+ * {@link Maps.ExpiringMap} has the same semantics as a regular map, but can automatically remove items if they haven't been set/get for a given interval, and/or if a capacity limit is reached.
+ * 
+ * * Create with {@link Maps.expiringMap}
+ * 
  * ### Map-of
  * 
  * {@link MapOfMutable} allows for several values to be stored under a single key. Unlike a regular JS Map

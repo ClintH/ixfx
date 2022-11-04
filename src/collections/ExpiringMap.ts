@@ -99,6 +99,11 @@ export const create = <K, V>(opts:Opts = {}):ExpiringMap<K, V> => new ExpiringMa
  * * `removed`: when an item is manually or automatically removed.
  * * `newKey`: when a new key is added
  * 
+ * ```js
+ * map.addEventListener(`expired`, evt => {
+ *  const { key, value } = evt;
+ * });
+ * ```
  * The map can automatically remove items based on elapsed intervals.
  * 
  * @example Automatically delete items that haven't been accessed for one second

@@ -1,5 +1,13 @@
 A rough changelog between NPM releases
 
+# 0.7.1 22.11.04
+
+* Util.mapObject: Like a regular map function, but for object properties.
+* Arrays.pushUnique: add items to an array, but only if they don't already exist
+* Maps.fromObject: create a map based on an object's properties
+* Maps.addObject: add property-value pairs of an object to a map
+* Collections.SetImmutable: immutable Set
+
 # 0.7.0 22.11.02
 
 * Collections.ExpiringMap: a map which can automatically drop elements which aren't updated/set after some period

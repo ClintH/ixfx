@@ -85,7 +85,6 @@ export * as Sets from './Set.js';
  */
 export * as Queues from './Queue.js';
 
-export { ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts } from './ExpiringMap.js';
 
 /**
  * Maps associate keys with values. Several helper functions are provided
