@@ -146,7 +146,7 @@ export const addKeepingExisting = <V>(set:ReadonlyMap<string, V>|undefined, hash
  * const sorted = Maps.sortByValue(m, comparer);
  * ```
  * 
- * `sortByValue` takes a comparison function that should return -1, 0 or 1 to indicate order of `a` to `b`. If not provided, {@link defaultComparer} is used.
+ * `sortByValue` takes a comparison function that should return -1, 0 or 1 to indicate order of `a` to `b`. If not provided, {@link Util.defaultComparer} is used.
  * @param map 
  * @param compareFn 
  * @returns 

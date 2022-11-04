@@ -65,7 +65,7 @@ export * as Arrays from './Arrays.js';
  * 
  * ixfx's {@link SetImmutable} (or {@link SetMutable}) compares items by value rather than reference, unlike the default JS implementation.
  * 
- * Create using {@link set} or {@link setMutable}
+ * Create using {@link Sets.set} or {@link Sets.setMutable}
  */
 export * as Sets from './Set.js';
 
