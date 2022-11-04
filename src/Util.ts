@@ -19,6 +19,39 @@ export const ifNaN = (v:number, fallback:number):number => {
 
 
 /**
+ * Maps the properties of an object through a map function.
+ * In terms of typesafety, the mapped properties are assumed to have the
+ * same type.
+ * 
+ * ```js
+ * const o = {
+ *  x: 10,
+ *  y: 20,
+ *  width: 200,
+ *  height: 200
+ * }
+ * 
+ * // Make each property use an averager instead
+ * const oAvg = mapObject(o, (value, key) => {
+ *  return movingAverage(10);
+ * });
+ * 
+ * // Add a value to the averager
+ * oAvg.x.add(20);
+ * ```
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const mapObject = <X extends Record<string, unknown>, V>(object:X, mapFn:(value:any, key?:readonly [keyof X], index?:number)=>V):RemapObjectPropertyType<X, V> => {
+  const mapped = Object.entries(object).map(([key, value], i) => [key, mapFn(value, (key as unknown) as ([keyof X]), i)]);
+  return Object.fromEntries(mapped);
+};
+
+
+export type RemapObjectPropertyType <OriginalType, PropType> = { readonly
+  [Property in keyof OriginalType]:PropType
+}
+
+/**
  * Returns true if `x` is a power of two
  * @param x 
  * @returns True if `x` is a power of two
