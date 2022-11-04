@@ -43,7 +43,7 @@
  * * {@link pointsTracker}: Tracks changes in multiple x,y coordinates. Useful for tracking each finger touch on a screen, for example.
  * * {@link frequencyMutable}: Count occurences of a value
  * 
- * 
+ * * {@link Pool.Pool}: Manage a shared set of resources
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`

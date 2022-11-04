@@ -106,14 +106,14 @@ test(`generate`, () => {
   const rB = p.addResource(`there`);
   const rC = p.addResource(`fella`);
 
-  const uA = p.use(`a`);
-  const uB = p.use(`b`);
-  const uC = p.use(`c`);
-  const uD = p.use(`d`);
-  const uE = p.use(`e`);
+  const uA = p.useValue(`a`);
+  const uB = p.useValue(`b`);
+  const uC = p.useValue(`c`);
+  const uD = p.useValue(`d`);
+  const uE = p.useValue(`e`);
 
-  expect(uC.data).toEqual(`fella`);
-  expect(uE.data).toEqual(`random-2`);
+  expect(uC).toEqual(`fella`);
+  expect(uE).toEqual(`random-2`);
 
 
   expect( () => {const uF = p.use(`f`) }).toThrow();
