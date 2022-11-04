@@ -724,3 +724,23 @@ export const reducePairwise = <V, X>(arr:readonly V[], reducer:(acc:X, a:V, b:V)
   }
   return initial;
 };
+
+/**
+ * Assuming that `input` array is only unique values, this function
+ * returns a new array with unique items from `values` added.
+ * 
+ * If `comparer` function is not provided, values are compared by reference.
+ * @param input 
+ * @param values 
+ */
+export const pushUnique = <V>(input:readonly V[], values:readonly V[], comparer?:IsEqual<V>):readonly V[] => {
+  const c = comparer ?? isEqualDefault;
+  const ret = [...input];
+  for (const v of values) {
+    const found = ret.find(i => c(i, v));
+    if (found) continue;
+    //eslint-disable-next-line functional/immutable-data
+    ret.push(v);
+  }
+  return ret;
+};
