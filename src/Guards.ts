@@ -19,7 +19,8 @@ export type NumberGuardRange =
   `bipolar`;
 
 /**
- * Throws an error if `t` is not a number or within specified range. 
+ * Throws an error if `t` is not a number or within specified range.
+ * Use an empty string for no special range constraints.
  * Alternatives: {@link integer} for additional integer check, {@link percent} for percentage-range.
  * 
  * * positive: must be at least zero

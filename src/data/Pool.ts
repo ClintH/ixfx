@@ -1,4 +1,4 @@
-import { SimpleEventEmitter } from "~/Events.js";
+import { SimpleEventEmitter } from "../Events.js";
 import * as Debug from "../Debug.js";
 /**
  * Policy for when the pool is fully used

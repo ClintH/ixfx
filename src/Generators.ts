@@ -1,10 +1,10 @@
-import {number as guardNumber, integer as guardInteger} from "./Guards.js";
-export {pingPong, pingPongPercent} from './modulation/PingPong.js';
+import { number as guardNumber, integer as guardInteger } from "./Guards.js";
+export { pingPong, pingPongPercent } from './modulation/PingPong.js';
 export * as Async from './IterableAsync.js';
 export * as Sync from './IterableSync.js';
 
-export {interval} from './flow/Interval.js';
-export {delayLoop} from './flow/Delay.js';
+export { interval } from './flow/Interval.js';
+export { delayLoop } from './flow/Delay.js';
 
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
@@ -21,7 +21,7 @@ export {delayLoop} from './flow/Delay.js';
  * @param start Start
  * @param end End (if undefined, range never ends)
  */
-export const numericRangeRaw = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false) {
+export const numericRangeRaw = function* (interval:number, start:number = 0, end?:number, repeating:boolean = false) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
   //eslint-disable-next-line functional/no-let
@@ -61,7 +61,7 @@ export const numericRangeRaw = function* (interval: number, start: number = 0, e
  * @param repeating Range loops from start indefinately. Default _false_
  * @param rounding A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
  */
-export const numericRange = function* (interval: number, start: number = 0, end?: number, repeating: boolean = false, rounding?: number) {
+export const numericRange = function* (interval:number, start:number = 0, end?:number, repeating:boolean = false, rounding?:number) {
   guardNumber(interval,  `nonZero`);
   
   const negativeInterval = interval < 0;
