@@ -22,10 +22,36 @@
 <li><a href="../functions/Geometry.Triangles.fromPoints.html">fromPoints</a>: Create from three <code>{ x, y }</code> sets</li>
 <li><a href="../functions/Geometry.Triangles.fromRadius.html">fromRadius</a>: Equilateral triangle of a given radius and center</li>
 </ul>
-<p>There are two sub-modules for dealing with particular triangles:</p>
+<p>There are sub-modules for dealing with particular triangles:</p>
 <ul>
 <li><a href="Geometry.Triangles.Equilateral.html">Equilateral</a>: Equilateral triangls</li>
 <li><a href="Geometry.Triangles.Right.html">Right</a>: Right-angled triangles</li>
+<li><a href="Geometry.Triangles.Isosceles.html">Isosceles</a>: Iscosceles triangles</li>
+</ul>
+<p>Calculations</p>
+<ul>
+<li><a href="../functions/Geometry.Triangles.angles.html">angles</a>: Internal angles in radians. <a href="../functions/Geometry.Triangles.anglesDegrees.html">anglesDegrees</a> for degrees. </li>
+<li><a href="../functions/Geometry.Triangles.area.html">area</a>: Area of triangle</li>
+<li><a href="../functions/Geometry.Triangles.bbox.html">bbox</a>: Bounding box</li>
+<li><a href="../functions/Geometry.Triangles.centroid.html">centroid</a>: Centroid of triangle</li>
+<li><a href="../functions/Geometry.Triangles.perimeter.html">perimeter</a>: Calculate perimeter</li>
+<li><a href="../functions/Geometry.Triangles.lengths.html">lengths</a>: Return array lengths of triangle&#39;s edges</li>
+<li><a href="../functions/Geometry.Triangles.rotate.html">rotate</a>, <a href="../functions/Geometry.Triangles.rotateByVertex.html">rotateByVertex</a></li>
+</ul>
+<p>Conversions</p>
+<ul>
+<li><a href="../functions/Geometry.Triangles.edges.html">edges</a>: Edges of triangle as <a href="../types/Geometry.Lines.Line.html">Line</a></li>
+<li><a href="../functions/Geometry.Triangles.corners.html">corners</a>: Corner positions</li>
+<li><a href="../functions/Geometry.Triangles.innerCircle.html">innerCircle</a>: Largest circle to fit within triangle</li>
+<li><a href="../functions/Geometry.Triangles.outerCircle.html">outerCircle</a>: Largest circle to enclose triangle</li>
+<li><a href="../functions/Geometry.Triangles.toFlatArray.html">toFlatArray</a></li>
+</ul>
+<p>Comparisons</p>
+<ul>
+<li><a href="../functions/Geometry.Triangles.intersectsPoint.html">intersectsPoint</a>: Whether a point intersects triangle</li>
+<li><a href="../functions/Geometry.Triangles.isEqual.html">isEqual</a>: Check whether two triangles have equal values</li>
+<li><a href="../functions/Geometry.Triangles.isAcute.html">isAcute</a>, <a href="../functions/Geometry.Triangles.isEquilateral.html">isEquilateral</a>, <a href="../functions/Geometry.Triangles.isIsosceles.html">isIsosceles</a>, <a href="../functions/Geometry.Triangles.isRightAngle.html">isRightAngle</a></li>
+<li><a href="../functions/Geometry.Triangles.isTriangle.html">isTriangle</a>: Returns true if object has expected properties of a triangle</li>
 </ul>
 </div></section>
 <section class="tsd-panel-group tsd-index-group">
@@ -70,7 +96,7 @@
 <a href="../functions/Geometry.Triangles.isEmpty.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Empty</span></a>
 <a href="../functions/Geometry.Triangles.isEqual.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Equal</span></a>
 <a href="../functions/Geometry.Triangles.isEquilateral.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Equilateral</span></a>
-<a href="../functions/Geometry.Triangles.isIsoceles.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Isoceles</span></a>
+<a href="../functions/Geometry.Triangles.isIsosceles.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Isosceles</span></a>
 <a href="../functions/Geometry.Triangles.isOblique.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Oblique</span></a>
 <a href="../functions/Geometry.Triangles.isObtuse.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Obtuse</span></a>
 <a href="../functions/Geometry.Triangles.isPlaceholder.html" class="tsd-index-link tsd-kind-function tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg><span>is<wbr/>Placeholder</span></a>
@@ -142,6 +168,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.Shapes.html">Shapes</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.Spheres.html">Spheres</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.SurfacePoints.html">Surface<wbr/>Points</a></li>
 <li class="current selected tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.Triangles.html">Triangles</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="Geometry.Triangles.Equilateral.html">Equilateral</a></li>
@@ -209,7 +237,7 @@
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isEmpty.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Empty</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isEqual.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Equal</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isEquilateral.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Equilateral</a></li>
-<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isIsoceles.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Isoceles</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isIsosceles.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Isosceles</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isOblique.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Oblique</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isObtuse.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Obtuse</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.Triangles.isPlaceholder.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Placeholder</a></li>
