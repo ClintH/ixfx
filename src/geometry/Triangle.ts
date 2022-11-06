@@ -1,7 +1,7 @@
-import { Lines,  radianToDegree, Polar, Circles, Rects} from './index.js';
+import { Lines,  radianToDegree, Polar, Circles, Rects } from './index.js';
 import * as Points from './Point.js';
 
-import {number as guardNumber} from '../Guards.js';
+import { number as guardNumber } from '../Guards.js';
 
 /**
  * Functions for working with equilateral triangles, defined by length
@@ -26,36 +26,36 @@ const piPi = Math.PI*2;
  *  - {@link fromRadius}: Equilateral triangle of a given radius and center
  */
 export type Triangle = {
-  readonly a: Points.Point,
-  readonly b: Points.Point,
-  readonly c: Points.Point
+  readonly a:Points.Point,
+  readonly b:Points.Point,
+  readonly c:Points.Point
 }
 
 /**
  * A triangle consisting of three empty points (Points.Empty)
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
-export const Empty = Object.freeze({a: {x:0, y:0}, b:{x:0, y:0}, c:{x:0, y:0}});
+export const Empty = Object.freeze({ a: { x:0, y:0 }, b:{ x:0, y:0 }, c:{ x:0, y:0 } });
 
 /**
  * A triangle consisting of three placeholder points (Points.Placeholder)
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
-export const Placeholder = Object.freeze({a: {x:NaN, y:NaN}, b:{x:NaN, y:NaN}, c:{x:NaN, y:NaN}});
+export const Placeholder = Object.freeze({ a: { x:NaN, y:NaN }, b:{ x:NaN, y:NaN }, c:{ x:NaN, y:NaN } });
 
 /**
  * Returns true if triangle is empty
  * @param t 
  * @returns 
  */
-export const isEmpty = (t: Triangle): boolean => Points.isEmpty(t.a) && Points.isEmpty(t.b) && Points.isEmpty(t.c);
+export const isEmpty = (t:Triangle):boolean => Points.isEmpty(t.a) && Points.isEmpty(t.b) && Points.isEmpty(t.c);
 
 /**
  * Returns true if triangle is a placeholder
  * @param t 
  * @returns 
  */
-export const isPlaceholder = (t: Triangle): boolean => Points.isPlaceholder(t.a) && Points.isPlaceholder(t.b) && Points.isPlaceholder(t.c);
+export const isPlaceholder = (t:Triangle):boolean => Points.isPlaceholder(t.a) && Points.isPlaceholder(t.b) && Points.isPlaceholder(t.c);
 
 /**
  * Applies `fn` to each of a triangle's corner points, returning the result. 
@@ -74,7 +74,7 @@ export const isPlaceholder = (t: Triangle): boolean => Points.isPlaceholder(t.a)
  * @param fn 
  * @returns 
  */
-export const apply = (t:Triangle, fn:(p:Points.Point, label?:string) => Points.Point) => Object.freeze<Triangle>(
+export const apply = (t:Triangle, fn:(p:Points.Point, label?:string)=>Points.Point) => Object.freeze<Triangle>(
   {
     ...t,
     a: fn(t.a, `a`),
@@ -88,7 +88,7 @@ export const apply = (t:Triangle, fn:(p:Points.Point, label?:string) => Points.P
  * @param t 
  * @param name 
  */
-export const guard = (t: Triangle, name: string = `t`) => {
+export const guard = (t:Triangle, name:string = `t`) => {
   if (t === undefined) throw Error(`{$name} undefined`);
   Points.guard(t.a, name + `.a`);
   Points.guard(t.b, name + `.b`);
@@ -100,7 +100,7 @@ export const guard = (t: Triangle, name: string = `t`) => {
  * @param p 
  * @returns 
  */
-export const isTriangle = (p: number | unknown): p is Triangle => {
+export const isTriangle = (p:number | unknown):p is Triangle => {
   if (p === undefined) return false;
   const tri = p as Triangle;
   if (!Points.isPoint(tri.a)) return false;
@@ -115,7 +115,7 @@ export const isTriangle = (p: number | unknown): p is Triangle => {
  * @param b 
  * @returns 
  */
-export const isEqual = (a: Triangle, b: Triangle): boolean => Points.isEqual(a.a, b.a) && Points.isEqual(a.b, b.b) && Points.isEqual(a.c, b.c);
+export const isEqual = (a:Triangle, b:Triangle):boolean => Points.isEqual(a.a, b.a) && Points.isEqual(a.b, b.b) && Points.isEqual(a.c, b.c);
 
 /**
  * Returns the corners (vertices) of the triangle as an array of points
@@ -187,11 +187,11 @@ export const isEquilateral = (t:Triangle):boolean => {
 };
 
 /**
- * Returns true if it is an isoceles triangle
+ * Returns true if it is an isosceles triangle
  * @param t
  * @returns 
  */
-export const isIsoceles = (t:Triangle):boolean => {
+export const isIsosceles = (t:Triangle):boolean => {
   const [a, b, c] = lengths(t);
   if (a === b) return true;
   if (b === c) return true;
@@ -280,7 +280,7 @@ export const innerCircle = (t:Triangle):Circles.CirclePositioned => {
   const p = perimeter(t) / 2;
   const a = area(t);
   const radius = a / p;
-  return {radius, ...c};
+  return { radius, ...c };
 };
 
 /**
@@ -346,10 +346,10 @@ export const rotateByVertex = (triangle:Triangle, amountRadian:number, vertex:`a
  * @param angleRadian Angle
  * @returns 
  */
-export const equilateralFromVertex = (origin:Points.Point = {x:0, y:0}, length:number = 10, angleRadian:number = Math.PI/2):Triangle => {  
+export const equilateralFromVertex = (origin:Points.Point = { x:0, y:0 }, length:number = 10, angleRadian:number = Math.PI/2):Triangle => {  
   const a = Points.project(origin, length, (Math.PI - (-angleRadian / 2)));
   const c = Points.project(origin, length, (Math.PI - (angleRadian / 2)));
-  return {a, b:origin, c};
+  return { a, b:origin, c };
 };
 
 
@@ -359,7 +359,7 @@ export const equilateralFromVertex = (origin:Points.Point = {x:0, y:0}, length:n
  * @param t 
  * @returns 
  */
-export const toFlatArray = (t:Triangle): readonly number[] => {
+export const toFlatArray = (t:Triangle):readonly number[] => {
   guard(t);
   return [
     t.a.x, t.a.y,
@@ -374,7 +374,7 @@ export const toFlatArray = (t:Triangle): readonly number[] => {
  * @param coords 
  * @returns 
  */
-export const fromFlatArray = (coords: readonly number[]): Triangle => {
+export const fromFlatArray = (coords:readonly number[]):Triangle => {
   if (!Array.isArray(coords)) throw new Error(`coords expected as array`);
   if (coords.length !== 6) throw new Error(`coords array expected with 6 elements. Got ${coords.length}`);
   return fromPoints(Points.fromNumbers(...coords));
@@ -385,7 +385,7 @@ export const fromFlatArray = (coords: readonly number[]): Triangle => {
  * @param points 
  * @returns 
  */
-export const fromPoints = (points: readonly Points.Point[]):Triangle => {
+export const fromPoints = (points:readonly Points.Point[]):Triangle => {
   if (!Array.isArray(points)) throw new Error(`points expected as array`);
   if (points.length !== 3) throw new Error(`points array expected with 3 elements. Got ${points.length}`);
   const t:Triangle = {
@@ -403,7 +403,7 @@ export const fromPoints = (points: readonly Points.Point[]):Triangle => {
  * @returns 
  */
 export const bbox = (t:Triangle, inflation = 0):Rects.RectPositioned => {
-  const {a, b, c} = t;
+  const { a, b, c } = t;
   const xMin = Math.min(a.x, b.x, c.x) - inflation;
   const xMax = Math.max(a.x, b.x, c.x) + inflation;
   const yMin = Math.min(a.y, b.y, c.y) - inflation;
@@ -419,9 +419,9 @@ export const bbox = (t:Triangle, inflation = 0):Rects.RectPositioned => {
 };
 
 export type BarycentricCoord = {
-  readonly a: number
-  readonly b: number,
-  readonly c: number
+  readonly a:number
+  readonly b:number,
+  readonly c:number
 }
 
 /**
@@ -454,18 +454,18 @@ export const barycentricCoord = (t:Triangle, a:Points.Point|number, b?:number):B
  * @param bc 
  * @returns 
  */
-export const barycentricToCartestian = (t:Triangle, bc:BarycentricCoord): Points.Point => {
+export const barycentricToCartestian = (t:Triangle, bc:BarycentricCoord):Points.Point => {
   guard(t);
-  const {a, b, c} = t;
+  const { a, b, c } = t;
   
   const x = a.x*bc.a + b.x*bc.b + c.x*bc.c;
   const y = a.y*bc.a + b.y*bc.b + c.y*bc.c;
   
   if (a.z && b.z && c.z) {
     const z = a.z*bc.a + b.z*bc.b + c.z*bc.c;
-    return Object.freeze({x, y, z});
+    return Object.freeze({ x, y, z });
   } else {
-    return Object.freeze({x, y});
+    return Object.freeze({ x, y });
   }
 };
 

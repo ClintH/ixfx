@@ -19,7 +19,8 @@ export type Point3d = Point & {
 };
 
 /**
- * Returns a Point form of either a point, x,y params or x,y,z params
+ * Returns a Point form of either a point, x,y params or x,y,z params.
+ * If parameters are undefined, an empty point is returned (0, 0)
  * @ignore
  * @param a 
  * @param b 

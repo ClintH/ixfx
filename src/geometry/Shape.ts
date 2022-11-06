@@ -1,6 +1,6 @@
-import {toCartesian} from "./Polar.js";
-import {integer as guardInteger} from "../Guards.js";
-import {Triangles, Points, Rects, Circles} from "./index.js";
+import { toCartesian } from "./Polar.js";
+import { integer as guardInteger } from "../Guards.js";
+import { Triangles, Points, Rects, Circles } from "./index.js";
 
 /**
  * Returns the center of a shape
@@ -10,7 +10,7 @@ import {Triangles, Points, Rects, Circles} from "./index.js";
  */
 export const center = (shape?:Rects.Rect|Triangles.Triangle|Circles.Circle):Points.Point => {
   if (shape === undefined) {
-    return Object.freeze({x:0.5, y:0.5});
+    return Object.freeze({ x:0.5, y:0.5 });
   } else if (Rects.isRect(shape)) {
     return Rects.center(shape as Rects.Rect);
   } else if (Triangles.isTriangle(shape)) {
@@ -51,7 +51,7 @@ export const center = (shape?:Rects.Rect|Triangles.Triangle|Circles.Circle):Poin
  * @param opts Options
  * @param origin Origin, or `{ x:0, y:0 }` by default.
  */
-export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Points.Point = {x:0, y:0}, opts?:{readonly initialAngleRadian?:number}):readonly Points.Point[] => {
+export const starburst = (outerRadius:number, points:number = 5, innerRadius?:number, origin:Points.Point = { x:0, y:0 }, opts?:{readonly initialAngleRadian?:number}):readonly Points.Point[] => {
   guardInteger(points, `positive`, `points`);
   const angle = Math.PI * 2 / points;
   const angleHalf = angle / 2;
@@ -124,7 +124,7 @@ export const arrow = (origin:Points.Point, from:`tip`|`tail`|`middle`, opts:Arro
   if (from === `tip`) {
     tri = Triangles.equilateralFromVertex(origin, arrowSize, triAngle);
     tailPoints = Rects.corners(Rects.fromTopLeft(
-      {x: tri.a.x - tailLength, y: origin.y - tailThickness / 2},
+      { x: tri.a.x - tailLength, y: origin.y - tailThickness / 2 },
       tailLength,
       tailThickness
     ));
@@ -137,14 +137,14 @@ export const arrow = (origin:Points.Point, from:`tip`|`tail`|`middle`, opts:Arro
     }, arrowSize, triAngle);
 
     tailPoints = Rects.corners(Rects.fromTopLeft(
-      {x: origin.x - midX, y: origin.y - midY},
+      { x: origin.x - midX, y: origin.y - midY },
       tailLength + arrowSize,
       tailThickness
     ));
   } else {
     //const midY = origin.y - tailThickness/2;
-    tailPoints = Rects.corners(Rects.fromTopLeft({x: origin.x, y: origin.y - tailThickness/2}, tailLength, tailThickness));
-    tri = Triangles.equilateralFromVertex({x: origin.x + tailLength + arrowSize*0.7, y: origin.y}, arrowSize, triAngle);
+    tailPoints = Rects.corners(Rects.fromTopLeft({ x: origin.x, y: origin.y - tailThickness/2 }, tailLength, tailThickness));
+    tri = Triangles.equilateralFromVertex({ x: origin.x + tailLength + arrowSize*0.7, y: origin.y }, arrowSize, triAngle);
   }
 
   const arrow = Points.rotate([

@@ -55,7 +55,21 @@
 export * as Data from './data/index.js';
 
 /**
- * Functions for different shapes, paths and coordinate spaces
+ * Functions for different shapes, paths and coordinate spaces.
+ * 
+ * A foundation module is {@link Points} for working with x, y (and maybe z).
+ * It has the top-level helper functions: {@link degreeToRadian} and {@link radianToDegree}
+ * 
+ * Basic shapes: {@link Arcs}, {@link Circles}, {@link Ellipses}, {@link Lines}, {@link Rects}, {@link Triangles}
+ * 
+ * Curves & paths: {@link Beziers}, {@link Paths}, {@link Compound}
+ * 
+ * Util:
+ * * {@link Polar}: Polar coordinates
+ * * {@link Scaler}: Simplify back and forth conversion between absolute/relative Cartesian coordinates
+ * * {@link Shapes}: Generates a few shapes like arrows
+ * * {@link SurfacePoints}: Generate points within a shape. Useful for creating patterns
+ * * {@link Vectors}: Vector operations working on either Cartesian or polar coordinates
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`

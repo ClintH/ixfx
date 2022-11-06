@@ -8,14 +8,80 @@ import * as Paths from './Path.js';
 import * as Points from './Point.js';
 import * as Rects from './Rect.js';
 import * as Ellipses from './Ellipse.js';
-import * as Polar from './Polar.js';
 import * as Shapes from './Shape.js';
 import * as Vectors from './Vector.js';
 import * as Waypoints from './Waypoint.js';
+import * as Spheres from './Sphere.js';
+import * as Polar from './Polar.js';
 
-export { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, Vectors, Waypoints };
+export { Circles, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses,  Waypoints, Spheres };
 
 export * as Scaler from './Scaler.js';
+
+/**
+ * Work with arcs. Arcs are a angle-limited circle, describing a wedge.
+ * 
+ * {@link ArcPositioned} has a origin x,y.
+ * 
+ * Conversions:
+ * - {@link fromDegrees}
+ * - {@link toLine}: A line from start/end position of arc
+ * - {@link toSvg}: Returns an SVG representation of arc
+ * 
+ * Calculations:
+ * - {@link bbox}: Bounding box
+ * - {@link interpolate}: Interplate two arcs
+ * - {@link point}: Find a point on the arc, given an angle
+ * - {@link length}: Circumference of arc
+ * 
+ * Comparisons:
+ * - {@link isArc}: Returns true if object is Arc-ish
+ * - {@link isEqual}: Returns true if two objects have identical arc properties
+ */
+export { Arcs };
+
+/**
+ * Generate a few basic geometric shapes
+ * Overview:
+ * * {@link arrow}
+ * * {@link starburst}
+ */
+export { Shapes };
+
+/**
+ * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
+ * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
+ * interoperate between these two coordinates.
+ */
+export { Vectors };
+
+/**
+ * Work with Polar coordinates.
+ * A Polar {@link Coord} is just `{ angleRadians:number, distance: number }`.
+ * 
+ * Conversion: {@link toCartesian}, {@link fromCartesian}, {@link toString}
+ * 
+ * Math: {@link divide}, {@link invert}, {@link multiply}, {@link dotProduct}
+ * 
+ * Geometric manipulations: {@link rotate}, {@link rotateDegrees}
+ * 
+ * Cleaning: {@link clampMagnitude}, {@link normalise}
+ * 
+ * Debugging: {@link toString}
+ * 
+ * Comparisons: {@link isAntiParallel}, {@link isOpposite}, {@link isParallel}, {@link isCoord}
+ */
+export { Polar };
+
+/**
+ * Functions for producing points within a shape.
+ * Useful for creating patterns.
+ * 
+ * Overview:
+ * * {@link sphereFibonacci}: Generate points on a sphere
+ * * {@link vogelSpiral}: Generate a sunflower-esque pattern of points in a circle 
+ */
+export * as SurfacePoints from './SurfacePoints.js';
 
 /**
  * Triangle processing.
@@ -25,9 +91,32 @@ export * as Scaler from './Scaler.js';
  * - {@link Triangles.fromPoints}: Create from three `{ x, y }` sets
  * - {@link Triangles.fromRadius}: Equilateral triangle of a given radius and center
  * 
- * There are two sub-modules for dealing with particular triangles:
+ * There are sub-modules for dealing with particular triangles:
  * - {@link Triangles.Equilateral}: Equilateral triangls
  * - {@link Triangles.Right}: Right-angled triangles
+ * - {@link Triangles.Isosceles}: Iscosceles triangles
+ * 
+ * Calculations
+ * - {@link angles}: Internal angles in radians. {@link anglesDegrees} for degrees. 
+ * - {@link area}: Area of triangle
+ * - {@link bbox}: Bounding box
+ * - {@link centroid}: Centroid of triangle
+ * - {@link perimeter}: Calculate perimeter
+ * - {@link lengths}: Return array lengths of triangle's edges
+ * - {@link rotate}, {@link rotateByVertex}
+ * 
+ * Conversions
+ * - {@link edges}: Edges of triangle as {@link Lines.Line}
+ * - {@link corners}: Corner positions
+ * - {@link innerCircle}: Largest circle to fit within triangle
+ * - {@link outerCircle}: Largest circle to enclose triangle
+ * - {@link toFlatArray}
+ * 
+ * Comparisons
+ * - {@link intersectsPoint}: Whether a point intersects triangle
+ * - {@link isEqual}: Check whether two triangles have equal values
+ * - {@link isAcute}, {@link isEquilateral}, {@link isIsosceles}, {@link isRightAngle}
+ * - {@link isTriangle}: Returns true if object has expected properties of a triangle
  */
 export * as Triangles from './Triangle.js';
 
