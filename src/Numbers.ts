@@ -2,6 +2,7 @@ import * as NumericArrays from './collections/NumericArrays.js';
 import { numberTracker } from './data/NumberTracker.js';
 import { TrackedValueOpts } from './data/TrackedValue.js';
 import { Easings } from './modulation/index.js';
+import { number as guard, integer as guardInteger } from './Guards.js';
 
 /**
  * Calculates the average of all numbers in an array.
@@ -112,7 +113,7 @@ export function* filter(it:Iterable<unknown>) {
 }
 
 /**
- * Rounds `v` by `every`.
+ * Rounds `v` by `every`. Middle values are rounded up by default.
  * 
  * ```js
  * quantiseEvery(11, 10);  // 10
@@ -121,12 +122,17 @@ export function* filter(it:Iterable<unknown>) {
  * quantiseEvery(4, 10);   // 0
  * quantiseEvery(100, 10); // 100
  * ```
+ * 
  * @param v 
  * @param every 
  * @param middleRoundsUp 
  * @returns 
  */
 export const quantiseEvery = (v:number, every:number, middleRoundsUp = true) => {
+  // Unit tested!
+  guard(v, ``, `v`);
+  guardInteger(every, ``, `every`);
+
   //eslint-disable-next-line functional/no-let
   let div = v / every;
   const divMod = div % 1;
@@ -135,3 +141,76 @@ export const quantiseEvery = (v:number, every:number, middleRoundsUp = true) => 
   return every * div;
 };
 
+/**
+ * Generates a `step`-length series of values between `start` and `end` (inclusive).
+ * Each value will be equally spaced.
+ * 
+ * ```js
+ * for (const v of linearSpace(1, 5, 6)) {
+ *  // Yields: 1, 2, 3, 4, 5, 6
+ * }
+ * ```
+ * 
+ * Numbers can be produced from large to small as well
+ * ```js
+ * const values = [...linearSpace(10, 5, 3)];
+ * // Yields: [10, 7.5, 5]
+ * ```
+ * @param start Start number (inclusive)
+ * @param end  End number (inclusive)
+ * @param steps How many steps to make from start -> end
+ * @param precision Number of decimal points to round to 
+ */
+export function* linearSpace(start:number, end:number, steps:number, precision?:number):IterableIterator<number> {
+  guard(start, ``, `start`);
+  guard(end, ``, `end`);
+
+  guard(steps, ``, `steps`);
+
+  const r = precision ? rounder(precision) : (v:number) => v;
+  const step = (end-start) / (steps -1);
+
+  guard(step, ``, `step`);
+  if (!Number.isFinite(step)) throw new Error(`Calculated step value is infinite`);
+
+  //eslint-disable-next-line functional/no-let
+  for (let i=0;i<steps;i++) {
+    const v = (start + (step * i));
+    yield r(v);
+  }
+}
+
+/**
+ * Rounds a number to given number of decimal places.
+ * 
+ * If you are reusing the same rounding, consider {@link rounder}.
+ * ```js
+ * round(10.12345, 2); // 10.12
+ * round(10.12345, 1); // 10.1
+ * round(10.12345);    // 10         
+ * ```
+ * @param v 
+ * @param decimalPlaces 
+ */
+export const round = (v:number, decimalPlaces:number = 0) => {
+  guard(v, ``, `v`);
+  return rounder(decimalPlaces)(v);
+};
+
+/**
+ * Returns a number rounding function
+ * ```js
+ * const r = rounder(2);
+ * r(10.12355); // 10.12
+ * ```
+ * @param decimalPlaces
+ * @returns 
+ */
+export const rounder = (decimalPlaces:number = 0) => {
+  guardInteger(decimalPlaces, `positive`, `decimalPlaces`);
+
+  if (decimalPlaces === 0) return Math.round;
+  const p = Math.pow(10, decimalPlaces);
+
+  return (v:number) => Math.floor(v*p) / p;
+};
