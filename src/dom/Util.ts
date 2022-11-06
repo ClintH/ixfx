@@ -6,9 +6,11 @@ import { Rects, Scaler } from '../geometry/index.js';
 export type ElementResizeArgs<V extends HTMLElement|SVGSVGElement> = {
   readonly el:V
   readonly bounds:{
-    readonly width:number,
+    readonly width:number
     readonly height:number
     readonly center:Points.Point
+    readonly min:number
+    readonly max:number
   }
 }
 
@@ -28,9 +30,19 @@ export const fullSizeElement = <V extends HTMLElement>(domQueryOrEl:string|V, on
     el.setAttribute(`width`, width.toString());
     el.setAttribute(`height`, height.toString());
 
-    const bounds = { width, height, center: { x: width/2, y:height/2 } };
-    if (onResized !== undefined) onResized({ el, bounds });
-
+    if (onResized !== undefined) {
+      const bounds = { 
+        min: Math.min(width, height),
+        max: Math.max(width, height),
+        width, 
+        height, 
+        center: { 
+          x: width/2, 
+          y:height/2 
+        } 
+      };
+      onResized({ el, bounds });
+    }
   };
   r.subscribe(update);
   
@@ -140,9 +152,15 @@ export const fullSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement|undefined|n
     //eslint-disable-next-line functional/immutable-data
     el.height = height;
 
-    
-    const bounds = { width, height, center: { x: width/2, y:height/2 } };
-    if (onResized !== undefined) onResized({ ctx, el, bounds });
+    if (onResized !== undefined) {
+      const bounds = { 
+        min: Math.min(width, height),
+        max: Math.max(width, height),
+        width, 
+        height, 
+        center: { x: width/2, y:height/2 } };
+      onResized({ ctx, el, bounds });
+    }
   };
 
   // Setup
@@ -218,8 +236,15 @@ export const parentSize = <V extends HTMLElement|SVGSVGElement>(domQueryOrEl:str
 
     el.setAttribute(`width`, width + `px`);
     el.setAttribute(`height`, height + `px`);
-    const bounds = { width, height, center: { x: width/2, y:height/2 } };
-    if (onResized !== undefined) onResized({ el, bounds });
+    if (onResized !== undefined) {
+      const bounds = { 
+        min: Math.min(width, height),
+        max: Math.max(width, height),
+        width, 
+        height, 
+        center: { x: width/2, y:height/2 } };
+      onResized({ el, bounds });
+    }
   });
 
   return ro;
@@ -317,8 +342,15 @@ export const parentSizeCanvas = (domQueryOrEl:string|HTMLCanvasElement, onResize
     el.setAttribute(`width`, el.offsetWidth + `px`);
     el.setAttribute(`height`, el.offsetHeight + `px`);
     
-    const bounds = { width, height, center: { x: width/2, y:height/2 } };
-    if (onResized !== undefined) onResized({ ctx, el, bounds });
+    if (onResized !== undefined) {
+      const bounds = { 
+        min: Math.min(width, height),
+        max: Math.max(width, height),
+        width, 
+        height, 
+        center: { x: width/2, y:height/2 } };
+      onResized({ ctx, el, bounds });
+    }
   });
 
   return ro;

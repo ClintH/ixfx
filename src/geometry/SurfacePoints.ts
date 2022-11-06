@@ -31,6 +31,10 @@ export type VogelSpiralOpts = {
    * Use this option OR the density value.
    */
   readonly spacing?:number
+  /**
+   * Rotation offset to apply, in radians. 0 by default
+   */
+  readonly rotation?:number
 }
 
 /**
@@ -66,7 +70,8 @@ export type VogelSpiralOpts = {
 export function* vogelSpiral(circle?:Circle, opts:VogelSpiralOpts = {}):IterableIterator<Points.Point> {
   const maxPoints = opts.maxPoints ?? 5000;
   const density = opts.density ?? 0.95;
-  
+  const rotationOffset = opts.rotation ?? 0;
+
   const c = circleToPositioned(circle ?? { radius: 1, x: 0, y: 0 });
   const max = c.radius;
   //eslint-disable-next-line functional/no-let
@@ -81,7 +86,7 @@ export function* vogelSpiral(circle?:Circle, opts:VogelSpiralOpts = {}):Iterable
   let angle = 0;
   while (count < maxPoints && radius < max) {
     radius = spacing * count ** 0.5;
-    angle = (count * 2 * pi) / goldenSection;
+    angle = rotationOffset + ((count * 2 * pi) / goldenSection);
     yield Object.freeze({
       x: c.x + (radius * cos(angle)),
       y: c.y + (radius * sin(angle))
