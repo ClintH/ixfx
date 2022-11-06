@@ -1,13 +1,16 @@
 import { Sphere } from "./Sphere.js";
 import * as Points from './Point.js';
-import { Circle, toPositioned as circleToPositioned } from "./Circle.js";
-import { scale } from "~/data/Scale.js";
+import { Circle, CirclePositioned, toPositioned as circleToPositioned } from "./Circle.js";
+import { scale } from "../data/Scale.js";
+import { linearSpace } from "~/Numbers.js";
 
 const cos = Math.cos;
 const sin = Math.sin;
+const asin = Math.asin;
 const sqrt = Math.sqrt;
 const pow = Math.pow;
 const pi = Math.PI;
+const piPi = Math.PI*2;
 const goldenAngle = pi * (3 - sqrt(5));
 const goldenSection = (1 + sqrt(5)) / 2;
 
@@ -42,7 +45,7 @@ export type VogelSpiralOpts = {
  * 
  * @example With no arguments, assumes a unit circle
  * ```js
- * for (const pt of vogelSpiral()) {
+ * for (const pt of circleVogelSpiral()) {
  *  // Generate points on a unit circle, with 95% density
  * }
  * ```
@@ -55,19 +58,19 @@ export type VogelSpiralOpts = {
  *  maxPoints: 50,
  *  density: 0.99
  * };
- * for (const pt of vogelSpiral(circle, opts)) {
+ * for (const pt of circleVogelSpiral(circle, opts)) {
  *  // Do something with point...
  * }
  * ```
  * 
  * @example Array format
  * ```js
- * const ptsArray = [...vogelSpiral(circle, opts)];
+ * const ptsArray = [...circleVogelSpiral(circle, opts)];
  * ```
  * @param circle 
  * @param opts 
  */
-export function* vogelSpiral(circle?:Circle, opts:VogelSpiralOpts = {}):IterableIterator<Points.Point> {
+export function* circleVogelSpiral(circle?:Circle, opts:VogelSpiralOpts = {}):IterableIterator<Points.Point> {
   const maxPoints = opts.maxPoints ?? 5000;
   const density = opts.density ?? 0.95;
   const rotationOffset = opts.rotation ?? 0;
@@ -95,6 +98,55 @@ export function* vogelSpiral(circle?:Circle, opts:VogelSpiralOpts = {}):Iterable
   }
 }
 
+export type CircleRingsOpts = {
+  readonly rings?:number
+  /**
+   * Rotation offset, in radians
+   */
+  readonly rotation?:number
+}
+/**
+ * Generates points spaced out on the given number of rings.
+ * 
+ * Get points as array
+ * ```js
+ * const circle = { radius: 5, x: 100, y: 100 };
+ * const opts = { rings: 5 };
+ * const points = [...circleRings(circle, rings)];
+ * ```
+ * 
+ * Or iterate over them
+ * ```js
+ * for (const point of circleRings(circle, opts)) {
+ * }
+ * ```
+ * Source: http://www.holoborodko.com/pavel/2015/07/23/generating-equidistant-points-on-unit-disk/#more-3453
+ * @param circle 
+ */
+export function* circleRings(circle?:Circle|CirclePositioned, opts:CircleRingsOpts = {}):IterableIterator<Points.Point> {
+  const rings = opts.rings ?? 5;
+  const c = circleToPositioned(circle ?? { radius: 1, x: 0, y: 0 });
+  const ringR = 1/rings;
+  const rotationOffset = opts.rotation ?? 0;
+
+  //eslint-disable-next-line functional/no-let
+  let ringCount = 1;
+  
+  // Origin
+  yield Object.freeze({ x: c.x, y: c.y });
+
+  //eslint-disable-next-line functional/no-let
+  for (let r=ringR;r<=1;r+=ringR) {
+    const n = Math.round(pi/asin(1/(2*ringCount)));
+    for (const theta of linearSpace(0, piPi, n+1)) {
+      yield Object.freeze({
+        x: c.x + (r*cos(theta + rotationOffset) * c.radius),
+        y: c.y + (r*sin(theta + rotationOffset) * c.radius)
+      });
+    }
+    ringCount++;
+  } 
+}
 /**
  * Fibonacci sphere algorithm. Generates points
  * distributed on a sphere.
