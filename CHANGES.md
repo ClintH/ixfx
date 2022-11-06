@@ -1,6 +1,9 @@
 A rough changelog between NPM releases
 
 - SurfacePoints: generate a Vogel spiral and distribution of points on a sphere.
+- SurfacePoints: distribute points on rings
+- Numbers.linearSpace: Generate x number of values from start->end, with linear distribution
+- Numbers.rounder: Returns a function to round numbers. Numbers.round() wraps this.
 
 # 0.7.1 22.11.04
 
