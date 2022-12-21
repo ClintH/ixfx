@@ -13,9 +13,11 @@ import * as Vectors from './Vector.js';
 import * as Waypoints from './Waypoint.js';
 import * as Spheres from './Sphere.js';
 import * as Polar from './Polar.js';
+import * as Layouts from './Layout.js';
 
 export { Circles, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses,  Waypoints, Spheres };
-
+export { Layouts };
+export { quadTree } from './QuadTree.js';
 export * as Scaler from './Scaler.js';
 
 /**

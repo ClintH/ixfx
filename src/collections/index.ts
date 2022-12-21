@@ -10,6 +10,8 @@ export { map } from './MapImmutable.js';
 export { mapMutable } from './MapMutable.js';
 export { MapOfMutableImpl } from './MapMultiMutable.js';
 
+export * as Trees from './Trees.js';
+
 /**
  * Stacks store items in order. 
  * 

@@ -1,6 +1,53 @@
 import { toCartesian } from "./Polar.js";
 import { integer as guardInteger } from "../Guards.js";
 import { Triangles, Points, Rects, Circles } from "./index.js";
+import { CirclePositioned } from "./Circle.js";
+import { RandomSource } from "~/Random.js";
+import { RectPositioned } from "./Rect.js";
+
+export type ContainsResult = `none`|`contained`
+
+export type ShapePositioned = CirclePositioned | RectPositioned;
+
+/**
+ * Returns the intersection result between a and b.
+ * @param a 
+ * @param b 
+ */
+export const isIntersecting = (a:ShapePositioned, b:ShapePositioned|Points.Point):boolean => {
+  if (Circles.isCirclePositioned(a)) {
+    return Circles.isIntersecting(a, b);
+  } else if (Rects.isRectPositioned(a)) {
+    return Rects.isIntersecting(a, b);
+  }
+  throw new Error(`a or b are unknown shapes. a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
+};
+
+// export enum Quadrant {
+//   Nw, Ne, Sw, Se
+// }
+
+
+export type RandomPointOpts = {
+  readonly randomSource?:RandomSource
+  readonly margin?:Points.Point
+}
+
+export const randomPoint = (shape:ShapePositioned, opts:RandomPointOpts = {}):Points.Point => {
+  if (Circles.isCirclePositioned(shape)) {
+    return Circles.randomPoint(shape, opts);
+  } else if (Rects.isRectPositioned(shape)) {
+    return Rects.randomPoint(shape, opts);
+  }
+  throw new Error(`Cannot create random point for unknown shape`);
+};
+
+// export type Shape = {
+//   intersects(x:Points.Point|Shape):ContainsResult
+//   readonly kind:`circular`
+
+// }
+
 
 /**
  * Returns the center of a shape

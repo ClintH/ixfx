@@ -1,5 +1,8 @@
-import { Points, Lines } from './index.js';
+import { Points, Lines, Circles } from './index.js';
 import { RandomSource, defaultRandom } from "../Random.js";
+import { CirclePositioned, isCirclePositioned } from './Circle.js';
+import * as Intersects from './Intersects.js';
+
 export type Rect = {
   readonly width:number,
   readonly height:number,
@@ -977,6 +980,23 @@ export const area = (rect:Rect):number => {
 };
 
 /**
+ * Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.
+ * A rectangle can be checked for intersections with another RectPositioned, CirclePositioned or Point.
+ * 
+ */
+export const isIntersecting = (a:RectPositioned, b:CirclePositioned|Points.Point):boolean => {
+  if (!isRectPositioned(a)) throw new Error(`a parameter should be RectPositioned`);
+
+  if (isCirclePositioned(b)) {
+    return Intersects.circleRect(b, a);
+  } else if (Points.isPoint(b)) {
+    return intersectsPoint(a, b);
+  }
+  throw new Error(`Unknown shape for b: ${JSON.stringify(b)}`);
+
+};
+
+/**
  * Returns a random positioned Rect on a 0..1 scale.
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
@@ -1001,4 +1021,37 @@ export const random = (rando?:RandomSource):RectPositioned => {
     width: rando(),
     height: rando()
   });
+};
+
+export type RandomPointOpts = {
+  readonly strategy?:`naive`
+  readonly randomSource?:RandomSource
+  readonly margin?:{readonly x:number, readonly y:number}
+}
+
+/**
+ * Returns a random point within a circle.
+ * 
+ * By default creates a uniform distribution.
+ * 
+ * ```js
+ * const pt = randomPoint({width: 5, height: 10});
+ * ```'
+ * @param within Circle to generate a point within
+ * @param opts Options
+ * @returns 
+ */
+export const randomPoint = (within:Rect|RectPositioned, opts:RandomPointOpts = {}):Points.Point => {
+  // TODO: Does not implement uniform distribution
+  // See: https://math.stackexchange.com/questions/366474/find-coordinates-of-n-points-uniformly-distributed-in-a-rectangle
+  const rand = opts.randomSource ?? defaultRandom;
+  const margin = opts.margin ?? { x:0, y:0 };
+
+  const x = rand() * (within.width - margin.x - margin.x);
+  const y = rand() * (within.height - margin.y - margin.y);
+
+  const pos = { x: x + margin.x, y: y + margin.y };
+  if (isPositioned(within)) {
+    return Points.sum(pos, within);
+  } else return Object.freeze(pos);
 };

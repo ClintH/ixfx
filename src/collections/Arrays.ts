@@ -384,10 +384,15 @@ export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = d
 };
 
 /**
- * Sorts an array of objects by the given property name, assuming its a number.
+ * Sorts an array of objects in ascending order
+ * by the given property name, assuming it is a number.
  * 
- * ```js`
- * const data = [ { size: 10, colour: `red` }, { size: 20, colour: `blue` }, { size: 5, colour: `pink` }];
+ * ```js
+ * const data = [ 
+ *  { size: 10, colour: `red` }, 
+ *  { size: 20, colour: `blue` },
+ *  { size: 5, colour: `pink` }
+ * ];
  * const sorted = Arrays.sortByNumericProperty(data, `size`);
  * 
  * Yields items ascending order:

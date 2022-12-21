@@ -2,7 +2,7 @@ import { Sphere } from "./Sphere.js";
 import * as Points from './Point.js';
 import { Circle, CirclePositioned, toPositioned as circleToPositioned } from "./Circle.js";
 import { scale } from "../data/Scale.js";
-import { linearSpace } from "~/Numbers.js";
+import { linearSpace } from "../Numbers.js";
 
 const cos = Math.cos;
 const sin = Math.sin;

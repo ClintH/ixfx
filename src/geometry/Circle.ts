@@ -1,8 +1,11 @@
 import { guard as guardPoint } from './Point.js';
 import { Path } from './Path.js';
 import { Line } from './Line.js';
-import { Points, Rects } from  './index.js';
+import { Points, Polar, Rects } from  './index.js';
+//import { ShapePositioned } from './Shape.js';
 import { Arrays } from '../collections/index.js';
+import { defaultRandom, RandomSource } from '../Random.js';
+import * as Intersects from './Intersects.js';
 const piPi = Math.PI *2;
 
 /**
@@ -20,6 +23,11 @@ export type CirclePositioned = Points.Point & Circle;
 export type CircularPath = Circle & Path & {
   readonly kind:`circular`
 };
+
+// export type CircularShape = Circle & Shape & {
+//   readonly kind:`circular`
+// }
+
 
 /**
  * Returns true if parameter has x,y. Does not verify if parameter is a circle or not
@@ -184,17 +192,33 @@ export const bbox = (circle:CirclePositioned|Circle):Rects.RectPositioned|Rects.
 /**
  * Returns true if `b` is completely contained by `a`
  *
+ * ```js
+ * // Compare two points
+ * isContainedBy(circleA, circleB);
+ * 
+ * // Compare a circle with a point
+ * isContainedBy(circleA, {x: 10, y: 20});
+ * 
+ * // Define radius as third parameter
+ * isContainedBy(circleA, {x: 10, y: 20}, 20);
+ * ```
  * @param a Circle
  * @param b Circle or point to compare to
+ * @param c Radius to accompany parameter b if it's a point
  * @returns
  */
-export const isContainedBy = (a:CirclePositioned, b:CirclePositioned|Points.Point):boolean => {
+export const isContainedBy = (a:CirclePositioned, b:CirclePositioned|Points.Point, c?:number):boolean => {
   const d = distanceCenter(a, b);
   if (isCircle(b)) {
     return (d < Math.abs(a.radius - b.radius));
-  } else {
-    return d <= a.radius;
-  }
+  } else if (Points.isPoint(b)) {
+    if (c !== undefined) {
+      // Defining a circle
+      return (d < Math.abs(a.radius - c));
+    } else {
+      return d <= a.radius;
+    }
+  } else throw new Error(`b parameter is expected to be CirclePositioned or Point`);
 };
 
 /***
@@ -209,24 +233,30 @@ export const isNaN = (a:Circle|CirclePositioned):boolean => {
   return false;
 };
 /**
- * Returns true if a or b overlap or are equal
+ * Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.
+ * A circle can be checked for intersections with another CirclePositioned, Point or RectPositioned.
  * 
- * Use `intersections` to find the points of intersection
+ * Use `intersections` to find the points of intersection.
  *
  * @param a Circle
  * @param b Circle or point to test
  * @returns True if circle overlap
  */
-export const isIntersecting = (a:CirclePositioned, b:CirclePositioned|Points.Point):boolean => {
+export const isIntersecting = (a:CirclePositioned, b:CirclePositioned|Points.Point|Rects.RectPositioned, c?:number):boolean => {
   if (Points.isEqual(a, b)) return true;
-  if (isContainedBy(a, b)) return true;
+  if (isContainedBy(a, b, c)) return true;
   if (isCircle(b)) {
-    return intersections(a, b).length === 2;
-  } 
+    return Intersects.circleCircle(a, b);
+  } else if (Rects.isRectPositioned(b)) {
+    return Intersects.circleRect(a, b);
+  } else if (Points.isPoint(b) && c !== undefined) {
+    return Intersects.circleCircle(a, { ...b, radius:c });
+  }
   return false;
 };
 
 /**
+ * 
  * Returns the points of intersection betweeen `a` and `b`.
  * 
  * Returns an empty array if circles are equal, one contains the other or if they don't touch at all.
@@ -297,6 +327,44 @@ export const isEqual = (a:CirclePositioned|Circle, b:CirclePositioned|Circle):bo
   return false;
 };
 
+export type RandomPointOpts = {
+  readonly strategy?:`naive`|`uniform`
+  readonly randomSource?:RandomSource
+}
+
+/**
+ * Returns a random point within a circle.
+ * 
+ * By default creates a uniform distribution.
+ * 
+ * ```js
+ * const pt = randomPoint({radius: 5});
+ * const pt = randomPoint({radius: 5, x: 10, y: 20});
+ * ```'
+ * 
+ * Generate points with a gaussian distribution
+ * ```js
+ * const pt = randomPoint(circle, {
+ *  randomSource: Random.gaussian
+ * })
+ * ```
+ * @param within Circle to generate a point within
+ * @param opts Options
+ * @returns 
+ */
+export const randomPoint = (within:Circle|CirclePositioned, opts:RandomPointOpts = {}):Points.Point => {
+  const offset:Points.Point = isPositioned(within) ? within : { x:0, y:0 };
+  const strategy = opts.strategy ?? `uniform`;
+  const rand = opts.randomSource ?? defaultRandom;
+  switch (strategy) {
+  case `naive`:
+    return Points.sum(offset, Polar.toCartesian(rand() * within.radius, rand() * piPi));
+  case `uniform`:
+    return Points.sum(offset, Polar.toCartesian(Math.sqrt(rand()) * within.radius, rand() * piPi));
+  default:
+    throw new Error(`Unknown strategy ${strategy}`);
+  }
+};
 
 export function multiplyScalar(a:CirclePositioned, value:number):CirclePositioned;
 
@@ -540,3 +608,4 @@ export const intersectionLine = (circle:CirclePositioned, line:Line):readonly Po
   }       
   return ret;
 };
+

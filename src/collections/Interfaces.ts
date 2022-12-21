@@ -17,6 +17,7 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
   readonly capacity:number
 }
 
+
 /**
  * @private
  */

@@ -1,5 +1,5 @@
-import { getOrGenerateSync } from "./collections/Map";
-import { goldenAngleColour } from "./visual/Colour";
+import { getOrGenerateSync } from "./collections/Map.js";
+import { goldenAngleColour } from "./visual/Colour.js";
 
 //eslint-disable-next-line functional/no-let
 let logColourCount = 0;

@@ -1,9 +1,14 @@
 A rough changelog between NPM releases
 
+- Collections.Trees: BinarySearchTree, Tree, basic traversal
+- Geometry.quadTree
+- Geometry.Intersects: centralise a bunch of geometry logic
+- Geometry.Layout: CirclePacking.random
 - SurfacePoints: generate a Vogel spiral and distribution of points on a sphere.
 - SurfacePoints: distribute points on rings
 - Numbers.linearSpace: Generate x number of values from start->end, with linear distribution
 - Numbers.rounder: Returns a function to round numbers. Numbers.round() wraps this.
+- Collections.mutableStack: fixed bug with pop
 
 # 0.7.1 22.11.04
 
