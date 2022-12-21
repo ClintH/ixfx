@@ -1,14 +1,14 @@
 // ✔ Unit tested!
-import {DiscardPolicy, Stack} from "./Interfaces.js";
-import {StackMutable} from './Interfaces.js';
+import { DiscardPolicy, Stack } from "./Interfaces.js";
+import { StackMutable } from './Interfaces.js';
 
 export type StackOpts = {
   readonly debug?:boolean
-  readonly capacity?: number
-  readonly discardPolicy?: DiscardPolicy
+  readonly capacity?:number
+  readonly discardPolicy?:DiscardPolicy
 }
 
-const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
+const trimStack = <V>(opts:StackOpts, stack:ReadonlyArray<V>, toAdd:ReadonlyArray<V>):ReadonlyArray<V> => {
   const potentialLength = stack.length + toAdd.length;
   const policy = opts.discardPolicy ?? `additions`;
   const capacity = opts.capacity ?? potentialLength;
@@ -43,7 +43,7 @@ const trimStack = <V>(opts: StackOpts, stack: ReadonlyArray<V>, toAdd: ReadonlyA
 };
 
 // Add to top (last index)
-const push = <V>(opts: StackOpts, stack: ReadonlyArray<V>, ...toAdd: ReadonlyArray<V>): ReadonlyArray<V> => {
+const push = <V>(opts:StackOpts, stack:ReadonlyArray<V>, ...toAdd:ReadonlyArray<V>):ReadonlyArray<V> => {
   // If stack is A, B and toAdd is C, D this yields A, B, C, D
   //const mutated = [...stack, ...toAdd];
   const potentialLength = stack.length + toAdd.length;
@@ -54,7 +54,7 @@ const push = <V>(opts: StackOpts, stack: ReadonlyArray<V>, ...toAdd: ReadonlyArr
 };
 
 // Remove from top (last index)
-const pop = <V>(opts: StackOpts, stack: ReadonlyArray<V>): ReadonlyArray<V> => {
+const pop = <V>(opts:StackOpts, stack:ReadonlyArray<V>):ReadonlyArray<V> => {
   if (stack.length === 0) throw new Error(`Stack is empty`);
   return stack.slice(0, stack.length - 1);
 };
@@ -67,11 +67,11 @@ const pop = <V>(opts: StackOpts, stack: ReadonlyArray<V>): ReadonlyArray<V> => {
  * @param {V[]} stack
  * @returns {(V | undefined)}
  */
-const peek = <V>(opts: StackOpts, stack: ReadonlyArray<V>): V | undefined => stack[stack.length - 1];
+const peek = <V>(opts:StackOpts, stack:ReadonlyArray<V>):V | undefined => stack[stack.length - 1];
 
-const isEmpty = <V>(opts: StackOpts, stack: ReadonlyArray<V>): boolean => stack.length === 0;
+const isEmpty = <V>(opts:StackOpts, stack:ReadonlyArray<V>):boolean => stack.length === 0;
 
-const isFull = <V>(opts: StackOpts, stack: ReadonlyArray<V>): boolean => {
+const isFull = <V>(opts:StackOpts, stack:ReadonlyArray<V>):boolean => {
   if (opts.capacity) {
     return stack.length >= opts.capacity;
   }
@@ -82,40 +82,40 @@ const isFull = <V>(opts: StackOpts, stack: ReadonlyArray<V>): boolean => {
 // Immutable
 // -------------------------
 class StackImpl<V> {
-  readonly opts: StackOpts;
+  readonly opts:StackOpts;
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  readonly data: ReadonlyArray<V>;
+  readonly data:ReadonlyArray<V>;
 
-  constructor(opts: StackOpts, data: ReadonlyArray<V>) {
+  constructor(opts:StackOpts, data:ReadonlyArray<V>) {
     this.opts = opts;
     this.data = data;
   }
 
-  push(...toAdd: ReadonlyArray<V>): Stack<V> {
+  push(...toAdd:ReadonlyArray<V>):Stack<V> {
     return new StackImpl<V>(this.opts, push(this.opts, this.data, ...toAdd));
   }
 
-  pop(): Stack<V> {
+  pop():Stack<V> {
     return new StackImpl<V>(this.opts, pop(this.opts, this.data));
   }
 
-  forEach(fn:(v:V) => void): void {
+  forEach(fn:(v:V)=>void):void {
     this.data.forEach(fn);
   }
 
-  forEachFromTop(fn:(v:V) => void): void {
+  forEachFromTop(fn:(v:V)=>void):void {
     [...this.data].reverse().forEach(fn);
   }
 
-  get isEmpty(): boolean {
+  get isEmpty():boolean {
     return isEmpty(this.opts, this.data);
   }
 
-  get isFull(): boolean {
+  get isFull():boolean {
     return isFull(this.opts, this.data);
   }
 
-  get peek(): V | undefined {
+  get peek():V | undefined {
     return peek(this.opts, this.data);
   }
 
@@ -128,44 +128,44 @@ class StackImpl<V> {
 // Mutable
 // -------------------------
 class StackMutableImpl<V> {
-  readonly opts: StackOpts;
+  readonly opts:StackOpts;
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  data: ReadonlyArray<V>;
+  data:ReadonlyArray<V>;
 
-  constructor(opts: StackOpts, data: ReadonlyArray<V>) {
+  constructor(opts:StackOpts, data:ReadonlyArray<V>) {
     this.opts = opts;
     this.data = data;
   }
 
-  push(...toAdd: ReadonlyArray<V>): number {
+  push(...toAdd:ReadonlyArray<V>):number {
     /* eslint-disable-next-line functional/immutable-data */
     this.data = push(this.opts, this.data, ...toAdd);
     return this.data.length;
   }
 
-  forEach(fn:(v:V) => void): void {
+  forEach(fn:(v:V)=>void):void {
     this.data.forEach(fn);
   }
 
-  forEachFromTop(fn:(v:V) => void): void {
+  forEachFromTop(fn:(v:V)=>void):void {
     [...this.data].reverse().forEach(fn);
   }
 
-  pop(): V|undefined {
+  pop():V|undefined {
     const v = peek(this.opts, this.data);
-    pop(this.opts, this.data);
+    this.data = pop(this.opts, this.data);
     return v;
   }
 
-  get isEmpty(): boolean {
+  get isEmpty():boolean {
     return isEmpty(this.opts, this.data);
   }
 
-  get isFull(): boolean {
+  get isFull():boolean {
     return isFull(this.opts, this.data);
   }
 
-  get peek(): V | undefined {
+  get peek():V | undefined {
     return peek(this.opts, this.data);
   }
 
@@ -197,7 +197,7 @@ class StackMutableImpl<V> {
  * @param opts Options
  * @param startingItems List of items to add to stack. Items will be pushed 'left to right', ie array index 0 will be bottom of the stack.
  */
-export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>): Stack<V> => new StackImpl({...opts}, [...startingItems]);
+export const stack = <V>(opts:StackOpts = {}, ...startingItems:ReadonlyArray<V>):Stack<V> => new StackImpl({ ...opts }, [...startingItems]);
 
 /**
  * Creates a stack. Mutable. Use {@link stack} for an immutable alternative.
@@ -219,4 +219,4 @@ export const stack = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V
  * s.peek;  // 3
  * ```
  */
-export const stackMutable = <V>(opts: StackOpts = {}, ...startingItems: ReadonlyArray<V>):StackMutable<V> =>  new StackMutableImpl({...opts}, [...startingItems]);
+export const stackMutable = <V>(opts:StackOpts = {}, ...startingItems:ReadonlyArray<V>):StackMutable<V> =>  new StackMutableImpl({ ...opts }, [...startingItems]);
