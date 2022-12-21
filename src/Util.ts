@@ -205,6 +205,10 @@ export const runningiOS = () => [
   // iPad on iOS 13 detection
   || (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
 
+
+export type CompareResult = 0|1|-1;
+export type Comparer<V> = (a:V, b:V)=>CompareResult;
+
 /**
  * Default sort comparer, following same sematics as Array.sort
  * @param x 
@@ -212,7 +216,7 @@ export const runningiOS = () => [
  * @returns 
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const defaultComparer = (x:any, y:any) => {
+export const defaultComparer = (x:any, y:any):CompareResult => {
   // Via https://stackoverflow.com/questions/47334234/how-to-implement-array-prototype-sort-default-compare-function
   if (x === undefined && y === undefined) return 0;
   if (x === undefined) return 1;
