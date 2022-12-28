@@ -98,12 +98,15 @@ export const toCartesian:ToCartesian = (a:Coord|number, b?:Points.Point|number, 
       return polarToCartesian(a.distance, a.angleRadian, b);  
     }
     throw new Error(`Expecting (Coord, Point). Second parameter is not a point`);
+  } else if (typeof a === `object`) {
+    throw new Error(`First param is an object, but not a Coord: ${JSON.stringify(a)}`);
   } else {
     if (typeof a === `number` && typeof b === `number`) {
       if (c === undefined) c = Points.Empty;
       if (!Points.isPoint(c)) throw new Error(`Expecting (number, number, Point). Point param wrong type`);
       return polarToCartesian(a, b, c);
     } else {
+      
       throw new Error(`Expecting parameters of (number, number). Got: (${typeof(a)}, ${typeof(b)}, ${typeof(c)}). a: ${JSON.stringify(a)}`);
     }
   }
