@@ -48,7 +48,6 @@ export const toHsl = (colour:Colourish):Hsl => {
   else return hsl;
 }
 
-
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
  * It's useful for generating perceptually different shades as the index increments.
