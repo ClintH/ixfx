@@ -1,6 +1,39 @@
 import { expect, test } from '@jest/globals';
 import * as Grids from '../../geometry/Grid.js';
 
+test(`indexFromCell`, () => {
+  expect(Grids.indexFromCell(2, { x: 1, y: 1 })).toEqual(3);
+  expect(Grids.indexFromCell(2, { x: 0, y: 0 })).toEqual(0);
+  expect(Grids.indexFromCell(2, { x: 0, y: 1 })).toEqual(2);
+});
+
+test(`cellFromIndex`, () => {
+  expect(Grids.cellFromIndex(2, 3)).toEqual({ x:1, y:1 });
+  expect(Grids.cellFromIndex(2, 0)).toEqual({ x: 0, y: 0 });
+  expect(Grids.cellFromIndex(2, 2)).toEqual({ x: 0, y: 1 });
+});
+
+test(`visitArray`, () => {
+  const data = [1, 2, 3, 4, 5, 6];
+  const cols = 2;
+
+  // Test data checking
+  // @ts-ignore
+  expect(() => Array.from(Grids.visitArray(null, 2))).toThrow();
+  // @ts-ignore
+  expect(() => Array.from(Grids.visitArray(undefined, 2))).toThrow();
+  // @ts-ignore
+  expect(() => Array.from(Grids.visitArray(`string`, 2))).toThrow();
+  expect(() => Array.from(Grids.visitArray([], -1))).toThrow();
+
+  // Test default visitor: left-to-right, top-to-bottom
+  const r1 = Array.from(Grids.visitArray(data, cols));
+  expect(r1).toEqual([[1, 0], [2, 1], [3, 2], [4, 3], [5, 4], [6, 5]]);
+
+
+});
+
+
 test(`cells`, () => {
   const g = { rows: 3, cols: 3 };
   const expected = [

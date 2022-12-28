@@ -1,34 +1,34 @@
-import {Rects, Points} from './index.js';
-import {integer as guardInteger} from '../Guards.js';
-import {clampIndex} from '../data/Clamp.js';
-import {randomElement} from '../collections/Arrays.js';
-import {SetMutable} from '../collections/Interfaces.js';
-import {setMutable, } from "../collections/Set.js";
-import {zipKeyValue} from "../collections/Map.js";
+import { Rects, Points } from './index.js';
+import { integer as guardInteger } from '../Guards.js';
+import { clampIndex } from '../data/Clamp.js';
+import { randomElement } from '../collections/Arrays.js';
+import { SetMutable } from '../collections/Interfaces.js';
+import { setMutable, } from "../collections/Set.js";
+import { zipKeyValue } from "../collections/Map.js";
 
 export type GridVisual = Readonly<{
-  readonly size: number,
+  readonly size:number,
 }>
 
 export type Grid = Readonly<{
-  readonly rows: number
-  readonly cols: number
+  readonly rows:number
+  readonly cols:number
 }>;
 
 export type Cell = Readonly<{
-  readonly x: number
-  readonly y: number
+  readonly x:number
+  readonly y:number
 }>;
 
 export type Neighbours = Readonly<{
-  readonly n: Cell | undefined,
-  readonly e: Cell | undefined,
-  readonly s: Cell | undefined,
-  readonly w: Cell | undefined,
-  readonly ne: Cell | undefined,
-  readonly nw: Cell | undefined,
-  readonly se: Cell | undefined,
-  readonly sw: Cell | undefined
+  readonly n:Cell | undefined,
+  readonly e:Cell | undefined,
+  readonly s:Cell | undefined,
+  readonly w:Cell | undefined,
+  readonly ne:Cell | undefined,
+  readonly nw:Cell | undefined,
+  readonly se:Cell | undefined,
+  readonly sw:Cell | undefined
 }>
 
 export type CardinalDirection = `` | `n` | `ne` | `e` | `se` | `s` | `sw` | `w` | `nw`;
@@ -36,29 +36,42 @@ export type CardinalDirection = `` | `n` | `ne` | `e` | `se` | `s` | `sw` | `w` 
 export type BoundsLogic = `unbounded` | `undefined` | `stop` | `wrap`;
 
 export type VisitorLogic = {
-  readonly options?: IdentifyNeighbours;
-  readonly select: NeighbourSelector
+  readonly options?:IdentifyNeighbours;
+  readonly select:NeighbourSelector
 }
 export type VisitGenerator = Generator<Readonly<Cell>, void, unknown>
 export type VisitorOpts = {
-  readonly visited?: SetMutable<Cell>
-  readonly reversed?: boolean
-  readonly debug?: boolean
+  readonly visited?:SetMutable<Cell>
+  readonly reversed?:boolean
+  readonly debug?:boolean
 }
-export type Visitor = (grid: Grid, start: Cell, opts?: VisitorOpts) => VisitGenerator;
+
+/**
+ * Visitor function.
+ * 
+ * Implementations:
+ * * {@link cells}: left-to-right, top-to-bottom. Same as {@link visitorRow}
+ * * {@link visitorBreadth}, {@link visitorDepth}
+ * * {@link visitorColumn}: top-to-bottom, left-to-right.
+ * * {@link visitorRandom}: Any unvisited location
+ * * {@link visitorRandomContiguous}: A random direct neighbour of current cell
+ */
+export type Visitor = (grid:Grid, start:Cell, opts?:VisitorOpts)=>VisitGenerator;
 
 export type NeighbourMaybe = readonly [keyof Neighbours, Cell | undefined];
 export type Neighbour = readonly [keyof Neighbours, Cell];
 
+export type CellAccessor = <V>(cell:Cell, wrap:BoundsLogic)=>V|undefined;
+
 /**
  * Neighbour selector logic. For a given set of `neighbours` pick one to visit next.
  */
-export type NeighbourSelector = (neighbours: ReadonlyArray<Neighbour>) => Neighbour | undefined;
+export type NeighbourSelector = (neighbours:ReadonlyArray<Neighbour>)=>Neighbour | undefined;
 
 /**
  * Identify neighbours logic. For a given `grid` and `origin`, return a list of neighbours
  */
-export type IdentifyNeighbours = (grid: Grid, origin: Cell) => ReadonlyArray<Neighbour>;
+export type IdentifyNeighbours = (grid:Grid, origin:Cell)=>ReadonlyArray<Neighbour>;
 
 /**
  * Returns true if `cell` parameter is a cell with x,y fields.
@@ -67,7 +80,7 @@ export type IdentifyNeighbours = (grid: Grid, origin: Cell) => ReadonlyArray<Nei
  * @param cell
  * @return True if parameter is a cell
  */
-const isCell = (cell: Cell | undefined): cell is Cell => {
+const isCell = (cell:Cell | undefined):cell is Cell => {
   if (cell === undefined) return false;
   return (`x` in cell && `y` in cell);
 };
@@ -78,20 +91,23 @@ const isCell = (cell: Cell | undefined): cell is Cell => {
  * @param n
  * @return
  */
-const isNeighbour = (n: Neighbour | NeighbourMaybe | undefined): n is Neighbour => {
+const isNeighbour = (n:Neighbour | NeighbourMaybe | undefined):n is Neighbour => {
   if (n === undefined) return false;
   if (n[1] === undefined) return false;
   return true;
 };
 
 /**
- * Returns _true_ if grids `a` and `b` are equal in value
+ * Returns _true_ if grids `a` and `b` are equal in value.
+ * Returns _false_ if either parameter is undefined.
  *
  * @param a
  * @param b
  * @return
  */
-export const isEqual = (a: Grid | GridVisual, b: Grid | GridVisual): boolean => {
+export const isEqual = (a:Grid | GridVisual, b:Grid | GridVisual):boolean => {
+  if (b === undefined) return false;
+  if (a === undefined) return false;
   if (`rows` in a && `cols` in a) {
     if (`rows` in b && `cols` in b) {
       if (a.rows !== b.rows || a.cols !== b.cols) return false;
@@ -108,19 +124,25 @@ export const isEqual = (a: Grid | GridVisual, b: Grid | GridVisual): boolean => 
 /**
  * Returns a key string for a cell instance
  * A key string allows comparison of instances by value rather than reference
+ * 
+ * ```js
+ * cellKeyString({x:10,y:20});
+ * // Yields: "Cell{10,20}";
+ * ```
  * @param v
  * @returns
  */
-export const cellKeyString = (v: Cell): string => `Cell{${v.x},${v.y}}`;
+export const cellKeyString = (v:Cell):string => `Cell{${v.x},${v.y}}`;
 
 /**
- * Returns true if two cells equal. Returns false if either cell (or both) are undefined
+ * Returns _true_ if two cells equal.
+ * Returns _false_ if either cell are undefined
  *
  * @param a
  * @param b
  * @returns
  */
-export const cellEquals = (a: Cell, b: Cell): boolean => {
+export const cellEquals = (a:Cell, b:Cell):boolean => {
   if (b === undefined) return false;
   if (a === undefined) return false;
   return a.x === b.x && a.y === b.y;
@@ -133,7 +155,7 @@ export const cellEquals = (a: Cell, b: Cell): boolean => {
  * @param paramName 
  * @param grid 
  */
-export const guardCell = (cell: Cell, paramName: string = `Param`, grid?: Grid) => {
+export const guardCell = (cell:Cell, paramName:string = `Param`, grid?:Grid) => {
   if (cell === undefined) throw new Error(paramName + ` is undefined. Expecting {x,y}`);
   if (cell.x === undefined) throw new Error(paramName + `.x is undefined`);
   if (cell.y === undefined) throw new Error(paramName + `.y is undefined`);
@@ -149,7 +171,7 @@ export const guardCell = (cell: Cell, paramName: string = `Param`, grid?: Grid) 
  * @param grid
  * @param paramName 
  */
-const guardGrid = (grid: Grid, paramName: string = `Param`) => {
+const guardGrid = (grid:Grid, paramName:string = `Param`) => {
   if (grid === undefined) throw new Error(`${paramName} is undefined. Expecting grid.`);
   if (!(`rows` in grid)) throw new Error(`${paramName}.rows is undefined`);
   if (!(`cols` in grid)) throw new Error(`${paramName}.cols is undefined`);
@@ -165,64 +187,87 @@ const guardGrid = (grid: Grid, paramName: string = `Param`) => {
  * @param cell
  * @return
  */
-export const inside = (grid: Grid, cell: Cell): boolean => {
+export const inside = (grid:Grid, cell:Cell):boolean => {
   if (cell.x < 0 || cell.y < 0) return false;
   if (cell.x >= grid.cols || cell.y >= grid.rows) return false;
   return true;
 };
+
 /**
  * Returns a visual rectangle of the cell, positioned from the top-left corner
  *
+ * ```js
+ * const cell = { x: 1, y: 0 };
+ * 
+ * // 5x5 grid, each cell 5px in size
+ * const grid = { rows: 5, cols: 5, size: 5 }
+ * 
+ * const r = rectangleForCell(cell, grid);
+ * 
+ * // Yields: { x: 5, y: 0, width: 5, height: 5 }
+ * ```
  * @param cell
  * @param grid
  * @return
  */
-export const rectangleForCell = (cell: Cell, grid: Grid & GridVisual): Rects.RectPositioned => {
+export const rectangleForCell = (cell:Cell, grid:Grid & GridVisual):Rects.RectPositioned => {
   guardCell(cell);
   const size = grid.size;
   const x = cell.x * size;
   const y = cell.y * size;
-  const r = Rects.fromTopLeft({x: x, y: y}, size, size);
+  const r = Rects.fromTopLeft({ x: x, y: y }, size, size);
   return r;
 };
 
 /**
  * Returns the cell at a specified visual coordinate
+ * or _undefined_ if the position is outside of the grid.
  *
  * @param position Position, eg in pixels
  * @param grid Grid
  * @return Cell at position or undefined if outside of the grid
  */
-export const cellAtPoint = (position: Points.Point, grid: Grid & GridVisual): Cell | undefined => {
+export const cellAtPoint = (position:Points.Point, grid:Grid & GridVisual):Cell | undefined => {
   const size = grid.size;
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
   const y = Math.floor(position.y / size);
   if (x >= grid.cols) return;
   if (y >= grid.rows) return;
-  return {x, y};
+  return { x, y };
 };
 
 /**
- * Returns a list of all cardinal directions
+ * Returns a list of all cardinal directions: n, ne, nw, e, s, se, sw, w
  */
 export const allDirections = Object.freeze([`n`, `ne`, `nw`, `e`, `s`, `se`, `sw`, `w`]) as ReadonlyArray<CardinalDirection>;
 
 /**
- * Returns a list of + shaped directions (ie. excluding diaganol)
+ * Returns a list of + shaped directions: n, e, s, w
  */
 export const crossDirections = Object.freeze([`n`, `e`, `s`, `w`]) as ReadonlyArray<CardinalDirection>;
 
 /**
- * Returns neighbours for a cell. If no `directions` are provided, it defaults to all.
+ * Returns neighbours for a cell. If no `directions` are provided, it defaults to {@link allDirections}.
  * 
  * ```js
- * const n = neighbours = ({rows: 5, cols: 5}, {x:2, y:2} `wrap`);
+ * const grid = { rows: 5, cols: 5 };
+ * const cell = { x:2, y:2 };
+ * 
+ * // Get n,ne,nw,e,s,se,sw and w neighbours
+ * const n = Grids.neighbours(grid, cell, `wrap`);
+ * 
+ * Yields:
  * {
  *  n: {x: 2, y: 1}
  *  s: {x: 2, y: 3}
  *  ....
  * }
+ * ```
+ * 
+ * Returns neighbours without diagonals (ie n, e, s, w):
+ * ```js
+ * const n = Grids.neighbours(grid, cell, `stop`, Grids.crossDirections);
  * ```
  * @returns Returns a map of cells, keyed by cardinal direction
  * @param grid Grid
@@ -230,34 +275,34 @@ export const crossDirections = Object.freeze([`n`, `e`, `s`, `w`]) as ReadonlyAr
  * @param bounds How to handle edges of grid
  * @param directions Directions to return
  */
-export const neighbours = (grid: Grid, cell: Cell, bounds: BoundsLogic = `undefined`, directions?: ReadonlyArray<CardinalDirection>): Neighbours => {
+export const neighbours = (grid:Grid, cell:Cell, bounds:BoundsLogic = `undefined`, directions?:ReadonlyArray<CardinalDirection>):Neighbours => {
   const dirs = directions ?? allDirections;
   const points = dirs.map(c => offset(grid, cell, getVectorFromCardinal(c), bounds));
   return zipKeyValue<Cell>(dirs, points) as Neighbours;
 };
 
 /**
- * Returns the visual midpoint of a cell (eg pixel coordinate)
+ * Returns the visual midpoint of a cell (eg. pixel coordinate)
  *
  * @param cell
  * @param grid
  * @return 
  */
-export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Points.Point => {
+export const cellMiddle = (cell:Cell, grid:Grid & GridVisual):Points.Point => {
   guardCell(cell);
 
   const size = grid.size;
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
   const y = cell.y * size; // + (grid.spacing ? cell.y * grid.spacing : 0);
-  return Object.freeze({x: x + size / 2, y: y + size / 2});
+  return Object.freeze({ x: x + size / 2, y: y + size / 2 });
 };
 
 /**
- * Returns the cells on the line of start and end, inclusive
+ * Returns the cells on the line of `start` and `end`, inclusive
  *
  * ```js
  * // Get cells that connect 0,0 and 10,10
- * const cells = getLine({x:0,y:0}, {x:10,y:10});
+ * const cells = Grids.getLine({x:0,y:0}, {x:10,y:10});
  * ```
  * 
  * This function does not handle wrapped coordinates.
@@ -265,7 +310,7 @@ export const cellMiddle = (cell: Cell, grid: Grid & GridVisual): Points.Point =>
  * @param end End cell
  * @returns
  */
-export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
+export const getLine = (start:Cell, end:Cell):ReadonlyArray<Cell> => {
   // https://stackoverflow.com/a/4672319
   guardCell(start);
   guardCell(end);
@@ -285,7 +330,7 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
   // eslint-disable-next-line no-constant-condition
   while (true) {
     // eslint-disable-next-line functional/immutable-data
-    cells.push(Object.freeze({x: startX, y: startY}));
+    cells.push(Object.freeze({ x: startX, y: startY }));
     if (startX === end.x && startY === end.y) break;
     const e2 = 2 * err;
     if (e2 > -dy) {
@@ -302,14 +347,14 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
 
 /**
  * Returns cells that correspond to the cardinal directions at a specified distance
- *
+ * i.e. it projects a line from `start` cell in all cardinal directions and returns the cells at `steps` distance.
  * @param grid Grid
  * @param steps Distance
  * @param start Start poiint
  * @param bound Logic for if bounds of grid are exceeded
  * @returns Cells corresponding to cardinals
  */
-export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds: BoundsLogic = `stop`): Neighbours => {
+export const offsetCardinals = (grid:Grid, start:Cell, steps:number, bounds:BoundsLogic = `stop`):Neighbours => {
   guardGrid(grid, `grid`);
   guardCell(start, `start`);
   guardInteger(steps, `aboveZero`, `steps`);
@@ -337,36 +382,36 @@ export const offsetCardinals = (grid: Grid, start: Cell, steps: number, bounds: 
  * @param multiplier Multipler
  * @returns Signed vector in the form of `{ x, y }`
  */
-export const getVectorFromCardinal = (cardinal: CardinalDirection, multiplier: number = 1): Cell => {
+export const getVectorFromCardinal = (cardinal:CardinalDirection, multiplier:number = 1):Cell => {
   // eslint-disable-next-line functional/no-let
   let v;
   switch (cardinal) {
   case `n`:
-    v = {x: 0, y: -1 * multiplier};
+    v = { x: 0, y: -1 * multiplier };
     break;
   case `ne`:
-    v = {x: 1 * multiplier, y: -1 * multiplier};
+    v = { x: 1 * multiplier, y: -1 * multiplier };
     break;
   case `e`:
-    v = {x: 1 * multiplier, y: 0};
+    v = { x: 1 * multiplier, y: 0 };
     break;
   case `se`:
-    v = {x: 1 * multiplier, y: 1 * multiplier};
+    v = { x: 1 * multiplier, y: 1 * multiplier };
     break;
   case `s`:
-    v = {x: 0, y: 1 * multiplier};
+    v = { x: 0, y: 1 * multiplier };
     break;
   case `sw`:
-    v = {x: -1 * multiplier, y: 1 * multiplier};
+    v = { x: -1 * multiplier, y: 1 * multiplier };
     break;
   case `w`:
-    v = {x: -1 * multiplier, y: 0};
+    v = { x: -1 * multiplier, y: 0 };
     break;
   case `nw`:
-    v = {x: -1 * multiplier, y: -1 * multiplier};
+    v = { x: -1 * multiplier, y: -1 * multiplier };
     break;
   default:
-    v = {x: 0, y: 0};
+    v = { x: 0, y: 0 };
   }
   return Object.freeze(v);
 };
@@ -381,16 +426,16 @@ export const getVectorFromCardinal = (cardinal: CardinalDirection, multiplier: n
  * @param endInclusive
  * @return Array of cells
  */
-export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolean = false): ReadonlyArray<Cell> {
+export const simpleLine = function (start:Cell, end:Cell, endInclusive:boolean = false):ReadonlyArray<Cell> {
   // eslint-disable-next-line functional/prefer-readonly-type
-  const cells: Cell[] = [];
+  const cells:Cell[] = [];
   if (start.x === end.x) {
     // Vertical
     const lastY = endInclusive ? end.y + 1 : end.y;
     // eslint-disable-next-line functional/no-let
     for (let y = start.y; y < lastY; y++) {
       // eslint-disable-next-line functional/immutable-data
-      cells.push({x: start.x, y: y});
+      cells.push({ x: start.x, y: y });
     }
   } else if (start.y === end.y) {
     // Horizontal
@@ -398,7 +443,7 @@ export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolea
     // eslint-disable-next-line functional/no-let
     for (let x = start.x; x < lastX; x++) {
       // eslint-disable-next-line functional/immutable-data
-      cells.push({x: x, y: start.y});
+      cells.push({ x: x, y: start.y });
     }
   } else {
     throw new Error(`Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`);
@@ -420,7 +465,7 @@ export const simpleLine = function (start: Cell, end: Cell, endInclusive: boolea
  * @param bounds
  * @returns Cell
  */
-export const offset = function (grid: Grid, start: Cell, vector: Cell, bounds: BoundsLogic = `undefined`): Cell | undefined {
+export const offset = function (grid:Grid, start:Cell, vector:Cell, bounds:BoundsLogic = `undefined`):Cell | undefined {
   guardCell(start, `start`, grid);
   guardCell(vector);
   guardGrid(grid, `grid`);
@@ -461,10 +506,10 @@ export const offset = function (grid: Grid, start: Cell, vector: Cell, bounds: B
   default:
     throw new Error(`Unknown BoundsLogic case ${bounds}`);
   }
-  return Object.freeze({x, y});
+  return Object.freeze({ x, y });
 };
 
-const neighbourList = (grid: Grid, cell: Cell, directions: ReadonlyArray<CardinalDirection>, bounds: BoundsLogic): ReadonlyArray<Neighbour> => {
+const neighbourList = (grid:Grid, cell:Cell, directions:ReadonlyArray<CardinalDirection>, bounds:BoundsLogic):ReadonlyArray<Neighbour> => {
   // Get neighbours for cell
   const cellNeighbours = neighbours(grid, cell, bounds, directions);
 
@@ -512,27 +557,27 @@ const neighbourList = (grid: Grid, cell: Cell, directions: ReadonlyArray<Cardina
  */
 // eslint-disable-next-line functional/prefer-readonly-type
 export const visitor = function* (
-  logic: VisitorLogic,
-  grid: Grid,
-  start: Cell,
-  opts: VisitorOpts = {}
-): VisitGenerator {
+  logic:VisitorLogic,
+  grid:Grid,
+  start:Cell,
+  opts:VisitorOpts = {}
+):VisitGenerator {
 
   guardGrid(grid, `grid`);
   guardCell(start, `start`, grid);
 
 
   const v = opts.visited ?? setMutable<Cell>(c => cellKeyString(c));
-  const possibleNeighbours = logic.options ? logic.options : (g: Grid, c: Cell) => neighbourList(g, c, crossDirections, `undefined`);
+  const possibleNeighbours = logic.options ? logic.options : (g:Grid, c:Cell) => neighbourList(g, c, crossDirections, `undefined`);
 
   if (!isCell(start)) throw new Error(`'start' parameter is undefined or not a cell`);
 
   // eslint-disable-next-line functional/no-let
-  let cellQueue: Cell[] = [start];
+  let cellQueue:Cell[] = [start];
   // eslint-disable-next-line functional/no-let
-  let moveQueue: Neighbour[] = [];
+  let moveQueue:Neighbour[] = [];
   // eslint-disable-next-line functional/no-let
-  let current: Cell | null = null;
+  let current:Cell | null = null;
 
   while (cellQueue.length > 0) {
     // console.log(`cell queue: ${cellQueue.length} move queue: ${moveQueue.length} current: ${JSON.stringify(current)}` );
@@ -582,32 +627,39 @@ export const visitor = function* (
   }
 };
 
-export const visitorDepth = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
+export const visitorDepth = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
   select: (nbos) => nbos[nbos.length - 1]
 },
 grid,
 start,
 opts);
 
-export const visitorBreadth = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
+export const visitorBreadth = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
   select: (nbos) => nbos[0]
 },
 grid,
 start,
 opts);
 
-const randomNeighbour = (nbos: readonly Neighbour[]) => randomElement(nbos); // .filter(isNeighbour));
+const randomNeighbour = (nbos:readonly Neighbour[]) => randomElement(nbos); // .filter(isNeighbour));
 
-export const visitorRandomContiguous = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
+export const visitorRandomContiguous = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
   select: randomNeighbour
 },
 grid,
 start,
 opts);
 
-export const visitorRandom = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => visitor({
+/**
+ * Visit by following rows. Normal order is left-to-right, top-to-bottom.
+ * @param grid 
+ * @param start 
+ * @param opts 
+ * @returns 
+ */
+export const visitorRandom = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => visitor({
   options: (grid, cell) => {
-    const t: Neighbour[] = [];
+    const t:Neighbour[] = [];
     for (const c of cells(grid, cell)) {
       // eslint-disable-next-line functional/immutable-data
       t.push([`n`, c]);
@@ -620,25 +672,25 @@ grid,
 start,
 opts);
 
-export const visitorRow = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => {
-  const {reversed = false} = opts;
+export const visitorRow = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
+  const { reversed = false } = opts;
 
-  const neighbourSelect = (nbos: readonly Neighbour[]) => nbos.find(n => n[0] === (reversed ? `w` : `e`));
+  const neighbourSelect = (nbos:readonly Neighbour[]) => nbos.find(n => n[0] === (reversed ? `w` : `e`));
 
-  const possibleNeighbours = (grid: Grid, cell: Cell): ReadonlyArray<Neighbour> => {
+  const possibleNeighbours = (grid:Grid, cell:Cell):ReadonlyArray<Neighbour> => {
     if (reversed) {
-      // WALKING BACKWARD ALONG RONG
+      // WALKING BACKWARD ALONG ROW
       if (cell.x > 0) {
         // All fine, step to the left
-        cell = {x: cell.x - 1, y: cell.y};
+        cell = { x: cell.x - 1, y: cell.y };
       } else {
         // At the beginning of a row
         if (cell.y > 0) {
           // Wrap to next row up
-          cell = {x: grid.cols - 1, y: cell.y - 1};
+          cell = { x: grid.cols - 1, y: cell.y - 1 };
         } else {
           // Wrap to end of grid
-          cell = {x: grid.cols - 1, y: grid.rows - 1};
+          cell = { x: grid.cols - 1, y: grid.rows - 1 };
         }
       }
     } else {
@@ -648,22 +700,22 @@ export const visitorRow = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => {
        */
       if (cell.x < grid.rows - 1) {
         // All fine, step to the right
-        cell = {x: cell.x + 1, y: cell.y};
+        cell = { x: cell.x + 1, y: cell.y };
       } else {
         // At the end of a row
         if (cell.y < grid.rows - 1) {
           // More rows available, wrap to next row down
-          cell = {x: 0, y: cell.y + 1};
+          cell = { x: 0, y: cell.y + 1 };
         } else {
           // No more rows available, wrap to start of the grid
-          cell = {x: 0, y: 0};
+          cell = { x: 0, y: 0 };
         }
       }
     }
     return [[(reversed ? `w` : `e`), cell]];
   };
 
-  const logic: VisitorLogic = {
+  const logic:VisitorLogic = {
     select: neighbourSelect,
     options: possibleNeighbours
   };
@@ -684,10 +736,10 @@ export const visitorRow = (grid: Grid, start: Cell, opts: VisitorOpts = {}) => {
  * @param visitor Visitor function
  * @returns 
  */
-export const visitFor = (grid: Grid, start: Cell, steps: number, visitor: Visitor): Cell => {
+export const visitFor = (grid:Grid, start:Cell, steps:number, visitor:Visitor):Cell => {
   guardInteger(steps, ``, `steps`);
 
-  const opts: VisitorOpts = {
+  const opts:VisitorOpts = {
     reversed: steps < 0
   };
   steps = Math.abs(steps);
@@ -703,7 +755,7 @@ export const visitFor = (grid: Grid, start: Cell, steps: number, visitor: Visito
 
   while (stepsMade < steps) {
     stepsMade++;
-    const {value} = v.next();
+    const { value } = v.next();
     if (value) {
       c = value;
       if (opts.debug) console.log(`stepsMade: ${stepsMade} cell: ${c.x}, ${c.y} reverse: ${opts.reversed}`);
@@ -728,38 +780,38 @@ export const visitFor = (grid: Grid, start: Cell, steps: number, visitor: Visito
  * @param opts Options
  * @returns Visitor generator
  */
-export const visitorColumn = (grid: Grid, start: Cell, opts: VisitorOpts = {}):VisitGenerator => {
-  const {reversed = false} = opts;
-  const logic: VisitorLogic = {
+export const visitorColumn = (grid:Grid, start:Cell, opts:VisitorOpts = {}):VisitGenerator => {
+  const { reversed = false } = opts;
+  const logic:VisitorLogic = {
     select: (nbos) => nbos.find(n => n[0] === (reversed ? `n` : `s`)),
-    options: (grid, cell): ReadonlyArray<Neighbour> => {
+    options: (grid, cell):ReadonlyArray<Neighbour> => {
       if (reversed) {
         // WALK UP COLUMN, RIGHT-TO-LEFT
         if (cell.y > 0) {
           // Easy case
-          cell = {x: cell.x, y: cell.y - 1};
+          cell = { x: cell.x, y: cell.y - 1 };
         } else {
           // Top of column
           if (cell.x === 0) {
             // Top-left corner, need to wrap
-            cell = {x: grid.cols - 1, y: grid.rows - 1};
+            cell = { x: grid.cols - 1, y: grid.rows - 1 };
           } else {
-            cell = {x: cell.x - 1, y: grid.rows - 1};
+            cell = { x: cell.x - 1, y: grid.rows - 1 };
           }
         }
       } else {
         // WALK DOWN COLUMNS, LEFT-TO-RIGHT
         if (cell.y < grid.rows - 1) {
           // Easy case, move down by one
-          cell = {x: cell.x, y: cell.y + 1};
+          cell = { x: cell.x, y: cell.y + 1 };
         } else {
           // End of column
           if (cell.x < grid.cols - 1) {
             // Move to next column and start at top
-            cell = {x: cell.x + 1, y: 0};
+            cell = { x: cell.x + 1, y: 0 };
           } else {
             // Move to start of grid
-            cell = {x: 0, y: 0};
+            cell = { x: 0, y: 0 };
           }
         }
       }
@@ -771,19 +823,22 @@ export const visitorColumn = (grid: Grid, start: Cell, opts: VisitorOpts = {}):V
 
 /**
  * Enumerate rows of grid, returning all the cells in the row
+ * as an array
+ * 
  * ```js
  * for (const row of Grid.rows(shape)) {
  *  // row is an array of Cells.
+ *  // [ {x:0, y:0}, {x:1, y:0} ... ] 
  * }
  * ```
  * @param grid 
  * @param start 
  */
-export const rows = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
+export const rows = function* (grid:Grid, start:Cell = { x: 0, y: 0 }) {
   //eslint-disable-next-line functional/no-let
   let row = start.y;
   //eslint-disable-next-line functional/no-let
-  let rowCells: Cell[] = [];
+  let rowCells:Cell[] = [];
  
   for (const c of cells(grid, start)) {
     if (c.y !== row) {
@@ -805,16 +860,16 @@ export const rows = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
  * @param grid
  * @param start
  */
-export const cells = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
+export const cells = function* (grid:Grid, start:Cell = { x: 0, y: 0 }) {
   guardGrid(grid, `grid`);
   guardCell(start, `start`, grid);
 
   // eslint-disable-next-line functional/no-let
-  let {x, y} = start;
+  let { x, y } = start;
   // eslint-disable-next-line functional/no-let
   let canMove = true;
   do {
-    yield {x, y};
+    yield { x, y };
     x++;
     if (x === grid.cols) {
       y++;
@@ -826,4 +881,121 @@ export const cells = function* (grid: Grid, start: Cell = {x: 0, y: 0}) {
     }
     if (x === start.x && y === start.y) canMove = false; // Complete
   } while (canMove);
+};
+
+export const accessArray = <V>(array:readonly V[], cols:number) => {
+  
+  const fn = (cell:Cell, wrap:BoundsLogic):V => {
+    const index = indexFromCell(cols, cell);
+    return array[index];
+  };
+  return fn;
+};
+
+/**
+ * Visits a grid packed into an array.
+ * 
+ * @example By default visits left-to-right, top-to-bottom:
+ * ```js
+ * const data = [1, 2, 3, 4, 5, 6];
+ * const cols = 2;
+ * for (const [value,index] of visitArray(data, cols)) {
+ *  // Yields: 1, 2, 3, 4, 5, 6
+ * }
+ * ```
+ * 
+ * @example
+ * ```js
+ * ```
+ * @param array 
+ * @param cols 
+ * @param iteratorFn 
+ */
+export function* visitArray<V>(array:readonly V[], cols:number, iteratorFn?:Visitor, opts?:VisitorOpts):IterableIterator<readonly [data:V, index:number]>  {
+  if (typeof array === `undefined`) throw Error(`First parameter is undefined, expected an array`);
+  if (array === null) throw Error(`First parameter is null, expected an array`);
+  if (!Array.isArray(array)) throw Error(`First parameter should be an array`);
+
+  guardInteger(cols, `aboveZero`, `cols`);
+  if (array.length === 0) return;
+  
+  const rows = Math.ceil(array.length / cols);
+  const g:Grid = {
+    cols, rows
+  };
+
+  if (iteratorFn === undefined) iteratorFn = cells;
+  const iter = iteratorFn(g, { x:0, y:0 }, opts);
+  for (const cell of iter) {
+    const index = indexFromCell(cols, cell);
+    yield [array[index], index];
+  }
+}
+
+/**
+ * Returns the index for a given cell.
+ * This is useful if a grid is stored in an array.
+ * 
+ * ```js
+ * const data = [ 
+ *  1, 2, 
+ *  3, 4, 
+ *  5, 6 ];
+ * const cols = 2; // Grid of 2 columns wide
+ * const index = indexFromCell(cols, {x: 1, y: 1});
+ * // Yields an index of 3
+ * console.log(data[index]); // Yields 4
+ * ```
+ * @see cellFromIndex
+ * @param colsOrGrid 
+ * @param cell 
+ * @returns 
+ */
+export const indexFromCell = (colsOrGrid:number|Grid, cell:Cell, wrap:BoundsLogic):number => {
+  //eslint-disable-next-line functional/no-let
+  let cols = 0;
+  if (typeof colsOrGrid === `number`) {
+    cols = colsOrGrid;
+  } else {
+    cols = colsOrGrid.cols;
+  }
+
+  guardInteger(cols, `aboveZero`, `colsOrGrid`);
+  
+
+  return cell.y * cols +  cell.x;
+};
+
+/**
+ * Returns x,y from an array index.
+ * 
+ * ```js
+ *  const data = [ 
+ *   1, 2, 
+ *   3, 4, 
+ *   5, 6 ];
+ * 
+ * // Cols of 2, index 2 (ie. data[2] == 3)
+ * const cell = cellFromIndex(2, 2);
+ * // Yields: {x: 0, y: 1}
+ * ```
+ * @see indexFromCell
+ * @param colsOrGrid 
+ * @param index 
+ * @returns 
+ */
+export const cellFromIndex = (colsOrGrid:number|Grid, index:number):Cell => {
+  //eslint-disable-next-line functional/no-let
+  let cols = 0;
+  if (typeof colsOrGrid === `number`) {
+    cols = colsOrGrid;
+  } else {
+    cols = colsOrGrid.cols;
+  }
+  guardInteger(cols, `aboveZero`, `colsOrGrid`);
+
+  return {
+    x: index % cols,
+    y: Math.floor(index / cols)
+  };
 };
