@@ -2,7 +2,7 @@ import * as Points from '../geometry/Point.js';
 import * as Paths from '../geometry/Path.js';
 import * as Lines from '../geometry/Line.js';
 import * as Triangles from '../geometry/Triangle.js';
-import {array as guardArray} from '../Guards.js';
+import { array as guardArray } from '../Guards.js';
 import * as Circles from '../geometry/Circle.js';
 import * as Arcs from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
@@ -12,9 +12,9 @@ import * as Colours from '../visual/Colour.js';
 
 //import * as color2k from 'color2k';
 
-import {stack, Stack} from '../collections/index.js';
-import {resolveEl} from '../dom/Util.js';
-import {roundUpToMultiple} from '../Util.js';
+import { stack, Stack } from '../collections/index.js';
+import { resolveEl } from '../dom/Util.js';
+import { roundUpToMultiple } from '../Util.js';
 
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -27,7 +27,7 @@ export type CanvasCtxQuery = null | string | CanvasRenderingContext2D | HTMLCanv
  * @param canvasElCtxOrQuery Canvas element reference or DOM query
  * @returns Drawing context.
  */
-export const getCtx = (canvasElCtxOrQuery:CanvasCtxQuery): CanvasRenderingContext2D => {
+export const getCtx = (canvasElCtxOrQuery:CanvasCtxQuery):CanvasRenderingContext2D => {
   if (canvasElCtxOrQuery === null) throw Error(`canvasElCtxOrQuery null. Must be a 2d drawing context or Canvas element`);
   if (canvasElCtxOrQuery === undefined) throw Error(`canvasElCtxOrQuery undefined. Must be a 2d drawing context or Canvas element`);
   
@@ -49,25 +49,25 @@ export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rec
   // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
   const ctx = getCtx(ctxOrCanvasEl);
   return {
-    paths(pathsToDraw: Paths.Path[], opts?: DrawingOpts): void {
+    paths(pathsToDraw:Paths.Path[], opts?:DrawingOpts):void {
       paths(ctx, pathsToDraw, opts);
     },
-    line(lineToDraw: Lines.Line|Lines.Line[], opts?: DrawingOpts): void {
+    line(lineToDraw:Lines.Line|Lines.Line[], opts?:DrawingOpts):void {
       line(ctx, lineToDraw, opts);
     },
-    rect(rectsToDraw:Rects.RectPositioned|Rects.RectPositioned[], opts?:DrawingOpts & { filled?:boolean}): void {
+    rect(rectsToDraw:Rects.RectPositioned|Rects.RectPositioned[], opts?:DrawingOpts & { filled?:boolean}):void {
       rect(ctx, rectsToDraw, opts);
     },
-    bezier(bezierToDraw: Beziers.QuadraticBezier|Beziers.CubicBezier, opts?:DrawingOpts): void {
+    bezier(bezierToDraw:Beziers.QuadraticBezier|Beziers.CubicBezier, opts?:DrawingOpts):void {
       bezier(ctx, bezierToDraw, opts);
     },
-    connectedPoints(pointsToDraw: Points.Point[], opts?: DrawingOpts & {loop?: boolean}): void {
+    connectedPoints(pointsToDraw:Points.Point[], opts?:DrawingOpts & {loop?:boolean}):void {
       connectedPoints(ctx, pointsToDraw, opts);
     },
-    pointLabels(pointsToDraw: Points.Point[], opts?:DrawingOpts): void {
+    pointLabels(pointsToDraw:Points.Point[], opts?:DrawingOpts):void {
       pointLabels(ctx, pointsToDraw, opts);
     },
-    dot(dotPosition: Points.Point|Points.Point[], opts?: DrawingOpts & {radius: number, outlined?: boolean, filled?: boolean}): void {
+    dot(dotPosition:Points.Point|Points.Point[], opts?:DrawingOpts & {radius:number, outlined?:boolean, filled?:boolean}):void {
       dot(ctx, dotPosition, opts);
     },
     circle(circlesToDraw:Circles.CirclePositioned|Circles.CirclePositioned[], opts:DrawingOpts):void {
@@ -76,8 +76,8 @@ export const makeHelper = (ctxOrCanvasEl:CanvasCtxQuery, canvasBounds?:Rects.Rec
     arc(arcsToDraw:Arcs.ArcPositioned|Arcs.ArcPositioned[], opts:DrawingOpts):void {
       arc(ctx, arcsToDraw, opts);
     },
-    textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?: Rects.RectPositioned}):void {
-      if (opts.bounds === undefined && canvasBounds !== undefined) opts = {...opts, bounds: {...canvasBounds, x:0, y:0 }};
+    textBlock(lines:string[], opts:DrawingOpts & { anchor:Points.Point, anchorPadding?:number, bounds?:Rects.RectPositioned}):void {
+      if (opts.bounds === undefined && canvasBounds !== undefined) opts = { ...opts, bounds: { ...canvasBounds, x:0, y:0 } };
       textBlock(ctx, lines, opts);
     }
   };
@@ -155,7 +155,7 @@ export const arc = (ctx:CanvasRenderingContext2D, arcs:Arcs.ArcPositioned|Readon
 /**
  * A drawing stack operation
  */
-export type StackOp = (ctx:CanvasRenderingContext2D) => void;
+export type StackOp = (ctx:CanvasRenderingContext2D)=>void;
 
 /**
  * A drawing stack (immutable)
@@ -234,7 +234,7 @@ export const drawingStack = (ctx:CanvasRenderingContext2D, stk?:Stack<StackOp>):
     return drawingStack(ctx, stk);
   };
 
-  return {push, pop, apply};
+  return { push, pop, apply };
 };
 
 export const lineThroughPoints = (ctx:CanvasRenderingContext2D, points:readonly Points.Point[], opts?:DrawingOpts):void => {
@@ -318,7 +318,7 @@ export const ellipse = (ctx:CanvasRenderingContext2D, ellipsesToDraw:Ellipses.El
  * @param pathsToDraw 
  * @param opts 
  */
-export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths.Path[]|Paths.Path, opts: Readonly<{readonly strokeStyle?: string, readonly debug?: boolean}> = {}) =>  {
+export const paths = (ctx:CanvasRenderingContext2D, pathsToDraw:readonly Paths.Path[]|Paths.Path, opts:Readonly<{readonly strokeStyle?:string, readonly debug?:boolean}> = {}) =>  {
   applyOpts(ctx, opts);
 
   const draw = (path:Paths.Path) => {
@@ -342,7 +342,7 @@ export const paths = (ctx: CanvasRenderingContext2D, pathsToDraw: readonly Paths
  * @param ctx
  * @param pts
  */
-export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly loop?: boolean, readonly fillStyle?:string, readonly strokeStyle?: string} = {}) => {
+export const connectedPoints = (ctx:CanvasRenderingContext2D, pts:readonly Points.Point[], opts:{readonly loop?:boolean, readonly fillStyle?:string, readonly strokeStyle?:string} = {}) => {
   const shouldLoop = opts.loop ?? false;
 
   guardArray(pts);
@@ -376,7 +376,7 @@ export const connectedPoints = (ctx: CanvasRenderingContext2D, pts: readonly Poi
  * @param opts 
  * @param labels Labels for points
  */
-export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.Point[], opts: {readonly fillStyle?:string} = {}, labels?:readonly string[]) => {
+export const pointLabels = (ctx:CanvasRenderingContext2D, pts:readonly Points.Point[], opts:{readonly fillStyle?:string} = {}, labels?:readonly string[]) => {
   if (pts.length === 0) return;
 
   // Throw an error if any point is invalid
@@ -396,7 +396,7 @@ export const pointLabels = (ctx: CanvasRenderingContext2D, pts: readonly Points.
  * @param point 
  * @returns 
  */
-export const translatePoint = (ctx:CanvasRenderingContext2D, point: Points.Point): Points.Point => {
+export const translatePoint = (ctx:CanvasRenderingContext2D, point:Points.Point):Points.Point => {
   const m = ctx.getTransform();
   return {
     x: point.x * m.a + point.y * m.c + m.e,
@@ -416,7 +416,7 @@ export const translatePoint = (ctx:CanvasRenderingContext2D, point: Points.Point
  * @param canvasEl 
  * @returns 
  */
-export const copyToImg = (canvasEl:HTMLCanvasElement): HTMLImageElement => {
+export const copyToImg = (canvasEl:HTMLCanvasElement):HTMLImageElement => {
   const img = document.createElement(`img`);
   //eslint-disable-next-line functional/immutable-data
   img.src = canvasEl.toDataURL(`image/jpeg`);
@@ -429,7 +429,7 @@ export const copyToImg = (canvasEl:HTMLCanvasElement): HTMLImageElement => {
  * @param pos 
  * @param opts 
  */
-export const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Points.Point[], opts?: DrawingOpts & {readonly radius?: number, readonly outlined?: boolean, readonly filled?: boolean})  => {
+export const dot = (ctx:CanvasRenderingContext2D, pos:Points.Point|readonly Points.Point[], opts?:DrawingOpts & {readonly radius?:number, readonly outlined?:boolean, readonly filled?:boolean})  => {
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
   
@@ -458,7 +458,7 @@ export const dot = (ctx: CanvasRenderingContext2D, pos: Points.Point|readonly Po
  * @param bezierToDraw 
  * @param opts 
  */
-export const bezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier|Beziers.CubicBezier, opts?: DrawingOpts) => {
+export const bezier = (ctx:CanvasRenderingContext2D, bezierToDraw:Beziers.QuadraticBezier|Beziers.CubicBezier, opts?:DrawingOpts) => {
   if (Beziers.isQuadraticBezier(bezierToDraw)) {
     quadraticBezier(ctx, bezierToDraw, opts);
   } else if (Beziers.isCubicBezier(bezierToDraw)) {
@@ -466,11 +466,11 @@ export const bezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Quad
   }
 };
 
-const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicBezier, opts: DrawingOpts = {}) => {
+const cubicBezier = (ctx:CanvasRenderingContext2D, bezierToDraw:Beziers.CubicBezier, opts:DrawingOpts = {}) => {
   // eslint-disable-next-line functional/no-let
   let stack = applyOpts(ctx, opts);
 
-  const {a, b, cubic1, cubic2} = bezierToDraw;
+  const { a, b, cubic1, cubic2 } = bezierToDraw;
   const isDebug = opts.debug ?? false;
 
   if (isDebug) {
@@ -485,9 +485,9 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
   ctx.stroke();
 
   if (isDebug) {
-    stack = stack.push(optsOp({...opts, 
+    stack = stack.push(optsOp({ ...opts, 
       strokeStyle: Colours.opacity(opts.strokeStyle ?? `silver`, 0.6),
-      fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4)}));
+      fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4) }));
 
     stack.apply();
     ctx.moveTo(a.x, a.y);
@@ -502,17 +502,17 @@ const cubicBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.CubicB
     ctx.fillText(`c1`, cubic1.x + 5, cubic1.y);
     ctx.fillText(`c2`, cubic2.x + 5, cubic2.y);
 
-    dot(ctx, cubic1, {radius: 3});
-    dot(ctx, cubic2, {radius: 3});
-    dot(ctx, a, {radius: 3});
-    dot(ctx, b, {radius: 3});
+    dot(ctx, cubic1, { radius: 3 });
+    dot(ctx, cubic2, { radius: 3 });
+    dot(ctx, a, { radius: 3 });
+    dot(ctx, b, { radius: 3 });
     stack = stack.pop();
     stack.apply();
   }
 };
 
-const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.QuadraticBezier, opts: DrawingOpts = {}) => {
-  const {a, b, quadratic} = bezierToDraw;
+const quadraticBezier = (ctx:CanvasRenderingContext2D, bezierToDraw:Beziers.QuadraticBezier, opts:DrawingOpts = {}) => {
+  const { a, b, quadratic } = bezierToDraw;
   const isDebug = opts.debug ?? false;
   // eslint-disable-next-line functional/no-let
   let stack = applyOpts(ctx, opts);
@@ -529,17 +529,17 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
      * ctx.fillStyle = opts.strokeStyle ?? `gray`;
      * ctx.strokeStyle = opts.strokeStyle ?? `gray`;
      */
-    stack = stack.push(optsOp({...opts, 
+    stack = stack.push(optsOp({ ...opts, 
       strokeStyle: Colours.opacity(opts.strokeStyle ?? `silver`, 0.6),
-      fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4)}));
+      fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4) }));
     connectedPoints(ctx, [a, quadratic, b]);
 
     ctx.fillText(`a`, a.x + 5, a.y);
     ctx.fillText(`b`, b.x + 5, b.y);
     ctx.fillText(`h`, quadratic.x + 5, quadratic.y);
-    dot(ctx, quadratic, {radius: 3});
-    dot(ctx, a, {radius: 3});
-    dot(ctx, b, {radius: 3});
+    dot(ctx, quadratic, { radius: 3 });
+    dot(ctx, a, { radius: 3 });
+    dot(ctx, b, { radius: 3 });
     /*
      * ctx.fillStyle = fs;
      * ctx.strokeStyle = ss;
@@ -560,21 +560,21 @@ const quadraticBezier = (ctx: CanvasRenderingContext2D, bezierToDraw: Beziers.Qu
  * @param toDraw 
  * @param opts 
  */
-export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly Lines.Line[], opts: LineOpts & DrawingOpts = {}) => {
+export const line = (ctx:CanvasRenderingContext2D, toDraw:Lines.Line|readonly Lines.Line[], opts:LineOpts & DrawingOpts = {}) => {
   const isDebug = opts.debug ?? false;
   const o = lineOp(opts.lineWidth, opts.lineJoin, opts.lineCap);
   applyOpts(ctx, opts, o);
 
   const draw = (d:Lines.Line) => {
-    const {a, b} = d;
+    const { a, b } = d;
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);
     ctx.lineTo(b.x, b.y);
     if (isDebug) { 
       ctx.fillText(`a`, a.x, a.y);
       ctx.fillText(`b`, b.x, b.y);
-      dot(ctx, a, {radius: 5, strokeStyle: `black`});
-      dot(ctx, b, {radius: 5, strokeStyle: `black`});
+      dot(ctx, a, { radius: 5, strokeStyle: `black` });
+      dot(ctx, b, { radius: 5, strokeStyle: `black` });
     }
     ctx.stroke();
   };
@@ -589,11 +589,11 @@ export const line = (ctx: CanvasRenderingContext2D, toDraw: Lines.Line|readonly 
  * @param toDraw 
  * @param opts 
  */
-export const triangle = (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triangle|readonly Triangles.Triangle[], opts: DrawingOpts & {readonly filled?:boolean} = {}) => {
+export const triangle = (ctx:CanvasRenderingContext2D, toDraw:Triangles.Triangle|readonly Triangles.Triangle[], opts:DrawingOpts & {readonly filled?:boolean} = {}) => {
   applyOpts(ctx, opts);
 
   const draw = (t:Triangles.Triangle) => {
-    connectedPoints(ctx, Triangles.corners(t), {...opts, loop: true});
+    connectedPoints(ctx, Triangles.corners(t), { ...opts, loop: true });
     
     if (opts.debug) {
       pointLabels(ctx, Triangles.corners(t), undefined, [`a`, `b`, `c`]);
@@ -619,12 +619,12 @@ export const triangle = (ctx: CanvasRenderingContext2D, toDraw: Triangles.Triang
  * @param toDraw 
  * @param opts 
  */
-export const rect = (ctx: CanvasRenderingContext2D, toDraw: Rects.RectPositioned|readonly Rects.RectPositioned[], opts: DrawingOpts & {readonly filled?:boolean} = {}) => {
+export const rect = (ctx:CanvasRenderingContext2D, toDraw:Rects.RectPositioned|readonly Rects.RectPositioned[], opts:DrawingOpts & {readonly filled?:boolean, readonly stroked?:boolean} = {}) => {
   applyOpts(ctx, opts);
-
+  
   const draw = (d:Rects.RectPositioned) => {
     if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
-    ctx.strokeRect(d.x, d.y, d.width, d.height);
+    if (opts.stroked ?? true) ctx.strokeRect(d.x, d.y, d.width, d.height);
 
     if (opts.debug) {
       pointLabels(ctx, Rects.corners(d), undefined, [`NW`, `NE`, `SE`, `SW`]);
@@ -656,12 +656,12 @@ export const textWidth = (ctx:CanvasRenderingContext2D, text?:string|null, paddi
  * @param lines 
  * @param opts 
  */
-export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[], opts:DrawingOpts & {readonly anchor:Points.Point, readonly anchorPadding?:number, readonly bounds?: Rects.RectPositioned}) => {
+export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[], opts:DrawingOpts & {readonly anchor:Points.Point, readonly anchorPadding?:number, readonly bounds?:Rects.RectPositioned}) => {
   applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;
 
   const anchor = opts.anchor;
-  const bounds = opts.bounds ?? {x:0, y:0, width:1000000, height:1000000};
+  const bounds = opts.bounds ?? { x:0, y:0, width:1000000, height:1000000 };
 
   // Measure each line
   const blocks = lines.map(l => ctx.measureText(l));
@@ -675,7 +675,7 @@ export const textBlock = (ctx:CanvasRenderingContext2D, lines:readonly string[],
   const totalHeight = heights.reduce((acc, val) => acc+val, 0);
 
   // eslint-disable-next-line functional/no-let
-  let {x, y} = anchor;
+  let { x, y } = anchor;
 
   if (anchor.x + maxWidth > bounds.width) x = bounds.width - (maxWidth + anchorPadding);
   else x -= anchorPadding;
@@ -699,9 +699,9 @@ export type VertAlign = `top` | `center` | `bottom`;
 /**
  * Draws an aligned text block
  */
-export const textBlockAligned = (ctx:CanvasRenderingContext2D, text:readonly string[]|string, opts:DrawingOpts & { readonly bounds: Rects.RectPositioned, readonly horiz?: HorizAlign, readonly vert?:VertAlign}) => {
-  const {bounds} = opts;
-  const {horiz = `left`, vert = `top`} = opts;
+export const textBlockAligned = (ctx:CanvasRenderingContext2D, text:readonly string[]|string, opts:DrawingOpts & { readonly bounds:Rects.RectPositioned, readonly horiz?:HorizAlign, readonly vert?:VertAlign}) => {
+  const { bounds } = opts;
+  const { horiz = `left`, vert = `top` } = opts;
 
   //eslint-disable-next-line functional/no-let
   let lines:readonly string[];
