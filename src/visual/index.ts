@@ -8,6 +8,8 @@ import * as Colour from './Colour.js';
 import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
 
+export * as ImageDataGrid from './ImageDataGrid.js';
+
 /**
  * Colour interpolation, scale generation and parsing
  * 
@@ -26,7 +28,7 @@ import * as Video from './Video.js';
  * * {@link toHsl}: to a `{h, s, l}` object
  * * {@link toRgb}: to a `{r, g, b}` object
  */
-export {Colour};
+export { Colour };
 
 /**
  * Working with video, either playback from a file or stream from a video camera.
@@ -43,13 +45,13 @@ export {Colour};
  * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
  * ```
  */
-export {Video};
+export { Video };
 
-export {Palette,  Drawing, Svg, Plot, Plot2, SceneGraph};
+export { Palette,  Drawing, Svg, Plot, Plot2, SceneGraph };
 
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = {...(window as any).ixfx, Visuals: {SceneGraph, Plot2, Drawing, Svg, Plot, Palette, Colour, Video}};
+    (window as any).ixfx = { ...(window as any).ixfx, Visuals: { SceneGraph, Plot2, Drawing, Svg, Plot, Palette, Colour, Video } };
   }
 } catch { /* no-op */ }
