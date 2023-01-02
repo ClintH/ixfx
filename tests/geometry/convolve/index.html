@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>convolve</title>
+</head>
+
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #sourceReadCanvas {
+      border: 1px solid red;
+    }
+
+    #output {
+      border: 2px solid blue;
+    }
+  </style>
+  <img style="display:none" id="sourceImg" src="mario.png" />
+  <canvas id="source" width="16" height="16"></canvas>
+  <canvas id="dest" width="16" height="16"></canvas>
+  <canvas id="sourceMagnified" width="256" height="256"></canvas>
+  <canvas id="destMagnified" width="256" height="256"></canvas>
+
+
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>
