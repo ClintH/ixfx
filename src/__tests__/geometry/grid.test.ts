@@ -2,9 +2,38 @@ import { expect, test } from '@jest/globals';
 import * as Grids from '../../geometry/Grid.js';
 
 test(`indexFromCell`, () => {
-  expect(Grids.indexFromCell(2, { x: 1, y: 1 })).toEqual(3);
-  expect(Grids.indexFromCell(2, { x: 0, y: 0 })).toEqual(0);
-  expect(Grids.indexFromCell(2, { x: 0, y: 1 })).toEqual(2);
+  const wrap = `undefined`;
+  const grid = { cols: 2, rows: 2 };
+  expect(Grids.indexFromCell(grid, { x: 1, y: 1 }, wrap)).toEqual(3);
+  expect(Grids.indexFromCell(grid, { x: 0, y: 0 }, wrap)).toEqual(0);
+  expect(Grids.indexFromCell(grid, { x: 0, y: 1 }, wrap)).toEqual(2);
+
+  // Wrapping: undefined
+  expect(Grids.indexFromCell(grid, { x: -1, y: 1 }, `undefined`)).toBeUndefined();
+  expect(Grids.indexFromCell(grid, { x: 1, y: -1 }, `undefined`)).toBeUndefined();
+  expect(Grids.indexFromCell(grid, { x: 2, y: 1 }, `undefined`)).toBeUndefined();
+  expect(Grids.indexFromCell(grid, { x: 1, y: 2 }, `undefined`)).toBeUndefined();
+
+  // Wrapping: stop
+  expect(Grids.indexFromCell(grid, { x: -1, y: 1 }, `stop`)).toEqual(2);
+  expect(Grids.indexFromCell(grid, { x: 1, y: -1 }, `stop`)).toEqual(1);
+  expect(Grids.indexFromCell(grid, { x: 2, y: 1 }, `stop`)).toEqual(3);
+  expect(Grids.indexFromCell(grid, { x: 1, y: 2 }, `stop`)).toEqual(3);
+
+  // Wrapping: unbounded
+  expect(() => Grids.indexFromCell(grid, { x: -1, y: 1 }, `unbounded`)).toThrow();
+  expect(() => Grids.indexFromCell(grid, { x: 1, y: -1 }, `unbounded`)).toThrow();
+  expect(() => Grids.indexFromCell(grid, { x: 2, y: 1 }, `unbounded`)).toThrow();
+  expect(() => Grids.indexFromCell(grid, { x: 1, y: 2 }, `unbounded`)).toThrow();
+
+
+  // Wrapping: wrap
+  const grid2 = { cols: 3, rows: 3 };
+  expect(Grids.indexFromCell(grid2, { x: -1, y: 1 }, `wrap`)).toEqual(5);
+  expect(Grids.indexFromCell(grid2, { x: 1, y: -1 }, `wrap`)).toEqual(7);
+  expect(Grids.indexFromCell(grid2, { x: 3, y: 1 }, `wrap`)).toEqual(3);
+  expect(Grids.indexFromCell(grid2, { x: 1, y: 3 }, `wrap`)).toEqual(1);
+  
 });
 
 test(`cellFromIndex`, () => {

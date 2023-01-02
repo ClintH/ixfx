@@ -44,6 +44,7 @@ export type VisitorOpts = {
   readonly visited?:SetMutable<Cell>
   readonly reversed?:boolean
   readonly debug?:boolean
+  readonly boundsWrap?:BoundsLogic
 }
 
 /**
@@ -61,7 +62,13 @@ export type Visitor = (grid:Grid, start:Cell, opts?:VisitorOpts)=>VisitGenerator
 export type NeighbourMaybe = readonly [keyof Neighbours, Cell | undefined];
 export type Neighbour = readonly [keyof Neighbours, Cell];
 
-export type CellAccessor = <V>(cell:Cell, wrap:BoundsLogic)=>V|undefined;
+/**
+ * A function that returns a value (or _undefined_) based on a _cell_
+ * 
+ * Implementations:
+ * * {@link access1dArray}: For accessing a single-dimension array as a grid
+ */
+export type CellAccessor<V> = (cell:Cell, wrap:BoundsLogic)=>V|undefined;
 
 /**
  * Neighbour selector logic. For a given set of `neighbours` pick one to visit next.
@@ -219,6 +226,22 @@ export const rectangleForCell = (cell:Cell, grid:Grid & GridVisual):Rects.RectPo
   return r;
 };
 
+/**
+ * Generator that returns rectangles for each cell in a grid
+ * 
+ * @example Draw rectangles
+ * ```js
+ * import { Drawing } from 'visuals.js' 
+ * const rects = [...Grids.asRectangles(grid)];
+ * Drawing.rect(ctx, rects, { strokeStyle: `silver`});
+ * ```
+ * @param grid 
+ */
+export function* asRectangles(grid:GridVisual & Grid):IterableIterator<Rects.RectPositioned> {
+  for (const c of cells(grid)) {
+    yield rectangleForCell(c, grid);
+  }
+}
 /**
  * Returns the cell at a specified visual coordinate
  * or _undefined_ if the position is outside of the grid.
@@ -458,7 +481,7 @@ export const simpleLine = function (start:Cell, end:Cell, endInclusive:boolean =
  * Different behaviour can be specified for how to handle when coordinates exceed the bounds of the grid
  * 
  * 
- * Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift down a line 
+ * Note: x and y wrapping are calculated independently. A large wrapping of x, for example won't shift up/down a line 
  * @param grid Grid to traverse
  * @param vector Offset in x/y
  * @param start Start point
@@ -580,12 +603,10 @@ export const visitor = function* (
   let current:Cell | null = null;
 
   while (cellQueue.length > 0) {
-    // console.log(`cell queue: ${cellQueue.length} move queue: ${moveQueue.length} current: ${JSON.stringify(current)}` );
     if (current === null) {
       // eslint-disable-next-line functional/immutable-data
       const nv = cellQueue.pop();
       if (nv === undefined) {
-        // console.log(`cellQueue drained`);
         break;
       }
       current = nv;
@@ -613,7 +634,6 @@ export const visitor = function* (
     moveQueue = moveQueue.filter(step => !v.has(step[1]));
 
     if (moveQueue.length === 0) {
-      // console.log(`moveQueue empty`);
       current = null;
     } else {
       // Pick move
@@ -672,7 +692,7 @@ grid,
 start,
 opts);
 
-export const visitorRow = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
+export const visitorRow = (grid:Grid, start:Cell = { x:0, y:0 }, opts:VisitorOpts = {}) => {
   const { reversed = false } = opts;
 
   const neighbourSelect = (nbos:readonly Neighbour[]) => nbos.find(n => n[0] === (reversed ? `w` : `e`));
@@ -696,7 +716,6 @@ export const visitorRow = (grid:Grid, start:Cell, opts:VisitorOpts = {}) => {
     } else {
       /*
        * WALKING FORWARD ALONG ROWS
-       * console.log(`${cell.x}, ${cell.y}`);
        */
       if (cell.x < grid.rows - 1) {
         // All fine, step to the right
@@ -883,10 +902,11 @@ export const cells = function* (grid:Grid, start:Cell = { x: 0, y: 0 }) {
   } while (canMove);
 };
 
-export const accessArray = <V>(array:readonly V[], cols:number) => {
-  
-  const fn = (cell:Cell, wrap:BoundsLogic):V => {
-    const index = indexFromCell(cols, cell);
+export const access1dArray = <V>(array:readonly V[], cols:number):CellAccessor<V> => {
+  const grid = { cols, rows: Math.ceil(array.length/cols) };
+  const fn:CellAccessor<V> = (cell:Cell, wrap:BoundsLogic):V|undefined => {
+    const index = indexFromCell(grid, cell, wrap);
+    if (index === undefined) return undefined;
     return array[index];
   };
   return fn;
@@ -919,15 +939,17 @@ export function* visitArray<V>(array:readonly V[], cols:number, iteratorFn?:Visi
   guardInteger(cols, `aboveZero`, `cols`);
   if (array.length === 0) return;
   
+  const wrap = opts?.boundsWrap ?? `stop`;
   const rows = Math.ceil(array.length / cols);
-  const g:Grid = {
+  const grid:Grid = {
     cols, rows
   };
 
   if (iteratorFn === undefined) iteratorFn = cells;
-  const iter = iteratorFn(g, { x:0, y:0 }, opts);
+  const iter = iteratorFn(grid, { x:0, y:0 }, opts);
   for (const cell of iter) {
-    const index = indexFromCell(cols, cell);
+    const index = indexFromCell(grid, cell, wrap);
+    if (index ===undefined) return undefined;
     yield [array[index], index];
   }
 }
@@ -946,24 +968,81 @@ export function* visitArray<V>(array:readonly V[], cols:number, iteratorFn?:Visi
  * // Yields an index of 3
  * console.log(data[index]); // Yields 4
  * ```
+ * 
+ * Bounds logic is applied to cell.x/y separately. Wrapping
+ * only ever happens in same col/row.
  * @see cellFromIndex
  * @param colsOrGrid 
  * @param cell 
  * @returns 
  */
-export const indexFromCell = (colsOrGrid:number|Grid, cell:Cell, wrap:BoundsLogic):number => {
+export const indexFromCell = (grid:Grid, cell:Cell, wrap:BoundsLogic):number|undefined => {
+  guardGrid(grid, `grid`);
+
   //eslint-disable-next-line functional/no-let
-  let cols = 0;
-  if (typeof colsOrGrid === `number`) {
-    cols = colsOrGrid;
-  } else {
-    cols = colsOrGrid.cols;
+
+  if (cell.x < 0) {
+    switch (wrap) {
+    case `stop`:
+      cell = { ...cell, x:0 };
+      break;
+    case `unbounded`:
+      throw new Error(`unbounded not supported`);
+    case `undefined`:
+      return undefined;
+    case `wrap`:
+      //cell = { ...cell, x: grid.cols + cell.x };
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      cell = offset(grid, { x:0, y:cell.y }, { x:cell.x, y:0 }, `wrap`)!;
+      break;
+    }
+  }
+  if (cell.y < 0) {
+    switch (wrap) {
+    case `stop`:
+      cell = { ...cell, y:0 };
+      break;
+    case `unbounded`:
+      throw new Error(`unbounded not supported`);
+    case `undefined`:
+      return undefined;
+    case `wrap`:
+      cell = { ...cell, y: grid.rows + cell.y };
+      break;
+    }
+  }
+  if (cell.x >= grid.cols) {
+    switch (wrap) {
+    case `stop`:
+      cell = { ...cell, x:grid.cols-1 };
+      break;
+    case `unbounded`:
+      throw new Error(`unbounded not supported`);
+    case `undefined`:
+      return undefined;
+    case `wrap`:
+      cell = { ...cell, x: cell.x % grid.cols  };
+      break;
+    }
+  }
+  if (cell.y >= grid.rows) {
+    switch (wrap) {
+    case `stop`:
+      cell = { ...cell, y:grid.rows-1 };
+      break;
+    case `unbounded`:
+      throw new Error(`unbounded not supported`);
+    case `undefined`:
+      return undefined;
+    case `wrap`:
+      cell = { ...cell, y: cell.y % grid.rows };
+      break;
+    }
   }
 
-  guardInteger(cols, `aboveZero`, `colsOrGrid`);
-  
-
-  return cell.y * cols +  cell.x;
+  const index = cell.y * grid.cols + cell.x;
+ 
+  return index;
 };
 
 /**
