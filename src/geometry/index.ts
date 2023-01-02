@@ -19,6 +19,7 @@ export { Circles, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipse
 export { Layouts };
 export { quadTree } from './QuadTree.js';
 export * as Scaler from './Scaler.js';
+export * as Convolve2d from './Convolve2d.js';
 
 /**
  * Work with arcs. Arcs are a angle-limited circle, describing a wedge.
