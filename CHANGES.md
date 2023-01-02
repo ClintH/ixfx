@@ -4,6 +4,8 @@ A rough changelog between NPM releases
 - Geometry.quadTree
 - Geometry.Intersects: centralise a bunch of geometry logic
 - Geometry.Layout: CirclePacking.random
+- Geometry.Convolve2d: Kernel convolution
+- Visuals.ImageDataGrid: Access the DOM's ImageData array as a virtual grid of RGBA values
 - SurfacePoints: generate a Vogel spiral and distribution of points on a sphere.
 - SurfacePoints: distribute points on rings
 - Numbers.linearSpace: Generate x number of values from start->end, with linear distribution
