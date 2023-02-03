@@ -139,6 +139,18 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     return this.type.toArray(m);
   }
 
+  /**
+   * Iterate over the values stored under `key`.
+   * If key does not exist, iteration is essentially a no-op
+   * @param key
+   * @returns 
+   */
+  *valuesFor(key:string) {
+    const m = this.#map.get(key);
+    if (m === undefined) return;
+    yield *this.type.iterable(m);
+  }
+
   getSource(key:string):M|undefined {
     return this.#map.get(key);
   }
@@ -171,7 +183,7 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
  * @example
  * ```js
  * const map = mapArray();
- * map.add(`hello`, [1,2,3,4]); // Adds series of numbers under key `hello`
+ * map.addKeyedValues(`hello`, [1,2,3,4]); // Adds series of numbers under key `hello`
  * 
  * const hello = map.get(`hello`); // Get back values
  * ```
@@ -207,6 +219,7 @@ export const mapArray = <V>(opts:MapArrayOpts<V> = {}):MapOfMutable<V, ReadonlyA
       if (dest === undefined) return [...values];
       return [...dest, ...values];
     },
+    iterable:(source) => source.values(),
     count: (source) => source.length,
     find: (source, predicate) => source.find(predicate),
     filter: (source, predicate) => source.filter(predicate),
@@ -253,6 +266,7 @@ export const mapSet = <V>(opts?:MapSetOpts<V>):MapOfMutable<V, ReadonlyMap<strin
     get name()  {
       return `set`;
     },
+    iterable: (source) => source.values(),
     add:(dest, values) => addKeepingExisting(dest, hash, ...values),
     count: (source) => source.size,
     find: (source, predicate) => mapFind(source, predicate),
@@ -300,6 +314,7 @@ export const mapCircularMutable = <V>(opts:MapCircularOpts<V>):MapOfMutable<V, C
     find: (source, predicate) => source.find(predicate),
     filter: (source, predicate) => source.filter(predicate),
     toArray: (source) => source,
+    iterable: (source) => source.values(),
     has: (source, value) => source.find(v => comparer(v, value)) !== undefined,
     without: (source, value) => source.filter(v => !comparer(v, value))
   };
