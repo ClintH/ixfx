@@ -17,7 +17,14 @@ import * as Layouts from './Layout.js';
 
 export { Circles, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses,  Waypoints, Spheres };
 export { Layouts };
-export { quadTree } from './QuadTree.js';
+
+/**
+ * Quad tree is a datastructure for efficiently determining whether
+ * a point/shape is at a location
+ * - {@link quadTree}: Create a quad tree
+ */
+export * as QuadTree from './QuadTree.js';
+
 export * as Scaler from './Scaler.js';
 export * as Convolve2d from './Convolve2d.js';
 
@@ -82,7 +89,7 @@ export { Polar };
  * 
  * Overview:
  * * {@link sphereFibonacci}: Generate points on a sphere
- * * {@link vogelSpiral}: Generate a sunflower-esque pattern of points in a circle 
+ * * {@link circleVogelSpiral}: Generate a sunflower-esque pattern of points in a circle 
  */
 export * as SurfacePoints from './SurfacePoints.js';
 
