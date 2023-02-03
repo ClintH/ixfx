@@ -242,15 +242,54 @@ export function* asRectangles(grid:GridVisual & Grid):IterableIterator<Rects.Rec
     yield rectangleForCell(c, grid);
   }
 }
+
+/**
+ * Returns a two-dimensional array according to `grid`
+ * size.
+ * 
+ * ```js
+ * const a = Grids.toArray({ rows: 3, cols: 2 });
+ * Yields:
+ * [ [_,_] ]
+ * [ [_,_] ]
+ * [ [_,_] ]
+ * ```
+ * 
+ * `initialValue` can be provided to set the value
+ * for all cells.
+ * @param grid 
+ * @param initialValue 
+ * @returns 
+ */
+//eslint-disable-next-line functional/prefer-readonly-type
+export const toArray = <V>(grid:Grid, initialValue?:V):V[][] => {
+  const ret = [];
+  //eslint-disable-next-line functional/no-let
+  for (let row=0;row<grid.rows;row++) {
+    //eslint-disable-next-line functional/immutable-data
+    ret[row] = new Array<V>(grid.cols);
+    if (initialValue) {
+      //eslint-disable-next-line functional/no-let
+      for (let col=0;col<grid.cols;col++) {
+        //eslint-disable-next-line functional/immutable-data
+        ret[row][col] = initialValue;
+      }
+    }
+  }
+  return ret;
+};
+
 /**
  * Returns the cell at a specified visual coordinate
  * or _undefined_ if the position is outside of the grid.
+ * 
+ * `position` must be in same coordinate/scale as the grid.
  *
  * @param position Position, eg in pixels
  * @param grid Grid
  * @return Cell at position or undefined if outside of the grid
  */
-export const cellAtPoint = (position:Points.Point, grid:Grid & GridVisual):Cell | undefined => {
+export const cellAtPoint = (grid:Grid & GridVisual, position:Points.Point):Cell | undefined => {
   const size = grid.size;
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
@@ -303,6 +342,14 @@ export const neighbours = (grid:Grid, cell:Cell, bounds:BoundsLogic = `undefined
   const points = dirs.map(c => offset(grid, cell, getVectorFromCardinal(c), bounds));
   return zipKeyValue<Cell>(dirs, points) as Neighbours;
 };
+
+export function* visitNeigbours(grid:Grid, cell:Cell, bounds:BoundsLogic =`undefined`, directions?:ReadonlyArray<CardinalDirection>) {
+  const dirs = directions ?? allDirections;
+  const points = dirs.map(c => offset(grid, cell, getVectorFromCardinal(c), bounds));
+  for (const pt of points) {
+    if (pt !== undefined) yield pt;
+  }
+}
 
 /**
  * Returns the visual midpoint of a cell (eg. pixel coordinate)
@@ -908,6 +955,29 @@ export const access1dArray = <V>(array:readonly V[], cols:number):CellAccessor<V
     const index = indexFromCell(grid, cell, wrap);
     if (index === undefined) return undefined;
     return array[index];
+  };
+  return fn;
+};
+
+/**
+ * Returns a function that updates a 2D array representation
+ * of a grid. Array is mutated.
+ * 
+ * ```js
+ * const m = Grids.array2dUpdater(grid, array);
+ * m(someValue, { x:2, y:3 });
+ * ```
+ * @param grid 
+ * @param array 
+ * @returns 
+ */
+//eslint-disable-next-line functional/prefer-readonly-type
+export const array2dUpdater = <V>(grid:Grid & GridVisual, array:V[][]) => {
+  const fn = (v:V, position:Points.Point) => {
+    const pos = cellAtPoint(grid, position);
+    if (pos === undefined) throw new Error(`Position does not exist. Pos: ${JSON.stringify(position)} Grid: ${JSON.stringify(grid)}`);
+    //eslint-disable-next-line functional/immutable-data
+    array[pos.y][pos.x] = v;
   };
   return fn;
 };
