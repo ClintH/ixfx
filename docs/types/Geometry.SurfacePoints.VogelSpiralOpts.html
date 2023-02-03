@@ -15,7 +15,7 @@
 <li><a href="../modules/Geometry.SurfacePoints.html">SurfacePoints</a></li>
 <li><a href="Geometry.SurfacePoints.VogelSpiralOpts.html">VogelSpiralOpts</a></li></ul>
 <h1>Type alias VogelSpiralOpts</h1></div>
-<div class="tsd-signature">Vogel<wbr/>Spiral<wbr/>Opts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>density<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>maxPoints<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>spacing<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
+<div class="tsd-signature">Vogel<wbr/>Spiral<wbr/>Opts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>density<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>maxPoints<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>rotation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>spacing<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 <div class="tsd-comment tsd-typography"><p>Options for a Vogel spiral</p>
 </div>
 <div class="tsd-type-declaration">
@@ -31,6 +31,10 @@ Use this parameter OR the <code>spacing</code> parameter.</p>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> max<wbr/>Points<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
 <div class="tsd-comment tsd-typography"><p>Upper limit of points to produce.
 By default, 5000.</p>
+</div></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> rotation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Rotation offset to apply, in radians. 0 by default</p>
 </div></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> spacing<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
@@ -63,7 +67,8 @@ Use this option OR the density value.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Maps.html">Maps</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Queues.html">Queues</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Sets.html">Sets</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Trees.html">Trees</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
@@ -87,12 +92,17 @@ Use this option OR the density value.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Beziers.html">Beziers</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Circles.html">Circles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Compound.html">Compound</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Convolve2d.html">Convolve2d</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Ellipses.html">Ellipses</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Grids.html">Grids</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.html">Layouts</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.CirclePacking.html">Circle<wbr/>Packing</a></li></ul></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Lines.html">Lines</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Paths.html">Paths</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Points.html">Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.QuadTree.html">Quad<wbr/>Tree</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
@@ -130,6 +140,7 @@ Use this option OR the density value.</p>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Drawing.html">Drawing</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.ImageDataGrid.html">Image<wbr/>Data<wbr/>Grid</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Palette.html">Palette</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot.html">Plot</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot2.html">Plot2</a></li>
@@ -140,7 +151,9 @@ Use this option OR the density value.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Video.html">Video</a></li></ul></li></ul></li></ul></div></details></nav>
 <nav class="tsd-navigation secondary menu-sticky">
 <ul>
-<li class="current tsd-kind-type-alias tsd-parent-kind-namespace"><a href="Geometry.SurfacePoints.VogelSpiralOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg>Vogel<wbr/>Spiral<wbr/>Opts</a></li>
-<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.SurfacePoints.sphereFibonacci.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>sphere<wbr/>Fibonacci</a></li>
-<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.SurfacePoints.vogelSpiral.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>vogel<wbr/>Spiral</a></li></ul></nav></div></div>
+<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="Geometry.SurfacePoints.CircleRingsOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg>Circle<wbr/>Rings<wbr/>Opts</a></li>
+<li class="current tsd-kind-type-alias tsd-parent-kind-namespace"><a href="Geometry.SurfacePoints.VogelSpiralOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Vogel<wbr/>Spiral<wbr/>Opts</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.SurfacePoints.circleRings.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>circle<wbr/>Rings</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.SurfacePoints.circleVogelSpiral.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>circle<wbr/>Vogel<wbr/>Spiral</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="../functions/Geometry.SurfacePoints.sphereFibonacci.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>sphere<wbr/>Fibonacci</a></li></ul></nav></div></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>

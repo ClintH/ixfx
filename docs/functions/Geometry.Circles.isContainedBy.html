@@ -17,9 +17,11 @@
 <h1>Function isContainedBy</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-<li class="tsd-signature tsd-anchor-link" id="isContainedBy">is<wbr/>Contained<wbr/>By<span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a>, b<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol"> | </span><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#isContainedBy" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="isContainedBy">is<wbr/>Contained<wbr/>By<span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a>, b<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol"> | </span><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a>, c<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#isContainedBy" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns true if <code>b</code> is completely contained by <code>a</code></p>
+<pre><code class="language-js"><span class="hl-0">// Compare two points</span><br/><span class="hl-8">isContainedBy</span><span class="hl-2">(</span><span class="hl-3">circleA</span><span class="hl-2">, </span><span class="hl-3">circleB</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Compare a circle with a point</span><br/><span class="hl-8">isContainedBy</span><span class="hl-2">(</span><span class="hl-3">circleA</span><span class="hl-2">, {</span><span class="hl-3">x:</span><span class="hl-2"> </span><span class="hl-7">10</span><span class="hl-2">, </span><span class="hl-3">y:</span><span class="hl-2"> </span><span class="hl-7">20</span><span class="hl-2">});</span><br/><br/><span class="hl-0">// Define radius as third parameter</span><br/><span class="hl-8">isContainedBy</span><span class="hl-2">(</span><span class="hl-3">circleA</span><span class="hl-2">, {</span><span class="hl-3">x:</span><span class="hl-2"> </span><span class="hl-7">10</span><span class="hl-2">, </span><span class="hl-3">y:</span><span class="hl-2"> </span><span class="hl-7">20</span><span class="hl-2">}, </span><span class="hl-7">20</span><span class="hl-2">);</span>
+</code></pre>
 
 <h3>Returns</h3></div>
 <div class="tsd-parameters">
@@ -32,6 +34,10 @@
 <li>
 <h5>b: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol"> | </span><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a></h5>
 <div class="tsd-comment tsd-typography"><p>Circle or point to compare to</p>
+</div></li>
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> c: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Radius to accompany parameter b if it&#39;s a point</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4></li></ul></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -60,7 +66,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Maps.html">Maps</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Queues.html">Queues</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Sets.html">Sets</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Trees.html">Trees</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
@@ -84,12 +91,17 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Beziers.html">Beziers</a></li>
 <li class="current tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Circles.html">Circles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Compound.html">Compound</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Convolve2d.html">Convolve2d</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Ellipses.html">Ellipses</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Grids.html">Grids</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.html">Layouts</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.CirclePacking.html">Circle<wbr/>Packing</a></li></ul></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Lines.html">Lines</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Paths.html">Paths</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Points.html">Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.QuadTree.html">Quad<wbr/>Tree</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
@@ -127,6 +139,7 @@
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Drawing.html">Drawing</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.ImageDataGrid.html">Image<wbr/>Data<wbr/>Grid</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Palette.html">Palette</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot.html">Plot</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot2.html">Plot2</a></li>
@@ -140,6 +153,7 @@
 <li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="../types/Geometry.Circles.Circle.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg>Circle</a></li>
 <li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Circle<wbr/>Positioned</a></li>
 <li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="../types/Geometry.Circles.CircularPath.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Circular<wbr/>Path</a></li>
+<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="../types/Geometry.Circles.RandomPointOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Random<wbr/>Point<wbr/>Opts</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.area.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>area</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.bbox.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>bbox</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.center.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>center</a></li>
@@ -160,6 +174,7 @@
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.multiplyScalar.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>multiply<wbr/>Scalar</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.nearest.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>nearest</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.point.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>point</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.randomPoint.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>random<wbr/>Point</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.toPath.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>to<wbr/>Path</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.toPositioned.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>to<wbr/>Positioned</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Circles.toSvg.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>to<wbr/>Svg</a></li></ul></nav></div></div>

@@ -18,7 +18,7 @@
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
 <li class="tsd-signature tsd-anchor-link" id="quantiseEvery">quantise<wbr/>Every<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, every<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, middleRoundsUp<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#quantiseEvery" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Rounds <code>v</code> by <code>every</code>.</p>
+<div class="tsd-comment tsd-typography"><p>Rounds <code>v</code> by <code>every</code>. Middle values are rounded up by default.</p>
 <pre><code class="language-js"><span class="hl-8">quantiseEvery</span><span class="hl-2">(</span><span class="hl-7">11</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">);  </span><span class="hl-0">// 10</span><br/><span class="hl-8">quantiseEvery</span><span class="hl-2">(</span><span class="hl-7">25</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">);  </span><span class="hl-0">// 30</span><br/><span class="hl-8">quantiseEvery</span><span class="hl-2">(</span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">);   </span><span class="hl-0">// 0</span><br/><span class="hl-8">quantiseEvery</span><span class="hl-2">(</span><span class="hl-7">4</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">);   </span><span class="hl-0">// 0</span><br/><span class="hl-8">quantiseEvery</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">); </span><span class="hl-0">// 100</span>
 </code></pre>
 
@@ -59,7 +59,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Maps.html">Maps</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Queues.html">Queues</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Sets.html">Sets</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Trees.html">Trees</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
@@ -83,12 +84,17 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Beziers.html">Beziers</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Circles.html">Circles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Compound.html">Compound</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Convolve2d.html">Convolve2d</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Ellipses.html">Ellipses</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Grids.html">Grids</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.html">Layouts</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.CirclePacking.html">Circle<wbr/>Packing</a></li></ul></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Lines.html">Lines</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Paths.html">Paths</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Points.html">Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.QuadTree.html">Quad<wbr/>Tree</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
@@ -126,6 +132,7 @@
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Drawing.html">Drawing</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.ImageDataGrid.html">Image<wbr/>Data<wbr/>Grid</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Palette.html">Palette</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot.html">Plot</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot2.html">Plot2</a></li>
@@ -140,9 +147,12 @@
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.averageWeighted.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>average<wbr/>Weighted</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.filter.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>filter</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.isValid.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>is<wbr/>Valid</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.linearSpace.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>linear<wbr/>Space</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.max.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>max</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.min.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>min</a></li>
 <li class="current tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.quantiseEvery.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>quantise<wbr/>Every</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.round.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>round</a></li>
+<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.rounder.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>rounder</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.total.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>total</a></li>
 <li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Numbers.tracker.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>tracker</a></li></ul></nav></div></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>

@@ -19,11 +19,10 @@
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
 <li class="tsd-signature tsd-anchor-link" id="sortByNumericProperty">sort<wbr/>By<wbr/>Numeric<wbr/>Property<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span>, propertyName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">K</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">V</span><span class="tsd-signature-symbol">[]</span><a href="#sortByNumericProperty" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Sorts an array of objects by the given property name, assuming its a number.</p>
-<p>```js<code>const data = [ { size: 10, colour:</code>red<code>}, { size: 20, colour:</code>blue<code>}, { size: 5, colour:</code>pink<code>}]; const sorted = Arrays.sortByNumericProperty(data,</code>size`);</p>
-<p>Yields items ascending order:
-[ { size: 5, colour: <code>pink</code> }, { size: 10, colour: <code>red</code> }, { size: 20, colour: <code>blue</code> } ]
-```</p>
+<div class="tsd-comment tsd-typography"><p>Sorts an array of objects in ascending order
+by the given property name, assuming it is a number.</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">data</span><span class="hl-2"> = [ </span><br/><span class="hl-2"> { </span><span class="hl-3">size:</span><span class="hl-2"> </span><span class="hl-7">10</span><span class="hl-2">, </span><span class="hl-3">colour:</span><span class="hl-2"> </span><span class="hl-4">`red`</span><span class="hl-2"> }, </span><br/><span class="hl-2"> { </span><span class="hl-3">size:</span><span class="hl-2"> </span><span class="hl-7">20</span><span class="hl-2">, </span><span class="hl-3">colour:</span><span class="hl-2"> </span><span class="hl-4">`blue`</span><span class="hl-2"> },</span><br/><span class="hl-2"> { </span><span class="hl-3">size:</span><span class="hl-2"> </span><span class="hl-7">5</span><span class="hl-2">, </span><span class="hl-3">colour:</span><span class="hl-2"> </span><span class="hl-4">`pink`</span><span class="hl-2"> }</span><br/><span class="hl-2">];</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">sorted</span><span class="hl-2"> = </span><span class="hl-3">Arrays</span><span class="hl-2">.</span><span class="hl-8">sortByNumericProperty</span><span class="hl-2">(</span><span class="hl-3">data</span><span class="hl-2">, </span><span class="hl-4">`size`</span><span class="hl-2">);</span><br/><br/><span class="hl-3">Yields</span><span class="hl-2"> </span><span class="hl-3">items</span><span class="hl-2"> </span><span class="hl-3">ascending</span><span class="hl-2"> </span><span class="hl-9">order</span><span class="hl-2">:</span><br/><span class="hl-2">[ { </span><span class="hl-3">size:</span><span class="hl-2"> </span><span class="hl-7">5</span><span class="hl-2">, </span><span class="hl-3">colour:</span><span class="hl-2"> </span><span class="hl-4">`pink`</span><span class="hl-2"> }, { </span><span class="hl-3">size:</span><span class="hl-2"> </span><span class="hl-7">10</span><span class="hl-2">, </span><span class="hl-3">colour:</span><span class="hl-2"> </span><span class="hl-4">`red`</span><span class="hl-2"> }, { </span><span class="hl-3">size:</span><span class="hl-2"> </span><span class="hl-7">20</span><span class="hl-2">, </span><span class="hl-3">colour:</span><span class="hl-2"> </span><span class="hl-4">`blue`</span><span class="hl-2"> } ]</span>
+</code></pre>
 </div>
 <section class="tsd-panel tsd-type-parameters">
 <h4>Type Parameters</h4>
@@ -66,7 +65,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Maps.html">Maps</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Queues.html">Queues</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Sets.html">Sets</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Trees.html">Trees</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
@@ -90,12 +90,17 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Beziers.html">Beziers</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Circles.html">Circles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Compound.html">Compound</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Convolve2d.html">Convolve2d</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Ellipses.html">Ellipses</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Grids.html">Grids</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.html">Layouts</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.CirclePacking.html">Circle<wbr/>Packing</a></li></ul></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Lines.html">Lines</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Paths.html">Paths</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Points.html">Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.QuadTree.html">Quad<wbr/>Tree</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
@@ -133,6 +138,7 @@
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Drawing.html">Drawing</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.ImageDataGrid.html">Image<wbr/>Data<wbr/>Grid</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Palette.html">Palette</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot.html">Plot</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot2.html">Plot2</a></li>

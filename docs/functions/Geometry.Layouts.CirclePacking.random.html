@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>vogelSpiral | ixfx</title><meta name="description" content="Documentation for ixfx"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>random | ixfx</title><meta name="description" content="Documentation for ixfx"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><link rel="stylesheet" href="../assets/custom.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -12,35 +12,27 @@
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">ixfx</a></li>
 <li><a href="../modules/Geometry.html">Geometry</a></li>
-<li><a href="../modules/Geometry.SurfacePoints.html">SurfacePoints</a></li>
-<li><a href="Geometry.SurfacePoints.vogelSpiral.html">vogelSpiral</a></li></ul>
-<h1>Function vogelSpiral</h1></div>
+<li><a href="../modules/Geometry.Layouts.html">Layouts</a></li>
+<li><a href="../modules/Geometry.Layouts.CirclePacking.html">CirclePacking</a></li>
+<li><a href="Geometry.Layouts.CirclePacking.random.html">random</a></li></ul>
+<h1>Function random</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-<li class="tsd-signature tsd-anchor-link" id="vogelSpiral">vogel<wbr/>Spiral<span class="tsd-signature-symbol">(</span>circle<span class="tsd-signature-symbol">?: </span><a href="../types/Geometry.Circles.Circle.html" class="tsd-signature-type" data-tsd-kind="Type alias">Circle</a>, opts<span class="tsd-signature-symbol">?: </span><a href="../types/Geometry.SurfacePoints.VogelSpiralOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">VogelSpiralOpts</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol">&gt;</span><a href="#vogelSpiral" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="random">random<span class="tsd-signature-symbol">(</span>circles<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><a href="../types/Geometry.Circles.Circle.html" class="tsd-signature-type" data-tsd-kind="Type alias">Circle</a><span class="tsd-signature-symbol">[]</span>, container<span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Shapes.ShapePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">ShapePositioned</a>, opts<span class="tsd-signature-symbol">?: </span><a href="../types/Geometry.Layouts.CirclePacking.RandomOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">RandomOpts</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a><span class="tsd-signature-symbol">[]</span><a href="#random" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Generates points on a Vogel spiral - a sunflower-like arrangement of points.</p>
-
-<h3>Example</h3><p>With no arguments, assumes a unit circle</p>
-<pre><code class="language-js"><span class="hl-1">for</span><span class="hl-2"> (</span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">pt</span><span class="hl-2"> </span><span class="hl-5">of</span><span class="hl-2"> </span><span class="hl-8">vogelSpiral</span><span class="hl-2">()) {</span><br/><span class="hl-2"> </span><span class="hl-0">// Generate points on a unit circle, with 95% density</span><br/><span class="hl-2">}</span>
-</code></pre>
-
-<h3>Example</h3><p>Specifying a circle and options</p>
-<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">circle</span><span class="hl-2"> = { </span><span class="hl-3">radius:</span><span class="hl-2"> </span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-3">x:</span><span class="hl-2"> </span><span class="hl-7">100</span><span class="hl-2">, </span><span class="hl-3">y:</span><span class="hl-2"> </span><span class="hl-7">100</span><span class="hl-2"> };</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">opts</span><span class="hl-2"> = {</span><br/><span class="hl-2"> </span><span class="hl-3">maxPoints:</span><span class="hl-2"> </span><span class="hl-7">50</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-3">density:</span><span class="hl-2"> </span><span class="hl-7">0.99</span><br/><span class="hl-2">};</span><br/><span class="hl-1">for</span><span class="hl-2"> (</span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">pt</span><span class="hl-2"> </span><span class="hl-5">of</span><span class="hl-2"> </span><span class="hl-8">vogelSpiral</span><span class="hl-2">(</span><span class="hl-3">circle</span><span class="hl-2">, </span><span class="hl-3">opts</span><span class="hl-2">)) {</span><br/><span class="hl-2"> </span><span class="hl-0">// Do something with point...</span><br/><span class="hl-2">}</span>
-</code></pre>
-
-<h3>Example</h3><p>Array format</p>
-<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">ptsArray</span><span class="hl-2"> = [...</span><span class="hl-8">vogelSpiral</span><span class="hl-2">(</span><span class="hl-3">circle</span><span class="hl-2">, </span><span class="hl-3">opts</span><span class="hl-2">)];</span>
-</code></pre>
+<div class="tsd-comment tsd-typography"><p>Naive randomised circle packing.
+<a href="https://tylerxhobbs.com/essays/2016/a-randomized-approach-to-cicle-packing">Algorithm by Taylor Hobbs</a></p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> circle: <a href="../types/Geometry.Circles.Circle.html" class="tsd-signature-type" data-tsd-kind="Type alias">Circle</a></h5></li>
+<h5>circles: <span class="tsd-signature-symbol">readonly </span><a href="../types/Geometry.Circles.Circle.html" class="tsd-signature-type" data-tsd-kind="Type alias">Circle</a><span class="tsd-signature-symbol">[]</span></h5></li>
 <li>
-<h5>opts: <a href="../types/Geometry.SurfacePoints.VogelSpiralOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">VogelSpiralOpts</a><span class="tsd-signature-symbol"> = {}</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type" data-tsd-kind="Type alias">Point</a><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></section></div>
+<h5>container: <a href="../types/Geometry.Shapes.ShapePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">ShapePositioned</a></h5></li>
+<li>
+<h5>opts: <a href="../types/Geometry.Layouts.CirclePacking.RandomOpts.html" class="tsd-signature-type" data-tsd-kind="Type alias">RandomOpts</a><span class="tsd-signature-symbol"> = {}</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Circles.CirclePositioned.html" class="tsd-signature-type" data-tsd-kind="Type alias">CirclePositioned</a><span class="tsd-signature-symbol">[]</span></h4></li></ul></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -67,7 +59,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Maps.html">Maps</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Queues.html">Queues</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Sets.html">Sets</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Stacks.html">Stacks</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Collections.Trees.html">Trees</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/Data.html">Data</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Data.Correlate.html">Correlate</a></li>
@@ -91,17 +84,22 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Beziers.html">Beziers</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Circles.html">Circles</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Compound.html">Compound</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Convolve2d.html">Convolve2d</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Ellipses.html">Ellipses</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Grids.html">Grids</a></li>
+<li class="current tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.html">Layouts</a>
+<ul>
+<li class="current tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Layouts.CirclePacking.html">Circle<wbr/>Packing</a></li></ul></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Lines.html">Lines</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Paths.html">Paths</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Points.html">Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Polar.html">Polar</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.QuadTree.html">Quad<wbr/>Tree</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Rects.html">Rects</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Scaler.html">Scaler</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Shapes.html">Shapes</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Spheres.html">Spheres</a></li>
-<li class="current tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.SurfacePoints.html">Surface<wbr/>Points</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.SurfacePoints.html">Surface<wbr/>Points</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.html">Triangles</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Geometry.Triangles.Equilateral.html">Equilateral</a></li>
@@ -134,6 +132,7 @@
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Colour.html">Colour</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Drawing.html">Drawing</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.ImageDataGrid.html">Image<wbr/>Data<wbr/>Grid</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Palette.html">Palette</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot.html">Plot</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Plot2.html">Plot2</a></li>
@@ -144,7 +143,6 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/Visual.Video.html">Video</a></li></ul></li></ul></li></ul></div></details></nav>
 <nav class="tsd-navigation secondary menu-sticky">
 <ul>
-<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="../types/Geometry.SurfacePoints.VogelSpiralOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg>Vogel<wbr/>Spiral<wbr/>Opts</a></li>
-<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.SurfacePoints.sphereFibonacci.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>sphere<wbr/>Fibonacci</a></li>
-<li class="current tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.SurfacePoints.vogelSpiral.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>vogel<wbr/>Spiral</a></li></ul></nav></div></div>
+<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="../types/Geometry.Layouts.CirclePacking.RandomOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4194304-path"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)" id="icon-4194304-text"></path></svg>Random<wbr/>Opts</a></li>
+<li class="current tsd-kind-function tsd-parent-kind-namespace"><a href="Geometry.Layouts.CirclePacking.random.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>random</a></li></ul></nav></div></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>
