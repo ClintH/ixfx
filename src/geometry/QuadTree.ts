@@ -2,12 +2,40 @@ import { Points, Rects, Shapes } from ".";
 import { TreeNode } from "../collections/Trees.js";
 import { ShapePositioned } from "./Shape";
 
-enum Direction {
+/**
+ * Options for quad tree
+ */
+export type QuadTreeOpts = {
+  /**
+   * Maximum items per node
+   */
+  readonly maxItems:number
+  /**
+   * Maximum level of sub-division
+   */
+  readonly maxLevels:number
+}
+
+
+/**
+ * Direction
+ */
+export enum Direction {
   Nw, Ne, Sw, Se
 }
 
-type QuadTreeItem = Points.Point | ShapePositioned;
+/**
+ * A Point or ShapePositioned
+ */
+export type QuadTreeItem = Points.Point | ShapePositioned;
 
+/**
+ * Creates a QuadTreeNode
+ * @param bounds Bounds of region
+ * @param initialData Initial items to place in quad tree
+ * @param opts Options
+ * @returns New quad tree
+ */
 export const quadTree = (bounds:Rects.RectPositioned, initialData:readonly QuadTreeItem[] = [], opts:Partial<QuadTreeOpts> = {}):QuadTreeNode => {
   const o:QuadTreeOpts = {
     maxItems: opts.maxItems ?? 4,
@@ -21,16 +49,38 @@ export const quadTree = (bounds:Rects.RectPositioned, initialData:readonly QuadT
   return n;
 };
 
+/**
+ * QuadTreeNode
+ * 
+ * To create, you probably want the {@link quadTree} function.
+ */
 export class QuadTreeNode extends TreeNode<void> {
   items:QuadTreeItem[] = [];
+  
+  /**
+   * Constructor
+   * @param boundary 
+   * @param level 
+   * @param opts 
+   */
   constructor(readonly boundary:Rects.RectPositioned, readonly level:number, readonly opts:QuadTreeOpts) {
     super(undefined);
   }
 
+  /**
+   * Get a descendant node in a given direction
+   * @param d 
+   * @returns 
+   */
   direction(d:Direction):QuadTreeNode|undefined {
     return this.descendants[d] as QuadTreeNode|undefined;
   }
   
+  /**
+   * Add an item to the quadtree
+   * @param p 
+   * @returns False if item is outside of boundary, True if item was added
+   */
   add(p:QuadTreeItem):boolean {
     if (!Shapes.isIntersecting(this.boundary, p)) return false;
 
@@ -56,6 +106,11 @@ export class QuadTreeNode extends TreeNode<void> {
     return true;
   }
 
+  /**
+   * Returns true if point is inside node's boundary
+   * @param p 
+   * @returns 
+   */
   couldHold(p:Points.Point) {
     return Rects.intersectsPoint(this.boundary, p);
   }
@@ -77,7 +132,3 @@ export class QuadTreeNode extends TreeNode<void> {
   }
 }
 
-export type QuadTreeOpts = {
-  readonly maxItems:number
-  readonly maxLevels:number
-}
