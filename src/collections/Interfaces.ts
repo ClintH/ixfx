@@ -26,6 +26,7 @@ export type MultiValue<V, M> = Readonly<{
   has(source:M, value:V): boolean
   add(destination:M|undefined, values:ReadonlyArray<V>):M
   toArray(source:M): ReadonlyArray<V>|undefined
+  iterable(source:M):IterableIterator<V>
   find(source:M, predicate:(v:V) => boolean): V|unknown
   filter(source:M, predicate:(v:V) => boolean): Iterable<V>// ReadonlyArray<V>
   without(source:M, value:V): ReadonlyArray<V>

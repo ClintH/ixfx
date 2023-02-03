@@ -1,4 +1,4 @@
-import {add, del, set, has} from './MapImmutable.js';
+import { add, del, set, has } from './MapImmutable.js';
 import { EitherKey, MapMutable } from "./Interfaces";
 
 /**
@@ -20,25 +20,25 @@ import { EitherKey, MapMutable } from "./Interfaces";
  * ```
  * @param data Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
-export const mapMutable = <K, V>(...data: EitherKey<K, V>): MapMutable<K, V> => {
+export const mapMutable = <K, V>(...data:EitherKey<K, V>):MapMutable<K, V> => {
   // eslint-disable-next-line functional/no-let
   let m = add(new Map<K, V>(), ...data);
   return {
-    add: (...data: EitherKey<K, V>) => {
+    add: (...data:EitherKey<K, V>) => {
       m = add(m, ...data);
     },
-    delete: (key: K) => {
+    delete: (key:K) => {
       m = del(m, key);
     },
     clear: () => {
       m = add(new Map<K, V>());
     },
-    set: (key: K, value: V): void => {
+    set: (key:K, value:V):void => {
       m = set(m, key, value);
     },
-    get: (key: K): V | undefined => m.get(key),
+    get: (key:K):V | undefined => m.get(key),
     entries: () => m.entries(),
     isEmpty: () => m.size === 0,
-    has: (key: K) => has(m, key)
+    has: (key:K) => has(m, key)
   };
 };

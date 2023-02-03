@@ -1,16 +1,22 @@
 A rough changelog between NPM releases
 
+# 0.8.0 23.02.03
+
 - Collections.Trees: BinarySearchTree, Tree, basic traversal
 - Geometry.quadTree
 - Geometry.Intersects: centralise a bunch of geometry logic
 - Geometry.Layout: CirclePacking.random
 - Geometry.Convolve2d: Kernel convolution
+- Geometry.Grid.toArray: return a 2D array form of a grid
+- Geometry.Grid.array2dUpdater: allows setting values to a 2D array with grid coordinates
 - Visuals.ImageDataGrid: Access the DOM's ImageData array as a virtual grid of RGBA values
 - SurfacePoints: generate a Vogel spiral and distribution of points on a sphere.
 - SurfacePoints: distribute points on rings
 - Numbers.linearSpace: Generate x number of values from start->end, with linear distribution
 - Numbers.rounder: Returns a function to round numbers. Numbers.round() wraps this.
 - Collections.mutableStack: fixed bug with pop
+- Collections.MapOfMutable: added iteration over values stored under key
+- Debug.logger/Deubg.logSet: can provide a colour key instead of colouring based on prefix
 
 # 0.7.1 22.11.04
 

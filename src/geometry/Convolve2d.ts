@@ -71,11 +71,11 @@ export function* convolve<V>(kernel:Kernel, source:Grids.Grid, access:Grids.Cell
   }
 }
 
-type Kernel2dArray = ReadonlyArray<readonly [cell:Grids.Cell, value:number]>;
+export type Kernel2dArray = ReadonlyArray<readonly [cell:Grids.Cell, value:number]>;
 
 /**
  * For a given kernel, returns an array of offsets. These
- * consist of a cell offset (eg {x:-1,y:-1}) and the value at that kernel position.
+ * consist of a cell offset (eg `{x:-1,y:-1}`) and the value at that kernel position.
  * @param kernel 
  * @param origin 
  * @returns 

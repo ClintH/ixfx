@@ -4,6 +4,7 @@ import { Circle, CirclePositioned, toPositioned as circleToPositioned } from "./
 import { scale } from "../data/Scale.js";
 import { linearSpace } from "../Numbers.js";
 
+
 const cos = Math.cos;
 const sin = Math.sin;
 const asin = Math.asin;
@@ -13,6 +14,7 @@ const pi = Math.PI;
 const piPi = Math.PI*2;
 const goldenAngle = pi * (3 - sqrt(5));
 const goldenSection = (1 + sqrt(5)) / 2;
+
 
 /**
  * Options for a Vogel spiral
