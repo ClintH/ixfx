@@ -72,7 +72,7 @@ export const goldenAngleColour = (index: number, saturation = 0.5, lightness = 0
   // Via Stackoverflow
   const hue = index * 137.508; // use golden angle approximation
   if (alpha === 1) return `hsl(${hue},${saturation*100}%,${lightness*100}%)`;
-  else  `hsl(${hue},${saturation*100}%,${lightness*100}%,${alpha*100}%)`
+  else return `hsl(${hue},${saturation*100}%,${lightness*100}%,${alpha*100}%)`
 }
 
 /**
