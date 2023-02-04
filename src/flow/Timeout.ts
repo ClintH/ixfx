@@ -1,21 +1,22 @@
-import {integer as guardInteger} from '../Guards.js';
-import {HasCompletion} from './index.js';
+import { integer as guardInteger } from '../Guards.js';
+import { HasCompletion } from './index.js';
 
-export type TimeoutSyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => void
-export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[]) => Promise<void>
+export type TimeoutSyncCallback = (elapsedMs?:number, ...args:readonly unknown[])=>void
+export type TimeoutAsyncCallback = (elapsedMs?:number, ...args:readonly unknown[])=>Promise<void>
 
 /**
  * A resettable timeout, returned by {@link timeout}
  */
 export type Timeout = HasCompletion & {
-  start(altTimeoutMs?: number, args?:readonly unknown[]): void;
-  cancel(): void;
-  get isDone(): boolean;
+  start(altTimeoutMs?:number, args?:readonly unknown[]):void;
+  cancel():void;
+  get isDone():boolean;
 }
 
 
 /**
- * Returns a {@link Timeout} that can be triggered, cancelled and reset
+ * Returns a {@link Timeout} that can be triggered, cancelled and reset. Use {@link continuously} for interval-
+ * based loops.
  *  
  * Once `start()` is called, `callback` will be scheduled to execute after `timeoutMs`.
  * If `start()` is called again, the waiting period will be reset to `timeoutMs`.
