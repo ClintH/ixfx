@@ -12,6 +12,9 @@
 
 import { IsEqual } from "./Util";
 
+export { eachInterval } from './flow/Interval.js';
+
+
 /**
  * Yields chunks of the iterable `it` such that the end of a chunk is the
  * start of the next chunk.

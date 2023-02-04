@@ -1,4 +1,5 @@
-import {IsEqual} from "./Util";
+import { IsEqual } from "./Util";
+export { eachInterval } from './flow/Interval.js';
 
 /**
  * Breaks an iterable into array chunks
@@ -45,7 +46,7 @@ export async function* concat<V>(...its:readonly Iterable<V>[]) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* dropWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export async function* dropWhile<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   //const iit = it[Symbol.asyncIterator]();
   for await (const v of it) { 
@@ -88,7 +89,7 @@ export async function equals<V>(it1:Iterable<V>, it2:Iterable<V>, equality?:IsEq
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function every<V>(it:Iterable<V>, f:(v:V) => boolean) {
+export async function every<V>(it:Iterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
   let ok = true;
@@ -123,7 +124,7 @@ export async function* fill<V>(it:AsyncIterable<V>, v:V) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* filter<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export async function* filter<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   for await (const v of it) {
     if (!f(v)) continue;
@@ -142,7 +143,7 @@ export async function* filter<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function find<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export async function find<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   for await (const v of it) { 
     if (f(v)) return v;
@@ -176,7 +177,7 @@ export async function* flatten<V>(it:AsyncIterable<V>) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function forEach<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export async function forEach<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   for await (const v of it) f(v);
 }
@@ -191,7 +192,7 @@ export async function forEach<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* map<V, X>(it:AsyncIterable<V>, f:(v:V) => X) {
+export async function* map<V, X>(it:AsyncIterable<V>, f:(v:V)=>X) {
   // https://surma.github.io/underdash/
   
   for await (const v of it) { 
@@ -291,7 +292,7 @@ export async function* range(start:number, len:number) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function reduce<V>(it:AsyncIterable<V>, f:(acc:V, current:V) => V, start:V) {
+export async function reduce<V>(it:AsyncIterable<V>, f:(acc:V, current:V)=>V, start:V) {
   // https://surma.github.io/underdash/
   
   for await (const v of it) start = f(start, v);
@@ -332,7 +333,7 @@ export async function* slice<V>(it:AsyncIterable<V>, start = 0, end = Number.POS
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function some<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export async function some<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for await (const v of it) { 
@@ -352,7 +353,7 @@ export async function some<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
  * @returns 
  */
 //eslint-disable-next-line func-style
-export async function* takeWhile<V>(it:AsyncIterable<V>, f:(v:V) => boolean) {
+export async function* takeWhile<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
   // https://surma.github.io/underdash/
   
   for await (const v of it) {
@@ -382,7 +383,7 @@ export async function toArray<V>(it:AsyncIterable<V>, count = Infinity):Promise<
   const iterator = it[Symbol.asyncIterator]();
   
   while (result.length < count) {
-    const {value, done} = await iterator.next();
+    const { value, done } = await iterator.next();
     if (done) break;
     //eslint-disable-next-line functional/immutable-data
     result.push(value);
@@ -401,7 +402,7 @@ export async function toArray<V>(it:AsyncIterable<V>, count = Infinity):Promise<
  * @param f 
  */
 //eslint-disable-next-line func-style
-export async function* unique<V>(it:AsyncIterable<V>, f:((id:V) => V) = id => id) {
+export async function* unique<V>(it:AsyncIterable<V>, f:((id:V)=>V) = id => id) {
   // https://surma.github.io/underdash/
   const buffer = [];
   
