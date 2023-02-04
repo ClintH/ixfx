@@ -109,6 +109,16 @@ export const numericRange = function* (interval:number, start:number = 0, end?:n
  * 
  * If you want to accumulate return values, consider using
  * {@link Flow.repeat}.
+ * 
+ * @example Run some code every 100ms, 10 times:
+ * ```js
+ * import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
+ * import { count } from 'https://unpkg.com/ixfx/dist/generators.js'
+ * const counter = count(10);
+ * for await (const v of interval(counter, 100)) {
+ *  // Do something
+ * }
+ * ```
  * @param amount Number of integers to yield 
  * @param offset Added to result
  */

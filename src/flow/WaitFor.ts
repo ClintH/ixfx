@@ -4,7 +4,6 @@
  * In short, it allows you to signal when the function succeeded, to cancel it, or
  * to be notified if it was canceled or completes.
  * 
- * 
  * @example Verbose example
  * ```js
  * // This function is called by `waitFor` if it was cancelled

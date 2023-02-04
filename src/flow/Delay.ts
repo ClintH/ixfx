@@ -1,4 +1,4 @@
-import {sleep} from "./Sleep.js";
+import { sleep } from "./Sleep.js";
 
 /**
  * Pauses execution for `timeoutMs` after which the asynchronous `callback` is executed and awaited.
@@ -30,7 +30,7 @@ import {sleep} from "./Sleep.js";
  * @param timeoutMs How long to delay
  * @return Returns result of `callback`.
  */
-export const delay = async <V>(callback:() => Promise<V>, timeoutMs: number): Promise<V> =>  {
+export const delay = async <V>(callback:()=>Promise<V>, timeoutMs:number):Promise<V> =>  {
   await sleep(timeoutMs);
   return Promise.resolve(await callback());
 };
