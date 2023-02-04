@@ -270,3 +270,41 @@ export const shortGuid = () => {
   const secondPartStr = `000${secondPart.toString(36)}`.slice(-3);
   return firstPartStr + secondPartStr;
 };
+
+/**
+ * Returns a random number of minutes, with a unit of milliseconds.
+ * `minMinutes` is 0 if undefined.
+ * 
+ * ```js
+ * minuteMs(5);     // ie 0...5*60*1000
+ * minuteMs(5, 1); // ie. 60*1000...5*60*1000
+ * ```
+ * 
+ * A very minor function, but can improve readability:
+ * ```js
+ * // Random timeout of up to 5 mins
+ * setTimeout(() => { ...}, minuteMs(5));
+ * ```
+ * @param maxMinutes 
+ * @param minMinutes 
+ * @returns 
+ */
+export const minutesMs = (maxMinutes:number, minMinutes:number = 0) => integer(maxMinutes*60*1000, minMinutes*60*1000);
+
+/**
+ * Returns a ranndom number of seconds, with a unit of milliseconds.
+ * `minSeconds` is 0 if undefined.
+ * ```js
+ * secondsMs(5);    // ie. 0...5000
+ * secondsMs(5, 1); // ie. 1000...5000
+ * ```
+ * A very minor function, but can improve readability:
+ * ```js
+ * // Random timeout of up to 5 seconds
+ * setTimeout(() => { ...}, secondsMs(5));
+ * ```
+ * @param maxSeconds 
+ * @param minSeconds 
+ * @returns 
+ */
+export const secondsMs = (maxSeconds:number, minSeconds:number = 0) => integer(maxSeconds*1000, minSeconds*1000);
