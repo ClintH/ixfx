@@ -4,6 +4,8 @@ type WithEvents = {
   removeEventListener(type: string, callbackfn: any): void;
 }
 
+export { eachInterval } from './flow/Interval.js';
+
 export const isAsyncIterable = (v: any): v is AsyncIterable<any> => Symbol.asyncIterator in Object(v);
 
 export const isIterable = (v: any): v is Iterable<any> => Symbol.iterator in Object(v);
