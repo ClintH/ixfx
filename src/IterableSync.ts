@@ -12,7 +12,7 @@
 
 import { IsEqual } from "./Util";
 
-export { eachInterval } from './flow/Interval.js';
+//export { eachInterval } from './flow/Interval.js';
 
 
 /**
@@ -221,7 +221,8 @@ export function* flatten<V>(it:Iterable<V>) {
   // https://surma.github.io/underdash/
   
   for (const v of it) {
-    if (Symbol.iterator in v) { 
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (Symbol.iterator in (v as any)) { 
       // @ts-ignore
       yield* v;
     } else {

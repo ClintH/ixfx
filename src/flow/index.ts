@@ -21,6 +21,8 @@ export * from './Sleep.js';
 export * from './WaitFor.js';
 export * from './Delay.js';
 export * from './Every.js';
+export * from './RunOnce.js';
+export { TaskQueue } from './TaskQueue.js';
 
 export type HasCompletion = {
   get isDone():boolean;

@@ -1,47 +1,64 @@
 A rough changelog between NPM releases
 
+# 0.8.1 
+
+ - Random/minuteMs/secondMs: Generate random times (in ms) from minute or second ranges
+
+Flow/
+ - runOnce: only run a closure once
+ - TaskQueue: serial task processing
+ - sleep & interval: support for an AbortSignal to cancel sleep
+ - continuously: now takes an options object:
+   - `fireBeforeWait`: if true, callback is run before waiting, rather than the default of after the initial wait
+   - `onStartCalled`: return value determines whether a call to .start() continues as normal, cancels, resets or disposes loop
+   - disposable: if true, the loop will throw an error if a start is attempted
+   
 # 0.8.0 23.02.03
 
-- Collections.Trees: BinarySearchTree, Tree, basic traversal
-- Geometry.quadTree
-- Geometry.Intersects: centralise a bunch of geometry logic
-- Geometry.Layout: CirclePacking.random
-- Geometry.Convolve2d: Kernel convolution
-- Geometry.Grid.toArray: return a 2D array form of a grid
-- Geometry.Grid.array2dUpdater: allows setting values to a 2D array with grid coordinates
-- Visuals.ImageDataGrid: Access the DOM's ImageData array as a virtual grid of RGBA values
+Geometry/
+- quadTree
+- Intersects: centralise a bunch of geometry logic
+- Layout: CirclePacking.random
+- Convolve2d: Kernel convolution
+- Grid.toArray: return a 2D array form of a grid
+- Grid.array2dUpdater: allows setting values to a 2D array with grid coordinates
+
+Collections/
+- Trees: BinarySearchTree, Tree, basic traversal
+- mutableStack: fixed bug with pop
+- MapOfMutable: added iteration over values stored under key
+
+- Visuals/ImageDataGrid: Access the DOM's ImageData array as a virtual grid of RGBA values
 - SurfacePoints: generate a Vogel spiral and distribution of points on a sphere.
 - SurfacePoints: distribute points on rings
-- Numbers.linearSpace: Generate x number of values from start->end, with linear distribution
-- Numbers.rounder: Returns a function to round numbers. Numbers.round() wraps this.
-- Collections.mutableStack: fixed bug with pop
-- Collections.MapOfMutable: added iteration over values stored under key
-- Debug.logger/Deubg.logSet: can provide a colour key instead of colouring based on prefix
+- Numbers/linearSpace: Generate x number of values from start->end, with linear distribution
+- Numbers/rounder: Returns a function to round numbers. Numbers.round() wraps this.
+- Debug/logger / Deubg/logSet: can provide a colour key instead of colouring based on prefix
 
 # 0.7.1 22.11.04
 
-- Util.mapObject: Like a regular map function, but for object properties.
-- Arrays.pushUnique: add items to an array, but only if they don't already exist
-- Maps.fromObject: create a map based on an object's properties
-- Maps.addObject: add property-value pairs of an object to a map
-- Collections.SetImmutable: immutable Set
+- Util/mapObject: Like a regular map function, but for object properties.
+- Arrays/pushUnique: add items to an array, but only if they don't already exist
+- Maps/fromObject: create a map based on an object's properties
+- Maps/addObject: add property-value pairs of an object to a map
+- Collections/SetImmutable: immutable Set
 
 # 0.7.0 22.11.02
 
-- Collections.ExpiringMap: a map which can automatically drop elements which
+- Collections/ExpiringMap: a map which can automatically drop elements which
   aren't updated/set after some period
-- Data.Pool: Manage a pool of resources
-- Io.VideoFile: Use a video file as a source for a frame grabber
-- Io.FrameProcessor: Update to support VideoFile
-- Collections.Maps.sortByValue/sortByValueProperty: return entries sorted by
+- Data/Pool: Manage a pool of resources
+- Io/VideoFile: Use a video file as a source for a frame grabber
+- Io/FrameProcessor: Update to support VideoFile
+- Collections/Maps.sortByValue/sortByValueProperty: return entries sorted by
   values, or property of values
-- Collections.Maps.deleteByValue: delete by value rather than key
-- Geometry.Scaler: convert to and from relative/absolute Cartesian coordinates
+- Collections/Maps.deleteByValue: delete by value rather than key
+- Geometry/Scaler: convert to and from relative/absolute Cartesian coordinates
   easily
 - Circle/Rects/Points.multiplyScalar / Points.multiplyScalar: multiply all
   components by a value
-- Flow.repeatReduce: call a function repeatedly, reducing down to a single value
-- Util.defaultComparer: follow default semantics for Array.sort
+- Flow/repeatReduce: call a function repeatedly, reducing down to a single value
+- Util/defaultComparer: follow default semantics for Array.sort
 
 # 0.6.7 22.10.18
 
@@ -49,11 +66,11 @@ A rough changelog between NPM releases
 
 # 0.6.6 22.10.17
 
-- Arrays.mergeByKey: merge two arrays with a custom key-generation function and
+- Arrays/mergeByKey: merge two arrays with a custom key-generation function and
   reconciler.
-- Arrays.reducePairwise: reduce-style function but pairwise
-- Maps.fromIterable: create a map from an iterable, such as an array
-- Maps.mergeByKey: merge two maps using a reconcile function
+- Arrays/reducePairwise: reduce-style function but pairwise
+- Maps/fromIterable: create a map from an iterable, such as an array
+- Maps/mergeByKey: merge two maps using a reconcile function
 - data/Correlate: Attempts to correlate two data sets by id and a supplied
   similarity function. Used for matching pose data from TensorFlow.js
 - flow/Timer.relativeTimerTicks: compute progression based on ticks instead of
@@ -79,11 +96,11 @@ A rough changelog between NPM releases
   that state. If multiple handlers are provided, there are some options for how
   to handle this: either the first valid response is used, the highest-rating or
   lowest-rating. In additional there are some fallback handlers.
-- Dom.DragDrop: generic drag and drop handler
-- Flow.Timer.hasElapsedMs / completionMs: returns functions that yield whether a
+- Dom/DragDrop: generic drag and drop handler
+- Flow/Timer.hasElapsedMs / completionMs: returns functions that yield whether a
   timer is done, or the percentage done
-- Geometry.Polar: additional functions for handling polar coordinates
-- Geometry.Vector: wrapper for Points.Point and Polar.Coords for vector
+- Geometry/Polar: additional functions for handling polar coordinates
+- Geometry/Vector: wrapper for Points.Point and Polar.Coords for vector
   (magnitude/direction) processing
 
 # 0.6.3 22.09.27

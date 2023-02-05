@@ -18,24 +18,17 @@ export type IntervalAsync<V> = (()=>V|Promise<V>) | Generator<V>;
  * ```js
  * import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
  * import { count } from 'https://unpkg.com/ixfx/dist/generators.js'
- * // Make a generator that counts to 10
- * const counter = count(10);
- * for await (const v of interval(counter, 1000)) {
+ * for await (const v of interval(count(10), 1000)) {
  *  // Do something with `v`
  * }
  * ```
- * 
- * In the above example, it won't work to create the generator in the for-of loop:
- * ```js
- * for await (const v of interval(count(10), 1000)) { .. }
- * ```
- * In this case, the count will keep being recreated. Instead, use {@link eachIterval}.
- * 
  * If you just want to loop at a certain speed, consider using {@link continuously} instead.
+ * 
+ * If the AbortSignal is triggered, an exception will be thrown, stopping iteration.
  * @template V Returns value of `produce` function
  * @param intervalMs Interval between execution
  * @param produce Function to call
- * @param signal AbortSignal to cancel long sleeps
+ * @param signal AbortSignal to cancel long sleeps. Throws an exception.
  * @template V Data type
  * @returns
  */
@@ -45,6 +38,7 @@ export const interval = async function*<V>(produce:IntervalAsync<V>, intervalMs:
   try {
     while (!cancelled) {
       await sleep(intervalMs, signal);
+      if (signal.aborted) throw new Error(`Signal aborted ${signal.reason}`);
       if (cancelled) return;
       if (typeof produce === `function`) {
         // Returns V or Promise<V>
@@ -84,10 +78,10 @@ export const interval = async function*<V>(produce:IntervalAsync<V>, intervalMs:
  * @param callback Function to run with each thing in `iterable`
  * @param signal AbortSignal to cancel sleep & loop
  */
-export const eachInterval = async function<V> (iterable:AsyncIterable<V>, intervalMs:number, callback:(v:V)=>boolean|void, signal?:AbortSignal) {
-  for await (const v of iterable) {
-    const r = await callback(v);
-    if (typeof r === `boolean` && !r) break;
-    await sleep(intervalMs, undefined, signal);
-  }
-};
+// export const eachInterval = async function<V> (iterable:AsyncIterable<V>, intervalMs:number, callback:(v:V)=>boolean|void, signal?:AbortSignal) {
+//   for await (const v of iterable) {
+//     const r = await callback(v);
+//     if (typeof r === `boolean` && !r) break;
+//     await sleep(intervalMs, undefined, signal);
+//   }
+// };

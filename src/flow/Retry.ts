@@ -1,5 +1,5 @@
-import {integer as guardInteger} from '../Guards.js';
-import {sleep} from './Sleep.js';
+import { integer as guardInteger } from '../Guards.js';
+import { sleep } from './Sleep.js';
 
 export type CancelToken = {
   readonly cancel:boolean
@@ -23,7 +23,7 @@ export type CancelToken = {
  * @param cancelToken If provided, this is checked before and after each sleep to see if retry should continue. If cancelled, promise will be rejected
  * @returns 
  */
-export const retry = async <V>(callback:() => Promise<V>, attempts:number = 5, startingTimeoutMs:number = 200, cancelToken?:CancelToken):Promise<V> => {
+export const retry = async <V>(callback:()=>Promise<V>, attempts:number = 5, startingTimeoutMs:number = 200, cancelToken?:CancelToken):Promise<V> => {
   guardInteger(attempts, `positive`, `attempts`);
   guardInteger(startingTimeoutMs, `positive`, `startingTimeoutMs`);
 

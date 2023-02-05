@@ -1,5 +1,5 @@
 import { IsEqual } from "./Util";
-export { eachInterval } from './flow/Interval.js';
+//export { eachInterval } from './flow/Interval.js';
 
 /**
  * Breaks an iterable into array chunks
@@ -162,7 +162,8 @@ export async function find<V>(it:AsyncIterable<V>, f:(v:V)=>boolean) {
 export async function* flatten<V>(it:AsyncIterable<V>) {
   // https://surma.github.io/underdash/
   for await (const v of it) {
-    if (Symbol.asyncIterator in v) { 
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (Symbol.asyncIterator in (v as any)) { 
       // @ts-ignore
       yield* v;
     } else {
