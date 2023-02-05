@@ -1,6 +1,6 @@
 import { Queues } from "../collections";
 
-export type Task = ()=>void
+type Task = ()=>void
 
 export type TaskQueueOpts = {
   /**
@@ -46,7 +46,17 @@ export class TaskQueue {
     this._queue = Queues.queueMutable<Task>();
   }
 
-  add(task:Task) {
+  /**
+   * Adds a task. This triggers processing loop if not already started.
+   * 
+   * ```js
+   * queue.add(async () => {
+   *  await sleep(1000);
+   * });
+   * ```
+   * @param task Task to run
+   */
+  add(task:()=>void) {
     this._queue.enqueue(task);
     if (this._timer === 0) this.schedule(this._startDelayMs);
   }
@@ -69,7 +79,7 @@ export class TaskQueue {
     }, intervalMs);
   }
 
-  async processQueue() {
+  private async processQueue() {
     const task = this._queue.dequeue();
     if (task === undefined) {
       this._timer = 0;
