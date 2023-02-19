@@ -4,7 +4,7 @@ import { TrackerBase } from "./TrackerBase.js";
 /**
  * A tracked value of type `V`.
  */
-export class ObjectTracker<V> extends TrackerBase<V> {
+export class ObjectTracker<V extends object> extends TrackerBase<V> {
   values:Timestamped<V>[];
 
   constructor(opts:TrackedValueOpts = {}) {

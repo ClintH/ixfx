@@ -1,5 +1,11 @@
 A rough changelog between NPM releases
 
+# 0.8.2  23.02.19
+
+Collections/Array
+ - removed readonly from the return value of arrays where applicable
+ - added `unique`, combining values from one or more arrays, only keeping unique values
+
 # 0.8.1 
 
  - Random/minuteMs/secondMs: Generate random times (in ms) from minute or second ranges
