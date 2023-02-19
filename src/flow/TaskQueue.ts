@@ -81,11 +81,12 @@ export class TaskQueue {
 
   private async processQueue() {
     const task = this._queue.dequeue();
-    if (task === undefined) {
-      this._timer = 0;
-    } else {
+    
+    this._timer = 0;
+    if (task !== undefined) {
       try {
         await task();
+        this._timer = 0;
         this.schedule(this._intervalMs);
       } catch (ex) {
         console.error(ex);
