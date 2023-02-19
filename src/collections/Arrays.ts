@@ -99,7 +99,7 @@ export const intersection = <V>(a1:ReadonlyArray<V>, a2:ReadonlyArray<V>, equali
  * @param array 
  * @returns 
  */
-export const flatten = <V>(array:ReadonlyArray<V|readonly V[]>):readonly V[] => Array.prototype.concat.apply([], [...array]);
+export const flatten = <V>(array:ReadonlyArray<V|readonly V[]>):V[] => Array.prototype.concat.apply([], [...array]);
 
 
 /**
@@ -127,7 +127,7 @@ export const flatten = <V>(array:ReadonlyArray<V|readonly V[]>):readonly V[] => 
  * @returns Zipped together array
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
+export const zip = (...arrays:ReadonlyArray<any>):Array<any> => {
   // Unit tested
   if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
   const lengths = arrays.map(a => a.length);
@@ -157,7 +157,7 @@ export const zip = (...arrays:ReadonlyArray<any>):ReadonlyArray<any> => {
  * @param arrays 
  * @returns 
  */
-export const interleave = <V>(...arrays:ReadonlyArray<readonly V[]>):ReadonlyArray<V> => {
+export const interleave = <V>(...arrays:ReadonlyArray<readonly V[]>):Array<V> => {
   if (arrays.some((a) => !Array.isArray(a))) throw new Error(`All parameters must be an array`);
   const lengths = arrays.map(a => a.length);
   if (!areValuesIdentical(lengths)) throw new Error(`Arrays must be of same length`);
@@ -199,7 +199,7 @@ export const interleave = <V>(...arrays:ReadonlyArray<readonly V[]>):ReadonlyArr
  * @param expand Expand strategy
  * @typeParam V Type of array 
  */
-export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`undefined`|`repeat`|`first`|`last` = `undefined`):ReadonlyArray<V> => {
+export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`undefined`|`repeat`|`first`|`last` = `undefined`):Array<V> => {
   // Unit tested
   if (data === undefined) throw new Error(`Data undefined`);
   if (!Array.isArray(data)) throw new Error(`data is not an array`);
@@ -250,7 +250,7 @@ export const ensureLength = <V>(data:ReadonlyArray<V>, length:number, expand:`un
  * @param startIndex Start index (defaults to 0)
  * @param endIndex End index (defaults to last index)
  */
-export const filterBetween = <V>(array:ReadonlyArray<V>, predicate:(value:V, index:number, array:ReadonlyArray<V>)=>boolean, startIndex?:number, endIndex?:number):readonly V[] => {
+export const filterBetween = <V>(array:ReadonlyArray<V>, predicate:(value:V, index:number, array:ReadonlyArray<V>)=>boolean, startIndex?:number, endIndex?:number):V[] => {
   guardArray(array);
   if (typeof startIndex === `undefined`) startIndex = 0;
   if (typeof endIndex === `undefined`) endIndex = array.length-1;
@@ -373,7 +373,7 @@ export const randomPluck = <V>(array:readonly V[], mutate = false, rand:RandomSo
  * @returns Copy with items moved around randomly
  * @template V Type of array items
  */
-export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = defaultRandom):ReadonlyArray<V> => {
+export const shuffle = <V>(dataToShuffle:ReadonlyArray<V>, rand:RandomSource = defaultRandom):Array<V> => {
   const array = [...dataToShuffle];
   // eslint-disable-next-line  functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
@@ -455,15 +455,32 @@ export const sortByNumericProperty = <V, K extends keyof V>(data:ReadonlyArray<V
  * @param comparer Comparison function. If not provided `Util.isEqualDefault` is used, which compares using `===`
  * @return Copy of array without value.
  */
-export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):ReadonlyArray<V> => data.filter(v => !comparer(v, value));
+export const without = <V>(data:ReadonlyArray<V>, value:V, comparer:IsEqual<V> = isEqualDefault):Array<V> => data.filter(v => !comparer(v, value));
 
 /**
- * Returns all items in `data` for as long as `predicate` returns true
+ * Returns all items in `data` for as long as `predicate` returns true.
+ * 
+ * `predicate` returns an array of `[stop:boolean, acc:A]`. The first value
+ * is _true_ when the iteration should stop, and the `acc` is the accumulated value.
+ * This allows `until` to be used to carry over some state from item to item.
+ * 
+ * @example Stop when we hit an item with value of 3
+ * ```js
+ * const v = Arrays.until([1,2,3,4,5], v => [v === 3, 0]);
+ * // [ 1, 2 ]
+ * ```
+ * 
+ * @example Stop when we reach a total
+ * ```js
+ * // Stop when accumulated value reaches 6
+ * const v = Arrays.until[1,2,3,4,5], (v, acc) => [acc >= 7, v+acc], 0);
+ * // [1, 2, 3]
+ * ```
  * @param data 
  * @param predicate 
  * @returns 
  */
-export const until = <V, A>(data:ReadonlyArray<V>, predicate:(v:V, acc:A)=>readonly [stop:boolean, acc:A], initial:A):readonly V[] => {
+export const until = <V, A>(data:ReadonlyArray<V>, predicate:(v:V, acc:A)=>readonly [stop:boolean, acc:A], initial:A):V[] => {
   const ret = [];
   //eslint-disable-next-line functional/no-let
   let total = initial;
@@ -502,7 +519,7 @@ export const until = <V, A>(data:ReadonlyArray<V>, predicate:(v:V, acc:A)=>reado
  * @typeParam V Type of array
  * @returns 
  */
-export const remove = <V>(data:ReadonlyArray<V>, index:number):ReadonlyArray<V> => {
+export const remove = <V>(data:ReadonlyArray<V>, index:number):Array<V> => {
   // ✔️ Unit tested
   if (!Array.isArray(data)) throw new Error(`'data' parameter should be an array`);
   guardIndex(data, index, `index`);
@@ -582,7 +599,7 @@ export const groupBy = <K, V>(array:ReadonlyArray<V>, grouper:(item:V)=>K) => ar
  * @param amount Amount, given as a percentage (0..1) or the number of interval (ie 3 for every third item)
  * @returns 
  */
-export const sample = <V>(array:ReadonlyArray<V>, amount:number):ReadonlyArray<V> => {
+export const sample = <V>(array:ReadonlyArray<V>, amount:number):Array<V> => {
   //eslint-disable-next-line functional/no-let
   let subsampleSteps = 1;
   if (amount <= 1) {
@@ -677,7 +694,7 @@ export type MergeReconcile<V> = (a:V, b:V)=>V;
  * @param reconcile Returns value to decide 'winner' when keys conflict.
  * @param arrays Arrays of data to merge 
  */
-export const mergeByKey = <V>(keyFn:ToString<V>, reconcile:MergeReconcile<V>, ...arrays:readonly ReadonlyArray<V>[]):ReadonlyArray<V> => {
+export const mergeByKey = <V>(keyFn:ToString<V>, reconcile:MergeReconcile<V>, ...arrays:readonly ReadonlyArray<V>[]):Array<V> => {
   const result = new Map<string, V>();
   for (const m of arrays) {
     for (const mv of m) {
@@ -734,11 +751,21 @@ export const reducePairwise = <V, X>(arr:readonly V[], reducer:(acc:X, a:V, b:V)
  * Assuming that `input` array is only unique values, this function
  * returns a new array with unique items from `values` added.
  * 
- * If `comparer` function is not provided, values are compared by reference.
+ * If `comparer` function is not provided, values are compared using the
+ * default === semantics (via {@link isEqualDefault})
+ * 
+ * ```js
+ * const existing = [ 1, 2, 3 ];
+ * const newValues = [ 3, 4, 5];
+ * const v = Arrays.pushUnique(existing, newValues);
+ * // [ 1, 2, 3, 4, 5]
+ * ```
+ * 
+ * To combine one or more arrays, keeping only unique items, use {@link unique}
  * @param input 
  * @param values 
  */
-export const pushUnique = <V>(input:readonly V[], values:readonly V[], comparer?:IsEqual<V>):readonly V[] => {
+export const pushUnique = <V>(input:readonly V[], values:readonly V[], comparer?:IsEqual<V>):V[] => {
   const c = comparer ?? isEqualDefault;
   const ret = [...input];
   for (const v of values) {
@@ -748,4 +775,23 @@ export const pushUnique = <V>(input:readonly V[], values:readonly V[], comparer?
     ret.push(v);
   }
   return ret;
+};
+
+/**
+ * Combines the values of one or more arrays, removing duplicates
+ * ```js
+ * const v = Arrays.unique([ [1, 2, 3, 4], [ 3, 4, 5, 6] ]);
+ * // [ 1, 2, 3, 4, 5, 6]
+ * ```
+ * @param arrays 
+ * @param comparer 
+ * @returns 
+ */
+export const unique = <V>(arrays:readonly (readonly V[])[], comparer = isEqualDefault):V[] => {
+  //eslint-disable-next-line functional/no-let
+  let t:V[] = [];
+  arrays.forEach(a => {
+    t = pushUnique<V>(t, a, comparer);
+  });
+  return t;
 };
