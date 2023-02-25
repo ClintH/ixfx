@@ -483,6 +483,13 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
   deleteKeyValue(key: string, value: V):boolean
   
   /**
+   * Delete all occurrences of `value`, regardless of
+   * key it is stored under.
+   * Returns _true_ if something was deleted.
+   * @param value 
+   */
+  deleteByValue(value:V):boolean
+  /**
    * Deletes all values stored under `key`. Returns _true_ if key was found
    * @param key
    */
