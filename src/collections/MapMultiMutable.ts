@@ -96,12 +96,30 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
   deleteKeyValue(key:string, value:V):boolean {
     const a = this.#map.get(key);
     if (a === undefined) return false;
-    const preCount = this.type.count(a);
+    return this.deleteKeyValueFromMap(a, key, value);
+  }
 
-    const filtered = this.type.without(a, value);// this.type.filter(a, v => !this.valueComparer(v, value));
+  private deleteKeyValueFromMap(map:M, key:string, value:V):boolean {
+    const preCount = this.type.count(map);
+    const filtered = this.type.without(map, value);
     const postCount = filtered.length;
     this.#map.set(key, this.type.add(undefined, filtered));
     return preCount > postCount;
+  }
+
+  deleteByValue(value:V):boolean {
+    let something = false;
+    Array.from(this.#map.keys()).filter(key => {
+      const a = this.#map.get(key);
+      if (!a) throw Error(`Bug: map could not be accessed`);
+      if (this.deleteKeyValueFromMap(a, key, value)) {
+        something = true; // note that something was deleted
+
+        // If key is empty, delete it
+        if (this.count(key) === 0) this.delete(key);
+      }
+    });
+    return something;
   }
 
   delete(key:string):boolean {
@@ -117,11 +135,12 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     const found = keys.find(key => {
       const a = this.#map.get(key);
       if (a === undefined) throw Error(`Bug: map could not be accessed`);
-      if (this.type.has(a, value)) return true;
-      return false;
+      return (this.type.has(a, value));
     });
     return found;
   }
+
+
 
   count(key:string):number {
     const e = this.#map.get(key);
