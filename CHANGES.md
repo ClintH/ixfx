@@ -1,5 +1,15 @@
 A rough changelog between NPM releases
 
+# 0.8.3 23.02.25
+
+Collections/Array
+ - Functions changed to take readonly or mutable array (although none mutate an input)
+ - filterAB: Array.filter, but returns items that return false as well as true 
+
+Collections/MapMulti
+ - Added 'removeValue' function that remove value regardless of key it is stored under
+
+ 
 # 0.8.2  23.02.19
 
 Collections/Array
