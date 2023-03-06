@@ -13,10 +13,23 @@ class SimpleMapArrayMutableImpl<V> {
     }
   }
 
-  keys():IterableIterator<string> {
-    return this.#map.keys();
+  *entries():IterableIterator<[key:string,value:V]> {
+    for (const key of this.#map.keys()) {
+      for (const value of this.#map.get(key)!) {
+        yield [key, value];
+      }
+    }
   }
 
+  *keys():IterableIterator<string> {
+    yield *this.#map.keys();
+  }
+
+  *values():IterableIterator<V> {
+    for (const entries of this.#map) {
+      yield *entries[1];
+    }
+  }
   
   debugString(): string {
     // eslint-disable-next-line functional/no-let
@@ -30,8 +43,11 @@ class SimpleMapArrayMutableImpl<V> {
     return r;
   }
 
-  get(key: string): ReadonlyArray<V> | undefined {
-    return this.#map.get(key);
+  *get(key: string): IterableIterator<V> {
+    const m = this.#map.get(key);
+    if (!m) return;
+    yield *m.values();
+    //return this.#map.get(key) ?? [];
   }
 
   delete(key: string, v: V): boolean {

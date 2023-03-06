@@ -71,13 +71,13 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
     const listeners = this.#listeners.get(type as string);
     if (listeners === undefined) return;
-    listeners.forEach(l => {
+    for (const l of listeners) {
       try {
         l(args, this);
       } catch (err) {
         console.debug(`Event listener error: `, err);
       }
-    });
+    }
   }
 
   /**

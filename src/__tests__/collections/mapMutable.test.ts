@@ -32,7 +32,6 @@ describe(`mutableMapArray`, () => {
   test(`withOpts`, () => {
     type Person = { readonly name: string, readonly city: string }
     const barry = {name: `Barry`, city: `London`};
-
     const barryOther = {name: `Barry`, city: `Manchester`};
     const barryCase = {name: `BARRY`, city: `London`}; 
     const sally = {name: `Sally`, city: `Bristol`};
@@ -48,23 +47,29 @@ describe(`mutableMapArray`, () => {
     
     m.addValue(barry, barryOther, barryCase, sally, sallyOther, sallyMoreProps);
    
+    // Check expected counts
+    expect([...m.keys()].length === 3);
+    expect([...m.entries()].length === 6);
+
+    // Check for key recall
+    expect([...m.values(`Bristol`)].length).toEqual(2);
     expect(m.count(`London`)).toEqual(2);
     expect(m.count(`Notfound`)).toEqual(0);
     expect(m.hasKeyValue(`Bristol`, {name: `Sally`, city: `Bristol`})).toBeTruthy();
     expect(m.hasKeyValue(`London`, {name: `Sally`, city: `Bristol`})).toBeFalsy();
-    
-    expect(m.has(`notfound`)).toBeFalse();
     expect(m.hasKeyValue(`Bristol`, sallyMoreProps)).toBeTruthy();
+    
+    // Check for non-existent keys
+    expect(m.has(`notfound`)).toBeFalse();
+    expect([...m.values('notfound')].length === 0);
     
     // Key equality
     expect(m.has(`LONDON`)).toBeFalse();
     expect(m.has(`London`)).toBeTrue();
     
-    // Fetch all values
-    expect(m.get(`Bristol`)?.length).toEqual(2);
-
     // Lookup key from value
     expect(m.findKeyForValue({name: `BARRY`, city: `London`})).toEqual(`London`);
+    expect(m.findKeyForValue({name: `notfound`, city: `notfound`})).toBeUndefined();
 
   });
 
@@ -120,8 +125,8 @@ describe(`mutableMapArray`, () => {
     expect(m.has(`notfound`)).toBeFalsy();
     expect(m.isEmpty).toBeFalse();
 
-    expect(m.keys()).toIncludeSameMembers([`apples`, `oranges`]);
-    expect(m.keysAndCounts()).toIncludeSameMembers([
+    expect([...m.keys()]).toIncludeSameMembers([`apples`, `oranges`]);
+    expect([...m.keysAndCounts()]).toIncludeSameMembers([
       [`apples`, 3],
       [`oranges`, 2]
     ])

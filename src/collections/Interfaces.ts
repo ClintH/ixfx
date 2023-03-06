@@ -24,8 +24,8 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
 export type MultiValue<V, M> = Readonly<{
   get name():string
   has(source:M, value:V): boolean
-  add(destination:M|undefined, values:ReadonlyArray<V>):M
-  toArray(source:M): ReadonlyArray<V>|undefined
+  add(destination:M|undefined, values:Iterable<V>):M
+  toArray(source:M): ReadonlyArray<V>
   iterable(source:M):IterableIterator<V>
   find(source:M, predicate:(v:V) => boolean): V|unknown
   filter(source:M, predicate:(v:V) => boolean): Iterable<V>// ReadonlyArray<V>
@@ -422,20 +422,30 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
  * Returns a human-readable rendering of contents 
  */
   debugString():string
+
 /**
  * Returns list of keys
  */
-  keys():readonly string[]
+  keys():IterableIterator<string>;// readonly string[]
+
+  values(key:string):IterableIterator<V>;
+
+  /**
+   * Iterates over key-value pairs.
+   * Unlike a normal map, the same key may appear several times.
+   */
+  entries():IterableIterator<[key:string,value:V]>
+
 /**
  * Returns a list of all keys and count of items therein
  */
-  keysAndCounts(): Array<[string, number]>
+  keysAndCounts(): IterableIterator<[string, number]>
 
 /**
- * Returns items under `key` or undefined if `key` is not found
+ * Returns items under `key` or an empty array if `key` is not found
  * @param key 
  */
-  get(key:string):ReadonlyArray<V>|undefined
+  //get(key:string):ReadonlyArray<V>
 
   /**
    * Returns the object managing values under the specified `key`
@@ -457,17 +467,19 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
    * @param key 
    */
   has(key:string):boolean
+
   /**
- * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
- * @param key
- * @param values
- */
+   * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
+   * @param key
+   * @param values
+   */
   addKeyedValues(key: string, ...values: ReadonlyArray<V>):void
-/**
- * Adds a value, automatically extracting a key via the
- * `groupBy` function assigned in the constructor options.
- * @param values Adds several values
- */
+
+  /**
+   * Adds a value, automatically extracting a key via the
+   * `groupBy` function assigned in the constructor options.
+   * @param values Adds several values
+   */
   addValue(...values:ReadonlyArray<V>):void
 
   /**
@@ -475,11 +487,11 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
    */
   clear():void
 
-/**
- * Deletes all values under `key` that match `value`.
- * @param key Key
- * @param value Value
- */
+  /**
+   * Deletes all values under `key` that match `value`.
+   * @param key Key
+   * @param value Value
+   */
   deleteKeyValue(key: string, value: V):boolean
   
   /**
@@ -489,28 +501,31 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
    * @param value 
    */
   deleteByValue(value:V):boolean
+
   /**
    * Deletes all values stored under `key`. Returns _true_ if key was found
    * @param key
    */
   delete(key:string): boolean
 
-/**
- * Returns true if the map is empty
- */
+  /**
+   * Returns true if the map is empty
+   */
   get isEmpty():boolean
 
   /**
-   * REturns the length of the longest child item
+   * Returns the length of the longest child item
    */
   get lengthMax():number; 
-/**
- * Finds the first key where value is stored. 
- * Note: value could be stored in multiple keys
- * @param value Value to seek
- * @returns Key, or undefined if value not found
- */
+
+  /**
+   * Finds the first key where value is stored. 
+   * Note: value could be stored in multiple keys
+   * @param value Value to seek
+   * @returns Key, or undefined if value not found
+   */
   findKeyForValue(value: V): string | undefined
+
 /**
  * Returns the number of values stored under `key`, or _0_ if `key` is not present.
  * @param key Key
@@ -594,11 +609,13 @@ export interface CircularArray<V> extends Array<V> {
   add(key:string, ...values:ReadonlyArray<V>):void
 
   /**
-   * Get items at key. Returns _undefined_ if key does not exist
+   * Get items at key. Returns an empty array if it does not exist
    * @param key 
    */
-  get(key:string):ReadonlyArray<V>|undefined
+  get(key:string):IterableIterator<V>
 
+  entries():IterableIterator<[key:string,value:V]>
+  
   /**
    * Deletes the specified `value` under `key`. Returns true if found.
    * @param key 
@@ -611,7 +628,6 @@ export interface CircularArray<V> extends Array<V> {
    */
   clear():void
 
-  
   keys():IterableIterator<string>;
 }
 

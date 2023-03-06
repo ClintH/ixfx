@@ -65,7 +65,7 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     super.fireEvent(`clear`, true);
   }
 
-  addKeyedValues(key:string, ...values:ReadonlyArray<V>) {
+  addKeyedValues(key:string, ...values:V[]) {
     const set = this.#map.get(key);
     //console.log(`addKeyedValues: key: ${key} values: ${JSON.stringify(values)}`);
     if (set === undefined) {
@@ -140,8 +140,6 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
     return found;
   }
 
-
-
   count(key:string):number {
     const e = this.#map.get(key);
     if (e === undefined) return 0;
@@ -149,13 +147,19 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
   }
 
   /**
-   * Returns the array of values stored under `key`
-   * or undefined if key does not exist
+   * Returns the array of values stored under `key`.
+   * An empty array is returned if there are no values
    */
-  get(key:string):readonly V[] | undefined {
+  get(key:string):readonly V[] {
     const m = this.#map.get(key);
-    if (m === undefined) return undefined;
+    if (m === undefined) return [];
     return this.type.toArray(m);
+  }
+
+  *values(key:string):IterableIterator<V> {
+    const m = this.#map.get(key);
+    if (m === undefined) return;
+    yield *this.type.iterable(m);
   }
 
   /**
@@ -175,24 +179,41 @@ export class MapOfMutableImpl<V, M> extends SimpleEventEmitter<MapArrayEvents<V>
   }
 
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  keys():string[] {
-    return Array.from(this.#map.keys());
+  *keys():IterableIterator<string> {
+    yield *this.#map.keys();
+    //return Array.from(this.#map.keys());
+  }
+
+  *entries():IterableIterator<[key:string,value:V]> {
+    for (const e of this.#map.entries()) {
+      for (const v of this.type.iterable(e[1])) {
+        yield [e[0], v];
+      }
+    }
   }
 
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  keysAndCounts():Array<[string, number]> {
-    const keys = this.keys();
+  *keysAndCounts():IterableIterator<[string, number]> {
+    //const keys = this.keys();
     /* eslint-disable-next-line functional/prefer-readonly-type */
-    const r = keys.map(k => [k, this.count(k)]) as Array<[string, number]>;
-    return r;
+    //const r = keys.map(k => [k, this.count(k)]) as Array<[string, number]>;
+    //return r;
+
+    for (const key of this.keys()) {
+      yield [key, this.count(key)];
+    }
   }
 
   merge(other:MapOfMutable<V, M>) {
-    const keys = other.keys();
-    keys.forEach(key => {
-      const data = other.get(key);
-      if (data !== undefined) this.addKeyedValues(key, ...data);
-    });
+    // const keys = other.keys();
+    // keys.forEach(key => {
+    //   const data = other.get(key);
+    //   if (data !== undefined) this.addKeyedValues(key, ...data);
+    // });
+    for (const key of other.keys()) {
+      const data = other.values(key);
+      this.addKeyedValues(key, ...data);
+    }
   }
 }
 
@@ -326,7 +347,10 @@ export const mapCircularMutable = <V>(opts:MapCircularOpts<V>):MapOfMutable<V, C
     },
     add:(dest, values) => {
       if (dest === undefined) dest = circularArray<V>(opts.capacity);
-      values.forEach(v => dest = dest?.add(v));
+      for (const v of values) {
+        //values.forEach(v => dest = dest?.add(v));
+        dest = dest.add(v);
+      }
       return dest;
     },
     count: (source) => source.length,
