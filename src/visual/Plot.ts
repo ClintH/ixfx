@@ -171,11 +171,14 @@ export const defaultAxis = (name:string):Axis => ({
  });
 
 export const calcScale = (buffer:BufferType, drawingOpts:DrawingOpts, seriesColours?:SeriesColours) => {
-  const seriesNames = buffer.keys();
+  //const seriesNames = buffer.keys();
   const scales:Series[] = [];
-  seriesNames.forEach(s => {
-    const series = buffer.get(s);
-    if (series === undefined) return;
+
+  for (const s of buffer.keys()) {
+    //seriesNames.forEach(s => {
+
+    const series = [...buffer.values(s)];
+    if (series.length === 0) break;
 
     let {min,max} = minMaxAvg(series);
     let range = max - min;
@@ -199,7 +202,7 @@ export const calcScale = (buffer:BufferType, drawingOpts:DrawingOpts, seriesColo
       name: s,
       colour: colour
     })
-  });
+  }
   return scales;
 }
 

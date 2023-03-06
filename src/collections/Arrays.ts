@@ -753,7 +753,7 @@ export const reducePairwise = <V, X>(arr:V[]|ReadonlyArray<V>, reducer:(acc:X, a
  * returns a new array with unique items from `values` added.
  * 
  * If `comparer` function is not provided, values are compared using the
- * default === semantics (via {@link isEqualDefault})
+ * default === semantics (via {@link Util.isEqualDefault})
  * 
  * ```js
  * const existing = [ 1, 2, 3 ];

@@ -1,5 +1,11 @@
 A rough changelog between NPM releases
 
+# 0.8.4 23.03.06
+
+Collections/MultiValue
+- Favour iterables rather than array return values
+
+
 # 0.8.3 23.02.25
 
 Collections/Array

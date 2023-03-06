@@ -24,7 +24,7 @@
 <div class="tsd-comment tsd-typography"><p>Assuming that <code>input</code> array is only unique values, this function
 returns a new array with unique items from <code>values</code> added.</p>
 <p>If <code>comparer</code> function is not provided, values are compared using the
-default === semantics (via isEqualDefault)</p>
+default === semantics (via <a href="Util.isEqualDefault.html">isEqualDefault</a>)</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">existing</span><span class="hl-2"> = [ </span><span class="hl-7">1</span><span class="hl-2">, </span><span class="hl-7">2</span><span class="hl-2">, </span><span class="hl-7">3</span><span class="hl-2"> ];</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">newValues</span><span class="hl-2"> = [ </span><span class="hl-7">3</span><span class="hl-2">, </span><span class="hl-7">4</span><span class="hl-2">, </span><span class="hl-7">5</span><span class="hl-2">];</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">v</span><span class="hl-2"> = </span><span class="hl-3">Arrays</span><span class="hl-2">.</span><span class="hl-8">pushUnique</span><span class="hl-2">(</span><span class="hl-3">existing</span><span class="hl-2">, </span><span class="hl-3">newValues</span><span class="hl-2">);</span><br/><span class="hl-0">// [ 1, 2, 3, 4, 5]</span>
 </code></pre>
 <p>To combine one or more arrays, keeping only unique items, use <a href="Collections.Arrays.unique.html">unique</a></p>

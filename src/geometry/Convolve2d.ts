@@ -1,5 +1,5 @@
-import { Rgb } from '~/visual/Colour.js';
-import { ImageDataGrid } from '~/visual/index.js';
+import { Rgb } from '../visual/Colour.js';
+import { ImageDataGrid } from '../visual/index.js';
 import * as Grids from './Grid.js';
 
 export type Kernel = readonly (readonly number[])[];
