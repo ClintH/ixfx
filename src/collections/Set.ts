@@ -3,7 +3,6 @@ import { ToString } from "../Util.js";
 import { SimpleEventEmitter } from "../Events.js";
 import { SetMutable, SetImmutable, ValueSetEventMap } from "./Interfaces.js";
 
-
 class StringSetImpl<V> implements SetImmutable<V> {
   private store:Map<string, V>;
   private keyString;
@@ -11,6 +10,10 @@ class StringSetImpl<V> implements SetImmutable<V> {
   constructor(keyString?:ToString<V>, map?:Map<string, V>) {
     this.store = map ?? new Map<string, V>();
     this.keyString = keyString ?? defaultKeyer<V>;
+  }
+
+  get size():number {
+    return this.store.size;
   }
 
   add(...values:readonly V[]):SetImmutable<V> {
@@ -75,6 +78,10 @@ class MutableStringSetImpl<V> extends SimpleEventEmitter<ValueSetEventMap<V>> im
   constructor(keyString:ToString<V> | undefined = undefined) {
     super();
     this.keyString = keyString ?? defaultKeyer<V>;
+  }
+
+  get size() {
+    return this.store.size;
   }
 
   add(...v:ReadonlyArray<V>) {

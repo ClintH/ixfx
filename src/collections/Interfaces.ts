@@ -207,6 +207,7 @@ export interface QueueMutable<V> {
  * s.delete(item); // Delete item by value
  * s.toArray();    // Returns values as an array
  * s.values();     // Returns an iterator over values
+ * s.size;         // Returns number of items in set
  * ```
  * 
  * @example Example usage
@@ -240,6 +241,7 @@ export interface QueueMutable<V> {
  */
 export interface SetImmutable<V> {
   has(v:V):boolean
+  get size():number
   add(...values: ReadonlyArray<V>):SetImmutable<V>
   values():IterableIterator<V>
     /**
@@ -269,6 +271,7 @@ export interface SetImmutable<V> {
  * s.delete(item); // Delete item by value
  * s.toArray();    // Returns values as an array
  * s.values();     // Returns an iterator over values
+ * s.size;         // Number of items stored in set
  * ```
  * 
  * @example Example usage
@@ -345,6 +348,11 @@ export interface SetMutable<V> extends SimpleEventEmitter<ValueSetEventMap<V>> {
    * Returns an array of values
    */
   toArray(): V[]
+
+  /**
+   * Returns the number of items stored in the set
+   */
+  get size():number
 }
 
 /**
