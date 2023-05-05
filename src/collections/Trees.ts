@@ -1,23 +1,11 @@
-//import {KeyValue} from "../KeyValue.js";
 import {IsEqual, isEqualDefault} from "../Util.js";
 import { queueMutable } from "./Queue.js";
 import { stackMutable } from "./Stack.js";
-
 import {betweenChomp} from "../Text.js";
 import { TreeNodeMutable, treeNodeMutable } from "./TreeNodeMutable.js";
 
 export { treeNodeMutable, TreeNodeMutable };
-
-/**
- * Source: https://github.com/amejiarosario/dsa.js-data-structures-algorithms-javascript/blob/c20acfb32f057355fa51fc0fedbdacebcab78baf/src/data-structures/trees/tree-node.js
- * License: MIT
- */
-// export type TreeNode<V> = Readonly<{
-//   value:V;
-//   label:string;
-//   descendants:readonly TreeNode<V>[];
-//   parent:TreeNode<V>|undefined;
-// }>
+export type Entry = [name:string, value:any]
 
 export type TreeNode = {
   /**
@@ -39,96 +27,49 @@ export function isTreeNode<V>(p:TreeNode|unknown):p is TreeNode {
   return true;
 }
 
-// export type LabelledTreeNode<V> = {
-//   label:string
-//   value:V|undefined;
-//   descendants:LabelledTreeNode<V>[];
-// }
 
+// function treeTest() {
+//   console.log(`Tree test`);
 
-
-// export const getRoot = <V>(node:TreeNode<V>):TreeNode<V> => {
-//   if (typeof node === 'undefined') throw new Error('node is undefined');
-//   if (node === null) throw new Error('node is null');
-//   if (typeof node.parent === 'undefined') return node;
-//   if (node.parent) return getRoot(node.parent);
-//   return node;
-// }
-
-// const createNode = (label:string, value:any, parent:TreeNode<any>):TreeNode<any> => {
-//   return {
-//     descendants: [],
-//     value,
-//     label,
-//     parent
-//   };
-// }
-
-
-
-// ['c:', 'data', 'file.txt']
-// ['c:', 'temp', 'file2.txt']
-// export const fromTokens = <V>(item:V, tokens:string[], root?:LabelledTreeNode<V>|undefined) => {
-//   let pos = root;
-//   for (const t of tokens) {
-//     // No current node. Eg if root is undefined
-//     if (pos === undefined) {
-//       pos = {
-//         value: item,
-//         label: t,
-//         descendants: []
-//       }
-//       if (root === undefined) root = pos;
-//     } else {
-//       // Does token match a descendant?
-//       const found = pos.descendants.find(dn => dn.label === t);
-//       pos = found;
+//   const testMap = new Map();
+//   testMap.set('jill', {
+//     address: {
+//       street: 'Blah St',
+//       number: 27
 //     }
+//   });
+//   testMap.set('john', {
+//     address: {
+//       street: 'West St',
+//       number: 35
+//     }
+//   })
+
+//   const testArray = [
+//     'one',
+//     ['two'],
+//     'three',
+//     ['four-a', 'four-b', 'four-c'],
+//     'five'
+//   ];
+
+//   const testObj = {
+//     name: 'Jill',
+//     address: {
+//       street: 'Blah St',
+//       number: 27
+//     },
+//     kids: [
+//       {
+//         name:'John',
+//         address: {
+//           street: 'West St',
+//           number: 35
+//         }
+//       },
+//       {name:'Sam'}
+//     ]
 //   }
-// }
-
-function treeTest() {
-  console.log(`Tree test`);
-
-  const testMap = new Map();
-  testMap.set('jill', {
-    address: {
-      street: 'Blah St',
-      number: 27
-    }
-  });
-  testMap.set('john', {
-    address: {
-      street: 'West St',
-      number: 35
-    }
-  })
-
-  const testArray = [
-    'one',
-    ['two'],
-    'three',
-    ['four-a', 'four-b', 'four-c'],
-    'five'
-  ];
-
-  const testObj = {
-    name: 'Jill',
-    address: {
-      street: 'Blah St',
-      number: 27
-    },
-    kids: [
-      {
-        name:'John',
-        address: {
-          street: 'West St',
-          number: 35
-        }
-      },
-      {name:'Sam'}
-    ]
-  }
 
   // console.log('direct descendants');
   // for (const x of directDescendants(testObj)) {
@@ -149,9 +90,9 @@ function treeTest() {
   // console.log('f2: ', findByDottedPath('kids[0].address.street', testObj));
   
 
-  const f1 = findByDottedPath('kids[0].address.blah', testObj);
-  console.log(prettyPrintEntryPath(f1));
-} 
+//   const f1 = findByDottedPath('kids[0].address.blah', testObj);
+//   console.log(prettyPrintEntryPath(f1));
+// } 
 //treeTest();
 
 function prettyPrintEntryPath(entries:Entry[]) {
@@ -164,13 +105,6 @@ function prettyPrintEntryPath(entries:Entry[]) {
   return t;
 }
 
-// export function traverse<V>(root:LabelledTreeNode<V>) {
-
-// }
-
-//export type TreeLike<V extends object> = object | TreeNode<V> | ArrayLike<any> | Map<any,V>
-export type Entry = [name:string, value:any]
-
 function prettyPrint(indent = 0, node:object, defaultLabel = 'root'):string {
   const entry = getEntry(node, defaultLabel);
   const t = `${'  '.repeat(indent)} + label: ${entry[0]} value: ${JSON.stringify(entry[1])}`;
@@ -182,6 +116,11 @@ function prettyPrint(indent = 0, node:object, defaultLabel = 'root'):string {
   }
 }
 
+/**
+ * Returns the direct descendents of a tree-like object
+ * @param node 
+ * @param defaultName 
+ */
 export function* directDescendants(node:object, defaultName?:string):IterableIterator<Entry> {
   if (Array.isArray(node)) {
     if (!defaultName) defaultName = 'array';
@@ -198,9 +137,14 @@ export function* directDescendants(node:object, defaultName?:string):IterableIte
   }
 }
 
-function findDirectDescendant(label:string, node:object):Entry|undefined {
+/**
+ * Finds a given direct descendent by label
+ * @param label 
+ * @param node 
+ * @returns 
+ */
+function findDirectDescendantByLabel(label:string, node:object):Entry|undefined {
   for (const d of directDescendants(node)) {
-    //console.log(`findDirectDescendant entry: ${d[0]} label: ${label} d: ${d}`);
     if (d[0] === label) return d;
   }
   return;
@@ -229,10 +173,6 @@ export function findByDottedPath(path:string, node:object):Entry[] {
   const navigationPath:Entry[] = [];
 
   for (let p of pathSplit) {
-    // console.log(p);
-    // console.log(node);
-    // console.log('--');
-
     const [origStr, arrayIndex] = betweenChomp(p, '[', ']');
     let e:Entry|undefined;
     //console.log(`orig: ${origStr} arrayIndex: ${arrayIndex}`);
@@ -240,7 +180,7 @@ export function findByDottedPath(path:string, node:object):Entry[] {
       p = origStr;
     }
     
-    e = findDirectDescendant(p, node);
+    e = findDirectDescendantByLabel(p, node);
     if (e && arrayIndex && Number.isInteger(parseInt(arrayIndex)) && Array.isArray(e[1])) {
       e = [origStr, e[1][parseInt(arrayIndex)]];
     }    
@@ -296,42 +236,6 @@ export function* breadthFirst(root:object):IterableIterator<Entry> {
     entry = queue.dequeue();
   }
 }
-
-
-/***
- * Breadth-first traversal
- */
-// export function* bfs<V>(root:TreeLike<V>):IterableIterator<TreeNode<V>> {
-//   if (!root) return;
-//   const queue = queueMutable<Entry>();
-//   queue.enqueue(root);
-//   let node = queue.dequeue();
-//   while (node) {
-//     yield node;
-//     if (node) {
-//       queue.enqueue(...directDescendants(node)); //.descendants);
-//     }
-//     node = queue.dequeue();
-//   }
-// }
-
-
-
-// export function* dfs<V>(root:TreeNode<V>):IterableIterator<TreeNode<V>> {
-//   if (!root) return;
-//   const stack = stackMutable<TreeNode<V>>();
-
-//   stack.push(root);
-//   let node = stack.pop();
-//   while (node) {
-//     yield node;
-//     if (node) {
-//       stack.push(...node.descendants);
-//     }
-//     node = stack.pop();
-//   }
-// }
-
 export const hasAnyChild = <V extends TreeNode>(parent:V, possibleChild:V, eq:IsEqual<V> = isEqualDefault):boolean => {
   return hasChild(parent, possibleChild, Number.MAX_SAFE_INTEGER, eq);
 }
