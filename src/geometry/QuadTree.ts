@@ -1,6 +1,7 @@
-import { Points, Rects, Shapes } from ".";
-import { TreeNode } from "../collections/Trees.js";
-import { ShapePositioned } from "./Shape";
+import {TreeNode} from "../collections/Trees.js";
+import {TreeNodeMutable} from "../collections/TreeNodeMutable.js";
+import { Points, Rects, Shapes } from "./index.js";
+import { ShapePositioned } from "./Shape.js";
 
 /**
  * Options for quad tree
@@ -15,7 +16,6 @@ export type QuadTreeOpts = {
    */
   readonly maxLevels:number
 }
-
 
 /**
  * Direction
@@ -36,44 +36,59 @@ export type QuadTreeItem = Points.Point | ShapePositioned;
  * @param opts Options
  * @returns New quad tree
  */
-export const quadTree = (bounds:Rects.RectPositioned, initialData:readonly QuadTreeItem[] = [], opts:Partial<QuadTreeOpts> = {}):QuadTreeNode => {
-  const o:QuadTreeOpts = {
-    maxItems: opts.maxItems ?? 4,
-    maxLevels: opts.maxLevels ?? 4
-  };
+// export const quadTree = (bounds:Rects.RectPositioned, initialData:readonly QuadTreeItem[] = [], opts:Partial<QuadTreeOpts> = {}):QuadTreeNode => {
+//   const o:QuadTreeOpts = {
+//     maxItems: opts.maxItems ?? 4,
+//     maxLevels: opts.maxLevels ?? 4
+//   };
 
-  const n = new QuadTreeNode(bounds, 0, o);
-  initialData.forEach(d => {
-    n.add(d);
-  });
-  return n;
-};
+//   const n = new QuadTreeNode( undefined, bounds, 0, o);
+//   initialData.forEach(d => {
+//     n.add(d);
+//   });
+//   return n;
+// };
+
 
 /**
  * QuadTreeNode
  * 
  * To create, you probably want the {@link quadTree} function.
  */
-export class QuadTreeNode extends TreeNode<void> {
+export class QuadTreeNode implements TreeNode {
   items:QuadTreeItem[] = [];
-  
+  children:QuadTreeNode[] = [];
+  parent:QuadTreeNode|undefined;
   /**
    * Constructor
    * @param boundary 
    * @param level 
    * @param opts 
    */
-  constructor(readonly boundary:Rects.RectPositioned, readonly level:number, readonly opts:QuadTreeOpts) {
-    super(undefined);
+  constructor(parent:QuadTreeNode|undefined, readonly boundary:Rects.RectPositioned, readonly level:number, readonly opts:QuadTreeOpts) {
+    this.parent = parent;
   }
 
+  *parents():IterableIterator<QuadTreeNode> {
+    let n:QuadTreeNode|undefined = this;
+    while (n.parent !== undefined) {
+      yield n.parent
+      n = n.parent;
+    }
+  }
+
+  *descendants():IterableIterator<QuadTreeNode> {
+    for (const c of this.children) {
+      yield c;
+    }
+  }
   /**
    * Get a descendant node in a given direction
    * @param d 
    * @returns 
    */
   direction(d:Direction):QuadTreeNode|undefined {
-    return this.descendants[d] as QuadTreeNode|undefined;
+    return this.children[d] as QuadTreeNode|undefined;
   }
   
   /**
@@ -84,21 +99,21 @@ export class QuadTreeNode extends TreeNode<void> {
   add(p:QuadTreeItem):boolean {
     if (!Shapes.isIntersecting(this.boundary, p)) return false;
 
-    if (this.descendants.length) {
-      this.descendants.forEach(d => (d as QuadTreeNode).add(p));
+    if (this.children.length) {
+      this.children.forEach(d => (d as QuadTreeNode).add(p));
       return true;
     }
 
     this.items.push(p);
     
     if (this.items.length > this.opts.maxItems && this.level < this.opts.maxLevels) {
-      if (!this.descendants.length) { 
+      if (!this.children.length) { 
         this.#subdivide();
       }
       
       // Add to child
       this.items.forEach(item => {
-        this.descendants.forEach(d => (d as QuadTreeNode).add(item));
+        this.children.forEach(d => (d as QuadTreeNode).add(item));
       });
       //this.descendants.forEach(d => (d as QuadTreeNode).add(p));
       this.items = [];
@@ -126,9 +141,10 @@ export class QuadTreeNode extends TreeNode<void> {
       x+w, y, x, y, x, y+h, x+w, y+h
     );
     const rects = coords.map(p => Rects.fromTopLeft(p, w, h));
-    rects.forEach((r, index) => {
-      this.descendants[index] = new QuadTreeNode(r, this.level + 1, this.opts);
-    });
+    // rects.forEach((r, index) => {
+    //   this.descendants[index] = new QuadTreeNode(r, this.level + 1, this.opts);
+    // });
+    this.children = rects.map(r => new QuadTreeNode(this, r, this.level+1, this.opts));
   }
 }
 
