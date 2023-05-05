@@ -1,4 +1,4 @@
-import { Queues } from "../collections";
+import { Queues } from "../collections/index.js";
 
 type Task = ()=>void
 
