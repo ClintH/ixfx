@@ -1,5 +1,19 @@
 A rough changelog between NPM releases
 
+# 0.8.5 23.05.05
+
+Collections/TreeNode
+- Broke some tree stuff into pure functions which the new TreeNodeMutable uses
+- Added support for tree-like operations over objects and Maps
+
+Collections/TreeNodeMutable
+- Basic implementation and test 
+
+text
+- betweenChomp: Return part of string before a given start and end match, eg '[' and ']', as well as a copy of the string with all of that removed.
+- Improved test coverage
+
+
 # 0.8.4 23.03.06
 
 Collections/MultiValue
