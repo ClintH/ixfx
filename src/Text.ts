@@ -1,3 +1,4 @@
+import {integer} from './Guards.js';
 import { string as random } from './Random.js';
 
 export { random };
@@ -11,11 +12,13 @@ export { random };
  * ```
  * @param source Source text 
  * @param start Start match
- * @param end If undefined, `start` will be used instead
+ * @param end If undefined, the `start` string will be looked for
  * @param lastEndMatch If true, looks for the last match of `end` (default). If false, looks for the first match.
  * @returns 
  */
 export const between = (source:string, start:string, end?:string, lastEndMatch = true):string | undefined => {
+  // ✔ Unit tested
+
   const startPos = source.indexOf(start);
   if (startPos < 0) return;
 
@@ -27,7 +30,33 @@ export const between = (source:string, start:string, end?:string, lastEndMatch =
   return source.substring(startPos+1, endPos);
 };
 
+/**
+ * Like {@link between}, but also returns the source string without the start/end match and what's between.
+ * ```js
+ * const [src,between] = betweenChomp('hello [there] friend', '[', ']');
+ * // src: 'hello  friend'
+ * // between: 'there'
+ * ```
+ * @param source 
+ * @param start 
+ * @param end 
+ * @param lastEndMatch 
+ * @returns 
+ */
+export const betweenChomp = (source:string, start:string, end?:string, lastEndMatch = true):[source:string,between:string|undefined] => {
+  // ✔ Unit tested
+  const startPos = source.indexOf(start);
+  if (startPos < 0) return [source, undefined];
 
+  if (end === undefined) end = start;
+
+  const endPos = lastEndMatch ? source.lastIndexOf(end) : source.indexOf(end, startPos+1);
+  if (endPos < 0) return [source, undefined];
+
+  const between = source.substring(startPos+1, endPos);
+  const src = source.substring(0, startPos) + source.substring(endPos+1);
+  return [src,between];
+};
 /**
  * Returns first position of the given character code, or -1 if not found.
  * @param source Source string
@@ -45,9 +74,11 @@ export const indexOfCharCode = (source:string, code:number, start = 0, end = sou
 };
 
 /**
- * Returns `source` with chars removed at `removeStart` position
+ * Returns `source` with a given number of characters removed from a start position.
+ * 
  * ```js
- * omitChars(`hello there`, 1, 3);
+ * // Remove three characters starting at position 1
+ * omitChars(`hello there`, 1, 3); // ie. removes 'ell'
  * // Yields: `ho there`
  * ```
  * @param source 
@@ -73,6 +104,11 @@ export const omitChars = (source:string, removeStart:number, removeLength:number
  * @returns 
  */
 export const splitByLength = (source:string, length:number):readonly string[] => {
+  integer(length, 'aboveZero', 'length');
+  if (source === null) throw new Error('source parameter null');
+  if (typeof source !== 'string') throw new Error('source parameter not a string');
+
+  // ✔ Unit tested
   const chunks = Math.ceil(source.length/length);
   const ret:string[] = [];
   //eslint-disable-next-line functional/no-let
@@ -109,8 +145,10 @@ export const untilMatch = (source:string, match:string, startPos = 0):string => 
 
 /**
  * 'Unwraps' a string, removing one or more 'wrapper' strings that it starts and ends with.
+ * Only removes when a matching end is found.
  * ```js
  * unwrap("'hello'", "'");        // hello
+ * // No mataching end 'a', so nothing happens
  * unwrap("apple", "a");          // apple
  * unwrap("wow", "w");            // o
  * unwrap(`"'blah'"`, '"', "'");  // blah
