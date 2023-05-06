@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import {integer, percent} from '../Guards';
+import {integer, integerParse, percent} from '../Guards';
 
 test (`percent`, () => {
   expect(() => percent(2)).toThrow();
@@ -39,5 +39,44 @@ test(`integer`, () => {
   expect(() => integer(0)).not.toThrow();
   expect(() => integer(1)).not.toThrow();
   expect(() => integer(100)).not.toThrow();
+
+});
+
+test(`integerParse`, () => {
+  expect(integerParse('10', 'positive')).toEqual(10);
+  expect(integerParse('10.89', 'positive')).toEqual(10);
+  expect(integerParse('0', 'positive', 0)).toEqual(0);
+  expect(integerParse('-10', 'positive', 0)).toEqual(0);
+
+  expect(integerParse('-10', 'negative')).toEqual(-10);
+  expect(integerParse('-10.99', 'negative')).toEqual(-10);
+  expect(integerParse('0', 'negative')).toEqual(0);
+  expect(integerParse('10', 'negative')).toBeNaN();
+  expect(integerParse('10', 'negative', 0)).toEqual(0);
+  
+  expect(integerParse('10', 'aboveZero')).toEqual(10);
+  expect(integerParse('0', 'aboveZero')).toBeNaN();
+  expect(integerParse('-10', 'aboveZero')).toBeNaN();
+
+  expect(integerParse('-10', 'belowZero')).toEqual(-10);
+  expect(integerParse('0', 'belowZero')).toBeNaN();
+  expect(integerParse('10', 'belowZero')).toBeNaN();
+
+  expect(integerParse('-1', 'bipolar')).toEqual(-1);
+  expect(integerParse('1', 'bipolar')).toEqual(1);
+  expect(integerParse('0', 'bipolar')).toEqual(0);
+  expect(integerParse('-2', 'bipolar')).toBeNaN();
+  expect(integerParse('2', 'bipolar')).toBeNaN();
+
+  expect(integerParse('-10', 'nonZero')).toEqual(-10);
+  expect(integerParse('0', 'aboveZero')).toBeNaN();
+  expect(integerParse('10', 'aboveZero')).toEqual(10);
+
+  expect(integerParse('1', 'percentage')).toEqual(1);
+  expect(integerParse('0', 'percentage')).toEqual(0);
+  expect(integerParse('-1', 'percentage')).toBeNaN();
+  expect(integerParse('-2', 'percentage')).toBeNaN();
+  expect(integerParse('2', 'percentage')).toBeNaN();
+
 
 });

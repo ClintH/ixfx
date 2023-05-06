@@ -82,15 +82,53 @@ export const percent = (value:number, paramName = `?`) => number(value, `percent
  * 
  * Note:
  * * `bipolar` will mean -1, 0 or 1.
+ * * positive: must be at least zero
+ * * negative: must be zero or lower
+ * * aboveZero: must be above zero
+ * * belowZero: must be below zero
+ * * percentage: must be within 0-1, inclusive
+ * * nonZero: can be anything except zero
  * @param value Value to check
  * @param paramName Param name for customising exception message
  * @param range Guard specifier.
  */
 export const integer = (value:number, range:NumberGuardRange = ``, paramName = `?`) => {
-  // Unit tested
+  // ✔️ Unit tested
   number(value, range, paramName);
   if (!Number.isInteger(value)) throw new Error(`Parameter ${paramName} is not an integer`);
 };
+
+/**
+ * Parses `value` as an integer, returning it if it meets the `range` criteria.
+ * If not, `defaultValue` is returned.
+ * 
+ * ```js
+ * const i = integerParse('10', 'positive');    // 10
+ * const i = integerParse('10.5', 'positive');  // 10
+ * const i = integerParse('0', 'nonZero', 100); // 100
+ * ```
+ * 
+ * NaN is returned if criteria does not match and no default is given
+ * ```js
+ * const i = integerParse('10', 'negative');    // NaN
+ * ```
+ * 
+ * @param value 
+ * @param range 
+ * @param defaultValue 
+ * @returns 
+ */
+export const integerParse = (value:any, range:NumberGuardRange = ``, defaultValue:number = Number.NaN)  => {
+  // ✔️ Unit tested
+  if (value === undefined) return defaultValue;
+  if (value === null) return defaultValue;
+  try {
+    integer(Number.parseInt (value), range, 'parsed');
+  } catch (ex) {
+    return defaultValue;
+  }
+  return parseInt(value);
+}
 
 /**
  * Returns true if parameter is an array of strings
