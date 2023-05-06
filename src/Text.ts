@@ -135,13 +135,41 @@ export const splitByLength = (source:string, length:number):readonly string[] =>
  * @param match 
  * @param startPos If provided, gives the starting offset. Default 0
  */
-export const untilMatch = (source:string, match:string, startPos = 0):string => {
-  if (startPos > source.length) throw new Error(`startPos should be less than length`);
-  const m = source.indexOf(match, startPos);
+export const untilMatch = (source:string, match:string, opts:MatchOpts = {}):string => {
+  //  ✔️ Unit tested
+  const startPos = opts.startPos ?? undefined;
+  const fromEnd = opts.fromEnd ?? false;
+  const m = fromEnd ? source.lastIndexOf(match, startPos) : source.indexOf(match, startPos);
   
   if (m < 0) return source;
-  return source.substring(startPos, m);
+  return source.substring(startPos ?? 0, m);
 };
+
+export type MatchOpts = {
+  startPos?:number
+  fromEnd?:boolean
+}
+/**
+ * Returns all the text in `source` that follows `match`. If not found, `source` is returned.
+ * ```js
+ * afterMatch(`Hello. There`, `.`); // ' There'
+ * afterMatch(`Hello, there', `,`); // 'Hello, there'
+ * ```
+ * @param source 
+ * @param match 
+ * @param startPos 
+ * @returns 
+ */
+export const afterMatch = (source:string, match:string, opts:MatchOpts = {}):string => {
+  //  ✔️ Unit tested
+  const startPos = opts.startPos ?? undefined;
+  const fromEnd = opts.fromEnd ?? false;
+  
+  const m = fromEnd ? source.lastIndexOf(match, startPos) : source.indexOf(match, startPos);
+  
+  if (m < 0) return source;
+  return source.substring(m + match.length);
+}
 
 /**
  * 'Unwraps' a string, removing one or more 'wrapper' strings that it starts and ends with.

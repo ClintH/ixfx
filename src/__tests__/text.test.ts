@@ -1,6 +1,34 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import { startsEnds, between, betweenChomp, omitChars, splitByLength } from '../Text.js';
+import { startsEnds, untilMatch, afterMatch, between, betweenChomp, omitChars, splitByLength } from '../Text.js';
+
+test('afterMatch', ()=> {
+  expect(afterMatch('T', '.')).toEqual('T');
+  expect(afterMatch('.T', '.')).toEqual('T');
+  expect(afterMatch('.', '.')).toEqual('');
+  
+  expect(afterMatch('Hello.There', '.')).toEqual('There');
+  expect(afterMatch('Hello.There.Poppet', '.')).toEqual('There.Poppet');
+  expect(afterMatch('Hello.There.Poppet', '.', { fromEnd: true })).toEqual('Poppet');
+  expect(afterMatch('Hello.There.Poppet', '!')).toEqual('Hello.There.Poppet');
+
+  expect(afterMatch('Hello.There.Poppet', '.', { startPos: 6})).toEqual('Poppet');
+
+});
+
+test('untilMatch', ()=> {
+  expect(untilMatch('H', '.')).toEqual('H');
+  expect(untilMatch('H.', '.')).toEqual('H');
+  expect(untilMatch('.', '.')).toEqual('');
+  
+  expect(untilMatch('Hello.There', '.')).toEqual('Hello');
+  expect(untilMatch('Hello.There.Poppet', '.')).toEqual('Hello');
+  expect(untilMatch('Hello.There.Poppet', '.', { fromEnd: true })).toEqual('Hello.There');
+  expect(untilMatch('Hello.There.Poppet', '!')).toEqual('Hello.There.Poppet');
+
+  expect(untilMatch('Hello.There.Poppet', '.', { startPos: 6})).toEqual('There');
+
+});
 
 test('splitByLength', () => {
   const t1 = 'hello there';
