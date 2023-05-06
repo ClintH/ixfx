@@ -14,6 +14,30 @@ import { IsEqual } from "./Util";
 
 //export { eachInterval } from './flow/Interval.js';
 
+/**
+ * Return first value from an iterable, or _undefined_ if
+ * no values are generated
+ * @param it 
+ * @returns 
+ */
+export function first<V>(it:Iterable<V>):V|undefined {
+  for (const val of it) {
+    return val;
+  }
+}
+
+/**
+ * Returns last value from an iterable, or _undefined_
+ * if no values are generated
+ * @param it 
+ */
+export function last<V>(it:Iterable<V>):V|undefined {
+  let ret:V|undefined;
+  for (const val of it) {
+    ret = val;
+  }
+  return ret;
+}
 
 /**
  * Yields chunks of the iterable `it` such that the end of a chunk is the
@@ -46,6 +70,7 @@ export function* chunksOverlapping<V>(it:Iterable<V>, size:number) {
 
   if (buffer.length > 0) yield buffer;
 }
+
 
 /**
  * Breaks an iterable into array chunks
