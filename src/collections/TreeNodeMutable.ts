@@ -1,13 +1,16 @@
+// #region Import
+import {afterMatch} from "../Text.js";
 import {QuadTreeItem} from "../geometry/QuadTree.js";
 import {without} from "./Arrays.js";
 import * as Trees from "./Trees.js";
-import {couldAddChild, directDescendants} from "./Trees.js";
+import { couldAddChild, directDescendants } from "./Trees.js";
+// #endregion
 
 /**
  * Basic tree node implementation
  */
 export class TreeNodeMutable<V> implements Trees.TreeNode {
-  readonly value: V;
+  value: V;
   readonly label: string;
   private children: readonly TreeNodeMutable<V>[];
   private parent: TreeNodeMutable<V>| undefined;
@@ -28,6 +31,53 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
 
   hasParent = (possibleParent:TreeNodeMutable<V>) => Trees.hasParent(this, possibleParent);
   hasAnyParent = (possibleParent:TreeNodeMutable<V>) => Trees.hasAnyParent(this, possibleParent);
+;
+  getByPath = (path:string, opts:Trees.PathOpts = {}) => {
+    const e = Trees.getByPath(path, this, opts);
+    if (!e) return;
+    return (e[1] as TreeNodeMutable<V>)
+  }
+
+  /**
+   * Adds a value by a string path.
+   * Automatically generates intermediate nodes.
+   * 
+   * ```js
+   * const rootValue = {}
+   * const root = treeNodeMutable(rootValue, 'pc');
+   * root.addValueByPath({x:'c'},  'c');
+   * root.addValueByPath({x:'admin'}, 'c.users.admin');
+   * ```
+   * 
+   * Creates the structure:
+   * ```
+   * pc         {}
+   * + c        {x: 'c' }
+   *  + users   undefined
+   *   + admin  {x: 'admin'}    
+   * ```
+   * @param value 
+   * @param path 
+   * @param pathOpts 
+   */
+  addValueByPath(value:V, path:string, pathOpts:Trees.PathOpts = {}) {
+    const sep = pathOpts.separator ?? '.';
+    const split = path.split(sep);
+    const label = split.at(-1); //afterMatch(path, sep, { fromEnd: true });
+    let node:TreeNodeMutable<any> = this;
+
+    for (const p of split) {
+      const found = node?.findChild(p);
+      if (!found && node) {
+        const n = new TreeNodeMutable<V|undefined>(undefined, p);
+        node.add(n);
+        node = n;
+      } else if (found) {
+        node = found;
+      }
+    }
+    if (node) node.value = value;
+  }
 
   /**
    * Adds a child
@@ -80,7 +130,7 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    * @returns 
    */
   prettyPrint(indent = 0):string {
-    const t = `${'  '.repeat(indent)} + label: ${this.label} value: ${JSON.stringify(this.value)}`;
+    const t = `${'  '.repeat(indent)} + label: ${this.label} value: ${this.value ? JSON.stringify(this.value) : '-'}`;
     if (this.children.length) {
       return t + '\n' + this.children.map(d => d.prettyPrint(indent+1)).join('\n');
     } else {
@@ -108,6 +158,28 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
       yield c;
     }
   }
+
+  findChild(label:string):TreeNodeMutable<V>|undefined {
+    if (label === undefined) throw new Error(`label param cannot be undefined`)
+    for (const c of this.children) {
+      if (c.label === label) return c;
+    }
+  }
+
+  /**
+   * Returns _true_ if this node is root,
+   * ie. does not have a parent
+   */
+  get isRoot():boolean {
+    return this.parent === undefined;
+  }
+
+  /**
+   * Returns _true_ if this node has no children
+   */
+  get isEmpty():boolean {
+    return this.children.length === 0;
+  }
 }
 
 /**
@@ -126,31 +198,6 @@ export const fromObject = (obj:object, label = `root`, parent?:TreeNodeMutable<a
   return root;
 }
 
-// function testTree() {
-//   const testObj = {
-//     name: 'Jill',
-//     address: {
-//       street: 'Blah St',
-//       number: 27
-//     },
-//     kids: [
-//       {
-//         name:'John',
-//         address: {
-//           street: 'West St',
-//           number: 35
-//         }
-//       },
-//       {name:'Sam'}
-//     ]
-//   }
-//   console.log('TreeNodeMutable Test')
-
-//   const t = fromObject(testObj);
-//   console.log(t.prettyPrint());
-// }
-
-//testTree();
 
 /**
  * Create a root tree node

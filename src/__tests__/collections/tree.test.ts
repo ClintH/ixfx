@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import { findByDottedPath } from '../../collections/Trees.js';
+import { PathOpts, traceByPath } from '../../collections/Trees.js';
 
 function getTestMap() {
   const testMap = new Map();
@@ -40,12 +40,26 @@ function getTestObj() {
   return testObj;
 }
 
-test('findByDottedPath', () => {
+
+test('traceByPath', () => {
   const t = getTestObj();
-  expect(findByDottedPath('kids[1]', t)).toEqual({name:'Sam'});
-  expect(findByDottedPath('address.street', t)).toEqual('Blah St');
-  expect(findByDottedPath('kids[0].address.street', t)).toEqual('West St');
+  const opts:PathOpts = {
+    separator: '.',
+    allowArrayIndexes: true
+  }
+  expect([...traceByPath('kids[1]', t, opts)]).toEqual([["kids[1]", {"name": "Sam"}]]);
+  expect([...traceByPath('address.street', t, opts)]).toEqual([["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
+  expect([...traceByPath('kids[0].address.street', t, opts)]).toEqual([["kids[0]", {"address": {"number": 35, "street": "West St"}, "name": "John"}], ["address", {"number": 35, "street": "West St"}], ["street", "West St"]]);
 
   const t2 = getTestMap();
-  expect(findByDottedPath('jill.address.street', t2)).toEqual('Blah St');
+  expect([...traceByPath('jill.address.street', t2, opts)]).toEqual([["jill", {"address": {"number": 27, "street": "Blah St"}}], ["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
+
+  const opts2:PathOpts = {
+    separator: '.',
+    allowArrayIndexes: false
+  }
+
+  // Not found when we don't use array indexes
+  expect([...traceByPath('kids[1]', t, opts2)]).toEqual([]);
+  expect([...traceByPath('kids[0].address.street', t, opts2)]).toEqual([]);
 });

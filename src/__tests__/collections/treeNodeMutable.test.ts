@@ -43,3 +43,27 @@ test('basic', () => {
   // Cannot add grandparent to child
   expect(() => c1c1.add(r)).toThrow();
 });
+
+test('pathBuild', () => {
+  const rootValue = {}
+  const root = treeNodeMutable(rootValue, 'pc');
+  root.addValueByPath({x:'c'},  'c');
+  root.addValueByPath({x:'users'}, 'c.users');
+  root.addValueByPath({x:'admin'}, 'c.users.admin');
+  root.addValueByPath({x:'share'}, 'c.users.share');
+  root.addValueByPath({x:'data'},'c.data');
+  root.addValueByPath({x:'test'},'c.users.admin.test');
+  //console.log(root.prettyPrint());
+
+  expect(root.getByPath('c.users')?.value).toEqual({x:'users'});
+  expect(root.getByPath('c.users.admin.test')?.value).toEqual({x:'test'});
+  expect(root.getByPath('c.doesnotexist')?.value).toEqual({x:'c'});
+
+  // Add without structure being in place nicely
+  const root2 =  treeNodeMutable(rootValue, 'pc');
+  root2.addValueByPath({x:'test'}, 'c.users.admin.test');
+  //console.log(root2.prettyPrint());
+  
+  expect(root2.getByPath('c.users.admin.test')?.value).toEqual({x:'test'});
+
+});

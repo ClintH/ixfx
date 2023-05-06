@@ -1,10 +1,16 @@
+// #region Imports
 import {IsEqual, isEqualDefault} from "../Util.js";
 import { queueMutable } from "./Queue.js";
 import { stackMutable } from "./Stack.js";
 import {betweenChomp} from "../Text.js";
 import { TreeNodeMutable, treeNodeMutable } from "./TreeNodeMutable.js";
+import { integerParse } from "../Guards.js";
+import {last} from "../IterableSync.js";
+
+// #endregion
 
 export { treeNodeMutable, TreeNodeMutable };
+
 export type Entry = [name:string, value:any]
 
 export type TreeNode = {
@@ -19,82 +25,13 @@ export type TreeNode = {
   parents():IterableIterator<TreeNode>
 }
 
-export function isTreeNode<V>(p:TreeNode|unknown):p is TreeNode {
+export function isTreeNode(p:TreeNode|unknown):p is TreeNode {
   if (p === undefined) return false;
   if (p === null) return false;
   if (typeof (p as TreeNode).descendants === 'undefined') return false;
   if (typeof (p as TreeNode).parents === 'undefined') return false;
   return true;
 }
-
-
-// function treeTest() {
-//   console.log(`Tree test`);
-
-//   const testMap = new Map();
-//   testMap.set('jill', {
-//     address: {
-//       street: 'Blah St',
-//       number: 27
-//     }
-//   });
-//   testMap.set('john', {
-//     address: {
-//       street: 'West St',
-//       number: 35
-//     }
-//   })
-
-//   const testArray = [
-//     'one',
-//     ['two'],
-//     'three',
-//     ['four-a', 'four-b', 'four-c'],
-//     'five'
-//   ];
-
-//   const testObj = {
-//     name: 'Jill',
-//     address: {
-//       street: 'Blah St',
-//       number: 27
-//     },
-//     kids: [
-//       {
-//         name:'John',
-//         address: {
-//           street: 'West St',
-//           number: 35
-//         }
-//       },
-//       {name:'Sam'}
-//     ]
-//   }
-
-  // console.log('direct descendants');
-  // for (const x of directDescendants(testObj)) {
-  //   console.log(x);
-  // }
-//   console.log('breadth first');
-//   for (const x of breadthFirst(testObj)) {
-//     console.log(x[0] + ' - ', x[1]);
-//   }
-// console.log();
-// console.log('depth first');
-// for (const x of depthFirst(testObj)) {
-//   console.log(x[0] + ' - ', x[1]);
-// }
-  // console.log('Find result');
-  // console.log('f1: ', findByDottedPath('kids[1]', testObj));
-  // console.log('f2: ', findByDottedPath('address.street', testObj));
-  // console.log('f2: ', findByDottedPath('kids[0].address.street', testObj));
-  
-
-//   const f1 = findByDottedPath('kids[0].address.blah', testObj);
-//   console.log(prettyPrintEntryPath(f1));
-// } 
-//treeTest();
-
 function prettyPrintEntryPath(entries:Entry[]) {
   if (entries.length === 0) return '(empty)';
   let t = '';
@@ -150,48 +87,72 @@ function findDirectDescendantByLabel(label:string, node:object):Entry|undefined 
   return;
 }
 
+export type PathOpts = {
+  separator?:string
+  allowArrayIndexes?:boolean
+
+}
+
 /**
- * Returns path of Entries:
+ * Returns the closest matching entry, tracing `path` in a tree.
+ * 
+ * Use {@link traceByPath} to step through all the segments.
+ * @param path 
+ * @param node 
+ * @param opts 
+ * @returns 
+ */
+export function getByPath(path:string, node:object, opts:PathOpts = {}):Entry|undefined {
+ return last(traceByPath(path, node, opts));
+}
+
+/**
+ * Enumerates from root over nodes that lead to the given path terminus
  * ```js
- * const p = findByDottedPath('kids[0].address.street', rootNode);
- * // Returns Entry objects representing:
- * // [kids[0], address, street]
+ * for (const p of traceByPath('address.street', rootNode)) {
+ * // 1. ["address", {"number": 27, "street": "Blah St"}]
+ * // 2. ["street", "Blah St"]]
+ * }
  * ```
  * 
- * Partial results are returned:
- * ```js
- * const p = findByDottedPath('kids[0].address.blah', rootNode);
- * // [kids[0], address]
- * // Could only trace path until 'address'
- * ```
+ * Results stop when the path goes 'cold'. Use {@link getByPath} to only fetch the
+ * closest matching entry.
  * @param path 
  * @param node 
  * @returns 
  */
-export function findByDottedPath(path:string, node:object):Entry[] {
-  const pathSplit = path.split('.');
-  const navigationPath:Entry[] = [];
+export function* traceByPath(path:string, node:object, opts:PathOpts = {}):Iterable<Entry> {
+  const separator = opts.separator ?? '.';
+  const allowArrayIndexes = opts.allowArrayIndexes ?? true;
+
+  const pathSplit = path.split(separator);
+  //const navigationPath:Entry[] = [];
 
   for (let p of pathSplit) {
-    const [origStr, arrayIndex] = betweenChomp(p, '[', ']');
-    let e:Entry|undefined;
-    //console.log(`orig: ${origStr} arrayIndex: ${arrayIndex}`);
-    if (arrayIndex && Number.isInteger(parseInt(arrayIndex))) {
-      p = origStr;
+    let e = findDirectDescendantByLabel(p, node);
+    if (allowArrayIndexes) {
+      const [withoutBrackets, arrayIndexStr] = betweenChomp(p, '[', ']');
+      const arrayIndex = integerParse(arrayIndexStr, 'positive', -1);
+      if (arrayIndex >=0) {
+       
+        // Get array by name without the []
+        e = findDirectDescendantByLabel(withoutBrackets, node);
+
+        if (e && Array.isArray(e[1])) {
+          // Result was array as expected
+          e = [p, e[1][arrayIndex]];
+        }
+      }
     }
-    
-    e = findDirectDescendantByLabel(p, node);
-    if (e && arrayIndex && Number.isInteger(parseInt(arrayIndex)) && Array.isArray(e[1])) {
-      e = [origStr, e[1][parseInt(arrayIndex)]];
-    }    
 
     if (!e) {
-      return navigationPath
+      return;
     }
     node = e[1];
-    navigationPath.push(e)
+    //navigationPath.push(e);
+    yield e;
   }
-  return navigationPath;
+  //return navigationPath;
 }
 
 function getEntry(node:object, defaultLabel = ''):Entry {
