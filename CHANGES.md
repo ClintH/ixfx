@@ -1,5 +1,19 @@
 A rough changelog between NPM releases
 
+# 0.8.6 23.05.06
+
+Guards/integerParse: Parse a value to an integer that follows given bounds, or return a default value
+
+Collections/Trees: Improved path-based iteration and tree-building
+
+Text/
+ - afterMatch: Return everything after a matched sub-string, or return the original if not found
+ - untilMatch: Use same opts type as new afterMatch
+ - Unit tests for both
+
+IterableSync
+ - first/last: return first or last item of an iterable
+- 
 # 0.8.5 23.05.05
 
 Collections/TreeNode
