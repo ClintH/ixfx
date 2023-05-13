@@ -3,7 +3,7 @@ import {afterMatch} from "../Text.js";
 import {QuadTreeItem} from "../geometry/QuadTree.js";
 import {without} from "./Arrays.js";
 import * as Trees from "./Trees.js";
-import { couldAddChild, directDescendants } from "./Trees.js";
+import { couldAddChild, directChildren } from "./Trees.js";
 // #endregion
 
 /**
@@ -12,8 +12,8 @@ import { couldAddChild, directDescendants } from "./Trees.js";
 export class TreeNodeMutable<V> implements Trees.TreeNode {
   value: V;
   readonly label: string;
-  private children: readonly TreeNodeMutable<V>[];
-  private parent: TreeNodeMutable<V>| undefined;
+  #children: readonly TreeNodeMutable<V>[];
+  #parent: TreeNodeMutable<V>| undefined;
 
   /**
    * Constructor
@@ -23,7 +23,7 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
   constructor(value:V, label:string) {
     this.value = value;
     this.label = label;
-    this.children = [];
+    this.#children = [];
   }
 
   hasChild = (possibleChild:TreeNodeMutable<V>) => Trees.hasChild(this, possibleChild);
@@ -86,11 +86,11 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    */
   add(child:TreeNodeMutable<V>) {
     Trees.couldAddChild(this, child);
-    this.children = [...this.children, child];
-    if (child.parent) {
-      child.parent.remove(child);
+    this.#children = [...this.#children, child];
+    if (child.#parent) {
+      child.#parent.remove(child);
     }
-    child.parent = this;
+    child.#parent = this;
   }
 
   /**
@@ -99,10 +99,10 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    * @param child 
    */
   remove(child:TreeNodeMutable<V>) {
-    if (child.parent !== this) throw new Error(`child.parent doesn't match`);
-    const w = without(this.children, child);
-    if (w.length === this.children.length) throw new Error(`child not found in descendants`);
-    this.children = w;
+    if (child.#parent !== this) throw new Error(`child.parent doesn't match`);
+    const w = without(this.#children, child);
+    if (w.length === this.#children.length) throw new Error(`child not found in descendants`);
+    this.#children = w;
   }
 
   /**
@@ -113,15 +113,15 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    */
   setDescendants(d:TreeNodeMutable<V>[]) {
     // Unset existing
-    for (const d of this.children) {
-      d.parent = undefined;
+    for (const d of this.#children) {
+      d.#parent = undefined;
     }
 
     for (const dd of d) {
       couldAddChild(this, dd);
-      dd.parent = this;      
+      dd.#parent = this;      
     }
-    this.children = d;
+    this.#children = d;
   }
 
   /**
@@ -131,8 +131,8 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    */
   prettyPrint(indent = 0):string {
     const t = `${'  '.repeat(indent)} + label: ${this.label} value: ${this.value ? JSON.stringify(this.value) : '-'}`;
-    if (this.children.length) {
-      return t + '\n' + this.children.map(d => d.prettyPrint(indent+1)).join('\n');
+    if (this.#children.length) {
+      return t + '\n' + this.#children.map(d => d.prettyPrint(indent+1)).join('\n');
     } else {
       return t;
     }
@@ -144,24 +144,29 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    */
   *parents():IterableIterator<TreeNodeMutable<V>> {
     let n:TreeNodeMutable<V>|undefined = this;
-    while (n.parent !== undefined) {
-      yield n.parent
-      n = n.parent;
+    while (n.#parent !== undefined) {
+      yield n.#parent
+      n = n.#parent;
     }
   }
 
   /**
    * Iterates over the direct descendents of node
    */
-  *descendants():IterableIterator<TreeNodeMutable<V>> {
-    for (const c of this.children) {
+  *children():IterableIterator<TreeNodeMutable<V>> {
+    for (const c of this.#children) {
       yield c;
     }
   }
 
+  /**
+   * Searches direct children, returning the node that has the given `label`
+   * @param label 
+   * @returns 
+   */
   findChild(label:string):TreeNodeMutable<V>|undefined {
     if (label === undefined) throw new Error(`label param cannot be undefined`)
-    for (const c of this.children) {
+    for (const c of this.#children) {
       if (c.label === label) return c;
     }
   }
@@ -171,14 +176,14 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
    * ie. does not have a parent
    */
   get isRoot():boolean {
-    return this.parent === undefined;
+    return this.#parent === undefined;
   }
 
   /**
    * Returns _true_ if this node has no children
    */
   get isEmpty():boolean {
-    return this.children.length === 0;
+    return this.#children.length === 0;
   }
 }
 
@@ -192,7 +197,7 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
 export const fromObject = (obj:object, label = `root`, parent?:TreeNodeMutable<any>):TreeNodeMutable<any> => {
   const root = new TreeNodeMutable(obj, label);
   if (parent) parent.add(root);
-  const children = [...directDescendants(obj, label)];
+  const children = [...directChildren(obj, label)];
   const childNodes = children.map(c => fromObject(c[1], c[0], root));
   root.setDescendants(childNodes);
   return root;

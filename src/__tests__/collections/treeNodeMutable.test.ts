@@ -6,7 +6,7 @@ test('basic', () => {
   const rootValue = {}
   const r = treeNodeMutable<any>(rootValue, 'root');
 
-  expect([...r.descendants()].length).toEqual(0);
+  expect([...r.children()].length).toEqual(0);
   expect(r.label).toEqual('root');
   expect(r.value).toEqual(rootValue);
 
