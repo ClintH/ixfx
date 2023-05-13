@@ -56,9 +56,9 @@ export type QuadTreeItem = Points.Point | ShapePositioned;
  * To create, you probably want the {@link quadTree} function.
  */
 export class QuadTreeNode implements TreeNode {
-  items:QuadTreeItem[] = [];
-  children:QuadTreeNode[] = [];
-  parent:QuadTreeNode|undefined;
+  #items:QuadTreeItem[] = [];
+  #children:QuadTreeNode[] = [];
+  #parent:QuadTreeNode|undefined;
   /**
    * Constructor
    * @param boundary 
@@ -66,19 +66,23 @@ export class QuadTreeNode implements TreeNode {
    * @param opts 
    */
   constructor(parent:QuadTreeNode|undefined, readonly boundary:Rects.RectPositioned, readonly level:number, readonly opts:QuadTreeOpts) {
-    this.parent = parent;
+    this.#parent = parent;
+  }
+
+  getLengthChildren(): number {
+    return this.#children.length;
   }
 
   *parents():IterableIterator<QuadTreeNode> {
     let n:QuadTreeNode|undefined = this;
-    while (n.parent !== undefined) {
-      yield n.parent
-      n = n.parent;
+    while (n.#parent !== undefined) {
+      yield n.#parent
+      n = n.#parent;
     }
   }
 
-  *descendants():IterableIterator<QuadTreeNode> {
-    for (const c of this.children) {
+  *children():IterableIterator<QuadTreeNode> {
+    for (const c of this.#children) {
       yield c;
     }
   }
@@ -88,7 +92,7 @@ export class QuadTreeNode implements TreeNode {
    * @returns 
    */
   direction(d:Direction):QuadTreeNode|undefined {
-    return this.children[d] as QuadTreeNode|undefined;
+    return this.#children[d] as QuadTreeNode|undefined;
   }
   
   /**
@@ -99,24 +103,24 @@ export class QuadTreeNode implements TreeNode {
   add(p:QuadTreeItem):boolean {
     if (!Shapes.isIntersecting(this.boundary, p)) return false;
 
-    if (this.children.length) {
-      this.children.forEach(d => (d as QuadTreeNode).add(p));
+    if (this.#children.length) {
+      this.#children.forEach(d => (d as QuadTreeNode).add(p));
       return true;
     }
 
-    this.items.push(p);
+    this.#items.push(p);
     
-    if (this.items.length > this.opts.maxItems && this.level < this.opts.maxLevels) {
-      if (!this.children.length) { 
+    if (this.#items.length > this.opts.maxItems && this.level < this.opts.maxLevels) {
+      if (!this.#children.length) { 
         this.#subdivide();
       }
       
       // Add to child
-      this.items.forEach(item => {
-        this.children.forEach(d => (d as QuadTreeNode).add(item));
+      this.#items.forEach(item => {
+        this.#children.forEach(d => (d as QuadTreeNode).add(item));
       });
       //this.descendants.forEach(d => (d as QuadTreeNode).add(p));
-      this.items = [];
+      this.#items = [];
     }
     return true;
   }
@@ -144,7 +148,7 @@ export class QuadTreeNode implements TreeNode {
     // rects.forEach((r, index) => {
     //   this.descendants[index] = new QuadTreeNode(r, this.level + 1, this.opts);
     // });
-    this.children = rects.map(r => new QuadTreeNode(this, r, this.level+1, this.opts));
+    this.#children = rects.map(r => new QuadTreeNode(this, r, this.level+1, this.opts));
   }
 }
 
