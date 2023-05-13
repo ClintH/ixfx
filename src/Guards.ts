@@ -66,6 +66,16 @@ export const number = (value?:number, range:NumberGuardRange = ``, paramName = `
 };
 
 /**
+ * Throws if `value` is _undefined_ or _null_.
+ * @param value 
+ * @param paramName 
+ */
+export const nullUndef = (value:any, paramName = '?') => {
+  if (typeof value === `undefined`) throw new Error(`${paramName} param is undefined`);
+  if (value === null) throw new Error(`${paramName} param is null`);
+
+}
+/**
  * Throws an error if `value` is not in the range of 0-1.
  * Equiv to `number(value, `percentage`);`
  * 
