@@ -208,9 +208,11 @@ function findDirectChildByLabel(label:string, node:object):Entry|undefined {
  * @param opts Options for parsing path. By default '.' is used as a separator
  * @returns 
  */
-export function getByPath(path:string, node:object, opts:PathOpts = {}):Entry|undefined {
+export function getByPath(path:string, node:object, opts:PathOpts = {}):Entry {
   // ✔️ Unit tested
- return last(traceByPath(path, node, opts));
+ const v = last(traceByPath(path, node, opts));
+ if (!v) throw new Error(`Could not trace path: ${path}`);
+ return v;
 }
 
 /**

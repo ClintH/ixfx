@@ -26,15 +26,19 @@ export class TreeNodeMutable<V> implements Trees.TreeNode {
     this.#children = [];
   }
 
+  getLengthChildren(): number {
+    return this.#children.length;
+  }
+
   hasChild = (possibleChild:TreeNodeMutable<V>) => Trees.hasChild(this, possibleChild);
   hasAnyChild = (possibleChild:TreeNodeMutable<V>) => Trees.hasAnyChild(this, possibleChild);
 
   hasParent = (possibleParent:TreeNodeMutable<V>) => Trees.hasParent(this, possibleParent);
   hasAnyParent = (possibleParent:TreeNodeMutable<V>) => Trees.hasAnyParent(this, possibleParent);
 ;
-  getByPath = (path:string, opts:Trees.PathOpts = {}) => {
+  getByPath = (path:string, opts:Trees.PathOpts = {}):TreeNodeMutable<V>|undefined => {
     const e = Trees.getByPath(path, this, opts);
-    if (!e) return;
+    if (!e[1]) return;
     return (e[1] as TreeNodeMutable<V>)
   }
 
