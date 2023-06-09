@@ -414,6 +414,11 @@ export type GenerateRandomOpts = RandomOpts & {
  *  // Warning: loops forever
  * }
  * ```
+ * 
+ * Behind the scenes, an array of numbers is created that captures the range, this is then
+ * shuffled on the first run, and again whenever the iterator loops, if that's allowed.
+ * 
+ * As a consequence, large ranges will consume larger amounts of memory.
  * @param maxOrOpts 
  * @returns 
  */

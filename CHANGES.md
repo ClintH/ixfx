@@ -1,5 +1,11 @@
 A rough changelog between NPM releases
 
+# 0.8.9 23.06.09
+
+Random/
+  - Test refactor so all functions take a single parameter
+  - generateIntegerUnique: randomly walk a range of intergers without repeating
+
 # 0.8.6 23.05.06
 
 Guards/integerParse: Parse a value to an integer that follows given bounds, or return a default value
