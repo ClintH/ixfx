@@ -1,5 +1,6 @@
 import { defaultComparer, IsEqual, isEqualDefault, ToString } from "../Util.js";
-export { create as expiringMap, ExpiringMap, ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts } from './ExpiringMap.js';
+export { create as expiringMap, ExpiringMap} from './ExpiringMap.js';
+export type {ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts} from './ExpiringMap.js';
 
 
 // ✔ UNIT TESTED!
