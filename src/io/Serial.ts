@@ -1,6 +1,6 @@
 import {JsonDevice, JsonDeviceOpts, JsonDeviceEvents, JsonDataEvent} from "./JsonDevice.js";
 
-export {JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent};
+export type {JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent};
 
 export type SerialOpts = JsonDeviceOpts & {
   readonly filters?:ReadonlyArray<SerialPortFilter>

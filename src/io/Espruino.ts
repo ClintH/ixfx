@@ -6,8 +6,8 @@ import {string as randomString} from "../Random.js";
 import {waitFor} from "../flow/WaitFor.js";
 import {EspruinoSerialDevice, EspruinoSerialDeviceOpts} from "./EspruinoSerialDevice.js";
 
-export {EspruinoBleDevice, EspruinoSerialDevice, EspruinoSerialDeviceOpts};
-
+export {EspruinoBleDevice, EspruinoSerialDevice};
+export type {EspruinoSerialDeviceOpts}
 export type DataEvent = {
   readonly data:string
 }

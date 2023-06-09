@@ -25,7 +25,8 @@ export * as Camera from './Camera.js';
 
 export * as VideoFile from './VideoFile.js';
 
-export { FrameProcessor, FrameProcessorOpts } from './FrameProcessor.js';
+export { FrameProcessor } from './FrameProcessor.js';
+export type {FrameProcessorOpts} from './FrameProcessor.js';
 
 /**
  * Microcontrollers such as Arduinos connected via USB serial
