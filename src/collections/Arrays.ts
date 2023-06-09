@@ -335,7 +335,6 @@ export const randomElement = <V>(array:ArrayLike<V>, rand:RandomSource = default
  * @return Returns an object `{value:V|undefined, array:V[]}`
  * 
  */
-//eslint-disable-next-line functional/prefer-readonly-type
 export const randomPluck = <V>(array:V[]|ReadonlyArray<V>, mutate = false, rand:RandomSource = defaultRandom):{readonly value:V|undefined, readonly array:Array<V> } => {
   if (array === undefined) throw new Error(`array is undefined`);
   if (!Array.isArray(array)) throw new Error(`'array' param is not an array`);
