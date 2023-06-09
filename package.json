@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -65,7 +65,8 @@
     "lint": "eslint src/**",
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js",
-    "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli"
+    "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
+    "ava": "ava --config ./config/ava.config.js"
   },
   "devDependencies": {
     "@svgdotjs/svg.js": "^3.1.2",
@@ -76,6 +77,7 @@
     "@types/web-bluetooth": "^0.0.16",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
+    "ava": "^5.3.0",
     "concurrently": "^7.6.0",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
@@ -92,6 +94,7 @@
     "ts-jest": "^29.0.5",
     "tsup": "^6.6.3",
     "tsutils": "^3.21.0",
+    "tsx": "^3.12.7",
     "typedoc": "^0.23.25",
     "typescript": "^4.9.5"
   },
@@ -108,5 +111,13 @@
   },
   "eslintIgnore": [
     "./dist/**/*"
-  ]
+  ],
+  "ava": {
+    "files": [
+      "./src/test/*.ts"
+    ],
+    "nodeArguments": [
+      "--loader=tsx"
+    ]
+  }
 }

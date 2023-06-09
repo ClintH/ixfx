@@ -1,15 +1,16 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-import "jest-extended"
+//import "jest-extended"
+
 export default {
   preset: `ts-jest/presets/default-esm`,
   testEnvironment: `jest-environment-node`,
   setupFilesAfterEnv: [`jest-extended/all`],
-  globals: {
-    // See reference: https://kulshekhar.github.io/ts-jest/docs/getting-started/options/tsconfig
-    "ts-jest": {
-        tsconfig: "config/tsconfig.jest.json"
-    }
-  },
+  // globals: {
+  //   // See reference: https://kulshekhar.github.io/ts-jest/docs/getting-started/options/tsconfig
+  //   "ts-jest": {
+  //       tsconfig: "config/tsconfig.jest.json"
+  //   }
+  // },
   extensionsToTreatAsEsm: [`.ts`],
   transform: {
         // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
