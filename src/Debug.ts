@@ -1,6 +1,51 @@
 import { getOrGenerateSync } from "./collections/Map.js";
 import { goldenAngleColour } from "./visual/Colour.js";
 
+export type LogKind = 'info'|'debug'|'error'|'warn';
+export type LogMsg = {
+  kind?: LogKind
+  msg: any
+  category?: string
+}
+
+export type LogFn = (msg:LogMsg) => void;
+
+/**
+ * Either a flag for default console logging, or a simple log function
+ */
+export type LogOption = boolean | LogFn;
+
+/**
+ * Resolve a LogOption to a function
+ * @param l 
+ * @returns 
+ */
+export const resolveLogOption = (l?: LogOption): LogFn => {
+  
+  if (typeof l === 'undefined') return (m: LogMsg) => {};
+  if (typeof l === 'boolean') {
+    return (m: LogMsg) => {
+      const kind = m.kind ?? `info`;
+      let msg = m.msg;
+      if (m.category) msg = `[${m.category}] ${msg}`;
+      switch (kind) {
+        case 'error':
+          console.error(msg);
+          break;
+        case `warn`:
+          console.warn(msg);
+          break;
+        case `info`:
+          console.info(msg);
+          break;
+        default: 
+          console.log(msg);
+      }
+    }
+  }
+  return l;
+}
+
 //eslint-disable-next-line functional/no-let
 let logColourCount = 0;
 const logColours = getOrGenerateSync(new Map<string, string>(), () => goldenAngleColour(++logColourCount));
