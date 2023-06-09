@@ -4,6 +4,40 @@ export type {ExpiringMapEvent, ExpiringMapEvents, Opts as ExpiringMapOpts} from 
 
 
 // ✔ UNIT TESTED!
+/**
+ * Gets the closest integer key to `target` in `data`.
+ * * Requires map to have numbers as keys, not strings
+ * * Math.round is used for rounding `target`.
+ * 
+ * Examples:
+ * ```js
+ * // Assuming numeric keys 1, 2, 3, 4 exist:
+ * getClosestIntegerKey(map, 3);    // 3
+ * getClosestIntegerKey(map, 3.1);  // 3
+ * getClosestIntegerKey(map, 3.5);  // 4
+ * getClosestIntegerKey(map, 3.6);  // 4
+ * getClosestIntegerKey(map, 100);  // 4
+ * getClosestIntegerKey(map, -100); // 1
+ * ```
+ * @param data Map 
+ * @param target Target value
+ * @returns 
+ */
+export const getClosestIntegerKey = <V>(data: Map<number, any>, target: number): number => {
+  target = Math.round(target);
+  console.log(`target: ${target}`);
+  if (data.has(target)) {
+    return target;
+  } else {
+    let offset = 1;
+    while (offset < 1000) {
+      if (data.has((target - offset))) return (target - offset);
+      else if (data.has((target + offset))) return (target + offset);
+      offset++;
+    }
+    throw new Error(`Could not find target ${target}`);
+  }
+}
 
 /**
  * Returns true if map contains `value` under `key`, using `comparer` function. Use {@link hasAnyValue} if you don't care
