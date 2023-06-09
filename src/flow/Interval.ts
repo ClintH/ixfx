@@ -32,13 +32,14 @@ export type IntervalAsync<V> = (()=>V|Promise<V>) | Generator<V>;
  * @template V Data type
  * @returns
  */
-export const interval = async function*<V>(produce:IntervalAsync<V>, intervalMs:number, signal:AbortSignal) {
+export const interval = async function*<V>(produce:IntervalAsync<V>, intervalMs:number, signal?:AbortSignal) {
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
   try {
     while (!cancelled) {
       await sleep(intervalMs, signal);
-      if (signal.aborted) throw new Error(`Signal aborted ${signal.reason}`);
+      
+      if (signal?.aborted) throw new Error(`Signal aborted ${signal?.reason}`);
       if (cancelled) return;
       if (typeof produce === `function`) {
         // Returns V or Promise<V>
