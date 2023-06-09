@@ -31,6 +31,9 @@ but not including the given max value.</p>
 range completes, it starts again in a new random way.</p>
 <pre><code class="language-js"><span class="hl-1">for</span><span class="hl-2"> (</span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">r</span><span class="hl-2"> </span><span class="hl-5">of</span><span class="hl-2"> </span><span class="hl-8">generateIntegerUnique</span><span class="hl-2">({ </span><span class="hl-3">max:</span><span class="hl-2"> </span><span class="hl-7">10</span><span class="hl-2">, </span><span class="hl-3">loop:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> })) {</span><br/><span class="hl-2"> </span><span class="hl-0">// Warning: loops forever</span><br/><span class="hl-2">}</span>
 </code></pre>
+<p>Behind the scenes, an array of numbers is created that captures the range, this is then
+shuffled on the first run, and again whenever the iterator loops, if that&#39;s allowed.</p>
+<p>As a consequence, large ranges will consume larger amounts of memory.</p>
 
 <h3>Returns</h3></div>
 <div class="tsd-parameters">
