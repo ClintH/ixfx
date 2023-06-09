@@ -1,5 +1,5 @@
 import { zip, filterBetween } from './Arrays.js';
-import * as Easings from "../modulation/Easing.js";
+import {EasingFn} from "../modulation/Easing.js";
 
 /**
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
@@ -138,7 +138,7 @@ export const average = (data:readonly number[]):number => {
  * @param data Data to average
  * @param weightings Array of weightings that match up to data array, or an easing function 
  */
-export const averageWeighted = (data:readonly number[], weightings:(readonly number[])|Easings.EasingFn):number => {
+export const averageWeighted = (data:readonly number[], weightings:(readonly number[])|EasingFn):number => {
   if (typeof weightings === `function`) weightings = weight(data, weightings);
 
   const ww = zip(data, weightings);
