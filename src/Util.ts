@@ -230,6 +230,21 @@ export const defaultComparer = (x:any, y:any):CompareResult => {
   return 0;
 };
 
+/**
+ * Returns a human-friendly representation of elapsed milliseconds
+ * @param ms 
+ * @returns 
+ */
+export const elapsedMs = (ms: number) => {
+  if (ms < 1000) return `${ms}ms`;
+  ms /= 1000;
+  if (ms < 120) return `${ms.toFixed(2)}secs`;
+  ms /= 60;
+  if (ms < 60) return `${ms.toFixed(2)}mins`
+  ms /= 60;
+  return `${ms.toFixed(2)}hrs`;
+}
+
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultToString = (obj:any) => {
   //ECMA specification: http://www.ecma-international.org/ecma-262/6.0/#sec-tostring
