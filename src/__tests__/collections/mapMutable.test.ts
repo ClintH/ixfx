@@ -3,11 +3,11 @@
 // @ts-nocheck
 import { expect, test, describe } from '@jest/globals';
 import {MapArrayOpts, MapSetOpts} from  '../../collections/Interfaces.js'
-import { mapArray, mapSet} from "../../collections/MapMultiMutable.js";
+import { mapArray, mapSetMutable} from "../../collections/MapMultiMutable.js";
 import {jest} from '@jest/globals'
 
-test(`mutableMapSet`, () => {
-  const m = mapSet<string>();
+test(`mapSetMutable`, () => {
+  const m = mapSetMutable<string>();
   m.addKeyedValues(`a`, `aa`, `ab`, `ac`, `aa`, `ab`);
   expect(m.count(`a`)).toEqual(3); // duplicate values should be dropped
 
@@ -21,13 +21,13 @@ test(`mutableMapSet`, () => {
   const barry = {name: `Barry`, city: `London`};
   const barryClone = {name: `Barry`, city: `London`};
 
-  const m2 = mapSet<Person>(opts);
+  const m2 = mapSetMutable<Person>(opts);
   expect(m2.count(`London`)).toEqual(0);
   m2.addValue(barry, barryClone);
   expect(m2.count(`London`)).toEqual(1);
 });
 
-describe(`mutableMapArray`, () => {
+describe(`mapArrayMutable`, () => {
 
   test(`withOpts`, () => {
     type Person = { readonly name: string, readonly city: string }
@@ -43,7 +43,7 @@ describe(`mutableMapArray`, () => {
       comparer:(a, b) => a.name === b.name && a.city === b.city
     }
 
-    const m = mapArray<Person>(opts);
+    const m = mapArrayMutable<Person>(opts);
     
     m.addValue(barry, barryOther, barryCase, sally, sallyOther, sallyMoreProps);
    
@@ -74,7 +74,7 @@ describe(`mutableMapArray`, () => {
   });
 
   test(`events`, () =>{
-    const m = mapArray<string>();
+    const m = mapArrayMutable<string>();
     
     const addKeyHandler = jest.fn();
     const addValueHandler = jest.fn();
@@ -105,7 +105,7 @@ describe(`mutableMapArray`, () => {
   });
 
   test(`defaultOpts`, () => {
-    const m = mapArray<string>();
+    const m = mapArrayMutable<string>();
     expect(m.isEmpty).toBeTrue();
     m.addKeyedValues(`apples`, `a` );
     m.addKeyedValues(`oranges`, `d`, `e`)

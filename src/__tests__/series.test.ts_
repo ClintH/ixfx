@@ -3,10 +3,8 @@ import * as Series from '../Series.js';
 import {IntervalTracker} from '../Tracker.js';
 
 /// TODO: Test atInterval
-// console.log(`Start`);
 // const s = atInterval(500, () => Math.random());
 // setTimeout(() => {
-//   console.log(`Killing`);
 //   s.cancel();
 // }, 5000);
 

@@ -6,7 +6,7 @@ test(`array-sort`, () => {
   const data = [ { size: 10, colour: `red` }, { size: 20, colour: `blue` }, { size: 5, colour: `pink` }, { size: 10, colour: `orange`}];
 
   const t1 = sortByNumericProperty(data, `size`);
-console.log(t1);
+  
   expect(t1).toEqual([
     { size: 5, colour: `pink` },
      { size: 10, colour: `red` },

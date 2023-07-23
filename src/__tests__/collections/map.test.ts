@@ -3,9 +3,9 @@
 /// <reference types="jest-extended" />
 import "jest-extended"
 import { expect, test } from '@jest/globals';
-import {mapMutable} from '../../collections/MapMutable.js';
-import {map} from '../../collections/MapImmutable.js';
-import {mergeByKey} from '../../collections/Map.js';
+import {mapMutable} from '../../collections/map/MapMutable.js';
+import {map} from '../../collections/map/MapImmutable.js';
+import {mergeByKey} from '../../collections/map/index.js';
 
 
 test(`map-mergeByKey`, () => {

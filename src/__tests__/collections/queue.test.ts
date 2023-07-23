@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import {queue, queueMutable} from '../../collections/Queue.js';
+import {queueMutable} from '../../collections/queue/QueueMutable.js';
+import { queue } from '../../collections/queue/Queue.js';
 
 test(`queue-mutable`, () => {
   const a = queueMutable<string>();

@@ -64,8 +64,6 @@ test(`removing-resources`, () => {
   expect(p.hasUser(`b`)).toBeFalsy();
   expect(p.hasUser(`c`)).toBeTruthy();
   
-
-  //console.log(p.dumpToString());
 });
 
 test(`evictOldestUser`, () => {

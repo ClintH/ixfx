@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { expect, test } from '@jest/globals';
-import { PathOpts, getLengthChildren, getByPath, traceByPath, directChildren } from '../../collections/Trees.js';
+import {expect, test} from '@jest/globals';
+import {type PathOpts, getLengthChildren, getByPath, traceByPath, directChildren} from '../../collections/Trees.js';
 
 function getTestMap() {
   const testMap = new Map();
@@ -28,13 +28,13 @@ function getTestObj() {
     },
     kids: [
       {
-        name:'John',
+        name: 'John',
         address: {
           street: 'West St',
           number: 35
         }
       },
-      {name:'Sam'}
+      {name: 'Sam'}
     ]
   }
   return testObj;
@@ -48,7 +48,7 @@ test('getLengthChildren', () => {
 test('directChildren', () => {
   expect([...directChildren(getTestObj())]).toEqual([
     ["name", "Jill"],
-    ["address", { number: 27, street: "Blah St"}],
+    ["address", {number: 27, street: "Blah St"}],
     ["kids", [
       {
         address: {
@@ -76,17 +76,17 @@ test('directChildren', () => {
     r: 0.5
   }]]);
 
-  const colours = [{r:1,g:0,b:0}, {r:0,g:1,b:0}, {r:0,g:0,b:1}];
+  const colours = [{r: 1, g: 0, b: 0}, {r: 0, g: 1, b: 0}, {r: 0, g: 0, b: 1}];
   expect([...directChildren(colours, 'colours')]).toEqual([
-    ["colours[0]", {r:1,g:0,b:0}],
-    ["colours[1]", {r:0,g:1,b:0}],
-    ["colours[2]", {r:0,g:0,b:1}],
+    ["colours[0]", {r: 1, g: 0, b: 0}],
+    ["colours[1]", {r: 0, g: 1, b: 0}],
+    ["colours[2]", {r: 0, g: 0, b: 1}],
   ]);
 });
 
 test('traceByPath', () => {
   const t = getTestObj();
-  const opts:PathOpts = {
+  const opts: PathOpts = {
     separator: '.',
     allowArrayIndexes: true
   }
@@ -97,7 +97,7 @@ test('traceByPath', () => {
   const t2 = getTestMap();
   expect([...traceByPath('jill.address.street', t2, opts)]).toEqual([["jill", {"address": {"number": 27, "street": "Blah St"}}], ["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
 
-  const opts2:PathOpts = {
+  const opts2: PathOpts = {
     separator: '.',
     allowArrayIndexes: false
   }
@@ -125,9 +125,9 @@ test('getByPath', () => {
   expect(getByPath('jane.address.country.state', people)).toEqual(['country', undefined]);
 
   expect([...traceByPath('jane.address.street.toofar', people)]).toEqual([
-    ["jane", { address: { postcode: 1000,street: 'West St', city: 'Blahville' }, colour: 'red'}],
-    ["address", { postcode: 1000, street: 'West St', city: 'Blahville' }],
-    ["street","West St"],
+    ["jane", {address: {postcode: 1000, street: 'West St', city: 'Blahville'}, colour: 'red'}],
+    ["address", {postcode: 1000, street: 'West St', city: 'Blahville'}],
+    ["street", "West St"],
     ["toofar", undefined]
   ]);
 

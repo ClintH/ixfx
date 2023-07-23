@@ -53,8 +53,7 @@ test('pathBuild', () => {
   root.addValueByPath({x:'share'}, 'c.users.share');
   root.addValueByPath({x:'data'},'c.data');
   root.addValueByPath({x:'test'},'c.users.admin.test');
-  //console.log(root.prettyPrint());
-
+ 
   expect(root.getByPath('c.users')?.value).toEqual({x:'users'});
   expect(root.getByPath('c.users.admin.test')?.value).toEqual({x:'test'});
   expect(root.getByPath('c.doesnotexist')).toBeUndefined();
@@ -62,7 +61,6 @@ test('pathBuild', () => {
   // Add without structure being in place nicely
   const root2 =  treeNodeMutable(rootValue, 'pc');
   root2.addValueByPath({x:'test'}, 'c.users.admin.test');
-  //console.log(root2.prettyPrint());
   
   expect(root2.getByPath('c.users.admin.test')?.value).toEqual({x:'test'});
   expect(root2.getByPath('c.doesnotexist')).toBeUndefined();

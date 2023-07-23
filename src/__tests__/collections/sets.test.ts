@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals';
-import { setMutable } from '../../collections/Set.js';
+import { setMutable } from '../../collections/set/';
 import { jest } from '@jest/globals';
 
 test(`mutableValueSet`, () => {

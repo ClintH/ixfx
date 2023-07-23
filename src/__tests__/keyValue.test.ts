@@ -1,10 +1,10 @@
 
 /* eslint-disable */
-import { expect, test } from '@jest/globals';
-import {KeyValue, sortByKey, sortByValueNumber, sortByValueString} from '../KeyValue.js';
+import {expect, test} from '@jest/globals';
+import {type KeyValue, sortByKey, sortByValueNumber, sortByValueString} from '../KeyValue.js';
 
 test(`sorting`, () => {
-  const a:KeyValue[] = [
+  const a: KeyValue[] = [
     [`apples`, 10],
     [`orange`, 2],
     [`zebras`, 0]
@@ -35,8 +35,8 @@ test(`sorting`, () => {
     [`orange`, 2],
     [`apples`, 10]
   ]);
-  
-  const b:KeyValue[] = [
+
+  const b: KeyValue[] = [
     [`a`, `one`],
     [`b`, `two`],
     [`c`, `three`],
