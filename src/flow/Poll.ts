@@ -1,5 +1,9 @@
 import { sleep } from './Sleep.js';
 
+export type PollOpts = {
+  sampleRateMs: number;
+  signal?: AbortSignal;
+};
 /**
  * Polls a function, returning values as an iterator. When the
  * function returns _undefined_, iterator ends.
@@ -19,17 +23,25 @@ import { sleep } from './Sleep.js';
  *  // iterate over envelope values, sampling every 100ms
  * }
  * ```
+ *
+ * An AbortSignal can be passed in to cancel iteration.
  * @param opts
  * @returns
  */
 export async function* iterableFromPoll<V>(
-  sampleRateMs: number,
-  poll: () => V | undefined
+  poll: () => V | undefined,
+  optsOrMillis: PollOpts | number
 ) {
+  const sampleRateMs =
+    typeof optsOrMillis === `number` ? optsOrMillis : optsOrMillis.sampleRateMs;
+  const signal =
+    typeof optsOrMillis === `number` ? undefined : optsOrMillis.signal;
+
   while (true) {
     const v = poll();
     if (typeof v === 'undefined') return;
     yield v;
-    await sleep(sampleRateMs);
+    await sleep({ millis: sampleRateMs, signal });
+    if (signal?.aborted) throw new Error(`Cancelling due to signal`);
   }
 }
