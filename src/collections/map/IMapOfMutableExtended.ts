@@ -16,9 +16,9 @@ export type MapArrayEvents<V> = {
  * Duplicate values can be added to the same or even a several keys.
  *
  * Three pre-defined MapOf's are available:
- * * {@link mapOfArrayMutable} - Map of arrays
- * * {@link mapOfSetMutable} - Map of unique items
- * * {@link mapOfCircularMutable} - Hold a limited set of values per key
+ * * {@link ofArrayMutable} - Map of arrays
+ * * {@link ofSetMutable} - Map of unique items
+ * * {@link ofCircularMutable} - Hold a limited set of values per key
  *
  * Adding
  * ```js

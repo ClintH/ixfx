@@ -18,7 +18,7 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
  *
  * @example Only store the most recent three items per key
  * ```js
- * const map = mapOfCircularMutable({capacity: 3});
+ * const map = ofCircularMutable({capacity: 3});
  * map.add(`hello`, [1, 2, 3, 4, 5]);
  * const hello = map.get(`hello`); // [3, 4, 5]
  * ```
@@ -27,7 +27,7 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
  * @param opts
  * @returns
  */
-export const mapOfCircularMutable = <V>(
+export const ofCircularMutable = <V>(
   opts: MapCircularOpts<V>
 ): IMapOfMutableExtended<V, ICircularArray<V>> => {
   const comparer = isEqualDefault;

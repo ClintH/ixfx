@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { ISimpleEventEmitter, Listener } from './ISimpleEventEmitter.js';
-import { mapOfSimpleMutable } from './collections/map/MapOfSimpleMutable.js';
+import { ofSimpleMutable } from './collections/map/MapOfSimpleMutable.js';
 
 export type { ISimpleEventEmitter, Listener };
 // type FlowSource = {
@@ -54,7 +54,7 @@ export type { ISimpleEventEmitter, Listener };
 // };
 
 export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
-  readonly #listeners = mapOfSimpleMutable<Listener<Events>>();
+  readonly #listeners = ofSimpleMutable<Listener<Events>>();
 
   /**
    * Fire event

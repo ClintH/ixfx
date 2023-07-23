@@ -1,12 +1,12 @@
 import test from 'ava';
-import {getClosestIntegerKey} from '../../collections/map/MapFns.js';
-import {mapOfSimple} from '../../collections/map/MapOfSimple.js';
+import { getClosestIntegerKey } from '../../collections/map/MapFns.js';
+import { ofSimple } from '../../collections/map/MapOfSimple.js';
 
 /**
  * Test immutable mapOf
  */
-test('mapOfSimple', t => {
-  let a = mapOfSimple<string>();
+test('mapOfSimple', (t) => {
+  let a = ofSimple<string>();
   let b = a.addKeyedValues('key-1', 'a', 'b', 'c');
   let c = b.addKeyedValues('key-2', 'd', 'e', 'f');
 
@@ -31,7 +31,7 @@ test('mapOfSimple', t => {
   //t.is(c.firstEntryByIterableValue('z'), undefined);
 });
 
-test('getClosestIntegerKey', t => {
+test('getClosestIntegerKey', (t) => {
   const data = new Map<number, boolean>();
   data.set(1, true);
   data.set(2, true);

@@ -27,7 +27,7 @@ test(`mapOfSetMutable`, () => {
   expect(m2.count(`London`)).toEqual(1);
 });
 
-describe(`mapOfArrayMutable`, () => {
+describe(`ofArrayMutable`, () => {
   test(`withOpts`, () => {
     type Person = { readonly name: string; readonly city: string };
     const barry = { name: `Barry`, city: `London` };
@@ -42,7 +42,7 @@ describe(`mapOfArrayMutable`, () => {
       comparer: (a, b) => a.name === b.name && a.city === b.city,
     };
 
-    const m = mapOfArrayMutable<Person>(opts);
+    const m = ofArrayMutable<Person>(opts);
 
     m.addValue(barry, barryOther, barryCase, sally, sallyOther, sallyMoreProps);
 
@@ -80,7 +80,7 @@ describe(`mapOfArrayMutable`, () => {
   });
 
   test(`events`, () => {
-    const m = mapOfArrayMutable<string>();
+    const m = ofArrayMutable<string>();
 
     const addKeyHandler = jest.fn();
     const addValueHandler = jest.fn();
@@ -110,7 +110,7 @@ describe(`mapOfArrayMutable`, () => {
   });
 
   test(`defaultOpts`, () => {
-    const m = mapOfArrayMutable<string>();
+    const m = ofArrayMutable<string>();
     expect(m.isEmpty).toBeTrue();
     m.addKeyedValues(`apples`, `a`);
     m.addKeyedValues(`oranges`, `d`, `e`);

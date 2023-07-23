@@ -1,7 +1,7 @@
 import type { IsEqual, ToString } from '../../Util.js';
-export { mapOfArrayMutable } from './MapOfArrayMutable.js';
+export { ofArrayMutable } from './MapOfArrayMutable.js';
 export {
-  mapOfSimpleMutable,
+  ofSimpleMutable as mapOfSimpleMutable,
   MapOfSimpleMutable,
 } from './MapOfSimpleMutable.js';
 export { MapOfMutableImpl } from './MapOfMultiImpl.js';

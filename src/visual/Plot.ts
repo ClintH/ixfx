@@ -7,8 +7,8 @@ import { resolveEl, parentSizeCanvas } from '../dom/Util.js';
 import { type Rect } from '../geometry/Rect.js';
 import { Colour, Drawing } from './index.js';
 import {
-  mapOfArrayMutable,
-  mapOfCircularMutable,
+  ofArrayMutable,
+  ofCircularMutable,
   type IMapOfMutableExtended,
 } from '../collections/map/index.js';
 
@@ -702,8 +702,8 @@ export const plot = (
   const capacity = opts.capacity ?? 10;
   const buffer =
     capacity > 0
-      ? mapOfCircularMutable<number>({ capacity })
-      : mapOfArrayMutable<number>();
+      ? ofCircularMutable<number>({ capacity })
+      : ofArrayMutable<number>();
   const metrics = ctx.measureText('Xy');
   const coalesce = opts.coalesce ?? true;
 

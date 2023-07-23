@@ -76,7 +76,7 @@ export class MapOfSimple<V>
  * A simple immutable map of arrays, without events. It can store multiple values
  * under the same key.
  *
- * For a fancier approaches, consider {@link mapArrayMutable}, {@link mapOfCircularMutable} or {@link mapOfSetMutable}.
+ * For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
  *
  * @example
  * ```js
@@ -90,7 +90,7 @@ export class MapOfSimple<V>
  * @template V Type of items
  * @returns New instance
  */
-export const mapOfSimple = <V>(
+export const ofSimple = <V>(
   groupBy: ToString<V> = defaultKeyer,
   valueEq: IsEqual<V> = isEqualDefault<V>
 ): IMapOfImmutable<V> => new MapOfSimple<V>(groupBy, valueEq);

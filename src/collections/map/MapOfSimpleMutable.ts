@@ -11,7 +11,7 @@ import { MapOfSimpleBase } from './MapOfSimpleBase.js';
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
  *
- * For a fancier approaches, consider {@link mapOfArrayMutable}, {@link mapOfCircularMutable} or {@link mapOfSetMutable}.
+ * For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
  *
  * @example
  * ```js
@@ -114,7 +114,7 @@ export class MapOfSimpleMutable<V>
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
  *
- * For a fancier approaches, consider {@link mapOfArrayMutable}, {@link mapOfCircularMutable} or {@link mapOfSetMutable}.
+ * For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
  *
  * @example
  * ```js
@@ -128,7 +128,7 @@ export class MapOfSimpleMutable<V>
  * @template V Type of items
  * @returns New instance
  */
-export const mapOfSimpleMutable = <V>(
+export const ofSimpleMutable = <V>(
   groupBy: ToString<V> = defaultKeyer,
   valueEq: IsEqual<V> = isEqualDefault<V>
 ): IMapOfMutable<V> => new MapOfSimpleMutable<V>(groupBy, valueEq);

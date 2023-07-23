@@ -295,9 +295,9 @@ export * as Modulation from './modulation/index.js';
  * which only allows a single value per key. IMapOfMutable also has events for listening to changes
  * in the data.
  *
- * * {@link Maps.mapOfArrayMutable}: Holds any number of items under a given key
- * * {@link Maps.mapOfSetMutable}: Holds any number of **unique** items under a given key
- * * {@link Maps.mapOfCircularMutable}: Holds the most recent _x_ items under a given key
+ * * {@link Maps.ofArrayMutable}: Holds any number of items under a given key
+ * * {@link Maps.ofSetMutable}: Holds any number of **unique** items under a given key
+ * * {@link Maps.ofCircularMutable}: Holds the most recent _x_ items under a given key
  *
  * For cases where events are not needed consider {@link Maps.mapOfSimpleMutable}. This is a bit more lightweight.
  *

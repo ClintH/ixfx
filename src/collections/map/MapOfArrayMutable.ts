@@ -21,7 +21,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * Returns a {@link IMapOfMutableExtended} to allow storing multiple values under a key, unlike a regular Map.
  * @example
  * ```js
- * const map = mapOfArrayMutable();
+ * const map = ofArrayMutable();
  * map.addKeyedValues(`hello`, [1,2,3,4]); // Adds series of numbers under key `hello`
  *
  * const hello = map.get(`hello`); // Get back values
@@ -33,18 +33,18 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  *
  * A custom {@link Util.ToString} function can be provided which is used when checking value equality (`has`, `without`)
  * ```js
- * const map = mapOfArrayMutable({toString:(v) => v.name}); // Compare values based on their `name` field;
+ * const map = ofArrayMutable({toString:(v) => v.name}); // Compare values based on their `name` field;
  * ```
  *
  * Alternatively, a {@link Util.IsEqual} function can be used:
  * ```js
- * const map = mapOfArrayMutable({comparer: (a, b) => a.name === b.name });
+ * const map = ofArrayMutable({comparer: (a, b) => a.name === b.name });
  * ```
  * @param opts
  * @template V Data type of items
  * @returns {@link IMapOfMutableExtended}
  */
-export const mapOfArrayMutable = <V>(
+export const ofArrayMutable = <V>(
   opts: MapArrayOpts<V> = {}
 ): IMapOfMutableExtended<V, ReadonlyArray<V>> => {
   const comparer =

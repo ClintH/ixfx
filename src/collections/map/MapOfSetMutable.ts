@@ -38,7 +38,7 @@ import type { IMapOfMutableExtended } from './IMapOfMutableExtended.js';
  * @param opts
  * @returns
  */
-export const mapOfSetMutable = <V>(
+export const ofSetMutable = <V>(
   opts?: MapSetOpts<V>
 ): IMapOfMutableExtended<V, ReadonlyMap<string, V>> => {
   const hash = opts?.hash ?? toStringDefault;
