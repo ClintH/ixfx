@@ -1,17 +1,17 @@
-import { Comparer, defaultComparer } from "../Util.js";
-import { BinaryTreeNode } from "./BinaryTreeNode.js";
-import { queueMutable } from "./Queue.js";
-import { stackMutable } from "./Stack.js";
+import { type Comparer, defaultComparer } from '../Util.js';
+import { BinaryTreeNode } from './BinaryTreeNode.js';
+import { queueMutable } from './queue/QueueMutable.js';
+import { stackMutable } from './Stack.js';
 
 /**
  * BinarySearchTree
  * Source: https://github.com/amejiarosario/dsa.js-data-structures-algorithms-javascript/blob/master/src/data-structures/trees/binary-search-tree.js
  */
 export class BinarySearchTree<V> {
-  root?:BinaryTreeNode<V>;
-  size:number;
+  root?: BinaryTreeNode<V>;
+  size: number;
 
-  constructor(readonly comparer:Comparer<V>) {
+  constructor(readonly comparer: Comparer<V>) {
     this.size = 0;
   }
 
@@ -23,17 +23,18 @@ export class BinarySearchTree<V> {
    * @param {any} value node's value to insert in the tree
    * @returns {BinaryTreeNode} newly added node
    */
-  add(value:V) {
+  add(value: V) {
     const node = new BinaryTreeNode(value);
 
     if (this.root) {
       const { found, parent } = this.findNodeAndParent(value, this.root); // <1>
-      if (found) { // duplicated: value already exist on the tree
+      if (found) {
+        // duplicated: value already exist on the tree
         found.multiplicity = (found.multiplicity || 1) + 1; // <2>
         this.size += 1;
         return found;
-      } 
-      
+      }
+
       if (parent) {
         const comp = this.comparer(value, parent.value);
         if (comp < 1) {
@@ -55,7 +56,7 @@ export class BinarySearchTree<V> {
    * @param {any} value node to find
    * @returns {boolean} true if is present, false otherwise
    */
-  has(value:V):boolean {
+  has(value: V): boolean {
     return !!this.find(value);
   }
 
@@ -63,10 +64,9 @@ export class BinarySearchTree<V> {
    * @param {any} value value to find
    * @returns {BinaryTreeNode|null} node if it found it or null if not
    */
-  find(value:V):BinaryTreeNode<V>|undefined {
+  find(value: V): BinaryTreeNode<V> | undefined {
     return this.findNodeAndParent(value, this.root).found;
   }
-
 
   /**
    * Recursively finds the node matching the value.
@@ -76,14 +76,22 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} parent keep track of parent (usually filled by recursion)
    * @returns {object} node and its parent like {node, parent}
    */
-  findNodeAndParent(value:V, node?:BinaryTreeNode<V>, parent?:BinaryTreeNode<V>):{found?:BinaryTreeNode<V>, parent?:BinaryTreeNode<V>} {
+  //eslint-disable-next-line functional/prefer-immutable-types
+  findNodeAndParent(
+    value: V,
+    //eslint-disable-next-line functional/prefer-immutable-types
+    node?: BinaryTreeNode<V>,
+    //eslint-disable-next-line functional/prefer-immutable-types
+    parent?: BinaryTreeNode<V>
+  ): { found?: BinaryTreeNode<V>; parent?: BinaryTreeNode<V> } {
     if (!node) return { found: node, parent };
 
     const comp = this.comparer(value, node?.value);
 
     if (comp === 0) {
       return { found: node, parent };
-    } if (comp < 1) {
+    }
+    if (comp < 1) {
       return this.findNodeAndParent(value, node.left, node);
     } else {
       return this.findNodeAndParent(value, node.right, node);
@@ -95,7 +103,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node subtree's root
    * @returns {BinaryTreeNode} right-most node (max value)
    */
-  getRightmost(node = this.root):BinaryTreeNode<V>|undefined {
+  getRightmost(node = this.root): BinaryTreeNode<V> | undefined {
     if (!node || !node.right) {
       return node;
     }
@@ -107,7 +115,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node subtree's root
    * @returns {BinaryTreeNode} left-most node (min value)
    */
-  getLeftmost(node = this.root):BinaryTreeNode<V>|undefined {
+  getLeftmost(node = this.root): BinaryTreeNode<V> | undefined {
     if (!node || !node.left) {
       return node;
     }
@@ -118,21 +126,29 @@ export class BinarySearchTree<V> {
    * Remove a node from the tree
    * @returns {boolean} false if not found and true if it was deleted
    */
-  remove(value:V):boolean {
-    const { found: nodeToRemove, parent } = this.findNodeAndParent(value, this.root); // <1>
+  remove(value: V): boolean {
+    const { found: nodeToRemove, parent } = this.findNodeAndParent(
+      value,
+      this.root
+    ); // <1>
 
     if (!nodeToRemove) return false; // <2>
 
     // Combine left and right children into one subtree without nodeToRemove
     const removedNodeChildren = this.combineLeftIntoRightSubtree(nodeToRemove); // <3>
 
-    if (nodeToRemove.multiplicity && nodeToRemove.multiplicity > 1) { // <4>
+    if (nodeToRemove.multiplicity && nodeToRemove.multiplicity > 1) {
+      // <4>
       nodeToRemove.multiplicity -= 1; // handles duplicated
-    } else if (nodeToRemove === this.root) { // <5>
+    } else if (nodeToRemove === this.root) {
+      // <5>
       // Replace (root) node to delete with the combined subtree.
       this.root = removedNodeChildren;
-      if (this.root) { this.root.parent = undefined; } // clearing up old parent
-    } else if (nodeToRemove.isParentLeftChild) { // <6>
+      if (this.root) {
+        this.root.parent = undefined;
+      } // clearing up old parent
+    } else if (nodeToRemove.isParentLeftChild) {
+      // <6>
       // Replace node to delete with the combined subtree.
       parent?.setLeftAndUpdateParent(removedNodeChildren);
     } else {
@@ -164,7 +180,8 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node
    * @returns {BinaryTreeNode} combined subtree
    */
-  combineLeftIntoRightSubtree(node:BinaryTreeNode<V>) {
+  //eslint-disable-next-line functional/prefer-immutable-types
+  combineLeftIntoRightSubtree(node: BinaryTreeNode<V>) {
     if (node.right) {
       const leftmost = this.getLeftmost(node.right);
       leftmost?.setLeftAndUpdateParent(node.left);
@@ -177,7 +194,7 @@ export class BinarySearchTree<V> {
    * Breath-first search for a tree (always starting from the root element).
    * @yields {BinaryTreeNode}
    */
-  * bfs() {
+  *bfs() {
     const queue = queueMutable<BinaryTreeNode<V>>();
     if (!this.root) return;
     queue.enqueue(this.root);
@@ -186,8 +203,12 @@ export class BinarySearchTree<V> {
       const node = queue.dequeue();
       yield node;
       if (node) {
-        if (node.left) { queue.enqueue(node.left); }
-        if (node.right) { queue.enqueue(node.right); }
+        if (node.left) {
+          queue.enqueue(node.left);
+        }
+        if (node.right) {
+          queue.enqueue(node.right);
+        }
       }
     }
   }
@@ -197,7 +218,7 @@ export class BinarySearchTree<V> {
    * @see preOrderTraversal Similar results to the pre-order transversal.
    * @yields {BinaryTreeNode}
    */
-  * dfs() {
+  *dfs() {
     const stack = stackMutable<BinaryTreeNode<V>>();
     if (!this.root) return;
 
@@ -207,37 +228,49 @@ export class BinarySearchTree<V> {
       const node = stack.pop();
       yield node;
       if (node) {
-        if (node.right) { stack.push(node.right); }
-        if (node.left) { stack.push(node.left); }
+        if (node.right) {
+          stack.push(node.right);
+        }
+        if (node.left) {
+          stack.push(node.left);
+        }
       }
     }
   }
- 
+
   /**
    * In-order traversal on a tree: left-root-right.
    * If the tree is a BST, then the values will be sorted in ascendent order
    * @param {BinaryTreeNode} node first node to start the traversal
    * @yields {BinaryTreeNode}
    */
-  * inOrderTraversal(node = this.root):IterableIterator<BinaryTreeNode<V>> {
+  *inOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (!node) return;
-    if (node && node.left) { yield* this.inOrderTraversal(node.left); }
+    if (node && node.left) {
+      yield* this.inOrderTraversal(node.left);
+    }
     yield node;
-    if (node && node.right) { yield* this.inOrderTraversal(node.right); }
+    if (node && node.right) {
+      yield* this.inOrderTraversal(node.right);
+    }
   }
- 
+
   /**
    * Pre-order traversal on a tree: root-left-right.
    * Similar results to DFS
    * @param {BinaryTreeNode} node first node to start the traversal
    * @yields {BinaryTreeNode}
    */
-  * preOrderTraversal(node = this.root):IterableIterator<BinaryTreeNode<V>> {
+  *preOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (!node) return;
     yield node;
     if (node) {
-      if (node.left) { yield* this.preOrderTraversal(node.left); }
-      if (node.right) { yield* this.preOrderTraversal(node.right); }
+      if (node.left) {
+        yield* this.preOrderTraversal(node.left);
+      }
+      if (node.right) {
+        yield* this.preOrderTraversal(node.right);
+      }
     }
   }
 
@@ -246,14 +279,17 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node first node to start the traversal
    * @yields {BinaryTreeNode}
    */
-  * postOrderTraversal(node = this.root):IterableIterator<BinaryTreeNode<V>> {
+  *postOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (node) {
-      if (node.left) { yield* this.postOrderTraversal(node.left); }
-      if (node.right) { yield* this.postOrderTraversal(node.right); }
+      if (node.left) {
+        yield* this.postOrderTraversal(node.left);
+      }
+      if (node.right) {
+        yield* this.postOrderTraversal(node.right);
+      }
       yield node;
     }
   }
-
 
   /**
    * Represent Binary Tree as an array.
@@ -287,32 +323,37 @@ export class BinarySearchTree<V> {
     const queue = queueMutable<BinaryTreeNode<V>>();
     const visited = new Map();
 
-    if (this.root) { queue.enqueue(this.root); }
+    if (this.root) {
+      queue.enqueue(this.root);
+    }
 
     while (!queue.isEmpty) {
       const current = queue.dequeue();
       array.push(current && current.value);
 
       if (current) {
-        visited.set(current, null); 
-        if (!visited.has(current.left) && current.left) { queue.enqueue(current.left); }
-        if (!visited.has(current.right) && current.right) { queue.enqueue(current.right); }
+        visited.set(current, null);
+        if (!visited.has(current.left) && current.left) {
+          queue.enqueue(current.left);
+        }
+        if (!visited.has(current.right) && current.right) {
+          queue.enqueue(current.right);
+        }
       }
     }
 
     return array;
   }
 }
-
-
-const stringBst = <V>(r:BinaryTreeNode<V>|undefined, indent = 0) => {
+//eslint-disable-next-line functional/prefer-immutable-types
+const stringBst = <V>(r: BinaryTreeNode<V> | undefined, indent = 0) => {
   if (!r) return `?`;
 
   const prefix = ` `.repeat(indent);
   //eslint-disable-next-line functional/no-let
-  let s = ``+ r.value;
-  s += `\n` + prefix + ` left: ` + stringBst(r.left, indent+1);
-  s += `\n` + prefix + ` right: ` + stringBst(r.right, indent+1);
+  let s = `` + r.value;
+  s += `\n` + prefix + ` left: ` + stringBst(r.left, indent + 1);
+  s += `\n` + prefix + ` right: ` + stringBst(r.right, indent + 1);
   return s;
 };
 
@@ -320,7 +361,7 @@ const test = [30, 40, 10, 15, 12, 50];
 const testTree = new BinarySearchTree<number>(defaultComparer);
 
 test.forEach((t, index) => {
-  console.log(index+ `. ` + t);
+  console.log(index + `. ` + t);
   testTree.add(t);
   console.log(stringBst(testTree.root));
 });
