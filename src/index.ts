@@ -171,7 +171,7 @@ export * as Flow from './flow/index.js';
  * Aliases:
  * * {@link delayLoop}: A generator that yields at a given rate
  * * {@link interval}: Generates values from a given function with a given delay
- * 
+ * * {@link randomUniqueInteger}: Random unique integer
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
@@ -259,10 +259,10 @@ export * as Modulation from './modulation/index.js';
  * 
  * ### MutableSet
  * Like a regular array, a set can store many items. However, duplicate items are ignored - it
- * only keeps unique items. ixfx's {@link SetMutable | MutableSet} allows for considering items as identical by value, not
+ * only keeps unique items. ixfx's {@link Sets.ISetMutable | MutableSet} allows for considering items as identical by value, not
  * just by reference as the default JS Set operates
  * 
- * * {@link setMutable}: Create a {@link SetMutable}
+ * * {@link Sets.setMutable}: Create a {@link Sets.ISetMutable}
  *
  * ### CircularArray
  * {@link circularArray} extends a regular array, but only keeps the last _x_ number of items. 
@@ -270,7 +270,7 @@ export * as Modulation from './modulation/index.js';
  * ## Ordered collections
  * 
  * {@link Queues}: a list of ordered data, like a bakery queue
- * * Create with {@link queue} or {@link queueMutable}
+ * * Create with {@link Queues.queue} or {@link Queues.queueMutable}
  * 
  * {@link Stacks}: a list of ordered data, like a stack of plates
  * * Create with {@link stack} or {@link stackMutable}
@@ -295,11 +295,11 @@ export * as Modulation from './modulation/index.js';
  * which only allows a single value per key. MapOfMutable also has events for listening to changes
  * in the data.
  * 
- * * {@link mapArray}: Holds any number of items under a given key
- * * {@link mapSet}: Holds any number of **unique** items under a given key
+ * * {@link mapArrayMutable}: Holds any number of items under a given key
+ * * {@link mapSetMutable}: Holds any number of **unique** items under a given key
  * * {@link mapCircularMutable}: Holds the most recent _x_ items under a given key
  * 
- * For cases where events are not needed consider {@link simpleMapArrayMutable}. This is a bit more lightweight.
+ * For cases where events are not needed consider {@link mapSimpleMutable}. This is a bit more lightweight.
  *
  * @example Importing
  * ```js
@@ -319,19 +319,27 @@ export * as Collections from './collections/index.js';
 /**
  * Totally rando.
  * 
- * Overview:
- * * {@link arrayElement} Random item from an array (alias of `Arrays.randomElement`)
- * * {@link arrayIndex} Random index of an array (alias of `Arrays.randomIndex`)
- * * {@link hue} Random hue - 0..359 number (alias of `Visual.Colour.randomHue`)
+ * Numbers
  * * {@link float} Random floating point number within a given range
  * * {@link integer} Random whole number within a given range
- * * {@link string} Random string made up of letters and numbers
- * * {@link shortGuid} Quasi-unique id generator
+ * Arrays
+ * * {@link arrayElement} Random item from an array (alias of `Arrays.randomElement`)
+ * * {@link arrayIndex} Random index of an array (alias of `Arrays.randomIndex`)
+ * 
+ * Time
+ * * {@link minutesMs} Random range of minutes, value in milliseconds
+ * * {@link secondsMs} Random range of seconds, value in milliseconds
  * 
  * Weighted random numbers:
  * * {@link weighted} Weigh distribution with an easing function
  * * {@link weightedInteger} As above, but whole numbers
  * * {@link gaussian} Gaussian (bell curve-like) distribution
+ * 
+ * More
+ * * {@link hue} Random hue - 0..359 number (alias of `Visual.Colour.randomHue`)
+ * * {@link string} Random string made up of letters and numbers
+ * * {@link shortGuid} Quasi-unique id generator
+ * 
  * 
  * @example Importing (with aliasing)
  * ```js
