@@ -1,5 +1,6 @@
-import { number as guardNumber } from "./Guards.js";
-import { untilMatch } from "./Text.js";
+import { number as guardNumber } from './Guards.js';
+import { untilMatch } from './Text.js';
+import { type Interval, intervalToMs } from './flow/index.js';
 
 export * as IterableAsync from './IterableAsync.js';
 export * as Debug from './Debug.js';
@@ -9,20 +10,19 @@ export * as Debug from './Debug.js';
 /**
  * Returns `fallback` if `v` is NaN, otherwise returns `v`
  * @param v
- * @param fallback 
- * @returns 
+ * @param fallback
+ * @returns
  */
-export const ifNaN = (v:number, fallback:number):number => {
+export const ifNaN = (v: number, fallback: number): number => {
   if (Number.isNaN(v)) return fallback;
   return v;
 };
-
 
 /**
  * Maps the properties of an object through a map function.
  * In terms of typesafety, the mapped properties are assumed to have the
  * same type.
- * 
+ *
  * ```js
  * const o = {
  *  x: 10,
@@ -30,33 +30,38 @@ export const ifNaN = (v:number, fallback:number):number => {
  *  width: 200,
  *  height: 200
  * }
- * 
+ *
  * // Make each property use an averager instead
  * const oAvg = mapObject(o, (value, key) => {
  *  return movingAverage(10);
  * });
- * 
+ *
  * // Add a value to the averager
  * oAvg.x.add(20);
  * ```
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const mapObject = <X extends Record<string, unknown>, V>(object:X, mapFn:(value:any, key?:readonly [keyof X], index?:number)=>V):RemapObjectPropertyType<X, V> => {
-  const mapped = Object.entries(object).map(([key, value], i) => [key, mapFn(value, (key as unknown) as ([keyof X]), i)]);
+export const mapObject = <X extends Record<string, unknown>, V>(
+  object: X,
+  mapFn: (value: any, key?: readonly [keyof X], index?: number) => V
+): RemapObjectPropertyType<X, V> => {
+  const mapped = Object.entries(object).map(([key, value], i) => [
+    key,
+    mapFn(value, key as unknown as [keyof X], i),
+  ]);
   return Object.fromEntries(mapped);
 };
 
-
-export type RemapObjectPropertyType <OriginalType, PropType> = { readonly
-  [Property in keyof OriginalType]:PropType
-}
+export type RemapObjectPropertyType<OriginalType, PropType> = {
+  readonly [Property in keyof OriginalType]: PropType;
+};
 
 /**
  * Returns true if `x` is a power of two
- * @param x 
+ * @param x
  * @returns True if `x` is a power of two
  */
-export const isPowerOfTwo = (x:number) => Math.log2(x) % 1 === 0;
+export const isPowerOfTwo = (x: number) => Math.log2(x) % 1 === 0;
 
 /**
  * Returns the relative difference from the `initial` value
@@ -66,15 +71,16 @@ export const isPowerOfTwo = (x:number) => Math.log2(x) % 1 === 0;
  * rel(150); // 1.5
  * rel(50);  // 0.5
  * ```
- * 
+ *
  * The code for this is simple:
  * ```js
  * const relativeDifference = (initial) => (v) => v/initial
  * ```
- * @param {number} initial 
- * @returns 
+ * @param {number} initial
+ * @returns
  */
-export const relativeDifference = (initial:number) => (v:number) => v/initial;
+export const relativeDifference = (initial: number) => (v: number) =>
+  v / initial;
 
 // try {
 //   if (typeof window !== `undefined`) {
@@ -95,22 +101,22 @@ export const relativeDifference = (initial:number) => (v:number) => v/initial;
  * getFieldByPath(d, `gyro`);    // {x:4, y:5, z:6}
  * getFieldByPath(d, ``);        // Returns original object
  * ```
- * 
+ *
  * If a field does not exist, `undefined` is returned.
  * Use {@link getFieldPaths} to get a list of paths.
- * @param o 
- * @param path 
- * @returns 
+ * @param o
+ * @param path
+ * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldByPath = (o:any, path:string = ``):any|undefined => {
+export const getFieldByPath = (o: any, path: string = ``): any | undefined => {
   if (path.length === 0) return o;
   if (path in o) {
     return o[path];
   } else {
     const start = untilMatch(path, `.`);
     if (start in o) {
-      return getFieldByPath(o[start], path.substring(start.length+1));
+      return getFieldByPath(o[start], path.substring(start.length + 1));
     } else {
       return undefined;
     }
@@ -124,23 +130,23 @@ export const getFieldByPath = (o:any, path:string = ``):any|undefined => {
  *  accel: {x: 1, y: 2, z: 3},
  *  gyro:  {x: 4, y: 5, z: 6}
  * };
- * const paths = getFieldPaths(d); 
+ * const paths = getFieldPaths(d);
  * // Yields [ `accel.x`, `accel.y`,`accel.z`,`gyro.x`,`gyro.y`,`gyro.z` ]
  * ```
- * 
+ *
  * Use {@link getFieldByPath} to fetch data by this 'path' string.
- * @param o 
- * @returns 
+ * @param o
+ * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldPaths = (o:any):readonly string[] => {
-  const paths:string[] = [];
+export const getFieldPaths = (o: any): readonly string[] => {
+  const paths: string[] = [];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const probe = (o:any, prefix = ``) => {
+  const probe = (o: any, prefix = ``) => {
     if (typeof o === `object`) {
       const keys = Object.keys(o);
       if (prefix.length > 0) prefix += `.`;
-      keys.forEach(k => probe(o[k], prefix + k));
+      keys.forEach((k) => probe(o[k], prefix + k));
     } else {
       //eslint-disable-next-line functional/immutable-data
       paths.push(prefix);
@@ -156,34 +162,34 @@ export const getFieldPaths = (o:any):readonly string[] => {
  * roundMultiple(19, 20); // 20
  * roundMultiple(21, 20); // 40
  * ```
- * @param v 
- * @param multiple 
- * @returns 
+ * @param v
+ * @param multiple
+ * @returns
  */
-export const roundUpToMultiple = (v:number, multiple:number):number => {
+export const roundUpToMultiple = (v: number, multiple: number): number => {
   guardNumber(v, `nonZero`, `v`);
   guardNumber(multiple, `nonZero`, `muliple`);
-  return Math.ceil(v/multiple)*multiple;
+  return Math.ceil(v / multiple) * multiple;
 };
 
-export type ToString<V> = (itemToMakeStringFor:V)=>string;
+export type ToString<V> = (itemToMakeStringFor: V) => string;
 
 /**
  * Function that returns true if `a` and `b` are considered equal
  */
-export type IsEqual<V> = (a:V, b:V)=>boolean;
+export type IsEqual<V> = (a: V, b: V) => boolean;
 
 /**
  * Default comparer function is equiv to checking `a === b`
  */
-export const isEqualDefault = <V>(a:V, b:V):boolean => a === b;
+export const isEqualDefault = <V>(a: V, b: V): boolean => a === b;
 
 /**
  * Comparer returns true if string representation of `a` and `b` are equal.
  * Uses `toStringDefault` to generate a string representation (`JSON.stringify`)
  * @returns True if the contents of `a` and `b` are equal
  */
-export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
+export const isEqualValueDefault = <V>(a: V, b: V): boolean => {
   // ✔ UNIT TESTED
   if (a === b) return true; // Object references are the same, or string values are the same
   return toStringDefault(a) === toStringDefault(b); // String representations are the same
@@ -192,31 +198,34 @@ export const isEqualValueDefault = <V>(a:V, b:V):boolean => {
 /**
  * A default converter to string that uses JSON.stringify if its an object, or the thing itself if it's a string
  */
-export const toStringDefault = <V>(itemToMakeStringFor:V):string => ((typeof itemToMakeStringFor === `string`) ? itemToMakeStringFor : JSON.stringify(itemToMakeStringFor));
+export const toStringDefault = <V>(itemToMakeStringFor: V): string =>
+  typeof itemToMakeStringFor === `string`
+    ? itemToMakeStringFor
+    : JSON.stringify(itemToMakeStringFor);
 
-export const runningiOS = () => [
-  `iPad Simulator`,
-  `iPhone Simulator`,
-  `iPod Simulator`,
-  `iPad`,
-  `iPhone`,
-  `iPod`
-].includes(navigator.platform)
+export const runningiOS = () =>
+  [
+    `iPad Simulator`,
+    `iPhone Simulator`,
+    `iPod Simulator`,
+    `iPad`,
+    `iPhone`,
+    `iPod`,
+  ].includes(navigator.platform) ||
   // iPad on iOS 13 detection
-  || (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
+  (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
 
-
-export type CompareResult = 0|1|-1;
-export type Comparer<V> = (a:V, b:V)=>CompareResult;
+export type CompareResult = 0 | 1 | -1;
+export type Comparer<V> = (a: V, b: V) => CompareResult;
 
 /**
  * Default sort comparer, following same sematics as Array.sort
- * @param x 
- * @param y 
- * @returns 
+ * @param x
+ * @param y
+ * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const defaultComparer = (x:any, y:any):CompareResult => {
+export const defaultComparer = (x: any, y: any): CompareResult => {
   // Via https://stackoverflow.com/questions/47334234/how-to-implement-array-prototype-sort-default-compare-function
   if (x === undefined && y === undefined) return 0;
   if (x === undefined) return 1;
@@ -226,39 +235,58 @@ export const defaultComparer = (x:any, y:any):CompareResult => {
   const yString = defaultToString(y);
 
   if (xString < yString) return -1;
-  if(xString > yString) return 1;
+  if (xString > yString) return 1;
   return 0;
 };
 
 /**
  * Returns a human-friendly representation of elapsed milliseconds
- * @param ms 
- * @returns 
+ * @param interval
+ * @returns
  */
-export const elapsedMs = (ms: number) => {
+export const elapsedMs = (interval: Interval) => {
+  //eslint-disable-next-line functional/no-let
+  let ms = intervalToMs(interval);
+  if (!ms) return '(undefined)';
   if (ms < 1000) return `${ms}ms`;
   ms /= 1000;
   if (ms < 120) return `${ms.toFixed(2)}secs`;
   ms /= 60;
-  if (ms < 60) return `${ms.toFixed(2)}mins`
+  if (ms < 60) return `${ms.toFixed(2)}mins`;
   ms /= 60;
   return `${ms.toFixed(2)}hrs`;
-}
+};
+
+export const defaultKeyer = <V>(a: V) => {
+  if (typeof a === `string`) {
+    return a;
+  } else {
+    return JSON.stringify(a);
+  }
+};
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-const defaultToString = (obj:any) => {
+const defaultToString = (obj: any) => {
   //ECMA specification: http://www.ecma-international.org/ecma-262/6.0/#sec-tostring
   if (obj === null) return `null`;
-  if (typeof obj === `boolean` ||  typeof obj === `number`) return (obj).toString();
+  if (typeof obj === `boolean` || typeof obj === `number`) {
+    return obj.toString();
+  }
 
   if (typeof obj === `string`) return obj;
   if (typeof obj === `symbol`) throw new TypeError();
-  return (obj).toString();
+  return obj.toString();
 };
 
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = { ...(window as any).ixfx,  getFieldByPath, getFieldPaths };
+    (window as any).ixfx = {
+      ...(window as any).ixfx,
+      getFieldByPath,
+      getFieldPaths,
+    };
   }
-} catch { /* no-op */ }
+} catch {
+  /* no-op */
+}
