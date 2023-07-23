@@ -1,10 +1,20 @@
 A rough changelog between NPM releases
 
+# 0.9.0 23.07.23
+
+Lots of refactors and minor improvements
+
+- Modulation/adsrIterable: iterate over envelope values over time
+- Abort Signal support through Flow module
+- Preferring a style that returns functions, and takes single arguments
+- Map.getClosestIntegerKey: Assuming a Map with number keys, returns the closest key for a given value
+
 # 0.8.9 23.06.09
 
 Random/
-  - Test refactor so all functions take a single parameter
-  - generateIntegerUnique: randomly walk a range of integers without repeating
+
+- Test refactor so all functions take a single parameter
+- generateIntegerUnique: randomly walk a range of integers without repeating
 
 # 0.8.6 23.05.06
 
@@ -13,65 +23,74 @@ Guards/integerParse: Parse a value to an integer that follows given bounds, or r
 Collections/Trees: Improved path-based iteration and tree-building
 
 Text/
- - afterMatch: Return everything after a matched sub-string, or return the original if not found
- - untilMatch: Use same opts type as new afterMatch
- - Unit tests for both
+
+- afterMatch: Return everything after a matched sub-string, or return the original if not found
+- untilMatch: Use same opts type as new afterMatch
+- Unit tests for both
 
 IterableSync
- - first/last: return first or last item of an iterable
-- 
+
+- first/last: return first or last item of an iterable
+-
+
 # 0.8.5 23.05.05
 
 Collections/TreeNode
+
 - Broke some tree stuff into pure functions which the new TreeNodeMutable uses
 - Added support for tree-like operations over objects and Maps
 
 Collections/TreeNodeMutable
-- Basic implementation and test 
+
+- Basic implementation and test
 
 text
+
 - betweenChomp: Return part of string before a given start and end match, eg '[' and ']', as well as a copy of the string with all of that removed.
 - Improved test coverage
-
 
 # 0.8.4 23.03.06
 
 Collections/MultiValue
-- Favour iterables rather than array return values
 
+- Favour iterables rather than array return values
 
 # 0.8.3 23.02.25
 
 Collections/Array
- - Functions changed to take readonly or mutable array (although none mutate an input)
- - filterAB: Array.filter, but returns items that return false as well as true 
+
+- Functions changed to take readonly or mutable array (although none mutate an input)
+- filterAB: Array.filter, but returns items that return false as well as true
 
 Collections/MapMulti
- - Added 'removeValue' function that remove value regardless of key it is stored under
 
- 
-# 0.8.2  23.02.19
+- Added 'removeValue' function that remove value regardless of key it is stored under
+
+# 0.8.2 23.02.19
 
 Collections/Array
- - removed readonly from the return value of arrays where applicable
- - added `unique`, combining values from one or more arrays, only keeping unique values
 
-# 0.8.1 
+- removed readonly from the return value of arrays where applicable
+- added `unique`, combining values from one or more arrays, only keeping unique values
 
- - Random/minuteMs/secondMs: Generate random times (in ms) from minute or second ranges
+# 0.8.1
+
+- Random/minuteMs/secondMs: Generate random times (in ms) from minute or second ranges
 
 Flow/
- - runOnce: only run a closure once
- - TaskQueue: serial task processing
- - sleep & interval: support for an AbortSignal to cancel sleep
- - continuously: now takes an options object:
-   - `fireBeforeWait`: if true, callback is run before waiting, rather than the default of after the initial wait
-   - `onStartCalled`: return value determines whether a call to .start() continues as normal, cancels, resets or disposes loop
-   - disposable: if true, the loop will throw an error if a start is attempted
-   
+
+- runOnce: only run a closure once
+- TaskQueue: serial task processing
+- sleep & interval: support for an AbortSignal to cancel sleep
+- continuously: now takes an options object:
+  - `fireBeforeWait`: if true, callback is run before waiting, rather than the default of after the initial wait
+  - `onStartCalled`: return value determines whether a call to .start() continues as normal, cancels, resets or disposes loop
+  - disposable: if true, the loop will throw an error if a start is attempted
+
 # 0.8.0 23.02.03
 
 Geometry/
+
 - quadTree
 - Intersects: centralise a bunch of geometry logic
 - Layout: CirclePacking.random
@@ -80,6 +99,7 @@ Geometry/
 - Grid.array2dUpdater: allows setting values to a 2D array with grid coordinates
 
 Collections/
+
 - Trees: BinarySearchTree, Tree, basic traversal
 - mutableStack: fixed bug with pop
 - MapOfMutable: added iteration over values stored under key
