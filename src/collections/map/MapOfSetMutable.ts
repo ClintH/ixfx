@@ -1,7 +1,7 @@
 import { toStringDefault } from '../../Util.js';
-import { without } from '../Arrays';
-import type { MapSetOpts, MultiValue } from './MapMulti';
-import { MapOfMutableImpl } from './MapOfMultiImpl';
+import { without } from '../Arrays.js';
+import type { MapSetOpts, MultiValue } from './MapMulti.js';
+import { MapOfMutableImpl } from './MapOfMultiImpl.js';
 import {
   hasAnyValue as mapHasAnyValue,
   toArray as mapToArray,
@@ -9,10 +9,10 @@ import {
   filter as mapFilter,
   addKeepingExisting,
 } from './MapFns.js';
-import type { IMapOfMutableExtended } from './IMapOfMutableExtended';
+import type { IMapOfMutableExtended } from './IMapOfMutableExtended.js';
 
 /**
- * Returns a {@link MapOfMutable} that uses a set to hold values.
+ * Returns a {@link IMapOfMutableExtended} that uses a set to hold values.
  * This means that only unique values are stored under each key. By default it
  * uses the JSON representation to compare items.
  *
@@ -23,7 +23,7 @@ import type { IMapOfMutableExtended } from './IMapOfMutableExtended';
  *
  * @example Only storing the newest three items per key
  * ```js
- * const map = mapSetMutable();
+ * const map = mapOfSetMutable();
  * map.add(`hello`, [1, 2, 3, 1, 2, 3]);
  * const hello = map.get(`hello`); // [1, 2, 3]
  * ```
@@ -31,14 +31,14 @@ import type { IMapOfMutableExtended } from './IMapOfMutableExtended';
  * @example
  * ```js
  * const hash = (v) => v.name; // Use name as the key
- * const map = mapSetMutable(hash);
+ * const map = mapOfSetMutable(hash);
  * map.add(`hello`, {age:40, name: `Mary`});
  * map.add(`hello`, {age:29, name: `Mary`}); // Value ignored as same name exists
  * ```
  * @param opts
  * @returns
  */
-export const mapSetMutable = <V>(
+export const mapOfSetMutable = <V>(
   opts?: MapSetOpts<V>
 ): IMapOfMutableExtended<V, ReadonlyMap<string, V>> => {
   const hash = opts?.hash ?? toStringDefault;

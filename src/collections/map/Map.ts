@@ -78,7 +78,7 @@ export interface IMapImmutable<K, V> {
 
 /**
  * Returns an {@link IMapImmutable}.
- * Use {@link mapMutable} as a mutable alternatve.
+ * Use {@link Maps.mutable} as a mutable alternatve.
  *
  * @example Basic usage
  * ```js
@@ -115,21 +115,21 @@ export interface IMapImmutable<K, V> {
  *
  * @param dataOrMap Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
-export const map = <K, V>(
+export const immutable = <K, V>(
   dataOrMap?: ReadonlyMap<K, V> | EitherKey<K, V>
 ): IMapImmutable<K, V> => {
-  if (dataOrMap === undefined) return map([]);
-  if (Array.isArray(dataOrMap)) return map(add(new Map(), ...dataOrMap));
+  if (dataOrMap === undefined) return immutable([]);
+  if (Array.isArray(dataOrMap)) return immutable(add(new Map(), ...dataOrMap));
   const data = dataOrMap as ReadonlyMap<K, V>;
   return {
     add: (...itemsToAdd: EitherKey<K, V>) => {
       const s = add(data, ...itemsToAdd);
-      return map(s);
+      return immutable(s);
     },
     get: (key: K) => data.get(key),
-    delete: (key: K) => map(del(data, key)),
+    delete: (key: K) => immutable(del(data, key)),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    clear: () => map(),
+    clear: () => immutable(),
     has: (key: K) => data.has(key),
     entries: () => data.entries(),
     isEmpty: () => data.size === 0,

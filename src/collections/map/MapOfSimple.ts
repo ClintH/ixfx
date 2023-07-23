@@ -76,11 +76,11 @@ export class MapOfSimple<V>
  * A simple immutable map of arrays, without events. It can store multiple values
  * under the same key.
  *
- * For a fancier approaches, consider {@link mapArrayMutable}, {@link mapCircularMutable} or {@link mapSetMutable}.
+ * For a fancier approaches, consider {@link mapArrayMutable}, {@link mapOfCircularMutable} or {@link mapOfSetMutable}.
  *
  * @example
  * ```js
- * let m = mapSimpleMutable();
+ * let m = mapSimple();
  * m = m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
  * m = m.delete(`hello`);       // Deletes everything under `hello`
  *

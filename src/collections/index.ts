@@ -97,7 +97,7 @@ import * as Maps from './map/index.js';
  * Maps associate keys with values. Several helper functions are provided
  * for working with the standard JS Map class.
  *
- * ixfx also includes {@link MapMutable}, {@link MapImmutable}
+ * ixfx also includes {@link Maps.IMapMutable}, {@link Maps.IMapImmutable}
  *
  * Overview:
  * * {@link getOrGenerate}: Solves a common scenario of wanting a value by a particular key, or generating it if it doesn't exist

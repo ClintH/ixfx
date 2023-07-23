@@ -28,7 +28,7 @@ just by reference as the default JS Set operates</p>
 <ul>
 <li><a href="../functions/Collections.Sets.setMutable.html" class="tsd-kind-function">setMutable</a>: Create a <a href="../interfaces/Collections.Sets.ISetMutable.html" class="tsd-kind-interface">ISetMutable</a></li>
 </ul>
-<a id="md:circulararray" class="tsd-anchor"></a><h3><a href="#md:circulararray">CircularArray</a></h3><p><a href="../functions/Collections.circularArray-1.html" class="tsd-kind-function">circularArray</a> extends a regular array, but only keeps the last <em>x</em> number of items. </p>
+<a id="md:circulararray" class="tsd-anchor"></a><h3><a href="#md:circulararray">CircularArray</a></h3><p><a href="../functions/Collections.circularArray-1.html" class="tsd-kind-function">circularArray</a> extends a regular array, but only keeps the last <em>x</em> number of items.</p>
 <a id="md:ordered-collections" class="tsd-anchor"></a><h2><a href="#md:ordered-collections">Ordered collections</a></h2><p><a href="Collections.Queues.html" class="tsd-kind-namespace">Queues</a>: a list of ordered data, like a bakery queue</p>
 <ul>
 <li>Create with <a href="../functions/Collections.Queues.queue.html" class="tsd-kind-function">queue</a> or <a href="../functions/Collections.Queues.queueMutable.html" class="tsd-kind-function">queueMutable</a></li>
@@ -39,24 +39,24 @@ just by reference as the default JS Set operates</p>
 </ul>
 <p>Both queue and stack come in mutable and immutable varieties and can limit items
 stored in varies ways.</p>
-<a id="md:map" class="tsd-anchor"></a><h3><a href="#md:map">Map</a></h3><p>MapImmutable is a slight variant of the usual JS Map. It allows for a custom logic for computing keys
+<a id="md:map" class="tsd-anchor"></a><h3><a href="#md:map">Map</a></h3><p><a href="../interfaces/Collections.Maps.IMapImmutable.html" class="tsd-kind-interface">IMapImmutable</a> is a slight variant of the usual JS Map. It allows for a custom logic for computing keys
 for items based on a function.</p>
 <ul>
-<li>Create with map or mapMutable</li>
+<li>Create with <a href="../functions/Collections.Maps.immutable.html" class="tsd-kind-function">immutable</a> or <a href="../functions/Collections.Maps.mutable.html" class="tsd-kind-function">mutable</a></li>
 </ul>
 <p><a href="../classes/Collections.Maps.ExpiringMap.html" class="tsd-kind-class">ExpiringMap</a> has the same semantics as a regular map, but can automatically remove items if they haven&#39;t been set/get for a given interval, and/or if a capacity limit is reached.</p>
 <ul>
 <li>Create with <a href="../functions/Collections.Maps.expiringMap-1.html" class="tsd-kind-function">expiringMap</a></li>
 </ul>
-<a id="md:map-of" class="tsd-anchor"></a><h3><a href="#md:map-of">Map-of</a></h3><p>MapOfMutable allows for several values to be stored under a single key. Unlike a regular JS Map
-which only allows a single value per key. MapOfMutable also has events for listening to changes
+<a id="md:map-of" class="tsd-anchor"></a><h3><a href="#md:map-of">Map-of</a></h3><p><a href="../interfaces/Collections.Maps.IMapOf.html" class="tsd-kind-interface">IMapOf</a> allows for several values to be stored under a single key. Unlike a regular JS Map
+which only allows a single value per key. IMapOfMutable also has events for listening to changes
 in the data.</p>
 <ul>
-<li>mapArrayMutable: Holds any number of items under a given key</li>
-<li>mapSetMutable: Holds any number of <strong>unique</strong> items under a given key</li>
-<li>mapCircularMutable: Holds the most recent <em>x</em> items under a given key</li>
+<li><a href="../functions/Collections.Maps.mapOfArrayMutable.html" class="tsd-kind-function">mapOfArrayMutable</a>: Holds any number of items under a given key</li>
+<li><a href="../functions/Collections.Maps.mapOfSetMutable.html" class="tsd-kind-function">mapOfSetMutable</a>: Holds any number of <strong>unique</strong> items under a given key</li>
+<li><a href="../functions/Collections.Maps.mapOfCircularMutable.html" class="tsd-kind-function">mapOfCircularMutable</a>: Holds the most recent <em>x</em> items under a given key</li>
 </ul>
-<p>For cases where events are not needed consider mapSimpleMutable. This is a bit more lightweight.</p>
+<p>For cases where events are not needed consider <a href="../functions/Collections.Maps.mapOfSimpleMutable-1.html" class="tsd-kind-function">mapOfSimpleMutable</a>. This is a bit more lightweight.</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <h4>Example</h4><p>Importing</p>

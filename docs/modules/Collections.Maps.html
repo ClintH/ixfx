@@ -19,7 +19,7 @@
 <section class="tsd-panel tsd-comment">
 <div class="tsd-comment tsd-typography"><p>Maps associate keys with values. Several helper functions are provided
 for working with the standard JS Map class.</p>
-<p>ixfx also includes <a href="../interfaces/Collections.Maps.MapMutable.html" class="tsd-kind-interface">MapMutable</a>, MapImmutable</p>
+<p>ixfx also includes <a href="../interfaces/Collections.Maps.IMapMutable.html" class="tsd-kind-interface">IMapMutable</a>, <a href="../interfaces/Collections.Maps.IMapImmutable.html" class="tsd-kind-interface">IMapImmutable</a></p>
 <p>Overview:</p>
 <ul>
 <li><a href="../functions/Collections.Maps.getOrGenerate-1.html" class="tsd-kind-function">getOrGenerate</a>: Solves a common scenario of wanting a value by a particular key, or generating it if it doesn&#39;t exist</li>
@@ -49,8 +49,12 @@ for working with the standard JS Map class.</p>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Interfaces</h3>
 <div class="tsd-index-list"><a href="../interfaces/Collections.Maps.IMapImmutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-256"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)"></path></g></svg><span>IMap<wbr/>Immutable</span></a>
+<a href="../interfaces/Collections.Maps.IMapMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Mutable</span></a>
+<a href="../interfaces/Collections.Maps.IMapOf.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Of</span></a>
+<a href="../interfaces/Collections.Maps.IMapOfMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Of<wbr/>Mutable</span></a>
 <a href="../interfaces/Collections.Maps.IMapOfMutableExtended.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Of<wbr/>Mutable<wbr/>Extended</span></a>
-<a href="../interfaces/Collections.Maps.MapMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Map<wbr/>Mutable</span></a>
+<a href="../interfaces/Collections.Maps.IMappish.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMappish</span></a>
+<a href="../interfaces/Collections.Maps.IWithEntries.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IWith<wbr/>Entries</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Type Aliases</h3>
@@ -59,6 +63,7 @@ for working with the standard JS Map class.</p>
 <a href="../types/Collections.Maps.ExpiringMapOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Opts</span></a>
 <a href="../types/Collections.Maps.GetOrGenerate.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Get<wbr/>Or<wbr/>Generate</span></a>
 <a href="../types/Collections.Maps.MapArrayEvents.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Events</span></a>
+<a href="../types/Collections.Maps.MapArrayOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Opts</span></a>
 <a href="../types/Collections.Maps.MapCircularOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Circular<wbr/>Opts</span></a>
 <a href="../types/Collections.Maps.MapMultiOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Multi<wbr/>Opts</span></a>
 <a href="../types/Collections.Maps.MapSetOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Set<wbr/>Opts</span></a>
@@ -81,14 +86,15 @@ for working with the standard JS Map class.</p>
 <a href="../functions/Collections.Maps.getOrGenerateSync.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Or<wbr/>Generate<wbr/>Sync</span></a>
 <a href="../functions/Collections.Maps.hasAnyValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Any<wbr/>Value</span></a>
 <a href="../functions/Collections.Maps.hasKeyValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Key<wbr/>Value</span></a>
-<a href="../functions/Collections.Maps.map.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map</span></a>
-<a href="../functions/Collections.Maps.mapMutable-1.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Mutable</span></a>
+<a href="../functions/Collections.Maps.immutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>immutable</span></a>
 <a href="../functions/Collections.Maps.mapOfArrayMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Array<wbr/>Mutable</span></a>
 <a href="../functions/Collections.Maps.mapOfCircularMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Circular<wbr/>Mutable</span></a>
+<a href="../functions/Collections.Maps.mapOfSetMutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Set<wbr/>Mutable</span></a>
 <a href="../functions/Collections.Maps.mapOfSimpleMutable-1.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Simple<wbr/>Mutable</span></a>
 <a href="../functions/Collections.Maps.mapToArray.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>To<wbr/>Array</span></a>
 <a href="../functions/Collections.Maps.mapToObjTransform.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>To<wbr/>Obj<wbr/>Transform</span></a>
 <a href="../functions/Collections.Maps.mergeByKey.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>merge<wbr/>By<wbr/>Key</span></a>
+<a href="../functions/Collections.Maps.mutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>mutable</span></a>
 <a href="../functions/Collections.Maps.sortByValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sort<wbr/>By<wbr/>Value</span></a>
 <a href="../functions/Collections.Maps.sortByValueProperty.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sort<wbr/>By<wbr/>Value<wbr/>Property</span></a>
 <a href="../functions/Collections.Maps.toArray.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>Array</span></a>
@@ -125,13 +131,18 @@ for working with the standard JS Map class.</p>
 <li><a href="../classes/Collections.Maps.ExpiringMap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Expiring<wbr/>Map</span></a></li>
 <li><a href="../classes/Collections.Maps.MapOfSimpleMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Map<wbr/>Of<wbr/>Simple<wbr/>Mutable</span></a></li>
 <li><a href="../interfaces/Collections.Maps.IMapImmutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Immutable</span></a></li>
+<li><a href="../interfaces/Collections.Maps.IMapMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Mutable</span></a></li>
+<li><a href="../interfaces/Collections.Maps.IMapOf.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Of</span></a></li>
+<li><a href="../interfaces/Collections.Maps.IMapOfMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Of<wbr/>Mutable</span></a></li>
 <li><a href="../interfaces/Collections.Maps.IMapOfMutableExtended.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMap<wbr/>Of<wbr/>Mutable<wbr/>Extended</span></a></li>
-<li><a href="../interfaces/Collections.Maps.MapMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Map<wbr/>Mutable</span></a></li>
+<li><a href="../interfaces/Collections.Maps.IMappish.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IMappish</span></a></li>
+<li><a href="../interfaces/Collections.Maps.IWithEntries.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IWith<wbr/>Entries</span></a></li>
 <li><a href="../types/Collections.Maps.ExpiringMapEvent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Event</span></a></li>
 <li><a href="../types/Collections.Maps.ExpiringMapEvents.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Events</span></a></li>
 <li><a href="../types/Collections.Maps.ExpiringMapOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Opts</span></a></li>
 <li><a href="../types/Collections.Maps.GetOrGenerate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Get<wbr/>Or<wbr/>Generate</span></a></li>
 <li><a href="../types/Collections.Maps.MapArrayEvents.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Events</span></a></li>
+<li><a href="../types/Collections.Maps.MapArrayOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Opts</span></a></li>
 <li><a href="../types/Collections.Maps.MapCircularOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Circular<wbr/>Opts</span></a></li>
 <li><a href="../types/Collections.Maps.MapMultiOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Multi<wbr/>Opts</span></a></li>
 <li><a href="../types/Collections.Maps.MapSetOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Set<wbr/>Opts</span></a></li>
@@ -151,14 +162,15 @@ for working with the standard JS Map class.</p>
 <li><a href="../functions/Collections.Maps.getOrGenerateSync.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Or<wbr/>Generate<wbr/>Sync</span></a></li>
 <li><a href="../functions/Collections.Maps.hasAnyValue.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Any<wbr/>Value</span></a></li>
 <li><a href="../functions/Collections.Maps.hasKeyValue.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Key<wbr/>Value</span></a></li>
-<li><a href="../functions/Collections.Maps.map.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map</span></a></li>
-<li><a href="../functions/Collections.Maps.mapMutable-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Mutable</span></a></li>
+<li><a href="../functions/Collections.Maps.immutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>immutable</span></a></li>
 <li><a href="../functions/Collections.Maps.mapOfArrayMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Array<wbr/>Mutable</span></a></li>
 <li><a href="../functions/Collections.Maps.mapOfCircularMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Circular<wbr/>Mutable</span></a></li>
+<li><a href="../functions/Collections.Maps.mapOfSetMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Set<wbr/>Mutable</span></a></li>
 <li><a href="../functions/Collections.Maps.mapOfSimpleMutable-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Of<wbr/>Simple<wbr/>Mutable</span></a></li>
 <li><a href="../functions/Collections.Maps.mapToArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>To<wbr/>Array</span></a></li>
 <li><a href="../functions/Collections.Maps.mapToObjTransform.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>To<wbr/>Obj<wbr/>Transform</span></a></li>
 <li><a href="../functions/Collections.Maps.mergeByKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>merge<wbr/>By<wbr/>Key</span></a></li>
+<li><a href="../functions/Collections.Maps.mutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>mutable</span></a></li>
 <li><a href="../functions/Collections.Maps.sortByValue.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sort<wbr/>By<wbr/>Value</span></a></li>
 <li><a href="../functions/Collections.Maps.sortByValueProperty.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sort<wbr/>By<wbr/>Value<wbr/>Property</span></a></li>
 <li><a href="../functions/Collections.Maps.toArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>Array</span></a></li>

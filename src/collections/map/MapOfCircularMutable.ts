@@ -9,7 +9,7 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
 };
 
 /**
- * Returns a {@link MapOfMutable} that uses a {@link ICircularArray} to hold values. Mutable.
+ * Returns a {@link IMapOfMutableExtended} that uses a {@link ICircularArray} to hold values. Mutable.
  * This means that the number of values stored under each key will be limited to the defined
  * capacity.
  *

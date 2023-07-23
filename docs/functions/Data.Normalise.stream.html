@@ -50,7 +50,7 @@ Normalised return values will be in the range of 0-1 (inclusive).</p>
 <p>Since normalisation is being adjusted as new min/max are encountered, it might
 be that value normalised to 1 at one time is different to what normalises to 1
 at a later time.</p>
-<p>If you already know what to expect of the number range, passingin <code>minDefault</code> 
+<p>If you already know what to expect of the number range, passingin <code>minDefault</code>
 and <code>maxDefault</code> primes the normalisation.</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">s</span><span class="hl-2"> = </span><span class="hl-3">Normalise</span><span class="hl-2">.</span><span class="hl-8">stream</span><span class="hl-2">();</span><br/><span class="hl-8">s</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">); </span><span class="hl-0">// 1, because it&#39;s the highest seen</span><br/><br/><span class="hl-0">// With priming:</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">s</span><span class="hl-2"> = </span><span class="hl-3">Normalise</span><span class="hl-2">.</span><span class="hl-8">stream</span><span class="hl-2">(</span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">10</span><span class="hl-2">);</span><br/><span class="hl-8">s</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">); </span><span class="hl-0">// 0.5, because we&#39;re expecting range 0-10</span>
 </code><button>Copy</button></pre>

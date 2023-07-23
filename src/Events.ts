@@ -1,7 +1,8 @@
 /* eslint-disable */
-import type {ISimpleEventEmitter, Listener} from "./ISimpleEventEmitter.js";
-import {mapOfSimpleMutable} from "./collections/map/MapOfSimpleMutable.js";
+import type { ISimpleEventEmitter, Listener } from './ISimpleEventEmitter.js';
+import { mapOfSimpleMutable } from './collections/map/MapOfSimpleMutable.js';
 
+export type { ISimpleEventEmitter, Listener };
 // type FlowSource = {
 //   name:string,
 //   dispose():void,
@@ -58,7 +59,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   /**
    * Fire event
    * @private
-   * @param type Type of event 
+   * @param type Type of event
    * @param args Arguments for event
    * @returns
    */
@@ -77,8 +78,15 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @param {Listener<Events>} listener
    * @memberof SimpleEventEmitter
    */
-  addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void { // (this: any, ev: Events[K]) => any): void {
-    this.#listeners.addKeyedValues(type as string, listener as Listener<Events>);
+  addEventListener<K extends keyof Events>(
+    type: K,
+    listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void
+  ): void {
+    // (this: any, ev: Events[K]) => any): void {
+    this.#listeners.addKeyedValues(
+      type as string,
+      listener as Listener<Events>
+    );
   }
 
   /**
@@ -87,8 +95,15 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @param {Listener<Events>} listener
    * @memberof SimpleEventEmitter
    */
-  removeEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void) { // listener: Listener<Events>): void {
-    this.#listeners.deleteKeyValue(type as string, listener as Listener<Events>);
+  removeEventListener<K extends keyof Events>(
+    type: K,
+    listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void
+  ) {
+    // listener: Listener<Events>): void {
+    this.#listeners.deleteKeyValue(
+      type as string,
+      listener as Listener<Events>
+    );
   }
 
   /**

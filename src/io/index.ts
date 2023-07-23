@@ -3,6 +3,7 @@
  */
 export * as Bluetooth from './NordicBleDevice.js';
 
+export type { Events, DataEvent } from './BleDevice.js';
 export * as AudioAnalysers from './AudioAnalyser.js';
 export * as AudioVisualisers from './AudioVisualiser.js';
 

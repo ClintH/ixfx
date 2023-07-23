@@ -18,7 +18,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
 };
 
 /**
- * Returns a {@link MapOfMutable} to allow storing multiple values under a key, unlike a regular Map.
+ * Returns a {@link IMapOfMutableExtended} to allow storing multiple values under a key, unlike a regular Map.
  * @example
  * ```js
  * const map = mapOfArrayMutable();
@@ -42,7 +42,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * ```
  * @param opts
  * @template V Data type of items
- * @returns {@link MapOfMutable}
+ * @returns {@link IMapOfMutableExtended}
  */
 export const mapOfArrayMutable = <V>(
   opts: MapArrayOpts<V> = {}

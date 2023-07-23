@@ -6,7 +6,6 @@ import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
 import { retry } from '../flow/Retry.js';
-//import {type Events} from "./Espruino.js";
 
 export type DataEvent = {
   readonly data: string;
@@ -112,16 +111,18 @@ export class BleDevice extends SimpleEventEmitter<Events> {
   }
 
   write(txt: string) {
-    if (this.states.state !== `connected`)
+    if (this.states.state !== `connected`) {
       throw new Error(`Cannot write while state is ${this.states.state}`);
+    }
     this.txBuffer.add(txt);
   }
 
   private async writeInternal(txt: string) {
     this.verbose(`writeInternal ${txt}`);
     const tx = this.tx;
-    if (tx === undefined)
+    if (tx === undefined) {
       throw new Error(`Unexpectedly without tx characteristic`);
+    }
     try {
       await tx.writeValue(this.codec.toBuffer(txt));
     } catch (ex: unknown) {

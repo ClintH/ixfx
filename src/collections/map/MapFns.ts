@@ -27,7 +27,7 @@ import type { GetOrGenerate } from './index.js';
  * @param target Target value
  * @returns
  */
-export const getClosestIntegerKey = <V>(
+export const getClosestIntegerKey = (
   data: ReadonlyMap<number, any>,
   target: number
 ): number => {
@@ -35,6 +35,7 @@ export const getClosestIntegerKey = <V>(
   if (data.has(target)) {
     return target;
   } else {
+    //eslint-disable-next-line functional/no-let
     let offset = 1;
     while (offset < 1000) {
       if (data.has(target - offset)) return target - offset;
@@ -158,7 +159,7 @@ export const getOrGenerate =
 export const firstEntryByIterablePredicate = <K, V>(
   map: IWithEntries<K, V>,
   predicate: (value: V, key: K) => boolean
-): [key: K, value: V] | undefined => {
+): readonly [key: K, value: V] | undefined => {
   for (const e of map.entries()) {
     if (predicate(e[1], e[0])) return e;
   }
@@ -186,7 +187,7 @@ export const firstEntryByIterableValue = <K, V>(
   map: IWithEntries<K, V>,
   value: V,
   isEqual: IsEqual<V> = isEqualDefault
-): [key: K, value: V] | undefined => {
+): readonly [key: K, value: V] | undefined => {
   for (const e of map.entries()) {
     if (isEqual(e[1], value)) return e;
   }
@@ -384,10 +385,11 @@ export const fromIterable = <V>(
   const m = new Map<string, V>();
   for (const d of data) {
     const id = keyFn(d);
-    if (m.has(id) && !allowOverwrites)
+    if (m.has(id) && !allowOverwrites) {
       throw new Error(
         `id ${id} is already used and new data will overwrite it. `
       );
+    }
     m.set(id, d);
   }
   return m;
@@ -464,7 +466,7 @@ export const addObject = <V>(map: Map<string, V>, data: any) => {
 export const find = <V>(
   map: ReadonlyMap<string, V>,
   predicate: (v: V) => boolean
-): V | undefined => Array.from(map.values()).find((vv) => predicate(vv));
+): V | undefined => Array.from(map.values()).find(predicate);
 
 /**
  * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link toObject}.
@@ -519,8 +521,9 @@ export const zipKeyValue = <V>(
   keys: ReadonlyArray<string>,
   values: ArrayLike<V | undefined>
 ) => {
-  if (keys.length !== values.length)
+  if (keys.length !== values.length) {
     throw new Error(`Keys and values arrays should be same length`);
+  }
   return Object.fromEntries(keys.map((k, i) => [k, values[i]]));
 };
 

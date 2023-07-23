@@ -26,7 +26,7 @@ as the normalisation range. <a href="https://clinth.github.io/ixfx-docs/data/nor
 <pre><code class="language-js"><span class="hl-1">import</span><span class="hl-2"> {</span><span class="hl-3">Normalise</span><span class="hl-2">} </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><br/><span class="hl-0">// Yields: [0.5, 0.1, 0.0, 0.9, 1]</span><br/><span class="hl-3">Normalise</span><span class="hl-2">.</span><span class="hl-8">array</span><span class="hl-2">([</span><span class="hl-7">5</span><span class="hl-2">,</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">0</span><span class="hl-2">,</span><span class="hl-7">9</span><span class="hl-2">,</span><span class="hl-7">10</span><span class="hl-2">]);</span>
 </code><button>Copy</button></pre>
 <p><code>minForced</code> and/or <code>maxForced</code> can
-be provided to use an arbitrary range. </p>
+be provided to use an arbitrary range.</p>
 <pre><code class="language-js"><span class="hl-0">// Forced range 0-100</span><br/><span class="hl-0">// Yields: [0.05, 0.01, 0.0, 0.09, 0.10]</span><br/><span class="hl-3">Normalise</span><span class="hl-2">.</span><span class="hl-8">array</span><span class="hl-2">([</span><span class="hl-7">5</span><span class="hl-2">,</span><span class="hl-7">1</span><span class="hl-2">,</span><span class="hl-7">0</span><span class="hl-2">,</span><span class="hl-7">9</span><span class="hl-2">,</span><span class="hl-7">10</span><span class="hl-2">], </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">100</span><span class="hl-2">);</span>
 </code><button>Copy</button></pre>
 <p>Return values are clamped to always be 0-1, inclusive.</p>

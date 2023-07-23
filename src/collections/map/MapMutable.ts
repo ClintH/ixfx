@@ -4,12 +4,12 @@ import { add, del, set, has } from './MapImmutableFns.js';
 /**
  * A mutable map.
  *
- * It is a wrapper around the in-built Map type, but adds roughly the same API as {@link MapImmutable}.
+ * It is a wrapper around the in-built Map type, but adds roughly the same API as {@link IMapImmutable}.
  *
  * @template K Type of map keys. Typically `string`
  * @template V Type of stored values
  */
-export interface MapMutable<K, V> {
+export interface IMapMutable<K, V> {
   /**
    * Adds one or more items to map
    *
@@ -74,8 +74,8 @@ export interface MapMutable<K, V> {
 }
 
 /**
- * Returns a {@link MapMutable} (which just wraps the in-built Map)
- * Use {@link map} for the immutable alternative.
+ * Returns a {@link IMapMutable} (which just wraps the in-built Map)
+ * Use {@link Maps.immutable} for the immutable alternative.
  *
  * @example Basic usage
  * ```js
@@ -92,9 +92,7 @@ export interface MapMutable<K, V> {
  * ```
  * @param data Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
-export const mapMutable = <K, V>(
-  ...data: EitherKey<K, V>
-): MapMutable<K, V> => {
+export const mutable = <K, V>(...data: EitherKey<K, V>): IMapMutable<K, V> => {
   // eslint-disable-next-line functional/no-let
   let m = add(new Map<K, V>(), ...data);
   return {
