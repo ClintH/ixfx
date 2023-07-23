@@ -68,11 +68,14 @@ export const sleep = <V>(
     return new Promise<V | undefined>((resolve, reject) => {
       if (signal) {
         signal.addEventListener(`abort`, () => {
-          reject(`Aborted`);
+          reject(signal.reason);
         });
       }
       setTimeout(() => {
-        signal?.throwIfAborted();
+        if (signal?.aborted) {
+          reject(signal.reason);
+          return;
+        }
         resolve(value);
       }, timeoutMs);
     });
