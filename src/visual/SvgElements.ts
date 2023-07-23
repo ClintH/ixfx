@@ -1,14 +1,12 @@
-
-import { CirclePositioned } from "../geometry/Circle.js";
-import * as Lines from "../geometry/Line.js";
-import * as Points from "../geometry/Point.js";
-import * as Svg from "./Svg.js";
-import { getCssVariable } from "./Colour.js";
+import { type CirclePositioned } from '../geometry/Circle.js';
+import * as Lines from '../geometry/Line.js';
+import * as Points from '../geometry/Point.js';
+import * as Svg from './Svg.js';
+import { getCssVariable } from './Colour.js';
 //import {Palette} from ".";
 
-
-const numOrPercentage = (v:number):string => {
-  if (v >= 0 && v <= 1) return (v * 100) + `%`;
+const numOrPercentage = (v: number): string => {
+  if (v >= 0 && v <= 1) return v * 100 + `%`;
   return v.toString();
 };
 
@@ -25,18 +23,31 @@ const numOrPercentage = (v:number):string => {
  * @param svgOrArray Path syntax, or array of paths. Can be empty if path data will be added later
  * @param parent SVG parent element
  * @param opts Options Drawing options
- * @returns 
+ * @returns
  */
-export const path = (svgOrArray:string | readonly string[], parent:SVGElement, opts?:Svg.PathDrawingOpts, queryOrExisting?:string | SVGPathElement):SVGPathElement => {
-  const elem = Svg.createOrResolve<SVGPathElement>(parent, `path`, queryOrExisting);
-  const svg = typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
+export const path = (
+  svgOrArray: string | readonly string[],
+  parent: SVGElement,
+  opts?: Svg.PathDrawingOpts,
+  queryOrExisting?: string | SVGPathElement
+): SVGPathElement => {
+  const elem = Svg.createOrResolve<SVGPathElement>(
+    parent,
+    `path`,
+    queryOrExisting
+  );
+  const svg =
+    typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
 
   elem.setAttributeNS(null, `d`, svg);
   parent.appendChild(elem);
   return pathUpdate(elem, opts);
 };
 
-export const pathUpdate = (elem:SVGPathElement, opts?:Svg.PathDrawingOpts) => {
+export const pathUpdate = (
+  elem: SVGPathElement,
+  opts?: Svg.PathDrawingOpts
+) => {
   if (opts) Svg.applyOpts(elem, opts);
   if (opts) Svg.applyStrokeOpts(elem, opts);
   return elem;
@@ -49,7 +60,11 @@ export const pathUpdate = (elem:SVGPathElement, opts?:Svg.PathDrawingOpts) => {
  * @param opts Drawing options
  * @returns SVGCircleElement
  */
-export const circleUpdate = (elem:SVGCircleElement, circle:CirclePositioned, opts?:Svg.CircleDrawingOpts) => {
+export const circleUpdate = (
+  elem: SVGCircleElement,
+  circle: CirclePositioned,
+  opts?: Svg.CircleDrawingOpts
+) => {
   elem.setAttributeNS(null, `cx`, circle.x.toString());
   elem.setAttributeNS(null, `cy`, circle.y.toString());
   elem.setAttributeNS(null, `r`, circle.radius.toString());
@@ -61,34 +76,50 @@ export const circleUpdate = (elem:SVGCircleElement, circle:CirclePositioned, opt
 
 /**
  * Creates or reuses a `SVGCircleElement`.
- * 
+ *
  * To update an existing element, use `circleUpdate`
- * @param circle 
- * @param parent 
- * @param opts 
- * @param queryOrExisting 
- * @returns 
+ * @param circle
+ * @param parent
+ * @param opts
+ * @param queryOrExisting
+ * @returns
  */
-export const circle = (circle:CirclePositioned, parent:SVGElement, opts?:Svg.CircleDrawingOpts, queryOrExisting?:string | SVGCircleElement):SVGCircleElement => {
-  const p = Svg.createOrResolve<SVGCircleElement>(parent, `circle`, queryOrExisting);
+export const circle = (
+  circle: CirclePositioned,
+  parent: SVGElement,
+  opts?: Svg.CircleDrawingOpts,
+  queryOrExisting?: string | SVGCircleElement
+): SVGCircleElement => {
+  const p = Svg.createOrResolve<SVGCircleElement>(
+    parent,
+    `circle`,
+    queryOrExisting
+  );
   return circleUpdate(p, circle, opts);
 };
 
 /**
  * Creates or resuses a `SVGGElement` (group)
- * 
+ *
  * To update an existing elemnet, use `groupUpdate`
- * @param children 
- * @param parent 
- * @param queryOrExisting 
- * @returns 
+ * @param children
+ * @param parent
+ * @param queryOrExisting
+ * @returns
  */
-export const group = (children:readonly SVGElement[], parent:SVGElement, queryOrExisting?:string | SVGGElement):SVGGElement => {
+export const group = (
+  children: readonly SVGElement[],
+  parent: SVGElement,
+  queryOrExisting?: string | SVGGElement
+): SVGGElement => {
   const p = Svg.createOrResolve<SVGGElement>(parent, `g`, queryOrExisting);
   return groupUpdate(p, children);
 };
 
-export const groupUpdate = (elem:SVGGElement, children:readonly SVGElement[]) => {
+export const groupUpdate = (
+  elem: SVGGElement,
+  children: readonly SVGElement[]
+) => {
   for (const c of children) {
     if (c.parentNode !== elem) {
       elem.appendChild(c);
@@ -100,26 +131,39 @@ export const groupUpdate = (elem:SVGGElement, children:readonly SVGElement[]) =>
 
 /**
  * Creates or reuses a SVGLineElement.
- * 
- * @param line 
- * @param parent 
- * @param opts 
- * @param queryOrExisting 
- * @returns 
+ *
+ * @param line
+ * @param parent
+ * @param opts
+ * @param queryOrExisting
+ * @returns
  */
-export const line = (line:Lines.Line, parent:SVGElement, opts?:Svg.LineDrawingOpts, queryOrExisting?:string | SVGLineElement):SVGLineElement => {
-  const lineEl = Svg.createOrResolve<SVGLineElement>(parent, `line`, queryOrExisting);
+export const line = (
+  line: Lines.Line,
+  parent: SVGElement,
+  opts?: Svg.LineDrawingOpts,
+  queryOrExisting?: string | SVGLineElement
+): SVGLineElement => {
+  const lineEl = Svg.createOrResolve<SVGLineElement>(
+    parent,
+    `line`,
+    queryOrExisting
+  );
   return lineUpdate(lineEl, line, opts);
 };
 
 /**
  * Updates a SVGLineElement instance with potentially changed line and drawing data
  * @param lineEl
- * @param line 
- * @param opts 
- * @returns 
+ * @param line
+ * @param opts
+ * @returns
  */
-export const lineUpdate = (lineEl:SVGLineElement, line:Lines.Line, opts?:Svg.LineDrawingOpts) => {
+export const lineUpdate = (
+  lineEl: SVGLineElement,
+  line: Lines.Line,
+  opts?: Svg.LineDrawingOpts
+) => {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, line.a.y.toString());
   lineEl.setAttributeNS(null, `x2`, line.b.x.toString());
@@ -132,19 +176,25 @@ export const lineUpdate = (lineEl:SVGLineElement, line:Lines.Line, opts?:Svg.Lin
 
 /**
  * Updates an existing SVGTextPathElement instance with text and drawing options
- * @param el 
- * @param text 
- * @param opts 
- * @returns 
+ * @param el
+ * @param text
+ * @param opts
+ * @returns
  */
-export const textPathUpdate = (el:SVGTextPathElement, text?:string, opts?:Svg.TextPathDrawingOpts) => {
+export const textPathUpdate = (
+  el: SVGTextPathElement,
+  text?: string,
+  opts?: Svg.TextPathDrawingOpts
+) => {
   if (opts?.method) el.setAttributeNS(null, `method`, opts.method);
   if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
   if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
   if (opts?.startOffset) {
     el.setAttributeNS(null, `startOffset`, numOrPercentage(opts.startOffset));
   }
-  if (opts?.textLength) el.setAttributeNS(null, `textLength`, numOrPercentage(opts.textLength));
+  if (opts?.textLength) {
+    el.setAttributeNS(null, `textLength`, numOrPercentage(opts.textLength));
+  }
 
   if (text) {
     //eslint-disable-next-line functional/immutable-data
@@ -157,32 +207,51 @@ export const textPathUpdate = (el:SVGTextPathElement, text?:string, opts?:Svg.Te
 
 /**
  * Creates or reuses a SVGTextPathElement.
- * @param pathRef 
- * @param text 
- * @param parent 
- * @param opts 
- * @param queryOrExisting 
- * @returns 
+ * @param pathRef
+ * @param text
+ * @param parent
+ * @param opts
+ * @param queryOrExisting
+ * @returns
  */
-export const textPath = (pathRef:string, text:string, parent:SVGElement, opts?:Svg.TextPathDrawingOpts, queryOrExisting?:string | SVGTextPathElement):SVGTextPathElement => {
-  const textEl = Svg.createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting + `-text`);
+export const textPath = (
+  pathRef: string,
+  text: string,
+  parent: SVGElement,
+  opts?: Svg.TextPathDrawingOpts,
+  queryOrExisting?: string | SVGTextPathElement
+): SVGTextPathElement => {
+  const textEl = Svg.createOrResolve<SVGTextElement>(
+    parent,
+    `text`,
+    queryOrExisting + `-text`
+  );
   // Update text properties, but don't pass in position or text
   textUpdate(textEl, undefined, undefined, opts);
 
-  const p = Svg.createOrResolve<SVGTextPathElement>(textEl, `textPath`, queryOrExisting);
+  const p = Svg.createOrResolve<SVGTextPathElement>(
+    textEl,
+    `textPath`,
+    queryOrExisting
+  );
   p.setAttributeNS(null, `href`, pathRef);
   return textPathUpdate(p, text, opts);
 };
 
 /**
  * Updates an existing SVGTextElement instance with position, text and drawing options
- * @param el 
- * @param pos 
- * @param text 
- * @param opts 
- * @returns 
+ * @param el
+ * @param pos
+ * @param text
+ * @param opts
+ * @returns
  */
-export const textUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, opts?:Svg.TextDrawingOpts) => {
+export const textUpdate = (
+  el: SVGTextElement,
+  pos?: Points.Point,
+  text?: string,
+  opts?: Svg.TextDrawingOpts
+) => {
   if (pos) {
     el.setAttributeNS(null, `x`, pos.x.toString());
     el.setAttributeNS(null, `y`, pos.y.toString());
@@ -215,31 +284,50 @@ export const textUpdate = (el:SVGTextElement, pos?:Points.Point, text?:string, o
  * Creates or reuses a SVGTextElement
  * @param pos Position of text
  * @param text Text
- * @param parent 
- * @param opts 
- * @param queryOrExisting 
- * @returns 
+ * @param parent
+ * @param opts
+ * @param queryOrExisting
+ * @returns
  */
-export const text = (text:string, parent:SVGElement, pos?:Points.Point, opts?:Svg.TextDrawingOpts, queryOrExisting?:string | SVGTextElement):SVGTextElement => {
-  const p = Svg.createOrResolve<SVGTextElement>(parent, `text`, queryOrExisting);
+export const text = (
+  text: string,
+  parent: SVGElement,
+  pos?: Points.Point,
+  opts?: Svg.TextDrawingOpts,
+  queryOrExisting?: string | SVGTextElement
+): SVGTextElement => {
+  const p = Svg.createOrResolve<SVGTextElement>(
+    parent,
+    `text`,
+    queryOrExisting
+  );
   return textUpdate(p, pos, text, opts);
 };
 
 /**
  * Creates a square grid based at a center point, with cells having `spacing` height and width.
- * 
+ *
  * It fits in as many cells as it can within `width` and `height`.
- * 
+ *
  * Returns a SVG group, consisting of horizontal and vertical lines
  * @param parent Parent element
  * @param center Center point of grid
  * @param spacing Width/height of cells
  * @param width How wide grid should be
  * @param height How high grid should be
- * @param opts 
+ * @param opts
  */
-export const grid = (parent:SVGElement, center:Points.Point, spacing:number, width:number, height:number, opts:Svg.LineDrawingOpts = {}) => {
-  if (!opts.strokeStyle) opts = { ...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
+export const grid = (
+  parent: SVGElement,
+  center: Points.Point,
+  spacing: number,
+  width: number,
+  height: number,
+  opts: Svg.LineDrawingOpts = {}
+) => {
+  if (!opts.strokeStyle) {
+    opts = { ...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
+  }
   if (!opts.strokeWidth) opts = { ...opts, strokeWidth: 1 };
 
   const g = Svg.createEl<SVGGElement>(`g`);
