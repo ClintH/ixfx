@@ -6,13 +6,13 @@ import * as KeyValueUtil from '../KeyValue.js';
  * Data should be an outer array containing two-element arrays for each
  * data point. The first element of the inner array is expected to be the key, the second the frequency.
  * For example,  `[`apples`, 2]` means the key `apples` was counted twice.
- * 
+ *
  * Usage:
  * .sortBy() automatically sorts prior to visualisation. By default off.
  * .update(data) full set of data to plot
  * .clear() empties plot - same as calling `update([])`
  * .el - The `HistogramVis` instance, or undefined if not created/disposed
- * 
+ *
  * ```
  * const plot = new FrequencyHistogramPlot(document.getElementById('histogram'));
  * plot.sortBy('key'); // Automatically sort by key
@@ -26,16 +26,19 @@ import * as KeyValueUtil from '../KeyValue.js';
 export class FrequencyHistogramPlot {
   //readonly parentEl:HTMLElement;
   // eslint-disable-next-line functional/prefer-readonly-type
-  
-  readonly el:HistogramVis|undefined;
-  // eslint-disable-next-line functional/prefer-readonly-type
-  #sorter:KeyValueUtil.SortingFn|undefined;
 
+  readonly el: HistogramVis | undefined;
+  // eslint-disable-next-line functional/prefer-readonly-type
+  #sorter: KeyValueUtil.SortingFn | undefined;
+
+  //eslint-disable-next-line functional/prefer-immutable-types
   constructor(el: HistogramVis) {
     this.el = el;
   }
 
-  setAutoSort(sortStyle:`value` | `valueReverse` | `key` | `keyReverse`):void {
+  setAutoSort(
+    sortStyle: `value` | `valueReverse` | `key` | `keyReverse`
+  ): void {
     // eslint-disable-next-line functional/immutable-data
     this.#sorter = KeyValueUtil.getSorter(sortStyle);
   }
@@ -59,7 +62,7 @@ export class FrequencyHistogramPlot {
     el.remove();
   }
 
-  update(data:ReadonlyArray<readonly [key:string, count:number]>) {
+  update(data: ReadonlyArray<readonly [key: string, count: number]>) {
     if (this.el === undefined) {
       console.warn(`FrequencyHistogramPlot this.el undefined`);
       return;
@@ -70,7 +73,7 @@ export class FrequencyHistogramPlot {
       this.el.data = this.#sorter(data as KeyValueUtil.KeyValue[]);
     } else {
       // eslint-disable-next-line functional/immutable-data
-      this.el.data  = [...data];
+      this.el.data = [...data];
     }
   }
 }

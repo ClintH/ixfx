@@ -1,5 +1,5 @@
-import { number as guardNumber} from "../Guards.js";
-import {NumberFunction} from "./index.js";
+import { number as guardNumber } from '../Guards.js';
+import { type NumberFunction } from './index.js';
 
 /**
  * Scales a percentage-scale number, ie: `v * t`.
@@ -9,10 +9,13 @@ import {NumberFunction} from "./index.js";
  * @param t Scale amount
  * @returns Scaled value
  */
-export const proportion = (v:number|NumberFunction, t:number|NumberFunction) => {
+export const proportion = (
+  v: number | NumberFunction,
+  t: number | NumberFunction
+) => {
   if (typeof v === `function`) v = v();
   if (typeof t === `function`) t = t();
-  
+
   guardNumber(v, `percentage`, `v`);
   guardNumber(t, `percentage`, `t`);
   return v * t;

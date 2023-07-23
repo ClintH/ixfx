@@ -1,5 +1,5 @@
-import { NumberTracker } from "./NumberTracker.js";
-import { TrackedValueOpts as TrackOpts } from "./TrackedValue.js";
+import { NumberTracker } from './NumberTracker.js';
+import { type TrackedValueOpts as TrackOpts } from './TrackedValue.js';
 
 /**
  * A `Tracker` that tracks interval between calls to `mark()`
@@ -22,26 +22,26 @@ export class IntervalTracker extends NumberTracker {
 /**
  * Returns a new {@link IntervalTracker} instance. IntervalTracker
  * records the interval between each call to `mark`.
- * 
+ *
  * ```js
  * import { intervalTracker } from 'https://unpkg.com/ixfx/dist/data.js';
- * 
+ *
  * const t = intervalTracker();
- * 
+ *
  * // Call `mark` to record an interval
  * t.mark();
  * ...
  * t.mark();
- * 
+ *
  * // Get average time in milliseconds between calls to `mark`
  * t.avg;
- * 
+ *
  * // Longest and shortest times are available too...
  * t.min / t.max
  * ```
- * 
+ *
  * Interval tracker can automatically reset after a given number of samples:
- * 
+ *
  * ```
  * // Reset after 100 samples
  * const t = intervalTracker({ resetAfterSamples: 100} );
@@ -49,4 +49,4 @@ export class IntervalTracker extends NumberTracker {
  * @param opts Options for tracker
  * @returns New interval tracker
  */
-export const intervalTracker = (opts?:TrackOpts) => new IntervalTracker(opts);
+export const intervalTracker = (opts?: TrackOpts) => new IntervalTracker(opts);

@@ -1,12 +1,12 @@
-import {LitElement, css, html} from 'lit';
-import {customElement} from 'lit/decorators/custom-element.js';
-import {property} from 'lit/decorators/property.js';
-import {repeat} from 'lit/directives/repeat.js';
-import {KeyValue} from '../KeyValue.js';
+import { LitElement, css, html } from 'lit';
+import { customElement } from 'lit/decorators/custom-element.js';
+import { property } from 'lit/decorators/property.js';
+import { repeat } from 'lit/directives/repeat.js';
+import { type KeyValue } from '../KeyValue.js';
 
 type Bar = {
-  readonly percentage: number
-  readonly data: KeyValue
+  readonly percentage: number;
+  readonly data: KeyValue;
 };
 
 const jsonData = (obj: unknown) => {
@@ -27,15 +27,21 @@ const jsonData = (obj: unknown) => {
           return;
         }
         if (o[i].length !== 2) {
-          console.error(`Histogram inner arrays should consist of two elements`);
+          console.error(
+            `Histogram inner arrays should consist of two elements`
+          );
           return;
         }
         if (typeof o[i][0] !== `string`) {
-          console.error(`First element of inner array should be a string (index ${i})`);
+          console.error(
+            `First element of inner array should be a string (index ${i})`
+          );
           return;
         }
         if (typeof o[i][1] !== `number`) {
-          console.error(`Second element of inner array should be a number (index ${i})`);
+          console.error(
+            `Second element of inner array should be a number (index ${i})`
+          );
           return;
         }
       }
@@ -67,11 +73,11 @@ const jsonData = (obj: unknown) => {
  * ]
  * </histogram-vis>
  * ```
- * 
+ *
  * CSS colour theming:
  * --histogram-bar-color
  * --histogram-label-color
- * 
+ *
  * HTML tag attributes
  * showXAxis (boolean)
  * showDataLabels (boolean)
@@ -104,11 +110,12 @@ export class HistogramVis extends LitElement {
       padding-left: 0.3vw;
       padding-right: 0.3vw;
     }
-    div.bar>div.barTrack {
+    div.bar > div.barTrack {
       background-color: var(--histogram-bar-color, gray);
       align-self: stretch;
     }
-    div.xAxisLabels, div.data {
+    div.xAxisLabels,
+    div.data {
       font-size: min(1vw, 1em);
       color: var(--histogram-label-color, currentColor);
     }
@@ -130,7 +137,6 @@ export class HistogramVis extends LitElement {
   //   showXAxis: { attribute: false}
   // };
 
-
   // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare data: readonly KeyValue[];
@@ -148,7 +154,7 @@ export class HistogramVis extends LitElement {
   declare showXAxis: boolean;
 
   // eslint-disable-next-line functional/prefer-readonly-type
-  @property({converter: jsonData, type: Object})
+  @property({ converter: jsonData, type: Object })
   declare json: readonly KeyValue[] | undefined;
 
   constructor() {
@@ -168,7 +174,7 @@ export class HistogramVis extends LitElement {
   }
 
   barTemplate(bar: Bar, index: number, _totalBars: number) {
-    const {percentage} = bar;
+    const { percentage } = bar;
     const [key, freq] = bar.data;
 
     // grid-area: rowStart / gridColStart / gridRowEnd / gridColEnd
@@ -179,38 +185,57 @@ export class HistogramVis extends LitElement {
 
     const dataLabel = html`<div class="data">${freq}</div>`;
     const xAxis = html`${key}`;
-    return html`
-    <div class="bar" style="grid-area: ${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}">
-      <div class="barTrack" style="height: ${(percentage ?? 0) * 100}%"></div>
-      ${this.showDataLabels ? dataLabel : ``}
-    </div>
-    <div class="xAxisLabels" style="grid-area: ${rowStart + 2} / ${colStart} / ${rowEnd + 2} / ${colEnd}">
-      ${this.showXAxis ? xAxis : ``}
-    </div>`;
+    return html` <div
+        class="bar"
+        style="grid-area: ${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}"
+      >
+        <div class="barTrack" style="height: ${(percentage ?? 0) * 100}%"></div>
+        ${this.showDataLabels ? dataLabel : ``}
+      </div>
+      <div
+        class="xAxisLabels"
+        style="grid-area: ${rowStart + 2} / ${colStart} / ${rowEnd +
+        2} / ${colEnd}"
+      >
+        ${this.showXAxis ? xAxis : ``}
+      </div>`;
   }
 
   render() {
-    if ((this.data === undefined || this.data.length === 0) && this.json === undefined) return html``;
-
+    if (
+      (this.data === undefined || this.data.length === 0) &&
+      this.json === undefined
+    ) {
+      return html``;
+    }
     const d = this.data ?? this.json;
     const length = d.length;
-    const highestCount = Math.max(...d.map(d => d[1] as number));
-    const bars = d.map(kv => ({data: kv, percentage: kv[1] as number / highestCount}));
+    const highestCount = Math.max(...d.map((d) => d[1] as number));
+    const bars = d.map((kv) => ({
+      data: kv,
+      percentage: (kv[1] as number) / highestCount,
+    }));
 
-    const xAxis = html`<div class="xAxis" style="grid-area: 2 / 1 / 3 / ${d.length + 1}"></div>`;
+    const xAxis = html`<div
+      class="xAxis"
+      style="grid-area: 2 / 1 / 3 / ${d.length + 1}"
+    ></div>`;
     const height = this.height ? `height: ${this.height};` : ``;
-    const h = html`
-    <style>
-    div.chart {
-      grid-template-columns: repeat(${d.length}, minmax(2px, 1fr));
-    }
-    </style>
-    <div class="container" style="${height}">
-      <div class="chart">
-      ${repeat(bars, (bar) => bar.data[0], (b, index) => this.barTemplate(b, index, length))}
-        ${this.showXAxis ? xAxis : ``}
-      </div>
-    </div>`;
+    const h = html` <style>
+        div.chart {
+          grid-template-columns: repeat(${d.length}, minmax(2px, 1fr));
+        }
+      </style>
+      <div class="container" style="${height}">
+        <div class="chart">
+          ${repeat(
+            bars,
+            (bar) => bar.data[0],
+            (b, index) => this.barTemplate(b, index, length)
+          )}
+          ${this.showXAxis ? xAxis : ``}
+        </div>
+      </div>`;
     return h;
   }
 }
@@ -218,6 +243,6 @@ export class HistogramVis extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     // eslint-disable-next-line quotes
-    readonly "histogram-vis": HistogramVis
+    readonly 'histogram-vis': HistogramVis;
   }
 }

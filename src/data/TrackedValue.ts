@@ -1,44 +1,44 @@
-import { GetOrGenerate, getOrGenerate } from "../collections/Map.js";
-import { TrackerBase } from "./TrackerBase.js";
+import { type GetOrGenerate, getOrGenerate } from '../collections/map/index.js';
+import { TrackerBase } from './TrackerBase.js';
 
 export type Timestamped<V> = V & {
-  readonly at:number
+  readonly at: number;
 };
 
 /**
  * Options
  */
 export type TrackedValueOpts = {
-  readonly id?:string
-  
+  readonly id?: string;
+
   /**
    * If true, intermediate points are stored. False by default
    */
-  readonly storeIntermediate?:boolean
+  readonly storeIntermediate?: boolean;
   /**
    * If above zero, tracker will reset after this many samples
    */
-  readonly resetAfterSamples?:number
-  
+  readonly resetAfterSamples?: number;
+
   /**
    * If above zero, there will be a limit to intermediate values kept.
-   * 
+   *
    * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
    * to `sampleLimit`. We only do this when the values are double the size so that
    * the collections do not need to be trimmed repeatedly whilst we are at the limit.
-   * 
+   *
    * Automatically implies storeIntermediate
    */
-  readonly sampleLimit?:number
-}
+  readonly sampleLimit?: number;
+};
 
 /**
  * Keeps track of keyed values of type `V` (eg Point) It stores occurences in type `T`, which
  * must extend from `TrackerBase<V>`, eg `PointTracker`.
- * 
+ *
  * The `creator` function passed in to the constructor is responsible for instantiating
  * the appropriate `TrackerBase` sub-class.
- * 
+ *
  * @example Sub-class
  * ```js
  * export class TrackedPointMap extends TrackedValueMap<Points.Point> {
@@ -52,13 +52,13 @@ export type TrackedValueOpts = {
  *  }
  * }
  * ```
- * 
+ *
  */
-export class TrackedValueMap<V, T extends TrackerBase<V>>  {
-  store:Map<string, T>;
-  gog:GetOrGenerate<string, T, V>;
+export class TrackedValueMap<V, T extends TrackerBase<V>> {
+  store: Map<string, T>;
+  gog: GetOrGenerate<string, T, V>;
 
-  constructor(creator:(key:string, start:V|undefined)=>T) {
+  constructor(creator: (key: string, start: V | undefined) => T) {
     this.store = new Map();
     this.gog = getOrGenerate<string, T, V>(this.store, creator);
   }
@@ -72,10 +72,10 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
 
   /**
    * Returns _true_ if `id` is stored
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
-  has(id:string) {
+  has(id: string) {
     return this.store.has(id);
   }
 
@@ -86,20 +86,22 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
    * @returns Information about start to last value
    */
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async seen(id:string, ...values:V[]):Promise<any> {
+  //eslint-disable-next-line functional/prefer-immutable-types
+  public async seen(id: string, ...values: V[]): Promise<any> {
     const trackedValue = await this.getTrackedValue(id, ...values);
-    
+
     // Pass it over to the TrackedValue
     return trackedValue.seen(...values);
   }
 
   /**
    * Creates or returns a TrackedValue instance for `id`.
-   * @param id 
-   * @param values 
-   * @returns 
+   * @param id
+   * @param values
+   * @returns
    */
-  protected async getTrackedValue(id:string, ...values:V[]) {
+  //eslint-disable-next-line functional/prefer-immutable-types
+  protected async getTrackedValue(id: string, ...values: V[]) {
     if (id === null) throw new Error(`id parameter cannot be null`);
     if (id === undefined) throw new Error(`id parameter cannot be undefined`);
 
@@ -113,7 +115,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
    * Use {@link reset} to clear them all.
    * @param id
    */
-  delete(id:string) {
+  delete(id: string) {
     this.store.delete(id);
   }
 
@@ -141,7 +143,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
 
   /**
    * Iterates TrackedValues ordered with oldest first
-   * @returns 
+   * @returns
    */
   *trackedByAge() {
     const tp = Array.from(this.store.values());
@@ -171,7 +173,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
 
   /**
    * Enumerate last received values
-   * 
+   *
    * @example Calculate centroid of latest-received values
    * ```js
    * const pointers = pointTracker();
@@ -195,12 +197,10 @@ export class TrackedValueMap<V, T extends TrackerBase<V>>  {
 
   /**
    * Returns a tracked value by id, or undefined if not found
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
-  get(id:string):TrackerBase<V>|undefined {
+  get(id: string): TrackerBase<V> | undefined {
     return this.store.get(id);
   }
 }
-
-

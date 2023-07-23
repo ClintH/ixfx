@@ -1,17 +1,17 @@
 // #region Imports
-import {IsEqual, isEqualDefault} from "../Util.js";
-import { queueMutable } from "./Queue.js";
-import { stackMutable } from "./Stack.js";
-import {betweenChomp} from "../Text.js";
-import { TreeNodeMutable, treeNodeMutable } from "./TreeNodeMutable.js";
-import { integerParse, nullUndef } from "../Guards.js";
-import {last} from "../IterableSync.js";
+import { type IsEqual, isEqualDefault } from '../Util.js';
+import { queueMutable } from './queue/index.js';
+import { stackMutable } from './Stack.js';
+import { betweenChomp } from '../Text.js';
+import { TreeNodeMutable, treeNodeMutable } from './TreeNodeMutable.js';
+import { integerParse, nullUndef } from '../Guards.js';
+import { last } from '../IterableSync.js';
 
 // #endregion
 
 export { treeNodeMutable, TreeNodeMutable };
 
-export type Entry = [name:string, value:any]
+export type Entry = readonly [name: string, value: any];
 
 /**
  * TreeNode type
@@ -20,15 +20,15 @@ export type TreeNode = {
   /**
    * Direct children of node
    */
-  children():IterableIterator<TreeNode>
+  children(): IterableIterator<TreeNode>;
   /**
    * Chain of parents of node. First result will be immediate parent,
    * last result will be the terminating parent (root)
    */
-  parents():IterableIterator<TreeNode>
+  parents(): IterableIterator<TreeNode>;
 
-  getLengthChildren?():number
-}
+  getLengthChildren?(): number;
+};
 
 /**
  * Options for parsing a path
@@ -37,21 +37,21 @@ export type PathOpts = {
   /**
    * Separator for path, eg '.'
    */
-  separator?:string
+  readonly separator?: string;
   /**
    * If true, [integer] will be used for arrays
    */
-  allowArrayIndexes?:boolean
-}
+  readonly allowArrayIndexes?: boolean;
+};
 
 /**
  * Returns _true_ if `p` seems to match the `TreeNode` type.
  * Returns _false_ if `p` is undefined or null.
- * 
- * @param p 
- * @returns 
+ *
+ * @param p
+ * @returns
  */
-export function isTreeNode(p:TreeNode|unknown):p is TreeNode {
+export function isTreeNode(p: TreeNode | unknown): p is TreeNode {
   nullUndef(p, `p`);
 
   if (typeof (p as TreeNode).children === 'undefined') return false;
@@ -62,7 +62,7 @@ export function isTreeNode(p:TreeNode|unknown):p is TreeNode {
 /**
  * Returns the count of immediate children for this
  * TreeNode (or map, or plain object)
- * 
+ *
  * ```js
  * const basicObj = {
  *  john: {
@@ -71,21 +71,24 @@ export function isTreeNode(p:TreeNode|unknown):p is TreeNode {
  * }
  * Trees.getLengthChildren(basicObj); // 1
  * ```
- * @param p 
- * @returns 
+ * @param p
+ * @returns
  */
-export const getLengthChildren = (p:TreeNode|object):number => {
+export const getLengthChildren = (p: TreeNode | object): number => {
   // ✔️ Unit tested
   if (isTreeNode(p)) {
-    if (typeof p.getLengthChildren !== `undefined`) return p.getLengthChildren();
+    if (typeof p.getLengthChildren !== `undefined`) {
+      return p.getLengthChildren();
+    }
   }
   return [...directChildren(p)].length;
-}
+};
 
-function prettyPrintEntryPath(entries:Entry[]) {
+function prettyPrintEntryPath(entries: readonly Entry[]) {
   if (entries.length === 0) return '(empty)';
+  //eslint-disable-next-line functional/no-let
   let t = '';
-  for (let i=0;i<entries.length;i++) {
+  for (let i = 0; i < entries.length; i++) {
     t += '  '.repeat(i);
     t += entries[i][0] + ' = ' + JSON.stringify(entries[i][1]) + '\n';
   }
@@ -93,26 +96,36 @@ function prettyPrintEntryPath(entries:Entry[]) {
 }
 
 /**
- * Returns a human-friendl debug string for a tree-like structure
+ * Returns a human-friendly debug string for a tree-like structure
  * ```js
  * console.log(Trees.prettyPrint(obj));
  * ```
- * @param indent 
- * @param node 
- * @param defaultLabel 
- * @returns 
+ * @param indent
+ * @param node
+ * @param defaultLabel
+ * @returns
  */
-export const prettyPrint = (node:object, indent = 0, defaultLabel = 'root'):string => {
+export const prettyPrint = (
+  node: object,
+  indent = 0,
+  defaultLabel = 'root'
+): string => {
   nullUndef(node, `node`);
   const entry = getEntry(node, defaultLabel);
-  const t = `${'  '.repeat(indent)} + label: ${entry[0]} value: ${JSON.stringify(entry[1])}`;
+  const t = `${'  '.repeat(indent)} + label: ${
+    entry[0]
+  } value: ${JSON.stringify(entry[1])}`;
   const children = [...directChildren(node, defaultLabel)];
   if (children.length) {
-    return t + '\n' + children.map(d => prettyPrint(d[1], indent+1,  d[0])).join('\n');
+    return (
+      t +
+      '\n' +
+      children.map((d) => prettyPrint(d[1], indent + 1, d[0])).join('\n')
+    );
   } else {
     return t;
   }
-}
+};
 
 /**
  * Returns the direct children of a tree-like object as a pairing
@@ -151,19 +164,22 @@ export const prettyPrint = (node:object, indent = 0, defaultLabel = 'root'):stri
  * @param node 
  * @param defaultName 
  */
-export function* directChildren(node:object, defaultName?:string):IterableIterator<Entry> {
+export function* directChildren(
+  node: object,
+  defaultName?: string
+): IterableIterator<Entry> {
   // ✔️ Unit tested
   nullUndef(node, `node`);
   if (Array.isArray(node)) {
     if (!defaultName) defaultName = 'array';
-    for (let i=0;i<node.length;i++) {
-      yield [defaultName + '[' + i.toString() + ']', node[i]]
+    for (let i = 0; i < node.length; i++) {
+      yield [defaultName + '[' + i.toString() + ']', node[i]];
     }
   } else if (isTreeNode(node)) {
     for (const n of node.children()) yield getEntry(n);
   } else if (typeof node === 'object') {
     if ('entries' in node) {
-      yield* (node as Map<any,any>).entries()
+      yield* (node as Map<any, any>).entries();
     }
     yield* Object.entries(node);
   }
@@ -171,22 +187,24 @@ export function* directChildren(node:object, defaultName?:string):IterableIterat
 
 /**
  * Finds a given direct child by label
- * @param label 
- * @param node 
- * @returns 
+ * @param label
+ * @param node
+ * @returns
  */
-function findDirectChildByLabel(label:string, node:object):Entry|undefined {
+function findDirectChildByLabel(
+  label: string,
+  node: object
+): Entry | undefined {
   for (const d of directChildren(node)) {
     if (d[0] === label) return d;
   }
-  return;
 }
 
 /**
  * Returns the closest matching entry, tracing `path` in a tree.
  * Returns an entry with _undefined_ value at the point where tracing stopped.
  * Use {@link traceByPath} to step through all the segments.
- * 
+ *
  * ```js
  * const people = {
  *  jane: {
@@ -206,19 +224,23 @@ function findDirectChildByLabel(label:string, node:object):Entry|undefined {
  * @param path Path, eg `jane.address.postcode`
  * @param node Node to look within
  * @param opts Options for parsing path. By default '.' is used as a separator
- * @returns 
+ * @returns
  */
-export function getByPath(path:string, node:object, opts:PathOpts = {}):Entry {
+export function getByPath(
+  path: string,
+  node: object,
+  opts: PathOpts = {}
+): Entry {
   // ✔️ Unit tested
- const v = last(traceByPath(path, node, opts));
- if (!v) throw new Error(`Could not trace path: ${path}`);
- return v;
+  const v = last(traceByPath(path, node, opts));
+  if (!v) throw new Error(`Could not trace path: ${path}`);
+  return v;
 }
 
 /**
  * Enumerates from root over nodes that lead to the given path terminus.
  * Use {@link getByPath} to only fetch the closest matching entry.
- * 
+ *
  * ```js
  * const people = {
  *  jane: {
@@ -236,15 +258,19 @@ export function getByPath(path:string, node:object, opts:PathOpts = {}):Entry {
  * // ["street","West St"]
  * }
  * ```
- * 
+ *
  * Results stop when the path can't be followed. The last entry will have a label of
  * the last sought path segment, and _undefined_ as its value.
- * 
- * @param path 
- * @param node 
- * @returns 
+ *
+ * @param path
+ * @param node
+ * @returns
  */
-export function* traceByPath(path:string, node:object, opts:PathOpts = {}):Iterable<Entry> {
+export function* traceByPath(
+  path: string,
+  node: object,
+  opts: PathOpts = {}
+): Iterable<Entry> {
   // ✔️ Unit tested
   nullUndef(path, `path`);
   nullUndef(node, `node`);
@@ -253,13 +279,13 @@ export function* traceByPath(path:string, node:object, opts:PathOpts = {}):Itera
   const allowArrayIndexes = opts.allowArrayIndexes ?? true;
   const pathSplit = path.split(separator);
 
-  for (let p of pathSplit) {
+  for (const p of pathSplit) {
+    //eslint-disable-next-line functional/no-let
     let e = findDirectChildByLabel(p, node);
     if (allowArrayIndexes) {
       const [withoutBrackets, arrayIndexStr] = betweenChomp(p, '[', ']');
       const arrayIndex = integerParse(arrayIndexStr, 'positive', -1);
-      if (arrayIndex >=0) {
-       
+      if (arrayIndex >= 0) {
         // Get array by name without the []
         e = findDirectChildByLabel(withoutBrackets, node);
 
@@ -282,11 +308,11 @@ export function* traceByPath(path:string, node:object, opts:PathOpts = {}):Itera
 /**
  * Generates a label for a node.
  * Uses the 'label' property if it exists, otherwise uses `defaultLabel`
- * @param node 
- * @param defaultLabel 
- * @returns 
+ * @param node
+ * @param defaultLabel
+ * @returns
  */
-function getEntry(node:object, defaultLabel = ''):Entry {
+function getEntry(node: object, defaultLabel = ''): Entry {
   if ('label' in node) {
     return [node.label as string, node];
   }
@@ -296,13 +322,14 @@ function getEntry(node:object, defaultLabel = ''):Entry {
 /**
  * Depth-first traversal over object, array, Map or TreeNode
  * @param root
- * @returns 
+ * @returns
  */
-export function* depthFirst(root:object):IterableIterator<Entry> {
+export function* depthFirst(root: object): IterableIterator<Entry> {
   if (!root) return;
   const stack = stackMutable<Entry>();
 
   stack.push(getEntry(root, 'root'));
+  //eslint-disable-next-line functional/no-let
   let entry = stack.pop();
   while (entry) {
     yield entry;
@@ -316,13 +343,14 @@ export function* depthFirst(root:object):IterableIterator<Entry> {
 
 /**
  * Breadth-first traversal over object, array, Map or TreeNode
- * @param root 
- * @returns 
+ * @param root
+ * @returns
  */
-export function* breadthFirst(root:object):IterableIterator<Entry> {
+export function* breadthFirst(root: object): IterableIterator<Entry> {
   if (!root) return;
   const queue = queueMutable<Entry>();
   queue.enqueue(getEntry(root, 'root'));
+  //eslint-disable-next-line functional/no-let
   let entry = queue.dequeue();
   while (entry) {
     yield entry;
@@ -339,17 +367,21 @@ export function* breadthFirst(root:object):IterableIterator<Entry> {
  * That is, it is any possible sub-child.
  * @param parent Parent tree
  * @param possibleChild Sought child
- * @param eq Equality function, or {@link isEqualDefault} if undefined.
- * @returns 
+ * @param eq Equality function, or {@link Util.isEqualDefault} if undefined.
+ * @returns
  */
-export const hasAnyChild = <V extends TreeNode>(parent:V, possibleChild:V, eq:IsEqual<V> = isEqualDefault):boolean => {
+export const hasAnyChild = <V extends TreeNode>(
+  parent: V,
+  possibleChild: V,
+  eq: IsEqual<V> = isEqualDefault
+): boolean => {
   return hasChild(parent, possibleChild, Number.MAX_SAFE_INTEGER, eq);
-}
+};
 
 /**
  * Returns _true_ if _possibleChild_ is contained within _maxDepth_ children
  * of _parent_ node. By default only looks at immediate children (maxDepth = 0).
- * 
+ *
  * ```js
  * // Just check parentNode for childNode
  * Trees.hasChild(parentNode, childNode);
@@ -361,10 +393,15 @@ export const hasAnyChild = <V extends TreeNode>(parent:V, possibleChild:V, eq:Is
  * @param parent Parent tree
  * @param possibleChild Sought child
  * @param maxDepth Maximum depth. 0 for immediate children, Number.MAX_SAFE_INTEGER for boundless
- * @param eq Equality function, or {@link isEqualDefault} if undefined.
- * @returns 
+ * @param eq Equality function, or {@link Util.isEqualDefault} if undefined.
+ * @returns
  */
-export const hasChild = <V extends TreeNode>(parent:V, possibleChild:V, maxDepth = 0, eq:IsEqual<V> = isEqualDefault):boolean => {
+export const hasChild = <V extends TreeNode>(
+  parent: V,
+  possibleChild: V,
+  maxDepth = 0,
+  eq: IsEqual<V> = isEqualDefault
+): boolean => {
   nullUndef(parent, `parent`);
   nullUndef(possibleChild, `possibleChild`);
 
@@ -374,7 +411,7 @@ export const hasChild = <V extends TreeNode>(parent:V, possibleChild:V, maxDepth
     if (hasChild(d, possibleChild, maxDepth - 1)) return true;
   }
   return false;
-}
+};
 
 /**
  * Returns _true_ if `child` exists within `possibleParent`. By default it only looks at the immediate
@@ -382,10 +419,15 @@ export const hasChild = <V extends TreeNode>(parent:V, possibleChild:V, maxDepth
  * @param child Child being sought
  * @param possibleParent Possible parent of child
  * @param maxDepth Max depth of traversal. Default of 0 only looks for immediate parent.
- * @param eq Equality comparison function. {@link isEqualDefault} used by default.
- * @returns 
+ * @param eq Equality comparison function. {@link Util.isEqualDefault} used by default.
+ * @returns
  */
-export const hasParent = <V extends TreeNode>(child:V, possibleParent:V, maxDepth = 0, eq:IsEqual<V> = isEqualDefault):boolean => {
+export const hasParent = <V extends TreeNode>(
+  child: V,
+  possibleParent: V,
+  maxDepth = 0,
+  eq: IsEqual<V> = isEqualDefault
+): boolean => {
   nullUndef(possibleParent, `possibleParent`);
   nullUndef(child, `child`);
 
@@ -395,18 +437,22 @@ export const hasParent = <V extends TreeNode>(child:V, possibleParent:V, maxDept
     if (maxDepth < 0) break;
   }
   return false;
-}
+};
 
 /**
  * Returns _true_ if `child` is parented at any level (grand-parented etc) by `possibleParent`
  * @param child Child being sought
  * @param possibleParent Possible parent of child
- * @param eq Equality comparison function {@link isEqualDefault} used by default
- * @returns 
+ * @param eq Equality comparison function {@link Util.isEqualDefault} used by default
+ * @returns
  */
-export const hasAnyParent = <V extends TreeNode>(child:V, possibleParent:V, eq:IsEqual<V> = isEqualDefault):boolean => {
+export const hasAnyParent = <V extends TreeNode>(
+  child: V,
+  possibleParent: V,
+  eq: IsEqual<V> = isEqualDefault
+): boolean => {
   return hasParent(child, possibleParent, Number.MAX_SAFE_INTEGER, eq);
-}
+};
 
 /**
  * Returns _true_ if `prospectiveChild` can be legally added to `parent`.
@@ -414,17 +460,25 @@ export const hasAnyParent = <V extends TreeNode>(child:V, possibleParent:V, eq:I
  *  * `parent` and `prospectiveChild` are equal
  *  * `parent` already contains `prospectiveChild`
  *  * `prospectiveChild` has `parent` as its own child
- * 
+ *
  * Throws an error if `parent` or `prospectiveChild` is null/undefined.
  * @param parent Parent to add to
  * @param prospectiveChild Prospective child
  * @param eq Equality function
  */
-export const couldAddChild = <V extends TreeNode>(parent:V, prospectiveChild:V, eq:IsEqual<V> = isEqualDefault) => {
+export const couldAddChild = <V extends TreeNode>(
+  parent: V,
+  prospectiveChild: V,
+  eq: IsEqual<V> = isEqualDefault
+) => {
   nullUndef(prospectiveChild, `prospectiveChild`);
   nullUndef(parent, `parent`);
 
   if (eq(parent, prospectiveChild)) throw new Error(`Child equals parent`);
-  if (hasAnyChild(parent, prospectiveChild, eq)) throw new Error(`Circular. Parent already has child`);
-  if (hasAnyChild(prospectiveChild, parent, eq)) throw new Error(`Prospective child has parent as child relation`);
-}
+  if (hasAnyChild(parent, prospectiveChild, eq)) {
+    throw new Error(`Circular. Parent already has child`);
+  }
+  if (hasAnyChild(prospectiveChild, parent, eq)) {
+    throw new Error(`Prospective child has parent as child relation`);
+  }
+};

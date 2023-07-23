@@ -1,12 +1,14 @@
-import { repeat } from "../flow/index.js";
-import { TrackedValueOpts, Timestamped } from "./TrackedValue.js";
-import { TrackerBase } from "./TrackerBase.js";
+import { repeat } from '../flow/index.js';
+import type { TrackedValueOpts, Timestamped } from './TrackedValue.js';
+import { TrackerBase } from './TrackerBase.js';
 
-export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
-  values:V[];
-  timestamps:number[];
+export class PrimitiveTracker<
+  V extends number | string
+> extends TrackerBase<V> {
+  values: V[];
+  timestamps: number[];
 
-  constructor(opts?:TrackedValueOpts) {
+  constructor(opts?: TrackedValueOpts) {
     super(opts);
     this.values = [];
     this.timestamps = [];
@@ -15,9 +17,9 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
   /**
    * Reduces size of value store to `limit`. Returns
    * number of remaining items
-   * @param limit 
+   * @param limit
    */
-  trimStore(limit:number):number {
+  trimStore(limit: number): number {
     if (limit >= this.values.length) return this.values.length;
     this.values = this.values.slice(-limit);
     this.timestamps = this.timestamps.slice(-limit);
@@ -27,27 +29,26 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
   onTrimmed() {
     // no-op
   }
-  
-    
-  get last():V|undefined {
+
+  get last(): V | undefined {
     return this.values.at(-1);
   }
 
-  get initial():V|undefined {
+  get initial(): V | undefined {
     return this.values.at(0);
   }
 
   /**
- * Returns number of recorded values (this can include the initial value)
- */
+   * Returns number of recorded values (this can include the initial value)
+   */
   get size() {
     return this.values.length;
   }
-  
+
   /**
    * Returns the elapsed time, in milliseconds since the instance was created
    */
-  get elapsed():number {
+  get elapsed(): number {
     if (this.values.length < 0) throw new Error(`No values seen yet`);
     return Date.now() - this.timestamps[0];
   }
@@ -61,7 +62,8 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
    * Tracks a value
    */
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seenImpl(p:V[]):V[] {
+  //eslint-disable-next-line functional/prefer-immutable-types
+  seenImpl(p: V[]): V[] {
     const last = p.at(-1) as Timestamped<V>;
     const now = Date.now();
     if (this.storeIntermediate) {
@@ -71,8 +73,7 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
       // Add as initial value
       this.values.push(last);
       this.timestamps.push(now);
-    }
-    else if (this.values.length === 2) {
+    } else if (this.values.length === 2) {
       // Replace last value
       this.values[1] = last;
       this.timestamps[1] = now;
@@ -84,5 +85,4 @@ export class PrimitiveTracker<V extends number|string> extends TrackerBase<V> {
 
     return p;
   }
-
 }

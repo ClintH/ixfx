@@ -1,17 +1,16 @@
-import { Timestamped, TrackedValueOpts } from "./TrackedValue.js";
-import { TrackerBase } from "./TrackerBase.js";
+import type { Timestamped, TrackedValueOpts } from './TrackedValue.js';
+import { TrackerBase } from './TrackerBase.js';
 
 /**
  * A tracked value of type `V`.
  */
 export class ObjectTracker<V extends object> extends TrackerBase<V> {
-  values:Timestamped<V>[];
+  values: Timestamped<V>[];
 
-  constructor(opts:TrackedValueOpts = {}) {
+  constructor(opts: TrackedValueOpts = {}) {
     super(opts);
     this.values = [];
   }
-
 
   onTrimmed() {
     // no-op
@@ -20,9 +19,9 @@ export class ObjectTracker<V extends object> extends TrackerBase<V> {
   /**
    * Reduces size of value store to `limit`. Returns
    * number of remaining items
-   * @param limit 
+   * @param limit
    */
-  trimStore(limit:number):number {
+  trimStore(limit: number): number {
     if (limit >= this.values.length) return this.values.length;
     this.values = this.values.slice(-limit);
     return this.values.length;
@@ -40,22 +39,25 @@ export class ObjectTracker<V extends object> extends TrackerBase<V> {
    * Tracks a value
    * @ignore
    */
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  seenImpl(p:V[]|Timestamped<V>[]):Timestamped<V>[] {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-immutable-types
+  seenImpl(p: V[] | Timestamped<V>[]): Timestamped<V>[] {
     // Make sure values have a timestamp
-    const ts = p.map(v => ((`at` in v) ? v : {
-      ...v,
-      at: Date.now()
-    }));
+    const ts = p.map((v) =>
+      `at` in v
+        ? v
+        : {
+            ...v,
+            at: Date.now(),
+          }
+    );
 
     const last = ts.at(-1) as Timestamped<V>;
-  
+
     if (this.storeIntermediate) this.values.push(...ts);
     else if (this.values.length === 0) {
       // Add as initial value
       this.values.push(last);
-    }
-    else if (this.values.length === 2) {
+    } else if (this.values.length === 2) {
       // Replace last value
       this.values[1] = last;
     } else if (this.values.length === 1) {
@@ -81,7 +83,7 @@ export class ObjectTracker<V extends object> extends TrackerBase<V> {
   get initial() {
     return this.values.at(0);
   }
-  
+
   /**
    * Returns number of recorded values (includes the initial value in the count)
    */
@@ -92,7 +94,7 @@ export class ObjectTracker<V extends object> extends TrackerBase<V> {
   /**
    * Returns the elapsed time, in milliseconds since the initial value
    */
-  get elapsed():number {
+  get elapsed(): number {
     return Date.now() - this.values[0].at;
   }
 }
