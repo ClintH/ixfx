@@ -559,16 +559,28 @@ export const adsr = (opts: EnvelopeOpts): Adsr => new AdsrImpl(opts);
  * @param sampleRateMs Sample rate
  * @returns
  */
-export async function* adsrIterable(opts: EnvelopeOpts, sampleRateMs: number) {
-  const env = adsr(opts);
+export async function* adsrIterable(
+  opts: AdsrIterableOpts
+): AsyncIterable<number> {
+  const env = adsr(opts.env);
+  const sampleRateMs = opts.sampleRateMs ?? 100;
   env.trigger();
 
-  yield* iterableFromPoll(sampleRateMs, () => {
-    if (env.isDone) return;
-    const v = env.value;
-    return v;
-  });
+  yield* iterableFromPoll(
+    () => {
+      if (env.isDone) return;
+      const v = env.value;
+      return v;
+    },
+    { sampleRateMs, signal: opts.signal }
+  );
 }
+
+export type AdsrIterableOpts = {
+  readonly signal?: AbortSignal;
+  readonly sampleRateMs?: number;
+  readonly env: EnvelopeOpts;
+};
 
 // const iterableSwap = <V>() => {
 //   let current:AsyncIterableIterator<V>|IterableIterator<V>|undefined;
