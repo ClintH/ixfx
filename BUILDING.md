@@ -44,6 +44,8 @@ build & copy files, assuming `ixfx-demos` is cloned in the same parent folder as
 npm run demos
 ```
 
+Once that is done you can use a live server in `ixfx-demos` to run the demos.
+
 Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos
 are always using the latest changes to the library.
 
