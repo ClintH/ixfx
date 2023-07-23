@@ -1,42 +1,43 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"search.exclude": {
-			"**/node_modules": true,
-			"**/etc": true,
-			"**/dist": true,
-			"**/build": true,
-			"**/docs": true
-		},
-		"[javascript]": {
-			"editor.defaultFormatter": "dbaeumer.vscode-eslint"
-		},
-		"[typescript]": {
-			"editor.defaultFormatter": "dbaeumer.vscode-eslint"
-		},
-		"editor.codeActionsOnSave": {
-			"source.fixAll.eslint": true
-		},
-		"eslint.workingDirectories": [
-			{
-				"mode": "auto"
-			}
-		],
-		"eslint.codeActionsOnSave.mode": "problems",
-		"eslint.format.enable": true,
-		"typescript.tsdk": "./node_modules/typescript/lib",
-		"liveServer.settings.port": 5501,
-		"spellright.language": [],
-		"spellright.documentTypes": [
-			"latex",
-			"plaintext"
-		],
-		"[jsonc]": {
-			"editor.defaultFormatter": "vscode.json-language-features"
-		}
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/etc": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/docs": true
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "typescript.preferences.importModuleSpecifierEnding": "js"
+    },
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "eslint.workingDirectories": [
+      {
+        "mode": "auto"
+      }
+    ],
+    "eslint.codeActionsOnSave.mode": "problems",
+    "eslint.format.enable": false,
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "liveServer.settings.port": 5501,
+    "spellright.language": [],
+    "spellright.documentTypes": ["latex", "plaintext"],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.formatOnSaveMode": "file",
+    "vs-code-prettier-eslint.prettierLast": false
+  }
 }
