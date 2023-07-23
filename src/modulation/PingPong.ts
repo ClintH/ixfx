@@ -1,9 +1,9 @@
-import {number as guardNumber} from "../Guards.js";
+import { number as guardNumber } from '../Guards.js';
 
 /**
  * Continually loops up and down between 0 and 1 by a specified interval.
  * Looping returns start value, and is inclusive of 0 and 1.
- * 
+ *
  * @example Usage
  * ```js
  * import {percentPingPong} from 'https://unpkg.com/ixfx/dist/modulation.js';
@@ -11,13 +11,13 @@ import {number as guardNumber} from "../Guards.js";
  *  // v will go up and down. Make sure you have a break somewhere because it is infinite
  * }
  * ```
- * 
+ *
  * @example Alternative:
  * ```js
  * const pp = pingPongPercent(0.1, 0.5); // Setup generator one time
  * const v = pp.next().value; // Call .next().value whenever a new value is needed
  * ```
- * 
+ *
  * Because limits are capped to -1 to 1, using large intervals can produce uneven distribution. Eg an interval of 0.8 yields 0, 0.8, 1
  *
  * `upper` and `lower` define the percentage range. Eg to ping pong between 40-60%:
@@ -28,7 +28,13 @@ import {number as guardNumber} from "../Guards.js";
  * @param start Starting point within range. Defaults to 0 using a positive interval or 1 for negative intervals
  * @param rounding Rounding to apply. This avoids floating-point rounding errors.
  */
-export const pingPongPercent = function (interval: number = 0.1, lower?: number, upper?: number, start?: number, rounding?: number) {
+export const pingPongPercent = function (
+  interval: number = 0.1,
+  lower?: number,
+  upper?: number,
+  start?: number,
+  rounding?: number
+) {
   if (lower === undefined) lower = 0;
   if (upper === undefined) upper = 1;
   if (start === undefined) start = lower;
@@ -49,7 +55,7 @@ export const pingPongPercent = function (interval: number = 0.1, lower?: number,
  *  // 0, 10, 20 .. 100, 90, 80, 70 ...
  * }
  * ```
- * 
+ *
  * Manual:
  * ```
  * const pp = pingPong(10, 0, 100);
@@ -61,13 +67,22 @@ export const pingPongPercent = function (interval: number = 0.1, lower?: number,
  * @param start Starting point within bounds (defaults to `lower`)
  * @param rounding Rounding is off by default. Use say 1000 if interval is a fractional amount to avoid rounding errors.
  */
-export const pingPong = function* (interval: number, lower: number, upper: number, start?: number, rounding?: number) {
+export const pingPong = function* (
+  interval: number,
+  lower: number,
+  upper: number,
+  start?: number,
+  rounding?: number
+) {
   if (lower === undefined) throw new Error(`Parameter 'lower' is undefined`);
-  if (interval === undefined) throw new Error(`Parameter 'interval' is undefined`);
+  if (interval === undefined) {
+    throw new Error(`Parameter 'interval' is undefined`);
+  }
   if (upper === undefined) throw new Error(`Parameter 'upper' is undefined`);
 
-  if (rounding === undefined && (interval <=1 && interval >= 0)) rounding = 10 / interval;
-  else if (rounding === undefined) rounding = 1234;
+  if (rounding === undefined && interval <= 1 && interval >= 0) {
+    rounding = 10 / interval;
+  } else if (rounding === undefined) rounding = 1234;
 
   if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);
   if (Number.isNaN(lower)) throw new Error(`lower parameter is NaN`);
@@ -77,7 +92,9 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   if (lower >= upper) throw new Error(`lower must be less than upper`);
   if (interval === 0) throw new Error(`Interval cannot be zero`);
   const distance = upper - lower;
-  if (Math.abs(interval) >= distance) throw new Error(`Interval should be between -${distance} and ${distance}`);
+  if (Math.abs(interval) >= distance) {
+    throw new Error(`Interval should be between -${distance} and ${distance}`);
+  }
 
   //eslint-disable-next-line functional/no-let
   let incrementing = interval > 0;
@@ -87,10 +104,18 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   lower = Math.floor(lower * rounding);
   interval = Math.floor(Math.abs(interval * rounding));
 
-  if (interval === 0) throw new Error(`Interval is zero (rounding: ${rounding})`);
+  if (interval === 0) {
+    throw new Error(`Interval is zero (rounding: ${rounding})`);
+  }
   if (start === undefined) start = lower;
   else start = Math.floor(start * rounding);
-  if (start > upper || start < lower) throw new Error(`Start (${start/rounding}) must be within lower (${lower/rounding}) and upper (${upper/rounding})`);
+  if (start > upper || start < lower) {
+    throw new Error(
+      `Start (${start / rounding}) must be within lower (${
+        lower / rounding
+      }) and upper (${upper / rounding})`
+    );
+  }
 
   //eslint-disable-next-line functional/no-let
   let v = start;
@@ -98,21 +123,22 @@ export const pingPong = function* (interval: number, lower: number, upper: numbe
   //eslint-disable-next-line functional/no-let
   let firstLoop = true;
   while (true) {
-    //console.log(`v: ${v} incrementing: ${incrementing} interval: ${interval}`);
     v = v + (incrementing ? interval : -interval);
     if (incrementing && v >= upper) {
       incrementing = false;
       v = upper;
       if (v === upper && firstLoop) {
         // Edge case where we start at upper bound and increment
-        v = lower; incrementing = true;
+        v = lower;
+        incrementing = true;
       }
     } else if (!incrementing && v <= lower) {
       incrementing = true;
       v = lower;
       if (v === lower && firstLoop) {
         // Edge case where we start at lower bound and decrement
-        v = upper; incrementing = false;
+        v = upper;
+        incrementing = false;
       }
     }
     yield v / rounding;
