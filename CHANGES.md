@@ -4,7 +4,7 @@ A rough changelog between NPM releases
 
 Random/
   - Test refactor so all functions take a single parameter
-  - generateIntegerUnique: randomly walk a range of intergers without repeating
+  - generateIntegerUnique: randomly walk a range of integers without repeating
 
 # 0.8.6 23.05.06
 

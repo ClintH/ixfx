@@ -29,10 +29,28 @@
         "ignoreClass": true
       }
     ],
+    "functional/prefer-immutable-types": [
+      "error",
+      {
+        "parameters": {
+          "enforcement": "None"
+        },
+        "returnTypes": {
+          "enforcement": "None",
+          "ignoreClasses": true,
+          "ignoreInferredTypes": true
+        },
+        "variables": {
+          "enforcement": "None"
+        }
+      }
+    ],
     "functional/immutable-data": [
       "error",
       {
-        "ignoreClasses": true
+        "ignoreClasses": true,
+        "ignoreAccessorPattern": ["**.style.**"],
+        "ignoreImmediateMutation": true
       }
     ],
     "functional/readonly-type": ["error", "keyword"],
@@ -65,6 +83,8 @@
         "caughtErrorsIgnorePattern": "^_"
       }
     ],
+    "@typescript-eslint/no-non-null-assertion": ["off"],
+    "@typescript-eslint/no-explicit-any": ["off"],
     "@typescript-eslint/ban-ts-comment": ["off"],
     // "indent": ["error", 2],
     // "linebreak-style": ["warn", "unix"],
@@ -105,12 +125,7 @@
     "eqeqeq": "error",
     "no-var": "error",
     "prefer-arrow-callback": "error",
-    "no-confusing-arrow": [
-      "error",
-      {
-        "allowParens": true
-      }
-    ],
+    "no-confusing-arrow": ["off"],
     "no-useless-concat": "error",
     "no-useless-constructor": "off",
     "no-useless-return": "error",
