@@ -1,14 +1,14 @@
-import { getOrGenerateSync } from "./collections/Map.js";
-import { goldenAngleColour } from "./visual/Colour.js";
+import { getOrGenerateSync } from './collections/map/index.js';
+import { goldenAngleColour } from './visual/Colour.js';
 
-export type LogKind = 'info'|'debug'|'error'|'warn';
+export type LogKind = 'info' | 'debug' | 'error' | 'warn';
 export type LogMsg = {
-  kind?: LogKind
-  msg: any
-  category?: string
-}
+  readonly kind?: LogKind;
+  readonly msg: any;
+  readonly category?: string;
+};
 
-export type LogFn = (msg:LogMsg) => void;
+export type LogFn = (msg: LogMsg) => void;
 
 /**
  * Either a flag for default console logging, or a simple log function
@@ -17,15 +17,19 @@ export type LogOption = boolean | LogFn;
 
 /**
  * Resolve a LogOption to a function
- * @param l 
- * @returns 
+ * @param l
+ * @returns
  */
 export const resolveLogOption = (l?: LogOption): LogFn => {
-  
-  if (typeof l === 'undefined') return (m: LogMsg) => {};
+  if (typeof l === 'undefined') {
+    return (_: LogMsg) => {
+      /** no-op */
+    };
+  }
   if (typeof l === 'boolean') {
     return (m: LogMsg) => {
       const kind = m.kind ?? `info`;
+      //eslint-disable-next-line functional/no-let
       let msg = m.msg;
       if (m.category) msg = `[${m.category}] ${msg}`;
       switch (kind) {
@@ -38,32 +42,33 @@ export const resolveLogOption = (l?: LogOption): LogFn => {
         case `info`:
           console.info(msg);
           break;
-        default: 
+        default:
           console.log(msg);
       }
-    }
+    };
   }
   return l;
-}
+};
 
 //eslint-disable-next-line functional/no-let
 let logColourCount = 0;
-const logColours = getOrGenerateSync(new Map<string, string>(), () => goldenAngleColour(++logColourCount));
-
+const logColours = getOrGenerateSync(new Map<string, string>(), () =>
+  goldenAngleColour(++logColourCount)
+);
 
 /**
  * Returns a bundled collection of {@link logger}s
- * 
+ *
  * ```js
  * const con = logSet(`a`);
  * con.log(`Hello`);  // console.log(`a Hello`);
  * con.warn(`Uh-oh`); // console.warn(`a Uh-oh`);
  * con.error(`Eek!`); // console.error(`a Eek!`);
  * ```
- * 
+ *
  * By default each prefix is assigned a colour. To use
  * another logic, provide the `colourKey` parameter.
- * 
+ *
  * ```js
  * // Both set of loggers will use same colour
  * const con = logSet(`a`, true, `system`);
@@ -72,53 +77,54 @@ const logColours = getOrGenerateSync(new Map<string, string>(), () => goldenAngl
  * @param prefix Prefix for log messages
  * @param verbose True by default. If false, log() messages are a no-op
  * @param colourKey If specified, log messages will be coloured by this key instead of prefix (default)
- * @returns 
+ * @returns
  */
-export const logSet = (prefix:string, verbose = true, colourKey?:string) => {
+export const logSet = (prefix: string, verbose = true, colourKey?: string) => {
   if (verbose) {
     return {
       log: logger(prefix, `log`, colourKey),
       warn: logger(prefix, `warn`, colourKey),
-      error: logger(prefix, `error`, colourKey)
+      error: logger(prefix, `error`, colourKey),
     };
   } else {
     return {
       //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      log: (_:any) => { /** no-op */ },
+      log: (_: any) => {
+        /** no-op */
+      },
       warn: logger(prefix, `warn`, colourKey),
-      error: logger(prefix, `error`, colourKey)
+      error: logger(prefix, `error`, colourKey),
     };
   }
-
 };
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Logger = (m:any)=>void;
+export type Logger = (m: any) => void;
 export type LogSet = {
-  readonly log:Logger,
-  readonly warn:Logger,
-  readonly error:Logger
+  readonly log: Logger;
+  readonly warn: Logger;
+  readonly error: Logger;
 };
 
 /**
  * Returns a console logging function which prefixes messages. This is
  * useful for tracing messages from different components. Each prefix
  * is assigned a colour, further helping to distinguish messages.
- * 
+ *
  * Use {@link logSet} to get a bundled set.
- * 
+ *
  * ```
  * // Initialise once
  * const log = logger(`a`);
  * const error = logger(`a`, `error`);
  * const warn = logger(`a`, `warn);
- * 
+ *
  * // And then use
  * log(`Hello`);    // console.log(`a Hello`);
  * error(`Uh-oh`);  // console.error(`a Uh-oh`);
  * warn(`Eek!`);    // console.warn(`a Eeek!`);
  * ```
- * 
+ *
  * Provide the `colourKey` parameter to make log messages
  * be coloured the same, even though the prefix is different.
  * ```js
@@ -127,29 +133,35 @@ export type LogSet = {
  * const log = logger(`a`,`log`,`system`);
  * const log2 = logger(`b`, `log`, `system`);
  * ```
- * @param prefix 
- * @param kind 
+ * @param prefix
+ * @param kind
  * @param colourKey Optional key to colour log lines by instead of prefix
- * @returns 
+ * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const logger = (prefix:string, kind:`log` | `warn` | `error` = `log`, colourKey?:string):Logger => (m:any) => {
-  if (m === undefined) {
-    m = `(undefined)`;
-  } else if (typeof m === `object`) {
-    m = JSON.stringify(m);
-  }
+export const logger =
+  (
+    prefix: string,
+    kind: `log` | `warn` | `error` = `log`,
+    colourKey?: string
+  ): Logger =>
+  (m: any) => {
+    if (m === undefined) {
+      m = `(undefined)`;
+    } else if (typeof m === `object`) {
+      m = JSON.stringify(m);
+    }
 
-  const colour = colourKey ?? prefix;
-  switch (kind) {
-  case `log`:
-    console.log(`%c${prefix} ${m}`, `color: ${logColours(colour)}`);
-    break;
-  case `warn`:
-    console.warn(prefix, m);
-    break;
-  case `error`:
-    console.error(prefix, m);
-    break;
-  }
-};
+    const colour = colourKey ?? prefix;
+    switch (kind) {
+      case `log`:
+        console.log(`%c${prefix} ${m}`, `color: ${logColours(colour)}`);
+        break;
+      case `warn`:
+        console.warn(prefix, m);
+        break;
+      case `error`:
+        console.error(prefix, m);
+        break;
+    }
+  };
