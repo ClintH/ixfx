@@ -1,10 +1,9 @@
-import { Polar, radianToDegree } from "./index.js";
-import { number as guardNumber } from '../Guards.js';
-import * as Lines from "./Line.js";
-import * as Points from "./Point.js";
+import { Polar } from './index.js';
+import * as Lines from './Line.js';
+import * as Points from './Point.js';
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
-const EmptyCartesian = Object.freeze({ x:0, y: 0 });
+const EmptyCartesian = Object.freeze({ x: 0, y: 0 });
 
 const piPi = Math.PI * 2;
 const pi = Math.PI;
@@ -16,19 +15,21 @@ const pi = Math.PI;
 
 export type Vector = Points.Point | Polar.Coord;
 
-
 /**
  * Create a vector from a point
- * 
+ *
  * If `unipolar` normalisation is used, direction will be fixed to 0..2π
  * if `bipolar` normalisation is used, direction will be fixed to -π...π
  * @param pt Point
  * @param angleNormalisation Technique to normalise angle
  * @param origin Origin to calculate vector from or 0,0 if left empty
- * @returns 
+ * @returns
  */
-export const fromPointPolar = (pt:Points.Point, angleNormalisation:`` | `unipolar` | `bipolar` = ``, origin:Points.Point = EmptyCartesian):Polar.Coord => {
-
+export const fromPointPolar = (
+  pt: Points.Point,
+  angleNormalisation: `` | `unipolar` | `bipolar` = ``,
+  origin: Points.Point = EmptyCartesian
+): Polar.Coord => {
   pt = Points.subtract(pt, origin);
 
   //eslint-disable-next-line functional/no-let
@@ -41,34 +42,35 @@ export const fromPointPolar = (pt:Points.Point, angleNormalisation:`` | `unipola
 
   return Object.freeze({
     distance: Points.distance(pt),
-    angleRadian: dir
+    angleRadian: dir,
   });
 };
 
 /**
  * Returns a Cartesian-coordiante vector from a line a -> b
- * @param line 
- * @returns 
+ * @param line
+ * @returns
  */
-export const fromLineCartesian = (line:Lines.Line):Points.Point => Points.subtract(line.b, line.a);
+export const fromLineCartesian = (line: Lines.Line): Points.Point =>
+  Points.subtract(line.b, line.a);
 
 /**
  * Returns a polar-coordinate vector from a line a -> b
- * @param line 
- * @returns 
+ * @param line
+ * @returns
  */
-export const fromLinePolar = (line:Lines.Line):Polar.Coord => {
+export const fromLinePolar = (line: Lines.Line): Polar.Coord => {
   Lines.guard(line, `line`);
   const pt = Points.subtract(line.b, line.a);
   return fromPointPolar(pt);
 };
 
-const isPolar = (v:Vector):v is Polar.Coord => {
+const isPolar = (v: Vector): v is Polar.Coord => {
   if (Polar.isCoord(v)) return true;
   return false;
 };
 
-const isCartesian = (v:Vector):v is Points.Point => {
+const isCartesian = (v: Vector): v is Points.Point => {
   if (Points.isPoint(v)) return true;
   return false;
 };
@@ -77,10 +79,10 @@ const isCartesian = (v:Vector):v is Points.Point => {
  * Returns the normalised vector (aka unit vector). This is where
  * direction is kept, but magnitude set to 1. This then just
  * suggests direction.
- * @param v 
- * @returns 
+ * @param v
+ * @returns
  */
-export const normalise = (v:Vector):Vector => {
+export const normalise = (v: Vector): Vector => {
   if (isPolar(v)) {
     return Polar.normalise(v);
   } else if (isCartesian(v)) {
@@ -89,22 +91,21 @@ export const normalise = (v:Vector):Vector => {
   throw new Error(`Expected polar/cartesian vector. Got: ${v}`);
 };
 
-
-export const quadrantOffsetAngle = (p:Points.Point):number => {
+export const quadrantOffsetAngle = (p: Points.Point): number => {
   if (p.x >= 0 && p.y >= 0) return 0; // Q1
   if (p.x < 0 && p.y >= 0) return pi; // Q2
-  if (p.x < 0 && p.y < 0) return pi;  // Q3
+  if (p.x < 0 && p.y < 0) return pi; // Q3
   return piPi; // Q4
 };
 
 /**
  * Converts a vector to a polar coordinate. If the provided
  * value is already Polar, it is returned.
- * @param v 
- * @param origin 
+ * @param v
+ * @param origin
  * @returns Polar vector
  */
-export const toPolar = (v:Vector, origin = Points.Empty):Polar.Coord => {
+export const toPolar = (v: Vector, origin = Points.Empty): Polar.Coord => {
   if (isPolar(v)) {
     return v;
   } else if (isCartesian(v)) {
@@ -116,10 +117,10 @@ export const toPolar = (v:Vector, origin = Points.Empty):Polar.Coord => {
 /**
  * Converts a Vector to a Cartesian coordinate. If the provided
  * value is already Cartesian, it is returned.
- * @param v 
+ * @param v
  * @returns Cartestian vector
  */
-export const toCartesian = (v:Vector):Points.Point => {
+export const toCartesian = (v: Vector): Points.Point => {
   if (isPolar(v)) {
     return Polar.toPoint(v);
   } else if (isCartesian(v)) {
@@ -130,11 +131,11 @@ export const toCartesian = (v:Vector):Points.Point => {
 
 /**
  * Return a human-friendly representation of vector
- * @param v 
- * @param digits 
- * @returns 
+ * @param v
+ * @param digits
+ * @returns
  */
-export const toString = (v:Vector, digits?:number) => {
+export const toString = (v: Vector, digits?: number) => {
   if (isPolar(v)) {
     return Polar.toString(v, digits);
   } else if (isCartesian(v)) {
@@ -145,11 +146,11 @@ export const toString = (v:Vector, digits?:number) => {
 
 /**
  * Calculate dot product of a vector
- * @param a 
- * @param b 
- * @returns 
+ * @param a
+ * @param b
+ * @returns
  */
-export const dotProduct = (a:Vector, b:Vector) => {
+export const dotProduct = (a: Vector, b: Vector) => {
   if (isPolar(a) && isPolar(b)) {
     return Polar.dotProduct(a, b);
   } else if (isCartesian(a) && isCartesian(b)) {
@@ -163,9 +164,9 @@ export const dotProduct = (a:Vector, b:Vector) => {
  * @param v Vector to clamp
  * @param max Maximum magnitude
  * @param min Minium magnitude
- * @returns 
+ * @returns
  */
-export const clampMagnitude = (v:Vector, max = 1, min = 0) => {
+export const clampMagnitude = (v: Vector, max = 1, min = 0) => {
   if (isPolar(v)) {
     return Polar.clampMagnitude(v, max, min);
   } else if (isCartesian(v)) {
@@ -176,13 +177,13 @@ export const clampMagnitude = (v:Vector, max = 1, min = 0) => {
 
 /**
  * Returns `a + b`.
- * 
+ *
  * Vector is returned in the same type as `a`.
- * @param a 
- * @param b 
- * @returns 
+ * @param a
+ * @param b
+ * @returns
  */
-export const sum = (a:Vector, b:Vector) => {
+export const sum = (a: Vector, b: Vector) => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);
@@ -192,12 +193,12 @@ export const sum = (a:Vector, b:Vector) => {
 
 /**
  * Returns `a - b`.
- * 
+ *
  * Vector is returned in the same type as `a`
- * @param a 
- * @param b 
+ * @param a
+ * @param b
  */
-export const subtract = (a:Vector, b:Vector) => {
+export const subtract = (a: Vector, b: Vector) => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);
@@ -207,12 +208,12 @@ export const subtract = (a:Vector, b:Vector) => {
 
 /**
  * Returns `a * b`.
- * 
+ *
  * Vector is returned in the same type `a`.
- * @param a 
- * @param b 
+ * @param a
+ * @param b
  */
-export const multiply = (a:Vector, b:Vector) => {
+export const multiply = (a: Vector, b: Vector) => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);
@@ -222,12 +223,12 @@ export const multiply = (a:Vector, b:Vector) => {
 
 /**
  * Returns `a / b`.
- * 
+ *
  * Vector is returned in the same type `a`.
- * @param a 
- * @param b 
+ * @param a
+ * @param b
  */
-export const divide = (a:Vector, b:Vector) => {
+export const divide = (a: Vector, b: Vector) => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);

@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { simpleMapArrayMutable } from "./collections/SimpleMapArray.js";
-export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>) => void;
+import type {ISimpleEventEmitter, Listener} from "./ISimpleEventEmitter.js";
+import {mapOfSimpleMutable} from "./collections/map/MapOfSimpleMutable.js";
 
 // type FlowSource = {
 //   name:string,
@@ -25,7 +25,6 @@ export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>)
 //   let timer:number|undefined;
 
 //   const input = sinkify(() => {
-//     //console.log(`debounce reset`);
 //     if (timer) window.clearTimeout(timer);
 //     timer = window.setTimeout(() => { sink[`*`](null); }, opts.timeoutMs);
 //   });
@@ -40,7 +39,7 @@ export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>)
 
 // export const debounce = (triggered:()=>void, timeoutMs:number):Debouncer => {
 //   const opts = { timeoutMs: timeoutMs};
-  
+
 //   const sink:FlowSink = {
 //     '*': () => {
 //       triggered();
@@ -53,13 +52,8 @@ export type Listener<Events> = (ev: unknown, sender: SimpleEventEmitter<Events>)
 //   return {...source, reset};
 // };
 
-export interface ISimpleEventEmitter<Events> {
-  addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void;
-  removeEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void):void;
-};
-
 export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
-  readonly #listeners = simpleMapArrayMutable<Listener<Events>>();
+  readonly #listeners = mapOfSimpleMutable<Listener<Events>>();
 
   /**
    * Fire event
@@ -69,14 +63,9 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @returns
    */
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
-    const listeners = this.#listeners.get(type as string);
-    if (listeners === undefined) return;
+    const listeners = this.#listeners.values(type as string);
     for (const l of listeners) {
-      try {
-        l(args, this);
-      } catch (err) {
-        console.debug(`Event listener error: `, err);
-      }
+      l(args, this);
     }
   }
 
@@ -89,9 +78,9 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @memberof SimpleEventEmitter
    */
   addEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void): void { // (this: any, ev: Events[K]) => any): void {
-    this.#listeners.add(type as string, listener as Listener<Events>);
+    this.#listeners.addKeyedValues(type as string, listener as Listener<Events>);
   }
-  
+
   /**
    * Remove event listener
    *
@@ -99,7 +88,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @memberof SimpleEventEmitter
    */
   removeEventListener<K extends keyof Events>(type: K, listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void) { // listener: Listener<Events>): void {
-    this.#listeners.delete(type as string, listener as Listener<Events>);
+    this.#listeners.deleteKeyValue(type as string, listener as Listener<Events>);
   }
 
   /**

@@ -1,12 +1,12 @@
-import {resolveEl} from "./Util.js";
+import { resolveEl } from './Util.js';
 
 /**
  * Adds tab and shift+tab to TEXTAREA
- * @param el 
+ * @param el
  */
-export const textAreaKeyboard = (el:HTMLTextAreaElement) => {
-
-  el.addEventListener(`keydown`, evt => {
+//eslint-disable-next-line functional/prefer-immutable-types
+export const textAreaKeyboard = (el: HTMLTextAreaElement) => {
+  el.addEventListener(`keydown`, (evt) => {
     const val = el.value;
     const start = el.selectionStart;
     const end = el.selectionEnd;
@@ -28,7 +28,6 @@ export const textAreaKeyboard = (el:HTMLTextAreaElement) => {
       evt.preventDefault();
       return false;
     }
-  
   });
 };
 
@@ -36,11 +35,11 @@ export const textAreaKeyboard = (el:HTMLTextAreaElement) => {
  * Quick access to <input type="checkbox"> value.
  * Provide a checkbox by string id or object reference. If a callback is
  * supplied, it will be called when the checkbox changes value.
- * 
+ *
  * ```
  * const opt = checkbox(`#chkMate`);
  * opt.checked; // Gets/sets
- * 
+ *
  * const opt = checkbox(document.getElementById(`#chkMate`), newVal => {
  *  if (newVal) ...
  * });
@@ -49,7 +48,11 @@ export const textAreaKeyboard = (el:HTMLTextAreaElement) => {
  * @param {(currentVal:boolean) => void} [onChanged]
  * @returns
  */
-export const checkbox = (domIdOrEl: string | HTMLInputElement, onChanged?:(currentVal:boolean) => void) => {
+export const checkbox = (
+  //eslint-disable-next-line functional/prefer-immutable-types
+  domIdOrEl: string | HTMLInputElement,
+  onChanged?: (currentVal: boolean) => void
+) => {
   const el = resolveEl<HTMLInputElement>(domIdOrEl);
 
   if (onChanged) {
@@ -58,35 +61,40 @@ export const checkbox = (domIdOrEl: string | HTMLInputElement, onChanged?:(curre
     });
   }
   return {
-    get checked():boolean  {
+    get checked(): boolean {
       return el.checked;
     },
-    set checked(val:boolean) {
+    set checked(val: boolean) {
       // eslint-disable-next-line functional/immutable-data
       el.checked = val;
-    }
+    },
   };
 };
 
 /**
  * Numeric INPUT
- * 
+ *
  * ```
  * const el = numeric(`#num`, (currentValue) => {
  *  // Called when input changes
  * })
  * ```
- * 
+ *
  * Get/set value
  * ```
  * el.value = 10;
  * ```
- * @param domIdOrEl 
- * @param onChanged 
+ * @param domIdOrEl
+ * @param onChanged
  * @param live If true, event handler fires based on `input` event, rather than `change`
- * @returns 
+ * @returns
  */
-export const numeric = (domIdOrEl: string | HTMLInputElement, onChanged?:(currentVal:number) => void, live?:boolean) => {
+export const numeric = (
+  //eslint-disable-next-line functional/prefer-immutable-types
+  domIdOrEl: string | HTMLInputElement,
+  onChanged?: (currentVal: number) => void,
+  live?: boolean
+) => {
   const el = resolveEl<HTMLInputElement>(domIdOrEl) as HTMLInputElement;
   const evt = live ? `change` : `input`;
   if (onChanged) {
@@ -95,13 +103,13 @@ export const numeric = (domIdOrEl: string | HTMLInputElement, onChanged?:(curren
     });
   }
   return {
-    get value():number  {
+    get value(): number {
       return parseInt(el.value);
     },
-    set value(val:number) {
+    set value(val: number) {
       // eslint-disable-next-line functional/immutable-data
       el.value = val.toString();
-    }
+    },
   };
 };
 
@@ -112,35 +120,39 @@ export type SelectOpts = {
   /**
    * Placeholder item
    */
-  readonly placeholderOpt?:string
+  readonly placeholderOpt?: string;
   /**
    * If true, a placeholder option 'Choose' is added to the list
    */
-  readonly shouldAddChoosePlaceholder?:boolean
+  readonly shouldAddChoosePlaceholder?: boolean;
   /**
    * Item to choose after a selection is made
    */
-  readonly autoSelectAfterChoice?:number
-}
+  readonly autoSelectAfterChoice?: number;
+};
 
 /**
  * Button
- * 
+ *
  * ```
  * const b = button(`#myButton`, () => {
  *  console.log(`Button clicked`);
  * });
  * ```
- * 
+ *
  * ```
  * b.click(); // Call the click handler
  * b.disabled = true / false;
  * ```
  * @param domQueryOrEl Query string or element instance
- * @param onClick Callback when button is clicked 
- * @returns 
+ * @param onClick Callback when button is clicked
+ * @returns
  */
-export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => void) => {
+export const button = (
+  //eslint-disable-next-line functional/prefer-immutable-types
+  domQueryOrEl: string | HTMLButtonElement,
+  onClick?: () => void
+) => {
   const el = resolveEl(domQueryOrEl) as HTMLButtonElement;
 
   if (onClick) {
@@ -152,7 +164,7 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
     click() {
       if (onClick) onClick();
     },
-    set disabled(val:boolean) {
+    set disabled(val: boolean) {
       // eslint-disable-next-line functional/immutable-data
       el.disabled = val;
     },
@@ -163,41 +175,41 @@ export const button = (domQueryOrEl:string|HTMLButtonElement, onClick?:() => voi
  * SELECT handler
  */
 export interface SelectHandler {
-  /** 
+  /**
    * Gets/Sets disabled
    */
-  set disabled(value:boolean);
+  set disabled(value: boolean);
 
-  get disabled():boolean;
-/**
- * Gets value
- */
-  get value():string;
-/**
- * Sets selected index
- */
-  get index():number;
-/**
- * _True_ if currently selected item is the placeholder
- */
-  get isSelectedPlaceholder():boolean;
-/**
- * Set options
- * @param opts Options
- * @param preSelect Item to preselect
- */
-  setOpts(opts:readonly string[], preSelect?:string):void;
-/**
- * Select item by index 
- * @param index Index
- * @param trigger If true, triggers change event
- */
-  select(index?:number, trigger?:boolean):void
+  get disabled(): boolean;
+  /**
+   * Gets value
+   */
+  get value(): string;
+  /**
+   * Sets selected index
+   */
+  get index(): number;
+  /**
+   * _True_ if currently selected item is the placeholder
+   */
+  get isSelectedPlaceholder(): boolean;
+  /**
+   * Set options
+   * @param opts Options
+   * @param preSelect Item to preselect
+   */
+  setOpts(opts: readonly string[], preSelect?: string): void;
+  /**
+   * Select item by index
+   * @param index Index
+   * @param trigger If true, triggers change event
+   */
+  select(index?: number, trigger?: boolean): void;
 }
 
 /**
  * SELECT element.
- * 
+ *
  * Handle changes in value:
  * ```
  * const mySelect = select(`#mySelect`, (newValue) => {
@@ -209,23 +221,23 @@ export interface SelectHandler {
  * ```
  * mySelect.disabled = true / false;
  * ```
- * 
+ *
  * Get currently selected index or value:
  * ```
  * mySelect.value / mySelect.index
  * ```
- * 
+ *
  * Is the currently selected value a placeholder?
  * ```
  * mySelect.isSelectedPlaceholder
  * ```
- * 
+ *
  * Set list of options
  * ```
  * // Adds options, preselecting `opt2`.
  * mySelect.setOpts([`opt1`, `opt2 ...], `opt2`);
  * ```
- * 
+ *
  * Select an element
  * ```
  * mySelect.select(1); // Select second item
@@ -234,11 +246,20 @@ export interface SelectHandler {
  * @param domQueryOrEl Query (eg `#id`) or element
  * @param onChanged Callback when a selection is made
  * @param opts Options
- * @return  
+ * @return
  */
-export const select = (domQueryOrEl:string|HTMLSelectElement, onChanged?:(currentVal:string) => void, opts:SelectOpts = {}):SelectHandler => {
+export const select = (
+  //eslint-disable-next-line functional/prefer-immutable-types
+  domQueryOrEl: string | HTMLSelectElement,
+  onChanged?: (currentVal: string) => void,
+  opts: SelectOpts = {}
+): SelectHandler => {
   const el = resolveEl(domQueryOrEl) as HTMLSelectElement;
-  const {placeholderOpt, shouldAddChoosePlaceholder = false, autoSelectAfterChoice = -1} = opts;
+  const {
+    placeholderOpt,
+    shouldAddChoosePlaceholder = false,
+    autoSelectAfterChoice = -1,
+  } = opts;
 
   const change = () => {
     if (onChanged !== undefined) onChanged(el.value);
@@ -252,28 +273,32 @@ export const select = (domQueryOrEl:string|HTMLSelectElement, onChanged?:(curren
     });
   }
   return {
-    set disabled(val:boolean) {
+    set disabled(val: boolean) {
       // eslint-disable-next-line functional/immutable-data
       el.disabled = val;
     },
-    get value():string {
+    get value(): string {
       return el.value;
     },
-    get index():number {
+    get index(): number {
       return el.selectedIndex;
     },
-    get isSelectedPlaceholder():boolean {
-      return ((shouldAddChoosePlaceholder || opts.placeholderOpt !== undefined) && el.selectedIndex === 0);
+    get isSelectedPlaceholder(): boolean {
+      return (
+        (shouldAddChoosePlaceholder || opts.placeholderOpt !== undefined) &&
+        el.selectedIndex === 0
+      );
     },
-    setOpts(opts:string[], preSelect?:string):void {
+    //eslint-disable-next-line functional/prefer-immutable-types
+    setOpts(opts: string[], preSelect?: string): void {
       // eslint-disable-next-line functional/immutable-data
       el.options.length = 0;
-      
+
       if (shouldAddChoosePlaceholder) opts = [`-- Choose --`, ...opts];
       else if (placeholderOpt !== undefined) opts = [placeholderOpt, ...opts];
       // eslint-disable-next-line functional/no-let
       let toSelect = 0;
-      
+
       opts.forEach((o, index) => {
         const optEl = document.createElement(`option`);
         // eslint-disable-next-line functional/immutable-data
@@ -286,12 +311,12 @@ export const select = (domQueryOrEl:string|HTMLSelectElement, onChanged?:(curren
       // eslint-disable-next-line functional/immutable-data
       el.selectedIndex = toSelect;
     },
-    select(index:number = 0, trigger:boolean = false):void {
+    select(index: number = 0, trigger: boolean = false): void {
       // eslint-disable-next-line functional/immutable-data
       el.selectedIndex = index;
       if (trigger && onChanged) {
         change();
-      } 
-    }
+      }
+    },
   };
 };

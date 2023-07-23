@@ -1,3 +1,5 @@
+export type AsyncPromiseOrGenerator<V> = (()=>V|Promise<V>) | Generator<V> | AsyncGenerator<V>;
+
 import { number as guardNumber } from "../Guards.js";
 import { sleep } from "./Sleep.js";
 
@@ -23,6 +25,7 @@ export * from './Delay.js';
 export * from './Every.js';
 export * from './RunOnce.js';
 export * from './BackOff.js';
+export * from './Poll.js';
 
 export { TaskQueue } from './TaskQueue.js';
 
@@ -195,6 +198,8 @@ export const repeatReduce = <V>(countOrPredicate:number|RepeatPredicate, fn:()=>
   }
   return initial;
 };
+
+
 
 try {
   if (typeof window !== `undefined`) {

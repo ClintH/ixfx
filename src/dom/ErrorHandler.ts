@@ -3,18 +3,18 @@
 /**
  * Creates an error handler to show errors on-screen.
  * This is useful when testing on mobile devices that lack access to the console.
- * 
+ *
  * ```js
  * const e = defaultErrorHandler();
  * ```
- * 
+ *
  * Manual control:
  * ```js
  * const e = defaultErrorHandler();
  * e.show(someError);
  * e.hide();
  * ```
- * @returns 
+ * @returns
  */
 export const defaultErrorHandler = () => {
   //eslint-disable-next-line functional/no-let
@@ -27,9 +27,9 @@ export const defaultErrorHandler = () => {
   container.style.display = `none`;
   container.style.top = `1em`;
   container.style.left = `1em`;
-  container.style.position =`absolute`;
+  container.style.position = `absolute`;
 
-  container.style.fontFamily =`monospace`;
+  container.style.fontFamily = `monospace`;
 
   const msgEl = document.createElement(`div`);
   msgEl.style.maxWidth = `50vw`;
@@ -39,10 +39,10 @@ export const defaultErrorHandler = () => {
   container.innerHTML = `<h1>Error</h1>`;
   container.append(msgEl);
 
-  const styleButton = (b:HTMLButtonElement) => {
+  const styleButton = (b: HTMLButtonElement) => {
     b.style.padding = `0.3em`;
     b.style.marginTop = `1em`;
-  }
+  };
 
   const btnClose = document.createElement(`button`);
   btnClose.innerText = `Close`;
@@ -64,7 +64,7 @@ export const defaultErrorHandler = () => {
   container.append(btnStop);
   document.body.append(container);
 
-  const show = (ex:Error|string|Event) => {
+  const show = (ex: Error | string | Event) => {
     container.style.display = `inline`;
     if ((ex as any).stack) {
       msgEl.innerHTML += `<pre>${(ex as any).stack}</pre>`;
@@ -74,7 +74,7 @@ export const defaultErrorHandler = () => {
   };
 
   const hide = () => {
-    container.style.display =`none`;
+    container.style.display = `none`;
   };
 
   window.onerror = (msg, url, lineNo, colNo, error) => {
@@ -87,14 +87,13 @@ export const defaultErrorHandler = () => {
         show(msg);
       }
     }
-    
   };
 
-  window.addEventListener(`unhandledrejection`, e => {
+  window.addEventListener(`unhandledrejection`, (e) => {
     console.log(e.reason);
-    if (enabled)  {
+    if (enabled) {
       show(e.reason);
     }
-  })
-  return { show, hide};
+  });
+  return { show, hide };
 };
