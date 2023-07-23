@@ -1,42 +1,42 @@
-import { degreeToRadian, Polar } from './index.js';
-import { guard as guardPoint, isPoint } from './Point.js';
-import { Path } from './Path.js';
-import { Lines, Points, Rects } from './index.js';
+import {degreeToRadian, Polar} from './index.js';
+import {guard as guardPoint, isPoint} from './Point.js';
+import {type Path} from './Path.js';
+import {Lines, Points, Rects} from './index.js';
 
 /**
  * Returns true if parameter is an arc
  * @param p Arc or number
  * @returns 
  */
-export const isArc = (p:Arc|number|unknown):p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
+export const isArc = (p: Arc | number | unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
 
 /**
  * Returns true if parameter has a positioned (x,y) 
  * @param p Point, Arc or ArcPositiond
  * @returns 
  */
-export const isPositioned = (p:Points.Point | Arc| ArcPositioned):p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
+export const isPositioned = (p: Points.Point | Arc | ArcPositioned): p is Points.Point => (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 /**
  * Arc, defined by radius, start and end point in radians, and whether it is counter-clockwise.
  */
 export type Arc = {
-/**
- * Radius of arc
- */
-  readonly radius:number
-/**
- * Start radian
- */
-  readonly startRadian:number
-/**
- * End radian
- */
-  readonly endRadian:number
-/**
- * If true, arc is counter-clockwise
- */
-  readonly counterClockwise?:boolean
+  /**
+   * Radius of arc
+   */
+  readonly radius: number
+  /**
+   * Start radian
+   */
+  readonly startRadian: number
+  /**
+   * End radian
+   */
+  readonly endRadian: number
+  /**
+   * If true, arc is counter-clockwise
+   */
+  readonly counterClockwise?: boolean
 }
 
 /**
@@ -44,7 +44,7 @@ export type Arc = {
  */
 export type ArcPositioned = Points.Point & Arc;
 
-const piPi = Math.PI *2;
+const piPi = Math.PI * 2;
 
 /**
  * Returns an arc from degrees, rather than radians
@@ -54,19 +54,19 @@ const piPi = Math.PI *2;
  * @param origin Optional center of arc
  * @returns Arc
  */
-export function fromDegrees(radius:number, startDegrees:number, endDegrees:number):Arc;
-export function fromDegrees(radius:number, startDegrees:number, endDegrees:number, origin:Points.Point):ArcPositioned
+export function fromDegrees(radius: number, startDegrees: number, endDegrees: number): Arc;
+export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin: Points.Point): ArcPositioned
 
 //eslint-disable-next-line func-style
-export function fromDegrees(radius:number, startDegrees:number, endDegrees:number, origin?:Points.Point):Arc|ArcPositioned  {
-  const a:Arc = {
+export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin?: Points.Point): Arc | ArcPositioned {
+  const a: Arc = {
     radius,
-    startRadian:degreeToRadian(startDegrees),
-    endRadian:degreeToRadian(endDegrees)
+    startRadian: degreeToRadian(startDegrees),
+    endRadian: degreeToRadian(endDegrees)
   };
   if (isPoint(origin)) {
     guardPoint(origin);
-    const ap:ArcPositioned = {
+    const ap: ArcPositioned = {
       ...a,
       x: origin.x,
       y: origin.y
@@ -83,7 +83,7 @@ export function fromDegrees(radius:number, startDegrees:number, endDegrees:numbe
  * @param arc
  * @returns Line from start to end of arc
  */
-export const toLine = (arc:ArcPositioned):Lines.Line => Lines.fromPoints(
+export const toLine = (arc: ArcPositioned): Lines.Line => Lines.fromPoints(
   point(arc, arc.startRadian),
   point(arc, arc.endRadian)
 );
@@ -95,7 +95,7 @@ export const toLine = (arc:ArcPositioned):Lines.Line => Lines.fromPoints(
  * @param origin Origin of arc (0,0 used by default)
  * @returns Coordinate
  */
-export const point = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.Point):Points.Point => {
+export const point = (arc: Arc | ArcPositioned, angleRadian: number, origin?: Points.Point): Points.Point => {
   if (angleRadian > arc.endRadian) throw new Error(`angleRadian beyond end angle of arc`);
   if (angleRadian < arc.startRadian) throw new Error(`angleRadian beyond start angle of arc`);
 
@@ -103,7 +103,7 @@ export const point = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.
     if (isPositioned(arc)) {
       origin = arc;
     } else {
-      origin = { x:0, y:0 };
+      origin = {x: 0, y: 0};
     }
   }
   return {
@@ -116,7 +116,7 @@ export const point = (arc:Arc|ArcPositioned, angleRadian:number, origin?:Points.
  * Throws an error if arc instance is invalid
  * @param arc 
  */
-export const guard = (arc:Arc|ArcPositioned) => {
+export const guard = (arc: Arc | ArcPositioned) => {
   if (arc === undefined) throw new Error(`Arc is undefined`);
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);
@@ -131,13 +131,13 @@ export const guard = (arc:Arc|ArcPositioned) => {
   if (Number.isNaN(arc.endRadian)) throw new Error(`Arc endRadian is NaN`);
   if (Number.isNaN(arc.startRadian)) throw new Error(`Arc endRadian is NaN`);
 
-  if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);  
+  if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);
 };
 
 
 type Interpolate = {
-  (amount:number, arc:Arc, origin:Points.Point):Points.Point;
-  (amount:number, arc:ArcPositioned):Points.Point;
+  (amount: number, arc: Arc, origin: Points.Point): Points.Point;
+  (amount: number, arc: ArcPositioned): Points.Point;
 };
 
 /**
@@ -147,9 +147,9 @@ type Interpolate = {
  * @param origin If arc is not positioned, pass in an origin
  * @returns 
  */
-export const interpolate:Interpolate = (amount:number, arc:ArcPositioned|Arc, origin?:Points.Point):Points.Point => {
+export const interpolate: Interpolate = (amount: number, arc: ArcPositioned | Arc, origin?: Points.Point): Points.Point => {
   guard(arc);
-  return point(arc, arc.startRadian + ((arc.endRadian-arc.startRadian)*amount), origin);
+  return point(arc, arc.startRadian + ((arc.endRadian - arc.startRadian) * amount), origin);
 };
 
 /**
@@ -157,16 +157,16 @@ export const interpolate:Interpolate = (amount:number, arc:ArcPositioned|Arc, or
  * @param arc 
  * @returns Path
  */
-export const toPath = (arc:ArcPositioned):Path => {
+export const toPath = (arc: ArcPositioned): Path => {
   guard(arc);
 
   return Object.freeze({
     ...arc,
-    nearest:(point:Points.Point) => { throw new Error(`not implemented`); },
-    interpolate:(amount:number) => interpolate(amount, arc),
-    bbox:() => bbox(arc) as Rects.RectPositioned,
+    nearest: (point: Points.Point) => {throw new Error(`not implemented`);},
+    interpolate: (amount: number) => interpolate(amount, arc),
+    bbox: () => bbox(arc) as Rects.RectPositioned,
     length: () => length(arc),
-    toSvgString:() => toSvg(arc),
+    toSvgString: () => toSvg(arc),
     kind: `arc`
   });
 };
@@ -176,22 +176,22 @@ export const toPath = (arc:ArcPositioned):Path => {
  * @param arc 
  * @returns Length
  */
-export const length = (arc:Arc):number =>  piPi*arc.radius*((arc.startRadian-arc.endRadian)/piPi);
+export const length = (arc: Arc): number => piPi * arc.radius * ((arc.startRadian - arc.endRadian) / piPi);
 
 /**
  * Calculates a {@link Geometry.Rects.Rect | Rect} bounding box for arc.
  * @param arc 
  * @returns Rectangle encompassing arc.
  */
-export const bbox = (arc:ArcPositioned|Arc):Rects.RectPositioned|Rects.Rect => {
+export const bbox = (arc: ArcPositioned | Arc): Rects.RectPositioned | Rects.Rect => {
   if (isPositioned(arc)) {
     const middle = interpolate(0.5, arc);
     const asLine = toLine(arc);
     return Points.bbox(middle, asLine.a, asLine.b);
   } else {
     return {
-      width: arc.radius*2,
-      height: arc.radius*2
+      width: arc.radius * 2,
+      height: arc.radius * 2
     };
   }
 };
@@ -205,15 +205,15 @@ type ToSvg = {
    * @param startRadian Start
    * @param endRadian End
    */
-  (origin:Points.Point, radius:number, startRadian:number, endRadian:number, opts?:SvgOpts):readonly string[];
+  (origin: Points.Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): readonly string[];
   /**
    * SVG path for non-positioned arc
    */
-  (arc:Arc, origin:Points.Point, opts?:SvgOpts):readonly string[];
-/**
- * SVG path for positioned arc
- */
-  (arc:ArcPositioned, opts?:SvgOpts):readonly string[];
+  (arc: Arc, origin: Points.Point, opts?: SvgOpts): readonly string[];
+  /**
+   * SVG path for positioned arc
+   */
+  (arc: ArcPositioned, opts?: SvgOpts): readonly string[];
 };
 
 
@@ -221,7 +221,7 @@ type ToSvg = {
  * Creates an SV path snippet for arc
  * @returns 
  */
-export const toSvg:ToSvg = (a:Points.Point|Arc|ArcPositioned, b?:number|Points.Point|SvgOpts, c?:number|SvgOpts, d?:number, e?:SvgOpts) => {
+export const toSvg: ToSvg = (a: Points.Point | Arc | ArcPositioned, b?: number | Points.Point | SvgOpts, c?: number | SvgOpts, d?: number, e?: SvgOpts) => {
   if (isArc(a)) {
     if (isPositioned(a)) {
       return toSvgFull(a, a.radius, a.startRadian, a.endRadian, b as SvgOpts);
@@ -229,15 +229,15 @@ export const toSvg:ToSvg = (a:Points.Point|Arc|ArcPositioned, b?:number|Points.P
       if (isPoint(b)) {
         return toSvgFull(b, a.radius, a.startRadian, a.endRadian, c as SvgOpts);
       } else {
-        return toSvgFull({ x: 0, y: 0 }, a.radius, a.startRadian, a.endRadian);
+        return toSvgFull({x: 0, y: 0}, a.radius, a.startRadian, a.endRadian);
       }
     }
   } else {
     if (c === undefined) throw new Error(`startAngle undefined`);
     if (d === undefined) throw new Error(`endAngle undefined`);
-   
+
     if (isPoint(a)) {
-      if (typeof b === `number` && typeof c ===  `number` && typeof d === `number`) {
+      if (typeof b === `number` && typeof c === `number` && typeof d === `number`) {
         return toSvgFull(a, b, c, d, e);
       } else {
         throw new Error(`Expected (point, number, number, number). Missing a number param.`);
@@ -245,25 +245,25 @@ export const toSvg:ToSvg = (a:Points.Point|Arc|ArcPositioned, b?:number|Points.P
     } else {
       throw new Error(`Expected (point, number, number, number). Missing first point.`);
     }
-  } 
+  }
 };
 
 export type SvgOpts = {
-  
+
   /**
    * "If the arc should be greater or less than 180 degrees"
    * ie. tries to maximise arc length
    */
-  readonly largeArc?:boolean
-  
+  readonly largeArc?: boolean
+
   /**
    * "If the arc should begin moving at positive angles"
    * ie. the kind of bend it makes to reach end point
    */
-  readonly sweep?:boolean
+  readonly sweep?: boolean
 }
 
-const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRadian:number, opts?:SvgOpts):readonly string[] => {
+const toSvgFull = (origin: Points.Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): readonly string[] => {
   // https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
   // A rx ry x-axis-rotation large-arc-flag sweep-flag x y
   // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
@@ -273,8 +273,8 @@ const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRa
   const isFullCircle = endRadian - startRadian === 360;
   const start = Polar.toCartesian(radius, endRadian - 0.01, origin);
   const end = Polar.toCartesian(radius, startRadian, origin);
-  
-  const { largeArc = false, sweep = false } = opts;
+
+  const {largeArc = false, sweep = false} = opts;
 
   const d = [`
     M ${start.x} ${start.y}
@@ -293,7 +293,7 @@ const toSvgFull = (origin:Points.Point, radius:number, startRadian:number, endRa
  * @param b 
  * @returns Distance 
  */
-export const distanceCenter = (a:ArcPositioned, b:ArcPositioned):number => Points.distance(a, b);
+export const distanceCenter = (a: ArcPositioned, b: ArcPositioned): number => Points.distance(a, b);
 
 /**
  * Returns true if the two arcs have the same values
@@ -308,7 +308,7 @@ export const distanceCenter = (a:ArcPositioned, b:ArcPositioned):number => Point
  * @param b
  * @returns {boolean}
  */
-export const isEqual = (a:Arc|ArcPositioned, b:Arc|ArcPositioned):boolean => {
+export const isEqual = (a: Arc | ArcPositioned, b: Arc | ArcPositioned): boolean => {
   if (a.radius !== b.radius) return false;
 
   if (isPositioned(a) && isPositioned(b)) {

@@ -1,7 +1,6 @@
-import {TreeNode} from "../collections/Trees.js";
-import {TreeNodeMutable} from "../collections/TreeNodeMutable.js";
-import { Points, Rects, Shapes } from "./index.js";
-import { ShapePositioned } from "./Shape.js";
+import { type TreeNode } from '../collections/Trees.js';
+import { Points, Rects, Shapes } from './index.js';
+import { type ShapePositioned } from './Shape.js';
 
 /**
  * Options for quad tree
@@ -10,18 +9,21 @@ export type QuadTreeOpts = {
   /**
    * Maximum items per node
    */
-  readonly maxItems:number
+  readonly maxItems: number;
   /**
    * Maximum level of sub-division
    */
-  readonly maxLevels:number
-}
+  readonly maxLevels: number;
+};
 
 /**
  * Direction
  */
 export enum Direction {
-  Nw, Ne, Sw, Se
+  Nw,
+  Ne,
+  Sw,
+  Se,
 }
 
 /**
@@ -49,23 +51,27 @@ export type QuadTreeItem = Points.Point | ShapePositioned;
 //   return n;
 // };
 
-
 /**
  * QuadTreeNode
- * 
+ *
  * To create, you probably want the {@link quadTree} function.
  */
 export class QuadTreeNode implements TreeNode {
-  #items:QuadTreeItem[] = [];
-  #children:QuadTreeNode[] = [];
-  #parent:QuadTreeNode|undefined;
+  #items: QuadTreeItem[] = [];
+  #children: QuadTreeNode[] = [];
+  #parent: QuadTreeNode | undefined;
   /**
    * Constructor
-   * @param boundary 
-   * @param level 
-   * @param opts 
+   * @param boundary
+   * @param level
+   * @param opts
    */
-  constructor(parent:QuadTreeNode|undefined, readonly boundary:Rects.RectPositioned, readonly level:number, readonly opts:QuadTreeOpts) {
+  constructor(
+    parent: QuadTreeNode | undefined,
+    readonly boundary: Rects.RectPositioned,
+    readonly level: number,
+    readonly opts: QuadTreeOpts
+  ) {
     this.#parent = parent;
   }
 
@@ -73,51 +79,55 @@ export class QuadTreeNode implements TreeNode {
     return this.#children.length;
   }
 
-  *parents():IterableIterator<QuadTreeNode> {
-    let n:QuadTreeNode|undefined = this;
+  *parents(): IterableIterator<QuadTreeNode> {
+    //eslint-disable-next-line functional/no-let,@typescript-eslint/no-this-alias
+    let n: QuadTreeNode | undefined = this;
     while (n.#parent !== undefined) {
-      yield n.#parent
+      yield n.#parent;
       n = n.#parent;
     }
   }
 
-  *children():IterableIterator<QuadTreeNode> {
+  *children(): IterableIterator<QuadTreeNode> {
     for (const c of this.#children) {
       yield c;
     }
   }
   /**
    * Get a descendant node in a given direction
-   * @param d 
-   * @returns 
+   * @param d
+   * @returns
    */
-  direction(d:Direction):QuadTreeNode|undefined {
-    return this.#children[d] as QuadTreeNode|undefined;
+  direction(d: Direction): QuadTreeNode | undefined {
+    return this.#children[d] as QuadTreeNode | undefined;
   }
-  
+
   /**
    * Add an item to the quadtree
-   * @param p 
+   * @param p
    * @returns False if item is outside of boundary, True if item was added
    */
-  add(p:QuadTreeItem):boolean {
+  add(p: QuadTreeItem): boolean {
     if (!Shapes.isIntersecting(this.boundary, p)) return false;
 
     if (this.#children.length) {
-      this.#children.forEach(d => (d as QuadTreeNode).add(p));
+      this.#children.forEach((d) => (d as QuadTreeNode).add(p));
       return true;
     }
 
     this.#items.push(p);
-    
-    if (this.#items.length > this.opts.maxItems && this.level < this.opts.maxLevels) {
-      if (!this.#children.length) { 
+
+    if (
+      this.#items.length > this.opts.maxItems &&
+      this.level < this.opts.maxLevels
+    ) {
+      if (!this.#children.length) {
         this.#subdivide();
       }
-      
+
       // Add to child
-      this.#items.forEach(item => {
-        this.#children.forEach(d => (d as QuadTreeNode).add(item));
+      this.#items.forEach((item) => {
+        this.#children.forEach((d) => (d as QuadTreeNode).add(item));
       });
       //this.descendants.forEach(d => (d as QuadTreeNode).add(p));
       this.#items = [];
@@ -127,10 +137,10 @@ export class QuadTreeNode implements TreeNode {
 
   /**
    * Returns true if point is inside node's boundary
-   * @param p 
-   * @returns 
+   * @param p
+   * @returns
    */
-  couldHold(p:Points.Point) {
+  couldHold(p: Points.Point) {
     return Rects.intersectsPoint(this.boundary, p);
   }
 
@@ -139,16 +149,15 @@ export class QuadTreeNode implements TreeNode {
     const h = this.boundary.height / 2;
     const x = this.boundary.x;
     const y = this.boundary.y;
-    
+
     // top-left corners of each of the four new sections
-    const coords = Points.fromNumbers(
-      x+w, y, x, y, x, y+h, x+w, y+h
-    );
-    const rects = coords.map(p => Rects.fromTopLeft(p, w, h));
+    const coords = Points.fromNumbers(x + w, y, x, y, x, y + h, x + w, y + h);
+    const rects = coords.map((p) => Rects.fromTopLeft(p, w, h));
     // rects.forEach((r, index) => {
     //   this.descendants[index] = new QuadTreeNode(r, this.level + 1, this.opts);
     // });
-    this.#children = rects.map(r => new QuadTreeNode(this, r, this.level+1, this.opts));
+    this.#children = rects.map(
+      (r) => new QuadTreeNode(this, r, this.level + 1, this.opts)
+    );
   }
 }
-
