@@ -1,80 +1,91 @@
-import {Arrays} from "../collections/index.js";
-import AudioVisualiser from "./AudioVisualiser.js";
-import {number as guardNumber, integer as guardInteger} from "../Guards.js";
-import {isPowerOfTwo} from "../Util.js";
+import { Arrays } from '../collections/index.js';
+import AudioVisualiser from './AudioVisualiser.js';
+import { number as guardNumber, integer as guardInteger } from '../Guards.js';
+import { isPowerOfTwo } from '../Util.js';
 
 /**
  * Options for audio processing
- * 
+ *
  * fftSize: Must be a power of 2, from 32 - 32768. Higher number means
  * more precision and higher CPU overhead
  * @see https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize
- * 
+ *
  * smoothingTimeConstant: Range from 0-1, default is 0.8.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/smoothingTimeConstant
- * 
+ *
  * debug: If true, additonal console logging will happen
  */
-export type Opts = Readonly<{
-  readonly showVis?:boolean
+export type Opts = {
+  readonly showVis?: boolean;
   /**
    * FFT size. Must be a power of 2, from 32 - 32768. Higher number means
    * more precision and higher CPU overhead
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize
    */
-  readonly fftSize?:number
+  readonly fftSize?: number;
   /**
    * Range from 0-1, default is 0.8
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/smoothingTimeConstant
    */
-  readonly smoothingTimeConstant?:number
-  readonly debug?:boolean
-}>;
+  readonly smoothingTimeConstant?: number;
+  readonly debug?: boolean;
+};
 
-export type DataAnalyser = (node:AnalyserNode, analyser:AudioAnalyser) => void;
+export type DataAnalyser = (
+  node: AnalyserNode,
+  analyser: AudioAnalyser
+) => void;
 
 /**
  * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link peakLevel} if you want sound level, or {@link freq} if you just want FFT results.
- * 
+ *
  * ```js
  * const onData = (freq, wave, analyser) => {
  *  // Demo: Get FFT results just for 100Hz-1KHz.
  *  const freqSlice = analyser.sliceByFrequency(100,1000,freq);
- * 
+ *
  *  // Demo: Get FFT value for a particular frequency (1KHz)
  *  const amt = freq[analyser.getIndexForFrequency(1000)];
  * }
  * basic(onData, {fftSize: 512});
  * ```
- * 
+ *
  * An `Analyser` instance is returned and can be controlled:
  * ```js
  * const analyser = basic(onData);
  * analyser.paused = true;
  * ```
- * 
- * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler. 
- * 
+ *
+ * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
+ *
  * @param onData Handler for data
  * @param opts Options
  * @returns Analyser instance
  */
-export const basic = (onData:(freq:Float32Array, wave:Float32Array, analyser:AudioAnalyser) => void, opts:Opts = {}):AudioAnalyser => new AudioAnalyser((node, analyser) => {
-  // Get frequency and amplitude data
-  const freq = new Float32Array(node.frequencyBinCount);
-  const wave = new Float32Array(node.fftSize);
+export const basic = (
+  onData: (
+    freq: Float32Array,
+    wave: Float32Array,
+    analyser: AudioAnalyser
+  ) => void,
+  opts: Opts = {}
+): AudioAnalyser =>
+  new AudioAnalyser((node, analyser) => {
+    // Get frequency and amplitude data
+    const freq = new Float32Array(node.frequencyBinCount);
+    const wave = new Float32Array(node.fftSize);
 
-  // Load arrays with data
-  node.getFloatFrequencyData(freq);
-  node.getFloatTimeDomainData(wave);
+    // Load arrays with data
+    node.getFloatFrequencyData(freq);
+    node.getFloatTimeDomainData(wave);
 
-  // Send back
-  onData(freq, wave, analyser);
-}, opts);
+    // Send back
+    onData(freq, wave, analyser);
+  }, opts);
 
 /**
  * Basic audio analyser. Returns FFT analysis. Use {@link peakLevel} if you want the sound level, or {@link basic} if you also want the waveform.
- * 
+ *
  * ```js
  * const onData = (freq, analyser) => {
  *  // Demo: Print out each sound frequency (Hz) and amount of energy in that band
@@ -85,42 +96,50 @@ export const basic = (onData:(freq:Float32Array, wave:Float32Array, analyser:Aud
  * }
  * freq(onData, {fftSize:512});
  * ```
- * 
- * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler. 
- * 
- * @param onData 
- * @param opts 
- * @returns 
+ *
+ * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
+ *
+ * @param onData
+ * @param opts
+ * @returns
  */
-export const freq = (onData:(freq:Float32Array, analyser:AudioAnalyser)=>void, opts:Opts={}):AudioAnalyser => new AudioAnalyser((node, analyser) => {
-  const freq = new Float32Array(node.frequencyBinCount);
-  node.getFloatFrequencyData(freq);
-  onData(freq, analyser);
-}, opts);
+export const freq = (
+  onData: (freq: Float32Array, analyser: AudioAnalyser) => void,
+  opts: Opts = {}
+): AudioAnalyser =>
+  new AudioAnalyser((node, analyser) => {
+    const freq = new Float32Array(node.frequencyBinCount);
+    node.getFloatFrequencyData(freq);
+    onData(freq, analyser);
+  }, opts);
 
 /**
  * Basic audio analyser which reports the peak sound level.
- * 
+ *
  * ```js
  * peakLevel(level => {
  *  console.log(level);
  * });
  * ```
- * 
- * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler. 
- * @param onData 
- * @param opts 
- * @returns 
+ *
+ * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
+ * @param onData
+ * @param opts
+ * @returns
  */
-export const peakLevel = (onData:(level:number, analyser:AudioAnalyser)=>void, opts:Opts={}):AudioAnalyser => new AudioAnalyser((node, analyser) => {
-  const wave = new Float32Array(node.fftSize);
-  node.getFloatTimeDomainData(wave);
-  onData(Arrays.maxFast(wave), analyser);
-}, opts);
+export const peakLevel = (
+  onData: (level: number, analyser: AudioAnalyser) => void,
+  opts: Opts = {}
+): AudioAnalyser =>
+  new AudioAnalyser((node, analyser) => {
+    const wave = new Float32Array(node.fftSize);
+    node.getFloatTimeDomainData(wave);
+    onData(Arrays.maxFast(wave), analyser);
+  }, opts);
 
 /**
  * Helper for doing audio analysis. It takes case of connecting the audio stream, running in a loop and pause capability.
- * 
+ *
  * Provide a function which works with an [AnalyserNode](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode), and does something with the result.
  * ```js
  * const myAnalysis = (node, analyser) => {
@@ -130,41 +149,49 @@ export const peakLevel = (onData:(level:number, analyser:AudioAnalyser)=>void, o
  * }
  * const a = new Analyser(myAnalysis);
  * ```
- * 
+ *
  * Two helper functions provide ready-to-use Analysers:
  * * {@link peakLevel} peak decibel reading
  * * {@link freq} FFT results
  * * {@link basic} FFT results and waveform
- * 
+ *
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
  *
  */
 export class AudioAnalyser {
-  showVis:boolean;
-  fftSize:number;
-  smoothingTimeConstant:number;
+  showVis: boolean;
+  fftSize: number;
+  smoothingTimeConstant: number;
   #isPaused = false;
-  debug:boolean;
+  debug: boolean;
   #initInProgress = false;
 
-  visualiser:AudioVisualiser|undefined;  
-  audioCtx:AudioContext|undefined;
-  analyserNode:AnalyserNode|undefined;
+  visualiser: AudioVisualiser | undefined;
+  audioCtx: AudioContext | undefined;
+  analyserNode: AnalyserNode | undefined;
 
-  analyse:DataAnalyser;
+  analyse: DataAnalyser;
 
-  constructor(analyse:DataAnalyser, opts:Opts = {}) {
+  constructor(analyse: DataAnalyser, opts: Opts = {}) {
     this.showVis = opts.showVis ?? false;
     this.fftSize = opts.fftSize ?? 1024;
     this.debug = opts.debug ?? false;
     this.smoothingTimeConstant = opts.smoothingTimeConstant ?? 0.8;
 
     guardInteger(this.fftSize, `positive`, `opts.fftSize`);
-    guardNumber(this.smoothingTimeConstant, `percentage`, `opts.smoothingTimeConstant`);
+    guardNumber(
+      this.smoothingTimeConstant,
+      `percentage`,
+      `opts.smoothingTimeConstant`
+    );
 
-    if (!isPowerOfTwo(this.fftSize)) throw new Error(`fftSize must be a power of two from 32 to 32768 (${this.fftSize})`);
-    if(this.fftSize < 32) throw new Error(`fftSize must be at least 32`);
-    if (this.fftSize > 32768) throw new Error(`fftSize must be no greater than 32768`);
+    if (!isPowerOfTwo(this.fftSize))
+      throw new Error(
+        `fftSize must be a power of two from 32 to 32768 (${this.fftSize})`
+      );
+    if (this.fftSize < 32) throw new Error(`fftSize must be at least 32`);
+    if (this.fftSize > 32768)
+      throw new Error(`fftSize must be no greater than 32768`);
 
     this.analyse = analyse;
     this.paused = false;
@@ -187,21 +214,22 @@ export class AudioAnalyser {
     this.#initInProgress = true;
 
     // Initalise microphone
-    navigator.mediaDevices.getUserMedia({audio: true})
-      .then(stream => {     
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
         this.onMicSuccess(stream);
       })
-      .catch(err => {
+      .catch((err) => {
         this.#initInProgress = false;
         console.error(err);
       });
   }
 
-  get paused():boolean {
+  get paused(): boolean {
     return this.#isPaused;
   }
 
-  set paused(v:boolean) {
+  set paused(v: boolean) {
     if (v === this.#isPaused) return;
     this.#isPaused = v;
     if (!v) {
@@ -212,7 +240,7 @@ export class AudioAnalyser {
     }
   }
 
-  private setup(audioCtx:AudioContext, stream:MediaStream) {
+  private setup(audioCtx: AudioContext, stream: MediaStream) {
     const analyser = audioCtx.createAnalyser();
 
     // fftSize must be a power of 2. Higher values slower, more detailed
@@ -231,7 +259,7 @@ export class AudioAnalyser {
   }
 
   // Microphone successfully initalised, now have access to audio data
-  private onMicSuccess(stream:MediaStream) {
+  private onMicSuccess(stream: MediaStream) {
     try {
       const audioCtx = new AudioContext();
 
@@ -282,7 +310,11 @@ export class AudioAnalyser {
   /**
    * Returns the maximum FFT value within the given frequency range
    */
-  getFrequencyRangeMax(lowFreq:number, highFreq:number, freqData:readonly number[]):number {
+  getFrequencyRangeMax(
+    lowFreq: number,
+    highFreq: number,
+    freqData: readonly number[]
+  ): number {
     const samples = this.sliceByFrequency(lowFreq, highFreq, freqData);
     return Arrays.max(samples);
   }
@@ -295,7 +327,11 @@ export class AudioAnalyser {
    * @param freqData Full-spectrum frequency data
    * @returns Sub-sampling of analysis
    */
-  sliceByFrequency(lowFreq:number, highFreq:number, freqData:readonly number[]) {
+  sliceByFrequency(
+    lowFreq: number,
+    highFreq: number,
+    freqData: readonly number[]
+  ) {
     const lowIndex = this.getIndexForFrequency(lowFreq);
     const highIndex = this.getIndexForFrequency(highFreq);
 
@@ -309,16 +345,19 @@ export class AudioAnalyser {
    * @param index Array index
    * @returns Sound frequency
    */
-  getFrequencyAtIndex(index:number):number {
+  getFrequencyAtIndex(index: number): number {
     const a = this.analyserNode;
     const ctx = this.audioCtx;
     if (a === undefined) throw new Error(`Analyser not available`);
     if (ctx === undefined) throw new Error(`Audio context not available`);
 
     guardInteger(index, `positive`, `index`);
-    if (index > a.frequencyBinCount) throw new Error(`Index ${index} exceeds frequency bin count ${a.frequencyBinCount}`);
+    if (index > a.frequencyBinCount)
+      throw new Error(
+        `Index ${index} exceeds frequency bin count ${a.frequencyBinCount}`
+      );
 
-    return index * ctx.sampleRate / (a.frequencyBinCount * 2);
+    return (index * ctx.sampleRate) / (a.frequencyBinCount * 2);
   }
 
   /**
@@ -326,12 +365,12 @@ export class AudioAnalyser {
    * @param freq Sound frequency
    * @returns Array index into frequency bins
    */
-  getIndexForFrequency(freq:number):number {
+  getIndexForFrequency(freq: number): number {
     const a = this.analyserNode;
     if (a === undefined) throw new Error(`Analyser not available`);
 
     const nyquist = a.context.sampleRate / 2.0;
-    const index = Math.round(freq / nyquist * a.frequencyBinCount);
+    const index = Math.round((freq / nyquist) * a.frequencyBinCount);
     if (index < 0) return 0;
     if (index >= a.frequencyBinCount) return a.frequencyBinCount - 1;
     return index;

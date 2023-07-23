@@ -1,10 +1,10 @@
-import {SimpleEventEmitter} from "../Events.js";
-import {StateChangeEvent, StateMachine} from "../flow/StateMachine.js";
-import {indexOfCharCode, omitChars} from "../Text.js";
-import {Codec} from "./Codec.js";
-import {StringReceiveBuffer} from "./StringReceiveBuffer.js";
-import {StringWriteBuffer} from "./StringWriteBuffer.js";
-import {retry} from "../flow/Retry.js";
+import { SimpleEventEmitter } from '../Events.js';
+import { type StateChangeEvent, StateMachine } from '../flow/StateMachine.js';
+import { indexOfCharCode, omitChars } from '../Text.js';
+import { Codec } from './Codec.js';
+import { StringReceiveBuffer } from './StringReceiveBuffer.js';
+import { StringWriteBuffer } from './StringWriteBuffer.js';
+import { retry } from '../flow/Retry.js';
 
 /**
  * Options for JsonDevice
@@ -13,20 +13,20 @@ export type JsonDeviceOpts = {
   /**
    * How much data to transfer at a time
    */
-  readonly chunkSize?: number
+  readonly chunkSize?: number;
   /**
    * Name of device. This is only used for assisting the console.log output
    */
-  readonly name?: string
+  readonly name?: string;
   /**
    * Number of times to automatically try to reconnect
    */
-  readonly connectAttempts?: number
+  readonly connectAttempts?: number;
   /**
    * If true, additional logging will be done
    */
-  readonly debug?: boolean
-}
+  readonly debug?: boolean;
+};
 
 /**
  * Data received event
@@ -35,8 +35,8 @@ export type JsonDataEvent = {
   /**
    * Data received
    */
-  readonly data: string
-}
+  readonly data: string;
+};
 
 /**
  * Events emitted by JsonDevice
@@ -45,11 +45,11 @@ export type JsonDeviceEvents = {
   /**
    * Data received
    */
-  readonly data: JsonDataEvent
+  readonly data: JsonDataEvent;
   /**
    * State changed
    */
-  readonly change: StateChangeEvent
+  readonly change: StateChangeEvent;
 };
 
 export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
@@ -57,9 +57,9 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   codec: Codec;
 
   verboseLogging = false;
-  name:string;
-  connectAttempts:number;
-  chunkSize:number;
+  name: string;
+  connectAttempts: number;
+  chunkSize: number;
 
   rxBuffer: StringReceiveBuffer;
   txBuffer: StringWriteBuffer;
@@ -74,14 +74,14 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.name = config.name ?? `JsonDevice`;
 
     // Transmit buffer
-    this.txBuffer = new StringWriteBuffer(async data => {
+    this.txBuffer = new StringWriteBuffer(async (data) => {
       // When we have data to actually write to device
       await this.writeInternal(data);
     }, config.chunkSize);
 
     // Receive buffer
-    this.rxBuffer = new StringReceiveBuffer(line => {
-      this.fireEvent(`data`, {data: line});
+    this.rxBuffer = new StringReceiveBuffer((line) => {
+      this.fireEvent(`data`, { data: line });
     });
 
     this.codec = new Codec();
@@ -89,10 +89,10 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
       ready: `connecting`,
       connecting: [`connected`, `closed`],
       connected: [`closed`],
-      closed: `connecting`
+      closed: `connecting`,
     });
 
-    this.states.addEventListener(`change`, evt => {
+    this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);
       this.verbose(`${evt.priorState} -> ${evt.newState}`);
       if (evt.priorState === `connected`) {
@@ -112,19 +112,21 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   }
 
   write(txt: string) {
-    if (this.states.state !== `connected`) throw new Error(`Cannot write while state is ${this.states.state}`);
+    if (this.states.state !== `connected`) {
+      throw new Error(`Cannot write while state is ${this.states.state}`);
+    }
     this.txBuffer.add(txt);
   }
 
   /**
    * Writes text to output device
-   * @param txt 
+   * @param txt
    */
-  protected abstract writeInternal(txt: string):void;
+  protected abstract writeInternal(txt: string): void;
 
   async close() {
     if (this.states.state !== `connected`) return;
-    
+
     // console.log(`rxBuffer closing`);
     // try {
     //   await this.rxBuffer.close();
@@ -140,33 +142,37 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     // }
 
     // console.log(`calling onClose`);
-    
+
     this.onClosed();
   }
 
   /**
    * Must change state
    */
-  abstract onClosed():void;
+  abstract onClosed(): void;
 
-  abstract onPreConnect():Promise<void>;
+  abstract onPreConnect(): Promise<void>;
 
   async connect() {
     const attempts = this.connectAttempts;
 
     this.states.state = `connecting`;
     await this.onPreConnect();
-    
-    await retry(async () => {
-      await this.onConnectAttempt();   
-      this.states.state = `connected`;
-    }, attempts, 200);
+
+    await retry(
+      async () => {
+        await this.onConnectAttempt();
+        this.states.state = `connected`;
+      },
+      attempts,
+      200
+    );
   }
 
   /**
    * Should throw if did not succeed.
    */
-  protected abstract onConnectAttempt():Promise<void>;
+  protected abstract onConnectAttempt(): Promise<void>;
 
   private onRx(evt: Event) {
     //const rx = this.rx;
@@ -210,4 +216,3 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     console.warn(`${this.name} `, m);
   }
 }
-

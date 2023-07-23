@@ -7,7 +7,7 @@
  * eg: const v = new Visualiser(document.getElementById('renderer'));
  *
  * Data must be passed to the component via renderFreq or renderWave.
- * 
+ *
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
@@ -19,10 +19,10 @@ import { AudioAnalyser } from './AudioAnalyser.js';
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {
   freqMaxRange = 200;
-  audio:AudioAnalyser;
-  parent:HTMLElement;
- 
-  lastPointer:Points.Point = { x:0, y:0 };
+  audio: AudioAnalyser;
+  parent: HTMLElement;
+
+  lastPointer: Points.Point = { x: 0, y: 0 };
   pointerDown = false;
   pointerClicking = false;
   pointerClickDelayMs = 100;
@@ -30,14 +30,14 @@ export default class AudioVisualiser {
 
   waveTracker;
   freqTracker;
-  el:HTMLElement;
+  el: HTMLElement;
 
-  constructor(parentElem:HTMLElement, audio:AudioAnalyser) {
+  constructor(parentElem: HTMLElement, audio: AudioAnalyser) {
     this.audio = audio;
     this.parent = parentElem;
     this.waveTracker = numberTracker();
     this.freqTracker = numberTracker();
-   
+
     // Add HTML
     parentElem.innerHTML = `
     <section>
@@ -65,35 +65,45 @@ export default class AudioVisualiser {
     `;
     this.el = parentElem.children[0] as HTMLElement;
 
-    document.getElementById(`rendererComponentToggle`)?.addEventListener(`click`, () => {
-      this.setExpanded(!this.isExpanded());
-    });
+    document
+      .getElementById(`rendererComponentToggle`)
+      ?.addEventListener(`click`, () => {
+        this.setExpanded(!this.isExpanded());
+      });
     this.el.addEventListener(`pointermove`, (e) => this.onPointer(e));
     //this.el.addEventListener(`touchbegin`, (e) => this.onPointer(e));
-    this.el.addEventListener(`pointerup`, () => { 
-      this.pointerDelaying = false; 
+    this.el.addEventListener(`pointerup`, () => {
+      this.pointerDelaying = false;
       this.pointerDown = false;
     });
     this.el.addEventListener(`pointerdown`, () => {
       this.pointerDelaying = true;
       setTimeout(() => {
-        if (this.pointerDelaying) { this.pointerDelaying = false; this.pointerDown = true; }
+        if (this.pointerDelaying) {
+          this.pointerDelaying = false;
+          this.pointerDown = true;
+        }
       }, this.pointerClickDelayMs);
     });
-    this.el.addEventListener(`pointerleave`, () => { 
-      this.pointerDelaying = false; 
-      this.pointerDown = false; });
-
-    document.getElementById(`rendererComponentWaveReset`)?.addEventListener(`click`, () => {
-      this.clear();
+    this.el.addEventListener(`pointerleave`, () => {
+      this.pointerDelaying = false;
+      this.pointerDown = false;
     });
+
+    document
+      .getElementById(`rendererComponentWaveReset`)
+      ?.addEventListener(`click`, () => {
+        this.clear();
+      });
   }
 
-  renderFreq(freq:readonly number[]) {
+  renderFreq(freq: readonly number[]) {
     if (!this.isExpanded()) return; // Don't render if collapsed
     if (!freq) return; // Data is undefined/null
 
-    const canvas = document.getElementById(`rendererComponentFreqData`) as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      `rendererComponentFreqData`
+    ) as HTMLCanvasElement;
     if (canvas === null) throw new Error(`Cannot find canvas element`);
     const g = canvas.getContext(`2d`);
     if (g === null) throw new Error(`Cannot create drawing context`);
@@ -104,7 +114,7 @@ export default class AudioVisualiser {
     g.clearRect(0, 0, canvasWidth, canvasHeight);
 
     const pointer = this.getPointerRelativeTo(canvas);
-    const width = (canvasWidth / bins);
+    const width = canvasWidth / bins;
     const minMax = Arrays.minMaxAvg(freq);
 
     //eslint-disable-next-line functional/no-let
@@ -116,12 +126,17 @@ export default class AudioVisualiser {
       const height = Math.abs(canvasHeight * valueRelative);
       const offset = canvasHeight - height;
 
-      const hue = i / bins * 360;
+      const hue = (i / bins) * 360;
       const left = i * width;
       g.fillStyle = `hsl(` + hue + `, 100%, 50%)`;
 
       // Show info about data under pointer
-      if (pointer.y > 0 && pointer.y <= canvasHeight && pointer.x >= left && pointer.x <= left + width) {
+      if (
+        pointer.y > 0 &&
+        pointer.y <= canvasHeight &&
+        pointer.x >= left &&
+        pointer.x <= left + width
+      ) {
         // Keep track of data
         if (this.freqTracker.id !== i.toString()) {
           this.freqTracker = numberTracker({ id: i.toString() });
@@ -132,14 +147,21 @@ export default class AudioVisualiser {
 
         // Display
         g.fillStyle = `black`;
-        if (this.audio) { 
-          g.fillText(`Frequency (${i}) at pointer: ${this.audio.getFrequencyAtIndex(i).toLocaleString(`en`)} - ${this.audio.getFrequencyAtIndex(i + 1).toLocaleString(`en`)}`, 2, 10); 
+        if (this.audio) {
+          g.fillText(
+            `Frequency (${i}) at pointer: ${this.audio
+              .getFrequencyAtIndex(i)
+              .toLocaleString(`en`)} - ${this.audio
+              .getFrequencyAtIndex(i + 1)
+              .toLocaleString(`en`)}`,
+            2,
+            10
+          );
         }
         g.fillText(`Raw value: ${freq[i].toFixed(2)}`, 2, 20);
         g.fillText(`Min: ${freqMma.min.toFixed(2)}`, 2, 40);
         g.fillText(`Max: ${freqMma.max.toFixed(2)}`, 60, 40);
         g.fillText(`Avg: ${freqMma.avg.toFixed(2)}`, 120, 40);
-
       }
       g.fillRect(left, offset, width, height);
     }
@@ -148,10 +170,10 @@ export default class AudioVisualiser {
   isExpanded() {
     const contentsElem = this.el.querySelector(`div`);
     if (contentsElem === null) throw new Error(`contents div not found`);
-    return (contentsElem.style.display === ``);
+    return contentsElem.style.display === ``;
   }
 
-  setExpanded(value:boolean) {
+  setExpanded(value: boolean) {
     const contentsElem = this.el.querySelector(`div`);
     const button = this.el.querySelector(`button`);
 
@@ -167,12 +189,16 @@ export default class AudioVisualiser {
   }
 
   clear() {
-    this.clearCanvas(document.getElementById(`rendererComponentFreqData`) as HTMLCanvasElement);
-    this.clearCanvas(document.getElementById(`rendererComponentWaveData`) as HTMLCanvasElement);
+    this.clearCanvas(
+      document.getElementById(`rendererComponentFreqData`) as HTMLCanvasElement
+    );
+    this.clearCanvas(
+      document.getElementById(`rendererComponentWaveData`) as HTMLCanvasElement
+    );
   }
 
   // Clears a canvas to white
-  clearCanvas(canvas:HTMLCanvasElement|null) {
+  clearCanvas(canvas: HTMLCanvasElement | null) {
     if (canvas === null) throw new Error(`Canvas is null`);
     const g = canvas.getContext(`2d`);
     if (g === null) throw new Error(`Cannot create drawing context`);
@@ -182,12 +208,14 @@ export default class AudioVisualiser {
 
   // Renders waveform data.
   // Adapted from MDN's AnalyserNode.getFloatTimeDomainData() example
-  renderWave(wave:readonly number[], bipolar = true) {
+  renderWave(wave: readonly number[], bipolar = true) {
     if (!this.isExpanded()) return; // Don't render if collapsed
     if (!wave) return; // Undefined or null data
-    const canvas = document.getElementById(`rendererComponentWaveData`) as HTMLCanvasElement;
+    const canvas = document.getElementById(
+      `rendererComponentWaveData`
+    ) as HTMLCanvasElement;
     if (canvas === null) throw new Error(`Cannot find wave canvas`);
-    
+
     const g = canvas.getContext(`2d`);
     if (g === null) throw new Error(`Cannot create drawing context for wave`);
 
@@ -224,7 +252,7 @@ export default class AudioVisualiser {
     //eslint-disable-next-line functional/no-let
     for (let i = 0; i < bins; i++) {
       const height = wave[i] * canvasHeight;
-      const y = bipolar ? (canvasHeight / 2) - height : canvasHeight - height;
+      const y = bipolar ? canvasHeight / 2 - height : canvasHeight - height;
 
       if (i === 0) {
         g.moveTo(x, y);
@@ -235,7 +263,7 @@ export default class AudioVisualiser {
 
       if (this.pointerDown) this.waveTracker.seen(wave[i]);
     }
-    g.lineTo(canvasWidth, bipolar ? canvasHeight / 2 : canvasHeight);//canvas.height / 2);
+    g.lineTo(canvasWidth, bipolar ? canvasHeight / 2 : canvasHeight); //canvas.height / 2);
     g.stroke();
 
     // Draw
@@ -252,27 +280,35 @@ export default class AudioVisualiser {
     }
 
     // Show info about data under pointer
-    if (pointer.y > 0 && pointer.y <= canvasHeight && pointer.x >= 0 && pointer.x <= canvasWidth) {
+    if (
+      pointer.y > 0 &&
+      pointer.y <= canvasHeight &&
+      pointer.x >= 0 &&
+      pointer.x <= canvasWidth
+    ) {
       g.fillStyle = `black`;
-      g.fillText(`Level: ` + (1.0 - (pointer.y / canvasHeight)).toFixed(2), 2, 10);
+      g.fillText(
+        `Level: ` + (1.0 - pointer.y / canvasHeight).toFixed(2),
+        2,
+        10
+      );
     }
-
   }
 
   // Yields pointer position relative to given element
-  getPointerRelativeTo(elem:HTMLElement) {
+  getPointerRelativeTo(elem: HTMLElement) {
     const rect = elem.getBoundingClientRect();
     return {
       x: this.lastPointer.x - rect.left - window.scrollX, //elem.offsetLeft + window.scrollX,
-      y: this.lastPointer.y - rect.top - window.scrollY//elem.offsetTop + window.scrollY
+      y: this.lastPointer.y - rect.top - window.scrollY, //elem.offsetTop + window.scrollY
     };
   }
 
   // Keeps track of last pointer position in page coordinate space
-  onPointer(evt:MouseEvent|PointerEvent) {
+  onPointer(evt: MouseEvent | PointerEvent) {
     this.lastPointer = {
       x: evt.pageX,
-      y: evt.pageY
+      y: evt.pageY,
     };
     evt.preventDefault();
   }

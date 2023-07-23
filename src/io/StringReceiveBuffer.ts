@@ -1,17 +1,17 @@
-
 /**
  * Receives text
  */
 export class StringReceiveBuffer {
   buffer: string = ``;
-  stream:WritableStream<string>|undefined;
+  stream: WritableStream<string> | undefined;
 
-  constructor(private onData: (data: string) => void, public separator = `\n`) {
-
-  }
+  constructor(
+    private onData: (data: string) => void,
+    public separator = `\n`
+  ) {}
 
   async close() {
-    const s= this.stream;
+    const s = this.stream;
     if (!s) return;
     await s.abort();
 
@@ -36,11 +36,11 @@ export class StringReceiveBuffer {
       },
       close() {
         b.clear();
-      }
+      },
     });
   }
 
-  addImpl(str: string):string {
+  addImpl(str: string): string {
     // Look for separator in new string
     const pos = str.indexOf(this.separator);
     if (pos < 0) {
@@ -53,17 +53,17 @@ export class StringReceiveBuffer {
     const part = str.substring(0, pos);
     try {
       this.onData(this.buffer + part);
-      str = str.substring(part.length+this.separator.length);
+      str = str.substring(part.length + this.separator.length);
     } catch (ex) {
       console.warn(ex);
     }
-    
+
     this.buffer = ``;
 
     return str;
   }
 
-  add(str:string) {
+  add(str: string) {
     while (str.length > 0) {
       str = this.addImpl(str);
     }

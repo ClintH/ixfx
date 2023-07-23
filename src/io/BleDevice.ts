@@ -1,21 +1,31 @@
-import {SimpleEventEmitter} from "../Events.js";
-import { StateMachine} from "../flow/StateMachine.js";
-import {indexOfCharCode, omitChars} from "../Text.js";
-import {Codec} from "./Codec.js";
-import {StringReceiveBuffer} from "./StringReceiveBuffer.js";
-import {StringWriteBuffer} from "./StringWriteBuffer.js";
-import {retry} from "../flow/Retry.js";
-import {Events} from "./Espruino.js";
+import { SimpleEventEmitter } from '../Events.js';
+import { StateMachine } from '../flow/StateMachine.js';
+import { type StateChangeEvent } from '../flow/StateMachine.js';
+import { indexOfCharCode, omitChars } from '../Text.js';
+import { Codec } from './Codec.js';
+import { StringReceiveBuffer } from './StringReceiveBuffer.js';
+import { StringWriteBuffer } from './StringWriteBuffer.js';
+import { retry } from '../flow/Retry.js';
+//import {type Events} from "./Espruino.js";
+
+export type DataEvent = {
+  readonly data: string;
+};
+
+export type Events = {
+  readonly data: DataEvent;
+  readonly change: StateChangeEvent;
+};
 
 export type Opts = {
-  readonly service:string
-  readonly rxGattCharacteristic:string
-  readonly txGattCharacteristic:string
-  readonly chunkSize:number
-  readonly name:string
-  readonly connectAttempts:number
-  readonly debug:boolean
-}
+  readonly service: string;
+  readonly rxGattCharacteristic: string;
+  readonly txGattCharacteristic: string;
+  readonly chunkSize: number;
+  readonly name: string;
+  readonly connectAttempts: number;
+  readonly debug: boolean;
+};
 
 const reconnect = async () => {
   console.log(`Connect?`);
@@ -35,8 +45,7 @@ const reconnect = async () => {
       console.log(evt);
       // Stop the scan to conserve power on mobile devices.
       abortController.abort();
-   
-   
+
       // At this point, we know that the device is in range, and we can attempt
       // to connect to it.
       await evt.device.gatt?.connect();
@@ -56,15 +65,15 @@ export class BleDevice extends SimpleEventEmitter<Events> {
   rxBuffer: StringReceiveBuffer;
   txBuffer: StringWriteBuffer;
 
-  constructor(private device: BluetoothDevice, private config:Opts) {
+  constructor(private device: BluetoothDevice, private config: Opts) {
     super();
     this.verboseLogging = config.debug;
-    this.txBuffer = new StringWriteBuffer(async data => {
+    this.txBuffer = new StringWriteBuffer(async (data) => {
       await this.writeInternal(data);
     }, config.chunkSize);
 
-    this.rxBuffer = new StringReceiveBuffer(line => {
-      this.fireEvent(`data`, { data:line });
+    this.rxBuffer = new StringReceiveBuffer((line) => {
+      this.fireEvent(`data`, { data: line });
     });
 
     this.codec = new Codec();
@@ -72,10 +81,10 @@ export class BleDevice extends SimpleEventEmitter<Events> {
       ready: `connecting`,
       connecting: [`connected`, `closed`],
       connected: [`closed`],
-      closed: `connecting`
+      closed: `connecting`,
     });
 
-    this.states.addEventListener(`change`, evt => {
+    this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);
       this.verbose(`${evt.priorState} -> ${evt.newState}`);
       if (evt.priorState === `connected`) {
@@ -94,26 +103,28 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     this.verbose(`ctor ${device.name} ${device.id}`);
   }
 
-  get isConnected():boolean {
+  get isConnected(): boolean {
     return this.states.state === `connected`;
   }
 
-  get isClosed():boolean {
+  get isClosed(): boolean {
     return this.states.state === `closed`;
   }
 
   write(txt: string) {
-    if (this.states.state !== `connected`) throw new Error(`Cannot write while state is ${this.states.state}`);
+    if (this.states.state !== `connected`)
+      throw new Error(`Cannot write while state is ${this.states.state}`);
     this.txBuffer.add(txt);
   }
 
   private async writeInternal(txt: string) {
     this.verbose(`writeInternal ${txt}`);
     const tx = this.tx;
-    if (tx === undefined) throw new Error(`Unexpectedly without tx characteristic`);
+    if (tx === undefined)
+      throw new Error(`Unexpectedly without tx characteristic`);
     try {
       await tx.writeValue(this.codec.toBuffer(txt));
-    } catch (ex:unknown) {
+    } catch (ex: unknown) {
       this.warn(ex);
     }
   }
@@ -132,22 +143,32 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     const gatt = this.device.gatt;
     if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
-    await retry(async () => {
-      const server = await gatt.connect();
-      this.verbose(`Getting primary service`);
-      const service = await server.getPrimaryService(this.config.service);
-      this.verbose(`Getting characteristics`);
-      const rx = await service.getCharacteristic(this.config.rxGattCharacteristic);
-      const tx = await service.getCharacteristic(this.config.txGattCharacteristic);
-  
-      rx.addEventListener(`characteristicvaluechanged`, (evt) => this.onRx(evt));
-      this.rx = rx;
-      this.tx = tx;
-      this.gatt = gatt;
-      this.states.state = `connected`;
-  
-      await rx.startNotifications();
-    }, attempts, 200);
+    await retry(
+      async () => {
+        const server = await gatt.connect();
+        this.verbose(`Getting primary service`);
+        const service = await server.getPrimaryService(this.config.service);
+        this.verbose(`Getting characteristics`);
+        const rx = await service.getCharacteristic(
+          this.config.rxGattCharacteristic
+        );
+        const tx = await service.getCharacteristic(
+          this.config.txGattCharacteristic
+        );
+
+        rx.addEventListener(`characteristicvaluechanged`, (evt) =>
+          this.onRx(evt)
+        );
+        this.rx = rx;
+        this.tx = tx;
+        this.gatt = gatt;
+        this.states.state = `connected`;
+
+        await rx.startNotifications();
+      },
+      attempts,
+      200
+    );
   }
 
   private onRx(evt: Event) {
@@ -188,8 +209,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     console.log(`${this.config.name} `, m);
   }
 
-  protected warn(m:unknown) {
+  protected warn(m: unknown) {
     console.warn(`${this.config.name} `, m);
   }
 }
-

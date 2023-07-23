@@ -1,19 +1,24 @@
-import {JsonDevice, JsonDeviceOpts, JsonDeviceEvents, JsonDataEvent} from "./JsonDevice.js";
+import {
+  type JsonDeviceOpts,
+  type JsonDeviceEvents,
+  type JsonDataEvent,
+  JsonDevice,
+} from './JsonDevice.js';
 
-export type {JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent};
+export type { JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent };
 
 export type SerialOpts = JsonDeviceOpts & {
-  readonly filters?:ReadonlyArray<SerialPortFilter>
-  readonly baudRate?:number
+  readonly filters?: ReadonlyArray<SerialPortFilter>;
+  readonly baudRate?: number;
   /**
    * End-of-line string sequence. \r\n by default.
    */
-  readonly eol?:string
-}
+  readonly eol?: string;
+};
 
 /**
  * Serial device. Assumes data is sent with new line characters (\r\n) between messages.
- * 
+ *
  * ```
  * const s = new Device();
  * s.addEventListener(`change`, evt => {
@@ -22,35 +27,35 @@ export type SerialOpts = JsonDeviceOpts & {
  *    // Do something when connected...
  *  }
  * });
- * 
+ *
  * // In a UI event handler...
  * s.connect();
  * ```
- * 
+ *
  * Reading incoming data:
  * ```
  * // Parse incoming data as JSON
  * s.addEventListener(`data`, evt => {
  *  try {
  *    const o = JSON.parse(evt.data);
- *    // If we get this far, JSON is legit 
+ *    // If we get this far, JSON is legit
  *  } catch (ex) {
  *  }
  * });
  * ```
- * 
+ *
  * Writing to the microcontroller
  * ```
  * s.write(JSON.stringify({msg:"hello"}));
  * ```
  */
 export class Device extends JsonDevice {
-  port:SerialPort|undefined;
-  tx:WritableStreamDefaultWriter<string>|undefined;
-  abort:AbortController;
-  baudRate:number;
+  port: SerialPort | undefined;
+  tx: WritableStreamDefaultWriter<string> | undefined;
+  abort: AbortController;
+  baudRate: number;
 
-  constructor(private config:SerialOpts = {}) {
+  constructor(private config: SerialOpts = {}) {
     super(config);
 
     this.abort = new AbortController();
@@ -66,13 +71,13 @@ export class Device extends JsonDevice {
 
   /**
    * Writes text collected in buffer
-   * @param txt 
+   * @param txt
    */
   protected async writeInternal(txt: string) {
     if (this.tx === undefined) throw new Error(`tx not ready`);
     try {
       this.tx.write(txt);
-    } catch (ex:unknown) {
+    } catch (ex: unknown) {
       this.warn(ex);
     }
   }
@@ -86,7 +91,7 @@ export class Device extends JsonDevice {
     // } catch (ex) {
     //   this.warn(ex);
     // }
-    this.states.state = `closed`; 
+    this.states.state = `closed`;
   }
 
   onPreConnect(): Promise<void> {
@@ -95,15 +100,15 @@ export class Device extends JsonDevice {
 
   async onConnectAttempt(): Promise<void> {
     //eslint-disable-next-line functional/no-let
-    let reqOpts:SerialPortRequestOptions = { };
-    const openOpts:SerialOptions = {
-      baudRate: this.baudRate
+    let reqOpts: SerialPortRequestOptions = {};
+    const openOpts: SerialOptions = {
+      baudRate: this.baudRate,
     };
 
     if (this.config.filters) reqOpts = { filters: [...this.config.filters] };
     this.port = await navigator.serial.requestPort(reqOpts);
 
-    this.port.addEventListener(`disconnect`, _ => {
+    this.port.addEventListener(`disconnect`, (_) => {
       this.close();
     });
 
@@ -112,29 +117,35 @@ export class Device extends JsonDevice {
     const txW = this.port.writable;
     const txText = new TextEncoderStream();
     if (txW !== null) {
-      txText.readable.pipeTo(txW, { signal: this.abort.signal }).catch(err => {
-        console.log(`Serial.onConnectAttempt txText pipe:`);
-        console.log(err);
-      });
+      txText.readable
+        .pipeTo(txW, { signal: this.abort.signal })
+        .catch((err) => {
+          console.log(`Serial.onConnectAttempt txText pipe:`);
+          console.log(err);
+        });
       this.tx = txText.writable.getWriter();
     }
 
     const rxR = this.port.readable;
-    const rxText = new TextDecoderStream(); 
+    const rxText = new TextDecoderStream();
     if (rxR !== null) {
-      rxR.pipeTo(rxText.writable, { signal: this.abort.signal }).catch(err => {
-        console.log(`Serial.onConnectAttempt rxR pipe:`);
-        console.log(err);
-      });
-      rxText.readable.pipeTo(this.rxBuffer.writable(), { signal: this.abort.signal }).catch(err => {
-        console.log(`Serial.onConnectAttempt rxText pipe:`);
-        console.log(err);
-        try {
-          this.port?.close();
-        } catch (ex) {
-          console.log(ex);
-        }
-      });
+      rxR
+        .pipeTo(rxText.writable, { signal: this.abort.signal })
+        .catch((err) => {
+          console.log(`Serial.onConnectAttempt rxR pipe:`);
+          console.log(err);
+        });
+      rxText.readable
+        .pipeTo(this.rxBuffer.writable(), { signal: this.abort.signal })
+        .catch((err) => {
+          console.log(`Serial.onConnectAttempt rxText pipe:`);
+          console.log(err);
+          try {
+            this.port?.close();
+          } catch (ex) {
+            console.log(ex);
+          }
+        });
     }
   }
 }

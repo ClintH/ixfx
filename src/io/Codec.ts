@@ -1,4 +1,3 @@
-
 /**
  * Handles utf-8 text encoding/decoding
  */
@@ -8,8 +7,8 @@ export class Codec {
 
   /**
    * Convert string to Uint8Array buffer
-   * @param str 
-   * @returns 
+   * @param str
+   * @returns
    */
   toBuffer(str: string) {
     return this.enc.encode(str);
@@ -17,8 +16,8 @@ export class Codec {
 
   /**
    * Returns a string from a provided buffer
-   * @param buffer 
-   * @returns 
+   * @param buffer
+   * @returns
    */
   fromBuffer(buffer: ArrayBuffer) {
     return this.dec.decode(buffer);

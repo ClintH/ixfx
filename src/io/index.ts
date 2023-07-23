@@ -12,9 +12,9 @@ export { Codec } from './Codec.js';
 
 /**
  * Espruino-based devices connected via Bluetooth LE
- * 
+ *
  * See [demos](https://clinth.github.io/ixfx-demos/io/)
- * 
+ *
  * Overview:
  * * {@link puck}: Connects a [Espruino BLE Device](../classes/Io.Espruino.EspruinoBleDevice.html).
  * * {@link Espruino.connectBle}: Connect to a generic Espruino via BLE
@@ -26,14 +26,13 @@ export * as Camera from './Camera.js';
 export * as VideoFile from './VideoFile.js';
 
 export { FrameProcessor } from './FrameProcessor.js';
-export type {FrameProcessorOpts} from './FrameProcessor.js';
+export type { FrameProcessorOpts } from './FrameProcessor.js';
 
 /**
  * Microcontrollers such as Arduinos connected via USB serial
- * 
+ *
  * Overview
  * * {@link Serial.Device}
- * 
+ *
  */
 export * as Serial from './Serial.js';
-
