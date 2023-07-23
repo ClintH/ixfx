@@ -4,10 +4,16 @@ export default {
     './src/test/**/*.ts',
     '!./src/test/util.ts'
   ],
-  extensions: {
-    ts: 'module'
-  },
-  nodeArguments: [
-    '--loader=tsx'
-  ]
-};
+  // extensions: {
+  //   ts: 'module'
+  // },
+  // nodeArguments: [
+  //   '--loader=tsx'
+  // ],
+  typescript: {
+    rewritePaths: {
+      "src/": "etc/build/"
+    },
+    compile: false
+  }
+}; 

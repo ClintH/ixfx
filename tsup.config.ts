@@ -15,11 +15,12 @@ export default defineConfig({
     geometry: `./src/geometry/index.ts`,
     io: './src/io/index.ts',
     keyValues: `./src/KeyValue.ts`,
-    maps: `./src/collections/Map.ts`,
+    maps: `./src/collections/Map/index.ts`,
     modulation: `./src/modulation/index.ts`,
     numbers: `./src/Numbers.ts`,
+    queues: `./src/collections/queue/index.ts`,
     random: `./src/Random.ts`,
-    sets: `./src/collections/Set.ts`,
+    sets: `./src/collections/set/index.ts`,
     stateMachine: `./src/flow/StateMachine.ts`,
     svg: `./src/visual/Svg.ts`,
     text: `./src/Text.ts`,
@@ -29,7 +30,7 @@ export default defineConfig({
   dts: true,
   noExternal: [`bezier-js`, `d3-color`, `d3-interpolate`, `rxjs`, `json5`],
   platform: `browser`,
-  target: `es2020`,
+  target: `es2022`,
   format: [
     `esm`
   ]

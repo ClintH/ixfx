@@ -3,9 +3,9 @@
     "outDir": "./etc/build",
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "src/*"
-      ],
+      // "~/*": [
+      //   "src/*"
+      // ],
       "fp-ts/*": [
         "node_modules/fp-ts/es6/*"
       ],
@@ -23,6 +23,7 @@
     ],
     "target": "esnext",
     "module": "ES2022",
+    "verbatimModuleSyntax": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
