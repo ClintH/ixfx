@@ -12,7 +12,7 @@ let ptrClick = {x: 300, y: 200};
 
 const circle = {x: window.innerWidth/2, y:window.innerHeight/2, radius: 200};
 const rect = {width: window.innerWidth - 200, height: window.innerHeight -200, x: 100, y: 100};
-const radiusRandom = Random.gaussianSkewed(4);
+const radiusRandom = Random.gaussianFn(4);
 const radiusMin = 2;
 const circleQuantity = 500;
 
