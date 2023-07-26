@@ -145,9 +145,16 @@ export * as Io from './io/index.js';
  * * {@link forEach} / {@link forEachAsync}: Loop over an iterable or array, with the possibility of early exit
  * * {@link repeat}: Runs a function a given number of times, collating results
  *
+ * Monitoring
+ * * {@link Elapsed.progress}: Track completion of a time duration
+ *
  * Loops
  * * {@link continuously}: Run code in a loop, as fast as possible or with a delay between each execution
  * * {@link delayLoop}: A generator that yields at a given rate
+ *
+ * Timers
+ * * {@link msElapsedTimer}: Timer that returns elapsed time since initial invocation
+ * * {@link ticksElapsedTimer}: Timer based on manual 'ticks'
  *
  * @example Importing
  * ```js

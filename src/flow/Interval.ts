@@ -1,4 +1,5 @@
 import { sleep } from './Sleep.js';
+import { toString as elapsedToString } from './Elapsed.js';
 import { type AsyncPromiseOrGenerator } from './index.js';
 
 export type Interval =

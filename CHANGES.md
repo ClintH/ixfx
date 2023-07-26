@@ -173,7 +173,7 @@ Collections/
   to handle this: either the first valid response is used, the highest-rating or
   lowest-rating. In additional there are some fallback handlers.
 - Dom/DragDrop: generic drag and drop handler
-- Flow/Timer.hasElapsedMs / completionMs: returns functions that yield whether a
+- Flow/Timer.hasElapsedMs / Elapsed.progress: returns functions that yield whether a
   timer is done, or the percentage done
 - Geometry/Polar: additional functions for handling polar coordinates
 - Geometry/Vector: wrapper for Points.Point and Polar.Coords for vector
