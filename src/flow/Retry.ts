@@ -1,9 +1,7 @@
-import { integer as guardInteger } from '../Guards.js';
-import { sleep } from './Sleep.js';
 
-export type CancelToken = {
-  readonly cancel: boolean;
-};
+// export type CancelToken = {
+//   readonly cancel: boolean;
+// };
 
 /**
  * Keeps executing `calback` until it runs without an exception being thrown.
@@ -23,34 +21,34 @@ export type CancelToken = {
  * @param cancelToken If provided, this is checked before and after each sleep to see if retry should continue. If cancelled, promise will be rejected
  * @returns
  */
-export const retry = async <V>(
-  callback: () => Promise<V>,
-  attempts: number = 5,
-  startingTimeoutMs: number = 200,
-  cancelToken?: CancelToken
-): Promise<V> => {
-  guardInteger(attempts, `positive`, `attempts`);
-  guardInteger(startingTimeoutMs, `positive`, `startingTimeoutMs`);
+// export const retry_ = async <V>(
+//   callback: () => Promise<V>,
+//   attempts: number = 5,
+//   startingTimeoutMs: number = 200,
+//   cancelToken?: CancelToken
+// ): Promise<V> => {
+//   guardInteger(attempts, `positive`, `attempts`);
+//   guardInteger(startingTimeoutMs, `positive`, `startingTimeoutMs`);
 
-  //eslint-disable-next-line functional/no-let
-  let timeout = startingTimeoutMs;
-  //eslint-disable-next-line functional/no-let
-  let totalSlept = 0;
-  while (attempts > 0) {
-    try {
-      return await callback();
-    } catch (ex) {
-      attempts--;
-    }
-    totalSlept += timeout;
+//   //eslint-disable-next-line functional/no-let
+//   let timeout = startingTimeoutMs;
+//   //eslint-disable-next-line functional/no-let
+//   let totalSlept = 0;
+//   while (attempts > 0) {
+//     try {
+//       return await callback();
+//     } catch (ex) {
+//       attempts--;
+//     }
+//     totalSlept += timeout;
 
-    if (cancelToken && cancelToken.cancel) throw new Error(`Cancelled`);
-    await sleep(timeout);
-    if (cancelToken && cancelToken.cancel) throw new Error(`Cancelled`);
+//     if (cancelToken && cancelToken.cancel) throw new Error(`Cancelled`);
+//     await sleep(timeout);
+//     if (cancelToken && cancelToken.cancel) throw new Error(`Cancelled`);
 
-    timeout *= 2;
-  }
-  throw new Error(
-    `Retry failed after ${attempts} attempts over ${totalSlept} ms.`
-  );
-};
+//     timeout *= 2;
+//   }
+//   throw new Error(
+//     `Retry failed after ${attempts} attempts over ${totalSlept} ms.`
+//   );
+// };

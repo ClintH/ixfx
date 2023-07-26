@@ -1,15 +1,11 @@
 export default {
 	require: ['./src/test/util.ts'],
+  verbose: false,
   files: [
     './src/test/**/*.ts',
     '!./src/test/util.ts'
   ],
-  // extensions: {
-  //   ts: 'module'
-  // },
-  // nodeArguments: [
-  //   '--loader=tsx'
-  // ],
+  failFast: true,
   typescript: {
     rewritePaths: {
       "src/": "etc/build/"

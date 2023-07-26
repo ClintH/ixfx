@@ -5,7 +5,7 @@ import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retry } from '../flow/Retry.js';
+import { retryWithBackOff } from '../flow/RetryWithBackOff.js';
 
 export type DataEvent = {
   readonly data: string;
@@ -144,7 +144,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     const gatt = this.device.gatt;
     if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
-    await retry(
+    await retryWithBackOff(
       async () => {
         const server = await gatt.connect();
         this.verbose(`Getting primary service`);
@@ -166,9 +166,12 @@ export class BleDevice extends SimpleEventEmitter<Events> {
         this.states.state = `connected`;
 
         await rx.startNotifications();
+        return true;
       },
-      attempts,
-      200
+      {
+        count: attempts,
+        startMs: 200
+      }
     );
   }
 

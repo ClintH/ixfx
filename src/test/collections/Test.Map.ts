@@ -1,3 +1,4 @@
+/* eslint-disable */
 import test from 'ava';
 import { getClosestIntegerKey } from '../../collections/map/MapFns.js';
 import { ofSimple } from '../../collections/map/MapOfSimple.js';

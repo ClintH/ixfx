@@ -3,17 +3,17 @@ import type { ValueSetEventMap } from './index.js';
 
 /**
  * A Set which stores unique items determined by their value, rather
- * than object reference (unlike the default JS Set). Create with {@link Sets.setMutable}. Mutable.
+ * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Mutable.
  *
  * By default the `JSON.stringify()` representation is considered the 'key' for an object.
- * Pass in a function to `setMutable` to define your own way of creating keys for values. The principle should
+ * Pass in a function to `Sets.mutable` to define your own way of creating keys for values. The principle should
  * be that objects that you consider identical should have the same string key value.
  *
- * SetMutable fires `add`, `clear` and `delete` events.
+ * ISetMutable fires `add`, `clear` and `delete` events.
  *
  * @example Overview of functions
  * ```js
- * const s = setMutable();
+ * const s = Sets.mutable();
  * s.add(item);    // Add one or more items. Items with same key are overriden.
  * s.has(item);    // Returns true if item value is present
  * s.clear();      // Remove everything
@@ -32,7 +32,7 @@ import type { ValueSetEventMap } from './index.js';
  * ];
  *
  * // Create a set, defining how keys will be generated
- * const set = setMutable(person => {
+ * const set = Sets.mutable(person => {
  *    // Key person objects by name and city.
  *    // ie. Generated keys will be: `Barry-London`, `Sally-Bristol`
  *    return `${person.name}-${person.city}`

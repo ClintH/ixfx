@@ -1,10 +1,10 @@
 /* eslint-disable */
 import { expect, test } from '@jest/globals';
-import {queueMutable} from '../../collections/queue/QueueMutable.js';
-import { queue } from '../../collections/queue/Queue.js';
+import {mutable} from '../../collections/queue/QueueMutable.js';
+import { immutable } from '../../collections/queue/Queue.js';
 
 test(`queue-mutable`, () => {
-  const a = queueMutable<string>();
+  const a = mutable<string>();
   expect(a.isEmpty).toBeTruthy();
   expect(a.length).toEqual(0);
   expect(a.isFull).toBeFalsy();
@@ -34,7 +34,7 @@ test(`queue`, () => {
   // Front of queue is index 0, end of queue (newer items) are end of array
 
   // Bounded queue. Default is that new additions are ignored
-  const a = queue<string>({capacity: 5});
+  const a = immutable<string>({capacity: 5});
   expect(a.isEmpty).toBeTruthy();
   const b = a.enqueue(`test`);
   let c = b;
@@ -57,7 +57,7 @@ test(`queue`, () => {
   expect(d.data).toEqual([`test1`, `test2`, `test3`, `new1`, `new2`]);
 
   // Unbounded queue
-  let a1 = queue<string>();
+  let a1 = immutable<string>();
   for (let i = 0; i < 15; i++) {
     a1 = a1.enqueue(`test` + i);
   }
@@ -66,52 +66,52 @@ test(`queue`, () => {
   // Test different overflow logic
 
   // Discard additions: let something in
-  let e = queue<string>({capacity: 4, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
+  let e = immutable<string>({capacity: 4, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
   e = e.enqueue(`test3`, `test4`, `test5`); // Only test3 should make it in
   expect(e.data).toEqual([`test0`, `test1`, `test2`, `test3`]);
 
   // Discard additions: already full
-  e = queue<string>({capacity: 3, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
+  e = immutable<string>({capacity: 3, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
   e = e.enqueue(`test3`, `test4`, `test5`);
   expect(e.data).toEqual([`test0`, `test1`, `test2`]);
 
   // Discard additions: let everything in
-  e = queue<string>({capacity: 6, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
+  e = immutable<string>({capacity: 6, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
   e = e.enqueue(`test3`, `test4`, `test5`);
   expect(e.data).toEqual([`test0`, `test1`, `test2`, `test3`, `test4`, `test5`]);
 
   // Older items are discarded (ie test0, test1) - partial flush
-  let f = queue<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
+  let f = immutable<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
   f = f.enqueue(`test3`, `test4`, `test5`);
   expect(f.data).toEqual([`test2`, `test3`, `test4`, `test5`]);
 
   // Older items are discarded (ie test0, test1) - complete flush
-  f = queue<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
+  f = immutable<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
   f = f.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
   expect(f.data).toEqual([`test4`, `test5`, `test6`, `test7`]);
 
   // Older items are discarded (ie test0, test1) - exact flush
-  f = queue<string>({capacity: 3, discardPolicy: `older`}, `test0`, `test1`, `test2`);
+  f = immutable<string>({capacity: 3, discardPolicy: `older`}, `test0`, `test1`, `test2`);
   f = f.enqueue(`test3`, `test4`, `test5`);
   expect(f.data).toEqual([`test3`, `test4`, `test5`]);
 
   // Newer items are discarded (ie test1, test2) - partial flush
-  let g = queue<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  let g = immutable<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
   g = g.enqueue(`test3`, `test4`, `test5`); // Only `test2` should survive from original
   expect(g.data).toEqual([`test0`, `test3`, `test4`, `test5`]);
 
   // Newer items are discarded (ie test1, test2) - complete flush
-  g = queue<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  g = immutable<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
   g = g.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
   expect(g.data).toEqual([`test4`, `test5`, `test6`, `test7`]);
 
   // Newer items are discarded (ie test1, test2) - exact flush
-  g = queue<string>({capacity: 3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  g = immutable<string>({capacity: 3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
   g = g.enqueue(`test3`, `test4`, `test5`);
   expect(g.data).toEqual([`test3`, `test4`, `test5`]);
 
   // One item past capacity with newer 
-  g = queue<string>({capacity:3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  g = immutable<string>({capacity:3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
   g = g.enqueue(`test3`);
   expect(g.data).toEqual([`test0`, `test1`, `test3`]);
 

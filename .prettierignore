@@ -1,3 +1,7 @@
-# Ignore artifacts:
+.vscode
+node_modules
 dist
 coverage
+etc
+tests
+config

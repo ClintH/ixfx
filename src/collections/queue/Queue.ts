@@ -5,7 +5,7 @@ import { type QueueOpts } from './index.js';
 // -------------------------------
 // Immutable
 // -------------------------------
-export class QueueImpl<V> implements IQueue<V> {
+export class QueueImmutable<V> implements IQueue<V> {
   readonly opts: QueueOpts;
   readonly data: ReadonlyArray<V>;
 
@@ -34,12 +34,12 @@ export class QueueImpl<V> implements IQueue<V> {
     this.data.forEach(fn); //(vv) => fn(vv));
   }
 
-  enqueue(...toAdd: ReadonlyArray<V>): QueueImpl<V> {
-    return new QueueImpl<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
+  enqueue(...toAdd: ReadonlyArray<V>): QueueImmutable<V> {
+    return new QueueImmutable<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
   }
 
-  dequeue(): QueueImpl<V> {
-    return new QueueImpl<V>(this.opts, dequeue(this.opts, this.data));
+  dequeue(): QueueImmutable<V> {
+    return new QueueImmutable<V>(this.opts, dequeue(this.opts, this.data));
   }
 
   get isEmpty(): boolean {
@@ -65,14 +65,14 @@ export class QueueImpl<V> implements IQueue<V> {
  * _dequeing_ removes items from the front (ie. the oldest).
  *
  * ```js
- * let q = queue();           // Create
+ * let q = Queues.immutable();           // Create
  * q = q.enqueue(`a`, `b`);   // Add two strings
  * const front = q.peek();    // `a` is at the front of queue (oldest)
  * q = q.dequeue();           // q now just consists of `b`
  * ```
  * @example Cap size to 5 items, throwing away newest items already in queue.
  * ```js
- * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * const q = Queues.immutable({capacity: 5, discardPolicy: `newer`});
  * ```
  *
  * @template V Data type of items
@@ -80,10 +80,10 @@ export class QueueImpl<V> implements IQueue<V> {
  * @param startingItems Index 0 is the front of the queue
  * @returns A new queue
  */
-export const queue = <V>(
+export const immutable = <V>(
   opts: QueueOpts = {},
   ...startingItems: ReadonlyArray<V>
 ): IQueue<V> => {
   opts = { ...opts }; // Make a copy of options
-  return new QueueImpl(opts, [...startingItems]); // Make a copy of array so it can't be modified
+  return new QueueImmutable(opts, [...startingItems]); // Make a copy of array so it can't be modified
 };

@@ -1,6 +1,7 @@
 // ✔ UNIT TESTED
 import { SimpleEventEmitter } from '../Events.js';
 import { isStringArray } from '../Guards.js';
+import * as Elapsed from './Elapsed.js';
 import type {
   StateMachineEventMap,
   MachineDescription,
@@ -84,7 +85,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   #m: MachineDescription;
   #isDone: boolean;
   #initial: string;
-  #changedAt: number;
+  #changedAt = Elapsed.infinity();
 
   /**
    * Create a state machine with initial state, description and options
@@ -107,7 +108,6 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     this.#debug = opts.debug ?? false;
     this.#state = initial;
     this.#isDone = false;
-    this.#changedAt = 0;
   }
 
   get states(): readonly string[] {
@@ -225,7 +225,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     //eslint-disable-next-line functional/immutable-data
     this.#state = this.#initial;
     //eslint-disable-next-line functional/immutable-data
-    this.#changedAt = Date.now();
+    this.#changedAt = Elapsed.since();
   }
 
   /**
@@ -302,7 +302,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     if (rules === null) {
       this.#isDone = true;
     }
-    this.#changedAt = Date.now();
+    this.#changedAt = Elapsed.since();
 
     setTimeout(() => {
       this.fireEvent(`change`, { newState: newState, priorState: priorState });
@@ -319,7 +319,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * See also `elapsed`
    */
   get changedAt(): number {
-    return this.#changedAt;
+    return this.#changedAt();
   }
 
   /**
@@ -327,7 +327,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * See also `changedAt`
    */
   get elapsed(): number {
-    return Date.now() - this.#changedAt;
+    return this.#changedAt();
   }
 }
 
@@ -493,12 +493,12 @@ export const drive = <V>(
 
   const drive = (r: DriverResult): boolean => {
     try {
-      if (typeof r.next !== undefined && r.next) {
+      if (typeof r.next !== `undefined` && r.next) {
         sm.next();
-      } else if (typeof r.state !== undefined) {
+      } else if (typeof r.state !== `undefined`) {
         //eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-non-null-assertion
         sm.state = r.state!;
-      } else if (typeof r.reset !== undefined && r.reset) {
+      } else if (typeof r.reset !== `undefined` && r.reset) {
         sm.reset();
       } else {
         throw new Error(

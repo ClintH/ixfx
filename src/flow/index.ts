@@ -24,9 +24,10 @@ export * from './WaitFor.js';
 export * from './Delay.js';
 export * from './Every.js';
 export * from './RunOnce.js';
-export * from './BackOff.js';
+export * from './RetryWithBackOff.js';
 export * from './Poll.js';
-
+import * as Elapsed  from './Elapsed.js';
+export {Elapsed}
 export { TaskQueue } from './TaskQueue.js';
 
 export type HasCompletion = {

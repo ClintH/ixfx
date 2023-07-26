@@ -262,7 +262,7 @@ export * as Modulation from './modulation/index.js';
  * only keeps unique items. ixfx's {@link Sets.ISetMutable | MutableSet} allows for considering items as identical by value, not
  * just by reference as the default JS Set operates
  *
- * * {@link Sets.setMutable}: Create a {@link Sets.ISetMutable}
+ * * {@link Sets.mutable}: Create a {@link Sets.ISetMutable}
  *
  * ### CircularArray
  * {@link circularArray} extends a regular array, but only keeps the last _x_ number of items.

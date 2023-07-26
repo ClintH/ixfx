@@ -1,6 +1,6 @@
 /**
  * A Set which stores unique items determined by their value, rather
- * than object reference (unlike the default JS Set). Create with {@link Sets.setMutable}. Immutable.
+ * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Immutable.
  *
  * By default the `JSON.stringify()` representation is considered the 'key' for an object.
  * Pass in a function to `setMutable` to define your own way of creating keys for values. The principle should
@@ -10,7 +10,7 @@
  *
  * @example Overview of functions
  * ```js
- * const s = setMutable();
+ * const s = Sets.mutable();
  * s.add(item);    // Add one or more items. Items with same key are overriden.
  * s.has(item);    // Returns true if item value is present
  * s.clear();      // Remove everything
@@ -29,7 +29,7 @@
  * ];
  *
  * // Create a set, defining how keys will be generated
- * let s = set(person => {
+ * let s = Sets.mutable(person => {
  *    // Key person objects by name and city.
  *    // ie. Generated keys will be: `Barry-London`, `Sally-Bristol`
  *    return `${person.name}-${person.city}`

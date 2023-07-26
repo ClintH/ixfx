@@ -6,6 +6,6 @@ export type ValueSetEventMap<V> = {
 }
 
 export * from './SetMutable.js';
-export * from './StringSetImpl.js';
+export * from './SetImmutable.js';
 export {type ISetMutable} from './ISetMutable.js';
 export {type ISetImmutable} from './ISetImmutable.js';

@@ -239,23 +239,7 @@ export const defaultComparer = (x: any, y: any): CompareResult => {
   return 0;
 };
 
-/**
- * Returns a human-friendly representation of elapsed milliseconds
- * @param interval
- * @returns
- */
-export const elapsedMs = (interval: Interval) => {
-  //eslint-disable-next-line functional/no-let
-  let ms = intervalToMs(interval);
-  if (!ms) return '(undefined)';
-  if (ms < 1000) return `${ms}ms`;
-  ms /= 1000;
-  if (ms < 120) return `${ms.toFixed(2)}secs`;
-  ms /= 60;
-  if (ms < 60) return `${ms.toFixed(2)}mins`;
-  ms /= 60;
-  return `${ms.toFixed(2)}hrs`;
-};
+
 
 export const defaultKeyer = <V>(a: V) => {
   if (typeof a === `string`) {

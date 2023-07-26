@@ -1,6 +1,6 @@
 import { type Comparer, defaultComparer } from '../Util.js';
 import { BinaryTreeNode } from './BinaryTreeNode.js';
-import { queueMutable } from './queue/QueueMutable.js';
+import { mutable } from './queue/QueueMutable.js';
 import { stackMutable } from './Stack.js';
 
 /**
@@ -195,7 +195,7 @@ export class BinarySearchTree<V> {
    * @yields {BinaryTreeNode}
    */
   *bfs() {
-    const queue = queueMutable<BinaryTreeNode<V>>();
+    const queue = mutable<BinaryTreeNode<V>>();
     if (!this.root) return;
     queue.enqueue(this.root);
 
@@ -320,7 +320,7 @@ export class BinarySearchTree<V> {
    */
   toArray() {
     const array = [];
-    const queue = queueMutable<BinaryTreeNode<V>>();
+    const queue = mutable<BinaryTreeNode<V>>();
     const visited = new Map();
 
     if (this.root) {

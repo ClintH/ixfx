@@ -2,7 +2,7 @@ import {Rects, Points} from './index.js';
 import {integer as guardInteger} from '../Guards.js';
 import {clampIndex} from '../data/Clamp.js';
 import {randomElement} from '../collections/Arrays.js';
-import {type ISetMutable, setMutable} from '../collections/set/index.js';
+import {type ISetMutable, mutable} from '../collections/set/index.js';
 import {zipKeyValue} from "../collections/map/index.js";
 
 export type GridVisual = Readonly<{
@@ -637,7 +637,7 @@ export const visitor = function* (
   guardCell(start, `start`, grid);
 
 
-  const v = opts.visited ?? setMutable<Cell>(c => cellKeyString(c));
+  const v = opts.visited ?? mutable<Cell>(c => cellKeyString(c));
   const possibleNeighbours = logic.options ? logic.options : (g: Grid, c: Cell) => neighbourList(g, c, crossDirections, `undefined`);
 
   if (!isCell(start)) throw new Error(`'start' parameter is undefined or not a cell`);

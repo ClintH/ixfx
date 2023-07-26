@@ -355,8 +355,9 @@ export const deviceEval = async (
   const timeoutMs = opts.timeoutMs ?? device.evalTimeoutMs;
   const assumeExclusive = opts.assumeExclusive ?? true;
 
-  if (typeof code !== `string`)
+  if (typeof code !== `string`) {
     throw new Error(`code parameter should be a string`);
+  }
 
   return new Promise((resolve, reject) => {
     // Generate a random id so reply can be matched up with this request
@@ -369,7 +370,7 @@ export const deviceEval = async (
 
         // Prefixed with angled bracket sometimes?
         if (cleaned.startsWith(`>{`) && cleaned.endsWith(`}`))
-          cleaned = cleaned.substring(1);
+          {cleaned = cleaned.substring(1);}
 
         // Parse reply, expecting JSON.
         const dd = JSON.parse(cleaned);
@@ -402,7 +403,7 @@ export const deviceEval = async (
 
     const onStateChange = (e: StateChangeEvent) => {
       if (e.newState !== `connected`)
-        done(`State changed to '${e.newState}', aborting`);
+        {done(`State changed to '${e.newState}', aborting`);}
     };
 
     device.addEventListener(`data`, onData);

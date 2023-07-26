@@ -26,7 +26,7 @@ export const trimQueue = <V>(
         opts,
         `trimQueue:DiscardAdditions: queueLen: ${queue.length} slice: ${
           potentialLength - capacity
-        } toAddLen: ${toAdd.length}`
+        } toAddLen: ${toAdd.length} nowFull: ${queue.length === opts.capacity}`
       );
       if (queue.length === opts.capacity) {
         return queue; // Completely full

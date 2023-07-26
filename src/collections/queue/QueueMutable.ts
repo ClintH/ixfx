@@ -2,7 +2,7 @@ import { type IQueueMutable } from './IQueueMutable.js';
 import { enqueue, peek, dequeue, isEmpty, isFull } from './QueueFns.js';
 import { type QueueOpts } from './index.js';
 
-export class QueueMutableImpl<V> implements IQueueMutable<V> {
+export class QueueMutable<V> implements IQueueMutable<V> {
   readonly opts: QueueOpts;
   // eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V>;
@@ -49,23 +49,23 @@ export class QueueMutableImpl<V> implements IQueueMutable<V> {
  * _dequeing_ removes items from the front (ie. the oldest).
  *
  * ```js
- * const q = queue();       // Create
+ * const q = Queues.mutable();       // Create
  * q.enqueue(`a`, `b`);     // Add two strings
  * const front = q.dequeue();  // `a` is at the front of queue (oldest)
  * ```
  *
  * @example Cap size to 5 items, throwing away newest items already in queue.
  * ```js
- * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
  * ```
  *
  * @template V Data type of items
  * @param opts
  * @param startingItems Items are added in array order. So first item will be at the front of the queue.
  */
-export function queueMutable<V>(
+export function mutable<V>(
   opts: QueueOpts = {},
   ...startingItems: ReadonlyArray<V>
 ): IQueueMutable<V> {
-  return new QueueMutableImpl({ ...opts }, [...startingItems]);
+  return new QueueMutable({ ...opts }, [...startingItems]);
 }

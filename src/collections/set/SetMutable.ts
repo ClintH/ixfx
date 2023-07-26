@@ -9,7 +9,7 @@ import {type ValueSetEventMap} from "./index.js";
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
  * @returns 
  */
-export const setMutable = <V>(keyString?: ToString<V> | undefined): ISetMutable<V> => new MutableStringSet(keyString);
+export const mutable = <V>(keyString?: ToString<V> | undefined): ISetMutable<V> => new MutableStringSet(keyString);
 
 /**
  * Mutable string set
