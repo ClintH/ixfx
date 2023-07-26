@@ -76,8 +76,10 @@ state, while <code>wakeup</code> can transition to either <code>coffee</code> or
 <a href="Flow.StateMachine.StateMachine.html#next" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>next</span></a>
 <a href="Flow.StateMachine.StateMachine.html#removeEventListener" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a>
 <a href="Flow.StateMachine.StateMachine.html#reset" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>reset</span></a>
+<a href="Flow.StateMachine.StateMachine.html#validateTransition" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate<wbr/>Transition</span></a>
 <a href="Flow.StateMachine.StateMachine.html#isValid-2" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>is<wbr/>Valid</span></a>
 <a href="Flow.StateMachine.StateMachine.html#validate" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate</span></a>
+<a href="Flow.StateMachine.StateMachine.html#validateTransition-2" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate<wbr/>Transition</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
@@ -207,14 +209,19 @@ Use <code>StateMachine.isValid</code> to check validity without changing.</p>
 <section class="tsd-panel tsd-member"><a id="isValid" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Valid</span><a href="#isValid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="isValid.isValid-1"><span class="tsd-kind-call-signature">is<wbr/>Valid</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">newState</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><a href="#isValid.isValid-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="isValid.isValid-1"><span class="tsd-kind-call-signature">is<wbr/>Valid</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">newState</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#isValid.isValid-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns <em>true</em> if <code>newState</code> is valid transition from current state.
+Use <a href="Flow.StateMachine.StateMachine.html#validateTransition-2" class="tsd-kind-method">validateTransition</a> if you want an explanation for the <em>false</em> results.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">newState</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span></h4></li></ul></section>
+<h5><span class="tsd-kind-parameter">newState</span>: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+<div class="tsd-comment tsd-typography"></div></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="next" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>next</span><a href="#next" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -277,12 +284,67 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <div class="tsd-comment tsd-typography">
 <h4>Memberof</h4><p>StateMachine</p>
 </div></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="validateTransition" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>validate<wbr/>Transition</span><a href="#validateTransition" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="validateTransition.validateTransition-1"><span class="tsd-kind-call-signature">validate<wbr/>Transition</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">newState</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><a href="#validateTransition.validateTransition-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns whether <code>newState</code> is a valid transition from current state,
+along with a message explanation. Use <a href="Flow.StateMachine.StateMachine.html#isValid-2" class="tsd-kind-method">isValid</a> if you just want a simple boolean</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">newState</span>: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span></h4>
+<div class="tsd-comment tsd-typography"></div></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="isValid-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>is<wbr/>Valid</span><a href="#isValid-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="isValid-2.isValid-3"><span class="tsd-kind-call-signature">is<wbr/>Valid</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">priorState</span>, <span class="tsd-kind-parameter">newState</span>, <span class="tsd-kind-parameter">description</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><a href="#isValid-2.isValid-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="isValid-2.isValid-3"><span class="tsd-kind-call-signature">is<wbr/>Valid</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">priorState</span>, <span class="tsd-kind-parameter">newState</span>, <span class="tsd-kind-parameter">description</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#isValid-2.isValid-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Checks whether a state change is valid.</p>
+<div class="tsd-comment tsd-typography"><p>Returns true if state change is valid</p>
+<pre><code class="language-js"><span class="hl-1">if</span><span class="hl-2"> (</span><span class="hl-8">isValid</span><span class="hl-2">(</span><span class="hl-3">priorState</span><span class="hl-2">, </span><span class="hl-3">newState</span><span class="hl-2">, </span><span class="hl-3">description</span><span class="hl-2">)) {</span><br/><span class="hl-2"> </span><span class="hl-0">// Do something</span><br/><span class="hl-2">}</span>
+</code><button>Copy</button></pre>
+<p>Use <a href="Flow.StateMachine.StateMachine.html#validateTransition-2" class="tsd-kind-method">validateTransition</a> for message on why transition is not valid.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">priorState</span>: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><span class="tsd-kind-parameter">newState</span>: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><span class="tsd-kind-parameter">description</span>: <a href="../interfaces/Flow.StateMachine.MachineDescription.html" class="tsd-signature-type tsd-kind-interface">MachineDescription</a></h5>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+<div class="tsd-comment tsd-typography"></div></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="validate" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>validate</span><a href="#validate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="validate.validate-1"><span class="tsd-kind-call-signature">validate</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">initial</span>, <span class="tsd-kind-parameter">m</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><a href="#validate.validate-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">initial</span>: <span class="tsd-signature-type">string</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">m</span>: <a href="../interfaces/Flow.StateMachine.MachineDescription.html" class="tsd-signature-type tsd-kind-interface">MachineDescription</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span></h4></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="validateTransition-2" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>validate<wbr/>Transition</span><a href="#validateTransition-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="validateTransition-2.validateTransition-3"><span class="tsd-kind-call-signature">validate<wbr/>Transition</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">priorState</span>, <span class="tsd-kind-parameter">newState</span>, <span class="tsd-kind-parameter">description</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><a href="#validateTransition-2.validateTransition-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Checks whether a state change is valid. Use <a href="Flow.StateMachine.StateMachine.html#isValid-2" class="tsd-kind-method">isValid</a> if you just want a simple boolean</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> [ </span><span class="hl-6">isValid</span><span class="hl-2">,</span><span class="hl-6">msg</span><span class="hl-2"> ] = </span><span class="hl-8">validateTransition</span><span class="hl-2">(</span><span class="hl-3">priorState</span><span class="hl-2">, </span><span class="hl-3">newState</span><span class="hl-2">, </span><span class="hl-3">description</span><span class="hl-2">);</span><br/><span class="hl-1">if</span><span class="hl-2"> (</span><span class="hl-3">isValid</span><span class="hl-2">) {</span><br/><span class="hl-2"> </span><span class="hl-0">// ...</span><br/><span class="hl-2">} </span><span class="hl-1">else</span><span class="hl-2"> {</span><br/><span class="hl-2"> </span><span class="hl-0">// Not valid, reason in msg</span><br/><span class="hl-2">}</span>
+</code><button>Copy</button></pre>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -307,20 +369,7 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <div class="tsd-comment tsd-typography">
 <h4>Static</h4>
 <h4>Memberof</h4><p>StateMachine</p>
-</div></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="validate" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>validate</span><a href="#validate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="validate.validate-1"><span class="tsd-kind-call-signature">validate</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">initial</span>, <span class="tsd-kind-parameter">m</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><a href="#validate.validate-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">initial</span>: <span class="tsd-signature-type">string</span></h5></li>
-<li>
-<h5><span class="tsd-kind-parameter">m</span>: <a href="../interfaces/Flow.StateMachine.MachineDescription.html" class="tsd-signature-type tsd-kind-interface">MachineDescription</a></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span></h4></li></ul></section></section></div>
+</div></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -350,8 +399,10 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <li><a href="#next" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>next</span></a></li>
 <li><a href="#removeEventListener" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a></li>
 <li><a href="#reset" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>reset</span></a></li>
+<li><a href="#validateTransition" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate<wbr/>Transition</span></a></li>
 <li><a href="#isValid-2" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>is<wbr/>Valid</span></a></li>
-<li><a href="#validate" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate</span></a></li></ul></div></details></div>
+<li><a href="#validate" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate</span></a></li>
+<li><a href="#validateTransition-2" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>validate<wbr/>Transition</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>ixfx</span></a>
 <ul class="tsd-small-nested-navigation">
@@ -377,9 +428,9 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <li><a href="../interfaces/Flow.StateMachine.StopEvent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Stop<wbr/>Event</span></a></li>
 <li><a href="../types/Flow.StateMachine.DriverDescription.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Driver<wbr/>Description</span></a></li>
 <li><a href="../types/Flow.StateMachine.DriverExpression.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Expression</span></a></li>
-<li><a href="../types/Flow.StateMachine.DriverResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Result</span></a></li>
 <li><a href="../types/Flow.StateMachine.StateEvent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Event</span></a></li>
 <li><a href="../types/Flow.StateMachine.StateHandler.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Handler</span></a></li>
+<li><a href="../types/Flow.StateMachine.StateHandlerResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Handler<wbr/>Result</span></a></li>
 <li><a href="../types/Flow.StateMachine.StateMachineEventMap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Machine<wbr/>Event<wbr/>Map</span></a></li>
 <li><a href="../functions/Flow.StateMachine.bidirectionalDescriptionFromList.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-64"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)"></path></g></svg><span>bidirectional<wbr/>Description<wbr/>From<wbr/>List</span></a></li>
 <li><a href="../functions/Flow.StateMachine.create.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>create</span></a></li>
@@ -402,8 +453,8 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <li><a href="../types/Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
 <li><a href="../types/Flow.PollOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Poll<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.RepeatPredicate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Repeat<wbr/>Predicate</span></a></li>
-<li><a href="../types/Flow.RetryWithBackOffOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>With<wbr/>Back<wbr/>Off<wbr/>Opts</span></a></li>
-<li><a href="../types/Flow.RetryWithBackOffResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>With<wbr/>Back<wbr/>Off<wbr/>Result</span></a></li>
+<li><a href="../types/Flow.RetryOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Opts</span></a></li>
+<li><a href="../types/Flow.RetryResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Result</span></a></li>
 <li><a href="../types/Flow.SleepOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Sleep<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.Timeout.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timeout</span></a></li>
 <li><a href="../types/Flow.TimeoutAsyncCallback.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timeout<wbr/>Async<wbr/>Callback</span></a></li>
@@ -411,7 +462,6 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <li><a href="../types/Flow.Timer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer</span></a></li>
 <li><a href="../types/Flow.TimerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer<wbr/>Source</span></a></li>
 <li><a href="../types/Flow.UpdateFailPolicy.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Update<wbr/>Fail<wbr/>Policy</span></a></li>
-<li><a href="../functions/Flow.completionMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>completion<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.continuously-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>continuously</span></a></li>
 <li><a href="../functions/Flow.debounce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>debounce</span></a></li>
 <li><a href="../functions/Flow.delay.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>delay</span></a></li>
@@ -426,14 +476,16 @@ If machine is finalised, no error is thrown and null is returned.</p>
 <li><a href="../functions/Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="../functions/Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.iterableFromPoll.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>iterable<wbr/>From<wbr/>Poll</span></a></li>
+<li><a href="../functions/Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="../functions/Flow.relativeTimerMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Timer<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.relativeTimerTicks.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Timer<wbr/>Ticks</span></a></li>
 <li><a href="../functions/Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="../functions/Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>
-<li><a href="../functions/Flow.retryWithBackOff.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>retry<wbr/>With<wbr/>Back<wbr/>Off</span></a></li>
+<li><a href="../functions/Flow.retry.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>retry</span></a></li>
 <li><a href="../functions/Flow.runOnce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>run<wbr/>Once</span></a></li>
 <li><a href="../functions/Flow.sleep.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sleep</span></a></li>
 <li><a href="../functions/Flow.throttle.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>throttle</span></a></li>
+<li><a href="../functions/Flow.ticksElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ticks<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="../functions/Flow.timeout-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>timeout</span></a></li>
 <li><a href="../functions/Flow.updateOutdated.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>update<wbr/>Outdated</span></a></li>
 <li><a href="../functions/Flow.waitFor.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>wait<wbr/>For</span></a></li></ul></div></details></li>

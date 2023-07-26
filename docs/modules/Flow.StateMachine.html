@@ -19,6 +19,11 @@
 <section class="tsd-panel tsd-comment">
 <div class="tsd-comment tsd-typography"><p>State Machine
 See <a href="../classes/Flow.StateMachine.StateMachine.html">here for usage</a>.</p>
+<ul>
+<li><a href="../functions/Flow.StateMachine.drive.html" class="tsd-kind-function">drive</a>: Drive a static machine</li>
+<li><a href="../functions/Flow.StateMachine.create.html" class="tsd-kind-function">create</a>: Create a state machine from initial state and machine description</li>
+<li><a href="../functions/Flow.StateMachine.fromList.html" class="tsd-kind-function">fromList</a>: Create a state machine from a simple list of states</li>
+</ul>
 </div>
 <div class="tsd-comment tsd-typography"></div></section>
 <section class="tsd-panel-group tsd-index-group">
@@ -41,9 +46,9 @@ See <a href="../classes/Flow.StateMachine.StateMachine.html">here for usage</a>.
 <h3 class="tsd-index-heading">Type Aliases</h3>
 <div class="tsd-index-list"><a href="../types/Flow.StateMachine.DriverDescription.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Driver<wbr/>Description</span></a>
 <a href="../types/Flow.StateMachine.DriverExpression.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Expression</span></a>
-<a href="../types/Flow.StateMachine.DriverResult.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Result</span></a>
 <a href="../types/Flow.StateMachine.StateEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Event</span></a>
 <a href="../types/Flow.StateMachine.StateHandler.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Handler</span></a>
+<a href="../types/Flow.StateMachine.StateHandlerResult.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Handler<wbr/>Result</span></a>
 <a href="../types/Flow.StateMachine.StateMachineEventMap.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Machine<wbr/>Event<wbr/>Map</span></a>
 </div></section>
 <section class="tsd-index-section">
@@ -94,9 +99,9 @@ See <a href="../classes/Flow.StateMachine.StateMachine.html">here for usage</a>.
 <li><a href="../interfaces/Flow.StateMachine.StopEvent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Stop<wbr/>Event</span></a></li>
 <li><a href="../types/Flow.StateMachine.DriverDescription.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Description</span></a></li>
 <li><a href="../types/Flow.StateMachine.DriverExpression.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Expression</span></a></li>
-<li><a href="../types/Flow.StateMachine.DriverResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Driver<wbr/>Result</span></a></li>
 <li><a href="../types/Flow.StateMachine.StateEvent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Event</span></a></li>
 <li><a href="../types/Flow.StateMachine.StateHandler.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Handler</span></a></li>
+<li><a href="../types/Flow.StateMachine.StateHandlerResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Handler<wbr/>Result</span></a></li>
 <li><a href="../types/Flow.StateMachine.StateMachineEventMap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>State<wbr/>Machine<wbr/>Event<wbr/>Map</span></a></li>
 <li><a href="../functions/Flow.StateMachine.bidirectionalDescriptionFromList.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>bidirectional<wbr/>Description<wbr/>From<wbr/>List</span></a></li>
 <li><a href="../functions/Flow.StateMachine.create.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>create</span></a></li>
@@ -119,8 +124,8 @@ See <a href="../classes/Flow.StateMachine.StateMachine.html">here for usage</a>.
 <li><a href="../types/Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
 <li><a href="../types/Flow.PollOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Poll<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.RepeatPredicate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Repeat<wbr/>Predicate</span></a></li>
-<li><a href="../types/Flow.RetryWithBackOffOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>With<wbr/>Back<wbr/>Off<wbr/>Opts</span></a></li>
-<li><a href="../types/Flow.RetryWithBackOffResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>With<wbr/>Back<wbr/>Off<wbr/>Result</span></a></li>
+<li><a href="../types/Flow.RetryOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Opts</span></a></li>
+<li><a href="../types/Flow.RetryResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Result</span></a></li>
 <li><a href="../types/Flow.SleepOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Sleep<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.Timeout.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timeout</span></a></li>
 <li><a href="../types/Flow.TimeoutAsyncCallback.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timeout<wbr/>Async<wbr/>Callback</span></a></li>
@@ -128,7 +133,6 @@ See <a href="../classes/Flow.StateMachine.StateMachine.html">here for usage</a>.
 <li><a href="../types/Flow.Timer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer</span></a></li>
 <li><a href="../types/Flow.TimerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer<wbr/>Source</span></a></li>
 <li><a href="../types/Flow.UpdateFailPolicy.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Update<wbr/>Fail<wbr/>Policy</span></a></li>
-<li><a href="../functions/Flow.completionMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>completion<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.continuously-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>continuously</span></a></li>
 <li><a href="../functions/Flow.debounce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>debounce</span></a></li>
 <li><a href="../functions/Flow.delay.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>delay</span></a></li>
@@ -143,14 +147,16 @@ See <a href="../classes/Flow.StateMachine.StateMachine.html">here for usage</a>.
 <li><a href="../functions/Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="../functions/Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.iterableFromPoll.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>iterable<wbr/>From<wbr/>Poll</span></a></li>
+<li><a href="../functions/Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="../functions/Flow.relativeTimerMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Timer<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.relativeTimerTicks.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Timer<wbr/>Ticks</span></a></li>
 <li><a href="../functions/Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="../functions/Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>
-<li><a href="../functions/Flow.retryWithBackOff.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>retry<wbr/>With<wbr/>Back<wbr/>Off</span></a></li>
+<li><a href="../functions/Flow.retry.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>retry</span></a></li>
 <li><a href="../functions/Flow.runOnce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>run<wbr/>Once</span></a></li>
 <li><a href="../functions/Flow.sleep.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sleep</span></a></li>
 <li><a href="../functions/Flow.throttle.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>throttle</span></a></li>
+<li><a href="../functions/Flow.ticksElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ticks<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="../functions/Flow.timeout-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>timeout</span></a></li>
 <li><a href="../functions/Flow.updateOutdated.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>update<wbr/>Outdated</span></a></li>
 <li><a href="../functions/Flow.waitFor.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>wait<wbr/>For</span></a></li></ul></div></details></li>
