@@ -25,30 +25,13 @@ export type ModTimer = Timer & {
  * timer(); // Returns true if timer is done
  * ```
  *
- * See also {@link completionMs}.
+ * See also {@link Elapsed.progress}.
  * @param totalMs
  * @returns
  */
 export function hasElapsedMs(totalMs: number): () => boolean {
   const t = relativeTimer(totalMs, msElapsedTimer());
   return () => t.isDone;
-}
-
-/**
- * Returns a function that returns the percentage of timer completion
- *
- * ```js
- * const timer = completionMs(1000);
- * timer(); // Returns 0..1
- * ```
- *
- * See also {@link hasElapsedMs}.
- * @param totalMs
- * @returns
- */
-export function completionMs(totalMs: number): () => number {
-  const t = relativeTimer(totalMs, msElapsedTimer());
-  return () => t.elapsed;
 }
 
 export const frequencyTimerSource =
@@ -218,9 +201,15 @@ export const frequencyTimer = (
 };
 
 /**
- * A timer that uses clock time
- * @private
+ * A timer that uses clock time. Start time is from the point of invocation.
+ *
+ * ```js
+ * const t = msElapsedTimer();
+ * t.reset(); // reset start
+ * t.elapsed; // ms since start
+ * ```
  * @returns {Timer}
+ * @see {ticksElapsedTimer}
  */
 export const msElapsedTimer = (): Timer => {
   // eslint-disable-next-line functional/no-let
@@ -239,8 +228,14 @@ export const msElapsedTimer = (): Timer => {
  * A timer that progresses with each call to `elapsed`.
  *
  * The first call to elapsed will return 1.
- * @private
+ *
+ * ```js
+ * const timer = ticksElapsedTimer();
+ * timer.reset(); // Reset to 0
+ * timer.elapsed; // Number of ticks
+ * ```
  * @returns {Timer}
+ * @see {msElapsedTimer}
  */
 export const ticksElapsedTimer = (): Timer => {
   // eslint-disable-next-line functional/no-let
