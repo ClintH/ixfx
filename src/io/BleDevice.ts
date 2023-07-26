@@ -5,7 +5,7 @@ import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retryWithBackOff } from '../flow/RetryWithBackOff.js';
+import { retry } from '../flow/Retry.js';
 
 export type DataEvent = {
   readonly data: string;
@@ -64,7 +64,10 @@ export class BleDevice extends SimpleEventEmitter<Events> {
   rxBuffer: StringReceiveBuffer;
   txBuffer: StringWriteBuffer;
 
-  constructor(private device: BluetoothDevice, private config: Opts) {
+  constructor(
+    private device: BluetoothDevice,
+    private config: Opts
+  ) {
     super();
     this.verboseLogging = config.debug;
     this.txBuffer = new StringWriteBuffer(async (data) => {
@@ -144,7 +147,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     const gatt = this.device.gatt;
     if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
-    await retryWithBackOff(
+    await retry(
       async () => {
         const server = await gatt.connect();
         this.verbose(`Getting primary service`);
@@ -170,7 +173,7 @@ export class BleDevice extends SimpleEventEmitter<Events> {
       },
       {
         count: attempts,
-        startMs: 200
+        startMs: 200,
       }
     );
   }

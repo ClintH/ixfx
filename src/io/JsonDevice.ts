@@ -4,7 +4,7 @@ import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retryWithBackOff } from '../flow/RetryWithBackOff.js';
+import { retry } from '../flow/Retry.js';
 
 /**
  * Options for JsonDevice
@@ -159,15 +159,15 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.states.state = `connecting`;
     await this.onPreConnect();
 
-    await retryWithBackOff(
+    await retry(
       async () => {
         await this.onConnectAttempt();
         this.states.state = `connected`;
         return true;
       },
       {
-        count:attempts,
-        startMs:200
+        count: attempts,
+        startMs: 200,
       }
     );
   }
