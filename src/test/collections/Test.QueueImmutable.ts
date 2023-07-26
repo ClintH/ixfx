@@ -2,7 +2,7 @@
 import test from 'ava';
 import { immutable } from '../../collections/queue/Queue.js';
 
-test(`basic`, t => {
+test(`basic`, (t) => {
   const q = immutable<string>();
 
   // Initial
@@ -37,11 +37,10 @@ test(`basic`, t => {
   t.true(q3.peek === `b`);
 });
 
-
-test(`bounded`, t => {
+test(`bounded`, (t) => {
   // Front of queue is index 0, end of queue (newer items) are end of array
   // Bounded queue. Default is that new additions are ignored
-  const a = immutable<string>({capacity: 5});
+  const a = immutable<string>({ capacity: 5 });
   t.true(a.isEmpty);
   const b = a.enqueue(`test`);
   let c = b;
@@ -69,58 +68,123 @@ test(`bounded`, t => {
   for (let i = 0; i < 15; i++) {
     a1 = a1.enqueue(`test` + i);
   }
-  t.like(a1.data, [`test0`, `test1`, `test2`, `test3`, `test4`, `test5`, `test6`, `test7`, `test8`, `test9`, `test10`, `test11`, `test12`, `test13`, `test14`]);
+  t.like(a1.data, [
+    `test0`,
+    `test1`,
+    `test2`,
+    `test3`,
+    `test4`,
+    `test5`,
+    `test6`,
+    `test7`,
+    `test8`,
+    `test9`,
+    `test10`,
+    `test11`,
+    `test12`,
+    `test13`,
+    `test14`,
+  ]);
 
   // Test different overflow logic
 
   // Discard additions: let something in
-  let e = immutable<string>({capacity: 4, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
+  let e = immutable<string>(
+    { capacity: 4, discardPolicy: `additions` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   e = e.enqueue(`test3`, `test4`, `test5`); // Only test3 should make it in
   t.like(e.data, [`test0`, `test1`, `test2`, `test3`]);
 
   // Discard additions: already full
-  e = immutable<string>({capacity: 3, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
+  e = immutable<string>(
+    { capacity: 3, discardPolicy: `additions` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   e = e.enqueue(`test3`, `test4`, `test5`);
   t.like(e.data, [`test0`, `test1`, `test2`]);
 
   // Discard additions: let everything in
-  e = immutable<string>({capacity: 6, discardPolicy: `additions`}, `test0`, `test1`, `test2`);
+  e = immutable<string>(
+    { capacity: 6, discardPolicy: `additions` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   e = e.enqueue(`test3`, `test4`, `test5`);
   t.like(e.data, [`test0`, `test1`, `test2`, `test3`, `test4`, `test5`]);
 
   // Older items are discarded (ie test0, test1) - partial flush
-  let f = immutable<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
+  let f = immutable<string>(
+    { capacity: 4, discardPolicy: `older` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   f = f.enqueue(`test3`, `test4`, `test5`);
   t.like(f.data, [`test2`, `test3`, `test4`, `test5`]);
 
   // Older items are discarded (ie test0, test1) - complete flush
-  f = immutable<string>({capacity: 4, discardPolicy: `older`}, `test0`, `test1`, `test2`);
+  f = immutable<string>(
+    { capacity: 4, discardPolicy: `older` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   f = f.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  t.like(f.data,[`test4`, `test5`, `test6`, `test7`]);
+  t.like(f.data, [`test4`, `test5`, `test6`, `test7`]);
 
   // Older items are discarded (ie test0, test1) - exact flush
-  f = immutable<string>({capacity: 3, discardPolicy: `older`}, `test0`, `test1`, `test2`);
+  f = immutable<string>(
+    { capacity: 3, discardPolicy: `older` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   f = f.enqueue(`test3`, `test4`, `test5`);
-  t.like(f.data,[`test3`, `test4`, `test5`]);
+  t.like(f.data, [`test3`, `test4`, `test5`]);
 
   // Newer items are discarded (ie test1, test2) - partial flush
-  let g = immutable<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
-  g = g.enqueue(`test3`, `test4`, `test5`); // Only `test2` should survive from original
-  t.like(g.data,[`test0`, `test3`, `test4`, `test5`]);
+  let g = immutable<string>(
+    { capacity: 4, discardPolicy: `newer` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
+  g = g.enqueue(`test3`, `test4`, `test5`);
+  t.like(g.data, [`test0`, `test1`, `test2`, `test5`]);
 
   // Newer items are discarded (ie test1, test2) - complete flush
-  g = immutable<string>({capacity: 4, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  g = immutable<string>(
+    { capacity: 4, discardPolicy: `newer` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   g = g.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  t.like(g.data,[`test4`, `test5`, `test6`, `test7`]);
+  t.like(g.data, [`test4`, `test5`, `test6`, `test7`]);
 
   // Newer items are discarded (ie test1, test2) - exact flush
-  g = immutable<string>({capacity: 3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  g = immutable<string>(
+    { capacity: 3, discardPolicy: `newer` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   g = g.enqueue(`test3`, `test4`, `test5`);
-  t.like(g.data,[`test3`, `test4`, `test5`]);
+  t.like(g.data, [`test3`, `test4`, `test5`]);
 
-  // One item past capacity with newer 
-  g = immutable<string>({capacity:3, discardPolicy: `newer`}, `test0`, `test1`, `test2`);
+  // One item past capacity with newer
+  g = immutable<string>(
+    { capacity: 3, discardPolicy: `newer` },
+    `test0`,
+    `test1`,
+    `test2`
+  );
   g = g.enqueue(`test3`);
-  t.like(g.data,[`test0`, `test1`, `test3`]);
-
+  t.like(g.data, [`test0`, `test1`, `test3`]);
 });
