@@ -1,54 +1,149 @@
-
-// export type CancelToken = {
-//   readonly cancel: boolean;
-// };
+import { sleep } from './Sleep.js';
+import { resolveLogOption } from '../Debug.js';
+import { since, toString as elapsedToString } from './Elapsed.js';
 
 /**
- * Keeps executing `calback` until it runs without an exception being thrown.
+ * Result of backoff
+ */
+export type RetryResult = {
+  /**
+   * Message describing outcome
+   */
+  readonly message?: string;
+  /**
+   * True if callback function was invoked once where it returned _true_
+   */
+  readonly success: boolean;
+  /**
+   * Number of times callback was attempted
+   */
+  readonly attempts: number;
+  /**
+   * Total elapsed time since beginning of call to `retry`
+   */
+  readonly elapsed: number;
+};
+
+/**
+ * Backoff options
+ */
+export type RetryOpts = {
+  /**
+   * Maximum number of attempts to make
+   */
+  readonly count: number;
+  /**
+   * Starting milliseconds for sleeping after failure
+   */
+  readonly startMs: number;
+  /**
+   * Initial waiting period before first attempt (optional)
+   */
+  readonly predelayMs?: number;
+  /**
+   * Optional abort signal
+   */
+  readonly abort?: AbortSignal;
+  /**
+   * Log: _true_ logs to console
+   */
+  readonly log?: boolean;
+  /**
+   * Math.pow factor. Defaults to 1.1. How much slower to
+   * get with each retry.
+   */
+  readonly power?: number;
+};
+
+/**
+ * Keeps calling `cb` until it returns _true_. If it throws an exception,
+ * it will cancel the retry, bubbling the exception.
  *
+ * ```js
+ * // A function that only works some of the time
+ * const flakyFn = async () => {
+ *  // do the thing
+ *  if (Math.random() > 0.9) return true; // success
+ *  return false; // 'failed'
+ * };
+ *
+ * // Retry it up to five times
+ * const result = await retry(flakyFn, {
+ *  count: 5,
+ *  startMs: 1000
+ * });
+ *
+ * if (result.success) {
+ *  // Yay
+ * } else {
+ *  console.log(`Failed after ${result.attempts} attempts. Elapsed: ${result.elapsed}`);
+ *  console.log(result.message);
+ * }
  * ```
- * // Retry up to five times, starting at 200ms delay
- * await retry(async () => {
- *  // Do something, sometimes throwing an error
- * }, 5, 200);
+ *
+ * An `AbortSignal` can be used to cancel process.
+ * ```js
+ * const abort = new AbortController();
+ * const result = await retry(cb, { startMs: 6000, count: 1000, signal: abort.signal });
+ *
+ * // Somewhere else...
+ * abort('Cancel!'); // Trigger abort
  * ```
- *
- * Each loop will run at twice the duration of the last, beginning at `startingTimeoutMs`.
- *
- * @param callback Async code to run
- * @param attempts Number of times to try
- * @param startingTimeoutMs Time to sleep for first iteration
- * @param cancelToken If provided, this is checked before and after each sleep to see if retry should continue. If cancelled, promise will be rejected
+ * @param cb Function to run
+ * @param opts Options
  * @returns
  */
-// export const retry_ = async <V>(
-//   callback: () => Promise<V>,
-//   attempts: number = 5,
-//   startingTimeoutMs: number = 200,
-//   cancelToken?: CancelToken
-// ): Promise<V> => {
-//   guardInteger(attempts, `positive`, `attempts`);
-//   guardInteger(startingTimeoutMs, `positive`, `startingTimeoutMs`);
+export const retry = async (
+  cb: () => Promise<boolean>,
+  //eslint-disable-next-line functional/prefer-immutable-types
+  opts: RetryOpts
+): Promise<RetryResult> => {
+  const signal = opts.abort;
+  const log = resolveLogOption(opts.log);
+  const power = opts.power ?? 1.1;
+  const predelayMs = opts.predelayMs ?? 0;
+  const startedAt = since();
 
-//   //eslint-disable-next-line functional/no-let
-//   let timeout = startingTimeoutMs;
-//   //eslint-disable-next-line functional/no-let
-//   let totalSlept = 0;
-//   while (attempts > 0) {
-//     try {
-//       return await callback();
-//     } catch (ex) {
-//       attempts--;
-//     }
-//     totalSlept += timeout;
+  //eslint-disable-next-line functional/no-let
+  let t = opts.startMs;
+  const count = opts.count;
+  //eslint-disable-next-line functional/no-let
+  let attempts = 0;
 
-//     if (cancelToken && cancelToken.cancel) throw new Error(`Cancelled`);
-//     await sleep(timeout);
-//     if (cancelToken && cancelToken.cancel) throw new Error(`Cancelled`);
+  if (predelayMs > 0) await sleep({ millis: predelayMs, signal: signal });
+  if (signal?.aborted) {
+    return {
+      success: false,
+      attempts,
+      elapsed: startedAt(),
+      message: `Aborted during predelay`,
+    };
+  }
+  while (attempts <= count) {
+    attempts++;
+    const ok = await cb();
+    if (ok) return { success: true, attempts, elapsed: startedAt() };
 
-//     timeout *= 2;
-//   }
-//   throw new Error(
-//     `Retry failed after ${attempts} attempts over ${totalSlept} ms.`
-//   );
-// };
+    log({
+      msg: `retry attempts: ${attempts} t: ${elapsedToString(t)}`,
+    });
+
+    // Did not succeed. Sleep
+    try {
+      await sleep({ millis: t, signal });
+    } catch (ex) {
+      // Eg if abort signal fires
+      return {
+        success: false,
+        attempts,
+        message: 'Sleep failed, possibly due to abort signal',
+        elapsed: startedAt(),
+      };
+    }
+
+    // Increase sleep time for next fail
+    t = Math.floor(Math.pow(t, power));
+  }
+
+  return { success: false, attempts, elapsed: startedAt() };
+};
