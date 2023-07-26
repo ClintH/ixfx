@@ -7,7 +7,7 @@ import type {
   MachineDescription,
   Options,
   StateDriverDescription,
-  DriverResult,
+  StateHandlerResult,
   DriverDescription,
   DriverExpression,
 } from './StateMachineTypes.js';
@@ -229,7 +229,39 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   }
 
   /**
-   * Checks whether a state change is valid.
+   * Returns true if state change is valid
+   * ```js
+   * if (isValid(priorState, newState, description)) {
+   *  // Do something
+   * }
+   * ```
+   *
+   * Use {@link validateTransition} for message on why transition is not valid.
+   * @param priorState
+   * @param newState
+   * @param description
+   * @returns
+   */
+  static isValid(
+    priorState: string,
+    newState: string,
+    description: MachineDescription
+  ): boolean {
+    const r = this.validateTransition(priorState, newState, description);
+    return r[0];
+  }
+
+  /**
+   * Checks whether a state change is valid. Use {@link isValid} if you just want a simple boolean
+   *
+   * ```js
+   * const [ isValid,msg ] = validateTransition(priorState, newState, description);
+   * if (isValid) {
+   *  // ...
+   * } else {
+   *  // Not valid, reason in msg
+   * }
+   * ```
    *
    * @static
    * @param priorState From state
@@ -238,7 +270,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * @returns If valid: [true,''], if invalid: [false, 'Error msg here']
    * @memberof StateMachine
    */
-  static isValid(
+  static validateTransition(
     priorState: string,
     newState: string,
     description: MachineDescription
@@ -269,7 +301,23 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     return [true, `ok`];
   }
 
-  isValid(newState: string): readonly [boolean, string] {
+  /**
+   * Returns whether `newState` is a valid transition from current state,
+   * along with a message explanation. Use {@link isValid} if you just want a simple boolean
+   * @param newState
+   * @returns
+   */
+  validateTransition(newState: string): readonly [boolean, string] {
+    return StateMachine.validateTransition(this.state, newState, this.#m);
+  }
+
+  /**
+   * Returns _true_ if `newState` is valid transition from current state.
+   * Use {@link validateTransition} if you want an explanation for the _false_ results.
+   * @param newState
+   * @returns
+   */
+  isValid(newState: string): boolean {
     return StateMachine.isValid(this.state, newState, this.#m);
   }
 
@@ -286,7 +334,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
 
     if (newState === priorState) return;
 
-    const [isValid, errorMsg] = StateMachine.isValid(
+    const [isValid, errorMsg] = StateMachine.validateTransition(
       priorState,
       newState,
       this.#m
@@ -349,11 +397,18 @@ export const fromList = (...states: readonly string[]): StateMachine =>
   new StateMachine(states[0], descriptionFromList(...states));
 
 /**
- * Returns a state machine based on a list of strings, where states can change forward and backwards.
+ * Returns a {@link StateMachine } based on a list of strings, where states can change forward and backwards.
  * ie, for the list [`a`, `b`, `c`], the changes can be:
  * a <-> b <-> c
  *
  * Use {@link fromList} for unidirectional state changes.
+ *
+ * ```js
+ * // Machine that can go: init <-> one <-> two <-> three
+ * const machine = StateMachine.fromListBidirectional(`init`,`one`, `two`, `three`);
+ * ```
+ *
+ * Since it's bidirectional, machine will never be in _done_ state.
  * @param states
  * @returns
  */
@@ -409,7 +464,7 @@ export const create = (
  * * '__fallback': used if there is no handler for state, or handler did not return a usable result.
  *
  * Each state can have a single function or array of functions to act as handlers.
- * The handler needs to return {@link DriverResult}. In the above example, you see
+ * The handler needs to return {@link StateHandlerResult}. In the above example, you see
  * how to change to a named state (`{state: 'one'}`), how to trigger `sm.next()` and
  * how to reset the state machine.
  *
@@ -491,7 +546,7 @@ export const drive = <V>(
     }
   }
 
-  const drive = (r: DriverResult): boolean => {
+  const drive = (r: StateHandlerResult): boolean => {
     try {
       if (typeof r.next !== `undefined` && r.next) {
         sm.next();
@@ -515,7 +570,7 @@ export const drive = <V>(
   const processResultSet = <V>(
     branch: DriverDescriptionNormalised<V>,
     //eslint-disable-next-line functional/prefer-immutable-types
-    resultSet: DriverResult[]
+    resultSet: StateHandlerResult[]
   ) => {
     for (const result of resultSet) {
       if (drive(result)) return true;
@@ -613,15 +668,22 @@ export const descriptionFromList = (
   ...states: readonly string[]
 ): MachineDescription => {
   const t = {};
+  if (!Array.isArray(states)) throw new Error(`Expected array of strings`);
   for (let i = 0; i < states.length; i++) {
+    const s = states[i];
+    if (typeof s !== `string`) {
+      throw new Error(
+        `Expected array of strings. Got type '${typeof s}' at index ${i}`
+      );
+    }
     if (i === states.length - 1) {
       /** @ts-ignore */
       //eslint-disable-next-line functional/immutable-data
-      t[states[i]] = null;
+      t[s] = null;
     } else {
       /** @ts-ignore */
       //eslint-disable-next-line functional/immutable-data
-      t[states[i]] = states[i + 1];
+      t[s] = states[i + 1];
     }
   }
   return t;
@@ -630,7 +692,7 @@ export const descriptionFromList = (
 /**
  * Returns a machine description based on a list of strings. Machine
  * can go back and forth between states:
- * A <-> B <-> C <-> D
+ * A <-> B <-> C <-> D -> [end]
  * @param states
  * @returns
  */
@@ -638,10 +700,19 @@ export const bidirectionalDescriptionFromList = (
   ...states: readonly string[]
 ): MachineDescription => {
   const t = {};
+  if (!Array.isArray(states)) throw new Error(`Expected array of strings`);
+
   for (let i = 0; i < states.length; i++) {
+    const s = states[i];
+    if (typeof s !== `string`) {
+      throw new Error(
+        `Expected array of strings. Got type '${typeof s}' at index ${i}`
+      );
+    }
+
     /** @ts-ignore */
     //eslint-disable-next-line functional/immutable-data
-    t[states[i]] = [];
+    t[s] = [];
   }
 
   for (let i = 0; i < states.length; i++) {
@@ -681,11 +752,16 @@ const normaliseDriverDescription = <V>(
   return n;
 };
 
+/**
+ * Sort state handler results by score. Undefined results are ignored.
+ * @param arr Results to sort
+ * @returns Sorted copy of input array
+ */
 const sortResults = (
-  arr: readonly (DriverResult | undefined)[] = []
-): readonly DriverResult[] => {
+  arr: readonly (StateHandlerResult | undefined)[] = []
+): readonly StateHandlerResult[] => {
   // Remove undefined
-  const a = arr.filter((v) => v !== undefined) as DriverResult[];
+  const a = arr.filter((v) => v !== undefined) as StateHandlerResult[];
   //eslint-disable-next-line functional/immutable-data
   a.sort((a, b) => {
     const aScore = a.score ?? 0;
@@ -697,12 +773,3 @@ const sortResults = (
   });
   return a;
 };
-
-// const sortTest:readonly (DriverResult|undefined)[] = [
-//   { score: 0.4 },
-//   { score: 0 },
-//   undefined,
-//   { score: 1 },
-//   { score: 0.1 }
-// ];
-// console.log(sortResults(sortTest));
