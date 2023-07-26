@@ -1,10 +1,23 @@
 import { sleep } from './Sleep.js';
 
+/**
+ * Delay options
+ */
 export type DelayOpts = {
+  /**
+   * Milliseconds
+   */
   readonly intervalMs: number;
+  /**
+   * Signal to cancel
+   */
   readonly signal?: AbortSignal;
+  /**
+   * When delay is applied
+   */
   readonly delay: 'before' | 'after' | 'both';
 };
+
 /**
  * Pauses execution for `timeoutMs` after which the asynchronous `callback` is executed and awaited.
  * Use {@link delayIterable} to step through an iterable with delays
@@ -46,13 +59,22 @@ export const delay = async <V>(
 };
 
 /**
- * Async iterable over an input iterable with delay
- * Use {@link delay} to return a result after some delay
+ * Iterate over a source iterable with some delay between results.
+ * Delay can be before, after or both before and after each result from the
+ * source iterable.
+ *
+ * Since it's an async iterable, `for await ... of` is needed.
+ *
  * ```js
- * for await (const i of delayIterable(count(10), { intervalMs: 1000, delay: 'before' })) {
+ * const opts = { intervalMs: 1000, delay: 'before' };
+ * const iterable = count(10);
+ * for await (const i of delayIterable(iterable, opts)) {
  *  // Prints 0..9 with one second between
  * }
  * ```
+ *
+ * Use {@link delay} to return a result after some delay
+ *
  * @param iter
  * @param opts
  */
