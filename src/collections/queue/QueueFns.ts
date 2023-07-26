@@ -14,20 +14,22 @@ export const trimQueue = <V>(
   const capacity = opts.capacity ?? potentialLength;
   const toRemove = potentialLength - capacity;
   const policy = opts.discardPolicy ?? `additions`;
-  debug(
-    opts,
-    `queueLen: ${queue.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${policy}`
-  );
+  // debug(
+  //   opts,
+  //   `queueLen: ${queue.length} potentialLen: ${potentialLength} toRemove: ${toRemove} policy: ${policy} toAdd.length: ${toAdd.length} capacity: ${capacity}`
+  // );
+  // debug(opts, `to add: ${JSON.stringify(toAdd)}`);
 
   switch (policy) {
     // Only add what we can from toAdd
     case `additions`:
-      debug(
-        opts,
-        `trimQueue:DiscardAdditions: queueLen: ${queue.length} slice: ${
-          potentialLength - capacity
-        } toAddLen: ${toAdd.length} nowFull: ${queue.length === opts.capacity}`
-      );
+      // debug(
+      //   opts,
+      //   `trimQueue:DiscardAdditions: queueLen: ${queue.length} slice: ${
+      //     potentialLength - capacity
+      //   } toAddLen: ${toAdd.length} nowFull: ${queue.length === opts.capacity}`
+      // );
+      if (queue.length === 0) return toAdd.slice(0, toAdd.length - toRemove);
       if (queue.length === opts.capacity) {
         return queue; // Completely full
       } else {
@@ -38,27 +40,39 @@ export const trimQueue = <V>(
     case `newer`:
       if (toRemove >= queue.length) {
         // New items will completely flush out old
-        return toAdd.slice(
+        //debug(opts, `slice start: ${toAdd.length - capacity}`);
+        if (queue.length === 0) {
+          // Special case when queue starts off empty
+          return [...toAdd.slice(0, capacity - 1), toAdd[toAdd.length - 1]];
+        }
+        const tmp = toAdd.slice(
           Math.max(0, toAdd.length - capacity),
           Math.min(toAdd.length, capacity) + 1
         );
+        //debug(opts, `Final value: ${JSON.stringify(tmp)}`);
+        return tmp;
       } else {
         // Keep some of the old
-        const toAddFinal = toAdd.slice(
-          0,
-          Math.min(toAdd.length, capacity - toRemove + 1)
-        );
-        const toKeep = queue.slice(0, queue.length - toRemove);
-        debug(
-          opts,
-          `trimQueue: toRemove: ${toRemove} keeping: ${JSON.stringify(
-            toKeep
-          )} from orig: ${JSON.stringify(queue)} toAddFinal: ${JSON.stringify(
-            toAddFinal
-          )}`
-        );
+        // const toAddFinal = toAdd.slice(
+        //   0,
+        //   Math.min(toAdd.length, capacity - toRemove + 1)
+        // );
+        // Cap 5, queue 5, toAdd: 10.
+        const countToAdd = Math.max(1, toAdd.length - queue.length);
+        const toAddFinal = toAdd.slice(toAdd.length - countToAdd, toAdd.length);
+        const toKeep = queue.slice(0, Math.min(queue.length, capacity - 1)); //toRemove);
+        // debug(
+        //   opts,
+        //   `trimQueue: countToAdd: ${countToAdd} qLen: ${
+        //     queue.length
+        //   } capacity: ${capacity} toRemove: ${toRemove} keeping: ${JSON.stringify(
+        //     toKeep
+        //   )} from orig: ${JSON.stringify(queue)} toAddFinal: ${JSON.stringify(
+        //     toAddFinal
+        //   )}`
+        // );
         const t = [...toKeep, ...toAddFinal];
-        debug(opts, `final: ${JSON.stringify(t)}`);
+        //debug(opts, `final: ${JSON.stringify(t)}`);
         return t;
       }
     // Remove from the front of the queue (0 index). ie. older items are discarded
