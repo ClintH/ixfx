@@ -84,6 +84,7 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
   #debug: boolean;
   #m: MachineDescription;
   #isDone: boolean;
+  #isDoneNeedsFiring = false;
   #initial: string;
   #changedAt = Elapsed.infinity();
 
@@ -108,6 +109,22 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
     this.#debug = opts.debug ?? false;
     this.#state = initial;
     this.#isDone = false;
+  }
+
+  #setIsDone(v: boolean) {
+    if (this.#isDone === v) return;
+    this.#isDone = v;
+    if (v) {
+      this.#isDoneNeedsFiring = true;
+      setTimeout(() => {
+        if (!this.#isDoneNeedsFiring) return;
+        this.#isDoneNeedsFiring = false;
+        //console.log(`StateMachine isDone (${this.#state}), firing stop.`);
+        this.fireEvent(`stop`, { state: this.#state });
+      }, 2);
+    } else {
+      this.#isDoneNeedsFiring = false;
+    }
   }
 
   get states(): readonly string[] {
@@ -220,8 +237,8 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    * @memberof StateMachine
    */
   reset() {
-    //eslint-disable-next-line functional/immutable-data
-    this.#isDone = false;
+    this.#setIsDone(false);
+
     //eslint-disable-next-line functional/immutable-data
     this.#state = this.#initial;
     //eslint-disable-next-line functional/immutable-data
@@ -331,7 +348,6 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
    */
   set state(newState: string) {
     const priorState = this.#state;
-
     if (newState === priorState) return;
 
     const [isValid, errorMsg] = StateMachine.validateTransition(
@@ -348,13 +364,15 @@ export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
 
     const rules = this.#m[newState];
     if (rules === null) {
-      this.#isDone = true;
+      // console.log(
+      //   `No rules for state: ${newState}, marking done. Prior: ${priorState}`
+      // );
+      this.#setIsDone(true);
     }
     this.#changedAt = Elapsed.since();
 
     setTimeout(() => {
       this.fireEvent(`change`, { newState: newState, priorState: priorState });
-      if (this.isDone) this.fireEvent(`stop`, { state: newState });
     }, 1);
   }
 
