@@ -185,7 +185,7 @@ export const calcScale = (
   for (const s of buffer.keys()) {
     //seriesNames.forEach(s => {
 
-    const series = [...buffer.values(s)];
+    const series = [...buffer.get(s)];
     if (series.length === 0) break;
 
     let { min, max } = minMaxAvg(series);

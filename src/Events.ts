@@ -64,7 +64,8 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @returns
    */
   protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
-    const listeners = this.#listeners.values(type as string);
+    const listeners = this.#listeners.get(type as string);
+    //console.log(`Firing ${type as string}`);
     for (const l of listeners) {
       l(args, this);
     }

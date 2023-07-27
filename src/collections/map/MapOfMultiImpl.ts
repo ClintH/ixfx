@@ -168,20 +168,23 @@ export class MapOfMutableImpl<V, M>
   }
 
   /**
-   * Returns the array of values stored under `key`.
+   * Iterates over values stored under `key`
    * An empty array is returned if there are no values
    */
-  get(key: string): readonly V[] {
-    const m = this.#map.get(key);
-    if (m === undefined) return [];
-    return this.type.toArray(m);
-  }
-
-  *values(key: string): IterableIterator<V> {
+  *get(key: string): IterableIterator<V> {
+    // const m = this.#map.get(key);
+    // if (m === undefined) return [];
+    // return this.type.toArray(m);
     const m = this.#map.get(key);
     if (m === undefined) return;
     yield* this.type.iterable(m);
   }
+
+  // *values(): IterableIterator<V> {
+  //   const m = this.#map.get(key);
+  //   if (m === undefined) return;
+  //   yield* this.type.iterable(m);
+  // }
 
   /**
    * Iterate over the values stored under `key`.
@@ -240,7 +243,7 @@ export class MapOfMutableImpl<V, M>
     //   if (data !== undefined) this.addKeyedValues(key, ...data);
     // });
     for (const key of other.keys()) {
-      const data = other.values(key);
+      const data = other.get(key);
       this.addKeyedValues(key, ...data);
     }
   }

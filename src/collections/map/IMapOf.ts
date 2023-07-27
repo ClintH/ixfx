@@ -10,7 +10,7 @@ export interface IMapOf<V> {
    * Iterates over all values stored under `key`
    * @param key
    */
-  values(key: string): IterableIterator<V>;
+  get(key: string): IterableIterator<V>;
 
   /**
    * Iterates over key-value pairs.
@@ -29,7 +29,7 @@ export interface IMapOf<V> {
    * @param key Key
    * @param value Value
    */
-  hasKeyValue(key: string, value: V, eq: IsEqual<V>): boolean;
+  hasKeyValue(key: string, value: V, eq?: IsEqual<V>): boolean;
 
   /**
    * Returns _true_ if `key` has any values
@@ -41,12 +41,6 @@ export interface IMapOf<V> {
    * Returns _true_ if the map is empty
    */
   get isEmpty(): boolean;
-
-  /**
-   * Returns the length of the longest child item
-   */
-  //get lengthMax(): number;
-
   /**
    * Returns the number of values stored under `key`, or _0_ if `key` is not present.
    * @param key Key
