@@ -6,7 +6,8 @@ import { type HasCompletion } from './index.js';
 export type TimerSource = () => Timer;
 
 /**
- * A timer instance
+ * A timer instance.
+ * See {@link msElapsedTimer}, {@link ticksElapsedTimer}, {@link frequencyTimer}
  */
 export type Timer = {
   reset(): void;
@@ -15,6 +16,23 @@ export type Timer = {
 
 export type ModTimer = Timer & {
   mod(amt: number): void;
+};
+
+export type TimerOpts = {
+  /**
+   * Timer to use. By default {@link msElapsedTimer}.
+   */
+  readonly timer?: Timer;
+};
+
+/**
+ * Options for relative timer
+ */
+export type RelativeTimerOpts = TimerOpts & {
+  /**
+   * If true, returned value will be clamped to 0..1. False by default
+   */
+  readonly clampValue?: boolean;
 };
 
 /**
@@ -30,38 +48,50 @@ export type ModTimer = Timer & {
  * @returns
  */
 export function hasElapsedMs(totalMs: number): () => boolean {
-  const t = relativeTimer(totalMs, msElapsedTimer());
+  const t = relativeTimer(totalMs, { timer: msElapsedTimer() });
   return () => t.isDone;
 }
 
 export const frequencyTimerSource =
   (frequency: number): TimerSource =>
   () =>
-    frequencyTimer(frequency, msElapsedTimer());
+    frequencyTimer(frequency, { timer: msElapsedTimer() });
 
 /**
- * Wraps a timer, returning a relative elapsed value.
+ * Wraps a timer, returning a relative elapsed value based on
+ * a given total. ie. percentage complete toward a total duration.
+ *
+ * If no timer is specified, milliseconds-based timer is used.
  *
  * ```js
- * let t = relativeTimer(1000, msElapsedTimer());
+ * const t = relativeTimer(1000);
+ * t.isDone;
+ * t.reset();
+ * t.elapsed;
+ * ```
+ *
+ * With options
+ * ```js
+ * // Total duration of 1000 ticks
+ * const t = relativeTimer(1000, { timer: ticksElapsedTimer(); clampValue:true });
  *
  * t.isDone;  // true if total has elapsed
  * t.reset(); // reset timer to 0
  * t.elapsed; // 0..1 scale of how close to completion
  * ```
  *
- * Use `relativeTimerMs` if you want to have a millisecond-based total
  * @private
  * @param total Total
- * @param timer Timer
- * @param clampValue If true, returned value never exceeds 1.0
+ * @param opts Options
  * @returns Timer
  */
 export const relativeTimer = (
   total: number,
-  timer: Timer,
-  clampValue = true
+  opts: RelativeTimerOpts = {}
 ): ModTimer & HasCompletion => {
+  const timer = opts.timer ?? msElapsedTimer();
+  const clampValue = opts.clampValue ?? false;
+
   //eslint-disable-next-line functional/no-let
   let done = false;
   //eslint-disable-next-line functional/no-let
@@ -87,53 +117,6 @@ export const relativeTimer = (
     },
   };
 };
-
-/**
- * Wraps a timer, returning a relative elapsed value.
- *
- * ```js
- * // Timer that counts to 1,000 milliseconds
- * let t = relativeTimerMs(1000);
- *
- * t.isDone;  // true if total milliseconds has elapsed
- * t.reset(); // reset timer to 0
- * t.elapsed; // 0..1 scale of how close to completion
- * ```
- * @param total Total
- * @param timer Timer
- * @param clampValue If true, returned value never exceeds 1.0
- * @returns Timer
- */
-export const relativeTimerMs = (total: number, clampValue = true) =>
-  relativeTimer(total, msElapsedTimer(), clampValue);
-
-/**
- * Wraps a tick-based 'timer', returning a relative value (0..1).
- * A value of 1 indicates the timer has completed.
- *
- * ```js
- * // Timer that counts 20 ticks
- * let t = relativeTimerTicks(20);
- *
- * t.isDone;  // true if total ticks has elapsed
- * t.reset(); // reset timer to 0
- * t.elapsed; // 0..1 scale of how close to completion
- * ```
- *
- * Example:
- * ```js
- * const t = relativeTimerTicks(10);
- * while (!t.isDone) {
- *  const progress = t.elapsed;
- *  // Yields: 0.1, 0.2, ... 1
- * }
- * ```
- * @param total
- * @param clampValue
- * @returns
- */
-export const relativeTimerTicks = (total: number, clampValue = true) =>
-  relativeTimer(total, ticksElapsedTimer(), clampValue);
 
 /**
  * A timer based on frequency: cycles per unit of time. These timers return a number from
@@ -167,8 +150,9 @@ export const relativeTimerTicks = (total: number, clampValue = true) =>
  */
 export const frequencyTimer = (
   frequency: number,
-  timer: Timer = msElapsedTimer()
+  opts: TimerOpts = {}
 ): ModTimer => {
+  const timer = opts.timer ?? msElapsedTimer();
   const cyclesPerSecond = frequency / 1000;
   //eslint-disable-next-line functional/no-let
   let modAmt = 1;
