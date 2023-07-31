@@ -18,7 +18,7 @@
 <h1>Function timeout</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="timeout"><span class="tsd-kind-call-signature">timeout</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">callback</span>, <span class="tsd-kind-parameter">timeoutMs</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Flow.Timeout.html" class="tsd-signature-type tsd-kind-type-alias">Timeout</a><a href="#timeout" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="timeout"><span class="tsd-kind-call-signature">timeout</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">callback</span>, <span class="tsd-kind-parameter">interval</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Flow.Timeout.html" class="tsd-signature-type tsd-kind-type-alias">Timeout</a><a href="#timeout" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns a <a href="../types/Flow.Timeout.html" class="tsd-kind-type-alias">Timeout</a> that can be triggered, cancelled and reset. Use <a href="Flow.continuously-1.html" class="tsd-kind-function">continuously</a> for interval-
 based loops.</p>
@@ -32,8 +32,7 @@ If <code>start()</code> is called again, the waiting period will be reset to <co
 <h5><span class="tsd-kind-parameter">callback</span>: <a href="../types/Flow.TimeoutSyncCallback.html" class="tsd-signature-type tsd-kind-type-alias">TimeoutSyncCallback</a><span class="tsd-signature-symbol"> | </span><a href="../types/Flow.TimeoutAsyncCallback.html" class="tsd-signature-type tsd-kind-type-alias">TimeoutAsyncCallback</a></h5>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><span class="tsd-kind-parameter">timeoutMs</span>: <span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h5><span class="tsd-kind-parameter">interval</span>: <a href="../types/Flow.Interval.html" class="tsd-signature-type tsd-kind-type-alias">Interval</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../types/Flow.Timeout.html" class="tsd-signature-type tsd-kind-type-alias">Timeout</a></h4><p><a href="../types/Flow.Timeout.html" class="tsd-kind-type-alias">Timeout</a></p>
 
 <div class="tsd-comment tsd-typography">
@@ -96,6 +95,7 @@ which can run a given function after a specified delay.</p>
 <li><a href="../types/Flow.ModTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Mod<wbr/>Timer</span></a></li>
 <li><a href="../types/Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
 <li><a href="../types/Flow.PollOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Poll<wbr/>Opts</span></a></li>
+<li><a href="../types/Flow.RelativeTimerOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Relative<wbr/>Timer<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.RepeatPredicate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Repeat<wbr/>Predicate</span></a></li>
 <li><a href="../types/Flow.RetryOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.RetryResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Result</span></a></li>
@@ -104,12 +104,12 @@ which can run a given function after a specified delay.</p>
 <li><a href="../types/Flow.TimeoutAsyncCallback.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timeout<wbr/>Async<wbr/>Callback</span></a></li>
 <li><a href="../types/Flow.TimeoutSyncCallback.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timeout<wbr/>Sync<wbr/>Callback</span></a></li>
 <li><a href="../types/Flow.Timer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer</span></a></li>
+<li><a href="../types/Flow.TimerOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.TimerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Timer<wbr/>Source</span></a></li>
 <li><a href="../types/Flow.UpdateFailPolicy.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Update<wbr/>Fail<wbr/>Policy</span></a></li>
 <li><a href="Flow.continuously-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-64"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)"></path></g></svg><span>continuously</span></a></li>
 <li><a href="Flow.debounce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>debounce</span></a></li>
 <li><a href="Flow.delay.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>delay</span></a></li>
-<li><a href="Flow.delayIterable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>delay<wbr/>Iterable</span></a></li>
 <li><a href="Flow.delayLoop.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>delay<wbr/>Loop</span></a></li>
 <li><a href="Flow.everyNth.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>every<wbr/>Nth</span></a></li>
 <li><a href="Flow.forEach.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>for<wbr/>Each</span></a></li>
@@ -119,10 +119,9 @@ which can run a given function after a specified delay.</p>
 <li><a href="Flow.hasElapsedMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Elapsed<wbr/>Ms</span></a></li>
 <li><a href="Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
+<li><a href="Flow.isInterval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Interval</span></a></li>
 <li><a href="Flow.iterableFromPoll.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>iterable<wbr/>From<wbr/>Poll</span></a></li>
 <li><a href="Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
-<li><a href="Flow.relativeTimerMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Timer<wbr/>Ms</span></a></li>
-<li><a href="Flow.relativeTimerTicks.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Timer<wbr/>Ticks</span></a></li>
 <li><a href="Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>
 <li><a href="Flow.retry.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>retry</span></a></li>

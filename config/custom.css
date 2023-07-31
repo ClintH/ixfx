@@ -2,6 +2,7 @@
   --dark-color-background: hsl(229, 20%, 20%);
   --dark-bg-dim: hsl(231, 21%, 29%);
   --dark-fg: hsl(231, 28%, 73%);
+  --dark-fg-light: hsl(231, 18%, 83%);
   --dark-fgDim: hsl(231, 12%, 50%);
 
   --dark-yellow: hsl(39, 100%, 71%);
@@ -12,6 +13,7 @@
   --light-color-background: hsl(0, 0%, 98%);
   --light-bg-dim: hsl(194, 6%, 94%);
   --light-fg: hsl(200, 16%, 52%);
+  --light-fg-dark: hsl(200, 1%, 52%);
   --light-fgDim: hsl(200, 16%, 32%);
 
   --light-yellow: hsl(39, 90%, 59%);
@@ -21,13 +23,13 @@
 
   --dark-color-ts-namespace: var(--dark-fg);
   --dark-color-ts: var(--dark-fg);
-  --dark-color-ts-function: var(--dark-fg);
+  --dark-color-ts-function: var(--dark-fg-light);
   --dark-color-ts-interface: var(--dark-fg);
   --dark-color-ts-variable: var(--dark-fg);
 
   --light-color-ts-namespace: var(--light-fg);
   --light-color-ts: var(--light-fg);
-  --light-color-ts-function: var(--light-fg);
+  --light-color-ts-function: var(--light-fg-dark);
   --light-color-ts-interface: var(--light-fg);
   --light-color-ts-variable: var(--light-fg);
   --light-code-background: var(--light-bg-dim);
@@ -60,7 +62,9 @@
   .tsd-kind-icon rect {
     stroke: var(--dark-fg);
   }
-
+  .tsd-kind-function {
+    color: var(--dark-color-ts-function);
+  }
   :root {
     --accent: var(--dark-yellow);
   }
@@ -71,6 +75,9 @@
     stroke: var(--light-fg);
   }
 
+  .tsd-kind-function {
+    color: var(--light-color-ts-function);
+  }
   :root {
     --accent: var(--light-yellow);
   }
