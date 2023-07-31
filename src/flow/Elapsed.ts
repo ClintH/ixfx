@@ -74,7 +74,7 @@ export const infinity = (): SinceFn => {
 export function progress(duration: Interval): () => number {
   const totalMs = intervalToMs(duration);
   if (!totalMs) throw new Error(`duration invalid`);
-  const t = relativeTimer(totalMs, msElapsedTimer());
+  const t = relativeTimer(totalMs, { timer: msElapsedTimer() });
   return () => t.elapsed;
 }
 
