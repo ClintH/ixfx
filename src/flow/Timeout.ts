@@ -1,6 +1,6 @@
 import { integer as guardInteger } from '../Guards.js';
 import { type HasCompletion } from './index.js';
-
+import { intervalToMs, type Interval } from './Interval.js';
 export type TimeoutSyncCallback = (
   elapsedMs?: number,
   ...args: readonly unknown[]
@@ -67,24 +67,25 @@ export type Timeout = HasCompletion & {
  */
 export const timeout = (
   callback: TimeoutSyncCallback | TimeoutAsyncCallback,
-  timeoutMs: number
+  interval: Interval
 ): Timeout => {
   if (callback === undefined) {
     throw new Error(`callback parameter is undefined`);
   }
-  guardInteger(timeoutMs, `aboveZero`, `timeoutMs`);
+  const intervalMs = intervalToMs(interval);
+  guardInteger(intervalMs, `aboveZero`, `interval`);
 
   //eslint-disable-next-line functional/no-let
   let timer = 0;
   //eslint-disable-next-line functional/no-let
   let startedAt = 0;
   const start = async (
-    altTimeoutMs: number = timeoutMs,
-    //eslint-disable-next-line functional/prefer-immutable-types
+    altInterval: Interval = interval,
     args: unknown[]
   ): Promise<void> => {
     const p = new Promise<void>((resolve, reject) => {
       startedAt = performance.now();
+      const altTimeoutMs = intervalToMs(altInterval);
       try {
         guardInteger(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
       } catch (e) {
