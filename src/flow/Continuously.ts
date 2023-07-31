@@ -1,5 +1,5 @@
 import { integer as guardInteger } from '../Guards.js';
-import { type HasCompletion } from './index.js';
+import { intervalToMs, type HasCompletion, type Interval } from './index.js';
 
 /**
  * Runs a function continuously, returned by {@link Continuously}
@@ -41,8 +41,8 @@ export type Continuously = HasCompletion & {
    * Set interval. Change will take effect on next loop. For it to kick
    * in earlier, call .reset() after changing the value.
    */
-  set intervalMs(ms: number);
-  get intervalMs(): number;
+  set interval(interval: Interval);
+  get interval(): Interval;
 };
 
 export type ContinuouslySyncCallback = (
@@ -159,12 +159,13 @@ export type ContinuouslyOpts = {
  */
 export const continuously = (
   callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback,
-  intervalMs?: number,
+  interval?: Interval,
   opts: ContinuouslyOpts = {}
 ): Continuously => {
-  if (intervalMs !== undefined) {
-    guardInteger(intervalMs, `positive`, `intervalMs`);
-  }
+  //eslint-disable-next-line functional/no-let
+  let intervalMs = intervalToMs(interval, 0);
+  guardInteger(intervalMs, `positive`, `interval`);
+
   const fireBeforeWait = opts.fireBeforeWait ?? false;
   const onStartCalled = opts.onStartCalled;
 
@@ -177,14 +178,16 @@ export const continuously = (
   //eslint-disable-next-line functional/no-let
   let startedAt = performance.now();
   //eslint-disable-next-line functional/no-let
-  let iMs = intervalMs === undefined ? 0 : intervalMs;
+  let intervalUsed = interval ?? 0;
   //eslint-disable-next-line functional/no-let
   let currentTimer = 0;
 
   const schedule =
-    iMs === 0 ? raf : (cb: () => void) => window.setTimeout(cb, iMs);
+    intervalMs === 0
+      ? raf
+      : (cb: () => void) => window.setTimeout(cb, intervalMs);
   const deschedule =
-    iMs === 0
+    intervalMs === 0
       ? (_: number) => {
           /** no-op */
         }
@@ -260,12 +263,14 @@ export const continuously = (
     start,
     reset,
     cancel,
-    get intervalMs() {
-      return iMs;
+    get interval() {
+      return intervalUsed;
     },
-    set intervalMs(ms: number) {
-      guardInteger(ms, `positive`, `ms`);
-      iMs = ms;
+    set interval(interval: Interval) {
+      const ms = intervalToMs(interval, 0);
+      guardInteger(ms, `positive`, `interval`);
+      intervalMs = ms;
+      intervalUsed = interval;
     },
     get isDone() {
       return !running;
