@@ -1,9 +1,8 @@
 import { number as guardNumber, integer as guardInteger } from './Guards.js';
 
-import { delayIterable } from './flow/Delay.js';
 import type { DelayOpts } from './flow/Delay.js';
 
-export { delayIterable, type DelayOpts };
+export { type DelayOpts };
 
 import { integerUniqueGen } from './Random.js';
 export {
