@@ -147,7 +147,10 @@ const create = function (
   }
 
   // Get a relative version of timer
-  const timer = relativeTimer(duration, timerSource(), true);
+  const timer = relativeTimer(duration, {
+    timer: timerSource(),
+    clampValue: true,
+  });
 
   return {
     get isDone() {
