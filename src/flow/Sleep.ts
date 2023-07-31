@@ -29,7 +29,7 @@ export type SleepOpts<V> = Interval & {
  *
  * A value can be provided, which is returned on awaking:
  * ```js
- * const v = await sleep({ seconds: 1, `hello`);
+ * const v = await sleep({ seconds: 1, value: `hello`);
  * // v = `hello`
  * ```
  *
@@ -50,10 +50,8 @@ export type SleepOpts<V> = Interval & {
  */
 export const sleep = <V>(
   //eslint-disable-next-line functional/prefer-immutable-types
-  optsOrMillis: SleepOpts<V> | number
+  optsOrMillis: SleepOpts<V>
 ): Promise<V | undefined> => {
-  if (typeof optsOrMillis === 'number') optsOrMillis = { millis: optsOrMillis };
-
   const timeoutMs = intervalToMs(optsOrMillis);
   const signal = optsOrMillis.signal;
   const value = optsOrMillis.value;
