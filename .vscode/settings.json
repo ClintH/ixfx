@@ -1,5 +1,4 @@
 {
-  "liveServer.settings.port": 5501,
   "typescript.tsdk": "node_modules/typescript/lib",
   "search.exclude": {
     "**/node_modules": true,

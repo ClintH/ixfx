@@ -5,7 +5,7 @@
       "type": "pwa-msedge",
       "request": "launch",
       "name": "Scratchpad",
-      "url": "http://localhost:5501/scratch/"
+      "url": "http://localhost:5500/docs/",
     }
   ]
 }
