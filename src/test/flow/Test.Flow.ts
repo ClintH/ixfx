@@ -1,16 +1,43 @@
+/* eslint-disable */
 import test from 'ava';
-import {intervalToMs} from '../../flow/Interval.js';
+import { continuously } from '../../flow/Continuously.js';
+import { JSDOM } from 'jsdom';
+import { sleep } from '../../flow/Sleep.js';
 
-test('intervalToMs', t => {
-  t.is(intervalToMs({millis:1000}), 1000);
+test('continuously', async (t) => {
+  const dom = new JSDOM();
+  // @ts-ignore
+  global.window = dom.window;
+  const loopCount = 5;
+  const duration = 200;
+  const expectedElapsed = loopCount * duration;
+  t.plan(loopCount + 1); // +1 for additional asserts whend one
 
-  t.is(intervalToMs({secs:1}), 1000);
+  let loops = loopCount;
+  let startedAt = Date.now();
+  const fn = () => {
+    t.assert(true);
+    loops--;
+    return loops > 0;
+  };
 
-  t.is(intervalToMs({millis:1000, secs:1}), 2000);
+  const c = continuously(fn, 200);
+  c.start();
 
-  t.is(intervalToMs({mins:1}), 60*1000);
-  t.is(intervalToMs({mins:1, secs:1}), (60*1000)+1000);
-
-  t.is(intervalToMs({hrs:1}), 60*60*1000);
-  t.is(intervalToMs({hrs: 1, mins:1, secs:1}), (60*60*1000)+(60*1000)+1000);
+  return new Promise(async (resolve, reject) => {
+    await sleep(expectedElapsed + 50);
+    t.true(c.isDone);
+    const elapsed = Date.now() - startedAt;
+    if (Math.abs(elapsed - expectedElapsed) > 100) {
+      t.fail(`Elapsed time too long: ${elapsed}, expected: ${expectedElapsed}`);
+    }
+    resolve();
+  });
 });
+
+// test('', t=> {
+//   const dom = new JSDOM();
+//   // @ts-ignore
+//   global.window = dom.window;
+//   continuously(
+// });
