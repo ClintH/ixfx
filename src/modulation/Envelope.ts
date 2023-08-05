@@ -5,7 +5,7 @@ import { type Path } from '../geometry/Path.js';
 import * as Bezier from '../geometry/Bezier.js';
 import { scale } from '../data/Scale.js';
 import { iterableFromPoll } from '../flow/Poll.js';
-import { StateMachine } from '../flow/StateMachine.js';
+import { StateMachineWithEvents } from '../flow/StateMachineWithEvents.js';
 
 /**
  * @returns Returns a full set of default ADSR options
@@ -126,7 +126,7 @@ export type Events = {
 };
 
 class AdsrBase extends SimpleEventEmitter<Events> {
-  readonly #sm: StateMachine;
+  readonly #sm: StateMachineWithEvents<any>;
   readonly #timeSource: TimerSource;
   #timer: Timer | undefined;
 
@@ -155,7 +155,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
       complete: null,
     };
 
-    this.#sm = new StateMachine(`attack`, descr);
+    this.#sm = new StateMachineWithEvents(descr, { initial: `attack` });
     this.#sm.addEventListener(`change`, (ev) => {
       // Reset timer on release
       if (ev.newState === `release` && this.#holdingInitial) {
