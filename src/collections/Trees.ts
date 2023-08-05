@@ -1,7 +1,7 @@
 // #region Imports
 import { type IsEqual, isEqualDefault } from '../Util.js';
-import { queueMutable } from './queue/index.js';
-import { stackMutable } from './Stack.js';
+import { QueueMutable } from './queue/QueueMutable.js';
+import { StackMutable } from './stack/StackMutable.js';
 import { betweenChomp } from '../Text.js';
 import { TreeNodeMutable, treeNodeMutable } from './TreeNodeMutable.js';
 import { integerParse, nullUndef } from '../Guards.js';
@@ -326,17 +326,19 @@ function getEntry(node: object, defaultLabel = ''): Entry {
  */
 export function* depthFirst(root: object): IterableIterator<Entry> {
   if (!root) return;
-  const stack = stackMutable<Entry>();
-
+  const stack = new StackMutable<Entry>();
+  //eslint-disable-next-line functional/immutable-data
   stack.push(getEntry(root, 'root'));
-  //eslint-disable-next-line functional/no-let
+  //eslint-disable-next-line functional/no-let,functional/immutable-data
   let entry = stack.pop();
   while (entry) {
     yield entry;
     if (entry) {
+      //eslint-disable-next-line functional/immutable-data
       stack.push(...directChildren(entry[1], entry[0]));
     }
     if (stack.isEmpty) break;
+    //eslint-disable-next-line functional/immutable-data
     entry = stack.pop();
   }
 }
@@ -348,7 +350,7 @@ export function* depthFirst(root: object): IterableIterator<Entry> {
  */
 export function* breadthFirst(root: object): IterableIterator<Entry> {
   if (!root) return;
-  const queue = queueMutable<Entry>();
+  const queue = new QueueMutable<Entry>();
   queue.enqueue(getEntry(root, 'root'));
   //eslint-disable-next-line functional/no-let
   let entry = queue.dequeue();
