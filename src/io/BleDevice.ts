@@ -1,6 +1,6 @@
 import { SimpleEventEmitter } from '../Events.js';
-import { StateMachine } from '../flow/StateMachine.js';
-import { type StateChangeEvent } from '../flow/StateMachine.js';
+import { StateMachineWithEvents } from '../flow/StateMachineWithEvents.js';
+import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
 import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
@@ -54,7 +54,7 @@ const reconnect = async () => {
 };
 
 export class BleDevice extends SimpleEventEmitter<Events> {
-  states: StateMachine;
+  states: StateMachineWithEvents<any>;
   codec: Codec;
   rx: BluetoothRemoteGATTCharacteristic | undefined;
   tx: BluetoothRemoteGATTCharacteristic | undefined;
@@ -79,12 +79,15 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     });
 
     this.codec = new Codec();
-    this.states = new StateMachine(`ready`, {
-      ready: `connecting`,
-      connecting: [`connected`, `closed`],
-      connected: [`closed`],
-      closed: `connecting`,
-    });
+    this.states = new StateMachineWithEvents(
+      {
+        ready: `connecting`,
+        connecting: [`connected`, `closed`],
+        connected: [`closed`],
+        closed: `connecting`,
+      },
+      { initial: `ready` }
+    );
 
     this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);

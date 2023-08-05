@@ -1,5 +1,8 @@
 import { SimpleEventEmitter } from '../Events.js';
-import { type StateChangeEvent, StateMachine } from '../flow/StateMachine.js';
+import {
+  type StateChangeEvent,
+  StateMachineWithEvents,
+} from '../flow/StateMachineWithEvents.js';
 import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
@@ -53,7 +56,7 @@ export type JsonDeviceEvents = {
 };
 
 export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
-  states: StateMachine;
+  states: StateMachineWithEvents<any>;
   codec: Codec;
 
   verboseLogging = false;
@@ -85,12 +88,15 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     });
 
     this.codec = new Codec();
-    this.states = new StateMachine(`ready`, {
-      ready: `connecting`,
-      connecting: [`connected`, `closed`],
-      connected: [`closed`],
-      closed: `connecting`,
-    });
+    this.states = new StateMachineWithEvents(
+      {
+        ready: `connecting`,
+        connecting: [`connected`, `closed`],
+        connected: [`closed`],
+        closed: `connecting`,
+      },
+      { initial: `ready` }
+    );
 
     this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);
