@@ -1,7 +1,7 @@
 import { type Comparer, defaultComparer } from '../Util.js';
 import { BinaryTreeNode } from './BinaryTreeNode.js';
 import { mutable } from './queue/QueueMutable.js';
-import { stackMutable } from './Stack.js';
+import { StackMutable } from './stack/StackMutable.js';
 
 /**
  * BinarySearchTree
@@ -219,7 +219,7 @@ export class BinarySearchTree<V> {
    * @yields {BinaryTreeNode}
    */
   *dfs() {
-    const stack = stackMutable<BinaryTreeNode<V>>();
+    const stack = new StackMutable<BinaryTreeNode<V>>();
     if (!this.root) return;
 
     stack.push(this.root);
