@@ -3,6 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
+import { pushUnique } from '../IterableSync.js';
 import { integer as guardInteger } from '../Guards.js';
 import { defaultRandom, type RandomSource } from '../Random.js';
 import {
@@ -11,7 +12,6 @@ import {
   isEqualValueDefault,
   type ToString,
 } from '../Util.js';
-
 export * from './NumericArrays.js';
 
 /**
@@ -62,29 +62,32 @@ export const guardIndex = <V>(
  *
  * @example Uses default equality function:
  * ```js
- * import { areValuesIdentical } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { valuesEqual } from 'https://unpkg.com/ixfx/dist/arrays.js';
  *
  * const a1 = [10, 10, 10];
- * areValuesIdentical(a1); // True
+ * valuesEqual(a1); // True
  *
  * const a2 = [ {name:`Jane`}, {name:`John} ];
- * areValuesIdentical(a2); // True, because JSON version captures value
+ * valuesEqual(a2); // True, because JSON version captures value
  * ```
  *
  * If we want to compare by value for objects that aren't readily
  * converted to JSON, you need to provide a function:
  *
  * ```js
- * areValuesIdentical(someArray, (a, b) => {
+ * valuesEqual(someArray, (a, b) => {
  *  return (a.eventType === b.eventType);
  * });
  * ```
+ *
+ * Returns _true_ if `array` is empty.
  * @param array Array
  * @param equality Equality checker. Uses string-conversion checking by default
  * @returns
  */
-export const areValuesIdentical = <V>(
-  array: ReadonlyArray<V> | ReadonlyArray<V>,
+export const valuesEqual = <V>(
+  //eslint-disable-next-line functional/prefer-readonly-type
+  array: ReadonlyArray<V> | Array<V>,
   equality?: IsEqual<V>
 ): boolean => {
   // Unit tested
@@ -105,6 +108,8 @@ export const areValuesIdentical = <V>(
  * intersection([1, 2, 3], [2, 4, 6]);
 // returns [2]
  * ```
+ * See also: 
+ * * {@link unique}: Unique set of items amongst one or more arrays
  * @param a1 
  * @param a2 
  * @param equality 
@@ -161,7 +166,7 @@ export const zip = (
     throw new Error(`All parameters must be an array`);
   }
   const lengths = arrays.map((a) => a.length);
-  if (!areValuesIdentical(lengths)) {
+  if (!valuesEqual(lengths)) {
     throw new Error(`Arrays must be of same length`);
   }
   const ret = [];
@@ -196,7 +201,7 @@ export const interleave = <V>(
     throw new Error(`All parameters must be an array`);
   }
   const lengths = arrays.map((a) => a.length);
-  if (!areValuesIdentical(lengths)) {
+  if (!valuesEqual(lengths)) {
     throw new Error(`Arrays must be of same length`);
   }
 
@@ -523,7 +528,8 @@ export const sortByNumericProperty = <V, K extends keyof V>(
  * @return Copy of array without value.
  */
 export const without = <V>(
-  data: ReadonlyArray<V> | ReadonlyArray<V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  data: ReadonlyArray<V> | Array<V>,
   value: V,
   comparer: IsEqual<V> = isEqualDefault
 ): Array<V> => data.filter((v) => !comparer(v, value));
@@ -552,7 +558,8 @@ export const without = <V>(
  * @returns
  */
 export const until = <V, A>(
-  data: ReadonlyArray<V> | ReadonlyArray<V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  data: ReadonlyArray<V> | Array<V>,
   predicate: (v: V, acc: A) => readonly [stop: boolean, acc: A],
   initial: A
 ): V[] => {
@@ -595,7 +602,8 @@ export const until = <V, A>(
  * @returns
  */
 export const remove = <V>(
-  data: ReadonlyArray<V> | ReadonlyArray<V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  data: ReadonlyArray<V> | Array<V>,
   index: number
 ): Array<V> => {
   // ✔️ Unit tested
@@ -642,21 +650,25 @@ export const remove = <V>(
  * @returns Map
  */
 export const groupBy = <K, V>(
-  array: ReadonlyArray<V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  array: Iterable<V>,
   grouper: (item: V) => K
-) =>
-  array.reduce((store, item) => {
-    const key = grouper(item);
-    const val = store.get(key);
-    if (val === undefined) {
-      store.set(key, [item]);
-    } else {
-      // eslint-disable-next-line functional/immutable-data
-      val.push(item);
+) => {
+  const map = new Map<K, V[]>();
+
+  for (const a of array) {
+    const key = grouper(a);
+    //eslint-disable-next-line functional/no-let
+    let existing = map.get(key);
+    if (!existing) {
+      existing = [];
+      map.set(key, existing);
     }
-    return store;
-    /* eslint-disable-next-line functional/prefer-readonly-type */
-  }, new Map<K, V[]>());
+    //eslint-disable-next-line functional/immutable-data
+    existing.push(a);
+  }
+  return map;
+};
 
 /**
  * Samples array
@@ -844,40 +856,6 @@ export const reducePairwise = <V, X>(
 };
 
 /**
- * Assuming that `input` array is only unique values, this function
- * returns a new array with unique items from `values` added.
- *
- * If `comparer` function is not provided, values are compared using the
- * default === semantics (via {@link Util.isEqualDefault})
- *
- * ```js
- * const existing = [ 1, 2, 3 ];
- * const newValues = [ 3, 4, 5];
- * const v = Arrays.pushUnique(existing, newValues);
- * // [ 1, 2, 3, 4, 5]
- * ```
- *
- * To combine one or more arrays, keeping only unique items, use {@link unique}
- * @param input
- * @param values
- */
-export const pushUnique = <V>(
-  input: readonly V[] | ReadonlyArray<V>,
-  values: readonly V[] | ReadonlyArray<V>,
-  comparer?: IsEqual<V>
-): V[] => {
-  const c = comparer ?? isEqualDefault;
-  const ret = [...input];
-  for (const v of values) {
-    const found = ret.find((i) => c(i, v));
-    if (found) continue;
-    //eslint-disable-next-line functional/immutable-data
-    ret.push(v);
-  }
-  return ret;
-};
-
-/**
  * Returns two separate arrays of everything that `filter` returns _true_,
  * and everything it returns _false_ on. The in-built Array.filter() in
  * constrast only returns things that `filter` returns _true_ for.
@@ -912,18 +890,157 @@ export const filterAB = <V>(
  * const v = Arrays.unique([ [1, 2, 3, 4], [ 3, 4, 5, 6] ]);
  * // [ 1, 2, 3, 4, 5, 6]
  * ```
+ * See also:
+ * * {@link intersection}: Overlap between two arrays
  * @param arrays
  * @param comparer
  * @returns
  */
 export const unique = <V>(
-  arrays: readonly (readonly V[])[],
+  //eslint-disable-next-line functional/prefer-readonly-type
+  arrays: Array<Array<V>>,
   comparer = isEqualDefault
 ): V[] => {
   //eslint-disable-next-line functional/no-let
   let t: V[] = [];
-  arrays.forEach((a) => {
+  for (let i = 0; i < arrays.length; i++) {
+    const a = arrays[i];
     t = pushUnique<V>(t, a, comparer);
-  });
+  }
   return t;
+};
+
+/**
+ * Compares the values of two arrays, returning a list
+ * of items they have in common, and those unique in `a` or `b`.
+ *
+ * ```js
+ * const a = ['apples', 'oranges', 'pears' ]
+ * const b = ['pears', 'kiwis', 'bananas' ];
+ *
+ * const r = compareValues(a, b);
+ * r.shared;  // [ 'pears' ]
+ * r.a;       // [ 'apples', 'oranges' ]
+ * r.b;       // [ 'kiwis', 'bananas' ]
+ * @param a
+ * @param b
+ * @param eq
+ * @returns
+ */
+export const compareValues = <V>(
+  a: ArrayLike<V>,
+  b: ArrayLike<V>,
+  eq = isEqualDefault<V>
+) => {
+  const shared = [];
+  const aUnique = [];
+  const bUnique = [];
+
+  for (let i = 0; i < a.length; i++) {
+    //eslint-disable-next-line functional/no-let
+    let seenInB = false;
+    for (let x = 0; x < b.length; x++) {
+      if (eq(a[i], b[x])) {
+        seenInB = true;
+        break;
+      }
+    }
+    if (seenInB) {
+      //eslint-disable-next-line functional/immutable-data
+      shared.push(a[i]);
+    } else {
+      //eslint-disable-next-line functional/immutable-data
+      aUnique.push(a[i]);
+    }
+  }
+
+  for (let i = 0; i < b.length; i++) {
+    //eslint-disable-next-line functional/no-let
+    let seenInA = false;
+    for (let x = 0; x < a.length; x++) {
+      if (eq(b[i], a[x])) {
+        seenInA = true;
+      }
+    }
+    if (!seenInA) {
+      //eslint-disable-next-line functional/immutable-data
+      bUnique.push(b[i]);
+    }
+  }
+
+  return {
+    shared,
+    a: aUnique,
+    b: bUnique,
+  };
+};
+
+/**
+ * Returns _true_ if all values in `arrays` are equal, regardless
+ * of their position. Use === checking by default.
+ * ```js
+ * const a = ['apples','oranges','pears'];
+ * const b = ['pears','oranges','apples'];
+ * compareValuesEqual(a, b); // True
+ * ```
+ *
+ * ```js
+ * const a = [ { name: 'John' }];
+ * const b = [ { name: 'John' }];
+ * // Use a custom equality checker
+ * compareValuesEqual(a, b, (aa,bb) => aa.name === bb.name);
+ * ```
+ * @param arrays
+ * @param eq
+ */
+export const compareValuesEqual = <V>(
+  //eslint-disable-next-line functional/prefer-readonly-type
+  a: ArrayLike<V>,
+  b: ArrayLike<V>,
+  eq = isEqualDefault<V>
+): boolean => {
+  const ret = compareValues(a, b, eq);
+  return ret.a.length === 0 && ret.b.length === 0;
+};
+
+/**
+ * Returns _true_ if contents of `needles` is contained by `haystack`.
+ * ```js
+ * const a = ['apples','oranges','pears','mandarins'];
+ * const b = ['pears', 'apples'];
+ * contains(a, b); // True
+ *
+ * const c = ['pears', 'bananas'];
+ * contains(a, b); // False ('bananas' does not exist in a)
+ * ```
+ * @param haystack
+ * @param needles
+ * @param eq
+ */
+export const contains = <V>(
+  haystack: ArrayLike<V>,
+  needles: ArrayLike<V>,
+  eq = isEqualDefault<V>
+) => {
+  if (!Array.isArray(haystack)) {
+    throw new Error(`Expects haystack parameter to be an array`);
+  }
+  if (!Array.isArray(needles)) {
+    throw new Error(`Expects needles parameter to be an array`);
+  }
+
+  for (let i = 0; i < needles.length; i++) {
+    //eslint-disable-next-line functional/no-let
+    let found = false;
+    for (let x = 0; x < haystack.length; x++) {
+      if (eq(needles[i], haystack[x])) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return false;
+    }
+  }
+  return true;
 };
