@@ -1,0 +1,388 @@
+export * from './StateMachineTypes.js';
+
+import * as Light from './StateMachineLight.js';
+export { Light };
+
+/**
+ * State machine.
+ *
+ * Machine description is a simple object of allowed state(s) from particular states.
+ *
+ * The following example has five possible states (wakeup, sleep, coffee, breakfast & bike). `Sleep` can only transition to the `wakeup`
+ * state, while `wakeup` can transition to either `coffee` or `breakfast`.
+ *
+ * Use `null` to signify the final state. Multiple states can terminate the machine if desired.
+ *
+ * ```js
+ * const description = {
+ *  sleep: 'wakeup',
+ *  wakeup: ['coffee', 'breakfast'],
+ *  coffee: `bike`,
+ *  breakfast: `bike`,
+ *  bike: null
+ * }
+ * ```
+ *
+ * Create the machine with the starting state (`sleep`):
+ *
+ * ```js
+ * const machine = StateMachine.create(`sleep`, description);
+ * ```
+ *
+ * Change the state by name:
+ *
+ * ```js
+ * machine.state = `wakeup`
+ * ```
+ *
+ * Or request an automatic transition (will use first state if there are several options):
+ *
+ * ```js
+ * machine.next();
+ * ```
+ *
+ * Check status:
+ *
+ * ```js
+ * if (machine.state === `coffee`) ...;
+ * ```
+ *
+ * Or if machine is in its terminal, completed state:
+ *
+ * ```js
+ * if (machine.isDone()) ...
+ * ```
+ *
+ * Listen for state changes
+ *
+ * ```js
+ * machine.addEventListener(`change`, evt => {
+ *  const {priorState, newState} = evt;
+ *  // State change from priorState -> newState
+ * });
+ *
+ * machine.addEventListener(`stop`, evt => {
+ *  // Machine has stropped
+ * });
+ * ```
+ * @export
+ * @class StateMachine
+ * @extends {SimpleEventEmitter<StateMachineEventMap>}
+ */
+// export class StateMachine extends SimpleEventEmitter<StateMachineEventMap> {
+//   #state: string;
+//   #debug: boolean;
+//   #m: MachineDescription;
+//   #isDone: boolean;
+//   #isDoneNeedsFiring = false;
+//   #initial: string;
+//   #changedAt = Elapsed.infinity();
+
+//   /**
+//    * Create a state machine with initial state, description and options
+//    * @param string initial Initial state
+//    * @param MachineDescription m Machine description
+//    * @param Options Options for machine (defaults to `{debug:false}`)
+//    * @memberof StateMachine
+//    */
+//   constructor(
+//     initial: string,
+//     m: MachineDescription,
+//     opts: Options = { debug: false }
+//   ) {
+//     super();
+//     const [isValid, errorMsg] = StateMachine.validate(initial, m);
+//     if (!isValid) throw new Error(errorMsg);
+
+//     this.#initial = initial;
+//     this.#m = m;
+//     this.#debug = opts.debug ?? false;
+//     this.#state = initial;
+//     this.#isDone = false;
+//   }
+
+//   #setIsDone(v: boolean) {
+//     if (this.#isDone === v) return;
+//     this.#isDone = v;
+//     if (v) {
+//       this.#isDoneNeedsFiring = true;
+//       setTimeout(() => {
+//         if (!this.#isDoneNeedsFiring) return;
+//         this.#isDoneNeedsFiring = false;
+//         //console.log(`StateMachine isDone (${this.#state}), firing stop.`);
+//         this.fireEvent(`stop`, { state: this.#state });
+//       }, 2);
+//     } else {
+//       this.#isDoneNeedsFiring = false;
+//     }
+//   }
+
+//   get states(): readonly string[] {
+//     return Object.keys(this.#m);
+//   }
+
+//   static validate(
+//     initial: string,
+//     m: MachineDescription
+//   ): readonly [boolean, string] {
+//     // Check that object is structured properly
+//     const keys = Object.keys(m);
+//     const finalStates: string[] = [];
+//     const seenKeys = new Set();
+//     const seenVals = new Set();
+
+//     for (let i = 0; i < keys.length; i++) {
+//       const key = keys[i];
+//       if (seenKeys.has(key)) return [false, `Key ${key} is already used`];
+//       seenKeys.add(key);
+
+//       if (typeof keys[i] !== `string`) {
+//         return [false, `Key[${i}] is not a string`];
+//       }
+//       const val = m[key];
+//       if (val === undefined) return [false, `Key ${key} value is undefined`];
+//       if (typeof val === `string`) {
+//         seenVals.add(val);
+//         if (val === key) return [false, `Loop present for ${key}`];
+//       } else if (Array.isArray(val)) {
+//         if (!isStringArray(val)) {
+//           return [false, `Key ${key} value is not an array of strings`];
+//         }
+//         val.forEach((v) => seenVals.add(v));
+//         if (val.find((v) => v === key)) {
+//           return [false, `Loop present for ${key}`];
+//         }
+//       } else if (val === null) {
+//         //eslint-disable-next-line functional/immutable-data
+//         finalStates.push(key);
+//       } else {
+//         return [
+//           false,
+//           `Key ${key} has a value that is neither null, string or array`,
+//         ];
+//       }
+//     }
+
+//     // Check that all values have a top-level state
+//     const seenValsArray = Array.from(seenVals);
+//     const missing = seenValsArray.find((v) => !seenKeys.has(v));
+//     if (missing) {
+//       return [
+//         false,
+//         `Potential state '${missing}' does not exist as a top-level state`,
+//       ];
+//     }
+//     // Check machine contains intial state
+//     if (m[initial] === undefined) {
+//       return [false, `Initial state ${initial} not present`];
+//     }
+//     return [true, ``];
+//   }
+
+//   /**
+//    * Moves to the next state if possible. If multiple states are possible, it will use the first.
+//    * If machine is finalised, no error is thrown and null is returned.
+//    *
+//    * @returns {(string|null)} Returns new state, or null if machine is finalised
+//    * @memberof StateMachine
+//    */
+//   next(): string | null {
+//     // Get possible transitions for current state
+//     const r = this.#m[this.#state];
+//     if (r === null) return null; // At the end
+
+//     // If there are multiple options, use the first
+//     if (Array.isArray(r)) {
+//       //eslint-disable-next-line functional/immutable-data
+//       if (typeof r[0] === `string`) this.state = r[0];
+//       else {
+//         throw new Error(
+//           `Error in machine description. Potential state array does not contain strings`
+//         );
+//       }
+//     } else if (typeof r === `string`) {
+//       //eslint-disable-next-line functional/immutable-data
+//       this.state = r; // Just one option
+//     } else {
+//       throw new Error(
+//         `Error in machine description. Potential state is neither array nor string`
+//       );
+//     }
+//     return this.state;
+//   }
+
+//   /**
+//    * Returns true if state machine is in its final state
+//    *
+//    * @returns
+//    * @memberof StateMachine
+//    */
+//   get isDone(): boolean {
+//     return this.#isDone;
+//   }
+
+//   /**
+//    * Resets machine to initial state
+//    *
+//    * @memberof StateMachine
+//    */
+//   reset() {
+//     this.#setIsDone(false);
+
+//     //eslint-disable-next-line functional/immutable-data
+//     this.#state = this.#initial;
+//     //eslint-disable-next-line functional/immutable-data
+//     this.#changedAt = Elapsed.since();
+//   }
+
+//   /**
+//    * Returns true if state change is valid
+//    * ```js
+//    * if (isValid(priorState, newState, description)) {
+//    *  // Do something
+//    * }
+//    * ```
+//    *
+//    * Use {@link validateTransition} for message on why transition is not valid.
+//    * @param priorState
+//    * @param newState
+//    * @param description
+//    * @returns
+//    */
+//   static isValid(
+//     priorState: string,
+//     newState: string,
+//     description: MachineDescription
+//   ): boolean {
+//     const r = this.validateTransition(priorState, newState, description);
+//     return r[0];
+//   }
+
+//   /**
+//    * Checks whether a state change is valid. Use {@link isValid} if you just want a simple boolean
+//    *
+//    * ```js
+//    * const [ isValid,msg ] = validateTransition(priorState, newState, description);
+//    * if (isValid) {
+//    *  // ...
+//    * } else {
+//    *  // Not valid, reason in msg
+//    * }
+//    * ```
+//    *
+//    * @static
+//    * @param priorState From state
+//    * @param newState To state
+//    * @param description Machine description
+//    * @returns If valid: [true,''], if invalid: [false, 'Error msg here']
+//    * @memberof StateMachine
+//    */
+//   static validateTransition(
+//     priorState: string,
+//     newState: string,
+//     description: MachineDescription
+//   ): readonly [boolean, string] {
+//     // Does state exist?
+//     if (description[newState] === undefined) {
+//       return [false, `Machine cannot change to non-existent state ${newState}`];
+//     }
+//     // Is transition allowed?
+//     const rules = description[priorState];
+//     if (Array.isArray(rules)) {
+//       if (!rules.includes(newState)) {
+//         return [
+//           false,
+//           `Machine cannot change '${priorState} -> ${newState}'. Allowed transitions: ${rules.join(
+//             `, `
+//           )}`,
+//         ];
+//       }
+//     } else {
+//       if (newState !== rules && rules !== `*`) {
+//         return [
+//           false,
+//           `Machine cannot '${priorState} -> ${newState}'. Allowed transition: ${rules}`,
+//         ];
+//       }
+//     }
+//     return [true, `ok`];
+//   }
+
+//   /**
+//    * Returns whether `newState` is a valid transition from current state,
+//    * along with a message explanation. Use {@link isValid} if you just want a simple boolean
+//    * @param newState
+//    * @returns
+//    */
+//   validateTransition(newState: string): readonly [boolean, string] {
+//     return StateMachine.validateTransition(this.state, newState, this.#m);
+//   }
+
+//   /**
+//    * Returns _true_ if `newState` is valid transition from current state.
+//    * Use {@link validateTransition} if you want an explanation for the _false_ results.
+//    * @param newState
+//    * @returns
+//    */
+//   isValid(newState: string): boolean {
+//     return StateMachine.isValid(this.state, newState, this.#m);
+//   }
+
+//   /**
+//    * Gets or sets state. Throws an error if an invalid transition is attempted.
+//    * Use `StateMachine.isValid` to check validity without changing.
+//    *
+//    * If `newState` is the same as current state, the request is ignored silently.
+//    *
+//    * @memberof StateMachine
+//    */
+//   set state(newState: string) {
+//     const priorState = this.#state;
+//     if (newState === priorState) return;
+
+//     const [isValid, errorMsg] = StateMachine.validateTransition(
+//       priorState,
+//       newState,
+//       this.#m
+//     );
+
+//     if (!isValid) throw new Error(errorMsg);
+
+//     if (this.#debug) console.log(`StateMachine: ${priorState} -> ${newState}`);
+
+//     this.#state = newState;
+
+//     const rules = this.#m[newState];
+//     if (rules === null) {
+//       // console.log(
+//       //   `No rules for state: ${newState}, marking done. Prior: ${priorState}`
+//       // );
+//       this.#setIsDone(true);
+//     }
+//     this.#changedAt = Elapsed.since();
+
+//     setTimeout(() => {
+//       this.fireEvent(`change`, { newState: newState, priorState: priorState });
+//     }, 1);
+//   }
+
+//   get state(): string {
+//     return this.#state;
+//   }
+
+//   /**
+//    * Returns timestamp when state was last changed.
+//    * See also `elapsed`
+//    */
+//   get changedAt(): number {
+//     return this.#changedAt();
+//   }
+
+//   /**
+//    * Returns milliseconds elapsed since last state change.
+//    * See also `changedAt`
+//    */
+//   get elapsed(): number {
+//     return this.#changedAt();
+//   }
+// }
