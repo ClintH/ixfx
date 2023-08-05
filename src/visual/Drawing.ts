@@ -9,12 +9,10 @@ import * as Beziers from '../geometry/Bezier.js';
 import * as Rects from '../geometry/Rect.js';
 import * as Ellipses from '../geometry/Ellipse.js';
 import * as Colours from '../visual/Colour.js';
-
-//import * as color2k from 'color2k';
-
-import { stack, type Stack } from '../collections/Stack.js';
 import { resolveEl } from '../dom/Util.js';
 import { roundUpToMultiple } from '../Util.js';
+import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
+import { StackImmutable } from '../collections/stack/StackImmutable.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
@@ -180,6 +178,7 @@ const applyOpts = (
   if (ctx === undefined) throw Error(`ctx undefined`);
 
   // Create a drawing stack, pushing an op generated from drawing options
+  //eslint-disable-next-line functional/immutable-data
   const stack = drawingStack(ctx).push(optsOp(opts), ...additionalOps);
 
   // Apply stack to context
@@ -280,18 +279,20 @@ const lineOp = (
  */
 export const drawingStack = (
   ctx: CanvasRenderingContext2D,
-  stk?: Stack<StackOp>
+  stk?: IStackImmutable<StackOp>
 ): DrawingStack => {
-  if (stk === undefined) stk = stack<StackOp>();
+  if (stk === undefined) stk = new StackImmutable<StackOp>();
 
   const push = (...ops: StackOp[]): DrawingStack => {
-    if (stk === undefined) stk = stack<StackOp>();
+    if (stk === undefined) stk = new StackImmutable<StackOp>();
+    //eslint-disable-next-line functional/immutable-data
     const s = stk.push(...ops);
     ops.forEach((o) => o(ctx));
     return drawingStack(ctx, s);
   };
 
   const pop = (): DrawingStack => {
+    //eslint-disable-next-line functional/immutable-data
     const s = stk?.pop();
     return drawingStack(ctx, s);
   };
@@ -358,6 +359,7 @@ export const circle = (
     ctx.beginPath();
     ctx.arc(c.x, c.y, c.radius, 0, PIPI);
     if (opts.strokeStyle) ctx.stroke();
+    //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
   };
   if (Array.isArray(circlesToDraw)) circlesToDraw.forEach(draw);
@@ -387,6 +389,7 @@ export const ellipse = (
     const endAngle = e.endAngle ?? PIPI;
     ctx.ellipse(e.x, e.y, e.radiusX, e.radiusY, rotation, startAngle, endAngle);
     if (opts.strokeStyle) ctx.stroke();
+    //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
   };
   if (Array.isArray(ellipsesToDraw)) ellipsesToDraw.forEach(draw);
@@ -462,6 +465,7 @@ export const connectedPoints = (
     ctx.stroke();
   }
   if (opts.fillStyle) {
+    //eslint-disable-next-line functional/immutable-data
     ctx.fill();
   }
 };
@@ -561,6 +565,7 @@ export const dot = (
     ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
   }
 
+  //eslint-disable-next-line functional/immutable-data
   if (opts.filled || !opts.outlined) ctx.fill();
   if (opts.outlined) ctx.stroke();
 };
@@ -606,6 +611,7 @@ const cubicBezier = (
   ctx.stroke();
 
   if (isDebug) {
+    //eslint-disable-next-line functional/immutable-data
     stack = stack.push(
       optsOp({
         ...opts,
@@ -631,6 +637,7 @@ const cubicBezier = (
     dot(ctx, cubic2, { radius: 3 });
     dot(ctx, a, { radius: 3 });
     dot(ctx, b, { radius: 3 });
+    //eslint-disable-next-line functional/immutable-data
     stack = stack.pop();
     stack.apply();
   }
@@ -658,6 +665,7 @@ const quadraticBezier = (
      * ctx.fillStyle = opts.strokeStyle ?? `gray`;
      * ctx.strokeStyle = opts.strokeStyle ?? `gray`;
      */
+    //eslint-disable-next-line functional/immutable-data
     stack = stack.push(
       optsOp({
         ...opts,
@@ -677,6 +685,7 @@ const quadraticBezier = (
      * ctx.fillStyle = fs;
      * ctx.strokeStyle = ss;
      */
+    //eslint-disable-next-line functional/immutable-data
     stack = stack.pop();
     stack.apply();
   }
@@ -825,6 +834,7 @@ export const textBlock = (
   const bounds = opts.bounds ?? { x: 0, y: 0, width: 1000000, height: 1000000 };
 
   // Measure each line
+  //eslint-disable-next-line functional/prefer-tacit
   const blocks = lines.map((l) => ctx.measureText(l));
 
   // Get width and height
@@ -893,6 +903,7 @@ export const textBlockAligned = (
   const middleY = bounds.height / 2;
 
   // Measure each line
+  //eslint-disable-next-line functional/prefer-tacit
   const blocks = lines.map((l) => ctx.measureText(l));
   const heights = blocks.map(
     (tm) => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent
