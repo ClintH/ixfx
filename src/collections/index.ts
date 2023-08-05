@@ -9,7 +9,6 @@ export {
   circularArray,
   type ICircularArray as CircularArray,
 } from './CircularArray.js';
-export { stack, stackMutable } from './Stack.js';
 export * as Trees from './Trees.js';
 
 /**
@@ -27,7 +26,7 @@ export * as Trees from './Trees.js';
  * how items are evicted.
  *
  */
-export * as Stacks from './Stack.js';
+export * as Stacks from './stack/index.js';
 
 /**
  * Arrays are a list of data. ixfx provides a number of functions for working with arrays in an immutable manner.
@@ -50,7 +49,7 @@ export * as Stacks from './Stack.js';
  * Finding/accessing
  * * {@link filterBetween}: Same as `Array.filter` but only looks within a specified index range
  * * {@link sample}: Returns a new array with a random sampling of input
- * * {@link areValuesIdentical}: Returns true if all the values in the array are identical
+ * * {@link valuesEqual}: Returns true if all the values in the array are identical
  *
  * Changing the shape
  * * {@link ensureLength}: Returns a copy of array with designated length, either padding it out or truncating as necessary
