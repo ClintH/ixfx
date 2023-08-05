@@ -106,6 +106,7 @@ export class MapOfMutableImpl<V, M>
     return this.type.has(m, value, eq);
   }
 
+  //eslint-disable-next-line functional/prefer-tacit
   has(key: string): boolean {
     return this.#map.has(key);
   }
@@ -172,19 +173,10 @@ export class MapOfMutableImpl<V, M>
    * An empty array is returned if there are no values
    */
   *get(key: string): IterableIterator<V> {
-    // const m = this.#map.get(key);
-    // if (m === undefined) return [];
-    // return this.type.toArray(m);
     const m = this.#map.get(key);
     if (m === undefined) return;
     yield* this.type.iterable(m);
   }
-
-  // *values(): IterableIterator<V> {
-  //   const m = this.#map.get(key);
-  //   if (m === undefined) return;
-  //   yield* this.type.iterable(m);
-  // }
 
   /**
    * Iterate over the values stored under `key`.
@@ -198,6 +190,7 @@ export class MapOfMutableImpl<V, M>
     yield* this.type.iterable(m);
   }
 
+  //eslint-disable-next-line functional/prefer-tacit
   getSource(key: string): M | undefined {
     return this.#map.get(key);
   }
@@ -213,6 +206,12 @@ export class MapOfMutableImpl<V, M>
       for (const v of this.type.iterable(e[1])) {
         yield [e[0], v];
       }
+    }
+  }
+
+  *valuesFlat(): IterableIterator<V> {
+    for (const e of this.#map.entries()) {
+      yield* this.type.iterable(e[1]);
     }
   }
 

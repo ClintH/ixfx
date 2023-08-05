@@ -68,7 +68,7 @@ export class MapOfSimpleBase<V> {
   /**
    * Iterate over all values (regardless of key)
    */
-  *values(): IterableIterator<V> {
+  *valuesFlat(): IterableIterator<V> {
     for (const entries of this.map) {
       yield* entries[1];
     }
@@ -88,6 +88,7 @@ export class MapOfSimpleBase<V> {
    * @param key
    * @returns
    */
+  //eslint-disable-next-line functional/prefer-tacit
   has(key: string): boolean {
     return this.map.has(key);
   }

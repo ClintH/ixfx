@@ -13,6 +13,12 @@ export interface IMapOf<V> {
   get(key: string): IterableIterator<V>;
 
   /**
+   * Iterates over all values, regardless of key.
+   * Same value may re-appear if it's stored under different keys.
+   */
+  valuesFlat(): IterableIterator<V>;
+
+  /**
    * Iterates over key-value pairs.
    * Unlike a normal map, the same key may appear several times.
    */
@@ -46,4 +52,12 @@ export interface IMapOf<V> {
    * @param key Key
    */
   count(key: string): number;
+
+  /**
+   * Finds the first key where value is stored.
+   * Note: value could be stored in multiple keys
+   * @param value Value to seek
+   * @returns Key, or undefined if value not found
+   */
+  firstKeyByValue(value: V, eq?: IsEqual<V> | undefined): string | undefined;
 }
