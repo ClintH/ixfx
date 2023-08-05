@@ -1,4 +1,4 @@
-import { queueMutable } from '../collections/queue/index.js';
+import { QueueMutable } from '../collections/queue/QueueMutable.js';
 
 type Task = () => void;
 
@@ -44,7 +44,7 @@ export class TaskQueue {
   private constructor(opts: TaskQueueOpts = {}) {
     this._startDelayMs = opts.startDelayMs ?? 500;
     this._intervalMs = opts.intervalMs ?? 100;
-    this._queue = queueMutable<Task>();
+    this._queue = new QueueMutable<Task>();
   }
 
   /**

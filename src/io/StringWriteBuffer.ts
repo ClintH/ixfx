@@ -1,10 +1,10 @@
-import { queueMutable } from '../collections/queue/index.js';
+import { QueueMutable } from '../collections/queue/QueueMutable.js';
 import { type Continuously, continuously } from '../flow/index.js';
 import { splitByLength } from '../Text.js';
 
 export class StringWriteBuffer {
   paused = false;
-  queue = queueMutable<string>();
+  queue = new QueueMutable<string>();
   writer: Continuously;
   intervalMs: number;
   stream: WritableStream<string> | undefined;
@@ -24,7 +24,7 @@ export class StringWriteBuffer {
   }
 
   clear() {
-    this.queue = queueMutable<string>();
+    this.queue = new QueueMutable<string>();
   }
 
   writable() {
