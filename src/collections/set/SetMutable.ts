@@ -1,20 +1,25 @@
 // ✔ UNIT TESTED
-import {type ToString, defaultKeyer} from "../../Util.js";
-import {SimpleEventEmitter} from "../../Events.js";
-import {type ISetMutable} from "./ISetMutable.js";
-import {type ValueSetEventMap} from "./index.js";
+import { type ToString, defaultKeyer } from '../../Util.js';
+import { SimpleEventEmitter } from '../../Events.js';
+import { type ISetMutable } from './ISetMutable.js';
+import { type ValueSetEventMap } from './index.js';
 
 /**
  * Creates a {@link ISetMutable}.
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`
- * @returns 
+ * @returns
  */
-export const mutable = <V>(keyString?: ToString<V> | undefined): ISetMutable<V> => new MutableStringSet(keyString);
+export const mutable = <V>(
+  keyString?: ToString<V> | undefined
+): ISetMutable<V> => new MutableStringSet(keyString);
 
 /**
  * Mutable string set
  */
-export class MutableStringSet<V> extends SimpleEventEmitter<ValueSetEventMap<V>> implements ISetMutable<V> {
+export class MutableStringSet<V>
+  extends SimpleEventEmitter<ValueSetEventMap<V>>
+  implements ISetMutable<V>
+{
   // ✔ UNIT TESTED
   /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();
@@ -40,17 +45,20 @@ export class MutableStringSet<V> extends SimpleEventEmitter<ValueSetEventMap<V>>
    * Adds one or more items to set. `add` event is fired for each item
    * @param v items to add
    */
-  add(...v: ReadonlyArray<V>) {
-    v.forEach(i => {
+  add(...values: Array<V>): boolean {
+    let somethingAdded = false;
+    for (const i of values) {
       const isUpdated = this.has(i);
       this.store.set(this.keyString(i), i);
-      super.fireEvent(`add`, {value: i, updated: isUpdated});
-    });
+      super.fireEvent(`add`, { value: i, updated: isUpdated });
+      if (!isUpdated) somethingAdded = true;
+    }
+    return somethingAdded;
   }
 
   /**
    * Returns values from set as an iterable
-   * @returns 
+   * @returns
    */
   values() {
     return this.store.values();
@@ -77,8 +85,8 @@ export class MutableStringSet<V> extends SimpleEventEmitter<ValueSetEventMap<V>>
 
   /**
    * Returns _true_ if item exists in set
-   * @param v 
-   * @returns 
+   * @param v
+   * @returns
    */
   has(v: V): boolean {
     return this.store.has(this.keyString(v));

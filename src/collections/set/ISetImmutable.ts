@@ -1,3 +1,5 @@
+import type { ISet } from './ISet.js';
+
 /**
  * A Set which stores unique items determined by their value, rather
  * than object reference (unlike the default JS Set). Create with {@link Sets.mutable}. Immutable.
@@ -49,14 +51,7 @@
  *
  * @template V Type of data stored
  */
-export interface ISetImmutable<V> {
-  has(v: V): boolean;
-  get size(): number;
+export interface ISetImmutable<V> extends ISet<V> {
   add(...values: ReadonlyArray<V>): ISetImmutable<V>;
-  values(): IterableIterator<V>;
-  /**
-   * Returns an array of values
-   */
-  toArray(): readonly V[];
   delete(v: V): ISetImmutable<V>;
 }
