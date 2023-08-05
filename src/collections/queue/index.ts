@@ -32,5 +32,5 @@ export type QueueOpts = {
 
 export { type IQueueMutable } from './IQueueMutable.js';
 export { type IQueue } from './IQueue.js';
-export { immutable as queue } from './Queue.js';
-export { mutable as queueMutable } from './QueueMutable.js';
+export { immutable } from './Queue.js';
+export { mutable } from './QueueMutable.js';

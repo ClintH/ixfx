@@ -15,7 +15,7 @@ export class QueueImmutable<V> implements IQueue<V> {
    * @param {V[]} data Initial data. Index 0 is front of queue
    * @memberof Queue
    */
-  constructor(opts: QueueOpts, data: ReadonlyArray<V>) {
+  constructor(opts: QueueOpts = {}, data: ReadonlyArray<V> = []) {
     if (opts === undefined) throw new Error(`opts parameter undefined`);
 
     this.opts = opts;
@@ -35,7 +35,10 @@ export class QueueImmutable<V> implements IQueue<V> {
   }
 
   enqueue(...toAdd: ReadonlyArray<V>): QueueImmutable<V> {
-    return new QueueImmutable<V>(this.opts, enqueue(this.opts, this.data, ...toAdd));
+    return new QueueImmutable<V>(
+      this.opts,
+      enqueue(this.opts, this.data, ...toAdd)
+    );
   }
 
   dequeue(): QueueImmutable<V> {
