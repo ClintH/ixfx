@@ -4,10 +4,50 @@ import {
   reducePairwise,
   mergeByKey,
   zip,
-  areValuesIdentical,
+  valuesEqual,
   ensureLength,
   remove,
+  compareValues,
+  compareValuesEqual,
+  contains,
 } from '../../collections/Arrays.js';
+
+test('contains', (t) => {
+  const a = ['apples', 'oranges', 'pears', 'mandarins'];
+  const b = ['pears', 'apples'];
+  t.true(contains(a, b));
+  t.true(contains(a, []));
+
+  const c = ['pears', 'bananas'];
+  t.false(contains(a, c));
+});
+
+test(`compare-values`, (t) => {
+  const a = ['apples', 'oranges', 'pears'];
+  const b = ['pears', 'kiwis', 'bananas'];
+  const r = compareValues(a, b);
+  t.like(r.shared, ['pears']);
+  t.like(r.a, ['apples', 'oranges']);
+  t.like(r.b, ['kiwis', 'bananas']);
+  t.false(compareValuesEqual(a, b));
+
+  const a1 = ['apples', 'oranges'];
+  const b1 = ['oranges', 'apples'];
+  t.true(compareValuesEqual(a1, b1));
+
+  const aa = [{ name: 'John' }, { name: 'Mary' }, { name: 'Sue' }];
+  const bb = [{ name: 'John' }, { name: 'Mary' }, { name: 'Jane' }];
+  // @ts-ignore
+  const rr = compareValues(aa, bb, (a, b) => a.name === b.name);
+  t.like(rr.shared, [{ name: 'John' }, { name: 'Mary' }]);
+  t.like(rr.a, [{ name: 'Sue' }]);
+  t.like(rr.b, [{ name: 'Jane' }]);
+  t.false(compareValuesEqual(aa, bb, (a, b) => a.name === b.name));
+
+  const aa1 = [{ name: 'John' }, { name: 'Mary' }];
+  const bb1 = [{ name: 'Mary' }, { name: 'John' }];
+  t.true(compareValuesEqual(aa1, bb1, (a, b) => a.name === b.name));
+});
 
 test(`array-sort`, (t) => {
   const data = [
@@ -117,23 +157,23 @@ test(`ensureLength`, (t) => {
   t.like(ensureLength([1, 2, 3], 5, `last`), [1, 2, 3, 3, 3]);
 });
 
-test(`areValuesIdentical`, (t) => {
+test(`valuesEqual`, (t) => {
   const a = [10, 10, 10];
   const b = [`hello`, `hello`, `hello`];
   const c = [true, true, true];
   const d = [100];
 
-  t.true(areValuesIdentical(a));
-  t.true(areValuesIdentical(b));
-  t.true(areValuesIdentical(c));
-  t.true(areValuesIdentical(d));
+  t.true(valuesEqual(a));
+  t.true(valuesEqual(b));
+  t.true(valuesEqual(c));
+  t.true(valuesEqual(d));
 
   const a1 = [10, 10, 11];
   const b1 = [`Hello`, `hello`];
   const c1 = [true, false];
-  t.false(areValuesIdentical(a1));
-  t.false(areValuesIdentical(b1));
-  t.false(areValuesIdentical(c1));
+  t.false(valuesEqual(a1));
+  t.false(valuesEqual(b1));
+  t.false(valuesEqual(c1));
 });
 
 // test(``, () => {

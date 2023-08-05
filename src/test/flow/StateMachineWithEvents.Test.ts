@@ -1,16 +1,14 @@
 /* eslint-disable */
 import test from 'ava';
 import {
-  descriptionFromList,
-  drive,
+  bidirectionalFromList,
   fromList,
-  create,
-  fromListBidirectional,
+  WithEvents,
 } from '../../flow/StateMachine.js';
-import { eventPromise } from '../util.js';
+import { arrayValuesEqual, eventPromise } from '../util.js';
+import { compareValuesEqual } from '../../collections/Arrays.js';
 
-const createAdsr = () =>
-  descriptionFromList(`attack`, `decay`, `sustain`, `release`);
+const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);
 
 const createMulti = () => ({
   awake: [`breakfast`, `coffee`],
@@ -25,10 +23,10 @@ test(`transitions`, (t) => {
 
   // Should throw creating a machine with invalid initial state
   t.throws(() => {
-    create(`blah`, m);
+    new WithEvents(m, { initial: `blah` });
   });
 
-  const sm = create(`attack`, m);
+  const sm = new WithEvents(m, { initial: `attack` });
 
   // Shouldn't be possible to set to undefined
   t.throws(() => {
@@ -57,7 +55,7 @@ test(`transitions`, (t) => {
 test(`paths`, (t) => {
   const m = createMulti();
   const debug = false;
-  let sm = create(`awake`, m);
+  let sm = new WithEvents(m, { initial: `awake` });
 
   // Try one path
   t.throws(() => {
@@ -68,14 +66,14 @@ test(`paths`, (t) => {
   t.true(sm.isDone);
 
   // Try a different valid path
-  sm = create(`awake`, m);
+  sm = new WithEvents(m, { initial: `awake` });
   sm.state = `breakfast`;
   sm.state = `coffee`;
   sm.state = `brushTeeth`;
   t.true(sm.isDone);
 
   // Try auto-progression
-  sm = create(`awake`, m, { debug: debug });
+  sm = new WithEvents(m, { initial: `awake`, debug: debug });
   t.false(sm.isDone);
 
   t.true(sm.next() === `breakfast`);
@@ -92,7 +90,9 @@ test(`paths`, (t) => {
 });
 
 test('fromList', (t) => {
-  const m = fromList('one', 'two', 'three');
+  const trans = fromList('one', 'two', 'three');
+  const m = new WithEvents(trans);
+  arrayValuesEqual(t, m.statesDefined, ['one', 'two', 'three']);
 
   // Now in 'one'
   t.true(m.state === `one`);
@@ -101,7 +101,7 @@ test('fromList', (t) => {
   t.false(m.isDone);
 
   t.false(m.isDone);
-  t.like(m.states, ['one', 'two', 'three']);
+  arrayValuesEqual(t, m.statesPossible, ['two']);
 
   // Now in 'two'
   t.true(m.next() === `two`);
@@ -124,7 +124,9 @@ test('fromList', (t) => {
 });
 
 test('fromListBidirectional', (t) => {
-  const m = fromListBidirectional('one', 'two', 'three');
+  const trans = bidirectionalFromList('one', 'two', 'three');
+  const m = new WithEvents(trans);
+  arrayValuesEqual(t, m.statesDefined, ['one', 'two', 'three']);
 
   // State: 'one'
   t.true(m.state === `one`);
@@ -133,13 +135,14 @@ test('fromListBidirectional', (t) => {
   t.false(m.isValid(`three`));
 
   t.false(m.isDone);
-  t.like(m.states, ['one', 'two', 'three']);
+  arrayValuesEqual(t, m.statesPossible, ['two']);
 
   // State: 'two'
   t.true(m.next() === `two`);
   t.true(m.isValid(`one`));
   t.false(m.isValid(`two`));
   t.true(m.isValid(`three`));
+  arrayValuesEqual(t, m.statesPossible, ['one', 'three']);
 
   // State: 'one'
   m.state = `one`;
@@ -159,6 +162,7 @@ test('fromListBidirectional', (t) => {
   t.false(m.isValid(`one`));
   t.true(m.isValid(`two`));
   t.false(m.isValid(`three`));
+  arrayValuesEqual(t, m.statesPossible, ['two']);
 
   // State: 'two'
   m.state = `two`;
@@ -185,11 +189,17 @@ test('validation', (t) => {
 // // Tests that machine finalises after all states transition
 test(`finalisation`, (t) => {
   const m = createAdsr();
-  const sm = create(`attack`, m, { debug: false });
+  const sm = new WithEvents(m, { initial: `attack` });
   sm.state = `decay`;
   sm.state = `sustain`;
   sm.state = `release`; // Finalises
   t.true(sm.isDone);
+  arrayValuesEqual(t, sm.statesDefined, [
+    'attack',
+    'decay',
+    'sustain',
+    'release',
+  ]);
 
   // Test that we can't transition out of final state
   const states = Object.keys(m);
@@ -204,8 +214,8 @@ test(`finalisation`, (t) => {
 
 // Test that all event ransitions happen, and there are no unexpected transitions
 test('event - stop', async (t) => {
-  const m = createAdsr();
-  const sm = create(`attack`, m, { debug: false });
+  const trans = createAdsr();
+  const sm = new WithEvents(trans, { initial: `attack` });
 
   await eventPromise({
     eventObj: sm,
@@ -223,8 +233,8 @@ test('event - stop', async (t) => {
 });
 
 test(`event - change`, async (t) => {
-  const m = createAdsr();
-  const sm = create(`attack`, m, { debug: false });
+  const trans = createAdsr();
+  const sm = new WithEvents(trans, { initial: `attack` });
 
   await eventPromise({
     eventObj: sm,
