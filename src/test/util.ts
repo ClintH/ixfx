@@ -1,12 +1,66 @@
 /* eslint-disable */
 import test, { type ExecutionContext } from 'ava';
 import { minMaxAvg } from '../collections/NumericArrays.js';
-
+import { compareValuesEqual } from '../collections/Arrays.js';
+import { isEqualDefault } from '../Util.js';
 //test.todo('sf');
 
 export const areIntegers = (t: ExecutionContext, a: Array<number>) => {
   for (let i = 0; i < a.length; i++) {
     t.is(Math.abs(a[i]) % 1, 0, `Integer ${a[i]}`);
+  }
+};
+
+export const arrayValuesEqual = (
+  t: ExecutionContext,
+  a: ArrayLike<any>,
+  b: ArrayLike<any>,
+  eq = isEqualDefault<any>
+) => {
+  if (compareValuesEqual(a, b, eq)) {
+    t.assert(true);
+  } else {
+    t.fail(`Arrays not equal. A: ${JSON.stringify(a)} B: ${JSON.stringify(b)}`);
+  }
+};
+
+export const closeTo = <V>(
+  t: ExecutionContext,
+  a: number,
+  b: number,
+  precision: number = 3
+) => {
+  const aa = a.toPrecision(precision);
+  const bb = b.toPrecision(precision);
+  if (aa !== bb) t.fail(`A is not close enough to B. A: ${a} B: ${b}`);
+  else t.assert(true);
+};
+/**
+ * True if a contains all of b.
+ * @param t
+ * @param a
+ * @param b
+ */
+export const arrayValueIncludes = <V>(
+  t: ExecutionContext,
+  a: ArrayLike<V>,
+  b: ArrayLike<V>,
+  eq = isEqualDefault<V>
+) => {
+  for (let i = 0; i < b.length; i++) {
+    let found = false;
+    for (let x = 0; x < a.length; x++) {
+      if (eq(b[i], a[x])) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      t.fail(
+        `Item not found: ${JSON.stringify(b[i])}. A: ${JSON.stringify(a)}`
+      );
+      break;
+    }
   }
 };
 
@@ -17,6 +71,13 @@ export type EventPromiseOpts = {
   runAfterAdd?: () => void;
   validateEvent?: (data: any) => boolean;
   timeoutMs: number;
+};
+
+export const isEmptyArray = (v: any) => {
+  if (Array.isArray(v)) {
+    return v.length === 0;
+  }
+  return false;
 };
 
 export const eventPromise = (opts: EventPromiseOpts) => {
