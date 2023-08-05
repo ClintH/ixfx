@@ -1,5 +1,5 @@
 import { average, averageWeighted } from '../collections/NumericArrays.js';
-import { queueMutable } from '../collections/queue/index.js';
+import { QueueMutable } from '../collections/queue/QueueMutable.js';
 import { integer as guardInteger } from '../Guards.js';
 
 /**
@@ -167,13 +167,13 @@ export const movingAverage = (
   let disposed = false;
 
   //eslint-disable-next-line functional/no-let
-  let q = queueMutable<number>({
+  let q = new QueueMutable<number>({
     capacity: samples,
     discardPolicy: `older`,
   });
 
   const clear = () => {
-    q = queueMutable<number>({
+    q = new QueueMutable<number>({
       capacity: samples,
       discardPolicy: `older`,
     });
