@@ -14,7 +14,7 @@ import * as Timer from './Timer.js';
  * See [here for usage](../classes/Flow.StateMachine.StateMachine.html).
  *
  * * {@link StateMachine.drive}: Drive a static machine
- * * {@link StateMachine.create}: Create a state machine from initial state and machine description
+ * * {@link StateMachine.init}: Create a state machine from initial state and machine description
  * * {@link fromList}: Create a state machine from a simple list of states
  */
 export { StateMachine };
