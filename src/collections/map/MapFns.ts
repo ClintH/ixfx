@@ -1,4 +1,5 @@
 import {
+  toStringDefault,
   defaultComparer,
   type IsEqual,
   isEqualDefault,
@@ -363,7 +364,8 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
   Array.from(map.values());
 
 /**
- * Returns a Map from an iterable
+ * Returns a Map from an iterable. By default throws an exception
+ * if iterable contains duplicate values.
  *
  * ```js
  * const data = [
@@ -373,13 +375,13 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
  * const map = Maps.fromIterable(data, v => v.fruit);
  * ```
  * @param data Input data
- * @param keyFn Function which returns a string id
- * @param allowOverwrites If true, items with same id will silently overwrite each other, with last write wins
+ * @param keyFn Function which returns a string id. By default uses the JSON value of the object.
+ * @param allowOverwrites When set to _true_, items with same id will silently overwrite each other, with last write wins. _false_ by default.
  * @returns
  */
 export const fromIterable = <V>(
   data: Iterable<V>,
-  keyFn: (v: V) => string,
+  keyFn = toStringDefault<V>,
   allowOverwrites = false
 ): ReadonlyMap<string, V> => {
   const m = new Map<string, V>();
