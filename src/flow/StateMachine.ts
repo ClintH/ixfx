@@ -1,3 +1,7 @@
+import { unique } from '../collections/Arrays.js';
+import { StateMachineWithEvents } from './StateMachineWithEvents.js';
+export { StateMachineWithEvents as WithEvents };
+
 /**
  * Transition result
  * * 'Ok': transition valid
@@ -13,18 +17,42 @@ export type TransitionResult =
   | 'Invalid'
   | 'Terminal';
 
+export type TransitionCondition<V extends Transitions> = {
+  readonly hasPriorState: readonly StateNames<V>[];
+  readonly isInState: StateNames<V>;
+};
+
+export type StateTargetStrict<V extends Transitions> = {
+  readonly state: StateNames<V> | null;
+  readonly preconditions?: readonly TransitionCondition<V>[];
+};
+
 /**
  * Possible state transitions, or _null_ if final state.
  */
-type StateTarget = string | readonly string[] | null;
+//export type StateTarget<V extends Transitions> = StateTargetExt<V> | null;
+
+export type StateTarget<V extends Transitions> =
+  | string
+  //eslint-disable-next-line functional/prefer-readonly-type
+  | string[]
+  | readonly string[]
+  | null
+  | StateTargetStrict<V>;
+//eslint-disable-next-line functional/prefer-readonly-type
+// | StateTargetStrict<V>[]
+// | readonly StateTargetStrict<V>[];
 
 /**
  * Maps state to allowable next states
  */
 export type Transitions = {
-  readonly [key: string]: StateTarget;
+  readonly [key: string]: StateTarget<Transitions>;
 };
 
+export type TransitionsStrict = {
+  readonly [key: string]: readonly StateTargetStrict<Transitions>[];
+};
 /**
  * List of possible states
  */
@@ -32,15 +60,18 @@ export type StateNames<V extends Transitions> = keyof V;
 
 export type Machine<V extends Transitions> = {
   /**
-   * Machine description, describing allowable
-   * state transitions
+   * Allowable state transitions
    */
   readonly states: V;
 };
+
 /**
- * Encapsulation of machine description and state
+ * Encapsulation of a 'running' machine description and state.
+ *
+ * See:
+ * - {@link cloneState}
  */
-export type MachineState<V extends Transitions> = Machine<V> & {
+export type MachineState<V extends Transitions> = {
   /**
    * Current state
    */
@@ -50,15 +81,25 @@ export type MachineState<V extends Transitions> = Machine<V> & {
    * state unless it has already been visited.
    */
   readonly visited: readonly StateNames<V>[];
+
+  //readonly machine: Machine<V>;
+  readonly machine: {
+    readonly [key in StateNames<V>]: readonly StateTargetStrict<V>[];
+  };
 };
 
+/**
+ * Clones machine state
+ * @param toClone
+ * @returns Cloned of `toClone`
+ */
 export const cloneState = <V extends Transitions>(
-  a: MachineState<V>
+  toClone: MachineState<V>
 ): MachineState<V> => {
   return Object.freeze({
-    value: a.value,
-    visited: a.visited,
-    states: { ...a.states },
+    value: toClone.value,
+    visited: [...toClone.visited],
+    machine: toClone.machine,
   });
 };
 /**
@@ -71,9 +112,9 @@ export const cloneState = <V extends Transitions>(
  *  shirt: null
  * }
  * // Defaults to first key, 'pants'
- * let sm = StateMachineLight.init(descr);
+ * let sm = StateMachine.init(descr);
  * // Move to 'shoes' state
- * sm = StateMachineLight.to(sm, 'shoes');
+ * sm = StateMachine.to(sm, 'shoes');
  * sm.state; // 'shoes'
  * sm.visited; // [ 'pants' ]
  * StateMachineLight.done(sm); // false
@@ -84,26 +125,90 @@ export const cloneState = <V extends Transitions>(
  * @returns
  */
 export const init = <V extends Transitions>(
-  sm: V,
+  stateMachine: Machine<V> | Transitions | TransitionsStrict,
   initialState?: StateNames<V>
 ): MachineState<V> => {
+  const [machine, machineValidationError] = validateMachine(stateMachine);
+  if (!machine) throw new Error(machineValidationError);
+
   const state: StateNames<V> =
-    (initialState as StateNames<V>) ?? Object.keys(sm)[0];
-  if (typeof sm[state] === 'undefined') {
+    (initialState as StateNames<V>) ?? Object.keys(machine.states)[0];
+  if (typeof machine.states[state] === 'undefined') {
     throw new Error(`Initial state not found`);
   }
 
-  const [validationOk, validationMsg] = validateDescription(sm);
-  if (!validationOk) {
-    throw new Error(`Machine not valid: ${validationMsg}`);
+  // Normalise states
+  const transitions = validateAndNormaliseTransitions(machine.states);
+  if (transitions === undefined) {
+    throw new Error(`Could not normalise transitions`);
   }
-
-  return {
+  // @ts-ignore
+  return Object.freeze({
     value: state,
-    states: { ...sm },
     visited: [],
-  };
+    machine: Object.fromEntries(transitions),
+  });
 };
+
+export const reset = <V extends Transitions>(
+  sm: MachineState<V>
+): MachineState<V> => {
+  // @ts-ignore
+  return init<V>(sm.machine);
+};
+
+export const validateMachine = <V extends Transitions>(
+  smOrTransitions: Machine<V> | Transitions | TransitionsStrict
+): [machine: Machine<V> | undefined, msg: string] => {
+  if (typeof smOrTransitions === 'undefined') {
+    return [undefined, 'Parameter undefined'];
+  }
+  if (smOrTransitions === null) {
+    return [undefined, 'Parameter null'];
+  }
+  if (`states` in smOrTransitions) {
+    // Assume Machine type
+    return [smOrTransitions as Machine<V>, ''];
+  }
+  if (typeof smOrTransitions === `object`) {
+    return [
+      {
+        // @ts-ignore
+        states: smOrTransitions,
+      },
+      '',
+    ];
+  }
+  return [
+    undefined,
+    `Unexpected type: ${typeof smOrTransitions}. Expected object`,
+  ];
+};
+
+// export const validateMachine = <V extends Transitions>(
+//   sm: Machine<V>
+// ): [machine: Machine<V> | undefined, msg: string] => {
+//   if (typeof sm === 'undefined') {
+//     return [undefined, `Parameter 'sm' is undefined`];
+//   }
+//   if (sm === null) return [undefined, `Parameter 'sm' is null`];
+//   if (`states` in sm) {
+//     const [transitions, validationError] = validateAndNormaliseTransitions(
+//       sm.states
+//     );
+//     if (transitions) {
+//       const machine: Machine<V> = {
+//         // @ts-ignore
+//         states: Object.fromEntries(transitions),
+//       };
+//       return [machine, ''];
+//     } else {
+//       return [undefined, validationError];
+//     }
+//   } else {
+//     return [undefined, `Parameter 'sm.states' is undefined`];
+//   }
+// };
 
 /**
  * Returns _true_ if `sm` is in its final state.
@@ -111,87 +216,164 @@ export const init = <V extends Transitions>(
  * @returns
  */
 export const done = <V extends Transitions>(sm: MachineState<V>): boolean => {
-  const p = possible(sm);
-  if (p.length === 0) return true;
-  return false;
+  return possible(sm).length === 0;
 };
 
 /**
- * Returns a list of possible states for `sm`, or
+ * Returns a list of possible state targets for `sm`, or
  * an empty list if no transitions are possible.
+ * @param sm
+ * @returns
+ */
+export const possibleTargets = <V extends Transitions>(
+  sm: MachineState<V>
+): readonly StateTargetStrict<V>[] => {
+  // Validate current state
+  validateMachineState(sm);
+  // get list of possible targets
+  const fromS = sm.machine[sm.value];
+
+  if (fromS.length === 1 && fromS[0].state === null) return [];
+  return fromS;
+};
+
+/**
+ * Returns a list of possible state names for `sm`, or
+ * an empty list if no transitions are possible.
+ *
  * @param sm
  * @returns
  */
 export const possible = <V extends Transitions>(
   sm: MachineState<V>
-): StateNames<V>[] => {
-  const fromS = validateState(sm);
-  if (fromS === null) return [];
-  if (Array.isArray(fromS)) {
-    if (fromS.length === 1 && fromS[0] === null) return [];
-    return fromS;
-  }
-  return [fromS as StateNames<V>];
+): (StateNames<V> | null)[] => {
+  const targets = possibleTargets(sm);
+  return targets.map((v) => v.state);
 };
 
-const validateDescription = (d: Transitions): [error: boolean, msg: string] => {
-  const normaliseTargets = (s: StateTarget): StateNames<any>[] => {
-    if (s === null) return [];
-    if (typeof s === 'undefined') throw new Error(`Undefined target`);
-    if (typeof s === 'string') return [s];
-    if (Array.isArray(s)) {
-      if (s.length === 1 && s[0] === null) return [];
-      for (const ss of s) {
-        if (typeof ss === `undefined`) {
-          throw new Error(`Undefined target exists in array`);
-        }
+export const normaliseTargets = <V extends Transitions>(
+  targets:
+    | StateTarget<V>
+    | readonly StateTargetStrict<V>[]
+    //eslint-disable-next-line functional/prefer-readonly-type
+    | StateTargetStrict<V>
+): StateTargetStrict<V>[] | null | undefined => {
+  const normaliseSingleTarget = (
+    target: string | undefined | null | object
+  ): StateTargetStrict<V> | undefined => {
+    // Terminal target
+    if (target === null) return { state: null };
+    // String is the target state
+    if (typeof target === 'string') {
+      return {
+        state: target,
+      };
+    } else if (typeof target === 'object' && 'state' in target) {
+      const targetState = target.state;
+      if (typeof targetState !== 'string') {
+        throw new Error(
+          `Target 'state' field is not a string. Got: ${typeof targetState}`
+        );
       }
-      return s;
+      if (`preconditions` in target) {
+        return {
+          state: targetState,
+          preconditions: target.preconditions as TransitionCondition<V>[],
+        };
+      }
+      return { state: targetState };
+    } else {
+      throw new Error(
+        `Unexpected type: ${typeof target}. Expected string or object with 'state' field.`
+      );
     }
-    throw new Error('Invalid target');
   };
 
-  // 0. Index top-level states, checking for dupes
-  const definedStates = new Set();
-  for (const e of Object.entries(d)) {
-    if (typeof e[0] === `undefined`) {
-      throw new Error(`Top-level undefined state`);
+  // Array of targets (either strings or objects)
+  if (Array.isArray(targets)) {
+    //eslint-disable-next-line functional/no-let
+    let containsNull = false;
+    const mapResults = targets.map((t) => {
+      const r = normaliseSingleTarget(t);
+      if (!r) throw new Error(`Invalid target`);
+      containsNull = containsNull || r.state === null;
+      return r;
+    });
+    if (containsNull && mapResults.length > 1) {
+      throw new Error(`Cannot have null as an possible state`);
     }
-    if (typeof e[1] === `undefined`) {
-      throw new Error(`Undefined target state for ${e[0]}`);
-    }
-    if (definedStates.has(e[0])) {
-      return [false, `State defined twice: ${e[0]}`];
-    }
-    definedStates.add(e[0]);
+    return mapResults;
+  } else {
+    const target = normaliseSingleTarget(targets);
+    if (!target) return;
+    return [target];
   }
-
-  // 1. Index target states
-  const targetStates = new Set();
-  for (const e of Object.entries(d)) {
-    const eS = normaliseTargets(e[1]);
-    //eslint-disable-next-line functional/prefer-tacit
-    eS.forEach((x) => targetStates.add(x));
-  }
-
-  // 2. Check each target state is also described at a top-level
-  for (const s of targetStates) {
-    if (!definedStates.has(s)) {
-      return [false, `Target state '${s}' is not defined at top-level.`];
-    }
-  }
-
-  return [true, ''];
 };
 
-const validateState = <V extends Transitions>(
-  sm: MachineState<V>
-): StateTarget => {
-  if (typeof sm === 'undefined') throw new Error('sm parameter is undefined');
-  if (typeof sm.value !== 'string') {
+const validateAndNormaliseTransitions = (
+  d: Transitions
+): Map<string, StateTargetStrict<typeof d>[]> | undefined => {
+  const returnMap = new Map<string, StateTargetStrict<typeof d>[]>();
+
+  // 1. Index top-level states
+  for (const [topLevelState, topLevelTargets] of Object.entries(d)) {
+    if (typeof topLevelState === `undefined`) {
+      throw new Error(`Top-level undefined state`);
+    }
+    if (typeof topLevelTargets === `undefined`) {
+      throw new Error(`Undefined target state for ${topLevelState}`);
+    }
+    if (returnMap.has(topLevelState)) {
+      throw new Error(`State defined twice: ${topLevelState}`);
+    }
+    if (topLevelState.includes(' ')) {
+      throw new Error('State names cannot contain spaces');
+    }
+    returnMap.set(topLevelState, []);
+  }
+
+  // 2. Normalise target
+  for (const [topLevelState, topLevelTargets] of Object.entries(d)) {
+    const targets = normaliseTargets(topLevelTargets);
+    if (targets === undefined) throw new Error(`Could not normalise target`);
+    if (targets !== null) {
+      // Check that they all exist as top-level states
+      const seenStates = new Set();
+      for (const target of targets) {
+        if (seenStates.has(target.state)) {
+          throw new Error(
+            `Target state '${target.state}' already exists for '${topLevelState}'`
+          );
+        }
+        seenStates.add(target.state);
+        if (target.state === null) continue;
+        if (!returnMap.has(target.state as string)) {
+          throw new Error(
+            `Target state '${target.state}' is not defined as a top-level state. Defined under: '${topLevelState}'`
+          );
+        }
+      }
+      returnMap.set(topLevelState, targets);
+    }
+  }
+  return returnMap;
+};
+
+/**
+ * Validates machine state, throwing an exception if not valid
+ * and returning `StateTargetStrict`
+ * @param state
+ * @returns
+ */
+const validateMachineState = <V extends Transitions>(
+  state: MachineState<V>
+): void => {
+  if (typeof state === 'undefined') {
+    throw new Error(`Parameter 'state' is undefined`);
+  }
+  if (typeof state.value !== 'string') {
     throw new Error('Existing state is not a string');
   }
-  return sm.states[sm.value];
 };
 
 /**
@@ -206,21 +388,26 @@ export const to = <V extends Transitions>(
   sm: MachineState<V>,
   toState: StateNames<V>
 ): MachineState<V> => {
-  validateState(sm);
-  const [ok, msg, possibleStates] = validate(sm, toState);
-  if (ok) {
-    return Object.freeze({
-      value: toState,
-      states: sm.states,
-      visited: pushUnique(sm.visited, [sm.value]),
-    });
-  } else {
+  validateMachineState(sm); // throws if not OK
+  validateTransition(sm, toState); // throws if not OK
+  return Object.freeze({
+    value: toState,
+    machine: sm.machine,
+    visited: unique<string>([sm.visited as string[], [sm.value] as string[]]),
+  });
+};
+
+export const next = <V extends Transitions>(
+  sm: MachineState<V>
+): MachineState<V> => {
+  //validateMachineState(sm);
+  const first = possibleTargets(sm).at(0);
+  if (!first || first.state === null) {
     throw new Error(
-      `${msg}: ${sm.value.toString()} -> ${toState.toString()}. Possible: ${possibleStates.join(
-        ','
-      )}`
+      `Not possible to move to a next state from '${sm.value as string}`
     );
   }
+  return to(sm, first.state);
 };
 
 /**
@@ -229,28 +416,44 @@ export const to = <V extends Transitions>(
  * @param toState
  * @returns
  */
-export const isValid = <V extends Transitions>(
+export const isValidTransition = <V extends Transitions>(
   sm: MachineState<V>,
   toState: StateNames<V>
 ): boolean => {
-  return validate(sm, toState)[0];
+  try {
+    validateTransition(sm, toState);
+    return true;
+  } catch (ex) {
+    return false;
+  }
 };
 
-export const validate = <V extends Transitions>(
+export const validateTransition = <V extends Transitions>(
   sm: MachineState<V>,
   toState: StateNames<V>
-): [error: boolean, reason: TransitionResult, possible: StateNames<V>[]] => {
-  if (typeof toState !== 'string') {
-    throw new Error('toState should be a string');
+): void => {
+  if (toState === null) throw new Error(`Cannot transition to null state`);
+  if (toState === undefined) {
+    throw new Error(`Cannot transition to undefined state`);
   }
-  const toS = sm.states[toState];
-  if (typeof toS === 'undefined') return [false, 'ToNotFound', []];
+  if (typeof toState !== 'string') {
+    throw new Error(
+      `Parameter 'toState' should be a string. Got: ${typeof toState}`
+    );
+  }
+
+  //const toS = sm.machine[toState];
+  //if (typeof toS === 'undefined') throw new Error(`Target state '${toState}' not defined`);
 
   const p = possible(sm);
-  if (p.length === 0) return [false, 'Terminal', []];
-  if (!p.includes(toState)) return [false, 'Invalid', p];
-
-  return [true, 'Ok', p];
+  if (p.length === 0) throw new Error('Machine is in terminal state');
+  if (!p.includes(toState)) {
+    throw new Error(
+      `Target state '${toState} not available at current state. Possible states: ${p.join(
+        ', '
+      )}`
+    );
+  }
 };
 
 /**
@@ -347,7 +550,3 @@ export const bidirectionalFromList = (
   }
   return t;
 };
-
-import { pushUnique } from '../IterableSync.js';
-import { StateMachineWithEvents } from './StateMachineWithEvents.js';
-export { StateMachineWithEvents as WithEvents };
