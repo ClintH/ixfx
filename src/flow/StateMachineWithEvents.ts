@@ -4,28 +4,28 @@ import * as StateMachine from './StateMachine.js';
 import type { StateNames, Transitions, MachineState } from './StateMachine.js';
 import { Elapsed } from './index.js';
 
-export interface StateChangeEvent {
-  readonly newState: string;
-  readonly priorState: string;
-}
-
-export interface StopEvent {
-  readonly state: string;
-}
-
-export type StateMachineEventMap = {
-  readonly change: StateChangeEvent;
-  readonly stop: StopEvent;
+export type StateChangeEvent<V extends Transitions> = {
+  readonly newState: StateNames<V>;
+  readonly priorState: StateNames<V>;
 };
 
-export type StateMachineOpts = {
+export type StopEvent<V extends Transitions> = {
+  readonly state: StateNames<V>;
+};
+
+export type StateMachineEventMap<V extends Transitions> = {
+  readonly change: StateChangeEvent<V>;
+  readonly stop: StopEvent<V>;
+};
+
+export type StateMachineOpts<V extends Transitions> = {
   readonly debug?: boolean;
-  readonly initial?: string;
+  readonly initial?: StateNames<V>;
 };
 
 export class StateMachineWithEvents<
   V extends Transitions,
-> extends SimpleEventEmitter<StateMachineEventMap> {
+> extends SimpleEventEmitter<StateMachineEventMap<V>> {
   #sm: MachineState<V>;
   #smInitial: MachineState<V>;
 
@@ -41,7 +41,7 @@ export class StateMachineWithEvents<
    * @param Options Options for machine (defaults to `{debug:false}`)
    * @memberof StateMachine
    */
-  constructor(m: V, opts: StateMachineOpts = {}) {
+  constructor(m: V, opts: StateMachineOpts<V> = {}) {
     super();
 
     this.#debug = opts.debug ?? false;
@@ -66,9 +66,12 @@ export class StateMachineWithEvents<
   }
 
   /**
-   * Return a list of possible states from current state
+   * Return a list of possible states from current state.
+   *
+   * If list is empty, no states are possible. Otherwise lists
+   * possible states, including 'null' for terminal
    */
-  get statesPossible(): readonly StateNames<V>[] {
+  get statesPossible(): readonly (StateNames<V> | null)[] {
     return StateMachine.possible(this.#sm);
   }
 
@@ -76,7 +79,7 @@ export class StateMachineWithEvents<
    * Return a list of all defined states
    */
   get statesDefined(): readonly StateNames<V>[] {
-    return Object.keys(this.#sm.states);
+    return Object.keys(this.#sm.machine);
   }
 
   /**
@@ -117,15 +120,12 @@ export class StateMachineWithEvents<
   }
 
   /**
-   * Returns whether `newState` is a valid transition from current state,
-   * along with a message explanation. Use {@link isValid} if you just want a simple boolean
+   * Throws if it's not valid to transition to `newState`
    * @param newState
    * @returns
    */
-  validateTransition(
-    newState: StateNames<V>
-  ): readonly [valid: boolean, msg: string, posisble: StateNames<V>[]] {
-    return StateMachine.validate(this.#sm, newState);
+  validateTransition(newState: StateNames<V>): void {
+    StateMachine.validateTransition(this.#sm, newState);
   }
 
   /**
@@ -135,7 +135,7 @@ export class StateMachineWithEvents<
    * @returns
    */
   isValid(newState: StateNames<V>): boolean {
-    return StateMachine.isValid(this.#sm, newState);
+    return StateMachine.isValidTransition(this.#sm, newState);
   }
 
   /**
@@ -146,13 +146,15 @@ export class StateMachineWithEvents<
    *
    * @memberof StateMachine
    */
-  set state(newState: string) {
+  set state(newState: StateNames<V>) {
     const priorState = this.#sm.value as string;
     if (newState === this.#sm.value) return;
 
     // Try to change state
     this.#sm = StateMachine.to(this.#sm, newState);
-    if (this.#debug) console.log(`StateMachine: ${priorState} -> ${newState}`);
+    if (this.#debug) {
+      console.log(`StateMachine: ${priorState} -> ${newState as string}`);
+    }
     this.#changedAt = Elapsed.since();
     setTimeout(() => {
       this.fireEvent(`change`, { newState: newState, priorState: priorState });
