@@ -11,11 +11,11 @@ export const areIntegers = (t: ExecutionContext, a: Array<number>) => {
   }
 };
 
-export const arrayValuesEqual = (
+export const arrayValuesEqual = <V>(
   t: ExecutionContext,
-  a: ArrayLike<any>,
-  b: ArrayLike<any>,
-  eq = isEqualDefault<any>
+  a: ArrayLike<V>,
+  b: ArrayLike<V>,
+  eq = isEqualDefault<V>
 ) => {
   if (compareValuesEqual(a, b, eq)) {
     t.assert(true);
