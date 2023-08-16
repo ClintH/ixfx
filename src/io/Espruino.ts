@@ -8,7 +8,11 @@ import {
   EspruinoSerialDevice,
   type EspruinoSerialDeviceOpts,
 } from './EspruinoSerialDevice.js';
-import type { DataEvent, Events } from './BleDevice.js';
+import type {
+  GenericStateTransitions,
+  IoDataEvent,
+  IoEvents,
+} from './index.js';
 
 export { EspruinoBleDevice, EspruinoSerialDevice };
 export type { EspruinoSerialDeviceOpts };
@@ -247,7 +251,8 @@ export const connectBle = async (opts: EspruinoBleOpts = {}) => {
  *
  * This base interface is implemented by {@link EspruinoBleDevice} and {@link EspruinoSerialDevice}.
  */
-export interface EspruinoDevice extends ISimpleEventEmitter<Events> {
+export interface EspruinoDevice
+  extends ISimpleEventEmitter<IoEvents<GenericStateTransitions>> {
   /**
    * Sends some code to be executed on the Espruino. The result
    * is packaged into JSON and sent back to your code. An exception is
@@ -363,7 +368,7 @@ export const deviceEval = async (
     // Generate a random id so reply can be matched up with this request
     const id = randomString(5);
 
-    const onData = (d: DataEvent) => {
+    const onData = (d: IoDataEvent) => {
       try {
         //eslint-disable-next-line functional/no-let
         let cleaned = d.data;
@@ -402,9 +407,9 @@ export const deviceEval = async (
       }
     };
 
-    const onStateChange = (e: StateChangeEvent) => {
-      if (e.newState !== `connected`) {
-        done(`State changed to '${e.newState}', aborting`);
+    const onStateChange = (evt: StateChangeEvent<GenericStateTransitions>) => {
+      if (evt.newState !== `connected`) {
+        done(`State changed to '${evt.newState}', aborting`);
       }
     };
 

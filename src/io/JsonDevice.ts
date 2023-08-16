@@ -1,13 +1,15 @@
 import { SimpleEventEmitter } from '../Events.js';
-import {
-  type StateChangeEvent,
-  StateMachineWithEvents,
-} from '../flow/StateMachineWithEvents.js';
+import * as StateMachine from '../flow/StateMachine.js';
+import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
 import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
 import { retry } from '../flow/Retry.js';
+import {
+  genericStateTransitionsInstance,
+  type GenericStateTransitions,
+} from './index.js';
 
 /**
  * Options for JsonDevice
@@ -52,11 +54,11 @@ export type JsonDeviceEvents = {
   /**
    * State changed
    */
-  readonly change: StateChangeEvent;
+  readonly change: StateChangeEvent<GenericStateTransitions>;
 };
 
 export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
-  states: StateMachineWithEvents<any>;
+  states: StateMachine.WithEvents<GenericStateTransitions>;
   codec: Codec;
 
   verboseLogging = false;
@@ -80,7 +82,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.txBuffer = new StringWriteBuffer(async (data) => {
       // When we have data to actually write to device
       await this.writeInternal(data);
-    }, config.chunkSize);
+    }, config);
 
     // Receive buffer
     this.rxBuffer = new StringReceiveBuffer((line) => {
@@ -88,15 +90,9 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     });
 
     this.codec = new Codec();
-    this.states = new StateMachineWithEvents(
-      {
-        ready: `connecting`,
-        connecting: [`connected`, `closed`],
-        connected: [`closed`],
-        closed: `connecting`,
-      },
-      { initial: `ready` }
-    );
+    this.states = new StateMachine.WithEvents(genericStateTransitionsInstance, {
+      initial: `ready`,
+    });
 
     this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);

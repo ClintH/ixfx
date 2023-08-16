@@ -1,20 +1,16 @@
 import { SimpleEventEmitter } from '../Events.js';
-import { StateMachineWithEvents } from '../flow/StateMachineWithEvents.js';
-import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
+import * as StateMachine from '../flow/StateMachine.js';
+
 import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
 import { retry } from '../flow/Retry.js';
-
-export type DataEvent = {
-  readonly data: string;
-};
-
-export type Events = {
-  readonly data: DataEvent;
-  readonly change: StateChangeEvent;
-};
+import {
+  genericStateTransitionsInstance,
+  type GenericStateTransitions,
+  type IoEvents,
+} from './index.js';
 
 export type Opts = {
   readonly service: string;
@@ -53,8 +49,10 @@ const reconnect = async () => {
   }
 };
 
-export class BleDevice extends SimpleEventEmitter<Events> {
-  states: StateMachineWithEvents<any>;
+export class BleDevice extends SimpleEventEmitter<
+  IoEvents<GenericStateTransitions>
+> {
+  states: StateMachine.WithEvents<GenericStateTransitions>;
   codec: Codec;
   rx: BluetoothRemoteGATTCharacteristic | undefined;
   tx: BluetoothRemoteGATTCharacteristic | undefined;
@@ -72,26 +70,23 @@ export class BleDevice extends SimpleEventEmitter<Events> {
     this.verboseLogging = config.debug;
     this.txBuffer = new StringWriteBuffer(async (data) => {
       await this.writeInternal(data);
-    }, config.chunkSize);
+    }, config);
 
     this.rxBuffer = new StringReceiveBuffer((line) => {
       this.fireEvent(`data`, { data: line });
     });
 
     this.codec = new Codec();
-    this.states = new StateMachineWithEvents(
+    this.states = new StateMachine.WithEvents<GenericStateTransitions>(
+      genericStateTransitionsInstance,
       {
-        ready: `connecting`,
-        connecting: [`connected`, `closed`],
-        connected: [`closed`],
-        closed: `connecting`,
-      },
-      { initial: `ready` }
+        initial: `ready`,
+      }
     );
-
     this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);
       this.verbose(`${evt.priorState} -> ${evt.newState}`);
+
       if (evt.priorState === `connected`) {
         // Clear out buffers
         this.rxBuffer.clear();
