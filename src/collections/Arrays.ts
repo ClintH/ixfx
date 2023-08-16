@@ -3,7 +3,6 @@
  * See Also: NumericArrays.ts
  */
 
-import { pushUnique } from '../IterableSync.js';
 import { integer as guardInteger } from '../Guards.js';
 import { defaultRandom, type RandomSource } from '../Random.js';
 import {
@@ -11,7 +10,9 @@ import {
   isEqualDefault,
   isEqualValueDefault,
   type ToString,
+  toStringDefault,
 } from '../Util.js';
+import { fromIterable as mapFromIterable } from './map/MapFns.js';
 export * from './NumericArrays.js';
 
 /**
@@ -890,24 +891,67 @@ export const filterAB = <V>(
  * const v = Arrays.unique([ [1, 2, 3, 4], [ 3, 4, 5, 6] ]);
  * // [ 1, 2, 3, 4, 5, 6]
  * ```
+ *
+ * A single array can be provided as well:
+ * ```js
+ * const v = Arrays.unique([ 1, 2, 3, 1, 2, 3 ]);
+ * // [ 1, 2, 3 ]
+ * ```
  * See also:
  * * {@link intersection}: Overlap between two arrays
+ * * {@link additionalValues}: Yield values from an iterable not present in the other
  * @param arrays
  * @param comparer
  * @returns
  */
 export const unique = <V>(
   //eslint-disable-next-line functional/prefer-readonly-type
-  arrays: Array<Array<V>>,
-  comparer = isEqualDefault
+  arrays: Array<Array<V>> | Array<V>,
+  comparer = isEqualDefault<V>
 ): V[] => {
   //eslint-disable-next-line functional/no-let
-  let t: V[] = [];
+  const t: V[] = [];
   for (let i = 0; i < arrays.length; i++) {
     const a = arrays[i];
-    t = pushUnique<V>(t, a, comparer);
+    if (Array.isArray(a)) {
+      for (const v of additionalValues<V>(t, a, comparer)) {
+        //eslint-disable-next-line functional/immutable-data
+        t.push(v);
+      }
+    } else {
+      return [...additionalValues<V>([], arrays as Array<V>, comparer)];
+    }
   }
   return t;
+};
+
+/**
+ * Returns _true_ if array contains duplicate values.
+ *
+ * ```js
+ *
+ * containsDuplicateValues(['a','b','a']); // True
+ * containsDuplicateValues([
+ *  { name: 'Apple' },
+ *  { name: 'Apple' }
+ * ]); // True
+ * ```
+ * @param array
+ * @param comparer
+ * @returns
+ */
+export const containsDuplicateValues = <V>(
+  //eslint-disable-next-line functional/prefer-readonly-type
+  array: Array<V> | ReadonlyArray<V>,
+  keyFn = toStringDefault<V>
+): boolean => {
+  if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
+  try {
+    const _ = mapFromIterable(array, keyFn);
+  } catch (ex) {
+    return true;
+  }
+  return false;
 };
 
 /**
@@ -1044,3 +1088,53 @@ export const contains = <V>(
   }
   return true;
 };
+
+/**
+ * Yield values from an iterable not present in the other.
+ *
+ * Assuming that `input` array is unique values, this function
+ * yields items from `values` which are not present in `input`.
+ *
+ * Duplicate items in `values` are ignored - only the first is yielded.
+ *
+ * If `eq` function is not provided, values are compared using the
+ * default === semantics (via {@link isEqualDefault})
+ *
+ * ```js
+ * const existing = [ 1, 2, 3 ];
+ * const newValues = [ 3, 4, 5];
+ * const v = [...additionalValues(existing, newValues)];
+ * // [ 1, 2, 3, 4, 5]
+ * ```
+ *
+ * ```js
+ * const existing = [ 1, 2, 3 ];
+ * const newValues = [ 3, 4, 5 ];
+ * for (const v of additionalValues(existing, newValues)) {
+ *  // 4, 5
+ * }
+ * To combine one or more iterables, keeping only unique items, use {@link unique}
+ * @param input
+ * @param values
+ */
+export function* additionalValues<V>(
+  //eslint-disable-next-line functional/prefer-readonly-type
+  input: Array<V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  values: Iterable<V>,
+  eq: IsEqual<V> = isEqualDefault
+): Iterable<V> {
+  // Keep track of values already yielded
+  const yielded: V[] = [];
+  for (const v of values) {
+    const found = input.find((i) => eq(i, v));
+    if (!found) {
+      const alreadyYielded = yielded.find((ii) => eq(ii, v));
+      if (!alreadyYielded) {
+        //eslint-disable-next-line functional/immutable-data
+        yielded.push(v);
+        yield v;
+      }
+    }
+  }
+}
