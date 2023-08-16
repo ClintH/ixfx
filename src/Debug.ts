@@ -8,7 +8,7 @@ export type LogMsg = {
   readonly category?: string;
 };
 
-export type LogFn = (msg: LogMsg) => void;
+export type LogFn = (msg: LogMsg | string) => void;
 
 /**
  * Either a flag for default console logging, or a simple log function
@@ -20,18 +20,27 @@ export type LogOption = boolean | LogFn;
  * @param l
  * @returns
  */
-export const resolveLogOption = (l?: LogOption): LogFn => {
+export const resolveLogOption = (
+  l?: LogOption,
+  defaults: { readonly category?: string; readonly kind?: string } = {}
+): LogFn => {
   if (typeof l === 'undefined') {
-    return (_: LogMsg) => {
+    return (_: LogMsg | string) => {
       /** no-op */
     };
   }
+  const defaultCat = defaults.category ?? '';
+  const defaultKind = defaults.kind ?? undefined;
+
   if (typeof l === 'boolean') {
-    return (m: LogMsg) => {
-      const kind = m.kind ?? `info`;
+    return (msgOrString: LogMsg | string) => {
+      const m =
+        typeof msgOrString === 'string' ? { msg: msgOrString } : msgOrString;
+      const kind = m.kind ?? defaultKind;
+      const category = m.category ?? defaultCat;
       //eslint-disable-next-line functional/no-let
       let msg = m.msg;
-      if (m.category) msg = `[${m.category}] ${msg}`;
+      if (category) msg = `[${category}] ${msg}`;
       switch (kind) {
         case 'error':
           console.error(msg);
