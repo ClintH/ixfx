@@ -10,49 +10,7 @@
  * @returns
  */
 
-import {
-  isEqualDefault,
-  type IsEqual,
-  type ToString,
-  toStringDefault,
-} from './Util.js';
-import { MutableStringSet } from './collections/set/SetMutable.js';
-
-/**
- * Assuming that `input` iterable is only unique values, this function
- * returns a new array with unique items from `values` added.
- *
- * If `comparer` function is not provided, values are compared using the
- * default === semantics (via {@link isEqualDefault})
- *
- * ```js
- * const existing = [ 1, 2, 3 ];
- * const newValues = [ 3, 4, 5];
- * const v = pushUnique(existing, newValues);
- * // [ 1, 2, 3, 4, 5]
- * ```
- *
- * To combine one or more iterables, keeping only unique items, use {@link unique}
- * @param input
- * @param values
- */
-export const pushUnique = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
-  input: Iterable<V>,
-  //eslint-disable-next-line functional/prefer-readonly-type
-  values: Iterable<V>,
-  comparer?: IsEqual<V>
-): V[] => {
-  const c = comparer ?? isEqualDefault;
-  const ret = [...input];
-  for (const v of values) {
-    const found = ret.find((i) => c(i, v));
-    if (found) continue;
-    //eslint-disable-next-line functional/immutable-data
-    ret.push(v);
-  }
-  return ret;
-};
+import { type IsEqual, type ToString, toStringDefault } from './Util.js';
 
 /**
  * Return first value from an iterable, or _undefined_ if
@@ -487,62 +445,53 @@ export function* takeWhile<V>(it: Iterable<V>, f: (v: V) => boolean) {
 }
 
 /**
- * Returns unique items from an iterable
+ * Returns unique items from an iterable or
+ * array of iterables.
+ *
+ * ```js
+ * const data = [ 'apples', 'oranges' ]
+ * const data2 = [ 'oranges', 'pears' ]
+ * const unique = [...unique([data,data2]];
+ * // Yields: [ 'apples', 'oranges', 'pears' ]
+ * ```
+ *
+ * Custom function can be used that returns a key for
+ * an item, determining equality. By default uses
+ * JSON.stringify.
+ *
  * ```js
  * const data = [ {i:0,v:2}, {i:1,v:3}, {i:2,v:2} ];
+ *
+ * // Item identity based on 'v' field
  * unique(data, e => e.v);
- * //Yields: [ {i:0,v:2},{i:1,v:3} ]
+ * //Yields: [ {i:0,v:2}, {i:1,v:3} ]
  * ```
- * @param it
+ * @param iterable Iterable, or array of iterables
  * @param f
  */
 //eslint-disable-next-line func-style
 export function* unique<V>(
-  it: Iterable<V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  iterable: Iterable<V> | Iterable<V>[],
   keyFn: ToString<V> = toStringDefault
 ) {
   // f: (id: V) => V = (id) => id) {
   // Adapted from https://surma.github.io/underdash/
   const buffer = [];
-
-  for (const v of it) {
-    const fv = keyFn(v);
-    if (buffer.indexOf(fv) !== -1) continue;
-    //eslint-disable-next-line functional/immutable-data
-    buffer.push(fv);
-    yield v;
+  //eslint-disable-next-line functional/no-let
+  let itera: Iterable<V>[] = [];
+  if (!Array.isArray(iterable)) {
+    itera = [iterable];
+  } else {
+    itera = iterable;
   }
-}
-
-/**
- * Returns the unique set of items from several iterables.
- * ```js
- * const data = [ 'apples', 'oranges' ]
- * const data2 = [ 'oranges', 'pears' ]
- * const unique = [...mergeUnique([data,data2]];
- * // Yields: ['apples', 'oranges', 'pears']
- * ```
- *
- * ```js
- * const data = [ 'apples', 'oranges' ]
- * const data2 = [ 'oranges', 'pears' ]
- * for (const i of mergeUnique([data,data2])) {
- *  // Yields: 'apples', 'oranges', 'pears'
- * }
- * ```
- * @param iterables
- * @param keyFn
- */
-export function* mergeUnique<V>(
-  iterables: Iterable<Iterable<V>>,
-  keyFn: ToString<V> = toStringDefault
-) {
-  const seen = new MutableStringSet<V>(keyFn);
-  for (const it of iterables) {
-    for (const i of it) {
-      if (seen.add(i)) {
-        yield i;
-      }
+  for (const it of itera) {
+    for (const v of it) {
+      const fv = keyFn(v);
+      if (buffer.indexOf(fv) !== -1) continue;
+      //eslint-disable-next-line functional/immutable-data
+      buffer.push(fv);
+      yield v;
     }
   }
 }
