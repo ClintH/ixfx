@@ -20,13 +20,16 @@ export * as Trees from './Trees.js';
  * before the oldest items (at the bottom). {@link Queues} operate differently, with
  * the oldest items (at the front of the queue) removed before the newest items (at the end of the queue).
  *
- * Create stacks with {@link stack} or {@link stackMutable}. These return a {@link Stack} or {@link StackMutable} respectively.
+ * Create stacks with {@link Stacks.immutable} or {@link Stacks.mutable}. These return a {@link IStackImmutable} or {@link IStackMutable} respectively.
  *
  * The ixfx implementation allow you to set a capacity limit with three {@link StackDiscardPolicy |policies} for
  * how items are evicted.
  *
  */
 export * as Stacks from './stack/index.js';
+
+export { StackMutable } from './stack/StackMutable.js';
+export { StackImmutable } from './stack/StackImmutable.js';
 
 /**
  * Arrays are a list of data. ixfx provides a number of functions for working with arrays in an immutable manner.
@@ -66,12 +69,13 @@ import * as Sets from './set/index.js';
 /**
  * Sets store unique items.
  *
- * ixfx's {@link ISetImmutable} (or {@link ISetMutable}) compares items by value rather than reference, unlike the default JS implementation.
+ * ixfx's {@link ISetImmutable} (or {@link Set.ISetMutable}) compares items by value rather than reference, unlike the default JS implementation.
  *
  * Create using {@link Sets.immutable} or {@link Sets.mutable}
  */
 export { Sets };
-
+export { SetStringMutable } from './set/SetMutable.js';
+export { SetStringImmutable } from './set/SetImmutable.js';
 import * as Queues from './queue/index.js';
 
 /**
@@ -86,10 +90,11 @@ import * as Queues from './queue/index.js';
  * The ixfx implementations allow you to set a capacity limit with three {@link QueueDiscardPolicy | policies} for
  * how items are evicted.
  *
- * Create queues with {@link Queues.queue} or {@link Queues.queueMutable}. These return a {@link IQueue} or {@link IQueueMutable} respectively.
+ * Create queues with {@link Queues.immutable} or {@link Queues.mutable}. These return a {@link IQueueImmutable} or {@link IQueueMutable} respectively.
  */
 export { Queues };
-
+export { QueueMutable } from './queue/QueueMutable.js';
+export { QueueImmutable } from './queue/QueueImmutable.js';
 import * as Maps from './map/index.js';
 
 /**
