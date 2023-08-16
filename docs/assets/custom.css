@@ -2,7 +2,7 @@
   --dark-color-background: hsl(229, 20%, 20%);
   --dark-bg-dim: hsl(231, 21%, 29%);
   --dark-fg: hsl(231, 28%, 73%);
-  --dark-fg-light: hsl(231, 18%, 83%);
+  --dark-fg-link: hsl(231, 18%, 83%);
   --dark-fgDim: hsl(231, 12%, 50%);
 
   --dark-yellow: hsl(39, 100%, 71%);
@@ -12,24 +12,24 @@
 
   --light-color-background: hsl(0, 0%, 98%);
   --light-bg-dim: hsl(194, 6%, 94%);
-  --light-fg: hsl(200, 16%, 52%);
-  --light-fg-dark: hsl(200, 1%, 52%);
+  --light-fg: hsl(200, 16%, 22%);
+  --light-fg-link: hsl(200, 90%, 42%);
   --light-fgDim: hsl(200, 16%, 32%);
 
-  --light-yellow: hsl(39, 90%, 59%);
+  --light-yellow: hsl(39, 100%, 49%);
   --light-purple: hsl(256, 90%, 65%);
   --light-blue: hsl(217, 38%, 55%);
   --light-green: hsl(85, 40%, 54%);
 
-  --dark-color-ts-namespace: var(--dark-fg);
+  --dark-color-ts-namespace: var(--dark-fg-link);
   --dark-color-ts: var(--dark-fg);
-  --dark-color-ts-function: var(--dark-fg-light);
+  --dark-color-ts-function: var(--dark-fg-link);
   --dark-color-ts-interface: var(--dark-fg);
   --dark-color-ts-variable: var(--dark-fg);
 
-  --light-color-ts-namespace: var(--light-fg);
+  --light-color-ts-namespace: var(--light-fg-link);
   --light-color-ts: var(--light-fg);
-  --light-color-ts-function: var(--light-fg-dark);
+  --light-color-ts-function: var(--light-fg-link);
   --light-color-ts-interface: var(--light-fg);
   --light-color-ts-variable: var(--light-fg);
   --light-code-background: var(--light-bg-dim);
@@ -64,6 +64,9 @@
   }
   .tsd-kind-function {
     color: var(--dark-color-ts-function);
+  } 
+  .tsd-kind-namespace {
+    color: var(--dark-color-ts-namespace);
   }
   :root {
     --accent: var(--dark-yellow);

@@ -19,7 +19,7 @@
 <h1>Function resolveLogOption</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="resolveLogOption"><span class="tsd-kind-call-signature">resolve<wbr/>Log<wbr/>Option</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">l</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Util.Debug.LogFn.html" class="tsd-signature-type tsd-kind-type-alias">LogFn</a><a href="#resolveLogOption" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="resolveLogOption"><span class="tsd-kind-call-signature">resolve<wbr/>Log<wbr/>Option</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">l</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">defaults</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Util.Debug.LogFn.html" class="tsd-signature-type tsd-kind-type-alias">LogFn</a><a href="#resolveLogOption" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Resolve a LogOption to a function</p>
 </div>
@@ -28,7 +28,14 @@
 <ul class="tsd-parameter-list">
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">l</span>: <a href="../types/Util.Debug.LogOption.html" class="tsd-signature-type tsd-kind-type-alias">LogOption</a></h5>
-<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><span class="tsd-kind-parameter">defaults</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">category</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">kind</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = {}</span></h5>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">category</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">kind</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../types/Util.Debug.LogFn.html" class="tsd-signature-type tsd-kind-type-alias">LogFn</a></h4>
 <div class="tsd-comment tsd-typography"></div></li></ul></section></div>
 <div class="col-sidebar">
@@ -85,6 +92,7 @@
 <li><a href="../types/Util.RemapObjectPropertyType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Remap<wbr/>Object<wbr/>Property<wbr/>Type</span></a></li>
 <li><a href="../types/Util.ToString.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>To<wbr/>String</span></a></li>
 <li><a href="Util.defaultComparer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>default<wbr/>Comparer</span></a></li>
+<li><a href="Util.defaultComparerInverse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>default<wbr/>Comparer<wbr/>Inverse</span></a></li>
 <li><a href="Util.defaultKeyer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>default<wbr/>Keyer</span></a></li>
 <li><a href="Util.getFieldByPath.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Field<wbr/>By<wbr/>Path</span></a></li>
 <li><a href="Util.getFieldPaths.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Field<wbr/>Paths</span></a></li>
@@ -92,7 +100,11 @@
 <li><a href="Util.isEqualDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Default</span></a></li>
 <li><a href="Util.isEqualValueDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Default</span></a></li>
 <li><a href="Util.isPowerOfTwo.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Power<wbr/>Of<wbr/>Two</span></a></li>
+<li><a href="Util.jsComparer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>js<wbr/>Comparer</span></a></li>
+<li><a href="Util.jsComparerInverse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>js<wbr/>Comparer<wbr/>Inverse</span></a></li>
 <li><a href="Util.mapObject.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>map<wbr/>Object</span></a></li>
+<li><a href="Util.numericComparer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>numeric<wbr/>Comparer</span></a></li>
+<li><a href="Util.numericComparerInverse.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>numeric<wbr/>Comparer<wbr/>Inverse</span></a></li>
 <li><a href="Util.relativeDifference.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>relative<wbr/>Difference</span></a></li>
 <li><a href="Util.roundUpToMultiple.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>round<wbr/>Up<wbr/>To<wbr/>Multiple</span></a></li>
 <li><a href="Util.runningiOS.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>runningiOS</span></a></li>

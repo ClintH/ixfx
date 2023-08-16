@@ -18,7 +18,29 @@
 <h1>Function intervalToMs</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="intervalToMs"><span class="tsd-kind-call-signature">interval<wbr/>To<wbr/>Ms</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">i</span>, <span class="tsd-kind-parameter">defaultNumber</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><a href="#intervalToMs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="intervalToMs"><span class="tsd-kind-call-signature">interval<wbr/>To<wbr/>Ms</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">i</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><a href="#intervalToMs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Return the millisecond value of an Interval.</p>
+<pre><code class="language-js"><span class="hl-8">intervalToMs</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">); </span><span class="hl-0">// 100</span><br/><span class="hl-8">intervalToMs</span><span class="hl-2">({ </span><span class="hl-3">millis:</span><span class="hl-2"> </span><span class="hl-7">100</span><span class="hl-2"> }); </span><span class="hl-0">// 100</span>
+</code><button>Copy</button></pre>
+<p>Use <code>defaultNumber</code> to return a default in the case of
+undefined or invalid input.</p>
+<pre><code class="language-js"><span class="hl-8">intervalToMs</span><span class="hl-2">(</span><span class="hl-5">undefined</span><span class="hl-2">); </span><span class="hl-0">// undefined</span><br/><span class="hl-8">intervalToMs</span><span class="hl-2">(</span><span class="hl-5">undefined</span><span class="hl-2">, </span><span class="hl-7">100</span><span class="hl-2">); </span><span class="hl-0">// 100</span>
+</code><button>Copy</button></pre>
+<p>If no default is provided, an exception is thrown.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">i</span>: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../types/Flow.Interval.html" class="tsd-signature-type tsd-kind-type-alias">Interval</a></h5>
+<div class="tsd-comment tsd-typography"><p>Interval</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h4><p>Milliseconds, or undefined</p>
+
+<div class="tsd-comment tsd-typography"></div></li>
+<li class="tsd-signature tsd-anchor-link" id="intervalToMs-1"><span class="tsd-kind-call-signature">interval<wbr/>To<wbr/>Ms</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">i</span>, <span class="tsd-kind-parameter">defaultNumber</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#intervalToMs-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Return the millisecond value of an Interval.</p>
 <pre><code class="language-js"><span class="hl-8">intervalToMs</span><span class="hl-2">(</span><span class="hl-7">100</span><span class="hl-2">); </span><span class="hl-0">// 100</span><br/><span class="hl-8">intervalToMs</span><span class="hl-2">({ </span><span class="hl-3">millis:</span><span class="hl-2"> </span><span class="hl-7">100</span><span class="hl-2"> }); </span><span class="hl-0">// 100</span>
@@ -38,11 +60,11 @@ undefined or invalid input.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">defaultNumber</span>: <span class="tsd-signature-type">number</span></h5>
+<h5><span class="tsd-kind-parameter">defaultNumber</span>: <span class="tsd-signature-type">number</span></h5>
 <div class="tsd-comment tsd-typography"><p>Default value if <code>i</code> is undefined</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h4><p>Milliseconds, or undefined</p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><p>Milliseconds, or undefined</p>
 
 <div class="tsd-comment tsd-typography"></div></li></ul></section></div>
 <div class="col-sidebar">

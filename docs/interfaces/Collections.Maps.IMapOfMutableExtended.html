@@ -92,12 +92,14 @@ Duplicate values can be added to the same or even a several keys.</p>
 <a href="Collections.Maps.IMapOfMutableExtended.html#deleteByValue" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>delete<wbr/>By<wbr/>Value</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#deleteKeyValue" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>delete<wbr/>Key<wbr/>Value</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#entriesFlat" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>entries<wbr/>Flat</span></a>
+<a href="Collections.Maps.IMapOfMutableExtended.html#firstKeyByValue" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>first<wbr/>Key<wbr/>By<wbr/>Value</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#get" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#has" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#hasKeyValue" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has<wbr/>Key<wbr/>Value</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#keys" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>keys</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#keysAndCounts" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>keys<wbr/>And<wbr/>Counts</span></a>
 <a href="Collections.Maps.IMapOfMutableExtended.html#removeEventListener" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a>
+<a href="Collections.Maps.IMapOfMutableExtended.html#valuesFlat" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>values<wbr/>Flat</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
@@ -305,6 +307,28 @@ Unlike a normal map, the same key may appear several times.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="Collections.Maps.IMapOfMutable.html">IMapOfMutable</a>.<a href="Collections.Maps.IMapOfMutable.html#entriesFlat">entriesFlat</a></p></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited"><a id="firstKeyByValue" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>first<wbr/>Key<wbr/>By<wbr/>Value</span><a href="#firstKeyByValue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="firstKeyByValue.firstKeyByValue-1"><span class="tsd-kind-call-signature">first<wbr/>Key<wbr/>By<wbr/>Value</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">eq</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><a href="#firstKeyByValue.firstKeyByValue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Finds the first key where value is stored.
+Note: value could be stored in multiple keys</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type tsd-kind-type-parameter">V</span></h5>
+<div class="tsd-comment tsd-typography"><p>Value to seek</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">eq</span>: <a href="../types/Util.IsEqual.html" class="tsd-signature-type tsd-kind-type-alias">IsEqual</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4><p>Key, or undefined if value not found</p>
+
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Inherited from <a href="Collections.Maps.IMapOfMutable.html">IMapOfMutable</a>.<a href="Collections.Maps.IMapOfMutable.html#firstKeyByValue">firstKeyByValue</a></p></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="get" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get</span><a href="#get" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -419,7 +443,18 @@ Unlike a normal map, the same key may appear several times.</p>
 <div class="tsd-comment tsd-typography">
 <h4>Memberof</h4><p>SimpleEventEmitter</p>
 </div><aside class="tsd-sources">
-<p>Inherited from <a href="../classes/Events.SimpleEventEmitter.html">SimpleEventEmitter</a>.<a href="../classes/Events.SimpleEventEmitter.html#removeEventListener">removeEventListener</a></p></aside></li></ul></section></section></div>
+<p>Inherited from <a href="../classes/Events.SimpleEventEmitter.html">SimpleEventEmitter</a>.<a href="../classes/Events.SimpleEventEmitter.html#removeEventListener">removeEventListener</a></p></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited"><a id="valuesFlat" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>values<wbr/>Flat</span><a href="#valuesFlat" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="valuesFlat.valuesFlat-1"><span class="tsd-kind-call-signature">values<wbr/>Flat</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span><a href="#valuesFlat.valuesFlat-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Iterates over all values, regardless of key.
+Same value may re-appear if it&#39;s stored under different keys.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Inherited from <a href="Collections.Maps.IMapOfMutable.html">IMapOfMutable</a>.<a href="Collections.Maps.IMapOfMutable.html#valuesFlat">valuesFlat</a></p></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -450,12 +485,14 @@ Unlike a normal map, the same key may appear several times.</p>
 <li><a href="#deleteByValue" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>delete<wbr/>By<wbr/>Value</span></a></li>
 <li><a href="#deleteKeyValue" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>delete<wbr/>Key<wbr/>Value</span></a></li>
 <li><a href="#entriesFlat" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>entries<wbr/>Flat</span></a></li>
+<li><a href="#firstKeyByValue" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>first<wbr/>Key<wbr/>By<wbr/>Value</span></a></li>
 <li><a href="#get" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get</span></a></li>
 <li><a href="#has" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has</span></a></li>
 <li><a href="#hasKeyValue" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has<wbr/>Key<wbr/>Value</span></a></li>
 <li><a href="#keys" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>keys</span></a></li>
 <li><a href="#keysAndCounts" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>keys<wbr/>And<wbr/>Counts</span></a></li>
-<li><a href="#removeEventListener" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a></li></ul></div></details></div>
+<li><a href="#removeEventListener" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>remove<wbr/>Event<wbr/>Listener</span></a></li>
+<li><a href="#valuesFlat" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>values<wbr/>Flat</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>ixfx</span></a>
 <ul class="tsd-small-nested-navigation">
@@ -521,13 +558,17 @@ Unlike a normal map, the same key may appear several times.</p>
 <li><a href="../modules/Collections.Sets.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Sets</span></a></li>
 <li><a href="../modules/Collections.Stacks.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Stacks</span></a></li>
 <li><a href="../modules/Collections.Trees.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Trees</span></a></li>
+<li><a href="../classes/Collections.QueueImmutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Queue<wbr/>Immutable</span></a></li>
+<li><a href="../classes/Collections.QueueMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Queue<wbr/>Mutable</span></a></li>
+<li><a href="../classes/Collections.SetStringImmutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Set<wbr/>String<wbr/>Immutable</span></a></li>
+<li><a href="../classes/Collections.SetStringMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Set<wbr/>String<wbr/>Mutable</span></a></li>
+<li><a href="../classes/Collections.StackImmutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Stack<wbr/>Immutable</span></a></li>
+<li><a href="../classes/Collections.StackMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Stack<wbr/>Mutable</span></a></li>
 <li><a href="Collections.CircularArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Circular<wbr/>Array</span></a></li>
 <li><a href="../types/Collections.ArrayKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Array<wbr/>Keys</span></a></li>
 <li><a href="../types/Collections.EitherKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Either<wbr/>Key</span></a></li>
 <li><a href="../types/Collections.ObjKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Obj<wbr/>Keys</span></a></li>
-<li><a href="../functions/Collections.circularArray-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>circular<wbr/>Array</span></a></li>
-<li><a href="../functions/Collections.stack.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>stack</span></a></li>
-<li><a href="../functions/Collections.stackMutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>stack<wbr/>Mutable</span></a></li></ul></div></details></li>
+<li><a href="../functions/Collections.circularArray-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>circular<wbr/>Array</span></a></li></ul></div></details></li>
 <li><a href="../modules/Data.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Data</span></a></li>
 <li><a href="../modules/Dom.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Dom</span></a></li>
 <li><a href="../modules/Events.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Events</span></a></li>
