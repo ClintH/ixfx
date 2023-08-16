@@ -1,6 +1,3 @@
-/**
- * State handler result. Steers the machine
- */
 // export type StateHandlerResult = {
 //   /**
 //    * Score of this result. This is used when a state
@@ -23,104 +20,104 @@
 //    */
 //   readonly reset?: boolean;
 // };
-
 // export type DriverExpression<V> = (args?: V) => StateHandlerResult | undefined;
 
-// export type DriverDescription<V> = {
-//   readonly select?: `first` | `highest` | `lowest`;
-//   readonly tryAll?: boolean;
-//   readonly expressions: DriverExpression<V> | readonly DriverExpression<V>[];
+// type DriverDescriptionNormalised<V> = {
+//   readonly select: `first` | `highest` | `lowest`;
+//   readonly tryAll: boolean;
+//   readonly expressions: readonly DriverExpression<V>[];
 // };
-// export interface StateDriverDescription<V> {
-//   readonly [key: string]:
-//     | DriverDescription<V>
-//     | readonly DriverExpression<V>[]
-//     | DriverExpression<V>;
+
+// interface StateDriverDescriptionNormalised<V> {
+//   readonly [key: string]: DriverDescriptionNormalised<V>;
 // }
 
-/**
- * Drive a state machine. [Demo sketch](https://github.com/ClintH/ixfx-demos/tree/main/flow/statemachine-regions)
- *
- * A description can be provided with functions to invoke for each named state.
- * The driver will invoke the function(s) corresponding to the current state of the machine.
- *
- * In the below example, it assumes a state machine with states 'init', 'one' and 'two'.
- *
- * ```js
- * StateMachine.drive(stateMachine, {
- *   init: () => {
- *     if (state.distances[0] > 0.1) return;
- *     return { state: `one` };
- *  },
- *   one: () => {
- *     if (state.distances[1] > 0.1) return;
- *     return { next: true };
- *   },
- *   two: () => {
- *     if (state.distances[2] > 0.1) return;
- *     return { reset: true };
- *   },
- *   __fallback:() => {
- *     // Handle case when the other handlers return undefined
- *   }
- * }
- * ```
- *
- * Three additional handlers can be defined: '__done', '__default'  and '__fallback'.
- * * '__done': used when there is no explicit handler for state and machine is done
- * * '__default': used if the state has no named handler
- * * '__fallback': used if there is no handler for state, or handler did not return a usable result.
- *
- * Each state can have a single function or array of functions to act as handlers.
- * The handler needs to return {@link StateHandlerResult}. In the above example, you see
- * how to change to a named state (`{state: 'one'}`), how to trigger `sm.next()` and
- * how to reset the state machine.
- *
- * If the function cannot do anything, it can just return.
- *
- * Multiple functions can be provided to handle a particular state, eg:
- * ```js
- * StateMachine.drive(stateMachine, {
- *  init: [
- *    () => { ... },
- *    () => { ... }
- *  ]
- * })
- * ```
- *
- * When multiple functions are provided, by default the first that returns a result
- * and the result can be executed is used.
- *
- * It's also possible to use the highest or lowest scoring result. To do so, results
- * must have a `score` property, as shown below. Extra syntax also has to be provided
- * instead of a bare array of functions. This is how the logic for selecting results can be
- * set.
- *
- * ```js
- * StateMachine.drive(stateMachine, {
- *   init: {
- *    select: `highest`,
- *    expressions: [
- *     () => {
- *      // some logic...
- *      return { score: 0.1, state: `hello` }
- *     },
- *     () => {
- *      // some logic...
- *       return { score: 0.2, state: `goodbye` }
- *     }
- *    ]
- *   }
- * });
- * ```
- *
- * The score results likely should not be hardcoded as in the above example,
- * but rather based on some other dynamic values influencing what action to take.
- *
- * @param sm
- * @param driver
- * @returns
- */
+// /**
+//  * Drive a state machine. [Demo sketch](https://github.com/ClintH/ixfx-demos/tree/main/flow/statemachine-regions)
+//  *
+//  * A description can be provided with functions to invoke for each named state.
+//  * The driver will invoke the function(s) corresponding to the current state of the machine.
+//  *
+//  * In the below example, it assumes a state machine with states 'init', 'one' and 'two'.
+//  *
+//  * ```js
+//  * StateMachine.drive(stateMachine, {
+//  *    // Run when state is 'init'
+//  *   init: () => {
+//  *     if (distances[0] > 0.1) return;
+//  *     // Change to state 'one' when distance is under 0.1
+//  *     return { state: `one` };
+//  *   },
+//  *   // Run when state is 'one'
+//  *   one: () => {
+//  *     if (distances[1] > 0.1) return;
+//  *     // Go to next state when distance is under 0.1
+//  *     return { next: true };
+//  *   },
+//  *   // Run when state is 'two'
+//  *   two: () => {
+//  *     if (distances[2] > 0.1) return;
+//  *     // Reset state machine if distance is under 0.1
+//  *     return { reset: true };
+//  *   }
+//  * }
+//  * ```
+//  *
+//  * Three additional handlers can be defined: '__done', '__default'  and '__fallback'.
+//  * * '__done': used when there is no explicit handler for state and machine is done
+//  * * '__default': used if the state has no named handler
+//  * * '__fallback': used if there is no handler for state, or handler did not return a usable result.
+//  *
+//  * Each state can have a single function or array of functions to act as handlers.
+//  * The handler needs to return {@link StateHandlerResult}. In the above example, you see
+//  * how to change to a named state (`{state: 'one'}`), how to trigger `sm.next()` and
+//  * how to reset the state machine.
+//  *
+//  * If the function cannot do anything, it can just return.
+//  *
+//  * Multiple functions can be provided to handle a particular state, eg:
+//  * ```js
+//  * StateMachine.drive(stateMachine, {
+//  *  init: [
+//  *    () => { ... },
+//  *    () => { ... }
+//  *  ]
+//  * })
+//  * ```
+//  *
+//  * When multiple functions are provided, by default the first that returns a result
+//  * and the result can be executed is used.
+//  *
+//  * It's also possible to use the highest or lowest scoring result. To do so, results
+//  * must have a `score` property, as shown below. Extra syntax also has to be provided
+//  * instead of a bare array of functions. This is how the logic for selecting results can be
+//  * set.
+//  *
+//  * ```js
+//  * StateMachine.drive(stateMachine, {
+//  *   init: {
+//  *    select: `highest`,
+//  *    expressions: [
+//  *     () => {
+//  *      // some logic...
+//  *      return { score: 0.1, state: `hello` }
+//  *     },
+//  *     () => {
+//  *      // some logic...
+//  *       return { score: 0.2, state: `goodbye` }
+//  *     }
+//  *    ]
+//  *   }
+//  * });
+//  * ```
+//  *
+//  * The score results likely should not be hardcoded as in the above example,
+//  * but rather based on some other dynamic values influencing what action to take.
+//  *
+//  * @param sm
+//  * @param driver
+//  * @returns
+//  */
 // export const drive = <V>(
 //   //eslint-disable-next-line functional/prefer-immutable-types
 //   sm: StateMachine,
@@ -241,16 +238,6 @@
 //   return process;
 // };
 
-// type DriverDescriptionNormalised<V> = {
-//   readonly select: `first` | `highest` | `lowest`;
-//   readonly tryAll: boolean;
-//   readonly expressions: readonly DriverExpression<V>[];
-// };
-
-// interface StateDriverDescriptionNormalised<V> {
-//   readonly [key: string]: DriverDescriptionNormalised<V>;
-// }
-
 // const isDriverDescription = <V>(
 //   v: DriverDescription<V> | readonly DriverExpression<V>[] | DriverExpression<V>
 // ): v is DriverDescription<V> => {
@@ -275,11 +262,11 @@
 //   return n;
 // };
 
-/**
- * Sort state handler results by score. Undefined results are ignored.
- * @param arr Results to sort
- * @returns Sorted copy of input array
- */
+// /**
+//  * Sort state handler results by score. Undefined results are ignored.
+//  * @param arr Results to sort
+//  * @returns Sorted copy of input array
+//  */
 // const sortResults = (
 //   arr: readonly (StateHandlerResult | undefined)[] = []
 // ): readonly StateHandlerResult[] => {
