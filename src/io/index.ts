@@ -1,5 +1,6 @@
 import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
 import { type Transitions } from '../flow/StateMachine.js';
+export { type StateChangeEvent };
 
 /**
  * Generic support for Bluetooth LE devices

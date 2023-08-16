@@ -18,7 +18,7 @@ export type StateMachineEventMap<V extends Transitions> = {
   readonly stop: StopEvent<V>;
 };
 
-export type StateMachineOpts<V extends Transitions> = {
+export type Opts<V extends Transitions> = {
   readonly debug?: boolean;
   readonly initial?: StateNames<V>;
 };
@@ -41,7 +41,7 @@ export class StateMachineWithEvents<
    * @param Options Options for machine (defaults to `{debug:false}`)
    * @memberof StateMachine
    */
-  constructor(m: V, opts: StateMachineOpts<V> = {}) {
+  constructor(m: V, opts: Opts<V> = {}) {
     super();
 
     this.#debug = opts.debug ?? false;

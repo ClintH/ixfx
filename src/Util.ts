@@ -338,7 +338,7 @@ export const jsComparer = (x: any, y: any): CompareResult => {
  *  10, 5, 100 -> 5, 10, 100
  * @param x
  * @param y
- * @see {@link defaultComparerInverse} Inverted order
+ * @see {@link comparerInverse} Inverted order
  * @returns
  */
 export const defaultComparer = (x: any, y: any): CompareResult => {

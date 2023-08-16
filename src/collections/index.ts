@@ -69,7 +69,7 @@ import * as Sets from './set/index.js';
 /**
  * Sets store unique items.
  *
- * ixfx's {@link ISetImmutable} (or {@link Set.ISetMutable}) compares items by value rather than reference, unlike the default JS implementation.
+ * ixfx's {@link ISetImmutable} (or {@link ISetMutable}) compares items by value rather than reference, unlike the default JS implementation.
  *
  * Create using {@link Sets.immutable} or {@link Sets.mutable}
  */

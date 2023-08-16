@@ -1,285 +1,260 @@
-// export type StateHandlerResult = {
-//   /**
-//    * Score of this result. This is used when a state
-//    * has multiple handlers returning results separately.
-//    */
-//   readonly score?: number;
-//   /**
-//    * If specified, the state to transition to.
-//    * This field is 2nd priority.
-//    */
-//   readonly state?: string;
-//   /**
-//    * If true, triggers next available state.
-//    * This flag is 1st priority.
-//    */
-//   readonly next?: boolean;
-//   /**
-//    * If true, resets the machine.
-//    * This flag is 3rd priority.
-//    */
-//   readonly reset?: boolean;
-// };
-// export type DriverExpression<V> = (args?: V) => StateHandlerResult | undefined;
+import * as StateMachine from './StateMachine.js';
+import * as Execute from './Execute.js';
+import { type MachineState } from './StateMachine.js';
+import { defaultComparer } from '../Util.js';
+import { randomElement } from '../collections/Arrays.js';
+import { resolveLogOption, type LogOption } from '../Debug.js';
 
-// type DriverDescriptionNormalised<V> = {
-//   readonly select: `first` | `highest` | `lowest`;
-//   readonly tryAll: boolean;
-//   readonly expressions: readonly DriverExpression<V>[];
-// };
+export type Result<V extends StateMachine.Transitions> = {
+  /**
+   * Score of this result. This is used when a state
+   * has multiple handlers returning results separately.
+   * If not defined, 0 is used.
+   */
+  readonly score?: number;
 
-// interface StateDriverDescriptionNormalised<V> {
-//   readonly [key: string]: DriverDescriptionNormalised<V>;
-// }
+  //readonly state?: StateMachine.StateNames<V>;
+  /**
+   * If specified,the state to transition to. Use
+   * _true_ to attempt to automatically advance machine.
+   * This field is 2nd priority.
+   */
+  readonly next?: StateMachine.StateNames<V> | boolean;
+  /**
+   * If true, resets the machine.
+   * This flag is 1st priority, taking precedence over the `next` field.
+   */
+  readonly reset?: boolean;
+};
 
-// /**
-//  * Drive a state machine. [Demo sketch](https://github.com/ClintH/ixfx-demos/tree/main/flow/statemachine-regions)
-//  *
-//  * A description can be provided with functions to invoke for each named state.
-//  * The driver will invoke the function(s) corresponding to the current state of the machine.
-//  *
-//  * In the below example, it assumes a state machine with states 'init', 'one' and 'two'.
-//  *
-//  * ```js
-//  * StateMachine.drive(stateMachine, {
-//  *    // Run when state is 'init'
-//  *   init: () => {
-//  *     if (distances[0] > 0.1) return;
-//  *     // Change to state 'one' when distance is under 0.1
-//  *     return { state: `one` };
-//  *   },
-//  *   // Run when state is 'one'
-//  *   one: () => {
-//  *     if (distances[1] > 0.1) return;
-//  *     // Go to next state when distance is under 0.1
-//  *     return { next: true };
-//  *   },
-//  *   // Run when state is 'two'
-//  *   two: () => {
-//  *     if (distances[2] > 0.1) return;
-//  *     // Reset state machine if distance is under 0.1
-//  *     return { reset: true };
-//  *   }
-//  * }
-//  * ```
-//  *
-//  * Three additional handlers can be defined: '__done', '__default'  and '__fallback'.
-//  * * '__done': used when there is no explicit handler for state and machine is done
-//  * * '__default': used if the state has no named handler
-//  * * '__fallback': used if there is no handler for state, or handler did not return a usable result.
-//  *
-//  * Each state can have a single function or array of functions to act as handlers.
-//  * The handler needs to return {@link StateHandlerResult}. In the above example, you see
-//  * how to change to a named state (`{state: 'one'}`), how to trigger `sm.next()` and
-//  * how to reset the state machine.
-//  *
-//  * If the function cannot do anything, it can just return.
-//  *
-//  * Multiple functions can be provided to handle a particular state, eg:
-//  * ```js
-//  * StateMachine.drive(stateMachine, {
-//  *  init: [
-//  *    () => { ... },
-//  *    () => { ... }
-//  *  ]
-//  * })
-//  * ```
-//  *
-//  * When multiple functions are provided, by default the first that returns a result
-//  * and the result can be executed is used.
-//  *
-//  * It's also possible to use the highest or lowest scoring result. To do so, results
-//  * must have a `score` property, as shown below. Extra syntax also has to be provided
-//  * instead of a bare array of functions. This is how the logic for selecting results can be
-//  * set.
-//  *
-//  * ```js
-//  * StateMachine.drive(stateMachine, {
-//  *   init: {
-//  *    select: `highest`,
-//  *    expressions: [
-//  *     () => {
-//  *      // some logic...
-//  *      return { score: 0.1, state: `hello` }
-//  *     },
-//  *     () => {
-//  *      // some logic...
-//  *       return { score: 0.2, state: `goodbye` }
-//  *     }
-//  *    ]
-//  *   }
-//  * });
-//  * ```
-//  *
-//  * The score results likely should not be hardcoded as in the above example,
-//  * but rather based on some other dynamic values influencing what action to take.
-//  *
-//  * @param sm
-//  * @param driver
-//  * @returns
-//  */
-// export const drive = <V>(
-//   //eslint-disable-next-line functional/prefer-immutable-types
-//   sm: StateMachine,
-//   driver: StateDriverDescription<V>
-// ) => {
-//   const defaultSelect = `first`;
-//   // Normalise driver first
-//   const d: StateDriverDescriptionNormalised<V> = {};
-//   for (const key of Object.keys(driver)) {
-//     const branch = driver[key];
-//     if (isDriverDescription(branch)) {
-//       // @ts-ignore
-//       //eslint-disable-next-line functional/immutable-data
-//       d[key] = normaliseDriverDescription(branch);
-//     } else if (Array.isArray(branch)) {
-//       // @ts-ignore
-//       //eslint-disable-next-line functional/immutable-data
-//       d[key] = {
-//         select: defaultSelect,
-//         expressions: branch,
-//         tryAll: true,
-//       };
-//     } else {
-//       // @ts-ignore
-//       //eslint-disable-next-line functional/immutable-data
-//       d[key] = {
-//         select: defaultSelect,
-//         tryAll: true,
-//         expressions: [branch as DriverExpression<V>],
-//       };
-//     }
-//   }
+//eslint-disable-next-line functional/no-mixed-types
+export type Runner<V extends StateMachine.Transitions> = {
+  readonly run: () => Promise<StateMachine.MachineState<V> | boolean>;
+  readonly getValue: () => StateMachine.StateNames<V>;
+  readonly to: (
+    state: StateMachine.StateNames<V>
+  ) => StateMachine.MachineState<V>;
+};
 
-//   const drive = (r: StateHandlerResult): boolean => {
-//     try {
-//       if (typeof r.next !== `undefined` && r.next) {
-//         sm.next();
-//       } else if (typeof r.state !== `undefined`) {
-//         //eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-non-null-assertion
-//         sm.state = r.state!;
-//       } else if (typeof r.reset !== `undefined` && r.reset) {
-//         sm.reset();
-//       } else {
-//         throw new Error(
-//           `Result has neither 'reset', 'next' nor 'state' properties needed to drive state machine`
-//         );
-//       }
-//       return true;
-//     } catch (ex) {
-//       console.warn(ex);
-//       return false;
-//     }
-//   };
+// export type Expression<Transitions extends StateMachine.Transitions> =
+//   Execute.Expression<Transitions, Result<Transitions>> &
+//     ((
+//       machine: StateMachine.MachineState<Transitions>
+//     ) => Result<Transitions> | undefined);
 
-//   const processResultSet = <V>(
-//     branch: DriverDescriptionNormalised<V>,
-//     //eslint-disable-next-line functional/prefer-immutable-types
-//     resultSet: StateHandlerResult[]
-//   ) => {
-//     for (const result of resultSet) {
-//       if (drive(result)) return true;
-//       if (!branch.tryAll) break;
-//     }
-//     return false;
-//   };
+export type StatesHandler<V extends StateMachine.Transitions> = {
+  readonly if:
+    | readonly StateMachine.StateNames<V>[]
+    //eslint-disable-next-line functional/prefer-readonly-type
+    | StateMachine.StateNames<V>[]
+    | StateMachine.StateNames<V>;
+  readonly then: readonly ExpressionOrResult<V>[] | ExpressionOrResult<V>;
+  /**
+   * Logic for choosing which result, if there are multiple expressions.
+   * By default 'highest' (for highest ranked result)
+   */
+  readonly resultChoice?: `first` | `highest` | `lowest` | `random`;
+};
 
-//   const processBranch = <V>(
-//     branch: DriverDescriptionNormalised<V> | null,
-//     args?: V
-//   ) => {
-//     if (!branch) return false;
-//     //eslint-disable-next-line functional/no-let
-//     let handled = false;
+// export type Prerequisite<V extends StateMachine.Transitions> =
+//   | readonly StateMachine.StateNames<V>[]
+//   | ((
+//       potentialState: StateMachine.StateNames<V>,
+//       state: StateMachine.MachineState<V>
+//     ) => boolean);
 
-//     switch (branch.select) {
-//       case `first`:
-//         for (const expr of branch.expressions) {
-//           const r = expr(args);
-//           if (!r) continue;
-//           if (drive(r)) {
-//             handled = true;
-//             break;
-//           }
-//         }
-//         break;
-//       case `highest`:
-//         handled = processResultSet(branch, [
-//           ...sortResults(branch.expressions.map((e) => e(args))),
-//         ]);
-//         break;
-//       case `lowest`:
-//         handled = processResultSet(
-//           branch,
-//           [...sortResults(branch.expressions.map((e) => e(args)))].reverse()
-//         );
-//         break;
-//       default:
-//         throw new Error(
-//           `Unknown select type: ${branch.select}. Expected first, highest or lowest`
-//         );
-//     }
-//     return handled;
-//   };
-
-//   const process = (args?: V) => {
-//     //eslint-disable-next-line functional/no-let
-//     let branch = d[sm.state];
-//     if (!branch && sm.isDone) d[`__done`];
-//     if (!branch) branch = d[`__default`];
-
-//     //eslint-disable-next-line functional/no-let
-//     let handled = processBranch(branch, args);
-//     if (!handled) {
-//       branch = d[`__fallback`];
-//       handled = processBranch(branch, args);
-//     }
-//   };
-//   return process;
+// export type StatePrerequisites<V extends StateMachine.Transitions> = {
+//   readonly states:
+//     | readonly StateMachine.StateNames<V>[]
+//     | StateMachine.StateNames<V>;
+//   readonly condition?: Prerequisite<V>;
 // };
 
-// const isDriverDescription = <V>(
-//   v: DriverDescription<V> | readonly DriverExpression<V>[] | DriverExpression<V>
-// ): v is DriverDescription<V> => {
-//   if (Array.isArray(v)) return false;
-//   const vv = v as DriverDescription<V>;
-//   if (typeof vv.expressions !== `undefined`) return true;
-//   return false;
-// };
+export type DriverOpts<V extends StateMachine.Transitions> = {
+  readonly handlers: readonly StatesHandler<V>[];
+  //readonly prereqs?: StatePrerequisites<V>;
+  readonly debug?: LogOption;
+  /**
+   * If _true_ execution of handlers is shuffled each time
+   */
+  readonly shuffleHandlers?: boolean;
+};
 
-// const normaliseDriverDescription = <V>(
-//   d: DriverDescription<V>
-// ): DriverDescriptionNormalised<V> => {
-//   const select = d.select ?? `first`;
-//   const expressions = Array.isArray(d.expressions)
-//     ? d.expressions
-//     : [d.expressions];
-//   const n: DriverDescriptionNormalised<V> = {
-//     select,
-//     expressions,
-//     tryAll: d.tryAll ?? true,
-//   };
-//   return n;
-// };
+// async function run<V extends StateMachine.Transitions>(
+//   machine: StateMachine.Machine<V>,
+//   handlers: readonly StatesHandler<V>[]
+// );
 
-// /**
-//  * Sort state handler results by score. Undefined results are ignored.
-//  * @param arr Results to sort
-//  * @returns Sorted copy of input array
-//  */
-// const sortResults = (
-//   arr: readonly (StateHandlerResult | undefined)[] = []
-// ): readonly StateHandlerResult[] => {
-//   // Remove undefined
-//   const a = arr.filter((v) => v !== undefined) as StateHandlerResult[];
-//   //eslint-disable-next-line functional/immutable-data
-//   a.sort((a, b) => {
-//     const aScore = a.score ?? 0;
-//     const bScore = b.score ?? 0;
+export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
+  | Result<Transitions>
+  | ((machine?: MachineState<Transitions>) => Result<Transitions> | undefined);
 
-//     if (aScore === bScore) return 0;
-//     if (aScore > bScore) return -1;
-//     return 1;
-//   });
-//   return a;
-// };
+/**
+ * Drive `machine`.
+ *
+ * Defaults to selecting the highest-ranked result to determine
+ * what to do next.
+ * @param machine
+ * @param handlersOrOpts
+ * @returns
+ */
+export async function init<V extends StateMachine.Transitions>(
+  machine: StateMachine.Machine<V> | StateMachine.Transitions,
+  handlersOrOpts: readonly StatesHandler<V>[] | DriverOpts<V>
+): Promise<Runner<V>> {
+  const opts: DriverOpts<V> = Array.isArray(handlersOrOpts)
+    ? {
+        handlers: handlersOrOpts as readonly StatesHandler<V>[],
+      }
+    : (handlersOrOpts as DriverOpts<V>);
+
+  const debug = resolveLogOption(opts.debug, {
+    category: 'StateMachineDriver',
+  });
+
+  // Index handlers by state, making sure there are not multiple
+  // handlers for a given state.
+  const byState = new Map<string, StatesHandler<V>>();
+  for (const h of opts.handlers) {
+    const ifBlock = Array.isArray(h.if) ? h.if : [h.if];
+    ifBlock.forEach((state) => {
+      if (typeof state !== 'string') {
+        throw new Error(
+          `Expected single or array of strings for the 'if' field. Got: '${typeof state}'.`
+        );
+      }
+
+      if (byState.has(state as string)) {
+        throw new Error(
+          `Multiple handlers defined for state '${
+            state as string
+          }'. There should be at most one.`
+        );
+      }
+      byState.set(state as string, h);
+    });
+  }
+
+  // const expressions: Expression<V>[] = [
+  //   (_machine) => {
+  //     const r: Result<V> = {
+  //       next: 'hello',
+  //     };
+  //     return r;
+  //   },
+  // ];
+
+  const runOpts: Execute.RunOpts<Result<V>> = {
+    // Rank results by score
+    rank: (a, b) => {
+      return defaultComparer(a.score ?? 0, b.score ?? 0);
+    },
+    shuffle: opts.shuffleHandlers ?? false,
+  };
+
+  //eslint-disable-next-line functional/no-let
+  let sm = StateMachine.init(machine);
+
+  // Check that all 'if' states are actually defined on machine
+  for (const [ifState] of byState) {
+    // Check if state is defined
+    if (
+      typeof sm.machine[ifState] === `undefined` &&
+      ifState !== '__fallback'
+    ) {
+      throw new Error(
+        `StateMachineDriver handler references a state ('${ifState}') which is not defined on the machine. Therefore this handler will never run.'`
+      );
+    }
+  }
+
+  const run = async (): Promise<StateMachine.MachineState<V> | boolean> => {
+    debug(`Run. State: ${sm.value as string}`);
+    const state = sm.value as string;
+    //eslint-disable-next-line functional/no-let
+    let handler = byState.get(state);
+    if (handler === undefined) {
+      debug(`  No handler for state '${state}', trying __fallback`);
+
+      // Is there a fallback?
+      handler = byState.get('__fallback');
+    }
+    if (handler === undefined) {
+      debug(`  No __fallback handler`);
+      return false;
+    }
+
+    // If the `first` option is given, stop executing fns as soon as we get
+    // a valid result.
+    const runOptsForHandler =
+      handler.resultChoice === `first`
+        ? {
+            ...runOpts,
+            stop: (latest: Result<V> | undefined) => {
+              if (!latest) return false;
+              if (`reset` in latest) return true;
+              if (`next` in latest) {
+                if (latest.next !== undefined) return true;
+              }
+              return false;
+            },
+          }
+        : runOpts;
+
+    const results = await Execute.run<MachineState<V>, Result<V>>(
+      handler.then,
+      runOptsForHandler,
+      sm
+    );
+    debug(
+      `  In state '${sm.value as string}' results: ${results.length}. Choice: ${
+        handler.resultChoice
+      }`
+    );
+
+    // Apply selection logic
+    //eslint-disable-next-line functional/no-let
+    let r: Result<V> | undefined;
+    switch (handler.resultChoice ?? 'highest') {
+      case 'highest':
+        r = results.at(-1);
+        break;
+      case 'first':
+        r = results[0]; // Since we break on the first result
+        break;
+      case 'lowest':
+        r = results.at(0);
+        break;
+      case 'random':
+        r = randomElement(results);
+        break;
+      default:
+        throw new Error(
+          `Unknown 'resultChoice' option: ${handler.resultChoice}. Expected highest, first, lowest or random`
+        );
+    }
+
+    debug(`  Chosen result: ${JSON.stringify(r)}`);
+    // Apply result
+    if (r && r.reset) {
+      sm = StateMachine.reset(sm);
+    } else if (r && r.next) {
+      if (typeof r.next === 'boolean') {
+        sm = StateMachine.next(sm);
+      } else {
+        debug(JSON.stringify(results));
+        sm = StateMachine.to(sm, r.next);
+      }
+    }
+    return sm;
+  };
+
+  return {
+    getValue: () => sm.value,
+    run,
+    to: (state: StateMachine.StateNames<V>) => {
+      sm = StateMachine.to(sm, state);
+      return sm;
+    },
+  };
+}

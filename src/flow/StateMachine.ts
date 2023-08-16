@@ -1,6 +1,28 @@
 import { unique } from '../collections/Arrays.js';
-import { StateMachineWithEvents } from './StateMachineWithEvents.js';
-export { StateMachineWithEvents as WithEvents };
+import {
+  StateMachineWithEvents,
+  type Opts,
+  type StateMachineEventMap,
+  type StopEvent,
+} from './StateMachineWithEvents.js';
+export {
+  StateMachineWithEvents as WithEvents,
+  type Opts as StateMachineWithEventsOpts,
+  type StateMachineEventMap,
+  type StopEvent,
+};
+
+/**
+ * State machine driver
+ */
+export { init as driver } from './StateMachineDriver.js';
+export type {
+  DriverOpts,
+  StatesHandler as DriverHandler,
+  Runner,
+  ExpressionOrResult as DriverExpression,
+  Result as DriverResult,
+} from './StateMachineDriver.js';
 
 /**
  * Transition result

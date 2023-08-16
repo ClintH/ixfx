@@ -1,6 +1,6 @@
 import test from 'ava';
 import * as StateMachine from '../../flow/StateMachine.js';
-import { type StatesHandler, init } from '../../flow/StateMachineDriver2.js';
+import { type StatesHandler, init } from '../../flow/StateMachineDriver.js';
 function createBasic() {
   // Simple state machine
   const states: StateMachine.Transitions = {
