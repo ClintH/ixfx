@@ -24,7 +24,7 @@ export const resolveLogOption = (
   l?: LogOption,
   defaults: { readonly category?: string; readonly kind?: string } = {}
 ): LogFn => {
-  if (typeof l === 'undefined') {
+  if (typeof l === 'undefined' || (typeof l === 'boolean' && l === false)) {
     return (_: LogMsg | string) => {
       /** no-op */
     };
@@ -32,7 +32,7 @@ export const resolveLogOption = (
   const defaultCat = defaults.category ?? '';
   const defaultKind = defaults.kind ?? undefined;
 
-  if (typeof l === 'boolean') {
+  if (typeof l === 'boolean' && l === true) {
     return (msgOrString: LogMsg | string) => {
       const m =
         typeof msgOrString === 'string' ? { msg: msgOrString } : msgOrString;
