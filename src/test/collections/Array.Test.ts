@@ -9,8 +9,87 @@ import {
   remove,
   compareValues,
   compareValuesEqual,
+  containsDuplicateValues,
   contains,
+  unique,
 } from '../../collections/Arrays.js';
+import { arrayValuesEqual } from '../util.js';
+
+test('containsDuplicateValues', (t) => {
+  t.true(containsDuplicateValues([1, 2, 3, 1]));
+  t.false(containsDuplicateValues([1, 2, 3, 4]));
+  t.true(containsDuplicateValues(['a', 'b', 'c', 'a']));
+  t.false(containsDuplicateValues(['a', 'b', 'c', 'd']));
+  t.true(
+    containsDuplicateValues([
+      { name: 'Bob' },
+      { name: 'Sally' },
+      { name: 'Bob' },
+    ])
+  );
+  t.false(
+    containsDuplicateValues([
+      { name: 'Bob' },
+      { name: 'Sally' },
+      { name: 'Jane' },
+    ])
+  );
+  t.true(
+    containsDuplicateValues(
+      [
+        { name: 'Bob', colour: 'red' },
+        { name: 'Sally', colour: 'blue' },
+        { name: 'Jane', colour: 'red' },
+      ],
+      (v) => v.colour
+    )
+  );
+  t.false(
+    containsDuplicateValues(
+      [
+        { name: 'Bob', colour: 'red' },
+        { name: 'Sally', colour: 'blue' },
+        { name: 'Jane', colour: 'red' },
+      ],
+      (v) => v.name
+    )
+  );
+  t.false(containsDuplicateValues([]));
+
+  //@ts-ignore
+  t.throws(() => containsDuplicateValues(undefined));
+  //@ts-ignore
+  t.throws(() => containsDuplicateValues(null));
+  //@ts-ignore
+  t.throws(() => containsDuplicateValues('hello'));
+});
+
+test('unique', (t) => {
+  const a = [1, 2, 3, 1, 2, 3, 4];
+  arrayValuesEqual(t, unique(a), [1, 2, 3, 4]);
+
+  const b = [1, 2, 3, 4, 5, 6, 7, 8];
+  arrayValuesEqual(t, unique<number>([a, b]), [1, 2, 3, 4, 5, 6, 7, 8]);
+
+  const c = [
+    { name: 'Bob', v: 1 },
+    { name: 'Sally', v: 2 },
+    { name: 'Bob', v: 3 },
+  ];
+  type Person = {
+    name: string;
+    v: number;
+  };
+  arrayValuesEqual<Person>(
+    t,
+    unique<Person>(c, (a, b) => a.name === b.name),
+    [
+      { name: 'Bob', v: 1 },
+      { name: 'Sally', v: 2 },
+    ],
+    (a, b) => a.name === b.name
+  );
+});
 
 test('contains', (t) => {
   const a = ['apples', 'oranges', 'pears', 'mandarins'];
