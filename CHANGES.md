@@ -1,5 +1,17 @@
 A rough changelog between NPM releases
 
+Flow/
+
+- StateMachine: Lightweight, pure function state machine implementation (no events, immutable)
+- StateMachineWithEvents wraps this and provides events like the old class implementation
+- Execute: runs a set of async functions in series, returning results as an array. Possibility to rank results or stop execution early
+- StateMachineDriver: Using StateMachine & Execute, run different functions depending on current state. With low amounts of code it's possible to cycle between different states
+
+Arrays/
+
+- containsDuplicateValues: returns _true_ if array contains repeated values
+- additionalValues: yields the values of one iterable which are not present in the source array.
+
 # 0.9.0 23.07.23
 
 Lots of refactors and minor improvements
