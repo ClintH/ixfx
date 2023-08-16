@@ -1,25 +1,52 @@
 import { number as guardNumber } from './Guards.js';
 import { untilMatch } from './Text.js';
-import { type Interval, intervalToMs } from './flow/index.js';
-
 export * as IterableAsync from './IterableAsync.js';
 export * as Debug from './Debug.js';
 
-//export { KeyValue } from './KeyValue.js';
-
 /**
- * Returns `fallback` if `v` is NaN, otherwise returns `v`
+ * Returns `fallback` if `v` is NaN, otherwise returns `v`.
+ *
+ * Throws if `v` is not a number type.
  * @param v
  * @param fallback
  * @returns
  */
 export const ifNaN = (v: number, fallback: number): number => {
+  // ✔️ Unit tested
+
   if (Number.isNaN(v)) return fallback;
+  if (typeof v !== 'number') {
+    throw new Error(`v is not a number. Got: ${typeof v}`);
+  }
   return v;
 };
 
 /**
  * Maps the properties of an object through a map function.
+ * That is, run each of the values of an object through a function, an return
+ * the result.
+ *
+ * @example Double the value of all fields
+ * ```js
+ * const rect = { width: 100, height: 250 };
+ * const doubled = mapObject(rect, (fieldValue) => {
+ *  return fieldValue*2;
+ * });
+ * // Yields: { width: 200, height: 500 }
+ * ```
+ *
+ * Since the map callback gets the name of the property, it can do context-dependent things.
+ * ```js
+ * const rect = { width: 100, height: 250, colour: 'red' }
+ * const doubled = mapObject(rect, (fieldValue, fieldName) => {
+ *  if (fieldName === 'width') return fieldValue*3;
+ *  else if (typeof fieldValue === 'number') return fieldValue*2;
+ *  return fieldValue;
+ * });
+ * // Yields: { width: 300, height: 500, colour: 'red' }
+ * ```
+ * In addition to bulk processing, it allows remapping of property types.
+ *
  * In terms of typesafety, the mapped properties are assumed to have the
  * same type.
  *
@@ -41,14 +68,20 @@ export const ifNaN = (v: number, fallback: number): number => {
  * ```
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const mapObject = <X extends Record<string, unknown>, V>(
-  object: X,
-  mapFn: (value: any, key?: readonly [keyof X], index?: number) => V
-): RemapObjectPropertyType<X, V> => {
-  const mapped = Object.entries(object).map(([key, value], i) => [
-    key,
-    mapFn(value, key as unknown as [keyof X], i),
-  ]);
+export const mapObject = <
+  SourceType extends Record<string, any>,
+  DestinationFieldType,
+>(
+  object: SourceType,
+  mapFn: (fieldValue: any, field: string, index: number) => DestinationFieldType
+): RemapObjectPropertyType<SourceType, DestinationFieldType> => {
+  type MapResult = [field: string, value: DestinationFieldType];
+  const entries = Object.entries(object);
+  const mapped = entries.map(([sourceField, sourceFieldValue], i) => [
+    sourceField,
+    mapFn(sourceFieldValue, sourceField, i),
+  ]) as MapResult[];
+  // @ts-ignore
   return Object.fromEntries(mapped);
 };
 
@@ -104,12 +137,18 @@ export const relativeDifference = (initial: number) => (v: number) =>
  *
  * If a field does not exist, `undefined` is returned.
  * Use {@link getFieldPaths} to get a list of paths.
+ *
+ * Throws if `o` is not an object.
  * @param o
  * @param path
  * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFieldByPath = (o: any, path: string = ``): any | undefined => {
+  if (o === null) throw new Error(`Parameter 'o' is null`);
+  if (typeof o !== 'object') {
+    throw new Error(`Parameter 'o' is not an object. Got: ${typeof o}`);
+  }
   if (path.length === 0) return o;
   if (path in o) {
     return o[path];
@@ -135,11 +174,17 @@ export const getFieldByPath = (o: any, path: string = ``): any | undefined => {
  * ```
  *
  * Use {@link getFieldByPath} to fetch data by this 'path' string.
+ *
+ * If object is _null_, and empty array is returned.
  * @param o
  * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getFieldPaths = (o: any): readonly string[] => {
+  if (o === null) return [];
+  if (typeof o !== 'object') {
+    throw new Error(`Parameter o should be an object. Got: ${typeof o}`);
+  }
   const paths: string[] = [];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const probe = (o: any, prefix = ``) => {
@@ -219,13 +264,48 @@ export type CompareResult = 0 | 1 | -1;
 export type Comparer<V> = (a: V, b: V) => CompareResult;
 
 /**
- * Default sort comparer, following same sematics as Array.sort
+ * Sort numbers in ascending order
+ * @param x
+ * @param y
+ * @returns
+ */
+export const numericComparer = (x: number, y: number): CompareResult => {
+  // ✔️ Unit tested
+  if (x === y) return 0;
+  if (x > y) return 1;
+  return -1;
+};
+
+/**
+ * Sorts numbers in descending order
+ * @param x
+ * @param y
+ * @returns
+ */
+export const numericComparerInverse = (x: number, y: number): CompareResult => {
+  // ✔️ Unit tested
+  if (x === y) return 0;
+  if (x > y) return -1;
+  return 1;
+};
+
+/**
+ * Default sort comparer, following same sematics as Array.sort.
+ * Consider using {@link defaultComparer} to get more logical sorting of numbers.
+ *
+ * Note: numbers are sorted in alphabetical order, eg:
+ * ```js
+ * [ 10, 20, 5, 100 ].sort(jsComparer); // same as .sort()
+ * // Yields: [10, 100, 20, 5]
+ * ```
  * @param x
  * @param y
  * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const defaultComparer = (x: any, y: any): CompareResult => {
+export const jsComparer = (x: any, y: any): CompareResult => {
+  // ✔️ Unit tested
+
   // Via https://stackoverflow.com/questions/47334234/how-to-implement-array-prototype-sort-default-compare-function
   if (x === undefined && y === undefined) return 0;
   if (x === undefined) return 1;
@@ -239,8 +319,53 @@ export const defaultComparer = (x: any, y: any): CompareResult => {
   return 0;
 };
 
+export const jsComparerInverse = (x: any, y: any): CompareResult =>
+  (jsComparer(x, y) * -1) as CompareResult;
 
+/**
+ * Compares numbers by numeric value, otherwise uses the default
+ * logic of string comparison.
+ *
+ * Is an ascending sort:
+ *  b, a, c -> a, b, c
+ *  10, 5, 100 -> 5, 10, 100
+ * @param x
+ * @param y
+ * @see {@link defaultComparerInverse} Inverted order
+ * @returns
+ */
+export const defaultComparer = (x: any, y: any): CompareResult => {
+  if (typeof x === `number` && typeof y === `number`) {
+    return numericComparer(x, y);
+  }
+  return jsComparer(x, y);
+};
 
+/**
+ * Compares numbers by numeric value, otherwise uses the default
+ * logic of string comparison.
+ *
+ * Is an descending sort:
+ *  b, a, c -> c, a, b
+ *  10, 5, 100 -> 100, 10, 5
+ * @param x
+ * @param y
+ * @returns
+ * @see {@link defaultComparer} Asending
+ */
+export const defaultComparerInverse = (x: any, y: any): CompareResult => {
+  if (typeof x === `number` && typeof y === `number`) {
+    return numericComparerInverse(x, y);
+  }
+  return jsComparerInverse(x, y);
+};
+
+/**
+ * If values are strings, uses that as the key.
+ * Otherwise uses `JSON.stringify`.
+ * @param a
+ * @returns
+ */
 export const defaultKeyer = <V>(a: V) => {
   if (typeof a === `string`) {
     return a;
