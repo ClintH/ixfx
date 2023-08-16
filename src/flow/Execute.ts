@@ -1,9 +1,11 @@
 import { defaultComparer, type Comparer } from '../Util.js';
 import { shuffle } from '../collections/Arrays.js';
 
-export type Expression<ArgsType, ResultType> = (
-  args: ArgsType | undefined
-) => Promise<ResultType | undefined> | ResultType | undefined;
+export type ExpressionOrResult<ArgsType, ResultType> =
+  | ResultType
+  | ((
+      args: ArgsType | undefined
+    ) => Promise<ResultType | undefined> | ResultType | undefined);
 
 //eslint-disable-next-line functional/no-mixed-types
 export type RunOpts<ResultType> = {
@@ -107,24 +109,37 @@ export type RunSingleOpts<V> = RunOpts<V> & {
  */
 export const run = async <ArgsType, ResultType>(
   expressions: //eslint-disable-next-line functional/prefer-readonly-type
-  | Expression<ArgsType, ResultType>[]
-    | readonly Expression<ArgsType, ResultType>[],
+  | ExpressionOrResult<ArgsType, ResultType>[]
+    | ExpressionOrResult<ArgsType, ResultType>
+    | readonly ExpressionOrResult<ArgsType, ResultType>[],
   opts: RunOpts<ResultType> = {},
   args?: ArgsType
 ): Promise<ResultType[]> => {
   const results: ResultType[] = [];
   const compareFn = opts.rank ?? defaultComparer;
-  if (opts.shuffle) expressions = shuffle(expressions);
+  //eslint-disable-next-line functional/no-let
+  let expressionsArray = Array.isArray(expressions)
+    ? (expressions as ExpressionOrResult<ArgsType, ResultType>[])
+    : [expressions as ExpressionOrResult<ArgsType, ResultType>];
+  if (opts.shuffle) expressionsArray = shuffle(expressionsArray);
 
-  for (let i = 0; i < expressions.length; i++) {
-    const exp = expressions[i];
-    const r = await exp(args);
+  for (let i = 0; i < expressionsArray.length; i++) {
+    const exp = expressionsArray[i];
+    //eslint-disable-next-line functional/no-let
+    let r: ResultType;
+    if (typeof exp === 'function') {
+      // @ts-ignore
+      r = await exp(args);
+    } else {
+      r = exp;
+    }
     if (r !== undefined) {
       //eslint-disable-next-line functional/immutable-data
       results.push(r);
       //eslint-disable-next-line functional/immutable-data
       results.sort(compareFn);
     }
+
     if (typeof opts.stop !== 'undefined') {
       if (opts.stop(r, results)) {
         break;
@@ -149,7 +164,7 @@ export const run = async <ArgsType, ResultType>(
  * @returns
  */
 export const runSingle = async <ArgsType, ResultType>(
-  expressions: readonly Expression<ArgsType, ResultType>[],
+  expressions: readonly ExpressionOrResult<ArgsType, ResultType>[],
   opts: RunSingleOpts<ResultType> = {},
   args?: ArgsType
 ): Promise<ResultType | undefined> => {
