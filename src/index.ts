@@ -277,10 +277,10 @@ export * as Modulation from './modulation/index.js';
  * ## Ordered collections
  *
  * {@link Queues}: a list of ordered data, like a bakery queue
- * * Create with {@link Queues.queue} or {@link Queues.queueMutable}
+ * * Create with {@link Queues.immutable} or {@link Queues.mutable}
  *
  * {@link Stacks}: a list of ordered data, like a stack of plates
- * * Create with {@link stack} or {@link stackMutable}
+ * * Create with {@link Stacks.immutable} or {@link Stacks.mutable}
  *
  * Both queue and stack come in mutable and immutable varieties and can limit items
  * stored in varies ways.
