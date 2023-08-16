@@ -1,11 +1,11 @@
-import type { IQueue } from './IQueue.js';
+import type { IQueueImmutable } from './IQueueImmutable.js';
 import { peek, isFull, isEmpty, enqueue, dequeue } from './QueueFns.js';
 import { type QueueOpts } from './index.js';
 
 // -------------------------------
 // Immutable
 // -------------------------------
-export class QueueImmutable<V> implements IQueue<V> {
+export class QueueImmutable<V> implements IQueueImmutable<V> {
   readonly opts: QueueOpts;
   readonly data: ReadonlyArray<V>;
 
@@ -86,7 +86,7 @@ export class QueueImmutable<V> implements IQueue<V> {
 export const immutable = <V>(
   opts: QueueOpts = {},
   ...startingItems: ReadonlyArray<V>
-): IQueue<V> => {
+): IQueueImmutable<V> => {
   opts = { ...opts }; // Make a copy of options
   return new QueueImmutable(opts, [...startingItems]); // Make a copy of array so it can't be modified
 };

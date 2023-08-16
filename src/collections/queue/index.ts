@@ -5,7 +5,7 @@ export type QueueDiscardPolicy = `older` | `newer` | `additions`;
  *
  * @example Cap size to 5 items, throwing away newest items already in queue.
  * ```js
- * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
  * ```
  */
 export type QueueOpts = {
@@ -31,6 +31,6 @@ export type QueueOpts = {
 };
 
 export { type IQueueMutable } from './IQueueMutable.js';
-export { type IQueue } from './IQueue.js';
-export { immutable } from './Queue.js';
+export { type IQueueImmutable } from './IQueueImmutable.js';
+export { immutable } from './QueueImmutable.js';
 export { mutable } from './QueueMutable.js';

@@ -17,7 +17,7 @@
  * ```
  *
  */
-export interface IQueue<V> {
+export interface IQueueImmutable<V> {
   /**
    * Enumerates queue from back-to-front
    *
@@ -34,7 +34,7 @@ export interface IQueue<V> {
    * Returns a new queue with items added
    * @param toAdd Items to add
    */
-  enqueue(...toAdd: ReadonlyArray<V>): IQueue<V>;
+  enqueue(...toAdd: ReadonlyArray<V>): IQueueImmutable<V>;
 
   /**
    * Dequeues (removes oldest item / item at front of queue).
@@ -42,7 +42,7 @@ export interface IQueue<V> {
    *
    * @returns Queue with item removed
    */
-  dequeue(): IQueue<V>;
+  dequeue(): IQueueImmutable<V>;
 
   /**
    * Returns true if queue is empty

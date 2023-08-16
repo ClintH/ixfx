@@ -1,5 +1,5 @@
 /**
- * Queue (mutable). See also {@link IQueue} for the immutable version.
+ * Queue (mutable). See also {@link IQueueImmutable} for the immutable version.
  *
  * Queues are useful if you want to treat 'older' or 'newer'
  * items differently. _Enqueing_ adds items at the back of the queue, while
