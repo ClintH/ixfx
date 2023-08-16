@@ -4,14 +4,13 @@ import {
   isEqualValueDefault,
   defaultComparer,
   numericComparer,
-  numericComparerInverse,
   jsComparer,
   ifNaN,
   getFieldByPath,
   getFieldPaths,
   mapObject,
   relativeDifference,
-  defaultComparerInverse,
+  comparerInverse,
 } from '../Util.js';
 
 test('relativeDifference', (t) => {
@@ -201,9 +200,18 @@ test('numericComparer', (t) => {
   t.like([10, 20, 0, 0, 100].sort(numericComparer), [0, 0, 10, 20, 100]);
 
   // Inverted
-  t.like([10, -20, 5, -100].sort(numericComparerInverse), [10, 5, -20, -100]);
-  t.like([10, 20, 5, 100].sort(numericComparerInverse), [100, 20, 10, 5]);
-  t.like([10, 20, 0, 0, 100].sort(numericComparerInverse), [100, 20, 10, 0, 0]);
+  t.like(
+    [10, -20, 5, -100].sort(comparerInverse(numericComparer)),
+    [10, 5, -20, -100]
+  );
+  t.like(
+    [10, 20, 5, 100].sort(comparerInverse(numericComparer)),
+    [100, 20, 10, 5]
+  );
+  t.like(
+    [10, 20, 0, 0, 100].sort(comparerInverse(numericComparer)),
+    [100, 20, 10, 0, 0]
+  );
 });
 
 test('defaultComparer', (t) => {
@@ -216,17 +224,26 @@ test('defaultComparer', (t) => {
   t.like('e d c b a'.split(' ').sort(defaultComparer), 'a b c d e'.split(' '));
 
   // Inverted
-  t.like([10, -20, 5, -100].sort(defaultComparerInverse), [10, 5, -20, -100]);
-  t.like([10, 20, 5, 100].sort(defaultComparerInverse), [100, 20, 10, 5]);
-  t.like([10, 20, 0, 0, 100].sort(defaultComparerInverse), [100, 20, 10, 0, 0]);
+  t.like(
+    [10, -20, 5, -100].sort(comparerInverse(defaultComparer)),
+    [10, 5, -20, -100]
+  );
+  t.like(
+    [10, 20, 5, 100].sort(comparerInverse(defaultComparer)),
+    [100, 20, 10, 5]
+  );
+  t.like(
+    [10, 20, 0, 0, 100].sort(comparerInverse(defaultComparer)),
+    [100, 20, 10, 0, 0]
+  );
   t.like(
     //eslint-disable-next-line functional/immutable-data
-    'a b c d e'.split(' ').sort(defaultComparerInverse),
+    'a b c d e'.split(' ').sort(comparerInverse(defaultComparer)),
     'e d c b a'.split(' ')
   );
   t.like(
     //eslint-disable-next-line functional/immutable-data
-    'e d c b a'.split(' ').sort(defaultComparerInverse),
+    'e d c b a'.split(' ').sort(comparerInverse(defaultComparer)),
     'e d c b a'.split(' ')
   );
 });

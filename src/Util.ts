@@ -260,11 +260,18 @@ export const runningiOS = () =>
   // iPad on iOS 13 detection
   (navigator.userAgent.includes(`Mac`) && `ontouchend` in document);
 
-export type CompareResult = 0 | 1 | -1;
+export type CompareResult = number; // 0 | 1 | -1;
 export type Comparer<V> = (a: V, b: V) => CompareResult;
 
 /**
- * Sort numbers in ascending order
+ * Sort numbers in ascending order.
+ *
+ * ```js
+ * [10, 4, 5, 0].sort(numericComparer);
+ * // Yields: [0, 4, 5, 10]
+ * [10, 4, 5, 0].sort(comparerInverse(numericComparer));
+ * // Yields: [ 10, 5, 4, 0]
+ * ```
  * @param x
  * @param y
  * @returns
@@ -276,18 +283,18 @@ export const numericComparer = (x: number, y: number): CompareResult => {
   return -1;
 };
 
-/**
- * Sorts numbers in descending order
- * @param x
- * @param y
- * @returns
- */
-export const numericComparerInverse = (x: number, y: number): CompareResult => {
-  // ✔️ Unit tested
-  if (x === y) return 0;
-  if (x > y) return -1;
-  return 1;
-};
+// /**
+//  * Sorts numbers in descending order
+//  * @param x
+//  * @param y
+//  * @returns
+//  */
+// export const numericComparerInverse = (x: number, y: number): CompareResult => {
+//   // ✔️ Unit tested
+//   if (x === y) return 0;
+//   if (x > y) return -1;
+//   return 1;
+// };
 
 /**
  * Default sort comparer, following same sematics as Array.sort.
@@ -319,8 +326,8 @@ export const jsComparer = (x: any, y: any): CompareResult => {
   return 0;
 };
 
-export const jsComparerInverse = (x: any, y: any): CompareResult =>
-  (jsComparer(x, y) * -1) as CompareResult;
+// export const jsComparerInverse = (x: any, y: any): CompareResult =>
+//   jsComparer(x, y) * -1;
 
 /**
  * Compares numbers by numeric value, otherwise uses the default
@@ -341,23 +348,35 @@ export const defaultComparer = (x: any, y: any): CompareResult => {
   return jsComparer(x, y);
 };
 
+// /**
+//  * Compares numbers by numeric value, otherwise uses the default
+//  * logic of string comparison.
+//  *
+//  * Is an descending sort:
+//  *  b, a, c -> c, a, b
+//  *  10, 5, 100 -> 100, 10, 5
+//  * @param x
+//  * @param y
+//  * @returns
+//  * @see {@link defaultComparer} Asending
+//  */
+// export const defaultComparerInverse = (x: any, y: any): CompareResult => {
+//   if (typeof x === `number` && typeof y === `number`) {
+//     return numericComparerInverse(x, y);
+//   }
+//   return jsComparerInverse(x, y);
+// };
+
 /**
- * Compares numbers by numeric value, otherwise uses the default
- * logic of string comparison.
- *
- * Is an descending sort:
- *  b, a, c -> c, a, b
- *  10, 5, 100 -> 100, 10, 5
- * @param x
- * @param y
+ * Inverts the source comparer.
+ * @param fn
  * @returns
- * @see {@link defaultComparer} Asending
  */
-export const defaultComparerInverse = (x: any, y: any): CompareResult => {
-  if (typeof x === `number` && typeof y === `number`) {
-    return numericComparerInverse(x, y);
-  }
-  return jsComparerInverse(x, y);
+export const comparerInverse = <V>(fn: Comparer<V>): Comparer<V> => {
+  return (x: V, y: V) => {
+    const v = fn(x, y);
+    return v * -1;
+  };
 };
 
 /**
