@@ -7,7 +7,7 @@ import { push, peek, pop, isEmpty, isFull } from './StackFns.js';
 import type { StackOpts } from './index.js';
 
 /**
- * Creates a stack. Mutable. Use {@link stack} for an immutable alternative.
+ * Creates a stack. Mutable. Use {@link StackImmutable} for an immutable alternative.
  *
  * @example Basic usage
  * ```js
@@ -73,6 +73,26 @@ export class StackMutable<V> implements IStackMutable<V> {
   }
 }
 
+/**
+ * Creates a stack. Mutable. Use {@link Stacks.immutable} for an immutable alternative.
+ *
+ * @example Basic usage
+ * ```js
+ * // Create
+ * const s = Stacks.mutable();
+ * // Add one or more items
+ * s.push(1, 2, 3, 4);
+ *
+ * // See what's on top
+ * s.peek;  // 4
+ *
+ * // Remove the top-most, and return it
+ * s.pop();   // 4
+ *
+ * // Now there's a new top-most element
+ * s.peek;  // 3
+ * ```
+ */
 export const mutable = <V>(
   opts: StackOpts = {},
   ...startingItems: ReadonlyArray<V>

@@ -2,9 +2,6 @@ export type { IStack } from './IStack.js';
 export type { IStackMutable } from './IStackMutable.js';
 export type { IStackImmutable } from './IStackImmutable.js';
 
-export { StackImmutable } from './StackImmutable.js';
-export { StackMutable } from './StackMutable.js';
-
 // ✔ Unit tested!
 export type StackDiscardPolicy = `older` | `newer` | `additions`;
 

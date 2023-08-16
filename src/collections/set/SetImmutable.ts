@@ -1,7 +1,7 @@
 import { type ToString, defaultKeyer, toStringDefault } from '../../Util.js';
 import { type ISetImmutable } from './index.js';
 
-export class StringSet<V> implements ISetImmutable<V> {
+export class SetStringImmutable<V> implements ISetImmutable<V> {
   private store: Map<string, V>;
   private keyString;
 
@@ -21,13 +21,13 @@ export class StringSet<V> implements ISetImmutable<V> {
       const key = this.keyString(v);
       s.set(key, v);
     }
-    return new StringSet<V>(this.keyString, s);
+    return new SetStringImmutable<V>(this.keyString, s);
   }
 
   delete(v: V): ISetImmutable<V> {
     const s = new Map<string, V>(this.store);
     const key = this.keyString(v);
-    if (s.delete(key)) return new StringSet(this.keyString, s);
+    if (s.delete(key)) return new SetStringImmutable(this.keyString, s);
     return this;
   }
 
@@ -51,5 +51,6 @@ export class StringSet<V> implements ISetImmutable<V> {
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`.
  * @returns
  */
-export const immutable = <V>(keyString: ToString<V> = toStringDefault): ISetImmutable<V> =>
-  new StringSet(keyString);
+export const immutable = <V>(
+  keyString: ToString<V> = toStringDefault
+): ISetImmutable<V> => new SetStringImmutable(keyString);

@@ -11,12 +11,12 @@ import { type ValueSetEventMap } from './index.js';
  */
 export const mutable = <V>(
   keyString?: ToString<V> | undefined
-): ISetMutable<V> => new MutableStringSet(keyString);
+): ISetMutable<V> => new SetStringMutable(keyString);
 
 /**
  * Mutable string set
  */
-export class MutableStringSet<V>
+export class SetStringMutable<V>
   extends SimpleEventEmitter<ValueSetEventMap<V>>
   implements ISetMutable<V>
 {
@@ -46,6 +46,7 @@ export class MutableStringSet<V>
    * @param v items to add
    */
   add(...values: Array<V>): boolean {
+    //eslint-disable-next-line functional/no-let
     let somethingAdded = false;
     for (const i of values) {
       const isUpdated = this.has(i);
@@ -60,6 +61,7 @@ export class MutableStringSet<V>
    * Returns values from set as an iterable
    * @returns
    */
+  //eslint-disable-next-line functional/prefer-tacit
   values() {
     return this.store.values();
   }

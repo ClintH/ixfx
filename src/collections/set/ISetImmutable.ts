@@ -8,7 +8,7 @@ import type { ISet } from './ISet.js';
  * Pass in a function to `setMutable` to define your own way of creating keys for values. The principle should
  * be that objects that you consider identical should have the same string key value.
  *
- * The {@link ISetMutable} alternative also has events for monitoring changes.
+ * The {@link Sets.ISetMutable} alternative also has events for monitoring changes.
  *
  * @example Overview of functions
  * ```js

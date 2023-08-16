@@ -53,7 +53,7 @@ export class StackImmutable<V> implements IStackImmutable<V> {
 }
 
 /**
- * Returns a stack. Immutable. Use {@link stackMutable} for a mutable alternative.
+ * Returns a stack. Immutable. Use {@link Stacks.mutable} for a mutable alternative.
  *
  * The basic usage is `push`/`pop` to add/remove, returning the modified stack. Use the
  * property `peek` to see what's on top.
