@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'ava';
-import { immutable } from '../../collections/queue/Queue.js';
+import { immutable } from '../../collections/queue/QueueImmutable.js';
 
 test(`basic`, (t) => {
   const q = immutable<string>();
