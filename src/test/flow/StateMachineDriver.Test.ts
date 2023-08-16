@@ -14,36 +14,67 @@ function createBasic() {
 
   const handlers: StatesHandler<typeof states>[] = [
     {
-      states: ['init'],
-      expressions: [
-        () => {
-          return { next: true };
-        },
-      ],
+      if: ['init'],
+      then: { next: true },
     },
     {
-      states: ['three'],
-      expressions: [
-        () => {
-          return { next: 'four' };
-        },
-      ],
+      if: 'three',
+      then: { next: 'four' },
     },
     {
-      states: ['four'],
-      expressions: [
-        () => {
-          return { score: 0, next: 'three' };
-        },
-        () => {
-          return { score: 10, next: 'five' };
-        },
+      if: ['four'],
+      then: [
+        { score: 0, next: 'three' },
+        { score: 10, next: 'five' },
       ],
     },
   ];
 
   return { states, handlers };
 }
+
+test('no-target', async (t) => {
+  const { states } = createBasic();
+  const handlers = [
+    {
+      if: '__fallback',
+      then: [{ next: true }],
+    },
+    {
+      if: 'three',
+      then: [{ next: 'gazoo' }],
+    },
+  ];
+
+  const driver = await init(states, { handlers, debug: false });
+  t.is(driver.getValue(), 'init');
+  await driver.run();
+  t.is(driver.getValue(), 'one');
+  await driver.run();
+  t.is(driver.getValue(), 'two');
+  await driver.run();
+  t.is(driver.getValue(), 'three');
+
+  // Throws because handler for state 'three' tries to go to an undefined state
+  await t.throwsAsync(driver.run());
+
+  const handlers2 = [
+    {
+      if: '__fallback',
+      then: [{ next: true }],
+    },
+    {
+      if: 'three',
+      then: [{ next: 'gazoo' }],
+    },
+    {
+      if: 'blah',
+      then: { next: 'who-cares' },
+    },
+  ];
+  // Will throw because 'blah' is not part of state machine definition
+  await t.throwsAsync(() => init(states, handlers2));
+});
 
 test('no-fallback', async (t) => {
   const { states, handlers } = createBasic();
@@ -73,14 +104,14 @@ test('basic', async (t) => {
 
   //eslint-disable-next-line functional/immutable-data
   handlers.push({
-    states: ['__fallback'],
-    expressions: [
+    if: ['__fallback'],
+    then: [
       () => {
         return { next: true };
       },
     ],
   });
-  const driver = await init(states, { handlers, debug: true });
+  const driver = await init(states, { handlers, debug: false });
   t.is(driver.getValue(), `init`);
   await driver.run(); // init -> .next
   t.is(driver.getValue(), 'one');
@@ -93,5 +124,9 @@ test('basic', async (t) => {
   await driver.run();
   t.is(driver.getValue(), 'four');
   await driver.run();
+  t.is(driver.getValue(), 'five');
+
+  // In final state, can't drive it further
+  await t.throwsAsync(driver.run());
   t.is(driver.getValue(), 'five');
 });

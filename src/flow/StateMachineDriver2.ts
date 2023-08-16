@@ -43,11 +43,12 @@ export type Runner<V extends StateMachine.Transitions> = {
 //     ) => Result<Transitions> | undefined);
 
 export type StatesHandler<V extends StateMachine.Transitions> = {
-  readonly states:
+  readonly if:
     | readonly StateMachine.StateNames<V>[]
     //eslint-disable-next-line functional/prefer-readonly-type
-    | StateMachine.StateNames<V>[];
-  readonly expressions: readonly Expression<V>[];
+    | StateMachine.StateNames<V>[]
+    | StateMachine.StateNames<V>;
+  readonly then: readonly ExpressionOrResult<V>[] | ExpressionOrResult<V>;
   /**
    * Logic for choosing which result, if there are multiple expressions.
    * By default 'highest' (for highest ranked result)
@@ -84,9 +85,9 @@ export type DriverOpts<V extends StateMachine.Transitions> = {
 //   handlers: readonly StatesHandler<V>[]
 // );
 
-export type Expression<Transitions extends StateMachine.Transitions> = (
-  machine?: MachineState<Transitions>
-) => Result<Transitions> | undefined;
+export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
+  | Result<Transitions>
+  | ((machine?: MachineState<Transitions>) => Result<Transitions> | undefined);
 
 /**
  * Drive `machine`.
@@ -115,7 +116,14 @@ export async function init<V extends StateMachine.Transitions>(
   // handlers for a given state.
   const byState = new Map<string, StatesHandler<V>>();
   for (const h of opts.handlers) {
-    h.states.forEach((state) => {
+    const ifBlock = Array.isArray(h.if) ? h.if : [h.if];
+    ifBlock.forEach((state) => {
+      if (typeof state !== 'string') {
+        throw new Error(
+          `Expected single or array of strings for the 'if' field. Got: '${typeof state}'.`
+        );
+      }
+
       if (byState.has(state as string)) {
         throw new Error(
           `Multiple handlers defined for state '${
@@ -146,6 +154,19 @@ export async function init<V extends StateMachine.Transitions>(
 
   //eslint-disable-next-line functional/no-let
   let sm = StateMachine.init(machine);
+
+  // Check that all 'if' states are actually defined on machine
+  for (const [ifState] of byState) {
+    // Check if state is defined
+    if (
+      typeof sm.machine[ifState] === `undefined` &&
+      ifState !== '__fallback'
+    ) {
+      throw new Error(
+        `StateMachineDriver handler references a state ('${ifState}') which is not defined on the machine. Therefore this handler will never run.'`
+      );
+    }
+  }
 
   const run = async (): Promise<StateMachine.MachineState<V> | boolean> => {
     debug(`Run. State: ${sm.value as string}`);
@@ -181,7 +202,7 @@ export async function init<V extends StateMachine.Transitions>(
         : runOpts;
 
     const results = await Execute.run<MachineState<V>, Result<V>>(
-      handler.expressions,
+      handler.then,
       runOptsForHandler,
       sm
     );

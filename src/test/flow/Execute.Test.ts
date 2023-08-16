@@ -1,6 +1,6 @@
 import test from 'ava';
 import { run, runSingle } from '../../flow/Execute.js';
-import { defaultComparer, defaultComparerInverse } from '../../Util.js';
+import { comparerInverse, defaultComparer } from '../../Util.js';
 
 test('multiple', async (t) => {
   // Return numbers, use default sorting
@@ -21,7 +21,7 @@ test('multiple', async (t) => {
 
   // Inverted order
   t.deepEqual(
-    await run(r1Exp, { rank: defaultComparerInverse }),
+    await run(r1Exp, { rank: comparerInverse<number>(defaultComparer) }),
     [10, 3, 2, 1, 0.5, 0]
   );
 });
@@ -62,7 +62,7 @@ test('single', async (t) => {
   );
 
   // Test inverted sort
-  t.is(await runSingle(r1Exp, { rank: defaultComparerInverse }), 0);
+  t.is(await runSingle(r1Exp, { rank: comparerInverse(defaultComparer) }), 0);
 
   // Return numbers with some undefined
   const r2 = await runSingle<any, number>([
