@@ -3,6 +3,44 @@ import test from 'ava';
 import * as StateMachine from '../../flow/StateMachine.js';
 import { isEmptyArray } from '../util.js';
 
+test('normaliseTargets', (t) => {
+  let a = StateMachine.normaliseTargets('hello');
+  t.like(a, [{ state: 'hello' }]);
+
+  a = StateMachine.normaliseTargets([{ state: 'a' }, { state: 'b' }]);
+  t.like(a, [{ state: 'a' }, { state: 'b' }]);
+
+  a = StateMachine.normaliseTargets(['a', 'b']);
+  t.like(a, [{ state: 'a' }, { state: 'b' }]);
+
+  a = StateMachine.normaliseTargets(null);
+  t.like(a, [{ state: null }]);
+
+  // @ts-ignore
+  a = StateMachine.normaliseTargets([null]);
+  t.like(a, [{ state: null }]);
+
+  // @ts-ignore
+  t.throws(() => StateMachine.normaliseTargets(undefined));
+
+  // @ts-ignore
+  t.throws(() => StateMachine.normaliseTargets(10));
+
+  // @ts-ignore
+  t.throws(() => StateMachine.normaliseTargets([false, true]));
+
+  // @ts-ignore
+  t.throws(() => StateMachine.normaliseTargets(['someState', null]));
+  // @ts-ignore
+  t.throws(() => StateMachine.normaliseTargets({ someObj: 'hi' }));
+  t.throws(() =>
+    // @ts-ignore
+    StateMachine.normaliseTargets([{ state: 'ok' }, { someObj: 'hi' }])
+  );
+
+  //t.like(StateMachine.normaliseTargets(['hello','there'], {}))
+});
+
 test('routine', (t) => {
   const sm = {
     wakeup: ['coffee', 'phone'],
@@ -19,20 +57,20 @@ test('routine', (t) => {
   t.true(isEmptyArray(l.visited));
 
   t.like(StateMachine.possible(l), ['coffee', 'phone']);
-  t.true(StateMachine.isValid(l, 'phone'));
-  t.true(StateMachine.isValid(l, 'coffee'));
+  t.true(StateMachine.isValidTransition(l, 'phone'));
+  t.true(StateMachine.isValidTransition(l, 'coffee'));
   t.false(StateMachine.done(l));
 
-  t.false(StateMachine.isValid(l, 'breakfast'));
+  t.false(StateMachine.isValidTransition(l, 'breakfast'));
   t.throws(() => StateMachine.to(l, 'breakfast'));
-  t.false(StateMachine.isValid(l, 'teeth'));
+  t.false(StateMachine.isValidTransition(l, 'teeth'));
   t.throws(() => StateMachine.to(l, 'teeth'));
-  t.false(StateMachine.isValid(l, 'wakeup'));
+  t.false(StateMachine.isValidTransition(l, 'wakeup'));
   t.throws(() => StateMachine.to(l, 'wakeup'));
-  t.false(StateMachine.isValid(l, 'bike'));
+  t.false(StateMachine.isValidTransition(l, 'bike'));
   t.throws(() => StateMachine.to(l, 'bike'));
   // @ts-ignore
-  t.false(StateMachine.isValid(l, 'blah'));
+  t.false(StateMachine.isValidTransition(l, 'blah'));
   // @ts-ignore
   t.throws(() => StateMachine.to(l, 'blah'));
 
@@ -46,19 +84,19 @@ test('routine', (t) => {
   t.true(isEmptyArray(l1.visited));
 
   t.true(l1.value === 'coffee');
-  t.true(StateMachine.isValid(l1, 'breakfast'));
+  t.true(StateMachine.isValidTransition(l1, 'breakfast'));
   t.like(StateMachine.possible(l1), ['breakfast', 'teeth']);
 
-  t.true(StateMachine.isValid(l1, 'teeth'));
+  t.true(StateMachine.isValidTransition(l1, 'teeth'));
   t.false(StateMachine.done(l1));
 
-  t.false(StateMachine.isValid(l1, 'wakeup'));
+  t.false(StateMachine.isValidTransition(l1, 'wakeup'));
   t.throws(() => StateMachine.to(l1, 'wakeup'));
 
-  t.false(StateMachine.isValid(l1, 'phone'));
+  t.false(StateMachine.isValidTransition(l1, 'phone'));
   t.throws(() => StateMachine.to(l1, 'phone'));
 
-  t.false(StateMachine.isValid(l1, 'bike'));
+  t.false(StateMachine.isValidTransition(l1, 'bike'));
   t.throws(() => StateMachine.to(l1, 'bike'));
 
   // l2: breakfast
@@ -70,8 +108,8 @@ test('routine', (t) => {
   t.false(StateMachine.done(l2));
   t.false(StateMachine.done(l1));
 
-  t.true(StateMachine.isValid(l2, 'coffee'));
-  t.true(StateMachine.isValid(l2, 'coffee'));
+  t.true(StateMachine.isValidTransition(l2, 'coffee'));
+  t.true(StateMachine.isValidTransition(l2, 'coffee'));
 
   // l3: teeth
   const l3 = StateMachine.to(l2, 'teeth');
@@ -94,12 +132,35 @@ test('routine', (t) => {
 });
 
 test('validation', (t) => {
+  t.throws(() => {
+    // @ts-ignore
+    StateMachine.init(undefined);
+  });
+
+  t.throws(() => {
+    // @ts-ignore
+    StateMachine.init('hello');
+  });
+
+  t.throws(() => {
+    // @ts-ignore
+    StateMachine.init(null);
+  });
+
   // Fails because 'there' does not exist as top-level
   t.throws(() => {
     StateMachine.init({
       hello: 'there',
     });
   });
+  t.throws(() => {
+    StateMachine.init({
+      states: {
+        hello: 'there',
+      },
+    });
+  });
+
   // Fails because 'hello' is defined twice
   t.throws(() => {
     StateMachine.init({
@@ -108,6 +169,79 @@ test('validation', (t) => {
       hello: 'you',
     });
   });
+  t.throws(() => {
+    StateMachine.init({
+      states: {
+        hello: 'there',
+        // @ts-ignore
+        hello: 'you',
+      },
+    });
+  });
+
+  // Target state repeated
+  t.throws(() => {
+    const d: StateMachine.Transitions = {
+      a: ['b', 'b'],
+      b: 'a',
+    };
+    StateMachine.init(d);
+  });
+
+  // Target states contains undefined state
+  t.throws(() => {
+    const d: StateMachine.Transitions = {
+      a: ['b', 'c'],
+      b: 'a',
+    };
+    StateMachine.init(d);
+  });
+
+  // Target states contains invalid data
+  t.throws(() => {
+    const d: StateMachine.Transitions = {
+      // @ts-ignore
+      a: [false, 'b'],
+      b: null,
+    };
+    StateMachine.init(d);
+  });
+  t.throws(() => {
+    const d: StateMachine.Transitions = {
+      // @ts-ignore
+      a: ['b', { someObject: 'true' }],
+      b: null,
+    };
+    StateMachine.init(d);
+  });
+});
+
+test('next', (t) => {
+  const smOnOff = {
+    on: 'off',
+    off: 'on',
+  };
+
+  const a = StateMachine.init(smOnOff, 'on');
+  const b = StateMachine.next(a);
+  const c = StateMachine.next(b);
+  t.is(b.value, 'off');
+  t.is(c.value, 'on');
+
+  const smSeq = {
+    a: 'b',
+    b: 'c',
+    c: null,
+  };
+  const aa = StateMachine.init(smSeq, 'a');
+  const bb = StateMachine.next(aa);
+  const cc = StateMachine.next(bb);
+  t.is(aa.value, 'a');
+  t.is(bb.value, 'b');
+  t.is(cc.value, 'c');
+
+  // Can't go past c
+  t.throws(() => StateMachine.next(cc));
 });
 
 test('default', (t) => {
@@ -118,17 +252,27 @@ test('default', (t) => {
 
   // No initial state
   const l = StateMachine.init(sm);
+
+  // Check that machine has been normalised
+  t.like(l.machine, {
+    off: [{ state: 'on' }],
+    on: [{ state: 'off' }],
+  });
+
   t.true(l.value === `on`);
   t.true(isEmptyArray(l.visited));
 
   t.like(StateMachine.possible(l), ['off']);
-  t.like(l.states, sm);
 
   // l2: Off
   const l2 = StateMachine.to(l, 'off');
   t.like(StateMachine.possible(l2), ['on']);
   t.true(l2.value === 'off');
-  t.like(l2.states, sm);
+  // Check that machine definition has not changed
+  t.like(l.machine, {
+    off: [{ state: 'on' }],
+    on: [{ state: 'off' }],
+  });
   t.like(l2.visited, ['on']);
 
   t.throws(() => {
