@@ -125,8 +125,17 @@ export type Events = {
   readonly complete: CompleteEvent;
 };
 
+const adsrTransitionsInstance = Object.freeze({
+  attack: [`decay`, `release`],
+  decay: [`sustain`, `release`],
+  sustain: [`release`],
+  release: [`complete`],
+  complete: null,
+});
+type AdsrStateTransitions = Readonly<typeof adsrTransitionsInstance>;
+
 class AdsrBase extends SimpleEventEmitter<Events> {
-  readonly #sm: StateMachineWithEvents<any>;
+  readonly #sm: StateMachineWithEvents<AdsrStateTransitions>;
   readonly #timeSource: TimerSource;
   #timer: Timer | undefined;
 
@@ -147,15 +156,11 @@ class AdsrBase extends SimpleEventEmitter<Events> {
     this.releaseDuration = opts.releaseDuration ?? 1000;
     this.shouldLoop = opts.shouldLoop ?? false;
 
-    const descr = {
-      attack: [`decay`, `release`],
-      decay: [`sustain`, `release`],
-      sustain: [`release`],
-      release: [`complete`],
-      complete: null,
-    };
+    this.#sm = new StateMachineWithEvents<AdsrStateTransitions>(
+      adsrTransitionsInstance,
+      { initial: `attack` }
+    );
 
-    this.#sm = new StateMachineWithEvents(descr, { initial: `attack` });
     this.#sm.addEventListener(`change`, (ev) => {
       // Reset timer on release
       if (ev.newState === `release` && this.#holdingInitial) {
