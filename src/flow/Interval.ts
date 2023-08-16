@@ -20,6 +20,11 @@ export type Interval =
       readonly mins?: number;
     };
 
+export function intervalToMs(i: Interval | undefined): number | undefined;
+export function intervalToMs(
+  i: Interval | undefined,
+  defaultNumber: number
+): number;
 /**
  * Return the millisecond value of an Interval.
  * ```js
@@ -40,10 +45,10 @@ export type Interval =
  * @param defaultNumber Default value if `i` is undefined
  * @returns Milliseconds, or undefined
  */
-export const intervalToMs = (
+export function intervalToMs(
   i: Interval | undefined,
   defaultNumber?: number
-): number | undefined => {
+): number | undefined {
   if (isInterval(i)) {
     // Number given, must be millis?
     if (typeof i === 'number') return i;
@@ -58,7 +63,7 @@ export const intervalToMs = (
     if (typeof defaultNumber !== 'undefined') return defaultNumber;
     throw new Error(`Not a valid interval`);
   }
-};
+}
 
 export function isInterval(i: number | Interval | undefined): i is Interval {
   if (i === undefined) return false;
