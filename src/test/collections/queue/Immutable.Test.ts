@@ -1,6 +1,9 @@
 /* eslint-disable */
 import test from 'ava';
-import { QueueImmutable, immutable } from '../../../collections/queue/Queue.js';
+import {
+  QueueImmutable,
+  immutable,
+} from '../../../collections/queue/QueueImmutable.js';
 import { arrayValuesEqual } from '../../util.js';
 
 test(`basic`, (t) => {
