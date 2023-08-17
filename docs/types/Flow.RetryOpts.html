@@ -15,10 +15,15 @@
 <li><a href="../modules.html">ixfx</a></li>
 <li><a href="../modules/Flow.html">Flow</a></li>
 <li><a href="Flow.RetryOpts.html">RetryOpts</a></li></ul>
-<h1>Type alias RetryOpts</h1></div>
-<div class="tsd-signature"><span class="tsd-kind-type-alias">Retry<wbr/>Opts</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">abort</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type ">AbortSignal</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">count</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">log</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">power</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">predelayMs</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">startMs</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
+<h1>Type alias RetryOpts&lt;V&gt;</h1></div>
+<div class="tsd-signature"><span class="tsd-kind-type-alias">Retry<wbr/>Opts</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">abort</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type ">AbortSignal</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">count</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">defaultValue</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">log</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">power</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">predelayMs</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">startMs</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
 <div class="tsd-comment tsd-typography"><p>Backoff options</p>
 </div>
+<section class="tsd-panel">
+<h4>Type Parameters</h4>
+<ul class="tsd-type-parameter-list">
+<li>
+<h4><span class="tsd-kind-type-parameter">V</span></h4></li></ul></section>
 <div class="tsd-type-declaration">
 <h4>Type declaration</h4>
 <ul class="tsd-parameters">
@@ -30,6 +35,11 @@
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">count</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
 <div class="tsd-comment tsd-typography"><p>Maximum number of attempts to make</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">default<wbr/>Value</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span></h5>
+<div class="tsd-comment tsd-typography"><p>Default value to return if it fails</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
@@ -49,8 +59,10 @@ get with each retry.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">start<wbr/>Ms</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"><p>Starting milliseconds for sleeping after failure</p>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">start<wbr/>Ms</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Starting milliseconds for sleeping after failure
+Defaults to 1000.
+Must be above zero.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div></div>
@@ -94,7 +106,6 @@ get with each retry.</p>
 <li><a href="Flow.IntervalOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Interval<wbr/>Opts</span></a></li>
 <li><a href="Flow.ModTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Mod<wbr/>Timer</span></a></li>
 <li><a href="Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
-<li><a href="Flow.PollOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Poll<wbr/>Opts</span></a></li>
 <li><a href="Flow.RelativeTimerOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Relative<wbr/>Timer<wbr/>Opts</span></a></li>
 <li><a href="Flow.RepeatPredicate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Repeat<wbr/>Predicate</span></a></li>
 <li><a href="Flow.RetryOpts.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Opts</span></a></li>
@@ -120,7 +131,6 @@ get with each retry.</p>
 <li><a href="../functions/Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="../functions/Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.isInterval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Interval</span></a></li>
-<li><a href="../functions/Flow.iterableFromPoll.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>iterable<wbr/>From<wbr/>Poll</span></a></li>
 <li><a href="../functions/Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="../functions/Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="../functions/Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>

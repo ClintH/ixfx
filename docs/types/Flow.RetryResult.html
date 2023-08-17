@@ -15,10 +15,15 @@
 <li><a href="../modules.html">ixfx</a></li>
 <li><a href="../modules/Flow.html">Flow</a></li>
 <li><a href="Flow.RetryResult.html">RetryResult</a></li></ul>
-<h1>Type alias RetryResult</h1></div>
-<div class="tsd-signature"><span class="tsd-kind-type-alias">Retry<wbr/>Result</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">attempts</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">elapsed</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">success</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
+<h1>Type alias RetryResult&lt;V&gt;</h1></div>
+<div class="tsd-signature"><span class="tsd-kind-type-alias">Retry<wbr/>Result</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">attempts</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">elapsed</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">success</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
 <div class="tsd-comment tsd-typography"><p>Result of backoff</p>
 </div>
+<section class="tsd-panel">
+<h4>Type Parameters</h4>
+<ul class="tsd-type-parameter-list">
+<li>
+<h4><span class="tsd-kind-type-parameter">V</span></h4></li></ul></section>
 <div class="tsd-type-declaration">
 <h4>Type declaration</h4>
 <ul class="tsd-parameters">
@@ -34,12 +39,19 @@
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">message</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
-<div class="tsd-comment tsd-typography"><p>Message describing outcome</p>
+<div class="tsd-comment tsd-typography"><p>Message describing outcome.</p>
+<p>If retry was aborted, message will be abort reason.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">success</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
 <div class="tsd-comment tsd-typography"><p>True if callback function was invoked once where it returned <em>true</em></p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h5>
+<div class="tsd-comment tsd-typography"><p>Value returned by succeeding function,
+or <em>undefined</em> if it failed</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div></div>
@@ -83,7 +95,6 @@
 <li><a href="Flow.IntervalOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Interval<wbr/>Opts</span></a></li>
 <li><a href="Flow.ModTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Mod<wbr/>Timer</span></a></li>
 <li><a href="Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
-<li><a href="Flow.PollOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Poll<wbr/>Opts</span></a></li>
 <li><a href="Flow.RelativeTimerOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Relative<wbr/>Timer<wbr/>Opts</span></a></li>
 <li><a href="Flow.RepeatPredicate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Repeat<wbr/>Predicate</span></a></li>
 <li><a href="Flow.RetryOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Retry<wbr/>Opts</span></a></li>
@@ -109,7 +120,6 @@
 <li><a href="../functions/Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="../functions/Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
 <li><a href="../functions/Flow.isInterval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Interval</span></a></li>
-<li><a href="../functions/Flow.iterableFromPoll.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>iterable<wbr/>From<wbr/>Poll</span></a></li>
 <li><a href="../functions/Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="../functions/Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="../functions/Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>
