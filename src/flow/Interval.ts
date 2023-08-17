@@ -61,7 +61,7 @@ export function intervalToMs(
     return ms;
   } else {
     if (typeof defaultNumber !== 'undefined') return defaultNumber;
-    throw new Error(`Not a valid interval`);
+    throw new Error(`Not a valid interval: ${i}`);
   }
 }
 
@@ -119,7 +119,7 @@ export type IntervalOpts = {
  *
  * @example Produce a random number every 500ms:
  * ```
- * const randomGenerator = interval(() => Math.random(), { fixed: 1000 });
+ * const randomGenerator = interval(() => Math.random(), 500);
  * for await (const r of randomGenerator) {
  *  // Random value every 1 second
  *  // Warning: does not end by itself, a `break` statement is needed
@@ -148,11 +148,16 @@ export type IntervalOpts = {
  * @returns
  */
 export const interval = async function* <V>(
-  produce: AsyncPromiseOrGenerator<V>,
-  opts: IntervalOpts = {}
+  produce: AsyncPromiseOrGenerator<V> | ArrayLike<V>,
+  optsOrFixedMs: IntervalOpts | number = {}
 ) {
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
+  const opts =
+    typeof optsOrFixedMs === 'number'
+      ? { fixed: optsOrFixedMs }
+      : optsOrFixedMs;
+
   const signal = opts.signal;
   const when = opts.delay ?? 'before';
   //eslint-disable-next-line functional/no-let
@@ -160,19 +165,26 @@ export const interval = async function* <V>(
   //eslint-disable-next-line functional/no-let
   let started = performance.now();
 
-  const minIntervalMs = intervalToMs(opts.minimum);
+  const minIntervalMs = opts.minimum ? intervalToMs(opts.minimum) : undefined;
   const doDelay = async () => {
     const elapsed = performance.now() - started;
     if (typeof minIntervalMs !== 'undefined') {
       sleepMs = Math.max(0, minIntervalMs - elapsed);
     }
-    //console.log(`sleepMs: ${sleepMs} min: ${opts.minIntervalMs} elapsed: ${elapsed}`);
     if (sleepMs) {
       await sleep({ millis: sleepMs, signal });
     }
     started = performance.now();
     if (signal?.aborted) throw new Error(`Signal aborted ${signal?.reason}`);
   };
+
+  // Get an iterator over array
+  if (Array.isArray(produce)) produce = produce.values();
+
+  const isGenerator =
+    typeof produce === `object` &&
+    `next` in produce &&
+    typeof produce.next === `function`;
 
   try {
     while (!cancelled) {
@@ -181,18 +193,13 @@ export const interval = async function* <V>(
       if (typeof produce === `function`) {
         // Returns V or Promise<V>
         const result = await produce();
+        if (typeof result === 'undefined') return; // Done
         yield result;
-      } else if (typeof produce === `object`) {
-        // Generator, perhaps?
-        if (`next` in produce && `return` in produce && `throw` in produce) {
-          const result = await produce.next();
-          if (result.done) return;
-          yield result.value;
-        } else {
-          throw new Error(
-            `interval: produce param does not seem to be a generator?`
-          );
-        }
+      } else if (isGenerator) {
+        // Generator
+        const result = await (produce as any).next();
+        if (result.done) return;
+        yield result.value;
       } else {
         throw new Error(
           `produce param does not seem to return a value/Promise and is not a generator?`
