@@ -24,6 +24,9 @@ export type SinceFn = () => number;
  *
  * // Later, when click happens:
  * state = { click: Elapsed.since() }
+ * ```
+ *
+ * Use {@link once} if you want to measure a single period, and stop it.
  * @returns
  */
 export const since = (): SinceFn => {
@@ -33,6 +36,32 @@ export const since = (): SinceFn => {
   };
 };
 
+/**
+ * Returns elapsed time since initial call, however
+ * timer stops when first invoked.
+ *
+ * ```js
+ * const elapsed = Elapsed.once();
+ * // ...do stuff
+ * elapsed(); // Yields time since Elapsed.once() was called
+ * // ...do more stuff
+ * elapsed(); // Is still the same number as above
+ * ```
+ *
+ * Use {@link since} to not have this stopping behaviour.
+ * @returns
+ */
+export const once = (): SinceFn => {
+  const start = Date.now();
+  //eslint-disable-next-line functional/no-let
+  let stoppedAt = 0;
+  return (): number => {
+    if (stoppedAt === 0) {
+      stoppedAt = Date.now() - start;
+    }
+    return stoppedAt;
+  };
+};
 /**
  * Returns a function that reports an 'infinite' elapsed time.
  * this can be useful as an initialiser for `elapsedSince`.
