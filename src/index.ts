@@ -143,7 +143,7 @@ export * as Io from './io/index.js';
  *
  * Iteration over values
  * * {@link forEach} / {@link forEachAsync}: Loop over an iterable or array, with the possibility of early exit
- * * {@link repeat}: Runs a function a given number of times, collating results
+ * * {@link repeat}: Runs a function a given number of times, yielding results as they come in
  *
  * Monitoring
  * * {@link Elapsed.progress}: Track completion of a time duration

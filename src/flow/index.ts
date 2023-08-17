@@ -1,6 +1,9 @@
 export type AsyncPromiseOrGenerator<V> =
-  | (() => V | Promise<V>)
+  | (() => Promise<V> | Promise<undefined>)
+  | (() => V | undefined)
   | Generator<V>
+  | IterableIterator<V>
+  | AsyncIterableIterator<V>
   | AsyncGenerator<V>;
 
 import { number as guardNumber } from '../Guards.js';
@@ -13,7 +16,7 @@ import * as Timer from './Timer.js';
  * State Machine
  * See [here for usage](../classes/Flow.StateMachine.StateMachine.html).
  *
- * * {@link StateMachine.driver}: Drive a static machine
+ * * {@link StateMachine.driver}: Drive a state machine
  * * {@link StateMachine.init}: Create a state machine from initial state and machine description
  * * {@link fromList}: Create a state machine from a simple list of states
  */
@@ -32,7 +35,8 @@ export * from './Delay.js';
 export * from './Every.js';
 export * from './RunOnce.js';
 export * from './Retry.js';
-export * from './Poll.js';
+//export * from './Poll.js';
+
 import * as Elapsed from './Elapsed.js';
 export { Elapsed };
 export { TaskQueue } from './TaskQueue.js';
@@ -124,12 +128,16 @@ export type RepeatPredicate = (
   valuesProduced: number
 ) => boolean;
 /**
- * Runs `fn` a certain number of times, accumulating result into an array.
- * If `fn` returns undefined, the result is ignored.
+ * Runs `fn` a certain number of times, yielding results.
+ * If `fn` returns undefined, the result is ignored, but loop continues.
  *
  * ```js
  * // Results will be an array with five random numbers
- * const results = repeat(5, () => Math.random());
+ * const results = [...repeat(5, () => Math.random())];
+ *
+ * // Or as an generator (note also the simpler expression form)
+ * for (const result of repeat(5, Math.random)) {
+ * }
  * ```
  *
  * Repeats can be specified as an integer (eg. 5 for five repeats), or a function
@@ -142,20 +150,19 @@ export type RepeatPredicate = (
  * ```
  *
  * If you don't need to accumulate return values, consider {@link Generators.count | Generators.count} with {@link Flow.forEach | Flow.forEach}.
- *
+ * If you want to have a waiting period between each repetition, consider {@link Flow.interval}.
  * @param countOrPredicate Number of repeats or function returning false when to stop
  * @param fn Function to run, must return a value to accumulate into array or _undefined_
- * @returns Array of accumulated results
+ * @returns Yields results, one at a time
  */
-export const repeat = <V>(
+export function* repeat<V>(
   countOrPredicate: number | RepeatPredicate,
   fn: () => V | undefined
-): readonly V[] => {
+) {
   // Unit tested: expected return array length
   //eslint-disable-next-line functional/no-let
   let repeats, valuesProduced;
   repeats = valuesProduced = 0;
-  const ret = [];
 
   if (typeof countOrPredicate === `number`) {
     guardNumber(countOrPredicate, `positive`, `countOrPredicate`);
@@ -163,22 +170,23 @@ export const repeat = <V>(
       repeats++;
       const v = fn();
       if (v === undefined) continue;
-      //eslint-disable-next-line functional/immutable-data
-      ret.push(v);
+      yield v;
       valuesProduced++;
     }
-  } else {
+  } else if (typeof countOrPredicate === 'function') {
     while (countOrPredicate(repeats, valuesProduced)) {
       repeats++;
       const v = fn();
       if (v === undefined) continue;
-      //eslint-disable-next-line functional/immutable-data
-      ret.push(v);
+      yield v;
       valuesProduced++;
     }
+  } else {
+    throw new Error(
+      `countOrPredicate should be a number or function. Got: ${typeof countOrPredicate}`
+    );
   }
-  return ret;
-};
+}
 
 /**
  * Repeatedly calls `fn`, reducing via `reduce`.
@@ -187,8 +195,8 @@ export const repeat = <V>(
  * repeatReduce(10, () => 1, (acc, v) => acc + v);
  * // Yields: 10
  *
- * // Multiplies random values against eachother 10 times
- * repeatReduce(10, () => Math.random(), (acc, v) => acc * v);
+ * // Multiplies random values against each other 10 times
+ * repeatReduce(10, Math.random, (acc, v) => acc * v);
  * // Yields a single number
  * ```
  * @param countOrPredicate

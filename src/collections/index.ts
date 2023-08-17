@@ -14,7 +14,7 @@ export * as Trees from './Trees.js';
 /**
  * Stacks store items in order.
  *
- * Stacks and queues can be helpful when it's necessary to process data in order, but each one has slightly different behaviour.
+ * Stacks and queues can be helpful for processing data in order. They each have slightly different behaviour.
  *
  * Like a stack of plates, the newest item (on top) is removed
  * before the oldest items (at the bottom). {@link Queues} operate differently, with

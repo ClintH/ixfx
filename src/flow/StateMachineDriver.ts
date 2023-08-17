@@ -36,12 +36,6 @@ export type Runner<V extends StateMachine.Transitions> = {
   ) => StateMachine.MachineState<V>;
 };
 
-// export type Expression<Transitions extends StateMachine.Transitions> =
-//   Execute.Expression<Transitions, Result<Transitions>> &
-//     ((
-//       machine: StateMachine.MachineState<Transitions>
-//     ) => Result<Transitions> | undefined);
-
 export type StatesHandler<V extends StateMachine.Transitions> = {
   readonly if:
     | readonly StateMachine.StateNames<V>[]
@@ -90,7 +84,7 @@ export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
   | ((machine?: MachineState<Transitions>) => Result<Transitions> | undefined);
 
 /**
- * Drive `machine`.
+ * Drives a state machine.
  *
  * Defaults to selecting the highest-ranked result to determine
  * what to do next.

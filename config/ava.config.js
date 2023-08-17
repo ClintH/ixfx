@@ -1,9 +1,9 @@
 export default {
-	require: ['./src/test/util.ts'],
+	require: ['./src/__test/util.ts'],
   verbose: false,
   files: [
-    './src/test/**/*.ts',
-    '!./src/test/util.ts'
+    './src/__test/**/*.ts',
+    '!./src/__test/util.ts'
   ],
   failFast: true,
   typescript: {

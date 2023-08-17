@@ -4,7 +4,7 @@ import { type Timer } from '../flow/Timer.js';
 import { type Path } from '../geometry/Path.js';
 import * as Bezier from '../geometry/Bezier.js';
 import { scale } from '../data/Scale.js';
-import { iterableFromPoll } from '../flow/Poll.js';
+import { interval } from '../flow/Interval.js';
 import { StateMachineWithEvents } from '../flow/StateMachineWithEvents.js';
 
 /**
@@ -571,13 +571,15 @@ export async function* adsrIterable(
   const sampleRateMs = opts.sampleRateMs ?? 100;
   env.trigger();
 
-  yield* iterableFromPoll(
+  yield* interval<number>(
     () => {
       if (env.isDone) return;
-      const v = env.value;
-      return v;
+      return env.value;
     },
-    { sampleRateMs, signal: opts.signal }
+    {
+      fixed: sampleRateMs,
+      signal: opts.signal,
+    }
   );
 }
 

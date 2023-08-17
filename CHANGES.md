@@ -1,5 +1,7 @@
 A rough changelog between NPM releases
 
+# 0.10.0 17.08.23
+
 Flow/
 
 - StateMachine: Lightweight, pure function state machine implementation (no events, immutable)
