@@ -174,3 +174,11 @@ export const logger =
         break;
     }
   };
+
+export const getErrorMessage = (ex: Error | unknown): string => {
+  if (typeof ex === 'string') return ex;
+  if (ex instanceof Error) {
+    return ex.message;
+  }
+  return ex as string;
+};
