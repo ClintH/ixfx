@@ -1,13 +1,15 @@
 import { sleep } from './Sleep.js';
-import { resolveLogOption } from '../Debug.js';
+import { getErrorMessage, resolveLogOption } from '../Debug.js';
 import { since, toString as elapsedToString } from './Elapsed.js';
-
+import { integer as integerGuard } from '../Guards.js';
 /**
  * Result of backoff
  */
-export type RetryResult = {
+export type RetryResult<V> = {
   /**
-   * Message describing outcome
+   * Message describing outcome.
+   *
+   * If retry was aborted, message will be abort reason.
    */
   readonly message?: string;
   /**
@@ -22,20 +24,28 @@ export type RetryResult = {
    * Total elapsed time since beginning of call to `retry`
    */
   readonly elapsed: number;
+
+  /**
+   * Value returned by succeeding function,
+   * or _undefined_ if it failed
+   */
+  readonly value: V | undefined;
 };
 
 /**
  * Backoff options
  */
-export type RetryOpts = {
+export type RetryOpts<V> = {
   /**
    * Maximum number of attempts to make
    */
   readonly count: number;
   /**
    * Starting milliseconds for sleeping after failure
+   * Defaults to 1000.
+   * Must be above zero.
    */
-  readonly startMs: number;
+  readonly startMs?: number;
   /**
    * Initial waiting period before first attempt (optional)
    */
@@ -53,24 +63,29 @@ export type RetryOpts = {
    * get with each retry.
    */
   readonly power?: number;
+
+  /***
+   * Default value to return if it fails
+   */
+  readonly defaultValue?: V;
 };
 
 /**
- * Keeps calling `cb` until it returns _true_. If it throws an exception,
- * it will cancel the retry, bubbling the exception.
+ * Keeps calling `cb` until it returns something other than _undefined_. If it throws an exception,
+ * it will cancel the retry, bubbling the exception and cancelling the retry.
  *
  * ```js
  * // A function that only works some of the time
  * const flakyFn = async () => {
  *  // do the thing
  *  if (Math.random() > 0.9) return true; // success
- *  return false; // 'failed'
+ *  return; // 'failed'
  * };
  *
- * // Retry it up to five times
+ * // Retry it up to five times,
+ * // starting with 1000ms interval
  * const result = await retry(flakyFn, {
- *  count: 5,
- *  startMs: 1000
+ *  count: 5
  * });
  *
  * if (result.success) {
@@ -93,11 +108,11 @@ export type RetryOpts = {
  * @param opts Options
  * @returns
  */
-export const retry = async (
-  cb: () => Promise<boolean>,
+export const retry = async <V>(
+  cb: () => Promise<V | undefined>,
   //eslint-disable-next-line functional/prefer-immutable-types
-  opts: RetryOpts
-): Promise<RetryResult> => {
+  opts: RetryOpts<V>
+): Promise<RetryResult<V>> => {
   const signal = opts.abort;
   const log = resolveLogOption(opts.log);
   const power = opts.power ?? 1.1;
@@ -105,30 +120,39 @@ export const retry = async (
   const startedAt = since();
 
   //eslint-disable-next-line functional/no-let
-  let t = opts.startMs;
+  let t = opts.startMs ?? 1000;
   const count = opts.count;
   //eslint-disable-next-line functional/no-let
   let attempts = 0;
+
+  integerGuard(count, 'aboveZero', 'count');
+  if (t <= 0) throw new Error(`startMs must be above zero`);
 
   if (predelayMs > 0) await sleep({ millis: predelayMs, signal: signal });
   if (signal?.aborted) {
     return {
       success: false,
       attempts,
+      value: opts.defaultValue,
       elapsed: startedAt(),
       message: `Aborted during predelay`,
     };
   }
-  while (attempts <= count) {
+  while (attempts < count) {
     attempts++;
-    const ok = await cb();
-    if (ok) return { success: true, attempts, elapsed: startedAt() };
-
+    const cbResult = await cb();
+    if (cbResult !== undefined) {
+      return { value: cbResult, success: true, attempts, elapsed: startedAt() };
+    }
     log({
       msg: `retry attempts: ${attempts} t: ${elapsedToString(t)}`,
     });
 
-    // Did not succeed. Sleep
+    // Did not succeed.
+    if (attempts >= count) {
+      break; // Out of attempts, no point sleeping again
+    }
+    // Sleep
     try {
       await sleep({ millis: t, signal });
     } catch (ex) {
@@ -136,7 +160,8 @@ export const retry = async (
       return {
         success: false,
         attempts,
-        message: 'Sleep failed, possibly due to abort signal',
+        value: opts.defaultValue,
+        message: getErrorMessage(ex),
         elapsed: startedAt(),
       };
     }
@@ -145,5 +170,11 @@ export const retry = async (
     t = Math.floor(Math.pow(t, power));
   }
 
-  return { success: false, attempts, elapsed: startedAt() };
+  return {
+    message: `Giving up after ${attempts} attempts.`,
+    success: false,
+    attempts,
+    value: opts.defaultValue,
+    elapsed: startedAt(),
+  };
 };
