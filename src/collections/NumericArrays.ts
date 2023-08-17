@@ -1,5 +1,10 @@
-import { zip, filterBetween } from './Arrays.js';
+import { zip } from './Arrays.js';
 import { type EasingFn } from '../modulation/Easing.js';
+export {
+  minMaxAvg,
+  type MinMaxAvgOpts,
+  type MinMaxAvgTotal,
+} from './MinMaxAvg.js';
 
 /**
  * Computes an average of an array with a set of weights applied.
@@ -309,79 +314,4 @@ export const minFast = (data: readonly number[] | Float32Array): number => {
     m = Math.min(m, data[i]);
   }
   return m;
-};
-
-export type MinMaxAvgTotal = {
-  /**
-   * Smallest value in array
-   */
-  readonly min: number;
-  /**
-   * Total of all items
-   */
-  readonly total: number;
-  /**
-   * Largest value in array
-   */
-  readonly max: number;
-  /**
-   * Average value in array
-   */
-  readonly avg: number;
-};
-
-/**
- * Returns the min, max, avg and total of the array.
- * Any values that are invalid are silently skipped over.
- *
- * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- *
- * const v = [10, 2, 4.2, 99];
- * const mma = Arrays.minMaxAvg(v);
- * Yields: { min: 2, max: 99, total: 115.2, avg: 28.8 }
- * ```
- *
- * Use {@link average}, {@link max}, {@link min} or {@link total} if you only need one of these.
- *
- * A start and end range can be provided if the calculation should be restricted to a part
- * of the input array. By default the whole array is used.
- *
- * @param data
- * @param startIndex If provided, starting index to do calculations (defaults full range)
- * @param endIndex If provided, the end index to do calculations (defaults full range)
- * @returns `{min, max, avg, total}`
- */
-export const minMaxAvg = (
-  data: readonly number[],
-  startIndex?: number,
-  endIndex?: number
-): MinMaxAvgTotal => {
-  if (data === undefined) throw new Error(`'data' is undefined`);
-  if (!Array.isArray(data)) throw new Error(`'data' parameter is not an array`);
-
-  if (data.length === 0) {
-    return {
-      total: 0,
-      min: 0,
-      max: 0,
-      avg: 0,
-    };
-  }
-  if (startIndex === undefined) startIndex = 0;
-  if (endIndex === undefined) endIndex = data.length - 1;
-
-  const validNumbers = filterBetween<number>(
-    data,
-    (d) => typeof d === `number` && !Number.isNaN(d),
-    startIndex,
-    endIndex
-  );
-  const total = validNumbers.reduce((acc, v) => acc + v, 0);
-  return {
-    total: total,
-    max: Math.max(...validNumbers),
-    min: Math.min(...validNumbers),
-    avg: total / validNumbers.length,
-  };
 };
