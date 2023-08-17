@@ -181,7 +181,7 @@ export function* linearSpace(
 
   guard(steps, ``, `steps`);
 
-  const r = precision ? rounder(precision) : (v: number) => v;
+  const r = precision ? round(precision) : (v: number) => v;
   const step = (end - start) / (steps - 1);
 
   guard(step, ``, `step`);
@@ -196,37 +196,107 @@ export function* linearSpace(
   }
 }
 
-/**
- * Rounds a number to given number of decimal places.
- *
- * If you are reusing the same rounding, consider {@link rounder}.
- * ```js
- * round(10.12345, 2); // 10.12
- * round(10.12345, 1); // 10.1
- * round(10.12345);    // 10
- * ```
- * @param v
- * @param decimalPlaces
- */
-export const round = (v: number, decimalPlaces: number = 0) => {
-  guard(v, ``, `v`);
-  return rounder(decimalPlaces)(v);
-};
+export function round(decimalPlaces: number, v: number): number;
+export function round(decimalPlaces: number): (v: number) => number;
 
 /**
- * Returns a number rounding function
+ * Rounds a number.
+ *
+ * If one parameter is given, it's the decimal places,
+ * and a rounding function is returned:
  * ```js
- * const r = rounder(2);
+ * const r = round(2);
  * r(10.12355); // 10.12
+ * ```
+ *
+ * If two parameters are given, the first is decimal places,
+ * the second the value to round.
+ * ```js
+ * round(2, 10.12355); // 10.12
  * ```
  * @param decimalPlaces
  * @returns
  */
-export const rounder = (decimalPlaces: number = 0) => {
-  guardInteger(decimalPlaces, `positive`, `decimalPlaces`);
+export function round(a: number, b?: number) {
+  guardInteger(a, `positive`, `decimalPlaces`);
 
-  if (decimalPlaces === 0) return Math.round;
-  const p = Math.pow(10, decimalPlaces);
+  //eslint-disable-next-line functional/no-let
+  let rounder;
+  if (a === 0) rounder = Math.round;
+  else {
+    const p = Math.pow(10, a);
+    rounder = (v: number) => Math.floor(v * p) / p;
+  }
 
-  return (v: number) => Math.floor(v * p) / p;
-};
+  if (typeof b === 'undefined') return rounder;
+  else return rounder(b);
+}
+
+export function isApproximately(
+  baseValue: number,
+  rangePercent: number
+): (v: number) => boolean;
+
+export function isApproximately(
+  baseValue: number,
+  rangePercent: number,
+  v: number
+): boolean;
+
+/**
+ * Returns a function that yields _true_ if a value is within
+ * a percentage range of a base value.
+ *
+ * ```js
+ * // Allow 10% above or below
+ * const closeTo100 = isApproximately(100, 0.1); // returns a function
+ * closeTo100(100); // true
+ * closeTo100(101); // true;
+ * closeTo100(90); // true;
+ * closeTo100(80); // false;
+ * ```
+ *
+ * `isApproximately` returns a function, but if a third value is provided,
+ * it returns true/false, testing the value:
+ * ```js
+ * isApproximately(100, 0.1, 101); // True
+ * ```
+ * If the tested value is not a number, _false_ is returned
+ * (because it is not, in fact approximately `baseValue`).
+ *
+ * For baseValues between -2 and 2, the calculated difference is rounded down
+ * to 5 decimal places to avoid weird JS floating point math.
+ * @param baseValue
+ * @param rangePercent
+ * @returns
+ */
+export function isApproximately(
+  baseValue: number,
+  rangePercent: number,
+  v?: number
+) {
+  guard(rangePercent, 'percentage', 'rangePercent');
+  guard(baseValue, '', 'baseValue');
+
+  const diff = baseValue * rangePercent;
+  const test = (v: number): boolean => {
+    try {
+      guard(v, '', 'v');
+
+      //eslint-disable-next-line functional/no-let
+      let diffV = Math.abs(v - baseValue);
+      if (Math.abs(baseValue) <= 2) {
+        diffV = round(5, diffV);
+      }
+      return diffV <= diff;
+    } catch (ex) {
+      return false;
+    }
+  };
+
+  if (typeof v !== 'undefined') {
+    return test(v);
+  } else {
+    return test;
+  }
+}
