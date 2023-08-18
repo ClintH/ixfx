@@ -85,7 +85,7 @@ const springRaw = (opts: SpringOpts = {}, from: number = 0, to: number = 1) => {
 //eslint-disable-next-line func-style
 export function* spring(
   opts: SpringOpts = {},
-  timerOrFreq: Timers.Timer | number | undefined
+  timerOrFreq?: Timers.Timer | number | undefined
 ) {
   if (timerOrFreq === undefined) timerOrFreq = Timers.msElapsedTimer();
   else if (typeof timerOrFreq === `number`) {
