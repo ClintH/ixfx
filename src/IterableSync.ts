@@ -13,6 +13,41 @@
 import { type IsEqual, type ToString, toStringDefault } from './Util.js';
 
 /**
+ * Returns a function that yields a value from a generator.
+ * ```js
+ * const spring = yieldNumber(Oscillators.spring());
+ *
+ * spring(); // latest value
+ * ```
+ *
+ * Instead of:
+ * ```js
+ * const spring = Oscillators.spring();
+ *
+ * spring.next().value
+ * ```
+ *
+ * A `defaultValue` can be provided if the source generator returns undefined:
+ * ```js
+ * const spring = yieldNumber(Oscillators.spring(), 0);
+ * spring(); // Returns 0 if the generator returns undefined
+ * ```
+ * @param generator
+ * @param defaultValue
+ * @returns
+ */
+export function yieldNumber(
+  generator: Generator<number>,
+  defaultValue = undefined
+) {
+  return () => {
+    const v = generator.next().value;
+    if (v === undefined) return defaultValue;
+    return v;
+  };
+}
+
+/**
  * Return first value from an iterable, or _undefined_ if
  * no values are generated
  * @param it
