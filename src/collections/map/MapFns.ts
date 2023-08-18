@@ -300,7 +300,7 @@ export const sortByValueProperty = <K, V, Z>(
   });
 };
 /**
- * Returns true if _any_ key contains `value`, based on the provided `comparer` function. Use {@link hasKeyValue}
+ * Returns _true_ if any key contains `value`, based on the provided `comparer` function. Use {@link hasKeyValue}
  * if you only want to find a value under a certain key.
  *
  * Having a comparer function is useful to check by value rather than object reference.
