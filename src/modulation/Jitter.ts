@@ -16,7 +16,8 @@ export type JitterOpts = {
 export type JitterFn = (value: number) => number;
 
 /**
- * Jitters `value` by the absolute `jitter` amount.
+ * Jitters `value` by the absolute `jitter` amount. Returns a function.
+ *
  * All values should be on a 0..1 scale, and the return value is by default clamped to 0..1.
  * Pass `clamped:false` as an option to allow for arbitary ranges.
  *
