@@ -44,25 +44,46 @@ export const scale = (
   outMin?: number,
   outMax?: number,
   easing?: (v: number) => number
-): number => {
+): number => scaleFn(inMin, inMax, outMin, outMax, easing)(v);
+
+/**
+ * Returns a scaling function
+ * @param inMin Input minimum
+ * @param inMax Input maximum
+ * @param outMin Output minimum. If not specified, 0
+ * @param outMax Output maximum. If not specified, 1
+ * @param easing Easing function
+ * @returns
+ */
+export const scaleFn = (
+  inMin: number,
+  inMax: number,
+  outMin?: number,
+  outMax?: number,
+  easing?: (v: number) => number
+): ((v: number) => number) => {
   if (outMax === undefined) outMax = 1;
   if (outMin === undefined) outMin = 0;
-  if (inMin === inMax) return outMax;
 
-  //eslint-disable-next-line functional/no-let
-  let a = (v - inMin) / (inMax - inMin);
-  if (easing !== undefined) a = easing(a);
-  return a * (outMax - outMin) + outMin;
+  return (v: number): number => {
+    if (inMin === inMax) return outMax!;
+
+    //eslint-disable-next-line functional/no-let
+    let a = (v - inMin) / (inMax - inMin);
+    if (easing !== undefined) a = easing(a);
+    return a * (outMax! - outMin!) + outMin!;
+  };
 };
 
 /**
  * As {@link scale}, but result is clamped to be
  * within `outMin` and `outMax`.
+ *
  * @param v
  * @param inMin
  * @param inMax
- * @param outMin
- * @param outMax
+ * @param outMin 1 by default
+ * @param outMax 0 by default d
  * @param easing
  * @returns
  */
@@ -130,6 +151,7 @@ export const scalePercentages = (
  * scalePercent(0.5, 10, 20); // 15
  * ```
  *
+ * @see {@link scalePercentFn} Returns a function
  * @param v Value to scale
  * @param outMin Minimum for output
  * @param outMax Maximum for output
@@ -139,7 +161,18 @@ export const scalePercent = (
   v: number,
   outMin: number,
   outMax: number
-): number => {
-  guardNumber(v, `percentage`, `v`);
-  return scale(v, 0, 1, outMin, outMax);
+): number => scalePercentFn(outMin, outMax)(v);
+
+/**
+ * Returns a function that scales an input percentage value to an output range
+ * @see {@link scalePercent} Calculates value
+ * @param outMin
+ * @param outMax
+ * @returns Function that takes a single argument
+ */
+export const scalePercentFn = (outMin: number, outMax: number) => {
+  return (v: number) => {
+    guardNumber(v, `percentage`, `v`);
+    return scale(v, 0, 1, outMin, outMax);
+  };
 };
