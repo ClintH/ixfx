@@ -1024,7 +1024,7 @@ export type CreateUpdateElement<V> = (
 ) => HTMLElement;
 
 export const reconcileChildren = <V>(
-  parentEl: Readonly<HTMLElement>,
+  parentEl: HTMLElement,
   list: ReadonlyMap<string, V>,
   createUpdate: CreateUpdateElement<V>
 ) => {
