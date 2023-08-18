@@ -78,7 +78,7 @@ export type TransitionsStrict = {
 /**
  * List of possible states
  */
-export type StateNames<V extends Transitions> = keyof V;
+export type StateNames<V extends Transitions> = keyof V & string;
 
 export type Machine<V extends Transitions> = {
   /**
@@ -471,9 +471,9 @@ export const validateTransition = <V extends Transitions>(
   if (p.length === 0) throw new Error('Machine is in terminal state');
   if (!p.includes(toState)) {
     throw new Error(
-      `Target state '${toState} not available at current state. Possible states: ${p.join(
-        ', '
-      )}`
+      `Target state '${toState}' not available at current state '${
+        sm.value
+      }'. Possible states: ${p.join(', ')}`
     );
   }
 };
