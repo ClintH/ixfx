@@ -905,10 +905,14 @@ export const filterAB = <V>(
  * @returns
  */
 export const unique = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
-  arrays: Array<Array<V>> | Array<V>,
+  arrays: //eslint-disable-next-line functional/prefer-readonly-type
+  | Array<Array<V>>
+    //eslint-disable-next-line functional/prefer-readonly-type
+    | Array<V>
+    | ReadonlyArray<V>
+    | ReadonlyArray<ReadonlyArray<V>>,
   comparer = isEqualDefault<V>
-): V[] => {
+): readonly V[] => {
   //eslint-disable-next-line functional/no-let
   const t: V[] = [];
   for (let i = 0; i < arrays.length; i++) {
