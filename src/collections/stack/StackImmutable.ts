@@ -1,7 +1,6 @@
 // -------------------------
 // Immutable
 // -------------------------
-import type { IStack } from './IStack.js';
 import type { IStackImmutable } from './IStackImmutable.js';
 import { push, pop, isEmpty, isFull, peek } from './StackFns.js';
 import type { StackOpts } from './index.js';
@@ -78,4 +77,4 @@ export class StackImmutable<V> implements IStackImmutable<V> {
 export const immutable = <V>(
   opts: StackOpts = {},
   ...startingItems: ReadonlyArray<V>
-): IStack<V> => new StackImmutable({ ...opts }, [...startingItems]);
+): IStackImmutable<V> => new StackImmutable({ ...opts }, [...startingItems]);
