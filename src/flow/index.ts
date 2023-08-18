@@ -4,7 +4,9 @@ export type AsyncPromiseOrGenerator<V> =
   | Generator<V>
   | IterableIterator<V>
   | AsyncIterableIterator<V>
-  | AsyncGenerator<V>;
+  | AsyncGenerator<V>
+  | AsyncIterable<V>
+  | Iterable<V>;
 
 import { number as guardNumber } from '../Guards.js';
 import { sleep } from './Sleep.js';

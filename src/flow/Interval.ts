@@ -150,7 +150,7 @@ export type IntervalOpts = {
 export const interval = async function* <V>(
   produce: AsyncPromiseOrGenerator<V> | ArrayLike<V>,
   optsOrFixedMs: IntervalOpts | number = {}
-) {
+): AsyncGenerator<V> {
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
   const opts =

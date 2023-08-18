@@ -156,7 +156,7 @@ export const quantiseEvery = (
  *
  * ```js
  * for (const v of linearSpace(1, 5, 6)) {
- *  // Yields: 1, 2, 3, 4, 5, 6
+ *  // Yields: [ 1, 1.8, 2.6, 3.4, 4.2, 5 ]
  * }
  * ```
  *
