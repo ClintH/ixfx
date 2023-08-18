@@ -5,7 +5,7 @@ export type ExpressionOrResult<ArgsType, ResultType> =
   | ResultType
   | ((
       args: ArgsType | undefined
-    ) => Promise<ResultType | undefined> | ResultType | undefined);
+    ) => Promise<ResultType | undefined> | ResultType | undefined | void);
 
 //eslint-disable-next-line functional/no-mixed-types
 export type RunOpts<ResultType> = {
