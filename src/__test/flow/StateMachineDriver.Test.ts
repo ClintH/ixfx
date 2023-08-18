@@ -61,7 +61,7 @@ test('no-target', async (t) => {
   const handlers2 = [
     {
       if: '__fallback',
-      then: [{ next: true }],
+      then: { next: true },
     },
     {
       if: 'three',
@@ -106,6 +106,9 @@ test('basic', async (t) => {
   handlers.push({
     if: ['__fallback'],
     then: [
+      () => {
+        // no-up
+      },
       () => {
         return { next: true };
       },

@@ -29,8 +29,9 @@ export type Result<V extends StateMachine.Transitions> = {
 
 //eslint-disable-next-line functional/no-mixed-types
 export type Runner<V extends StateMachine.Transitions> = {
-  readonly run: () => Promise<StateMachine.MachineState<V> | boolean>;
+  readonly run: () => Promise<StateMachine.MachineState<V> | undefined>;
   readonly getValue: () => StateMachine.StateNames<V>;
+  readonly reset: () => void;
   readonly to: (
     state: StateMachine.StateNames<V>
   ) => StateMachine.MachineState<V>;
@@ -81,7 +82,9 @@ export type DriverOpts<V extends StateMachine.Transitions> = {
 
 export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
   | Result<Transitions>
-  | ((machine?: MachineState<Transitions>) => Result<Transitions> | undefined);
+  | ((
+      machine?: MachineState<Transitions>
+    ) => Result<Transitions> | undefined | void);
 
 /**
  * Drives a state machine.
@@ -162,7 +165,7 @@ export async function init<V extends StateMachine.Transitions>(
     }
   }
 
-  const run = async (): Promise<StateMachine.MachineState<V> | boolean> => {
+  const run = async (): Promise<StateMachine.MachineState<V> | undefined> => {
     debug(`Run. State: ${sm.value as string}`);
     const state = sm.value as string;
     //eslint-disable-next-line functional/no-let
@@ -175,7 +178,7 @@ export async function init<V extends StateMachine.Transitions>(
     }
     if (handler === undefined) {
       debug(`  No __fallback handler`);
-      return false;
+      return;
     }
 
     // If the `first` option is given, stop executing fns as soon as we get
@@ -244,6 +247,9 @@ export async function init<V extends StateMachine.Transitions>(
   };
 
   return {
+    reset: () => {
+      sm = StateMachine.reset(sm);
+    },
     getValue: () => sm.value,
     run,
     to: (state: StateMachine.StateNames<V>) => {
