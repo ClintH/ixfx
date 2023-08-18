@@ -92,6 +92,11 @@ export const infinity = (): SinceFn => {
  * timer(); // Returns 0..1
  * ```
  *
+ * Note that timer can exceed 1 (100%). To cap it:
+ * ```js
+ * Elapsed.progress(1000, { clampValue: true });
+ * ```
+ *
  * Takes an {@link Interval} for more expressive time:
  * ```js
  * const timer = Elapsed.progress({ mins: 4 });
@@ -100,10 +105,17 @@ export const infinity = (): SinceFn => {
  * @param totalMs
  * @returns
  */
-export function progress(duration: Interval): () => number {
+export function progress(
+  duration: Interval,
+  opts: { readonly clampValue?: boolean } = {}
+): () => number {
   const totalMs = intervalToMs(duration);
   if (!totalMs) throw new Error(`duration invalid`);
-  const t = relativeTimer(totalMs, { timer: msElapsedTimer() });
+  const timerOpts = {
+    ...opts,
+    timer: msElapsedTimer(),
+  };
+  const t = relativeTimer(totalMs, timerOpts);
   return () => t.elapsed;
 }
 
@@ -119,12 +131,13 @@ export const toString = (millisOrFn: number | SinceFn | Interval): string => {
   } else if (typeof millisOrFn === `object`) {
     interval = intervalToMs(interval)!;
   }
+
   //eslint-disable-next-line functional/no-let
   let ms = intervalToMs(interval);
-  if (!ms) return '(undefined)';
+  if (typeof ms === 'undefined') return '(undefined)';
   if (ms < 1000) return `${ms}ms`;
   ms /= 1000;
-  if (ms < 120) return `${ms.toFixed(2)}secs`;
+  if (ms < 120) return `${ms.toFixed(1)}secs`;
   ms /= 60;
   if (ms < 60) return `${ms.toFixed(2)}mins`;
   ms /= 60;
