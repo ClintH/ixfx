@@ -19,11 +19,14 @@
 <h1>Function progress</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="progress"><span class="tsd-kind-call-signature">progress</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">duration</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><a href="#progress" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="progress"><span class="tsd-kind-call-signature">progress</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">duration</span>, <span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><a href="#progress" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns a function that returns the percentage of timer completion.
 Starts timing immediately.</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">timer</span><span class="hl-2"> = </span><span class="hl-3">Elapsed</span><span class="hl-2">.</span><span class="hl-8">progress</span><span class="hl-2">(</span><span class="hl-7">1000</span><span class="hl-2">);</span><br/><span class="hl-8">timer</span><span class="hl-2">(); </span><span class="hl-0">// Returns 0..1</span>
+</code><button>Copy</button></pre>
+<p>Note that timer can exceed 1 (100%). To cap it:</p>
+<pre><code class="language-js"><span class="hl-3">Elapsed</span><span class="hl-2">.</span><span class="hl-8">progress</span><span class="hl-2">(</span><span class="hl-7">1000</span><span class="hl-2">, { </span><span class="hl-3">clampValue:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> });</span>
 </code><button>Copy</button></pre>
 <p>Takes an <a href="../types/Flow.Interval.html" class="tsd-kind-type-alias">Interval</a> for more expressive time:</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">timer</span><span class="hl-2"> = </span><span class="hl-3">Elapsed</span><span class="hl-2">.</span><span class="hl-8">progress</span><span class="hl-2">({ </span><span class="hl-3">mins:</span><span class="hl-2"> </span><span class="hl-7">4</span><span class="hl-2"> });</span>
@@ -34,7 +37,12 @@ Starts timing immediately.</p>
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">duration</span>: <a href="../types/Flow.Interval.html" class="tsd-signature-type tsd-kind-type-alias">Interval</a></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">duration</span>: <a href="../types/Flow.Interval.html" class="tsd-signature-type tsd-kind-type-alias">Interval</a></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">opts</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">clampValue</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = {}</span></h5>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">clamp<wbr/>Value</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5></li></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span></h4>
 <ul class="tsd-parameters">
 <li class="tsd-parameter-signature">
