@@ -566,12 +566,12 @@ export const adsr = (opts: EnvelopeOpts): Adsr => new AdsrImpl(opts);
  */
 export async function* adsrIterable(
   opts: AdsrIterableOpts
-): AsyncIterable<number> {
+): AsyncGenerator<number> {
   const env = adsr(opts.env);
   const sampleRateMs = opts.sampleRateMs ?? 100;
   env.trigger();
 
-  yield* interval<number>(
+  for await (const v of interval<number>(
     () => {
       if (env.isDone) return;
       return env.value;
@@ -580,7 +580,9 @@ export async function* adsrIterable(
       fixed: sampleRateMs,
       signal: opts.signal,
     }
-  );
+  )) {
+    yield v;
+  }
 }
 
 export type AdsrIterableOpts = {
