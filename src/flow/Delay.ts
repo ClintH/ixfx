@@ -12,7 +12,7 @@ export type DelayOpts = Interval & {
   /**
    * When delay is applied. "before" is default.
    */
-  readonly delay: 'before' | 'after' | 'both';
+  readonly delay?: 'before' | 'after' | 'both';
 };
 
 /**
@@ -63,8 +63,10 @@ export type DelayOpts = Interval & {
 export const delay = async <V>(
   callback: () => Promise<V>,
   //eslint-disable-next-line functional/prefer-immutable-types
-  opts: DelayOpts
+  optsOrMillis: DelayOpts | number
 ): Promise<V> => {
+  const opts =
+    typeof optsOrMillis === 'number' ? { millis: optsOrMillis } : optsOrMillis;
   const delayWhen = opts.delay ?? 'before';
   if (delayWhen === `before` || delayWhen === `both`) {
     await sleep(opts);
