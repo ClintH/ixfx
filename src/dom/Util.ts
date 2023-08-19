@@ -746,174 +746,6 @@ export const createIn = (
 };
 
 /**
- * Creates a table based on a list of objects
- * ```
- * const t = dataTableList(parentEl, map);
- *
- * t(newMap)
- * ```
- */
-export const dataTableList = (
-  parentOrQuery: Readonly<HTMLElement | string>,
-  data: ReadonlyMap<string, object>
-): ((data: ReadonlyMap<string, object>) => void) => {
-  const parent = resolveEl(parentOrQuery);
-
-  const update = (data: ReadonlyMap<string, object>) => {
-    const seenTables = new Set();
-
-    for (const [key, value] of data) {
-      const tKey = `table-${key}`;
-      seenTables.add(tKey);
-      //eslint-disable-next-line functional/no-let
-      let t = parent.querySelector(`#${tKey}`);
-      if (t === null) {
-        t = document.createElement(`table`);
-        //eslint-disable-next-line functional/immutable-data
-        t.id = tKey;
-        parent.append(t);
-      }
-
-      updateDataTable(t as HTMLTableElement, value);
-    }
-
-    // Remove tables that aren't present in map
-    const tables = Array.from(parent.querySelectorAll(`table`));
-    tables.forEach((t) => {
-      if (!seenTables.has(t.id)) {
-        t.remove();
-      }
-    });
-  };
-
-  if (data) update(data);
-
-  return (d: ReadonlyMap<string, object>) => {
-    update(d);
-  };
-};
-
-/**
- * Format data. Return _undefined_ to signal that
- * data was not handled.
- */
-export type DataFormatter = (data: object, path: string) => string | undefined;
-
-/**
- * Updates a TABLE elment based on `data`'s key-object pairs
- * @param t
- * @param data
- * @returns
- */
-const updateDataTable = (
-  //eslint-disable-next-line functional/prefer-immutable-types
-  t: HTMLTableElement,
-  data: object,
-  opts: DataTableOpts = {}
-) => {
-  const precision = opts.precision ?? 2;
-
-  if (data === undefined) {
-    //eslint-disable-next-line functional/immutable-data
-    t.innerHTML = ``;
-    return;
-  }
-  const seenRows = new Set();
-
-  for (const [key, value] of Object.entries(data)) {
-    const domKey = `row-${key}`;
-    seenRows.add(domKey);
-
-    //eslint-disable-next-line functional/no-let
-    let rowEl = t.querySelector(`#${domKey}`);
-    if (rowEl === null) {
-      rowEl = document.createElement(`tr`);
-      t.append(rowEl);
-      //eslint-disable-next-line functional/immutable-data
-      rowEl.id = domKey;
-
-      const keyEl = document.createElement(`td`);
-      //eslint-disable-next-line functional/immutable-data
-      keyEl.innerText = key;
-      rowEl.append(keyEl);
-    }
-
-    //eslint-disable-next-line functional/no-let
-    let valEl = rowEl.querySelector(`#${domKey}-val`);
-
-    if (valEl === null) {
-      valEl = document.createElement(`td`);
-      //eslint-disable-next-line functional/immutable-data
-      valEl.id = `${domKey}-val`;
-      rowEl.append(valEl);
-    }
-
-    //eslint-disable-next-line functional/no-let
-    let valueHTML: string | undefined;
-    if (opts.formatter) {
-      valueHTML = opts.formatter(value, key);
-    }
-
-    // If there's no formatter, or not handled...
-    if (valueHTML === undefined) {
-      if (typeof value === `object`) {
-        valueHTML = JSON5.stringify(value);
-      } else if (typeof value === `number`) {
-        if (opts.roundNumbers) {
-          valueHTML = Math.round(value).toString();
-        } else {
-          valueHTML = value.toFixed(precision);
-        }
-      } else {
-        valueHTML = (value as object).toString();
-      }
-    }
-    //eslint-disable-next-line functional/immutable-data
-    (valEl as HTMLElement).innerHTML = valueHTML;
-  }
-
-  // Remove rows that aren't present in data
-  const rows = Array.from(t.querySelectorAll(`tr`));
-  rows.forEach((r) => {
-    if (!seenRows.has(r.id)) {
-      r.remove();
-    }
-  });
-};
-
-export type DataTableOpts = {
-  readonly formatter?: DataFormatter;
-  readonly precision?: number;
-  readonly roundNumbers?: boolean;
-};
-/**
- * Creates a HTML table where each row is a key-value pair from `data`.
- * First column is the key, second column data.
- *
- * ```js
- * const dt = dataTable(`#hostDiv`);
- * dt({
- *  name: `Blerg`,
- *  height: 120
- * });
- * ```
- */
-export const dataTable = (
-  parentOrQuery: Readonly<HTMLElement | string>,
-  data?: object,
-  opts?: DataTableOpts
-): ((data: object) => void) => {
-  const parent = resolveEl(parentOrQuery);
-  const t = document.createElement(`table`);
-  parent.append(t);
-
-  if (data) updateDataTable(t, data, opts);
-  return (d: object) => {
-    updateDataTable(t, d, opts);
-  };
-};
-
-/**
  * Remove all child nodes from `parent`
  * @param parent
  */
@@ -1020,12 +852,14 @@ export const copyToClipboard = (obj: object) => {
 
 export type CreateUpdateElement<V> = (
   item: V,
-  el: Readonly<HTMLElement | null>
+  //eslint-disable-next-line functional/prefer-readonly-type
+  el: HTMLElement | null
 ) => HTMLElement;
 
 export const reconcileChildren = <V>(
   parentEl: HTMLElement,
-  list: ReadonlyMap<string, V>,
+  //eslint-disable-next-line functional/prefer-readonly-type
+  list: Map<string, V>,
   createUpdate: CreateUpdateElement<V>
 ) => {
   if (parentEl === null) throw new Error(`parentEl is null`);
