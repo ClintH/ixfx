@@ -219,8 +219,7 @@ export * as Visual from './visual/index.js';
  * * {@link pointerVisualise}: Shows pointer events for debugging purposes
  *
  * Components
- * * {@link dataTable}: Creates a HTML table from an object
- * * {@link dataTableList}: Create a list of tables from a Map of data
+ * * {@link DataTable}: Creates a HTML table from an object/map of objects
  * * {@link log}: log to DOM
  * * {@link rx}: keep track of event data
  *

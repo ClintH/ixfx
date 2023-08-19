@@ -1,5 +1,9 @@
 A rough changelog between NPM releases
 
+# 0.10.1 19.08.23
+
+Small fixes
+
 # 0.10.0 17.08.23
 
 Flow/
