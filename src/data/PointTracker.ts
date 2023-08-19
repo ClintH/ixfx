@@ -295,7 +295,7 @@ export const pointsTracker = (opts: TrackOpts = {}) =>
  * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
  * track the pointer as it moves until pointerup.
  *
- * [See the point tracker playground](https://clinth.github.io/ixfx-demos/playgrounds/data/point-tracker/)
+ * [See the point tracker playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
  *
  * ```js
  * import { pointTracker } from 'https://unpkg.com/ixfx/dist/data.js';
