@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -109,7 +109,7 @@
     "rxjs": "^7.8.0"
   },
   "engines": {
-    "node": ">=17.0.1"
+    "node": ">=16.20.0"
   },
   "eslintIgnore": [
     "./dist/**/*"

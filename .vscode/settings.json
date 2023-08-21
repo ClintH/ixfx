@@ -8,5 +8,16 @@
     "**/docs": true
   },
   "files.eol": "\n",
-  "prettier.prettierPath": "node_modules/prettier/index.cjs"
+  "prettier.prettierPath": "node_modules/prettier/index.cjs",
+  "cSpell.words": [
+    "bezier",
+    "color",
+    "copyfiles",
+    "espruino",
+    "svgdotjs",
+    "tsup",
+    "tsutils",
+    "typecheck",
+    "webtreemap"
+  ]
 }
