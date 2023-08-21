@@ -53,7 +53,7 @@ export type Constraints = {
 /**
  * Result from starting a camera
  */
-//eslint-disable-next-line functional/no-mixed-type
+//eslint-disable-next-line functional/no-mixed-types
 export type StartResult = {
   /**
    * Call dispose to stop the camera feed and remove any created resources,
@@ -176,12 +176,12 @@ const startWithVideoEl = async (
   };
 
   // Just in case some intuitive values are passed in...
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((constraints as any).facingMode === `front`)
+  if ((constraints as any).facingMode === `front`) {
     constraints = { ...constraints, facingMode: `user` };
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((constraints as any).facingMode === `back`)
+  }
+  if ((constraints as any).facingMode === `back`) {
     constraints = { ...constraints, facingMode: `environment` };
+  }
 
   if (constraints.facingMode) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any

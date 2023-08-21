@@ -100,6 +100,7 @@ export async function* frames(
   // TODO: When ImageBitmap has possibility to get pixels, that might also help to avoid having to write to hidden canvas
 
   const maxIntervalMs = opts.maxIntervalMs ?? 0;
+  
   const showCanvas = opts.showCanvas ?? false;
   //eslint-disable-next-line functional/no-let
   let canvasEl = opts.canvasEl;
