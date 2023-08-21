@@ -892,3 +892,69 @@ export const reconcileChildren = <V>(
 
   prune.forEach((p) => p.remove());
 };
+
+/**
+ * Adds `cssClass` to element(s) if `value` is true.
+ * ```js
+ * setClass(`#someId`, true, `activated`);
+ * ```
+ * @param query 
+ * @param value 
+ * @param cssClass 
+ * @returns 
+ */
+export const setCssClass = (selectors:string, value:boolean, cssClass:string) => {
+  const elements = Array.from(document.querySelectorAll(selectors));
+
+  if (!elements) return;
+
+  for (const element of elements) {
+    if (value) element.classList.add(cssClass);
+    else element.classList.remove(cssClass);
+  }
+};
+
+export const setCssDisplay = (selectors:string, value:string) => {
+  const elements = Array.from(document.querySelectorAll(selectors));
+  if (!elements) return;
+  for (const element of elements) {
+    //eslint-disable-next-line functional/immutable-data
+    (element as HTMLElement).style.display = value;
+  }
+};
+
+export const byId = <V extends HTMLElement>(id:string):HTMLElement => {
+  const element = document.getElementById(id);
+  return element as V;
+}
+
+export const setHtml = (selectors:string, value:string|number) => {
+  const elements = Array.from(document.querySelectorAll(selectors));
+  if (!elements) return;
+  if (typeof value === 'number') {
+    value = value.toString();
+  } 
+  for (const element of elements) {
+    //eslint-disable-next-line functional/immutable-data
+    element.innerHTML = value;
+  }
+};
+
+export const setText = (selectors:string, value:string|number) => {
+  const elements = Array.from(document.querySelectorAll(selectors));
+  if (!elements) return;
+  if (typeof value === 'number') {
+    value = value.toString();
+  } 
+  for (const element of elements) {
+    //eslint-disable-next-line functional/immutable-data
+    element.textContent = value;
+  }
+};
+
+export const el = (selectors:string) => ({
+  text:(value:string|number) => setText(selectors, value),
+  html:(value:string|number) => setHtml(selectors, value),
+  cssDisplay:(value:string) => setCssDisplay(selectors, value),
+  cssClass:(value:boolean, cssClass:string) => setCssClass(selectors, value, cssClass)
+});
