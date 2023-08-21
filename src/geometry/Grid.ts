@@ -1,5 +1,5 @@
 import { Rects, Points } from './index.js';
-import { integer as guardInteger } from '../Guards.js';
+import { integer as guardInteger, number as guardNumber } from '../Guards.js';
 import { clampIndex } from '../data/Clamp.js';
 import { randomElement } from '../collections/Arrays.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
@@ -343,6 +343,7 @@ export const cellAtPoint = (
   position: Points.Point
 ): Cell | undefined => {
   const size = grid.size;
+  guardNumber(size, 'positive', 'grid.size');
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
   const y = Math.floor(position.y / size);

@@ -246,13 +246,13 @@ export const connectBle = async (opts: EspruinoBleOpts = {}) => {
   return d;
 };
 
+export type Events = IoEvents<GenericStateTransitions>;
 /**
  * EspruinoDevice
  *
  * This base interface is implemented by {@link EspruinoBleDevice} and {@link EspruinoSerialDevice}.
  */
-export interface EspruinoDevice
-  extends ISimpleEventEmitter<IoEvents<GenericStateTransitions>> {
+export interface EspruinoDevice extends ISimpleEventEmitter<Events> {
   /**
    * Sends some code to be executed on the Espruino. The result
    * is packaged into JSON and sent back to your code. An exception is
