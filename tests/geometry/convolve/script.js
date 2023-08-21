@@ -78,7 +78,7 @@ const reducer = (values) => {
  */
 const testSourceCopy = async () => {
   for await (const cell of interval(Grids.cells(grid), 20)) {
-    const r = Grids.rectangleForCell(cell, grid);
+    const r = Grids.rectangleForCell(grid, cell);
     const px = imageGrid(cell);//scaleCell(cell));
     const fill = `rgb(${px.r},${px.g},${px.b})`;
     const opts = {stroked:false,fillStyle: fill, filled: true};
@@ -86,7 +86,7 @@ const testSourceCopy = async () => {
     Drawing.rect(destCtx, r, opts);
 
     // Draw magnified
-    const rScaled = Grids.rectangleForCell(cell, gridScaled);
+    const rScaled = Grids.rectangleForCell(gridScaled,cell);
     Drawing.rect(destMagnifiedCtx, rScaled, opts );
   }
 }
@@ -106,7 +106,7 @@ const testConvolveRaw = async () => {
   // For each source cell, compute convolved value
   for await (const [cell, value] of interval(convolve, 10)) {
     // Compute rectangle to fill for this cell
-    const r = Grids.rectangleForCell(cell, grid);
+    const r = Grids.rectangleForCell(grid, cell);
     
     // Create drawing options
     const opts = {
@@ -117,7 +117,7 @@ const testConvolveRaw = async () => {
     Drawing.rect(destCtx, r, opts);
 
     // Magnified version
-    const rScaled = Grids.rectangleForCell(cell, gridScaled);
+    const rScaled = Grids.rectangleForCell(gridScaled, cell);
     Drawing.rect(destMagnifiedCtx, rScaled, opts);
   }
 }
@@ -132,7 +132,7 @@ const testConvolveImage = async () => {
   // For each source cell, compute convolved value
   for await (const [cell, value] of interval(convolve, 10)) {
      // Compute rectangle to fill for this cell
-     const r = Grids.rectangleForCell(cell, grid);
+     const r = Grids.rectangleForCell(grid, cell);
     
      // Create drawing options
      const opts = {
@@ -143,7 +143,7 @@ const testConvolveImage = async () => {
      Drawing.rect(destCtx, r, opts);
  
      // Magnified version
-     const rScaled = Grids.rectangleForCell(cell, gridScaled);
+     const rScaled = Grids.rectangleForCell(gridScaled,cell);
      Drawing.rect(destMagnifiedCtx, rScaled, opts);
   }
 }

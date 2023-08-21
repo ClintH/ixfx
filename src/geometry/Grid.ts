@@ -5,7 +5,7 @@ import { randomElement } from '../collections/Arrays.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
 import { zipKeyValue } from '../collections/map/index.js';
 
-export type GridVisual = {
+export type GridVisual = Grid & {
   readonly size: number;
 };
 
@@ -171,7 +171,10 @@ export const cellKeyString = (v: Cell): string => `Cell{${v.x},${v.y}}`;
  * @param b
  * @returns
  */
-export const cellEquals = (a: Cell, b: Cell): boolean => {
+export const cellEquals = (
+  a: Cell | undefined,
+  b: Cell | undefined
+): boolean => {
   if (b === undefined) return false;
   if (a === undefined) return false;
   return a.x === b.x && a.y === b.y;
@@ -253,7 +256,7 @@ export const inside = (grid: Grid, cell: Cell): boolean => {
  * // 5x5 grid, each cell 5px in size
  * const grid = { rows: 5, cols: 5, size: 5 }
  *
- * const r = rectangleForCell(cell, grid);
+ * const r = rectangleForCell(grid, cell,);
  *
  * // Yields: { x: 5, y: 0, width: 5, height: 5 }
  * ```
@@ -262,8 +265,8 @@ export const inside = (grid: Grid, cell: Cell): boolean => {
  * @return
  */
 export const rectangleForCell = (
-  cell: Cell,
-  grid: Grid & GridVisual
+  grid: GridVisual,
+  cell: Cell
 ): Rects.RectPositioned => {
   guardCell(cell);
   const size = grid.size;
@@ -285,10 +288,10 @@ export const rectangleForCell = (
  * @param grid
  */
 export function* asRectangles(
-  grid: GridVisual & Grid
+  grid: GridVisual
 ): IterableIterator<Rects.RectPositioned> {
   for (const c of cells(grid)) {
-    yield rectangleForCell(c, grid);
+    yield rectangleForCell(grid, c);
   }
 }
 
@@ -339,7 +342,7 @@ export const toArray = <V>(grid: Grid, initialValue?: V): V[][] => {
  * @return Cell at position or undefined if outside of the grid
  */
 export const cellAtPoint = (
-  grid: Grid & GridVisual,
+  grid: GridVisual,
   position: Points.Point
 ): Cell | undefined => {
   const size = grid.size;
@@ -439,10 +442,7 @@ export function* visitNeigbours(
  * @param grid
  * @return
  */
-export const cellMiddle = (
-  cell: Cell,
-  grid: Grid & GridVisual
-): Points.Point => {
+export const cellMiddle = (grid: GridVisual, cell: Cell): Points.Point => {
   guardCell(cell);
 
   const size = grid.size;
@@ -745,7 +745,7 @@ export const visitor = function* (
   guardGrid(grid, `grid`);
   guardCell(start, `start`, grid);
 
-  const v = opts.visited ?? mutable<Cell>((c) => cellKeyString(c));
+  const v = opts.visited ?? mutable<Cell>(cellKeyString);
   const possibleNeighbours = logic.options
     ? logic.options
     : (g: Grid, c: Cell) => neighbourList(g, c, crossDirections, `undefined`);
@@ -1136,7 +1136,7 @@ export const access1dArray = <V>(
  * @returns
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const array2dUpdater = <V>(grid: Grid & GridVisual, array: V[][]) => {
+export const array2dUpdater = <V>(grid: GridVisual, array: V[][]) => {
   const fn = (v: V, position: Points.Point) => {
     const pos = cellAtPoint(grid, position);
     if (pos === undefined) {
