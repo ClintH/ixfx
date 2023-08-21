@@ -1,5 +1,5 @@
 import { type EitherKey } from '../index.js';
-import { add, del } from './MapImmutableFns.js';
+import { add, del, set } from './MapImmutableFns.js';
 
 /**
  * An immutable map. Rather than changing the map, functions like `add` and `delete`
@@ -50,6 +50,15 @@ export interface IMapImmutable<K, V> {
    * @param key
    */
   get(key: K): V | undefined;
+
+  /**
+   * Sets `key` to be `value`, overwriting anything existing.
+   * Returns a new map with added key.
+   * @param key
+   * @param value
+   */
+  set(key: K, value: V): IMapImmutable<K, V>;
+
   /**
    * Returns _true_ if map contains `key`
    * @example
@@ -85,7 +94,7 @@ export interface IMapImmutable<K, V> {
  * // Creating
  * let m = map();
  * // Add
- * m = m.add(["name", "sally"]);
+ * m = m.set("name", "sally");
  * // Recall
  * m.get("name");
  * ```
@@ -101,8 +110,11 @@ export interface IMapImmutable<K, V> {
  * ```js
  * // Create
  * let m = map();
- * // Add
+ * // Add as array or key & value pair
  * m = m.add(["name" , "sally"]);
+ * m = m.add({ key: "name", value: "sally" });
+ * // Add using the more typical set
+ * m = m.set("name", "sally");
  * m.get("name");   // "sally";
  * m.has("age");    // false
  * m.has("name");   // true
@@ -124,6 +136,10 @@ export const immutable = <K, V>(
   return {
     add: (...itemsToAdd: EitherKey<K, V>) => {
       const s = add(data, ...itemsToAdd);
+      return immutable(s);
+    },
+    set: (key: K, value: V) => {
+      const s = set(data, key, value);
       return immutable(s);
     },
     get: (key: K) => data.get(key),
