@@ -210,7 +210,7 @@ async function* delayAnimationLoop() {
 //eslint-disable-next-line func-style
 export async function* delayLoop(timeout: Interval) {
   const timeoutMs = intervalToMs(timeout);
-  if (!timeoutMs) throw new Error(`timeout is undefined`);
+  if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);
   if (timeoutMs < 0) throw new Error('Timeout is less than zero');
   if (timeoutMs === 0) return yield* delayAnimationLoop();
 
