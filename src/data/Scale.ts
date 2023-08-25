@@ -44,7 +44,7 @@ export const scale = (
   outMin?: number,
   outMax?: number,
   easing?: (v: number) => number
-): number => scaleFn(inMin, inMax, outMin, outMax, easing)(v);
+): number => scaler(inMin, inMax, outMin, outMax, easing)(v);
 
 /**
  * Returns a scaling function
@@ -55,23 +55,24 @@ export const scale = (
  * @param easing Easing function
  * @returns
  */
-export const scaleFn = (
+export const scaler = (
   inMin: number,
   inMax: number,
   outMin?: number,
   outMax?: number,
   easing?: (v: number) => number
 ): ((v: number) => number) => {
-  if (outMax === undefined) outMax = 1;
-  if (outMin === undefined) outMin = 0;
+
+  const oMax = outMax ?? 1;
+  const oMin = outMin ?? 0;
 
   return (v: number): number => {
-    if (inMin === inMax) return outMax!;
+    if (inMin === inMax) return oMax;
 
     //eslint-disable-next-line functional/no-let
     let a = (v - inMin) / (inMax - inMin);
     if (easing !== undefined) a = easing(a);
-    return a * (outMax! - outMin!) + outMin!;
+    return a * (oMax - oMin) + oMin;
   };
 };
 
@@ -135,7 +136,7 @@ export const scaleClamped = (
 export const scalePercentages = (
   percentage: number,
   outMin: number,
-  outMax: number = 1
+  outMax = 1
 ): number => {
   throwFromResult(numberTest(percentage, `percentage`, `v`));
   throwFromResult(numberTest(outMin, `percentage`, `outMin`));
@@ -151,7 +152,7 @@ export const scalePercentages = (
  * scalePercent(0.5, 10, 20); // 15
  * ```
  *
- * @see {@link scalePercentFn} Returns a function
+ * @see {@link scalerPercent} Returns a function
  * @param v Value to scale
  * @param outMin Minimum for output
  * @param outMax Maximum for output
@@ -161,7 +162,7 @@ export const scalePercent = (
   v: number,
   outMin: number,
   outMax: number
-): number => scalePercentFn(outMin, outMax)(v);
+): number => scalerPercent(outMin, outMax)(v);
 
 /**
  * Returns a function that scales an input percentage value to an output range
@@ -170,7 +171,7 @@ export const scalePercent = (
  * @param outMax
  * @returns Function that takes a single argument
  */
-export const scalePercentFn = (outMin: number, outMax: number) => {
+export const scalerPercent = (outMin: number, outMax: number) => {
   return (v: number) => {
     throwFromResult(numberTest(v, `percentage`, `v`));
     return scale(v, 0, 1, outMin, outMax);
