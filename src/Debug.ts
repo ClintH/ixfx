@@ -1,19 +1,22 @@
 import { getOrGenerateSync } from './collections/map/index.js';
 import { goldenAngleColour } from './visual/Colour.js';
 
-export type LogKind = 'info' | 'debug' | 'error' | 'warn';
-export type LogMsg = {
+export type LogKind = `info` | `debug` | `error` | `warn`;
+export interface LogMessage {
   readonly kind?: LogKind;
   readonly msg: any;
   readonly category?: string;
-};
+}
 
-export type LogFn = (msg: LogMsg | string) => void;
+export type MessageLogger = (message: LogMessage | string) => void;
+
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+//export type MessageLogger = (m: any) => void;
 
 /**
  * Either a flag for default console logging, or a simple log function
  */
-export type LogOption = boolean | LogFn;
+export type LogOption = boolean | MessageLogger;
 
 /**
  * Resolve a LogOption to a function
@@ -23,36 +26,40 @@ export type LogOption = boolean | LogFn;
 export const resolveLogOption = (
   l?: LogOption,
   defaults: { readonly category?: string; readonly kind?: string } = {}
-): LogFn => {
-  if (typeof l === 'undefined' || (typeof l === 'boolean' && l === false)) {
-    return (_: LogMsg | string) => {
+): MessageLogger => {
+  if (l === undefined || (typeof l === `boolean` && !l)) {
+    return (_: LogMessage | string) => {
       /** no-op */
     };
   }
-  const defaultCat = defaults.category ?? '';
+  const defaultCat = defaults.category ?? ``;
   const defaultKind = defaults.kind ?? undefined;
 
-  if (typeof l === 'boolean' && l === true) {
-    return (msgOrString: LogMsg | string) => {
+  if (typeof l === `boolean`) {
+    return (messageOrString: LogMessage | string) => {
       const m =
-        typeof msgOrString === 'string' ? { msg: msgOrString } : msgOrString;
+        typeof messageOrString === `string` ? { msg: messageOrString } : messageOrString;
       const kind = m.kind ?? defaultKind;
       const category = m.category ?? defaultCat;
       //eslint-disable-next-line functional/no-let
-      let msg = m.msg;
-      if (category) msg = `[${category}] ${msg}`;
+      let message = m.msg;
+      if (category) message = `[${ category }] ${ message }`;
       switch (kind) {
-        case 'error':
-          console.error(msg);
+        case `error`: {
+          console.error(message);
           break;
-        case `warn`:
-          console.warn(msg);
+        }
+        case `warn`: {
+          console.warn(message);
           break;
-        case `info`:
-          console.info(msg);
+        }
+        case `info`: {
+          console.info(message);
           break;
-        default:
-          console.log(msg);
+        }
+        default: {
+          console.log(message);
+        }
       }
     };
   }
@@ -95,25 +102,24 @@ export const logSet = (prefix: string, verbose = true, colourKey?: string) => {
       warn: logger(prefix, `warn`, colourKey),
       error: logger(prefix, `error`, colourKey),
     };
-  } else {
-    return {
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      log: (_: any) => {
-        /** no-op */
-      },
-      warn: logger(prefix, `warn`, colourKey),
-      error: logger(prefix, `error`, colourKey),
-    };
   }
+  return {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    log: (_: any) => {
+      /** no-op */
+    },
+    warn: logger(prefix, `warn`, colourKey),
+    error: logger(prefix, `error`, colourKey),
+  };
+
 };
 
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Logger = (m: any) => void;
-export type LogSet = {
-  readonly log: Logger;
-  readonly warn: Logger;
-  readonly error: Logger;
-};
+
+export interface LogSet {
+  readonly log: MessageLogger;
+  readonly warn: MessageLogger;
+  readonly error: MessageLogger;
+}
 
 /**
  * Returns a console logging function which prefixes messages. This is
@@ -153,30 +159,33 @@ export const logger =
     prefix: string,
     kind: `log` | `warn` | `error` = `log`,
     colourKey?: string
-  ): Logger =>
-  (m: any) => {
-    if (m === undefined) {
-      m = `(undefined)`;
-    } else if (typeof m === `object`) {
-      m = JSON.stringify(m);
-    }
+  ): MessageLogger =>
+    (m: any) => {
+      if (m === undefined) {
+        m = `(undefined)`;
+      } else if (typeof m === `object`) {
+        m = JSON.stringify(m);
+      }
 
-    const colour = colourKey ?? prefix;
-    switch (kind) {
-      case `log`:
-        console.log(`%c${prefix} ${m}`, `color: ${logColours(colour)}`);
-        break;
-      case `warn`:
-        console.warn(prefix, m);
-        break;
-      case `error`:
-        console.error(prefix, m);
-        break;
-    }
-  };
+      const colour = colourKey ?? prefix;
+      switch (kind) {
+        case `log`: {
+          console.log(`%c${ prefix } ${ m }`, `color: ${ logColours(colour) }`);
+          break;
+        }
+        case `warn`: {
+          console.warn(prefix, m);
+          break;
+        }
+        case `error`: {
+          console.error(prefix, m);
+          break;
+        }
+      }
+    };
 
-export const getErrorMessage = (ex: Error | unknown): string => {
-  if (typeof ex === 'string') return ex;
+export const getErrorMessage = (ex: unknown): string => {
+  if (typeof ex === `string`) return ex;
   if (ex instanceof Error) {
     return ex.message;
   }

@@ -51,19 +51,19 @@ export const averageWeighted = (
  * // Yields: { name: 'john', x: 20, y: 40 }
  * ```
  * @param obj 
- * @param fn 
+ * @param apply 
  * @returns 
  */
-export const applyToValues = <T extends Record<string, any>>(obj: T, fn: (v: number) => number): T => {
-  const o: T = { ...obj };
-  for (const [ key, value ] of Object.entries(obj)) {
+export const applyToValues = <T extends Record<string, any>>(object: T, apply: (v: number) => number): T => {
+  const o: T = { ...object };
+  for (const [ key, value ] of Object.entries(object)) {
     if (typeof value === `number`) {
       // Run number through function
       //eslint-disable-next-line functional/immutable-data
-      (o as any)[ key ] = fn(value);
+      (o as any)[ key ] = apply(value);
     } else {
       // Copy value
-      //eslint-disable-next-line functional/immutable-data
+      //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-unsafe-assignment
       (o as any)[ key ] = value;
     }
   }

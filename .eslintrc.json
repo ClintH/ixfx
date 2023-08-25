@@ -29,11 +29,26 @@
     "unicorn/consistent-function-scoping": "off",
     "unicorn/filename-case": ["error", {"case":"pascalCase"}],
     "unicorn/require-post-message-target-origin": "off",
+    "unicorn/prevent-abbreviations": ["error", {
+      "ignore": [
+        ".*Opts$"
+      ],
+      "allowList":{"args":true}}],
     "@typescript-eslint/ban-ts-comment": ["off"],
     "@typescript-eslint/array-type": ["error", { "default":"generic" }],
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unsafe-assignment":"off",
     "@typescript-eslint/no-unnecessary-condition": ["error", {"allowConstantLoopConditions":true}],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
     "functional/no-conditional-statements": "off",
     "functional/no-let": ["error", {"allowInFunctions":true}],
     "functional/no-throw-statements": ["off"],

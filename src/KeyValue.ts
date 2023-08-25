@@ -47,14 +47,14 @@ export const getSorter = (sortStyle: `value` | `valueReverse` | `key` | `keyReve
       return sortByKey(true);
     }
     default: {
-      throw new Error(`Unknown sorting value '${ sortStyle }'. Expecting: value, valueReverse, key or keyReverse`);
+      throw new Error(`Unknown sorting value '${ (sortStyle as string) }'. Expecting: value, valueReverse, key or keyReverse`);
     }
   }
 };
 
 
 export const minMaxAvg = (entries: ReadonlyArray<KeyValue>, conversionFunction?: (v: KeyValue) => number) => {
-  if (conversionFunction === undefined) conversionFunction = (v: KeyValue) => v[ 1 ] as number;
-  const values = entries.map<number>(conversionFunction);
+  const converter = conversionFunction ?? ((v: KeyValue) => v[ 1 ] as number);
+  const values = entries.map<number>(entry => converter(entry));
   return arrayMinMaxAg(values);
 };

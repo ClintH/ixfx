@@ -1,8 +1,8 @@
-/* eslint-disable */
+
 import type { ISimpleEventEmitter, Listener } from './ISimpleEventEmitter.js';
 import { ofSimpleMutable } from './collections/map/MapOfSimpleMutable.js';
 
-export type { ISimpleEventEmitter, Listener };
+
 // type FlowSource = {
 //   name:string,
 //   dispose():void,
@@ -63,7 +63,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @param args Arguments for event
    * @returns
    */
-  protected fireEvent<K extends keyof Events>(type: K, args: Events[K]) {
+  protected fireEvent<K extends keyof Events>(type: K, args: Events[ K ]) {
     const listeners = this.#listeners.get(type as string);
     //console.log(`Firing ${type as string}`);
     for (const l of listeners) {
@@ -81,7 +81,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    */
   addEventListener<K extends keyof Events>(
     type: K,
-    listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void
+    listener: (event: Events[ K ], sender: SimpleEventEmitter<Events>) => void
   ): void {
     // (this: any, ev: Events[K]) => any): void {
     this.#listeners.addKeyedValues(
@@ -98,7 +98,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    */
   removeEventListener<K extends keyof Events>(
     type: K,
-    listener: (ev: Events[K], sender: SimpleEventEmitter<Events>) => void
+    listener: (event: Events[ K ], sender: SimpleEventEmitter<Events>) => void
   ) {
     // listener: Listener<Events>): void {
     this.#listeners.deleteKeyValue(
@@ -182,3 +182,5 @@ export interface WebSocketEventListenerMap {
   open: (event: Event) => void | {handleEvent: (event: Event) => void};
 }
 */
+
+export { type ISimpleEventEmitter, type Listener } from './ISimpleEventEmitter.js';

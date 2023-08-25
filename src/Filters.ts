@@ -10,7 +10,7 @@ export const rangeInclusive = (min: number, max: number) => {
   };
 };
 
-export const filter = <V>(v: V, fn: (v: V) => boolean, skipValue: V | undefined): V | undefined => {
-  if (fn(v)) return v;
+export const filter = <V>(v: V, predicate: (v: V) => boolean, skipValue: V | undefined): V | undefined => {
+  if (predicate(v)) return v;
   return skipValue;
 };

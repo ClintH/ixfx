@@ -345,7 +345,7 @@ export const splitRanges = (
   const ranges: Array<Range> = [];
   //eslint-disable-next-line functional/no-let
   let index = 0;
-  //eslint-disable-next-line functional/no-let
+  //eslint-disable-next-line functional/no-let,unicorn/prevent-abbreviations
   for (let i = 0; i < source.length; i++) {
     if (source.indexOf(split, i) === i) {
       //eslint-disable-next-line functional/no-let

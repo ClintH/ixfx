@@ -31,7 +31,7 @@ export async function* chunks<V>(it: Iterable<V>, size: number) {
  * @param its
  */
 //eslint-disable-next-line func-style
-export async function* concat<V>(...its: readonly Iterable<V>[]) {
+export async function* concat<V>(...its: ReadonlyArray<Iterable<V>>) {
   // Source: https://surma.github.io/underdash/
   for await (const it of its) yield* it;
 }
@@ -71,21 +71,21 @@ export async function* dropWhile<V>(
  */
 //eslint-disable-next-line func-style
 export async function equals<V>(
-  it1: Iterable<V>,
-  it2: Iterable<V>,
+  it1: AsyncIterable<V>,
+  it2: AsyncIterable<V>,
   equality?: IsEqual<V>
 ) {
   // https://surma.github.io/underdash/
-  const iit1 = it1[Symbol.iterator]();
-  const iit2 = it2[Symbol.iterator]();
+  const iit1 = it1[ Symbol.asyncIterator ]();// it1[ Symbol.iterator ]();
+  const iit2 = it2[ Symbol.asyncIterator ]();
   //eslint-disable-next-line no-constant-condition
   while (true) {
-    const i1 = await iit1.next(),
-      i2 = await iit2.next();
+    const index1 = await iit1.next();
+    const index2 = await iit2.next();
     if (equality !== undefined) {
-      if (!equality(i1.value, i2.value)) return false;
-    } else if (i1.value !== i2.value) return false;
-    if (i1.done || i2.done) return i1.done && i2.done;
+      if (!equality(index1.value, index2.value)) return false;
+    } else if (index1.value !== index2.value) return false;
+    if (index1.done ?? index2.done) return index1.done && index2.done;
   }
 }
 
@@ -118,6 +118,8 @@ export async function every<V>(it: Iterable<V>, f: (v: V) => boolean) {
 //eslint-disable-next-line func-style
 export async function* fill<V>(it: AsyncIterable<V>, v: V) {
   // https://surma.github.io/underdash/
+
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   for await (const _ of it) yield v;
 }
 
@@ -172,7 +174,7 @@ export async function* flatten<V>(it: AsyncIterable<V>) {
   for await (const v of it) {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (Symbol.asyncIterator in (v as any)) {
-      // @ts-ignore
+      // @ts-expect-error
       yield* v;
     } else {
       yield v;
@@ -279,11 +281,11 @@ export async function min<V>(it: AsyncIterable<V>, gt = (a: V, b: V) => a > b) {
  * @param start
  * @param len
  */
-//eslint-disable-next-line func-style
-export async function* range(start: number, len: number) {
+//eslint-disable-next-line func-style,@typescript-eslint/require-await
+export async function* range(start: number, length: number) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < len; i++) {
+  for (let index = 0; index < length; index++) {
     yield start++;
   }
   //for (let i=len;len > 0; len--) yield start++;
@@ -303,7 +305,7 @@ export async function* range(start: number, len: number) {
 //eslint-disable-next-line func-style
 export async function reduce<V>(
   it: AsyncIterable<V>,
-  f: (acc: V, current: V) => V,
+  f: (accumulator: V, current: V) => V,
   start: V
 ) {
   // https://surma.github.io/underdash/
@@ -325,7 +327,7 @@ export async function* slice<V>(
   end = Number.POSITIVE_INFINITY
 ) {
   // https://surma.github.io/underdash/
-  const iit = it[Symbol.asyncIterator]();
+  const iit = it[ Symbol.asyncIterator ]();
 
   for (; start > 0; start--, end--) await iit.next();
 
@@ -399,17 +401,17 @@ export async function* takeWhile<V>(
 //eslint-disable-next-line func-style
 export async function toArray<V>(
   it: AsyncIterable<V>,
-  count = Infinity
-): Promise<readonly V[]> {
+  count = Number.POSITIVE_INFINITY
+): Promise<ReadonlyArray<V>> {
   // https://2ality.com/2016/10/asynchronous-iteration.html
   const result = [];
-  const iterator = it[Symbol.asyncIterator]();
+  const iterator = it[ Symbol.asyncIterator ]();
 
   while (result.length < count) {
-    const { value, done } = await iterator.next();
-    if (done) break;
+    const r = await iterator.next();
+    if (r.done) break;
     //eslint-disable-next-line functional/immutable-data
-    result.push(value);
+    result.push(r.value);
   }
   return result;
 }
@@ -428,11 +430,11 @@ export async function* unique<V>(
   f: (id: V) => V = (id) => id
 ) {
   // https://surma.github.io/underdash/
-  const buffer = [];
+  const buffer: Array<V> = [];
 
   for await (const v of it) {
     const fv = f(v);
-    if (buffer.indexOf(fv) !== -1) continue;
+    if (buffer.includes(fv)) continue;
     //eslint-disable-next-line functional/immutable-data
     buffer.push(fv);
     yield v;
@@ -449,13 +451,13 @@ export async function* unique<V>(
  * @returns
  */
 //eslint-disable-next-line func-style
-export async function* zip<V>(...its: readonly AsyncIterable<V>[]) {
+export async function* zip<V>(...its: ReadonlyArray<AsyncIterable<V>>) {
   // https://surma.github.io/underdash/
-  const iits = its.map((it) => it[Symbol.asyncIterator]());
+  const iits = its.map((it) => it[ Symbol.asyncIterator ]());
 
   while (true) {
     const vs = await Promise.all(iits.map((it) => it.next()));
     if (vs.some((v) => v.done)) return;
-    yield vs.map((v) => v.value);
+    yield vs.map((v) => v.value as V);
   }
 }

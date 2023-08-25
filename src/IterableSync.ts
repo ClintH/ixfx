@@ -38,10 +38,11 @@ import { type IsEqual, type ToString, toStringDefault } from './Util.js';
  */
 export function yieldNumber(
   generator: Generator<number>,
-  defaultValue = undefined
+  defaultValue?: number
 ) {
-  return () => {
-    const v = generator.next().value;
+
+  return (): number | undefined => {
+    const v: number | undefined = generator.next().value as number | undefined;
     if (v === undefined) return defaultValue;
     return v;
   };
@@ -54,8 +55,8 @@ export function yieldNumber(
  * @returns
  */
 export function first<V>(it: Iterable<V>): V | undefined {
-  for (const val of it) {
-    return val;
+  for (const value of it) {
+    return value;
   }
 }
 
@@ -66,11 +67,11 @@ export function first<V>(it: Iterable<V>): V | undefined {
  */
 export function last<V>(it: Iterable<V>): V | undefined {
   //eslint-disable-next-line functional/no-let
-  let ret: V | undefined;
-  for (const val of it) {
-    ret = val;
+  let returnValue: V | undefined;
+  for (const value of it) {
+    returnValue = value;
   }
-  return ret;
+  return returnValue;
 }
 
 /**
@@ -89,7 +90,7 @@ export function* chunksOverlapping<V>(it: Iterable<V>, size: number) {
   if (size <= 1) throw new Error(`Size should be at least 2`);
 
   //eslint-disable-next-line functional/no-let
-  let buffer: V[] = [];
+  let buffer: Array<V> = [];
 
   for (const v of it) {
     //eslint-disable-next-line functional/immutable-data
@@ -97,7 +98,7 @@ export function* chunksOverlapping<V>(it: Iterable<V>, size: number) {
     if (buffer.length === size) {
       yield buffer;
       //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      buffer = [buffer.at(-1)!];
+      buffer = [ buffer.at(-1)! ];
     }
   }
   if (buffer.length <= 1) return;
@@ -135,7 +136,7 @@ export function* chunks<V>(it: Iterable<V>, size: number) {
  * @param its
  */
 //eslint-disable-next-line func-style
-export function* concat<V>(...its: readonly Iterable<V>[]) {
+export function* concat<V>(...its: ReadonlyArray<Iterable<V>>) {
   for (const it of its) yield* it;
 }
 
@@ -177,12 +178,12 @@ export function equals<V>(
   //it2 = it2[Symbol.iterator]();
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const i1 = it1.next(),
-      i2 = it2.next();
+    const index1 = it1.next(),
+      index2 = it2.next();
     if (equality !== undefined) {
-      if (!equality(i1.value, i2.value)) return false;
-    } else if (i1.value !== i2.value) return false;
-    if (i1.done || i2.done) return i1.done && i2.done;
+      if (!equality(index1.value, index2.value)) return false;
+    } else if (index1.value !== index2.value) return false;
+    if (index1.done ?? index2.done) return index1.done && index2.done;
   }
 }
 
@@ -217,6 +218,7 @@ export function every<V>(it: Iterable<V>, f: (v: V) => boolean) {
 export function* fill<V>(it: Iterable<V>, v: V) {
   // https://surma.github.io/underdash/
 
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const _ of it) yield v;
 }
 
@@ -284,7 +286,7 @@ export function* flatten<V>(it: Iterable<V>) {
   for (const v of it) {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (Symbol.iterator in (v as any)) {
-      // @ts-ignore
+      // @ts-expect-error
       yield* v;
     } else {
       yield v;
@@ -380,10 +382,10 @@ export function min<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b) {
  * @param len
  */
 //eslint-disable-next-line func-style
-export function* range(start: number, len: number) {
+export function* range(start: number, length: number) {
   // https://surma.github.io/underdash/
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < len; i++) {
+  for (let index = 0; index < length; index++) {
     yield start++;
   }
   //for (let i=len;len > 0; len--) yield start++;
@@ -403,7 +405,7 @@ export function* range(start: number, len: number) {
 //eslint-disable-next-line func-style
 export function reduce<V>(
   it: Iterable<V>,
-  f: (acc: V, current: V) => V,
+  f: (accumulator: V, current: V) => V,
   start: V
 ) {
   // https://surma.github.io/underdash/
@@ -425,7 +427,7 @@ export function* slice<V>(
   end = Number.POSITIVE_INFINITY
 ) {
   // https://surma.github.io/underdash/
-  const iit = it[Symbol.iterator]();
+  const iit = it[ Symbol.iterator ]();
 
   for (; start > 0; start--, end--) iit.next();
 
@@ -507,23 +509,19 @@ export function* takeWhile<V>(it: Iterable<V>, f: (v: V) => boolean) {
 //eslint-disable-next-line func-style
 export function* unique<V>(
   //eslint-disable-next-line functional/prefer-readonly-type
-  iterable: Iterable<V> | Iterable<V>[],
-  keyFn: ToString<V> = toStringDefault
+  iterable: Iterable<V> | Array<Iterable<V>>,
+  keyFunction: ToString<V> = toStringDefault
 ) {
   // f: (id: V) => V = (id) => id) {
   // Adapted from https://surma.github.io/underdash/
-  const buffer = [];
+  const buffer: Array<string> = [];
   //eslint-disable-next-line functional/no-let
-  let itera: Iterable<V>[] = [];
-  if (!Array.isArray(iterable)) {
-    itera = [iterable];
-  } else {
-    itera = iterable;
-  }
+  let itera: Array<Iterable<V>> = [];
+  itera = Array.isArray(iterable) ? iterable : [ iterable ];
   for (const it of itera) {
     for (const v of it) {
-      const fv = keyFn(v);
-      if (buffer.indexOf(fv) !== -1) continue;
+      const fv = keyFunction(v);
+      if (buffer.includes(fv)) continue;
       //eslint-disable-next-line functional/immutable-data
       buffer.push(fv);
       yield v;
@@ -541,13 +539,13 @@ export function* unique<V>(
  * @returns
  */
 //eslint-disable-next-line func-style
-export function* zip<V>(...its: readonly Iterable<V>[]) {
+export function* zip<V>(...its: ReadonlyArray<Iterable<V>>) {
   // https://surma.github.io/underdash/
-  const iits = its.map((it) => it[Symbol.iterator]());
+  const iits = its.map((it) => it[ Symbol.iterator ]());
 
   while (true) {
     const vs = iits.map((it) => it.next());
     if (vs.some((v) => v.done)) return;
-    yield vs.map((v) => v.value);
+    yield vs.map((v) => v.value as V);
   }
 }

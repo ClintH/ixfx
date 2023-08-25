@@ -1,28 +1,18 @@
 import { throwIntegerTest, throwNumberTest } from './Guards.js';
 
-import type { DelayOpts } from './flow/Delay.js';
 
-export { type DelayOpts };
 
-import { integerUniqueGen } from './Random.js';
-export {
-  /**
-   * Generate unique integers within a given range
-   * * @example 0..9 range
-   * ```js
-   * const rand = [ ...randomUniqueInteger(10) ];
-   * // eg: [2, 9, 6, 0, 8, 7, 3, 4, 5, 1]
-   * ```
-   */
-  integerUniqueGen as randomUniqueInteger,
-};
+
+
+
+
 
 export { pingPong, pingPongPercent } from './modulation/PingPong.js';
 export * as Async from './IterableAsync.js';
 export * as Sync from './IterableSync.js';
 
 export { interval } from './flow/Interval.js';
-export { delayLoop } from './flow/Delay.js';
+export { delayLoop, type DelayOpts } from './flow/Delay.js';
 
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
@@ -41,9 +31,9 @@ export { delayLoop } from './flow/Delay.js';
  */
 export const numericRangeRaw = function* (
   interval: number,
-  start: number = 0,
+  start = 0,
   end?: number,
-  repeating: boolean = false
+  repeating = false
 ) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
@@ -86,9 +76,9 @@ export const numericRangeRaw = function* (
  */
 export const numericRange = function* (
   interval: number,
-  start: number = 0,
+  start = 0,
   end?: number,
-  repeating: boolean = false,
+  repeating = false,
   rounding?: number
 ) {
   throwNumberTest(interval, `nonZero`);
@@ -158,7 +148,7 @@ export const numericRange = function* (
  * @param amount Number of integers to yield
  * @param offset Added to result
  */
-export const count = function* (amount: number, offset: number = 0) {
+export const count = function* (amount: number, offset = 0) {
   // Unit tested.
   throwIntegerTest(amount, ``, `amount`);
   throwIntegerTest(offset, ``, `offset`);
@@ -166,11 +156,10 @@ export const count = function* (amount: number, offset: number = 0) {
   if (amount === 0) return;
 
   //eslint-disable-next-line functional/no-let
-  let i = 0;
+  let index = 0;
   do {
-    if (amount < 0) yield -i + offset;
-    else yield i + offset;
-  } while (i++ < Math.abs(amount) - 1);
+    yield (amount < 0 ? -index + offset : index + offset);
+  } while (index++ < Math.abs(amount) - 1);
 };
 
 /**
@@ -194,9 +183,9 @@ export const count = function* (amount: number, offset: number = 0) {
  * @returns
  */
 export const numericPercent = function (
-  interval: number = 0.01,
-  repeating: boolean = false,
-  start: number = 0,
+  interval = 0.01,
+  repeating = false,
+  start = 0,
   end = 1
 ) {
   throwNumberTest(interval, `percentage`, `interval`);
@@ -204,3 +193,5 @@ export const numericPercent = function (
   throwNumberTest(end, `percentage`, `end`);
   return numericRange(interval, start, end, repeating);
 };
+
+export { integerUniqueGen as randomUniqueInteger } from './Random.js';

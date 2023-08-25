@@ -1,27 +1,28 @@
-type WithEvents = {
+interface WithEvents {
   addEventListener(type: string, callbackfn: any): void;
   removeEventListener(type: string, callbackfn: any): void;
-};
+}
 
 //export { eachInterval } from './flow/Interval.js';
 
 export const isAsyncIterable = (v: any): v is AsyncIterable<any> =>
-  Symbol.asyncIterator in Object(v);
+  Symbol.asyncIterator in new Object(v);
 
 export const isIterable = (v: any): v is Iterable<any> =>
-  Symbol.iterator in Object(v);
+  Symbol.iterator in new Object(v);
 
 export const eventsToIterable = <V>(
   eventSource: WithEvents,
   eventType: string
-): AsyncIterator<any, any, undefined> => {
-  const pullQueue: any[] = [];
-  const pushQueue: any[] = [];
-  //eslint-disable-next-line functional/no-let
+): AsyncIterator<any> => {
+  const pullQueue: Array<any> = [];
+  const pushQueue: Array<any> = [];
   let done = false;
-  const pushValue = async (args: any) => {
-    if (pullQueue.length !== 0) {
+  const pushValue = (args: any) => {
+    if (pullQueue.length > 0) {
+      //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const resolver = pullQueue.shift();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       resolver(...args);
     } else {
       pushQueue.push(args);
@@ -30,21 +31,23 @@ export const eventsToIterable = <V>(
 
   const pullValue = (): Promise<V> =>
     new Promise<V>((resolve) => {
-      if (pushQueue.length !== 0) {
-        const args = pushQueue.shift();
-        // @ts-ignore
-        resolve(...args);
+      if (pushQueue.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const arguments_ = pushQueue.shift();
+        // @ts-expect-error
+        resolve(...arguments_);
       } else {
         pullQueue.push(resolve);
       }
     });
 
-  const handler = (...args: any) => {
-    pushValue(args);
+  const handler = (...arguments_: any) => {
+    pushValue(arguments_);
   };
 
   eventSource.addEventListener(eventType, handler);
-  const r = {
+
+  const r: AsyncIterator<V> = {
     next: async (): Promise<IteratorResult<V>> => {
       if (done) return { done: true, value: undefined };
       return {
@@ -52,11 +55,13 @@ export const eventsToIterable = <V>(
         value: await pullValue(),
       };
     },
+    //eslint-disable-next-line @typescript-eslint/require-await
     return: async (): Promise<IteratorResult<V>> => {
       done = true;
       eventSource.removeEventListener(eventType, handler);
       return { done: true, value: undefined };
     },
+    //eslint-disable-next-line @typescript-eslint/require-await
     throw: async (error: any): Promise<IteratorResult<V>> => {
       done = true;
       return {

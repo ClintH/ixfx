@@ -1,11 +1,11 @@
-import {shuffle} from './collections/Arrays.js';
-import {numberTest as guardNumberTest, integerTest as guardIntegerTest, throwFromResult} from './Guards.js';
-import {type EasingName, get as EasingGet} from './modulation/Easing.js';
-import {clamp} from './data/Clamp.js';
-import {range} from './IterableSync.js';
+import { shuffle } from './collections/Arrays.js';
+import { numberTest as guardNumberTest, integerTest as guardIntegerTest, throwFromResult } from './Guards.js';
+import { type EasingName, get as EasingGet } from './modulation/Easing.js';
+import { clamp } from './data/Clamp.js';
+import { range } from './IterableSync.js';
 
-export {randomElement as arrayElement} from './collections/Arrays.js';
-export {randomHue as hue} from './visual/Colour.js';
+export { randomElement as arrayElement } from './collections/Arrays.js';
+export { randomHue as hue } from './visual/Colour.js';
 
 export interface RandomOptions {
   readonly max: number;
@@ -61,13 +61,13 @@ export const weightedSource = (
 ): RandomSource => {
   const options =
     typeof easingNameOrOptions === `string`
-      ? {easing: easingNameOrOptions}
+      ? { easing: easingNameOrOptions }
       : easingNameOrOptions;
   const source = options.source ?? defaultRandom;
   const easingName = options.easing ?? `quadIn`;
   const easingFunction = EasingGet(easingName);
   if (easingFunction === undefined) {
-    throw new Error(`Easing function '${easingName}' not found.`);
+    throw new Error(`Easing function '${ easingName }' not found.`);
   }
 
   const compute = (): number => {
@@ -131,7 +131,7 @@ export type WeightedIntegerOptions = WeightedOptions & Readonly<{
 export const weightedIntegerSource = (
   maxOrOptions: number | WeightedIntegerOptions
 ): RandomSource => {
-  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
+  const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   const source = options.source ?? defaultRandom;
   const max = options.max;
   const min = options.min ?? 0;
@@ -144,7 +144,7 @@ export const weightedIntegerSource = (
 
   const easingFunction = EasingGet(easingName);
   if (easingFunction === undefined) {
-    throw new Error(`Easing '${easingName}' not found`);
+    throw new Error(`Easing '${ easingName }' not found`);
   }
 
   throwFromResult(guardNumberTest(min));
@@ -294,7 +294,7 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
   if (typeof maxOrOptions === `undefined`) {
     throw new TypeError(`maxOrOpts is undefined`);
   }
-  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
+  const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   //eslint-disable-next-line functional/no-let
   let max = Math.floor(options.max);
   //eslint-disable-next-line functional/no-let
@@ -308,14 +308,14 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
   }
   const randomSource = options.source ?? defaultRandom;
   if (min > max) {
-    throw new Error(`Min value is greater than max (min: ${min} max: ${max})`);
+    throw new Error(`Min value is greater than max (min: ${ min } max: ${ max })`);
   }
 
   throwFromResult(guardNumberTest(min, ``, `min`));
   throwFromResult(guardNumberTest(max, ``, `max`));
 
   if (max === min) {
-    throw new Error(`Max and min values cannot be the same (${max})`);
+    throw new Error(`Max and min values cannot be the same (${ max })`);
   }
 
   // Distance
@@ -377,7 +377,7 @@ export const integer = (maxOrOptions: number | RandomOptions): number =>
  * @returns Random number
  */
 export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSource => {
-  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
+  const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   //eslint-disable-next-line functional/no-let
   let max = options.max;
   //eslint-disable-next-line functional/no-let
@@ -392,7 +392,7 @@ export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSou
     max = 0;
   }
   if (min > max) {
-    throw new Error(`Min is greater than max. Min: ${min} max: ${max}`);
+    throw new Error(`Min is greater than max. Min: ${ min } max: ${ max }`);
   }
 
   return () => source() * (max - min) + min;
@@ -437,7 +437,7 @@ export interface StringOptions {
  */
 export const string = (lengthOrOptions: number | StringOptions = 5) => {
   const options =
-    typeof lengthOrOptions === `number` ? {length: lengthOrOptions} : lengthOrOptions;
+    typeof lengthOrOptions === `number` ? { length: lengthOrOptions } : lengthOrOptions;
   const calculate = options.source ?? defaultRandom;
   return calculate()
     .toString(36)
@@ -452,13 +452,13 @@ export const string = (lengthOrOptions: number | StringOptions = 5) => {
  * @param opts Options.
  * @returns
  */
-export const shortGuid = (options: Readonly<{source?: RandomSource}> = {}) => {
+export const shortGuid = (options: Readonly<{ source?: RandomSource }> = {}) => {
   const source = options.source ?? defaultRandom;
   // Via Stackoverflow...
   const firstPart = Math.trunc(source() * 46_656);
   const secondPart = Math.trunc(source() * 46_656);
-  const firstPartString = `000${firstPart.toString(36)}`.slice(-3);
-  const secondPartString = `000${secondPart.toString(36)}`.slice(-3);
+  const firstPartString = `000${ firstPart.toString(36) }`.slice(-3);
+  const secondPartString = `000${ secondPart.toString(36) }`.slice(-3);
   return firstPartString + secondPartString;
 };
 
@@ -498,11 +498,11 @@ export const minutesMsSource = (
 ): RandomSource => {
   const options =
     typeof maxMinutesOrOptions === `number`
-      ? {max: maxMinutesOrOptions}
+      ? { max: maxMinutesOrOptions }
       : maxMinutesOrOptions;
   const min = (options.min ?? 0) * 60 * 1000;
   const max = options.max * 60 * 1000;
-  return integerSource({...options, max, min});
+  return integerSource({ ...options, max, min });
 };
 
 /**
@@ -561,11 +561,11 @@ export const secondsMsSource = (
 ): RandomSource => {
   const options =
     typeof maxSecondsOrOptions === `number`
-      ? {max: maxSecondsOrOptions}
+      ? { max: maxSecondsOrOptions }
       : maxSecondsOrOptions;
   const min = (options.min ?? 0) * 1000;
   const max = options.max * 1000;
-  return () => integer({...options, max, min});
+  return () => integer({ ...options, max, min });
 };
 
 /**
@@ -628,7 +628,7 @@ export type GenerateRandomOptions = RandomOptions & Readonly<{
 export function* integerUniqueGen(
   maxOrOptions: number | GenerateRandomOptions
 ): IterableIterator<number> {
-  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
+  const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   const min = options.min ?? 0;
   const max = options.max;
   const source = options.source ?? defaultRandom;
@@ -637,10 +637,10 @@ export function* integerUniqueGen(
   throwFromResult(guardIntegerTest(min, ``, `min`));
   throwFromResult(guardIntegerTest(max, ``, `max`));
   if (min > max) {
-    throw new Error(`Min value is greater than max. Min: ${min} Max: ${max}`);
+    throw new Error(`Min value is greater than max. Min: ${ min } Max: ${ max }`);
   }
 
-  const origRange = [...range(min, max - min)];
+  const origRange = [ ...range(min, max - min) ];
   //eslint-disable-next-line functional/no-let
   let numberRange = shuffle(origRange);
   //eslint-disable-next-line functional/no-let
@@ -650,8 +650,8 @@ export function* integerUniqueGen(
       if (loop) numberRange = shuffle(origRange, source);
       else return;
     }
-    yield numberRange[index++];
+    yield numberRange[ index++ ];
   }
 }
 
-export {randomIndex as arrayIndex} from './collections/Arrays.js';
+export { randomIndex as arrayIndex } from './collections/Arrays.js';
