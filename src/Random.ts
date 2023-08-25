@@ -1,18 +1,17 @@
-import { randomIndex, randomElement, shuffle } from './collections/Arrays.js';
-import { number as guardNumber, integer as guardInteger } from './Guards.js';
-import { type EasingName, get as EasingGet } from './modulation/Easing.js';
-import { clamp } from './data/Clamp.js';
-import { range } from './IterableSync.js';
+import {shuffle} from './collections/Arrays.js';
+import {numberTest as guardNumberTest, integerTest as guardIntegerTest, throwFromResult} from './Guards.js';
+import {type EasingName, get as EasingGet} from './modulation/Easing.js';
+import {clamp} from './data/Clamp.js';
+import {range} from './IterableSync.js';
 
-export { randomIndex as arrayIndex };
-export { randomElement as arrayElement };
-export { randomHue as hue } from './visual/Colour.js';
+export {randomElement as arrayElement} from './collections/Arrays.js';
+export {randomHue as hue} from './visual/Colour.js';
 
-export type RandomOpts = {
+export interface RandomOptions {
   readonly max: number;
   readonly min?: number;
   readonly source?: RandomSource;
-};
+}
 
 /**
  * Default random number generator: `Math.random`.
@@ -22,14 +21,14 @@ export const defaultRandom = Math.random;
 /**
  * A random source.
  *
- * Predefined sources: {@link defaultRandom}, {@link gaussianFn}, {@link weightedFn}
+ * Predefined sources: {@link defaultRandom}, {@link gaussianSource}, {@link weightedSource}
  */
 export type RandomSource = () => number;
 
 /**
  * Options for producing weighted distribution
  */
-export type WeightedOpts = {
+export interface WeightedOptions {
   /**
    * Easing function to use (optional)
    */
@@ -38,7 +37,7 @@ export type WeightedOpts = {
    * Random source (optional)
    */
   readonly source?: RandomSource;
-};
+}
 
 /***
  * Returns a random number, 0..1, weighted by a given easing function.
@@ -47,33 +46,33 @@ export type WeightedOpts = {
  *
  * ```js
  * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
- * const r1 = Random.weightedFn();          // quadIn easing by default, which skews toward low values
+ * const r1 = Random.weightedSource();          // quadIn easing by default, which skews toward low values
  * r1(); // Produce a value
  *
- * const r2 = Random.weightedFn(`quadOut`); // quadOut favours high values
+ * const r2 = Random.weightedSource(`quadOut`); // quadOut favours high values
  * r2(); // Produce a value
  * ```
  * @param easingName Easing name or options `quadIn` by default.
  * @see {@link weighted} Returns value instead of function
  * @returns Function which returns a weighted random value
  */
-export const weightedFn = (
-  easingNameOrOpts: EasingName | WeightedOpts = 'quadIn'
+export const weightedSource = (
+  easingNameOrOptions: EasingName | WeightedOptions = `quadIn`
 ): RandomSource => {
-  const opts =
-    typeof easingNameOrOpts === 'string'
-      ? { easing: easingNameOrOpts }
-      : easingNameOrOpts;
-  const source = opts.source ?? defaultRandom;
-  const easingName = opts.easing ?? 'quadIn';
-  const easingFn = EasingGet(easingName as EasingName);
-  if (easingFn === undefined) {
+  const options =
+    typeof easingNameOrOptions === `string`
+      ? {easing: easingNameOrOptions}
+      : easingNameOrOptions;
+  const source = options.source ?? defaultRandom;
+  const easingName = options.easing ?? `quadIn`;
+  const easingFunction = EasingGet(easingName);
+  if (easingFunction === undefined) {
     throw new Error(`Easing function '${easingName}' not found.`);
   }
 
   const compute = (): number => {
     const r = source();
-    return easingFn(r);
+    return easingFunction(r);
   };
   return compute;
 };
@@ -82,7 +81,7 @@ export const weightedFn = (
  * Returns a random number, 0..1, weighted by a given easing function.
  * Default easing is `quadIn`, which skews towards zero.
  *
- * Use {@link weightedFn} to return a function instead.
+ * Use {@link weightedSource} to return a function instead.
  *
  * ```js
  * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
@@ -90,17 +89,17 @@ export const weightedFn = (
  * Random.weighted(`quadOut`); // quadOut favours high values
  * ```
  * @param easingNameOrOpts Options. Uses 'quadIn' by default.
- * @see {@link weightedFn} Returns a function rather than value
+ * @see {@link weightedSource} Returns a function rather than value
  * @returns Random number (0-1)
  */
 export const weighted = (
-  easingNameOrOpts: EasingName | WeightedOpts = 'quadIn'
-): number => weightedFn(easingNameOrOpts)();
+  easingNameOrOptions: EasingName | WeightedOptions = `quadIn`
+): number => weightedSource(easingNameOrOptions)();
 
-export type WeightedIntOpts = WeightedOpts & {
-  readonly min?: number;
-  readonly max: number;
-};
+export type WeightedIntegerOptions = WeightedOptions & Readonly<{
+  min?: number;
+  max: number;
+}>;
 /**
  * Random integer, weighted according to an easing function.
  * Number will be inclusive of `min` and below `max`.
@@ -129,30 +128,30 @@ export type WeightedIntOpts = WeightedOpts & {
  * @param maxOrOpts Maximum (exclusive)
  * @returns Function that produces a random weighted integer
  */
-export const weightedIntegerFn = (
-  maxOrOpts: number | WeightedIntOpts
+export const weightedIntegerSource = (
+  maxOrOptions: number | WeightedIntegerOptions
 ): RandomSource => {
-  const opts = typeof maxOrOpts === 'number' ? { max: maxOrOpts } : maxOrOpts;
-  const source = opts.source ?? defaultRandom;
-  const max = opts.max;
-  const min = opts.min ?? 0;
-  const easingName = opts.easing ?? `quadIn`;
-  if (max === undefined) throw new Error(`max field is undefined`);
-  if (typeof easingName !== 'string') {
-    throw new Error(`easing field expected to be string`);
+  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
+  const source = options.source ?? defaultRandom;
+  const max = options.max;
+  const min = options.min ?? 0;
+  const easingName = options.easing ?? `quadIn`;
+  if (typeof max === `undefined`) throw new Error(`max field is undefined`);
+  if (typeof easingName !== `string`) {
+    throw new TypeError(`easing field expected to be string`);
   }
-  guardNumber(max);
+  throwFromResult(guardNumberTest(max));
 
-  const easingFn = EasingGet(easingName as EasingName);
-  if (easingFn === undefined) {
+  const easingFunction = EasingGet(easingName);
+  if (easingFunction === undefined) {
     throw new Error(`Easing '${easingName}' not found`);
   }
 
-  guardNumber(min);
+  throwFromResult(guardNumberTest(min));
   if (max <= min) throw new Error(`Max should be greater than min`);
 
   const compute = (): number => {
-    const r = clamp(easingFn(source()));
+    const r = clamp(easingFunction(source()));
     return Math.floor(r * (max - min)) + min;
   };
   return compute;
@@ -174,12 +173,12 @@ export const weightedIntegerFn = (
  * ```js
  * Random.weightedInteger({ max: 100, easing: `quadIn` })
  * ```
- * @inheritDoc {@link weightedIntegerFn}
+ * @inheritDoc {@link weightedIntegerSource}
  * @param maxOrOpts
  * @returns Random weighted integer
  */
-export const weightedInteger = (maxOrOpts: number | WeightedIntOpts): number =>
-  weightedIntegerFn(maxOrOpts)();
+export const weightedInteger = (maxOrOptions: number | WeightedIntegerOptions): number =>
+  weightedIntegerSource(maxOrOptions)();
 
 /**
  * Returns a random number with gaussian (ie. bell-curved) distribution
@@ -199,7 +198,7 @@ export const weightedInteger = (maxOrOpts: number | WeightedIntOpts): number =>
  * @param skew Skew factor. Defaults to 1, no skewing. Above 1 will skew to left, below 1 will skew to right
  * @returns 
  */
-export const gaussian = (skew = 1) => gaussianFn(skew)();
+export const gaussian = (skew = 1) => gaussianSource(skew)();
 
 /**
  * Returns a function that generates a gaussian-distributed random number
@@ -226,32 +225,38 @@ export const gaussian = (skew = 1) => gaussianFn(skew)();
  * @param skew
  * @returns
  */
-export const gaussianFn = (skew = 1): RandomSource => {
+export const gaussianSource = (skew = 1): RandomSource => {
   const min = 0;
   const max = 1;
   // Source: https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
 
   const compute = (): number => {
+    const u = calculateNonZero();
+    const v = calculateNonZero();
     //eslint-disable-next-line functional/no-let
-    let u = 0,
-      v = 0;
-    while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while (v === 0) v = Math.random();
-    //eslint-disable-next-line functional/no-let
-    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    let result = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 
-    num = num / 10.0 + 0.5; // Translate to 0 -> 1
-    if (num > 1 || num < 0) {
-      num = compute(); //;gaussian(skew); // resample between 0 and 1 if out of range
+    result = result / 10 + 0.5; // Translate to 0 -> 1
+    if (result > 1 || result < 0) {
+      result = compute(); //;gaussian(skew); // resample between 0 and 1 if out of range
     } else {
-      num = Math.pow(num, skew); // Skew
-      num *= max - min; // Stretch to fill range
-      num += min; // offset to min
+      result = Math.pow(result, skew); // Skew
+      result *= max - min; // Stretch to fill range
+      result += min; // offset to min
     }
-    return num;
+    return result;
   };
   return compute;
 };
+
+const calculateNonZero = (source: RandomSource = defaultRandom) => {
+  let v = 0;
+  while (v === 0) {
+    //eslint-disable-next-line functional/no-expression-statements
+    v = source();
+  }
+  return v;
+}
 
 /**
  * Returns a function that produces a random integer between `max` (exclusive) and 0 (inclusive)
@@ -259,55 +264,55 @@ export const gaussianFn = (skew = 1): RandomSource => {
  *
  * Invoke directly:
  * ```js
- * integerFn(10)();  // Random number 0-9
+ * integerSource(10)();  // Random number 0-9
  * ```
  *
  * Or keep a reference to re-compute:
  * ```js
- * const r = integerFn(10);
+ * const r = integerSource(10);
  * r(); // Produce a random integer
  * ```
  *
  * If a negative value is given, this is assumed to be the
  * minimum (inclusive), with 0 as the max (inclusive)
  * ```js
- * integerFn(-5)();  // Random number from -5 to 0
+ * integerSource(-5)();  // Random number from -5 to 0
  * ```
  *
  * Specify options for a custom minimum or source of random:
  * ```js
- * integerFn({ max: 5,  min: 10 })();  // Random number 4-10
- * integerFn({ max: -5, min: -10 })(); // Random number from -10 to -6
- * integerFn({ max: 10, source: Math.random })(); // Random number between 0-9, with custom source of random
+ * integerSource({ max: 5,  min: 10 })();  // Random number 4-10
+ * integerSource({ max: -5, min: -10 })(); // Random number from -10 to -6
+ * integerSource({ max: 10, source: Math.random })(); // Random number between 0-9, with custom source of random
  * ```
  *
  * Throws an error if max & min are equal
  * @param maxOrOpts Max value (exclusive), or set of options
  * @returns Random integer
  */
-export const integerFn = (maxOrOpts: number | RandomOpts): RandomSource => {
-  if (typeof maxOrOpts === `undefined`) {
-    throw new Error(`maxOrOpts is undefined`);
+export const integerSource = (maxOrOptions: number | RandomOptions): RandomSource => {
+  if (typeof maxOrOptions === `undefined`) {
+    throw new TypeError(`maxOrOpts is undefined`);
   }
-  const opts = typeof maxOrOpts === 'number' ? { max: maxOrOpts } : maxOrOpts;
+  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
   //eslint-disable-next-line functional/no-let
-  let max = Math.floor(opts.max);
+  let max = Math.floor(options.max);
   //eslint-disable-next-line functional/no-let
-  let min = Math.floor(opts.min ?? 0);
+  let min = Math.floor(options.min ?? 0);
 
   // If we just get -5 as the max, invert so
   // max:1 and min: -5 instead for -5...0 range
-  if (!opts.min && max < 0) {
+  if (!options.min && max < 0) {
     max = 1;
-    min = opts.max;
+    min = options.max;
   }
-  const randomSource = opts.source ?? defaultRandom;
+  const randomSource = options.source ?? defaultRandom;
   if (min > max) {
     throw new Error(`Min value is greater than max (min: ${min} max: ${max})`);
   }
 
-  guardNumber(min, '', 'min');
-  guardNumber(max, '', 'max');
+  throwFromResult(guardNumberTest(min, ``, `min`));
+  throwFromResult(guardNumberTest(max, ``, `max`));
 
   if (max === min) {
     throw new Error(`Max and min values cannot be the same (${max})`);
@@ -320,7 +325,7 @@ export const integerFn = (maxOrOpts: number | RandomOpts): RandomSource => {
 
 /**
  * Returns a random integer between `max` (exclusive) and 0 (inclusive)
- * Use {@link integerFn} to return a function instead.
+ * Use {@link integerSource} to return a function instead.
  *
  * ```js
  * integer(10);  // Random number 0-9
@@ -343,8 +348,8 @@ export const integerFn = (maxOrOpts: number | RandomOpts): RandomSource => {
  * @param maxOrOpts Max value (exclusive), or set of options
  * @returns Random integer
  */
-export const integer = (maxOrOpts: number | RandomOpts): number =>
-  integerFn(maxOrOpts)();
+export const integer = (maxOrOptions: number | RandomOptions): number =>
+  integerSource(maxOrOptions)();
 
 /**
  * Returns a function that produces random float values.
@@ -356,33 +361,33 @@ export const integer = (maxOrOpts: number | RandomOpts): number =>
  * ```js
  * // Random number between 0..1 (but not including 1)
  * // (this would be identical to Math.random())
- * const r = floatFn();
+ * const r = floatSource();
  * r(); // Execute to produce random value
  *
  * // Random float between 0..100 (but not including 100)
- * const v = floatFn(100)();
+ * const v = floatSource(100)();
  * ```
  *
  * Options can be used:
  * ```js
  * // Random float between 20..40 (possibly including 20, but always lower than 40)
- * const r = floatFn({ min: 20, max: 40 });
+ * const r = floatSource({ min: 20, max: 40 });
  * ```
  * @param maxOrOpts Maximum value (exclusive) or options
  * @returns Random number
  */
-export const floatFn = (maxOrOpts: number | RandomOpts = 1): RandomSource => {
-  const opts = typeof maxOrOpts === 'number' ? { max: maxOrOpts } : maxOrOpts;
+export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSource => {
+  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
   //eslint-disable-next-line functional/no-let
-  let max = opts.max;
+  let max = options.max;
   //eslint-disable-next-line functional/no-let
-  let min = opts.min ?? 0;
-  const source = opts.source ?? defaultRandom;
+  let min = options.min ?? 0;
+  const source = options.source ?? defaultRandom;
 
-  guardNumber(min, '', 'min');
-  guardNumber(max, '', 'max');
+  throwFromResult(guardNumberTest(min, ``, `min`));
+  throwFromResult(guardNumberTest(max, ``, `max`));
 
-  if (!opts.min && max < 0) {
+  if (!options.min && max < 0) {
     min = max;
     max = 0;
   }
@@ -395,7 +400,7 @@ export const floatFn = (maxOrOpts: number | RandomOpts = 1): RandomSource => {
 
 /**
  * Returns a random float between `max` (exclusive) and 0 (inclusive). Max is 1 if unspecified.
- * Use {@link floatFn} to get a function that produces values. This is used internally.
+ * Use {@link floatSource} to get a function that produces values. This is used internally.
  *
  * ```js
  * // Random number between 0..1 (but not including 1)
@@ -413,13 +418,13 @@ export const floatFn = (maxOrOpts: number | RandomOpts = 1): RandomSource => {
  * @param maxOrOpts Maximum value (exclusive) or options
  * @returns Random number
  */
-export const float = (maxOrOpts: number | RandomOpts = 1): number =>
-  floatFn(maxOrOpts)();
+export const float = (maxOrOptions: number | RandomOptions = 1): number =>
+  floatSource(maxOrOptions)();
 
-export type StringOpts = {
+export interface StringOptions {
   readonly length: number;
   readonly source?: RandomSource;
-};
+}
 /**
  * Returns a string of random letters and numbers of a given `length`.
  *
@@ -430,13 +435,13 @@ export type StringOpts = {
  * @param length Length of random string
  * @returns Random string
  */
-export const string = (lengthOrOpts: number | StringOpts = 5) => {
-  const opts =
-    typeof lengthOrOpts === 'number' ? { length: lengthOrOpts } : lengthOrOpts;
-  const source = opts.source ?? defaultRandom;
-  source()
+export const string = (lengthOrOptions: number | StringOptions = 5) => {
+  const options =
+    typeof lengthOrOptions === `number` ? {length: lengthOrOptions} : lengthOrOptions;
+  const calculate = options.source ?? defaultRandom;
+  return calculate()
     .toString(36)
-    .substring(2, length + 2);
+    .slice(2, length + 2);
 };
 
 /**
@@ -447,25 +452,25 @@ export const string = (lengthOrOpts: number | StringOpts = 5) => {
  * @param opts Options.
  * @returns
  */
-export const shortGuid = (opts: { readonly source?: RandomSource } = {}) => {
-  const source = opts.source ?? defaultRandom;
+export const shortGuid = (options: Readonly<{source?: RandomSource}> = {}) => {
+  const source = options.source ?? defaultRandom;
   // Via Stackoverflow...
-  const firstPart = (source() * 46656) | 0;
-  const secondPart = (source() * 46656) | 0;
-  const firstPartStr = `000${firstPart.toString(36)}`.slice(-3);
-  const secondPartStr = `000${secondPart.toString(36)}`.slice(-3);
-  return firstPartStr + secondPartStr;
+  const firstPart = Math.trunc(source() * 46_656);
+  const secondPart = Math.trunc(source() * 46_656);
+  const firstPartString = `000${firstPart.toString(36)}`.slice(-3);
+  const secondPartString = `000${secondPart.toString(36)}`.slice(-3);
+  return firstPartString + secondPartString;
 };
 
 /**
  * Returns a random number of minutes, with a unit of milliseconds.
  * Max value is exclusive.
- * Use {@link minutesMs} to get a value directly, or {@link minutesMsFn} to return a function.
+ * Use {@link minutesMs} to get a value directly, or {@link minutesMsSource} to return a function.
  *
  * @example Random value from 0 to one milli less than 5 * 60 * 1000
  * ```js
  * // Create function that returns value
- * const f = minuteMsFn(5);
+ * const f = minutesMsSource(5);
  *
  * f(); // Generate value
  * ```
@@ -473,7 +478,7 @@ export const shortGuid = (opts: { readonly source?: RandomSource } = {}) => {
  * @example Specified options:
  * ```js
  * // Random time between one minute and 5 minutes
- * const f = minuteMsFn({ max: 5, min: 1 });
+ * const f = minutesMsSource({ max: 5, min: 1 });
  * f();
  * ```
  *
@@ -482,22 +487,22 @@ export const shortGuid = (opts: { readonly source?: RandomSource } = {}) => {
  * code a little more literate:
  * ```js
  * // Random timeout of up to 5 mins
- * setTimeout(() => { ... }, minuteMs(5));
+ * setTimeout(() => { ... }, minutesMsSource(5));
  * ```
  * @param maxMinutesOrOpts
  * @see {@link minutesMs}
  * @returns Function that produces a random value
  */
-export const minutesMsFn = (
-  maxMinutesOrOpts: number | RandomOpts
+export const minutesMsSource = (
+  maxMinutesOrOptions: number | RandomOptions
 ): RandomSource => {
-  const opts =
-    typeof maxMinutesOrOpts === 'number'
-      ? { max: maxMinutesOrOpts }
-      : maxMinutesOrOpts;
-  const min = (opts.min ?? 0) * 60 * 1000;
-  const max = opts.max * 60 * 1000;
-  return integerFn({ ...opts, max, min });
+  const options =
+    typeof maxMinutesOrOptions === `number`
+      ? {max: maxMinutesOrOptions}
+      : maxMinutesOrOptions;
+  const min = (options.min ?? 0) * 60 * 1000;
+  const max = options.max * 60 * 1000;
+  return integerSource({...options, max, min});
 };
 
 /**
@@ -512,24 +517,24 @@ export const minutesMsFn = (
  * // Random time between one minute and 5 minutes
  * minuteMs({ max: 5, min: 1 });
  * ```
- * @inheritDoc minutesMsFn
+ * @inheritDoc minutesMsSource
  *
  * @param maxMinutesOrOpts
- * @see {@link minutesMsFn}
+ * @see {@link minutesMsSource}
  * @returns Milliseconds
  */
-export const minutesMs = (maxMinutesOrOpts: number | RandomOpts): number =>
-  minutesMsFn(maxMinutesOrOpts)();
+export const minutesMs = (maxMinutesOrOptions: number | RandomOptions): number =>
+  minutesMsSource(maxMinutesOrOptions)();
 
 /**
  * Returns function which produces a random number of seconds, with a unit of milliseconds.
  * Maximum value is exclusive.
- * Use {@link secondsMs} to return a random value directly, or {@link secondsMsFn} to return a function.
+ * Use {@link secondsMs} to return a random value directly, or {@link secondsMsSource} to return a function.
  *
  * @example Random milliseconds between 0..4999
  * ```js
  * // Create function
- * const f = secondsMsFn(5000);
+ * const f = secondsMsSource(5000);
  * // Produce a value
  * const value = f();
  * ```
@@ -537,7 +542,7 @@ export const minutesMs = (maxMinutesOrOpts: number | RandomOpts): number =>
  * @example Options can be provided
  * ```js
  * // Random milliseconds between 1000-4999
- * const value = secondsMsFn({ max:5, min:1 })();
+ * const value = secondsMsSource({ max:5, min:1 })();
  * // Note the extra () at the end to execute the function
  * ```
  *
@@ -546,21 +551,21 @@ export const minutesMs = (maxMinutesOrOpts: number | RandomOpts): number =>
  * code a little more literate:
  * ```js
  * // Random timeout of up to 5 seconds
- * setTimeout(() => { ...}, secondsMs(5));
+ * setTimeout(() => { ...}, secondsMsSource(5));
  * ```
  * @param maxSecondsOrOpts Maximum seconds, or options.
  * @returns Milliseconds
  */
-export const secondsMsFn = (
-  maxSecondsOrOpts: number | RandomOpts
+export const secondsMsSource = (
+  maxSecondsOrOptions: number | RandomOptions
 ): RandomSource => {
-  const opts =
-    typeof maxSecondsOrOpts === 'number'
-      ? { max: maxSecondsOrOpts }
-      : maxSecondsOrOpts;
-  const min = (opts.min ?? 0) * 1000;
-  const max = opts.max * 1000;
-  return () => integer({ ...opts, max, min });
+  const options =
+    typeof maxSecondsOrOptions === `number`
+      ? {max: maxSecondsOrOptions}
+      : maxSecondsOrOptions;
+  const min = (options.min ?? 0) * 1000;
+  const max = options.max * 1000;
+  return () => integer({...options, max, min});
 };
 
 /**
@@ -574,19 +579,19 @@ export const secondsMsFn = (
  * // Random milliseconds between 1000-4999
  * secondsMs({ max:5, min:1 });
  * ```
- * @inheritDoc secondsMsFn
+ * @inheritDoc secondsMsSource
  * @param maxSecondsOrOpts
  * @returns
  */
-export const secondsMs = (maxSecondsOrOpts: number | RandomOpts): number =>
-  secondsMsFn(maxSecondsOrOpts)();
+export const secondsMs = (maxSecondsOrOptions: number | RandomOptions): number =>
+  secondsMsSource(maxSecondsOrOptions)();
 
-export type GenerateRandomOpts = RandomOpts & {
+export type GenerateRandomOptions = RandomOptions & Readonly<{
   /**
    * If true, number range is looped
    */
-  readonly loop?: boolean;
-};
+  loop?: boolean;
+}>;
 
 /**
  * Returns a generator over random unique integers, up to
@@ -621,16 +626,16 @@ export type GenerateRandomOpts = RandomOpts & {
  * @returns
  */
 export function* integerUniqueGen(
-  maxOrOpts: number | GenerateRandomOpts
+  maxOrOptions: number | GenerateRandomOptions
 ): IterableIterator<number> {
-  const opts = typeof maxOrOpts === 'number' ? { max: maxOrOpts } : maxOrOpts;
-  const min = opts.min ?? 0;
-  const max = opts.max;
-  const source = opts.source ?? defaultRandom;
-  const loop = opts.loop ?? false;
+  const options = typeof maxOrOptions === `number` ? {max: maxOrOptions} : maxOrOptions;
+  const min = options.min ?? 0;
+  const max = options.max;
+  const source = options.source ?? defaultRandom;
+  const loop = options.loop ?? false;
 
-  guardInteger(min, '', 'min');
-  guardInteger(max, '', 'max');
+  throwFromResult(guardIntegerTest(min, ``, `min`));
+  throwFromResult(guardIntegerTest(max, ``, `max`));
   if (min > max) {
     throw new Error(`Min value is greater than max. Min: ${min} Max: ${max}`);
   }
@@ -648,3 +653,5 @@ export function* integerUniqueGen(
     yield numberRange[index++];
   }
 }
+
+export {randomIndex as arrayIndex} from './collections/Arrays.js';
