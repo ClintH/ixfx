@@ -1,4 +1,4 @@
-import { number as guardNumber } from './Guards.js';
+import { numberTest, throwFromResult } from './Guards.js';
 import { untilMatch } from './Text.js';
 export * as IterableAsync from './IterableAsync.js';
 export * as Debug from './Debug.js';
@@ -15,8 +15,8 @@ export const ifNaN = (v: number, fallback: number): number => {
   // ✔️ Unit tested
 
   if (Number.isNaN(v)) return fallback;
-  if (typeof v !== 'number') {
-    throw new Error(`v is not a number. Got: ${typeof v}`);
+  if (typeof v !== `number`) {
+    throw new TypeError(`v is not a number. Got: ${ typeof v }`);
   }
   return v;
 };
@@ -67,26 +67,27 @@ export const ifNaN = (v: number, fallback: number): number => {
  * oAvg.x.add(20);
  * ```
  */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mapObject = <
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   SourceType extends Record<string, any>,
   DestinationFieldType,
 >(
   object: SourceType,
-  mapFn: (fieldValue: any, field: string, index: number) => DestinationFieldType
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mapFunction: (fieldValue: any, field: string, index: number) => DestinationFieldType
 ): RemapObjectPropertyType<SourceType, DestinationFieldType> => {
-  type MapResult = [field: string, value: DestinationFieldType];
+  type MapResult = [ field: string, value: DestinationFieldType ];
   const entries = Object.entries(object);
-  const mapped = entries.map(([sourceField, sourceFieldValue], i) => [
+  const mapped = entries.map(([ sourceField, sourceFieldValue ], index) => [
     sourceField,
-    mapFn(sourceFieldValue, sourceField, i),
-  ]) as MapResult[];
-  // @ts-ignore
+    mapFunction(sourceFieldValue, sourceField, index),
+  ]) as Array<MapResult>;
+  // @ts-expect-error
   return Object.fromEntries(mapped);
 };
 
-export type RemapObjectPropertyType<OriginalType, PropType> = {
-  readonly [Property in keyof OriginalType]: PropType;
+export type RemapObjectPropertyType<OriginalType, PropertyType> = {
+  readonly [ Property in keyof OriginalType ]: PropertyType;
 };
 
 /**
@@ -144,21 +145,19 @@ export const relativeDifference = (initial: number) => (v: number) =>
  * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldByPath = (o: any, path: string = ``): any | undefined => {
+export const getFieldByPath = (o: any, path = ``): any => {
   if (o === null) throw new Error(`Parameter 'o' is null`);
-  if (typeof o !== 'object') {
-    throw new Error(`Parameter 'o' is not an object. Got: ${typeof o}`);
+  if (typeof o !== `object`) {
+    throw new TypeError(`Parameter 'o' is not an object. Got: ${ typeof o }`);
   }
   if (path.length === 0) return o;
   if (path in o) {
-    return o[path];
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return o[ path ];
   } else {
     const start = untilMatch(path, `.`);
-    if (start in o) {
-      return getFieldByPath(o[start], path.substring(start.length + 1));
-    } else {
-      return undefined;
-    }
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return start in o ? getFieldByPath(o[ start ], path.slice(Math.max(0, start.length + 1))) : undefined;
   }
 };
 
@@ -179,26 +178,29 @@ export const getFieldByPath = (o: any, path: string = ``): any | undefined => {
  * @param o
  * @returns
  */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldPaths = (o: any): readonly string[] => {
+export const getFieldPaths = (o: object | null): ReadonlyArray<string> => {
   if (o === null) return [];
-  if (typeof o !== 'object') {
-    throw new Error(`Parameter o should be an object. Got: ${typeof o}`);
+  if (typeof o !== `object`) {
+    throw new TypeError(`Parameter 'o' should be an object. Got: ${ typeof o }`);
   }
-  const paths: string[] = [];
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const probe = (o: any, prefix = ``) => {
-    if (typeof o === `object`) {
-      const keys = Object.keys(o);
-      if (prefix.length > 0) prefix += `.`;
-      keys.forEach((k) => probe(o[k], prefix + k));
-    } else {
-      //eslint-disable-next-line functional/immutable-data
-      paths.push(prefix);
+
+  //const paths: string[] = [];
+
+  // Probe a given object, with a set of initial paths and prefix
+  const probe = (o: object, initialPaths: ReadonlyArray<string>, prefix: string): ReadonlyArray<string> => {
+    if (typeof o !== `object`) {
+      // Nothing to recurse into
+      return [ ...initialPaths, prefix ];
     }
+
+    const prefixToUse = (prefix.length > 0) ? prefix + `.` : prefix;
+
+    const keys = Object.keys(o);
+
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return [ ...keys.map(key => probe((o as any)[ key ], [], prefixToUse + key)), initialPaths ].flat();
   };
-  probe(o);
-  return paths;
+  return probe(o, [], ``);
 };
 
 /**
@@ -212,8 +214,8 @@ export const getFieldPaths = (o: any): readonly string[] => {
  * @returns
  */
 export const roundUpToMultiple = (v: number, multiple: number): number => {
-  guardNumber(v, `nonZero`, `v`);
-  guardNumber(multiple, `nonZero`, `muliple`);
+  throwFromResult(numberTest(v, `nonZero`, `v`));
+  throwFromResult(numberTest(multiple, `nonZero`, `multiple`));
   return Math.ceil(v / multiple) * multiple;
 };
 
@@ -248,6 +250,7 @@ export const toStringDefault = <V>(itemToMakeStringFor: V): string =>
     ? itemToMakeStringFor
     : JSON.stringify(itemToMakeStringFor);
 
+//eslint-disable-next-line functional/functional-parameters
 export const runningiOS = () =>
   [
     `iPad Simulator`,
@@ -341,6 +344,7 @@ export const jsComparer = (x: any, y: any): CompareResult => {
  * @see {@link comparerInverse} Inverted order
  * @returns
  */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const defaultComparer = (x: any, y: any): CompareResult => {
   if (typeof x === `number` && typeof y === `number`) {
     return numericComparer(x, y);
@@ -372,9 +376,9 @@ export const defaultComparer = (x: any, y: any): CompareResult => {
  * @param fn
  * @returns
  */
-export const comparerInverse = <V>(fn: Comparer<V>): Comparer<V> => {
+export const comparerInverse = <V>(comparer: Comparer<V>): Comparer<V> => {
   return (x: V, y: V) => {
-    const v = fn(x, y);
+    const v = comparer(x, y);
     return v * -1;
   };
 };
@@ -386,35 +390,32 @@ export const comparerInverse = <V>(fn: Comparer<V>): Comparer<V> => {
  * @returns
  */
 export const defaultKeyer = <V>(a: V) => {
-  if (typeof a === `string`) {
-    return a;
-  } else {
-    return JSON.stringify(a);
-  }
+  return typeof a === `string` ? a : JSON.stringify(a);
 };
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-const defaultToString = (obj: any) => {
+const defaultToString = (object: any): string => {
   //ECMA specification: http://www.ecma-international.org/ecma-262/6.0/#sec-tostring
-  if (obj === null) return `null`;
-  if (typeof obj === `boolean` || typeof obj === `number`) {
-    return obj.toString();
+  if (object === null) return `null`;
+  if (typeof object === `boolean` || typeof object === `number`) {
+    return object.toString();
   }
 
-  if (typeof obj === `string`) return obj;
-  if (typeof obj === `symbol`) throw new TypeError();
-  return obj.toString();
+  if (typeof object === `string`) return object;
+  if (typeof object === `symbol`) throw new TypeError(`Symbol cannot be converted to string`);
+  return JSON.stringify(object);
 };
 
-try {
-  if (typeof window !== `undefined`) {
-    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = {
-      ...(window as any).ixfx,
-      getFieldByPath,
-      getFieldPaths,
-    };
-  }
-} catch {
-  /* no-op */
-}
+// try {
+//   if (typeof window !== `undefined`) {
+//     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+//     (window as any).ixfx = {
+//       //eslint-disable-next-line @typescript-eslint/no-explicit-any
+//       ...(window as any).ixfx,
+//       getFieldByPath,
+//       getFieldPaths,
+//     };
+//   }
+// } catch {
+//   /* no-op */
+// }
