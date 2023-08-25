@@ -1,4 +1,3 @@
-/* eslint-disable */
 type WithEvents = {
   addEventListener(type: string, callbackfn: any): void;
   removeEventListener(type: string, callbackfn: any): void;
