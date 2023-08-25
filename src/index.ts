@@ -265,7 +265,7 @@ export * as Modulation from './modulation/index.js';
  *
  * ### MutableSet
  * Like a regular array, a set can store many items. However, duplicate items are ignored - it
- * only keeps unique items. ixfx's {@link Sets.ISetMutable | MutableSet} allows for considering items as identical by value, not
+ * only keeps unique items. ixfx's {@link Sets.ISetMutable} allows for considering items as identical by value, not
  * just by reference as the default JS Set operates
  *
  * * {@link Sets.mutable}: Create a {@link Sets.ISetMutable}
