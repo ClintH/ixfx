@@ -1,4 +1,4 @@
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 
 /**
  * Continually loops up and down between 0 and 1 by a specified interval.
@@ -39,10 +39,10 @@ export const pingPongPercent = function (
   if (upper === undefined) upper = 1;
   if (start === undefined) start = lower;
 
-  guardNumber(interval, `bipolar`, `interval`);
-  guardNumber(upper, `bipolar`, `end`);
-  guardNumber(start, `bipolar`, `offset`);
-  guardNumber(lower, `bipolar`, `start`);
+  throwNumberTest(interval, `bipolar`, `interval`);
+  throwNumberTest(upper, `bipolar`, `end`);
+  throwNumberTest(start, `bipolar`, `offset`);
+  throwNumberTest(lower, `bipolar`, `start`);
   return pingPong(interval, lower, upper, start, rounding);
 };
 
@@ -93,7 +93,7 @@ export const pingPong = function* (
   if (interval === 0) throw new Error(`Interval cannot be zero`);
   const distance = upper - lower;
   if (Math.abs(interval) >= distance) {
-    throw new Error(`Interval should be between -${distance} and ${distance}`);
+    throw new Error(`Interval should be between -${ distance } and ${ distance }`);
   }
 
   //eslint-disable-next-line functional/no-let
@@ -105,15 +105,14 @@ export const pingPong = function* (
   interval = Math.floor(Math.abs(interval * rounding));
 
   if (interval === 0) {
-    throw new Error(`Interval is zero (rounding: ${rounding})`);
+    throw new Error(`Interval is zero (rounding: ${ rounding })`);
   }
   if (start === undefined) start = lower;
   else start = Math.floor(start * rounding);
   if (start > upper || start < lower) {
     throw new Error(
-      `Start (${start / rounding}) must be within lower (${
-        lower / rounding
-      }) and upper (${upper / rounding})`
+      `Start (${ start / rounding }) must be within lower (${ lower / rounding
+      }) and upper (${ upper / rounding })`
     );
   }
 
