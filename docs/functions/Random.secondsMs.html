@@ -18,25 +18,23 @@
 <h1>Function secondsMs</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="secondsMs"><span class="tsd-kind-call-signature">seconds<wbr/>Ms</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">maxSecondsOrOpts</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#secondsMs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="secondsMs"><span class="tsd-kind-call-signature">seconds<wbr/>Ms</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">maxSecondsOrOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#secondsMs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns function which produces a random number of seconds, with a unit of milliseconds.
 Maximum value is exclusive.
-Use <a href="Random.secondsMs.html" class="tsd-kind-function">secondsMs</a> to return a random value directly, or <a href="Random.secondsMsFn.html" class="tsd-kind-function">secondsMsFn</a> to return a function.</p>
+Use <a href="Random.secondsMs.html" class="tsd-kind-function">secondsMs</a> to return a random value directly, or <a href="Random.secondsMsSource.html" class="tsd-kind-function">secondsMsSource</a> to return a function.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">maxSecondsOrOpts</span>: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../modules/Random.html" class="tsd-signature-type tsd-kind-namespace">Random</a><span class="tsd-signature-symbol">.</span><a href="../types/Random.RandomOpts.html" class="tsd-signature-type tsd-kind-type-alias">RandomOpts</a></h5>
-<div class="tsd-comment tsd-typography"><p>Maximum seconds, or options.</p>
-</div>
+<h5><span class="tsd-kind-parameter">maxSecondsOrOptions</span>: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/Random.RandomOptions.html" class="tsd-signature-type tsd-kind-interface">RandomOptions</a></h5>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography">
 <h4>Remarks</h4><p>It&#39;s a very minor function, but can make
 code a little more literate:</p>
-<pre><code class="language-js"><span class="hl-0">// Random timeout of up to 5 seconds</span><br/><span class="hl-8">setTimeout</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> { ...}, </span><span class="hl-8">secondsMs</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">));</span>
+<pre><code class="language-js"><span class="hl-0">// Random timeout of up to 5 seconds</span><br/><span class="hl-8">setTimeout</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> { ...}, </span><span class="hl-8">secondsMsSource</span><span class="hl-2">(</span><span class="hl-7">5</span><span class="hl-2">));</span>
 </code><button>Copy</button></pre>
 
 <h4>Example</h4><p>Random milliseconds between 0..4999</p>
@@ -84,28 +82,28 @@ code a little more literate:</p>
 <li><a href="../modules/Random.html#hue"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8388608"></use></svg><span>hue</span></a></li>
 <li><a href="../modules/Random.html#integerUniqueGen"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8388608"></use></svg><span>integer<wbr/>Unique<wbr/>Gen</span></a></li>
 <li><a href="../modules/Random.html#string"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8388608"></use></svg><span>string</span></a></li>
-<li><a href="../types/Random.GenerateRandomOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Generate<wbr/>Random<wbr/>Opts</span></a></li>
-<li><a href="../types/Random.RandomOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Random<wbr/>Opts</span></a></li>
+<li><a href="../interfaces/Random.RandomOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-256"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)"></path></g></svg><span>Random<wbr/>Options</span></a></li>
+<li><a href="../interfaces/Random.StringOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>String<wbr/>Options</span></a></li>
+<li><a href="../interfaces/Random.WeightedOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Weighted<wbr/>Options</span></a></li>
+<li><a href="../types/Random.GenerateRandomOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Generate<wbr/>Random<wbr/>Options</span></a></li>
 <li><a href="../types/Random.RandomSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Random<wbr/>Source</span></a></li>
-<li><a href="../types/Random.StringOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>String<wbr/>Opts</span></a></li>
-<li><a href="../types/Random.WeightedIntOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Weighted<wbr/>Int<wbr/>Opts</span></a></li>
-<li><a href="../types/Random.WeightedOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Weighted<wbr/>Opts</span></a></li>
+<li><a href="../types/Random.WeightedIntegerOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Weighted<wbr/>Integer<wbr/>Options</span></a></li>
 <li><a href="Random.defaultRandom.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-64"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)"></path></g></svg><span>default<wbr/>Random</span></a></li>
 <li><a href="Random.float.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>float</span></a></li>
-<li><a href="Random.floatFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>float<wbr/>Fn</span></a></li>
+<li><a href="Random.floatSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>float<wbr/>Source</span></a></li>
 <li><a href="Random.gaussian.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>gaussian</span></a></li>
-<li><a href="Random.gaussianFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>gaussian<wbr/>Fn</span></a></li>
+<li><a href="Random.gaussianSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>gaussian<wbr/>Source</span></a></li>
 <li><a href="Random.integer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>integer</span></a></li>
-<li><a href="Random.integerFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>integer<wbr/>Fn</span></a></li>
+<li><a href="Random.integerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>integer<wbr/>Source</span></a></li>
 <li><a href="Random.minutesMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>minutes<wbr/>Ms</span></a></li>
-<li><a href="Random.minutesMsFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>minutes<wbr/>Ms<wbr/>Fn</span></a></li>
+<li><a href="Random.minutesMsSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>minutes<wbr/>Ms<wbr/>Source</span></a></li>
 <li><a href="Random.secondsMs.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>seconds<wbr/>Ms</span></a></li>
-<li><a href="Random.secondsMsFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>seconds<wbr/>Ms<wbr/>Fn</span></a></li>
+<li><a href="Random.secondsMsSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>seconds<wbr/>Ms<wbr/>Source</span></a></li>
 <li><a href="Random.shortGuid.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>short<wbr/>Guid</span></a></li>
 <li><a href="Random.weighted.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>weighted</span></a></li>
-<li><a href="Random.weightedFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>weighted<wbr/>Fn</span></a></li>
 <li><a href="Random.weightedInteger.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>weighted<wbr/>Integer</span></a></li>
-<li><a href="Random.weightedIntegerFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>weighted<wbr/>Integer<wbr/>Fn</span></a></li></ul></div></details></li>
+<li><a href="Random.weightedIntegerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>weighted<wbr/>Integer<wbr/>Source</span></a></li>
+<li><a href="Random.weightedSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>weighted<wbr/>Source</span></a></li></ul></div></details></li>
 <li><a href="../modules/Text.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Text</span></a></li>
 <li><a href="../modules/Util.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Util</span></a></li>
 <li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li></ul></nav></div></div></div>
