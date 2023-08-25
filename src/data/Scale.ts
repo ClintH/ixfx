@@ -1,5 +1,5 @@
 import { clamp } from './Clamp.js';
-import { number as guardNumber } from '../Guards.js';
+import { numberTest, throwFromResult } from '../Guards.js';
 
 /**
  * Scales `v` from an input range to an output range (aka `map`)
@@ -137,9 +137,9 @@ export const scalePercentages = (
   outMin: number,
   outMax: number = 1
 ): number => {
-  guardNumber(percentage, `percentage`, `v`);
-  guardNumber(outMin, `percentage`, `outMin`);
-  guardNumber(outMax, `percentage`, `outMax`);
+  throwFromResult(numberTest(percentage, `percentage`, `v`));
+  throwFromResult(numberTest(outMin, `percentage`, `outMin`));
+  throwFromResult(numberTest(outMax, `percentage`, `outMax`));
   return scale(percentage, 0, 1, outMin, outMax);
 };
 
@@ -172,7 +172,7 @@ export const scalePercent = (
  */
 export const scalePercentFn = (outMin: number, outMax: number) => {
   return (v: number) => {
-    guardNumber(v, `percentage`, `v`);
+    throwFromResult(numberTest(v, `percentage`, `v`));
     return scale(v, 0, 1, outMin, outMax);
   };
 };

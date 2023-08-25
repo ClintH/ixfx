@@ -1,4 +1,4 @@
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 import { type Interval, intervalToMs } from './index.js';
 
 export type SleepOpts<V> = Interval & {
@@ -55,7 +55,7 @@ export const sleep = <V>(
   const timeoutMs = intervalToMs(optsOrMillis);
   const signal = optsOrMillis.signal;
   const value = optsOrMillis.value;
-  guardNumber(timeoutMs, `positive`, `timeoutMs`);
+  throwNumberTest(timeoutMs, `positive`, `timeoutMs`);
   if (timeoutMs === 0) {
     return new Promise<V | undefined>((resolve) =>
       requestAnimationFrame((_) => {

@@ -1,4 +1,4 @@
-import { number as guardNumber, integer as guardInteger } from './Guards.js';
+import { throwIntegerTest, throwNumberTest } from './Guards.js';
 
 import type { DelayOpts } from './flow/Delay.js';
 
@@ -91,7 +91,7 @@ export const numericRange = function* (
   repeating: boolean = false,
   rounding?: number
 ) {
-  guardNumber(interval, `nonZero`);
+  throwNumberTest(interval, `nonZero`);
 
   const negativeInterval = interval < 0;
   if (end === undefined) {
@@ -99,12 +99,12 @@ export const numericRange = function* (
   } else {
     if (negativeInterval && start < end) {
       throw new Error(
-        `Interval of ${interval} will never go from ${start} to ${end}`
+        `Interval of ${ interval } will never go from ${ start } to ${ end }`
       );
     }
     if (!negativeInterval && start > end) {
       throw new Error(
-        `Interval of ${interval} will never go from ${start} to ${end}`
+        `Interval of ${ interval } will never go from ${ start } to ${ end }`
       );
     }
   }
@@ -160,8 +160,8 @@ export const numericRange = function* (
  */
 export const count = function* (amount: number, offset: number = 0) {
   // Unit tested.
-  guardInteger(amount, ``, `amount`);
-  guardInteger(offset, ``, `offset`);
+  throwIntegerTest(amount, ``, `amount`);
+  throwIntegerTest(offset, ``, `offset`);
 
   if (amount === 0) return;
 
@@ -199,8 +199,8 @@ export const numericPercent = function (
   start: number = 0,
   end = 1
 ) {
-  guardNumber(interval, `percentage`, `interval`);
-  guardNumber(start, `percentage`, `start`);
-  guardNumber(end, `percentage`, `end`);
+  throwNumberTest(interval, `percentage`, `interval`);
+  throwNumberTest(start, `percentage`, `start`);
+  throwNumberTest(end, `percentage`, `end`);
   return numericRange(interval, start, end, repeating);
 };

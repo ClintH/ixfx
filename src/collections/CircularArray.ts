@@ -1,4 +1,4 @@
-import { integer as guardInteger } from '../Guards.js';
+import {throwIntegerTest} from '../Guards.js';
 
 /**
  * The circular array is immutable. It keeps up to `capacity` items.
@@ -53,7 +53,7 @@ class CircularArray<V> extends Array {
   constructor(capacity: number = 0) {
     super();
     // Allowed to create with capacity zero
-    guardInteger(capacity, `positive`, `capacity`);
+    throwIntegerTest(capacity, `positive`, `capacity`);
 
     // Can't throw because .filter won't use ctor proprly
     this.#capacity = capacity;

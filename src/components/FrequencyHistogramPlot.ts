@@ -29,7 +29,7 @@ export class FrequencyHistogramPlot {
 
   readonly el: HistogramVis | undefined;
   // eslint-disable-next-line functional/prefer-readonly-type
-  #sorter: KeyValueUtil.SortingFn | undefined;
+  #sorter: KeyValueUtil.Sorter | undefined;
 
   //eslint-disable-next-line functional/prefer-immutable-types
   constructor(el: HistogramVis) {
@@ -62,7 +62,7 @@ export class FrequencyHistogramPlot {
     el.remove();
   }
 
-  update(data: ReadonlyArray<readonly [key: string, count: number]>) {
+  update(data: ReadonlyArray<readonly [ key: string, count: number ]>) {
     if (this.el === undefined) {
       console.warn(`FrequencyHistogramPlot this.el undefined`);
       return;
@@ -73,7 +73,7 @@ export class FrequencyHistogramPlot {
       this.el.data = this.#sorter(data as KeyValueUtil.KeyValue[]);
     } else {
       // eslint-disable-next-line functional/immutable-data
-      this.el.data = [...data];
+      this.el.data = [ ...data ];
     }
   }
 }

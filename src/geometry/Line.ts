@@ -1,9 +1,9 @@
-import {Arrays} from '../collections/index.js';
-import {minFast} from '../collections/NumericArrays.js';
-import {number as guardNumber, percent as guardPercent} from '../Guards.js';
-import {Points, Rects} from './index.js';
-import {type Path} from './Path.js';
-import {guard as guardPoint, type Point} from './Point.js';
+import { Arrays } from '../collections/index.js';
+import { minFast } from '../collections/NumericArrays.js';
+import { throwNumberTest, throwPercentTest } from '../Guards.js';
+import { Points, Rects } from './index.js';
+import { type Path } from './Path.js';
+import { guard as guardPoint, type Point } from './Point.js';
 
 /**
  * A line, which consists of an `a` and `b` {@link Points.Point}.
@@ -15,14 +15,14 @@ export type Line = {
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Empty = Object.freeze({
-  a: Object.freeze({x: 0, y: 0}),
-  b: Object.freeze({x: 0, y: 0})
+  a: Object.freeze({ x: 0, y: 0 }),
+  b: Object.freeze({ x: 0, y: 0 })
 });
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Placeholder = Object.freeze({
-  a: Object.freeze({x: NaN, y: NaN}),
-  b: Object.freeze({x: NaN, y: NaN})
+  a: Object.freeze({ x: NaN, y: NaN }),
+  b: Object.freeze({ x: NaN, y: NaN })
 });
 
 /**
@@ -131,9 +131,9 @@ export const apply = (line: Line, fn: (p: Points.Point) => Points.Point) => Obje
  * @param paramName 
  */
 export const guard = (line: Line, paramName: string = `line`) => {
-  if (line === undefined) throw new Error(`${paramName} undefined`);
-  if (line.a === undefined) throw new Error(`${paramName}.a undefined. Expected {a:Point, b:Point}. Got: ${JSON.stringify(line)}`);
-  if (line.b === undefined) throw new Error(`${paramName}.b undefined. Expected {a:Point, b:Point} Got: ${JSON.stringify(line)}`);
+  if (line === undefined) throw new Error(`${ paramName } undefined`);
+  if (line.a === undefined) throw new Error(`${ paramName }.a undefined. Expected {a:Point, b:Point}. Got: ${ JSON.stringify(line) }`);
+  if (line.b === undefined) throw new Error(`${ paramName }.b undefined. Expected {a:Point, b:Point} Got: ${ JSON.stringify(line) }`);
 };
 
 /**
@@ -191,6 +191,8 @@ export const multiply = (line: Line, point: Points.Point): Line => (Object.freez
  * const ll = Lines.divide(l, {x:2, y:4});
  * // Yields: 0.5,0.25 -> 5,2.5
  * ```
+ * 
+ * Dividing by zero will give Infinity for that dimension.
  * @param line 
  * @param point 
  * @returns 
@@ -321,7 +323,7 @@ export function length(aOrLine: Points.Point | Line | PolyLine, pointB?: Points.
     return sum;
   }
 
-  const [a, b] = getPointsParam(aOrLine, pointB);
+  const [ a, b ] = getPointsParam(aOrLine, pointB);
   const x = b.x - a.x;
   const y = b.y - a.y;
   if (a.z !== undefined && b.z !== undefined) {
@@ -344,7 +346,7 @@ export function length(aOrLine: Points.Point | Line | PolyLine, pointB?: Points.
  * @returns 
  */
 export const midpoint = (aOrLine: Points.Point | Line, pointB?: Points.Point): Points.Point => {
-  const [a, b] = getPointsParam(aOrLine, pointB);
+  const [ a, b ] = getPointsParam(aOrLine, pointB);
   return interpolate(0.5, a, b);
 };
 
@@ -357,7 +359,7 @@ export const midpoint = (aOrLine: Points.Point | Line, pointB?: Points.Point): P
  * @param b 
  * @returns 
  */
-export const getPointsParam = (aOrLine: Points.Point | Line, b?: Points.Point): readonly [Points.Point, Points.Point] => {
+export const getPointsParam = (aOrLine: Points.Point | Line, b?: Points.Point): readonly [ Points.Point, Points.Point ] => {
   //eslint-disable-next-line functional/no-let
   let a;
   if (isLine(aOrLine)) {
@@ -365,12 +367,12 @@ export const getPointsParam = (aOrLine: Points.Point | Line, b?: Points.Point): 
     a = aOrLine.a;
   } else {
     a = aOrLine;
-    if (b === undefined) throw new Error(`Since first parameter is not a line, two points are expected. Got a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`);
+    if (b === undefined) throw new Error(`Since first parameter is not a line, two points are expected. Got a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) }`);
   }
   guardPoint(a, `a`);
   guardPoint(a, `b`);
 
-  return [a, b];
+  return [ a, b ];
 };
 
 /**
@@ -389,22 +391,22 @@ export const getPointsParam = (aOrLine: Points.Point | Line, b?: Points.Point): 
 export const nearest = (line: Line | readonly Line[], point: Points.Point): Points.Point => {
 
   const n = (line: Line): Points.Point => {
-    const {a, b} = line;
-    const atob = {x: b.x - a.x, y: b.y - a.y};
-    const atop = {x: point.x - a.x, y: point.y - a.y};
+    const { a, b } = line;
+    const atob = { x: b.x - a.x, y: b.y - a.y };
+    const atop = { x: point.x - a.x, y: point.y - a.y };
     const len = atob.x * atob.x + atob.y * atob.y;
 
     //eslint-disable-next-line functional/no-let
     let dot = atop.x * atob.x + atop.y * atob.y;
     const t = Math.min(1, Math.max(0, dot / len));
     dot = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
-    return {x: a.x + atob.x * t, y: a.y + atob.y * t};
+    return { x: a.x + atob.x * t, y: a.y + atob.y * t };
   };
 
   if (Array.isArray(line)) {
     const pts = line.map(l => n(l));
     const dists = pts.map(p => Points.distance(p, point));
-    return Object.freeze<Points.Point>(pts[Arrays.minIndex(...dists)]);
+    return Object.freeze<Points.Point>(pts[ Arrays.minIndex(...dists) ]);
   } else {
     return Object.freeze<Points.Point>(n(line as Line));
   }
@@ -517,7 +519,7 @@ export const parallel = (line: Line, distance: number): Line => {
 export const scaleFromMidpoint = (line: Line, factor: number): Line => {
   const a = interpolate(factor / 2, line);
   const b = interpolate(0.5 + factor / 2, line);
-  return {a, b};
+  return { a, b };
 };
 
 /**
@@ -527,7 +529,7 @@ export const scaleFromMidpoint = (line: Line, factor: number): Line => {
  */
 export const pointAtX = (line: Line, x: number): Points.Point => {
   const y = line.a.y + (x - line.a.x) * slope(line);
-  return Object.freeze({x: x, y});
+  return Object.freeze({ x: x, y });
 };
 
 /**
@@ -576,7 +578,7 @@ export const extendFromA = (line: Line, distance: number): Line => {
 //eslint-disable-next-line func-style
 export function* pointsOf(line: Line): Generator<Points.Point> {
   // Via https://play.ertdfgcvb.xyz/#/src/demos/dyna
-  const {a, b} = line;
+  const { a, b } = line;
   //eslint-disable-next-line functional/no-let
   let x0 = Math.floor(a.x);
   //eslint-disable-next-line functional/no-let
@@ -591,7 +593,7 @@ export function* pointsOf(line: Line): Generator<Points.Point> {
   let err = dx + dy;
 
   while (true) {
-    yield {x: x0, y: y0};
+    yield { x: x0, y: y0 };
     if (x0 === x1 && y0 === y1) break;
     const e2 = 2 * err;
     if (e2 >= dy) {
@@ -710,16 +712,16 @@ export function interpolate(amount: number, aOrLine: Points.Point | Line, pointB
     pointBOrAllowOverflow = undefined;
   }
 
-  if (!allowOverflow) guardPercent(amount, `amount`);
-  else guardNumber(amount, ``, `amount`);
+  if (!allowOverflow) throwPercentTest(amount, `amount`);
+  else throwNumberTest(amount, ``, `amount`);
 
-  const [a, b] = getPointsParam(aOrLine, pointBOrAllowOverflow);
+  const [ a, b ] = getPointsParam(aOrLine, pointBOrAllowOverflow);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
 
   // Points are identical, return a copy of b
-  if (d === 0 && d2 === 0) return Object.freeze({...b});
+  if (d === 0 && d2 === 0) return Object.freeze({ ...b });
 
   const x = b.x - (d2 * (b.x - a.x) / d);
   const y = b.y - (d2 * (b.y - a.y) / d);
@@ -789,8 +791,8 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
   if (Number.isNaN(y1)) throw new Error(`y1 is NaN`);
   if (Number.isNaN(y2)) throw new Error(`y2 is NaN`);
 
-  const a = {x: x1, y: y1};
-  const b = {x: x2, y: y2};
+  const a = { x: x1, y: y1 };
+  const b = { x: x2, y: y2 };
   return fromPoints(a, b);
 };
 
@@ -811,9 +813,9 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  */
 export const toFlatArray = (a: Points.Point | Line, b: Points.Point): readonly number[] => {
   if (isLine(a)) {
-    return [a.a.x, a.a.y, a.b.x, a.b.y];
+    return [ a.a.x, a.a.y, a.b.x, a.b.y ];
   } else if (Points.isPoint(a) && Points.isPoint(b)) {
-    return [a.x, a.y, b.x, b.y];
+    return [ a.x, a.y, b.x, b.y ];
   } else {
     throw new Error(`Expected single line parameter, or a and b points`);
   }
@@ -848,7 +850,7 @@ export function* asPoints(lines: Iterable<Line>) {
  * @param b 
  * @returns 
  */
-export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[] => [`M${a.x} ${a.y} L ${b.x} ${b.y}`];
+export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[] => [ `M${ a.x } ${ a.y } L ${ b.x } ${ b.y }` ];
 
 /**
  * Returns a line from four numbers [x1,y1,x2,y2].
@@ -866,7 +868,7 @@ export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[]
 export const fromFlatArray = (arr: readonly number[]): Line => {
   if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);
   if (arr.length !== 4) throw new Error(`array is expected to have length four`);
-  return fromNumbers(arr[0], arr[1], arr[2], arr[3]);
+  return fromNumbers(arr[ 0 ], arr[ 1 ], arr[ 2 ], arr[ 3 ]);
 };
 
 /**
@@ -885,8 +887,8 @@ export const fromFlatArray = (arr: readonly number[]): Line => {
 export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
   guardPoint(a, `a`);
   guardPoint(b, `b`);
-  a = Object.freeze({...a});
-  b = Object.freeze({...b});
+  a = Object.freeze({ ...a });
+  b = Object.freeze({ ...b });
   return Object.freeze({
     a: a,
     b: b
@@ -909,12 +911,12 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
 export const joinPointsToLines = (...points: readonly Points.Point[]): PolyLine => {
   const lines = [];
   //eslint-disable-next-line functional/no-let
-  let start = points[0];
+  let start = points[ 0 ];
   //eslint-disable-next-line functional/no-let
   for (let i = 1; i < points.length; i++) {
     //eslint-disable-next-line functional/immutable-data
-    lines.push(fromPoints(start, points[i]));
-    start = points[i];
+    lines.push(fromPoints(start, points[ i ]));
+    start = points[ i ];
   }
   return lines;
 };
@@ -966,7 +968,7 @@ export const bbox = (line: Line): Rects.RectPositioned => Points.bbox(line.a, li
  * @returns 
  */
 export const toPath = (line: Line): LinePath => {
-  const {a, b} = line;
+  const { a, b } = line;
   return Object.freeze({
     ...line,
     length: () => length(a, b),
@@ -975,7 +977,7 @@ export const toPath = (line: Line): LinePath => {
     toString: () => toString(a, b),
     toFlatArray: () => toFlatArray(a, b),
     toSvgString: () => toSvgString(a, b),
-    toPoints: () => [a, b],
+    toPoints: () => [ a, b ],
     rotate: (amountRadian: number, origin: Points.Point) => toPath(rotate(line, amountRadian, origin)),
     nearest: (point: Point) => nearest(line, point),
     sum: (point: Points.Point) => toPath(sum(line, point)),

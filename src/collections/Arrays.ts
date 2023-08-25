@@ -3,7 +3,7 @@
  * See Also: NumericArrays.ts
  */
 
-import { integer as guardInteger } from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 import { defaultRandom, type RandomSource } from '../Random.js';
 import {
   type IsEqual,
@@ -28,13 +28,13 @@ export * from './NumericArrays.js';
  */
 export const guardArray = <V>(array: ArrayLike<V>, paramName: string = `?`) => {
   if (array === undefined) {
-    throw new Error(`Param '${paramName}' is undefined. Expected array.`);
+    throw new Error(`Param '${ paramName }' is undefined. Expected array.`);
   }
   if (array === null) {
-    throw new Error(`Param '${paramName}' is null. Expected array.`);
+    throw new Error(`Param '${ paramName }' is null. Expected array.`);
   }
   if (!Array.isArray(array)) {
-    throw new Error(`Param '${paramName}' not an array as expected`);
+    throw new Error(`Param '${ paramName }' not an array as expected`);
   }
 };
 
@@ -50,10 +50,10 @@ export const guardIndex = <V>(
   paramName: string = `index`
 ) => {
   guardArray(array);
-  guardInteger(index, `positive`, paramName);
+  throwIntegerTest(index, `positive`, paramName);
   if (index > array.length - 1) {
     throw new Error(
-      `'${paramName}' ${index} beyond array max of ${array.length - 1}`
+      `'${ paramName }' ${ index } beyond array max of ${ array.length - 1 }`
     );
   }
 };
@@ -96,7 +96,7 @@ export const valuesEqual = <V>(
   if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array.`);
   if (array.length === 0) return true;
   const eq = equality === undefined ? isEqualValueDefault : equality;
-  const a = array[0];
+  const a = array[ 0 ];
   const r = array.some((v) => !eq(a, v));
   if (r) return false;
   return true;
@@ -132,7 +132,7 @@ export const intersection = <V>(
  * @returns
  */
 export const flatten = <V>(array: ReadonlyArray<V | readonly V[]>): V[] =>
-  Array.prototype.concat.apply([], [...array]);
+  Array.prototype.concat.apply([], [ ...array ]);
 
 /**
  * Zip ombines the elements of two or more arrays based on their index.
@@ -171,11 +171,11 @@ export const zip = (
     throw new Error(`Arrays must be of same length`);
   }
   const ret = [];
-  const len = lengths[0];
+  const len = lengths[ 0 ];
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < len; i++) {
     //eslint-disable-next-line functional/immutable-data
-    ret.push(arrays.map((a) => a[i]));
+    ret.push(arrays.map((a) => a[ i ]));
   }
   return ret;
 };
@@ -207,13 +207,13 @@ export const interleave = <V>(
   }
 
   const ret = [];
-  const len = lengths[0];
+  const len = lengths[ 0 ];
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < len; i++) {
     //eslint-disable-next-line functional/no-let
     for (let p = 0; p < arrays.length; p++) {
       //eslint-disable-next-line functional/immutable-data
-      ret.push(arrays[p][i]);
+      ret.push(arrays[ p ][ i ]);
     }
   }
   return ret;
@@ -251,11 +251,11 @@ export const ensureLength = <V>(
   // Unit tested
   if (data === undefined) throw new Error(`Data undefined`);
   if (!Array.isArray(data)) throw new Error(`data is not an array`);
-  if (data.length === length) return [...data];
+  if (data.length === length) return [ ...data ];
   if (data.length > length) {
     return data.slice(0, length);
   }
-  const d = [...data];
+  const d = [ ...data ];
   const add = length - d.length;
 
   //eslint-disable-next-line functional/no-let
@@ -267,13 +267,13 @@ export const ensureLength = <V>(
       d.push(undefined);
     } else if (expand === `repeat`) {
       //eslint-disable-next-line functional/immutable-data
-      d.push(data[i % data.length]);
+      d.push(data[ i % data.length ]);
     } else if (expand === `first`) {
       //eslint-disable-next-line functional/immutable-data
-      d.push(data[0]);
+      d.push(data[ 0 ]);
     } else if (expand === `last`) {
       //eslint-disable-next-line functional/immutable-data
-      d.push(data[data.length - 1]);
+      d.push(data[ data.length - 1 ]);
     }
   }
   return d;
@@ -319,7 +319,7 @@ export const filterBetween = <V>(
   //eslint-disable-next-line functional/no-let
   for (let i = startIndex; i < endIndex; i++) {
     //eslint-disable-next-line functional/immutable-data
-    if (predicate(array[i], i, array)) t.push(array[i]);
+    if (predicate(array[ i ], i, array)) t.push(array[ i ]);
   }
   return t;
 };
@@ -365,7 +365,7 @@ export const randomElement = <V>(
   rand: RandomSource = defaultRandom
 ): V => {
   guardArray(array, `array`);
-  return array[Math.floor(rand() * array.length)];
+  return array[ Math.floor(rand() * array.length) ];
 };
 
 /**
@@ -408,17 +408,17 @@ export const randomPluck = <V>(
   const index = randomIndex(array, rand);
   if (mutate) {
     return {
-      value: array[index],
+      value: array[ index ],
       //eslint-disable-next-line functional/immutable-data
       array: array.splice(index, 1),
     };
   } else {
     // Copy array, remove item from that
-    const t = [...array];
+    const t = [ ...array ];
     //eslint-disable-next-line functional/immutable-data
     t.splice(index, 1);
     return {
-      value: array[index],
+      value: array[ index ],
       array: t,
     };
   }
@@ -443,11 +443,11 @@ export const shuffle = <V>(
   dataToShuffle: ReadonlyArray<V> | ReadonlyArray<V>,
   rand: RandomSource = defaultRandom
 ): Array<V> => {
-  const array = [...dataToShuffle];
+  const array = [ ...dataToShuffle ];
   // eslint-disable-next-line  functional/no-let
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [ array[ i ], array[ j ] ] = [ array[ j ], array[ i ] ];
   }
   return array;
 };
@@ -474,10 +474,10 @@ export const sortByNumericProperty = <V, K extends keyof V>(
   data: ReadonlyArray<V> | ReadonlyArray<V>,
   propertyName: K
 ) =>
-  [...data].sort((a, b) => {
+  [ ...data ].sort((a, b) => {
     guardArray(data, `data`);
-    const av = a[propertyName];
-    const bv = b[propertyName];
+    const av = a[ propertyName ];
+    const bv = b[ propertyName ];
     if (av < bv) return -1;
     if (av > bv) return 1;
     return 0;
@@ -561,7 +561,7 @@ export const without = <V>(
 export const until = <V, A>(
   //eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V> | Array<V>,
-  predicate: (v: V, acc: A) => readonly [stop: boolean, acc: A],
+  predicate: (v: V, acc: A) => readonly [ stop: boolean, acc: A ],
   initial: A
 ): V[] => {
   const ret = [];
@@ -569,13 +569,13 @@ export const until = <V, A>(
   let total = initial;
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < data.length; i++) {
-    const [stop, acc] = predicate(data[i], total);
+    const [ stop, acc ] = predicate(data[ i ], total);
     if (stop) break;
 
     total = acc;
 
     //eslint-disable-next-line functional/immutable-data
-    ret.push(data[i]);
+    ret.push(data[ i ]);
   }
   return ret;
 };
@@ -612,7 +612,7 @@ export const remove = <V>(
     throw new Error(`'data' parameter should be an array`);
   }
   guardIndex(data, index, `index`);
-  return [...data.slice(0, index), ...data.slice(index + 1)];
+  return [ ...data.slice(0, index), ...data.slice(index + 1) ];
 };
 
 /**
@@ -707,7 +707,7 @@ export const sample = <V>(array: ArrayLike<V>, amount: number): Array<V> => {
     subsampleSteps = amount;
   }
 
-  guardInteger(subsampleSteps, `positive`, `amount`);
+  throwIntegerTest(subsampleSteps, `positive`, `amount`);
   if (subsampleSteps > array.length - 1) {
     throw new Error(`Subsample steps exceeds array length`);
   }
@@ -716,7 +716,7 @@ export const sample = <V>(array: ArrayLike<V>, amount: number): Array<V> => {
   //eslint-disable-next-line functional/no-let
   for (let i = subsampleSteps - 1; i < array.length; i += subsampleSteps) {
     //eslint-disable-next-line functional/immutable-data
-    r.push(array[i]);
+    r.push(array[ i ]);
   }
   return r;
 };
@@ -815,7 +815,7 @@ export const mergeByKey = <V>(
       result.set(mk, v);
     }
   }
-  return [...result.values()];
+  return [ ...result.values() ];
 };
 
 /**
@@ -851,7 +851,7 @@ export const reducePairwise = <V, X>(
   if (arr.length < 2) return initial;
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < arr.length - 1; i++) {
-    initial = reducer(initial, arr[i], arr[i + 1]);
+    initial = reducer(initial, arr[ i ], arr[ i + 1 ]);
   }
   return initial;
 };
@@ -873,16 +873,16 @@ export const reducePairwise = <V, X>(
 export const filterAB = <V>(
   data: readonly V[] | ReadonlyArray<V>,
   filter: (a: V) => boolean
-): [a: V[], b: V[]] => {
+): [ a: V[], b: V[] ] => {
   const a: V[] = [];
   const b: V[] = [];
   for (let i = 0; i < data.length; i++) {
     //eslint-disable-next-line functional/immutable-data
-    if (filter(data[i]!)) a.push(data[i]!);
+    if (filter(data[ i ]!)) a.push(data[ i ]!);
     //eslint-disable-next-line functional/immutable-data
-    else b.push(data[i]!);
+    else b.push(data[ i ]!);
   }
-  return [a, b];
+  return [ a, b ];
 };
 
 /**
@@ -906,7 +906,7 @@ export const filterAB = <V>(
  */
 export const unique = <V>(
   arrays: //eslint-disable-next-line functional/prefer-readonly-type
-  | Array<Array<V>>
+    | Array<Array<V>>
     //eslint-disable-next-line functional/prefer-readonly-type
     | Array<V>
     | ReadonlyArray<V>
@@ -916,14 +916,14 @@ export const unique = <V>(
   //eslint-disable-next-line functional/no-let
   const t: V[] = [];
   for (let i = 0; i < arrays.length; i++) {
-    const a = arrays[i];
+    const a = arrays[ i ];
     if (Array.isArray(a)) {
       for (const v of additionalValues<V>(t, a, comparer)) {
         //eslint-disable-next-line functional/immutable-data
         t.push(v);
       }
     } else {
-      return [...additionalValues<V>([], arrays as Array<V>, comparer)];
+      return [ ...additionalValues<V>([], arrays as Array<V>, comparer) ];
     }
   }
   return t;
@@ -988,17 +988,17 @@ export const compareValues = <V>(
     //eslint-disable-next-line functional/no-let
     let seenInB = false;
     for (let x = 0; x < b.length; x++) {
-      if (eq(a[i], b[x])) {
+      if (eq(a[ i ], b[ x ])) {
         seenInB = true;
         break;
       }
     }
     if (seenInB) {
       //eslint-disable-next-line functional/immutable-data
-      shared.push(a[i]);
+      shared.push(a[ i ]);
     } else {
       //eslint-disable-next-line functional/immutable-data
-      aUnique.push(a[i]);
+      aUnique.push(a[ i ]);
     }
   }
 
@@ -1006,13 +1006,13 @@ export const compareValues = <V>(
     //eslint-disable-next-line functional/no-let
     let seenInA = false;
     for (let x = 0; x < a.length; x++) {
-      if (eq(b[i], a[x])) {
+      if (eq(b[ i ], a[ x ])) {
         seenInA = true;
       }
     }
     if (!seenInA) {
       //eslint-disable-next-line functional/immutable-data
-      bUnique.push(b[i]);
+      bUnique.push(b[ i ]);
     }
   }
 
@@ -1081,7 +1081,7 @@ export const contains = <V>(
     //eslint-disable-next-line functional/no-let
     let found = false;
     for (let x = 0; x < haystack.length; x++) {
-      if (eq(needles[i], haystack[x])) {
+      if (eq(needles[ i ], haystack[ x ])) {
         found = true;
         break;
       }

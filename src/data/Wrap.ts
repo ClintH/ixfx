@@ -1,4 +1,4 @@
-import { number as guardNumber, integer as guardInteger } from '../Guards.js';
+import { throwNumberTest, throwIntegerTest } from '../Guards.js';
 
 /**
  * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
@@ -44,9 +44,9 @@ import { number as guardNumber, integer as guardInteger } from '../Guards.js';
  * @returns
  */
 export const wrapInteger = (v: number, min: number = 0, max: number = 360) => {
-  guardInteger(v, undefined, `v`);
-  guardInteger(min, undefined, `min`);
-  guardInteger(max, undefined, `max`);
+  throwIntegerTest(v, undefined, `v`);
+  throwIntegerTest(min, undefined, `min`);
+  throwIntegerTest(max, undefined, `max`);
 
   if (v === min) return min;
   if (v === max) return min; // Wraps
@@ -84,9 +84,9 @@ export const wrapInteger = (v: number, min: number = 0, max: number = 360) => {
  * @returns
  */
 export const wrap = (v: number, min: number = 0, max: number = 1) => {
-  guardNumber(v, ``, `min`);
-  guardNumber(min, ``, `min`);
-  guardNumber(max, ``, `max`);
+  throwNumberTest(v, ``, `min`);
+  throwNumberTest(min, ``, `min`);
+  throwNumberTest(max, ``, `max`);
 
   if (v === min) return min;
   if (v === max) return min; // Wraps

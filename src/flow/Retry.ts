@@ -1,7 +1,7 @@
 import { sleep } from './Sleep.js';
 import { getErrorMessage, resolveLogOption } from '../Debug.js';
 import { since, toString as elapsedToString } from './Elapsed.js';
-import { integer as integerGuard } from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 /**
  * Result of backoff
  */
@@ -125,7 +125,7 @@ export const retry = async <V>(
   //eslint-disable-next-line functional/no-let
   let attempts = 0;
 
-  integerGuard(count, 'aboveZero', 'count');
+  throwIntegerTest(count, 'aboveZero', 'count');
   if (t <= 0) throw new Error(`startMs must be above zero`);
 
   if (predelayMs > 0) await sleep({ millis: predelayMs, signal: signal });
@@ -145,7 +145,7 @@ export const retry = async <V>(
       return { value: cbResult, success: true, attempts, elapsed: startedAt() };
     }
     log({
-      msg: `retry attempts: ${attempts} t: ${elapsedToString(t)}`,
+      msg: `retry attempts: ${ attempts } t: ${ elapsedToString(t) }`,
     });
 
     // Did not succeed.
@@ -171,7 +171,7 @@ export const retry = async <V>(
   }
 
   return {
-    message: `Giving up after ${attempts} attempts.`,
+    message: `Giving up after ${ attempts } attempts.`,
     success: false,
     attempts,
     value: opts.defaultValue,

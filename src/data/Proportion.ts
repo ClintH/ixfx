@@ -1,4 +1,4 @@
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 import { type NumberFunction } from './index.js';
 
 /**
@@ -16,7 +16,7 @@ export const proportion = (
   if (typeof v === `function`) v = v();
   if (typeof t === `function`) t = t();
 
-  guardNumber(v, `percentage`, `v`);
-  guardNumber(t, `percentage`, `t`);
+  throwNumberTest(v, `percentage`, `v`);
+  throwNumberTest(t, `percentage`, `t`);
   return v * t;
 };

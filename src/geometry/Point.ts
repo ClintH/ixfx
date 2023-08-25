@@ -1,6 +1,6 @@
 import { Circles, Lines, Points, Polar, Rects } from './index.js';
 import { interpolate as lineInterpolate } from './Line.js';
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 import { clamp as clampNumber, wrap as wrapNumber } from '../data/index.js';
 import { Arrays } from '../collections/index.js';
 import { type RandomSource, defaultRandom } from '../Random.js';
@@ -36,11 +36,11 @@ export function getPointParam(
 
   if (Array.isArray(a)) {
     if (a.length === 0) return Object.freeze({ x: 0, y: 0 });
-    if (a.length === 1) return Object.freeze({ x: a[0], y: 0 });
-    if (a.length === 2) return Object.freeze({ x: a[0], y: a[1] });
-    if (a.length === 3) return Object.freeze({ x: a[0], y: a[1], z: a[2] });
+    if (a.length === 1) return Object.freeze({ x: a[ 0 ], y: 0 });
+    if (a.length === 2) return Object.freeze({ x: a[ 0 ], y: a[ 1 ] });
+    if (a.length === 3) return Object.freeze({ x: a[ 0 ], y: a[ 1 ], z: a[ 2 ] });
     throw new Error(
-      `Expected array to be 1-3 elements in length. Got ${a.length}.`
+      `Expected array to be 1-3 elements in length. Got ${ a.length }.`
     );
   }
 
@@ -48,9 +48,9 @@ export function getPointParam(
     return a;
   } else if (typeof a !== `number` || typeof b !== `number`) {
     throw new Error(
-      `Expected point or x,y as parameters. Got: a: ${JSON.stringify(
+      `Expected point or x,y as parameters. Got: a: ${ JSON.stringify(
         a
-      )} b: ${JSON.stringify(b)}`
+      ) } b: ${ JSON.stringify(b) }`
     );
   }
 
@@ -137,7 +137,7 @@ export const findMinimum = (
 ): Point => {
   if (points.length === 0) throw new Error(`No points provided`);
   //eslint-disable-next-line functional/no-let
-  let min = points[0];
+  let min = points[ 0 ];
   points.forEach((p) => {
     min = compareFn(min, p);
   });
@@ -293,36 +293,36 @@ export type PointCalculableShape =
 export function guard(p: Point, name = `Point`) {
   if (p === undefined) {
     throw new Error(
-      `'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`
+      `'${ name }' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
     );
   }
   if (p === null) {
     throw new Error(
-      `'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`
+      `'${ name }' is null. Expected {x,y} got ${ JSON.stringify(p) }`
     );
   }
   if (p.x === undefined) {
     throw new Error(
-      `'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`
+      `'${ name }.x' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
     );
   }
   if (p.y === undefined) {
     throw new Error(
-      `'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`
+      `'${ name }.y' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
     );
   }
   if (typeof p.x !== `number`) {
-    throw new Error(`'${name}.x' must be a number. Got ${p.x}`);
+    throw new Error(`'${ name }.x' must be a number. Got ${ p.x }`);
   }
   if (typeof p.y !== `number`) {
-    throw new Error(`'${name}.y' must be a number. Got ${p.y}`);
+    throw new Error(`'${ name }.y' must be a number. Got ${ p.y }`);
   }
 
-  if (p.x === null) throw new Error(`'${name}.x' is null`);
-  if (p.y === null) throw new Error(`'${name}.y' is null`);
+  if (p.x === null) throw new Error(`'${ name }.x' is null`);
+  if (p.y === null) throw new Error(`'${ name }.y' is null`);
 
-  if (Number.isNaN(p.x)) throw new Error(`'${name}.x' is NaN`);
-  if (Number.isNaN(p.y)) throw new Error(`'${name}.y' is NaN`);
+  if (Number.isNaN(p.x)) throw new Error(`'${ name }.x' is NaN`);
+  if (Number.isNaN(p.y)) throw new Error(`'${ name }.y' is NaN`);
 }
 
 /**
@@ -332,10 +332,10 @@ export function guard(p: Point, name = `Point`) {
  */
 export const guardNonZeroPoint = (pt: Point | Point3d, name = `pt`) => {
   guard(pt, name);
-  guardNumber(pt.x, `nonZero`, `${name}.x`);
-  guardNumber(pt.y, `nonZero`, `${name}.y`);
+  throwNumberTest(pt.x, `nonZero`, `${ name }.x`);
+  throwNumberTest(pt.y, `nonZero`, `${ name }.y`);
   if (typeof pt.z !== `undefined`) {
-    guardNumber(pt.z, `nonZero`, `${name}.z`);
+    throwNumberTest(pt.z, `nonZero`, `${ name }.z`);
   }
 
   return true;
@@ -406,9 +406,9 @@ export const centroid = (...points: readonly (Point | undefined)[]): Point => {
       }
       if (!isPoint(p)) {
         throw new Error(
-          `'points' contains something which is not a point: ${JSON.stringify(
+          `'points' contains something which is not a point: ${ JSON.stringify(
             p
-          )}`
+          ) }`
         );
       }
       return {
@@ -488,7 +488,7 @@ export const isPoint3d = (p: Point | unknown): p is Point3d => {
  * @param p
  * @returns
  */
-export const toArray = (p: Point): readonly number[] => [p.x, p.y];
+export const toArray = (p: Point): readonly number[] => [ p.x, p.y ];
 
 /**
  * Returns a human-friendly string representation `(x, y)`.
@@ -505,9 +505,9 @@ export function toString(p: Point, digits?: number): string {
 
   if (p.z !== undefined) {
     const z = digits ? p.z.toFixed(digits) : p.z;
-    return `(${x},${y},${z})`;
+    return `(${ x },${ y },${ z })`;
   } else {
-    return `(${x},${y})`;
+    return `(${ x },${ y })`;
   }
 }
 
@@ -530,14 +530,15 @@ export const isEqual = (...p: readonly Point[]): boolean => {
 
   //eslint-disable-next-line functional/no-let
   for (let i = 1; i < p.length; i++) {
-    if (p[i].x !== p[0].x) return false;
-    if (p[i].y !== p[0].y) return false;
+    if (p[ i ].x !== p[ 0 ].x) return false;
+    if (p[ i ].y !== p[ 0 ].y) return false;
   }
   return true;
 };
 
 /**
- * Returns true if two points are within a specified range.
+ * Returns true if two points are within a specified range on both axes.
+ * 
  * Provide a point for the range to set different x/y range, or pass a number
  * to use the same range for both axis.
  *
@@ -559,8 +560,14 @@ export const withinRange = (
   b: Point,
   maxRange: Point | number
 ): boolean => {
+  guard(a, `a`);
+  guard(b, `b`);
+
   if (typeof maxRange === `number`) {
+    throwNumberTest(maxRange, `positive`, `maxRange`);
     maxRange = { x: maxRange, y: maxRange };
+  } else {
+    guard(maxRange, `maxRange`);
   }
   const x = Math.abs(b.x - a.x);
   const y = Math.abs(b.y - a.y);
@@ -610,8 +617,8 @@ export const from = (
       throw new Error(`Expected array of length two, got ` + xOrArray.length);
     }
     return Object.freeze({
-      x: xOrArray[0],
-      y: xOrArray[1],
+      x: xOrArray[ 0 ],
+      y: xOrArray[ 1 ],
     });
   } else {
     if (xOrArray === undefined) xOrArray = 0;
@@ -642,14 +649,14 @@ export const fromNumbers = (
 ): readonly Point[] => {
   const pts: Point[] = [];
 
-  if (Array.isArray(coords[0])) {
+  if (Array.isArray(coords[ 0 ])) {
     // [[x,y],[x,y]...]
     (coords as number[][]).forEach((coord) => {
       if (!(coord.length % 2 === 0)) {
         throw new Error(`coords array should be even-numbered`);
       }
       //eslint-disable-next-line  functional/immutable-data
-      pts.push(Object.freeze({ x: coord[0], y: coord[1] }));
+      pts.push(Object.freeze({ x: coord[ 0 ], y: coord[ 1 ] }));
     });
   } else {
     // [x,y,x,y,x,y]
@@ -660,7 +667,7 @@ export const fromNumbers = (
     for (let i = 0; i < coords.length; i += 2) {
       //eslint-disable-next-line  functional/immutable-data
       pts.push(
-        Object.freeze({ x: coords[i] as number, y: coords[i + 1] as number })
+        Object.freeze({ x: coords[ i ] as number, y: coords[ i + 1 ] as number })
       );
     }
   }
@@ -736,11 +743,11 @@ export function subtract(
       });
     }
   } else {
-    guardNumber(a, ``, `a`);
+    throwNumberTest(a, ``, `a`);
     if (typeof b !== `number`) {
       throw new Error(`Second parameter is expected to by y value`);
     }
-    guardNumber(b, ``, `b`);
+    throwNumberTest(b, ``, `b`);
 
     if (Number.isNaN(c)) throw new Error(`Third parameter is NaN`);
     if (Number.isNaN(d)) throw new Error(`Fourth parameter is NaN`);
@@ -818,8 +825,8 @@ export const pipelineApply = (
  */
 export const pipeline =
   (...pipeline: readonly ((pt: Point) => Point)[]) =>
-  (pt: Point) =>
-    pipeline.reduce((prev, curr) => curr(prev), pt);
+    (pt: Point) =>
+      pipeline.reduce((prev, curr) => curr(prev), pt);
 
 /**
  * Reduces over points, treating _x_ and _y_ separately.
@@ -889,7 +896,7 @@ export const sum: Sum = function (
   d?: number
 ): Point {
   // ✔️ Unit tested
-  if (a === undefined) throw new Error(`a missing. a: ${a}`);
+  if (a === undefined) throw new Error(`a missing. a: ${ a }`);
 
   //eslint-disable-next-line functional/no-let
   let ptA: Point | undefined;
@@ -912,8 +919,8 @@ export const sum: Sum = function (
     ptB = { x: c, y: d === undefined ? 0 : d };
   }
 
-  if (ptA === undefined) throw new Error(`ptA missing. a: ${a}`);
-  if (ptB === undefined) throw new Error(`ptB missing. b: ${b}`);
+  if (ptA === undefined) throw new Error(`ptA missing. a: ${ a }`);
+  if (ptB === undefined) throw new Error(`ptB missing. b: ${ b }`);
   guard(ptA, `a`);
   guard(ptB, `b`);
   return Object.freeze({
@@ -1000,8 +1007,8 @@ export function multiply(
   guard(a, `a`);
   if (typeof bOrX === `number`) {
     if (typeof y === `undefined`) y = bOrX;
-    guardNumber(y, ``, `y`);
-    guardNumber(bOrX, ``, `x`);
+    throwNumberTest(y, ``, `y`);
+    throwNumberTest(bOrX, ``, `x`);
     return Object.freeze({ x: a.x * bOrX, y: a.y * y });
   } else if (isPoint(bOrX)) {
     guard(bOrX, `b`);
@@ -1017,7 +1024,7 @@ export function multiply(
     });
   } else {
     throw new Error(
-      `Invalid arguments. a: ${JSON.stringify(a)} b: ${JSON.stringify(bOrX)}`
+      `Invalid arguments. a: ${ JSON.stringify(a) } b: ${ JSON.stringify(bOrX) }`
     );
   }
 }
@@ -1061,6 +1068,8 @@ export const multiplyScalar = (
  *  y: a.y / b.y
  * }
  * ```
+ * 
+ * Dividing by zero will give Infinity for that dimension.
  * @param a
  * @param b
  */
@@ -1074,6 +1083,8 @@ export function divide(a: Point, b: Point): Point;
  *  y: a.y / rect.hight
  * };
  * ```
+ * 
+ * Dividing by zero will give Infinity for that dimension.
  * @param a
  * @param Rect
  */
@@ -1087,6 +1098,8 @@ export function divide(a: Point, rect: Rects.Rect): Point;
  *  y: b.y / y
  * };
  * ```
+ * 
+ * Dividing by zero will give Infinity for that dimension.
  * @param a Point
  * @param x X divisor
  * @param y Y divisor. If unspecified, x divisor is used.
@@ -1101,6 +1114,8 @@ export function divide(a: Point, x: number, y?: number): Point;
  *  y: y1 / y2
  * };
  * ```
+ * 
+ * Dividing by zero will give Infinity for that dimension.
  * @param x1
  * @param y1
  * @param x2
@@ -1127,7 +1142,7 @@ export function divide(
   if (isPoint(a)) {
     guard(a, `a`);
     if (isPoint(b)) {
-      guardNonZeroPoint(b);
+      //guardNonZeroPoint(b);
       return Object.freeze({
         x: a.x / b.x,
         y: a.y / b.y,
@@ -1141,8 +1156,8 @@ export function divide(
     } else {
       if (c === undefined) c = b;
       guard(a);
-      guardNumber(b, `nonZero`, `x`);
-      guardNumber(c, `nonZero`, `y`);
+      throwNumberTest(b, `nonZero`, `x`);
+      throwNumberTest(c, `nonZero`, `y`);
       return Object.freeze({
         x: a.x / b,
         y: a.y / c,
@@ -1152,12 +1167,12 @@ export function divide(
     if (typeof b !== `number`) {
       throw new Error(`expected second parameter to be y1 coord`);
     }
-    guardNumber(a, `positive`, `x1`);
-    guardNumber(b, `positive`, `y1`);
+    throwNumberTest(a, `positive`, `x1`);
+    throwNumberTest(b, `positive`, `y1`);
     if (c === undefined) c = 1;
     if (d === undefined) d = c;
-    guardNumber(c, `nonZero`, `x2`);
-    guardNumber(d, `nonZero`, `y2`);
+    throwNumberTest(c, `nonZero`, `x2`);
+    throwNumberTest(d, `nonZero`, `y2`);
 
     return Object.freeze({
       x: a / c,
@@ -1234,15 +1249,15 @@ export const quantiseEvery = (pt: Point, snap: Point, middleRoundsUp = true) =>
  * @returns
  */
 export const convexHull = (...pts: readonly Point[]): readonly Point[] => {
-  const sorted = [...pts].sort(compareByX);
+  const sorted = [ ...pts ].sort(compareByX);
   if (sorted.length === 1) return sorted;
 
   const x = (points: Point[]) => {
     const v: Point[] = [];
     points.forEach((p) => {
       while (v.length >= 2) {
-        const q = v[v.length - 1];
-        const r = v[v.length - 2];
+        const q = v[ v.length - 1 ];
+        const r = v[ v.length - 2 ];
         if ((q.x - r.x) * (p.y - r.y) >= (q.y - r.y) * (p.x - r.x)) {
           //eslint-disable-next-line functional/immutable-data
           v.pop();
@@ -1260,7 +1275,7 @@ export const convexHull = (...pts: readonly Point[]): readonly Point[] => {
   //eslint-disable-next-line functional/immutable-data
   const lower = x(sorted.reverse());
 
-  if (upper.length === 1 && lower.length === 1 && isEqual(lower[0], upper[0])) {
+  if (upper.length === 1 && lower.length === 1 && isEqual(lower[ 0 ], upper[ 0 ])) {
     return upper;
   }
   return upper.concat(lower);
@@ -1355,25 +1370,25 @@ export function rotate(
 ): Point | ReadonlyArray<Point> {
   if (origin === undefined) origin = { x: 0, y: 0 };
   guard(origin, `origin`);
-  guardNumber(amountRadian, ``, `amountRadian`);
+  throwNumberTest(amountRadian, ``, `amountRadian`);
   const arrayInput = Array.isArray(pt);
 
   // no-op
   if (amountRadian === 0) return pt;
 
   if (!arrayInput) {
-    pt = [pt as Point];
+    pt = [ pt as Point ];
   }
 
   const ptAr = pt as ReadonlyArray<Point>;
-  ptAr.forEach((p, index) => guard(p, `pt[${index}]`));
+  ptAr.forEach((p, index) => guard(p, `pt[${ index }]`));
 
   //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const asPolar = ptAr.map((p) => Polar.fromCartesian(p, origin!));
   const rotated = asPolar.map((p) => Polar.rotate(p, amountRadian));
   const asCartesisan = rotated.map((p) => Polar.toCartesian(p, origin));
   if (arrayInput) return asCartesisan;
-  else return asCartesisan[0];
+  else return asCartesisan[ 0 ];
 
   //const p = Polar.fromCartesian(pt, origin);
   //const pp = Polar.rotate(p, amountRadian);
@@ -1386,16 +1401,16 @@ export const rotatePointArray = (
   amountRadian: number
 ): number[][] => {
   const mat = [
-    [Math.cos(amountRadian), -Math.sin(amountRadian)],
-    [Math.sin(amountRadian), Math.cos(amountRadian)],
+    [ Math.cos(amountRadian), -Math.sin(amountRadian) ],
+    [ Math.sin(amountRadian), Math.cos(amountRadian) ],
   ];
   const result = [];
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < v.length; ++i) {
     //eslint-disable-next-line functional/immutable-data
-    result[i] = [
-      mat[0][0] * v[i][0] + mat[0][1] * v[i][1],
-      mat[1][0] * v[i][0] + mat[1][1] * v[i][1],
+    result[ i ] = [
+      mat[ 0 ][ 0 ] * v[ i ][ 0 ] + mat[ 0 ][ 1 ] * v[ i ][ 1 ],
+      mat[ 1 ][ 0 ] * v[ i ][ 0 ] + mat[ 1 ][ 1 ] * v[ i ][ 1 ],
     ];
   }
   return result;
@@ -1476,8 +1491,8 @@ export function normaliseByRect(
   // ✔️ Unit tested
   if (isPoint(a)) {
     if (typeof b === `number` && c !== undefined) {
-      guardNumber(b, `positive`, `width`);
-      guardNumber(c, `positive`, `height`);
+      throwNumberTest(b, `positive`, `width`);
+      throwNumberTest(c, `positive`, `height`);
     } else {
       if (!Rects.isRect(b)) {
         throw new Error(`Expected second parameter to be a rect`);
@@ -1490,7 +1505,7 @@ export function normaliseByRect(
       y: a.y / c,
     });
   } else {
-    guardNumber(a, `positive`, `x`);
+    throwNumberTest(a, `positive`, `x`);
     if (typeof b !== `number`) {
       throw new Error(`Expecting second parameter to be a number (width)`);
     }
@@ -1498,10 +1513,10 @@ export function normaliseByRect(
       throw new Error(`Expecting third parameter to be a number (height)`);
     }
 
-    guardNumber(b, `positive`, `y`);
-    guardNumber(c, `positive`, `width`);
+    throwNumberTest(b, `positive`, `y`);
+    throwNumberTest(c, `positive`, `width`);
     if (d === undefined) throw new Error(`Expected height parameter`);
-    guardNumber(d, `positive`, `height`);
+    throwNumberTest(d, `positive`, `height`);
     return Object.freeze({
       x: a / c,
       y: b / d,
@@ -1519,8 +1534,8 @@ export function normaliseByRect(
  * A custom source of randomness can be provided:
  * ```js
  * import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
- * import { weightedFn } from "https://unpkg.com/ixfx/dist/random.js"
- * const pt = Points.random(weightedFn(`quadIn`));
+ * import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
+ * const pt = Points.random(weightedSource(`quadIn`));
  * ```
  * @param rando
  * @returns
@@ -1693,8 +1708,8 @@ export function clamp(
   if (isPoint(a)) {
     if (b === undefined) b = 0;
     if (c === undefined) c = 1;
-    guardNumber(b, ``, `min`);
-    guardNumber(c, ``, `max`);
+    throwNumberTest(b, ``, `min`);
+    throwNumberTest(c, ``, `max`);
     return Object.freeze({
       x: clampNumber(a.x, b, c),
       y: clampNumber(a.y, b, c),
@@ -1703,10 +1718,10 @@ export function clamp(
     if (b === undefined) throw new Error(`Expected y coordinate`);
     if (c === undefined) c = 0;
     if (d === undefined) d = 1;
-    guardNumber(a, ``, `x`);
-    guardNumber(b, ``, `y`);
-    guardNumber(c, ``, `min`);
-    guardNumber(d, ``, `max`);
+    throwNumberTest(a, ``, `x`);
+    throwNumberTest(b, ``, `y`);
+    throwNumberTest(c, ``, `min`);
+    throwNumberTest(d, ``, `max`);
 
     return Object.freeze({
       x: clampNumber(a, c, d),

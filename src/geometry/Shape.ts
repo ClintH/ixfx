@@ -1,5 +1,5 @@
 import { toCartesian } from './Polar.js';
-import { integer as guardInteger } from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 import { Triangles, Points, Rects, Circles } from './index.js';
 import type { CirclePositioned } from './Circle.js';
 import type { RandomSource } from '../Random.js';
@@ -24,7 +24,7 @@ export const isIntersecting = (
     return Rects.isIntersecting(a, b);
   }
   throw new Error(
-    `a or b are unknown shapes. a: ${JSON.stringify(a)} b: ${JSON.stringify(b)}`
+    `a or b are unknown shapes. a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) }`
   );
 };
 
@@ -73,7 +73,7 @@ export const center = (
   } else if (Circles.isCircle(shape)) {
     return Circles.center(shape);
   } else {
-    throw new Error(`Unknown shape: ${JSON.stringify(shape)}`);
+    throw new Error(`Unknown shape: ${ JSON.stringify(shape) }`);
   }
 };
 
@@ -113,7 +113,7 @@ export const starburst = (
   origin: Points.Point = { x: 0, y: 0 },
   opts?: { readonly initialAngleRadian?: number }
 ): readonly Points.Point[] => {
-  guardInteger(points, `positive`, `points`);
+  throwIntegerTest(points, `positive`, `points`);
   const angle = (Math.PI * 2) / points;
   const angleHalf = angle / 2;
 
@@ -231,13 +231,13 @@ export const arrow = (
 
   const arrow = Points.rotate(
     [
-      tailPoints[0],
-      tailPoints[1],
+      tailPoints[ 0 ],
+      tailPoints[ 1 ],
       tri.a,
       tri.b,
       tri.c,
-      tailPoints[2],
-      tailPoints[3],
+      tailPoints[ 2 ],
+      tailPoints[ 3 ],
     ],
     angleRadian,
     origin

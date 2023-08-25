@@ -1,6 +1,6 @@
 import { degreeToRadian, radianToDegree } from './index.js';
 import * as Points from './Point.js';
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 const _piPi = Math.PI * 2;
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
@@ -109,7 +109,7 @@ export const toCartesian: ToCartesian = (
     );
   } else if (typeof a === `object`) {
     throw new Error(
-      `First param is an object, but not a Coord: ${JSON.stringify(a)}`
+      `First param is an object, but not a Coord: ${ JSON.stringify(a) }`
     );
   } else {
     if (typeof a === `number` && typeof b === `number`) {
@@ -122,9 +122,9 @@ export const toCartesian: ToCartesian = (
       return polarToCartesian(a, b, c);
     } else {
       throw new Error(
-        `Expecting parameters of (number, number). Got: (${typeof a}, ${typeof b}, ${typeof c}). a: ${JSON.stringify(
+        `Expecting parameters of (number, number). Got: (${ typeof a }, ${ typeof b }, ${ typeof c }). a: ${ JSON.stringify(
           a
-        )}`
+        ) }`
       );
     }
   }
@@ -192,48 +192,48 @@ export const normalise = (c: Coord): Coord => {
 export const guard = (p: Coord, name = `Point`) => {
   if (p === undefined) {
     throw new Error(
-      `'${name}' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(
+      `'${ name }' is undefined. Expected {distance, angleRadian} got ${ JSON.stringify(
         p
-      )}`
+      ) }`
     );
   }
   if (p === null) {
     throw new Error(
-      `'${name}' is null. Expected {distance, angleRadian} got ${JSON.stringify(
+      `'${ name }' is null. Expected {distance, angleRadian} got ${ JSON.stringify(
         p
-      )}`
+      ) }`
     );
   }
   if (p.angleRadian === undefined) {
     throw new Error(
-      `'${name}.angleRadian' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(
+      `'${ name }.angleRadian' is undefined. Expected {distance, angleRadian} got ${ JSON.stringify(
         p
-      )}`
+      ) }`
     );
   }
   if (p.distance === undefined) {
     throw new Error(
-      `'${name}.distance' is undefined. Expected {distance, angleRadian} got ${JSON.stringify(
+      `'${ name }.distance' is undefined. Expected {distance, angleRadian} got ${ JSON.stringify(
         p
-      )}`
+      ) }`
     );
   }
   if (typeof p.angleRadian !== `number`) {
     throw new Error(
-      `'${name}.angleRadian' must be a number. Got ${p.angleRadian}`
+      `'${ name }.angleRadian' must be a number. Got ${ p.angleRadian }`
     );
   }
   if (typeof p.distance !== `number`) {
-    throw new Error(`'${name}.distance' must be a number. Got ${p.distance}`);
+    throw new Error(`'${ name }.distance' must be a number. Got ${ p.distance }`);
   }
 
-  if (p.angleRadian === null) throw new Error(`'${name}.angleRadian' is null`);
-  if (p.distance === null) throw new Error(`'${name}.distance' is null`);
+  if (p.angleRadian === null) throw new Error(`'${ name }.angleRadian' is null`);
+  if (p.distance === null) throw new Error(`'${ name }.distance' is null`);
 
   if (Number.isNaN(p.angleRadian)) {
-    throw new Error(`'${name}.angleRadian' is NaN`);
+    throw new Error(`'${ name }.angleRadian' is NaN`);
   }
-  if (Number.isNaN(p.distance)) throw new Error(`'${name}.distance' is NaN`);
+  if (Number.isNaN(p.distance)) throw new Error(`'${ name }.distance' is NaN`);
 };
 /**
  * Calculate dot product of two Coords.
@@ -342,7 +342,7 @@ export const spiralRaw = (
  */
 export const multiply = (v: Coord, amt: number): Coord => {
   guard(v);
-  guardNumber(amt, ``, `amt`);
+  throwNumberTest(amt, ``, `amt`);
   return Object.freeze({
     ...v,
     distance: v.distance * amt,
@@ -358,7 +358,7 @@ export const multiply = (v: Coord, amt: number): Coord => {
  */
 export const divide = (v: Coord, amt: number): Coord => {
   guard(v);
-  guardNumber(amt, ``, `amt`);
+  throwNumberTest(amt, ``, `amt`);
   return Object.freeze({
     ...v,
     distance: v.distance / amt,
@@ -415,7 +415,7 @@ export const toString = (p: Coord, digits?: number): string => {
   const angleDeg = radianToDegree(p.angleRadian);
   const d = digits ? p.distance.toFixed(digits) : p.distance;
   const a = digits ? angleDeg.toFixed(digits) : angleDeg;
-  return `(${d},${a})`;
+  return `(${ d },${ a })`;
 };
 
 export const toPoint = (v: Coord, origin = EmptyCartesian): Points.Point => {

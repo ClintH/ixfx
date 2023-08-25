@@ -1,5 +1,5 @@
 import { sleep } from './Sleep.js';
-import { numberTry } from '../Guards.js';
+import { numberTest } from '../Guards.js';
 import { type AsyncPromiseOrGenerator } from './index.js';
 
 /**
@@ -14,11 +14,11 @@ import { type AsyncPromiseOrGenerator } from './index.js';
 export type Interval =
   | number
   | {
-      readonly millis?: number;
-      readonly secs?: number;
-      readonly hours?: number;
-      readonly mins?: number;
-    };
+    readonly millis?: number;
+    readonly secs?: number;
+    readonly hours?: number;
+    readonly mins?: number;
+  };
 
 export function intervalToMs(i: Interval | undefined): number | undefined;
 export function intervalToMs(
@@ -61,7 +61,7 @@ export function intervalToMs(
     return ms;
   } else {
     if (typeof defaultNumber !== 'undefined') return defaultNumber;
-    throw new Error(`Not a valid interval: ${i}`);
+    throw new Error(`Not a valid interval: ${ i }`);
   }
 }
 
@@ -79,16 +79,16 @@ export function isInterval(i: number | Interval | undefined): i is Interval {
   const hasMins = 'mins' in i;
   const hasHours = 'hours' in i;
   if (hasMillis) {
-    if (!numberTry(i.millis)) return false;
+    if (!numberTest(i.millis)[ 0 ]) return false;
   }
   if (hasSecs) {
-    if (!numberTry(i.secs)) return false;
+    if (!numberTest(i.secs)[ 0 ]) return false;
   }
   if (hasMins) {
-    if (!numberTry(i.mins)) return false;
+    if (!numberTest(i.mins)[ 0 ]) return false;
   }
   if (hasHours) {
-    if (!numberTry(i.hours)) return false;
+    if (!numberTest(i.hours)[ 0 ]) return false;
   }
   if (hasMillis || hasSecs || hasHours || hasMins) return true;
   return false;
@@ -175,7 +175,7 @@ export const interval = async function* <V>(
       await sleep({ millis: sleepMs, signal });
     }
     started = performance.now();
-    if (signal?.aborted) throw new Error(`Signal aborted ${signal?.reason}`);
+    if (signal?.aborted) throw new Error(`Signal aborted ${ signal?.reason }`);
   };
 
   // Get an iterator over array

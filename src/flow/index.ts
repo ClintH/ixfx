@@ -8,7 +8,7 @@ export type AsyncPromiseOrGenerator<V> =
   | AsyncIterable<V>
   | Iterable<V>;
 
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 import { sleep } from './Sleep.js';
 
 import * as StateMachine from './StateMachine.js';
@@ -167,7 +167,7 @@ export function* repeat<V>(
   repeats = valuesProduced = 0;
 
   if (typeof countOrPredicate === `number`) {
-    guardNumber(countOrPredicate, `positive`, `countOrPredicate`);
+    throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
     while (countOrPredicate-- > 0) {
       repeats++;
       const v = fn();
@@ -185,7 +185,7 @@ export function* repeat<V>(
     }
   } else {
     throw new Error(
-      `countOrPredicate should be a number or function. Got: ${typeof countOrPredicate}`
+      `countOrPredicate should be a number or function. Got: ${ typeof countOrPredicate }`
     );
   }
 }
@@ -214,7 +214,7 @@ export const repeatReduce = <V>(
   reduce: (acc: V, value: V) => V
 ): V => {
   if (typeof countOrPredicate === `number`) {
-    guardNumber(countOrPredicate, `positive`, `countOrPredicate`);
+    throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
     while (countOrPredicate-- > 0) {
       const v = fn();
       if (v === undefined) continue;

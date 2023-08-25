@@ -1,4 +1,10 @@
+/**
+ * Normalise module
+ * * {@link array}: Normalises the contents of an array of known values.
+ * * {@link stream}: Normalises a stream of unknown values.
+ */
 export * as Normalise from './Normalise.js';
+
 export * from './FrequencyMutable.js';
 export * from './MovingAverage.js';
 export * from './NumberTracker.js';

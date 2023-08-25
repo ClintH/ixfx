@@ -1,4 +1,4 @@
-export type ArrayKeys<K, V> = ReadonlyArray<readonly [key: K, value: V]>;
+export type ArrayKeys<K, V> = ReadonlyArray<readonly [ key: K, value: V ]>;
 export type ObjKeys<K, V> = ReadonlyArray<{
   readonly key: K;
   readonly value: V;
@@ -35,6 +35,11 @@ export { StackImmutable } from './stack/StackImmutable.js';
  * Arrays are a list of data. ixfx provides a number of functions for working with arrays in an immutable manner.
  * This means that the input array is not changed.
  *
+ * Import example:
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * ```
+ * 
  * For arrays of numbers:
  * * {@link average}, {@link max}, {@link min}, {@link total}: Calculate average/max/min/total
  * * {@link averageWeighted}: Calculate average, but applies a weighting function, eg to favour items at beginning of array
@@ -101,6 +106,11 @@ import * as Maps from './map/index.js';
  * Maps associate keys with values. Several helper functions are provided
  * for working with the standard JS Map class.
  *
+ * Import example
+ * ```js
+ * import { Maps } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * ```
+ * 
  * ixfx also includes {@link Maps.IMapMutable}, {@link Maps.IMapImmutable}
  *
  * Overview:

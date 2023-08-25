@@ -1,5 +1,5 @@
 import { Rects, Points } from './index.js';
-import { integer as guardInteger, number as guardNumber } from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 import { clampIndex } from '../data/Clamp.js';
 import { randomElement } from '../collections/Arrays.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
@@ -71,8 +71,8 @@ export type Visitor = (
   opts?: VisitorOpts
 ) => VisitGenerator;
 
-export type NeighbourMaybe = readonly [keyof Neighbours, Cell | undefined];
-export type Neighbour = readonly [keyof Neighbours, Cell];
+export type NeighbourMaybe = readonly [ keyof Neighbours, Cell | undefined ];
+export type Neighbour = readonly [ keyof Neighbours, Cell ];
 
 /**
  * A function that returns a value (or _undefined_) based on a _cell_
@@ -119,7 +119,7 @@ const isNeighbour = (
   n: Neighbour | NeighbourMaybe | undefined
 ): n is Neighbour => {
   if (n === undefined) return false;
-  if (n[1] === undefined) return false;
+  if (n[ 1 ] === undefined) return false;
   return true;
 };
 
@@ -161,7 +161,7 @@ export const isEqual = (
  * @param v
  * @returns
  */
-export const cellKeyString = (v: Cell): string => `Cell{${v.x},${v.y}}`;
+export const cellKeyString = (v: Cell): string => `Cell{${ v.x },${ v.y }}`;
 
 /**
  * Returns _true_ if two cells equal.
@@ -208,7 +208,7 @@ export const guardCell = (
   if (grid !== undefined) {
     if (!inside(grid, cell)) {
       throw new Error(
-        `${paramName} is outside of grid. Cell: ${cell.x},${cell.y} Grid: ${grid.cols}, ${grid.rows}`
+        `${ paramName } is outside of grid. Cell: ${ cell.x },${ cell.y } Grid: ${ grid.cols }, ${ grid.rows }`
       );
     }
   }
@@ -221,16 +221,16 @@ export const guardCell = (
  */
 const guardGrid = (grid: Grid, paramName: string = `Param`) => {
   if (grid === undefined) {
-    throw new Error(`${paramName} is undefined. Expecting grid.`);
+    throw new Error(`${ paramName } is undefined. Expecting grid.`);
   }
-  if (!(`rows` in grid)) throw new Error(`${paramName}.rows is undefined`);
-  if (!(`cols` in grid)) throw new Error(`${paramName}.cols is undefined`);
+  if (!(`rows` in grid)) throw new Error(`${ paramName }.rows is undefined`);
+  if (!(`cols` in grid)) throw new Error(`${ paramName }.cols is undefined`);
 
   if (!Number.isInteger(grid.rows)) {
-    throw new Error(`${paramName}.rows is not an integer`);
+    throw new Error(`${ paramName }.rows is not an integer`);
   }
   if (!Number.isInteger(grid.cols)) {
-    throw new Error(`${paramName}.cols is not an integer`);
+    throw new Error(`${ paramName }.cols is not an integer`);
   }
 };
 
@@ -319,12 +319,12 @@ export const toArray = <V>(grid: Grid, initialValue?: V): V[][] => {
   //eslint-disable-next-line functional/no-let
   for (let row = 0; row < grid.rows; row++) {
     //eslint-disable-next-line functional/immutable-data
-    ret[row] = new Array<V>(grid.cols);
+    ret[ row ] = new Array<V>(grid.cols);
     if (initialValue) {
       //eslint-disable-next-line functional/no-let
       for (let col = 0; col < grid.cols; col++) {
         //eslint-disable-next-line functional/immutable-data
-        ret[row][col] = initialValue;
+        ret[ row ][ col ] = initialValue;
       }
     }
   }
@@ -346,7 +346,7 @@ export const cellAtPoint = (
   position: Points.Point
 ): Cell | undefined => {
   const size = grid.size;
-  guardNumber(size, 'positive', 'grid.size');
+  throwIntegerTest(size, 'positive', 'grid.size');
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
   const y = Math.floor(position.y / size);
@@ -516,12 +516,12 @@ export const offsetCardinals = (
 ): Neighbours => {
   guardGrid(grid, `grid`);
   guardCell(start, `start`);
-  guardInteger(steps, `aboveZero`, `steps`);
+  throwIntegerTest(steps, `aboveZero`, `steps`);
 
   const directions = allDirections;
   const vectors = directions.map((d) => getVectorFromCardinal(d, steps));
   const cells = directions.map((d, i) =>
-    offset(grid, start, vectors[i], bounds)
+    offset(grid, start, vectors[ i ], bounds)
   );
 
   return zipKeyValue(directions, cells) as Neighbours;
@@ -615,7 +615,7 @@ export const simpleLine = function (
     }
   } else {
     throw new Error(
-      `Only does vertical and horizontal: ${start.x},${start.y} - ${end.x},${end.y}`
+      `Only does vertical and horizontal: ${ start.x },${ start.y } - ${ end.x },${ end.y }`
     );
   }
   return cells;
@@ -679,7 +679,7 @@ export const offset = function (
       y += vector.y;
       break;
     default:
-      throw new Error(`Unknown BoundsLogic case ${bounds}`);
+      throw new Error(`Unknown BoundsLogic case ${ bounds }`);
   }
   return Object.freeze({ x, y });
 };
@@ -755,7 +755,7 @@ export const visitor = function* (
   }
 
   // eslint-disable-next-line functional/no-let
-  let cellQueue: Cell[] = [start];
+  let cellQueue: Cell[] = [ start ];
   // eslint-disable-next-line functional/no-let
   let moveQueue: Neighbour[] = [];
   // eslint-disable-next-line functional/no-let
@@ -776,7 +776,7 @@ export const visitor = function* (
       yield current;
 
       const nextSteps = possibleNeighbours(grid, current).filter(
-        (step) => !v.has(step[1])
+        (step) => !v.has(step[ 1 ])
       );
 
       if (nextSteps.length === 0) {
@@ -791,7 +791,7 @@ export const visitor = function* (
     }
 
     // Remove steps already made
-    moveQueue = moveQueue.filter((step) => !v.has(step[1]));
+    moveQueue = moveQueue.filter((step) => !v.has(step[ 1 ]));
 
     if (moveQueue.length === 0) {
       current = null;
@@ -800,8 +800,8 @@ export const visitor = function* (
       const potential = logic.select(moveQueue);
       if (potential !== undefined) {
         // eslint-disable-next-line functional/immutable-data
-        cellQueue.push(potential[1]);
-        current = potential[1];
+        cellQueue.push(potential[ 1 ]);
+        current = potential[ 1 ];
       }
     }
   }
@@ -810,7 +810,7 @@ export const visitor = function* (
 export const visitorDepth = (grid: Grid, start: Cell, opts: VisitorOpts = {}) =>
   visitor(
     {
-      select: (nbos) => nbos[nbos.length - 1],
+      select: (nbos) => nbos[ nbos.length - 1 ],
     },
     grid,
     start,
@@ -824,7 +824,7 @@ export const visitorBreadth = (
 ) =>
   visitor(
     {
-      select: (nbos) => nbos[0],
+      select: (nbos) => nbos[ 0 ],
     },
     grid,
     start,
@@ -865,7 +865,7 @@ export const visitorRandom = (
         const t: Neighbour[] = [];
         for (const c of cells(grid, cell)) {
           // eslint-disable-next-line functional/immutable-data
-          t.push([`n`, c]);
+          t.push([ `n`, c ]);
         }
         return t;
       },
@@ -884,7 +884,7 @@ export const visitorRow = (
   const { reversed = false } = opts;
 
   const neighbourSelect = (nbos: readonly Neighbour[]) =>
-    nbos.find((n) => n[0] === (reversed ? `w` : `e`));
+    nbos.find((n) => n[ 0 ] === (reversed ? `w` : `e`));
 
   const possibleNeighbours = (
     grid: Grid,
@@ -923,7 +923,7 @@ export const visitorRow = (
         }
       }
     }
-    return [[reversed ? `w` : `e`, cell]];
+    return [ [ reversed ? `w` : `e`, cell ] ];
   };
 
   const logic: VisitorLogic = {
@@ -953,7 +953,7 @@ export const visitFor = (
   steps: number,
   visitor: Visitor
 ): Cell => {
-  guardInteger(steps, ``, `steps`);
+  throwIntegerTest(steps, ``, `steps`);
 
   const opts: VisitorOpts = {
     reversed: steps < 0,
@@ -976,7 +976,7 @@ export const visitFor = (
       c = value;
       if (opts.debug) {
         console.log(
-          `stepsMade: ${stepsMade} cell: ${c.x}, ${c.y} reverse: ${opts.reversed}`
+          `stepsMade: ${ stepsMade } cell: ${ c.x }, ${ c.y } reverse: ${ opts.reversed }`
         );
       }
     } else {
@@ -986,7 +986,7 @@ export const visitFor = (
         v = visitor(grid, start, opts);
         v.next();
         c = start;
-        if (opts.debug) console.log(`resetting visitor to ${steps}`);
+        if (opts.debug) console.log(`resetting visitor to ${ steps }`);
       } else throw new Error(`Value not received by visitor`);
     }
   }
@@ -1007,7 +1007,7 @@ export const visitorColumn = (
 ): VisitGenerator => {
   const { reversed = false } = opts;
   const logic: VisitorLogic = {
-    select: (nbos) => nbos.find((n) => n[0] === (reversed ? `n` : `s`)),
+    select: (nbos) => nbos.find((n) => n[ 0 ] === (reversed ? `n` : `s`)),
     options: (grid, cell): ReadonlyArray<Neighbour> => {
       if (reversed) {
         // WALK UP COLUMN, RIGHT-TO-LEFT
@@ -1039,7 +1039,7 @@ export const visitorColumn = (
           }
         }
       }
-      return [[reversed ? `n` : `s`, cell]];
+      return [ [ reversed ? `n` : `s`, cell ] ];
     },
   };
   return visitor(logic, grid, start, opts);
@@ -1067,7 +1067,7 @@ export const rows = function* (grid: Grid, start: Cell = { x: 0, y: 0 }) {
   for (const c of cells(grid, start)) {
     if (c.y !== row) {
       yield rowCells;
-      rowCells = [c];
+      rowCells = [ c ];
       row = c.y;
     } else {
       //eslint-disable-next-line functional/immutable-data
@@ -1118,7 +1118,7 @@ export const access1dArray = <V>(
   ): V | undefined => {
     const index = indexFromCell(grid, cell, wrap);
     if (index === undefined) return undefined;
-    return array[index];
+    return array[ index ];
   };
   return fn;
 };
@@ -1141,13 +1141,13 @@ export const array2dUpdater = <V>(grid: GridVisual, array: V[][]) => {
     const pos = cellAtPoint(grid, position);
     if (pos === undefined) {
       throw new Error(
-        `Position does not exist. Pos: ${JSON.stringify(
+        `Position does not exist. Pos: ${ JSON.stringify(
           position
-        )} Grid: ${JSON.stringify(grid)}`
+        ) } Grid: ${ JSON.stringify(grid) }`
       );
     }
     //eslint-disable-next-line functional/immutable-data
-    array[pos.y][pos.x] = v;
+    array[ pos.y ][ pos.x ] = v;
   };
   return fn;
 };
@@ -1176,14 +1176,14 @@ export function* visitArray<V>(
   cols: number,
   iteratorFn?: Visitor,
   opts?: VisitorOpts
-): IterableIterator<readonly [data: V, index: number]> {
+): IterableIterator<readonly [ data: V, index: number ]> {
   if (typeof array === `undefined`) {
     throw Error(`First parameter is undefined, expected an array`);
   }
   if (array === null) throw Error(`First parameter is null, expected an array`);
   if (!Array.isArray(array)) throw Error(`First parameter should be an array`);
 
-  guardInteger(cols, `aboveZero`, `cols`);
+  throwIntegerTest(cols, `aboveZero`, `cols`);
   if (array.length === 0) return;
 
   const wrap = opts?.boundsWrap ?? `stop`;
@@ -1198,7 +1198,7 @@ export function* visitArray<V>(
   for (const cell of iter) {
     const index = indexFromCell(grid, cell, wrap);
     if (index === undefined) return undefined;
-    yield [array[index], index];
+    yield [ array[ index ], index ];
   }
 }
 
@@ -1326,7 +1326,7 @@ export const cellFromIndex = (
   } else {
     cols = colsOrGrid.cols;
   }
-  guardInteger(cols, `aboveZero`, `colsOrGrid`);
+  throwIntegerTest(cols, `aboveZero`, `colsOrGrid`);
 
   return {
     x: index % cols,

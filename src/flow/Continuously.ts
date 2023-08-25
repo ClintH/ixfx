@@ -1,4 +1,4 @@
-import { integer as guardInteger } from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 import { intervalToMs, type HasCompletion, type Interval } from './index.js';
 
 /**
@@ -164,7 +164,7 @@ export const continuously = (
 ): Continuously => {
   //eslint-disable-next-line functional/no-let
   let intervalMs = intervalToMs(interval, 0);
-  guardInteger(intervalMs, `positive`, `interval`);
+  throwIntegerTest(intervalMs, `positive`, `interval`);
 
   const fireBeforeWait = opts.fireBeforeWait ?? false;
   const onStartCalled = opts.onStartCalled;
@@ -189,8 +189,8 @@ export const continuously = (
   const deschedule =
     intervalMs === 0
       ? (_: number) => {
-          /** no-op */
-        }
+        /** no-op */
+      }
       : (timer: number) => window.clearTimeout(timer);
 
   const cancel = () => {
@@ -268,7 +268,7 @@ export const continuously = (
     },
     set interval(interval: Interval) {
       const ms = intervalToMs(interval, 0);
-      guardInteger(ms, `positive`, `interval`);
+      throwIntegerTest(ms, `positive`, `interval`);
       intervalMs = ms;
       intervalUsed = interval;
     },

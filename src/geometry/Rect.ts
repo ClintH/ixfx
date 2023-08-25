@@ -199,7 +199,7 @@ export function fromNumbers(
 /**
  * Rectangle as array: `[width, height]`
  */
-export type RectArray = readonly [width: number, height: number];
+export type RectArray = readonly [ width: number, height: number ];
 
 /**
  * Positioned rectangle as array: `[x, y, width, height]`
@@ -261,12 +261,12 @@ export function toArray(
   rect: Rect | RectPositioned
 ): RectArray | RectPositionedArray {
   if (isPositioned(rect)) {
-    return [rect.x, rect.y, rect.width, rect.height];
+    return [ rect.x, rect.y, rect.width, rect.height ];
   } else if (isRect(rect)) {
-    return [rect.width, rect.height];
+    return [ rect.width, rect.height ];
   } else {
     throw new Error(
-      `rect param is not a rectangle. Got: ${JSON.stringify(rect)}`
+      `rect param is not a rectangle. Got: ${ JSON.stringify(rect) }`
     );
   }
 }
@@ -625,9 +625,9 @@ export const maxFromCorners = (
 };
 
 const guardDim = (d: number, name: string = `Dimension`) => {
-  if (d === undefined) throw Error(`${name} is undefined`);
-  if (isNaN(d)) throw Error(`${name} is NaN`);
-  if (d < 0) throw Error(`${name} cannot be negative`);
+  if (d === undefined) throw Error(`${ name } is undefined`);
+  if (isNaN(d)) throw Error(`${ name } is NaN`);
+  if (d < 0) throw Error(`${ name } cannot be negative`);
 };
 
 /**
@@ -644,7 +644,7 @@ export const guard = (rect: Rect, name: string = `rect`) => {
 };
 
 const guardPositioned = (rect: RectPositioned, name: string = `rect`) => {
-  if (!isPositioned(rect)) throw new Error(`Expected ${name} to have x,y`);
+  if (!isPositioned(rect)) throw new Error(`Expected ${ name } to have x,y`);
   guard(rect, name);
 };
 
@@ -756,7 +756,7 @@ export const cardinal = (
         y: y + height / 2,
       });
     default:
-      throw new Error(`Unknown direction: ${card}`);
+      throw new Error(`Unknown direction: ${ card }`);
   }
 };
 
@@ -996,9 +996,9 @@ export function multiply(
   } else {
     if (typeof b !== `number`) {
       throw new Error(
-        `Expected second parameter of type Rect or number. Got ${JSON.stringify(
+        `Expected second parameter of type Rect or number. Got ${ JSON.stringify(
           b
-        )}`
+        ) }`
       );
     }
     if (c === undefined) c = b;
@@ -1129,7 +1129,7 @@ export const edges = (
   const c = corners(rect, origin);
 
   // Connect all the corners, back to first corner again
-  return Lines.joinPointsToLines(...c, c[0]);
+  return Lines.joinPointsToLines(...c, c[ 0 ]);
 };
 
 /**
@@ -1181,7 +1181,7 @@ export const isIntersecting = (
   } else if (Points.isPoint(b)) {
     return intersectsPoint(a, b);
   }
-  throw new Error(`Unknown shape for b: ${JSON.stringify(b)}`);
+  throw new Error(`Unknown shape for b: ${ JSON.stringify(b) }`);
 };
 
 /**
@@ -1194,8 +1194,8 @@ export const isIntersecting = (
  * A custom source of randomness can be provided:
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * import { weightedFn } from "https://unpkg.com/ixfx/dist/random.js"
- * const r = Rects.random(weightedFn(`quadIn`));
+ * import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
+ * const r = Rects.random(weightedSource(`quadIn`));
  * ```
  * @param rando
  * @returns

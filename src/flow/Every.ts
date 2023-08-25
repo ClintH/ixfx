@@ -1,4 +1,4 @@
-import { integer as guardInteger } from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 
 /**
  * Returns true for every _n_th call, eg 2 for every second call.
@@ -29,7 +29,7 @@ export const everyNth = (
   nth: number,
   callback?: (...args: readonly unknown[]) => void
 ) => {
-  guardInteger(nth, `positive`, `nth`);
+  throwIntegerTest(nth, `positive`, `nth`);
 
   //eslint-disable-next-line functional/no-let
   let counter = 0;

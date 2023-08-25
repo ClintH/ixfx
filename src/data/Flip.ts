@@ -1,5 +1,5 @@
 import { type NumberFunction } from './index.js';
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 
 /**
  * Flips a percentage-scale number: `1 - v`.
@@ -17,6 +17,6 @@ import { number as guardNumber } from '../Guards.js';
  */
 export const flip = (v: number | NumberFunction) => {
   if (typeof v === `function`) v = v();
-  guardNumber(v, `percentage`, `v`);
+  throwNumberTest(v, `percentage`, `v`);
   return 1 - v;
 };

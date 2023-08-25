@@ -1,6 +1,6 @@
 import { SimpleEventEmitter } from '../../Events.js';
 import { sortByValueProperty } from './MapFns.js';
-import { integer as guardInteger } from '../../Guards.js';
+import { throwIntegerTest } from '../../Guards.js';
 
 /**
  * Expiring map options
@@ -138,7 +138,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     super();
     this.capacity = opts.capacity ?? -1;
 
-    guardInteger(this.capacity, `nonZero`, `capacity`);
+    throwIntegerTest(this.capacity, `nonZero`, `capacity`);
     this.store = new Map();
     this.keyCount = 0;
 
@@ -164,9 +164,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     return this.keyCount;
   }
 
-  *entries(): IterableIterator<[k: K, v: V]> {
+  *entries(): IterableIterator<[ k: K, v: V ]> {
     for (const entry of this.store.entries()) {
-      yield [entry[0], entry[1].value];
+      yield [ entry[ 0 ], entry[ 1 ].value ];
     }
   }
 
@@ -269,9 +269,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     let sortBy = ``;
     if (this.evictPolicy === `oldestGet`) sortBy = `lastGet`;
     else if (this.evictPolicy === `oldestSet`) sortBy = `lastSet`;
-    else throw Error(`Unknown eviction policy ${this.evictPolicy}`);
+    else throw Error(`Unknown eviction policy ${ this.evictPolicy }`);
     const sorted = sortByValueProperty(this.store, sortBy);
-    return sorted[0][0];
+    return sorted[ 0 ][ 0 ];
   }
 
   #maintain() {
@@ -290,30 +290,30 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
   deleteWithElapsed(
     time: number,
     prop: `get` | `set` | `either`
-  ): [k: K, v: V][] {
-    const entries = [...this.store.entries()];
-    const prune: [k: K, v: V][] = [];
+  ): [ k: K, v: V ][] {
+    const entries = [ ...this.store.entries() ];
+    const prune: [ k: K, v: V ][] = [];
     const now = Date.now();
     for (const e of entries) {
-      const elapsedGet = now - e[1].lastGet;
-      const elapsedSet = now - e[1].lastSet;
+      const elapsedGet = now - e[ 1 ].lastGet;
+      const elapsedSet = now - e[ 1 ].lastSet;
       const elapsed =
         prop === `get`
           ? elapsedGet
           : prop === `set`
-          ? elapsedSet
-          : Math.max(elapsedGet, elapsedSet);
+            ? elapsedSet
+            : Math.max(elapsedGet, elapsedSet);
       if (elapsed >= time) {
-        prune.push([e[0], e[1].value]);
+        prune.push([ e[ 0 ], e[ 1 ].value ]);
       }
     }
 
     for (const e of prune) {
-      this.store.delete(e[0]);
+      this.store.delete(e[ 0 ]);
       this.keyCount = this.keyCount - 1;
       const eventArgs = {
-        key: e[0],
-        value: e[1],
+        key: e[ 0 ],
+        value: e[ 1 ],
       };
       this.fireEvent(`expired`, eventArgs);
       this.fireEvent(`removed`, eventArgs);
@@ -349,7 +349,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
       // Evict first
       const key = this.findEvicteeKey();
       if (!key) {
-        throw new Error(`ExpiringMap full (capacity: ${this.capacity})`);
+        throw new Error(`ExpiringMap full (capacity: ${ this.capacity })`);
       }
       const existing = this.store.get(key);
       this.store.delete(key);

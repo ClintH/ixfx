@@ -1,7 +1,7 @@
 import { minMaxAvg } from '../collections/NumericArrays.js';
 import { clamp } from './Clamp.js';
 import { scale } from './Scale.js';
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 /**
  * Normalises numbers, adjusting min/max as new values are processed.
  * Normalised return values will be in the range of 0-1 (inclusive).
@@ -44,11 +44,11 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
   //eslint-disable-next-line functional/no-let
   let max = maxDefault ?? Number.MIN_SAFE_INTEGER;
 
-  guardNumber(minDefault);
-  guardNumber(maxDefault);
+  throwNumberTest(minDefault);
+  throwNumberTest(maxDefault);
 
   return (v: number): number => {
-    guardNumber(v);
+    throwNumberTest(v);
     min = Math.min(min, v);
     max = Math.max(max, v);
     return scale(v, min, max);

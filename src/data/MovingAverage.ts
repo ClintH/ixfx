@@ -1,6 +1,6 @@
 import { average, averageWeighted } from '../collections/NumericArrays.js';
 import { QueueMutable } from '../collections/queue/QueueMutable.js';
-import { integer as guardInteger } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 
 /**
  * A moving average calculator (exponential weighted moving average) which does not keep track of
@@ -28,7 +28,7 @@ import { integer as guardInteger } from '../Guards.js';
  * @returns {@link MovingAverage}
  */
 export const movingAverageLight = (scaling: number = 3): MovingAverage => {
-  guardInteger(scaling, `aboveZero`, `scaling`);
+  throwNumberTest(scaling, `aboveZero`, `scaling`);
   //eslint-disable-next-line functional/no-let
   let average = 0;
   //eslint-disable-next-line functional/no-let
@@ -79,8 +79,8 @@ export const movingAverageTimed = (
   value: number = 0,
   scaling: number = 3
 ): MovingAverage => {
-  guardInteger(scaling, `aboveZero`, `scaling`);
-  guardInteger(updateRateMs, `aboveZero`, `decayRateMs`);
+  throwNumberTest(scaling, `aboveZero`, `scaling`);
+  throwNumberTest(updateRateMs, `aboveZero`, `decayRateMs`);
 
   const mal = movingAverageLight(scaling);
 
