@@ -1,8 +1,8 @@
 import * as NumericArrays from './collections/NumericArrays.js';
 import { numberTracker } from './data/NumberTracker.js';
-import { type TrackedValueOpts } from './data/TrackedValue.js';
+import { type TrackedValueOpts as TrackedValueOptions } from './data/TrackedValue.js';
 import { Easings } from './modulation/index.js';
-import { number as guard, integer as guardInteger } from './Guards.js';
+import { numberTest, integerTest, throwFromResult } from './Guards.js';
 
 /**
  * Calculates the average of all numbers in an array.
@@ -24,7 +24,7 @@ import { number as guard, integer as guardInteger } from './Guards.js';
  * @param data Data to average.
  * @returns Average of array
  */
-export const average = (...numbers: readonly number[]) =>
+export const average = (...numbers: ReadonlyArray<number>) =>
   NumericArrays.average(numbers);
 
 /**
@@ -34,9 +34,41 @@ export const average = (...numbers: readonly number[]) =>
  * @returns
  */
 export const averageWeighted = (
-  weightings: readonly number[] | Easings.EasingFn,
-  ...numbers: readonly number[]
+  weightings: ReadonlyArray<number> | Easings.EasingFn,
+  ...numbers: ReadonlyArray<number>
 ): number => NumericArrays.averageWeighted(numbers, weightings);
+
+/**
+ * Apples `fn` to every key of `obj` which is numeric.
+ * ```js
+ * const o = {
+ *  name: 'john',
+ *  x: 10,
+ *  y: 20
+ * };
+ * const o2 = applyToValues(o, (v) => v * 2);
+ * 
+ * // Yields: { name: 'john', x: 20, y: 40 }
+ * ```
+ * @param obj 
+ * @param fn 
+ * @returns 
+ */
+export const applyToValues = <T extends Record<string, any>>(obj: T, fn: (v: number) => number): T => {
+  const o: T = { ...obj };
+  for (const [ key, value ] of Object.entries(obj)) {
+    if (typeof value === `number`) {
+      // Run number through function
+      //eslint-disable-next-line functional/immutable-data
+      (o as any)[ key ] = fn(value);
+    } else {
+      // Copy value
+      //eslint-disable-next-line functional/immutable-data
+      (o as any)[ key ] = value;
+    }
+  }
+  return o;
+}
 
 /**
  * Returns the minimum number out of `data`.
@@ -49,7 +81,7 @@ export const averageWeighted = (
  * @param data
  * @returns Minimum number
  */
-export const min = (...data: readonly number[]): number =>
+export const min = (...data: ReadonlyArray<number>): number =>
   NumericArrays.min(data);
 
 /**
@@ -63,7 +95,7 @@ export const min = (...data: readonly number[]): number =>
  * @param data
  * @returns Maximum number
  */
-export const max = (...data: readonly number[]): number =>
+export const max = (...data: ReadonlyArray<number>): number =>
   NumericArrays.max(data);
 
 /**
@@ -77,7 +109,7 @@ export const max = (...data: readonly number[]): number =>
  * @param data
  * @returns Total
  */
-export const total = (...data: readonly number[]): number =>
+export const total = (...data: ReadonlyArray<number>): number =>
   NumericArrays.total(data);
 
 /**
@@ -85,7 +117,7 @@ export const total = (...data: readonly number[]): number =>
  * @param possibleNumber
  * @returns
  */
-export const isValid = (possibleNumber: number | unknown) => {
+export const isValid = (possibleNumber: unknown) => {
   if (typeof possibleNumber !== `number`) return false;
   if (Number.isNaN(possibleNumber)) return false;
   return true;
@@ -94,7 +126,7 @@ export const isValid = (possibleNumber: number | unknown) => {
 /**
  * Alias for [Data.numberTracker](Data.numberTracker.html)
  */
-export const tracker = (opts?: TrackedValueOpts) => numberTracker(opts);
+export const tracker = (options?: TrackedValueOptions) => numberTracker(options);
 
 /**
  * Filters an iterator of values, only yielding
@@ -139,14 +171,14 @@ export const quantiseEvery = (
   middleRoundsUp = true
 ) => {
   // Unit tested!
-  guard(v, ``, `v`);
-  guardInteger(every, ``, `every`);
+  throwFromResult(numberTest(v, ``, `v`));
+  throwFromResult(integerTest(every, ``, `every`));
 
   //eslint-disable-next-line functional/no-let
   let div = v / every;
-  const divMod = div % 1;
+  const divModule = div % 1;
   div = Math.floor(div);
-  if ((divMod === 0.5 && middleRoundsUp) || divMod > 0.5) div++;
+  if ((divModule === 0.5 && middleRoundsUp) || divModule > 0.5) div++;
   return every * div;
 };
 
@@ -176,22 +208,22 @@ export function* linearSpace(
   steps: number,
   precision?: number
 ): IterableIterator<number> {
-  guard(start, ``, `start`);
-  guard(end, ``, `end`);
+  throwFromResult(numberTest(start, ``, `start`));
+  throwFromResult(numberTest(end, ``, `end`));
 
-  guard(steps, ``, `steps`);
+  throwFromResult(numberTest(steps, ``, `steps`));
 
   const r = precision ? round(precision) : (v: number) => v;
   const step = (end - start) / (steps - 1);
 
-  guard(step, ``, `step`);
+  throwFromResult(numberTest(step, ``, `step`));
   if (!Number.isFinite(step)) {
-    throw new Error(`Calculated step value is infinite`);
+    throw new TypeError(`Calculated step value is infinite`);
   }
 
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < steps; i++) {
-    const v = start + step * i;
+  for (let index = 0; index < steps; index++) {
+    const v = start + step * index;
     yield r(v);
   }
 }
@@ -218,7 +250,7 @@ export function round(decimalPlaces: number): (v: number) => number;
  * @returns
  */
 export function round(a: number, b?: number) {
-  guardInteger(a, `positive`, `decimalPlaces`);
+  throwFromResult(integerTest(a, `positive`, `decimalPlaces`));
 
   //eslint-disable-next-line functional/no-let
   let rounder;
@@ -228,8 +260,7 @@ export function round(a: number, b?: number) {
     rounder = (v: number) => Math.floor(v * p) / p;
   }
 
-  if (typeof b === 'undefined') return rounder;
-  else return rounder(b);
+  return b === undefined ? rounder : rounder(b);
 }
 
 export function isApproximately(
@@ -275,13 +306,13 @@ export function isApproximately(
   rangePercent: number,
   v?: number
 ) {
-  guard(rangePercent, 'percentage', 'rangePercent');
-  guard(baseValue, '', 'baseValue');
+  throwFromResult(numberTest(rangePercent, `percentage`, `rangePercent`));
+  throwFromResult(numberTest(baseValue, ``, `baseValue`));
 
   const diff = baseValue * rangePercent;
   const test = (v: number): boolean => {
     try {
-      guard(v, '', 'v');
+      throwFromResult(numberTest(v, ``, `v`));
 
       //eslint-disable-next-line functional/no-let
       let diffV = Math.abs(v - baseValue);
@@ -289,14 +320,10 @@ export function isApproximately(
         diffV = round(5, diffV);
       }
       return diffV <= diff;
-    } catch (ex) {
+    } catch {
       return false;
     }
   };
 
-  if (typeof v !== 'undefined') {
-    return test(v);
-  } else {
-    return test;
-  }
+  return v === undefined ? test : test(v);
 }
