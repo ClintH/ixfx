@@ -1,7 +1,7 @@
 import { Lines, radianToDegree, Polar, Circles, Rects } from './index.js';
 import * as Points from './Point.js';
 
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 
 /**
  * Functions for working with equilateral triangles, defined by length
@@ -141,7 +141,7 @@ export const isEqual = (a: Triangle, b: Triangle): boolean =>
  */
 export const corners = (t: Triangle): readonly Points.Point[] => {
   guard(t);
-  return [t.a, t.b, t.c];
+  return [ t.a, t.b, t.c ];
 };
 
 /**
@@ -199,7 +199,7 @@ export const anglesDegrees = (t: Triangle): readonly number[] => {
  */
 export const isEquilateral = (t: Triangle): boolean => {
   guard(t);
-  const [a, b, c] = lengths(t);
+  const [ a, b, c ] = lengths(t);
   return a === b && b === c;
 };
 
@@ -209,7 +209,7 @@ export const isEquilateral = (t: Triangle): boolean => {
  * @returns
  */
 export const isIsosceles = (t: Triangle): boolean => {
-  const [a, b, c] = lengths(t);
+  const [ a, b, c ] = lengths(t);
   if (a === b) return true;
   if (b === c) return true;
   if (c === a) return true;
@@ -255,7 +255,7 @@ export const isObtuse = (t: Triangle): boolean =>
 export const centroid = (t: Triangle): Points.Point => {
   guard(t);
   const total = Points.reduce(
-    [t.a, t.b, t.c],
+    [ t.a, t.b, t.c ],
     (p: Points.Point, acc: Points.Point) => ({
       x: p.x + acc.x,
       y: p.y + acc.y,
@@ -290,8 +290,8 @@ export const area = (t: Triangle): number => {
   const e = edges(t).map((l) => Lines.length(l));
 
   // Add up length of edges, halve
-  const p = (e[0] + e[1] + e[2]) / 2;
-  return Math.sqrt(p * (p - e[0]) * (p - e[1]) * (p - e[2]));
+  const p = (e[ 0 ] + e[ 1 ] + e[ 2 ]) / 2;
+  return Math.sqrt(p * (p - e[ 0 ]) * (p - e[ 1 ]) * (p - e[ 2 ]));
 };
 
 /**
@@ -312,7 +312,7 @@ export const innerCircle = (t: Triangle): Circles.CirclePositioned => {
  * @returns
  */
 export const outerCircle = (t: Triangle): Circles.CirclePositioned => {
-  const [a, b, c] = edges(t).map((l) => Lines.length(l));
+  const [ a, b, c ] = edges(t).map((l) => Lines.length(l));
   const cent = centroid(t);
   const radius =
     (a * b * c) /
@@ -343,7 +343,7 @@ export const fromRadius = (
   radius: number,
   opts: { readonly initialAngleRadian?: number } = {}
 ): Triangle => {
-  guardNumber(radius, `positive`, `radius`);
+  throwNumberTest(radius, `positive`, `radius`);
   Points.guard(origin, `origin`);
 
   const initialAngleRadian = opts.initialAngleRadian ?? 0;
@@ -402,7 +402,7 @@ export const equilateralFromVertex = (
  */
 export const toFlatArray = (t: Triangle): readonly number[] => {
   guard(t);
-  return [t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y];
+  return [ t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y ];
 };
 
 /**
@@ -415,7 +415,7 @@ export const fromFlatArray = (coords: readonly number[]): Triangle => {
   if (!Array.isArray(coords)) throw new Error(`coords expected as array`);
   if (coords.length !== 6) {
     throw new Error(
-      `coords array expected with 6 elements. Got ${coords.length}`
+      `coords array expected with 6 elements. Got ${ coords.length }`
     );
   }
   return fromPoints(Points.fromNumbers(...coords));
@@ -430,13 +430,13 @@ export const fromPoints = (points: readonly Points.Point[]): Triangle => {
   if (!Array.isArray(points)) throw new Error(`points expected as array`);
   if (points.length !== 3) {
     throw new Error(
-      `points array expected with 3 elements. Got ${points.length}`
+      `points array expected with 3 elements. Got ${ points.length }`
     );
   }
   const t: Triangle = {
-    a: points[0],
-    b: points[1],
-    c: points[2],
+    a: points[ 0 ],
+    b: points[ 1 ],
+    c: points[ 2 ],
   };
   return t;
 };
