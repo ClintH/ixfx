@@ -17,6 +17,10 @@ export type NumberGuardRange =
   | `percentage`
   | `bipolar`;
 
+type GuardResultOk = Readonly<readonly [true: boolean]>;
+type GuardResultFail = Readonly<readonly [false: boolean, reason: string]>;
+type GuardResult = GuardResultFail | GuardResultOk;
+
 /**
  * Throws an error if `t` is not a number or within specified range.
  * Use an empty string for no special range constraints.
@@ -34,113 +38,73 @@ export type NumberGuardRange =
  * @param range Range to enforce
  * @returns
  */
-export const number = (
-  value?: number,
+export const numberTest = (
+  value?: unknown,
   range: NumberGuardRange = ``,
-  paramName = `?`,
-  throwException = true
-): boolean => {
+  parameterName = `?`,
+): GuardResult => {
+  if (value === null) return [false, `Parameter ${parameterName} is null`];
   if (typeof value === `undefined`) {
-    if (throwException) {
-      throw new Error(`Parameter ${paramName} is undefined`);
-    } else {
-      return false;
-    }
+    return [false, `Parameter ${parameterName} is undefined`];
   }
   if (Number.isNaN(value)) {
-    if (throwException) {
-      throw new Error(`Parameter '${paramName}' is NaN`);
-    } else {
-      return false;
-    }
+    return [false, `Parameter '${parameterName}' is NaN`];
   }
   if (typeof value !== `number`) {
-    if (throwException) {
-      throw new Error(`Parameter '${paramName}' is not a number (${value})`);
-    } else {
-      return false;
-    }
+    return [false, `Parameter '${parameterName}' is not a number (${JSON.stringify(value)})`];
   }
   switch (range) {
-    case `positive`:
+    case `positive`: {
       if (value < 0) {
-        if (throwException) {
-          throw new Error(
-            `Parameter '${paramName}' must be at least zero (${value})`
-          );
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must be at least zero (${value})`];
       }
       break;
-    case `negative`:
+    } case `negative`: {
       if (value > 0) {
-        if (throwException) {
-          throw new Error(
-            `Parameter '${paramName}' must be zero or lower (${value})`
-          );
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must be zero or lower (${value})`];
       }
       break;
-    case `aboveZero`:
+    }
+    case `aboveZero`: {
       if (value <= 0) {
-        if (throwException) {
-          throw new Error(
-            `Parameter '${paramName}' must be above zero (${value})`
-          );
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must be above zero (${value})`]
+
       }
       break;
-    case `belowZero`:
+    }
+    case `belowZero`: {
       if (value >= 0) {
-        if (throwException) {
-          throw new Error(
-            `Parameter '${paramName}' must be below zero (${value})`
-          );
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must be below zero (${value})`];
       }
       break;
-    case `percentage`:
+    }
+    case `percentage`: {
       if (value > 1 || value < 0) {
-        if (throwException) {
-          throw new Error(
-            `Parameter '${paramName}' must be in percentage range (0 to 1). (${value})`
-          );
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must be in percentage range (0 to 1). (${value})`]
       }
       break;
-    case `nonZero`:
+    }
+    case `nonZero`: {
       if (value === 0) {
-        if (throwException) {
-          throw new Error(`Parameter '${paramName}' must non-zero. (${value})`);
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must non-zero. (${value})`];
       }
       break;
-    case `bipolar`:
+    }
+    case `bipolar`: {
       if (value > 1 || value < -1) {
-        if (throwException) {
-          throw new Error(
-            `Parameter '${paramName}' must be in bipolar percentage range (-1 to 1). (${value})`
-          );
-        } else {
-          return false;
-        }
+        return [false, `Parameter '${parameterName}' must be in bipolar percentage range (-1 to 1). (${value})`];
       }
       break;
+    }
   }
-  return true;
+  return [true];
 };
 
+export const throwNumberTest = (value?: unknown,
+  range: NumberGuardRange = ``,
+  parameterName = `?`) => {
+  throwFromResult(numberTest(value, range, parameterName));
+}
 /**
  * Test a number, returning _true_ if it passes, _false_ if not.
  * Compared to {@link number} which by default throws an exception.
@@ -148,26 +112,34 @@ export const number = (
  * @param range
  * @returns
  */
-export const numberTry = (
-  value?: number,
-  range: NumberGuardRange = ``
-): boolean => {
-  return number(value, range, '', false);
-};
+// export const numberTry = (
+//   value?: number,
+//   range: NumberGuardRange = ``
+// ): boolean => {
+//   return number(value, range, ``, false);
+// };
 
 /**
  * Throws if `value` is _undefined_ or _null_.
  * @param value
  * @param paramName
  */
-export const nullUndef = (value: any, paramName = '?') => {
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const nullUndef = (value: any, parameterName = `?`): GuardResult => {
   if (typeof value === `undefined`) {
-    throw new Error(`${paramName} param is undefined`);
+    return [false, `${parameterName} param is undefined`];
   }
-  if (value === null) throw new Error(`${paramName} param is null`);
+  if (value === null) return [false, `${parameterName} param is null`];
+  return [true];
 };
+
+export const throwFromResult = (test: GuardResultFail | GuardResultOk) => {
+  if (test[0]) return false;
+  else throw new Error(test[1]);
+}
+
 /**
- * Throws an error if `value` is not in the range of 0-1.
+ * Returns test of `value` being in the range of 0-1.
  * Equiv to `number(value, `percentage`);`
  *
  * This is the same as calling ```number(t, `percentage`)```
@@ -175,9 +147,12 @@ export const nullUndef = (value: any, paramName = '?') => {
  * @param paramName Param name for customising exception message
  * @returns
  */
-export const percent = (value: number, paramName = `?`) =>
-  number(value, `percentage`, paramName);
+export const percentTest = (value: number, parameterName = `?`): GuardResult =>
+  numberTest(value, `percentage`, parameterName);
 
+export const throwPercentTest = (value: number, parameterName = `?`) => {
+  throwFromResult(percentTest(value, parameterName));
+}
 /**
  * Throws an error if `value` is not an integer, or does not meet guard criteria.
  * See {@link number} for guard details, or use that if integer checking is not required.
@@ -194,18 +169,25 @@ export const percent = (value: number, paramName = `?`) =>
  * @param paramName Param name for customising exception message
  * @param range Guard specifier.
  */
-export const integer = (
+export const integerTest = (
   value: number | undefined,
   range: NumberGuardRange = ``,
-  paramName = `?`
-) => {
+  parameterName = `?`
+): GuardResult => {
   // ✔️ Unit tested
-  number(value, range, paramName);
+  const r = numberTest(value, range, parameterName);
+  if (!r[0]) return r;
   if (!Number.isInteger(value)) {
-    throw new Error(`Parameter ${paramName} is not an integer`);
+    return [false, `Parameter ${parameterName} is not an integer`];
   }
+  return [true];
 };
 
+export const throwIntegerTest = (value: number | undefined,
+  range: NumberGuardRange = ``,
+  parameterName = `?`) => {
+  throwFromResult(integerTest(value, range, parameterName));
+}
 /**
  * Parses `value` as an integer, returning it if it meets the `range` criteria.
  * If not, `defaultValue` is returned.
@@ -227,19 +209,22 @@ export const integer = (
  * @returns
  */
 export const integerParse = (
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any,
   range: NumberGuardRange = ``,
   defaultValue: number = Number.NaN
-) => {
+): number => {
   // ✔️ Unit tested
   if (value === undefined) return defaultValue;
   if (value === null) return defaultValue;
   try {
-    integer(Number.parseInt(value), range, 'parsed');
-  } catch (ex) {
+    const parsed = Number.parseInt(value);
+    const r = integerTest(parsed, range, `parsed`);
+    return r[0] ? parsed : defaultValue;
+  } catch {
     return defaultValue;
   }
-  return parseInt(value);
+  return Number.parseInt(value);
 };
 
 /**
@@ -249,7 +234,7 @@ export const integerParse = (
  */
 export const isStringArray = (value: unknown): boolean => {
   if (!Array.isArray(value)) return false;
-  return value.find((v) => typeof v !== `string`) === undefined;
+  return !value.some((v) => typeof v !== `string`);
 };
 
 /**
@@ -257,11 +242,16 @@ export const isStringArray = (value: unknown): boolean => {
  * @param value
  * @param paramName
  */
-export const array = (value: unknown, paramName = `?`): void => {
+export const arrayTest = (value: unknown, parameterName = `?`): GuardResult => {
   if (!Array.isArray(value)) {
-    throw new Error(`Parameter '${paramName}' is expected to be an array'`);
+    return [false, `Parameter '${parameterName}' is expected to be an array'`];
   }
+  return [true];
 };
+
+export const throwArrayTest = (value: unknown, parameterName = `?`) => {
+  throwFromResult(arrayTest(value, parameterName));
+}
 
 /** Throws an error if parameter is not defined */
 export const defined = <T>(argument: T | undefined): argument is T =>
