@@ -1,0 +1,192 @@
+// import * as Filters from "./Filters.js";
+// import * as Producers from "./Generators.js";
+
+// type MatchFunction<V> = {
+//   (v: V, index?: number, array?: V[]): boolean
+// }
+
+// /**
+//  * Returns true if value(s) match filter
+//  *
+//  * @interface ManyValueMatch
+//  * @template V
+//  */
+// interface ManyValueMatch<V> {
+//   (v: Iterable<V>): boolean;
+// }
+
+// /**
+//  * Returns a function that returns true if values match filter(s)
+//  *
+//  * @template V
+//  * @param {MatchFunction<V>[]} filters
+//  * @param {{allValuesMustMatch?: boolean, allFiltersMustMatch?: boolean, mismatchThrow?: boolean}} [opts={}]
+//  * @returns {ManyValueMatch<V>}
+//  */
+// const matches = <V>(filters: Iterable<MatchFunction<V>>, opts: {allValuesMustMatch?: boolean, allFiltersMustMatch?: boolean, mismatchThrow?: boolean, debug?: boolean} = {}): ManyValueMatch<V> => {
+//   const allValues = opts.allValuesMustMatch ?? false;
+//   const allFilters = opts.allFiltersMustMatch ?? false;
+//   const mismatchThrow = opts.mismatchThrow ?? false;
+//   const debug = opts.debug ?? false;
+//   if (debug) console.log(`matches. allFilters: ${allFilters} allValues: ${allValues}`);
+
+//   return (vArray: Iterable<V>): boolean => {
+//     let someMatch = false;
+//     for (const v of vArray) {
+//       if (debug) console.log(` v: ${v}`);
+//       let valueBasedFind = false;
+//       let filterCount = 0;
+//       for (const f of filters) {
+//         filterCount++;
+//         const filterBasedFind = f(v);
+//         if (debug) console.log(`  filter #${filterCount} result = ${filterBasedFind}`);
+//         if (!filterBasedFind && (allValues && allFilters)) {
+//           if (mismatchThrow) throw Error(`Filter #${filterCount} failed for value: ${v}`);
+//           return false;
+//         }
+//         if (filterBasedFind && !allFilters) {
+//           // No need to apply all filters
+//           valueBasedFind = true;
+//           break;
+//         }
+//         if (filterBasedFind) valueBasedFind = true;
+//       }
+//       if (debug) console.log(`  result after all filters = ${valueBasedFind}`);
+
+//       // Some filter matched, and we don't need to match all values = true
+//       if (valueBasedFind && !allValues) return true;
+
+//       // No filter matched this value, and we need all values to match = false
+//       if (!valueBasedFind && allValues) {
+//         if (mismatchThrow) throw Error(`Some filter(s) failed for value: ${v}`);
+//         return false;
+//       }
+//       // No filters matched, but we need all filters or all values = false
+//       if (!valueBasedFind && (allFilters && allValues)) {
+//         if (mismatchThrow) throw Error(`All filter(s) failed for value: ${v}`);
+//         return false;
+//       }
+//       if (valueBasedFind) someMatch = true;
+//     }
+//     return someMatch;
+//   };
+// };
+
+// /**
+//  * Returns a function that filters a set of items by a set of filters
+//  *
+//  * @template V
+//  * @param {Iterable<MatchFunction<V>>} filters If filter returns true, item is included
+//  * @param {{allFiltersMustMatch?: boolean}} [opts={}] 
+//  * @returns
+//  */
+// export const filter = <V>(filters: Iterable<MatchFunction<V>>, opts: {allFiltersMustMatch?: boolean} = {}) => {
+//   const allFilters = opts.allFiltersMustMatch ?? false;
+
+//   const r = function* (vArray: Iterable<V>) {
+//     for (const v of vArray) {
+//       let matched = false;
+
+//       for (const f of filters) {
+//         const matchedFilter = f(v);
+//         if (matchedFilter && !allFilters) {
+//           // Don't need all filters to match
+//           matched = true;
+//           break;
+//         } else if (!matchedFilter && allFilters) {
+//           // Do need all filters, and we missed a match, so that's a fail
+//           matched = false;
+//           break;
+//         } else if (matchedFilter) {
+//           matched = true;
+//         }
+//       }
+//       if (matched) yield v;
+//     }
+//   };
+//   return r;
+// };
+
+// /**
+//  * Tests that all-value-match and all-filter-match works
+//  *
+//  */
+// const testAllMatches = () => {
+//   const dataSet = Producers.numericRange(0.05, 0, 1);
+//   const opts = {allValuesMustMatch: true, allFiltersMustMatch: true, mismatchThrow: false};
+//   console.log(`testAllMatches. dataSet: ${dataSet}`);
+//   let shouldNotMatch = matches([Filters.threshold(0.5), Filters.rangeInclusive(0.7, 1)], opts);
+//   if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (1)`);
+
+//   shouldNotMatch = matches([Filters.rangeInclusive(0.21, 0.41)], opts);
+//   if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (2)`);
+
+//   opts.mismatchThrow = true;
+//   const shouldMatch = matches([Filters.rangeInclusive(0, 1)], opts);
+//   if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch`);
+
+//   console.log(`testAllMatches OK`);
+// };
+
+// /**
+//  * Tests that all-value-match and some-filter-match works
+//  *
+//  */
+// const testSomeFilterMatches = () => {
+//   const dataSet = Producers.numericRange(0.05, 0, 1);
+//   const opts = {debug: false, allValuesMustMatch: true, allFiltersMustMatch: false, mismatchThrow: false};
+//   console.log(`testSomeFilterMatches. dataSet: ${dataSet}`);
+
+//   let shouldNotMatch = matches([Filters.threshold(0.5), Filters.rangeInclusive(0.7, 1)], opts);
+//   if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (1)`);
+
+//   shouldNotMatch = matches([Filters.rangeInclusive(0.21, 0.41)], opts);
+//   if (shouldNotMatch(dataSet)) throw Error(`Unexpected match (2)`);
+
+//   opts.mismatchThrow = true;
+//   const shouldMatch = matches([Filters.rangeInclusive(0, 1)], opts);
+//   if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch`);
+
+//   console.log(`testSomeFilterMatches OK`);
+// };
+
+// /**
+//  * Tests that some-value-match and all-filter-match works
+//  *
+//  */
+// const testSomeValueMatches = () => {
+//   const dataSet = Producers.numericRange(0.05, 0, 1);
+//   const opts = {allValuesMustMatch: false, allFiltersMustMatch: true, mismatchThrow: false, debug: false};
+
+//   console.log(`testSomeValueMatches. dataSet: ${dataSet}`);
+
+//   let shouldMatch = matches([Filters.threshold(0.5), Filters.rangeInclusive(0.7, 1)], opts);
+//   if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch (1)`);
+
+//   shouldMatch = matches([Filters.rangeInclusive(0.21, 0.41)], opts);
+//   if (!shouldMatch(dataSet)) throw Error(`Unexpected mismatch (2)`);
+
+//   const shouldNotMatch = matches([Filters.rangeInclusive(2, 3)], opts);
+//   if (shouldNotMatch(dataSet)) throw Error(`Unexpected match`);
+
+//   console.log(`testSomeValueMatches OK`);
+// };
+
+
+// const testFind = () => {
+//   const dataSet = Producers.numericRange(0.05, 0, 1);
+//   let f = filter([Filters.rangeInclusive(0, 0.1), Filters.rangeInclusive(0.9, 1)], {allFiltersMustMatch: true});
+//   let fArray = Array.from(f(dataSet));
+//   if (fArray.length !== 0) throw Error(`Expected 0 matched items, got ${fArray.length}`);
+
+//   f = filter([Filters.rangeInclusive(0, 0.1), Filters.rangeInclusive(0.9, 1)], {allFiltersMustMatch: false});
+//   fArray = Array.from(f(dataSet));
+//   if (fArray.length !== 6) throw Error(`Expected 6 matched items, got ${fArray.length}`);
+
+//   console.log(`testFind OK`);
+// };
+
+// testAllMatches();
+// testSomeFilterMatches();
+// testSomeValueMatches();
+// testFind();
