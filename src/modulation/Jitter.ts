@@ -1,10 +1,10 @@
 import {
   type RandomSource,
-  floatFn as randomFloatFn,
+  floatSource as randomFloatFn,
   float as randomFloat,
 } from '../Random.js';
 import { clamp } from '../data/Clamp.js';
-import { number as guardNumber } from '../Guards.js';
+import { throwNumberTest } from '../Guards.js';
 
 export type JitterOpts = {
   readonly relative?: number;
@@ -58,7 +58,7 @@ export const jitter = (opts: JitterOpts = {}): JitterFn => {
   //eslint-disable-next-line functional/no-let
   let r = (_: number) => 0;
   if (typeof opts.absolute !== 'undefined') {
-    guardNumber(
+    throwNumberTest(
       opts.absolute,
       clamped ? `percentage` : `bipolar`,
       `opts.absolute`
@@ -70,7 +70,7 @@ export const jitter = (opts: JitterOpts = {}): JitterFn => {
     });
     r = (v: number) => v + absRand();
   } else if (typeof opts.relative !== 'undefined') {
-    guardNumber(
+    throwNumberTest(
       opts.relative,
       clamped ? `percentage` : `bipolar`,
       `opts.relative`
@@ -87,7 +87,7 @@ export const jitter = (opts: JitterOpts = {}): JitterFn => {
   }
 
   const compute = (value: number) => {
-    guardNumber(value, clamped ? `percentage` : `bipolar`, `value`);
+    throwNumberTest(value, clamped ? `percentage` : `bipolar`, `value`);
     //eslint-disable-next-line functional/no-let
     let v = r(value);
     if (clamped) v = clamp(v);
