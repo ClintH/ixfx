@@ -1,6 +1,6 @@
 import { Arrays } from '../collections/index.js';
 import AudioVisualiser from './AudioVisualiser.js';
-import { number as guardNumber, integer as guardInteger } from '../Guards.js';
+import { throwNumberTest, throwIntegerTest } from '../Guards.js';
 import { isPowerOfTwo } from '../Util.js';
 
 /**
@@ -178,20 +178,20 @@ export class AudioAnalyser {
     this.debug = opts.debug ?? false;
     this.smoothingTimeConstant = opts.smoothingTimeConstant ?? 0.8;
 
-    guardInteger(this.fftSize, `positive`, `opts.fftSize`);
-    guardNumber(
+    throwIntegerTest(this.fftSize, `positive`, `opts.fftSize`);
+    throwNumberTest(
       this.smoothingTimeConstant,
       `percentage`,
       `opts.smoothingTimeConstant`
     );
 
-    if (!isPowerOfTwo(this.fftSize))
+    if (!isPowerOfTwo(this.fftSize)) {
       throw new Error(
-        `fftSize must be a power of two from 32 to 32768 (${this.fftSize})`
+        `fftSize must be a power of two from 32 to 32768 (${ this.fftSize })`
       );
+    }
     if (this.fftSize < 32) throw new Error(`fftSize must be at least 32`);
-    if (this.fftSize > 32768)
-      throw new Error(`fftSize must be no greater than 32768`);
+    if (this.fftSize > 32768) { throw new Error(`fftSize must be no greater than 32768`); }
 
     this.analyse = analyse;
     this.paused = false;
@@ -264,7 +264,7 @@ export class AudioAnalyser {
       const audioCtx = new AudioContext();
 
       audioCtx.addEventListener(`statechange`, () => {
-        if (this.debug) console.log(`Audio context state: ${audioCtx.state}`);
+        if (this.debug) console.log(`Audio context state: ${ audioCtx.state }`);
       });
 
       this.audioCtx = audioCtx;
@@ -351,11 +351,12 @@ export class AudioAnalyser {
     if (a === undefined) throw new Error(`Analyser not available`);
     if (ctx === undefined) throw new Error(`Audio context not available`);
 
-    guardInteger(index, `positive`, `index`);
-    if (index > a.frequencyBinCount)
+    throwIntegerTest(index, `positive`, `index`);
+    if (index > a.frequencyBinCount) {
       throw new Error(
-        `Index ${index} exceeds frequency bin count ${a.frequencyBinCount}`
+        `Index ${ index } exceeds frequency bin count ${ a.frequencyBinCount }`
       );
+    }
 
     return (index * ctx.sampleRate) / (a.frequencyBinCount * 2);
   }
