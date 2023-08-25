@@ -1,15 +1,15 @@
 /* eslint-disable */
-import { minIndex } from '../collections/NumericArrays.js';
-import { type PointCalculableShape } from '../geometry/Point.js';
-import { Arrays } from '../collections/index.js';
-import { Points, Rects } from '../geometry/index.js';
-import { clamp, flip, scale } from '../data/index.js';
-import { parentSizeCanvas } from '../dom/Util.js';
+import {minIndex} from '../collections/NumericArrays.js';
+import {type PointCalculableShape} from '../geometry/Point.js';
+import {Arrays} from '../collections/index.js';
+import {Points, Rects} from '../geometry/index.js';
+import {clamp, flip, scale} from '../data/index.js';
+import {parentSizeCanvas} from '../dom/Util.js';
 import * as Sg from './SceneGraph.js';
 
-import { textWidth } from './Drawing.js';
-import { getFieldPaths, getFieldByPath, ifNaN } from '../Util.js';
-import { number as guardNumber } from '../Guards.js';
+import {textWidth} from './Drawing.js';
+import {getFieldPaths, getFieldByPath, ifNaN} from '../Util.js';
+import {throwNumberTest} from '../Guards.js';
 
 /**
  * A data source
@@ -109,7 +109,7 @@ class ArrayDataSource implements DataSource {
     if (!this.dirty && this._range !== undefined) return this._range;
     this.dirty = false;
     this._range = Arrays.minMaxAvg(this.data);
-    return { ...this._range, changed: true };
+    return {...this._range, changed: true};
   }
 
   add(value: number) {
@@ -171,8 +171,8 @@ export class Series {
     this.drawingStyle = opts.drawingStyle ?? `line`;
     this.colour = opts.colour;
     this.width = opts.width ?? 3;
-    this.axisRange = opts.axisRange ?? { min: Number.NaN, max: Number.NaN };
-    this._visualRange = { ...this.axisRange };
+    this.axisRange = opts.axisRange ?? {min: Number.NaN, max: Number.NaN};
+    this._visualRange = {...this.axisRange};
     this._visualRangeStretch = opts.visualRangeStretch ?? true;
 
     if (sourceType === `array`) {
@@ -198,7 +198,7 @@ export class Series {
         const rmax = Math.max(ifNaN(vr.max, sourceRange.max), sourceRange.max);
         if (rmin !== vr.min || rmax !== vr.max) {
           // Changed
-          vr = { min: rmin, max: rmax };
+          vr = {min: rmin, max: rmax};
           changed = true;
         }
       } else {
@@ -210,7 +210,7 @@ export class Series {
       }
     }
     this._visualRange = vr;
-    return { ...vr, changed };
+    return {...vr, changed};
   }
 
   scaleValue(value: number): number {
@@ -224,7 +224,7 @@ export class Series {
   }
 
   add(value: number) {
-    guardNumber(value, ``, `value`);
+    throwNumberTest(value, ``, `value`);
     this.source.add(value);
     this.plot.plotArea.needsDrawing = true;
   }
@@ -235,7 +235,7 @@ export class Series {
    */
   clear() {
     this.source.clear();
-    this._visualRange = { ...this.axisRange };
+    this._visualRange = {...this.axisRange};
     this.plot.plotArea.needsDrawing = true;
   }
 }
@@ -377,7 +377,7 @@ export class PlotArea extends Sg.CanvasBox {
       for (let i = 0; i < d.length; i++) {
         const scaled = clamp(series.scaleValue(d[i]));
         y = padding + this.paddingPx + v.height * flip(scaled);
-        shapes.push({ x, y, index: i, value: d[i] });
+        shapes.push({x, y, index: i, value: d[i]});
 
         if (i == 0) ctx.moveTo(x + pxPerPt / 2, y);
         else ctx.lineTo(x + pxPerPt / 2, y);
@@ -397,7 +397,7 @@ export class PlotArea extends Sg.CanvasBox {
         ctx.beginPath();
         ctx.arc(x + pxPerPt / 2, y, series.width, 0, this.piPi);
         ctx.fill();
-        shapes.push({ radius: series.width, x, y, index: i, value: d[i] });
+        shapes.push({radius: series.width, x, y, index: i, value: d[i]});
         x += pxPerPt;
       }
     } else if (series.drawingStyle === `bar`) {
@@ -423,7 +423,7 @@ export class PlotArea extends Sg.CanvasBox {
 }
 
 export class Legend extends Sg.CanvasBox {
-  sampleSize = { width: 10, height: 10 };
+  sampleSize = {width: 10, height: 10};
   padding = 3;
   widthSnapping = 20;
 
@@ -577,11 +577,11 @@ export class AxisY extends Sg.CanvasBox {
 
   constructor(private plot: Plot) {
     super(plot, plot.canvasEl, `AxisY`);
-    this.lastRange = { min: 0, max: 0 };
+    this.lastRange = {min: 0, max: 0};
   }
 
   clear() {
-    this.lastRange = { min: 0, max: 0 };
+    this.lastRange = {min: 0, max: 0};
     this.lastPlotAreaHeight = 0;
   }
 
@@ -847,7 +847,7 @@ export class Plot extends Sg.CanvasBox {
       colour: `hsl(${(len * 25) % 360}, 70%,50%)`,
       ...seriesOpts,
     };
-    if (this.defaultSeriesOpts) opts = { ...this.defaultSeriesOpts, ...opts };
+    if (this.defaultSeriesOpts) opts = {...this.defaultSeriesOpts, ...opts};
 
     const s = new Series(name, type, this, opts);
     // if (type === `array` && initialData !== undefined) {

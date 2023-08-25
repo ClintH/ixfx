@@ -1,5 +1,9 @@
 A rough changelog between NPM releases
 
+# 0.10.5 25.0823
+
+* Linting
+* 
 # 0.10.1 19.08.23
 
 Small fixes
