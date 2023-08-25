@@ -1,7 +1,5 @@
-import { integer } from './Guards.js';
-import { string as random } from './Random.js';
-
-export { random };
+import { integerTest, throwFromResult } from './Guards.js';
+export { string as random } from './Random.js';
 
 /**
  * Returns source text that is between `start` and `end` match strings. Returns _undefined_ if start/end is not found.
@@ -34,7 +32,7 @@ export const between = (
     : source.indexOf(end, startPos + 1);
   if (endPos < 0) return;
 
-  return source.substring(startPos + 1, endPos);
+  return source.slice(startPos + 1, endPos);
 };
 
 /**
@@ -55,21 +53,21 @@ export const betweenChomp = (
   start: string,
   end?: string,
   lastEndMatch = true
-): [source: string, between: string | undefined] => {
+): [ source: string, between: string | undefined ] => {
   // ✔ Unit tested
   const startPos = source.indexOf(start);
-  if (startPos < 0) return [source, undefined];
+  if (startPos < 0) return [ source, undefined ];
 
   if (end === undefined) end = start;
 
   const endPos = lastEndMatch
     ? source.lastIndexOf(end)
     : source.indexOf(end, startPos + 1);
-  if (endPos < 0) return [source, undefined];
+  if (endPos < 0) return [ source, undefined ];
 
-  const between = source.substring(startPos + 1, endPos);
-  const src = source.substring(0, startPos) + source.substring(endPos + 1);
-  return [src, between];
+  const between = source.slice(startPos + 1, endPos);
+  const sourceResult = source.slice(0, startPos) + source.slice(endPos + 1);
+  return [ sourceResult, between ];
 };
 /**
  * Returns first position of the given character code, or -1 if not found.
@@ -86,8 +84,8 @@ export const indexOfCharCode = (
   end = source.length - 1
 ): number => {
   //eslint-disable-next-line functional/no-let
-  for (let i = start; i <= end; i++) {
-    if (source.charCodeAt(i) === code) return i;
+  for (let index = start; index <= end; index++) {
+    if (source.codePointAt(index) === code) return index;
   }
   return -1;
 };
@@ -110,8 +108,8 @@ export const omitChars = (
   removeStart: number,
   removeLength: number
 ) =>
-  source.substring(0, removeStart) +
-  source.substring(removeStart + removeLength);
+  source.slice(0, removeStart) +
+  source.slice(removeStart + removeLength);
 
 /**
  * Splits a string into `length`-size chunks.
@@ -129,28 +127,28 @@ export const omitChars = (
  * @returns
  */
 export const splitByLength = (
-  source: string,
+  source: string | null,
   length: number
-): readonly string[] => {
-  integer(length, 'aboveZero', 'length');
-  if (source === null) throw new Error('source parameter null');
-  if (typeof source !== 'string') {
-    throw new Error('source parameter not a string');
+): ReadonlyArray<string> => {
+  throwFromResult(integerTest(length, `aboveZero`, `length`));
+  if (source === null) throw new Error(`source parameter null`);
+  if (typeof source !== `string`) {
+    throw new TypeError(`source parameter not a string`);
   }
 
   // ✔ Unit tested
   const chunks = Math.ceil(source.length / length);
-  const ret: string[] = [];
+  const returnValue: Array<string> = [];
   //eslint-disable-next-line functional/no-let
   let start = 0;
 
   //eslint-disable-next-line functional/no-let
   for (let c = 0; c < chunks; c++) {
     //eslint-disable-next-line functional/immutable-data
-    ret.push(source.substring(start, start + length));
+    returnValue.push(source.slice(start, start + length));
     start += length;
   }
-  return ret;
+  return returnValue;
 };
 
 /**
@@ -168,23 +166,23 @@ export const splitByLength = (
 export const untilMatch = (
   source: string,
   match: string,
-  opts: MatchOpts = {}
+  options: MatchOptions = {}
 ): string => {
   //  ✔️ Unit tested
-  const startPos = opts.startPos ?? undefined;
-  const fromEnd = opts.fromEnd ?? false;
+  const startPos = options.startPos ?? undefined;
+  const fromEnd = options.fromEnd ?? false;
   const m = fromEnd
     ? source.lastIndexOf(match, startPos)
     : source.indexOf(match, startPos);
 
   if (m < 0) return source;
-  return source.substring(startPos ?? 0, m);
+  return source.slice(startPos ?? 0, m);
 };
 
-export type MatchOpts = {
+export interface MatchOptions {
   readonly startPos?: number;
   readonly fromEnd?: boolean;
-};
+}
 /**
  * Returns all the text in `source` that follows `match`. If not found, `source` is returned.
  * ```js
@@ -199,18 +197,18 @@ export type MatchOpts = {
 export const afterMatch = (
   source: string,
   match: string,
-  opts: MatchOpts = {}
+  options: MatchOptions = {}
 ): string => {
   //  ✔️ Unit tested
-  const startPos = opts.startPos ?? undefined;
-  const fromEnd = opts.fromEnd ?? false;
+  const startPos = options.startPos ?? undefined;
+  const fromEnd = options.fromEnd ?? false;
 
   const m = fromEnd
     ? source.lastIndexOf(match, startPos)
     : source.indexOf(match, startPos);
 
   if (m < 0) return source;
-  return source.substring(m + match.length);
+  return source.slice(Math.max(0, m + match.length));
 };
 
 /**
@@ -229,7 +227,7 @@ export const afterMatch = (
  */
 export const unwrap = (
   source: string,
-  ...wrappers: readonly string[]
+  ...wrappers: ReadonlyArray<string>
 ): string => {
   //eslint-disable-next-line functional/no-let
   let matched = false;
@@ -237,7 +235,7 @@ export const unwrap = (
     matched = false;
     for (const w of wrappers) {
       if (source.startsWith(w) && source.endsWith(w)) {
-        source = source.substring(w.length, source.length - w.length * 2 + 1);
+        source = source.slice(w.length, source.length - w.length * 2 + 1);
         matched = true;
       }
     }
@@ -249,7 +247,7 @@ export const unwrap = (
 /**
  * A range
  */
-export type Range = {
+export interface Range {
   /**
    * Text of range
    */
@@ -266,13 +264,13 @@ export type Range = {
    * Index of range. First range is 0
    */
   readonly index: number;
-};
+}
 
-export type LineSpan = {
+export interface LineSpan {
   readonly start: number;
   readonly end: number;
   readonly length: number;
-};
+}
 
 /**
  * Calculates the span, defined in {@link Range} indexes, that includes `start` through to `end` character positions.
@@ -285,18 +283,17 @@ export type LineSpan = {
  * @returns Span
  */
 export const lineSpan = (
-  ranges: readonly Range[],
+  ranges: ReadonlyArray<Range>,
   start: number,
   end: number
 ): LineSpan => {
   //eslint-disable-next-line functional/no-let
   let s = -1;
   //eslint-disable-next-line functional/no-let
-  let e = -1;
+  let endPos = -1;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < ranges.length; i++) {
-    const r = ranges[i];
-    s = i;
+  for (const [ index, r ] of ranges.entries()) {
+    s = index;
     if (r.text.length === 0) continue;
     if (start < r.end) {
       break;
@@ -304,18 +301,18 @@ export const lineSpan = (
   }
 
   //eslint-disable-next-line functional/no-let
-  for (let i = s; i < ranges.length; i++) {
-    const r = ranges[i];
-    e = i;
+  for (let index = s; index < ranges.length; index++) {
+    const r = ranges[ index ];
+    endPos = index;
     if (end === r.end) {
-      e = i + 1;
+      endPos = index + 1;
       break;
     }
     if (end < r.end) {
       break;
     }
   }
-  return { length: e - s, start: s, end: e };
+  return { length: endPos - s, start: s, end: endPos };
 };
 
 /**
@@ -340,12 +337,12 @@ export const lineSpan = (
 export const splitRanges = (
   source: string,
   split: string
-): readonly Range[] => {
+): ReadonlyArray<Range> => {
   //eslint-disable-next-line functional/no-let
   let start = 0;
   //eslint-disable-next-line functional/no-let
   let text = ``;
-  const ranges: Range[] = [];
+  const ranges: Array<Range> = [];
   //eslint-disable-next-line functional/no-let
   let index = 0;
   //eslint-disable-next-line functional/no-let
@@ -389,13 +386,13 @@ export const splitRanges = (
  */
 export const countCharsFromStart = (
   source: string,
-  ...chars: readonly string[]
+  ...chars: ReadonlyArray<string>
 ): number => {
   //eslint-disable-next-line functional/no-let
   let counted = 0;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < source.length; i++) {
-    if (chars.includes(source.charAt(i))) {
+  for (let index = 0; index < source.length; index++) {
+    if (chars.includes(source.charAt(index))) {
       counted++;
     } else {
       break;
@@ -426,4 +423,4 @@ export const startsEnds = (
 
 //eslint-disable-next-line no-useless-escape
 export const htmlEntities = (source: string): string =>
-  source.replace(/[\u00A0-\u9999<>\&]/g, (i) => `&#${i.charCodeAt(0)};`);
+  source.replaceAll(/[&<>\u00A0-\u9999]/g, (index) => `&#${ index.codePointAt(0) };`);
