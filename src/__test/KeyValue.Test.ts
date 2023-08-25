@@ -1,9 +1,9 @@
 
 /* eslint-disable */
-import {expect, test} from '@jest/globals';
+import test from 'ava';
 import {type KeyValue, sortByKey, sortByValueNumber, sortByValueString} from '../KeyValue.js';
 
-test(`sorting`, () => {
+test(`sorting`, (t) => {
   const a: KeyValue[] = [
     [`apples`, 10],
     [`orange`, 2],
@@ -11,26 +11,26 @@ test(`sorting`, () => {
   ];
 
   // Sort by numeric value
-  expect(sortByValueNumber(false)(a)).toStrictEqual([
+  t.deepEqual(sortByValueNumber(false)(a), [
     [`zebras`, 0],
     [`orange`, 2],
     [`apples`, 10]
   ]);
 
-  expect(sortByValueNumber(true)(a)).toStrictEqual([
+  t.deepEqual(sortByValueNumber(true)(a), [
     [`apples`, 10],
     [`orange`, 2],
     [`zebras`, 0]
   ]);
 
   // Sort by key
-  expect(sortByKey(false)(a)).toStrictEqual([
+  t.deepEqual(sortByKey(false)(a), [
     [`apples`, 10],
     [`orange`, 2],
     [`zebras`, 0]
   ]);
 
-  expect(sortByKey(true)(a)).toStrictEqual([
+  t.deepEqual(sortByKey(true)(a), [
     [`zebras`, 0],
     [`orange`, 2],
     [`apples`, 10]
@@ -44,7 +44,7 @@ test(`sorting`, () => {
   ];
 
   // Sort by string value
-  expect(sortByValueString(false)(b)).toStrictEqual([
+  t.deepEqual(sortByValueString(false)(b), [
     [`d`, `four`],
     [`a`, `one`],
     [`c`, `three`],

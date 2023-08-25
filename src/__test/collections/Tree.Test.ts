@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {expect, test} from '@jest/globals';
+import test from 'ava';
 import {type PathOpts, getLengthChildren, getByPath, traceByPath, directChildren} from '../../collections/Trees.js';
 
 function getTestMap() {
@@ -40,13 +40,13 @@ function getTestObj() {
   return testObj;
 }
 
-test('getLengthChildren', () => {
-  expect(getLengthChildren(getTestObj())).toEqual(3);
-  expect(getLengthChildren(getTestMap())).toEqual(2);
+test('getLengthChildren', (t) => {
+  t.is(getLengthChildren(getTestObj()), 3);
+  t.is(getLengthChildren(getTestMap()), 2);
 });
 
-test('directChildren', () => {
-  expect([...directChildren(getTestObj())]).toEqual([
+test('directChildren', (t) => {
+  t.deepEqual([...directChildren(getTestObj())], [
     ["name", "Jill"],
     ["address", {number: 27, street: "Blah St"}],
     ["kids", [
@@ -70,32 +70,32 @@ test('directChildren', () => {
       b: 0.5
     }
   }
-  expect([...directChildren(simpleObj)]).toEqual([["colour", {
+  t.deepEqual([...directChildren(simpleObj)], [["colour", {
     b: 0.5,
     g: 0.5,
     r: 0.5
   }]]);
 
   const colours = [{r: 1, g: 0, b: 0}, {r: 0, g: 1, b: 0}, {r: 0, g: 0, b: 1}];
-  expect([...directChildren(colours, 'colours')]).toEqual([
+  t.deepEqual([...directChildren(colours, 'colours')], [
     ["colours[0]", {r: 1, g: 0, b: 0}],
     ["colours[1]", {r: 0, g: 1, b: 0}],
     ["colours[2]", {r: 0, g: 0, b: 1}],
   ]);
 });
 
-test('traceByPath', () => {
-  const t = getTestObj();
+test('traceByPath', (t) => {
+  const o = getTestObj();
   const opts: PathOpts = {
     separator: '.',
     allowArrayIndexes: true
   }
-  expect([...traceByPath('kids[1]', t, opts)]).toEqual([["kids[1]", {"name": "Sam"}]]);
-  expect([...traceByPath('address.street', t, opts)]).toEqual([["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
-  expect([...traceByPath('kids[0].address.street', t, opts)]).toEqual([["kids[0]", {"address": {"number": 35, "street": "West St"}, "name": "John"}], ["address", {"number": 35, "street": "West St"}], ["street", "West St"]]);
+  t.deepEqual([...traceByPath('kids[1]', o, opts)], [["kids[1]", {"name": "Sam"}]]);
+  t.deepEqual([...traceByPath('address.street', o, opts)], [["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
+  t.deepEqual([...traceByPath('kids[0].address.street', o, opts)], [["kids[0]", {"address": {"number": 35, "street": "West St"}, "name": "John"}], ["address", {"number": 35, "street": "West St"}], ["street", "West St"]]);
 
   const t2 = getTestMap();
-  expect([...traceByPath('jill.address.street', t2, opts)]).toEqual([["jill", {"address": {"number": 27, "street": "Blah St"}}], ["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
+  t.deepEqual([...traceByPath('jill.address.street', t2, opts)], [["jill", {"address": {"number": 27, "street": "Blah St"}}], ["address", {"number": 27, "street": "Blah St"}], ["street", "Blah St"]]);
 
   const opts2: PathOpts = {
     separator: '.',
@@ -103,11 +103,11 @@ test('traceByPath', () => {
   }
 
   // Not found when we don't use array indexes
-  expect([...traceByPath('kids[1]', t, opts2)]).toEqual([['kids[1]', undefined]]);
-  expect([...traceByPath('kids[0].address.street', t, opts2)]).toEqual([['kids[0]', undefined]]);
+  t.deepEqual([...traceByPath('kids[1]', t, opts2)], [['kids[1]', undefined]]);
+  t.deepEqual([...traceByPath('kids[0].address.street', t, opts2)], [['kids[0]', undefined]]);
 });
 
-test('getByPath', () => {
+test('getByPath', (t) => {
   const people = {
     jane: {
       address: {
@@ -119,12 +119,12 @@ test('getByPath', () => {
     }
   }
   const e = getByPath('jane.address.postcode', people);
-  expect(e).toEqual(["postcode", 1000]);
+  t.deepEqual(e, ["postcode", 1000]);
 
-  expect(getByPath('jane.address.country', people)).toEqual(['country', undefined]);
-  expect(getByPath('jane.address.country.state', people)).toEqual(['country', undefined]);
+  t.deepEqual(getByPath('jane.address.country', people), ['country', undefined]);
+  t.deepEqual(getByPath('jane.address.country.state', people), ['country', undefined]);
 
-  expect([...traceByPath('jane.address.street.toofar', people)]).toEqual([
+  t.deepEqual([...traceByPath('jane.address.street.toofar', people)], [
     ["jane", {address: {postcode: 1000, street: 'West St', city: 'Blahville'}, colour: 'red'}],
     ["address", {postcode: 1000, street: 'West St', city: 'Blahville'}],
     ["street", "West St"],

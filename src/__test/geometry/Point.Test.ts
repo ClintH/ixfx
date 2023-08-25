@@ -9,6 +9,37 @@ function closeTo(t: ExecutionContext<unknown>, input: number, target: number, pe
   t.fail(`Value: ${input} target: ${target} diff%: ${diff * 100}`);
 }
 
+test(`withinRange`, t => {
+
+  t.true(Points.withinRange({x: -1, y: -1}, Points.Empty, 1));
+  t.true(Points.withinRange({x: 1, y: 1}, Points.Empty, 1));
+  t.false(Points.withinRange({x: 1, y: 1}, Points.Empty, 0));
+  t.false(Points.withinRange({x: 2, y: 2}, Points.Empty, 1));
+
+  // Both coords have to be within range
+  t.false(Points.withinRange({x: 1, y: 1}, {x: 100, y: 1}, 1));
+  t.false(Points.withinRange({x: 1, y: 1}, {x: 1, y: 100}, 1));
+
+  t.true(Points.withinRange({x: 100, y: 100}, {x: 101, y: 101}, 1));
+  t.true(Points.withinRange({x: 100, y: 100}, {x: 105, y: 101}, {x: 5, y: 1}));
+  t.false(Points.withinRange({x: 100, y: 100}, {x: 105, y: 105}, {x: 5, y: 1}));
+
+  // With point as range
+  t.true(Points.withinRange(Points.Empty, Points.Empty, Points.Empty));
+  t.true(Points.withinRange(Points.Empty, {x: 1, y: 100}, {x: 1, y: 100}));
+
+  t.throws(() => Points.withinRange(Points.Empty, Points.Placeholder, 1));
+  // @ts-expect-error
+  t.throws(() => Points.withinRange(Points.Empty, Points.Empty, false));
+  t.throws(() => Points.withinRange(Points.Empty, Points.Empty, Number.NaN));
+  // @ts-expect-error
+  t.throws(() => Points.withinRange({}, Points.Empty, 1));
+  // @ts-expect-error
+  t.throws(() => Points.withinRange(Points.Empty, {}, 1));
+
+
+});
+
 test(`normalise`, t => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
   t.like(Points.normalise({x: 5, y: 2}), {x: 0.9284766908852594, y: 0.3713906763541037});
@@ -116,10 +147,10 @@ test(`divide`, t => {
   // expect(() => Points.divide({x: 10, y: 0}, 1, 1)).toThrow();
 
   // B contains zero
+  t.like(Points.divide({x: 10, y: 5}, {x: 0, y: 10}), {x: Infinity, y: 0.5});
+  t.like(Points.divide({x: 10, y: 5}, {x: 10, y: 0}), {x: 1, y: Infinity});
   t.throws(() => Points.divide({x: 10, y: 5}, 0, 10));
   t.throws(() => Points.divide({x: 10, y: 5}, 10, 0));
-  t.throws(() => Points.divide({x: 10, y: 5}, {x: 0, y: 10}));
-  t.throws(() => Points.divide({x: 10, y: 5}, {x: 10, y: 0}));
 
   // B contains NaN
   t.throws(() => Points.divide({x: 10, y: 5}, NaN, 2));

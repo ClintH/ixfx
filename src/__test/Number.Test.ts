@@ -5,7 +5,29 @@ import {
   linearSpace,
   quantiseEvery,
   round,
+  applyToValues
 } from '../Numbers.js';
+
+test('apply', t => {
+  const o = {
+    name: 'john',
+    x: 10,
+    y: 20
+  };
+  const o2 = applyToValues(o, (v) => v * 2);
+  t.is(o2.x, 20);
+  t.is(o2.y, 40);
+
+
+  const oo = {
+    h: 330,
+    l: 0.7058823529411764,
+    s: 1,
+  }
+  const oo2 = applyToValues(oo, v => round(3, v));
+  t.like(oo2, {h: 330, l: 0.705, s: 1});
+
+});
 
 test('isApproximately', (t) => {
   const closeTo100 = isApproximately(100, 0.1);
@@ -26,7 +48,7 @@ test('isApproximately', (t) => {
 
   t.throws(() => isApproximately(Number.NaN, 0.1));
   // @ts-ignore
-  t.throws(() => isApproximately({ hello: 'there' }, 0.1));
+  t.throws(() => isApproximately({hello: 'there'}, 0.1));
   // @ts-ignore
   t.throws(() => isApproximately('100', 0.1));
   // @ts-ignore

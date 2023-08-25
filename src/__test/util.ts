@@ -1,8 +1,8 @@
 /* eslint-disable */
-import test, { type ExecutionContext } from 'ava';
-import { minMaxAvg } from '../collections/NumericArrays.js';
-import { compareValuesEqual } from '../collections/Arrays.js';
-import { isEqualDefault } from '../Util.js';
+import test, {type ExecutionContext} from 'ava';
+import {minMaxAvg} from '../collections/NumericArrays.js';
+import {compareValuesEqual} from '../collections/Arrays.js';
+import {isEqualDefault} from '../Util.js';
 //test.todo('sf');
 
 export const areIntegers = (t: ExecutionContext, a: Array<number>) => {
@@ -35,6 +35,14 @@ export const closeTo = <V>(
   if (aa !== bb) t.fail(`A is not close enough to B. A: ${a} B: ${b}`);
   else t.assert(true);
 };
+
+export const isCloseTo = (a: number, b: number, precision: number = 3) => {
+  const aa = a.toPrecision(precision);
+  const bb = b.toPrecision(precision);
+  if (aa !== bb) return [false, `A is not close enough to B. A: ${a} B: ${b} Precision: ${precision}`];
+  else return [true];
+}
+
 /**
  * True if a contains all of b.
  * @param t
@@ -198,7 +206,7 @@ export const rangeCheck = (
   v: Iterable<number>,
   expected: ExpectedOpts
 ) => {
-  const { min, max } = minMaxAvg(v);
+  const {min, max} = minMaxAvg(v);
   if (expected.lowerExcl !== undefined) {
     if (min < expected.lowerExcl) {
       t.is(min, expected.lowerExcl, 'Lower exclusive');
