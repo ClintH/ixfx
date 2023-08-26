@@ -1,7 +1,7 @@
 import { intervalToMs, type Interval } from './Interval.js';
 import { msElapsedTimer, relativeTimer } from './Timer.js';
 
-export type SinceFn = () => number;
+export type Since = () => number;
 
 /**
  * Returns elapsed time since initial call.
@@ -29,7 +29,7 @@ export type SinceFn = () => number;
  * Use {@link once} if you want to measure a single period, and stop it.
  * @returns
  */
-export const since = (): SinceFn => {
+export const since = (): Since => {
   const start = Date.now();
   return (): number => {
     return Date.now() - start;
@@ -51,7 +51,7 @@ export const since = (): SinceFn => {
  * Use {@link since} to not have this stopping behaviour.
  * @returns
  */
-export const once = (): SinceFn => {
+export const once = (): Since => {
   const start = Date.now();
   //eslint-disable-next-line functional/no-let
   let stoppedAt = 0;
@@ -77,7 +77,7 @@ export const once = (): SinceFn => {
  * ```
  * @returns
  */
-export const infinity = (): SinceFn => {
+export const infinity = (): Since => {
   return (): number => {
     return Number.POSITIVE_INFINITY;
   };
@@ -107,7 +107,7 @@ export const infinity = (): SinceFn => {
  */
 export function progress(
   duration: Interval,
-  opts: { readonly clampValue?: boolean } = {}
+  opts: { readonly clampValue?: boolean, readonly wrapValue?: boolean } = {}
 ): () => number {
   const totalMs = intervalToMs(duration);
   if (!totalMs) throw new Error(`duration invalid`);
@@ -119,27 +119,26 @@ export function progress(
   return () => t.elapsed;
 }
 
-export const toString = (millisOrFn: number | SinceFn | Interval): string => {
+export const toString = (millisOrFunction: number | Since | Interval): string => {
   //eslint-disable-next-line functional/no-let
   let interval = 0;
-  if (typeof millisOrFn === `function`) {
-    const intervalResult = millisOrFn();
-    if (typeof intervalResult === `object`) interval = intervalToMs(interval)!;
-    else interval = intervalResult;
-  } else if (typeof millisOrFn === `number`) {
-    interval = millisOrFn;
-  } else if (typeof millisOrFn === `object`) {
+  if (typeof millisOrFunction === `function`) {
+    const intervalResult = millisOrFunction();
+    interval = (typeof intervalResult === `object`) ? intervalToMs(interval)! : intervalResult;
+  } else if (typeof millisOrFunction === `number`) {
+    interval = millisOrFunction;
+  } else if (typeof millisOrFunction === `object`) {
     interval = intervalToMs(interval)!;
   }
 
   //eslint-disable-next-line functional/no-let
   let ms = intervalToMs(interval);
-  if (typeof ms === 'undefined') return '(undefined)';
-  if (ms < 1000) return `${ms}ms`;
+  if (typeof ms === `undefined`) return `(undefined)`;
+  if (ms < 1000) return `${ ms }ms`;
   ms /= 1000;
-  if (ms < 120) return `${ms.toFixed(1)}secs`;
+  if (ms < 120) return `${ ms.toFixed(1) }secs`;
   ms /= 60;
-  if (ms < 60) return `${ms.toFixed(2)}mins`;
+  if (ms < 60) return `${ ms.toFixed(2) }mins`;
   ms /= 60;
-  return `${ms.toFixed(2)}hrs`;
+  return `${ ms.toFixed(2) }hrs`;
 };
