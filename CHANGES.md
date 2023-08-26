@@ -1,9 +1,14 @@
 A rough changelog between NPM releases
 
-# 0.10.5 25.0823
+# 0.11.1 26.08.23
+
+* PlotBipolar
+* Data.Bipolar module
+  
+# 0.10.5 25.08.23
 
 * Linting
-* 
+ 
 # 0.10.1 19.08.23
 
 Small fixes
