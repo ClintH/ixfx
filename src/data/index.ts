@@ -16,6 +16,24 @@ export * from './TrackerBase.js';
 export * from './Clamp.js';
 export * from './Scale.js';
 export * from './Flip.js';
+
+/**
+ * Work with bipolar values (-1...1)
+ * 
+ * Import:
+ * ```js
+ * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
+ * ```
+ * 
+ * Overview:
+ * * {@link immutable}: Immutable wrapper around a value
+ * * {@link clamp}: Clamp on -1..1 scale
+ * * {@link scale}: Scale a value to -1..1
+ * * {@link toScalar}: Convert -1..1 to 0..1
+ * * {@link fromScalar}: Convert from 0..1 to -1..1
+ * * {@link towardZero}: Nudge a bipolar value towards zero
+ */
+export * as Bipolar from './Bipolar.js';
 export * from './Interpolate.js';
 export * from './Wrap.js';
 export * as Correlate from './Correlate.js';
