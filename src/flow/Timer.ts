@@ -14,7 +14,7 @@ export type Timer = {
   get elapsed(): number;
 };
 
-export type ModTimer = Timer & {
+export type ModulationTimer = Timer & {
   mod(amt: number): void;
 };
 
@@ -32,7 +32,8 @@ export type RelativeTimerOpts = TimerOpts & {
   /**
    * If true, returned value will be clamped to 0..1. False by default
    */
-  readonly clampValue?: boolean;
+  readonly clampValue?: boolean
+  readonly wrapValue?: boolean
 };
 
 /**
@@ -54,8 +55,8 @@ export function hasElapsedMs(totalMs: number): () => boolean {
 
 export const frequencyTimerSource =
   (frequency: number): TimerSource =>
-  () =>
-    frequencyTimer(frequency, { timer: msElapsedTimer() });
+    () =>
+      frequencyTimer(frequency, { timer: msElapsedTimer() });
 
 /**
  * Wraps a timer, returning a relative elapsed value based on
@@ -88,18 +89,20 @@ export const frequencyTimerSource =
 export const relativeTimer = (
   total: number,
   opts: RelativeTimerOpts = {}
-): ModTimer & HasCompletion => {
+): ModulationTimer & HasCompletion => {
   const timer = opts.timer ?? msElapsedTimer();
   const clampValue = opts.clampValue ?? false;
+  const wrapValue = opts.wrapValue ?? false;
+  if (clampValue && wrapValue) throw new Error(`clampValue and wrapValue cannot both be enabled`);
 
   //eslint-disable-next-line functional/no-let
   let done = false;
   //eslint-disable-next-line functional/no-let
-  let modAmt = 1;
+  let modulationAmount = 1;
 
   return {
     mod(amt: number) {
-      modAmt = amt;
+      modulationAmount = amt;
     },
     get isDone() {
       return done;
@@ -110,9 +113,13 @@ export const relativeTimer = (
     },
     get elapsed() {
       //eslint-disable-next-line functional/no-let
-      let v = timer.elapsed / (total * modAmt);
+      let v = timer.elapsed / (total * modulationAmount);
       if (clampValue) v = clamp(v);
-      if (v >= 1) done = true;
+      else if (wrapValue) {
+        if (v >= 1) v = v % 1;
+      } else {
+        if (v >= 1) done = true;
+      }
       return v;
     },
   };
@@ -151,32 +158,32 @@ export const relativeTimer = (
 export const frequencyTimer = (
   frequency: number,
   opts: TimerOpts = {}
-): ModTimer => {
+): ModulationTimer => {
   const timer = opts.timer ?? msElapsedTimer();
   const cyclesPerSecond = frequency / 1000;
   //eslint-disable-next-line functional/no-let
-  let modAmt = 1;
+  let modulationAmount = 1;
   return {
     mod: (amt: number) => {
-      modAmt = amt;
+      modulationAmount = amt;
     },
     reset: () => {
       timer.reset();
     },
     get elapsed() {
       // Get position in a cycle
-      const v = timer.elapsed * (cyclesPerSecond * modAmt);
+      const v = timer.elapsed * (cyclesPerSecond * modulationAmount);
 
       // Get fractional part
       const f = v - Math.floor(v);
       if (f < 0) {
         throw new Error(
-          `Unexpected cycle fraction less than 0. Elapsed: ${v} f: ${f}`
+          `Unexpected cycle fraction less than 0. Elapsed: ${ v } f: ${ f }`
         );
       }
       if (f > 1) {
         throw new Error(
-          `Unexpected cycle fraction more than 1. Elapsed: ${v} f: ${f}`
+          `Unexpected cycle fraction more than 1. Elapsed: ${ v } f: ${ f }`
         );
       }
       return f;
