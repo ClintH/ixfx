@@ -87,7 +87,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
     };
   } else {
     throw new Error(
-      `Unknown 'reference' parameter: ${JSON.stringify(reference)}`
+      `Unknown 'reference' parameter: ${ JSON.stringify(reference) }`
     );
   }
 };
@@ -253,7 +253,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
       };
     default:
       throw new Error(
-        `Unexpected target coordinate space: ${targetSpace}. Expected: viewport, document or screen`
+        `Unexpected target coordinate space: ${ targetSpace }. Expected: viewport, document or screen`
       );
   }
 };
@@ -286,7 +286,7 @@ export const positionFromMiddle = (
   );
 
   // Apply via CSS
-  el.style.transform = `translate(${offsetPos.x}px, ${offsetPos.y}px)`;
+  el.style.transform = `translate(${ offsetPos.x }px, ${ offsetPos.y }px)`;
 };
 
 export const fullSizeElement = <V extends HTMLElement>(
@@ -336,7 +336,7 @@ export const canvasHelper = (
   if (!domQueryOrEl) throw new Error(`domQueryOrEl is null or undefined`);
   const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
   if (el.nodeName !== `CANVAS`) {
-    throw new Error(`Expected CANVAS HTML element. Got: ${el.nodeName}`);
+    throw new Error(`Expected CANVAS HTML element. Got: ${ el.nodeName }`);
   }
   const fullSize = opts.fullSize ?? true;
   const ratio = Math.round(window.devicePixelRatio) || 1;
@@ -422,7 +422,7 @@ export const fullSizeCanvas = (
   const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
   if (el.nodeName !== `CANVAS`) {
     throw new Error(
-      `Expected HTML element with node name CANVAS, not ${el.nodeName}`
+      `Expected HTML element with node name CANVAS, not ${ el.nodeName }`
     );
   }
   const ctx = el.getContext(`2d`);
@@ -493,17 +493,17 @@ export const cycleCssClass = (
   }
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < list.length; i++) {
-    if (el.classList.contains(list[i])) {
-      el.classList.remove(list[i]);
+    if (el.classList.contains(list[ i ])) {
+      el.classList.remove(list[ i ]);
       if (i + 1 < list.length) {
-        el.classList.add(list[i + 1]);
+        el.classList.add(list[ i + 1 ]);
       } else {
-        el.classList.add(list[0]);
+        el.classList.add(list[ 0 ]);
       }
       return;
     }
   }
-  el.classList.add(list[0]);
+  el.classList.add(list[ 0 ]);
 };
 
 /**
@@ -574,15 +574,15 @@ export const getTranslation = (
   // Can either be 2d or 3d transform
   const matrixType = matrix.includes(`3d`) ? `3d` : `2d`;
   // @ts-ignore
-  const matrixValues = matrix.match(/matrix.*\((.+)\)/)[1].split(`, `);
+  const matrixValues = matrix.match(/matrix.*\((.+)\)/)[ 1 ].split(`, `);
 
   // 2d Matrixes have 6 values
   // Last 2 values are X and Y.
   // 2d Matrixes does not have Z value.
   if (matrixType === `2d`) {
     return {
-      x: parseFloat(matrixValues[4]),
-      y: parseFloat(matrixValues[5]),
+      x: parseFloat(matrixValues[ 4 ]),
+      y: parseFloat(matrixValues[ 5 ]),
       z: 0,
     };
   }
@@ -591,9 +591,9 @@ export const getTranslation = (
   // The 13th, 14th, and 15th values are X, Y, and Z
   if (matrixType === `3d`) {
     return {
-      x: parseFloat(matrixValues[12]),
-      y: parseFloat(matrixValues[13]),
-      z: parseFloat(matrixValues[14]),
+      x: parseFloat(matrixValues[ 12 ]),
+      y: parseFloat(matrixValues[ 13 ]),
+      z: parseFloat(matrixValues[ 14 ]),
     };
   }
 
@@ -617,7 +617,7 @@ export const parentSizeCanvas = (
   const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
   if (el.nodeName !== `CANVAS`) {
     throw new Error(
-      `Expected HTML element with node name CANVAS, not ${el.nodeName}`
+      `Expected HTML element with node name CANVAS, not ${ el.nodeName }`
     );
   }
   const parent = el.parentElement;
@@ -689,21 +689,18 @@ export const resolveEl = <V extends Element>(domQueryOrEl: string | V): V => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {
-      if (!domQueryOrEl.startsWith(`#`)) {
-        throw new Error(
-          `Query '${domQueryOrEl}' did not match anything. Did you mean '#${domQueryOrEl}?`
-        );
-      } else {
-        throw new Error(
-          `Query '${domQueryOrEl}' did not match anything. Try '#id', 'div', or '.class'`
-        );
-      }
+      const error = !domQueryOrEl.startsWith(`#`) ? new Error(
+        `Query '${ domQueryOrEl }' did not match anything. Did you mean '#${ domQueryOrEl }?`
+      ) : new Error(
+        `Query '${ domQueryOrEl }' did not match anything. Try '#id', 'div', or '.class'`
+      );
+      throw error;
     }
     domQueryOrEl = d as V;
   } else if (domQueryOrEl === null) {
-    throw new Error(`domQueryOrEl ${domQueryOrEl} is null`);
+    throw new Error(`domQueryOrEl ${ domQueryOrEl } is null`);
   } else if (domQueryOrEl === undefined) {
-    throw new Error(`domQueryOrEl ${domQueryOrEl} is undefined`);
+    throw new Error(`domQueryOrEl ${ domQueryOrEl } is undefined`);
   }
   const el = domQueryOrEl as V;
   return el;
@@ -779,7 +776,7 @@ export const themeChangeObservable = (): Observable<
     });
 
     const opts: MutationObserverInit = {
-      attributeFilter: [`class`],
+      attributeFilter: [ `class` ],
       attributes: true,
     };
 
@@ -867,9 +864,9 @@ export const reconcileChildren = <V>(
 
   const seen = new Set<string>();
 
-  for (const [key, value] of list) {
-    const id = `c-${key}`;
-    const el = parentEl.querySelector(`#${id}`) as HTMLElement;
+  for (const [ key, value ] of list) {
+    const id = `c-${ key }`;
+    const el = parentEl.querySelector(`#${ id }`) as HTMLElement;
     const finalEl = createUpdate(value, el);
     //eslint-disable-next-line functional/immutable-data
     if (el !== finalEl) {
@@ -883,7 +880,7 @@ export const reconcileChildren = <V>(
   const prune: HTMLElement[] = [];
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < parentEl.children.length; i++) {
-    const c = parentEl.children[i] as HTMLElement;
+    const c = parentEl.children[ i ] as HTMLElement;
     if (!seen.has(c.id)) {
       //eslint-disable-next-line functional/immutable-data
       prune.push(c);
@@ -903,7 +900,7 @@ export const reconcileChildren = <V>(
  * @param cssClass 
  * @returns 
  */
-export const setCssClass = (selectors:string, value:boolean, cssClass:string) => {
+export const setCssClass = (selectors: string, value: boolean, cssClass: string) => {
   const elements = Array.from(document.querySelectorAll(selectors));
 
   if (!elements) return;
@@ -914,7 +911,7 @@ export const setCssClass = (selectors:string, value:boolean, cssClass:string) =>
   }
 };
 
-export const setCssDisplay = (selectors:string, value:string) => {
+export const setCssDisplay = (selectors: string, value: string) => {
   const elements = Array.from(document.querySelectorAll(selectors));
   if (!elements) return;
   for (const element of elements) {
@@ -923,38 +920,38 @@ export const setCssDisplay = (selectors:string, value:string) => {
   }
 };
 
-export const byId = <V extends HTMLElement>(id:string):HTMLElement => {
+export const byId = <V extends HTMLElement>(id: string): HTMLElement => {
   const element = document.getElementById(id);
   return element as V;
 }
 
-export const setHtml = (selectors:string, value:string|number) => {
+export const setHtml = (selectors: string, value: string | number) => {
   const elements = Array.from(document.querySelectorAll(selectors));
   if (!elements) return;
   if (typeof value === 'number') {
     value = value.toString();
-  } 
+  }
   for (const element of elements) {
     //eslint-disable-next-line functional/immutable-data
     element.innerHTML = value;
   }
 };
 
-export const setText = (selectors:string, value:string|number) => {
+export const setText = (selectors: string, value: string | number) => {
   const elements = Array.from(document.querySelectorAll(selectors));
   if (!elements) return;
   if (typeof value === 'number') {
     value = value.toString();
-  } 
+  }
   for (const element of elements) {
     //eslint-disable-next-line functional/immutable-data
     element.textContent = value;
   }
 };
 
-export const el = (selectors:string) => ({
-  text:(value:string|number) => setText(selectors, value),
-  html:(value:string|number) => setHtml(selectors, value),
-  cssDisplay:(value:string) => setCssDisplay(selectors, value),
-  cssClass:(value:boolean, cssClass:string) => setCssClass(selectors, value, cssClass)
+export const el = (selectors: string) => ({
+  text: (value: string | number) => setText(selectors, value),
+  html: (value: string | number) => setHtml(selectors, value),
+  cssDisplay: (value: string) => setCssDisplay(selectors, value),
+  cssClass: (value: boolean, cssClass: string) => setCssClass(selectors, value, cssClass)
 });
