@@ -9,6 +9,13 @@ import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
 
 export * as ImageDataGrid from './ImageDataGrid.js';
+export * as BipolarView from './BipolarView.js';
+export * as Palette from './Palette.js';
+export * as Drawing from './Drawing.js';
+export * as Svg from './Svg.js';
+export * as Plot from './Plot.js';
+export * as Plot2 from './Plot2.js';
+export * as SceneGraph from './SceneGraph.js';
 
 /**
  * Colour interpolation, scale generation and parsing
@@ -28,7 +35,7 @@ export * as ImageDataGrid from './ImageDataGrid.js';
  * * {@link toHsl}: to a `{h, s, l}` object
  * * {@link toRgb}: to a `{r, g, b}` object
  */
-export { Colour };
+export * as Colour from './Colour.js';
 
 /**
  * Working with video, either playback from a file or stream from a video camera.
@@ -45,9 +52,7 @@ export { Colour };
  * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
  * ```
  */
-export { Video };
-
-export { Palette, Drawing, Svg, Plot, Plot2, SceneGraph };
+export * as Video from './Video.js';
 
 try {
   if (typeof window !== `undefined`) {
@@ -69,3 +74,4 @@ try {
 } catch {
   /* no-op */
 }
+

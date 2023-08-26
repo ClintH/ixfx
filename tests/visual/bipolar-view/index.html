@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bipolar-view</title>
+</head>
+
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #plot {
+      border: 2px solid whitesmoke;
+   
+    background-image: conic-gradient(
+        from 295deg at 50% 50% in oklch longer hue, 
+        lch(70% 385 91) 0% 100%, 100%, lch(66% 346 84) 100%
+      );
+    }
+    
+  </style>
+  <canvas id="plot">
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
