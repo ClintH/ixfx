@@ -3,8 +3,8 @@ import * as Envelopes from './Envelope.js';
 import * as Forces from './Forces.js';
 import * as Oscillators from './Oscillator.js';
 import { type JitterFn, type JitterOpts, jitter } from './Jitter.js';
+export { perSecond } from './PerSecond.js';
 export * from './PingPong.js';
-
 /**
  * Jitter
  */
