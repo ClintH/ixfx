@@ -27,7 +27,8 @@
  * * {@link scale}: Scale a value from an input range to an output range
  * * {@link wrap}: Wraps a value to be within a range
  * * {@link wrapInteger}: Wraps an integer to be within a range
- *
+ * * {@link Bipolar}: Module for working with bipolar values
+ * 
  * ### Averaging
  * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
  *
