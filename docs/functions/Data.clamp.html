@@ -42,7 +42,8 @@ Defaults to a 0-1 range, useful for percentages.</p>
 <pre><code class="language-js"><span class="hl-0">// 0.5 - just fine, within default of 0 to 1</span><br/><span class="hl-8">clamp</span><span class="hl-2">(</span><span class="hl-7">0.5</span><span class="hl-2">);</span><br/><span class="hl-0">// 1 - above default max of 1</span><br/><span class="hl-8">clamp</span><span class="hl-2">(</span><span class="hl-7">1.5</span><span class="hl-2">);</span><br/><span class="hl-0">// 0 - below range</span><br/><span class="hl-8">clamp</span><span class="hl-2">(-</span><span class="hl-7">50</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">100</span><span class="hl-2">);</span><br/><span class="hl-0">// 50 - within range</span><br/><span class="hl-8">clamp</span><span class="hl-2">(</span><span class="hl-7">50</span><span class="hl-2">, </span><span class="hl-7">0</span><span class="hl-2">, </span><span class="hl-7">50</span><span class="hl-2">);</span>
 </code><button>Copy</button></pre>
 <p>For clamping integer ranges, consider <a href="Data.clampIndex.html" class="tsd-kind-function">clampIndex</a>
-For clamping <code>{ x, y }</code> points, consider <a href="Geometry.Points.clamp.html" class="tsd-kind-function">Geometry.Points.clamp</a>.</p>
+For clamping <code>{ x, y }</code> points, consider <a href="Geometry.Points.clamp.html" class="tsd-kind-function">Geometry.Points.clamp</a>.
+For clamping bipolar values: <a href="Data.Bipolar.clamp.html" class="tsd-kind-function">clamp</a></p>
 </div></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
@@ -66,6 +67,7 @@ For clamping <code>{ x, y }</code> points, consider <a href="Geometry.Points.cla
 <details class="tsd-index-accordion" open data-key="Data"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg><a href="../modules/Data.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Data</span></a></summary>
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
+<li><a href="../modules/Data.Bipolar.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Bipolar</span></a></li>
 <li><a href="../modules/Data.Correlate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Correlate</span></a></li>
 <li><a href="../modules/Data.Normalise.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Normalise</span></a></li>
 <li><a href="../modules/Data.Pool.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Pool</span></a></li>
