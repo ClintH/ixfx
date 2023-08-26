@@ -16,7 +16,7 @@
  *
  * For clamping integer ranges, consider {@link clampIndex }
  * For clamping `{ x, y }` points, consider {@link Geometry.Points.clamp | Geometry.Points.clamp}.
- *
+ * For clamping bipolar values: {@link Bipolar.clamp}
  * @param v Value to clamp
  * @param Minimum value (inclusive)
  * @param Maximum value (inclusive)
@@ -60,19 +60,19 @@ export const clamp = (v: number, min = 0, max = 1) => {
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const clampIndex = (
   v: number,
-  arrayOrLength: number | readonly any[]
+  arrayOrLength: number | ReadonlyArray<any>
 ): number => {
   // ✔ UNIT TESTED
   if (!Number.isInteger(v)) {
-    throw new Error(`v parameter must be an integer (${v})`);
+    throw new TypeError(`v parameter must be an integer (${ v })`);
   }
   const length = Array.isArray(arrayOrLength)
     ? arrayOrLength.length
     : (arrayOrLength as number);
 
   if (!Number.isInteger(length)) {
-    throw new Error(
-      `length parameter must be an integer (${length}, ${typeof length})`
+    throw new TypeError(
+      `length parameter must be an integer (${ length }, ${ typeof length })`
     );
   }
   v = Math.round(v);
