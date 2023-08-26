@@ -1,6 +1,6 @@
 A rough changelog between NPM releases
 
-# 0.11.1 26.08.23
+# 0.11.5 26.08.23
 
 * PlotBipolar
 * Data.Bipolar module
