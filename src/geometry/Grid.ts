@@ -1,5 +1,5 @@
 import { Rects, Points } from './index.js';
-import { throwIntegerTest } from '../Guards.js';
+import { throwIntegerTest, throwNumberTest } from '../Guards.js';
 import { clampIndex } from '../data/Clamp.js';
 import { randomElement } from '../collections/Arrays.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
@@ -200,10 +200,10 @@ export const guardCell = (
   if (Number.isNaN(cell.x)) throw new Error(paramName + `.x is NaN`);
   if (Number.isNaN(cell.y)) throw new Error(paramName + `.y is NaN`);
   if (!Number.isInteger(cell.x)) {
-    throw new Error(paramName + `.x is non-integer`);
+    throw new TypeError(paramName + `.x is non-integer`);
   }
   if (!Number.isInteger(cell.y)) {
-    throw new Error(paramName + `.y is non-integer`);
+    throw new TypeError(paramName + `.y is non-integer`);
   }
   if (grid !== undefined) {
     if (!inside(grid, cell)) {
@@ -227,10 +227,10 @@ const guardGrid = (grid: Grid, paramName: string = `Param`) => {
   if (!(`cols` in grid)) throw new Error(`${ paramName }.cols is undefined`);
 
   if (!Number.isInteger(grid.rows)) {
-    throw new Error(`${ paramName }.rows is not an integer`);
+    throw new TypeError(`${ paramName }.rows is not an integer`);
   }
   if (!Number.isInteger(grid.cols)) {
-    throw new Error(`${ paramName }.cols is not an integer`);
+    throw new TypeError(`${ paramName }.cols is not an integer`);
   }
 };
 
@@ -346,7 +346,7 @@ export const cellAtPoint = (
   position: Points.Point
 ): Cell | undefined => {
   const size = grid.size;
-  throwIntegerTest(size, 'positive', 'grid.size');
+  throwNumberTest(size, `positive`, `grid.size`);
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
   const y = Math.floor(position.y / size);
@@ -550,32 +550,41 @@ export const getVectorFromCardinal = (
   // eslint-disable-next-line functional/no-let
   let v;
   switch (cardinal) {
-    case `n`:
+    case `n`: {
       v = { x: 0, y: -1 * multiplier };
       break;
-    case `ne`:
+    }
+    case `ne`: {
       v = { x: 1 * multiplier, y: -1 * multiplier };
       break;
-    case `e`:
+    }
+    case `e`: {
       v = { x: 1 * multiplier, y: 0 };
       break;
-    case `se`:
+    }
+    case `se`: {
       v = { x: 1 * multiplier, y: 1 * multiplier };
       break;
-    case `s`:
+    }
+    case `s`: {
       v = { x: 0, y: 1 * multiplier };
       break;
-    case `sw`:
+    }
+    case `sw`: {
       v = { x: -1 * multiplier, y: 1 * multiplier };
       break;
-    case `w`:
+    }
+    case `w`: {
       v = { x: -1 * multiplier, y: 0 };
       break;
-    case `nw`:
+    }
+    case `nw`: {
       v = { x: -1 * multiplier, y: -1 * multiplier };
       break;
-    default:
+    }
+    default: {
       v = { x: 0, y: 0 };
+    }
   }
   return Object.freeze(v);
 };
@@ -650,7 +659,7 @@ export const offset = function (
   // eslint-disable-next-line functional/no-let
   let y = start.y;
   switch (bounds) {
-    case `wrap`:
+    case `wrap`: {
       x += vector.x % grid.cols;
       y += vector.y % grid.rows;
       if (x < 0) x = grid.cols + x;
@@ -662,24 +671,29 @@ export const offset = function (
         y -= grid.rows;
       }
       break;
-    case `stop`:
+    }
+    case `stop`: {
       x += vector.x;
       y += vector.y;
       x = clampIndex(x, grid.cols);
       y = clampIndex(y, grid.rows);
       break;
-    case `undefined`:
+    }
+    case `undefined`: {
       x += vector.x;
       y += vector.y;
       if (x < 0 || y < 0) return;
       if (x >= grid.cols || y >= grid.rows) return;
       break;
-    case `unbounded`:
+    }
+    case `unbounded`: {
       x += vector.x;
       y += vector.y;
       break;
-    default:
+    }
+    default: {
       throw new Error(`Unknown BoundsLogic case ${ bounds }`);
+    }
   }
   return Object.freeze({ x, y });
 };
@@ -1235,60 +1249,76 @@ export const indexFromCell = (
 
   if (cell.x < 0) {
     switch (wrap) {
-      case `stop`:
+      case `stop`: {
         cell = { ...cell, x: 0 };
         break;
-      case `unbounded`:
+      }
+      case `unbounded`: {
         throw new Error(`unbounded not supported`);
-      case `undefined`:
+      }
+      case `undefined`: {
         return undefined;
-      case `wrap`:
+      }
+      case `wrap`: {
         //cell = { ...cell, x: grid.cols + cell.x };
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         cell = offset(grid, { x: 0, y: cell.y }, { x: cell.x, y: 0 }, `wrap`)!;
         break;
+      }
     }
   }
   if (cell.y < 0) {
     switch (wrap) {
-      case `stop`:
+      case `stop`: {
         cell = { ...cell, y: 0 };
         break;
-      case `unbounded`:
+      }
+      case `unbounded`: {
         throw new Error(`unbounded not supported`);
-      case `undefined`:
+      }
+      case `undefined`: {
         return undefined;
-      case `wrap`:
+      }
+      case `wrap`: {
         cell = { ...cell, y: grid.rows + cell.y };
         break;
+      }
     }
   }
   if (cell.x >= grid.cols) {
     switch (wrap) {
-      case `stop`:
+      case `stop`: {
         cell = { ...cell, x: grid.cols - 1 };
         break;
-      case `unbounded`:
+      }
+      case `unbounded`: {
         throw new Error(`unbounded not supported`);
-      case `undefined`:
+      }
+      case `undefined`: {
         return undefined;
-      case `wrap`:
+      }
+      case `wrap`: {
         cell = { ...cell, x: cell.x % grid.cols };
         break;
+      }
     }
   }
   if (cell.y >= grid.rows) {
     switch (wrap) {
-      case `stop`:
+      case `stop`: {
         cell = { ...cell, y: grid.rows - 1 };
         break;
-      case `unbounded`:
+      }
+      case `unbounded`: {
         throw new Error(`unbounded not supported`);
-      case `undefined`:
+      }
+      case `undefined`: {
         return undefined;
-      case `wrap`:
+      }
+      case `wrap`: {
         cell = { ...cell, y: cell.y % grid.rows };
         break;
+      }
     }
   }
 
