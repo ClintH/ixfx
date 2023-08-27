@@ -34,6 +34,7 @@
         ".*Opts$",
         "ctx",
         "el",
+        "fn",
         "opts"
       ],
       "allowList":{"args":true}}],
