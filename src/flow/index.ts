@@ -8,6 +8,8 @@ export type AsyncPromiseOrGenerator<V> =
   | AsyncIterable<V>
   | Iterable<V>;
 
+export * as Elapsed from './Elapsed.js';
+
 import { throwNumberTest } from '../Guards.js';
 import { sleep } from './Sleep.js';
 
@@ -22,7 +24,8 @@ import * as Timer from './Timer.js';
  * * {@link StateMachine.init}: Create a state machine from initial state and machine description
  * * {@link fromList}: Create a state machine from a simple list of states
  */
-export { StateMachine };
+export * as StateMachine from './StateMachine.js';
+
 export * from './Timer.js';
 
 export * from './Interval.js';
@@ -37,10 +40,7 @@ export * from './Delay.js';
 export * from './Every.js';
 export * from './RunOnce.js';
 export * from './Retry.js';
-//export * from './Poll.js';
 
-import * as Elapsed from './Elapsed.js';
-export { Elapsed };
 export { TaskQueue } from './TaskQueue.js';
 
 export type HasCompletion = {
@@ -68,7 +68,7 @@ export type HasCompletion = {
  */
 export const forEach = <V>(
   iterator: IterableIterator<V> | ReadonlyArray<V>,
-  fn: (v?: V) => boolean | void
+  fn: (v?: V) => boolean
 ) => {
   for (const x of iterator) {
     const r = fn(x);
@@ -159,7 +159,7 @@ export type RepeatPredicate = (
  */
 export function* repeat<V>(
   countOrPredicate: number | RepeatPredicate,
-  fn: () => V | undefined
+  fn: (repeats: number, valuesProduced: number) => V | undefined
 ) {
   // Unit tested: expected return array length
   //eslint-disable-next-line functional/no-let
@@ -170,21 +170,21 @@ export function* repeat<V>(
     throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
     while (countOrPredicate-- > 0) {
       repeats++;
-      const v = fn();
+      const v = fn(repeats, valuesProduced);
       if (v === undefined) continue;
       yield v;
       valuesProduced++;
     }
-  } else if (typeof countOrPredicate === 'function') {
+  } else if (typeof countOrPredicate === `function`) {
     while (countOrPredicate(repeats, valuesProduced)) {
       repeats++;
-      const v = fn();
+      const v = fn(repeats, valuesProduced);
       if (v === undefined) continue;
       yield v;
       valuesProduced++;
     }
   } else {
-    throw new Error(
+    throw new TypeError(
       `countOrPredicate should be a number or function. Got: ${ typeof countOrPredicate }`
     );
   }
@@ -211,7 +211,7 @@ export const repeatReduce = <V>(
   countOrPredicate: number | RepeatPredicate,
   fn: () => V | undefined,
   initial: V,
-  reduce: (acc: V, value: V) => V
+  reduce: (accumulator: V, value: V) => V
 ): V => {
   if (typeof countOrPredicate === `number`) {
     throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
@@ -246,3 +246,4 @@ try {
 } catch {
   /* no-op */
 }
+
