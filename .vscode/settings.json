@@ -32,7 +32,6 @@
   "eslint.codeActionsOnSave.mode": "problems",
   "eslint.format.enable": false,
   "eslint.lintTask.enable": true,
-  "typescript.tsdk": "./node_modules/typescript/lib",
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "[javascript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
@@ -51,6 +50,6 @@
   "typescript.format.insertSpaceAfterCommaDelimiter": true,
   "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
   "typescript.format.insertSpaceAfterTypeAssertion": true,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true
-
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  "typescript.tsdk": "./node_modules/typescript/lib",
 }
