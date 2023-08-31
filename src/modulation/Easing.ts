@@ -60,15 +60,15 @@ export type EasingFn = (x: number) => number;
  * t.reset();   // Reset to 0
  * t.isDone;    // _True_ if finished
  * ```
- * @param nameOrFn Name of easing, or an easing function
+ * @param nameOrFunction Name of easing, or an easing function
  * @param durationMs Duration in milliseconds
  * @returns Easing
  */
 export const time = function (
-  nameOrFn: EasingName | EasingFn,
+  nameOrFunction: EasingName | EasingFn,
   durationMs: number
 ): Easing {
-  return create(nameOrFn, durationMs, msElapsedTimer);
+  return create(nameOrFunction, durationMs, msElapsedTimer);
 };
 
 /**
@@ -87,10 +87,10 @@ export const time = function (
  * @returns Easing
  */
 export const tick = function (
-  nameOrFn: EasingName | EasingFn,
+  nameOrFunction: EasingName | EasingFn,
   durationTicks: number
 ): Easing {
-  return create(nameOrFn, durationTicks, ticksElapsedTimer);
+  return create(nameOrFunction, durationTicks, ticksElapsedTimer);
 };
 
 /**
@@ -134,16 +134,15 @@ export type Easing = HasCompletion & {
  * @returns
  */
 const create = function (
-  nameOrFn: EasingName | EasingFn,
+  nameOrFunction: EasingName | EasingFn,
   duration: number,
   timerSource: TimerSource
 ): Easing {
   //eslint-disable-next-line functional/no-let
-  let fn: EasingFn | undefined;
-  if (typeof nameOrFn === `function`) fn = nameOrFn;
-  else fn = get(nameOrFn);
+  const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
   if (fn === undefined) {
-    throw new Error(`Easing function not found: ${nameOrFn}`);
+    const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: ${ nameOrFunction }`) : new Error(`Easing function not found`);
+    throw error;
   }
 
   // Get a relative version of timer
@@ -159,7 +158,7 @@ const create = function (
     compute: () => {
       const relative = timer.elapsed;
       //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return fn!(relative);
+      return fn(relative);
     },
     reset: () => {
       timer.reset();
@@ -186,13 +185,13 @@ const create = function (
  */
 export const fromCubicBezier =
   (b: number, d: number): EasingFn =>
-  (t: number) => {
-    const s = 1 - t;
-    const s2 = s * s;
-    const t2 = t * t;
-    const t3 = t2 * t;
-    return 3 * b * s2 * t + 3 * d * s * t2 + t3;
-  };
+    (t: number) => {
+      const s = 1 - t;
+      const s2 = s * s;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      return 3 * b * s2 * t + 3 * d * s * t2 + t3;
+    };
 
 /**
  * Returns a mix of two easing functions.
@@ -263,24 +262,26 @@ export type EasingName = keyof typeof functions;
  * @returns Easing function
  */
 export const get = function (easingName: EasingName): EasingFn | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (easingName === null) throw new Error(`easingName is null`);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (easingName === undefined) throw new Error(`easingName is undefined`);
   const name = easingName.toLocaleLowerCase();
   const found = Object.entries(functions).find(
-    ([k, _v]) => k.toLocaleLowerCase() === name
+    ([ k, _v ]) => k.toLocaleLowerCase() === name
   );
 
   if (found === undefined) return found;
-  return found[1];
+  return found[ 1 ];
 };
 
 /**
- *
+ * Iterate over available easings.
  * @private
  * @returns Returns list of available easing names
  */
-export const getEasings = function (): readonly string[] {
-  return Array.from(Object.keys(functions));
+export function* getEasings(): Iterable<string> {
+  yield* Object.keys(functions);
 };
 
 /**
@@ -292,20 +293,20 @@ export const getEasings = function (): readonly string[] {
  *
  * Try different positive and negative values for `stdDev` to pinch
  * or flatten the bell shape.
- * @param stdDev
+ * @param standardDeviation
  * @returns
  */
-export const gaussian = (stdDev: number = 0.4): EasingFn => {
+export const gaussian = (standardDeviation = 0.4): EasingFn => {
   const a = 1 / sqrt(2 * pi);
   const mean = 0.5;
 
   return (t: number) => {
-    const f = a / stdDev;
+    const f = a / standardDeviation;
     // p:-8 pinched
     //eslint-disable-next-line functional/no-let
     let p = -2.5; // -1/1.25;
     //eslint-disable-next-line functional/no-let
-    let c = (t - mean) / stdDev;
+    let c = (t - mean) / standardDeviation;
     c *= c;
     p *= c;
     const v = f * pow(Math.E, p); // * (2/pi);//0.62;
@@ -329,7 +330,7 @@ const bounceOut = function (x: number): number {
   } else if (x < 2.5 / d1) {
     return n1 * (x -= 2.25 / d1) * x + 0.9375;
   } else {
-    return n1 * (x -= 2.625 / d1) * x + 0.984375;
+    return n1 * (x -= 2.625 / d1) * x + 0.984_375;
   }
 };
 
@@ -337,7 +338,22 @@ const quintIn = (x: number): number => x * x * x * x * x;
 const quintOut = (x: number): number => 1 - pow(1 - x, 5);
 const arch = (x: number): number => x * (1 - x) * 4;
 
+/**
+ * Weighted average
+ * 
+ * `slowDownFactor` 
+ * @param currentValue 
+ * @param targetValue 
+ * @param slowDownFactor 
+ * @returns 
+ */
+export const weightedAverage = (currentValue: number, targetValue: number, slowDownFactor: number) => {
+  return ((currentValue * (slowDownFactor - 1)) + targetValue) / slowDownFactor
+}
+
 export const functions = {
+  smoothstep: (x: number): number => x * x * (3 - 2 * x),
+  smootherstep: (x: number): number => (x * (x * 6 - 15) + 10) * x * x * x,
   arch,
   bell: gaussian(),
   sineIn: (x: number): number => 1 - cos((x * pi) / 2),
@@ -361,20 +377,21 @@ export const functions = {
     x === 0
       ? 0
       : x === 1
-      ? 1
-      : x < 0.5
-      ? pow(2, 20 * x - 10) / 2
-      : (2 - pow(2, -20 * x + 10)) / 2,
+        ? 1
+        // eslint-disable-next-line unicorn/no-nested-ternary
+        : x < 0.5
+          ? pow(2, 20 * x - 10) / 2
+          : (2 - pow(2, -20 * x + 10)) / 2,
   circIn: (x: number): number => 1 - sqrt(1 - pow(x, 2)),
   circOut: (x: number): number => sqrt(1 - pow(x - 1, 2)),
   backIn: (x: number): number => {
-    const c1 = 1.70158;
+    const c1 = 1.701_58;
     const c3 = c1 + 1;
 
     return c3 * x * x * x - c1 * x * x;
   },
   backOut: (x: number): number => {
-    const c1 = 1.70158;
+    const c1 = 1.701_58;
     const c3 = c1 + 1;
 
     return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
@@ -384,7 +401,7 @@ export const functions = {
       ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
       : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2,
   backInOut: (x: number): number => {
-    const c1 = 1.70158;
+    const c1 = 1.701_58;
     const c2 = c1 * 1.525;
 
     return x < 0.5
@@ -396,18 +413,18 @@ export const functions = {
 
     return x === 0
       ? 0
-      : x === 1
-      ? 1
-      : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
+      : (x === 1
+        ? 1
+        : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4));
   },
   elasticOut: (x: number): number => {
     const c4 = (2 * pi) / 3;
 
     return x === 0
       ? 0
-      : x === 1
-      ? 1
-      : pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1;
+      : (x === 1
+        ? 1
+        : pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1);
   },
   bounceIn: (x: number): number => 1 - bounceOut(1 - x),
   bounceOut: bounceOut,
@@ -417,10 +434,11 @@ export const functions = {
     return x === 0
       ? 0
       : x === 1
-      ? 1
-      : x < 0.5
-      ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2
-      : (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1;
+        ? 1
+        // eslint-disable-next-line unicorn/no-nested-ternary
+        : x < 0.5
+          ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2
+          : (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1;
   },
   bounceInOut: (x: number): number =>
     x < 0.5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2,
