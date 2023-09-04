@@ -43,6 +43,8 @@ export { Easings };
  */
 export * from './Envelope.js';
 
+export * as Envelopes from './Envelope.js';
+
 /**
  * Forces module can help to compute basic physical forces like gravity, friction, springs etc.
  *
