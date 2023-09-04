@@ -44,20 +44,20 @@ export type AdsrOpts = {
   /**
    * Attack bezier 'bend'. Bend from -1 to 1. 0 for a straight line
    */
-  readonly attackBend: number;
+  readonly attackBend?: number;
   /**
    * Decay bezier 'bend'. Bend from -1 to 1. 0 for a straight line
    */
-  readonly decayBend: number;
+  readonly decayBend?: number;
   /**
    * Release bezier 'bend'. Bend from -1 to 1. 0 for a straight line
    */
-  readonly releaseBend: number;
+  readonly releaseBend?: number;
 
   /**
    * Peak level (maximum of attack stage)
    */
-  readonly peakLevel: number;
+  readonly peakLevel?: number;
 
   /**
    * Starting level (usually 0)
@@ -66,7 +66,7 @@ export type AdsrOpts = {
   /**
    * Sustain level. Only valid if trigger and hold happens
    */
-  readonly sustainLevel: number;
+  readonly sustainLevel?: number;
   /**
    * Release level, when envelope is done (usually 0)
    */
@@ -85,26 +85,26 @@ export type AdsrTimingOpts = {
    *
    * @type {boolean}
    */
-  readonly shouldLoop: boolean;
+  readonly shouldLoop?: boolean;
 
   /**
    * Duration for attack stage
    * Unit depends on timer source
    * @type {number}
    */
-  readonly attackDuration: number;
+  readonly attackDuration?: number;
   /**
    * Duration for decay stage
    * Unit depends on timer source
    * @type {number}
    */
-  readonly decayDuration: number;
+  readonly decayDuration?: number;
   /**
    * Duration for release stage
    * Unit depends on timer source
    * @type {number}
    */
-  readonly releaseDuration: number;
+  readonly releaseDuration?: number;
 };
 
 /**
@@ -126,10 +126,11 @@ export type Events = {
 };
 
 const adsrTransitionsInstance = Object.freeze({
-  attack: [`decay`, `release`],
-  decay: [`sustain`, `release`],
-  sustain: [`release`],
-  release: [`complete`],
+  attack: [ `decay`, `release` ],
+  decay: [ `sustain`, `release` ],
+  sustain: [ `release` ],
+  release: [ `complete` ],
+  //eslint-disable-next-line unicorn/no-null
   complete: null,
 });
 type AdsrStateTransitions = Readonly<typeof adsrTransitionsInstance>;
@@ -161,15 +162,15 @@ class AdsrBase extends SimpleEventEmitter<Events> {
       { initial: `attack` }
     );
 
-    this.#sm.addEventListener(`change`, (ev) => {
+    this.#sm.addEventListener(`change`, (event) => {
       // Reset timer on release
-      if (ev.newState === `release` && this.#holdingInitial) {
+      if (event.newState === `release` && this.#holdingInitial) {
         this.#timer?.reset();
       }
-      super.fireEvent(`change`, ev);
+      super.fireEvent(`change`, event);
     });
-    this.#sm.addEventListener(`stop`, (ev) => {
-      super.fireEvent(`complete`, ev);
+    this.#sm.addEventListener(`stop`, (event) => {
+      super.fireEvent(`complete`, event);
     });
 
     this.#timeSource = msElapsedTimer;
@@ -190,36 +191,41 @@ class AdsrBase extends SimpleEventEmitter<Events> {
     do {
       hasChanged = false;
       switch (this.#sm.state) {
-        case `attack`:
+        case `attack`: {
           if (elapsed > this.attackDuration || wasHeld) {
             this.#sm.next();
             hasChanged = true;
           }
           break;
-        case `decay`:
+        }
+        case `decay`: {
           if (elapsed > this.decayDurationTotal || wasHeld) {
             this.#sm.next();
             hasChanged = true;
           }
           break;
-        case `sustain`:
+        }
+        case `sustain`: {
           if (!this.#holding || wasHeld) {
             elapsed = 0;
             this.#sm.next();
-            this.#timer?.reset();
+            this.#timer.reset();
             hasChanged = true;
           }
           break;
-        case `release`:
+        }
+        case `release`: {
           if (elapsed > this.releaseDuration) {
             this.#sm.next();
             hasChanged = true;
           }
           break;
-        case `complete`:
+        }
+        case `complete`: {
           if (this.shouldLoop) {
             this.trigger(this.#holdingInitial);
           }
+        }
       }
     } while (hasChanged);
     return hasChanged;
@@ -232,37 +238,43 @@ class AdsrBase extends SimpleEventEmitter<Events> {
    */
   protected computeRaw(
     allowStateChange = true
-  ): [stage: string | undefined, amount: number, prevStage: string] {
-    if (this.#timer === undefined) return [undefined, 0, this.#sm.state];
+  ): [ stage: string | undefined, amount: number, prevStage: string ] {
+    if (this.#timer === undefined) return [ undefined, 0, this.#sm.state ];
 
     // Change state if necessary based on elapsed time
     if (allowStateChange) this.switchState();
 
-    const prevStage = this.#sm.state;
+    const previousStage = this.#sm.state;
 
     const elapsed = this.#timer.elapsed;
     // eslint-disable-next-line functional/no-let
     let relative = 0;
     const state = this.#sm.state;
     switch (state) {
-      case `attack`:
+      case `attack`: {
         relative = elapsed / this.attackDuration;
         break;
-      case `decay`:
+      }
+      case `decay`: {
         relative = (elapsed - this.attackDuration) / this.decayDuration;
         break;
-      case `sustain`:
+      }
+      case `sustain`: {
         relative = 1;
         break;
-      case `release`:
+      }
+      case `release`: {
         relative = Math.min(elapsed / this.releaseDuration, 1);
         break;
-      case `complete`:
-        return [undefined, 1, prevStage];
-      default:
-        throw new Error(`State machine in unknown state: ${state}`);
+      }
+      case `complete`: {
+        return [ undefined, 1, previousStage ];
+      }
+      default: {
+        throw new Error(`State machine in unknown state: ${ state }`);
+      }
     }
-    return [state, relative, prevStage];
+    return [ state, relative, previousStage ];
   }
 
   get isDone(): boolean {
@@ -273,7 +285,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
     /* no op */
   }
 
-  trigger(hold: boolean = false) {
+  trigger(hold = false) {
     this.onTrigger();
 
     this.#sm.reset();
@@ -383,7 +395,7 @@ export interface Adsr extends SimpleEventEmitter<Events> {
    */
   compute(
     allowStateChange?: boolean
-  ): readonly [stage: string | undefined, scaled: number, raw: number];
+  ): readonly [ stage: string | undefined, scaled: number, raw: number ];
 
   /**
    * Returns the scaled value
@@ -468,7 +480,7 @@ class AdsrImpl extends AdsrBase implements Adsr {
   onTrigger() {
     this.initialLevelOverride = undefined;
     if (!this.retrigger) {
-      const [_stage, scaled, _raw] = this.compute();
+      const [ _stage, scaled, _raw ] = this.compute();
       if (!Number.isNaN(scaled) && scaled > 0) {
         this.initialLevelOverride = scaled;
       }
@@ -476,33 +488,36 @@ class AdsrImpl extends AdsrBase implements Adsr {
   }
 
   get value(): number {
-    return this.compute(true)[1];
+    return this.compute(true)[ 1 ];
   }
 
   compute(
     allowStateChange = true
-  ): [stage: string | undefined, scaled: number, raw: number] {
-    const [stage, amt] = super.computeRaw(allowStateChange);
-    if (stage === undefined) return [undefined, NaN, NaN];
+  ): [ stage: string | undefined, scaled: number, raw: number ] {
+    const [ stage, amt ] = super.computeRaw(allowStateChange);
+    if (stage === undefined) return [ undefined, Number.NaN, Number.NaN ];
     // eslint-disable-next-line functional/no-let
     let v;
     switch (stage) {
-      case `attack`:
+      case `attack`: {
         v = this.attackPath.interpolate(amt).y;
         if (this.initialLevelOverride !== undefined) {
           v = scale(v, 0, 1, this.initialLevelOverride, 1);
         }
         this.releasedAt = v;
         break;
-      case `decay`:
+      }
+      case `decay`: {
         v = this.decayPath.interpolate(amt).y;
         this.releasedAt = v;
         break;
-      case `sustain`:
+      }
+      case `sustain`: {
         v = this.sustainLevel;
         this.releasedAt = v;
         break;
-      case `release`:
+      }
+      case `release`: {
         v = this.releasePath.interpolate(amt).y;
         // Bound release level to the amp level that we released at.
         // ie. when release happens before a stage completes
@@ -510,14 +525,17 @@ class AdsrImpl extends AdsrBase implements Adsr {
           v = scale(v, 0, this.sustainLevel, 0, this.releasedAt);
         }
         break;
-      case `complete`:
+      }
+      case `complete`: {
         v = this.releaseLevel;
         this.releasedAt = undefined;
         break;
-      default:
-        throw new Error(`Unknown state: ${stage}`);
+      }
+      default: {
+        throw new Error(`Unknown state: ${ stage }`);
+      }
     }
-    return [stage, v, amt];
+    return [ stage, v, amt ];
   }
 }
 
@@ -567,14 +585,14 @@ export const adsr = (opts: EnvelopeOpts): Adsr => new AdsrImpl(opts);
 export async function* adsrIterable(
   opts: AdsrIterableOpts
 ): AsyncGenerator<number> {
-  const env = adsr(opts.env);
+  const envelope = adsr(opts.env);
   const sampleRateMs = opts.sampleRateMs ?? 100;
-  env.trigger();
+  envelope.trigger();
 
   for await (const v of interval<number>(
     () => {
-      if (env.isDone) return;
-      return env.value;
+      if (envelope.isDone) return;
+      return envelope.value;
     },
     {
       fixed: sampleRateMs,
