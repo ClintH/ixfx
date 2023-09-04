@@ -189,6 +189,8 @@ export interface MatchOptions {
  * afterMatch(`Hello. There`, `.`); // ' There'
  * afterMatch(`Hello, there', `,`); // 'Hello, there'
  * ```
+ * 
+ * If `source` is _undefined_, an error is thrown.
  * @param source
  * @param match
  * @param startPos
@@ -199,6 +201,9 @@ export const afterMatch = (
   match: string,
   options: MatchOptions = {}
 ): string => {
+  //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (source === undefined) throw new Error(`source is undefined`);
+
   //  ✔️ Unit tested
   const startPos = options.startPos ?? undefined;
   const fromEnd = options.fromEnd ?? false;
