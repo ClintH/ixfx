@@ -315,14 +315,14 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  *
  * @example Setup
  * ```js
- * import {adsr, defaultAdsrOpts} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * const opts = {
- *  ...defaultAdsrOpts(),
+ *  ...Envelopes.defaultAdsrOpts(),
  *  attackDuration: 1000,
  *  decayDuration: 200,
  *  sustainDuration: 100
  * }
- * const env = adsr(opts);
+ * const env = Envelopes.adsr(opts);
  * ```
  *
  * [Options for envelope](https://clinth.github.io/ixfx/types/Modulation.EnvelopeOpts.html) are as follows:
@@ -552,11 +552,11 @@ export const adsr = (opts: EnvelopeOpts): Adsr => new AdsrImpl(opts);
  *
  * @example Init
  * ```js
- * import { adsrIterable, defaultAdsrOpts } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * import { IterableAsync } from  'https://unpkg.com/ixfx/dist/util.js';
  *
  * const opts = {
- *  ...defaultAdsrOpts(),
+ *  ...Envelopes.defaultAdsrOpts(),
  *  attackDuration: 1000,
  *  releaseDuration: 1000,
  *  sustainLevel: 1,
@@ -568,13 +568,13 @@ export const adsr = (opts: EnvelopeOpts): Adsr => new AdsrImpl(opts);
  * @example Add data to array
  * ```js
  * // Sample an envelope every 20ms into an array
- * const data = await IterableAsync.toArray(adsrIterable(opts, 20));
+ * const data = await IterableAsync.toArray(Envelopes.adsrIterable(opts, 20));
  * ```
  *
  * @example Iterate with `for await`
  * ```js
  * // Work with values as sampled
- * for await (const v of adsrIterable(opts, 5)) {
+ * for await (const v of Envelopes.adsrIterable(opts, 5)) {
  *  // Work with envelope value `v`...
  * }
  * ```

@@ -39,7 +39,7 @@ export type { JitterFn, JitterOpts };
 export { Easings };
 
 /**
- * Envelope
+ * Envelopes
  */
 export * from './Envelope.js';
 
