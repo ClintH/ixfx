@@ -1,5 +1,11 @@
 A rough changelog between NPM releases
 
+# 0.11.7 04.09.23
+
+* Dom.inlineConsole(): adds a DIV that captures and displays unhandled errors, console.log, console.warn & console.error
+* Export Envelopes as sub-module of modulation
+* Easing.smoothstep
+
 # 0.11.5 26.08.23
 
 * PlotBipolar

@@ -23,6 +23,10 @@
       "error",
       "backtick"
     ],
+    "indent": [
+      "error",
+      2,
+      {"SwitchCase": 1}],
     "object-curly-spacing": ["error","always"],
     "unicorn/consistent-destructuring": "off",
     "unicorn/no-thenable": "off",
