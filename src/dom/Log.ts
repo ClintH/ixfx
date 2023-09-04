@@ -14,8 +14,9 @@ export type LogOpts = {
 //eslint-disable-next-line functional/no-mixed-types
 export type Log = {
   clear(): void;
-  error(msgOrError: string | Error | unknown): void;
-  log(msg?: string | object | number): HTMLElement | undefined;
+  error(messageOrError: unknown): void;
+  log(message?: string | object | number): HTMLElement | undefined;
+  warn(message?: string | object | number): HTMLElement | undefined;
   //eslint-disable-next-line functional/prefer-immutable-types
   append(el: HTMLElement): void;
   dispose(): void;
@@ -54,7 +55,7 @@ export type Log = {
  */
 export const log = (
   //eslint-disable-next-line functional/prefer-immutable-types
-  domQueryOrEl: HTMLElement | string,
+  domQueryOrElement: HTMLElement | string,
   opts: LogOpts = {}
 ): Log => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -73,15 +74,15 @@ export const log = (
   // eslint-disable-next-line functional/no-let
   let lastLogRepeats = 0;
 
-  const parentEl = resolveEl<HTMLElement>(domQueryOrEl);
+  const parentElement = resolveEl<HTMLElement>(domQueryOrElement);
   const fontFamily = monospaced
     ? `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", Monaco, "Courier New", Courier, monospace`
     : `normal`;
   const shadowRoot = addShadowCss(
-    parentEl,
+    parentElement,
     `
   .log {
-    font-family: ${fontFamily};
+    font-family: ${ fontFamily };
     background-color: var(--code-background-color);
     padding: var(--padding1, 0.2em);
     overflow-y: auto;
@@ -118,33 +119,27 @@ export const log = (
     flex: 1;
     word-break: break-word;
   }
-  ${css}
+  ${ css }
   `
   );
 
   const el = document.createElement(`div`);
-  // eslint-disable-next-line functional/immutable-data
+  // eslint-disable-next-line functional/immutable-data,unicorn/no-keyword-prefix
   el.className = `log`;
   shadowRoot.append(el);
 
-  const error = (msgOrError: string | Error | unknown) => {
+  const error = (messageOrError: string | Error | unknown) => {
     const line = document.createElement(`div`);
 
-    if (typeof msgOrError === `string`) {
+    if (typeof messageOrError === `string`) {
       // eslint-disable-next-line functional/immutable-data
-      line.innerHTML = msgOrError;
-    } else if (msgOrError instanceof Error) {
-      const stack = msgOrError.stack;
-      if (stack === undefined) {
-        // eslint-disable-next-line functional/immutable-data
-        line.innerHTML = msgOrError.toString();
-      } else {
-        // eslint-disable-next-line functional/immutable-data
-        line.innerHTML = stack.toString();
-      }
+      line.innerHTML = messageOrError;
+    } else if (messageOrError instanceof Error) {
+      const stack = messageOrError.stack;
+      line.innerHTML = stack === undefined ? messageOrError.toString() : stack.toString();
     } else {
       // eslint-disable-next-line functional/immutable-data
-      line.innerHTML = msgOrError as string;
+      line.innerHTML = messageOrError as string;
     }
     line.classList.add(`error`);
     append(line);
@@ -155,64 +150,71 @@ export const log = (
   //eslint-disable-next-line functional/no-let
   let lastLogTime = 0;
 
+  const warn = (whatToLog: unknown = ``): HTMLElement | undefined => {
+    const element = log(whatToLog);
+    if (!element) return element;
+    element.classList.add(`warning`);
+    return element;
+  }
   const log = (whatToLog: unknown = ``): HTMLElement | undefined => {
     // eslint-disable-next-line functional/no-let
-    let msg: string | undefined;
+    let message: string | undefined;
     const interval = window.performance.now() - lastLogTime;
     if (opts.minIntervalMs && interval < opts.minIntervalMs) return;
     lastLogTime = window.performance.now();
 
     if (typeof whatToLog === `object`) {
-      msg = JSON.stringify(whatToLog);
+      message = JSON.stringify(whatToLog);
     } else if (whatToLog === undefined) {
-      msg = `(undefined)`;
+      message = `(undefined)`;
     } else if (whatToLog === null) {
-      msg = `(null)`;
+      message = `(null)`;
     } else if (typeof whatToLog === `number`) {
-      if (Number.isNaN(msg)) msg = `(NaN)`;
-      msg = whatToLog.toString();
+      if (Number.isNaN(message)) message = `(NaN)`;
+      message = whatToLog.toString();
     } else {
-      msg = whatToLog as string;
+      message = whatToLog as string;
     }
 
-    if (msg.length === 0) {
+    if (message.length === 0) {
       const rule = document.createElement(`hr`);
       lastLog = undefined;
       append(rule);
-    } else if (msg === lastLog && collapseDuplicates) {
-      const lastEl = el.firstElementChild as HTMLElement;
+    } else if (message === lastLog && collapseDuplicates) {
+      const lastElement = el.firstElementChild as HTMLElement;
       // eslint-disable-next-line functional/no-let
-      let lastBadge = lastEl.querySelector(`.badge`);
+      let lastBadge = lastElement.querySelector(`.badge`);
       if (lastBadge === null) {
         lastBadge = document.createElement(`div`);
-        // eslint-disable-next-line functional/immutable-data
+        // eslint-disable-next-line functional/immutable-data,unicorn/no-keyword-prefix
         lastBadge.className = `badge`;
-        lastEl.insertAdjacentElement(`beforeend`, lastBadge);
+        lastElement.insertAdjacentElement(`beforeend`, lastBadge);
       }
-      if (lastEl !== null) {
+      if (lastElement !== null) {
         // eslint-disable-next-line functional/immutable-data
         lastBadge.textContent = (++lastLogRepeats).toString();
       }
-      return lastEl;
+      return lastElement;
     } else {
       const line = document.createElement(`div`);
       // eslint-disable-next-line functional/immutable-data
-      line.innerText = msg;
+      line.textContent = message;
       append(line);
-      lastLog = msg;
+      lastLog = message;
       return line;
     }
   };
+
 
   //eslint-disable-next-line functional/prefer-immutable-types
   const append = (line: HTMLElement) => {
     if (timestamp) {
       const wrapper = document.createElement(`div`);
       const timestamp = document.createElement(`div`);
-      // eslint-disable-next-line functional/immutable-data
+      // eslint-disable-next-line functional/immutable-data,unicorn/no-keyword-prefix
       timestamp.className = `timestamp`;
       // eslint-disable-next-line functional/immutable-data
-      timestamp.innerText = new Date().toLocaleTimeString();
+      timestamp.textContent = new Date().toLocaleTimeString();
       wrapper.append(timestamp, line);
       line.classList.add(`msg`);
       wrapper.classList.add(`line`);
@@ -222,7 +224,7 @@ export const log = (
     }
 
     if (opts.reverse) {
-      el.appendChild(line);
+      el.append(line);
     } else {
       el.insertBefore(line, el.firstChild);
     }
@@ -257,6 +259,7 @@ export const log = (
   return {
     error,
     log,
+    warn,
     append,
     clear,
     dispose,

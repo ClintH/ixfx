@@ -2,7 +2,7 @@ import { getOrGenerateSync } from './collections/map/index.js';
 import { goldenAngleColour } from './visual/Colour.js';
 
 export type LogKind = `info` | `debug` | `error` | `warn`;
-export interface LogMessage {
+export type LogMessage = {
   readonly kind?: LogKind;
   readonly msg: any;
   readonly category?: string;
@@ -115,7 +115,7 @@ export const logSet = (prefix: string, verbose = true, colourKey?: string) => {
 };
 
 
-export interface LogSet {
+export type LogSet = {
   readonly log: MessageLogger;
   readonly warn: MessageLogger;
   readonly error: MessageLogger;

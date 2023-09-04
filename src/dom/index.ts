@@ -14,3 +14,5 @@ export * from './PointerVisualise.js';
 export * from './ErrorHandler.js';
 
 export * as DragDrop from './DragDrop.js';
+
+export * from './InlineConsole.js';

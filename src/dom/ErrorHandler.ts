@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 /**
  * Creates an error handler to show errors on-screen.
  * This is useful when testing on mobile devices that lack access to the console.
@@ -31,68 +29,64 @@ export const defaultErrorHandler = () => {
 
   container.style.fontFamily = `monospace`;
 
-  const msgEl = document.createElement(`div`);
-  msgEl.style.maxWidth = `50vw`;
-  msgEl.style.maxHeight = `50vh`;
-  msgEl.style.overflowY = `scroll`;
+  const messageElement = document.createElement(`div`);
+  messageElement.style.maxWidth = `50vw`;
+  messageElement.style.maxHeight = `50vh`;
+  messageElement.style.overflowY = `scroll`;
 
   container.innerHTML = `<h1>Error</h1>`;
-  container.append(msgEl);
+  container.append(messageElement);
 
   const styleButton = (b: HTMLButtonElement) => {
     b.style.padding = `0.3em`;
     b.style.marginTop = `1em`;
   };
 
-  const btnClose = document.createElement(`button`);
-  btnClose.innerText = `Close`;
-  btnClose.onclick = () => {
+  const buttonClose = document.createElement(`button`);
+  buttonClose.textContent = `Close`;
+  buttonClose.addEventListener(`click`, () => {
     hide();
-  };
+  });
 
-  const btnStop = document.createElement(`button`);
-  btnStop.innerText = `Stop displaying errors`;
-  btnStop.onclick = () => {
+  const buttonStop = document.createElement(`button`);
+  buttonStop.textContent = `Stop displaying errors`;
+  buttonStop.addEventListener(`click`, () => {
     enabled = false;
     hide();
-  };
+  });
 
-  styleButton(btnClose);
-  styleButton(btnStop);
+  styleButton(buttonClose);
+  styleButton(buttonStop);
 
-  container.append(btnClose);
-  container.append(btnStop);
+  container.append(buttonClose);
+  container.append(buttonStop);
   document.body.append(container);
 
   const show = (ex: Error | string | Event) => {
     container.style.display = `inline`;
-    if ((ex as any).stack) {
-      msgEl.innerHTML += `<pre>${(ex as any).stack}</pre>`;
-    } else {
-      msgEl.innerHTML += `<p>${ex}</p>`;
-    }
+    messageElement.innerHTML += (ex as any).stack ? `<pre>${ (ex as any).stack }</pre>` : `<p>${ ex.toString() }</p>`;
   };
 
   const hide = () => {
     container.style.display = `none`;
   };
 
-  window.onerror = (msg, url, lineNo, colNo, error) => {
+  window.onerror = (message, url, lineNo, colNo, error) => {
     if (enabled) {
       if (error) {
         console.log(error);
         show(error);
       } else {
-        console.log(msg);
-        show(msg);
+        console.log(message);
+        show(message);
       }
     }
   };
 
-  window.addEventListener(`unhandledrejection`, (e) => {
-    console.log(e.reason);
+  window.addEventListener(`unhandledrejection`, (event) => {
+    console.log(event.reason);
     if (enabled) {
-      show(e.reason);
+      show(event.reason);
     }
   });
   return { show, hide };
