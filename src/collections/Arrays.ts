@@ -535,6 +535,9 @@ export const without = <V>(
   comparer: IsEqual<V> = isEqualDefault
 ): Array<V> => data.filter((v) => !comparer(v, value));
 
+export const withoutUndefined = <V>(data: ReadonlyArray<V> | Array<V>): Array<V> => {
+  return data.filter(v => v !== undefined);
+}
 /**
  * Returns all items in `data` for as long as `predicate` returns true.
  *
