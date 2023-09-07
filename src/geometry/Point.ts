@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Circles, Lines, Points, Polar, Rects } from './index.js';
 import { interpolate as lineInterpolate } from './Line.js';
 import { throwNumberTest } from '../Guards.js';
@@ -26,9 +27,9 @@ export type Point3d = Point & {
  * @param b
  * @returns
  */
-export function getPointParam(
+export function getPointParameter(
   //eslint-disable-next-line functional/prefer-readonly-type
-  a?: Point | number | number[] | readonly number[],
+  a?: Point | number | Array<number> | ReadonlyArray<number>,
   b?: number | boolean,
   c?: number
 ): Point | Point3d {
@@ -47,7 +48,7 @@ export function getPointParam(
   if (Points.isPoint(a)) {
     return a;
   } else if (typeof a !== `number` || typeof b !== `number`) {
-    throw new Error(
+    throw new TypeError(
       `Expected point or x,y as parameters. Got: a: ${ JSON.stringify(
         a
       ) } b: ${ JSON.stringify(b) }`
@@ -62,8 +63,8 @@ export function getPointParam(
   return Object.freeze({ x: a, y: b });
 }
 
-export const dotProduct = (...pts: readonly Point[]): number => {
-  const a = pts.map(Points.toArray);
+export const dotProduct = (...pts: ReadonlyArray<Point>): number => {
+  const a = pts.map(p => Points.toArray(p));
   return Arrays.dotProduct(a);
 };
 
@@ -80,7 +81,7 @@ export const Empty = Object.freeze({ x: 0, y: 0 });
  * Use `isPlaceholder` to check if a point is a placeholder.
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
-export const Placeholder = Object.freeze({ x: NaN, y: NaN });
+export const Placeholder = Object.freeze({ x: Number.NaN, y: Number.NaN });
 
 /**
  * Returns true if both x and y is 0.
@@ -127,20 +128,20 @@ export const isNaN = (p: Point) => Number.isNaN(p.x) || Number.isNaN(p.y);
  *  return b;
  * }, points);
  * ```
- * @param compareFn Compare function returns the smallest of `a` or `b`
+ * @param comparer Compare function returns the smallest of `a` or `b`
  * @param points
  * @returns
  */
 export const findMinimum = (
-  compareFn: (a: Point, b: Point) => Point,
-  ...points: readonly Point[]
+  comparer: (a: Point, b: Point) => Point,
+  ...points: ReadonlyArray<Point>
 ): Point => {
   if (points.length === 0) throw new Error(`No points provided`);
   //eslint-disable-next-line functional/no-let
   let min = points[ 0 ];
-  points.forEach((p) => {
-    min = compareFn(min, p);
-  });
+  for (const p of points) {
+    min = comparer(min, p);
+  }
   return min;
 };
 
@@ -158,7 +159,7 @@ export const findMinimum = (
  * @param points
  * @returns
  */
-export const leftmost = (...points: readonly Point[]): Point =>
+export const leftmost = (...points: ReadonlyArray<Point>): Point =>
   findMinimum((a, b) => (a.x <= b.x ? a : b), ...points);
 
 /**
@@ -175,12 +176,13 @@ export const leftmost = (...points: readonly Point[]): Point =>
  * @param points
  * @returns
  */
-export const rightmost = (...points: readonly Point[]): Point =>
+export const rightmost = (...points: ReadonlyArray<Point>): Point =>
   findMinimum((a, b) => (a.x >= b.x ? a : b), ...points);
 
-export function distance(a: Point, b: Point): number;
+export function distance(a: Point, b?: Point): number;
 export function distance(a: Point, x: number, y: number): number;
-export function distance(a: Point): number;
+//export function distance(a: Point): number;
+
 
 /**
  * Calculate distance between two points.
@@ -211,14 +213,10 @@ export function distance(
   y?: number,
   z?: number
 ): number {
-  const pt = getPointParam(xOrB, y, z);
+  const pt = getPointParameter(xOrB, y, z);
   guard(pt);
 
-  if (isPoint3d(pt) && isPoint3d(a)) {
-    return Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z);
-  } else {
-    return Math.hypot(pt.x - a.x, pt.y - a.y);
-  }
+  return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
 }
 
 /**
@@ -312,10 +310,12 @@ export function guard(p: Point, name = `Point`) {
     );
   }
   if (typeof p.x !== `number`) {
-    throw new Error(`'${ name }.x' must be a number. Got ${ p.x }`);
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    throw new TypeError(`'${ name }.x' must be a number. Got ${ p.x }`);
   }
   if (typeof p.y !== `number`) {
-    throw new Error(`'${ name }.y' must be a number. Got ${ p.y }`);
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    throw new TypeError(`'${ name }.y' must be a number. Got ${ p.y }`);
   }
 
   if (p.x === null) throw new Error(`'${ name }.x' is null`);
@@ -394,13 +394,14 @@ export const angle = (a: Point, b?: Point, c?: Point) => {
  * @param points
  * @returns A single point
  */
-export const centroid = (...points: readonly (Point | undefined)[]): Point => {
+export const centroid = (...points: ReadonlyArray<Point | undefined>): Point => {
   if (!Array.isArray(points)) throw new Error(`Expected list of points`);
-  const sum = points.reduce(
-    (prev, p) => {
-      if (p === undefined) return prev; // Ignore undefined
+  // eslint-disable-next-line unicorn/no-array-reduce
+  const sum = points.reduce<Point>(
+    (previous, p) => {
+      if (p === undefined) return previous; // Ignore undefined
       if (Array.isArray(p)) {
-        throw new Error(
+        throw new TypeError(
           `'points' list contains an array. Did you mean: centroid(...myPoints)?`
         );
       }
@@ -412,8 +413,8 @@ export const centroid = (...points: readonly (Point | undefined)[]): Point => {
         );
       }
       return {
-        x: prev.x + p.x,
-        y: prev.y + p.y,
+        x: previous.x + p.x,
+        y: previous.y + p.y,
       };
     },
     { x: 0, y: 0 }
@@ -430,22 +431,18 @@ export const centroid = (...points: readonly (Point | undefined)[]): Point => {
  * @param points
  * @returns
  */
-export const bbox = (...points: readonly Point[]): Rects.RectPositioned => {
+export const bbox = (...points: ReadonlyArray<Point>): Rects.RectPositioned => {
   const leftMost = findMinimum((a, b) => {
-    if (a.x < b.x) return a;
-    else return b;
+    return a.x < b.x ? a : b;
   }, ...points);
   const rightMost = findMinimum((a, b) => {
-    if (a.x > b.x) return a;
-    else return b;
+    return a.x > b.x ? a : b;
   }, ...points);
   const topMost = findMinimum((a, b) => {
-    if (a.y < b.y) return a;
-    else return b;
+    return a.y < b.y ? a : b;
   }, ...points);
   const bottomMost = findMinimum((a, b) => {
-    if (a.y > b.y) return a;
-    else return b;
+    return a.y > b.y ? a : b;
   }, ...points);
 
   const topLeft = { x: leftMost.x, y: topMost.y };
@@ -460,6 +457,7 @@ export const bbox = (...points: readonly Point[]): Rects.RectPositioned => {
  * @param p
  * @returns
  */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export function isPoint(p: number | unknown): p is Point {
   if (p === undefined) return false;
   if (p === null) return false;
@@ -468,6 +466,7 @@ export function isPoint(p: number | unknown): p is Point {
   return true;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export const isPoint3d = (p: Point | unknown): p is Point3d => {
   if (p === undefined) return false;
   if (p === null) return false;
@@ -488,7 +487,7 @@ export const isPoint3d = (p: Point | unknown): p is Point3d => {
  * @param p
  * @returns
  */
-export const toArray = (p: Point): readonly number[] => [ p.x, p.y ];
+export const toArray = (p: Point): ReadonlyArray<number> => [ p.x, p.y ];
 
 /**
  * Returns a human-friendly string representation `(x, y)`.
@@ -503,11 +502,11 @@ export function toString(p: Point, digits?: number): string {
   const x = digits ? p.x.toFixed(digits) : p.x;
   const y = digits ? p.y.toFixed(digits) : p.y;
 
-  if (p.z !== undefined) {
+  if (p.z === undefined) {
+    return `(${ x },${ y })`;
+  } else {
     const z = digits ? p.z.toFixed(digits) : p.z;
     return `(${ x },${ y },${ z })`;
-  } else {
-    return `(${ x },${ y })`;
   }
 }
 
@@ -524,14 +523,14 @@ export function toString(p: Point, digits?: number): string {
  * @param b
  * @returns _True_ if points are equal
  */
-export const isEqual = (...p: readonly Point[]): boolean => {
+export const isEqual = (...p: ReadonlyArray<Point>): boolean => {
   if (p === undefined) throw new Error(`parameter 'p' is undefined`);
   if (p.length < 2) return true;
 
   //eslint-disable-next-line functional/no-let
-  for (let i = 1; i < p.length; i++) {
-    if (p[ i ].x !== p[ 0 ].x) return false;
-    if (p[ i ].y !== p[ 0 ].y) return false;
+  for (let index = 1; index < p.length; index++) {
+    if (p[ index ].x !== p[ 0 ].x) return false;
+    if (p[ index ].y !== p[ 0 ].y) return false;
   }
   return true;
 };
@@ -609,7 +608,7 @@ export const interpolate = (
  * @returns Point
  */
 export const from = (
-  xOrArray?: number | readonly number[],
+  xOrArray?: number | ReadonlyArray<number>,
   y?: number
 ): Point => {
   if (Array.isArray(xOrArray)) {
@@ -645,29 +644,29 @@ export const from = (
  * @returns
  */
 export const fromNumbers = (
-  ...coords: readonly ReadonlyArray<number>[] | readonly number[]
-): readonly Point[] => {
-  const pts: Point[] = [];
+  ...coords: ReadonlyArray<ReadonlyArray<number>> | ReadonlyArray<number>
+): ReadonlyArray<Point> => {
+  const pts: Array<Point> = [];
 
   if (Array.isArray(coords[ 0 ])) {
     // [[x,y],[x,y]...]
-    (coords as number[][]).forEach((coord) => {
+    for (const coord of (coords as Array<Array<number>>)) {
       if (!(coord.length % 2 === 0)) {
         throw new Error(`coords array should be even-numbered`);
       }
       //eslint-disable-next-line  functional/immutable-data
       pts.push(Object.freeze({ x: coord[ 0 ], y: coord[ 1 ] }));
-    });
+    }
   } else {
     // [x,y,x,y,x,y]
     if (coords.length % 2 !== 0) {
       throw new Error(`Expected even number of elements: [x,y,x,y...]`);
     }
     //eslint-disable-next-line functional/no-let
-    for (let i = 0; i < coords.length; i += 2) {
+    for (let index = 0; index < coords.length; index += 2) {
       //eslint-disable-next-line  functional/immutable-data
       pts.push(
-        Object.freeze({ x: coords[ i ] as number, y: coords[ i + 1 ] as number })
+        Object.freeze({ x: coords[ index ] as number, y: coords[ index + 1 ] as number })
       );
     }
   }
@@ -745,7 +744,7 @@ export function subtract(
   } else {
     throwNumberTest(a, ``, `a`);
     if (typeof b !== `number`) {
-      throw new Error(`Second parameter is expected to by y value`);
+      throw new TypeError(`Second parameter is expected to by y value`);
     }
     throwNumberTest(b, ``, `b`);
 
@@ -805,7 +804,7 @@ export const apply = (
  */
 export const pipelineApply = (
   pt: Point,
-  ...pipelineFns: readonly ((pt: Point) => Point)[]
+  ...pipelineFns: ReadonlyArray<(pt: Point) => Point>
 ): Point => pipeline(...pipelineFns)(pt); // pipeline.reduce((prev, curr) => curr(prev), pt);
 
 /**
@@ -824,9 +823,10 @@ export const pipelineApply = (
  * @returns
  */
 export const pipeline =
-  (...pipeline: readonly ((pt: Point) => Point)[]) =>
+  (...pipeline: ReadonlyArray<(pt: Point) => Point>) =>
     (pt: Point) =>
-      pipeline.reduce((prev, curr) => curr(prev), pt);
+      // eslint-disable-next-line unicorn/no-array-reduce
+      pipeline.reduce((previous, current) => current(previous), pt);
 
 /**
  * Reduces over points, treating _x_ and _y_ separately.
@@ -843,16 +843,17 @@ export const pipeline =
  * @returns
  */
 export const reduce = (
-  pts: readonly Point[],
+  pts: ReadonlyArray<Point>,
   fn: (p: Point, accumulated: Point) => Point,
-  initial: Point = { x: 0, y: 0 }
+  initial?: Point
 ): Point => {
+  if (initial === undefined) initial = { x: 0, y: 0 }
   //eslint-disable-next-line functional/no-let
-  let acc = initial;
-  pts.forEach((p) => {
-    acc = fn(p, acc);
-  });
-  return acc;
+  let accumulator = initial;
+  for (const p of pts) {
+    accumulator = fn(p, accumulator);
+  };
+  return accumulator;
 };
 
 type Sum = {
@@ -896,7 +897,7 @@ export const sum: Sum = function (
   d?: number
 ): Point {
   // ✔️ Unit tested
-  if (a === undefined) throw new Error(`a missing. a: ${ a }`);
+  if (a === undefined) throw new TypeError(`a missing`);
 
   //eslint-disable-next-line functional/no-let
   let ptA: Point | undefined;
@@ -909,18 +910,18 @@ export const sum: Sum = function (
       ptB = b;
     } else {
       if (b === undefined) throw new Error(`Expects x coordinate`);
-      ptB = { x: b, y: c === undefined ? b : c };
+      ptB = { x: b, y: c ?? b };
     }
   } else if (!isPoint(b)) {
     // Neither of first two params are points
     if (b === undefined) throw new Error(`Expected number as second param`);
     ptA = { x: a, y: b };
     if (c === undefined) throw new Error(`Expects x coordiante`);
-    ptB = { x: c, y: d === undefined ? 0 : d };
+    ptB = { x: c, y: d ?? 0 };
   }
 
-  if (ptA === undefined) throw new Error(`ptA missing. a: ${ a }`);
-  if (ptB === undefined) throw new Error(`ptB missing. b: ${ b }`);
+  if (ptA === undefined) throw new Error(`ptA missing. a: ${ JSON.stringify(a) }`);
+  if (ptB === undefined) throw new Error(`ptB missing. b: ${ JSON.stringify(b) }`);
   guard(ptA, `a`);
   guard(ptB, `b`);
   return Object.freeze({
@@ -930,23 +931,7 @@ export const sum: Sum = function (
 };
 
 /**
- * Returns `a` multiplied by `b`
- *
- * ie.
- * ```js
- * return {
- *  x: a.x * b.x,
- *   y: a.y * b.y
- * }
- * ```
- * @param a
- * @param b
- * @returns
- */
-export function multiply(a: Point, b: Point): Point;
-
-/**
- * Multiply by a width,height:
+ * Multiply by a width,height or x,y
  * ```
  * return {
  *  x: a.x * rect.width,
@@ -956,7 +941,7 @@ export function multiply(a: Point, b: Point): Point;
  * @param a
  * @param rect
  */
-export function multiply(a: Point, rect: Rects.Rect): Point;
+export function multiply(a: Point, rectOrPoint: Rects.Rect | Points.Point): Point;
 
 /**
  * Returns `a` multipled by some x and/or y scaling factor
@@ -1045,35 +1030,17 @@ export const multiplyScalar = (
   pt: Point | Point3d,
   v: number
 ): Point | Point3d => {
-  if (isPoint3d(pt)) {
-    return Object.freeze({
-      ...pt,
-      x: pt.x * v,
-      y: pt.y * v,
-      z: pt.z * v,
-    });
-  } else {
-    return Object.freeze({
-      ...pt,
-      x: pt.x * v,
-      y: pt.y * v,
-    });
-  }
+  return isPoint3d(pt) ? Object.freeze({
+    ...pt,
+    x: pt.x * v,
+    y: pt.y * v,
+    z: pt.z * v,
+  }) : Object.freeze({
+    ...pt,
+    x: pt.x * v,
+    y: pt.y * v,
+  });
 };
-/**
- * Divides a / b:
- * ```js
- * return {
- *  x: a.x / b.x,
- *  y: a.y / b.y
- * }
- * ```
- * 
- * Dividing by zero will give Infinity for that dimension.
- * @param a
- * @param b
- */
-export function divide(a: Point, b: Point): Point;
 
 /**
  * Divides point a by rectangle:
@@ -1084,11 +1051,20 @@ export function divide(a: Point, b: Point): Point;
  * };
  * ```
  * 
+ * Or point:
+ * ```js
+ * return {
+ *  x: a.x / b.x,
+ *  y: a.y / b.y
+ * }
+ * ```
+ * 
+ * 
  * Dividing by zero will give Infinity for that dimension.
  * @param a
  * @param Rect
  */
-export function divide(a: Point, rect: Rects.Rect): Point;
+export function divide(a: Point, rectOrPoint: Rects.Rect | Points.Point): Point;
 
 /**
  * Divides a point by x,y.
@@ -1165,7 +1141,7 @@ export function divide(
     }
   } else {
     if (typeof b !== `number`) {
-      throw new Error(`expected second parameter to be y1 coord`);
+      throw new TypeError(`expected second parameter to be y1 coord`);
     }
     throwNumberTest(a, `positive`, `x1`);
     throwNumberTest(b, `positive`, `y1`);
@@ -1184,15 +1160,15 @@ export function divide(
 /**
  * Returns a function that divides a point:
  * ```js
- * const f = divideFn(100, 200);
+ * const f = divider(100, 200);
  * f(50,100); // Yields: { x: 0.5, y: 0.5 }
  * ```
  *
  * Input values can be Point, separate x,y and optional z values or an array:
  * ```js
- * const f = divideFn({ x: 100, y: 100 });
- * const f = divideFn( 100, 100 );
- * const f = divideFn([ 100, 100 ]);
+ * const f = divider({ x: 100, y: 100 });
+ * const f = divider( 100, 100 );
+ * const f = divider([ 100, 100 ]);
  * ```
  *
  * Likewise the returned function an take these as inputs:
@@ -1209,29 +1185,25 @@ export function divide(
  * @returns
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export function divideFn(a: Point | number | number[], b?: number, c?: number) {
-  const divisor = getPointParam(a, b, c);
+export function divider(a: Point | number | Array<number>, b?: number, c?: number) {
+  const divisor = getPointParameter(a, b, c);
   guardNonZeroPoint(divisor, `divisor`);
 
   return (
-    aa: Point | number | number[],
+    aa: Point | number | Array<number>,
     bb?: number,
     cc?: number
   ): Point | Point3d => {
-    const dividend = getPointParam(aa, bb, cc);
+    const dividend = getPointParameter(aa, bb, cc);
 
-    if (typeof dividend.z !== `undefined`) {
-      return Object.freeze({
-        x: dividend.x / divisor.x,
-        y: dividend.y / divisor.y,
-        z: dividend.z / (divisor.z ?? 1),
-      });
-    } else {
-      return Object.freeze({
-        x: dividend.x / divisor.x,
-        y: dividend.y / divisor.y,
-      });
-    }
+    return typeof dividend.z === `undefined` ? Object.freeze({
+      x: dividend.x / divisor.x,
+      y: dividend.y / divisor.y,
+    }) : Object.freeze({
+      x: dividend.x / divisor.x,
+      y: dividend.y / divisor.y,
+      z: dividend.z / (divisor.z ?? 1),
+    });
   };
 }
 
@@ -1248,16 +1220,18 @@ export const quantiseEvery = (pt: Point, snap: Point, middleRoundsUp = true) =>
  * @param pts
  * @returns
  */
-export const convexHull = (...pts: readonly Point[]): readonly Point[] => {
+export const convexHull = (...pts: ReadonlyArray<Point>): ReadonlyArray<Point> => {
   const sorted = [ ...pts ].sort(compareByX);
   if (sorted.length === 1) return sorted;
 
-  const x = (points: Point[]) => {
-    const v: Point[] = [];
-    points.forEach((p) => {
+  const x = (points: Array<Point>) => {
+    const v: Array<Point> = [];
+    for (const p of points) {
       while (v.length >= 2) {
-        const q = v[ v.length - 1 ];
-        const r = v[ v.length - 2 ];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const q = v.at(-1)!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const r = v.at(-2)!;
         if ((q.x - r.x) * (p.y - r.y) >= (q.y - r.y) * (p.x - r.x)) {
           //eslint-disable-next-line functional/immutable-data
           v.pop();
@@ -1265,7 +1239,7 @@ export const convexHull = (...pts: readonly Point[]): readonly Point[] => {
       }
       //eslint-disable-next-line functional/immutable-data
       v.push(p);
-    });
+    }
     //eslint-disable-next-line functional/immutable-data
     v.pop();
     return v;
@@ -1278,7 +1252,7 @@ export const convexHull = (...pts: readonly Point[]): readonly Point[] => {
   if (upper.length === 1 && lower.length === 1 && isEqual(lower[ 0 ], upper[ 0 ])) {
     return upper;
   }
-  return upper.concat(lower);
+  return [ ...upper, ...lower ];
 };
 
 /**
@@ -1299,7 +1273,7 @@ export const compare = (a: Point, b: Point): number => {
   if (a.x < b.x || a.y < b.y) return -1;
   if (a.x > b.x || a.y > b.y) return 1;
   if (a.x === b.x && a.x === b.y) return 0;
-  return NaN;
+  return Number.NaN;
 };
 
 /**
@@ -1381,14 +1355,13 @@ export function rotate(
   }
 
   const ptAr = pt as ReadonlyArray<Point>;
-  ptAr.forEach((p, index) => guard(p, `pt[${ index }]`));
+  for (const [ index, p ] of ptAr.entries()) guard(p, `pt[${ index }]`);
 
   //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const asPolar = ptAr.map((p) => Polar.fromCartesian(p, origin!));
   const rotated = asPolar.map((p) => Polar.rotate(p, amountRadian));
   const asCartesisan = rotated.map((p) => Polar.toCartesian(p, origin));
-  if (arrayInput) return asCartesisan;
-  else return asCartesisan[ 0 ];
+  return arrayInput ? asCartesisan : asCartesisan[ 0 ];
 
   //const p = Polar.fromCartesian(pt, origin);
   //const pp = Polar.rotate(p, amountRadian);
@@ -1397,20 +1370,20 @@ export function rotate(
 
 //eslint-disable-next-line functional/prefer-readonly-type
 export const rotatePointArray = (
-  v: ReadonlyArray<readonly number[]>,
+  v: ReadonlyArray<ReadonlyArray<number>>,
   amountRadian: number
-): number[][] => {
+): Array<Array<number>> => {
   const mat = [
     [ Math.cos(amountRadian), -Math.sin(amountRadian) ],
     [ Math.sin(amountRadian), Math.cos(amountRadian) ],
   ];
   const result = [];
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < v.length; ++i) {
+  for (const [ index, element ] of v.entries()) {
     //eslint-disable-next-line functional/immutable-data
-    result[ i ] = [
-      mat[ 0 ][ 0 ] * v[ i ][ 0 ] + mat[ 0 ][ 1 ] * v[ i ][ 1 ],
-      mat[ 1 ][ 0 ] * v[ i ][ 0 ] + mat[ 1 ][ 1 ] * v[ i ][ 1 ],
+    result[ index ] = [
+      mat[ 0 ][ 0 ] * element[ 0 ] + mat[ 0 ][ 1 ] * element[ 1 ],
+      mat[ 1 ][ 0 ] * element[ 0 ] + mat[ 1 ][ 1 ] * element[ 1 ],
     ];
   }
   return result;
@@ -1422,7 +1395,7 @@ const length = (ptOrX: Point | number, y?: number): number => {
     ptOrX = ptOrX.x;
   }
   if (y === undefined) throw new Error(`Expected y`);
-  return Math.sqrt(ptOrX * ptOrX + y * y);
+  return Math.hypot(ptOrX, y);
 };
 
 /**
@@ -1437,7 +1410,7 @@ const length = (ptOrX: Point | number, y?: number): number => {
  * @returns
  */
 export const normalise = (ptOrX: Point | number, y?: number): Point => {
-  const pt = getPointParam(ptOrX, y);
+  const pt = getPointParameter(ptOrX, y);
   const l = length(pt);
   if (l === 0) return Points.Empty;
   return Object.freeze({
@@ -1507,10 +1480,10 @@ export function normaliseByRect(
   } else {
     throwNumberTest(a, `positive`, `x`);
     if (typeof b !== `number`) {
-      throw new Error(`Expecting second parameter to be a number (width)`);
+      throw new TypeError(`Expecting second parameter to be a number (width)`);
     }
     if (typeof c !== `number`) {
-      throw new Error(`Expecting third parameter to be a number (height)`);
+      throw new TypeError(`Expecting third parameter to be a number (height)`);
     }
 
     throwNumberTest(b, `positive`, `y`);
@@ -1571,9 +1544,13 @@ export const random = (rando?: RandomSource): Point => {
  */
 export const wrap = (
   pt: Point,
-  ptMax: Point = { x: 1, y: 1 },
-  ptMin: Point = { x: 0, y: 0 }
+  ptMax?: Point,
+  ptMin?: Point
 ): Point => {
+
+  if (ptMax === undefined) ptMax = { x: 1, y: 1 };
+  if (ptMin === undefined) ptMin = { x: 0, y: 0 };
+
   // ✔️ Unit tested
   guard(pt, `pt`);
   guard(ptMax, `ptMax`);
@@ -1600,40 +1577,41 @@ export const invert = (
   what: `both` | `x` | `y` | `z` = `both`
 ): Point => {
   switch (what) {
-    case `both`:
-      if (isPoint3d(pt)) {
-        return Object.freeze({
-          ...pt,
-          x: pt.x * -1,
-          y: pt.y * -1,
-          z: pt.z * -1,
-        });
-      } else {
-        return Object.freeze({
-          ...pt,
-          x: pt.x * -1,
-          y: pt.y * -1,
-        });
-      }
-    case `x`:
+    case `both`: {
+      return isPoint3d(pt) ? Object.freeze({
+        ...pt,
+        x: pt.x * -1,
+        y: pt.y * -1,
+        z: pt.z * -1,
+      }) : Object.freeze({
+        ...pt,
+        x: pt.x * -1,
+        y: pt.y * -1,
+      });
+    }
+    case `x`: {
       return Object.freeze({
         ...pt,
         x: pt.x * -1,
       });
-    case `y`:
+    }
+    case `y`: {
       return Object.freeze({
         ...pt,
         y: pt.y * -1,
       });
-    case `z`:
+    }
+    case `z`: {
       if (isPoint3d(pt)) {
         return Object.freeze({
           ...pt,
           z: pt.z * -1,
         });
       } else throw new Error(`pt parameter is missing z`);
-    default:
+    }
+    default: {
       throw new Error(`Unknown what parameter. Expecting 'both', 'x' or 'y'`);
+    }
   }
 };
 
@@ -1792,7 +1770,7 @@ export type PointRelationResult = {
  * @returns
  */
 export const relation = (a: Point | number, b?: number): PointRelation => {
-  const start = getPointParam(a, b);
+  const start = getPointParameter(a, b);
   //eslint-disable-next-line functional/no-let
   let totalX = 0;
   //eslint-disable-next-line functional/no-let
@@ -1804,7 +1782,7 @@ export const relation = (a: Point | number, b?: number): PointRelation => {
   //eslint-disable-next-line functional/no-let
   let lastPoint = start;
   const update = (aa: Point | number, bb?: number) => {
-    const p = getPointParam(aa, bb);
+    const p = getPointParameter(aa, bb);
     totalX += p.x;
     totalY += p.y;
     count++;
@@ -1847,13 +1825,9 @@ export const progressBetween = (
   // from -> to
   const b = Points.subtract(to, from);
 
-  if (Points.isPoint3d(a) && Points.isPoint3d(b)) {
-    return (
-      (a.x * b.x + a.y * b.y + a.z * b.z) / (b.x * b.x + b.y * b.y + b.z * b.z)
-    );
-  } else {
-    return (a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y);
-  }
+  return Points.isPoint3d(a) && Points.isPoint3d(b) ? (
+    (a.x * b.x + a.y * b.y + a.z * b.z) / (b.x * b.x + b.y * b.y + b.z * b.z)
+  ) : (a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y);
 };
 // const p = { x: 100, y: 100 };
 // console.log(`distance: ` + distance(p));

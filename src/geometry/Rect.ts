@@ -3,6 +3,7 @@ import { type RandomSource, defaultRandom } from '../Random.js';
 import { type CirclePositioned, isCirclePositioned } from './Circle.js';
 import * as Intersects from './Intersects.js';
 import type { CardinalDirection } from './Grid.js';
+import type { PointCalculableShape } from './Point.js';
 
 export type Rect = {
   readonly width: number;
@@ -42,6 +43,7 @@ export const isPlaceholder = (rect: Rect): boolean =>
 export const isPositioned = (
   p: Points.Point | Rect | RectPositioned
 ): p is Points.Point =>
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 /**
@@ -49,9 +51,11 @@ export const isPositioned = (
  * @param p
  * @returns
  */
-export const isRect = (p: number | unknown): p is Rect => {
+export const isRect = (p: unknown): p is Rect => {
   if (p === undefined) return false;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if ((p as Rect).width === undefined) return false;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if ((p as Rect).height === undefined) return false;
   return true;
 };
@@ -64,7 +68,7 @@ export const isRect = (p: number | unknown): p is Rect => {
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isRectPositioned = (
-  p: Rect | RectPositioned | any
+  p: Rect | RectPositioned | PointCalculableShape
 ): p is RectPositioned => isRect(p) && isPositioned(p);
 
 /**
@@ -101,7 +105,9 @@ export const fromElement = (el: HTMLElement): Rect => ({
  * @returns
  */
 export const isEqualSize = (a: Rect, b: Rect): boolean => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (a === undefined) throw new Error(`a undefined`);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (b === undefined) throw new Error(`b undefined`);
   return a.width === b.width && a.height === b.height;
 };
@@ -184,7 +190,7 @@ export function fromNumbers(
   if (width === undefined || height === undefined) {
     if (typeof xOrWidth !== `number`) throw new Error(`width is not an number`);
     if (typeof yOrHeight !== `number`) {
-      throw new Error(`height is not an number`);
+      throw new TypeError(`height is not an number`);
     }
     return Object.freeze({ width: xOrWidth, height: yOrHeight });
   }
@@ -352,10 +358,10 @@ export function subtract(a: Rect, width: number, height?: number): Rect;
  * @returns
  */
 //eslint-disable-next-line func-style
-export function subtract(a: Rect, b: Rect | number, c?: number): Rect {
+export function subtract(a: Rect | undefined, b: Rect | number, c?: number): Rect {
   if (a === undefined) throw new Error(`First parameter undefined`);
   if (typeof b === `number`) {
-    const height = c === undefined ? 0 : c;
+    const height = c ?? 0;
     return Object.freeze({
       ...a,
       width: a.width - b,
@@ -418,9 +424,10 @@ export function sum(a: Rect, width: number, height?: number): Rect;
  */
 //eslint-disable-next-line func-style
 export function sum(a: Rect, b: Rect | number, c?: number): Rect {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (a === undefined) throw new Error(`First parameter undefined`);
   if (typeof b === `number`) {
-    const height = c === undefined ? 0 : c;
+    const height = c ?? 0;
     return Object.freeze({
       ...a,
       width: a.width + b,
@@ -567,7 +574,7 @@ export const distanceFromExterior = (
   if (intersectsPoint(rect, pt)) return 0;
   const dx = Math.max(rect.x - pt.x, 0, pt.x - rect.x + rect.width);
   const dy = Math.max(rect.y - pt.y, 0, pt.y - rect.y + rect.height);
-  return Math.sqrt(dx * dx + dy * dy);
+  return Math.hypot(dx, dy);
 };
 
 /**
@@ -624,10 +631,11 @@ export const maxFromCorners = (
   };
 };
 
-const guardDim = (d: number, name: string = `Dimension`) => {
-  if (d === undefined) throw Error(`${ name } is undefined`);
-  if (isNaN(d)) throw Error(`${ name } is NaN`);
-  if (d < 0) throw Error(`${ name } cannot be negative`);
+const guardDim = (d: number, name = `Dimension`) => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (d === undefined) throw new Error(`${ name } is undefined`);
+  if (Number.isNaN(d)) throw new Error(`${ name } is NaN`);
+  if (d < 0) throw new Error(`${ name } cannot be negative`);
 };
 
 /**
@@ -636,14 +644,37 @@ const guardDim = (d: number, name: string = `Dimension`) => {
  * @param rect
  * @param name
  */
-export const guard = (rect: Rect, name: string = `rect`) => {
-  if (rect === undefined) throw Error(`{$name} undefined`);
+export const guard = (rect: Rect, name = `rect`) => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (rect === undefined) throw new Error(`{$name} undefined`);
   if (isPositioned(rect)) Points.guard(rect, name);
   guardDim(rect.width, name + `.width`);
   guardDim(rect.height, name + `.height`);
 };
 
-const guardPositioned = (rect: RectPositioned, name: string = `rect`) => {
+/**
+ * Clamps `value` so it does not exceed `maximum`
+ * on either dimension. x,y are ignored.
+ * 
+ * ```js
+ * clamp({ width:100, height:5 }, { width:10, height:10 }); // { width:10, height:5 }
+ * 
+ * clamp({ width:10, height:10 }, { width:10, height:10 }); // { width:10, height:10 }
+ * ```
+ * 
+ * Any existing data on `value` is copied to output.
+ * @param value Input rectangle
+ * @param maximum Maximum allowed size
+ */
+export const clamp = (value: Rect, maximum: Rect): Rect => {
+  return Object.freeze({
+    ...value,
+    width: Math.min(value.width, maximum.width),
+    height: Math.min(value.height, maximum.height)
+  });
+}
+
+const guardPositioned = (rect: RectPositioned, name = `rect`) => {
   if (!isPositioned(rect)) throw new Error(`Expected ${ name } to have x,y`);
   guard(rect, name);
 };
@@ -691,7 +722,7 @@ export const fromTopLeft = (
 export const corners = (
   rect: RectPositioned | Rect,
   origin?: Points.Point
-): readonly Points.Point[] => {
+): ReadonlyArray<Points.Point> => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
   else if (origin === undefined) {
@@ -718,45 +749,56 @@ export const corners = (
  */
 export const cardinal = (
   rect: RectPositioned,
-  card: CardinalDirection | 'center'
+  card: CardinalDirection | `center`
 ): Points.Point => {
   const { x, y, width, height } = rect;
   switch (card) {
-    case 'nw':
+    case `nw`: {
       return Object.freeze({ x, y });
-    case 'n':
+    }
+    case `n`: {
       return Object.freeze({
         x: x + width / 2,
         y,
       });
-    case 'ne':
+    }
+    case `ne`: {
       return Object.freeze({
         x: x + width,
         y,
       });
-    case 'sw':
+    }
+    case `sw`: {
       return Object.freeze({ x, y: y + height });
-    case 's':
+    }
+    case `s`: {
       return Object.freeze({
         x: x + width / 2,
         y: y + height,
       });
-    case 'se':
+    }
+    case `se`: {
       return Object.freeze({
         x: x + width,
         y: y + height,
       });
-    case 'w':
+    }
+    case `w`: {
       return Object.freeze({ x, y: y + height / 2 });
-    case 'e':
+    }
+    case `e`: {
       return Object.freeze({ x: x + width, y: y + height / 2 });
-    case 'center':
+    }
+    case `center`: {
       return Object.freeze({
         x: x + width / 2,
         y: y + height / 2,
       });
-    default:
+    }
+    default: {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unknown direction: ${ card }`);
+    }
   }
 };
 
@@ -783,14 +825,18 @@ export const getEdgeX = (
 ): number => {
   guard(rect);
   switch (edge) {
-    case `top`:
+    case `top`: {
       return Points.isPoint(rect) ? rect.x : 0;
-    case `bottom`:
+    }
+    case `bottom`: {
       return Points.isPoint(rect) ? rect.x : 0;
-    case `left`:
+    }
+    case `left`: {
       return Points.isPoint(rect) ? rect.y : 0;
-    case `right`:
+    }
+    case `right`: {
       return Points.isPoint(rect) ? rect.x + rect.width : rect.width;
+    }
   }
 };
 
@@ -818,14 +864,18 @@ export const getEdgeY = (
 ): number => {
   guard(rect);
   switch (edge) {
-    case `top`:
+    case `top`: {
       return Points.isPoint(rect) ? rect.y : 0;
-    case `bottom`:
+    }
+    case `bottom`: {
       return Points.isPoint(rect) ? rect.y + rect.height : rect.height;
-    case `left`:
+    }
+    case `left`: {
       return Points.isPoint(rect) ? rect.y : 0;
-    case `right`:
+    }
+    case `right`: {
       return Points.isPoint(rect) ? rect.y : 0;
+    }
   }
 };
 
@@ -871,25 +921,21 @@ export const normaliseByRect = (
     if (typeof normaliseByOrWidth === `number`) {
       width = normaliseByOrWidth;
     } else {
-      throw new Error(
+      throw new TypeError(
         `Expects rectangle or width and height parameters for normaliseBy`
       );
     }
   }
 
-  if (isPositioned(rect)) {
-    return Object.freeze({
-      x: rect.x / width,
-      y: rect.y / height,
-      width: rect.width / width,
-      height: rect.height / height,
-    });
-  } else {
-    return Object.freeze({
-      width: rect.width / width,
-      height: rect.height / height,
-    });
-  }
+  return isPositioned(rect) ? Object.freeze({
+    x: rect.x / width,
+    y: rect.y / height,
+    width: rect.width / width,
+    height: rect.height / height,
+  }) : Object.freeze({
+    width: rect.width / width,
+    height: rect.height / height,
+  });
 };
 
 /**
@@ -978,24 +1024,20 @@ export function multiply(
 ): RectPositioned | Rect {
   guard(a, `a`);
   if (isRect(b)) {
-    if (isRectPositioned(a)) {
-      return Object.freeze({
-        ...a,
-        x: a.x * b.width,
-        y: a.y * b.height,
-        width: a.width * b.width,
-        height: a.height * b.height,
-      });
-    } else {
-      return Object.freeze({
-        ...a,
-        width: a.width * b.width,
-        height: a.height * b.height,
-      });
-    }
+    return isRectPositioned(a) ? Object.freeze({
+      ...a,
+      x: a.x * b.width,
+      y: a.y * b.height,
+      width: a.width * b.width,
+      height: a.height * b.height,
+    }) : Object.freeze({
+      ...a,
+      width: a.width * b.width,
+      height: a.height * b.height,
+    });
   } else {
     if (typeof b !== `number`) {
-      throw new Error(
+      throw new TypeError(
         `Expected second parameter of type Rect or number. Got ${ JSON.stringify(
           b
         ) }`
@@ -1003,21 +1045,17 @@ export function multiply(
     }
     if (c === undefined) c = b;
 
-    if (isRectPositioned(a)) {
-      return Object.freeze({
-        ...a,
-        x: a.x * b,
-        y: a.y * c,
-        width: a.width * b,
-        height: a.height * c,
-      });
-    } else {
-      return Object.freeze({
-        ...a,
-        width: a.width * b,
-        height: a.height * c,
-      });
-    }
+    return isRectPositioned(a) ? Object.freeze({
+      ...a,
+      x: a.x * b,
+      y: a.y * c,
+      width: a.width * b,
+      height: a.height * c,
+    }) : Object.freeze({
+      ...a,
+      width: a.width * b,
+      height: a.height * c,
+    });
   }
 }
 
@@ -1045,21 +1083,17 @@ export function multiplyScalar(
   rect: Rect | RectPositioned,
   amount: number
 ): Rect | RectPositioned {
-  if (isPositioned(rect)) {
-    return Object.freeze({
-      ...rect,
-      x: rect.x * amount,
-      y: rect.y * amount,
-      width: rect.width * amount,
-      height: rect.height * amount,
-    });
-  } else {
-    return Object.freeze({
-      ...rect,
-      width: rect.width * amount,
-      height: rect.height * amount,
-    });
-  }
+  return isPositioned(rect) ? Object.freeze({
+    ...rect,
+    x: rect.x * amount,
+    y: rect.y * amount,
+    width: rect.width * amount,
+    height: rect.height * amount,
+  }) : Object.freeze({
+    ...rect,
+    width: rect.width * amount,
+    height: rect.height * amount,
+  });
 }
 
 /**
@@ -1102,7 +1136,7 @@ export const center = (
  * @param rect
  * @returns
  */
-export const lengths = (rect: RectPositioned): readonly number[] => {
+export const lengths = (rect: RectPositioned): ReadonlyArray<number> => {
   guardPositioned(rect, `rect`);
   return edges(rect).map((l) => Lines.length(l));
 };
@@ -1125,7 +1159,7 @@ export const lengths = (rect: RectPositioned): readonly number[] => {
 export const edges = (
   rect: RectPositioned | Rect,
   origin?: Points.Point
-): readonly Lines.Line[] => {
+): ReadonlyArray<Lines.Line> => {
   const c = corners(rect, origin);
 
   // Connect all the corners, back to first corner again
@@ -1242,7 +1276,5 @@ export const randomPoint = (
   const y = rand() * (within.height - margin.y - margin.y);
 
   const pos = { x: x + margin.x, y: y + margin.y };
-  if (isPositioned(within)) {
-    return Points.sum(pos, within);
-  } else return Object.freeze(pos);
+  return isPositioned(within) ? Points.sum(pos, within) : Object.freeze(pos);
 };

@@ -63,7 +63,7 @@ export type PointSpaces = `viewport` | `screen` | `document`;
 export const pointScaler = (reference: PointSpaces = `viewport`) => {
   if (reference === `viewport`) {
     return (a: Readonly<Points.Point | number | number[]>, b?: number) => {
-      const pt = Points.getPointParam(a, b);
+      const pt = Points.getPointParameter(a, b);
       return Object.freeze({
         x: pt.x / window.innerWidth,
         y: pt.y / window.innerHeight,
@@ -71,7 +71,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
     };
   } else if (reference === `screen`) {
     return (a: Readonly<Points.Point | number | number[]>, b?: number) => {
-      const pt = Points.getPointParam(a, b);
+      const pt = Points.getPointParameter(a, b);
       return Object.freeze({
         x: pt.x / screen.width,
         y: pt.y / screen.height,
@@ -79,7 +79,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
     };
   } else if (reference === `document`) {
     return (a: Readonly<Points.Point | number | number[]>, b?: number) => {
-      const pt = Points.getPointParam(a, b);
+      const pt = Points.getPointParameter(a, b);
       return Object.freeze({
         x: pt.x / document.body.scrollWidth,
         y: pt.y / document.body.scrollHeight,
@@ -229,7 +229,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
   switch (targetSpace) {
     case `screen`:
       return (a: Readonly<Points.Point | number[] | number>, b?: number) => {
-        const pt = Points.getPointParam(a, b);
+        const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.screenX,
           y: pt.y + window.screenY,
@@ -237,7 +237,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
       };
     case `document`:
       return (a: Readonly<Points.Point | number[] | number>, b?: number) => {
-        const pt = Points.getPointParam(a, b);
+        const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.scrollX,
           y: pt.y + window.scrollY,
@@ -245,7 +245,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
       };
     case `viewport`:
       return (a: Readonly<Points.Point | number[] | number>, b?: number) => {
-        const pt = Points.getPointParam(a, b);
+        const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x,
           y: pt.y,

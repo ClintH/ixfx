@@ -1,10 +1,10 @@
-import {guard as guardPoint} from './Point.js';
-import {type Path} from './Path.js';
-import {type Line} from './Line.js';
-import {Points, Polar, Rects} from './index.js';
+import { guard as guardPoint } from './Point.js';
+import { type Path } from './Path.js';
+import { type Line } from './Line.js';
+import { Points, Polar, Rects } from './index.js';
 //import { ShapePositioned } from './Shape.js';
-import {Arrays} from '../collections/index.js';
-import {defaultRandom, type RandomSource} from '../Random.js';
+import { Arrays } from '../collections/index.js';
+import { defaultRandom, type RandomSource } from '../Random.js';
 import * as Intersects from './Intersects.js';
 const piPi = Math.PI * 2;
 
@@ -76,7 +76,7 @@ export const point = (circle: Circle | CirclePositioned, angleRadian: number, or
     if (isPositioned(circle)) {
       origin = circle;
     } else {
-      origin = {x: 0, y: 0};
+      origin = { x: 0, y: 0 };
     }
   }
   return {
@@ -95,8 +95,8 @@ const guard = (circle: CirclePositioned | Circle, paramName = `circle`) => {
     guardPoint(circle, `circle`);
   }
 
-  if (Number.isNaN(circle.radius)) throw new Error(`${paramName}.radius is NaN`);
-  if (circle.radius <= 0) throw new Error(`${paramName}.radius must be greater than zero`);
+  if (Number.isNaN(circle.radius)) throw new Error(`${ paramName }.radius is NaN`);
+  if (circle.radius <= 0) throw new Error(`${ paramName }.radius must be greater than zero`);
 };
 
 /**
@@ -129,8 +129,8 @@ const guardPositioned = (circle: CirclePositioned, paramName = `circle`) => {
  * @returns Center of circle
  */
 export const center = (circle: CirclePositioned | Circle) => {
-  if (isPositioned(circle)) return Object.freeze({x: circle.x, y: circle.y});
-  else return Object.freeze({x: circle.radius, y: circle.radius});
+  if (isPositioned(circle)) return Object.freeze({ x: circle.x, y: circle.y });
+  else return Object.freeze({ x: circle.radius, y: circle.radius });
 };
 /**
  * Computes relative position along circle
@@ -185,7 +185,7 @@ export const bbox = (circle: CirclePositioned | Circle): Rects.RectPositioned | 
   if (isPositioned(circle)) {
     return Rects.fromCenter(circle, circle.radius * 2, circle.radius * 2);
   } else {
-    return {width: circle.radius * 2, height: circle.radius * 2};
+    return { width: circle.radius * 2, height: circle.radius * 2 };
   }
 };
 
@@ -250,7 +250,7 @@ export const isIntersecting = (a: CirclePositioned, b: CirclePositioned | Points
   } else if (Rects.isRectPositioned(b)) {
     return Intersects.circleRect(a, b);
   } else if (Points.isPoint(b) && c !== undefined) {
-    return Intersects.circleCircle(a, {...b, radius: c});
+    return Intersects.circleCircle(a, { ...b, radius: c });
   }
   return false;
 };
@@ -353,7 +353,7 @@ export type RandomPointOpts = {
  * @returns 
  */
 export const randomPoint = (within: Circle | CirclePositioned, opts: RandomPointOpts = {}): Points.Point => {
-  const offset: Points.Point = isPositioned(within) ? within : {x: 0, y: 0};
+  const offset: Points.Point = isPositioned(within) ? within : { x: 0, y: 0 };
   const strategy = opts.strategy ?? `uniform`;
   const rand = opts.randomSource ?? defaultRandom;
   switch (strategy) {
@@ -362,7 +362,7 @@ export const randomPoint = (within: Circle | CirclePositioned, opts: RandomPoint
     case `uniform`:
       return Points.sum(offset, Polar.toCartesian(Math.sqrt(rand()) * within.radius, rand() * piPi));
     default:
-      throw new Error(`Unknown strategy ${strategy}`);
+      throw new Error(`Unknown strategy ${ strategy }`);
   }
 };
 
@@ -475,13 +475,13 @@ export const toSvg: ToSvg = (a: CirclePositioned | number | Circle, sweep: boole
 
 const toSvgFull = (radius: number, origin: Points.Point, sweep: boolean): readonly string[] => {
   // https://stackoverflow.com/questions/5737975/circle-drawing-with-svgs-arc-path
-  const {x, y} = origin;
+  const { x, y } = origin;
   const s = sweep ? `1` : `0`;
   return `
-    M ${x}, ${y}
-    m -${radius}, 0
-    a ${radius},${radius} 0 1,${s} ${radius * 2},0
-    a ${radius},${radius} 0 1,${s} -${radius * 2},0
+    M ${ x }, ${ y }
+    m -${ radius }, 0
+    a ${ radius },${ radius } 0 1,${ s } ${ radius * 2 },0
+    a ${ radius },${ radius } 0 1,${ s } -${ radius * 2 },0
   `.split(`\n`);
 };
 
@@ -503,13 +503,13 @@ export const nearest = (circle: CirclePositioned | readonly CirclePositioned[], 
     const l = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
     const x = a.x + (a.radius * ((b.x - a.x) / l));
     const y = a.y + (a.radius * ((b.y - a.y) / l));
-    return {x, y};
+    return { x, y };
   };
 
   if (Array.isArray(circle)) {
     const pts = circle.map(l => n(l));
     const dists = pts.map(p => Points.distance(p, b));
-    return Object.freeze<Points.Point>(pts[Arrays.minIndex(...dists)]);
+    return Object.freeze<Points.Point>(pts[ Arrays.minIndex(...dists) ]);
   } else {
     return Object.freeze<Points.Point>(n(circle as CirclePositioned));
   }
@@ -528,7 +528,7 @@ export const toPositioned = (circle: Circle | CirclePositioned, defaultPositionO
   if (isPositioned(circle)) return circle;
 
   // Returns 0,0 if params are undefined
-  const pt = Points.getPointParam(defaultPositionOrX, y);
+  const pt = Points.getPointParameter(defaultPositionOrX, y);
   return Object.freeze({
     ...circle,
     ...pt

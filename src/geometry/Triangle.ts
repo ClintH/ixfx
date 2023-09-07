@@ -482,7 +482,7 @@ export const barycentricCoord = (
   a: Points.Point | number,
   b?: number
 ): BarycentricCoord => {
-  const pt = Points.getPointParam(a, b);
+  const pt = Points.getPointParameter(a, b);
 
   const ab = (x: number, y: number, pa: Points.Point, pb: Points.Point) =>
     (pa.y - pb.y) * x + (pb.x - pa.x) * y + pa.x * pb.y - pb.x * pa.y;
@@ -535,7 +535,7 @@ export const intersectsPoint = (
 ): boolean => {
   const box = bbox(t);
 
-  const pt = Points.getPointParam(a, b);
+  const pt = Points.getPointParameter(a, b);
 
   // If it's not in the bounding box, can return false straight away
   if (!Rects.intersectsPoint(box, pt)) return false;
