@@ -43,7 +43,7 @@ export const getClosestIntegerKey = (
       else if (data.has(target + offset)) return target + offset;
       offset++;
     }
-    throw new Error(`Could not find target ${target}`);
+    throw new Error(`Could not find target ${ target }`);
   }
 };
 
@@ -97,9 +97,9 @@ export const deleteByValue = <K, V>(
   comparer: IsEqual<V> = isEqualDefault
 ) => {
   for (const e of Object.entries(map)) {
-    if (comparer(e[1], value)) {
+    if (comparer(e[ 1 ], value)) {
       // @ts-ignore
-      map.delete(e[0]);
+      map.delete(e[ 0 ]);
     }
   }
 };
@@ -128,15 +128,15 @@ export const getOrGenerate =
     map: IMappish<K, V>,
     fn: (key: K, args?: Z) => Promise<V> | V
   ): GetOrGenerate<K, V, Z> =>
-  async (key: K, args?: Z): Promise<V> => {
-    //eslint-disable-next-line functional/no-let
-    let value = map.get(key);
-    if (value !== undefined) return Promise.resolve(value);
-    value = await fn(key, args);
-    if (value === undefined) throw new Error(`fn returned undefined`);
-    map.set(key, value);
-    return value;
-  };
+    async (key: K, args?: Z): Promise<V> => {
+      //eslint-disable-next-line functional/no-let
+      let value = map.get(key);
+      if (value !== undefined) return Promise.resolve(value);
+      value = await fn(key, args);
+      if (value === undefined) throw new Error(`fn returned undefined`);
+      map.set(key, value);
+      return value;
+    };
 
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
@@ -160,9 +160,9 @@ export const getOrGenerate =
 export const firstEntryByIterablePredicate = <K, V>(
   map: IWithEntries<K, V>,
   predicate: (value: V, key: K) => boolean
-): readonly [key: K, value: V] | undefined => {
+): readonly [ key: K, value: V ] | undefined => {
   for (const e of map.entries()) {
-    if (predicate(e[1], e[0])) return e;
+    if (predicate(e[ 1 ], e[ 0 ])) return e;
   }
 };
 
@@ -188,9 +188,9 @@ export const firstEntryByIterableValue = <K, V>(
   map: IWithEntries<K, V>,
   value: V,
   isEqual: IsEqual<V> = isEqualDefault
-): readonly [key: K, value: V] | undefined => {
+): readonly [ key: K, value: V ] | undefined => {
   for (const e of map.entries()) {
-    if (isEqual(e[1], value)) return e;
+    if (isEqual(e[ 1 ], value)) return e;
   }
 };
 
@@ -203,14 +203,14 @@ export const firstEntryByIterableValue = <K, V>(
 //eslint-disable-next-line functional/prefer-readonly-type
 export const getOrGenerateSync =
   <K, V, Z>(map: IMappish<K, V>, fn: (key: K, args?: Z) => V) =>
-  (key: K, args?: Z): V => {
-    //eslint-disable-next-line functional/no-let
-    let value = map.get(key);
-    if (value !== undefined) return value;
-    value = fn(key, args);
-    map.set(key, value);
-    return value;
-  };
+    (key: K, args?: Z): V => {
+      //eslint-disable-next-line functional/no-let
+      let value = map.get(key);
+      if (value !== undefined) return value;
+      value = fn(key, args);
+      map.set(key, value);
+      return value;
+    };
 
 /**
  * Adds items to a map only if their key doesn't already exist
@@ -270,7 +270,7 @@ export const sortByValue = <K, V>(
   compareFn?: (a: V, b: V) => number
 ) => {
   const f = compareFn ?? defaultComparer;
-  [...map.entries()].sort((a, b) => f(a[1], b[1]));
+  [ ...map.entries() ].sort((a, b) => f(a[ 1 ], b[ 1 ]));
 };
 
 /**
@@ -292,11 +292,11 @@ export const sortByValueProperty = <K, V, Z>(
   compareFn?: (a: Z, b: Z) => number
 ) => {
   const cfn = typeof compareFn === `undefined` ? defaultComparer : compareFn;
-  return [...map.entries()].sort((aE, bE) => {
-    const a = aE[1];
-    const b = bE[1];
+  return [ ...map.entries() ].sort((aE, bE) => {
+    const a = aE[ 1 ];
+    const b = bE[ 1 ];
     // @ts-ignore
-    return cfn(a[prop], b[prop]);
+    return cfn(a[ prop ], b[ prop ]);
   });
 };
 /**
@@ -322,7 +322,7 @@ export const hasAnyValue = <K, V>(
   comparer: IsEqual<V>
 ): boolean => {
   const entries = Array.from(map.entries());
-  return entries.some((kv) => comparer(kv[1], value));
+  return entries.some((kv) => comparer(kv[ 1 ], value));
 };
 
 /**
@@ -363,6 +363,7 @@ export function* filter<V>(
 export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
   Array.from(map.values());
 
+
 /**
  * Returns a Map from an iterable. By default throws an exception
  * if iterable contains duplicate values.
@@ -389,7 +390,7 @@ export const fromIterable = <V>(
     const id = keyFn(d);
     if (m.has(id) && !allowOverwrites) {
       throw new Error(
-        `id ${id} is already used and new data will overwrite it. `
+        `id ${ id } is already used and new data will overwrite it. `
       );
     }
     m.set(id, d);
@@ -448,7 +449,7 @@ export const fromObject = <V>(data: any): ReadonlyMap<string, V> => {
 //eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-readonly-type
 export const addObject = <V>(map: Map<string, V>, data: any) => {
   const entries = Object.entries(data);
-  for (const [key, value] of entries) {
+  for (const [ key, value ] of entries) {
     map.set(key, value as V);
   }
 };
@@ -497,11 +498,11 @@ export const find = <V>(
 export const mapToObjTransform = <T, K>(
   m: ReadonlyMap<string, T>,
   valueTransform: (value: T) => K
-): { readonly [key: string]: K } =>
-  Array.from(m).reduce((obj: any, [key, value]) => {
+): { readonly [ key: string ]: K } =>
+  Array.from(m).reduce((obj: any, [ key, value ]) => {
     const t = valueTransform(value);
     /* eslint-disable-next-line functional/immutable-data */
-    obj[key] = t;
+    obj[ key ] = t;
     return obj;
   }, {});
 
@@ -526,7 +527,7 @@ export const zipKeyValue = <V>(
   if (keys.length !== values.length) {
     throw new Error(`Keys and values arrays should be same length`);
   }
-  return Object.fromEntries(keys.map((k, i) => [k, values[i]]));
+  return Object.fromEntries(keys.map((k, i) => [ k, values[ i ] ]));
 };
 
 //#region Functions by Kees C. Bakker
@@ -559,7 +560,7 @@ export const zipKeyValue = <V>(
 export const transformMap = <K, V, R>(
   source: ReadonlyMap<K, V>,
   transformer: (value: V, key: K) => R
-) => new Map(Array.from(source, (v) => [v[0], transformer(v[1], v[0])]));
+) => new Map(Array.from(source, (v) => [ v[ 0 ], transformer(v[ 1 ], v[ 0 ]) ]));
 
 /**
  * Converts a `Map` to a plain object, useful for serializing to JSON.
@@ -583,10 +584,10 @@ export const transformMap = <K, V, R>(
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const toObject = <T>(
   m: ReadonlyMap<string, T>
-): { readonly [key: string]: T } =>
-  Array.from(m).reduce((obj: any, [key, value]) => {
+): { readonly [ key: string ]: T } =>
+  Array.from(m).reduce((obj: any, [ key, value ]) => {
     /* eslint-disable-next-line functional/immutable-data */
-    obj[key] = value;
+    obj[ key ] = value;
     return obj;
   }, {});
 
@@ -623,7 +624,7 @@ export const toObject = <T>(
 export const mapToArray = <K, V, R>(
   m: ReadonlyMap<K, V>,
   transformer: (key: K, item: V) => R
-): readonly R[] => Array.from(m.entries()).map((x) => transformer(x[0], x[1]));
+): readonly R[] => Array.from(m.entries()).map((x) => transformer(x[ 0 ], x[ 1 ]));
 // End Functions by Kees C. Bakker
 //#endregion
 
@@ -674,7 +675,7 @@ export const mergeByKey = <K, V>(
 ): ReadonlyMap<K, V> => {
   const result = new Map<K, V>();
   for (const m of maps) {
-    for (const [mk, mv] of m) {
+    for (const [ mk, mv ] of m) {
       //eslint-disable-next-line functional/no-let
       let v = result.get(mk);
       if (v) {
