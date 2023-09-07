@@ -242,6 +242,16 @@ export const isEqualValueDefault = <V>(a: V, b: V): boolean => {
   return toStringDefault(a) === toStringDefault(b); // String representations are the same
 };
 
+// Via Vuejs
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const objectToString = Object.prototype.toString
+const toTypeString = (value: unknown): string =>
+  objectToString.call(value)
+export const isMap = (value: unknown): value is Map<any, any> =>
+  toTypeString(value) === `[object Map]`
+export const isSet = (value: unknown): value is Set<any> =>
+  toTypeString(value) === `[object Set]`
+
 /**
  * A default converter to string that uses JSON.stringify if its an object, or the thing itself if it's a string
  */
