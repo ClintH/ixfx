@@ -1,0 +1,13 @@
+{
+  "port": 5554,
+  "open": "tests/",
+  "openTerminal": false,
+  "watch": [
+    "tests/**/*",
+    "dist/**/*"
+  ],
+  "ignore": [
+    "./src/**/*"
+  ],
+  "navigate": false
+}
