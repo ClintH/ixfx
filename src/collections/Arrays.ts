@@ -6,12 +6,14 @@
 import { throwIntegerTest } from '../Guards.js';
 import { defaultRandom, type RandomSource } from '../Random.js';
 import {
-  type IsEqual,
-  isEqualDefault,
-  isEqualValueDefault,
   type ToString,
   toStringDefault,
 } from '../Util.js';
+import {
+  type IsEqual,
+  isEqualDefault,
+  isEqualValueDefault
+} from '../IsEqual.js'
 import { fromIterable as mapFromIterable } from './map/MapFns.js';
 export * from './NumericArrays.js';
 
