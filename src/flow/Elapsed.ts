@@ -30,9 +30,9 @@ export type Since = () => number;
  * @returns
  */
 export const since = (): Since => {
-  const start = Date.now();
+  const start = performance.now();
   return (): number => {
-    return Date.now() - start;
+    return performance.now() - start;
   };
 };
 
