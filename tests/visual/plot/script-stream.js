@@ -12,8 +12,6 @@ const testSeries = p.createSeries(`testb`, `stream`, {
   colour: `blue`
 });
 
-p.update();
-
 const loop = continuously(() => {
   testSeries.add(Math.random());
   p.update();
@@ -28,4 +26,5 @@ document.getElementById(`btnToggle`).addEventListener(`click`, () => {
 
 document.getElementById(`btnToggleYAxis`).addEventListener(`click`, () => {
   p.axisY.visible = !p.axisY.visible;
+  console.log(`Visible: ${p.axisY.visible}`);
 });
