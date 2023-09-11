@@ -20,9 +20,9 @@ export type Interval =
     readonly mins?: number;
   };
 
-export function intervalToMs(i: Interval | undefined): number | undefined;
+export function intervalToMs(interval: Interval | undefined): number | undefined;
 export function intervalToMs(
-  i: Interval | undefined,
+  interval: Interval | undefined,
   defaultNumber: number
 ): number;
 /**
@@ -41,55 +41,48 @@ export function intervalToMs(
  * ```
  *
  * If no default is provided, an exception is thrown.
- * @param i Interval
+ * @param interval Interval
  * @param defaultNumber Default value if `i` is undefined
  * @returns Milliseconds, or undefined
  */
 export function intervalToMs(
-  i: Interval | undefined,
+  interval: Interval | undefined,
   defaultNumber?: number
 ): number | undefined {
-  if (isInterval(i)) {
+  if (isInterval(interval)) {
     // Number given, must be millis?
-    if (typeof i === 'number') return i;
+    if (typeof interval === `number`) return interval;
 
     //eslint-disable-next-line functional/no-let
-    let ms = i.millis ?? 0;
-    ms += (i.hours ?? 0) * 60 * 60 * 1000;
-    ms += (i.mins ?? 0) * 60 * 1000;
-    ms += (i.secs ?? 0) * 1000;
+    let ms = interval.millis ?? 0;
+    ms += (interval.hours ?? 0) * 60 * 60 * 1000;
+    ms += (interval.mins ?? 0) * 60 * 1000;
+    ms += (interval.secs ?? 0) * 1000;
     return ms;
   } else {
-    if (typeof defaultNumber !== 'undefined') return defaultNumber;
-    throw new Error(`Not a valid interval: ${ i }`);
+    if (typeof defaultNumber !== `undefined`) return defaultNumber;
+    throw new Error(`Not a valid interval: ${ interval }`);
   }
 }
 
-export function isInterval(i: number | Interval | undefined): i is Interval {
-  if (i === undefined) return false;
-  if (i === null) return false;
-  if (typeof i === `number`) {
-    if (Number.isNaN(i)) return false;
-    if (!Number.isFinite(i)) return false;
+export function isInterval(interval: number | Interval | undefined): interval is Interval {
+  if (interval === undefined) return false;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (interval === null) return false;
+  if (typeof interval === `number`) {
+    if (Number.isNaN(interval)) return false;
+    if (!Number.isFinite(interval)) return false;
     return true;
-  } else if (typeof i !== 'object') return false;
+  } else if (typeof interval !== `object`) return false;
 
-  const hasMillis = 'millis' in i;
-  const hasSecs = 'secs' in i;
-  const hasMins = 'mins' in i;
-  const hasHours = 'hours' in i;
-  if (hasMillis) {
-    if (!numberTest(i.millis)[ 0 ]) return false;
-  }
-  if (hasSecs) {
-    if (!numberTest(i.secs)[ 0 ]) return false;
-  }
-  if (hasMins) {
-    if (!numberTest(i.mins)[ 0 ]) return false;
-  }
-  if (hasHours) {
-    if (!numberTest(i.hours)[ 0 ]) return false;
-  }
+  const hasMillis = `millis` in interval;
+  const hasSecs = `secs` in interval;
+  const hasMins = `mins` in interval;
+  const hasHours = `hours` in interval;
+  if (hasMillis && !numberTest(interval.millis)[ 0 ]) return false;
+  if (hasSecs && !numberTest(interval.secs)[ 0 ]) return false;
+  if (hasMins && !numberTest(interval.mins)[ 0 ]) return false;
+  if (hasHours && !numberTest(interval.hours)[ 0 ]) return false;
   if (hasMillis || hasSecs || hasHours || hasMins) return true;
   return false;
 }
@@ -111,7 +104,7 @@ export type IntervalOpts = {
   /**
    * When to perform delay. Default is before 'produce' is invoked.
    */
-  readonly delay?: 'before' | 'after';
+  readonly delay?: `before` | `after`;
 };
 /**
  * Generates values from `produce` with a time delay.
@@ -154,12 +147,12 @@ export const interval = async function* <V>(
   //eslint-disable-next-line functional/no-let
   let cancelled = false;
   const opts =
-    typeof optsOrFixedMs === 'number'
+    typeof optsOrFixedMs === `number`
       ? { fixed: optsOrFixedMs }
       : optsOrFixedMs;
 
   const signal = opts.signal;
-  const when = opts.delay ?? 'before';
+  const when = opts.delay ?? `before`;
   //eslint-disable-next-line functional/no-let
   let sleepMs = intervalToMs(opts.fixed) ?? intervalToMs(opts.minimum, 0);
   //eslint-disable-next-line functional/no-let
@@ -168,14 +161,14 @@ export const interval = async function* <V>(
   const minIntervalMs = opts.minimum ? intervalToMs(opts.minimum) : undefined;
   const doDelay = async () => {
     const elapsed = performance.now() - started;
-    if (typeof minIntervalMs !== 'undefined') {
+    if (typeof minIntervalMs !== `undefined`) {
       sleepMs = Math.max(0, minIntervalMs - elapsed);
     }
     if (sleepMs) {
       await sleep({ millis: sleepMs, signal });
     }
     started = performance.now();
-    if (signal?.aborted) throw new Error(`Signal aborted ${ signal?.reason }`);
+    if (signal?.aborted) throw new Error(`Signal aborted ${ signal.reason }`);
   };
 
   // Get an iterator over array
@@ -188,16 +181,16 @@ export const interval = async function* <V>(
 
   try {
     while (!cancelled) {
-      if (when === 'before') await doDelay();
-      if (cancelled) return;
+      if (when === `before`) await doDelay();
+      //if (cancelled) return;
       if (typeof produce === `function`) {
         // Returns V or Promise<V>
         const result = await produce();
-        if (typeof result === 'undefined') return; // Done
+        if (typeof result === `undefined`) return; // Done
         yield result;
       } else if (isGenerator) {
         // Generator
-        const result = await (produce as any).next();
+        const result = await (produce as AsyncGenerator<V>).next();
         if (result.done) return;
         yield result.value;
       } else {
@@ -206,7 +199,7 @@ export const interval = async function* <V>(
         );
       }
 
-      if (when === 'after') await doDelay();
+      if (when === `after`) await doDelay();
     }
   } finally {
     cancelled = true;
