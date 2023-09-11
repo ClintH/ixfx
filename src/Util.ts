@@ -3,6 +3,14 @@ import { untilMatch } from './Text.js';
 export * as IterableAsync from './IterableAsync.js';
 export * as Debug from './Debug.js';
 
+type ArrayLengthMutationKeys = `splice` | `push` | `pop` | `shift` | `unshift` | number
+type ArrayItems<T extends Array<any>> = T extends Array<infer TItems> ? TItems : never
+export type FixedLengthArray<T extends Array<any>> =
+  Pick<T, Exclude<keyof T, ArrayLengthMutationKeys>>
+  & { [ Symbol.iterator ]: () => IterableIterator<ArrayItems<T>> }
+
+export const isFunction = (object: unknown): object is (...args: Array<any>) => any => object instanceof Function;
+
 /**
  * Returns `fallback` if `v` is NaN, otherwise returns `v`.
  *
@@ -220,27 +228,6 @@ export const roundUpToMultiple = (v: number, multiple: number): number => {
 };
 
 export type ToString<V> = (itemToMakeStringFor: V) => string;
-
-/**
- * Function that returns true if `a` and `b` are considered equal
- */
-export type IsEqual<V> = (a: V, b: V) => boolean;
-
-/**
- * Default comparer function is equiv to checking `a === b`
- */
-export const isEqualDefault = <V>(a: V, b: V): boolean => a === b;
-
-/**
- * Comparer returns true if string representation of `a` and `b` are equal.
- * Uses `toStringDefault` to generate a string representation (`JSON.stringify`)
- * @returns True if the contents of `a` and `b` are equal
- */
-export const isEqualValueDefault = <V>(a: V, b: V): boolean => {
-  // ✔ UNIT TESTED
-  if (a === b) return true; // Object references are the same, or string values are the same
-  return toStringDefault(a) === toStringDefault(b); // String representations are the same
-};
 
 // Via Vuejs
 // eslint-disable-next-line @typescript-eslint/unbound-method

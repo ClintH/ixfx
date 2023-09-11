@@ -154,7 +154,7 @@ export const throwPercentTest = (value: number, parameterName = `?`) => {
   throwFromResult(percentTest(value, parameterName));
 }
 /**
- * Throws an error if `value` is not an integer, or does not meet guard criteria.
+ * Checks if `value` an integer and meets additional criteria.
  * See {@link number} for guard details, or use that if integer checking is not required.
  *
  * Note:
