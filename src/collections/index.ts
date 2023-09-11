@@ -11,6 +11,8 @@ export {
 } from './CircularArray.js';
 export * as Trees from './Trees.js';
 
+export * as Iterables from './Iterables.js';
+
 /**
  * Stacks store items in order.
  *
