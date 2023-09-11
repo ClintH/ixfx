@@ -1,36 +1,9 @@
-export type QueueDiscardPolicy = `older` | `newer` | `additions`;
 
-/**
- * Queue options.
- *
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
- * ```
- */
-export type QueueOpts = {
-  /**
-   * @private
-   */
-  readonly debug?: boolean;
-  /**
-   * Capcity limit
-   */
-  readonly capacity?: number;
-  /**
-   * Default is `additions`, meaning new items are discarded.
-   *
-   * `older`: Removes items front of the queue (ie older items are discarded)
-   *
-   * `newer`: Remove from rear of queue to make space for new items (ie newer items are discarded)
-   *
-   * `additions`: Only adds new items that there are room for (ie. brand new items are discarded)
-   *
-   */
-  readonly discardPolicy?: QueueDiscardPolicy;
-};
 
 export { type IQueueMutable } from './IQueueMutable.js';
 export { type IQueueImmutable } from './IQueueImmutable.js';
+export { type IPriorityQueueMutable } from './IPriorityQueueMutable.js';
+export { type QueueOpts } from './QueueTypes.js';
 export { immutable } from './QueueImmutable.js';
 export { mutable } from './QueueMutable.js';
+export { priority } from './PriorityMutable.js';
