@@ -17,7 +17,11 @@ export * from './Clamp.js';
 export * from './Scale.js';
 export * from './Flip.js';
 
-export * as Pipes from './Pipes.js'
+export * as Pipes from './pipes/index.js'
+export * as Signals from './Signal.js';
+export * as Chains from './Chain.js';
+
+
 /**
  * Work with bipolar values (-1...1)
  * 
