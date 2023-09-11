@@ -1,5 +1,19 @@
-import { type IsEqual } from './Util.js';
-//export { eachInterval } from './flow/Interval.js';
+import { type IsEqual } from './IsEqual.js';
+import { sleep } from './flow/Sleep.js';
+
+export async function* fromArray<V>(array: Array<V>): AsyncGenerator<V> {
+  for (const v of array) {
+    yield v;
+    await sleep(1);
+  }
+}
+
+export async function* fromIterable<V>(iterable: Iterable<V>): AsyncGenerator<V> {
+  for (const v of iterable) {
+    yield v;
+    await sleep(1);
+  }
+}
 
 /**
  * Breaks an iterable into array chunks
@@ -402,7 +416,7 @@ export async function* takeWhile<V>(
 export async function toArray<V>(
   it: AsyncIterable<V>,
   count = Number.POSITIVE_INFINITY
-): Promise<ReadonlyArray<V>> {
+): Promise<Array<V>> {
   // https://2ality.com/2016/10/asynchronous-iteration.html
   const result = [];
   const iterator = it[ Symbol.asyncIterator ]();
