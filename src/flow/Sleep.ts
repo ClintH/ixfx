@@ -6,6 +6,15 @@ export type SleepOpts<V> = Interval & {
   readonly value?: V;
 };
 
+if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
+  // eslint-disable-next-line unicorn/no-lonely-if
+  if (typeof window === `undefined`) {
+    // @ts-expect-error
+    globalThis.requestAnimationFrame = setImmediate;
+  }
+  //window.requestAnimationFrame = window.setImmediate;
+}
+
 /**
  * Returns after timeout period.
  *
