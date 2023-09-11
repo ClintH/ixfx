@@ -1,8 +1,7 @@
+import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
 import {
   toStringDefault,
   defaultComparer,
-  type IsEqual,
-  isEqualDefault,
   type ToString,
 } from '../../Util.js';
 import type { IMappish, IWithEntries } from './IMappish.js';

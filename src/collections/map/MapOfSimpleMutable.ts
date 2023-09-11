@@ -1,8 +1,7 @@
+import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
 import {
   type ToString,
-  defaultKeyer,
-  type IsEqual,
-  isEqualDefault,
+  defaultKeyer
 } from '../../Util.js';
 import type { IMapOfMutable } from './IMapOfMutable.js';
 import { MapOfSimpleBase } from './MapOfSimpleBase.js';
@@ -38,7 +37,7 @@ export class MapOfSimpleMutable<V>
     if (existing === undefined) {
       this.map.set(key, values);
     } else {
-      this.map.set(key, [...existing, ...values]);
+      this.map.set(key, [ ...existing, ...values ]);
     }
   }
 
@@ -78,11 +77,11 @@ export class MapOfSimpleMutable<V>
   deleteByValue(value: V): boolean {
     //eslint-disable-next-line functional/no-let
     let del = false;
-    for (const entries of [...this.map.entries()]) {
-      for (const values of entries[1]) {
+    for (const entries of [ ...this.map.entries() ]) {
+      for (const values of entries[ 1 ]) {
         if (this.valueEq(values, value)) {
           del = true;
-          this.deleteKeyValue(entries[0], value);
+          this.deleteKeyValue(entries[ 0 ], value);
         }
       }
     }

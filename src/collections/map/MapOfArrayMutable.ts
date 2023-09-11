@@ -1,4 +1,5 @@
-import { type IsEqual, type ToString, isEqualDefault } from '../../Util.js';
+import type { ToString } from 'src/Util.js';
+import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
 import { type IMapOfMutableExtended } from './IMapOfMutableExtended.js';
 import { type MapMultiOpts, type MultiValue } from './MapMulti.js';
 import { MapOfMutableImpl } from './MapOfMultiImpl.js';
@@ -59,8 +60,8 @@ export const ofArrayMutable = <V>(
       return `array`;
     },
     add: (dest, values) => {
-      if (dest === undefined) return [...values];
-      return [...dest, ...values];
+      if (dest === undefined) return [ ...values ];
+      return [ ...dest, ...values ];
     },
     iterable: (source) => source.values(),
     count: (source) => source.length,

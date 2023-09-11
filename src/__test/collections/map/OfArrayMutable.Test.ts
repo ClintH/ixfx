@@ -5,7 +5,7 @@ import {
 } from '../../../collections/map/MapOfArrayMutable.js';
 import type { IMapOfMutableExtended } from '../../../collections/map/IMapOfMutableExtended.js';
 import { arrayValueIncludes } from '../../util.js';
-import { isEqualValueDefault } from '../../../Util.js';
+import { isEqualValueDefault } from '../../../IsEqual.js';
 
 test(`withOpts`, (t) => {
   type Person = { readonly name: string; readonly city: string };
@@ -26,11 +26,11 @@ test(`withOpts`, (t) => {
   m.addValue(barry, barryOther, barryCase, sally, sallyOther, sallyMoreProps);
 
   // Check expected counts
-  t.assert([...m.keys()].length === 3);
-  t.assert([...m.entriesFlat()].length === 6);
+  t.assert([ ...m.keys() ].length === 3);
+  t.assert([ ...m.entriesFlat() ].length === 6);
 
   // Check for key recall
-  t.is([...m.get(`Bristol`)].length, 2);
+  t.is([ ...m.get(`Bristol`) ].length, 2);
   t.is(m.count(`London`), 2);
   t.is(m.count(`Notfound`), 0);
   t.true(m.hasKeyValue(`Bristol`, { name: `Sally`, city: `Bristol` }));
@@ -39,7 +39,7 @@ test(`withOpts`, (t) => {
 
   // Check for non-existent keys
   t.false(m.has(`notfound`));
-  t.is([...m.get('notfound')].length, 0);
+  t.is([ ...m.get('notfound') ].length, 0);
 
   // Key equality
   t.false(m.has(`LONDON`));
@@ -118,13 +118,13 @@ test(`defaultOpts`, (t) => {
   t.false(m.has(`notfound`));
   t.false(m.isEmpty);
 
-  arrayValueIncludes(t, [...m.keys()], [`apples`, `oranges`]);
+  arrayValueIncludes(t, [ ...m.keys() ], [ `apples`, `oranges` ]);
   arrayValueIncludes(
     t,
-    [...m.keysAndCounts()],
+    [ ...m.keysAndCounts() ],
     [
-      [`apples`, 3],
-      [`oranges`, 2],
+      [ `apples`, 3 ],
+      [ `oranges`, 2 ],
     ],
     isEqualValueDefault
   );

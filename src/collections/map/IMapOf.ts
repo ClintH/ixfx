@@ -1,4 +1,4 @@
-import type { IsEqual } from 'src/Util.js';
+import type { IsEqual } from 'src/IsEqual.js';
 
 export interface IMapOf<V> {
   /**
@@ -22,12 +22,12 @@ export interface IMapOf<V> {
    * Iterates over key-value pairs.
    * Unlike a normal map, the same key may appear several times.
    */
-  entriesFlat(): IterableIterator<readonly [key: string, value: V]>;
+  entriesFlat(): IterableIterator<readonly [ key: string, value: V ]>;
 
   /**
    * Iteates over all keys and the count of values therein
    */
-  keysAndCounts(): IterableIterator<readonly [string, number]>;
+  keysAndCounts(): IterableIterator<readonly [ string, number ]>;
 
   /**
    * Returns _true_ if `value` is stored under `key`.

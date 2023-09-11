@@ -1,6 +1,6 @@
 // ✔ UNIT TESTED
 
-import { type IsEqual, isEqualDefault } from '../../Util.js';
+import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
 import type { IMapOf } from './IMapOf.js';
 import type { IWithEntries } from './IMappish.js';
 
@@ -26,11 +26,11 @@ import type { IWithEntries } from './IMappish.js';
 export const firstEntryByIterablePredicate = <K, V>(
   map: IWithEntries<K, Iterable<V>>,
   predicate: (value: V, key: K) => boolean
-): readonly [key: K, value: Iterable<V>] | undefined => {
+): readonly [ key: K, value: Iterable<V> ] | undefined => {
   for (const e of map.entries()) {
-    const val = e[1];
+    const val = e[ 1 ];
     for (const subValue of val) {
-      if (predicate(subValue, e[0])) return e;
+      if (predicate(subValue, e[ 0 ])) return e;
     }
   }
 };
@@ -40,13 +40,13 @@ export const firstEntryByIterablePredicate = <K, V>(
  */
 export const lengthMax = <V>(map: IMapOf<V>): number => {
   //eslint-disable-next-line functional/no-let
-  let largest: readonly [string, number] = ['', 0];
+  let largest: readonly [ string, number ] = [ '', 0 ];
   for (const e of map.keysAndCounts()) {
-    if (e[1] > largest[1]) {
+    if (e[ 1 ] > largest[ 1 ]) {
       largest = e;
     }
   }
-  return largest[1];
+  return largest[ 1 ];
 };
 
 /**
@@ -71,9 +71,9 @@ export const firstEntryByIterableValue = <K, V>(
   map: IWithEntries<K, Iterable<V>>,
   value: V,
   isEqual: IsEqual<V> = isEqualDefault
-): readonly [key: K, value: Iterable<V>] | undefined => {
+): readonly [ key: K, value: Iterable<V> ] | undefined => {
   for (const e of map.entries()) {
-    const val = e[1];
+    const val = e[ 1 ];
     for (const subValue of val) {
       if (isEqual(subValue, value)) return e;
     }

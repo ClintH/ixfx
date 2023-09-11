@@ -1,22 +1,22 @@
 /* eslint-disable */
 import test from 'ava';
-import type {KeyValue} from '../../KeyValue.js';
-import {FrequencyMutable} from '../../data/FrequencyMutable.js';
-import {shuffle} from '../../collections/Arrays.js';
-import {arrayValuesEqual} from '../util.js';
-import {isEqualValueDefault} from '../../Util.js';
+import type { KeyValue } from '../../KeyValue.js';
+import { FrequencyMutable } from '../../data/FrequencyMutable.js';
+import { shuffle } from '../../collections/Arrays.js';
+import { arrayValuesEqual } from '../util.js';
+import { isEqualValueDefault } from '../../IsEqual.js';
 
 test(`sorting`, (t) => {
   const a: KeyValue[] = [
-    [`apple`, 10],
-    [`orange`, 2],
-    [`zebra`, 1],
-    [`banana`, 3],
-    [`pineapple`, 9]
+    [ `apple`, 10 ],
+    [ `orange`, 2 ],
+    [ `zebra`, 1 ],
+    [ `banana`, 3 ],
+    [ `pineapple`, 9 ]
   ];
 
   // Produces: [zebra, orange, apple, orange, apple ...]
-  const aSeries = shuffle(a.flatMap(kv => Array(kv[1]).fill(kv[0])));
+  const aSeries = shuffle(a.flatMap(kv => Array(kv[ 1 ]).fill(kv[ 0 ])));
 
   // Test it can count properly
   const h = new FrequencyMutable();
@@ -31,10 +31,10 @@ test(`sorting`, (t) => {
 
   // Test iterators
   const aKeys = Array.from(h.keys());
-  arrayValuesEqual(t, aKeys, [`apple`, `orange`, `zebra`, `banana`, `pineapple`]);
+  arrayValuesEqual(t, aKeys, [ `apple`, `orange`, `zebra`, `banana`, `pineapple` ]);
 
   const aValues = Array.from(h.values());
-  arrayValuesEqual(t, aValues, [10, 2, 1, 3, 9]);
+  arrayValuesEqual(t, aValues, [ 10, 2, 1, 3, 9 ]);
 
   // Should work
   h.add(null);

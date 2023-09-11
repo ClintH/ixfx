@@ -1,9 +1,7 @@
 import {
   type IsEqual,
-  type ToString,
-  isEqualDefault,
-  toStringDefault,
-} from '../../Util.js';
+  isEqualDefault
+} from '../../IsEqual.js';
 import type {
   MapArrayEvents,
   IMapOfMutableExtended,
@@ -11,6 +9,7 @@ import type {
 import type { MapMultiOpts, MultiValue } from './MapMulti.js';
 import { SimpleEventEmitter } from '../../Events.js';
 import type { IMapOf } from './IMapOf.js';
+import { toStringDefault, type ToString } from '../../Util.js';
 
 /**
  * @internal
@@ -20,7 +19,7 @@ export class MapOfMutableImpl<V, M>
   implements IMapOfMutableExtended<V, M>
 {
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  readonly #map: Map<string, M> = new Map();
+  readonly #map = new Map<string, M>();
   readonly groupBy: ToString<V>;
   readonly type: MultiValue<V, M>;
 
@@ -52,17 +51,17 @@ export class MapOfMutableImpl<V, M>
   debugString(): string {
     const keys = Array.from(this.#map.keys());
     // eslint-disable-next-line functional/no-let
-    let r = `Keys: ${keys.join(`, `)}\r\n`;
+    let r = `Keys: ${ keys.join(`, `) }\r\n`;
     keys.forEach((k) => {
       const v = this.#map.get(k);
       if (v !== undefined) {
         const asArray = this.type.toArray(v);
         if (asArray !== undefined) {
-          r += ` - ${k} (${this.type.count(v)}) = ${JSON.stringify(
+          r += ` - ${ k } (${ this.type.count(v) }) = ${ JSON.stringify(
             asArray
-          )}\r\n`;
+          ) }\r\n`;
         }
-      } else r += ` - ${k} (undefined)\r\n`;
+      } else r += ` - ${ k } (undefined)\r\n`;
     });
     return r;
   }
@@ -201,37 +200,37 @@ export class MapOfMutableImpl<V, M>
     //return Array.from(this.#map.keys());
   }
 
-  *entriesFlat(): IterableIterator<[key: string, value: V]> {
+  *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
     for (const e of this.#map.entries()) {
-      for (const v of this.type.iterable(e[1])) {
-        yield [e[0], v];
+      for (const v of this.type.iterable(e[ 1 ])) {
+        yield [ e[ 0 ], v ];
       }
     }
   }
 
   *valuesFlat(): IterableIterator<V> {
     for (const e of this.#map.entries()) {
-      yield* this.type.iterable(e[1]);
+      yield* this.type.iterable(e[ 1 ]);
     }
   }
 
-  *entries(): IterableIterator<[key: string, value: V[]]> {
+  *entries(): IterableIterator<[ key: string, value: V[] ]> {
     //yield* this.#map.entries();
-    for (const [k, v] of this.#map.entries()) {
-      const tmp = [...this.type.iterable(v)];
-      yield [k, tmp];
+    for (const [ k, v ] of this.#map.entries()) {
+      const tmp = [ ...this.type.iterable(v) ];
+      yield [ k, tmp ];
     }
   }
 
   /* eslint-disable-next-line functional/prefer-readonly-type */
-  *keysAndCounts(): IterableIterator<[string, number]> {
+  *keysAndCounts(): IterableIterator<[ string, number ]> {
     //const keys = this.keys();
     /* eslint-disable-next-line functional/prefer-readonly-type */
     //const r = keys.map(k => [k, this.count(k)]) as Array<[string, number]>;
     //return r;
 
     for (const key of this.keys()) {
-      yield [key, this.count(key)];
+      yield [ key, this.count(key) ];
     }
   }
 
@@ -264,8 +263,8 @@ export class MapOfMutableImpl<V, M>
     this.#map.forEach(fn);
   }
 
-  get [Symbol.toStringTag]() {
-    return this.#map[Symbol.toStringTag];
+  get [ Symbol.toStringTag ]() {
+    return this.#map[ Symbol.toStringTag ];
   }
 
   // [Symbol.iterator]() {

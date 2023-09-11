@@ -1,12 +1,12 @@
 import type { QueueOpts } from './index.js';
 
-export const debug = (opts: QueueOpts, msg: string): void => {
+export const debug = (opts: QueueOpts<any>, message: string): void => {
   /* eslint-disable-next-line functional/no-expression-statements */
-  opts.debug ? console.log(`queue:${msg}`) : null;
+  opts.debug ? console.log(`queue:${ message }`) : null;
 };
 
 export const trimQueue = <V>(
-  opts: QueueOpts,
+  opts: QueueOpts<V>,
   queue: ReadonlyArray<V>,
   toAdd: ReadonlyArray<V>
 ): ReadonlyArray<V> => {
@@ -22,7 +22,7 @@ export const trimQueue = <V>(
 
   switch (policy) {
     // Only add what we can from toAdd
-    case `additions`:
+    case `additions`: {
       // debug(
       //   opts,
       //   `trimQueue:DiscardAdditions: queueLen: ${queue.length} slice: ${
@@ -34,23 +34,24 @@ export const trimQueue = <V>(
         return queue; // Completely full
       } else {
         // Only add some from the new array (from the front)
-        return [...queue, ...toAdd.slice(0, toRemove - 1)];
+        return [ ...queue, ...toAdd.slice(0, toRemove - 1) ];
       }
+    }
     // Remove from rear of queue (last index) before adding new things
-    case `newer`:
+    case `newer`: {
       if (toRemove >= queue.length) {
         // New items will completely flush out old
         //debug(opts, `slice start: ${toAdd.length - capacity}`);
         if (queue.length === 0) {
           // Special case when queue starts off empty
-          return [...toAdd.slice(0, capacity - 1), toAdd[toAdd.length - 1]];
+          return [ ...toAdd.slice(0, capacity - 1), toAdd.at(-1)! ];
         }
-        const tmp = toAdd.slice(
+        return toAdd.slice(
           Math.max(0, toAdd.length - capacity),
           Math.min(toAdd.length, capacity) + 1
         );
         //debug(opts, `Final value: ${JSON.stringify(tmp)}`);
-        return tmp;
+        //return tmp;
       } else {
         // Keep some of the old
         // const toAddFinal = toAdd.slice(
@@ -71,16 +72,20 @@ export const trimQueue = <V>(
         //     toAddFinal
         //   )}`
         // );
-        const t = [...toKeep, ...toAddFinal];
+        const t = [ ...toKeep, ...toAddFinal ];
         //debug(opts, `final: ${JSON.stringify(t)}`);
         return t;
       }
+    }
     // Remove from the front of the queue (0 index). ie. older items are discarded
-    case `older`:
+    case `older`: {
       // If queue is A, B and toAdd is C, D this yields A, B, C, D
-      return [...queue, ...toAdd].slice(toRemove);
-    default:
-      throw new Error(`Unknown overflow policy ${policy}`);
+      return [ ...queue, ...toAdd ].slice(toRemove);
+    }
+    default: {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Unknown overflow policy ${ policy }`);
+    }
   }
 };
 
@@ -94,10 +99,11 @@ export const trimQueue = <V>(
  * @returns {V[]}
  */
 export const enqueue = <V>(
-  opts: QueueOpts,
+  opts: QueueOpts<V>,
   queue: ReadonlyArray<V>,
   ...toAdd: ReadonlyArray<V>
 ): ReadonlyArray<V> => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (opts === undefined) throw new Error(`opts parameter undefined`);
 
   const potentialLength = queue.length + toAdd.length;
@@ -105,19 +111,17 @@ export const enqueue = <V>(
 
   const toReturn = overSize
     ? trimQueue(opts, queue, toAdd)
-    : [...queue, ...toAdd];
+    : [ ...queue, ...toAdd ];
   if (opts.capacity && toReturn.length !== opts.capacity && overSize) {
     throw new Error(
-      `Bug! Expected return to be at capacity. Return len: ${
-        toReturn.length
-      } capacity: ${opts.capacity} opts: ${JSON.stringify(opts)}`
+      `Bug! Expected return to be at capacity. Return len: ${ toReturn.length
+      } capacity: ${ opts.capacity } opts: ${ JSON.stringify(opts) }`
     );
   }
   if (!opts.capacity && toReturn.length !== potentialLength) {
     throw new Error(
-      `Bug! Return length not expected. Return len: ${
-        toReturn.length
-      } expected: ${potentialLength} opts: ${JSON.stringify(opts)}`
+      `Bug! Return length not expected. Return len: ${ toReturn.length
+      } expected: ${ potentialLength } opts: ${ JSON.stringify(opts) }`
     );
   }
   return toReturn;
@@ -125,7 +129,7 @@ export const enqueue = <V>(
 
 // Remove from front of queue (0 index)
 export const dequeue = <V>(
-  opts: QueueOpts,
+  opts: QueueOpts<V>,
   queue: ReadonlyArray<V>
 ): ReadonlyArray<V> => {
   if (queue.length === 0) throw new Error(`Queue is empty`);
@@ -141,15 +145,15 @@ export const dequeue = <V>(
  * @returns {(V | undefined)}
  */
 export const peek = <V>(
-  opts: QueueOpts,
+  opts: QueueOpts<V>,
   queue: ReadonlyArray<V>
-): V | undefined => queue[0];
+): V | undefined => queue[ 0 ];
 
-export const isEmpty = <V>(opts: QueueOpts, queue: ReadonlyArray<V>): boolean =>
+export const isEmpty = <V>(opts: QueueOpts<V>, queue: ReadonlyArray<V>): boolean =>
   queue.length === 0;
 
 export const isFull = <V>(
-  opts: QueueOpts,
+  opts: QueueOpts<V>,
   queue: ReadonlyArray<V>
 ): boolean => {
   if (opts.capacity) {

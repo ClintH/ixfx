@@ -1,7 +1,8 @@
 import { type IQueueMutable } from './IQueueMutable.js';
 import { enqueue, peek, dequeue, isEmpty, isFull } from './QueueFns.js';
-import { type QueueOpts } from './index.js';
-
+import { type QueueOpts } from './QueueTypes.js';
+import { without } from '../Arrays.js';
+import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
 /**
  * Returns a mutable queue. Queues are useful if you want to treat 'older' or 'newer'
  * items differently. _Enqueing_ adds items at the back of the queue, while
@@ -23,14 +24,17 @@ import { type QueueOpts } from './index.js';
  * @param startingItems Items are added in array order. So first item will be at the front of the queue.
  */
 export class QueueMutable<V> implements IQueueMutable<V> {
-  readonly opts: QueueOpts;
+  readonly opts: QueueOpts<V>;
   // eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V>;
+  eq: IsEqual<V>;
 
-  constructor(opts: QueueOpts = {}, data: ReadonlyArray<V> = []) {
+  constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (opts === undefined) throw new Error(`opts parameter undefined`);
     this.opts = opts;
     this.data = data;
+    this.eq = opts.eq ?? isEqualDefault;
   }
 
   enqueue(...toAdd: ReadonlyArray<V>): number {
@@ -41,9 +45,21 @@ export class QueueMutable<V> implements IQueueMutable<V> {
 
   dequeue(): V | undefined {
     const v = peek(this.opts, this.data);
+    if (v === undefined) return;
     /* eslint-disable-next-line functional/immutable-data */
     this.data = dequeue(this.opts, this.data);
     return v;
+  }
+
+  /**
+   * Remove item from queue, regardless of position.
+   * Returns _true_ if something was removed.
+   * @param v 
+   */
+  remove(v: V, comparer?: IsEqual<V>): boolean {
+    const length = this.data.length;
+    this.data = without(this.data, v, comparer ?? this.eq);
+    return this.data.length !== length;
   }
 
   get isEmpty(): boolean {
@@ -64,8 +80,9 @@ export class QueueMutable<V> implements IQueueMutable<V> {
 }
 
 export function mutable<V>(
-  opts: QueueOpts = {},
+  opts: QueueOpts<V> = {},
   ...startingItems: ReadonlyArray<V>
 ): IQueueMutable<V> {
-  return new QueueMutable({ ...opts }, [...startingItems]);
+  return new QueueMutable({ ...opts }, [ ...startingItems ]);
 }
+

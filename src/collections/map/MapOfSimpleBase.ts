@@ -1,8 +1,7 @@
+import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
 import {
   defaultKeyer,
-  type IsEqual,
   type ToString,
-  isEqualDefault,
 } from '../../Util.js';
 import { firstEntryByIterableValue } from './MapMultiFns.js';
 
@@ -19,7 +18,7 @@ export class MapOfSimpleBase<V> {
   constructor(
     groupBy: ToString<V> = defaultKeyer,
     valueEq: IsEqual<V> = isEqualDefault<V>,
-    initial: [string, readonly V[]][] = []
+    initial: [ string, readonly V[] ][] = []
   ) {
     this.groupBy = groupBy;
     this.valueEq = valueEq;
@@ -28,23 +27,23 @@ export class MapOfSimpleBase<V> {
   /**
    * Iterate over all entries
    */
-  *entriesFlat(): IterableIterator<[key: string, value: V]> {
+  *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
     for (const key of this.map.keys()) {
       for (const value of this.map.get(key)!) {
-        yield [key, value];
+        yield [ key, value ];
       }
     }
   }
 
-  *entries(): IterableIterator<[key: string, value: V[]]> {
-    for (const [k, v] of this.map.entries()) {
-      yield [k, [...v]];
+  *entries(): IterableIterator<[ key: string, value: V[] ]> {
+    for (const [ k, v ] of this.map.entries()) {
+      yield [ k, [ ...v ] ];
     }
   }
 
   firstKeyByValue(value: V, eq: IsEqual<V> = isEqualDefault) {
     const e = firstEntryByIterableValue(this, value, eq);
-    if (e) return e[0];
+    if (e) return e[ 0 ];
   }
 
   /**
@@ -70,16 +69,16 @@ export class MapOfSimpleBase<V> {
    */
   *valuesFlat(): IterableIterator<V> {
     for (const entries of this.map) {
-      yield* entries[1];
+      yield* entries[ 1 ];
     }
   }
 
   /**
    * Iterate over keys and length of values stored under keys
    */
-  *keysAndCounts(): IterableIterator<[string, number]> {
+  *keysAndCounts(): IterableIterator<[ string, number ]> {
     for (const entries of this.map) {
-      yield [entries[0], entries[1].length];
+      yield [ entries[ 0 ], entries[ 1 ].length ];
     }
   }
 
@@ -119,7 +118,7 @@ export class MapOfSimpleBase<V> {
     keys.every((k) => {
       const v = this.map.get(k);
       if (v === undefined) return;
-      r += k + ` (${v.length}) = ${JSON.stringify(v)}\r\n`;
+      r += k + ` (${ v.length }) = ${ JSON.stringify(v) }\r\n`;
     });
     return r;
   }

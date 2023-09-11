@@ -1,11 +1,11 @@
 import test from 'ava';
 import { immutable } from '../../../collections/map/index.js';
 import { arrayValuesEqual } from '../../util.js';
-import { isEqualValueDefault } from '../../../Util.js';
+import { isEqualValueDefault } from '../../../IsEqual.js';
 
 test(`immutableMap`, (t) => {
   const m = immutable();
-  const m2 = m.add([`apples`, 10]);
+  const m2 = m.add([ `apples`, 10 ]);
   const m3 = m2.add({ key: `oranges`, value: 9 }, { key: `grapes`, value: 10 });
 
   t.true(m.isEmpty());
@@ -38,9 +38,9 @@ test(`immutableMap`, (t) => {
 
   // test starting with data
   const m6 = immutable<string, number>([
-    [`apples`, 10],
-    [`oranges`, 9],
-    [`grapes`, 10],
+    [ `apples`, 10 ],
+    [ `oranges`, 9 ],
+    [ `grapes`, 10 ],
   ]);
   const m6Entries = Array.from(m6.entries());
   const m3Entries = Array.from(m3.entries());

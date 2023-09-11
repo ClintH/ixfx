@@ -6,7 +6,7 @@ import { type QueueOpts } from './index.js';
 // Immutable
 // -------------------------------
 export class QueueImmutable<V> implements IQueueImmutable<V> {
-  readonly opts: QueueOpts;
+  readonly opts: QueueOpts<V>;
   readonly data: ReadonlyArray<V>;
 
   /**
@@ -15,7 +15,8 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
    * @param {V[]} data Initial data. Index 0 is front of queue
    * @memberof Queue
    */
-  constructor(opts: QueueOpts = {}, data: ReadonlyArray<V> = []) {
+  constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (opts === undefined) throw new Error(`opts parameter undefined`);
 
     this.opts = opts;
@@ -24,8 +25,8 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
 
   forEach(fn: (v: V) => void) {
     //eslint-disable-next-line functional/no-let
-    for (let i = this.data.length - 1; i >= 0; i--) {
-      fn(this.data[i]);
+    for (let index = this.data.length - 1; index >= 0; index--) {
+      fn(this.data[ index ]);
     }
   }
 
@@ -84,9 +85,9 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  * @returns A new queue
  */
 export const immutable = <V>(
-  opts: QueueOpts = {},
+  opts: QueueOpts<V> = {},
   ...startingItems: ReadonlyArray<V>
 ): IQueueImmutable<V> => {
   opts = { ...opts }; // Make a copy of options
-  return new QueueImmutable(opts, [...startingItems]); // Make a copy of array so it can't be modified
+  return new QueueImmutable(opts, [ ...startingItems ]); // Make a copy of array so it can't be modified
 };

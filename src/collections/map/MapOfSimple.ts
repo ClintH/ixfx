@@ -1,8 +1,9 @@
-import type { IsEqual, ToString } from '../../Util.js';
+import type { ToString } from '../../Util.js';
 import type { IMapOf } from './IMapOf.js';
 import type { IMapOfImmutable } from './IMapOfImmutable.js';
-import { defaultKeyer, isEqualDefault } from '../../Util.js';
+import { defaultKeyer } from '../../Util.js';
 import { MapOfSimpleBase } from './MapOfSimpleBase.js';
+import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
 
 /**
  * Simple immutable MapOf
@@ -11,28 +12,28 @@ export class MapOfSimple<V>
   extends MapOfSimpleBase<V>
   implements IMapOf<V>, IMapOfImmutable<V>
 {
-  addKeyedValues(key: string, ...values: readonly V[]): IMapOfImmutable<V> {
+  addKeyedValues(key: string, ...values: ReadonlyArray<V>): IMapOfImmutable<V> {
     //const asEntries = values.map(v => [key, v]) as [string, V[]][];
     //return this.addBatch(asEntries);
-    return this.addBatch([[key, values]]);
+    return this.addBatch([ [ key, values ] ]);
   }
 
-  addValue(...values: readonly V[]): IMapOfImmutable<V> {
-    const asEntries = values.map((v) => [this.groupBy(v), v]) as [
+  addValue(...values: ReadonlyArray<V>): IMapOfImmutable<V> {
+    const asEntries = values.map((v) => [ this.groupBy(v), v ]) as Array<[
       string,
       V[]
-    ][];
+    ]>;
     return this.addBatch(asEntries);
   }
 
   //eslint-disable-next-line functional/prefer-immutable-types
-  addBatch(entries: [key: string, value: readonly V[]][]): IMapOfImmutable<V> {
+  addBatch(entries: Array<[ key: string, value: readonly V[] ]>): IMapOfImmutable<V> {
     // Deep copy Map
-    const tmp = new Map<string, V[]>(
-      [...this.map.entries()].map((e) => [e[0], [...e[1]]])
+    const tmp = new Map<string, Array<V>>(
+      [ ...this.map.entries() ].map((e) => [ e[ 0 ], [ ...e[ 1 ] ] ])
     );
 
-    for (const [key, list] of entries) {
+    for (const [ key, list ] of entries) {
       // Does key exist already
       const existingList = tmp.get(key);
       if (typeof existingList === `undefined`) {
@@ -44,7 +45,7 @@ export class MapOfSimple<V>
         existingList.push(...list);
       }
     }
-    return new MapOfSimple<V>(this.groupBy, this.valueEq, [...tmp.entries()]);
+    return new MapOfSimple<V>(this.groupBy, this.valueEq, [ ...tmp.entries() ]);
   }
 
   clear(): IMapOfImmutable<V> {
@@ -56,18 +57,18 @@ export class MapOfSimple<V>
   }
 
   deleteByValue(value: V, eq?: IsEqual<V>): IMapOfImmutable<V> {
-    const entries = [...this.map.entries()];
+    const entries = [ ...this.map.entries() ];
     const eqFn = eq ?? this.valueEq;
     const x = entries.map((entry) => {
-      const key = entry[0];
-      const values = entry[1].filter((vv) => !eqFn(vv, value)) as readonly V[];
-      return [key, values] as [string, V[]];
+      const key = entry[ 0 ];
+      const values = entry[ 1 ].filter((vv) => !eqFn(vv, value)) as ReadonlyArray<V>;
+      return [ key, values ] as [ string, Array<V> ];
     });
     return new MapOfSimple<V>(this.groupBy, this.valueEq, x);
   }
 
   delete(key: string): IMapOfImmutable<V> {
-    const entries = [...this.map.entries()].filter((e) => e[0] !== key);
+    const entries = [ ...this.map.entries() ].filter((e) => e[ 0 ] !== key);
     return new MapOfSimple<V>(this.groupBy, this.valueEq, entries);
   }
 }

@@ -1,4 +1,5 @@
-import type { IsEqual, ToString } from '../../Util.js';
+import type { ToString } from 'src/Util.js';
+import type { IsEqual } from '../../IsEqual.js';
 export { ofArrayMutable } from './MapOfArrayMutable.js';
 export {
   ofSimpleMutable as mapOfSimpleMutable,

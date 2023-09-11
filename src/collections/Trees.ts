@@ -1,5 +1,5 @@
 // #region Imports
-import { type IsEqual, isEqualDefault } from '../Util.js';
+import { type IsEqual, isEqualDefault } from '../IsEqual.js';
 import { QueueMutable } from './queue/QueueMutable.js';
 import { StackMutable } from './stack/StackMutable.js';
 import { betweenChomp } from '../Text.js';
@@ -11,7 +11,7 @@ import { last } from '../IterableSync.js';
 
 export { treeNodeMutable, TreeNodeMutable };
 
-export type Entry = readonly [name: string, value: any];
+export type Entry = readonly [ name: string, value: any ];
 
 /**
  * TreeNode type
@@ -81,7 +81,7 @@ export const getLengthChildren = (p: TreeNode | object): number => {
       return p.getLengthChildren();
     }
   }
-  return [...directChildren(p)].length;
+  return [ ...directChildren(p) ].length;
 };
 
 function prettyPrintEntryPath(entries: readonly Entry[]) {
@@ -90,7 +90,7 @@ function prettyPrintEntryPath(entries: readonly Entry[]) {
   let t = '';
   for (let i = 0; i < entries.length; i++) {
     t += '  '.repeat(i);
-    t += entries[i][0] + ' = ' + JSON.stringify(entries[i][1]) + '\n';
+    t += entries[ i ][ 0 ] + ' = ' + JSON.stringify(entries[ i ][ 1 ]) + '\n';
   }
   return t;
 }
@@ -112,15 +112,14 @@ export const prettyPrint = (
 ): string => {
   nullUndef(node, `node`);
   const entry = getEntry(node, defaultLabel);
-  const t = `${'  '.repeat(indent)} + label: ${
-    entry[0]
-  } value: ${JSON.stringify(entry[1])}`;
-  const children = [...directChildren(node, defaultLabel)];
+  const t = `${ '  '.repeat(indent) } + label: ${ entry[ 0 ]
+    } value: ${ JSON.stringify(entry[ 1 ]) }`;
+  const children = [ ...directChildren(node, defaultLabel) ];
   if (children.length) {
     return (
       t +
       '\n' +
-      children.map((d) => prettyPrint(d[1], indent + 1, d[0])).join('\n')
+      children.map((d) => prettyPrint(d[ 1 ], indent + 1, d[ 0 ])).join('\n')
     );
   } else {
     return t;
@@ -173,7 +172,7 @@ export function* directChildren(
   if (Array.isArray(node)) {
     if (!defaultName) defaultName = 'array';
     for (let i = 0; i < node.length; i++) {
-      yield [defaultName + '[' + i.toString() + ']', node[i]];
+      yield [ defaultName + '[' + i.toString() + ']', node[ i ] ];
     }
   } else if (isTreeNode(node)) {
     for (const n of node.children()) yield getEntry(n);
@@ -196,7 +195,7 @@ function findDirectChildByLabel(
   node: object
 ): Entry | undefined {
   for (const d of directChildren(node)) {
-    if (d[0] === label) return d;
+    if (d[ 0 ] === label) return d;
   }
 }
 
@@ -233,7 +232,7 @@ export function getByPath(
 ): Entry {
   // ✔️ Unit tested
   const v = last(traceByPath(path, node, opts));
-  if (!v) throw new Error(`Could not trace path: ${path}`);
+  if (!v) throw new Error(`Could not trace path: ${ path }`);
   return v;
 }
 
@@ -283,24 +282,24 @@ export function* traceByPath(
     //eslint-disable-next-line functional/no-let
     let e = findDirectChildByLabel(p, node);
     if (allowArrayIndexes) {
-      const [withoutBrackets, arrayIndexStr] = betweenChomp(p, '[', ']');
+      const [ withoutBrackets, arrayIndexStr ] = betweenChomp(p, '[', ']');
       const arrayIndex = integerParse(arrayIndexStr, 'positive', -1);
       if (arrayIndex >= 0) {
         // Get array by name without the []
         e = findDirectChildByLabel(withoutBrackets, node);
 
-        if (e && Array.isArray(e[1])) {
+        if (e && Array.isArray(e[ 1 ])) {
           // Result was array as expected
-          e = [p, e[1][arrayIndex]];
+          e = [ p, e[ 1 ][ arrayIndex ] ];
         }
       }
     }
 
     if (!e) {
-      yield [p, undefined];
+      yield [ p, undefined ];
       return;
     }
-    node = e[1];
+    node = e[ 1 ];
     yield e;
   }
 }
@@ -314,9 +313,9 @@ export function* traceByPath(
  */
 function getEntry(node: object, defaultLabel = ''): Entry {
   if ('label' in node) {
-    return [node.label as string, node];
+    return [ node.label as string, node ];
   }
-  return [defaultLabel, node];
+  return [ defaultLabel, node ];
 }
 
 /**
@@ -335,7 +334,7 @@ export function* depthFirst(root: object): IterableIterator<Entry> {
     yield entry;
     if (entry) {
       //eslint-disable-next-line functional/immutable-data
-      stack.push(...directChildren(entry[1], entry[0]));
+      stack.push(...directChildren(entry[ 1 ], entry[ 0 ]));
     }
     if (stack.isEmpty) break;
     //eslint-disable-next-line functional/immutable-data
@@ -357,7 +356,7 @@ export function* breadthFirst(root: object): IterableIterator<Entry> {
   while (entry) {
     yield entry;
     if (entry) {
-      queue.enqueue(...directChildren(entry[1], entry[0]));
+      queue.enqueue(...directChildren(entry[ 1 ], entry[ 0 ]));
     }
     if (queue.isEmpty) break;
     entry = queue.dequeue();

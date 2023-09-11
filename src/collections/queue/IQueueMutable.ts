@@ -17,6 +17,7 @@
  * ```
  *
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IQueueMutable<V> {
   /**
    * Returns true if queue is empty
@@ -48,5 +49,5 @@ export interface IQueueMutable<V> {
   /**
    * Data in queue as an array
    */
-  get data(): readonly V[];
+  get data(): ReadonlyArray<V>;
 }

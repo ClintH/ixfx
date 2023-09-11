@@ -1,4 +1,4 @@
-import { isEqualDefault } from '../../Util.js';
+import { isEqualDefault } from '../../IsEqual.js';
 import { type ICircularArray, circularArray } from '../CircularArray.js';
 import type { MapMultiOpts, MultiValue } from './MapMulti.js';
 import { MapOfMutableImpl } from './MapOfMultiImpl.js';
