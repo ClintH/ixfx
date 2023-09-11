@@ -7,6 +7,7 @@ import * as Palette from './Palette.js';
 import * as Colour from './Colour.js';
 import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
+import { resolveEl } from '../dom/Util.js';
 
 export * as ImageDataGrid from './ImageDataGrid.js';
 export * as BipolarView from './BipolarView.js';
@@ -15,6 +16,7 @@ export * as Drawing from './Drawing.js';
 export * as Svg from './Svg.js';
 export * as Plot from './Plot.js';
 export * as Plot2 from './Plot2.js';
+export * as Plot3 from './Plot3.js';
 export * as SceneGraph from './SceneGraph.js';
 
 /**
@@ -75,3 +77,42 @@ try {
   /* no-op */
 }
 
+/**
+ * Scales a canvas to account for retina displays.
+ * 
+ * ```js
+ * const r = scaleCanvas(`#my-canvas`);
+ * r.ctx;      // CanvasRendering2D
+ * r.element;  // HTMLCanvasElement
+ * r.bounds;   // {x:number,y:number,width:number,height:number}
+ * ```
+ * 
+ * Eg:
+ * ```js
+ * const { ctx } = scaleCanvas(`#my-canvas`);
+ * ctx.fillStyle = `red`;
+ * ctx.fillRect(0,0,100,100);
+ * ```
+ * 
+ * Throws an error if `domQueryOrElement` does not resolve.w
+ * @param domQueryOrElement 
+ * @returns 
+ */
+export const scaleCanvas = (domQueryOrElement: HTMLCanvasElement | string) => {
+  const canvasElement = resolveEl<HTMLCanvasElement>(domQueryOrElement);
+  const ratio = window.devicePixelRatio;
+  canvasElement.style.width = canvasElement.width + `px`;
+  canvasElement.style.height = canvasElement.height + `px`;
+  canvasElement.width *= devicePixelRatio;
+  canvasElement.height *= devicePixelRatio;
+
+  const getContext = () => {
+    const ctx = canvasElement.getContext(`2d`);
+
+    if (ctx === null) throw new Error(`Could not get drawing context`);
+    ctx.save();
+    ctx.scale(ratio, ratio);
+    return ctx;
+  }
+  return { ctx: getContext(), element: canvasElement, bounds: canvasElement.getBoundingClientRect() };
+}
