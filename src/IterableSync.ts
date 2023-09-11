@@ -10,7 +10,8 @@
  * @returns
  */
 
-import { type IsEqual, type ToString, toStringDefault } from './Util.js';
+import { type ToString, toStringDefault } from './Util.js';
+import { type IsEqual } from './IsEqual.js';
 
 /**
  * Returns a function that yields a value from a generator.
