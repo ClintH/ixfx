@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { QueueMutable, StackMutable } from "../../collections/index.js"
-import { PriorityMutable } from "../../collections/queue/PriorityMutable.js"
 import { immutable as immutableMap, type IMapImmutable } from "../../collections/map/Map.js"
-import { NumberMap } from "../../collections/map/NumberMap.js"
-import { Sync } from "../../Generators.js"
+
 
 export type Vertex = Readonly<{
   id: string
