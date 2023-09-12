@@ -1052,8 +1052,8 @@ export const compareValuesEqual = <V>(
   b: ArrayLike<V>,
   eq = isEqualDefault<V>
 ): boolean => {
-  const ret = compareValues(a, b, eq);
-  return ret.a.length === 0 && ret.b.length === 0;
+  const returnValue = compareValues(a, b, eq);
+  return returnValue.a.length === 0 && returnValue.b.length === 0;
 };
 
 /**
