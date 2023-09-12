@@ -1,4 +1,5 @@
 import { type EitherKey } from '../index.js';
+import type { IMapBase } from './IMapBase.js';
 import { add, del, set } from './MapImmutableFns.js';
 
 /**
@@ -18,7 +19,8 @@ import { add, del, set } from './MapImmutableFns.js';
  * @template K Type of map keys. Typically `string`
  * @template V Type of stored values
  */
-export interface IMapImmutable<K, V> {
+//eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface IMapImmutable<K, V> extends IMapBase<K, V> {
   /**
    * Adds one or more items, returning the changed map.
    *
@@ -41,15 +43,7 @@ export interface IMapImmutable<K, V> {
    * Returns an empty map
    */
   clear(): IMapImmutable<K, V>;
-  /**
-   * Returns an item by key, or _undefined_ if not found
-   * @example
-   * ```js
-   * const item = map.get(`hello`);
-   * ```
-   * @param key
-   */
-  get(key: K): V | undefined;
+
 
   /**
    * Sets `key` to be `value`, overwriting anything existing.
@@ -59,30 +53,6 @@ export interface IMapImmutable<K, V> {
    */
   set(key: K, value: V): IMapImmutable<K, V>;
 
-  /**
-   * Returns _true_ if map contains `key`
-   * @example
-   * ```js
-   * if (map.has(`hello`)) ...
-   * ```
-   * @param key
-   */
-  has(key: K): boolean;
-  /**
-   * Returns _true_ if map is empty
-   */
-  isEmpty(): boolean;
-  /**
-   * Iterates over entries (in the form of [key,value])
-   *
-   * @example
-   * ```js
-   * for (const [key, value] of map.entries()) {
-   *  // Use key, value...
-   * }
-   * ```
-   */
-  entries(): IterableIterator<readonly [K, V]>;
 }
 
 /**
@@ -131,7 +101,8 @@ export const immutable = <K, V>(
   dataOrMap?: ReadonlyMap<K, V> | EitherKey<K, V>
 ): IMapImmutable<K, V> => {
   if (dataOrMap === undefined) return immutable([]);
-  if (Array.isArray(dataOrMap)) return immutable(add(new Map(), ...dataOrMap));
+  if (Array.isArray(dataOrMap)) return immutable<K, V>(add(new Map(), ...dataOrMap));
+
   const data = dataOrMap as ReadonlyMap<K, V>;
   return {
     add: (...itemsToAdd: EitherKey<K, V>) => {
@@ -148,6 +119,7 @@ export const immutable = <K, V>(
     clear: () => immutable(),
     has: (key: K) => data.has(key),
     entries: () => data.entries(),
+    values: () => data.values(),
     isEmpty: () => data.size === 0,
   };
 };

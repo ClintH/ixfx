@@ -1,3 +1,5 @@
+import { NumberMap } from './NumberMap.js';
+
 export type GetOrGenerate<K, V, Z> = (key: K, args?: Z) => Promise<V>;
 export { create as expiringMap, ExpiringMap } from './ExpiringMap.js';
 export type {
@@ -15,5 +17,6 @@ export type { MapCircularOpts } from './MapOfCircularMutable.js';
 export type { IMapOfMutable } from './IMapOfMutable.js';
 export type { IMappish, IWithEntries } from './IMappish.js';
 export type { MapArrayOpts } from './MapOfArrayMutable.js';
+export { NumberMap } from './NumberMap.js';
 export * from './MapMulti.js';
 export * from './MapFns.js';

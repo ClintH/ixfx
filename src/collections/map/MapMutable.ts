@@ -1,4 +1,5 @@
 import { type EitherKey } from '../index.js';
+import type { IMapBase } from './IMapBase.js';
 import { add, del, set, has } from './MapImmutableFns.js';
 
 /**
@@ -9,7 +10,8 @@ import { add, del, set, has } from './MapImmutableFns.js';
  * @template K Type of map keys. Typically `string`
  * @template V Type of stored values
  */
-export interface IMapMutable<K, V> {
+//eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface IMapMutable<K, V> extends IMapBase<K, V> {
   /**
    * Adds one or more items to map
    *
@@ -39,38 +41,6 @@ export interface IMapMutable<K, V> {
    * Clears map
    */
   clear(): void;
-  /**
-   * Gets an item by key
-   * @example
-   * ```js
-   * const item = map.get(`hello`);
-   * ```
-   * @param key
-   */
-  get(key: K): V | undefined;
-  /**
-   * Returns _true_ if map contains key
-   * @example
-   * ```js
-   * if (map.has(`hello`)) ...
-   * ```
-   * @param key
-   */
-  has(key: K): boolean;
-  /**
-   * Returns _true_ if map is empty
-   */
-  isEmpty(): boolean;
-  /**
-   * Iterates over entries (consisting of [key,value])
-   * @example
-   * ```js
-   * for (const [key, value] of map.entries()) {
-   *  // Use key, value...
-   * }
-   * ```
-   */
-  entries(): IterableIterator<readonly [K, V]>;
 }
 
 /**
@@ -110,6 +80,7 @@ export const mutable = <K, V>(...data: EitherKey<K, V>): IMapMutable<K, V> => {
     },
     get: (key: K): V | undefined => m.get(key),
     entries: () => m.entries(),
+    values: () => m.values(),
     isEmpty: () => m.size === 0,
     has: (key: K) => has(m, key),
   };
