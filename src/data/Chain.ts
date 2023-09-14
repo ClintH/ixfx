@@ -8,34 +8,50 @@ import { isAsyncIterable } from "../Iterable.js";
 import { Queues } from "../collections/index.js";
 import { throwIntegerTest } from "../Guards.js";
 
-type GenAsync<V> = AsyncGenerator<V>
-type Gen<V> = Generator<V> | AsyncGenerator<V> | IterableIterator<V>;
+/**
+ * A Generator, AsyncGenerator or IterableIterator
+ */
+export type Gen<V> = Generator<V> | AsyncGenerator<V> | IterableIterator<V>;
 type GenOrData<V> = Array<V> | Gen<V>;
 
-type GenFactory<In, Out> = (input: GenOrData<In>) => GenAsync<Out>;
-type GenFactoryNoInput<Out> = () => GenAsync<Out>;
+type Chain<In, Out> = (input: GenOrData<In>) => AsyncGenerator<Out>;
+
+type GenFactoryNoInput<Out> = () => AsyncGenerator<Out>;
 
 export type ChainArguments<In, Out> = [
-  GenFactory<In, any> | GenOrData<In> | GenFactoryNoInput<Out>,
-  ...Array<GenFactory<any, any>>,
-  GenFactory<any, Out>
+  Chain<In, any> | GenOrData<In> | GenFactoryNoInput<Out>,
+  ...Array<Chain<any, any>>,
+  Chain<any, Out>
 ]
 
+/**
+ * Wrap the primitive value as generator
+ * @param value 
+ */
 function* primitiveToGenerator(value: number | boolean | string) {
   yield value;
 }
 
+/**
+ * Wrap the primitive value as an async generator
+ * @param value 
+ */
 async function* primitiveToAsyncGenerator(value: number | boolean | string) {
   yield value;
   await sleep(1);
 }
 
-function resolveToGenAsync<V>(input: GenOrData<V> | GenFactoryNoInput<V>): GenAsync<V> {
+/**
+ * Resolve the data, primitive or function to an AsyncGenerator
+ * @param input 
+ * @returns 
+ */
+function resolveToAsyncGen<V>(input: GenOrData<V> | GenFactoryNoInput<V>): AsyncGenerator<V> {
   if (Array.isArray(input)) {
     return Async.fromArray(input);
   } else if (typeof input === `number` || typeof input === `boolean` || typeof input === `string`) {
     // Assumes V is primitive
-    return primitiveToAsyncGenerator(input) as GenAsync<V>;
+    return primitiveToAsyncGenerator(input) as AsyncGenerator<V>;
   } else if (typeof input === `function`) {
     return input();
   } else if (isAsyncIterable(input)) {
@@ -44,6 +60,11 @@ function resolveToGenAsync<V>(input: GenOrData<V> | GenFactoryNoInput<V>): GenAs
   return Async.fromIterable(input);
 }
 
+/**
+ * Resolve the array, data or function to a Generator
+ * @param input 
+ * @returns 
+ */
 function resolveToGen<V>(input: GenOrData<V> | GenFactoryNoInput<V>): Gen<V> {
   if (Array.isArray(input)) {
     const a = input.values();
@@ -58,17 +79,30 @@ function resolveToGen<V>(input: GenOrData<V> | GenFactoryNoInput<V>): Gen<V> {
   return input;
 }
 
+/**
+ * Delay options
+ */
 export type DelayOptions = {
+  /**
+   * Time before yielding
+   */
   before?: Interval,
+  /**
+   * Time after yielding
+   */
   after?: Interval
 }
 
-
-export function delay<In>(options: DelayOptions): GenFactory<In, In> {
+/**
+ * Add delay before/after values are emitted from the input stream.
+ * @param options 
+ * @returns 
+ */
+export function delay<In>(options: DelayOptions): Chain<In, In> {
   const before = intervalToMs(options.before, 0);
   const after = intervalToMs(options.after, 0);
 
-  async function* delay(input: GenOrData<In>): GenAsync<In> {
+  async function* delay(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     for await (const value of input) {
       if (before > 0) {
@@ -101,10 +135,10 @@ export function delay<In>(options: DelayOptions): GenFactory<In, In> {
  * @param rate 
  * @returns 
  */
-export function debounce<In>(rate: Interval): GenFactory<In, In> {
+export function debounce<In>(rate: Interval): Chain<In, In> {
   const rateMs = intervalToMs(rate, 0);
 
-  async function* debounce(input: GenOrData<In>): GenAsync<In> {
+  async function* debounce(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     let elapsed = Elapsed.since();
     for await (const value of input) {
@@ -118,14 +152,15 @@ export function debounce<In>(rate: Interval): GenFactory<In, In> {
 }
 
 /**
- * Allow values through until a duration has elapsed
+ * Allow values through until a duration has elapsed. After
+ * that, the chain stops.
  * @param duration 
  * @returns 
  */
-export function duration<In>(elapsed: Interval): GenFactory<In, In> {
+export function duration<In>(elapsed: Interval): Chain<In, In> {
   const durationMs = intervalToMs(elapsed, 0);
 
-  async function* duration(input: GenOrData<In>): GenAsync<In> {
+  async function* duration(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     const elapsed = Elapsed.since();
     for await (const value of input) {
@@ -136,8 +171,6 @@ export function duration<In>(elapsed: Interval): GenFactory<In, In> {
   duration._name = `duration`;
   return duration;
 }
-
-
 
 export type TickOptions = {
   interval: Interval
@@ -163,7 +196,7 @@ export function tick(options: TickOptions): GenFactoryNoInput<number> {
   let looped = 0;
   const durationTime = intervalToMs(options.elapsed, Number.MAX_SAFE_INTEGER);
 
-  async function* ts(): GenAsync<number> {
+  async function* ts(): AsyncGenerator<number> {
     const elapsed = Elapsed.since();
     while (looped < loops && elapsed() < durationTime) {
       yield asClockTime ? Date.now() : elapsed();
@@ -179,16 +212,19 @@ export function tick(options: TickOptions): GenFactoryNoInput<number> {
 }
 
 /**
- * Treats generator as a promise
+ * Treats the chain/generator as a promise
  * 
  * ```js
  * const ticker = asPromise(tick({ interval: 1000 }));
- * const x = await ticker(); //  Waits for 1000 before giving a value
+ * const x = await ticker(); //  Waits for 1000ms before giving a value
  * ```
+ * 
+ * This will only ever return one value. To return multiple values, it's necessary
+ * to call `asPromise` and `await` the result in a loop.
  * @param valueToWrap 
  * @returns 
  */
-export function asPromise<V>(valueToWrap: GenAsync<V> | GenFactoryNoInput<V>) {
+export function asPromise<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>) {
   let lastValue: V | undefined;
 
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;
@@ -203,9 +239,9 @@ export function asPromise<V>(valueToWrap: GenAsync<V> | GenFactoryNoInput<V>) {
 }
 
 /**
- * Returns the most recent value from the generator, or
- * `initialValue` (defaulting to _undefined_) if there is no
- * value returned from generator.
+ * Returns the most recent value from the chain/generator, or
+ * `initialValue` (defaulting to _undefined_) if no value
+ * has been emitted yet.
  * 
  * ```js
  * const ticker = asValue(tick({ interval: 1000 }));
@@ -220,7 +256,7 @@ export function asPromise<V>(valueToWrap: GenAsync<V> | GenFactoryNoInput<V>) {
  * @param initialValue 
  * @returns 
  */
-export function asValue<V>(valueToWrap: GenAsync<V> | GenFactoryNoInput<V>, initialValue?: V) {
+export function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>, initialValue?: V) {
   let lastValue: V | undefined = initialValue;
   let awaiting = false;
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;
@@ -242,7 +278,7 @@ export function asValue<V>(valueToWrap: GenAsync<V> | GenFactoryNoInput<V>, init
 }
 
 /**
- * Calls `callback` whenever the generator produces a value.
+ * Calls `callback` whenever the chain/generator produces a value.
  * 
  * When using `asCallback`, call it with `await` to let generator run its course before continuing:
  * ```js
@@ -280,13 +316,13 @@ export async function asCallback<V>(valueToWrap: GenOrData<V> | GenFactoryNoInpu
  * @param chain 
  * @returns 
  */
-export async function asArray<Out>(valueToWrap: GenAsync<Out> | GenFactoryNoInput<Out>): Promise<Array<Out>> {
+export async function asArray<Out>(valueToWrap: AsyncGenerator<Out> | GenFactoryNoInput<Out>): Promise<Array<Out>> {
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;
   return Async.toArray(outputType);
 }
 
 /**
- * Adds values to an array as they are produced,
+ * Adds values to the provided array as they are produced,
  * mutating array.
  * 
  * ```js
@@ -297,7 +333,7 @@ export async function asArray<Out>(valueToWrap: GenAsync<Out> | GenFactoryNoInpu
  * @param chain 
  * @param array 
  */
-export async function addToArray<Out>(array: Array<Out>, valueToWrap: GenAsync<Out> | GenFactoryNoInput<Out>) {
+export async function addToArray<Out>(array: Array<Out>, valueToWrap: AsyncGenerator<Out> | GenFactoryNoInput<Out>) {
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;
   for await (const value of outputType) {
     array.push(value);
@@ -305,23 +341,31 @@ export async function addToArray<Out>(array: Array<Out>, valueToWrap: GenAsync<O
 }
 
 /**
- * Input a single value, return a single value
+ * Input a single value to the chain, return a single result
  * @param f 
  * @param input 
  * @returns 
  */
-export async function single<In, Out>(f: GenFactory<In, Out>, input: In): Promise<Out | undefined> {
+export async function single<In, Out>(f: Chain<In, Out>, input: In): Promise<Out | undefined> {
   const iterator = await f([ input ]).next();
   return iterator.value as Out | undefined;
 }
 
 /**
  * Takes an array of values, flattening to a single one
- * @param flattener 
+ * using the provided `flattener` function.
+ * 
+ * ```js
+ * // Create a chain that flattens values
+ * const flatten = Chains.flatten(values => Math.max(...values));
+ * // Feed it a single input (an array), get a single output back:
+ * const result = await Chains.single(flatten, [ 1, 2, 3]); // 3
+ * ```
+ * @param flattener Function to flatten array of values to a single value
  * @returns 
  */
-export function flatten<In, Out>(flattener: (v: Array<In>) => Out): GenFactory<Array<In>, Out> {
-  async function* flatten(input: GenOrData<Array<In>>): GenAsync<Out> {
+export function flatten<In, Out>(flattener: (v: Array<In>) => Out): Chain<Array<In>, Out> {
+  async function* flatten(input: GenOrData<Array<In>>): AsyncGenerator<Out> {
     input = resolveToGen(input);
     for await (const value of input) {
       yield flattener(value);
@@ -331,9 +375,13 @@ export function flatten<In, Out>(flattener: (v: Array<In>) => Out): GenFactory<A
   return flatten;
 }
 
-
-export function transform<In, Out>(transformer: (v: In) => Out): GenFactory<In, Out> {
-  async function* transform(input: GenOrData<In>): GenAsync<Out> {
+/**
+ * Transform values from one type to another. Just like a map function.
+ * @param transformer 
+ * @returns 
+ */
+export function transform<In, Out>(transformer: (v: In) => Out): Chain<In, Out> {
+  async function* transform(input: GenOrData<In>): AsyncGenerator<Out> {
     input = resolveToGen(input);
     for await (const value of input) {
       yield transformer(value);
@@ -347,16 +395,17 @@ export function transform<In, Out>(transformer: (v: In) => Out): GenFactory<In, 
  * Merge values from several sources into one stream, interleaving values.
  * When all streams are complete it finishes.
  * 
- * Alternatively, {@link mergeAsArray} emits snapshots of all the generators, as quickly as the fastest one
- * Or {@link synchronise} which releases a set of results when all inputs have emitted a value
+ * Alternatively:
+ * - {@link mergeAsArray} emits snapshots of all the generators, as quickly as the fastest one
+ * - {@link synchronise} which releases a set of results when all inputs have emitted a value
  * @param sources 
  */
-export async function* mergeFlat<Out>(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): GenAsync<Out> {
-  const sourcesInput = sources.map(source => resolveToGenAsync(source));
+export async function* mergeFlat<Out>(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): AsyncGenerator<Out> {
+  const sourcesInput = sources.map(source => resolveToAsyncGen(source));
   const buffer = Queues.mutable<Out>();
   let completed = 0;
 
-  const schedule = async (source: GenAsync<any>) => {
+  const schedule = async (source: AsyncGenerator<any>) => {
     const x = await source.next();
     if (x.done) {
       completed++;
@@ -400,7 +449,7 @@ export async function* mergeFlat<Out>(...sources: Array<GenOrData<any> | GenFact
  * - {@link synchronise} only return results when all sourcse have yielded a value
  * @param sources 
  */
-export async function* mergeAsArray(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): GenAsync<Array<any>> {
+export async function* mergeAsArray(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): AsyncGenerator<Array<any>> {
   const sourcesInput = sources.map(source => resolveToGen(source));
   let somethingProduced = true;
   while (somethingProduced) {
@@ -427,7 +476,18 @@ export async function* mergeAsArray(...sources: Array<GenOrData<any> | GenFactor
   }
 }
 
-export async function* synchronise(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): GenAsync<Array<any>> {
+/**
+ * Synchronise several sources, releasing a set of results when every
+ * source has produced something. Finishes as soon as _any_ source finishes.
+ * 
+ * ie. the rate of emitting data is determined by the slowest source.
+ * 
+ * Alternatively:
+ * - {@link mergeFlat} interleaves streams as single values
+ * - {@link mergeAsArray} emits snapshots of all the generators, as quickly as the fastest one
+ * @param sources 
+ */
+export async function* synchronise(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): AsyncGenerator<Array<any>> {
   const sourcesInput = sources.map(source => resolveToGen(source));
   let somethingStopped = false;
   while (!somethingStopped) {
@@ -455,8 +515,13 @@ export async function* synchronise(...sources: Array<GenOrData<any> | GenFactory
   }
 }
 
-export function cap<In>(limit: number): GenFactory<In, In> {
-  async function* cap(input: GenOrData<In>): GenAsync<In> {
+/**
+ * Emits up to a capped amount of items from the input
+ * @param limit 
+ * @returns 
+ */
+export function cap<In>(limit: number): Chain<In, In> {
+  async function* cap(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     let yielded = 0;
     for await (const value of input) {
@@ -474,8 +539,8 @@ export function cap<In>(limit: number): GenFactory<In, In> {
  * @param limit 
  * @returns 
  */
-export function tally<In>(): GenFactory<In, number> {
-  async function* tally(input: GenOrData<In>): GenAsync<number> {
+export function tally<In>(): Chain<In, number> {
+  async function* tally(input: GenOrData<In>): AsyncGenerator<number> {
     input = resolveToGen(input);
     let count = 0;
     for await (const _ of input) {
@@ -492,9 +557,9 @@ export function tally<In>(): GenFactory<In, number> {
  * @param returnRemainders If true (default) left over data that didn't make a full chunk is also returned
  * @returns 
  */
-export function chunk<In>(size: number, returnRemainders = true): GenFactory<In, Array<In>> {
+export function chunk<In>(size: number, returnRemainders = true): Chain<In, Array<In>> {
   throwIntegerTest(size, `aboveZero`, `size`);
-  async function* chunk(input: GenOrData<In>): GenAsync<Array<In>> {
+  async function* chunk(input: GenOrData<In>): AsyncGenerator<Array<In>> {
     input = resolveToGen(input);
     let buffer: Array<In> = [];
     for await (const value of input) {
@@ -510,8 +575,14 @@ export function chunk<In>(size: number, returnRemainders = true): GenFactory<In,
   return chunk;
 }
 
-export function filter<In>(predicate: (v: In) => boolean): GenFactory<In, In> {
-  async function* filter(input: GenOrData<In>): GenAsync<In> {
+/**
+ * Filters the input source, only allowing through
+ * data for which `predicate` returns _true_
+ * @param predicate 
+ * @returns 
+ */
+export function filter<In>(predicate: (v: In) => boolean): Chain<In, In> {
+  async function* filter(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     for await (const value of input) {
       if (predicate(value)) {
@@ -523,33 +594,34 @@ export function filter<In>(predicate: (v: In) => boolean): GenFactory<In, In> {
   return filter;
 }
 
-
-
-export async function* chain<In, Out>(...functions: ChainArguments<In, Out>): GenAsync<Out> {
+/**
+ * Chain functions together.
+ * 
+ * @example Process an array of strings. Transforming into
+ * integers, and then filtering only even numbers.
+ * ```js
+ * const ch = Chains.chain(
+ *  [ `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10` ],
+ *  Chains.transform<string, number>(v => Number.parseInt(v)),
+ *  Chains.filter(v => v % 2 === 0)
+ *);
+ * const output = await Async.toArray(ch2);
+ * // [ 2, 4, 6, 8, 10 ]
+ * ```
+ * @param functions 
+ * @returns 
+ */
+export async function* chain<In, Out>(...functions: ChainArguments<In, Out>): AsyncGenerator<Out> {
   let input: Gen<In> | undefined;
   for (const fnOrData of functions) {
-    // console.log(`chain: fnOrData: ${ JSON.stringify(fnOrData) }`);
-    // if (`_name` in fnOrData) {
-    //   console.log(` fnOrData name: ${ fnOrData._name as string }`);
-    // }
-    // if (input && `_name` in input) {
-    //   console.log(` input name: ${ input._name as string }`);
-    // }
     if (typeof fnOrData === `function`) {
       input = fnOrData(input ?? []);
     } else {
       input = resolveToGen(fnOrData);
-      //console.log(` input data resolved to: ${ JSON.stringify(input) }`);
     }
   }
   if (input === undefined) return;
   for await (const v of input) {
-    //console.log(`chain output: ${ JSON.stringify(v) }`);
     yield v as Out;
   }
-  //console.log(`Done`);
-  //return input;
-  //yield* input as Output<Out>;
 }
-
-//const t = chain<number, number>([ 1, 2, 3 ]);
