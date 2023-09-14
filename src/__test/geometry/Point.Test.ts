@@ -40,11 +40,24 @@ test(`withinRange`, t => {
 
 });
 
+test(`round`, t => {
+  t.like(Points.round({ x: 1.12345, y: 2.6789 }, 2), { x: 1.12, y: 2.67 });
+  t.like(Points.round({ x: -1.12345, y: -2.6789 }, 2), { x: -1.13, y: -2.68 });
+
+  // x,y separate
+  t.like(Points.round(1.12345, 2.6789, 2), { x: 1.12, y: 2.67 });
+
+  // with data
+  // @ts-expect-error
+  t.like(Points.round({ x: 1.12345, y: 2.6789, colour: `red` }, 2), { x: 1.12, y: 2.67, colour: `red` });
+
+})
+
 test(`normalise`, t => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
-  t.like(Points.normalise({ x: 5, y: 2 }), { x: 0.9284766908852594, y: 0.3713906763541037 });
-  t.like(Points.normalise({ x: -5, y: 2 }), { x: -0.9284766908852594, y: 0.3713906763541037 });
-  t.like(Points.normalise({ x: 5, y: -2 }), { x: 0.9284766908852594, y: -0.3713906763541037 });
+  t.like(Points.round(Points.normalise({ x: 5, y: 2 }), 2), { x: 0.92, y: 0.37 });
+  t.like(Points.round(Points.normalise({ x: -5, y: 2 }), 2), { x: -0.93, y: 0.37 });
+  t.like(Points.round(Points.normalise({ x: 5, y: -2 }), 2), { x: 0.92, y: -0.38 });
   t.pass();
 });
 
