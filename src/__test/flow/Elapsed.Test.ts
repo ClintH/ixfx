@@ -9,5 +9,5 @@ test('toString', (t) => {
   t.is(toString(fn), '100ms');
 
   const elapsed = since();
-  t.is(toString(elapsed), '0ms');
+  t.is(toString(elapsed, 0), '0ms');
 });
