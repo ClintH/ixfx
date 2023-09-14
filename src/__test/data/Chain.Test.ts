@@ -3,6 +3,7 @@ import * as Chains from '../../data/Chain.js';
 import { Async, count } from '../../Generators.js';
 import { sleep } from '../../flow/Sleep.js';
 import { Elapsed } from '../../flow/index.js';
+import { isApproximately } from '../../Numbers.js';
 
 const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
 
@@ -107,25 +108,28 @@ test(`addToArray`, async t => {
 });
 
 test('asPromise', async t => {
-  const tick = Chains.tick({ interval: 1000 });
+  const timeout = 100;
+  const loops = 10;
+  t.plan(loops);
+  const tick = Chains.tick({ interval: timeout, loops });
   const tickValue = Chains.asPromise(tick);
 
   setInterval(async () => {
-    console.log(`tickValue: ${ tickValue() }`);
-  }, 500);
+    const v = await tickValue();
+    t.assert(true);
+  }, timeout);
 
-  await sleep(5000);
+  await sleep(timeout * (loops + 1));
 });
 
 test('asValue', async t => {
-  const tick = Chains.tick({ interval: 1000 });
+  const tick = Chains.tick({ interval: 100 });
   const tickValue = Chains.asValue(tick);
-
-  setInterval(() => {
-    console.log(`tickValue: ${ tickValue() }`);
-  }, 500);
-
-  await sleep(5000);
+  const v1 = await tickValue();
+  t.falsy(v1);
+  await sleep(100);
+  const v2 = await tickValue();
+  t.truthy(v2);
 });
 
 
