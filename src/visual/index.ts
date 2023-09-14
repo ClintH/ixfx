@@ -1,6 +1,7 @@
 import * as Drawing from './Drawing.js';
 import * as Svg from './Svg.js';
-import * as Plot from './Plot.js';
+//import * as Plot from './Plot.js';
+
 import * as Plot2 from './Plot2.js';
 
 import * as Palette from './Palette.js';
@@ -15,8 +16,9 @@ export * as Palette from './Palette.js';
 export * as Drawing from './Drawing.js';
 export * as Svg from './Svg.js';
 export * as Plot from './Plot.js';
+
 export * as Plot2 from './Plot2.js';
-export * as Plot3 from './Plot3.js';
+//export * as Plot3 from './Plot3.js';
 export * as SceneGraph from './SceneGraph.js';
 
 /**
@@ -66,7 +68,6 @@ try {
         Plot2,
         Drawing,
         Svg,
-        Plot,
         Palette,
         Colour,
         Video,
