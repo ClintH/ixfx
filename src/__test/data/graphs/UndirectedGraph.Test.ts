@@ -9,9 +9,9 @@ test(`edgesForVertex`, t => {
 
   const edges = [ ...G.edgesForVertex(g, `0`) ];
   t.deepEqual(edges, [
-    { a: 0, b: 1 },
-    { a: 0, b: 2 },
-    { a: 0, b: 3 }
+    { a: `0`, b: `1`, weight: undefined },
+    { a: `0`, b: `2`, weight: undefined },
+    { a: `0`, b: `3`, weight: undefined }
   ]);
 });
 
