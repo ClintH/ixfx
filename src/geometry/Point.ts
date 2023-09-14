@@ -5,7 +5,7 @@ import { throwNumberTest } from '../Guards.js';
 import { clamp as clampNumber, wrap as wrapNumber } from '../data/index.js';
 import { Arrays } from '../collections/index.js';
 import { type RandomSource, defaultRandom } from '../Random.js';
-import { quantiseEvery as quantiseEveryNumber } from '../Numbers.js';
+import { quantiseEvery as quantiseEveryNumber, round as roundNumber } from '../Numbers.js';
 /**
  * A point, consisting of x, y and maybe z fields.
  */
@@ -1414,11 +1414,29 @@ export const normalise = (ptOrX: Point | number, y?: number): Point => {
   const l = length(pt);
   if (l === 0) return Points.Empty;
   return Object.freeze({
+    ...pt,
     x: pt.x / l,
     y: pt.y / l,
   });
 };
 
+/**
+ * Round the point's _x_ and _y_ to given number of digits
+ * @param ptOrX 
+ * @param yOrDigits 
+ * @param digits 
+ * @returns 
+ */
+export const round = (ptOrX: Point | number, yOrDigits?: number, digits?: number): Point => {
+  const pt = getPointParameter(ptOrX, yOrDigits);
+  digits = digits ?? yOrDigits;
+  digits = digits ?? 2;
+  return Object.freeze({
+    ...pt,
+    x: roundNumber(digits, pt.x),
+    y: roundNumber(digits, pt.y)
+  })
+}
 /**
  * Normalises a point by a given width and height
  * @param pt Point
