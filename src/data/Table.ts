@@ -52,7 +52,6 @@ export class Table<V> {
   asArray(): Array<Array<V | undefined>> {
     const r: Array<Array<V | undefined>> = [];
     for (const row of this.rows) {
-      console.log(`row: ${ JSON.stringify(row) }`);
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (row === undefined) r.push([]);
       else r.push([ ...row ]);
