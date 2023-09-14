@@ -99,8 +99,8 @@ export function toAdjacencyMatrix(graph: DirectedGraph): Table<boolean> {
   const v = [ ...graph.vertices.values() ];
   //const m: Array<Array<boolean>> = [];
   const table = new Table<boolean>();
-  table.labelColumns(v.map(vv => vv.id));
-  table.labelRows(v.map(vv => vv.id));
+  table.labelColumns(...v.map(vv => vv.id));
+  table.labelRows(...v.map(vv => vv.id));
 
   // const row: Array<boolean> = [];
   // for (let index = 0; index < v.length; index++) {
@@ -667,7 +667,8 @@ export function graphFromVertices(vertices: Iterable<Vertex>): DirectedGraph {
 }
 
 /**
- * Get all the cycles ('strongly-connected cycles') within the graph
+ * Get all the cycles ('strongly-connected-components') within the graph
+ * [Read more](https://en.wikipedia.org/wiki/Strongly_connected_component)
  * @param graph 
  * @returns 
  */

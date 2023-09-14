@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { immutable as immutableMap, type IMapImmutable } from "../../collections/map/Map.js"
+import { Table } from "../Table.js"
 
 
 export type Vertex = Readonly<{
@@ -19,7 +20,7 @@ export type Graph = Readonly<{
 
 export type ConnectOptions = Readonly<{
   a: string
-  b: string
+  b: string | Array<string>
   weight?: number
 }>
 
@@ -62,7 +63,7 @@ export const getConnection = (graph: Graph, a: string | Vertex, b: string | Vert
   const bb = resolveVertex(graph, b);
   for (const edge of graph.edges) {
     if (edge.a == aa.id && edge.b === bb.id) return edge;
-    if (edge.b == bb.id && edge.a === aa.id) return edge;
+    if (edge.a == bb.id && edge.b === aa.id) return edge;
   }
   return;
 }
@@ -98,9 +99,12 @@ export function connectTo(graph: Graph, a: string, b: string, weight?: number): 
 
 export function connect(graph: Graph, options: ConnectOptions): Graph {
   const { a, weight, b } = options;
+  const destinations = Array.isArray(b) ? b : [ b ];
 
-  const result = connectTo(graph, a, b, weight);
-  graph = result.graph;
+  for (const destination of destinations) {
+    const result = connectTo(graph, a, destination, weight);
+    graph = result.graph;
+  }
 
   return graph;
 }
@@ -116,28 +120,85 @@ export const graph = (...initialConnections: Array<ConnectOptions>): Graph => {
   return g;
 }
 
-export function toAdjacencyMatrix(graph: Graph) {
+export function toAdjacencyMatrix(graph: Graph): Table<boolean> {
   const v = [ ...graph.vertices.values() ];
-  const m: Array<Array<boolean>> = [];
-  const row: Array<boolean> = [];
-  for (let index = 0; index < v.length; index++) {
-    row[ index ] = false;
-  }
+
+  const table = new Table<boolean>();
+  table.labelColumns(...v.map(vv => vv.id));
+  table.labelRows(...v.map(vv => vv.id));
 
   // eslint-disable-next-line @typescript-eslint/prefer-for-of, unicorn/prevent-abbreviations
   for (let i = 0; i < v.length; i++) {
-    m[ i ] = [ ...row ];
+    table.setRow(i, v.length, false);
+
     const ii = v[ i ];
     // eslint-disable-next-line unicorn/prevent-abbreviations
     for (const [ j, jj ] of v.entries()) {
       const connected = hasConnection(graph, ii, jj);
       if (connected) {
-        console.log(`Yes ${ ii.id } -> ${ jj.id } i: ${ i } j: ${ j }`);
-        m[ i ][ j ] = true;
-      } else {
-        console.log(`ii: ${ ii.id } jj: ${ jj.id } - ${ i } j: ${ j }`);
+        table.set(i, j, true);
       }
     }
   }
-  return m;
+  return table;
+}
+
+/**
+ * Return a string representation of the graph for debug inspection
+ * @param graph 
+ * @returns 
+ */
+export const dumpGraph = (graph: Graph): string => {
+  const lines = debugGraphToArray(graph);
+  return lines.join(`\n`);
+}
+
+/**
+ * Return an array of a debug-print of every vertex.
+ * @param graph 
+ * @returns 
+ */
+const debugGraphToArray = (graph: Graph): Array<string> => {
+  const r: Array<string> = [];
+
+  r.push(`Vertices: ${ [ ...graph.vertices.values() ].map(v => v.id).join(`, `) }`);
+  // eslint-disable-next-line unicorn/no-array-push-push
+  r.push(`Edges:`);
+  for (const edge of graph.edges) {
+    r.push(stringForEdge(edge));
+  }
+  return r;
+}
+
+const stringForEdge = (edge: Edge) => {
+  const weight = edge.weight ? ` (${ edge.weight })` : ``;
+  return `${ edge.a } <-> ${ edge.b }${ weight }`
+}
+
+/**
+ * Iterate over all the vertices connectd to `context` vertex
+ * @param graph Graph
+ * @param context id or Vertex
+ * @returns 
+ */
+export function* adjacentVertices(graph: Graph, context: Vertex | string | undefined) {
+  if (context === undefined) return;
+  const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
+  if (vertex === undefined) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
+
+  for (const edge of graph.edges) {
+    if (edge.a === context) yield resolveVertex(graph, edge.b);
+    else if (edge.b === context) yield resolveVertex(graph, edge.a);
+  }
+}
+
+export function* edgesForVertex(graph: Graph, context: Vertex | string | undefined) {
+  if (context === undefined) return;
+  const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
+  if (vertex === undefined) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
+
+  for (const edge of graph.edges) {
+    if (edge.a === context) yield edge;
+    else if (edge.b === context) yield edge;
+  }
 }
