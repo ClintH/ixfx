@@ -1,3 +1,4 @@
+import { round } from '../Numbers.js';
 import { intervalToMs, type Interval } from './Interval.js';
 import { msElapsedTimer, relativeTimer } from './Timer.js';
 
@@ -119,22 +120,22 @@ export function progress(
   return () => t.elapsed;
 }
 
-export const toString = (millisOrFunction: number | Since | Interval): string => {
+export const toString = (millisOrFunction: number | Since | Interval, rounding = 2): string => {
   //eslint-disable-next-line functional/no-let
-  let interval = 0;
+  let interval: number | undefined = {} = 0;
   if (typeof millisOrFunction === `function`) {
     const intervalResult = millisOrFunction();
-    interval = (typeof intervalResult === `object`) ? intervalToMs(interval)! : intervalResult;
+    return toString(intervalResult);
   } else if (typeof millisOrFunction === `number`) {
     interval = millisOrFunction;
   } else if (typeof millisOrFunction === `object`) {
-    interval = intervalToMs(interval)!;
+    interval = intervalToMs(interval);
   }
 
   //eslint-disable-next-line functional/no-let
   let ms = intervalToMs(interval);
   if (typeof ms === `undefined`) return `(undefined)`;
-  if (ms < 1000) return `${ ms }ms`;
+  if (ms < 1000) return `${ round(rounding, ms) }ms`;
   ms /= 1000;
   if (ms < 120) return `${ ms.toFixed(1) }secs`;
   ms /= 60;
