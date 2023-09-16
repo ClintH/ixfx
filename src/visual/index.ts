@@ -18,7 +18,7 @@ export * as Svg from './Svg.js';
 export * as Plot from './Plot.js';
 
 export * as Plot2 from './Plot2.js';
-//export * as Plot3 from './Plot3.js';
+export * as PlotOld from './PlotOld.js';
 export * as SceneGraph from './SceneGraph.js';
 
 /**

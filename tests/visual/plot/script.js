@@ -21,12 +21,12 @@ const sine = Oscillators.sine(0.1);
 
 const loop2 = continuously(() => {
   const d = {
-    acc: {x: 6995, y: -3834, z: -1644},
-    gyro: {x: -35, y: 102, p: 213 * Math.random()}
+    acc: {x: 6995*Math.random(), y: -3834*Math.random(), z: -1644*Math.random()},
+    gyro: {x: -35*Math.random(), y: 102*Math.random(), z: 213 * Math.random()}
   };
-  p.add(d);
+  p.plot(d);
   p.update();
-});
+},100);
 loop2.start();
 
 const loop = continuously(() => {

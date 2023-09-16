@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { minIndex } from '../collections/NumericArrays.js';
 import { type PointCalculableShape } from '../geometry/Point.js';
 import { Arrays } from '../collections/index.js';
@@ -7,7 +6,8 @@ import { clamp, flip, scale } from '../data/index.js';
 import { parentSizeCanvas } from '../dom/Util.js';
 import * as Sg from './SceneGraph.js';
 
-import { textWidth } from './Drawing.js';
+import { textRect, textWidth } from './Drawing.js';
+
 import { getFieldPaths, getFieldByPath, ifNaN } from '../Util.js';
 import { throwNumberTest } from '../Guards.js';
 import type { RectPositioned } from 'src/geometry/Rect.js';
@@ -55,11 +55,15 @@ export type Opts = {
   /**
    * Colour for axis lines & labels
    */
-  axisColour?: string;
+  axisStrokeColour?: string;
+
+  axisTextColour?: string
+
+  legendTextColour?: string
   /**
    * Width for axis lines
    */
-  axisWidth?: number;
+  axisStrokeWidth?: number;
 };
 
 /**
@@ -105,7 +109,7 @@ class ArrayDataSource implements DataSource {
   dirty = false;
   type = `array`;
 
-  _range: Arrays.MinMaxAvgTotal | undefined;
+  private _range: Arrays.MinMaxAvgTotal | undefined;
 
   constructor(series: Series) {
     this.series = series;
@@ -130,8 +134,14 @@ class ArrayDataSource implements DataSource {
   get range(): DataRange {
     if (!this.dirty && this._range !== undefined) return this._range;
     this.dirty = false;
-    this._range = Arrays.minMaxAvg(this.data);
-    return { ...this._range, changed: true };
+    const updatedRange = Arrays.minMaxAvg(this.data);
+    if (this._range === undefined || updatedRange.max !== this._range.max || updatedRange.min !== this._range.min) {
+      this._range = updatedRange;
+      return { ...this._range, changed: true };
+    } else {
+      return { ...this._range, changed: false };
+
+    }
   }
 
   add(value: number) {
@@ -195,7 +205,6 @@ export class Series {
 
     if (sourceType === `array`) {
       this.source = new ArrayDataSource(this);
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (sourceType === `stream`) {
       this.source = new StreamingDataSource(this);
     } else throw new Error(`Unknown sourceType. Expected array|stream`);
@@ -233,9 +242,11 @@ export class Series {
   }
 
   scaleValue(value: number): number {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.source === undefined) return value;
     const r = this.visualRange;
+    if (r.changed) {
+      this.plot.notify(`range-change`, this.plot.plotArea);
+    }
     if (r.min == r.max) {
       // No real scale - only received the same value for this series
       return 0.5;
@@ -285,7 +296,7 @@ export class PlotArea extends Sg.CanvasBox {
   ): Rects.Rect | string {
 
     const axisY = opts.getActualSize(`AxisY`);
-
+    const padding = this.paddingPx;
     const legend = opts.getActualSize(`Legend`);
     const legendHeight = legend?.height ?? 0;
 
@@ -296,26 +307,37 @@ export class PlotArea extends Sg.CanvasBox {
     if (!legend) return `No Legend`;
     if (!axisX) return `No AxisX`;
 
-    console.log(`---- ${ axisY.width } ---- `);
     return {
       width: opts.bounds.width - axisY.width - this.paddingPx,
-      height: opts.bounds.height - legendHeight - axisXHeight - this.paddingPx,
+      height: opts.bounds.height - legendHeight - axisXHeight - padding,
     };
   }
 
   protected layoutSelf(measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent: Sg.Layout) {
     const axisY = measureState.getActualSize(`AxisY`);
+    //const axisX = measureState.getActualSize(`AxisX`);
+    const padding = this.paddingPx;
+
+    //const legend = measureState.getActualSize(`Legend`);
+    //const legendHeight = legend?.height ?? 0;
+
+    //const axisXHeight = axisX?.height ?? 0;
     const axisYWidth = axisY?.width ?? 0;
-    // if (axisY === undefined) return;
-    // if (axisY.width === undefined) return;
-    return { x: axisYWidth, y: 0 }
+
+    //const height = this._measuredSize?.height ?? 0;
+
+    return {
+      x: axisYWidth,
+      y: padding // layoutState.bounds.height - height - axisXHeight - legendHeight
+    }
   }
 
   protected onNotify(message: string, source: Sg.Box): void {
+    //this.debugLog(`onNotify message: ${ message } source: ${ source.id }`);
     if (message === `measureApplied` && source === this.plot.axisY)
       this.layoutInvalidated(`PlotArea.onNotify measureApplied to axisY`);
-    // if (message === `measureApplied` && source === this.plot.legend)
-    //   this.layoutInvalidated(`PlotArea.onNotify measureApplied to legend`);
+    if (message === `laidout` && source === this.plot.legend)
+      this.layoutInvalidated(`PlotArea.onNotify laidout to legend`);
   }
 
   // protected onClick(p: Points.Point): void {
@@ -344,7 +366,6 @@ export class PlotArea extends Sg.CanvasBox {
     if (p === undefined) return;
 
     for (const series of this.plot.series.values()) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (p === undefined) {
         series.tooltip = undefined;
         return;
@@ -362,14 +383,15 @@ export class PlotArea extends Sg.CanvasBox {
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
     if (this.plot.frozen) return;
     const seriesCopy = this.plot.seriesArray(); // [...this.plot.series.values()];
-    ctx.fillStyle = `hsla(10,50%,50%,0.5)`;
-    ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
-    //ctx.clearRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+    //ctx.fillStyle = `hsla(10,50%,50%,0.5)`;
+    //ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+
+    // Using -1 for y to catch a few random peaks from sharp lines
+    ctx.clearRect(0, -1, this.canvasRegion.width, this.canvasRegion.height);
 
     for (const series of seriesCopy) {
       if (series.source.type === `array` || series.source.type === `stream`) {
         const arraySeries = series.source as ArrayDataSource;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (arraySeries.data === undefined) return;
         const d = [ ...arraySeries.data ];
         this.drawDataSet(series, d, ctx);
@@ -402,7 +424,6 @@ export class PlotArea extends Sg.CanvasBox {
       const distances = shapes.map((v) => Points.distanceToExterior(pt, v));
       const index = minIndex(...distances);
       const closest = shapes[ index ];
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (closest === undefined) [ undefined, 0 ];
       return [ closest, distances[ index ] ];
     };
@@ -440,7 +461,6 @@ export class PlotArea extends Sg.CanvasBox {
         shapes.push({ radius: series.width, x, y, index: index, value: d[ index ] });
         x += pxPerPt;
       }
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (series.drawingStyle === `bar`) {
       ctx.fillStyle = series.colour;
       const interBarPadding = Math.ceil(pxPerPt * 0.1);
@@ -469,6 +489,8 @@ export class Legend extends Sg.CanvasBox {
   padding = 3;
   widthSnapping = 20;
 
+  labelMeasurements = new Map<string, Rects.RectPositioned>();
+
   constructor(private plot: Plot, region: Rects.RectPositioned) {
     super(plot, `Legend`, region);
   }
@@ -477,77 +499,156 @@ export class Legend extends Sg.CanvasBox {
     /** no-op */
   }
 
+  protected layoutSelf(measureState: Sg.MeasureState, layoutState: Sg.LayoutState, _parent: Sg.Layout) {
+    const axisY = measureState.getActualSize(`AxisY`);
+    const axisYWidth = axisY?.width ?? 0;
+
+    const height = this._measuredSize?.height ?? 0;
+    return {
+      x: axisYWidth,
+      y: layoutState.bounds.height - height
+    }
+  }
+
   protected measureSelf(
-    opts: Sg.MeasureState,
+    opts: Sg.CanvasMeasureState,
     _parent?: Sg.Measurement
   ): Rects.Rect | Rects.RectPositioned | string {
-    const yAxis = opts.measurements.get(`AxisY`);
+    const series = this.plot.seriesArray();
     const sample = this.sampleSize;
-    const widthSnapping = this.widthSnapping;
     const padding = this.padding;
-    const ctx = (opts as Sg.CanvasMeasureState).ctx;
+    const widthSnapping = this.widthSnapping;
+    const ctx = opts.ctx;
 
+    const yAxis = opts.measurements.get(`AxisY`);
     const yAxisWidth = yAxis?.actual.width ?? 0;
 
-    //if (yAxis === undefined) return;
+    let x = padding;
+    let y = padding;
+    const availableWidth = opts.bounds.width - yAxisWidth - padding;
 
-    const usableWidth = opts.bounds.width - yAxisWidth;
-
-    const series = this.plot.seriesArray();
-    let width = padding;
+    //let rows = 1;
+    let rowHeight = 0;
     for (const s of series) {
-      width += sample.width + padding;
-      width += textWidth(ctx, s.name, padding, widthSnapping);
-      width += textWidth(ctx, s.tooltip, padding, widthSnapping);
+      const startX = x;
+      x += sample.width + padding;
+      ctx.textBaseline = `middle`;
+
+      const text = textRect(ctx, s.name, padding, widthSnapping);
+
+      x += textWidth(ctx, s.name, padding, widthSnapping);
+
+      if (s.tooltip) {
+        x += textWidth(ctx, s.tooltip, padding, widthSnapping);
+      }
+      const r = { width: 10, height: 10, x: startX, y };
+
+      this.labelMeasurements.set(s.name, r)
+      rowHeight = Math.min(sample.height + padding + padding, text.height + padding + padding);
+      x += padding;
+      if (x > availableWidth) {
+        x = padding;
+        y += rowHeight;
+        //rows++;
+
+      }
     }
 
-    const rows = Math.max(1, Math.ceil(width / usableWidth));
-    const h = rows * (this.sampleSize.height + this.padding + this.padding);
     return {
-      x: yAxisWidth,
-      y: opts.bounds.height - h,
-      width: usableWidth,
-      height: h,
-    };
+      width: availableWidth,
+      height: y + rowHeight
+    }
+    // const ctx = (opts as Sg.CanvasMeasureState).ctx;
+
+    // const usableWidth = opts.bounds.width - yAxisWidth;
+
+    // let width = padding;
+    // for (const s of series) {
+    //   width += sample.width + padding;
+    //   width += textWidth(ctx, s.name, padding, widthSnapping);
+    //   width += textWidth(ctx, s.tooltip, padding, widthSnapping);
+    // }
+
+    // const rows = Math.max(1, Math.ceil(width / usableWidth));
+    // console.log(`rows: ${ rows }`);
+    // const h = rows * (this.sampleSize.height + this.padding + this.padding);
+    // return {
+    //   x: yAxisWidth,
+    //   y: opts.bounds.height - h,
+    //   width: usableWidth,
+    //   height: h,
+    // };
   }
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
     const series = this.plot.seriesArray();
     const sample = this.sampleSize;
     const padding = this.padding;
-    const widthSnapping = this.widthSnapping;
-
-    let x = padding;
-    let y = padding;
+    this.debugLog(`drawSelf`);
 
     ctx.clearRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
-
-    // for (let i = 0; i < series.length; i++) {
     for (const s of series) {
-      ctx.fillStyle = s.colour;
-      ctx.fillRect(x, y, sample.width, sample.height);
-      x += sample.width + padding;
-      ctx.textBaseline = `middle`;
+      const r = this.labelMeasurements.get(s.name);
+      if (r === undefined) continue;
+      let x = r.x;
 
-      ctx.fillText(s.name, x, y + sample.height / 2);
-      x += textWidth(ctx, s.name, padding, widthSnapping);
+      // Draw colour chip
+      ctx.fillStyle = s.colour;
+      ctx.fillRect(x, r.y, sample.width, sample.height);
+      x += sample.width + padding;
+
+      // Label
+      ctx.textBaseline = `middle`;
+      ctx.fillStyle = this.plot.legendTextColour;
+      ctx.fillText(s.name, x, r.y + sample.height / 2);
 
       if (s.tooltip) {
-        ctx.fillStyle = this.plot.axisColour;
-        ctx.fillText(s.tooltip, x, y + sample.height / 2);
-        x += textWidth(ctx, s.tooltip, padding, widthSnapping);
-      }
-      x += padding;
-      if (x > this.canvasRegion.width - 100) {
-        x = padding;
-        y += sample.height + padding + padding;
+        ctx.fillStyle = this.plot.legendTextColour;
+        ctx.fillText(s.tooltip, r.x, r.y + sample.height / 2);
       }
     }
+    // const series = this.plot.seriesArray();
+    // const sample = this.sampleSize;
+    // const padding = this.padding;
+    // const widthSnapping = this.widthSnapping;
+
+    // let x = padding;
+    // let y = padding;
+
+    // ctx.clearRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+    // let rows = 1;
+    // for (const s of series) {
+    //   ctx.fillStyle = s.colour;
+    //   ctx.fillRect(x, y, sample.width, sample.height);
+    //   x += sample.width + padding;
+    //   ctx.textBaseline = `middle`;
+    //   ctx.fillStyle = this.plot.legendTextColour;
+    //   ctx.fillText(s.name, x, y + sample.height / 2);
+    //   x += textWidth(ctx, s.name, padding, widthSnapping);
+
+    //   if (s.tooltip) {
+    //     ctx.fillStyle = this.plot.legendTextColour;
+    //     ctx.fillText(s.tooltip, x, y + sample.height / 2);
+    //     x += textWidth(ctx, s.tooltip, padding, widthSnapping);
+    //   }
+    //   x += padding;
+    //   if (x > this.canvasRegion.width - 100) {
+    //     x = padding;
+    //     y += sample.height + padding + padding;
+    //     rows++;
+    //     this.debugLog(`drawSelf rows: ${ rows }`);
+    //   }
+    // }
   }
 
   protected onNotify(message: string, source: Sg.Box): void {
-    if (message === `measureApplied` && source === (this._parent as Plot).axisY)
+    this.debugLog(`onNotify ${ message } source: ${ source.id }`);
+    if (message === `measureApplied` && source === (this._parent as Plot).axisY) {
       this.layoutInvalidated(`Legend.onNotify measureApplied to axisY`);
+
+    } else if (message == `range-change`) {
+      //this.layoutInvalidated(`Legend.onNotify range-change`);
+    }
   }
 }
 
@@ -564,8 +665,10 @@ export class AxisX extends Sg.CanvasBox {
   }
 
   protected onNotify(message: string, source: Sg.Box): void {
-    // if (message === `measureApplied` && source === this.plot.axisY)
-    //   this.layoutInvalidated(`AxisX.onNotify measureApplied to axisY`);
+    //this.debugLog(message);
+    if (message === `measureApplied` && source === this.plot.axisY) {
+      this.layoutInvalidated(`AxisX.onNotify measureApplied to axisY`);
+    }
     // if (message === `measureApplied` && source === this.plot.legend) {
     //   this.layoutInvalidated(`AxisX.onNotify measureApplied to legend`);
     // }
@@ -574,49 +677,52 @@ export class AxisX extends Sg.CanvasBox {
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
     const plot = this.plot;
     const v = this.canvasRegion;
-    const width = plot.axisWidth;
+    const strokeWidth = plot.axisStrokeWidth;
 
-    const colour = this.colour ?? plot.axisColour;
+    const colour = this.colour ?? plot.axisStrokeColour;
     ctx.strokeStyle = colour;
 
     ctx.clearRect(0, 0, v.width, v.height);
+    //ctx.fillStyle = `hsla(200,50%,50%,0.5)`;
+    //ctx.fillRect(0, 0, v.width, v.height);
+    //this.debugLog(`drawSelf: ${ v.width } x ${ v.height } padding: ${ this.paddingPx }`);
     ctx.beginPath();
-    ctx.lineWidth = width;
-    ctx.moveTo(0, width / 2);
-    ctx.lineTo(v.width, width / 2);
+    ctx.lineWidth = strokeWidth;
+    ctx.moveTo(0, strokeWidth / 2);
+    ctx.lineTo(v.width, strokeWidth / 2);
     ctx.stroke();
   }
 
   protected measureSelf(
-    opts: Sg.MeasureState,
+    opts: Sg.CanvasMeasureState,
     _parent?: Sg.Measurement
   ): Rects.Rect | Rects.RectPositioned | string {
     const plot = this.plot;
-
+    const padding = this.paddingPx;
     const yAxis = opts.measurements.get(`AxisY`);
     const yAxisWidth = yAxis?.actual.width ?? 0;
 
-    const h = plot.axisWidth + this.paddingPx;
+    // TODO: If we start using x-axis labels
+    const heightOfText = 0;//textHeight(opts.ctx, `100`, padding);
+    const h = plot.axisStrokeWidth + heightOfText + padding + padding;
 
     return {
-      width: opts.bounds.width - yAxisWidth,
+      width: opts.bounds.width - yAxisWidth - padding,
       height: h,
     };
   }
 
-  protected layoutSelf(measureState: Sg.MeasureState, layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Points.Point | undefined {
-    const plot = this.plot;
+  protected layoutSelf(measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Points.Point | undefined {
     const yAxis = measureState.measurements.get(`AxisY`);
-    const legend = measureState.measurements.get(`Legend`);
+    const legend = measureState.getActualSize(`Legend`);
+    const legendHeight = legend?.height ?? 0;
 
-    const legendHeight = legend?.actual.height ?? 0;
     const yAxisWidth = yAxis?.actual.width ?? 0;
 
-    const h = plot.axisWidth + this.paddingPx;
-
+    const height = this._measuredSize?.height ?? 0;
     return {
       x: yAxisWidth,
-      y: measureState.bounds.height - h - legendHeight
+      y: measureState.bounds.height - height - legendHeight
     }
   }
 }
@@ -647,6 +753,7 @@ export class AxisY extends Sg.CanvasBox {
   }
 
   protected measurePreflight(): void {
+    //this.debugLog(`measurePreflight`);
     // const series = this.getSeries();
     // if (
     //   series !== undefined &&
@@ -657,22 +764,27 @@ export class AxisY extends Sg.CanvasBox {
   }
 
   protected onNotify(message: string, source: Sg.Box): void {
+    //this.debugLog(message);
     const pa = this.plot.plotArea;
+    if (message === `range-change`) {
+      // Notification that series range has changed
+      this.drawingInvalidated(`range-change`);
+      return;
+    }
+
     if (message === `measureApplied` && source === pa && (pa.canvasRegion.height !== this.lastPlotAreaHeight)) {
       this.lastPlotAreaHeight = pa.canvasRegion.height;
       this.drawingInvalidated(`AxisY.onNotify height change`);
     }
   }
 
-  protected measureSelf(opts: Sg.MeasureState): Rects.Rect {
-    //this.debugLog(`measureSelf. needsLayout: ${ this._needsLayout } needsDrawing: ${ this.needsDrawing }`);
+  protected measureSelf(copts: Sg.CanvasMeasureState): Rects.Rect {
+    //this.debugLog(`measureSelf. needsLayout: ${ this._needsLayoutX } needsDrawing: ${ this._needsDrawing }`);
 
-    const copts = opts as Sg.CanvasMeasureState;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (copts.ctx === undefined) throw new Error(`opts.ctx is undefined`);
 
     const paddingPx = this.paddingPx;
-    let width = this.plot.axisWidth + paddingPx;
+    let width = this.plot.axisStrokeWidth + paddingPx;
 
     const series = this.getSeries();
     if (series !== undefined) {
@@ -683,15 +795,15 @@ export class AxisY extends Sg.CanvasBox {
       const textToMeasure = `9`.repeat(this._maxDigits);
       width += textWidth(copts.ctx, textToMeasure, paddingPx * 2);
     }
-    const w = opts.resolveToPx(this.desiredRegion?.width, width, width);
+    const w = copts.resolveToPx(this.desiredRegion?.width, width, width);
     return {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       width: w!,
-      height: opts.bounds.height,
+      height: copts.bounds.height,
     };
   }
 
-  protected layoutSelf(measureState: Sg.MeasureState, layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Points.Point {
+  protected layoutSelf(_measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Points.Point {
     return { x: 0, y: 0 }
   }
 
@@ -719,9 +831,9 @@ export class AxisY extends Sg.CanvasBox {
     const v = this.canvasRegion;
     const paddingPx = this.paddingPx;
     const r = series.visualRange;
-    const width = plot.axisWidth;
+    const strokeWidth = plot.axisStrokeWidth;
 
-    const colour = this.colour ?? plot.axisColour;
+    const colour = this.colour ?? plot.axisStrokeColour;
     ctx.strokeStyle = colour;
     ctx.fillStyle = colour;
 
@@ -729,17 +841,22 @@ export class AxisY extends Sg.CanvasBox {
     this.lastRange = r;
     ctx.clearRect(0, 0, v.width, v.height);
 
+    // ctx.fillStyle = `yellow`;
+    // ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+
     ctx.beginPath();
-    ctx.lineWidth = width;
-    const lineX = v.width - width / 2;
-    ctx.moveTo(lineX, plotArea.paddingPx + width);
-    ctx.lineTo(lineX, plotArea.canvasRegion.height + width);
+    ctx.lineWidth = strokeWidth;
+    const lineX = v.width - strokeWidth / 2;
+    ctx.moveTo(lineX, plotArea.paddingPx + strokeWidth);
+    ctx.lineTo(lineX, plotArea.canvasRegion.height + paddingPx + strokeWidth + strokeWidth);
     ctx.stroke();
 
     ctx.textBaseline = `top`;
     const fromRight = v.width - paddingPx * 4;
 
+    ctx.fillStyle = plot.axisTextColour;
     if (isRangeSinglePoint(r)) {
+      this.debugLog(`rangeSinglePoint`);
       drawText(ctx, series.formatValue(r.max), (size) => [
         fromRight - size.width,
         plotArea.computeY(series, r.max) - paddingPx * 4,
@@ -748,7 +865,7 @@ export class AxisY extends Sg.CanvasBox {
       // Draw min/max data labels
       drawText(ctx, series.formatValue(r.max), (size) => [
         fromRight - size.width,
-        plotArea.computeY(series, r.max) + width / 2,
+        plotArea.computeY(series, r.max) + strokeWidth / 2,
       ]);
       drawText(ctx, series.formatValue(r.min), (size) => [
         fromRight - size.width,
@@ -763,7 +880,6 @@ const drawText = (
   text: string,
   position: (size: TextMetrics) => [ x: number, y: number ]
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (ctx === undefined) throw new Error(`ctx is undefined`);
   const size = ctx.measureText(text);
   const xy = position(size);
@@ -793,8 +909,11 @@ export class Plot extends Sg.CanvasBox {
   legend: Legend;
   axisX: AxisX;
   axisY: AxisY;
-  axisColour: string;
-  axisWidth: number;
+  axisStrokeColour: string;
+  axisTextColour: string;
+  legendTextColour: string;
+
+  axisStrokeWidth: number;
   series: Map<string, Series>;
   private _frozen = false;
   private _canvasEl: HTMLCanvasElement;
@@ -803,30 +922,33 @@ export class Plot extends Sg.CanvasBox {
   defaultSeriesOpts?: SeriesOpts;
   constructor(canvasElementOrQuery: HTMLCanvasElement | string, opts: Opts = {}) {
     const { ctx, element, bounds } = scaleCanvas(canvasElementOrQuery);
-    console.log(`bounds: ${ JSON.stringify(bounds) }`);
     super(undefined, `Plot`, bounds);
     this._canvasEl = element;
     this._ctx = ctx;
 
     if (opts.autoSize) {
       parentSizeCanvas(element, (event) => {
+        this.drawingInvalidated(`resize`);
         this.update(event.ctx, true);
       });
     }
 
-    this.axisColour = opts.axisColour ?? `black`;
-    this.axisWidth = opts.axisWidth ?? 3;
+    this.axisStrokeColour = opts.axisStrokeColour ?? `black`;
+    this.axisTextColour = opts.axisTextColour ?? `black`;
+    this.legendTextColour = opts.legendTextColour ?? `black`;
+
+    this.axisStrokeWidth = opts.axisStrokeWidth ?? 3;
     this.series = new Map();
     this.plotArea = new PlotArea(this, bounds);
     this.legend = new Legend(this, bounds);
     this.axisX = new AxisX(this, bounds);
     this.axisY = new AxisY(this, bounds);
 
-    this.plotArea.debugLayout = true;
-    this.axisX.debugLayout = true;
-    this.axisY.debugLayout = true;
-    this.legend.debugLayout = true;
-    this.debugLayout = true;
+    // this.plotArea.debugLayout = false;
+    // this.axisX.debugLayout = false;
+    // this.axisY.debugLayout = false;
+    // this.legend.debugLayout = true;
+    // this.debugLayout = true;
   }
 
   update(ctx?: CanvasRenderingContext2D, force = false) {
@@ -895,14 +1017,17 @@ export class Plot extends Sg.CanvasBox {
    */
   plot(o: any) {
     const paths = getFieldPaths(o);
+    let seriesCreated = false;
     for (const p of paths) {
       let s = this.series.get(p);
       if (s === undefined) {
         s = this.createSeries(p, `stream`);
         s.drawingStyle = `line`;
+        seriesCreated = true;
       }
       s.add(getFieldByPath(o, p));
     }
+    if (seriesCreated) this.legend.layoutInvalidated(`new series`);
     this.update();
   }
 

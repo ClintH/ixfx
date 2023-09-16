@@ -19,7 +19,6 @@ const c = continuously(() => {
   //   z: integer(10000, -10000)
   // }
 
-
   const d = {
     acc: {x: 6995, y: -3834, z: -1644},
     gyro: {x: -35, y: 102, z: 213 * Math.random()}

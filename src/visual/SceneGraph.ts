@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Arrays } from '../collections/index.js';
 import { Points } from '../geometry/index.js';
 import * as Rects from '../geometry/Rect.js';
@@ -56,7 +55,6 @@ export const boxRectFromRectPx = (r: Rects.RectPositioned): BoxRect => {
 }
 
 const unitIsEqual = (a: BoxUnit, b: BoxUnit): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (a.type === `px` && b.type === `px`) {
     return a.value === b.value;
   }
@@ -88,14 +86,11 @@ class BaseState {
   resolveToPx(u: BoxUnit | undefined, maxValue: number, defaultValue?: number): number | undefined {
     if (u === undefined && defaultValue !== undefined) return defaultValue;
     if (u === undefined) return; //throw new Error(`unit undefined`);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (u.type === undefined) throw new TypeError(`Expected 'type' and 'value' fields. Type is missing`);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (u.value === undefined) throw new TypeError(`Expected 'type' and 'value' fields. Value is missing`);
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     if (u.type === `px`) return u.value;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (u.type === `pc`) return u.value * maxValue;
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     // @ts-expect-error
@@ -303,7 +298,7 @@ export abstract class Box {
    */
   layoutInvalidated(reason: string) {
     if (reason === undefined) debugger;
-    this.debugLog(`layoutInvalidated ${ reason }`);
+    //this.debugLog(`layoutInvalidated ${ reason }`);
     this._needsMeasuring = true;
     this._needsLayoutX = true;
     // TODO: Only set to true during measuring if it actually changes
@@ -311,10 +306,9 @@ export abstract class Box {
     this.notifyChildLayoutNeeded();
   }
 
-  drawingInvalidated(reason: string): void {
+  drawingInvalidated(_reason: string): void {
     this._needsDrawing = true;
-    this.debugLog(`drawingInvalidated ${ reason }`);
-
+    //this.debugLog(`drawingInvalidated ${ reason }`);
   }
 
   /**
@@ -362,7 +356,7 @@ export abstract class Box {
 
     const different = this._measuredSize === undefined ? true : !Rects.isEqualSize(m.actual, this._measuredSize);
     if (different) {
-      this.debugLog(`measureAply: Size is different than previous. Actual: ${ JSON.stringify(m.actual) } current: ${ JSON.stringify(this._measuredSize) }`);
+      //this.debugLog(`measureApply: Size is different than previous. Actual: ${ JSON.stringify(m.actual) } current: ${ JSON.stringify(this._measuredSize) }`);
       this._needsLayoutX = true;
     }
 
@@ -382,9 +376,9 @@ export abstract class Box {
     this._needsLayoutX = false;
 
     const different = this._layoutPosition === undefined ? true : !Points.isEqual(l.actual, this._layoutPosition);
-    if (different) {
-      this.debugLog(`layoutApply. Position different than previous. ${ JSON.stringify(l.actual) }`);
-    }
+    // if (different) {
+    //   this.debugLog(`layoutApply. Position different than previous. ${ JSON.stringify(l.actual) }`);
+    // }
     this._layoutPosition = { x: l.actual.x, y: l.actual.y };
 
     for (const c of l.children) {
@@ -402,7 +396,9 @@ export abstract class Box {
    * @param m 
    */
   debugLog(m: any) {
+    if (!this.debugLayout) return;
     console.log(this.id, m);
+
   }
 
   layoutStart(measureState: MeasureState, layoutState: LayoutState, force: boolean, parent?: Layout): Layout | undefined {
@@ -422,7 +418,7 @@ export abstract class Box {
 
     // Assign
     m.actual = currentPosition;
-    this.debugLog(`layoutStart: current: ${ JSON.stringify(currentPosition) }`);
+
     m.children = this.children.map((c) => c.layoutStart(measureState, layoutState, force, m));
     if (Arrays.withoutUndefined(m.children).length < this.children.length) {
       return undefined; // One of the children did not resolve
@@ -486,10 +482,10 @@ export abstract class Box {
 
       // For some reason we can't measure
       if (typeof currentMeasurement === `string`) {
-        this.debugLog(`measureStart: measureSelf failed: ${ currentMeasurement }`);
+        //this.debugLog(`measureStart: measureSelf failed: ${ currentMeasurement }`);
         return;
       } else if (currentMeasurement === undefined) {
-        this.debugLog(`measureStart: measureSelf failed for some other reason`);
+        //this.debugLog(`measureStart: measureSelf failed for some other reason`);
         return;
       }
 
@@ -499,7 +495,7 @@ export abstract class Box {
 
     m.children = this.children.map((c) => c.measureStart(opts, force, m));
     if (Arrays.withoutUndefined(m.children).length < this.children.length) {
-      this.debugLog(`measureStart: Child failed measureStart`);
+      //this.debugLog(`measureStart: Child failed measureStart`);
       return undefined; // One of the children did not resolve
     }
 
@@ -524,7 +520,7 @@ export abstract class Box {
     const desired = opts.resolveBox(this._desiredRect);
 
     size = desired ? Rects.clamp(desired, context) : context;
-    this.debugLog(`measureSelf: desired: ${ JSON.stringify(desired) }`);
+
     if (Rects.isPlaceholder(size)) {
       return `Box.measureSelf - No size for box?`;
     }
@@ -563,7 +559,6 @@ export abstract class Box {
    * @returns 
    */
   update(context: object, force = false) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (context === undefined) throw new Error(`context is undefined`);
 
     if (!this._needsMeasuring && !this._needsLayoutX && !force) return;
@@ -574,7 +569,7 @@ export abstract class Box {
 
     // Measure everything
     if (this._needsMeasuring || force) {
-      this.debugLog(`update: needs measuring (force: ${ force }) bounds: ${ JSON.stringify(measureState.bounds) }`);
+      //this.debugLog(`update: needs measuring (force: ${ force }) bounds: ${ JSON.stringify(measureState.bounds) }`);
       while (attempts--) {
         const m = this.measureStart(measureState, force);
         if (m !== undefined) {
@@ -590,7 +585,6 @@ export abstract class Box {
 
     // Lay it out
     if (this._needsLayoutX || force) {
-      this.debugLog(`update: needs layout (force: ${ force })`);
       const p = this.layoutStart(measureState, layoutState, force);
       if (p === undefined) {
         this.debugLog(`Warning: could not layout`);
@@ -598,7 +592,6 @@ export abstract class Box {
         this.layoutApply(p);
         layoutApplied = true;
       }
-      //this.layoutApply(p);
     }
     this.updateComplete(measureApplied, layoutApplied);
   }
@@ -612,7 +605,6 @@ export class CanvasMeasureState extends MeasureState {
   constructor(bounds: Rects.RectPositioned, ctx: CanvasRenderingContext2D) {
     super(bounds);
     this.ctx = ctx;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (ctx === undefined) throw new Error(`ctx is undefined`);
   }
 }
@@ -622,7 +614,6 @@ export class CanvasLayoutState extends LayoutState {
   constructor(bounds: Rects.RectPositioned, ctx: CanvasRenderingContext2D) {
     super(bounds);
     this.ctx = ctx;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (ctx === undefined) throw new Error(`ctx is undefined`);
 
   }
@@ -641,14 +632,6 @@ export class CanvasBox extends Box {
   ) {
     super(parent, id);
     this.bounds = bounds;
-
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    //if (canvasElement === undefined) throw new Error(`canvasEl undefined`);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    //if (canvasElement === null) throw new Error(`canvasEl null`);
-    //this.canvasEl = canvasElement;
-
-    //if (parent === undefined) this.designateRoot();
   }
 
   static fromCanvas(canvasElement: HTMLCanvasElement): CanvasBox {
@@ -756,10 +739,10 @@ export class CanvasBox extends Box {
    * @returns MeasureState
    */
   protected updateBegin(context: CanvasRenderingContext2D): [ MeasureState, LayoutState ] {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (context === undefined) throw new Error(`Context is undefined`);
     let bounds = this.getBounds();
-    this.debugLog(`updateBegin bounds: ${ JSON.stringify(bounds) } measured: ${ JSON.stringify(this._measuredSize) }`);
+    //this.debugLog(`updateBegin bounds: ${ JSON.stringify(bounds) } measured: ${ JSON.stringify(this._measuredSize) }`);
+
     if (bounds === undefined) {
       this.debugLog(`No bounds for element or parent, using canvas bounds`);
       bounds = { x: 0, y: 0, width: context.canvas.width, height: context.canvas.height }
@@ -786,7 +769,7 @@ export class CanvasBox extends Box {
   }
 
   protected updateComplete(_measureChanged: boolean, _layoutChanged: boolean): void {
-    this.debugLog(`updateComplete. measureChanged: ${ _measureChanged } layoutChanged: ${ _layoutChanged } pos: ${ JSON.stringify(this._layoutPosition) }`);
+    //this.debugLog(`updateComplete. measureChanged: ${ _measureChanged } layoutChanged: ${ _layoutChanged } pos: ${ JSON.stringify(this._layoutPosition) }`);
     this.canvasRegion = Rects.placeholderPositioned;
   }
 
@@ -821,7 +804,7 @@ export class CanvasBox extends Box {
 
       //this.debugLog(`draw: canvasRegion: ${ JSON.stringify(this.canvasRegion) }`);
       if (this._needsLayoutX || this._needsMeasuring) {
-        this.debugLog(`draw: warning: drawing with outdated layout / measurements`);
+        //this.debugLog(`draw: warning: drawing with outdated layout / measurements`);
       }
       ctx.save();
       const v = this.canvasRegion;
