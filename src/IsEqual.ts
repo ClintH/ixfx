@@ -1,5 +1,4 @@
-
-const toStringDefault = <V>(itemToMakeStringFor: V): string =>
+export const toStringDefault = <V>(itemToMakeStringFor: V): string =>
   typeof itemToMakeStringFor === `string`
     ? itemToMakeStringFor
     : JSON.stringify(itemToMakeStringFor);

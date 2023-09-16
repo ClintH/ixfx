@@ -140,7 +140,7 @@ export const relativeTimer = (
  *
  * By default it uses elapsed clock time as a basis for frequency. ie., cycles per second.
  *
- * It returns a `ModTimer`, which allows for a modulation amount to be continually applied
+ * It returns a `ModulationTimer`, which allows for a modulation amount to be continually applied
  * to the calculation of the 'position' within a cycle.
  *
  * @example Prints around 0/0.5 each second, as timer is half a cycle per second

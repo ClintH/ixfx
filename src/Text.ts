@@ -201,7 +201,6 @@ export const afterMatch = (
   match: string,
   options: MatchOptions = {}
 ): string => {
-  //eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (source === undefined) throw new Error(`source is undefined`);
 
   //  ✔️ Unit tested

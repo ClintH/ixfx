@@ -58,7 +58,6 @@ export function isClosed<V>(v: InOut<V>): v is InOutSignalClosed {
   const [ value, signal ] = v;
   if (signal === undefined) return false;
   if (value !== undefined) return false;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return (signal.type === `closed`)
 }
 
