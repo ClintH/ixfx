@@ -1,5 +1,18 @@
 A rough changelog between NPM releases
 
+# 0.12.0 16.09.23
+
+* Data.Chains: process a series of async generators
+* Data.Pipes: Stream-like data processing
+* Data.Table: simple table-style of data structure
+* Data.Graphs - directed & undirected graph structures
+  * Directed has a bunch of functions for detecting cycles, paths, topological sorts etc
+* Geometry.Points.round
+* Collections.NumberMap: work with Map<string,number>. Eg adding, multiplying
+* Collections.Queue.PriorityMutable: priority queue
+* Async iterables: Async.fromArray, Async.fromIterable
+* Util.isMap, Util.isSet
+
 # 0.11.7 04.09.23
 
 * Dom.inlineConsole(): adds a DIV that captures and displays unhandled errors, console.log, console.warn & console.error
