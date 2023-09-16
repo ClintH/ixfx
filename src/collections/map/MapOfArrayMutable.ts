@@ -29,7 +29,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * ```
  *
  * Takes options:
- * * `comparer`: {@link Util.IsEqual}
+ * * `comparer`: {@link IsEqual}
  * * `toString`: {@link Util.ToString}
  *
  * A custom {@link Util.ToString} function can be provided which is used when checking value equality (`has`, `without`)
@@ -37,7 +37,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * const map = ofArrayMutable({toString:(v) => v.name}); // Compare values based on their `name` field;
  * ```
  *
- * Alternatively, a {@link Util.IsEqual} function can be used:
+ * Alternatively, a {@link IsEqual} function can be used:
  * ```js
  * const map = ofArrayMutable({comparer: (a, b) => a.name === b.name });
  * ```
