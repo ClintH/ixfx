@@ -1,18 +1,20 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import type { Primitive, StringOrNumber } from "../../KeyValue.js";
-import { average as NumericArrayAverage } from "../../collections/NumericArrays.js";
+//import type { Primitive, StringOrNumber } from "../../KeyValue.js";
+//import { average as NumericArrayAverage } from "../../collections/NumericArrays.js";
 import { intervalToMs, type Interval } from "../../flow/Interval.js";
 
-import { count } from "../../Generators.js";
-import { getErrorMessage } from "../../Debug.js";
+//import { count } from "../../Generators.js";
+//import { getErrorMessage } from "../../Debug.js";
+
 import type { InOut, Signal } from "../Signal.js";
 import * as Signals from '../Signal.js';
 import type { OutletCallback, PipeBidi, Readable, SetOutletOptions, Writeable } from "./Types.js";
 import * as As from "./As.js";
 import * as Ops from './Ops.js';
 import * as From from './From.js';
+
 
 import type { Rect } from "src/geometry/Rect.js";
 
@@ -21,7 +23,9 @@ export * as As from "./As.js";
 export * as Ops from './Ops.js';
 export * as From from './From.js';
 export * as Signals from '../Signal.js';
+export * as Feed from './Feed.js';
 
+export * from './Types.js';
 export const NullSink = (_: any) => {
   /** no-op */
 }
