@@ -19,27 +19,9 @@
 <h1>Function multiply</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="multiply"><span class="tsd-kind-call-signature">multiply</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">b</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#multiply" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="multiply"><span class="tsd-kind-call-signature">multiply</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">rectOrPoint</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#multiply" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Returns <code>a</code> multiplied by <code>b</code></p>
-<p>ie.</p>
-<pre><code class="language-js"><span class="hl-1">return</span><span class="hl-2"> {</span><br/><span class="hl-2"> </span><span class="hl-3">x:</span><span class="hl-2"> </span><span class="hl-3">a</span><span class="hl-2">.</span><span class="hl-3">x</span><span class="hl-2"> * </span><span class="hl-3">b</span><span class="hl-2">.</span><span class="hl-3">x</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-3">y:</span><span class="hl-2"> </span><span class="hl-3">a</span><span class="hl-2">.</span><span class="hl-3">y</span><span class="hl-2"> * </span><span class="hl-3">b</span><span class="hl-2">.</span><span class="hl-3">y</span><br/><span class="hl-2">}</span>
-</code><button>Copy</button></pre>
-</div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">a</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5>
-<div class="tsd-comment tsd-typography"></div></li>
-<li>
-<h5><span class="tsd-kind-parameter">b</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5>
-<div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h4>
-<div class="tsd-comment tsd-typography"></div></li>
-<li class="tsd-signature tsd-anchor-link" id="multiply-1"><span class="tsd-kind-call-signature">multiply</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">rect</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#multiply-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Multiply by a width,height:</p>
+<div class="tsd-comment tsd-typography"><p>Multiply by a width,height or x,y</p>
 <pre><code><span class="hl-1">return</span><span class="hl-2"> {</span><br/><span class="hl-2"> </span><span class="hl-3">x:</span><span class="hl-2"> </span><span class="hl-3">a</span><span class="hl-2">.</span><span class="hl-3">x</span><span class="hl-2"> * </span><span class="hl-3">rect</span><span class="hl-2">.</span><span class="hl-3">width</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-3">y:</span><span class="hl-2"> </span><span class="hl-3">a</span><span class="hl-2">.</span><span class="hl-3">y</span><span class="hl-2"> * </span><span class="hl-3">rect</span><span class="hl-2">.</span><span class="hl-3">height</span><br/><span class="hl-2">};</span>
 </code><button>Copy</button></pre>
 </div>
@@ -50,11 +32,10 @@
 <h5><span class="tsd-kind-parameter">a</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><span class="tsd-kind-parameter">rect</span>: <a href="../types/Geometry.Rects.Rect.html" class="tsd-signature-type tsd-kind-type-alias">Rect</a></h5>
-<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h5><span class="tsd-kind-parameter">rectOrPoint</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><span class="tsd-signature-symbol"> | </span><a href="../types/Geometry.Rects.Rect.html" class="tsd-signature-type tsd-kind-type-alias">Rect</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h4>
 <div class="tsd-comment tsd-typography"></div></li>
-<li class="tsd-signature tsd-anchor-link" id="multiply-2"><span class="tsd-kind-call-signature">multiply</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">x</span>, <span class="tsd-kind-parameter">y</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#multiply-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="multiply-1"><span class="tsd-kind-call-signature">multiply</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">x</span>, <span class="tsd-kind-parameter">y</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#multiply-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns <code>a</code> multipled by some x and/or y scaling factor</p>
 <p>ie.</p>
@@ -147,7 +128,7 @@
 <li><a href="Geometry.Points.distanceToCenter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>distance<wbr/>To<wbr/>Center</span></a></li>
 <li><a href="Geometry.Points.distanceToExterior.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>distance<wbr/>To<wbr/>Exterior</span></a></li>
 <li><a href="Geometry.Points.divide.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divide</span></a></li>
-<li><a href="Geometry.Points.divideFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divide<wbr/>Fn</span></a></li>
+<li><a href="Geometry.Points.divider.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divider</span></a></li>
 <li><a href="Geometry.Points.dotProduct.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>dot<wbr/>Product</span></a></li>
 <li><a href="Geometry.Points.findMinimum.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>find<wbr/>Minimum</span></a></li>
 <li><a href="Geometry.Points.from.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from</span></a></li>
@@ -179,6 +160,7 @@
 <li><a href="Geometry.Points.rightmost.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rightmost</span></a></li>
 <li><a href="Geometry.Points.rotate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rotate</span></a></li>
 <li><a href="Geometry.Points.rotatePointArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rotate<wbr/>Point<wbr/>Array</span></a></li>
+<li><a href="Geometry.Points.round.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>round</span></a></li>
 <li><a href="Geometry.Points.subtract.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>subtract</span></a></li>
 <li><a href="Geometry.Points.sum.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sum</span></a></li>
 <li><a href="Geometry.Points.toArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>Array</span></a></li>
@@ -206,5 +188,9 @@
 <li><a href="../modules/Random.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Random</span></a></li>
 <li><a href="../modules/Text.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Text</span></a></li>
 <li><a href="../modules/Util.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Util</span></a></li>
-<li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li></ul></nav></div></div></div>
+<li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li>
+<li><a href="../types/IsEqual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Is<wbr/>Equal</span></a></li>
+<li><a href="isEqualDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Default</span></a></li>
+<li><a href="isEqualValueDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Default</span></a></li>
+<li><a href="toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li></ul></nav></div></div></div>
 <div class="overlay"></div></body></html>

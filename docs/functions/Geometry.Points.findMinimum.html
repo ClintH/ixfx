@@ -19,7 +19,7 @@
 <h1>Function findMinimum</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="findMinimum"><span class="tsd-kind-call-signature">find<wbr/>Minimum</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">compareFn</span>, <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">points</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#findMinimum" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="findMinimum"><span class="tsd-kind-call-signature">find<wbr/>Minimum</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">comparer</span>, <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">points</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><a href="#findMinimum" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns the &#39;minimum&#39; point from an array of points, using a comparison function.</p>
 </div>
@@ -27,7 +27,7 @@
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">compareFn</span>: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">b</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><span class="tsd-signature-symbol">)</span></h5>
+<h5><span class="tsd-kind-parameter">comparer</span>: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">b</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a><span class="tsd-signature-symbol">)</span></h5>
 <div class="tsd-comment tsd-typography"><p>Compare function returns the smallest of <code>a</code> or <code>b</code></p>
 </div>
 <div class="tsd-comment tsd-typography"></div>
@@ -115,7 +115,7 @@
 <li><a href="Geometry.Points.distanceToCenter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>distance<wbr/>To<wbr/>Center</span></a></li>
 <li><a href="Geometry.Points.distanceToExterior.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>distance<wbr/>To<wbr/>Exterior</span></a></li>
 <li><a href="Geometry.Points.divide.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divide</span></a></li>
-<li><a href="Geometry.Points.divideFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divide<wbr/>Fn</span></a></li>
+<li><a href="Geometry.Points.divider.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divider</span></a></li>
 <li><a href="Geometry.Points.dotProduct.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>dot<wbr/>Product</span></a></li>
 <li><a href="Geometry.Points.findMinimum.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>find<wbr/>Minimum</span></a></li>
 <li><a href="Geometry.Points.from.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from</span></a></li>
@@ -147,6 +147,7 @@
 <li><a href="Geometry.Points.rightmost.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rightmost</span></a></li>
 <li><a href="Geometry.Points.rotate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rotate</span></a></li>
 <li><a href="Geometry.Points.rotatePointArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rotate<wbr/>Point<wbr/>Array</span></a></li>
+<li><a href="Geometry.Points.round.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>round</span></a></li>
 <li><a href="Geometry.Points.subtract.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>subtract</span></a></li>
 <li><a href="Geometry.Points.sum.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sum</span></a></li>
 <li><a href="Geometry.Points.toArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>Array</span></a></li>
@@ -174,5 +175,9 @@
 <li><a href="../modules/Random.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Random</span></a></li>
 <li><a href="../modules/Text.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Text</span></a></li>
 <li><a href="../modules/Util.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Util</span></a></li>
-<li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li></ul></nav></div></div></div>
+<li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li>
+<li><a href="../types/IsEqual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Is<wbr/>Equal</span></a></li>
+<li><a href="isEqualDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Default</span></a></li>
+<li><a href="isEqualValueDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Default</span></a></li>
+<li><a href="toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li></ul></nav></div></div></div>
 <div class="overlay"></div></body></html>

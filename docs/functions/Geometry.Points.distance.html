@@ -19,7 +19,7 @@
 <h1>Function distance</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="distance"><span class="tsd-kind-call-signature">distance</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">b</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="distance"><span class="tsd-kind-call-signature">distance</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">b</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Calculate distance between two points.</p>
 <p>```js`
@@ -46,7 +46,7 @@ distance(ptC, 0.5, 0.8, 0.1);
 <li>
 <h5><span class="tsd-kind-parameter">a</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5></li>
 <li>
-<h5><span class="tsd-kind-parameter">b</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5></li></ul></div>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">b</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-signature tsd-anchor-link" id="distance-1"><span class="tsd-kind-call-signature">distance</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span>, <span class="tsd-kind-parameter">x</span>, <span class="tsd-kind-parameter">y</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
@@ -79,34 +79,6 @@ distance(ptC, 0.5, 0.8, 0.1);
 <h5><span class="tsd-kind-parameter">x</span>: <span class="tsd-signature-type">number</span></h5></li>
 <li>
 <h5><span class="tsd-kind-parameter">y</span>: <span class="tsd-signature-type">number</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
-<div class="tsd-comment tsd-typography"></div></li>
-<li class="tsd-signature tsd-anchor-link" id="distance-2"><span class="tsd-kind-call-signature">distance</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">a</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#distance-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Calculate distance between two points.</p>
-<p>```js`
-// Distance between two points
-const ptA = { x: 0.5, y:0.8 };
-const ptB = { x: 1, y: 0.4 };
-distance(ptA, ptB);
-// Or, provide x,y as parameters
-distance(ptA, 0.4, 0.9);</p>
-<p>// Distance from ptA to x: 0.5, y:0.8, z: 0.1
-const ptC = { x: 0.5, y:0.5, z: 0.3 };
-// With x,y,z as parameters:
-distance(ptC, 0.5, 0.8, 0.1);
-``
-@param a First point
-@param xOrB Second point, or x coord
-@param y y coord, if x coord is given
-@param z Optional z coord, if x and y are given.
-@returns</p>
-</div>
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">a</span>: <a href="../types/Geometry.Points.Point.html" class="tsd-signature-type tsd-kind-type-alias">Point</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 <div class="tsd-comment tsd-typography"></div></li></ul></section></div>
 <div class="col-sidebar">
@@ -171,7 +143,7 @@ distance(ptC, 0.5, 0.8, 0.1);
 <li><a href="Geometry.Points.distanceToCenter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>distance<wbr/>To<wbr/>Center</span></a></li>
 <li><a href="Geometry.Points.distanceToExterior.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>distance<wbr/>To<wbr/>Exterior</span></a></li>
 <li><a href="Geometry.Points.divide.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divide</span></a></li>
-<li><a href="Geometry.Points.divideFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divide<wbr/>Fn</span></a></li>
+<li><a href="Geometry.Points.divider.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>divider</span></a></li>
 <li><a href="Geometry.Points.dotProduct.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>dot<wbr/>Product</span></a></li>
 <li><a href="Geometry.Points.findMinimum.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>find<wbr/>Minimum</span></a></li>
 <li><a href="Geometry.Points.from.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from</span></a></li>
@@ -203,6 +175,7 @@ distance(ptC, 0.5, 0.8, 0.1);
 <li><a href="Geometry.Points.rightmost.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rightmost</span></a></li>
 <li><a href="Geometry.Points.rotate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rotate</span></a></li>
 <li><a href="Geometry.Points.rotatePointArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>rotate<wbr/>Point<wbr/>Array</span></a></li>
+<li><a href="Geometry.Points.round.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>round</span></a></li>
 <li><a href="Geometry.Points.subtract.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>subtract</span></a></li>
 <li><a href="Geometry.Points.sum.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>sum</span></a></li>
 <li><a href="Geometry.Points.toArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>Array</span></a></li>
@@ -230,5 +203,9 @@ distance(ptC, 0.5, 0.8, 0.1);
 <li><a href="../modules/Random.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Random</span></a></li>
 <li><a href="../modules/Text.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Text</span></a></li>
 <li><a href="../modules/Util.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Util</span></a></li>
-<li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li></ul></nav></div></div></div>
+<li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li>
+<li><a href="../types/IsEqual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Is<wbr/>Equal</span></a></li>
+<li><a href="isEqualDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Default</span></a></li>
+<li><a href="isEqualValueDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Default</span></a></li>
+<li><a href="toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li></ul></nav></div></div></div>
 <div class="overlay"></div></body></html>
