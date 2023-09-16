@@ -29,9 +29,9 @@ export type BipolarWrapper = {
  * 
  * ```js
  * let v = immutable(); // Starts with 0 by default
- * v = v.add(0.1);  // v.value is 0.1
- * v = v.inverse(); // v.value is -0.1
- * v = v.multiply(0.2); // v.value is 0.02
+ * v = v.add(0.1);      // v.value is 0.1
+ * v = v.inverse();     // v.value is -0.1
+ * v = v.multiply(0.2); // v.value is -0.02
  * 
  * v = immutable(1);
  * v = v.towardZero(0.1); // 0.9
