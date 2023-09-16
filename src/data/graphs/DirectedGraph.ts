@@ -208,7 +208,6 @@ export function* adjacentVertices(graph: DirectedGraph, context: Vertex | string
  * @returns 
  */
 export const vertexHasOut = (vertex: Vertex, outIdOrVertex: string | Vertex): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (vertex === undefined) return false;
   const outId = typeof outIdOrVertex === `string` ? outIdOrVertex : outIdOrVertex.id;
   return vertex.out.some(edge => edge.id === outId);

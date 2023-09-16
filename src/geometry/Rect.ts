@@ -43,7 +43,6 @@ export const isPlaceholder = (rect: Rect): boolean =>
 export const isPositioned = (
   p: Points.Point | Rect | RectPositioned
 ): p is Points.Point =>
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
 
 /**
@@ -53,9 +52,7 @@ export const isPositioned = (
  */
 export const isRect = (p: unknown): p is Rect => {
   if (p === undefined) return false;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if ((p as Rect).width === undefined) return false;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if ((p as Rect).height === undefined) return false;
   return true;
 };
@@ -105,9 +102,7 @@ export const fromElement = (el: HTMLElement): Rect => ({
  * @returns
  */
 export const isEqualSize = (a: Rect, b: Rect): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (a === undefined) throw new Error(`a undefined`);
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (b === undefined) throw new Error(`b undefined`);
   return a.width === b.width && a.height === b.height;
 };
@@ -424,7 +419,6 @@ export function sum(a: Rect, width: number, height?: number): Rect;
  */
 //eslint-disable-next-line func-style
 export function sum(a: Rect, b: Rect | number, c?: number): Rect {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (a === undefined) throw new Error(`First parameter undefined`);
   if (typeof b === `number`) {
     const height = c ?? 0;
@@ -632,7 +626,6 @@ export const maxFromCorners = (
 };
 
 const guardDim = (d: number, name = `Dimension`) => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (d === undefined) throw new Error(`${ name } is undefined`);
   if (Number.isNaN(d)) throw new Error(`${ name } is NaN`);
   if (d < 0) throw new Error(`${ name } cannot be negative`);
@@ -645,7 +638,6 @@ const guardDim = (d: number, name = `Dimension`) => {
  * @param name
  */
 export const guard = (rect: Rect, name = `rect`) => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (rect === undefined) throw new Error(`{$name} undefined`);
   if (isPositioned(rect)) Points.guard(rect, name);
   guardDim(rect.width, name + `.width`);

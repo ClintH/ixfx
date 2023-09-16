@@ -103,7 +103,6 @@ export const enqueue = <V>(
   queue: ReadonlyArray<V>,
   ...toAdd: ReadonlyArray<V>
 ): ReadonlyArray<V> => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (opts === undefined) throw new Error(`opts parameter undefined`);
 
   const potentialLength = queue.length + toAdd.length;

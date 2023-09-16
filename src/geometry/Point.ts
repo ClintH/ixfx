@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Circles, Lines, Points, Polar, Rects } from './index.js';
 import { interpolate as lineInterpolate } from './Line.js';
 import { throwNumberTest } from '../Guards.js';

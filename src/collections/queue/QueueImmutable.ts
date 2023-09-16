@@ -16,7 +16,6 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
    * @memberof Queue
    */
   constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (opts === undefined) throw new Error(`opts parameter undefined`);
 
     this.opts = opts;

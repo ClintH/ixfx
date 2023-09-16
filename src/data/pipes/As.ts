@@ -26,7 +26,6 @@ export async function* asAsyncIterable<V>(p: Readable<V>): AsyncGenerator<V> {
   let promise = asPromise(p);
   while (true) {
     const value = await promise;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (value === undefined) return;
 
     yield value;

@@ -262,9 +262,7 @@ export type EasingName = keyof typeof functions;
  * @returns Easing function
  */
 export const get = function (easingName: EasingName): EasingFn | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (easingName === null) throw new Error(`easingName is null`);
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (easingName === undefined) throw new Error(`easingName is undefined`);
   const name = easingName.toLocaleLowerCase();
   const found = Object.entries(functions).find(

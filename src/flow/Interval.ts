@@ -67,7 +67,6 @@ export function intervalToMs(
 
 export function isInterval(interval: number | Interval | undefined): interval is Interval {
   if (interval === undefined) return false;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (interval === null) return false;
   if (typeof interval === `number`) {
     if (Number.isNaN(interval)) return false;

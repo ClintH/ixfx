@@ -30,7 +30,6 @@ export class QueueMutable<V> implements IQueueMutable<V> {
   eq: IsEqual<V>;
 
   constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (opts === undefined) throw new Error(`opts parameter undefined`);
     this.opts = opts;
     this.data = data;
