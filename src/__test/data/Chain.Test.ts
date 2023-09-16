@@ -7,6 +7,56 @@ import { isApproximately } from '../../Numbers.js';
 
 const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
 
+test(`fromFunction`, async t => {
+  // Low-level
+  let produced = 0;
+  const factory = Chains.fromFunction(() => {
+    return produced++;
+  });
+  const f = factory();
+  let count = 0;
+  for await (const v of f) {
+    t.is(v, count);
+    count++;
+    if (count === 5) break;
+  }
+
+  const r1 = await Chains.single(factory, 10);
+  t.is(r1, 5);
+
+  // In context
+  produced = 0;
+  const ch1 = Chains.chain<number, string>(
+    Chains.fromFunction(() => produced++),
+    Chains.transform(v => `x:${ v }`),
+    Chains.take(5)
+  );
+  const ch1Result = (await Chains.asArray(ch1)).join(` `);
+  t.deepEqual(ch1Result, `x:0 x:1 x:2 x:3 x:4`);
+});
+
+test(`lazy`, async t => {
+  // Make sure input is not called on too early
+  let produced = 0;
+  let fired = false;
+  const l1 = Chains.lazy().fromFunction(() => {
+    if (!fired) t.fail(`Lazy function used before fired`);
+    if (produced === 5) return;
+    return produced++;
+  });
+
+  setTimeout(async () => {
+    fired = true;
+    const x = await l1.asArray([]);
+    t.deepEqual(x, [ 0, 1, 2, 3, 4 ]);
+  }, 200);
+
+
+  const l3 = await Chains.lazy().max().input([ 4, 0, 10 ]).lastOutput();
+  t.is(l3, 10);
+  await sleep(250);
+});
+
 test(`chunk`, async t => {
   // Chunk of 1
   const ch1 = Chains.chain<number, number[]>(
@@ -155,13 +205,13 @@ test('filter', async t => {
   t.deepEqual(out1, [ 2, 4, 6, 8, 10 ]);
 });
 
-test('cap', async t => {
+test('take', async t => {
   const inputData = getData();
   const limit = 5;
-  const output = await Async.toArray(Chains.cap(limit)(inputData));
+  const output = await Async.toArray(Chains.take(limit)(inputData));
   t.deepEqual(output, inputData.slice(0, limit));
 
-  const output2 = await Async.toArray(Chains.cap(0)(inputData));
+  const output2 = await Async.toArray(Chains.take(0)(inputData));
   t.is(output2.length, 0);
 });
 
