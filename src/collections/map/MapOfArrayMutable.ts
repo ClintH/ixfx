@@ -50,26 +50,26 @@ export const ofArrayMutable = <V>(
 ): IMapOfMutableExtended<V, ReadonlyArray<V>> => {
   const comparer =
     opts.comparer === undefined
-      ? opts.toString === undefined
+      ? (opts.toString === undefined
         ? (a: V, b: V) => opts.toString(a) === opts.toString(b)
-        : isEqualDefault
+        : isEqualDefault)
       : opts.comparer;
 
   const t: MultiValue<V, ReadonlyArray<V>> = {
     get name() {
       return `array`;
     },
-    add: (dest, values) => {
-      if (dest === undefined) return [ ...values ];
-      return [ ...dest, ...values ];
+    add: (destination, values) => {
+      if (destination === undefined) return [ ...values ];
+      return [ ...destination, ...values ];
     },
     iterable: (source) => source.values(),
     count: (source) => source.length,
-    find: (source, predicate) => source.find(predicate),
-    filter: (source, predicate) => source.filter(predicate),
+    find: (source, predicate) => source.find(f => predicate(f)),
+    filter: (source, predicate) => source.filter(f => predicate(f)),
     toArray: (source) => source,
     has: (source, value) =>
-      source.find((v) => comparer(v, value)) !== undefined,
+      source.some((v) => comparer(v, value)) !== undefined,
     without: (source, value) => source.filter((v) => !comparer(v, value)),
     //[Symbol.iterator]: (source) => source[Symbol.iterator]()
   };
