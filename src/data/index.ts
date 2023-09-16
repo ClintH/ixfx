@@ -1,3 +1,5 @@
+
+
 /**
  * Normalise module
  * * {@link array}: Normalises the contents of an array of known values.
@@ -20,8 +22,10 @@ export * from './Flip.js';
 export * as Pipes from './pipes/index.js'
 export * as Signals from './Signal.js';
 export * as Chains from './Chain.js';
-
 export * as Graphs from './graphs/index.js'
+
+export * from './Table.js';
+
 /**
  * Work with bipolar values (-1...1)
  * 
