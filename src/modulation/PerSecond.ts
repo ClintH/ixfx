@@ -9,12 +9,13 @@
  * 
  * @example Usage example
  * ```js
- * const settings = {
+ * const settings = Object.freeze({
  *  ageMod: perSecond(0.1);
- * }
- * let state = {
+* });
+ * 
+ * let state = Object.freeze({
  *  age: 1
- * }
+ * });
  * 
  * // Update
  * setInterval(() => {
@@ -24,7 +25,7 @@
  *  age += settings.ageMod(); 
  *  state = {
  *    ...state,
- *    age
+ *    age: clamp(age)
  *  }
  * });
  * ```
