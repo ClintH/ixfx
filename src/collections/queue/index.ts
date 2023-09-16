@@ -1,5 +1,5 @@
 
-
+export * from './QueueTypes.js';
 export { type IQueueMutable } from './IQueueMutable.js';
 export { type IQueueImmutable } from './IQueueImmutable.js';
 export { type IPriorityQueueMutable } from './IPriorityQueueMutable.js';
