@@ -12,11 +12,11 @@ import { throwIntegerTest } from "../Guards.js";
  * A Generator, AsyncGenerator or IterableIterator
  */
 export type Gen<V> = Generator<V> | AsyncGenerator<V> | IterableIterator<V>;
-type GenOrData<V> = Array<V> | Gen<V>;
+export type GenOrData<V> = Array<V> | Gen<V>;
 
-type Chain<In, Out> = (input: GenOrData<In>) => AsyncGenerator<Out>;
+export type Chain<In, Out> = (input: GenOrData<In>) => AsyncGenerator<Out>;
 
-type GenFactoryNoInput<Out> = () => AsyncGenerator<Out>;
+export type GenFactoryNoInput<Out> = () => AsyncGenerator<Out>;
 
 export type ChainArguments<In, Out> = [
   Chain<In, any> | GenOrData<In> | GenFactoryNoInput<Out>,
@@ -46,7 +46,8 @@ async function* primitiveToAsyncGenerator(value: number | boolean | string) {
  * @param input 
  * @returns 
  */
-function resolveToAsyncGen<V>(input: GenOrData<V> | GenFactoryNoInput<V>): AsyncGenerator<V> {
+function resolveToAsyncGen<V>(input: GenOrData<V> | GenFactoryNoInput<V> | undefined): AsyncGenerator<V> | undefined {
+  if (input === undefined) return;
   if (Array.isArray(input)) {
     return Async.fromArray(input);
   } else if (typeof input === `number` || typeof input === `boolean` || typeof input === `string`) {
@@ -118,6 +119,130 @@ export function delay<In>(options: DelayOptions): Chain<In, In> {
   return delay;
 }
 
+function isNoInput<Out>(c: Chain<any, any>): c is GenFactoryNoInput<Out> {
+  if (`_allowNoInput` in c) return true;
+  return false;
+}
+
+export type LazyChain<In, Out> = {
+  /**
+   * Return the chain as a regular generator, 
+   * optionally providing the starting data
+   * @param data 
+   * @returns 
+   */
+  asGenerator: (data?: GenOrData<In>) => AsyncGenerator<Out>
+  asArray: (data?: GenOrData<In>) => Promise<Array<Out>>
+  lastOutput: (data?: GenOrData<In>) => Promise<Out | undefined>
+  firstOutput: (data?: GenOrData<In>) => Promise<Out | undefined>
+  fromFunction: (callback: () => any) => LazyChain<any, any>
+  take: (limit: number) => LazyChain<In, Out>
+  chunk: (size: number, returnRemainers?: boolean) => LazyChain<In, Out>
+  filter: (predicate: (input: any) => boolean) => LazyChain<In, Out>
+  min: () => LazyChain<any, number>
+  max: () => LazyChain<any, number>
+  average: () => LazyChain<any, number>
+  total: () => LazyChain<In, number>
+  tally: () => LazyChain<In, number>
+  input: (data: GenOrData<In>) => LazyChain<In, Out>;
+}
+
+export function lazy<In, Out>(): LazyChain<In, Out> {
+  const chained: Array<Chain<any, any>> = [];
+  let dataToUse: GenOrData<In> | undefined;
+
+  const asGenerator = <V>(data?: GenOrData<In>) => {
+    if (data === undefined) data = dataToUse;
+    let d = resolveToAsyncGen(data);
+    for (const c of chained) {
+      if (d === undefined) {
+        if (isNoInput<In>(c)) {
+          d = c();
+        } else {
+          throw new Error(`Function '${ getName(c) }' requires input. Provide it to the function, or call 'input' earlier.`)
+        }
+      } else {
+        d = c(d);
+      }
+    }
+    return d as AsyncGenerator<V>
+  }
+
+  const w = {
+    asGenerator,
+    fromFunction: (callback: () => any) => {
+      chained.push(fromFunction(callback));
+      return w;
+    },
+    take: (limit: number) => {
+      chained.push(take(limit));
+      return w;
+    },
+    chunk: (size: number, returnRemainders = true) => {
+      chained.push(chunk(size, returnRemainders))
+      return w;
+    },
+    filter: (predicate: (input: any) => boolean) => {
+      chained.push(filter(predicate));
+      return w;
+    },
+    min: (): LazyChain<any, number> => {
+      chained.push(min());
+      return w as unknown as LazyChain<any, number>;
+    },
+    max: (): LazyChain<any, number> => {
+      chained.push(max());
+      return w as unknown as LazyChain<any, number>;
+    },
+    average: (): LazyChain<any, number> => {
+      chained.push(average());
+      return w as unknown as LazyChain<any, number>;
+    },
+    total: (): LazyChain<any, number> => {
+      chained.push(total());
+      return w as unknown as LazyChain<any, number>;
+    },
+    tally: (): LazyChain<any, number> => {
+      chained.push(tally());
+      return w as unknown as LazyChain<any, number>;
+    },
+    input(data: GenOrData<In>) {
+      dataToUse = data;
+      return w
+    },
+    asAsync(data?: GenOrData<In>) {
+      let d = data ?? dataToUse;
+      for (const c of chained) {
+        if (d === undefined && isNoInput<In>(c)) {
+          d = c();
+        } else if (d === undefined) {
+          throw new Error(`Function '${ getName(c) }' needs input. Pass in data calling 'asAsync', or call 'input' earlier`);
+        } else {
+          d = c(d);
+        }
+      }
+      return w;
+    },
+    asArray: async (data?: GenOrData<In>): Promise<Array<Out>> => {
+      const g = asGenerator<Out>(data);
+      return await Async.toArray<Out>(g);
+    },
+    firstOutput: async (data?: GenOrData<In>): Promise<Out | undefined> => {
+      const g = asGenerator<Out>(data);
+      const v = await g.next();
+      return v.value as Out;
+    },
+    lastOutput: async (data?: GenOrData<In>): Promise<Out | undefined> => {
+      const g = asGenerator<Out>(data);
+      let lastValue: Out | undefined;
+      for await (const v of g) {
+        lastValue = v as Out;
+      }
+      return lastValue;
+    },
+  }
+  return w as unknown as LazyChain<In, Out>;
+}
 
 /**
  * Ensure a minimum length of time between values.
@@ -209,6 +334,45 @@ export function tick(options: TickOptions): GenFactoryNoInput<number> {
   }
   ts._name = `timestamp`;
   return ts;
+}
+
+/**
+ * Produce a value from a callback. When
+ * the callback returns _undefined_ it is considered done.
+ * 
+ * ```js
+ * const callback = () => Math.random();
+ * 
+ * const f = Chains.fromFunction(callback);
+ * f(); // New random number
+ * ```
+ * 
+ * In the context of a chain:
+ * ```js
+ * let produced = 0;
+ * const chain = Chains.chain<number, string>(
+ *  // Produce incrementing numbers
+ *  Chains.fromFunction(() => produced++),
+ *  // Convert to `x:0`, `x:1` ...
+ *  Chains.transform(v => `x:${ v }`),
+ *  // Take first 5 results
+ *  Chains.cap(5)
+ * );
+ * const data = await Chains.asArray(chain);
+ * ```
+ * @param callback 
+ * @returns 
+ */
+export function fromFunction<Out>(callback: () => Promise<Out> | Out): GenFactoryNoInput<Out> {
+  async function* fromFunction(): AsyncGenerator<Out> {
+    while (true) {
+      const v = await callback();
+      if (v === undefined) break;
+      yield v;
+    }
+  }
+  fromFunction._name = `fromFunction`;
+  return fromFunction;
 }
 
 /**
@@ -405,7 +569,12 @@ export async function* mergeFlat<Out>(...sources: Array<GenOrData<any> | GenFact
   const buffer = Queues.mutable<Out>();
   let completed = 0;
 
-  const schedule = async (source: AsyncGenerator<any>) => {
+  const schedule = async (source: AsyncGenerator<any> | undefined) => {
+    if (source === undefined) {
+      completed++;
+      return;
+    }
+
     const x = await source.next();
     if (x.done) {
       completed++;
@@ -516,12 +685,12 @@ export async function* synchronise(...sources: Array<GenOrData<any> | GenFactory
 }
 
 /**
- * Emits up to a capped amount of items from the input
+ * Take `limit` number of results from the stream, before closing
  * @param limit 
  * @returns 
  */
-export function cap<In>(limit: number): Chain<In, In> {
-  async function* cap(input: GenOrData<In>): AsyncGenerator<In> {
+export function take<In>(limit: number): Chain<In, In> {
+  async function* take(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     let yielded = 0;
     for await (const value of input) {
@@ -529,13 +698,22 @@ export function cap<In>(limit: number): Chain<In, In> {
       yield value;
     }
   }
-  cap._name = `cap`;
-  return cap;
+  take._name = `take`;
+  return take;
 }
 
+const getName = (c: Chain<any, any>): string => {
+  if (`_name` in c) {
+    return c._name as string;
+  } else {
+    return c.name;
+  }
+}
 /**
  * Returns a running tally of how many items have been
  * emitted from the input source.
+ * 
+ * This is different than {@link total} which adds up numeric values
  * @param limit 
  * @returns 
  */
@@ -549,6 +727,85 @@ export function tally<In>(): Chain<In, number> {
   }
   tally._name = `tally`;
   return tally;
+}
+
+/**
+ * Returns the smallest value from the input.
+ * Non-numeric data is filtered out
+ * @returns 
+ */
+export function min(): Chain<number, number> {
+  async function* min(input: GenOrData<number>): AsyncGenerator<number> {
+    input = resolveToGen(input);
+    let min = Number.MAX_SAFE_INTEGER;
+    for await (const value of input) {
+      if (typeof value !== `number`) break;
+
+      min = Math.min(value, min);
+      yield min;
+    }
+  }
+  min._name = `min`;
+  return min;
+}
+
+/**
+ * Returns the largest value from the input
+ * Non-numeric data is filtered out
+ * @returns 
+ */
+export function max(): Chain<number, number> {
+  async function* max(input: GenOrData<number>): AsyncGenerator<number> {
+    input = resolveToGen(input);
+    let max = Number.MIN_SAFE_INTEGER;
+    for await (const value of input) {
+      if (typeof value !== `number`) break;
+      max = Math.max(value, max);
+      yield max;
+    }
+  }
+  max._name = `max`;
+  return max;
+}
+
+/**
+ * Returns the average from the input.
+ * Non-numeric values are filtered out.
+ * @returns 
+ */
+export function average(): Chain<number, number> {
+  async function* average(input: GenOrData<number>): AsyncGenerator<number> {
+    input = resolveToGen(input);
+    let total = 0;
+    let count = 0;
+    for await (const value of input) {
+      if (typeof value !== `number`) break;
+      count++;
+      total += value;
+      yield total / count;
+    }
+  }
+  average._name = `average`;
+  return average;
+}
+
+/**
+ * Returns the total of the numeric values.
+ * Non-numeric values are filtered out.
+ * @returns 
+ */
+export function total(): Chain<number, number> {
+  async function* average(input: GenOrData<number>): AsyncGenerator<number> {
+    input = resolveToGen(input);
+    let total = 0;
+    for await (const value of input) {
+      if (typeof value !== `number`) break;
+      total += value;
+      yield total;
+    }
+  }
+  average._name = `average`;
+  return average;
 }
 
 /**
@@ -578,6 +835,8 @@ export function chunk<In>(size: number, returnRemainders = true): Chain<In, Arra
 /**
  * Filters the input source, only allowing through
  * data for which `predicate` returns _true_
+ * 
+ * {@link drop}, on the other hand excludes values for which predicate is _true_
  * @param predicate 
  * @returns 
  */
@@ -592,6 +851,26 @@ export function filter<In>(predicate: (v: In) => boolean): Chain<In, In> {
   }
   filter._name = `filter`;
   return filter;
+}
+
+/**
+ * Drops all values from input stream for which `predicate` returns _true_
+ * 
+ * {@link filter}, on the other hand includes values where the predicate is _true_
+ * @param predicate 
+ * @returns 
+ */
+export function drop<In>(predicate: (v: In) => boolean): Chain<In, In> {
+  async function* drop(input: GenOrData<In>): AsyncGenerator<In> {
+    input = resolveToGen(input);
+    for await (const value of input) {
+      if (!predicate(value)) {
+        yield value;
+      }
+    }
+  }
+  drop._name = `drop`;
+  return drop;
 }
 
 /**
@@ -625,3 +904,4 @@ export async function* chain<In, Out>(...functions: ChainArguments<In, Out>): As
     yield v as Out;
   }
 }
+
