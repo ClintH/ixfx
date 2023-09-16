@@ -20,12 +20,12 @@ export type Op<In, Out> = OnePipeOp<In, Out> | OneToManyOp<In, Out>;
 
 export type OpFactory<In, Out> = (args: any) => Op<In, Out>;
 
-export type CapOptions = {
+export type TakeOptions = {
   length: number
   keepOpen?: boolean
 }
 
-const Names_Cap = `cap` as const;
+const Names_Take = `take` as const;
 const Names_Synchronise = `synchronise` as const;
 
 /**
@@ -33,13 +33,13 @@ const Names_Synchronise = `synchronise` as const;
  * 
  * eg. let through the first five items.
  * 
- * By default, output pipe will close when cap is reached.
- * Signals with no values do not count towards cap, but are sent to output.
+ * By default, output pipe will close when limit is reached.
+ * Signals with no values do not count towards limit, but are sent to output.
  * @param p 
  * @param options 
  * @returns 
  */
-export const cap = <V>(options: CapOptions): OnePipeOp<V, V> => {
+export const take = <V>(options: TakeOptions): OnePipeOp<V, V> => {
   let count = 0;
   const length = options.length;
   const keepOpen = options.keepOpen ?? false;
@@ -51,7 +51,7 @@ export const cap = <V>(options: CapOptions): OnePipeOp<V, V> => {
       if (count >= length) {
         upstream.setOutlet(NullSink);
         if (keepOpen) return;
-        downstream.inlet(Signals.close(Names_Cap));
+        downstream.inlet(Signals.close(Names_Take));
         return;
       }
       // Pass data or signal
