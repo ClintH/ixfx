@@ -75,9 +75,10 @@ export type MapArrayEvents<V> = {
  * @template V Values stored under keys
  * @template M Type of data structure managing values
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapOfMutableExtended<V, M>
   extends SimpleEventEmitter<MapArrayEvents<V>>,
-    IMapOfMutable<V> {
+  IMapOfMutable<V> {
   /**
    * Returns the object managing values under the specified `key`
    * @private

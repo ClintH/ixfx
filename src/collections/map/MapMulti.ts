@@ -20,7 +20,7 @@ export type MultiValue<V, M> = {
   add(destination: M | undefined, values: Iterable<V>): M;
   toArray(source: M): ReadonlyArray<V>;
   iterable(source: M): IterableIterator<V>;
-  find(source: M, predicate: (v: V) => boolean): V | unknown;
+  find(source: M, predicate: (v: V) => boolean): V | undefined;
   filter(source: M, predicate: (v: V) => boolean): Iterable<V>; // ReadonlyArray<V>
   without(source: M, value: V): ReadonlyArray<V>;
   count(source: M): number;

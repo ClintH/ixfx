@@ -49,20 +49,22 @@ export class MapOfMutableImpl<V, M>
   }
 
   debugString(): string {
-    const keys = Array.from(this.#map.keys());
+    const keys = [ ...this.#map.keys() ];
     // eslint-disable-next-line functional/no-let
     let r = `Keys: ${ keys.join(`, `) }\r\n`;
-    keys.forEach((k) => {
+    for (const k of keys) {
       const v = this.#map.get(k);
-      if (v !== undefined) {
+      if (v === undefined) {
+        r += ` - ${ k } (undefined)\r\n`
+      } else {
         const asArray = this.type.toArray(v);
         if (asArray !== undefined) {
           r += ` - ${ k } (${ this.type.count(v) }) = ${ JSON.stringify(
             asArray
           ) }\r\n`;
         }
-      } else r += ` - ${ k } (undefined)\r\n`;
-    });
+      }
+    };
     return r;
   }
 
@@ -76,9 +78,8 @@ export class MapOfMutableImpl<V, M>
   }
 
   //eslint-disable-next-line functional/prefer-immutable-types
-  addKeyedValues(key: string, ...values: V[]) {
+  addKeyedValues(key: string, ...values: Array<V>) {
     const set = this.#map.get(key);
-    //console.log(`addKeyedValues: key: ${key} values: ${JSON.stringify(values)}`);
     if (set === undefined) {
       this.#map.set(key, this.type.add(undefined, values));
       super.fireEvent(`addedKey`, { key: key });
@@ -90,13 +91,13 @@ export class MapOfMutableImpl<V, M>
     }
   }
   //eslint-disable-next-line functional/prefer-immutable-types
-  set(key: string, values: V[]) {
+  set(key: string, values: Array<V>) {
     this.addKeyedValues(key, ...values);
     return this;
   }
 
   addValue(...values: ReadonlyArray<V>) {
-    values.forEach((v) => this.addKeyedValues(this.groupBy(v), v));
+    for (const v of values) this.addKeyedValues(this.groupBy(v), v);
   }
 
   hasKeyValue(key: string, value: V, eq: IsEqual<V>): boolean {
@@ -127,9 +128,9 @@ export class MapOfMutableImpl<V, M>
   deleteByValue(value: V): boolean {
     //eslint-disable-next-line functional/no-let
     let something = false;
-    Array.from(this.#map.keys()).filter((key) => {
+    [ ...this.#map.keys() ].filter((key) => {
       const a = this.#map.get(key);
-      if (!a) throw Error(`Bug: map could not be accessed`);
+      if (!a) throw new Error(`Bug: map could not be accessed`);
       if (this.deleteKeyValueFromMap(a, key, value)) {
         something = true; // note that something was deleted
 
@@ -152,19 +153,20 @@ export class MapOfMutableImpl<V, M>
     value: V,
     eq: IsEqual<V> = isEqualDefault
   ): string | undefined {
-    const keys = Array.from(this.#map.keys());
+    const keys = [ ...this.#map.keys() ];
     const found = keys.find((key) => {
       const a = this.#map.get(key);
-      if (a === undefined) throw Error(`Bug: map could not be accessed`);
-      return this.type.has(a, value, eq);
+      if (a === undefined) throw new Error(`Bug: map could not be accessed`);
+      const r = this.type.has(a, value, eq);
+      return r;
     });
     return found;
   }
 
   count(key: string): number {
-    const e = this.#map.get(key);
-    if (e === undefined) return 0;
-    return this.type.count(e);
+    const entry = this.#map.get(key);
+    if (entry === undefined) return 0;
+    return this.type.count(entry);
   }
 
   /**
@@ -201,24 +203,24 @@ export class MapOfMutableImpl<V, M>
   }
 
   *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
-    for (const e of this.#map.entries()) {
-      for (const v of this.type.iterable(e[ 1 ])) {
-        yield [ e[ 0 ], v ];
+    for (const entry of this.#map.entries()) {
+      for (const v of this.type.iterable(entry[ 1 ])) {
+        yield [ entry[ 0 ], v ];
       }
     }
   }
 
   *valuesFlat(): IterableIterator<V> {
-    for (const e of this.#map.entries()) {
-      yield* this.type.iterable(e[ 1 ]);
+    for (const entry of this.#map.entries()) {
+      yield* this.type.iterable(entry[ 1 ]);
     }
   }
 
-  *entries(): IterableIterator<[ key: string, value: V[] ]> {
+  *entries(): IterableIterator<[ key: string, value: Array<V> ]> {
     //yield* this.#map.entries();
     for (const [ k, v ] of this.#map.entries()) {
-      const tmp = [ ...this.type.iterable(v) ];
-      yield [ k, tmp ];
+      const temporary = [ ...this.type.iterable(v) ];
+      yield [ k, temporary ];
     }
   }
 
@@ -249,19 +251,23 @@ export class MapOfMutableImpl<V, M>
   get size() {
     return this.#map.size;
   }
-
-  forEach(
-    fn: (
-      value: readonly V[],
-      key: string,
-      //eslint-disable-next-line functional/prefer-immutable-types
-      map: Map<string, readonly V[]>
-    ) => void,
-    _thisArg?: any
-  ) {
-    // @ts-ignore
-    this.#map.forEach(fn);
-  }
+  /*
+    forEach_(
+      fn: (
+        value: ReadonlyArray<V>,
+        key: string,
+        //eslint-disable-next-line functional/prefer-immutable-types
+        map: Map<string, ReadonlyArray<V>>
+      ) => void,
+      _?: any
+    ) {
+      // for (const [key,value] of this.#map.entries()) {
+      //   value
+      // }
+      // @ts-expect-error
+      this.#map.forEach(fn);
+    }
+    */
 
   get [ Symbol.toStringTag ]() {
     return this.#map[ Symbol.toStringTag ];

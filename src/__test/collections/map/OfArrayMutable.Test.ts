@@ -18,7 +18,11 @@ test(`withOpts`, (t) => {
 
   const opts: MapArrayOpts<Person> = {
     groupBy: (p) => p.city,
-    comparer: (a, b) => a.name === b.name && a.city === b.city,
+    comparer: (a, b) => {
+      const eq = a.name === b.name && a.city === b.city;
+      //console.log(`  test comparer: result: ${ eq } a.name: ${ a.name } b.name: ${ b.name } a.city: ${ a.city } b.city: ${ b.city }`);
+      return eq;
+    }
   };
 
   const m = ofArrayMutable<Person>(opts);

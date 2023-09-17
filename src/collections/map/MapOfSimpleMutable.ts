@@ -62,7 +62,7 @@ export class MapOfSimpleMutable<V>
   deleteKeyValue(key: string, value: V): boolean {
     const existing = this.map.get(key);
     if (existing === undefined) return false;
-    const without = existing.filter((i) => !this.valueEq(i, value));
+    const without = existing.filter((existingValue) => !this.valueEq(existingValue, value));
     this.map.set(key, without);
     return without.length < existing.length;
   }
@@ -77,11 +77,12 @@ export class MapOfSimpleMutable<V>
   deleteByValue(value: V): boolean {
     //eslint-disable-next-line functional/no-let
     let del = false;
-    for (const entries of [ ...this.map.entries() ]) {
-      for (const values of entries[ 1 ]) {
+    const entries = [ ...this.map.entries() ];
+    for (const keyEntries of entries) {
+      for (const values of keyEntries[ 1 ]) {
         if (this.valueEq(values, value)) {
           del = true;
-          this.deleteKeyValue(entries[ 0 ], value);
+          this.deleteKeyValue(keyEntries[ 0 ], value);
         }
       }
     }

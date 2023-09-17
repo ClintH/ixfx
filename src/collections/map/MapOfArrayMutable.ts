@@ -15,7 +15,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
   /**
    * Key function
    */
-  readonly toString?: ToString<V>;
+  readonly convertToString?: ToString<V>;
 };
 
 /**
@@ -32,9 +32,9 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * * `comparer`: {@link IsEqual}
  * * `toString`: {@link Util.ToString}
  *
- * A custom {@link Util.ToString} function can be provided which is used when checking value equality (`has`, `without`)
+ * A custom {@link Util.ToString} function can be provided as the `convertToString` opion. This is then used when checking value equality (`has`, `without`)
  * ```js
- * const map = ofArrayMutable({toString:(v) => v.name}); // Compare values based on their `name` field;
+ * const map = ofArrayMutable({ convertToString:(v) => v.name}); // Compare values based on their `name` field;
  * ```
  *
  * Alternatively, a {@link IsEqual} function can be used:
@@ -48,12 +48,24 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
 export const ofArrayMutable = <V>(
   opts: MapArrayOpts<V> = {}
 ): IMapOfMutableExtended<V, ReadonlyArray<V>> => {
-  const comparer =
-    opts.comparer === undefined
-      ? (opts.toString === undefined
-        ? (a: V, b: V) => opts.toString(a) === opts.toString(b)
-        : isEqualDefault)
-      : opts.comparer;
+  // const toStringFunction = opts.toString === undefined ?  
+  // const comparer =
+  //   opts.comparer === undefined
+  //     ? (opts.toString === undefined
+  //       ? (a: V, b: V) => opts.toString(a) === opts.toString(b)
+  //       : isEqualDefault)
+  //     : opts.comparer;
+  // const convertToStringComparer = opts.convertToString === undefined ? undefined : (a: V, b: V) => {
+  //   const r = opts.convertToString(a) === opts.convertToString(b)
+  //   console.log(`ofArrayMutable toString comparer: r: ${ r } a: ${ a } b: ${ b }`);
+  //   console.log(`ofArrayMutable toString comparer: a: ${ opts.toString(a) } b: ${ opts.toString(b) }`);
+  //   return r;
+  // };
+
+  const convertToString = opts.convertToString;
+  const toStringFunction: IsEqual<V> = typeof convertToString === `undefined` ? isEqualDefault : (a: V, b: V) => convertToString(a) === convertToString(b)
+
+  const comparer = opts.comparer ?? toStringFunction;
 
   const t: MultiValue<V, ReadonlyArray<V>> = {
     get name() {
@@ -68,8 +80,7 @@ export const ofArrayMutable = <V>(
     find: (source, predicate) => source.find(f => predicate(f)),
     filter: (source, predicate) => source.filter(f => predicate(f)),
     toArray: (source) => source,
-    has: (source, value) =>
-      source.some((v) => comparer(v, value)) !== undefined,
+    has: (source, value) => source.some((v) => comparer(v, value)),
     without: (source, value) => source.filter((v) => !comparer(v, value)),
     //[Symbol.iterator]: (source) => source[Symbol.iterator]()
   };
