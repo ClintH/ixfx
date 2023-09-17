@@ -1,5 +1,10 @@
 A rough changelog between NPM releases
 
+# 0.12.1 17.09.23
+
+* Dom.DataDisplay: easily display state
+* Data.noiseFilter wip
+  
 # 0.12.0 16.09.23
 
 * Data.Chains: process a series of async generators

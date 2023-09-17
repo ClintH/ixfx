@@ -89,7 +89,8 @@ export const movingAverageTimed = (
 
   const reschedule = () => {
     if (timer !== 0) clearTimeout(timer);
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+    // @ts-ignore
     timer = setTimeout(decay, updateRateMs) as number;
   };
 
