@@ -21,8 +21,8 @@ export const Empty = Object.freeze({
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Placeholder = Object.freeze({
-  a: Object.freeze({ x: NaN, y: NaN }),
-  b: Object.freeze({ x: NaN, y: NaN })
+  a: Object.freeze({ x: Number.NaN, y: Number.NaN }),
+  b: Object.freeze({ x: Number.NaN, y: Number.NaN })
 });
 
 /**
@@ -128,12 +128,12 @@ export const apply = (line: Line, fn: (p: Points.Point) => Points.Point) => Obje
  * 
  * Does not validate points
  * @param line 
- * @param paramName 
+ * @param name 
  */
-export const guard = (line: Line, paramName: string = `line`) => {
-  if (line === undefined) throw new Error(`${ paramName } undefined`);
-  if (line.a === undefined) throw new Error(`${ paramName }.a undefined. Expected {a:Point, b:Point}. Got: ${ JSON.stringify(line) }`);
-  if (line.b === undefined) throw new Error(`${ paramName }.b undefined. Expected {a:Point, b:Point} Got: ${ JSON.stringify(line) }`);
+export const guard = (line: Line, name = `line`) => {
+  if (line === undefined) throw new Error(`${ name } undefined`);
+  if (line.a === undefined) throw new Error(`${ name }.a undefined. Expected {a:Point, b:Point}. Got: ${ JSON.stringify(line) }`);
+  if (line.b === undefined) throw new Error(`${ name }.b undefined. Expected {a:Point, b:Point} Got: ${ JSON.stringify(line) }`);
 };
 
 /**
@@ -280,8 +280,8 @@ export const normaliseByRect = (line: Line, width: number, height: number): Line
  * @returns True if point is within range
  */
 export const withinRange = (line: Line, point: Points.Point, maxRange: number): boolean => {
-  const dist = distance(line, point);
-  return dist <= maxRange;
+  const calculatedDistance = distance(line, point);
+  return calculatedDistance <= maxRange;
 };
 
 /**
@@ -319,11 +319,11 @@ export function length(line: Line | PolyLine): number;
 //eslint-disable-next-line func-style
 export function length(aOrLine: Points.Point | Line | PolyLine, pointB?: Points.Point): number {
   if (isPolyLine(aOrLine)) {
-    const sum = aOrLine.reduce((acc, v) => length(v) + acc, 0);
+    const sum = aOrLine.reduce((accumulator, v) => length(v) + accumulator, 0);
     return sum;
   }
-
-  const [ a, b ] = getPointsParam(aOrLine, pointB);
+  if (aOrLine === undefined) throw new TypeError(`Parameter 'aOrLine' is undefined`);
+  const [ a, b ] = getPointParameter(aOrLine, pointB);
   const x = b.x - a.x;
   const y = b.y - a.y;
   if (a.z !== undefined && b.z !== undefined) {
@@ -346,7 +346,7 @@ export function length(aOrLine: Points.Point | Line | PolyLine, pointB?: Points.
  * @returns 
  */
 export const midpoint = (aOrLine: Points.Point | Line, pointB?: Points.Point): Points.Point => {
-  const [ a, b ] = getPointsParam(aOrLine, pointB);
+  const [ a, b ] = getPointParameter(aOrLine, pointB);
   return interpolate(0.5, a, b);
 };
 
@@ -359,7 +359,7 @@ export const midpoint = (aOrLine: Points.Point | Line, pointB?: Points.Point): P
  * @param b 
  * @returns 
  */
-export const getPointsParam = (aOrLine: Points.Point | Line, b?: Points.Point): readonly [ Points.Point, Points.Point ] => {
+export const getPointParameter = (aOrLine: Points.Point | Line, b?: Points.Point): readonly [ Points.Point, Points.Point ] => {
   //eslint-disable-next-line functional/no-let
   let a;
   if (isLine(aOrLine)) {
@@ -388,17 +388,17 @@ export const getPointsParam = (aOrLine: Points.Point | Line, b?: Points.Point): 
  * @param point
  * @returns Point `{ x, y }`
  */
-export const nearest = (line: Line | readonly Line[], point: Points.Point): Points.Point => {
+export const nearest = (line: Line | ReadonlyArray<Line>, point: Points.Point): Points.Point => {
 
   const n = (line: Line): Points.Point => {
     const { a, b } = line;
     const atob = { x: b.x - a.x, y: b.y - a.y };
     const atop = { x: point.x - a.x, y: point.y - a.y };
-    const len = atob.x * atob.x + atob.y * atob.y;
+    const length = atob.x * atob.x + atob.y * atob.y;
 
     //eslint-disable-next-line functional/no-let
     let dot = atop.x * atob.x + atop.y * atob.y;
-    const t = Math.min(1, Math.max(0, dot / len));
+    const t = Math.min(1, Math.max(0, dot / length));
     dot = (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
     return { x: a.x + atob.x * t, y: a.y + atob.y * t };
   };
@@ -436,9 +436,11 @@ export const slope = (lineOrPoint: Line | Points.Point, b?: Points.Point): numbe
     a = lineOrPoint;
     if (b === undefined) throw new Error(`b parameter required`);
   }
-  if (b !== undefined) {
+  if (b === undefined) {
+    throw new TypeError(`Second point missing`)
+  } else {
     return (b.y - a.y) / (b.x - a.x);
-  } else throw Error(`Second point missing`);
+  }
 };
 
 const directionVector = (line: Line): Points.Point => ({
@@ -467,7 +469,7 @@ const directionVectorNormalised = (line: Line): Points.Point => {
  * @param distance Distance from line. Use negatives to flip side
  * @param amount Relative place on line to project point from. 0 projects from A, 0.5 from the middle, 1 from B.
  */
-export const perpendicularPoint = (line: Line, distance: number, amount: number = 0) => {
+export const perpendicularPoint = (line: Line, distance: number, amount = 0) => {
   const origin = interpolate(amount, line);
   const dvn = directionVectorNormalised(line);
   return {
@@ -545,16 +547,15 @@ export const pointAtX = (line: Line, x: number): Points.Point => {
  * @return Newly extended line
  */
 export const extendFromA = (line: Line, distance: number): Line => {
-  const len = length(line);
+  const calculatedLength = length(line);
   return Object.freeze({
     ...line,
     a: line.a,
     b: Object.freeze({
-      x: line.b.x + (line.b.x - line.a.x) / len * distance,
-      y: line.b.y + (line.b.y - line.a.y) / len * distance,
+      x: line.b.x + (line.b.x - line.a.x) / calculatedLength * distance,
+      y: line.b.y + (line.b.y - line.a.y) / calculatedLength * distance,
     })
-  })
-    ;
+  });
 };
 
 /**
@@ -579,9 +580,7 @@ export const extendFromA = (line: Line, distance: number): Line => {
 export function* pointsOf(line: Line): Generator<Points.Point> {
   // Via https://play.ertdfgcvb.xyz/#/src/demos/dyna
   const { a, b } = line;
-  //eslint-disable-next-line functional/no-let
   let x0 = Math.floor(a.x);
-  //eslint-disable-next-line functional/no-let
   let y0 = Math.floor(a.y);
   const x1 = Math.floor(b.x);
   const y1 = Math.floor(b.y);
@@ -589,12 +588,13 @@ export function* pointsOf(line: Line): Generator<Points.Point> {
   const dy = -Math.abs(y1 - y0);
   const sx = x0 < x1 ? 1 : -1;
   const sy = y0 < y1 ? 1 : -1;
-  //eslint-disable-next-line functional/no-let
+  // eslint-disable-next-line unicorn/prevent-abbreviations
   let err = dx + dy;
 
   while (true) {
     yield { x: x0, y: y0 };
     if (x0 === x1 && y0 === y1) break;
+    // eslint-disable-next-line unicorn/prevent-abbreviations
     const e2 = 2 * err;
     if (e2 >= dy) {
       err += dy;
@@ -712,10 +712,11 @@ export function interpolate(amount: number, aOrLine: Points.Point | Line, pointB
     pointBOrAllowOverflow = undefined;
   }
 
+  // eslint-disable-next-line unicorn/no-negated-condition
   if (!allowOverflow) throwPercentTest(amount, `amount`);
   else throwNumberTest(amount, ``, `amount`);
 
-  const [ a, b ] = getPointsParam(aOrLine, pointBOrAllowOverflow);
+  const [ a, b ] = getPointParameter(aOrLine, pointBOrAllowOverflow);
 
   const d = length(a, b);
   const d2 = d * (1 - amount);
@@ -811,7 +812,7 @@ export const fromNumbers = (x1: number, y1: number, x2: number, y2: number): Lin
  * @param {Point} b
  * @returns {number[]}
  */
-export const toFlatArray = (a: Points.Point | Line, b: Points.Point): readonly number[] => {
+export const toFlatArray = (a: Points.Point | Line, b: Points.Point): ReadonlyArray<number> => {
   if (isLine(a)) {
     return [ a.a.x, a.a.y, a.b.x, a.b.y ];
   } else if (Points.isPoint(a) && Points.isPoint(b)) {
@@ -850,7 +851,7 @@ export function* asPoints(lines: Iterable<Line>) {
  * @param b 
  * @returns 
  */
-export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[] => [ `M${ a.x } ${ a.y } L ${ b.x } ${ b.y }` ];
+export const toSvgString = (a: Points.Point, b: Points.Point): ReadonlyArray<string> => [ `M${ a.x } ${ a.y } L ${ b.x } ${ b.y }` ];
 
 /**
  * Returns a line from four numbers [x1,y1,x2,y2].
@@ -862,13 +863,13 @@ export const toSvgString = (a: Points.Point, b: Points.Point): readonly string[]
  * const line = Lines.fromFlatArray(...[0, 0, 100, 100]);
  * // line is {a: { x:0, y:0 }, b: { x: 100, y: 100 } }
  * ```
- * @param arr Array in the form [x1,y1,x2,y2]
+ * @param array Array in the form [x1,y1,x2,y2]
  * @returns Line
  */
-export const fromFlatArray = (arr: readonly number[]): Line => {
-  if (!Array.isArray(arr)) throw new Error(`arr parameter is not an array`);
-  if (arr.length !== 4) throw new Error(`array is expected to have length four`);
-  return fromNumbers(arr[ 0 ], arr[ 1 ], arr[ 2 ], arr[ 3 ]);
+export const fromFlatArray = (array: ReadonlyArray<number>): Line => {
+  if (!Array.isArray(array)) throw new Error(`arr parameter is not an array`);
+  if (array.length !== 4) throw new Error(`array is expected to have length four`);
+  return fromNumbers(array[ 0 ], array[ 1 ], array[ 2 ], array[ 3 ]);
 };
 
 /**
@@ -908,15 +909,15 @@ export const fromPoints = (a: Points.Point, b: Points.Point): Line => {
  * @param points 
  * @returns 
  */
-export const joinPointsToLines = (...points: readonly Points.Point[]): PolyLine => {
+export const joinPointsToLines = (...points: ReadonlyArray<Points.Point>): PolyLine => {
   const lines = [];
   //eslint-disable-next-line functional/no-let
   let start = points[ 0 ];
   //eslint-disable-next-line functional/no-let
-  for (let i = 1; i < points.length; i++) {
+  for (let index = 1; index < points.length; index++) {
     //eslint-disable-next-line functional/immutable-data
-    lines.push(fromPoints(start, points[ i ]));
-    start = points[ i ];
+    lines.push(fromPoints(start, points[ index ]));
+    start = points[ index ];
   }
   return lines;
 };
@@ -997,8 +998,8 @@ export const toPath = (line: Line): LinePath => {
 };
 
 export type LinePath = Line & Path & {
-  toFlatArray(): readonly number[]
-  toPoints(): readonly Points.Point[]
+  toFlatArray(): ReadonlyArray<number>
+  toPoints(): ReadonlyArray<Points.Point>
   rotate(amountRadian: number, origin: Points.Point): LinePath
   sum(point: Points.Point): LinePath
   divide(point: Points.Point): LinePath
