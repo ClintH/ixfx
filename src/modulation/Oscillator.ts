@@ -31,7 +31,7 @@ export type SpringOpts = {
   readonly countdown?: number;
 };
 
-const springRaw = (opts: SpringOpts = {}, from: number = 0, to: number = 1) => {
+const springRaw = (opts: SpringOpts = {}, from = 0, to = 1) => {
   /** MIT License github.com/pushkine/ */
   const mass = opts.mass ?? 1;
   const stiffness = opts.stiffness ?? 100;
@@ -39,21 +39,21 @@ const springRaw = (opts: SpringOpts = {}, from: number = 0, to: number = 1) => {
   const damping = opts.damping ?? 10;
   const velocity = opts.velocity ?? 0.1;
   const delta = to - from;
-  if (true === soft || 1.0 <= damping / (2.0 * Math.sqrt(stiffness * mass))) {
+  if (soft || 1 <= damping / (2 * Math.sqrt(stiffness * mass))) {
     const angularFrequency = -Math.sqrt(stiffness / mass);
     const leftover = -angularFrequency * delta - velocity;
     return (t: number) =>
       to - (delta + t * leftover) * Math.E ** (t * angularFrequency);
   } else {
-    const dampingFrequency = Math.sqrt(4.0 * mass * stiffness - damping ** 2.0);
+    const dampingFrequency = Math.sqrt(4 * mass * stiffness - damping ** 2);
     const leftover =
-      (damping * delta - 2.0 * mass * velocity) / dampingFrequency;
+      (damping * delta - 2 * mass * velocity) / dampingFrequency;
     const dfm = (0.5 * dampingFrequency) / mass;
     const dm = -(0.5 * damping) / mass;
     return (t: number) =>
       to -
       (Math.cos(t * dfm) * delta + Math.sin(t * dfm) * leftover) *
-        Math.E ** (t * dm);
+      Math.E ** (t * dm);
   }
 };
 
@@ -114,9 +114,9 @@ export function* spring(
  *
  * ```js
  * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- *
+ * import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
  * // Setup
- * const osc = Oscillators.sine(Timers.frequencyTimer(10));
+ * const osc = Oscillators.sine(frequencyTimer(10));
  * const osc = Oscillators.sine(0.1);
  *
  * // Call whenever a value is needed
@@ -136,6 +136,7 @@ export function* spring(
  */
 //eslint-disable-next-line func-style
 export function* sine(timerOrFreq: Timers.Timer | number) {
+  if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   }
@@ -152,6 +153,8 @@ export function* sine(timerOrFreq: Timers.Timer | number) {
  */
 //eslint-disable-next-line func-style
 export function* sineBipolar(timerOrFreq: Timers.Timer | number) {
+  if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
+
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   }
@@ -198,7 +201,7 @@ export function* triangle(timerOrFreq: Timers.Timer | number) {
  *
  * ```js
  * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- *
+ * import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
  * // Setup
  * const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
  *
@@ -211,6 +214,8 @@ export function* triangle(timerOrFreq: Timers.Timer | number) {
  */
 //eslint-disable-next-line func-style
 export function* saw(timerOrFreq: Timers.Timer | number) {
+  if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
+
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Timers.frequencyTimer(timerOrFreq);
   }
