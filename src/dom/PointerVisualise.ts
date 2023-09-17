@@ -1,8 +1,7 @@
 import {
-  type PointTrackerResults,
   pointsTracker,
 } from '../data/PointTracker.js';
-import { fullSizeElement, resolveEl } from './Util.js';
+import { fullSizeElement, resolveEl as resolveElement } from './Util.js';
 import * as Svg from '../visual/Svg.js';
 
 export type Opts = {
@@ -44,12 +43,12 @@ export const pointerVisualise = (
   const trace = opts.trace ?? false;
   const hue = opts.hue ?? 100;
 
-  const startFillStyle = `hsla(${hue}, 100%, 10%, 10%)`;
+  const startFillStyle = `hsla(${ hue }, 100%, 10%, 10%)`;
 
   //eslint-disable-next-line functional/no-let
   let currentHue = hue;
 
-  const el = resolveEl(elOrQuery);
+  const el = resolveElement(elOrQuery);
   const tracker = pointsTracker({
     storeIntermediate: trace,
   });
@@ -77,46 +76,46 @@ export const pointerVisualise = (
   let pointerCount = 0;
 
   //eslint-disable-next-line functional/prefer-immutable-types
-  const lostPointer = async (ev: PointerEvent) => {
-    const id = ev.pointerId.toString();
+  const lostPointer = (event: PointerEvent) => {
+    const id = event.pointerId.toString();
     tracker.delete(id);
     currentHue = hue;
-    svg.querySelector(`#pv-start-${id}`)?.remove();
+    svg.querySelector(`#pv-start-${ id }`)?.remove();
 
     //eslint-disable-next-line functional/no-let
-    for (let i = 0; i < pointerCount + 10; i++) {
-      svg.querySelector(`#pv-progress-${id}-${i}`)?.remove();
+    for (let index = 0; index < pointerCount + 10; index++) {
+      svg.querySelector(`#pv-progress-${ id }-${ index }`)?.remove();
     }
     pointerCount = 0;
   };
 
   //eslint-disable-next-line functional/prefer-immutable-types
-  const trackPointer = async (ev: PointerEvent) => {
-    const id = ev.pointerId.toString();
-    const pt = { x: ev.x, y: ev.y };
-    const type = ev.pointerType;
-    if (ev.type === `pointermove` && !tracker.has(id)) {
+  const trackPointer = async (event: PointerEvent) => {
+    const id = event.pointerId.toString();
+    const pt = { x: event.x, y: event.y };
+    const type = event.pointerType;
+    if (event.type === `pointermove` && !tracker.has(id)) {
       return;
     }
-    const info = (await tracker.seen(id, pt)) as PointTrackerResults;
+    const info = (await tracker.seen(id, pt));
 
     if (info.values.length === 1) {
       const el = Svg.Elements.circle(
         {
-          ...info.values[0],
+          ...info.values[ 0 ],
           radius: type === `touch` ? touchRadius : mouseRadius,
         },
         svg,
         {
           fillStyle: startFillStyle,
         },
-        `#pv-start-${id}`
+        `#pv-start-${ id }`
       );
       el.style.pointerEvents = `none`;
       el.style.touchAction = `none`;
     }
 
-    const progressFillStyle = `hsla(${currentHue}, 100%, 50%, 50%)`;
+    const progressFillStyle = `hsla(${ currentHue }, 100%, 50%, 50%)`;
 
     const el2 = Svg.Elements.circle(
       { ...pt, radius: type === `touch` ? touchRadius : mouseRadius },
@@ -124,22 +123,23 @@ export const pointerVisualise = (
       {
         fillStyle: progressFillStyle,
       },
-      `#pv-progress-${id}-${info.values.length}`
+      `#pv-progress-${ id }-${ info.values.length }`
     );
     el2.style.pointerEvents = `none`;
     el2.style.touchAction = `none`;
     currentHue += 1;
     pointerCount = info.values.length;
-    return true;
   };
 
-  document.body.appendChild(svg);
+  document.body.append(svg);
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   el.addEventListener(`pointerdown`, trackPointer);
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   el.addEventListener(`pointermove`, trackPointer);
   el.addEventListener(`pointerup`, lostPointer);
   el.addEventListener(`pointerleave`, lostPointer);
-  el.addEventListener(`contextmenu`, (ev) => {
-    ev.preventDefault();
+  el.addEventListener(`contextmenu`, (event) => {
+    event.preventDefault();
   });
 };
