@@ -14,8 +14,21 @@ export type PointTrack = Points.PointRelationResult & {
   // readonly speedFromInitial:number
 };
 
+/**
+ * Results of point tracking
+ */
 export type PointTrackerResults = {
+  /**
+   * Relation of last point to previous point
+   */
   readonly fromLast: PointTrack;
+  /**
+   * Relation of last point to initial point.
+   * 
+   * When the tracker is reset or resizes (eg. if it reaches its capacity), the
+   * initial point will be the first new point. Thus, the initial point
+   * always maintains some time horizon
+   */
   readonly fromInitial: PointTrack;
   readonly values: ReadonlyArray<Points.Point>;
 };
@@ -87,30 +100,32 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * @param p Point
    */
   computeResults(
-    //eslint-disable-next-line functional/prefer-immutable-types
     p: Array<TimestampedObject<Points.Point>>
   ): PointTrackerResults {
     const currentLast = this.last;
-    super.seen(...p);
-    const lastNewest = this.last;
 
-    // Don't yet have an initial relation function
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const previousLast = this.values.at(-2);
+
     if (this.initialRelation === undefined && this.initial) {
+      // Don't yet have an initial relation function
       this.initialRelation = Points.relation(this.initial);
     } else if (this.initialRelation === undefined) {
+      // Don't have an initial relation, but also don't have an initial point :()
       throw new Error(`Bug: No initialRelation, and this.inital is undefined?`);
     }
 
-    const lastRelation = Points.relation(currentLast);
+    // Make a new relator based on previous point
+    const lastRelation = previousLast === undefined ? Points.relation(currentLast) : Points.relation(previousLast);
 
-    // Get basic geometric relation from start to the last provided point
-    const initialRel: PointTrack = {
-      ...this.initialRelation(lastNewest),
-    };
+    // Compute relation from initial point to latest
+    const initialRel: PointTrack = this.initialRelation(currentLast);
 
-    const speed = currentLast === undefined ? 0 : Lines.length(currentLast, lastNewest) / (lastNewest.at - currentLast.at)
+    const speed = previousLast === undefined ? 0 : Lines.length(previousLast, currentLast) / (currentLast.at - previousLast.at);
+
+    // Compute relation from current point to the previous
     const lastRel: PointTrack = {
-      ...lastRelation(lastNewest),
+      ...lastRelation(currentLast),
       speed,
     };
 
@@ -233,13 +248,13 @@ export class TrackedPointMap extends TrackedValueMap<
    * Track a PointerEvent
    * @param event
    */
-  seenEvent(event: PointerEvent): Promise<PointTrackerResults> {
+  seenEvent(event: PointerEvent): Promise<Array<PointTrackerResults>> {
     if (`getCoalescedEvents` in event) {
       const events = event.getCoalescedEvents();
-      const eventsAsPoints = events.map(event => ({ x: event.clientX, y: event.clientY }));
-      return super.seen(event.pointerId.toString(), ...eventsAsPoints);
+      const seens = events.map(subEvent => super.seen(subEvent.pointerId.toString(), subEvent));
+      return Promise.all(seens);
     } else {
-      return super.seen((event as PointerEvent).pointerId.toString(), event);
+      return Promise.all([ super.seen((event as PointerEvent).pointerId.toString(), event) ]);
     }
   }
 }
@@ -247,8 +262,13 @@ export class TrackedPointMap extends TrackedValueMap<
 /**
  * Track several named points over time, eg a TensorFlow body pose point.
  * Call `seen()` to track a point. Mutable. If you want to compare
- * a single coordinate with a reference coordinate, [Geometry.Points.relation](Geometry.Points.relation.html) may be a better choice.
+ * a single coordinate with a reference coordinate,  may be a better choice.
  *
+ * See also:
+ * * [Geometry.Points.relation](Geometry.Points.relation.html): Compute relation info between two points
+ * * [Data.pointTracker](Data.pointTracker-1.html): Track relation between points over time
+ * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
+ * 
  * Basic usage
  * ```js
  * import { pointsTracker } from 'https://unpkg.com/ixfx/dist/data.js';
@@ -320,6 +340,7 @@ export const pointsTracker = (opts: TrackOpts = {}) =>
  * See also
  * * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
  * * {@link pointsTracker}: Track several points, useful for multi-touch.
+ * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
  * 
  * ```js
  * import { pointTracker } from 'https://unpkg.com/ixfx/dist/data.js';

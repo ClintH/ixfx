@@ -47,8 +47,7 @@ export abstract class TrackerBase<V, SeenResultType> {
 
   /**
    * Calculate results
-   * 
-   * Calls seenImpl -> onSeen
+   *  
    * @param p 
    * @returns 
    */

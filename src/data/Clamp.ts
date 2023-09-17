@@ -17,20 +17,20 @@
  * For clamping integer ranges, consider {@link clampIndex }
  * For clamping `{ x, y }` points, consider {@link Geometry.Points.clamp | Geometry.Points.clamp}.
  * For clamping bipolar values: {@link Bipolar.clamp}
- * @param v Value to clamp
+ * @param value Value to clamp
  * @param Minimum value (inclusive)
  * @param Maximum value (inclusive)
  * @returns Clamped value
  */
-export const clamp = (v: number, min = 0, max = 1) => {
+export const clamp = (value: number, min = 0, max = 1) => {
   // ✔ UNIT TESTED
-  if (Number.isNaN(v)) throw new Error(`v parameter is NaN`);
-  if (Number.isNaN(min)) throw new Error(`min parameter is NaN`);
-  if (Number.isNaN(max)) throw new Error(`max parameter is NaN`);
+  if (Number.isNaN(value)) throw new Error(`'value' parameter is NaN`);
+  if (Number.isNaN(min)) throw new Error(`'min' parameter is NaN`);
+  if (Number.isNaN(max)) throw new Error(`'max' parameter is NaN`);
 
-  if (v < min) return min;
-  if (v > max) return max;
-  return v;
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
 };
 
 /**

@@ -1761,27 +1761,39 @@ export type PointRelationResult = {
 };
 
 /**
- * Tracks the relation between two points
- *
+ * Tracks the relation between two points.
+ * 
+ * 1. Call `Points.relation` with the initial reference point
+ * 2. You get back a function
+ * 3. Call the function with a new point to compute relational information.
+ * 
+ * It computes angle, average, centroid, distance and speed.
+ * 
  * ```js
  * import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
  *
- * // Start point: 50,50
- * const t = Points.relation({x:50,y:50});
+ * // Reference point: 50,50
+ * const t = Points.relation({x:50,y:50}); // t is a function
  *
- * // Compare to 0,0
- * const { angle, distanceFromStart, distanceFromLast, average, centroid, speed } = t({x:0,y:0});
+ * // Invoke the returned function with a point
+ * const relation = t({ x:0, y:0 }); // Juicy relational data
+ * ```
+ * 
+ * Or with destructuring:
+ * 
+ * ```js
+ * const { angle, distanceFromStart, distanceFromLast, average, centroid, speed } = t({ x:0,y:0 });
  * ```
  *
- * X,y coordinates can also be used as parameters:
+ * x & y coordinates can also be used as parameters:
  * ```js
  * const t = Points.relation(50, 50);
  * const result = t(0, 0);
  * // result.speed, result.angle ...
  * ```
  *
- * Note that all the intermediate values are not stored. It keeps the initial
- * point, and the previous point. If you want to compute something over a set
+ * Note that intermediate values are not stored. It keeps the initial
+ * and most-recent point. If you want to compute something over a set
  * of prior points, you may want to use [Data.pointsTracker](./Data.pointsTracker.html)
  * @param start
  * @returns

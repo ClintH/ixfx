@@ -72,7 +72,6 @@ export const pointerVisualise = (
   svg.style.touchAction = `none`;
 
   fullSizeElement(svg);
-  //eslint-disable-next-line functional/no-let
   let pointerCount = 0;
 
   //eslint-disable-next-line functional/prefer-immutable-types
@@ -82,14 +81,12 @@ export const pointerVisualise = (
     currentHue = hue;
     svg.querySelector(`#pv-start-${ id }`)?.remove();
 
-    //eslint-disable-next-line functional/no-let
     for (let index = 0; index < pointerCount + 10; index++) {
       svg.querySelector(`#pv-progress-${ id }-${ index }`)?.remove();
     }
     pointerCount = 0;
   };
 
-  //eslint-disable-next-line functional/prefer-immutable-types
   const trackPointer = async (event: PointerEvent) => {
     const id = event.pointerId.toString();
     const pt = { x: event.x, y: event.y };
@@ -97,7 +94,7 @@ export const pointerVisualise = (
     if (event.type === `pointermove` && !tracker.has(id)) {
       return;
     }
-    const info = (await tracker.seen(id, pt));
+    const info = (await tracker.seen(event.pointerId.toString(), { x: event.clientX, y: event.clientY }));
 
     if (info.values.length === 1) {
       const el = Svg.Elements.circle(
@@ -115,13 +112,13 @@ export const pointerVisualise = (
       el.style.touchAction = `none`;
     }
 
-    const progressFillStyle = `hsla(${ currentHue }, 100%, 50%, 50%)`;
+    const fillStyle = `hsla(${ currentHue }, 100%, 50%, 50%)`;
 
     const el2 = Svg.Elements.circle(
       { ...pt, radius: type === `touch` ? touchRadius : mouseRadius },
       svg,
       {
-        fillStyle: progressFillStyle,
+        fillStyle,
       },
       `#pv-progress-${ id }-${ info.values.length }`
     );
