@@ -27,7 +27,7 @@ import { throwNumberTest } from '../Guards.js';
  * @param scaling Scaling factor. 1 is no smoothing. Default: 3
  * @returns {@link MovingAverage}
  */
-export const movingAverageLight = (scaling: number = 3): MovingAverage => {
+export const movingAverageLight = (scaling = 3): MovingAverage => {
   throwNumberTest(scaling, `aboveZero`, `scaling`);
   //eslint-disable-next-line functional/no-let
   let average = 0;
@@ -75,9 +75,9 @@ export const movingAverageLight = (scaling: number = 3): MovingAverage => {
  * @returns
  */
 export const movingAverageTimed = (
-  updateRateMs: number = 200,
-  value: number = 0,
-  scaling: number = 3
+  updateRateMs = 200,
+  value = 0,
+  scaling = 3
 ): MovingAverage => {
   throwNumberTest(scaling, `aboveZero`, `scaling`);
   throwNumberTest(updateRateMs, `aboveZero`, `decayRateMs`);
@@ -89,7 +89,7 @@ export const movingAverageTimed = (
 
   const reschedule = () => {
     if (timer !== 0) clearTimeout(timer);
-    // @ts-ignore
+    // @ts-expect-error
     timer = setTimeout(decay, updateRateMs) as number;
   };
 
@@ -156,12 +156,12 @@ export const movingAverageTimed = (
  *
  * Because it keeps track of `samples` previous data, there is a memory impact. A lighter version is {@link movingAverageLight} which does not keep a buffer of prior data, but can't be as easily fine-tuned.
  * @param samples Number of samples to compute average from
- * @param weightingFn Optional weighting function
+ * @param weighter Optional weighting function
  * @returns
  */
 export const movingAverage = (
   samples = 100,
-  weightingFn?: (v: number) => number
+  weighter?: (v: number) => number
 ): MovingAverage => {
   //eslint-disable-next-line functional/no-let
   let disposed = false;
@@ -180,11 +180,7 @@ export const movingAverage = (
   };
 
   const compute = () => {
-    if (weightingFn === undefined) {
-      return average(q.data);
-    } else {
-      return averageWeighted(q.data, weightingFn);
-    }
+    return weighter === undefined ? average(q.data) : averageWeighted(q.data, weighter);
   };
 
   const add = (v: number) => {
@@ -221,3 +217,52 @@ export type MovingAverage = {
   dispose(): void;
   get isDisposed(): boolean;
 };
+
+const PiPi = Math.PI * 2;
+
+const smoothingFactor = (timeDelta: number, cutoff: number): number => {
+  const r = PiPi * cutoff * timeDelta;
+  return r / (r + 1);
+}
+
+const exponentialSmoothing = (smoothingFactor: number, value: number, previous: number): number => {
+  return smoothingFactor * value + (1 - smoothingFactor) * previous
+}
+
+/**
+ * Noise filtering
+ * 
+ * Algorithm: https://gery.casiez.net/1euro/
+ * 
+ * Based on [Jaan Tollander de Balsch's implementation](https://jaantollander.com/post/noise-filtering-using-one-euro-filter/)
+ * @param cutoffMin 
+ * @param speedCoefficient 
+ * @param cutoffDefault 
+ */
+export const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault = 1) => {
+  let previousValue = 0;
+  let derivativeLast = 0;
+  let timestampLast = 0;
+
+  const compute = (value: number, timestamp?: number) => {
+    if (timestamp === undefined) timestamp = performance.now();
+    const timeDelta = timestamp - timestampLast;
+
+    // Filtered derivative
+    const s = smoothingFactor(timeDelta, cutoffDefault);
+    const valueDelta = (value - previousValue) / timeDelta;
+    const derivative = exponentialSmoothing(s, valueDelta, derivativeLast);
+
+    // Filtered signal
+    const cutoff = cutoffMin + speedCoefficient * Math.abs(derivative);
+    const a = smoothingFactor(timeDelta, cutoff);
+    const smoothed = exponentialSmoothing(a, value, previousValue);
+
+    previousValue = smoothed;
+    derivativeLast = derivative;
+    timestampLast = timestamp;
+
+    return smoothed;
+  }
+  return compute;
+}
