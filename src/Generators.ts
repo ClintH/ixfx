@@ -37,7 +37,6 @@ export const numericRangeRaw = function* (
 ) {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (end === undefined) end = Number.MAX_SAFE_INTEGER;
-  //eslint-disable-next-line functional/no-let
   let v = start;
   do {
     while (v < end) {
@@ -105,7 +104,6 @@ export const numericRange = function* (
   interval = interval * rounding;
 
   do {
-    //eslint-disable-next-line functional/no-let
     let v = start * rounding;
     while ((!negativeInterval && v <= end) || (negativeInterval && v >= end)) {
       yield v / rounding;
@@ -155,7 +153,6 @@ export const count = function* (amount: number, offset = 0) {
 
   if (amount === 0) return;
 
-  //eslint-disable-next-line functional/no-let
   let index = 0;
   do {
     yield (amount < 0 ? -index + offset : index + offset);

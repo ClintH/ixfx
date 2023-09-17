@@ -41,7 +41,6 @@ export const resolveLogOption = (
         typeof messageOrString === `string` ? { msg: messageOrString } : messageOrString;
       const kind = m.kind ?? defaultKind;
       const category = m.category ?? defaultCat;
-      //eslint-disable-next-line functional/no-let
       let message = m.msg;
       if (category) message = `[${ category }] ${ message }`;
       switch (kind) {
@@ -66,7 +65,7 @@ export const resolveLogOption = (
   return l;
 };
 
-//eslint-disable-next-line functional/no-let
+// eslint-disable-next-line functional/no-let
 let logColourCount = 0;
 const logColours = getOrGenerateSync(new Map<string, string>(), () =>
   goldenAngleColour(++logColourCount)

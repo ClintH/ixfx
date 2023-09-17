@@ -39,7 +39,8 @@
         "ctx",
         "el",
         "fn",
-        "opts"
+        "opts",
+        ".*El$"
       ],
       "allowList":{"args":true}}],
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
