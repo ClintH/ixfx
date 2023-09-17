@@ -1,9 +1,9 @@
-import { type TrackedValueOpts } from './TrackedValue.js';
+import { type Timestamped, type TrackedValueOpts } from './TrackedValue.js';
 
 /**
  * Base tracker class
  */
-export abstract class TrackerBase<V> {
+export abstract class TrackerBase<V, SeenResultType> {
   /**
    * @ignore
    */
@@ -45,8 +45,14 @@ export abstract class TrackerBase<V> {
     this.onReset();
   }
 
-  //eslint-disable-next-line functional/prefer-immutable-types
-  seen(...p: V[]) {
+  /**
+   * Calculate results
+   * 
+   * Calls seenImpl -> onSeen
+   * @param p 
+   * @returns 
+   */
+  seen(...p: Array<V>): SeenResultType {
     if (this.resetAfterSamples > 0 && this.seenCount > this.resetAfterSamples) {
       this.reset();
     } else if (this.sampleLimit > 0 && this.seenCount > this.sampleLimit * 2) {
@@ -55,16 +61,15 @@ export abstract class TrackerBase<V> {
     }
 
     this.seenCount += p.length;
-    const t = this.seenImpl(p);
-    this.onSeen(t);
+    const t = this.filterData(p);
+    return this.computeResults(t);
   }
 
   /**
    * @ignore
    * @param p
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
-  abstract seenImpl(p: V[]): V[];
+  abstract filterData(p: Array<V>): Array<Timestamped>;
 
   abstract get last(): V | undefined;
 
@@ -82,10 +87,7 @@ export abstract class TrackerBase<V> {
    * @ignore
    */
   //eslint-disable-next-line @typescript-eslint/no-empty-function
-  //eslint-disable-next-line functional/prefer-immutable-types
-  onSeen(_p: V[]) {
-    /** no-op */
-  }
+  abstract computeResults(_p: Array<Timestamped>): SeenResultType;
 
   /**
    * @ignore

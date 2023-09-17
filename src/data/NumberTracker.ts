@@ -1,11 +1,17 @@
-import { PrimitiveTracker } from './PrimitiveTracker.js';
+import { PrimitiveTracker, type TimestampedPrimitive } from './PrimitiveTracker.js';
 import {
   type TrackedValueOpts as TrackOpts,
-  type Timestamped,
 } from './TrackedValue.js';
 import { minFast, maxFast, totalFast } from '../collections/NumericArrays.js';
 
-export class NumberTracker extends PrimitiveTracker<number> {
+export type NumberTrackerResults = {
+  readonly total: number
+  readonly min: number
+  readonly max: number
+  readonly avg: number
+};
+
+export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults> {
   total = 0;
   min = Number.MAX_SAFE_INTEGER;
   max = Number.MIN_SAFE_INTEGER;
@@ -48,12 +54,20 @@ export class NumberTracker extends PrimitiveTracker<number> {
     this.total = totalFast(this.values);
   }
 
-  //eslint-disable-next-line functional/prefer-immutable-types
-  onSeen(values: Timestamped<number>[]) {
-    if (values.some((v) => Number.isNaN(v))) throw Error(`Cannot add NaN`);
-    this.total = values.reduce((acc, v) => acc + v, this.total);
-    this.min = Math.min(...values, this.min);
-    this.max = Math.max(...values, this.max);
+  computeResults(values: Array<TimestampedPrimitive<number>>): NumberTrackerResults {
+    if (values.some((v) => Number.isNaN(v))) throw new Error(`Cannot add NaN`);
+    const numbers = values.map(value => value.value);
+
+    this.total = numbers.reduce((accumulator, v) => accumulator + v, this.total);
+    this.min = Math.min(...numbers, this.min);
+    this.max = Math.max(...numbers, this.max);
+    const r: NumberTrackerResults = {
+      max: this.max,
+      min: this.min,
+      total: this.total,
+      avg: this.avg
+    }
+    return r;
   }
 
   getMinMaxAvg() {

@@ -1,9 +1,10 @@
 import { type GetOrGenerate, getOrGenerate } from '../collections/map/index.js';
 import { TrackerBase } from './TrackerBase.js';
 
-export type Timestamped<V> = V & {
-  readonly at: number;
-};
+export type Timestamped = {
+  readonly at: number
+}
+export type TimestampedObject<V> = V & Timestamped;
 
 /**
  * Options
@@ -33,7 +34,7 @@ export type TrackedValueOpts = {
 };
 
 /**
- * Keeps track of keyed values of type `V` (eg Point) It stores occurences in type `T`, which
+ * Keeps track of keyed values of type `V` (eg Point). It stores occurences in type `T`, which
  * must extend from `TrackerBase<V>`, eg `PointTracker`.
  *
  * The `creator` function passed in to the constructor is responsible for instantiating
@@ -54,7 +55,7 @@ export type TrackedValueOpts = {
  * ```
  *
  */
-export class TrackedValueMap<V, T extends TrackerBase<V>> {
+export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
   store: Map<string, T>;
   gog: GetOrGenerate<string, T, V>;
 
@@ -87,11 +88,13 @@ export class TrackedValueMap<V, T extends TrackerBase<V>> {
    */
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   //eslint-disable-next-line functional/prefer-immutable-types
-  public async seen(id: string, ...values: V[]): Promise<any> {
+  public async seen(id: string, ...values: Array<V>): Promise<TResult> {
     const trackedValue = await this.getTrackedValue(id, ...values);
 
     // Pass it over to the TrackedValue
-    return trackedValue.seen(...values);
+    const result = trackedValue.seen(...values);
+
+    return result;
   }
 
   /**
@@ -101,12 +104,12 @@ export class TrackedValueMap<V, T extends TrackerBase<V>> {
    * @returns
    */
   //eslint-disable-next-line functional/prefer-immutable-types
-  protected async getTrackedValue(id: string, ...values: V[]) {
+  protected async getTrackedValue(id: string, ...values: Array<V>) {
     if (id === null) throw new Error(`id parameter cannot be null`);
     if (id === undefined) throw new Error(`id parameter cannot be undefined`);
 
     // Create or recall TrackedValue by id
-    const trackedValue = await this.gog(id, values[0]);
+    const trackedValue = await this.gog(id, values[ 0 ]);
     return trackedValue;
   }
 
@@ -146,7 +149,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V>> {
    * @returns
    */
   *trackedByAge() {
-    const tp = Array.from(this.store.values());
+    const tp = [ ...this.store.values() ];
     tp.sort((a, b) => {
       const aa = a.elapsed;
       const bb = b.elapsed;
@@ -200,7 +203,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V>> {
    * @param id
    * @returns
    */
-  get(id: string): TrackerBase<V> | undefined {
+  get(id: string): TrackerBase<V, TResult> | undefined {
     return this.store.get(id);
   }
 }

@@ -1,8 +1,8 @@
 import * as Points from '../geometry/Point.js';
 import {
-  type Timestamped,
   TrackedValueMap,
   type TrackedValueOpts as TrackOpts,
+  type TimestampedObject,
 } from './TrackedValue.js';
 import { ObjectTracker } from './ObjectTracker.js';
 import { Lines, Polar, Vectors } from '../geometry/index.js';
@@ -17,14 +17,14 @@ export type PointTrack = Points.PointRelationResult & {
 export type PointTrackerResults = {
   readonly fromLast: PointTrack;
   readonly fromInitial: PointTrack;
-  readonly values: readonly Points.Point[];
+  readonly values: ReadonlyArray<Points.Point>;
 };
 
 /**
  * Point tracker. Create via `pointTracker()`.
  *
  */
-export class PointTracker extends ObjectTracker<Points.Point> {
+export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResults> {
   /**
    * Function that yields the relation from initial point
    */
@@ -67,18 +67,32 @@ export class PointTracker extends ObjectTracker<Points.Point> {
     this.initialRelation = undefined;
   }
 
+  seenEvent(p: PointerEvent): PointTrackerResults {
+    if (`getCoalescedEvents` in p) {
+      const events = p.getCoalescedEvents();
+      const asPoints = events.map(event => ({ x: event.clientX, y: event.clientY }));
+      return this.seen(...asPoints);
+    } else {
+      // @ts-expect-error
+      return this.seen({ x: p.clientX, y: p.clientY });
+    }
+  }
+
   /**
    * Tracks a point, returning data on its relation to the
    * initial point and the last received point.
+   * 
+   * Use {@link seenEvent} to track a raw `PointerEvent`.
+   * 
    * @param p Point
    */
-  seen(
+  computeResults(
     //eslint-disable-next-line functional/prefer-immutable-types
-    ...p: Points.Point[] | Timestamped<Points.Point>[]
+    p: Array<TimestampedObject<Points.Point>>
   ): PointTrackerResults {
     const currentLast = this.last;
     super.seen(...p);
-    const newLast = this.last;
+    const lastNewest = this.last;
 
     // Don't yet have an initial relation function
     if (this.initialRelation === undefined && this.initial) {
@@ -91,20 +105,19 @@ export class PointTracker extends ObjectTracker<Points.Point> {
 
     // Get basic geometric relation from start to the last provided point
     const initialRel: PointTrack = {
-      ...this.initialRelation(newLast),
+      ...this.initialRelation(lastNewest),
     };
+
+    const speed = currentLast === undefined ? 0 : Lines.length(currentLast, lastNewest) / (lastNewest.at - currentLast.at)
     const lastRel: PointTrack = {
-      ...lastRelation(newLast),
-      speed:
-        this.values.length < 2
-          ? 0
-          : Lines.length(currentLast, newLast) / (newLast.at - currentLast.at),
+      ...lastRelation(lastNewest),
+      speed,
     };
 
     const r: PointTrackerResults = {
       fromInitial: initialRel,
       fromLast: lastRel,
-      values: [...this.values],
+      values: [ ...this.values ],
     };
     this.lastResult = r;
     return r;
@@ -158,11 +171,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
    */
   distanceFromStart(): number {
     const initial = this.initial;
-    if (this.values.length >= 2 && initial !== undefined) {
-      return Points.distance(initial, this.last);
-    } else {
-      return 0;
-    }
+    return this.values.length >= 2 && initial !== undefined ? Points.distance(initial, this.last) : 0;
   }
 
   /**
@@ -173,11 +182,7 @@ export class PointTracker extends ObjectTracker<Points.Point> {
    */
   difference(): Points.Point {
     const initial = this.initial;
-    if (this.values.length >= 2 && initial !== undefined) {
-      return Points.subtract(this.last, initial);
-    } else {
-      return Points.Placeholder;
-    }
+    return this.values.length >= 2 && initial !== undefined ? Points.subtract(this.last, initial) : Points.Placeholder;
   }
 
   /**
@@ -209,7 +214,8 @@ export class PointTracker extends ObjectTracker<Points.Point> {
  */
 export class TrackedPointMap extends TrackedValueMap<
   Points.Point,
-  PointTracker
+  PointTracker,
+  PointTrackerResults
 > {
   constructor(opts: TrackOpts = {}) {
     super((key, start) => {
@@ -221,6 +227,20 @@ export class TrackedPointMap extends TrackedValueMap<
       p.seen(start);
       return p;
     });
+  }
+
+  /**
+   * Track a PointerEvent
+   * @param event
+   */
+  seenEvent(event: PointerEvent): Promise<PointTrackerResults> {
+    if (`getCoalescedEvents` in event) {
+      const events = event.getCoalescedEvents();
+      const eventsAsPoints = events.map(event => ({ x: event.clientX, y: event.clientY }));
+      return super.seen(event.pointerId.toString(), ...eventsAsPoints);
+    } else {
+      return super.seen((event as PointerEvent).pointerId.toString(), event);
+    }
   }
 }
 
@@ -249,9 +269,9 @@ export class TrackedPointMap extends TrackedValueMap<
  *
  * More functions...
  * ```js
- * pt.size;         // How many named points are being tracked
- * pt.delete(id);  // Delete named point
- * pt.reset();     // Clear data
+ * pt.size;       // How many named points are being tracked
+ * pt.delete(id); // Delete named point
+ * pt.reset();    // Clear data
  * ```
  *
  * Accessing by id:
@@ -264,9 +284,9 @@ export class TrackedPointMap extends TrackedValueMap<
  * Iterating over data
  *
  * ```js
- * pt.trackedByAge();   // Iterates over tracked points, sorted by age (oldest first)
- * pt.tracked();  // Tracked values
- * pt.ids();      // Iterator over ids
+ * pt.trackedByAge(); // Iterates over tracked points, sorted by age (oldest first)
+ * pt.tracked(); // Tracked values
+ * pt.ids();     // Iterator over ids
  *
  * // Last received value for each named point
  * pt.last();
@@ -282,7 +302,9 @@ export class TrackedPointMap extends TrackedValueMap<
  * ```
  *
  * Options:
- * * `storeIntermediate`: if true, all points are stored internally
+ * * `id`: Id of this tracker. Optional
+ * * `sampleLimit`: How many samples to store
+ * * `storeIntermediate`: If _true_, all points are stored internally
  * * `resetAfterSamples`: If set above 0, it will automatically reset after the given number of samples have been seen
  * @param opts
  * @returns
@@ -295,17 +317,19 @@ export const pointsTracker = (opts: TrackOpts = {}) =>
  * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
  * track the pointer as it moves until pointerup.
  *
- * [See the point tracker playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
- *
+ * See also
+ * * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
+ * * {@link pointsTracker}: Track several points, useful for multi-touch.
+ * 
  * ```js
  * import { pointTracker } from 'https://unpkg.com/ixfx/dist/data.js';
  *
- * // Create a tracker
+ * // Create a tracker on a pointerdown
  * const t = pointTracker();
  *
- * // ...and later, tell it when a point is seen
+ * // ...and later, tell it when a point is seen (eg. pointermove)
  * const nfo = t.seen({x: evt.x, y:evt.y});
- * // nfo gives us some details on the relation between the seen point, the start, and points in-between
+ * // nfo gives us some details on the relation between the seen point, the start, and points inbetween
  * // nfo.angle, nfo.centroid, nfo.speed etc.
  * ```
  *
@@ -325,7 +349,8 @@ export const pointsTracker = (opts: TrackOpts = {}) =>
  * ```
  *
  * By default, the tracker only keeps track of the initial point and
- * does not store intermediate 'seen' points. To use the tracker as a buffer.
+ * does not store intermediate 'seen' points. To use the tracker as a buffer,
+ * set `storeIntermediate` option to _true_.
  *
  * ```js
  * // Keep only the last 10 points
@@ -345,7 +370,7 @@ export const pointsTracker = (opts: TrackOpts = {}) =>
  * })
  * ```
  *
- * When using a limited buffer, the 'initial' point will be the oldest in the
+ * When using a buffer limited by `sampleLimit`, the 'initial' point will be the oldest in the
  * buffer, not actually the very first point seen.
  */
 export const pointTracker = (opts: TrackOpts = {}) => new PointTracker(opts);

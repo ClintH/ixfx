@@ -1,15 +1,27 @@
-import { repeat } from '../flow/index.js';
-import type { TrackedValueOpts, Timestamped } from './TrackedValue.js';
+//import { repeat } from '../flow/index.js';
+
+import type { TrackedValueOpts } from './TrackedValue.js';
 import { TrackerBase } from './TrackerBase.js';
 
-export class PrimitiveTracker<
-  V extends number | string
-> extends TrackerBase<V> {
-  values: V[];
-  timestamps: number[];
+export type TimestampedPrimitive<V extends number | string> = {
+  at: number
+  value: V
+}
+
+export abstract class PrimitiveTracker<
+  V extends number | string,
+  TResult
+> extends TrackerBase<V, TResult> {
+
+  //computeResults(_p: Timestamped[]): TResult;
+
+  values: Array<V>;
+  timestamps: Array<number>;
+  //data: Array<TimestampedPrimitive<V>>;
 
   constructor(opts?: TrackedValueOpts) {
     super(opts);
+    //this.data = [];
     this.values = [];
     this.timestamps = [];
   }
@@ -21,6 +33,7 @@ export class PrimitiveTracker<
    */
   trimStore(limit: number): number {
     if (limit >= this.values.length) return this.values.length;
+    //this.data = this.data.slice(-limit);
     this.values = this.values.slice(-limit);
     this.timestamps = this.timestamps.slice(-limit);
     return this.values.length;
@@ -50,7 +63,7 @@ export class PrimitiveTracker<
    */
   get elapsed(): number {
     if (this.values.length < 0) throw new Error(`No values seen yet`);
-    return Date.now() - this.timestamps[0];
+    return Date.now() - this.timestamps[ 0 ];
   }
 
   onReset() {
@@ -61,28 +74,42 @@ export class PrimitiveTracker<
   /**
    * Tracks a value
    */
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //eslint-disable-next-line functional/prefer-immutable-types
-  seenImpl(p: V[]): V[] {
-    const last = p.at(-1) as Timestamped<V>;
-    const now = Date.now();
+  filterData(rawValues: Array<V>): Array<TimestampedPrimitive<V>> {
+    const lastValue = rawValues.at(-1);
+    const last: TimestampedPrimitive<V> = { value: lastValue as unknown as V, at: performance.now() };
+
+    const values: Array<TimestampedPrimitive<V>> = rawValues.map(value => ({
+      at: performance.now(),
+      value: value
+    }));
+
+    //const now = Date.now();
     if (this.storeIntermediate) {
-      this.values.push(...p);
-      this.timestamps.push(...repeat(p.length, () => now));
-    } else if (this.values.length === 0) {
-      // Add as initial value
-      this.values.push(last);
-      this.timestamps.push(now);
-    } else if (this.values.length === 2) {
-      // Replace last value
-      this.values[1] = last;
-      this.timestamps[1] = now;
-    } else if (this.values.length === 1) {
-      // Add last value
-      this.values.push(last);
-      this.timestamps.push(now);
+      this.values.push(...rawValues);
+      //this.timestamps.push(...repeat(p.length, () => now));
+      this.timestamps.push(...values.map(v => v.at));
+    } else switch (this.values.length) {
+      case 0: {
+        // Add as initial value
+        this.values.push(last.value);
+        this.timestamps.push(last.at);
+        break;
+      }
+      case 2: {
+        // Replace last value
+        this.values[ 1 ] = last.value;
+        this.timestamps[ 1 ] = last.at;
+        break;
+      }
+      case 1: {
+        // Add last value
+        this.values.push(last.value);
+        this.timestamps.push(last.at);
+        break;
+      }
+      // No default
     }
 
-    return p;
+    return values;
   }
 }
