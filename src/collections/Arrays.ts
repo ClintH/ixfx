@@ -4,7 +4,7 @@
  */
 
 import { throwIntegerTest } from '../Guards.js';
-import { defaultRandom, type RandomSource } from '../Random.js';
+import { defaultRandom, weightedIndex, type RandomSource } from '../Random.js';
 import {
   type ToString,
   toStringDefault,
@@ -325,6 +325,7 @@ export const filterBetween = <V>(
   }
   return t;
 };
+
 /**
  * Returns a random array index.
  *
@@ -345,6 +346,30 @@ export const randomIndex = <V>(
   array: ArrayLike<V>,
   rand: RandomSource = defaultRandom
 ): number => Math.floor(rand() * array.length);
+
+/**
+ * Selects a random array index, biased by the provided `weightings`.
+ * 
+ * In the below example, `a` will be picked 20% of the time, `b` 50% and so on.
+ * ```js
+ * const data =    [  `a`,  `b`,  `c`,  `d` ]
+ * const weights = [ 0.2,  0.5,  0.1,  0.2 ] 
+ * ```
+ * @param array 
+ * @param weightings 
+ * @param rand 
+ */
+export const randomElementWeightedSource = <V>(array: ArrayLike<V>, weightings: Array<number>, rand: RandomSource = defaultRandom) => {
+  if (array.length !== weightings.length) throw new Error(`Lengths of 'array' and 'weightings' should be the same.`);
+  const r = weightedIndex(weightings);
+  return (): V => {
+    const index = r();
+    return array[ index ];
+  }
+}
+
+
+
 
 /**
  * Returns random element.
