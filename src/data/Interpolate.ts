@@ -1,5 +1,5 @@
-import { piPi } from './index.js';
 import { wrap } from './Wrap.js';
+export const piPi = Math.PI * 2;
 
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
