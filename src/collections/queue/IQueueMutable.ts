@@ -50,4 +50,6 @@ export interface IQueueMutable<V> {
    * Data in queue as an array
    */
   get data(): ReadonlyArray<V>;
+
+  clear(): void;
 }
