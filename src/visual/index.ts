@@ -15,7 +15,8 @@ export * as BipolarView from './BipolarView.js';
 export * as Palette from './Palette.js';
 export * as Drawing from './Drawing.js';
 export * as Svg from './Svg.js';
-export * as Plot from './Plot.js';
+//export * as Plot from './Plot.js';
+
 
 export * as Plot2 from './Plot2.js';
 export * as PlotOld from './PlotOld.js';
