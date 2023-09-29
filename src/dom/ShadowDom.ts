@@ -15,6 +15,6 @@ export const addShadowCss = (
   } else {
     shadowRoot = parentEl.attachShadow({ mode: `open` });
   }
-  shadowRoot.appendChild(styleEl);
+  shadowRoot.append(styleEl);
   return shadowRoot;
 };
