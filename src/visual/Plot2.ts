@@ -7,8 +7,8 @@ import { parentSizeCanvas } from '../dom/Util.js';
 import * as Sg from './SceneGraph.js';
 
 import { textRect, textWidth } from './Drawing.js';
-
-import { getFieldPaths, getFieldByPath, ifNaN } from '../Util.js';
+import { ifNaN } from '../Util.js'
+import { getPaths, getField } from '../Immutable.js';
 import { throwNumberTest } from '../Guards.js';
 import type { RectPositioned } from 'src/geometry/Rect.js';
 import { scaleCanvas } from './index.js';
@@ -1016,7 +1016,7 @@ export class Plot extends Sg.CanvasBox {
    * @param o
    */
   plot(o: any) {
-    const paths = getFieldPaths(o);
+    const paths = getPaths(o);
     let seriesCreated = false;
     for (const p of paths) {
       let s = this.series.get(p);
@@ -1025,7 +1025,7 @@ export class Plot extends Sg.CanvasBox {
         s.drawingStyle = `line`;
         seriesCreated = true;
       }
-      s.add(getFieldByPath(o, p));
+      s.add(getField(o, p));
     }
     if (seriesCreated) this.legend.layoutInvalidated(`new series`);
     this.update();
