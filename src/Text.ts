@@ -179,7 +179,7 @@ export const untilMatch = (
   return source.slice(startPos ?? 0, m);
 };
 
-export interface MatchOptions {
+export type MatchOptions = {
   readonly startPos?: number;
   readonly fromEnd?: boolean;
 }
@@ -251,7 +251,7 @@ export const unwrap = (
 /**
  * A range
  */
-export interface Range {
+export type Range = {
   /**
    * Text of range
    */
@@ -270,7 +270,7 @@ export interface Range {
   readonly index: number;
 }
 
-export interface LineSpan {
+export type LineSpan = {
   readonly start: number;
   readonly end: number;
   readonly length: number;

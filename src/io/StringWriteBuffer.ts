@@ -1,8 +1,8 @@
+import type { Interval } from '../flow/IntervalType.js';
 import { QueueMutable } from '../collections/queue/QueueMutable.js';
 import {
   type Continuously,
-  continuously,
-  type Interval,
+  continuously
 } from '../flow/index.js';
 import { splitByLength } from '../Text.js';
 
