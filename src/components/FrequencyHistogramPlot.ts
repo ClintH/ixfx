@@ -68,12 +68,12 @@ export class FrequencyHistogramPlot {
       return;
     }
 
-    if (this.#sorter !== undefined) {
-      // eslint-disable-next-line functional/immutable-data, functional/prefer-readonly-type
-      this.el.data = this.#sorter(data as KeyValueUtil.KeyValue[]);
-    } else {
+    if (this.#sorter === undefined) {
       // eslint-disable-next-line functional/immutable-data
       this.el.data = [ ...data ];
+    } else {
+      // eslint-disable-next-line functional/immutable-data, functional/prefer-readonly-type
+      this.el.data = this.#sorter(data as Array<KeyValueUtil.KeyValue>);
     }
   }
 }
