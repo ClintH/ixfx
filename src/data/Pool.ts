@@ -1,5 +1,5 @@
 import { SimpleEventEmitter } from '../Events.js';
-import * as Debug from '../Debug.js';
+import * as Debug from '../debug/index.js';
 /**
  * Policy for when the pool is fully used
  */
@@ -82,7 +82,7 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
     this._pool = resource.pool;
     this._userExpireAfterMs = this._pool.userExpireAfterMs;
     this._state = `idle`;
-    this._pool.log.log(`PoolUser ctor key: ${this.key}`);
+    this._pool.log.log(`PoolUser ctor key: ${ this.key }`);
   }
 
   /**
@@ -92,9 +92,7 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
   toString() {
     if (this.isDisposed) return `PoolUser. State: disposed`;
 
-    return `PoolUser. State: ${this._state} Elapsed: ${
-      performance.now() - this._lastUpdate
-    } Data: ${JSON.stringify(this.resource.data)}`;
+    return `PoolUser. State: ${ this._state } Elapsed: ${ performance.now() - this._lastUpdate } Data: ${ JSON.stringify(this.resource.data) }`;
   }
 
   /**
@@ -117,7 +115,7 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
     const data = resource.data;
     this._state = `disposed`;
     resource._release(this);
-    this._pool.log.log(`PoolUser dispose key: ${this.key} reason: ${reason}`);
+    this._pool.log.log(`PoolUser dispose key: ${ this.key } reason: ${ reason }`);
     this.fireEvent(`disposed`, { data, reason });
     super.clearEventListeners();
   }
@@ -130,9 +128,9 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
     if (this.isDisposed) throw new Error(`User disposed`);
     const resource = this.resource;
     const data = resource.data;
-    this._pool.log.log(`PoolUser release key: ${this.key} reason: ${reason}`);
+    this._pool.log.log(`PoolUser release key: ${ this.key } reason: ${ reason }`);
     this.fireEvent(`released`, { data, reason });
-    this._dispose(`release-${reason}`);
+    this._dispose(`release-${ reason }`);
   }
 
   // #region Properties
@@ -183,7 +181,7 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
 export class Resource<V> {
   private state: PoolState;
   private readonly _data: V;
-  private users: PoolUser<V>[];
+  private users: Array<PoolUser<V>>;
   private readonly capacityPerResource;
   private readonly resourcesWithoutUserExpireAfterMs;
   private lastUsersChange: number;
@@ -218,9 +216,7 @@ export class Resource<V> {
    * @returns
    */
   toString() {
-    return `Resource (expired: ${this.isExpiredFromUsers} users: ${
-      this.users.length
-    }, state: ${this.state}) data: ${JSON.stringify(this.data)}`;
+    return `Resource (expired: ${ this.isExpiredFromUsers } users: ${ this.users.length }, state: ${ this.state }) data: ${ JSON.stringify(this.data) }`;
   }
 
   /**
@@ -292,9 +288,9 @@ export class Resource<V> {
     if (this.state === `disposed`) return;
     const data = this._data;
     this.state = `disposed`;
-    this.pool.log.log(`Resource disposed (${reason})`);
+    this.pool.log.log(`Resource disposed (${ reason })`);
     for (const u of this.users) {
-      u._dispose(`resource-${reason}`);
+      u._dispose(`resource-${ reason }`);
     }
     this.users = [];
     this.lastUsersChange = performance.now();
@@ -308,7 +304,7 @@ export class Resource<V> {
  * Resource pool
  */
 export class Pool<V> {
-  private _resources: Resource<V>[];
+  private _resources: Array<Resource<V>>;
   private _users: Map<string, PoolUser<V>>;
 
   readonly capacity: number;
@@ -364,15 +360,15 @@ export class Pool<V> {
   dumpToString() {
     //eslint-disable-next-line functional/no-let
     let r = `Pool
-    capacity: ${this.capacity} userExpireAfterMs: ${this.userExpireAfterMs} capacityPerResource: ${this.capacityPerResource}
-    resources count: ${this._resources.length}`;
+    capacity: ${ this.capacity } userExpireAfterMs: ${ this.userExpireAfterMs } capacityPerResource: ${ this.capacityPerResource }
+    resources count: ${ this._resources.length }`;
 
-    const res = this._resources.map((r) => r.toString()).join(`\r\n\t`);
-    r += `\r\nResources:\r\n\t` + res;
+    const resource = this._resources.map((r) => r.toString()).join(`\r\n\t`);
+    r += `\r\nResources:\r\n\t` + resource;
 
     r += `\r\nUsers: \r\n`;
-    for (const [k, v] of this._users.entries()) {
-      r += `\tk: ${k} v: ${v.toString()}\r\n`;
+    for (const [ k, v ] of this._users.entries()) {
+      r += `\tk: ${ k } v: ${ v.toString() }\r\n`;
     }
     return r;
   }
@@ -382,7 +378,7 @@ export class Pool<V> {
    * @returns
    */
   getUsersByLongestElapsed() {
-    return [...this._users.values()].sort((a, b) => {
+    return [ ...this._users.values() ].sort((a, b) => {
       const aa = a.elapsed;
       const bb = b.elapsed;
       if (aa === bb) return 0;
@@ -396,7 +392,7 @@ export class Pool<V> {
    * @returns
    */
   getResourcesSortedByUse() {
-    return [...this._resources].sort((a, b) => {
+    return [ ...this._resources ].sort((a, b) => {
       if (a.usersCount === b.usersCount) return 0;
       if (a.usersCount < b.usersCount) return -1;
       return 1;
@@ -417,11 +413,11 @@ export class Pool<V> {
 
     if (this.capacity > 0 && this._resources.length === this.capacity) {
       throw new Error(
-        `Capacity limit (${this.capacity}) reached. Cannot add more.`
+        `Capacity limit (${ this.capacity }) reached. Cannot add more.`
       );
     }
 
-    this.log.log(`Adding resource: ${JSON.stringify(resource)}`);
+    this.log.log(`Adding resource: ${ JSON.stringify(resource) }`);
     const pi = new Resource<V>(this, resource);
     this._resources.push(pi);
     return pi;
@@ -436,31 +432,31 @@ export class Pool<V> {
     let changed = false;
 
     // Find all disposed resources
-    const nuke: Resource<V>[] = [];
+    const nuke: Array<Resource<V>> = [];
     for (const p of this._resources) {
       if (p.isDisposed) {
-        this.log.log(`Maintain, disposed resource: ${JSON.stringify(p.data)}`);
+        this.log.log(`Maintain, disposed resource: ${ JSON.stringify(p.data) }`);
         nuke.push(p);
       } else if (p.isExpiredFromUsers) {
-        this.log.log(`Maintain, expired resource: ${JSON.stringify(p.data)}`);
+        this.log.log(`Maintain, expired resource: ${ JSON.stringify(p.data) }`);
         nuke.push(p);
       }
     }
 
     // Remove them
     if (nuke.length > 0) {
-      for (const res of nuke) {
-        res.dispose(`diposed/expired`);
+      for (const resource of nuke) {
+        resource.dispose(`diposed/expired`);
       }
       changed = true;
     }
 
     // Find 'users' to clean up
-    const userKeysToRemove: string[] = [];
-    for (const [key, user] of this._users.entries()) {
+    const userKeysToRemove: Array<string> = [];
+    for (const [ key, user ] of this._users.entries()) {
       if (!user.isValid) {
         this.log.log(
-          `Maintain. Invalid user: ${user.key} (Disposed: ${user.isDisposed} Expired: ${user.isExpired} Resource disposed: ${user.resource.isDisposed})`
+          `Maintain. Invalid user: ${ user.key } (Disposed: ${ user.isDisposed } Expired: ${ user.isExpired } Resource disposed: ${ user.resource.isDisposed })`
         );
 
         userKeysToRemove.push(key);
@@ -475,7 +471,7 @@ export class Pool<V> {
 
     if (changed) {
       this.log.log(
-        `End: resource len: ${this._resources.length} users: ${this.usersLength}`
+        `End: resource len: ${ this._resources.length } users: ${ this.usersLength }`
       );
     }
   }
@@ -486,8 +482,8 @@ export class Pool<V> {
    * `values`.
    */
   *resources() {
-    const res = [...this._resources];
-    for (const r of res) {
+    const resource = [ ...this._resources ];
+    for (const r of resource) {
       yield r;
     }
   }
@@ -500,8 +496,8 @@ export class Pool<V> {
    * active user.
    */
   *values() {
-    const res = [...this._resources];
-    for (const r of res) {
+    const resource = [ ...this._resources ];
+    for (const r of resource) {
       yield r.data;
     }
   }
@@ -537,11 +533,11 @@ export class Pool<V> {
 
   /**
    * Returns true if `v` has an associted resource in the pool
-   * @param res
+   * @param resource
    * @returns
    */
-  hasResource(res: V): boolean {
-    const found = this._resources.find((v) => v.data === res);
+  hasResource(resource: V): boolean {
+    const found = this._resources.find((v) => v.data === resource);
     return found !== undefined;
   }
 
@@ -580,10 +576,10 @@ export class Pool<V> {
     // for (let i=0;i<sorted.length;i++) {
     //   console.log(i +`. users: ` + sorted[i].usersCount);
     // }
-    if (sorted.length > 0 && sorted[0].hasUserCapacity) {
+    if (sorted.length > 0 && sorted[ 0 ].hasUserCapacity) {
       // No problem, resource has capacity
-      this.log.log(`resource has capacity: ${sorted[0].data}`);
-      const u = this._assign(userKey, sorted[0]);
+      //this.log.log(`resource has capacity: ${ sorted[ 0 ].data }`);
+      const u = this._assign(userKey, sorted[ 0 ]);
       return u;
     }
 
@@ -593,10 +589,10 @@ export class Pool<V> {
       (this.capacity < 0 || this._resources.length < this.capacity)
     ) {
       this.log.log(
-        `capacity: ${this.capacity} resources: ${this._resources.length}`
+        `capacity: ${ this.capacity } resources: ${ this._resources.length }`
       );
-      const newResource = this.addResource(this.generateResource());
-      const u = this._assign(userKey, newResource);
+      const resourceGenerated = this.addResource(this.generateResource());
+      const u = this._assign(userKey, resourceGenerated);
       return u;
     }
   }
@@ -605,7 +601,7 @@ export class Pool<V> {
    * Return the number of users
    */
   get usersLength() {
-    return [...this._users.values()].length;
+    return [ ...this._users.values() ].length;
   }
 
   /**
@@ -614,8 +610,8 @@ export class Pool<V> {
    * @returns
    */
   useValue(userKey: string): V {
-    const res = this.use(userKey);
-    return res.resource.data;
+    const resource = this.use(userKey);
+    return resource.resource.data;
   }
 
   /**
@@ -641,14 +637,14 @@ export class Pool<V> {
     if (this.fullPolicy === `error`) {
       console.log(this.dumpToString());
       throw new Error(
-        `Pool is fully used (fullPolicy: ${this.fullPolicy}, capacity: ${this.capacity})`
+        `Pool is fully used (fullPolicy: ${ this.fullPolicy }, capacity: ${ this.capacity })`
       );
     }
     // Evict oldest user
     if (this.fullPolicy === `evictOldestUser`) {
       const users = this.getUsersByLongestElapsed();
       if (users.length > 0) {
-        this.release(users[0].key, `evictedOldestUser`);
+        this.release(users[ 0 ].key, `evictedOldestUser`);
 
         const match2 = this._findUser(userKey);
         if (match2) return match2;
@@ -658,7 +654,7 @@ export class Pool<V> {
     // Evict newest user
 
     // Evict from random pool item
-    throw new Error(`Pool is fully used (${this.fullPolicy})`);
+    throw new Error(`Pool is fully used (${ this.fullPolicy })`);
   }
 }
 
