@@ -1,4 +1,4 @@
-import {defineConfig} from 'tsup';
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: {
@@ -6,8 +6,10 @@ export default defineConfig({
     bundle: `./src/index.ts`,
     collections: `./src/collections/index.ts`,
     components: `./src/components/index.ts`,
+    webcomponents: `./src/web-components/index.ts`,
     data: `./src/data/index.ts`,
     dom: `./src/dom/index.ts`,
+    debug: `./src/debug/index.ts`,
     events: `./src/Events.ts`,
     flow: './src/flow/index.ts',
     forms: `./src/dom/Forms.ts`,
@@ -28,7 +30,7 @@ export default defineConfig({
     visual: `./src/visual/index.ts`,
   },
   dts: true,
-  noExternal: [`bezier-js`, `d3-color`, `d3-interpolate`, `rxjs`, `json5`],
+  noExternal: [ `bezier-js`, `d3-color`, `d3-interpolate`, `rxjs`, `json5` ],
   platform: `browser`,
   target: `es2022`,
   format: [
