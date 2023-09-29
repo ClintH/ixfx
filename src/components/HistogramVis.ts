@@ -9,49 +9,49 @@ type Bar = {
   readonly data: KeyValue;
 };
 
-const jsonData = (obj: unknown) => {
-  if (obj === null || obj === undefined || obj === `undefined`) return;
+const jsonData = (object: unknown) => {
+  if (object === null || object === undefined || object === `undefined`) return;
   try {
-    if (typeof obj === `string`) {
-      if (obj.length === 0) return;
-      const o = JSON.parse(obj);
+    if (typeof object === `string`) {
+      if (object.length === 0) return;
+      const o = JSON.parse(object);
       if (!Array.isArray(o)) {
         console.error(`Histogram innerText should be JSON array`);
         return;
       }
 
       // eslint-disable-next-line functional/no-let
-      for (let i = 0; i < o.length; i++) {
-        if (!Array.isArray(o[i])) {
+      for (const [ index, element ] of o.entries()) {
+        if (!Array.isArray(element)) {
           console.error(`Histogram array should consist of inner arrays`);
           return;
         }
-        if (o[i].length !== 2) {
+        if (element.length !== 2) {
           console.error(
             `Histogram inner arrays should consist of two elements`
           );
           return;
         }
-        if (typeof o[i][0] !== `string`) {
+        if (typeof element[ 0 ] !== `string`) {
           console.error(
-            `First element of inner array should be a string (index ${i})`
+            `First element of inner array should be a string (index ${ index })`
           );
           return;
         }
-        if (typeof o[i][1] !== `number`) {
+        if (typeof element[ 1 ] !== `number`) {
           console.error(
-            `Second element of inner array should be a number (index ${i})`
+            `Second element of inner array should be a number (index ${ index })`
           );
           return;
         }
       }
       return o;
     }
-  } catch (ex) {
-    console.log(obj);
-    console.error(ex);
+  } catch (error) {
+    console.log(object);
+    console.error(error);
   }
-  return undefined;
+  return;
 };
 
 /**
@@ -139,7 +139,7 @@ export class HistogramVis extends LitElement {
 
   // eslint-disable-next-line functional/prefer-readonly-type
   @property()
-  declare data: readonly KeyValue[];
+  declare data: ReadonlyArray<KeyValue>;
 
   // eslint-disable-next-line functional/prefer-readonly-type
   @property()
@@ -155,7 +155,7 @@ export class HistogramVis extends LitElement {
 
   // eslint-disable-next-line functional/prefer-readonly-type
   @property({ converter: jsonData, type: Object })
-  declare json: readonly KeyValue[] | undefined;
+  declare json: ReadonlyArray<KeyValue> | undefined;
 
   constructor() {
     super();
@@ -175,7 +175,7 @@ export class HistogramVis extends LitElement {
 
   barTemplate(bar: Bar, index: number, _totalBars: number) {
     const { percentage } = bar;
-    const [key, freq] = bar.data;
+    const [ key, freq ] = bar.data;
 
     // grid-area: rowStart / gridColStart / gridRowEnd / gridColEnd
     const rowStart = 1;
@@ -183,22 +183,24 @@ export class HistogramVis extends LitElement {
     const colStart = index + 1;
     const colEnd = colStart + 1;
 
-    const dataLabel = html`<div class="data">${freq}</div>`;
-    const xAxis = html`${key}`;
-    return html` <div
-        class="bar"
-        style="grid-area: ${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}"
-      >
-        <div class="barTrack" style="height: ${(percentage ?? 0) * 100}%"></div>
-        ${this.showDataLabels ? dataLabel : ``}
-      </div>
+    const dataLabel = html`<div class="data">${ freq }</div>`;
+    const xAxis = html`${ key }`;
+    return html`
       <div
-        class="xAxisLabels"
-        style="grid-area: ${rowStart + 2} / ${colStart} / ${rowEnd +
-        2} / ${colEnd}"
-      >
-        ${this.showXAxis ? xAxis : ``}
-      </div>`;
+             class="bar"
+             style="grid-area: ${ rowStart } / ${ colStart } / ${ rowEnd } / ${ colEnd }"
+           >
+             <div class="barTrack" style="height: ${ (percentage ?? 0) * 100 }%"></div>
+             ${ this.showDataLabels ? dataLabel : `` }
+           </div>
+           <div
+             class="xAxisLabels"
+             style="grid-area: ${ rowStart + 2 } / ${ colStart } / ${ rowEnd +
+      2 } / ${ colEnd }"
+           >
+             ${ this.showXAxis ? xAxis : `` }
+           </div>
+    `;
   }
 
   render() {
@@ -210,32 +212,36 @@ export class HistogramVis extends LitElement {
     }
     const d = this.data ?? this.json;
     const length = d.length;
-    const highestCount = Math.max(...d.map((d) => d[1] as number));
+    const highestCount = Math.max(...d.map((d) => d[ 1 ] as number));
     const bars = d.map((kv) => ({
       data: kv,
-      percentage: (kv[1] as number) / highestCount,
+      percentage: (kv[ 1 ] as number) / highestCount,
     }));
 
-    const xAxis = html`<div
-      class="xAxis"
-      style="grid-area: 2 / 1 / 3 / ${d.length + 1}"
-    ></div>`;
-    const height = this.height ? `height: ${this.height};` : ``;
-    const h = html` <style>
-        div.chart {
-          grid-template-columns: repeat(${d.length}, minmax(2px, 1fr));
-        }
-      </style>
-      <div class="container" style="${height}">
-        <div class="chart">
-          ${repeat(
-            bars,
-            (bar) => bar.data[0],
-            (b, index) => this.barTemplate(b, index, length)
-          )}
-          ${this.showXAxis ? xAxis : ``}
-        </div>
-      </div>`;
+    const xAxis = html`
+      <div
+            class="xAxis"
+            style="grid-area: 2 / 1 / 3 / ${ d.length + 1 }"
+          ></div>
+    `;
+    const height = this.height ? `height: ${ this.height };` : ``;
+    const h = html`
+      <style>
+             div.chart {
+               grid-template-columns: repeat(${ d.length }, minmax(2px, 1fr));
+             }
+           </style>
+           <div class="container" style="${ height }">
+             <div class="chart">
+               ${ repeat(
+      bars,
+      (bar) => bar.data[ 0 ],
+      (b, index) => this.barTemplate(b, index, length)
+    ) }
+               ${ this.showXAxis ? xAxis : `` }
+             </div>
+           </div>
+    `;
     return h;
   }
 }
