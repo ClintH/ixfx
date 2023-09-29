@@ -1,5 +1,9 @@
 import { fromObject } from "./DataTable.js";
 
+export type DataDisplayOptions = {
+  theme?: `dark` | `light`
+}
+
 // TODO Visually show data which has changed since last update
 // TODO Click on a field to show a sparkline for it
 /**
@@ -21,14 +25,15 @@ export class DataDisplay {
    * Constructor
    * @param darkMode 
    */
-  constructor(darkMode = false) {
+  constructor(options: DataDisplayOptions = {}) {
+    const theme = options.theme ?? `dark`;
 
     const existing = document.querySelector(`#ixfx-data-display`);
     if (existing !== null) throw new Error(`DataDisplay already loaded on this page`);
 
     const container = document.createElement(`div`);
     container.id = `ixfx-data-display`;
-    if (darkMode) container.classList.add(`dark`);
+    container.classList.add(`theme-${ theme }`);
 
     const css = document.createElement(`style`);
     css.textContent = `
@@ -45,7 +50,7 @@ export class DataDisplay {
       right: 1em;
       top: 1em;
     }
-    #ixfx-data-display.dark {
+    #ixfx-data-display.theme-dark {
       background: black;
       color: white;
       border: 2px solid hsl(0deg 0.61% 10%);
@@ -71,7 +76,7 @@ export class DataDisplay {
       text-align: right;
       padding-right: 0.5em;
     }
-    #ixfx-data-display.dark .label {
+    #ixfx-data-display.theme-dark .label {
       color: gray;
     }
     `
