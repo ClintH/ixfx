@@ -2,7 +2,7 @@
 /* eslint-disable unicorn/prefer-ternary */
 import { Async } from "../Generators.js";
 import { Elapsed } from "../flow/index.js";
-import { intervalToMs, type Interval } from "../flow/Interval.js";
+import { intervalToMs, type Interval } from "../flow/IntervalType.js";
 import { sleep } from "../flow/Sleep.js";
 import { isAsyncIterable } from "../Iterable.js";
 import { Queues } from "../collections/index.js";
@@ -137,6 +137,8 @@ export type LazyChain<In, Out> = {
   firstOutput: (data?: GenOrData<In>) => Promise<Out | undefined>
   fromFunction: (callback: () => any) => LazyChain<any, any>
   take: (limit: number) => LazyChain<In, Out>
+  debounce: (duration: Interval) => LazyChain<In, Out>
+  delay: (options: DelayOptions) => LazyChain<In, Out>
   chunk: (size: number, returnRemainers?: boolean) => LazyChain<In, Out>
   filter: (predicate: (input: any) => boolean) => LazyChain<In, Out>
   min: () => LazyChain<any, number>
@@ -144,7 +146,11 @@ export type LazyChain<In, Out> = {
   average: () => LazyChain<any, number>
   total: () => LazyChain<In, number>
   tally: () => LazyChain<In, number>
-  input: (data: GenOrData<In>) => LazyChain<In, Out>;
+  input: (data: GenOrData<In>) => LazyChain<In, Out>
+  drop: (predicate: (value: In) => boolean) => LazyChain<In, Out>
+  duration: (period: Interval) => LazyChain<In, Out>
+  flatten: (flattener: (values: Array<any>) => any) => LazyChain<In, Out>
+  transform: (transformer: (v: any) => any) => LazyChain<In, Out>
 }
 
 export function lazy<In, Out>(): LazyChain<In, Out> {
@@ -170,6 +176,30 @@ export function lazy<In, Out>(): LazyChain<In, Out> {
 
   const w = {
     asGenerator,
+    transform: (transformer: (v: any) => any) => {
+      chained.push(transform(transformer));
+      return w;
+    },
+    flatten: (flattener: (values: Array<any>) => any) => {
+      chained.push(flatten(flattener));
+      return w;
+    },
+    drop: (predicate: (v: In) => boolean) => {
+      chained.push(drop(predicate));
+      return w;
+    },
+    delay: (options: DelayOptions) => {
+      chained.push(delay(options));
+      return w;
+    },
+    duration: (elapsed: Interval) => {
+      chained.push(duration(elapsed));
+      return w;
+    },
+    debounce: (rate: Interval) => {
+      chained.push(debounce(rate));
+      return w;
+    },
     fromFunction: (callback: () => any) => {
       chained.push(fromFunction(callback));
       return w;
@@ -373,6 +403,26 @@ export function fromFunction<Out>(callback: () => Promise<Out> | Out): GenFactor
   }
   fromFunction._name = `fromFunction`;
   return fromFunction;
+}
+
+const oncePromise = (target: EventTarget, name: string): Promise<any> => {
+  return new Promise(resolve => {
+    const handler = (...args: Array<any>) => {
+      target.removeEventListener(name, handler);
+      resolve(args);
+    };
+    target.addEventListener(name, handler);
+  });
+};
+
+export function fromEvent<Out>(target: EventTarget, name: string) {
+  async function* fromEvent(): AsyncGenerator<Out> {
+    while (true) {
+      yield await oncePromise(target, name) as Out;
+    }
+  }
+  fromEvent._name = `fromEvent`;
+  return fromEvent;
 }
 
 /**
