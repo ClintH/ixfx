@@ -1,5 +1,5 @@
 import { throwNumberTest } from '../Guards.js';
-import { type Interval, intervalToMs } from './index.js';
+import { type Interval, intervalToMs } from './IntervalType.js';
 
 export type SleepOpts<V> = Interval & {
   readonly signal?: AbortSignal;

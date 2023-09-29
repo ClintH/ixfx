@@ -1,7 +1,8 @@
 import { sleep } from './Sleep.js';
-import { getErrorMessage, resolveLogOption } from '../Debug.js';
+import { resolveLogOption } from '../debug/Logger.js';
 import { since, toString as elapsedToString } from './Elapsed.js';
 import { throwIntegerTest } from '../Guards.js';
+import { getErrorMessage } from '../debug/GetErrorMessage.js';
 /**
  * Result of backoff
  */
@@ -104,12 +105,12 @@ export type RetryOpts<V> = {
  * // Somewhere else...
  * abort('Cancel!'); // Trigger abort
  * ```
- * @param cb Function to run
+ * @param callback Function to run
  * @param opts Options
  * @returns
  */
 export const retry = async <V>(
-  cb: () => Promise<V | undefined>,
+  callback: () => Promise<V | undefined>,
   //eslint-disable-next-line functional/prefer-immutable-types
   opts: RetryOpts<V>
 ): Promise<RetryResult<V>> => {
@@ -125,7 +126,7 @@ export const retry = async <V>(
   //eslint-disable-next-line functional/no-let
   let attempts = 0;
 
-  throwIntegerTest(count, 'aboveZero', 'count');
+  throwIntegerTest(count, `aboveZero`, `count`);
   if (t <= 0) throw new Error(`startMs must be above zero`);
 
   if (predelayMs > 0) await sleep({ millis: predelayMs, signal: signal });
@@ -140,9 +141,9 @@ export const retry = async <V>(
   }
   while (attempts < count) {
     attempts++;
-    const cbResult = await cb();
-    if (cbResult !== undefined) {
-      return { value: cbResult, success: true, attempts, elapsed: startedAt() };
+    const callbackResult = await callback();
+    if (callbackResult !== undefined) {
+      return { value: callbackResult, success: true, attempts, elapsed: startedAt() };
     }
     log({
       msg: `retry attempts: ${ attempts } t: ${ elapsedToString(t) }`,
@@ -155,13 +156,13 @@ export const retry = async <V>(
     // Sleep
     try {
       await sleep({ millis: t, signal });
-    } catch (ex) {
+    } catch (error) {
       // Eg if abort signal fires
       return {
         success: false,
         attempts,
         value: opts.defaultValue,
-        message: getErrorMessage(ex),
+        message: getErrorMessage(error),
         elapsed: startedAt(),
       };
     }

@@ -3,7 +3,7 @@ import * as Execute from './Execute.js';
 import { type MachineState } from './StateMachine.js';
 import { defaultComparer } from '../Util.js';
 import { randomElement } from '../collections/Arrays.js';
-import { resolveLogOption, type LogOption } from '../Debug.js';
+import * as Logger from '../debug/Logger.js';
 
 export type Result<V extends StateMachine.Transitions> = {
   /**
@@ -39,11 +39,11 @@ export type Runner<V extends StateMachine.Transitions> = {
 
 export type StatesHandler<V extends StateMachine.Transitions> = {
   readonly if:
-    | readonly StateMachine.StateNames<V>[]
-    //eslint-disable-next-line functional/prefer-readonly-type
-    | StateMachine.StateNames<V>[]
-    | StateMachine.StateNames<V>;
-  readonly then: readonly ExpressionOrResult<V>[] | ExpressionOrResult<V>;
+  | ReadonlyArray<StateMachine.StateNames<V>>
+  //eslint-disable-next-line functional/prefer-readonly-type
+  | Array<StateMachine.StateNames<V>>
+  | StateMachine.StateNames<V>;
+  readonly then: ReadonlyArray<ExpressionOrResult<V>> | ExpressionOrResult<V>;
   /**
    * Logic for choosing which result, if there are multiple expressions.
    * By default 'highest' (for highest ranked result)
@@ -66,9 +66,9 @@ export type StatesHandler<V extends StateMachine.Transitions> = {
 // };
 
 export type DriverOpts<V extends StateMachine.Transitions> = {
-  readonly handlers: readonly StatesHandler<V>[];
+  readonly handlers: ReadonlyArray<StatesHandler<V>>;
   //readonly prereqs?: StatePrerequisites<V>;
-  readonly debug?: LogOption;
+  readonly debug?: Logger.LogOption;
   /**
    * If _true_ execution of handlers is shuffled each time
    */
@@ -83,8 +83,8 @@ export type DriverOpts<V extends StateMachine.Transitions> = {
 export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
   | Result<Transitions>
   | ((
-      machine?: MachineState<Transitions>
-    ) => Result<Transitions> | undefined | void);
+    machine?: MachineState<Transitions>
+  ) => Result<Transitions> | undefined);
 
 /**
  * Drives a state machine.
@@ -95,41 +95,41 @@ export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
  * @param handlersOrOpts
  * @returns
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 export async function init<V extends StateMachine.Transitions>(
   machine: StateMachine.Machine<V> | StateMachine.Transitions,
-  handlersOrOpts: readonly StatesHandler<V>[] | DriverOpts<V>
+  handlersOrOpts: ReadonlyArray<StatesHandler<V>> | DriverOpts<V>
 ): Promise<Runner<V>> {
   const opts: DriverOpts<V> = Array.isArray(handlersOrOpts)
     ? {
-        handlers: handlersOrOpts as readonly StatesHandler<V>[],
-      }
+      handlers: handlersOrOpts as ReadonlyArray<StatesHandler<V>>,
+    }
     : (handlersOrOpts as DriverOpts<V>);
 
-  const debug = resolveLogOption(opts.debug, {
-    category: 'StateMachineDriver',
+  const debug = Logger.resolveLogOption(opts.debug, {
+    category: `StateMachineDriver`,
   });
 
   // Index handlers by state, making sure there are not multiple
   // handlers for a given state.
   const byState = new Map<string, StatesHandler<V>>();
   for (const h of opts.handlers) {
-    const ifBlock = Array.isArray(h.if) ? h.if : [h.if];
-    ifBlock.forEach((state) => {
-      if (typeof state !== 'string') {
-        throw new Error(
-          `Expected single or array of strings for the 'if' field. Got: '${typeof state}'.`
+    const ifBlock = Array.isArray(h.if) ? h.if : [ h.if ];
+    for (const state of ifBlock) {
+      if (typeof state !== `string`) {
+        throw new TypeError(
+          `Expected single or array of strings for the 'if' field. Got: '${ typeof state }'.`
         );
       }
 
-      if (byState.has(state as string)) {
+      if (byState.has(state)) {
         throw new Error(
-          `Multiple handlers defined for state '${
-            state as string
+          `Multiple handlers defined for state '${ state
           }'. There should be at most one.`
         );
       }
-      byState.set(state as string, h);
-    });
+      byState.set(state, h);
+    }
   }
 
   // const expressions: Expression<V>[] = [
@@ -153,28 +153,28 @@ export async function init<V extends StateMachine.Transitions>(
   let sm = StateMachine.init(machine);
 
   // Check that all 'if' states are actually defined on machine
-  for (const [ifState] of byState) {
+  for (const [ ifState ] of byState) {
     // Check if state is defined
     if (
-      typeof sm.machine[ifState] === `undefined` &&
-      ifState !== '__fallback'
+      typeof sm.machine[ ifState ] === `undefined` &&
+      ifState !== `__fallback`
     ) {
       throw new Error(
-        `StateMachineDriver handler references a state ('${ifState}') which is not defined on the machine. Therefore this handler will never run.'`
+        `StateMachineDriver handler references a state ('${ ifState }') which is not defined on the machine. Therefore this handler will never run.'`
       );
     }
   }
 
   const run = async (): Promise<StateMachine.MachineState<V> | undefined> => {
-    debug(`Run. State: ${sm.value as string}`);
-    const state = sm.value as string;
+    debug(`Run. State: ${ sm.value }`);
+    const state = sm.value;
     //eslint-disable-next-line functional/no-let
     let handler = byState.get(state);
     if (handler === undefined) {
-      debug(`  No handler for state '${state}', trying __fallback`);
+      debug(`  No handler for state '${ state }', trying __fallback`);
 
       // Is there a fallback?
-      handler = byState.get('__fallback');
+      handler = byState.get(`__fallback`);
     }
     if (handler === undefined) {
       debug(`  No __fallback handler`);
@@ -183,60 +183,62 @@ export async function init<V extends StateMachine.Transitions>(
 
     // If the `first` option is given, stop executing fns as soon as we get
     // a valid result.
-    const runOptsForHandler =
+    const runOptionsForHandler =
       handler.resultChoice === `first`
         ? {
-            ...runOpts,
-            stop: (latest: Result<V> | undefined) => {
-              if (!latest) return false;
-              if (`reset` in latest) return true;
-              if (`next` in latest) {
-                if (latest.next !== undefined) return true;
-              }
-              return false;
-            },
-          }
+          ...runOpts,
+          stop: (latest: Result<V> | undefined) => {
+            if (!latest) return false;
+            if (`reset` in latest) return true;
+            if (`next` in latest && latest.next !== undefined) return true;
+            return false;
+          },
+        }
         : runOpts;
 
     const results = await Execute.run<MachineState<V>, Result<V>>(
       handler.then,
-      runOptsForHandler,
+      runOptionsForHandler,
       sm
     );
     debug(
-      `  In state '${sm.value as string}' results: ${results.length}. Choice: ${
-        handler.resultChoice
+      `  In state '${ sm.value }' results: ${ results.length }. Choice: ${ handler.resultChoice
       }`
     );
 
     // Apply selection logic
     //eslint-disable-next-line functional/no-let
     let r: Result<V> | undefined;
-    switch (handler.resultChoice ?? 'highest') {
-      case 'highest':
+    switch (handler.resultChoice ?? `highest`) {
+      case `highest`: {
         r = results.at(-1);
         break;
-      case 'first':
-        r = results[0]; // Since we break on the first result
+      }
+      case `first`: {
+        r = results[ 0 ]; // Since we break on the first result
         break;
-      case 'lowest':
+      }
+      case `lowest`: {
         r = results.at(0);
         break;
-      case 'random':
+      }
+      case `random`: {
         r = randomElement(results);
         break;
-      default:
+      }
+      default: {
         throw new Error(
-          `Unknown 'resultChoice' option: ${handler.resultChoice}. Expected highest, first, lowest or random`
+          `Unknown 'resultChoice' option: ${ handler.resultChoice }. Expected highest, first, lowest or random`
         );
+      }
     }
 
-    debug(`  Chosen result: ${JSON.stringify(r)}`);
+    debug(`  Chosen result: ${ JSON.stringify(r) }`);
     // Apply result
     if (r && r.reset) {
       sm = StateMachine.reset(sm);
     } else if (r && r.next) {
-      if (typeof r.next === 'boolean') {
+      if (typeof r.next === `boolean`) {
         sm = StateMachine.next(sm);
       } else {
         debug(JSON.stringify(results));
