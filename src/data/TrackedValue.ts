@@ -1,4 +1,4 @@
-import { type GetOrGenerate, getOrGenerate } from '../collections/map/index.js';
+import { type GetOrGenerate, getOrGenerate } from '../collections/map/GetOrGenerate.js';
 import { TrackerBase } from './TrackerBase.js';
 
 export type Timestamped = {
