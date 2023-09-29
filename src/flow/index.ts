@@ -40,12 +40,11 @@ export * from './Delay.js';
 export * from './Every.js';
 export * from './RunOnce.js';
 export * from './Retry.js';
+export * from './Types.js';
 
 export { TaskQueue } from './TaskQueue.js';
 
-export type HasCompletion = {
-  get isDone(): boolean;
-};
+
 
 /**
  * Iterates over `iterator` (iterable/array), calling `fn` for each value.

@@ -1,5 +1,5 @@
 import { round } from '../Numbers.js';
-import { intervalToMs, type Interval } from './Interval.js';
+import { intervalToMs, type Interval } from './IntervalType.js';
 import { msElapsedTimer, relativeTimer } from './Timer.js';
 
 export type Since = () => number;

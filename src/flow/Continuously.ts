@@ -1,6 +1,6 @@
 import { throwIntegerTest } from '../Guards.js';
-import { intervalToMs, type HasCompletion, type Interval } from './index.js';
-
+import { intervalToMs, type Interval } from './IntervalType.js';
+import type { HasCompletion } from './Types.js';
 /**
  * Runs a function continuously, returned by {@link Continuously}
  */

@@ -1,4 +1,4 @@
-import { intervalToMs, type Interval } from './Interval.js';
+import { intervalToMs, type Interval } from './IntervalType.js';
 import { sleep } from './Sleep.js';
 
 /**
@@ -12,7 +12,7 @@ export type DelayOpts = Interval & {
   /**
    * When delay is applied. "before" is default.
    */
-  readonly delay?: 'before' | 'after' | 'both';
+  readonly delay?: `before` | `after` | `both`;
 };
 
 /**
@@ -66,8 +66,8 @@ export const delay = async <V>(
   optsOrMillis: DelayOpts | number
 ): Promise<V> => {
   const opts =
-    typeof optsOrMillis === 'number' ? { millis: optsOrMillis } : optsOrMillis;
-  const delayWhen = opts.delay ?? 'before';
+    typeof optsOrMillis === `number` ? { millis: optsOrMillis } : optsOrMillis;
+  const delayWhen = opts.delay ?? `before`;
   if (delayWhen === `before` || delayWhen === `both`) {
     await sleep(opts);
   }
@@ -211,7 +211,7 @@ async function* delayAnimationLoop() {
 export async function* delayLoop(timeout: Interval) {
   const timeoutMs = intervalToMs(timeout);
   if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);
-  if (timeoutMs < 0) throw new Error('Timeout is less than zero');
+  if (timeoutMs < 0) throw new Error(`Timeout is less than zero`);
   if (timeoutMs === 0) return yield* delayAnimationLoop();
 
   //eslint-disable-next-line functional/no-let,@typescript-eslint/no-explicit-any
