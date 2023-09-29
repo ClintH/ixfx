@@ -1,20 +1,20 @@
 import { throwIntegerTest, integerTest } from '../Guards.js';
 import { type HasCompletion } from './index.js';
-import { intervalToMs, type Interval } from './Interval.js';
+import { intervalToMs, type Interval } from './IntervalType.js';
 export type TimeoutSyncCallback = (
   elapsedMs?: number,
-  ...args: readonly unknown[]
+  ...args: ReadonlyArray<unknown>
 ) => void;
 export type TimeoutAsyncCallback = (
   elapsedMs?: number,
-  ...args: readonly unknown[]
+  ...args: ReadonlyArray<unknown>
 ) => Promise<void>;
 
 /**
  * A resettable timeout, returned by {@link timeout}
  */
 export type Timeout = HasCompletion & {
-  start(altTimeoutMs?: number, args?: readonly unknown[]): void;
+  start(altTimeoutMs?: number, args?: ReadonlyArray<unknown>): void;
   cancel(): void;
   get isDone(): boolean;
 };
@@ -81,7 +81,7 @@ export const timeout = (
   let startedAt = 0;
   const start = async (
     altInterval: Interval = interval,
-    args: unknown[]
+    args: Array<unknown>
   ): Promise<void> => {
     const p = new Promise<void>((resolve, reject) => {
       startedAt = performance.now();
@@ -95,7 +95,7 @@ export const timeout = (
       timer = window.setTimeout(async () => {
         await callback(performance.now() - startedAt, ...args);
         timer = 0;
-        resolve(undefined);
+        resolve();
       }, altTimeoutMs);
     });
     return p;
