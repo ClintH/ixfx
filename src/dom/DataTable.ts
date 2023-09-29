@@ -1,4 +1,4 @@
-import { round } from 'src/Numbers.js';
+import { round } from '../Numbers.js';
 import { resolveEl as resolveElement } from './Util.js';
 import JSON5 from 'json5';
 
@@ -39,13 +39,6 @@ const toTableSimple = (v: object, options: FormattingOptions): string => {
     html += `<div class="label" style="display:table-cell">${ entry[ 0 ] }</div>
       <div class="data" style="display:table-cell">${ value }</div>`
   }
-  // for (const entry of Object.entries(v)) {
-  //   const value = toHtmlSimple(entry[ 1 ], options);
-  //   html += `<div style="display:table-row">
-  //     <div class="label" style="display:table-cell">${ entry[ 0 ] }</div>
-  //     <div class="data" style="display:table-cell">${ value }</div>
-  //     </div>`
-  // }
   html += `</div>`;
   return html;
 }
@@ -187,8 +180,10 @@ const updateElement = (
         valueHTML = opts.roundNumbers ? Math.round(value).toString() : value.toFixed(precision);
       } else if (typeof value === `boolean`) {
         valueHTML = value ? `true` : `false`;
+      } else if (typeof value === `string`) {
+        valueHTML = `"${ value }"`;
       } else {
-        valueHTML = `JSON` + JSON.stringify(value);
+        valueHTML = JSON.stringify(value);
       }
     }
 
