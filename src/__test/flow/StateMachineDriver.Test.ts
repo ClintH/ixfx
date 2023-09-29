@@ -8,13 +8,13 @@ function createBasic() {
     one: 'two',
     two: 'three',
     three: 'four',
-    four: ['three', 'five'],
+    four: [ 'three', 'five' ],
     five: null,
   } as const;
 
   const handlers: StatesHandler<typeof states>[] = [
     {
-      if: ['init'],
+      if: [ 'init' ],
       then: { next: true },
     },
     {
@@ -22,7 +22,7 @@ function createBasic() {
       then: { next: 'four' },
     },
     {
-      if: ['four'],
+      if: [ 'four' ],
       then: [
         { score: 0, next: 'three' },
         { score: 10, next: 'five' },
@@ -38,11 +38,11 @@ test('no-target', async (t) => {
   const handlers = [
     {
       if: '__fallback',
-      then: [{ next: true }],
+      then: [ { next: true } ],
     },
     {
       if: 'three',
-      then: [{ next: 'gazoo' }],
+      then: [ { next: 'gazoo' } ],
     },
   ];
 
@@ -65,7 +65,7 @@ test('no-target', async (t) => {
     },
     {
       if: 'three',
-      then: [{ next: 'gazoo' }],
+      then: [ { next: 'gazoo' } ],
     },
     {
       if: 'blah',
@@ -104,10 +104,11 @@ test('basic', async (t) => {
 
   //eslint-disable-next-line functional/immutable-data
   handlers.push({
-    if: ['__fallback'],
+    if: [ '__fallback' ],
     then: [
       () => {
         // no-up
+        return undefined;
       },
       () => {
         return { next: true };

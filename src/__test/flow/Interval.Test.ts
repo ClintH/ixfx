@@ -1,6 +1,6 @@
 import test from 'ava';
-import { intervalToMs, interval, isInterval } from '../../flow/Interval.js';
-import { Elapsed } from '../../flow/index.js';
+import { intervalToMs, isInterval } from '../../flow/IntervalType.js';
+import { Elapsed, interval } from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
 import { count } from '../../Generators.js';
 
@@ -15,7 +15,7 @@ test('interval-function', async (t) => {
 
   for await (const r of randomGenerator) {
     if (typeof r !== 'number') {
-      t.fail(`Iterator should be number. Got: ${typeof r}`);
+      t.fail(`Iterator should be number. Got: ${ typeof r }`);
     }
     produced++;
     if (produced === maxLoops) break;
@@ -30,11 +30,11 @@ test('interval-array', async (t) => {
     fixed: 100,
     delay: 'before',
   } as const;
-  const list = ['thom', 'jonny', 'colin', 'ed', 'phil'];
+  const list = [ 'thom', 'jonny', 'colin', 'ed', 'phil' ];
   const iterateResult = [];
   const elapsed = Elapsed.once();
   for await (const i of interval(list, opts)) {
-    if (typeof i !== 'string') t.fail(`Expected string type. Got: ${typeof i}`);
+    if (typeof i !== 'string') t.fail(`Expected string type. Got: ${ typeof i }`);
     //eslint-disable-next-line functional/immutable-data
     iterateResult.push(i);
   }
@@ -42,7 +42,7 @@ test('interval-array', async (t) => {
   t.like(list, iterateResult);
   t.true(
     isApproximately((list.length + 1) * opts.fixed, 0.1, elapsed()),
-    `Elapsed: ${elapsed()}`
+    `Elapsed: ${ elapsed() }`
   );
 });
 
@@ -53,12 +53,12 @@ test('interval-generator', async (t) => {
   // Use interval to loop over counter with 1000ms delay
   for await (const v of interval(counter, 100)) {
     if (typeof v !== `number`) {
-      t.fail(`Expected number return type, got ${typeof v}`);
+      t.fail(`Expected number return type, got ${ typeof v }`);
     }
     //eslint-disable-next-line functional/immutable-data
     created.push(v);
   }
-  t.like(created, [0, 1, 2, 3, 4]);
+  t.like(created, [ 0, 1, 2, 3, 4 ]);
 });
 
 test('interval-type', (t) => {

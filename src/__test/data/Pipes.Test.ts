@@ -1,7 +1,7 @@
-import test from 'ava';
-import { bidi } from '../../data/pipes/index.js';
-import { sleep } from '../../flow/Sleep.js';
-import { arrayValuesEqual } from '../util.js';
+// import test from 'ava';
+// import * as Pipes from '../../data/pipes/index.js';
+// import { sleep } from '../../flow/Sleep.js';
+// import { arrayValuesEqual } from '../util.js';
 
 
 const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
@@ -31,8 +31,8 @@ const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
 // });
 
 // test('connect', t => {
-//   const a = bidi();
-//   const b = bidi();
+//   const a = Pipes.bidi<number>();
+//   const b = Pipes.bidi<number>();
 
 //   connect()(a, b);
 
