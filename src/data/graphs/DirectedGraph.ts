@@ -419,6 +419,7 @@ const debugDumpVertex = (v: Vertex): Array<string> => {
   for (const edge of v.out) {
     r.push(` -> ${ stringForEdge(edge) }`);
   }
+  if (v.out.length === 0) r[ 0 ] += ` (terminal)`;
 
   return r;
 }
