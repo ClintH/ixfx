@@ -1,7 +1,6 @@
 import { numberTest, throwFromResult } from './Guards.js';
-import { untilMatch } from './Text.js';
 export * as IterableAsync from './IterableAsync.js';
-export * as Debug from './Debug.js';
+
 
 export type ArrayLengthMutationKeys = `splice` | `push` | `pop` | `shift` | `unshift` | number
 export type ArrayItems<T extends Array<any>> = T extends Array<infer TItems> ? TItems : never
@@ -29,74 +28,6 @@ export const ifNaN = (v: number, fallback: number): number => {
   return v;
 };
 
-/**
- * Maps the properties of an object through a map function.
- * That is, run each of the values of an object through a function, an return
- * the result.
- *
- * @example Double the value of all fields
- * ```js
- * const rect = { width: 100, height: 250 };
- * const doubled = mapObject(rect, (fieldValue) => {
- *  return fieldValue*2;
- * });
- * // Yields: { width: 200, height: 500 }
- * ```
- *
- * Since the map callback gets the name of the property, it can do context-dependent things.
- * ```js
- * const rect = { width: 100, height: 250, colour: 'red' }
- * const doubled = mapObject(rect, (fieldValue, fieldName) => {
- *  if (fieldName === 'width') return fieldValue*3;
- *  else if (typeof fieldValue === 'number') return fieldValue*2;
- *  return fieldValue;
- * });
- * // Yields: { width: 300, height: 500, colour: 'red' }
- * ```
- * In addition to bulk processing, it allows remapping of property types.
- *
- * In terms of typesafety, the mapped properties are assumed to have the
- * same type.
- *
- * ```js
- * const o = {
- *  x: 10,
- *  y: 20,
- *  width: 200,
- *  height: 200
- * }
- *
- * // Make each property use an averager instead
- * const oAvg = mapObject(o, (value, key) => {
- *  return movingAverage(10);
- * });
- *
- * // Add a value to the averager
- * oAvg.x.add(20);
- * ```
- */
-export const mapObject = <
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  SourceType extends Record<string, any>,
-  DestinationFieldType,
->(
-  object: SourceType,
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mapFunction: (fieldValue: any, field: string, index: number) => DestinationFieldType
-): RemapObjectPropertyType<SourceType, DestinationFieldType> => {
-  type MapResult = [ field: string, value: DestinationFieldType ];
-  const entries = Object.entries(object);
-  const mapped = entries.map(([ sourceField, sourceFieldValue ], index) => [
-    sourceField,
-    mapFunction(sourceFieldValue, sourceField, index),
-  ]) as Array<MapResult>;
-  // @ts-expect-error
-  return Object.fromEntries(mapped);
-};
-
-export type RemapObjectPropertyType<OriginalType, PropertyType> = {
-  readonly [ Property in keyof OriginalType ]: PropertyType;
-};
 
 /**
  * Returns true if `x` is a power of two
@@ -131,85 +62,9 @@ export const relativeDifference = (initial: number) => (v: number) =>
 //   }
 // } catch { /* no-op */ }
 
-/**
- * Returns a field on object `o` by a dotted path.
- * ```
- * const d = {
- *  accel: {x: 1, y: 2, z: 3},
- *  gyro:  {x: 4, y: 5, z: 6}
- * };
- * getFieldByPath(d, `accel.x`); // 1
- * getFieldByPath(d, `gyro.z`);  // 6
- * getFieldByPath(d, `gyro`);    // {x:4, y:5, z:6}
- * getFieldByPath(d, ``);        // Returns original object
- * ```
- *
- * If a field does not exist, `undefined` is returned.
- * Use {@link getFieldPaths} to get a list of paths.
- *
- * Throws if `o` is not an object.
- * @param o
- * @param path
- * @returns
- */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getFieldByPath = (o: any, path = ``): any => {
-  if (o === null) throw new Error(`Parameter 'o' is null`);
-  if (typeof o !== `object`) {
-    throw new TypeError(`Parameter 'o' is not an object. Got: ${ typeof o }`);
-  }
-  if (path.length === 0) return o;
-  if (path in o) {
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return o[ path ];
-  } else {
-    const start = untilMatch(path, `.`);
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return start in o ? getFieldByPath(o[ start ], path.slice(Math.max(0, start.length + 1))) : undefined;
-  }
-};
 
-/**
- * Returns a list of paths for all the fields on `o`
- * ```
- * const d = {
- *  accel: {x: 1, y: 2, z: 3},
- *  gyro:  {x: 4, y: 5, z: 6}
- * };
- * const paths = getFieldPaths(d);
- * // Yields [ `accel.x`, `accel.y`,`accel.z`,`gyro.x`,`gyro.y`,`gyro.z` ]
- * ```
- *
- * Use {@link getFieldByPath} to fetch data by this 'path' string.
- *
- * If object is _null_, and empty array is returned.
- * @param o
- * @returns
- */
-export const getFieldPaths = (o: object | null): ReadonlyArray<string> => {
-  if (o === null) return [];
-  if (typeof o !== `object`) {
-    throw new TypeError(`Parameter 'o' should be an object. Got: ${ typeof o }`);
-  }
 
-  //const paths: string[] = [];
 
-  // Probe a given object, with a set of initial paths and prefix
-  const probe = (o: object, initialPaths: ReadonlyArray<string>, prefix: string): ReadonlyArray<string> => {
-    if (typeof o !== `object`) {
-      // Nothing to recurse into
-      return [ ...initialPaths, prefix ];
-    }
-
-    const prefixToUse = (prefix.length > 0) ? prefix + `.` : prefix;
-
-    const keys = Object.keys(o);
-
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return [ ...keys.map(key => probe((o as any)[ key ], [], prefixToUse + key)), initialPaths ].flat();
-  };
-  return probe(o, [], ``);
-};
 
 /**
  * Rounds `v` up to the nearest multiple of `multiple`
@@ -416,3 +271,4 @@ const defaultToString = (object: any): string => {
 // } catch {
 //   /* no-op */
 // }
+
