@@ -18,7 +18,9 @@
     "./collections.js": "./dist/collections.js",
     "./arrays.js": "./dist/arrays.js",
     "./components.js": "./dist/components.js",
+    "./webcomponents.js": "./dist/webcomponents.js",
     "./data.js": "./dist/data.js",
+    "./debug.js":"./dist/debug.js",
     "./dom.js": "./dist/dom.js",
     "./events.js": "./dist/events.js",
     "./forms.js": "./dist/forms.js",
@@ -67,7 +69,8 @@
     "test:coverage": "jest --collectCoverage --config config/jest.config.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js",
     "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
-    "ava": "tsc && ava --config ./config/ava.config.js"
+    "ava": "tsc && ava --config ./config/ava.config.js",
+    "circular": "madge --circular --extensions ts src/"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
