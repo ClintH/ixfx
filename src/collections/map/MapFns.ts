@@ -4,8 +4,7 @@ import {
   defaultComparer,
   type ToString,
 } from '../../Util.js';
-import type { IMappish, IWithEntries } from './IMappish.js';
-import type { GetOrGenerate } from './index.js';
+import type { IWithEntries } from './IMappish.js';
 
 // ✔ UNIT TESTED!
 /**
@@ -69,7 +68,7 @@ export const hasKeyValue = <K, V>(
   comparer: IsEqual<V>
 ): boolean => {
   if (!map.has(key)) return false;
-  const values = Array.from(map.values());
+  const values = [ ...map.values() ];
   return values.some((v) => comparer(v, value));
 };
 
@@ -95,47 +94,14 @@ export const deleteByValue = <K, V>(
   value: V,
   comparer: IsEqual<V> = isEqualDefault
 ) => {
-  for (const e of Object.entries(map)) {
-    if (comparer(e[ 1 ], value)) {
-      // @ts-ignore
-      map.delete(e[ 0 ]);
+  for (const entry of Object.entries(map)) {
+    if (comparer(entry[ 1 ], value)) {
+      (map as any).delete(entry[ 0 ]);
     }
   }
 };
 
-/**
- * Returns a function that fetches a value from a map, or generates and sets it if not present.
- * Undefined is never returned, because if `fn` yields that, an error is thrown.
- *
- * See {@link getOrGenerateSync} for a synchronous version.
- *
- * ```
- * const m = getOrGenerate(new Map(), (key) => {
- *  return key.toUppercase();
- * });
- *
- * // Not contained in map, so it will run the uppercase function,
- * // setting the value to the key 'hello'.
- * const v = await m(`hello`);  // Yields 'HELLO'
- * const v1 = await m(`hello`); // Value exists, so it is returned ('HELLO')
- * ```
- *
- */
-//eslint-disable-next-line functional/prefer-readonly-type
-export const getOrGenerate =
-  <K, V, Z>(
-    map: IMappish<K, V>,
-    fn: (key: K, args?: Z) => Promise<V> | V
-  ): GetOrGenerate<K, V, Z> =>
-    async (key: K, args?: Z): Promise<V> => {
-      //eslint-disable-next-line functional/no-let
-      let value = map.get(key);
-      if (value !== undefined) return Promise.resolve(value);
-      value = await fn(key, args);
-      if (value === undefined) throw new Error(`fn returned undefined`);
-      map.set(key, value);
-      return value;
-    };
+
 
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
@@ -188,28 +154,12 @@ export const firstEntryByIterableValue = <K, V>(
   value: V,
   isEqual: IsEqual<V> = isEqualDefault
 ): readonly [ key: K, value: V ] | undefined => {
-  for (const e of map.entries()) {
-    if (isEqual(e[ 1 ], value)) return e;
+  for (const entry of map.entries()) {
+    if (isEqual(entry[ 1 ], value)) return entry;
   }
 };
 
-/**
- * @inheritDoc getOrGenerate
- * @param map
- * @param fn
- * @returns
- */
-//eslint-disable-next-line functional/prefer-readonly-type
-export const getOrGenerateSync =
-  <K, V, Z>(map: IMappish<K, V>, fn: (key: K, args?: Z) => V) =>
-    (key: K, args?: Z): V => {
-      //eslint-disable-next-line functional/no-let
-      let value = map.get(key);
-      if (value !== undefined) return value;
-      value = fn(key, args);
-      map.set(key, value);
-      return value;
-    };
+
 
 /**
  * Adds items to a map only if their key doesn't already exist
@@ -226,21 +176,21 @@ export const getOrGenerateSync =
  * Maps.addKeepingExisting(map, p => p.name, ...peopleArray);
  * ```
  * @param set
- * @param hashFunc
+ * @param hasher
  * @param values
  * @returns
  */
 export const addKeepingExisting = <V>(
   set: ReadonlyMap<string, V> | undefined,
-  hashFunc: ToString<V>,
+  hasher: ToString<V>,
   ...values: readonly V[]
 ) => {
   const s = set === undefined ? new Map() : new Map(set);
-  values.forEach((v) => {
-    const vStr = hashFunc(v);
-    if (s.has(vStr)) return;
-    s.set(vStr, v);
-  });
+  for (const v of values) {
+    const hashResult = hasher(v);
+    if (s.has(hashResult)) continue;
+    s.set(hashResult, v);
+  }
   return s;
 };
 
@@ -261,14 +211,14 @@ export const addKeepingExisting = <V>(
  *
  * `sortByValue` takes a comparison function that should return -1, 0 or 1 to indicate order of `a` to `b`. If not provided, {@link Util.defaultComparer} is used.
  * @param map
- * @param compareFn
+ * @param comparer
  * @returns
  */
 export const sortByValue = <K, V>(
   map: ReadonlyMap<K, V>,
-  compareFn?: (a: V, b: V) => number
+  comparer?: (a: V, b: V) => number
 ) => {
-  const f = compareFn ?? defaultComparer;
+  const f = comparer ?? defaultComparer;
   [ ...map.entries() ].sort((a, b) => f(a[ 1 ], b[ 1 ]));
 };
 

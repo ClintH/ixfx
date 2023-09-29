@@ -48,10 +48,10 @@ export class SetStringMutable<V>
   add(...values: Array<V>): boolean {
     //eslint-disable-next-line functional/no-let
     let somethingAdded = false;
-    for (const i of values) {
-      const isUpdated = this.has(i);
-      this.store.set(this.keyString(i), i);
-      super.fireEvent(`add`, { value: i, updated: isUpdated });
+    for (const value of values) {
+      const isUpdated = this.has(value);
+      this.store.set(this.keyString(value), value);
+      super.fireEvent(`add`, { value: value, updated: isUpdated });
       if (!isUpdated) somethingAdded = true;
     }
     return somethingAdded;
@@ -98,7 +98,7 @@ export class SetStringMutable<V>
    * Returns array copy of set
    * @returns Array copy of set
    */
-  toArray(): V[] {
-    return Array.from(this.store.values());
+  toArray(): Array<V> {
+    return [ ...this.store.values() ];
   }
 }

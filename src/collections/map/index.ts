@@ -1,6 +1,3 @@
-import { NumberMap } from './NumberMap.js';
-
-export type GetOrGenerate<K, V, Z> = (key: K, args?: Z) => Promise<V>;
 export { create as expiringMap, ExpiringMap } from './ExpiringMap.js';
 export type {
   ExpiringMapEvent,
