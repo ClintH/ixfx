@@ -15,6 +15,16 @@ const pi = Math.PI;
 
 export type Vector = Points.Point | Polar.Coord;
 
+export const fromRadians = (radians: number) => {
+  return Object.freeze({
+    x: Math.cos(radians),
+    y: Math.sin(radians)
+  });
+}
+
+export const toRadians = (point: Points.Point) => {
+  return Math.atan2(point.y, point.x);
+}
 /**
  * Create a vector from a point
  *
@@ -88,7 +98,7 @@ export const normalise = (v: Vector): Vector => {
   } else if (isCartesian(v)) {
     return Points.normalise(v);
   }
-  throw new Error(`Expected polar/cartesian vector. Got: ${v}`);
+  throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
 export const quadrantOffsetAngle = (p: Points.Point): number => {
@@ -111,7 +121,7 @@ export const toPolar = (v: Vector, origin = Points.Empty): Polar.Coord => {
   } else if (isCartesian(v)) {
     return Polar.fromCartesian(v, origin);
   }
-  throw new Error(`Expected polar/cartesian vector. Got: ${v}`);
+  throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
 /**
@@ -126,7 +136,7 @@ export const toCartesian = (v: Vector): Points.Point => {
   } else if (isCartesian(v)) {
     return v;
   }
-  throw new Error(`Expected polar/cartesian vector. Got: ${v}`);
+  throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
 /**
@@ -141,7 +151,7 @@ export const toString = (v: Vector, digits?: number) => {
   } else if (isCartesian(v)) {
     return Points.toString(v, digits);
   }
-  throw new Error(`Expected polar/cartesian vector. Got: ${v}`);
+  throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
 /**
