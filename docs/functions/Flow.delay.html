@@ -51,7 +51,7 @@ Must be called with <code>await</code> if you want the pause effect.</p>
 <h4>Example</h4><p>Pause and wait for function</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">result</span><span class="hl-2"> = </span><span class="hl-1">await</span><span class="hl-2"> </span><span class="hl-8">delay</span><span class="hl-2">(</span><span class="hl-5">async</span><span class="hl-2"> () </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">Math</span><span class="hl-2">.</span><span class="hl-8">random</span><span class="hl-2">(), </span><span class="hl-7">1000</span><span class="hl-2">);</span><br/><span class="hl-3">console</span><span class="hl-2">.</span><span class="hl-8">log</span><span class="hl-2">(</span><span class="hl-3">result</span><span class="hl-2">); </span><span class="hl-0">// Prints out result after one second</span>
 </code><button>Copy</button></pre>
-<p>If the <code>interval</code> option is a number its treated as milliseconds. <a href="../types/Flow.Interval.html" class="tsd-kind-type-alias">Interval</a> can also be used:</p>
+<p>If the <code>interval</code> option is a number its treated as milliseconds. Interval can also be used:</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">result</span><span class="hl-2"> = </span><span class="hl-1">await</span><span class="hl-2"> </span><span class="hl-8">delay</span><span class="hl-2">(</span><span class="hl-5">async</span><span class="hl-2"> () </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">Math</span><span class="hl-2">.</span><span class="hl-8">random</span><span class="hl-2">(), { </span><span class="hl-3">mins:</span><span class="hl-2"> </span><span class="hl-7">1</span><span class="hl-2"> });</span>
 </code><button>Copy</button></pre>
 <p>If <code>await</code> is omitted, the function will run after the provided timeout, and code will continue to run.</p>
@@ -103,7 +103,6 @@ If you want to be able to cancel or re-run a delayed function, consider using
 <li><a href="../types/Flow.DebouncedFunction.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Debounced<wbr/>Function</span></a></li>
 <li><a href="../types/Flow.DelayOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Delay<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.HasCompletion.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Has<wbr/>Completion</span></a></li>
-<li><a href="../types/Flow.Interval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Interval</span></a></li>
 <li><a href="../types/Flow.IntervalOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Interval<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.ModulationTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Modulation<wbr/>Timer</span></a></li>
 <li><a href="../types/Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
@@ -129,9 +128,7 @@ If you want to be able to cancel or re-run a delayed function, consider using
 <li><a href="Flow.frequencyTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>frequency<wbr/>Timer</span></a></li>
 <li><a href="Flow.frequencyTimerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>frequency<wbr/>Timer<wbr/>Source</span></a></li>
 <li><a href="Flow.hasElapsedMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Elapsed<wbr/>Ms</span></a></li>
-<li><a href="Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
-<li><a href="Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
-<li><a href="Flow.isInterval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Interval</span></a></li>
+<li><a href="Flow.interval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>

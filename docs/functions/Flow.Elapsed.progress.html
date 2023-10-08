@@ -28,7 +28,7 @@ Starts timing immediately.</p>
 <p>Note that timer can exceed 1 (100%). To cap it:</p>
 <pre><code class="language-js"><span class="hl-3">Elapsed</span><span class="hl-2">.</span><span class="hl-8">progress</span><span class="hl-2">(</span><span class="hl-7">1000</span><span class="hl-2">, { </span><span class="hl-3">clampValue:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> });</span>
 </code><button>Copy</button></pre>
-<p>Takes an <a href="../types/Flow.Interval.html" class="tsd-kind-type-alias">Interval</a> for more expressive time:</p>
+<p>Takes an Interval for more expressive time:</p>
 <pre><code class="language-js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">timer</span><span class="hl-2"> = </span><span class="hl-3">Elapsed</span><span class="hl-2">.</span><span class="hl-8">progress</span><span class="hl-2">({ </span><span class="hl-3">mins:</span><span class="hl-2"> </span><span class="hl-7">4</span><span class="hl-2"> });</span>
 </code><button>Copy</button></pre>
 <p>See also <a href="Flow.hasElapsedMs.html" class="tsd-kind-function">hasElapsedMs</a>.</p>
@@ -37,7 +37,7 @@ Starts timing immediately.</p>
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">duration</span>: <a href="../types/Flow.Interval.html" class="tsd-signature-type tsd-kind-type-alias">Interval</a></h5></li>
+<h5><span class="tsd-kind-parameter">duration</span>: <span class="tsd-signature-type ">Interval</span></h5></li>
 <li>
 <h5><span class="tsd-kind-parameter">opts</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">clampValue</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">wrapValue</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters">
@@ -98,7 +98,6 @@ Starts timing immediately.</p>
 <li><a href="../types/Flow.DebouncedFunction.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Debounced<wbr/>Function</span></a></li>
 <li><a href="../types/Flow.DelayOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Delay<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.HasCompletion.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Has<wbr/>Completion</span></a></li>
-<li><a href="../types/Flow.Interval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Interval</span></a></li>
 <li><a href="../types/Flow.IntervalOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Interval<wbr/>Opts</span></a></li>
 <li><a href="../types/Flow.ModulationTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Modulation<wbr/>Timer</span></a></li>
 <li><a href="../types/Flow.OnStartCalled.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>On<wbr/>Start<wbr/>Called</span></a></li>
@@ -124,9 +123,7 @@ Starts timing immediately.</p>
 <li><a href="Flow.frequencyTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>frequency<wbr/>Timer</span></a></li>
 <li><a href="Flow.frequencyTimerSource.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>frequency<wbr/>Timer<wbr/>Source</span></a></li>
 <li><a href="Flow.hasElapsedMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Elapsed<wbr/>Ms</span></a></li>
-<li><a href="Flow.interval-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
-<li><a href="Flow.intervalToMs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval<wbr/>To<wbr/>Ms</span></a></li>
-<li><a href="Flow.isInterval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Interval</span></a></li>
+<li><a href="Flow.interval.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>interval</span></a></li>
 <li><a href="Flow.msElapsedTimer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ms<wbr/>Elapsed<wbr/>Timer</span></a></li>
 <li><a href="Flow.repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
 <li><a href="Flow.repeatReduce.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Reduce</span></a></li>
