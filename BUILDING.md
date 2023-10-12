@@ -79,13 +79,7 @@ npm run test
 Run a single test:
 
 ```
-npm run test grid.test.ts
-```
-
-Test coverage report:
-
-```
-npm run test:coverage
+npm run test -- --match="name-of-test"
 ```
 
 ESLint report:
