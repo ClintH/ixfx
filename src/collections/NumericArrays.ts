@@ -1,5 +1,5 @@
 import { zip } from './Arrays.js';
-import { type EasingFn } from '../modulation/Easing.js';
+import { type EasingFn as EasingFunction } from '../modulation/Easing.js';
 export {
   minMaxAvg,
   type MinMaxAvgOpts,
@@ -43,15 +43,17 @@ export {
  * @param weightings Array of weightings that match up to data array, or an easing function
  */
 export const averageWeighted = (
-  data: readonly number[],
-  weightings: readonly number[] | EasingFn
+  data: Array<number> | ReadonlyArray<number>,
+  weightings: Array<number> | ReadonlyArray<number> | EasingFunction
 ): number => {
   if (typeof weightings === `function`) weightings = weight(data, weightings);
 
   const ww = zip(data, weightings);
-  const [totalV, totalW] = ww.reduce(
-    (acc, v: readonly number[]) => [acc[0] + v[0] * v[1], acc[1] + v[1]],
-    [0, 0]
+  // eslint-disable-next-line unicorn/no-array-reduce
+  const [ totalV, totalW ] = ww.reduce(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    (accumulator, v: Array<number>) => [ accumulator[ 0 ] + v[ 0 ] * v[ 1 ], accumulator[ 1 ] + v[ 1 ] ],
+    [ 0, 0 ]
   );
   return totalV / totalW;
 };
@@ -88,10 +90,10 @@ export const averageWeighted = (
  * @param fn Returns a weighting based on the given relative position. If unspecified, `(x) => x` is used.
  */
 export const weight = (
-  data: readonly number[],
+  data: Array<number> | ReadonlyArray<number>,
   fn?: (relativePos: number) => number
-): readonly number[] => {
-  const f = fn === undefined ? (x: number) => x : fn;
+): Array<number> => {
+  const f = fn ?? ((x: number) => x);
   return validNumbers(data).map(
     (v: number, index: number) => v * f(index / (validNumbers.length - 1))
   );
@@ -103,7 +105,7 @@ export const weight = (
  * @param data
  * @returns
  */
-export const validNumbers = (data: readonly number[]) =>
+export const validNumbers = (data: ReadonlyArray<number>) =>
   data.filter((d) => typeof d === `number` && !Number.isNaN(d));
 
 /**
@@ -113,21 +115,21 @@ export const validNumbers = (data: readonly number[]) =>
  * @returns
  */
 export const dotProduct = (
-  values: ReadonlyArray<readonly number[]>
+  values: ReadonlyArray<ReadonlyArray<number>>
 ): number => {
   //eslint-disable-next-line functional/no-let
   let r = 0;
-  const len = values[0].length;
+  const length = values[ 0 ].length;
 
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < len; i++) {
+  for (let index = 0; index < length; index++) {
     //eslint-disable-next-line functional/no-let
     let t = 0;
     //eslint-disable-next-line functional/no-let
-    for (let p = 0; p < values.length; p++) {
-      if (p === 0) t = values[p][i];
+    for (const [ p, value ] of values.entries()) {
+      if (p === 0) t = value[ index ];
       else {
-        t *= values[p][i];
+        t *= value[ index ];
       }
     }
     r += t;
@@ -157,11 +159,11 @@ export const dotProduct = (
  * @param data Data to average.
  * @returns Average of array
  */
-export const average = (data: readonly number[]): number => {
+export const average = (data: ReadonlyArray<number>): number => {
   // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
   const valid = validNumbers(data);
-  const total = valid.reduce((acc, v) => acc + v, 0);
+  const total = valid.reduce((accumulator, v) => accumulator + v, 0);
   return total / valid.length;
 };
 
@@ -176,7 +178,7 @@ export const average = (data: readonly number[]): number => {
  * @param data
  * @returns Minimum number
  */
-export const min = (data: readonly number[]): number =>
+export const min = (data: ReadonlyArray<number>): number =>
   Math.min(...validNumbers(data));
 
 /**
@@ -189,10 +191,11 @@ export const min = (data: readonly number[]): number =>
  * @param data Array of numbers
  * @returns Index of largest value
  */
-export const maxIndex = (data: readonly number[]): number =>
+export const maxIndex = (data: ReadonlyArray<number>): number =>
+  // eslint-disable-next-line unicorn/no-array-reduce
   data.reduce(
-    (bestIndex, value, index, arr) =>
-      value > arr[bestIndex] ? index : bestIndex,
+    (bestIndex, value, index, array) =>
+      value > array[ bestIndex ] ? index : bestIndex,
     0
   );
 
@@ -207,10 +210,11 @@ export const maxIndex = (data: readonly number[]): number =>
  * @param data Array of numbers
  * @returns Index of smallest value
  */
-export const minIndex = (...data: readonly number[]): number =>
+export const minIndex = (...data: ReadonlyArray<number>): number =>
+  // eslint-disable-next-line unicorn/no-array-reduce
   data.reduce(
-    (bestIndex, value, index, arr) =>
-      value < arr[bestIndex] ? index : bestIndex,
+    (bestIndex, value, index, array) =>
+      value < array[ bestIndex ] ? index : bestIndex,
     0
   );
 
@@ -225,7 +229,7 @@ export const minIndex = (...data: readonly number[]): number =>
  * @param data List of numbers
  * @returns Maximum number
  */
-export const max = (data: readonly number[]): number =>
+export const max = (data: ReadonlyArray<number>): number =>
   Math.max(...validNumbers(data));
 
 /**
@@ -239,12 +243,13 @@ export const max = (data: readonly number[]): number =>
  * @param data Array of numbers
  * @returns Total
  */
-export const total = (data: readonly number[]): number =>
-  data.reduce((prev, curr) => {
-    if (typeof curr !== `number`) return prev;
-    if (Number.isNaN(curr)) return prev;
-    if (Number.isFinite(curr)) return prev;
-    return prev + curr;
+export const total = (data: ReadonlyArray<number>): number =>
+  // eslint-disable-next-line unicorn/no-array-reduce
+  data.reduce((previous, current) => {
+    if (typeof current !== `number`) return previous;
+    if (Number.isNaN(current)) return previous;
+    if (Number.isFinite(current)) return previous;
+    return previous + current;
   }, 0);
 
 /**
@@ -260,12 +265,12 @@ export const total = (data: readonly number[]): number =>
  * @returns Maximum
  */
 //eslint-disable-next-line functional/prefer-immutable-types
-export const maxFast = (data: readonly number[] | Float32Array): number => {
+export const maxFast = (data: ReadonlyArray<number> | Float32Array): number => {
   //eslint-disable-next-line functional/no-let
   let m = Number.MIN_SAFE_INTEGER;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < data.length; i++) {
-    m = Math.max(m, data[i]);
+  for (const datum of data) {
+    m = Math.max(m, datum);
   }
   return m;
 };
@@ -283,12 +288,12 @@ export const maxFast = (data: readonly number[] | Float32Array): number => {
  * @returns Maximum
  */
 //eslint-disable-next-line functional/prefer-immutable-types
-export const totalFast = (data: readonly number[] | Float32Array): number => {
+export const totalFast = (data: ReadonlyArray<number> | Float32Array): number => {
   //eslint-disable-next-line functional/no-let
   let m = 0;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < data.length; i++) {
-    m += data[i];
+  for (const datum of data) {
+    m += datum;
   }
   return m;
 };
@@ -306,12 +311,12 @@ export const totalFast = (data: readonly number[] | Float32Array): number => {
  * @returns Maximum
  */
 //eslint-disable-next-line functional/prefer-immutable-types
-export const minFast = (data: readonly number[] | Float32Array): number => {
+export const minFast = (data: ReadonlyArray<number> | Float32Array): number => {
   //eslint-disable-next-line functional/no-let
   let m = Number.MIN_SAFE_INTEGER;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < data.length; i++) {
-    m = Math.min(m, data[i]);
+  for (const datum of data) {
+    m = Math.min(m, datum);
   }
   return m;
 };
