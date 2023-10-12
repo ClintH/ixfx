@@ -13,11 +13,32 @@ import {
   contains,
   unique,
   filterBetween,
+  flatten,
+  without
 } from '../../collections/Arrays.js';
 import { arrayValuesEqual } from '../util.js';
 
+test('without', t => {
+
+  t.deepEqual(without([ `a`, `b`, `c` ], `b`), [ `a`, `c` ]);
+  t.deepEqual(without([ `a`, `b`, `c` ], [ `b`, `c` ]), [ `a` ]);
+  t.deepEqual(without([ `a`, `b`, `c` ], [ `a`, `b`, `c` ]), []);
+  t.deepEqual(without([ `a`, `b`, `c` ], `d`), [ `a`, `b`, `c` ]);
+
+});
+
+test('flatten', (t) => {
+  t.deepEqual(
+    flatten([ 1, [ 2, 3 ], [ [ 4 ] ] ]),
+    [ 1, 2, 3, [ 4 ] ]);
+  t.deepEqual(
+    flatten([ 1, 2, 3, 4 ]),
+    [ 1, 2, 3, 4 ]);
+
+});
+
 test('filterBetween', (t) => {
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 
   const r1 = filterBetween(numbers, () => true, 5, 7);
   t.like(r1, numbers.slice(5, 7));
@@ -35,10 +56,10 @@ test('filterBetween', (t) => {
 });
 
 test('containsDuplicateValues', (t) => {
-  t.true(containsDuplicateValues([1, 2, 3, 1]));
-  t.false(containsDuplicateValues([1, 2, 3, 4]));
-  t.true(containsDuplicateValues(['a', 'b', 'c', 'a']));
-  t.false(containsDuplicateValues(['a', 'b', 'c', 'd']));
+  t.true(containsDuplicateValues([ 1, 2, 3, 1 ]));
+  t.false(containsDuplicateValues([ 1, 2, 3, 4 ]));
+  t.true(containsDuplicateValues([ 'a', 'b', 'c', 'a' ]));
+  t.false(containsDuplicateValues([ 'a', 'b', 'c', 'd' ]));
   t.true(
     containsDuplicateValues([
       { name: 'Bob' },
@@ -84,11 +105,11 @@ test('containsDuplicateValues', (t) => {
 });
 
 test('unique', (t) => {
-  const a = [1, 2, 3, 1, 2, 3, 4];
-  arrayValuesEqual(t, unique(a), [1, 2, 3, 4]);
+  const a = [ 1, 2, 3, 1, 2, 3, 4 ];
+  arrayValuesEqual(t, unique(a), [ 1, 2, 3, 4 ]);
 
-  const b = [1, 2, 3, 4, 5, 6, 7, 8];
-  arrayValuesEqual(t, unique<number>([a, b]), [1, 2, 3, 4, 5, 6, 7, 8]);
+  const b = [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+  arrayValuesEqual(t, unique<number>([ a, b ]), [ 1, 2, 3, 4, 5, 6, 7, 8 ]);
 
   const c = [
     { name: 'Bob', v: 1 },
@@ -111,39 +132,39 @@ test('unique', (t) => {
 });
 
 test('contains', (t) => {
-  const a = ['apples', 'oranges', 'pears', 'mandarins'];
-  const b = ['pears', 'apples'];
+  const a = [ 'apples', 'oranges', 'pears', 'mandarins' ];
+  const b = [ 'pears', 'apples' ];
   t.true(contains(a, b));
   t.true(contains(a, []));
 
-  const c = ['pears', 'bananas'];
+  const c = [ 'pears', 'bananas' ];
   t.false(contains(a, c));
 });
 
 test(`compare-values`, (t) => {
-  const a = ['apples', 'oranges', 'pears'];
-  const b = ['pears', 'kiwis', 'bananas'];
+  const a = [ 'apples', 'oranges', 'pears' ];
+  const b = [ 'pears', 'kiwis', 'bananas' ];
   const r = compareValues(a, b);
-  t.like(r.shared, ['pears']);
-  t.like(r.a, ['apples', 'oranges']);
-  t.like(r.b, ['kiwis', 'bananas']);
+  t.like(r.shared, [ 'pears' ]);
+  t.like(r.a, [ 'apples', 'oranges' ]);
+  t.like(r.b, [ 'kiwis', 'bananas' ]);
   t.false(compareValuesEqual(a, b));
 
-  const a1 = ['apples', 'oranges'];
-  const b1 = ['oranges', 'apples'];
+  const a1 = [ 'apples', 'oranges' ];
+  const b1 = [ 'oranges', 'apples' ];
   t.true(compareValuesEqual(a1, b1));
 
-  const aa = [{ name: 'John' }, { name: 'Mary' }, { name: 'Sue' }];
-  const bb = [{ name: 'John' }, { name: 'Mary' }, { name: 'Jane' }];
+  const aa = [ { name: 'John' }, { name: 'Mary' }, { name: 'Sue' } ];
+  const bb = [ { name: 'John' }, { name: 'Mary' }, { name: 'Jane' } ];
   // @ts-ignore
   const rr = compareValues(aa, bb, (a, b) => a.name === b.name);
-  t.like(rr.shared, [{ name: 'John' }, { name: 'Mary' }]);
-  t.like(rr.a, [{ name: 'Sue' }]);
-  t.like(rr.b, [{ name: 'Jane' }]);
+  t.like(rr.shared, [ { name: 'John' }, { name: 'Mary' } ]);
+  t.like(rr.a, [ { name: 'Sue' } ]);
+  t.like(rr.b, [ { name: 'Jane' } ]);
   t.false(compareValuesEqual(aa, bb, (a, b) => a.name === b.name));
 
-  const aa1 = [{ name: 'John' }, { name: 'Mary' }];
-  const bb1 = [{ name: 'Mary' }, { name: 'John' }];
+  const aa1 = [ { name: 'John' }, { name: 'Mary' } ];
+  const bb1 = [ { name: 'Mary' }, { name: 'John' } ];
   t.true(compareValuesEqual(aa1, bb1, (a, b) => a.name === b.name));
 });
 
@@ -168,7 +189,7 @@ test(`array-sort`, (t) => {
 
 test(`array-reducePairwise`, (t) => {
   const reducer = (acc: string, a: string, b: string) => {
-    return acc + `[${a}-${b}]`;
+    return acc + `[${ a }-${ b }]`;
   };
 
   const t1 = reducePairwise(`a b c d e f g`.split(` `), reducer, `!`);
@@ -180,7 +201,7 @@ test(`array-reducePairwise`, (t) => {
   const t3 = reducePairwise([], reducer, `!`);
   t.is(t3, `!`);
 
-  const t4 = reducePairwise([`a`], reducer, `!`);
+  const t4 = reducePairwise([ `a` ], reducer, `!`);
   t.is(t4, `!`);
 
   // @ts-ignore
@@ -190,8 +211,8 @@ test(`array-reducePairwise`, (t) => {
 });
 
 test(`array-mergeByKey`, (t) => {
-  const a1 = [`1-1`, `1-2`, `1-3`, `1-4`];
-  const a2 = [`2-1`, `2-2`, `2-3`, `2-5`];
+  const a1 = [ `1-1`, `1-2`, `1-3`, `1-4` ];
+  const a2 = [ `2-1`, `2-2`, `2-3`, `2-5` ];
 
   const keyFn = (v: string) => v.substr(-1, 1);
   const reconcileFn = (a: string, b: string) => {
@@ -226,12 +247,12 @@ test(`array-mergeByKey`, (t) => {
 });
 
 test(`remove`, (t) => {
-  t.like(remove([1, 2, 3], 2), [1, 2]);
-  t.like(remove([1, 2, 3], 0), [2, 3]);
-  t.like(remove([1, 2, 3], 1), [1, 3]);
+  t.like(remove([ 1, 2, 3 ], 2), [ 1, 2 ]);
+  t.like(remove([ 1, 2, 3 ], 0), [ 2, 3 ]);
+  t.like(remove([ 1, 2, 3 ], 1), [ 1, 3 ]);
 
   // Index past length
-  t.throws(() => remove([1, 2, 3], 3));
+  t.throws(() => remove([ 1, 2, 3 ], 3));
   // Not an array
   // @ts-ignore
   t.throws(() => remove(10, 3));
@@ -239,36 +260,36 @@ test(`remove`, (t) => {
 });
 
 test(`ensureLength`, (t) => {
-  t.like(ensureLength([1, 2, 3], 2), [1, 2]);
-  t.like(ensureLength([1, 2, 3], 3), [1, 2, 3]);
-  t.like(ensureLength([1, 2, 3], 5, `undefined`), [
+  t.like(ensureLength([ 1, 2, 3 ], 2), [ 1, 2 ]);
+  t.like(ensureLength([ 1, 2, 3 ], 3), [ 1, 2, 3 ]);
+  t.like(ensureLength([ 1, 2, 3 ], 5, `undefined`), [
     1,
     2,
     3,
     undefined,
     undefined,
   ]);
-  t.like(ensureLength([1, 2, 3], 5, `repeat`), [1, 2, 3, 1, 2]);
-  t.like(ensureLength([1, 2, 3], 7, `repeat`), [1, 2, 3, 1, 2, 3, 1]);
+  t.like(ensureLength([ 1, 2, 3 ], 5, `repeat`), [ 1, 2, 3, 1, 2 ]);
+  t.like(ensureLength([ 1, 2, 3 ], 7, `repeat`), [ 1, 2, 3, 1, 2, 3, 1 ]);
 
-  t.like(ensureLength([1, 2, 3], 5, `first`), [1, 2, 3, 1, 1]);
-  t.like(ensureLength([1, 2, 3], 5, `last`), [1, 2, 3, 3, 3]);
+  t.like(ensureLength([ 1, 2, 3 ], 5, `first`), [ 1, 2, 3, 1, 1 ]);
+  t.like(ensureLength([ 1, 2, 3 ], 5, `last`), [ 1, 2, 3, 3, 3 ]);
 });
 
 test(`valuesEqual`, (t) => {
-  const a = [10, 10, 10];
-  const b = [`hello`, `hello`, `hello`];
-  const c = [true, true, true];
-  const d = [100];
+  const a = [ 10, 10, 10 ];
+  const b = [ `hello`, `hello`, `hello` ];
+  const c = [ true, true, true ];
+  const d = [ 100 ];
 
   t.true(valuesEqual(a));
   t.true(valuesEqual(b));
   t.true(valuesEqual(c));
   t.true(valuesEqual(d));
 
-  const a1 = [10, 10, 11];
-  const b1 = [`Hello`, `hello`];
-  const c1 = [true, false];
+  const a1 = [ 10, 10, 11 ];
+  const b1 = [ `Hello`, `hello` ];
+  const c1 = [ true, false ];
   t.false(valuesEqual(a1));
   t.false(valuesEqual(b1));
   t.false(valuesEqual(c1));
@@ -285,24 +306,27 @@ test(`valuesEqual`, (t) => {
 // });
 
 test(`zip`, (t) => {
-  const a = [10, 11, 12, 13];
-  const b = [`apples`, `oranges`, `pears`, `grapes`];
-  const c = [true, false, true, false];
+  const a = [ 10, 11, 12, 13 ];
+  const b = [ `apples`, `oranges`, `pears`, `grapes` ];
+  const c = [ true, false, true, false ];
 
-  t.like(zip(a), [[10], [11], [12], [13]]);
+  t.like(zip(a), [ [ 10 ], [ 11 ], [ 12 ], [ 13 ] ]);
   t.like(zip(a, b, c), [
-    [10, `apples`, true],
-    [11, `oranges`, false],
-    [12, `pears`, true],
-    [13, `grapes`, false],
+    [ 10, `apples`, true ],
+    [ 11, `oranges`, false ],
+    [ 12, `pears`, true ],
+    [ 13, `grapes`, false ],
   ]);
 
   // Throw if sizes are different
-  const d = [100, 200, 300];
+  const d = [ 100, 200, 300 ];
   t.throws(() => zip(a, d));
 
   // Throw if not array
+  // @ts-expect-error
   t.throws(() => zip(a, `potato`));
+  // @ts-expect-error
   t.throws(() => zip(undefined));
+  // @ts-expect-error
   t.throws(() => zip(`hello`));
 });
