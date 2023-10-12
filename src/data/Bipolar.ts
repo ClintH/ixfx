@@ -1,4 +1,5 @@
 
+import { floatSource, type RandomOptions, type RandomSource } from '../Random.js';
 import { throwNumberTest } from '../Guards.js';
 import { interpolate } from './Interpolate.js';
 import { scaler as numberScaler } from './Scale.js';
@@ -144,6 +145,49 @@ export const scale = (inputValue: number, inMin: number, inMax: number) => {
   return clamp(numberScaler(inMin, inMax, -1, 1)(inputValue));
 }
 
+/**
+ * Source for random bipolar values
+ * ```js
+ * const r = Bipolar.randomSource();
+ * r(); // Produce random value on -1...1 scale
+ * ```
+ * 
+ * Options can be provided, for example
+ * ```js
+ * // -0.5 to 0.5 range
+ * Bipolar.randomSource({ max: 0.5 });
+ * ```
+ * 
+ * Consider using {@link random} if you just want a one-off random
+ * value.
+ * @param source 
+ * @returns 
+ */
+export const randomSource = (maxOrOptions?: number | RandomOptions): RandomSource => {
+  const source = floatSource(maxOrOptions);
+  return () => (source() * 2) - 1;
+}
+
+/**
+ * Returns a random bipolar value
+ * ```js
+ * const r = Bipolar.random(); // -1...1 random
+ * ```
+ * 
+ * Options can be provided, eg.
+ * ```js
+ * Bipolar.random({ max: 0.5 }); // -0.5..0.5 random
+ * ```
+ * 
+ * Use {@link randomSource} if you want to generate random
+ * values with same settings repeatedly.
+ * @param maxOrOptions 
+ * @returns 
+ */
+export const random = (maxOrOptions?: number | RandomOptions): number => {
+  const source = randomSource(maxOrOptions);
+  return source();
+}
 /**
  * Clamp a bipolar value
  * ```js
