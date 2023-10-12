@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.12.3",
+  "version": "0.13.0",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -66,10 +66,8 @@
     "docs:watch": "typedoc --customCss ./config/custom.css --watch --options ./config/typedoc.json",
     "docs:copyIcons": "copyfiles --up 1 ./config/*.png ./docs/assets/",
     "lint": "eslint src/**",
-    "test:coverage": "jest --collectCoverage --config config/jest.config.js",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.config.js",
     "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
-    "ava": "tsc && ava --config ./config/ava.config.js",
+    "test": "tsc && ava --config ./config/ava.config.js",
     "circular": "madge --circular --extensions ts src/"
   },
   "devDependencies": {
