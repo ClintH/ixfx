@@ -18,7 +18,7 @@
 <h1>Function jitter</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="jitter"><span class="tsd-kind-call-signature">jitter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Modulation.JitterFn.html" class="tsd-signature-type tsd-kind-type-alias">JitterFn</a><a href="#jitter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="jitter"><span class="tsd-kind-call-signature">jitter</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Modulation.Jitterer.html" class="tsd-signature-type tsd-kind-type-alias">Jitterer</a><a href="#jitter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Jitters <code>value</code> by the absolute <code>jitter</code> amount. Returns a function.</p>
 <p>All values should be on a 0..1 scale, and the return value is by default clamped to 0..1.
@@ -49,7 +49,7 @@ random number generator:</p>
 <div class="tsd-comment tsd-typography"><p>Options</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="../types/Modulation.JitterFn.html" class="tsd-signature-type tsd-kind-type-alias">JitterFn</a></h4><p>Function that performs jitter</p>
+<h4 class="tsd-returns-title">Returns <a href="../types/Modulation.Jitterer.html" class="tsd-signature-type tsd-kind-type-alias">Jitterer</a></h4><p>Function that performs jitter</p>
 
 <div class="tsd-comment tsd-typography"></div></li></ul></section></div>
 <div class="col-sidebar">
@@ -99,9 +99,10 @@ random number generator:</p>
 <li><a href="../modules/Modulation.Envelopes.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Envelopes</span></a></li>
 <li><a href="../modules/Modulation.Forces.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Forces</span></a></li>
 <li><a href="../modules/Modulation.Oscillators.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Oscillators</span></a></li>
-<li><a href="../types/Modulation.JitterFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Jitter<wbr/>Fn</span></a></li>
-<li><a href="../types/Modulation.JitterOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Jitter<wbr/>Opts</span></a></li>
+<li><a href="../types/Modulation.JitterOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Jitter<wbr/>Opts</span></a></li>
+<li><a href="../types/Modulation.Jitterer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Jitterer</span></a></li>
 <li><a href="Modulation.jitter.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-64"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)"></path></g></svg><span>jitter</span></a></li>
+<li><a href="Modulation.jitterAbsolute.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>jitter<wbr/>Absolute</span></a></li>
 <li><a href="Modulation.perSecond.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>per<wbr/>Second</span></a></li></ul></div></details></li>
 <li><a href="../modules/Numbers.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Numbers</span></a></li>
 <li><a href="../modules/Random.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Random</span></a></li>

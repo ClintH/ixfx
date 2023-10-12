@@ -16,27 +16,6 @@
 <li><a href="Modulation.html">Modulation</a></li>
 <li><a href="Modulation.Oscillators.html">Oscillators</a></li></ul>
 <h1>Namespace Oscillators</h1></div>
-<section class="tsd-panel tsd-comment">
-<div class="tsd-comment tsd-typography"><p>Oscillators module has waveshapes for producing values with a specified frequency.</p>
-<p>Overview</p>
-<ul>
-<li><a href="../functions/Modulation.Oscillators.saw.html" class="tsd-kind-function">saw</a>: &#39;Sawtooth&#39; wave</li>
-<li><a href="../functions/Modulation.Oscillators.sine.html" class="tsd-kind-function">sine</a>: Sine wave</li>
-<li><a href="../functions/Modulation.Oscillators.sineBipolar.html" class="tsd-kind-function">sineBipolar</a>: Sine wave with range of -1 to 1</li>
-<li><a href="../functions/Modulation.Oscillators.square.html" class="tsd-kind-function">square</a>: Square wave</li>
-<li><a href="../functions/Modulation.Oscillators.triangle.html" class="tsd-kind-function">triangle</a>: Triangle wave</li>
-<li><a href="../functions/Modulation.Oscillators.spring.html" class="tsd-kind-function">spring</a>: Spring oscillator</li>
-</ul>
-</div>
-<div class="tsd-comment tsd-typography">
-<h4>Example</h4><p>On-demand sampling</p>
-<pre><code class="language-js"><span class="hl-0">// Saw wave with frequency of 0.10hZ</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">osc</span><span class="hl-2"> = </span><span class="hl-3">Oscillators</span><span class="hl-2">.</span><span class="hl-8">saw</span><span class="hl-2">(</span><span class="hl-7">0.1</span><span class="hl-2">);</span><br/><br/><span class="hl-0">// Whever we need to sample from the oscillator...</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">v</span><span class="hl-2"> = </span><span class="hl-3">osc</span><span class="hl-2">.</span><span class="hl-8">next</span><span class="hl-2">().</span><span class="hl-3">value</span><span class="hl-2">;</span>
-</code><button>Copy</button></pre>
-
-<h4>Example</h4><p>Importing</p>
-<pre><code class="language-js"><span class="hl-0">// If library is stored two directories up under `ixfx/`</span><br/><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">Oscillators</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;../../ixfx/dist/modulation.js&#39;</span><span class="hl-2">;</span><br/><span class="hl-3">Oscillators</span><span class="hl-2">.</span><span class="hl-8">saw</span><span class="hl-2">(...);</span><br/><br/><span class="hl-0">// Import from web</span><br/><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">Oscillators</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/modulation.js&#39;</span><br/><span class="hl-3">Oscillators</span><span class="hl-2">.</span><span class="hl-8">saw</span><span class="hl-2">(...);</span>
-</code><button>Copy</button></pre>
-</div></section>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <h3 class="tsd-index-heading uppercase">Index</h3>
@@ -110,9 +89,10 @@
 <li><a href="../functions/Modulation.Oscillators.spring.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>spring</span></a></li>
 <li><a href="../functions/Modulation.Oscillators.square.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>square</span></a></li>
 <li><a href="../functions/Modulation.Oscillators.triangle.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>triangle</span></a></li></ul></div></details></li>
-<li><a href="../types/Modulation.JitterFn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Jitter<wbr/>Fn</span></a></li>
 <li><a href="../types/Modulation.JitterOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Jitter<wbr/>Opts</span></a></li>
+<li><a href="../types/Modulation.Jitterer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Jitterer</span></a></li>
 <li><a href="../functions/Modulation.jitter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>jitter</span></a></li>
+<li><a href="../functions/Modulation.jitterAbsolute.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>jitter<wbr/>Absolute</span></a></li>
 <li><a href="../functions/Modulation.perSecond.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>per<wbr/>Second</span></a></li></ul></div></details></li>
 <li><a href="Numbers.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Numbers</span></a></li>
 <li><a href="Random.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Random</span></a></li>

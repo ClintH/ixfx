@@ -40,7 +40,8 @@
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">debug</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
-<div class="tsd-comment tsd-typography"><p>If true, additional logging will trace activity of pool</p>
+<div class="tsd-comment tsd-typography"><p>If true, additional logging will trace activity of pool.
+Default: false</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
@@ -61,7 +62,8 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">full<wbr/>Policy</span><span class="tsd-signature-symbol">?: </span><a href="Data.Pool.FullPolicy.html" class="tsd-signature-type tsd-kind-type-alias">FullPolicy</a></h5>
-<div class="tsd-comment tsd-typography"><p>What to do if pool is full and a new resource allocation is requested</p>
+<div class="tsd-comment tsd-typography"><p>What to do if pool is full and a new resource allocation is requested.
+Default is <code>error</code>, throwing an error when pool is full.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
@@ -77,13 +79,15 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">resources<wbr/>Without<wbr/>User<wbr/>Expire<wbr/>After<wbr/>Ms</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
-<div class="tsd-comment tsd-typography"><p>If above 0, resources with no users will be automatically removed after this interval</p>
+<div class="tsd-comment tsd-typography"><p>If above 0, resources with no users will be automatically removed after this interval.
+Default: disabled</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span class="tsd-kind-property">user<wbr/>Expire<wbr/>After<wbr/>Ms</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
 <div class="tsd-comment tsd-typography"><p>If above 0, users will be removed if there is no activity after this interval.
-Activity is marked whenever <code>use</code> us called with that user key</p>
+Activity is marked whenever <code>use</code> us called with that user key.
+Default: disabled</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div></div>
