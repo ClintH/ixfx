@@ -13,8 +13,8 @@ export const areIntegers = (t: ExecutionContext, a: Array<number>) => {
 
 export const arrayValuesEqual = <V>(
   t: ExecutionContext,
-  a: ArrayLike<V>,
-  b: ArrayLike<V>,
+  a: Iterable<V>,
+  b: Iterable<V>,
   eq = isEqualDefault<V>
 ) => {
   if (compareValuesEqual(a, b, eq)) {
@@ -166,6 +166,14 @@ export const rangeCheckInteger = (
   areIntegers(t, v);
 };
 
+/**
+ * Succeeds if there is a value in `v` with some nearness to the target
+ * @param t 
+ * @param v 
+ * @param range 
+ * @param target 
+ * @returns 
+ */
 export const someNearness = (
   t: ExecutionContext,
   v: Iterable<number>,
@@ -190,6 +198,14 @@ export const someNearness = (
   return false;
 };
 
+/**
+ * Fails if none of the values are close to the `targets`.
+ * @param t 
+ * @param v 
+ * @param range 
+ * @param targets 
+ * @returns 
+ */
 export const someNearnessMany = (
   t: ExecutionContext,
   v: Iterable<number>,
