@@ -213,8 +213,8 @@ export function distance(
   z?: number
 ): number {
   const pt = getPointParameter(xOrB, y, z);
-  guard(pt);
-
+  guard(pt, `b`);
+  guard(a, `a`);
   return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
 }
 
@@ -371,12 +371,18 @@ export const abs = (pt: Point) => ({
  * @returns
  */
 export const angle = (a: Point, b?: Point, c?: Point) => {
+  guard(a, `a`);
+
   if (b === undefined) {
     return Math.atan2(a.y, a.x);
-  } else if (c !== undefined) {
-    return Math.atan2(b.y - a.y, b.x - a.x) - Math.atan2(c.y - a.y, c.x - a.x);
   }
-  return Math.atan2(b.y - a.y, b.x - a.x);
+  guard(b, `b`);
+  if (c === undefined) {
+    return Math.atan2(b.y - a.y, b.x - a.x);
+  }
+
+  guard(c, `c`);
+  return Math.atan2(b.y - a.y, b.x - a.x) - Math.atan2(c.y - a.y, c.x - a.x);
 };
 
 /**
