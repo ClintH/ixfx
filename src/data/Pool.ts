@@ -15,11 +15,13 @@ export type Opts<V> = {
   readonly capacity?: number;
   /**
    * If above 0, users will be removed if there is no activity after this interval.
-   * Activity is marked whenever `use` us called with that user key
+   * Activity is marked whenever `use` us called with that user key.
+   * Default: disabled
    */
   readonly userExpireAfterMs?: number;
   /**
-   * If above 0, resources with no users will be automatically removed after this interval
+   * If above 0, resources with no users will be automatically removed after this interval.
+   * Default: disabled
    */
   readonly resourcesWithoutUserExpireAfterMs?: number;
   /**
@@ -27,11 +29,13 @@ export type Opts<V> = {
    */
   readonly capacityPerResource?: number;
   /**
-   * What to do if pool is full and a new resource allocation is requested
+   * What to do if pool is full and a new resource allocation is requested.
+   * Default is `error`, throwing an error when pool is full.
    */
   readonly fullPolicy?: FullPolicy;
   /**
-   * If true, additional logging will trace activity of pool
+   * If true, additional logging will trace activity of pool.
+   * Default: false
    */
   readonly debug?: boolean;
   /**
@@ -179,27 +183,29 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
  * A resource allocated in the Pool
  */
 export class Resource<V> {
-  private state: PoolState;
-  private readonly _data: V;
-  private users: Array<PoolUser<V>>;
-  private readonly capacityPerResource;
-  private readonly resourcesWithoutUserExpireAfterMs;
-  private lastUsersChange: number;
+  #state: PoolState;
+  #data: V;
+  #users: Array<PoolUser<V>>;
+  readonly #capacityPerResource;
+  readonly #resourcesWithoutUserExpireAfterMs;
+  #lastUsersChange: number;
 
   /**
    * Constructor.
    * @param pool Pool
    * @param data Data
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   constructor(readonly pool: Pool<V>, data: V) {
-    this._data = data;
-    this.lastUsersChange = 0;
-    this.resourcesWithoutUserExpireAfterMs =
+    if (data === undefined) throw new Error(`Parameter 'data' is undefined`);
+    if (pool === undefined) throw new Error(`Parameter 'pool' is undefined`);
+
+    this.#data = data;
+    this.#lastUsersChange = 0;
+    this.#resourcesWithoutUserExpireAfterMs =
       pool.resourcesWithoutUserExpireAfterMs;
-    this.capacityPerResource = pool.capacityPerResource;
-    this.users = [];
-    this.state = `idle`;
+    this.#capacityPerResource = pool.capacityPerResource;
+    this.#users = [];
+    this.#state = `idle`;
   }
 
   /**
@@ -207,8 +213,19 @@ export class Resource<V> {
    * Throws an error if disposed
    */
   get data() {
-    if (this.state === `disposed`) throw new Error(`Resource disposed`);
-    return this._data;
+    if (this.#state === `disposed`) throw new Error(`Resource disposed`);
+    return this.#data;
+  }
+
+  /**
+   * Changes the data associated with this resource.
+   * Throws an error if disposed or `data` is undefined.
+   * @param data
+   */
+  updateData(data: V) {
+    if (this.#state === `disposed`) throw new Error(`Resource disposed`);
+    if (data === undefined) throw new Error(`Parameter 'data' is undefined`);
+    this.#data = data;
   }
 
   /**
@@ -216,7 +233,7 @@ export class Resource<V> {
    * @returns
    */
   toString() {
-    return `Resource (expired: ${ this.isExpiredFromUsers } users: ${ this.users.length }, state: ${ this.state }) data: ${ JSON.stringify(this.data) }`;
+    return `Resource (expired: ${ this.isExpiredFromUsers } users: ${ this.#users.length }, state: ${ this.#state }) data: ${ JSON.stringify(this.data) }`;
   }
 
   /**
@@ -224,12 +241,11 @@ export class Resource<V> {
    * @internal
    * @param user
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   _assign(user: PoolUser<V>) {
-    const existing = this.users.find((u) => u === user || u.key === user.key);
+    const existing = this.#users.find((u) => u === user || u.key === user.key);
     if (existing) throw new Error(`User instance already assigned to resource`);
-    this.users.push(user);
-    this.lastUsersChange = performance.now();
+    this.#users.push(user);
+    this.#lastUsersChange = performance.now();
   }
 
   /**
@@ -237,25 +253,24 @@ export class Resource<V> {
    * @internal
    * @param user
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   _release(user: PoolUser<V>) {
-    this.users = this.users.filter((u) => u !== user);
+    this.#users = this.#users.filter((u) => u !== user);
     this.pool._release(user);
-    this.lastUsersChange = performance.now();
+    this.#lastUsersChange = performance.now();
   }
 
   /**
    * Returns true if resource can have additional users allocated
    */
   get hasUserCapacity() {
-    return this.usersCount < this.capacityPerResource;
+    return this.usersCount < this.#capacityPerResource;
   }
 
   /**
    * Returns number of uses of the resource
    */
   get usersCount() {
-    return this.users.length;
+    return this.#users.length;
   }
 
   /**
@@ -263,11 +278,11 @@ export class Resource<V> {
    * has elapsed since the users list has changed for this resource
    */
   get isExpiredFromUsers() {
-    if (this.resourcesWithoutUserExpireAfterMs <= 0) return false;
-    if (this.users.length > 0) return false;
+    if (this.#resourcesWithoutUserExpireAfterMs <= 0) return false;
+    if (this.#users.length > 0) return false;
     return (
       performance.now() >
-      this.resourcesWithoutUserExpireAfterMs + this.lastUsersChange
+      this.#resourcesWithoutUserExpireAfterMs + this.#lastUsersChange
     );
   }
 
@@ -275,7 +290,7 @@ export class Resource<V> {
    * Returns true if instance is disposed
    */
   get isDisposed() {
-    return this.state === `disposed`;
+    return this.#state === `disposed`;
   }
 
   /**
@@ -285,15 +300,15 @@ export class Resource<V> {
    * @returns
    */
   dispose(reason: string) {
-    if (this.state === `disposed`) return;
-    const data = this._data;
-    this.state = `disposed`;
+    if (this.#state === `disposed`) return;
+    const data = this.#data;
+    this.#state = `disposed`;
     this.pool.log.log(`Resource disposed (${ reason })`);
-    for (const u of this.users) {
+    for (const u of this.#users) {
       u._dispose(`resource-${ reason }`);
     }
-    this.users = [];
-    this.lastUsersChange = performance.now();
+    this.#users = [];
+    this.#lastUsersChange = performance.now();
     this.pool._releaseResource(this, reason);
 
     if (this.pool.freeResource) this.pool.freeResource(data);
