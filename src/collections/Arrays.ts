@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /**
  * Functions for working with primitive arrays, regardless of type
  * See Also: NumericArrays.ts
@@ -16,6 +17,7 @@ import {
 } from '../IsEqual.js'
 import { fromIterable as mapFromIterable } from './map/MapFns.js';
 export * from './NumericArrays.js';
+export { compareValues, compareValuesEqual } from './Iterables.js';
 
 /**
  * Throws an error if `array` parameter is not a valid array
@@ -26,17 +28,17 @@ export * from './NumericArrays.js';
  * ```
  * @private
  * @param array
- * @param paramName
+ * @param name
  */
-export const guardArray = <V>(array: ArrayLike<V>, paramName: string = `?`) => {
+export const guardArray = <V>(array: ArrayLike<V>, name = `?`) => {
   if (array === undefined) {
-    throw new Error(`Param '${ paramName }' is undefined. Expected array.`);
+    throw new TypeError(`Param '${ name }' is undefined. Expected array.`);
   }
   if (array === null) {
-    throw new Error(`Param '${ paramName }' is null. Expected array.`);
+    throw new TypeError(`Param '${ name }' is null. Expected array.`);
   }
   if (!Array.isArray(array)) {
-    throw new Error(`Param '${ paramName }' not an array as expected`);
+    throw new TypeError(`Param '${ name }' not an array as expected`);
   }
 };
 
@@ -49,13 +51,13 @@ export const guardArray = <V>(array: ArrayLike<V>, paramName: string = `?`) => {
 export const guardIndex = <V>(
   array: ArrayLike<V>,
   index: number,
-  paramName: string = `index`
+  name = `index`
 ) => {
   guardArray(array);
-  throwIntegerTest(index, `positive`, paramName);
+  throwIntegerTest(index, `positive`, name);
   if (index > array.length - 1) {
     throw new Error(
-      `'${ paramName }' ${ index } beyond array max of ${ array.length - 1 }`
+      `'${ name }' ${ index } beyond array max of ${ array.length - 1 }`
     );
   }
 };
@@ -97,7 +99,7 @@ export const valuesEqual = <V>(
 
   if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array.`);
   if (array.length === 0) return true;
-  const eq = equality === undefined ? isEqualValueDefault : equality;
+  const eq = equality ?? isEqualValueDefault;
   const a = array[ 0 ];
   const r = array.some((v) => !eq(a, v));
   if (r) return false;
@@ -113,31 +115,32 @@ export const valuesEqual = <V>(
  * ```
  * See also: 
  * * {@link unique}: Unique set of items amongst one or more arrays
- * @param a1 
- * @param a2 
+ * @param arrayA 
+ * @param arrayB 
  * @param equality 
  * @returns 
  */
 export const intersection = <V>(
-  a1: ReadonlyArray<V> | ReadonlyArray<V>,
-  a2: ReadonlyArray<V> | ReadonlyArray<V>,
+  arrayA: ReadonlyArray<V> | Array<V>,
+  arrayB: ReadonlyArray<V> | Array<V>,
   equality: IsEqual<V> = isEqualDefault
-) => a1.filter((e1) => a2.some((e2) => equality(e1, e2)));
+) => arrayA.filter((valueFromA) => arrayB.some((valueFromB) => equality(valueFromA, valueFromB)));
 
 /**
  * Returns a 'flattened' copy of array, un-nesting arrays one level
  * ```js
- * flatten([1, [2, 3], [[4]]] ]);
+ * flatten([1, [2, 3], [[4]] ]);
  * // Yields: [ 1, 2, 3, [4]];
  * ```
  * @param array
  * @returns
  */
-export const flatten = <V>(array: ReadonlyArray<V | readonly V[]>): V[] =>
-  Array.prototype.concat.apply([], [ ...array ]);
+export const flatten = (array: ReadonlyArray<any> | Array<any>): Array<any> =>
+  [ ...array ].flat();
+
 
 /**
- * Zip ombines the elements of two or more arrays based on their index.
+ * Zip combines the elements of two or more arrays based on their index.
  *
  * ```js
  * import { zip } from 'https://unpkg.com/ixfx/dist/arrays.js';
@@ -162,7 +165,7 @@ export const flatten = <V>(array: ReadonlyArray<V | readonly V[]>): V[] =>
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const zip = (
-  ...arrays: ReadonlyArray<any> | ReadonlyArray<any>
+  ...arrays: Array<Array<any>> | ReadonlyArray<Array<any>> | ReadonlyArray<ReadonlyArray<any>>
 ): Array<any> => {
   // Unit tested
   if (arrays.some((a) => !Array.isArray(a))) {
@@ -172,14 +175,15 @@ export const zip = (
   if (!valuesEqual(lengths)) {
     throw new Error(`Arrays must be of same length`);
   }
-  const ret = [];
-  const len = lengths[ 0 ];
-  //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < len; i++) {
-    //eslint-disable-next-line functional/immutable-data
-    ret.push(arrays.map((a) => a[ i ]));
+
+  const returnValue = [];
+  const length = lengths[ 0 ];
+
+  for (let index = 0; index < length; index++) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    returnValue.push(arrays.map((a) => a[ index ]));
   }
-  return ret;
+  return returnValue;
 };
 
 /**
@@ -198,7 +202,7 @@ export const zip = (
  * @returns
  */
 export const interleave = <V>(
-  ...arrays: ReadonlyArray<readonly V[]> | ReadonlyArray<readonly V[]>
+  ...arrays: ReadonlyArray<ReadonlyArray<V>> | Array<Array<V>>
 ): Array<V> => {
   if (arrays.some((a) => !Array.isArray(a))) {
     throw new Error(`All parameters must be an array`);
@@ -208,28 +212,28 @@ export const interleave = <V>(
     throw new Error(`Arrays must be of same length`);
   }
 
-  const ret = [];
-  const len = lengths[ 0 ];
+  const returnValue = [];
+  const length = lengths[ 0 ];
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < len; i++) {
+  for (let index = 0; index < length; index++) {
     //eslint-disable-next-line functional/no-let
-    for (let p = 0; p < arrays.length; p++) {
+    for (const array of arrays) {
       //eslint-disable-next-line functional/immutable-data
-      ret.push(arrays[ p ][ i ]);
+      returnValue.push(array[ index ]);
     }
   }
-  return ret;
+  return returnValue;
 };
 
 /**
- * Returns an copy of `data` with specified length.
+ * Returns a copy of `data` with specified length.
  * If the input array is too long, it is truncated.
  *
  * If the input array is too short, it will be expanded based on the `expand` strategy:
  *  - 'undefined': fill with `undefined`
  *  - 'repeat': repeat array elements, starting from position 0
- *  - 'first': continually use first element
- *  - 'last': continually use last element
+ *  - 'first': repeat with first element from `data`
+ *  - 'last': repeat with last element from `data`
  *
  * ```js
  * import { ensureLength } from 'https://unpkg.com/ixfx/dist/arrays.js';
@@ -246,7 +250,7 @@ export const interleave = <V>(
  * @typeParam V Type of array
  */
 export const ensureLength = <V>(
-  data: ReadonlyArray<V> | ReadonlyArray<V>,
+  data: ReadonlyArray<V> | Array<V>,
   length: number,
   expand: `undefined` | `repeat` | `first` | `last` = `undefined`
 ): Array<V> => {
@@ -261,21 +265,28 @@ export const ensureLength = <V>(
   const add = length - d.length;
 
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < add; i++) {
+  for (let index = 0; index < add; index++) {
     //eslint-disable-next-line functional/immutable-data
-    if (expand === `undefined`) {
-      // @ts-ignore
-      //eslint-disable-next-line functional/immutable-data
-      d.push(undefined);
-    } else if (expand === `repeat`) {
-      //eslint-disable-next-line functional/immutable-data
-      d.push(data[ i % data.length ]);
-    } else if (expand === `first`) {
-      //eslint-disable-next-line functional/immutable-data
-      d.push(data[ 0 ]);
-    } else if (expand === `last`) {
-      //eslint-disable-next-line functional/immutable-data
-      d.push(data[ data.length - 1 ]);
+    switch (expand) {
+      case `undefined`: {
+        // @ts-expect-error
+        d.push(undefined);
+        break;
+      }
+      case `repeat`: {
+        d.push(data[ index % data.length ]);
+        break;
+      }
+      case `first`: {
+        d.push(data[ 0 ]);
+        break;
+      }
+      case `last`: {
+        // @ts-expect-error
+        d.push(data.at(-1));
+        break;
+      }
+      // No default
     }
   }
   return d;
@@ -301,27 +312,27 @@ export const ensureLength = <V>(
  * @param endIndex End index (by default runs until end)
  */
 export const filterBetween = <V>(
-  array: ReadonlyArray<V> | ReadonlyArray<V>,
+  array: ReadonlyArray<V> | Array<V>,
   predicate: (
     value: V,
     index: number,
-    array: ReadonlyArray<V> | ReadonlyArray<V>
+    array: ReadonlyArray<V> | Array<V>
   ) => boolean,
   startIndex?: number,
   endIndex?: number
-): V[] => {
+): Array<V> => {
   guardArray(array);
   if (typeof startIndex === `undefined`) startIndex = 0;
   if (typeof endIndex === `undefined`) endIndex = array.length; //- 1;
   guardIndex(array, startIndex, `startIndex`);
   guardIndex(array, endIndex - 1, `endIndex`);
 
-  const t: V[] = [];
+  const t: Array<V> = [];
 
   //eslint-disable-next-line functional/no-let
-  for (let i = startIndex; i < endIndex; i++) {
+  for (let index = startIndex; index < endIndex; index++) {
     //eslint-disable-next-line functional/immutable-data
-    if (predicate(array[ i ], i, array)) t.push(array[ i ]);
+    if (predicate(array[ index ], index, array)) t.push(array[ index ]);
   }
   return t;
 };
@@ -357,11 +368,11 @@ export const randomIndex = <V>(
  * ```
  * @param array 
  * @param weightings 
- * @param rand 
+ * @param randomSource 
  */
-export const randomElementWeightedSource = <V>(array: ArrayLike<V>, weightings: Array<number>, rand: RandomSource = defaultRandom) => {
+export const randomElementWeightedSource = <V>(array: ArrayLike<V>, weightings: Array<number>, randomSource: RandomSource = defaultRandom) => {
   if (array.length !== weightings.length) throw new Error(`Lengths of 'array' and 'weightings' should be the same.`);
-  const r = weightedIndex(weightings);
+  const r = weightedIndex(weightings, randomSource);
   return (): V => {
     const index = r();
     return array[ index ];
@@ -425,7 +436,7 @@ export const randomElement = <V>(
  *
  */
 export const randomPluck = <V>(
-  array: readonly V[] | ReadonlyArray<V>,
+  array: ReadonlyArray<V> | Array<V>,
   mutate = false,
   rand: RandomSource = defaultRandom
 ): { readonly value: V | undefined; readonly array: Array<V> } => {
@@ -467,14 +478,14 @@ export const randomPluck = <V>(
  * @template V Type of array items
  */
 export const shuffle = <V>(
-  dataToShuffle: ReadonlyArray<V> | ReadonlyArray<V>,
+  dataToShuffle: ReadonlyArray<V>,
   rand: RandomSource = defaultRandom
 ): Array<V> => {
   const array = [ ...dataToShuffle ];
   // eslint-disable-next-line  functional/no-let
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [ array[ i ], array[ j ] ] = [ array[ j ], array[ i ] ];
+  for (let index = array.length - 1; index > 0; index--) {
+    const index_ = Math.floor(rand() * (index + 1));
+    [ array[ index ], array[ index_ ] ] = [ array[ index_ ], array[ index ] ];
   }
   return array;
 };
@@ -498,20 +509,19 @@ export const shuffle = <V>(
  * @param propertyName
  */
 export const sortByNumericProperty = <V, K extends keyof V>(
-  data: ReadonlyArray<V> | ReadonlyArray<V>,
+  data: ReadonlyArray<V> | Array<V>,
   propertyName: K
-) =>
-  [ ...data ].sort((a, b) => {
-    guardArray(data, `data`);
-    const av = a[ propertyName ];
-    const bv = b[ propertyName ];
-    if (av < bv) return -1;
-    if (av > bv) return 1;
-    return 0;
-  });
+) => [ ...data ].sort((a, b) => {
+  guardArray(data, `data`);
+  const av = a[ propertyName ];
+  const bv = b[ propertyName ];
+  if (av < bv) return -1;
+  if (av > bv) return 1;
+  return 0;
+});
 
 /**
- * Returns an array with a value omitted. If value is not found, result will be a copy of input.
+ * Returns an array with value(s) omitted. If value is not found, result will be a copy of input.
  * Value checking is completed via the provided `comparer` function.
  * By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
  *
@@ -551,16 +561,28 @@ export const sortByNumericProperty = <V, K extends keyof V>(
  *
  * @template V Type of array items
  * @param data Source array
- * @param value Value to remove
+ * @param value Value(s) to remove
  * @param comparer Comparison function. If not provided `Util.isEqualDefault` is used, which compares using `===`
  * @return Copy of array without value.
  */
 export const without = <V>(
   //eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V> | Array<V>,
-  value: V,
+  value: V | Array<V>,
   comparer: IsEqual<V> = isEqualDefault
-): Array<V> => data.filter((v) => !comparer(v, value));
+): Array<V> => {
+  if (Array.isArray(value)) {
+    const returnArray = []
+    for (const source of data) {
+      if (!value.some(v => comparer(source, v))) {
+        returnArray.push(source);
+      }
+    }
+    return returnArray;
+  } else {
+    return data.filter((v) => !comparer(v, value));
+  }
+}
 
 export const withoutUndefined = <V>(data: ReadonlyArray<V> | Array<V>): Array<V> => {
   return data.filter(v => v !== undefined);
@@ -591,23 +613,23 @@ export const withoutUndefined = <V>(data: ReadonlyArray<V> | Array<V>): Array<V>
 export const until = <V, A>(
   //eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V> | Array<V>,
-  predicate: (v: V, acc: A) => readonly [ stop: boolean, acc: A ],
+  predicate: (v: V, accumulator: A) => readonly [ stop: boolean, acc: A ],
   initial: A
-): V[] => {
-  const ret = [];
+): Array<V> => {
+  const returnValue = [];
   //eslint-disable-next-line functional/no-let
   let total = initial;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < data.length; i++) {
-    const [ stop, acc ] = predicate(data[ i ], total);
+  for (const datum of data) {
+    const [ stop, accumulator ] = predicate(datum, total);
     if (stop) break;
 
-    total = acc;
+    total = accumulator;
 
     //eslint-disable-next-line functional/immutable-data
-    ret.push(data[ i ]);
+    returnValue.push(datum);
   }
-  return ret;
+  return returnValue;
 };
 
 /**
@@ -639,7 +661,7 @@ export const remove = <V>(
 ): Array<V> => {
   // ✔️ Unit tested
   if (!Array.isArray(data)) {
-    throw new Error(`'data' parameter should be an array`);
+    throw new TypeError(`'data' parameter should be an array`);
   }
   guardIndex(data, index, `index`);
   return [ ...data.slice(0, index), ...data.slice(index + 1) ];
@@ -685,7 +707,7 @@ export const groupBy = <K, V>(
   array: Iterable<V>,
   grouper: (item: V) => K
 ) => {
-  const map = new Map<K, V[]>();
+  const map = new Map<K, Array<V>>();
 
   for (const a of array) {
     const key = grouper(a);
@@ -741,12 +763,12 @@ export const sample = <V>(array: ArrayLike<V>, amount: number): Array<V> => {
   if (subsampleSteps > array.length - 1) {
     throw new Error(`Subsample steps exceeds array length`);
   }
-  const r: V[] = [];
+  const r: Array<V> = [];
 
   //eslint-disable-next-line functional/no-let
-  for (let i = subsampleSteps - 1; i < array.length; i += subsampleSteps) {
+  for (let index = subsampleSteps - 1; index < array.length; index += subsampleSteps) {
     //eslint-disable-next-line functional/immutable-data
-    r.push(array[ i ]);
+    r.push(array[ index ]);
   }
   return r;
 };
@@ -764,15 +786,15 @@ export const sample = <V>(array: ArrayLike<V>, amount: number): Array<V> => {
  */
 //eslint-disable-next-line func-style
 export function chunks<V>(
-  arr: ReadonlyArray<V> | ReadonlyArray<V>,
+  array: ReadonlyArray<V>,
   size: number
 ) {
   // https://surma.github.io/underdash/
   const output = [];
   //eslint-disable-next-line  functional/no-let
-  for (let i = 0; i < arr.length; i += size) {
+  for (let index = 0; index < array.length; index += size) {
     //eslint-disable-next-line functional/immutable-data
-    output.push(arr.slice(i, i + size));
+    output.push(array.slice(index, index + size));
   }
   return output;
 }
@@ -826,22 +848,18 @@ export type MergeReconcile<V> = (a: V, b: V) => V;
  * @param arrays Arrays of data to merge
  */
 export const mergeByKey = <V>(
-  keyFn: ToString<V>,
+  keyFunction: ToString<V>,
   reconcile: MergeReconcile<V>,
-  ...arrays: readonly ReadonlyArray<V>[]
+  ...arrays: ReadonlyArray<ReadonlyArray<V>>
 ): Array<V> => {
   const result = new Map<string, V>();
   for (const m of arrays) {
     for (const mv of m) {
       if (mv === undefined) continue;
-      const mk = keyFn(mv);
+      const mk = keyFunction(mv);
       //eslint-disable-next-line functional/no-let
       let v = result.get(mk);
-      if (v) {
-        v = reconcile(v, mv);
-      } else {
-        v = mv;
-      }
+      v = v ? reconcile(v, mv) : mv;
       result.set(mk, v);
     }
   }
@@ -873,15 +891,15 @@ export const mergeByKey = <V>(
  * @returns
  */
 export const reducePairwise = <V, X>(
-  arr: readonly V[] | ReadonlyArray<V>,
-  reducer: (acc: X, a: V, b: V) => X,
+  array: ReadonlyArray<V>,
+  reducer: (accumulator: X, a: V, b: V) => X,
   initial: X
 ) => {
-  guardArray(arr, `arr`);
-  if (arr.length < 2) return initial;
+  guardArray(array, `arr`);
+  if (array.length < 2) return initial;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < arr.length - 1; i++) {
-    initial = reducer(initial, arr[ i ], arr[ i + 1 ]);
+  for (let index = 0; index < array.length - 1; index++) {
+    initial = reducer(initial, array[ index ], array[ index + 1 ]);
   }
   return initial;
 };
@@ -901,16 +919,16 @@ export const reducePairwise = <V, X>(
  * @returns Array of two elements. The first is items that match `filter`, the second is items that do not.
  */
 export const filterAB = <V>(
-  data: readonly V[] | ReadonlyArray<V>,
+  data: ReadonlyArray<V>,
   filter: (a: V) => boolean
-): [ a: V[], b: V[] ] => {
-  const a: V[] = [];
-  const b: V[] = [];
-  for (let i = 0; i < data.length; i++) {
+): [ a: Array<V>, b: Array<V> ] => {
+  const a: Array<V> = [];
+  const b: Array<V> = [];
+  for (const datum of data) {
     //eslint-disable-next-line functional/immutable-data
-    if (filter(data[ i ]!)) a.push(data[ i ]!);
+    if (filter(datum)) a.push(datum);
     //eslint-disable-next-line functional/immutable-data
-    else b.push(data[ i ]!);
+    else b.push(datum);
   }
   return [ a, b ];
 };
@@ -935,21 +953,17 @@ export const filterAB = <V>(
  * @returns
  */
 export const unique = <V>(
-  arrays: //eslint-disable-next-line functional/prefer-readonly-type
+  arrays:
     | Array<Array<V>>
-    //eslint-disable-next-line functional/prefer-readonly-type
     | Array<V>
     | ReadonlyArray<V>
     | ReadonlyArray<ReadonlyArray<V>>,
   comparer = isEqualDefault<V>
-): readonly V[] => {
-  //eslint-disable-next-line functional/no-let
-  const t: V[] = [];
-  for (let i = 0; i < arrays.length; i++) {
-    const a = arrays[ i ];
+): ReadonlyArray<V> => {
+  const t: Array<V> = [];
+  for (const a of arrays) {
     if (Array.isArray(a)) {
       for (const v of additionalValues<V>(t, a, comparer)) {
-        //eslint-disable-next-line functional/immutable-data
         t.push(v);
       }
     } else {
@@ -977,108 +991,15 @@ export const unique = <V>(
 export const containsDuplicateValues = <V>(
   //eslint-disable-next-line functional/prefer-readonly-type
   array: Array<V> | ReadonlyArray<V>,
-  keyFn = toStringDefault<V>
+  keyFunction = toStringDefault<V>
 ): boolean => {
   if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
   try {
-    const _ = mapFromIterable(array, keyFn);
-  } catch (ex) {
+    const _ = mapFromIterable(array, keyFunction);
+  } catch {
     return true;
   }
   return false;
-};
-
-/**
- * Compares the values of two arrays, returning a list
- * of items they have in common, and those unique in `a` or `b`.
- *
- * ```js
- * const a = ['apples', 'oranges', 'pears' ]
- * const b = ['pears', 'kiwis', 'bananas' ];
- *
- * const r = compareValues(a, b);
- * r.shared;  // [ 'pears' ]
- * r.a;       // [ 'apples', 'oranges' ]
- * r.b;       // [ 'kiwis', 'bananas' ]
- * @param a
- * @param b
- * @param eq
- * @returns
- */
-export const compareValues = <V>(
-  a: ArrayLike<V>,
-  b: ArrayLike<V>,
-  eq = isEqualDefault<V>
-) => {
-  const shared = [];
-  const aUnique = [];
-  const bUnique = [];
-
-  for (let i = 0; i < a.length; i++) {
-    //eslint-disable-next-line functional/no-let
-    let seenInB = false;
-    for (let x = 0; x < b.length; x++) {
-      if (eq(a[ i ], b[ x ])) {
-        seenInB = true;
-        break;
-      }
-    }
-    if (seenInB) {
-      //eslint-disable-next-line functional/immutable-data
-      shared.push(a[ i ]);
-    } else {
-      //eslint-disable-next-line functional/immutable-data
-      aUnique.push(a[ i ]);
-    }
-  }
-
-  for (let i = 0; i < b.length; i++) {
-    //eslint-disable-next-line functional/no-let
-    let seenInA = false;
-    for (let x = 0; x < a.length; x++) {
-      if (eq(b[ i ], a[ x ])) {
-        seenInA = true;
-      }
-    }
-    if (!seenInA) {
-      //eslint-disable-next-line functional/immutable-data
-      bUnique.push(b[ i ]);
-    }
-  }
-
-  return {
-    shared,
-    a: aUnique,
-    b: bUnique,
-  };
-};
-
-/**
- * Returns _true_ if all values in `arrays` are equal, regardless
- * of their position. Use === checking by default.
- * ```js
- * const a = ['apples','oranges','pears'];
- * const b = ['pears','oranges','apples'];
- * compareValuesEqual(a, b); // True
- * ```
- *
- * ```js
- * const a = [ { name: 'John' }];
- * const b = [ { name: 'John' }];
- * // Use a custom equality checker
- * compareValuesEqual(a, b, (aa,bb) => aa.name === bb.name);
- * ```
- * @param arrays
- * @param eq
- */
-export const compareValuesEqual = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
-  a: ArrayLike<V>,
-  b: ArrayLike<V>,
-  eq = isEqualDefault<V>
-): boolean => {
-  const returnValue = compareValues(a, b, eq);
-  return returnValue.a.length === 0 && returnValue.b.length === 0;
 };
 
 /**
@@ -1101,17 +1022,17 @@ export const contains = <V>(
   eq = isEqualDefault<V>
 ) => {
   if (!Array.isArray(haystack)) {
-    throw new Error(`Expects haystack parameter to be an array`);
+    throw new TypeError(`Expects haystack parameter to be an array`);
   }
   if (!Array.isArray(needles)) {
-    throw new Error(`Expects needles parameter to be an array`);
+    throw new TypeError(`Expects needles parameter to be an array`);
   }
 
-  for (let i = 0; i < needles.length; i++) {
+  for (const needle of needles) {
     //eslint-disable-next-line functional/no-let
     let found = false;
-    for (let x = 0; x < haystack.length; x++) {
-      if (eq(needles[ i ], haystack[ x ])) {
+    for (const element of haystack) {
+      if (eq(needle, element)) {
         found = true;
         break;
       }
@@ -1159,9 +1080,9 @@ export function* additionalValues<V>(
   eq: IsEqual<V> = isEqualDefault
 ): Iterable<V> {
   // Keep track of values already yielded
-  const yielded: V[] = [];
+  const yielded: Array<V> = [];
   for (const v of values) {
-    const found = input.find((i) => eq(i, v));
+    const found = input.find((index) => eq(index, v));
     if (!found) {
       const alreadyYielded = yielded.find((ii) => eq(ii, v));
       if (!alreadyYielded) {
