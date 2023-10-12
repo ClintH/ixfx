@@ -1,7 +1,8 @@
 import {
   type RandomSource,
-  floatSource as randomFloatFn,
+  floatSource as randomFloatFunction,
   float as randomFloat,
+  defaultRandom,
 } from '../Random.js';
 import { clamp } from '../data/Clamp.js';
 import { throwNumberTest } from '../Guards.js';
@@ -13,7 +14,48 @@ export type JitterOpts = {
   readonly source?: RandomSource;
 };
 
-export type JitterFn = (value: number) => number;
+export type Jitterer = (value: number) => number;
+
+/**
+ * Returns a {@link Jitterer} that works with absolute values.
+ * 
+ * ```js
+ * // Jitter by -10 to 10
+ * const j = jitterAbsolute({ absolute: 10 });
+ * j(100); // Produces range of 90-110
+ * ```
+ * 
+ * When `clamped` is true, return value is clamped to 0...value
+ * ```js
+ * const j = jitterAbsolute({ absolute: 10, clamped: true })
+ * j(100); // Produces range of 90-100
+ * ```
+ * @param opts 
+ * @returns 
+ */
+export const jitterAbsolute = (opts: JitterOpts): Jitterer => {
+  const { relative, absolute } = opts;
+  const clamped = opts.clamped ?? false;
+  const source = opts.source ?? defaultRandom;
+  if (absolute !== undefined) {
+    return (value: number) => {
+      const abs = (source() * absolute * 2) - absolute;
+      const valueNew = value + abs;
+      if (clamped) return clamp(valueNew, 0, value);
+      return valueNew;
+    }
+  }
+  if (relative !== undefined) {
+    return (value: number) => {
+      const rel = value * relative;
+      const abs = (source() * rel * 2) - rel;
+      const valueNew = value + abs;
+      if (clamped) return clamp(valueNew, 0, value);
+      return valueNew;
+    }
+  }
+  throw new Error(`Either absolute or relative fields expected`);
+}
 
 /**
  * Jitters `value` by the absolute `jitter` amount. Returns a function.
@@ -53,23 +95,25 @@ export type JitterFn = (value: number) => number;
  * @param opts Options
  * @returns Function that performs jitter
  */
-export const jitter = (opts: JitterOpts = {}): JitterFn => {
+export const jitter = (opts: JitterOpts = {}): Jitterer => {
   const clamped = opts.clamped ?? true;
   //eslint-disable-next-line functional/no-let
   let r = (_: number) => 0;
-  if (typeof opts.absolute !== 'undefined') {
+  if (opts.absolute !== undefined) {
     throwNumberTest(
       opts.absolute,
       clamped ? `percentage` : `bipolar`,
       `opts.absolute`
     );
-    const absRand = randomFloatFn({
-      min: -opts.absolute!,
-      max: opts.absolute!,
+    const absRand = randomFloatFunction({
+      min: -opts.absolute,
+      max: opts.absolute,
       source: opts.source,
     });
     r = (v: number) => v + absRand();
-  } else if (typeof opts.relative !== 'undefined') {
+  } else if (opts.relative === undefined) {
+    throw new TypeError(`Either absolute or relative jitter amount is required.`);
+  } else {
     throwNumberTest(
       opts.relative,
       clamped ? `percentage` : `bipolar`,
@@ -78,12 +122,12 @@ export const jitter = (opts: JitterOpts = {}): JitterFn => {
     r = (v: number) =>
       v +
       randomFloat({
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         min: -opts.relative! * v,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         max: opts.relative! * v,
         source: opts.source,
       });
-  } else {
-    throw new Error(`Either absolute or relative jitter amount is required.`);
   }
 
   const compute = (value: number) => {
