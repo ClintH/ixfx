@@ -8,6 +8,6 @@ test('toString', (t) => {
   const fn = () => 100;
   t.is(toString(fn), '100ms');
 
-  const elapsed = since();
+  const elapsed = () => 0;
   t.is(toString(elapsed, 0), '0ms');
 });
