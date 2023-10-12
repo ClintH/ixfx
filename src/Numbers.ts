@@ -34,8 +34,8 @@ export const average = (...numbers: ReadonlyArray<number>) =>
  * @returns
  */
 export const averageWeighted = (
-  weightings: ReadonlyArray<number> | Easings.EasingFn,
-  ...numbers: ReadonlyArray<number>
+  weightings: Array<number> | ReadonlyArray<number> | Easings.EasingFn,
+  ...numbers: Array<number> | ReadonlyArray<number>
 ): number => NumericArrays.averageWeighted(numbers, weightings);
 
 /**
