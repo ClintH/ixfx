@@ -7,11 +7,11 @@ import { range } from './IterableSync.js';
 export { randomElement as arrayElement } from './collections/Arrays.js';
 export { randomHue as hue } from './visual/Colour.js';
 
-export interface RandomOptions {
-  readonly max: number;
-  readonly min?: number;
-  readonly source?: RandomSource;
-}
+export type RandomOptions = Readonly<{
+  max: number;
+  min?: number;
+  source?: RandomSource;
+}>
 
 /**
  * Default random number generator: `Math.random`.
@@ -28,16 +28,16 @@ export type RandomSource = () => number;
 /**
  * Options for producing weighted distribution
  */
-export interface WeightedOptions {
+export type WeightedOptions = Readonly<{
   /**
    * Easing function to use (optional)
    */
-  readonly easing?: EasingName;
+  easing?: EasingName;
   /**
    * Random source (optional)
    */
-  readonly source?: RandomSource;
-}
+  source?: RandomSource;
+}>
 
 /***
  * Returns a random number, 0..1, weighted by a given easing function.
@@ -192,18 +192,20 @@ export const weightedInteger = (maxOrOptions: number | WeightedIntegerOptions): 
 * @returns 
 */
 export const weightedIndex = (weightings: Array<number>, rand: RandomSource = defaultRandom): () => number => {
-  let precompute: Array<number> = [];
+  const precompute: Array<number> = [];
   let total = 0;
-  for (let i = 0; i < weightings.length; i++) {
-    total += weightings[ i ];
-    precompute[ i ] = total;
+  // eslint-disable-next-line unicorn/no-for-loop
+  for (let index = 0; index < weightings.length; index++) {
+    total += weightings[ index ];
+    precompute[ index ] = total;
   }
   if (total !== 1) throw new Error(`Weightings should add up to 1. Got: ${ total }`);
 
   return (): number => {
     const v = rand();
-    for (let i = 0; i < precompute.length; i++) {
-      if (v <= precompute[ i ]) return i;
+    // eslint-disable-next-line unicorn/no-for-loop
+    for (let index = 0; index < precompute.length; index++) {
+      if (v <= precompute[ index ]) return index;
     }
     throw new Error(`Bug: weightedIndex could not select index`);
   }
@@ -450,10 +452,11 @@ export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSou
 export const float = (maxOrOptions: number | RandomOptions = 1): number =>
   floatSource(maxOrOptions)();
 
-export interface StringOptions {
-  readonly length: number;
-  readonly source?: RandomSource;
-}
+export type StringOptions = Readonly<{
+  length: number;
+  source?: RandomSource;
+}>
+
 /**
  * Returns a string of random letters and numbers of a given `length`.
  *
