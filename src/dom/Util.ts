@@ -5,6 +5,7 @@ import { Rects, Scaler } from '../geometry/index.js';
 import type { CardinalDirection } from '../geometry/Grid.js';
 import { cardinal } from '../geometry/Rect.js';
 
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
   readonly el: V;
   readonly bounds: {
@@ -16,6 +17,7 @@ export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
   };
 };
 
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
   readonly ctx: CanvasRenderingContext2D;
 };
@@ -61,34 +63,39 @@ export type PointSpaces = `viewport` | `screen` | `document`;
  * @returns
  */
 export const pointScaler = (reference: PointSpaces = `viewport`) => {
-  if (reference === `viewport`) {
-    return (a: Readonly<Points.Point | number | number[]>, b?: number) => {
-      const pt = Points.getPointParameter(a, b);
-      return Object.freeze({
-        x: pt.x / window.innerWidth,
-        y: pt.y / window.innerHeight,
-      });
-    };
-  } else if (reference === `screen`) {
-    return (a: Readonly<Points.Point | number | number[]>, b?: number) => {
-      const pt = Points.getPointParameter(a, b);
-      return Object.freeze({
-        x: pt.x / screen.width,
-        y: pt.y / screen.height,
-      });
-    };
-  } else if (reference === `document`) {
-    return (a: Readonly<Points.Point | number | number[]>, b?: number) => {
-      const pt = Points.getPointParameter(a, b);
-      return Object.freeze({
-        x: pt.x / document.body.scrollWidth,
-        y: pt.y / document.body.scrollHeight,
-      });
-    };
-  } else {
-    throw new Error(
-      `Unknown 'reference' parameter: ${ JSON.stringify(reference) }`
-    );
+  switch (reference) {
+    case `viewport`: {
+      return (a: Readonly<Points.Point | number | Array<number>>, b?: number) => {
+        const pt = Points.getPointParameter(a, b);
+        return Object.freeze({
+          x: pt.x / window.innerWidth,
+          y: pt.y / window.innerHeight,
+        });
+      };
+    }
+    case `screen`: {
+      return (a: Readonly<Points.Point | number | Array<number>>, b?: number) => {
+        const pt = Points.getPointParameter(a, b);
+        return Object.freeze({
+          x: pt.x / screen.width,
+          y: pt.y / screen.height,
+        });
+      };
+    }
+    case `document`: {
+      return (a: Readonly<Points.Point | number | Array<number>>, b?: number) => {
+        const pt = Points.getPointParameter(a, b);
+        return Object.freeze({
+          x: pt.x / document.body.scrollWidth,
+          y: pt.y / document.body.scrollHeight,
+        });
+      };
+    }
+    default: {
+      throw new Error(
+        `Unknown 'reference' parameter: ${ JSON.stringify(reference) }`
+      );
+    }
   }
 };
 
@@ -160,6 +167,7 @@ export type ElPositionOpts = {
  * @param scaled
  * @returns
  */
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export const positionFn = (
   domQueryOrEl: Readonly<string | HTMLElement>,
   opts: ElPositionOpts = {}
@@ -227,34 +235,39 @@ export const positionRelative = (
  */
 export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
   switch (targetSpace) {
-    case `screen`:
-      return (a: Readonly<Points.Point | number[] | number>, b?: number) => {
+    case `screen`: {
+      return (a: Readonly<Points.Point | Array<number> | number>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.screenX,
           y: pt.y + window.screenY,
         });
       };
-    case `document`:
-      return (a: Readonly<Points.Point | number[] | number>, b?: number) => {
+    }
+    case `document`: {
+      return (a: Readonly<Points.Point | Array<number> | number>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.scrollX,
           y: pt.y + window.scrollY,
         });
       };
-    case `viewport`:
-      return (a: Readonly<Points.Point | number[] | number>, b?: number) => {
+    }
+    case `viewport`: {
+      return (a: Readonly<Points.Point | Array<number> | number>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x,
           y: pt.y,
         });
       };
-    default:
+    }
+    default: {
       throw new Error(
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         `Unexpected target coordinate space: ${ targetSpace }. Expected: viewport, document or screen`
       );
+    }
   }
 };
 
@@ -342,7 +355,6 @@ export const canvasHelper = (
   const ratio = Math.round(window.devicePixelRatio) || 1;
   const scaleBy = opts.scaleBy ?? `both`;
 
-  //eslint-disable-next-line functional/no-let
   let scaler: Scaler.Scaler = Scaler.scaler(`both`);
 
   const updateDimensions = (rect: Rects.Rect) => {
@@ -351,14 +363,9 @@ export const canvasHelper = (
 
     const pixelScaled = Rects.multiply(rect, ratio, ratio);
 
-    //eslint-disable-next-line functional/immutable-data
     el.width = pixelScaled.width;
-    //eslint-disable-next-line functional/immutable-data
     el.height = pixelScaled.height;
-
-    //eslint-disable-next-line functional/immutable-data
     el.style.width = rect.width + `px`;
-    //eslint-disable-next-line functional/immutable-data
     el.style.height = rect.height + `px`;
   };
 
@@ -432,9 +439,7 @@ export const fullSizeCanvas = (
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    //eslint-disable-next-line functional/immutable-data
     el.width = width;
-    //eslint-disable-next-line functional/immutable-data
     el.height = height;
 
     if (onResized !== undefined) {
@@ -451,13 +456,9 @@ export const fullSizeCanvas = (
 
   // Setup
   if (!skipCss) {
-    //eslint-disable-next-line functional/immutable-data
     el.style.top = `0`;
-    //eslint-disable-next-line functional/immutable-data
     el.style.left = `0`;
-    //eslint-disable-next-line functional/immutable-data
     el.style.zIndex = `-100`;
-    //eslint-disable-next-line functional/immutable-data
     el.style.position = `fixed`;
   }
 
@@ -485,18 +486,18 @@ export const fullSizeCanvas = (
  */
 export const cycleCssClass = (
   el: Readonly<HTMLElement>,
-  list: readonly string[]
+  list: ReadonlyArray<string>
 ) => {
   if (el === null || !el) return;
   if (!Array.isArray(list)) {
-    throw new Error(`List should be an array of strings`);
+    throw new TypeError(`List should be an array of strings`);
   }
-  //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < list.length; i++) {
-    if (el.classList.contains(list[ i ])) {
-      el.classList.remove(list[ i ]);
-      if (i + 1 < list.length) {
-        el.classList.add(list[ i + 1 ]);
+
+  for (let index = 0; index < list.length; index++) {
+    if (el.classList.contains(list[ index ])) {
+      el.classList.remove(list[ index ]);
+      if (index + 1 < list.length) {
+        el.classList.add(list[ index + 1 ]);
       } else {
         el.classList.add(list[ 0 ]);
       }
@@ -516,19 +517,19 @@ export const cycleCssClass = (
 export const parentSize = <V extends HTMLElement | SVGSVGElement>(
   domQueryOrEl: string | V,
   onResized?: (args: ElementResizeArgs<V>) => void,
-  timeoutMs: number = 100
+  timeoutMs = 100
 ) => {
   const el = resolveEl<V>(domQueryOrEl);
   const parent = el.parentElement;
   if (parent === null) throw new Error(`Element has no parent`);
 
   const ro = resizeObservable(parent, timeoutMs).subscribe(
-    (entries: readonly ResizeObserverEntry[]) => {
-      const e = entries.find((v) => v.target === parent);
-      if (e === undefined) return;
+    (entries: ReadonlyArray<ResizeObserverEntry>) => {
+      const entry = entries.find((v) => v.target === parent);
+      if (entry === undefined) return;
 
-      const width = e.contentRect.width;
-      const height = e.contentRect.height;
+      const width = entry.contentRect.width;
+      const height = entry.contentRect.height;
 
       el.setAttribute(`width`, width + `px`);
       el.setAttribute(`height`, height + `px`);
@@ -573,7 +574,7 @@ export const getTranslation = (
 
   // Can either be 2d or 3d transform
   const matrixType = matrix.includes(`3d`) ? `3d` : `2d`;
-  // @ts-ignore
+  // @ts-expect-error
   const matrixValues = matrix.match(/matrix.*\((.+)\)/)[ 1 ].split(`, `);
 
   // 2d Matrixes have 6 values
@@ -581,8 +582,8 @@ export const getTranslation = (
   // 2d Matrixes does not have Z value.
   if (matrixType === `2d`) {
     return {
-      x: parseFloat(matrixValues[ 4 ]),
-      y: parseFloat(matrixValues[ 5 ]),
+      x: Number.parseFloat(matrixValues[ 4 ]),
+      y: Number.parseFloat(matrixValues[ 5 ]),
       z: 0,
     };
   }
@@ -591,9 +592,9 @@ export const getTranslation = (
   // The 13th, 14th, and 15th values are X, Y, and Z
   if (matrixType === `3d`) {
     return {
-      x: parseFloat(matrixValues[ 12 ]),
-      y: parseFloat(matrixValues[ 13 ]),
-      z: parseFloat(matrixValues[ 14 ]),
+      x: Number.parseFloat(matrixValues[ 12 ]),
+      y: Number.parseFloat(matrixValues[ 13 ]),
+      z: Number.parseFloat(matrixValues[ 14 ]),
     };
   }
 
@@ -612,7 +613,7 @@ export const getTranslation = (
 export const parentSizeCanvas = (
   domQueryOrEl: Readonly<string | HTMLCanvasElement>,
   onResized?: (args: CanvasResizeArgs) => void,
-  timeoutMs: number = 100
+  timeoutMs = 100
 ) => {
   const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
   if (el.nodeName !== `CANVAS`) {
@@ -623,26 +624,22 @@ export const parentSizeCanvas = (
   const parent = el.parentElement;
   if (parent === null) throw new Error(`Element has no parent`);
 
-  const ctx = (el as HTMLCanvasElement).getContext(`2d`);
+  const ctx = (el).getContext(`2d`);
   if (ctx === null) throw new Error(`Could not create drawing context`);
 
   //const safetyMargin = 4;
 
-  //eslint-disable-next-line functional/immutable-data
   el.style.width = `100%`;
-  //eslint-disable-next-line functional/immutable-data
   el.style.height = `100%`;
 
-  //console.log('parent height: ' + parent.getBoundingClientRect().height);
-  //console.log(`parent offset Height: ${parent.offsetHeight}`);
 
   const ro = resizeObservable(parent, timeoutMs).subscribe(
-    (entries: readonly ResizeObserverEntry[]) => {
-      const e = entries.find((v) => v.target === parent);
-      if (e === undefined) return;
+    (entries: ReadonlyArray<ResizeObserverEntry>) => {
+      const entry = entries.find((v) => v.target === parent);
+      if (entry === undefined) return;
 
-      const width = e.contentRect.width;
-      const height = e.contentRect.height;
+      const width = entry.contentRect.width;
+      const height = entry.contentRect.height;
       //console.log(`contentH: ${e.contentRect.height} current: ${el.getBoundingClientRect().height}`);
 
       // el.setAttribute(`width`, width-safetyMargin + `px`);
@@ -671,7 +668,7 @@ export const parentSizeCanvas = (
  * @param timeoutMs
  * @returns
  */
-export const windowResize = (timeoutMs: number = 100) =>
+export const windowResize = (timeoutMs = 100) =>
   fromEvent(window, `resize`).pipe(debounceTime(timeoutMs));
 
 /**
@@ -685,14 +682,14 @@ export const windowResize = (timeoutMs: number = 100) =>
  * @param domQueryOrEl
  * @returns
  */
-export const resolveEl = <V extends Element>(domQueryOrEl: string | V): V => {
+export const resolveEl = <V extends Element>(domQueryOrEl: string | V | null | undefined): V => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {
-      const error = !domQueryOrEl.startsWith(`#`) ? new Error(
-        `Query '${ domQueryOrEl }' did not match anything. Did you mean '#${ domQueryOrEl }?`
-      ) : new Error(
+      const error = domQueryOrEl.startsWith(`#`) ? new Error(
         `Query '${ domQueryOrEl }' did not match anything. Try '#id', 'div', or '.class'`
+      ) : new Error(
+        `Query '${ domQueryOrEl }' did not match anything. Did you mean '#${ domQueryOrEl }?`
       );
       throw error;
     }
@@ -702,7 +699,7 @@ export const resolveEl = <V extends Element>(domQueryOrEl: string | V): V => {
   } else if (domQueryOrEl === undefined) {
     throw new Error(`domQueryOrEl ${ domQueryOrEl } is undefined`);
   }
-  const el = domQueryOrEl as V;
+  const el = domQueryOrEl;
   return el;
 };
 
@@ -738,7 +735,7 @@ export const createIn = (
   tagName: string
 ): HTMLElement => {
   const el = document.createElement(tagName);
-  parent.appendChild(el);
+  parent.append(el);
   return el;
 };
 
@@ -747,11 +744,10 @@ export const createIn = (
  * @param parent
  */
 export const clear = (parent: Readonly<HTMLElement>) => {
-  //eslint-disable-next-line functional/no-let
   let c = parent.lastElementChild;
 
   while (c) {
-    parent.removeChild(c);
+    c.remove();
     c = parent.lastElementChild;
   }
 };
@@ -768,9 +764,9 @@ export const clear = (parent: Readonly<HTMLElement>) => {
  * @returns
  */
 export const themeChangeObservable = (): Observable<
-  readonly MutationRecord[]
+  ReadonlyArray<MutationRecord>
 > => {
-  const o = new Observable<MutationRecord[]>((subscriber) => {
+  const o = new Observable<Array<MutationRecord>>((subscriber) => {
     const ro = new MutationObserver((entries) => {
       subscriber.next(entries);
     });
@@ -803,15 +799,15 @@ export const themeChangeObservable = (): Observable<
  */
 export const resizeObservable = (
   elem: Readonly<Element>,
-  timeoutMs: number = 1000
-): Observable<readonly ResizeObserverEntry[]> => {
+  timeoutMs = 1000
+): Observable<ReadonlyArray<ResizeObserverEntry>> => {
   if (elem === null) {
     throw new Error(`elem parameter is null. Expected element to observe`);
   }
   if (elem === undefined) {
     throw new Error(`elem parameter is undefined. Expected element to observe`);
   }
-  const o = new Observable<ResizeObserverEntry[]>((subscriber) => {
+  const o = new Observable<Array<ResizeObserverEntry>>((subscriber) => {
     const ro = new ResizeObserver((entries) => {
       subscriber.next(entries);
     });
@@ -829,18 +825,18 @@ export const resizeObservable = (
  * @param obj
  * @returns Promise
  */
-export const copyToClipboard = (obj: object) => {
+export const copyToClipboard = (object: object) => {
   const p = new Promise((resolve, reject) => {
     //const json = JSON.stringify(obj, null, 2);
-    const str = JSON5.stringify(obj);
-    navigator.clipboard.writeText(JSON.stringify(str)).then(
+    const string_ = JSON5.stringify(object);
+    navigator.clipboard.writeText(JSON.stringify(string_)).then(
       () => {
         resolve(true);
       },
-      (_err) => {
+      (error) => {
         console.warn(`Could not copy to clipboard`);
-        console.log(str);
-        reject(_err);
+        console.log(string_);
+        reject(error);
       }
     );
   });
@@ -866,28 +862,31 @@ export const reconcileChildren = <V>(
 
   for (const [ key, value ] of list) {
     const id = `c-${ key }`;
-    const el = parentEl.querySelector(`#${ id }`) as HTMLElement;
-    const finalEl = createUpdate(value, el);
-    //eslint-disable-next-line functional/immutable-data
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const el = parentEl.querySelector(`#${ id }`);
+    const finalEl = createUpdate(value, el as HTMLElement);
     if (el !== finalEl) {
-      //eslint-disable-next-line functional/immutable-data
       finalEl.id = id;
       parentEl.append(finalEl);
     }
     seen.add(id);
   }
 
-  const prune: HTMLElement[] = [];
-  //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < parentEl.children.length; i++) {
-    const c = parentEl.children[ i ] as HTMLElement;
-    if (!seen.has(c.id)) {
-      //eslint-disable-next-line functional/immutable-data
-      prune.push(c);
+  const prune: Array<HTMLElement> = [];
+  for (const child of parentEl.children) {
+    if (!seen.has(child.id)) {
+      prune.push(child as HTMLElement);
     }
   }
 
-  prune.forEach((p) => p.remove());
+  // for (let index = 0; index < parentEl.children.length; index++) {
+  //   const c = parentEl.children[ index ] as HTMLElement;
+  //   if (!seen.has(c.id)) {
+  //     prune.push(c);
+  //   }
+  // }
+
+  for (const p of prune) p.remove();
 };
 
 /**
@@ -900,10 +899,9 @@ export const reconcileChildren = <V>(
  * @param cssClass 
  * @returns 
  */
-export const setCssClass = (selectors: string, value: boolean, cssClass: string) => {
-  const elements = Array.from(document.querySelectorAll(selectors));
-
-  if (!elements) return;
+export const setCssClass = (selectors: QueryOrElements, value: boolean, cssClass: string) => {
+  const elements = resolveEls(selectors);
+  if (elements.length === 0) return;
 
   for (const element of elements) {
     if (value) element.classList.add(cssClass);
@@ -911,47 +909,96 @@ export const setCssClass = (selectors: string, value: boolean, cssClass: string)
   }
 };
 
-export const setCssDisplay = (selectors: string, value: string) => {
-  const elements = Array.from(document.querySelectorAll(selectors));
-  if (!elements) return;
+/**
+ * Toggles a CSS class on all elements that match selector
+ * @param selectors 
+ * @param cssClass 
+ * @returns 
+ */
+export const setCssToggle = (selectors: QueryOrElements, cssClass: string) => {
+  const elements = resolveEls(selectors);
+  if (elements.length === 0) return;
   for (const element of elements) {
-    //eslint-disable-next-line functional/immutable-data
-    (element as HTMLElement).style.display = value;
+    element.classList.toggle(cssClass);
+  }
+}
+
+export const setCssDisplay = (selectors: QueryOrElements, value: string) => {
+  const elements = resolveEls(selectors);
+  if (elements.length === 0) return;
+  for (const element of elements) {
+    (element).style.display = value;
   }
 };
 
+/**
+ * Gets a HTML element by id, throwing an error if not found
+ * @param id 
+ * @returns 
+ */
 export const byId = <V extends HTMLElement>(id: string): HTMLElement => {
+  // eslint-disable-next-line unicorn/prefer-query-selector
   const element = document.getElementById(id);
+  if (element === null) throw new Error(`HTML element with id '${ id }' not found`);
   return element as V;
 }
 
-export const setHtml = (selectors: string, value: string | number) => {
-  const elements = Array.from(document.querySelectorAll(selectors));
-  if (!elements) return;
-  if (typeof value === 'number') {
+export type QueryOrElements = string | Array<Element> | Array<HTMLElement> | HTMLElement | Element
+
+export const resolveEls = (selectors: QueryOrElements): Array<HTMLElement> => {
+  if (selectors === undefined) return [];
+  if (selectors === null) return [];
+  if (Array.isArray(selectors)) return selectors as Array<HTMLElement>;
+  if (typeof selectors === `string`) {
+    const elements = [ ...document.querySelectorAll(selectors) ]
+    return elements as Array<HTMLElement>
+  }
+  return [ selectors as HTMLElement ];
+}
+
+export const setHtml = (selectors: QueryOrElements, value: string | number) => {
+  const elements = resolveEls(selectors);
+  if (elements.length === 0) return;
+  if (typeof value === `number`) {
     value = value.toString();
   }
   for (const element of elements) {
-    //eslint-disable-next-line functional/immutable-data
     element.innerHTML = value;
   }
 };
 
-export const setText = (selectors: string, value: string | number) => {
-  const elements = Array.from(document.querySelectorAll(selectors));
-  if (!elements) return;
-  if (typeof value === 'number') {
+export const setText = (selectors: QueryOrElements, value: string | number) => {
+  const elements = resolveEls(selectors);
+  if (elements.length === 0) return;
+  if (typeof value === `number`) {
     value = value.toString();
   }
   for (const element of elements) {
-    //eslint-disable-next-line functional/immutable-data
     element.textContent = value;
   }
 };
 
-export const el = (selectors: string) => ({
-  text: (value: string | number) => setText(selectors, value),
-  html: (value: string | number) => setHtml(selectors, value),
-  cssDisplay: (value: string) => setCssDisplay(selectors, value),
-  cssClass: (value: boolean, cssClass: string) => setCssClass(selectors, value, cssClass)
-});
+export const elRequery = (selectors: string) => {
+  ({
+    text: (value: string | number) => { setText(selectors, value); },
+    html: (value: string | number) => { setHtml(selectors, value); },
+    cssDisplay: (value: string) => { setCssDisplay(selectors, value); },
+    cssClass: (value: boolean, cssClass: string) => { setCssClass(selectors, value, cssClass); },
+    cssToggle: (cssClass: string) => { setCssToggle(selectors, cssClass); },
+    el: () => resolveEl(selectors),
+    els: () => resolveEls(selectors)
+  });
+}
+
+export const el = (selectors: QueryOrElements) => {
+  const elements = resolveEls(selectors);
+  return {
+    text: (value: string | number) => { setText(elements, value); },
+    html: (value: string | number) => { setHtml(elements, value); },
+    cssDisplay: (value: string) => { setCssDisplay(elements, value); },
+    cssClass: (value: boolean, cssClass: string) => { setCssClass(elements, value, cssClass); },
+    cssToggle: (cssClass: string) => { setCssToggle(elements, cssClass); },
+    el: () => elements[ 0 ],
+    els: () => elements
+  }
+}
