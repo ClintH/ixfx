@@ -1,16 +1,48 @@
 /** Utilities for working with immutable objects */
 
 import { untilMatch } from "./Text.js"
+import JSON5 from 'json5';
+import { isPlainObjectOrPrimitive } from "./Util.js";
+/**
+ * Return _true_ if `a` and `b` ought to be considered equal
+ * at a given path
+ */
 export type IsEqualContext<V> = (a: V, b: V, path: string) => boolean
 
-export const isEqualContextString: IsEqualContext<any> = (a: any, b: any, path: string): boolean => {
-  return JSON.stringify(a) === JSON.stringify(b);
+/**
+ * Returns _true_ if `a` and `b are equal based on their JSON representations.
+ * `path` is ignored.
+ * @param a 
+ * @param b 
+ * @param path 
+ * @returns 
+ */
+export const isEqualContextString: IsEqualContext<any> = (a: any, b: any, _path: string): boolean => {
+  // if (!isPlainObject(a)) throw new Error(`Parameter 'a' is not a plain object`);
+  // if (!isPlainObject(b)) throw new Error(`Parameter 'b' is not a plain object`);
+
+  return JSON5.stringify(a) === JSON5.stringify(b);
 }
 
 export type Change<V> = {
   path: string
   previous?: V
   value: V
+}
+
+export type CompareDataOptions<V> = {
+  /**
+   * Comparison function for values. By default uses
+   * JSON.stringify() to compare by value.
+   */
+  eq: IsEqualContext<V>
+  /**
+   * If true, inherited fields are also compared.
+   * This is necessary for events, for example.
+   * 
+   * Only plain-object values are used, the other keys are ignored.
+   */
+  deepEntries: boolean
 }
 
 /**
@@ -21,20 +53,34 @@ export type Change<V> = {
  * @param pathPrefix 
  * @returns 
  */
-export const compareData = <V extends Record<string, any>>(a: V, b: V, pathPrefix = ``, eq = isEqualContextString): Array<Change<any>> => {
-  const entries = Object.entries(a);
+export const compareData = <V extends Record<string, any>>(a: V, b: V, pathPrefix = ``, options: Partial<CompareDataOptions<V>> = {}): Array<Change<any>> => {
+
+  const deepProbe = options.deepEntries ?? false;
+  const eq = options.eq ?? isEqualContextString;
   const changes: Array<Change<any>> = [];
+
+  let entries: Array<[ key: string, value: any ]> = [];
+  if (deepProbe) {
+    for (const field in a) {
+      const value = (a as any)[ field ];
+      if (isPlainObjectOrPrimitive(value as unknown)) {
+        entries.push([ field, value ]);
+      }
+    }
+  } else {
+    entries = Object.entries(a);
+  }
   const isArray = Array.isArray(a);
+
   for (const [ key, valueA ] of entries) {
     if (typeof valueA === `object`) {
-      changes.push(...compareData(valueA, b[ key ], key + `.`, eq));
+      changes.push(...compareData(valueA, b[ key ], key + `.`, options));
     } else {
       const valueB = b[ key ];
       const sub = isArray ? untilMatch(pathPrefix, `.`, { fromEnd: true }) + `[${ key }]` : pathPrefix + key;
 
       if (!eq(valueA, valueB, sub)) {
         changes.push({ path: sub, previous: valueA, value: valueB });
-
       }
     }
   }
@@ -127,14 +173,11 @@ export const getField = <V>(o: Record<string, any>, path: string): V => {
 }
 
 const getFieldImpl = <V>(o: Record<string, any>, split: Array<string>): V => {
-  // console.log(`getFieldImpl split: ${ JSON.stringify(split) } len: ${ split.length } o: ${ JSON.stringify(o) }`);
   if (split.length === 0) throw new Error(`Path run out`);
   const start = split.shift();
-  //console.log(`  start: ${ start }`);
   if (!start) throw new Error(`Unexpected empty split`);
   const arrayStart = start.indexOf(`[`);
   const arrayEnd = start.indexOf(`]`, arrayStart);
-  //console.log(`   arrayStart: ${ arrayStart } arrayEnd: ${ arrayEnd }`);
   if (arrayStart > 0 && arrayEnd > arrayStart) {
     // Only look for 'field[X]', not '[X]', which is caught later...
     const field = start.slice(0, arrayStart);
@@ -258,8 +301,6 @@ export const getPaths = (o: object | null): ReadonlyArray<string> => {
   }
   // Probe a given object, with a set of initial paths and prefix
   const probe = (o: object, initialPaths: ReadonlyArray<string>, prefix: string): ReadonlyArray<string> => {
-    //console.log(`probe prefix: ${ prefix } o: ${ JSON.stringify(o) } initial: ${ JSON.stringify(initialPaths) }`);
-
     if (typeof o !== `object`) {
       return [ ...initialPaths, prefix ];
     } else if (prefix.length > 0) {
@@ -267,9 +308,7 @@ export const getPaths = (o: object | null): ReadonlyArray<string> => {
     }
 
     const prefixToUse = (prefix.length > 0) ? prefix + `.` : prefix;
-
     const keys = Object.keys(o);
-
     const x = keys.map(key => {
       const value = (o as any)[ key ];
       const keyName = Array.isArray(o) ? untilMatch(prefixToUse, `.`, { fromEnd: true }) + `[${ key }]` : prefixToUse + key
@@ -282,6 +321,11 @@ export const getPaths = (o: object | null): ReadonlyArray<string> => {
   return probe(o, [], ``);
 };
 
+/**
+ * Returns a representation of the object
+ * @param o 
+ * @returns 
+ */
 export const getPathsAndData = (o: object): Array<Change<any>> => {
   if (o === null) return [];
   if (o === undefined) return [];
