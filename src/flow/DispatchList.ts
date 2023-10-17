@@ -15,6 +15,20 @@ export class DispatchList<V> {
     this.#handlers = [];
   }
 
+  /**
+   * Returns _true_ if list is empty
+   * @returns 
+   */
+  isEmpty() {
+    return this.#handlers.length === 0;
+  }
+
+  /**
+   * Adds a handler
+   * @param handler 
+   * @param options 
+   * @returns 
+   */
   add(handler: Dispatch<V>, options: { once?: boolean } = {}): string {
     this.#counter++;
     const once = options.once ?? false;
