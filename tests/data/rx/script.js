@@ -3,35 +3,70 @@ import * as Flow from '../../../dist/flow.js';
 import { Elapsed } from '../../../dist/flow.js';
 import * as Generators from '../../../dist/generators.js';
 
-const generateRect = () => ({width:window.innerWidth, height:window.innerHeight});
-const width = Reactive.number(10);
-
-const rxWindow = Reactive.win();
-const size = Reactive.transform(rxWindow.size, (size) => size.width*size.height);
-
-const pointer = Reactive.event(window, `pointermove`, {
-  process:(event) => {
-    if (event === undefined) return 0;
-    return {x:event.x, y:event.y}
-  }
-});
-
-size.on(size => console.log(size));
-
-const test = {
-  rectangle: {
-    width: width,
-    height: 20,
-    left: Reactive.field(pointer,`x`),
-    top: Reactive.field(pointer, `y`)
-  }
+function testGenerator() {
+  const time = Flow.interval(() => Math.random(), 1000);
+  const r = Reactive.generator(time);
+  console.log(`Pre subscribe`);
+  setTimeout(() => {
+    console.log(`about to subscribe`)
+    r.on(v => {
+      console.log(v.value);
+    })
+  }, 5000); 
 }
+//testGenerator();
 
-const x = Reactive.prepare(test);
-console.log(x);
-x.on(v => {
-  console.log(`New rectangle: ${JSON.stringify(x)}`);
-})
+function testDispose() {
+  const r = Reactive.number(10);
+  const rEvent = Reactive.event(document, `pointermove`);
+
+  r.on(v => {
+    console.log(v);
+  });
+  rEvent.on(v => {
+    console.log(v);
+  })
+  setInterval(() => {
+    if (r.isDisposed) return;
+    r.set(Math.random());
+  }, 1000);
+
+  setTimeout(() => {
+    r.dispose(`r disposed`);
+    rEvent.dispose(`event dispose`);
+  }, 5000)
+}
+testDispose();
+
+// const generateRect = () => ({width:window.innerWidth, height:window.innerHeight});
+// const width = Reactive.number(10);
+
+// const rxWindow = Reactive.win();
+// const size = Reactive.transform(rxWindow.size, (size) => size.width*size.height);
+
+// const pointer = Reactive.event(window, `pointermove`, {
+//   process:(event) => {
+//     if (event === undefined) return 0;
+//     return {x:event.x, y:event.y}
+//   }
+// });
+
+// size.on(size => console.log(size));
+
+// const test = {
+//   rectangle: {
+//     width: width,
+//     height: 20,
+//     left: Reactive.field(pointer,`x`),
+//     top: Reactive.field(pointer, `y`)
+//   }
+// }
+
+// const x = Reactive.prepare(test);
+// console.log(x);
+// x.on(v => {
+//   console.log(`New rectangle: ${JSON.stringify(x)}`);
+// })
 
 // setInterval(() => {
 //   width.set(Math.random());

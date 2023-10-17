@@ -6,8 +6,36 @@ import {
   ifNaN,
   relativeDifference,
   comparerInverse,
-  toStringDefault
+  toStringDefault,
+  isPlainObject,
+  isPlainObjectOrPrimitive
 } from '../Util.js';
+
+test('isPlainObjectOrPrimitive', t => {
+  t.true(isPlainObjectOrPrimitive(`hello`));
+  t.true(isPlainObjectOrPrimitive(10));
+  t.true(isPlainObjectOrPrimitive({ hello: `there` }));
+  t.false(isPlainObjectOrPrimitive(undefined));
+  t.false(isPlainObjectOrPrimitive(null));
+  t.false(isPlainObjectOrPrimitive(Number));
+  if (typeof window !== `undefined`) {
+    t.false(isPlainObjectOrPrimitive(window));
+  }
+
+});
+
+test('isPlainObject', t => {
+  t.false(isPlainObject(undefined));
+  t.false(isPlainObject(null));
+  t.false(isPlainObject(`hello`));
+  t.false(isPlainObject(10));
+  t.false(isPlainObject(Number));
+  if (typeof window !== `undefined`) {
+    t.false(isPlainObject(window));
+  }
+  t.true(isPlainObject({ hello: `there` }));
+
+});
 
 test('relativeDifference', (t) => {
   const rel = relativeDifference(100);
