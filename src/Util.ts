@@ -11,6 +11,38 @@ export type FixedLengthArray<T extends Array<any>> =
 export const isFunction = (object: unknown): object is (...args: Array<any>) => any => object instanceof Function;
 
 /**
+ * Returns _true_ if `value` is a plain object
+ * 
+ * ```js
+ * isPlainObject(`text`); // false
+ * isPlainObject(document); // false
+ * isPlainObject({ hello: `there` }); // true
+ * ```
+ * @param value 
+ * @returns 
+ */
+export const isPlainObject = (value: unknown) => {
+  if (typeof value !== `object` || value === null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
+
+/**
+ * Returns _true_ if `value` is primitive value or plain object
+ * @param value 
+ * @returns 
+ */
+export const isPlainObjectOrPrimitive = (value: unknown) => {
+  const t = typeof value;
+  if (t === `symbol`) return false;
+  if (t === `function`) return false;
+  if (t === `bigint`) return true;
+  if (t === `number`) return true;
+  if (t === `string`) return true;
+  if (t === `boolean`) return true;
+  return isPlainObject(value);
+}
+/**
  * Returns `fallback` if `v` is NaN, otherwise returns `v`.
  *
  * Throws if `v` is not a number type.
@@ -54,17 +86,6 @@ export const isPowerOfTwo = (x: number) => Math.log2(x) % 1 === 0;
  */
 export const relativeDifference = (initial: number) => (v: number) =>
   v / initial;
-
-// try {
-//   if (typeof window !== `undefined`) {
-//     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-//     (window as any).ixfx = {...(window as any).ixfx, clamp, clampIndex, flip, interpolate, interpolateAngle, proportion, relativeDifference, scale, scalePercent, wrap, wrapInteger, wrapRange};
-//   }
-// } catch { /* no-op */ }
-
-
-
-
 
 /**
  * Rounds `v` up to the nearest multiple of `multiple`
