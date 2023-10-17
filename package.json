@@ -27,6 +27,7 @@
     "./flow.js": "./dist/flow.js",
     "./geometry.js": "./dist/geometry.js",
     "./generators.js": "./dist/generators.js",
+    "./global.js": "./dist/global.js",
     "./io.js": "./dist/io/js",
     "./keyValues.js": "./dist/keyValues.js",
     "./modulation.js": "./dist/modulation.js",

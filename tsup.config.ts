@@ -13,6 +13,7 @@ export default defineConfig({
     events: `./src/Events.ts`,
     flow: './src/flow/index.ts',
     forms: `./src/dom/Forms.ts`,
+    global: `./src/MakeGlobal.ts`,
     generators: `./src/Generators.ts`,
     geometry: `./src/geometry/index.ts`,
     io: './src/io/index.ts',

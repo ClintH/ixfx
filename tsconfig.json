@@ -15,7 +15,8 @@
     },
     "lib": [
       "esnext",
-      "dom"
+      "dom",
+      "DOM.Iterable"
     ],
     "types": [
       "@types/web-bluetooth",
