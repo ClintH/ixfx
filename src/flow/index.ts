@@ -9,6 +9,7 @@ export type AsyncPromiseOrGenerator<V> =
   | Iterable<V>;
 
 export * as Elapsed from './Elapsed.js';
+export * from './DispatchList.js';
 
 import { throwNumberTest } from '../Guards.js';
 import { sleep } from './Sleep.js';
