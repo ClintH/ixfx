@@ -1,12 +1,4 @@
 import { throwIntegerTest, throwNumberTest } from './Guards.js';
-
-
-
-
-
-
-
-
 export { pingPong, pingPongPercent } from './modulation/PingPong.js';
 export * as Async from './IterableAsync.js';
 export * as Sync from './IterableSync.js';
