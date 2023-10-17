@@ -40,6 +40,14 @@ export class QueueMutable<V> implements IQueueMutable<V> {
     this.data = [];
   }
 
+  /**
+   * Return a copy of the array
+   * @returns 
+   */
+  toArray() {
+    return [ ...this.data ];
+  }
+
   enqueue(...toAdd: ReadonlyArray<V>): number {
     /* eslint-disable-next-line functional/immutable-data */
     this.data = enqueue(this.opts, this.data, ...toAdd);
