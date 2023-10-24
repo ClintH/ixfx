@@ -19,8 +19,6 @@ export * from './Clamp.js';
 export * from './Scale.js';
 export * from './Flip.js';
 
-// export * as Pipes from './Pipe.js'
-// export * as Pipez from './Pipez.js';
 export * as Reactive from './Reactive.js';
 export * as Chains from './Chain.js';
 export * as Graphs from './graphs/index.js'
