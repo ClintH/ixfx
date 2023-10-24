@@ -1,5 +1,29 @@
 A rough changelog between NPM releases
 
+# 0.14.2 24.10.23
+
+* Bug fixes with Plot2 and SceneGraph, StringWriteBuffer
+* Immutable.getPaths has option to only return leaf fields
+
+* Renamed Chains.chain to Chains.run
+* Added Chains.prepare to decouple data source and chain
+
+# 0.14.0 17.10.23
+
+* Util.isPlainObjectOrPrimitive: returns false if it's something like 'window' or 'document'
+* Util.isPlainObject: returns true if it's a simple {...} object
+* Improvements to Reactive
+* IQueueMutable.toArray() to copy contents
+* Dom.elRequery: Dynamic wrapper that re-queries matching element(s)
+* Immutable.isEqualContextString: use JSON5 rather than JSON.toString
+* Immutable.compareData has open to 'deep probe'. This picks up fields which are not iterable. Eg. for things on PointerEvents.
+* Unit testings: Arrays.flatten, Arrays.without, Modulation.jitter
+* Geometry.Point: improve parameter guarding for Points.angle and Points.distance
+* Data.Pool: ability to mutate resource-associated data
+* Bipolar.random & Bipolar.randomSource
+* Moved Arrays.compareValueEqual. compareValues to Iterables
+* Vector.fromRadians, Vector.toRadians
+
 # 0.12.1 17.09.23
 
 * Dom.DataDisplay: easily display state
