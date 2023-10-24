@@ -146,6 +146,27 @@ export const scale = (inputValue: number, inMin: number, inMax: number) => {
 }
 
 /**
+ * Scale a number, clamped to -1..1 range
+ * ```js
+ * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
+ * // Scale 100 on 0..100 scale
+ * Bipolar.scale(100, 0, 100); // 1
+ * Bipolar.scale(50, 0, 100);  // 0
+ * Bipolar.scale(0, 0, 100);   // -1
+ * ```
+ * 
+ * Return value is clamped.
+ * @param inputValue Value to scale
+ * @param inMin Minimum of scale
+ * @param inMax Maximum of scale
+ * @returns Bipolar value on -1..1 scale
+ */
+export const scaleClamped = (inputValue: number, inMin: number, inMax: number) => {
+  return numberScaler(inMin, inMax, -1, 1)(inputValue);
+}
+
+/**
  * Source for random bipolar values
  * ```js
  * const r = Bipolar.randomSource();
