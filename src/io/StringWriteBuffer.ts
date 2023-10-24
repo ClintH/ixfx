@@ -61,7 +61,9 @@ export class StringWriteBuffer {
     opts: Opts = {}
   ) {
     this.chunkSize = opts.chunkSize ?? -1;
-    this.writer = continuously(this.onWrite, opts.interval ?? 10);
+    this.writer = continuously(async () => {
+      await this.onWrite()
+    }, opts.interval ?? 10);
   }
 
   /**
@@ -100,7 +102,7 @@ export class StringWriteBuffer {
   }
 
   private createWritable() {
-    //eslint-disable-next-line @typescript-eslint/no-this-alias
+    // eslint-disable-next-line unicorn/no-this-assignment,@typescript-eslint/no-this-alias
     const b = this;
     return new WritableStream<string>({
       write(chunk) {
@@ -147,15 +149,15 @@ export class StringWriteBuffer {
    * Longer strings are automatically chunked up according to the buffer's settings.
    *
    * Throws an error if {@link close} has been called.
-   * @param str
+   * @param stringToQueue
    */
-  add(str: string) {
+  add(stringToQueue: string) {
     if (this.closed) throw new Error(`Buffer closed`);
     // Add whole string or chunked string
     if (this.chunkSize > 0) {
-      this.queue.enqueue(...splitByLength(str, this.chunkSize));
+      this.queue.enqueue(...splitByLength(stringToQueue, this.chunkSize));
     } else {
-      this.queue.enqueue(str);
+      this.queue.enqueue(stringToQueue);
     }
 
     // Run continuously loop if it's not already running
