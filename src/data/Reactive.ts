@@ -292,6 +292,16 @@ export function event<V extends Record<string, any>, EventName extends string>(t
   // };
 }
 
+export function manual<V>(): Reactive<V> & ReactiveWritable<V> {
+  const events = initEvent<V>();
+  return {
+    set(value: V) {
+      events.notify(value);
+    },
+    on: events.on
+  };
+}
+
 export type ObjectOptions<V> = {
   deepEntries: boolean
   eq: Immutable.IsEqualContext<V>
