@@ -36,14 +36,15 @@ const reconnect = async () => {
     // range.
     const abortController = new AbortController();
     await device.watchAdvertisements({ signal: abortController.signal });
-    device.addEventListener(`advertisementreceived`, async (evt) => {
-      console.log(evt);
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    device.addEventListener(`advertisementreceived`, async (event) => {
+      console.log(event);
       // Stop the scan to conserve power on mobile devices.
       abortController.abort();
 
       // At this point, we know that the device is in range, and we can attempt
       // to connect to it.
-      await evt.device.gatt?.connect();
+      await event.device.gatt?.connect();
       console.log(`Connected!`);
     });
   }
@@ -83,11 +84,11 @@ export class BleDevice extends SimpleEventEmitter<
         initial: `ready`,
       }
     );
-    this.states.addEventListener(`change`, (evt) => {
-      this.fireEvent(`change`, evt);
-      this.verbose(`${evt.priorState} -> ${evt.newState}`);
+    this.states.addEventListener(`change`, (event) => {
+      this.fireEvent(`change`, event);
+      this.verbose(`${ event.priorState } -> ${ event.newState }`);
 
-      if (evt.priorState === `connected`) {
+      if (event.priorState === `connected`) {
         // Clear out buffers
         this.rxBuffer.clear();
         this.txBuffer.clear();
@@ -100,7 +101,7 @@ export class BleDevice extends SimpleEventEmitter<
       this.states.state = `closed`;
     });
 
-    this.verbose(`ctor ${device.name} ${device.id}`);
+    this.verbose(`ctor ${ device.name } ${ device.id }`);
   }
 
   get isConnected(): boolean {
@@ -113,21 +114,21 @@ export class BleDevice extends SimpleEventEmitter<
 
   write(txt: string) {
     if (this.states.state !== `connected`) {
-      throw new Error(`Cannot write while state is ${this.states.state}`);
+      throw new Error(`Cannot write while state is ${ this.states.state }`);
     }
     this.txBuffer.add(txt);
   }
 
   private async writeInternal(txt: string) {
-    this.verbose(`writeInternal ${txt}`);
+    this.verbose(`writeInternal ${ txt }`);
     const tx = this.tx;
     if (tx === undefined) {
       throw new Error(`Unexpectedly without tx characteristic`);
     }
     try {
       await tx.writeValue(this.codec.toBuffer(txt));
-    } catch (ex: unknown) {
-      this.warn(ex);
+    } catch (error: unknown) {
+      this.warn(error);
     }
   }
 
@@ -147,6 +148,7 @@ export class BleDevice extends SimpleEventEmitter<
 
     await retry(
       async () => {
+        this.verbose(`connect.retry`);
         const server = await gatt.connect();
         this.verbose(`Getting primary service`);
         const service = await server.getPrimaryService(this.config.service);
@@ -158,8 +160,7 @@ export class BleDevice extends SimpleEventEmitter<
           this.config.txGattCharacteristic
         );
 
-        rx.addEventListener(`characteristicvaluechanged`, (evt) =>
-          this.onRx(evt)
+        rx.addEventListener(`characteristicvaluechanged`, (event) => { this.onRx(event); }
         );
         this.rx = rx;
         this.tx = tx;
@@ -176,45 +177,45 @@ export class BleDevice extends SimpleEventEmitter<
     );
   }
 
-  private onRx(evt: Event) {
+  private onRx(event: Event) {
     const rx = this.rx;
     if (rx === undefined) return;
 
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const view = (evt.target as any).value as DataView;
+    const view = (event.target as any).value as DataView;
     if (view === undefined) return;
 
     //eslint-disable-next-line functional/no-let
-    let str = this.codec.fromBuffer(view.buffer);
+    let string_ = this.codec.fromBuffer(view.buffer);
 
     // Check for flow control chars
-    const plzStop = indexOfCharCode(str, 19);
-    const plzStart = indexOfCharCode(str, 17);
+    const plzStop = indexOfCharCode(string_, 19);
+    const plzStart = indexOfCharCode(string_, 17);
 
     // Remove if found
     if (plzStart && plzStop < plzStart) {
       this.verbose(`Tx plz start`);
-      str = omitChars(str, plzStart, 1);
+      string_ = omitChars(string_, plzStart, 1);
       this.txBuffer.paused = false;
     }
     if (plzStop && plzStop > plzStart) {
       this.verbose(`Tx plz stop`);
-      str = omitChars(str, plzStop, 1);
+      string_ = omitChars(string_, plzStop, 1);
       this.txBuffer.paused = true;
     }
 
-    this.rxBuffer.add(str);
+    this.rxBuffer.add(string_);
   }
 
   protected verbose(m: string) {
-    if (this.verboseLogging) console.info(`${this.config.name} `, m);
+    if (this.verboseLogging) console.info(`${ this.config.name }`, m);
   }
 
   protected log(m: string) {
-    console.log(`${this.config.name} `, m);
+    console.log(`${ this.config.name }`, m);
   }
 
   protected warn(m: unknown) {
-    console.warn(`${this.config.name} `, m);
+    console.warn(`${ this.config.name }`, m);
   }
 }

@@ -6,7 +6,7 @@ import { string as randomString } from '../Random.js';
 import { waitFor } from '../flow/WaitFor.js';
 import {
   EspruinoSerialDevice,
-  type EspruinoSerialDeviceOpts,
+
 } from './EspruinoSerialDevice.js';
 import type {
   GenericStateTransitions,
@@ -14,8 +14,8 @@ import type {
   IoEvents,
 } from './index.js';
 
-export { EspruinoBleDevice, EspruinoSerialDevice };
-export type { EspruinoSerialDeviceOpts };
+
+
 
 export type EspruinoStates =
   | `ready`
@@ -23,7 +23,7 @@ export type EspruinoStates =
   | `connected`
   | `closed`
   | `closing`
-  | `connecting`;
+  ;
 
 /**
  * Options for device
@@ -78,7 +78,7 @@ export type EspruinoBleOpts = {
   /**
    * If specified, these filtering options are used instead
    */
-  readonly filters?: readonly BluetoothLEScanFilter[];
+  readonly filters?: ReadonlyArray<BluetoothLEScanFilter>;
 };
 
 /**
@@ -114,7 +114,7 @@ export const puck = async (opts: EspruinoBleOpts = {}) => {
 
   const device = await navigator.bluetooth.requestDevice({
     filters: getFilters(opts),
-    optionalServices: [NordicDefaults.service],
+    optionalServices: [ NordicDefaults.service ],
   });
 
   console.log(device.name);
@@ -188,7 +188,7 @@ export const serial = async (
  */
 const getFilters = (opts: EspruinoBleOpts) => {
   //eslint-disable-next-line functional/no-let
-  const filters: BluetoothLEScanFilter[] = [];
+  const filters: Array<BluetoothLEScanFilter> = [];
 
   if (opts.filters) {
     //eslint-disable-next-line functional/immutable-data
@@ -197,7 +197,7 @@ const getFilters = (opts: EspruinoBleOpts) => {
     // Name filter
     //eslint-disable-next-line functional/immutable-data
     filters.push({ name: opts.name });
-    console.info(`Filtering Bluetooth devices by name '${opts.name}'`);
+    console.info(`Filtering Bluetooth devices by name '${ opts.name }'`);
   } else {
     // Default filter
     //eslint-disable-next-line functional/immutable-data
@@ -239,9 +239,9 @@ const getFilters = (opts: EspruinoBleOpts) => {
 export const connectBle = async (opts: EspruinoBleOpts = {}) => {
   const device = await navigator.bluetooth.requestDevice({
     filters: getFilters(opts),
-    optionalServices: [NordicDefaults.service],
+    optionalServices: [ NordicDefaults.service ],
   });
-  const d = new EspruinoBleDevice(device, { name: `Espruino` });
+  const d = new EspruinoBleDevice(device, { name: `Espruino`, ...opts });
   await d.connect();
   return d;
 };
@@ -252,7 +252,7 @@ export type Events = IoEvents<GenericStateTransitions>;
  *
  * This base interface is implemented by {@link EspruinoBleDevice} and {@link EspruinoSerialDevice}.
  */
-export interface EspruinoDevice extends ISimpleEventEmitter<Events> {
+export type EspruinoDevice = {
   /**
    * Sends some code to be executed on the Espruino. The result
    * is packaged into JSON and sent back to your code. An exception is
@@ -282,7 +282,7 @@ export interface EspruinoDevice extends ISimpleEventEmitter<Events> {
   eval(
     code: string,
     opts?: EvalOpts,
-    warn?: (msg: string) => void
+    warn?: (message: string) => void
   ): Promise<string>;
 
   /**
@@ -323,7 +323,7 @@ export interface EspruinoDevice extends ISimpleEventEmitter<Events> {
   get evalTimeoutMs(): number;
 
   get isConnected(): boolean;
-}
+} & ISimpleEventEmitter<Events>
 
 /**
  * Evaluates some code on an Espruino device.
@@ -361,7 +361,7 @@ export const deviceEval = async (
   const assumeExclusive = opts.assumeExclusive ?? true;
 
   if (typeof code !== `string`) {
-    throw new Error(`code parameter should be a string`);
+    throw new TypeError(`code parameter should be a string`);
   }
 
   return new Promise((resolve, reject) => {
@@ -375,7 +375,7 @@ export const deviceEval = async (
 
         // Prefixed with angled bracket sometimes?
         if (cleaned.startsWith(`>{`) && cleaned.endsWith(`}`)) {
-          cleaned = cleaned.substring(1);
+          cleaned = cleaned.slice(1);
         }
 
         // Parse reply, expecting JSON.
@@ -389,12 +389,12 @@ export const deviceEval = async (
               resolve(dd.result);
             }
           } else {
-            warn(`Expected reply ${id}, got ${dd.reply}`);
+            warn(`Expected reply ${ id }, got ${ dd.reply }`);
           }
         } else {
-          warn(`Expected packet, missing 'reply' field. Got: ${d.data}`);
+          warn(`Expected packet, missing 'reply' field. Got: ${ d.data }`);
         }
-      } catch (ex: unknown) {
+      } catch (error: unknown) {
         // If there was a syntax error, response won't be JSON
         if (assumeExclusive) {
           // Fail with unexpected reply as the message
@@ -402,14 +402,14 @@ export const deviceEval = async (
         } else {
           // Unexpected reply, but we cannot be sure if it's in response to eval or
           // some other code running on board. So just warn and eventually timeout
-          warn(ex as string);
+          warn(error as string);
         }
       }
     };
 
-    const onStateChange = (evt: StateChangeEvent<GenericStateTransitions>) => {
-      if (evt.newState !== `connected`) {
-        done(`State changed to '${evt.newState}', aborting`);
+    const onStateChange = (event: StateChangeEvent<GenericStateTransitions>) => {
+      if (event.newState !== `connected`) {
+        done(`State changed to '${ event.newState }', aborting`);
       }
     };
 
@@ -429,8 +429,11 @@ export const deviceEval = async (
       }
     );
 
-    const src = `\x10${evalReplyPrefix}(JSON.stringify({reply:"${id}", result:JSON.stringify(${code})}))\n`;
-    if (debug) warn(src);
-    device.write(src);
+    const source = `\u0010${ evalReplyPrefix }(JSON.stringify({reply:"${ id }", result:JSON.stringify(${ code })}))\n`;
+    if (debug) warn(source);
+    device.write(source);
   });
 };
+
+export { type EspruinoSerialDeviceOpts, EspruinoSerialDevice } from './EspruinoSerialDevice.js';
+export { EspruinoBleDevice } from './EspruinoBleDevice.js';

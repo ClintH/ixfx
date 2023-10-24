@@ -73,9 +73,10 @@ export class EspruinoBleDevice extends NordicBleDevice {
    *
    * @param code Code to send. A new line is added automatically.
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async writeScript(code: string) {
-    this.write(`\x03\x10reset();\n`);
-    this.write(`\x10${code}\n`);
+    this.write(`\u0003\u0010reset();\n`);
+    this.write(`\u0010${ code }\n`);
   }
 
   /**
@@ -107,11 +108,11 @@ export class EspruinoBleDevice extends NordicBleDevice {
   async eval(
     code: string,
     opts: EvalOpts = {},
-    warn?: (msg: string) => void
+    warn?: (message: string) => void
   ): Promise<string> {
     const debug = opts.debug ?? false;
-    const warnCb = warn ?? ((m) => this.warn(m));
-    return deviceEval(code, opts, this, `Bluetooth.println`, debug, warnCb);
+    const warnCallback = warn ?? ((m) => { this.warn(m); });
+    return deviceEval(code, opts, this, `Bluetooth.println`, debug, warnCallback);
   }
   /*
     const timeoutMs = opts.timeoutMs ?? this.evalTimeoutMs;
