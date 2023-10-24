@@ -31,6 +31,11 @@ export type TrackedValueOpts = {
    * Automatically implies storeIntermediate
    */
   readonly sampleLimit?: number;
+
+  /**
+   * If true
+   */
+  readonly debug?: boolean
 };
 
 /**
