@@ -51,7 +51,7 @@ export type PathOpts = {
  * @param p
  * @returns
  */
-export function isTreeNode(p: TreeNode | unknown): p is TreeNode {
+export function isTreeNode(p: TreeNode | object): p is TreeNode {
   nullUndef(p, `p`);
 
   if ((p as TreeNode).children === undefined) return false;
