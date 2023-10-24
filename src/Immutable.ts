@@ -285,25 +285,30 @@ export type RemapObjectPropertyType<OriginalType, PropertyType> = {
  *  gyro:  {x: 4, y: 5, z: 6}
  * };
  * const paths = getFieldPaths(d);
- * // Yields [ `accel.x`, `accel.y`,`accel.z`,`gyro.x`,`gyro.y`,`gyro.z` ]
+ * // Yields [ `accel`, `gyro`, `accel.x`, `accel.y`,`accel.z`,`gyro.x`,`gyro.y`,`gyro.z` ]
  * ```
  *
  * Use {@link getFieldByPath} to fetch data by this 'path' string.
  *
  * If object is _null_, and empty array is returned.
+ * 
+ * If `onlyLeaves` is _true_, only leaf nodes are included. _False_ by default.
+ * If it was set to _true_, 'accel' and 'gyro' would not be included.
+ *
  * @param o
  * @returns
  */
-export const getPaths = (o: object | null): ReadonlyArray<string> => {
+export const getPaths = (o: object | null, onlyLeaves = false): ReadonlyArray<string> => {
   if (o === null) return [];
   if (typeof o !== `object`) {
     throw new TypeError(`Parameter 'o' should be an object. Got: ${ typeof o }`);
   }
+
   // Probe a given object, with a set of initial paths and prefix
   const probe = (o: object, initialPaths: ReadonlyArray<string>, prefix: string): ReadonlyArray<string> => {
     if (typeof o !== `object`) {
       return [ ...initialPaths, prefix ];
-    } else if (prefix.length > 0) {
+    } else if (prefix.length > 0 && !onlyLeaves) {
       initialPaths = [ ...initialPaths, prefix ];
     }
 

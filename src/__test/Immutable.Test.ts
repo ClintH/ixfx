@@ -67,6 +67,16 @@ test('getPaths', (t) => {
     `gyro.z`,
   ]);
 
+  const paths2 = getPaths(d, true);
+  arrayValuesEqual(t, paths2, [
+    `accel.x`,
+    `accel.y`,
+    `accel.z`,
+    `gyro.x`,
+    `gyro.y`,
+    `gyro.z`,
+  ]);
+
   // @ts-ignore
   t.throws(() => getPaths(undefined));
 
