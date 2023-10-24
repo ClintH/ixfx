@@ -19,12 +19,13 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
   }
 
   /**
-   * Reduces size of value store to `limit`. Returns
-   * number of remaining items
+   * Reduces size of value store to `limit`. 
+   * Returns number of remaining items
    * @param limit
    */
   trimStore(limit: number): number {
     if (limit >= this.values.length) return this.values.length;
+    // Index 0 will be the oldest
     this.values = this.values.slice(-limit);
     return this.values.length;
   }
