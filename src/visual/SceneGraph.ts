@@ -298,7 +298,7 @@ export abstract class Box {
    */
   layoutInvalidated(reason: string) {
     if (reason === undefined) debugger;
-    //this.debugLog(`layoutInvalidated ${ reason }`);
+    this.debugLog(`layoutInvalidated ${ reason }`);
     this._needsMeasuring = true;
     this._needsLayoutX = true;
     // TODO: Only set to true during measuring if it actually changes
@@ -632,6 +632,7 @@ export class CanvasBox extends Box {
   ) {
     super(parent, id);
     this.bounds = bounds;
+    this.debugLog(`CanvasBox ctor bounds: ${ JSON.stringify(bounds) }`);
   }
 
   static fromCanvas(canvasElement: HTMLCanvasElement): CanvasBox {
@@ -730,8 +731,7 @@ export class CanvasBox extends Box {
   }
 
   getBounds(): Rects.RectPositioned | undefined {
-    if (this.bounds === undefined && this._parent) return (this._parent as CanvasBox).bounds;
-    return this.bounds;
+    return this.bounds === undefined && this._parent ? (this._parent as CanvasBox).bounds : this.bounds;
   }
 
   /**
