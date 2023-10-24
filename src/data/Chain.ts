@@ -14,14 +14,27 @@ import { throwIntegerTest } from "../Guards.js";
 export type Gen<V> = Generator<V> | AsyncGenerator<V> | IterableIterator<V>;
 export type GenOrData<V> = Array<V> | Gen<V>;
 
-export type Chain<In, Out> = (input: GenOrData<In>) => AsyncGenerator<Out>;
+export type Link<In, Out> = (input: GenOrData<In>) => AsyncGenerator<Out>;
 
 export type GenFactoryNoInput<Out> = () => AsyncGenerator<Out>;
 
-export type ChainArguments<In, Out> = [
-  Chain<In, any> | GenOrData<In> | GenFactoryNoInput<Out>,
-  ...Array<Chain<any, any>>,
-  Chain<any, Out>
+/**
+ * An array of chain links where first one is a source
+ */
+export type LinksWithSource<In, Out> = [
+  Link<In, any> | GenOrData<In> | GenFactoryNoInput<In>,
+  ...Array<Link<any, any>>,
+  Link<any, Out>
+]
+
+
+/**
+ * An array of chain links without a source
+ */
+export type Links<In, Out> = [
+  Link<In, any>,
+  ...Array<Link<any, any>>,
+  Link<any, Out>
 ]
 
 /**
@@ -99,7 +112,7 @@ export type DelayOptions = {
  * @param options 
  * @returns 
  */
-export function delay<In>(options: DelayOptions): Chain<In, In> {
+export function delay<In>(options: DelayOptions): Link<In, In> {
   const before = intervalToMs(options.before, 0);
   const after = intervalToMs(options.after, 0);
 
@@ -119,7 +132,7 @@ export function delay<In>(options: DelayOptions): Chain<In, In> {
   return delay;
 }
 
-function isNoInput<Out>(c: Chain<any, any>): c is GenFactoryNoInput<Out> {
+function isNoInput<Out>(c: Link<any, any>): c is GenFactoryNoInput<Out> {
   if (`_allowNoInput` in c) return true;
   return false;
 }
@@ -154,7 +167,7 @@ export type LazyChain<In, Out> = {
 }
 
 export function lazy<In, Out>(): LazyChain<In, Out> {
-  const chained: Array<Chain<any, any>> = [];
+  const chained: Array<Link<any, any>> = [];
   let dataToUse: GenOrData<In> | undefined;
 
   const asGenerator = <V>(data?: GenOrData<In>) => {
@@ -290,7 +303,7 @@ export function lazy<In, Out>(): LazyChain<In, Out> {
  * @param rate 
  * @returns 
  */
-export function debounce<In>(rate: Interval): Chain<In, In> {
+export function debounce<In>(rate: Interval): Link<In, In> {
   const rateMs = intervalToMs(rate, 0);
 
   async function* debounce(input: GenOrData<In>): AsyncGenerator<In> {
@@ -312,7 +325,7 @@ export function debounce<In>(rate: Interval): Chain<In, In> {
  * @param duration 
  * @returns 
  */
-export function duration<In>(elapsed: Interval): Chain<In, In> {
+export function duration<In>(elapsed: Interval): Link<In, In> {
   const durationMs = intervalToMs(elapsed, 0);
 
   async function* duration(input: GenOrData<In>): AsyncGenerator<In> {
@@ -560,7 +573,7 @@ export async function addToArray<Out>(array: Array<Out>, valueToWrap: AsyncGener
  * @param input 
  * @returns 
  */
-export async function single<In, Out>(f: Chain<In, Out>, input: In): Promise<Out | undefined> {
+export async function single<In, Out>(f: Link<In, Out>, input: In): Promise<Out | undefined> {
   const iterator = await f([ input ]).next();
   return iterator.value as Out | undefined;
 }
@@ -578,7 +591,7 @@ export async function single<In, Out>(f: Chain<In, Out>, input: In): Promise<Out
  * @param flattener Function to flatten array of values to a single value
  * @returns 
  */
-export function flatten<In, Out>(flattener: (v: Array<In>) => Out): Chain<Array<In>, Out> {
+export function flatten<In, Out>(flattener: (v: Array<In>) => Out): Link<Array<In>, Out> {
   async function* flatten(input: GenOrData<Array<In>>): AsyncGenerator<Out> {
     input = resolveToGen(input);
     for await (const value of input) {
@@ -594,7 +607,7 @@ export function flatten<In, Out>(flattener: (v: Array<In>) => Out): Chain<Array<
  * @param transformer 
  * @returns 
  */
-export function transform<In, Out>(transformer: (v: In) => Out): Chain<In, Out> {
+export function transform<In, Out>(transformer: (v: In) => Out): Link<In, Out> {
   async function* transform(input: GenOrData<In>): AsyncGenerator<Out> {
     input = resolveToGen(input);
     for await (const value of input) {
@@ -739,7 +752,7 @@ export async function* synchronise(...sources: Array<GenOrData<any> | GenFactory
  * @param limit 
  * @returns 
  */
-export function take<In>(limit: number): Chain<In, In> {
+export function take<In>(limit: number): Link<In, In> {
   async function* take(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     let yielded = 0;
@@ -752,7 +765,7 @@ export function take<In>(limit: number): Chain<In, In> {
   return take;
 }
 
-const getName = (c: Chain<any, any>): string => {
+const getName = (c: Link<any, any>): string => {
   if (`_name` in c) {
     return c._name as string;
   } else {
@@ -767,7 +780,7 @@ const getName = (c: Chain<any, any>): string => {
  * @param limit 
  * @returns 
  */
-export function tally<In>(): Chain<In, number> {
+export function tally<In>(): Link<In, number> {
   async function* tally(input: GenOrData<In>): AsyncGenerator<number> {
     input = resolveToGen(input);
     let count = 0;
@@ -784,7 +797,7 @@ export function tally<In>(): Chain<In, number> {
  * Non-numeric data is filtered out
  * @returns 
  */
-export function min(): Chain<number, number> {
+export function min(): Link<number, number> {
   async function* min(input: GenOrData<number>): AsyncGenerator<number> {
     input = resolveToGen(input);
     let min = Number.MAX_SAFE_INTEGER;
@@ -804,7 +817,7 @@ export function min(): Chain<number, number> {
  * Non-numeric data is filtered out
  * @returns 
  */
-export function max(): Chain<number, number> {
+export function max(): Link<number, number> {
   async function* max(input: GenOrData<number>): AsyncGenerator<number> {
     input = resolveToGen(input);
     let max = Number.MIN_SAFE_INTEGER;
@@ -823,7 +836,7 @@ export function max(): Chain<number, number> {
  * Non-numeric values are filtered out.
  * @returns 
  */
-export function average(): Chain<number, number> {
+export function average(): Link<number, number> {
   async function* average(input: GenOrData<number>): AsyncGenerator<number> {
     input = resolveToGen(input);
     let total = 0;
@@ -844,7 +857,7 @@ export function average(): Chain<number, number> {
  * Non-numeric values are filtered out.
  * @returns 
  */
-export function total(): Chain<number, number> {
+export function total(): Link<number, number> {
   async function* average(input: GenOrData<number>): AsyncGenerator<number> {
     input = resolveToGen(input);
     let total = 0;
@@ -864,7 +877,7 @@ export function total(): Chain<number, number> {
  * @param returnRemainders If true (default) left over data that didn't make a full chunk is also returned
  * @returns 
  */
-export function chunk<In>(size: number, returnRemainders = true): Chain<In, Array<In>> {
+export function chunk<In>(size: number, returnRemainders = true): Link<In, Array<In>> {
   throwIntegerTest(size, `aboveZero`, `size`);
   async function* chunk(input: GenOrData<In>): AsyncGenerator<Array<In>> {
     input = resolveToGen(input);
@@ -890,7 +903,7 @@ export function chunk<In>(size: number, returnRemainders = true): Chain<In, Arra
  * @param predicate 
  * @returns 
  */
-export function filter<In>(predicate: (v: In) => boolean): Chain<In, In> {
+export function filter<In>(predicate: (v: In) => boolean): Link<In, In> {
   async function* filter(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     for await (const value of input) {
@@ -910,7 +923,7 @@ export function filter<In>(predicate: (v: In) => boolean): Chain<In, In> {
  * @param predicate 
  * @returns 
  */
-export function drop<In>(predicate: (v: In) => boolean): Chain<In, In> {
+export function drop<In>(predicate: (v: In) => boolean): Link<In, In> {
   async function* drop(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     for await (const value of input) {
@@ -924,12 +937,12 @@ export function drop<In>(predicate: (v: In) => boolean): Chain<In, In> {
 }
 
 /**
- * Chain functions together.
+ * Chain functions together. First argument is the source.
  * 
  * @example Process an array of strings. Transforming into
  * integers, and then filtering only even numbers.
  * ```js
- * const ch = Chains.chain(
+ * const ch = Chains.run(
  *  [ `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10` ],
  *  Chains.transform<string, number>(v => Number.parseInt(v)),
  *  Chains.filter(v => v % 2 === 0)
@@ -940,7 +953,7 @@ export function drop<In>(predicate: (v: In) => boolean): Chain<In, In> {
  * @param functions 
  * @returns 
  */
-export async function* chain<In, Out>(...functions: ChainArguments<In, Out>): AsyncGenerator<Out> {
+export async function* run<In, Out>(...functions: LinksWithSource<In, Out>): AsyncGenerator<Out> {
   let input: Gen<In> | undefined;
   for (const fnOrData of functions) {
     if (typeof fnOrData === `function`) {
@@ -955,3 +968,25 @@ export async function* chain<In, Out>(...functions: ChainArguments<In, Out>): As
   }
 }
 
+/**
+ * Prepare a chain, allowing you to provide a source at execution time.
+ * ```js
+ * const chain = Chains.prepare(
+ *  Chains.transform<string,number>( v => number.parseInt(v) ),
+ *  Chains.filter<number>(v => v % 2 === 0)
+ * );
+ * 
+ * // Run it with provided source
+ * for await (const v of chain([`1`, `2`, `3`])) {
+ * 
+ * }
+ * ```
+ * @param functions 
+ * @returns 
+ */
+export function prepare<In, Out>(...functions: Links<In, Out>) {
+  const r = (source: GenOrData<In> | GenFactoryNoInput<Out>) => {
+    return run(source, ...functions);
+  }
+  return r;
+}
