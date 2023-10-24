@@ -100,7 +100,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * @param p Point
    */
   computeResults(
-    p: Array<TimestampedObject<Points.Point>>
+    _p: Array<TimestampedObject<Points.Point>>
   ): PointTrackerResults {
     const currentLast = this.last;
 
@@ -181,7 +181,8 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * Returns distance from latest point to initial point.
    * If there are less than two points, zero is returned.
    *
-   * This is the direct distance, not the accumulated length.
+   * This is the direct distance from initial to last,
+   * not the accumulated length.
    * @returns Distance
    */
   distanceFromStart(): number {
