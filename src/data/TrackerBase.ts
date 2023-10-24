@@ -26,8 +26,11 @@ export abstract class TrackerBase<V, SeenResultType> {
 
   public readonly id: string;
 
+  protected debug: boolean;
+
   constructor(opts: TrackedValueOpts = {}) {
     this.id = opts.id ?? `tracker`;
+    this.debug = opts.debug ?? false;
     this.sampleLimit = opts.sampleLimit ?? -1;
     this.resetAfterSamples = opts.resetAfterSamples ?? -1;
 
@@ -35,6 +38,10 @@ export abstract class TrackerBase<V, SeenResultType> {
       opts.storeIntermediate ??
       (this.sampleLimit > -1 || this.resetAfterSamples > -1);
     this.seenCount = 0;
+
+    if (this.debug) {
+      console.log(`TrackerBase: sampleLimit: ${ this.sampleLimit } resetAfter: ${ this.resetAfterSamples } store: ${ this.storeIntermediate }`);
+    }
   }
 
   /**
