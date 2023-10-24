@@ -922,13 +922,14 @@ export class Plot extends Sg.CanvasBox {
   defaultSeriesOpts?: SeriesOpts;
   constructor(canvasElementOrQuery: HTMLCanvasElement | string, opts: Opts = {}) {
     const { ctx, element, bounds } = scaleCanvas(canvasElementOrQuery);
-    super(undefined, `Plot`, bounds);
+    super(undefined, `Plot`);//bounds);
     this._canvasEl = element;
     this._ctx = ctx;
 
     if (opts.autoSize) {
       parentSizeCanvas(element, (event) => {
         this.drawingInvalidated(`resize`);
+        this.layoutInvalidated(`resize`);
         this.update(event.ctx, true);
       });
     }
@@ -944,9 +945,9 @@ export class Plot extends Sg.CanvasBox {
     this.axisX = new AxisX(this, bounds);
     this.axisY = new AxisY(this, bounds);
 
-    // this.plotArea.debugLayout = false;
-    // this.axisX.debugLayout = false;
-    // this.axisY.debugLayout = false;
+    // this.plotArea.debugLayout = true;
+    // this.axisX.debugLayout = true;
+    // this.axisY.debugLayout = true;
     // this.legend.debugLayout = true;
     // this.debugLayout = true;
   }
@@ -1016,7 +1017,7 @@ export class Plot extends Sg.CanvasBox {
    * @param o
    */
   plot(o: any) {
-    const paths = getPaths(o);
+    const paths = getPaths(o, true);
     let seriesCreated = false;
     for (const p of paths) {
       let s = this.series.get(p);
