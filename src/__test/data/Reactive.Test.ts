@@ -4,6 +4,32 @@ import * as Flow from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
 import { count } from '../../Generators.js';
 
+import * as Reactive from '../../data/Reactive.js';
+
+// const r = Reactive.object({ name: `bob`, level: 2 });
+// r.on(value => {
+//   // reactive value has been changed
+// });
+// r.onDiff(changes => {
+//   // or handle just the set of changed fields
+// })
+
+// // ...somewhere else
+// // apply partial update, eg:
+// r.update({ name: `jane ` })
+// // set a field
+// r.updateField(`level`, 3);
+// // update whole object and let it take care of figuring out changeset
+// r.set({ name: `barry`, level: 4 });
+
+// const source = Reactive.event(window, `pointermove`);
+// let t = Reactive.throttle(source, { elapsed: 100 })
+// t = Reactive.field(t, `button`);
+// t.on(value => {
+//   // button id
+// })
+
+
 test(`object-field`, async t => {
   const o = object({ name: `bob`, level: 2 });
   let count = 0;
