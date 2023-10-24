@@ -4,5 +4,15 @@
       "path": "."
     }
   ],
-  "settings": {}
+  "settings": {
+    "workbench.colorCustomizations": {  
+      "workbench.colorCustomizations": {
+      "symbolIcon.variableForeground": "#a8a8a8",
+      "symbolIcon.arrayForeground": "#a8a8a8",
+      "symbolIcon.booleanForeground": "#a8a8a8",
+      "symbolIcon.classForeground": "#a8a8a8",
+      "symbolIcon.colorForeground": "#a8a8a8",
+      "symbolIcon.constantForeground": "#a8a8a8"
+    },}
+  }
 }
