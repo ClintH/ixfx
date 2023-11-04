@@ -22,7 +22,7 @@ export * from './Flip.js';
 export * as Reactive from './Reactive.js';
 export * as Chains from './Chain.js';
 export * as Graphs from './graphs/index.js'
-
+export * from './TrackUnique.js';
 export * from './Table.js';
 
 /**
