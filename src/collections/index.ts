@@ -30,6 +30,8 @@ export * as Iterables from './Iterables.js';
  */
 export * as Stacks from './stack/index.js';
 
+export * from './ArrayCycle.js';
+
 export { StackMutable } from './stack/StackMutable.js';
 export { StackImmutable } from './stack/StackImmutable.js';
 
