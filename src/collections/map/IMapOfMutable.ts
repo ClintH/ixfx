@@ -1,5 +1,6 @@
 import { type IMapOf } from './IMapOf';
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapOfMutable<V> extends IMapOf<V> {
   /**
    * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
@@ -19,6 +20,11 @@ export interface IMapOfMutable<V> extends IMapOf<V> {
    * Clears the map
    */
   clear(): void;
+
+  /**
+   * Returns the number of keys
+   */
+  get lengthKeys(): number;
 
   /**
    * Deletes all values under `key` that match `value`.

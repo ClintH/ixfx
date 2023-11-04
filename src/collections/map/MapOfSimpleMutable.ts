@@ -41,6 +41,7 @@ export class MapOfSimpleMutable<V>
     }
   }
 
+
   /**
    * Adds a value, automatically extracting a key via the
    * `groupBy` function assigned in the constructor options.

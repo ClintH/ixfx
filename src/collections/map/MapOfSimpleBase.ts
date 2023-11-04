@@ -18,32 +18,35 @@ export class MapOfSimpleBase<V> {
   constructor(
     groupBy: ToString<V> = defaultKeyer,
     valueEq: IsEqual<V> = isEqualDefault<V>,
-    initial: [ string, readonly V[] ][] = []
+    initial: Array<[ string, ReadonlyArray<V> ]> = []
   ) {
     this.groupBy = groupBy;
     this.valueEq = valueEq;
     this.map = new Map(initial);
   }
+
+
   /**
    * Iterate over all entries
    */
   *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
     for (const key of this.map.keys()) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       for (const value of this.map.get(key)!) {
         yield [ key, value ];
       }
     }
   }
 
-  *entries(): IterableIterator<[ key: string, value: V[] ]> {
+  *entries(): IterableIterator<[ key: string, value: Array<V> ]> {
     for (const [ k, v ] of this.map.entries()) {
       yield [ k, [ ...v ] ];
     }
   }
 
   firstKeyByValue(value: V, eq: IsEqual<V> = isEqualDefault) {
-    const e = firstEntryByIterableValue(this, value, eq);
-    if (e) return e[ 0 ];
+    const entry = firstEntryByIterableValue(this, value, eq);
+    if (entry) return entry[ 0 ];
   }
 
   /**
@@ -114,7 +117,7 @@ export class MapOfSimpleBase<V> {
   debugString(): string {
     // eslint-disable-next-line functional/no-let
     let r = ``;
-    const keys = Array.from(this.map.keys());
+    const keys = [ ...this.map.keys() ];
     keys.every((k) => {
       const v = this.map.get(k);
       if (v === undefined) return;
@@ -141,4 +144,9 @@ export class MapOfSimpleBase<V> {
     if (!values) return 0;
     return values.length;
   }
+
+  get lengthKeys() {
+    return this.map.size;
+  }
+
 }

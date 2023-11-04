@@ -37,6 +37,13 @@ export class MapOfMutableImpl<V, M>
   }
 
   /**
+   * Returns the number of keys
+   */
+  get lengthKeys(): number {
+    return this.#map.size;
+  }
+
+  /**
    * Returns the length of the longest child list
    */
   get lengthMax() {
