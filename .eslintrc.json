@@ -33,6 +33,7 @@
     "unicorn/consistent-function-scoping": "off",
     "unicorn/filename-case": ["error", {"case":"pascalCase"}],
     "unicorn/require-post-message-target-origin": "off",
+    "unicorn/no-this-assignment": "off",
     "unicorn/prevent-abbreviations": ["error", {
       "ignore": [
         ".*Opts$",
