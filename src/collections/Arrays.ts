@@ -560,27 +560,27 @@ export const sortByNumericProperty = <V, K extends keyof V>(
  * Consider {@link remove} to remove an item by index.
  *
  * @template V Type of array items
- * @param data Source array
- * @param value Value(s) to remove
+ * @param sourceArray Source array
+ * @param toRemove Value(s) to remove
  * @param comparer Comparison function. If not provided `Util.isEqualDefault` is used, which compares using `===`
  * @return Copy of array without value.
  */
 export const without = <V>(
   //eslint-disable-next-line functional/prefer-readonly-type
-  data: ReadonlyArray<V> | Array<V>,
-  value: V | Array<V>,
+  sourceArray: ReadonlyArray<V> | Array<V>,
+  toRemove: V | Array<V>,
   comparer: IsEqual<V> = isEqualDefault
 ): Array<V> => {
-  if (Array.isArray(value)) {
+  if (Array.isArray(toRemove)) {
     const returnArray = []
-    for (const source of data) {
-      if (!value.some(v => comparer(source, v))) {
+    for (const source of sourceArray) {
+      if (!toRemove.some(v => comparer(source, v))) {
         returnArray.push(source);
       }
     }
     return returnArray;
   } else {
-    return data.filter((v) => !comparer(v, value));
+    return sourceArray.filter((v) => !comparer(v, toRemove));
   }
 }
 
