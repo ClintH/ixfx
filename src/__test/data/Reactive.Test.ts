@@ -87,7 +87,7 @@ test(`object-set`, async t => {
     if (count === 0) t.deepEqual(v, { name: `jane`, level: 2 });
     if (count === 1) t.deepEqual(v, { name: `mary`, level: 3 });
 
-    console.log(`value: ${ JSON.stringify(v) }`);
+    //console.log(`value: ${ JSON.stringify(v) }`);
     count++;
   });
   o.onDiff(diffV => {
@@ -100,7 +100,7 @@ test(`object-set`, async t => {
       { path: `level`, previous: 2, value: 3 }
     ]);
 
-    console.log(diff);
+    //console.log(diff);
     diffCount++;
   })
   // Won't fire a change, since values are the same
