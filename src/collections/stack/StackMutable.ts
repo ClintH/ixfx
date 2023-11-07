@@ -36,8 +36,14 @@ export class StackMutable<V> implements IStackMutable<V> {
     this.data = data;
   }
 
+  /**
+   * Push data onto the stack.
+   * If `toAdd` is empty, nothing happens
+   * @param toAdd Data to add
+   * @returns Length of stack
+   */
   push(...toAdd: ReadonlyArray<V>): number {
-    /* eslint-disable-next-line functional/immutable-data */
+    if (toAdd.length === 0) return this.data.length;
     this.data = push(this.opts, this.data, ...toAdd);
     return this.data.length;
   }
@@ -47,7 +53,7 @@ export class StackMutable<V> implements IStackMutable<V> {
   }
 
   forEachFromTop(fn: (v: V) => void): void {
-    [...this.data].reverse().forEach(fn);
+    [ ...this.data ].reverse().forEach(fn);
   }
 
   pop(): V | undefined {
@@ -96,4 +102,4 @@ export class StackMutable<V> implements IStackMutable<V> {
 export const mutable = <V>(
   opts: StackOpts = {},
   ...startingItems: ReadonlyArray<V>
-): IStackMutable<V> => new StackMutable({ ...opts }, [...startingItems]);
+): IStackMutable<V> => new StackMutable({ ...opts }, [ ...startingItems ]);
