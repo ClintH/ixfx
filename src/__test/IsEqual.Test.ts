@@ -1,8 +1,41 @@
 import test from 'ava';
 import {
   isEqualDefault,
-  isEqualValueDefault
+  isEqualValueDefault,
+  isEqualValueIgnoreOrder
 } from '../IsEqual.js'
+
+test(`isEqualValueIgnoreOrder`, t => {
+  // Objects
+  const obj1 = {
+    name: 'blah',
+  };
+  const obj2 = {
+    name: 'blah',
+  };
+  t.true(isEqualValueIgnoreOrder(obj1, obj1));
+  t.true(isEqualValueIgnoreOrder(obj1, obj2));
+
+  const obj3 = {
+    name: `a`,
+    colour: {
+      r: 200,
+      g: 100,
+      b: 50
+    },
+    size: 20
+  };
+  const obj4 = {
+    colour: {
+      b: 50,
+      g: 100,
+      r: 200,
+    },
+    size: 20,
+    name: `a`
+  }
+  t.true(isEqualValueIgnoreOrder(obj3, obj4));
+})
 
 test('isEqual', (t) => {
   // Booleans
