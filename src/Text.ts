@@ -2,6 +2,40 @@ import { integerTest, throwFromResult } from './Guards.js';
 export { string as random } from './Random.js';
 
 /**
+ * Given a long string, abbreviates it with ...
+ * ```js
+ * abbreviate(`This is something`, 7); // `This is...`
+ * ```
+ * 
+ * If `source` is under `maxLength` the original is returned.
+ * @param source 
+ * @param maxLength Maximum length. Defaults to 20
+ * @returns 
+ */
+export const abbreviate = (source: string, maxLength = 15) => {
+  // ✔️ Unit tested
+  throwFromResult(integerTest(maxLength, `aboveZero`, `maxLength`));
+  if (typeof source !== `string`) throw new Error(`Parameter 'source' is not a string`);
+
+  if (source.length > maxLength && source.length > 3) {
+    if (maxLength > 15) {
+      const chunk = Math.round((maxLength - 2) / 2);
+      return source.slice(0, chunk) + `...` + source.slice(-chunk);
+    }
+    return source.slice(0, maxLength) + `...`;
+  }
+  return source;
+}
+
+/**
+ * Uses JSON.toString() on `source`, but abbreviates result.
+ * @param source Object to stringify
+ * @param maxLength Default 20
+ * @returns 
+ */
+export const jsonAbbreviate = (source: any, maxLength = 20) => abbreviate(JSON.stringify(source), maxLength);
+
+/**
  * Returns source text that is between `start` and `end` match strings. Returns _undefined_ if start/end is not found.
  *
  * ```js
@@ -91,7 +125,7 @@ export const indexOfCharCode = (
 };
 
 /**
- * Returns `source` with a given number of characters removed from a start position.
+ * Returns `source` with a given number of characters removed from start position.
  *
  * ```js
  * // Remove three characters starting at position 1
