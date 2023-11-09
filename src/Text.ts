@@ -33,7 +33,11 @@ export const abbreviate = (source: string, maxLength = 15) => {
  * @param maxLength Default 20
  * @returns 
  */
-export const jsonAbbreviate = (source: any, maxLength = 20) => abbreviate(JSON.stringify(source), maxLength);
+export const toStringAbbreviate = (source: any, maxLength = 20) => {
+  if (source === undefined) return `(undefined)`;
+  if (source === null) return `(null)`;
+  return abbreviate(JSON.stringify(source), maxLength);
+}
 
 /**
  * Returns source text that is between `start` and `end` match strings. Returns _undefined_ if start/end is not found.
