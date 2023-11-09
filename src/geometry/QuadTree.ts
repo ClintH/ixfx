@@ -1,4 +1,4 @@
-import { type TreeNode } from '../collections/Trees.js';
+import { type TraversableTree } from '../collections/tree/Types.js';
 import { Points, Rects, Shapes } from './index.js';
 import { type ShapePositioned } from './Shape.js';
 
@@ -56,9 +56,9 @@ export type QuadTreeItem = Points.Point | ShapePositioned;
  *
  * To create, you probably want the {@link quadTree} function.
  */
-export class QuadTreeNode implements TreeNode {
-  #items: QuadTreeItem[] = [];
-  #children: QuadTreeNode[] = [];
+export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
+  #items: Array<QuadTreeItem> = [];
+  #children: Array<QuadTreeNode> = [];
   #parent: QuadTreeNode | undefined;
   /**
    * Constructor
@@ -88,10 +88,22 @@ export class QuadTreeNode implements TreeNode {
     }
   }
 
+  getParent() {
+    return this.#parent;
+  }
+
   *children(): IterableIterator<QuadTreeNode> {
     for (const c of this.#children) {
       yield c;
     }
+  }
+
+  getValue() {
+    return this.#items;
+  }
+
+  getIdentity() {
+    return this;
   }
   /**
    * Get a descendant node in a given direction
@@ -99,7 +111,7 @@ export class QuadTreeNode implements TreeNode {
    * @returns
    */
   direction(d: Direction): QuadTreeNode | undefined {
-    return this.#children[d] as QuadTreeNode | undefined;
+    return this.#children[ d ] as QuadTreeNode | undefined;
   }
 
   /**
@@ -110,8 +122,8 @@ export class QuadTreeNode implements TreeNode {
   add(p: QuadTreeItem): boolean {
     if (!Shapes.isIntersecting(this.boundary, p)) return false;
 
-    if (this.#children.length) {
-      this.#children.forEach((d) => (d as QuadTreeNode).add(p));
+    if (this.#children.length > 0) {
+      for (const d of this.#children) (d).add(p);
       return true;
     }
 
@@ -121,14 +133,14 @@ export class QuadTreeNode implements TreeNode {
       this.#items.length > this.opts.maxItems &&
       this.level < this.opts.maxLevels
     ) {
-      if (!this.#children.length) {
+      if (this.#children.length === 0) {
         this.#subdivide();
       }
 
       // Add to child
-      this.#items.forEach((item) => {
-        this.#children.forEach((d) => (d as QuadTreeNode).add(item));
-      });
+      for (const item of this.#items) {
+        for (const d of this.#children) (d).add(item);
+      }
       //this.descendants.forEach(d => (d as QuadTreeNode).add(p));
       this.#items = [];
     }
