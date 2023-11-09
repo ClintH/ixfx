@@ -945,9 +945,13 @@ export const filterAB = <V>(
  * const v = Arrays.unique([ 1, 2, 3, 1, 2, 3 ]);
  * // [ 1, 2, 3 ]
  * ```
+ * 
+ * By default uses JSON.toString() to compare values.
+ * 
  * See also:
  * * {@link intersection}: Overlap between two arrays
  * * {@link additionalValues}: Yield values from an iterable not present in the other
+ * * {@link containsDuplicateValues}: Returns true if array contains duplicates
  * @param arrays
  * @param comparer
  * @returns
@@ -977,19 +981,23 @@ export const unique = <V>(
  * Returns _true_ if array contains duplicate values.
  *
  * ```js
- *
  * containsDuplicateValues(['a','b','a']); // True
  * containsDuplicateValues([
  *  { name: 'Apple' },
  *  { name: 'Apple' }
  * ]); // True
  * ```
- * @param array
- * @param comparer
+ * 
+ * Uses JSON.toString() by default to compare values.
+ * 
+ * See also:
+ * * {@link containsDuplicateInstances}: Compare based on reference, rather than value
+ * * {@link unique} Get unique set of values in an array
+ * @param array Array to examine
+ * @param comparer Comparer, uses JSON.toString by default
  * @returns
  */
 export const containsDuplicateValues = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
   array: Array<V> | ReadonlyArray<V>,
   keyFunction = toStringDefault<V>
 ): boolean => {
@@ -1001,6 +1009,23 @@ export const containsDuplicateValues = <V>(
   }
   return false;
 };
+
+/**
+ * Returns _true_ if array contains duplicate instances.
+ * Use {@link containsDuplicateValues} if you'd rather compare by value.
+ * @param array 
+ * @returns 
+ */
+export const containsDuplicateInstances = <V>(array: Array<V> | ReadonlyArray<V>): boolean => {
+  if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
+  for (let index = 0; index < array.length; index++) {
+    for (let x = 0; x < array.length; x++) {
+      if (index === x) continue;
+      if (array[ index ] === array[ x ]) return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Returns _true_ if contents of `needles` is contained by `haystack`.
