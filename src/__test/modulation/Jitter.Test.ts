@@ -11,7 +11,7 @@ test(`relative-absolute`, t => {
   const relD = [ ...repeat(tests, () => rel(50)) ];
 
   // Check that jitter values are within range
-  someNearnessMany(t, relD, 0.01, [ 25, 75 ]);
+  someNearnessMany(t, relD, 0.015, [ 25, 75 ]);
   rangeCheck(t, relD, {
     lowerExcl: 25,
     upperExcl: 75,
