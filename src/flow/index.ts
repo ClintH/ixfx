@@ -30,6 +30,7 @@ export * as StateMachine from './StateMachine.js';
 export * from './Timer.js';
 
 export * from './Interval.js';
+export * from './IntervalType.js';
 export * from './Timeout.js';
 export * from './UpdateOutdated.js';
 export * from './Continuously.js';
