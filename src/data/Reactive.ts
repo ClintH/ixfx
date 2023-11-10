@@ -4,7 +4,7 @@ import * as Immutable from '../Immutable.js';
 import { QueueMutable } from "../collections/index.js";
 import * as DiGraph from "./graphs/DirectedGraph.js";
 
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export type SignalKinds = `done`;
 export type Passed<V> = {
