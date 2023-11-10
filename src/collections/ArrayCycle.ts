@@ -16,11 +16,20 @@
  * c.select(`pears`); // `pears`
  * ```
  * 
- * Selecting by value uses === semantics.
- * @param opts 
+ * Other features:
+ * ```js
+ * c.current;   // Current value
+ * c.toArray(); // Copy of array being cycled over
+ * ```
+ * 
+ * Additional info:
+ * * Selecting by value uses === semantics.
+ * * Works with a copy of input array
+ * @param options Array to cycle over 
  * @returns 
  */
-export const arrayCycle = <T>(opts: ReadonlyArray<T>) => {
+export const cycle = <T>(options: ReadonlyArray<T> | Array<T>) => {
+  const opts = [ ...options ];
   let index = 0;
   const next = () => {
     index++;
