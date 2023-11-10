@@ -35,9 +35,9 @@ export type DiffNode<T> = Node<DiffAnnotation<T>> & {
 
 export const compare = <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq: IsEqual<T> = isEqualValueIgnoreOrder, parent?: DiffNode<T> | undefined): DiffNode<T> => {
   const valueEqual = valueOrIdentityEqual(a, b, eq);
-  if (!valueEqual) {
-    console.log(`changed compare a: ${ toStringSingle(a) } b: ${ toStringSingle(b) }`);
-  }
+  // if (!valueEqual) {
+  //   nsole.log(`changed compare a: ${ toStringSingle(a) } b: ${ toStringSingle(b) }`);
+  // }
   const childrenCompare = compareChildren(a, b, eq);
 
   const diff: DiffAnnotation<T> = {
