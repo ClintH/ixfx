@@ -1,4 +1,4 @@
-import type { ArrayKeys, EitherKey, ObjKeys } from '../index.js';
+import type { ArrayKeys, EitherKey, ObjectKeys } from '../index.js';
 
 /**
  * Adds an array o [k,v] to the map, returning a new instance
@@ -12,9 +12,9 @@ const addArray = <K, V>(
 ): ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
   data.forEach((d) => {
-    if (d[0] === undefined) throw new Error(`key cannot be undefined`);
-    if (d[1] === undefined) throw new Error(`value cannot be undefined`);
-    x.set(d[0], d[1]);
+    if (d[ 0 ] === undefined) throw new Error(`key cannot be undefined`);
+    if (d[ 1 ] === undefined) throw new Error(`value cannot be undefined`);
+    x.set(d[ 0 ], d[ 1 ]);
   });
   return x;
 };
@@ -27,7 +27,7 @@ const addArray = <K, V>(
  */
 const addObjects = <K, V>(
   map: ReadonlyMap<K, V>,
-  data: ObjKeys<K, V>
+  data: ObjectKeys<K, V>
 ): ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
   data.forEach((d) => {
@@ -75,14 +75,14 @@ export const add = <K, V>(
   if (data === undefined) throw new Error(`data parameter i.s undefined`);
   if (data.length === 0) return map;
 
-  const firstRecord = data[0];
+  const firstRecord = data[ 0 ];
   const isObj =
     typeof (firstRecord as { readonly key: K; readonly value: V }).key !==
-      `undefined` &&
+    `undefined` &&
     typeof (firstRecord as { readonly key: K; readonly value: V }).value !==
-      `undefined`; //(typeof (data[0] as {readonly key:K}).key !== undefined && typeof (data[0] as {readonly value:V}).value !== undefined);
+    `undefined`; //(typeof (data[0] as {readonly key:K}).key !== undefined && typeof (data[0] as {readonly value:V}).value !== undefined);
   return isObj
-    ? addObjects(map, data as ObjKeys<K, V>)
+    ? addObjects(map, data as ObjectKeys<K, V>)
     : addArray(map, data as ArrayKeys<K, V>);
 };
 
