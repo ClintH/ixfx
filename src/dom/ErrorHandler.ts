@@ -1,3 +1,5 @@
+import { getErrorMessage } from "../debug/GetErrorMessage.js";
+
 /**
  * Creates an error handler to show errors on-screen.
  * This is useful when testing on mobile devices that lack access to the console.
@@ -64,13 +66,14 @@ export const defaultErrorHandler = () => {
 
   const show = (ex: Error | string | Event) => {
     container.style.display = `inline`;
-    messageElement.innerHTML += (ex as any).stack ? `<pre>${ (ex as any).stack }</pre>` : `<p>${ ex.toString() }</p>`;
+    messageElement.innerHTML += (ex as any).stack ? `<pre>${ (ex as any).stack }</pre>` : `<p>${ getErrorMessage(ex) }</p>`;
   };
 
   const hide = () => {
     container.style.display = `none`;
   };
 
+  // eslint-disable-next-line unicorn/prefer-add-event-listener
   window.onerror = (message, url, lineNo, colNo, error) => {
     if (enabled) {
       if (error) {

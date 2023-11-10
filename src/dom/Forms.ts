@@ -6,26 +6,26 @@ import { resolveEl } from './Util.js';
  */
 //eslint-disable-next-line functional/prefer-immutable-types
 export const textAreaKeyboard = (el: HTMLTextAreaElement) => {
-  el.addEventListener(`keydown`, (evt) => {
-    const val = el.value;
+  el.addEventListener(`keydown`, (event) => {
+    const elementValue = el.value;
     const start = el.selectionStart;
     const end = el.selectionEnd;
 
-    if (evt.key === `Tab` && evt.shiftKey) {
+    if (event.key === `Tab` && event.shiftKey) {
       if (el.value.substring(start - 2, start) === `  `) {
         //eslint-disable-next-line functional/immutable-data
-        el.value = val.substring(0, start - 2) + val.substring(end);
+        el.value = elementValue.slice(0, Math.max(0, start - 2)) + elementValue.slice(Math.max(0, end));
       }
       //eslint-disable-next-line functional/immutable-data
       el.selectionStart = el.selectionEnd = start - 2;
-      evt.preventDefault();
+      event.preventDefault();
       return false;
-    } else if (evt.key === `Tab`) {
+    } else if (event.key === `Tab`) {
       //eslint-disable-next-line functional/immutable-data
-      el.value = val.substring(0, start) + `  ` + val.substring(end);
+      el.value = elementValue.slice(0, Math.max(0, start)) + `  ` + elementValue.slice(Math.max(0, end));
       //eslint-disable-next-line functional/immutable-data
       el.selectionStart = el.selectionEnd = start + 2;
-      evt.preventDefault();
+      event.preventDefault();
       return false;
     }
   });
@@ -51,7 +51,7 @@ export const textAreaKeyboard = (el: HTMLTextAreaElement) => {
 export const checkbox = (
   //eslint-disable-next-line functional/prefer-immutable-types
   domIdOrEl: string | HTMLInputElement,
-  onChanged?: (currentVal: boolean) => void
+  onChanged?: (currentValue: boolean) => void
 ) => {
   const el = resolveEl<HTMLInputElement>(domIdOrEl);
 
@@ -64,9 +64,9 @@ export const checkbox = (
     get checked(): boolean {
       return el.checked;
     },
-    set checked(val: boolean) {
+    set checked(value: boolean) {
       // eslint-disable-next-line functional/immutable-data
-      el.checked = val;
+      el.checked = value;
     },
   };
 };
@@ -92,23 +92,23 @@ export const checkbox = (
 export const numeric = (
   //eslint-disable-next-line functional/prefer-immutable-types
   domIdOrEl: string | HTMLInputElement,
-  onChanged?: (currentVal: number) => void,
+  onChanged?: (currentValue: number) => void,
   live?: boolean
 ) => {
-  const el = resolveEl<HTMLInputElement>(domIdOrEl) as HTMLInputElement;
-  const evt = live ? `change` : `input`;
+  const el = resolveEl<HTMLInputElement>(domIdOrEl);
+  const eventName = live ? `change` : `input`;
   if (onChanged) {
-    el.addEventListener(evt, () => {
-      onChanged(parseInt(el.value));
+    el.addEventListener(eventName, () => {
+      onChanged(Number.parseInt(el.value));
     });
   }
   return {
     get value(): number {
-      return parseInt(el.value);
+      return Number.parseInt(el.value);
     },
-    set value(val: number) {
+    set value(value: number) {
       // eslint-disable-next-line functional/immutable-data
-      el.value = val.toString();
+      el.value = value.toString();
     },
   };
 };
@@ -153,10 +153,10 @@ export const button = (
   domQueryOrEl: string | HTMLButtonElement,
   onClick?: () => void
 ) => {
-  const el = resolveEl(domQueryOrEl) as HTMLButtonElement;
+  const el = resolveEl(domQueryOrEl);
 
   if (onClick) {
-    el.addEventListener(`click`, (_ev) => {
+    el.addEventListener(`click`, (_event) => {
       onClick();
     });
   }
@@ -164,9 +164,9 @@ export const button = (
     click() {
       if (onClick) onClick();
     },
-    set disabled(val: boolean) {
+    set disabled(value: boolean) {
       // eslint-disable-next-line functional/immutable-data
-      el.disabled = val;
+      el.disabled = value;
     },
   };
 };
@@ -174,7 +174,7 @@ export const button = (
 /**
  * SELECT handler
  */
-export interface SelectHandler {
+export type SelectHandler = {
   /**
    * Gets/Sets disabled
    */
@@ -198,7 +198,7 @@ export interface SelectHandler {
    * @param opts Options
    * @param preSelect Item to preselect
    */
-  setOpts(opts: readonly string[], preSelect?: string): void;
+  setOpts(opts: ReadonlyArray<string>, preSelect?: string): void;
   /**
    * Select item by index
    * @param index Index
@@ -251,10 +251,10 @@ export interface SelectHandler {
 export const select = (
   //eslint-disable-next-line functional/prefer-immutable-types
   domQueryOrEl: string | HTMLSelectElement,
-  onChanged?: (currentVal: string) => void,
+  onChanged?: (currentValue: string) => void,
   opts: SelectOpts = {}
 ): SelectHandler => {
-  const el = resolveEl(domQueryOrEl) as HTMLSelectElement;
+  const el = resolveEl(domQueryOrEl);
   const {
     placeholderOpt,
     shouldAddChoosePlaceholder = false,
@@ -268,14 +268,14 @@ export const select = (
   };
 
   if (onChanged) {
-    el.addEventListener(`change`, (_ev) => {
+    el.addEventListener(`change`, (_event) => {
       change();
     });
   }
   return {
-    set disabled(val: boolean) {
+    set disabled(value: boolean) {
       // eslint-disable-next-line functional/immutable-data
-      el.disabled = val;
+      el.disabled = value;
     },
     get value(): string {
       return el.value;
@@ -290,16 +290,16 @@ export const select = (
       );
     },
     //eslint-disable-next-line functional/prefer-immutable-types
-    setOpts(opts: string[], preSelect?: string): void {
+    setOpts(opts: Array<string>, preSelect?: string): void {
       // eslint-disable-next-line functional/immutable-data
       el.options.length = 0;
 
-      if (shouldAddChoosePlaceholder) opts = [`-- Choose --`, ...opts];
-      else if (placeholderOpt !== undefined) opts = [placeholderOpt, ...opts];
+      if (shouldAddChoosePlaceholder) opts = [ `-- Choose --`, ...opts ];
+      else if (placeholderOpt !== undefined) opts = [ placeholderOpt, ...opts ];
       // eslint-disable-next-line functional/no-let
       let toSelect = 0;
 
-      opts.forEach((o, index) => {
+      for (const [ index, o ] of opts.entries()) {
         const optEl = document.createElement(`option`);
         // eslint-disable-next-line functional/immutable-data
         optEl.value = o;
@@ -307,11 +307,11 @@ export const select = (
         optEl.innerHTML = o;
         if (preSelect !== undefined && o === preSelect) toSelect = index;
         el.options.add(optEl);
-      });
+      }
       // eslint-disable-next-line functional/immutable-data
       el.selectedIndex = toSelect;
     },
-    select(index: number = 0, trigger: boolean = false): void {
+    select(index = 0, trigger = false): void {
       // eslint-disable-next-line functional/immutable-data
       el.selectedIndex = index;
       if (trigger && onChanged) {

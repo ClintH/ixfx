@@ -1,15 +1,15 @@
-import * as Arcs from './Arc.js';
-import * as Beziers from './Bezier.js';
-import * as Circles from './Circle.js';
-import * as Compound from './CompoundPath.js';
-import * as Grids from './Grid.js';
-import * as Lines from './Line.js';
-import * as Paths from './Path.js';
-import * as Points from './Point.js';
-import * as Rects from './Rect.js';
-import * as Ellipses from './Ellipse.js';
-import * as Shapes from './Shape.js';
-import * as Polar from './Polar.js';
+// import * as Arcs from './Arc.js';
+// import * as Beziers from './Bezier.js';
+// import * as Circles from './Circle.js';
+// import * as Compound from './CompoundPath.js';
+// import * as Grids from './Grid.js';
+// import * as Lines from './Line.js';
+// import * as Paths from './Path.js';
+// import * as Points from './Point.js';
+// import * as Rects from './Rect.js';
+// import * as Ellipses from './Ellipse.js';
+// import * as Shapes from './Shape.js';
+// import * as Polar from './Polar.js';
 
 export * as Waypoints from './Waypoint.js';
 export * as Spheres from './Sphere.js';
@@ -174,16 +174,17 @@ export function radianToDegree(angleInRadians: number | ReadonlyArray<number>): 
   return Array.isArray(angleInRadians) ? angleInRadians.map(v => v * 180 / Math.PI) : (angleInRadians as number) * 180 / Math.PI;
 }
 
+import type { Point } from './Point.js';
 /**
  * Angle from x-axis to point (ie. `Math.atan2`)
  * @param point 
  * @returns 
  */
-export const radiansFromAxisX = (point: Points.Point): number => Math.atan2(point.x, point.y);
+export const radiansFromAxisX = (point: Point): number => Math.atan2(point.x, point.y);
 
-try {
-  if (typeof window !== `undefined`) {
-    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = { ...(window as any).ixfx, Geometry: { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, radiansFromAxisX, radianToDegree, degreeToRadian } };
-  }
-} catch { /* no-op */ }
+// try {
+//   if (typeof window !== `undefined`) {
+//     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
+//     (window as any).ixfx = { ...(window as any).ixfx, Geometry: { Circles, Arcs, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses, Polar, Shapes, radiansFromAxisX, radianToDegree, degreeToRadian } };
+//   }
+// } catch { /* no-op */ }

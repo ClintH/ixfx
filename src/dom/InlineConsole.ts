@@ -1,3 +1,4 @@
+import { getErrorMessage } from '../debug/GetErrorMessage.js';
 import { afterMatch } from '../Text.js';
 import { log, type LogOpts } from './Log.js';
 
@@ -68,7 +69,8 @@ export const inlineConsole = (opts: InlineConsoleOptions = {}) => {
   //eslint-disable-next-line unicorn/prefer-add-event-listener
   window.onerror = (event, source, lineno, _colno, error) => {
     const abbreviatedSource = source === undefined ? `` : afterMatch(source, `/`, { fromEnd: true });
-    const eventString = typeof event === `string` ? event : event.toString();
+    //const eventString = typeof event === `string` ? event : JSON.stringify(event).toString();
+    const eventString = getErrorMessage(error);
     //const errorString = error === undefined ? `` : error.message;
 
     logger.error(eventString + ` (${ abbreviatedSource }:${ lineno })`);

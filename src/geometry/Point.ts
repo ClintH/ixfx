@@ -72,8 +72,7 @@ export const dotProduct = (...pts: ReadonlyArray<Point>): number => {
  *
  * Use `isEmpty` to check if a point is empty.
  */
-//eslint-disable-next-line @typescript-eslint/naming-convention
-export const Empty = Object.freeze({ x: 0, y: 0 });
+export const Empty = { x: 0, y: 0 } as const;
 
 /**
  * Placeholder point, where x and y is `NaN`.

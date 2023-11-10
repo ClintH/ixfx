@@ -8,7 +8,7 @@ export type PluckOpts = {
 
 export type TransformOpts = {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-immutable-types
-  transform(ev: Event): any;
+  transform(event: Event): any;
 };
 
 /**
@@ -54,23 +54,23 @@ export const rx = <V extends object>(
   opts?: DomRxOpts
 ): Rx<V> => {
   const el = resolveEl<HTMLElement>(elOrQuery);
-  const ev = fromEvent(el, event);
-  // @ts-ignore
+  const eventRx = fromEvent(el, event);
+  // @ts-expect-error
   const value: V = {};
 
   const clear = () => {
     const keys = Object.keys(value);
-    keys.forEach((key) => {
-      // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-explicit-any
-      delete (value as any)[key];
-    });
+    for (const key of keys) {
+      // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-explicit-any, @typescript-eslint/no-dynamic-delete
+      delete (value as any)[ key ];
+    }
   };
   //eslint-disable-next-line functional/prefer-immutable-types
   const setup = (sub: Observable<Event>): Rx<V> => {
     sub.subscribe({
-      next: (newValue) => {
+      next: (latestValue) => {
         // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-explicit-any
-        Object.assign(value, newValue);
+        Object.assign(value, latestValue);
       },
     });
     return {
@@ -79,15 +79,15 @@ export const rx = <V extends object>(
     };
   };
 
-  if (opts === undefined) return setup(ev);
+  if (opts === undefined) return setup(eventRx);
 
   if ((opts as PluckOpts).pluck) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return setup(ev.pipe(map((x) => (x as any)[(opts as PluckOpts).pluck])));
+    return setup(eventRx.pipe(map((x) => (x as any)[ (opts as PluckOpts).pluck ])));
   } else if ((opts as TransformOpts).transform) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return setup(ev.pipe(map((x) => (opts as TransformOpts).transform(x))));
+    return setup(eventRx.pipe(map((x) => (opts as TransformOpts).transform(x))));
   }
 
-  return setup(ev);
+  return setup(eventRx);
 };

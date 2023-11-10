@@ -128,7 +128,7 @@ export const log = (
   el.className = `log`;
   shadowRoot.append(el);
 
-  const error = (messageOrError: string | Error | unknown) => {
+  const error = (messageOrError: string | Error) => {
     const line = document.createElement(`div`);
 
     if (typeof messageOrError === `string`) {

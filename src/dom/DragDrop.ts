@@ -34,14 +34,14 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
 
   // Click to select
   //eslint-disable-next-line functional/prefer-immutable-types
-  const onElementClick = (evt: MouseEvent) => {
+  const onElementClick = (event: MouseEvent) => {
     const selected = elem.classList.contains(`drag-sel`);
     if (selected) {
       elem.classList.remove(`drag-sel`);
     } else {
       elem.classList.add(`drag-sel`);
     }
-    evt.stopPropagation();
+    event.stopPropagation();
   };
 
   elem.ownerDocument.addEventListener(`click`, onParentClick);
@@ -59,7 +59,7 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
   const dispose = () => {
     console.log(`drag dispose`);
     if (elem.classList.contains(`drag-progress`)) {
-      onDragCancel(null, `dispose`);
+      onDragCancel(undefined, `dispose`);
     } else {
       dragCleanup();
     }
@@ -69,33 +69,33 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
 
   // Dragging
   //eslint-disable-next-line functional/prefer-immutable-types
-  const onPointerMove = (e: PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const onPointerMove = (moveEvent: PointerEvent) => {
+    moveEvent.preventDefault();
+    moveEvent.stopPropagation();
 
     const offset = Points.isPlaceholder(initial)
-      ? { x: e.offsetX, y: e.offsetY }
+      ? { x: moveEvent.offsetX, y: moveEvent.offsetY }
       : {
-          x: e.x - initial.x,
-          y: e.y - initial.y,
-        };
+        x: moveEvent.x - initial.x,
+        y: moveEvent.y - initial.y,
+      };
     const state: DragState = {
       delta: offset,
       initial: initial,
       token,
     };
     if (typeof listener.progress !== `undefined` && !listener.progress(state)) {
-      onDragCancel(null, `discontinued`);
+      onDragCancel(undefined, `discontinued`);
     }
   };
 
   // Done dragging
   //eslint-disable-next-line functional/prefer-immutable-types
-  const onPointerUp = (e: PointerEvent) => {
+  const onPointerUp = (upEvent: PointerEvent) => {
     dragCleanup();
     const offset = {
-      x: e.x - initial.x,
-      y: e.y - initial.y,
+      x: upEvent.x - initial.x,
+      y: upEvent.y - initial.y,
     };
     const state: DragState = {
       initial: initial,
@@ -110,8 +110,8 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
   // Drag is cancelled
   const onDragCancel = (
     //eslint-disable-next-line functional/prefer-immutable-types
-    evt: PointerEvent | MouseEvent | null,
-    reason: string = `pointercancel`
+    event: PointerEvent | MouseEvent | undefined,
+    reason = `pointercancel`
   ) => {
     dragCleanup();
     const state: DragState = {
@@ -124,15 +124,15 @@ export const draggable = (elem: SVGElement, listener: DragListener) => {
     }
   };
 
-  elem.addEventListener(`pointerdown`, (evt) => {
+  elem.addEventListener(`pointerdown`, (event) => {
     const selected = elem.classList.contains(`drag-sel`);
     if (!selected) return;
 
-    initial = { x: evt.x, y: evt.y };
+    initial = { x: event.x, y: event.y };
     const s =
-      typeof listener.start !== `undefined`
-        ? listener.start()
-        : { allow: true, token };
+      typeof listener.start === `undefined`
+        ? { allow: true, token }
+        : listener.start();
     if (!s.allow) return;
 
     token = s.token;
