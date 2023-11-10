@@ -3,7 +3,6 @@ import { compareData, getPathsAndData, map, updateByPath, applyChanges, getField
 import { arrayValuesEqual } from './util.js';
 import { isEqualValueDefault } from '../IsEqual.js';
 
-
 test(`getPathsAndData`, t => {
   const d1 = {
     accel: { x: 1, y: 2, z: 3 },
@@ -21,7 +20,6 @@ test(`getPathsAndData`, t => {
     { path: `gyro.z`, value: 6 }
   ], isEqualValueDefault);
 
-
   const d2 = {
     message: `hello`,
     profiles: [
@@ -33,23 +31,23 @@ test(`getPathsAndData`, t => {
   arrayValuesEqual(t, r2, [
     { path: `message`, value: `hello` },
     { path: `profiles`, value: d2.profiles },
-    { path: `profiles[0]`, value: d2.profiles[ 0 ] },
-    { path: `profiles[0].name`, value: d2.profiles[ 0 ].name },
+    { path: `profiles.0`, value: d2.profiles[ 0 ] },
+    { path: `profiles.0.name`, value: d2.profiles[ 0 ].name },
 
-    { path: `profiles[0].animals`, value: d2.profiles[ 0 ].animals },
-    { path: `profiles[0].animals[0]`, value: d2.profiles[ 0 ].animals[ 0 ] },
-    { path: `profiles[0].animals[1]`, value: d2.profiles[ 0 ].animals[ 1 ] },
+    { path: `profiles.0.animals`, value: d2.profiles[ 0 ].animals },
+    { path: `profiles.0.animals.0`, value: d2.profiles[ 0 ].animals[ 0 ] },
+    { path: `profiles.0.animals.1`, value: d2.profiles[ 0 ].animals[ 1 ] },
 
-    { path: `profiles[1]`, value: d2.profiles[ 1 ] },
-    { path: `profiles[1].name`, value: d2.profiles[ 1 ].name },
-    { path: `profiles[1].animals`, value: d2.profiles[ 1 ].animals },
-    { path: `profiles[1].animals[0]`, value: d2.profiles[ 1 ].animals[ 0 ] },
-    { path: `profiles[1].animals[1]`, value: d2.profiles[ 1 ].animals[ 1 ] },
+    { path: `profiles.1`, value: d2.profiles[ 1 ] },
+    { path: `profiles.1.name`, value: d2.profiles[ 1 ].name },
+    { path: `profiles.1.animals`, value: d2.profiles[ 1 ].animals },
+    { path: `profiles.1.animals.0`, value: d2.profiles[ 1 ].animals[ 0 ] },
+    { path: `profiles.1.animals.1`, value: d2.profiles[ 1 ].animals[ 1 ] },
 
   ], isEqualValueDefault);
 });
 
-test('getPaths', (t) => {
+test('get-paths', (t) => {
   const d = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
@@ -77,7 +75,7 @@ test('getPaths', (t) => {
     `gyro.z`,
   ]);
 
-  // @ts-ignore
+  //@ts-ignore
   t.throws(() => getPaths(undefined));
 
   t.deepEqual(getPaths(null), []);
@@ -93,13 +91,15 @@ test('getPaths', (t) => {
   arrayValuesEqual(t, d2R, [
     `message`,
     `profiles`,
-    `profiles[0]`, `profiles[0].name`, `profiles[0].animals`, `profiles[0].animals[0]`, `profiles[0].animals[1]`,
-    `profiles[1]`, `profiles[1].name`, `profiles[1].animals`, `profiles[1].animals[0]`, `profiles[1].animals[1]`,
+    `profiles.0`, `profiles.0.name`, `profiles.0.animals`, `profiles.0.animals.0`, `profiles.0.animals.1`,
+    `profiles.1`, `profiles.1.name`, `profiles.1.animals`, `profiles.1.animals.0`, `profiles.1.animals.1`,
   ])
 });
 
-
 test('getField', (t) => {
+  t.is(getField({ name: { first: `Thom`, last: `Yorke` } }, `name.first`), `Thom`);
+  t.is(getField({ colours: [ `red`, `green`, `blue` ] }, `colours.1`), `green`);
+  t.falsy(getField({ colours: [ `red`, `green`, `blue` ] }, `colours.3`));
   const d = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
@@ -115,7 +115,7 @@ test('getField', (t) => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  t.is(getField(d2, `profiles[1].animals[1]`), `rabbit`);
+  t.is(getField(d2, `profiles.1.animals.1`), `rabbit`);
 
   t.throws(() => getField(d, ``))
   // @ts-expect-error
@@ -135,11 +135,9 @@ test('getField', (t) => {
     ]
   }
   t.deepEqual(getField(d3, `profiles`), d3.profiles);
-  t.deepEqual(getField(d3, `profiles[0]`), d3.profiles[ 0 ]);
-  t.deepEqual(getField(d3, `profiles[0].animals`), d3.profiles[ 0 ].animals);
-  t.deepEqual(getField(d3, `profiles[0].animals[1]`), d3.profiles[ 0 ].animals[ 1 ]);
-
-
+  t.deepEqual(getField(d3, `profiles.0`), d3.profiles[ 0 ]);
+  t.deepEqual(getField(d3, `profiles.0.animals`), d3.profiles[ 0 ].animals);
+  t.deepEqual(getField(d3, `profiles.0.animals.1`), d3.profiles[ 0 ].animals[ 1 ]);
 });
 
 test('map', (t) => {
@@ -147,7 +145,7 @@ test('map', (t) => {
     x: 10,
     y: 20,
   };
-  //eslint-disable-next-line functional/no-let
+
   let count = 0;
   const o1b = map<typeof o1a, string>(o1a, (fieldValue, field, index) => {
     if (count === 0 && index !== 0) t.fail('index not right. Expected 0');
@@ -277,7 +275,7 @@ test(`compareData`, t => {
     sizes: [ 10, 20, 30 ]
   });
   t.is(cc2.length, 1);
-  t.deepEqual(cc2, [ { path: `colours[2]`, previous: `blue`, value: undefined } ]);
+  t.deepEqual(cc2, [ { path: `colours.2`, previous: `blue`, value: undefined } ]);
 
   // Remove from array start
   const cc3 = compareData(test2, {
@@ -286,9 +284,9 @@ test(`compareData`, t => {
   });
   t.is(cc3.length, 3);
   t.deepEqual(cc3, [
-    { path: `colours[0]`, previous: `red`, value: `green` },
-    { path: `colours[1]`, previous: `green`, value: `blue` },
-    { path: `colours[2]`, previous: `blue`, value: undefined }
+    { path: `colours.0`, previous: `red`, value: `green` },
+    { path: `colours.1`, previous: `green`, value: `blue` },
+    { path: `colours.2`, previous: `blue`, value: undefined }
   ]);
 
   // Array re-arrange
@@ -298,9 +296,9 @@ test(`compareData`, t => {
   });
   t.is(cc4.length, 3);
   t.deepEqual(cc4, [
-    { path: `colours[0]`, previous: `red`, value: `blue` },
-    { path: `colours[1]`, previous: `green`, value: `red` },
-    { path: `colours[2]`, previous: `blue`, value: `green` }
+    { path: `colours.0`, previous: `red`, value: `blue` },
+    { path: `colours.1`, previous: `green`, value: `red` },
+    { path: `colours.2`, previous: `blue`, value: `green` }
   ]);
 });
 
@@ -331,7 +329,7 @@ test(`updateByPath`, t => {
     colours: [ `red`, `green`, `blue` ],
     flag: true
   };
-  const rr1 = updateByPath(aa, `colours[1]`, `pink`);
+  const rr1 = updateByPath(aa, `colours.1`, `pink`);
 
   t.deepEqual(rr1, { flag: true, colours: [ `red`, `pink`, `blue` ] });
 
@@ -351,9 +349,9 @@ test(`updateByPath`, t => {
       { colour: `green`, size: 20 }
     ]
   }
-  const rrr1 = updateByPath(aaa, `profile.jane.colours[0]`, `yellow`);
+  const rrr1 = updateByPath(aaa, `profile.jane.colours.0`, `yellow`);
   t.is(rrr1.profile.jane.colours[ 0 ], `yellow`);
-  const rrr2 = updateByPath(aaa, `widgets[1].size`, 30);
+  const rrr2 = updateByPath(aaa, `widgets.1.size`, 30);
   t.is(rrr2.widgets[ 1 ].size, 30);
 
   // Array values which are objects
@@ -363,7 +361,7 @@ test(`updateByPath`, t => {
       { colour: `green`, size: 20 }
     ]
   }
-  const b1 = updateByPath(b, `values[1].size`, 22);
+  const b1 = updateByPath(b, `values.1.size`, 22);
   t.deepEqual(b1,
     {
       values: [
@@ -372,7 +370,7 @@ test(`updateByPath`, t => {
       ]
     });
 
-  const b2 = updateByPath(b, `values[1]`, { colour: `pink`, size: 5 });
+  const b2 = updateByPath(b, `values.1`, { colour: `pink`, size: 5 });
   t.deepEqual(b2, {
     values: [
       { colour: `red`, size: 10 },
