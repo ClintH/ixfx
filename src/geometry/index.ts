@@ -9,14 +9,21 @@ import * as Points from './Point.js';
 import * as Rects from './Rect.js';
 import * as Ellipses from './Ellipse.js';
 import * as Shapes from './Shape.js';
-import * as Vectors from './Vector.js';
-import * as Waypoints from './Waypoint.js';
-import * as Spheres from './Sphere.js';
 import * as Polar from './Polar.js';
-import * as Layouts from './Layout.js';
 
-export { Circles, Lines, Rects, Points, Paths, Grids, Beziers, Compound, Ellipses,  Waypoints, Spheres };
-export { Layouts };
+export * as Waypoints from './Waypoint.js';
+export * as Spheres from './Sphere.js';
+export * as Layouts from './Layout.js';
+export * as Circles from './Circle.js';
+export * as Lines from './Line.js';
+export * as Rects from './Rect.js';
+export * as Points from './Point.js';
+export * as Paths from './Path.js';
+export * as Grids from './Grid.js';
+export * as Beziers from './Bezier.js';
+export * as Compound from './CompoundPath.js';
+export * as Ellipses from './Ellipse.js';
+
 
 /**
  * Quad tree is a datastructure for efficiently determining whether
@@ -48,7 +55,7 @@ export * as Convolve2d from './Convolve2d.js';
  * - {@link isArc}: Returns true if object is Arc-ish
  * - {@link isEqual}: Returns true if two objects have identical arc properties
  */
-export { Arcs };
+export * as Arcs from './Arc.js';
 
 /**
  * Generate a few basic geometric shapes
@@ -56,14 +63,15 @@ export { Arcs };
  * * {@link arrow}
  * * {@link starburst}
  */
-export { Shapes };
+export * as Shapes from './Shape.js';
 
 /**
  * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
  * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
  * interoperate between these two coordinates.
  */
-export { Vectors };
+export * as Vectors from './Vector.js';
+
 
 /**
  * Work with Polar coordinates.
@@ -81,7 +89,7 @@ export { Vectors };
  * 
  * Comparisons: {@link isAntiParallel}, {@link isOpposite}, {@link isParallel}, {@link isCoord}
  */
-export { Polar };
+export * as Polar from './Polar.js';
 
 /**
  * Functions for producing points within a shape.
@@ -135,21 +143,17 @@ export * as Triangles from './Triangle.js';
  * @param angleInDegrees 
  * @returns 
  */
-export function degreeToRadian(angleInDegrees:number):number;
+export function degreeToRadian(angleInDegrees: number): number;
 
 /**
  * Convert angles in degrees to angles in radians
  * @param angleInDegrees 
  */
-export function degreeToRadian(angleInDegrees:readonly number[]):readonly number[];
+export function degreeToRadian(angleInDegrees: ReadonlyArray<number>): ReadonlyArray<number>;
 
 //eslint-disable-next-line func-style
-export function degreeToRadian(angleInDegrees:number|readonly number[]):number|readonly number[] {
-  if (Array.isArray(angleInDegrees)) {
-    return angleInDegrees.map(v => v * (Math.PI / 180.0));
-  } else {
-    return (angleInDegrees as number) * (Math.PI / 180.0);
-  }
+export function degreeToRadian(angleInDegrees: number | ReadonlyArray<number>): number | ReadonlyArray<number> {
+  return Array.isArray(angleInDegrees) ? angleInDegrees.map(v => v * (Math.PI / 180)) : (angleInDegrees as number) * (Math.PI / 180);
 }
 
 /**
@@ -157,21 +161,17 @@ export function degreeToRadian(angleInDegrees:number|readonly number[]):number|r
  * @param angleInRadians
  * @returns 
  */
-export function radianToDegree(angleInRadians:number):number;
+export function radianToDegree(angleInRadians: number): number;
 
 /**
  * Convert angles in radians to angles in degrees
  * @param angleInRadians 
  */
-export function radianToDegree(angleInRadians:readonly number[]):readonly number[];
+export function radianToDegree(angleInRadians: ReadonlyArray<number>): ReadonlyArray<number>;
 
 //eslint-disable-next-line func-style
-export function radianToDegree(angleInRadians:number|readonly number[]):number| readonly number[] {
-  if (Array.isArray(angleInRadians)) {
-    return angleInRadians.map(v => v * 180 / Math.PI);
-  } else {
-    return (angleInRadians as number) * 180 / Math.PI;
-  }
+export function radianToDegree(angleInRadians: number | ReadonlyArray<number>): number | ReadonlyArray<number> {
+  return Array.isArray(angleInRadians) ? angleInRadians.map(v => v * 180 / Math.PI) : (angleInRadians as number) * 180 / Math.PI;
 }
 
 /**
@@ -179,7 +179,7 @@ export function radianToDegree(angleInRadians:number|readonly number[]):number| 
  * @param point 
  * @returns 
  */
-export const radiansFromAxisX = (point:Points.Point):number => Math.atan2(point.x, point.y);
+export const radiansFromAxisX = (point: Points.Point): number => Math.atan2(point.x, point.y);
 
 try {
   if (typeof window !== `undefined`) {
