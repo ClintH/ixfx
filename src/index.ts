@@ -55,6 +55,8 @@
  */
 export * as Data from './data/index.js';
 
+export * as Debug from './debug/index.js';
+
 /**
  * Functions for different shapes, paths and coordinate spaces.
  *
@@ -362,3 +364,4 @@ export * as Util from './Util.js';
 export * from './IsEqual.js';
 
 
+export * as Immutable from './Immutable.js'
