@@ -134,10 +134,10 @@ export const addValueByPath = <T>(value: T, path: string, node?: LabelledNode<T>
   let count = 0;
   for (const p of split) {
     const lastEntry = count === split.length - 1;
-    //console.log(`p: ${ p }`);
+    //onsole.log(`p: ${ p }`);
     const found = findChildByLabel(p, node);
     if (found === undefined) {
-      //console.log(`  - not found`);
+      //onsole.log(`  - not found`);
       const labelled: LabelledValue<T> = {
         value: (lastEntry ? value : undefined),
         label: p
@@ -167,7 +167,7 @@ export const addValueByPath = <T>(value: T, path: string, node?: LabelledNode<T>
           }
         }
       } else {
-        //console.log(`  - found!`, found.value);
+        //onsole.log(`  - found!`, found.value);
         node = found;
       }
     }
@@ -250,10 +250,10 @@ export const valuesByPath = <T>(path: string, node: LabelledNode<T>, pathOpts: P
   const split = path.split(separator);
   let c: LabelledNode<T> | undefined = node;
   for (const p of split) {
-    //console.log(`getValue p: ${ p }`);
+    //onsole.log(`getValue p: ${ p }`);
     c = findChildByLabel(p, c);
     if (c === undefined) {
-      //console.log(`getValue  - could not find. node: ${ JSON.stringify(node.value) }`);
+      //onsole.log(`getValue  - could not find. node: ${ JSON.stringify(node.value) }`);
       return [];
     }
   }
