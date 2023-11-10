@@ -17,6 +17,8 @@ import {
 } from '../IsEqual.js'
 import { fromIterable as mapFromIterable } from './map/MapFns.js';
 export * from './NumericArrays.js';
+export * from './ArrayCycle.js';
+
 export { compareValues, compareValuesEqual } from './Iterables.js';
 
 /**
