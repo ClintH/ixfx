@@ -17,3 +17,4 @@ export type { MapArrayOpts } from './MapOfArrayMutable.js';
 export { NumberMap } from './NumberMap.js';
 export * from './MapMulti.js';
 export * from './MapFns.js';
+export * from './GetOrGenerate.js';
