@@ -19,7 +19,7 @@
 <h1>Function without</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="without"><span class="tsd-kind-call-signature">without</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span>, <span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">comparer</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span><a href="#without" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="without"><span class="tsd-kind-call-signature">without</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">sourceArray</span>, <span class="tsd-kind-parameter">toRemove</span>, <span class="tsd-kind-parameter">comparer</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span><a href="#without" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Returns an array with value(s) omitted. If value is not found, result will be a copy of input.
 Value checking is completed via the provided <code>comparer</code> function.
@@ -37,12 +37,12 @@ By default checking whether <code>a === b</code>. To compare based on value, use
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span></h5>
+<h5><span class="tsd-kind-parameter">sourceArray</span>: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span></h5>
 <div class="tsd-comment tsd-typography"><p>Source array</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span></h5>
+<h5><span class="tsd-kind-parameter">toRemove</span>: <span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type tsd-kind-type-parameter">V</span><span class="tsd-signature-symbol">[]</span></h5>
 <div class="tsd-comment tsd-typography"><p>Value(s) to remove</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
@@ -101,7 +101,9 @@ By default checking whether <code>a === b</code>. To compare based on value, use
 <li><a href="Collections.Arrays.averageWeighted.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>average<wbr/>Weighted</span></a></li>
 <li><a href="Collections.Arrays.chunks.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>chunks</span></a></li>
 <li><a href="Collections.Arrays.contains.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>contains</span></a></li>
+<li><a href="Collections.Arrays.containsDuplicateInstances.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>contains<wbr/>Duplicate<wbr/>Instances</span></a></li>
 <li><a href="Collections.Arrays.containsDuplicateValues.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>contains<wbr/>Duplicate<wbr/>Values</span></a></li>
+<li><a href="Collections.Arrays.cycle.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>cycle</span></a></li>
 <li><a href="Collections.Arrays.dotProduct.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>dot<wbr/>Product</span></a></li>
 <li><a href="Collections.Arrays.ensureLength.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ensure<wbr/>Length</span></a></li>
 <li><a href="Collections.Arrays.filterAB.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>filterAB</span></a></li>
@@ -153,14 +155,16 @@ By default checking whether <code>a === b</code>. To compare based on value, use
 <li><a href="../interfaces/Collections.CircularArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-256"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)"></path></g></svg><span>Circular<wbr/>Array</span></a></li>
 <li><a href="../types/Collections.ArrayKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Array<wbr/>Keys</span></a></li>
 <li><a href="../types/Collections.EitherKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Either<wbr/>Key</span></a></li>
-<li><a href="../types/Collections.ObjKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Obj<wbr/>Keys</span></a></li>
+<li><a href="../types/Collections.ObjectKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Object<wbr/>Keys</span></a></li>
 <li><a href="Collections.circularArray-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>circular<wbr/>Array</span></a></li></ul></div></details></li>
 <li><a href="../modules/Data.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Data</span></a></li>
+<li><a href="../modules/Debug.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Debug</span></a></li>
 <li><a href="../modules/Dom.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Dom</span></a></li>
 <li><a href="../modules/Events.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Events</span></a></li>
 <li><a href="../modules/Flow.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Flow</span></a></li>
 <li><a href="../modules/Generators.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Generators</span></a></li>
 <li><a href="../modules/Geometry.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Geometry</span></a></li>
+<li><a href="../modules/Immutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Immutable</span></a></li>
 <li><a href="../modules/Io.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Io</span></a></li>
 <li><a href="../modules/KeyValues.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Key<wbr/>Values</span></a></li>
 <li><a href="../modules/Modulation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Modulation</span></a></li>
@@ -171,6 +175,10 @@ By default checking whether <code>a === b</code>. To compare based on value, use
 <li><a href="../modules/Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li>
 <li><a href="../types/IsEqual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Is<wbr/>Equal</span></a></li>
 <li><a href="isEqualDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Default</span></a></li>
+<li><a href="isEqualTrace.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Trace</span></a></li>
 <li><a href="isEqualValueDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Default</span></a></li>
-<li><a href="toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li></ul></nav></div></div></div>
+<li><a href="isEqualValueIgnoreOrder.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Ignore<wbr/>Order</span></a></li>
+<li><a href="isEqualValuePartial.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Partial</span></a></li>
+<li><a href="toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li>
+<li><a href="toStringOrdered.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Ordered</span></a></li></ul></nav></div></div></div>
 <div class="overlay"></div></body></html>

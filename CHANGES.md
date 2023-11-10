@@ -1,5 +1,13 @@
 A rough changelog between NPM releases
 
+# 0.15.0 09.11.23
+Collections
+* Major changes to Trees module
+* Arrays.cycle: cycle through elements of array
+
+Data
+* trackUnique: Returns _true_ when a new value is seen
+ 
 # 0.14.2 24.10.23
 
 * Bug fixes with Plot2 and SceneGraph, StringWriteBuffer

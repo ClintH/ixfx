@@ -25,7 +25,7 @@ for working with the standard JS Map class.</p>
 <p>ixfx also includes <a href="../interfaces/Collections.Maps.IMapMutable.html" class="tsd-kind-interface">IMapMutable</a>, <a href="../interfaces/Collections.Maps.IMapImmutable.html" class="tsd-kind-interface">IMapImmutable</a></p>
 <p>Overview:</p>
 <ul>
-<li>getOrGenerate: Solves a common scenario of wanting a value by a particular key, or generating it if it doesn&#39;t exist</li>
+<li><a href="../functions/Collections.Maps.getOrGenerate-1.html" class="tsd-kind-function">getOrGenerate</a>: Solves a common scenario of wanting a value by a particular key, or generating it if it doesn&#39;t exist</li>
 <li><a href="../functions/Collections.Maps.filter.html" class="tsd-kind-function">filter</a>: Yields values in map that match a predicate</li>
 <li><a href="../functions/Collections.Maps.find.html" class="tsd-kind-function">find</a>: Finds the first value that matches a predicate, or <em>undefined</em> if nothing found</li>
 <li><a href="../functions/Collections.Maps.hasAnyValue.html" class="tsd-kind-function">hasAnyValue</a>: Searches through all keys, returning true if any occurence of <em>value</em> was found</li>
@@ -65,6 +65,7 @@ for working with the standard JS Map class.</p>
 <div class="tsd-index-list"><a href="../types/Collections.Maps.ExpiringMapEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4194304"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-type-alias)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.31 16V8.224H8.91V7.24H14.79V8.224H12.39V16H11.31Z" fill="var(--color-text)"></path></g></svg><span>Expiring<wbr/>Map<wbr/>Event</span></a>
 <a href="../types/Collections.Maps.ExpiringMapEvents.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Events</span></a>
 <a href="../types/Collections.Maps.ExpiringMapOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Opts</span></a>
+<a href="../types/Collections.Maps.GetOrGenerate.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Get<wbr/>Or<wbr/>Generate</span></a>
 <a href="../types/Collections.Maps.MapArrayEvents.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Events</span></a>
 <a href="../types/Collections.Maps.MapArrayOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Opts</span></a>
 <a href="../types/Collections.Maps.MapCircularOpts.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Circular<wbr/>Opts</span></a>
@@ -85,6 +86,8 @@ for working with the standard JS Map class.</p>
 <a href="../functions/Collections.Maps.fromIterable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from<wbr/>Iterable</span></a>
 <a href="../functions/Collections.Maps.fromObject.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from<wbr/>Object</span></a>
 <a href="../functions/Collections.Maps.getClosestIntegerKey.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Closest<wbr/>Integer<wbr/>Key</span></a>
+<a href="../functions/Collections.Maps.getOrGenerate-1.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Or<wbr/>Generate</span></a>
+<a href="../functions/Collections.Maps.getOrGenerateSync.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Or<wbr/>Generate<wbr/>Sync</span></a>
 <a href="../functions/Collections.Maps.hasAnyValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Any<wbr/>Value</span></a>
 <a href="../functions/Collections.Maps.hasKeyValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Key<wbr/>Value</span></a>
 <a href="../functions/Collections.Maps.immutable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>immutable</span></a>
@@ -143,6 +146,7 @@ for working with the standard JS Map class.</p>
 <li><a href="../types/Collections.Maps.ExpiringMapEvent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Event</span></a></li>
 <li><a href="../types/Collections.Maps.ExpiringMapEvents.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Events</span></a></li>
 <li><a href="../types/Collections.Maps.ExpiringMapOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Expiring<wbr/>Map<wbr/>Opts</span></a></li>
+<li><a href="../types/Collections.Maps.GetOrGenerate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Get<wbr/>Or<wbr/>Generate</span></a></li>
 <li><a href="../types/Collections.Maps.MapArrayEvents.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Events</span></a></li>
 <li><a href="../types/Collections.Maps.MapArrayOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Array<wbr/>Opts</span></a></li>
 <li><a href="../types/Collections.Maps.MapCircularOpts.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Map<wbr/>Circular<wbr/>Opts</span></a></li>
@@ -160,6 +164,8 @@ for working with the standard JS Map class.</p>
 <li><a href="../functions/Collections.Maps.fromIterable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from<wbr/>Iterable</span></a></li>
 <li><a href="../functions/Collections.Maps.fromObject.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>from<wbr/>Object</span></a></li>
 <li><a href="../functions/Collections.Maps.getClosestIntegerKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Closest<wbr/>Integer<wbr/>Key</span></a></li>
+<li><a href="../functions/Collections.Maps.getOrGenerate-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Or<wbr/>Generate</span></a></li>
+<li><a href="../functions/Collections.Maps.getOrGenerateSync.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>get<wbr/>Or<wbr/>Generate<wbr/>Sync</span></a></li>
 <li><a href="../functions/Collections.Maps.hasAnyValue.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Any<wbr/>Value</span></a></li>
 <li><a href="../functions/Collections.Maps.hasKeyValue.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>has<wbr/>Key<wbr/>Value</span></a></li>
 <li><a href="../functions/Collections.Maps.immutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>immutable</span></a></li>
@@ -190,14 +196,16 @@ for working with the standard JS Map class.</p>
 <li><a href="../interfaces/Collections.CircularArray.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Circular<wbr/>Array</span></a></li>
 <li><a href="../types/Collections.ArrayKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Array<wbr/>Keys</span></a></li>
 <li><a href="../types/Collections.EitherKey.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Either<wbr/>Key</span></a></li>
-<li><a href="../types/Collections.ObjKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Obj<wbr/>Keys</span></a></li>
+<li><a href="../types/Collections.ObjectKeys.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Object<wbr/>Keys</span></a></li>
 <li><a href="../functions/Collections.circularArray-1.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>circular<wbr/>Array</span></a></li></ul></div></details></li>
 <li><a href="Data.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Data</span></a></li>
+<li><a href="Debug.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Debug</span></a></li>
 <li><a href="Dom.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Dom</span></a></li>
 <li><a href="Events.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Events</span></a></li>
 <li><a href="Flow.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Flow</span></a></li>
 <li><a href="Generators.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Generators</span></a></li>
 <li><a href="Geometry.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Geometry</span></a></li>
+<li><a href="Immutable.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Immutable</span></a></li>
 <li><a href="Io.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Io</span></a></li>
 <li><a href="KeyValues.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Key<wbr/>Values</span></a></li>
 <li><a href="Modulation.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Modulation</span></a></li>
@@ -208,6 +216,10 @@ for working with the standard JS Map class.</p>
 <li><a href="Visual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Visual</span></a></li>
 <li><a href="../types/IsEqual.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Is<wbr/>Equal</span></a></li>
 <li><a href="../functions/isEqualDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Default</span></a></li>
+<li><a href="../functions/isEqualTrace.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Trace</span></a></li>
 <li><a href="../functions/isEqualValueDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Default</span></a></li>
-<li><a href="../functions/toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li></ul></nav></div></div></div>
+<li><a href="../functions/isEqualValueIgnoreOrder.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Ignore<wbr/>Order</span></a></li>
+<li><a href="../functions/isEqualValuePartial.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>is<wbr/>Equal<wbr/>Value<wbr/>Partial</span></a></li>
+<li><a href="../functions/toStringDefault.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Default</span></a></li>
+<li><a href="../functions/toStringOrdered.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>to<wbr/>String<wbr/>Ordered</span></a></li></ul></nav></div></div></div>
 <div class="overlay"></div></body></html>
