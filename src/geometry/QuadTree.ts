@@ -38,18 +38,18 @@ export type QuadTreeItem = Points.Point | ShapePositioned;
  * @param opts Options
  * @returns New quad tree
  */
-// export const quadTree = (bounds:Rects.RectPositioned, initialData:readonly QuadTreeItem[] = [], opts:Partial<QuadTreeOpts> = {}):QuadTreeNode => {
-//   const o:QuadTreeOpts = {
-//     maxItems: opts.maxItems ?? 4,
-//     maxLevels: opts.maxLevels ?? 4
-//   };
+export const quadTree = (bounds: Rects.RectPositioned, initialData: ReadonlyArray<QuadTreeItem> = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode => {
+  const o: QuadTreeOpts = {
+    maxItems: opts.maxItems ?? 4,
+    maxLevels: opts.maxLevels ?? 4
+  };
 
-//   const n = new QuadTreeNode( undefined, bounds, 0, o);
-//   initialData.forEach(d => {
-//     n.add(d);
-//   });
-//   return n;
-// };
+  const n = new QuadTreeNode(undefined, bounds, 0, o);
+  for (const d of initialData) {
+    n.add(d);
+  }
+  return n;
+};
 
 /**
  * QuadTreeNode
