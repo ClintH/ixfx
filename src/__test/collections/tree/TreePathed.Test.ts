@@ -10,13 +10,10 @@ import { isEqualValueDefault } from '../../../IsEqual.js';
 test(`tree-dotted-path`, t => {
   const root = TreePathed.addValueByPath({}, 'c');
   TreePathed.addValueByPath({ x: 'admin' }, 'c.users.admin', root);
-  t.is(TreeArrayBacked.computeMaxDepth(root), 3);
+  t.is(TreeArrayBacked.computeMaxDepth(root), 2); // since root is not counted
   const c = TreeArrayBacked.findAnyChildByValue({ value: { x: "admin" }, label: "admin", }, root, isEqualValueDefault);
   t.truthy(c);
-  console.log(TreeArrayBacked.toStringDeep(root));
-  console.log('--');
   TreePathed.addValueByPath({ x: 'admin2' }, 'c.users.admin', root);
-  console.log(TreeArrayBacked.toStringDeep(root));
 });
 
 test(`tree-dotted-overwrite`, t => {

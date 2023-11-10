@@ -2,7 +2,7 @@ import test from 'ava';
 import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children, toStringDeep } from '../../../collections/tree/TraverseObject.js';
 import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
 import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
-import { isEqualValueDefault } from '../../../IsEqual.js';
+import { isEqualValueDefault, isEqualValuePartial } from '../../../IsEqual.js';
 
 function getTestMap() {
   const testMap = new Map();
@@ -38,43 +38,90 @@ function getTestObj() {
       },
       { name: 'Sam' }
     ]
-  }
+  } as const;
   return testObj;
 }
 
+
+
 test(`as-tree`, t => {
-  const r1 = create(getTestObj());
+  const r1 = create(getTestObj(), { name: `test` });
+  //onsole.log(toStringDeep(r1));
   t.deepEqual(r1.value?.value, getTestObj());
   t.is(r1.childrenStore.length, 3);
-  t.deepEqual(r1.childrenStore[ 0 ].value, { name: `name`, value: `Jill` });
-  console.log(TreeMutable.toStringDeep(r1));
-  // const testMap = getTestMap();
-  // const r2 = create(testMap, `obj`);
-  // t.is(r2.value?.value, testMap);
-  // t.is(r2.childrenStore.length, 2);
+  t.deepEqual(r1.childrenStore[ 0 ].value, { name: `name`, value: `Jill`, ancestors: [ `test` ] });
+  t.deepEqual(r1.childrenStore[ 1 ].value, {
+    name: `address`, value: {
+      street: 'Blah St',
+      number: 27
+    }, ancestors: [ `test` ]
+  });
+  t.deepEqual(r1.childrenStore[ 2 ].value, {
+    name: `kids`, value: [
+      {
+        name: 'John',
+        address: {
+          street: 'West St',
+          number: 35
+        }
+      },
+      { name: 'Sam' }
+    ], ancestors: [ `test` ]
+  });
+
 });
 
-// test(`as-tree-values`, t => {
-//   const r1 = create(getTestObj(), { onlyStoreValues: true });
-//   t.deepEqual(r1.value?.value, getTestObj());
-//   t.is(r1.childrenStore.length, 3);
-//   console.log(toStringDeep(r1));
-//   t.deepEqual(r1.childrenStore[ 0 ].value?.value, { name: `name`, value: `Jill` });
-//   // const testMap = getTestMap();
-//   // const r2 = create(testMap, `obj`);
-//   // t.is(r2.value?.value, testMap);
-//   // t.is(r2.childrenStore.length, 2);
-// });
+test(`follow-value`, t => {
+  const r1 = asDynamicTraversable(getTestObj(), { name: `obj` });
 
+  let callbackCount = 0;
+  let iterCount = 0;
+  for (const fv of TraversableTree.followValue(r1, (node) => {
+    callbackCount++;
+    return false;
+  })) {
+    iterCount++;
+  };
+  t.is(callbackCount, 3);
+  t.is(iterCount, 0);
+
+  callbackCount = 0;
+  iterCount = 0;
+  const pathSplit = `kids.1.name`.split('.');
+  const results = [];
+  for (const fv of TraversableTree.followValue(r1, (node) => {
+    callbackCount++;
+    if (node.name === pathSplit[ 0 ]) {
+      pathSplit.shift();
+      return true;
+    }
+    return false;
+  })) {
+    iterCount++;
+    results.push(fv);
+  }
+
+  t.like(results, [
+    { name: `kids`, ancestors: [ `obj` ] },
+    { name: `1`, value: { name: `Sam` }, ancestors: [ `obj`, `kids` ] },
+    { name: `name`, value: `Sam`, ancestors: [ `obj`, `kids`, `1` ] }
+  ]);
+  t.is(iterCount, 3);
+  t.is(callbackCount, 6);
+
+})
 
 test(`as-traversable-object`, t => {
   const r1 = asDynamicTraversable(getTestObj(), { name: `obj` });
-  t.true(TraversableTree.hasChildValue(r1, { name: `name`, value: `Jill` }, isEqualValueDefault));
+  //onsole.log(TraversableTree.toStringDeep(r1));
+  t.true(TraversableTree.hasChildValue(r1, { name: `name`, value: `Jill`, ancestors: [ "obj" ] }, isEqualValueDefault));
+
   t.true(TraversableTree.hasChildValue(r1, {
     name: `address`, value: {
       street: 'Blah St',
       number: 27
-    }
+    },
+    ancestors: [ "obj" ]
   }, isEqualValueDefault));
   t.false(TraversableTree.hasChildValue(r1, {
     // @ts-ignore
@@ -84,9 +131,9 @@ test(`as-traversable-object`, t => {
     }
   }, isEqualValueDefault));
 
-  t.true(TraversableTree.hasAnyChildValue(r1, { name: `number`, value: 35 }, isEqualValueDefault));
+  t.true(TraversableTree.hasAnyChildValue(r1, { name: `number`, value: 35, ancestors: [ "obj", "kids", "0", "address" ] }, isEqualValueDefault));
 
-  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', value: 'John' }, isEqualValueDefault);
+  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', value: 'John', ancestors: [] }, isEqualValuePartial);
   t.truthy(r1a);
   if (r1a !== undefined) {
     t.true(TraversableTree.hasAnyChild(r1, r1a));
@@ -99,70 +146,18 @@ test(`as-traversable-array`, t => {
   const r1 = asDynamicTraversable([ 1, 2, 3, 4, 5 ], { name: `test` });
   const breadthFirst = [ ...TraversableTree.breadthFirst(r1) ];
   t.is(breadthFirst.length, 5);
-
-  t.true(TraversableTree.hasChildValue(r1, { name: `test[1]`, value: 2 }, isEqualValueDefault));
-  t.false(TraversableTree.hasChildValue(r1, { name: `test[10]`, value: 10 }, isEqualValueDefault));
+  t.true(TraversableTree.hasChildValue(r1, { name: `1`, value: 2, ancestors: [ `test` ] }, isEqualValuePartial));
+  t.false(TraversableTree.hasChildValue(r1, { name: `0`, value: 10, ancestors: [ `test` ] }, isEqualValuePartial));
   t.is(TraversableTree.childrenLength(r1), 5);
 })
 
 
-// test(`fromUnknown`, t => {
-//   const r1 = fromUnknown([ 1, 2, 3, 4, 5 ], `array`);
-//   console.log(prettyPrint(r1));
-//   const r2 = fromUnknown([
-//     { name: `John`, size: 20 },
-//     { name: `Jill`, size: 20 }
-//   ], `array`);
-//   console.log(prettyPrint(r2));
-
-//   const r3 = fromUnknown(getTestObj(), `obj`);
-//   console.log(prettyPrint(r3));
-
-//   const r4 = fromUnknown(getTestMap(), `map`);
-//   console.log(prettyPrint(r4));
-// });
-
-
-
-// test(`isEqual`, (t) => {
-//   const a1 = getTestObj();
-//   const b1 = getTestObj();
-//   t.true(isEqual(a1, b1));
-
-//   // const b2 = getTestObj();
-//   // b2.kids[ 0 ].name = `JOHN`;
-//   // t.false(isEqual(a1, b2));
-
-//   // // Custom equalit that ignores uppercase name
-//   // t.true(isEqual(a1, b2, (a, b) => {
-//   //   return JSON.stringify(a).toLowerCase() === JSON.stringify(b).toLowerCase()
-//   // }));
-
-//   // const b3 = getTestObj();
-//   // b3.kids.push({ name: `New` });
-//   // t.false(isEqual(a1, b3));
-
-//   // const b4 = getTestObj();
-//   // (b4 as any).gloorp = true;
-//   // t.false(isEqual(a1, b4));
-
-//   // const b5 = getTestObj();
-//   // b5.name = `Jilly`;
-//   // t.false(isEqual(a1, b5));
-
-// });
-
-// test('getLengthChildren', (t) => {
-//   t.is(getLengthChildren(getTestObj()), 3);
-//   t.is(getLengthChildren(getTestMap()), 2);
-// });
-
 test('direct-children', (t) => {
-  t.deepEqual([ ...children(getTestObj()) ], [
-    { name: "name", value: "Jill" },
-    { name: "address", value: { number: 27, street: "Blah St" } },
+  t.like([ ...children(getTestObj()) ], [
+    { name: "name", nodeValue: "Jill" },
+    { name: "address", sourceValue: { number: 27, street: "Blah St" } },
     {
-      name: "kids", value: [
+      name: "kids", sourceValue: [
         {
           address: {
             number: 35,
@@ -184,9 +179,9 @@ test('direct-children', (t) => {
       b: 0.5
     }
   }
-  t.deepEqual([ ...children(simpleObj) ], [
+  t.like([ ...children(simpleObj) ], [
     {
-      name: "colour", value: {
+      name: "colour", sourceValue: {
         b: 0.5,
         g: 0.5,
         r: 0.5
@@ -194,51 +189,105 @@ test('direct-children', (t) => {
     } ]);
 
   const colours = [ { r: 1, g: 0, b: 0 }, { r: 0, g: 1, b: 0 }, { r: 0, g: 0, b: 1 } ];
-  t.deepEqual([ ...children(colours, { name: 'colours' }) ], [
-    { name: "colours[0]", value: { r: 1, g: 0, b: 0 } },
-    { name: "colours[1]", value: { r: 0, g: 1, b: 0 } },
-    { name: "colours[2]", value: { r: 0, g: 0, b: 1 } },
+  t.like([ ...children(colours, { name: 'colours' }) ], [
+    { name: "0", sourceValue: { r: 1, g: 0, b: 0 } },
+    { name: "1", sourceValue: { r: 0, g: 1, b: 0 } },
+    { name: "2", sourceValue: { r: 0, g: 0, b: 1 } },
   ]);
 });
 
 test('trace-by-path', (t) => {
   const o = getTestObj();
   const opts: PathOpts = {
-    separator: '.',
-    allowArrayIndexes: true
+    separator: '.'
   }
-  t.deepEqual([ ...traceByPath('kids[1]', o, opts) ],
+  t.like([ ...traceByPath('kids.1', o, opts) ],
     [
-      { name: "kids[1]", value: { "name": "Sam" } }
+      { name: "kids", ancestors: [], nodeValue: undefined },
+      { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" } }
     ]);
-  t.deepEqual([ ...traceByPath('address.street', o, opts) ], [
-    { name: "address", value: { "number": 27, "street": "Blah St" } },
-    { name: "street", value: "Blah St" }
+
+  t.like([ ...traceByPath('kids.1.name', o, opts) ],
+    [
+      { name: "kids", ancestors: [], nodeValue: undefined },
+      { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" } },
+      { name: "name", ancestors: [ `kids`, `1` ], nodeValue: "Sam" }
+    ]);
+
+  t.like([ ...traceByPath('address.street', o, opts) ], [
+    { name: "address", sourceValue: { "number": 27, "street": "Blah St" } },
+    { name: "street", nodeValue: "Blah St" }
   ]);
-  t.deepEqual([ ...traceByPath('kids[0].address.street', o, opts) ], [
-    { name: "kids[0]", value: { "address": { "number": 35, "street": "West St" }, "name": "John" } },
-    { name: "address", value: { "number": 35, "street": "West St" } },
-    { name: "street", value: "West St" }
+
+  t.like([ ...traceByPath('kids.0.address.street', o, opts) ], [
+    {
+      name: "kids", sourceValue: [
+        {
+          name: 'John',
+          address: {
+            street: 'West St',
+            number: 35
+          }
+        },
+        { name: 'Sam' }
+      ], ancestors: []
+    },
+    {
+      name: "0", sourceValue: {
+        name: 'John',
+        address: {
+          street: 'West St',
+          number: 35
+        }
+      }, ancestors: [ `kids` ]
+    },
+    {
+      name: "address", sourceValue: {
+        street: 'West St',
+        number: 35
+      }, ancestors: [ `kids`, `0` ]
+    },
+    { name: "street", nodeValue: "West St", ancestors: [ `kids`, `0`, `address` ] }
   ]);
+
 
   const t2 = getTestMap();
-  t.deepEqual([ ...traceByPath('jill.address.street', t2, opts) ], [
-    { name: "jill", value: { "address": { "number": 27, "street": "Blah St" } } },
-    { name: "address", value: { "number": 27, "street": "Blah St" } },
-    { name: "street", value: "Blah St" }
+
+  t.like([ ...traceByPath('jill.address.street', t2, opts) ], [
+    {
+      name: "jill", sourceValue: {
+        address: {
+          street: 'Blah St',
+          number: 27
+        }
+      }, ancestors: []
+    },
+    {
+      name: "address", sourceValue: {
+        street: 'Blah St',
+        number: 27
+      }, ancestors: [ `jill` ]
+    },
+    { name: "street", nodeValue: "Blah St", ancestors: [ `jill`, `address` ] }
   ]);
 
-  const opts2: PathOpts = {
-    separator: '.',
-    allowArrayIndexes: false
-  }
-
-  // Not found when we don't use array indexes
-  t.deepEqual([ ...traceByPath('kids[1]', t, opts2) ], [
-    { name: 'kids[1]', value: undefined }
-  ]);
-  t.deepEqual([ ...traceByPath('kids[0].address.street', t, opts2) ], [
-    { name: 'kids[0]', value: undefined }
+  // Unknown path
+  t.like([ ...traceByPath('jill.address.street2', t2, opts) ], [
+    {
+      name: "jill", sourceValue: {
+        address: {
+          street: 'Blah St',
+          number: 27
+        }
+      }, ancestors: []
+    },
+    {
+      name: "address", sourceValue: {
+        street: 'Blah St',
+        number: 27
+      }, ancestors: [ `jill` ]
+    },
+    { name: "street2", nodeValue: undefined, sourceValue: undefined, ancestors: [ `jill`, `address` ] }
   ]);
 });
 
@@ -254,16 +303,15 @@ test('get-by-path', (t) => {
     }
   }
   const e = getByPath('jane.address.postcode', people);
-  t.deepEqual(e, { name: "postcode", value: 1000 });
+  t.like(e, { name: "postcode", nodeValue: 1000 });
+  t.like(getByPath('jane.address.country', people), { name: 'country', nodeValue: undefined });
+  t.like(getByPath('jane.address.country.state', people), { name: 'country', nodeValue: undefined });
 
-  t.deepEqual(getByPath('jane.address.country', people), { name: 'country', value: undefined });
-  t.deepEqual(getByPath('jane.address.country.state', people), { name: 'country', value: undefined });
-
-  t.deepEqual([ ...traceByPath('jane.address.street.toofar', people) ], [
-    { name: "jane", value: { address: { postcode: 1000, street: 'West St', city: 'Blahville' }, colour: 'red' } },
-    { name: "address", value: { postcode: 1000, street: 'West St', city: 'Blahville' } },
-    { name: "street", value: "West St" },
-    { name: "toofar", value: undefined }
+  t.like([ ...traceByPath('jane.address.street.toofar', people) ], [
+    { name: "jane", sourceValue: { address: { postcode: 1000, street: 'West St', city: 'Blahville' }, colour: 'red' } },
+    { name: "address", sourceValue: { postcode: 1000, street: 'West St', city: 'Blahville' } },
+    { name: "street", nodeValue: "West St" },
+    { name: "toofar", nodeValue: undefined }
   ]);
 
 });
