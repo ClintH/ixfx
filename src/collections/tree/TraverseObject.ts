@@ -1,11 +1,12 @@
-import { betweenChomp, toStringAbbreviate } from '../../Text.js';
-import { integerParse, nullUndef } from '../../Guards.js';
+import { toStringAbbreviate } from '../../Text.js';
+import { nullUndef } from '../../Guards.js';
 import { last } from '../../IterableSync.js';
 import * as TreeArrayBacked from './TreeMutable.js';
 import { isPrimitive } from '../../KeyValue.js';
 import type { TraversableTree, Node, SimplifiedNode } from './Types.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
-export type EntryStatic = Readonly<{ name: string, value: any }>
+export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: Array<string> }>;
+export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
 
 /**
  * Options for parsing a path
@@ -15,10 +16,7 @@ export type PathOpts = {
    * Separator for path, eg '.'
    */
   readonly separator?: string;
-  /**
-   * If true, [integer] will be used for arrays
-   */
-  readonly allowArrayIndexes?: boolean;
+
 };
 
 export function prettyPrintEntries(entries: ReadonlyArray<Entry>) {
@@ -59,10 +57,6 @@ export const prettyPrint = (
 };
 
 export const toStringDeep = (node: Node<Entry | EntryStatic>, indent = 0) => {
-  // if (node.value === undefined) throw new Error(`node.value undefined`);
-  // if (node.value.nodeValue === undefined) throw new Error(`node.value.nodeValue undefined.`);
-  // if (node.value.sourceValue === undefined) throw new Error(`node.value.sourceValue undefined`);
-
   let t = ` `.repeat(indent) + ` ` + node.value?.name;
   if (node.value !== undefined) {
     if (`sourceValue` in node.value && `nodeValue` in node.value) {
@@ -71,6 +65,11 @@ export const toStringDeep = (node: Node<Entry | EntryStatic>, indent = 0) => {
       sourceValue = sourceValue === nodeValue ? `` : `source: ` + sourceValue;
       t += ` = ${ nodeValue } ${ sourceValue }`
     } else if (`value` in node.value && node.value.value !== undefined) t += ` = ${ node.value.value }`;
+
+    if (`ancestors` in node.value) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      t += ` (ancestors: ${ (node.value.ancestors!).join(`, `) })`;
+    }
   }
   t += `\n`
   for (const c of node.childrenStore) {
@@ -79,7 +78,11 @@ export const toStringDeep = (node: Node<Entry | EntryStatic>, indent = 0) => {
   return t;
 }
 
-export type ChildrenOptions = CreateOptions;
+export type ChildrenOptions = Readonly<{
+  filter: `none` | `leaves` | `branches`
+  name: string
+}>;
+
 /**
  * Returns the direct children of a tree-like object as a pairing
  * of node name and value. Supports basic objects, Maps and arrays. 
@@ -88,11 +91,11 @@ export type ChildrenOptions = CreateOptions;
  * 
  * @example Simple object
  * ```js
-    * const o = {
-      *  colour: {
+ * const o = {
+ *  colour: {
  *    r: 0.5, g: 0.5, b: 0.5
-        *  }
-      * };
+ *  }
+ * };
  * 
  * const children = [ ...Trees.children(o) ];
  * // Children:
@@ -106,7 +109,7 @@ export type ChildrenOptions = CreateOptions;
  * Arrays are assigned a name based on index.
  * @example Arrays
  * ```js
-const colours = [ { r: 1, g: 0, b: 0 }, { r: 0, g: 1, b: 0 }, { r: 0, g: 0, b: 1 } ];
+ * const colours = [ { r: 1, g: 0, b: 0 }, { r: 0, g: 1, b: 0 }, { r: 0, g: 0, b: 1 } ];
  * // Children: 
  * // [
  * //  { name: "array[0]", value: {r:1,g:0,b:0} },
@@ -115,9 +118,10 @@ const colours = [ { r: 1, g: 0, b: 0 }, { r: 0, g: 1, b: 0 }, { r: 0, g: 0, b: 1
  * // ]
  * ```
  * 
- * Pass in `defaultName` (eg 'colours') to have names generated as 'colours[0]', etc.
+ * Pass in `options.name` (eg 'colours') to have names generated as 'colours[0]', etc.
+ * Options can also be used to filter children. By default all direct children are returned.
  * @param node 
- * @param defaultName 
+ * @param options  
  */
 export function* children<T extends object>(
   node: T,
@@ -125,26 +129,46 @@ export function* children<T extends object>(
 ): IterableIterator<Entry> {
   // ✔️ Unit tested
   nullUndef(node, `node`);
-  let defaultName = options.name;
+  //let defaultName = options.name;
+
+  const filter = options.filter ?? `none`;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  const valueFor = options.valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
+  //const valueFor = (v: any) => v;// options.valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
+
+  const filterByValue = (v: any): [ filter: boolean, isPrimitive: boolean ] => {
+    if (filter === `none`) return [ true, isPrimitive(v) ];
+    else if (filter === `leaves` && isPrimitive(v)) return [ true, true ];
+    else if (filter === `branches` && !isPrimitive(v)) return [ true, false ];
+    return [ false, isPrimitive(v) ];
+  }
 
   if (Array.isArray(node)) {
-    if (!defaultName) defaultName = `array`;
+    //if (options.name === undefined) defaultName = `array`;
     for (const [ index, element ] of node.entries()) {
-      yield { name: defaultName + `[ ` + index.toString() + ` ]`, sourceValue: element, nodeValue: valueFor(element) };
+      const f = filterByValue(element);
+      if (f[ 0 ]) {
+        yield { name: index.toString(), sourceValue: element, nodeValue: f[ 1 ] ? element : undefined };
+        //yield { name: defaultName + `[` + index.toString() + `]`, sourceValue: element, nodeValue: f[ 1 ] ? element : undefined };
+      }
     }
   } else if (typeof node === `object`) {
-    if (`entries` in node) {
-      for (const entry of (node as any as Map<any, any>).entries()) {
-        yield { name: entry[ 0 ], sourceValue: entry[ 1 ], nodeValue: valueFor(entry[ 1 ]) };
-      }
-    } else {
-      for (const entry of Object.entries(node)) {
-        yield { name: entry[ 0 ], sourceValue: entry[ 1 ], nodeValue: valueFor(entry[ 1 ]) };
+    const entriesIter = (`entries` in node) ? (node as any as Map<any, any>).entries() : Object.entries(node);
+    for (const [ name, value ] of entriesIter) {
+      //onsole.log(`children name: ${ name } type: ${ typeof value } isPrim: ${ isPrimitive(value) } filter: ${ filter }`);
+      const f = filterByValue(value);
+      if (f[ 0 ]) {
+        yield { name: name, sourceValue: value, nodeValue: f[ 1 ] ? value : undefined };
       }
     }
+  }
+}
+
+export function* depthFirst<T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: Array<string> = []): IterableIterator<EntryWithAncestors> {
+  for (const c of children(node, options)) {
+    //onsole.log(`depthFirst name: ${ c.name } nodeValue: ${ toStringAbbreviate(c.nodeValue) }`)
+    yield { ...c, ancestors: [ ...ancestors ] };
+    yield* depthFirst(c.sourceValue, options, [ ...ancestors, c.name ]);
   }
 }
 
@@ -236,37 +260,41 @@ export function* traceByPath<T extends object>(
   path: string,
   node: T,
   opts: PathOpts = {}
-): Iterable<Entry> {
+): Iterable<EntryWithAncestors> {
   // ✔️ Unit tested
   nullUndef(path, `path`);
   nullUndef(node, `node`);
 
   const separator = opts.separator ?? `.`;
-  const allowArrayIndexes = opts.allowArrayIndexes ?? true;
+  // const allowArrayIndexes = opts.allowArrayIndexes ?? true;
   const pathSplit = path.split(separator);
 
+  const ancestors: Array<string> = [];
   for (const p of pathSplit) {
-    let entry = childByName(p, node);
-    if (allowArrayIndexes) {
-      const [ withoutBrackets, arrayIndexString ] = betweenChomp(p, `[ `, ` ]`);
-      const arrayIndex = integerParse(arrayIndexString, `positive`, -1);
-      if (arrayIndex >= 0) {
-        // Get array by name without the []
-        entry = childByName(withoutBrackets, node);
-
-        if (entry && Array.isArray(entry.sourceValue)) {
-          // Result was array as expected
-          entry = { name: p, sourceValue: entry.sourceValue[ arrayIndex ], nodeValue: entry.sourceValue[ arrayIndex ] };
-        }
-      }
-    }
+    const entry = childByName(p, node);
+    //onsole.log(`traceByPath: entry: ${ entry?.name } path: '${ path }' p: '${ p }' source: ${ JSON.stringify(entry?.sourceValue) }`);
+    // if (allowArrayIndexes) {
+    //   const [ withoutBrackets, arrayIndexString ] = betweenChomp(p, `[`, `]`);
+    //   //onsole.log(`  withoutBrackets: ${ withoutBrackets } str: ${ arrayIndexString } without: ${ withoutBrackets }`);
+    //   const arrayIndex = integerParse(arrayIndexString, `positive`, -1);
+    //   if (arrayIndex >= 0) {
+    //     // Get array by name without the []
+    //     entry = childByName(withoutBrackets, node);
+    //     //onsole.log(`  entry: ${ entry?.name }`);
+    //     if (entry && Array.isArray(entry.sourceValue)) {
+    //       // Result was array as expected
+    //       entry = { name: p, sourceValue: entry.sourceValue[ arrayIndex ], nodeValue: entry.sourceValue[ arrayIndex ] };
+    //     }
+    //   }
+    // }
 
     if (!entry) {
-      yield { name: p, sourceValue: undefined, nodeValue: undefined };
+      yield { name: p, sourceValue: undefined, nodeValue: undefined, ancestors };
       return;
     }
     node = entry.sourceValue;
-    yield entry;
+    yield { ...entry, ancestors: [ ...ancestors ] };
+    ancestors.push(p);
   }
 }
 
@@ -295,18 +323,19 @@ export function* traceByPath<T extends object>(
  * @param parent 
  * @returns 
  */
-export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions>, parent?: TraversableTree<EntryStatic> | undefined): TraversableTree<EntryStatic> => {
+export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions>, ancestors: Array<string> = [], parent?: TraversableTree<EntryStatic> | undefined,): TraversableTree<EntryStatic> => {
+  const name = options.name ?? `object`;
   const t: TraversableTree<EntryStatic> = {
     *children() {
       for (const c of children(node, options)) {
-        yield asDynamicTraversable(c.sourceValue, { ...options, name: c.name }, t);
+        yield asDynamicTraversable(c.sourceValue, { ...options, name: c.name }, [ ...ancestors, name ], t);
       }
     },
     getParent() {
       return parent;
     },
     getValue() {
-      return { name: options.name ?? `object_`, value: node };
+      return { name, value: node, ancestors };
     },
     getIdentity() {
       return node;
@@ -314,7 +343,6 @@ export const asDynamicTraversable = <T extends object>(node: T, options: Partial
   }
   return t;
 }
-
 
 /**
  * Reads all fields and sub-fields of `node`, returning as a 'wrapped' tree structure.
@@ -359,17 +387,20 @@ export type CreateOptions = {
  * @returns 
  */
 export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): Node<EntryStatic> => {
+  const valuesAtLeaves = options.valuesAtLeaves ?? false;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  const valueFor = options.valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
-  return createImpl(node, valueFor(node), options);
+  const valueFor = valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
+  return createImpl(node, valueFor(node), options, []);
 }
 
-const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Partial<CreateOptions> = {}): Node<EntryStatic> => {
+const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Partial<CreateOptions> = {}, ancestors: Array<string>): Node<EntryStatic> => {
   const defaultName = options.name ?? `object_ci`;
-  const r = TreeArrayBacked.root<EntryStatic>({ name: defaultName, value: nodeValue });
-
+  //onsole.log(`createImpl name: ${ defaultName } nodeValue: ${ JSON.stringify(nodeValue) }`);
+  const r = TreeArrayBacked.root<EntryStatic>({ name: defaultName, value: nodeValue, ancestors: [ ...ancestors ] });
+  ancestors = [ ...ancestors, defaultName ];
   for (const c of children(sourceValue, options)) {
-    TreeArrayBacked.add(createImpl(c.sourceValue, c.nodeValue, { ...options, name: c.name }), r);
+    const v = options.valuesAtLeaves ? c.nodeValue : c.sourceValue;
+    TreeArrayBacked.add(createImpl(c.sourceValue, v, { ...options, name: c.name }, ancestors), r);
   }
   return r;
 }
