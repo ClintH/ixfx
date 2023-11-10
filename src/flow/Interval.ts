@@ -3,7 +3,6 @@ import { sleep } from './Sleep.js';
 
 import { type AsyncPromiseOrGenerator } from './index.js';
 
-
 export type IntervalOpts = {
   /**
    * Sleep a fixed period of time regardless of how long each invocation of 'produce' takes
