@@ -1,9 +1,10 @@
-import { Rects, Points } from './index.js';
+import { Rects } from './index.js';
 import { throwIntegerTest, throwNumberTest } from '../Guards.js';
 import { clampIndex } from '../data/Clamp.js';
-import { randomElement } from '../collections/Arrays.js';
+import { randomElement } from '../collections/arrays/index.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
 import { zipKeyValue } from '../collections/map/index.js';
+import type { Point } from './points/Types.js';
 
 export type GridVisual = Grid & {
   readonly size: number;
@@ -47,7 +48,7 @@ export type VisitorLogic = {
   readonly options?: IdentifyNeighbours;
   readonly select: NeighbourSelector;
 };
-export type VisitGenerator = Generator<Readonly<Cell>, void, unknown>;
+export type VisitGenerator = Generator<Readonly<Cell>, void>;
 export type VisitorOpts = {
   readonly visited?: ISetMutable<Cell>;
   readonly reversed?: boolean;
@@ -189,28 +190,26 @@ export const cellEquals = (
  */
 export const guardCell = (
   cell: Cell,
-  paramName: string = `Param`,
+  parameterName = `Param`,
   grid?: Grid
 ) => {
   if (cell === undefined) {
-    throw new Error(paramName + ` is undefined. Expecting {x,y}`);
+    throw new Error(parameterName + ` is undefined. Expecting {x,y}`);
   }
-  if (cell.x === undefined) throw new Error(paramName + `.x is undefined`);
-  if (cell.y === undefined) throw new Error(paramName + `.y is undefined`);
-  if (Number.isNaN(cell.x)) throw new Error(paramName + `.x is NaN`);
-  if (Number.isNaN(cell.y)) throw new Error(paramName + `.y is NaN`);
+  if (cell.x === undefined) throw new Error(parameterName + `.x is undefined`);
+  if (cell.y === undefined) throw new Error(parameterName + `.y is undefined`);
+  if (Number.isNaN(cell.x)) throw new Error(parameterName + `.x is NaN`);
+  if (Number.isNaN(cell.y)) throw new Error(parameterName + `.y is NaN`);
   if (!Number.isInteger(cell.x)) {
-    throw new TypeError(paramName + `.x is non-integer`);
+    throw new TypeError(parameterName + `.x is non-integer`);
   }
   if (!Number.isInteger(cell.y)) {
-    throw new TypeError(paramName + `.y is non-integer`);
+    throw new TypeError(parameterName + `.y is non-integer`);
   }
-  if (grid !== undefined) {
-    if (!inside(grid, cell)) {
-      throw new Error(
-        `${ paramName } is outside of grid. Cell: ${ cell.x },${ cell.y } Grid: ${ grid.cols }, ${ grid.rows }`
-      );
-    }
+  if (grid !== undefined && !inside(grid, cell)) {
+    throw new Error(
+      `${ parameterName } is outside of grid. Cell: ${ cell.x },${ cell.y } Grid: ${ grid.cols }, ${ grid.rows }`
+    );
   }
 };
 
@@ -219,18 +218,18 @@ export const guardCell = (
  * @param grid
  * @param paramName
  */
-const guardGrid = (grid: Grid, paramName: string = `Param`) => {
+const guardGrid = (grid: Grid, parameterName = `Param`) => {
   if (grid === undefined) {
-    throw new Error(`${ paramName } is undefined. Expecting grid.`);
+    throw new Error(`${ parameterName } is undefined. Expecting grid.`);
   }
-  if (!(`rows` in grid)) throw new Error(`${ paramName }.rows is undefined`);
-  if (!(`cols` in grid)) throw new Error(`${ paramName }.cols is undefined`);
+  if (!(`rows` in grid)) throw new Error(`${ parameterName }.rows is undefined`);
+  if (!(`cols` in grid)) throw new Error(`${ parameterName }.cols is undefined`);
 
   if (!Number.isInteger(grid.rows)) {
-    throw new TypeError(`${ paramName }.rows is not an integer`);
+    throw new TypeError(`${ parameterName }.rows is not an integer`);
   }
   if (!Number.isInteger(grid.cols)) {
-    throw new TypeError(`${ paramName }.cols is not an integer`);
+    throw new TypeError(`${ parameterName }.cols is not an integer`);
   }
 };
 
@@ -314,21 +313,21 @@ export function* asRectangles(
  * @returns
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const toArray = <V>(grid: Grid, initialValue?: V): V[][] => {
-  const ret = [];
+export const toArray = <V>(grid: Grid, initialValue?: V): Array<Array<V>> => {
+  const returnValue = [];
   //eslint-disable-next-line functional/no-let
   for (let row = 0; row < grid.rows; row++) {
     //eslint-disable-next-line functional/immutable-data
-    ret[ row ] = new Array<V>(grid.cols);
+    returnValue[ row ] = Array.from<V>({ length: grid.cols });
     if (initialValue) {
       //eslint-disable-next-line functional/no-let
       for (let col = 0; col < grid.cols; col++) {
         //eslint-disable-next-line functional/immutable-data
-        ret[ row ][ col ] = initialValue;
+        returnValue[ row ][ col ] = initialValue;
       }
     }
   }
-  return ret;
+  return returnValue;
 };
 
 /**
@@ -343,7 +342,7 @@ export const toArray = <V>(grid: Grid, initialValue?: V): V[][] => {
  */
 export const cellAtPoint = (
   grid: GridVisual,
-  position: Points.Point
+  position: Point
 ): Cell | undefined => {
   const size = grid.size;
   throwNumberTest(size, `positive`, `grid.size`);
@@ -413,11 +412,11 @@ export const neighbours = (
   bounds: BoundsLogic = `undefined`,
   directions?: ReadonlyArray<CardinalDirection>
 ): Neighbours => {
-  const dirs = directions ?? allDirections;
-  const points = dirs.map((c) =>
+  const directories = directions ?? allDirections;
+  const points = directories.map((c) =>
     offset(grid, cell, getVectorFromCardinal(c), bounds)
   );
-  return zipKeyValue<Cell>(dirs, points) as Neighbours;
+  return zipKeyValue<Cell>(directories, points) as Neighbours;
 };
 
 export function* visitNeigbours(
@@ -426,8 +425,8 @@ export function* visitNeigbours(
   bounds: BoundsLogic = `undefined`,
   directions?: ReadonlyArray<CardinalDirection>
 ) {
-  const dirs = directions ?? allDirections;
-  const points = dirs.map((c) =>
+  const directories = directions ?? allDirections;
+  const points = directories.map((c) =>
     offset(grid, cell, getVectorFromCardinal(c), bounds)
   );
   for (const pt of points) {
@@ -442,7 +441,7 @@ export function* visitNeigbours(
  * @param grid
  * @return
  */
-export const cellMiddle = (grid: GridVisual, cell: Cell): Points.Point => {
+export const cellMiddle = (grid: GridVisual, cell: Cell): Point => {
   guardCell(cell);
 
   const size = grid.size;
@@ -478,7 +477,7 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
   const sx = startX < end.x ? 1 : -1;
   const sy = startY < end.y ? 1 : -1;
   // eslint-disable-next-line functional/no-let
-  let err = dx - dy;
+  let error = dx - dy;
 
   const cells = [];
   // eslint-disable-next-line no-constant-condition
@@ -486,13 +485,13 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
     // eslint-disable-next-line functional/immutable-data
     cells.push(Object.freeze({ x: startX, y: startY }));
     if (startX === end.x && startY === end.y) break;
-    const e2 = 2 * err;
+    const e2 = 2 * error;
     if (e2 > -dy) {
-      err -= dy;
+      error -= dy;
       startX += sx;
     }
     if (e2 < dx) {
-      err += dx;
+      error += dx;
       startY += sy;
     }
   }
@@ -520,8 +519,8 @@ export const offsetCardinals = (
 
   const directions = allDirections;
   const vectors = directions.map((d) => getVectorFromCardinal(d, steps));
-  const cells = directions.map((d, i) =>
-    offset(grid, start, vectors[ i ], bounds)
+  const cells = directions.map((d, index) =>
+    offset(grid, start, vectors[ index ], bounds)
   );
 
   return zipKeyValue(directions, cells) as Neighbours;
@@ -545,7 +544,7 @@ export const offsetCardinals = (
  */
 export const getVectorFromCardinal = (
   cardinal: CardinalDirectionOptional,
-  multiplier: number = 1
+  multiplier = 1
 ): Cell => {
   // eslint-disable-next-line functional/no-let
   let v;
@@ -602,10 +601,10 @@ export const getVectorFromCardinal = (
 export const simpleLine = function (
   start: Cell,
   end: Cell,
-  endInclusive: boolean = false
+  endInclusive = false
 ): ReadonlyArray<Cell> {
   // eslint-disable-next-line functional/prefer-readonly-type
-  const cells: Cell[] = [];
+  const cells: Array<Cell> = [];
   if (start.x === end.x) {
     // Vertical
     const lastY = endInclusive ? end.y + 1 : end.y;
@@ -769,9 +768,9 @@ export const visitor = function* (
   }
 
   // eslint-disable-next-line functional/no-let
-  let cellQueue: Cell[] = [ start ];
+  let cellQueue: Array<Cell> = [ start ];
   // eslint-disable-next-line functional/no-let
-  let moveQueue: Neighbour[] = [];
+  let moveQueue: Array<Neighbour> = [];
   // eslint-disable-next-line functional/no-let
   let current: Cell | null = null;
 
@@ -796,7 +795,7 @@ export const visitor = function* (
       if (nextSteps.length === 0) {
         // No more moves for this cell
         if (current !== null) {
-          cellQueue = cellQueue.filter((cq) => cellEquals(cq, current as Cell));
+          cellQueue = cellQueue.filter((cq) => cellEquals(cq, current!));
         }
       } else {
         // eslint-disable-next-line functional/immutable-data
@@ -824,7 +823,7 @@ export const visitor = function* (
 export const visitorDepth = (grid: Grid, start: Cell, opts: VisitorOpts = {}) =>
   visitor(
     {
-      select: (nbos) => nbos[ nbos.length - 1 ],
+      select: (nbos) => nbos.at(-1),
     },
     grid,
     start,
@@ -845,7 +844,7 @@ export const visitorBreadth = (
     opts
   );
 
-const randomNeighbour = (nbos: readonly Neighbour[]) => randomElement(nbos); // .filter(isNeighbour));
+const randomNeighbour = (nbos: ReadonlyArray<Neighbour>) => randomElement(nbos); // .filter(isNeighbour));
 
 export const visitorRandomContiguous = (
   grid: Grid,
@@ -876,7 +875,7 @@ export const visitorRandom = (
   visitor(
     {
       options: (grid, cell) => {
-        const t: Neighbour[] = [];
+        const t: Array<Neighbour> = [];
         for (const c of cells(grid, cell)) {
           // eslint-disable-next-line functional/immutable-data
           t.push([ `n`, c ]);
@@ -897,7 +896,7 @@ export const visitorRow = (
 ) => {
   const { reversed = false } = opts;
 
-  const neighbourSelect = (nbos: readonly Neighbour[]) =>
+  const neighbourSelect = (nbos: ReadonlyArray<Neighbour>) =>
     nbos.find((n) => n[ 0 ] === (reversed ? `w` : `e`));
 
   const possibleNeighbours = (
@@ -1076,16 +1075,16 @@ export const rows = function* (grid: Grid, start: Cell = { x: 0, y: 0 }) {
   //eslint-disable-next-line functional/no-let
   let row = start.y;
   //eslint-disable-next-line functional/no-let
-  let rowCells: Cell[] = [];
+  let rowCells: Array<Cell> = [];
 
   for (const c of cells(grid, start)) {
-    if (c.y !== row) {
+    if (c.y === row) {
+      //eslint-disable-next-line functional/immutable-data
+      rowCells.push(c);
+    } else {
       yield rowCells;
       rowCells = [ c ];
       row = c.y;
-    } else {
-      //eslint-disable-next-line functional/immutable-data
-      rowCells.push(c);
     }
   }
   if (rowCells.length > 0) yield rowCells;
@@ -1122,7 +1121,7 @@ export const cells = function* (grid: Grid, start: Cell = { x: 0, y: 0 }) {
 };
 
 export const access1dArray = <V>(
-  array: readonly V[],
+  array: ReadonlyArray<V>,
   cols: number
 ): CellAccessor<V> => {
   const grid = { cols, rows: Math.ceil(array.length / cols) };
@@ -1150,8 +1149,8 @@ export const access1dArray = <V>(
  * @returns
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export const array2dUpdater = <V>(grid: GridVisual, array: V[][]) => {
-  const fn = (v: V, position: Points.Point) => {
+export const array2dUpdater = <V>(grid: GridVisual, array: Array<Array<V>>) => {
+  const fn = (v: V, position: Point) => {
     const pos = cellAtPoint(grid, position);
     if (pos === undefined) {
       throw new Error(
@@ -1186,16 +1185,16 @@ export const array2dUpdater = <V>(grid: GridVisual, array: V[][]) => {
  * @param iteratorFn
  */
 export function* visitArray<V>(
-  array: readonly V[],
+  array: ReadonlyArray<V>,
   cols: number,
-  iteratorFn?: Visitor,
+  iteratorFunction?: Visitor,
   opts?: VisitorOpts
 ): IterableIterator<readonly [ data: V, index: number ]> {
   if (typeof array === `undefined`) {
-    throw Error(`First parameter is undefined, expected an array`);
+    throw new TypeError(`First parameter is undefined, expected an array`);
   }
-  if (array === null) throw Error(`First parameter is null, expected an array`);
-  if (!Array.isArray(array)) throw Error(`First parameter should be an array`);
+  if (array === null) throw new Error(`First parameter is null, expected an array`);
+  if (!Array.isArray(array)) throw new Error(`First parameter should be an array`);
 
   throwIntegerTest(cols, `aboveZero`, `cols`);
   if (array.length === 0) return;
@@ -1207,8 +1206,8 @@ export function* visitArray<V>(
     rows,
   };
 
-  if (iteratorFn === undefined) iteratorFn = cells;
-  const iter = iteratorFn(grid, { x: 0, y: 0 }, opts);
+  if (iteratorFunction === undefined) iteratorFunction = cells;
+  const iter = iteratorFunction(grid, { x: 0, y: 0 }, opts);
   for (const cell of iter) {
     const index = indexFromCell(grid, cell, wrap);
     if (index === undefined) return undefined;
@@ -1351,11 +1350,7 @@ export const cellFromIndex = (
 ): Cell => {
   //eslint-disable-next-line functional/no-let
   let cols = 0;
-  if (typeof colsOrGrid === `number`) {
-    cols = colsOrGrid;
-  } else {
-    cols = colsOrGrid.cols;
-  }
+  cols = typeof colsOrGrid === `number` ? colsOrGrid : colsOrGrid.cols;
   throwIntegerTest(cols, `aboveZero`, `colsOrGrid`);
 
   return {

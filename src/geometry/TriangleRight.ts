@@ -1,5 +1,6 @@
 import { Points, Triangles } from './index.js';
 import { type Circle } from './Circle.js';
+import type { Point } from './points/Types.js';
 
 export type Right = {
   readonly adjacent?: number;
@@ -30,14 +31,14 @@ export type DefinedRight = {
  */
 export const fromA = (
   t: Right,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const tt = resolveLengths(t);
   const seg = hypotenuseSegments(t);
   const h = height(t);
   const a = { x: origin.x, y: origin.y };
   const b = { x: origin.x + tt.hypotenuse, y: origin.y };
-  const c = { x: origin.x + seg[1], y: origin.y - h };
+  const c = { x: origin.x + seg[ 1 ], y: origin.y - h };
   return { a, b, c };
 };
 
@@ -58,14 +59,14 @@ export const fromA = (
  */
 export const fromB = (
   t: Right,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const tt = resolveLengths(t);
   const seg = hypotenuseSegments(t);
   const h = height(t);
   const b = { x: origin.x, y: origin.y };
   const a = { x: origin.x - tt.hypotenuse, y: origin.y };
-  const c = { x: origin.x - seg[0], y: origin.y - h };
+  const c = { x: origin.x - seg[ 0 ], y: origin.y - h };
   return { a, b, c };
 };
 
@@ -92,13 +93,13 @@ export const fromB = (
  */
 export const fromC = (
   t: Right,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const seg = hypotenuseSegments(t);
   const h = height(t);
   const c = { x: origin.x, y: origin.y };
-  const a = { x: origin.x - seg[1], y: origin.y + h };
-  const b = { x: origin.x + seg[0], y: origin.y + h };
+  const a = { x: origin.x - seg[ 1 ], y: origin.y + h };
+  const b = { x: origin.x + seg[ 0 ], y: origin.y + h };
   return { a, b, c };
 };
 
@@ -162,11 +163,11 @@ export const height = (t: Right): number => {
  */
 export const hypotenuseSegments = (
   t: Right
-): readonly [p: number, q: number] => {
+): readonly [ p: number, q: number ] => {
   const tt = resolveLengths(t);
   const p = (tt.opposite * tt.opposite) / tt.hypotenuse;
   const q = (tt.adjacent * tt.adjacent) / tt.hypotenuse;
-  return [p, q];
+  return [ p, q ];
 };
 
 export const perimeter = (t: Right): number => {
@@ -190,7 +191,7 @@ export const angleAtPointA = (t: Right): number => {
     (tt.adjacent * tt.adjacent +
       tt.hypotenuse * tt.hypotenuse -
       tt.opposite * tt.opposite) /
-      (2 * tt.adjacent * tt.hypotenuse)
+    (2 * tt.adjacent * tt.hypotenuse)
   );
 };
 
@@ -205,7 +206,7 @@ export const angleAtPointB = (t: Right): number => {
     (tt.opposite * tt.opposite +
       tt.hypotenuse * tt.hypotenuse -
       tt.adjacent * tt.adjacent) /
-      (2 * tt.opposite * tt.hypotenuse)
+    (2 * tt.opposite * tt.hypotenuse)
   );
 };
 
@@ -219,7 +220,7 @@ export const angleAtPointB = (t: Right): number => {
  */
 export const medians = (
   t: Right
-): readonly [a: number, b: number, c: number] => {
+): readonly [ a: number, b: number, c: number ] => {
   const tt = resolveLengths(t);
   const b = tt.adjacent * tt.adjacent;
   const c = tt.hypotenuse * tt.hypotenuse;

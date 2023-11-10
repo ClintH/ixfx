@@ -1,8 +1,8 @@
-import { sortByNumericProperty } from "../collections/Arrays.js";
+import { sortByNumericProperty } from "../collections/arrays/index.js";
 import * as Circles from "./Circle.js";
 import * as Shapes from "./Shape.js";
-import * as Points from './Point.js';
-import type { RandomSource } from "../Random.js";
+import type { RandomSource } from "../random/Types.js";
+import type { Point } from "./points/Types.js";
 
 export type RandomOpts = {
   readonly attempts?: number
@@ -19,7 +19,7 @@ export const random = (circles: ReadonlyArray<Circles.Circle>, container: Shapes
   const sorted = sortByNumericProperty(circles, `radius`);
   const positionedCircles: Array<Circles.CirclePositioned> = [];
 
-  const willHit = (b: Points.Point, radius: number) => positionedCircles.some(v => Circles.isIntersecting(v, b, radius));
+  const willHit = (b: Point, radius: number) => positionedCircles.some(v => Circles.isIntersecting(v, b, radius));
 
   while (sorted.length > 0) {
     //eslint-disable-next-line functional/immutable-data

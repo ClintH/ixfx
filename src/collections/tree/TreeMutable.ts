@@ -1,5 +1,5 @@
 import { isEqualDefault, type IsEqual } from "../../IsEqual.js"
-import { containsDuplicateInstances, without } from "../Arrays.js"
+import { containsDuplicateInstances, without } from "../arrays/index.js"
 import { QueueMutable } from "../queue/QueueMutable.js"
 import { StackMutable } from "../stack/StackMutable.js"
 import { compare as treeCompare } from './Compare.js';

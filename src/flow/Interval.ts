@@ -1,7 +1,7 @@
 import { intervalToMs, type Interval } from './IntervalType.js';
 import { sleep } from './Sleep.js';
 
-import { type AsyncPromiseOrGenerator } from './index.js';
+import { type AsyncPromiseOrGenerator } from './Types.js';
 
 export type IntervalOpts = {
   /**

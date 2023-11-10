@@ -1,4 +1,5 @@
-import { type Point, isPoint } from './Point.js';
+import { isPoint } from './points/index.js';
+import type { Point } from './points/Types.js';
 import { type Rect, isRect, placeholder as PlaceholderRect } from './Rect.js';
 
 /**
@@ -87,16 +88,21 @@ export const scaler = (
 
   const computeScale = () => {
     switch (scaleBy) {
-      case `height`:
+      case `height`: {
         return { x: sh, y: sh };
-      case `width`:
+      }
+      case `width`: {
         return { x: sw, y: sw };
-      case `min`:
+      }
+      case `min`: {
         return { x: Math.min(sw, sh), y: Math.min(sw, sh) };
-      case `max`:
+      }
+      case `max`: {
         return { x: Math.max(sw, sh), y: Math.max(sw, sh) };
-      default:
+      }
+      default: {
         return { x: sw, y: sh };
+      }
     }
   };
 
@@ -105,7 +111,7 @@ export const scaler = (
     b?: number | Rect,
     c?: number | Rect,
     d?: number
-  ): [x: number, y: number, w: number, h: number] => {
+  ): [ x: number, y: number, w: number, h: number ] => {
     //eslint-disable-next-line functional/no-let
     let inX = Number.NaN;
     //eslint-disable-next-line functional/no-let
@@ -119,7 +125,7 @@ export const scaler = (
       inX = a;
       if (typeof b === `number`) {
         inY = b;
-        if (c === undefined) return [inX, inY, outW, outH];
+        if (c === undefined) return [ inX, inY, outW, outH ];
         if (isRect(c)) {
           outW = c.width;
           outH = c.height;
@@ -128,7 +134,7 @@ export const scaler = (
           if (typeof d === `number`) {
             outH = d;
           } else {
-            throw new Error(`Missing final height value`);
+            throw new TypeError(`Missing final height value`);
           }
         } else throw new Error(`Missing valid output range`);
       } else if (isRect(b)) {
@@ -142,7 +148,7 @@ export const scaler = (
     } else if (isPoint(a)) {
       inX = a.x;
       inY = a.y;
-      if (b === undefined) return [inX, inY, outW, outH];
+      if (b === undefined) return [ inX, inY, outW, outH ];
       if (isRect(b)) {
         outW = b.width;
         outH = b.height;
@@ -151,19 +157,19 @@ export const scaler = (
         if (typeof c === `number`) {
           outH = c;
         } else {
-          throw new Error(
+          throw new TypeError(
             `Expected height as third parameter after Point and output width`
           );
         }
       } else {
-        throw new Error(
+        throw new TypeError(
           `Expected Rect or width as second parameter when first parameter is a Point`
         );
       }
     } else {
       throw new Error(`Expected input Point or x value as first parameter`);
     }
-    return [inX, inY, outW, outH];
+    return [ inX, inY, outW, outH ];
   };
 
   const scaleAbs = (
@@ -203,17 +209,13 @@ export const scaler = (
       s = computeScale();
     }
 
-    if (abs) {
-      return {
-        x: x * s.x,
-        y: y * s.y,
-      };
-    } else {
-      return {
-        x: x / s.x,
-        y: y / s.y,
-      };
-    }
+    return abs ? {
+      x: x * s.x,
+      y: y * s.y,
+    } : {
+      x: x / s.x,
+      y: y / s.y,
+    };
   };
 
   return {

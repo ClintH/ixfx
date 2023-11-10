@@ -1,11 +1,11 @@
 import { type CirclePositioned } from '../geometry/Circle.js';
 import * as Lines from '../geometry/Line.js';
-import * as Points from '../geometry/Point.js';
 import * as Svg from './Svg.js';
 import { getCssVariable } from './Colour.js';
+import type { Point } from '../geometry/points/Types.js';
 //import {Palette} from ".";
 
-const numOrPercentage = (v: number): string => {
+const numberOrPercentage = (v: number): string => {
   if (v >= 0 && v <= 1) return v * 100 + `%`;
   return v.toString();
 };
@@ -26,7 +26,7 @@ const numOrPercentage = (v: number): string => {
  * @returns
  */
 export const path = (
-  svgOrArray: string | readonly string[],
+  svgOrArray: string | ReadonlyArray<string>,
   parent: SVGElement,
   opts?: Svg.PathDrawingOpts,
   queryOrExisting?: string | SVGPathElement
@@ -40,7 +40,7 @@ export const path = (
     typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
 
   elem.setAttributeNS(null, `d`, svg);
-  parent.appendChild(elem);
+  parent.append(elem);
   return pathUpdate(elem, opts);
 };
 
@@ -108,7 +108,7 @@ export const circle = (
  * @returns
  */
 export const group = (
-  children: readonly SVGElement[],
+  children: ReadonlyArray<SVGElement>,
   parent: SVGElement,
   queryOrExisting?: string | SVGGElement
 ): SVGGElement => {
@@ -118,11 +118,11 @@ export const group = (
 
 export const groupUpdate = (
   elem: SVGGElement,
-  children: readonly SVGElement[]
+  children: ReadonlyArray<SVGElement>
 ) => {
   for (const c of children) {
     if (c.parentNode !== elem) {
-      elem.appendChild(c);
+      elem.append(c);
     }
   }
 
@@ -190,10 +190,10 @@ export const textPathUpdate = (
   if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
   if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
   if (opts?.startOffset) {
-    el.setAttributeNS(null, `startOffset`, numOrPercentage(opts.startOffset));
+    el.setAttributeNS(null, `startOffset`, numberOrPercentage(opts.startOffset));
   }
   if (opts?.textLength) {
-    el.setAttributeNS(null, `textLength`, numOrPercentage(opts.textLength));
+    el.setAttributeNS(null, `textLength`, numberOrPercentage(opts.textLength));
   }
 
   if (text) {
@@ -215,7 +215,7 @@ export const textPathUpdate = (
  * @returns
  */
 export const textPath = (
-  pathRef: string,
+  pathReference: string,
   text: string,
   parent: SVGElement,
   opts?: Svg.TextPathDrawingOpts,
@@ -234,7 +234,7 @@ export const textPath = (
     `textPath`,
     queryOrExisting
   );
-  p.setAttributeNS(null, `href`, pathRef);
+  p.setAttributeNS(null, `href`, pathReference);
   return textPathUpdate(p, text, opts);
 };
 
@@ -248,7 +248,7 @@ export const textPath = (
  */
 export const textUpdate = (
   el: SVGTextElement,
-  pos?: Points.Point,
+  pos?: Point,
   text?: string,
   opts?: Svg.TextDrawingOpts
 ) => {
@@ -292,7 +292,7 @@ export const textUpdate = (
 export const text = (
   text: string,
   parent: SVGElement,
-  pos?: Points.Point,
+  pos?: Point,
   opts?: Svg.TextDrawingOpts,
   queryOrExisting?: string | SVGTextElement
 ): SVGTextElement => {
@@ -319,7 +319,7 @@ export const text = (
  */
 export const grid = (
   parent: SVGElement,
-  center: Points.Point,
+  center: Point,
   spacing: number,
   width: number,
   height: number,
@@ -352,6 +352,6 @@ export const grid = (
     line(vert, g);
     x += spacing;
   }
-  parent.appendChild(g);
+  parent.append(g);
   return g;
 };

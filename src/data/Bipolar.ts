@@ -1,8 +1,9 @@
 
-import { floatSource, type RandomOptions, type RandomSource } from '../Random.js';
+import { type RandomOptions, type RandomSource } from '../random/Types.js';
 import { throwNumberTest } from '../Guards.js';
 import { interpolate } from './Interpolate.js';
 import { scaler as numberScaler } from './Scale.js';
+import { floatSource } from '../random/FloatSource.js';
 
 /**
  * Wrapper around a bipolar value. Immutable.

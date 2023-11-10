@@ -1,7 +1,7 @@
 /* eslint-disable */
 import test, { type ExecutionContext } from 'ava';
-import { minMaxAvg } from '../collections/NumericArrays.js';
-import { compareValuesEqual } from '../collections/Arrays.js';
+import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
+import { compareValuesEqual } from '../collections/arrays/index.js';
 import { isEqualDefault } from '../IsEqual.js';
 //test.todo('sf');
 

@@ -1,4 +1,4 @@
-import * as Points from '../geometry/Point.js';
+import * as Points from '../geometry/points/index.js';
 import {
   TrackedValueMap,
   type TrackedValueOpts as TrackOpts,
@@ -6,6 +6,7 @@ import {
 } from './TrackedValue.js';
 import { ObjectTracker } from './ObjectTracker.js';
 import { Lines, Polar, Vectors } from '../geometry/index.js';
+import type { Point } from '../geometry/points/Types.js';
 
 /**
  * Information about seen points
@@ -30,14 +31,14 @@ export type PointTrackerResults = {
    * always maintains some time horizon
    */
   readonly fromInitial: PointTrack;
-  readonly values: ReadonlyArray<Points.Point>;
+  readonly values: ReadonlyArray<Point>;
 };
 
 /**
  * Point tracker. Create via `pointTracker()`.
  *
  */
-export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResults> {
+export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   /**
    * Function that yields the relation from initial point
    */
@@ -100,7 +101,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * @param p Point
    */
   computeResults(
-    _p: Array<TimestampedObject<Points.Point>>
+    _p: Array<TimestampedObject<Point>>
   ): PointTrackerResults {
     const currentLast = this.last;
 
@@ -159,7 +160,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * Returns a vector of the initial/last points of the tracker.
    * Returns as a Cartesian coordinate
    */
-  get vectorCartesian(): Points.Point {
+  get vectorCartesian(): Point {
     return Vectors.fromLineCartesian(this.lineStartEnd);
   }
 
@@ -196,7 +197,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    *
    * `Points.Placeholder` is returned if there's only one point so far.
    */
-  difference(): Points.Point {
+  difference(): Point {
     const initial = this.initial;
     return this.values.length >= 2 && initial !== undefined ? Points.subtract(this.last, initial) : Points.Placeholder;
   }
@@ -229,7 +230,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
  * track added values.
  */
 export class TrackedPointMap extends TrackedValueMap<
-  Points.Point,
+  Point,
   PointTracker,
   PointTrackerResults
 > {

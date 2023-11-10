@@ -1,15 +1,4 @@
-// import * as Arcs from './Arc.js';
-// import * as Beziers from './Bezier.js';
-// import * as Circles from './Circle.js';
-// import * as Compound from './CompoundPath.js';
-// import * as Grids from './Grid.js';
-// import * as Lines from './Line.js';
-// import * as Paths from './Path.js';
-// import * as Points from './Point.js';
-// import * as Rects from './Rect.js';
-// import * as Ellipses from './Ellipse.js';
-// import * as Shapes from './Shape.js';
-// import * as Polar from './Polar.js';
+
 
 export * as Waypoints from './Waypoint.js';
 export * as Spheres from './Sphere.js';
@@ -17,13 +6,13 @@ export * as Layouts from './Layout.js';
 export * as Circles from './Circle.js';
 export * as Lines from './Line.js';
 export * as Rects from './Rect.js';
-export * as Points from './Point.js';
+export * as Points from './points/index.js';
 export * as Paths from './Path.js';
 export * as Grids from './Grid.js';
 export * as Beziers from './Bezier.js';
 export * as Compound from './CompoundPath.js';
 export * as Ellipses from './Ellipse.js';
-
+export * from './Types.js';
 
 /**
  * Quad tree is a datastructure for efficiently determining whether
@@ -174,7 +163,7 @@ export function radianToDegree(angleInRadians: number | ReadonlyArray<number>): 
   return Array.isArray(angleInRadians) ? angleInRadians.map(v => v * 180 / Math.PI) : (angleInRadians as number) * 180 / Math.PI;
 }
 
-import type { Point } from './Point.js';
+import type { Point } from './points/Types.js';
 /**
  * Angle from x-axis to point (ie. `Math.atan2`)
  * @param point 

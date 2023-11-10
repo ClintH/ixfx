@@ -1,9 +1,10 @@
+import type { Point } from '../geometry/points/Types.js';
 import { Points } from '../geometry/index.js';
 
 export type DragState = {
   readonly token?: object;
-  readonly initial: Points.Point;
-  readonly delta: Points.Point;
+  readonly initial: Point;
+  readonly delta: Point;
 };
 
 export type DragStart = {

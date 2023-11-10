@@ -1,8 +1,9 @@
+import type { Point } from './points/Types.js';
 import { Points, Paths, Rects } from './index.js';
 
 export type CompoundPath = Paths.Path & {
-  readonly segments:readonly Paths.Path[]
-  readonly kind:`compound`
+  readonly segments: readonly Paths.Path[]
+  readonly kind: `compound`
 };
 
 /**
@@ -13,10 +14,10 @@ export type CompoundPath = Paths.Path & {
  * @param {Paths.Path} path Path to substitute in
  * @returns {CompoundPath} New compoundpath
  */
-export const setSegment = (compoundPath:CompoundPath, index:number, path:Paths.Path):CompoundPath => {
-  const existing = [...compoundPath.segments];
+export const setSegment = (compoundPath: CompoundPath, index: number, path: Paths.Path): CompoundPath => {
+  const existing = [ ...compoundPath.segments ];
   //eslint-disable-next-line functional/prefer-readonly-type,functional/immutable-data
-  existing[index] = path;
+  existing[ index ] = path;
   return fromPaths(...existing);
 };
 
@@ -29,7 +30,7 @@ export const setSegment = (compoundPath:CompoundPath, index:number, path:Paths.P
  * @param {Dimensions} [dimensions] Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-export const interpolate = (paths:readonly Paths.Path[], t:number, useWidth?:boolean, dimensions?:Dimensions) => {
+export const interpolate = (paths: readonly Paths.Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
@@ -43,14 +44,14 @@ export const interpolate = (paths:readonly Paths.Path[], t:number, useWidth?:boo
   const l = useWidth ? dimensions.widths : dimensions.lengths;
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < l.length; i++) {
-    if (soFar + l[i] >= expected) {
+    if (soFar + l[ i ] >= expected) {
       const relative = expected - soFar;
       //eslint-disable-next-line functional/no-let
-      let amt = relative / l[i];
+      let amt = relative / l[ i ];
       //eslint-disable-next-line functional/no-let
       if (amt > 1) amt = 1;
-      return paths[i].interpolate(amt);
-    } else soFar += l[i];
+      return paths[ i ].interpolate(amt);
+    } else soFar += l[ i ];
   }
   return { x: 0, y: 0 };
 };
@@ -61,26 +62,26 @@ export type Dimensions = {
    *
    * @type {number[]}
    */
-  readonly widths:readonly number[],
+  readonly widths: readonly number[],
   /**
    * Length of each path
    *
    * @type {number[]}
    */
-  readonly lengths:readonly number[],
+  readonly lengths: readonly number[],
 
   /**
    * Total length of all paths
    *
    * @type {number}
    */
-  readonly totalLength:number,
+  readonly totalLength: number,
   /**
    * Total width of all paths
    *
    * @type {number}
    */
-  readonly totalWidth:number
+  readonly totalWidth: number
 }
 /**
  * Computes the widths and lengths of all paths, adding them up as well
@@ -88,7 +89,7 @@ export type Dimensions = {
  * @param {Paths.Path[]} paths
  * @returns {Dimensions}
  */
-export const computeDimensions = (paths:readonly Paths.Path[]):Dimensions => {
+export const computeDimensions = (paths: readonly Paths.Path[]): Dimensions => {
   const widths = paths.map(l => l.bbox().width);
   const lengths = paths.map(l => l.length());
   //eslint-disable-next-line functional/no-let
@@ -96,9 +97,9 @@ export const computeDimensions = (paths:readonly Paths.Path[]):Dimensions => {
   //eslint-disable-next-line functional/no-let
   let totalWidth = 0;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < lengths.length; i++) totalLength += lengths[i];
+  for (let i = 0; i < lengths.length; i++) totalLength += lengths[ i ];
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < widths.length; i++) totalWidth += widths[i];
+  for (let i = 0; i < widths.length; i++) totalWidth += widths[ i ];
 
   return { totalLength, totalWidth, widths, lengths };
 };
@@ -110,7 +111,7 @@ export const computeDimensions = (paths:readonly Paths.Path[]):Dimensions => {
  * 
  * @returns {Rects.Rect}
  */
-export const bbox = (paths:readonly Paths.Path[]):Rects.RectPositioned => {
+export const bbox = (paths: readonly Paths.Path[]): Rects.RectPositioned => {
   const boxes = paths.map(p => p.bbox());
   const corners = boxes.map(b => Rects.corners(b)).flat();
 
@@ -123,25 +124,25 @@ export const bbox = (paths:readonly Paths.Path[]):Rects.RectPositioned => {
  * @param {Paths.Path[]} paths
  * @returns {string}
  */
-export const toString = (paths:readonly Paths.Path[]):string => paths.map(p => p.toString()).join(`, `);
+export const toString = (paths: readonly Paths.Path[]): string => paths.map(p => p.toString()).join(`, `);
 
 /**
  * Throws an error if paths are not connected together, in order
  *
  * @param {Paths.Path[]} paths
  */
-export const guardContinuous = (paths:readonly Paths.Path[]) => {
+export const guardContinuous = (paths: readonly Paths.Path[]) => {
   //eslint-disable-next-line functional/no-let
-  let lastPos = Paths.getEnd(paths[0]);
+  let lastPos = Paths.getEnd(paths[ 0 ]);
   //eslint-disable-next-line functional/no-let
   for (let i = 1; i < paths.length; i++) {
-    const start = Paths.getStart(paths[i]);
+    const start = Paths.getStart(paths[ i ]);
     if (!Points.isEqual(start, lastPos)) throw new Error(`Path index ` + i + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);
-    lastPos = Paths.getEnd(paths[i]);
+    lastPos = Paths.getEnd(paths[ i ]);
   }
 };
 
-export const toSvgString = (paths:readonly Paths.Path[]):readonly string[] => paths.flatMap(p => p.toSvgString());
+export const toSvgString = (paths: readonly Paths.Path[]): readonly string[] => paths.flatMap(p => p.toSvgString());
 
 /**
  * Create a compoundpath from an array of paths.
@@ -150,15 +151,15 @@ export const toSvgString = (paths:readonly Paths.Path[]):readonly string[] => pa
  * @param {...Paths.Path[]} paths
  * @returns {CompoundPath}
  */
-export const fromPaths = (...paths:readonly Paths.Path[]):CompoundPath => {
+export const fromPaths = (...paths: readonly Paths.Path[]): CompoundPath => {
   guardContinuous(paths); // Throws an error if paths are not connected
   const dims = computeDimensions(paths);
 
   return Object.freeze({
     segments: paths,
     length: () => dims.totalLength,
-    nearest:(_:Points.Point) => { throw new Error(`not implemented`); },
-    interpolate: (t:number, useWidth = false) => interpolate(paths, t, useWidth, dims),
+    nearest: (_: Point) => { throw new Error(`not implemented`); },
+    interpolate: (t: number, useWidth = false) => interpolate(paths, t, useWidth, dims),
     bbox: () => bbox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths),

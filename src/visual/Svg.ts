@@ -1,11 +1,9 @@
 import { type CirclePositioned } from '../geometry/Circle.js';
 import { markerPrebuilt } from './SvgMarkers.js';
 import * as Lines from '../geometry/Line.js';
-import * as Points from '../geometry/Point.js';
 import * as Elements from './SvgElements.js';
 import * as Rects from '../geometry/Rect.js';
-
-export { Elements };
+import type { Point } from '../geometry/points/Types.js';
 
 export type MarkerOpts = StrokeOpts &
   DrawingOpts & {
@@ -83,12 +81,12 @@ export type TextDrawingOpts = StrokeOpts &
   DrawingOpts & {
     readonly anchor?: `start` | `middle` | `end`;
     readonly align?:
-      | `text-bottom`
-      | `text-top`
-      | `baseline`
-      | `top`
-      | `hanging`
-      | `middle`;
+    | `text-bottom`
+    | `text-top`
+    | `baseline`
+    | `top`
+    | `hanging`
+    | `middle`;
     readonly userSelect?: boolean;
   };
 
@@ -131,17 +129,13 @@ export const createOrResolve = <V extends SVGElement>(
   //eslint-disable-next-line functional/no-let
   let existing = null;
   if (queryOrExisting !== undefined) {
-    if (typeof queryOrExisting === `string`) {
-      existing = parent.querySelector(queryOrExisting);
-    } else existing = queryOrExisting;
+    existing = typeof queryOrExisting === `string` ? parent.querySelector(queryOrExisting) : queryOrExisting;
   }
   if (existing === null) {
     const p = document.createElementNS(`http://www.w3.org/2000/svg`, type) as V;
-    parent.appendChild(p);
-    if (queryOrExisting && typeof queryOrExisting === `string`) {
-      //eslint-disable-next-line functional/immutable-data
-      if (queryOrExisting.startsWith(`#`)) p.id = queryOrExisting.substring(1);
-    }
+    parent.append(p);
+    if (queryOrExisting && typeof queryOrExisting === `string` && //eslint-disable-next-line functional/immutable-data
+      queryOrExisting.startsWith(`#`)) p.id = queryOrExisting.substring(1);
     return p;
   }
   return existing as V;
@@ -164,7 +158,7 @@ export const clear = (parent: SVGElement) => {
   //eslint-disable-next-line functional/no-let
   let c = parent.lastElementChild;
   while (c) {
-    parent.removeChild(c);
+    c.remove();
     c = parent.lastElementChild;
   }
 };
@@ -260,7 +254,7 @@ export type SvgHelper = {
    */
   text(
     text: string,
-    pos: Points.Point,
+    pos: Point,
     opts?: TextDrawingOpts,
     queryOrExisting?: string | SVGTextElement
   ): SVGTextElement;
@@ -272,7 +266,7 @@ export type SvgHelper = {
    * @param queryOrExisting DOM query to look up existing element, or the element instance
    */
   textPath(
-    pathRef: string,
+    pathReference: string,
     text: string,
     opts?: TextDrawingOpts,
     queryOrExisting?: string | SVGTextPathElement
@@ -306,7 +300,7 @@ export type SvgHelper = {
    * @param queryOrExisting DOM query to look up existing element, or the element instance
    */
   path(
-    svgStr: string | readonly string[],
+    svgString: string | ReadonlyArray<string>,
     opts?: PathDrawingOpts,
     queryOrExisting?: string | SVGPathElement
   ): SVGPathElement;
@@ -319,7 +313,7 @@ export type SvgHelper = {
    * @param opts Drawing options
    */
   grid(
-    center: Points.Point,
+    center: Point,
     spacing: number,
     width: number,
     height: number,
@@ -357,9 +351,9 @@ export type SvgHelper = {
  */
 export const getBounds = (svg: SVGElement): Rects.Rect => {
   const w = svg.getAttributeNS(null, `width`);
-  const width = w === null ? 0 : parseFloat(w);
+  const width = w === null ? 0 : Number.parseFloat(w);
   const h = svg.getAttributeNS(null, `height`);
-  const height = h === null ? 0 : parseFloat(h);
+  const height = h === null ? 0 : Number.parseFloat(h);
   return { width, height };
 };
 
@@ -389,20 +383,19 @@ export const makeHelper = (
   }
 
   const o: SvgHelper = {
-    remove: (queryOrExisting: string | SVGElement) =>
-      remove(parent, queryOrExisting),
+    remove: (queryOrExisting: string | SVGElement) => { remove(parent, queryOrExisting); },
     text: (
       text: string,
-      pos: Points.Point,
+      pos: Point,
       opts?: TextDrawingOpts,
       queryOrExisting?: string | SVGTextElement
     ) => Elements.text(text, parent, pos, opts, queryOrExisting),
     textPath: (
-      pathRef: string,
+      pathReference: string,
       text: string,
       opts?: TextDrawingOpts,
       queryOrExisting?: string | SVGTextPathElement
-    ) => Elements.textPath(pathRef, text, parent, opts, queryOrExisting),
+    ) => Elements.textPath(pathReference, text, parent, opts, queryOrExisting),
     line: (
       line: Lines.Line,
       opts?: LineDrawingOpts,
@@ -414,12 +407,12 @@ export const makeHelper = (
       queryOrExisting?: string | SVGCircleElement
     ) => Elements.circle(circle, parent, opts, queryOrExisting),
     path: (
-      svgStr: string | readonly string[],
+      svgString: string | readonly string[],
       opts?: PathDrawingOpts,
       queryOrExisting?: string | SVGPathElement
-    ) => Elements.path(svgStr, parent, opts, queryOrExisting),
+    ) => Elements.path(svgString, parent, opts, queryOrExisting),
     grid: (
-      center: Points.Point,
+      center: Point,
       spacing: number,
       width: number,
       height: number,
@@ -430,7 +423,7 @@ export const makeHelper = (
     get width(): number {
       const w = parent.getAttributeNS(null, `width`);
       if (w === null) return 0;
-      return parseFloat(w);
+      return Number.parseFloat(w);
     },
     set width(width: number) {
       parent.setAttributeNS(null, `width`, width.toString());
@@ -441,16 +434,18 @@ export const makeHelper = (
     get height(): number {
       const w = parent.getAttributeNS(null, `height`);
       if (w === null) return 0;
-      return parseFloat(w);
+      return Number.parseFloat(w);
     },
     set height(height: number) {
       parent.setAttributeNS(null, `height`, height.toString());
     },
     clear: () => {
       while (parent.firstChild) {
-        parent.removeChild(parent.lastChild as HTMLElement);
+        (parent.lastChild as HTMLElement).remove();
       }
     },
   };
   return o;
 };
+
+export * as Elements from './SvgElements.js';

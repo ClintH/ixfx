@@ -1,4 +1,5 @@
-import { average, averageWeighted } from '../collections/NumericArrays.js';
+import { averageWeighted } from '../collections/arrays/AverageWeighted.js';
+import { average } from '../collections/arrays/NumericArrays.js';
 import { QueueMutable } from '../collections/queue/QueueMutable.js';
 import { throwNumberTest } from '../Guards.js';
 

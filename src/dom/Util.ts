@@ -1,9 +1,10 @@
 import { Observable, debounceTime, fromEvent } from 'rxjs';
-import * as Points from '../geometry/Point.js';
+import * as Points from '../geometry/points/index.js';
 import JSON5 from 'json5';
 import { Rects, Scaler } from '../geometry/index.js';
 import type { CardinalDirection } from '../geometry/Grid.js';
 import { cardinal } from '../geometry/Rect.js';
+import type { Point } from '../geometry/points/Types.js';
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
@@ -11,7 +12,7 @@ export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
   readonly bounds: {
     readonly width: number;
     readonly height: number;
-    readonly center: Points.Point;
+    readonly center: Point;
     readonly min: number;
     readonly max: number;
   };
@@ -65,7 +66,7 @@ export type PointSpaces = `viewport` | `screen` | `document`;
 export const pointScaler = (reference: PointSpaces = `viewport`) => {
   switch (reference) {
     case `viewport`: {
-      return (a: Readonly<Points.Point | number | Array<number>>, b?: number) => {
+      return (a: Readonly<Point | number | Array<number>>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x / window.innerWidth,
@@ -74,7 +75,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
       };
     }
     case `screen`: {
-      return (a: Readonly<Points.Point | number | Array<number>>, b?: number) => {
+      return (a: Readonly<Point | number | Array<number>>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x / screen.width,
@@ -83,7 +84,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
       };
     }
     case `document`: {
-      return (a: Readonly<Points.Point | number | Array<number>>, b?: number) => {
+      return (a: Readonly<Point | number | Array<number>>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x / document.body.scrollWidth,
@@ -171,7 +172,7 @@ export type ElPositionOpts = {
 export const positionFn = (
   domQueryOrEl: Readonly<string | HTMLElement>,
   opts: ElPositionOpts = {}
-): (() => Points.Point) => {
+): (() => Point) => {
   const targetSpace = opts.target ?? `viewport`;
   const relative = opts.relative ?? false;
   const anchor = opts.anchor ?? `nw`;
@@ -190,7 +191,7 @@ export const positionFn = (
 export const cardinalPosition = (
   domQueryOrEl: Readonly<string | HTMLElement>,
   anchor: CardinalDirection | `center` = `nw`
-): Points.Point => {
+): Point => {
   const el = resolveEl(domQueryOrEl);
   return cardinal(el.getBoundingClientRect(), anchor);
 };
@@ -209,7 +210,7 @@ export const cardinalPosition = (
 export const positionRelative = (
   domQueryOrEl: Readonly<string | HTMLElement>,
   target: PointSpaces = `viewport`
-): Points.Point => {
+): Point => {
   const f = positionFn(domQueryOrEl, { relative: true, target });
   return f();
 };
@@ -236,7 +237,7 @@ export const positionRelative = (
 export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
   switch (targetSpace) {
     case `screen`: {
-      return (a: Readonly<Points.Point | Array<number> | number>, b?: number) => {
+      return (a: Readonly<Point | Array<number> | number>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.screenX,
@@ -245,7 +246,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
       };
     }
     case `document`: {
-      return (a: Readonly<Points.Point | Array<number> | number>, b?: number) => {
+      return (a: Readonly<Point | Array<number> | number>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.scrollX,
@@ -254,7 +255,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
       };
     }
     case `viewport`: {
-      return (a: Readonly<Points.Point | Array<number> | number>, b?: number) => {
+      return (a: Readonly<Point | Array<number> | number>, b?: number) => {
         const pt = Points.getPointParameter(a, b);
         return Object.freeze({
           x: pt.x,
@@ -278,7 +279,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
  */
 export const positionFromMiddle = (
   domQueryOrEl: string | HTMLElement,
-  relativePos: Points.Point,
+  relativePos: Point,
   relativeTo: `window` | `screen` = `window`
 ) => {
   if (!domQueryOrEl) throw new Error(`domQueryOrEl is null or undefined`);
@@ -555,7 +556,7 @@ export const parentSize = <V extends HTMLElement | SVGSVGElement>(
  */
 export const getTranslation = (
   domQueryOrEl: Readonly<string | HTMLElement>
-): Points.Point => {
+): Point => {
   // Source:
   // https://raw.githubusercontent.com/zellwk/javascript/master/src/browser/dom/translate-values.js
 

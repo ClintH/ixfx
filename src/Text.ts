@@ -1,5 +1,5 @@
 import { integerTest, throwFromResult } from './Guards.js';
-export { string as random } from './Random.js';
+export { string as random } from './random/String.js';
 
 /**
  * Given a long string, abbreviates it with ...

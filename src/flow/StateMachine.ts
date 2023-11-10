@@ -1,4 +1,4 @@
-import { unique } from '../collections/Arrays.js';
+import { unique } from '../collections/arrays/index.js';
 import {
   StateMachineWithEvents,
   type Opts,
@@ -69,11 +69,11 @@ export type StateTarget<V extends Transitions> =
  * Maps state to allowable next states
  */
 export type Transitions = {
-  readonly [key: string]: StateTarget<Transitions>;
+  readonly [ key: string ]: StateTarget<Transitions>;
 };
 
 export type TransitionsStrict = {
-  readonly [key: string]: readonly StateTargetStrict<Transitions>[];
+  readonly [ key: string ]: readonly StateTargetStrict<Transitions>[];
 };
 /**
  * List of possible states
@@ -106,7 +106,7 @@ export type MachineState<V extends Transitions> = {
 
   //readonly machine: Machine<V>;
   readonly machine: {
-    readonly [key in StateNames<V>]: readonly StateTargetStrict<V>[];
+    readonly [ key in StateNames<V> ]: readonly StateTargetStrict<V>[];
   };
 };
 
@@ -120,7 +120,7 @@ export const cloneState = <V extends Transitions>(
 ): MachineState<V> => {
   return Object.freeze({
     value: toClone.value,
-    visited: [...toClone.visited],
+    visited: [ ...toClone.visited ],
     machine: toClone.machine,
   });
 };
@@ -150,12 +150,12 @@ export const init = <V extends Transitions>(
   stateMachine: Machine<V> | Transitions | TransitionsStrict,
   initialState?: StateNames<V>
 ): MachineState<V> => {
-  const [machine, machineValidationError] = validateMachine(stateMachine);
+  const [ machine, machineValidationError ] = validateMachine(stateMachine);
   if (!machine) throw new Error(machineValidationError);
 
   const state: StateNames<V> =
-    (initialState as StateNames<V>) ?? Object.keys(machine.states)[0];
-  if (typeof machine.states[state] === 'undefined') {
+    (initialState as StateNames<V>) ?? Object.keys(machine.states)[ 0 ];
+  if (typeof machine.states[ state ] === 'undefined') {
     throw new Error(`Initial state not found`);
   }
 
@@ -181,16 +181,16 @@ export const reset = <V extends Transitions>(
 
 export const validateMachine = <V extends Transitions>(
   smOrTransitions: Machine<V> | Transitions | TransitionsStrict
-): [machine: Machine<V> | undefined, msg: string] => {
+): [ machine: Machine<V> | undefined, msg: string ] => {
   if (typeof smOrTransitions === 'undefined') {
-    return [undefined, 'Parameter undefined'];
+    return [ undefined, 'Parameter undefined' ];
   }
   if (smOrTransitions === null) {
-    return [undefined, 'Parameter null'];
+    return [ undefined, 'Parameter null' ];
   }
   if (`states` in smOrTransitions) {
     // Assume Machine type
-    return [smOrTransitions as Machine<V>, ''];
+    return [ smOrTransitions as Machine<V>, '' ];
   }
   if (typeof smOrTransitions === `object`) {
     return [
@@ -203,7 +203,7 @@ export const validateMachine = <V extends Transitions>(
   }
   return [
     undefined,
-    `Unexpected type: ${typeof smOrTransitions}. Expected object`,
+    `Unexpected type: ${ typeof smOrTransitions }. Expected object`,
   ];
 };
 
@@ -253,9 +253,9 @@ export const possibleTargets = <V extends Transitions>(
   // Validate current state
   validateMachineState(sm);
   // get list of possible targets
-  const fromS = sm.machine[sm.value];
+  const fromS = sm.machine[ sm.value ];
 
-  if (fromS.length === 1 && fromS[0].state === null) return [];
+  if (fromS.length === 1 && fromS[ 0 ].state === null) return [];
   return fromS;
 };
 
@@ -294,7 +294,7 @@ export const normaliseTargets = <V extends Transitions>(
       const targetState = target.state;
       if (typeof targetState !== 'string') {
         throw new Error(
-          `Target 'state' field is not a string. Got: ${typeof targetState}`
+          `Target 'state' field is not a string. Got: ${ typeof targetState }`
         );
       }
       if (`preconditions` in target) {
@@ -306,7 +306,7 @@ export const normaliseTargets = <V extends Transitions>(
       return { state: targetState };
     } else {
       throw new Error(
-        `Unexpected type: ${typeof target}. Expected string or object with 'state' field.`
+        `Unexpected type: ${ typeof target }. Expected string or object with 'state' field.`
       );
     }
   };
@@ -328,7 +328,7 @@ export const normaliseTargets = <V extends Transitions>(
   } else {
     const target = normaliseSingleTarget(targets);
     if (!target) return;
-    return [target];
+    return [ target ];
   }
 };
 
@@ -338,15 +338,15 @@ const validateAndNormaliseTransitions = (
   const returnMap = new Map<string, StateTargetStrict<typeof d>[]>();
 
   // 1. Index top-level states
-  for (const [topLevelState, topLevelTargets] of Object.entries(d)) {
+  for (const [ topLevelState, topLevelTargets ] of Object.entries(d)) {
     if (typeof topLevelState === `undefined`) {
       throw new Error(`Top-level undefined state`);
     }
     if (typeof topLevelTargets === `undefined`) {
-      throw new Error(`Undefined target state for ${topLevelState}`);
+      throw new Error(`Undefined target state for ${ topLevelState }`);
     }
     if (returnMap.has(topLevelState)) {
-      throw new Error(`State defined twice: ${topLevelState}`);
+      throw new Error(`State defined twice: ${ topLevelState }`);
     }
     if (topLevelState.includes(' ')) {
       throw new Error('State names cannot contain spaces');
@@ -355,7 +355,7 @@ const validateAndNormaliseTransitions = (
   }
 
   // 2. Normalise target
-  for (const [topLevelState, topLevelTargets] of Object.entries(d)) {
+  for (const [ topLevelState, topLevelTargets ] of Object.entries(d)) {
     const targets = normaliseTargets(topLevelTargets);
     if (targets === undefined) throw new Error(`Could not normalise target`);
     if (targets !== null) {
@@ -364,14 +364,14 @@ const validateAndNormaliseTransitions = (
       for (const target of targets) {
         if (seenStates.has(target.state)) {
           throw new Error(
-            `Target state '${target.state}' already exists for '${topLevelState}'`
+            `Target state '${ target.state }' already exists for '${ topLevelState }'`
           );
         }
         seenStates.add(target.state);
         if (target.state === null) continue;
         if (!returnMap.has(target.state as string)) {
           throw new Error(
-            `Target state '${target.state}' is not defined as a top-level state. Defined under: '${topLevelState}'`
+            `Target state '${ target.state }' is not defined as a top-level state. Defined under: '${ topLevelState }'`
           );
         }
       }
@@ -415,7 +415,7 @@ export const to = <V extends Transitions>(
   return Object.freeze({
     value: toState,
     machine: sm.machine,
-    visited: unique<string>([sm.visited as string[], [sm.value] as string[]]),
+    visited: unique<string>([ sm.visited as string[], [ sm.value ] as string[] ]),
   });
 };
 
@@ -426,7 +426,7 @@ export const next = <V extends Transitions>(
   const first = possibleTargets(sm).at(0);
   if (!first || first.state === null) {
     throw new Error(
-      `Not possible to move to a next state from '${sm.value as string}`
+      `Not possible to move to a next state from '${ sm.value as string }`
     );
   }
   return to(sm, first.state);
@@ -460,7 +460,7 @@ export const validateTransition = <V extends Transitions>(
   }
   if (typeof toState !== 'string') {
     throw new Error(
-      `Parameter 'toState' should be a string. Got: ${typeof toState}`
+      `Parameter 'toState' should be a string. Got: ${ typeof toState }`
     );
   }
 
@@ -471,9 +471,8 @@ export const validateTransition = <V extends Transitions>(
   if (p.length === 0) throw new Error('Machine is in terminal state');
   if (!p.includes(toState)) {
     throw new Error(
-      `Target state '${toState}' not available at current state '${
-        sm.value
-      }'. Possible states: ${p.join(', ')}`
+      `Target state '${ toState }' not available at current state '${ sm.value
+      }'. Possible states: ${ p.join(', ') }`
     );
   }
 };
@@ -498,20 +497,20 @@ export const fromList = (...states: readonly string[]): Transitions => {
   if (!Array.isArray(states)) throw new Error(`Expected array of strings`);
   if (states.length <= 2) throw new Error(`Expects at least two states`);
   for (let i = 0; i < states.length; i++) {
-    const s = states[i];
+    const s = states[ i ];
     if (typeof s !== `string`) {
       throw new Error(
-        `Expected array of strings. Got type '${typeof s}' at index ${i}`
+        `Expected array of strings. Got type '${ typeof s }' at index ${ i }`
       );
     }
     if (i === states.length - 1) {
       /** @ts-ignore */
       //eslint-disable-next-line functional/immutable-data
-      t[s] = null;
+      t[ s ] = null;
     } else {
       /** @ts-ignore */
       //eslint-disable-next-line functional/immutable-data
-      t[s] = states[i + 1];
+      t[ s ] = states[ i + 1 ];
     }
   }
   return t;
@@ -539,35 +538,35 @@ export const bidirectionalFromList = (
   if (states.length < 2) throw new Error(`Expects at least two states`);
 
   for (let i = 0; i < states.length; i++) {
-    const s = states[i];
+    const s = states[ i ];
     if (typeof s !== `string`) {
       throw new Error(
-        `Expected array of strings. Got type '${typeof s}' at index ${i}`
+        `Expected array of strings. Got type '${ typeof s }' at index ${ i }`
       );
     }
 
     /** @ts-ignore */
     //eslint-disable-next-line functional/immutable-data
-    t[s] = [];
+    t[ s ] = [];
   }
 
   for (let i = 0; i < states.length; i++) {
     /** @ts-ignore */
-    const v = t[states[i]] as string[];
+    const v = t[ states[ i ] ] as string[];
     if (i === states.length - 1) {
       if (states.length > 1) {
         //eslint-disable-next-line functional/immutable-data
-        v.push(states[i - 1]);
+        v.push(states[ i - 1 ]);
       } else {
         /** @ts-ignore */
         //eslint-disable-next-line functional/immutable-data
-        t[states[i]] = null;
+        t[ states[ i ] ] = null;
       }
     } else {
       //eslint-disable-next-line functional/immutable-data
-      v.push(states[i + 1]);
+      v.push(states[ i + 1 ]);
       //eslint-disable-next-line functional/immutable-data
-      if (i > 0) v.push(states[i - 1]);
+      if (i > 0) v.push(states[ i - 1 ]);
     }
   }
   return t;

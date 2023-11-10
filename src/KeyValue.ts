@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/lib/function.js';
 import * as S from 'fp-ts/lib/string.js';
 import * as N from 'fp-ts/lib/number.js';
 import { reverse as reverseOrd, contramap } from 'fp-ts/lib/Ord.js';
-import { minMaxAvg as arrayMinMaxAg } from './collections/Arrays.js';
+import { minMaxAvg as arrayMinMaxAg } from './collections/arrays/index.js';
 
 /// ✔ Sorting functions are unit tested
 

@@ -1,7 +1,6 @@
-/* eslint-disable */
 import * as d3Colour from 'd3-color';
 import * as d3Interpolate from 'd3-interpolate';
-import { defaultRandom, type RandomSource } from '../Random.js';
+import { defaultRandom, type RandomSource } from '../random/Types.js';
 import { throwNumberTest } from '../Guards.js';
 
 export type Hsl = { h: number; s: number; l: number; opacity?: number };
@@ -43,6 +42,7 @@ export type InterpolationOpts = {
  */
 export const toHsl = (colour: Colourish): Hsl => {
   const c = resolveColour(colour);
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   if (c === null) throw new Error(`Could not resolve colour ${ colour }`);
 
   if (isHsl(c)) return c;
@@ -51,6 +51,7 @@ export const toHsl = (colour: Colourish): Hsl => {
     if (c.opacity) return { ...asHsl, opacity: c.opacity };
     return asHsl;
   }
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   throw new Error(`Could not resolve colour ${ colour }`);
 };
 
@@ -73,7 +74,7 @@ export const goldenAngleColour = (
   index: number,
   saturation = 0.5,
   lightness = 0.75,
-  alpha = 1.0
+  alpha = 1
 ) => {
   throwNumberTest(index, `positive`, `index`);
   throwNumberTest(saturation, `percentage`, `saturation`);
@@ -82,11 +83,7 @@ export const goldenAngleColour = (
 
   // Via Stackoverflow
   const hue = index * 137.508; // use golden angle approximation
-  if (alpha === 1)
-    return `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%)`;
-  else
-    return `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%,${ alpha * 100
-      }%)`;
+  return alpha === 1 ? `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%)` : `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%,${ alpha * 100 }%)`;
 };
 
 /**
@@ -115,17 +112,15 @@ export const randomHue = (rand: RandomSource = defaultRandom): number => {
 export const toRgb = (colour: Colourish): Rgb => {
   const c = resolveColour(colour);
   const rgb = c.rgb();
-  if (c.opacity < 1)
-    return { r: rgb.r, g: rgb.g, b: rgb.b, opacity: c.opacity };
-  else return { r: rgb.r, g: rgb.g, b: rgb.b };
+  return c.opacity < 1 ? { r: rgb.r, g: rgb.g, b: rgb.b, opacity: c.opacity } : { r: rgb.r, g: rgb.g, b: rgb.b };
 };
 
 const resolveColour = (c: Colourish): Colour => {
   if (typeof c === `string`) {
     const css = d3Colour.color(c);
     if (css !== null) return css;
-    if (c.startsWith(`hsl`) && c.indexOf('%') <= 0) throw new Error(`Could not resolve CSS colour ${ c }. HSL values should be in the form: hsl(0, 50%, 50%)`);
-    else throw new Error(`Could not resolve CSS colour ${ c }`);
+    const error = c.startsWith(`hsl`) && c.indexOf(`%`) <= 0 ? new Error(`Could not resolve CSS colour ${ c }. HSL values should be in the form: hsl(0, 50%, 50%)`) : new Error(`Could not resolve CSS colour ${ c }`);
+    throw error;
   } else {
     if (isHsl(c)) return d3Colour.hsl(c.h, c.s, c.l);
     if (isRgb(c)) return d3Colour.rgb(c.r, c.g, c.b);
@@ -180,7 +175,7 @@ export const opacity = (colour: Colourish, amt: number): string => {
  */
 export const getCssVariable = (
   name: string,
-  fallbackColour: string = `black`,
+  fallbackColour = `black`,
   root?: HTMLElement
 ): string => {
   if (root === undefined) root = document.body;
@@ -223,7 +218,7 @@ export const interpolate = (
   if (typeof optsOrSpace === `undefined`) opts = {};
   else if (typeof optsOrSpace === `string`)
     opts = { space: optsOrSpace as Spaces };
-  else opts = optsOrSpace as InterpolationOpts;
+  else opts = optsOrSpace;
 
   const inter = getInterpolator(opts, [ from, to ]);
   if (inter === undefined) throw new Error(`Could not handle colour/space`);
@@ -232,7 +227,7 @@ export const interpolate = (
 
 const getInterpolator = (
   optsOrSpace: InterpolationOpts | string,
-  colours: Colourish[]
+  colours: Array<Colourish>
 ): ((t: number) => string) | undefined => {
   if (!Array.isArray(colours))
     throw new Error(`Expected one or more colours as parameters`);
@@ -241,7 +236,7 @@ const getInterpolator = (
   if (typeof optsOrSpace === `undefined`) opts = {};
   else if (typeof optsOrSpace === `string`)
     opts = { space: optsOrSpace as Spaces };
-  else opts = optsOrSpace as InterpolationOpts;
+  else opts = optsOrSpace;
 
   if (!Array.isArray(colours))
     throw new Error(`Expected array for colours parameter`);
@@ -251,41 +246,43 @@ const getInterpolator = (
   let inter;
 
   switch (space) {
-    case `lab`:
+    case `lab`: {
       inter = d3Interpolate.interpolateLab;
       break;
-    case `hsl`:
+    }
+    case `hsl`: {
       inter = long
         ? d3Interpolate.interpolateHslLong
         : d3Interpolate.interpolateHsl;
       break;
-    case `hcl`:
+    }
+    case `hcl`: {
       inter = long
         ? d3Interpolate.interpolateHclLong
         : d3Interpolate.interpolateHcl;
       break;
-    case `cubehelix`:
+    }
+    case `cubehelix`: {
       inter = long
         ? d3Interpolate.interpolateCubehelixLong
         : d3Interpolate.interpolateCubehelix;
       break;
-    case `rgb`:
+    }
+    case `rgb`: {
       inter = d3Interpolate.interpolateRgb;
-    default:
+    }
+    default: {
       inter = d3Interpolate.interpolateRgb;
-  }
-
-  if (opts.gamma) {
-    if (space === `rgb` || space === `cubehelix`) {
-      inter = (inter as d3Interpolate.ColorGammaInterpolationFactory).gamma(
-        opts.gamma
-      );
     }
   }
 
-  if (colours.length > 2) {
-    return d3Interpolate.piecewise(inter, colours);
-  } else return inter(colours[ 0 ], colours[ 1 ]);
+  if (opts.gamma && (space === `rgb` || space === `cubehelix`)) {
+    inter = (inter as d3Interpolate.ColorGammaInterpolationFactory).gamma(
+      opts.gamma
+    );
+  }
+
+  return colours.length > 2 ? d3Interpolate.piecewise(inter, colours) : inter(colours[ 0 ], colours[ 1 ]);
 };
 
 /**
@@ -306,8 +303,8 @@ const getInterpolator = (
 export const scale = (
   steps: number,
   opts: InterpolationOpts | string,
-  ...colours: Colourish[]
-): string[] => {
+  ...colours: Array<Colourish>
+): Array<string> => {
   throwNumberTest(steps, `aboveZero`, `steps`);
   if (!Array.isArray(colours))
     throw new Error(`Expected one or more colours as parameters`);
@@ -319,7 +316,7 @@ export const scale = (
   //eslint-disable-next-line functional/no-let
   let amt = 0;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < steps; i++) {
+  for (let index = 0; index < steps; index++) {
     //eslint-disable-next-line functional/immutable-data
     r.push(inter(amt));
     amt += perStep;

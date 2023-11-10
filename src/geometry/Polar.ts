@@ -1,6 +1,7 @@
 import { degreeToRadian, radianToDegree } from './index.js';
-import * as Points from './Point.js';
+import * as Points from './points/index.js';
 import { throwNumberTest } from '../Guards.js';
+import type { Point } from './points/Types.js';
 const _piPi = Math.PI * 2;
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
@@ -19,8 +20,8 @@ export type Coord = {
  * Converts to Cartesian coordiantes
  */
 type ToCartesian = {
-  (point: Coord, origin?: Points.Point): Points.Point;
-  (distance: number, angleRadians: number, origin?: Points.Point): Points.Point;
+  (point: Coord, origin?: Point): Point;
+  (distance: number, angleRadians: number, origin?: Point): Point;
 };
 
 /**
@@ -28,7 +29,7 @@ type ToCartesian = {
  * @param p
  * @returns True if `p` seems to be a Coord
  */
-export const isCoord = (p: number | unknown): p is Coord => {
+export const isCoord = (p: unknown): p is Coord => {
   if ((p as Coord).distance === undefined) return false;
   if ((p as Coord).angleRadian === undefined) return false;
   return true;
@@ -50,8 +51,8 @@ export const isCoord = (p: number | unknown): p is Coord => {
  * @returns
  */
 export const fromCartesian = (
-  point: Points.Point,
-  origin: Points.Point
+  point: Point,
+  origin: Point
 ): Coord => {
   point = Points.subtract(point, origin);
   //eslint-disable-next-line functional/no-let
@@ -67,7 +68,7 @@ export const fromCartesian = (
   return Object.freeze({
     ...point,
     angleRadian: angle,
-    distance: Math.sqrt(point.x * point.x + point.y * point.y),
+    distance: Math.hypot(point.x, point.y),
   });
 };
 
@@ -96,9 +97,9 @@ export const fromCartesian = (
  */
 export const toCartesian: ToCartesian = (
   a: Coord | number,
-  b?: Points.Point | number,
-  c?: Points.Point
-): Points.Point => {
+  b?: Point | number,
+  c?: Point
+): Point => {
   if (isCoord(a)) {
     if (b === undefined) b = Points.Empty;
     if (Points.isPoint(b)) {
@@ -108,7 +109,7 @@ export const toCartesian: ToCartesian = (
       `Expecting (Coord, Point). Second parameter is not a point`
     );
   } else if (typeof a === `object`) {
-    throw new Error(
+    throw new TypeError(
       `First param is an object, but not a Coord: ${ JSON.stringify(a) }`
     );
   } else {
@@ -121,7 +122,7 @@ export const toCartesian: ToCartesian = (
       }
       return polarToCartesian(a, b, c);
     } else {
-      throw new Error(
+      throw new TypeError(
         `Expecting parameters of (number, number). Got: (${ typeof a }, ${ typeof b }, ${ typeof c }). a: ${ JSON.stringify(
           a
         ) }`
@@ -219,19 +220,21 @@ export const guard = (p: Coord, name = `Point`) => {
     );
   }
   if (typeof p.angleRadian !== `number`) {
-    throw new Error(
+    throw new TypeError(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `'${ name }.angleRadian' must be a number. Got ${ p.angleRadian }`
     );
   }
   if (typeof p.distance !== `number`) {
-    throw new Error(`'${ name }.distance' must be a number. Got ${ p.distance }`);
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    throw new TypeError(`'${ name }.distance' must be a number. Got ${ p.distance }`);
   }
 
   if (p.angleRadian === null) throw new Error(`'${ name }.angleRadian' is null`);
   if (p.distance === null) throw new Error(`'${ name }.distance' is null`);
 
   if (Number.isNaN(p.angleRadian)) {
-    throw new Error(`'${ name }.angleRadian' is NaN`);
+    throw new TypeError(`'${ name }.angleRadian' is NaN`);
   }
   if (Number.isNaN(p.distance)) throw new Error(`'${ name }.distance' is NaN`);
 };
@@ -393,8 +396,8 @@ export const clampMagnitude = (v: Coord, max = 1, min = 0): Coord => {
 const polarToCartesian = (
   distance: number,
   angleRadians: number,
-  origin: Points.Point = Points.Empty
-): Points.Point => {
+  origin: Point = Points.Empty
+): Point => {
   Points.guard(origin);
   return Object.freeze({
     x: origin.x + distance * Math.cos(angleRadians),
@@ -418,7 +421,7 @@ export const toString = (p: Coord, digits?: number): string => {
   return `(${ d },${ a })`;
 };
 
-export const toPoint = (v: Coord, origin = EmptyCartesian): Points.Point => {
+export const toPoint = (v: Coord, origin = EmptyCartesian): Point => {
   guard(v, `v`);
   return Object.freeze({
     x: origin.x + v.distance * Math.cos(v.angleRadian),

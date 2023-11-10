@@ -69,7 +69,7 @@
     "lint": "eslint src/**",
     "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
     "test": "tsc && ava --config ./config/ava.config.js",
-    "circular": "madge --circular --extensions ts src/"
+    "circular": "madge --circular --extensions ts src/ > madge.txt"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",

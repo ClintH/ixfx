@@ -1,15 +1,16 @@
 import { Points, Lines } from './index.js';
-import { type RandomSource, defaultRandom } from '../Random.js';
+import { type RandomSource, defaultRandom } from '../random/Types.js';
 import { type CirclePositioned, isCirclePositioned } from './Circle.js';
 import * as Intersects from './Intersects.js';
 import type { CardinalDirection } from './Grid.js';
-import type { PointCalculableShape } from './Point.js';
+import type { Point } from './points/Types.js';
+import type { PointCalculableShape } from './Types.js';
 
 export type Rect = {
   readonly width: number;
   readonly height: number;
 };
-export type RectPositioned = Points.Point & Rect;
+export type RectPositioned = Point & Rect;
 
 export const empty = Object.freeze({ width: 0, height: 0 });
 export const emptyPositioned = Object.freeze({
@@ -41,9 +42,9 @@ export const isPlaceholder = (rect: Rect): boolean =>
  * @returns
  */
 export const isPositioned = (
-  p: Points.Point | Rect | RectPositioned
-): p is Points.Point =>
-  (p as Points.Point).x !== undefined && (p as Points.Point).y !== undefined;
+  p: Point | Rect | RectPositioned
+): p is Point =>
+  (p as Point).x !== undefined && (p as Point).y !== undefined;
 
 /**
  * Returns _true_ if `p` has width and height.
@@ -448,7 +449,7 @@ export function sum(a: Rect, b: Rect | number, c?: number): Rect {
  */
 export function intersectsPoint(
   rect: Rect | RectPositioned,
-  point: Points.Point
+  point: Point
 ): boolean;
 
 /**
@@ -483,7 +484,7 @@ export function intersectsPoint(
 //eslint-disable-next-line func-style
 export function intersectsPoint(
   rect: Rect | RectPositioned,
-  a: Points.Point | number,
+  a: Point | number,
   b?: number
 ): boolean {
   guard(rect, `rect`);
@@ -525,7 +526,7 @@ export function intersectsPoint(
  * @returns
  */
 export const fromCenter = (
-  origin: Points.Point,
+  origin: Point,
   width: number,
   height: number
 ): RectPositioned => {
@@ -561,7 +562,7 @@ export const fromCenter = (
  */
 export const distanceFromExterior = (
   rect: RectPositioned,
-  pt: Points.Point
+  pt: Point
 ): number => {
   guardPositioned(rect, `rect`);
   Points.guard(pt, `pt`);
@@ -585,7 +586,7 @@ export const distanceFromExterior = (
  */
 export const distanceFromCenter = (
   rect: RectPositioned,
-  pt: Points.Point
+  pt: Point
 ): number => Points.distance(center(rect), pt);
 
 /**
@@ -601,10 +602,10 @@ export const distanceFromCenter = (
  *
  */
 export const maxFromCorners = (
-  topLeft: Points.Point,
-  topRight: Points.Point,
-  bottomRight: Points.Point,
-  bottomLeft: Points.Point
+  topLeft: Point,
+  topRight: Point,
+  bottomRight: Point,
+  bottomLeft: Point
 ): RectPositioned => {
   if (topLeft.y > bottomRight.y) {
     throw new Error(`topLeft.y greater than bottomRight.y`);
@@ -686,7 +687,7 @@ const guardPositioned = (rect: RectPositioned, name = `rect`) => {
  * @returns
  */
 export const fromTopLeft = (
-  origin: Points.Point,
+  origin: Point,
   width: number,
   height: number
 ): RectPositioned => {
@@ -713,8 +714,8 @@ export const fromTopLeft = (
  */
 export const corners = (
   rect: RectPositioned | Rect,
-  origin?: Points.Point
-): ReadonlyArray<Points.Point> => {
+  origin?: Point
+): ReadonlyArray<Point> => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
   else if (origin === undefined) {
@@ -742,7 +743,7 @@ export const corners = (
 export const cardinal = (
   rect: RectPositioned,
   card: CardinalDirection | `center`
-): Points.Point => {
+): Point => {
   const { x, y, width, height } = rect;
   switch (card) {
     case `nw`: {
@@ -1104,8 +1105,8 @@ export function multiplyScalar(
  */
 export const center = (
   rect: RectPositioned | Rect,
-  origin?: Points.Point
-): Points.Point => {
+  origin?: Point
+): Point => {
   guard(rect);
   if (origin === undefined && Points.isPoint(rect)) origin = rect;
   else if (origin === undefined) origin = { x: 0, y: 0 }; // throw new Error(`Unpositioned rect needs origin param`);
@@ -1150,7 +1151,7 @@ export const lengths = (rect: RectPositioned): ReadonlyArray<number> => {
  */
 export const edges = (
   rect: RectPositioned | Rect,
-  origin?: Points.Point
+  origin?: Point
 ): ReadonlyArray<Lines.Line> => {
   const c = corners(rect, origin);
 
@@ -1196,7 +1197,8 @@ export const area = (rect: Rect): number => {
  */
 export const isIntersecting = (
   a: RectPositioned,
-  b: CirclePositioned | Points.Point
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  b: CirclePositioned | Point
 ): boolean => {
   if (!isRectPositioned(a)) {
     throw new Error(`a parameter should be RectPositioned`);
@@ -1258,7 +1260,7 @@ export type RandomPointOpts = {
 export const randomPoint = (
   within: Rect | RectPositioned,
   opts: RandomPointOpts = {}
-): Points.Point => {
+): Point => {
   // TODO: Does not implement uniform distribution
   // See: https://math.stackexchange.com/questions/366474/find-coordinates-of-n-points-uniformly-distributed-in-a-rectangle
   const rand = opts.randomSource ?? defaultRandom;

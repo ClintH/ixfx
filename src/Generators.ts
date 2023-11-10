@@ -183,4 +183,4 @@ export const numericPercent = function (
   return numericRange(interval, start, end, repeating);
 };
 
-export { integerUniqueGen as randomUniqueInteger } from './Random.js';
+export { integerUniqueGen as randomUniqueInteger } from './random/index.js';

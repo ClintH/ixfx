@@ -6,12 +6,12 @@ import {
   WithEvents,
 } from '../../flow/StateMachine.js';
 import { arrayValuesEqual, eventPromise } from '../util.js';
-import { compareValuesEqual } from '../../collections/Arrays.js';
+import { compareValuesEqual } from '../../collections/arrays/index.js';
 
 const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);
 
 const createMulti = () => ({
-  awake: [`breakfast`, `coffee`],
+  awake: [ `breakfast`, `coffee` ],
   breakfast: `coffee`,
   coffee: `brushTeeth`,
   brushTeeth: null,
@@ -92,7 +92,7 @@ test(`paths`, (t) => {
 test('fromList', (t) => {
   const trans = fromList('one', 'two', 'three');
   const m = new WithEvents(trans);
-  arrayValuesEqual(t, m.statesDefined, ['one', 'two', 'three']);
+  arrayValuesEqual(t, m.statesDefined, [ 'one', 'two', 'three' ]);
 
   // Now in 'one'
   t.true(m.state === `one`);
@@ -101,7 +101,7 @@ test('fromList', (t) => {
   t.false(m.isDone);
 
   t.false(m.isDone);
-  arrayValuesEqual(t, m.statesPossible, ['two']);
+  arrayValuesEqual(t, m.statesPossible, [ 'two' ]);
 
   // Now in 'two'
   t.true(m.next() === `two`);
@@ -126,7 +126,7 @@ test('fromList', (t) => {
 test('fromListBidirectional', (t) => {
   const trans = bidirectionalFromList('one', 'two', 'three');
   const m = new WithEvents(trans);
-  arrayValuesEqual(t, m.statesDefined, ['one', 'two', 'three']);
+  arrayValuesEqual(t, m.statesDefined, [ 'one', 'two', 'three' ]);
 
   // State: 'one'
   t.true(m.state === `one`);
@@ -135,14 +135,14 @@ test('fromListBidirectional', (t) => {
   t.false(m.isValid(`three`));
 
   t.false(m.isDone);
-  arrayValuesEqual(t, m.statesPossible, ['two']);
+  arrayValuesEqual(t, m.statesPossible, [ 'two' ]);
 
   // State: 'two'
   t.true(m.next() === `two`);
   t.true(m.isValid(`one`));
   t.false(m.isValid(`two`));
   t.true(m.isValid(`three`));
-  arrayValuesEqual(t, m.statesPossible, ['one', 'three']);
+  arrayValuesEqual(t, m.statesPossible, [ 'one', 'three' ]);
 
   // State: 'one'
   m.state = `one`;
@@ -162,7 +162,7 @@ test('fromListBidirectional', (t) => {
   t.false(m.isValid(`one`));
   t.true(m.isValid(`two`));
   t.false(m.isValid(`three`));
-  arrayValuesEqual(t, m.statesPossible, ['two']);
+  arrayValuesEqual(t, m.statesPossible, [ 'two' ]);
 
   // State: 'two'
   m.state = `two`;
@@ -178,11 +178,11 @@ test('fromListBidirectional', (t) => {
 
 test('validation', (t) => {
   // @ts-ignore
-  t.throws(() => fromList(['one', 'two']));
+  t.throws(() => fromList([ 'one', 'two' ]));
   t.throws(() => fromList());
 
   // @ts-ignore
-  t.throws(() => fromListBidirectional(['one', 'two']));
+  t.throws(() => fromListBidirectional([ 'one', 'two' ]));
   t.throws(() => fromList());
 });
 

@@ -1,5 +1,6 @@
 import { type TraversableTree } from '../collections/tree/Types.js';
 import { Points, Rects, Shapes } from './index.js';
+import type { Point } from './points/Types.js';
 import { type ShapePositioned } from './Shape.js';
 
 /**
@@ -29,7 +30,7 @@ export enum Direction {
 /**
  * A Point or ShapePositioned
  */
-export type QuadTreeItem = Points.Point | ShapePositioned;
+export type QuadTreeItem = Point | ShapePositioned;
 
 /**
  * Creates a QuadTreeNode
@@ -152,7 +153,7 @@ export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
    * @param p
    * @returns
    */
-  couldHold(p: Points.Point) {
+  couldHold(p: Point) {
     return Rects.intersectsPoint(this.boundary, p);
   }
 

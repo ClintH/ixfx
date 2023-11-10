@@ -2,7 +2,7 @@ import { EspruinoBleDevice } from './EspruinoBleDevice.js';
 import { defaultOpts as NordicDefaults } from './NordicBleDevice.js';
 import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
 import { type ISimpleEventEmitter } from '../ISimpleEventEmitter.js';
-import { string as randomString } from '../Random.js';
+import { string as randomString } from '../random/String.js';
 import { waitFor } from '../flow/WaitFor.js';
 import {
   EspruinoSerialDevice,
@@ -13,9 +13,6 @@ import type {
   IoDataEvent,
   IoEvents,
 } from './index.js';
-
-
-
 
 export type EspruinoStates =
   | `ready`

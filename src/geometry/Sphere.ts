@@ -1,5 +1,5 @@
-import * as Points from './Point.js';
+import type { Point3d } from "./points/Types.js";
 
-export type Sphere = Points.Point3d & {
+export type Sphere = Point3d & {
   readonly radius: number;
 };

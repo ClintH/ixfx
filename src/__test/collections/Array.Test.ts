@@ -15,7 +15,7 @@ import {
   filterBetween,
   flatten,
   without
-} from '../../collections/Arrays.js';
+} from '../../collections/arrays/index.js';
 import { arrayValuesEqual } from '../util.js';
 
 test('without', t => {

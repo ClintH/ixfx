@@ -2,7 +2,7 @@
  * Acknowledgements: much of the work here is an adapation from Daniel Shiffman's excellent _The Nature of Code_ website.
  */
 import { Points, Polar } from '../geometry/index.js';
-import { type Point } from '../geometry/Point.js';
+import { type Point } from '../geometry/points/Types.js';
 import { clamp } from '../data/Clamp.js';
 import { interpolateAngle } from '../data/Interpolate.js';
 import { type Rect, getEdgeX, getEdgeY } from '../geometry/Rect.js';
@@ -54,23 +54,23 @@ export type ForceFn = (t: ForceAffected) => ForceAffected;
 /**
  * A vector to apply to acceleration or a force function
  */
-export type ForceKind = Points.Point | ForceFn | null;
+export type ForceKind = Point | ForceFn | null;
 
 /**
  * Throws an error if `t` is not of the `ForceAffected` shape.
  * @param t
  * @param name
  */
-export const guard = (t: ForceAffected, name: string = `t`) => {
+export const guard = (t: ForceAffected, name = `t`) => {
   if (t === undefined) {
-    throw new Error(`Parameter ${name} is undefined. Expected ForceAffected`);
+    throw new Error(`Parameter ${ name } is undefined. Expected ForceAffected`);
   }
   if (t === null) {
-    throw new Error(`Parameter ${name} is null. Expected ForceAffected`);
+    throw new Error(`Parameter ${ name } is null. Expected ForceAffected`);
   }
   if (typeof t !== `object`) {
-    throw new Error(
-      `Parameter ${name} is type ${typeof t}. Expected object of shape ForceAffected`
+    throw new TypeError(
+      `Parameter ${ name } is type ${ typeof t }. Expected object of shape ForceAffected`
     );
   }
 };
@@ -171,24 +171,24 @@ export const constrainBounce = (
  */
 export const attractionForce =
   (
-    attractors: readonly ForceAffected[],
+    attractors: ReadonlyArray<ForceAffected>,
     gravity: number,
     distanceRange: { readonly min?: number; readonly max?: number } = {}
   ) =>
-  (attractee: ForceAffected): ForceAffected => {
-    //eslint-disable-next-line functional/no-let
-    let accel = attractee.acceleration ?? Points.Empty;
-    attractors.forEach((a) => {
-      if (a === attractee) return;
+    (attractee: ForceAffected): ForceAffected => {
+      //eslint-disable-next-line functional/no-let
+      let accel = attractee.acceleration ?? Points.Empty;
+      for (const a of attractors) {
+        if (a === attractee) continue;
 
-      const f = computeAttractionForce(a, attractee, gravity, distanceRange);
-      accel = Points.sum(accel, f);
-    });
-    return {
-      ...attractee,
-      acceleration: accel,
+        const f = computeAttractionForce(a, attractee, gravity, distanceRange);
+        accel = Points.sum(accel, f);
+      }
+      return {
+        ...attractee,
+        acceleration: accel,
+      };
     };
-  };
 
 /**
  * Computes the attraction force between two things.
@@ -236,7 +236,7 @@ export const computeAttractionForce = (
   attractee: ForceAffected,
   gravity: number,
   distanceRange: { readonly min?: number; readonly max?: number } = {}
-): Points.Point => {
+): Point => {
   if (attractor.position === undefined) {
     throw new Error(`attractor.position not set`);
   }
@@ -244,8 +244,8 @@ export const computeAttractionForce = (
     throw new Error(`attractee.position not set`);
   }
 
-  const distRangeMin = distanceRange.min ?? 0.01;
-  const distRangeMax = distanceRange.max ?? 0.7;
+  const distributionRangeMin = distanceRange.min ?? 0.01;
+  const distributionRangeMax = distanceRange.max ?? 0.7;
 
   // Vector between objects
   const f = Points.normalise(
@@ -253,7 +253,7 @@ export const computeAttractionForce = (
   );
 
   // Distance
-  const d = clamp(Points.distance(f), distRangeMin, distRangeMax);
+  const d = clamp(Points.distance(f), distributionRangeMin, distributionRangeMax);
 
   // Multiply vector by gravity, scaled by mass of things and distance
   return Points.multiply(
@@ -271,7 +271,7 @@ export type TargetOpts = {
    * If distance is less than this range, don't move.
    * If undefined (default), will try to get an exact position
    */
-  readonly range?: Points.Point;
+  readonly range?: Point;
 };
 /**
  * A force that moves a thing toward `targetPos`.
@@ -283,7 +283,7 @@ export type TargetOpts = {
  * @param diminishBy Scales acceleration. Defaults to 0.001.
  * @returns
  */
-export const targetForce = (targetPos: Points.Point, opts: TargetOpts = {}) => {
+export const targetForce = (targetPos: Point, opts: TargetOpts = {}) => {
   const fn = (t: ForceAffected): ForceAffected => {
     const accel = computeAccelerationToTarget(
       targetPos,
@@ -347,21 +347,17 @@ export const targetForce = (targetPos: Points.Point, opts: TargetOpts = {}) => {
  */
 export const apply = (
   t: ForceAffected,
-  ...accelForces: readonly ForceKind[]
+  ...accelForces: ReadonlyArray<ForceKind>
 ): ForceAffected => {
   if (t === undefined) throw new Error(`t parameter is undefined`);
 
-  accelForces.forEach((f) => {
-    if (f === null || f === undefined) return;
-    if (typeof f === `function`) {
-      t = f(t);
-    } else {
-      t = {
-        ...t,
-        acceleration: Points.sum(t.acceleration ?? Points.Empty, f),
-      };
-    }
-  });
+  for (const f of accelForces) {
+    if (f === null || f === undefined) continue;
+    t = typeof f === `function` ? f(t) : {
+      ...t,
+      acceleration: Points.sum(t.acceleration ?? Points.Empty, f),
+    };
+  }
 
   // Integate velocity from acceleration
   const velo = computeVelocity(
@@ -401,12 +397,12 @@ export const apply = (
  * @returns Force function
  */
 export const accelerationForce =
-  (vector: Points.Point, mass: MassApplication = `ignored`): ForceFn =>
-  (t: ForceAffected) =>
-    Object.freeze({
-      ...t,
-      acceleration: massApplyAccel(vector, t, mass), //Points.sum(t.acceleration ?? Points.Empty, op(t.mass ?? 1))
-    });
+  (vector: Point, mass: MassApplication = `ignored`): ForceFn =>
+    (t: ForceAffected) =>
+      Object.freeze({
+        ...t,
+        acceleration: massApplyAccel(vector, t, mass), //Points.sum(t.acceleration ?? Points.Empty, op(t.mass ?? 1))
+      });
 
 /**
  * Returns an acceleration vector with mass either dampening or multiplying it.
@@ -437,22 +433,33 @@ export const accelerationForce =
  * @returns Acceleration vector
  */
 const massApplyAccel = (
-  vector: Points.Point,
+  vector: Point,
   thing: ForceAffected,
   mass: MassApplication = `ignored`
 ) => {
   //eslint-disable-next-line functional/no-let
   let op;
-  if (mass === `dampen`) {
-    op = (mass: number) => Points.divide(vector, mass, mass);
-  } else if (mass === `multiply`) {
-    op = (mass: number) => Points.multiply(vector, mass, mass);
-  } else if (mass === `ignored`) {
-    op = (_mass: number) => vector;
-  } else {
-    throw new Error(
-      `Unknown 'mass' parameter '${mass}. Expected 'dampen', 'multiply' or 'ignored'`
-    );
+  switch (mass) {
+    case `dampen`: {
+      op = (mass: number) => Points.divide(vector, mass, mass);
+
+      break;
+    }
+    case `multiply`: {
+      op = (mass: number) => Points.multiply(vector, mass, mass);
+
+      break;
+    }
+    case `ignored`: {
+      op = (_mass: number) => vector;
+
+      break;
+    }
+    default: {
+      throw new Error(
+        `Unknown 'mass' parameter '${ mass }. Expected 'dampen', 'multiply' or 'ignored'`
+      );
+    }
   }
   return Points.sum(thing.acceleration ?? Points.Empty, op(thing.mass ?? 1));
   // if (t.mass) {
@@ -482,17 +489,17 @@ const massApplyAccel = (
  */
 export const magnitudeForce =
   (force: number, mass: MassApplication = `ignored`): ForceFn =>
-  (t: ForceAffected): ForceAffected => {
-    if (t.velocity === undefined) return t;
+    (t: ForceAffected): ForceAffected => {
+      if (t.velocity === undefined) return t;
 
-    const mag = Points.distance(Points.normalise(t.velocity));
-    const magSq = force * mag * mag;
-    const vv = Points.multiply(Points.invert(t.velocity), magSq);
-    return Object.freeze({
-      ...t,
-      acceleration: massApplyAccel(vv, t, mass),
-    });
-  };
+      const mag = Points.distance(Points.normalise(t.velocity));
+      const magSq = force * mag * mag;
+      const vv = Points.multiply(Points.invert(t.velocity), magSq);
+      return Object.freeze({
+        ...t,
+        acceleration: massApplyAccel(vv, t, mass),
+      });
+    };
 
 /**
  * Null force does nothing
@@ -543,11 +550,11 @@ export const velocityForce = (
  * @returns
  */
 export const angularForce = () => (t: ForceAffected) => {
-  const acc = t.angularAcceleration ?? 0;
+  const accumulator = t.angularAcceleration ?? 0;
   const vel = t.angularVelocity ?? 0;
   const angle = t.angle ?? 0;
 
-  const v = vel + acc;
+  const v = vel + accumulator;
   const a = angle + v;
 
   return Object.freeze({
@@ -571,14 +578,14 @@ export const angularForce = () => (t: ForceAffected) => {
  * @returns
  */
 export const angleFromAccelerationForce =
-  (scaling: number = 20) =>
-  (t: ForceAffected) => {
-    const accel = t.acceleration ?? Points.Empty;
-    return Object.freeze({
-      ...t,
-      angularAcceleration: accel.x * scaling,
-    });
-  };
+  (scaling = 20) =>
+    (t: ForceAffected) => {
+      const accel = t.acceleration ?? Points.Empty;
+      return Object.freeze({
+        ...t,
+        angularAcceleration: accel.x * scaling,
+      });
+    };
 
 /**
  * Yields a force function that applies the thing's velocity to its angular acceleration.
@@ -587,17 +594,17 @@ export const angleFromAccelerationForce =
  * @returns
  */
 export const angleFromVelocityForce =
-  (interpolateAmt: number = 1) =>
-  (t: ForceAffected) => {
-    const a = Points.angle(t.velocity ?? Points.Empty);
-    return Object.freeze({
-      ...t,
-      angle:
-        interpolateAmt < 1
-          ? interpolateAngle(interpolateAmt, t.angle ?? 0, a)
-          : a,
-    });
-  };
+  (interpolateAmt = 1) =>
+    (t: ForceAffected) => {
+      const a = Points.angle(t.velocity ?? Points.Empty);
+      return Object.freeze({
+        ...t,
+        angle:
+          interpolateAmt < 1
+            ? interpolateAngle(interpolateAmt, t.angle ?? 0, a)
+            : a,
+      });
+    };
 
 /**
  * Spring force
@@ -630,32 +637,32 @@ export const angleFromVelocityForce =
  */
 export const springForce =
   (
-    pinnedAt: Points.Point,
-    restingLength: number = 0.5,
+    pinnedAt: Point,
+    restingLength = 0.5,
     k = 0.0002,
     damping = 0.999
   ) =>
-  (t: ForceAffected): ForceAffected => {
-    const dir = Points.subtract(t.position ?? Points.Empty, pinnedAt);
-    const mag = Points.distance(dir);
-    const stretch = Math.abs(restingLength - mag);
+    (t: ForceAffected): ForceAffected => {
+      const dir = Points.subtract(t.position ?? Points.Empty, pinnedAt);
+      const mag = Points.distance(dir);
+      const stretch = Math.abs(restingLength - mag);
 
-    const f = Points.pipelineApply(dir, Points.normalise, (p) =>
-      Points.multiply(p, -k * stretch)
-    );
+      const f = Points.pipelineApply(dir, Points.normalise, (p) =>
+        Points.multiply(p, -k * stretch)
+      );
 
-    const accel = massApplyAccel(f, t, `dampen`);
-    const velo = computeVelocity(
-      accel ?? Points.Empty,
-      t.velocity ?? Points.Empty
-    );
-    const veloDamped = Points.multiply(velo, damping, damping);
-    return {
-      ...t,
-      velocity: veloDamped,
-      acceleration: Points.Empty,
+      const accel = massApplyAccel(f, t, `dampen`);
+      const velo = computeVelocity(
+        accel ?? Points.Empty,
+        t.velocity ?? Points.Empty
+      );
+      const veloDamped = Points.multiply(velo, damping, damping);
+      return {
+        ...t,
+        velocity: veloDamped,
+        acceleration: Points.Empty,
+      };
     };
-  };
 
 /**
  * Pendulum force options
@@ -708,32 +715,32 @@ export type PendulumOpts = {
  * @returns
  */
 export const pendulumForce =
-  (pinnedAt: Points.Point = { x: 0.5, y: 0 }, opts: PendulumOpts = {}) =>
-  (t: ForceAffected): ForceAffected => {
-    const length =
-      opts.length ?? Points.distance(pinnedAt, t.position ?? Points.Empty);
-    const speed = opts.speed ?? 0.001;
-    const damping = opts.damping ?? 0.995;
+  (pinnedAt: Point = { x: 0.5, y: 0 }, opts: PendulumOpts = {}) =>
+    (t: ForceAffected): ForceAffected => {
+      const length =
+        opts.length ?? Points.distance(pinnedAt, t.position ?? Points.Empty);
+      const speed = opts.speed ?? 0.001;
+      const damping = opts.damping ?? 0.995;
 
-    //eslint-disable-next-line functional/no-let
-    let angle = t.angle;
-    if (angle === undefined) {
-      if (t.position) {
-        angle = Points.angle(pinnedAt, t.position) - Math.PI / 2;
-      } else {
-        angle = 0; // Position wherever
+      //eslint-disable-next-line functional/no-let
+      let angle = t.angle;
+      if (angle === undefined) {
+        if (t.position) {
+          angle = Points.angle(pinnedAt, t.position) - Math.PI / 2;
+        } else {
+          angle = 0; // Position wherever
+        }
       }
-    }
-    const accel = ((-1 * speed) / length) * Math.sin(angle);
-    const v = (t.angularVelocity ?? 0) + accel;
-    angle += v;
+      const accel = ((-1 * speed) / length) * Math.sin(angle);
+      const v = (t.angularVelocity ?? 0) + accel;
+      angle += v;
 
-    return Object.freeze({
-      angularVelocity: v * damping,
-      angle,
-      position: computePositionFromAngle(length, angle + Math.PI / 2, pinnedAt),
-    });
-  };
+      return Object.freeze({
+        angularVelocity: v * damping,
+        angle,
+        position: computePositionFromAngle(length, angle + Math.PI / 2, pinnedAt),
+      });
+    };
 
 /**
  * Compute velocity based on acceleration and current velocity
@@ -743,13 +750,12 @@ export const pendulumForce =
  * @returns
  */
 export const computeVelocity = (
-  acceleration: Points.Point,
-  velocity: Points.Point,
+  acceleration: Point,
+  velocity: Point,
   velocityMax?: number
-): Points.Point => {
+): Point => {
   const p = Points.sum(velocity, acceleration);
-  if (velocityMax !== undefined) return Points.clampMagnitude(p, velocityMax);
-  else return p;
+  return velocityMax === undefined ? p : Points.clampMagnitude(p, velocityMax);
 };
 
 /**
@@ -775,8 +781,8 @@ export const computeVelocity = (
  * @returns
  */
 export const computeAccelerationToTarget = (
-  targetPos: Points.Point,
-  currentPos: Points.Point,
+  targetPos: Point,
+  currentPos: Point,
   opts: TargetOpts = {}
 ) => {
   const diminishBy = opts.diminishBy ?? 0.001;
@@ -784,11 +790,9 @@ export const computeAccelerationToTarget = (
   // Compare to current position of thing to get vector direction
   const direction = Points.subtract(targetPos, currentPos);
 
-  if (opts.range) {
-    // If direction is less than range, return { x: 0, y: 0}
-    if (Points.compare(Points.abs(direction), opts.range) === -2) {
-      return Points.Empty;
-    }
+  if (opts.range && // If direction is less than range, return { x: 0, y: 0}
+    Points.compare(Points.abs(direction), opts.range) === -2) {
+    return Points.Empty;
   }
 
   // Diminish vector to make a meaningful acceleration
@@ -802,9 +806,9 @@ export const computeAccelerationToTarget = (
  * @returns Point
  */
 export const computePositionFromVelocity = (
-  position: Points.Point,
-  velocity: Points.Point
-): Points.Point => Points.sum(position, velocity);
+  position: Point,
+  velocity: Point
+): Point => Points.sum(position, velocity);
 
 /**
  * Compute a position based on distance and angle from origin
@@ -816,7 +820,7 @@ export const computePositionFromVelocity = (
 export const computePositionFromAngle = (
   distance: number,
   angleRadians: number,
-  origin: Points.Point
+  origin: Point
 ) => Polar.toCartesian(distance, angleRadians, origin);
 
 const _angularForce = angularForce();

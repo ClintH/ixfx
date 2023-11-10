@@ -1,5 +1,4 @@
 import { type Sphere } from './Sphere.js';
-import * as Points from './Point.js';
 import {
   type Circle,
   type CirclePositioned,
@@ -7,6 +6,7 @@ import {
 } from './Circle.js';
 import { scale } from '../data/Scale.js';
 import { linearSpace } from '../Numbers.js';
+import type { Point, Point3d } from './points/Types.js';
 
 const cos = Math.cos;
 const sin = Math.sin;
@@ -77,7 +77,7 @@ export type VogelSpiralOpts = {
 export function* circleVogelSpiral(
   circle?: Circle,
   opts: VogelSpiralOpts = {}
-): IterableIterator<Points.Point> {
+): IterableIterator<Point> {
   const maxPoints = opts.maxPoints ?? 5000;
   const density = opts.density ?? 0.95;
   const rotationOffset = opts.rotation ?? 0;
@@ -133,7 +133,7 @@ export type CircleRingsOpts = {
 export function* circleRings(
   circle?: Circle | CirclePositioned,
   opts: CircleRingsOpts = {}
-): IterableIterator<Points.Point> {
+): IterableIterator<Point> {
   const rings = opts.rings ?? 5;
   const c = circleToPositioned(circle ?? { radius: 1, x: 0, y: 0 });
   const ringR = 1 / rings;
@@ -183,7 +183,7 @@ export function* sphereFibonacci(
   samples: number = 100,
   rotationRadians: number = 0,
   sphere?: Sphere
-): IterableIterator<Points.Point3d> {
+): IterableIterator<Point3d> {
   const offset = 2 / samples;
   const s = sphere ?? { x: 0, y: 0, z: 0, radius: 1 };
 

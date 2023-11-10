@@ -1,11 +1,11 @@
 import { defaultComparer, type Comparer } from '../Util.js';
-import { shuffle } from '../collections/Arrays.js';
+import { shuffle } from '../collections/arrays/index.js';
 
 export type ExpressionOrResult<ArgsType, ResultType> =
   | ResultType
   | ((
-      args: ArgsType | undefined
-    ) => Promise<ResultType | undefined> | ResultType | undefined | void);
+    args: ArgsType | undefined
+  ) => Promise<ResultType | undefined> | ResultType | undefined | void);
 
 //eslint-disable-next-line functional/no-mixed-types
 export type RunOpts<ResultType> = {
@@ -109,7 +109,7 @@ export type RunSingleOpts<V> = RunOpts<V> & {
  */
 export const run = async <ArgsType, ResultType>(
   expressions: //eslint-disable-next-line functional/prefer-readonly-type
-  | ExpressionOrResult<ArgsType, ResultType>[]
+    | ExpressionOrResult<ArgsType, ResultType>[]
     | ExpressionOrResult<ArgsType, ResultType>
     | readonly ExpressionOrResult<ArgsType, ResultType>[],
   opts: RunOpts<ResultType> = {},
@@ -120,11 +120,11 @@ export const run = async <ArgsType, ResultType>(
   //eslint-disable-next-line functional/no-let
   let expressionsArray = Array.isArray(expressions)
     ? (expressions as ExpressionOrResult<ArgsType, ResultType>[])
-    : [expressions as ExpressionOrResult<ArgsType, ResultType>];
+    : [ expressions as ExpressionOrResult<ArgsType, ResultType> ];
   if (opts.shuffle) expressionsArray = shuffle(expressionsArray);
 
   for (let i = 0; i < expressionsArray.length; i++) {
-    const exp = expressionsArray[i];
+    const exp = expressionsArray[ i ];
     //eslint-disable-next-line functional/no-let
     let r: ResultType;
     if (typeof exp === 'function') {

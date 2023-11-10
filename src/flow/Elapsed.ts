@@ -1,4 +1,4 @@
-import { round } from '../Numbers.js';
+import { round } from '../numbers/Round.js';
 import { intervalToMs, type Interval } from './IntervalType.js';
 import { msElapsedTimer, relativeTimer } from './Timer.js';
 

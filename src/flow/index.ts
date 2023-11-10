@@ -1,12 +1,3 @@
-export type AsyncPromiseOrGenerator<V> =
-  | (() => Promise<V> | Promise<undefined>)
-  | (() => V | undefined)
-  | Generator<V>
-  | IterableIterator<V>
-  | AsyncIterableIterator<V>
-  | AsyncGenerator<V>
-  | AsyncIterable<V>
-  | Iterable<V>;
 
 export * as Elapsed from './Elapsed.js';
 export * from './DispatchList.js';
@@ -16,7 +7,7 @@ import { sleep } from './Sleep.js';
 
 import * as StateMachine from './StateMachine.js';
 import * as Timer from './Timer.js';
-
+export * from './Types.js';
 /**
  * State Machine
  * See [here for usage](../classes/Flow.StateMachine.StateMachine.html).

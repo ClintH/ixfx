@@ -1,6 +1,6 @@
 import test, { type ExecutionContext } from 'ava';
 
-import * as Points from '../../geometry/Point.js';
+import * as Points from '../../geometry/points/index.js';
 
 function closeTo(t: ExecutionContext<unknown>, input: number, target: number, percent: number = 0.001) {
   const diff = (Math.abs(target - input) / target);

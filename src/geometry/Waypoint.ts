@@ -1,8 +1,9 @@
 import * as Lines from './Line.js';
-import * as Points from './Point.js';
+import * as Points from './points/index.js';
 import { type CirclePositioned } from './Circle.js';
 import { Arrays } from '../collections/index.js';
 import { type Path } from './Path.js';
+import type { Point } from './points/Types.js';
 
 export type Waypoint = CirclePositioned;
 
@@ -12,7 +13,7 @@ export type Opts = {
 };
 
 export const fromPoints = (
-  waypoints: readonly Points.Point[],
+  waypoints: ReadonlyArray<Point>,
   opts: Opts = {}
 ) => {
   const lines = Lines.joinPointsToLines(...waypoints);
@@ -22,11 +23,11 @@ export const fromPoints = (
   );
 };
 
-export const init = (paths: readonly Path[], opts: Opts = {}) => {
+export const init = (paths: ReadonlyArray<Path>, opts: Opts = {}) => {
   //const enforceOrder = opts.enforceOrder ?? true;
   const maxDistanceFromLine = opts.maxDistanceFromLine ?? 0.1;
 
-  const checkUnordered = (pt: Points.Point) => {
+  const checkUnordered = (pt: Point) => {
     const results = paths.map((p, index) => {
       const nearest = p.nearest(pt);
       const distance = Points.distance(pt, nearest);
@@ -39,7 +40,7 @@ export const init = (paths: readonly Path[], opts: Opts = {}) => {
     return sorted;
   };
 
-  // const checkUnordered = (p:Points.Point) => {
+  // const checkUnordered = (p:Point) => {
   //   // Calculate progress of pointer between all the waypoint lines
   //   const progresses = lines.map((line, index) => (
   //     {

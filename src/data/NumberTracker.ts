@@ -2,7 +2,7 @@ import { PrimitiveTracker, type TimestampedPrimitive } from './PrimitiveTracker.
 import {
   type TrackedValueOpts as TrackOpts,
 } from './TrackedValue.js';
-import { minFast, maxFast, totalFast } from '../collections/NumericArrays.js';
+import { minFast, maxFast, totalFast } from '../collections/arrays/NumericArrays.js';
 
 export type NumberTrackerResults = {
   readonly total: number

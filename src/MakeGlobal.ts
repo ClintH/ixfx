@@ -1,5 +1,5 @@
 import * as Util from './Util.js';
-import * as Random from './Random.js';
+import * as Random from './random/index.js';
 import * as Data from './data/index.js';
 import * as Geometry from './geometry/index.js';
 import * as Text from './Text.js';

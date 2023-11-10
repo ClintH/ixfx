@@ -1,6 +1,7 @@
 import { Polar } from './index.js';
 import * as Lines from './Line.js';
-import * as Points from './Point.js';
+import * as Points from './points/index.js';
+import type { Point } from './points/Types.js';
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 const EmptyCartesian = Object.freeze({ x: 0, y: 0 });
@@ -13,7 +14,7 @@ const pi = Math.PI;
 // const Q3 = Q1 + Q2;
 // const Q4 = Math.PI * 2;
 
-export type Vector = Points.Point | Polar.Coord;
+export type Vector = Point | Polar.Coord;
 
 export const fromRadians = (radians: number) => {
   return Object.freeze({
@@ -22,7 +23,7 @@ export const fromRadians = (radians: number) => {
   });
 }
 
-export const toRadians = (point: Points.Point) => {
+export const toRadians = (point: Point) => {
   return Math.atan2(point.y, point.x);
 }
 /**
@@ -36,9 +37,9 @@ export const toRadians = (point: Points.Point) => {
  * @returns
  */
 export const fromPointPolar = (
-  pt: Points.Point,
+  pt: Point,
   angleNormalisation: `` | `unipolar` | `bipolar` = ``,
-  origin: Points.Point = EmptyCartesian
+  origin: Point = EmptyCartesian
 ): Polar.Coord => {
   pt = Points.subtract(pt, origin);
 
@@ -61,7 +62,7 @@ export const fromPointPolar = (
  * @param line
  * @returns
  */
-export const fromLineCartesian = (line: Lines.Line): Points.Point =>
+export const fromLineCartesian = (line: Lines.Line): Point =>
   Points.subtract(line.b, line.a);
 
 /**
@@ -80,7 +81,7 @@ const isPolar = (v: Vector): v is Polar.Coord => {
   return false;
 };
 
-const isCartesian = (v: Vector): v is Points.Point => {
+const isCartesian = (v: Vector): v is Point => {
   if (Points.isPoint(v)) return true;
   return false;
 };
@@ -101,7 +102,7 @@ export const normalise = (v: Vector): Vector => {
   throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
-export const quadrantOffsetAngle = (p: Points.Point): number => {
+export const quadrantOffsetAngle = (p: Point): number => {
   if (p.x >= 0 && p.y >= 0) return 0; // Q1
   if (p.x < 0 && p.y >= 0) return pi; // Q2
   if (p.x < 0 && p.y < 0) return pi; // Q3
@@ -130,7 +131,7 @@ export const toPolar = (v: Vector, origin = Points.Empty): Polar.Coord => {
  * @param v
  * @returns Cartestian vector
  */
-export const toCartesian = (v: Vector): Points.Point => {
+export const toCartesian = (v: Vector): Point => {
   if (isPolar(v)) {
     return Polar.toPoint(v);
   } else if (isCartesian(v)) {

@@ -12,9 +12,9 @@
  */
 
 import { Arrays } from '../collections/index.js';
-import { Points } from '../geometry/index.js';
 import { numberTracker } from '../data/NumberTracker.js';
 import { AudioAnalyser } from './AudioAnalyser.js';
+import type { Point } from '../geometry/points/Types.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {
@@ -22,7 +22,7 @@ export default class AudioVisualiser {
   audio: AudioAnalyser;
   parent: HTMLElement;
 
-  lastPointer: Points.Point = { x: 0, y: 0 };
+  lastPointer: Point = { x: 0, y: 0 };
   pointerDown = false;
   pointerClicking = false;
   pointerClickDelayMs = 100;
@@ -63,7 +63,7 @@ export default class AudioVisualiser {
       </div>
     </section>
     `;
-    this.el = parentElem.children[0] as HTMLElement;
+    this.el = parentElem.children[ 0 ] as HTMLElement;
 
     document
       .getElementById(`rendererComponentToggle`)
@@ -119,9 +119,9 @@ export default class AudioVisualiser {
 
     //eslint-disable-next-line functional/no-let
     for (let i = 0; i < bins; i++) {
-      if (!Number.isFinite(freq[i])) continue;
+      if (!Number.isFinite(freq[ i ])) continue;
 
-      const value = freq[i] - minMax.min;
+      const value = freq[ i ] - minMax.min;
       const valueRelative = value / this.freqMaxRange;
       const height = Math.abs(canvasHeight * valueRelative);
       const offset = canvasHeight - height;
@@ -141,7 +141,7 @@ export default class AudioVisualiser {
         if (this.freqTracker.id !== i.toString()) {
           this.freqTracker = numberTracker({ id: i.toString() });
         }
-        this.freqTracker.seen(freq[i]);
+        this.freqTracker.seen(freq[ i ]);
 
         const freqMma = this.freqTracker.getMinMaxAvg();
 
@@ -149,19 +149,19 @@ export default class AudioVisualiser {
         g.fillStyle = `black`;
         if (this.audio) {
           g.fillText(
-            `Frequency (${i}) at pointer: ${this.audio
+            `Frequency (${ i }) at pointer: ${ this.audio
               .getFrequencyAtIndex(i)
-              .toLocaleString(`en`)} - ${this.audio
-              .getFrequencyAtIndex(i + 1)
-              .toLocaleString(`en`)}`,
+              .toLocaleString(`en`) } - ${ this.audio
+                .getFrequencyAtIndex(i + 1)
+                .toLocaleString(`en`) }`,
             2,
             10
           );
         }
-        g.fillText(`Raw value: ${freq[i].toFixed(2)}`, 2, 20);
-        g.fillText(`Min: ${freqMma.min.toFixed(2)}`, 2, 40);
-        g.fillText(`Max: ${freqMma.max.toFixed(2)}`, 60, 40);
-        g.fillText(`Avg: ${freqMma.avg.toFixed(2)}`, 120, 40);
+        g.fillText(`Raw value: ${ freq[ i ].toFixed(2) }`, 2, 20);
+        g.fillText(`Min: ${ freqMma.min.toFixed(2) }`, 2, 40);
+        g.fillText(`Max: ${ freqMma.max.toFixed(2) }`, 60, 40);
+        g.fillText(`Avg: ${ freqMma.avg.toFixed(2) }`, 120, 40);
       }
       g.fillRect(left, offset, width, height);
     }
@@ -251,7 +251,7 @@ export default class AudioVisualiser {
 
     //eslint-disable-next-line functional/no-let
     for (let i = 0; i < bins; i++) {
-      const height = wave[i] * canvasHeight;
+      const height = wave[ i ] * canvasHeight;
       const y = bipolar ? canvasHeight / 2 - height : canvasHeight - height;
 
       if (i === 0) {
@@ -261,7 +261,7 @@ export default class AudioVisualiser {
       }
       x += width;
 
-      if (this.pointerDown) this.waveTracker.seen(wave[i]);
+      if (this.pointerDown) this.waveTracker.seen(wave[ i ]);
     }
     g.lineTo(canvasWidth, bipolar ? canvasHeight / 2 : canvasHeight); //canvas.height / 2);
     g.stroke();

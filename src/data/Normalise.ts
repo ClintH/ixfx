@@ -1,4 +1,4 @@
-import { minMaxAvg } from '../collections/NumericArrays.js';
+import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
 import { clamp } from './Clamp.js';
 import { scale } from './Scale.js';
 import { throwNumberTest } from '../Guards.js';

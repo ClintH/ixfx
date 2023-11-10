@@ -1,5 +1,6 @@
-import { Points, Triangles } from './index.js';
+import { Triangles } from './index.js';
 import { type Circle } from './Circle.js';
+import type { Point } from './points/Types.js';
 
 export type Isosceles = {
   readonly legs: number;
@@ -47,12 +48,12 @@ export const incircle = (t: Isosceles): Circle => {
 
 export const medians = (
   t: Isosceles
-): readonly [a: number, b: number, c: number] => {
+): readonly [ a: number, b: number, c: number ] => {
   const aa = t.legs * t.legs;
   const cc = t.base * t.base;
   const medianAB = Math.sqrt(aa + 2 * cc) / 2;
   const medianC = Math.sqrt(4 * aa - cc) / 2;
-  return [medianAB, medianAB, medianC];
+  return [ medianAB, medianAB, medianC ];
 };
 
 /**
@@ -66,7 +67,7 @@ export const medians = (
  */
 export const fromCenter = (
   t: Isosceles,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const h = height(t);
   const incircleR = incircle(t).radius;
@@ -80,7 +81,7 @@ export const fromCenter = (
 
 export const fromA = (
   t: Isosceles,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const h = height(t);
   const a = { x: origin.x, y: origin.y };
@@ -91,7 +92,7 @@ export const fromA = (
 
 export const fromB = (
   t: Isosceles,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const h = height(t);
   const b = { x: origin.x, y: origin.y };
@@ -102,7 +103,7 @@ export const fromB = (
 
 export const fromC = (
   t: Isosceles,
-  origin: Points.Point = { x: 0, y: 0 }
+  origin: Point = { x: 0, y: 0 }
 ): Triangles.Triangle => {
   const h = height(t);
   const c = { x: origin.x, y: origin.y };

@@ -1,7 +1,8 @@
 import * as Rects from './Rect.js';
 import * as Grids from './Grid.js';
-import * as Points from './Point.js';
+import * as Points from './points/index.js';
 import { Arrays } from '../collections/index.js';
+import type { Point } from './points/Types.js';
 
 export type PoissonDiskOpts = {
   readonly radius?: number;
@@ -11,17 +12,17 @@ export type PoissonDiskOpts = {
 const isPointValid = (
   radius: number,
   grid: Grids.Grid & Grids.GridVisual,
-  point: Points.Point,
+  point: Point,
   reference: Grids.Cell,
-  ar: readonly (readonly Points.Point[])[]
+  ar: ReadonlyArray<ReadonlyArray<Point>>
 ) => {
   //const cellForPoint = Grids.cellAtPoint(grid, point);
   // if (!cellForPoint) throw new Error(`Cell could not be calculated for point ${JSON.stringify(point)}`);
   for (const p of Grids.visitNeigbours(grid, reference, `undefined`)) {
-    const pointInGrid = ar[p.y][p.x];
+    const pointInGrid = ar[ p.y ][ p.x ];
     if (pointInGrid) {
-      const dist = Points.distance(point, pointInGrid);
-      if (dist < radius) return false;
+      const distribution = Points.distance(point, pointInGrid);
+      if (distribution < radius) return false;
     }
   }
   return true;
@@ -42,16 +43,16 @@ export const poissonDisk = (
   };
 
   const randomPoint = () => Rects.randomPoint(rect);
-  const ar = Grids.toArray<Points.Point>(grid);
-  const arUpdater = Grids.array2dUpdater<Points.Point>(grid, ar);
-  const active: Points.Point[] = [];
+  const ar = Grids.toArray<Point>(grid);
+  const arUpdater = Grids.array2dUpdater<Point>(grid, ar);
+  const active: Array<Point> = [];
   //eslint-disable-next-line functional/no-let
-  let growthPoint: Points.Point | undefined = randomPoint();
+  let growthPoint: Point | undefined = randomPoint();
   //eslint-disable-next-line functional/immutable-data
   active.push(growthPoint);
   arUpdater(growthPoint, growthPoint);
 
-  while (active.length) {
+  while (active.length > 0) {
     if (!growthPoint) {
       growthPoint = Arrays.randomPluck(active, true).value;
     }
@@ -59,15 +60,15 @@ export const poissonDisk = (
       const reference = Grids.cellAtPoint(grid, growthPoint);
       if (!reference) {
         throw new Error(
-          `Could not compute cell for point ${JSON.stringify(
+          `Could not compute cell for point ${ JSON.stringify(
             growthPoint
-          )} grid: ${JSON.stringify(grid)}`
+          ) } grid: ${ JSON.stringify(grid) }`
         );
       }
       //eslint-disable-next-line functional/no-let
       let added = false;
       //eslint-disable-next-line functional/no-let
-      for (let i = 0; i < limit; i++) {
+      for (let index = 0; index < limit; index++) {
         const r = randomPoint();
         if (isPointValid(radius, grid, r, reference, ar)) {
           arUpdater(r, r);

@@ -1,11 +1,10 @@
 import {
-  type RandomSource,
-  floatSource as randomFloatFunction,
-  float as randomFloat,
-  defaultRandom,
-} from '../Random.js';
+  float as randomFloat
+} from '../random/index.js';
+import { floatSource as randomFloatFunction } from '../random/FloatSource.js';
 import { clamp } from '../data/Clamp.js';
 import { throwNumberTest } from '../Guards.js';
+import { defaultRandom, type RandomSource } from '../random/Types.js';
 
 export type JitterOpts = {
   readonly relative?: number;

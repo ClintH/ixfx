@@ -1,0 +1,232 @@
+:root {
+  --dark-color-background: hsl(229, 20%, 20%);
+  --dark-bg-dim: hsl(231, 21%, 29%);
+  --dark-fg: hsl(231, 28%, 73%);
+  --dark-fg-link: hsl(231, 18%, 83%);
+  --dark-fgDim: hsl(231, 12%, 50%);
+
+  --dark-yellow: hsl(39, 100%, 71%);
+  --dark-purple: hsl(276, 68%, 75%);
+  --dark-blue: hsl(197, 100%, 77%);
+  --dark-green: hsl(68, 55%, 60%);
+
+  --light-color-background: hsl(0, 0%, 98%);
+  --light-bg-dim: hsl(194, 6%, 94%);
+  --light-fg: hsl(200, 16%, 22%);
+  --light-fg-link: hsl(200, 90%, 42%);
+  --light-fgDim: hsl(200, 16%, 32%);
+
+  --light-yellow: hsl(39, 100%, 49%);
+  --light-purple: hsl(256, 90%, 65%);
+  --light-blue: hsl(217, 38%, 55%);
+  --light-green: hsl(85, 40%, 54%);
+
+  --dark-color-ts-namespace: var(--dark-fg-link);
+  --dark-color-ts: var(--dark-fg);
+  --dark-color-ts-function: var(--dark-fg-link);
+  --dark-color-ts-interface: var(--dark-fg);
+  --dark-color-ts-variable: var(--dark-fg);
+
+  --light-color-ts-namespace: var(--light-fg-link);
+  --light-color-ts: var(--light-fg);
+  --light-color-ts-function: var(--light-fg-link);
+  --light-color-ts-interface: var(--light-fg);
+  --light-color-ts-variable: var(--light-fg);
+  --light-code-background: var(--light-bg-dim);
+
+  --light-color-text: var(--light-fg);
+  --light-color-accent: var(--light-bg-dim);
+  --light-hl-0: var(--light-green);
+  --light-hl-1: var(--light-fgDim);
+  --light-hl-3: var(--light-fgDim);
+  --light-hl-4: var(--light-blue);
+  --light-hl-6: var(--light-blue);
+  --light-hl-7: var(--light-fgDim);
+  --light-hl-9: var(--light-purple);
+  --accent: var(--light-yellow);
+
+  --dark-color-text: var(--dark-fg);
+  --dark-color-accent: var(--dark-bg-dim);
+  --dark-hl-0: var(--dark-green);
+  --dark-hl-1: var(--dark-fg);
+  --dark-hl-6: var(--dark-blue);
+  --dark-hl-7: var(--dark-yellow);
+  --dark-hl-9: var(--dark-purple);
+}
+
+.tsd-navigation.primary a {
+  padding: 0.3rem 0.3rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tsd-kind-icon rect {
+    stroke: var(--dark-fg);
+  }
+  .tsd-kind-function {
+    color: var(--dark-color-ts-function);
+  } 
+  .tsd-kind-namespace {
+    color: var(--dark-color-ts-namespace);
+  }
+  :root {
+    --accent: var(--dark-yellow);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .tsd-kind-icon rect {
+    stroke: var(--light-fg);
+  }
+
+  .tsd-kind-function {
+    color: var(--light-color-ts-function);
+  }
+  :root {
+    --accent: var(--light-yellow);
+  }
+}
+
+
+/* body.dark {
+  --bg: var(--dark-bg);
+  --bg-dim: var(--dark-bg-dim);
+  --accent: var(--dark-yellow);
+  --fg: var(--dark-fg);
+  --fgDim: var(--dark-fgDim);
+  --bg-dim: var(--dark-bg-dim);
+
+  --purple: var(--dark-purple);
+  --green: var(--dark-green);
+  --blue: var(--dark-blue);
+} */
+/* 
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: var(--light-bg);
+    --bg-dim: var(--light-bg-dim);
+    --accent: var(--light-yellow);
+    --fg: var(--light-fg);
+    --fgDim: var(--light-fgDim);
+
+    --purple: var(--light-purple);
+    --green: var(--light-green);
+    --blue: var(--light-blue);
+  }
+} */
+
+/* body.light {
+  --bg: var(--light-bg);
+  --bg-dim: var(--light-bg-dim);
+  --accent: var(--light-yellow);
+  --fg: var(--light-fg);
+  --fgDim: var(--light-fgDim);
+
+  --purple: var(--light-purple);
+  --green: var(--light-green);
+  --blue: var(--light-blue);
+} */
+
+/* body.dark,
+body.light,
+body.os {
+  --color-comment-tag: var(--bg-dim);
+  --color-comment-tag-text: var(--fgDim);
+  --color-panel-divider: var(--bg-dim);
+  --color-ts: var(--purple);
+  --color-ts-class: var(--blue);
+  --color-ts-interface: var(--green);
+  --color-text: var(--fg);
+  --color-panel: var(--bg);
+  --dark-color: background: var(--bg);
+  --color-panel: var(--bg);
+  --color-background: var(--bg);
+} */
+
+h1,
+h2,
+h3 {
+  color: var(--accent);
+}
+
+.tsd-typography {
+  line-height: 1.4em;
+}
+
+.tsd-type-parameters h4,
+.tsd-type-parameters .tsd-comment,
+.tsd-type-parameters .tsd-comment p {
+  display: inline;
+}
+
+.tsd-type-parameters li {
+  margin: 1em 0 0.5em 0;
+}
+
+ul.tsd-type-parameters {
+  list-style: square;
+  margin: 0;
+  padding-left: 20px;
+}
+
+li.tsd-kind-namespace.tsd-parent-kind-namespace {
+  display: none;
+}
+
+.tsd-navigation.primary ul li li a {
+  margin-left: 0;
+}
+
+.col-menu {
+  border: none;
+}
+
+/* Hide headers in right-hand panel */
+.tsd-accordion-summary {
+  display: none;
+}
+
+.tsd-navigation.primary ul li a {
+  margin-left: 0;
+}
+
+/* 'Index' accordion in main context */
+.tsd-index-summary {
+  display: none;
+}
+
+h3.tsd-index-heading.uppercase {
+  display: none;
+}
+
+.tsd-navigation a {
+  color: var(--fg);
+}
+
+.settings {
+  display: none;
+}
+
+/* dl.tsd-comment-tags dt {
+  text-transform: uppercase;
+  border: none;
+  padding: 0;
+  color: var(--fg);
+}
+
+.tsd-type-parameters li {
+  display: inline-block;
+  margin-right: 2em;
+}
+
+.tsd-hierarchy {
+  display: none;
+}
+
+.tsd-panel,
+.tsd-page-title {
+  box-shadow: none;
+}
+
+.tsd-sources {
+  display: none;
+} */

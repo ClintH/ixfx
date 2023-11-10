@@ -357,7 +357,7 @@ export * as Collections from './collections/index.js';
  * import {hue as randomHue, string as randomString} from 'https://unpkg.com/ixfx/dist/random.js'
  * ```
  */
-export * as Random from './Random.js';
+export * as Random from './random/index.js';
 export * as KeyValues from './KeyValue.js';
 
 export * as Util from './Util.js';

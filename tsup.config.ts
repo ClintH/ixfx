@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: {
-    arrays: `./src/collections/Arrays.ts`,
+    arrays: `./src/collections/arrays/index.ts`,
     bundle: `./src/index.ts`,
     collections: `./src/collections/index.ts`,
     components: `./src/components/index.ts`,
@@ -22,7 +22,7 @@ export default defineConfig({
     modulation: `./src/modulation/index.ts`,
     numbers: `./src/Numbers.ts`,
     queues: `./src/collections/queue/index.ts`,
-    random: `./src/Random.ts`,
+    random: `./src/random/index.ts`,
     sets: `./src/collections/set/index.ts`,
     stateMachine: `./src/flow/StateMachine.ts`,
     svg: `./src/visual/Svg.ts`,

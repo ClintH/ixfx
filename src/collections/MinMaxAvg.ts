@@ -1,5 +1,5 @@
-import { slice } from '../IterableSync.js';
-import { filterBetween } from './Arrays.js';
+import { slice } from '../iterable/SliceSync.js';
+import { filterBetween } from './FilterBetween.js';
 
 export type MinMaxAvgTotal = {
   /**
@@ -57,12 +57,13 @@ export type MinMaxAvgOpts = {
  */
 export const minMaxAvg = (
   //eslint-disable-next-line functional/prefer-readonly-type
-  data: readonly number[] | number[] | Iterable<number>,
+  data: ReadonlyArray<number> | Array<number> | Iterable<number>,
   opts: MinMaxAvgOpts = {}
 ): MinMaxAvgTotal => {
   if (data === undefined) throw new Error(`'data' is undefined`);
   if (!Array.isArray(data)) {
     if (`next` in data) {
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       if (opts.startIndex || opts.endIndex) {
         data = slice(data, opts.startIndex, opts.endIndex);
       }
@@ -76,7 +77,7 @@ export const minMaxAvg = (
       let samples = 0;
       for (const v of data) {
         if (typeof v !== `number`) {
-          throw new Error(`Generator should yield numbers. Got: ${typeof v}`);
+          throw new TypeError(`Generator should yield numbers. Got: ${ typeof v }`);
         }
         total += v;
         samples++;
@@ -111,7 +112,7 @@ export const minMaxAvg = (
     startIndex,
     endIndex
   );
-  const total = validNumbers.reduce((acc, v) => acc + v, 0);
+  const total = validNumbers.reduce((accumulator, v) => accumulator + v, 0);
   return {
     total: total,
     max: Math.max(...validNumbers),

@@ -1,5 +1,5 @@
 /**
- * Queue (immutable). See also {@link ./QueueMutable.ts}.
+ * Queue (immutable). See also {@link QueueMutable}.
  *
  * Queues are useful if you want to treat 'older' or 'newer'
  * items differently. _Enqueing_ adds items at the back of the queue, while
@@ -17,6 +17,7 @@
  * ```
  *
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IQueueImmutable<V> {
   /**
    * Enumerates queue from back-to-front
@@ -65,5 +66,5 @@ export interface IQueueImmutable<V> {
   /**
    * Data in queue as an array
    */
-  get data(): readonly V[];
+  get data(): ReadonlyArray<V>;
 }

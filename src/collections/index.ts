@@ -69,7 +69,7 @@ export { StackImmutable } from './stack/StackImmutable.js';
  * * {@link without}: Returns an array with specified value omitted
  * * {@link zip}: Groups together elements from several arrays based on their index
  */
-export * as Arrays from './Arrays.js';
+export * as Arrays from './arrays/index.js';
 
 /**
  * Sets store unique items.

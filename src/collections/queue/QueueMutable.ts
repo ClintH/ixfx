@@ -1,7 +1,7 @@
 import { type IQueueMutable } from './IQueueMutable.js';
 import { enqueue, peek, dequeue, isEmpty, isFull } from './QueueFns.js';
 import { type QueueOpts } from './QueueTypes.js';
-import { without } from '../Arrays.js';
+import { without } from '../arrays/index.js';
 import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
 /**
  * Returns a mutable queue. Queues are useful if you want to treat 'older' or 'newer'

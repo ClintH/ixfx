@@ -1,5 +1,5 @@
 import { type Circle } from './Circle.js';
-import { type Point } from './Point.js';
+import { type Point } from './points/Types.js';
 import { type Triangle } from './Triangle.js';
 
 const pi4over3 = (Math.PI * 4) / 3;
@@ -7,8 +7,8 @@ const pi2over3 = (Math.PI * 2) / 3;
 
 export type TriangleEquilateral =
   | {
-      readonly length: number;
-    }
+    readonly length: number;
+  }
   | number;
 
 const resolveLength = (t: TriangleEquilateral): number => {

@@ -1,7 +1,8 @@
+import type { Point } from '../geometry/points/Types.js';
 import { Arrays } from '../collections/index.js';
 import { Points } from '../geometry/index.js';
 import * as Rects from '../geometry/Rect.js';
-import { hue as randomHue } from '../Random.js';
+import { hue as randomHue } from '../random/index.js';
 
 export type Measurement = {
   actual: Rects.Rect;
@@ -10,7 +11,7 @@ export type Measurement = {
 };
 
 export type Layout = {
-  actual: Points.Point;
+  actual: Point;
   ref: Box;
   children: Array<Layout | undefined>;
 };
@@ -154,7 +155,7 @@ export abstract class Box {
   private _desiredRect: BoxRect | undefined;
 
   protected _measuredSize: Rects.Rect | undefined;
-  protected _layoutPosition: Points.Point | undefined;
+  protected _layoutPosition: Point | undefined;
 
   protected children: Array<Box> = [];
   protected readonly _parent: Box | undefined;
@@ -430,7 +431,7 @@ export abstract class Box {
     measureState: MeasureState,
     layoutState: LayoutState,
     _parent?: Layout
-  ): Points.Point | undefined {
+  ): Point | undefined {
     // TODO: Proper layout
     const box = layoutState.resolveBox(this._desiredRect);
     const x = box === undefined ? 0 : (`x` in box ? box.x : 0);
@@ -659,7 +660,7 @@ export class CanvasBox extends Box {
     });
   }
 
-  protected onClick(_p: Points.Point) {
+  protected onClick(_p: Point) {
     /** no-up */
   }
 
@@ -669,7 +670,7 @@ export class CanvasBox extends Box {
    * @param p 
    * @returns 
    */
-  private notifyClick(p: Points.Point) {
+  private notifyClick(p: Point) {
     if (Rects.isPlaceholder(this.canvasRegion)) return;
     if (Rects.intersectsPoint(this.canvasRegion, p)) {
       const pp = Points.subtract(p, this.canvasRegion.x, this.canvasRegion.y);
@@ -694,7 +695,7 @@ export class CanvasBox extends Box {
    * @param p 
    * @returns 
    */
-  private notifyPointerMove(p: Points.Point) {
+  private notifyPointerMove(p: Point) {
     if (Rects.isPlaceholder(this.canvasRegion)) return;
     if (Rects.intersectsPoint(this.canvasRegion, p)) {
       const pp = Points.subtract(p, this.canvasRegion.x, this.canvasRegion.y);
@@ -714,7 +715,7 @@ export class CanvasBox extends Box {
    * Handler when pointer moves within our region
    * @param _p 
    */
-  protected onPointerMove(_p: Points.Point) {
+  protected onPointerMove(_p: Point) {
     /** no-up */
 
   }
