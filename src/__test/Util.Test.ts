@@ -8,8 +8,34 @@ import {
   comparerInverse,
   toStringDefault,
   isPlainObject,
+  isInteger,
   isPlainObjectOrPrimitive
 } from '../Util.js';
+
+test('isInteger', t => {
+  // Nunber inputs
+  t.true(isInteger(1));
+  t.true(isInteger(0));
+  t.false(isInteger(0.1));
+  t.false(isInteger(0.9));
+  t.false(isInteger(99.9));
+  t.false(isInteger(Number.NaN));
+
+  // String inputs
+  t.true(isInteger(`1`));
+  t.true(isInteger(`0`));
+  t.false(isInteger(`1.1`));
+
+  // @ts-expect-error
+  t.false(isInteger({}));
+  // @ts-expect-error
+  t.false(isInteger(false));
+  // @ts-expect-error
+  t.false(isInteger(true));
+  // @ts-expect-error
+  t.false(isInteger(new Map()));
+
+});
 
 test('isPlainObjectOrPrimitive', t => {
   t.true(isPlainObjectOrPrimitive(`hello`));
