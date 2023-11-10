@@ -2,8 +2,35 @@ import test from 'ava';
 import {
   isEqualDefault,
   isEqualValueDefault,
-  isEqualValueIgnoreOrder
+  isEqualValueIgnoreOrder,
+  isEqualValuePartial
 } from '../IsEqual.js'
+
+test(`isEqualValuePartial`, t => {
+  const obj1 = {
+    name: `blah`,
+    address: {
+      street: `West`,
+      number: 35
+    }
+  };
+
+  t.true(isEqualValuePartial(obj1, { name: `blah` }));
+  t.false(isEqualValuePartial(obj1, { name: `nope` }));
+  t.true(isEqualValuePartial(obj1, { address: { number: 35 } }));
+  t.true(isEqualValuePartial(obj1, { address: { number: 35, street: `West` } }));
+  t.false(isEqualValuePartial(obj1, { address: { number: 35, streetWrong: `West` } }));
+  t.false(isEqualValuePartial(obj1, { address: { number: 35, street: `North` } }));
+  t.true(isEqualValuePartial(obj1, {
+    name: `blah`,
+    address: {
+      street: `West`,
+      number: 35
+    }
+  }));
+
+
+});
 
 test(`isEqualValueIgnoreOrder`, t => {
   // Objects
