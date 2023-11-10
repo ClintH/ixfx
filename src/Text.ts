@@ -93,6 +93,9 @@ export const betweenChomp = (
   lastEndMatch = true
 ): [ source: string, between: string | undefined ] => {
   // ✔ Unit tested
+  if (typeof source !== `string`) throw new Error(`Parameter 'source' is not a string`);
+  if (typeof start !== `string`) throw new Error(`Parameter 'start' is not a string`);
+  if (end !== undefined && typeof end !== `string`) throw new Error(`Parameter 'end' is not a string`);
   const startPos = source.indexOf(start);
   if (startPos < 0) return [ source, undefined ];
 

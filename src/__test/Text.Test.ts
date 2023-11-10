@@ -95,5 +95,18 @@ test(`betweenChomp`, (t) => {
   t.is(r5[ 0 ], 'hello [there] pal');
   t.true(r5[ 1 ] === undefined);
 
+  const r6 = betweenChomp(`test[1]`, `[`, `]`);
+  t.is(r6[ 1 ], `1`);
+  t.is(r6[ 0 ], `test`);
+
+  // @ts-expect-error
+  t.throws(() => betweenChomp(1, `st`));
+
+  // @ts-expect-error
+  t.throws(() => betweenChomp(``, {}));
+
+  // @ts-expect-error
+  t.throws(() => betweenChomp(``, `st`, {}));
+
 });
 
