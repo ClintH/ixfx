@@ -92,8 +92,10 @@ export const timeout = (
         return;
       }
       if (timer !== 0) cancel();
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       timer = window.setTimeout(async () => {
-        await callback(performance.now() - startedAt, ...args);
+        const args_ = args ?? [];
+        await callback(performance.now() - startedAt, ...args_);
         timer = 0;
         resolve();
       }, altTimeoutMs);
@@ -108,6 +110,7 @@ export const timeout = (
   };
 
   return {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     start,
     cancel,
     get isDone() {
