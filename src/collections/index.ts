@@ -1,9 +1,9 @@
 export type ArrayKeys<K, V> = ReadonlyArray<readonly [ key: K, value: V ]>;
-export type ObjKeys<K, V> = ReadonlyArray<{
+export type ObjectKeys<K, V> = ReadonlyArray<{
   readonly key: K;
   readonly value: V;
 }>;
-export type EitherKey<K, V> = ArrayKeys<K, V> | ObjKeys<K, V>;
+export type EitherKey<K, V> = ArrayKeys<K, V> | ObjectKeys<K, V>;
 
 export {
   circularArray,
@@ -29,8 +29,6 @@ export * as Iterables from './Iterables.js';
  *
  */
 export * as Stacks from './stack/index.js';
-
-export * from './ArrayCycle.js';
 
 export { StackMutable } from './stack/StackMutable.js';
 export { StackImmutable } from './stack/StackImmutable.js';
@@ -73,8 +71,6 @@ export { StackImmutable } from './stack/StackImmutable.js';
  */
 export * as Arrays from './Arrays.js';
 
-import * as Sets from './set/index.js';
-
 /**
  * Sets store unique items.
  *
@@ -82,10 +78,12 @@ import * as Sets from './set/index.js';
  *
  * Create using {@link Sets.immutable} or {@link Sets.mutable}
  */
-export { Sets };
+export * as Sets from './set/index.js';
+
+
 export { SetStringMutable } from './set/SetMutable.js';
 export { SetStringImmutable } from './set/SetImmutable.js';
-import * as Queues from './queue/index.js';
+
 
 /**
  * Queues store items in the order in which they are added.
@@ -101,10 +99,11 @@ import * as Queues from './queue/index.js';
  *
  * Create queues with {@link Queues.immutable} or {@link Queues.mutable}. These return a {@link IQueueImmutable} or {@link IQueueMutable} respectively.
  */
-export { Queues };
+export * as Queues from './queue/index.js';
+
 export { QueueMutable } from './queue/QueueMutable.js';
 export { QueueImmutable } from './queue/QueueImmutable.js';
-import * as Maps from './map/index.js';
+
 
 /**
  * Maps associate keys with values. Several helper functions are provided
@@ -131,4 +130,6 @@ import * as Maps from './map/index.js';
  * * {@link transformMap}: Like `Array.map`, but for Maps. Useful for generating a map as a transform of an input map.
  * * {@link zipKeyValue}: Given an array of keys and values, combines them together into a map
  */
-export { Maps };
+export * as Maps from './map/index.js';
+
+
