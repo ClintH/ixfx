@@ -306,6 +306,11 @@ export const hasParent = <T>(child: Node<T>, prospectiveParent: Node<T>) => {
 /**
  * Computes the maximum depth of the tree.
  * That is, how many steps down from `node` it can go.
+ * If a tree is: root -> childA -> subChildB
+ * ```js
+ * // Yields 2, since there are at max two steps down from root
+ * computeMaxDepth(root); 
+ * ```
  * @param node 
  * @returns 
  */
