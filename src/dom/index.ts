@@ -3,7 +3,7 @@ export * from './Log.js';
 export * from './DomRx.js';
 export * from './Util.js';
 export * as DataTable from './DataTable.js';
-export { DataDisplay } from './DataDisplay.js';
+export * from './DataDisplay.js';
 
 /**
  * Functions for working with DOM elements
