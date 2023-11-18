@@ -1,9 +1,10 @@
-import { type CirclePositioned } from '../geometry/Circle.js';
+/* eslint-disable unicorn/no-null */
+
 import { markerPrebuilt } from './SvgMarkers.js';
 import * as Lines from '../geometry/Line.js';
 import * as Elements from './SvgElements.js';
-import * as Rects from '../geometry/Rect.js';
-import type { Point } from '../geometry/points/Types.js';
+
+import type { Rect, Point, CirclePositioned, Line } from '../geometry/Types.js';
 
 export type MarkerOpts = StrokeOpts &
   DrawingOpts & {
@@ -126,7 +127,6 @@ export const createOrResolve = <V extends SVGElement>(
   type: string,
   queryOrExisting?: string | V
 ): V => {
-  //eslint-disable-next-line functional/no-let
   let existing = null;
   if (queryOrExisting !== undefined) {
     existing = typeof queryOrExisting === `string` ? parent.querySelector(queryOrExisting) : queryOrExisting;
@@ -135,7 +135,7 @@ export const createOrResolve = <V extends SVGElement>(
     const p = document.createElementNS(`http://www.w3.org/2000/svg`, type) as V;
     parent.append(p);
     if (queryOrExisting && typeof queryOrExisting === `string` && //eslint-disable-next-line functional/immutable-data
-      queryOrExisting.startsWith(`#`)) p.id = queryOrExisting.substring(1);
+      queryOrExisting.startsWith(`#`)) p.id = queryOrExisting.slice(1);
     return p;
   }
   return existing as V;
@@ -146,16 +146,15 @@ export const remove = <V extends SVGElement>(
   queryOrExisting: string | V
 ) => {
   if (typeof queryOrExisting === `string`) {
-    const e = parent.querySelector(queryOrExisting);
-    if (e === null) return;
-    e.remove();
+    const elem = parent.querySelector(queryOrExisting);
+    if (elem === null) return;
+    elem.remove();
   } else {
     queryOrExisting.remove();
   }
 };
 
 export const clear = (parent: SVGElement) => {
-  //eslint-disable-next-line functional/no-let
   let c = parent.lastElementChild;
   while (c) {
     c.remove();
@@ -175,7 +174,6 @@ export const createEl = <V extends SVGElement>(
 ): V => {
   const m = document.createElementNS(`http://www.w3.org/2000/svg`, type) as V;
   if (id) {
-    //eslint-disable-next-line functional/immutable-data
     m.id = id;
   }
   return m;
@@ -278,7 +276,7 @@ export type SvgHelper = {
    * @param queryOrExisting DOM query to look up existing element, or the element instance
    */
   line(
-    line: Lines.Line,
+    line: Line,
     opts?: LineDrawingOpts,
     queryOrExisting?: string | SVGLineElement
   ): SVGLineElement;
@@ -349,7 +347,7 @@ export type SvgHelper = {
  * @param svg
  * @returns
  */
-export const getBounds = (svg: SVGElement): Rects.Rect => {
+export const getBounds = (svg: SVGElement): Rect => {
   const w = svg.getAttributeNS(null, `width`);
   const width = w === null ? 0 : Number.parseFloat(w);
   const h = svg.getAttributeNS(null, `height`);
@@ -362,7 +360,7 @@ export const getBounds = (svg: SVGElement): Rects.Rect => {
  * @param svg
  * @param bounds
  */
-export const setBounds = (svg: SVGElement, bounds: Rects.Rect): void => {
+export const setBounds = (svg: SVGElement, bounds: Rect): void => {
   svg.setAttributeNS(null, `width`, bounds.width.toString());
   svg.setAttributeNS(null, `height`, bounds.height.toString());
 };
@@ -397,7 +395,7 @@ export const makeHelper = (
       queryOrExisting?: string | SVGTextPathElement
     ) => Elements.textPath(pathReference, text, parent, opts, queryOrExisting),
     line: (
-      line: Lines.Line,
+      line: Line,
       opts?: LineDrawingOpts,
       queryOrExisting?: string | SVGLineElement
     ) => Elements.line(line, parent, opts, queryOrExisting),
@@ -407,7 +405,7 @@ export const makeHelper = (
       queryOrExisting?: string | SVGCircleElement
     ) => Elements.circle(circle, parent, opts, queryOrExisting),
     path: (
-      svgString: string | readonly string[],
+      svgString: string | ReadonlyArray<string>,
       opts?: PathDrawingOpts,
       queryOrExisting?: string | SVGPathElement
     ) => Elements.path(svgString, parent, opts, queryOrExisting),

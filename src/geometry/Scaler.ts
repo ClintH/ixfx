@@ -1,6 +1,7 @@
 import { isPoint } from './points/index.js';
-import type { Point } from './points/Types.js';
-import { type Rect, isRect, placeholder as PlaceholderRect } from './Rect.js';
+import type { Point, Rect } from './Types.js';
+import { isRect } from './rect/Guard.js';
+import { placeholder as PlaceholderRect } from './rect/index.js';
 
 /**
  * A scale function that takes an input value to scale.
@@ -22,7 +23,7 @@ import { type Rect, isRect, placeholder as PlaceholderRect } from './Rect.js';
  * scale({x:10, y:20}, {width: 800, height: 600});
  * ```
  */
-export type ScaleFn = (
+export type Scaler = (
   a: number | Point,
   b?: number | Rect,
   c?: number | Rect,
@@ -32,15 +33,15 @@ export type ScaleFn = (
 /**
  * A scaler than can convert to a from an output range
  */
-export type Scaler = {
+export type ScalerCombined = {
   /**
    * Relative to absolute coordinates
    */
-  readonly abs: ScaleFn;
+  readonly abs: Scaler;
   /**
    * Absolute to relative coordintes
    */
-  readonly rel: ScaleFn;
+  readonly rel: Scaler;
 };
 
 /**
@@ -76,7 +77,7 @@ export type Scaler = {
 export const scaler = (
   scaleBy: `both` | `min` | `max` | `width` | `height` = `both`,
   defaultRect?: Rect
-): Scaler => {
+): ScalerCombined => {
   const defaultBounds = defaultRect ?? PlaceholderRect;
 
   //eslint-disable-next-line functional/no-let

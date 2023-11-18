@@ -1,8 +1,7 @@
-import { type CirclePositioned } from '../geometry/Circle.js';
+import type { Point, CirclePositioned, Line } from '../geometry/Types.js';
 import * as Lines from '../geometry/Line.js';
 import * as Svg from './Svg.js';
 import { getCssVariable } from './Colour.js';
-import type { Point } from '../geometry/points/Types.js';
 //import {Palette} from ".";
 
 const numberOrPercentage = (v: number): string => {
@@ -139,7 +138,7 @@ export const groupUpdate = (
  * @returns
  */
 export const line = (
-  line: Lines.Line,
+  line: Line,
   parent: SVGElement,
   opts?: Svg.LineDrawingOpts,
   queryOrExisting?: string | SVGLineElement
@@ -161,7 +160,7 @@ export const line = (
  */
 export const lineUpdate = (
   lineEl: SVGLineElement,
-  line: Lines.Line,
+  line: Line,
   opts?: Svg.LineDrawingOpts
 ) => {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());

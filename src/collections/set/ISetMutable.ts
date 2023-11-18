@@ -56,6 +56,7 @@ import type { ValueSetEventMap } from './index.js';
  *
  * @template V Type of data stored
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface ISetMutable<V>
   extends SimpleEventEmitter<ValueSetEventMap<V>> {
   /**
@@ -98,7 +99,7 @@ export interface ISetMutable<V>
   /**
    * Returns an array of values
    */
-  toArray(): readonly V[];
+  toArray(): ReadonlyArray<V>;
 
   /**
    * Returns the number of items stored in the set

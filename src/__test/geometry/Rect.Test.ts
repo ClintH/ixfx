@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import * as Rects from '../../geometry/Rect.js';
+import * as Rects from '../../geometry/rect/index.js';
 
 test(`cardinal`, t => {
 

@@ -1,8 +1,8 @@
 import test from 'ava';
-import * as Teq from '../../geometry/TriangleEquilateral.js';
-import * as Tra from '../../geometry/TriangleRight.js';
-import * as Tis from '../../geometry/TriangleIsosceles.js';
-import { degreeToRadian } from '../../geometry/index.js';
+import * as Teq from '../../geometry/triangle/Equilateral.js';
+import * as Tra from '../../geometry/triangle/Right.js';
+import * as Tis from '../../geometry/triangle/Isosceles.js';
+import { degreeToRadian } from '../../geometry/Angles.js';
 import { closeTo } from '../util.js';
 
 test(`equilateral`, (tst) => {
@@ -29,9 +29,9 @@ test(`isosceles`, (tst) => {
   closeTo(tst, Tis.incircle(t).radius, 3.873, 4);
 
   const medians = Tis.medians(t);
-  closeTo(tst, medians[0], 12.2474, 3);
-  closeTo(tst, medians[1], 12.2474, 3);
-  closeTo(tst, medians[2], 19.365, 3);
+  closeTo(tst, medians[ 0 ], 12.2474, 3);
+  closeTo(tst, medians[ 1 ], 12.2474, 3);
+  closeTo(tst, medians[ 2 ], 19.365, 3);
 });
 
 test(`rightAngle`, (tst) => {
@@ -47,13 +47,13 @@ test(`rightAngle`, (tst) => {
   closeTo(tst, Tra.incircle(t).radius, 3.486122, 4);
 
   const hypoSegments = Tra.hypotenuseSegments(t);
-  closeTo(tst, hypoSegments[0], 5.547002, 4);
-  closeTo(tst, hypoSegments[1], 12.480754, 4);
+  closeTo(tst, hypoSegments[ 0 ], 5.547002, 4);
+  closeTo(tst, hypoSegments[ 1 ], 12.480754, 4);
 
   const medians = Tra.medians(t);
-  closeTo(tst, medians[0], 15.811388, 4);
-  closeTo(tst, medians[1], 12.5, 1);
-  closeTo(tst, medians[2], 9.013878, 4);
+  closeTo(tst, medians[ 0 ], 15.811388, 4);
+  closeTo(tst, medians[ 1 ], 12.5, 1);
+  closeTo(tst, medians[ 2 ], 9.013878, 4);
 
   closeTo(tst, Tra.oppositeFromAdjacent(1, 10), 15.57408, 5);
   closeTo(tst, Tra.oppositeFromHypotenuse(1, 10), 8.41471, 5);

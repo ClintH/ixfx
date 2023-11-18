@@ -1,8 +1,10 @@
-import { isCirclePositioned, distanceFromExterior as circleDistanceFromExterior } from "../Circle.js";
+import { distanceFromExterior as circleDistanceFromExterior } from "../circle/DistanceFromExterior.js";
 import { distance, isPoint } from "./index.js";
-import type { Point } from "./Types.js";
-import { isRectPositioned, distanceFromExterior as rectDistanceFromExterior } from "../Rect.js";
+import type { Point } from "../Types.js";
+import { distanceFromExterior as rectDistanceFromExterior } from "../rect/Distance.js";
 import type { PointCalculableShape } from "../Types.js";
+import { isCirclePositioned } from "../circle/Guard.js";
+import { isRectPositioned } from "../rect/Guard.js";
 
 /**
  * Returns the distance from point `a` to the exterior of `shape`.

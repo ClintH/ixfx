@@ -11,14 +11,14 @@ import {
 } from '../../Util.js';
 import {
   type IsEqual,
-  isEqualDefault,
-  isEqualValueDefault
+  isEqualDefault
 } from '../../IsEqual.js'
 import { fromIterable as mapFromIterable } from '../map/MapFns.js';
 import { type RandomSource, defaultRandom } from '../../random/Types.js';
 import { weightedIndex } from '../../random/WeightedIndex.js';
 import { guardArray } from '../GuardArray.js';
 import { guardIndex } from '../GuardIndex.js';
+import { valuesEqual } from './ValuesEqual.js';
 export * from './NumericArrays.js';
 export * from '../ArrayCycle.js';
 export * from '../FilterBetween.js';
@@ -26,53 +26,13 @@ export * from '../GuardArray.js';
 export * from '../GuardIndex.js';
 export * from './AverageWeighted.js';
 export * from './NumericArrays.js';
+export * from './Zip.js';
+export * from './ValuesEqual.js';
 
 export { compareValues, compareValuesEqual } from '../Iterables.js';
 
 
-/**
- * Returns _true_ if all the contents of the array are identical.
- *
- * @example Uses default equality function:
- * ```js
- * import { valuesEqual } from 'https://unpkg.com/ixfx/dist/arrays.js';
- *
- * const a1 = [10, 10, 10];
- * valuesEqual(a1); // True
- *
- * const a2 = [ {name:`Jane`}, {name:`John} ];
- * valuesEqual(a2); // True, because JSON version captures value
- * ```
- *
- * If we want to compare by value for objects that aren't readily
- * converted to JSON, you need to provide a function:
- *
- * ```js
- * valuesEqual(someArray, (a, b) => {
- *  return (a.eventType === b.eventType);
- * });
- * ```
- *
- * Returns _true_ if `array` is empty.
- * @param array Array
- * @param equality Equality checker. Uses string-conversion checking by default
- * @returns
- */
-export const valuesEqual = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
-  array: ReadonlyArray<V> | Array<V>,
-  equality?: IsEqual<V>
-): boolean => {
-  // Unit tested
 
-  if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array.`);
-  if (array.length === 0) return true;
-  const eq = equality ?? isEqualValueDefault;
-  const a = array[ 0 ];
-  const r = array.some((v) => !eq(a, v));
-  if (r) return false;
-  return true;
-};
 
 /**
  * Returns the _intersection_ of two arrays: the elements that are in common.
@@ -107,52 +67,6 @@ export const flatten = (array: ReadonlyArray<any> | Array<any>): Array<any> =>
   [ ...array ].flat();
 
 
-/**
- * Zip combines the elements of two or more arrays based on their index.
- *
- * ```js
- * import { zip } from 'https://unpkg.com/ixfx/dist/arrays.js';
- *
- * const a = [1,2,3];
- * const b = [`red`, `blue`, `green`];
- *
- * const c = zip(a, b);
- * // Yields:
- * // [
- * //   [1, `red`],
- * //   [2, `blue`],
- * //   [3, `green`]
- * // ]
- * ```
- *
- * Typically the arrays you zip together are all about the same logical item. Eg, in the above example
- * perhaps `a` is size and `b` is colour. So thing #1 (at array index 0) is a red thing of size 1. Before
- * zipping we'd access it by `a[0]` and `b[0]`. After zipping, we'd have c[0], which is array of [1, `red`].
- * @param arrays
- * @returns Zipped together array
- */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const zip = (
-  ...arrays: Array<Array<any>> | ReadonlyArray<Array<any>> | ReadonlyArray<ReadonlyArray<any>>
-): Array<any> => {
-  // Unit tested
-  if (arrays.some((a) => !Array.isArray(a))) {
-    throw new Error(`All parameters must be an array`);
-  }
-  const lengths = arrays.map((a) => a.length);
-  if (!valuesEqual(lengths)) {
-    throw new Error(`Arrays must be of same length`);
-  }
-
-  const returnValue = [];
-  const length = lengths[ 0 ];
-
-  for (let index = 0; index < length; index++) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    returnValue.push(arrays.map((a) => a[ index ]));
-  }
-  return returnValue;
-};
 
 /**
  * Returns an interleaving of two or more arrays. All arrays must be the same length.

@@ -1,24 +1,22 @@
 import * as Points from '../geometry/points/index.js';
-import * as Paths from '../geometry/Path.js';
 import * as Lines from '../geometry/Line.js';
-import * as Triangles from '../geometry/Triangle.js';
+import * as Triangles from '../geometry/triangle/index.js';
 import { throwArrayTest } from '../Guards.js';
-import * as Circles from '../geometry/Circle.js';
 import * as Arcs from '../geometry/Arc.js';
 import * as Beziers from '../geometry/Bezier.js';
-import * as Rects from '../geometry/Rect.js';
 import * as Ellipses from '../geometry/Ellipse.js';
 import * as Colours from '../visual/Colour.js';
 import { resolveEl } from '../dom/Util.js';
 import { roundUpToMultiple } from '../Util.js';
 import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
 import { StackImmutable } from '../collections/stack/StackImmutable.js';
-import type { Point } from 'src/geometry/points/Types.js';
-
+import type { Point, CirclePositioned, Rect, RectPositioned, Line, Path, Triangle } from '../geometry/Types.js';
+import { empty as RectsEmpty } from '../geometry/rect/index.js';
+import { corners as RectsCorners } from '../geometry/rect/index.js';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 
-export type CanvasCtxQuery =
+export type CanvasContextQuery =
   | null
   | string
   | CanvasRenderingContext2D
@@ -30,7 +28,7 @@ export type CanvasCtxQuery =
  * @returns Drawing context.
  */
 export const getContext = (
-  canvasElementContextOrQuery: CanvasCtxQuery
+  canvasElementContextOrQuery: CanvasContextQuery
 ): CanvasRenderingContext2D => {
   if (canvasElementContextOrQuery === null) {
     throw new Error(
@@ -48,6 +46,7 @@ export const getContext = (
       ? canvasElementContextOrQuery
       : canvasElementContextOrQuery instanceof HTMLCanvasElement
         ? canvasElementContextOrQuery.getContext(`2d`)
+        // eslint-disable-next-line unicorn/no-nested-ternary
         : typeof canvasElementContextOrQuery === `string`
           ? resolveEl<HTMLCanvasElement>(canvasElementContextOrQuery).getContext(`2d`)
           : canvasElementContextOrQuery;
@@ -62,20 +61,20 @@ export const getContext = (
  * @returns
  */
 export const makeHelper = (
-  ctxOrCanvasEl: CanvasCtxQuery,
-  canvasBounds?: Rects.Rect
+  ctxOrCanvasEl: CanvasContextQuery,
+  canvasBounds?: Rect
 ) => {
   // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
   const ctx = getContext(ctxOrCanvasEl);
   return {
-    paths(pathsToDraw: Array<Paths.Path>, opts?: DrawingOpts): void {
+    paths(pathsToDraw: Array<Path>, opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
     },
-    line(lineToDraw: Lines.Line | Array<Lines.Line>, opts?: DrawingOpts): void {
+    line(lineToDraw: Line | Array<Line>, opts?: DrawingOpts): void {
       line(ctx, lineToDraw, opts);
     },
     rect(
-      rectsToDraw: Rects.RectPositioned | Array<Rects.RectPositioned>,
+      rectsToDraw: RectPositioned | Array<RectPositioned>,
       opts?: DrawingOpts & { filled?: boolean }
     ): void {
       rect(ctx, rectsToDraw, opts);
@@ -106,7 +105,8 @@ export const makeHelper = (
       dot(ctx, dotPosition, opts);
     },
     circle(
-      circlesToDraw: Circles.CirclePositioned | Array<Circles.CirclePositioned>,
+      circlesToDraw: CirclePositioned | Array<
+        CirclePositioned>,
       opts: DrawingOpts
     ): void {
       circle(ctx, circlesToDraw, opts);
@@ -122,7 +122,7 @@ export const makeHelper = (
       opts: DrawingOpts & {
         anchor: Point;
         anchorPadding?: number;
-        bounds?: Rects.RectPositioned;
+        bounds?: RectPositioned;
       }
     ): void {
       if (opts.bounds === undefined && canvasBounds !== undefined) {
@@ -353,20 +353,24 @@ export const lineThroughPoints = (
  */
 export const circle = (
   ctx: CanvasRenderingContext2D,
-  circlesToDraw: Circles.CirclePositioned | ReadonlyArray<Circles.CirclePositioned>,
+  circlesToDraw: CirclePositioned | ReadonlyArray<CirclePositioned>,
   opts: DrawingOpts = {}
 ) => {
   applyOpts(ctx, opts);
 
-  const draw = (c: Circles.CirclePositioned) => {
+  const draw = (c: CirclePositioned) => {
     ctx.beginPath();
     ctx.arc(c.x, c.y, c.radius, 0, PIPI);
     if (opts.strokeStyle) ctx.stroke();
     //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
   };
-  if (Array.isArray(circlesToDraw)) circlesToDraw.forEach(draw);
-  else draw(circlesToDraw as Circles.CirclePositioned);
+
+  if (Array.isArray(circlesToDraw)) {
+    for (const c of circlesToDraw) draw(c);
+  } else {
+    draw(circlesToDraw as CirclePositioned);
+  }
 };
 
 /**
@@ -385,12 +389,12 @@ export const ellipse = (
 ) => {
   applyOpts(ctx, opts);
 
-  const draw = (e: Ellipses.EllipsePositioned) => {
+  const draw = (ellipse: Ellipses.EllipsePositioned) => {
     ctx.beginPath();
-    const rotation = e.rotation ?? 0;
-    const startAngle = e.startAngle ?? 0;
-    const endAngle = e.endAngle ?? PIPI;
-    ctx.ellipse(e.x, e.y, e.radiusX, e.radiusY, rotation, startAngle, endAngle);
+    const rotation = ellipse.rotation ?? 0;
+    const startAngle = ellipse.startAngle ?? 0;
+    const endAngle = ellipse.endAngle ?? PIPI;
+    ctx.ellipse(ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, rotation, startAngle, endAngle);
     if (opts.strokeStyle) ctx.stroke();
     //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
@@ -411,20 +415,23 @@ export const ellipse = (
  */
 export const paths = (
   ctx: CanvasRenderingContext2D,
-  pathsToDraw: ReadonlyArray<Paths.Path> | Paths.Path,
+  pathsToDraw: ReadonlyArray<Path> | Path,
   opts: { readonly strokeStyle?: string; readonly debug?: boolean } = {}
 ) => {
   applyOpts(ctx, opts);
 
-  const draw = (path: Paths.Path) => {
+  const draw = (path: Path) => {
     // Call appropriate drawing function depending on the type of path
     if (Beziers.isQuadraticBezier(path)) quadraticBezier(ctx, path, opts);
     else if (Lines.isLine(path)) line(ctx, path, opts);
     else throw new Error(`Unknown path type ${ JSON.stringify(path) }`);
   };
 
-  if (Array.isArray(pathsToDraw)) pathsToDraw.forEach(draw);
-  else draw(pathsToDraw as Paths.Path);
+  if (Array.isArray(pathsToDraw)) {
+    for (const p of pathsToDraw) draw(p);
+  } else {
+    draw(pathsToDraw as Path);
+  }
 };
 
 /**
@@ -710,14 +717,14 @@ const quadraticBezier = (
  */
 export const line = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Lines.Line | ReadonlyArray<Lines.Line>,
+  toDraw: Line | ReadonlyArray<Line>,
   opts: LineOpts & DrawingOpts = {}
 ) => {
   const isDebug = opts.debug ?? false;
   const o = lineOp(opts.lineWidth, opts.lineJoin, opts.lineCap);
   applyOpts(ctx, opts, o);
 
-  const draw = (d: Lines.Line) => {
+  const draw = (d: Line) => {
     const { a, b } = d;
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);
@@ -731,8 +738,11 @@ export const line = (
     ctx.stroke();
   };
 
-  if (Array.isArray(toDraw)) toDraw.forEach(draw);
-  else draw(toDraw as Lines.Line);
+  if (Array.isArray(toDraw)) {
+    for (const t of toDraw) draw(t);
+  } else {
+    draw(toDraw as Line);
+  }
 };
 
 /**
@@ -743,12 +753,12 @@ export const line = (
  */
 export const triangle = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Triangles.Triangle | ReadonlyArray<Triangles.Triangle>,
+  toDraw: Triangle | ReadonlyArray<Triangle>,
   opts: DrawingOpts & { readonly filled?: boolean } = {}
 ) => {
   applyOpts(ctx, opts);
 
-  const draw = (t: Triangles.Triangle) => {
+  const draw = (t: Triangle) => {
     connectedPoints(ctx, Triangles.corners(t), { ...opts, loop: true });
 
     if (opts.debug) {
@@ -756,8 +766,13 @@ export const triangle = (
     }
   };
 
-  if (Array.isArray(toDraw)) toDraw.forEach(draw);
-  else draw(toDraw as Triangles.Triangle);
+  if (Array.isArray(toDraw)) {
+    for (const t of toDraw) {
+      draw(t);
+    }
+  } else {
+    draw(toDraw as Triangle);
+  }
 };
 
 // export const arrowFromTip = (ctx:CanvasRenderingContext2D, tipPos: Point, tailLength:number, opts:DrawingOpts) => {
@@ -777,7 +792,7 @@ export const triangle = (
  */
 export const rect = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Rects.RectPositioned | ReadonlyArray<Rects.RectPositioned>,
+  toDraw: RectPositioned | ReadonlyArray<RectPositioned>,
   opts: DrawingOpts & {
     readonly filled?: boolean;
     readonly stroked?: boolean;
@@ -785,17 +800,22 @@ export const rect = (
 ) => {
   applyOpts(ctx, opts);
 
-  const draw = (d: Rects.RectPositioned) => {
+  const draw = (d: RectPositioned) => {
     if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
     if (opts.stroked ?? true) ctx.strokeRect(d.x, d.y, d.width, d.height);
 
     if (opts.debug) {
-      pointLabels(ctx, Rects.corners(d), undefined, [ `NW`, `NE`, `SE`, `SW` ]);
+      pointLabels(ctx, RectsCorners(d), undefined, [ `NW`, `NE`, `SE`, `SW` ]);
     }
   };
 
-  if (Array.isArray(toDraw)) toDraw.forEach(draw);
-  else draw(toDraw as Rects.RectPositioned);
+  if (Array.isArray(toDraw)) {
+    for (const t of toDraw) {
+      draw(t);
+    }
+  } else {
+    draw(toDraw as RectPositioned);
+  }
 };
 
 /**
@@ -822,8 +842,8 @@ export const textWidth = (
 
 export const textRect = (ctx: CanvasRenderingContext2D,
   text?: string | null,
-  padding = 0, widthMultiple?: number): Rects.Rect => {
-  if (text === undefined || text === null || text.length === 0) return Rects.empty;
+  padding = 0, widthMultiple?: number): Rect => {
+  if (text === undefined || text === null || text.length === 0) return RectsEmpty;
   const m = ctx.measureText(text);
 
   const width = (widthMultiple) ? roundUpToMultiple(m.width, widthMultiple) + padding : m.width + padding;
@@ -858,7 +878,7 @@ export const textBlock = (
   opts: DrawingOpts & {
     readonly anchor: Point;
     readonly anchorPadding?: number;
-    readonly bounds?: Rects.RectPositioned;
+    readonly bounds?: RectPositioned;
   }
 ) => {
   applyOpts(ctx, opts);
@@ -912,7 +932,7 @@ export const textBlockAligned = (
   ctx: CanvasRenderingContext2D,
   text: ReadonlyArray<string> | string,
   opts: DrawingOpts & {
-    readonly bounds: Rects.RectPositioned;
+    readonly bounds: RectPositioned;
     readonly horiz?: HorizAlign;
     readonly vert?: VertAlign;
   }
@@ -920,30 +940,24 @@ export const textBlockAligned = (
   const { bounds } = opts;
   const { horiz = `left`, vert = `top` } = opts;
 
-  //eslint-disable-next-line functional/no-let
-  let lines: ReadonlyArray<string>;
-  lines = typeof text === `string` ? [ text ] : text;
+  const lines = typeof text === `string` ? [ text ] : text;
 
   applyOpts(ctx, opts);
 
   ctx.save();
   ctx.translate(bounds.x, bounds.y);
-  //eslint-disable-next-line functional/immutable-data
   ctx.textAlign = `left`;
-  //eslint-disable-next-line functional/immutable-data
   ctx.textBaseline = `top`;
   const middleX = bounds.width / 2;
   const middleY = bounds.height / 2;
 
   // Measure each line
-  //eslint-disable-next-line functional/prefer-tacit
   const blocks = lines.map((l) => ctx.measureText(l));
   const heights = blocks.map(
     (tm) => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent
   );
   const totalHeight = heights.reduce((accumulator, value) => accumulator + value, 0);
 
-  //eslint-disable-next-line functional/no-let
   let y = 0;
   if (vert === `center`) y = middleY - totalHeight / 2;
   else if (vert === `bottom`) {
@@ -951,11 +965,10 @@ export const textBlockAligned = (
   }
 
   for (const [ index, line ] of lines.entries()) {
-    //eslint-disable-next-line functional/no-let
     let x = 0;
     if (horiz === `center`) x = middleX - blocks[ index ].width / 2;
     else if (horiz === `right`) x = bounds.width - blocks[ index ].width;
-    ctx.fillText(lines[ index ], x, y);
+    ctx.fillText(line, x, y);
     y += heights[ index ];
   }
 

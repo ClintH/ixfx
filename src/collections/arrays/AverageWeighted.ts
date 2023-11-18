@@ -1,4 +1,5 @@
-import { weight, zip } from './index.js';
+import { zip } from './Zip.js';
+import { weight } from './NumericArrays.js';
 import { type EasingFn as EasingFunction } from '../../modulation/Easing.js';
 /**
  * Computes an average of an array with a set of weights applied.

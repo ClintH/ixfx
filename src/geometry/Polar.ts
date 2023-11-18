@@ -1,37 +1,28 @@
-import { degreeToRadian, radianToDegree } from './index.js';
+import { degreeToRadian, radianToDegree } from './Angles.js';
 import * as Points from './points/index.js';
 import { throwNumberTest } from '../Guards.js';
-import type { Point } from './points/Types.js';
+import type { Point, PolarCoord } from './Types.js';
 const _piPi = Math.PI * 2;
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 const EmptyCartesian = Object.freeze({ x: 0, y: 0 });
 
 /**
- * Polar coordinate, made up of a distance and angle in radians.
- * Most computations involving Coords require an `origin` as well.
- */
-export type Coord = {
-  readonly distance: number;
-  readonly angleRadian: number;
-};
-
-/**
  * Converts to Cartesian coordiantes
  */
 type ToCartesian = {
-  (point: Coord, origin?: Point): Point;
+  (point: PolarCoord, origin?: Point): Point;
   (distance: number, angleRadians: number, origin?: Point): Point;
 };
 
 /**
- * Returns true if `p` seems to be a {@link Coord} (ie has both distance & angleRadian fields)
+ * Returns true if `p` seems to be a {@link PolarCoord} (ie has both distance & angleRadian fields)
  * @param p
- * @returns True if `p` seems to be a Coord
+ * @returns True if `p` seems to be a PolarCoord
  */
-export const isCoord = (p: unknown): p is Coord => {
-  if ((p as Coord).distance === undefined) return false;
-  if ((p as Coord).angleRadian === undefined) return false;
+export const isPolarCoord = (p: unknown): p is PolarCoord => {
+  if ((p as PolarCoord).distance === undefined) return false;
+  if ((p as PolarCoord).angleRadian === undefined) return false;
   return true;
 };
 
@@ -53,7 +44,7 @@ export const isCoord = (p: unknown): p is Coord => {
 export const fromCartesian = (
   point: Point,
   origin: Point
-): Coord => {
+): PolarCoord => {
   point = Points.subtract(point, origin);
   //eslint-disable-next-line functional/no-let
   //let a =  Math.atan2(point.y, point.x);
@@ -96,11 +87,11 @@ export const fromCartesian = (
  * @returns
  */
 export const toCartesian: ToCartesian = (
-  a: Coord | number,
+  a: PolarCoord | number,
   b?: Point | number,
   c?: Point
 ): Point => {
-  if (isCoord(a)) {
+  if (isPolarCoord(a)) {
     if (b === undefined) b = Points.Empty;
     if (Points.isPoint(b)) {
       return polarToCartesian(a.distance, a.angleRadian, b);
@@ -149,7 +140,7 @@ export const toCartesian: ToCartesian = (
 export function* spiral(
   smoothness: number,
   zoom: number
-): IterableIterator<Coord & { readonly step: number }> {
+): IterableIterator<PolarCoord & { readonly step: number }> {
   //eslint-disable-next-line functional/no-let
   let step = 0;
 
@@ -165,18 +156,18 @@ export function* spiral(
 }
 
 /**
- * Returns a rotated coordiante
+ * Returns a rotated coordinate
  * @param c Coordinate
  * @param amountRadian Amount to rotate, in radians
  * @returns
  */
-export const rotate = (c: Coord, amountRadian: number): Coord =>
+export const rotate = (c: PolarCoord, amountRadian: number): PolarCoord =>
   Object.freeze({
     ...c,
     angleRadian: c.angleRadian + amountRadian,
   });
 
-export const normalise = (c: Coord): Coord => {
+export const normalise = (c: PolarCoord): PolarCoord => {
   //guard(v, `v`);
   if (c.distance === 0) throw new Error(`Cannot normalise vector of length 0`);
   return Object.freeze({
@@ -186,11 +177,11 @@ export const normalise = (c: Coord): Coord => {
 };
 
 /**
- * Throws an error if Coord is invalid
+ * Throws an error if PolarCoord is invalid
  * @param p
  * @param name
  */
-export const guard = (p: Coord, name = `Point`) => {
+export const guard = (p: PolarCoord, name = `Point`) => {
   if (p === undefined) {
     throw new Error(
       `'${ name }' is undefined. Expected {distance, angleRadian} got ${ JSON.stringify(
@@ -239,17 +230,17 @@ export const guard = (p: Coord, name = `Point`) => {
   if (Number.isNaN(p.distance)) throw new Error(`'${ name }.distance' is NaN`);
 };
 /**
- * Calculate dot product of two Coords.
+ * Calculate dot product of two PolarCoords.
  *
  * Eg, power is the dot product of force and velocity
  *
  * Dot products are also useful for comparing similarity of
- *  angle between two unit Coord.
+ *  angle between two unit PolarCoords.
  * @param a
  * @param b
  * @returns
  */
-export const dotProduct = (a: Coord, b: Coord): number => {
+export const dotProduct = (a: PolarCoord, b: PolarCoord): number => {
   guard(a, `a`);
   guard(b, `b`);
   return a.distance * b.distance * Math.cos(b.angleRadian - a.angleRadian);
@@ -260,7 +251,7 @@ export const dotProduct = (a: Coord, b: Coord): number => {
  * @param p
  * @returns
  */
-export const invert = (p: Coord): Coord => {
+export const invert = (p: PolarCoord): PolarCoord => {
   guard(p, `c`);
   return Object.freeze({
     ...p,
@@ -269,12 +260,12 @@ export const invert = (p: Coord): Coord => {
 };
 
 /**
- * Returns true if Coords have same magnitude but opposite direction
+ * Returns true if PolarCoords have same magnitude but opposite direction
  * @param a
  * @param b
  * @returns
  */
-export const isOpposite = (a: Coord, b: Coord): boolean => {
+export const isOpposite = (a: PolarCoord, b: PolarCoord): boolean => {
   guard(a, `a`);
   guard(b, `b`);
   if (a.distance !== b.distance) return false;
@@ -282,12 +273,12 @@ export const isOpposite = (a: Coord, b: Coord): boolean => {
 };
 
 /**
- * Returns true if Coords have the same direction, regardless of magnitude
+ * Returns true if PolarCoords have the same direction, regardless of magnitude
  * @param a
  * @param b
  * @returns
  */
-export const isParallel = (a: Coord, b: Coord): boolean => {
+export const isParallel = (a: PolarCoord, b: PolarCoord): boolean => {
   guard(a, `a`);
   guard(b, `b`);
   return a.angleRadian === b.angleRadian;
@@ -299,7 +290,7 @@ export const isParallel = (a: Coord, b: Coord): boolean => {
  * @param b
  * @returns
  */
-export const isAntiParallel = (a: Coord, b: Coord): boolean => {
+export const isAntiParallel = (a: PolarCoord, b: PolarCoord): boolean => {
   guard(a, `a`);
   guard(b, `b`);
   return a.angleRadian === -b.angleRadian;
@@ -311,7 +302,7 @@ export const isAntiParallel = (a: Coord, b: Coord): boolean => {
  * @param amountDeg Amount to rotate, in degrees
  * @returns
  */
-export const rotateDegrees = (c: Coord, amountDeg: number): Coord =>
+export const rotateDegrees = (c: PolarCoord, amountDeg: number): PolarCoord =>
   Object.freeze({
     ...c,
     angleRadian: c.angleRadian + degreeToRadian(amountDeg),
@@ -328,7 +319,7 @@ export const spiralRaw = (
   step: number,
   smoothness: number,
   zoom: number
-): Coord => {
+): PolarCoord => {
   const a = smoothness * step;
   return Object.freeze({
     distance: zoom * a,
@@ -343,7 +334,7 @@ export const spiralRaw = (
  * @param amt
  * @returns
  */
-export const multiply = (v: Coord, amt: number): Coord => {
+export const multiply = (v: PolarCoord, amt: number): PolarCoord => {
   guard(v);
   throwNumberTest(amt, ``, `amt`);
   return Object.freeze({
@@ -359,7 +350,7 @@ export const multiply = (v: Coord, amt: number): Coord => {
  * @param amt
  * @returns
  */
-export const divide = (v: Coord, amt: number): Coord => {
+export const divide = (v: PolarCoord, amt: number): PolarCoord => {
   guard(v);
   throwNumberTest(amt, ``, `amt`);
   return Object.freeze({
@@ -375,8 +366,7 @@ export const divide = (v: Coord, amt: number): Coord => {
  * @param min
  * @returns
  */
-export const clampMagnitude = (v: Coord, max = 1, min = 0): Coord => {
-  //eslint-disable-next-line functional/no-let
+export const clampMagnitude = (v: PolarCoord, max = 1, min = 0): PolarCoord => {
   let mag = v.distance;
   if (mag > max) mag = max;
   if (mag < min) mag = min;
@@ -387,7 +377,7 @@ export const clampMagnitude = (v: Coord, max = 1, min = 0): Coord => {
 };
 
 /**
- * Converts a polar coordiante to Cartesian
+ * Converts a polar coordinate to Cartesian
  * @param distance Distance
  * @param angleRadians Angle in radians
  * @param origin Origin, or 0,0 by default.
@@ -411,7 +401,7 @@ const polarToCartesian = (
  * @param p
  * @returns
  */
-export const toString = (p: Coord, digits?: number): string => {
+export const toString = (p: PolarCoord, digits?: number): string => {
   if (p === undefined) return `(undefined)`;
   if (p === null) return `(null)`;
 
@@ -421,7 +411,7 @@ export const toString = (p: Coord, digits?: number): string => {
   return `(${ d },${ a })`;
 };
 
-export const toPoint = (v: Coord, origin = EmptyCartesian): Point => {
+export const toPoint = (v: PolarCoord, origin = EmptyCartesian): Point => {
   guard(v, `v`);
   return Object.freeze({
     x: origin.x + v.distance * Math.cos(v.angleRadian),

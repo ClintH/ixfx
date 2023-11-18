@@ -1,4 +1,4 @@
-import type { Point } from '../geometry/points/Types.js';
+import type { Point } from '../geometry/Types.js';
 import { Points } from '../geometry/index.js';
 
 export type DragState = {

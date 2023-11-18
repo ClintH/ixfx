@@ -1,6 +1,6 @@
 import test from 'ava';
 import { ofSetMutable } from '../../../collections/map/MapOfSetMutable.js';
-import type { MapSetOpts } from 'src/collections/map/index.js';
+import type { MapSetOpts } from '../../../collections/map/index.js';
 
 test(`ofSetMutable`, (t) => {
   const m = ofSetMutable<string>();
@@ -11,7 +11,7 @@ test(`ofSetMutable`, (t) => {
 
   const opts: MapSetOpts<Person> = {
     groupBy: (p) => p.city,
-    hash: (p) => `${p.name}-${p.city}`,
+    hash: (p) => `${ p.name }-${ p.city }`,
   };
 
   const barry = { name: `Barry`, city: `London` };

@@ -1,4 +1,4 @@
-import { Drawing } from "./index.js";
+import * as Drawing from "./Drawing.js";
 import * as Bipolar from "../data/Bipolar.js";
 
 /**

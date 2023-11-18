@@ -1,55 +1,14 @@
-import { guard as guardPoint } from './points/index.js';
-import { type Path } from './Path.js';
-import { type Line } from './Line.js';
-import { Points, Polar, Rects } from './index.js';
-//import { ShapePositioned } from './Shape.js';
-import { Arrays } from '../collections/index.js';
-import { defaultRandom, type RandomSource } from '../random/Types.js';
-import * as Intersects from './Intersects.js';
-import type { Point } from './points/Types.js';
+import type { Line, Circle, Point, CirclePositioned, CircularPath, RectPositioned, Rect } from '../Types.js';
+import { Points, Polar } from '../index.js';
+import { Arrays } from '../../collections/index.js';
+import { defaultRandom, type RandomSource } from '../../random/Types.js';
+import { guard, isCircle, isCirclePositioned } from './Guard.js';
+import { fromCenter as RectsFromCenter } from '../rect/index.js';
 const piPi = Math.PI * 2;
-
-/**
- * A circle
- */
-export type Circle = {
-  readonly radius: number
-}
-
-/**
- * A {@link Circle} with position
- */
-export type CirclePositioned = Point & Circle;
-
-export type CircularPath = Circle & Path & {
-  readonly kind: `circular`
-};
-
-// export type CircularShape = Circle & Shape & {
-//   readonly kind:`circular`
-// }
-
-
-/**
- * Returns true if parameter has x,y. Does not verify if parameter is a circle or not
- * 
- * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
- * 
- * const circleA = { radius: 5 };
- * Circles.isPositioned(circle); // false
- * 
- * const circleB = { radius: 5, x: 10, y: 10 }
- * Circles.isPositioned(circle); // true
- * ```
- * @param p Circle
- * @returns 
- */
-export const isPositioned = (p: Circle | Point): p is Point => (p as Point).x !== undefined && (p as Point).y !== undefined;
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const isCircle = (p: any): p is Circle => (p as Circle).radius !== undefined;
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const isCirclePositioned = (p: any): p is CirclePositioned => isCircle(p) && isPositioned(p);
+export * from './DistanceCenter.js';
+export * from './DistanceFromExterior.js';
+export * from './Guard.js';
+export * from './ToPositioned.js';
 
 /**
  * Returns a point on a circle at a specified angle in radians
@@ -74,7 +33,7 @@ export const isCirclePositioned = (p: any): p is CirclePositioned => isCircle(p)
  */
 export const point = (circle: Circle | CirclePositioned, angleRadian: number, origin?: Point): Point => {
   if (origin === undefined) {
-    origin = isPositioned(circle) ? circle : { x: 0, y: 0 };
+    origin = isCirclePositioned(circle) ? circle : { x: 0, y: 0 };
   }
   return {
     x: (Math.cos(-angleRadian) * circle.radius) + origin.x,
@@ -82,30 +41,6 @@ export const point = (circle: Circle | CirclePositioned, angleRadian: number, or
   };
 };
 
-/**
- * Throws if radius is out of range. If x,y is present, these will be validated too.
- * @param circle 
- * @param paramName 
- */
-const guard = (circle: CirclePositioned | Circle, parameterName = `circle`) => {
-  if (isPositioned(circle)) {
-    guardPoint(circle, `circle`);
-  }
-
-  if (Number.isNaN(circle.radius)) throw new Error(`${ parameterName }.radius is NaN`);
-  if (circle.radius <= 0) throw new Error(`${ parameterName }.radius must be greater than zero`);
-};
-
-/**
- * Throws if `circle` is not positioned or has dodgy fields
- * @param circle 
- * @param paramName 
- * @returns 
- */
-const guardPositioned = (circle: CirclePositioned, parameterName = `circle`) => {
-  if (!isPositioned(circle)) throw new Error(`Expected a positioned circle with x,y`);
-  guard(circle, parameterName);
-};
 
 /**
  * Returns the center of a circle
@@ -126,7 +61,7 @@ const guardPositioned = (circle: CirclePositioned, parameterName = `circle`) => 
  * @returns Center of circle
  */
 export const center = (circle: CirclePositioned | Circle) => {
-  return isPositioned(circle) ? Object.freeze({ x: circle.x, y: circle.y }) : Object.freeze({ x: circle.radius, y: circle.radius });
+  return isCirclePositioned(circle) ? Object.freeze({ x: circle.x, y: circle.y }) : Object.freeze({ x: circle.radius, y: circle.radius });
 };
 /**
  * Computes relative position along circle
@@ -177,116 +112,8 @@ export const area = (circle: Circle) => {
  * @param circle
  * @returns 
  */
-export const bbox = (circle: CirclePositioned | Circle): Rects.RectPositioned | Rects.Rect => {
-  return isPositioned(circle) ? Rects.fromCenter(circle, circle.radius * 2, circle.radius * 2) : { width: circle.radius * 2, height: circle.radius * 2 };
-};
-
-/**
- * Returns true if `b` is completely contained by `a`
- *
- * ```js
- * // Compare two points
- * isContainedBy(circleA, circleB);
- * 
- * // Compare a circle with a point
- * isContainedBy(circleA, {x: 10, y: 20});
- * 
- * // Define radius as third parameter
- * isContainedBy(circleA, {x: 10, y: 20}, 20);
- * ```
- * @param a Circle
- * @param b Circle or point to compare to
- * @param c Radius to accompany parameter b if it's a point
- * @returns
- */
-export const isContainedBy = (a: CirclePositioned, b: CirclePositioned | Point, c?: number): boolean => {
-  const d = distanceCenter(a, b);
-  if (isCircle(b)) {
-    return (d < Math.abs(a.radius - b.radius));
-  } else if (Points.isPoint(b)) {
-    // eslint-disable-next-line unicorn/prefer-ternary
-    if (c === undefined) {
-      return d <= a.radius;
-    } else {
-      // Defining a circle
-      return (d < Math.abs(a.radius - c));
-    }
-  } else throw new Error(`b parameter is expected to be CirclePositioned or Point`);
-};
-
-/***
- * Returns true if radius, x or y are NaN
- */
-export const isNaN = (a: Circle | CirclePositioned): boolean => {
-  if (Number.isNaN(a.radius)) return true;
-  if (isPositioned(a)) {
-    if (Number.isNaN(a.x)) return true;
-    if (Number.isNaN(a.y)) return true;
-  }
-  return false;
-};
-/**
- * Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.
- * A circle can be checked for intersections with another CirclePositioned, Point or RectPositioned.
- * 
- * Use `intersections` to find the points of intersection.
- *
- * @param a Circle
- * @param b Circle or point to test
- * @returns True if circle overlap
- */
-export const isIntersecting = (a: CirclePositioned, b: CirclePositioned | Point | Rects.RectPositioned, c?: number): boolean => {
-  if (Points.isEqual(a, b)) return true;
-  if (isContainedBy(a, b, c)) return true;
-  if (isCircle(b)) {
-    return Intersects.circleCircle(a, b);
-  } else if (Rects.isRectPositioned(b)) {
-    return Intersects.circleRect(a, b);
-  } else if (Points.isPoint(b) && c !== undefined) {
-    return Intersects.circleCircle(a, { ...b, radius: c });
-  }
-  return false;
-};
-
-/**
- * 
- * Returns the points of intersection betweeen `a` and `b`.
- * 
- * Returns an empty array if circles are equal, one contains the other or if they don't touch at all.
- *
- * @param a Circle
- * @param b Circle
- * @returns Points of intersection, or an empty list if there are none
- */
-export const intersections = (a: CirclePositioned, b: CirclePositioned): ReadonlyArray<Point> => {
-  const vector = Points.subtract(b, a);
-  const centerD = Math.hypot((vector.y), (vector.x));
-
-  // Do not intersect
-  if (centerD > a.radius + b.radius) return [];
-
-  // Circle contains another
-  if (centerD < Math.abs(a.radius - b.radius)) return [];
-
-  // Circles are the same
-  if (isEqual(a, b)) return [];
-
-  const centroidD = ((a.radius * a.radius) - (b.radius * b.radius) + (centerD * centerD)) / (2 * centerD);
-  const centroid = {
-    x: a.x + (vector.x * centroidD / centerD),
-    y: a.y + (vector.y * centroidD / centerD)
-  };
-
-  const centroidIntersectionD = Math.sqrt((a.radius * a.radius) - (centroidD * centroidD));
-
-  const intersection = {
-    x: -vector.y * (centroidIntersectionD / centerD),
-    y: vector.x * (centroidIntersectionD / centerD)
-  };
-  return [
-    Points.sum(centroid, intersection),
-    Points.subtract(centroid, intersection)
-  ];
+export const bbox = (circle: CirclePositioned | Circle): RectPositioned | Rect => {
+  return isCirclePositioned(circle) ? RectsFromCenter(circle, circle.radius * 2, circle.radius * 2) : { width: circle.radius * 2, height: circle.radius * 2 };
 };
 
 /**
@@ -308,12 +135,12 @@ export const intersections = (a: CirclePositioned, b: CirclePositioned): Readonl
 export const isEqual = (a: CirclePositioned | Circle, b: CirclePositioned | Circle): boolean => {
   if (a.radius !== b.radius) return false;
 
-  if (isPositioned(a) && isPositioned(b)) {
+  if (isCirclePositioned(a) && isCirclePositioned(b)) {
     if (a.x !== b.x) return false;
     if (a.y !== b.y) return false;
     if (a.z !== b.z) return false;
     return true;
-  } else if (!isPositioned(a) && !isPositioned(b)) {
+  } else if (!isCirclePositioned(a) && !isCirclePositioned(b)) {
     // no-op
   } else return false; // one is positioned one not
 
@@ -346,7 +173,7 @@ export type RandomPointOpts = {
  * @returns 
  */
 export const randomPoint = (within: Circle | CirclePositioned, opts: RandomPointOpts = {}): Point => {
-  const offset: Point = isPositioned(within) ? within : { x: 0, y: 0 };
+  const offset: Point = isCirclePositioned(within) ? within : { x: 0, y: 0 };
   const strategy = opts.strategy ?? `uniform`;
   const rand = opts.randomSource ?? defaultRandom;
   switch (strategy) {
@@ -379,7 +206,7 @@ export function multiplyScalar(a: Circle, value: number): Circle;
  * ```
  */
 export function multiplyScalar(a: Circle | CirclePositioned, value: number): Circle | CirclePositioned {
-  if (isPositioned(a)) {
+  if (isCirclePositioned(a)) {
     const pt = Points.multiplyScalar(a, value);
     return Object.freeze({
       ...a,
@@ -395,51 +222,8 @@ export function multiplyScalar(a: Circle | CirclePositioned, value: number): Cir
 }
 
 
-/**
- * Returns the distance between two circle centers.
- * 
- * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
- * const circleA = { radius: 5, x: 5, y: 5 }
- * const circleB = { radius: 10, x: 20, y: 20 }
- * const distance = Circles.distanceCenter(circleA, circleB);
- * ```
- * Throws an error if either is lacking position.
- * @param a 
- * @param b 
- * @returns Distance
- */
-export const distanceCenter = (a: CirclePositioned, b: CirclePositioned | Point): number => {
-  guardPositioned(a, `a`);
-  if (isCirclePositioned(b)) {
-    guardPositioned(b, `b`);
-  }
-  return Points.distance(a, b);
-};
 
-/**
- * Returns the distance between the exterior of two circles, or between the exterior of a circle and point.
- * If `b` overlaps or is enclosed by `a`, distance is 0.
- * 
- * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
- * const circleA = { radius: 5, x: 5, y: 5 }
- * const circleB = { radius: 10, x: 20, y: 20 }
- * const distance = Circles.distanceCenter(circleA, circleB);
- * ```
- * @param a
- * @param b 
- */
-export const distanceFromExterior = (a: CirclePositioned, b: CirclePositioned | Point): number => {
-  guardPositioned(a, `a`);
-  if (isCirclePositioned(b)) {
-    return Math.max(0, distanceCenter(a, b) - a.radius - b.radius);
-  } else if (Points.isPoint(b)) {
-    const distribution = Points.distance(a, b);
-    if (distribution < a.radius) return 0;
-    return distribution;
-  } else throw new Error(`Second parameter invalid type`);
-};
+
 
 type ToSvg = {
   (circleOrRadius: Circle | number, sweep: boolean, origin: Point): ReadonlyArray<string>;
@@ -459,7 +243,7 @@ export const toSvg: ToSvg = (a: CirclePositioned | number | Circle, sweep: boole
     if (origin !== undefined) {
       return toSvgFull(a.radius, origin, sweep);
     }
-    if (isPositioned(a)) {
+    if (isCirclePositioned(a)) {
       return toSvgFull(a.radius, a, sweep);
     } else throw new Error(`origin parameter needed for non-positioned circle`);
   } else {
@@ -512,25 +296,6 @@ export const nearest = (circle: CirclePositioned | ReadonlyArray<CirclePositione
 };
 
 /**
- * Returns a positioned version of a circle.
- * If circle is already positioned, it is returned.
- * If no default position is supplied, 0,0 is used.
- * @param circle 
- * @param defaultPositionOrX 
- * @param y 
- * @returns 
- */
-export const toPositioned = (circle: Circle | CirclePositioned, defaultPositionOrX?: Point | number, y?: number): CirclePositioned => {
-  if (isPositioned(circle)) return circle;
-
-  // Returns 0,0 if params are undefined
-  const pt = Points.getPointParameter(defaultPositionOrX, y);
-  return Object.freeze({
-    ...circle,
-    ...pt
-  });
-};
-/**
  * Returns a `CircularPath` representation of a circle
  *
  * @param {CirclePositioned} circle
@@ -548,7 +313,7 @@ export const toPath = (circle: CirclePositioned): CircularPath => {
      * @returns {Point} X,y
      */
     interpolate: (t: number) => interpolate(circle, t),
-    bbox: () => bbox(circle) as Rects.RectPositioned,
+    bbox: () => bbox(circle) as RectPositioned,
     length: () => length(circle),
     toSvgString: (sweep = true) => toSvg(circle, sweep),
     kind: `circular`

@@ -1,14 +1,17 @@
 import { toCartesian } from './Polar.js';
 import { throwIntegerTest } from '../Guards.js';
-import { Triangles, Points, Rects, Circles } from './index.js';
-import type { CirclePositioned } from './Circle.js';
+import { Triangles, Points } from './index.js';
+import { isCirclePositioned, isCircle } from './circle/Guard.js';
 import type { RandomSource } from '../random/Types.js';
-import type { RectPositioned } from './Rect.js';
-import type { Point } from './points/Types.js';
-
+import type { RectPositioned, CirclePositioned, Triangle, Point, Rect, Circle, ShapePositioned } from './Types.js';
+import { center as RectsCenter, corners as RectsCorners, fromTopLeft as RectsFromTopLeft } from './rect/index.js';
+import { isIntersecting as CirclesIsIntersecting } from './circle/Intersecting.js';
+import { randomPoint as circleRandomPoint, center as circleCenter } from './circle/index.js';
+import { randomPoint as rectRandomPoint } from './rect/index.js';
+import { isRect, isRectPositioned } from './rect/Guard.js';
 export type ContainsResult = `none` | `contained`;
 
-export type ShapePositioned = CirclePositioned | RectPositioned;
+import { isIntersecting as RectsIsIntersecting } from './rect/Intersects.js';
 
 /**
  * Returns the intersection result between a and b.
@@ -19,10 +22,10 @@ export const isIntersecting = (
   a: ShapePositioned,
   b: ShapePositioned | Point
 ): boolean => {
-  if (Circles.isCirclePositioned(a)) {
-    return Circles.isIntersecting(a, b);
-  } else if (Rects.isRectPositioned(a)) {
-    return Rects.isIntersecting(a, b);
+  if (isCirclePositioned(a)) {
+    return CirclesIsIntersecting(a, b);
+  } else if (isRectPositioned(a)) {
+    return RectsIsIntersecting(a, b);
   }
   throw new Error(
     `a or b are unknown shapes. a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) }`
@@ -42,10 +45,10 @@ export const randomPoint = (
   shape: ShapePositioned,
   opts: RandomPointOpts = {}
 ): Point => {
-  if (Circles.isCirclePositioned(shape)) {
-    return Circles.randomPoint(shape, opts);
-  } else if (Rects.isRectPositioned(shape)) {
-    return Rects.randomPoint(shape, opts);
+  if (isCirclePositioned(shape)) {
+    return circleRandomPoint(shape, opts);
+  } else if (isRectPositioned(shape)) {
+    return rectRandomPoint(shape, opts);
   }
   throw new Error(`Cannot create random point for unknown shape`);
 };
@@ -63,16 +66,16 @@ export const randomPoint = (
  * @returns
  */
 export const center = (
-  shape?: Rects.Rect | Triangles.Triangle | Circles.Circle
+  shape?: Rect | Triangle | Circle
 ): Point => {
   if (shape === undefined) {
     return Object.freeze({ x: 0.5, y: 0.5 });
-  } else if (Rects.isRect(shape)) {
-    return Rects.center(shape);
+  } else if (isRect(shape)) {
+    return RectsCenter(shape);
   } else if (Triangles.isTriangle(shape)) {
     return Triangles.centroid(shape);
-  } else if (Circles.isCircle(shape)) {
-    return Circles.center(shape);
+  } else if (isCircle(shape)) {
+    return circleCenter(shape);
   } else {
     throw new Error(`Unknown shape: ${ JSON.stringify(shape) }`);
   }
@@ -181,15 +184,13 @@ export const arrow = (
 
   const triAngle = Math.PI / 2;
 
-  //eslint-disable-next-line functional/no-let
-  let tri: Triangles.Triangle;
-  //eslint-disable-next-line functional/no-let
+  let tri: Triangle;
   let tailPoints: ReadonlyArray<Point>;
 
   if (from === `tip`) {
     tri = Triangles.equilateralFromVertex(origin, arrowSize, triAngle);
-    tailPoints = Rects.corners(
-      Rects.fromTopLeft(
+    tailPoints = RectsCorners(
+      RectsFromTopLeft(
         { x: tri.a.x - tailLength, y: origin.y - tailThickness / 2 },
         tailLength,
         tailThickness
@@ -207,8 +208,8 @@ export const arrow = (
       triAngle
     );
 
-    tailPoints = Rects.corners(
-      Rects.fromTopLeft(
+    tailPoints = RectsCorners(
+      RectsFromTopLeft(
         { x: origin.x - midX, y: origin.y - midY },
         tailLength + arrowSize,
         tailThickness
@@ -216,8 +217,8 @@ export const arrow = (
     );
   } else {
     //const midY = origin.y - tailThickness/2;
-    tailPoints = Rects.corners(
-      Rects.fromTopLeft(
+    tailPoints = RectsCorners(
+      RectsFromTopLeft(
         { x: origin.x, y: origin.y - tailThickness / 2 },
         tailLength,
         tailThickness

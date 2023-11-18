@@ -1,12 +1,13 @@
-import { type Sphere } from './Sphere.js';
-import {
-  type Circle,
-  type CirclePositioned,
-  toPositioned as circleToPositioned,
-} from './Circle.js';
+
+import type {
+  Circle,
+  CirclePositioned,
+  Sphere,
+  Point, Point3d
+} from './Types.js';
+import { toPositioned as circleToPositioned } from './circle/ToPositioned.js';
 import { scale } from '../data/Scale.js';
 import { linearSpace } from '../Numbers.js';
-import type { Point, Point3d } from './points/Types.js';
 
 const cos = Math.cos;
 const sin = Math.sin;

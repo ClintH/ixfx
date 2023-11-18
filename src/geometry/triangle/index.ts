@@ -1,36 +1,31 @@
-import { Lines, radianToDegree, Polar, Circles, Rects } from './index.js';
-import * as Points from './points/index.js';
-
-import { throwNumberTest } from '../Guards.js';
-import type { Point } from './points/Types.js';
+import * as Polar from '../Polar.js';
+import * as Points from '../points/index.js';
+import { throwNumberTest } from '../../Guards.js';
+import type { Point, CirclePositioned, RectPositioned, Triangle } from '../Types.js';
+import { radianToDegree } from '../Angles.js';
+import { guard } from './Guard.js';
+import { perimeter } from './Perimeter.js';
+import { area } from './Area.js';
+import { intersectsPoint as RectsIntersectsPoint } from '../rect/Intersects.js';
+export * from './Guard.js';
+export * from './Area.js';
+export * from './Edges.js';
+export * from './OuterCircle.js';
+export * from './Perimeter.js';
 
 /**
  * Functions for working with equilateral triangles, defined by length
  */
-export * as Equilateral from './TriangleEquilateral.js';
+export * as Equilateral from './Equilateral.js';
 
 /**
  * Functions for working with right-angled triangles, defined by two of three edges
  */
-export * as Right from './TriangleRight.js';
+export * as Right from './Right.js';
 
-export * as Isosceles from './TriangleIsosceles.js';
+export * as Isosceles from './Isosceles.js';
 
 const piPi = Math.PI * 2;
-
-/**
- * Triangle.
- *
- * Helpers for creating:
- *  - {@link fromFlatArray}: Create from [x1, y1, x2, y2, x3, y3]
- *  - {@link fromPoints}: Create from three `{x,y}` sets
- *  - {@link fromRadius}: Equilateral triangle of a given radius and center
- */
-export type Triangle = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly c: Point;
-};
 
 /**
  * A triangle consisting of three empty points (Points.Empty)
@@ -47,9 +42,9 @@ export const Empty = Object.freeze({
  */
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Placeholder = Object.freeze({
-  a: { x: NaN, y: NaN },
-  b: { x: NaN, y: NaN },
-  c: { x: NaN, y: NaN },
+  a: { x: Number.NaN, y: Number.NaN },
+  b: { x: Number.NaN, y: Number.NaN },
+  c: { x: Number.NaN, y: Number.NaN },
 });
 
 /**
@@ -98,24 +93,14 @@ export const apply = (
     c: fn(t.c, `c`),
   });
 
-/**
- * Throws an exception if the triangle is invalid
- * @param t
- * @param name
- */
-export const guard = (t: Triangle, name: string = `t`) => {
-  if (t === undefined) throw Error(`{$name} undefined`);
-  Points.guard(t.a, name + `.a`);
-  Points.guard(t.b, name + `.b`);
-  Points.guard(t.c, name + `.c`);
-};
+
 
 /**
  * Returns true if the parameter appears to be a valid triangle
  * @param p
  * @returns
  */
-export const isTriangle = (p: number | unknown): p is Triangle => {
+export const isTriangle = (p: unknown): p is Triangle => {
   if (p === undefined) return false;
   const tri = p as Triangle;
   if (!Points.isPoint(tri.a)) return false;
@@ -140,27 +125,19 @@ export const isEqual = (a: Triangle, b: Triangle): boolean =>
  * @param t
  * @returns Array of length three
  */
-export const corners = (t: Triangle): readonly Point[] => {
+export const corners = (t: Triangle): ReadonlyArray<Point> => {
   guard(t);
   return [ t.a, t.b, t.c ];
 };
 
-/**
- * Returns the edges (ie sides) of the triangle as an array of lines
- * @param t
- * @returns Array of length three
- */
-export const edges = (t: Triangle): Lines.PolyLine => {
-  guard(t);
-  return Lines.joinPointsToLines(t.a, t.b, t.c, t.a);
-};
+
 
 /**
  * Returns the lengths of the triangle sides
  * @param t
  * @returns Array of length three
  */
-export const lengths = (t: Triangle): readonly number[] => {
+export const lengths = (t: Triangle): ReadonlyArray<number> => {
   guard(t);
   return [
     Points.distance(t.a, t.b),
@@ -174,7 +151,7 @@ export const lengths = (t: Triangle): readonly number[] => {
  * @param t
  * @returns
  */
-export const angles = (t: Triangle): readonly number[] => {
+export const angles = (t: Triangle): ReadonlyArray<number> => {
   guard(t);
   return [
     Points.angle(t.a, t.b),
@@ -188,7 +165,7 @@ export const angles = (t: Triangle): readonly number[] => {
  * @param t
  * @returns
  */
-export const anglesDegrees = (t: Triangle): readonly number[] => {
+export const anglesDegrees = (t: Triangle): ReadonlyArray<number> => {
   guard(t);
   return radianToDegree(angles(t));
 };
@@ -223,7 +200,7 @@ export const isIsosceles = (t: Triangle): boolean => {
  * @returns
  */
 export const isRightAngle = (t: Triangle): boolean =>
-  angles(t).some((v) => v === Math.PI / 2);
+  angles(t).includes(Math.PI / 2);
 
 /**
  * Returns true if triangle is oblique: No interior angle is 90 degrees
@@ -257,9 +234,9 @@ export const centroid = (t: Triangle): Point => {
   guard(t);
   const total = Points.reduce(
     [ t.a, t.b, t.c ],
-    (p: Point, acc: Point) => ({
-      x: p.x + acc.x,
-      y: p.y + acc.y,
+    (p: Point, accumulator: Point) => ({
+      x: p.x + accumulator.x,
+      y: p.y + accumulator.y,
     })
   );
   const div = {
@@ -270,36 +247,10 @@ export const centroid = (t: Triangle): Point => {
 };
 
 /**
- * Calculates perimeter of a triangle
- * @param t
- * @returns
- */
-export const perimeter = (t: Triangle): number => {
-  guard(t);
-  return edges(t).reduce<number>((acc, v) => acc + Lines.length(v), 0);
-};
-
-/**
- * Calculates the area of a triangle
- * @param t
- * @returns
- */
-export const area = (t: Triangle): number => {
-  guard(t, `t`);
-
-  // Get length of edges
-  const e = edges(t).map((l) => Lines.length(l));
-
-  // Add up length of edges, halve
-  const p = (e[ 0 ] + e[ 1 ] + e[ 2 ]) / 2;
-  return Math.sqrt(p * (p - e[ 0 ]) * (p - e[ 1 ]) * (p - e[ 2 ]));
-};
-
-/**
  * Returns the largest circle enclosed by triangle `t`.
  * @param t
  */
-export const innerCircle = (t: Triangle): Circles.CirclePositioned => {
+export const innerCircle = (t: Triangle): CirclePositioned => {
   const c = centroid(t);
   const p = perimeter(t) / 2;
   const a = area(t);
@@ -307,22 +258,7 @@ export const innerCircle = (t: Triangle): Circles.CirclePositioned => {
   return { radius, ...c };
 };
 
-/**
- * Returns the largest circle touching the corners of triangle `t`.
- * @param t
- * @returns
- */
-export const outerCircle = (t: Triangle): Circles.CirclePositioned => {
-  const [ a, b, c ] = edges(t).map((l) => Lines.length(l));
-  const cent = centroid(t);
-  const radius =
-    (a * b * c) /
-    Math.sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
-  return {
-    radius,
-    ...cent,
-  };
-};
+
 
 /**
  * Returns an equilateral triangle centered at the origin.
@@ -369,7 +305,7 @@ export const rotateByVertex = (
   vertex: `a` | `b` | `c` = `b`
 ): Triangle => {
   const origin =
-    vertex === `a` ? triangle.a : vertex === `b` ? triangle.b : triangle.c;
+    vertex === `a` ? triangle.a : (vertex === `b` ? triangle.b : triangle.c);
   return Object.freeze({
     a: Points.rotate(triangle.a, amountRadian, origin),
     b: Points.rotate(triangle.b, amountRadian, origin),
@@ -386,10 +322,12 @@ export const rotateByVertex = (
  * @returns
  */
 export const equilateralFromVertex = (
-  origin: Point = { x: 0, y: 0 },
-  length: number = 10,
+  origin?: Point,
+  length = 10,
   angleRadian: number = Math.PI / 2
 ): Triangle => {
+  if (!origin) origin = Object.freeze({ x: 0, y: 0 })
+
   const a = Points.project(origin, length, Math.PI - -angleRadian / 2);
   const c = Points.project(origin, length, Math.PI - angleRadian / 2);
   return { a, b: origin, c };
@@ -401,7 +339,7 @@ export const equilateralFromVertex = (
  * @param t
  * @returns
  */
-export const toFlatArray = (t: Triangle): readonly number[] => {
+export const toFlatArray = (t: Triangle): ReadonlyArray<number> => {
   guard(t);
   return [ t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y ];
 };
@@ -412,7 +350,7 @@ export const toFlatArray = (t: Triangle): readonly number[] => {
  * @param coords
  * @returns
  */
-export const fromFlatArray = (coords: readonly number[]): Triangle => {
+export const fromFlatArray = (coords: ReadonlyArray<number>): Triangle => {
   if (!Array.isArray(coords)) throw new Error(`coords expected as array`);
   if (coords.length !== 6) {
     throw new Error(
@@ -427,7 +365,7 @@ export const fromFlatArray = (coords: readonly number[]): Triangle => {
  * @param points
  * @returns
  */
-export const fromPoints = (points: readonly Point[]): Triangle => {
+export const fromPoints = (points: ReadonlyArray<Point>): Triangle => {
   if (!Array.isArray(points)) throw new Error(`points expected as array`);
   if (points.length !== 3) {
     throw new Error(
@@ -448,14 +386,14 @@ export const fromPoints = (points: readonly Point[]): Triangle => {
  * @param inflation If specified, box will be inflated by this much. Default: 0.
  * @returns
  */
-export const bbox = (t: Triangle, inflation = 0): Rects.RectPositioned => {
+export const bbox = (t: Triangle, inflation = 0): RectPositioned => {
   const { a, b, c } = t;
   const xMin = Math.min(a.x, b.x, c.x) - inflation;
   const xMax = Math.max(a.x, b.x, c.x) + inflation;
   const yMin = Math.min(a.y, b.y, c.y) - inflation;
   const yMax = Math.max(a.y, b.y, c.y) + inflation;
 
-  const r: Rects.RectPositioned = {
+  const r: RectPositioned = {
     x: xMin,
     y: yMin,
     width: xMax - xMin,
@@ -539,7 +477,7 @@ export const intersectsPoint = (
   const pt = Points.getPointParameter(a, b);
 
   // If it's not in the bounding box, can return false straight away
-  if (!Rects.intersectsPoint(box, pt)) return false;
+  if (!RectsIntersectsPoint(box, pt)) return false;
 
   const bc = barycentricCoord(t, pt);
 

@@ -87,10 +87,11 @@ export class FrameProcessor {
     let el: HTMLElement | undefined;
 
     switch (this._source) {
-      case `camera`:
+      case `camera`: {
         el = this._cameraStartResult?.videoEl;
         if (el !== undefined) el.style.display = enabled ? `block` : `none`;
         break;
+      }
     }
 
     this._showPreview = enabled;
@@ -108,7 +109,7 @@ export class FrameProcessor {
     if (this._source === `camera` || this._source === `video`) {
       el = this._videoSourceCapture?.canvasEl;
       if (el !== undefined) el.style.display = enabled ? `block` : `none`;
-    } else throw new Error(`Source not implemented: ${this._source}`);
+    } else throw new Error(`Source not implemented: ${ this._source }`);
 
     this._showCanvas = enabled;
   }
@@ -122,7 +123,7 @@ export class FrameProcessor {
     if (this._source === `camera` || this._source === `video`) {
       return this._videoSourceCapture;
     }
-    throw new Error(`Source kind not supported ${this._source}`);
+    throw new Error(`Source kind not supported ${ this._source }`);
   }
 
   /**
@@ -198,12 +199,14 @@ export class FrameProcessor {
   private async init() {
     this._timer = performance.now();
     switch (this._source) {
-      case `camera`:
+      case `camera`: {
         await this.initCamera();
         break;
-      case `video`:
+      }
+      case `video`: {
         await this.initVideo();
         break;
+      }
     }
     this._state = `initialised`;
   }
@@ -214,12 +217,14 @@ export class FrameProcessor {
       this._videoSourceCapture?.dispose();
     }
     switch (this._source) {
-      case `camera`:
+      case `camera`: {
         this._cameraStartResult?.dispose();
         break;
-      case `video`:
+      }
+      case `video`: {
         this._videoStartResult?.dispose();
         break;
+      }
     }
     this._teardownNeeded = false;
   }
@@ -232,12 +237,15 @@ export class FrameProcessor {
     if (this._state === `disposed`) throw new Error(`Disposed`);
 
     switch (this._source) {
-      case `camera`:
+      case `camera`: {
         return this.getFrameCamera();
-      case `video`:
+      }
+      case `video`: {
         return this.getFrameCamera();
-      default:
-        throw new Error(`source type unhandled ${this._source}`);
+      }
+      default: {
+        throw new Error(`source type unhandled ${ this._source }`);
+      }
     }
   }
 

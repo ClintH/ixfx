@@ -1,18 +1,9 @@
-import { Arrays } from '../collections/index.js';
+import * as Arrays from '../collections/arrays/index.js';
 import { minFast } from '../collections/arrays/NumericArrays.js';
 import { throwNumberTest, throwPercentTest } from '../Guards.js';
-import { Points, Rects } from './index.js';
-import { type Path } from './Path.js';
-import { guard as guardPoint } from './points/index.js';
-import type { Point } from './points/Types.js';
-
-/**
- * A line, which consists of an `a` and `b` {@link Point}.
- */
-export type Line = {
-  readonly a: Point
-  readonly b: Point
-}
+import * as Points from './points/index.js';
+import { guard as guardPoint } from './points/Guard.js';
+import type { RectPositioned, Path, Point, Line, PolyLine } from './Types.js';
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Empty = Object.freeze({
@@ -35,11 +26,6 @@ export const Placeholder = Object.freeze({
 export const isEmpty = (l: Line): boolean => Points.isEmpty(l.a) && Points.isEmpty(l.b);
 
 export const isPlaceholder = (l: Line): boolean => Points.isPlaceholder(l.a) && Points.isPlaceholder(l.b);
-
-/**
- * A PolyLine, consisting of more than one line.
- */
-export type PolyLine = ReadonlyArray<Line>;
 
 /**
  * Returns true if `p` is a valid line, containing `a` and `b` Points.
@@ -944,7 +930,7 @@ export const fromPointsToPath = (a: Point, b: Point): LinePath => toPath(fromPoi
  * const rect = Lines.bbox(line);
  * ```
  */
-export const bbox = (line: Line): Rects.RectPositioned => Points.bbox(line.a, line.b);
+export const bbox = (line: Line): RectPositioned => Points.bbox(line.a, line.b);
 
 /**
  * Returns a path wrapper around a line instance. This is useful if there are a series

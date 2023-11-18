@@ -1,6 +1,6 @@
-import { type Path } from './Path.js';
-import type { Point } from './points/Types.js';
-import { degreeToRadian } from './index.js';
+
+import type { Point, Path } from './Types.js';
+import { degreeToRadian } from './Angles.js';
 
 /**
  * An ellipse

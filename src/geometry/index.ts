@@ -1,11 +1,8 @@
-
-
 export * as Waypoints from './Waypoint.js';
-export * as Spheres from './Sphere.js';
 export * as Layouts from './Layout.js';
-export * as Circles from './Circle.js';
+export * as Circles from './circle/index.js';
 export * as Lines from './Line.js';
-export * as Rects from './Rect.js';
+export * as Rects from './rect/index.js';
 export * as Points from './points/index.js';
 export * as Paths from './Path.js';
 export * as Grids from './Grid.js';
@@ -13,6 +10,7 @@ export * as Beziers from './Bezier.js';
 export * as Compound from './CompoundPath.js';
 export * as Ellipses from './Ellipse.js';
 export * from './Types.js';
+export * from './Angles.js';
 
 /**
  * Quad tree is a datastructure for efficiently determining whether
@@ -55,7 +53,7 @@ export * as Arcs from './Arc.js';
 export * as Shapes from './Shape.js';
 
 /**
- * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
+ * Helper functions for working with vectors, which can either be a {@link Point} or Polar {@link PolarCoord}.
  * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
  * interoperate between these two coordinates.
  */
@@ -64,7 +62,7 @@ export * as Vectors from './Vector.js';
 
 /**
  * Work with Polar coordinates.
- * A Polar {@link Coord} is just `{ angleRadians:number, distance: number }`.
+ * A {@link PolarCoord} is just `{ angleRadians:number, distance: number }`.
  * 
  * Conversion: {@link toCartesian}, {@link fromCartesian}, {@link toString}
  * 
@@ -76,7 +74,7 @@ export * as Vectors from './Vector.js';
  * 
  * Debugging: {@link toString}
  * 
- * Comparisons: {@link isAntiParallel}, {@link isOpposite}, {@link isParallel}, {@link isCoord}
+ * Comparisons: {@link isAntiParallel}, {@link isOpposite}, {@link isParallel}, {@link isPolarCoord}
  */
 export * as Polar from './Polar.js';
 
@@ -113,7 +111,7 @@ export * as SurfacePoints from './SurfacePoints.js';
  * - {@link rotate}, {@link rotateByVertex}
  * 
  * Conversions
- * - {@link edges}: Edges of triangle as {@link Lines.Line}
+ * - {@link edges}: Edges of triangle as {@link Line}
  * - {@link corners}: Corner positions
  * - {@link innerCircle}: Largest circle to fit within triangle
  * - {@link outerCircle}: Largest circle to enclose triangle
@@ -125,51 +123,7 @@ export * as SurfacePoints from './SurfacePoints.js';
  * - {@link isAcute}, {@link isEquilateral}, {@link isIsosceles}, {@link isRightAngle}
  * - {@link isTriangle}: Returns true if object has expected properties of a triangle
  */
-export * as Triangles from './Triangle.js';
-
-/**
- * Convert angle in degrees to angle in radians.
- * @param angleInDegrees 
- * @returns 
- */
-export function degreeToRadian(angleInDegrees: number): number;
-
-/**
- * Convert angles in degrees to angles in radians
- * @param angleInDegrees 
- */
-export function degreeToRadian(angleInDegrees: ReadonlyArray<number>): ReadonlyArray<number>;
-
-//eslint-disable-next-line func-style
-export function degreeToRadian(angleInDegrees: number | ReadonlyArray<number>): number | ReadonlyArray<number> {
-  return Array.isArray(angleInDegrees) ? angleInDegrees.map(v => v * (Math.PI / 180)) : (angleInDegrees as number) * (Math.PI / 180);
-}
-
-/**
- * Convert angle in radians to angle in degrees
- * @param angleInRadians
- * @returns 
- */
-export function radianToDegree(angleInRadians: number): number;
-
-/**
- * Convert angles in radians to angles in degrees
- * @param angleInRadians 
- */
-export function radianToDegree(angleInRadians: ReadonlyArray<number>): ReadonlyArray<number>;
-
-//eslint-disable-next-line func-style
-export function radianToDegree(angleInRadians: number | ReadonlyArray<number>): number | ReadonlyArray<number> {
-  return Array.isArray(angleInRadians) ? angleInRadians.map(v => v * 180 / Math.PI) : (angleInRadians as number) * 180 / Math.PI;
-}
-
-import type { Point } from './points/Types.js';
-/**
- * Angle from x-axis to point (ie. `Math.atan2`)
- * @param point 
- * @returns 
- */
-export const radiansFromAxisX = (point: Point): number => Math.atan2(point.x, point.y);
+export * as Triangles from './triangle/index.js';
 
 // try {
 //   if (typeof window !== `undefined`) {

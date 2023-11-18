@@ -1,9 +1,8 @@
 import { sortByNumericProperty } from "../collections/arrays/index.js";
-import * as Circles from "./Circle.js";
-import * as Shapes from "./Shape.js";
 import type { RandomSource } from "../random/Types.js";
-import type { Point } from "./points/Types.js";
-
+import { randomPoint as ShapesRandomPoint } from "./Shape.js";
+import type { Point, Circle, CirclePositioned, ShapePositioned } from "./Types.js";
+import { isIntersecting as CirclesIsIntersecting } from "./circle/Intersecting.js";
 export type RandomOpts = {
   readonly attempts?: number
   readonly randomSource?: RandomSource
@@ -12,14 +11,14 @@ export type RandomOpts = {
  * Naive randomised circle packing.
  * [Algorithm by Taylor Hobbs](https://tylerxhobbs.com/essays/2016/a-randomized-approach-to-cicle-packing)
  */
-export const random = (circles: ReadonlyArray<Circles.Circle>, container: Shapes.ShapePositioned, opts: RandomOpts = {}) => {
+export const random = (circles: ReadonlyArray<Circle>, container: ShapePositioned, opts: RandomOpts = {}) => {
   if (!Array.isArray(circles)) throw new Error(`Parameter 'circles' is not an array`);
   const attempts = opts.attempts ?? 2000;
 
   const sorted = sortByNumericProperty(circles, `radius`);
-  const positionedCircles: Array<Circles.CirclePositioned> = [];
+  const positionedCircles: Array<CirclePositioned> = [];
 
-  const willHit = (b: Point, radius: number) => positionedCircles.some(v => Circles.isIntersecting(v, b, radius));
+  const willHit = (b: Point, radius: number) => positionedCircles.some(v => CirclesIsIntersecting(v, b, radius));
 
   while (sorted.length > 0) {
     //eslint-disable-next-line functional/immutable-data
@@ -30,7 +29,7 @@ export const random = (circles: ReadonlyArray<Circles.Circle>, container: Shapes
 
     //eslint-disable-next-line functional/no-let
     for (let index = 0; index < attempts; index++) {
-      const position = Shapes.randomPoint(container, randomPointOpts);
+      const position = ShapesRandomPoint(container, randomPointOpts);
       if (!willHit(position, circle.radius)) {
         //eslint-disable-next-line functional/immutable-data
         positionedCircles.push(Object.freeze({ ...circle, ...position }));

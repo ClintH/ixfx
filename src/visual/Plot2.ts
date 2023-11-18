@@ -1,7 +1,10 @@
 import { minIndex } from '../collections/arrays/NumericArrays.js';
-import { Arrays } from '../collections/index.js';
-import { Points, Rects } from '../geometry/index.js';
-import { clamp, flip, scale } from '../data/index.js';
+import * as Arrays from '../collections/arrays/index.js';
+import * as Points from '../geometry/points/index.js';
+import { clamp } from '../data/Clamp.js';
+import { flip } from '../data/Flip.js';
+import { scale } from '../data/Scale.js';
+
 import { parentSizeCanvas } from '../dom/Util.js';
 import * as Sg from './SceneGraph.js';
 
@@ -9,10 +12,10 @@ import { textRect, textWidth } from './Drawing.js';
 import { ifNaN } from '../Util.js'
 import { getPaths, getField } from '../Immutable.js';
 import { throwNumberTest } from '../Guards.js';
-import type { RectPositioned } from 'src/geometry/Rect.js';
-import { scaleCanvas } from './index.js';
-import type { Point } from '../geometry/points/Types.js';
-import type { PointCalculableShape } from 'src/geometry/Types.js';
+import type { Rect, RectPositioned, Point } from '../geometry/Types.js';
+import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
+import { scaleCanvas } from './ScaleCanvas.js';
+import type { PointCalculableShape } from '../geometry/Types.js';
 
 /**
  * 
@@ -281,7 +284,7 @@ export class PlotArea extends Sg.CanvasBox {
   lastRangeChange = 0;
   pointer: Point | undefined;
 
-  constructor(private plot: Plot, region: Rects.RectPositioned) {
+  constructor(private plot: Plot, region: RectPositioned) {
     super(plot, `PlotArea`, region);
 
   }
@@ -294,7 +297,7 @@ export class PlotArea extends Sg.CanvasBox {
   protected measureSelf(
     opts: Sg.MeasureState,
     _parent?: Sg.Measurement
-  ): Rects.Rect | string {
+  ): Rect | string {
 
     const axisY = opts.getActualSize(`AxisY`);
     const padding = this.paddingPx;
@@ -411,7 +414,7 @@ export class PlotArea extends Sg.CanvasBox {
     ctx: CanvasRenderingContext2D
   ): void {
     const padding = this.paddingPx + series.width;
-    const v = Rects.subtract(this.canvasRegion, padding * 2, padding * 3.5);
+    const v = RectsSubtract(this.canvasRegion, padding * 2, padding * 3.5);
     const pxPerPt = v.width / d.length;
 
     series.lastPxPerPt = pxPerPt;
@@ -459,7 +462,6 @@ export class PlotArea extends Sg.CanvasBox {
         ctx.beginPath();
         ctx.arc(x + pxPerPt / 2, y, series.width, 0, this.piPi);
         ctx.fill();
-        // @ts-expect-error
         shapes.push({ radius: series.width, x, y, index: index, value: d[ index ] });
         x += pxPerPt;
       }
@@ -491,9 +493,9 @@ export class Legend extends Sg.CanvasBox {
   padding = 3;
   widthSnapping = 20;
 
-  labelMeasurements = new Map<string, Rects.RectPositioned>();
+  labelMeasurements = new Map<string, RectPositioned>();
 
-  constructor(private plot: Plot, region: Rects.RectPositioned) {
+  constructor(private plot: Plot, region: RectPositioned) {
     super(plot, `Legend`, region);
   }
 
@@ -515,7 +517,7 @@ export class Legend extends Sg.CanvasBox {
   protected measureSelf(
     opts: Sg.CanvasMeasureState,
     _parent?: Sg.Measurement
-  ): Rects.Rect | Rects.RectPositioned | string {
+  ): Rect | RectPositioned | string {
     const series = this.plot.seriesArray();
     const sample = this.sampleSize;
     const padding = this.padding;
@@ -698,7 +700,7 @@ export class AxisX extends Sg.CanvasBox {
   protected measureSelf(
     opts: Sg.CanvasMeasureState,
     _parent?: Sg.Measurement
-  ): Rects.Rect | Rects.RectPositioned | string {
+  ): Rect | RectPositioned | string {
     const plot = this.plot;
     const padding = this.paddingPx;
     const yAxis = opts.measurements.get(`AxisY`);
@@ -780,7 +782,7 @@ export class AxisY extends Sg.CanvasBox {
     }
   }
 
-  protected measureSelf(copts: Sg.CanvasMeasureState): Rects.Rect {
+  protected measureSelf(copts: Sg.CanvasMeasureState): Rect {
     //this.debugLog(`measureSelf. needsLayout: ${ this._needsLayoutX } needsDrawing: ${ this._needsDrawing }`);
 
     if (copts.ctx === undefined) throw new Error(`opts.ctx is undefined`);

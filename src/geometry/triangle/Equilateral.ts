@@ -1,6 +1,5 @@
-import { type Circle } from './Circle.js';
-import { type Point } from './points/Types.js';
-import { type Triangle } from './Triangle.js';
+
+import type { Triangle, Circle, Point } from '../Types.js';
 
 const pi4over3 = (Math.PI * 4) / 3;
 const pi2over3 = (Math.PI * 2) / 3;
@@ -35,9 +34,11 @@ const resolveLength = (t: TriangleEquilateral): number => {
  */
 export const fromCenter = (
   t: TriangleEquilateral,
-  origin: Point = { x: 0, y: 0 },
+  origin?: Point,
   rotationRad?: number
 ): Triangle => {
+  if (!origin) origin = Object.freeze({ x: 0, y: 0 })
+
   const r = resolveLength(t) / Math.sqrt(3);
   const rot = rotationRad ?? Math.PI * 1.5;
   const b = {
@@ -64,8 +65,10 @@ export const fromCenter = (
  */
 export const centerFromA = (
   t: TriangleEquilateral,
-  ptA: Point = { x: 0, y: 0 }
+  ptA?: Point
 ): Point => {
+  if (!ptA) ptA = Object.freeze({ x: 0, y: 0 })
+
   const r = resolveLength(t);
   const { radius } = incircle(t);
   return {
@@ -82,8 +85,10 @@ export const centerFromA = (
  */
 export const centerFromB = (
   t: TriangleEquilateral,
-  ptB: Point = { x: 0, y: 0 }
+  ptB?: Point
 ): Point => {
+  if (!ptB) ptB = Object.freeze({ x: 0, y: 0 })
+
   const { radius } = incircle(t);
   return {
     x: ptB.x,
@@ -99,8 +104,10 @@ export const centerFromB = (
  */
 export const centerFromC = (
   t: TriangleEquilateral,
-  ptC: Point = { x: 0, y: 0 }
+  ptC?: Point
 ): Point => {
+  if (!ptC) ptC = Object.freeze({ x: 0, y: 0 })
+
   const r = resolveLength(t);
   const { radius } = incircle(t);
 

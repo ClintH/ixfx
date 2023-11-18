@@ -1,16 +1,15 @@
 import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
 import { type ICircularArray } from '../collections/CircularArray.js';
 
-import { subtract as pointSubtract } from '../geometry/points/index.js';
+//import { subtract as pointSubtract } from '../geometry/points/index.js';
 import { resolveEl, parentSizeCanvas } from '../dom/Util.js';
-import { type Rect } from '../geometry/Rect.js';
+import type { Rect, Point } from '../geometry/Types.js';
 import { Colour, Drawing } from './index.js';
 import {
   ofArrayMutable,
   ofCircularMutable,
   type IMapOfMutableExtended,
 } from '../collections/map/index.js';
-import type { Point } from '../geometry/points/Types.js';
 
 export type Plotter = {
   add(value: number, series?: string, skipDrawing?: boolean): void;
@@ -687,6 +686,7 @@ export const plot = (
 
   canvasEl.addEventListener(`pointermove`, onPointerMove);
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ctx = canvasEl.getContext(`2d`)!;
 
   const capacity = opts.capacity ?? 10;

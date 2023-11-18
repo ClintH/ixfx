@@ -1,9 +1,7 @@
 import * as Lines from './Line.js';
 import * as Points from './points/index.js';
-import { type CirclePositioned } from './Circle.js';
+import type { Path, Point, CirclePositioned } from './Types.js';
 import { Arrays } from '../collections/index.js';
-import { type Path } from './Path.js';
-import type { Point } from './points/Types.js';
 
 export type Waypoint = CirclePositioned;
 

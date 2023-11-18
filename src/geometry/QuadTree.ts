@@ -1,8 +1,9 @@
 import { type TraversableTree } from '../collections/tree/Types.js';
-import { Points, Rects, Shapes } from './index.js';
-import type { Point } from './points/Types.js';
-import { type ShapePositioned } from './Shape.js';
-
+import { Shapes } from './index.js';
+import type { Point, RectPositioned, ShapePositioned } from './Types.js';
+import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
+import { intersectsPoint as RectsIntersectsPoint } from './rect/Intersects.js';
+import { fromNumbers as PointsFromNumbers } from './points/index.js';
 /**
  * Options for quad tree
  */
@@ -39,7 +40,7 @@ export type QuadTreeItem = Point | ShapePositioned;
  * @param opts Options
  * @returns New quad tree
  */
-export const quadTree = (bounds: Rects.RectPositioned, initialData: ReadonlyArray<QuadTreeItem> = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode => {
+export const quadTree = (bounds: RectPositioned, initialData: ReadonlyArray<QuadTreeItem> = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode => {
   const o: QuadTreeOpts = {
     maxItems: opts.maxItems ?? 4,
     maxLevels: opts.maxLevels ?? 4
@@ -69,7 +70,7 @@ export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
    */
   constructor(
     parent: QuadTreeNode | undefined,
-    readonly boundary: Rects.RectPositioned,
+    readonly boundary: RectPositioned,
     readonly level: number,
     readonly opts: QuadTreeOpts
   ) {
@@ -154,7 +155,7 @@ export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
    * @returns
    */
   couldHold(p: Point) {
-    return Rects.intersectsPoint(this.boundary, p);
+    return RectsIntersectsPoint(this.boundary, p);
   }
 
   #subdivide() {
@@ -164,8 +165,8 @@ export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
     const y = this.boundary.y;
 
     // top-left corners of each of the four new sections
-    const coords = Points.fromNumbers(x + w, y, x, y, x, y + h, x + w, y + h);
-    const rects = coords.map((p) => Rects.fromTopLeft(p, w, h));
+    const coords = PointsFromNumbers(x + w, y, x, y, x, y + h, x + w, y + h);
+    const rects = coords.map((p) => RectsFromTopLeft(p, w, h));
     // rects.forEach((r, index) => {
     //   this.descendants[index] = new QuadTreeNode(r, this.level + 1, this.opts);
     // });

@@ -1,7 +1,8 @@
 import test from 'ava';
-import { Points, degreeToRadian } from '../../geometry/index.js';
+import { Points } from '../../geometry/index.js';
 import * as Polar from '../../geometry/Polar.js';
-import type { Point } from '../../geometry/points/Types.js';
+import type { Point } from '../../geometry/Types.js';
+import { degreeToRadian } from '../../geometry/Angles.js';
 
 const closeEnough = (a: Point, b: Point): boolean => {
   a = Points.apply(a, Math.round);

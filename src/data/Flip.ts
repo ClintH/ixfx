@@ -1,5 +1,5 @@
-import { type NumberFunction } from './index.js';
 import { throwNumberTest } from '../Guards.js';
+import type { NumberFunction } from './Types.js';
 
 /**
  * Flips a percentage-scale number: `1 - v`.

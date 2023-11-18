@@ -1,7 +1,7 @@
 import { SimpleEventEmitter } from '../Events.js';
 import { msElapsedTimer, type TimerSource } from '../flow/index.js';
 import { type Timer } from '../flow/Timer.js';
-import { type Path } from '../geometry/Path.js';
+import type { Path } from '../geometry/Types.js';
 import * as Bezier from '../geometry/Bezier.js';
 import { scale } from '../data/Scale.js';
 import { interval } from '../flow/Interval.js';

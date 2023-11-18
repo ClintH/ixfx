@@ -5,8 +5,8 @@ import {
   type TimestampedObject,
 } from './TrackedValue.js';
 import { ObjectTracker } from './ObjectTracker.js';
-import { Lines, Polar, Vectors } from '../geometry/index.js';
-import type { Point } from '../geometry/points/Types.js';
+import { Lines, Vectors } from '../geometry/index.js';
+import type { Line, Point, PolarCoord, PolyLine } from '../geometry/Types.js';
 
 /**
  * Information about seen points
@@ -143,7 +143,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * Returns a polyline representation of stored points.
    * Returns an empty array if points were not saved, or there's only one.
    */
-  get line(): Lines.PolyLine {
+  get line(): PolyLine {
     if (this.values.length === 1) return [];
     return Lines.joinPointsToLines(...this.values);
   }
@@ -152,7 +152,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * Returns a vector of the initial/last points of the tracker.
    * Returns as a polar coordinate
    */
-  get vectorPolar(): Polar.Coord {
+  get vectorPolar(): PolarCoord {
     return Vectors.fromLinePolar(this.lineStartEnd);
   }
 
@@ -169,7 +169,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    *
    * If there are less than two points, Lines.Empty is returned
    */
-  get lineStartEnd(): Lines.Line {
+  get lineStartEnd(): Line {
     const initial = this.initial;
     if (this.values.length < 2 || !initial) return Lines.Empty;
     return {

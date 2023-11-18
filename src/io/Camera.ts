@@ -1,7 +1,8 @@
+import type { Rect } from '../geometry/Types.js';
 import { waitFor } from '../flow/WaitFor.js';
-import * as Rects from '../geometry/Rect.js';
+import { getErrorMessage } from '../debug/GetErrorMessage.js';
 
-const startTimeoutMs = 10000;
+const startTimeoutMs = 10_000;
 
 /**
  * Print available media devices to console
@@ -10,12 +11,12 @@ const startTimeoutMs = 10000;
 export const dumpDevices = async (filterKind = `videoinput`) => {
   const devices = await navigator.mediaDevices.enumerateDevices();
 
-  devices.forEach((d) => {
-    if (d.kind !== filterKind) return;
+  for (const d of devices) {
+    if (d.kind !== filterKind) continue;
     console.log(d.label);
-    console.log(` Kind: ${d.kind}`);
-    console.log(` Device id: ${d.deviceId}`);
-  });
+    console.log(` Kind: ${ d.kind }`);
+    console.log(` Device id: ${ d.deviceId }`);
+  }
 };
 
 /**
@@ -29,15 +30,15 @@ export type Constraints = {
   /**
    * Maximum resolution
    */
-  readonly max?: Rects.Rect;
+  readonly max?: Rect;
   /**
    * Minimum resolution
    */
-  readonly min?: Rects.Rect;
+  readonly min?: Rect;
   /**
    * Ideal resolution
    */
-  readonly ideal?: Rects.Rect;
+  readonly ideal?: Rect;
   /**
    * If specified, will try to use this media device id
    */
@@ -117,7 +118,7 @@ export const start = async (
 
   videoEl.classList.add(`ixfx-camera`);
 
-  document.body.appendChild(videoEl);
+  document.body.append(videoEl);
 
   //eslint-disable-next-line functional/no-let
   let stopVideo = () => {
@@ -141,11 +142,11 @@ export const start = async (
     const r = await startWithVideoEl(videoEl, constraints);
     stopVideo = r.dispose;
     return { videoEl, dispose };
-  } catch (ex) {
+  } catch (error) {
     // If it didn't work, delete the created element
-    console.error(ex);
+    console.error(error);
     dispose();
-    throw ex;
+    throw error;
   }
 };
 
@@ -162,9 +163,9 @@ const startWithVideoEl = async (
   if (videoEl === undefined) throw new Error(`videoEl undefined`);
   if (videoEl === null) throw new Error(`videoEl null`);
 
-  const maxRes = constraints.max;
-  const minRes = constraints.min;
-  const idealRes = constraints.ideal;
+  const maxResolution = constraints.max;
+  const minResolution = constraints.min;
+  const idealResolution = constraints.ideal;
 
   // Setup constraints
   const c = {
@@ -193,42 +194,42 @@ const startWithVideoEl = async (
     (c.video as any).deviceId = constraints.deviceId;
   }
 
-  if (idealRes) {
+  if (idealResolution) {
     //eslint-disable-next-line functional/immutable-data
     c.video.width = {
       ...c.video.width,
-      ideal: idealRes.width,
+      ideal: idealResolution.width,
     };
     //eslint-disable-next-line functional/immutable-data
     c.video.height = {
       ...c.video.height,
-      ideal: idealRes.height,
+      ideal: idealResolution.height,
     };
   }
 
-  if (maxRes) {
+  if (maxResolution) {
     //eslint-disable-next-line functional/immutable-data
     c.video.width = {
       ...c.video.width,
-      max: maxRes.width,
+      max: maxResolution.width,
     };
     //eslint-disable-next-line functional/immutable-data
     c.video.height = {
       ...c.video.height,
-      max: maxRes.height,
+      max: maxResolution.height,
     };
   }
 
-  if (minRes) {
+  if (minResolution) {
     //eslint-disable-next-line functional/immutable-data
     c.video.width = {
       ...c.video.width,
-      min: minRes.width,
+      min: minResolution.width,
     };
     //eslint-disable-next-line functional/immutable-data
     c.video.height = {
       ...c.video.height,
-      min: minRes.height,
+      min: minResolution.height,
     };
   }
 
@@ -236,7 +237,7 @@ const startWithVideoEl = async (
   const done = waitFor(
     constraints.startTimeoutMs ?? startTimeoutMs,
     (reason) => {
-      throw new Error(`Camera getUserMedia failed: ${reason}`);
+      throw new Error(`Camera getUserMedia failed: ${ reason }`);
     }
   );
 
@@ -247,7 +248,7 @@ const startWithVideoEl = async (
     const dispose = () => {
       videoEl.pause();
       const t = stream.getTracks();
-      t.forEach((track) => track.stop());
+      for (const track of t) track.stop();
     };
 
     // Assign to VIDEO element
@@ -255,23 +256,22 @@ const startWithVideoEl = async (
     videoEl.srcObject = stream;
     done();
 
-    const ret = { videoEl, dispose };
+    const returnValue = { videoEl, dispose };
     const p = new Promise<StartResult>((resolve, reject) => {
       videoEl.addEventListener(`loadedmetadata`, () => {
         videoEl
           .play()
           .then(() => {
-            resolve(ret);
+            resolve(returnValue);
           })
-          .catch((ex) => {
-            reject(ex);
+          .catch((error) => {
+            reject(error);
           });
       });
     });
     return p;
-  } catch (ex) {
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    done((ex as any).toString());
-    throw ex;
+  } catch (error) {
+    done(getErrorMessage(error));
+    throw error;
   }
 };

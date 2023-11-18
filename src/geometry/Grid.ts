@@ -1,10 +1,10 @@
-import { Rects } from './index.js';
+import type { Point, RectPositioned } from './Types.js';
+import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
 import { throwIntegerTest, throwNumberTest } from '../Guards.js';
 import { clampIndex } from '../data/Clamp.js';
 import { randomElement } from '../collections/arrays/index.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
 import { zipKeyValue } from '../collections/map/index.js';
-import type { Point } from './points/Types.js';
 
 export type GridVisual = Grid & {
   readonly size: number;
@@ -266,12 +266,12 @@ export const inside = (grid: Grid, cell: Cell): boolean => {
 export const rectangleForCell = (
   grid: GridVisual,
   cell: Cell
-): Rects.RectPositioned => {
+): RectPositioned => {
   guardCell(cell);
   const size = grid.size;
   const x = cell.x * size;
   const y = cell.y * size;
-  const r = Rects.fromTopLeft({ x: x, y: y }, size, size);
+  const r = RectsFromTopLeft({ x: x, y: y }, size, size);
   return r;
 };
 
@@ -288,7 +288,7 @@ export const rectangleForCell = (
  */
 export function* asRectangles(
   grid: GridVisual
-): IterableIterator<Rects.RectPositioned> {
+): IterableIterator<RectPositioned> {
   for (const c of cells(grid)) {
     yield rectangleForCell(grid, c);
   }
@@ -485,12 +485,12 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
     // eslint-disable-next-line functional/immutable-data
     cells.push(Object.freeze({ x: startX, y: startY }));
     if (startX === end.x && startY === end.y) break;
-    const e2 = 2 * error;
-    if (e2 > -dy) {
+    const error2 = 2 * error;
+    if (error2 > -dy) {
       error -= dy;
       startX += sx;
     }
-    if (e2 < dx) {
+    if (error2 < dx) {
       error += dx;
       startY += sy;
     }
@@ -691,6 +691,7 @@ export const offset = function (
       break;
     }
     default: {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unknown BoundsLogic case ${ bounds }`);
     }
   }
@@ -702,13 +703,13 @@ const neighbourList = (
   cell: Cell,
   directions: ReadonlyArray<CardinalDirection>,
   bounds: BoundsLogic
-): ReadonlyArray<Neighbour> => {
+): ReadonlyArray<NeighbourMaybe> => {
   // Get neighbours for cell
   const cellNeighbours = neighbours(grid, cell, bounds, directions);
 
   // Filter out undefined cells
   const entries = Object.entries(cellNeighbours);
-  return (entries as Array<NeighbourMaybe>).filter(isNeighbour);
+  return (entries as Array<NeighbourMaybe>).filter(n => isNeighbour(n));
 };
 
 /**
@@ -748,7 +749,6 @@ const neighbourList = (
  * @param visited Optional tracker of visited cells
  * @returns Cells
  */
-// eslint-disable-next-line functional/prefer-readonly-type
 export const visitor = function* (
   logic: VisitorLogic,
   grid: Grid,
@@ -759,24 +759,18 @@ export const visitor = function* (
   guardCell(start, `start`, grid);
 
   const v = opts.visited ?? mutable<Cell>(cellKeyString);
-  const possibleNeighbours = logic.options
-    ? logic.options
-    : (g: Grid, c: Cell) => neighbourList(g, c, crossDirections, `undefined`);
+  const possibleNeighbours = logic.options ?? ((g: Grid, c: Cell) => neighbourList(g, c, crossDirections, `undefined`));
 
   if (!isCell(start)) {
     throw new Error(`'start' parameter is undefined or not a cell`);
   }
 
-  // eslint-disable-next-line functional/no-let
   let cellQueue: Array<Cell> = [ start ];
-  // eslint-disable-next-line functional/no-let
   let moveQueue: Array<Neighbour> = [];
-  // eslint-disable-next-line functional/no-let
-  let current: Cell | null = null;
+  let current: Cell | undefined = undefined;
 
   while (cellQueue.length > 0) {
-    if (current === null) {
-      // eslint-disable-next-line functional/immutable-data
+    if (current === undefined) {
       const nv = cellQueue.pop();
       if (nv === undefined) {
         break;
@@ -789,17 +783,25 @@ export const visitor = function* (
       yield current;
 
       const nextSteps = possibleNeighbours(grid, current).filter(
-        (step) => !v.has(step[ 1 ])
+        (step) => {
+          if (step[ 1 ] === undefined) return false;
+          return !v.has(step[ 1 ])
+        }
       );
 
       if (nextSteps.length === 0) {
         // No more moves for this cell
-        if (current !== null) {
-          cellQueue = cellQueue.filter((cq) => cellEquals(cq, current!));
+        if (current !== undefined) {
+          cellQueue = cellQueue.filter((cq) => cellEquals(cq, current));
         }
       } else {
-        // eslint-disable-next-line functional/immutable-data
-        moveQueue.push(...nextSteps);
+        for (const n of nextSteps) {
+          if (n === undefined) continue;
+          if (n[ 1 ] === undefined) continue;
+          // @ts-expect-error
+          moveQueue.push(n);
+        }
+        //moveQueue.push(...nextSteps);
       }
     }
 
@@ -807,7 +809,7 @@ export const visitor = function* (
     moveQueue = moveQueue.filter((step) => !v.has(step[ 1 ]));
 
     if (moveQueue.length === 0) {
-      current = null;
+      current = undefined;
     } else {
       // Pick move
       const potential = logic.select(moveQueue);
@@ -891,9 +893,11 @@ export const visitorRandom = (
 
 export const visitorRow = (
   grid: Grid,
-  start: Cell = { x: 0, y: 0 },
+  start?: Cell,
   opts: VisitorOpts = {}
 ) => {
+  if (!start) start = { x: 0, y: 0 }
+
   const { reversed = false } = opts;
 
   const neighbourSelect = (nbos: ReadonlyArray<Neighbour>) =>
@@ -910,6 +914,7 @@ export const visitorRow = (
         cell = { x: cell.x - 1, y: cell.y };
       } else {
         // At the beginning of a row
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (cell.y > 0) {
           // Wrap to next row up
           cell = { x: grid.cols - 1, y: cell.y - 1 };
@@ -927,6 +932,7 @@ export const visitorRow = (
         cell = { x: cell.x + 1, y: cell.y };
       } else {
         // At the end of a row
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (cell.y < grid.rows - 1) {
           // More rows available, wrap to next row down
           cell = { x: 0, y: cell.y + 1 };
@@ -1029,6 +1035,7 @@ export const visitorColumn = (
           cell = { x: cell.x, y: cell.y - 1 };
         } else {
           // Top of column
+          // eslint-disable-next-line unicorn/prefer-ternary
           if (cell.x === 0) {
             // Top-left corner, need to wrap
             cell = { x: grid.cols - 1, y: grid.rows - 1 };
@@ -1043,6 +1050,7 @@ export const visitorColumn = (
           cell = { x: cell.x, y: cell.y + 1 };
         } else {
           // End of column
+          // eslint-disable-next-line unicorn/prefer-ternary
           if (cell.x < grid.cols - 1) {
             // Move to next column and start at top
             cell = { x: cell.x + 1, y: 0 };
@@ -1071,7 +1079,8 @@ export const visitorColumn = (
  * @param grid
  * @param start
  */
-export const rows = function* (grid: Grid, start: Cell = { x: 0, y: 0 }) {
+export const rows = function* (grid: Grid, start?: Cell) {
+  if (!start) start = { x: 0, y: 0 }
   //eslint-disable-next-line functional/no-let
   let row = start.y;
   //eslint-disable-next-line functional/no-let
@@ -1097,7 +1106,9 @@ export const rows = function* (grid: Grid, start: Cell = { x: 0, y: 0 }) {
  * @param grid
  * @param start
  */
-export const cells = function* (grid: Grid, start: Cell = { x: 0, y: 0 }) {
+export const cells = function* (grid: Grid, start?: Cell) {
+  if (!start) start = { x: 0, y: 0 }
+
   guardGrid(grid, `grid`);
   guardCell(start, `start`, grid);
 

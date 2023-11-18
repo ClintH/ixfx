@@ -1,4 +1,4 @@
-import type { ToString } from 'src/Util.js';
+import type { ToString } from '../../Util.js';
 import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
 import { type IMapOfMutableExtended } from './IMapOfMutableExtended.js';
 import { type MapMultiOpts, type MultiValue } from './MapMulti.js';

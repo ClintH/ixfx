@@ -1,15 +1,22 @@
-import { Polar, Rects } from '../index.js';
+import * as Polar from '../Polar.js';
+import * as Arrays from '../../collections/arrays/index.js';
 import { interpolate as lineInterpolate } from '../Line.js';
+import { isRect } from '../rect/Guard.js';
 import { throwNumberTest } from '../../Guards.js';
+import { distance } from './Distance.js';
 import { clamp as clampNumber } from '../../data/Clamp.js';
 import { wrap as wrapNumber } from '../../data/Wrap.js';
-import { Arrays } from '../../collections/index.js';
 import { type RandomSource, defaultRandom } from '../../random/Types.js';
 import { quantiseEvery as quantiseEveryNumber, round as roundNumber } from '../../Numbers.js';
-import type { Point3d, Point } from './Types.js';
+import { guard, guardNonZeroPoint, isPoint, isPoint3d } from './Guard.js';
+import { maxFromCorners as RectsMaxFromCorners } from '../rect/index.js';
+import { guard as RectsGuard } from '../rect/Guard.js'
+import type { Point, Point3d, Rect, RectPositioned } from '../Types.js';
 export * from './DistanceToCenter.js';
 export * from './DistanceToExterior.js';
-export * from './Types.js';
+export * from './Distance.js';
+export * from './Guard.js';
+
 /**
  * Returns a Point form of either a point, x,y params or x,y,z params.
  * If parameters are undefined, an empty point is returned (0, 0)
@@ -73,24 +80,6 @@ export const Empty = { x: 0, y: 0 } as const;
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Placeholder = Object.freeze({ x: Number.NaN, y: Number.NaN });
 
-/**
- * Returns true if both x and y is 0.
- * Use `Points.Empty` to return an empty point.
- * @param p
- * @returns
- */
-export const isEmpty = (p: Point) => p.x === 0 && p.y === 0;
-
-/**
- * Returns true if point is a placeholder, where both x and y
- * are `NaN`.
- *
- * Use Points.Placeholder to return a placeholder point.
- * @param p
- * @returns
- */
-export const isPlaceholder = (p: Point) =>
-  Number.isNaN(p.x) && Number.isNaN(p.y);
 
 /**
  * Returns true if p.x and p.y === null
@@ -168,106 +157,6 @@ export const leftmost = (...points: ReadonlyArray<Point>): Point =>
  */
 export const rightmost = (...points: ReadonlyArray<Point>): Point =>
   findMinimum((a, b) => (a.x >= b.x ? a : b), ...points);
-
-export function distance(a: Point, b?: Point): number;
-export function distance(a: Point, x: number, y: number): number;
-//export function distance(a: Point): number;
-
-
-/**
- * Calculate distance between two points.
- *
- * ```js`
- * // Distance between two points
- * const ptA = { x: 0.5, y:0.8 };
- * const ptB = { x: 1, y: 0.4 };
- * distance(ptA, ptB);
- * // Or, provide x,y as parameters
- * distance(ptA, 0.4, 0.9);
- *
- * // Distance from ptA to x: 0.5, y:0.8, z: 0.1
- * const ptC = { x: 0.5, y:0.5, z: 0.3 };
- * // With x,y,z as parameters:
- * distance(ptC, 0.5, 0.8, 0.1);
- * ``
- * @param a First point
- * @param xOrB Second point, or x coord
- * @param y y coord, if x coord is given
- * @param z Optional z coord, if x and y are given.
- * @returns
- */
-//eslint-disable-next-line func-style
-export function distance(
-  a: Point | Point3d,
-  xOrB?: Point | Point3d | number,
-  y?: number,
-  z?: number
-): number {
-  const pt = getPointParameter(xOrB, y, z);
-  guard(pt, `b`);
-  guard(a, `a`);
-  return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
-}
-
-
-
-/**
- * Throws an error if point is invalid
- * @param p
- * @param name
- */
-export function guard(p: Point, name = `Point`) {
-  if (p === undefined) {
-    throw new Error(
-      `'${ name }' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (p === null) {
-    throw new Error(
-      `'${ name }' is null. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (p.x === undefined) {
-    throw new Error(
-      `'${ name }.x' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (p.y === undefined) {
-    throw new Error(
-      `'${ name }.y' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (typeof p.x !== `number`) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    throw new TypeError(`'${ name }.x' must be a number. Got ${ p.x }`);
-  }
-  if (typeof p.y !== `number`) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    throw new TypeError(`'${ name }.y' must be a number. Got ${ p.y }`);
-  }
-
-  if (p.x === null) throw new Error(`'${ name }.x' is null`);
-  if (p.y === null) throw new Error(`'${ name }.y' is null`);
-
-  if (Number.isNaN(p.x)) throw new Error(`'${ name }.x' is NaN`);
-  if (Number.isNaN(p.y)) throw new Error(`'${ name }.y' is NaN`);
-}
-
-/**
- * Throws if parameter is not a valid point, or either x or y is 0
- * @param pt
- * @returns
- */
-export const guardNonZeroPoint = (pt: Point | Point3d, name = `pt`) => {
-  guard(pt, name);
-  throwNumberTest(pt.x, `nonZero`, `${ name }.x`);
-  throwNumberTest(pt.y, `nonZero`, `${ name }.y`);
-  if (typeof pt.z !== `undefined`) {
-    throwNumberTest(pt.z, `nonZero`, `${ name }.z`);
-  }
-
-  return true;
-};
 
 /**
  * Returns a point with Math.abs applied to x and y.
@@ -365,7 +254,7 @@ export const centroid = (...points: ReadonlyArray<Point | undefined>): Point => 
  * @param points
  * @returns
  */
-export const bbox = (...points: ReadonlyArray<Point>): Rects.RectPositioned => {
+export const bbox = (...points: ReadonlyArray<Point>): RectPositioned => {
   const leftMost = findMinimum((a, b) => {
     return a.x < b.x ? a : b;
   }, ...points);
@@ -383,32 +272,10 @@ export const bbox = (...points: ReadonlyArray<Point>): Rects.RectPositioned => {
   const topRight = { x: rightMost.x, y: topMost.y };
   const bottomRight = { x: rightMost.x, y: bottomMost.y };
   const bottomLeft = { x: leftMost.x, y: bottomMost.y };
-  return Rects.maxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
+  return RectsMaxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
 };
 
-/**
- * Returns _true_ if the parameter has x and y fields
- * @param p
- * @returns
- */
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-export function isPoint(p: number | unknown): p is Point {
-  if (p === undefined) return false;
-  if (p === null) return false;
-  if ((p as Point).x === undefined) return false;
-  if ((p as Point).y === undefined) return false;
-  return true;
-}
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-export const isPoint3d = (p: Point | unknown): p is Point3d => {
-  if (p === undefined) return false;
-  if (p === null) return false;
-  if ((p as Point3d).x === undefined) return false;
-  if ((p as Point3d).y === undefined) return false;
-  if ((p as Point3d).z === undefined) return false;
-  return true;
-};
 
 /**
  * Returns point as an array in the form [x,y]. This can be useful for some libraries
@@ -875,7 +742,7 @@ export const sum: Sum = function (
  * @param a
  * @param rect
  */
-export function multiply(a: Point, rectOrPoint: Rects.Rect | Point): Point;
+export function multiply(a: Point, rectOrPoint: Rect | Point): Point;
 
 /**
  * Returns `a` multipled by some x and/or y scaling factor
@@ -918,7 +785,7 @@ export function multiply(a: Point, x: number, y?: number): Point;
 /* eslint-disable func-style */
 export function multiply(
   a: Point,
-  bOrX: Rects.Rect | Point | number,
+  bOrX: Rect | Point | number,
   y?: number
 ): Point {
   // ✔️ Unit tested
@@ -935,8 +802,8 @@ export function multiply(
       x: a.x * bOrX.x,
       y: a.y * bOrX.y,
     });
-  } else if (Rects.isRect(bOrX)) {
-    Rects.guard(bOrX, `rect`);
+  } else if (isRect(bOrX)) {
+    RectsGuard(bOrX, `rect`);
     return Object.freeze({
       x: a.x * bOrX.width,
       y: a.y * bOrX.height,
@@ -998,7 +865,7 @@ export const multiplyScalar = (
  * @param a
  * @param Rect
  */
-export function divide(a: Point, rectOrPoint: Rects.Rect | Point): Point;
+export function divide(a: Point, rectOrPoint: Rect | Point): Point;
 
 /**
  * Divides a point by x,y.
@@ -1043,7 +910,7 @@ export function divide(x1: number, y1: number, x2?: number, y2?: number): Point;
  */
 export function divide(
   a: Point | number,
-  b: Rects.Rect | Point | number,
+  b: Rect | Point | number,
   c?: number,
   d?: number
 ): Point {
@@ -1057,8 +924,8 @@ export function divide(
         x: a.x / b.x,
         y: a.y / b.y,
       });
-    } else if (Rects.isRect(b)) {
-      Rects.guard(b, `rect`);
+    } else if (isRect(b)) {
+      RectsGuard(b, `rect`);
       return Object.freeze({
         x: a.x / b.width,
         y: a.y / b.height,
@@ -1383,7 +1250,7 @@ export function normaliseByRect(
   height: number
 ): Point;
 
-export function normaliseByRect(pt: Point, rect: Rects.Rect): Point;
+export function normaliseByRect(pt: Point, rect: Rect): Point;
 
 /**
  * Normalises x,y by width and height so it is on a 0..1 scale
@@ -1409,7 +1276,7 @@ export function normaliseByRect(
  */
 export function normaliseByRect(
   a: Point | number,
-  b: number | Rects.Rect,
+  b: number | Rect,
   c?: number,
   d?: number
 ): Point {
@@ -1419,7 +1286,7 @@ export function normaliseByRect(
       throwNumberTest(b, `positive`, `width`);
       throwNumberTest(c, `positive`, `height`);
     } else {
-      if (!Rects.isRect(b)) {
+      if (!isRect(b)) {
         throw new Error(`Expected second parameter to be a rect`);
       }
       c = b.height;

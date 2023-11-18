@@ -1,10 +1,11 @@
 import { Observable, debounceTime, fromEvent } from 'rxjs';
 import * as Points from '../geometry/points/index.js';
 import JSON5 from 'json5';
-import { Rects, Scaler } from '../geometry/index.js';
+import { Scaler } from '../geometry/index.js';
+import { multiply as RectsMultiply } from '../geometry/rect/Multiply.js';
 import type { CardinalDirection } from '../geometry/Grid.js';
-import { cardinal } from '../geometry/Rect.js';
-import type { Point } from '../geometry/points/Types.js';
+import { cardinal } from '../geometry/rect/index.js';
+import type { Point, Rect } from '../geometry/Types.js';
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
@@ -356,13 +357,13 @@ export const canvasHelper = (
   const ratio = Math.round(window.devicePixelRatio) || 1;
   const scaleBy = opts.scaleBy ?? `both`;
 
-  let scaler: Scaler.Scaler = Scaler.scaler(`both`);
+  let scaler: Scaler.ScalerCombined = Scaler.scaler(`both`);
 
-  const updateDimensions = (rect: Rects.Rect) => {
+  const updateDimensions = (rect: Rect) => {
     // Create a new scaler
     scaler = Scaler.scaler(scaleBy, rect);
 
-    const pixelScaled = Rects.multiply(rect, ratio, ratio);
+    const pixelScaled = RectsMultiply(rect, ratio, ratio);
 
     el.width = pixelScaled.width;
     el.height = pixelScaled.height;

@@ -1,25 +1,7 @@
-import type { Point } from './points/Types.js';
-import { Lines, Beziers, Rects, Points } from './index.js';
+import * as Lines from './Line.js';
+import * as Beziers from './Bezier.js';
+import type { Point, Path } from './Types.js';
 
-export type Path = {
-  length(): number
-  /**
-     * Returns a point at a relative (0.0-1.0) position along the path
-     *
-     * @param {number} t Relative position (0.0-1.0)
-     * @returns {Point} Point
-     */
-  interpolate(t: number): Point
-  bbox(): Rects.RectPositioned
-  /**
-   * Returns the nearest point on path to `point`
-   * @param point 
-   */
-  nearest(point: Point): Point
-  toString(): string
-  toSvgString(): ReadonlyArray<string>
-  readonly kind: `compound` | `elliptical` | `circular` | `arc` | `bezier/cubic` | `bezier/quadratic` | `line`
-}
 /**
  * Return the start point of a path
  *

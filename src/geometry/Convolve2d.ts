@@ -1,12 +1,12 @@
-import {type Rgb} from '../visual/Colour.js';
-import {ImageDataGrid} from '../visual/index.js';
+import { type Rgb } from '../visual/Colour.js';
+import * as ImageDataGrid from '../visual/ImageDataGrid.js';
 import * as Grids from './Grid.js';
 
-export type Kernel = readonly (readonly number[])[];
-export type CellWithValue<V> = readonly [cell: Grids.Cell, value: V | undefined];
-export type ScalarAndValue<V> = readonly [scalar: number, v: V | undefined];
+export type Kernel = ReadonlyArray<ReadonlyArray<number>>;
+export type CellWithValue<V> = readonly [ cell: Grids.Cell, value: V | undefined ];
+export type ScalarAndValue<V> = readonly [ scalar: number, v: V | undefined ];
 export type KernelCompute = <V>(offset: Grids.Cell, value: V) => V;
-export type KernelReduce<V> = (values: readonly ScalarAndValue<V>[]) => V | undefined;
+export type KernelReduce<V> = (values: ReadonlyArray<ScalarAndValue<V>>) => V | undefined;
 
 /**
  * Multiply every element of kernel by the same `scalar` value.
@@ -17,16 +17,16 @@ export type KernelReduce<V> = (values: readonly ScalarAndValue<V>[]) => V | unde
  */
 export const multiply = (kernel: Kernel, scalar: number): Kernel => {
   const rows = kernel.length;
-  const cols = kernel[0].length;
-  const copy: number[][] = [];
+  const cols = kernel[ 0 ].length;
+  const copy: Array<Array<number>> = [];
   //eslint-disable-next-line functional/no-let
   for (let row = 0; row < rows; row++) {
     //eslint-disable-next-line functional/immutable-data
-    copy[row] = [];
+    copy[ row ] = [];
     //eslint-disable-next-line functional/no-let
     for (let col = 0; col < cols; col++) {
       //eslint-disable-next-line functional/immutable-data
-      copy[row][col] = kernel[row][col] * scalar;
+      copy[ row ][ col ] = kernel[ row ][ col ] * scalar;
     }
   }
   return copy;
@@ -34,10 +34,10 @@ export const multiply = (kernel: Kernel, scalar: number): Kernel => {
 
 
 export function convolveCell<V>(c: Grids.Cell, kernel: Kernel2dArray, source: Grids.Grid, access: Grids.CellAccessor<V>, reduce: KernelReduce<V>): V | undefined {
-  const valuesAtKernelPos: ScalarAndValue<V>[] = kernel.map(o => {
-    const pos = Grids.offset(source, c, o[0], `stop`); // `stop` avoids fringing at extents of image
-    if (!pos) return [o[1], undefined];
-    return [o[1], access(pos, `undefined`)];
+  const valuesAtKernelPos: Array<ScalarAndValue<V>> = kernel.map(o => {
+    const pos = Grids.offset(source, c, o[ 0 ], `stop`); // `stop` avoids fringing at extents of image
+    if (!pos) return [ o[ 1 ], undefined ];
+    return [ o[ 1 ], access(pos, `undefined`) ];
   });
   return reduce(valuesAtKernelPos);
 }
@@ -48,7 +48,7 @@ export function convolveCell<V>(c: Grids.Cell, kernel: Kernel2dArray, source: Gr
  * @param image 
  */
 export function* convolveImage(kernel: Kernel, image: ImageData) {
-  const grid = {rows: image.width, cols: image.height};
+  const grid = { rows: image.width, cols: image.height };
   const imageDataAsGrid = ImageDataGrid.accessor(image);
 
   yield* convolve(kernel, grid, imageDataAsGrid, Grids.cells(grid), rgbReducer);
@@ -60,18 +60,18 @@ export function* convolve<V>(kernel: Kernel, source: Grids.Grid, access: Grids.C
   // Use middle, eg 3x3 = 1,1
   if (!origin) {
     const kernelRows = kernel.length;
-    const kernelCols = kernel[0].length;
-    origin = {x: Math.floor(kernelRows / 2), y: Math.floor(kernelCols / 2)};
+    const kernelCols = kernel[ 0 ].length;
+    origin = { x: Math.floor(kernelRows / 2), y: Math.floor(kernelCols / 2) };
   }
 
   const asArray = kernel2dToArray(kernel, origin);
   for (const c of visitor) {
     const v = convolveCell<V>(c, asArray, source, access, reduce);
-    yield [c, v];
+    yield [ c, v ];
   }
 }
 
-export type Kernel2dArray = ReadonlyArray<readonly [cell: Grids.Cell, value: number]>;
+export type Kernel2dArray = ReadonlyArray<readonly [ cell: Grids.Cell, value: number ]>;
 
 /**
  * For a given kernel, returns an array of offsets. These
@@ -83,22 +83,22 @@ export type Kernel2dArray = ReadonlyArray<readonly [cell: Grids.Cell, value: num
 export const kernel2dToArray = (kernel: Kernel, origin?: Grids.Cell): Kernel2dArray => {
   const offsets: Kernel2dArray = [];
   const rows = kernel.length;
-  const cols = kernel[0].length;
-  if (!origin) origin = {x: Math.floor(rows / 2), y: Math.floor(cols / 2)};
+  const cols = kernel[ 0 ].length;
+  if (!origin) origin = { x: Math.floor(rows / 2), y: Math.floor(cols / 2) };
 
   //eslint-disable-next-line functional/no-let
   for (let xx = 0; xx < rows; xx++) {
     //eslint-disable-next-line functional/no-let
     for (let yy = 0; yy < cols; yy++) {
       //eslint-disable-next-line functional/immutable-data
-      // @ts-ignore
-      offsets.push([{x: xx - origin.x, y: yy - origin.y}, kernel[xx][yy]]);
+      // @ts-expect-error
+      offsets.push([ { x: xx - origin.x, y: yy - origin.y }, kernel[ xx ][ yy ] ]);
     }
   }
   return offsets;
 };
 
-export const rgbReducer: KernelReduce<Rgb> = (values: readonly ScalarAndValue<Rgb>[]) => {
+export const rgbReducer: KernelReduce<Rgb> = (values: ReadonlyArray<ScalarAndValue<Rgb>>) => {
   //eslint-disable-next-line functional/no-let
   let r = 0;
   //eslint-disable-next-line functional/no-let
@@ -108,9 +108,9 @@ export const rgbReducer: KernelReduce<Rgb> = (values: readonly ScalarAndValue<Rg
   //eslint-disable-next-line functional/no-let
   const opacity = 0;
   //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < values.length; i++) {
-    const rgb = values[i][1];
-    const scale = values[i][0];
+  for (const value of values) {
+    const rgb = value[ 1 ];
+    const scale = value[ 0 ];
     if (rgb === undefined) continue;
     if (rgb.opacity === 0) continue;
     if (scale === 0) continue;
@@ -129,48 +129,48 @@ export const rgbReducer: KernelReduce<Rgb> = (values: readonly ScalarAndValue<Rg
   return result;
 };
 export const identityKernel = [
-  [0, 0, 0],
-  [0, 1, 0],
-  [0, 0, 0]
+  [ 0, 0, 0 ],
+  [ 0, 1, 0 ],
+  [ 0, 0, 0 ]
 ];
 
 
 export const edgeDetectionKernel = [
-  [0, -1, 0],
-  [-1, 4, -1],
-  [0, -1, 0]
+  [ 0, -1, 0 ],
+  [ -1, 4, -1 ],
+  [ 0, -1, 0 ]
 ];
 
 export const sharpenKernel = [
-  [0, -1, 0],
-  [-1, 5, -1],
-  [0, -1, 0]
+  [ 0, -1, 0 ],
+  [ -1, 5, -1 ],
+  [ 0, -1, 0 ]
 ];
 
 export const boxBlurKernel = multiply([
-  [1, 1, 1],
-  [1, 1, 1],
-  [1, 1, 1]
+  [ 1, 1, 1 ],
+  [ 1, 1, 1 ],
+  [ 1, 1, 1 ]
 ], 1 / 9);
 
 export const gaussianBlur3Kernel = multiply([
-  [1, 2, 1],
-  [2, 4, 2],
-  [1, 2, 1]
+  [ 1, 2, 1 ],
+  [ 2, 4, 2 ],
+  [ 1, 2, 1 ]
 ], 1 / 16);
 
 export const gaussianBlur5Kernel = multiply([
-  [1, 4, 6, 4, 1],
-  [4, 16, 24, 16, 4],
-  [6, 24, 36, 24, 6],
-  [4, 16, 24, 16, 4],
-  [1, 4, 6, 4, 1],
+  [ 1, 4, 6, 4, 1 ],
+  [ 4, 16, 24, 16, 4 ],
+  [ 6, 24, 36, 24, 6 ],
+  [ 4, 16, 24, 16, 4 ],
+  [ 1, 4, 6, 4, 1 ],
 ], 1 / 256);
 
 export const unsharpMasking5Kernel = multiply([
-  [1, 4, 6, 4, 1],
-  [4, 16, 24, 16, 4],
-  [6, 24, -476, 24, 6],
-  [4, 16, 24, 16, 4],
-  [1, 4, 6, 4, 1],
+  [ 1, 4, 6, 4, 1 ],
+  [ 4, 16, 24, 16, 4 ],
+  [ 6, 24, -476, 24, 6 ],
+  [ 4, 16, 24, 16, 4 ],
+  [ 1, 4, 6, 4, 1 ],
 ], -1 / 256);

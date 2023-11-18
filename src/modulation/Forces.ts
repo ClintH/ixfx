@@ -2,10 +2,10 @@
  * Acknowledgements: much of the work here is an adapation from Daniel Shiffman's excellent _The Nature of Code_ website.
  */
 import { Points, Polar } from '../geometry/index.js';
-import { type Point } from '../geometry/points/Types.js';
+import type { Rect, Point } from '../geometry/Types.js';
 import { clamp } from '../data/Clamp.js';
 import { interpolateAngle } from '../data/Interpolate.js';
-import { type Rect, getEdgeX, getEdgeY } from '../geometry/Rect.js';
+import { getEdgeX, getEdgeY } from '../geometry/rect/index.js';
 
 /**
  * Logic for applying mass
@@ -103,9 +103,10 @@ export const guard = (t: ForceAffected, name = `t`) => {
  * @returns A function that can perform bounce logic
  */
 export const constrainBounce = (
-  bounds: Rect = { width: 1, height: 1 },
+  bounds?: Rect,
   dampen = 1
 ) => {
+  if (!bounds) bounds = { width: 1, height: 1 }
   const minX = getEdgeX(bounds, `left`);
   const maxX = getEdgeX(bounds, `right`);
   const minY = getEdgeY(bounds, `top`);
@@ -116,9 +117,8 @@ export const constrainBounce = (
       t.position ?? Points.Empty,
       t.velocity ?? Points.Empty
     );
-    //eslint-disable-next-line functional/no-let
+
     let velocity = t.velocity ?? Points.Empty;
-    //eslint-disable-next-line functional/no-let
     let { x, y } = position;
 
     if (x > maxX) {
@@ -176,7 +176,6 @@ export const attractionForce =
     distanceRange: { readonly min?: number; readonly max?: number } = {}
   ) =>
     (attractee: ForceAffected): ForceAffected => {
-      //eslint-disable-next-line functional/no-let
       let accel = attractee.acceleration ?? Points.Empty;
       for (const a of attractors) {
         if (a === attractee) continue;
@@ -437,7 +436,7 @@ const massApplyAccel = (
   thing: ForceAffected,
   mass: MassApplication = `ignored`
 ) => {
-  //eslint-disable-next-line functional/no-let
+
   let op;
   switch (mass) {
     case `dampen`: {
@@ -457,6 +456,7 @@ const massApplyAccel = (
     }
     default: {
       throw new Error(
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         `Unknown 'mass' parameter '${ mass }. Expected 'dampen', 'multiply' or 'ignored'`
       );
     }
@@ -643,11 +643,11 @@ export const springForce =
     damping = 0.999
   ) =>
     (t: ForceAffected): ForceAffected => {
-      const dir = Points.subtract(t.position ?? Points.Empty, pinnedAt);
-      const mag = Points.distance(dir);
+      const direction = Points.subtract(t.position ?? Points.Empty, pinnedAt);
+      const mag = Points.distance(direction);
       const stretch = Math.abs(restingLength - mag);
 
-      const f = Points.pipelineApply(dir, Points.normalise, (p) =>
+      const f = Points.pipelineApply(direction, Points.normalise, (p) =>
         Points.multiply(p, -k * stretch)
       );
 
@@ -715,16 +715,17 @@ export type PendulumOpts = {
  * @returns
  */
 export const pendulumForce =
-  (pinnedAt: Point = { x: 0.5, y: 0 }, opts: PendulumOpts = {}) =>
+  (pinnedAt?: Point, opts: PendulumOpts = {}) =>
     (t: ForceAffected): ForceAffected => {
+      if (!pinnedAt) pinnedAt = { x: 0, y: 0 };
       const length =
         opts.length ?? Points.distance(pinnedAt, t.position ?? Points.Empty);
       const speed = opts.speed ?? 0.001;
       const damping = opts.damping ?? 0.995;
 
-      //eslint-disable-next-line functional/no-let
       let angle = t.angle;
       if (angle === undefined) {
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (t.position) {
           angle = Points.angle(pinnedAt, t.position) - Math.PI / 2;
         } else {

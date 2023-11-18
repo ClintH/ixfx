@@ -1,6 +1,7 @@
 import { Bezier as BezierLibrary } from 'bezier-js';
-import { Paths, Rects, Lines } from './index.js';
-import type { Point } from './points/Types.js';
+import { interpolate as LinesInterpolate } from './Line.js';
+import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
+import type { Point, Path } from './Types.js';
 
 export type QuadraticBezier = {
   readonly a: Point,
@@ -8,7 +9,7 @@ export type QuadraticBezier = {
   readonly quadratic: Point
 }
 
-export type QuadraticBezierPath = Paths.Path & QuadraticBezier;
+export type QuadraticBezierPath = Path & QuadraticBezier;
 export type CubicBezier = {
   readonly a: Point,
   readonly b: Point,
@@ -16,10 +17,10 @@ export type CubicBezier = {
   readonly cubic2: Point,
 }
 
-export type CubicBezierPath = Paths.Path & CubicBezier;
+export type CubicBezierPath = Path & CubicBezier;
 
-export const isQuadraticBezier = (path: Paths.Path | QuadraticBezier | CubicBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
-export const isCubicBezier = (path: Paths.Path | CubicBezier | QuadraticBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
+export const isQuadraticBezier = (path: Path | QuadraticBezier | CubicBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
+export const isCubicBezier = (path: Path | CubicBezier | QuadraticBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
 
 /**
  * Returns a new quadratic bezier with specified bend amount
@@ -42,7 +43,7 @@ export const quadraticSimple = (start: Point, end: Point, bend = 0): QuadraticBe
   if (Number.isNaN(bend)) throw new Error(`bend is NaN`);
   if (bend < -1 || bend > 1) throw new Error(`Expects bend range of -1 to 1`);
 
-  const middle = Lines.interpolate(0.5, start, end);
+  const middle = LinesInterpolate(0.5, start, end);
   // eslint-disable-next-line functional/no-let
   let target = middle;
   if (end.y < start.y) {
@@ -55,7 +56,7 @@ export const quadraticSimple = (start: Point, end: Point, bend = 0): QuadraticBe
       { x: Math.min(start.x, end.x), y: Math.max(start.y, end.y) };
   }
 
-  const handle = Lines.interpolate(Math.abs(bend), middle, target,);
+  const handle = LinesInterpolate(Math.abs(bend), middle, target,);
   return quadratic(start, end, handle);
 };
 
@@ -110,7 +111,7 @@ const cubicToPath = (cubic: CubicBezier): CubicBezierPath => {
       if (xSize === undefined) throw new Error(`x.size not present on calculated bbox`);
       if (ySize === undefined) throw new Error(`x.size not present on calculated bbox`);
 
-      return Rects.fromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
+      return RectsFromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
     },
     toString: () => bzr.toString(),
     toSvgString: () => [ `brrup` ],
@@ -139,7 +140,7 @@ const quadratictoPath = (quadraticBezier: QuadraticBezier): QuadraticBezierPath 
       const ySize = y.size;
       if (xSize === undefined) throw new Error(`x.size not present on calculated bbox`);
       if (ySize === undefined) throw new Error(`x.size not present on calculated bbox`);
-      return Rects.fromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
+      return RectsFromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
     },
     toString: () => bzr.toString(),
     toSvgString: () => quadraticToSvgString(a, b, quadratic),

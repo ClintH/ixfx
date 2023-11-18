@@ -1,5 +1,5 @@
 import test from 'ava';
-import { degreeToRadian, radianToDegree } from '../../geometry/index.js';
+import { degreeToRadian, radianToDegree } from '../../geometry/Angles.js';
 /* eslint-disable */
 
 test(`degreeToRadian`, (t) => {

@@ -3,8 +3,6 @@ import {
   sortByNumericProperty,
   reducePairwise,
   mergeByKey,
-  zip,
-  valuesEqual,
   ensureLength,
   remove,
   compareValues,
@@ -14,9 +12,11 @@ import {
   unique,
   filterBetween,
   flatten,
+  zip,
   without
 } from '../../collections/arrays/index.js';
 import { arrayValuesEqual } from '../util.js';
+import { valuesEqual } from '../../collections/arrays/ValuesEqual.js';
 
 test('without', t => {
 

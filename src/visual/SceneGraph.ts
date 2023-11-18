@@ -1,11 +1,14 @@
-import type { Point } from '../geometry/points/Types.js';
 import { Arrays } from '../collections/index.js';
 import { Points } from '../geometry/index.js';
-import * as Rects from '../geometry/Rect.js';
+import * as Rects from '../geometry/rect/index.js';
+import { intersectsPoint as RectsIntersectsPoint } from '../geometry/rect/Intersects.js';
+import { isPlaceholder as RectsIsPlaceholder } from '../geometry/rect/Guard.js';
+import { placeholderPositioned as RectsPlaceholderPositioned, placeholder as RectsPlaceholder, emptyPositioned as RectsEmptyPositioned } from '../geometry/rect/index.js';
 import { hue as randomHue } from '../random/index.js';
+import type { Rect, RectPositioned, Point } from '../geometry/Types.js';
 
 export type Measurement = {
-  actual: Rects.Rect;
+  actual: Rect;
   ref: Box;
   children: Array<Measurement | undefined>;
 };
@@ -46,7 +49,7 @@ export const boxRectFromPx = (x: number, y: number, width: number, height: numbe
     height: boxUnitFromPx(height)
   }
 }
-export const boxRectFromRectPx = (r: Rects.RectPositioned): BoxRect => {
+export const boxRectFromRectPx = (r: RectPositioned): BoxRect => {
   return {
     x: boxUnitFromPx(r.x),
     y: boxUnitFromPx(r.y),
@@ -77,9 +80,9 @@ const boxRectIsEqual = (
 };
 
 class BaseState {
-  bounds: Rects.RectPositioned;
+  bounds: RectPositioned;
   pass: number;
-  constructor(bounds: Rects.RectPositioned) {
+  constructor(bounds: RectPositioned) {
     this.bounds = bounds;
     this.pass = 0;
   }
@@ -98,7 +101,7 @@ class BaseState {
     throw new Error(`Unknown unit type: ${ u.type }`);
   }
 
-  resolveBox(box: BoxRect | undefined): Rects.Rect | Rects.RectPositioned | undefined {
+  resolveBox(box: BoxRect | undefined): Rect | RectPositioned | undefined {
     if (box === undefined) return undefined;
     const x = this.resolveToPx(box.x, this.bounds.width);
     const y = this.resolveToPx(box.y, this.bounds.height);
@@ -119,15 +122,15 @@ class BaseState {
 export class MeasureState extends BaseState {
   measurements: Map<string, Measurement>;
 
-  constructor(bounds: Rects.RectPositioned) {
+  constructor(bounds: RectPositioned) {
     super(bounds);
     this.measurements = new Map<string, Measurement>();
   }
 
-  getActualSize(id: string): Rects.Rect | undefined {
+  getActualSize(id: string): Rect | undefined {
     const s = this.measurements.get(id);
     if (s === undefined) return;
-    if (Rects.isPlaceholder(s.actual)) return;
+    if (RectsIsPlaceholder(s.actual)) return;
     return s.actual;
   }
 
@@ -139,7 +142,7 @@ export class MeasureState extends BaseState {
 export class LayoutState extends BaseState {
   layouts: Map<string, Layout>;
 
-  constructor(bounds: Rects.RectPositioned) {
+  constructor(bounds: RectPositioned) {
     super(bounds);
     this.layouts = new Map<string, Layout>();
   }
@@ -150,11 +153,11 @@ export class LayoutState extends BaseState {
 export abstract class Box {
 
   /** Rectangle Box occupies in canvas/etc */
-  canvasRegion: Rects.RectPositioned = Rects.placeholderPositioned;
+  canvasRegion: RectPositioned = RectsPlaceholderPositioned;
 
   private _desiredRect: BoxRect | undefined;
 
-  protected _measuredSize: Rects.Rect | undefined;
+  protected _measuredSize: Rect | undefined;
   protected _layoutPosition: Point | undefined;
 
   protected children: Array<Box> = [];
@@ -463,7 +466,7 @@ export abstract class Box {
     const m: Measurement = {
       ref: this,
       // So far no known measurement
-      actual: Rects.placeholder,
+      actual: RectsPlaceholder,
       children: [],
     };
     // Stash away measurement by id
@@ -471,9 +474,9 @@ export abstract class Box {
 
     if (!this._visible && !this.takesSpaceWhenInvisible) {
       // If we're not visible, there's no actual size
-      m.actual = Rects.emptyPositioned;
+      m.actual = RectsEmptyPositioned;
     } else {
-      let currentMeasurement: Rects.Rect | string | undefined = this._measuredSize;
+      let currentMeasurement: Rect | string | undefined = this._measuredSize;
 
       // If we need to, measure how big it actually is
       if (this._needsMeasuring || this._measuredSize === undefined) {
@@ -514,15 +517,15 @@ export abstract class Box {
   protected measureSelf(
     opts: MeasureState,
     parent?: Measurement
-  ): Rects.Rect | string {
-    let size = Rects.placeholder;
+  ): Rect | string {
+    let size = RectsPlaceholder;
 
     const context = parent ? parent.actual : opts.bounds;
     const desired = opts.resolveBox(this._desiredRect);
 
     size = desired ? Rects.clamp(desired, context) : context;
 
-    if (Rects.isPlaceholder(size)) {
+    if (RectsIsPlaceholder(size)) {
       return `Box.measureSelf - No size for box?`;
     }
     return size;
@@ -603,7 +606,7 @@ export abstract class Box {
  */
 export class CanvasMeasureState extends MeasureState {
   readonly ctx: CanvasRenderingContext2D;
-  constructor(bounds: Rects.RectPositioned, ctx: CanvasRenderingContext2D) {
+  constructor(bounds: RectPositioned, ctx: CanvasRenderingContext2D) {
     super(bounds);
     this.ctx = ctx;
     if (ctx === undefined) throw new Error(`ctx is undefined`);
@@ -612,7 +615,7 @@ export class CanvasMeasureState extends MeasureState {
 
 export class CanvasLayoutState extends LayoutState {
   readonly ctx: CanvasRenderingContext2D;
-  constructor(bounds: Rects.RectPositioned, ctx: CanvasRenderingContext2D) {
+  constructor(bounds: RectPositioned, ctx: CanvasRenderingContext2D) {
     super(bounds);
     this.ctx = ctx;
     if (ctx === undefined) throw new Error(`ctx is undefined`);
@@ -624,12 +627,12 @@ export class CanvasLayoutState extends LayoutState {
  * A Box that exists on a HTMLCanvasElement
  */
 export class CanvasBox extends Box {
-  readonly bounds: Rects.RectPositioned | undefined;
+  readonly bounds: RectPositioned | undefined;
   constructor(
     parent: CanvasBox | undefined,
     //canvasElement: HTMLCanvasElement,
     id: string,
-    bounds?: Rects.RectPositioned
+    bounds?: RectPositioned
   ) {
     super(parent, id);
     this.bounds = bounds;
@@ -671,8 +674,8 @@ export class CanvasBox extends Box {
    * @returns 
    */
   private notifyClick(p: Point) {
-    if (Rects.isPlaceholder(this.canvasRegion)) return;
-    if (Rects.intersectsPoint(this.canvasRegion, p)) {
+    if (RectsIsPlaceholder(this.canvasRegion)) return;
+    if (RectsIntersectsPoint(this.canvasRegion, p)) {
       const pp = Points.subtract(p, this.canvasRegion.x, this.canvasRegion.y);
       this.onClick(pp);
       // TODO: Only call `notifyClick` if child is within range?
@@ -696,8 +699,8 @@ export class CanvasBox extends Box {
    * @returns 
    */
   private notifyPointerMove(p: Point) {
-    if (Rects.isPlaceholder(this.canvasRegion)) return;
-    if (Rects.intersectsPoint(this.canvasRegion, p)) {
+    if (RectsIsPlaceholder(this.canvasRegion)) return;
+    if (RectsIntersectsPoint(this.canvasRegion, p)) {
       const pp = Points.subtract(p, this.canvasRegion.x, this.canvasRegion.y);
       this.onPointerMove(pp);
       for (const c of this.children) (c as CanvasBox).notifyPointerMove(pp);
@@ -731,7 +734,7 @@ export class CanvasBox extends Box {
     this.draw(context, force);
   }
 
-  getBounds(): Rects.RectPositioned | undefined {
+  getBounds(): RectPositioned | undefined {
     return this.bounds === undefined && this._parent ? (this._parent as CanvasBox).bounds : this.bounds;
   }
 
@@ -771,18 +774,18 @@ export class CanvasBox extends Box {
 
   protected updateComplete(_measureChanged: boolean, _layoutChanged: boolean): void {
     //this.debugLog(`updateComplete. measureChanged: ${ _measureChanged } layoutChanged: ${ _layoutChanged } pos: ${ JSON.stringify(this._layoutPosition) }`);
-    this.canvasRegion = Rects.placeholderPositioned;
+    this.canvasRegion = RectsPlaceholderPositioned;
   }
 
   protected measureApply(m: Measurement): boolean {
     const different = super.measureApply(m);
-    if (different) this.canvasRegion = Rects.placeholderPositioned;
+    if (different) this.canvasRegion = RectsPlaceholderPositioned;
     return different;
   }
 
   protected layoutApply(l: Layout): boolean {
     const different = super.layoutApply(l);
-    if (different) this.canvasRegion = Rects.placeholderPositioned;
+    if (different) this.canvasRegion = RectsPlaceholderPositioned;
     return different;
   }
 
@@ -792,7 +795,7 @@ export class CanvasBox extends Box {
     // if (!this._needsDrawing && !force) return;
 
     if (this._needsDrawing || force) {
-      if (Rects.isPlaceholder(this.canvasRegion)) {
+      if (RectsIsPlaceholder(this.canvasRegion)) {
         if (this._layoutPosition === undefined) return;
         if (this._measuredSize === undefined) return;
         this.canvasRegion = {

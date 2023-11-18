@@ -1,6 +1,4 @@
-import { Points, Triangles } from './index.js';
-import { type Circle } from './Circle.js';
-import type { Point } from './points/Types.js';
+import type { Point, Circle, Triangle } from '../Types.js';
 
 export type Right = {
   readonly adjacent?: number;
@@ -31,8 +29,9 @@ export type DefinedRight = {
  */
 export const fromA = (
   t: Right,
-  origin: Point = { x: 0, y: 0 }
-): Triangles.Triangle => {
+  origin?: Point
+): Triangle => {
+  if (!origin) origin = Object.freeze({ x: 0, y: 0 })
   const tt = resolveLengths(t);
   const seg = hypotenuseSegments(t);
   const h = height(t);
@@ -59,8 +58,10 @@ export const fromA = (
  */
 export const fromB = (
   t: Right,
-  origin: Point = { x: 0, y: 0 }
-): Triangles.Triangle => {
+  origin?: Point
+): Triangle => {
+  if (!origin) origin = Object.freeze({ x: 0, y: 0 })
+
   const tt = resolveLengths(t);
   const seg = hypotenuseSegments(t);
   const h = height(t);
@@ -93,8 +94,10 @@ export const fromB = (
  */
 export const fromC = (
   t: Right,
-  origin: Point = { x: 0, y: 0 }
-): Triangles.Triangle => {
+  origin?: Point
+): Triangle => {
+  if (!origin) origin = Object.freeze({ x: 0, y: 0 })
+
   const seg = hypotenuseSegments(t);
   const h = height(t);
   const c = { x: origin.x, y: origin.y };
@@ -119,7 +122,7 @@ export const resolveLengths = (t: Right): DefinedRight => {
       ...t,
       adjacent: a,
       opposite: o,
-      hypotenuse: Math.sqrt(a * a + o * o),
+      hypotenuse: Math.hypot(a, o),
     };
   } else if (a && h) {
     return {

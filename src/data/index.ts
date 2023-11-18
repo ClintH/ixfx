@@ -47,6 +47,6 @@ export * from './Interpolate.js';
 export * from './Wrap.js';
 export * as Correlate from './Correlate.js';
 export * as Pool from './Pool.js';
-
+export * from './Types.js';
 export const piPi = Math.PI * 2;
-export type NumberFunction = () => number;
+

@@ -1,9 +1,8 @@
-import * as Rects from './Rect.js';
+import * as Rects from './rect/index.js';
 import * as Grids from './Grid.js';
 import * as Points from './points/index.js';
 import { Arrays } from '../collections/index.js';
-import type { Point } from './points/Types.js';
-
+import type { RectPositioned, Point } from "./Types.js";
 export type PoissonDiskOpts = {
   readonly radius?: number;
   readonly limit?: number;
@@ -30,7 +29,7 @@ const isPointValid = (
 // https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm
 // http://extremelearning.com.au/an-improved-version-of-bridsons-algorithm-n-for-poisson-disc-sampling/
 export const poissonDisk = (
-  rect: Rects.RectPositioned,
+  rect: RectPositioned,
   opts: PoissonDiskOpts
 ) => {
   const radius = opts.radius ?? 1;
