@@ -3,7 +3,7 @@ import { nullUndef } from '../../Guards.js';
 import { last } from '../../IterableSync.js';
 import * as TreeArrayBacked from './TreeMutable.js';
 import { isPrimitive } from '../../KeyValue.js';
-import type { TraversableTree, Node, SimplifiedNode } from './Types.js';
+import type { TraversableTree, TreeNode, SimplifiedNode } from './Types.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
 export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: Array<string> }>;
 export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
@@ -56,7 +56,7 @@ export const prettyPrint = (
   ) : t;
 };
 
-export const toStringDeep = (node: Node<Entry | EntryStatic>, indent = 0) => {
+export const toStringDeep = (node: TreeNode<Entry | EntryStatic>, indent = 0) => {
   let t = ` `.repeat(indent) + ` ` + node.value?.name;
   if (node.value !== undefined) {
     if (`sourceValue` in node.value && `nodeValue` in node.value) {
@@ -386,14 +386,14 @@ export type CreateOptions = {
  * @param defaultName 
  * @returns 
  */
-export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): Node<EntryStatic> => {
+export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): TreeNode<EntryStatic> => {
   const valuesAtLeaves = options.valuesAtLeaves ?? false;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   const valueFor = valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
   return createImpl(node, valueFor(node), options, []);
 }
 
-const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Partial<CreateOptions> = {}, ancestors: Array<string>): Node<EntryStatic> => {
+const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Partial<CreateOptions> = {}, ancestors: Array<string>): TreeNode<EntryStatic> => {
   const defaultName = options.name ?? `object_ci`;
   //onsole.log(`createImpl name: ${ defaultName } nodeValue: ${ JSON.stringify(nodeValue) }`);
   const r = TreeArrayBacked.root<EntryStatic>({ name: defaultName, value: nodeValue, ancestors: [ ...ancestors ] });

@@ -1,5 +1,5 @@
 import * as TreeArrayBacked from "./TreeMutable.js";
-import type { LabelledValue, LabelledNode, Node } from "./Types.js";
+import type { LabelledValue, LabelledNode, TreeNode } from "./Types.js";
 /**
  * Options for parsing a path
  */
@@ -51,7 +51,7 @@ export type PathOpts = Readonly<{
  * @returns 
  */
 export const create = <T>(pathOpts: Partial<PathOpts> = {}) => {
-  let root: Node<LabelledValue<T>> | undefined;
+  let root: TreeNode<LabelledValue<T>> | undefined;
 
   const add = (value: T, path: string) => {
     const n = addValueByPath(value, path, root, pathOpts);

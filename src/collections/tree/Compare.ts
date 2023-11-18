@@ -1,6 +1,6 @@
 import { type IsEqual, isEqualValueIgnoreOrder } from "../../IsEqual.js";
 import * as TreeMutable from './TreeMutable.js';
-import type { Node, TraversableTree } from './Types.js';
+import type { TreeNode, TraversableTree } from './Types.js';
 
 export type DiffAnnotation<T> = {
   /**
@@ -29,7 +29,7 @@ export type DiffAnnotation<T> = {
   removed: Array<TraversableTree<T>>
 }
 
-export type DiffNode<T> = Node<DiffAnnotation<T>> & {
+export type DiffNode<T> = TreeNode<DiffAnnotation<T>> & {
   toString: () => string
 };
 

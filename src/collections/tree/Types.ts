@@ -12,10 +12,10 @@ export type LabelledValues<TValue> = {
 /**
  * Array-backed tree node
  */
-export type Node<TValue> = {
-  parent: Node<TValue> | undefined
+export type TreeNode<TValue> = {
+  parent: TreeNode<TValue> | undefined
   value: TValue | undefined
-  childrenStore: ReadonlyArray<Node<TValue>>
+  childrenStore: ReadonlyArray<TreeNode<TValue>>
 }
 
 export type SimplifiedNode<TValue> = {
@@ -23,7 +23,7 @@ export type SimplifiedNode<TValue> = {
   childrenStore: ReadonlyArray<SimplifiedNode<TValue>>
 }
 
-export type LabelledNode<TValue> = Node<LabelledValue<TValue>>;
+export type LabelledNode<TValue> = TreeNode<LabelledValue<TValue>>;
 
 export type TraversableTree<TValue> = {
   /**

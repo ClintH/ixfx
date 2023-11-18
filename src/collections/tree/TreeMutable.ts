@@ -4,20 +4,20 @@ import { QueueMutable } from "../queue/QueueMutable.js"
 import { StackMutable } from "../stack/StackMutable.js"
 import { compare as treeCompare } from './Compare.js';
 import { toStringAbbreviate } from "../../Text.js"
-import type { LabelledSingleValue, Node, SimplifiedNode, TraversableTree } from "./Types.js"
+import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree } from "./Types.js"
 
-export const compare = <T>(a: Node<T>, b: Node<T>, eq?: IsEqual<T>) => {
+export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>) => {
   return treeCompare(asDynamicTraversable(a), asDynamicTraversable(b), eq);
 }
 
 /**
- * Converts `Node` to `SimplifiedNode`, removing the 'parent' fields.
+ * Converts `TreeNode` to `SimplifiedNode`, removing the 'parent' fields.
  * This can be useful because if you have the whole tree, the parent field
  * is redundant and because it makes circular references can make dumping to console etc more troublesome.
  * @param node 
  * @returns 
  */
-export const stripParentage = <T>(node: Node<T>): SimplifiedNode<T> => {
+export const stripParentage = <T>(node: TreeNode<T>): SimplifiedNode<T> => {
   const n: SimplifiedNode<T> = {
     value: node.value,
     childrenStore: node.childrenStore.map(c => stripParentage(c))
@@ -25,13 +25,13 @@ export const stripParentage = <T>(node: Node<T>): SimplifiedNode<T> => {
   return n;
 }
 /**
- * Wraps a {@link Node} for a more object-oriented means of access.
+ * Wraps a {@link TreeNode} for a more object-oriented means of access.
  */
 export type WrappedNode<T> = TraversableTree<T> & {
   /**
    * Underlying Node
    */
-  wraps: Node<T>,
+  wraps: TreeNode<T>,
   /**
    * Gets value, if defined
    * @returns Value of Node
@@ -47,7 +47,7 @@ export type WrappedNode<T> = TraversableTree<T> & {
    * @param child 
    * @returns 
    */
-  add: (child: WrappedNode<T> | Node<T>) => WrappedNode<T>
+  add: (child: WrappedNode<T> | TreeNode<T>) => WrappedNode<T>
   /**
    * Adds a new child node, with `value` as its value
    * @param value 
@@ -59,29 +59,29 @@ export type WrappedNode<T> = TraversableTree<T> & {
    * @param child 
    * @returns 
    */
-  hasChild: (child: WrappedNode<T> | Node<T>) => boolean
+  hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
   /**
    * Returns _true_ if `child` is contained any any descendant
    * @param child
    * @returns 
    */
-  hasAnyChild: (child: WrappedNode<T> | Node<T>) => boolean
+  hasAnyChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
   /**
    * Returns _true_ if `parent` is the immediate parent for this node
    * @param parent 
    * @returns 
    */
-  hasParent: (parent: WrappedNode<T> | Node<T>) => boolean
+  hasParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean
   /**
    * Returns _true_ if `parent` is the immediate or ancestor parent for this node
    * @param parent 
    * @returns 
    */
-  hasAnyParent: (parent: WrappedNode<T> | Node<T>) => boolean
+  hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean
 }
 
-const unwrapped = <T>(node: Node<T> | WrappedNode<T>) => (`wraps` in node) ? node.wraps : node;
-const wrapped = <T>(node: Node<T> | WrappedNode<T>) => (`wraps` in node) ? node : wrap(node);
+const unwrapped = <T>(node: TreeNode<T> | WrappedNode<T>) => (`wraps` in node) ? node.wraps : node;
+const wrapped = <T>(node: TreeNode<T> | WrappedNode<T>) => (`wraps` in node) ? node : wrap(node);
 
 /**
  * Wraps node `n` for a more object-oriented means of access.
@@ -90,7 +90,7 @@ const wrapped = <T>(node: Node<T> | WrappedNode<T>) => (`wraps` in node) ? node 
  * @param n Node to wrap
  * @returns 
  */
-export const wrap = <T>(n: Node<T>): WrappedNode<T> => {
+export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
   return {
     *children() {
       for (const c of n.childrenStore) {
@@ -100,16 +100,16 @@ export const wrap = <T>(n: Node<T>): WrappedNode<T> => {
     getValue: () => n.value as T,
     getIdentity: () => n,
     getParent: () => n.parent === undefined ? undefined : wrap(n.parent),
-    hasParent: (parent: WrappedNode<T> | Node<T>): boolean => {
+    hasParent: (parent: WrappedNode<T> | TreeNode<T>): boolean => {
       return hasParent(n, unwrapped(parent));
     },
-    hasAnyParent: (parent: WrappedNode<T> | Node<T>): boolean => {
+    hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>): boolean => {
       return hasAnyParent(n, unwrapped(parent));
     },
-    hasChild: (child: WrappedNode<T> | Node<T>): boolean => {
+    hasChild: (child: WrappedNode<T> | TreeNode<T>): boolean => {
       return hasChild(unwrapped(child), n);
     },
-    hasAnyChild: (child: WrappedNode<T> | Node<T>): boolean => {
+    hasAnyChild: (child: WrappedNode<T> | TreeNode<T>): boolean => {
       return hasAnyChild(unwrapped(child), n);
     },
     remove: () => {
@@ -119,7 +119,7 @@ export const wrap = <T>(n: Node<T>): WrappedNode<T> => {
       const nodeValue = addValue(value, n);
       return wrap(nodeValue);
     },
-    add: (child: WrappedNode<T> | Node<T>): WrappedNode<T> => {
+    add: (child: WrappedNode<T> | TreeNode<T>): WrappedNode<T> => {
       add(unwrapped(child), n);
       return wrapped(child);
     },
@@ -133,7 +133,7 @@ export const wrap = <T>(n: Node<T>): WrappedNode<T> => {
  * @param child 
  * @returns 
  */
-export const remove = <T>(child: Node<T>) => {
+export const remove = <T>(child: TreeNode<T>) => {
   const p = child.parent;
   if (p === undefined) return;
   child.parent = undefined;
@@ -145,11 +145,11 @@ export const remove = <T>(child: Node<T>) => {
  * @param node 
  * @returns 
  */
-export function* depthFirst<T>(node: Node<T>): IterableIterator<Node<T>> {
+export function* depthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>> {
   if (!root) return;
-  const stack = new StackMutable<Node<T>>();
+  const stack = new StackMutable<TreeNode<T>>();
   stack.push(...node.childrenStore);
-  let entry: Node<T> | undefined = stack.pop();
+  let entry: TreeNode<T> | undefined = stack.pop();
   while (entry) {
     yield entry;
     if (entry) {
@@ -165,11 +165,11 @@ export function* depthFirst<T>(node: Node<T>): IterableIterator<Node<T>> {
  * @param node 
  * @returns 
  */
-export function* breadthFirst<T>(node: Node<T>): IterableIterator<Node<T>> {
+export function* breadthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>> {
   if (!node) return;
-  const queue = new QueueMutable<Node<T>>();
+  const queue = new QueueMutable<TreeNode<T>>();
   queue.enqueue(...node.childrenStore);
-  let entry: Node<T> | undefined = queue.dequeue();
+  let entry: TreeNode<T> | undefined = queue.dequeue();
   while (entry) {
     yield entry;
     if (entry) {
@@ -186,7 +186,7 @@ export function* breadthFirst<T>(node: Node<T>): IterableIterator<Node<T>> {
  * @param seen 
  * @returns 
  */
-export function treeTest<T>(root: Node<T>, seen: Array<Node<T>> = []): [ ok: boolean, msg: string, node: Node<T> ] {
+export function treeTest<T>(root: TreeNode<T>, seen: Array<TreeNode<T>> = []): [ ok: boolean, msg: string, node: TreeNode<T> ] {
   if (root.parent === root) return [ false, `Root has itself as parent`, root ];
   if (seen.includes(root)) return [ false, `Same node instance is appearing further in tree`, root ];
   seen.push(root);
@@ -206,7 +206,7 @@ export function treeTest<T>(root: Node<T>, seen: Array<Node<T>> = []): [ ok: boo
  * @param root 
  * @returns 
  */
-export function throwTreeTest<T>(root: Node<T>) {
+export function throwTreeTest<T>(root: TreeNode<T>) {
   const v = treeTest(root);
   if (v[ 0 ]) return;
   throw new Error(`${ v[ 1 ] } Node: ${ toStringAbbreviate(v[ 2 ].value, 30) }`, { cause: v[ 2 ] })
@@ -215,7 +215,7 @@ export function throwTreeTest<T>(root: Node<T>) {
  * Iterate over direct children of `root`
  * @param root 
  */
-export function* children<T>(root: Node<T>): IterableIterator<Node<T>> {
+export function* children<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
   for (const c of root.childrenStore) {
     yield c;
   }
@@ -225,7 +225,7 @@ export function* children<T>(root: Node<T>): IterableIterator<Node<T>> {
  * Iterate over all parents of `root`. First result is the immediate parent.
  * @param root 
  */
-export function* parents<T>(root: Node<T>): IterableIterator<Node<T>> {
+export function* parents<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
   let p = root.parent;
   while (p) {
     yield p;
@@ -233,14 +233,14 @@ export function* parents<T>(root: Node<T>): IterableIterator<Node<T>> {
   }
 }
 
-export const hasChild = <T>(child: Node<T>, parent: Node<T>) => {
+export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
   for (const c of parent.childrenStore) {
     if (c === child) return true;
   }
   return false;
 }
 
-export const findChildByValue = <T>(value: T, parent: Node<T>, eq: IsEqual<T> = isEqualDefault) => {
+export const findChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault) => {
   for (const c of parent.childrenStore) {
     if (eq(value, c.value as T)) return c;
   }
@@ -256,20 +256,20 @@ export const findChildByValue = <T>(value: T, parent: Node<T>, eq: IsEqual<T> = 
  * @param parent 
  * @returns 
  */
-export const hasAnyChild = <T>(prospectiveChild: Node<T>, parent: Node<T>) => {
+export const hasAnyChild = <T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T>) => {
   for (const c of breadthFirst(parent)) {
     if (c === prospectiveChild) return true;
   }
   return false;
 }
 
-export const findAnyChildByValue = <T>(value: T, parent: Node<T>, eq: IsEqual<T> = isEqualDefault) => {
+export const findAnyChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault) => {
   for (const c of breadthFirst(parent)) {
     if (eq(c.value as T, value)) return c;
   }
 }
 
-export const getRoot = <T>(node: Node<T>): Node<T> => {
+export const getRoot = <T>(node: TreeNode<T>): TreeNode<T> => {
   if (node.parent) return getRoot(node.parent);
   return node;
 }
@@ -283,7 +283,7 @@ export const getRoot = <T>(node: Node<T>): Node<T> => {
  * @param prospectiveParent 
  * @returns 
  */
-export const hasAnyParent = <T>(child: Node<T>, prospectiveParent: Node<T>) => {
+export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>) => {
   for (const p of parents(child)) {
     if (p === prospectiveParent) return true;
   }
@@ -299,7 +299,7 @@ export const hasAnyParent = <T>(child: Node<T>, prospectiveParent: Node<T>) => {
  * @param prospectiveParent 
  * @returns 
  */
-export const hasParent = <T>(child: Node<T>, prospectiveParent: Node<T>) => {
+export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>) => {
   return child.parent === prospectiveParent;
 }
 
@@ -314,11 +314,11 @@ export const hasParent = <T>(child: Node<T>, prospectiveParent: Node<T>) => {
  * @param node 
  * @returns 
  */
-export const computeMaxDepth = <T>(node: Node<T>) => {
+export const computeMaxDepth = <T>(node: TreeNode<T>) => {
   return computeMaxDepthImpl(node, 0);
 }
 
-const computeMaxDepthImpl = <T>(node: Node<T>, startingDepth = 0) => {
+const computeMaxDepthImpl = <T>(node: TreeNode<T>, startingDepth = 0) => {
   let depth = startingDepth;
   for (const c of node.childrenStore) {
     depth = Math.max(depth, computeMaxDepthImpl(c, startingDepth + 1));
@@ -326,7 +326,7 @@ const computeMaxDepthImpl = <T>(node: Node<T>, startingDepth = 0) => {
   return depth;
 }
 
-export const add = <T>(child: Node<T>, parent: Node<T>) => {
+export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
   throwAttemptedChild(child, parent);
   //if (hasAnyChild(parent, child)) throw new Error(`Parent already contains child`);
   //if (hasAnyParent(child, parent)) throw new Error(`Child already has parent`);
@@ -338,7 +338,7 @@ export const add = <T>(child: Node<T>, parent: Node<T>) => {
   }
 }
 
-export const addValue = <T>(value: T | undefined, parent: Node<T>) => {
+export const addValue = <T>(value: T | undefined, parent: TreeNode<T>) => {
   return createNode(value, parent);
 }
 
@@ -352,7 +352,7 @@ export const root = <T>(value?: T | undefined) => {
   return createNode(value);
 }
 
-export const fromPlainObject = (value: Record<string, any>, label = ``, parent?: Node<any>, seen: Array<any> = []): Node<LabelledSingleValue<any>> => {
+export const fromPlainObject = (value: Record<string, any>, label = ``, parent?: TreeNode<any>, seen: Array<any> = []): TreeNode<LabelledSingleValue<any>> => {
   const entries = Object.entries(value);
   parent = parent === undefined ? root() : addValue<LabelledSingleValue<any>>({ label, value }, parent);
   for (const entry of entries) {
@@ -380,8 +380,8 @@ export const rootWrapped = <T>(value: T | undefined) => {
   return wrap(createNode(value));
 }
 
-export const createNode = <T>(value: T | undefined, parent?: Node<T> | undefined): Node<T> => {
-  const n: Node<T> = {
+export const createNode = <T>(value: T | undefined, parent?: TreeNode<T> | undefined): TreeNode<T> => {
+  const n: TreeNode<T> = {
     childrenStore: [],
     parent: parent,
     value: value
@@ -392,11 +392,11 @@ export const createNode = <T>(value: T | undefined, parent?: Node<T> | undefined
   return n;
 }
 
-export const childrenLength = <T>(node: Node<T>): number => {
+export const childrenLength = <T>(node: TreeNode<T>): number => {
   return node.childrenStore.length;
 }
 
-export const value = <T>(node: Node<T>): T | undefined => {
+export const value = <T>(node: TreeNode<T>): T | undefined => {
   return node.value;
 }
 
@@ -407,7 +407,7 @@ export const value = <T>(node: Node<T>): T | undefined => {
  * @param node 
  * @returns 
  */
-export const asDynamicTraversable = <T>(node: Node<T>): TraversableTree<T> => {
+export const asDynamicTraversable = <T>(node: TreeNode<T>): TraversableTree<T> => {
   const t: TraversableTree<T> = {
     *children() {
       for (const c of node.childrenStore) {
@@ -428,7 +428,7 @@ export const asDynamicTraversable = <T>(node: Node<T>): TraversableTree<T> => {
   return t;
 }
 
-const throwAttemptedChild = <T>(c: Node<T>, parent: Node<T>) => {
+const throwAttemptedChild = <T>(c: TreeNode<T>, parent: TreeNode<T>) => {
   if (parent === c) throw new Error(`Cannot add self as child`);
   if (c.parent === parent) return; // skip if it's already a child
   if (hasAnyParent(parent, c)) throw new Error(`Child contains parent (1)`, { cause: c });
@@ -436,7 +436,7 @@ const throwAttemptedChild = <T>(c: Node<T>, parent: Node<T>) => {
   if (hasAnyChild(parent, c)) throw new Error(`Child contains parent (2)`, { cause: c });
 }
 
-export const setChildren = <T>(parent: Node<T>, children: Array<Node<T>>) => {
+export const setChildren = <T>(parent: TreeNode<T>, children: Array<TreeNode<T>>) => {
   // Verify children are legit
   for (const c of children) {
     throwAttemptedChild(c, parent);
@@ -448,7 +448,7 @@ export const setChildren = <T>(parent: Node<T>, children: Array<Node<T>>) => {
   }
 }
 
-export const toStringDeep = <T>(node: Node<T>, indent = 0): string => {
+export const toStringDeep = <T>(node: TreeNode<T>, indent = 0): string => {
   const t = `${ `  `.repeat(indent) } + ${ node.value ? JSON.stringify(node.value) : `-` }`;
   return node.childrenStore.length > 0 ? (
     t +
@@ -457,7 +457,7 @@ export const toStringDeep = <T>(node: Node<T>, indent = 0): string => {
   ) : t;
 }
 
-export function* followValue<T>(root: Node<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth = 1): IterableIterator<T | undefined> {
+export function* followValue<T>(root: TreeNode<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth = 1): IterableIterator<T | undefined> {
   for (const c of root.childrenStore) {
     const value = c.value;
     if (value === undefined) continue;
