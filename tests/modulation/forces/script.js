@@ -101,7 +101,7 @@ const basicTest = () => {
     mass: 1
   };
 
-  // In relative coordintes
+  // In relative coordinates
   const liquid = {
     width: 1,
     height: 0.5,
