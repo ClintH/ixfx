@@ -35,6 +35,12 @@ test('untilMatch', (t) => {
 
   t.is(untilMatch('Hello.There.Poppet', '.', { startPos: 6 }), 'There');
 
+  // With fallback
+  t.is(untilMatch(`Hello There`, '!', { fallback: `Bob` }), `Bob`);
+  t.throws(() => untilMatch(`Hello There`, '!', { ifNoMatch: `throw` }));
+  t.is(untilMatch(`Hello There`, '!', { ifNoMatch: `original` }), `Hello There`);
+  t.throws(() => untilMatch(`Hello There`, '!', { ifNoMatch: `fallback` }));
+
 });
 
 test('splitByLength', (t) => {

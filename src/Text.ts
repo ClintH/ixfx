@@ -192,13 +192,31 @@ export const splitByLength = (
   return returnValue;
 };
 
+export type UntilMatchOptions = MatchOptions & {
+  ifNoMatch: `throw` | `original` | `fallback`,
+  fallback?: string
+}
+
 /**
- * Returns the `source` string up until (and excluding) `match`. If match is not
- * found, all of `source` is returned.
+ * Returns the `source` string up until (and excluding) `match`. 
+ * 
+ * By default, if match is not found, all of `source` is returned.
  *
  * ```js
  * // Yields `apple `
  * untilMarch(`apple orange melon`, `orange`);
+ * ```
+ * 
+ * If match is not found, fallback can be returned instead:
+ * ```js
+ * // Yields 'lemon'
+ * untilMatch(`apple orange mellon`, `kiwi`, { fallback: `lemon` });
+ * ```
+ * 
+ * Or an exception thrown
+ * ```js
+ * // Throws
+ * untilMatch(`apple orange mellon`, `kiwi`, { ifNoMatch: `throw` });
  * ```
  * @param source
  * @param match
@@ -207,18 +225,28 @@ export const splitByLength = (
 export const untilMatch = (
   source: string,
   match: string,
-  options: MatchOptions = {}
+  options: Partial<UntilMatchOptions> = {}
 ): string => {
   //  ✔️ Unit tested
+  let fallback = options.fallback;
+  const ifNoMatch = options.ifNoMatch ?? (fallback ? `fallback` : `original`);
+  if (ifNoMatch === `original`) fallback = source;
+  if (ifNoMatch === `fallback` && fallback === undefined) throw new Error(`Fallback must be provided`);
   const startPos = options.startPos ?? undefined;
   const fromEnd = options.fromEnd ?? false;
   const m = fromEnd
     ? source.lastIndexOf(match, startPos)
     : source.indexOf(match, startPos);
 
-  if (m < 0) return source;
+  if (m < 0) {
+    if (ifNoMatch === `throw`) throw new Error(`Match string not found in source`);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return fallback!;
+  }
   return source.slice(startPos ?? 0, m);
 };
+
+
 
 export type MatchOptions = {
   readonly startPos?: number;
