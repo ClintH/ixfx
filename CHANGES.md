@@ -1,5 +1,20 @@
 A rough changelog between NPM releases
 
+# 0.16.0 24.11.23
+
+Text.untilMatch: options for how to handle when there is no match. Before the source string is returned. Now it can optionally throw an error or yield a fallback.
+
+Geometry
+* Circles.interiorIntegerPoints: iterate integer points within a circle
+* Circles.exteriorIntegerPoints: iterate integer points that define the circumference
+
+IterableSync
+* unique: changed to compare by object reference
+* uniqueByValue: compare by value
+
+Modulation
+* jitter: Bug fix with min/max value polarity
+
 # 0.15.0 09.11.23
 Collections
 * Major changes to Trees module
