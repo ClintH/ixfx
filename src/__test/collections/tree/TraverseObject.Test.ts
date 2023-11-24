@@ -2,6 +2,7 @@ import test from 'ava';
 import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children, toStringDeep } from '../../../collections/tree/TraverseObject.js';
 import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
 import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
+import * as TreeCompare from '../../../collections/tree/Compare.js';
 import { isEqualValueDefault, isEqualValuePartial } from '../../../IsEqual.js';
 
 function getTestMap() {
@@ -315,3 +316,65 @@ test('get-by-path', (t) => {
   ]);
 
 });
+
+test(`tree-object-compare`, t => {
+  const generate = () => ({
+    person: {
+      name: `Jane`,
+      size: 20
+    },
+    thing: {
+      value: true,
+      subValue: {
+        red: 0.5,
+        green: 1,
+        blue: 0
+      }
+    }
+  })
+
+  const v1 = generate();
+  const v2 = generate();
+  v2.thing.subValue.blue = Math.random();
+  const tree1 = create(v1, { valuesAtLeaves: true });
+  const tree2 = create(v2, { valuesAtLeaves: true });
+  const diff1 = TreeMutable.compare(tree1, create(v1, { valuesAtLeaves: true }));
+  t.is(diff1.value?.added.length, 0);
+  t.is(diff1.value?.removed.length, 0);
+  t.false(diff1.value?.childChanged);
+  t.false(diff1.value?.valueChanged);
+
+  const diff2 = TreeMutable.compare(tree1, tree2);
+  t.is(diff2.value?.added.length, 0);
+  t.is(diff2.value?.removed.length, 0);
+  t.true(diff2.value?.childChanged);
+  t.false(diff2.value?.valueChanged);
+
+  let valueChanged = 0;
+  let childChanged = 0;
+  let changedNode;
+
+  // Top level changes
+  for (const diff2Kid of diff2.childrenStore) {
+    const v = diff2Kid.value;
+    if (v === undefined) continue;
+    if (v.valueChanged) valueChanged++;
+    if (v.childChanged) childChanged++;
+    if (v.childChanged) changedNode = diff2Kid;
+  }
+
+  t.is(valueChanged, 0);
+  t.is(childChanged, 1);
+
+  // if (changedNode) {
+  //   for (const diff2KidKid of changedNode?.childrenStore) {
+  //     console.log(diff2KidKid.toString());
+
+  //   }
+  // }
+  //console.log(diff2);
+  //console.log(toStringDeep(tree1));
+  //console.log(toStringDeep(tree2));
+
+
+})
