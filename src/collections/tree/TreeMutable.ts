@@ -6,6 +6,16 @@ import { compare as treeCompare } from './Compare.js';
 import { toStringAbbreviate } from "../../Text.js"
 import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree } from "./Types.js"
 
+/**
+ * Compares two nodes.
+ * 
+ * By default uses `isEqualValueIgnoreOrder` to compare nodes. This means
+ * values of nodes will be compared, ignoring the order of fields.
+ * @param a 
+ * @param b 
+ * @param eq Comparison function. Uses `isEqualValueIgnoreOrder` by default.
+ * @returns Compare results
+ */
 export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>) => {
   return treeCompare(asDynamicTraversable(a), asDynamicTraversable(b), eq);
 }
