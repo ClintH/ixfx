@@ -323,7 +323,7 @@ export function* traceByPath<T extends object>(
  * @param parent 
  * @returns 
  */
-export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions>, ancestors: Array<string> = [], parent?: TraversableTree<EntryStatic> | undefined,): TraversableTree<EntryStatic> => {
+export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: Array<string> = [], parent?: TraversableTree<EntryStatic> | undefined,): TraversableTree<EntryStatic> => {
   const name = options.name ?? `object`;
   const t: TraversableTree<EntryStatic> = {
     *children() {
