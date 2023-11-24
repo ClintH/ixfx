@@ -1,19 +1,59 @@
+import { type ToString, toStringDefault } from './Util.js';
+import { type IsEqual } from './IsEqual.js';
+
 export { slice } from './iterable/SliceSync.js';
 
 /**
- * Return `it` broken up into chunks of `size`
- *
+ * Filters the `input` iterable, only yielding unique values. Use {@link unique} to compare
+ * by object reference instead.
+ * 
  * ```js
- * chunks([1,2,3,4,5,6,7,8,9,10], 3);
- * // Yields: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
+ * const d = ['a', 'b', 'c', 'b', 'd' ];
+ * for (const v of uniqueByValue(d)) {
+ *  // Yields: 'a', 'b', 'c', 'd'
+ * // (extra 'b' is skipped)
+ * }
  * ```
- * @param it
- * @param size
- * @returns
+ * 
+ * By default, JSON.stringify is used to create a string representing value. These are added
+ * to a Set of strings, which is how we keep track of uniqueness. If the value is already a string it is used as-is.
+ * 
+ * This allows you to have custom logic for what determines uniqueness. Eg, using a single field
+ * of an object as an identifier:
+ * 
+ * ```js
+ * const people = [
+ *  { name: `Mary`, size: 20 }, { name: `Abdul`, size: 19 }, { name: `Mary`, size: 5 }
+ * ]
+ * for (const v of uniqueByValue(d, v=>v.name)) {
+ *  // Yields: { name: `Mary`, size: 20 }, { name: `Abdul`, size: 19 }
+ *  // Second 'Mary' is skipped because name is the same, even though size field is different.
+ * }
+ * ```
+ * 
+ * If you want to keep track of the set of keys, or prime it with some existing data, provide a Set instance:
+ * ```js
+ * const unique = new Set();
+ * unique.add(`b`);
+ * const d = [`a`, `b`, `c`];
+ * for (const v of uniqueByValue(d, toStringDefault, unique)) {
+ *  // Yields: `a`, `c`
+ *  // `b` is skipped because it was already in set
+ * }
+ * // After completion, `unique` contains `a`, `b` and `c`.
+ * ```
+ * @param input 
+ * @param seen 
+ * @param toString 
  */
-
-import { type ToString, toStringDefault } from './Util.js';
-import { type IsEqual } from './IsEqual.js';
+export function* uniqueByValue<T>(input: Iterable<T>, toString: ToString<T> = toStringDefault, seen: Set<string> = new Set<string>()): Generator<T> {
+  for (const v of input) {
+    const key = toString(v);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    yield v;
+  }
+}
 
 /**
  * Returns a function that yields a value from a generator.
@@ -470,38 +510,22 @@ export function* takeWhile<V>(it: Iterable<V>, f: (v: V) => boolean) {
  * // Yields: [ 'apples', 'oranges', 'pears' ]
  * ```
  *
- * Custom function can be used that returns a key for
- * an item, determining equality. By default uses
- * JSON.stringify.
- *
- * ```js
- * const data = [ {i:0,v:2}, {i:1,v:3}, {i:2,v:2} ];
- *
- * // Item identity based on 'v' field
- * unique(data, e => e.v);
- * //Yields: [ {i:0,v:2}, {i:1,v:3} ]
- * ```
+ * Uses object reference to compare values.
+ * Use {@link uniqueByValue} if this doesn't suffice.
  * @param iterable Iterable, or array of iterables
  * @param f
  */
-//eslint-disable-next-line func-style
 export function* unique<V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
-  iterable: Iterable<V> | Array<Iterable<V>>,
-  keyFunction: ToString<V> = toStringDefault
+  iterable: Iterable<V> | Array<Iterable<V>>
 ) {
-  // f: (id: V) => V = (id) => id) {
   // Adapted from https://surma.github.io/underdash/
-  const buffer: Array<string> = [];
-  //eslint-disable-next-line functional/no-let
+  const buffer: Array<any> = [];
   let itera: Array<Iterable<V>> = [];
   itera = Array.isArray(iterable) ? iterable : [ iterable ];
   for (const it of itera) {
     for (const v of it) {
-      const fv = keyFunction(v);
-      if (buffer.includes(fv)) continue;
-      //eslint-disable-next-line functional/immutable-data
-      buffer.push(fv);
+      if (buffer.includes(v)) continue;
+      buffer.push(v);
       yield v;
     }
   }
