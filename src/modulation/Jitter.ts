@@ -96,7 +96,6 @@ export const jitterAbsolute = (opts: JitterOpts): Jitterer => {
  */
 export const jitter = (opts: JitterOpts = {}): Jitterer => {
   const clamped = opts.clamped ?? true;
-  //eslint-disable-next-line functional/no-let
   let r = (_: number) => 0;
   if (opts.absolute !== undefined) {
     throwNumberTest(
@@ -113,18 +112,17 @@ export const jitter = (opts: JitterOpts = {}): Jitterer => {
   } else if (opts.relative === undefined) {
     throw new TypeError(`Either absolute or relative jitter amount is required.`);
   } else {
+    const rel = opts.relative ?? 0.1;
     throwNumberTest(
-      opts.relative,
+      rel,
       clamped ? `percentage` : `bipolar`,
       `opts.relative`
     );
     r = (v: number) =>
       v +
       randomFloat({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        min: -opts.relative! * v,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        max: opts.relative! * v,
+        min: -Math.abs(rel * v),
+        max: Math.abs(rel * v),
         source: opts.source,
       });
   }
