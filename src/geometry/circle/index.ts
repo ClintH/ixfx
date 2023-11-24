@@ -9,6 +9,8 @@ export * from './DistanceCenter.js';
 export * from './DistanceFromExterior.js';
 export * from './Guard.js';
 export * from './ToPositioned.js';
+export * from './ExteriorPoints.js';
+export * from './InteriorPoints.js';
 
 /**
  * Returns a point on a circle at a specified angle in radians
@@ -96,6 +98,8 @@ export const circumference = (circle: Circle): number => {
   guard(circle);
   return piPi * circle.radius;
 };
+
+
 
 /**
  * Returns the area of `circle`.

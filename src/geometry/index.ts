@@ -9,7 +9,7 @@ export * as Grids from './Grid.js';
 export * as Beziers from './Bezier.js';
 export * as Compound from './CompoundPath.js';
 export * as Ellipses from './Ellipse.js';
-export * from './Types.js';
+export type * from './Types.js';
 export * from './Angles.js';
 
 /**
