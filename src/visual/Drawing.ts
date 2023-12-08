@@ -309,6 +309,12 @@ export const drawingStack = (
   return { push, pop, apply };
 };
 
+/**
+ * Draws a curved line through a set of points
+ * @param ctx 
+ * @param points 
+ * @param opts 
+ */
 export const lineThroughPoints = (
   ctx: CanvasRenderingContext2D,
   points: ReadonlyArray<Point>,
@@ -448,12 +454,14 @@ export const connectedPoints = (
   ctx: CanvasRenderingContext2D,
   pts: ReadonlyArray<Point>,
   opts: {
-    readonly loop?: boolean;
-    readonly fillStyle?: string;
-    readonly strokeStyle?: string;
+    readonly lineWidth?: number
+    readonly loop?: boolean
+    readonly fillStyle?: string
+    readonly strokeStyle?: string
   } = {}
 ) => {
   const shouldLoop = opts.loop ?? false;
+
 
   throwArrayTest(pts);
   if (pts.length === 0) return;
@@ -464,6 +472,7 @@ export const connectedPoints = (
   applyOpts(ctx, opts);
 
   // Draw points
+  if (opts.lineWidth) ctx.lineWidth = opts.lineWidth;
   ctx.beginPath();
   ctx.moveTo(pts[ 0 ].x, pts[ 0 ].y);
   for (const pt of pts) ctx.lineTo(pt.x, pt.y);
@@ -785,14 +794,15 @@ export const triangle = (
 // }
 
 /**
- * Draws one or more rectangles
+ * Draws one or more rectangles.
+ * 
  * @param ctx
  * @param toDraw
  * @param opts
  */
 export const rect = (
   ctx: CanvasRenderingContext2D,
-  toDraw: RectPositioned | ReadonlyArray<RectPositioned>,
+  toDraw: Rect | RectPositioned | ReadonlyArray<RectPositioned>,
   opts: DrawingOpts & {
     readonly filled?: boolean;
     readonly stroked?: boolean;
@@ -800,9 +810,13 @@ export const rect = (
 ) => {
   applyOpts(ctx, opts);
 
-  const draw = (d: RectPositioned) => {
-    if (opts.filled) ctx.fillRect(d.x, d.y, d.width, d.height);
-    if (opts.stroked ?? true) ctx.strokeRect(d.x, d.y, d.width, d.height);
+  const filled = opts.filled ?? (opts.fillStyle === undefined ? false : true);
+  const stroked = opts.stroked ?? (opts.strokeStyle === undefined ? false : true);
+  const draw = (d: RectPositioned | Rect) => {
+    const x = `x` in d ? d.x : 0;
+    const y = `y` in d ? d.y : 0;
+    if (filled) ctx.fillRect(x, y, d.width, d.height);
+    if (stroked ?? true) ctx.strokeRect(x, y, d.width, d.height);
 
     if (opts.debug) {
       pointLabels(ctx, RectsCorners(d), undefined, [ `NW`, `NE`, `SE`, `SW` ]);
