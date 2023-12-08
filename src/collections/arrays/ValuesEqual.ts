@@ -1,17 +1,18 @@
 import { type IsEqual, isEqualValueDefault } from "../../IsEqual.js";
 
 /**
- * Returns _true_ if all the contents of the array are identical.
- *
+ * Returns _true_ if the contents of the array are all the same.
+ * Uses value-based equality checking by default.
+ * 
  * @example Uses default equality function:
  * ```js
  * import { valuesEqual } from 'https://unpkg.com/ixfx/dist/arrays.js';
  *
- * const a1 = [10, 10, 10];
+ * const a1 = [ 10, 10, 10 ];
  * valuesEqual(a1); // True
  *
- * const a2 = [ {name:`Jane`}, {name:`John} ];
- * valuesEqual(a2); // True, because JSON version captures value
+ * const a2 = [ { name:`Jane` }, { name:`John` } ];
+ * valuesEqual(a2); // True, even though object references are different
  * ```
  *
  * If we want to compare by value for objects that aren't readily
