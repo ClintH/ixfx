@@ -11,6 +11,7 @@ export * as Compound from './CompoundPath.js';
 export * as Ellipses from './Ellipse.js';
 export type * from './Types.js';
 export * from './Angles.js';
+export * as CurveSimplification from './CurveSimplification.js';
 
 /**
  * Quad tree is a datastructure for efficiently determining whether
