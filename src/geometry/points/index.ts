@@ -16,6 +16,7 @@ export * from './DistanceToCenter.js';
 export * from './DistanceToExterior.js';
 export * from './Distance.js';
 export * from './Guard.js';
+export type { Point, Point3d } from '../Types.js';
 
 /**
  * Returns a Point form of either a point, x,y params or x,y,z params.
