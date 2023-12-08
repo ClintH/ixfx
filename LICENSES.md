@@ -1,3 +1,10 @@
+Ramer Douglas Peucker implementation
+
+Marius Karthaus
+http://www.LowVoice.nl
+
+---
+
 The MIT License (MIT)
 
 Copyright © 2022 github.com/pushkine/
