@@ -42,6 +42,8 @@ export { slice } from './iterable/SliceSync.js';
  * }
  * // After completion, `unique` contains `a`, `b` and `c`.
  * ```
+ * 
+ * Creating your own Set is useful for tracking unique values across several calls to `uniqueByValue`.
  * @param input 
  * @param seen 
  * @param toString 
