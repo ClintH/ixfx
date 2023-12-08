@@ -47,12 +47,14 @@ export const toStringOrdered = (itemToMakeStringFor: any) => {
 export type IsEqual<T> = (a: T, b: T) => boolean;
 
 /**
- * Default comparer function is equiv to checking `a === b`
+ * Default comparer function is equiv to checking `a === b`.
+ * Use {@link isEqualValueDefault} to compare by value, via comparing JSON string representation.
  */
 export const isEqualDefault = <T>(a: T, b: T): boolean => a === b;
 
 /**
  * Comparer returns true if string representation of `a` and `b` are equal.
+ * Use {@link isEqualDefault} to compare using === semantics
  * Uses `toStringDefault` to generate a string representation (via `JSON.stringify`).
  * 
  * Returns _false_ if the ordering of fields is different, even though values are identical:
