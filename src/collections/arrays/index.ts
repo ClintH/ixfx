@@ -867,6 +867,40 @@ export const containsDuplicateInstances = <V>(array: Array<V> | ReadonlyArray<V>
 }
 
 /**
+ * Returns _true_ if the two arrays have the same items at same indexes.
+ * Returns _false_ if arrays are of different length.
+ * By default uses === semantics for equality checking.
+ * 
+ * ```js
+ * isEqual([ 1, 2, 3], [ 1, 2, 3 ]); // true
+ * isEqual([ 1, 2, 3], [ 3, 2, 1 ]); // false
+ * ```
+ * 
+ * Compare by value
+ * ```js
+ * isEqual(a, b, isEqualValueDefault);
+ * ```
+ * 
+ * Custom compare, eg based on `name` field:
+ * ```js
+ * isEqual(a, b, (compareA, compareB) => compareA.name === compareB.name);
+ * ```
+ * @param arrayA 
+ * @param arrayB 
+ * @param isEqual 
+ */
+export const isEqual = <V>(arrayA: Array<V>, arrayB: Array<V>, isEqual = isEqualDefault<V>): boolean => {
+  if (!Array.isArray(arrayA)) throw new Error(`Parameter 'arrayA' is not actually an array`);
+  if (!Array.isArray(arrayB)) throw new Error(`Parameter 'arrayB' is not actually an array`);
+
+  if (arrayA.length !== arrayB.length) return false;
+  // eslint-disable-next-line unicorn/no-for-loop
+  for (let indexA = 0; indexA < arrayA.length; indexA++) {
+    if (!(isEqual(arrayA[ indexA ], arrayB[ indexA ]))) return false;
+  }
+  return true;
+}
+/**
  * Returns _true_ if contents of `needles` is contained by `haystack`.
  * ```js
  * const a = ['apples','oranges','pears','mandarins'];
