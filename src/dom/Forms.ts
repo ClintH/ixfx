@@ -161,15 +161,30 @@ export const button = (
     });
   }
   return {
+    get title(): string | null {
+      return el.textContent;
+    },
+    set title(value: string) {
+      el.textContent = value;
+    },
     click() {
       if (onClick) onClick();
     },
     set disabled(value: boolean) {
-      // eslint-disable-next-line functional/immutable-data
       el.disabled = value;
     },
+    get el(): HTMLButtonElement {
+      return el
+    }
   };
 };
+
+export const buttonCreate = (title: string, onClick?: () => void) => {
+  const el = document.createElement(`button`);
+  const w = button(el, onClick);
+  w.title = title;
+  return w;
+}
 
 /**
  * SELECT handler

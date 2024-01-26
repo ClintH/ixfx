@@ -22,7 +22,7 @@
     "typescript.preferences.importModuleSpecifierEnding": "js"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.workingDirectories": [
     {
