@@ -1,8 +1,10 @@
 import { intervalToMs, type Interval } from "../flow/IntervalType.js";
 import { DispatchList, type Dispatch } from "../flow/DispatchList.js"
 import * as Immutable from '../Immutable.js';
-import { QueueMutable } from "../collections/index.js";
-import * as DiGraph from "./graphs/DirectedGraph.js";
+import { continuously } from "../flow/Continuously.js";
+export * as Dom from './ReactiveDom.js';
+export * from './ReactiveOps.js';
+export * from './ReactiveGraph.js';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -19,25 +21,13 @@ export type PassedSignal = Passed<any> & {
   context: string
 }
 
+export type EventOptions<V> = {
+  process: (args?: Event | undefined) => V
+  lazy?: boolean
+}
+
 export type PassedValue<V> = Passed<V> & {
   value: V
-}
-
-export function isSignal<V>(v: Passed<V> | PassedSignal): v is PassedSignal {
-  if (v.value !== undefined) return false;
-  if (`signal` in v && v.signal !== undefined) return true;
-  return false;
-}
-
-/**
- * Returns _true_ if `v` has a non-undefined value. Note that sometimes
- * _undefined_ is a legal value to pass
- * @param v 
- * @returns 
- */
-export function hasValue<V>(v: Passed<V> | PassedSignal): v is PassedValue<V> {
-  if (v.value !== undefined) return true;
-  return false;
 }
 
 export type Reactive<V> = {
@@ -61,41 +51,76 @@ export type ReactiveInitial<V> = Reactive<V> & {
   last(): V
 }
 
+export type ReactiveFinite = {
+  isDone(): boolean
+}
+
 export type ReactiveDisposable = {
   dispose(reason: string): void
   isDisposed(): boolean
 }
 
-export type ReactiveFinite = {
-  isDone(): boolean
-
-}
-
-// export type ReactiveCloseable = ReactiveFinite & {
-//   close(reason: string): void
-// }
-
 export type ReactiveDiff<V> = ReactiveDisposable & ReactiveWritable<V> & {
-  onDiff(handler: (changes: Passed<Array<Immutable.Change<any>>>) => void): void
+  onDiff(handler: (changes: Passed<Array<Immutable.Change<any>>>) => void): () => void
   update(changedPart: Record<string, any>): void
   updateField(field: string, value: any): void
 }
 
-// export function readable<V>(): ReactiveDisposable & Reactive<V> {
-//   const events = initEvent<V>();
-//   let disposed = false;
-//   return {
-//     dispose(reason) {
-//       if (disposed) return;
-//       disposed = true;
-//       events.signal(`done`, `Closed: ${ reason }`);
-//     },
-//     isDisposed() {
-//       return disposed;
-//     },
-//     on: events.on
-//   }
-// }
+
+
+/**
+ * Options when creating a reactive object.
+ */
+export type ObjectOptions<V> = {
+  /**
+   * _false_ by default.
+   * If _true_, inherited fields are included. This is necessary for event args, for example.
+   */
+  deepEntries: boolean
+  /**
+   * Uses JSON.stringify() by default.
+   * Fn that returns _true_ if two values are equal, given a certain path.
+   */
+  eq: Immutable.IsEqualContext<V>
+}
+
+
+export function messageIsSignal<V>(message: Passed<V> | PassedSignal): message is PassedSignal {
+  if (message.value !== undefined) return false;
+  if (`signal` in message && message.signal !== undefined) return true;
+  return false;
+}
+
+export function messageIsDoneSignal<V>(message: Passed<V> | PassedSignal): boolean {
+  if (message.value !== undefined) return false;
+  if (`signal` in message && message.signal === `done`) return true;
+  return false;
+}
+
+/**
+ * Returns _true_ if `v` has a non-undefined value. Note that sometimes
+ * _undefined_ is a legal value to pass
+ * @param v 
+ * @returns 
+ */
+export function messageHasValue<V>(v: Passed<V> | PassedSignal): v is PassedValue<V> {
+  if (v.value !== undefined) return true;
+  return false;
+}
+
+export const hasLast = <V>(rx: Reactive<V> | ReactiveDiff<V>): rx is ReactiveInitial<V> => {
+  if (`last` in rx) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const v = (rx as any).last();
+    if (v !== undefined) return true;
+  }
+  return false;
+}
+
+export const isDisposable = (v: object): v is ReactiveDisposable => {
+  return (`isDisposed` in v && `dispose` in v);
+}
+
 
 export function number(initialValue: number): ReactiveDisposable & ReactiveWritable<number> & ReactiveInitial<number>;
 export function number(): ReactiveDisposable & ReactiveWritable<number> & ReactiveNonInitial<number>;
@@ -115,110 +140,6 @@ export function number(initialValue?: number): ReactiveDisposable & ReactiveWrit
     on: events.on,
     set
   }
-}
-
-/**
- * Monitors input reactive values, storing values as they happen to an array.
- * Whenever a new value is emitted, the whole array is sent out, containing current
- * values from each source.
- * 
- * @param values 
- * @returns 
- */
-export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V | undefined>> {
-  const event = initEvent<Array<V | undefined>>();
-  const data: Array<V | undefined> = [];
-
-  for (const [ index, v ] of values.entries()) {
-    data[ index ] = undefined;
-    v.on(valueChanged => {
-      if (!isSignal(valueChanged)) {
-        data[ index ] = valueChanged.value;
-      }
-      event.notify(data);
-    });
-  }
-
-  return {
-    on: event.on
-  }
-}
-
-/**
- * Waits for all sources to produce a value, sending the combined results as an array.
- * After sending, it waits again for each source to send a value.
- * 
- * Each source's latest value is returned, in the case of some sources producing results
- * faster than others.
- * 
- * If a value completes, we won't wait for it and the result set gets smaller.
- * @param sources 
- * @returns 
- */
-export function synchronise<V>(...sources: Array<Reactive<V>>): Reactive<Array<V | undefined>> {
-  const event = initEvent<Array<V>>();
-  let data: Array<V | undefined> = [];
-
-  for (const [ index, v ] of sources.entries()) {
-    data[ index ] = undefined;
-    v.on(valueChanged => {
-      if (isSignal(valueChanged)) {
-        if (valueChanged.signal === `done`) {
-          sources.splice(index, 1);
-        }
-        return;
-      }
-      data[ index ] = valueChanged.value;
-
-      if (!data.includes(undefined)) {
-        // All array elements contain values
-        event.notify(data as Array<V>);
-        data = [];
-      }
-    });
-  }
-
-  return {
-    on: event.on
-  }
-}
-
-
-
-export type ResolveAfterOptions = {
-  loops?: number
-  infinite?: boolean
-}
-
-export function resolveAfter<V extends Record<string, any>>(interval: Interval, callbackOrValue: V | (() => V), options: ResolveAfterOptions = {}): Reactive<V> {
-  const intervalMs = intervalToMs(interval, 0);
-  const event = initEvent<V>();
-  const loops = options.infinite ? Number.MAX_SAFE_INTEGER : options.loops ?? 1;
-  let remaining = loops;
-
-  const run = () => {
-    if (typeof callbackOrValue === `function`) {
-      const value = callbackOrValue();
-      event.notify(value);
-    } else {
-      event.notify(callbackOrValue);
-    }
-    remaining--;
-    if (remaining > 0) {
-      setTimeout(run, intervalMs);
-    }
-  }
-  setTimeout(run, intervalMs);
-
-  const r: Reactive<V> = {
-    on: event.on
-  }
-  return r;
-}
-
-export type EventOptions<V> = {
-  process: (args?: Event | undefined) => V
-  lazy?: boolean
 }
 
 export function event<V extends Record<string, any>, EventName extends string>(target: EventTarget, name: EventName, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable;
@@ -278,20 +199,12 @@ export function event<V extends Record<string, any>, EventName extends string>(t
       return rxObject.on(handler);
     }
   }
-  // const result = {
-  //   dispose: () => {
-  //     target.removeEventListener(name, callback)
-  //   },
-  //   [ `${ name }` ]: rxObject
-  // }
-
-  // return result as {
-  //   [ key in EventName ]: typeof rxObject
-  // } & {
-  //   dispose: () => void
-  // };
 }
 
+/**
+ * Initialises a reactive that pipes values to listeners directly.
+ * @returns 
+ */
 export function manual<V>(): Reactive<V> & ReactiveWritable<V> {
   const events = initEvent<V>();
   return {
@@ -302,12 +215,7 @@ export function manual<V>(): Reactive<V> & ReactiveWritable<V> {
   };
 }
 
-export type ObjectOptions<V> = {
-  deepEntries: boolean
-  eq: Immutable.IsEqualContext<V>
-}
 
-//export function object<V extends Record<string, any>>(options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
 
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 
@@ -373,18 +281,21 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
 
 
   const update = (toMerge: Partial<V>) => {
-    const pd = Immutable.getPathsAndData(toMerge);
+    //const pd = Immutable.getPathsAndData(toMerge);
+    //console.log(`pd: ${ JSON.stringify(pd) }`);
     // eslint-disable-next-line unicorn/prefer-ternary
     if (value === undefined) {
       value = toMerge as V;
     } else {
       const diff = Immutable.compareData(toMerge, value);
+      //console.log(`diff: ${ JSON.stringify(diff) }`);
       if (diff.length === 0) return; // No changes
       value = {
         ...value,
         ...toMerge
       }
-      diffEvent.notify(pd);
+      diffEvent.notify(diff);
+      //diffEvent.notify(pd);
     }
     setEvent.notify(value);
   }
@@ -435,7 +346,12 @@ export type InitEventOptions = {
   onNoSubscribers: () => void
 }
 
-function initEvent<V>(options: Partial<InitEventOptions> = {}) {
+/**
+ * @ignore
+ * @param options 
+ * @returns 
+ */
+export function initEvent<V>(options: Partial<InitEventOptions> = {}) {
   let dispatcher: DispatchList<Passed<V>> | undefined;
   let disposed = false;
   let firstSubscribe = false;
@@ -454,8 +370,8 @@ function initEvent<V>(options: Partial<InitEventOptions> = {}) {
   }
   return {
     dispose: (reason: string) => {
+      //console.log(`initEvent:dispose (${ reason }) disposed: ${ disposed }`);
       if (disposed) return;
-      //console.log(`initEvent dispose ${ reason }`);
       dispatcher?.notify({ value: undefined, signal: `done`, context: `Disposed: ${ reason }` });
       disposed = true;
     },
@@ -482,6 +398,7 @@ function initEvent<V>(options: Partial<InitEventOptions> = {}) {
       if (disposed) throw new Error(`Disposed`);
       if (dispatcher === undefined) dispatcher = new DispatchList();
       const id = dispatcher.add(handler);
+      emptySubscriptions = false;
       if (!firstSubscribe) {
         firstSubscribe = true;
         if (onFirstSubscribe) setTimeout(() => { onFirstSubscribe() }, 10);
@@ -513,7 +430,13 @@ export type UpstreamOptions<In> = {
   onStop: () => void
 }
 
-const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Partial<UpstreamOptions<In>>) => {
+/**
+ * @ignore
+ * @param upstreamSource 
+ * @param options 
+ * @returns 
+ */
+export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Partial<UpstreamOptions<In>>) => {
   const lazy = options.lazy ?? true;
   const disposeIfSourceDone = options.disposeIfSourceDone ?? true;
   const onValue = options.onValue ?? ((_v: In) => {/** no-op */ })
@@ -525,14 +448,14 @@ const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Pa
 
     if (options.onStart) options.onStart();
     unsub = source.on(value => {
-      if (isSignal(value)) {
+      if (messageIsSignal(value)) {
         if (value.signal === `done`) {
           stop();
           if (disposeIfSourceDone) events.dispose(`Source is completed`);
         } else {
           events.through(value);
         }
-      } else if (hasValue(value)) {
+      } else if (messageHasValue(value)) {
         onValue(value.value);
       }
     });
@@ -556,95 +479,6 @@ const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Pa
   if (!lazy) start();
   const events = initEvent<Out>(initOpts);
   return events;
-}
-
-export type FieldOptions<V> = InitEventOptions & {
-  /**
-   * If `field` is missing on a value, this value is used in its place.
-   * If not set, the value is skipped.
-   */
-  missingFieldDefault: V
-};
-/**
- * From a source value, yields a field from it.
- * 
- * If a source value doesn't have that field, it is skipped.
- * 
- * @param source 
- * @param field 
- * @returns 
- */
-export function field<In, Out>(fieldSource: ReactiveOrSource<In>, field: keyof In, options: Partial<FieldOptions<Out>> = {}): Reactive<Out> {
-  const upstream = initUpstream<In, Out>(fieldSource, {
-    disposeIfSourceDone: true,
-    ...options,
-    onValue(value) {
-      let t = (value as any)[ field ];
-      if (t === undefined && options.missingFieldDefault !== undefined) {
-        t = options.missingFieldDefault as Out;
-      }
-      upstream.notify(t as Out);
-    },
-  })
-
-  return {
-    on: upstream.on
-  }
-  // const source = resolveSource(fieldSource);
-  // const events = initEvent<Out>();
-  // source.on(value => {
-  //   if (isSignal(value)) {
-  //     if (value.signal === `done`) {
-  //       events.dispose(`Source stream closed`);
-  //     }
-  //     return;
-  //   }
-  //   if (value.value) {
-  //     const t = value.value[ field ];
-  //     events.notify(t as Out);
-  //   }
-  // })
-
-  // return {
-  //   on: events.on,
-  //   dispose: events.dispose,
-  //   isDisposed() {
-  //     return events.isDisposed();
-  //   },
-  // }
-}
-
-export type TransformOpts = InitEventOptions;
-
-/**
- * Transforms values from `source` using the `transformer` function.
- * @param source 
- * @param transformer 
- * @returns 
- */
-export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (value: In) => Out, options: Partial<TransformOpts> = {}): Reactive<Out> {
-  const upstream = initUpstream<In, Out>(input, {
-    ...options,
-    onValue(value) {
-      const t = transformer(value);
-      upstream.notify(t);
-    },
-  })
-
-  return {
-    on: upstream.on
-  }
-}
-
-export type BatchOptions = InitEventOptions & {
-  /**
-   * If _true_ (default) remaining results are yielded
-   * if source closes. If _false_, only 'complete' batches are yielded.
-   */
-  returnRemainder: boolean
-  elapsed: Interval
-  limit: number
-  logic: `or` | `and`
 }
 
 export type GeneratorOptions = {
@@ -736,108 +570,73 @@ export const resolveSource = <V>(source: ReactiveOrSource<V>): Reactive<V> => {
     return generator(source, { lazy: true });
   }
 }
-/**
- * Queue from `source`, emitting when thresholds are reached.
- * Can use a combination of elapsed time or number of data items.
- * 
- * By default options are ORed
- *
- * ```js
- * // Emit data in batches of 5 items
- * batch(source, { limit: 5 });
- * // Emit data every second
- * batch(source, { elapsed: 1000 });
- * ```
- * @param source 
- * @param options 
- * @returns 
- */
-export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<BatchOptions> = {}): Reactive<Array<V>> {
-  //const source = resolveSource(batchSource);
-  const elapsed = intervalToMs(options.elapsed, 0);
-  const queue = new QueueMutable<V>();
-  const limit = options.limit ?? 0;
-  const logic = options.logic ?? `or`;
-  const returnRemainder = options.returnRemainder ?? true;
 
-  let lastFire = performance.now();
-  const upstreamOpts = {
-    ...options,
-    onStop() {
-      if (returnRemainder && !queue.isEmpty) {
-        const data = queue.toArray();
-        queue.clear();
-        upstream.notify(data);
-      }
-    },
-    onValue(value: V) {
-      queue.enqueue(value);
-      trigger();
-    },
-  }
-  const upstream = initUpstream<V, Array<V>>(batchSource, upstreamOpts);
-
-  // let off: undefined | (() => void);
-
-  // const close = (reason: string) => {
-  //   console.log(`batch.close queue: ${ queue.length } returnRemainer: ${ returnRemainder }`);
-  //   if (off !== undefined) off();
-  //   if (returnRemainder && !queue.isEmpty) {
-  //     const data = queue.data;
-  //     queue.clear();
-  //     events.notify(data as Array<V>);
-  //   }
-  //   events.dispose(reason);
-  // }
-
-  // const initOpts: InitEventOptions = {
-  //   onFirstSubscribe() {
-  //     console.log(`batch onFirstSub`);
-  //     off = source.on(value => {
-  //       console.log(`batch value ${ JSON.stringify(value) }`);
-  //       if (isValue(value)) {
-  //         queue.enqueue(value.value);
-  //         trigger();
-  //       } else if (isSignal(value) && value.signal === `done`) {
-  //         close(`batch source closed`);
-  //       }
-  //     });
-  //   },
-  //   onNoSubscribers() {
-  //     close(`batch onNoSubscribers`);
-  //   },
-  // }
-  //const events = initEvent<Array<V>>(initOpts);
-
-  const trigger = () => {
-    const now = performance.now();
-    let byElapsed = false;
-    let byLimit = false;
-    if (elapsed > 0 && (now - lastFire > elapsed)) {
-      lastFire = now;
-      byElapsed = true;
-    }
-    if (limit > 0 && queue.length >= limit) {
-      byLimit = true;
-    }
-    if (logic === `or` && (!byElapsed && !byLimit)) return;
-    if (logic === `and` && (!byElapsed || !byLimit)) return;
-
-    // Fire queued data
-    const data = queue.toArray();
-    queue.clear();
-    upstream.notify(data);
-  }
-
-  const r: Reactive<Array<V>> = {
-    on: upstream.on
-  }
-  return r;
+export type FromArrayOptions = {
+  /**
+   * Interval between each item being read. 5ms by default.
+   */
+  intervalMs: Interval
+  /**
+   * If _true_, only starts after first subscriber. _False_ by default.
+   */
+  lazy: boolean
+  /**
+   * Governs behaviour if all subscribers are removed AND lazy=true. By default continues
+   * iteration.
+   * 
+   * pause: stop at last array index
+   * reset: go back to 0
+   * empty: continue, despite there being no listeners (default)
+   */
+  idle: `` | `pause` | `reset`
 }
 
-export type ToArrayOptions = {
-  limit: number
-  elapsed: number
+export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions> = {}): Reactive<V> & ReactiveFinite & ReactiveInitial<V> => {
+  const lazy = options.lazy ?? false;
+  const idle = options.idle ?? ``;
+  const intervalMs = intervalToMs(options.intervalMs, 5);
+  let index = 0;
+  let lastValue = array[ 0 ];
+
+  const s = initEvent<V>({
+    onFirstSubscribe() {
+      //console.log(`Rx.fromArray onFirstSubscribe. Lazy: ${ lazy } reader running: ${ c.isRunning }`);
+      // Start if in lazy mode and not running
+      if (lazy && !c.isRunning) c.start();
+    },
+    onNoSubscribers() {
+      if (lazy) {
+        if (idle === `pause`) {
+          c.cancel();
+        } else if (idle === `reset`) {
+          c.cancel();
+          index = 0;
+        }
+      }
+    }
+  });
+
+  const c = continuously(() => {
+    lastValue = array[ index ];
+    index++;
+
+    s.notify(lastValue)
+    if (index === array.length) {
+      return false;
+    }
+  }, intervalMs);
+
+  if (!lazy) c.start();
+
+  return {
+    isDone() {
+      return index === array.length;
+    },
+    last() {
+      return lastValue;
+    },
+    on: s.on
+  }
 }
 
 /**
@@ -848,177 +647,135 @@ export type ToArrayOptions = {
  * @param options 
  * @returns 
  */
-export const toArray = async <V>(reactiveSource: ReactiveOrSource<V>, options: Partial<ToArrayOptions> = {}): Promise<Array<V>> => {
-  const source = resolveSource(reactiveSource);
-  const maxValues = options.limit ?? Number.MAX_SAFE_INTEGER;
-  const maxDuration = options.elapsed ?? Number.MAX_SAFE_INTEGER;
-  let buffer: Array<V> = [];
+// export const toArray = async <V>(reactiveSource: ReactiveOrSource<V>, options: Partial<ToArrayOptions> = {}): Promise<Array<V>> => {
+//   const source = resolveSource(reactiveSource);
+//   const maxValues = options.limit ?? Number.MAX_SAFE_INTEGER;
+//   const maxDuration = options.elapsed ?? Number.MAX_SAFE_INTEGER;
+//   let buffer: Array<V> = [];
 
-  let start = -1;
-  const promise = new Promise<Array<V>>((resolve, _reject) => {
-    const done = () => {
-      off();
-      resolve(buffer);
-      buffer = []
-    }
+//   let start = -1;
+//   const promise = new Promise<Array<V>>((resolve, _reject) => {
+//     const done = () => {
+//       off();
+//       resolve(buffer);
+//       buffer = []
+//     }
 
-    const off = source.on(value => {
-      if (start === -1) start = Date.now();
-      if (isSignal(value) && value.signal === `done`) {
-        done();
-      } else if (hasValue(value)) {
-        buffer.push(value.value);
-        if (buffer.length >= maxValues) {
-          done();
-        }
-      }
-      if (Date.now() - start > maxDuration) {
-        done();
-      }
-    });
-  })
-  return promise;
-}
-
-export type ThrottleOptions = InitEventOptions & {
-  elapsed: Interval
-}
-
-export function throttle<V>(throttleSource: ReactiveOrSource<V>, options: Partial<ThrottleOptions> = {}): Reactive<V> {
-  const elapsed = intervalToMs(options.elapsed, 0);
-  let lastFire = performance.now();
-  let lastValue: V | undefined;
-
-  const upstream = initUpstream<V, V>(throttleSource, {
-    ...options,
-    onValue(value) {
-      lastValue = value;
-      trigger();
-    },
-  });
-
-  const trigger = () => {
-    const now = performance.now();
-    let byElapsed = false;
-    if (elapsed > 0 && (now - lastFire > elapsed)) {
-      lastFire = now;
-      byElapsed = true;
-    }
-    if (!byElapsed) return;
-
-    if (lastValue !== undefined) {
-      upstream.notify(lastValue);
-    }
-  }
-
-  const r: Reactive<V> = {
-    on: upstream.on
-  }
-  return r;
-}
-
-export function win() {
-  const generateRect = () => ({ width: window.innerWidth, height: window.innerHeight });
-
-  const size = event(window, `resize`, {
-    lazy: true,
-    process: () => generateRect(),
-  });
-  const pointer = event(window, `pointermove`, {
-    lazy: true,
-    process: (args: Event | undefined) => {
-      if (args === undefined) return { x: 0, y: 0 };
-      const pe = args as PointerEvent;
-      return { x: pe.x, y: pe.y }
-    }
-  });
-  const dispose = (reason = `Reactive.win.dispose`) => {
-    size.dispose(reason);
-    pointer.dispose(reason);
-  }
-  return { dispose, size, pointer };
-}
+//     const off = source.on(value => {
+//       if (start === -1) start = Date.now();
+//       if (messageIsSignal(value) && value.signal === `done`) {
+//         done();
+//       } else if (messageHasValue(value)) {
+//         buffer.push(value.value);
+//         if (buffer.length >= maxValues) {
+//           done();
+//         }
+//       }
+//       if (Date.now() - start > maxDuration) {
+//         done();
+//       }
+//     });
+//   })
+//   return promise;
+// }
 
 
-type RxNodeBase = {
-  type: `primitive` | `rx` | `object`
-}
 
-type RxNodeRx = RxNodeBase & {
-  type: `rx`,
-  value: Reactive<any>
-}
 
-type RxNodePrimitive = RxNodeBase & {
-  type: `primitive`,
-  value: any
-}
-
-type RxNode = RxNodeRx | RxNodePrimitive;
-
-function isReactive(o: object): o is Reactive<any> {
-  if (typeof o !== `object`) return false;
-  if (`on` in o) {
-    return (typeof o.on === `function`);
-  }
-  return false;
+export type ToArrayOptions<V> = {
+  /**
+   * Maximim time to wait for `limit` to be reached. 10s by default.
+   */
+  maximumWait: Interval
+  /**
+   * Number of items to read
+   */
+  limit: number
+  /**
+   * Behaviour if threshold is not reached.
+   * partial: return partial results
+   * throw: throw an error
+   * fill: fill remaining array slots with `fillValue`
+   */
+  underThreshold: `partial` | `throw` | `fill`
+  /**
+   * Value to fill empty slots with if `underThreshold = 'fill'`.
+   */
+  fillValue: V
 }
 
 /**
- * Build a graph of reactive dependencies for `rx`
- * @param rx 
+ * By default, reads all the values from `source`, or until 5 seconds has elapsed.
+ * 
+ * If `limit` is provided as an option, it will exit early, or throw if that number of values was not acheived.
+ * @param source 
+ * @param options 
+ * @returns 
  */
-export function prepare<V extends Record<string, any>>(rx: V): Reactive<V> {
-  let g = DiGraph.graph();
-  const nodes = new Map<string, RxNode>();
-  const events = initEvent<V>();
+export async function toArrayOrThrow<V>(source: ReactiveOrSource<V>, options: Partial<ToArrayOptions<V>> = {}): Promise<Array<V>> {
+  const limit = options.limit ?? Number.MAX_SAFE_INTEGER;
+  const maximumWait = options.maximumWait ?? 5 * 1000;
+  const v = await toArray(source, { limit, maximumWait, underThreshold: `partial` });
 
-  const process = (o: object, path: string) => {
-    for (const [ key, value ] of Object.entries(o)) {
-      const subPath = path + `.` + key;
-      g = DiGraph.connect(g, {
-        from: path,
-        to: subPath
-      });
-      if (isReactive(value)) {
-        nodes.set(subPath, { value, type: `rx` });
-        value.on(v => {
-          console.log(`Reactive.prepare value: ${ JSON.stringify(v) } path: ${ subPath }`);
-        });
-      } else {
-        const valueType = typeof value;
-        // eslint-disable-next-line unicorn/prefer-switch
-        if (valueType === `bigint` || valueType === `boolean` || valueType === `number` || valueType === `string`) {
-          nodes.set(subPath, { type: `primitive`, value });
-        } else if (valueType === `object`) {
-          process(value, subPath)
-        } else if (valueType === `function`) {
-          console.log(`Reactive.process - not handling functions`);
+  // There was a limit, but it wasn't reached
+  if (options.limit && v.length < options.limit) throw new Error(`Threshold not reached. Wanted: ${ options.limit }, got ${ v.length }`);
+
+  // Otherwise, we may have been reading for a specified duration
+  return v as Array<V>;
+}
+
+/**
+ * Reads a set number of values from `source`, returning as an array.
+ * After the limit is reached (or source completes), the source is unsubscribed from.
+ * 
+ * If no limit is set, it will read until `source` completes or `maximumWait` is reached.
+ * `maximumWait` is 10 seconds by default.
+ * 
+ * Use {@link toArrayOrThrow} if want to throw if limit is not reached.
+ * @param source 
+ * @param options 
+ * @returns 
+ */
+export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<ToArrayOptions<V>> = {}): Promise<Array<V | undefined>> {
+  const limit = options.limit ?? Number.MAX_SAFE_INTEGER;
+  const maximumWait = intervalToMs(options.maximumWait, 10 * 1000);
+  const underThreshold = options.underThreshold ?? `partial`
+  const read: Array<V | undefined> = [];
+  const rx = resolveSource(source);
+
+  const promise = new Promise<Array<V | undefined>>((resolve, reject) => {
+
+    const done = () => {
+      clearTimeout(maxWait)
+      unsub();
+      if (read.length < limit && underThreshold === `throw`) {
+        reject(new Error(`Threshold not reached. Wanted: ${ limit } got: ${ read.length }. Maximum wait: ${ maximumWait }`));
+        return;
+      }
+      if (read.length < limit && underThreshold === `fill`) {
+        for (let index = 0; index < limit; index++) {
+          if (read[ index ] === undefined) read[ index ] = options.fillValue;
         }
       }
+      resolve(read);
     }
-  }
 
-  // const produce = () => {
-  //   Object.fromEntries(entries);
-  // }
+    const maxWait = setTimeout(() => {
+      done();
+    }, maximumWait);
 
-  // process(rx, `_root`);
-  // console.log(DiGraph.dumpGraph(g));
+    const unsub = rx.on(message => {
+      if (messageIsDoneSignal(message)) {
+        done();
+      } else if (messageHasValue(message)) {
+        read.push(message.value);
+        if (read.length === limit) {
+          done();
+        }
+      }
+    });
+  });
 
-  // console.log(`--- Map ---`);
-
-  // for (const entries of nodes.entries()) {
-  //   console.log(entries[ 0 ]);
-  //   console.log(entries[ 1 ]);
-  //   console.log(``)
-  // }
-
-
-  const returnValue = {
-    graph: g,
-    on: events.on
-  }
-  return returnValue;
+  return promise;
 }
 

@@ -26,9 +26,14 @@ export type Continuously = HasCompletion & {
    */
   get ticks(): number;
   /**
-   * Returns true if the loop is not running (for some reason or another)
+   * Returns _true_ if the loop is not running. This could be because
+   * it was never started, or it started and was exited.
    */
   get isDone(): boolean;
+  /**
+   * Returns _true_ if the loop is currently running.
+   */
+  get isRunning(): boolean;
   /**
    * If disposed, the continuously instance won't be re-startable
    */
@@ -48,16 +53,18 @@ export type Continuously = HasCompletion & {
 export type ContinuouslySyncCallback = (
   ticks?: number,
   elapsedMs?: number
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => boolean | void;
 export type ContinuouslyAsyncCallback = (
   ticks?: number,
   elapsedMs?: number
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => Promise<boolean | void>;
 
 const raf =
-  typeof window !== `undefined`
-    ? (cb: () => void) => window.requestAnimationFrame(cb)
-    : (cb: () => void) => window.setTimeout(cb, 1);
+  typeof window === `undefined`
+    ? (callback: () => void) => window.setTimeout(callback, 1)
+    : (callback: () => void) => window.requestAnimationFrame(callback);
 
 export type OnStartCalled = `continue` | `cancel` | `reset` | `dispose`;
 
@@ -162,36 +169,30 @@ export const continuously = (
   interval?: Interval,
   opts: ContinuouslyOpts = {}
 ): Continuously => {
-  //eslint-disable-next-line functional/no-let
   let intervalMs = intervalToMs(interval, 0);
   throwIntegerTest(intervalMs, `positive`, `interval`);
 
   const fireBeforeWait = opts.fireBeforeWait ?? false;
   const onStartCalled = opts.onStartCalled;
 
-  //eslint-disable-next-line functional/no-let
   let disposed = false;
-  //eslint-disable-next-line functional/no-let
   let running = false;
-  //eslint-disable-next-line functional/no-let
   let ticks = 0;
-  //eslint-disable-next-line functional/no-let
   let startedAt = performance.now();
-  //eslint-disable-next-line functional/no-let
   let intervalUsed = interval ?? 0;
-  //eslint-disable-next-line functional/no-let
-  let currentTimer = 0;
+  let currentTimer: any = 0;
 
   const schedule =
     intervalMs === 0
       ? raf
-      : (cb: () => void) => window.setTimeout(cb, intervalMs);
+      : (callback_: () => void) => globalThis.setTimeout(callback_, intervalMs);
   const deschedule =
     intervalMs === 0
       ? (_: number) => {
         /** no-op */
       }
-      : (timer: number) => window.clearTimeout(timer);
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+      : (timer: number) => globalThis.clearTimeout(timer);
 
   const cancel = () => {
     if (!running) return;
@@ -203,18 +204,13 @@ export const continuously = (
 
   const loop = async () => {
     if (!running) return;
-    const valOrPromise = callback(ticks++, performance.now() - startedAt);
-    //eslint-disable-next-line functional/no-let
-    let val;
-    if (typeof valOrPromise === `object`) {
-      val = await valOrPromise;
-    } else {
-      val = valOrPromise;
-    }
-    if (val !== undefined && !val) {
+    const valueOrPromise = callback(ticks++, performance.now() - startedAt);
+    const value = typeof valueOrPromise === `object` ? (await valueOrPromise) : valueOrPromise;
+    if (value !== undefined && !value) {
       cancel();
       return;
     }
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     currentTimer = schedule(loop);
   };
 
@@ -224,16 +220,21 @@ export const continuously = (
     if (onStartCalled !== undefined) {
       // Function governs whether to allow .start() to go ahead
       const doWhat = onStartCalled(ticks, performance.now() - startedAt);
-      if (doWhat === `cancel`) {
-        cancel();
-        return;
-      } else if (doWhat === `reset`) {
-        reset();
-        return;
-      } else if (doWhat === `dispose`) {
-        disposed = true;
-        cancel();
-        return;
+      switch (doWhat) {
+        case `cancel`: {
+          cancel();
+          return;
+        }
+        case `reset`: {
+          reset();
+          return;
+        }
+        case `dispose`: {
+          disposed = true;
+          cancel();
+          return;
+        }
+        // No default
       }
     }
 
@@ -242,8 +243,9 @@ export const continuously = (
       startedAt = performance.now();
       running = true;
       if (fireBeforeWait) {
-        loop(); // Exec first, then wait
+        void loop(); // Exec first, then wait
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         currentTimer = schedule(loop); // Wait first, then exec
       }
     }
@@ -274,6 +276,9 @@ export const continuously = (
     },
     get isDone() {
       return !running;
+    },
+    get isRunning() {
+      return running;
     },
     get isDisposed() {
       return disposed;

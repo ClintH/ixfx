@@ -1,10 +1,36 @@
-// import test from 'ava';
-// import * as Pipes from '../../data/pipes/index.js';
-// import { sleep } from '../../flow/Sleep.js';
-// import { arrayValuesEqual } from '../util.js';
-
+import test from 'ava';
+import * as Pipes from '../../data/Pipe.js';
+import { sleep } from '../../flow/Sleep.js';
+import { arrayValuesEqual } from '../util.js';
 
 const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
+
+test(`pipes-number`, t => {
+  const v = Pipes.number(10);
+  t.plan(8);
+  const msgSub = v.on.message(msg => {
+    console.log(`msg1: ${ JSON.stringify(msg) }`);
+    t.deepEqual(msg, { value: 15 });
+    msgSub.off();
+  });
+  const valueSub = v.on.value(msg => {
+    //console.log(`msg2: ${ msg }`);
+    t.deepEqual(msg, 15);
+    valueSub.off();
+  });
+  t.is(v.value, 10);
+  v.push({ value: 15 });
+  t.is(v.value, 15);
+
+  // Update via property
+  v.value = 12;
+  t.is(v.value, 12);
+  t.false(v.isClosed);
+
+  v.close();
+  t.true(v.isClosed);
+  t.throws(() => v.value = 100); // Can't change when closed
+});
 
 // test('insert', t => {
 //   const a = bidi<number>();

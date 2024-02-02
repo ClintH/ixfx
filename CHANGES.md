@@ -1,5 +1,11 @@
 A rough changelog between NPM releases
 
+# 0.17.0 02.02.24
+Data
+* Improved unit tests of reactive module
+* Added 'Reactive.Dom' sub-module for updating HTML elements based on reactive instances
+* Added 'Reactive.to', for passing values between reactives with a transform function
+
 # 0.16.0 24.11.23
 
 Text.untilMatch: options for how to handle when there is no match. Before the source string is returned. Now it can optionally throw an error or yield a fallback.

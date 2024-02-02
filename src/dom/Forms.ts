@@ -12,6 +12,7 @@ export const textAreaKeyboard = (el: HTMLTextAreaElement) => {
     const end = el.selectionEnd;
 
     if (event.key === `Tab` && event.shiftKey) {
+      // eslint-disable-next-line unicorn/prefer-string-slice
       if (el.value.substring(start - 2, start) === `  `) {
         //eslint-disable-next-line functional/immutable-data
         el.value = elementValue.slice(0, Math.max(0, start - 2)) + elementValue.slice(Math.max(0, end));
@@ -149,36 +150,87 @@ export type SelectOpts = {
  * @returns
  */
 export const button = (
-  //eslint-disable-next-line functional/prefer-immutable-types
   domQueryOrEl: string | HTMLButtonElement,
-  onClick?: () => void
+  onClickHandler?: () => void
 ) => {
   const el = resolveEl(domQueryOrEl);
 
-  if (onClick) {
-    el.addEventListener(`click`, (_event) => {
-      onClick();
-    });
+  const addEvent = () => {
+    if (onClickHandler) {
+      el.addEventListener(`click`, onClickHandler);
+    }
   }
+
+  const removeEvent = () => {
+    if (onClickHandler) {
+      el.removeEventListener(`click`, onClickHandler)
+    }
+  }
+
+  addEvent();
+
   return {
+    /**
+     * Gets text content of button
+     */
     get title(): string | null {
       return el.textContent;
     },
+    /**
+     * Sets text content of button
+     */
     set title(value: string) {
       el.textContent = value;
     },
-    click() {
-      if (onClick) onClick();
+    /**
+     * Disposes the button.
+     * Removes event handler and optionally removes from document
+     * @param deleteElement 
+     */
+    dispose(deleteElement = false) {
+      removeEvent();
+      if (deleteElement) el.remove();
     },
+    /**
+     * Sets the click handler, overwriting existing.
+     * @param handler 
+     */
+    onClick(handler?: () => void) {
+      removeEvent();
+      onClickHandler = handler;
+      addEvent();
+    },
+    /**
+     * Trigger onClick handler
+     */
+    click() {
+      if (onClickHandler) onClickHandler();
+    },
+    /**
+     * Sets disabled state of button
+     */
     set disabled(value: boolean) {
       el.disabled = value;
     },
+    /**
+     * Gets the button element
+     */
     get el(): HTMLButtonElement {
       return el
     }
   };
 };
 
+/**
+ * Creates a BUTTON element, wrapping it via {@link button} and returning it.
+ * ```js
+ * const b = buttonCreate(`Stop`, () => console.log(`Stop`));
+ * someParent.addNode(b.el);
+ * ```
+ * @param title 
+ * @param onClick 
+ * @returns 
+ */
 export const buttonCreate = (title: string, onClick?: () => void) => {
   const el = document.createElement(`button`);
   const w = button(el, onClick);

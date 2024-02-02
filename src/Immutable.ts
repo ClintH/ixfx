@@ -45,9 +45,13 @@ export type CompareDataOptions<V> = {
 /**
  * Scans object, producing a list of changed fields.
  * 
+ * Options:
+ * - deepEntries (false): If _false_ Object.entries are used to scan the object. This won't work for some objects, eg event args
+ * - eq (JSON.stringify): By-value comparison function
  * @param a 
  * @param b 
  * @param pathPrefix 
+ * @param options
  * @returns 
  */
 export const compareData = <V extends Record<string, any>>(a: V, b: V, pathPrefix = ``, options: Partial<CompareDataOptions<V>> = {}): Array<Change<any>> => {
@@ -68,7 +72,6 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, pathPrefi
     entries = Object.entries(a);
   }
 
-  //const isArray = Array.isArray(a);
   for (const [ key, valueA ] of entries) {
     if (typeof valueA === `object`) {
       changes.push(...compareData(valueA, b[ key ], key + `.`, options));

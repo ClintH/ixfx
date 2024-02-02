@@ -1,12 +1,11 @@
 import test from 'ava';
-import { batch, generator, toArray, field, transform, object } from '../../data/Reactive.js';
+import * as Rx from '../../data/Reactive.js';
 import * as Flow from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
 import { count } from '../../Generators.js';
 
-import * as Reactive from '../../data/Reactive.js';
 
-// const r = Reactive.object({ name: `bob`, level: 2 });
+// const r = Rx.object({ name: `bob`, level: 2 });
 // r.on(value => {
 //   // reactive value has been changed
 // });
@@ -22,16 +21,155 @@ import * as Reactive from '../../data/Reactive.js';
 // // update whole object and let it take care of figuring out changeset
 // r.set({ name: `barry`, level: 4 });
 
-// const source = Reactive.event(window, `pointermove`);
-// let t = Reactive.throttle(source, { elapsed: 100 })
-// t = Reactive.field(t, `button`);
+// const source = Rx.event(window, `pointermove`);
+// let t = Rx.throttle(source, { elapsed: 100 })
+// t = Rx.field(t, `button`);
 // t.on(value => {
 //   // button id
 // })
 
 
+test(`rx-number`, t => {
+  const nonInit = Rx.number();
+  t.falsy(nonInit.last());
+  t.false(Rx.hasLast(nonInit));
+  t.plan(8);
+  nonInit.on(v => {
+    t.is(v.value, 10);
+  });
+  nonInit.set(10);
+  t.is(nonInit.last(), 10);
+  t.true(Rx.hasLast(nonInit));
+
+  const x = Rx.number(5);
+  t.truthy(x.last());
+  t.true(Rx.hasLast(x));
+  t.is(x.last(), 5);
+
+
+});
+
+test(`rx-from-array`, async t => {
+  const a1 = [ 1, 2, 3, 4, 5 ];
+  // Default options
+  const v1 = Rx.fromArray(a1);
+  t.false(v1.isDone());
+  t.is(v1.last(), 1);
+
+  let read: number[] = [];
+  const v1Off = v1.on(msg => {
+    if (msg.value) {
+      read.push(msg.value);
+    }
+  });
+  await Flow.sleep(1000);
+  v1Off();
+  t.deepEqual(read, a1);
+
+});
+
+test(`rx-from-array-lazy`, async t => {
+  const a1 = [ 1, 2, 3, 4, 5 ];
+
+  // Pause: Step 1 read 2 items
+  const v2 = Rx.fromArray(a1, { idle: `pause`, lazy: true });
+  let read: number[] = [];
+  const v2Off1 = v2.on(msg => {
+    if (msg.value) {
+      read.push(msg.value);
+      if (read.length === 2) {
+        v2Off1();
+      }
+    }
+  });
+  await Flow.sleep(200);
+  t.deepEqual(read, [ 1, 2 ]);
+
+  // Pause: Step 2, keep reading, expecting data to continue and complete
+  const v2Off2 = v2.on(msg => {
+    if (msg.value) {
+      read.push(msg.value);
+    }
+  });
+  await Flow.sleep(200);
+  t.deepEqual(read, a1);
+
+  // Reset: Step 1 read 2 times
+  const v3 = Rx.fromArray(a1, { idle: `reset`, lazy: true });
+  read = [];
+  const v3Off1 = v3.on(msg => {
+    if (msg.value) {
+      read.push(msg.value);
+      if (read.length === 2) {
+        v3Off1();
+      }
+    }
+  });
+  await Flow.sleep(200);
+  t.deepEqual(read, [ 1, 2 ]);
+
+  // Reset: Step 2: continue reading
+  const v3Off2 = v3.on(msg => {
+    if (msg.value) read.push(msg.value);
+  });
+  await Flow.sleep(200);
+  t.deepEqual(read, [ 1, 2, 1, 2, 3, 4, 5 ])
+});
+
+test(`rx-manual`, t => {
+  const v = Rx.manual();
+  t.plan(1);
+  v.on(msg => {
+    t.deepEqual(msg.value, `hello`);
+  });
+  v.set(`hello`);
+});
+
+test(`rx-event`, async t => {
+  const target = new EventTarget();
+
+  const v1 = Rx.event(target, `hello`);
+  t.falsy(v1.last());
+  const results: string[] = [];
+  let gotDone = false
+  v1.on(msg => {
+    if (Rx.messageHasValue(msg)) {
+      results.push((msg as any).value.detail);
+    } else if (Rx.messageIsDoneSignal(msg)) {
+      gotDone = true;
+    } else {
+      console.log(msg);
+    }
+  });
+  target.dispatchEvent(new CustomEvent(`wrong`, { detail: `wrong-1` }));
+
+  const produceEvents = (count: number) => {
+    const expected = [];
+    for (let i = 0; i < 5; i++) {
+      const value = `hello-${ i }`;
+      expected.push(value);
+      target.dispatchEvent(new CustomEvent(`hello`, { detail: value }));
+    }
+    return expected;
+  }
+
+  const expectedFive = produceEvents(5);
+  await Flow.sleep(200);
+  t.deepEqual(results, expectedFive);
+  t.false(gotDone, `Received done message too early`);
+
+  // Unsubscribe - expect that we don't receive any additional data
+  v1.dispose(`test dispose`);
+  const expectedTen = produceEvents(10);
+  await Flow.sleep(200);
+  t.true(gotDone, `Did not receive done message`);
+  t.true(v1.isDisposed());
+  t.deepEqual(results, expectedFive);
+
+});
+
 test(`object-field`, async t => {
-  const o = object({ name: `bob`, level: 2 });
+  const o = Rx.object({ name: `bob`, level: 2 });
   let count = 0;
   o.on(valueRaw => {
     const value = valueRaw.value;
@@ -52,7 +190,7 @@ test(`object-field`, async t => {
 });
 
 test(`object-update`, async t => {
-  const o = object({ name: `bob`, level: 2 });
+  const o = Rx.object({ name: `bob`, level: 2 });
   let count = 0;
   o.on(valueRaw => {
     const value = valueRaw.value;
@@ -79,7 +217,7 @@ test(`object-update`, async t => {
 
 test(`object-set`, async t => {
 
-  const o = object({ name: `bob`, level: 2 });
+  const o = Rx.object({ name: `bob`, level: 2 });
   let count = 0;
   let diffCount = 0;
   o.on(value => {
@@ -117,15 +255,15 @@ test(`object-set`, async t => {
   await Flow.sleep(1000);
 });
 
-test(`field`, async t => {
+test(`rx-field`, async t => {
   const data1 = [
     { name: `a` },
     { name: `b` },
     { name: `c` },
     { name: `d` }
   ];
-  const f1 = field<{ name: string }, string>(data1, `name`);
-  const values1 = await toArray(f1);
+  const f1 = Rx.field<{ name: string }, string>(data1, `name`);
+  const values1 = await Rx.toArrayOrThrow(f1);
   t.is(values1.length, data1.length);
   t.deepEqual(values1, [ `a`, `b`, `c`, `d` ]);
 
@@ -137,8 +275,8 @@ test(`field`, async t => {
     { name: `d` }
   ];
   // @ts-expect-error
-  const f2 = field<{ name: string }, string>(data2, `name`);
-  const values2 = await toArray(f2);
+  const f2 = Rx.field<{ name: string }, string>(data2, `name`);
+  const values2 = await Rx.toArray(f2);
   t.is(values2.length, data2.length - 1);
   t.deepEqual(values2, [ `a`, `b`, `d` ]);
 
@@ -150,23 +288,10 @@ test(`field`, async t => {
     { name: `d` }
   ];
   // @ts-expect-error
-  const f3 = field<{ name: string }, string>(data3, `name`, { missingFieldDefault: `` });
-  const values3 = await toArray(f3);
+  const f3 = Rx.field<{ name: string }, string>(data3, `name`, { missingFieldDefault: `` });
+  const values3 = await Rx.toArray(f3);
   t.is(values3.length, data3.length);
   t.deepEqual(values3, [ `a`, `b`, ``, `d` ]);
-
-});
-
-test(`transform`, async t => {
-  // Simple array as source
-  const data = [ 1, 2, 3, 4, 5 ];
-  const values = transform(data, (v => v + '!'));
-  const valuesArray = await toArray(values);
-  t.is(valuesArray.length, data.length);
-  for (let i = 0; i < data.length; i++) {
-    t.is(valuesArray[ i ], data[ i ] + '!');
-  }
-
 
 });
 
@@ -176,7 +301,7 @@ test(`generator-async`, async t => {
   const valueCount = 10;
   const valuesOverTime = Flow.interval(() => Math.random(), valueRateMs);
 
-  const source = generator(valuesOverTime);
+  const source = Rx.generator(valuesOverTime);
   const values1: number[] = [];
   const start = Date.now();
   source.on(v => {
@@ -199,7 +324,7 @@ test(`generator-async`, async t => {
 
 test(`generator-sync`, async t => {
   const values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-  const source = generator(values.values(), { lazy: true });
+  const source = Rx.generator(values.values(), { lazy: true });
   const readValues: number[] = [];
   source.on(v => {
     if (v.value) {
@@ -213,76 +338,54 @@ test(`generator-sync`, async t => {
 
 test(`toArray`, async t => {
   const values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-  const source1 = generator(values.values(), { lazy: true });
-  const reader1 = await toArray(source1);
+  const source1 = Rx.generator(values.values(), { lazy: true });
+  const reader1 = await Rx.toArray(source1);
   t.true(reader1.length === values.length);
 
   // maxValues option
-  const source2 = generator(values.values(), { lazy: true });
-  const reader2 = await toArray(source2, { limit: 3 });
+  const source2 = Rx.generator(values.values(), { lazy: true });
+  const reader2 = await Rx.toArray(source2, { limit: 3 });
   t.true(reader2.length === 3);
 });
 
-test(`batch-limit`, async t => {
-  // Even number of items per batch
-  const amt1 = 20;
-  const values1 = count(amt1);
-  const limit1 = 5;
-  const b1 = batch(values1, { limit: limit1 });
-  const reader1 = await toArray(b1);
-  t.is(reader1.flat().length, amt1);
-  t.is(reader1.length, Math.ceil(amt1 / limit1));
-  for (const row of reader1) {
-    t.is(row.length, limit1);
+const genArray = (count: number) => {
+  const data: string[] = [];
+  for (let i = 0; i < count; i++) {
+    data[ i ] = `data-${ i }`;
   }
+  return data;
+}
 
-  //Remainders
-  const amt2 = 20;
-  const values2 = count(amt2);
-  const limit2 = 6;
-  const b2 = batch(values2, { limit: limit2 });
-  const reader2 = await toArray(b2);
-  t.is(reader2.flat().length, amt2);
-  for (let i = 0; i < reader2.length; i++) {
-    if (i === reader2.length - 1) {
-      t.is(reader2[ i ].length, amt2 % limit2);
-    } else {
-      t.is(reader2[ i ].length, limit2);
-    }
-  }
-})
+test(`rx-to-array`, async t => {
+  const data = genArray(100);
 
-test(`batch-elapsed`, async t => {
-  // Read all items within the elapsed period
-  const amt1 = 20;
-  const started1 = Date.now();
-  const values1 = count(amt1);
-  const elapsed1 = 5000;
-  const b1 = batch(values1, { elapsed: elapsed1 });
-  const reader1 = await toArray(b1);
-  const readElapsed = Date.now() - started1;
-  t.is(reader1.flat().length, amt1);
+  // Simple case: limit reachable
+  const v1 = Rx.fromArray(data);
+  const vv1 = await Rx.toArray(v1, { limit: 5 });
+  await Flow.sleep(200);
+  t.deepEqual(vv1, data.slice(0, 5));
 
-  t.true(readElapsed < 1000, `Reading shouldn't take full time since source ends`);
+  // Throws, limit not reached
+  const v2 = Rx.fromArray(data);
+  t.throwsAsync(async () => {
+    const vv2 = await Rx.toArray(v2, { limit: 1000, underThreshold: `throw`, maximumWait: 200 });
+    await Flow.sleep(200);
+  })
 
-  // Read items in gulps
-  const amt2 = 20;
-  const elapsed2 = 200;
-  const interval2 = 50
-  const values2 = count(amt2);
-  // Produce values every 500ms
-  const valuesOverTime = Flow.interval(values2, interval2);
-  const b2 = batch(valuesOverTime, { elapsed: elapsed2 });
-  const reader2 = await toArray(b2);
-  t.is(reader2.flat().length, amt2);
-  for (const row of reader2) {
-    t.is(row.length, elapsed2 / interval2);
-  }
+  // Fill with placeholder
+  const v3 = Rx.fromArray([ 1, 2, 3, 4, 5 ]);
+  const vv3 = await Rx.toArray(v3, { limit: 10, underThreshold: `fill`, fillValue: 9, maximumWait: 200 });
+  await Flow.sleep(200);
+  t.deepEqual(vv3, [ 1, 2, 3, 4, 5, 9, 9, 9, 9, 9 ])
+
+  // Return what we can
+  const v4 = Rx.fromArray([ 1, 2, 3, 4, 5 ]);
+  const vv4 = await Rx.toArray(v4, { limit: 10, underThreshold: `partial`, maximumWait: 200 });
+  await Flow.sleep(200);
+  t.deepEqual(vv4, [ 1, 2, 3, 4, 5 ]);
 });
 
-/**
- * Tests lazy subscription
- */
+
 test(`generator-lazy`, async t => {
   let produceCount = 0;
   let consumeCount = 0;
@@ -292,7 +395,7 @@ test(`generator-lazy`, async t => {
     return Math.random();
   }, { fixed: 100, signal: ac.signal });
 
-  const r = generator(time);
+  const r = Rx.generator(time);
   setTimeout(() => {
     // Wait 2s before subscribing
     r.on(v => {
