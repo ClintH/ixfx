@@ -352,7 +352,6 @@ export abstract class Box {
    * 3. Calls `measureApply` on each child
    * 4. If there's a change or `force`, sets `needsDrawing` to _true_, and notifies root of `measureApplied`
    * @param m Measurement for box
-   * @param force If true forces `measureApplied` notify
    * @returns 
    */
   protected measureApply(m: Measurement) {
@@ -452,7 +451,7 @@ export abstract class Box {
    * 2.2. Use size
    * 2. Calls `measureStart` on each child
    * @param opts Options
-   * @param force 
+   * @param force Force measurement
    * @param parent Parent's measurement 
    * @returns Measurement
    */
@@ -536,7 +535,7 @@ export abstract class Box {
    * Gets initial state for a run of measurements & layout.
    * 
    * Called when update() is called
-   * @param force
+   * @param context
    */
   protected abstract updateBegin(context: any): [ MeasureState, LayoutState ];
 
@@ -559,7 +558,7 @@ export abstract class Box {
    * 1. Calls `this.updateBegin()` to initialise measurement state
    * 2. In a loop, run `measureStart()` and then `measureApply` if possible
    * 3. Call `updateDone` when finished
-   * @param force 
+   * @param force Force update
    * @returns 
    */
   update(context: object, force = false) {
@@ -727,7 +726,7 @@ export class CanvasBox extends Box {
    * Performs recalculations and drawing as necessary
    * If nothing needs to happen, function returns.
    * @param context 
-   * @param force 
+   * @param force Force update
    */
   update(context: CanvasRenderingContext2D, force = false) {
     super.update(context, force);

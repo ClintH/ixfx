@@ -1,17 +1,28 @@
-import { toCartesian } from './Polar.js';
-import { throwIntegerTest } from '../Guards.js';
-import { Triangles, Points } from './index.js';
-import { isCirclePositioned, isCircle } from './circle/Guard.js';
-import type { RandomSource } from '../random/Types.js';
-import type { RectPositioned, CirclePositioned, Triangle, Point, Rect, Circle, ShapePositioned } from './Types.js';
-import { center as RectsCenter, corners as RectsCorners, fromTopLeft as RectsFromTopLeft } from './rect/index.js';
-import { isIntersecting as CirclesIsIntersecting } from './circle/Intersecting.js';
-import { randomPoint as circleRandomPoint, center as circleCenter } from './circle/index.js';
-import { randomPoint as rectRandomPoint } from './rect/index.js';
-import { isRect, isRectPositioned } from './rect/Guard.js';
+import { toCartesian } from '../Polar.js';
+import { throwIntegerTest } from '../../Guards.js';
+import { Triangles, Points } from '../index.js';
+import { isCirclePositioned, isCircle } from '../circle/Guard.js';
+import type { RandomSource } from '../../random/Types.js';
+import { center as RectsCenter, corners as RectsCorners, fromTopLeft as RectsFromTopLeft } from '../rect/index.js';
+import { isIntersecting as CirclesIsIntersecting } from '../circle/Intersecting.js';
+import { randomPoint as circleRandomPoint, center as circleCenter, type Circle } from '../circle/index.js';
+import { randomPoint as rectRandomPoint } from '../rect/index.js';
+import { isRect, isRectPositioned } from '../rect/Guard.js';
+
+import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';
+import type { Point, Rect, Triangle, CirclePositioned, RectPositioned, PolyLine, Line } from '../Types.js';
 export type ContainsResult = `none` | `contained`;
 
-import { isIntersecting as RectsIsIntersecting } from './rect/Intersects.js';
+export type ShapePositioned = CirclePositioned | RectPositioned;
+
+export type PointCalculableShape =
+  | PolyLine
+  | Line
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  | RectPositioned
+  | Point
+  | CirclePositioned
+  ;
 
 /**
  * Returns the intersection result between a and b.

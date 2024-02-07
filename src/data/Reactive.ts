@@ -256,8 +256,8 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
  *  { path: `level`, previous: 2, value: 3 }
  * ]
  * ```
- * @param initialValue 
- * @param eq 
+ * @param initialValue  Initial value
+ * @param options Options
  * @returns 
  */
 export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDisposable & ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {

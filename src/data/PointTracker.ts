@@ -1,4 +1,4 @@
-import * as Points from '../geometry/points/index.js';
+import * as Points from '../geometry/point/index.js';
 import {
   TrackedValueMap,
   type TrackedValueOpts as TrackOpts,
@@ -6,7 +6,8 @@ import {
 } from './TrackedValue.js';
 import { ObjectTracker } from './ObjectTracker.js';
 import { Lines, Vectors } from '../geometry/index.js';
-import type { Line, Point, PolarCoord, PolyLine } from '../geometry/Types.js';
+import type { PolarCoord } from '../geometry/Types.js';
+import type { Line, PolyLine } from '../geometry/Types.js';
 
 /**
  * Information about seen points
@@ -31,14 +32,14 @@ export type PointTrackerResults = {
    * always maintains some time horizon
    */
   readonly fromInitial: PointTrack;
-  readonly values: ReadonlyArray<Point>;
+  readonly values: ReadonlyArray<Points.Point>;
 };
 
 /**
  * Point tracker. Create via `pointTracker()`.
  *
  */
-export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
+export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResults> {
   /**
    * Function that yields the relation from initial point
    */
@@ -98,10 +99,10 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * 
    * Use {@link seenEvent} to track a raw `PointerEvent`.
    * 
-   * @param p Point
+   * @param _p Point
    */
   computeResults(
-    _p: Array<TimestampedObject<Point>>
+    _p: Array<TimestampedObject<Points.Point>>
   ): PointTrackerResults {
     const currentLast = this.last;
 
@@ -160,7 +161,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * Returns a vector of the initial/last points of the tracker.
    * Returns as a Cartesian coordinate
    */
-  get vectorCartesian(): Point {
+  get vectorCartesian(): Points.Point {
     return Vectors.fromLineCartesian(this.lineStartEnd);
   }
 
@@ -197,7 +198,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    *
    * `Points.Placeholder` is returned if there's only one point so far.
    */
-  difference(): Point {
+  difference(): Points.Point {
     const initial = this.initial;
     return this.values.length >= 2 && initial !== undefined ? Points.subtract(this.last, initial) : Points.Placeholder;
   }
@@ -230,7 +231,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
  * track added values.
  */
 export class TrackedPointMap extends TrackedValueMap<
-  Point,
+  Points.Point,
   PointTracker,
   PointTrackerResults
 > {

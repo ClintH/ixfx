@@ -2,8 +2,6 @@
 export type ChangeKind = `mutate` | `add` | `del`
 export type ChangeRecord = [ kind: ChangeKind, path: string, value: any ];
 
-
-
 /**
  * Result of {@link compareData}
  */

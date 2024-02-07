@@ -1,4 +1,5 @@
 import * as Dom from '../../../dist/dom.js';
+import {Drawing} from '../../../dist/visual.js';
 import { Waypoints, Points, Lines, Paths } from '../../../dist/geometry.js';
 import { Arrays } from '../../../dist/collections.js';
 
@@ -21,6 +22,7 @@ let state = Object.freeze({
   /**
    * @type {CanvasRenderingContext2D}
    */
+  // @ts-ignore
   ctx:undefined,
   waypointTracker: Waypoints.fromPoints(settings.waypoints),
   bounds: {
@@ -63,19 +65,10 @@ const tick = () => {
   });
 };
 
-/**
- * This is run at animation speed. It
- * should just draw based on whatever is in state
- * @returns 
- */
+
 const drawState = () => {
   const { waypoints } = settings;
-  const {  progresses, ctx } = state;
-
-  /** @type HTMLCanvasElement|null */
-  // const canvasEl = document.querySelector(`#canvas`);
-  // const ctx = canvasEl?.getContext(`2d`);
-  // if (!ctx || !canvasEl) return;
+  const { progresses, ctx } = state;
 
   // Clear canvas
   clear(ctx);
@@ -83,26 +76,20 @@ const drawState = () => {
   // Draw lines between wayoints
   ctx.fillStyle = `white`;
   ctx.strokeStyle = `silver`;
+  Drawing.connectedPoints(ctx, waypoints.map(relPt => relToAbs(relPt)), { strokeStyle: `silver`});
 
-  const corner1 = {x:0, y:0};
-  const corner2 = {x:1, y:1};
-
-  drawLine(ctx, corner1, corner2);
-
-  // waypointLines.forEach((line, index) => {
+  // waypoints.forEach((line, index) => {
   //   const p = progresses.find(p=>p.index === index);
   //   drawLabelledLine(ctx, line, `Pair ${index} Progress: ${p?.score.toFixed(2) ?? ``}`);
   // });
 
-  for (const wpt of progresses) {
-    let title = wpt.distance.toFixed(2);
-    title = `Index: ${wpt.index} ${title}`
-    drawLabelledPoint(ctx, wpt.nearest, `white`, title);
+  for (const p of progresses) {
+    let title = `Index: ${p.index} Rank: ${p.rank} Dist: ${p.distance.toFixed(2)} Progress: ${p.positionRelative.toFixed(2)}`;
+    drawLabelledPoint(ctx, p.nearest, `white`, title);
   };
 
   // Draw waypoints
   waypoints.forEach((wp, index) => {
-
     drawLabelledPoint(ctx, wp, `yellow`, index.toString());
   });
 };
@@ -115,7 +102,6 @@ const drawLine = (ctx, a, b) => {
   ctx.lineTo(b.x, b.y);
   ctx.strokeStyle = `white`;
   ctx.stroke();
-
 }
 
 /**
@@ -136,7 +122,7 @@ const drawLabelledLine = (ctx, line, title) => {
 
   if (title) {
     const mid = Lines.midpoint(a, b);
-    ctx.fillText(title, mid.x + 10, mid.y);
+    ctx.fillText(title, mid.x + 30, mid.y + 30);
   }
 };
 /**
@@ -232,7 +218,7 @@ function drawLabelledPoint(ctx, point, fillStyle = `black`, msg = ``, textFillSt
   if (msg.length) {
     ctx.fillStyle = textFillStyle;
     ctx.textAlign = `center`;
-    ctx.fillText(msg, radius * 2, radius * 2);
+    ctx.fillText(msg, radius * 4, radius * 4);
   }
   ctx.restore();
 }

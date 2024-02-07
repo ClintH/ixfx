@@ -1,5 +1,6 @@
-import type { CirclePositioned, Point } from "../Types.js";
-import { distance } from "../points/Distance.js";
+import type { CirclePositioned } from "./index.js";
+import { distance } from "../point/Distance.js";
+import type { Point } from "../Types.js";
 
 /**
  * Returns all integer points contained within `circle`.

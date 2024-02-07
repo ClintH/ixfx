@@ -292,8 +292,8 @@ export async function min<V>(it: AsyncIterable<V>, gt = (a: V, b: V) => a > b) {
  * range(-5, 10);
  * // Yields: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
  * ```
- * @param start
- * @param len
+ * @param start Start number
+ * @param length Length
  */
 //eslint-disable-next-line func-style,@typescript-eslint/require-await
 export async function* range(start: number, length: number) {

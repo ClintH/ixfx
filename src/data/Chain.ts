@@ -322,7 +322,7 @@ export function debounce<In>(rate: Interval): Link<In, In> {
 /**
  * Allow values through until a duration has elapsed. After
  * that, the chain stops.
- * @param duration 
+ * @param elapsed 
  * @returns 
  */
 export function duration<In>(elapsed: Interval): Link<In, In> {
@@ -479,8 +479,8 @@ export function asPromise<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<
  * it isn't already awaiting a result.
  * 
  * In the meantime, the last value (or `initialValue`) is returned.
- * @param valueToWrap 
- * @param initialValue 
+ * @param valueToWrap Value to wrap
+ * @param initialValue Initial value
  * @returns 
  */
 export function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>, initialValue?: V) {
@@ -540,7 +540,7 @@ export async function asCallback<V>(valueToWrap: GenOrData<V> | GenFactoryNoInpu
  * const values = await asArray(tick( { interval: 1000, loops: 5 }));
  * // After 5 seconds, values will be a set of timestamps.
  * ```
- * @param chain 
+ * @param valueToWrap 
  * @returns 
  */
 export async function asArray<Out>(valueToWrap: AsyncGenerator<Out> | GenFactoryNoInput<Out>): Promise<Array<Out>> {
@@ -557,7 +557,7 @@ export async function asArray<Out>(valueToWrap: AsyncGenerator<Out> | GenFactory
  * addToArray(data, tick({ interval: 1000, loops: 5 }));
  * // Execution continues immediately, with `data` mutated over time
  * ```
- * @param chain 
+ * @param valueToWrap 
  * @param array 
  */
 export async function addToArray<Out>(array: Array<Out>, valueToWrap: AsyncGenerator<Out> | GenFactoryNoInput<Out>) {
@@ -777,7 +777,6 @@ const getName = (c: Link<any, any>): string => {
  * emitted from the input source.
  * 
  * This is different than {@link total} which adds up numeric values
- * @param limit 
  * @returns 
  */
 export function tally<In>(): Link<In, number> {

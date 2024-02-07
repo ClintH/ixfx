@@ -1,6 +1,7 @@
-import type { Point, CirclePositioned } from "../Types.js";
-import { distance as pointsDistance } from '../points/Distance.js';
+import type { CirclePositioned } from "./index.js";
+import { distance as pointsDistance } from '../point/Distance.js';
 import { guardPositioned, isCirclePositioned } from "./Guard.js";
+import type { Point } from "../Types.js";
 
 /**
  * Returns the distance between two circle centers.

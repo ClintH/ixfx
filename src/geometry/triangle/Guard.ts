@@ -1,6 +1,6 @@
 import type { Triangle } from "../Types.js";
 
-import { guard as PointsGuard } from '../points/Guard.js'
+import { guard as PointsGuard } from '../point/Guard.js'
 
 /**
  * Throws an exception if the triangle is invalid

@@ -44,7 +44,7 @@ export type PipeDomBinding = {
  * bindTextContent(myEl, source, v => v.name);
  * ```
  * 
- * Uses {@link bindField}, with `{field:'textContent'}` as the options
+ * Uses {@link bind}, with `{field:'textContent'}` as the options
  * @param elOrQuery 
  * @param source 
  * @param transformer 
@@ -143,10 +143,10 @@ export const create = <V>(source: Rx.Reactive<V>, options: Partial<DomCreateOpti
  * 
  * // Pluck a particular field from source data.
  * // Ie someEl.textContent = value.colour
- * bindField(someEl, readableSource, { sourceField: `colour` });
+ * bind(someEl, readableSource, { sourceField: `colour` });
  * 
  * // Transform value before setting it to field
- * bindField(someEl, readableSource, { 
+ * bind(someEl, readableSource, { 
  *  field: `innerHTML`, 
  *  transform: (v) => `Colour: ${v.colour}`
  * })

@@ -1,11 +1,10 @@
 
-import { Points, Paths } from './index.js';
-import type { RectPositioned, Point, Path } from './Types.js';
-import { corners as RectsCorners } from './rect/index.js';
-export type CompoundPath = Path & {
-  readonly segments: ReadonlyArray<Path>
-  readonly kind: `compound`
-};
+import { Points, Paths } from '../index.js';
+import type { CompoundPath, Dimensions, Path } from '../Types.js';
+import type { Point } from '../point/index.js';
+import { corners as RectsCorners, type RectPositioned } from '../rect/index.js';
+import { sortByNumericProperty } from '../../collections/arrays/SortByNumericProperty.js';
+
 
 /**
  * Returns a new compoundpath, replacing a path at a given index
@@ -53,25 +52,54 @@ export const interpolate = (paths: ReadonlyArray<Path>, t: number, useWidth?: bo
   return { x: 0, y: 0 };
 };
 
-export type Dimensions = {
-  /**
-   * Width of each path (based on bounding box)
-   */
-  readonly widths: ReadonlyArray<number>,
-  /**
-   * Length of each path
-   */
-  readonly lengths: ReadonlyArray<number>,
-
-  /**
-   * Total length of all paths
-   */
-  readonly totalLength: number,
-  /**
-   * Total width of all paths
-   */
-  readonly totalWidth: number
+/**
+ * Returns the shortest distance of `point` to any point on `paths`.
+ * @param paths 
+ * @param point 
+ * @returns 
+ */
+export const distanceToPoint = (paths: ReadonlyArray<Path>, point: Points.Point): number => {
+  if (paths.length === 0) return 0;
+  let distances = paths.map((p, index) => ({ path: p, index, distance: p.distanceToPoint(point) }));
+  distances = sortByNumericProperty(distances, `distance`);
+  if (distances.length === 0) throw new Error(`Could not look up distances`);
+  return distances[ 0 ].distance;
 }
+
+/**
+ * Relative position
+ * @param paths Paths
+ * @param point Point
+ * @param intersectionThreshold Threshold 
+ * @param dimensions Pre-computed dimensions
+ * @returns 
+ */
+export const relativePosition = (paths: ReadonlyArray<Path>, point: Points.Point, intersectionThreshold: number, dimensions?: Dimensions): number => {
+  if (dimensions === undefined) {
+    dimensions = computeDimensions(paths);
+  }
+  let distances = paths.map((p, index) => ({ path: p, index, distance: p.distanceToPoint(point) }));
+  distances = sortByNumericProperty(distances, `distance`);
+  if (distances.length < 0) throw new Error(`Point does not intersect with path`);
+  const d = distances[ 0 ];
+  if (d.distance > intersectionThreshold) throw new Error(`Point does not intersect with path. Minimum distance: ${ d.distance }, threshold: ${ intersectionThreshold }`);
+
+  const relativePositionOnPath = d.path.relativePosition(point, intersectionThreshold);
+
+  // Add up distances
+  let accumulated = 0;
+  for (let index = 0; index < d.index; index++) {
+    // Add up length of paths before closest path segment
+    accumulated += dimensions.lengths[ index ];
+  }
+
+  // Add up partial amount of closest path
+  accumulated += dimensions.lengths[ d.index ] * relativePositionOnPath;
+  const accumulatedRel = accumulated / dimensions.totalLength;
+  console.log(`acc: ${ accumulated } rel: ${ accumulatedRel } on path: ${ relativePositionOnPath } path: ${ d.index }`);
+  return accumulatedRel;
+}
+
 /**
  * Computes the widths and lengths of all paths, adding them up as well
  *
@@ -146,6 +174,8 @@ export const fromPaths = (...paths: ReadonlyArray<Path>): CompoundPath => {
     length: () => dims.totalLength,
     nearest: (_: Point) => { throw new Error(`not implemented`); },
     interpolate: (t: number, useWidth = false) => interpolate(paths, t, useWidth, dims),
+    relativePosition: (point: Points.Point, intersectionThreshold: number) => relativePosition(paths, point, intersectionThreshold, dims),
+    distanceToPoint: (point: Points.Point) => distanceToPoint(paths, point),
     bbox: () => bbox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths),

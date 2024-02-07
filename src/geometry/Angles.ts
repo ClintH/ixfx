@@ -1,4 +1,4 @@
-import type { Point } from './Types.js';
+import type { Point } from './point/index.js';
 /**
  * Convert angle in degrees to angle in radians.
  * @param angleInDegrees 

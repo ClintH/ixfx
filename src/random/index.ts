@@ -122,12 +122,12 @@ const calculateNonZero = (source: RandomSource = defaultRandom) => {
  * ```
  *
  * Throws an error if max & min are equal
- * @param maxOrOpts Max value (exclusive), or set of options
+ * @param maxOrOptions Max value (exclusive), or set of options
  * @returns Random integer
  */
 export const integerSource = (maxOrOptions: number | RandomOptions): RandomSource => {
   if (typeof maxOrOptions === `undefined`) {
-    throw new TypeError(`maxOrOpts is undefined`);
+    throw new TypeError(`maxOrOptions is undefined`);
   }
   const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   //eslint-disable-next-line functional/no-let
@@ -180,7 +180,7 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
  * ```
  *
  * Throws an error if max & min are equal
- * @param maxOrOpts Max value (exclusive), or set of options
+ * @param maxOrOptions Max value (exclusive), or set of options
  * @returns Random integer
  */
 export const integer = (maxOrOptions: number | RandomOptions): number =>
@@ -205,7 +205,7 @@ export const integer = (maxOrOptions: number | RandomOptions): number =>
  * // Random float between 20..40 (possibly including 20, but always lower than 40)
  * const v = float({ min: 20, max: 40 });
  * ```
- * @param maxOrOpts Maximum value (exclusive) or options
+ * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
 export const float = (maxOrOptions: number | RandomOptions = 1): number =>
@@ -389,7 +389,7 @@ export type GenerateRandomOptions = RandomOptions & Readonly<{
  * shuffled on the first run, and again whenever the iterator loops, if that's allowed.
  *
  * As a consequence, large ranges will consume larger amounts of memory.
- * @param maxOrOpts
+ * @param maxOrOptions
  * @returns
  */
 export function* integerUniqueGen(

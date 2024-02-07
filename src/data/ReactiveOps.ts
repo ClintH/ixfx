@@ -213,7 +213,7 @@ export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<Reso
  * 
  * If a source value doesn't have that field, it is skipped.
  * 
- * @param source 
+ * @param fieldSource 
  * @param field 
  * @returns 
  */
@@ -239,7 +239,7 @@ export function field<In, Out>(fieldSource: ReactiveOrSource<In>, field: keyof I
 
 /**
  * Transforms values from `source` using the `transformer` function.
- * @param source 
+ * @param input 
  * @param transformer 
  * @returns 
  */
@@ -272,7 +272,7 @@ export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (va
  * // Emit data every second
  * batch(source, { elapsed: 1000 });
  * ```
- * @param source 
+ * @param batchSource 
  * @param options 
  * @returns 
  */

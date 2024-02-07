@@ -2,10 +2,10 @@ import type { Point } from "bezier-js";
 import { guardPositioned } from "./Guard.js";
 import { intersectsPoint } from "./Intersects.js";
 import { center } from "./index.js";
-import type { RectPositioned } from "../Types.js";
-import { guard as PointsGuard } from '../points/Guard.js';
+import type { RectPositioned } from "./index.js";
+import { guard as PointsGuard } from '../point/Guard.js';
 
-import { distance as PointsDistance } from '../points/index.js';
+import { distance as PointsDistance } from '../point/index.js';
 
 /**
  * Returns the distance from the perimeter of `rect` to `pt`.

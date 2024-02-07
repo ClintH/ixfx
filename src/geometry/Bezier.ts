@@ -1,7 +1,7 @@
 import { Bezier as BezierLibrary } from 'bezier-js';
-import { interpolate as LinesInterpolate } from './Line.js';
+import { interpolate as LinesInterpolate } from './line/index.js';
 import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
-import type { Point, Path } from './Types.js';
+import type { Path, Point } from './Types.js';
 
 export type QuadraticBezier = {
   readonly a: Point,
@@ -113,7 +113,12 @@ const cubicToPath = (cubic: CubicBezier): CubicBezierPath => {
 
       return RectsFromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
     },
-    toString: () => bzr.toString(),
+    relativePosition: (_point: Point, _intersectionThreshold: number) => {
+      throw new Error(`Not implemented`);
+    },
+    distanceToPoint: (_point: Point): number => {
+      throw new Error(`Not implemented`);
+    },
     toSvgString: () => [ `brrup` ],
     kind: `bezier/cubic`
   });
@@ -141,6 +146,14 @@ const quadratictoPath = (quadraticBezier: QuadraticBezier): QuadraticBezierPath 
       if (xSize === undefined) throw new Error(`x.size not present on calculated bbox`);
       if (ySize === undefined) throw new Error(`x.size not present on calculated bbox`);
       return RectsFromTopLeft({ x: x.min, y: y.min }, xSize, ySize);
+    },
+    distanceToPoint: (_point: Point): number => {
+      throw new Error(`Not implemented`);
+
+    },
+    relativePosition: (_point: Point, _intersectionThreshold: number): number => {
+      throw new Error(`Not implemented`);
+
     },
     toString: () => bzr.toString(),
     toSvgString: () => quadraticToSvgString(a, b, quadratic),

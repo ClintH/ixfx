@@ -1,5 +1,5 @@
 import { guard } from "./Guard.js";
-import { length as LinesLength } from '../Line.js';
+import { length as LinesLength } from '../line/index.js';
 import { edges } from "./Edges.js";
 import type { Triangle } from "../Types.js";
 

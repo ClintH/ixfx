@@ -1,10 +1,8 @@
 /* eslint-disable unicorn/no-null */
 
 import { markerPrebuilt } from './SvgMarkers.js';
-import * as Lines from '../geometry/Line.js';
 import * as Elements from './SvgElements.js';
-
-import type { Rect, Point, CirclePositioned, Line } from '../geometry/Types.js';
+import type { Point, Line, CirclePositioned, Rect } from '../geometry/Types.js';
 
 export type MarkerOpts = StrokeOpts &
   DrawingOpts & {
@@ -125,7 +123,8 @@ export type TextPathDrawingOpts = TextDrawingOpts & {
 export const createOrResolve = <V extends SVGElement>(
   parent: SVGElement,
   type: string,
-  queryOrExisting?: string | V
+  queryOrExisting?: string | V,
+  suffix?: string
 ): V => {
   let existing = null;
   if (queryOrExisting !== undefined) {
@@ -134,8 +133,10 @@ export const createOrResolve = <V extends SVGElement>(
   if (existing === null) {
     const p = document.createElementNS(`http://www.w3.org/2000/svg`, type) as V;
     parent.append(p);
-    if (queryOrExisting && typeof queryOrExisting === `string` && //eslint-disable-next-line functional/immutable-data
-      queryOrExisting.startsWith(`#`)) p.id = queryOrExisting.slice(1);
+    if (queryOrExisting && typeof queryOrExisting === `string` &&
+      queryOrExisting.startsWith(`#`)) {
+      p.id = suffix !== undefined && !queryOrExisting.endsWith(suffix) ? queryOrExisting.slice(1) + suffix : queryOrExisting.slice(1);
+    }
     return p;
   }
   return existing as V;
@@ -258,16 +259,18 @@ export type SvgHelper = {
   ): SVGTextElement;
   /**
    * Creates text on a path
-   * @param pathRef Reference to path element
+   * @param pathReference Reference to path element
    * @param text Text
    * @param opts Drawing options
-   * @param queryOrExisting DOM query to look up existing element, or the element instance
+   * @param textQueryOrExisting DOM query to look up existing element, or the element instance
+   * @param pathQueryOrExisting DOM query to look up existing element, or the element instance
    */
   textPath(
     pathReference: string,
     text: string,
     opts?: TextDrawingOpts,
-    queryOrExisting?: string | SVGTextPathElement
+    textQueryOrExisting?: string | SVGTextElement,
+    pathQueryOrExisting?: string | SVGTextPathElement
   ): SVGTextPathElement;
   /**
    * Creates a line
@@ -293,7 +296,7 @@ export type SvgHelper = {
   ): SVGCircleElement;
   /**
    * Creates a path
-   * @param svgStr Path description, or empty string
+   * @param svgString Path description, or empty string
    * @param opts Drawing options
    * @param queryOrExisting DOM query to look up existing element, or the element instance
    */
@@ -392,8 +395,9 @@ export const makeHelper = (
       pathReference: string,
       text: string,
       opts?: TextDrawingOpts,
-      queryOrExisting?: string | SVGTextPathElement
-    ) => Elements.textPath(pathReference, text, parent, opts, queryOrExisting),
+      textQueryOrExisting?: string | SVGTextElement,
+      pathQueryOrExisting?: string | SVGTextPathElement
+    ) => Elements.textPath(pathReference, text, parent, opts, textQueryOrExisting, pathQueryOrExisting),
     line: (
       line: Line,
       opts?: LineDrawingOpts,

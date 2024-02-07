@@ -423,8 +423,8 @@ export function min<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b) {
  * range(-5, 10);
  * // Yields: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
  * ```
- * @param start
- * @param len
+ * @param start Start
+ * @param length Length
  */
 //eslint-disable-next-line func-style
 export function* range(start: number, length: number) {
@@ -515,7 +515,6 @@ export function* takeWhile<V>(it: Iterable<V>, f: (v: V) => boolean) {
  * Uses object reference to compare values.
  * Use {@link uniqueByValue} if this doesn't suffice.
  * @param iterable Iterable, or array of iterables
- * @param f
  */
 export function* unique<V>(
   iterable: Iterable<V> | Array<Iterable<V>>

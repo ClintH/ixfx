@@ -36,9 +36,8 @@ export class StateMachineWithEvents<
 
   /**
    * Create a state machine with initial state, description and options
-   * @param string initial Initial state
-   * @param MachineDescription m Machine description
-   * @param Options Options for machine (defaults to `{debug:false}`)
+   * @param m Machine description
+   * @param opts Options for machine (defaults to `{debug:false}`)
    * @memberof StateMachine
    */
   constructor(m: V, opts: Opts<V> = {}) {
@@ -92,8 +91,8 @@ export class StateMachineWithEvents<
   next(): string | null {
     const p = StateMachine.possible(this.#sm);
     if (p.length === 0) return null;
-    this.state = p[0] as string;
-    return p[0] as string;
+    this.state = p[ 0 ] as string;
+    return p[ 0 ] as string;
   }
 
   /**
@@ -153,7 +152,7 @@ export class StateMachineWithEvents<
     // Try to change state
     this.#sm = StateMachine.to(this.#sm, newState);
     if (this.#debug) {
-      console.log(`StateMachine: ${priorState} -> ${newState as string}`);
+      console.log(`StateMachine: ${ priorState } -> ${ newState as string }`);
     }
     this.#changedAt = Elapsed.since();
     setTimeout(() => {

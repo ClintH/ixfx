@@ -1,7 +1,9 @@
-import * as Lines from './Line.js';
-import * as Points from './points/index.js';
-import type { Line, Vector, Point, PolarCoord } from './Types.js';
+import type { Line } from './line/index.js';
+import * as Lines from './line/index.js';
+import type { Point } from './point/index.js';
+import * as Points from './point/index.js'
 import { clampMagnitude as polarClampMagnitude, normalise as polarNormalise, dotProduct as polarDotProduct, toString as polarToString, toPoint as polarToPoint, fromCartesian as polarFromCartesian, isPolarCoord } from './Polar.js';
+import type { PolarCoord, Vector } from './Types.js';
 //eslint-disable-next-line @typescript-eslint/naming-convention
 const EmptyCartesian = Object.freeze({ x: 0, y: 0 });
 
@@ -59,7 +61,7 @@ export const fromPointPolar = (
  * @param line
  * @returns
  */
-export const fromLineCartesian = (line: Line): Point =>
+export const fromLineCartesian = (line: Line): Points.Point =>
   Points.subtract(line.b, line.a);
 
 /**

@@ -23,7 +23,7 @@ import { numberTest as guardNumberTest, throwFromResult } from '../Guards.js';
  * // Random float between 20..40 (possibly including 20, but always lower than 40)
  * const r = floatSource({ min: 20, max: 40 });
  * ```
- * @param maxOrOpts Maximum value (exclusive) or options
+ * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
 export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSource => {

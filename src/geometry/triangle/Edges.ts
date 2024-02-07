@@ -1,6 +1,6 @@
 
 import type { Triangle, PolyLine } from "../Types.js";
-import { joinPointsToLines } from "../Line.js";
+import { joinPointsToLines } from "../line/index.js";
 import { guard } from "./Guard.js";
 /**
  * Returns the edges (ie sides) of the triangle as an array of lines

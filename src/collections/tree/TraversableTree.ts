@@ -198,7 +198,7 @@ export const hasChildValue = <T>(
  * * {@link depthFirst}: Children, depth-first
  * * {@link parents}: Chain of parents, starting with immediate parent
  * * {@link siblings}: Nodes with same parent
- * @param node 
+ * @param node Node to begin from
  * @returns 
  */
 export function* siblings<T>(node: TraversableTree<T>): IterableIterator<TraversableTree<T>> {
@@ -218,7 +218,7 @@ export function* siblings<T>(node: TraversableTree<T>): IterableIterator<Travers
  * * {@link depthFirst}: Children, depth-first
  * * {@link parents}: Chain of parents, starting with immediate parent
  * * {@link siblings}: Nodes with same parent
- * @param node 
+ * @param node Node to begin from
  * @returns 
  */
 export function* parents<T>(node: TraversableTree<T>): IterableIterator<TraversableTree<T>> {
@@ -261,7 +261,7 @@ export const findChildByValue = <TValue>(parent: TraversableTree<TValue>,
  * * {@link depthFirst}: Children, depth-first
  * * {@link parents}: Chain of parents, starting with immediate parent
  * * {@link siblings}: Nodes with same parent
- * @param node 
+ * @param root Root node 
  * @returns 
  */
 export function* depthFirst<T>(root: TraversableTree<T>): IterableIterator<TraversableTree<T>> {
@@ -283,7 +283,8 @@ export function* depthFirst<T>(root: TraversableTree<T>): IterableIterator<Trave
  * * {@link depthFirst}: Children, depth-first
  * * {@link parents}: Chain of parents, starting with immediate parent
  * * {@link siblings}: Nodes with same parent
- * @param node 
+ * @param root Root node
+ * @param depth How many levels to traverse 
  * @returns 
  */
 export function* breadthFirst<T>(root: TraversableTree<T>, depth = Number.MAX_SAFE_INTEGER): IterableIterator<TraversableTree<T>> {

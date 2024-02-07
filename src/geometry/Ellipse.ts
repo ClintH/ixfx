@@ -1,6 +1,7 @@
 
-import type { Point, Path } from './Types.js';
+import type { Point } from './point/index.js';
 import { degreeToRadian } from './Angles.js';
+import type { Path } from './path/index.js';
 
 /**
  * An ellipse
@@ -22,7 +23,7 @@ export type Ellipse = {
 export type EllipsePositioned = Point & Ellipse
 
 
-export const fromDegrees = (radiusX: number, radiusY: number, rotationDeg: number = 0, startAngleDeg: number = 0, endAngleDeg: number = 360): Ellipse => ({
+export const fromDegrees = (radiusX: number, radiusY: number, rotationDeg = 0, startAngleDeg = 0, endAngleDeg = 360): Ellipse => ({
   radiusX, radiusY,
   rotation: degreeToRadian(rotationDeg),
   startAngle: degreeToRadian(startAngleDeg),

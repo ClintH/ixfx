@@ -1,15 +1,13 @@
 import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
 import { type ICircularArray } from '../collections/CircularArray.js';
-
-//import { subtract as pointSubtract } from '../geometry/points/index.js';
 import { resolveEl, parentSizeCanvas } from '../dom/Util.js';
-import type { Rect, Point } from '../geometry/Types.js';
 import { Colour, Drawing } from './index.js';
 import {
   ofArrayMutable,
   ofCircularMutable,
   type IMapOfMutableExtended,
 } from '../collections/map/index.js';
+import type { Rect, Point } from '../geometry/Types.js';
 
 export type Plotter = {
   add(value: number, series?: string, skipDrawing?: boolean): void;

@@ -1,4 +1,4 @@
-import type { Rect } from "../Types.js";
+import type { Rect } from "./index.js";
 
 /**
  * Sums width/height of `b` with `a` (ie: a + b), returning result.

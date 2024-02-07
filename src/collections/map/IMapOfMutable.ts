@@ -1,4 +1,4 @@
-import { type IMapOf } from './IMapOf';
+import { type IMapOf } from './IMapOf.js';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapOfMutable<V> extends IMapOf<V> {

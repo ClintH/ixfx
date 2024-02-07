@@ -1,10 +1,9 @@
-import type { Point } from "bezier-js";
 import { guard } from "./Guard.js";
 import { isPositioned, isRectPositioned } from "./Guard.js";
 import { isCirclePositioned } from '../circle/Guard.js';
-import type { RectPositioned, Rect, CirclePositioned } from "../Types.js";
 import * as Intersects from '../Intersects.js';
-import { isPoint } from "../points/Guard.js";
+import { isPoint } from "../point/Guard.js";
+import type { CirclePositioned, Rect, RectPositioned, Point } from "../Types.js";
 /**
  * Returns _true_ if `point` is within, or on boundary of `rect`.
  *

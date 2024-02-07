@@ -164,8 +164,8 @@ export const opacity = (colour: Colourish, amt: number): string => {
 
 /**
  * Gets a CSS variable.
- * @example Fetch --accent variable, or use `yellow` if not found.
  * ```
+ * // Fetch --accent variable, or use `yellow` if not found.
  * getCssVariable(`accent`, `yellow`);
  * ```
  * @param name Name of variable. Omit the `--`

@@ -28,10 +28,8 @@ export * from './AverageWeighted.js';
 export * from './NumericArrays.js';
 export * from './Zip.js';
 export * from './ValuesEqual.js';
-
+export * from './SortByNumericProperty.js';
 export { compareValues, compareValuesEqual } from '../Iterables.js';
-
-
 
 
 /**
@@ -329,35 +327,7 @@ export const shuffle = <V>(
   return array;
 };
 
-/**
- * Sorts an array of objects in ascending order
- * by the given property name, assuming it is a number.
- *
- * ```js
- * const data = [
- *  { size: 10, colour: `red` },
- *  { size: 20, colour: `blue` },
- *  { size: 5, colour: `pink` }
- * ];
- * const sorted = Arrays.sortByNumericProperty(data, `size`);
- *
- * Yields items ascending order:
- * [ { size: 5, colour: `pink` }, { size: 10, colour: `red` }, { size: 20, colour: `blue` } ]
- * ```
- * @param data
- * @param propertyName
- */
-export const sortByNumericProperty = <V, K extends keyof V>(
-  data: ReadonlyArray<V> | Array<V>,
-  propertyName: K
-) => [ ...data ].sort((a, b) => {
-  guardArray(data, `data`);
-  const av = a[ propertyName ];
-  const bv = b[ propertyName ];
-  if (av < bv) return -1;
-  if (av > bv) return 1;
-  return 0;
-});
+
 
 /**
  * Returns an array with value(s) omitted. If value is not found, result will be a copy of input.
@@ -619,7 +589,7 @@ export const sample = <V>(array: ArrayLike<V>, amount: number): Array<V> => {
  * chunks([1,2,3,4,5,6,7,8,9,10], 3);
  * // Yields: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
  * ```
- * @param arr
+ * @param array
  * @param size
  * @returns
  */
@@ -724,7 +694,7 @@ export const mergeByKey = <V>(
  * const result = reducePairwise(`a b c d e f g`.split(` `), reducer, `!`);
  * Yields: `![a-b][b-c][c-d][d-e][e-f][f-g]`
  * ```
- * @param arr
+ * @param array
  * @param reducer
  * @param initial
  * @returns

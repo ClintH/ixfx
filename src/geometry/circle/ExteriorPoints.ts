@@ -1,5 +1,5 @@
-import type { CirclePositioned, Point } from "../Types.js";
-
+import type { Point } from "../Types.js";
+import type { CirclePositioned } from "./index.js";
 
 /**
  * Yields the points making up the exterior (ie. circumference) of the circle.

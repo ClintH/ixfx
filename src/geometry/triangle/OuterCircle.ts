@@ -1,5 +1,6 @@
-import { length as LinesLength } from '../Line.js';
-import type { CirclePositioned, Triangle } from '../Types.js';
+import { length as LinesLength } from '../line/index.js';
+import type { Triangle, CirclePositioned } from "../Types.js";
+
 import { edges } from "./Edges.js";
 import { centroid } from './index.js';
 

@@ -14,6 +14,7 @@ export type Palette = {
    *  2. The next fallback colour is used (array cycles)
    *
    * @param key
+   * @param fallback
    * @returns
    */
   get(key: string, fallback?: string): string;
@@ -29,7 +30,7 @@ export type Palette = {
    * Adds a colour with a given key
    *
    * @param key
-   * @param colour
+   * @param value
    */
   add(key: string, value: string): void;
 
@@ -52,7 +53,7 @@ class PaletteImpl {
 
   constructor(fallbacks?: readonly string[]) {
     if (fallbacks !== undefined) this.fallbacks = fallbacks;
-    else this.fallbacks = [`red`, `blue`, `green`, `orange`];
+    else this.fallbacks = [ `red`, `blue`, `green`, `orange` ];
     this.#elementBase = document.body;
   }
 
@@ -84,7 +85,7 @@ class PaletteImpl {
     // Not found
     if (fromCss === undefined || fromCss.length === 0) {
       if (fallback !== undefined) return fallback;
-      fromCss = this.fallbacks[this.#lastFallback];
+      fromCss = this.fallbacks[ this.#lastFallback ];
       this.#lastFallback++;
       if (this.#lastFallback === this.fallbacks.length) this.#lastFallback = 0;
     }

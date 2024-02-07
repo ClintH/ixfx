@@ -79,8 +79,8 @@ export const forEach = <V>(
  * await forEachAsync([0,1,2,3], i => console.log(i), 1000);
  * ```
  *
- * @example Retry `doSomething` up to five times, with 5 seconds between each attempt
  * ```
+ * // Retry up to five times, with 5 seconds between each attempt
  * await forEachAsync(count(5), i=> {
  *  try {
  *    await doSomething();

@@ -32,7 +32,7 @@ export type WeightedIntegerOptions = WeightedOptions & Readonly<{
  * Note: result from easing function will be clamped to
  * the min/max (by default 0-1);
  *
- * @param maxOrOpts Maximum (exclusive)
+ * @param maxOrOptions Maximum (exclusive)
  * @returns Function that produces a random weighted integer
  */
 export const weightedIntegerSource = (
@@ -81,7 +81,7 @@ export const weightedIntegerSource = (
  * Random.weightedInteger({ max: 100, easing: `quadIn` })
  * ```
  * @inheritDoc {@link weightedIntegerSource}
- * @param maxOrOpts
+ * @param maxOrOptions
  * @returns Random weighted integer
  */
 export const weightedInteger = (maxOrOptions: number | WeightedIntegerOptions): number =>

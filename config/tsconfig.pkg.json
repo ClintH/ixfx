@@ -2,8 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "declaration": true,
-    "declarationMap": false
+    "declarationMap": true
   },
 }

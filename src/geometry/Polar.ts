@@ -1,7 +1,8 @@
 import { degreeToRadian, radianToDegree } from './Angles.js';
-import * as Points from './points/index.js';
+import * as Points from './point/index.js';
 import { throwNumberTest } from '../Guards.js';
-import type { Point, PolarCoord } from './Types.js';
+import type { PolarCoord } from './Types.js';
+import type { Point } from './point/index.js';
 const _piPi = Math.PI * 2;
 
 //eslint-disable-next-line @typescript-eslint/naming-convention

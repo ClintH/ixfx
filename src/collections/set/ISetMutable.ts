@@ -63,7 +63,7 @@ export interface ISetMutable<V>
    * Add `values` to set.
    * Corresponding keys will be generated according to the
    * function provided to `setMutable`, or `JSON.stringify` by default.
-   * @param v Value(s) to add
+   * @param values Value(s) to add
    * @returns _true_ if something new was added
    */
   add(...values: ReadonlyArray<V>): boolean;
@@ -92,7 +92,7 @@ export interface ISetMutable<V>
 
   /**
    * Returns _true_ if _value_ is contained in Set
-   * @param v
+   * @param value
    */
   has(value: V): boolean;
 

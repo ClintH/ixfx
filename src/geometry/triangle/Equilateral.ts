@@ -1,5 +1,4 @@
-
-import type { Triangle, Circle, Point } from '../Types.js';
+import type { Triangle, Circle, Point } from "../Types.js";
 
 const pi4over3 = (Math.PI * 4) / 3;
 const pi2over3 = (Math.PI * 2) / 3;

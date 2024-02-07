@@ -1,5 +1,4 @@
-import type { Point, Circle, Triangle } from '../Types.js';
-
+import type { Triangle, Circle, Point } from "../Types.js";
 export type Right = {
   readonly adjacent?: number;
   readonly hypotenuse?: number;

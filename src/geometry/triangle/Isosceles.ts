@@ -1,5 +1,5 @@
-import type { Circle, Point, Triangle } from '../Types.js';
 
+import type { Triangle, Circle, Point } from "../Types.js";
 export type Isosceles = {
   readonly legs: number;
   readonly base: number;

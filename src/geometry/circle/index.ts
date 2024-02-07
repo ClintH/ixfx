@@ -1,9 +1,9 @@
-import type { Line, Circle, Point, CirclePositioned, CircularPath, RectPositioned, Rect } from '../Types.js';
 import { Points, Polar } from '../index.js';
 import { Arrays } from '../../collections/index.js';
 import { defaultRandom, type RandomSource } from '../../random/Types.js';
 import { guard, isCircle, isCirclePositioned } from './Guard.js';
 import { fromCenter as RectsFromCenter } from '../rect/index.js';
+import type { Point, Rect, RectPositioned, Line, Path } from '../Types.js';
 const piPi = Math.PI * 2;
 export * from './DistanceCenter.js';
 export * from './DistanceFromExterior.js';
@@ -11,6 +11,22 @@ export * from './Guard.js';
 export * from './ToPositioned.js';
 export * from './ExteriorPoints.js';
 export * from './InteriorPoints.js';
+
+/**
+ * A circle
+ */
+export type Circle = {
+  readonly radius: number
+}
+
+/**
+ * A {@link Circle} with position
+ */
+export type CirclePositioned = Point & Circle;
+
+export type CircularPath = Circle & Path & {
+  readonly kind: `circular`
+};
 
 /**
  * Returns a point on a circle at a specified angle in radians
@@ -226,9 +242,6 @@ export function multiplyScalar(a: Circle | CirclePositioned, value: number): Cir
 }
 
 
-
-
-
 type ToSvg = {
   (circleOrRadius: Circle | number, sweep: boolean, origin: Point): ReadonlyArray<string>;
   (circle: CirclePositioned, sweep: boolean): ReadonlyArray<string>;
@@ -320,6 +333,12 @@ export const toPath = (circle: CirclePositioned): CircularPath => {
     bbox: () => bbox(circle) as RectPositioned,
     length: () => length(circle),
     toSvgString: (sweep = true) => toSvg(circle, sweep),
+    relativePosition: (_point: Point, _intersectionThreshold: number) => {
+      throw new Error(`Not implemented`)
+    },
+    distanceToPoint: (_point: Point): number => {
+      throw new Error(`Not implemented`)
+    },
     kind: `circular`
   });
 };

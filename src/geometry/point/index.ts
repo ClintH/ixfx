@@ -1,6 +1,6 @@
 import * as Polar from '../Polar.js';
 import * as Arrays from '../../collections/arrays/index.js';
-import { interpolate as lineInterpolate } from '../Line.js';
+import { interpolate as lineInterpolate } from '../line/index.js';
 import { isRect } from '../rect/Guard.js';
 import { throwNumberTest } from '../../Guards.js';
 import { distance } from './Distance.js';
@@ -11,12 +11,64 @@ import { quantiseEvery as quantiseEveryNumber, round as roundNumber } from '../.
 import { guard, guardNonZeroPoint, isPoint, isPoint3d } from './Guard.js';
 import { maxFromCorners as RectsMaxFromCorners } from '../rect/index.js';
 import { guard as RectsGuard } from '../rect/Guard.js'
-import type { Point, Point3d, Rect, RectPositioned } from '../Types.js';
+
+import type { Rect, RectPositioned } from '../Types.js';
 export * from './DistanceToCenter.js';
 export * from './DistanceToExterior.js';
 export * from './Distance.js';
 export * from './Guard.js';
-export type { Point, Point3d } from '../Types.js';
+/**
+ * A point, consisting of x, y and maybe z fields.
+ */
+export type Point = {
+  readonly x: number;
+  readonly y: number;
+  readonly z?: number;
+};
+
+export type Point3d = Point & {
+  readonly z: number;
+};
+
+
+export type PointRelation = (
+  a: Point | number,
+  b?: number
+) => PointRelationResult;
+
+export type PointRelationResult = {
+  /**
+   * Angle from start
+   */
+  readonly angle: number;
+  /**
+   * Distance from start
+   */
+  readonly distanceFromStart: number;
+  /**
+   * Distance from last compared point
+   */
+  readonly distanceFromLast: number;
+
+  /**
+   * Center point from start
+   */
+  readonly centroid: Point;
+  /**
+   * Average of all points seen
+   * This is calculated by summing x,y and dividing by total points
+   */
+  readonly average: Point;
+
+  /**
+   * Speed. Distance/millisecond from one sample to the next.
+   */
+  readonly speed: number;
+};
+
+
+// eslint-disable-next-line unicorn/prefer-export-from
+//export type { Point };
 
 /**
  * Returns a Point form of either a point, x,y params or x,y,z params.
@@ -27,7 +79,6 @@ export type { Point, Point3d } from '../Types.js';
  * @returns
  */
 export function getPointParameter(
-  //eslint-disable-next-line functional/prefer-readonly-type
   a?: Point | number | Array<number> | ReadonlyArray<number>,
   b?: number | boolean,
   c?: number
@@ -117,7 +168,6 @@ export const findMinimum = (
   ...points: ReadonlyArray<Point>
 ): Point => {
   if (points.length === 0) throw new Error(`No points provided`);
-  //eslint-disable-next-line functional/no-let
   let min = points[ 0 ];
   for (const p of points) {
     min = comparer(min, p);
@@ -329,7 +379,6 @@ export const isEqual = (...p: ReadonlyArray<Point>): boolean => {
   if (p === undefined) throw new Error(`parameter 'p' is undefined`);
   if (p.length < 2) return true;
 
-  //eslint-disable-next-line functional/no-let
   for (let index = 1; index < p.length; index++) {
     if (p[ index ].x !== p[ 0 ].x) return false;
     if (p[ index ].y !== p[ 0 ].y) return false;
@@ -464,7 +513,7 @@ export const fromNumbers = (
     if (coords.length % 2 !== 0) {
       throw new Error(`Expected even number of elements: [x,y,x,y...]`);
     }
-    //eslint-disable-next-line functional/no-let
+
     for (let index = 0; index < coords.length; index += 2) {
       //eslint-disable-next-line  functional/immutable-data
       pts.push(
@@ -650,7 +699,6 @@ export const reduce = (
   initial?: Point
 ): Point => {
   if (initial === undefined) initial = { x: 0, y: 0 }
-  //eslint-disable-next-line functional/no-let
   let accumulator = initial;
   for (const p of pts) {
     accumulator = fn(p, accumulator);
@@ -701,9 +749,7 @@ export const sum: Sum = function (
   // ✔️ Unit tested
   if (a === undefined) throw new TypeError(`a missing`);
 
-  //eslint-disable-next-line functional/no-let
   let ptA: Point | undefined;
-  //eslint-disable-next-line functional/no-let
   let ptB: Point | undefined;
   if (isPoint(a)) {
     ptA = a;
@@ -741,7 +787,7 @@ export const sum: Sum = function (
  * };
  * ```
  * @param a
- * @param rect
+ * @param rectOrPoint
  */
 export function multiply(a: Point, rectOrPoint: Rect | Point): Point;
 
@@ -864,7 +910,7 @@ export const multiplyScalar = (
  * 
  * Dividing by zero will give Infinity for that dimension.
  * @param a
- * @param Rect
+ * @param rectOrPoint
  */
 export function divide(a: Point, rectOrPoint: Rect | Point): Point;
 
@@ -1180,7 +1226,6 @@ export const rotatePointArray = (
     [ Math.sin(amountRadian), Math.cos(amountRadian) ],
   ];
   const result = [];
-  //eslint-disable-next-line functional/no-let
   for (const [ index, element ] of v.entries()) {
     //eslint-disable-next-line functional/immutable-data
     result[ index ] = [
@@ -1469,7 +1514,6 @@ export const toIntegerValues = (
  */
 export const clampMagnitude = (pt: Point, max = 1, min = 0): Point => {
   const length = distance(pt);
-  //eslint-disable-next-line functional/no-let
   let ratio = 1;
   if (length > max) {
     ratio = max / length;
@@ -1528,40 +1572,6 @@ export function clamp(
   }
 }
 
-export type PointRelation = (
-  a: Point | number,
-  b?: number
-) => PointRelationResult;
-
-export type PointRelationResult = {
-  /**
-   * Angle from start
-   */
-  readonly angle: number;
-  /**
-   * Distance from start
-   */
-  readonly distanceFromStart: number;
-  /**
-   * Distance from last compared point
-   */
-  readonly distanceFromLast: number;
-
-  /**
-   * Center point from start
-   */
-  readonly centroid: Point;
-  /**
-   * Average of all points seen
-   * This is calculated by summing x,y and dividing by total points
-   */
-  readonly average: Point;
-
-  /**
-   * Speed. Distance/millisecond from one sample to the next.
-   */
-  readonly speed: number;
-};
 
 /**
  * Tracks the relation between two points.
@@ -1603,15 +1613,10 @@ export type PointRelationResult = {
  */
 export const relation = (a: Point | number, b?: number): PointRelation => {
   const start = getPointParameter(a, b);
-  //eslint-disable-next-line functional/no-let
   let totalX = 0;
-  //eslint-disable-next-line functional/no-let
   let totalY = 0;
-  //eslint-disable-next-line functional/no-let
   let count = 0;
-  //eslint-disable-next-line functional/no-let
   let lastUpdate = performance.now();
-  //eslint-disable-next-line functional/no-let
   let lastPoint = start;
   const update = (aa: Point | number, bb?: number) => {
     const p = getPointParameter(aa, bb);

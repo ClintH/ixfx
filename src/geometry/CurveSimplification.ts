@@ -1,5 +1,5 @@
-import type { Point } from "./Types.js";
-import { distance } from "./points/Distance.js";
+import type { Point } from "./point/index.js";
+import { distance } from "./point/Distance.js";
 /**
  * Simplifies a curve by dropping points based on shortest distance.
  * 

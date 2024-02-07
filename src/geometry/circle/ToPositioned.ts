@@ -1,6 +1,7 @@
 import { Points } from "../index.js";
-import type { Point, Circle, CirclePositioned } from "../Types.js";
+import type { Circle, CirclePositioned } from "./index.js";
 import { isCirclePositioned } from "./Guard.js";
+import type { Point } from "../Types.js";
 
 /**
  * Returns a positioned version of a circle.

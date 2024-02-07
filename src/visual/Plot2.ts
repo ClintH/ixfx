@@ -1,6 +1,6 @@
 import { minIndex } from '../collections/arrays/NumericArrays.js';
 import * as Arrays from '../collections/arrays/index.js';
-import * as Points from '../geometry/points/index.js';
+import * as Points from '../geometry/point/index.js';
 import { clamp } from '../data/Clamp.js';
 import { flip } from '../data/Flip.js';
 import { scale } from '../data/Scale.js';
@@ -12,10 +12,9 @@ import { textRect, textWidth } from './Drawing.js';
 import { ifNaN } from '../Util.js'
 import { getPaths, getField } from '../Immutable.js';
 import { throwNumberTest } from '../Guards.js';
-import type { Rect, RectPositioned, Point } from '../geometry/Types.js';
+import type { Rect, RectPositioned, PointCalculableShape } from '../geometry/Types.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
 import { scaleCanvas } from './ScaleCanvas.js';
-import type { PointCalculableShape } from '../geometry/Types.js';
 
 /**
  * 
@@ -104,7 +103,7 @@ export type DataPoint = {
 };
 
 export type DataHitPoint = (
-  pt: Point
+  pt: Points.Point
 ) => [ point: DataPoint | undefined, distance: number ];
 
 class ArrayDataSource implements DataSource {
@@ -282,7 +281,7 @@ export class PlotArea extends Sg.CanvasBox {
   // If pointer is more than this distance away from a data point, it's ignored
   pointerDistanceThreshold = 20;
   lastRangeChange = 0;
-  pointer: Point | undefined;
+  pointer: Points.Point | undefined;
 
   constructor(private plot: Plot, region: RectPositioned) {
     super(plot, `PlotArea`, region);
@@ -356,7 +355,7 @@ export class PlotArea extends Sg.CanvasBox {
     (this.plot.legend as Sg.CanvasBox).drawingInvalidated(`PlotArea.onPointerLeave`);
   }
 
-  protected onPointerMove(p: Point): void {
+  protected onPointerMove(p: Points.Point): void {
     this.pointer = p;
     this.plot.legend.drawingInvalidated(`PlotArea.onPointerMove`);
   }
@@ -424,7 +423,7 @@ export class PlotArea extends Sg.CanvasBox {
     ctx.lineWidth = series.width;
     const shapes: Array<DataPoint & PointCalculableShape> = [];
 
-    series.dataHitPoint = (pt: Point): [ DataPoint, number ] => {
+    series.dataHitPoint = (pt: Points.Point): [ DataPoint, number ] => {
       const distances = shapes.map((v) => Points.distanceToExterior(pt, v));
       const index = minIndex(...distances);
       const closest = shapes[ index ];
@@ -716,7 +715,7 @@ export class AxisX extends Sg.CanvasBox {
     };
   }
 
-  protected layoutSelf(measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Point | undefined {
+  protected layoutSelf(measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Points.Point | undefined {
     const yAxis = measureState.measurements.get(`AxisY`);
     const legend = measureState.getActualSize(`Legend`);
     const legendHeight = legend?.height ?? 0;
@@ -807,7 +806,7 @@ export class AxisY extends Sg.CanvasBox {
     };
   }
 
-  protected layoutSelf(_measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Point {
+  protected layoutSelf(_measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Points.Point {
     return { x: 0, y: 0 }
   }
 

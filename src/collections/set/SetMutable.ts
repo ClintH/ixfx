@@ -43,7 +43,7 @@ export class SetStringMutable<V>
 
   /**
    * Adds one or more items to set. `add` event is fired for each item
-   * @param v items to add
+   * @param values items to add
    */
   add(...values: Array<V>): boolean {
     //eslint-disable-next-line functional/no-let

@@ -1,7 +1,7 @@
 import { SimpleEventEmitter } from '../Events.js';
 import { msElapsedTimer, type TimerSource } from '../flow/index.js';
 import { type Timer } from '../flow/Timer.js';
-import type { Path } from '../geometry/Types.js';
+import type { Path } from '../geometry/path/index.js';
 import * as Bezier from '../geometry/Bezier.js';
 import { scale } from '../data/Scale.js';
 import { interval } from '../flow/Interval.js';
@@ -110,12 +110,14 @@ export type AdsrTimingOpts = {
 /**
  * State change event
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface StateChangeEvent {
   readonly newState: string;
   readonly priorState: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface CompleteEvent {
   /* no-op */
 }
@@ -565,21 +567,20 @@ export const adsr = (opts: EnvelopeOpts): Adsr => new AdsrImpl(opts);
  * };
  * ```
  *
- * @example Add data to array
  * ```js
+ * //  Add data to array
  * // Sample an envelope every 20ms into an array
  * const data = await IterableAsync.toArray(Envelopes.adsrIterable(opts, 20));
  * ```
  *
- * @example Iterate with `for await`
  * ```js
+ * // Iterate with `for await`
  * // Work with values as sampled
  * for await (const v of Envelopes.adsrIterable(opts, 5)) {
  *  // Work with envelope value `v`...
  * }
  * ```
  * @param opts Envelope options
- * @param sampleRateMs Sample rate
  * @returns
  */
 export async function* adsrIterable(

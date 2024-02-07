@@ -1,7 +1,7 @@
-import type { CirclePositioned, Point } from "../Types.js";
-import { isPoint } from "../points/Guard.js";
+import { isPoint } from "../point/Guard.js";
 import { distanceCenter } from "./DistanceCenter.js";
 import { isCircle } from "./Guard.js";
+import type { Point, CirclePositioned } from "../Types.js";
 
 /**
  * Returns true if `b` is completely contained by `a`

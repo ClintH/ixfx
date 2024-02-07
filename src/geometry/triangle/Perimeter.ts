@@ -1,6 +1,6 @@
 import { guard } from "./Guard.js";
 import type { Triangle } from "../Types.js";
-import { length as LinesLength } from '../Line.js';
+import { length as LinesLength } from '../line/index.js';
 import { edges } from "./Edges.js";
 
 /**
@@ -10,5 +10,5 @@ import { edges } from "./Edges.js";
  */
 export const perimeter = (t: Triangle): number => {
   guard(t);
-  return edges(t).reduce<number>((accumulator, v) => accumulator + LinesLength(v), 0);
+  return edges(t).reduce((accumulator, v) => accumulator + LinesLength(v), 0);
 };

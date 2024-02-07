@@ -1,8 +1,7 @@
 import { distanceFromExterior as circleDistanceFromExterior } from "../circle/DistanceFromExterior.js";
 import { distance, isPoint } from "./index.js";
-import type { Point } from "../Types.js";
+import type { Point, PointCalculableShape } from "../Types.js";
 import { distanceFromExterior as rectDistanceFromExterior } from "../rect/Distance.js";
-import type { PointCalculableShape } from "../Types.js";
 import { isCirclePositioned } from "../circle/Guard.js";
 import { isRectPositioned } from "../rect/Guard.js";
 

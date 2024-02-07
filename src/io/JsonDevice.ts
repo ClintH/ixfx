@@ -96,7 +96,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
 
     this.states.addEventListener(`change`, (evt) => {
       this.fireEvent(`change`, evt);
-      this.verbose(`${evt.priorState} -> ${evt.newState}`);
+      this.verbose(`${ evt.priorState } -> ${ evt.newState }`);
       if (evt.priorState === `connected`) {
         // Clear out buffers
         this.rxBuffer.clear();
@@ -115,7 +115,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
 
   write(txt: string) {
     if (this.states.state !== `connected`) {
-      throw new Error(`Cannot write while state is ${this.states.state}`);
+      throw new Error(`Cannot write while state is ${ this.states.state }`);
     }
     this.txBuffer.add(txt);
   }
@@ -210,14 +210,14 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   }
 
   protected verbose(m: string) {
-    if (this.verboseLogging) console.info(`${this.name} `, m);
+    if (this.verboseLogging) console.info(`${ this.name } `, m);
   }
 
   protected log(m: string) {
-    console.log(`${this.name} `, m);
+    console.log(`${ this.name } `, m);
   }
 
   protected warn(m: unknown) {
-    console.warn(`${this.name} `, m);
+    console.warn(`${ this.name } `, m);
   }
 }

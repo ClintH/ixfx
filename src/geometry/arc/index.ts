@@ -1,22 +1,9 @@
-import { degreeToRadian } from './Angles.js';
-import { guard as guardPoint, isPoint } from './points/index.js';
-import type { Point, RectPositioned, Rect, Path, Line } from './Types.js';
-import { Lines } from './index.js';
-import { bbox as pointsBbox, distance as pointsDistance } from './points/index.js';
-import { toCartesian } from './Polar.js';
-/**
- * Returns true if parameter is an arc
- * @param p Arc or number
- * @returns 
- */
-export const isArc = (p: unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
-
-/**
- * Returns true if parameter has a positioned (x,y) 
- * @param p Point, Arc or ArcPositiond
- * @returns 
- */
-export const isPositioned = (p: Point | Arc | ArcPositioned): p is Point => (p as Point).x !== undefined && (p as Point).y !== undefined;
+import { degreeToRadian } from '../Angles.js';
+import { guard as guardPoint, isPoint } from '../point/index.js';
+import { Lines } from '../index.js';
+import { bbox as pointsBbox, distance as pointsDistance } from '../point/index.js';
+import { toCartesian } from '../Polar.js';
+import type { Line, Path, Rect, Point, RectPositioned } from '../Types.js';
 
 /**
  * Arc, defined by radius, start and end point in radians, and whether it is counter-clockwise.
@@ -45,7 +32,40 @@ export type Arc = {
  */
 export type ArcPositioned = Point & Arc;
 
+
+/**
+ * Returns true if parameter is an arc
+ * @param p Arc or number
+ * @returns 
+ */
+export const isArc = (p: unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
+
+/**
+ * Returns true if parameter has a positioned (x,y) 
+ * @param p Point, Arc or ArcPositiond
+ * @returns 
+ */
+export const isPositioned = (p: Point | Arc | ArcPositioned): p is Point => (p as Point).x !== undefined && (p as Point).y !== undefined;
+
 const piPi = Math.PI * 2;
+
+/**
+ * Returns an arc from degrees, rather than radians
+ * @param radius Radius of arc
+ * @param startDegrees Start angle in degrees
+ * @param endDegrees End angle in degrees
+ * @returns Arc
+ */
+export function fromDegrees(radius: number, startDegrees: number, endDegrees: number): Arc;
+
+/**
+ * Returns an arc from degrees, rather than radians
+ * @param radius Radius of arc
+ * @param startDegrees Start angle in degrees
+ * @param endDegrees End angle in degrees
+ * @param origin Optional center of arc
+ * @returns Arc
+ */export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin: Point): ArcPositioned
 
 /**
  * Returns an arc from degrees, rather than radians
@@ -55,9 +75,6 @@ const piPi = Math.PI * 2;
  * @param origin Optional center of arc
  * @returns Arc
  */
-export function fromDegrees(radius: number, startDegrees: number, endDegrees: number): Arc;
-export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin: Point): ArcPositioned
-
 //eslint-disable-next-line func-style
 export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin?: Point): Arc | ArcPositioned {
   const a: Arc = {
@@ -164,6 +181,12 @@ export const toPath = (arc: ArcPositioned): Path => {
     bbox: () => bbox(arc) as RectPositioned,
     length: () => length(arc),
     toSvgString: () => toSvg(arc),
+    relativePosition: (_point: Point, _intersectionThreshold: number) => {
+      throw new Error(`Not implemented`)
+    },
+    distanceToPoint: (_point: Point): number => {
+      throw new Error(`Not implemented`)
+    },
     kind: `arc`
   });
 };

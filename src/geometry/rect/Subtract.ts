@@ -1,4 +1,4 @@
-import type { Rect } from "../Types.js";
+import type { Rect } from "./index.js";
 
 /**
  * Subtracts width/height of `b` from `a` (ie: a - b), returning result.

@@ -1,10 +1,10 @@
 
-import { guard as PointsGuard } from '../points/Guard.js';
-import { isEqual as PointsIsEqual, isPoint, sum as PointsSum } from '../points/index.js';
+import { guard as PointsGuard } from '../point/Guard.js';
+import { isEqual as PointsIsEqual, isPoint, sum as PointsSum, type Point } from '../point/index.js';
 import { type RandomSource, defaultRandom } from '../../random/Types.js';
-import { joinPointsToLines as LinesJoinPointsToLines, length as LinesLength } from '../Line.js';
+import { joinPointsToLines as LinesJoinPointsToLines, length as LinesLength } from '../line/index.js';
 import type { CardinalDirection } from '../Grid.js';
-import type { Line, Point, Rect, RectArray, RectPositioned, RectPositionedArray } from '../Types.js';
+import type { Line } from '../Types.js';
 import { guard, guardDim, guardPositioned, isPositioned, isRect } from './Guard.js';
 export * from './Distance.js';
 export * from './FromNumbers.js';
@@ -12,6 +12,26 @@ export * from './Intersects.js';
 export * from './Multiply.js';
 export * from './Subtract.js';
 export * from './Sum.js';
+
+/**
+ * Rectangle as array: `[width, height]`
+ */
+export type RectArray = readonly [ width: number, height: number ];
+
+/**
+ * Positioned rectangle as array: `[x, y, width, height]`
+ */
+export type RectPositionedArray = readonly [
+  x: number,
+  y: number,
+  width: number,
+  height: number
+];
+export type Rect = {
+  readonly width: number;
+  readonly height: number;
+};
+export type RectPositioned = Point & Rect;
 
 export const empty = Object.freeze({ width: 0, height: 0 });
 export const emptyPositioned = Object.freeze({
@@ -449,7 +469,7 @@ export const getEdgeY = (
   guard(rect);
   switch (edge) {
     case `top`: {
-      return isPoint(rect) ? rect.y : 0;
+      return (isPoint(rect) ? rect.y : 0);
     }
     case `bottom`: {
       return isPoint(rect) ? rect.y + rect.height : rect.height;

@@ -23,7 +23,7 @@ export class DataDisplay {
 
   /**
    * Constructor
-   * @param darkMode 
+   * @param options Options
    */
   constructor(options: DataDisplayOptions = {}) {
     const theme = options.theme ?? `dark`;

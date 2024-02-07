@@ -237,6 +237,8 @@ export * as Dom from './dom/index.js';
 
 export * as Events from './Events.js';
 
+export * from './Compare.js';
+
 /**
  * The Modulation module contains functions for, well, modulating data.
  *

@@ -1,8 +1,8 @@
 import { sortByNumericProperty } from "../collections/arrays/index.js";
 import type { RandomSource } from "../random/Types.js";
-import { randomPoint as ShapesRandomPoint } from "./Shape.js";
-import type { Point, Circle, CirclePositioned, ShapePositioned } from "./Types.js";
+import { randomPoint as ShapesRandomPoint, type ShapePositioned } from "./shape/index.js";
 import { isIntersecting as CirclesIsIntersecting } from "./circle/Intersecting.js";
+import type { Circle, CirclePositioned, Point } from "./Types.js";
 export type RandomOpts = {
   readonly attempts?: number
   readonly randomSource?: RandomSource

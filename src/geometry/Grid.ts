@@ -1,5 +1,5 @@
-import type { Point, RectPositioned } from './Types.js';
-import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
+import type { Point } from './point/index.js';
+import { fromTopLeft as RectsFromTopLeft, type RectPositioned } from './rect/index.js';
 import { throwIntegerTest, throwNumberTest } from '../Guards.js';
 import { clampIndex } from '../data/Clamp.js';
 import { randomElement } from '../collections/arrays/index.js';
@@ -308,8 +308,8 @@ export function* asRectangles(
  *
  * `initialValue` can be provided to set the value
  * for all cells.
- * @param grid
- * @param initialValue
+ * @param grid Grid
+ * @param initialValue Initial value
  * @returns
  */
 //eslint-disable-next-line functional/prefer-readonly-type
@@ -1191,9 +1191,10 @@ export const array2dUpdater = <V>(grid: GridVisual, array: Array<Array<V>>) => {
  * @example
  * ```js
  * ```
- * @param array
- * @param cols
- * @param iteratorFn
+ * @param array Array
+ * @param cols Columns
+ * @param iteratorFunction Visitor function
+ * @param opts Options
  */
 export function* visitArray<V>(
   array: ReadonlyArray<V>,

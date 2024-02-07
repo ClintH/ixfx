@@ -1,4 +1,4 @@
-import type { RectPositioned, Rect } from "../Types.js";
+import type { RectPositioned, Rect } from "./index.js";
 /**
  * Returns a rectangle from width, height
  * ```js

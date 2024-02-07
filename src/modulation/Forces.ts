@@ -2,10 +2,10 @@
  * Acknowledgements: much of the work here is an adapation from Daniel Shiffman's excellent _The Nature of Code_ website.
  */
 import { Points, Polar } from '../geometry/index.js';
-import type { Rect, Point } from '../geometry/Types.js';
+import type { Point } from '../geometry/point/index.js';
 import { clamp } from '../data/Clamp.js';
 import { interpolateAngle } from '../data/Interpolate.js';
-import { getEdgeX, getEdgeY } from '../geometry/rect/index.js';
+import { getEdgeX, getEdgeY, type Rect } from '../geometry/rect/index.js';
 
 /**
  * Logic for applying mass

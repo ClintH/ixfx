@@ -1,8 +1,8 @@
-import * as Points from '../geometry/points/index.js';
-import * as Lines from '../geometry/Line.js';
+import * as Points from '../geometry/point/index.js';
+import * as Lines from '../geometry/line/index.js';
 import * as Triangles from '../geometry/triangle/index.js';
 import { throwArrayTest } from '../Guards.js';
-import * as Arcs from '../geometry/Arc.js';
+import * as Arcs from '../geometry/arc/index.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Ellipses from '../geometry/Ellipse.js';
 import * as Colours from '../visual/Colour.js';
@@ -10,7 +10,8 @@ import { resolveEl } from '../dom/Util.js';
 import { roundUpToMultiple } from '../Util.js';
 import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
 import { StackImmutable } from '../collections/stack/StackImmutable.js';
-import type { Point, CirclePositioned, Rect, RectPositioned, Line, Path, Triangle } from '../geometry/Types.js';
+import type { Point, CirclePositioned, Rect, RectPositioned } from '../geometry/Types.js';
+import type { Line, Path, Triangle } from '../geometry/Types.js';
 import { empty as RectsEmpty } from '../geometry/rect/index.js';
 import { corners as RectsCorners } from '../geometry/rect/index.js';
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -206,11 +207,11 @@ export const arc = (
     ctx.stroke();
   };
 
-  if (Array.isArray(arcs)) {
-    for (const arc of arcs) {
-      draw(arc);
-    }
-  } else draw(arcs as Arcs.ArcPositioned);
+  const arcsArray = Array.isArray(arcs) ? arcs : [ arcs ];
+  for (const arc of arcsArray) {
+    draw(arc);
+  }
+
 };
 
 /**
@@ -224,7 +225,7 @@ export type StackOp = (ctx: CanvasRenderingContext2D) => void;
 export type DrawingStack = {
   /**
    * Push a new drawing op
-   * @param op Operation to add
+   * @param ops Operation to add
    * @returns stack with added op
    */
   push(...ops: ReadonlyArray<StackOp>): DrawingStack;
@@ -405,11 +406,11 @@ export const ellipse = (
     //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
   };
-  if (Array.isArray(ellipsesToDraw)) {
-    for (const ellipse of ellipsesToDraw) {
-      draw(ellipse);
-    }
-  } else draw(ellipsesToDraw as Ellipses.EllipsePositioned);
+
+  const ellipsesArray = Array.isArray(ellipsesToDraw) ? ellipsesToDraw : [ ellipsesToDraw ];
+  for (const ellipse of ellipsesArray) {
+    draw(ellipse);
+  }
 };
 
 /**

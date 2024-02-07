@@ -1,11 +1,7 @@
 import {
   type JsonDeviceOpts,
-  type JsonDeviceEvents,
-  type JsonDataEvent,
   JsonDevice,
 } from './JsonDevice.js';
-
-export type { JsonDeviceEvents, JsonDeviceOpts, JsonDataEvent };
 
 export type SerialOpts = JsonDeviceOpts & {
   readonly filters?: ReadonlyArray<SerialPortFilter>;
@@ -63,7 +59,7 @@ export class Device extends JsonDevice {
     const eol = config.eol ?? `\r\n`;
 
     this.baudRate = config.baudRate ?? 9600;
-    if (config.name === undefined) super.name = `Serial.Device`;
+    if (config.name === undefined) this.name = `Serial.Device`;
 
     // Serial.println on microcontroller == \r\n
     this.rxBuffer.separator = eol;
@@ -77,8 +73,8 @@ export class Device extends JsonDevice {
     if (this.tx === undefined) throw new Error(`tx not ready`);
     try {
       this.tx.write(txt);
-    } catch (ex: unknown) {
-      this.warn(ex);
+    } catch (error: unknown) {
+      this.warn(error);
     }
   }
 
@@ -105,7 +101,7 @@ export class Device extends JsonDevice {
       baudRate: this.baudRate,
     };
 
-    if (this.config.filters) reqOpts = { filters: [...this.config.filters] };
+    if (this.config.filters) reqOpts = { filters: [ ...this.config.filters ] };
     this.port = await navigator.serial.requestPort(reqOpts);
 
     this.port.addEventListener(`disconnect`, (_) => {
@@ -119,9 +115,9 @@ export class Device extends JsonDevice {
     if (txW !== null) {
       txText.readable
         .pipeTo(txW, { signal: this.abort.signal })
-        .catch((err) => {
+        .catch((error) => {
           console.log(`Serial.onConnectAttempt txText pipe:`);
-          console.log(err);
+          console.log(error);
         });
       this.tx = txText.writable.getWriter();
     }
@@ -131,21 +127,23 @@ export class Device extends JsonDevice {
     if (rxR !== null) {
       rxR
         .pipeTo(rxText.writable, { signal: this.abort.signal })
-        .catch((err) => {
+        .catch((error) => {
           console.log(`Serial.onConnectAttempt rxR pipe:`);
-          console.log(err);
+          console.log(error);
         });
       rxText.readable
         .pipeTo(this.rxBuffer.writable(), { signal: this.abort.signal })
-        .catch((err) => {
+        .catch((error) => {
           console.log(`Serial.onConnectAttempt rxText pipe:`);
-          console.log(err);
+          console.log(error);
           try {
             this.port?.close();
-          } catch (ex) {
-            console.log(ex);
+          } catch (error) {
+            console.log(error);
           }
         });
     }
   }
 }
+
+export { type JsonDeviceEvents, type JsonDataEvent, type JsonDeviceOpts } from './JsonDevice.js';

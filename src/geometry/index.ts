@@ -1,15 +1,16 @@
 export * as Waypoints from './Waypoint.js';
 export * as Layouts from './Layout.js';
 export * as Circles from './circle/index.js';
-export * as Lines from './Line.js';
+export * as Lines from './line/index.js';
 export * as Rects from './rect/index.js';
-export * as Points from './points/index.js';
-export * as Paths from './Path.js';
+export * as Points from './point/index.js';
+export * as Paths from './path/index.js';
 export * as Grids from './Grid.js';
 export * as Beziers from './Bezier.js';
-export * as Compound from './CompoundPath.js';
+export * as Compound from './path/CompoundPath.js';
 export * as Ellipses from './Ellipse.js';
 export type * from './Types.js';
+
 export * from './Angles.js';
 export * as CurveSimplification from './CurveSimplification.js';
 
@@ -43,7 +44,7 @@ export * as Convolve2d from './Convolve2d.js';
  * - {@link isArc}: Returns true if object is Arc-ish
  * - {@link isEqual}: Returns true if two objects have identical arc properties
  */
-export * as Arcs from './Arc.js';
+export * as Arcs from './arc/index.js';
 
 /**
  * Generate a few basic geometric shapes
@@ -51,7 +52,7 @@ export * as Arcs from './Arc.js';
  * * {@link arrow}
  * * {@link starburst}
  */
-export * as Shapes from './Shape.js';
+export * as Shapes from './shape/index.js';
 
 /**
  * Helper functions for working with vectors, which can either be a {@link Point} or Polar {@link PolarCoord}.

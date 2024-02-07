@@ -1,4 +1,4 @@
-import {throwIntegerTest} from '../Guards.js';
+import { throwIntegerTest } from '../Guards.js';
 
 /**
  * The circular array is immutable. It keeps up to `capacity` items.
@@ -14,8 +14,7 @@ import {throwIntegerTest} from '../Guards.js';
  * a.pointer; // The current position in array it will write to
  * ```
  * @class CircularArray
- * @extends {Array}
- * @template V
+ * @extends Array
  */
 export interface ICircularArray<V> extends Array<V> {
   /**
@@ -29,8 +28,8 @@ export interface ICircularArray<V> extends Array<V> {
    *
    * Items are added at `pointer` position, which automatically cycles through available array indexes.
    *
-   * @param {V} thing Thing to add
-   * @returns {Circular<V>} Circular with item added
+   * @param v Thing to add
+   * @returns Circular with item added
    * @memberof Circular
    */
   add(v: V): ICircularArray<V>;
@@ -60,10 +59,15 @@ class CircularArray<V> extends Array {
     this.#pointer = 0;
   }
 
+  /**
+   * Add to array
+   * @param thing Thing to add
+   * @returns 
+   */
   add(thing: V): CircularArray<V> {
     const ca = CircularArray.from(this) as CircularArray<V>;
     /* eslint-disable-next-line functional/immutable-data */
-    ca[this.#pointer] = thing;
+    ca[ this.#pointer ] = thing;
     /* eslint-disable-next-line functional/immutable-data */
     ca.#capacity = this.#capacity;
     if (this.#capacity > 0) {

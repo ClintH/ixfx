@@ -1,8 +1,8 @@
 import * as Rects from './rect/index.js';
 import * as Grids from './Grid.js';
-import * as Points from './points/index.js';
+import * as Points from './point/index.js';
 import { Arrays } from '../collections/index.js';
-import type { RectPositioned, Point } from "./Types.js";
+import type { Point, RectPositioned } from "./Types.js";
 export type PoissonDiskOpts = {
   readonly radius?: number;
   readonly limit?: number;

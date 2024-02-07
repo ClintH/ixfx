@@ -1,14 +1,12 @@
-
 import type {
   Circle,
+  Point,
+  Point3d, Sphere,
   CirclePositioned,
-  Sphere,
-  Point, Point3d
 } from './Types.js';
 import { toPositioned as circleToPositioned } from './circle/ToPositioned.js';
 import { scale } from '../data/Scale.js';
 import { linearSpace } from '../Numbers.js';
-
 const cos = Math.cos;
 const sin = Math.sin;
 const asin = Math.asin;
@@ -181,18 +179,17 @@ export function* circleRings(
  * @returns
  */
 export function* sphereFibonacci(
-  samples: number = 100,
-  rotationRadians: number = 0,
+  samples = 100,
+  rotationRadians = 0,
   sphere?: Sphere
 ): IterableIterator<Point3d> {
   const offset = 2 / samples;
   const s = sphere ?? { x: 0, y: 0, z: 0, radius: 1 };
 
-  //eslint-disable-next-line functional/no-let
-  for (let i = 0; i < samples; i++) {
-    const y = i * offset - 1 + offset / 2;
+  for (let index = 0; index < samples; index++) {
+    const y = index * offset - 1 + offset / 2;
     const r = sqrt(1 - pow(y, 2));
-    const a = ((i + 1) % samples) * goldenAngle + rotationRadians;
+    const a = ((index + 1) % samples) * goldenAngle + rotationRadians;
     const x = cos(a) * r;
     const z = sin(a) * r;
     //eslint-disable-next-line functional/immutable-data

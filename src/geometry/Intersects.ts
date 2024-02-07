@@ -1,6 +1,7 @@
 import { intersections as circleIntersections } from "./circle/Intersections.js";
+import type { CirclePositioned } from "./circle/index.js";
+import type { RectPositioned } from "./rect/index.js";
 
-import type { RectPositioned, CirclePositioned } from "./Types.js";
 export const circleRect = (a: CirclePositioned, b: RectPositioned) => {
   // https://yal.cc/rectangle-circle-intersection-test/
   const deltaX = a.x - Math.max(b.x, Math.min(a.x, b.x + b.width));

@@ -54,7 +54,7 @@ export class StringWriteBuffer {
   /**
    * Constructor
    * @param dataHandler Calback to 'send' data onwards
-   * @param chunkSize Size to break up strings
+   * @param opts Options
    */
   constructor(
     private dataHandler: (data: string) => Promise<void>,

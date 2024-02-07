@@ -124,7 +124,7 @@ export const isReadableValue = <V>(r: IReadable<V> | IReadableValue<V>): r is IR
  * v.on.value(x => console.log(`Value is now ${x}`)); 
  * // Update
  * v.value = 20;
- * @param initialValue 
+ * @param initialValue Initial value
  * @returns 
  */
 export const number = (initialValue: number) => {
@@ -139,7 +139,7 @@ export const number = (initialValue: number) => {
  * const o = object({ person: `Jane`, colour: `red` });
  * 
  * ```
- * @param initialValue 
+ * @param initialValue Initial value
  * @returns 
  */
 export const object = <V extends Record<string, any>>(initialValue: V) => {
@@ -316,7 +316,7 @@ const initReadableEvents = <V>() => {
   return { value, message, onValue, onMessage, clear }
 }
 
-class ReadWriteValue<V> implements IReadable<V>, IReadableValue<V>, IWritable<V>, IWritableValue<V> {
+export class ReadWriteValue<V> implements IReadable<V>, IReadableValue<V>, IWritable<V>, IWritableValue<V> {
   protected _value: V;
   readonly on;
   private readonly dispatch;

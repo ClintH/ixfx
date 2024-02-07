@@ -1,10 +1,11 @@
-import type { CirclePositioned, Point, RectPositioned } from "../Types.js";
+import type { CirclePositioned } from "./index.js";
 import * as Intersects from '../Intersects.js';
 import { isContainedBy } from "./IsContainedBy.js";
 import { isCircle } from "./Guard.js";
 import { isRectPositioned } from "../rect/Guard.js";
-import { isEqual as PointsIsEqual } from "../points/index.js";
-import { isPoint } from '../points/Guard.js';
+import { isEqual as PointsIsEqual, type Point } from "../point/index.js";
+import { isPoint } from '../point/Guard.js';
+import type { RectPositioned } from "../rect/index.js";
 
 /**
  * Returns true if `a` or `b` overlap, are equal, or `a` contains `b`.

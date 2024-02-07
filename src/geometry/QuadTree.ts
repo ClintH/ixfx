@@ -1,9 +1,10 @@
 import { type TraversableTree } from '../collections/tree/Types.js';
-import { Shapes } from './index.js';
-import type { Point, RectPositioned, ShapePositioned } from './Types.js';
-import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
+import * as Shapes from './shape/index.js';
+import type { Point } from './point/index.js';
+import { fromTopLeft as RectsFromTopLeft, type RectPositioned } from './rect/index.js';
 import { intersectsPoint as RectsIntersectsPoint } from './rect/Intersects.js';
-import { fromNumbers as PointsFromNumbers } from './points/index.js';
+import { fromNumbers as PointsFromNumbers } from './point/index.js';
+import type { ShapePositioned } from './shape/index.js';
 /**
  * Options for quad tree
  */

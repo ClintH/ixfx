@@ -1,6 +1,6 @@
 import test from 'ava';
 /* eslint-disable */
-import * as Lines from '../../geometry/Line.js';
+import * as Lines from '../../geometry/line/index.js';
 
 test('basic', (t) => {
   t.deepEqual(Lines.Empty, { a: { x: 0, y: 0 }, b: { x: 0, y: 0 } });

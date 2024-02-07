@@ -1,11 +1,11 @@
 import { Observable, debounceTime, fromEvent } from 'rxjs';
-import * as Points from '../geometry/points/index.js';
+import * as Points from '../geometry/point/index.js';
 import JSON5 from 'json5';
 import { Scaler } from '../geometry/index.js';
 import { multiply as RectsMultiply } from '../geometry/rect/Multiply.js';
 import type { CardinalDirection } from '../geometry/Grid.js';
-import { cardinal } from '../geometry/rect/index.js';
-import type { Point, Rect } from '../geometry/Types.js';
+import { cardinal, type Rect } from '../geometry/rect/index.js';
+import type { Point } from '../geometry/Types.js';
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {

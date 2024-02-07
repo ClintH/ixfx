@@ -1,6 +1,6 @@
-import type { Point, CirclePositioned } from "../Types.js";
+import type { CirclePositioned } from "./index.js";
 import { distanceCenter } from "./DistanceCenter.js";
-import { isPoint as PointsIsPoint, distance as PointsDistance } from "../points/index.js";
+import { isPoint as PointsIsPoint, distance as PointsDistance, type Point } from "../point/index.js";
 import { guardPositioned, isCirclePositioned } from "./Guard.js";
 
 /**

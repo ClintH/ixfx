@@ -103,7 +103,7 @@ export const infinity = (): Since => {
  * const timer = Elapsed.progress({ mins: 4 });
  * ```
  * See also {@link hasElapsedMs}.
- * @param totalMs
+ * @param duration
  * @returns
  */
 export function progress(

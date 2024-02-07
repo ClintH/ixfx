@@ -1,5 +1,6 @@
+/* eslint-disable unicorn/no-null */
 import type { Point, CirclePositioned, Line } from '../geometry/Types.js';
-import * as Lines from '../geometry/Line.js';
+import * as Lines from '../geometry/line/index.js';
 import * as Svg from './Svg.js';
 import { getCssVariable } from './Colour.js';
 //import {Palette} from ".";
@@ -218,12 +219,13 @@ export const textPath = (
   text: string,
   parent: SVGElement,
   opts?: Svg.TextPathDrawingOpts,
-  queryOrExisting?: string | SVGTextPathElement
+  textQueryOrExisting?: string | SVGTextElement,
+  pathQueryOrExisting?: string | SVGTextPathElement
 ): SVGTextPathElement => {
   const textEl = Svg.createOrResolve<SVGTextElement>(
     parent,
     `text`,
-    queryOrExisting + `-text`
+    textQueryOrExisting, `-text`
   );
   // Update text properties, but don't pass in position or text
   textUpdate(textEl, undefined, undefined, opts);
@@ -231,7 +233,7 @@ export const textPath = (
   const p = Svg.createOrResolve<SVGTextPathElement>(
     textEl,
     `textPath`,
-    queryOrExisting
+    pathQueryOrExisting
   );
   p.setAttributeNS(null, `href`, pathReference);
   return textPathUpdate(p, text, opts);
