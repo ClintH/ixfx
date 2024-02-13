@@ -13,9 +13,9 @@ export class IntervalTracker extends NumberTracker {
 
   mark() {
     if (this.lastMark > 0) {
-      this.seen(window.performance.now() - this.lastMark);
+      this.seen(performance.now() - this.lastMark);
     }
-    this.lastMark = window.performance.now();
+    this.lastMark = performance.now();
   }
 }
 
