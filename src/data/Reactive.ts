@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { intervalToMs, type Interval } from "../flow/IntervalType.js";
 import { DispatchList, type Dispatch } from "../flow/DispatchList.js"
 import * as Immutable from '../Immutable.js';
@@ -66,6 +67,19 @@ export type ReactiveDiff<V> = ReactiveDisposable & ReactiveWritable<V> & {
   updateField(field: string, value: any): void
 }
 
+export type ReactiveStream<V> = Reactive<V> & ReactiveDisposable & ReactiveWritable<V> & {
+  through(message: Passed<V>): void
+  /**
+   * Removes all the subscribers from this stream.
+   */
+  reset(): void
+  /**
+   * Dispatches a signal
+   * @param signal 
+   * @param context 
+   */
+  signal(signal: SignalKinds, context?: string): void
+}
 
 
 /**
@@ -126,11 +140,11 @@ export function number(initialValue: number): ReactiveDisposable & ReactiveWrita
 export function number(): ReactiveDisposable & ReactiveWritable<number> & ReactiveNonInitial<number>;
 export function number(initialValue?: number): ReactiveDisposable & ReactiveWritable<number> & (ReactiveNonInitial<number> | ReactiveInitial<number>) {
   let value = initialValue;
-  const events = initEvent<number>();
+  const events = initStream<number>();
 
   const set = (v: number) => {
     value = v;
-    events.notify(v);
+    events.set(v);
   }
 
   return {
@@ -206,15 +220,14 @@ export function event<V extends Record<string, any>, EventName extends string>(t
  * @returns 
  */
 export function manual<V>(): Reactive<V> & ReactiveWritable<V> {
-  const events = initEvent<V>();
+  const events = initStream<V>();
   return {
     set(value: V) {
-      events.notify(value);
+      events.set(value);
     },
     on: events.on
   };
 }
-
 
 
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
@@ -262,8 +275,8 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
  */
 export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDisposable & ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
   const eq = options.eq ?? Immutable.isEqualContextString;
-  const setEvent = initEvent<V>();
-  const diffEvent = initEvent<Array<Immutable.Change<any>>>();
+  const setEvent = initStream<V>();
+  const diffEvent = initStream<Array<Immutable.Change<any>>>();
 
   let value: V | undefined = initialValue;
   let disposed = false;
@@ -272,11 +285,11 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     if (value !== undefined) {
       const diff = Immutable.compareData(value, v, ``, options);
       if (diff.length === 0) return;
-      diffEvent.notify(diff);
+      diffEvent.set(diff);
     }
 
     value = v;
-    setEvent.notify(v);
+    setEvent.set(v);
   }
 
 
@@ -294,10 +307,10 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
         ...value,
         ...toMerge
       }
-      diffEvent.notify(diff);
+      diffEvent.set(diff);
       //diffEvent.notify(pd);
     }
-    setEvent.notify(value);
+    setEvent.set(value);
   }
 
   const updateField = (path: string, valueForField: any) => {
@@ -306,8 +319,8 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     if (eq(existing, valueForField, path)) return;
     const o = Immutable.updateByPath(value, path, valueForField);
     value = o;
-    diffEvent.notify([ { path, value: valueForField, previous: existing } ]);
-    setEvent.notify(o);
+    diffEvent.set([ { path, value: valueForField, previous: existing } ]);
+    setEvent.set(o);
   }
 
   const dispose = (reason: string) => {
@@ -346,12 +359,13 @@ export type InitEventOptions = {
   onNoSubscribers: () => void
 }
 
+
 /**
  * @ignore
  * @param options 
  * @returns 
  */
-export function initEvent<V>(options: Partial<InitEventOptions> = {}) {
+export function initStream<V>(options: Partial<InitEventOptions> = {}): ReactiveStream<V> {
   let dispatcher: DispatchList<Passed<V>> | undefined;
   let disposed = false;
   let firstSubscribe = false;
@@ -378,11 +392,11 @@ export function initEvent<V>(options: Partial<InitEventOptions> = {}) {
     isDisposed: () => {
       return disposed
     },
-    clear: () => {
+    reset: () => {
       dispatcher?.clear();
       isEmpty();
     },
-    notify: (v: V) => {
+    set: (v: V) => {
       if (disposed) throw new Error(`Disposed`);
       dispatcher?.notify({ value: v });
     },
@@ -477,7 +491,7 @@ export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, opti
     },
   }
   if (!lazy) start();
-  const events = initEvent<Out>(initOpts);
+  const events = initStream<Out>(initOpts);
   return events;
 }
 
@@ -517,7 +531,7 @@ export function generator<V>(generator: IterableIterator<V> | AsyncIterableItera
       }
     },
   }
-  const events = initEvent<V>(eventOpts);
+  const events = initStream<V>(eventOpts);
 
   const read = async () => {
     try {
@@ -527,7 +541,7 @@ export function generator<V>(generator: IterableIterator<V> | AsyncIterableItera
         return;
       }
       if (!reading) return;
-      events.notify(v.value);
+      events.set(v.value);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       events.dispose(`Generator error: ${ (error as any).toString() }`);
@@ -598,7 +612,7 @@ export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions>
   let index = 0;
   let lastValue = array[ 0 ];
 
-  const s = initEvent<V>({
+  const s = initStream<V>({
     onFirstSubscribe() {
       //console.log(`Rx.fromArray onFirstSubscribe. Lazy: ${ lazy } reader running: ${ c.isRunning }`);
       // Start if in lazy mode and not running
@@ -620,7 +634,7 @@ export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions>
     lastValue = array[ index ];
     index++;
 
-    s.notify(lastValue)
+    s.set(lastValue)
     if (index === array.length) {
       return false;
     }
