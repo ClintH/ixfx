@@ -1,3 +1,4 @@
+import type { IsEqual } from "../../IsEqual.js";
 /**
  * Queue (mutable). See also {@link IQueueImmutable} for the immutable version.
  *
@@ -17,6 +18,8 @@
  * ```
  *
  */
+
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IQueueMutable<V> {
   /**
@@ -51,5 +54,23 @@ export interface IQueueMutable<V> {
    */
   get data(): ReadonlyArray<V>;
 
+  /**
+ * Removes values that match `predicate`.
+ * See also {@link remove} if to remove a value based on equality checking.
+ * @param predicate 
+ * @returns Returns number of items removed.
+ */
+  removeWhere(predicate: (item: V) => boolean): number
+
+  /**
+   * Remove value from queue, regardless of position.
+   * Returns _true_ if something was removed.
+   * 
+   * See also {@link removeWhere} to remove based on a predicate
+   * @param value 
+   */
+  remove(value: V, comparer?: IsEqual<V>): boolean;
+
+  at(index: number): V;
   clear(): void;
 }
