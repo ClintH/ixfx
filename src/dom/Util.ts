@@ -5,7 +5,7 @@ import { Scaler } from '../geometry/index.js';
 import { multiply as RectsMultiply } from '../geometry/rect/Multiply.js';
 import type { CardinalDirection } from '../geometry/Grid.js';
 import { cardinal, type Rect } from '../geometry/rect/index.js';
-import type { Point } from '../geometry/Types.js';
+import type { Point } from '../geometry/point/index.js';
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
@@ -189,6 +189,16 @@ export const positionFn = (
   }
 };
 
+/**
+ * Returns a {x,y} Point on a cardinal position of element.
+ * ```
+ * // Top edge, middle horizontal position
+ * const pos = cardinalPosition(`#blah`, `n`);
+ * ```
+ * @param domQueryOrEl 
+ * @param anchor 
+ * @returns 
+ */
 export const cardinalPosition = (
   domQueryOrEl: Readonly<string | HTMLElement>,
   anchor: CardinalDirection | `center` = `nw`
@@ -838,12 +848,41 @@ export const copyToClipboard = (object: object) => {
       (error) => {
         console.warn(`Could not copy to clipboard`);
         console.log(string_);
-        reject(error);
+        reject(new Error(error));
       }
     );
   });
   return p;
 };
+
+/**
+ * Inserts `element` into `parent` sorted according to its HTML attribute `data-sort`.
+ * 
+ * Assumes:
+ * * Every child of `parent` and `element`, has a `data-sort` attribute. This is the basis for sorting.
+ * * `parent` starts off empty or pre-sorted.
+ * * Order of `parent`'s children is not changed (ie it always remains sorted)
+ * @param parent 
+ * @param element 
+ */
+export const insertSorted = (parent: HTMLElement, element: HTMLElement) => {
+  const elSort = element.getAttribute(`data-sort`) ?? ``;
+  let elAfter;
+  let elBefore;
+  for (const c of parent.children) {
+    const sort = c.getAttribute(`data-sort`) ?? ``;
+    if (elSort >= sort) elAfter = c;
+    if (elSort <= sort) elBefore = c;
+    if (elAfter !== undefined && elBefore !== undefined) break;
+  }
+  if (elAfter !== undefined) {
+    elAfter.insertAdjacentElement(`afterend`, element);
+  } else if (elBefore === undefined) {
+    parent.append(element);
+  } else {
+    elBefore.insertAdjacentElement(`beforebegin`, element);
+  }
+}
 
 export type CreateUpdateElement<V> = (
   item: V,
