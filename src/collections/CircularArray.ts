@@ -49,7 +49,7 @@ class CircularArray<V> extends Array {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   #pointer: number;
 
-  constructor(capacity: number = 0) {
+  constructor(capacity = 0) {
     super();
     // Allowed to create with capacity zero
     throwIntegerTest(capacity, `positive`, `capacity`);
