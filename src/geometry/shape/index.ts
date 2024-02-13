@@ -3,24 +3,30 @@ import { throwIntegerTest } from '../../Guards.js';
 import { Triangles, Points } from '../index.js';
 import { isCirclePositioned, isCircle } from '../circle/Guard.js';
 import type { RandomSource } from '../../random/Types.js';
-import { center as RectsCenter, corners as RectsCorners, fromTopLeft as RectsFromTopLeft } from '../rect/index.js';
+import { corners as RectsCorners } from '../rect/Corners.js';
+import { center as RectsCenter, fromTopLeft as RectsFromTopLeft } from '../rect/index.js';
 import { isIntersecting as CirclesIsIntersecting } from '../circle/Intersecting.js';
 import { randomPoint as circleRandomPoint, center as circleCenter, type Circle } from '../circle/index.js';
 import { randomPoint as rectRandomPoint } from '../rect/index.js';
 import { isRect, isRectPositioned } from '../rect/Guard.js';
 
 import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';
-import type { Point, Rect, Triangle, CirclePositioned, RectPositioned, PolyLine, Line } from '../Types.js';
+import type { Rect, Triangle, CirclePositioned, RectPositioned, PolyLine, Line } from '../Types.js';
 export type ContainsResult = `none` | `contained`;
 
 export type ShapePositioned = CirclePositioned | RectPositioned;
+
+
+export type Sphere = Points.Point3d & {
+  readonly radius: number;
+};
 
 export type PointCalculableShape =
   | PolyLine
   | Line
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   | RectPositioned
-  | Point
+  | Points.Point
   | CirclePositioned
   ;
 
@@ -31,7 +37,7 @@ export type PointCalculableShape =
  */
 export const isIntersecting = (
   a: ShapePositioned,
-  b: ShapePositioned | Point
+  b: ShapePositioned | Points.Point
 ): boolean => {
   if (isCirclePositioned(a)) {
     return CirclesIsIntersecting(a, b);
@@ -49,13 +55,13 @@ export const isIntersecting = (
 
 export type RandomPointOpts = {
   readonly randomSource?: RandomSource;
-  readonly margin?: Point;
+  readonly margin?: Points.Point;
 };
 
 export const randomPoint = (
   shape: ShapePositioned,
   opts: RandomPointOpts = {}
-): Point => {
+): Points.Point => {
   if (isCirclePositioned(shape)) {
     return circleRandomPoint(shape, opts);
   } else if (isRectPositioned(shape)) {
@@ -78,7 +84,7 @@ export const randomPoint = (
  */
 export const center = (
   shape?: Rect | Triangle | Circle
-): Point => {
+): Points.Point => {
   if (shape === undefined) {
     return Object.freeze({ x: 0.5, y: 0.5 });
   } else if (isRect(shape)) {
@@ -125,9 +131,9 @@ export const starburst = (
   outerRadius: number,
   points = 5,
   innerRadius?: number,
-  origin: Point = Points.Empty,
+  origin: Points.Point = Points.Empty,
   opts?: { readonly initialAngleRadian?: number }
-): ReadonlyArray<Point> => {
+): ReadonlyArray<Points.Point> => {
   throwIntegerTest(points, `positive`, `points`);
   const angle = (Math.PI * 2) / points;
   const angleHalf = angle / 2;
@@ -184,10 +190,10 @@ export type ArrowOpts = {
  * @returns
  */
 export const arrow = (
-  origin: Point,
+  origin: Points.Point,
   from: `tip` | `tail` | `middle`,
   opts: ArrowOpts = {}
-): ReadonlyArray<Point> => {
+): ReadonlyArray<Points.Point> => {
   const tailLength = opts.tailLength ?? 10;
   const tailThickness = opts.tailThickness ?? Math.max(tailLength / 5, 5);
   const angleRadian = opts.angleRadian ?? 0;
@@ -196,7 +202,7 @@ export const arrow = (
   const triAngle = Math.PI / 2;
 
   let tri: Triangle;
-  let tailPoints: ReadonlyArray<Point>;
+  let tailPoints: ReadonlyArray<Points.Point>;
 
   if (from === `tip`) {
     tri = Triangles.equilateralFromVertex(origin, arrowSize, triAngle);

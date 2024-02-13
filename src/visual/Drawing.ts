@@ -10,10 +10,17 @@ import { resolveEl } from '../dom/Util.js';
 import { roundUpToMultiple } from '../Util.js';
 import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
 import { StackImmutable } from '../collections/stack/StackImmutable.js';
-import type { Point, CirclePositioned, Rect, RectPositioned } from '../geometry/Types.js';
-import type { Line, Path, Triangle } from '../geometry/Types.js';
+//import type { Point, CirclePositioned, Rect, RectPositioned } from '../geometry/Types.js';
+//import type { Line, Path, Triangle } from '../geometry/Types.js';
+import type { Point } from '../geometry/point/index.js';
+import type { Line } from '../geometry/line/index.js';
+import type { CirclePositioned } from '../geometry/circle/index.js';
+import type { Rect, RectPositioned } from '../geometry/rect/index.js';
+import type { Path } from '../geometry/path/index.js';
+import type { Triangle } from '../geometry/triangle/index.js';
+
 import { empty as RectsEmpty } from '../geometry/rect/index.js';
-import { corners as RectsCorners } from '../geometry/rect/index.js';
+import { corners as RectsCorners } from '../geometry/rect/Corners.js';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 

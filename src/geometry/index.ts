@@ -55,7 +55,7 @@ export * as Arcs from './arc/index.js';
 export * as Shapes from './shape/index.js';
 
 /**
- * Helper functions for working with vectors, which can either be a {@link Point} or Polar {@link PolarCoord}.
+ * Helper functions for working with vectors, which can either be a {@link Point} or Polar {@link Polar.Coord}.
  * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
  * interoperate between these two coordinates.
  */
@@ -64,7 +64,7 @@ export * as Vectors from './Vector.js';
 
 /**
  * Work with Polar coordinates.
- * A {@link PolarCoord} is just `{ angleRadians:number, distance: number }`.
+ * A {@link Polar.Coord} is just `{ angleRadians:number, distance: number }`.
  * 
  * Conversion: {@link toCartesian}, {@link fromCartesian}, {@link toString}
  * 

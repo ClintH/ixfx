@@ -1,3 +1,4 @@
+
 import { isPoint } from './point/index.js';
 import type { Point } from './point/index.js';
 import { isRect } from './rect/Guard.js';
@@ -42,7 +43,15 @@ export type ScalerCombined = {
    * Absolute to relative coordintes
    */
   readonly rel: Scaler;
+
+  readonly width: number;
+
+  readonly height: number;
+
 };
+
+
+export type ScaleBy = `both` | `min` | `max` | `width` | `height`;
 
 /**
  * Returns a set of scaler functions, to convert to and from ranges.
@@ -75,7 +84,7 @@ export type ScalerCombined = {
  * @returns
  */
 export const scaler = (
-  scaleBy: `both` | `min` | `max` | `width` | `height` = `both`,
+  scaleBy: ScaleBy = `both`,
   defaultRect?: Rect
 ): ScalerCombined => {
   const defaultBounds = defaultRect ?? PlaceholderRect;
@@ -113,13 +122,9 @@ export const scaler = (
     c?: number | Rect,
     d?: number
   ): [ x: number, y: number, w: number, h: number ] => {
-    //eslint-disable-next-line functional/no-let
     let inX = Number.NaN;
-    //eslint-disable-next-line functional/no-let
     let inY = Number.NaN;
-    //eslint-disable-next-line functional/no-let
     let outW = defaultBounds.width;
-    //eslint-disable-next-line functional/no-let
     let outH = defaultBounds.height;
 
     if (typeof a === `number`) {
@@ -222,5 +227,27 @@ export const scaler = (
   return {
     rel: scaleRel,
     abs: scaleAbs,
+    width: defaultBounds.width,
+    height: defaultBounds.height
   };
 };
+
+// export const scalerReactive = (scaleBy: ScaleBy = `both`,
+//   defaultRect?: ReactiveInitial<Rect>) => {
+
+//   const resolve = (a: Point | Rect | RectPositioned | number, b: Rect | number, c: number, d: number) => {
+//     if (typeof a === `number`) {
+//       if (typeof b === `number`) {
+//         return { x: a, y: b, width: undefined, height: undefined }
+//       } else {
+//         throw new TypeError(`Expected 'b' parameter to be the y value?`);
+//       }
+//     } else if (isPoint(a)) {
+//       if (isRect(b)) {
+//         // Positioned rect
+//         return {
+//           x: 
+//       }
+//       }
+//     }
+//   }

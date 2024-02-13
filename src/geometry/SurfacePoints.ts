@@ -1,9 +1,8 @@
-import type {
-  Circle,
-  Point,
-  Point3d, Sphere,
-  CirclePositioned,
-} from './Types.js';
+
+import type { Point, Point3d } from './point/index.js';
+import type { Circle, CirclePositioned } from './circle/index.js';
+import type { Sphere } from './shape/index.js';
+
 import { toPositioned as circleToPositioned } from './circle/ToPositioned.js';
 import { scale } from '../data/Scale.js';
 import { linearSpace } from '../Numbers.js';

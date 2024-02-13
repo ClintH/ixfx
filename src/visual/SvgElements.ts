@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/no-null */
-import type { Point, CirclePositioned, Line } from '../geometry/Types.js';
+import type { CirclePositioned } from '../geometry/circle/index.js';
+import type { Point } from '../geometry/point/index.js';
 import * as Lines from '../geometry/line/index.js';
 import * as Svg from './Svg.js';
 import { getCssVariable } from './Colour.js';
@@ -139,7 +140,7 @@ export const groupUpdate = (
  * @returns
  */
 export const line = (
-  line: Line,
+  line: Lines.Line,
   parent: SVGElement,
   opts?: Svg.LineDrawingOpts,
   queryOrExisting?: string | SVGLineElement
@@ -161,7 +162,7 @@ export const line = (
  */
 export const lineUpdate = (
   lineEl: SVGLineElement,
-  line: Line,
+  line: Lines.Line,
   opts?: Svg.LineDrawingOpts
 ) => {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());

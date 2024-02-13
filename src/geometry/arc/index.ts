@@ -3,7 +3,10 @@ import { guard as guardPoint, isPoint } from '../point/index.js';
 import { Lines } from '../index.js';
 import { bbox as pointsBbox, distance as pointsDistance } from '../point/index.js';
 import { toCartesian } from '../Polar.js';
-import type { Line, Path, Rect, Point, RectPositioned } from '../Types.js';
+import type { Point } from '../point/index.js';
+import type { Line } from '../line/index.js';
+import type { Path } from '../path/index.js';
+import type { Rect, RectPositioned } from '../rect/index.js';
 
 /**
  * Arc, defined by radius, start and end point in radians, and whether it is counter-clockwise.

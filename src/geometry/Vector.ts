@@ -2,8 +2,8 @@ import type { Line } from './line/index.js';
 import * as Lines from './line/index.js';
 import type { Point } from './point/index.js';
 import * as Points from './point/index.js'
-import { clampMagnitude as polarClampMagnitude, normalise as polarNormalise, dotProduct as polarDotProduct, toString as polarToString, toPoint as polarToPoint, fromCartesian as polarFromCartesian, isPolarCoord } from './Polar.js';
-import type { PolarCoord, Vector } from './Types.js';
+import * as Polar from './Polar.js';
+import type { Vector } from './Types.js';
 //eslint-disable-next-line @typescript-eslint/naming-convention
 const EmptyCartesian = Object.freeze({ x: 0, y: 0 });
 
@@ -39,7 +39,7 @@ export const fromPointPolar = (
   pt: Point,
   angleNormalisation: `` | `unipolar` | `bipolar` = ``,
   origin: Point = EmptyCartesian
-): PolarCoord => {
+): Polar.Coord => {
   pt = Points.subtract(pt, origin);
 
   //eslint-disable-next-line functional/no-let
@@ -69,14 +69,14 @@ export const fromLineCartesian = (line: Line): Points.Point =>
  * @param line
  * @returns
  */
-export const fromLinePolar = (line: Line): PolarCoord => {
+export const fromLinePolar = (line: Line): Polar.Coord => {
   Lines.guard(line, `line`);
   const pt = Points.subtract(line.b, line.a);
   return fromPointPolar(pt);
 };
 
-const isPolar = (v: Vector): v is PolarCoord => {
-  if (isPolarCoord(v)) return true;
+const isPolar = (v: Vector): v is Polar.Coord => {
+  if (Polar.isPolarCoord(v)) return true;
   return false;
 };
 
@@ -94,7 +94,7 @@ const isCartesian = (v: Vector): v is Point => {
  */
 export const normalise = (v: Vector): Vector => {
   if (isPolar(v)) {
-    return polarNormalise(v);
+    return Polar.normalise(v);
   } else if (isCartesian(v)) {
     return Points.normalise(v);
   }
@@ -116,11 +116,11 @@ export const quadrantOffsetAngle = (p: Point): number => {
  * @param origin
  * @returns Polar vector
  */
-export const toPolar = (v: Vector, origin = Points.Empty): PolarCoord => {
+export const toPolar = (v: Vector, origin = Points.Empty): Polar.Coord => {
   if (isPolar(v)) {
     return v;
   } else if (isCartesian(v)) {
-    return polarFromCartesian(v, origin);
+    return Polar.fromCartesian(v, origin);
   }
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
@@ -134,7 +134,7 @@ export const toPolar = (v: Vector, origin = Points.Empty): PolarCoord => {
  */
 export const toCartesian = (v: Vector): Point => {
   if (isPolar(v)) {
-    return polarToPoint(v);
+    return Polar.toPoint(v);
   } else if (isCartesian(v)) {
     return v;
   }
@@ -150,7 +150,7 @@ export const toCartesian = (v: Vector): Point => {
  */
 export const toString = (v: Vector, digits?: number) => {
   if (isPolar(v)) {
-    return polarToString(v, digits);
+    return Polar.toString(v, digits);
   } else if (isCartesian(v)) {
     return Points.toString(v, digits);
   }
@@ -166,7 +166,7 @@ export const toString = (v: Vector, digits?: number) => {
  */
 export const dotProduct = (a: Vector, b: Vector) => {
   if (isPolar(a) && isPolar(b)) {
-    return polarDotProduct(a, b);
+    return Polar.dotProduct(a, b);
   } else if (isCartesian(a) && isCartesian(b)) {
     return Points.dotProduct(a, b);
   }
@@ -182,7 +182,7 @@ export const dotProduct = (a: Vector, b: Vector) => {
  */
 export const clampMagnitude = (v: Vector, max = 1, min = 0) => {
   if (isPolar(v)) {
-    return polarClampMagnitude(v, max, min);
+    return Polar.clampMagnitude(v, max, min);
   } else if (isCartesian(v)) {
     return Points.clampMagnitude(v, max, min);
   }

@@ -5,7 +5,8 @@ import { intersectsPoint as RectsIntersectsPoint } from '../geometry/rect/Inters
 import { isPlaceholder as RectsIsPlaceholder } from '../geometry/rect/Guard.js';
 import { placeholderPositioned as RectsPlaceholderPositioned, placeholder as RectsPlaceholder, emptyPositioned as RectsEmptyPositioned } from '../geometry/rect/index.js';
 import { hue as randomHue } from '../random/index.js';
-import type { Rect, RectPositioned, Point } from '../geometry/Types.js';
+import type { Point } from '../geometry/point/index.js';
+import type { Rect, RectPositioned } from '../geometry/rect/index.js';
 
 export type Measurement = {
   actual: Rect;

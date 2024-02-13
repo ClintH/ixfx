@@ -1,8 +1,8 @@
 
 import { Points, Paths } from '../index.js';
-import type { CompoundPath, Dimensions, Path } from '../Types.js';
+import type { CompoundPath, Dimensions, Path, RectPositioned } from '../Types.js';
 import type { Point } from '../point/index.js';
-import { corners as RectsCorners, type RectPositioned } from '../rect/index.js';
+import { corners as RectsCorners } from '../rect/Corners.js';
 import { sortByNumericProperty } from '../../collections/arrays/SortByNumericProperty.js';
 
 

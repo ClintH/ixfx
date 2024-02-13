@@ -6,8 +6,8 @@ import {
 } from './TrackedValue.js';
 import { ObjectTracker } from './ObjectTracker.js';
 import { Lines, Vectors } from '../geometry/index.js';
-import type { PolarCoord } from '../geometry/Types.js';
-import type { Line, PolyLine } from '../geometry/Types.js';
+import type { Coord as PolarCoord } from '../geometry/Polar.js';
+import type { Line, PolyLine } from '../geometry/line/index.js';
 
 /**
  * Information about seen points

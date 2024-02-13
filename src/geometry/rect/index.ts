@@ -1,15 +1,20 @@
 
 import { guard as PointsGuard } from '../point/Guard.js';
-import { isEqual as PointsIsEqual, isPoint, sum as PointsSum, type Point } from '../point/index.js';
-import { type RandomSource, defaultRandom } from '../../random/Types.js';
-import { joinPointsToLines as LinesJoinPointsToLines, length as LinesLength } from '../line/index.js';
-import type { CardinalDirection } from '../Grid.js';
-import type { Line } from '../Types.js';
-import { guard, guardDim, guardPositioned, isPositioned, isRect } from './Guard.js';
+import { isEqual as PointsIsEqual, isPoint, type Point } from '../point/index.js';
+
+import { length as LinesLength } from '../line/index.js';
+
+import { edges } from './Edges.js';
+
+import { getRectPositioned, guard, guardDim, guardPositioned, isPositioned, isRect, isRectPositioned } from './Guard.js';
+export * from './Cardinal.js';
+export * from './Corners.js';
 export * from './Distance.js';
+export * from './Edges.js';
 export * from './FromNumbers.js';
 export * from './Intersects.js';
 export * from './Multiply.js';
+export * from './Random.js';
 export * from './Subtract.js';
 export * from './Sum.js';
 
@@ -259,6 +264,55 @@ export const maxFromCorners = (
   };
 };
 
+/**
+ * Accepts:
+ * * x,y,w,h
+ * * x,y,rect
+ * * point,rect
+ * * RectPositioned
+ * * Rect, x,y
+ * * Rect, Point
+ * @param a 
+ * @param b 
+ * @param c 
+ * @param d 
+ * @returns 
+ */
+export function getRectPositionedParameter(a: number | Point | Rect | RectPositioned, b?: Rect | number | Point, c?: number | Rect, d?: number): RectPositioned {
+  if (typeof a === `number`) {
+    if (typeof b === `number`) {
+      if (typeof c === `number` && typeof d === `number`) {
+        return { x: a, y: b, width: c, height: d }
+      } else if (isRect(c)) {
+        return { x: a, y: b, width: c.width, height: c.height }
+      } else {
+        throw new TypeError(`If params 'a' & 'b' are numbers, expect following parameters to be x,y or Rect`);
+      }
+    } else {
+      throw new TypeError(`If parameter 'a' is a number, expect following parameters to be: y,w,h`);
+    }
+  } else if (isRectPositioned(a)) {
+    return a;
+  } else if (isRect(a)) {
+    if (typeof b === `number` && typeof c === `number`) {
+      return { width: a.width, height: a.height, x: b, y: c };
+    } else if (isPoint(b)) {
+      return { width: a.width, height: a.height, x: b.x, y: b.y };
+    } else {
+      throw new TypeError(`If param 'a' is a Rect, expects following parameters to be x,y`);
+    }
+  } else if (isPoint(a)) {
+    if (typeof b === `number` && typeof c === `number`) {
+      return { x: a.x, y: a.y, width: b, height: c };
+    } else if (isRect(b)) {
+      return { x: a.x, y: a.y, width: b.width, height: b.height };
+    } else {
+      throw new TypeError(`If parameter 'a' is a Point, expect following params to be: Rect or width,height`);
+    }
+  }
+  throw new TypeError(`Expect a first parameter to be x,RectPositioned,Rect or Point`);
+}
+
 
 /**
  * Clamps `value` so it does not exceed `maximum`
@@ -307,180 +361,6 @@ export const fromTopLeft = (
   PointsGuard(origin, `origin`);
 
   return { x: origin.x, y: origin.y, width: width, height: height };
-};
-
-/**
- * Returns the four corners of a rectangle as an array of Points.
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * const rect = { width: 100, height: 100, x: 0, y: 0};
- * const pts = Rects.corners(rect);
- * ```
- *
- * If the rectangle is not positioned, is origin can be provided.
- * @param rect
- * @param origin
- * @returns
- */
-export const corners = (
-  rect: RectPositioned | Rect,
-  origin?: Point
-): ReadonlyArray<Point> => {
-  guard(rect);
-  if (origin === undefined && isPoint(rect)) origin = rect;
-  else if (origin === undefined) {
-    throw new Error(`Unpositioned rect needs origin param`);
-  }
-
-  return [
-    { x: origin.x, y: origin.y },
-    { x: origin.x + rect.width, y: origin.y },
-    { x: origin.x + rect.width, y: origin.y + rect.height },
-    { x: origin.x, y: origin.y + rect.height },
-  ];
-};
-
-/**
- * Returns a point on cardinal direction, or 'center' for the middle.
- *
- * ```js
- * cardinal({x: 10, y:10, width:100, height: 20}, 'center');
- * ```
- * @param rect Rectangle
- * @param card Cardinal direction or 'center'
- * @returns Point
- */
-export const cardinal = (
-  rect: RectPositioned,
-  card: CardinalDirection | `center`
-): Point => {
-  const { x, y, width, height } = rect;
-  switch (card) {
-    case `nw`: {
-      return Object.freeze({ x, y });
-    }
-    case `n`: {
-      return Object.freeze({
-        x: x + width / 2,
-        y,
-      });
-    }
-    case `ne`: {
-      return Object.freeze({
-        x: x + width,
-        y,
-      });
-    }
-    case `sw`: {
-      return Object.freeze({ x, y: y + height });
-    }
-    case `s`: {
-      return Object.freeze({
-        x: x + width / 2,
-        y: y + height,
-      });
-    }
-    case `se`: {
-      return Object.freeze({
-        x: x + width,
-        y: y + height,
-      });
-    }
-    case `w`: {
-      return Object.freeze({ x, y: y + height / 2 });
-    }
-    case `e`: {
-      return Object.freeze({ x: x + width, y: y + height / 2 });
-    }
-    case `center`: {
-      return Object.freeze({
-        x: x + width / 2,
-        y: y + height / 2,
-      });
-    }
-    default: {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`Unknown direction: ${ card }`);
-    }
-  }
-};
-
-/**
- * Returns a point on the edge of rectangle
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
- * const r1 = {x: 10, y: 10, width: 100, height: 50};
- * Rects.getEdgeX(r1, `right`);  // Yields: 110
- * Rects.getEdgeX(r1, `bottom`); // Yields: 10
- *
- * const r2 = {width: 100, height: 50};
- * Rects.getEdgeX(r2, `right`);  // Yields: 100
- * Rects.getEdgeX(r2, `bottom`); // Yields: 0
- * ```
- * @param rect
- * @param edge Which edge: right, left, bottom, top
- * @returns
- */
-export const getEdgeX = (
-  rect: RectPositioned | Rect,
-  edge: `right` | `bottom` | `left` | `top`
-): number => {
-  guard(rect);
-  switch (edge) {
-    case `top`: {
-      return isPoint(rect) ? rect.x : 0;
-    }
-    case `bottom`: {
-      return isPoint(rect) ? rect.x : 0;
-    }
-    case `left`: {
-      return isPoint(rect) ? rect.y : 0;
-    }
-    case `right`: {
-      return isPoint(rect) ? rect.x + rect.width : rect.width;
-    }
-  }
-};
-
-/**
- * Returns a point on the edge of rectangle
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
- * const r1 = {x: 10, y: 10, width: 100, height: 50};
- * Rects.getEdgeY(r1, `right`);  // Yields: 10
- * Rects.getEdgeY(r1, `bottom`); // Yields: 60
- *
- * const r2 = {width: 100, height: 50};
- * Rects.getEdgeY(r2, `right`);  // Yields: 0
- * Rects.getEdgeY(r2, `bottom`); // Yields: 50
- * ```
- * @param rect
- * @param edge Which edge: right, left, bottom, top
- * @returns
- */
-export const getEdgeY = (
-  rect: RectPositioned | Rect,
-  edge: `right` | `bottom` | `left` | `top`
-): number => {
-  guard(rect);
-  switch (edge) {
-    case `top`: {
-      return (isPoint(rect) ? rect.y : 0);
-    }
-    case `bottom`: {
-      return isPoint(rect) ? rect.y + rect.height : rect.height;
-    }
-    case `left`: {
-      return isPoint(rect) ? rect.y : 0;
-    }
-    case `right`: {
-      return isPoint(rect) ? rect.y : 0;
-    }
-  }
 };
 
 /**
@@ -564,11 +444,13 @@ export const center = (
   if (origin === undefined && isPoint(rect)) origin = rect;
   else if (origin === undefined) origin = { x: 0, y: 0 }; // throw new Error(`Unpositioned rect needs origin param`);
 
+  const r = getRectPositioned(rect, origin);
   return Object.freeze({
     x: origin.x + rect.width / 2,
     y: origin.y + rect.height / 2,
   });
 };
+
 
 /**
  * Returns the length of each side of the rectangle (top, right, bottom, left)
@@ -587,30 +469,6 @@ export const lengths = (rect: RectPositioned): ReadonlyArray<number> => {
   return edges(rect).map((l) => LinesLength(l));
 };
 
-/**
- * Returns four lines based on each corner.
- * Lines are given in order: top, right, bottom, left
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * const rect = { width: 100, height: 100, x: 100, y: 100 };
- * // Yields: array of length four
- * const lines = Rects.lines(rect);
- * ```
- *
- * @param {(RectPositioned|Rect)} rect
- * @param {Points.Point} [origin]
- * @returns {Lines.Line[]}
- */
-export const edges = (
-  rect: RectPositioned | Rect,
-  origin?: Point
-): ReadonlyArray<Line> => {
-  const c = corners(rect, origin);
-
-  // Connect all the corners, back to first corner again
-  return LinesJoinPointsToLines(...c, c[ 0 ]);
-};
 
 /**
  * Returns the perimeter of `rect` (ie. sum of all edges)
@@ -643,65 +501,3 @@ export const area = (rect: Rect): number => {
   return rect.height * rect.width;
 };
 
-
-
-/**
- * Returns a random positioned Rect on a 0..1 scale.
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * const r = Rects.random(); // eg {x: 0.2549012, y:0.859301, width: 0.5212, height: 0.1423 }
- * ```
- *
- * A custom source of randomness can be provided:
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
- * const r = Rects.random(weightedSource(`quadIn`));
- * ```
- * @param rando
- * @returns
- */
-export const random = (rando?: RandomSource): RectPositioned => {
-  if (rando === undefined) rando = defaultRandom;
-
-  return Object.freeze({
-    x: rando(),
-    y: rando(),
-    width: rando(),
-    height: rando(),
-  });
-};
-
-export type RandomPointOpts = {
-  readonly strategy?: `naive`;
-  readonly randomSource?: RandomSource;
-  readonly margin?: { readonly x: number; readonly y: number };
-};
-
-/**
- * Returns a random point within a circle.
- *
- * By default creates a uniform distribution.
- *
- * ```js
- * const pt = randomPoint({width: 5, height: 10});
- * ```'
- * @param within Circle to generate a point within
- * @param opts Options
- * @returns
- */
-export const randomPoint = (
-  within: Rect | RectPositioned,
-  opts: RandomPointOpts = {}
-): Point => {
-  // TODO: Does not implement uniform distribution
-  // See: https://math.stackexchange.com/questions/366474/find-coordinates-of-n-points-uniformly-distributed-in-a-rectangle
-  const rand = opts.randomSource ?? defaultRandom;
-  const margin = opts.margin ?? { x: 0, y: 0 };
-
-  const x = rand() * (within.width - margin.x - margin.x);
-  const y = rand() * (within.height - margin.y - margin.y);
-
-  const pos = { x: x + margin.x, y: y + margin.y };
-  return isPositioned(within) ? PointsSum(pos, within) : Object.freeze(pos);
-};

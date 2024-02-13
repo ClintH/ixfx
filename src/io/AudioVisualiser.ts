@@ -14,7 +14,7 @@
 import { Arrays } from '../collections/index.js';
 import { numberTracker } from '../data/NumberTracker.js';
 import { AudioAnalyser } from './AudioAnalyser.js';
-import type { Point } from '../geometry/Types.js';
+import type { Point } from '../geometry/point/index.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {

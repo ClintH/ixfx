@@ -20,6 +20,32 @@ export const guard = (rect: Rect, name = `rect`) => {
   guardDim(rect.height, name + `.height`);
 };
 
+/**
+ * Returns a positioned rect or if it's not possible, throws an error.
+ * 
+ * If `rect` is positioned and `origin` is provided, returned result uses `origin` as x,y instead.
+ * ```js
+ * // Returns input because it's positioned
+ * getRectPositioned({x:1,y:2,width:10,height:20});
+ * // Returns {x:1,y:2,width:10,height:20}
+ * getRectPositioned({width:10,height:20}, {x:1, y:2 }); 
+ * // Throws, because we have no point
+ * getRectPositioned({width:10,height:20})
+ * ```
+ * @param rect 
+ * @param origin 
+ * @returns 
+ */
+export const getRectPositioned = (rect: Rect | RectPositioned, origin?: Point): RectPositioned => {
+  guard(rect);
+  if (isPositioned(rect) && origin === undefined) {
+    return rect;
+  }
+  if (origin === undefined) throw new Error(`Unpositioned rect needs origin parameter`);
+  return Object.freeze({ ...rect, ...origin });
+
+}
+
 export const guardPositioned = (rect: RectPositioned, name = `rect`) => {
   if (!isPositioned(rect)) throw new Error(`Expected ${ name } to have x,y`);
   guard(rect, name);

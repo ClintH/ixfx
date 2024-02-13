@@ -3,7 +3,11 @@ import { Arrays } from '../../collections/index.js';
 import { defaultRandom, type RandomSource } from '../../random/Types.js';
 import { guard, isCircle, isCirclePositioned } from './Guard.js';
 import { fromCenter as RectsFromCenter } from '../rect/index.js';
-import type { Point, Rect, RectPositioned, Line, Path } from '../Types.js';
+import type { Path } from '../path/index.js';
+import type { Point } from '../point/index.js';
+import type { Rect, RectPositioned } from '../rect/index.js';
+import type { Line } from '../line/index.js';
+
 const piPi = Math.PI * 2;
 export * from './DistanceCenter.js';
 export * from './DistanceFromExterior.js';

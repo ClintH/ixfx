@@ -1,12 +1,8 @@
 // Easings from https://easings.net/
+import { msElapsedTimer, relativeTimer, ticksElapsedTimer, type TimerSource } from '../flow/Timer.js';
 import { interpolate } from '../data/Interpolate.js';
-import {
-  msElapsedTimer,
-  type HasCompletion,
-  relativeTimer,
-  ticksElapsedTimer,
-  type TimerSource,
-} from '../flow/index.js';
+import type { HasCompletion } from '../flow/Types.js';
+
 
 const sqrt = Math.sqrt;
 const pow = Math.pow;

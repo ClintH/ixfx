@@ -1,7 +1,8 @@
 import { Bezier as BezierLibrary } from 'bezier-js';
 import { interpolate as LinesInterpolate } from './line/index.js';
 import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
-import type { Path, Point } from './Types.js';
+import type { Point } from '../geometry/point/index.js';
+import type { Path } from '../geometry/path/index.js';
 
 export type QuadraticBezier = {
   readonly a: Point,
