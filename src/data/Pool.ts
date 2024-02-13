@@ -113,10 +113,10 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
    * @param reason
    * @returns
    */
-  _dispose(reason: string) {
+  _dispose(reason: string, data: V) {
     if (this._state === `disposed`) return;
     const resource = this.resource;
-    const data = resource.data;
+    //const data = resource.data;
     this._state = `disposed`;
     resource._release(this);
     this._pool.log.log(`PoolUser dispose key: ${ this.key } reason: ${ reason }`);
@@ -134,7 +134,7 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
     const data = resource.data;
     this._pool.log.log(`PoolUser release key: ${ this.key } reason: ${ reason }`);
     this.fireEvent(`released`, { data, reason });
-    this._dispose(`release-${ reason }`);
+    this._dispose(`release-${ reason }`, data);
   }
 
   // #region Properties
@@ -305,7 +305,7 @@ export class Resource<V> {
     this.#state = `disposed`;
     this.pool.log.log(`Resource disposed (${ reason })`);
     for (const u of this.#users) {
-      u._dispose(`resource-${ reason }`);
+      u._dispose(`resource-${ reason }`, data);
     }
     this.#users = [];
     this.#lastUsersChange = performance.now();
@@ -475,7 +475,7 @@ export class Pool<V> {
         );
 
         userKeysToRemove.push(key);
-        user._dispose(`invalid`);
+        user._dispose(`invalid`, user.data);
       }
     }
 
@@ -650,7 +650,7 @@ export class Pool<V> {
 
     // Throw an error if all items are being used
     if (this.fullPolicy === `error`) {
-      console.log(this.dumpToString());
+      //console.log(this.dumpToString());
       throw new Error(
         `Pool is fully used (fullPolicy: ${ this.fullPolicy }, capacity: ${ this.capacity })`
       );
