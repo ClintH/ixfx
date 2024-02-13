@@ -1,6 +1,6 @@
 import test from 'ava';
 import { compareData, getPathsAndData, map, updateByPath, applyChanges, getField, getPaths } from '../Immutable.js';
-import { arrayValuesEqual } from './util.js';
+import { arrayValuesEqual } from './Include.js';
 import { isEqualValueDefault } from '../IsEqual.js';
 
 test(`getPathsAndData`, t => {

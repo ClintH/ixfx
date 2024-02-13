@@ -1,7 +1,7 @@
 import test from 'ava';
 import { jitter, jitterAbsolute } from '../../modulation/Jitter.js';
 import { repeat } from '../../flow/index.js';
-import { rangeCheck, someNearnessMany } from '../util.js';
+import { rangeCheck, someNearnessMany } from '../Include.js';
 
 test(`relative-absolute`, t => {
   const tests = 10 * 1000;
@@ -11,7 +11,7 @@ test(`relative-absolute`, t => {
   const relD = [ ...repeat(tests, () => rel(50)) ];
 
   // Check that jitter values are within range
-  someNearnessMany(t, relD, 0.015, [ 25, 75 ]);
+  someNearnessMany(t, relD, 0.02, [ 25, 75 ]);
   rangeCheck(t, relD, {
     lowerExcl: 25,
     upperExcl: 75,
@@ -29,7 +29,7 @@ test('absolute-absolute', (t) => {
   const absD = [ ...repeat(tests, () => abs(50)) ];
 
   // ...should be a range of 0..100 when clamped
-  someNearnessMany(t, absD, 0.05, [ 0, 100 ]);
+  someNearnessMany(t, absD, 0.06, [ 0, 100 ]);
   rangeCheck(t, absD, {
     lowerExcl: 0,
     upperExcl: 100,

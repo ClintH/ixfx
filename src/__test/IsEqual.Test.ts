@@ -28,8 +28,6 @@ test(`isEqualValuePartial`, t => {
       number: 35
     }
   }));
-
-
 });
 
 test(`isEqualValueIgnoreOrder`, t => {

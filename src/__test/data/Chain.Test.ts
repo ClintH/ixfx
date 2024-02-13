@@ -3,17 +3,30 @@ import * as Chains from '../../data/Chain.js';
 import { Async, count } from '../../Generators.js';
 import { sleep } from '../../flow/Sleep.js';
 import { Elapsed } from '../../flow/index.js';
+import { intervalTracker } from '../../data/IntervalTracker.js';
+import { isApproximately } from '../../Numbers.js';
 
 const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
 
-// const xValues = Chains.run(
-//   Chains.fromEvent<PointerEvent>(window, `pointermove`),
-//   Chains.transform<PointerEvent, number>(event => event.x)
-// )
+test('asPromise', async t => {
+  const timeout = 100;
+  const loops = 10;
+  t.plan(loops);
+  t.timeout(timeout * (loops + 2));
+  const tick = Chains.tick({ interval: timeout, loops });
+  const tickValue = Chains.asPromise(tick);
 
-// for await (const x of xValues) {
-//   console.log(x);
-// }
+  let timer = setInterval(async () => {
+    const v = await tickValue();
+    if (v === undefined) {
+      clearInterval(timer);
+      return;
+    }
+    t.assert(true);
+  }, timeout);
+
+  await sleep(timeout * (loops + 1));
+});
 
 
 test(`fromFunction`, async t => {
@@ -166,20 +179,7 @@ test(`addToArray`, async t => {
   t.is(data.length, 5);
 });
 
-test('asPromise', async t => {
-  const timeout = 100;
-  const loops = 10;
-  t.plan(loops);
-  const tick = Chains.tick({ interval: timeout, loops });
-  const tickValue = Chains.asPromise(tick);
 
-  setInterval(async () => {
-    const v = await tickValue();
-    t.assert(true);
-  }, timeout);
-
-  await sleep(timeout * (loops + 1));
-});
 
 test('asValue', async t => {
   const tick = Chains.tick({ interval: 100 });
@@ -190,7 +190,6 @@ test('asValue', async t => {
   const v2 = await tickValue();
   t.truthy(v2);
 });
-
 
 test('asCallback', async t => {
   t.plan(5);
@@ -234,7 +233,7 @@ test(`synchronise`, async t => {
 
 test(`debounce`, async t => {
   t.plan(3);
-  const elapsed = Elapsed.since();
+  //const elapsed = Elapsed.since();
   const ch1 = Chains.run(
     Chains.tick({ interval: 10, elapsed: 350 }),
     Chains.debounce(100)
@@ -273,19 +272,52 @@ test('chain', async t => {
 })
 
 test('delay', async t => {
+  const interval = 200;
   const ch = Chains.run(
     [ `1`, `2`, `3` ],
     Chains.transform<string, number>(v => Number.parseInt(v)),
-    Chains.delay({ before: 1000 })
+    Chains.delay({ before: interval })
   );
 
-  t.pass();
+  const tracker = intervalTracker();
+  for await (const v of ch) {
+    tracker.mark();
+  }
+  t.true(isApproximately(interval, 0.01)(tracker.avg));
 });
 
 test('tick', async t => {
-  const ch = Chains.run(
-    Chains.tick({ interval: 1000 }),
-    Chains.transform<string, number>(v => Number.parseInt(v)),
+  // Tick with interval
+  const intervalMs = 100;
+  const ch1 = Chains.run(
+    Chains.tick({ interval: intervalMs }),
+    Chains.transform<string, number>(v => Number.parseInt(v))
   );
-  t.pass();
+  let tracker = intervalTracker();
+  let count = 0;
+  for await (const v of ch1) {
+    tracker.mark();
+    if (count++ > 20) break;
+  }
+  // Check that interval between iterations is about right
+  t.true(isApproximately(intervalMs, 0.01)(tracker.avg))
+
+  // Tick with max loops
+  let loops = 10;
+  const ch2 = Chains.run(
+    Chains.tick({ loops, interval: intervalMs }),
+    Chains.transform<string, number>(v => Number.parseInt(v))
+  );
+  tracker = intervalTracker();
+  count = 0;
+  for await (const v of ch2) {
+    tracker.mark();
+    count++;
+  }
+  // Check that loops is right
+  t.is(loops, count);
+
+  // Check that interval between iterations is about right
+  t.true(isApproximately(intervalMs, 0.01)(tracker.avg))
+
 });

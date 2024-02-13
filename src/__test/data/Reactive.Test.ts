@@ -256,15 +256,15 @@ test(`object-set`, async t => {
 });
 
 test(`rx-field`, async t => {
-  const data1 = [
+  const data = [
     { name: `a` },
     { name: `b` },
     { name: `c` },
     { name: `d` }
   ];
-  const f1 = Rx.field<{ name: string }, string>(data1, `name`);
-  const values1 = await Rx.toArrayOrThrow(f1);
-  t.is(values1.length, data1.length);
+  const f = Rx.field<{ name: string }, string>(`name`)(data);
+  const values1 = await Rx.toArrayOrThrow(f);
+  t.is(values1.length, data.length);
   t.deepEqual(values1, [ `a`, `b`, `c`, `d` ]);
 
   // Check with some values that don't have field
@@ -275,7 +275,7 @@ test(`rx-field`, async t => {
     { name: `d` }
   ];
   // @ts-expect-error
-  const f2 = Rx.field<{ name: string }, string>(data2, `name`);
+  const f2 = Rx.field<{ name: string }, string>(`name`)(data2);
   const values2 = await Rx.toArray(f2);
   t.is(values2.length, data2.length - 1);
   t.deepEqual(values2, [ `a`, `b`, `d` ]);
@@ -288,7 +288,7 @@ test(`rx-field`, async t => {
     { name: `d` }
   ];
   // @ts-expect-error
-  const f3 = Rx.field<{ name: string }, string>(data3, `name`, { missingFieldDefault: `` });
+  const f3 = Rx.field<{ name: string }, string>(`name`, { missingFieldDefault: `` })(data3);
   const values3 = await Rx.toArray(f3);
   t.is(values3.length, data3.length);
   t.deepEqual(values3, [ `a`, `b`, ``, `d` ]);
@@ -390,24 +390,29 @@ test(`generator-lazy`, async t => {
   let produceCount = 0;
   let consumeCount = 0;
   const ac = new AbortController();
+
+  // Keep track of how many times its called.
+  // Runs every 100ms
   const time = Flow.interval(() => {
     produceCount++;
     return Math.random();
   }, { fixed: 100, signal: ac.signal });
 
+  // Reactive from a generator
   const r = Rx.generator(time);
+
+  // Wait 2s before subscribing
   setTimeout(() => {
-    // Wait 2s before subscribing
     r.on(v => {
       consumeCount++;
-      //console.log(`consume: ${ consumeCount } produce: ${ produceCount }`);
       if (consumeCount === 10) {
         // We should have consumed as many as created
         ac.abort(`hey`);
       }
     })
-  }, 2000);
-  await Flow.sleep(3000);
+  }, 1500);
+
+  await Flow.sleep(1000);
   t.is(consumeCount, produceCount);
 
 })

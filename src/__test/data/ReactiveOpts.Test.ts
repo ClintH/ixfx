@@ -19,14 +19,12 @@ const genArray = (count: number) => {
 test(`transform`, async t => {
   // Simple array as source
   const data = [ 1, 2, 3, 4, 5 ];
-  const values = Rx.transform(data, (v => v + '!'));
+  const values = Rx.transform((v => v + '!'))(data);
   const valuesArray = await Rx.toArray(values);
   t.is(valuesArray.length, data.length);
   for (let i = 0; i < data.length; i++) {
     t.is(valuesArray[ i ], data[ i ] + '!');
   }
-
-
 });
 
 
@@ -35,7 +33,7 @@ test(`batch-limit`, async t => {
   const amt1 = 20;
   const values1 = count(amt1);
   const limit1 = 5;
-  const b1 = Rx.batch(values1, { limit: limit1 });
+  const b1 = Rx.batch({ quantity: limit1 })(values1);
   const reader1 = await Rx.toArray(b1);
   t.is(reader1.flat().length, amt1);
   t.is(reader1.length, Math.ceil(amt1 / limit1));
@@ -48,7 +46,7 @@ test(`batch-limit`, async t => {
   const amt2 = 20;
   const values2 = count(amt2);
   const limit2 = 6;
-  const b2 = Rx.batch(values2, { limit: limit2 });
+  const b2 = Rx.batch({ quantity: limit2 })(values2);
   const reader2 = await Rx.toArray(b2);
   t.is(reader2.flat().length, amt2);
   for (let i = 0; i < reader2.length; i++) {
@@ -60,31 +58,42 @@ test(`batch-limit`, async t => {
   }
 })
 
-test(`batch-elapsed`, async t => {
+test(`batch-elapsed-1`, async t => {
   // Read all items within the elapsed period
-  const amt1 = 20;
-  const started1 = Date.now();
-  const values1 = count(amt1);
-  const elapsed1 = 5000;
-  const b1 = Rx.batch(values1, { elapsed: elapsed1 });
-  const reader1 = await Rx.toArray(b1);
-  const readElapsed = Date.now() - started1;
-  t.is(reader1.flat().length, amt1);
+  const amt = 20;
+  const started = Date.now();
+  const values = count(amt);
+  const elapsed = 5000;
+  // Make a batch for 5 seconds. But `count` gives all the values
+  // quickly, so it won't take long
+  const batch = Rx.batch({ elapsed: elapsed })(values);
+  const reader = await Rx.toArray(batch);
+  const readElapsed = Date.now() - started;
+  // Check that that toArray yielded all the emitted values
+  t.is(reader.flat().length, amt);
+  // Expect that time to drain source isn't so long
+  t.true(readElapsed < 500, `Reading shouldn't take full time since source ends`);
+});
 
-  t.true(readElapsed < 1000, `Reading shouldn't take full time since source ends`);
-
+test(`batched-elapsed-2`, async t => {
   // Read items in gulps
-  const amt2 = 20;
-  const elapsed2 = 200;
-  const interval2 = 50
-  const values2 = count(amt2);
-  // Produce values every 500ms
-  const valuesOverTime = Flow.interval(values2, interval2);
-  const b2 = Rx.batch(valuesOverTime, { elapsed: elapsed2 });
-  const reader2 = await Rx.toArrayOrThrow(b2);
-  t.is(reader2.flat().length, amt2);
-  for (const row of reader2) {
-    t.is(row.length, elapsed2 / interval2);
+  const amt = 20;
+  const elapsed = 200;
+  const interval = 50
+  const values = count(amt);
+  // Iterate over values with an interval
+  const valuesOverTime = Flow.interval(values, interval);
+
+  // Batch read over elapsed ms
+  const batch = Rx.batch({ elapsed: elapsed })(valuesOverTime);
+
+  // Read all the batched sets of data
+  const reader = await Rx.toArrayOrThrow(batch);
+
+  // Expect that number of read items is the same as source
+  t.is(reader.flat().length, amt);
+  for (const row of reader) {
+    t.is(row.length, elapsed / interval);
   }
 });
 

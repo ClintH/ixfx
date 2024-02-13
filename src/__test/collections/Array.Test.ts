@@ -15,7 +15,7 @@ import {
   zip,
   without
 } from '../../collections/arrays/index.js';
-import { arrayValuesEqual } from '../util.js';
+import { arrayValuesEqual } from '../Include.js';
 import { valuesEqual } from '../../collections/arrays/ValuesEqual.js';
 
 test('without', t => {

@@ -6,7 +6,6 @@ import * as TreePathed from '../../../collections/tree/Pathed.js';
 
 import { isEqualValueDefault } from '../../../IsEqual.js';
 
-
 test(`tree-dotted-path`, t => {
   const root = TreePathed.addValueByPath({}, 'c');
   TreePathed.addValueByPath({ x: 'admin' }, 'c.users.admin', root);
@@ -59,5 +58,4 @@ test(`tree-dotted-wrapper`, t => {
   t.false(root.remove(`c.users.notfound`));
   t.true(root.remove(`c.users.blerg`));
   t.false(root.hasPath(`c.users.blerg`));
-
 })

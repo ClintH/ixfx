@@ -1,6 +1,6 @@
 import test from 'ava';
 import { integerUniqueGen, integer, float } from '../random/index.js';
-import { equalUnordered, rangeCheck, rangeCheckInteger } from './util.js';
+import { equalUnordered, rangeCheck, rangeCheckInteger } from './Include.js';
 import { weightedInteger } from '../random/WeightedInteger.js';
 
 const repeat = <V>(count: number, fn: () => V): V[] => {

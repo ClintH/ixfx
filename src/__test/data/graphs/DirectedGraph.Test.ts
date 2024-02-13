@@ -1,6 +1,6 @@
 import test from 'ava';
 import * as Dg from '../../../data/graphs/DirectedGraph.js';
-import { arrayValuesEqual } from '../../util.js';
+import { arrayValuesEqual } from '../../Include.js';
 import { compareValuesEqual } from '../../../collections/arrays/index.js';
 
 const linearGraph = () => {

@@ -4,7 +4,7 @@ import {
   type MapArrayOpts,
 } from '../../../collections/map/MapOfArrayMutable.js';
 import type { IMapOfMutableExtended } from '../../../collections/map/IMapOfMutableExtended.js';
-import { arrayValueIncludes } from '../../util.js';
+import { arrayValueIncludes } from '../../Include.js';
 import { isEqualValueDefault } from '../../../IsEqual.js';
 
 test(`withOpts`, (t) => {

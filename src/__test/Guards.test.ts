@@ -1,51 +1,50 @@
 import test from 'ava';
-import {isStringArray, integerTest, integerParse, percentTest} from '../Guards.js';
+import { isStringArray, integerTest, integerParse, percentTest } from '../Guards.js';
 
 test(`isStringArray`, (t) => {
-  t.true(isStringArray([`a`, `b`, `c`]));
-  t.true(isStringArray(['a']));
-  t.false(isStringArray([`a`, `b`, false]));
-  t.false(isStringArray([`a`, `b`, null]));
-  t.false(isStringArray([`a`, `b`, true]));
-  t.false(isStringArray([`a`, `b`, {}]));
-
+  t.true(isStringArray([ `a`, `b`, `c` ]));
+  t.true(isStringArray([ 'a' ]));
+  t.false(isStringArray([ `a`, `b`, false ]));
+  t.false(isStringArray([ `a`, `b`, null ]));
+  t.false(isStringArray([ `a`, `b`, true ]));
+  t.false(isStringArray([ `a`, `b`, {} ]));
 });
 
 test(`percent`, (t) => {
-  t.false(percentTest(2)[0]);
-  t.false(percentTest(-2)[0]);
-  t.false(percentTest(Number.NaN)[0]);
+  t.false(percentTest(2)[ 0 ]);
+  t.false(percentTest(-2)[ 0 ]);
+  t.false(percentTest(Number.NaN)[ 0 ]);
   // @ts-expect-error
-  t.false(percentTest(`string`)[0]);
+  t.false(percentTest(`string`)[ 0 ]);
   // @ts-expect-error
-  t.false(percentTest(true)[0]);
+  t.false(percentTest(true)[ 0 ]);
   // @ts-expect-error
-  t.false(percentTest(false)[0]);
+  t.false(percentTest(false)[ 0 ]);
   // @ts-expect-error
-  t.false(percentTest({a: true})[0]);
+  t.false(percentTest({ a: true })[ 0 ]);
 
-  t.true(percentTest(1)[0]);
-  t.true(percentTest(0)[0]);
-  t.true(percentTest(0.5)[0]);
+  t.true(percentTest(1)[ 0 ]);
+  t.true(percentTest(0)[ 0 ]);
+  t.true(percentTest(0.5)[ 0 ]);
 });
 
 test(`integer`, (t) => {
   // @ts-ignore
-  t.false(integerTest(`string`)[0]);
+  t.false(integerTest(`string`)[ 0 ]);
   // @ts-ignore
-  t.false(integerTest(true)[0]);
+  t.false(integerTest(true)[ 0 ]);
   // @ts-ignore
-  t.false(integerTest(false)[0]);
+  t.false(integerTest(false)[ 0 ]);
   // @ts-ignore
-  t.false(integerTest({a: true})[0]);
+  t.false(integerTest({ a: true })[ 0 ]);
 
-  t.false(integerTest(-0.5)[0]);
-  t.false(integerTest(0.5)[0]);
-  t.false(integerTest(Number.NaN)[0]);
+  t.false(integerTest(-0.5)[ 0 ]);
+  t.false(integerTest(0.5)[ 0 ]);
+  t.false(integerTest(Number.NaN)[ 0 ]);
 
-  t.true(integerTest(0)[0]);
-  t.true(integerTest(1)[0]);
-  t.true(integerTest(100)[0]);
+  t.true(integerTest(0)[ 0 ]);
+  t.true(integerTest(1)[ 0 ]);
+  t.true(integerTest(100)[ 0 ]);
 });
 
 test(`integerParse`, (t) => {

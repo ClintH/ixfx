@@ -5,7 +5,7 @@ import {
   fromList,
   WithEvents,
 } from '../../flow/StateMachine.js';
-import { arrayValuesEqual, eventPromise } from '../util.js';
+import { arrayValuesEqual, eventPromise } from '../Include.js';
 import { compareValuesEqual } from '../../collections/arrays/index.js';
 
 const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);

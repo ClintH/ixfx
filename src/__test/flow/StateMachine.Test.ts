@@ -1,24 +1,24 @@
 /* eslint-disable */
 import test from 'ava';
 import * as StateMachine from '../../flow/StateMachine.js';
-import { isEmptyArray } from '../util.js';
+import { isEmptyArray } from '../Include.js';
 
 test('normaliseTargets', (t) => {
   let a = StateMachine.normaliseTargets('hello');
-  t.like(a, [{ state: 'hello' }]);
+  t.like(a, [ { state: 'hello' } ]);
 
-  a = StateMachine.normaliseTargets([{ state: 'a' }, { state: 'b' }]);
-  t.like(a, [{ state: 'a' }, { state: 'b' }]);
+  a = StateMachine.normaliseTargets([ { state: 'a' }, { state: 'b' } ]);
+  t.like(a, [ { state: 'a' }, { state: 'b' } ]);
 
-  a = StateMachine.normaliseTargets(['a', 'b']);
-  t.like(a, [{ state: 'a' }, { state: 'b' }]);
+  a = StateMachine.normaliseTargets([ 'a', 'b' ]);
+  t.like(a, [ { state: 'a' }, { state: 'b' } ]);
 
   a = StateMachine.normaliseTargets(null);
-  t.like(a, [{ state: null }]);
+  t.like(a, [ { state: null } ]);
 
   // @ts-ignore
-  a = StateMachine.normaliseTargets([null]);
-  t.like(a, [{ state: null }]);
+  a = StateMachine.normaliseTargets([ null ]);
+  t.like(a, [ { state: null } ]);
 
   // @ts-ignore
   t.throws(() => StateMachine.normaliseTargets(undefined));
@@ -27,15 +27,15 @@ test('normaliseTargets', (t) => {
   t.throws(() => StateMachine.normaliseTargets(10));
 
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets([false, true]));
+  t.throws(() => StateMachine.normaliseTargets([ false, true ]));
 
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets(['someState', null]));
+  t.throws(() => StateMachine.normaliseTargets([ 'someState', null ]));
   // @ts-ignore
   t.throws(() => StateMachine.normaliseTargets({ someObj: 'hi' }));
   t.throws(() =>
     // @ts-ignore
-    StateMachine.normaliseTargets([{ state: 'ok' }, { someObj: 'hi' }])
+    StateMachine.normaliseTargets([ { state: 'ok' }, { someObj: 'hi' } ])
   );
 
   //t.like(StateMachine.normaliseTargets(['hello','there'], {}))
@@ -43,10 +43,10 @@ test('normaliseTargets', (t) => {
 
 test('routine', (t) => {
   const sm = {
-    wakeup: ['coffee', 'phone'],
-    coffee: ['breakfast', 'teeth'],
-    breakfast: ['coffee', 'teeth'],
-    phone: ['teeth'],
+    wakeup: [ 'coffee', 'phone' ],
+    coffee: [ 'breakfast', 'teeth' ],
+    breakfast: [ 'coffee', 'teeth' ],
+    phone: [ 'teeth' ],
     teeth: 'bike',
     bike: null,
   };
@@ -56,7 +56,7 @@ test('routine', (t) => {
   t.true(l.value === 'wakeup');
   t.true(isEmptyArray(l.visited));
 
-  t.like(StateMachine.possible(l), ['coffee', 'phone']);
+  t.like(StateMachine.possible(l), [ 'coffee', 'phone' ]);
   t.true(StateMachine.isValidTransition(l, 'phone'));
   t.true(StateMachine.isValidTransition(l, 'coffee'));
   t.false(StateMachine.done(l));
@@ -77,7 +77,7 @@ test('routine', (t) => {
   const ll1 = StateMachine.to(l, 'phone');
   const ll2 = StateMachine.to(ll1, 'teeth');
   const ll3 = StateMachine.to(ll2, 'bike');
-  t.like(ll3.visited, ['wakeup', 'phone', 'teeth']);
+  t.like(ll3.visited, [ 'wakeup', 'phone', 'teeth' ]);
 
   // Try with initial state further along
   const l1 = StateMachine.init(sm, 'coffee');
@@ -85,7 +85,7 @@ test('routine', (t) => {
 
   t.true(l1.value === 'coffee');
   t.true(StateMachine.isValidTransition(l1, 'breakfast'));
-  t.like(StateMachine.possible(l1), ['breakfast', 'teeth']);
+  t.like(StateMachine.possible(l1), [ 'breakfast', 'teeth' ]);
 
   t.true(StateMachine.isValidTransition(l1, 'teeth'));
   t.false(StateMachine.done(l1));
@@ -103,7 +103,7 @@ test('routine', (t) => {
   const l2 = StateMachine.to(l1, 'breakfast');
   t.true(l2.value === 'breakfast');
   t.true(l1.value === 'coffee');
-  t.like(StateMachine.possible(l2), ['coffee', 'teeth']);
+  t.like(StateMachine.possible(l2), [ 'coffee', 'teeth' ]);
 
   t.false(StateMachine.done(l2));
   t.false(StateMachine.done(l1));
@@ -115,13 +115,13 @@ test('routine', (t) => {
   const l3 = StateMachine.to(l2, 'teeth');
   t.true(l3.value === 'teeth');
   t.false(StateMachine.done(l3));
-  t.like(StateMachine.possible(l3), ['bike']);
+  t.like(StateMachine.possible(l3), [ 'bike' ]);
 
   // l4: bike
   const l4 = StateMachine.to(l3, 'bike');
   t.true(l4.value === 'bike');
   t.true(isEmptyArray(StateMachine.possible(l4)));
-  t.like(l4.visited, ['coffee', 'breakfast', 'teeth']);
+  t.like(l4.visited, [ 'coffee', 'breakfast', 'teeth' ]);
   t.false(StateMachine.done(l1));
   t.false(StateMachine.done(l2));
   t.false(StateMachine.done(l3));
@@ -182,7 +182,7 @@ test('validation', (t) => {
   // Target state repeated
   t.throws(() => {
     const d: StateMachine.Transitions = {
-      a: ['b', 'b'],
+      a: [ 'b', 'b' ],
       b: 'a',
     };
     StateMachine.init(d);
@@ -191,7 +191,7 @@ test('validation', (t) => {
   // Target states contains undefined state
   t.throws(() => {
     const d: StateMachine.Transitions = {
-      a: ['b', 'c'],
+      a: [ 'b', 'c' ],
       b: 'a',
     };
     StateMachine.init(d);
@@ -201,7 +201,7 @@ test('validation', (t) => {
   t.throws(() => {
     const d: StateMachine.Transitions = {
       // @ts-ignore
-      a: [false, 'b'],
+      a: [ false, 'b' ],
       b: null,
     };
     StateMachine.init(d);
@@ -209,7 +209,7 @@ test('validation', (t) => {
   t.throws(() => {
     const d: StateMachine.Transitions = {
       // @ts-ignore
-      a: ['b', { someObject: 'true' }],
+      a: [ 'b', { someObject: 'true' } ],
       b: null,
     };
     StateMachine.init(d);
@@ -255,25 +255,25 @@ test('default', (t) => {
 
   // Check that machine has been normalised
   t.like(l.machine, {
-    off: [{ state: 'on' }],
-    on: [{ state: 'off' }],
+    off: [ { state: 'on' } ],
+    on: [ { state: 'off' } ],
   });
 
   t.true(l.value === `on`);
   t.true(isEmptyArray(l.visited));
 
-  t.like(StateMachine.possible(l), ['off']);
+  t.like(StateMachine.possible(l), [ 'off' ]);
 
   // l2: Off
   const l2 = StateMachine.to(l, 'off');
-  t.like(StateMachine.possible(l2), ['on']);
+  t.like(StateMachine.possible(l2), [ 'on' ]);
   t.true(l2.value === 'off');
   // Check that machine definition has not changed
   t.like(l.machine, {
-    off: [{ state: 'on' }],
-    on: [{ state: 'off' }],
+    off: [ { state: 'on' } ],
+    on: [ { state: 'off' } ],
   });
-  t.like(l2.visited, ['on']);
+  t.like(l2.visited, [ 'on' ]);
 
   t.throws(() => {
     // @ts-ignore
@@ -289,5 +289,5 @@ test('default', (t) => {
   t.false(StateMachine.done(l2));
 
   const l3 = StateMachine.to(l2, 'on');
-  t.like(l3.visited, ['on', 'off']);
+  t.like(l3.visited, [ 'on', 'off' ]);
 });

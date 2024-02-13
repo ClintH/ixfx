@@ -43,8 +43,6 @@ test(`toAdjacencyMatrix`, t => {
     { a: `2`, b: `1` }
   );
   const m = G.toAdjacencyMatrix(g);
-
-
   t.deepEqual(m.rows[ 0 ], [ false, true, true, true ]);
   t.deepEqual(m.rows[ 1 ], [ true, false, true, false ]);
   t.deepEqual(m.rows[ 2 ], [ true, true, false, false ]);

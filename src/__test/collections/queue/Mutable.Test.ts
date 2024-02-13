@@ -1,6 +1,6 @@
 import test from 'ava';
 import { QueueMutable } from '../../../collections/queue/QueueMutable.js';
-import { arrayValuesEqual } from '../../util.js';
+import { arrayValuesEqual } from '../../Include.js';
 
 test(`basic`, (t) => {
   const a = new QueueMutable<string>();
@@ -15,7 +15,7 @@ test(`basic`, (t) => {
   t.falsy(a.isEmpty);
   t.falsy(a.isFull);
 
-  arrayValuesEqual(t, a.data, [`test0`, `test1`]);
+  arrayValuesEqual(t, a.data, [ `test0`, `test1` ]);
   t.is(a.peek, `test0`);
 
   const b = a.dequeue();

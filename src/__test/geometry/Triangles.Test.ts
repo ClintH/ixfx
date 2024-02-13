@@ -3,7 +3,7 @@ import * as Teq from '../../geometry/triangle/Equilateral.js';
 import * as Tra from '../../geometry/triangle/Right.js';
 import * as Tis from '../../geometry/triangle/Isosceles.js';
 import { degreeToRadian } from '../../geometry/Angles.js';
-import { closeTo } from '../util.js';
+import { closeTo } from '../Include.js';
 
 test(`equilateral`, (tst) => {
   const t: Teq.TriangleEquilateral = {

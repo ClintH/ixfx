@@ -5,15 +5,13 @@ import { isApproximately } from '../../Numbers.js';
 
 test('basic', async (t) => {
   const expectedCount = 3;
-
-  //eslint-disable-next-line functional/no-let
   let timesInvoked = 0;
   const fn = async () => {
     timesInvoked++;
     if (timesInvoked === expectedCount) return { name: 'Sue' };
   };
 
-  const result = await retry(fn, { count: expectedCount * 2 });
+  const result = await retry(fn, { count: expectedCount * 2, startMs: 100 });
   t.is(timesInvoked, expectedCount);
   t.is(result.attempts, expectedCount);
   t.true(result.success);
@@ -29,7 +27,7 @@ test('count', async (t) => {
   const fn = async () => {
     timesInvoked++;
   };
-  const result = await retry(fn, { count: expectedCount });
+  const result = await retry(fn, { count: expectedCount, startMs: 100 });
   t.is(timesInvoked, expectedCount);
   t.is(result.attempts, expectedCount);
   t.false(result.success);
