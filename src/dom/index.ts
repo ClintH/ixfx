@@ -1,6 +1,4 @@
 export * from './Log.js';
-
-export * from './DomRx.js';
 export * from './Util.js';
 export * as DataTable from './DataTable.js';
 export * from './DataDisplay.js';
@@ -17,3 +15,5 @@ export * from './ErrorHandler.js';
 export * as DragDrop from './DragDrop.js';
 
 export * from './InlineConsole.js';
+
+export * as Variables from './CssVariables.js';
