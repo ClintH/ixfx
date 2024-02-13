@@ -26,22 +26,63 @@ Reactive.Dom.bindTextContent(lblXy, ptr, {transform: v=> {
 }})
 
 const clicks = Reactive.number(0);
-clicks.on(msg => {
-  console.log(msg);
-})
-const btnClicks = Reactive.event(btnClick, `click`);
+const btnClicks = Reactive.event(document.getElementById(`btnClick`), `click`);
 Reactive.to(btnClicks, clicks, _ => {
   return clicks.last() + 1
 });
 Reactive.Dom.bindTextContent(`#lblClicks`, clicks);
 
-setTimeout(() => {
-  btnClicks.dispose(`Test dispose`);
-}, 2000);
+//const btnClicksTest = Reactive.batchAndSingle(btnClicks, {elapsed:100, order:(a,b) => a.})
+const btnClicksBatch = Reactive.batch({ elapsed: 200})(btnClicks);
+// btnClicksBatch.on(msg=> {
+//   console.log(msg.value);
+// })
+//const btnClicksElapsed = Reactive.annotateElapsed(Reactive.event(document.getElementById(`btnClick`), `click`));
+
+const btnClickSwitch= Reactive.switcher(btnClicksBatch, {
+  single: v=> v.length == 1,
+  double: v=> v.length == 2,
+  more: v=>v.length > 2
+});
+btnClickSwitch.single.on(msg => {
+  console.log(`single!`);
+});
+btnClickSwitch.double.on(msg => {
+  console.log(`double!`);
+});
+
+const btnClickCount = Reactive.transform(v=> ({length:v.length, paths:v.map(event=>event.composedPath())}));
+btnClickCount.on(msg => {
+  console.log(msg.value);
+})
+
+//Reactive.with(Reactive.event()).transform({}).batch({});
+
+Reactive.pipe(Reactive.event(document,`click`), Reactive.transform({}), Reactive.batch({}))
+
+// setTimeout(() => {
+//   btnClicks.dispose(`Test dispose`);
+// }, 2000);
+
+// const switcherSource = Reactive.number(0);
+// const x = Reactive.switcher(switcherSource, {
+//   even: v => v % 2 === 0,
+//   odd: v => v % 2 !== 0
+// });
+// x.even.on(msg => {
+//   console.log(`even: ${msg.value}`);
+// });
+// x.odd.on(msg => {
+//   console.log(`odd: ${msg.value}`);
+// })
+// setInterval(() => {
+//   switcherSource.set(switcherSource.last() +1);
+// }, 1000);
+
 
 const rxObject = Reactive.object({name:`Jane`, ticks:0});
 const b = Reactive.Dom.bindDiffUpdate(lblObj, rxObject, (diffs, el) => {
-  console.log(diffs);
+  //console.log(diffs);
   for (const diff of diffs) {
   if (diff.path !== `ticks`) return;
   el.textContent = `${diff.previous} -> ${diff.value}`
