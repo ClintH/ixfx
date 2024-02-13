@@ -1,5 +1,6 @@
 import { clamp } from '../data/Clamp.js';
 import { type HasCompletion } from './index.js';
+
 /**
  * Creates a timer
  */
