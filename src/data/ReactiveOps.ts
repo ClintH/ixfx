@@ -1,7 +1,12 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { type Interval, intervalToMs } from "../flow/IntervalType.js";
-import { type Reactive, type ReactiveWritable, messageHasValue, messageIsSignal, isDisposable, initEvent, type InitEventOptions, type ReactiveOrSource, initUpstream, messageIsDoneSignal } from "./Reactive.js";
+import { type Reactive, type ReactiveWritable, messageHasValue, messageIsSignal, isDisposable, initStream, type InitEventOptions, type ReactiveOrSource, initUpstream, messageIsDoneSignal, type ReactiveDisposable, type Passed, type ReactiveStream, resolveSource } from "./Reactive.js";
 import { QueueMutable } from "../collections/index.js";
 import { continuously } from "../flow/Continuously.js";
+import { isPlainObjectOrPrimitive } from "../Util.js";
+import { shuffle } from "../collections/arrays/index.js";
+import { timeout } from "../flow/Timeout.js";
+import { map as ImmutableMap } from "../Immutable.js";
 
 export type TransformOpts = InitEventOptions;
 
@@ -12,8 +17,7 @@ export type BatchOptions = InitEventOptions & {
    */
   returnRemainder: boolean
   elapsed: Interval
-  limit: number
-  logic: `or` | `and`
+  quantity: number
 }
 
 export type FieldOptions<V> = InitEventOptions & {
@@ -24,6 +28,7 @@ export type FieldOptions<V> = InitEventOptions & {
    */
   missingFieldDefault: V
 };
+
 /**
  * Connects reactive A to B, passing through a transform function.
  * 
@@ -54,6 +59,198 @@ export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform: 
   return unsub;
 }
 
+export type SplitOptions = {
+  quantity: number
+}
+
+/**
+ * Creates a set of streams each of which receives data from `source`.
+ * By default these are lazy and dispose if the upstream source closes.
+ * 
+ * See also {@link splitLabelled} to split into named streams.
+ * @param source 
+ * @param quantity 
+ * @returns 
+ */
+export const split = <T>(options: Partial<SplitOptions> = {}) => {
+  const quantity = options.quantity ?? 2;
+  return (r: ReactiveOrSource<T>) => {
+    const outputs: Array<ReactiveStream<T>> = [];
+    const source = resolveSource(r);
+    for (let index = 0; index < quantity; index++) {
+      outputs.push(initUpstream(source, { disposeIfSourceDone: true, lazy: true }));
+    }
+    return outputs;
+  }
+}
+
+/**
+ * Splits `source` into several duplicated streams. Returns an object with keys according to `labels`.
+ * Each value is a stream which echos the values from `source`.
+ * ```js
+ * const [a,b,c] = splitLabelled(source, `a`, `b`, `c`);
+ * // a, b, c are Reactive types
+ * ```
+ * 
+ * See also {@link split} to get an unlabelled split
+ * @param source 
+ * @param labels 
+ * @returns 
+ */
+export const splitLabelled = <T, K extends PropertyKey>(...labels: Array<K>) => {
+  return (r: ReactiveOrSource<T>): Record<K, Reactive<T>> => {
+    const source = resolveSource(r);
+    const t: Partial<Record<K, Reactive<T>>> = {}
+    for (const label of labels) {
+      t[ label ] = initUpstream(source, { lazy: true, disposeIfSourceDone: true });
+    }
+    return t as Record<K, Reactive<T>>;
+  }
+}
+
+/**
+ * Switcher options.
+ * 
+ * match (default: 'first')
+ * * 'first': Outputs to first case where predicate is _true_
+ * * 'all': Outputs to all cases where predicate is _true_
+ */
+export type SwitcherOptions = {
+  match: `first` | `all`
+}
+
+/**
+ * Switcher generates several output streams, labelled according to the values of `cases`.
+ * Values from `source` are fed to the output streams if their associated predicate function returns _true_.
+ * 
+ * In this way, we can split one input stream into several output streams, each potentially getting a different
+ * subset of the input.
+ * 
+ * With `options`, you can specify whether to send to multiple outputs if several match, or just the first (default behaviour).
+ * 
+ * The below example shows setting up a switcher and consuming the output streams.
+ * @example
+ * ```js
+ * // Initialise a reactive number, starting at 0
+ * const switcherSource = Reactive.number(0);
+ * // Set up the switcher
+ * const x = Reactive.switcher(switcherSource, {
+ *  even: v => v % 2 === 0,
+ *  odd: v => v % 2 !== 0
+ * });
+ * // Listen for outputs from each of the resulting streams
+ * x.even.on(msg => {
+ *   console.log(`even: ${msg.value}`);
+ * });
+ * x.odd.on(msg => {
+ *   console.log(`odd: ${msg.value}`);
+ * })
+ * // Set new values to the number source, counting upwards
+ * // ...this will in turn trigger the console outputs above
+ * setInterval(() => {
+ *   switcherSource.set(switcherSource.last() + 1);
+ * }, 1000);
+ * ```
+ * 
+ * If `source` closes, all the output streams will be closed as well.
+ * @param source 
+ * @param cases 
+ * @param options 
+ * @returns 
+ */
+export const switcher = <TValue, TRec extends Record<string, FilterPredicate<TValue>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}) => {
+  return (r: ReactiveOrSource<TValue>): Record<TLabel, Reactive<TValue>> => {
+    const match = options.match ?? `first`;
+    const source = resolveSource(r);
+    let disposed = false;
+    // Setup output streams
+    const t: Partial<Record<TLabel, ReactiveStream<TValue>>> = {}
+    for (const label of Object.keys(cases)) {
+      (t as any)[ label ] = initStream<TValue>();
+    }
+
+    const performDispose = () => {
+      if (disposed) return;
+      unsub();
+      disposed = true;
+      for (const stream of Object.values(t)) {
+        (stream as ReactiveStream<any>).dispose(`switcher source dispose`);
+      }
+    }
+
+    // Listen to source
+    const unsub = source.on(message => {
+      // Got a value
+      if (messageHasValue(message)) {
+        for (const [ lbl, pred ] of Object.entries(cases)) {
+          if (pred(message.value)) {
+            ((t as any)[ lbl ] as ReactiveStream<TValue>).set(message.value);
+            if (match === `first`) break;
+          }
+        }
+      } else if (messageIsDoneSignal(message)) {
+        performDispose();
+      }
+    })
+    return t as Record<TLabel, Reactive<TValue>>;
+  }
+}
+
+export type PipeSet<In, Out> = [
+  Reactive<In>,
+  ...Array<Reactive<any> & ReactiveWritable<any>>,
+  ReactiveWritable<Out> & Reactive<any>
+]
+
+/**
+ * Pipes the output of one stream into another, in order.
+ * The stream returned is a new stream which captures the final output.
+ * 
+ * If any stream in the pipe closes the whole pipe is closed.
+ * @param streams 
+ * @returns 
+ */
+export const pipe = <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>): Reactive<TOutput> & ReactiveDisposable => {
+  const event = initStream<TOutput>();
+  const unsubs: Array<() => void> = [];
+  const performDispose = (reason: string) => {
+    for (const s of streams) {
+      if (isDisposable(s) && !s.isDisposed) s.dispose(reason);
+    }
+    for (const s of unsubs) {
+      s();
+    }
+    event.dispose(reason);
+  }
+
+  for (let index = 0; index < streams.length; index++) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    unsubs.push(streams[ index ].on((message: Passed<unknown>) => {
+      const isLast = index === streams.length - 1;
+      if (messageHasValue(message)) {
+        if (isLast) {
+          // Last stream, send to output
+          event.set(message.value as TOutput);
+        } else {
+          // @ts-expect-error
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          streams[ index + 1 ].set(message.value);
+        }
+      } else if (messageIsDoneSignal(message)) {
+        performDispose(`Upstream disposed`);
+      }
+    }));
+  }
+  return {
+    on: event.on,
+    dispose(reason) {
+      performDispose(reason);
+    },
+    isDisposed() {
+      return event.isDisposed();
+    },
+  };
+}
 
 /**
  * Monitors input reactive values, storing values as they happen to an array.
@@ -64,7 +261,7 @@ export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform: 
  * @returns 
  */
 export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V | undefined>> {
-  const event = initEvent<Array<V | undefined>>();
+  const event = initStream<Array<V | undefined>>();
   const data: Array<V | undefined> = [];
 
   for (const [ index, v ] of values.entries()) {
@@ -73,7 +270,7 @@ export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V
       if (!messageIsSignal(valueChanged)) {
         data[ index ] = valueChanged.value;
       }
-      event.notify(data);
+      event.set(data);
     });
   }
 
@@ -90,34 +287,36 @@ export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V
  * faster than others.
  * 
  * If a value completes, we won't wait for it and the result set gets smaller.
- * @param sources 
- * @returns 
+ * 
  */
-export function synchronise<V>(...sources: Array<Reactive<V>>): Reactive<Array<V | undefined>> {
-  const event = initEvent<Array<V>>();
-  let data: Array<V | undefined> = [];
+export function synchronise<V>() {
+  return (...sources: Array<ReactiveOrSource<V>>): Reactive<Array<V | undefined>> => {
+    const event = initStream<Array<V>>();
+    let data: Array<V | undefined> = [];
 
-  for (const [ index, v ] of sources.entries()) {
-    data[ index ] = undefined;
-    v.on(valueChanged => {
-      if (messageIsSignal(valueChanged)) {
-        if (valueChanged.signal === `done`) {
-          sources.splice(index, 1);
+    for (const [ index, source ] of sources.entries()) {
+      data[ index ] = undefined;
+      const v = resolveSource(source);
+      v.on(valueChanged => {
+        if (messageIsSignal(valueChanged)) {
+          if (valueChanged.signal === `done`) {
+            sources.splice(index, 1);
+          }
+          return;
         }
-        return;
-      }
-      data[ index ] = valueChanged.value;
+        data[ index ] = valueChanged.value;
 
-      if (!data.includes(undefined)) {
-        // All array elements contain values
-        event.notify(data as Array<V>);
-        data = [];
-      }
-    });
-  }
+        if (!data.includes(undefined)) {
+          // All array elements contain values
+          event.set(data as Array<V>);
+          data = [];
+        }
+      });
+    }
 
-  return {
-    on: event.on
+    return {
+      on: event.on
+    }
   }
 }
 
@@ -173,7 +372,7 @@ export type ResolveOptions = {
 export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<ResolveOptions> = {}): Reactive<V> {
   const intervalMs = intervalToMs(options.interval, 0);
   const lazy = options.lazy ?? false;
-  const event = initEvent<V>({
+  const event = initStream<V>({
     onFirstSubscribe() {
       if (lazy && !c.isRunning) c.start();
     },
@@ -191,9 +390,9 @@ export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<Reso
     if (typeof callbackOrValue === `function`) {
       // eslint-disable-next-line @typescript-eslint/ban-types
       const value = (callbackOrValue as (Function))();
-      event.notify(value);
+      event.set(value);
     } else {
-      event.notify(callbackOrValue);
+      event.set(callbackOrValue);
     }
     remaining--;
     if (remaining === 0) return false; // Stop loop
@@ -212,51 +411,333 @@ export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<Reso
  * From a source value, yields a field from it.
  * 
  * If a source value doesn't have that field, it is skipped.
- * 
- * @param fieldSource 
- * @param field 
+
  * @returns 
  */
-export function field<In, Out>(fieldSource: ReactiveOrSource<In>, field: keyof In, options: Partial<FieldOptions<Out>> = {}): Reactive<Out> {
-  const upstream = initUpstream<In, Out>(fieldSource, {
-    disposeIfSourceDone: true,
-    ...options,
-    onValue(value) {
-      let t = (value)[ field ];
-      if (t === undefined && options.missingFieldDefault !== undefined) {
-        // @ts-expect-error
-        t = options.missingFieldDefault as Out;
-      }
-      upstream.notify(t as Out);
-    },
-  })
+export function field<TIn, TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>> = {}): ReactiveOp<TIn, TFieldType> {
+  return (fieldSource: ReactiveOrSource<TIn>): Reactive<TFieldType> => {
+    const upstream = initUpstream<TIn, TFieldType>(fieldSource, {
+      disposeIfSourceDone: true,
+      ...options,
+      onValue(value) {
+        let t = (value)[ fieldName ];
+        if (t === undefined && options.missingFieldDefault !== undefined) {
+          // @ts-expect-error
+          t = options.missingFieldDefault as TFieldType;
+        }
+        upstream.set(t as TFieldType);
+      },
+    })
 
-  return {
-    on: upstream.on
+    return {
+      on: upstream.on
+    }
+  }
+}
+
+export type FilterPredicate<In> = (value: In) => boolean;
+
+/**
+ * Passes all values where `predicate` function returns _true_.
+ */
+export function filter<In>(predicate: FilterPredicate<In>, options: Partial<InitEventOptions>): ReactiveOp<In, In> {
+  return (input: ReactiveOrSource<In>): Reactive<In> => {
+    const upstream = initUpstream<In, In>(input, {
+      ...options,
+      onValue(value) {
+        if (predicate(value)) {
+          upstream.set(value);
+        }
+      },
+    })
+
+    return {
+      on: upstream.on
+    }
   }
 }
 
 
 /**
  * Transforms values from `source` using the `transformer` function.
- * @param input 
  * @param transformer 
  * @returns 
  */
-export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (value: In) => Out, options: Partial<TransformOpts> = {}): Reactive<Out> {
-  const upstream = initUpstream<In, Out>(input, {
-    ...options,
-    onValue(value) {
-      const t = transformer(value);
-      upstream.notify(t);
-    },
-  })
+export function transform<In, Out>(transformer: (value: In) => Out, options: Partial<TransformOpts> = {}): ReactiveOp<In, Out> {
+  return (input: ReactiveOrSource<In>): Reactive<Out> => {
+    const upstream = initUpstream<In, Out>(input, {
+      ...options,
+      onValue(value) {
+        const t = transformer(value);
+        upstream.set(t);
+      },
+    })
 
-  return {
-    on: upstream.on
+    return {
+      on: upstream.on
+    }
   }
 }
 
+
+/**
+ * Annotates values from `source`, appending new fields to values.
+ * Output stream will be the type `In & Out`.
+ */
+export function annotate<In, TAnnotation>(transformer: (value: In) => In & TAnnotation, options: Partial<TransformOpts> = {}): ReactiveOp<In, In & TAnnotation> {
+  return (input: ReactiveOrSource<In>): Reactive<In & TAnnotation> => {
+    const upstream = initUpstream<In, In & TAnnotation>(input, {
+      ...options,
+      onValue(value) {
+        const t = transformer(value);
+        upstream.set(t);
+      },
+    })
+
+    return {
+      on: upstream.on
+    }
+  }
+}
+
+export type AnnotationElapsed = {
+  elapsedMs: number
+}
+
+/**
+ * Annotates values from `source`, adding a `elapsedMs` field to values.
+ * Elapsed will be the time in milliseconds since the last value. If it is the first value, -1 is used.
+ * @param input 
+ * @param transformer 
+ * @param options 
+ * @returns 
+ */
+export const annotateElapsed = <In>() => {
+  return (input: ReactiveOrSource<In>) => {
+    let last = 0;
+    const a = annotate<In, AnnotationElapsed>((value) => {
+      const elapsed = last === 0 ? 0 : Date.now() - last;
+      last = Date.now();
+      return { ...value, elapsedMs: elapsed };
+    })(input);
+    return a;
+  }
+}
+
+/**
+ * Create a new object from input, based on cloning fields rather than a destructured copy.
+ * This is useful for event args.
+ * @param input 
+ * @returns 
+ */
+export const cloneFromFields = <In>(): ReactiveOp<In, In> => transform<In, In>((v): In => {
+  const entries: Array<[ key: string, value: any ]> = [];
+  for (const field in v) {
+    const value = (v as any)[ field ];
+    if (isPlainObjectOrPrimitive(value as unknown)) {
+      entries.push([ field, value ]);
+    }
+  }
+  return Object.fromEntries(entries) as In;
+})
+
+export type SingleFromArrayOptions<V> = {
+  /**
+   * Function to select a single value from array
+   * @param value 
+   * @returns 
+   */
+  predicate: (value: V) => boolean
+  /**
+   * `default`: leave array in same order (default option)
+   * `random`: shuffles array before further processing
+   * function: function that sorts values
+   */
+  order: `default` | `random` | ((a: V, b: V) => number)
+  /**
+   * Selects an index from array. 0 being first, 1 being second.
+   * Reverse indexing also works: -1 being last, -2 being second last...
+   * 
+   * If index exceeds length of array, _undefined_ is returned
+   */
+  at: number
+}
+
+/**
+ * For a stream that emits arrays of values, this op will select a single value.
+ * 
+ * Can select based on:
+ * * predicate: a function that returns _true_ for a value
+ * * at: selection based on array index (can be combined with random ordering to select a random value)
+ * 
+ * ```js
+ * // If source is Reactive<Array<number>>, picks the first even number
+ * singleFromArray(source, { 
+ *  predicate: v => v % 2 === 0
+ * });
+ * 
+ * // Selects a random value from source
+ * singleFromArray(source, { 
+ *  order: `random`,
+ *  at: 0
+ * });
+ * ```
+ * 
+ * If neither `predicate` or `at` options are given, exception is thrown.
+ * @param source Source to read from
+ * @param options Options for selection
+ * @returns 
+ */
+export function singleFromArray<V>(source: ReactiveOrSource<Array<V>>, options: Partial<SingleFromArrayOptions<V>> = {}): Reactive<V> {
+  const order = options.order ?? `default`;
+  if (!options.at && !options.predicate) throw new Error(`Options must have 'predicate' or 'at' fields`);
+
+  let preprocess = (values: Array<V>) => values;
+  if (order === `random`) preprocess = shuffle;
+  else if (typeof order === `function`) preprocess = (values) => values.toSorted(order);
+
+  const upstream = initUpstream<Array<V>, V>(source, {
+    onValue(values) {
+      values = preprocess(values);
+      if (options.predicate) {
+        for (const v of values) {
+          if (options.predicate(v)) {
+            upstream.set(v);
+          }
+        }
+      } else if (options.at) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        upstream.set(values.at(options.at)!);
+      }
+    },
+  });
+  return upstream;
+}
+
+/**
+ * Batches values from `source`, and then emits a single value according to the selection logic.
+ * @param source 
+ * @param options 
+ * @returns 
+ */
+// export function batchAndSingle<V>(options: Partial<SingleFromArrayOptions<V> & BatchOptions>): ReactiveOp<V, V> {
+//   const b = batch(options);
+//   return (source: ReactiveOrSource<V>) => {
+//     const batched = batch(source, options);
+//     const single = singleFromArray(batched, options);
+//     return single;
+//   }
+// }
+
+export type Wrapped<TIn> = {
+  batch: (options: Partial<BatchOptions>) => Wrapped<Array<TIn>>
+  annotateElapsed: () => Wrapped<TIn & AnnotationElapsed>
+  annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation) => Wrapped<TIn & TAnnotation>
+  field: <TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>>) => Wrapped<TFieldType>
+  filter: (predicate: FilterPredicate<TIn>, options: Partial<InitEventOptions>) => Wrapped<TIn>
+  split: (options: Partial<SplitOptions>) => Array<Wrapped<TIn>>
+  transform: <TOut>(transformer: (value: TIn) => TOut, options: Partial<TransformOpts>) => Wrapped<TOut>
+  throttle: (options: Partial<ThrottleOptions>) => Wrapped<TIn>
+  synchronise: () => Wrapped<Array<TIn | undefined>>
+  switcher: <TRec extends Record<string, FilterPredicate<TIn>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions>) => Record<TLabel, Wrapped<TIn>>
+  splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => Record<K, Wrapped<TIn>>
+}
+
+// export type WrappedSingle<TIn> = {
+// }
+
+export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
+  return {
+    batch: (options: Partial<BatchOptions>): Wrapped<Array<TIn>> => {
+      const b = batch<TIn>(options);
+      const w = wrap<Array<TIn>>(b(source));
+      return w;
+    },
+    annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation): Wrapped<TIn & TAnnotation> => {
+      const a = annotate<TIn, TAnnotation>(transformer)(source);
+      return wrap(a);
+    },
+    annotateElapsed: () => {
+      return wrap(annotateElapsed<TIn>()(source));
+    },
+    field: <TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>> = {}) => {
+      const f = field<TIn, TFieldType>(fieldName, options)(source);
+      return wrap<TFieldType>(f);
+    },
+    filter: (predicate: FilterPredicate<TIn>, options: Partial<InitEventOptions>) => {
+      return wrap(filter(predicate, options)(source));
+    },
+    split: (options: Partial<SplitOptions> = {}) => {
+      const streams = split<TIn>(options)(source).map(v => wrap(v));
+      return streams;
+    },
+    splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => {
+      const l = splitLabelled<TIn, keyof TIn>(...labels)(source);
+      const m = ImmutableMap<typeof l, Wrapped<TIn>>(l, v => wrap(v)) as Record<K, Wrapped<TIn>>;
+      return m;
+    },
+    switcher: <TRec extends Record<string, FilterPredicate<TIn>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}) => {
+      const s = switcher<TIn, TRec, TLabel>(cases, options)(source);
+      const m = ImmutableMap<typeof s, Wrapped<TIn>>(s, v => wrap(v));
+      return m as Record<TLabel, Wrapped<TIn>>;
+    },
+    synchronise: () => {
+      return wrap(synchronise<TIn>()(source));
+    },
+    throttle: (options: Partial<ThrottleOptions> = {}) => {
+      return wrap(throttle<TIn>(options)(source));
+    },
+    transform: <TOut>(transformer: (value: TIn) => TOut, options: Partial<TransformOpts> = {}) => {
+      return wrap(transform(transformer, options)(source));
+    }
+  }
+}
+
+export function batch<V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> {
+  return (source: ReactiveOrSource<V>) => {
+    return batchRaw(source, options);
+  }
+}
+
+export type ReactiveOpInit<TIn, TOut, TOpts> = (options: Partial<TOpts>) => ReactiveOp<TIn, TOut>
+export type ReactiveOp<TIn, TOut> = (source: ReactiveOrSource<TIn>) => Reactive<TOut>
+
+export type ReactiveOpLinks<In, Out> = [
+  ReactiveOrSource<In>,
+  ...Array<ReactiveOp<any, any>>,
+  ReactiveOp<any, Out>
+]
+
+/**
+ * Connects all the `ops` together, ready for a source.
+ * Returns a function that takes a `source`.
+ * @param ops 
+ * @returns 
+ */
+const prepareOps = <TIn, TOut>(...ops: Array<ReactiveOp<TIn, TOut>>) => {
+  return (source: ReactiveOrSource<TIn>) => {
+    for (const op of ops) {
+      // @ts-expect-error
+      source = op(source);
+    }
+    return source as any as Reactive<TOut>;
+  }
+}
+
+/**
+ * Connects `source` to serially-connected set of ops. Values thus
+ * flow from `source` to each op in turn.
+ * 
+ * Returned result is the final reactive.
+ * 
+ * @param source 
+ * @param ops 
+ * @returns 
+ */
+export function run<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<any, any>>) {
+  const raw = prepareOps<TIn, TOut>(...ops);
+  return raw(source);
+}
 
 /**
  * Queue from `source`, emitting when thresholds are reached. Returns a new Reactive
@@ -268,7 +749,7 @@ export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (va
  *
  * ```js
  * // Emit data in batches of 5 items
- * batch(source, { limit: 5 });
+ * batch(source, { quantity: 5 });
  * // Emit data every second
  * batch(source, { elapsed: 1000 });
  * ```
@@ -276,82 +757,70 @@ export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (va
  * @param options 
  * @returns 
  */
-export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<BatchOptions> = {}): Reactive<Array<V>> {
-  //const source = resolveSource(batchSource);
-  const elapsed = intervalToMs(options.elapsed, 0);
+export function batchRaw<V>(batchSource: ReactiveOrSource<V>, options: Partial<BatchOptions> = {}): Reactive<Array<V>> {
   const queue = new QueueMutable<V>();
-  const limit = options.limit ?? 0;
-  const logic = options.logic ?? `or`;
+  const quantity = options.quantity ?? 0;
+  //const logic = options.logic ?? `or`;
   const returnRemainder = options.returnRemainder ?? true;
 
-  let lastFire = performance.now();
+  //let lastFire = performance.now();
   const upstreamOpts = {
     ...options,
     onStop() {
       if (returnRemainder && !queue.isEmpty) {
         const data = queue.toArray();
         queue.clear();
-        upstream.notify(data);
+        upstream.set(data);
       }
     },
     onValue(value: V) {
       queue.enqueue(value);
-      trigger();
+      //console.log(`onValue: ${ queue.length }`);
+      if (quantity > 0 && queue.length >= quantity) {
+        // Reached quantity limit
+        send();
+      }
+      // Start timer
+      //console.log(timer?.isDone);
+      if (timer !== undefined && timer.isDone) {
+        //console.log(` timer started`);
+        timer.start();
+      }
     },
   }
   const upstream = initUpstream<V, Array<V>>(batchSource, upstreamOpts);
 
-  // let off: undefined | (() => void);
+  const send = () => {
+    //console.log(`send`);
+    if (queue.isEmpty) return;
 
-  // const close = (reason: string) => {
-  //   console.log(`batch.close queue: ${ queue.length } returnRemainer: ${ returnRemainder }`);
-  //   if (off !== undefined) off();
-  //   if (returnRemainder && !queue.isEmpty) {
-  //     const data = queue.data;
-  //     queue.clear();
-  //     events.notify(data as Array<V>);
-  //   }
-  //   events.dispose(reason);
-  // }
-
-  // const initOpts: InitEventOptions = {
-  //   onFirstSubscribe() {
-  //     console.log(`batch onFirstSub`);
-  //     off = source.on(value => {
-  //       console.log(`batch value ${ JSON.stringify(value) }`);
-  //       if (isValue(value)) {
-  //         queue.enqueue(value.value);
-  //         trigger();
-  //       } else if (isSignal(value) && value.signal === `done`) {
-  //         close(`batch source closed`);
-  //       }
-  //     });
-  //   },
-  //   onNoSubscribers() {
-  //     close(`batch onNoSubscribers`);
-  //   },
-  // }
-  //const events = initEvent<Array<V>>(initOpts);
-
-  const trigger = () => {
-    const now = performance.now();
-    let byElapsed = false;
-    let byLimit = false;
-    if (elapsed > 0 && (now - lastFire > elapsed)) {
-      lastFire = now;
-      byElapsed = true;
-    }
-    if (limit > 0 && queue.length >= limit) {
-      byLimit = true;
-    }
-    if (logic === `or` && (!byElapsed && !byLimit)) return;
-    if (logic === `and` && (!byElapsed || !byLimit)) return;
+    // Reset timer
+    if (timer !== undefined) timer.start();
 
     // Fire queued data
     const data = queue.toArray();
     queue.clear();
-    upstream.notify(data);
+    upstream.set(data);
   }
+
+  const timer = options.elapsed ? timeout(send, options.elapsed) : undefined
+
+  // const trigger = () => {
+  //   const now = performance.now();
+  //   let byElapsed = false;
+  //   let byLimit = false;
+  //   if (elapsed > 0 && (now - lastFire > elapsed)) {
+  //     lastFire = now;
+  //     byElapsed = true;
+  //   }
+  //   if (limit > 0 && queue.length >= limit) {
+  //     byLimit = true;
+  //   }
+  //   if (logic === `or` && (!byElapsed && !byLimit)) return;
+  //   if (logic === `and` && (!byElapsed || !byLimit)) return;
+
+  //   send();
+  // }
 
   const r: Reactive<Array<V>> = {
     on: upstream.on
@@ -359,42 +828,42 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
   return r;
 }
 
-
-
 export type ThrottleOptions = InitEventOptions & {
   elapsed: Interval
 }
 
-export function throttle<V>(throttleSource: ReactiveOrSource<V>, options: Partial<ThrottleOptions> = {}): Reactive<V> {
-  const elapsed = intervalToMs(options.elapsed, 0);
-  let lastFire = performance.now();
-  let lastValue: V | undefined;
+export function throttle<V>(options: Partial<ThrottleOptions> = {}): ReactiveOp<V, V> {
+  return (throttleSource: ReactiveOrSource<V>): Reactive<V> => {
+    const elapsed = intervalToMs(options.elapsed, 0);
+    let lastFire = performance.now();
+    let lastValue: V | undefined;
 
-  const upstream = initUpstream<V, V>(throttleSource, {
-    ...options,
-    onValue(value) {
-      lastValue = value;
-      trigger();
-    },
-  });
+    const upstream = initUpstream<V, V>(throttleSource, {
+      ...options,
+      onValue(value) {
+        lastValue = value;
+        trigger();
+      },
+    });
 
-  const trigger = () => {
-    const now = performance.now();
-    let byElapsed = false;
-    if (elapsed > 0 && (now - lastFire > elapsed)) {
-      lastFire = now;
-      byElapsed = true;
+    const trigger = () => {
+      const now = performance.now();
+      let byElapsed = false;
+      if (elapsed > 0 && (now - lastFire > elapsed)) {
+        lastFire = now;
+        byElapsed = true;
+      }
+      if (!byElapsed) return;
+
+      if (lastValue !== undefined) {
+        upstream.set(lastValue);
+      }
     }
-    if (!byElapsed) return;
 
-    if (lastValue !== undefined) {
-      upstream.notify(lastValue);
+    const r: Reactive<V> = {
+      on: upstream.on
     }
+    return r;
   }
-
-  const r: Reactive<V> = {
-    on: upstream.on
-  }
-  return r;
 }
 
