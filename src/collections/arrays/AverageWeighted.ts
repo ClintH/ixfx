@@ -1,6 +1,5 @@
 import { zip } from './Zip.js';
 import { weight } from './NumericArrays.js';
-import { type EasingFn as EasingFunction } from '../../modulation/Easing.js';
 /**
  * Computes an average of an array with a set of weights applied.
  *
@@ -39,7 +38,7 @@ import { type EasingFn as EasingFunction } from '../../modulation/Easing.js';
  */
 export const averageWeighted = (
   data: Array<number> | ReadonlyArray<number>,
-  weightings: Array<number> | ReadonlyArray<number> | EasingFunction
+  weightings: Array<number> | ReadonlyArray<number> | ((value: number) => number)
 ): number => {
   if (typeof weightings === `function`) weightings = weight(data, weightings);
 
