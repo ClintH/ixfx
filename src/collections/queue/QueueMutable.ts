@@ -40,6 +40,13 @@ export class QueueMutable<V> implements IQueueMutable<V> {
     this.data = [];
   }
 
+  at(index: number): V {
+    if (index >= this.data.length) throw new Error(`Index outside bounds of queue`);
+    const v = this.data.at(index);
+    if (v === undefined) throw new Error(`Index appears to be outside range of queue`);
+    return v;
+  }
+
   /**
    * Return a copy of the array
    * @returns 
@@ -63,14 +70,28 @@ export class QueueMutable<V> implements IQueueMutable<V> {
   }
 
   /**
-   * Remove item from queue, regardless of position.
+   * Remove value from queue, regardless of position.
    * Returns _true_ if something was removed.
-   * @param v 
+   * 
+   * See also {@link removeWhere} to remove based on a predicate
+   * @param value 
    */
-  remove(v: V, comparer?: IsEqual<V>): boolean {
+  remove(value: V, comparer?: IsEqual<V>): boolean {
     const length = this.data.length;
-    this.data = without(this.data, v, comparer ?? this.eq);
+    this.data = without(this.data, value, comparer ?? this.eq);
     return this.data.length !== length;
+  }
+
+  /**
+   * Removes values that match `predicate`.
+   * See also {@link remove} if to remove a value based on equality checking.
+   * @param predicate 
+   * @returns Returns number of items removed.
+   */
+  removeWhere(predicate: (item: V) => boolean) {
+    const countPre = this.data.length;
+    this.data = this.data.filter((element) => predicate(element));
+    return countPre - this.data.length;
   }
 
   get isEmpty(): boolean {
