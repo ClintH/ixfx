@@ -1,5 +1,18 @@
 A rough changelog between NPM releases
 
+# 0.17.5
+
+Data
+* Improvements to Reactive
+
+Dom
+* cssVariables: sync DOM attributes with CSS variable values
+* Forms.button improvements
+* 
+
+Collections
+* QueueMutable gains .at, .removeWhere, .remove
+
 # 0.17.0 02.02.24
 Data
 * Improved unit tests of reactive module
