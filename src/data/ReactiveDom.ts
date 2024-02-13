@@ -1,6 +1,6 @@
 import { resolveEl } from "../dom/Util.js";
 import * as Rx from "./Reactive.js";
-import type { Change } from "src/Immutable.js";
+import type { Change } from "../Immutable.js";
 
 export type DomBindOptions<V> = {
   /**
