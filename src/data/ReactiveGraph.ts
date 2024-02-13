@@ -1,4 +1,4 @@
-import { initEvent, type Reactive } from "./Reactive.js"
+import { initStream, type Reactive } from "./Reactive.js"
 
 import * as DiGraph from "./graphs/DirectedGraph.js";
 type RxNodeBase = {
@@ -32,7 +32,7 @@ function isReactive(o: object): o is Reactive<any> {
 export function prepare<V extends Record<string, any>>(rx: V): Reactive<V> {
   let g = DiGraph.graph();
   const nodes = new Map<string, RxNode>();
-  const events = initEvent<V>();
+  const events = initStream<V>();
 
   const process = (o: object, path: string) => {
     for (const [ key, value ] of Object.entries(o)) {
