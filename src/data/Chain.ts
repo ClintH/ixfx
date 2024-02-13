@@ -348,12 +348,11 @@ export type TickOptions = {
 }
 
 /**
- * Generate timestamp values
- * By default it runs forever. 
- * Use `loops` or `elapsed` to set upper limits.
+ * Generate timestamp values at `interval` rate. By default it runs forever. 
+ * Use `loops` or `elapsed` to set upper limit on how long it should run.
  * 
  * Options:
- * - `asClockTime`: If true, yielded value will be clock time rather than elapsed
+ * - `asClockTime`: If _true_, yielded value will be clock time rather than elapsed milliseconds
  * @param options 
  * @returns 
  */
@@ -872,6 +871,14 @@ export function total(): Link<number, number> {
 
 /**
  * Chunks an input stream into `size` chunks.
+ * 
+ * Eg, with a chunk size of 3, the input stream of:
+ *  1, 2, 3, 4, 5, 6
+ * Yields:
+ *  [ 1, 2, 3 ], [ 4, 5, 6 ]
+ * 
+ * If `returnRemainders` is _true_ (default), any left over values are returned even if
+ * it's less than `size`.
  * @param size 
  * @param returnRemainders If true (default) left over data that didn't make a full chunk is also returned
  * @returns 
@@ -914,6 +921,8 @@ export function filter<In>(predicate: (v: In) => boolean): Link<In, In> {
   filter._name = `filter`;
   return filter;
 }
+
+
 
 /**
  * Drops all values from input stream for which `predicate` returns _true_
