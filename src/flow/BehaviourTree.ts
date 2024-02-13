@@ -1,4 +1,4 @@
-export type TaskState = `Failed`|`Running`|`Success`;
+export type TaskState = `Failed` | `Running` | `Success`;
 export type Task = {
   readonly state: TaskState
 }
@@ -18,111 +18,109 @@ export type NodeBase = {
 }
 
 export type SeqNode = NodeBase & {
-  readonly seq: readonly Node[]
+  readonly seq: ReadonlyArray<Node>
 }
 export type SelNode = NodeBase & {
-  readonly sel: readonly Node[]
+  readonly sel: ReadonlyArray<Node>
 }
 
 export type Node = SeqNode | SelNode | string;
 
-const t:Node = {
+const t: Node = {
   name: `root`,
   seq: [
-    `walk_to_door`, 
-    { 
+    `walk_to_door`,
+    {
       name: `door_locked`,
       sel: [
-        `open_door`, 
+        `open_door`,
         {
           name: `open_locked_door`,
-          seq: [`unlock_door`, `open_door`]
+          seq: [ `unlock_door`, `open_door` ]
         },
-        `smash_door`] 
+        `smash_door` ]
     },
-    `walk_through_door`, 
+    `walk_through_door`,
     `close_door`
   ]
 };
 
 type Traversal = readonly [
-  node:Node,
-  path:string
+  node: Node,
+  path: string
 ];
 
-const getName = (t:Node, defaultValue = ``) => {
-  if (typeof t === `object`) {
-    if (`name` in t) {
-      if (t.name !== undefined) return t.name;
-    }
+const getName = (t: Node, defaultValue = ``) => {
+  if (typeof t === `object` && `name` in t) {
+    if (t.name !== undefined) return t.name;
   }
   return defaultValue;
 };
 
 //eslint-disable-next-line func-style
-export function* iterateBreadth(t:Node, pathPrefix?:string):Generator<Traversal> {
+export function* iterateBreadth(t: Node, pathPrefix?: string): Generator<Traversal> {
   if (typeof pathPrefix === `undefined`) {
     pathPrefix = getName(t);
   }
- 
-  for (const [i, n] of entries(t)) {
-    yield [n, pathPrefix];    
+
+  for (const [ index, n ] of entries(t)) {
+    yield [ n, pathPrefix ];
   }
-  for (const [i, n] of entries(t)) {
+  for (const [ index, n ] of entries(t)) {
     const name = getName(n, `?`);
-    const prefix = pathPrefix.length > 0 ? pathPrefix +`.` +name : name;
-    yield* iterateBreadth(n, prefix);    
+    const prefix = pathPrefix.length > 0 ? pathPrefix + `.` + name : name;
+    yield* iterateBreadth(n, prefix);
   }
 }
 
 //eslint-disable-next-line func-style
-export function* iterateDepth(t:Node, pathPrefix?:string):Generator<Traversal> {
+export function* iterateDepth(t: Node, pathPrefix?: string): Generator<Traversal> {
   if (typeof pathPrefix === `undefined`) {
     pathPrefix = getName(t);
   }
-  for (const [i, n] of entries(t)) {
-    yield [n, pathPrefix];
+  for (const [ index, n ] of entries(t)) {
+    yield [ n, pathPrefix ];
     const name = getName(n, `?`);
-    const prefix = pathPrefix.length > 0 ? pathPrefix +`.` +name : name;
-    yield* iterateBreadth(n, prefix);     
+    const prefix = pathPrefix.length > 0 ? pathPrefix + `.` + name : name;
+    yield* iterateBreadth(n, prefix);
   }
 }
 
 type ValidateOpts = {
-  readonly duplicatesAllowed:boolean
+  readonly duplicatesAllowed: boolean
 }
 
 //eslint-disable-next-line func-style
-function isSeqNode(n:Node): n is SeqNode {
+function isSeqNode(n: Node): n is SeqNode {
   return (n as SeqNode).seq !== undefined;
 }
 
 //eslint-disable-next-line func-style
-function isSelNode(n:Node): n is SelNode {
+function isSelNode(n: Node): n is SelNode {
   return (n as SelNode).sel !== undefined;
 }
 
 //eslint-disable-next-line func-style
-function* entries(n:Node) {
+function* entries(n: Node) {
   if (isSeqNode(n)) {
     yield* n.seq.entries();
   } else if (isSelNode(n)) {
     yield* n.sel.entries();
-  } else if (typeof n ===`string`) {
+  } else if (typeof n === `string`) {
     // no-op
   } else {
-    throw new Error(`Unexpected shape of node. seq/sel missing`);
+    throw new TypeError(`Unexpected shape of node. seq/sel missing`);
   }
 }
 
 for (const tn of iterateBreadth(t)) {
-  console.log(`Path: ${tn[1]}`);
-  console.log(`Node: ${JSON.stringify(tn[0])}`);
+  console.log(`Path: ${ tn[ 1 ] }`);
+  console.log(`Node: ${ JSON.stringify(tn[ 0 ]) }`);
 }
 
 console.log(`---`);
 
 for (const tn of iterateDepth(t)) {
-  console.log(`Path: ${tn[1]}`);
-  console.log(`Node: ${JSON.stringify(tn[0])}`);
+  console.log(`Path: ${ tn[ 1 ] }`);
+  console.log(`Node: ${ JSON.stringify(tn[ 0 ]) }`);
 }
