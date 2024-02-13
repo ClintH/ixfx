@@ -96,6 +96,7 @@ export const deleteByValue = <K, V>(
 ) => {
   for (const entry of Object.entries(map)) {
     if (comparer(entry[ 1 ], value)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       (map as any).delete(entry[ 0 ]);
     }
   }
@@ -126,8 +127,8 @@ export const firstEntryByIterablePredicate = <K, V>(
   map: IWithEntries<K, V>,
   predicate: (value: V, key: K) => boolean
 ): readonly [ key: K, value: V ] | undefined => {
-  for (const e of map.entries()) {
-    if (predicate(e[ 1 ], e[ 0 ])) return e;
+  for (const entry of map.entries()) {
+    if (predicate(entry[ 1 ], entry[ 0 ])) return entry;
   }
 };
 
@@ -183,7 +184,7 @@ export const firstEntryByIterableValue = <K, V>(
 export const addKeepingExisting = <V>(
   set: ReadonlyMap<string, V> | undefined,
   hasher: ToString<V>,
-  ...values: readonly V[]
+  ...values: ReadonlyArray<V>
 ) => {
   const s = set === undefined ? new Map() : new Map(set);
   for (const v of values) {
@@ -237,15 +238,15 @@ export const sortByValue = <K, V>(
  */
 export const sortByValueProperty = <K, V, Z>(
   map: ReadonlyMap<K, V>,
-  prop: string,
-  compareFn?: (a: Z, b: Z) => number
+  property: string,
+  compareFunction?: (a: Z, b: Z) => number
 ) => {
-  const cfn = typeof compareFn === `undefined` ? defaultComparer : compareFn;
+  const cfn = typeof compareFunction === `undefined` ? defaultComparer : compareFunction;
   return [ ...map.entries() ].sort((aE, bE) => {
     const a = aE[ 1 ];
     const b = bE[ 1 ];
-    // @ts-ignore
-    return cfn(a[ prop ], b[ prop ]);
+    // @ts-expect-error
+    return cfn(a[ property ], b[ property ]);
   });
 };
 /**
@@ -270,7 +271,7 @@ export const hasAnyValue = <K, V>(
   value: V,
   comparer: IsEqual<V>
 ): boolean => {
-  const entries = Array.from(map.entries());
+  const entries = [ ...map.entries() ];
   return entries.some((kv) => comparer(kv[ 1 ], value));
 };
 
@@ -310,7 +311,7 @@ export function* filter<V>(
  * @returns
  */
 export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
-  Array.from(map.values());
+  [ ...map.values() ];
 
 
 /**
@@ -331,12 +332,12 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
  */
 export const fromIterable = <V>(
   data: Iterable<V>,
-  keyFn = toStringDefault<V>,
+  keyFunction = toStringDefault<V>,
   allowOverwrites = false
 ): ReadonlyMap<string, V> => {
   const m = new Map<string, V>();
   for (const d of data) {
-    const id = keyFn(d);
+    const id = keyFunction(d);
     if (m.has(id) && !allowOverwrites) {
       throw new Error(
         `id ${ id } is already used and new data will overwrite it. `
@@ -369,7 +370,7 @@ export const fromObject = <V>(data: any): ReadonlyMap<string, V> => {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any,functional/prefer-readonly-type
   const map = new Map<string, V>();
   if (Array.isArray(data)) {
-    data.forEach((d) => addObject<V>(map, d));
+    for (const d of data) addObject<V>(map, d);
   } else {
     addObject<V>(map, data);
   }
@@ -418,7 +419,7 @@ export const addObject = <V>(map: Map<string, V>, data: any) => {
 export const find = <V>(
   map: ReadonlyMap<string, V>,
   predicate: (v: V) => boolean
-): V | undefined => Array.from(map.values()).find(predicate);
+): V | undefined => [ ...map.values() ].find(v => predicate(v));
 
 /**
  * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link toObject}.
@@ -428,7 +429,7 @@ export const find = <V>(
  * map.set(`name`, `Alice`);
  * map.set(`pet`, `dog`);
  *
- * const o = mapToObjTransform(map, v => {
+ * const o = mapToObjectTransform(map, v => {
  *  ...v,
  *  registered: true
  * });
@@ -444,15 +445,16 @@ export const find = <V>(
  * @returns
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const mapToObjTransform = <T, K>(
+export const mapToObjectTransform = <T, K>(
   m: ReadonlyMap<string, T>,
   valueTransform: (value: T) => K
-): { readonly [ key: string ]: K } =>
-  Array.from(m).reduce((obj: any, [ key, value ]) => {
+): Readonly<Record<string, K>> =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, unicorn/no-array-reduce
+  [ ...m ].reduce((object: any, [ key, value ]) => {
     const t = valueTransform(value);
     /* eslint-disable-next-line functional/immutable-data */
-    obj[ key ] = t;
-    return obj;
+    object[ key ] = t;
+    return object;
   }, {});
 
 /**
@@ -476,7 +478,7 @@ export const zipKeyValue = <V>(
   if (keys.length !== values.length) {
     throw new Error(`Keys and values arrays should be same length`);
   }
-  return Object.fromEntries(keys.map((k, i) => [ k, values[ i ] ]));
+  return Object.fromEntries(keys.map((k, index) => [ k, values[ index ] ]));
 };
 
 //#region Functions by Kees C. Bakker
@@ -498,7 +500,7 @@ export const zipKeyValue = <V>(
  * mapOfInts.get(`a`); // Yields 10 (a proper number)
  * ```
  *
- * If you want to combine values into a single object, consider instead  {@link mapToObjTransform}.
+ * If you want to combine values into a single object, consider instead  {@link mapToObjectTransform}.
  * @param source
  * @param transformer
  * @typeParam K Type of keys (generally a string)
@@ -533,11 +535,12 @@ export const transformMap = <K, V, R>(
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const toObject = <T>(
   m: ReadonlyMap<string, T>
-): { readonly [ key: string ]: T } =>
-  Array.from(m).reduce((obj: any, [ key, value ]) => {
+): Readonly<Record<string, T>> =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  [ ...m ].reduce((object: any, [ key, value ]) => {
     /* eslint-disable-next-line functional/immutable-data */
-    obj[ key ] = value;
-    return obj;
+    object[ key ] = value;
+    return object;
   }, {});
 
 /**
@@ -573,7 +576,7 @@ export const toObject = <T>(
 export const mapToArray = <K, V, R>(
   m: ReadonlyMap<K, V>,
   transformer: (key: K, item: V) => R
-): readonly R[] => Array.from(m.entries()).map((x) => transformer(x[ 0 ], x[ 1 ]));
+): ReadonlyArray<R> => [ ...m.entries() ].map((x) => transformer(x[ 0 ], x[ 1 ]));
 // End Functions by Kees C. Bakker
 //#endregion
 
@@ -620,18 +623,14 @@ export type MergeReconcile<V> = (a: V, b: V) => V;
  */
 export const mergeByKey = <K, V>(
   reconcile: MergeReconcile<V>,
-  ...maps: readonly ReadonlyMap<K, V>[]
+  ...maps: ReadonlyArray<ReadonlyMap<K, V>>
 ): ReadonlyMap<K, V> => {
   const result = new Map<K, V>();
   for (const m of maps) {
     for (const [ mk, mv ] of m) {
       //eslint-disable-next-line functional/no-let
       let v = result.get(mk);
-      if (v) {
-        v = reconcile(v, mv);
-      } else {
-        v = mv;
-      }
+      v = v ? reconcile(v, mv) : mv;
       result.set(mk, v);
     }
   }
