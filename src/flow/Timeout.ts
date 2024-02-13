@@ -16,7 +16,7 @@ export type TimeoutAsyncCallback = (
 export type Timeout = HasCompletion & {
   start(altTimeoutMs?: number, args?: ReadonlyArray<unknown>): void;
   cancel(): void;
-  get isDone(): boolean;
+  get hasExecuted(): boolean;
 };
 
 /**
@@ -75,10 +75,11 @@ export const timeout = (
   const intervalMs = intervalToMs(interval);
   throwIntegerTest(intervalMs, `aboveZero`, `interval`);
 
-  //eslint-disable-next-line functional/no-let
-  let timer = 0;
-  //eslint-disable-next-line functional/no-let
+  let timer: ReturnType<typeof setTimeout>;
   let startedAt = 0;
+  let completedCount = 0;
+  let running = false;
+
   const start = async (
     altInterval: Interval = interval,
     args: Array<unknown>
@@ -91,12 +92,14 @@ export const timeout = (
         reject(it[ 1 ]);
         return;
       }
-      if (timer !== 0) cancel();
+      if (running) cancel();
+
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      timer = window.setTimeout(async () => {
+      timer = globalThis.setTimeout(async () => {
         const args_ = args ?? [];
         await callback(performance.now() - startedAt, ...args_);
-        timer = 0;
+        completedCount++;
+        running = false;
         resolve();
       }, altTimeoutMs);
     });
@@ -104,17 +107,26 @@ export const timeout = (
   };
 
   const cancel = () => {
-    if (timer === 0) return;
+    if (!running) return;
     startedAt = 0;
-    window.clearTimeout(timer);
+    globalThis.clearTimeout(timer);
+    running = false;
   };
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     start,
     cancel,
-    get isDone() {
-      return timer !== 0;
+    /**
+     * Returns _true_ timer has executed `callback`.
+     * Returns _false_ if timer hasn't been started, elapsed time hasn't been reached
+     * or the timer was cancelled.
+     */
+    get hasExecuted() {
+      return completedCount > 0;
     },
+    get isDone() {
+      return startedAt === 0;
+    }
   };
 };
