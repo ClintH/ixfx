@@ -1,8 +1,7 @@
-import type { QueueOpts } from './index.js';
+import type { QueueOpts } from './QueueTypes.js';
 
 export const debug = (opts: QueueOpts<any>, message: string): void => {
-  /* eslint-disable-next-line functional/no-expression-statements */
-  opts.debug ? console.log(`queue:${ message }`) : null;
+  opts.debug ? console.log(`queue:${ message }`) : undefined;
 };
 
 export const trimQueue = <V>(

@@ -70,6 +70,7 @@ export type WrappedNode<T> = TraversableTree<T> & {
    * @returns 
    */
   hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
+  queryValue: (value: T) => IterableIterator<WrappedNode<T>>
   /**
    * Returns _true_ if `child` is contained any any descendant
    * @param child
@@ -109,6 +110,11 @@ export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
     },
     getValue: () => n.value as T,
     getIdentity: () => n,
+    *queryValue(value: T): IterableIterator<WrappedNode<T>> {
+      for (const v of queryByValue(value, unwrapped(n))) {
+        yield wrap(v);
+      }
+    },
     getParent: () => n.parent === undefined ? undefined : wrap(n.parent),
     hasParent: (parent: WrappedNode<T> | TreeNode<T>): boolean => {
       return hasParent(n, unwrapped(parent));
@@ -243,6 +249,16 @@ export function* parents<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
   }
 }
 
+/**
+ * Returns the depth of `node`. A root node (ie. with no parents) has a depth of 0.
+ * @param node 
+ * @returns 
+ */
+export function nodeDepth(node: TreeNode<any>): number {
+  const p = [ ...parents(node) ];
+  return p.length;
+}
+
 export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
   for (const c of parent.childrenStore) {
     if (c === child) return true;
@@ -250,11 +266,16 @@ export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
   return false;
 }
 
-export const findChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault) => {
+export const findChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined => {
   for (const c of parent.childrenStore) {
     if (eq(value, c.value as T)) return c;
   }
-  return false;
+}
+
+export function* queryByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): IterableIterator<TreeNode<T>> {
+  for (const c of parent.childrenStore) {
+    if (eq(value, c.value as T)) yield c;
+  }
 }
 
 /**
