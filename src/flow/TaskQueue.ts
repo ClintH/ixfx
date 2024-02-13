@@ -1,6 +1,6 @@
-import { QueueMutable } from '../collections/queue/QueueMutable.js';
+import { mutable } from '../collections/queue/QueueMutable.js';
 
-type Task = () => void;
+type Task = () => Promise<void>;
 
 export type TaskQueueOpts = {
   /**
@@ -44,7 +44,7 @@ export class TaskQueue {
   private constructor(opts: TaskQueueOpts = {}) {
     this._startDelayMs = opts.startDelayMs ?? 500;
     this._intervalMs = opts.intervalMs ?? 100;
-    this._queue = new QueueMutable<Task>();
+    this._queue = mutable<Task>(); // new QueueMutable<Task>();
   }
 
   /**
@@ -57,7 +57,7 @@ export class TaskQueue {
    * ```
    * @param task Task to run
    */
-  add(task: () => void) {
+  add(task: () => Promise<void>) {
     this._queue.enqueue(task);
     if (this._timer === 0) this.schedule(this._startDelayMs);
   }
@@ -78,7 +78,7 @@ export class TaskQueue {
     // Start the processing loop
     //eslint-disable-next-line functional/immutable-data
     this._timer = setTimeout(() => {
-      this.processQueue();
+      void this.processQueue();
     }, intervalMs);
   }
 
@@ -93,8 +93,8 @@ export class TaskQueue {
         //eslint-disable-next-line functional/immutable-data
         this._timer = 0;
         this.schedule(this._intervalMs);
-      } catch (ex) {
-        console.error(ex);
+      } catch (error) {
+        console.error(error);
       }
     }
   }
