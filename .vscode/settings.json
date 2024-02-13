@@ -16,7 +16,8 @@
     "**/etc": true,
     "**/dist": true,
     "**/build": true,
-    "**/docs": true
+    "**/docs": true,
+    "**/.tsimp":true
   },
   "[typescript]": {
     "typescript.preferences.importModuleSpecifierEnding": "js"

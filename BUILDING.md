@@ -82,6 +82,11 @@ Run a single test:
 npm run test -- --match="name-of-test"
 ```
 
+Run a single test file:
+```
+npx ava --config ./config/ava.config.js ./src/__test/NAME_OF_FILE.ts
+```
+
 ESLint report:
 
 ```

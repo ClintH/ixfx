@@ -1,15 +1,20 @@
 export default {
-	require: ['./src/__test/util.ts'],
-  verbose: false,
+  verbose: true,
   files: [
-    './src/__test/**/*.ts',
-    '!./src/__test/util.ts'
+    './src/__test/**/*.Test.ts',
   ],
-  failFast: true,
-  typescript: {
-    rewritePaths: {
-      "src/": "etc/build/"
-    },
-    compile: false
-  }
+  failFast: false,
+  // typescript: {
+  //   rewritePaths: {
+  //     "src/": "etc/build/"
+  //   },
+  //   compile: false
+  // },
+  extensions: {
+    ts: "module",
+    js:true
+  },
+  nodeArguments: [
+    "--import=tsimp"
+  ]
 }; 
