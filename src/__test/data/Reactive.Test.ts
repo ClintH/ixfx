@@ -71,7 +71,7 @@ test(`rx-from-array`, async t => {
 test(`rx-from-array-lazy`, async t => {
   const a1 = [ 1, 2, 3, 4, 5 ];
 
-  // Pause: Step 1 read 2 items
+  // Pause: Step 1: read 2 items from source
   const v2 = Rx.fromArray(a1, { idle: `pause`, lazy: true });
   let read: number[] = [];
   const v2Off1 = v2.on(msg => {
@@ -82,10 +82,11 @@ test(`rx-from-array-lazy`, async t => {
       }
     }
   });
+  // Should only have two items, because we unsubscribed
   await Flow.sleep(200);
   t.deepEqual(read, [ 1, 2 ]);
 
-  // Pause: Step 2, keep reading, expecting data to continue and complete
+  // Pause: Step 2: keep reading, expecting data to continue and complete
   const v2Off2 = v2.on(msg => {
     if (msg.value) {
       read.push(msg.value);
