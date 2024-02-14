@@ -134,7 +134,6 @@ const create = function (
   duration: number,
   timerSource: TimerSource
 ): Easing {
-  //eslint-disable-next-line functional/no-let
   const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
   if (fn === undefined) {
     const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: ${ nameOrFunction }`) : new Error(`Easing function not found`);
@@ -146,18 +145,29 @@ const create = function (
     timer: timerSource(),
     clampValue: true,
   });
+  let startCount = 1;
 
   return {
     get isDone() {
       return timer.isDone;
     },
+    get runState() {
+      if (timer.isDone) return `idle`;
+      return `scheduled`;
+    },
+    /**
+     * Returns 1 if it has been created, returns +1 for each additional time the timer has been reset.
+     */
+    get startCount() {
+      return startCount;
+    },
     compute: () => {
       const relative = timer.elapsed;
-      //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return fn(relative);
     },
     reset: () => {
       timer.reset();
+      startCount++;
     },
   };
 };

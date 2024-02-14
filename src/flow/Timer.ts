@@ -1,5 +1,5 @@
 import { clamp } from '../data/Clamp.js';
-import { type HasCompletion } from './index.js';
+import { intervalToMs, type Interval } from './index.js';
 
 /**
  * Creates a timer
@@ -11,8 +11,9 @@ export type TimerSource = () => Timer;
  * See {@link msElapsedTimer}, {@link ticksElapsedTimer}, {@link frequencyTimer}
  */
 export type Timer = {
-  reset(): void;
-  get elapsed(): number;
+  reset(): void
+  get elapsed(): number
+  get isDone(): boolean
 };
 
 export type ModulationTimer = Timer & {
@@ -23,7 +24,7 @@ export type TimerOpts = {
   /**
    * Timer to use. By default {@link msElapsedTimer}.
    */
-  readonly timer?: Timer;
+  readonly timer: Timer;
 };
 
 /**
@@ -33,24 +34,24 @@ export type RelativeTimerOpts = TimerOpts & {
   /**
    * If true, returned value will be clamped to 0..1. False by default
    */
-  readonly clampValue?: boolean
-  readonly wrapValue?: boolean
+  readonly clampValue: boolean
+  readonly wrapValue: boolean
 };
 
 /**
- * Returns a function that returns true if timer is complete
+ * A function that returns _true_ when an interval has elapsed
  *
  * ```js
- * const timer = hasElapsedMs(1000);
- * timer(); // Returns true if timer is done
+ * const oneSecond = hasElapsedMs(1000);
+ * oneSecond(); // Returns _true_ when timer is done
  * ```
  *
  * See also {@link Elapsed.progress}.
- * @param totalMs
+ * @param elapsed
  * @returns
  */
-export function hasElapsedMs(totalMs: number): () => boolean {
-  const t = relativeTimer(totalMs, { timer: msElapsedTimer() });
+export function hasElapsed(elapsed: Interval): () => boolean {
+  const t = relativeTimer(intervalToMs(elapsed, 0), { timer: msElapsedTimer() });
   return () => t.isDone;
 }
 
@@ -62,24 +63,26 @@ export const frequencyTimerSource =
 /**
  * Wraps a timer, returning a relative elapsed value based on
  * a given total. ie. percentage complete toward a total duration.
+ * This is useful because other parts of code don't need to know
+ * about the absolute time values, you get a nice relative completion number.
  *
  * If no timer is specified, milliseconds-based timer is used.
  *
  * ```js
  * const t = relativeTimer(1000);
- * t.isDone;
- * t.reset();
- * t.elapsed;
+ * t.elapsed;   // returns % completion (0...1)
+ * ```
+ * 
+ * Additional fields/methods on the timer:
+ * ```js
+ * t.isDone;  // _true_ if .elapsed has reached 1
+ * t.reset(); // start from zero again
  * ```
  *
  * With options
  * ```js
  * // Total duration of 1000 ticks
  * const t = relativeTimer(1000, { timer: ticksElapsedTimer(); clampValue:true });
- *
- * t.isDone;  // true if total has elapsed
- * t.reset(); // reset timer to 0
- * t.elapsed; // 0..1 scale of how close to completion
  * ```
  *
  * @private
@@ -89,40 +92,38 @@ export const frequencyTimerSource =
  */
 export const relativeTimer = (
   total: number,
-  opts: RelativeTimerOpts = {}
-): ModulationTimer & HasCompletion => {
-  const timer = opts.timer ?? msElapsedTimer();
+  opts: Partial<RelativeTimerOpts> = {}
+): ModulationTimer => {
+
   const clampValue = opts.clampValue ?? false;
   const wrapValue = opts.wrapValue ?? false;
   if (clampValue && wrapValue) throw new Error(`clampValue and wrapValue cannot both be enabled`);
 
-  //eslint-disable-next-line functional/no-let
-  let done = false;
-  //eslint-disable-next-line functional/no-let
   let modulationAmount = 1;
+
+  // Create and starts timer
+  const timer = opts.timer ?? msElapsedTimer();
+
+  const computeElapsed = () => {
+    let v = timer.elapsed / (total * modulationAmount);
+    if (clampValue) v = clamp(v);
+    else if (wrapValue && v >= 1) v = v % 1;
+    return v;
+  }
 
   return {
     mod(amt: number) {
       modulationAmount = amt;
     },
     get isDone() {
-      return done;
-    },
-    reset: () => {
-      done = false;
-      timer.reset();
+      return computeElapsed() >= 1;
     },
     get elapsed() {
-      //eslint-disable-next-line functional/no-let
-      let v = timer.elapsed / (total * modulationAmount);
-      if (clampValue) v = clamp(v);
-      else if (wrapValue) {
-        if (v >= 1) v = v % 1;
-      } else {
-        if (v >= 1) done = true;
-      }
-      return v;
+      return computeElapsed();
     },
+    reset: () => {
+      timer.reset();
+    }
   };
 };
 
@@ -158,12 +159,30 @@ export const relativeTimer = (
  */
 export const frequencyTimer = (
   frequency: number,
-  opts: TimerOpts = {}
+  opts: Partial<TimerOpts> = {}
 ): ModulationTimer => {
   const timer = opts.timer ?? msElapsedTimer();
   const cyclesPerSecond = frequency / 1000;
-  //eslint-disable-next-line functional/no-let
   let modulationAmount = 1;
+
+  const computeElapsed = () => {
+    // Get position in a cycle
+    const v = timer.elapsed * (cyclesPerSecond * modulationAmount);
+
+    // Get fractional part
+    const f = v - Math.floor(v);
+    if (f < 0) {
+      throw new Error(
+        `Unexpected cycle fraction less than 0. Elapsed: ${ v } f: ${ f }`
+      );
+    }
+    if (f > 1) {
+      throw new Error(
+        `Unexpected cycle fraction more than 1. Elapsed: ${ v } f: ${ f }`
+      );
+    }
+    return f;
+  }
   return {
     mod: (amt: number) => {
       modulationAmount = amt;
@@ -171,23 +190,11 @@ export const frequencyTimer = (
     reset: () => {
       timer.reset();
     },
+    get isDone() {
+      return computeElapsed() >= 1;
+    },
     get elapsed() {
-      // Get position in a cycle
-      const v = timer.elapsed * (cyclesPerSecond * modulationAmount);
-
-      // Get fractional part
-      const f = v - Math.floor(v);
-      if (f < 0) {
-        throw new Error(
-          `Unexpected cycle fraction less than 0. Elapsed: ${ v } f: ${ f }`
-        );
-      }
-      if (f > 1) {
-        throw new Error(
-          `Unexpected cycle fraction more than 1. Elapsed: ${ v } f: ${ f }`
-        );
-      }
-      return f;
+      return computeElapsed();
     },
   };
 };
@@ -200,19 +207,33 @@ export const frequencyTimer = (
  * t.reset(); // reset start
  * t.elapsed; // ms since start
  * ```
+ * 
+ * Like other {@link Timer} functions, it returns a `isDone` property,
+ * but this will always return _true_.
  * @returns {Timer}
  * @see {ticksElapsedTimer}
  */
 export const msElapsedTimer = (): Timer => {
-  // eslint-disable-next-line functional/no-let
   let start = performance.now();
   return {
+    /**
+     * Reset timer
+     */
     reset: () => {
       start = performance.now();
     },
+    /**
+     * Returns elapsed time since start
+     */
     get elapsed() {
       return performance.now() - start;
     },
+    /**
+     * Always returns _true_
+     */
+    get isDone() {
+      return false;
+    }
   };
 };
 
@@ -224,8 +245,11 @@ export const msElapsedTimer = (): Timer => {
  * ```js
  * const timer = ticksElapsedTimer();
  * timer.reset(); // Reset to 0
- * timer.elapsed; // Number of ticks
+ * timer.elapsed; // Number of ticks (and also increment ticks)
  * ```
+ * 
+ * Like other {@link Timer} functions, returns with a `isDone` field,
+ * but this will always return _true_.
  * @returns {Timer}
  * @see {msElapsedTimer}
  */
@@ -233,11 +257,26 @@ export const ticksElapsedTimer = (): Timer => {
   // eslint-disable-next-line functional/no-let
   let start = 0;
   return {
+    /**
+     * Reset ticks to 0. The next call to `elapsed` will return 1.
+     */
     reset: () => {
       start = 0;
     },
+    /**
+     * Returns the number of elapsed ticks as well as
+     * incrementing the tick count. 
+     * 
+     * Minimum is 1
+     */
     get elapsed() {
       return ++start;
     },
+    /**
+     * Always returns _true_
+     */
+    get isDone() {
+      return true;
+    }
   };
 };

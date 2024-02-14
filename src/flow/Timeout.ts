@@ -1,6 +1,9 @@
+
 import { throwIntegerTest, integerTest } from '../Guards.js';
-import { type HasCompletion } from './index.js';
+import { type HasCompletion, type HasCompletionRunStates } from './index.js';
+
 import { intervalToMs, type Interval } from './IntervalType.js';
+
 export type TimeoutSyncCallback = (
   elapsedMs?: number,
   ...args: ReadonlyArray<unknown>
@@ -16,7 +19,6 @@ export type TimeoutAsyncCallback = (
 export type Timeout = HasCompletion & {
   start(altTimeoutMs?: number, args?: ReadonlyArray<unknown>): void;
   cancel(): void;
-  get hasExecuted(): boolean;
 };
 
 /**
@@ -77,8 +79,14 @@ export const timeout = (
 
   let timer: ReturnType<typeof setTimeout>;
   let startedAt = 0;
-  let completedCount = 0;
-  let running = false;
+  let startCount = 0;
+  let state: HasCompletionRunStates = `idle`;
+
+  const clear = () => {
+    startedAt = 0;
+    globalThis.clearTimeout(timer);
+    state = `idle`;
+  }
 
   const start = async (
     altInterval: Interval = interval,
@@ -89,17 +97,36 @@ export const timeout = (
       const altTimeoutMs = intervalToMs(altInterval);
       const it = integerTest(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
       if (!it[ 0 ]) {
-        reject(it[ 1 ]);
+        reject(new Error(it[ 1 ]));
         return;
       }
-      if (running) cancel();
+
+      switch (state) {
+        case `scheduled`: {
+          // Cancel other scheduled execution
+          cancel();
+          break;
+        }
+        case `running`: {
+          console.warn(`Timeout being rescheduled while task is already running`);
+          break;
+        }
+      }
+      state = `scheduled`;
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       timer = globalThis.setTimeout(async () => {
+        if (state !== `scheduled`) {
+          console.warn(`Timeout skipping execution since state is not 'scheduled'`);
+          clear();
+          return;
+        }
         const args_ = args ?? [];
+        startCount++;
+        state = `running`;
         await callback(performance.now() - startedAt, ...args_);
-        completedCount++;
-        running = false;
+        state = `idle`
+        clear();
         resolve();
       }, altTimeoutMs);
     });
@@ -107,26 +134,19 @@ export const timeout = (
   };
 
   const cancel = () => {
-    if (!running) return;
-    startedAt = 0;
-    globalThis.clearTimeout(timer);
-    running = false;
+    if (state === `idle`) return;
+    clear();
   };
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     start,
     cancel,
-    /**
-     * Returns _true_ timer has executed `callback`.
-     * Returns _false_ if timer hasn't been started, elapsed time hasn't been reached
-     * or the timer was cancelled.
-     */
-    get hasExecuted() {
-      return completedCount > 0;
+    get runState() {
+      return state;
     },
-    get isDone() {
-      return startedAt === 0;
+    get startCount() {
+      return startCount;
     }
   };
 };
