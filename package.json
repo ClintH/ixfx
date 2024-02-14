@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.17.5",
+  "version": "0.17.6",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -71,7 +71,7 @@
     "docs:copyIcons": "copyfiles --up 1 ./config/*.png ./docs/assets/",
     "lint": "eslint src/**",
     "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
-    "test": "tsc && ava --config ./config/ava.config.js --timeout=30s",
+    "test": "tsc && ava --config ./config/ava.config.js --timeout=10s",
     "circular": "madge --circular --extensions ts src/ > madge.txt"
   },
   "devDependencies": {
@@ -114,9 +114,6 @@
     "lit": "^3.1.1",
     "rxjs": "^7.8.0",
     "tsimp": "^2.0.11"
-  },
-  "engines": {
-    "node": ">=21.0.0"
   },
   "eslintIgnore": [
     "./dist/**/*"
