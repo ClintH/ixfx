@@ -29,7 +29,7 @@ test('changedDataFields', t => {
   t.is(Object.entries(r3).length, 2);
   t.is((r3 as any).message, `hello!`);
   t.deepEqual((r3 as any).position, { x: 10 });
-  console.log(`changedDataFields done`);
+  //console.log(`changedDataFields done`);
 });
 
 test(`changedDataFields-array`, t => {
