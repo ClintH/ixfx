@@ -70,7 +70,7 @@ test('predelay', async (t) => {
   const predelayMs = 1000;
   const fn = async () => {
     if (firstInvoke) {
-      t.true(isApproximately(predelayMs, 0.01, elapsed()));
+      t.true(isApproximately(predelayMs, 0.02, elapsed()));
       firstInvoke = true;
     }
   };

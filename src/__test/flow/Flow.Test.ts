@@ -11,7 +11,7 @@ test('continuously', async (t) => {
   const loopCount = 5;
   const duration = 200;
   const expectedElapsed = loopCount * duration;
-  t.plan(loopCount + 1); // +1 for additional asserts whend one
+  t.plan(loopCount + 5); // +5 for additional asserts 
 
   let loops = loopCount;
   let startedAt = Date.now();
@@ -22,17 +22,19 @@ test('continuously', async (t) => {
   };
 
   const c = continuously(fn, 200);
+  t.is(c.startCount, 0);
+  t.is(c.runState, `idle`);
   c.start();
+  t.is(c.runState, `scheduled`);
 
-  return new Promise(async (resolve, reject) => {
-    await sleep(expectedElapsed + 50);
-    t.true(c.isDone);
-    const elapsed = Date.now() - startedAt;
-    if (Math.abs(elapsed - expectedElapsed) > 100) {
-      t.fail(`Elapsed time too long: ${elapsed}, expected: ${expectedElapsed}`);
-    }
-    resolve();
-  });
+  //return new Promise(async (resolve, reject) => {
+  await sleep(expectedElapsed + 50);
+  t.true(c.startCount > 0);
+  const elapsed = Date.now() - startedAt;
+  t.true(Math.abs(elapsed - expectedElapsed) < 100, `Elapsed time too long: ${ elapsed }, expected: ${ expectedElapsed }`);
+
+  //  resolve();
+  //});
 });
 
 // test('', t=> {

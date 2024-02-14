@@ -4,8 +4,6 @@ import * as Flow from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
 import { count } from '../../Generators.js';
 
-import * as Reactive from '../../data/Reactive.js';
-
 const genArray = (count: number) => {
   const data: string[] = [];
   for (let i = 0; i < count; i++) {
@@ -14,7 +12,9 @@ const genArray = (count: number) => {
   return data;
 }
 
-
+// test(`dummy`, t => {
+//   t.pass();
+// })
 
 test(`transform`, async t => {
   // Simple array as source
@@ -33,7 +33,7 @@ test(`batch-limit`, async t => {
   const amt1 = 20;
   const values1 = count(amt1);
   const limit1 = 5;
-  const b1 = Rx.batch({ quantity: limit1 })(values1);
+  const b1 = Rx.batch(values1, { quantity: limit1 });
   const reader1 = await Rx.toArray(b1);
   t.is(reader1.flat().length, amt1);
   t.is(reader1.length, Math.ceil(amt1 / limit1));
@@ -46,7 +46,7 @@ test(`batch-limit`, async t => {
   const amt2 = 20;
   const values2 = count(amt2);
   const limit2 = 6;
-  const b2 = Rx.batch({ quantity: limit2 })(values2);
+  const b2 = Rx.batch(values2, { quantity: limit2 });
   const reader2 = await Rx.toArray(b2);
   t.is(reader2.flat().length, amt2);
   for (let i = 0; i < reader2.length; i++) {
@@ -58,6 +58,34 @@ test(`batch-limit`, async t => {
   }
 })
 
+test(`batch-elapsed-0`, async t => {
+  const m = Rx.manual<number>();
+  const results: Array<Array<number>> = [];
+  const batchElapsed = 200;
+  Rx.wrap(m)
+    .transform(v => v / 10)
+    .batch({ elapsed: batchElapsed, returnRemainder: false })
+    .value(v => {
+      results.push(v);
+    });
+
+  // Run through numbers
+  let start = Date.now();
+  const arr = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+  const arrInterval = 50;
+
+  for await (const v of Flow.interval(arr, arrInterval)) {
+    m.set(v);
+  }
+  let elapsed = Date.now() - start;
+  const expectedItemsPerBatch = Math.floor(batchElapsed / arrInterval);
+  console.log(`expected: ${ expectedItemsPerBatch }`);
+  // Test batching
+  t.deepEqual(results, [
+    [ 0.1, 0.2, 0.3, 0.4 ], [ 0.5, 0.6, 0.7, 0.8 ]
+  ])
+});
+
 test(`batch-elapsed-1`, async t => {
   // Read all items within the elapsed period
   const amt = 20;
@@ -66,7 +94,7 @@ test(`batch-elapsed-1`, async t => {
   const elapsed = 5000;
   // Make a batch for 5 seconds. But `count` gives all the values
   // quickly, so it won't take long
-  const batch = Rx.batch({ elapsed: elapsed })(values);
+  const batch = Rx.batch(values, { elapsed: elapsed });
   const reader = await Rx.toArray(batch);
   const readElapsed = Date.now() - started;
   // Check that that toArray yielded all the emitted values
@@ -85,7 +113,7 @@ test(`batched-elapsed-2`, async t => {
   const valuesOverTime = Flow.interval(values, interval);
 
   // Batch read over elapsed ms
-  const batch = Rx.batch({ elapsed: elapsed })(valuesOverTime);
+  const batch = Rx.batch(valuesOverTime, { elapsed: elapsed });
 
   // Read all the batched sets of data
   const reader = await Rx.toArrayOrThrow(batch);
@@ -108,16 +136,16 @@ test(`rx-resolve`, async t => {
   const r1Off = r.on(msg => {
     results1++;
   });
-  await Flow.sleep(1000);
+  await Flow.sleep(500);
   r1Off();
 
-  await Flow.sleep(1000);
+  await Flow.sleep(500);
 
   let results2 = 0;
   const r2Off = r.on(msg => {
     results2++;
   });
-  await Flow.sleep(1000);
+  await Flow.sleep(500);
   r2Off();
 
   t.is(results1, results2);
