@@ -16,6 +16,12 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
   min = Number.MAX_SAFE_INTEGER;
   max = Number.MIN_SAFE_INTEGER;
 
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+  constructor(opts?: TrackOpts) {
+    super(opts);
+    /** no-op */
+  }
+
   get avg() {
     return this.total / this.seenCount;
   }
@@ -128,5 +134,6 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * t.timestampes; // array of millisecond times, indexes correspond to t.values
  * ```
  * @class NumberTracker
+ * @constructs NumberTracker
  */
 export const numberTracker = (opts: TrackOpts = {}) => new NumberTracker(opts);
