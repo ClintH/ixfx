@@ -43,7 +43,7 @@ import { throwNumberTest, throwIntegerTest } from '../Guards.js';
  * @param max Integer maximum of range (default: 360). Exlusive
  * @returns
  */
-export const wrapInteger = (v: number, min: number = 0, max: number = 360) => {
+export const wrapInteger = (v: number, min = 0, max = 360) => {
   throwIntegerTest(v, undefined, `v`);
   throwIntegerTest(min, undefined, `min`);
   throwIntegerTest(max, undefined, `max`);
@@ -83,7 +83,7 @@ export const wrapInteger = (v: number, min: number = 0, max: number = 360) => {
  * @param max
  * @returns
  */
-export const wrap = (v: number, min: number = 0, max: number = 1) => {
+export const wrap = (v: number, min = 0, max = 1) => {
   throwNumberTest(v, ``, `min`);
   throwNumberTest(min, ``, `min`);
   throwNumberTest(max, ``, `max`);
