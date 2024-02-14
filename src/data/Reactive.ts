@@ -25,6 +25,16 @@ export type PassedSignal = Passed<any> & {
 export type EventOptions<V> = {
   process: (args?: Event | undefined) => V
   lazy?: boolean
+  /**
+   * If true, log messages are emitted
+   * when event handlers are added/removed
+   */
+  debugLifecycle?: boolean
+  /**
+   * If true, log messages are emitted
+   * when the source event fires
+   */
+  debugFiring?: boolean
 }
 
 export type PassedValue<V> = Passed<V> & {
@@ -156,9 +166,9 @@ export function number(initialValue?: number): ReactiveDisposable & ReactiveWrit
   }
 }
 
-export function event<V extends Record<string, any>, EventName extends string>(target: EventTarget, name: EventName, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable;
+export function event<V extends Record<string, any>>(target: EventTarget, name: string, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable;
 
-export function event<V extends Record<string, any>, EventName extends string>(target: EventTarget, name: EventName, options?: Optional<EventOptions<V>, `process`>): ReactiveNonInitial<V> & ReactiveDisposable;
+export function event<V extends Record<string, any>>(target: EventTarget, name: string, options?: Optional<EventOptions<V>, `process`>): ReactiveNonInitial<V> & ReactiveDisposable;
 
 /**
  * Subscribes to an event, emitting data
@@ -167,16 +177,18 @@ export function event<V extends Record<string, any>, EventName extends string>(t
  * @param options Options
  * @returns 
  */
-export function event<V extends Record<string, any>, EventName extends string>(target: EventTarget, name: EventName, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable {
+export function event<V extends Record<string, any>>(target: EventTarget, name: string, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable {
   const process = options.process;
   const initialValue = process ? process() : undefined;
-
+  const debugLifecycle = options.debugLifecycle ?? false;
+  const debugFiring = options.debugFiring ?? false;
   const rxObject = initialValue ? object<V>(initialValue, { deepEntries: true }) : object<V>(undefined, { deepEntries: true });
   const lazy = options.lazy ?? false;
   let eventAdded = false;
   let disposed = false;
 
   const callback = (args: any) => {
+    if (debugFiring) console.log(`Reactive.event '${ name }' firing '${ JSON.stringify(args) }`)
     rxObject.set(process ? process(args) : args);
   }
 
@@ -184,12 +196,18 @@ export function event<V extends Record<string, any>, EventName extends string>(t
     if (!eventAdded) return;
     eventAdded = false;
     target.removeEventListener(name, callback);
+    if (debugLifecycle) {
+      console.log(`Reactive.event remove '${ name }'`);
+    }
   }
 
   const add = () => {
     if (eventAdded) return;
     eventAdded = true;
     target.addEventListener(name, callback);
+    if (debugLifecycle) {
+      console.log(`Reactive.event add '${ name }'`);
+    }
   }
 
   if (!lazy) add();
@@ -598,9 +616,9 @@ export type FromArrayOptions = {
    * Governs behaviour if all subscribers are removed AND lazy=true. By default continues
    * iteration.
    * 
-   * pause: stop at last array index
-   * reset: go back to 0
-   * empty: continue, despite there being no listeners (default)
+   * * pause: stop at last array index
+   * * reset: go back to 0
+   * * empty: continue, despite there being no listeners (default)
    */
   idle: `` | `pause` | `reset`
 }
@@ -614,11 +632,12 @@ export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions>
 
   const s = initStream<V>({
     onFirstSubscribe() {
-      //console.log(`Rx.fromArray onFirstSubscribe. Lazy: ${ lazy } reader running: ${ c.isRunning }`);
+      //console.log(`Rx.fromArray onFirstSubscribe. Lazy: ${ lazy } reader state: ${ c.runState }`);
       // Start if in lazy mode and not running
-      if (lazy && !c.isRunning) c.start();
+      if (lazy && c.runState === `idle`) c.start();
     },
     onNoSubscribers() {
+      //console.log(`Rx.fromArray onNoSubscribers. Lazy: ${ lazy } reader state: ${ c.runState } on idle: ${ idle }`);
       if (lazy) {
         if (idle === `pause`) {
           c.cancel();
@@ -631,11 +650,14 @@ export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions>
   });
 
   const c = continuously(() => {
+    //console.log(`Rx.fromArray loop index ${ index } lazy: ${ lazy }`);
+
     lastValue = array[ index ];
     index++;
 
     s.set(lastValue)
     if (index === array.length) {
+      //console.log(`Rx.fromArray exiting continuously`);
       return false;
     }
   }, intervalMs);
@@ -693,9 +715,6 @@ export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions>
 //   return promise;
 // }
 
-
-
-
 export type ToArrayOptions<V> = {
   /**
    * Maximim time to wait for `limit` to be reached. 10s by default.
@@ -722,6 +741,15 @@ export type ToArrayOptions<V> = {
  * By default, reads all the values from `source`, or until 5 seconds has elapsed.
  * 
  * If `limit` is provided as an option, it will exit early, or throw if that number of values was not acheived.
+ * 
+ * ```js
+ * // Read from `source` for 5 seconds
+ * const data = await toArrayOrThrow()(source);
+ * // Read 5 items from `source`
+ * const data = await toArrayOrThrow({ limit: 5 })(source);
+ * // Read for 10s
+ * const data = await toArrayOrThrow({ maximumWait: 10_1000 })(source);
+ * ```
  * @param source 
  * @param options 
  * @returns 
@@ -736,16 +764,28 @@ export async function toArrayOrThrow<V>(source: ReactiveOrSource<V>, options: Pa
 
   // Otherwise, we may have been reading for a specified duration
   return v as Array<V>;
+
 }
 
 /**
- * Reads a set number of values from `source`, returning as an array.
- * After the limit is reached (or source completes), the source is unsubscribed from.
+ * Reads a set number of values from `source`, returning as an array. May contain
+ * empty values if desired values is not reached.
+ * 
+ * After the limit is reached (or `source` completes), `source` is unsubscribed from.
  * 
  * If no limit is set, it will read until `source` completes or `maximumWait` is reached.
  * `maximumWait` is 10 seconds by default.
  * 
- * Use {@link toArrayOrThrow} if want to throw if limit is not reached.
+ * Use {@link toArrayOrThrow} to throw if desired limit is not reached.
+ * 
+ * ```js
+ * // Read from `source` for 5 seconds
+ * const data = await toArray()(source);
+ * // Read 5 items from `source`
+ * const data = await toArray({ limit: 5 })(source);
+ * // Read for 10s
+ * const data = await toArray({ maximumWait: 10_1000 })(source);
+ * ```
  * @param source 
  * @param options 
  * @returns 
@@ -755,6 +795,7 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
   const maximumWait = intervalToMs(options.maximumWait, 10 * 1000);
   const underThreshold = options.underThreshold ?? `partial`
   const read: Array<V | undefined> = [];
+
   const rx = resolveSource(source);
 
   const promise = new Promise<Array<V | undefined>>((resolve, reject) => {
@@ -791,5 +832,10 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
   });
 
   return promise;
+
 }
 
+// wrap(event<{ x: number, y: number }>(document.body, `pointerup`))
+//   .batch({ elapsed: 200 })
+//   .transform(v => v.length)
+//   .value(v => { console.log(v) });
