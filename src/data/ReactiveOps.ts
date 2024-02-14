@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { type Interval, intervalToMs } from "../flow/IntervalType.js";
-import { type Reactive, type ReactiveWritable, messageHasValue, messageIsSignal, isDisposable, initStream, type InitEventOptions, type ReactiveOrSource, initUpstream, messageIsDoneSignal, type ReactiveDisposable, type Passed, type ReactiveStream, resolveSource } from "./Reactive.js";
+import { type Reactive, type ReactiveWritable, messageHasValue, messageIsSignal, isDisposable, initStream, type InitEventOptions, type ReactiveOrSource, initUpstream, messageIsDoneSignal, type ReactiveDisposable, type Passed, type ReactiveStream, resolveSource, toArray, type ToArrayOptions, toArrayOrThrow } from "./Reactive.js";
 import { QueueMutable } from "../collections/index.js";
 import { continuously } from "../flow/Continuously.js";
 import { isPlainObjectOrPrimitive } from "../Util.js";
@@ -374,7 +374,7 @@ export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<Reso
   const lazy = options.lazy ?? false;
   const event = initStream<V>({
     onFirstSubscribe() {
-      if (lazy && !c.isRunning) c.start();
+      if (lazy && c.runState === `idle`) c.start();
     },
     onNoSubscribers() {
       if (lazy) {
@@ -629,28 +629,138 @@ export function singleFromArray<V>(source: ReactiveOrSource<Array<V>>, options: 
 //   }
 // }
 
+/**
+ * Wrapped Reactive for object-oriented access
+ */
 export type Wrapped<TIn> = {
+  source: Reactive<TIn>,
+  /**
+   * Copies values from source into an array, throwing
+   * an error if expected number of items is not reached
+   * @param options 
+   * @returns 
+   */
+  toArrayOrThrow: (options: Partial<ToArrayOptions<TIn>>) => Promise<Array<TIn>>
+  /**
+   * Copies values from source into an array.
+   * @param options 
+   * @returns 
+   */
+  toArray: (options: Partial<ToArrayOptions<TIn>>) => Promise<Array<TIn | undefined>>
+  /**
+   * Accumulate a batch of values, emitted as an array
+   * @param options 
+   * @returns 
+   */
   batch: (options: Partial<BatchOptions>) => Wrapped<Array<TIn>>
+  /**
+   * Annotate values with a timestamp of elapsed time
+   * (uses `annotate`)
+   * @returns 
+   */
   annotateElapsed: () => Wrapped<TIn & AnnotationElapsed>
+  /**
+   * Annotate values with some additional field(s)
+   * @param transformer 
+   * @returns 
+   */
   annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation) => Wrapped<TIn & TAnnotation>
+  /**
+   * Pluck and emit a single field from values
+   * @param fieldName 
+   * @param options 
+   * @returns 
+   */
   field: <TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>>) => Wrapped<TFieldType>
+  /**
+   * Throws away values that don't match `predicate`
+   * @param predicate 
+   * @param options 
+   * @returns 
+   */
   filter: (predicate: FilterPredicate<TIn>, options: Partial<InitEventOptions>) => Wrapped<TIn>
+  /**
+   * Converts one source stream into two, with values being emitted by both
+   * @param options 
+   * @returns 
+   */
   split: (options: Partial<SplitOptions>) => Array<Wrapped<TIn>>
-  transform: <TOut>(transformer: (value: TIn) => TOut, options: Partial<TransformOpts>) => Wrapped<TOut>
+  /**
+   * Transforms all values
+   * @param transformer 
+   * @param options 
+   * @returns 
+   */
+  transform: <TOut>(transformer: (value: TIn) => TOut, options?: Partial<TransformOpts>) => Wrapped<TOut>
+  /**
+   * Only allow values through if a minimum of time has elapsed. Throws away values.
+   * Ie. converts a fast stream into a slower one.
+   * @param options 
+   * @returns 
+   */
   throttle: (options: Partial<ThrottleOptions>) => Wrapped<TIn>
-  synchronise: () => Wrapped<Array<TIn | undefined>>
+  /**
+   * Emits values when this stream and any additional streams produce a value.
+   * Outputted values captures the last value from each stream.
+   * @returns 
+   */
+  synchronise: (...additionalSources: Array<ReactiveOrSource<TIn> | Wrapped<TIn>>) => Wrapped<Array<TIn | undefined>>
+  /**
+   * Creates new streams for each case, sending values to the stream if they match the filter predicate
+   * @param cases 
+   * @param options 
+   * @returns 
+   */
   switcher: <TRec extends Record<string, FilterPredicate<TIn>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions>) => Record<TLabel, Wrapped<TIn>>
+  /**
+   * Creates new streams for each case
+   * @param labels 
+   * @returns 
+   */
   splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => Record<K, Wrapped<TIn>>
+  /**
+   * Listen for values
+   * @param callback 
+   * @returns 
+   */
+  value: (callback: (value: TIn) => void) => void
 }
 
-// export type WrappedSingle<TIn> = {
-// }
-
+/**
+ * Wrap a reactive source in a OOP wrapper to allow for chained
+ * function calls.
+ * 
+ * For every `pointerup` event on the body, batch the events over
+ * periods of 200ms, and then get the number of events in that period,
+ * finally printing it out.
+ * 
+ * eg. detecting single or double-clicks
+ * ```js
+ * wrap(event<{ x: number, y: number }>(document.body, `pointerup`))
+ *  .batch({ elapsed: 200 })
+ *  .transform(v => v.length)
+ *  .value(v => { console.log(v) });
+ * ```
+ * @param source 
+ * @returns 
+ */
 export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
   return {
+    source: resolveSource(source),
+    toArray: (options: Partial<ToArrayOptions<TIn>>) => {
+      return toArray(source, options);
+    },
+    toArrayOrThrow: (options: Partial<ToArrayOptions<TIn>>) => {
+      return toArrayOrThrow(source, options);
+    },
+    value: (callback: ((value: TIn) => void)) => {
+      const s = resolveSource(source);
+      s.on(message => {
+        if (messageHasValue(message)) callback(message.value);
+      })
+    },
     batch: (options: Partial<BatchOptions>): Wrapped<Array<TIn>> => {
-      const b = batch<TIn>(options);
-      const w = wrap<Array<TIn>>(b(source));
+      const w = wrap<Array<TIn>>(batch(source, options));
       return w;
     },
     annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation): Wrapped<TIn & TAnnotation> => {
@@ -681,8 +791,11 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       const m = ImmutableMap<typeof s, Wrapped<TIn>>(s, v => wrap(v));
       return m as Record<TLabel, Wrapped<TIn>>;
     },
-    synchronise: () => {
-      return wrap(synchronise<TIn>()(source));
+    synchronise: (...additionalSources: Array<Wrapped<TIn> | ReactiveOrSource<TIn>>) => {
+      const unwrapped: Array<Reactive<TIn>> = additionalSources.map(v => {
+        return `source` in v ? v.source : resolveSource(v);
+      });
+      return wrap(synchronise<TIn>()(source, ...unwrapped));
     },
     throttle: (options: Partial<ThrottleOptions> = {}) => {
       return wrap(throttle<TIn>(options)(source));
@@ -693,11 +806,19 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
   }
 }
 
-export function batch<V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> {
-  return (source: ReactiveOrSource<V>) => {
-    return batchRaw(source, options);
+// export function batchOp<V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> {
+//   return (source: ReactiveOrSource<V>) => {
+//     return batch(source, options);
+//   }
+// }
+
+export const Ops = {
+  batch: <V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> => {
+    return (source: ReactiveOrSource<V>) => {
+      return batch(source, options);
+    }
   }
-}
+} as const;
 
 export type ReactiveOpInit<TIn, TOut, TOpts> = (options: Partial<TOpts>) => ReactiveOp<TIn, TOut>
 export type ReactiveOp<TIn, TOut> = (source: ReactiveOrSource<TIn>) => Reactive<TOut>
@@ -757,7 +878,7 @@ export function run<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<Reac
  * @param options 
  * @returns 
  */
-export function batchRaw<V>(batchSource: ReactiveOrSource<V>, options: Partial<BatchOptions> = {}): Reactive<Array<V>> {
+export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<BatchOptions> = {}): Reactive<Array<V>> {
   const queue = new QueueMutable<V>();
   const quantity = options.quantity ?? 0;
   //const logic = options.logic ?? `or`;
@@ -775,15 +896,15 @@ export function batchRaw<V>(batchSource: ReactiveOrSource<V>, options: Partial<B
     },
     onValue(value: V) {
       queue.enqueue(value);
-      //console.log(`onValue: ${ queue.length }`);
+      console.log(`Reactive.batch onValue. Queue len: ${ queue.length } quantity: ${ quantity } timer state: '${ timer?.runState }'`);
       if (quantity > 0 && queue.length >= quantity) {
         // Reached quantity limit
         send();
       }
       // Start timer
       //console.log(timer?.isDone);
-      if (timer !== undefined && timer.isDone) {
-        //console.log(` timer started`);
+      if (timer !== undefined && timer.runState === `idle`) {
+        console.log(`Reactive.batch timer started`);
         timer.start();
       }
     },
@@ -791,7 +912,7 @@ export function batchRaw<V>(batchSource: ReactiveOrSource<V>, options: Partial<B
   const upstream = initUpstream<V, Array<V>>(batchSource, upstreamOpts);
 
   const send = () => {
-    //console.log(`send`);
+    console.log(`Reactive.batch send`);
     if (queue.isEmpty) return;
 
     // Reset timer
