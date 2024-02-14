@@ -1,5 +1,4 @@
 export default {
-  verbose: true,
   files: [
     './src/__test/**/*.Test.ts',
   ],
