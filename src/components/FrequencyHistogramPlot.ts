@@ -24,28 +24,20 @@ import * as KeyValueUtil from '../KeyValue.js';
  * @class FrequencyHistogramPlot
  */
 export class FrequencyHistogramPlot {
-  //readonly parentEl:HTMLElement;
-  // eslint-disable-next-line functional/prefer-readonly-type
-
   readonly el: HistogramVis | undefined;
-  // eslint-disable-next-line functional/prefer-readonly-type
-  #sorter: KeyValueUtil.Sorter | undefined;
-
-  //eslint-disable-next-line functional/prefer-immutable-types
+  #sorter: KeyValueUtil.KeyValueSorter | undefined;
   constructor(el: HistogramVis) {
     this.el = el;
   }
 
   setAutoSort(
-    sortStyle: `value` | `valueReverse` | `key` | `keyReverse`
+    sortStyle: `value` | `value-reverse` | `key` | `key-reverse`
   ): void {
-    // eslint-disable-next-line functional/immutable-data
     this.#sorter = KeyValueUtil.getSorter(sortStyle);
   }
 
   clear() {
     if (this.el === undefined) return;
-    // eslint-disable-next-line functional/immutable-data
     this.el.data = [];
   }
 
@@ -68,12 +60,6 @@ export class FrequencyHistogramPlot {
       return;
     }
 
-    if (this.#sorter === undefined) {
-      // eslint-disable-next-line functional/immutable-data
-      this.el.data = [ ...data ];
-    } else {
-      // eslint-disable-next-line functional/immutable-data, functional/prefer-readonly-type
-      this.el.data = this.#sorter(data as Array<KeyValueUtil.KeyValue>);
-    }
+    this.el.data = this.#sorter === undefined ? [ ...data ] : this.#sorter(data as Array<KeyValueUtil.KeyValue>);
   }
 }

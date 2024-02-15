@@ -6,7 +6,7 @@ import * as KeyValueUtil from '../KeyValue.js';
 import { KeyValues } from '../index.js';
 
 export type FrequencyEventMap = {
-  readonly change: void;
+  readonly change: { context: any };
 };
 
 export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
@@ -17,18 +17,14 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * Constructor
    * @param keyString Function to key items. Uses JSON.stringify by default
    */
-  constructor(keyString: ToString<V> | undefined = undefined) {
+  constructor(keyString?: ToString<V> | undefined) {
     super();
     this.#store = new Map();
 
     if (keyString === undefined) {
       keyString = (a) => {
         if (a === undefined) throw new Error(`Cannot create key for undefined`);
-        if (typeof a === `string`) {
-          return a;
-        } else {
-          return JSON.stringify(a);
-        }
+        return typeof a === `string` ? a : JSON.stringify(a);
       };
     }
     this.#keyString = keyString;
@@ -39,7 +35,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    */
   clear() {
     this.#store.clear();
-    this.fireEvent(`change`, undefined);
+    this.fireEvent(`change`, { context: this });
   }
 
   /**
@@ -59,8 +55,8 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   /**
    * @returns Copy of entries as an array of `[key, count]`
    */
-  toArray(): [key: string, count: number][] {
-    return Array.from(this.#store.entries());
+  toArray(): Array<[ key: string, count: number ]> {
+    return [ ...this.#store.entries() ];
   }
 
   /**
@@ -70,10 +66,10 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   debugString(): string {
     //eslint-disable-next-line functional/no-let
     let t = ``;
-    for (const [key, count] of this.#store.entries()) {
-      t += `${key}: ${count}, `;
+    for (const [ key, count ] of this.#store.entries()) {
+      t += `${ key }: ${ count }, `;
     }
-    if (t.endsWith(`, `)) return t.substring(0, t.length - 2);
+    if (t.endsWith(`, `)) return t.slice(0, Math.max(0, t.length - 2));
     return t;
   }
 
@@ -112,7 +108,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * @returns Copy of entries as an array
    */
   entries(): Array<KeyValueUtil.KeyValue> {
-    return Array.from(this.#store.entries());
+    return [ ...this.#store.entries() ];
   }
 
   /**
@@ -129,7 +125,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * @returns Sorted array of [key,frequency]
    */
   entriesSorted(
-    sortStyle: `value` | `valueReverse` | `key` | `keyReverse` = `value`
+    sortStyle: KeyValues.SortSyles = `value`
   ): ReadonlyArray<KeyValues.KeyValue> {
     const s = KeyValueUtil.getSorter(sortStyle);
     return s(this.entries());
@@ -140,17 +136,17 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * @param values Values to add. Fires _change_ event after adding item(s)
    */
   //eslint-disable-next-line functional/prefer-immutable-types
-  add(...values: V[]) {
+  add(...values: Array<V>) {
     if (values === undefined) throw new Error(`value parameter is undefined`);
 
-    const keys = values.map(this.#keyString);
+    const keys = values.map(v => this.#keyString(v));
 
     //const key = this.#keyString(value);
-    keys.forEach((key) => {
+    for (const key of keys) {
       const score = this.#store.get(key) ?? 0;
       this.#store.set(key, score + 1);
-    });
-    this.fireEvent(`change`, undefined);
+    }
+    this.fireEvent(`change`, { context: this });
   }
 }
 
