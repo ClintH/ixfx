@@ -1,28 +1,10 @@
-import { Observable, debounceTime, fromEvent } from 'rxjs';
+//import { Observable, debounceTime, fromEvent } from 'rxjs';
 import * as Points from '../geometry/point/index.js';
 import JSON5 from 'json5';
-import { Scaler } from '../geometry/index.js';
-import { multiply as RectsMultiply } from '../geometry/rect/Multiply.js';
 import type { CardinalDirection } from '../geometry/Grid.js';
-import { cardinal, type Rect } from '../geometry/rect/index.js';
+import { cardinal } from '../geometry/rect/index.js';
 import type { Point } from '../geometry/point/index.js';
-
-// eslint-disable-next-line unicorn/prevent-abbreviations
-export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
-  readonly el: V;
-  readonly bounds: {
-    readonly width: number;
-    readonly height: number;
-    readonly center: Point;
-    readonly min: number;
-    readonly max: number;
-  };
-};
-
-// eslint-disable-next-line unicorn/prevent-abbreviations
-export type CanvasResizeArgs = ElementResizeArgs<HTMLCanvasElement> & {
-  readonly ctx: CanvasRenderingContext2D;
-};
+import { resolveEl, resolveEls, type QueryOrElements } from './ResolveEl.js';
 
 export type PointSpaces = `viewport` | `screen` | `document`;
 
@@ -314,172 +296,11 @@ export const positionFromMiddle = (
   el.style.transform = `translate(${ offsetPos.x }px, ${ offsetPos.y }px)`;
 };
 
-export const fullSizeElement = <V extends HTMLElement>(
-  domQueryOrEl: string | V,
-  onResized?: (args: ElementResizeArgs<V>) => void
-) => {
-  const el = resolveEl<V>(domQueryOrEl);
 
-  const r = windowResize();
-  const update = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
 
-    el.setAttribute(`width`, width.toString());
-    el.setAttribute(`height`, height.toString());
 
-    if (onResized !== undefined) {
-      const bounds = {
-        min: Math.min(width, height),
-        max: Math.max(width, height),
-        width,
-        height,
-        center: {
-          x: width / 2,
-          y: height / 2,
-        },
-      };
-      onResized({ el, bounds });
-    }
-  };
-  r.subscribe(update);
 
-  update();
-  return r;
-};
 
-export type CanvasOpts = {
-  readonly skipCss?: boolean;
-  readonly fullSize?: boolean;
-  readonly scaleBy?: `both` | `width` | `height` | `min` | `max`;
-};
-
-export const canvasHelper = (
-  domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>,
-  opts: CanvasOpts
-) => {
-  if (!domQueryOrEl) throw new Error(`domQueryOrEl is null or undefined`);
-  const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
-  if (el.nodeName !== `CANVAS`) {
-    throw new Error(`Expected CANVAS HTML element. Got: ${ el.nodeName }`);
-  }
-  const fullSize = opts.fullSize ?? true;
-  const ratio = Math.round(window.devicePixelRatio) || 1;
-  const scaleBy = opts.scaleBy ?? `both`;
-
-  let scaler: Scaler.ScalerCombined = Scaler.scaler(`both`);
-
-  const updateDimensions = (rect: Rect) => {
-    // Create a new scaler
-    scaler = Scaler.scaler(scaleBy, rect);
-
-    const pixelScaled = RectsMultiply(rect, ratio, ratio);
-
-    el.width = pixelScaled.width;
-    el.height = pixelScaled.height;
-    el.style.width = rect.width + `px`;
-    el.style.height = rect.height + `px`;
-  };
-
-  // Window has resized
-  const onWindowResize = () => {
-    const innerWindow = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
-    updateDimensions(innerWindow);
-  };
-
-  const getContext = () => {
-    const ctx = el.getContext(`2d`);
-    if (ctx === null) throw new Error(`Could not create drawing context`);
-
-    ctx.scale(ratio, ratio);
-  };
-
-  if (fullSize) {
-    const r = windowResize();
-    r.subscribe(onWindowResize);
-  }
-
-  return {
-    abs: scaler.abs,
-    rel: scaler.rel,
-    getContext,
-  };
-};
-
-/**
- * Resizes given canvas element to match window size.
- * To resize canvas to match its parent, use {@link parentSizeCanvas}.
- *
- * To make the canvas appear propery, it sets the following CSS:
- * ```css
- * {
- *  top: 0;
- *  left: 0;
- *  zIndex: -1;
- *  position: fixed;
- * }
- * ```
- * Pass _true_ for `skipCss` to avoid this.
- *
- * Provide a callback for when resize happens.
- * @param domQueryOrEl Query string or reference to canvas element
- * @param onResized Callback for when resize happens, eg for redrawing canvas
- * @param skipCss if true, style are not added
- * @returns Observable
- */
-export const fullSizeCanvas = (
-  domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>,
-  onResized?: (args: CanvasResizeArgs) => void,
-  skipCss = false
-) => {
-  if (domQueryOrEl === null || domQueryOrEl === undefined) {
-    throw new Error(`domQueryOrEl is null or undefined`);
-  }
-  const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
-  if (el.nodeName !== `CANVAS`) {
-    throw new Error(
-      `Expected HTML element with node name CANVAS, not ${ el.nodeName }`
-    );
-  }
-  const ctx = el.getContext(`2d`);
-  if (ctx === null) throw new Error(`Could not create drawing context`);
-
-  const update = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    el.width = width;
-    el.height = height;
-
-    if (onResized !== undefined) {
-      const bounds = {
-        min: Math.min(width, height),
-        max: Math.max(width, height),
-        width,
-        height,
-        center: { x: width / 2, y: height / 2 },
-      };
-      onResized({ ctx, el, bounds });
-    }
-  };
-
-  // Setup
-  if (!skipCss) {
-    el.style.top = `0`;
-    el.style.left = `0`;
-    el.style.zIndex = `-100`;
-    el.style.position = `fixed`;
-  }
-
-  const r = windowResize();
-  r.subscribe(update);
-
-  update();
-  return r;
-};
 
 /**
  * Given an array of class class names, this will cycle between them each time
@@ -519,47 +340,7 @@ export const cycleCssClass = (
   el.classList.add(list[ 0 ]);
 };
 
-/**
- * Sets width/height atributes on the given element according to the size of its parent.
- * @param domQueryOrEl Elememnt to resize
- * @param onResized Callback when resize happens
- * @param timeoutMs Timeout for debouncing events
- * @returns
- */
-export const parentSize = <V extends HTMLElement | SVGSVGElement>(
-  domQueryOrEl: string | V,
-  onResized?: (args: ElementResizeArgs<V>) => void,
-  timeoutMs = 100
-) => {
-  const el = resolveEl<V>(domQueryOrEl);
-  const parent = el.parentElement;
-  if (parent === null) throw new Error(`Element has no parent`);
 
-  const ro = resizeObservable(parent, timeoutMs).subscribe(
-    (entries: ReadonlyArray<ResizeObserverEntry>) => {
-      const entry = entries.find((v) => v.target === parent);
-      if (entry === undefined) return;
-
-      const width = entry.contentRect.width;
-      const height = entry.contentRect.height;
-
-      el.setAttribute(`width`, width + `px`);
-      el.setAttribute(`height`, height + `px`);
-      if (onResized !== undefined) {
-        const bounds = {
-          min: Math.min(width, height),
-          max: Math.max(width, height),
-          width,
-          height,
-          center: { x: width / 2, y: height / 2 },
-        };
-        onResized({ el, bounds });
-      }
-    }
-  );
-
-  return ro;
-};
 
 /**
  * Source: https://zellwk.com/blog/translate-in-javascript
@@ -613,107 +394,6 @@ export const getTranslation = (
   return { x: 0, y: 0, z: 0 };
 };
 
-/**
- * Resizes given canvas to its parent element.
- * To resize canvas to match the viewport, use {@link fullSizeCanvas}.
- *
- * Provide a callback for when resize happens.
- * @param domQueryOrEl Query string or reference to canvas element
- * @param onResized Callback for when resize happens, eg for redrawing canvas
- * @returns Observable
- */
-export const parentSizeCanvas = (
-  domQueryOrEl: Readonly<string | HTMLCanvasElement>,
-  onResized?: (args: CanvasResizeArgs) => void,
-  timeoutMs = 100
-) => {
-  const el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
-  if (el.nodeName !== `CANVAS`) {
-    throw new Error(
-      `Expected HTML element with node name CANVAS, not ${ el.nodeName }`
-    );
-  }
-  const parent = el.parentElement;
-  if (parent === null) throw new Error(`Element has no parent`);
-
-  const ctx = (el).getContext(`2d`);
-  if (ctx === null) throw new Error(`Could not create drawing context`);
-
-  //const safetyMargin = 4;
-
-  el.style.width = `100%`;
-  el.style.height = `100%`;
-
-
-  const ro = resizeObservable(parent, timeoutMs).subscribe(
-    (entries: ReadonlyArray<ResizeObserverEntry>) => {
-      const entry = entries.find((v) => v.target === parent);
-      if (entry === undefined) return;
-
-      const width = entry.contentRect.width;
-      const height = entry.contentRect.height;
-      //console.log(`contentH: ${e.contentRect.height} current: ${el.getBoundingClientRect().height}`);
-
-      // el.setAttribute(`width`, width-safetyMargin + `px`);
-      // el.setAttribute(`height`, height-safetyMargin + `px`);
-      el.setAttribute(`width`, el.offsetWidth + `px`);
-      el.setAttribute(`height`, el.offsetHeight + `px`);
-
-      if (onResized !== undefined) {
-        const bounds = {
-          min: Math.min(width, height),
-          max: Math.max(width, height),
-          width,
-          height,
-          center: { x: width / 2, y: height / 2 },
-        };
-        onResized({ ctx, el, bounds });
-      }
-    }
-  );
-
-  return ro;
-};
-
-/**
- * Returns an Observable for window resize. Default 100ms debounce.
- * @param timeoutMs
- * @returns
- */
-export const windowResize = (timeoutMs = 100) =>
-  fromEvent(window, `resize`).pipe(debounceTime(timeoutMs));
-
-/**
- * Resolves either a string or HTML element to an element.
- * Useful when an argument is either an HTML element or query.
- *
- * ```js
- * resolveEl(`#someId`);
- * resolveEl(someElement);
- * ```
- * @param domQueryOrEl
- * @returns
- */
-export const resolveEl = <V extends Element>(domQueryOrEl: string | V | null | undefined): V => {
-  if (typeof domQueryOrEl === `string`) {
-    const d = document.querySelector(domQueryOrEl);
-    if (d === null) {
-      const error = domQueryOrEl.startsWith(`#`) ? new Error(
-        `Query '${ domQueryOrEl }' did not match anything. Try '#id', 'div', or '.class'`
-      ) : new Error(
-        `Query '${ domQueryOrEl }' did not match anything. Did you mean '#${ domQueryOrEl }?`
-      );
-      throw error;
-    }
-    domQueryOrEl = d as V;
-  } else if (domQueryOrEl === null) {
-    throw new Error(`domQueryOrEl ${ domQueryOrEl } is null`);
-  } else if (domQueryOrEl === undefined) {
-    throw new Error(`domQueryOrEl ${ domQueryOrEl } is undefined`);
-  }
-  const el = domQueryOrEl;
-  return el;
-};
 
 /**
  * Creates an element after `sibling`
@@ -764,73 +444,6 @@ export const clear = (parent: Readonly<HTMLElement>) => {
   }
 };
 
-/**
- * Observer when document's class changes
- *
- * ```js
- * const c = themeChangeObservable();
- * c.subscribe(() => {
- *  // Class has changed...
- * });
- * ```
- * @returns
- */
-export const themeChangeObservable = (): Observable<
-  ReadonlyArray<MutationRecord>
-> => {
-  const o = new Observable<Array<MutationRecord>>((subscriber) => {
-    const ro = new MutationObserver((entries) => {
-      subscriber.next(entries);
-    });
-
-    const opts: MutationObserverInit = {
-      attributeFilter: [ `class` ],
-      attributes: true,
-    };
-
-    ro.observe(document.documentElement, opts);
-    return function unsubscribe() {
-      ro.disconnect();
-    };
-  });
-  return o;
-};
-
-/**
- * Observer when element resizes. Specify `timeoutMs` to debounce.
- *
- * ```
- * const o = resizeObservable(myEl, 500);
- * o.subscribe(() => {
- *  // called 500ms after last resize
- * });
- * ```
- * @param elem
- * @param timeoutMs Tiemout before event gets triggered
- * @returns
- */
-export const resizeObservable = (
-  elem: Readonly<Element>,
-  timeoutMs = 1000
-): Observable<ReadonlyArray<ResizeObserverEntry>> => {
-  if (elem === null) {
-    throw new Error(`elem parameter is null. Expected element to observe`);
-  }
-  if (elem === undefined) {
-    throw new Error(`elem parameter is undefined. Expected element to observe`);
-  }
-  const o = new Observable<Array<ResizeObserverEntry>>((subscriber) => {
-    const ro = new ResizeObserver((entries) => {
-      subscriber.next(entries);
-    });
-
-    ro.observe(elem);
-    return function unsubscribe() {
-      ro.unobserve(elem);
-    };
-  });
-  return o.pipe(debounceTime(timeoutMs));
-};
 
 /**
  * Copies string representation of object to clipboard
@@ -984,18 +597,7 @@ export const byId = <V extends HTMLElement>(id: string): HTMLElement => {
   return element as V;
 }
 
-export type QueryOrElements = string | Array<Element> | Array<HTMLElement> | HTMLElement | Element
 
-export const resolveEls = (selectors: QueryOrElements): Array<HTMLElement> => {
-  if (selectors === undefined) return [];
-  if (selectors === null) return [];
-  if (Array.isArray(selectors)) return selectors as Array<HTMLElement>;
-  if (typeof selectors === `string`) {
-    const elements = [ ...document.querySelectorAll(selectors) ]
-    return elements as Array<HTMLElement>
-  }
-  return [ selectors as HTMLElement ];
-}
 
 export const setHtml = (selectors: QueryOrElements, value: string | number) => {
   const elements = resolveEls(selectors);
