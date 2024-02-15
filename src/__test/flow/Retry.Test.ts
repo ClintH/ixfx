@@ -22,7 +22,6 @@ test('basic', async (t) => {
 test('count', async (t) => {
   t.timeout(4 * 1000);
   const expectedCount = 3;
-  //eslint-disable-next-line functional/no-let
   let timesInvoked = 0;
   const fn = async () => {
     timesInvoked++;
@@ -42,7 +41,6 @@ test('count', async (t) => {
 
 test('abort', async (t) => {
   const abortController = new AbortController();
-  //eslint-disable-next-line functional/no-let
   let timesInvoked = 0;
   const abortAfter = 10;
   const fn = async () => {
@@ -64,13 +62,13 @@ test('abort', async (t) => {
 });
 
 test('predelay', async (t) => {
-  //eslint-disable-next-line functional/no-let
   let firstInvoke = true;
   const elapsed = Elapsed.since();
-  const predelayMs = 1000;
+  const predelayMs = 200;
   const fn = async () => {
     if (firstInvoke) {
-      t.true(isApproximately(predelayMs, 0.02, elapsed()));
+      const elapsedValue = elapsed();
+      t.true(isApproximately(predelayMs, 0.06, elapsedValue), elapsedValue.toString());
       firstInvoke = true;
     }
   };

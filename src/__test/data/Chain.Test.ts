@@ -288,7 +288,7 @@ test('delay', async t => {
 
 test('tick', async t => {
   // Tick with interval
-  const intervalMs = 100;
+  const intervalMs = 50;
   const ch1 = Chains.run(
     Chains.tick({ interval: intervalMs }),
     Chains.transform<string, number>(v => Number.parseInt(v))

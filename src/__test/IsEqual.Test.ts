@@ -6,6 +6,7 @@ import {
   isEqualValuePartial
 } from '../IsEqual.js'
 
+
 test(`isEqualValuePartial`, t => {
   const obj1 = {
     name: `blah`,

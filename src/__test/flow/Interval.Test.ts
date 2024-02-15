@@ -5,7 +5,7 @@ import { isApproximately } from '../../Numbers.js';
 import { count } from '../../Generators.js';
 
 test('interval-function', async (t) => {
-  const rateMs = 100;
+  const rateMs = 50;
   const maxLoops = 5;
   const randomGenerator = interval(Math.random, { fixed: rateMs });
 
@@ -27,7 +27,7 @@ test('interval-function', async (t) => {
 
 test('interval-array', async (t) => {
   const opts = {
-    fixed: 100,
+    fixed: 50,
     delay: 'before',
   } as const;
   const list = [ 'thom', 'jonny', 'colin', 'ed', 'phil' ];
@@ -50,8 +50,8 @@ test('interval-generator', async (t) => {
   // A generator that counts to 5
   const counter = count(5);
   const created = [];
-  // Use interval to loop over counter with 1000ms delay
-  for await (const v of interval(counter, 100)) {
+  // Use interval to loop over counter with delay
+  for await (const v of interval(counter, 50)) {
     if (typeof v !== `number`) {
       t.fail(`Expected number return type, got ${ typeof v }`);
     }

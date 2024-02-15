@@ -129,7 +129,7 @@ test(`rx-manual`, t => {
 test(`rx-event`, async t => {
   const target = new EventTarget();
 
-  const v1 = Rx.event(target, `hello`);
+  const v1 = Rx.fromEvent(target, `hello`);
   t.falsy(v1.last());
   const results: string[] = [];
   let gotDone = false
