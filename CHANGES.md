@@ -8,7 +8,6 @@ Data
 Dom
 * cssVariables: sync DOM attributes with CSS variable values
 * Forms.button improvements
-* 
 
 Collections
 * QueueMutable gains .at, .removeWhere, .remove

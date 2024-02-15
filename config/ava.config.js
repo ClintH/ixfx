@@ -2,7 +2,7 @@ export default {
   files: [
     './src/__test/**/*.Test.ts',
   ],
-  failFast: false,
+  failFast: true,
   // typescript: {
   //   rewritePaths: {
   //     "src/": "etc/build/"
@@ -14,6 +14,7 @@ export default {
     js:true
   },
   nodeArguments: [
-    "--import=tsimp"
+    "--import=tsimp",
+    "--trace-warnings"
   ]
 }; 
