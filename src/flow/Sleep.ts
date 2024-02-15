@@ -1,10 +1,10 @@
 import { throwNumberTest } from '../Guards.js';
 import { type Interval, intervalToMs } from './IntervalType.js';
 
-export type SleepOpts<V> = Interval & {
-  readonly signal?: AbortSignal;
-  readonly value?: V;
-};
+export type SleepOpts<V> = Interval & Partial<{
+  readonly signal: AbortSignal;
+  readonly value: V;
+}>;
 
 if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
   // eslint-disable-next-line unicorn/no-lonely-if
@@ -58,13 +58,13 @@ if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
  * @return
  */
 export const sleep = <V>(
-  //eslint-disable-next-line functional/prefer-immutable-types
   optsOrMillis: SleepOpts<V>
 ): Promise<V | undefined> => {
-  const timeoutMs = intervalToMs(optsOrMillis);
+  const timeoutMs = intervalToMs(optsOrMillis, 1);
   const signal = optsOrMillis.signal;
   const value = optsOrMillis.value;
   throwNumberTest(timeoutMs, `positive`, `timeoutMs`);
+
   if (timeoutMs === 0) {
     return new Promise<V | undefined>((resolve) =>
       requestAnimationFrame((_) => {
@@ -73,16 +73,22 @@ export const sleep = <V>(
     );
   } else {
     return new Promise<V | undefined>((resolve, reject) => {
+      const onAbortSignal = () => {
+        signal?.removeEventListener(`abort`, onAbortSignal);
+        reject(new Error(signal!.reason));
+      }
+
       if (signal) {
-        signal.addEventListener(`abort`, () => {
-          reject(signal.reason);
-        });
+        //console.log(`Flow.sleep added to abort signal`);
+        signal.addEventListener(`abort`, onAbortSignal);
       }
       setTimeout(() => {
         if (signal?.aborted) {
           reject(signal.reason);
           return;
         }
+        signal?.removeEventListener(`abort`, onAbortSignal);
+
         resolve(value);
       }, timeoutMs);
     });
