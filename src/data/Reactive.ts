@@ -43,11 +43,23 @@ export type PassedValue<V> = Passed<V> & {
 
 export type Reactive<V> = {
   /**
-   * Subscribes to a reactive.
+   * Subscribes to a reactive. Receives
+   * data as well as signals. Use `value` if you
+   * just care about values.
+   * 
    * Return result unsubscribes.
+   * 
+   * ```js
+   * const unsub = someReactive.on(msg => {
+   *    // Do something with msg.value
+   * });
+   * 
+   * unsub(); // Unsubscribe
+   * ```
    * @param handler 
    */
   on(handler: (value: Passed<V>) => void): () => void
+  value(handler: (value: V) => void): () => void
 }
 
 export type ReactiveNonInitial<V> = Reactive<V> & {
@@ -162,13 +174,14 @@ export function number(initialValue?: number): ReactiveDisposable & ReactiveWrit
     isDisposed: events.isDisposed,
     last: () => value,
     on: events.on,
+    value: events.value,
     set
   }
 }
 
-export function event<V extends Record<string, any>>(target: EventTarget, name: string, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable;
+export function fromEvent<V extends Record<string, any>>(target: EventTarget, name: string, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable;
 
-export function event<V extends Record<string, any>>(target: EventTarget, name: string, options?: Optional<EventOptions<V>, `process`>): ReactiveNonInitial<V> & ReactiveDisposable;
+export function fromEvent<V extends Record<string, any>>(target: EventTarget, name: string, options?: Optional<EventOptions<V>, `process`>): ReactiveNonInitial<V> & ReactiveDisposable;
 
 /**
  * Subscribes to an event, emitting data
@@ -177,7 +190,7 @@ export function event<V extends Record<string, any>>(target: EventTarget, name: 
  * @param options Options
  * @returns 
  */
-export function event<V extends Record<string, any>>(target: EventTarget, name: string, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable {
+export function fromEvent<V extends Record<string, any>>(target: EventTarget, name: string, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable {
   const process = options.process;
   const initialValue = process ? process() : undefined;
   const debugLifecycle = options.debugLifecycle ?? false;
@@ -229,6 +242,10 @@ export function event<V extends Record<string, any>>(target: EventTarget, name: 
     on: (handler: (v: Passed<V>) => void) => {
       if (lazy) add();
       return rxObject.on(handler);
+    },
+    value: (handler: (v: V) => void) => {
+      if (lazy) add();
+      return rxObject.value(handler);
     }
   }
 }
@@ -237,16 +254,91 @@ export function event<V extends Record<string, any>>(target: EventTarget, name: 
  * Initialises a reactive that pipes values to listeners directly.
  * @returns 
  */
-export function manual<V>(): Reactive<V> & ReactiveWritable<V> {
-  const events = initStream<V>();
+export function manual<V>(options: Partial<InitStreamOptions> = {}): Reactive<V> & ReactiveWritable<V> {
+  const events = initStream<V>(options);
   return {
     set(value: V) {
       events.set(value);
     },
-    on: events.on
+    on: events.on,
+    value: events.value
   };
 }
 
+/**
+ * Creates a RxJs style observable
+ * ```js
+ * const o = observable(stream => {
+ *  // Code to run for initialisation when we go from idle to at least one subscriber
+ *  // Won't run again for additional subscribers, but WILL run again if we lose
+ *  // all subscribers and then get one
+ * 
+ *  // To send a value:
+ *  stream.set(someValue);
+ * 
+ *   // Optional: return function to call when all subscribers are removed
+ *   return () => {
+ *     // Code to run when all subscribers are removed
+ *   }
+ * });
+ * ```
+ * 
+ * For example:
+ * ```js
+ * const xy = observable<(stream => {
+ *  // Send x,y coords from PointerEvent
+ *  const send = (event) => {
+ *    stream.set({ x: event.x, y: event.y });
+ *  }
+ *  window.addEventListener(`pointermove`, send);
+ *  return () => {
+ *    // Unsubscribe
+ *    window.removeEventListener(`pointermove`, send);
+ *  }
+ * });
+ * 
+ * xy.value(value => {
+ *  console.log(value);
+ * });
+ * ```
+ * @param init 
+ * @returns 
+ */
+export function observable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined) {
+  const ow = observableWritable(init);
+  return {
+    on: ow.on,
+    value: ow.value
+  }
+}
+
+/**
+ * As {@link observable}, but returns a Reactive that allows writing
+ * @param init 
+ * @returns 
+ */
+export function observableWritable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined) {
+  let onCleanup: (() => void) | undefined = () => {/** no-op */ };
+  const ow = manual<V>({
+    onFirstSubscribe() {
+      onCleanup = init(ow);
+    },
+    onNoSubscribers() {
+      if (onCleanup) onCleanup();
+    },
+  });
+
+  return {
+    ...ow,
+    value: (callback: (value: V) => void) => {
+      return ow.on(message => {
+        if (messageHasValue(message)) {
+          callback(message.value);
+        }
+      });
+    }
+  };
+}
 
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 
@@ -360,6 +452,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     updateField,
     last: () => value,
     on: setEvent.on,
+    value: setEvent.value,
     onDiff: diffEvent.on,
     /**
      * Set the whole object
@@ -372,18 +465,17 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
   }
 }
 
-export type InitEventOptions = {
+export type InitStreamOptions = {
   onFirstSubscribe: () => void
   onNoSubscribers: () => void
 }
-
 
 /**
  * @ignore
  * @param options 
  * @returns 
  */
-export function initStream<V>(options: Partial<InitEventOptions> = {}): ReactiveStream<V> {
+export function initStream<V>(options: Partial<InitStreamOptions> = {}): ReactiveStream<V> {
   let dispatcher: DispatchList<Passed<V>> | undefined;
   let disposed = false;
   let firstSubscribe = false;
@@ -400,6 +492,22 @@ export function initStream<V>(options: Partial<InitEventOptions> = {}): Reactive
       if (onNoSubscribers) onNoSubscribers();
     }
   }
+
+  const subscribe = (handler: Dispatch<Passed<V>>) => {
+    if (disposed) throw new Error(`Disposed`);
+    if (dispatcher === undefined) dispatcher = new DispatchList();
+    const id = dispatcher.add(handler);
+    emptySubscriptions = false;
+    if (!firstSubscribe) {
+      firstSubscribe = true;
+      if (onFirstSubscribe) setTimeout(() => { onFirstSubscribe() }, 10);
+    }
+    return () => {
+      dispatcher?.remove(id);
+      isEmpty();
+    }
+  }
+
   return {
     dispose: (reason: string) => {
       //console.log(`initEvent:dispose (${ reason }) disposed: ${ disposed }`);
@@ -426,19 +534,14 @@ export function initStream<V>(options: Partial<InitEventOptions> = {}): Reactive
       if (disposed) throw new Error(`Disposed`);
       dispatcher?.notify({ signal, value: undefined, context });
     },
-    on: (handler: Dispatch<Passed<V>>) => {
-      if (disposed) throw new Error(`Disposed`);
-      if (dispatcher === undefined) dispatcher = new DispatchList();
-      const id = dispatcher.add(handler);
-      emptySubscriptions = false;
-      if (!firstSubscribe) {
-        firstSubscribe = true;
-        if (onFirstSubscribe) setTimeout(() => { onFirstSubscribe() }, 10);
-      }
-      return () => {
-        dispatcher?.remove(id);
-        isEmpty();
-      }
+    on: (handler: Dispatch<Passed<V>>) => subscribe(handler),
+    value: (handler: (value: V) => void) => {
+      const unsub = subscribe(message => {
+        if (messageHasValue(message)) {
+          handler(message.value);
+        }
+      });
+      return unsub;
     }
   }
 }
@@ -500,7 +603,7 @@ export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, opti
     if (options.onStop) options.onStop();
   }
 
-  const initOpts: InitEventOptions = {
+  const initOpts: InitStreamOptions = {
     onFirstSubscribe() {
       if (lazy) start();
     },
@@ -537,7 +640,7 @@ export function generator<V>(generator: IterableIterator<V> | AsyncIterableItera
   const lazy = options.lazy ?? true;
   let reading = false;
 
-  const eventOpts: InitEventOptions = {
+  const eventOpts: InitStreamOptions = {
     onFirstSubscribe() {
       if (lazy && !reading) {
         readingStart();
@@ -580,6 +683,7 @@ export function generator<V>(generator: IterableIterator<V> | AsyncIterableItera
 
   return {
     on: events.on,
+    value: events.value,
     dispose: events.dispose,
     isDisposed: events.isDisposed
   }
@@ -671,7 +775,8 @@ export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions>
     last() {
       return lastValue;
     },
-    on: s.on
+    on: s.on,
+    value: s.value
   }
 }
 
