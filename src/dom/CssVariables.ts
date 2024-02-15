@@ -1,5 +1,5 @@
 import * as Text from "../Text.js"
-import { resolveEl } from "./Util.js"
+import { resolveEl } from "./ResolveEl.js"
 
 /**
  * CSS Variable
