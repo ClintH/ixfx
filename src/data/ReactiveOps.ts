@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { type Interval, intervalToMs } from "../flow/IntervalType.js";
-import { type Reactive, type ReactiveWritable, messageHasValue, messageIsSignal, isDisposable, initStream, type InitEventOptions, type ReactiveOrSource, initUpstream, messageIsDoneSignal, type ReactiveDisposable, type Passed, type ReactiveStream, resolveSource, toArray, type ToArrayOptions, toArrayOrThrow } from "./Reactive.js";
+import { type Reactive, type ReactiveWritable, messageHasValue, messageIsSignal, isDisposable, initStream, type InitStreamOptions, type ReactiveOrSource, initUpstream, messageIsDoneSignal, type ReactiveDisposable, type Passed, type ReactiveStream, resolveSource, toArray, type ToArrayOptions, toArrayOrThrow } from "./Reactive.js";
 import { QueueMutable } from "../collections/index.js";
 import { continuously } from "../flow/Continuously.js";
 import { isPlainObjectOrPrimitive } from "../Util.js";
@@ -8,9 +8,9 @@ import { shuffle } from "../collections/arrays/index.js";
 import { timeout } from "../flow/Timeout.js";
 import { map as ImmutableMap } from "../Immutable.js";
 
-export type TransformOpts = InitEventOptions;
+export type TransformOpts = InitStreamOptions;
 
-export type BatchOptions = InitEventOptions & {
+export type BatchOptions = InitStreamOptions & {
   /**
    * If _true_ (default) remaining results are yielded
    * if source closes. If _false_, only 'complete' batches are yielded.
@@ -20,7 +20,7 @@ export type BatchOptions = InitEventOptions & {
   quantity: number
 }
 
-export type FieldOptions<V> = InitEventOptions & {
+export type FieldOptions<V> = InitStreamOptions & {
 
   /**
    * If `field` is missing on a value, this value is used in its place.
@@ -243,6 +243,7 @@ export const pipe = <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>): Rea
   }
   return {
     on: event.on,
+    value: event.value,
     dispose(reason) {
       performDispose(reason);
     },
@@ -275,7 +276,8 @@ export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V
   }
 
   return {
-    on: event.on
+    on: event.on,
+    value: event.value
   }
 }
 
@@ -315,7 +317,8 @@ export function synchronise<V>() {
     }
 
     return {
-      on: event.on
+      on: event.on,
+      value: event.value
     }
   }
 }
@@ -401,10 +404,10 @@ export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<Reso
 
   if (!lazy) c.start();
 
-  const r: Reactive<V> = {
-    on: event.on
-  }
-  return r;
+  return {
+    on: event.on,
+    value: event.value
+  };
 }
 
 /**
@@ -429,9 +432,7 @@ export function field<TIn, TFieldType>(fieldName: keyof TIn, options: Partial<Fi
       },
     })
 
-    return {
-      on: upstream.on
-    }
+    return toReadable(upstream);
   }
 }
 
@@ -440,7 +441,7 @@ export type FilterPredicate<In> = (value: In) => boolean;
 /**
  * Passes all values where `predicate` function returns _true_.
  */
-export function filter<In>(predicate: FilterPredicate<In>, options: Partial<InitEventOptions>): ReactiveOp<In, In> {
+export function filter<In>(predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): ReactiveOp<In, In> {
   return (input: ReactiveOrSource<In>): Reactive<In> => {
     const upstream = initUpstream<In, In>(input, {
       ...options,
@@ -451,12 +452,11 @@ export function filter<In>(predicate: FilterPredicate<In>, options: Partial<Init
       },
     })
 
-    return {
-      on: upstream.on
-    }
+    return toReadable(upstream);
   }
 }
 
+const toReadable = <V>(upstream: ReactiveStream<V>) => ({ on: upstream.on, value: upstream.value });
 
 /**
  * Transforms values from `source` using the `transformer` function.
@@ -473,9 +473,7 @@ export function transform<In, Out>(transformer: (value: In) => Out, options: Par
       },
     })
 
-    return {
-      on: upstream.on
-    }
+    return toReadable(upstream);
   }
 }
 
@@ -494,9 +492,7 @@ export function annotate<In, TAnnotation>(transformer: (value: In) => In & TAnno
       },
     })
 
-    return {
-      on: upstream.on
-    }
+    return toReadable(upstream);
   }
 }
 
@@ -678,7 +674,7 @@ export type Wrapped<TIn> = {
    * @param options 
    * @returns 
    */
-  filter: (predicate: FilterPredicate<TIn>, options: Partial<InitEventOptions>) => Wrapped<TIn>
+  filter: (predicate: FilterPredicate<TIn>, options: Partial<InitStreamOptions>) => Wrapped<TIn>
   /**
    * Converts one source stream into two, with values being emitted by both
    * @param options 
@@ -699,6 +695,8 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   throttle: (options: Partial<ThrottleOptions>) => Wrapped<TIn>
+  debounce: (options: Partial<DebounceOptions>) => Wrapped<TIn>
+
   /**
    * Emits values when this stream and any additional streams produce a value.
    * Outputted values captures the last value from each stream.
@@ -774,7 +772,7 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       const f = field<TIn, TFieldType>(fieldName, options)(source);
       return wrap<TFieldType>(f);
     },
-    filter: (predicate: FilterPredicate<TIn>, options: Partial<InitEventOptions>) => {
+    filter: (predicate: FilterPredicate<TIn>, options: Partial<InitStreamOptions>) => {
       return wrap(filter(predicate, options)(source));
     },
     split: (options: Partial<SplitOptions> = {}) => {
@@ -797,8 +795,11 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       });
       return wrap(synchronise<TIn>()(source, ...unwrapped));
     },
+    debounce: (options: Partial<DebounceOptions> = {}) => {
+      return wrap(debounce<TIn>(source, options));
+    },
     throttle: (options: Partial<ThrottleOptions> = {}) => {
-      return wrap(throttle<TIn>(options)(source));
+      return wrap(throttle<TIn>(source, options));
     },
     transform: <TOut>(transformer: (value: TIn) => TOut, options: Partial<TransformOpts> = {}) => {
       return wrap(transform(transformer, options)(source));
@@ -812,12 +813,27 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
 //   }
 // }
 
+const opify = <V>(fn: (source: ReactiveOrSource<V>, ...args: Array<any>) => Reactive<V>, ...args: Array<any>) => {
+  return (source: ReactiveOrSource<V>) => {
+    return fn(source, ...args);
+  }
+}
+
 export const Ops = {
   batch: <V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> => {
     return (source: ReactiveOrSource<V>) => {
       return batch(source, options);
     }
-  }
+  },
+  debounce: <V>(options: Partial<DebounceOptions>): ReactiveOp<V, V> => {
+    return (source: ReactiveOrSource<V>) => {
+      return debounce(source, options);
+    }
+  },
+  throttle: <V>(options: Partial<ThrottleOptions>) => opify<V>(throttle, options)
+  // throttle: <V>(options: Partial<ThrottleOptions>): ReactiveOp<V, V> => {
+  //   return (source: ReactiveOrSource> V >)
+  // }
 } as const;
 
 export type ReactiveOpInit<TIn, TOut, TOpts> = (options: Partial<TOpts>) => ReactiveOp<TIn, TOut>
@@ -896,7 +912,7 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
     },
     onValue(value: V) {
       queue.enqueue(value);
-      console.log(`Reactive.batch onValue. Queue len: ${ queue.length } quantity: ${ quantity } timer state: '${ timer?.runState }'`);
+      //console.log(`Reactive.batch onValue. Queue len: ${ queue.length } quantity: ${ quantity } timer state: '${ timer?.runState }'`);
       if (quantity > 0 && queue.length >= quantity) {
         // Reached quantity limit
         send();
@@ -904,7 +920,7 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
       // Start timer
       //console.log(timer?.isDone);
       if (timer !== undefined && timer.runState === `idle`) {
-        console.log(`Reactive.batch timer started`);
+        //console.log(`Reactive.batch timer started`);
         timer.start();
       }
     },
@@ -912,7 +928,7 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
   const upstream = initUpstream<V, Array<V>>(batchSource, upstreamOpts);
 
   const send = () => {
-    console.log(`Reactive.batch send`);
+    //console.log(`Reactive.batch send`);
     if (queue.isEmpty) return;
 
     // Reset timer
@@ -943,48 +959,102 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
   //   send();
   // }
 
-  const r: Reactive<Array<V>> = {
-    on: upstream.on
-  }
-  return r;
+  return toReadable(upstream);
 }
 
-export type ThrottleOptions = InitEventOptions & {
+export type DebounceOptions = InitStreamOptions & {
+  /**
+   * Minimum time between events. Default 50ms
+   */
   elapsed: Interval
 }
 
-export function throttle<V>(options: Partial<ThrottleOptions> = {}): ReactiveOp<V, V> {
-  return (throttleSource: ReactiveOrSource<V>): Reactive<V> => {
-    const elapsed = intervalToMs(options.elapsed, 0);
-    let lastFire = performance.now();
-    let lastValue: V | undefined;
+/**
+ * Debounce waits for `elapsed` time after the last received value before emitting it.
+ * 
+ * If a flurry of values are received that are within the interval, it won't emit anything. But then
+ * as soon as there is a gap in the messages that meets the interval, the last received value is sent out.
+ * 
+ * `debounce` always emits with at least `elapsed` as a delay after a value received. While {@link throttle} potentially
+ * sends immediately, if it's outside of the elapsed period.
+ * 
+ * This is a subtly different logic to {@link throttle}. `throttle` more eagerly sends the first value, potentially
+ * not sending later values. `debouce` however will send later values, potentially ignoring earlier ones.
+ * @param source 
+ * @param options 
+ * @returns 
+ */
+export function debounce<V>(source: ReactiveOrSource<V>, options: Partial<DebounceOptions> = {}): Reactive<V> {
+  const elapsed = intervalToMs(options.elapsed, 50);
+  let lastValue: V | undefined;
 
-    const upstream = initUpstream<V, V>(throttleSource, {
-      ...options,
-      onValue(value) {
-        lastValue = value;
-        trigger();
-      },
-    });
+  const timer = timeout(() => {
+    const v = lastValue;
+    if (v) {
+      upstream.set(v);
+      lastValue = undefined;
+    }
+  }, elapsed);
 
-    const trigger = () => {
-      const now = performance.now();
-      let byElapsed = false;
-      if (elapsed > 0 && (now - lastFire > elapsed)) {
-        lastFire = now;
-        byElapsed = true;
-      }
-      if (!byElapsed) return;
+  const upstream = initUpstream<V, V>(source, {
+    ...options,
+    onValue(value) {
+      lastValue = value;
+      timer.start();
+    }
+  });
+  return toReadable(upstream);
+}
 
+export type ThrottleOptions = InitStreamOptions & {
+  elapsed: Interval
+}
+
+/**
+ * Only allow a value through if a minimum amount of time has elapsed.
+ * since the last value. This effectively slows down a source to a given number
+ * of values/ms. Values emitted by the source which are too fast are discarded.
+ * 
+ * Throttle will fire on the first value received.
+ * 
+ * In more detail:
+ * Every time throttle passes a value, it records the time it allowed something through. For every
+ * value received, it checks the elapsed time against this timestamp, throwing away values if
+ * the period hasn't elapsed.
+ * 
+ * With this logic, a fury of values of the source might be discarded if they fall within the elapsed time
+ * window. But then if there is not a new value for a while, the actual duration between values can be longer
+ * than expected. This is in contrast to {@link debounce}, which will emit the last value received after a duration, 
+ * even if the source stops sending.
+ * @param options 
+ * @returns 
+ */
+export function throttle<V>(throttleSource: ReactiveOrSource<V>, options: Partial<ThrottleOptions> = {}): Reactive<V> {
+
+  const elapsed = intervalToMs(options.elapsed, 0);
+  let lastFire = performance.now();
+  let lastValue: V | undefined;
+
+  const upstream = initUpstream<V, V>(throttleSource, {
+    ...options,
+    onValue(value) {
+      lastValue = value;
+      trigger();
+    },
+  });
+
+  const trigger = () => {
+    const now = performance.now();
+    if (elapsed > 0 && (now - lastFire > elapsed)) {
+      lastFire = now;
       if (lastValue !== undefined) {
         upstream.set(lastValue);
       }
     }
-
-    const r: Reactive<V> = {
-      on: upstream.on
-    }
-    return r;
   }
+
+
+  return toReadable(upstream);
+
 }
 
