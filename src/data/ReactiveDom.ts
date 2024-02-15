@@ -1,4 +1,4 @@
-import { resolveEl } from "../dom/Util.js";
+import { resolveEl } from "../dom/ResolveEl.js";
 import * as Rx from "./Reactive.js";
 import type { Change } from "../Immutable.js";
 
@@ -383,11 +383,11 @@ export const createUpdate = <V>(source: Rx.Reactive<V>, updater: (v: V, el: HTML
 export function win() {
   const generateRect = () => ({ width: window.innerWidth, height: window.innerHeight });
 
-  const size = Rx.event(window, `resize`, {
+  const size = Rx.fromEvent(window, `resize`, {
     lazy: true,
     process: () => generateRect(),
   });
-  const pointer = Rx.event(window, `pointermove`, {
+  const pointer = Rx.fromEvent(window, `pointermove`, {
     lazy: true,
     process: (args: Event | undefined) => {
       if (args === undefined) return { x: 0, y: 0 };
