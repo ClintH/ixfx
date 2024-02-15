@@ -17,7 +17,17 @@ export type TimeoutAsyncCallback = (
  * A resettable timeout, returned by {@link timeout}
  */
 export type Timeout = HasCompletion & {
+  /**
+   * Starts the timer.
+   * If the timer has already been started and has a scheduled execution, this is cancelled 
+   * and re-scheduled.
+   * @param altTimeoutMs Optional override for the interval. Use _undefined_ to use the original interval
+   * @param args 
+   */
   start(altTimeoutMs?: number, args?: ReadonlyArray<unknown>): void;
+  /**
+   * Cancels the timer, aborting any scheduled execution.
+   */
   cancel(): void;
 };
 
@@ -108,7 +118,7 @@ export const timeout = (
           break;
         }
         case `running`: {
-          console.warn(`Timeout being rescheduled while task is already running`);
+          //console.warn(`Timeout being rescheduled while task is already running`);
           break;
         }
       }

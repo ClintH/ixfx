@@ -42,7 +42,7 @@ export type RelativeTimerOpts = TimerOpts & {
  * A function that returns _true_ when an interval has elapsed
  *
  * ```js
- * const oneSecond = hasElapsedMs(1000);
+ * const oneSecond = hasElapsed(1000);
  * oneSecond(); // Returns _true_ when timer is done
  * ```
  *
