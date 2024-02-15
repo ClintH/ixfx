@@ -1,9 +1,10 @@
-import { sort } from 'fp-ts/lib/Array.js';
-import { pipe } from 'fp-ts/lib/function.js';
-import * as S from 'fp-ts/lib/string.js';
-import * as N from 'fp-ts/lib/number.js';
-import { reverse as reverseOrd, contramap } from 'fp-ts/lib/Ord.js';
+// import { sort } from 'fp-ts/lib/Array.js';
+// import { pipe } from 'fp-ts/lib/function.js';
+// import * as S from 'fp-ts/lib/string.js';
+// import * as N from 'fp-ts/lib/number.js';
+// import { reverse as reverseOrd, contramap } from 'fp-ts/lib/Ord.js';
 
+import { defaultComparer, jsComparer } from './Util.js';
 import { minMaxAvg as arrayMinMaxAg } from './collections/arrays/index.js';
 
 /// ✔ Sorting functions are unit tested
@@ -22,44 +23,55 @@ export function isPrimitive(v: any): v is Primitive {
   return false;
 }
 
-const byKey = (reverse = false) => pipe(
-  reverse ? reverseOrd(S.Ord) : S.Ord,
-  contramap((v: KeyValue) => v[ 0 ])
-);
+// const byKey = (reverse = false) => pipe(
+//   reverse ? reverseOrd(S.Ord) : S.Ord,
+//   contramap((v: KeyValue) => v[ 0 ])
+// );
 
-export const byValueString = (reverse = false) => pipe(
-  reverse ? reverseOrd(S.Ord) : S.Ord,
-  contramap((v: KeyValue) => v[ 1 ] as string)
-);
+// export const byValueString = (reverse = false) => pipe(
+//   reverse ? reverseOrd(S.Ord) : S.Ord,
+//   contramap((v: KeyValue) => v[ 1 ] as string)
+// );
 
-const byValueNumber = (reverse = false) => pipe(
-  reverse ? reverseOrd(N.Ord) : N.Ord,
-  contramap((v: KeyValue) => v[ 1 ] as number)
-);
+// const byValueNumber = (reverse = false) => pipe(
+//   reverse ? reverseOrd(N.Ord) : N.Ord,
+//   contramap((v: KeyValue) => v[ 1 ] as number)
+// );
 
-export const sortByKey = (reverse = false) => sort<KeyValue>(byKey(reverse));
-export const sortByValueString = (reverse = false) => sort<KeyValue>(byValueString(reverse));
-export const sortByValueNumber = (reverse = false) => sort<KeyValue>(byValueNumber(reverse));
+// export const sortByKey = (reverse = false) => sort<KeyValue>(byKey(reverse));
+// export const sortByValueString = (reverse = false) => sort<KeyValue>(byValueString(reverse));
+// export const sortByValueNumber = (reverse = false) => sort<KeyValue>(byValueNumber(reverse));
 
 // eslint-disable-next-line functional/prefer-readonly-type,functional/prefer-immutable-types
-export type Sorter = (data: Array<KeyValue>) => Array<KeyValue>;
+export type KeyValueSorter = (data: Array<KeyValue>) => Array<KeyValue>;
 
-export const getSorter = (sortStyle: `value` | `valueReverse` | `key` | `keyReverse`) => {
+const sorterByValueIndex = (index: number, reverse = false) => {
+  return (values: Array<KeyValue>) => {
+    const s = values.toSorted((a, b) => {
+      return defaultComparer(a[ index ], b[ index ]);
+    });
+    if (reverse) return s.reverse();
+    return s;
+  }
+}
+
+export type SortSyles = `value` | `value-reverse` | `key` | `key-reverse`;
+export const getSorter = (sortStyle: SortSyles): KeyValueSorter => {
   switch (sortStyle) {
     case `value`: {
-      return sortByValueNumber(false);
+      return sorterByValueIndex(1, false);
     }
-    case `valueReverse`: {
-      return sortByValueNumber(true);
+    case `value-reverse`: {
+      return sorterByValueIndex(1, true);
     }
     case `key`: {
-      return sortByKey(false);
+      return sorterByValueIndex(0, false);
     }
-    case `keyReverse`: {
-      return sortByKey(true);
+    case `key-reverse`: {
+      return sorterByValueIndex(0, true);
     }
     default: {
-      throw new Error(`Unknown sorting value '${ (sortStyle as string) }'. Expecting: value, valueReverse, key or keyReverse`);
+      throw new Error(`Unknown sorting value '${ (sortStyle as string) }'. Expecting: value, value-reverse, key or key-reverse`);
     }
   }
 };
