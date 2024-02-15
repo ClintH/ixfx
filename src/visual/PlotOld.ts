@@ -1,6 +1,6 @@
 import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
 import { type ICircularArray } from '../collections/CircularArray.js';
-import { resolveEl, parentSizeCanvas } from '../dom/Util.js';
+import { resolveEl } from '../dom/ResolveEl.js';
 import { Colour, Drawing } from './index.js';
 import {
   ofArrayMutable,
@@ -8,6 +8,7 @@ import {
   type IMapOfMutableExtended,
 } from '../collections/map/index.js';
 import type { Rect, Point } from '../geometry/Types.js';
+import { parentSizeCanvas } from '../dom/CanvasSizing.js';
 
 export type Plotter = {
   add(value: number, series?: string, skipDrawing?: boolean): void;

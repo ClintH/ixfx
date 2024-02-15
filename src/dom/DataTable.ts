@@ -1,5 +1,5 @@
 import { round } from '../Numbers.js';
-import { resolveEl as resolveElement } from './Util.js';
+import { resolveEl as resolveElement } from './ResolveEl.js';
 import JSON5 from 'json5';
 
 export type FormattingOptions = {

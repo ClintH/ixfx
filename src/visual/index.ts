@@ -8,7 +8,6 @@ import * as Palette from './Palette.js';
 import * as Colour from './Colour.js';
 import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
-import { resolveEl } from '../dom/Util.js';
 
 export * as ImageDataGrid from './ImageDataGrid.js';
 export * as BipolarView from './BipolarView.js';

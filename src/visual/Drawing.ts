@@ -6,7 +6,7 @@ import * as Arcs from '../geometry/arc/index.js';
 import * as Beziers from '../geometry/Bezier.js';
 import * as Ellipses from '../geometry/Ellipse.js';
 import * as Colours from '../visual/Colour.js';
-import { resolveEl } from '../dom/Util.js';
+import { resolveEl } from '../dom/ResolveEl.js';
 import { roundUpToMultiple } from '../Util.js';
 import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
 import { StackImmutable } from '../collections/stack/StackImmutable.js';

@@ -4,8 +4,6 @@ import * as Points from '../geometry/point/index.js';
 import { clamp } from '../data/Clamp.js';
 import { flip } from '../data/Flip.js';
 import { scale } from '../data/Scale.js';
-
-import { parentSizeCanvas } from '../dom/Util.js';
 import * as Sg from './SceneGraph.js';
 
 import { textRect, textWidth } from './Drawing.js';
@@ -15,6 +13,7 @@ import { throwNumberTest } from '../Guards.js';
 import type { Rect, RectPositioned, PointCalculableShape } from '../geometry/Types.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
 import { scaleCanvas } from './ScaleCanvas.js';
+import { parentSizeCanvas } from '../dom/CanvasSizing.js';
 
 /**
  * 

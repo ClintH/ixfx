@@ -1,8 +1,9 @@
 import {
   pointsTracker,
 } from '../data/PointTracker.js';
-import { fullSizeElement, resolveEl as resolveElement } from './Util.js';
+import { resolveEl as resolveElement } from './ResolveEl.js';
 import * as Svg from '../visual/Svg.js';
+import { fullSizeElement } from './ElementSizing.js';
 
 export type Opts = {
   readonly touchRadius?: number;

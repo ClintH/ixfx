@@ -1,4 +1,4 @@
-import { resolveEl } from "../dom/Util.js";
+import { resolveEl } from "../dom/ResolveEl.js";
 
 /**
  * Scales a canvas to account for retina displays.

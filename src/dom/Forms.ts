@@ -1,4 +1,4 @@
-import { resolveEl } from './Util.js';
+import { resolveEl } from './ResolveEl.js';
 
 /**
  * Adds tab and shift+tab to TEXTAREA
