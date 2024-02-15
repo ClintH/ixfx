@@ -78,7 +78,10 @@ export function prepare<V extends Record<string, any>>(rx: V): Reactive<V> {
 
   const returnValue = {
     graph: g,
-    on: events.on
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    on: events.on,
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    value: events.value
   }
   return returnValue;
 }
