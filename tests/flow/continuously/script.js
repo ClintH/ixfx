@@ -1,4 +1,4 @@
-import {continuously, interval, eachInterval} from '../../../dist/flow.js';
+import {continuously, interval} from '../../../dist/flow.js';
 import * as Dom from '../../../dist/dom.js';
 import { count } from '../../../dist/generators.js'
 
@@ -122,4 +122,12 @@ async function testLongReset() {
   c.start();
   log.log(`Done.`);
 }
-testLongReset();
+//testLongReset();
+
+
+// async function testSimple() {
+//   continuously(() => {
+//     log.log(`Loop`);
+//   }).start();
+// };
+// testSimple();

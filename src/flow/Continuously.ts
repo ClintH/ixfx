@@ -228,12 +228,16 @@ export const continuously = (
   };
 
   const loop = async () => {
-    if (runState === `idle` || currentTimer === undefined) return;
+    //console.log(`continuously loop state: ${ runState } timer: ${ currentTimer }`);
+    if (runState === `idle`) return;
     runState = `running`
     startCount++;
     const valueOrPromise = callback(ticks++, performance.now() - startedAt);
     const value = typeof valueOrPromise === `object` ? (await valueOrPromise) : valueOrPromise;
-    if (cancelled) return;
+    if (cancelled) {
+      //console.log(`continiously cancelled!`);
+      return;
+    }
     runState = `scheduled`;
 
     // Didn't get a value, exit out
@@ -271,6 +275,7 @@ export const continuously = (
       }
     }
 
+    //console.log(`continuously start runState: ${ runState }`);
     if (runState === `idle`) {
       // Start running
       startedAt = performance.now();
