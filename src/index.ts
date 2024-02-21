@@ -57,7 +57,7 @@ export * as Data from './data/index.js';
 
 export * as Debug from './debug/index.js';
 
-
+export * as Rx from './rx/index.js';
 
 /**
  * Functions for different shapes, paths and coordinate spaces.
@@ -192,7 +192,7 @@ export * as Flow from './flow/index.js';
  * import {count, interval} from 'https://unpkg.com/ixfx/dist/generators.js'
  * ```
  */
-export * as Generators from './Generators.js';
+export * as Generators from './generators/index.js';
 
 /**
  * Visuals
