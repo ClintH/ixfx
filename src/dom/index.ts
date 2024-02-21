@@ -17,3 +17,4 @@ export * from './CanvasSizing.js';
 export * from './ElementSizing.js';
 export * from './ResolveEl.js';
 export * as Rx from './DomRx.js';
+export * from './Query.js';
