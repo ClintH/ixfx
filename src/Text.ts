@@ -1,5 +1,6 @@
 import { integerTest, throwFromResult } from './Guards.js';
 export { string as random } from './random/String.js';
+export { stringSegmentsFromEnd as segmentsFromEnd } from './generators/index.js'
 
 /**
  * Given a long string, abbreviates it with ...
@@ -192,10 +193,7 @@ export const splitByLength = (
   return returnValue;
 };
 
-export type UntilMatchOptions = MatchOptions & {
-  ifNoMatch: `throw` | `original` | `fallback`,
-  fallback?: string
-}
+
 
 /**
  * Returns the `source` string up until (and excluding) `match`. 
@@ -222,38 +220,92 @@ export type UntilMatchOptions = MatchOptions & {
  * @param match
  * @param startPos If provided, gives the starting offset. Default 0
  */
-export const untilMatch = (
-  source: string,
-  match: string,
-  options: Partial<UntilMatchOptions> = {}
-): string => {
-  //  ✔️ Unit tested
-  let fallback = options.fallback;
-  const ifNoMatch = options.ifNoMatch ?? (fallback ? `fallback` : `original`);
-  if (ifNoMatch === `original`) fallback = source;
-  if (ifNoMatch === `fallback` && fallback === undefined) throw new Error(`Fallback must be provided`);
-  const startPos = options.startPos ?? undefined;
-  const fromEnd = options.fromEnd ?? false;
-  const m = fromEnd
-    ? source.lastIndexOf(match, startPos)
-    : source.indexOf(match, startPos);
+// export const untilMatch = (
+//   source: string,
+//   match: string,
+//   options: Partial<UntilMatchOptions> = {}
+// ): string => {
+//   //  ✔️ Unit tested
+//   let fallback = options.fallback;
+//   const ifNoMatch = options.ifNoMatch ?? (fallback ? `fallback` : `original`);
+//   if (ifNoMatch === `original`) fallback = source;
+//   if (ifNoMatch === `fallback` && fallback === undefined) throw new Error(`Fallback must be provided`);
+//   const startPos = options.startPos ?? undefined;
+//   const fromEnd = options.fromEnd ?? false;
+//   const m = fromEnd
+//     ? source.lastIndexOf(match, startPos)
+//     : source.indexOf(match, startPos);
 
-  if (m < 0) {
-    if (ifNoMatch === `throw`) throw new Error(`Match string not found in source`);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return fallback!;
-  }
-  return source.slice(startPos ?? 0, m);
-};
+//   if (m < 0) {
+//     if (ifNoMatch === `throw`) throw new Error(`Match string not found in source`);
+//     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+//     return fallback!;
+//   }
+//   return source.slice(startPos ?? 0, m);
+// };
 
 
+// export type UntilMatchOptions = MatchOptions & {
+//   ifNoMatch: `throw` | `original` | `fallback`,
+//   fallback?: string
+// }
 
 export type MatchOptions = {
-  readonly startPos?: number;
-  readonly fromEnd?: boolean;
+  startPos: number;
+  fromEnd: boolean;
+  ifNoMatch: `throw` | `original` | `fallback`,
+  fallback: string
 }
+
+// export const afterMatch = (
+//   source: string,
+//   match: string,
+//   options: MatchOptions = {}
+// ): string => {
+//   if (source === undefined) throw new Error(`Param 'source' is undefined`);
+
+//   //  ✔️ Unit tested
+//   const startPos = options.startPos ?? undefined;
+//   const fromEnd = options.fromEnd ?? false;
+
+//   const m = fromEnd
+//     ? source.lastIndexOf(match, startPos)
+//     : source.indexOf(match, startPos);
+
+//   if (m < 0) return source;
+//   return source.slice(Math.max(0, m + match.length));
+// };
+
+/**
+ * Returns all the text in `source` that precedes (and does not include) `match`. If not found, `source` is returned.
+ * 
+ * See also: {@link beforeMatch}, {@link beforeAfterMatch}.
+ * 
+ * ```js
+ * afterMatch(`Hello. There`, `.`); // ' There'
+ * afterMatch(`Hello, there', `,`); // 'Hello, there'
+ * ```
+ * 
+ * If `source` is _undefined_, an error is thrown.
+ * @param source
+ * @param match
+ * @param startPos
+ * @returns
+ */
+export const beforeMatch = (
+  source: string,
+  match: string,
+  options: Partial<MatchOptions> = {}
+): string => {
+  const ba = beforeAfterMatch(source, match, options);
+  return ba[ 0 ];
+}
+
 /**
  * Returns all the text in `source` that follows `match`. If not found, `source` is returned.
+ * 
+ * See also: {@link beforeMatch}, {@link beforeAfterMatch}.
+ * 
  * ```js
  * afterMatch(`Hello. There`, `.`); // ' There'
  * afterMatch(`Hello, there', `,`); // 'Hello, there'
@@ -268,11 +320,31 @@ export type MatchOptions = {
 export const afterMatch = (
   source: string,
   match: string,
-  options: MatchOptions = {}
+  options: Partial<MatchOptions> = {}
 ): string => {
-  if (source === undefined) throw new Error(`source is undefined`);
+  const ba = beforeAfterMatch(source, match, options);
+  return ba[ 1 ];
+}
 
-  //  ✔️ Unit tested
+/**
+ * Returns the text that is before and after `match`.
+ * 
+ * See also: {@link beforeMatch}, {@link afterMatch}.
+ * 
+ * If `match` is at the end of start of `source`, after or before might be an empty string.
+ * @param source 
+ * @param match 
+ * @param options 
+ * @returns 
+ */
+export const beforeAfterMatch = (source: string, match: string, options: Partial<MatchOptions> = {}): [ before: string, after: string ] => {
+  if (source === undefined) throw new Error(`Param 'source' is undefined`);
+
+  let fallback = options.fallback;
+  const ifNoMatch = options.ifNoMatch ?? (fallback ? `fallback` : `original`);
+  if (ifNoMatch === `original`) fallback = source;
+  if (ifNoMatch === `fallback` && fallback === undefined) throw new Error(`Fallback must be provided`);
+
   const startPos = options.startPos ?? undefined;
   const fromEnd = options.fromEnd ?? false;
 
@@ -280,10 +352,17 @@ export const afterMatch = (
     ? source.lastIndexOf(match, startPos)
     : source.indexOf(match, startPos);
 
-  if (m < 0) return source;
-  return source.slice(Math.max(0, m + match.length));
-};
-
+  if (m < 0 && ifNoMatch === `throw`) throw new Error(`Match '${ match }' not found in source.`);
+  if (m < 0 && ifNoMatch === `original`) return [ source, source ];
+  if (m < 0 && ifNoMatch === `fallback`) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return [ fallback!, fallback! ];
+  }
+  return [
+    source.slice(0, m),
+    source.slice(Math.max(0, m + match.length))
+  ]
+}
 /**
  * 'Unwraps' a string, removing one or more 'wrapper' strings that it starts and ends with.
  * Only removes when a matching end is found.
