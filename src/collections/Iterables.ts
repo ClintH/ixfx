@@ -64,6 +64,7 @@ export const compareValuesEqual = <V>(
 /**
  * Compares the values of two iterables, returning a list
  * of items they have in common, and those unique in `a` or `b`.
+ * Ignores ordering of values.
  *
  * ```js
  * const a = ['apples', 'oranges', 'pears' ]
@@ -73,6 +74,7 @@ export const compareValuesEqual = <V>(
  * r.shared;  // [ 'pears' ]
  * r.a;       // [ 'apples', 'oranges' ]
  * r.b;       // [ 'kiwis', 'bananas' ]
+ * ```
  * @param a
  * @param b
  * @param eq
