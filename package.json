@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.18.0",
+  "version": "0.18.2",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -37,6 +37,7 @@
     "./numbers.js": "./dist/numbers.js",
     "./queues.js": "./dist/queues.js",
     "./random.js": "./dist/random.js",
+    "./rx.js": "./dist/rx.js",
     "./sets.js": "./dist/sets.js",
     "./stateMachine.js": "./dist/stateMachine.js",
     "./svg.js": "./dist/svg.js",
@@ -111,7 +112,6 @@
     "d3-color": "^3.1.0",
     "json5": "^2.2.3",
     "lit": "^3.1.1",
-    "rxjs": "^7.8.0",
     "tsimp": "^2.0.11"
   },
   "eslintIgnore": [
