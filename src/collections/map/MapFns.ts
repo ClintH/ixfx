@@ -46,6 +46,24 @@ export const getClosestIntegerKey = (
 };
 
 /**
+ * Returns the first value in `data` that matches a key from `keys`.
+ * ```js
+ * // Iterate, yielding: `a.b.c.d`, `b.c.d`, `c.d`, `d`
+ * const keys = Text.segmentsFromEnd(`a.b.c.d`);
+ * // Gets first value that matches a key (starting from most precise)
+ * const value = getFromKeys(data, keys);
+ * ```
+ * @param data 
+ * @param keys 
+ * @returns 
+ */
+export const getFromKeys = <T>(data: ReadonlyMap<string, T>, keys: Iterable<string>): T | undefined => {
+  for (const key of keys) {
+    if (data.has(key)) return data.get(key);
+  }
+}
+
+/**
  * Returns true if map contains `value` under `key`, using `comparer` function. Use {@link hasAnyValue} if you don't care
  * what key value might be under.
  *
@@ -404,7 +422,7 @@ export const addObject = <V>(map: Map<string, V>, data: any) => {
   }
 };
 /**
- * Returns the first found item that matches `predicate` or _undefined_.
+ * Returns the first found value that matches `predicate` or _undefined_.
  *
  * If you want all matches, use {@link filter}.
  *
@@ -413,8 +431,8 @@ export const addObject = <V>(map: Map<string, V>, data: any) => {
  * const overThirty = find(people, person => person.age > 30);
  * ```
  * @param map Map to search
- * @param predicate Function that returns true for a matching item
- * @returns Found item or _undefined_
+ * @param predicate Function that returns true for a matching value
+ * @returns Found value or _undefined_
  */
 export const find = <V>(
   map: ReadonlyMap<string, V>,
