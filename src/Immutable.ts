@@ -2,6 +2,7 @@
 import JSON5 from 'json5';
 import { isInteger, isPlainObjectOrPrimitive } from "./Util.js";
 import * as TraversableObject from './collections/tree/TraverseObject.js';
+import { compareValues } from './collections/Iterables.js';
 
 /**
  * Return _true_ if `a` and `b` ought to be considered equal
@@ -28,6 +29,7 @@ export type Change<V> = {
 }
 
 export type CompareDataOptions<V> = {
+  pathPrefix: string
   /**
    * Comparison function for values. By default uses
    * JSON.stringify() to compare by value.
@@ -40,48 +42,94 @@ export type CompareDataOptions<V> = {
    * Only plain-object values are used, the other keys are ignored.
    */
   deepEntries: boolean
+
+  /**
+   * If _true_, includes fields that are present in B, but missing in A.
+   * _False_ by default.
+   */
+  includeMissingFromA: boolean
 }
 
 /**
- * Scans object, producing a list of changed fields.
+ * Compares the keys of two objects, returning a set of those in
+ * common, and those in either A or B exclusively.
+ * ```js
+ * const a = { colour: `red`, intensity: 5 };
+ * const b = { colour: `pink`, size: 10 };
+ * const c = compareKeys(a, b);
+ * // c.shared = [ `colour` ]
+ * // c.a = [ `intensity` ]
+ * // c.b = [ `size`  ]
+ * ```
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const compareKeys = (a: object, b: object) => {
+  const c = compareValues(Object.keys(a), Object.keys(b));
+  return c;
+}
+
+/**
+ * Scans object, producing a list of changed fields where B's value differs from A.
  * 
  * Options:
- * - deepEntries (false): If _false_ Object.entries are used to scan the object. This won't work for some objects, eg event args
- * - eq (JSON.stringify): By-value comparison function
+ * - `deepEntries` (_false_): If _false_ Object.entries are used to scan the object. This won't work for some objects, eg event args
+ * - `eq` (JSON.stringify): By-value comparison function
+ * - `includeMissingFromA` (_false): If _true_ includes fields present on B but missing on A.
  * @param a 
  * @param b 
  * @param pathPrefix 
  * @param options
  * @returns 
  */
-export const compareData = <V extends Record<string, any>>(a: V, b: V, pathPrefix = ``, options: Partial<CompareDataOptions<V>> = {}): Array<Change<any>> => {
-
+export const compareData = <V extends Record<string, any>>(a: V, b: V, options: Partial<CompareDataOptions<V>> = {}): Array<Change<any>> => {
+  const pathPrefix = options.pathPrefix ?? ``;
   const deepProbe = options.deepEntries ?? false;
   const eq = options.eq ?? isEqualContextString;
+  const includeMissingFromA = options.includeMissingFromA ?? false;
   const changes: Array<Change<any>> = [];
 
-  let entries: Array<[ key: string, value: any ]> = [];
-  if (deepProbe) {
-    for (const field in a) {
-      const value = (a as any)[ field ];
-      if (isPlainObjectOrPrimitive(value as unknown)) {
-        entries.push([ field, value ]);
+  const getEntries = (target: V) => {
+    if (deepProbe) {
+      const entries: Array<[ key: string, value: any ]> = [];
+      for (const field in target) {
+        const value = (target as any)[ field ];
+        if (isPlainObjectOrPrimitive(value as unknown)) {
+          entries.push([ field, value ]);
+        }
       }
+      return entries;
+    } else {
+      return Object.entries(target);
     }
-  } else {
-    entries = Object.entries(a);
   }
 
-  for (const [ key, valueA ] of entries) {
+  //console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) }`);
+  const entriesA = getEntries(a);
+  const entriesAKeys = new Set<string>();
+  for (const [ key, valueA ] of entriesA) {
+    entriesAKeys.add(key);
+    //console.log(`Immutable.compareDataA key: ${ key } value: ${ valueA }`);
     if (typeof valueA === `object`) {
-      changes.push(...compareData(valueA, b[ key ], key + `.`, options));
+      changes.push(...compareData(valueA, b[ key ], { ...options, pathPrefix: key + `.` }));
     } else {
       const valueB = b[ key ];
-      const sub = pathPrefix + key;// isArray ? untilMatch(pathPrefix, `.`, { fromEnd: true }) + `[${ key }]` : pathPrefix + key;
-      //onsole.log(`sub: ${ sub } isArray: ${ isArray } pathPrefix: ${ pathPrefix } key: ${ key }`)
+      const sub = pathPrefix + key;
       if (!eq(valueA, valueB, sub)) {
+        //console.log(`  value changed. A: ${ valueA } B: ${ valueB } sub: ${ sub }`)
         changes.push({ path: sub, previous: valueA, value: valueB });
       }
+    }
+  }
+
+  if (includeMissingFromA) {
+    const entriesB = getEntries(b);
+    for (const [ key, valueB ] of entriesB) {
+      if (entriesAKeys.has(key)) continue;
+      // Key in B that's not in A
+      //console.log(`Immutable.compareDataB key: ${ key } value: ${ valueB }`);
+      changes.push({ path: pathPrefix + key, previous: undefined, value: valueB });
     }
   }
   return changes;
@@ -100,7 +148,7 @@ export const applyChanges = <V extends Record<string, any>>(a: V, changes: Array
 }
 
 /**
- * Returns a copy of an object with a specified path changed to `value`.
+ * Returns a copy of `target` object with a specified path changed to `value`.
  * 
  * ```js
  * const a = {
@@ -109,53 +157,88 @@ export const applyChanges = <V extends Record<string, any>>(a: V, changes: Array
  * }
  * 
  * const a1 = updateByPath(a, `message`, `new message`);
+ * // a1 = { message: `new message`, position: { x: 10, y: 20 }}
  * const a2 = updateByPath(a, `position.x`, 20);
+ * // a2 = { message: `hello`, position: { x: 20, y: 20 }}
  * ```
  * 
- * If the path cannot be resolved, an exception is thrown
- * @param o 
- * @param path 
- * @param value 
+ * Paths can also be array indexes:
+ * ```js
+ * updateByPath([`a`,`b`,`c`], 2, `d`);
+ * // Yields: [ `a`, `b`, `d` ]
+ * ```
+ * 
+ * By default, only existing array indexes can be updated. Use the `allowShapeChange` parameter 
+ * to allow setting arbitrary indexes.
+ * ```js
+ * // Throws because array index 3 is undefined
+ * updateByPath([ `a`, `b`, `c` ], `3`, `d`);
+ * 
+ * // With allowShapeChange flag
+ * updateByPath([ `a`, `b`, `c` ], `3`, `d`, true);
+ * // Returns: [ `a`, `b`, `c`, `d` ]
+ * ```
+ * 
+ * Throws an error if:
+ * * `path` cannot be resolved (eg. `position.z` in the above example)
+ * * `value` applied to `target` results in the object having a different shape (eg missing a field, field
+ * changing type, or array index out of bounds). Use `allowShapeChange` to suppress this error.
+ * * Path is undefined or not a string
+ * * Target is undefined/null
+ * @param target Object to update
+ * @param path Path to set value
+ * @param value Value to set
+ * @param allowShapeChange By default _false_, throwing an error if an update change the shape of the original object.
  * @returns 
  */
-export const updateByPath = <V extends Record<string, any>>(o: V, path: string, value: any, createIfNecessary = false): V => {
+export const updateByPath = <V extends Record<string, any>>(target: V, path: string, value: any, allowShapeChange = false): V => {
   if (path === undefined) throw new Error(`Parameter 'path' is undefined`);
   if (typeof path !== `string`) throw new Error(`Parameter 'path' should be a string. Got: ${ typeof path }`);
-  if (o === undefined) throw new Error(`Parameter 'o' is undefined`);
-  if (o === null) throw new Error(`Parameter 'o' is null`);
+  if (target === undefined) throw new Error(`Parameter 'target' is undefined`);
+  if (target === null) throw new Error(`Parameter 'target' is null`);
 
   const split = path.split(`.`);
-  const r = updateByPathImpl(o, split, value, createIfNecessary);
+  const r = updateByPathImpl(target, split, value, allowShapeChange);
   return r as V;
 }
 
-const updateByPathImpl = (o: any, split: Array<string>, value: any, createIfNecessary: boolean): any => {
-  if (split.length === 0) return value;
+const updateByPathImpl = (o: any, split: Array<string>, value: any, allowShapeChange: boolean): any => {
+  if (split.length === 0) {
+    //console.log(`Immutable.updateByPathImpl o: ${ JSON.stringify(o) } value: ${ JSON.stringify(value) }`);
 
+    if (allowShapeChange) return value; // yolo
+
+    if (Array.isArray(o) && !Array.isArray(value)) throw new Error(`Expected array value, got: '${ JSON.stringify(value) }'. Set allowShapeChange=true to ignore.`);
+    if (!Array.isArray(o) && Array.isArray(value)) throw new Error(`Unexpected array value, got: '${ JSON.stringify(value) }'. Set allowShapeChange=true to ignore.`);
+
+    if (typeof o !== typeof value) throw new Error(`Cannot reassign object type. (${ typeof o } -> ${ typeof value }). Set allowShapeChange=true to ignore.`);
+
+    // Make sure new value has the same set of keys
+    if (typeof o === `object` && !Array.isArray(o)) {
+      const c = compareKeys(o, value);
+      if (c.a.length > 0) {
+        throw new Error(`New value is missing key(s): ${ c.a.join(`,`) }`);
+      }
+      if (c.b.length > 0) {
+        throw new Error(`New value cannot add new key(s): ${ c.b.join(`,`) }`);
+      }
+    }
+    return value;
+  }
   const start = split.shift();
   if (!start) return value;
 
-  // const arrayStart = start.indexOf(`[`);
-  // const arrayEnd = start.indexOf(`]`, arrayStart);
-  // if (arrayStart > 0 && arrayEnd > arrayStart) {
-  //   const field = start.slice(0, arrayStart);
-  //   const index = start.slice(arrayStart, arrayEnd + 1);
-  //   split.unshift(index);
-  //   const copy = { ...o };
-  //   copy[ field ] = updateByPathImpl(copy[ field ], split, value, createIfNecessary);
-  //   return copy;
-  // }
-
   const isInt = isInteger(start);
-  if (isInt && Array.isArray(o)) { //if (start.startsWith(`[`) && start.endsWith(`]`) && Array.isArray(o)) {
-    const index = Number.parseInt(start); //start.slice(1, -1));
+  if (isInt && Array.isArray(o)) {
+    const index = Number.parseInt(start);
+    if (index >= o.length && !allowShapeChange) throw new Error(`Array index ${ index } is outside of the existing length of ${ o.length }. Use allowShapeChange=true to permit this.`);
     const copy = [ ...o ];
-    copy[ index ] = updateByPathImpl(copy[ index ], split, value, createIfNecessary);
+    copy[ index ] = updateByPathImpl(copy[ index ], split, value, allowShapeChange);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return copy;
   } else if (start in o) {
     const copy = { ...o };
-    copy[ start ] = updateByPathImpl(copy[ start ], split, value, createIfNecessary);
+    copy[ start ] = updateByPathImpl(copy[ start ], split, value, allowShapeChange);
     return copy;
   } else {
     throw new Error(`Path ${ start } not found in data`);
@@ -179,7 +262,7 @@ const updateByPathImpl = (o: any, split: Array<string>, value: any, createIfNece
  * @returns 
  */
 export const getField = <V>(object: Record<string, any>, path: string): V => {
-  if (typeof path !== `string`) throw new Error(`Parameter 'path' ought to be a string`);
+  if (typeof path !== `string`) throw new Error(`Parameter 'path' ought to be a string. Got: '${ typeof path }'`);
   if (path.length === 0) throw new Error(`Parameter 'path' is empty`);
   if (object === undefined) throw new Error(`Parameter 'object' is undefined`);
   if (object === null) throw new Error(`Parameter 'object' is null`);
@@ -212,7 +295,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): V =
       return getFieldImpl(object[ start ], split);
     }
   } else {
-    throw new Error(`Path ${ start } not found in data`);
+    throw new Error(`Path '${ start }' not found in data`);
   }
 }
 
