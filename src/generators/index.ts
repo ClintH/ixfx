@@ -1,10 +1,12 @@
-import { throwIntegerTest, throwNumberTest } from './Guards.js';
-export { pingPong, pingPongPercent } from './modulation/PingPong.js';
+import { afterMatch, beforeAfterMatch } from '../Text.js';
+import { throwIntegerTest, throwNumberTest } from '../Guards.js';
+export { pingPong, pingPongPercent } from '../modulation/PingPong.js';
 export * as Async from './IterableAsync.js';
 export * as Sync from './IterableSync.js';
+export * as Chain from './chain/index.js';
 
-export { interval } from './flow/Interval.js';
-export { delayLoop, type DelayOpts } from './flow/Delay.js';
+export { interval } from '../flow/Interval.js';
+export { delayLoop, type DelayOpts } from '../flow/Delay.js';
 
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
@@ -37,6 +39,67 @@ export const numericRangeRaw = function* (
     }
   } while (repeating);
 };
+
+/**
+ * Returns chunks of `source`, broken up by `delimiter` (default '.').
+ * 
+ * If `delimiter` is not found, no results are yielded.
+ * 
+ * ````js
+ * stringSegmentsFromEnd(`a.b.c.d`);
+ * // Yields:
+ * // `a.b.c.d`
+ * // `b.c.d`
+ * // `c.d`
+ * // `d`
+ * ```
+ * @param source 
+ * @param delimiter 
+ */
+export function* stringSegmentsFromEnd(source: string, delimiter = `.`) {
+  while (source.length > 0) {
+    yield source;
+    const trimmed = afterMatch(source, delimiter);
+    if (trimmed === source) {
+      // Delimiter not found
+      break;
+    }
+    source = trimmed;
+  }
+}
+
+/**
+ * Returns chunks of `source`, broken up by `delimiter` (default '.').
+ * 
+ * If `delimiter` is not found, no results are yielded.
+ * 
+ * ````js
+ * stringSegmentsFromStart(`a.b.c.d`);
+ * // Yields:
+ * // `d`
+ * // `c.d`
+ * // `b.c.d`
+ * // `a.b.c.d`
+ * ```
+ * @param source 
+ * @param delimiter 
+ */
+export function* stringSegmentsFromStart(source: string, delimiter = `.`) {
+  let accumulator = ``;
+  const orig = source;
+  while (source.length > 0) {
+    const ba = beforeAfterMatch(source, delimiter, { fromEnd: true, ifNoMatch: `original` });
+    if (ba[ 0 ] === ba[ 1 ] && ba[ 1 ] === source) {
+      // Delimiter not found
+      break;
+    }
+    const v = ba[ 1 ] + accumulator;
+    yield v;
+    accumulator = delimiter + v;
+    source = ba[ 0 ];
+  }
+  yield orig;
+}
 
 /**
  * Generates a range of numbers, with a given interval.
@@ -183,4 +246,4 @@ export const numericPercent = function (
   return numericRange(interval, start, end, repeating);
 };
 
-export { integerUniqueGen as randomUniqueInteger } from './random/index.js';
+export { integerUniqueGen as randomUniqueInteger } from '../random/index.js';

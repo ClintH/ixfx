@@ -1,5 +1,5 @@
-import { type IsEqual } from './IsEqual.js';
-import { sleep } from './flow/Sleep.js';
+import { type IsEqual } from '../IsEqual.js';
+import { sleep } from '../flow/Sleep.js';
 
 export async function* fromArray<V>(array: Array<V>): AsyncGenerator<V> {
   for (const v of array) {

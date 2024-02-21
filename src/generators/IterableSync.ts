@@ -1,7 +1,7 @@
-import { type ToString, toStringDefault } from './Util.js';
-import { type IsEqual } from './IsEqual.js';
+import { type ToString, toStringDefault } from '../Util.js';
+import { type IsEqual } from '../IsEqual.js';
 
-export { slice } from './iterable/SliceSync.js';
+export { slice } from '../iterable/SliceSync.js';
 
 /**
  * Filters the `input` iterable, only yielding unique values. Use {@link unique} to compare
