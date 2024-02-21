@@ -15,13 +15,9 @@ export * from './PointTracker.js';
 export * from './TrackedValue.js';
 export * from './TrackerBase.js';
 export * from './PrimitiveTracker.js';
-
 export * from './Clamp.js';
 export * from './Scale.js';
 export * from './Flip.js';
-
-export * as Reactive from './Reactive.js';
-export * as Chains from './Chain.js';
 export * as Graphs from './graphs/index.js'
 export * from './TrackUnique.js';
 export * from './Table.js';
