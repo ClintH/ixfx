@@ -3,7 +3,8 @@ import { toStringDefault, type ToString } from "../Util.js";
 export type TrackUnique<T> = (value: T) => boolean
 
 /**
- * Tracks unique values
+ * Tracks unique values. Returns _true_ if value is unique.
+ * Alternatively: {@link trackUniqueInstances}
  * 
  * ```js
  * const t = trackUnique();
@@ -23,15 +24,37 @@ export type TrackUnique<T> = (value: T) => boolean
  * // Since we're judging uniques by name only
  * t({ name:`John`, level:3 }); // false
  * ```
+ * 
+ * Return function throws an error if `value` is null or undefined.
  * @returns 
  */
 export const trackUnique = <T>(toString: ToString<T> = toStringDefault): TrackUnique<T> => {
   const set = new Set<string>();
 
   return (value: T) => {
+    if (value === null) throw new TypeError(`Param 'value' cannot be null`);
+    if (value === undefined) throw new TypeError(`Param 'value' cannot be undefined`);
+
     const asString = (typeof value === `string`) ? value : toString(value);
     if (set.has(asString)) return false;
     set.add(asString);
+    return true;
+  }
+}
+
+/**
+ * Tracks unique object instances. Returns _true_ if value is unique.
+ * Alternatively: {@link trackUnique} to track by value.
+ */
+export const trackUniqueInstances = <T>(): TrackUnique<T> => {
+
+  const set = new Set<T>();
+  return (value: T) => {
+    if (value === null) throw new TypeError(`Param 'value' cannot be null`);
+    if (value === undefined) throw new TypeError(`Param 'value' cannot be undefined`);
+
+    if (set.has(value)) return false;
+    set.add(value);
     return true;
   }
 }
