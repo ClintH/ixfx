@@ -1,5 +1,5 @@
 import type { Interval } from 'src/flow/IntervalType.js';
-import * as Rx from '../data/Reactive.js';
+import * as Rx from '../rx/index.js';
 
 /**
  * Returns an Reactive for window resize. Default 100ms debounce.
@@ -7,7 +7,6 @@ import * as Rx from '../data/Reactive.js';
  * @returns
  */
 export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<UIEvent>({ elapsed: elapsed ?? 100 })(Rx.fromEvent(window, `resize`));
-//Rx.fromEvent(window, `resize`).pipe(debounceTime(timeoutMs));
 
 /**
  * Observe when document's class changes
@@ -37,26 +36,6 @@ export const themeChange = () => {
   });
   return m;
 }
-// export const themeChangeObservable = (): Observable<
-//   ReadonlyArray<MutationRecord>
-// > => {
-//   const o = new Observable<Array<MutationRecord>>((subscriber) => {
-//     const ro = new MutationObserver((entries) => {
-//       subscriber.next(entries);
-//     });
-
-//     const opts: MutationObserverInit = {
-//       attributeFilter: [ `class` ],
-//       attributes: true,
-//     };
-
-//     ro.observe(document.documentElement, opts);
-//     return function unsubscribe() {
-//       ro.disconnect();
-//     };
-//   });
-//   return o;
-// };
 
 /**
  * Observe when element resizes. Specify `timeoutMs` to debounce, uses 100ms by default.
@@ -95,15 +74,6 @@ export const resizeObservable = (
   return Rx.Ops.debounce<Array<ResizeObserverEntry>>({ elapsed: timeout ?? 100 })(m);
 }
 
-//   const o = new Observable<Array<ResizeObserverEntry>>((subscriber) => {
-//     const ro = new ResizeObserver((entries) => {
-//       subscriber.next(entries);
-//     });
 
-//     ro.observe(elem);
-//     return function unsubscribe() {
-//       ro.unobserve(elem);
-//     };
-//   });
-//   return o.pipe(debounceTime(timeoutMs));
-// };
+
+//elements(Rx.fromObject([ `a`, `b`, `c` ]));
