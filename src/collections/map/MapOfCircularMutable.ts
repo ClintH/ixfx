@@ -36,13 +36,13 @@ export const ofCircularMutable = <V>(
     get name() {
       return `circular`;
     },
-    add: (dest, values) => {
-      if (dest === undefined) dest = circularArray<V>(opts.capacity);
+    add: (destination, values) => {
+      if (destination === undefined) destination = circularArray<V>(opts.capacity);
       for (const v of values) {
         //values.forEach(v => dest = dest?.add(v));
-        dest = dest.add(v);
+        destination = destination.add(v);
       }
-      return dest;
+      return destination;
     },
     count: (source) => source.length,
     find: (source, predicate) => source.find(predicate),

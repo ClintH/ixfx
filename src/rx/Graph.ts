@@ -27,7 +27,7 @@ function isReactive(o: object): o is Reactive<any> {
 
 /**
  * Build a graph of reactive dependencies for `rx`
- * @param rx 
+ * @param _rx 
  */
 export function prepare<V extends Record<string, any>>(_rx: V): Reactive<V> {
   let g = DiGraph.graph();

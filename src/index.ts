@@ -95,7 +95,8 @@ export * as Geometry from './geometry/index.js';
  * * {@link splitByLength}: Splits up a source string into x-charcter sized chunks
  * * {@link startsEnds}: Returns true if a string starts and end with the given strings
  * * {@link unwrap}: 'Unwraps' a string, removing characters if they appear at beginning and end
- * * {@link untilMatch}: Returns from the start of a string until match has been found
+ * * {@link beforeMatch}: Returns from the start of a string until match has been found
+ * * {@link afterMatch}: As above, but returns part of string after match
  *
  * @example Importing
  * ```js
@@ -226,7 +227,6 @@ export * as Visual from './visual/index.js';
  * Components
  * * {@link DataTable}: Creates a HTML table from an object/map of objects
  * * {@link log}: log to DOM
- * * {@link rx}: keep track of event data
  *
  * Basic DOM manipulation
  * * {@link clear}: remove all child nodes from a parent

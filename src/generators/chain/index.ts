@@ -10,6 +10,7 @@ import type { Link, GenFactoryNoInput, LazyChain, GenOrData, LinksWithSource, Ge
 import * as L from './Links.js';
 export * as Dom from './Dom.js';
 export * as Links from './Links.js';
+export * from './Types.js';
 
 function isNoInput<Out>(c: Link<any, any>): c is GenFactoryNoInput<Out> {
   if (`_allowNoInput` in c) return true;

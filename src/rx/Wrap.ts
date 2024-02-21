@@ -62,12 +62,12 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
     },
     splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => {
       const l = splitLabelled<TIn, keyof TIn>(...labels)(source);
-      const m = ImmutableMap<typeof l, Wrapped<TIn>>(l, v => wrap(v)) as Record<K, Wrapped<TIn>>;
+      const m = ImmutableMap<typeof l, Wrapped<TIn>>(l, v => wrap(v as Reactive<TIn>)) as Record<K, Wrapped<TIn>>;
       return m;
     },
     switcher: <TRec extends Record<string, FilterPredicate<TIn>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}) => {
       const s = switcher<TIn, TRec, TLabel>(source, cases, options);
-      const m = ImmutableMap<typeof s, Wrapped<TIn>>(s, v => wrap(v));
+      const m = ImmutableMap<typeof s, Wrapped<TIn>>(s, v => wrap(v as Reactive<TIn>));
       return m as Record<TLabel, Wrapped<TIn>>;
     },
     synchronise: (...additionalSources: Array<Wrapped<TIn> | ReactiveOrSource<TIn>>) => {

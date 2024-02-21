@@ -16,6 +16,7 @@ import { throwIntegerTest } from '../Guards.js';
  * @class CircularArray
  * @extends Array
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface ICircularArray<V> extends Array<V> {
   /**
    * Returns true if the array has filled to capacity and is now
@@ -28,11 +29,11 @@ export interface ICircularArray<V> extends Array<V> {
    *
    * Items are added at `pointer` position, which automatically cycles through available array indexes.
    *
-   * @param v Thing to add
+   * @param value Thing to add
    * @returns Circular with item added
    * @memberof Circular
    */
-  add(v: V): ICircularArray<V>;
+  add(value: V): ICircularArray<V>;
 
   get length(): number;
 
@@ -61,13 +62,13 @@ class CircularArray<V> extends Array {
 
   /**
    * Add to array
-   * @param thing Thing to add
+   * @param value Thing to add
    * @returns 
    */
-  add(thing: V): CircularArray<V> {
+  add(value: V): CircularArray<V> {
     const ca = CircularArray.from(this) as CircularArray<V>;
     /* eslint-disable-next-line functional/immutable-data */
-    ca[ this.#pointer ] = thing;
+    ca[ this.#pointer ] = value;
     /* eslint-disable-next-line functional/immutable-data */
     ca.#capacity = this.#capacity;
     if (this.#capacity > 0) {
