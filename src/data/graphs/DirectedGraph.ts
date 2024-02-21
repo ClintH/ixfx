@@ -3,7 +3,7 @@ import { QueueMutable, StackMutable } from "../../collections/index.js"
 import { PriorityMutable } from "../../collections/queue/PriorityMutable.js"
 import { immutable as immutableMap, type IMapImmutable } from "../../collections/map/Map.js"
 import { NumberMap } from "../../collections/map/NumberMap.js"
-import { Sync } from "../../Generators.js"
+import { Sync } from "../../generators/index.js"
 import { Table } from "../Table.js"
 
 export type DistanceCompute = (graph: DirectedGraph, edge: Edge) => number;
