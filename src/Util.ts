@@ -1,5 +1,5 @@
 import { numberTest, throwFromResult } from './Guards.js';
-export * as IterableAsync from './IterableAsync.js';
+export * as IterableAsync from './generators/IterableAsync.js';
 
 
 export type ArrayLengthMutationKeys = `splice` | `push` | `pop` | `shift` | `unshift` | number
