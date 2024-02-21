@@ -6,7 +6,7 @@ import * as Text from './Text.js';
 import * as Numbers from './Numbers.js';
 import * as Io from './io/index.js';
 import * as Flow from './flow/index.js';
-import * as Generators from './Generators.js';
+import * as Generators from './generators/index.js';
 import * as Visual from './visual/index.js';
 import * as Dom from './dom/index.js';
 import * as Events from './Events.js';
