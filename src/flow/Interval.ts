@@ -25,7 +25,8 @@ export type IntervalOpts = {
 /**
  * Generates values from `produce` with a time delay.
  * `produce` can be a simple function that returns a value, an async function, or a generator.
- *
+ * If `produce` returns _undefined_, generator exits.
+ * 
  * @example Produce a random number every 500ms:
  * ```
  * const randomGenerator = interval(() => Math.random(), 500);

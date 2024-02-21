@@ -23,9 +23,9 @@ export const resolveEl = <V extends Element>(domQueryOrEl: string | V | null | u
     }
     domQueryOrEl = d as V;
   } else if (domQueryOrEl === null) {
-    throw new Error(`domQueryOrEl ${ domQueryOrEl } is null`);
+    throw new Error(`Param 'domQueryOrEl' is null`);
   } else if (domQueryOrEl === undefined) {
-    throw new Error(`domQueryOrEl ${ domQueryOrEl } is undefined`);
+    throw new Error(`Param 'domQueryOrEl' is undefined`);
   }
   const el = domQueryOrEl;
   return el;
