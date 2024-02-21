@@ -1,7 +1,7 @@
 import { shuffle } from '../collections/arrays/index.js';
 import { numberTest as guardNumberTest, integerTest as guardIntegerTest, throwFromResult } from '../Guards.js';
 
-import { range } from '../IterableSync.js';
+import { range } from '../generators/IterableSync.js';
 import { type RandomSource, defaultRandom, type RandomOptions } from './Types.js';
 import { floatSource } from './FloatSource.js';
 
