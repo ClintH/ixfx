@@ -11,11 +11,11 @@ const addArray = <K, V>(
   data: ArrayKeys<K, V>
 ): ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
-  data.forEach((d) => {
+  for (const d of data) {
     if (d[ 0 ] === undefined) throw new Error(`key cannot be undefined`);
     if (d[ 1 ] === undefined) throw new Error(`value cannot be undefined`);
     x.set(d[ 0 ], d[ 1 ]);
-  });
+  }
   return x;
 };
 
@@ -30,12 +30,12 @@ const addObjects = <K, V>(
   data: ObjectKeys<K, V>
 ): ReadonlyMap<K, V> => {
   const x = new Map<K, V>(map.entries());
-  data.forEach((d) => {
+  for (const d of data) {
     if (d.key === undefined) throw new Error(`key cannot be undefined`);
     if (d.value === undefined) throw new Error(`value cannot be undefined`);
 
     x.set(d.key, d.value);
-  });
+  }
   return x;
 };
 
@@ -76,12 +76,12 @@ export const add = <K, V>(
   if (data.length === 0) return map;
 
   const firstRecord = data[ 0 ];
-  const isObj =
+  const isObject =
     typeof (firstRecord as { readonly key: K; readonly value: V }).key !==
     `undefined` &&
     typeof (firstRecord as { readonly key: K; readonly value: V }).value !==
     `undefined`; //(typeof (data[0] as {readonly key:K}).key !== undefined && typeof (data[0] as {readonly value:V}).value !== undefined);
-  return isObj
+  return isObject
     ? addObjects(map, data as ObjectKeys<K, V>)
     : addArray(map, data as ArrayKeys<K, V>);
 };
