@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rx-dom</title>
+</head>
+<style>
+  :root {
+    --size: 1em;
+  }
+  html,body {
+    height: 100%;
+  }
+  body {
+    background-color: silver;
+  }
+  #fields-size {
+    width: var(--size);
+    height: var(--size);
+    border: 1px solid black;
+    display: inline-block;
+  }
+  </style>
+<body>
+  <h1>rx-dom</h1>
+  <div id="simple">Simple</div>
+  <hr>
+  <div id="fields">
+    <div>Name: <span id="fields-name">name</span></div>
+    <div>Colour: <span id="fields-colour">&nbsp; &nbsp; &nbsp; &nbsp;</span></div>
+    <div>Size: <span id="fields-size">size</span></div>
+    <div>Blah: <span id="fields-blah">blah</span></div>
+  </div>
+  <hr>
+  <div id="creation">
+  </div>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>
