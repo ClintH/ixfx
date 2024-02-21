@@ -1,12 +1,13 @@
 import test from 'ava';
-import * as Chains from '../../data/Chain.js';
-import { Async, count } from '../../Generators.js';
+import * as Chains from '../../generators/chain/index.js';
+import { Async, count } from '../../generators/index.js';
 import { sleep } from '../../flow/Sleep.js';
 import { Elapsed } from '../../flow/index.js';
 import { intervalTracker } from '../../data/IntervalTracker.js';
 import { isApproximately } from '../../Numbers.js';
 
-const getData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
+const getNumberData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
+const getStringData = () => getNumberData().map(v => v.toString());
 
 test('asPromise', async t => {
   const timeout = 100;
@@ -48,10 +49,10 @@ test(`fromFunction`, async t => {
 
   // In context
   produced = 0;
-  const ch1 = Chains.run<number, string>(
+  const ch1 = Chains.run(
     Chains.fromFunction(() => produced++),
-    Chains.transform(v => `x:${ v }`),
-    Chains.take(5)
+    Chains.Links.transform(v => `x:${ v }`),
+    Chains.Links.take(5)
   );
   const ch1Result = (await Chains.asArray(ch1)).join(` `);
   t.deepEqual(ch1Result, `x:0 x:1 x:2 x:3 x:4`);
@@ -81,42 +82,42 @@ test(`lazy`, async t => {
 
 test(`chunk`, async t => {
   // Chunk of 1
-  const ch1 = Chains.run<number, number[]>(
+  const ch1 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
-    Chains.chunk<number>(1)
+    Chains.Links.chunk(1)
   );
   const r1 = await Chains.asArray(ch1);
   t.deepEqual(r1, [ [ 1 ], [ 2 ], [ 3 ], [ 4 ], [ 5 ], [ 6 ] ]);
 
   // Chunk of 2
-  const ch2 = Chains.run<number, number[]>(
+  const ch2 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
-    Chains.chunk<number>(2)
+    Chains.Links.chunk(2)
   );
   const r2 = await Chains.asArray(ch2);
   t.deepEqual(r2, [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]);
 
   // Chunk of 4 - with remainders
-  const ch3 = Chains.run<number, number[]>(
+  const ch3 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
-    Chains.chunk<number>(4)
+    Chains.Links.chunk(4)
   );
   const r3 = await Chains.asArray(ch3);
   t.deepEqual(r3, [ [ 1, 2, 3, 4 ], [ 5, 6 ] ]);
 
   // Chunk of 4 - suppress remainders
-  const ch4 = Chains.run<number, number[]>(
+  const ch4 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
-    Chains.chunk<number>(4, false)
+    Chains.Links.chunk(4, false)
   );
   const r4 = await Chains.asArray(ch4);
   t.deepEqual(r4, [ [ 1, 2, 3, 4 ] ]);
 
   // Throw for zero-sized chunk
   await t.throwsAsync(async () => {
-    const ch5 = Chains.run<number, number[]>(
+    const ch5 = Chains.run(
       [ 1, 2, 3, 4, 5, 6 ],
-      Chains.chunk<number>(0)
+      Chains.Links.chunk(0)
     );
     const r5 = await Chains.asArray(ch5);
   });
@@ -124,15 +125,15 @@ test(`chunk`, async t => {
 
 test(`flatten`, async t => {
   // Simple
-  const f = Chains.flatten<string, string>(data => data.join(`-`));
+  const f = Chains.Links.flatten<string, string>(data => data.join(`-`));
   const r1 = await Chains.single(f, [ `a`, `b`, `c` ]);
   t.is(r1, `a-b-c`);
 
-  const ch1 = Chains.run<number, string>(
+  const ch1 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
-    Chains.transform<number, string>(v => `x:${ v }`),
-    Chains.chunk<string>(3),
-    Chains.flatten<string, string>(v => v.join(`-`))
+    Chains.Links.transform(v => `x:${ v }`),
+    Chains.Links.chunk(3),
+    Chains.Links.flatten(v => v.join(`-`))
   );
   const r2 = (await Chains.asArray(ch1)).join(`;`);
   t.is(r2, `x:1-x:2-x:3;x:4-x:5-x:6`)
@@ -140,22 +141,22 @@ test(`flatten`, async t => {
 });
 
 test(`merge`, async t => {
-  const t1 = Chains.run<number, string>(
+  const t1 = Chains.run(
     Chains.tick({ interval: 50, loops: 10 }),
-    Chains.tally(),
-    Chains.transform<number, string>(v => `a:${ v }`)
+    Chains.Links.tally(),
+    Chains.Links.transform(v => `a:${ v }`)
   );
 
-  const t2 = Chains.run<number, string>(
+  const t2 = Chains.run(
     Chains.tick({ interval: 10, loops: 9 }),
-    Chains.tally(),
-    Chains.transform<number, string>(v => `b:${ v }`)
+    Chains.Links.tally(),
+    Chains.Links.transform(v => `b:${ v }`)
   );
 
-  const t3 = Chains.run<number, string>(
+  const t3 = Chains.run(
     Chains.tick({ interval: 30, loops: 8 }),
-    Chains.tally(),
-    Chains.transform<number, string>(v => `c:${ v }`)
+    Chains.Links.tally(),
+    Chains.Links.transform(v => `c:${ v }`)
   );
 
   const output = await Chains.asArray(Chains.mergeFlat(t1, t2, t3));
@@ -201,25 +202,25 @@ test('asCallback', async t => {
 });
 
 test('transform', async t => {
-  const tr = Chains.transform<string, number>(v => Number.parseInt(v));
+  const tr = Chains.Links.transform<string, number>(v => Number.parseInt(v));
   const output = await Async.toArray(tr([ `1`, `2`, `3` ]));
   const expected = [ 1, 2, 3 ];
   t.deepEqual(output, expected);
 })
 
 test('filter', async t => {
-  const data = getData();
-  const out1 = await Async.toArray(Chains.filter<number>(v => v % 2 === 0)(data));
+  const data = getNumberData();
+  const out1 = await Async.toArray(Chains.Links.filter<number>(v => v % 2 === 0)(data));
   t.deepEqual(out1, [ 2, 4, 6, 8, 10 ]);
 });
 
 test('take', async t => {
-  const inputData = getData();
+  const inputData = getNumberData();
   const limit = 5;
-  const output = await Async.toArray(Chains.take(limit)(inputData));
+  const output = await Async.toArray(Chains.Links.take(limit)(inputData));
   t.deepEqual(output, inputData.slice(0, limit));
 
-  const output2 = await Async.toArray(Chains.take(0)(inputData));
+  const output2 = await Async.toArray(Chains.Links.take(0)(inputData));
   t.is(output2.length, 0);
 });
 
@@ -236,7 +237,7 @@ test(`debounce`, async t => {
   //const elapsed = Elapsed.since();
   const ch1 = Chains.run(
     Chains.tick({ interval: 10, elapsed: 350 }),
-    Chains.debounce(100)
+    Chains.Links.debounce(100)
   );
   for await (const v of ch1) {
     t.assert(true);
@@ -247,17 +248,17 @@ test('chain', async t => {
   // Input array, transform
   const ch1 = Chains.run(
     [ `1`, `2`, `3` ],
-    Chains.transform<string, number>(v => Number.parseInt(v))
+    Chains.Links.transform(v => Number.parseInt(v))
   );
   const out1 = await Async.toArray(ch1);
   t.deepEqual(out1, [ 1, 2, 3 ]);
 
   // Input array, transform & filter
-  const data = getData();
+  const data = getStringData();
   const ch2 = Chains.run(
     data,
-    Chains.transform<string, number>(v => Number.parseInt(v)),
-    Chains.filter(v => v % 2 === 0)
+    Chains.Links.transform(v => Number.parseInt(v)),
+    Chains.Links.filter(v => v % 2 === 0)
   );
   const out2 = await Async.toArray(ch2);
   t.deepEqual(out2, [ 2, 4, 6, 8, 10 ]);
@@ -265,18 +266,90 @@ test('chain', async t => {
   // Generator input
   const ch3 = Chains.run(
     count(10, 1),
-    Chains.filter(v => v % 2 === 0)
+    Chains.Links.filter(v => v % 2 === 0)
   );
   const out3 = await Async.toArray(ch3);
   t.deepEqual(out3, [ 2, 4, 6, 8, 10 ])
 })
 
+test(`rank-array`, async t => {
+  const values = [ [ 1, 2, 3 ], [ 3, 2, 1 ], [ 1, 2, 1 ], [ 1, 1, 1 ] ];
+
+  const ranker = (a: number, b: number) => {
+    if (a > b) return `a`;
+    if (a < b) return `b`;
+    return `eq`
+  };
+
+  // Basic
+  const ch1 = Chains.run(
+    values,
+    Chains.Links.rankArray(ranker));
+  const out1 = await Async.toArray(ch1);
+  t.deepEqual(out1, [ 3 ])
+
+  // Also emit equal ranked
+  const ch2 = Chains.run(
+    values,
+    Chains.Links.rankArray(ranker, { emitEqualRanked: true }));
+  const out2 = await Async.toArray(ch2);
+  t.deepEqual(out2, [ 3, 3 ])
+
+  // Always emit max
+  const ch3 = Chains.run(
+    values,
+    Chains.Links.rankArray(ranker, { emitRepeatHighest: true }));
+  const out3 = await Async.toArray(ch3);
+  t.deepEqual(out3, [ 3, 3, 3, 3 ]);
+
+  // -- Within arrays
+  // const values = [ [1,2,3], [3,2,1], [1,2,1], [1,1,1] ];
+  const ch4 = Chains.run(
+    values,
+    Chains.Links.rankArray(ranker, { withinArrays: true }));
+  const out4 = await Async.toArray(ch4);
+  t.deepEqual(out4, [ 3, 3, 2, 1 ])
+});
+
+test(`rank`, async t => {
+  const objects: Array<{ size: number }> = [
+    { size: 4 }, { size: 2 }, { size: 10 }, { size: 10 }, { size: 1 }, { size: 4 }, { size: 11 }
+  ]
+
+  const ranker = (a: any, b: any) => {
+    if (a.size > b.size) return `a`;
+    if (a.size < b.size) return `b`;
+    return `eq`
+  };
+
+  // Basic
+  const ch1 = Chains.run(
+    objects,
+    Chains.Links.rank(ranker));
+  const out1 = await Async.toArray(ch1);
+  t.deepEqual(out1, [ { size: 4 }, { size: 10 }, { size: 11 } ])
+
+  // Also emit equal ranked
+  const ch2 = Chains.run(
+    objects,
+    Chains.Links.rank(ranker, { emitEqualRanked: true }));
+  const out2 = await Async.toArray(ch2);
+  t.deepEqual(out2, [ { size: 4 }, { size: 10 }, { size: 10 }, { size: 11 } ])
+
+  // Always emit max
+  const ch3 = Chains.run(
+    objects,
+    Chains.Links.rank(ranker, { emitRepeatHighest: true }));
+  const out3 = await Async.toArray(ch3);
+  t.deepEqual(out3, [ { size: 4 }, { size: 4 }, { size: 10 }, { size: 10 }, { size: 10 }, { size: 10 }, { size: 11 } ])
+});
+
 test('delay', async t => {
   const interval = 200;
   const ch = Chains.run(
     [ `1`, `2`, `3` ],
-    Chains.transform<string, number>(v => Number.parseInt(v)),
-    Chains.delay({ before: interval })
+    Chains.Links.transform(v => Number.parseInt(v)),
+    Chains.Links.delay<number>({ before: interval })
   );
 
   const tracker = intervalTracker();
@@ -291,7 +364,7 @@ test('tick', async t => {
   const intervalMs = 50;
   const ch1 = Chains.run(
     Chains.tick({ interval: intervalMs }),
-    Chains.transform<string, number>(v => Number.parseInt(v))
+    Chains.Links.transform(v => v)
   );
   let tracker = intervalTracker();
   let count = 0;
@@ -306,7 +379,7 @@ test('tick', async t => {
   let loops = 10;
   const ch2 = Chains.run(
     Chains.tick({ loops, interval: intervalMs }),
-    Chains.transform<string, number>(v => Number.parseInt(v))
+    Chains.Links.transform(v => v)
   );
   tracker = intervalTracker();
   count = 0;

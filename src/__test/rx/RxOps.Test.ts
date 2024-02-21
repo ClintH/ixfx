@@ -1,8 +1,8 @@
 import test from 'ava';
-import * as Rx from '../../data/Reactive.js';
+import * as Rx from '../../rx/index.js';
 import * as Flow from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
-import { count } from '../../Generators.js';
+import { count } from '../../generators/index.js';
 
 const genArray = (count: number) => {
   const data: string[] = [];
@@ -19,7 +19,7 @@ const genArray = (count: number) => {
 test(`transform`, async t => {
   // Simple array as source
   const data = [ 1, 2, 3, 4, 5 ];
-  const values = Rx.transform((v => v + '!'))(data);
+  const values = Rx.transform(data, (v => v + '!'));
   const valuesArray = await Rx.toArray(values);
   t.is(valuesArray.length, data.length);
   for (let i = 0; i < data.length; i++) {
@@ -79,7 +79,7 @@ test(`batch-elapsed-0`, async t => {
   }
   let elapsed = Date.now() - start;
   const expectedItemsPerBatch = Math.floor(batchElapsed / arrInterval);
-  console.log(`expected: ${ expectedItemsPerBatch }`);
+  //console.log(`expected: ${ expectedItemsPerBatch }`);
   // Test batching
   t.deepEqual(results, [
     [ 0.1, 0.2, 0.3, 0.4 ], [ 0.5, 0.6, 0.7, 0.8 ]

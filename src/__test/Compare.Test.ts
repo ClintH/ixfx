@@ -76,8 +76,6 @@ test(`changedDataFields-array`, t => {
   });
   t.deepEqual(r4c, { colours: [ `red`, `green` ] });
 
-
-  console.log(`changedDataFields-arrays done`);
 });
 
 // test(`compareData-array`, t => {

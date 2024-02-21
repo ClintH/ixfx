@@ -1,8 +1,8 @@
 import test from 'ava';
-import * as Rx from '../../data/Reactive.js';
+import * as Rx from '../../rx/index.js';
 import * as Flow from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
-import { count } from '../../Generators.js';
+import * as Generators from '../../generators/index.js';
 
 
 // const r = Rx.object({ name: `bob`, level: 2 });
@@ -28,6 +28,61 @@ import { count } from '../../Generators.js';
 //   // button id
 // })
 
+test(`rx-from-proxy`, async t => {
+  const { proxy: person, rx: personRx } = Rx.fromProxy({ name: `jill` });
+  let valueFired = 0;
+
+  personRx.value(v => {
+    t.deepEqual(v, { name: "john" });
+    valueFired++;
+  });
+  personRx.on(v => {
+    t.deepEqual(v.value, { name: `john` });
+    valueFired++;
+  });
+  personRx.onDiff(diff => {
+    t.deepEqual(diff.value, [ { path: `name`, value: `john`, previous: `jill` } ]);
+    valueFired++;
+  })
+
+  t.is(person.name, `jill`);
+  t.is(personRx.last().name, `jill`);
+  person.name = `john`;
+  t.is(person.name, `john`);
+  t.is(personRx.last().name, `john`);
+
+  // @ts-ignore
+  t.throws(() => proxy.age = 12);
+
+  const { proxy: person2, rx: person2Rx } = Rx.fromProxy({
+    name: `jill`, address: {
+      street: `Test St`, number: 12
+    }
+  });
+  person2Rx.value(v => {
+    valueFired++;
+  });
+  person2.address = { street: `West St`, number: 12 };
+
+  await Flow.sleep(50);
+  t.is(valueFired, 4);
+
+  valueFired = 0;
+  const { proxy: array, rx: arrayRx } = Rx.fromProxy([ `a`, `b`, `c` ]);
+  arrayRx.value(v => {
+    t.deepEqual(v, [ `a`, `d`, `c` ]);
+    valueFired++;
+  });
+  arrayRx.onDiff(diff => {
+    t.deepEqual(diff.value, [ { path: `1`, value: `d`, previous: `b` } ]);
+    valueFired++;
+  });
+
+  array[ 1 ] = `d`;
+  t.deepEqual(array, [ `a`, `d`, `c` ]);
+  await Flow.sleep(50);
+  t.is(valueFired, 2);
+});
 
 test(`rx-number`, t => {
   const nonInit = Rx.number();
@@ -45,8 +100,6 @@ test(`rx-number`, t => {
   t.truthy(x.last());
   t.true(Rx.hasLast(x));
   t.is(x.last(), 5);
-
-
 });
 
 test(`rx-from-array`, async t => {
@@ -139,7 +192,7 @@ test(`rx-event`, async t => {
     } else if (Rx.messageIsDoneSignal(msg)) {
       gotDone = true;
     } else {
-      console.log(msg);
+      t.fail(`Unexpected message: ${ JSON.stringify(msg) }`);
     }
   });
   target.dispatchEvent(new CustomEvent(`wrong`, { detail: `wrong-1` }));
@@ -170,7 +223,7 @@ test(`rx-event`, async t => {
 });
 
 test(`object-field`, async t => {
-  const o = Rx.object({ name: `bob`, level: 2 });
+  const o = Rx.fromObject({ name: `bob`, level: 2 });
   let count = 0;
   o.on(valueRaw => {
     const value = valueRaw.value;
@@ -190,18 +243,40 @@ test(`object-field`, async t => {
   t.is(count, 2);
 });
 
+test(`from-generator`, async t => {
+  // Synchronous generator
+  const r1 = Rx.fromGenerator(Generators.count(5));
+  const r1Data = await Rx.toArray(r1);
+  t.deepEqual(r1Data, [ 0, 1, 2, 3, 4 ]);
+
+  // Asynchronous generator
+  const count = 5;
+  let countProgress = count;
+  const intervalPeriod = 100;
+  const r2 = Generators.interval(() => {
+    if (countProgress === 0) return;
+    return --countProgress;
+  }, intervalPeriod);
+  let start = performance.now();
+  const r2Data = await Rx.toArray(r2);
+  let elapsed = performance.now() - start;
+  t.is(countProgress, 0);
+  t.deepEqual(r2Data, [ 4, 3, 2, 1, 0 ]);
+  t.true(isApproximately((count + 1) * intervalPeriod, 0.1)(elapsed), `Elapsed: ${ elapsed }`);
+
+});
+
 test(`object-update`, async t => {
-  const o = Rx.object({ name: `bob`, level: 2 });
+  const o = Rx.fromObject({ name: `bob`, level: 2 });
   let count = 0;
   o.on(valueRaw => {
     const value = valueRaw.value;
-    //console.log(`count: ${ count }`, value);
     if (count === 0) t.deepEqual(value, { name: `Jane`, level: 2 });
     if (count === 1) t.deepEqual(value, { name: `Jane`, level: 3 });
     count++;
   });
 
-  // Won't change anything
+  // Won't change anything, nor trigger the above event handler
   o.update({ name: `bob` });
   o.update({ level: 2 });
   t.deepEqual(o.last(), { name: `bob`, level: 2 });
@@ -212,13 +287,28 @@ test(`object-update`, async t => {
   o.update({ level: 3 });
   t.deepEqual(o.last(), { name: `Jane`, level: 3 });
 
-  await Flow.sleep(1000);
-  t.is(count, 2);
+  const o2 = Rx.fromObject([ `` ]);
+  o2.on(message => {
+    //console.log(`o2`, message.value);
+    t.deepEqual(message.value, [ `a`, `b` ]);
+    count++;
+  });
+  o2.onDiff(diffMsg => {
+    t.deepEqual(diffMsg.value, [
+      { path: '0', previous: '', value: 'a' },
+      { path: '1', previous: undefined, value: 'b' }
+    ]);
+    count++;
+  })
+  o2.set([ `a`, `b` ]);
+
+  await Flow.sleep(100);
+  t.is(count, 4);
 });
 
 test(`object-set`, async t => {
 
-  const o = Rx.object({ name: `bob`, level: 2 });
+  const o = Rx.fromObject({ name: `bob`, level: 2 });
   let count = 0;
   let diffCount = 0;
   o.on(value => {
@@ -226,7 +316,6 @@ test(`object-set`, async t => {
     if (count === 0) t.deepEqual(v, { name: `jane`, level: 2 });
     if (count === 1) t.deepEqual(v, { name: `mary`, level: 3 });
 
-    //console.log(`value: ${ JSON.stringify(v) }`);
     count++;
   });
   o.onDiff(diffV => {
@@ -307,10 +396,8 @@ test(`generator-async`, async t => {
   const start = Date.now();
   source.on(v => {
     if (v.value === undefined) return;
-    //console.log(`source.on len: ${ values1.length } v: ${ JSON.stringify(v) }`);
     values1.push(v.value);
     if (values1.length === valueCount) {
-      //console.log(`Disposing source`);
       source.dispose(`test dispose`);
       return;
     }

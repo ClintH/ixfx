@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'ava';
-import { startsEnds, abbreviate, untilMatch, afterMatch, between, betweenChomp, omitChars, splitByLength } from '../Text.js';
+import { startsEnds, abbreviate, beforeMatch, afterMatch, between, betweenChomp, omitChars, splitByLength, beforeAfterMatch } from '../Text.js';
 
 test('abbreviate', t => {
   t.is(abbreviate(`This is something`, 100), `This is something`);
@@ -9,8 +9,29 @@ test('abbreviate', t => {
   t.is(abbreviate(`abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz`, 20), `abcdefghi...rstuvwxyz`);
 });
 
+test('beforeAfterMatch', t => {
+  t.deepEqual(beforeAfterMatch('T', '.'), [ `T`, `T` ]);
+  t.deepEqual(beforeAfterMatch('T', '.', { ifNoMatch: `fallback`, fallback: `x` }), [ `x`, `x` ]);
+  t.deepEqual(beforeAfterMatch('T', '.', { ifNoMatch: `original`, fallback: `x` }), [ `T`, `T` ]);
+  t.throws(() => { beforeAfterMatch(`T`, `.`, { ifNoMatch: `throw` }) });
+
+  t.deepEqual(beforeAfterMatch('.T', '.'), [ ``, `T` ]);
+  t.deepEqual(beforeAfterMatch('.', '.'), [ ``, `` ]);
+
+  t.deepEqual(beforeAfterMatch('Hello.There', '.'), [ `Hello`, 'There' ]);
+  t.deepEqual(beforeAfterMatch('Hello.There.Poppet', '.'), [ `Hello`, 'There.Poppet' ]);
+  t.deepEqual(beforeAfterMatch('Hello.There.Poppet', '.', { fromEnd: true }), [ `Hello.There`, 'Poppet' ]);
+  t.deepEqual(beforeAfterMatch('Hello.There.Poppet', `!`), [ 'Hello.There.Poppet', 'Hello.There.Poppet' ]);
+
+  t.deepEqual(beforeAfterMatch('Hello.There.Poppet', '.', { startPos: 6 }), [ `Hello.There`, 'Poppet' ]);
+});
+
 test('afterMatch', (t) => {
   t.is(afterMatch('T', '.'), 'T');
+  t.is(afterMatch('T', '.', { ifNoMatch: `fallback`, fallback: `x` }), 'x');
+  t.is(afterMatch('T', '.', { fallback: `x` }), 'x');
+  t.throws(() => afterMatch(`T`, `.`, { ifNoMatch: `throw` }));
+
   t.is(afterMatch('.T', '.'), 'T');
   t.is(afterMatch('.', '.'), '');
 
@@ -23,23 +44,27 @@ test('afterMatch', (t) => {
 
 });
 
-test('untilMatch', (t) => {
-  t.is(untilMatch('H', '.'), 'H');
-  t.is(untilMatch('H.', '.'), 'H');
-  t.is(untilMatch('.', '.'), '');
+test('beforeMatch', (t) => {
+  t.is(beforeMatch('H', '.'), 'H');
+  t.is(beforeMatch('T', '.', { ifNoMatch: `fallback`, fallback: `x` }), 'x');
+  t.is(beforeMatch('T', '.', { fallback: `x` }), 'x');
+  t.throws(() => beforeMatch(`T`, `.`, { ifNoMatch: `throw` }));
 
-  t.is(untilMatch('Hello.There', '.'), 'Hello');
-  t.is(untilMatch('Hello.There.Poppet', '.'), 'Hello');
-  t.is(untilMatch('Hello.There.Poppet', '.', { fromEnd: true }), 'Hello.There');
-  t.is(untilMatch('Hello.There.Poppet', '!'), 'Hello.There.Poppet');
+  t.is(beforeMatch('H.', '.'), 'H');
+  t.is(beforeMatch('.', '.'), '');
 
-  t.is(untilMatch('Hello.There.Poppet', '.', { startPos: 6 }), 'There');
+  t.is(beforeMatch('Hello.There', '.'), 'Hello');
+  t.is(beforeMatch('Hello.There.Poppet', '.'), 'Hello');
+  t.is(beforeMatch('Hello.There.Poppet', '.', { fromEnd: true }), 'Hello.There');
+  t.is(beforeMatch('Hello.There.Poppet', '!'), 'Hello.There.Poppet');
+
+  t.is(beforeMatch('Hello.There.Poppet', '.', { startPos: 6 }), 'Hello.There');
 
   // With fallback
-  t.is(untilMatch(`Hello There`, '!', { fallback: `Bob` }), `Bob`);
-  t.throws(() => untilMatch(`Hello There`, '!', { ifNoMatch: `throw` }));
-  t.is(untilMatch(`Hello There`, '!', { ifNoMatch: `original` }), `Hello There`);
-  t.throws(() => untilMatch(`Hello There`, '!', { ifNoMatch: `fallback` }));
+  t.is(beforeMatch(`Hello There`, '!', { fallback: `Bob` }), `Bob`);
+  t.throws(() => beforeMatch(`Hello There`, '!', { ifNoMatch: `throw` }));
+  t.is(beforeMatch(`Hello There`, '!', { ifNoMatch: `original` }), `Hello There`);
+  t.throws(() => beforeMatch(`Hello There`, '!', { ifNoMatch: `fallback` }));
 
 });
 

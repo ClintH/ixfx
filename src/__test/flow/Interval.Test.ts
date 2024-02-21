@@ -2,7 +2,7 @@ import test from 'ava';
 import { intervalToMs, isInterval } from '../../flow/IntervalType.js';
 import { Elapsed, interval } from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
-import { count } from '../../Generators.js';
+import { count } from '../../generators/index.js';
 
 test('interval-function', async (t) => {
   const rateMs = 50;

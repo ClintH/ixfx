@@ -1,9 +1,9 @@
 import test from 'ava';
-import { compareData, getPathsAndData, map, updateByPath, applyChanges, getField, getPaths } from '../Immutable.js';
+import { compareData, getPathsAndData, map, updateByPath, applyChanges, getField, getPaths, compareKeys } from '../Immutable.js';
 import { arrayValuesEqual } from './Include.js';
 import { isEqualValueDefault } from '../IsEqual.js';
 
-test(`getPathsAndData`, t => {
+test(`get-paths-and-data`, t => {
   const d1 = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
@@ -96,7 +96,7 @@ test('get-paths', (t) => {
   ])
 });
 
-test('getField', (t) => {
+test('get-field', (t) => {
   t.is(getField({ name: { first: `Thom`, last: `Yorke` } }, `name.first`), `Thom`);
   t.is(getField({ colours: [ `red`, `green`, `blue` ] }, `colours.1`), `green`);
   t.falsy(getField({ colours: [ `red`, `green`, `blue` ] }, `colours.3`));
@@ -172,7 +172,7 @@ test('map', (t) => {
 });
 
 
-test(`applyChanges`, t => {
+test(`apply-changes`, t => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -205,7 +205,32 @@ test(`applyChanges`, t => {
   });
 });
 
-test(`compareData`, t => {
+test(`compare-data-array`, t => {
+  // Index 1 has a value when it didn't before
+  const c1 = compareData([ `a` ], [ `a`, `a` ], { includeMissingFromA: true });
+  t.deepEqual(c1, [ { path: `1`, previous: undefined, value: `a` } ]);
+
+  // Indexes 1 & 2 are now undefined
+  const c2 = compareData([ `a`, `a`, `a` ], [ `a` ], { includeMissingFromA: true });
+  t.deepEqual(c2, [ { path: `1`, previous: `a`, value: undefined }, { path: `2`, previous: `a`, value: undefined } ]);
+
+  const c3 = compareData([], [ `a`, `a`, `a` ], { includeMissingFromA: true });
+  t.deepEqual(c3, [
+    { path: `0`, previous: undefined, value: `a` },
+    { path: `1`, previous: undefined, value: `a` },
+    { path: `2`, previous: undefined, value: `a` }
+  ]);
+
+  const c4 = compareData([ `a`, `a`, `a` ], [], { includeMissingFromA: true });
+  t.deepEqual(c4, [
+    { path: `0`, previous: `a`, value: undefined },
+    { path: `1`, previous: `a`, value: undefined },
+    { path: `2`, previous: `a`, value: undefined }
+  ]);
+
+});
+
+test(`compare-data`, t => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -302,7 +327,7 @@ test(`compareData`, t => {
   ]);
 });
 
-test(`updateByPath`, t => {
+test(`update-by-path`, t => {
   const a = {
     position: { x: 10, y: 20 },
     message: `hello`
@@ -378,10 +403,58 @@ test(`updateByPath`, t => {
     ]
   });
 
-  const b3 = updateByPath(b, `values`, `hello`);
+  // Throw because we're changing the shape from an object to a string
+  t.throws(() => {
+    updateByPath(b, `values`, `hello`)
+  });
+
+  const b3 = updateByPath(b, `values`, `hello`, true);
   t.deepEqual(b3, {
     values: `hello`
   });
 
 
+
+  // Expect to throw because 'number' is missing
+  t.throws(() => {
+    updateByPath({
+      name: `jill`, address: {
+        street: `Test St`, number: 12
+      }
+    }, `address`, { street: `West St` });
+  });
+
+  const c1 = updateByPath({
+    name: `jill`, address: {
+      street: `Test St`, number: 12
+    }
+  }, `address`, { street: `West St`, number: 12 });
+  t.deepEqual(c1, {
+    name: `jill`, address: {
+      street: `West St`, number: 12
+    }
+  });
+
+  const c2 = updateByPath([ `a`, `b`, `c` ], `2`, `d`);
+  t.deepEqual(c2, [ `a`, `b`, `d` ]);
+
+  // Throws because array index is out of bounds
+  t.throws(() => {
+    updateByPath([ `a`, `b`, `c` ], `3`, `d`);
+  });
+  // Allowed
+  const c3 = updateByPath([ `a`, `b`, `c` ], `3`, `d`, true);
+
+  t.deepEqual(c3, [ `a`, `b`, `c`, `d` ]);
+
 });
+
+test(`compare-keys`, t => {
+  const a = { colour: `red`, intensity: 5 };
+  const b = { colour: `pink`, size: 10 };
+  const c = compareKeys(a, b);
+  t.deepEqual(c.shared, [ `colour` ]);
+  t.deepEqual(c.a, [ `intensity` ]);
+  t.deepEqual(c.b, [ `size` ]);
+
+})
