@@ -59,20 +59,23 @@ function creationSimple() {
   });
 }
 
-function creation() {
+/**
+ * Tests the Dom.elements function which creates and updates HTML DOM elements
+ * based on granular changes to the reactive object.
+ */
+function testElements() {
   const source = Rx.fromObject([
-    { name: `Bob`, address: {
-      street:`West St`, number: 19
-      }
+    { 
+      name: `Bob`, address: { street:`West St`, number: 19 }
     },
-    { name: `Jane`, address: {
+    { 
+      name: `Jane`, address: {
       street:`East St`, number: 20
       }
     }]
     );
-  setInterval(() => {
-    source.updateField(`1.address.number`, Math.floor(Math.random()*100));
-  }, 1000);
+
+
   Rx.Dom.elements(source, {
     container:`#creation`, 
     defaultTag:`span`,
@@ -85,7 +88,7 @@ function creation() {
         htmlContent:true,
         transform: v => `Name: ${v}`
       },
-      'address': {
+      '_root.address': {
         htmlContent:true,
         nestChildren:true,
         tagName:`div`,
@@ -93,16 +96,47 @@ function creation() {
       },
       'address.street': {
         htmlContent:true,
-        transform: v=> `Street: ${v}`
+        transform: v=> `${v}`
       },
       '_root': {
         htmlContent:true,
         nestChildren: true,
-        tagName: `div`,
-        transform: (v) => `<div><hr /></div>`
+        tagName: `section`,
+        transform: (v) => ``
       }
     }
   });
+
+  // setInterval(() => {
+  //   source.updateField(`1.address.number`, Math.floor(Math.random()*100));
+  // }, 500);
+
+  // setTimeout(() => {
+  //   source.updateField(`0`, { name: `Bobby`, address: {street:`North St`, number: 12}});
+  // }, 1000);
+
+  // New item
+  setTimeout(() => {
+    console.log(`--- new --- `);
+    const data = [
+      ...source.last(),  
+      { 
+        name: `Ringo`, address: { street:`Apple St`, number: 99 }
+      }
+    ];
+    console.log(data);
+    source.set(data);
+  }, 1500);
+
+  // Delete
+  setTimeout(() => {
+    console.log(`--- delete ---`);
+    const data = Arrays.remove(source.last(), 1);
+    console.log(data);
+    source.set(data);
+  }, 2500);
+
+
 }
 
-creation();
+testElements();
