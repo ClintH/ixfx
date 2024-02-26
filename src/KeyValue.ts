@@ -15,11 +15,16 @@ export type Primitive = string | number | bigint | boolean;
 export type BasicType = StringOrNumber | object;
 export type KeyValue = readonly [ key: string, value: StringOrNumber ];
 
-export function isPrimitive(v: any): v is Primitive {
-  if (typeof v == `number`) return true;
-  if (typeof v === `string`) return true;
-  if (typeof v == `bigint`) return true;
-  if (typeof v === `boolean`) return true;
+/**
+ * Returns _true_ if `value` is number, string, bigint or boolean.
+ * @param value Value to check
+ * @returns _True_ if value is number, string, bigint or boolean.
+ */
+export function isPrimitive(value: any): value is Primitive {
+  if (typeof value === `number`) return true;
+  if (typeof value === `string`) return true;
+  if (typeof value === `bigint`) return true;
+  if (typeof value === `boolean`) return true;
   return false;
 }
 
