@@ -1,4 +1,4 @@
-import { afterMatch, beforeAfterMatch } from '../Text.js';
+import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
 import { throwIntegerTest, throwNumberTest } from '../Guards.js';
 export { pingPong, pingPongPercent } from '../modulation/PingPong.js';
 export * as Async from './IterableAsync.js';
@@ -46,7 +46,7 @@ export const numericRangeRaw = function* (
  * If `delimiter` is not found, no results are yielded.
  * 
  * ````js
- * stringSegmentsFromEnd(`a.b.c.d`);
+ * stringSegmentsEndToEnd(`a.b.c.d`);
  * // Yields:
  * // `a.b.c.d`
  * // `b.c.d`
@@ -56,7 +56,7 @@ export const numericRangeRaw = function* (
  * @param source 
  * @param delimiter 
  */
-export function* stringSegmentsFromEnd(source: string, delimiter = `.`) {
+export function* stringSegmentsEndToEnd(source: string, delimiter = `.`) {
   while (source.length > 0) {
     yield source;
     const trimmed = afterMatch(source, delimiter);
@@ -74,7 +74,7 @@ export function* stringSegmentsFromEnd(source: string, delimiter = `.`) {
  * If `delimiter` is not found, no results are yielded.
  * 
  * ````js
- * stringSegmentsFromStart(`a.b.c.d`);
+ * stringSegmentsEndToStart(`a.b.c.d`);
  * // Yields:
  * // `d`
  * // `c.d`
@@ -84,7 +84,7 @@ export function* stringSegmentsFromEnd(source: string, delimiter = `.`) {
  * @param source 
  * @param delimiter 
  */
-export function* stringSegmentsFromStart(source: string, delimiter = `.`) {
+export function* stringSegmentsEndToStart(source: string, delimiter = `.`) {
   let accumulator = ``;
   const orig = source;
   while (source.length > 0) {
@@ -100,6 +100,60 @@ export function* stringSegmentsFromStart(source: string, delimiter = `.`) {
   }
   yield orig;
 }
+
+/**
+ * Returns chunks of `source`, broken up by `delimiter` (default '.').
+ * 
+ * If `delimiter` is not found, no results are yielded.
+ * 
+ * ```js
+ * stringSegmentsStartToEnd(`a.b.c.d`);
+ * // Yields:
+ * // `a`
+ * // `a.b`
+ * // `a.b.c`
+ * // `a.b.c.d`
+ * ```
+ * @param source 
+ * @param delimiter 
+ */
+export function* stringSegmentsStartToEnd(source: string, delimiter = `.`) {
+  let accumulator = ``;
+  const orig = source;
+  while (source.length > 0) {
+    const ba = beforeAfterMatch(source, delimiter, { ifNoMatch: `original` });
+    if (ba[ 0 ] === source && ba[ 1 ] === source) break;
+    accumulator += ba[ 0 ];
+    yield accumulator;
+    accumulator += delimiter;
+    source = ba[ 1 ];
+  }
+  yield orig;
+}
+
+/**
+ * ```js
+ * stringSegmentsStartToStart(`a.b.c.d`);
+ * // Yields:
+ * // `a.b.c.d`
+ * // `a.b.c`,
+ * // `a.b`,
+ * // `a`,
+ * ```
+ * @param source 
+ * @param delimiter 
+ */
+export function* stringSegmentsStartToStart(source: string, delimiter = `.`) {
+  const orig = source;
+  while (source.length > 0) {
+    yield source;
+
+    const b = beforeMatch(source, delimiter, { ifNoMatch: `original`, fromEnd: true });
+    if (b === source) break;
+    source = b;
+  }
+}
+
 
 /**
  * Generates a range of numbers, with a given interval.
