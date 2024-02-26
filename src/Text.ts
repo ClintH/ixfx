@@ -1,6 +1,5 @@
 import { integerTest, throwFromResult } from './Guards.js';
 export { string as random } from './random/String.js';
-export { stringSegmentsFromEnd as segmentsFromEnd } from './generators/index.js'
 
 /**
  * Given a long string, abbreviates it with ...
@@ -576,3 +575,39 @@ export const startsEnds = (
 //eslint-disable-next-line no-useless-escape
 export const htmlEntities = (source: string): string =>
   source.replaceAll(/[&<>\u00A0-\u9999]/g, (index) => `&#${ index.codePointAt(0) };`);
+
+
+/**
+ * Simple wilcard matching. Use '*' in `pattern` to denote any number of characters.
+ * ```js
+ * // Must start with 'cat'
+ * wildcard(`cat*`,`caterpillar`); // true
+ * // Must end with 'cat'
+ * wildcat(`*cat`, `bobcat`);  // true
+ * // 'cat' anywhere in string
+ * wildcard(`*cat*`, `see cat run`); // true
+ * ```
+ * @param pattern 
+ * @returns 
+ */
+export const wildcard = (pattern: string) => {
+  // Based on source: https://stackoverflow.com/questions/26246601/wildcard-string-comparison-in-javascript
+  // for this solution to work on any string, no matter what characters it has
+  const escapeRegex = (value: string) => value.replaceAll(/([!$()*+./:=?[\\\]^{|}])/g, `\\$1`);
+
+  // "."  => Find a single character, except newline or line terminator
+  // ".*" => Matches any string that contains zero or more characters
+  pattern = pattern.split(`*`).map(m => escapeRegex(m)).join(`.*`);
+
+  // "^"  => Matches any string with the following at the beginning of it
+  // "$"  => Matches any string with that in front at the end of it
+  pattern = `^` + pattern + `$`
+
+  // Create a regular expression object for matching string
+  const regex = new RegExp(pattern);
+
+  return (value: string) => {
+    // Returns true if it finds a match, otherwse it returns false
+    return regex.test(value);
+  }
+}
