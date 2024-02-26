@@ -3,6 +3,7 @@ import JSON5 from 'json5';
 import { isInteger, isPlainObjectOrPrimitive } from "./Util.js";
 import * as TraversableObject from './collections/tree/TraverseObject.js';
 import { compareValues } from './collections/Iterables.js';
+import { isPrimitive } from './KeyValue.js';
 
 /**
  * Return _true_ if `a` and `b` ought to be considered equal
@@ -84,11 +85,20 @@ export const compareKeys = (a: object, b: object) => {
  * @returns 
  */
 export const compareData = <V extends Record<string, any>>(a: V, b: V, options: Partial<CompareDataOptions<V>> = {}): Array<Change<any>> => {
+  if (a === undefined) throw new Error(`Param 'a' undefined`);
+  if (b === undefined) return [ { path: options.pathPrefix ?? ``, previous: a, value: undefined } ]
   const pathPrefix = options.pathPrefix ?? ``;
   const deepProbe = options.deepEntries ?? false;
   const eq = options.eq ?? isEqualContextString;
   const includeMissingFromA = options.includeMissingFromA ?? false;
   const changes: Array<Change<any>> = [];
+
+  console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ options.pathPrefix }`);
+
+  if (isPrimitive(a) && isPrimitive(b)) {
+    if (a !== b) changes.push({ path: options.pathPrefix ?? ``, value: b, previous: a });
+    return changes;
+  }
 
   const getEntries = (target: V) => {
     if (deepProbe) {
@@ -105,7 +115,6 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
     }
   }
 
-  //console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) }`);
   const entriesA = getEntries(a);
   const entriesAKeys = new Set<string>();
   for (const [ key, valueA ] of entriesA) {
@@ -114,12 +123,17 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
     if (typeof valueA === `object`) {
       changes.push(...compareData(valueA, b[ key ], { ...options, pathPrefix: key + `.` }));
     } else {
-      const valueB = b[ key ];
       const sub = pathPrefix + key;
-      if (!eq(valueA, valueB, sub)) {
-        //console.log(`  value changed. A: ${ valueA } B: ${ valueB } sub: ${ sub }`)
-        changes.push({ path: sub, previous: valueA, value: valueB });
+      if (key in b) {
+        const valueB = b[ key ];
+        if (!eq(valueA, valueB, sub)) {
+          //console.log(`  value changed. A: ${ valueA } B: ${ valueB } sub: ${ sub }`)
+          changes.push({ path: sub, previous: valueA, value: valueB });
+        }
+      } else {
+        changes.push({ path: sub, previous: valueA, value: undefined });
       }
+
     }
   }
 
@@ -301,8 +315,8 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): V =
 
 /**
  * Maps the properties of an object through a map function.
- * That is, run each of the values of an object through a function, an return
- * the result.
+ * That is, run each of the values of an object through a function,
+ * setting the result onto the same key structure as original.
  *
  * @example Double the value of all fields
  * ```js
@@ -325,7 +339,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): V =
  * ```
  * In addition to bulk processing, it allows remapping of property types.
  *
- * In terms of typesafety, the mapped properties are assumed to have the
+ * In terms of type-safety, the mapped properties are assumed to have the
  * same type.
  *
  * ```js
@@ -341,6 +355,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): V =
  *  return movingAverage(10);
  * });
  *
+ * // Instead of { x:number, y:number... }, we now have { x:movingAverage(), y:movingAverage()... }
  * // Add a value to the averager
  * oAvg.x.add(20);
  * ```
@@ -382,7 +397,7 @@ export type RemapObjectPropertyType<OriginalType, PropertyType> = {
  *
  * Use {@link getField} to fetch data by this 'path' string.
  *
- * If object is _null_, and empty array is returned.
+ * If object is _null_, an empty array is returned.
  * 
  * If `onlyLeaves` is _true_, only leaf nodes are included. _false_ by default.
  * ```js
@@ -412,24 +427,39 @@ export const getPaths = (object: object | null, onlyLeaves = false): ReadonlyArr
 };
 
 /**
- * Returns a representation of the object
- * @param o 
+ * Returns a representation of the object as a set of paths and data.
+ * ```js
+ * const o = { name: `hello`, size: 20, colour: { r:200, g:100, b:40 } }
+ * getPathsAndData(o);
+ * // Yields:
+ * // [ 
+ * // { path: `name`, value: `hello` },
+ * // { path: `size`, value: `20` },
+ * // { path: `colour.r`, value: `200` },
+ * // { path: `colour.g`, value: `100` },
+ * // { path: `colour.b`, value: `40` }
+ * //]
+ * ```
+ * @param o Object to get paths and data for
+ * @param maxDepth Set maximum recursion depth. By default unlimited.
+ * @param prefix Manually set a path prefix if it's necessary
  * @returns 
  */
-export const getPathsAndData = (o: object): Array<Change<any>> => {
+export const getPathsAndData = (o: object, maxDepth = Number.MAX_SAFE_INTEGER, prefix = ``): Array<Change<any>> => {
   if (o === null) return [];
   if (o === undefined) return [];
   const result: Array<Change<any>> = [];
-  getPathsAndDataImpl(o, ``, result);
+  getPathsAndDataImpl(o, prefix, result, maxDepth);
   return result;
 }
 
-const getPathsAndDataImpl = (o: object, prefix: string, result: Array<Change<any>>) => {
+const getPathsAndDataImpl = (o: object, prefix: string, result: Array<Change<any>>, maxDepth: number) => {
+  if (maxDepth <= 0) return result;
   if (typeof o === `object`) {
     for (const entries of Object.entries(o)) {
       const sub = (prefix.length > 0 ? prefix + `.` : ``) + entries[ 0 ];
       result.push({ path: sub, value: entries[ 1 ] });
-      getPathsAndDataImpl(entries[ 1 ], sub, result);
+      getPathsAndDataImpl(entries[ 1 ], sub, result, maxDepth - 1);
     }
   }
   return result;
