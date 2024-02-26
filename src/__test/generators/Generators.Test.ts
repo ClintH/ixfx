@@ -1,9 +1,9 @@
 /* eslint-disable */
 import test from 'ava';
-import { count, stringSegmentsFromEnd, stringSegmentsFromStart } from '../../generators/index.js';
+import { count, stringSegmentsEndToEnd, stringSegmentsEndToStart, stringSegmentsStartToStart, stringSegmentsStartToEnd } from '../../generators/index.js';
 
-test(`stringSegmentsFromStart`, t => {
-  const result = [ ...stringSegmentsFromStart(`a.b.c.d`, `.`) ];
+test(`stringSegmentsEndToStart`, t => {
+  const result = [ ...stringSegmentsEndToStart(`a.b.c.d`, `.`) ];
   t.deepEqual(result, [
     `d`,
     `c.d`,
@@ -12,8 +12,28 @@ test(`stringSegmentsFromStart`, t => {
   ]);
 });
 
-test(`stringSegmentsFromEnd`, t => {
-  const result = [ ...stringSegmentsFromEnd(`a.b.c.d`, `.`) ];
+test(`stringSegmentsStartToEnd`, t => {
+  const result = [ ...stringSegmentsStartToEnd(`a.b.c.d`, `.`) ];
+  t.deepEqual(result, [
+    `a`,
+    `a.b`,
+    `a.b.c`,
+    `a.b.c.d`
+  ]);
+});
+
+test(`stringSegmentsStartToStart`, t => {
+  const result = [ ...stringSegmentsStartToStart(`a.b.c.d`, `.`) ];
+  t.deepEqual(result, [
+    `a.b.c.d`,
+    `a.b.c`,
+    `a.b`,
+    `a`,
+  ]);
+});
+
+test(`stringSegmentsEndToEnd`, t => {
+  const result = [ ...stringSegmentsEndToEnd(`a.b.c.d`, `.`) ];
   t.deepEqual(result, [
     `a.b.c.d`,
     `b.c.d`,
