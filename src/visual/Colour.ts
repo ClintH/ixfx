@@ -129,7 +129,11 @@ const resolveColour = (c: Colourish): Colour => {
 };
 
 /**
- * Returns a colour in hex format `#000000`
+ * Returns a colour in hex format `#000000`. 
+ * Input colour can be a human-friendly colour name ("blue"), a HSL
+ * colour (eg. "hsl(0, 50%, 50%)")", an object {h,s,l} or {r,g,b}.
+ * Note that
+ * '#' is included as a prefix.
  * @param colour
  * @returns Hex format, including #
  */
