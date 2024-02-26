@@ -1,12 +1,13 @@
 import * as Immutable from "../Immutable.js";
 import { resolveEl } from "../dom/ResolveEl.js";
 import * as Rx from "./index.js";
-import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindTargetNodeResolved, DomBindSourceValue, DomBindValueTarget, ElementBind } from './Types.js';
+import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind } from './Types.js';
 import { hasLast, messageHasValue, messageIsSignal } from "./Util.js";
 import type { Change } from "../Immutable.js";
 import { getFromKeys } from "../collections/map/MapFns.js";
-import { stringSegmentsFromEnd, stringSegmentsFromStart } from "../generators/index.js";
-import { beforeMatch } from "src/Text.js";
+import { afterMatch, beforeMatch } from "../Text.js";
+import { stringSegmentsEndToEnd, stringSegmentsStartToEnd, stringSegmentsStartToStart } from "../generators/index.js";
+import { QueueMutable } from "src/collections/index.js";
 
 /**
  * Updates an element's `textContent` when the source value changes
@@ -490,6 +491,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
 
   for (const [ key, value ] of Object.entries(options.binds ?? {})) {
     const tagName = value.tagName ?? defaultTag;
+    //console.log(`key: ${ key }`);
     binds.set(key, {
       ...value,
       update: resolveBindUpdaterBase(value),
@@ -500,28 +502,32 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
   }
 
   const findBind = (path: string) => {
-    const bind = getFromKeys(binds, stringSegmentsFromEnd(path));
+    const bind = getFromKeys(binds, stringSegmentsEndToEnd(path));
     if (bind !== undefined) return bind;
     if (!path.includes(`.`)) return binds.get(`_root`);
   }
 
   function* ancestorBinds(path: string) {
-    let first = true;
-    for (const p of stringSegmentsFromStart(path)) {
-      console.log(`ancestorBinds path: ${ path } p: ${ p }`)
-      if (first) {
-        first = false;
-        continue;
+    for (const p of stringSegmentsStartToStart(path)) {
+      //console.log(` ancestorBinds path: ${ path } segment: ${ p }`)
+
+      if (binds.has(p)) {
+        //console.log(`  bind: ${ p } found: ${ JSON.stringify(binds.get(p)) }`);
+        yield binds.get(p);
+      } else {
+        //console.log(` bind: ${ p } not found`);
       }
-      if (binds.has(p)) yield binds.get(p);
     }
-    if (binds.has(`_root`)) yield binds.get(`_root`);
+    if (binds.has(`_root`) && path.includes(`.`)) yield binds.get(`_root`);
   }
 
 
   const create = (path: string, value: any) => {
+    const rootedPath = getRootedPath(path);
+    console.log(`Rx.Dom.elements.create: ${ path } rooted: ${ rootedPath } value: ${ JSON.stringify(value) }`);
+
     // Create
-    const bind = findBind(path);
+    const bind = findBind(getRootedPath(path));
     let tagName = defaultTag;
     if (bind?.tagName) tagName = bind.tagName;
 
@@ -530,72 +536,115 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
     update(path, el, value);
 
     let parentForEl;
-    for (const b of ancestorBinds(path)) {
-      //console.log(`path: ${ path } b: ${ JSON.stringify(b) }`);
+    for (const b of ancestorBinds(rootedPath)) {
+      //console.log(`  path: ${ rootedPath } b: ${ JSON.stringify(b) }`);
       if (b?.nestChildren) {
-        parentForEl = elByField.get(b.path === `_root` ? beforeMatch(path, `.`) : b.path);
-        if (parentForEl !== undefined) {
+        // Get root of path
+        const absoluteRoot = beforeMatch(path, `.`);
+        const findBy = b.path.replace(`_root`, absoluteRoot);
+
+        parentForEl = elByField.get(findBy);
+        if (parentForEl === undefined) {
+          //console.log(`    could not find parent. path: ${ path } b.path: ${ b.path } findBy: ${ findBy }`);
+        } else {
+          //console.log(`    found parent`);
           break;
         }
       }
     }
     (parentForEl ?? containerEl).append(el);
     elByField.set(path, el);
+    console.log(`Added el: ${ path }`);
   }
 
   const update = (path: string, el: HTMLElement, value: any) => {
-    //console.log(`update path: ${ path } value: `, value);
+    console.log(`Rx.dom.update path: ${ path } value:`, value);
 
-    const bind = findBind(path);
+    const bind = findBind(getRootedPath(path));
     if (bind === undefined) {
-      //console.log(` -- no bind for ${ path }`)
+      //console.log(`Rx.dom.update   no bind for ${ path }`)
       if (typeof value === `object`) value = JSON.stringify(value);
       el.textContent = value;
     } else {
-      //console.log(` -- got bind! ${ path } `);
+      //console.log(`Rx.dom.update   got bind! ${ path } `);
       if (bind.transform) value = bind.transform(value);
       bind.update(value, el);
     }
   }
 
   const changes = (changes: Array<Immutable.Change<any>>) => {
-    for (const d of changes) {
+    const queue = new QueueMutable({}, changes);
+    let d = queue.dequeue();
+    const seenPaths = new Set<string>();
+    while (d !== undefined) {
+      //for (const d of changes) {
+      const path = d.path;
       if (d.previous === undefined) {
-        create(d.path, d.value);
+        // Create
+        console.log(`Rx.Dom.elements.changes no previous. path: ${ path }`);
+
+        create(path, d.value);
+        const subdata = Immutable.getPathsAndData(d.value, Number.MAX_SAFE_INTEGER, path);
+        console.log(subdata);
+        for (const dd of subdata) {
+          if (!seenPaths.has(dd.path)) {
+            queue.enqueue(dd);
+            seenPaths.add(dd.path);
+          }
+        }
       } else if (d.value === undefined) {
         // Delete
-        const el = elByField.get(d.path);
+        const el = elByField.get(path);
         if (el === undefined) {
-          console.warn(`No element to delete? ${ d.path } `);
+          console.warn(`No element to delete? ${ path } `);
         } else {
+          console.log(`Rx.Dom.elements.changes delete ${ path }`);
           el.remove();
         }
       } else {
         // Update
-        const el = elByField.get(d.path);
+        const el = elByField.get(path);
         if (el === undefined) {
-          //console.warn(`No element to update ? ${ d.path } `);
-          create(d.path, d.value);
+          console.warn(`Rx.Dom.elements.changes No element to update ? ${ path } `);
+          create(path, d.value);
         } else {
-          update(d.path, el, d.value);
+          //console.log(`Rx.Dom.elements.changes Updating ${ path } `, el);
+          update(path, el, d.value);
         }
       }
+      d = queue.dequeue();
     }
   }
 
+  /**
+   * Source has changed
+   */
   source.onDiff(message => {
     if (message.value) {
-      //console.log(`diff ${ JSON.stringify(message.value) } `);
+      console.log(`Rx.Dom.elements diff ${ JSON.stringify(message.value) } `);
       changes(message.value);
     }
   });
 
+  // Source has an initial value, use that
   if (hasLast(source)) {
     const last = source.last();
-    //console.log(`last`, last);
-    changes(Immutable.getPathsAndData(last as object));
+    // Get data of value as a set of paths and data
+    // but only at first level of depth, because changes() will probe
+    // deeper itself
+    changes(Immutable.getPathsAndData(last as object, 1));
   }
 };
+
+/**
+ * Replaces the root portion of `path` with the magic keyword `_root`
+ * @param path 
+ * @returns 
+ */
+const getRootedPath = (path: string) => {
+  const after = afterMatch(path, `.`);
+  return after === path ? `_root` : `_root.` + after;
+}
 
 export function win() {
   const generateRect = () => ({ width: window.innerWidth, height: window.innerHeight });
