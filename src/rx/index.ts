@@ -270,7 +270,7 @@ export function fromObject<V extends Record<string, any>>(initialValue?: V, opti
   const set = (v: V) => {
     if (value !== undefined) {
       const diff = Immutable.compareData(value, v, { ...options, includeMissingFromA: true });
-      //console.log(`fromObject.set diff`, diff);
+      console.log(`Rx.fromObject.set diff`, diff);
       if (diff.length === 0) return;
       diffEvent.set(diff);
     }
@@ -280,38 +280,47 @@ export function fromObject<V extends Record<string, any>>(initialValue?: V, opti
   }
 
   const update = (toMerge: Partial<V>) => {
-    //const pd = Immutable.getPathsAndData(toMerge);
-    //console.log(`pd: ${ JSON.stringify(pd) }`);
     // eslint-disable-next-line unicorn/prefer-ternary
     if (value === undefined) {
       value = toMerge as V;
     } else {
       const diff = Immutable.compareData(toMerge, value);
-      //console.log(`Reactive.fromObject value: ${ JSON.stringify(value) } diff: ${ JSON.stringify(diff) }`);
+      // console.log(`Rx.fromObject.update value: ${ JSON.stringify(value) }`);
+      // console.log(`Rx.fromObject.update  diff: ${ JSON.stringify(diff) }`);
       if (diff.length === 0) return; // No changes
       value = {
         ...value,
         ...toMerge
       }
       diffEvent.set(diff);
-      //diffEvent.notify(pd);
     }
     setEvent.set(value);
   }
 
   const updateField = (path: string, valueForField: any) => {
     if (value === undefined) throw new Error(`Cannot update value when it has not already been set`);
-    //console.log(`updateField value: ${ JSON.stringify(value) }`);
+    //console.log(`Rx.fromObject.updateField path: ${ path } value: ${ JSON.stringify(valueForField) }`);
+
     const existing = Immutable.getField<any>(value, path);
+    //console.log(`Rx.fromObject.updateField path: ${ path } existing: ${ JSON.stringify(existing) }`);
     if (eq(existing, valueForField, path)) {
-      //console.log(`Rx.object.updateField identical existig: ${ existing } value: ${ valueForField } path: ${ path }`);
+      //console.log(`Rx.object.updateField identical existing: ${ existing } value: ${ valueForField } path: ${ path }`);
       return;
     }
+    let diff = Immutable.compareData(existing, valueForField, { ...options, includeMissingFromA: true });
+    diff = diff.map(d => {
+      if (d.path.length > 0) return { ...d, path: path + `.` + d.path };
+      return { ...d, path };
+    })
+
+    //console.log(`Rx.fromObject.updateField diff`, diff);
     const o = Immutable.updateByPath(value, path, valueForField);
     value = o;
-    diffEvent.set([ { path, value: valueForField, previous: existing } ]);
+    //diffEvent.set([ { path, value: valueForField, previous: existing } ]);
+
+    diffEvent.set(diff);
     setEvent.set(o);
-    //console.log(`Rx.object.updateField: path: '${ path }' value: '${ JSON.stringify(valueForField) }' o: ${ JSON.stringify(o) }`);
+    //console.log(`Rx.fromObject.updateField: path: '${ path }' value: '${ JSON.stringify(valueForField) }' o: ${ JSON.stringify(o) }`);
   }
 
   const dispose = (reason: string) => {
