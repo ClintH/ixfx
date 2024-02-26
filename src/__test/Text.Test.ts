@@ -1,6 +1,28 @@
 /* eslint-disable */
 import test from 'ava';
-import { startsEnds, abbreviate, beforeMatch, afterMatch, between, betweenChomp, omitChars, splitByLength, beforeAfterMatch } from '../Text.js';
+import { startsEnds, abbreviate, beforeMatch, afterMatch, between, betweenChomp, omitChars, splitByLength, beforeAfterMatch, wildcard } from '../Text.js';
+
+test('wildcard', t => {
+  t.true(wildcard(`bird*`)(`bird123`));
+  t.true(wildcard(`bird*`)(`birdd123`));
+  t.false(wildcard(`bird*`)(` bird123`));
+
+  t.true(wildcard(`*bird`)(`123bird`));
+  t.false(wildcard(`*bird`)(`123bird `));
+
+  t.true(wildcard(`*bird*`)(`bird123`));
+  t.true(wildcard(`*bird*`)(`123bird123`));
+  t.true(wildcard(`*bird*`)(`123bird`));
+
+  t.false(wildcard(`*bird*`)(`bir`));
+
+
+  t.true(wildcard(`*bird*bird*`)(`bird123bird`));
+  t.true(wildcard(`*bird*bird*`)(`123bird123bird123`));
+
+  t.false(wildcard(`should noo*oot match`)(`should not match`));
+
+});
 
 test('abbreviate', t => {
   t.is(abbreviate(`This is something`, 100), `This is something`);
@@ -66,6 +88,7 @@ test('beforeMatch', (t) => {
   t.is(beforeMatch(`Hello There`, '!', { ifNoMatch: `original` }), `Hello There`);
   t.throws(() => beforeMatch(`Hello There`, '!', { ifNoMatch: `fallback` }));
 
+  t.is(beforeMatch(`a.b.c.d`, `.`, { fromEnd: true }), `a.b.c`);
 });
 
 test('splitByLength', (t) => {
