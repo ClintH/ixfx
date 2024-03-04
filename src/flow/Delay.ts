@@ -128,7 +128,19 @@ export const delay = async <V>(
 /**
  * Async generator that loops via `requestAnimationFrame`.
  *
+ * We can use `for await of` to run code:
+ * ```js
+ * const loop = delayAnimationLoop();
+ * for await (const o of loop) {
+ *  // Do something...
+ *  // Warning: loops forever
+ * }
+ * // Warning: execution doesn't continue to this point
+ * // unless there is a 'break' in loop.
  * ```
+ * 
+ * Or use the generator in manually:
+ * ```js
  * // Loop forever
  * (async () => {
  *  const loop = delayAnimationLoop();
@@ -140,36 +152,46 @@ export const delay = async <V>(
  *  }
  * })();
  * ```
+ * 
+ * Practically, these approaches are not so useful
+ * because execution blocks until the loop finishes.
+ * 
+ * Instead, we might want to continually loop a bit
+ * of code while other bits of code continue to run.
+ * 
+ * The below example shows how to do this.
+ * 
+ * ```js
+ * setTimeout(async () => {
+ *  for await (const _ of delayAnimationLoop()) {
+ *    // Do soething at animation speed
+ *  }
+ * });
+ * 
+ * // Execution continues while loop also runs
+ * ```
  *
- * ```
- * const loop = delayAnimationLoop();
- * for await (const o of loop) {
- *  // Do something...
- *  // Warning: loops forever
- * }
- * ```
  */
 //eslint-disable-next-line func-style
 async function* delayAnimationLoop() {
-  //eslint-disable-next-line functional/no-let,@typescript-eslint/no-explicit-any
-  let resolve: any;
-  //eslint-disable-next-line functional/no-let
+  let resolve: ((value?: undefined) => void) | undefined;
   let p = new Promise<undefined>((r) => (resolve = r));
-  //eslint-disable-next-line functional/no-let
   let timer = 0;
   const callback = () => {
-    resolve();
+    if (resolve) resolve();
     p = new Promise<undefined>((r) => (resolve = r));
   };
 
   try {
     while (true) {
-      timer = window.requestAnimationFrame(callback);
-      yield await p;
+      timer = globalThis.requestAnimationFrame(callback);
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+      const _ = await p;
+      yield _;
     }
   } finally {
-    resolve();
-    window.cancelAnimationFrame(timer);
+    if (resolve) resolve();
+    globalThis.cancelAnimationFrame(timer);
   }
 }
 
@@ -214,24 +236,24 @@ export async function* delayLoop(timeout: Interval) {
   if (timeoutMs < 0) throw new Error(`Timeout is less than zero`);
   if (timeoutMs === 0) return yield* delayAnimationLoop();
 
-  //eslint-disable-next-line functional/no-let,@typescript-eslint/no-explicit-any
-  let resolve: any;
-  //eslint-disable-next-line functional/no-let
+  let resolve: ((value?: undefined) => void) | undefined;
   let p = new Promise<undefined>((r) => (resolve = r));
-  //eslint-disable-next-line functional/no-let
-  let timer = 0;
+  let timer: ReturnType<typeof globalThis.setTimeout> | undefined;
   const callback = () => {
-    resolve();
+    if (resolve) resolve();
     p = new Promise<undefined>((r) => (resolve = r));
   };
 
   try {
     while (true) {
-      timer = window.setTimeout(callback, timeoutMs);
-      yield await p;
+      timer = globalThis.setTimeout(callback, timeoutMs);
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+      const _ = await p;
+      yield _;
     }
   } finally {
-    resolve();
-    window.clearTimeout(timer);
+    if (resolve) resolve();
+    if (timer !== undefined) globalThis.clearTimeout(timer);
+    timer = undefined;
   }
 }

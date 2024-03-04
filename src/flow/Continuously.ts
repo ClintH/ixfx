@@ -61,11 +61,6 @@ export type ContinuouslyAsyncCallback = (
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => Promise<boolean | void>;
 
-// const raf =
-//   typeof window === `undefined`
-//     ? (callback: () => void) => window.setTimeout(callback, 1)
-//     : (callback: () => void) => window.requestAnimationFrame(callback);
-
 export type OnStartCalled = `continue` | `cancel` | `reset` | `dispose`;
 
 //eslint-disable-next-line functional/no-mixed-types

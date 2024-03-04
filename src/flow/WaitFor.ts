@@ -57,12 +57,14 @@ export const waitFor = (
   onAborted: (reason: string) => void,
   onComplete?: (success: boolean) => void
 ) => {
-  //eslint-disable-next-line functional/no-let
+
+  let t: ReturnType<typeof globalThis.setTimeout> | undefined;
+
   let success = false;
   const done = (error?: string) => {
-    if (t !== 0) {
+    if (t !== undefined) {
       window.clearTimeout(t);
-      t = 0;
+      t = undefined;
     }
     if (error) {
       onAborted(error);
@@ -72,11 +74,10 @@ export const waitFor = (
     if (onComplete !== undefined) onComplete(success);
   };
 
-  //eslint-disable-next-line functional/no-let
-  let t = window.setTimeout(() => {
-    t = 0;
+  t = globalThis.setTimeout(() => {
+    t = undefined;
     try {
-      onAborted(`Timeout after ${timeoutMs}ms`);
+      onAborted(`Timeout after ${ timeoutMs }ms`);
     } finally {
       if (onComplete !== undefined) onComplete(success);
     }

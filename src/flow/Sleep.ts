@@ -12,7 +12,6 @@ if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
     // @ts-expect-error
     globalThis.requestAnimationFrame = setImmediate;
   }
-  //window.requestAnimationFrame = window.setImmediate;
 }
 
 /**
@@ -65,6 +64,7 @@ export const sleep = <V>(
   const value = optsOrMillis.value;
   throwNumberTest(timeoutMs, `positive`, `timeoutMs`);
 
+  // eslint-disable-next-line unicorn/prefer-ternary
   if (timeoutMs === 0) {
     return new Promise<V | undefined>((resolve) =>
       requestAnimationFrame((_) => {
@@ -74,8 +74,12 @@ export const sleep = <V>(
   } else {
     return new Promise<V | undefined>((resolve, reject) => {
       const onAbortSignal = () => {
-        signal?.removeEventListener(`abort`, onAbortSignal);
-        reject(new Error(signal!.reason));
+        if (signal) {
+          signal.removeEventListener(`abort`, onAbortSignal);
+          reject(new Error(signal.reason));
+        } else {
+          reject(new Error(`Cancelled`));
+        }
       }
 
       if (signal) {
@@ -83,10 +87,11 @@ export const sleep = <V>(
         signal.addEventListener(`abort`, onAbortSignal);
       }
       setTimeout(() => {
-        if (signal?.aborted) {
-          reject(signal.reason);
+        if (signal && signal?.aborted) {
+          reject(new Error(signal.reason));
           return;
         }
+
         signal?.removeEventListener(`abort`, onAbortSignal);
 
         resolve(value);

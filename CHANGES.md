@@ -1,5 +1,27 @@
 A rough changelog between NPM releases
 
+# 0.18.3 04.03.24
+
+Generators
+* stringSegmentsStartToStart et al.: step through a 'segments' of a string. Unlike .split(), segments are generated on demand
+
+Text.wildcard: simple *-style matching
+
+Flow
+* Avoid using window. for timeout stuff, using globalThis instead for NodeJs compat
+Collections
+* ExpiringMap.clear(): clear all values
+
+# 0.18.2
+
+Collections.Maps
+* getFromKeys: returns first value in a map that matches an Iterable of keys
+
+Data
+* trackUniqueInstances: track by instance, not value
+
+Refactoring of reactive module
+
 # 0.17.5
 
 Data
