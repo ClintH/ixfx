@@ -216,7 +216,6 @@ export function* linearSpace(
   throwFromResult(numberTest(end, ``, `end`));
 
   throwFromResult(numberTest(steps, ``, `steps`));
-
   const r = precision ? round(precision) : (v: number) => v;
   const step = (end - start) / (steps - 1);
 
