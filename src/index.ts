@@ -16,6 +16,8 @@
  * @module
  */
 
+export * from './Results.js';
+
 /**
  * Processing streams of data. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
  *

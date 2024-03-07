@@ -93,7 +93,7 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
   const includeMissingFromA = options.includeMissingFromA ?? false;
   const changes: Array<Change<any>> = [];
 
-  console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ options.pathPrefix }`);
+  //console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ options.pathPrefix }`);
 
   if (isPrimitive(a) && isPrimitive(b)) {
     if (a !== b) changes.push({ path: options.pathPrefix ?? ``, value: b, previous: a });

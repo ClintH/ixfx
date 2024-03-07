@@ -6,8 +6,8 @@ import { hasLast, messageHasValue, messageIsSignal } from "./Util.js";
 import type { Change } from "../Immutable.js";
 import { getFromKeys } from "../collections/map/MapFns.js";
 import { afterMatch, beforeMatch } from "../Text.js";
-import { stringSegmentsEndToEnd, stringSegmentsStartToEnd, stringSegmentsStartToStart } from "../generators/index.js";
-import { QueueMutable } from "src/collections/index.js";
+import { stringSegmentsEndToEnd, stringSegmentsStartToStart } from "../generators/index.js";
+import { QueueMutable } from "../collections/index.js";
 
 /**
  * Updates an element's `textContent` when the source value changes

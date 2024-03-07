@@ -43,9 +43,9 @@ export const numberTest = (
   range: NumberGuardRange = ``,
   parameterName = `?`,
 ): GuardResult => {
-  if (value === null) return [ false, `Parameter ${ parameterName } is null` ];
+  if (value === null) return [ false, `Parameter '${ parameterName }' is null` ];
   if (typeof value === `undefined`) {
-    return [ false, `Parameter ${ parameterName } is undefined` ];
+    return [ false, `Parameter '${ parameterName }' is undefined` ];
   }
   if (Number.isNaN(value)) {
     return [ false, `Parameter '${ parameterName }' is NaN` ];

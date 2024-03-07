@@ -34,6 +34,7 @@ export * from './Every.js';
 export * from './RunOnce.js';
 export * from './Retry.js';
 export * from './Types.js';
+export * from './RequestResponseMatch.js';
 
 export { TaskQueue } from './TaskQueue.js';
 

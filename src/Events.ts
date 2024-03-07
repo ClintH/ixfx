@@ -1,6 +1,79 @@
 
 import type { ISimpleEventEmitter, Listener } from './ISimpleEventEmitter.js';
 import { ofSimpleMutable } from './collections/map/MapOfSimpleMutable.js';
+import { intervalToMs, type Interval } from './flow/IntervalType.js';
+
+/**
+ * Subscribes to events on `target`, returning the event data
+ * from the first event that fires.
+ * 
+ * By default waits a maximum of 1 minute.
+ * 
+ * Automatically unsubscribes on success or failure (ie. timeout)
+ * 
+ * ```js
+ * // Event will be data from either event, whichever fires first
+ * // Exception is thrown if neither fires within 1 second
+ * const event = await eventRace(document.body, [`pointermove`, `pointerdown`], { timeout: 1000 });
+ * ```
+ * @param target 
+ * @param eventNames 
+ * @param opts 
+ * @returns 
+ */
+export const eventRace = (target: EventTarget, eventNames: Array<string>, opts: Partial<{ timeout: Interval, signal: AbortSignal }> = {}) => {
+  const intervalMs = intervalToMs(opts.timeout, 60 * 1000);
+  const signal = opts.signal;
+  let triggered = false;
+  let disposed = false;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+
+  const promise = new Promise<Event>((resolve, reject) => {
+    const onEvent = (event: Event) => {
+      if (`type` in event) {
+        if (eventNames.includes(event.type)) {
+          triggered = true;
+          resolve(event);
+          dispose();
+        } else {
+          console.warn(`eventRace: Got event '${ event.type }' that is not in race list`);
+        }
+      } else {
+        console.warn(`eventRace: Event data does not have expected 'type' field`);
+        console.log(event);
+      }
+    }
+
+    for (const name of eventNames) {
+      target.addEventListener(name, onEvent);
+    }
+
+    const dispose = () => {
+      if (disposed) return;
+      if (timeout !== undefined) clearTimeout(timeout);
+      timeout = undefined;
+      disposed = true;
+      for (const name of eventNames) {
+        target.removeEventListener(name, onEvent);
+      }
+    }
+
+    timeout = setTimeout(() => {
+      if (triggered || disposed) return;
+      dispose();
+      reject(new Error(`Events not fired within interval. Events: ${ JSON.stringify(eventNames) }`));
+    }, intervalMs);
+
+
+    signal?.addEventListener(`abort`, () => {
+      if (triggered || disposed) return;
+      dispose();
+      reject(new Error(`Abort signal received ${ signal.reason }`));
+    });
+  });
+  return promise;
+}
+
 
 export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   readonly #listeners = ofSimpleMutable<Listener<Events>>();

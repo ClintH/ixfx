@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-useless-template-literals */
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from '../flow/StateMachine.js';
 
@@ -5,7 +6,7 @@ import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retry } from '../flow/Retry.js';
+import { retryFunction } from '../flow/Retry.js';
 import {
   genericStateTransitionsInstance,
   type GenericStateTransitions,
@@ -146,7 +147,7 @@ export class BleDevice extends SimpleEventEmitter<
     const gatt = this.device.gatt;
     if (gatt === undefined) throw new Error(`Gatt not available on device`);
 
-    await retry(
+    await retryFunction(
       async () => {
         this.verbose(`connect.retry`);
         const server = await gatt.connect();
@@ -171,8 +172,8 @@ export class BleDevice extends SimpleEventEmitter<
         return true;
       },
       {
-        count: attempts,
-        startMs: 200,
+        limitAttempts: attempts,
+        startAt: 200,
       }
     );
   }

@@ -1,6 +1,6 @@
 import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
 import { type Transitions } from '../flow/StateMachine.js';
-export { type StateChangeEvent };
+
 
 /**
  * Generic support for Bluetooth LE devices
@@ -43,6 +43,7 @@ export type { FrameProcessorOpts } from './FrameProcessor.js';
  *
  */
 export * as Serial from './Serial.js';
+export * from './ReconnectingWebSocket.js';
 
 export type IoDataEvent = {
   readonly data: string;
@@ -55,8 +56,8 @@ export type IoEvents<StateMachineTransitions extends Transitions> = {
 
 export const genericStateTransitionsInstance = Object.freeze({
   ready: `connecting`,
-  connecting: [`connected`, `closed`],
-  connected: [`closed`],
+  connecting: [ `connected`, `closed` ],
+  connected: [ `closed` ],
   closed: `connecting`,
 });
 
@@ -64,3 +65,5 @@ export const genericStateTransitionsInstance = Object.freeze({
 export type GenericStateTransitions = Readonly<
   typeof genericStateTransitionsInstance
 >;
+
+export { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';

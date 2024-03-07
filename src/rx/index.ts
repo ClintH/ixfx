@@ -270,7 +270,7 @@ export function fromObject<V extends Record<string, any>>(initialValue?: V, opti
   const set = (v: V) => {
     if (value !== undefined) {
       const diff = Immutable.compareData(value, v, { ...options, includeMissingFromA: true });
-      console.log(`Rx.fromObject.set diff`, diff);
+      //console.log(`Rx.fromObject.set diff`, diff);
       if (diff.length === 0) return;
       diffEvent.set(diff);
     }

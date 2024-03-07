@@ -1,7 +1,7 @@
 /* eslint-disable */
 import test from 'ava';
 import {
-  bidirectionalFromList,
+  fromListBidirectional,
   fromList,
   WithEvents,
 } from '../../flow/StateMachine.js';
@@ -124,7 +124,7 @@ test('fromList', (t) => {
 });
 
 test('fromListBidirectional', (t) => {
-  const trans = bidirectionalFromList('one', 'two', 'three');
+  const trans = fromListBidirectional('one', 'two', 'three');
   const m = new WithEvents(trans);
   arrayValuesEqual(t, m.statesDefined, [ 'one', 'two', 'three' ]);
 

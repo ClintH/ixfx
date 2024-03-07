@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-useless-template-literals */
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from '../flow/StateMachine.js';
 import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
@@ -5,7 +6,7 @@ import { indexOfCharCode, omitChars } from '../Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retry } from '../flow/Retry.js';
+import { retryFunction } from '../flow/Retry.js';
 import {
   genericStateTransitionsInstance,
   type GenericStateTransitions,
@@ -81,6 +82,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     // Transmit buffer
     this.txBuffer = new StringWriteBuffer(async (data) => {
       // When we have data to actually write to device
+      // eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression
       await this.writeInternal(data);
     }, config);
 
@@ -94,10 +96,10 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
       initial: `ready`,
     });
 
-    this.states.addEventListener(`change`, (evt) => {
-      this.fireEvent(`change`, evt);
-      this.verbose(`${ evt.priorState } -> ${ evt.newState }`);
-      if (evt.priorState === `connected`) {
+    this.states.addEventListener(`change`, (event) => {
+      this.fireEvent(`change`, event);
+      this.verbose(`${ event.priorState } -> ${ event.newState }`);
+      if (event.priorState === `connected`) {
         // Clear out buffers
         this.rxBuffer.clear();
         this.txBuffer.clear();
@@ -126,6 +128,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
    */
   protected abstract writeInternal(txt: string): void;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async close() {
     if (this.states.state !== `connected`) return;
 
@@ -161,15 +164,15 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.states.state = `connecting`;
     await this.onPreConnect();
 
-    await retry(
+    await retryFunction(
       async () => {
         await this.onConnectAttempt();
         this.states.state = `connected`;
         return true;
       },
       {
-        count: attempts,
-        startMs: 200,
+        limitAttempts: attempts,
+        startAt: 200,
       }
     );
   }
@@ -179,45 +182,45 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
    */
   protected abstract onConnectAttempt(): Promise<void>;
 
-  private onRx(evt: Event) {
+  private onRx(event: Event) {
     //const rx = this.rx;
     //if (rx === undefined) return;
 
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const view = (evt.target as any).value as DataView;
+    const view = (event.target as any).value as DataView;
     if (view === undefined) return;
 
     //eslint-disable-next-line functional/no-let
-    let str = this.codec.fromBuffer(view.buffer);
+    let string_ = this.codec.fromBuffer(view.buffer);
 
     // Check for flow control chars
-    const plzStop = indexOfCharCode(str, 19);
-    const plzStart = indexOfCharCode(str, 17);
+    const plzStop = indexOfCharCode(string_, 19);
+    const plzStart = indexOfCharCode(string_, 17);
 
     // Remove if found
     if (plzStart && plzStop < plzStart) {
       this.verbose(`Tx plz start`);
-      str = omitChars(str, plzStart, 1);
+      string_ = omitChars(string_, plzStart, 1);
       this.txBuffer.paused = false;
     }
     if (plzStop && plzStop > plzStart) {
       this.verbose(`Tx plz stop`);
-      str = omitChars(str, plzStop, 1);
+      string_ = omitChars(string_, plzStop, 1);
       this.txBuffer.paused = true;
     }
 
-    this.rxBuffer.add(str);
+    this.rxBuffer.add(string_);
   }
 
   protected verbose(m: string) {
-    if (this.verboseLogging) console.info(`${ this.name } `, m);
+    if (this.verboseLogging) console.info(`${ this.name }`, m);
   }
 
   protected log(m: string) {
-    console.log(`${ this.name } `, m);
+    console.log(`${ this.name }`, m);
   }
 
   protected warn(m: unknown) {
-    console.warn(`${ this.name } `, m);
+    console.warn(`${ this.name }`, m);
   }
 }

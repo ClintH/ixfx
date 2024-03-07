@@ -1,5 +1,13 @@
 A rough changelog between NPM releases
 
+# 0.18.4 07.03.24
+
+Io
++ reconnectingWebSocket: handle reconnecting a websocket
+
+Flow
++  RequestResponseMatch: house-keeping of matching a responses to requests, with timeout 
+
 # 0.18.3 04.03.24
 
 Generators
