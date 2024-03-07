@@ -3,7 +3,50 @@
  * In short, it allows you to signal when the function succeeded, to cancel it, or
  * to be notified if it was canceled or completes.
  *
- * @example Verbose example
+ * It does not execute or track the outcome of execution itself. Rather it's a bit
+ * of machinery that needs to be steered by your own logic.
+ * 
+ * `waitFor` takes a timeout, and two lifecycle functions, `onAborted` and `onComplete`.
+ * `onAborted` is called if the timeout has elapsed. `onComplete` will run on either success or failure.
+ * 
+ * ```js
+ * waitFor(1000, 
+ * (error) => {
+ *  // Failed
+ * },
+ * (success) => {
+ *  if (success) {
+ *    // Succeeded
+ *  }
+ * });
+ * ```
+ * 
+ * When calling `waitFor` you get back a function to signal success or failure:
+ * ```js
+ * const done = waitFor(1000, onAborted, onComplete);
+ * done();          // No parameters signals success
+ * done('failed');  // A string parameter indicates failure
+ * ```
+ * 
+ * @example Compact
+ * ```js
+ * const done = waitFor(1000,
+ *  (reason) => {
+ *    console.log(`Aborted: ${reason}`);
+ *  },
+ *  (success) => {
+ *    console.log(`Completed. Success: ${success ?? `Yes!` : `No`}`)
+ *  });
+ *
+ * try {
+ *  runSomethingThatMightScrewUp();
+ *  done(); // Signal it succeeded
+ * } catch (e) {
+ *  done(e); // Signal there was an error
+ * }
+ * ```
+ * 
+ * @example Verbose
  * ```js
  * // This function is called by `waitFor` if it was cancelled
  * const onAborted = (reason:string) => {
@@ -30,23 +73,7 @@
  *
  * The completion handler is useful for removing event handlers.
  *
- * @example Compact example
- * ```js
- * const done = waitFor(1000,
- *  (reason) => {
- *    console.log(`Aborted: ${reason}`);
- *  },
- *  (success) => {
- *    console.log(`Completed. Success: ${success ?? `Yes!` : `No`}`)
- *  });
- *
- * try {
- *  runSomethingThatMightScrewUp();
- *  done(); // Signal it succeeded
- * } catch (e) {
- *  done(e); // Signal there was an error
- * }
- * ```
+
  * @param timeoutMs
  * @param onAborted
  * @param onComplete

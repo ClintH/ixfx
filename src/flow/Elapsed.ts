@@ -5,7 +5,7 @@ import { msElapsedTimer, relativeTimer } from './Timer.js';
 export type Since = () => number;
 
 /**
- * Returns elapsed time since initial call.
+ * Returns elapsed time since the initial call.
  * ```js
  * // Record start
  * const elapsed = Elapsed.since();
@@ -37,6 +37,25 @@ export const since = (): Since => {
   };
 };
 
+/**
+ * Returns the interval between the start and each subsequent call.
+ * 
+ * ```js
+ * const interval = Elapsed.interval();
+ * interval(); // Time from Elapsed.interval()
+ * interval(); // Time since last interval() call
+ * ```
+ * @returns 
+ */
+export const interval = (): Since => {
+  let start = performance.now();
+  return (): number => {
+    const now = performance.now();
+    const x = now - start;
+    start = now;
+    return x;
+  }
+}
 /**
  * Returns elapsed time since initial call, however
  * timer stops when first invoked.

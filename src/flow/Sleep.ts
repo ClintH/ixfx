@@ -10,7 +10,9 @@ if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
   // eslint-disable-next-line unicorn/no-lonely-if
   if (typeof window === `undefined`) {
     // @ts-expect-error
-    globalThis.requestAnimationFrame = setImmediate;
+    globalThis.requestAnimationFrame = (callback) => {
+      setTimeout(callback, 1);
+    }
   }
 }
 

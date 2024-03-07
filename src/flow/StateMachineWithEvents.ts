@@ -23,6 +23,20 @@ export type Opts<V extends Transitions> = {
   readonly initial?: StateNames<V>;
 };
 
+/**
+ * A state machine that fires events when state changes.
+ * 
+ * ```js
+ * const transitions = StateMachine.fromList(`a`, `b`, `c`);
+ * const m = new StateMachineWithEvents(transitions);
+ * m.addEventListener(`change`, event => {
+ *  console.log(`${event.priorState} -> ${event.newState}`);
+ * });
+ * m.addEventListener(`stop`, event => {
+ *  console.log(`State machine has reached final state`);
+ * });
+ * ```
+ */
 export class StateMachineWithEvents<
   V extends Transitions,
 > extends SimpleEventEmitter<StateMachineEventMap<V>> {
@@ -38,7 +52,6 @@ export class StateMachineWithEvents<
    * Create a state machine with initial state, description and options
    * @param m Machine description
    * @param opts Options for machine (defaults to `{debug:false}`)
-   * @memberof StateMachine
    */
   constructor(m: V, opts: Opts<V> = {}) {
     super();
@@ -57,7 +70,7 @@ export class StateMachineWithEvents<
         if (!this.#isDoneNeedsFiring) return;
         this.#isDoneNeedsFiring = false;
         //console.log(`StateMachine isDone (${this.#state}), firing stop.`);
-        this.fireEvent(`stop`, { state: this.#sm.value as string });
+        this.fireEvent(`stop`, { state: this.#sm.value });
       }, 2);
     } else {
       this.#isDoneNeedsFiring = false;
@@ -70,14 +83,14 @@ export class StateMachineWithEvents<
    * If list is empty, no states are possible. Otherwise lists
    * possible states, including 'null' for terminal
    */
-  get statesPossible(): readonly (StateNames<V> | null)[] {
+  get statesPossible(): ReadonlyArray<StateNames<V> | null> {
     return StateMachine.possible(this.#sm);
   }
 
   /**
    * Return a list of all defined states
    */
-  get statesDefined(): readonly StateNames<V>[] {
+  get statesDefined(): ReadonlyArray<StateNames<V>> {
     return Object.keys(this.#sm.machine);
   }
 
@@ -91,15 +104,14 @@ export class StateMachineWithEvents<
   next(): string | null {
     const p = StateMachine.possible(this.#sm);
     if (p.length === 0) return null;
-    this.state = p[ 0 ] as string;
-    return p[ 0 ] as string;
+    this.state = p[ 0 ]!;
+    return p[ 0 ]!;
   }
 
   /**
-   * Returns true if state machine is in its final state
+   * Returns _true_ if state machine is in its final state
    *
    * @returns
-   * @memberof StateMachine
    */
   get isDone(): boolean {
     return StateMachine.done(this.#sm);
@@ -107,8 +119,6 @@ export class StateMachineWithEvents<
 
   /**
    * Resets machine to initial state
-   *
-   * @memberof StateMachine
    */
   reset() {
     this.#setIsDone(false);
@@ -139,20 +149,20 @@ export class StateMachineWithEvents<
 
   /**
    * Gets or sets state. Throws an error if an invalid transition is attempted.
-   * Use `StateMachine.isValid` to check validity without changing.
+   * Use `isValid()` to check validity without changing.
    *
    * If `newState` is the same as current state, the request is ignored silently.
    *
    * @memberof StateMachine
    */
   set state(newState: StateNames<V>) {
-    const priorState = this.#sm.value as string;
+    const priorState = this.#sm.value;
     if (newState === this.#sm.value) return;
 
     // Try to change state
     this.#sm = StateMachine.to(this.#sm, newState);
     if (this.#debug) {
-      console.log(`StateMachine: ${ priorState } -> ${ newState as string }`);
+      console.log(`StateMachine: ${ priorState } -> ${ newState }`);
     }
     this.#changedAt = Elapsed.since();
     setTimeout(() => {
@@ -163,14 +173,13 @@ export class StateMachineWithEvents<
   }
 
   get state(): string {
-    return this.#sm.value as string;
+    return this.#sm.value;
   }
 
   /**
    * Returns timestamp when state was last changed.
    * See also `elapsed`
    */
-  //eslint-disable-next-line functional/prefer-tacit
   get changedAt(): number {
     return this.#changedAt();
   }
@@ -179,7 +188,6 @@ export class StateMachineWithEvents<
    * Returns milliseconds elapsed since last state change.
    * See also `changedAt`
    */
-  //eslint-disable-next-line functional/prefer-tacit
   get elapsed(): number {
     return this.#changedAt();
   }

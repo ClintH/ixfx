@@ -142,6 +142,7 @@ export const init = <V extends Transitions>(
   if (!machine) throw new Error(machineValidationError);
 
   const state: StateNames<V> =
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     (initialState!) ?? Object.keys(machine.states)[ 0 ];
   if (machine.states[ state ] === undefined) {
     throw new TypeError(`Initial state not found`);
@@ -412,6 +413,7 @@ export const next = <V extends Transitions>(
 ): MachineState<V> => {
   //validateMachineState(sm);
   const first = possibleTargets(sm).at(0);
+  // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
   if (!first || first.state === null) {
     throw new Error(
       `Not possible to move to a next state from '${ sm.value }`

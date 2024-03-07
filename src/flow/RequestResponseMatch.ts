@@ -150,16 +150,36 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
     }
   }
 
+  /**
+   * Make a request and get the outcome via a Promise
+   * @param request 
+   */
   request(request: TRequest): Promise<TResp>;
+
+  /**
+   * Makes a request with a callback for the outcome
+   * @param request 
+   * @param callback 
+   */
+  request(request: TRequest, callback: (error: boolean, response: TResp | string) => void): void;
+
+  /**
+   * Makes a request.
+   * If `callback` is set, it's equivalent to calling `requestCallback`.
+   * If `callback` is not set, a promise is returned
+   * @param request 
+   * @param callback 
+   * @returns 
+   */
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   request(request: TRequest, callback?: (error: boolean, response: TResp | string) => void): void | Promise<TResp> {
-    if (callback !== undefined) { this.requestCallback(request, callback); return; }
-    return this.requestAwait(request);
+    if (callback !== undefined) { this.#requestCallback(request, callback); return; }
+    return this.#requestAwait(request);
   }
 
   /**
-   * Make a request and not wait for a response to this specific message.
-   * @param req 
+   * Make a request and don't wait for the outcome.
+   * @param request 
    */
   requestAndForget(request: TRequest) {
     const id = this.keyRequest(request);
@@ -175,12 +195,12 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
   }
 
   /**
-   * Make a request, returning a Promise for the value.
+   * Make a request, returning a Promise for the outcome.
    * Errors will throw an exception.
-   * @param req 
+   * @param request 
    * @returns 
    */
-  requestAwait(request: TRequest) {
+  #requestAwait(request: TRequest) {
     const id = this.keyRequest(request);
     if (this.#outgoing.has(id)) throw new Error(`Already a request pending with id '${ id }'`);
 
@@ -200,11 +220,11 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
   }
 
   /**
-   * Make a request with a callback for result value or error
-   * @param req 
+   * Make a request, and get notified of outcome with a callback
+   * @param request 
    * @param callback 
    */
-  requestCallback(request: TRequest, callback: (error: boolean, response: TResp | string) => void) {
+  #requestCallback(request: TRequest, callback: (error: boolean, response: TResp | string) => void) {
     const id = this.keyRequest(request);
     if (this.#outgoing.has(id)) throw new Error(`Already a request pending with id '${ id }'`);
 
@@ -220,14 +240,14 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
 
   /**
    * Response has been received
-   * @param resp Response
+   * @param response Response
    * @returns _True_ if response matched a request 
    */
-  response(resp: TResp, keepAlive: boolean): boolean {
-    const id = this.keyResponse(resp);
+  response(response: TResp, keepAlive: boolean): boolean {
+    const id = this.keyResponse(response);
     const request = this.#outgoing.get(id);
     if (!request) {
-      if (this.whenUnmatchedResponse === `throw`) throw new Error(`Unmatched response with id: '${ id }'`, { cause: resp });
+      if (this.whenUnmatchedResponse === `throw`) throw new Error(`Unmatched response with id: '${ id }'`, { cause: response });
       // otherwise ignore
       return false;
     }
@@ -239,14 +259,14 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
       this.#outgoing.delete(id);
     }
     if (request.promiseResolve) {
-      request.promiseResolve(resp);
+      request.promiseResolve(response);
     }
     if (request.callback) {
-      request.callback(false, resp);
+      request.callback(false, response);
     }
-    this.fireEvent(`match`, { request: request.req, response: resp });
+    this.fireEvent(`match`, { request: request.req, response: response });
     if (!keepAlive) {
-      this.fireEvent(`completed`, { request: request.req, response: resp, success: true });
+      this.fireEvent(`completed`, { request: request.req, response: response, success: true });
     }
     return true;
   }

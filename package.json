@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.18.4",
+  "version": "0.18.5",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -25,12 +25,12 @@
     "./events.js": "./dist/events.js",
     "./forms.js": "./dist/forms.js",
     "./flow.js": "./dist/flow.js",
-    "./geometry.js": "./dist/geometry.js",
     "./generators.js": "./dist/generators.js",
+    "./geometry.js": "./dist/geometry.js",
     "./guards.js": "./dist/guards.js",
     "./global.js": "./dist/global.js",
-    "./io.js": "./dist/io/js",
     "./immutable.js": "./dist/immutable.js",
+    "./io.js": "./dist/io/js",
     "./keyValues.js": "./dist/keyValues.js",
     "./modulation.js": "./dist/modulation.js",
     "./maps.js": "./dist/maps.js",
