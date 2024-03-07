@@ -588,7 +588,7 @@ export const angleFromAccelerationForce =
     };
 
 /**
- * Yields a force function that applies the thing's velocity to its angular acceleration.
+ * Yields a force function that applies the thing's velocity to its angle.
  * This will mean it points in the direction of travel.
  * @param interpolateAmt If provided, the angle will be interpolated toward by this amount. Defaults to 1, no interpolation
  * @returns

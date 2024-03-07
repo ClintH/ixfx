@@ -327,7 +327,7 @@ class AdsrBase extends SimpleEventEmitter<Events> {
  * const env = Envelopes.adsr(opts);
  * ```
  *
- * [Options for envelope](https://clinth.github.io/ixfx/types/Modulation.EnvelopeOpts.html) are as follows:
+ * [Options for envelope](https://clinth.github.io/ixfx/types/Modulation.Envelopes.AdsrOpts.html) are as follows:
  *
  * ```js
  * initialLevel?: number
@@ -543,6 +543,20 @@ class AdsrImpl extends AdsrBase implements Adsr {
 
 /**
  * Creates an {@link Adsr} envelope.
+ * 
+ * ```js
+ * const opts = {
+ *  ...Envelopes.defaultAdsrOpts(),
+ *  attackDuration: 1000,
+ *  releaseDuration: 1000,
+ *  sustainLevel: 1,
+ *  attackBend: 1,
+ *  decayBend: -1
+ * };
+ * const env = Envelopes.adsr(opts);
+ * ```
+ * 
+ * See {@link Adsr} for more.
  * @param opts
  * @returns New {@link Adsr} Envelope
  */
