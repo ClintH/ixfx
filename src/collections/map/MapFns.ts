@@ -238,7 +238,7 @@ export const sortByValue = <K, V>(
   comparer?: (a: V, b: V) => number
 ) => {
   const f = comparer ?? defaultComparer;
-  [ ...map.entries() ].sort((a, b) => f(a[ 1 ], b[ 1 ]));
+  return [ ...map.entries() ].sort((a, b) => f(a[ 1 ], b[ 1 ]));
 };
 
 /**

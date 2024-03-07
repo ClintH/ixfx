@@ -128,7 +128,7 @@ export const isValid = (possibleNumber: unknown) => {
 };
 
 /**
- * Alias for [Data.numberTracker](Data.numberTracker.html)
+ * Alias for [Data.numberTracker](https://clinth.github.io/ixfx/classes/Data.numberTracker-1.html)
  */
 export const tracker = (options?: TrackedValueOptions) => numberTracker(options);
 
