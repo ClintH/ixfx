@@ -3,6 +3,7 @@ import { isEqualDefault, type IsEqual } from "../../IsEqual.js";
 import { QueueMutable } from "../queue/QueueMutable.js";
 import { StackMutable } from "../stack/StackMutable.js";
 import type { TraversableTree } from "./Types.js";
+import { quadTree } from "src/geometry/QuadTree.js";
 
 export const childrenLength = <T>(tree: TraversableTree<T>): number => {
   return [ ...tree.children() ].length;
@@ -264,12 +265,14 @@ export const findChildByValue = <TValue>(parent: TraversableTree<TValue>,
  * @param root Root node 
  * @returns 
  */
-export function* depthFirst<T>(root: TraversableTree<T>): IterableIterator<TraversableTree<T>> {
+export function* depthFirst<T extends TraversableTree<any>>(root: T): Generator<T> {
   if (!root) return;
-  const stack = new StackMutable<TraversableTree<T>>();
-  let entry: TraversableTree<T> | undefined = root;
+  const stack = new StackMutable<T>();
+  let entry: T | undefined = root;
   while (entry) {
-    stack.push(...entry.children());
+    const entries = [ ...entry.children() ] as Array<T>;
+    stack.push(...entries);
+    if (stack.isEmpty) break;
     entry = stack.pop();
     if (entry) yield entry;
   }
