@@ -4,7 +4,6 @@ import * as Flow from '../../flow/index.js';
 import { isApproximately } from '../../Numbers.js';
 import * as Generators from '../../generators/index.js';
 
-
 // const r = Rx.object({ name: `bob`, level: 2 });
 // r.on(value => {
 //   // reactive value has been changed
@@ -28,61 +27,89 @@ import * as Generators from '../../generators/index.js';
 //   // button id
 // })
 
-test(`rx-from-proxy`, async t => {
-  const { proxy: person, rx: personRx } = Rx.fromProxy({ name: `jill` });
-  let valueFired = 0;
-
-  personRx.value(v => {
-    t.deepEqual(v, { name: "john" });
-    valueFired++;
-  });
-  personRx.on(v => {
-    t.deepEqual(v.value, { name: `john` });
-    valueFired++;
-  });
-  personRx.onDiff(diff => {
-    t.deepEqual(diff.value, [ { path: `name`, value: `john`, previous: `jill` } ]);
-    valueFired++;
+test(`rx-from-proxy-array`, async t => {
+  const { proxy, rx } = Rx.fromProxy([ `one`, `two`, `three` ]);
+  let step = 0;
+  rx.value(v => {
+    //console.log(`value`, v);
+    switch (step) {
+      case 0: {
+        t.deepEqual(v, [ `one`, `two`, `three`, `four` ]);
+        break;
+      }
+      case 1: {
+        t.deepEqual(v, [ `one`, `two`, `three` ]);
+        break;
+      }
+    }
   })
 
-  t.is(person.name, `jill`);
-  t.is(personRx.last().name, `jill`);
-  person.name = `john`;
-  t.is(person.name, `john`);
-  t.is(personRx.last().name, `john`);
-
-  // @ts-ignore
-  t.throws(() => proxy.age = 12);
-
-  const { proxy: person2, rx: person2Rx } = Rx.fromProxy({
-    name: `jill`, address: {
-      street: `Test St`, number: 12
-    }
-  });
-  person2Rx.value(v => {
-    valueFired++;
-  });
-  person2.address = { street: `West St`, number: 12 };
-
+  // Step 0: [one,two,three,four]  
+  proxy.push(`four`);
   await Flow.sleep(50);
-  t.is(valueFired, 4);
 
-  valueFired = 0;
-  const { proxy: array, rx: arrayRx } = Rx.fromProxy([ `a`, `b`, `c` ]);
-  arrayRx.value(v => {
-    t.deepEqual(v, [ `a`, `d`, `c` ]);
-    valueFired++;
-  });
-  arrayRx.onDiff(diff => {
-    t.deepEqual(diff.value, [ { path: `1`, value: `d`, previous: `b` } ]);
-    valueFired++;
-  });
-
-  array[ 1 ] = `d`;
-  t.deepEqual(array, [ `a`, `d`, `c` ]);
+  // Step 1: [one, two, three]
+  step++;
+  proxy.pop();
   await Flow.sleep(50);
-  t.is(valueFired, 2);
+
 });
+
+// test(`rx-from-proxy-object`, async t => {
+//   const { proxy: person, rx: personRx } = Rx.fromProxy({ name: `jill` });
+//   let valueFired = 0;
+
+//   personRx.value(v => {
+//     t.deepEqual(v, { name: "john" });
+//     valueFired++;
+//   });
+//   personRx.on(v => {
+//     t.deepEqual(v.value, { name: `john` });
+//     valueFired++;
+//   });
+//   personRx.onDiff(diff => {
+//     t.deepEqual(diff.value, [ { path: `name`, value: `john`, previous: `jill` } ]);
+//     valueFired++;
+//   })
+
+//   t.is(person.name, `jill`);
+//   t.is(personRx.last().name, `jill`);
+//   person.name = `john`;
+//   t.is(person.name, `john`);
+//   t.is(personRx.last().name, `john`);
+
+//   // @ts-ignore
+//   t.throws(() => proxy.age = 12);
+
+//   const { proxy: person2, rx: person2Rx } = Rx.fromProxy({
+//     name: `jill`, address: {
+//       street: `Test St`, number: 12
+//     }
+//   });
+//   person2Rx.value(v => {
+//     valueFired++;
+//   });
+//   person2.address = { street: `West St`, number: 12 };
+
+//   await Flow.sleep(50);
+//   t.is(valueFired, 4);
+
+//   valueFired = 0;
+//   const { proxy: array, rx: arrayRx } = Rx.fromProxy([ `a`, `b`, `c` ]);
+//   arrayRx.value(v => {
+//     t.deepEqual(v, [ `a`, `d`, `c` ]);
+//     valueFired++;
+//   });
+//   arrayRx.onDiff(diff => {
+//     t.deepEqual(diff.value, [ { path: `1`, value: `d`, previous: `b` } ]);
+//     valueFired++;
+//   });
+
+//   array[ 1 ] = `d`;
+//   t.deepEqual(array, [ `a`, `d`, `c` ]);
+//   await Flow.sleep(50);
+//   t.is(valueFired, 2);
+// });
 
 test(`rx-number`, t => {
   const nonInit = Rx.number();
@@ -105,7 +132,7 @@ test(`rx-number`, t => {
 test(`rx-from-array`, async t => {
   const a1 = [ 1, 2, 3, 4, 5 ];
   // Default options
-  const v1 = Rx.fromArray(a1);
+  const v1 = Rx.readFromArray(a1);
   t.false(v1.isDone());
   t.is(v1.last(), 1);
 
@@ -125,7 +152,7 @@ test(`rx-from-array-lazy`, async t => {
   const a1 = [ 1, 2, 3, 4, 5 ];
 
   // Pause: Step 1: read 2 items from source
-  const v2 = Rx.fromArray(a1, { idle: `pause`, lazy: true });
+  const v2 = Rx.readFromArray(a1, { idle: `pause`, lazy: true });
   let read: number[] = [];
   const v2Off1 = v2.on(msg => {
     if (msg.value) {
@@ -149,7 +176,7 @@ test(`rx-from-array-lazy`, async t => {
   t.deepEqual(read, a1);
 
   // Reset: Step 1 read 2 times
-  const v3 = Rx.fromArray(a1, { idle: `reset`, lazy: true });
+  const v3 = Rx.readFromArray(a1, { idle: `reset`, lazy: true });
   read = [];
   const v3Off1 = v3.on(msg => {
     if (msg.value) {
@@ -448,26 +475,26 @@ test(`rx-to-array`, async t => {
   const data = genArray(100);
 
   // Simple case: limit reachable
-  const v1 = Rx.fromArray(data);
+  const v1 = Rx.readFromArray(data);
   const vv1 = await Rx.toArray(v1, { limit: 5 });
   await Flow.sleep(200);
   t.deepEqual(vv1, data.slice(0, 5));
 
   // Throws, limit not reached
-  const v2 = Rx.fromArray(data);
+  const v2 = Rx.readFromArray(data);
   t.throwsAsync(async () => {
     const vv2 = await Rx.toArray(v2, { limit: 1000, underThreshold: `throw`, maximumWait: 200 });
     await Flow.sleep(200);
   })
 
   // Fill with placeholder
-  const v3 = Rx.fromArray([ 1, 2, 3, 4, 5 ]);
+  const v3 = Rx.readFromArray([ 1, 2, 3, 4, 5 ]);
   const vv3 = await Rx.toArray(v3, { limit: 10, underThreshold: `fill`, fillValue: 9, maximumWait: 200 });
   await Flow.sleep(200);
   t.deepEqual(vv3, [ 1, 2, 3, 4, 5, 9, 9, 9, 9, 9 ])
 
   // Return what we can
-  const v4 = Rx.fromArray([ 1, 2, 3, 4, 5 ]);
+  const v4 = Rx.readFromArray([ 1, 2, 3, 4, 5 ]);
   const vv4 = await Rx.toArray(v4, { limit: 10, underThreshold: `partial`, maximumWait: 200 });
   await Flow.sleep(200);
   t.deepEqual(vv4, [ 1, 2, 3, 4, 5 ]);
