@@ -55,9 +55,10 @@ export const quadTree = (bounds: RectPositioned, initialData: ReadonlyArray<Quad
 };
 
 /**
- * QuadTreeNode
+ * QuadTreeNode. The values of the node is an array of {@link QuadTreeItem}.
  *
  * To create, you probably want the {@link quadTree} function.
+ * 
  */
 export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
   #items: Array<QuadTreeItem> = [];
@@ -95,12 +96,19 @@ export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
     return this.#parent;
   }
 
+  /**
+   * Iterates over immediate children
+   */
   *children(): IterableIterator<QuadTreeNode> {
     for (const c of this.#children) {
       yield c;
     }
   }
 
+  /**
+   * Array of QuadTreeItem
+   * @returns
+   */
   getValue() {
     return this.#items;
   }

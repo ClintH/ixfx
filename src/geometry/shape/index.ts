@@ -16,7 +16,6 @@ export type ContainsResult = `none` | `contained`;
 
 export type ShapePositioned = CirclePositioned | RectPositioned;
 
-
 export type Sphere = Points.Point3d & {
   readonly radius: number;
 };
@@ -32,6 +31,8 @@ export type PointCalculableShape =
 
 /**
  * Returns the intersection result between a and b.
+ * `a` can be a {@link CirclePositioned} or {@link RectPositioned}
+ * `b` can be as above or a {@link Point}.
  * @param a
  * @param b
  */
@@ -54,20 +55,26 @@ export const isIntersecting = (
 // }
 
 export type RandomPointOpts = {
-  readonly randomSource?: RandomSource;
-  readonly margin?: Points.Point;
+  readonly randomSource: RandomSource;
 };
 
+/**
+ * Returns a random point within a shape.
+ * `shape` can be {@link CirclePositioned} or {@link RectPositioned}
+ * @param shape 
+ * @param opts 
+ * @returns 
+ */
 export const randomPoint = (
   shape: ShapePositioned,
-  opts: RandomPointOpts = {}
+  opts: Partial<RandomPointOpts> = {}
 ): Points.Point => {
   if (isCirclePositioned(shape)) {
     return circleRandomPoint(shape, opts);
   } else if (isRectPositioned(shape)) {
     return rectRandomPoint(shape, opts);
   }
-  throw new Error(`Cannot create random point for unknown shape`);
+  throw new Error(`Unknown shape. Only CirclePositioned and RectPositioned are supported.`);
 };
 
 // export type Shape = {

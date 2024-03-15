@@ -89,11 +89,8 @@ export const scaler = (
 ): ScalerCombined => {
   const defaultBounds = defaultRect ?? PlaceholderRect;
 
-  //eslint-disable-next-line functional/no-let
   let sw = 1;
-  //eslint-disable-next-line functional/no-let
   let sh = 1;
-  //eslint-disable-next-line functional/no-let
   let s = { x: 1, y: 1 };
 
   const computeScale = () => {

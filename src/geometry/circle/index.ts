@@ -172,8 +172,21 @@ export const isEqual = (a: CirclePositioned | Circle, b: CirclePositioned | Circ
 };
 
 export type RandomPointOpts = {
-  readonly strategy?: `naive` | `uniform`
-  readonly randomSource?: RandomSource
+  /**
+   * Algorithm to calculate random values.
+   * Default: 'uniform'
+   */
+  readonly strategy: `naive` | `uniform`
+  /**
+   * Random number source.
+   * Default: Math.random
+   */
+  readonly randomSource: RandomSource
+  /**
+   * Margin within shape to start generating random points
+   * Default: 0
+   */
+  readonly margin: number
 }
 
 /**
@@ -196,20 +209,22 @@ export type RandomPointOpts = {
  * @param opts Options
  * @returns 
  */
-export const randomPoint = (within: Circle | CirclePositioned, opts: RandomPointOpts = {}): Point => {
+export const randomPoint = (within: Circle | CirclePositioned, opts: Partial<RandomPointOpts> = {}): Point => {
   const offset: Point = isCirclePositioned(within) ? within : { x: 0, y: 0 };
   const strategy = opts.strategy ?? `uniform`;
+  const margin = opts.margin ?? 0;
+  const radius = within.radius - margin;
   const rand = opts.randomSource ?? defaultRandom;
   switch (strategy) {
     case `naive`: {
-      return Points.sum(offset, Polar.toCartesian(rand() * within.radius, rand() * piPi));
+      return Points.sum(offset, Polar.toCartesian(rand() * radius, rand() * piPi));
     }
     case `uniform`: {
-      return Points.sum(offset, Polar.toCartesian(Math.sqrt(rand()) * within.radius, rand() * piPi));
+      return Points.sum(offset, Polar.toCartesian(Math.sqrt(rand()) * radius, rand() * piPi));
     }
     default: {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`Unknown strategy ${ strategy }`);
+      throw new Error(`Unknown strategy '${ strategy }'. Expects 'uniform' or 'naive'`);
     }
   }
 };

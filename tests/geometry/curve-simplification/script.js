@@ -3,6 +3,8 @@ import {Drawing} from '../../../dist/visual.js';
 import { CurveSimplification, Points } from '../../../dist/geometry.js';
 import { Arrays } from '../../../dist/collections.js';
 
+const canvas = new Dom.CanvasHelper(`#canvas`, {fill:`viewport`});
+
 // For comparison, using data sets from Ramer Douglas Peucker's example
 // https://karthaus.nl/rdp/
 const dataSets = {
@@ -15,13 +17,10 @@ const ingestPoints = (points) => {
   return points.map(pt => Points.from(pt));
 }
 
-/**
- * 
- * @param {CanvasRenderingContext2D} ctx 
- * @param {import('../../../dist/geometry.js').Rect} bounds 
- */
-const draw = (ctx, bounds) => {
-  Drawing.rect(ctx, bounds,  {fillStyle:`silver`});
+
+const draw = () => {
+  const { ctx, size } = canvas;
+  Drawing.rect(ctx, size,  {fillStyle:`silver`});
 
   ctx.save();
   ctx.translate(300,300);
@@ -38,9 +37,5 @@ const draw = (ctx, bounds) => {
 
   ctx.restore();
 }
-const setup = () => {
-  Dom.fullSizeCanvas(`#canvas`, args => {
-    draw(args.ctx, args.bounds);
-  });
-};
-setup();
+
+draw();

@@ -1,7 +1,6 @@
 import * as Dom from '../../../dist/dom.js';
 import {Drawing} from '../../../dist/visual.js';
 import { Waypoints, Points, Lines, Paths } from '../../../dist/geometry.js';
-import { Arrays } from '../../../dist/collections.js';
 
 // Define settings - properties that don't change
 const settings = Object.freeze({
@@ -14,36 +13,25 @@ const settings = Object.freeze({
     { x:0.1, y:0.1 },
     { x:0.3, y:0.3 },
     { x:0.5, y:0.4 }
-  ]
+  ],
+  canvas: new Dom.CanvasHelper(`#canvas`, {fill:`viewport`, draw:drawState})
 });
 
 // Initial state - properties that change as code runs
 let state = Object.freeze({
-  /**
-   * @type {CanvasRenderingContext2D}
-   */
-  // @ts-ignore
-  ctx:undefined,
   waypointTracker: Waypoints.fromPoints(settings.waypoints),
-  bounds: {
-    width: 0,
-    height: 0,
-    center: { x: 0, y: 0 },
-  },
   /** 
    * Current relative pointer position
    * @type {Points.Point} */
   pointer: { x: 0, y:0 },
-  /** @type number */
-  scaleBy: 1,
   /**
    * @type {{path:Paths.Path, nearest:Points.Point, distance:number}[]}
    */
   progresses: []
 });
 
-const relToAbs = (point) => Points.multiply(point, state.scaleBy,state.scaleBy);
-const absToRel = (point) => Points.divide(point, state.scaleBy,state.scaleBy);
+// const relToAbs = (point) => Points.multiply(point, state.scaleBy,state.scaleBy);
+// const absToRel = (point) => Points.divide(point, state.scaleBy,state.scaleBy);
 
 const tick = () => {
   const { pointer, waypointTracker } = state;
@@ -66,17 +54,19 @@ const tick = () => {
 };
 
 
-const drawState = () => {
-  const { waypoints } = settings;
-  const { progresses, ctx } = state;
+function drawState()  {
+  console.log(`drawStart`);
+  const { waypoints, canvas } = settings;
+  const { progresses } = state;
+  const ctx = canvas.ctx;
 
   // Clear canvas
   clear(ctx);
-
+  
   // Draw lines between wayoints
   ctx.fillStyle = `white`;
   ctx.strokeStyle = `silver`;
-  Drawing.connectedPoints(ctx, waypoints.map(relPt => relToAbs(relPt)), { strokeStyle: `silver`});
+  Drawing.connectedPoints(ctx, waypoints.map(relPt => canvas.abs(relPt)), { strokeStyle: `silver`});
 
   // waypoints.forEach((line, index) => {
   //   const p = progresses.find(p=>p.index === index);
@@ -95,8 +85,9 @@ const drawState = () => {
 };
 
 const drawLine = (ctx, a, b) => {
-  a = relToAbs(a);
-  b = relToAbs(b);
+  const { canvas } = settings;
+  a = canvas.abs(a);
+  b = canvas.abs(b);
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
   ctx.lineTo(b.x, b.y);
@@ -111,8 +102,9 @@ const drawLine = (ctx, a, b) => {
  * @param {string} [title] 
  */
 const drawLabelledLine = (ctx, line, title) => {
-  const a = relToAbs(line.a);
-  const b = relToAbs(line.b);
+  const { canvas } = settings;
+  const a = canvas.abs(line.a);
+  const b = canvas.rel(line.b);
 
   ctx.beginPath();
   ctx.moveTo(a.x, a.y);
@@ -130,10 +122,11 @@ const drawLabelledLine = (ctx, line, title) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 const clear = (ctx) => {
-  const { width, height } = state.bounds;
+  //const { width, height } = state.bounds;
+  const { canvas } = settings;
 
   // Make background transparent
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Clear with a colour
   //ctx.fillStyle = `orange`;
@@ -145,7 +138,8 @@ const clear = (ctx) => {
 };
 
 const onPointerMove = (evt) => {
-  updateState({ pointer: absToRel(evt) });
+  const { canvas } = settings;
+  updateState({ pointer: canvas.rel(evt) });
 };
 
 /**
@@ -154,14 +148,17 @@ const onPointerMove = (evt) => {
 const setup = () => {
   const { tickLoopMs } = settings;
 
-  Dom.fullSizeCanvas(`#canvas`, args => {
-    // Update state with new size of canvas
-    updateState({ 
-      bounds: args.bounds,
-      ctx: args.ctx,
-      scaleBy: Math.min(args.bounds.width, args.bounds.height)
-    });
-  });
+  // Dom.fullSizeCanvas(`#canvas`, args => {
+  //   // Update state with new size of canvas
+  //   updateState({ 
+  //     bounds: args.bounds,
+  //     ctx: args.ctx,
+  //     scaleBy: Math.min(args.bounds.width, args.bounds.height)
+  //   });
+  // });
+  // const helper = Dom.canvasHelper(`#canvas`, {onResize:(size) => {
+
+  // }});
 
   // Call `tick` at a given rate
   const tickLoop = () => {
@@ -171,11 +168,11 @@ const setup = () => {
   tickLoop();
 
   // Animation loop
-  const animationLoop = () => {
-    drawState();
-    window.requestAnimationFrame(animationLoop);
-  };
-  animationLoop();
+  // const animationLoop = () => {
+  //   drawState();
+  //   window.requestAnimationFrame(animationLoop);
+  // };
+  // animationLoop();
 
   document.addEventListener(`pointermove`, onPointerMove);
 };
@@ -199,11 +196,11 @@ function updateState (s) {
  * @param {{x:number, y:number}} point 
  */
 function drawLabelledPoint(ctx, point, fillStyle = `black`, msg = ``, textFillStyle = `white`)  {
-
+  const { canvas } = settings;
   const radius = 5;
 
   // Convert x,y to absolute point
-  const abs = relToAbs(point);
+  const abs = canvas.abs(point);
 
   // Translate so 0,0 is the center of circle
   ctx.save();

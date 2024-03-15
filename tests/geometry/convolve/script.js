@@ -1,4 +1,3 @@
-import {parentSizeCanvas} from '../../../dist/dom.js';
 import { Convolve2d, Grids } from '../../../dist/geometry.js';
 import { Drawing, ImageDataGrid } from '../../../dist/visual.js';
 import { interval } from '../../../dist/flow.js';
@@ -130,21 +129,23 @@ const testConvolveImage = async () => {
   const baseOpts =  { filled: true, stroked: false };
 
   // For each source cell, compute convolved value
-  for await (const [cell, value] of interval(convolve, 10)) {
-     // Compute rectangle to fill for this cell
-     const r = Grids.rectangleForCell(grid, cell);
+  for await (const [cell, value] of interval(convolve, 1)) {
+    if (!value) continue;
     
-     // Create drawing options
-     const opts = {
-       ...baseOpts,
-       fillStyle: `rgb(${value.r},${value.g},${value.b})`
-     };
-     
-     Drawing.rect(destCtx, r, opts);
- 
-     // Magnified version
-     const rScaled = Grids.rectangleForCell(gridScaled,cell);
-     Drawing.rect(destMagnifiedCtx, rScaled, opts);
+    // Compute rectangle to fill for this cell
+    const r = Grids.rectangleForCell(grid, cell);
+
+    // Create drawing options
+    const opts = {
+      ...baseOpts,
+      fillStyle: `rgb(${value.r},${value.g},${value.b})`
+    };
+    
+    Drawing.rect(destCtx, r, opts);
+
+    // Magnified version
+    const rScaled = Grids.rectangleForCell(gridScaled,cell);
+    Drawing.rect(destMagnifiedCtx, rScaled, opts);
   }
 }
 

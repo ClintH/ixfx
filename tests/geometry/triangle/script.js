@@ -1,22 +1,22 @@
-import {parentSizeCanvas} from '../../../dist/dom.js';
+import {CanvasHelper} from '../../../dist/dom.js';
 import {Drawing} from '../../../dist/visual.js';
 import {Triangles} from '../../../dist/geometry.js';
 
 let ptr = {x: 0, y: 0};
 let ptrClick = {x: 300, y: 200};
 
-const canvasEl = document.getElementById(`plot`);
-parentSizeCanvas('#plot', (args) => {
-  draw();
-});
+// const canvasEl = document.getElementById(`plot`);
+// parentSizeCanvas('#plot', (args) => {
+//   draw();
+// });
 
-/** @type {CanvasRenderingContext2D} */
-const ctx = canvasEl.getContext(`2d`);
+//const ctx = canvasEl.getContext(`2d`);
 
+const c = new CanvasHelper(`#plot`, {fill:`viewport`, onResize: () => draw()});
 
 const drawTriangleE = () => {
   const origin = ptrClick;
-
+  const ctx = c.ctx;
   ctx.fillStyle = `black`;
   ctx.fillText(`Equilateral triangles`, 100, 100);
   const eq = {length: 100};
@@ -38,7 +38,7 @@ const drawTriangleE = () => {
 
 const drawTriangleR = () => {
   const origin = ptrClick;
-
+  const ctx = c.ctx;
   ctx.fillStyle = `black`;
   ctx.fillText(`Right triangles`, 100, 100);
   const rt = {opposite: 100, adjacent: 150};
@@ -56,11 +56,16 @@ const drawTriangleR = () => {
     {strokeStyle: `orange`, debug: true});
 }
 
-const drawTriangleIsos = () => {
+/**
+ * 
+ * @param {import('../../../dist/dom.js').CanvasHelper} c 
+ */
+function drawTriangleIsos(c) {
   const origin = ptrClick;
+  const ctx = c.ctx;
 
   ctx.fillStyle = `black`;
-  ctx.fillText(`Right triangles`, 100, 100);
+  ctx.fillText(`Right triangles ${Math.floor(ptr.x)},${Math.floor(ptr.y)}`, 100, 100);
   const rt = {legs: 200, base: 100};
 
 
@@ -81,8 +86,14 @@ const drawTriangleIsos = () => {
     {strokeStyle: `orange`, debug: true});
 }
 
-const draw = () => {
-  drawTriangleIsos();
+function draw() {
+  //console.log(`size: ${c.width} x ${c.height} ptr: ${ptr.x}, ${ptr.y}`)
+
+  c.ctx.clearRect(0, 0, c.width, c.height);
+
+  drawTriangleIsos(c);
+
+  Drawing.dot(c.ctx, ptr);
 }
 
 document.addEventListener(`pointermove`, evt => {
@@ -90,7 +101,6 @@ document.addEventListener(`pointermove`, evt => {
     x: evt.x,
     y: evt.y
   };
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
   draw();
 });
 
@@ -99,7 +109,7 @@ document.addEventListener(`pointerup`, evt => {
     x: evt.x,
     y: evt.y
   };
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  c.ctx.clearRect(0, 0, c.width, c.height);
   draw();
 });
 
