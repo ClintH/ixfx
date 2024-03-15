@@ -2,8 +2,8 @@
 import JSON5 from 'json5';
 import { isInteger, isPlainObjectOrPrimitive } from "./Util.js";
 import * as TraversableObject from './collections/tree/TraverseObject.js';
-import { compareValues } from './collections/Iterables.js';
 import { isPrimitive } from './KeyValue.js';
+import { compareValues as IterableCompareValues } from './collections/Iterables.js';
 
 /**
  * Return _true_ if `a` and `b` ought to be considered equal
@@ -67,7 +67,7 @@ export type CompareDataOptions<V> = {
  * @returns 
  */
 export const compareKeys = (a: object, b: object) => {
-  const c = compareValues(Object.keys(a), Object.keys(b));
+  const c = IterableCompareValues(Object.keys(a), Object.keys(b));
   return c;
 }
 
@@ -85,7 +85,13 @@ export const compareKeys = (a: object, b: object) => {
  * @returns 
  */
 export const compareData = <V extends Record<string, any>>(a: V, b: V, options: Partial<CompareDataOptions<V>> = {}): Array<Change<any>> => {
-  if (a === undefined) throw new Error(`Param 'a' undefined`);
+  if (a === undefined) {
+    return [ {
+      path: options.pathPrefix ?? ``,
+      value: b
+    } ]
+    //throw new Error(`Param 'a' undefined`);
+  }
   if (b === undefined) return [ { path: options.pathPrefix ?? ``, previous: a, value: undefined } ]
   const pathPrefix = options.pathPrefix ?? ``;
   const deepProbe = options.deepEntries ?? false;
@@ -379,6 +385,69 @@ export const map = <
   // @ts-expect-error
   return Object.fromEntries(mapped);
 };
+
+/**
+ * Returns a copy of `object` with integer numbers as keys instead of whatever it has.
+ * ```js
+ * keysToNumbers({ '1': true }); // Yields: { 1: true }
+ * ```
+ * 
+ * The `onInvalidKey` sets how to handle keys that cannot be converted to integers.
+ * * 'throw' (default): throws an exception
+ * * 'ignore': that key & value is ignored
+ * * 'keep': uses the string key instead
+ * 
+ * ``js
+ * keysToNumber({ hello: 'there' }, `ignore`); // Yields: {  }
+ * keysToNumber({ hello: 'there' }, `throw`); // Exception
+ * keysToNumber({ hello: 'there' }, `keep`); // Yields: { hello: 'there' }
+ * ```
+ * @param object 
+ * @param onInvalidKey 
+ * @returns 
+ */
+export const keysToNumbers = <T>(object: Record<any, T>, onInvalidKey: `throw` | `ignore` | `keep` = `throw`): Record<number, T> => {
+  const returnObject: Record<number, T> = {};
+  for (const entry of Object.entries(object)) {
+    const asNumber = Number.parseInt(entry[ 0 ]);
+    if (Number.isNaN(asNumber)) {
+      switch (onInvalidKey) {
+        case `throw`: {
+          throw new TypeError(`Cannot convert key '${ entry[ 0 ] }' to an integer`);
+        }
+        case `ignore`: {
+          continue;
+        }
+        case `keep`: {
+          (returnObject as any)[ entry[ 0 ] ] = entry[ 1 ];
+          continue;
+        }
+        default: {
+          throw new Error(`Param 'onInvalidKey' should be: 'throw', 'ignore' or 'keep'.`);
+        }
+      }
+    }
+    returnObject[ asNumber ] = entry[ 1 ];
+  }
+  return returnObject;
+}
+
+/**
+ * Returns _true_ if Object.entries() is empty for `value`
+ * @param value 
+ * @returns 
+ */
+export const isEmptyEntries = (value: object) => [ ...Object.entries(value) ].length === 0;
+
+export const mapKeys = <TKey extends string | number | symbol>(object: Record<any, any>, mapFunction: (key: string) => TKey) => {
+  // @ts-expect-error
+  const destinationObject: Record<TKey, any> = {};
+  for (const entries of Object.entries(object)) {
+    const key = mapFunction(entries[ 0 ]);
+    destinationObject[ key ] = entries[ 1 ];
+  }
+  return destinationObject;
+}
 
 export type RemapObjectPropertyType<OriginalType, PropertyType> = {
   readonly [ Property in keyof OriginalType ]: PropertyType;
