@@ -25,6 +25,9 @@ export type SimplifiedNode<TValue> = {
 
 export type LabelledNode<TValue> = TreeNode<LabelledValue<TValue>>;
 
+/**
+ * Traversable Tree
+ */
 export type TraversableTree<TValue> = {
   /**
    * Direct children of node
@@ -34,3 +37,4 @@ export type TraversableTree<TValue> = {
   getValue(): TValue
   getIdentity(): any
 };
+
