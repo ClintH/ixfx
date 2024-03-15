@@ -121,9 +121,11 @@ export const compareValues = <V>(
     }
   }
 
+  const isSame = aUnique.length === 0 && bUnique.length === 0;
   return {
     shared,
     a: aUnique,
     b: bUnique,
+    isSame
   };
 };
