@@ -1,57 +1,121 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { continuously } from "../flow/Continuously.js";
-import { intervalToMs } from "../flow/IntervalType.js";
+import { compareArrays, type ChangeRecord } from "../Compare.js";
+import { type IsEqual, isEqualValueDefault } from "../IsEqual.js";
+import * as Arrays from '../collections/arrays/index.js';
 import { initStream } from "./InitStream.js";
-import type { FromArrayOptions, ReactiveFinite, ReactiveInitial, Reactive } from "./Types.js";
+import type { ReactiveInitial, ReactiveDisposable, ReactiveNonInitial, ReactiveArray } from "./Types.js";
 
-export const fromArray = <V>(array: Array<V>, options: Partial<FromArrayOptions> = {}): Reactive<V> & ReactiveFinite & ReactiveInitial<V> => {
-  const lazy = options.lazy ?? false;
-  const idle = options.idle ?? ``;
-  const intervalMs = intervalToMs(options.intervalMs, 5);
-  let index = 0;
-  let lastValue = array[ 0 ];
+/**
+ * Options when creating a reactive object.
+ */
+export type ArrayOptions<V> = {
 
-  const s = initStream<V>({
-    onFirstSubscribe() {
-      //console.log(`Rx.fromArray onFirstSubscribe. Lazy: ${ lazy } reader state: ${ c.runState }`);
-      // Start if in lazy mode and not running
-      if (lazy && c.runState === `idle`) c.start();
-    },
-    onNoSubscribers() {
-      //console.log(`Rx.fromArray onNoSubscribers. Lazy: ${ lazy } reader state: ${ c.runState } on idle: ${ idle }`);
-      if (lazy) {
-        if (idle === `pause`) {
-          c.cancel();
-        } else if (idle === `reset`) {
-          c.cancel();
-          index = 0;
-        }
-      }
-    }
-  });
-  const c = continuously(() => {
-    //console.log(`Rx.fromArray loop index ${ index } lazy: ${ lazy }`);
+  /**
+   * Uses JSON.stringify() by default.
+   * Fn that returns _true_ if two values are equal, given a certain path.
+   */
+  eq: IsEqual<V>
+}
 
-    lastValue = array[ index ];
-    index++;
+export function fromArray<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayOptions<V>> = {}): ReactiveDisposable & ReactiveArray<V> & (ReactiveInitial<ReadonlyArray<V>> | ReactiveNonInitial<ReadonlyArray<V>>) {
+  const eq = options.eq ?? isEqualValueDefault;
+  const setEvent = initStream<Array<V>>();
+  //const diffEvent = initStream<Array<Immutable.Change<any>>>();
+  const arrayEvent = initStream<Array<ChangeRecord<number>>>();
+  let value: ReadonlyArray<V> = initialValue;
+  let disposed = false;
 
-    s.set(lastValue)
-    if (index === array.length) {
-      //console.log(`Rx.fromArray exiting continuously`);
-      return false;
-    }
-  }, intervalMs);
+  const set = (replacement: Array<V> | ReadonlyArray<V>) => {
+    const diff = compareArrays<V>(value as Array<V>, replacement as Array<V>, eq);
+    console.log(`Rx.fromArray.set diff`, diff);
+    //if (diff.length === 0) return;
+    //diffEvent.set(diff);
+    value = replacement;
+    setEvent.set([ ...replacement ]);
+  }
 
-  if (!lazy) c.start();
+  const setAt = (index: number, v: V) => {
+    (value as Array<V>)[ index ] = v;
+    setEvent.set([ ...value ]);
+  }
+
+  const push = (v: V) => {
+    value = [ ...value, v ];
+    setEvent.set([ ...value ]);
+    const cr: ChangeRecord<number> = [ `add`, value.length - 1, v ];
+    arrayEvent.set([ cr ]);
+  }
+
+  const deleteAt = (index: number) => {
+    const valueChanged = Arrays.remove(value, index);
+    if (valueChanged.length === value.length) return; // no change
+    const diff = compareArrays<V>(value as Array<V>, valueChanged, eq);
+    console.log(diff.summary);
+    value = valueChanged;
+    setEvent.set([ ...value ]);
+    arrayEvent.set(diff.summary);
+  }
+
+  const deleteWhere = (filter: (value: V) => boolean) => {
+    const valueChanged = value.filter(v => !filter(v));
+    const count = value.length - valueChanged.length;
+    const diff = compareArrays<V>(value as Array<V>, valueChanged, eq);
+    value = valueChanged;
+    setEvent.set([ ...value ]);
+    arrayEvent.set(diff.summary);
+    return count;
+  }
+
+  const insertAt = (index: number, v: V) => {
+    const valueChanged = Arrays.insertAt(value, index, v);
+    const diff = compareArrays<V>(value as Array<V>, valueChanged, eq);
+    value = valueChanged;
+    setEvent.set([ ...value ]);
+    arrayEvent.set(diff.summary);
+  }
+
+  // const update = (toMerge: Partial<V>) => {
+  //   // eslint-disable-next-line unicorn/prefer-ternary
+  //   if (value === undefined) {
+  //     value = toMerge as V;
+  //   } else {
+  //     const diff = Immutable.compareData(toMerge, value);
+  //     // console.log(`Rx.fromObject.update value: ${ JSON.stringify(value) }`);
+  //     // console.log(`Rx.fromObject.update  diff: ${ JSON.stringify(diff) }`);
+  //     if (diff.length === 0) return; // No changes
+  //     value = {
+  //       ...value,
+  //       ...toMerge
+  //     }
+  //     diffEvent.set(diff);
+  //   }
+  //   setEvent.set(value);
+  // }
+
+  const dispose = (reason: string) => {
+    if (disposed) return;
+    //diffEvent.dispose(reason);
+    setEvent.dispose(reason);
+    disposed = true;
+  }
 
   return {
-    isDone() {
-      return index === array.length;
+    dispose,
+    isDisposed() {
+      return disposed
     },
-    last() {
-      return lastValue;
-    },
-    on: s.on,
-    value: s.value
+    last: () => value,
+    on: setEvent.on,
+    onArray: arrayEvent.on,
+    value: setEvent.value,
+    setAt,
+    push,
+    deleteAt,
+    deleteWhere,
+    insertAt,
+    /**
+     * Set the whole object
+     */
+    set
   }
 }
