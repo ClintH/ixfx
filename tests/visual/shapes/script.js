@@ -1,4 +1,4 @@
-import {parentSizeCanvas} from '../../../dist/dom.js';
+import {CanvasHelper} from '../../../dist/dom.js';
 import {Drawing} from '../../../dist/visual.js';
 import {degreeToRadian, Points, Lines, Shapes, Triangles, Rects} from '../../../dist/geometry.js';
 import {dotProduct} from '../../../dist/arrays.js';
@@ -6,11 +6,7 @@ import {dotProduct} from '../../../dist/arrays.js';
 let ptr = {x: 0, y: 0};
 let ptrClick = {x: 300, y: 200};
 
-const canvasEl = document.getElementById(`plot`);
-parentSizeCanvas('#plot', (args) => {
-  draw();
-});
-
+const canvas = new CanvasHelper(`#plot`, {fill:`viewport`,onResize:() => { draw(); }});
 
 console.log(dotProduct([
   [1, 2, 3], [1, 2, 3]
@@ -27,34 +23,33 @@ console.log(dotProduct([
 const tri = Triangles.fromFlatArray([0, 0, 0, 1, 1, 0]);
 console.log(Triangles.barycentricCoord(tri, 0.5, 0.5));
 
-/** @type {CanvasRenderingContext2D} */
-const ctx = canvasEl.getContext(`2d`);
 
 const drawStarburst = () => {
-  const pts = Shapes.starburst(300, 10, 140, {x: canvasEl.width / 2, y: canvasEl.height / 2});
-  Drawing.connectedPoints(ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
+  const pts = Shapes.starburst(300, 10, 140, {x: canvas.width / 2, y: canvas.height / 2});
+  Drawing.connectedPoints(canvas.ctx, pts, {loop: true, fillStyle: `orange`, strokeStyle: `red`});
 }
 
 const drawTriangle = () => {
   const origin = {x: 200, y: 200};
   const t = Triangles.fromRadius(origin, 100, {initialAngleRadian: -Math.PI / 2});
-  Drawing.triangle(ctx, t, {strokeStyle: `blue`, fillStyle: `silver`, debug: true});
-  Drawing.dot(ctx, origin, {fillStyle: `blue`});
+  Drawing.triangle(canvas.ctx, t, {strokeStyle: `blue`, fillStyle: `silver`, debug: true});
+  Drawing.dot(canvas.ctx, origin, {fillStyle: `blue`});
 
   const c = Triangles.centroid(t);
-  Drawing.dot(ctx, c, {fillStyle: `yellow`});
+  Drawing.dot(canvas.ctx, c, {fillStyle: `yellow`});
 
   const innerCircle = Triangles.innerCircle(t);
-  Drawing.circle(ctx, innerCircle, {strokeStyle: `purple`});
+  Drawing.circle(canvas.ctx, innerCircle, {strokeStyle: `purple`});
 
   const outerCircle = Triangles.outerCircle(t);
-  Drawing.circle(ctx, outerCircle, {strokeStyle: `purple`});
+  Drawing.circle(canvas.ctx, outerCircle, {strokeStyle: `purple`});
 
   const inside = Triangles.intersectsPoint(t, ptr);
-  Drawing.dot(ctx, ptr, {fillStyle: inside ? `red` : `black`});
+  Drawing.dot(canvas.ctx, ptr, {fillStyle: inside ? `red` : `black`});
 }
 
 const drawLine = () => {
+  const { ctx } = canvas;
   const a = {x: 100, y: 100};
   const b = {x: 300, y: 150};
   const line = {a, b};
@@ -78,7 +73,7 @@ const drawLine = () => {
 }
 
 const drawArrow = () => {
-
+  const { ctx}= canvas;
   const opts = {
     angleRadian: degreeToRadian(45),
     tailThickness: 50,
@@ -98,7 +93,7 @@ document.addEventListener(`pointermove`, evt => {
     x: evt.x,
     y: evt.y
   };
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  canvas.clear();
   draw();
 });
 
@@ -107,7 +102,7 @@ document.addEventListener(`pointerup`, evt => {
     x: evt.x,
     y: evt.y
   };
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  canvas.clear();
   draw();
 
 });
