@@ -1,11 +1,13 @@
+import * as Immutable from './Immutable.js';
+import { isEqualDefault, type IsEqual } from './IsEqual.js';
 
 export type ChangeKind = `mutate` | `add` | `del`
-export type ChangeRecord = [ kind: ChangeKind, path: string, value: any ];
+export type ChangeRecord<TKey extends string | number | symbol> = [ kind: ChangeKind, path: TKey, value: any ];
 
 /**
  * Result of {@link compareData}
  */
-export type CompareChangeSet = {
+export type CompareChangeSet<TKey extends string | number> = {
   /**
    * _True_ if there are any changes
    */
@@ -13,21 +15,24 @@ export type CompareChangeSet = {
   /**
    * Results for child objects
    */
-  children: Record<string, CompareChangeSet>
+  children: Record<TKey, CompareChangeSet<any>>
   /**
    * Values that have changed
    */
-  changed: Record<string, any>
+  changed: Record<TKey, any>
   /**
    * Fields that have been added
    */
-  added: Record<string, any>
+  added: Record<TKey, any>
   /**
    * Fields that have been removed
    */
-  removed: Array<string>
+  removed: Array<TKey>
   isArray: boolean
-  summary: Array<ChangeRecord>
+  /**
+   * Summary of changes
+   */
+  summary: Array<ChangeRecord<TKey>>
 }
 
 /**
@@ -42,7 +47,7 @@ export type CompareChangeSet = {
  * changedDataFields(a, { msg: `hi!!` });       // { msg: `hi!!`, v: undefined }
  * ```
  * 
- * Under the hood, we use `{@link compareData}(a, b, true)`. If B has additional or removed fields,
+ * Under the hood, we use {@link compareData}(a, b, true). If B has additional or removed fields,
  * this is considered an error.
  * 
  * If a field is an array, the whole array is returned, rather than a diff.
@@ -58,7 +63,7 @@ export const changedDataFields = (a: object, b: object) => {
   return output;
 }
 
-const compareResultToObject = (r: CompareChangeSet, b: object): Record<string, any> | Array<any> => {
+const compareResultToObject = (r: CompareChangeSet<any>, b: object): Record<string, any> | Array<any> => {
   const output = {}
 
   if (r.isArray) {
@@ -82,13 +87,36 @@ const compareResultToObject = (r: CompareChangeSet, b: object): Record<string, a
   return output;
 }
 
+export const compareArrays = <TValue>(a: Array<TValue>, b: Array<TValue>, eq: IsEqual<TValue> = isEqualDefault<TValue>): CompareChangeSet<number> => {
+  if (!Array.isArray(a)) throw new Error(`Param 'a' is not an array`);
+  if (!Array.isArray(b)) throw new Error(`Param 'b' is not an array`);
+  const c = compareData(a, b, false, eq);
+  if (!c.isArray) throw new Error(`Change set does not have arrays as parameters`);
+
+  const convert = (key: string) => {
+    if (key.startsWith(`_`)) {
+      return Number.parseInt(key.slice(1));
+    } else throw new Error(`Unexpected key '${ key }'`);
+  }
+  const cc: CompareChangeSet<number> = {
+    ...c,
+    added: Immutable.mapKeys(c.added, convert),
+    changed: Immutable.mapKeys(c.changed, convert),
+    removed: c.removed.map(v => convert(v)),
+    summary: c.summary.map(value => {
+      return [ value[ 0 ], convert(value[ 1 ]), value[ 2 ] ];
+    })
+  }
+  return cc;
+}
+
 /**
- * Compares A to B. Assumes they are simple objects, essentially key-value pairs, where the values are primitive values or other simple objects.
+ * Compares A to B. Assumes they are simple objects, essentially key-value pairs, where the values are primitive values or other simple objects. It also works with arrays.
  * 
  * @param a 
  * @param b 
  */
-export const compareData = (a: object, b: object, assumeSameShape = false): CompareChangeSet => {
+export const compareData = (a: object, b: object, assumeSameShape = false, eq: IsEqual<any> = isEqualDefault): CompareChangeSet<string> => {
   const entriesA = Object.entries(a);
   const entriesB = Object.entries(b);
 
@@ -99,7 +127,7 @@ export const compareData = (a: object, b: object, assumeSameShape = false): Comp
   const removed: Array<string> = [];
   const isArray = Array.isArray(a);
 
-  const summary = new Array<ChangeRecord>();
+  const summary = new Array<ChangeRecord<string>>();
   let hasChanged = false;
 
   // Look for existing entries of A that are modified
@@ -125,13 +153,13 @@ export const compareData = (a: object, b: object, assumeSameShape = false): Comp
     }
 
     if (typeof aValue === `object`) {
-      const r = compareData(aValue, bValue, assumeSameShape);
+      const r = compareData(aValue, bValue, assumeSameShape, eq);
       if (r.hasChanged) hasChanged = true;
       (children as any)[ outputKey ] = r;
-      const childSummary = r.summary.map(sum => { return [ sum[ 0 ], outputKey + `.` + sum[ 1 ], sum[ 2 ] ] }) as Array<ChangeRecord>;
+      const childSummary = r.summary.map(sum => { return [ sum[ 0 ], outputKey + `.` + sum[ 1 ], sum[ 2 ] ] }) as Array<ChangeRecord<string>>;
       summary.push(...childSummary);
     } else {
-      if (aValue !== bValue) {
+      if (!eq(aValue, bValue)) {
         (changed as any)[ outputKey ] = bValue;
         hasChanged = true;
         summary.push([ `mutate`, outputKey, bValue ]);
