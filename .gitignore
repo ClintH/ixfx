@@ -12,3 +12,4 @@ node_modules/
 espruino/__tests__/
 madge.txt
 .tsimp
+coverage

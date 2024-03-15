@@ -13,6 +13,8 @@ export * from './FromGenerator.js';
 export * from './Util.js';
 export * from './Wrap.js';
 import * as OpFns from './Ops.js';
+export * from './Lit.js';
+export * from './ReadFromArray.js';
 export * as Dom from './Dom.js';
 import { initStream } from "./InitStream.js";
 
@@ -313,8 +315,8 @@ export function fromObject<V extends Record<string, any>>(initialValue?: V, opti
       return { ...d, path };
     })
 
-    //console.log(`Rx.fromObject.updateField diff`, diff);
-    const o = Immutable.updateByPath(value, path, valueForField);
+    //console.log(`Rx.fromObject.updateField diff path: ${ path }`, diff);
+    const o = Immutable.updateByPath(value, path, valueForField, true);
     value = o;
     //diffEvent.set([ { path, value: valueForField, previous: existing } ]);
 
@@ -479,14 +481,28 @@ export const fromProxy = <V extends object>(target: V): { proxy: V, rx: Reactive
 
   const proxy = new Proxy(target, {
     set(target, p, newValue, _receiver) {
+
+      const isArray = Array.isArray(target);
+      //console.log(`Rx.fromProxy set. Target: ${ JSON.stringify(target) } (${ typeof target } array: ${ Array.isArray(target) }) p: ${ JSON.stringify(p) } (${ typeof p }) newValue: ${ JSON.stringify(newValue) } recv: ${ _receiver }`);
+
+      // Ignore length if target is array
+      if (isArray && p === `length`) return true;
+
       if (typeof p === `string`) {
-        //console.log(`Rx.fromProxy set: ${ JSON.stringify(p) } to: ${ JSON.stringify(newValue) }`);
         rx.updateField(p, newValue);
       }
 
+      // If target is array and field looks like an array index...
+      if (isArray && typeof p === `string`) {
+        const pAsNumber = Number.parseInt(p);
+        if (!Number.isNaN(pAsNumber)) {
+          target[ pAsNumber ] = newValue;
+          return true;
+        }
+      }
       (target as any)[ p ] = newValue;
       return true;
-    },
+    }
   });
   return { proxy, rx }
 }

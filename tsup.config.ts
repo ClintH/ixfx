@@ -35,7 +35,7 @@ export default defineConfig({
     visual: `./src/visual/index.ts`,
   },
   dts: true,
-  noExternal: [ `bezier-js`, `d3-color`, `d3-interpolate`, `json5` ],
+  noExternal: [ `bezier-js`, `d3-color`, `d3-interpolate`, `json5`, `lit-html` ],
   platform: `browser`,
   target: `es2022`,
   format: [

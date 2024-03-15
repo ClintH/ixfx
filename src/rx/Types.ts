@@ -1,3 +1,4 @@
+import type { ChangeRecord } from '../Compare.js';
 import type { Interval } from '../flow/IntervalType.js';
 import * as Immutable from '../Immutable.js';
 
@@ -64,27 +65,6 @@ export type UpstreamOptions<In> = {
   onStop: () => void
 }
 
-export type ToArrayOptions<V> = {
-  /**
-   * Maximim time to wait for `limit` to be reached. 10s by default.
-   */
-  maximumWait: Interval
-  /**
-   * Number of items to read
-   */
-  limit: number
-  /**
-   * Behaviour if threshold is not reached.
-   * partial: return partial results
-   * throw: throw an error
-   * fill: fill remaining array slots with `fillValue`
-   */
-  underThreshold: `partial` | `throw` | `fill`
-  /**
-   * Value to fill empty slots with if `underThreshold = 'fill'`.
-   */
-  fillValue: V
-}
 
 /**
  * Wrapped Reactive for object-oriented access
@@ -185,6 +165,28 @@ export type Wrapped<TIn> = {
   value: (callback: (value: TIn) => void) => void
 }
 
+export type ToArrayOptions<V> = {
+  /**
+   * Maximim time to wait for `limit` to be reached. 10s by default.
+   */
+  maximumWait: Interval
+  /**
+   * Number of items to read
+   */
+  limit: number
+  /**
+   * Behaviour if threshold is not reached.
+   * partial: return partial results
+   * throw: throw an error
+   * fill: fill remaining array slots with `fillValue`
+   */
+  underThreshold: `partial` | `throw` | `fill`
+  /**
+   * Value to fill empty slots with if `underThreshold = 'fill'`.
+   */
+  fillValue: V
+}
+
 export type FromArrayOptions = {
   /**
    * Interval between each item being read. 5ms by default.
@@ -265,6 +267,15 @@ export type ReactiveFinite = {
 export type ReactiveDisposable = {
   dispose(reason: string): void
   isDisposed(): boolean
+}
+
+export type ReactiveArray<V> = ReactiveDisposable & ReactiveWritable<Array<V>> & {
+  push(value: V): void
+  deleteAt(index: number): void
+  deleteWhere(filter: (value: V) => boolean): number
+  setAt(index: number, value: V): void
+  insertAt(index: number, value: V): void
+  onArray(handler: (changes: Passed<Array<ChangeRecord<number>>>) => void): () => void
 }
 
 export type ReactiveDiff<V> = ReactiveDisposable & ReactiveWritable<V> & {
