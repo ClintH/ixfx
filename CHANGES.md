@@ -1,5 +1,10 @@
 A rough changelog between NPM releases
 
+# 0.19.0 24.03.24
+
+CanvasHelper class instead of 'fullScreenCanvas' function
+
+
 # 0.18.6 07.03.24
 
 Io

@@ -21,17 +21,17 @@ const t2 = resolveValue(() => true);
 //   return state;
 // }
 
-const resolveState = <T extends Record<string, Primi | PrimiFunc>>(state: T): ResolvedValues<T> => {
-  return Object.fromEntries(Object.entries(state).map(entry => {
-    if (typeof entry[ 1 ] === `function`) return [ entry[ 0 ], entry[ 1 ]() ];
-    return entry;
-  }))
-}
+// const resolveState = <T extends Record<string, Primi | PrimiFunc>>(state: T): ResolvedValues<T> => {
+//   return Object.fromEntries(Object.entries(state).map(entry => {
+//     if (typeof entry[ 1 ] === `function`) return [ entry[ 0 ], entry[ 1 ]() ];
+//     return entry;
+//   }))
+// }
 
-const testState = {
-  x: 10,
-  resolveX: () => true
-};
-const testResolved = resolveState(testState);
-testResolved.resolveX;
-testResolved.x;
+// const testState = {
+//   x: 10,
+//   resolveX: () => true
+// };
+// const testResolved = resolveState(testState);
+// testResolved.resolveX;
+// testResolved.x;

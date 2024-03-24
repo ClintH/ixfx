@@ -17,6 +17,8 @@ export * from './Multiply.js';
 export * from './Random.js';
 export * from './Subtract.js';
 export * from './Sum.js';
+export * from './Guard.js';
+
 
 /**
  * Rectangle as array: `[width, height]`

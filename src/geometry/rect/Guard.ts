@@ -10,6 +10,13 @@ export const guardDim = (d: number, name = `Dimension`) => {
 /**
  * Throws an error if rectangle is missing fields or they
  * are not valid.
+ * 
+ * Checks:
+ * * `width` and `height` must be defined on `rect`
+ * * dimensions (w & h) must not be NaN
+ * * dimensions (w & h) must not be negative
+ * 
+ * If `rect` has x,y, this value is checked as well.
  * @param rect
  * @param name
  */
