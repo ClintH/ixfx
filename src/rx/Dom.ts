@@ -6,8 +6,22 @@ import { hasLast, messageHasValue, messageIsSignal } from "./Util.js";
 import type { Change } from "../Immutable.js";
 import { getFromKeys } from "../collections/map/MapFns.js";
 import { afterMatch, beforeMatch } from "../Text.js";
-import { stringSegmentsEndToEnd, stringSegmentsStartToStart } from "../generators/index.js";
+import { stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "../text/Segments.js";
 import { QueueMutable } from "../collections/index.js";
+import { fromObject } from "./FromObject.js";
+
+
+/**
+ * Reactive stream of array of elements that match `query`.
+ * @param query 
+ * @returns 
+ */
+export function fromDomQuery(query: string) {
+  const elements = [ ...document.querySelectorAll(query) ] as Array<HTMLElement>;
+
+  return fromObject(elements);
+  /// TODO: MutationObserver to update element list
+}
 
 /**
  * Updates an element's `textContent` when the source value changes
@@ -502,13 +516,13 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
   }
 
   const findBind = (path: string) => {
-    const bind = getFromKeys(binds, stringSegmentsEndToEnd(path));
+    const bind = getFromKeys(binds, stringSegmentsWholeToEnd(path));
     if (bind !== undefined) return bind;
     if (!path.includes(`.`)) return binds.get(`_root`);
   }
 
   function* ancestorBinds(path: string) {
-    for (const p of stringSegmentsStartToStart(path)) {
+    for (const p of stringSegmentsWholeToFirst(path)) {
       //console.log(` ancestorBinds path: ${ path } segment: ${ p }`)
 
       if (binds.has(p)) {
@@ -650,12 +664,12 @@ export function win() {
   const generateRect = () => ({ width: window.innerWidth, height: window.innerHeight });
 
   const size = Rx.fromEvent(window, `resize`, {
-    lazy: true,
-    process: () => generateRect(),
+    lazy: `very`,
+    transform: () => generateRect(),
   });
   const pointer = Rx.fromEvent(window, `pointermove`, {
-    lazy: true,
-    process: (args: Event | undefined) => {
+    lazy: `very`,
+    transform: (args: Event | undefined) => {
       if (args === undefined) return { x: 0, y: 0 };
       const pe = args as PointerEvent;
       return { x: pe.x, y: pe.y }

@@ -29,7 +29,7 @@ import { throwNumberTest } from '../Guards.js';
  * @param rounding Rounding to apply. This avoids floating-point rounding errors.
  */
 export const pingPongPercent = function (
-  interval: number = 0.1,
+  interval = 0.1,
   lower?: number,
   upper?: number,
   start?: number,
@@ -107,8 +107,7 @@ export const pingPong = function* (
   if (interval === 0) {
     throw new Error(`Interval is zero (rounding: ${ rounding })`);
   }
-  if (start === undefined) start = lower;
-  else start = Math.floor(start * rounding);
+  start = start === undefined ? lower : Math.floor(start * rounding);
   if (start > upper || start < lower) {
     throw new Error(
       `Start (${ start / rounding }) must be within lower (${ lower / rounding
