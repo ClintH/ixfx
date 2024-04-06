@@ -35,7 +35,6 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
   const rx = resolveSource(source);
 
   const promise = new Promise<Array<V | undefined>>((resolve, reject) => {
-
     const done = () => {
       clearTimeout(maxWait)
       unsub();
@@ -45,7 +44,10 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
       }
       if (read.length < limit && underThreshold === `fill`) {
         for (let index = 0; index < limit; index++) {
-          if (read[ index ] === undefined) read[ index ] = options.fillValue;
+          if (read[ index ] === undefined) {
+            //console.log(`Rx.toArray filling at index: ${ index }`);
+            read[ index ] = options.fillValue;
+          }
         }
       }
       resolve(read);
@@ -56,10 +58,12 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
     }, maximumWait);
 
     const unsub = rx.on(message => {
+      //console.log(`Rx.toArray: ${ JSON.stringify(message) }`);
       if (messageIsDoneSignal(message)) {
         done();
       } else if (messageHasValue(message)) {
         read.push(message.value);
+        //console.log(`Rx.toArray read buffer: ${ JSON.stringify(read) }`);
         if (read.length === limit) {
           done();
         }
