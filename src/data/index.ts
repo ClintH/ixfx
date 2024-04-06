@@ -21,6 +21,7 @@ export * from './Flip.js';
 export * as Graphs from './graphs/index.js'
 export * from './TrackUnique.js';
 export * from './Table.js';
+export * from './ResolveFields.js';
 
 /**
  * Work with bipolar values (-1...1)
