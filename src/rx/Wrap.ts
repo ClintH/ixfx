@@ -1,7 +1,7 @@
-import { batch, annotate, annotateElapsed, field, filter, split, splitLabelled, switcher, synchronise, debounce, throttle, transform } from "./Ops.js";
+import { batch, annotate, annotateElapsed, field, filter, split, splitLabelled, switcher, sync, debounce, throttle, transform } from "./Ops.js";
 import { resolveSource } from "./ResolveSource.js";
 import { toArray, toArrayOrThrow } from "./ToArray.js";
-import type { ReactiveOrSource, Wrapped, ToArrayOptions, BatchOptions, FieldOptions, FilterPredicate, InitStreamOptions, SplitOptions, SwitcherOptions, Reactive, DebounceOptions, ThrottleOptions, TransformOpts } from "./Types.js";
+import type { ReactiveOrSource, Wrapped, ToArrayOptions, BatchOptions, FieldOptions, FilterPredicate, InitStreamOptions, SplitOptions, SwitcherOptions, Reactive, DebounceOptions, ThrottleOptions, TransformOpts, RxValueTypes, SyncOptions } from "./Types.js";
 import { messageHasValue } from "./Util.js";
 import { map as ImmutableMap } from '../Immutable.js';
 
@@ -43,18 +43,18 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       return w;
     },
     annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation): Wrapped<TIn & TAnnotation> => {
-      const a = annotate<TIn, TAnnotation>(transformer)(source);
+      const a = annotate<TIn, TAnnotation>(source, transformer);
       return wrap(a);
     },
     annotateElapsed: () => {
-      return wrap(annotateElapsed<TIn>()(source));
+      return wrap(annotateElapsed<TIn>(source));
     },
     field: <TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>> = {}) => {
       const f = field<TIn, TFieldType>(fieldName, options)(source);
       return wrap<TFieldType>(f);
     },
     filter: (predicate: FilterPredicate<TIn>, options: Partial<InitStreamOptions>) => {
-      return wrap(filter(predicate, options)(source));
+      return wrap(filter(source, predicate, options));
     },
     split: (options: Partial<SplitOptions> = {}) => {
       const streams = split<TIn>(options)(source).map(v => wrap(v));
@@ -70,11 +70,11 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       const m = ImmutableMap<typeof s, Wrapped<TIn>>(s, v => wrap(v as Reactive<TIn>));
       return m as Record<TLabel, Wrapped<TIn>>;
     },
-    synchronise: (...additionalSources: Array<Wrapped<TIn> | ReactiveOrSource<TIn>>) => {
-      const unwrapped: Array<Reactive<TIn>> = additionalSources.map(v => {
-        return `source` in v ? v.source : resolveSource(v);
-      });
-      return wrap(synchronise<TIn>()(source, ...unwrapped));
+    //synchronise: (...additionalSources: Array<Wrapped<TIn> | ReactiveOrSource<TIn>>) => {
+    synchronise: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(additionalSources: T, options: Partial<SyncOptions> = {}) => {
+      const unwrapped = [ source, ...additionalSources ].map(v => resolveSource(v));
+      const x = sync(unwrapped, options) as Reactive<[ TIn, ...RxValueTypes<T> ]>;
+      return wrap(x); //synchronise<TIn>([ source, ...unwrapped ] as const));
     },
     debounce: (options: Partial<DebounceOptions> = {}) => {
       return wrap(debounce<TIn>(source, options));
