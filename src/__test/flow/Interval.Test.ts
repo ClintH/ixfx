@@ -1,8 +1,8 @@
 import test from 'ava';
 import { intervalToMs, isInterval } from '../../flow/IntervalType.js';
 import { Elapsed, interval } from '../../flow/index.js';
-import { isApproximately } from '../../Numbers.js';
-import { count } from '../../generators/index.js';
+import { isApproximately } from '../../numbers/IsApproximately.js';
+import { count } from '../../numbers/Count.js';
 
 test('interval-function', async (t) => {
   const rateMs = 50;

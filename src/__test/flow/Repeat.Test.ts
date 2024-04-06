@@ -2,15 +2,15 @@ import test from 'ava';
 import { repeat } from '../../flow/index.js';
 
 test(`repeat`, (t) => {
-  const test1 = [...repeat(5, () => 1)];
+  const test1 = [ ...repeat(5, () => 1) ];
   t.is(test1.length, 5);
 
-  const test2 = [...repeat(0, () => 1)];
+  const test2 = [ ...repeat(0, () => 1) ];
   t.is(test2.length, 0);
 
   // Error: not a number
   // @ts-ignore
-  t.throws(() => [...repeat(undefined, () => 10)]);
+  t.throws(() => [ ...repeat(undefined, () => 10) ]);
 
   // Test using predicate
   const test3 = [

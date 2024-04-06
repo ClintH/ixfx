@@ -1,7 +1,7 @@
 import test from 'ava';
 import { retryFunction, backoffGenerator } from '../../flow/Retry.js';
 import { Elapsed, sleep } from '../../flow/index.js';
-import { isApproximately } from '../../Numbers.js';
+import { isApproximately } from '../../numbers/IsApproximately.js';
 
 test('backoffGenerator', async t => {
   // Use 1 as value, 1.1 as power

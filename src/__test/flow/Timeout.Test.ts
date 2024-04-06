@@ -1,8 +1,7 @@
 import test from 'ava';
 import { timeout } from '../../flow/Timeout.js';
 import { sleep } from '../../flow/Sleep.js';
-import { Elapsed } from '../../flow/index.js';
-import { isApproximately } from '../../Numbers.js';
+import { isApproximately } from '../../numbers/IsApproximately.js';
 
 /**
  * Tests a single firing

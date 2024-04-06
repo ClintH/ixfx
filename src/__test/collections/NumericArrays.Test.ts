@@ -1,6 +1,6 @@
 import test from 'ava';
 import { average, minMaxAvg } from '../../collections/arrays/NumericArrays.js';
-import { count } from '../../generators/index.js';
+import { count } from '../../numbers/Count.js';
 
 test(`minMaxAvg`, (t) => {
   const startIndex = 5;
