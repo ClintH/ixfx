@@ -1,8 +1,40 @@
 A rough changelog between NPM releases
 
+# 0.20.0 24.04.06
+
+* Refactor to remove 'Generators' module. Functions moved to Numbers, Text & Iterables modules.
+* Data.ResolveFields: given a Record<string,v>, returns a Record<string,x>. Where v is a value,function,reactive,iterable and x is a primitive value or object. Essentially it resolve each field where there are dynamic fields to a value.
+
+Iterables
+* Rather than having to use Sync or Async sub-modules, there's a 'front-end' function which calls the right one 
+* Improved parity of Sync/Async versions
+
+Collections.Maps
+  + some: returns _true_ for any value in map
+
+Flow
+ * repeat: refactor to allow async callback values
+ * continuously: added support for AbortSignal
+* 
+Rx
+ + count: produce incrementing values
+ + fromFunction: yield values based on calling a function repeatedy
+ + pinged: trigger a function and yield a value whenever an upstream reactive produces a value
+ + fromObject: Yield values based on change to an object
+ + fromProxy: Intercept changes to an object and use that to produce values (uses fromObject)
+ + fromEvent: produce values based on events firing
+ + wrap: Produce a fluent wrapper arounds Reactive functions
+ + isReactive: return true if input value looks like a reactive
+ + mergeToObject: from an input of Record<string,Reactive>, yield object values with same keys as map of input reactives
+ + mergeToArray: from an input set of Reactives, yield array values in same order as input reactives
+ + sync: Only emit values when all input reactives produce a value, yielding an array of values
+ + syncToObject: Only emit values when all input reactives produce a value, yield an object
+ + cache: Guarantee a value from a readable reactive
++ 
 # 0.19.0 24.03.24
 
-CanvasHelper class instead of 'fullScreenCanvas' function
+Dom
++ CanvasHelper class instead of 'fullScreenCanvas' function
 
 
 # 0.18.6 07.03.24
