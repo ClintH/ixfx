@@ -251,7 +251,7 @@ const updateByPathImpl = (o: any, split: Array<string>, value: any, allowShapeCh
   const isInt = isInteger(start);
   if (isInt && Array.isArray(o)) {
     const index = Number.parseInt(start);
-    if (index >= o.length && !allowShapeChange) throw new Error(`Array index ${ index } is outside of the existing length of ${ o.length }. Use allowShapeChange=true to permit this.`);
+    if (index >= o.length && !allowShapeChange) throw new Error(`Array index ${ index.toString() } is outside of the existing length of ${ o.length.toString() }. Use allowShapeChange=true to permit this.`);
     const copy = [ ...o ];
     copy[ index ] = updateByPathImpl(copy[ index ], split, value, allowShapeChange);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -386,6 +386,13 @@ export const map = <
   return Object.fromEntries(mapped);
 };
 
+// const o = {
+//   hello:`there`
+// };
+// const o1 = map(o, (field) => 1);
+// o1.hello = 10;
+
+
 /**
  * Returns a copy of `object` with integer numbers as keys instead of whatever it has.
  * ```js
@@ -449,8 +456,11 @@ export const mapKeys = <TKey extends string | number | symbol>(object: Record<an
   return destinationObject;
 }
 
-export type RemapObjectPropertyType<OriginalType, PropertyType> = {
+export type ReadonlyRemapObjectPropertyType<OriginalType, PropertyType> = {
   readonly [ Property in keyof OriginalType ]: PropertyType;
+};
+export type RemapObjectPropertyType<OriginalType, PropertyType> = {
+  [ Property in keyof OriginalType ]: PropertyType;
 };
 
 /**
