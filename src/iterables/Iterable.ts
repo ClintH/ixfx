@@ -3,13 +3,13 @@ type WithEvents = {
   removeEventListener(type: string, callbackfn: any): void;
 }
 
-//export { eachInterval } from './flow/Interval.js';
-
 export const isAsyncIterable = (v: any): v is AsyncIterable<any> =>
   Symbol.asyncIterator in new Object(v);
 
 export const isIterable = (v: any): v is Iterable<any> =>
   Symbol.iterator in new Object(v);
+
+
 
 export const eventsToIterable = <V>(
   eventSource: WithEvents,
@@ -66,7 +66,7 @@ export const eventsToIterable = <V>(
       done = true;
       return {
         done: true,
-        value: Promise.reject(error),
+        value: Promise.reject(new Error(error)),
       };
     },
   };

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable unicorn/prefer-ternary */
-import { Async } from "../index.js";
+import * as Async from "../IterableAsync.js";
 import { Elapsed } from "../../flow/index.js";
 import { intervalToMs, type Interval } from "../../flow/IntervalType.js";
 import { sleep } from "../../flow/Sleep.js";
@@ -292,7 +292,7 @@ export function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>
       outputType.next().then(v => {
         lastValue = v.value;
         awaiting = false;
-      }).catch(error => {
+      }).catch((error: unknown) => {
         awaiting = false;
         throw error;
       });

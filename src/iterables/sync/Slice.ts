@@ -1,10 +1,3 @@
-/**
- * Returns a section from an iterable
- * @param it Iterable
- * @param start Start index
- * @param end End index (or until completion)
- */
-//eslint-disable-next-line func-style
 export function* slice<V>(
   it: Iterable<V>,
   start = 0,

@@ -1,4 +1,4 @@
-import { Async } from "../index.js";
+import * as Async from "../IterableAsync.js";
 import type { GenOrData, GenFactoryNoInput, Gen } from "./Types.js";
 import { isAsyncIterable } from "../Iterable.js";
 import { sleep } from "../../flow/Sleep.js";

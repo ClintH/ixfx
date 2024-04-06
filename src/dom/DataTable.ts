@@ -1,4 +1,4 @@
-import { round } from '../Numbers.js';
+import { round } from '../numbers/Round.js';
 import { resolveEl as resolveElement } from './ResolveEl.js';
 import JSON5 from 'json5';
 
