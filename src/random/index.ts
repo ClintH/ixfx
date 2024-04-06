@@ -1,9 +1,9 @@
 import { shuffle } from '../collections/arrays/index.js';
 import { numberTest as guardNumberTest, integerTest as guardIntegerTest, throwFromResult } from '../Guards.js';
 
-import { range } from '../generators/IterableSync.js';
 import { type RandomSource, defaultRandom, type RandomOptions } from './Types.js';
 import { floatSource } from './FloatSource.js';
+import { count } from '../numbers/Count.js';
 
 export { randomElement as arrayElement } from '../collections/arrays/index.js';
 export { randomHue as hue } from '../visual/Colour.js';
@@ -407,10 +407,8 @@ export function* integerUniqueGen(
     throw new Error(`Min value is greater than max. Min: ${ min } Max: ${ max }`);
   }
 
-  const origRange = [ ...range(min, max - min) ];
-  //eslint-disable-next-line functional/no-let
+  const origRange = [ ...count(max - min, min) ];
   let numberRange = shuffle(origRange);
-  //eslint-disable-next-line functional/no-let
   let index = 0;
   while (true) {
     if (index === numberRange.length) {

@@ -6,7 +6,7 @@ import {
   quantiseEvery,
   round,
   applyToValues
-} from '../Numbers.js';
+} from '../numbers/index.js';
 
 test('apply', t => {
   const o = {
@@ -25,7 +25,7 @@ test('apply', t => {
     s: 1,
   }
   const oo2 = applyToValues(oo, v => round(3, v));
-  t.like(oo2, {h: 330, l: 0.705, s: 1});
+  t.like(oo2, { h: 330, l: 0.705, s: 1 });
 
 });
 
@@ -48,7 +48,7 @@ test('isApproximately', (t) => {
 
   t.throws(() => isApproximately(Number.NaN, 0.1));
   // @ts-ignore
-  t.throws(() => isApproximately({hello: 'there'}, 0.1));
+  t.throws(() => isApproximately({ hello: 'there' }, 0.1));
   // @ts-ignore
   t.throws(() => isApproximately('100', 0.1));
   // @ts-ignore
@@ -81,21 +81,21 @@ test(`round`, (t) => {
 });
 
 test(`linearSpace`, (t) => {
-  const t1 = [...linearSpace(0, 9, 10)];
-  t.like(t1, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  const t1 = [ ...linearSpace(0, 9, 10) ];
+  t.like(t1, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]);
 
-  const t2 = [...linearSpace(5, 10, 11)];
+  const t2 = [ ...linearSpace(5, 10, 11) ];
 
-  t.like(t2, [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10]);
+  t.like(t2, [ 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10 ]);
 
-  const t3 = [...linearSpace(10, 5, 6)];
-  t.like(t3, [10, 9, 8, 7, 6, 5]);
+  const t3 = [ ...linearSpace(10, 5, 6) ];
+  t.like(t3, [ 10, 9, 8, 7, 6, 5 ]);
 
-  const t4 = [...linearSpace(10, 5, 2)];
-  t.like(t4, [10, 5]);
+  const t4 = [ ...linearSpace(10, 5, 2) ];
+  t.like(t4, [ 10, 5 ]);
 
-  const t5 = [...linearSpace(10, 5, 3)];
-  t.like(t5, [10, 7.5, 5]);
+  const t5 = [ ...linearSpace(10, 5, 3) ];
+  t.like(t5, [ 10, 7.5, 5 ]);
 });
 
 test(`quantiseEvery`, (t) => {
@@ -115,19 +115,19 @@ test(`quantiseEvery`, (t) => {
 });
 
 test(`average`, (t) => {
-  const a = [1];
+  const a = [ 1 ];
   t.is(average(...a), 1);
 
-  const b = [1, 2, 3, 4, 5];
+  const b = [ 1, 2, 3, 4, 5 ];
   t.is(average(...b), 3);
 
-  const c = [-5, 5];
+  const c = [ -5, 5 ];
   t.is(average(...c), 0);
 
-  const d = [1, 0, null, undefined, NaN];
+  const d = [ 1, 0, null, undefined, NaN ];
   // @ts-ignore
   t.is(average(...d), 0.5);
 
-  const e = [1, 1.4, 0.9, 0.1];
+  const e = [ 1, 1.4, 0.9, 0.1 ];
   t.is(average(...e), 0.85);
 });
