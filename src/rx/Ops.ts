@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { intervalToMs } from "../flow/IntervalType.js";
-import { QueueMutable } from "../collections/index.js";
+import { Maps, QueueMutable } from "../collections/index.js";
 import { continuously } from "../flow/Continuously.js";
 import { isPlainObjectOrPrimitive } from "../Util.js";
 import { shuffle } from "../collections/arrays/index.js";
 import { timeout } from "../flow/Timeout.js";
-import type { AnnotationElapsed, BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, InitStreamOptions, Passed, PipeSet, Reactive, ReactiveDisposable, ReactiveOp, ReactiveOrSource, ReactiveStream, ReactiveWritable, ResolveOptions, SingleFromArrayOptions, SplitOptions, SwitcherOptions, ThrottleOptions, TransformOpts } from "./Types.js";
+import type { AnnotationElapsed, BatchOptions, CacheOpts, DebounceOptions, FieldOptions, FilterPredicate, InitStreamOptions, MergeOptions, Passed, PipeSet, Reactive, ReactiveDisposable, ReactiveInitial, ReactiveOp, ReactiveOrSource, ReactiveStream, ReactiveWritable, ResolveOptions, RxValueTypeObject, RxValueTypes, SingleFromArrayOptions, SplitOptions, SwitcherOptions, SyncOptions, ThrottleOptions, TransformOpts } from "./Types.js";
 import { isDisposable, messageHasValue, messageIsDoneSignal, messageIsSignal } from "./Util.js";
 import { initStream, initUpstream } from "./InitStream.js";
 import { resolveSource } from "./ResolveSource.js";
+import { zipKeyValue } from "../collections/map/MapFns.js";
 
 /**
  * Connects reactive A to B, passing through a transform function.
@@ -26,7 +27,7 @@ export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform: 
       unsub();
       if (closeBonA) {
         if (isDisposable(b)) {
-          b.dispose(`Source closed (${ message.context })`);
+          b.dispose(`Source closed (${ message.context ?? `` })`);
         } else {
           console.warn(`Reactive.to cannot close 'b' reactive since it is not disposable`);
         }
@@ -57,7 +58,7 @@ export const split = <T>(options: Partial<SplitOptions> = {}) => {
     const outputs: Array<ReactiveStream<T>> = [];
     const source = resolveSource(r);
     for (let index = 0; index < quantity; index++) {
-      outputs.push(initUpstream(source, { disposeIfSourceDone: true, lazy: true }));
+      outputs.push(initUpstream(source, { disposeIfSourceDone: true, lazy: `initial` }));
     }
     return outputs;
   }
@@ -81,7 +82,7 @@ export const splitLabelled = <T, K extends PropertyKey>(...labels: Array<K>) => 
     const source = resolveSource(r);
     const t: Partial<Record<K, Reactive<T>>> = {}
     for (const label of labels) {
-      t[ label ] = initUpstream(source, { lazy: true, disposeIfSourceDone: true });
+      t[ label ] = initUpstream(source, { lazy: `initial`, disposeIfSourceDone: true });
     }
     return t as Record<K, Reactive<T>>;
   }
@@ -110,13 +111,13 @@ export const splitLabelled = <T, K extends PropertyKey>(...labels: Array<K>) => 
  * });
  * // Listen for outputs from each of the resulting streams
  * x.even.on(msg => {
- *   console.log(`even: ${msg.value}`);
+ *   log(`even: ${msg.value}`);
  * });
  * x.odd.on(msg => {
- *   console.log(`odd: ${msg.value}`);
+ *   log(`odd: ${msg.value}`);
  * })
  * // Set new values to the number source, counting upwards
- * // ...this will in turn trigger the console outputs above
+ * // ...this will in turn trigger the outputs above
  * setInterval(() => {
  *   switcherSource.set(switcherSource.last() + 1);
  * }, 1000);
@@ -219,25 +220,188 @@ export const pipe = <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>): Rea
   };
 }
 
+
+
+
+// const sources = [
+//   readFromArray([ 1, 2, 3 ]),
+//   readFromArray([ `hello`, `there` ])
+// ] as const;
+// const mergeResult = mergeToArray(sources);
+// mergeResult.value(value => {
+//   const v0 = value[ 0 ];
+//   const v1 = value[ 1 ];
+// })
+// const syncResult = synchronise(sources);
+// syncResult.value(value => {
+//   const v0 = value[ 0 ];
+//   const v1 = value[ 1 ];
+// })
+
+/**
+ * Monitors input reactive values, storing values as they happen to an object.
+ * Whenever a new value is emitted, the whole object is sent out, containing current
+ * values from each source (or _undefined_ if not yet emitted)
+ * 
+ * See {@link mergeToArray} to combine streams by name into an array instead.
+ * 
+ * ```
+ * const sources = {
+ *  fast: Rx.fromFunction(Math.random, { loop: true, interval: 100 }),
+ *  slow: Rx.fromFunction(Math.random, { loop: true, interval: 200 })
+ * ];
+ * const r = Rx.mergeToArray(sources);
+ * r.value(value => {
+ *  // 'value' will be an object containing the labelled latest
+ *  // values from each source.
+ *  // { fast: number, slow: number }
+ * });
+ * ```
+ * 
+ * The tempo of this stream will be set by the fastest source stream.
+ * See {@link sync} to have pace determined by slowest source, and only
+ * send when each source has produce a new value compared to last time.
+ * 
+ * This source ends if all source streams end.
+ * @param reactiveSources Sources to merge
+ * @param options Options for merging 
+ * @returns 
+ */
+export function mergeToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<MergeOptions> = {}): ReactiveDisposable & Reactive<RxValueTypeObject<T>> {
+  type State<V> = {
+    source: Reactive<V>
+    done: boolean
+    data: V | undefined
+    off: () => void
+  }
+
+  const event = initStream<RxValueTypeObject<T>>();
+  const onSourceDone = options.onSourceDone ?? `break`;
+
+  const states = new Map<string, State<any>>();
+  for (const [ key, source ] of Object.entries(reactiveSources)) {
+    const s: State<any> = {
+      source: resolveSource(source),
+      done: false,
+      data: undefined,
+      off: () => { /** no-op */ }
+    }
+    states.set(key, s);
+  }
+  // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
+  const someUnfinished = () => Maps.some(states, v => !v.done);
+
+  const unsub = () => {
+    for (const state of states.values()) state.off();
+  }
+
+  const getData = (): RxValueTypeObject<T> => {
+    const r = {};
+    for (const [ key, state ] of states) {
+      (r as any)[ key ] = state.data;
+    }
+    return r as RxValueTypeObject<T>;
+  }
+
+  for (const state of states.values()) {
+    state.off = state.source.on(message => {
+      if (messageIsDoneSignal(message)) {
+        state.done = true;
+        state.off();
+        state.off = () => {/**no-op */ }
+        if (onSourceDone === `break`) {
+          unsub();
+          event.dispose(`Source has completed and 'break' is behaviour`);
+          return;
+        }
+        if (!someUnfinished()) {
+          // All sources are done
+          unsub();
+          event.dispose(`All sources completed`);
+        }
+      } else if (messageHasValue(message)) {
+        state.data = message.value;
+        event.set(getData());
+      }
+    });
+  }
+
+  return {
+    on: event.on,
+    value: event.value,
+    dispose(reason) {
+      console.log(`mergeToObject dispose`);
+      unsub();
+      event.dispose(reason);
+    },
+    isDisposed() {
+      return event.isDisposed()
+    },
+  }
+}
+
 /**
  * Monitors input reactive values, storing values as they happen to an array.
  * Whenever a new value is emitted, the whole array is sent out, containing current
- * values from each source.
+ * values from each source, or _undefined_ if not yet emitted.
  * 
- * @param values 
+ * See {@link mergeToObject} to combine streams by name into an object, rather than array.
+ * 
+ * ```
+ * const sources = [
+ *  Rx.fromFunction(Math.random, { loop: true, interval: 100 }),
+ *  Rx.fromFunction(Math.random, { loop: true, interval: 200 })
+ * ];
+ * const r = Rx.mergeToArray(sources);
+ * r.value(value => {
+ *  // Value will be an array of last value from each source:
+ *  // [number,number]  
+ * });
+ * ```
+ * 
+ * The tempo of this stream will be set by the fastest source stream.
+ * See {@link sync} to have pace determined by slowest source, and only
+ * send when each source has produce a new value compared to last time.
+ * 
+ * This source ends if all source streams end.
+ * @param reactiveSources Sources to merge
+ * @param options Options for merging 
  * @returns 
  */
-export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V | undefined>> {
-  const event = initStream<Array<V | undefined>>();
-  const data: Array<V | undefined> = [];
+export function mergeToArray<const T extends ReadonlyArray<ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<MergeOptions> = {}): Reactive<RxValueTypes<T>> {
+  const event = initStream<RxValueTypes<T>>();
+  const onSourceDone = options.onSourceDone ?? `break`;
+  const data: Array<RxValueTypes<T> | undefined> = [];
+  const sources = reactiveSources.map(source => resolveSource(source));
+  const noop = () => {/** no-op */ };
+  const sourceOff = sources.map(_ => noop);
+  const doneSources = sources.map(_ => false);
 
-  for (const [ index, v ] of values.entries()) {
+  const unsub = () => {
+    for (const v of sourceOff) { v() }
+  }
+
+  for (const [ index, v ] of sources.entries()) {
     data[ index ] = undefined;
-    v.on(valueChanged => {
-      if (!messageIsSignal(valueChanged)) {
-        data[ index ] = valueChanged.value;
+    sourceOff[ index ] = v.on(message => {
+      if (messageIsDoneSignal(message)) {
+        doneSources[ index ] = true;
+        sourceOff[ index ]();
+        sourceOff[ index ] = noop;
+        if (onSourceDone === `break`) {
+          unsub();
+          event.dispose(`Source has completed and 'break' is set`);
+          return;
+        }
+        if (!doneSources.includes(false)) {
+          // All sources are done
+          unsub();
+          event.dispose(`All sources completed`);
+        }
+      } else if (messageHasValue(message)) {
+        data[ index ] = message.value;
+        event.set([ ...data ] as RxValueTypes<T>);
       }
-      event.set(data);
     });
   }
 
@@ -247,46 +411,153 @@ export function mergeAsArray<V>(...values: Array<Reactive<V>>): Reactive<Array<V
   }
 }
 
+
+
+export function syncToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<SyncOptions> = {}): Reactive<RxValueTypeObject<T>> {
+  const keys = Object.keys(reactiveSources)
+  const values = Object.values(reactiveSources);
+
+  const s = sync(values, options);
+  const st = transform(s, (streamValues) => {
+    return zipKeyValue(keys, streamValues);
+  });
+  return st as Reactive<RxValueTypeObject<T>>;
+}
+
+//export function synchronise<V>(sources: Array<ReactiveOrSource<any>>, options: Partial<SynchroniseOptions> = {}): Reactive<Array<any>> {
+
 /**
  * Waits for all sources to produce a value, sending the combined results as an array.
- * After sending, it waits again for each source to send a value.
+ * After sending, it waits again for each source to send at least one value.
  * 
- * Each source's latest value is returned, in the case of some sources producing results
- * faster than others.
+ * Use {@link syncToObject} to output objects based on labelled sources rather than an array of values.
  * 
- * If a value completes, we won't wait for it and the result set gets smaller.
+ * Pace will be set by the slowest source. Alternatively, use {@link mergeToArray} where the rate is determined by fastest source.
  * 
+ * Only complete results are sent. For example if source A & B finish and source C is still producing values,
+ * synchronisation is not possible because A & B stopped producing values. Thus the stream will self-terminate
+ * after `maximumWait` (2 seconds). The newer values from C are lost.
  */
-export function synchronise<V>() {
-  return (...sources: Array<ReactiveOrSource<V>>): Reactive<Array<V | undefined>> => {
-    const event = initStream<Array<V>>();
-    let data: Array<V | undefined> = [];
+export function sync<const T extends ReadonlyArray<ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<SyncOptions> = {}): Reactive<RxValueTypes<T>> {
+  const onSourceDone = options.onSourceDone ?? `break`;
+  const finalValue = options.finalValue ?? `undefined`;
+  const maximumWait = intervalToMs(options.maximumWait, 2000);
 
-    for (const [ index, source ] of sources.entries()) {
+  let watchdog: ReturnType<typeof globalThis.setTimeout> | undefined;
+
+  type State<V> = {
+    done: boolean,
+    finalData: V | undefined,
+    source: Reactive<V>
+    unsub: () => void
+  }
+
+  const data: Array<RxValueTypes<T> | undefined> = [];
+  //const finalData: Array<RxValueTypes<T> | undefined> = [];
+
+  // Resolve sources
+  //const sources = reactiveSources.map(source => resolveSource(source));
+  //const noop = () => {/*no-op*/ }
+  //const sourcesUnsub: Array<Unsubscriber> = sources.map(_ => noop);
+
+  const states: Array<State<any>> = reactiveSources.map(source => ({
+    finalData: undefined,
+    done: false,
+    source: resolveSource(source),
+    unsub: () => {/**no-op */ }
+  }));
+
+
+  const unsubscribe = () => {
+    for (const s of states) {
+      s.unsub();
+      s.unsub = () => {/**no-op */ }
+    }
+  }
+
+  const isDataSetComplete = () => {
+    // eslint-disable-next-line unicorn/no-for-loop
+    for (let index = 0; index < data.length; index++) {
+      if (onSourceDone === `allow` && states[ index ].done) continue;
+      if (data[ index ] === undefined) return false;
+    }
+    return true;
+  }
+
+  const hasIncompleteSource = () => states.some(s => !s.done);
+  const resetDataSet = () => {
+    for (let index = 0; index < data.length; index++) {
+      if (finalValue === `last` && states[ index ].done) continue; // Don't overwrite
       data[ index ] = undefined;
-      const v = resolveSource(source);
-      v.on(valueChanged => {
+    }
+  }
+
+  const onWatchdog = () => {
+    done(`Sync timeout exceeded (${ maximumWait.toString() })`);
+  }
+
+  const done = (reason: string) => {
+    if (watchdog) clearTimeout(watchdog);
+    unsubscribe();
+    event.dispose(reason);
+  }
+
+  const init = () => {
+    watchdog = setTimeout(onWatchdog, maximumWait);
+
+    for (const [ index, state ] of states.entries()) {
+      data[ index ] = undefined; // init array positions to be undefined
+
+      state.unsub = state.source.on(valueChanged => {
         if (messageIsSignal(valueChanged)) {
           if (valueChanged.signal === `done`) {
-            sources.splice(index, 1);
+            state.finalData = data[ index ];
+            state.unsub();
+            state.done = true;
+            state.unsub = () => { /** no-op */ }
+            if (finalValue === `undefined`) data[ index ] = undefined;
+            if (onSourceDone === `break`) {
+              done(`Source '${ index.toString() }' done, and onSourceDone:'break' is set`);
+              return;
+            }
+            if (!hasIncompleteSource()) {
+              done(`All sources done`);
+              return;
+            }
           }
           return;
         }
         data[ index ] = valueChanged.value;
 
-        if (!data.includes(undefined)) {
+        if (isDataSetComplete()) {
           // All array elements contain values
-          event.set(data as Array<V>);
-          data = [];
+          // Emit data and reset
+          event.set([ ...data ] as RxValueTypes<T>);
+          resetDataSet();
+          if (watchdog) clearTimeout(watchdog);
+          watchdog = setTimeout(onWatchdog, maximumWait);
         }
       });
     }
-
-    return {
-      on: event.on,
-      value: event.value
-    }
   }
+
+  const event = initStream<RxValueTypes<T>>({
+    onFirstSubscribe() {
+      unsubscribe();
+      init();
+    },
+    onNoSubscribers() {
+      if (watchdog) clearTimeout(watchdog);
+      unsubscribe();
+
+    },
+  });
+
+  return {
+    on: event.on,
+    value: event.value
+  }
+
 }
 
 /**
@@ -296,7 +567,7 @@ export function synchronise<V>() {
  * const rx = resolve('hello', { interval: 5000 });
  * rx.on(msg => {
  *  // 'hello' after 5 seconds
- *  console.log(msg.value);
+ *  log(msg.value);
  * });
  * ```
  * 
@@ -380,19 +651,16 @@ export function field<TIn, TFieldType>(fieldName: keyof TIn, options: Partial<Fi
 /**
  * Passes all values where `predicate` function returns _true_.
  */
-export function filter<In>(predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): ReactiveOp<In, In> {
-  return (input: ReactiveOrSource<In>): Reactive<In> => {
-    const upstream = initUpstream<In, In>(input, {
-      ...options,
-      onValue(value) {
-        if (predicate(value)) {
-          upstream.set(value);
-        }
-      },
-    })
-
-    return toReadable(upstream);
-  }
+export function filter<In>(input: ReactiveOrSource<In>, predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): Reactive<In> {
+  const upstream = initUpstream<In, In>(input, {
+    ...options,
+    onValue(value) {
+      if (predicate(value)) {
+        upstream.set(value);
+      }
+    },
+  })
+  return toReadable(upstream);
 }
 
 const toReadable = <V>(upstream: ReactiveStream<V>) => ({ on: upstream.on, value: upstream.value });
@@ -403,8 +671,8 @@ const toReadable = <V>(upstream: ReactiveStream<V>) => ({ on: upstream.on, value
  * @returns 
  */
 export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (value: In) => Out, options: Partial<TransformOpts> = {}): Reactive<Out> {
-  //return (): Reactive<Out> => {
   const upstream = initUpstream<In, Out>(input, {
+    lazy: `initial`,
     ...options,
     onValue(value) {
       const t = transformer(value);
@@ -413,26 +681,112 @@ export function transform<In, Out>(input: ReactiveOrSource<In>, transformer: (va
   })
 
   return toReadable(upstream);
-  // }
 }
 
+/**
+ * Returns a new stream that uses `initial` as it's starting 'last' value.
+ * When `input` emits new values, this will be returned as the 'last' value.
+ * 
+ * `input` won't be activated until the defaultValue reactive is subscribed to.
+ * 
+ * ```js
+ * // Produce a random number after 1s
+ * const r = Rx.fromFunction(Math.random, { predelay: 1000 });
+ * // Wrap reactive with an initial value of 10
+ * const dv = Rx.defaultValue(r, 10);
+ * dv.last(); // 10
+ * ```
+ * 
+ * In this case, `dv.last()` will _always_ be 10 because we're not subscribing
+ * to `dv`. To do this, we ought to subscribe, or use {@link takeLastValue}.
+ * ```js
+ * const value = await Rx.takeLastValue(dv);
+ * ```
+ * 
+ * Another option is to pass in `lazy: false` when initialising `defaultValue`.
+ * This way `fromFunction` stream is subscribed to immediately and it produces a value.
+ * ```js
+ * const r = Rx.fromFunction(Math.random, { predelay: 1000 });
+ * const dv = Rx.defaultValue(r, 10, { lazy: false });
+ * dv.last();   // 10
+ * await sleep(1000);
+ * dv.last();   // eg. 0.3234
+ * ```
+ * @param input 
+ * @param initial 
+ * @returns 
+ */
+// export function defaultValue<In>(input: ReactiveOrSource<In>, initial: In, options: Partial<UpstreamOptions<In>> = {}): ReactiveInitial<In> {
+//   let value = initial;
+//   const stream = initUpstream<In, In>(input, {
+//     ...options,
+//     onValue(v) {
+//       value = v;
+//       stream.set(v);
+//     }
+//   });
+//   return {
+//     on: stream.on,
+//     last() {
+//       return value;
+//     },
+//     value: stream.value
+//   };
+// }
+
+/**
+ * Caches the last value from a stream so it's available
+ * as a `last` parameter
+ * @param input 
+ * @param options 
+ * @returns 
+ */
+export function cache<In>(input: ReactiveOrSource<In>, options: Partial<CacheOpts<In>> = {}): ReactiveInitial<In> {
+  let lastValue: In | undefined = options.initialValue;
+  const upstream = initUpstream<In, In>(input, {
+    ...options,
+    onValue(value) {
+      lastValue = value;
+      upstream.set(value);
+    },
+  })
+
+  const readable = toReadable(upstream);
+  return {
+    ...readable,
+    // @ts-expect-error
+    last() {
+      return lastValue;
+    },
+  }
+}
+
+// export function selectFields<In,Fields extends string[]>(input:ReactiveOrSource<In>, fields:Fields, options:Partial<InitStreamOptions> = {}): Reactive<Out> {
+
+//   const upstream = initUpstream<In, Out>(input, {
+//     ...options,
+//     onValue(value) {
+//       const t = transformer(value);
+//       upstream.set(t);
+//     },
+//   })
+
+//   return toReadable(upstream);
+// }
 
 /**
  * Annotates values from `source`, appending new fields to values.
  * Output stream will be the type `In & Out`.
  */
-export function annotate<In, TAnnotation>(transformer: (value: In) => In & TAnnotation, options: Partial<TransformOpts> = {}): ReactiveOp<In, In & TAnnotation> {
-  return (input: ReactiveOrSource<In>): Reactive<In & TAnnotation> => {
-    const upstream = initUpstream<In, In & TAnnotation>(input, {
-      ...options,
-      onValue(value) {
-        const t = transformer(value);
-        upstream.set(t);
-      },
-    })
-
-    return toReadable(upstream);
-  }
+export function annotate<In, TAnnotation>(input: ReactiveOrSource<In>, transformer: (value: In) => In & TAnnotation, options: Partial<TransformOpts> = {}): Reactive<In & TAnnotation> {
+  const upstream = initUpstream<In, In & TAnnotation>(input, {
+    ...options,
+    onValue(value) {
+      const t = transformer(value);
+      upstream.set(t);
+    },
+  })
+  return toReadable(upstream);
 }
 
 /**
@@ -443,16 +797,13 @@ export function annotate<In, TAnnotation>(transformer: (value: In) => In & TAnno
  * @param options 
  * @returns 
  */
-export const annotateElapsed = <In>() => {
-  return (input: ReactiveOrSource<In>) => {
-    let last = 0;
-    const a = annotate<In, AnnotationElapsed>((value) => {
-      const elapsed = last === 0 ? 0 : Date.now() - last;
-      last = Date.now();
-      return { ...value, elapsedMs: elapsed };
-    })(input);
-    return a;
-  }
+export const annotateElapsed = <In>(input: ReactiveOrSource<In>) => {
+  let last = 0;
+  return annotate<In, AnnotationElapsed>(input, (value) => {
+    const elapsed = last === 0 ? 0 : Date.now() - last;
+    last = Date.now();
+    return { ...value, elapsedMs: elapsed };
+  });
 }
 
 /**
@@ -525,62 +876,12 @@ export function singleFromArray<V>(source: ReactiveOrSource<Array<V>>, options: 
   return upstream;
 }
 
-/**
- * Batches values from `source`, and then emits a single value according to the selection logic.
- * @param source 
- * @param options 
- * @returns 
- */
-// export function batchAndSingle<V>(options: Partial<SingleFromArrayOptions<V> & BatchOptions>): ReactiveOp<V, V> {
-//   const b = batch(options);
-//   return (source: ReactiveOrSource<V>) => {
-//     const batched = batch(source, options);
-//     const single = singleFromArray(batched, options);
-//     return single;
-//   }
-// }
 
-// export function batchOp<V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> {
-//   return (source: ReactiveOrSource<V>) => {
-//     return batch(source, options);
-//   }
-// }
 
 
 /**
- * Connects all the `ops` together, ready for a source.
- * Returns a function that takes a `source`.
- * @param ops 
- * @returns 
- */
-const prepareOps = <TIn, TOut>(...ops: Array<ReactiveOp<TIn, TOut>>) => {
-  return (source: ReactiveOrSource<TIn>) => {
-    for (const op of ops) {
-      // @ts-expect-error
-      source = op(source);
-    }
-    return source as any as Reactive<TOut>;
-  }
-}
-
-/**
- * Connects `source` to serially-connected set of ops. Values thus
- * flow from `source` to each op in turn.
- * 
- * Returned result is the final reactive.
- * 
- * @param source 
- * @param ops 
- * @returns 
- */
-export function run<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<any, any>>) {
-  const raw = prepareOps<TIn, TOut>(...ops);
-  return raw(source);
-}
-
-/**
- * Queue from `source`, emitting when thresholds are reached. Returns a new Reactive
- * which produces arrays.
+ * Queue from `source`, emitting when thresholds are reached. 
+ * The resulting Reactive produces arrays.
  * 
  * Can use a combination of elapsed time or number of data items.
  * 
@@ -614,15 +915,12 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
     },
     onValue(value: V) {
       queue.enqueue(value);
-      //console.log(`Reactive.batch onValue. Queue len: ${ queue.length } quantity: ${ quantity } timer state: '${ timer?.runState }'`);
       if (quantity > 0 && queue.length >= quantity) {
         // Reached quantity limit
         send();
       }
       // Start timer
-      //console.log(timer?.isDone);
       if (timer !== undefined && timer.runState === `idle`) {
-        //console.log(`Reactive.batch timer started`);
         timer.start();
       }
     },
@@ -630,7 +928,6 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
   const upstream = initUpstream<V, Array<V>>(batchSource, upstreamOpts);
 
   const send = () => {
-    //console.log(`Reactive.batch send`);
     if (queue.isEmpty) return;
 
     // Reset timer
