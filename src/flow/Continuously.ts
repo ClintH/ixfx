@@ -64,8 +64,9 @@ export type ContinuouslyAsyncCallback = (
 export type OnStartCalled = `continue` | `cancel` | `reset` | `dispose`;
 
 //eslint-disable-next-line functional/no-mixed-types
-export type ContinuouslyOpts = {
-  readonly fireBeforeWait: boolean;
+export type ContinuouslyOpts = Readonly<{
+  signal: AbortSignal;
+  fireBeforeWait: boolean;
   /**
    * Called whenever .start() is invoked.
    * If this function returns:
@@ -75,11 +76,11 @@ export type ContinuouslyOpts = {
    *  - `reset`: loop resets (ie. existing scheduled task is cancelled)
    *
    */
-  readonly onStartCalled: (
+  onStartCalled: (
     ticks?: number,
     elapsedMs?: number
   ) => OnStartCalled;
-};
+}>;
 
 /**
  * Returns a {@link Continuously} that continuously at `intervalMs`, executing `callback`.
@@ -166,7 +167,7 @@ export const continuously = (
 ): Continuously => {
   let intervalMs = intervalToMs(interval, 0);
   throwIntegerTest(intervalMs, `positive`, `interval`);
-
+  const signal = opts.signal;
   const fireBeforeWait = opts.fireBeforeWait ?? false;
   const onStartCalled = opts.onStartCalled;
 
@@ -224,7 +225,11 @@ export const continuously = (
 
   const loop = async () => {
     //console.log(`continuously loop state: ${ runState } timer: ${ currentTimer }`);
+    if (opts.signal?.aborted) {
+      runState = `idle`;
+    }
     if (runState === `idle`) return;
+
     runState = `running`
     startCount++;
     const valueOrPromise = callback(ticks++, performance.now() - startedAt);
