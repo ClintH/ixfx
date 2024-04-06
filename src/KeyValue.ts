@@ -17,6 +17,7 @@ export type KeyValue = readonly [ key: string, value: StringOrNumber ];
 
 /**
  * Returns _true_ if `value` is number, string, bigint or boolean.
+ * Returns _false_ if `value` is an object, null, undefined
  * @param value Value to check
  * @returns _True_ if value is number, string, bigint or boolean.
  */
