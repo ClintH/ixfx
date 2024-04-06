@@ -4,7 +4,7 @@ import { type Rect } from '../geometry/rect/index.js';
 import { multiply as RectsMultiply } from "../geometry/rect/index.js";
 import { windowResize } from "./DomRx.js";
 import type { ScaleBy } from "../geometry/Scaler.js";
-import { SimpleEventEmitter } from "src/Events.js";
+import { SimpleEventEmitter } from "../Events.js";
 
 export type CanvasOpts = {
   /**
