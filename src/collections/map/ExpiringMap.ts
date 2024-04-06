@@ -1,6 +1,7 @@
 import { SimpleEventEmitter } from '../../Events.js';
 import { sortByValueProperty } from './MapFns.js';
 import { throwIntegerTest } from '../../Guards.js';
+import { intervalToMs, type Interval } from '../../flow/IntervalType.js';
 
 /**
  * Expiring map options
@@ -291,17 +292,24 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
   /**
    * Deletes all values where elapsed time has past
    * for get/set or either.
-   *
-   * Remove items are returned
-   * @param time
-   * @param prop get/set/either
+   * ```js
+   * // Delete all keys (and associated values) not accessed for a minute
+   * em.deleteWithElapsed({mins:1}, `get`);
+   * // Delete things that were set 1s ago
+   * em.deleteWithElapsed(1000, `set`);
+   * ```
+   * 
+   * @param interval Interval
+   * @param property Basis for deletion 'get','set' or 'either'
+   * @returns Items removed
    */
   deleteWithElapsed(
-    time: number,
+    interval: Interval,
     property: `get` | `set` | `either`
   ): Array<[ k: K, v: V ]> {
     const entries = [ ...this.store.entries() ];
     const prune: Array<[ k: K, v: V ]> = [];
+    const intervalMs = intervalToMs(interval, 1000);
     const now = Date.now();
     for (const entry of entries) {
       const elapsedGet = now - entry[ 1 ].lastGet;
@@ -312,7 +320,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
           : (property === `set`
             ? elapsedSet
             : Math.max(elapsedGet, elapsedSet));
-      if (elapsed >= time) {
+      if (elapsed >= intervalMs) {
         prune.push([ entry[ 0 ], entry[ 1 ].value ]);
       }
     }
