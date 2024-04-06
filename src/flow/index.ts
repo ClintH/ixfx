@@ -1,12 +1,10 @@
 
-export * as Elapsed from './Elapsed.js';
-export * from './DispatchList.js';
-
-import { throwNumberTest } from '../Guards.js';
 import { sleep } from './Sleep.js';
-
 import * as StateMachine from './StateMachine.js';
 import * as Timer from './Timer.js';
+
+export * as Elapsed from './Elapsed.js';
+export * from './DispatchList.js';
 export * from './Types.js';
 /**
  * State Machine
@@ -38,6 +36,8 @@ export * from './RequestResponseMatch.js';
 
 export { TaskQueue } from './TaskQueue.js';
 
+import { repeatAsync, repeat } from './Repeat.js';
+export { repeatAsync, repeat, type RepeatPredicate } from './Repeat.js';
 
 
 /**
@@ -118,122 +118,13 @@ export const forEachAsync = async function <V>(
   }
 };
 
-export type RepeatPredicate = (
-  repeats: number,
-  valuesProduced: number
-) => boolean;
-/**
- * Runs `fn` a certain number of times, yielding results.
- * If `fn` returns undefined, the result is ignored, but loop continues.
- *
- * ```js
- * // Results will be an array with five random numbers
- * const results = [...repeat(5, () => Math.random())];
- *
- * // Or as an generator (note also the simpler expression form)
- * for (const result of repeat(5, Math.random)) {
- * }
- * ```
- *
- * Repeats can be specified as an integer (eg. 5 for five repeats), or a function
- * that gives _false_ when repeating should stop.
- *
- * ```js
- * // Keep running `fn` until we've accumulated 10 values
- * // Useful if `fn` sometimes returns _undefined_
- * const results = repeat((repeats, valuesProduced) => valuesProduced < 10, fn);
- * ```
- *
- * If you don't need to accumulate return values, consider {@link Generators.count | Generators.count} with {@link Flow.forEach | Flow.forEach}.
- * If you want to have a waiting period between each repetition, consider {@link Flow.interval}.
- * @param countOrPredicate Number of repeats or function returning false when to stop
- * @param fn Function to run, must return a value to accumulate into array or _undefined_
- * @returns Yields results, one at a time
- */
-export function* repeat<V>(
-  countOrPredicate: number | RepeatPredicate,
-  fn: (repeats: number, valuesProduced: number) => V | undefined
-) {
-  // Unit tested: expected return array length
-  //eslint-disable-next-line functional/no-let
-  let repeats, valuesProduced;
-  repeats = valuesProduced = 0;
-
-  if (typeof countOrPredicate === `number`) {
-    throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
-    while (countOrPredicate-- > 0) {
-      repeats++;
-      const v = fn(repeats, valuesProduced);
-      if (v === undefined) continue;
-      yield v;
-      valuesProduced++;
-    }
-  } else if (typeof countOrPredicate === `function`) {
-    while (countOrPredicate(repeats, valuesProduced)) {
-      repeats++;
-      const v = fn(repeats, valuesProduced);
-      if (v === undefined) continue;
-      yield v;
-      valuesProduced++;
-    }
-  } else {
-    throw new TypeError(
-      `countOrPredicate should be a number or function. Got: ${ typeof countOrPredicate }`
-    );
-  }
-}
-
-/**
- * Repeatedly calls `fn`, reducing via `reduce`.
- *
- * ```js
- * repeatReduce(10, () => 1, (acc, v) => acc + v);
- * // Yields: 10
- *
- * // Multiplies random values against each other 10 times
- * repeatReduce(10, Math.random, (acc, v) => acc * v);
- * // Yields a single number
- * ```
- * @param countOrPredicate
- * @param fn
- * @param initial
- * @param reduce
- * @returns
- */
-export const repeatReduce = <V>(
-  countOrPredicate: number | RepeatPredicate,
-  fn: () => V | undefined,
-  initial: V,
-  reduce: (accumulator: V, value: V) => V
-): V => {
-  if (typeof countOrPredicate === `number`) {
-    throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
-    while (countOrPredicate-- > 0) {
-      const v = fn();
-      if (v === undefined) continue;
-      initial = reduce(initial, v);
-    }
-  } else {
-    //eslint-disable-next-line functional/no-let
-    let repeats, valuesProduced;
-    repeats = valuesProduced = 0;
-    while (countOrPredicate(repeats, valuesProduced)) {
-      repeats++;
-      const v = fn();
-      if (v === undefined) continue;
-      initial = reduce(initial, v);
-      valuesProduced++;
-    }
-  }
-  return initial;
-};
 
 try {
   if (typeof window !== `undefined`) {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
     (window as any).ixfx = {
       ...(window as any).ixfx,
-      Flow: { StateMachine, Timer, forEach, forEachAsync, repeat },
+      Flow: { StateMachine, Timer, forEach, forEachAsync, repeatAsync, repeat },
     };
   }
 } catch {
