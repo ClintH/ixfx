@@ -1,8 +1,9 @@
 import test from 'ava';
 import * as Rx from '../../rx/index.js';
 import * as Flow from '../../flow/index.js';
-import { isApproximately } from '../../Numbers.js';
-import * as Generators from '../../generators/index.js';
+import { isApproximately, count } from '../../numbers/index.js';
+import * as Iter from '../../iterables/index.js';
+import { interval } from '../../flow/index.js';
 
 // const r = Rx.object({ name: `bob`, level: 2 });
 // r.on(value => {
@@ -26,6 +27,22 @@ import * as Generators from '../../generators/index.js';
 // t.on(value => {
 //   // button id
 // })
+
+// test(`rx-run`, async t => {
+//   const r = Rx.run(
+//     // Produce a random number
+//     Rx.fromFunction(Math.random, { interval: 10 }),
+//     // Scale to 0,1
+//     Rx.Ops.transform(v => Math.floor(v * 2))
+//   );
+//   const off = r.value(value => {
+//     console.log(value);
+//   });
+//   await Flow.sleep(1000);
+//   off();
+// });
+
+
 
 test(`rx-from-proxy-array`, async t => {
   const { proxy, rx } = Rx.fromProxy([ `one`, `two`, `three` ]);
@@ -54,6 +71,8 @@ test(`rx-from-proxy-array`, async t => {
   await Flow.sleep(50);
 
 });
+
+
 
 // test(`rx-from-proxy-object`, async t => {
 //   const { proxy: person, rx: personRx } = Rx.fromProxy({ name: `jill` });
@@ -113,8 +132,8 @@ test(`rx-from-proxy-array`, async t => {
 
 test(`rx-number`, t => {
   const nonInit = Rx.number();
-  t.falsy(nonInit.last());
-  t.false(Rx.hasLast(nonInit));
+  t.falsy(nonInit.last(), "Undefined initial value");
+  t.false(Rx.hasLast(nonInit), "No last value");
   t.plan(8);
   nonInit.on(v => {
     t.is(v.value, 10);
@@ -129,72 +148,32 @@ test(`rx-number`, t => {
   t.is(x.last(), 5);
 });
 
-test(`rx-from-array`, async t => {
-  const a1 = [ 1, 2, 3, 4, 5 ];
-  // Default options
-  const v1 = Rx.readFromArray(a1);
-  t.false(v1.isDone());
-  t.is(v1.last(), 1);
+test(`rx-boolean`, t => {
+  const nonInit = Rx.boolean();
+  t.falsy(nonInit.last(), "Undefined initial value");
+  t.false(Rx.hasLast(nonInit), "No last value");
+  t.plan(10);
+  let count = 0;
+  nonInit.on(v => {
+    count++;
+    if (count === 1) {
+      t.is(v.value, true);
+    } else if (count === 2) {
+      t.is(v.value, false);
+    } else t.fail(`Unexpectedly called three times`);
 
-  let read: number[] = [];
-  const v1Off = v1.on(msg => {
-    if (msg.value) {
-      read.push(msg.value);
-    }
   });
-  await Flow.sleep(1000);
-  v1Off();
-  t.deepEqual(read, a1);
+  nonInit.set(true);
+  t.is(nonInit.last(), true);
+  t.true(Rx.hasLast(nonInit));
 
-});
+  nonInit.set(false);
+  t.is(nonInit.last(), false);
+  t.true(Rx.hasLast(nonInit));
 
-test(`rx-from-array-lazy`, async t => {
-  const a1 = [ 1, 2, 3, 4, 5 ];
-
-  // Pause: Step 1: read 2 items from source
-  const v2 = Rx.readFromArray(a1, { idle: `pause`, lazy: true });
-  let read: number[] = [];
-  const v2Off1 = v2.on(msg => {
-    if (msg.value) {
-      read.push(msg.value);
-      if (read.length === 2) {
-        v2Off1();
-      }
-    }
-  });
-  // Should only have two items, because we unsubscribed
-  await Flow.sleep(200);
-  t.deepEqual(read, [ 1, 2 ]);
-
-  // Pause: Step 2: keep reading, expecting data to continue and complete
-  const v2Off2 = v2.on(msg => {
-    if (msg.value) {
-      read.push(msg.value);
-    }
-  });
-  await Flow.sleep(200);
-  t.deepEqual(read, a1);
-
-  // Reset: Step 1 read 2 times
-  const v3 = Rx.readFromArray(a1, { idle: `reset`, lazy: true });
-  read = [];
-  const v3Off1 = v3.on(msg => {
-    if (msg.value) {
-      read.push(msg.value);
-      if (read.length === 2) {
-        v3Off1();
-      }
-    }
-  });
-  await Flow.sleep(200);
-  t.deepEqual(read, [ 1, 2 ]);
-
-  // Reset: Step 2: continue reading
-  const v3Off2 = v3.on(msg => {
-    if (msg.value) read.push(msg.value);
-  });
-  await Flow.sleep(200);
-  t.deepEqual(read, [ 1, 2, 1, 2, 3, 4, 5 ])
+  const x = Rx.boolean(false);
+  t.is(x.last(), false);
+  t.true(Rx.hasLast(x));
 });
 
 test(`rx-manual`, t => {
@@ -272,15 +251,15 @@ test(`object-field`, async t => {
 
 test(`from-generator`, async t => {
   // Synchronous generator
-  const r1 = Rx.fromGenerator(Generators.count(5));
+  const r1 = Rx.fromGenerator(count(5));
   const r1Data = await Rx.toArray(r1);
   t.deepEqual(r1Data, [ 0, 1, 2, 3, 4 ]);
 
   // Asynchronous generator
-  const count = 5;
-  let countProgress = count;
+  const runCount = 5;
+  let countProgress = runCount;
   const intervalPeriod = 100;
-  const r2 = Generators.interval(() => {
+  const r2 = interval(() => {
     if (countProgress === 0) return;
     return --countProgress;
   }, intervalPeriod);
@@ -289,7 +268,7 @@ test(`from-generator`, async t => {
   let elapsed = performance.now() - start;
   t.is(countProgress, 0);
   t.deepEqual(r2Data, [ 4, 3, 2, 1, 0 ]);
-  t.true(isApproximately((count + 1) * intervalPeriod, 0.1)(elapsed), `Elapsed: ${ elapsed }`);
+  t.true(isApproximately((runCount + 1) * intervalPeriod, 0.1)(elapsed), `Elapsed: ${ elapsed }`);
 
 });
 
@@ -412,53 +391,16 @@ test(`rx-field`, async t => {
 
 });
 
-test(`generator-async`, async t => {
-  // Produce values every 100ms
-  const valueRateMs = 100;
-  const valueCount = 10;
-  const valuesOverTime = Flow.interval(() => Math.random(), valueRateMs);
 
-  const source = Rx.generator(valuesOverTime);
-  const values1: number[] = [];
-  const start = Date.now();
-  source.on(v => {
-    if (v.value === undefined) return;
-    values1.push(v.value);
-    if (values1.length === valueCount) {
-      source.dispose(`test dispose`);
-      return;
-    }
-  });
-  t.false(source.isDisposed());
-  const sleepFor = valueRateMs * (valueCount + 2);
-  await Flow.sleep(sleepFor);
-  const elapsed = Date.now() - start;
-  //t.true(isApproximately(valueRateMs * valueCount, 0.1)(elapsed));
-  t.true(source.isDisposed());
-});
-
-test(`generator-sync`, async t => {
-  const values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-  const source = Rx.generator(values.values(), { lazy: true });
-  const readValues: number[] = [];
-  source.on(v => {
-    if (v.value) {
-      readValues.push(v.value);
-    }
-  });
-
-  await Flow.sleep(1000);
-  t.true(readValues.length === values.length);
-});
 
 test(`toArray`, async t => {
   const values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-  const source1 = Rx.generator(values.values(), { lazy: true });
+  const source1 = Rx.fromGenerator(values.values(), { lazy: `initial` });
   const reader1 = await Rx.toArray(source1);
   t.true(reader1.length === values.length);
 
   // maxValues option
-  const source2 = Rx.generator(values.values(), { lazy: true });
+  const source2 = Rx.fromGenerator(values.values(), { lazy: `initial` });
   const reader2 = await Rx.toArray(source2, { limit: 3 });
   t.true(reader2.length === 3);
 });
@@ -500,34 +442,3 @@ test(`rx-to-array`, async t => {
   t.deepEqual(vv4, [ 1, 2, 3, 4, 5 ]);
 });
 
-
-test(`generator-lazy`, async t => {
-  let produceCount = 0;
-  let consumeCount = 0;
-  const ac = new AbortController();
-
-  // Keep track of how many times its called.
-  // Runs every 100ms
-  const time = Flow.interval(() => {
-    produceCount++;
-    return Math.random();
-  }, { fixed: 100, signal: ac.signal });
-
-  // Reactive from a generator
-  const r = Rx.generator(time);
-
-  // Wait 2s before subscribing
-  setTimeout(() => {
-    r.on(v => {
-      consumeCount++;
-      if (consumeCount === 10) {
-        // We should have consumed as many as created
-        ac.abort(`hey`);
-      }
-    })
-  }, 1500);
-
-  await Flow.sleep(1000);
-  t.is(consumeCount, produceCount);
-
-})
