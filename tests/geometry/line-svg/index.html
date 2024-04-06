@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>line-svg</title>
+</head>
+
+<body>
+  <style>
+    :root {
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      --hue: 183;
+      --fg: hsl(var(--hue), 85%, 50%);
+      --bg: hsl(var(--hue), 85%, 21%);
+      --arc: hsl(51, 100%, 62%);
+    }
+
+    body,
+    html {
+      overflow: hidden;
+      font-family: var(--font);
+      height: 100%;
+      width: 100%;
+      touch-action: none;
+      background-color: var(--bg);
+      color: var(--fg);
+    }
+  </style>
+  <p>Press and hold mouse/fingers</p>
+  <svg></svg>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

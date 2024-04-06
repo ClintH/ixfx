@@ -7,7 +7,8 @@ import { distance } from './Distance.js';
 import { clamp as clampNumber } from '../../data/Clamp.js';
 import { wrap as wrapNumber } from '../../data/Wrap.js';
 import { type RandomSource, defaultRandom } from '../../random/Types.js';
-import { quantiseEvery as quantiseEveryNumber, round as roundNumber } from '../../Numbers.js';
+import { quantiseEvery as quantiseEveryNumber } from '../../numbers/Quantise.js';
+import { round as roundNumber } from '../../numbers/Round.js';
 import { guard, guardNonZeroPoint, isPoint, isPoint3d } from './Guard.js';
 import { maxFromCorners as RectsMaxFromCorners } from '../rect/index.js';
 import { guard as RectsGuard } from '../rect/Guard.js'

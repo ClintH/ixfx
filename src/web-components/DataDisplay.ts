@@ -1,5 +1,5 @@
 
-import { round } from "../Numbers.js";
+import { round } from "../numbers/Round.js";
 import { changedDataFields, } from "../Compare.js";
 export type FormattingOptions = {
   readonly precision?: number

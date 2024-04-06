@@ -5,8 +5,8 @@
  * * {@link Data}: Scaling, clamping, interpolating, averaging data
  * * {@link Dom}: DOM manipulation
  * * {@link Flow}: Delays, loops, State Machine, deboucing, throttling, timers
- * * {@link Generators}: Generate data
  * * {@link Geometry}: Working with various kinds of shapes and spatial calcuations
+ * * {@link Iterables}: Work with iterables/generators
  * * {@link Io}: Connect to Espruino, Arduino, sound and video inputs
  * * {@link Modulation}: Envelopes, oscillators, jittering, forces
  * * {@link Numbers}: A few number-processing functions
@@ -110,15 +110,6 @@ export * as Geometry from './geometry/index.js';
  */
 export * as Text from './Text.js';
 
-/**
- * Number processing
- *
- * Note though that 'number processing' is all over the place. This is
- * added mostly as a semantic aliasing where it makes sense.
- * Overview
- * * {@link average}: Average numbers
- */
-export * as Numbers from './Numbers.js';
 
 /**
  * Input and output to devices, sensors and actuators
@@ -174,19 +165,79 @@ export * as Io from './io/index.js';
  */
 export * as Flow from './flow/index.js';
 
+
 /**
- * Generators produce values on demand.
- *
- * Overview:
+ * A set of functions for working with async generators/iterators.
+ * 
+ * Functions marked (S) work with endless iterables. That is, they don't require
+ * that an iterable finishes.
+ * 
+ * Conversions
+ * * {@link toArray} Copy contents of iterable to an array
+ * * {@link map} Yields value from an input iterable transformed (with possible change of type) through a map function. (S)
+ * * {@link fromArray} Yields values from an array over time.
+ * * {@link fromIterable} Yields values from an input iterable over time.
+ * 
+ * Comparisons
+ * * {@link every} Returns _true_ if predicate is _true_ for every item in iterable
+ * * {@link equals} Returns _true_ if values in two iterables are the same at the same location, judged by a provided equality function
+ * * {@link max} Yields the currently highest max value from an iterable (S)
+ * * {@link min} Yields the currently highest min value from an iterable (S)
+ * * {@link unique} Return a set of unique items, compared by reference. (S)
+ * * {@link uniqueByValue} Return a set of unique items, compared by value. (S)
+ * 
+ * Filtering/finding
+ * * {@link filter} Yields value from iterator that match a predicate (opposite of `dropWhile`)
+ * * {@link dropWhile} Yields values from iterator, except those that meet predicate. Opposite of `filter`
+ * * {@link find} Returns first value from iterator that matches predicate (S)
+ * * {@link some} Returns _true_ if a value matching a predicate is found. (S)
+ * * {@link reduce} Reduce an iterable down to one value using an 'accumulator' function
+ * 
+ * Reshaping
+ * * {@link map} Yields value from an input iterable transformed (with possible change of type) through a map function. (S)
+ * * {@link chunks} Yields a certain sized 'chunk' of values from iterable as an array (S)
+ * * {@link concat} Yields all the results of each iterable in turn (S)
+ * * {@link flatten} For an input iterator of arrays, returns a flattened set of values
+ * * {@link slice} Take a slice of an iterable
+ * * {@link zip} Combines items at same position from iterables
+ * * {@link fill} Yields a fixed value for every value from an iterable
+ * 
+ * Iterating
+ * * {@link forEach} Runs a function for each value of iterable (S)
+ * * {@link until} Calls a function for each value of an iterable. Value itself is ignored (unlike a {@link forEach}) (S)
+ * 
+ * 
+ *  * @example Importing
+ * ```js
+ * // If library is stored two directories up under `ixfx/`
+ * import { map } from '../../ixfx/dist/iterables.js';
+ * // Import from web
+ * import { map } from 'https://unpkg.com/ixfx/dist/iterables.js'
+ * ```
+*/
+export * as Iterables from './iterables/index.js';
+
+/**
+ * Generating numbers
  * * {@link count}: Generate a set numbers, counting by one
  * * {@link numericPercent}: Generate a range of numbers on the percentage scale of 0-1
  * * {@link numericRange}: Generate a range of numbers
  * * {@link pingPong} / {@link pingPongPercent}: Generate numbers that repeat up and down between the set limits
+ * * {@link randomUniqueInteger}: Random unique integer
+ */
+export * as Numbers from './numbers/index.js';
+
+/**
+ * Generators produce values on demand.
  *
+
+ *
+ * Generating text:
+ * * {@link stringSegmentsWholeToEnd}, {@link stringSegmentsLastToWhole}, {@link stringSegmentsFirstToWhole},{@link stringSegmentsWholeToFirst}: step through a segmented string, eg 'a.b.c.d' in various orders.
+ * 
  * Aliases:
  * * {@link delayLoop}: A generator that yields at a given rate
  * * {@link interval}: Generates values from a given function with a given delay
- * * {@link randomUniqueInteger}: Random unique integer
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
@@ -195,7 +246,8 @@ export * as Flow from './flow/index.js';
  * import {count, interval} from 'https://unpkg.com/ixfx/dist/generators.js'
  * ```
  */
-export * as Generators from './generators/index.js';
+//export * as Generators from './generators/index.js';
+
 
 /**
  * Visuals
