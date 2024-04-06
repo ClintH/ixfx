@@ -5,6 +5,7 @@
 build
 etc
 dist
+TODO.md
 *.log
 npm-debug.log*
 node_modules/
