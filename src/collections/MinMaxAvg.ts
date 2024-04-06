@@ -1,4 +1,4 @@
-import { slice } from '../iterable/SliceSync.js';
+import { slice } from '../iterables/sync/Slice.js';
 import { filterBetween } from './FilterBetween.js';
 
 export type MinMaxAvgTotal = {

@@ -1,5 +1,5 @@
 
-import { applyToValues, round } from '../../Numbers.js';
+import { applyToValues, round } from '../../numbers/index.js';
 import * as Colour from '../../visual/Colour.js';
 import test from 'ava';
 test(`opacity`, (t) => {

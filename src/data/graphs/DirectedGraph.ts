@@ -3,7 +3,7 @@ import { QueueMutable, StackMutable } from "../../collections/index.js"
 import { PriorityMutable } from "../../collections/queue/PriorityMutable.js"
 import { immutable as immutableMap, type IMapImmutable } from "../../collections/map/Map.js"
 import { NumberMap } from "../../collections/map/NumberMap.js"
-import { Sync } from "../../generators/index.js"
+import * as Sync from "../../iterables/IterableSync.js"
 import { Table } from "../Table.js"
 
 export type DistanceCompute = (graph: DirectedGraph, edge: Edge) => number;
@@ -409,7 +409,7 @@ export function connect(graph: DirectedGraph, options: ConnectOptions): Directed
  */
 const debugDumpVertex = (v: Vertex): Array<string> => {
   const r = [
-    `${ v.id }`
+    v.id
   ]
   const stringForEdge = (edge: Edge) => edge.weight === undefined ? edge.id : `${ edge.id } (${ edge.weight })`
 

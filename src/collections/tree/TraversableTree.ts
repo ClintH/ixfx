@@ -3,7 +3,6 @@ import { isEqualDefault, type IsEqual } from "../../IsEqual.js";
 import { QueueMutable } from "../queue/QueueMutable.js";
 import { StackMutable } from "../stack/StackMutable.js";
 import type { TraversableTree } from "./Types.js";
-import { quadTree } from "src/geometry/QuadTree.js";
 
 export const childrenLength = <T>(tree: TraversableTree<T>): number => {
   return [ ...tree.children() ].length;

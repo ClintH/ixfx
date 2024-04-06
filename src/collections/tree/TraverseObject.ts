@@ -1,6 +1,6 @@
 import { toStringAbbreviate } from '../../Text.js';
 import { nullUndef } from '../../Guards.js';
-import { last } from '../../generators/IterableSync.js';
+import { last } from '../../iterables/IterableSync.js';
 import * as TreeArrayBacked from './TreeMutable.js';
 import { isPrimitive } from '../../KeyValue.js';
 import type { TraversableTree, TreeNode, SimplifiedNode } from './Types.js';
