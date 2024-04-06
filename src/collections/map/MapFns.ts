@@ -424,7 +424,8 @@ export const addObject = <V>(map: Map<string, V>, data: any) => {
 /**
  * Returns the first found value that matches `predicate` or _undefined_.
  *
- * If you want all matches, use {@link filter}.
+ * Use {@link some} if you don't care about the value, just whether it appears.
+ * Use {@link filter} to get all value(s) that match `predicate`.
  *
  * @example First person over thirty
  * ```js
@@ -438,6 +439,22 @@ export const find = <V>(
   map: ReadonlyMap<string, V>,
   predicate: (v: V) => boolean
 ): V | undefined => [ ...map.values() ].find(v => predicate(v));
+
+/**
+ * Returns _true_ if `predicate` yields _true_ for any value in `map`.
+ * Use {@link find} if you want the matched value.
+ * ```js
+ * const map = new Map();
+ * map.set(`fruit`, `apple`);
+ * map.set(`colour`, `red`);
+ * Maps.some(map, v => v === `red`);    // true
+ * Maps.some(map, v => v === `orange`); // false
+ * ```
+ * @param map 
+ * @param predicate 
+ * @returns 
+ */
+export const some = <V>(map: ReadonlyMap<string, V>, predicate: (v: V) => boolean): boolean => [ ...map.values() ].some(v => predicate(v));
 
 /**
  * Converts a map to a simple object, transforming from type `T` to `K` as it does so. If no transforms are needed, use {@link toObject}.
