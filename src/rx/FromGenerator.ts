@@ -1,45 +1,51 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { initStream } from "./InitStream.js";
-import type { GeneratorOptions, InitStreamOptions, Reactive, ReactiveDisposable } from "./Types.js";
+import { intervalToMs } from "../flow/IntervalType.js";
+import { initLazyStream } from "./InitStream.js";
+import type { FromGeneratorOptions, Reactive, ReactiveDisposable } from "./Types.js";
 
 /**
- * Creates a readable reactive based on a generator
+ * Creates a readable reactive based on a (async)generator
  * ```js
- * // Generators that makes a random value every 5 seconds
+ * // Generator a random value every 5 seconds
  * const valuesOverTime = Flow.interval(() => Math.random(), 5000);
  * // Wrap the generator
- * const r = Reactive.generator(time);
+ * const r = Rx.fromGenerator(time);
  * // Get notified when there is a new value
- * r.on(v => {
- *   console.log(v.value);
+ * r.value(v => {
+ *   console.log(v);
  * });
  * ```
  * @param generator 
  */
-export function generator<V>(generator: IterableIterator<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V>, options: Partial<GeneratorOptions> = {}): ReactiveDisposable & Reactive<V> {
-  const lazy = options.lazy ?? true;
+export function fromGenerator<V>(generator: IterableIterator<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V>, options: Partial<FromGeneratorOptions> = {}): ReactiveDisposable & Reactive<V> {
+  const lazy = options.lazy ?? `initial`;
+  const signal = options.signal;
+  const interval = intervalToMs(options.interval, 5);
   let reading = false;
 
-  const eventOpts: InitStreamOptions = {
-    onFirstSubscribe() {
-      if (lazy && !reading) {
-        readingStart();
-      }
+  const events = initLazyStream<V>({
+    ...options,
+    lazy,
+    onStart() {
+      readingStart();
     },
-    onNoSubscribers() {
-      if (lazy && reading) {
-        reading = false;
-      }
+    onStop() {
+      reading = false;
     },
-  }
-  const events = initStream<V>(eventOpts);
+  });
 
   const read = async () => {
     try {
+      if (signal?.aborted) {
+        events.dispose(`Signalled (${ signal.reason })`);
+        reading = false;
+        return;
+      }
       const v = await generator.next();
+      //console.log(`fromGenerator: v ${ JSON.stringify(v) }`);
       if (v.done) {
         events.dispose(`Generator complete`);
-        return;
+        reading = false;
       }
       if (!reading) return;
       events.set(v.value);
@@ -51,7 +57,7 @@ export function generator<V>(generator: IterableIterator<V> | AsyncIterableItera
     if (events.isDisposed()) return;
     if (!reading) return;
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setTimeout(read);
+    setTimeout(read, interval);
   }
 
   const readingStart = () => {
