@@ -23,13 +23,20 @@ export function messageHasValue<V>(v: Passed<V> | PassedSignal): v is PassedValu
   return false;
 }
 
-export const hasLast = <V>(rx: Reactive<V> | ReactiveDiff<V>): rx is ReactiveInitial<V> => {
-  if (`last` in rx) {
+
+export const hasLast = <V>(rx: Reactive<V> | ReactiveDiff<V> | object): rx is ReactiveInitial<V> => {
+  if (!isReactive(rx)) return false;
+  if (`last`) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const v = (rx as any).last();
     if (v !== undefined) return true;
   }
   return false;
+}
+
+export const isReactive = <V>(rx: object): rx is Reactive<V> => {
+  if (typeof rx !== `object`) return false;
+  return (`on` in rx && `value` in rx)
 }
 
 export const isDisposable = (v: object): v is ReactiveDisposable => {
