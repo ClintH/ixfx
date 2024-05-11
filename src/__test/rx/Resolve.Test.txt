@@ -1,0 +1,33 @@
+import test from 'ava';
+import * as Rx from '../../rx/index.js';
+import * as Flow from '../../flow/index.js';
+import { count } from '../../numbers/Count.js';
+import { isApproximately } from '../../numbers/IsApproximately.js';
+// test(`resolve`, async t => {
+//   let produced = 0;
+//   const r = Rx.From.resolve(() => {
+//     produced++;
+//     return Math.floor(Math.random() * 1000);
+//   }, { lazy: `initial`, infinite: true, interval: 50 });
+
+//   let results1 = 0;
+//   const r1Off = r.on(msg => {
+//     results1++;
+//   });
+//   await Flow.sleep(500);
+//   r1Off();
+
+//   await Flow.sleep(500);
+
+//   let results2 = 0;
+//   const r2Off = r.on(msg => {
+//     results2++;
+//   });
+//   await Flow.sleep(500);
+//   r2Off();
+
+//   t.is(results1, results2);
+
+//   // Since producer is lazy, we expect # produced to be amount listened to
+//   t.is(results1 + results2, produced);
+// });
