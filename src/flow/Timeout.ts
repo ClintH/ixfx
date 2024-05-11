@@ -1,4 +1,3 @@
-
 import { throwIntegerTest, integerTest } from '../Guards.js';
 import { type HasCompletion, type HasCompletionRunStates } from './index.js';
 
@@ -160,3 +159,18 @@ export const timeout = (
     }
   };
 };
+
+
+// const average = movingAverageLight();
+// const rm = rateMinimum({
+//   interval: { secs: 1 },
+//   whatToCall: (distance: number) => {
+//     average(distance);
+//   },
+//   fallback() {
+//     return 0;
+//   }
+// })
+// document.addEventListener(`pointermove`, event => {
+//   rm(event.movementX + event.movementY);
+// });
