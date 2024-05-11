@@ -879,16 +879,16 @@ export const containsDuplicateInstances = <V>(array: Array<V> | ReadonlyArray<V>
  * ```
  * @param arrayA 
  * @param arrayB 
- * @param isEqual 
+ * @param eq 
  */
-export const isEqual = <V>(arrayA: Array<V>, arrayB: Array<V>, isEqual = isEqualDefault<V>): boolean => {
+export const isEqual = <V>(arrayA: Array<V>, arrayB: Array<V>, eq = isEqualDefault<V>): boolean => {
   if (!Array.isArray(arrayA)) throw new Error(`Parameter 'arrayA' is not actually an array`);
   if (!Array.isArray(arrayB)) throw new Error(`Parameter 'arrayB' is not actually an array`);
 
   if (arrayA.length !== arrayB.length) return false;
   // eslint-disable-next-line unicorn/no-for-loop
   for (let indexA = 0; indexA < arrayA.length; indexA++) {
-    if (!(isEqual(arrayA[ indexA ], arrayB[ indexA ]))) return false;
+    if (!(eq(arrayA[ indexA ], arrayB[ indexA ]))) return false;
   }
   return true;
 }
