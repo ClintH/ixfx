@@ -24,7 +24,7 @@ import { throwIntegerTest } from "../Guards.js";
  * @example Run some code every 100ms, 10 times:
  * ```js
  * import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
- * import { count } from 'https://unpkg.com/ixfx/dist/generators.js'
+ * import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
  * const counter = count(10);
  * for await (const v of interval(counter, { fixedIntervalMs: 100 })) {
  *  // Do something
