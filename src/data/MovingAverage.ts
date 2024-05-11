@@ -1,7 +1,9 @@
+import type { Interval } from 'src/flow/IntervalType.js';
 import { averageWeighted } from '../collections/arrays/AverageWeighted.js';
 import { average } from '../collections/arrays/NumericArrays.js';
 import { QueueMutable } from '../collections/queue/QueueMutable.js';
-import { throwNumberTest } from '../Guards.js';
+import { numberTest, throwNumberTest } from '../Guards.js';
+import { rateMinimum } from 'src/flow/RateMinimum.js';
 
 /**
  * A moving average calculator (exponential weighted moving average) which does not keep track of
@@ -28,98 +30,139 @@ import { throwNumberTest } from '../Guards.js';
  * @param scaling Scaling factor. 1 is no smoothing. Default: 3
  * @returns {@link MovingAverage}
  */
-export const movingAverageLight = (scaling = 3): MovingAverage => {
+export const movingAverageLight = (scaling = 3): (value?: number) => number => {
   throwNumberTest(scaling, `aboveZero`, `scaling`);
-  //eslint-disable-next-line functional/no-let
   let average = 0;
-  //eslint-disable-next-line functional/no-let
   let count = 0;
 
-  //eslint-disable-next-line functional/no-let
-  let disposed = false;
-  const ma: MovingAverage = {
-    dispose() {
-      disposed = true;
-    },
-    get isDisposed() {
-      return disposed;
-    },
-    add(v: number) {
-      if (disposed) throw new Error(`MovingAverage disposed, cannot add`);
+  return (v?: number) => {
+    const r = numberTest(v, ``, `v`);
+    if (r[ 0 ] && v !== undefined) {
+      // Valid number
       count++;
       average = average + (v - average) / Math.min(count, scaling);
-      return average;
-    },
-    clear() {
-      if (disposed) throw new Error(`MovingAverage disposed, cannot clear`);
-      average = 0;
-      count = 0;
-    },
-    compute() {
-      return average;
-    },
-  };
-  return ma;
+    }
+    return average;
+  }
+
+  // let disposed = false;
+  // const ma: MovingAverage = {
+  //   dispose() {
+  //     disposed = true;
+  //   },
+  //   get isDisposed() {
+  //     return disposed;
+  //   },
+  //   add(v: number) {
+  //     if (disposed) throw new Error(`MovingAverage disposed, cannot add`);
+  //     count++;
+  //     average = average + (v - average) / Math.min(count, scaling);
+  //     return average;
+  //   },
+  //   clear() {
+  //     if (disposed) throw new Error(`MovingAverage disposed, cannot clear`);
+  //     average = 0;
+  //     count = 0;
+  //   },
+  //   compute() {
+  //     return average;
+  //   },
+  // };
+  // return ma;
 };
+
+export type MovingAverageTimedOptions = Readonly<{
+  interval: Interval
+  default?: number
+  abort?: AbortSignal
+}>
 
 /**
  * Uses the same algorithm as {@link movingAverageLight}, but adds values automatically if
  * nothing has been manually added.
  *
+ * ```js
+ * // By default, 0 is added if interval elapses
+ * const mat = movingAverageTimed({ interval: 1000 });
+ * mat(10); // Add value of 10, returns latest average
+ * 
+ * mat(); // Get current average
+ * ```
+ * 
  * This is useful if you are averaging something based on events. For example calculating the
  * average speed of the pointer. If there is no speed, there is no pointer move event. Using
  * this function, `value` is added at a rate of `updateRateMs`. This timer is reset
  * every time a value is added, a bit like the `debounce` function.
+ * 
+ * Use an AbortSignal to cancel the timer associated with the `movingAverageTimed` function.
  * @param updateRateMs
  * @param value
  * @param scaling
  * @returns
  */
-export const movingAverageTimed = (
-  updateRateMs = 200,
-  value = 0,
-  scaling = 3
-): MovingAverage => {
-  throwNumberTest(scaling, `aboveZero`, `scaling`);
-  throwNumberTest(updateRateMs, `aboveZero`, `decayRateMs`);
-
-  const mal = movingAverageLight(scaling);
-
-  //eslint-disable-next-line functional/no-let
-  let timer = 0;
-
-  const reschedule = () => {
-    if (timer !== 0) clearTimeout(timer);
-    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
-    // @ts-ignore
-    timer = setTimeout(decay, updateRateMs) as number;
-  };
-
-  const decay = () => {
-    mal.add(value);
-    if (!mal.isDisposed) setTimeout(decay, updateRateMs);
-  };
-
-  const ma: MovingAverage = {
-    add(v: number) {
-      reschedule();
-      return mal.add(v);
+export const movingAverageTimed = (options: MovingAverageTimedOptions) => {
+  const average = movingAverageLight();
+  const rm = rateMinimum({
+    ...options,
+    whatToCall: (distance: number) => {
+      average(distance);
     },
+    fallback() {
+      return options.default ?? 0;
+    }
+  })
 
-    dispose() {
-      mal.dispose();
-    },
-    clear: function (): void {
-      mal.clear();
-    },
-    compute: function (): number {
-      return mal.compute();
-    },
-    isDisposed: false,
-  };
-
-  return ma;
+  return (v: number) => {
+    rm(v);
+    return average();
+  }
 };
+
+// export const movingAverageTimed = (
+//   updateRateMs = 200,
+//   value = 0,
+//   scaling = 3
+// ): MovingAverage => {
+//   throwNumberTest(scaling, `aboveZero`, `scaling`);
+//   throwNumberTest(updateRateMs, `aboveZero`, `decayRateMs`);
+
+//   const mal = movingAverageLight(scaling);
+
+//   //eslint-disable-next-line functional/no-let
+//   let timer = 0;
+
+//   const reschedule = () => {
+//     if (timer !== 0) clearTimeout(timer);
+//     // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+//     // @ts-ignore
+//     timer = setTimeout(decay, updateRateMs) as number;
+//   };
+
+//   const decay = () => {
+//     mal.add(value);
+//     if (!mal.isDisposed) setTimeout(decay, updateRateMs);
+//   };
+
+//   const ma: MovingAverage = {
+//     add(v: number) {
+//       reschedule();
+//       return mal.add(v);
+//     },
+
+//     dispose() {
+//       mal.dispose();
+//     },
+//     clear: function (): void {
+//       mal.clear();
+//     },
+//     compute: function (): number {
+//       return mal.compute();
+//     },
+//     isDisposed: false,
+//   };
+
+//   return ma;
+// };
 
 /**
  * Creates a moving average for a set number of `samples`.
@@ -164,61 +207,67 @@ export const movingAverageTimed = (
 export const movingAverage = (
   samples = 100,
   weighter?: (v: number) => number
-): MovingAverage => {
-  //eslint-disable-next-line functional/no-let
-  let disposed = false;
+): (value?: number) => number => {
+  //let disposed = false;
 
-  //eslint-disable-next-line functional/no-let
-  let q = new QueueMutable<number>({
+  const q = new QueueMutable<number>({
     capacity: samples,
     discardPolicy: `older`,
   });
 
-  const clear = () => {
-    q = new QueueMutable<number>({
-      capacity: samples,
-      discardPolicy: `older`,
-    });
-  };
-
-  const compute = () => {
+  return (v?: number | undefined) => {
+    const r = numberTest(v);
+    if (r[ 0 ] && v !== undefined) {
+      q.enqueue(v);
+    }
     return weighter === undefined ? average(q.data) : averageWeighted(q.data, weighter);
-  };
+  }
 
-  const add = (v: number) => {
-    q.enqueue(v);
-    return compute();
-  };
+  // const clear = () => {
+  //   q = new QueueMutable<number>({
+  //     capacity: samples,
+  //     discardPolicy: `older`,
+  //   });
+  // };
 
-  const dispose = () => {
-    disposed = true;
-  };
+  // const compute = () => {
+  //   return weighter === undefined ? average(q.data) : averageWeighted(q.data, weighter);
+  // };
 
-  return { add, compute, clear, dispose, isDisposed: disposed };
+  // const add = (v: number) => {
+  //   q.enqueue(v);
+  //   return compute();
+  // };
+
+  // const dispose = () => {
+  //   disposed = true;
+  // };
+
+  // return { add, compute, clear, dispose, isDisposed: disposed };
 };
 
 /**
  * Moving average.
  * Create via {@link movingAverage} or {@link movingAverageLight}.
  */
-export type MovingAverage = {
-  /**
-   * Clear data
-   */
-  clear(): void;
-  /**
-   * Returns current average
-   */
-  compute(): number;
-  /**
-   * Adds a value, returning new average
-   * @param v Value to add
-   */
-  add(v: number): number;
+// export type MovingAverage = {
+//   /**
+//    * Clear data
+//    */
+//   clear(): void;
+//   /**
+//    * Returns current average
+//    */
+//   compute(): number;
+//   /**
+//    * Adds a value, returning new average
+//    * @param v Value to add
+//    */
+//   add(v: number): number;
 
-  dispose(): void;
-  get isDisposed(): boolean;
-};
+//   dispose(): void;
+//   get isDisposed(): boolean;
+// };
 
 const PiPi = Math.PI * 2;
 
@@ -237,9 +286,9 @@ const exponentialSmoothing = (smoothingFactor: number, value: number, previous: 
  * Algorithm: https://gery.casiez.net/1euro/
  * 
  * Based on [Jaan Tollander de Balsch's implementation](https://jaantollander.com/post/noise-filtering-using-one-euro-filter/)
- * @param cutoffMin 
- * @param speedCoefficient 
- * @param cutoffDefault 
+ * @param cutoffMin Default: 1
+ * @param speedCoefficient Default: 0
+ * @param cutoffDefault Default: 1
  */
 export const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault = 1) => {
   let previousValue = 0;

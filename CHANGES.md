@@ -1,5 +1,9 @@
 A rough changelog between NPM releases
 
+# 0.20.3
+
+* Changed Data.movingAverage et al to return a function rather than object with add, clear, compute functions.
+
 # 0.20.0 24.04.06
 
 * Refactor to remove 'Generators' module. Functions moved to Numbers, Text & Iterables modules.
