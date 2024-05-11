@@ -2,6 +2,13 @@ import * as Async from "../IterableAsync.js";
 import type { GenOrData, GenFactoryNoInput, Gen } from "./Types.js";
 import { isAsyncIterable } from "../Iterable.js";
 import { sleep } from "../../flow/Sleep.js";
+
+export function isGenFactoryNoInput<Out>(c: any): c is GenFactoryNoInput<Out> {
+  if (!(`_type` in c)) return false;
+  if (c._type === `GenFactoryNoInput`) return true;
+  return false;
+}
+
 /**
  * Wrap the primitive value as generator
  * @param value 
@@ -9,6 +16,16 @@ import { sleep } from "../../flow/Sleep.js";
 function* primitiveToGenerator(value: number | boolean | string) {
   yield value;
 }
+
+export const oncePromise = (target: EventTarget, name: string): Promise<any> => {
+  return new Promise(resolve => {
+    const handler = (...args: Array<any>) => {
+      target.removeEventListener(name, handler);
+      resolve(args);
+    };
+    target.addEventListener(name, handler);
+  });
+};
 
 /**
  * Wrap the primitive value as an async generator

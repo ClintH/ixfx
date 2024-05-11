@@ -1,5 +1,54 @@
 import type { Interval } from "../../flow/IntervalType.js";
+export type SyncOptions = {
 
+  /**
+   * How to handle when a source completes.
+   * * 'allow' means we continue synchronising with remaining alive sources. Use 'finalValue' option to control what data is returned for completed sources
+   * * 'break' means we stop the stream, because synchronisation across all sources is no longer possible.
+   * 
+   * Default: 'break'.
+   */
+  onSourceDone: `allow` | `break`,
+  /**
+   * Maximum time to wait for synchronisation to happen.
+   * If interval is exceeded, stream closes.
+   * Default: 2s
+   */
+  maximumWait: Interval
+  /**
+   * If we continue synchronisation when a source is done (via `onSourceDone:'allow'`),
+   * what source should be returned for a completed source?
+   * * 'undefined': _undefined_
+   * * 'last': the last received value, or _undefined_
+   * 
+   * Default: 'undefined'
+   */
+  finalValue: `undefined` | `last`
+}
+
+
+export type CombineLatestOptions = {
+  onSourceDone: `allow` | `break`
+  /**
+ * If we continue synchronisation when a source is done (via `onSourceDone:'allow'`),
+ * what source should be returned for a completed source?
+ * * 'undefined': _undefined_
+ * * 'last': the last received value, or _undefined_
+ * 
+ * Default: 'undefined'
+ */
+  finalValue: `undefined` | `last`
+
+  /**
+   * After an array is emitted, what to do with
+   * last values. By default, the last value is kept.
+   * If 'undefined' is used, _undefined_ is used until
+   * source emits again.
+   * 
+   * Default: 'last'
+   */
+  afterEmit: `undefined` | `last`
+}
 
 /**
  * A Generator, AsyncGenerator or IterableIterator
@@ -15,12 +64,18 @@ export type GenOrData<V> = Array<V> | Gen<V>;
  * A function which can form part of a chain.
  * It takes an input {@link GenOrData}, and returns a new generator.
  */
-export type Link<In, Out> = (input: GenOrData<In>) => AsyncGenerator<Out>;
+export type Link<In, Out> = {
+  (input: GenOrData<In>): AsyncGenerator<Out>
+  _name: string
+}
 
 /**
  * A function which can start a chain, since it takes no input
  */
-export type GenFactoryNoInput<Out> = () => AsyncGenerator<Out>;
+export type GenFactoryNoInput<Out> = {
+  (): AsyncGenerator<Out>
+  _type: `GenFactoryNoInput`, _name: string
+}
 
 // export type LinksWithSource0<TFinal> = [
 //   GenOrData<TFinal> | GenFactoryNoInput<TFinal>
@@ -43,7 +98,6 @@ export type GenFactoryNoInput<Out> = () => AsyncGenerator<Out>;
 //   Link<T2, T3>,
 //   Link<T3, TFinal>
 // ]
-
 
 
 // export type LinksWithSource4<TFinal, T1, T2, T3, T4> = [
@@ -282,3 +336,14 @@ export type LazyChain<In, Out> = {
    */
   transform: (transformer: (v: any) => any) => LazyChain<In, Out>
 }
+
+export type GenValueTypeObject<T extends Record<string, GenOrData<any> | GenFactoryNoInput<any>>> =
+  { [ K in keyof T ]:
+    T[ K ] extends Generator<infer V> ? V | undefined :
+    T[ K ] extends AsyncGenerator<infer V> ? V | undefined :
+    T[ K ] extends IterableIterator<infer V> ? V | undefined :
+    T[ K ] extends AsyncIterableIterator<infer V> ? V | undefined :
+    T[ K ] extends Array<infer V> ? V | undefined :
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    T[ K ] extends (...args: any) => any ? ReturnType<T[ K ]> | undefined :
+    never };
