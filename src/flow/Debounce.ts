@@ -1,3 +1,4 @@
+import type { Interval } from './IntervalType.js';
 import {
   timeout,
   type TimeoutSyncCallback,
@@ -63,19 +64,19 @@ import {
  * await d();
  * ```
  * @param callback Function to filter access to
- * @param timeoutMs Minimum time between invocations
+ * @param interval Minimum time between invocations
  * @returns Debounce function
  */
 export const debounce = (
   callback: TimeoutSyncCallback | TimeoutAsyncCallback,
-  timeoutMs: number
+  interval: Interval
 ): DebouncedFunction => {
-  const t = timeout(callback, timeoutMs);
+  const t = timeout(callback, interval);
   //eslint-disable-next-line functional/prefer-immutable-types
-  return (...args: unknown[]) => t.start(undefined, args);
+  return (...args: Array<unknown>) => { t.start(undefined, args); };
 };
 
 /**
  * Debounced function
  */
-export type DebouncedFunction = (...args: readonly unknown[]) => void;
+export type DebouncedFunction = (...args: ReadonlyArray<unknown>) => void;
