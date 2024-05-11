@@ -6,7 +6,7 @@ import * as Rx from '../rx/index.js';
  * @param timeoutMs
  * @returns
  */
-export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<UIEvent>({ elapsed: elapsed ?? 100 })(Rx.fromEvent(window, `resize`));
+export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<UIEvent>({ elapsed: elapsed ?? 100 })(Rx.From.event(window, `resize`));
 
 /**
  * Observe when document's class changes
@@ -20,7 +20,7 @@ export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<UIEvent>({ e
  * @returns
  */
 export const themeChange = () => {
-  const m = Rx.observable<Array<MutationRecord>>(stream => {
+  const m = Rx.From.observable<Array<MutationRecord>>(stream => {
     const ro = new MutationObserver((entries) => {
       stream.set(entries);
     });
@@ -61,7 +61,7 @@ export const resizeObservable = (
     throw new Error(`elem parameter is undefined. Expected element to observe`);
   }
 
-  const m = Rx.observable<Array<ResizeObserverEntry>>(stream => {
+  const m = Rx.From.observable<Array<ResizeObserverEntry>>(stream => {
     const ro = new ResizeObserver((entries) => {
       stream.set(entries);
     });
@@ -73,7 +73,3 @@ export const resizeObservable = (
   });
   return Rx.Ops.debounce<Array<ResizeObserverEntry>>({ elapsed: timeout ?? 100 })(m);
 }
-
-
-
-//elements(Rx.fromObject([ `a`, `b`, `c` ]));
