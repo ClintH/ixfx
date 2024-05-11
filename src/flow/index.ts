@@ -127,7 +127,7 @@ try {
     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
     (window as any).ixfx = {
       ...(window as any).ixfx,
-      Flow: { StateMachine, Timer, forEach, forEachAsync, repeatAsync: repeatAwait, repeat },
+      Flow: { StateMachine, Timer, forEach, forEachAsync, repeatAwait, repeat },
     };
   }
 } catch {

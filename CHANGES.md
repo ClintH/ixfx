@@ -5,9 +5,14 @@ A rough changelog between NPM releases
 Data
 
 * Changed movingAverage et al to return a function rather than object with add, clear, compute functions.
-
++ Collections.MassiveSet: The inbuilt JS Set has a size limitation. MassiveSet has similar semantics but with more storage.
+  
+Modulation
++ cycler
+  
 Flow
 + rateMinimum: maintain a minimum rate of calling a function
+* Sleep: improved used of AbortSignal
 
 # 0.20.0 24.04.06
 
