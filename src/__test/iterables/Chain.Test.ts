@@ -140,7 +140,149 @@ test(`flatten`, async t => {
 
 });
 
-test(`merge`, async t => {
+/**
+ * Merge to object, breaking when stream stops
+ */
+test(`combine-latest-to-object-break`, async t => {
+  const c1 = Chains.combineLatestToObject({
+    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+  }, { onSourceDone: `break`, afterEmit: `last` });
+  const c1Array = await Chains.asArray(c1);
+  // Slow chain doesn't get a chance to finish due to 'onSourceDone:break'
+  // Values get repeated because afterEmit:last
+  t.deepEqual(c1Array, [
+    { fast: 1, slow: undefined }, { fast: 2, slow: undefined }, { fast: 2, slow: 5 }, { fast: 3, slow: 5 }, { fast: 4, slow: 5 }
+  ]);
+
+  // Slow chain doesn't get a chance to finish due to 'onSourceDone:break'
+  // Values set to undefined because afterEmit:undefined  
+  const c2 = Chains.combineLatestToObject({
+    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+  }, { onSourceDone: `break`, afterEmit: 'undefined' });
+  const c2Array = await Chains.asArray(c2);
+  t.deepEqual(c2Array, [
+    { fast: 1, slow: undefined }, { fast: 2, slow: undefined }, { fast: undefined, slow: 5 }, { fast: 3, slow: undefined }, { fast: 4, slow: undefined }
+  ]);
+
+});
+
+test(`combine-latest-to-object-allow`, async t => {
+  const c1 = Chains.combineLatestToObject({
+    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+  }, { onSourceDone: `allow`, finalValue: `last`, afterEmit: `last` });
+  const c1Array = await Chains.asArray(c1);
+
+  // Allow source to finish without closing.
+  // Expect last values to be carried forward becase of afterEmit: last and finalValue:last
+  t.deepEqual(c1Array, [
+    { fast: 1, slow: undefined },
+    { fast: 2, slow: undefined },
+    { fast: 2, slow: 5 },
+    { fast: 3, slow: 5 },
+    { fast: 4, slow: 5 },
+    { fast: 4, slow: 6 },
+    { fast: 4, slow: 7 }
+  ]);
+
+  const c2 = Chains.combineLatestToObject({
+    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+  }, { onSourceDone: `allow`, finalValue: `undefined`, afterEmit: `last` });
+  const c2Array = await Chains.asArray(c2);
+
+  // Allow source to finish without closing.
+  // Expect last values to be undefined forward becase of afterEmit: last and finalValue:undefined
+  t.deepEqual(c2Array, [
+    { fast: 1, slow: undefined },
+    { fast: 2, slow: undefined },
+    { fast: 2, slow: 5 },
+    { fast: 3, slow: 5 },
+    { fast: 4, slow: 5 },
+    { fast: undefined, slow: 5 },
+    { fast: undefined, slow: 6 },
+    { fast: undefined, slow: 7 }
+  ]);
+
+  const c3 = Chains.combineLatestToObject({
+    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+  }, { onSourceDone: `allow`, finalValue: `undefined`, afterEmit: `undefined` });
+  const c3Array = await Chains.asArray(c3);
+
+  // Allow source to finish without closing.
+  // Expect last values to be undefined forward becase of afterEmit: undefined and finalValue:undefined
+  t.deepEqual(c3Array, [
+    { fast: 1, slow: undefined },
+    { fast: 2, slow: undefined },
+    { fast: undefined, slow: 5 },
+    { fast: 3, slow: undefined },
+    { fast: 4, slow: undefined },
+    { fast: undefined, slow: 6 },
+    { fast: undefined, slow: 7 }
+  ]);
+});
+
+
+test(`combine-latest-to-array`, async t => {
+  const c1 = Chains.combineLatestToArray([
+    Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    Chains.fromArray([ 5, 6, 7 ], 25)
+  ], { onSourceDone: `break`, afterEmit: `last` });
+  const c1Array = await Chains.asArray(c1);
+
+  // Second chain a bit slow, second doesn't get a chance to finish due to 'onSourceDone:break'
+  // Values get repeated because afterEmit:last
+  t.deepEqual(c1Array, [
+    [ 1, undefined ], [ 2, undefined ], [ 2, 5 ], [ 3, 5 ], [ 4, 5 ]
+  ]);
+
+  const c1a = Chains.combineLatestToArray([
+    Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    Chains.fromArray([ 5, 6, 7 ], 25)
+  ], { onSourceDone: `break`, afterEmit: 'undefined' });
+  const c1aArray = await Chains.asArray(c1a);
+
+  // afterEmit:undefined
+  t.deepEqual(c1aArray, [
+    [ 1, undefined ], [ 2, undefined ], [ undefined, 5 ], [ 3, undefined ], [ 4, undefined ]
+  ]);
+
+  const c2 = Chains.combineLatestToArray([
+    Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    Chains.fromArray([ 5, 6, 7 ], 25)
+  ], { onSourceDone: `allow`, finalValue: `last`, afterEmit: `last` });
+  const c2Array = await Chains.asArray(c2);
+
+  // Second chain a bit slow, second doesn't get a chance to finish due to 'onSourceDone:break'
+  t.deepEqual(c2Array, [
+    [ 1, undefined ], [ 2, undefined ], [ 2, 5 ], [ 3, 5 ], [ 4, 5 ],
+    [ 4, 6 ], [ 4, 7 ]
+  ]);
+
+  const c2a = Chains.combineLatestToArray([
+    Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    Chains.fromArray([ 5, 6, 7 ], 25)
+  ], { onSourceDone: `allow`, finalValue: `last`, afterEmit: `undefined` });
+  const c2aArray = await Chains.asArray(c2a);
+  t.deepEqual(c2aArray, [
+    [ 1, undefined ], [ 2, undefined ], [ undefined, 5 ], [ 3, undefined ], [ 4, undefined ], [ undefined, 6 ], [ undefined, 7 ]
+  ]);
+
+  const c3 = Chains.combineLatestToArray([
+    Chains.fromArray([ 1, 2, 3, 4 ], 10),
+    Chains.fromArray([ 5, 6, 7 ], 25)
+  ], { onSourceDone: `allow`, finalValue: `undefined` });
+  const c3Array = await Chains.asArray(c3);
+  t.deepEqual(c3Array, [
+    [ 1, undefined ], [ 2, undefined ], [ 2, 5 ], [ 3, 5 ],
+    [ 4, 5 ], [ undefined, 5 ], [ undefined, 6 ], [ undefined, 7 ]
+  ]);
+});
+
+test(`merge-flat`, async t => {
   const t1 = Chains.run(
     Chains.tick({ interval: 50, loops: 10 }),
     Chains.Links.tally(),
@@ -224,12 +366,44 @@ test('take', async t => {
   t.is(output2.length, 0);
 });
 
-test(`synchronise`, async t => {
+test(`syncToArray`, async t => {
   const t1 = Chains.tick({ interval: 10, loops: 10 });
   const t2 = Chains.tick({ interval: 20, loops: 5, asClockTime: true });
-  const ch1 = Chains.synchronise(t1, t2);
-  const output = await Chains.asArray(ch1);
-  t.is(output.length, 5);
+  const ch1 = Chains.syncToArray([ t1, t2 ], { onSourceDone: `break` });
+  const output1 = await Chains.asArray(ch1);
+  // Expect the total length to be 5 because 'onSourceDone:break'
+  t.is(output1.length, 5);
+
+  const ch2 = Chains.syncToArray([
+    Chains.tick({ interval: 10, loops: 10 }),
+    Chains.tick({ interval: 20, loops: 5, asClockTime: true })
+  ], { onSourceDone: `allow` });
+
+  const ch2Array = await Chains.asArray(ch2);
+  t.is(ch2Array.length, 10);
+
+  const ch3 = Chains.syncToArray([
+    Async.withDelay([ 1, 2, 3 ], 10),
+    Async.withDelay([ 4, 5, 6 ], 15)
+  ], { onSourceDone: `allow` });
+  const ch3Array = await Chains.asArray(ch3);
+  t.deepEqual(ch3Array, [ [ 1, 4 ], [ 2, 5 ], [ 3, 6 ] ]);
+
+  const ch4 = Chains.syncToArray([
+    Async.withDelay([ 1, 2, 3, 4 ], 10),
+    Async.withDelay([ 5, 6, 7 ], 15)
+  ], { onSourceDone: `allow`, finalValue: `last` });
+  const ch4Array = await Chains.asArray(ch4);
+  // Expect repeat of '7' because of 'finalValue:last'
+  t.deepEqual(ch4Array, [
+    [ 1, 5 ], [ 2, 6 ], [ 3, 7 ], [ 4, 7 ], [ 4, 7 ]
+  ]);
+
+  // Expect error because maximumWait gets exceed
+  const ch5 = Chains.syncToArray([
+    Async.withDelay([ 1, 2, 3, 4 ], 2000)
+  ], { onSourceDone: `allow`, finalValue: `last`, maximumWait: 500 });
+  await t.throwsAsync(async () => await Chains.asArray(ch5));
 });
 
 test(`debounce`, async t => {
