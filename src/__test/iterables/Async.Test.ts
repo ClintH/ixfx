@@ -1,7 +1,7 @@
 import * as IterableAsync from '../../iterables/IterableAsync.js';
 import test from 'ava';
-import { isApproximately } from '../../numbers/IsApproximately.js';
 import { count } from '../../numbers/Count.js';
+import * as Flow from '../../flow/index.js';
 test(`repeat`, async t => {
   const r1 = await IterableAsync.toArray(IterableAsync.repeat(() => count(3), 3));
   t.deepEqual(r1, [ 0, 1, 2, 0, 1, 2, 0, 1, 2 ]);
@@ -37,10 +37,51 @@ test(`min`, async t => {
   t.deepEqual(r3Array, [ 0, -3 ]);
 });
 
+test(`fromFunctionAwaited`, async t => {
+  let count = 0;
+  let executed = 0;
+  const results: Array<number> = [];
+  const fn = () => {
+    executed++;
+    return executed;
+  }
+  for await (const v of IterableAsync.fromFunctionAwaited(fn)) {
+    results.push(v);
+    count++;
+    if (count === 5) break;
+  }
+  t.is(count, 5);
+  t.is(executed, 5);
+  t.deepEqual(results, [ 1, 2, 3, 4, 5 ]);
+});
+
 test(`dropWhile`, async t => {
   const r1 = IterableAsync.dropWhile(IterableAsync.fromArray([ 1, 2, 3, 4 ]), e => e < 3);
   const r1Result = await IterableAsync.toArray(r1);
   t.deepEqual(r1Result, [ 3, 4 ]);
+});
+
+test(`nextWithTimeout`, async t => {
+  // Iterate through array 1min at a time
+  const slow = () => IterableAsync.withDelay([ 1, 2, 3, 4 ], { secs: 1 });
+  await t.throwsAsync(async () => {
+    const v = await IterableAsync.nextWithTimeout(slow(), 200);
+    t.fail(`Did not throw`);
+  });
+  await Flow.sleep(300);
+
+  // Iterate through array 1min at a time
+  const lessSlow = IterableAsync.withDelay([ 1, 2, 3, 4 ], 50);
+  const v1 = await IterableAsync.nextWithTimeout(lessSlow, 200);
+  const v2 = await IterableAsync.nextWithTimeout(lessSlow, 200);
+  const v3 = await IterableAsync.nextWithTimeout(lessSlow, 200);
+  const v4 = await IterableAsync.nextWithTimeout(lessSlow, 200);
+  const v5 = await IterableAsync.nextWithTimeout(lessSlow, 200);
+  t.is(v1.value, 1);
+  t.is(v2.value, 2);
+  t.is(v3.value, 3);
+  t.is(v4.value, 4);
+  t.is(v5.done, true);
 });
 
 test(`until`, async t => {
