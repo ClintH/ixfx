@@ -7,19 +7,42 @@ import * as Iter from '../iterables/index.js';
 import * as Rx from '../rx/index.js';
 import { interval } from '../flow/index.js';
 
-test(`poll`, async t => {
+test(`pull`, async t => {
+  const counter = () => {
+    let x = 0;
+    return () => {
+      x++;
+      return x;
+    };
+  }
   const v1 = {
     name: `hello`,
-    random: Rx.fromFunction(Math.random, { interval: 1000 }),
-    gen: Mod.pingPong(1, 0, 5)
+    random: Rx.From.func(Math.random, { interval: 100, debugLabel: `random` }),
+    gen: Mod.pingPong(1, 0, 5),
+    count: counter()
   }
 
+  // Create a pull mechanism
   const p1 = pull(v1);
 
-  await Flow.repeatAsync(10, async () => {
-    console.log(`poll: ${ JSON.stringify(p1.compute()) }`);
-    await Flow.sleep(500);
-  })
+  // Run an async function 10 times
+  const p1Loop = await Flow.repeatAwait(10, async () => {
+    await Flow.sleep(100);
+    const r = await p1.compute();
+    return r;
+  });
+  const p1Data = await Iter.toArray(p1Loop);
+
+  let count = 1;
+  for (const d of p1Data) {
+    if (count === 1) t.falsy(d.random);
+    t.is(d.name, `hello`);
+    t.is(d.count, count++);
+    // @ts-expect-error
+    t.true(d.gen <= 5);
+    // @ts-expect-error
+    t.true(d.gen >= 0);
+  }
   p1.dispose();
 });
 
@@ -76,7 +99,7 @@ test(`field-resolve`, async t => {
     // Generator
     gen: Numbers.count(c),
     // Rx
-    rx: Rx.readFromArray([ 1, 2, 3, 4, 5 ], { interval: 100 }),
+    rx: Rx.From.array([ 1, 2, 3, 4, 5 ], { interval: 100 }),
     // Regular function
     rand: Math.random
   };
