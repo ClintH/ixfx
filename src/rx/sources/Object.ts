@@ -1,11 +1,11 @@
-import { Immutable } from "../index.js";
-import { initStream } from "./InitStream.js";
-import type { ObjectOptions, ReactiveDiff, ReactiveInitial, ReactiveNonInitial, ReactiveDisposable } from "./Types.js";
+/* eslint-disable @typescript-eslint/unbound-method */
+import { Immutable } from "../../index.js";
+import { initStream } from "../InitStream.js";
+import type { ReactiveDiff, ReactiveInitial, ReactiveNonInitial, ReactiveDisposable } from "../Types.js";
+import type { ObjectOptions } from "./Types.js";
 
-export function fromObject<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
-
-export function fromObject<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
-
+export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
+export function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
 
 /**
  * Creates a Reactive wrapper with the shape of the input object.
@@ -15,11 +15,11 @@ export function fromObject<V extends Record<string, any>>(initialValue: undefine
  * * `set()`, 'resets' the whole object
  * * `update()` changes a particular field
  * 
- * Consider using {@link fromProxy} to return a object with properties that can be
+ * Consider using {@link Rx.From.objectProxy} to return a object with properties that can be
  * set in the usual way yet is also Reactive.
  * 
  * ```js
- * const o = fromObject({ name: `bob`, level: 2 });
+ * const o = Rx.From.object({ name: `bob`, level: 2 });
  * o.on(value => {
  *  const changed = value.value;
  * });
@@ -34,7 +34,7 @@ export function fromObject<V extends Record<string, any>>(initialValue: undefine
  * `onDiff` subscribes to a rough diff of the object.
  * 
  * ```js
- * const o = fromObject({ name: `bob`, level: 2 });
+ * const o = Rx.From.object({ name: `bob`, level: 2 });
  * o.onDiff(diffValue => {
  *  const diff = diffValue.value;
  * })
@@ -50,7 +50,7 @@ export function fromObject<V extends Record<string, any>>(initialValue: undefine
  * @param options Options
  * @returns 
  */
-export function fromObject<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDisposable & ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
+export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDisposable<V> & ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
   const eq = options.eq ?? Immutable.isEqualContextString;
   const setEvent = initStream<V>();
   const diffEvent = initStream<Array<Immutable.Change<any>>>();

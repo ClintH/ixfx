@@ -2,46 +2,24 @@ import type { Primitive } from 'src/KeyValue.js';
 import type { ChangeRecord } from '../Compare.js';
 import type { Interval } from '../flow/IntervalType.js';
 import * as Immutable from '../Immutable.js';
+import type { AnnotationElapsed, BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions } from './ops/Types.js';
+import type { TimeoutTriggerOptions } from './sources/Types.js';
 
-
-export type MergeOptions = {
+export type CombineLatestOptions = {
+  /**
+   * If _true_, disposes all the merged sources when the merged reactive closes.
+   * Default: _true_.
+   */
+  disposeSources: boolean
   /**
    * How to handle when a source ends.
-   * * 'allow': continue mergeAsArrayStream, last value for done stream will kept
-   * * 'break': stop mergeAsArrayStream
+   * * 'allow': continue combined stream, last value for done stream will kept
+   * * 'break': stop combined stream
    * 
    * Default: 'break'
    */
   onSourceDone: `allow` | `break`
 }
-
-export type SyncOptions = {
-
-  /**
-   * How to handle when a source completes.
-   * * 'allow' means we continue synchronising with remaining alive sources. Use 'finalValue' option to control what data is returned for completed sources
-   * * 'break' means we stop the stream, because synchronisation across all sources is no longer possible.
-   * 
-   * Default: 'break'.
-   */
-  onSourceDone: `allow` | `break`,
-  /**
-   * Maximum time to wait for synchronisation to happen.
-   * If interval is exceeded, stream closes.
-   * Default: 2s
-   */
-  maximumWait: Interval
-  /**
-   * If we continue synchronisation when a source is done (via `onSourceDone:'allow'`),
-   * what source should be returned for a completed source?
-   * * 'undefined': _undefined_
-   * * 'last': the last received value, or _undefined_
-   * 
-   * Default: 'undefined'
-   */
-  finalValue: `undefined` | `last`
-}
-
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -58,21 +36,6 @@ export type PassedSignal = Passed<any> & {
   value: undefined
   signal: SignalKinds
   context: string
-}
-
-export type EventOptions<V> = {
-  transform: (args?: Event | undefined) => V
-  lazy?: Lazy
-  /**
-   * If true, log messages are emitted
-   * when event handlers are added/removed
-   */
-  debugLifecycle?: boolean
-  /**
-   * If true, log messages are emitted
-   * when the source event fires
-   */
-  debugFiring?: boolean
 }
 
 export type PassedValue<V> = Passed<V> & {
@@ -97,33 +60,15 @@ export type UpstreamOptions<In> = {
    */
   onStop: () => void
 
-  onDispose: () => void
+  onDispose: (reason: string) => void
 }
+
 
 /**
  * Wrapped Reactive for object-oriented access
  */
 export type Wrapped<TIn> = {
   source: Reactive<TIn>,
-  /**
-   * Copies values from source into an array, throwing
-   * an error if expected number of items is not reached
-   * @param options 
-   * @returns 
-   */
-  toArrayOrThrow: (options: Partial<ToArrayOptions<TIn>>) => Promise<Array<TIn>>
-  /**
-   * Copies values from source into an array.
-   * @param options 
-   * @returns 
-   */
-  toArray: (options: Partial<ToArrayOptions<TIn>>) => Promise<Array<TIn | undefined>>
-  /**
-   * Accumulate a batch of values, emitted as an array
-   * @param options 
-   * @returns 
-   */
-  batch: (options: Partial<BatchOptions>) => Wrapped<Array<TIn>>
   /**
    * Annotate values with a timestamp of elapsed time
    * (uses `annotate`)
@@ -136,6 +81,15 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation) => Wrapped<TIn & TAnnotation>
+  /**
+  * Accumulate a batch of values, emitted as an array
+  * @param options 
+  * @returns 
+  */
+  batch: (options: Partial<BatchOptions>) => Wrapped<Array<TIn>>
+
+  debounce: (options: Partial<DebounceOptions>) => Wrapped<TIn>
+
   /**
    * Pluck and emit a single field from values
    * @param fieldName 
@@ -150,6 +104,10 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   filter: (predicate: FilterPredicate<TIn>, options: Partial<InitStreamOptions>) => Wrapped<TIn>
+
+  combineLatestToArray: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(sources: T, options: Partial<CombineLatestOptions>) => Wrapped<RxValueTypes<T>>
+  combineLatestToObject: <const T extends Record<string, ReactiveOrSource<any>>>(sources: T, options: { name: string } & Partial<CombineLatestOptions>) => Wrapped<RxValueTypeObject<T>>
+
   /**
    * Converts one source stream into two, with values being emitted by both
    * @param options 
@@ -157,31 +115,16 @@ export type Wrapped<TIn> = {
    */
   split: (options: Partial<SplitOptions>) => Array<Wrapped<TIn>>
   /**
-   * Transforms all values
-   * @param transformer 
-   * @param options 
-   * @returns 
-   */
-  transform: <TOut>(transformer: (value: TIn) => TOut, options?: Partial<TransformOpts>) => Wrapped<TOut>
-  /**
-   * Only allow values through if a minimum of time has elapsed. Throws away values.
-   * Ie. converts a fast stream into a slower one.
-   * @param options 
-   * @returns 
-   */
-  throttle: (options: Partial<ThrottleOptions>) => Wrapped<TIn>
-  debounce: (options: Partial<DebounceOptions>) => Wrapped<TIn>
+ * Emits values when this stream and any additional streams produce a value. The resulting stream is
+ * thus an array of values, each source at a given index.
+ * Waits to output a value until each stream has produced a value. Thus, the pace is determined by
+ * the slowest stream.
+ * @returns 
+ */
+  syncToArray: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(reactiveSources: T, options?: Partial<SyncOptions>) => Wrapped<[ TIn, ...RxValueTypes<T> ]>
 
-  /**
-   * Emits values when this stream and any additional streams produce a value. The resulting stream is
-   * thus an array of values, each source at a given index.
-   * Waits to output a value until each stream has produced a value. Thus, the pace is determined by
-   * the slowest stream.
-   * @returns 
-   */
-  synchronise: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(reactiveSources: T, options?: Partial<SyncOptions>) => Wrapped<[ TIn, ...RxValueTypes<T> ]>
+  syncToObject: <const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options?: { name?: string } & Partial<SyncOptions>) => Wrapped<RxValueTypeObject<T>>
 
-  //synchronise: (...additionalSources: Array<ReactiveOrSource<TIn> | Wrapped<TIn>>) => Wrapped<Array<TIn | undefined>>
   /**
    * Creates new streams for each case, sending values to the stream if they match the filter predicate
    * @param cases 
@@ -196,11 +139,40 @@ export type Wrapped<TIn> = {
    */
   splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => Record<K, Wrapped<TIn>>
   /**
+   * Transforms all values
+   * @param transformer 
+   * @param options 
+   * @returns 
+   */
+  transform: <TOut>(transformer: (value: TIn) => TOut, options?: Partial<TransformOpts>) => Wrapped<TOut>
+  /**
+   * Only allow values through if a minimum of time has elapsed. Throws away values.
+   * Ie. converts a fast stream into a slower one.
+   * @param options 
+   * @returns 
+   */
+  throttle: (options: Partial<ThrottleOptions>) => Wrapped<TIn>
+  timeoutTrigger: <TTriggerValue>(options: TimeoutTriggerOptions<TTriggerValue>) => Wrapped<TIn | TTriggerValue>
+  /**
+   * Copies values from source into an array, throwing
+   * an error if expected number of items is not reached
+   * @param options 
+   * @returns 
+   */
+  toArrayOrThrow: (options: Partial<ToArrayOptions<TIn>>) => Promise<Array<TIn>>
+  /**
+   * Copies values from source into an array.
+   * @param options 
+   * @returns 
+   */
+  toArray: (options: Partial<ToArrayOptions<TIn>>) => Promise<Array<TIn | undefined>>
+  /**
    * Listen for values
    * @param callback 
    * @returns 
    */
   value: (callback: (value: TIn) => void) => void
+
 }
 
 export type ToArrayOptions<V> = {
@@ -239,112 +211,9 @@ export type InitLazyStreamOptions = Partial<InitStreamOptions> & {
 };
 
 export type CountOptions = { lazy: Lazy, amount: number, offset: number, interval: Interval, signal: AbortSignal }
-export type PingedFunctionOptions = {
-  /**
-   * If _true_, stream closes if function throws an error.
-   * If _false_, errors are emitted as signals, but stream is not closed.
-   * Default: _true_
-   */
-  closeOnError: boolean
-  /**
-   * Laziness
-   * * start: only begins on first subscriber. Keeps running even when there are no subscribers
-   * * very: only begins on first subscriber. Stops looping if there are no subscribers
-   * * never: begins calling function when initalised and doesn't stop until Reactive is disposed
-   */
-  lazy: Lazy,
-  /**
- * If specified, a time before invoking function.
- * If `repeat` is used, this is in addition to `interval` time.
- */
-  predelay: Interval,
-  /***
-* If specified, signal is checked to prevent function execution.
-* Also used for aborting a looped fromFunction.
-*/
-  signal: AbortSignal
-}
-
-export type FromFunctionOptions = {
-  /**
-   * If _true_, stream closes if function throws an error.
-   * If _false_, errors are emitted as signals, but stream is not closed.
-   * Default: _true_
-   */
-  closeOnError: boolean
-  /**
-   * Laziness
-   * * start: only begins on first subscriber. Keeps running even when there are no subscribers
-   * * very: only begins on first subscriber. Stops looping if there are no subscribers
-   * * never: begins calling function when initalised and doesn't stop until Reactive is disposed
-   */
-  lazy: Lazy
-  /**
-   * If specified, sets an upper limit of how many times we loop
-   * (if this is also enabled)
-   */
-  maximumRepeats: number
-  /**
-   * If specified, function is called repeatedly with this delay
-   */
-  interval: Interval
-  /**
-   * If specified, a time before invoking function.
-   * If `repeat` is used, this is in addition to `interval` time.
-   */
-  predelay: Interval,
-  /***
-   * If specified, signal is checked to prevent function execution.
-   * Also used for aborting a looped fromFunction.
-   */
-  signal: AbortSignal
-}
 
 
-export type ReadFromArrayOptions = {
-  /**
-   * Interval between each item being read. Default: 5ms.
-   */
-  interval: Interval
-
-  lazy: Lazy
-  /**
-   * Behaviour when reactive stops, for example due to having no subscribers
-   * * continue: iteration continues through array where it left off
-   * * reset: iteration begins from start of array
-   */
-  whenStopped: `continue` | `reset`
-  debugLifecycle: boolean
-  signal: AbortSignal
-}
-
-export type FromGeneratorOptions = {
-  /**
-   * Minimum time interval between reads from generator
-   * Default: 5ms
-   */
-  interval: Interval
-  /**
-   * If _true_, only accesses the generator if there is a subscriber.
-   * Default: true
-   */
-  lazy: Lazy,
-  signal: AbortSignal
-
-}
-
-/**
- * Switcher options.
- * 
- * match (default: 'first')
- * * 'first': Outputs to first case where predicate is _true_
- * * 'all': Outputs to all cases where predicate is _true_
- */
-export type SwitcherOptions = {
-  match: `first` | `all`
-}
-
-export type ReactiveOrSource<V> = Wrapped<V> | Reactive<V> | IterableIterator<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V> | Array<V>
+export type ReactiveOrSource<V> = Wrapped<V> | Reactive<V> | IterableIterator<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V> | Array<V> | (() => V)
 
 export type BindUpdateOpts<V> = {
   initial: (v: V, el: HTMLElement) => void,
@@ -392,12 +261,12 @@ export type ReactiveFinite = {
   isDone(): boolean
 }
 
-export type ReactiveDisposable = {
+export type ReactiveDisposable<V> = Reactive<V> & {
   dispose(reason: string): void
   isDisposed(): boolean
 }
 
-export type ReactiveArray<V> = ReactiveDisposable & ReactiveWritable<Array<V>> & {
+export type ReactiveArray<V> = ReactiveWritable<Array<V>> & {
   push(value: V): void
   deleteAt(index: number): void
   deleteWhere(filter: (value: V) => boolean): number
@@ -406,7 +275,7 @@ export type ReactiveArray<V> = ReactiveDisposable & ReactiveWritable<Array<V>> &
   onArray(handler: (changes: Passed<Array<ChangeRecord<number>>>) => void): () => void
 }
 
-export type ReactiveDiff<V> = ReactiveDisposable & ReactiveWritable<V> & {
+export type ReactiveDiff<V> = ReactiveDisposable<V> & ReactiveWritable<V> & {
   /**
    * Diff information
    * @param handler 
@@ -426,7 +295,7 @@ export type ReactiveDiff<V> = ReactiveDisposable & ReactiveWritable<V> & {
   updateField(field: string, value: any): void
 }
 
-export type ReactiveStream<V> = Reactive<V> & ReactiveDisposable & ReactiveWritable<V> & {
+export type ReactiveStream<V> = Reactive<V> & ReactiveDisposable<V> & ReactiveWritable<V> & {
   through(message: Passed<V>): void
   /**
    * Removes all the subscribers from this stream.
@@ -438,23 +307,6 @@ export type ReactiveStream<V> = Reactive<V> & ReactiveDisposable & ReactiveWrita
    * @param context 
    */
   signal(signal: SignalKinds, context?: string): void
-}
-
-
-/**
- * Options when creating a reactive object.
- */
-export type ObjectOptions<V> = {
-  /**
-   * _false_ by default.
-   * If _true_, inherited fields are included. This is necessary for event args, for example.
-   */
-  deepEntries: boolean
-  /**
-   * Uses JSON.stringify() by default.
-   * Fn that returns _true_ if two values are equal, given a certain path.
-   */
-  eq: Immutable.IsEqualContext<V>
 }
 
 export type DomBindValueTarget = {
@@ -524,8 +376,6 @@ export type DomBindSourceValue<V> = {
   transformValue?: (input: any) => string
 }
 
-
-export type FilterPredicate<In> = (value: In) => boolean;
 export type PipeSet<In, Out> = [
   Reactive<In>,
   ...Array<Reactive<any> & ReactiveWritable<any>>,
@@ -533,22 +383,16 @@ export type PipeSet<In, Out> = [
 ]
 
 export type InitStreamOptions = {
+  /**
+   * Optional label to associate with this stream. Useful for debugging.
+   */
+  debugLabel: string
   onFirstSubscribe: () => void
   onNoSubscribers: () => void
-  onDispose: () => void
+  onDispose: (reason: string) => void
 }
 
-export type ThrottleOptions = InitStreamOptions & {
-  elapsed: Interval
-}
 
-export type AnnotationElapsed = {
-  elapsedMs: number
-}
-
-export type SplitOptions = {
-  quantity: number
-}
 
 export type DomCreateOptions = {
   tagName: string
@@ -562,76 +406,23 @@ export type PipeDomBinding = {
   remove(deleteElements: boolean): void
 }
 
+
 /**
- * Transform options
+ * WithValue stream options
  */
-export type TransformOpts = InitStreamOptions;
-/**
- * Cached stream options
- */
-export type CacheOpts<V> = InitStreamOptions & {
+export type WithValueOptions<V> = Partial<InitStreamOptions> & {
   /**
    * Initial value
    */
-  initialValue: V,
+  initial: V,
   /**
    * Laziness
    */
-  lazy: Lazy
+  lazy?: Lazy
 }
 
-export type BatchOptions = InitStreamOptions & {
-  /**
-   * If _true_ (default) remaining results are yielded
-   * if source closes. If _false_, only batches that meet
-   * `elapsed` or `quantity` are emitted.
-   */
-  returnRemainder: boolean
-  /**
-   * Amount of time to gather results for a batch.
-   * 'elapsed' and 'quantity' is ORed. Meaning a batch will the minimum of
-   * 'elapsed' and 'quantity'
-   */
-  elapsed: Interval
-  /**
-   * Number of items to gather for a batch.
-   * 'elapsed' and 'quantity' is ORed. Meaning a batch will the minimum of
-   * 'elapsed' and 'quantity'
-   */
-  quantity: number
-}
-
-export type FieldOptions<V> = InitStreamOptions & {
-
-  /**
-   * If `field` is missing on a value, this value is used in its place.
-   * If not set, the value is skipped.
-   */
-  missingFieldDefault: V
-};
 
 
-export type SingleFromArrayOptions<V> = {
-  /**
-   * Function to select a single value from array
-   * @param value 
-   * @returns 
-   */
-  predicate: (value: V) => boolean
-  /**
-   * `default`: leave array in same order (default option)
-   * `random`: shuffles array before further processing
-   * function: function that sorts values
-   */
-  order: `default` | `random` | ((a: V, b: V) => number)
-  /**
-   * Selects an index from array. 0 being first, 1 being second.
-   * Reverse indexing also works: -1 being last, -2 being second last...
-   * 
-   * If index exceeds length of array, _undefined_ is returned
-   */
-  at: number
-}
 
 export type ResolveOptions = {
   /**
@@ -659,13 +450,6 @@ export type ReactiveOpLinks<In, Out> = [
   ...Array<ReactiveOp<any, any>>,
   ReactiveOp<any, Out>
 ]
-
-export type DebounceOptions = InitStreamOptions & {
-  /**
-   * Minimum time between events. Default 50ms
-   */
-  elapsed: Interval
-}
 
 export type RxValueTypes<T extends ReadonlyArray<ReactiveOrSource<any>>> =
   { [ K in keyof T ]: T[ K ] extends Reactive<infer V> ? V | undefined :
@@ -696,17 +480,3 @@ export type PrimitiveValueTypeObject<T extends Record<string, Primitive>> =
     T[ K ] extends bigint ? bigint | undefined :
     never };
 
-export type RxPrimitiveValueTypeObject<T extends Record<string, Primitive | ReactiveOrSource<any>>> =
-  { [ K in keyof T ]:
-    T[ K ] extends number ? number | undefined :
-    T[ K ] extends string ? string | undefined :
-    T[ K ] extends boolean ? boolean | undefined :
-    T[ K ] extends bigint ? bigint | undefined :
-    T[ K ] extends Reactive<infer V> ? V | undefined :
-    T[ K ] extends Wrapped<infer V> ? V | undefined :
-    T[ K ] extends Generator<infer V> ? V | undefined :
-    T[ K ] extends AsyncGenerator<infer V> ? V | undefined :
-    T[ K ] extends IterableIterator<infer V> ? V | undefined :
-    T[ K ] extends AsyncIterableIterator<infer V> ? V | undefined :
-    T[ K ] extends Array<infer V> ? V | undefined :
-    never };

@@ -1,5 +1,5 @@
-import { fromObject } from "./FromObject.js";
-import { symbol, type ReactiveDiff, type ReactiveInitial } from "./Types.js";
+import { object } from "./Object.js";
+import { symbol, type ReactiveDiff, type ReactiveInitial } from "../Types.js";
 
 export type ReactiveProxied<V> = V & {
   [ symbol ]: ReactiveDiff<V> & ReactiveInitial<V>
@@ -9,7 +9,7 @@ export type ReactiveProxied<V> = V & {
  * on a {@link Reactive} object as well.
  * 
  * ```js
- * const { proxy, rx } = fromProxy({ colour: `red`, x: 10, y: 20 });
+ * const { proxy, rx } = Rx.From.objectProxy({ colour: `red`, x: 10, y: 20 });
  * 
  * rx.value(v => {
  *  // Get notified when proxy is changed
@@ -23,22 +23,22 @@ export type ReactiveProxied<V> = V & {
  * Keep in mind that changing `target` directly won't affect the proxied object or Reactive. Thus,
  * only update the proxied object after calling `fromProxy`.
  * 
- * The benefit of `fromProxy` instead of {@link fromObject} is because the proxied object can be passed to other code that doesn't need
+ * The benefit of `objectProxy` instead of {@link Rx.From.object} is because the proxied object can be passed to other code that doesn't need
  * to know anything about Reactive objects.
  * 
  * You can assign the return values to more meaningful names using
  * JS syntax.
  * ```js
- * const { proxy:colour, rx:colourRx } = fromProxy({ colour: `red` });
+ * const { proxy:colour, rx:colourRx } = Rx.From.objectProxy({ colour: `red` });
  * ```
  * 
  * See also:
- * * {@link fromProxySymbol}: Instead of {proxy,rx} return result, puts the `rx` under a symbol on the proxy.
+ * * {@link objectProxySymbol}: Instead of {proxy,rx} return result, puts the `rx` under a symbol on the proxy.
  * @param target 
  * @returns 
  */
-export const fromProxy = <V extends object>(target: V): { proxy: V, rx: ReactiveDiff<V> & ReactiveInitial<V> } => {
-  const rx = fromObject(target);
+export const objectProxy = <V extends object>(target: V): { proxy: V, rx: ReactiveDiff<V> & ReactiveInitial<V> } => {
+  const rx = object(target);
 
   const proxy = new Proxy(target, {
     set(target, p, newValue, _receiver) {
@@ -69,7 +69,7 @@ export const fromProxy = <V extends object>(target: V): { proxy: V, rx: Reactive
 }
 
 /**
- * Same as {@link fromProxy}, but the return value is the proxied object along with 
+ * Same as {@link proxy}, but the return value is the proxied object along with 
  * the Reactive wrapped as symbol property.
  * 
  * ```js
@@ -84,8 +84,8 @@ export const fromProxy = <V extends object>(target: V): { proxy: V, rx: Reactive
  * @param target 
  * @returns 
  */
-export const fromProxySymbol = <V extends object>(target: V): ReactiveProxied<V> => {
-  const { proxy, rx } = fromProxy(target);
+export const objectProxySymbol = <V extends object>(target: V): ReactiveProxied<V> => {
+  const { proxy, rx } = objectProxy(target);
 
   const p = proxy as ReactiveProxied<V>;
   p[ symbol ] = rx;

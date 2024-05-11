@@ -1,16 +1,16 @@
-import type { EventOptions, Optional, Passed, ReactiveDisposable, ReactiveInitial, ReactiveNonInitial } from "./Types.js";
-import { fromObject } from "./index.js";
+import type { Optional, Passed, ReactiveDisposable, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
+import { object } from "./Object.js";
+import type { EventOptions } from "./Types.js";
 
-export function fromEvent<V extends Record<string, any>>(target: EventTarget | null, name: string, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable;
-
-export function fromEvent<V extends Record<string, any>>(target: EventTarget | null, name: string, options?: Optional<EventOptions<V>, `transform`>): ReactiveNonInitial<V> & ReactiveDisposable;
+export function event<V extends Record<string, any>>(target: EventTarget | null, name: string, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable<V>;
+export function event<V extends Record<string, any>>(target: EventTarget | null, name: string, options?: Optional<EventOptions<V>, `transform`>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
 
 /**
  * Subscribes to an event, emitting data
  * 
  * @example Print x,y position of mouse as it moves
  * ```js
- * const r = Rx.fromEvent(document, `pointermove`);
+ * const r = Rx.From.event(document, `pointermove`);
  * r.value(event => {
  *  const { x, y } = event;
  * });
@@ -20,7 +20,7 @@ export function fromEvent<V extends Record<string, any>>(target: EventTarget | n
  * passes through this function before emitting. 
  * ```js
  * // Emit relative pixel values rather than absolute
- * Rx.fromEvent(document,`pointermove`, { 
+ * Rx.From.event(document,`pointermove`, { 
  *  transform: (event) => ({ x: event.x/window.innerWidth, y:event.y/window.innerHeight })
  * })
  * ```
@@ -32,7 +32,7 @@ export function fromEvent<V extends Record<string, any>>(target: EventTarget | n
  * ```js
  * // Makes an initial value of {x:0.5,y:0.5},
  * // but later yields relative pixel values
- * Rx.fromEvent(document,`pointermove`, { 
+ * Rx.From.event(document,`pointermove`, { 
  *  transform: (event) => {
  *    if (!event) return { x: 0.5, y: 0.5 }
  *    return { x: event.x / window.innerWidth, y: event.y / window.innerHeight }
@@ -50,14 +50,14 @@ export function fromEvent<V extends Record<string, any>>(target: EventTarget | n
  * @param options Options
  * @returns 
  */
-export function fromEvent<V extends Record<string, any>>(target: EventTarget | null, name: string, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable {
+export function event<V extends Record<string, any>>(target: EventTarget | null, name: string, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable<V> {
   // TODO could this have better typing to pick up on the proper eventargs?
   if (target === null) throw new Error(`Param 'target' is null`);
   const transform = options.transform;
   const initialValue = transform ? transform() : undefined;
   const debugLifecycle = options.debugLifecycle ?? false;
   const debugFiring = options.debugFiring ?? false;
-  const rxObject = initialValue ? fromObject<V>(initialValue, { deepEntries: true }) : fromObject<V>(undefined, { deepEntries: true });
+  const rxObject = initialValue ? object<V>(initialValue, { deepEntries: true }) : object<V>(undefined, { deepEntries: true });
   const lazy = options.lazy ?? false;
   let eventAdded = false;
   let disposed = false;

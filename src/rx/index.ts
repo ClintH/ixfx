@@ -1,73 +1,29 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import type { Reactive, ReactiveDisposable, ReactiveInitial, ReactiveNonInitial, ReactiveOrSource, ReactiveWritable, BatchOptions, ReactiveOp, InitStreamOptions, ThrottleOptions, DebounceOptions, CacheOpts } from "./Types.js";
-import { messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
-export * from './Ops.js';
+//#region imports
+import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet } from "./Types.js";
+
+import { isDisposable, messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
+import * as OpFns from './ops/index.js';
+import { initStream } from "./InitStream.js";
+import { type Interval, intervalToMs } from '../flow/IntervalType.js';
+import { resolveSource } from './ResolveSource.js';
+import type { BatchOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
+import type { TimeoutTriggerOptions } from "./sources/Types.js";
+//#endregion
+
+//#region exports
+export * from './ops/index.js';
 export * from './Graph.js';
 export * from './Types.js';
 export * from './ToArray.js';
 export * from './ToGenerator.js';
-export * from './FromArray.js';
-export * from './FromGenerator.js';
-export * from './FromEvent.js';
 export * from './Util.js';
 export * from './Wrap.js';
-import * as OpFns from './Ops.js';
-export * from './Lit.js';
-export * from './ReadFromArray.js';
-export * from './FromFunction.js';
-export * from './FromProxy.js';
-export * from './FromObject.js';
 export * from './ResolveSource.js';
 export * from './Count.js';
 export * as Dom from './Dom.js';
-import { initStream } from "./InitStream.js";
-import { type Interval, intervalToMs } from '../flow/IntervalType.js';
-import { resolveSource } from './ResolveSource.js';
-import { pinged } from "./FromFunction.js";
-
-
-export function boolean(initialValue: boolean): ReactiveDisposable & ReactiveWritable<boolean> & ReactiveInitial<boolean>;
-export function boolean(): ReactiveDisposable & ReactiveWritable<boolean> & ReactiveNonInitial<boolean>;
-export function boolean(initialValue?: boolean): ReactiveDisposable & ReactiveWritable<boolean> & (ReactiveNonInitial<boolean> | ReactiveInitial<boolean>) {
-  let value = initialValue;
-  const events = initStream<boolean>();
-
-  const set = (v: boolean) => {
-    value = v;
-    events.set(v);
-  }
-
-  return {
-    dispose: events.dispose,
-    isDisposed: events.isDisposed,
-    last: () => value,
-    on: events.on,
-    value: events.value,
-    set
-  }
-}
-
-export function number(initialValue: number): ReactiveDisposable & ReactiveWritable<number> & ReactiveInitial<number>;
-export function number(): ReactiveDisposable & ReactiveWritable<number> & ReactiveNonInitial<number>;
-export function number(initialValue?: number): ReactiveDisposable & ReactiveWritable<number> & (ReactiveNonInitial<number> | ReactiveInitial<number>) {
-  let value = initialValue;
-  const events = initStream<number>();
-
-  const set = (v: number) => {
-    value = v;
-    events.set(v);
-  }
-
-  return {
-    dispose: events.dispose,
-    isDisposed: events.isDisposed,
-    last: () => value,
-    on: events.on,
-    value: events.value,
-    set
-  }
-}
-
+export * as From from './sources/index.js';
+//#endregion
 
 /**
  * Initialises a reactive that pipes values to listeners directly.
@@ -84,128 +40,170 @@ export function manual<V>(options: Partial<InitStreamOptions> = {}): Reactive<V>
   };
 }
 
-/**
- * Creates a RxJs style observable
- * ```js
- * const o = observable(stream => {
- *  // Code to run for initialisation when we go from idle to at least one subscriber
- *  // Won't run again for additional subscribers, but WILL run again if we lose
- *  // all subscribers and then get one
- * 
- *  // To send a value:
- *  stream.set(someValue);
- * 
- *   // Optional: return function to call when all subscribers are removed
- *   return () => {
- *     // Code to run when all subscribers are removed
- *   }
- * });
- * ```
- * 
- * For example:
- * ```js
- * const xy = observable<(stream => {
- *  // Send x,y coords from PointerEvent
- *  const send = (event) => {
- *    stream.set({ x: event.x, y: event.y });
- *  }
- *  window.addEventListener(`pointermove`, send);
- *  return () => {
- *    // Unsubscribe
- *    window.removeEventListener(`pointermove`, send);
- *  }
- * });
- * 
- * xy.value(value => {
- *  console.log(value);
- * });
- * ```
- * @param init 
- * @returns 
- */
-export function observable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined) {
-  const ow = observableWritable(init);
-  return {
-    on: ow.on,
-    value: ow.value
-  }
-}
-
-/**
- * As {@link observable}, but returns a Reactive that allows writing
- * @param init 
- * @returns 
- */
-export function observableWritable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined) {
-  let onCleanup: (() => void) | undefined = () => {/** no-op */ };
-  const ow = manual<V>({
-    onFirstSubscribe() {
-      onCleanup = init(ow);
-    },
-    onNoSubscribers() {
-      if (onCleanup) onCleanup();
-    },
-  });
-
-  return {
-    ...ow,
-    value: (callback: (value: V) => void) => {
-      return ow.on(message => {
-        if (messageHasValue(message)) {
-          callback(message.value);
-        }
-      });
-    }
-  };
-}
-
-
-/**
- * Creates a Reactive from an AsyncGenerator or Generator
- * @param gen 
- * @returns 
- */
-// export function readFromGenerator<V>(gen: AsyncGenerator<V> | Generator<V>) {
-//   const rx = initStream<V>();
-//   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-//   setTimeout(async () => {
-//     try {
-//       for await (const value of gen) {
-//         rx.set(value);
-//       }
-//       rx.dispose(`Source generator complete`);
-//     } catch (error) {
-//       console.error(error);
-//       rx.dispose(`Error while iterating`);
-//     }
-//   }, 1);
-//   return rx;
-// }
-
-
 export const Ops = {
+  /**
+ * Annotates values.
+ * 
+ * For every value `input` emits, run it through `transformer`, which should
+ * return the original value with additional fields.
+ * 
+ * Conceptually the same as `transform`, just with typing to enforce result
+ * values are V & TAnnotation
+ * @param transformer 
+ * @returns 
+ */
   annotate: <V, TAnnotation>(transformer: (input: V) => V & TAnnotation) => opify(OpFns.annotate, transformer),
+  /**
+   * Annotates all values with the elapsed time since the last value
+   * @returns 
+   */
   annotateElapsed: <V>() => opify<V>(OpFns.annotateElapsed),
-  cache: <V>(opts: Partial<CacheOpts<V>>): ReactiveOp<V, V> => {
-    return opify<V>(OpFns.cache, opts);
-  },
+
+  /**
+   * Takes a stream of values and batches them up (by quantity or time elapsed),
+   * emitting them as an array.
+   * @param options 
+   * @returns 
+   */
   batch: <V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> => {
     return (source: ReactiveOrSource<V>) => {
       return OpFns.batch(source, options);
     }
   },
+
+  cloneFromFields: <V>(): ReactiveOp<V, V> => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.cloneFromFields(source);
+    }
+  },
+  /**
+ * Merges values from several sources into a single source that emits values as an array.
+ * @param options 
+ * @returns 
+ */
+  combineLatestToArray: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(options: Partial<CombineLatestOptions> = {}) => {
+    return (sources: T) => {
+      return OpFns.combineLatestToArray(sources, options);
+    }
+  },
+  /**
+   * Merges values from several sources into a single source that emits values as an object.
+   * @param options
+   * @returns 
+   */
+  combineLatestToObject: <const T extends Record<string, ReactiveOrSource<any>>>(options: Partial<CombineLatestOptions> = {}) => {
+    return (reactiveSources: T) => {
+      return OpFns.combineLatestToObject(reactiveSources, options);
+    }
+  },
+  /**
+ * Debounce values from the stream. It will wait until a certain time
+ * has elapsed before emitting latest value.
+ * 
+ * Effect is that no values are emitted if input emits faster than the provided
+ * timeout.
+ * 
+ * See also: throttle
+ * @param options 
+ * @returns 
+ */
   debounce: <V>(options: Partial<DebounceOptions>): ReactiveOp<V, V> => {
     return (source: ReactiveOrSource<V>) => {
       return OpFns.debounce(source, options);
     }
   },
+  /**
+   * Yields the value of a field from an input stream of values.
+   * Eg if the source reactive emits `{ colour: string, size: number }`,
+   * we might use `field` to pluck out the `colour` field, thus returning
+   * a stream of string values.
+   * @param fieldName 
+   * @param options 
+   * @returns 
+   */
+  field: <V extends object>(fieldName: keyof V, options: FieldOptions<V>) => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.field(source, fieldName, options);
+    }
+  },
+  /**
+   * Filters the input stream, only re-emitting values that pass the predicate
+   * @param predicate 
+   * @returns 
+   */
   filter: <V>(predicate: (value: V) => boolean) => opify(OpFns.filter, predicate),
+
+  pipe: <TInput, TOutput>(...streams: Array<Reactive<any> & ReactiveWritable<any>>) => {
+    return (source: ReactiveOrSource<TInput>) => {
+      const resolved = resolveSource(source);
+      const s = [ resolved, ...streams ] as PipeSet<TInput, TOutput>;
+      return OpFns.pipe(...s);
+    }
+  },
+
+  singleFromArray: <V>(options: Partial<SingleFromArrayOptions<V>> = {}) => {
+    return (source: ReactiveOrSource<Array<V>>) => {
+      return OpFns.singleFromArray(source, options)
+    }
+  },
+
+  split: <V>(options: Partial<SplitOptions> = {}) => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.split(source, options);
+    }
+  },
+  splitLabelled: <V>(labels: Array<string>) => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.splitLabelled(source, labels);
+    }
+  },
+  switcher: <TValue, TRec extends Record<string, FilterPredicate<TValue>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}) => {
+    return (source: ReactiveOrSource<TValue>): Record<TLabel, Reactive<TValue>> => {
+      return OpFns.switcher(source, cases, options);
+    }
+  },
+  syncToArray: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(options: Partial<SyncOptions> = {}) => {
+    return (reactiveSources: T): Reactive<RxValueTypes<T>> => {
+      return OpFns.syncToArray(reactiveSources, options);
+    }
+  },
+  syncToObject: <const T extends Record<string, ReactiveOrSource<any>>>(options: Partial<SyncOptions> = {}) => {
+    return (reactiveSources: T): Reactive<RxValueTypeObject<T>> => {
+      return OpFns.syncToObject(reactiveSources, options);
+    }
+  },
+  /**
+ * Throttle values from the stream.
+ * Only emits a value if some minimum time has elapsed.
+ * @param options 
+ * @returns 
+ */
+  throttle: <V>(options: Partial<ThrottleOptions>) => opify<V>(OpFns.throttle, options),
+  /**
+   * Trigger a value if 'source' does not emit a value within an interval.
+   * Trigger value can be a fixed value, result of function, or step through an iterator.
+   * @param options 
+   * @returns 
+   */
+  timeoutTrigger: <V, TTriggerValue>(options: TimeoutTriggerOptions<TTriggerValue>) => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.timeoutTrigger<V, TTriggerValue>(source, options);
+    }
+  },
   transform: <In, Out>(transformer: ((value: In) => Out)): ReactiveOp<In, Out> => {
     return (source: ReactiveOrSource<In>) => {
       return OpFns.transform(source, transformer);
     }
   },
-  throttle: <V>(options: Partial<ThrottleOptions>) => opify<V>(OpFns.throttle, options)
+
+  /**
+  * Reactive where last (or a given initial) value is available to read
+  * @param opts 
+  * @returns 
+  */
+  withValue: <V>(opts: Partial<WithValueOptions<V>>): ReactiveOp<V, V> => {
+    return opify<V>(OpFns.withValue, opts);
+  },
 } as const;
 
 /**
@@ -283,10 +281,32 @@ export async function takeNextValue<V>(source: ReactiveOrSource<V>, maximumWait:
   return p;
 }
 
-// export function derived<T>(compute: () => T, dependencies) {
+/**
+ * Connects reactive A to B, passing through a transform function.
+ * 
+ * Returns a function to unsubcribe A->B
+ * @param a 
+ * @param b 
+ * @param transform 
+ */
+export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform: (valueA: TA) => TB, closeBonA = false) => {
+  const unsub = a.on(message => {
+    if (messageHasValue(message)) {
+      b.set(transform(message.value));
+    } else if (messageIsDoneSignal(message)) {
+      unsub();
+      if (closeBonA) {
+        if (isDisposable<any>(b)) {
+          b.dispose(`Source closed (${ message.context ?? `` })`);
+        } else {
+          console.warn(`Reactive.to cannot close 'b' reactive since it is not disposable`);
+        }
+      }
+    } else {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.warn(`Unsupported message: ${ JSON.stringify(message) }`);
+    }
 
-// }
-
-
-//const isEven = derived(() => (counter.last() & 1) == 0);
-
+  });
+  return unsub;
+}

@@ -61,6 +61,7 @@ export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStrea
   const onStart = options.onStart ?? (() => {/* no-op*/ })
 
   const events = initStream<V>({
+    ...options,
     onFirstSubscribe() {
       if (lazy !== `never`) onStart();
     },
@@ -114,7 +115,7 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
       if (disposed) return;
       dispatcher?.notify({ value: undefined, signal: `done`, context: `Disposed: ${ reason }` });
       disposed = true;
-      if (options.onDispose) options.onDispose();
+      if (options.onDispose) options.onDispose(reason);
     },
     isDisposed: () => {
       return disposed

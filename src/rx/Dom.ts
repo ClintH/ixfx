@@ -8,8 +8,7 @@ import { getFromKeys } from "../collections/map/MapFns.js";
 import { afterMatch, beforeMatch } from "../Text.js";
 import { stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "../text/Segments.js";
 import { QueueMutable } from "../collections/index.js";
-import { fromObject } from "./FromObject.js";
-
+import { object } from "./sources/Object.js";
 
 /**
  * Reactive stream of array of elements that match `query`.
@@ -19,7 +18,7 @@ import { fromObject } from "./FromObject.js";
 export function fromDomQuery(query: string) {
   const elements = [ ...document.querySelectorAll(query) ] as Array<HTMLElement>;
 
-  return fromObject(elements);
+  return object(elements);
   /// TODO: MutationObserver to update element list
 }
 
@@ -663,11 +662,11 @@ const getRootedPath = (path: string) => {
 export function win() {
   const generateRect = () => ({ width: window.innerWidth, height: window.innerHeight });
 
-  const size = Rx.fromEvent(window, `resize`, {
+  const size = Rx.From.event(window, `resize`, {
     lazy: `very`,
     transform: () => generateRect(),
   });
-  const pointer = Rx.fromEvent(window, `pointermove`, {
+  const pointer = Rx.From.event(window, `pointermove`, {
     lazy: `very`,
     transform: (args: Event | undefined) => {
       if (args === undefined) return { x: 0, y: 0 };

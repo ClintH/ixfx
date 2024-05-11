@@ -1,0 +1,106 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+import { intervalToMs } from "../flow/IntervalType.js";
+import { QueueMutable } from "../collections/index.js";
+import { continuously } from "../flow/Continuously.js";
+import { isPlainObjectOrPrimitive } from "../Util.js";
+import { shuffle } from "../collections/arrays/index.js";
+import { timeout } from "../flow/Timeout.js";
+import type { AnnotationElapsed, BatchOptions, WithValueOptions, DebounceOptions, FieldOptions, FilterPredicate, InitStreamOptions, Passed, PipeSet, Reactive, ReactiveDisposable, ReactiveInitial, ReactiveOrSource, ReactiveStream, ReactiveWritable, ResolveOptions, SingleFromArrayOptions, SplitOptions, SwitcherOptions, ThrottleOptions, TimeoutTriggerOptions, TransformOpts } from "./Types.js";
+import { isDisposable, isTrigger, messageHasValue, messageIsDoneSignal, resolveTriggerValue } from "./Util.js";
+import { initStream, initUpstream } from "./InitStream.js";
+import { resolveSource } from "./ResolveSource.js";
+
+export * from './ops/index.js';
+
+
+
+
+// const sources = [
+//   readFromArray([ 1, 2, 3 ]),
+//   readFromArray([ `hello`, `there` ])
+// ] as const;
+// const mergeResult = mergeToArray(sources);
+// mergeResult.value(value => {
+//   const v0 = value[ 0 ];
+//   const v1 = value[ 1 ];
+// })
+// const syncResult = synchronise(sources);
+// syncResult.value(value => {
+//   const v0 = value[ 0 ];
+//   const v1 = value[ 1 ];
+// })
+
+
+
+
+//export function synchronise<V>(sources: Array<ReactiveOrSource<any>>, options: Partial<SynchroniseOptions> = {}): Reactive<Array<any>> {
+
+
+
+
+/**
+ * Returns a new stream that uses `initial` as it's starting 'last' value.
+ * When `input` emits new values, this will be returned as the 'last' value.
+ *
+ * `input` won't be activated until the defaultValue reactive is subscribed to.
+ *
+ * ```js
+ * // Produce a random number after 1s
+ * const r = Rx.fromFunction(Math.random, { predelay: 1000 });
+ * // Wrap reactive with an initial value of 10
+ * const dv = Rx.defaultValue(r, 10);
+ * dv.last(); // 10
+ * ```
+ *
+ * In this case, `dv.last()` will _always_ be 10 because we're not subscribing
+ * to `dv`. To do this, we ought to subscribe, or use {@link takeLastValue}.
+ * ```js
+ * const value = await Rx.takeLastValue(dv);
+ * ```
+ *
+ * Another option is to pass in `lazy: false` when initialising `defaultValue`.
+ * This way `fromFunction` stream is subscribed to immediately and it produces a value.
+ * ```js
+ * const r = Rx.fromFunction(Math.random, { predelay: 1000 });
+ * const dv = Rx.defaultValue(r, 10, { lazy: false });
+ * dv.last();   // 10
+ * await sleep(1000);
+ * dv.last();   // eg. 0.3234
+ * ```
+ * @param input
+ * @param initial
+ * @returns
+ */
+// export function defaultValue<In>(input: ReactiveOrSource<In>, initial: In, options: Partial<UpstreamOptions<In>> = {}): ReactiveInitial<In> {
+//   let value = initial;
+//   const stream = initUpstream<In, In>(input, {
+//     ...options,
+//     onValue(v) {
+//       value = v;
+//       stream.set(v);
+//     }
+//   });
+//   return {
+//     on: stream.on,
+//     last() {
+//       return value;
+//     },
+//     value: stream.value
+//   };
+// }
+
+
+// export function selectFields<In,Fields extends string[]>(input:ReactiveOrSource<In>, fields:Fields, options:Partial<InitStreamOptions> = {}): Reactive<Out> {
+
+//   const upstream = initUpstream<In, Out>(input, {
+//     ...options,
+//     onValue(value) {
+//       const t = transformer(value);
+//       upstream.set(t);
+//     },
+//   })
+
+//   return toReadable(upstream);
+// }
+
+

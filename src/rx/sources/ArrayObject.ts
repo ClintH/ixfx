@@ -1,23 +1,18 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { compareArrays, type ChangeRecord } from "../Compare.js";
-import { type IsEqual, isEqualValueDefault } from "../IsEqual.js";
-import * as Arrays from '../collections/arrays/index.js';
-import { initStream } from "./InitStream.js";
-import type { ReactiveInitial, ReactiveDisposable, ReactiveNonInitial, ReactiveArray } from "./Types.js";
+import { compareArrays, type ChangeRecord } from "../../Compare.js";
+import { isEqualValueDefault } from "../../IsEqual.js";
+import * as Arrays from '../../collections/arrays/index.js';
+import { initStream } from "../InitStream.js";
+import type { ReactiveInitial, ReactiveDisposable, ReactiveNonInitial, ReactiveArray } from "../Types.js";
+import type { ArrayObjectOptions } from "./Types.js";
 
 /**
- * Options when creating a reactive object.
+ * Wraps an array object
+ * @param initialValue 
+ * @param options 
+ * @returns 
  */
-export type ArrayOptions<V> = {
-
-  /**
-   * Uses JSON.stringify() by default.
-   * Fn that returns _true_ if two values are equal, given a certain path.
-   */
-  eq: IsEqual<V>
-}
-
-export function fromArray<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayOptions<V>> = {}): ReactiveDisposable & ReactiveArray<V> & (ReactiveInitial<ReadonlyArray<V>> | ReactiveNonInitial<ReadonlyArray<V>>) {
+export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayObjectOptions<V>> = {}): ReactiveDisposable<ReadonlyArray<V>> & ReactiveArray<V> & (ReactiveInitial<ReadonlyArray<V>> | ReactiveNonInitial<ReadonlyArray<V>>) {
   const eq = options.eq ?? isEqualValueDefault;
   const setEvent = initStream<Array<V>>();
   //const diffEvent = initStream<Array<Immutable.Change<any>>>();
@@ -27,7 +22,7 @@ export function fromArray<V>(initialValue: ReadonlyArray<V> = [], options: Parti
 
   const set = (replacement: Array<V> | ReadonlyArray<V>) => {
     const diff = compareArrays<V>(value as Array<V>, replacement as Array<V>, eq);
-    console.log(`Rx.fromArray.set diff`, diff);
+    //console.log(`Rx.fromArray.set diff`, diff);
     //if (diff.length === 0) return;
     //diffEvent.set(diff);
     value = replacement;
@@ -50,7 +45,7 @@ export function fromArray<V>(initialValue: ReadonlyArray<V> = [], options: Parti
     const valueChanged = Arrays.remove(value, index);
     if (valueChanged.length === value.length) return; // no change
     const diff = compareArrays<V>(value as Array<V>, valueChanged, eq);
-    console.log(diff.summary);
+    //console.log(diff.summary);
     value = valueChanged;
     setEvent.set([ ...value ]);
     arrayEvent.set(diff.summary);
@@ -99,7 +94,7 @@ export function fromArray<V>(initialValue: ReadonlyArray<V> = [], options: Parti
     disposed = true;
   }
 
-  return {
+  const r = {
     dispose,
     isDisposed() {
       return disposed
@@ -118,4 +113,5 @@ export function fromArray<V>(initialValue: ReadonlyArray<V> = [], options: Parti
      */
     set
   }
+  return r;
 }

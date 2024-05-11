@@ -1,0 +1,67 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+import { continuously } from "../../flow/Continuously.js";
+import { intervalToMs } from "../../flow/IntervalType.js";
+import { initStream } from "../InitStream.js";
+import type { ResolveOptions, Reactive } from "../Types.js";
+
+/**
+ * Wraps a function or value as a reactive. Can optionally wait for a given period or continually produce the value.
+ *
+ * ```js
+ * const rx = resolve('hello', { interval: 5000 });
+ * rx.on(msg => {
+ *  // 'hello' after 5 seconds
+ *  log(msg.value);
+ * });
+ * ```
+ *
+ * ```js
+ * // Produces a random number every second, but only
+ * // when there is a subscriber.
+ * const rx = resolve(() => Math.floor(Math.random()*100), { interval: 1000, infinite: true, lazy: true });
+ * ```
+ *
+ * Options:
+ * - Set _loops_ or _infinite_. If neither of these are set, it runs once.
+ * - _interval_ is 0 by default.
+ * @param callbackOrValue
+ * @param options
+ * @returns
+ */
+// export function resolve<V>(callbackOrValue: V | (() => V), options: Partial<ResolveOptions> = {}): Reactive<V> {
+//   const intervalMs = intervalToMs(options.interval, 0);
+//   const lazy = options.lazy ?? false;
+//   const event = initStream<V>({
+//     onFirstSubscribe() {
+//       if (lazy && c.runState === `idle`) c.start();
+//     },
+//     onNoSubscribers() {
+//       if (lazy) {
+//         c.cancel();
+//       }
+//     }
+//   });
+
+//   const loops = options.infinite ? Number.MAX_SAFE_INTEGER : options.loops ?? 1;
+//   let remaining = loops;
+
+//   const c = continuously(() => {
+//     if (typeof callbackOrValue === `function`) {
+//       // eslint-disable-next-line @typescript-eslint/ban-types
+//       const value = (callbackOrValue as (Function))();
+//       event.set(value);
+//     } else {
+//       event.set(callbackOrValue);
+//     }
+//     remaining--;
+//     if (remaining === 0) return false; // Stop loop
+//   }, intervalMs);
+
+
+//   if (!lazy) c.start();
+
+//   return {
+//     on: event.on,
+//     value: event.value
+//   };
+// }
