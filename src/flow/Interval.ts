@@ -39,7 +39,7 @@ export type IntervalOpts = {
  * @example Return values from a generator every 500ms:
  * ```js
  * import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
- * import { count } from 'https://unpkg.com/ixfx/dist/generators.js'
+ * import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
  * for await (const v of interval(count(10), { fixed: 1000 })) {
  *  // Do something with `v`
  * }
