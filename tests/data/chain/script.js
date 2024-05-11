@@ -1,8 +1,8 @@
 import * as Rx from '../../../dist/rx.js';
 import * as Flow from '../../../dist/flow.js';
 import { Elapsed } from '../../../dist/flow.js';
-import * as Generators from '../../../dist/generators.js';
-import {Chain} from '../../../dist/generators.js';
+import * as Generators from '../../../dist/numbers.js';
+import {Chain} from '../../../dist/iterables.js';
 
 // Chains.chain(
 //   Chains.fromEvent(window, `pointermove`),

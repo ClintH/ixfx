@@ -1,7 +1,4 @@
 import * as Rx from '../../../dist/rx.js';
-import * as Flow from '../../../dist/flow.js';
-import { Elapsed } from '../../../dist/flow.js';
-import * as Generators from '../../../dist/generators.js';
 import * as Arrays from '../../../dist/arrays.js';
 
 /**

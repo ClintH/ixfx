@@ -1,13 +1,13 @@
-import { Reactive} from '../../../dist/data.js';
+import * as Rx from '../../../dist/rx.js';
 import * as Flow from '../../../dist/flow.js';
 import { Elapsed } from '../../../dist/flow.js';
-import * as Generators from '../../../dist/generators.js';
-const width = Reactive.number(10);
+import * as Iterables from '../../../dist/iterables.js';
+const width = Rx.number(10);
 
-const rxWindow = Reactive.win();
-const size = Reactive.transform(rxWindow.size, (size) => size.width*size.height);
+const rxWindow = Rx.win();
+const size = Rx.transform(rxWindow.size, (size) => size.width*size.height);
 
-const pointer = Reactive.event(window, `pointermove`, {
+const pointer = Rx.event(window, `pointermove`, {
   process:(event) => {
     if (event === undefined) return 0;
     return {x:event.x, y:event.y}
@@ -20,12 +20,12 @@ const test = {
   rectangle: {
     width: width,
     height: 20,
-    left: Reactive.field(pointer,`x`),
-    top: Reactive.field(pointer, `y`)
+    left: Rx.field(pointer,`x`),
+    top: Rx.field(pointer, `y`)
   }
 }
 
-const x = Reactive.prepare(test);
+const x = Rx.prepare(test);
 console.log(x);
 x.on(v => {
   console.log(`New rectangle: ${JSON.stringify(x)}`);
@@ -36,25 +36,25 @@ setInterval(() => {
 },1000);
 
 function testNumber() {
-  const x = Reactive.number(10);
+  const x = Rx.number(10);
   //console.log(x.last());
   //x.on(v => console.log(`Value: ${v}`));
 
   // Update x quite fast
   setInterval(() => x.set(Math.random()), 100); 
 
-  // const batched = Reactive.batch(x, { elapsed: 1000 });
+  // const batched = Rx.batch(x, { elapsed: 1000 });
   // batched.on(data => {
   //   console.log(data);
   // })
 
-  const throttle = Reactive.throttle(x, { elapsed: 1000 });
+  const throttle = Rx.throttle(x, { elapsed: 1000 });
   throttle.on(data=>{
     console.log(data);
   })
 }
 
-const rx = Reactive.win();
+const rx = Rx.win();
 rx.pointer.on(v => {
   console.log(v);
 })

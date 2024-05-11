@@ -1,6 +1,6 @@
 import {continuously, interval} from '../../../dist/flow.js';
 import * as Dom from '../../../dist/dom.js';
-import { count } from '../../../dist/generators.js'
+import { count } from '../../../dist/numbers.js'
 
 const log = Dom.log(`#log`, {
   capacity: 20,

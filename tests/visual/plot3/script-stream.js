@@ -1,5 +1,5 @@
 import {Plot3} from '../../../dist/visual.js';
-import {pingPongPercent} from '../../../dist/generators.js';
+import {pingPongPercent} from '../../../dist/numbers.js';
 import {continuously} from '../../../dist/flow.js';
 import {Oscillators} from '../../../dist/modulation.js';
 import { scaleCanvas} from '../../../dist/visual.js';

@@ -1,9 +1,11 @@
 import { Svg, Colour } from '../../../dist/visual.js';
-import * as Generators from '../../../dist/generators.js';
+import * as Iterables from '../../../dist/iterables.js';
 import * as Dom from '../../../dist/dom.js';
 import { Lines, Points } from '../../../dist/geometry.js';
 import * as Data from '../../../dist/data.js';
 import * as Rx from '../../../dist/rx.js';
+import {pingPongPercent} from '../../../dist/numbers.js';
+import { Chains } from '../../../dist/iterables.js';
 
 const settings = Object.freeze({
   // Relative middle
@@ -14,21 +16,32 @@ const settings = Object.freeze({
   pingPongInterval: 0.01 
 });
 
-const computeState = Data.fieldResolver({
+// const r1 = Rx.transform(
+//   Rx.fromEvent(document.body, `pointermove`), value => {
+//     if (!value) return { x: 0.5, y:0.5};
+//     return { x:value.x/window.innerWidth, y:value.y/window.innerHeight}
+//   });
+// r1.value(x => {
+//   console.log(x);
+// })
+
+const state2 = Data.pull({
   // Loop up and down again from 0 and 100%, 1% at a time
-  pingPong: Generators.pingPongPercent(settings.pingPongInterval),
+  pingPong: pingPongPercent(settings.pingPongInterval),
+  // Keep track of relative mouse coords
   mouse: Rx.transform(
-    Rx.fromEvent(document, `pointermove`), value => {
+    Rx.fromEvent(document.body, `pointermove`), value => {
       if (!value) return { x: 0.5, y:0.5};
       return { x:value.x/window.innerWidth, y:value.y/window.innerHeight}
-    })
-  });
-
-let state = Object.freeze({
-  bounds: { width: 0, height: 0, center: { x: 0, y: 0 } },
-  pointers: {},
-  mouse: { x:0, y:0 }
+  }),
+  pointers:{}
 });
+
+// let state = Object.freeze({
+//   bounds: { width: 0, height: 0, center: { x: 0, y: 0 } },
+//   pointers: {},
+//   mouse: { x:0, y:0 }
+// });
 
 
 // const updateSvg = () => {
@@ -101,7 +114,7 @@ function setup() {
   const loop = async () => {
     // update();
     // updateSvg();
-    const s = await computeState();
+    const s = await state2.compute();
     console.log(JSON.stringify(s));
     window.setTimeout(loop, 500);
   };

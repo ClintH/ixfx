@@ -1,4 +1,4 @@
-import { Chain} from '../../../dist/generators.js';
+import { } from '../../../dist/iterables.js';
 
 /**
  * Creates/updates an element per value that passes through the chain
