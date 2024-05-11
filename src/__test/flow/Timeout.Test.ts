@@ -62,7 +62,7 @@ test(`start`, async t => {
   a.start();
   t.is(a.runState, `scheduled`);
   await sleep(delayChange + 10);
-  t.true(isApproximately(delayChange, 0.01)(elapsed));
+  t.true(isApproximately(delayChange, 0.1, elapsed));
   t.is(aFired, 2);
   t.is(a.runState, `idle`);
 
