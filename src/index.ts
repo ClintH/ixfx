@@ -227,27 +227,6 @@ export * as Iterables from './iterables/index.js';
  */
 export * as Numbers from './numbers/index.js';
 
-/**
- * Generators produce values on demand.
- *
-
- *
- * Generating text:
- * * {@link stringSegmentsWholeToEnd}, {@link stringSegmentsLastToWhole}, {@link stringSegmentsFirstToWhole},{@link stringSegmentsWholeToFirst}: step through a segmented string, eg 'a.b.c.d' in various orders.
- * 
- * Aliases:
- * * {@link delayLoop}: A generator that yields at a given rate
- * * {@link interval}: Generates values from a given function with a given delay
- * @example Importing
- * ```js
- * // If library is stored two directories up under `ixfx/`
- * import {count, interval} from '../../ixfx/dist/generators.js';
- * // Import from web
- * import {count, interval} from 'https://unpkg.com/ixfx/dist/generators.js'
- * ```
- */
-//export * as Generators from './generators/index.js';
-
 
 /**
  * Visuals
