@@ -6,6 +6,9 @@ import { windowResize } from "./DomRx.js";
 import type { ScaleBy } from "../geometry/Scaler.js";
 import { SimpleEventEmitter } from "../Events.js";
 
+/**
+ * Options
+ */
 export type CanvasOpts = {
   /**
    * If _true_ (default) canvas is cleared when a resize happens
@@ -16,12 +19,17 @@ export type CanvasOpts = {
    */
   readonly skipCss: boolean;
   readonly scaleBy: ScaleBy;
-  readonly onResize?: (size: Rect) => void
+  /**
+   * Callback when canvas is resized
+   * @param size 
+   * @returns 
+   */
+  readonly onResize?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void
   /**
    * Automatically set canvas to fill. Default: 'none'
-   * * viewport: size of screen
-   * * parent: size of parent element
-   * * none: no resizing. Use 'width' and 'height' options to set the logical size of the canvas
+   * * 'viewport': size of screen
+   * * 'parent': size of parent element
+   * * 'none': no resizing. Use 'width' and 'height' options to set the logical size of the canvas
    * 
    */
   readonly fill: `viewport` | `parent` | `none`
@@ -41,24 +49,51 @@ export type CanvasOpts = {
    */
   readonly zIndex: number
   /**
-   * If specified, this will be called in an animation loop
+   * If specified, this function be called in an animation loop.
    * @param ctx 
    * @param size 
    * @returns 
    */
-  readonly draw?: (ctx: CanvasRenderingContext2D, size: Rect) => void
+  readonly draw?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void
 };
 
 export type CanvasEvents = {
   /**
    * Fired when canvas is resized
    */
-  resize: { size: Rect }
+  resize: { size: Rect, helper: CanvasHelper, ctx: CanvasRenderingContext2D }
 }
 
 /**
  * A wrapper for the CANVAS element that scales the canvas for high-DPI displays
  * and helps with resizing.
+ * 
+ * ```js
+ * const canvas = new CanvasHelper(`#my-canvas`, { fill: `viewport` });
+ * const { ctx, width, height } = canvas.ctx; // Get drawing context, width & height
+ * ```
+ * 
+ * Draw whenever it is resized using the 'resize' event
+ * ```js
+ * canvas.addEventListener(`resize`, ({ctx, size}) => {
+ *  // Use ctx...  
+ * });
+ * ```
+ * 
+ * Or provide a function when initialising:
+ * ```js
+ * const onResize = (ctx, size) => {
+ *  // Do drawing
+ * }
+ * const canvas = new CanvasHelper(`#my-canvas`, { fill: `viewport`, onResize });
+ * ```
+ * 
+ * Automatically draw at animation speeds:
+ * ```js
+ * const draw = () => {
+ * }
+ * const canvas = new CanvasHelper(`#my-canvas`, { fill: `viewport`, draw });
+ * ```
  * @param domQueryOrEl Canvas element to wrap
  * @param opts Options
  * @returns 
@@ -78,6 +113,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     if (this.el.nodeName !== `CANVAS`) {
       throw new Error(`Expected CANVAS HTML element. Got: ${ this.el.nodeName }`);
     }
+
 
     this.opts = {
       fill: opts.fill ?? `none`,
@@ -125,8 +161,8 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     this.el.height = pixelScaled.height;
 
     // But scaled down on screen
-    this.el.style.width = logicalSize.width + `px`;
-    this.el.style.height = logicalSize.height + `px`;
+    this.el.style.width = logicalSize.width.toString() + `px`;
+    this.el.style.height = logicalSize.height.toString() + `px`;
 
     // Since dimensions have change, reset context
     this.#getContext(true);
@@ -140,9 +176,9 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     // Notify listeners of resize
     const r = this.opts.onResize;
     if (r) {
-      setTimeout(() => { r(this.size) }, 100);
+      setTimeout(() => { r(this.ctx, this.size, this) }, 100);
     }
-    this.fireEvent(`resize`, { size: this.#currentSize });
+    this.fireEvent(`resize`, { ctx: this.ctx, size: this.#currentSize, helper: this });
   }
 
   /**
@@ -214,7 +250,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     const d = this.opts.draw;
     if (d) {
       const sched = () => {
-        d(this.ctx, this.#currentSize);
+        d(this.ctx, this.#currentSize, this);
         requestAnimationFrame(sched);
       }
       setTimeout(() => { sched() }, 100);
