@@ -16,8 +16,7 @@ import { toStringDefault, type ToString } from '../../Util.js';
  */
 export class MapOfMutableImpl<V, M>
   extends SimpleEventEmitter<MapArrayEvents<V>>
-  implements IMapOfMutableExtended<V, M>
-{
+  implements IMapOfMutableExtended<V, M> {
   /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #map = new Map<string, M>();
   readonly groupBy: ToString<V>;
@@ -224,7 +223,6 @@ export class MapOfMutableImpl<V, M>
   }
 
   *entries(): IterableIterator<[ key: string, value: Array<V> ]> {
-    //yield* this.#map.entries();
     for (const [ k, v ] of this.#map.entries()) {
       const temporary = [ ...this.type.iterable(v) ];
       yield [ k, temporary ];
@@ -233,22 +231,12 @@ export class MapOfMutableImpl<V, M>
 
   /* eslint-disable-next-line functional/prefer-readonly-type */
   *keysAndCounts(): IterableIterator<[ string, number ]> {
-    //const keys = this.keys();
-    /* eslint-disable-next-line functional/prefer-readonly-type */
-    //const r = keys.map(k => [k, this.count(k)]) as Array<[string, number]>;
-    //return r;
-
     for (const key of this.keys()) {
       yield [ key, this.count(key) ];
     }
   }
 
   merge(other: IMapOf<V>) {
-    // const keys = other.keys();
-    // keys.forEach(key => {
-    //   const data = other.get(key);
-    //   if (data !== undefined) this.addKeyedValues(key, ...data);
-    // });
     for (const key of other.keys()) {
       const data = other.get(key);
       this.addKeyedValues(key, ...data);
@@ -258,29 +246,9 @@ export class MapOfMutableImpl<V, M>
   get size() {
     return this.#map.size;
   }
-  /*
-    forEach_(
-      fn: (
-        value: ReadonlyArray<V>,
-        key: string,
-        //eslint-disable-next-line functional/prefer-immutable-types
-        map: Map<string, ReadonlyArray<V>>
-      ) => void,
-      _?: any
-    ) {
-      // for (const [key,value] of this.#map.entries()) {
-      //   value
-      // }
-      // @ts-expect-error
-      this.#map.forEach(fn);
-    }
-    */
+
 
   get [ Symbol.toStringTag ]() {
     return this.#map[ Symbol.toStringTag ];
   }
-
-  // [Symbol.iterator]() {
-  //   return this.type[Symbol.iterator]();
-  // }
 }
