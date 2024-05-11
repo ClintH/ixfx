@@ -1,4 +1,4 @@
-type WithEvents = {
+export type WithEvents = {
   addEventListener(type: string, callbackfn: any): void;
   removeEventListener(type: string, callbackfn: any): void;
 }
@@ -9,9 +9,7 @@ export const isAsyncIterable = (v: any): v is AsyncIterable<any> =>
 export const isIterable = (v: any): v is Iterable<any> =>
   Symbol.iterator in new Object(v);
 
-
-
-export const eventsToIterable = <V>(
+export const fromEvent = <V>(
   eventSource: WithEvents,
   eventType: string
 ): AsyncIterator<any> => {

@@ -1,6 +1,6 @@
-import type { Interval } from '../flow/IntervalType.js';
+import { intervalToMs, type Interval } from '../flow/IntervalType.js';
 import { toStringDefault, type IsEqual } from '../IsEqual.js';
-import { sleep } from '../flow/Sleep.js';
+import { sleep, type SleepOpts } from '../flow/Sleep.js';
 import { isAsyncIterable, isIterable } from './Iterable.js';
 import type { ToString } from 'src/Util.js';
 
@@ -349,6 +349,39 @@ export async function* slice<V>(
   }
 }
 
+/**
+ * Enumerates over an input iterable, with a delay between items.
+ * @param it 
+ * @param delay 
+ */
+export async function* withDelay<V>(it: Iterable<V>, delay: Interval) {
+  for (const v of it) {
+    await sleep(delay);
+    yield v;
+  }
+}
+
+/***
+ * Returns the next IteratorResult,
+ * throwing an error if it does not happen
+ * within `interval` (default: 1s)
+ */
+export async function nextWithTimeout<V>(it: AsyncIterableIterator<V> | IterableIterator<V>, options: SleepOpts<any>) {
+  const ms = intervalToMs(options, 1000);
+
+  const value: IteratorResult<V> | undefined = await Promise.race([
+    (async () => {
+      await sleep({ millis: ms, signal: options.signal });
+      // eslint-disable-next-line unicorn/no-useless-undefined
+      return undefined;
+    })(),
+    (async () => {
+      return await it.next();
+    })()
+  ]);
+  if (value === undefined) throw new Error(`Timeout`);
+  return value;
+}
 
 export async function some<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>) {
   // https://surma.github.io/underdash/
@@ -396,6 +429,46 @@ export async function toArray<V>(it: AsyncIterable<V>, count = Number.POSITIVE_I
     result.push(r.value);
   }
   return result;
+}
+
+/**
+ * Access awaited `callback` as an iterable:
+ * ```js
+ * const fn = () => Math.random();
+ * for await (const v of fromFunctionAwaited(fn)) {
+ *  // Generate infinite random numbers
+ * }
+ * ```
+ * 
+ * `callback` can be async, result is awaited.
+ * This requires the use of `for await`.
+ * Use {@link fromFunction} otherwise;
+ * @param callback 
+ */
+export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
+  while (true) {
+    const v = await callback();
+    yield v;
+  }
+}
+
+/**
+ * Access `callback` as an iterable:
+ * ```js
+ * const fn = () => Math.random();
+ * for (const v of fromFunctionAwaited(fn)) {
+ *  // Generate infinite random numbers
+ * }
+ * ```
+ * 
+ * Use {@link fromFunctionAwaited} to await `callback`.
+ * @param callback 
+ */
+export function* fromFunction<T>(callback: () => T) {
+  while (true) {
+    const v = callback();
+    yield v;
+  }
 }
 
 export async function* unique<V>(
