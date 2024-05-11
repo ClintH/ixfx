@@ -1,9 +1,9 @@
-import type { Interval } from 'src/flow/IntervalType.js';
+import type { Interval } from '../flow/IntervalType.js';
 import { averageWeighted } from '../collections/arrays/AverageWeighted.js';
 import { average } from '../collections/arrays/NumericArrays.js';
 import { QueueMutable } from '../collections/queue/QueueMutable.js';
 import { numberTest, throwNumberTest } from '../Guards.js';
-import { rateMinimum } from 'src/flow/RateMinimum.js';
+import { rateMinimum } from '../flow/RateMinimum.js';
 
 /**
  * A moving average calculator (exponential weighted moving average) which does not keep track of
@@ -28,7 +28,7 @@ import { rateMinimum } from 'src/flow/RateMinimum.js';
  *
  * Use `clear()` to reset the moving average, or `compute()` to get the current value without adding.
  * @param scaling Scaling factor. 1 is no smoothing. Default: 3
- * @returns {@link MovingAverage}
+ * @returns Function that adds to average.
  */
 export const movingAverageLight = (scaling = 3): (value?: number) => number => {
   throwNumberTest(scaling, `aboveZero`, `scaling`);

@@ -1,4 +1,3 @@
-import { relativeTimer } from "src/flow/index.js"
 
 /**
  * Returns a proportion of `amount` depending on elapsed time.

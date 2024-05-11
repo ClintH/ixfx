@@ -4,6 +4,17 @@ import * as Async from "../IterableAsync.js";
 import type { GenOrData, GenFactoryNoInput, SyncOptions } from "./Types.js";
 import { resolveToGen } from "./Util.js";
 
+// export function syncToObject<const T extends Record<string, GenOrData<any>>>(reactiveSources: T, options: Partial<SyncOptions> = {}): AsyncGenerator<GenValueTypeObject<T>> {
+//   const keys = Object.keys(reactiveSources)
+//   const values = Object.values(reactiveSources);
+
+//   const s = syncToArray(values, options);
+//   const st = transform(s, (streamValues) => {
+//     return zipKeyValue(keys, streamValues);
+//   });
+//   return st as AsyncGenerator<GenValueTypeObject<T>>;
+// }
+
 /**
  * Waits for all sources to produce a value, sending the combined results as an array.
  * After sending, it waits again for each source to send at least one value.
