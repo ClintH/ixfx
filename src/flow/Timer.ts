@@ -8,15 +8,24 @@ export type TimerSource = () => Timer;
 
 /**
  * A timer instance.
- * See {@link msElapsedTimer}, {@link ticksElapsedTimer}, {@link frequencyTimer}
+ * {@link CompletionTimer} also contains an 'isDone' field.
+ * 
+ * See: {@link msElapsedTimer}, {@link ticksElapsedTimer}, {@link frequencyTimer}
  */
 export type Timer = {
   reset(): void
   get elapsed(): number
-  get isDone(): boolean
 };
 
-export type ModulationTimer = Timer & {
+/**
+ * A {@link Timer} that has a sense of completion.
+ * See {@link relativeTimer}
+ */
+export type CompletionTimer = Timer & {
+  get isDone(): boolean
+}
+
+export type ModulationTimer = CompletionTimer & {
   mod(amt: number): void;
 };
 
@@ -72,13 +81,25 @@ export const frequencyTimerSource =
  * const t = relativeTimer(1000);
  * t.elapsed;   // returns % completion (0...1)
  * ```
- * 
- * Additional fields/methods on the timer:
+ * It can also use a tick based timer
  * ```js
- * t.isDone;  // _true_ if .elapsed has reached 1
+ * // Timer that is 'done' at 100 ticks
+ * const t = relativeTimer(100, { timer: ticksElapsedTimer() });
+ * ```
+ * 
+ * Additional fields/methods on the timer instance
+ * ```js
+ * t.isDone;  // _true_ if .elapsed has reached (or exceeded) 1
  * t.reset(); // start from zero again
  * ```
  *
+ * Options:
+ * * timer: timer to use. If not specified, `msElapsedTimer()` is used.
+ * * clampValue: if _true_, return value is clamped to 0..1 (default: _false_)
+ * * wrapValue: if _true_, return value wraps around continously from 0..1..0 etc. (default: _false_)
+ * 
+ * Note that `clampValue` and `wrapValue` are mutually exclusive: only one can be _true_, but both can be _false_.
+ * 
  * With options
  * ```js
  * // Total duration of 1000 ticks
@@ -227,12 +248,6 @@ export const msElapsedTimer = (): Timer => {
      */
     get elapsed() {
       return performance.now() - start;
-    },
-    /**
-     * Always returns _true_
-     */
-    get isDone() {
-      return false;
     }
   };
 };
@@ -271,12 +286,6 @@ export const ticksElapsedTimer = (): Timer => {
      */
     get elapsed() {
       return ++start;
-    },
-    /**
-     * Always returns _true_
-     */
-    get isDone() {
-      return true;
     }
   };
 };
