@@ -76,6 +76,7 @@ export const sleep = <V>(
   } else {
     return new Promise<V | undefined>((resolve, reject) => {
       const onAbortSignal = () => {
+        clearTimeout(t);
         if (signal) {
           signal.removeEventListener(`abort`, onAbortSignal);
           reject(new Error(signal.reason));
@@ -85,19 +86,32 @@ export const sleep = <V>(
       }
 
       if (signal) {
-        //console.log(`Flow.sleep added to abort signal`);
         signal.addEventListener(`abort`, onAbortSignal);
       }
-      setTimeout(() => {
-        if (signal && signal?.aborted) {
+      const t = setTimeout(() => {
+        signal?.removeEventListener(`abort`, onAbortSignal);
+        if (signal?.aborted) {
           reject(new Error(signal.reason));
           return;
         }
-
-        signal?.removeEventListener(`abort`, onAbortSignal);
-
         resolve(value);
       }, timeoutMs);
     });
   }
 };
+
+/**
+ * Delays until `predicate` returns true.
+ * Can be useful for synchronising with other async activities.
+ * ```js
+ * // Delay until 'count' reaches 5
+ * await sleepWhile(() => count >= 5, 100);
+ * ```
+ * @param predicate 
+ * @param checkInterval 
+ */
+export const sleepWhile = async (predicate: () => boolean, checkInterval = 100) => {
+  while (predicate()) {
+    await sleep(checkInterval);
+  }
+}
