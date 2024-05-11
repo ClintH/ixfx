@@ -1,14 +1,44 @@
-//import { resolveSource } from "src/rx/ResolveSource.js";
-//import type { Reactive, ReactiveOrSource, RxValueTypeObject } from "../rx/Types.js";
-//import { hasLast } from "../rx/Util.js";
 import * as Rx from '../rx/index.js';
-import { isPrimitive } from "../KeyValue.js";
-import { isAsyncIterable, isIterable } from '../iterables/Iterable.js';
+import { isPrimitive, type PrimitiveOrObject } from "../KeyValue.js";
 
 type ValueType = string | number | boolean | object
 
 type FunctionType<V> = (() => V) | (() => Promise<V>);
 type ValueOrFunction<V> = ValueType | FunctionType<V> | Iterator<V> | AsyncIterator<V>;
+
+export type PullRecord<T extends Record<string, PrimitiveOrObject | (() => any) | Rx.Reactive<any>>> =
+  { [ K in keyof T ]:
+    T[ K ] extends number ? number | undefined :
+    T[ K ] extends string ? string | undefined :
+    T[ K ] extends boolean ? boolean | undefined :
+    T[ K ] extends bigint ? bigint | undefined :
+    T[ K ] extends () => Promise<any> ? Awaited<ReturnType<T[ K ]>> :
+    T[ K ] extends () => any ? ReturnType<T[ K ]> :
+    T[ K ] extends Rx.Reactive<infer V> ? V | undefined :
+    T[ K ] extends Generator<infer V> ? V | undefined :
+    T[ K ] extends AsyncGenerator<infer V> ? V | undefined :
+    T[ K ] extends IterableIterator<infer V> ? V | undefined :
+    T[ K ] extends AsyncIterableIterator<infer V> ? V | undefined :
+    T[ K ] extends Array<infer V> ? V | undefined :
+    T[ K ] extends object ? T[ K ] :
+    never };
+
+// export type PullRecord2<T extends Record<string, PrimitiveOrObject | ReactiveOrSource<any>>> =
+//   { [ K in keyof T ]:
+//     T[ K ] extends number ? number | undefined :
+
+//     T[ K ] extends string ? string | undefined :
+//     T[ K ] extends boolean ? boolean | undefined :
+//     T[ K ] extends bigint ? bigint | undefined :
+//     T[ K ] extends Reactive<infer V> ? V | undefined :
+//     T[ K ] extends Wrapped<infer V> ? V | undefined :
+//     T[ K ] extends Generator<infer V> ? V | undefined :
+//     T[ K ] extends AsyncGenerator<infer V> ? V | undefined :
+//     T[ K ] extends IterableIterator<infer V> ? V | undefined :
+//     T[ K ] extends AsyncIterableIterator<infer V> ? V | undefined :
+//     T[ K ] extends Array<infer V> ? V | undefined :
+//     T[ K ] extends object ? T[ K ] :
+//     never };
 
 export type ResolveValue<V> =
   V extends () => Promise<any> ? Awaited<ReturnType<V>> :
@@ -17,7 +47,6 @@ export type ResolveValue<V> =
   V extends Iterator<number> ? number :
   V extends Iterator<string> ? string :
   V extends Iterator<boolean> ? boolean :
-
   V extends AsyncIterator<object> ? object :
   V extends AsyncIterator<number> ? number :
   V extends AsyncIterator<string> ? string :
@@ -66,7 +95,7 @@ async function resolveValue<V extends ValueType>(valueOrFunction: ValueOrFunctio
  * 
  * It also works with generators
  * ```js
- * import { count } from './generators.js';
+ * import { count } from './numbers.js';
  * 
  * const state = {
  *  length: 10,
@@ -102,78 +131,91 @@ export function fieldResolver<V extends object>(object: V) {
   return () => fieldResolve(object);
 }
 
-export type Primitive = boolean | bigint | number | string;
-
-export function pull<T extends Record<string, Primitive | Rx.ReactiveOrSource<any>>>(value: T): { compute: () => Rx.RxPrimitiveValueTypeObject<T>, dispose: () => void } {
+export function pull<T extends Record<string, PrimitiveOrObject | (() => any)>>(value: T): { compute: () => Promise<PullRecord<T>>, dispose: () => void } {
   const sources: Record<string, Rx.Reactive<any>> = {};
-  const fixedValues: Record<string, Array<any> | Primitive> = {};
-  const generators: Record<string, Iterable<any> | Generator<any> | AsyncIterable<any> | AsyncGenerator<any>> = {};
+  const fixedValues: Record<string, Array<any> | PrimitiveOrObject> = {};
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const callers: Record<string, Function | (() => any)> = {};
 
   for (const [ key, v ] of Object.entries(value)) {
     if (Array.isArray(v) || isPrimitive(v)) {
       fixedValues[ key ] = v;
-    } else if (isIterable(v) || isAsyncIterable(v)) {
-      generators[ key ] = v;
+      // } else if (isIterable(v) || isAsyncIterable(v)) {
+      //   generators[ key ] = ChainFromIterable(v)();
+    } else if (typeof v === `function`) {
+      callers[ key ] = v;
     } else {
-      const s = Rx.resolveSource(v);
-      (sources as any)[ key ] = s;
+      try {
+        console.log(`pull: ${ key }`);
+        const s = Rx.resolveSource(v as any);
+        (sources as any)[ key ] = s;
+      } catch {
+        fixedValues[ key ] = v;
+      }
     }
   }
 
   // Merge sources to one Rx
-  const r = Rx.mergeToObject(sources, { onSourceDone: `allow` });
-
+  const latestToObjectRx = Rx.combineLatestToObject(sources, { onSourceDone: `allow` });
   let lastRxValue: Record<string, any> | undefined;
-  const off = r.value(v => {
+  const latestToObjectOff = latestToObjectRx.value(v => {
     lastRxValue = v;
   });
 
-  const compute = () => ({ ...fixedValues, ...lastRxValue } as Rx.RxPrimitiveValueTypeObject<T>);
-  const dispose = () => {
-    off();
-    if (Rx.isDisposable(r)) {
-      r.dispose(`ResolveFields.dispose`);
+  //let computeCallersCount = 0;
+  const computeCallers = async () => {
+    const r = {};
+    //computeCallersCount++;
+    for (const [ key, value ] of Object.entries(callers)) {
+      (r as any)[ key ] = await value();
     }
+    //console.log(`computeCallers: ${ computeCallersCount }`, r);
+    return r;
+  }
+
+  const compute = async () => ({ ...fixedValues, ...lastRxValue, ...(await computeCallers()) } as PullRecord<T>);
+  const dispose = () => {
+    latestToObjectOff();
+    latestToObjectRx.dispose(`ResolveFields.dispose`);
   }
   return { compute, dispose };
 }
 
+// export function push<T extends Record<string, Primitive | Rx.ReactiveOrSource<any>>>(value: T): { compute: () => Rx.RxPrimitiveValueTypeObject<T>, dispose: () => void } {
+//   const sources: Record<string, Rx.Reactive<any>> = {};
+//   //const interval = intervalToMs(options.interval, 100);
+//   const fixedValues: Record<string, Array<any> | Primitive> = {};
 
-export function push<T extends Record<string, Primitive | Rx.ReactiveOrSource<any>>>(value: T): { compute: () => Rx.RxPrimitiveValueTypeObject<T>, dispose: () => void } {
-  const sources: Record<string, Rx.Reactive<any>> = {};
-  //const interval = intervalToMs(options.interval, 100);
-  const fixedValues: Record<string, Array<any> | Primitive> = {};
+//   // Convert dynamic things to a Reactive and stash under 'sources'
+//   // Stash fixed values to 'fixedValues'
+//   for (const [ key, v ] of Object.entries(value)) {
+//     if (Array.isArray(v) || isPrimitive(v)) {
+//       fixedValues[ key ] = v;
+//       continue;
+//     }
+//     const s = Rx.resolveSource(v);
+//     (sources as any)[ key ] = s;
+//   }
 
-  // Convert dynamic things to a Reactive and stash under 'sources'
-  // Stash fixed values to 'fixedValues'
-  for (const [ key, v ] of Object.entries(value)) {
-    if (Array.isArray(v) || isPrimitive(v)) {
-      fixedValues[ key ] = v;
-      continue;
-    }
-    const s = Rx.resolveSource(v);
-    (sources as any)[ key ] = s;
-  }
+//   // Merge sources to one Rx
+//   const r = Rx.mergeToObject(sources, { onSourceDone: `allow` });
 
-  // Merge sources to one Rx
-  const r = Rx.mergeToObject(sources, { onSourceDone: `allow` });
+//   // Throttle data if necessary
+//   // if (interval > 0) {
+//   //   r = Rx.throttle(r, { elapsed: interval });
+//   // }
 
-  // Throttle data if necessary
-  // if (interval > 0) {
-  //   r = Rx.throttle(r, { elapsed: interval });
-  // }
+//   let lastRxValue: Record<string, any> | undefined;
+//   const off = r.value(v => {
+//     lastRxValue = v;
+//   });
 
-  let lastRxValue: Record<string, any> | undefined;
-  const off = r.value(v => {
-    lastRxValue = v;
-  });
-
-  const compute = () => ({ ...fixedValues, ...lastRxValue } as Rx.RxPrimitiveValueTypeObject<T>);
-  const dispose = () => {
-    off();
-    if (Rx.isDisposable(r)) {
-      r.dispose(`ResolveFields.dispose`);
-    }
-  }
-  return { compute, dispose };
-}
+//   const compute = () => ({ ...fixedValues, ...lastRxValue } as Rx.RxPrimitiveValueTypeObject<T>);
+//   const dispose = () => {
+//     off();
+//     if (Rx.isDisposable(r)) {
+//       r.dispose(`ResolveFields.dispose`);
+//     }
+//   }
+//   return { compute, dispose };
+// }
