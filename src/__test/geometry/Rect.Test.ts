@@ -7,7 +7,8 @@ test(`corners`, t => {
   const r2 = Rects.corners({ width: 20, height: 5 }, { x: 10, y: 10 });
   t.deepEqual(r1, r2);
   t.deepEqual(r1, [
-    { x: 10, y: 10 }, { x: 30, y: 10 }, { x: 15, y: 10 }, { x: 30, y: 15 }
+    // ne, nw, sw, se
+    { x: 10, y: 10 }, { x: 30, y: 10 }, { x: 30, y: 15 }, { x: 10, y: 15 }
   ])
 });
 
