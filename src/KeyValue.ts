@@ -1,16 +1,10 @@
-// import { sort } from 'fp-ts/lib/Array.js';
-// import { pipe } from 'fp-ts/lib/function.js';
-// import * as S from 'fp-ts/lib/string.js';
-// import * as N from 'fp-ts/lib/number.js';
-// import { reverse as reverseOrd, contramap } from 'fp-ts/lib/Ord.js';
 
-import { defaultComparer, jsComparer } from './Util.js';
+import { defaultComparer } from './Util.js';
 import { minMaxAvg as arrayMinMaxAg } from './collections/arrays/index.js';
-
-/// ✔ Sorting functions are unit tested
 
 export type StringOrNumber = string | number | bigint;
 export type Primitive = string | number | bigint | boolean;
+export type PrimitiveOrObject = Primitive | object;
 
 export type BasicType = StringOrNumber | object;
 export type KeyValue = readonly [ key: string, value: StringOrNumber ];
@@ -26,6 +20,12 @@ export function isPrimitive(value: any): value is Primitive {
   if (typeof value === `string`) return true;
   if (typeof value === `bigint`) return true;
   if (typeof value === `boolean`) return true;
+  return false;
+}
+
+export function isPrimitiveOrObject(value: any): value is PrimitiveOrObject {
+  if (isPrimitive(value)) return true;
+  if (typeof value === `object`) return true;
   return false;
 }
 
