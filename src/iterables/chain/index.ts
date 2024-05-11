@@ -21,19 +21,6 @@ export * from './Sync.js';
 export * from './Ticks.js'
 export * from './Util.js';
 
-// export function syncToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<SyncOptions> = {}): AsyncGenerator<RxValueTypeObject<T>> {
-//   const keys = Object.keys(reactiveSources)
-//   const values = Object.values(reactiveSources);
-
-//   const s = syncToArray(values, options);
-//   const st = transform(s, (streamValues) => {
-//     return zipKeyValue(keys, streamValues);
-//   });
-//   return st as Reactive<RxValueTypeObject<T>>;
-// }
-
-
-
 /**
  * Prepare a chain, allowing you to provide a source at execution time.
  * ```js

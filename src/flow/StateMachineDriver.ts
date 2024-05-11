@@ -84,7 +84,8 @@ export type ExpressionOrResult<Transitions extends StateMachine.Transitions> =
   | Result<Transitions>
   | ((
     machine?: MachineState<Transitions>
-  ) => Result<Transitions> | undefined);
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+  ) => Result<Transitions> | undefined | void);
 
 /**
  * Drives a state machine.
@@ -235,7 +236,7 @@ export async function init<V extends StateMachine.Transitions>(
 
     debug(`  Chosen result: ${ JSON.stringify(r) }`);
     // Apply result
-    if (r && r.reset) {
+    if (r?.reset) {
       sm = StateMachine.reset(sm);
     } else if (r && r.next) {
       if (typeof r.next === `boolean`) {
