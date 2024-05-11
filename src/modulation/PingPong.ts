@@ -47,7 +47,7 @@ export const pingPongPercent = function (
 };
 
 /**
- * Ping-pongs continually back and forth `start` and `end` with a given `interval`. Use `pingPongPercent` for 0-1 ping-ponging
+ * Ping-pongs continually back and forth a `lower` and `upper` value (both inclusive) by a given `interval`. Use `pingPongPercent` for 0-1 ping-ponging
  *
  * In a loop:
  * ```
@@ -115,10 +115,8 @@ export const pingPong = function* (
     );
   }
 
-  //eslint-disable-next-line functional/no-let
   let v = start;
   yield v / rounding;
-  //eslint-disable-next-line functional/no-let
   let firstLoop = true;
   while (true) {
     v = v + (incrementing ? interval : -interval);
