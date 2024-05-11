@@ -4,6 +4,17 @@ import { continuously } from '../../flow/Continuously.js';
 import { JSDOM } from 'jsdom';
 import { sleep } from '../../flow/Sleep.js';
 
+test(`sleep`, async t => {
+  const ac = new AbortController();
+
+  setTimeout(() => {
+    ac.abort(`test abort`);
+  }, 200);
+  await t.throwsAsync(async () => {
+    await sleep({ secs: 60, signal: ac.signal });
+  });
+});
+
 test('continuously', async (t) => {
   const dom = new JSDOM();
   // @ts-ignore

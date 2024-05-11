@@ -2,7 +2,12 @@ A rough changelog between NPM releases
 
 # 0.20.3
 
-* Changed Data.movingAverage et al to return a function rather than object with add, clear, compute functions.
+Data
+
+* Changed movingAverage et al to return a function rather than object with add, clear, compute functions.
+
+Flow
++ rateMinimum: maintain a minimum rate of calling a function
 
 # 0.20.0 24.04.06
 
