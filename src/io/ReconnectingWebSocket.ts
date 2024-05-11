@@ -3,6 +3,7 @@ import { intervalToMs, type Interval } from "../flow/IntervalType.js"
 import { eventRace } from "../Events.js"
 import { StateMachine } from "../flow/index.js"
 
+
 export type ReconnectingWebsocket = {
   /**
    * Sends data
@@ -42,9 +43,16 @@ export type ReconnectingOptions = {
    * Default: 5s
    */
   checkStateMs: Interval
+  /**
+   * Callback when message is received
+   * @param message 
+   * @returns 
+   */
   onMessage: (message: any) => void
+  onConnected: () => void
+  onDisconnected: () => void
+  onError: (error: any) => void
 }
-
 
 export const reconnectingWebsocket = (url: string | URL, opts: Partial<ReconnectingOptions> = {}): ReconnectingWebsocket => {
   const startDelayMs = intervalToMs(opts.startDelay, 2000);
@@ -61,17 +69,19 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
 
   let ws: WebSocket | undefined;
   const onError = (event_: any) => {
-    const event = event_;
-    console.log(`rw on error`, event_);
-    console.error(` error: ${ event.error }`);
-    console.error(` type: ${ event.type }`);
-    console.error(` error msg: ${ event.message }`);
+    if (opts.onError) {
+      opts.onError(event_);
+    } else {
+      console.log(`rw on error`, event_);
+      console.error(` error: ${ event_.error }`);
+      console.error(` type: ${ event_.type }`);
+      console.error(` error msg: ${ event_.message }`);
+    }
   }
 
   const onMessage = (message: MessageEvent) => {
     if (opts.onMessage) opts.onMessage(message.data);
   }
-
 
   const connect = async () => {
     if (currentState.value === `connecting`) throw new Error(`Cannot connect twice`);
@@ -105,6 +115,7 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
       }
       result = true;
       currentState = StateMachine.to(currentState, `open`);
+      if (opts.onConnected) opts.onConnected();
     } else {
       currentState = StateMachine.to(currentState, `closed`);
     }
@@ -125,7 +136,10 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
 
   const onDisconnected = () => {
     if (currentState.value === `closed`) return;
-    if (currentState.value === `open`) currentState = StateMachine.to(currentState, `closed`);
+    if (currentState.value === `open`) {
+      currentState = StateMachine.to(currentState, `closed`);
+      if (opts.onDisconnected) opts.onDisconnected();
+    }
     if (reconnect && currentState.value !== `connecting`) {
       console.log(`Scheduling connect`);
       setTimeout(() => {
@@ -142,6 +156,7 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
     reconnect = false;
     currentState = StateMachine.to(currentState, `closed`);
     ws?.close();
+    if (opts.onDisconnected) opts.onDisconnected();
   }
 
   const open = () => {
