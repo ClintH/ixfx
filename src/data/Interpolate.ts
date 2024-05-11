@@ -1,7 +1,13 @@
 import type { Interval } from 'src/flow/IntervalType.js';
 import { wrap } from './Wrap.js';
 import { progress } from '../flow/Elapsed.js';
+import { throwNumberTest } from '../Guards.js';
+import { clamp } from './Clamp.js';
 export const piPi = Math.PI * 2;
+
+export type InterpolateOptions = {
+  limits: `clamp` | `wrap` | `ignore`
+}
 
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
@@ -10,7 +16,7 @@ export const piPi = Math.PI * 2;
  *
  * @example Get the halfway point between 30 and 60
  * ```js
- * import {interpolate} from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/data.js';
  * interpolate(0.5, 30, 60);
  * ```
  *
@@ -35,16 +41,59 @@ export const piPi = Math.PI * 2;
  * See also {@link interpolatorStepped} and {@link interpolatorInterval} for functions
  * which help to manage progression from A->B over steps or interval.
  * 
- * To interpolate certain types:  {@link Visual.Colour.interpolate | Visual.Colour.interpolate }, {@link Geometry.Points.interpolate | Geometry.Points.interpolate}.
+ * If two parameters are given, it instead returns a function which interpolates:
+ * ```js
+ * const i = interpolate(100, 200);
+ * i(0.5); // 150
+ * 
+ * // Compared to:
+ * interpolate(0.5, 100, 200); // 150
+ * ```
+ * 
+ * This is useful if you want to reuse the interpolator with fixed `a` and `b` values.
+ * 
+ * Usually interpolation amount is on a 0...1 scale, inclusive. What is the interpolation result
+ * if this scale is exceeded? By default it is clamped to 0..1, so the return value is always between `a` and `b` (inclusive).
+ * 
+ * Alternatively, set the `limits` option:
+ * * 'wrap': wrap amount, eg 1.5 is the same as 0.5, 2 is the same as 1
+ * * 'ignore': allow exceeding values. eg 1.5 will yield b*1.5.
+ * * 'clamp': default behaviour of clamping interpolation amount to 0..1
+ * 
+ * To interpolate certain types: {@link Visual.Colour.interpolate | Visual.Colour.interpolate }, {@link Geometry.Points.interpolate | Geometry.Points.interpolate}.
  * @param amount Interpolation amount, between 0 and 1 inclusive
  * @param a Start (ie when `amt` is 0)
  * @param b End (ie. when `amt` is 1)
  * @returns Interpolated value which will be between `a` and `b`.
  */
-export const interpolate = (amount: number, a: number, b: number): number => {
-  const v = (1 - amount) * a + amount * b;
-  return v;
+export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
+export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
+export function interpolate(amountOrA: number, aOrB: number, bOrMissingOrOpts?: number | Partial<InterpolateOptions>, options?: Partial<InterpolateOptions>) {
+  const a = bOrMissingOrOpts === undefined ? amountOrA : aOrB;
+  const b = bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object` ? aOrB : bOrMissingOrOpts;
+  // eslint-disable-next-line unicorn/no-negated-condition, @typescript-eslint/prefer-nullish-coalescing
+  const opts = options !== undefined ? options : (typeof bOrMissingOrOpts === `number` ? {} : bOrMissingOrOpts);
+  const limits = opts?.limits ?? `clamp`;
+
+  throwNumberTest(a, ``, `a`);
+  throwNumberTest(b, ``, `b`);
+
+  const index = (amount: number) => {
+    if (limits === `clamp`) {
+      amount = clamp(amount);
+    } else if (limits === `wrap`) {
+      if (amount > 1) amount = amount % 1;
+      else if (amount < 0) {
+        amount = 1 + (amount % 1);
+      }
+    }
+    throwNumberTest(amount, ``, `amount`);
+    return (1 - amount) * a + amount * b;
+  }
+  if (bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object`) return index;
+  return index(amountOrA);
 };
+
 
 /**
  * Returns a function that interpolates from A to B.
@@ -97,19 +146,22 @@ export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, start
  * Given the same A & B values, steps will be larger if it's a longer
  * duration, and shorter if it's a smaller duration.
  * 
+ * A function is returned, which when invoked yields a value between A..B.
+ * 
  * Alternatively to step through by the same amount regardless
  * of time, use {@link interpolatorStepped}.
  * 
  * ```js
  * // Interpolate from 0..1 over one minute
  * const v = interpolatorInterval({mins:1});
- * v(); // Current value
+ * v(); // Compute current value
  * ```
  * 
  * Use start and end points:
  * ```js
  * // Interpolate from 100-200 over 10 seconds
  * const v = interpolatorInterval({secs:10}, 100, 200);
+ * v(); // Compute current value
  * ```
  * @param duration
  * @param a 
