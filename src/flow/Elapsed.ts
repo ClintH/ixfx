@@ -27,7 +27,9 @@ export type Since = () => number;
  * state = { click: Elapsed.since() }
  * ```
  *
- * Use {@link once} if you want to measure a single period, and stop it.
+ * See also:
+ * * {@link once} if you want to measure a single period, and stop it.
+ * * {@link interval} time _between_ calls
  * @returns
  */
 export const since = (): Since => {
@@ -45,6 +47,10 @@ export const since = (): Since => {
  * interval(); // Time from Elapsed.interval()
  * interval(); // Time since last interval() call
  * ```
+ * 
+ * See also:
+ * * {@link since}: time since first call
+ * * {@link once}: time between two events
  * @returns 
  */
 export const interval = (): Since => {
@@ -58,7 +64,7 @@ export const interval = (): Since => {
 }
 /**
  * Returns elapsed time since initial call, however
- * timer stops when first invoked.
+ * unlike {@link since}, timer stops when first invoked.
  *
  * ```js
  * const elapsed = Elapsed.once();
@@ -67,8 +73,10 @@ export const interval = (): Since => {
  * // ...do more stuff
  * elapsed(); // Is still the same number as above
  * ```
- *
- * Use {@link since} to not have this stopping behaviour.
+ * 
+ * See also:
+ * * {@link since}: elapsed time
+ * * {@link interval}: time _between_ calls
  * @returns
  */
 export const once = (): Since => {
@@ -84,7 +92,7 @@ export const once = (): Since => {
 };
 /**
  * Returns a function that reports an 'infinite' elapsed time.
- * this can be useful as an initialiser for `elapsedSince`.
+ * this can be useful as an initialiser for `Elapsed.since` et al.
  *
  * ```js
  * // Init clicked to be an infinite time
