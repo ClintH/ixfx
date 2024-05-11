@@ -12,6 +12,7 @@ import type { Rect, RectPositioned } from "./index.js";
  * ```
  *
  * If the rectangle is not positioned, is origin can be provided.
+ * Order of corners: ne, nw, sw, se
  * @param rect
  * @param origin
  * @returns
