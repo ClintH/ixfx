@@ -1,9 +1,55 @@
 import test from 'ava';
-import { interpolatorInterval, interpolatorStepped } from '../../data/Interpolate.js';
+import { interpolate, interpolatorInterval, interpolatorStepped } from '../../data/Interpolate.js';
 import { round } from '../../numbers/Round.js';
 import { delayLoop } from '../../flow/Delay.js';
 import { arrayValuesEqual } from '../Include.js';
 import { compareValuesEqual } from '../../collections/Iterables.js';
+
+test(`basic`, t => {
+  t.is(interpolate(0, 0, 100), 0);
+  t.is(interpolate(0.5, 0, 100), 50);
+  t.is(interpolate(1, 0, 100), 100);
+
+  t.is(interpolate(0, 100, 0), 100);
+  t.is(interpolate(0.5, 100, 0), 50);
+  t.is(interpolate(1, 100, 0), 0);
+
+  t.is(interpolate(0, 0, -100), 0);
+  t.is(interpolate(0.5, 0, -100), -50);
+  t.is(interpolate(1, 0, -100), -100);
+
+  const f = interpolate(0, 100);
+  t.true(typeof f === `function`, typeof f);
+  t.is(f(0), 0);
+  t.is(f(0.5), 50);
+  t.is(f(1), 100);
+
+});
+
+test(`limits`, t => {
+  // Default is clamp
+  t.is(interpolate(1.1, 0, 100), 100);
+  t.is(interpolate(-0.1, 0, 100), 0);
+
+  // Clamp
+  t.is(interpolate(1.1, 0, 100, { limits: `clamp` }), 100);
+  t.is(interpolate(-0.1, 0, 100, { limits: `clamp` }), 0);
+
+  // Ignore
+  t.is(Math.floor(interpolate(1.1, 0, 100, { limits: `ignore` })), 110);
+  t.is(interpolate(-0.1, 0, 100, { limits: `ignore` }), -10);
+  t.is(interpolate(0, 0, 100, { limits: `ignore` }), 0);
+  t.is(interpolate(0.5, 0, 100, { limits: `ignore` }), 50);
+  t.is(interpolate(1, 0, 100, { limits: `ignore` }), 100);
+
+  // Wrap
+  t.is(Math.floor(interpolate(1.1, 0, 100, { limits: `wrap` })), 10);
+  t.is(Math.floor(interpolate(-0.1, 0, 100, { limits: `wrap` })), 90);
+  t.is(interpolate(0, 0, 100, { limits: `wrap` }), 0);
+  t.is(interpolate(0.5, 0, 100, { limits: `wrap` }), 50);
+  t.is(interpolate(1, 0, 100, { limits: `wrap` }), 100);
+});
+
 
 test(`interpolatorInterval`, async t => {
 
