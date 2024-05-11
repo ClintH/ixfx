@@ -1,11 +1,11 @@
 import test from 'ava';
 
 import * as Shape from '../../geometry/shape/index.js';
-import { Circles, Rects } from 'src/geometry/index.js';
+import { Circles, Rects } from '../../geometry/index.js';
 
 test(`random-point`, t => {
   // @ts-expect-error
-  t.throws(Shape.randomPoint({ x: 10, y: 20 }));
+  t.throws(() => Shape.randomPoint({ x: 10, y: 20 }));
 
   const shape1 = { x: 10, y: 10, radius: 10 };
   const r1 = Shape.randomPoint(shape1);
