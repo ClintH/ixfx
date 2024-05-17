@@ -4,9 +4,39 @@ import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { count } from '../../../numbers/Count.js';
 import { isApproximately } from '../../../numbers/IsApproximately.js';
+
+test(`timeout-repeat`, async t => {
+  // Emit 'goodbye' every 1s
+  const s1 = Rx.From.func(() => 'goodbye', { interval: { secs: 2 } });
+  const time = Flow.Elapsed.interval();
+
+  let values = 0;
+  const r1 = Rx.timeoutTrigger(s1, {
+    interval: 50,
+    repeat: true,
+    fn() {
+      const elapsed = time();
+      const ok = isApproximately(50, 0.1, elapsed);
+      if (!ok && !r1.isDisposed()) {
+        t.fail(`Elapsed: ${ elapsed }`);
+      }
+      return `hello`
+    }
+  });
+  r1.value(v => {
+    values++;
+  });
+
+  await Flow.sleep(1000);
+  r1.dispose(`test`);
+  // Expect 19 values
+  t.is(values, 19);
+});
+
 test(`timeout-value-immediate`, async t => {
-  // Emit 'a' every 100ms
+  // Emit 'goodbye' every 200ms
   const s1 = Rx.From.func(() => 'goodbye', { interval: 200 });
+
   // Emit 'hello' if we don't get anything from s1 after 150ms
   const r1 = Rx.timeoutTrigger(s1, { value: 'hello', interval: 150, immediate: true });
   const time = Flow.Elapsed.interval();
@@ -34,7 +64,7 @@ test(`timeout-value-immediate`, async t => {
 });
 
 test(`timeout-value-non-immediate`, async t => {
-  // Emit 'a' every 100ms
+  // Emit 'goodbye' every 200ms
   const s1 = Rx.From.func(() => 'goodbye', { interval: 200 });
   // Emit 'hello' if we don't get anything from s1 after 150ms
   const r1 = Rx.timeoutTrigger(s1, { fn: () => 'hello', interval: 150, immediate: false });
