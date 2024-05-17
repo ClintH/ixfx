@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 //#region imports
-import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet } from "./Types.js";
+import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactiveInitial, ReactiveDisposable } from "./Types.js";
 
 import { isDisposable, messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
 import * as OpFns from './ops/index.js';
@@ -222,6 +222,7 @@ const prepareOps = <TIn, TOut>(...ops: Array<ReactiveOp<TIn, TOut>>) => {
   }
 }
 
+
 /**
  * Connects `source` to serially-connected set of ops. Values thus
  * flow from `source` to each op in turn.
@@ -236,6 +237,51 @@ export function run<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<Reac
   const raw = prepareOps<TIn, TOut>(...ops);
   return raw(source);
 }
+
+export function cache<T>(r: Reactive<T>, initialValue: T) {
+  let lastValue: T | undefined = initialValue;
+  r.value(value => {
+    lastValue = value;
+  });
+  return {
+    ...r,
+    last() {
+      return lastValue
+    },
+    reset() {
+      lastValue = undefined;
+    }
+  }
+
+}
+
+// export function runWithInitial<TIn, TOut>(initial: TOut, source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<any, any>>): ReactiveInitial<TOut> & ReactiveDisposable<TOut> {
+//   let lastValue = initial;
+//   const raw = prepareOps<TIn, TOut>(...ops);
+//   const r = raw(source);
+//   let disposed = false;
+
+//   r.value(value => {
+//     lastValue = value;
+//   });
+
+//   return {
+//     ...r,
+//     isDisposed() {
+//       return disposed
+//     },
+//     dispose(reason) {
+//       if (disposed) return;
+//       if (isDisposable(r)) {
+//         r.dispose(reason);
+//       }
+//       disposed = true;
+//     },
+//     last() {
+//       return lastValue;
+//     },
+//   }
+// }
 
 /**
  * Grabs the next value emitted from `source`.
