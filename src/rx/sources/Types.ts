@@ -53,9 +53,24 @@ export type TriggerGenerator<TTriggerValue> = {
   gen: IterableIterator<TTriggerValue>
 }
 
+/**
+ * A trigger can be a value, a function or generator. Value triggers never complete.
+ * 
+ * A trigger function is considered complete if it returns undefined.
+ * A trigger generator is considered complete if it returns done.
+ * 
+ */
 export type Trigger<TTriggerValue> = TriggerValue<TTriggerValue> | TriggerFunction<TTriggerValue> | TriggerGenerator<TTriggerValue>;
 
 export type TimeoutTriggerOptions<TTriggerValue> = Trigger<TTriggerValue> & {
+  /**
+   * Whether to repeatedly trigger even if upstream source doesn't emit values.
+   * When _false_ (default) it will emit a max of one value after a source value if `interval` is reached.
+   * When _true_, it will continue emitting values at `interval`.
+   * Default: false
+   */
+  repeat?: boolean
+
   /**
    * Interval before emitting trigger value
    * Default: 1s
