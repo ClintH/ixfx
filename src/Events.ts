@@ -61,7 +61,7 @@ export const eventRace = (target: EventTarget, eventNames: Array<string>, opts: 
     timeout = setTimeout(() => {
       if (triggered || disposed) return;
       dispose();
-      reject(new Error(`Events not fired within interval. Events: ${ JSON.stringify(eventNames) }`));
+      reject(new Error(`eventRace: Events not fired within interval. Events: ${ JSON.stringify(eventNames) } Interval: ${ intervalMs }`));
     }, intervalMs);
 
 
