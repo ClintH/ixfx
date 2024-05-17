@@ -110,7 +110,22 @@ export const puck = async (opts: EspruinoBleOpts = {}) => {
   const debug = opts.debug ?? false;
 
   const device = await navigator.bluetooth.requestDevice({
-    filters: getFilters(opts),
+    filters: getFilters(opts, `Puck.js`),
+    optionalServices: [ NordicDefaults.service ],
+  });
+
+  console.log(device.name);
+  const d = new EspruinoBleDevice(device, { name, debug });
+  await d.connect();
+  return d;
+};
+
+export const bangle = async (opts: EspruinoBleOpts = {}) => {
+  const name = opts.name ?? `Bangle`;
+  const debug = opts.debug ?? false;
+
+  const device = await navigator.bluetooth.requestDevice({
+    filters: getFilters(opts, `Bangle.js`),
     optionalServices: [ NordicDefaults.service ],
   });
 
@@ -183,7 +198,7 @@ export const serial = async (
  * @param opts
  * @returns
  */
-const getFilters = (opts: EspruinoBleOpts) => {
+const getFilters = (opts: EspruinoBleOpts, defaultNamePrefix: string) => {
   //eslint-disable-next-line functional/no-let
   const filters: Array<BluetoothLEScanFilter> = [];
 
@@ -197,14 +212,14 @@ const getFilters = (opts: EspruinoBleOpts) => {
     console.info(`Filtering Bluetooth devices by name '${ opts.name }'`);
   } else {
     // Default filter
-    //eslint-disable-next-line functional/immutable-data
-    filters.push({ namePrefix: `Puck.js` });
+    filters.push({ namePrefix: defaultNamePrefix });//`Puck.js` });
   }
   // {namePrefix: 'Pixl.js'},
   // {namePrefix: 'MDBT42Q'},
   // {namePrefix: 'RuuviTag'},
   // {namePrefix: 'iTracker'},
   // {namePrefix: 'Thingy'},
+  // {namePrefix: 'Bangle.js'},
   // {namePrefix: 'Espruino'},
   //{services: [NordicDefaults.service]}
 
@@ -235,7 +250,7 @@ const getFilters = (opts: EspruinoBleOpts) => {
  */
 export const connectBle = async (opts: EspruinoBleOpts = {}) => {
   const device = await navigator.bluetooth.requestDevice({
-    filters: getFilters(opts),
+    filters: getFilters(opts, `Puck.js`),
     optionalServices: [ NordicDefaults.service ],
   });
   const d = new EspruinoBleDevice(device, { name: `Espruino`, ...opts });
@@ -417,7 +432,7 @@ export const deviceEval = async (
     const done = waitFor(
       timeoutMs,
       (reason: string) => {
-        reject(reason);
+        reject(new Error(reason));
       },
       () => {
         // If we got a response or there was a timeout, remove event listeners
