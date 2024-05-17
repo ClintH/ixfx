@@ -1,6 +1,6 @@
 import { intervalToMs } from "../../flow/IntervalType.js";
 import { initUpstream } from "../InitStream.js";
-import type { ReactiveOrSource, Reactive } from "../Types.js";
+import type { ReactiveOrSource, Reactive, ReactiveDisposable } from "../Types.js";
 import { isTrigger, resolveTriggerValue } from "../Util.js";
 import type { TimeoutTriggerOptions } from "../sources/Types.js";
 
@@ -29,30 +29,41 @@ import type { TimeoutTriggerOptions } from "../sources/Types.js";
  * @param source 
  * @param options 
  */
-export function timeoutTrigger<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutTriggerOptions<TTriggerValue>): Reactive<TSource | TTriggerValue> {
+export function timeoutTrigger<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutTriggerOptions<TTriggerValue>): ReactiveDisposable<TSource | TTriggerValue> & Reactive<TSource | TTriggerValue> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const immediate = options.immediate ?? true;
+  const repeat = options.repeat ?? false;
   const timeoutMs = intervalToMs(options.interval, 1000);
   if (!isTrigger(options)) {
     throw new Error(`Param 'options' does not contain trigger 'value' or 'fn' fields`);
   }
+
+  // Send value from trigger
   const sendFallback = () => {
     const [ value, done ] = resolveTriggerValue(options);
     if (done) {
       events.dispose(`Trigger completed`);
     } else {
+      if (events.isDisposed()) return;
       events.set(value);
+      if (repeat) {
+        timer = setTimeout(sendFallback, timeoutMs);
+      }
     }
   }
 
   const events = initUpstream<TSource, TSource | TTriggerValue>(source, {
     disposeIfSourceDone: true,
+    // Received a value from upstream source
     onValue(v) {
+      // Reset timeout
       if (timer) clearTimeout(timer);
       timer = setTimeout(sendFallback, timeoutMs);
+      // Emit value
       events.set(v);
     },
     onDispose() {
+      console.log(`disposing`);
       if (timer) clearTimeout(timer);
     },
   });
