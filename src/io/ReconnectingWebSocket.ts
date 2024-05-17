@@ -2,6 +2,7 @@ import { retryTask } from "../flow/Retry.js"
 import { intervalToMs, type Interval } from "../flow/IntervalType.js"
 import { eventRace } from "../Events.js"
 import { StateMachine } from "../flow/index.js"
+import { getErrorMessage } from "src/debug/GetErrorMessage.js"
 
 
 export type ReconnectingWebsocket = {
@@ -96,10 +97,14 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
 
     // Keep trying to connect
     const retry = await retryTask({
-      async probe(attempts: number) {
-        const wss = new WebSocket(url);
-        const r = await eventRace(wss, [ `open`, `error` ], { timeout: 1000 });
-        return r.type === `open` ? { success: true, value: wss } : { success: false, value: undefined };
+      async probe(_attempts: number) {
+        try {
+          const wss = new WebSocket(url);
+          const r = await eventRace(wss, [ `open`, `error` ], { timeout: 1000 });
+          return r.type === `open` ? { success: true, value: wss } : { success: false, value: undefined };
+        } catch (error) {
+          return { success: false, message: getErrorMessage(error) }
+        }
       },
     }, { predelayMs: startDelayMs, limitAttempts: opts.limitAttempts });
 
