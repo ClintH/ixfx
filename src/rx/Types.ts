@@ -376,10 +376,14 @@ export type DomBindSourceValue<V> = {
   transformValue?: (input: any) => string
 }
 
+// export type PipeSet<In, Out> = [
+//   Reactive<In>,
+//   ...Array<Reactive<any> & ReactiveWritable<any>>,
+//   ReactiveWritable<Out> & Reactive<any>
+// ]
 export type PipeSet<In, Out> = [
   Reactive<In>,
-  ...Array<Reactive<any> & ReactiveWritable<any>>,
-  ReactiveWritable<Out> & Reactive<any>
+  ...Array<Reactive<any> & ReactiveWritable<any>>
 ]
 
 export type InitStreamOptions = {
