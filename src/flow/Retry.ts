@@ -185,14 +185,38 @@ export type RetryTask<T> = {
 export const retryFunction = <T>(callback: () => Promise<T | undefined>, opts: Partial<RetryOpts<T>> = {}) => {
   const task: RetryTask<T> = {
     async probe() {
-      const v = await callback();
-      if (v === undefined) return { value: opts.taskValueFallback, success: false };
-      return { value: v, success: true };
+      try {
+        const v = await callback();
+        if (v === undefined) return { value: opts.taskValueFallback, success: false };
+        return { value: v, success: true };
+      } catch (error) {
+        return { success: false, message: getErrorMessage(error) };
+      }
     },
   }
   return retryTask(task, opts);
 }
 
+/**
+ * Keeps trying to run `task`.
+ * 
+ * ```js
+ * const task = (attempts) => {
+ *  // attempts is number of times it has been retried
+ *  
+ *  if (Math.random() > 0.5) {
+ *    // Return a succesful result
+ *    return { success: true }
+ *  } else {
+ *  }
+ * 
+ * }
+ * const t = await retryTask(task, opts);
+ * ```
+ * @param task 
+ * @param opts 
+ * @returns 
+ */
 export const retryTask = async <V>(
   task: RetryTask<V>,
   opts: Partial<RetryOpts<V>> = {}
