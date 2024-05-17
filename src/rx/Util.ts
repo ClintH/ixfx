@@ -71,6 +71,18 @@ export const isTrigger = <V>(t: any): t is Trigger<V> => {
 export type ResolveTriggerValue<V> = [ value: V, false ];
 export type ResolveTriggerDone = [ undefined, true ];
 
+/**
+ * Resolves a trigger value.
+ * 
+ * A trigger can be a value, a function or generator. Value triggers never complete.
+ * A trigger function is considered complete if it returns undefined.
+ * A trigger generator is considered complete if it returns done.
+ * 
+ * Returns `[value, _false_]` if we have a value and trigger is not completed.
+ * Returns `[value, _true_]` trigger is completed
+ * @param t 
+ * @returns 
+ */
 export function resolveTriggerValue<V>(t: Trigger<V>): ResolveTriggerDone | ResolveTriggerValue<V> {
   if (isTriggerValue(t)) return [ t.value, false ];
   if (isTriggerFunction(t)) {
