@@ -17,6 +17,7 @@
  * 
  * {@link didSignal} returns _true_/_false_ if signal happened rather
  * than throwing an exception.
+ * 
  */
 export class SyncWait {
   #resolve?: (value?: any) => void;
@@ -29,6 +30,19 @@ export class SyncWait {
       this.#resolve = undefined;
     }
     this.#promise = Promise.resolve();
+  }
+
+  /**
+   * Throw away any previous signalled state.
+   * This will cause any currently waiters to throw
+   */
+  flush() {
+    if (this.#reject) {
+      this.#reject(`Flushed`);
+      this.#reject = undefined;
+    }
+    this.#resolve = undefined;
+    this.#promise = undefined;
   }
 
   #initPromise() {
