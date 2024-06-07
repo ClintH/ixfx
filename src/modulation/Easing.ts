@@ -42,6 +42,7 @@ const tickRelativeTimer = function (upperBound: number): RelativeTimer {
 };
 */
 
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type EasingFn = (x: number) => number;
 
 /**
@@ -159,6 +160,9 @@ const create = function (
      * Returns 1 if it has been created, returns +1 for each additional time the timer has been reset.
      */
     get startCount() {
+      return startCount;
+    },
+    get startCountTotal() {
       return startCount;
     },
     compute: () => {
