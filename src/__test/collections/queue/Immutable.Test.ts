@@ -28,9 +28,9 @@ test(`basic`, (t) => {
   // Test immutability and enqueing
   const d = c.dequeue().dequeue().enqueue(`new1`).enqueue(`new2`);
   t.is(a.length, 0);
-  arrayValuesEqual(t, b.data, [ `test` ]);
-  arrayValuesEqual(t, c.data, [ `test`, `test0`, `test1`, `test2`, `test3` ]);
-  arrayValuesEqual(t, d.data, [ `test1`, `test2`, `test3`, `new1`, `new2` ]);
+  arrayValuesEqual(t, b.toArray(), [ `test` ]);
+  arrayValuesEqual(t, c.toArray(), [ `test`, `test0`, `test1`, `test2`, `test3` ]);
+  arrayValuesEqual(t, d.toArray(), [ `test1`, `test2`, `test3`, `new1`, `new2` ]);
 });
 
 test(`unbounded`, (t) => {
@@ -39,7 +39,7 @@ test(`unbounded`, (t) => {
   for (let i = 0; i < 15; i++) {
     a1 = a1.enqueue(`test` + i);
   }
-  arrayValuesEqual(t, a1.data, [
+  arrayValuesEqual(t, a1.toArray(), [
     `test0`,
     `test1`,
     `test2`,
@@ -69,7 +69,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   e = e.enqueue(`test3`, `test4`, `test5`); // Only test3 should make it in
-  arrayValuesEqual(t, e.data, [ `test0`, `test1`, `test2`, `test3` ]);
+  arrayValuesEqual(t, e.toArray(), [ `test0`, `test1`, `test2`, `test3` ]);
 });
 
 test(`unbounded-additions`, (t) => {
@@ -81,7 +81,7 @@ test(`unbounded-additions`, (t) => {
     `test2`
   );
   e = e.enqueue(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, e.data, [ `test0`, `test1`, `test2` ]);
+  arrayValuesEqual(t, e.toArray(), [ `test0`, `test1`, `test2` ]);
 
   // Discard additions: let everything in
   e = immutable<string>(
@@ -91,7 +91,7 @@ test(`unbounded-additions`, (t) => {
     `test2`
   );
   e = e.enqueue(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, e.data, [
+  arrayValuesEqual(t, e.toArray(), [
     `test0`,
     `test1`,
     `test2`,
@@ -110,7 +110,7 @@ test(`unbounded-older`, (t) => {
     `test2`
   );
   f = f.enqueue(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, f.data, [ `test2`, `test3`, `test4`, `test5` ]);
+  arrayValuesEqual(t, f.toArray(), [ `test2`, `test3`, `test4`, `test5` ]);
 
   // Older items are discarded (ie test0, test1) - complete flush
   f = immutable<string>(
@@ -120,7 +120,7 @@ test(`unbounded-older`, (t) => {
     `test2`
   );
   f = f.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  arrayValuesEqual(t, f.data, [ `test4`, `test5`, `test6`, `test7` ]);
+  arrayValuesEqual(t, f.toArray(), [ `test4`, `test5`, `test6`, `test7` ]);
 
   // Older items are discarded (ie test0, test1) - exact flush
   f = immutable<string>(
@@ -130,7 +130,7 @@ test(`unbounded-older`, (t) => {
     `test2`
   );
   f = f.enqueue(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, f.data, [ `test3`, `test4`, `test5` ]);
+  arrayValuesEqual(t, f.toArray(), [ `test3`, `test4`, `test5` ]);
 });
 
 test(`unbounded-newer`, (t) => {
@@ -142,7 +142,7 @@ test(`unbounded-newer`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, g.data, [ `test0`, `test1`, `test2`, `test5` ]);
+  arrayValuesEqual(t, g.toArray(), [ `test0`, `test1`, `test2`, `test5` ]);
 
   // Newer items are discarded (ie test1, test2) - complete flush
   g = immutable<string>(
@@ -152,7 +152,7 @@ test(`unbounded-newer`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  arrayValuesEqual(t, g.data, [ `test4`, `test5`, `test6`, `test7` ]);
+  arrayValuesEqual(t, g.toArray(), [ `test4`, `test5`, `test6`, `test7` ]);
 
   // Newer items are discarded (ie test1, test2) - exact flush
   g = immutable<string>(
@@ -162,7 +162,7 @@ test(`unbounded-newer`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, g.data, [ `test3`, `test4`, `test5` ]);
+  arrayValuesEqual(t, g.toArray(), [ `test3`, `test4`, `test5` ]);
 
   // One item past capacity with newer
   g = immutable<string>(
@@ -172,5 +172,5 @@ test(`unbounded-newer`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`);
-  arrayValuesEqual(t, g.data, [ `test0`, `test1`, `test3` ]);
+  arrayValuesEqual(t, g.toArray(), [ `test0`, `test1`, `test3` ]);
 });
