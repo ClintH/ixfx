@@ -31,6 +31,29 @@ export * from './ValuesEqual.js';
 export * from './SortByNumericProperty.js';
 export { compareValues, compareValuesEqual } from '../Iterables.js';
 
+/**
+ * Combines values in piecewise fashion.
+ * Throws an error if there are less than two entries.
+ * 
+ * ```js
+ * piecewise([1, 2, 3, 4, 5]);
+ * Yields:
+ * [[1,2],[2,3],[3,4],[4,5] ]
+ * 
+ * piecewise([ 1, 2, 3, 4 ]);
+ * Yields:
+ * [1,2],[2,3],[3,4]
+ * ```
+ * @param values 
+ */
+export function* piecewise<T>(values: Array<T>) {
+  if (!Array.isArray(values)) throw new Error(`Param 'values' is not an array`);
+  if (values.length < 2) throw new Error(`Array needs to have at least two entries. Length: ${ values.length }`);
+
+  for (let index = 1; index < values.length; index++) {
+    yield [ values[ index - 1 ], values[ index ] ];
+  }
+}
 
 /**
  * Returns the _intersection_ of two arrays: the elements that are in common.
