@@ -1,5 +1,9 @@
 import * as Drawing from "./Drawing.js";
 import * as Bipolar from "../data/Bipolar.js";
+import type { IQueueImmutable } from "../collections/queue/IQueueImmutable.js";
+import { Queues } from "../collections/index.js";
+import { type CirclePositioned } from "../geometry/index.js";
+import { Colour } from "./index.js";
 
 /**
  * Options
@@ -22,6 +26,16 @@ export type BipolarViewOptions = Readonly<{
   labelColour?: string,
   axisWidth?: number,
   asPercentages?: boolean,
+  /**
+   * If non-zero, will render the last X number of values with increasing opacity.
+   * Default: 0
+   */
+  displayLastValues?: number
+  /**
+   * If _true_, (default) negative y values are at the bottom.
+   * If _false_  negative y values are at the top.
+   */
+  yAxisBottomNegative?: boolean,
   /**
    * Custom rendering for background
    */
@@ -58,16 +72,19 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
   const labels = opts.labels ?? [ `x`, `y` ];
   const labelPrecision = opts.labelPrecision ?? 2;
   const asPercentages = opts.asPercentages ?? false;
+  const displayLastValues = opts.displayLastValues ?? 0;
   // Flags
   const showWhiskers = opts.showWhiskers ?? true;
   const showDot = opts.showDot ?? true;
   const showLabels = opts.showLabels ?? true;
+  const yAxisBottomNegative = opts.yAxisBottomNegative ?? true;
   // Colours
-  const axisColour = opts.axisColour ?? `silver`;
-  const bgColour = opts.bgColour ?? `white`;
-  const whiskerColour = opts.whiskerColour ?? `black`;
-  const dotColour = opts.dotColour ?? whiskerColour;
-  const labelColour = opts.labelColour ?? axisColour;
+  const axisColour = Colour.resolveToString(opts.axisColour, `silver`);
+  const bgColour = Colour.resolveToString(opts.bgColour, `white`);
+  const whiskerColour = Colour.resolveToString(opts.whiskerColour, `black`);
+  const dotColour = Colour.resolveToString(opts.dotColour, opts.whiskerColour, `black`);
+  const labelColour = Colour.resolveToString(opts.labelColour, opts.axisColour, `silver`);
+
   // Sizes
   const axisWidth = (opts.axisWidth ?? 1 * window.devicePixelRatio);
   const dotRadius = (opts.dotRadius ?? 5 * window.devicePixelRatio);
@@ -76,10 +93,18 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
   const width = (opts.width ?? getNumericAttribute(element, `width`, 200) * window.devicePixelRatio);
   const height = (opts.height ?? getNumericAttribute(element, `height`, 200) * window.devicePixelRatio);
 
+  let lastValues: IQueueImmutable<CirclePositioned> | undefined;
+  if (displayLastValues > 0) {
+    lastValues = Queues.immutable<CirclePositioned>({
+      capacity: displayLastValues,
+      discardPolicy: `older`
+    });
+  }
+
   element.width = width;// * window.devicePixelRatio;
   element.height = height;// * window.devicePixelRatio;
-  element.style.width = width / window.devicePixelRatio + `px`;
-  element.style.height = height / window.devicePixelRatio + `px`;
+  element.style.width = `${ (width / window.devicePixelRatio) }px`;
+  element.style.height = `${ (height / window.devicePixelRatio) }px`;
 
   const midY = height / 2;
   const midX = width / 2;
@@ -89,7 +114,7 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
   if (window.devicePixelRatio >= 2) {
     ctx.font = `20px sans-serif`;
   }
-  const percentageFormat = (v: number) => Math.round(v * 100) + `%`;
+  const percentageFormat = (v: number) => `${ Math.round(v * 100) }%`;
   const fixedFormat = (v: number) => v.toFixed(labelPrecision);
 
   const valueFormat = asPercentages ? percentageFormat : fixedFormat;
@@ -102,8 +127,12 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
   }
 
   const renderBackground: Render = opts.renderBackground ?? ((ctx, width, height): void => {
-    ctx.fillStyle = bgColour;
-    ctx.fillRect(0, 0, width, height);
+    if (opts.bgColour === `transparent`) {
+      ctx.clearRect(0, 0, width, height);
+    } else {
+      ctx.fillStyle = bgColour;
+      ctx.fillRect(0, 0, width, height);
+    }
   });
 
   return (x: number, y: number) => {
@@ -122,6 +151,8 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
     ctx.restore();
     ctx.fillText((labels[ 0 ] + ` ` + valueFormat(x)).trim(), pad, midX + 2);
 
+    if (!yAxisBottomNegative) y *= -1;
+
     // Axes
     ctx.strokeStyle = axisColour;
     ctx.lineWidth = axisWidth;
@@ -135,13 +166,28 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
 
     const yy = (height - pad - pad) / 2 * -y;
     const xx = (width - pad - pad) / 2 * x;
+    const dotPos = { x: xx, y: yy, radius: dotRadius };
 
+    if (lastValues) {
+      lastValues = lastValues.enqueue(dotPos);
+    }
     ctx.save();
     ctx.translate(midX, midY);
 
     // Dot
     if (showDot) {
-      Drawing.circle(ctx, { radius: dotRadius, x: xx, y: yy }, { fillStyle: dotColour });
+      if (lastValues) {
+        const opacityStep = 1 / lastValues.length;
+        let opacity = 1;
+        // eslint-disable-next-line unicorn/no-array-for-each
+        lastValues.forEach(d => {
+          const colour = Colour.opacity(dotColour, opacity);
+          Drawing.circle(ctx, d, { fillStyle: colour });
+          opacity -= opacityStep;
+        });
+      } else {
+        Drawing.circle(ctx, dotPos, { fillStyle: dotColour });
+      }
     }
 
     // Whiskers
@@ -158,8 +204,6 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
       ctx.lineTo(xx + whiskerSize, 0);
       ctx.stroke();
       ctx.closePath();
-
-
     }
 
     // Restore transform
