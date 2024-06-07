@@ -9,10 +9,20 @@ export type HasCompletion = {
   get runState(): HasCompletionRunStates
   /**
    * Returns the number of times the scheduled function
-   * has been started.
+   * has been executed.
+   * 
+   * This number will be reset in some conditions.
+   * For example `continuously` resets it when the loop stops.
+   * 
+   * Use {@link startCountTotal} to track total number.
    */
   get startCount(): number
 
+  /**
+   * Total number of times scheduled function has been
+   * executed.
+   */
+  get startCountTotal(): number
 };
 
 export type AsyncPromiseOrGenerator<V> =
