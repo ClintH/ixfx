@@ -1,11 +1,24 @@
+import { throwNumberTest } from "../../Guards.js";
 import { isEqualDefault, type IsEqual } from "../../IsEqual.js";
 import { max as IterablesMax, min as IterablesMin } from "../Iterables.js";
 import type { IPriorityQueueMutable, PriorityItem } from "./IPriorityQueueMutable.js";
 import { QueueMutable } from "./QueueMutable.js";
 import type { QueueOpts } from "./QueueTypes.js";
 
+/**
+ * Simple priority queue implementation.
+ * Higher numbers mean higher priority.
+ * 
+ * ```js
+ * const pm = new PriorityMutable();
+ * 
+ * // Add items with a priority (higher numeric value = higher value)
+ * pm.enqueueWithPriority(`hello`, 4);
+ * pm.enqueueWithPriotity(`there`, 1);
+ * 
+ * ```
+ */
 export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements IPriorityQueueMutable<V> {
-
   constructor(opts: QueueOpts<PriorityItem<V>> = {}) {
     if (opts.eq === undefined) {
       opts = {
@@ -18,7 +31,13 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
     super(opts);
   }
 
+  /**
+   * Adds an item with a given priority
+   * @param item Item
+   * @param priority Priority (higher numeric value means higher priority)
+   */
   enqueueWithPriority(item: V, priority: number) {
+    throwNumberTest(priority, `positive`)
     super.enqueue({ item, priority });
   }
 
