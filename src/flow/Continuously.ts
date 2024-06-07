@@ -200,6 +200,7 @@ export const continuously = (
   let disposed = false;
   let runState: HasCompletionRunStates = `idle`;
   let startCount = 0;
+  let startCountTotal = 0;
   let startedAt = performance.now();
   let intervalUsed = interval ?? 0;
   let cancelled = false;
@@ -243,6 +244,7 @@ export const continuously = (
 
     runState = `running`
     startCount++;
+    startCountTotal++;
     const valueOrPromise = callback(startCount, performance.now() - startedAt);
     const value = typeof valueOrPromise === `object` ? (await valueOrPromise) : valueOrPromise;
     if (cancelled) {
@@ -321,6 +323,9 @@ export const continuously = (
     },
     get runState() {
       return runState;
+    },
+    get startCountTotal() {
+      return startCountTotal;
     },
     get startCount() {
       return startCount;
