@@ -29,6 +29,7 @@ export const trimQueue = <V>(
       //   } toAddLen: ${toAdd.length} nowFull: ${queue.length === opts.capacity}`
       // );
       if (queue.length === 0) return toAdd.slice(0, toAdd.length - toRemove);
+      // eslint-disable-next-line unicorn/prefer-ternary
       if (queue.length === opts.capacity) {
         return queue; // Completely full
       } else {
@@ -43,6 +44,7 @@ export const trimQueue = <V>(
         //debug(opts, `slice start: ${toAdd.length - capacity}`);
         if (queue.length === 0) {
           // Special case when queue starts off empty
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           return [ ...toAdd.slice(0, capacity - 1), toAdd.at(-1)! ];
         }
         return toAdd.slice(
