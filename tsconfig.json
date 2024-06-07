@@ -3,15 +3,9 @@
     "outDir": "./etc/build",
     "baseUrl": ".",
     "paths": {
-      // "~/*": [
-      //   "src/*"
-      // ],
       "fp-ts/*": [
         "node_modules/fp-ts/es6/*"
-      ],
-      // "rxjs/*": [
-      //   "node_modules/rxjs/dist/esm/*"
-      // ]
+      ]
     },
     "lib": [
       "esnext",
