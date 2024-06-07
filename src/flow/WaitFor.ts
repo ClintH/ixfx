@@ -33,9 +33,6 @@
  * const done = waitFor(1000,
  *  (reason) => {
  *    console.log(`Aborted: ${reason}`);
- *  },
- *  (success) => {
- *    console.log(`Completed. Success: ${success ?? `Yes!` : `No`}`)
  *  });
  *
  * try {
@@ -84,7 +81,6 @@ export const waitFor = (
   onAborted: (reason: string) => void,
   onComplete?: (success: boolean) => void
 ) => {
-
   let t: ReturnType<typeof globalThis.setTimeout> | undefined;
 
   let success = false;
