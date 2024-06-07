@@ -35,6 +35,7 @@ export type InterpolationOpts = {
  * @returns
  */
 export const toHsl = (colour: Colourish): Hsl => {
+  if (typeof colour === `string` && colour === `transparent`) return { h: 0, s: 0, l: 0, opacity: 0 };
   const c = resolve(colour);
   const hsl = c.hsl;
   const parsedHsl = {
@@ -42,7 +43,14 @@ export const toHsl = (colour: Colourish): Hsl => {
     s: hsl[ 1 ] / 100,
     l: hsl[ 2 ] / 100
   }
-  if (c.alpha !== 1) return { ...parsedHsl, opacity: c.alpha / 100 };
+  if (c.alpha !== 1) {
+    if (`type` in (c.alpha as any)) {
+      //const alphaType = (c.alpha as any).type;
+      const alphaRaw = Number.parseFloat((c.alpha as any).raw);
+      return { ...parsedHsl, opacity: alphaRaw }
+    }
+    return { ...parsedHsl, opacity: c.alpha / 100 };
+  }
   return parsedHsl;
 
   // if (isHsl(colour)) return colour;
@@ -103,25 +111,11 @@ export const toString = (colour: Colourish): string => {
  * @param colour 
  * @returns 
  */
-export const toHslaString = (colour: Colourish): string => {
-  const c = resolve(colour);
-  return c.toString({ format: `hsla` });
-
-  // if (typeof colour === `string`) {
-  //   if (colour.startsWith(`hsla(`)) return colour;
-  //   if (colour.startsWith(`hsl(`)) return colour;
-  // }
-  // // eslint-disable-next-line prefer-const
-  // let { h, s, l, opacity } = toHsl(colour);
-  // if (Number.isNaN(h)) h = 0;
-  // if (Number.isNaN(s)) s = 0;
-  // if (Number.isNaN(l)) l = 0;
-
-  // if (opacity !== undefined) {
-  //   return `hsla(${ Math.floor(h * 360) },${ Math.floor(s * 100) }%,${ Math.floor(l * 100) }%,${ opacity })`
-  // }
-  // return `hsla(${ Math.floor(h * 360) },${ Math.floor(s * 100) }%,${ Math.floor(l * 100) }%,1)`
-}
+// export const toHslaString = (colour: Colourish): string => {
+//   if (typeof colour === `string` && colour === `transparent`) return `hsla(0,0%,0%,0)`;
+//   const c = resolve(colour);
+//   return c.toString({ format: `hsl` });
+// }
 
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
@@ -199,7 +193,6 @@ export const resolve = (colour: Colourish): Color => {
     if (colour.startsWith(`--`)) {
       // Resolve CSS variable
       colour = getComputedStyle(document.body).getPropertyValue(colour);
-      console.log(`CSS colour: ${ colour }`);
     }
     return new Color(colour);
   } else {
@@ -233,7 +226,6 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
     if (colour === null) continue;
     const c = resolve(colour);
     const hsl = c.hsl;
-    console.log(`hsl:`, hsl);
     return c.display();
   }
   return `rebeccapurple`;
@@ -251,6 +243,7 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
  * @returns Hex format, including #
  */
 export const toHex = (colour: Colourish): string => {
+  if (typeof colour === `string` && colour === `transparent`) return `#00000000`;
   const c = resolve(colour);
   return c.toString({ format: `hex` });
 };
@@ -356,7 +349,6 @@ export const interpolator = (colours: Array<Colourish>, opts: Partial<Interpolat
     const s = scaleNumber(amt, 0, 1, 0, ranges.length);
     const index = Math.floor(s);
     const amtAdjusted = s - index;
-    //console.log(`Colour.interpolator: amt: ${ amt } s: ${ s } index: ${ index } amtAdjusted: ${ amtAdjusted } ranges: ${ ranges.length } steps: ${ steps }`);
     return ranges[ index ](amtAdjusted);
   }
 }
