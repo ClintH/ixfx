@@ -59,16 +59,16 @@ test(`bounded`, (t) => {
   // Test immutability and enqueing
   const d = c.dequeue().dequeue().enqueue(`new1`).enqueue(`new2`);
   t.true(a.length === 0);
-  t.like(b.data, [`test`]);
-  t.like(c.data, [`test`, `test0`, `test1`, `test2`, `test3`]);
-  t.like(d.data, [`test1`, `test2`, `test3`, `new1`, `new2`]);
+  t.like(b.toArray(), [ `test` ]);
+  t.like(c.toArray(), [ `test`, `test0`, `test1`, `test2`, `test3` ]);
+  t.like(d.toArray(), [ `test1`, `test2`, `test3`, `new1`, `new2` ]);
 
   // Unbounded queue
   let a1 = immutable<string>();
   for (let i = 0; i < 15; i++) {
     a1 = a1.enqueue(`test` + i);
   }
-  t.like(a1.data, [
+  t.like(a1.toArray(), [
     `test0`,
     `test1`,
     `test2`,
@@ -96,7 +96,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   e = e.enqueue(`test3`, `test4`, `test5`); // Only test3 should make it in
-  t.like(e.data, [`test0`, `test1`, `test2`, `test3`]);
+  t.like(e.toArray(), [ `test0`, `test1`, `test2`, `test3` ]);
 
   // Discard additions: already full
   e = immutable<string>(
@@ -106,7 +106,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   e = e.enqueue(`test3`, `test4`, `test5`);
-  t.like(e.data, [`test0`, `test1`, `test2`]);
+  t.like(e.toArray(), [ `test0`, `test1`, `test2` ]);
 
   // Discard additions: let everything in
   e = immutable<string>(
@@ -116,7 +116,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   e = e.enqueue(`test3`, `test4`, `test5`);
-  t.like(e.data, [`test0`, `test1`, `test2`, `test3`, `test4`, `test5`]);
+  t.like(e.toArray(), [ `test0`, `test1`, `test2`, `test3`, `test4`, `test5` ]);
 
   // Older items are discarded (ie test0, test1) - partial flush
   let f = immutable<string>(
@@ -126,7 +126,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   f = f.enqueue(`test3`, `test4`, `test5`);
-  t.like(f.data, [`test2`, `test3`, `test4`, `test5`]);
+  t.like(f.toArray(), [ `test2`, `test3`, `test4`, `test5` ]);
 
   // Older items are discarded (ie test0, test1) - complete flush
   f = immutable<string>(
@@ -136,7 +136,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   f = f.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  t.like(f.data, [`test4`, `test5`, `test6`, `test7`]);
+  t.like(f.toArray(), [ `test4`, `test5`, `test6`, `test7` ]);
 
   // Older items are discarded (ie test0, test1) - exact flush
   f = immutable<string>(
@@ -146,7 +146,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   f = f.enqueue(`test3`, `test4`, `test5`);
-  t.like(f.data, [`test3`, `test4`, `test5`]);
+  t.like(f.toArray(), [ `test3`, `test4`, `test5` ]);
 
   // Newer items are discarded (ie test1, test2) - partial flush
   let g = immutable<string>(
@@ -156,7 +156,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`);
-  t.like(g.data, [`test0`, `test1`, `test2`, `test5`]);
+  t.like(g.toArray(), [ `test0`, `test1`, `test2`, `test5` ]);
 
   // Newer items are discarded (ie test1, test2) - complete flush
   g = immutable<string>(
@@ -166,7 +166,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  t.like(g.data, [`test4`, `test5`, `test6`, `test7`]);
+  t.like(g.toArray(), [ `test4`, `test5`, `test6`, `test7` ]);
 
   // Newer items are discarded (ie test1, test2) - exact flush
   g = immutable<string>(
@@ -176,7 +176,7 @@ test(`bounded`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`);
-  t.like(g.data, [`test3`, `test4`, `test5`]);
+  t.like(g.toArray(), [ `test3`, `test4`, `test5` ]);
 
   // One item past capacity with newer
   g = immutable<string>(
@@ -186,5 +186,21 @@ test(`bounded`, (t) => {
     `test2`
   );
   g = g.enqueue(`test3`);
-  t.like(g.data, [`test0`, `test1`, `test3`]);
+  t.like(g.toArray(), [ `test0`, `test1`, `test3` ]);
+});
+
+test(`bounded-2`, t => {
+  let q = immutable({ capacity: 5 });
+  let xCount = 1;
+  let yCount = 1;
+  const gen = () => ({ x: xCount++, y: yCount++ });
+
+  q = q.enqueue(gen());
+  q = q.enqueue(gen());
+  q = q.enqueue(gen());
+  q = q.enqueue(gen());
+  q = q.enqueue(gen());
+  q = q.enqueue(gen());
+
+  console.log(q.toArray());
 });
