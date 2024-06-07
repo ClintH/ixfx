@@ -2,6 +2,7 @@ import { type ToString, toStringDefault } from '../Util.js';
 import { type IsEqual } from '../IsEqual.js';
 import { isIterable } from './Iterable.js';
 export { slice } from './sync/Slice.js';
+export { reduce } from './sync/Reduce.js';
 
 export function* uniqueByValue<T>(input: Iterable<T>, toString: ToString<T> = toStringDefault, seen: Set<string> = new Set<string>()): Generator<T> {
   for (const v of input) {
@@ -303,16 +304,6 @@ export function* min<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b) {
   }
 }
 
-export function reduce<V>(
-  it: Iterable<V>,
-  f: (accumulator: V, current: V) => V,
-  start: V
-) {
-  // https://surma.github.io/underdash/
-
-  for (const v of it) start = f(start, v);
-  return start;
-}
 
 
 export function some<V>(it: Iterable<V>, f: (v: V) => boolean) {
