@@ -1,5 +1,9 @@
+import { reduce as IterableReduce } from '../iterables/sync/Reduce.js';
 import { throwNumberTest } from '../Guards.js';
 
+/**
+ * Logic for continuing repeats
+ */
 export type RepeatPredicate = (
   repeats: number,
   valuesProduced: number
@@ -7,9 +11,12 @@ export type RepeatPredicate = (
 
 
 /**
- * Calls and waits for the async function `fn` repeatedly, yielding each result asynchronously
- * The number of repeats is set by giving a number as the first parameter, or a function, which when returns _false, repeat stops.
- * Use {@link repeat} if `fn` does not need to be awaited. 
+ * Calls and waits for the async function `fn` repeatedly, yielding each result asynchronously.
+ * Use {@link repeat} if `fn` does not need to be awaited.
+ * 
+ * The number of repeats is determined by the first parameter. If it's a:
+ * - number: how many times to repeat
+ * - function: it gets called before each repeat, if it returns _false_ repeating stops.
  * 
  * Using a fixed number of repeats:
  * ```js
@@ -21,15 +28,21 @@ export type RepeatPredicate = (
  * });
  * ``` 
  * 
- * Using a function to dynamically determine number of repeats
+ * Using a function to dynamically determine number of repeats. The function gets
+ * passed the number of repeats so far as well as the number of values produced. This
+ * is count of non-undefined results from `cb` that is being repeated.
+ * 
  * ```js
+ * async function task() {
+ *  // do something
+ * }
+ * 
  * await Flow.repeatAwait(
  *  (repeats, valuesProduced) => {
+ *    // Logic for deciding whether to repeat or not
  *    if (repeats > 5) return false; // Stop repeating
  *  },
- *  async () => {
- *    await Flow.sleep(1);
- *  }
+ *  task
  * );
  * ```
  * 
@@ -40,8 +53,9 @@ export type RepeatPredicate = (
  *  // Loops 5 times, v is the return value of calling `fn` (Math.random)
  * }
  * ```
- * @param countOrPredicate Numnber of repeats, or a function that returns _false_ for when to stop.
+ * @param countOrPredicate Number of times to repeat, or a function that returns _false_ to stop the loop.
  * @param fn Function to execute. Asynchronous functions will be awited
+ * @template V Return type of repeating function
  * @returns Asynchronous generator of `fn` results.
  */
 export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined>): AsyncGenerator<V> {
@@ -50,9 +64,13 @@ export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (
 
 /**
  * Calls `fn` repeatedly, yielding each result.
- * The number of repeats is set by giving a number as the first parameter, or a function, which when returns _false, repeat stops.
  * Use {@link repeatAwait} if `fn` is asynchronous and you want to wait for it. 
  * 
+ * The number of repeats is determined by the first parameter. If it's a:
+ * - number: how many times to repeat
+ * - function: it gets called before each repeat, if it returns _false_ repeating stops.
+ * 
+ * Example: using a fixed number of repeats
  * ```js
  * // Results will be an array with five random numbers
  * const results = [...repeat(5, () => Math.random())];
@@ -62,19 +80,21 @@ export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (
  * }
  * ```
  * 
- * Using a function to dynamically determine number of repeats
+ * Example: Using a function to dynamically determine number of repeats
  * ```js
+ * function task() {
+ * }
+ * 
  * Flow.repeat(
  *  (repeats, valuesProduced) => {
  *    if (repeats > 5) return false; // Stop repeating
  *  },
- *  () => {
- *    // Do something
- *  }
+ *  task
  * );
  * ```
  * 
- * In the above cases we're not using the return value from `fn`. This would look like:
+ * In the above cases we're not using the return value from `fn`. To do so,
+ * this would look like:
  * ```js
  * const g = Flow.repeat(5, () => Math.random);
  * for (const v of g) {
@@ -87,6 +107,7 @@ export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (
  * * {@link Flow.interval} - if you want to repeatedly call something with an interval between
  * @param countOrPredicate Numnber of repeats, or a function that returns _false_ for when to stop.
  * @param fn Function to execute. Asynchronous functions will be awited
+ * @template V Return type of repeating function
  * @returns Asynchronous generator of `fn` results.
  */
 export function repeat<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => V | undefined): Generator<V> {
@@ -99,6 +120,7 @@ export function repeat<V>(countOrPredicate: number | RepeatPredicate, fn: (repea
  * Yields result of `fn` asynchronously
  * @param predicate 
  * @param fn 
+ * @template V Return type of repeating function
  */
 async function* repeatWhileAwaited<V>(predicate: RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined>): AsyncGenerator<V> {
   let repeats = 0;
@@ -114,8 +136,9 @@ async function* repeatWhileAwaited<V>(predicate: RepeatPredicate, fn: (repeats: 
 
 /**
  * Calls `fn` until `predicate` returns _false_. Yields result of `fn`.
- * @param predicate 
- * @param fn 
+ * @param predicate Determiner for whether repeating continues
+ * @param fn Function to call
+ * @template V Return type of repeating function
  */
 function* repeatWhile<V>(predicate: RepeatPredicate, fn: (repeats: number, valuesProduced: number) => V | undefined): Generator<V> {
   let repeats = 0;
@@ -132,8 +155,9 @@ function* repeatWhile<V>(predicate: RepeatPredicate, fn: (repeats: number, value
 /**
  * Calls `fn`, `count` number of times, waiting for the result of `fn`.
  * Yields result of `fn` asynchronously
- * @param count 
- * @param fn 
+ * @param count Number of times to run
+ * @param fn Function to run
+ * @template V Return type of repeating function
  */
 async function* repeatTimesAwaited<V>(count: number, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined> | V | undefined) {
   throwNumberTest(count, `positive`, `count`);
@@ -150,8 +174,9 @@ async function* repeatTimesAwaited<V>(count: number, fn: (repeats: number, value
 
 /**
  * Calls `fn`, `count` times. Assumes a synchronous function. Yields result of `fn`.
- * @param count 
- * @param fn 
+ * @template V Return type of repeating function
+ * @param count Number of times to run
+ * @param fn Function to run
  */
 function* repeatTimes<V>(count: number, fn: (repeats: number, valuesProduced: number) => V | undefined): Generator<V> {
   throwNumberTest(count, `positive`, `count`);
@@ -178,36 +203,40 @@ function* repeatTimes<V>(count: number, fn: (repeats: number, valuesProduced: nu
  * repeatReduce(10, Math.random, (acc, v) => acc * v);
  * // Yields a single number
  * ```
- * @param countOrPredicate
- * @param fn
- * @param initial
- * @param reduce
- * @returns
+ * @param countOrPredicate Number of times to run, or function to keep running
+ * @param fn Function to call
+ * @param initial Initial value
+ * @param reduce Function to reduce value
+ * @template V Return type of repeating function
+ * @returns Final result
  */
-export const repeatReduce = <V>(
-  countOrPredicate: number | RepeatPredicate,
-  fn: () => V | undefined,
-  initial: V,
-  reduce: (accumulator: V, value: V) => V
-): V => {
-  if (typeof countOrPredicate === `number`) {
-    throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
-    while (countOrPredicate-- > 0) {
-      const v = fn();
-      if (v === undefined) continue;
-      initial = reduce(initial, v);
-    }
-  } else {
-    //eslint-disable-next-line functional/no-let
-    let repeats, valuesProduced;
-    repeats = valuesProduced = 0;
-    while (countOrPredicate(repeats, valuesProduced)) {
-      repeats++;
-      const v = fn();
-      if (v === undefined) continue;
-      initial = reduce(initial, v);
-      valuesProduced++;
-    }
-  }
-  return initial;
-};
+// export const repeatReduce = <V>(
+//   countOrPredicate: number | RepeatPredicate,
+//   fn: () => V | undefined,
+//   reduce: (accumulator: V, value: V) => V,
+//   initial: V
+// ): V => {
+
+//   return IterableReduce(repeat(countOrPredicate, fn), reduce, initial);
+
+//   // if (typeof countOrPredicate === `number`) {
+//   //   throwNumberTest(countOrPredicate, `positive`, `countOrPredicate`);
+//   //   while (countOrPredicate-- > 0) {
+//   //     const v = fn();
+//   //     if (v === undefined) continue;
+//   //     initial = reduce(initial, v);
+//   //   }
+//   // } else {
+//   //   //eslint-disable-next-line functional/no-let
+//   //   let repeats, valuesProduced;
+//   //   repeats = valuesProduced = 0;
+//   //   while (countOrPredicate(repeats, valuesProduced)) {
+//   //     repeats++;
+//   //     const v = fn();
+//   //     if (v === undefined) continue;
+//   //     initial = reduce(initial, v);
+//   //     valuesProduced++;
+//   //   }
+//   // }
+//   // return initial;
+// };
