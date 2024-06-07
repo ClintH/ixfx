@@ -1,8 +1,8 @@
 import test from 'ava';
 import { PriorityMutable } from '../../../collections/queue/PriorityMutable.js';
 
-test(`pq-basic`, (t) => {
-  const p1 = new PriorityMutable();
+test(`basic`, (t) => {
+  const p1 = new PriorityMutable<string>();
   p1.enqueueWithPriority(`low`, 2);
   p1.enqueueWithPriority(`high`, 4);
   p1.enqueueWithPriority(`medium`, 3);
