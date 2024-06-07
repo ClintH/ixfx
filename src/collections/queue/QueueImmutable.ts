@@ -7,7 +7,7 @@ import { type QueueOpts } from './index.js';
 // -------------------------------
 export class QueueImmutable<V> implements IQueueImmutable<V> {
   readonly opts: QueueOpts<V>;
-  readonly data: ReadonlyArray<V>;
+  #data: ReadonlyArray<V>;
 
   /**
    * Creates an instance of Queue.
@@ -19,46 +19,51 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
     if (opts === undefined) throw new Error(`opts parameter undefined`);
 
     this.opts = opts;
-    this.data = data;
+    this.#data = data;
   }
 
   forEach(fn: (v: V) => void) {
     //eslint-disable-next-line functional/no-let
-    for (let index = this.data.length - 1; index >= 0; index--) {
-      fn(this.data[ index ]);
+    for (let index = this.#data.length - 1; index >= 0; index--) {
+      fn(this.#data[ index ]);
     }
   }
 
   forEachFromFront(fn: (v: V) => void) {
     // From front of queue
-    this.data.forEach(fn); //(vv) => fn(vv));
+    // eslint-disable-next-line unicorn/no-array-for-each
+    this.#data.forEach(item => { fn(item) }); //(vv) => fn(vv));
   }
 
-  enqueue(...toAdd: ReadonlyArray<V>): QueueImmutable<V> {
+  enqueue(...toAdd: ReadonlyArray<V> | Array<V>): QueueImmutable<V> {
     return new QueueImmutable<V>(
       this.opts,
-      enqueue(this.opts, this.data, ...toAdd)
+      enqueue(this.opts, this.#data, ...toAdd)
     );
   }
 
   dequeue(): QueueImmutable<V> {
-    return new QueueImmutable<V>(this.opts, dequeue(this.opts, this.data));
+    return new QueueImmutable<V>(this.opts, dequeue(this.opts, this.#data));
   }
 
   get isEmpty(): boolean {
-    return isEmpty(this.opts, this.data);
+    return isEmpty(this.opts, this.#data);
   }
 
   get isFull(): boolean {
-    return isFull(this.opts, this.data);
+    return isFull(this.opts, this.#data);
   }
 
   get length(): number {
-    return this.data.length;
+    return this.#data.length;
   }
 
   get peek(): V | undefined {
-    return peek(this.opts, this.data);
+    return peek(this.opts, this.#data);
+  }
+
+  toArray() {
+    return [ ...this.#data ];
   }
 }
 
