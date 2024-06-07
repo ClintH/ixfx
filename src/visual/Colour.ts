@@ -96,8 +96,6 @@ const rgbToColorJs = (rgb: Rgb): Color => {
 /**
  * Returns a colour in the best-possible CSS colour form.
  * The return value can be used setting colours in the canvas or DOM manipulations.
- * 
- * See also: {@link toHslaString} 
  * @param colour 
  */
 export const toString = (colour: Colourish): string => {
@@ -225,7 +223,6 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
     if (colour === undefined) continue;
     if (colour === null) continue;
     const c = resolve(colour);
-    const hsl = c.hsl;
     return c.display();
   }
   return `rebeccapurple`;
