@@ -2,6 +2,19 @@
 import test from 'ava';
 import { mutable } from '../../collections/queue/QueueMutable.js';
 
+test(`remove`, t => {
+  const a = mutable<string>();
+  a.enqueue(`test0`, `test1`, `test2`, `test3`, `test4`);
+  t.deepEqual(a.toArray(), [ `test0`, `test1`, `test2`, `test3`, `test4` ]);
+  t.is(a.length, 5);
+  t.is(a.peek, `test0`);
+
+  const l = a.removeWhere(v => v === `test2`);
+  t.is(l, 1);
+
+  t.deepEqual(a.toArray(), [ `test0`, `test1`, `test3`, `test4` ]);
+});
+
 test(`basic`, (t) => {
   const a = mutable<string>();
 
@@ -19,7 +32,7 @@ test(`basic`, (t) => {
   t.false(a.isEmpty);
   t.false(a.isFull);
 
-  t.like(a.data, [`test0`, `test1`]);
+  t.like(a.toArray(), [ `test0`, `test1` ]);
   t.true(a.peek === `test0`);
 
   // Remove from front of queue
@@ -55,21 +68,21 @@ test('bounded older', (t) => {
 
   t.true(qOlder1.length === 3);
   t.true(qOlder1.isFull);
-  t.like(qOlder1.data, [`b`, `c`, `d`]);
+  t.like(qOlder1.toArray(), [ `b`, `c`, `d` ]);
   t.true(qOlder2.length === 3);
   t.true(qOlder2.isFull);
-  t.like(qOlder2.data, [`b`, `c`, `d`]);
+  t.like(qOlder2.toArray(), [ `b`, `c`, `d` ]);
 
   qOlder1.enqueue(`e`, `f`, `g`);
   qOlder2.enqueue(`e`);
   qOlder2.enqueue(`f`);
   qOlder2.enqueue(`g`);
 
-  t.like(qOlder1.data, [`e`, `f`, `g`]);
+  t.like(qOlder1.toArray(), [ `e`, `f`, `g` ]);
   t.true(qOlder1.length === 3);
   t.true(qOlder1.isFull);
 
-  t.like(qOlder2.data, [`e`, `f`, `g`]);
+  t.like(qOlder2.toArray(), [ `e`, `f`, `g` ]);
   t.true(qOlder2.length === 3);
   t.true(qOlder2.isFull);
 });
@@ -88,7 +101,7 @@ test('bounded newer', (t) => {
   q1.enqueue(`a`, `b`, `c`, `d`);
   t.true(q1.length === 3);
   t.true(q1.isFull);
-  t.like(q1.data, [`a`, `b`, `d`]);
+  t.like(q1.toArray(), [ `a`, `b`, `d` ]);
 
   // Add in series
   q2.enqueue(`a`);
@@ -97,18 +110,18 @@ test('bounded newer', (t) => {
   q2.enqueue(`d`);
   t.true(q2.length === 3);
   t.true(q2.isFull);
-  t.like(q2.data, [`a`, `b`, `d`]);
+  t.like(q2.toArray(), [ `a`, `b`, `d` ]);
 
   // Batch
   q1.enqueue(`e`, `f`);
-  t.like(q1.data, [`a`, `b`, `f`]);
+  t.like(q1.toArray(), [ `a`, `b`, `f` ]);
   t.true(q1.length === 3);
   t.true(q1.isFull);
 
   // Sequence
   q2.enqueue(`e`);
   q2.enqueue(`f`);
-  t.like(q2.data, [`a`, `b`, `f`]);
+  t.like(q2.toArray(), [ `a`, `b`, `f` ]);
   t.true(q2.length === 3);
   t.true(q2.isFull);
 });
@@ -121,7 +134,7 @@ test('bounded additions', (t) => {
   q1.enqueue(`a`, `b`, `c`, `d`);
   t.true(q1.length === 3);
   t.true(q1.isFull);
-  t.like(q1.data, [`a`, `b`, `c`]);
+  t.like(q1.toArray(), [ `a`, `b`, `c` ]);
 
   const q2 = mutable<string>({ capacity: 3, discardPolicy: 'additions' });
   q2.enqueue(`a`);
@@ -130,17 +143,17 @@ test('bounded additions', (t) => {
   q2.enqueue(`d`);
   t.true(q2.length === 3);
   t.true(q2.isFull);
-  t.like(q2.data, [`a`, `b`, `c`]);
+  t.like(q2.toArray(), [ `a`, `b`, `c` ]);
 
   q1.enqueue(`e`, `f`, `g`);
-  t.like(q1.data, [`a`, `b`, `c`]);
+  t.like(q1.toArray(), [ `a`, `b`, `c` ]);
   t.true(q1.length === 3);
   t.true(q1.isFull);
 
   q2.enqueue(`e`);
   q2.enqueue(`f`);
   q2.enqueue(`g`);
-  t.like(q2.data, [`a`, `b`, `c`]);
+  t.like(q2.toArray(), [ `a`, `b`, `c` ]);
   t.true(q2.length === 3);
   t.true(q2.isFull);
 
