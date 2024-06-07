@@ -47,6 +47,8 @@ export interface IQueueMutable<V> {
 
   /**
    * Dequeues (removes oldest item / item at front of queue)
+   * 
+   * Use {@link peek} to look at the item at front of queue without removing it.
    * @returns Item, or undefined if queue is empty
    */
   readonly dequeue: () => V | undefined;
@@ -80,13 +82,30 @@ export interface IQueueMutable<V> {
   get isEmpty(): boolean;
 
   /**
- * Removes values that match `predicate`.
- * See also {@link remove} if to remove a value based on equality checking.
- * @param predicate 
- * @returns Returns number of items removed.
- */
+   * Removes values that match `predicate`.
+   * 
+   * ```js
+   * // Eg queue of strings, compare by value
+   * queue.removeWhere(v => v === `someValue`);
+   * 
+   * // Eg queue of objects, compare by reference
+   * queue.removeWhere(v => v === someTarget);
+   * 
+   * // Eg use ixfx function to compare value of objects, regardless of key ordering
+   * queue.removeWhere(v => isEqualValueIgnoreOrder(v, someTarget));
+   * ```
+   * @param predicate 
+   * @returns Returns number of items removed.
+   */
   removeWhere(predicate: (item: V) => boolean): number
 
+  /**
+   * Returns the item at given rank (0 being front of queue)
+   * @param index 
+   */
   at(index: number): V;
+  /**
+   * Clears the queue
+   */
   clear(): void;
 }
