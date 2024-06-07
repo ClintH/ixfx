@@ -465,7 +465,7 @@ export const from = (
 ): Point => {
   if (Array.isArray(xOrArray)) {
     if (xOrArray.length !== 2) {
-      throw new Error(`Expected array of length two, got ` + xOrArray.length);
+      throw new Error(`Expected array of length two, got ${ xOrArray.length }`);
     }
     return Object.freeze({
       x: xOrArray[ 0 ],
@@ -1206,15 +1206,10 @@ export function rotate(
   const ptAr = pt as ReadonlyArray<Point>;
   for (const [ index, p ] of ptAr.entries()) guard(p, `pt[${ index }]`);
 
-  //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const asPolar = ptAr.map((p) => Polar.fromCartesian(p, origin!));
+  const asPolar = ptAr.map((p) => Polar.fromCartesian(p, origin));
   const rotated = asPolar.map((p) => Polar.rotate(p, amountRadian));
   const asCartesisan = rotated.map((p) => Polar.toCartesian(p, origin));
   return arrayInput ? asCartesisan : asCartesisan[ 0 ];
-
-  //const p = Polar.fromCartesian(pt, origin);
-  //const pp = Polar.rotate(p, amountRadian);
-  //return Polar.toCartesian(pp, origin);
 }
 
 //eslint-disable-next-line functional/prefer-readonly-type
