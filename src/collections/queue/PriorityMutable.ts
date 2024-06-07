@@ -40,7 +40,7 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
     }
     if (toDelete === undefined && !addIfMissing) throw new Error(`Item not found in priority queue. Item: ${ JSON.stringify(item) }`);
     if (toDelete !== undefined) {
-      this.remove(toDelete);
+      this.removeWhere(item => toDelete === item)
     }
     this.enqueueWithPriority(item, priority);
   }
@@ -48,14 +48,14 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
   dequeueMax(): V | undefined {
     const m = IterablesMax(this.data, v => v.priority);
     if (m === undefined) return;
-    this.remove(m);
+    this.removeWhere(item => item === m);
     return m.item;
   }
 
   dequeueMin(): V | undefined {
     const m = IterablesMin(this.data, v => v.priority);
     if (m === undefined) return;
-    this.remove(m);
+    this.removeWhere(item => item === m);
     return m.item;
   }
 
