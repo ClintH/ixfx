@@ -26,7 +26,7 @@ export * from './ScaleCanvas.js';
  * Colour interpolation, scale generation and parsing
  *
  * Overview
- * * {@link interpolate}: Blend colours
+ * * {@link interpolator}: Blend colours
  * * {@link scale}: Produce colour scale
  * * {@link opacity}: Give a colour opacity
  * * {@link randomHue}: Generate a random hue
