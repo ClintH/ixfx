@@ -80,7 +80,8 @@ export const objectProxy = <V extends object>(target: V): { proxy: V, rx: Reacti
  * });
  * ```
  * 
- * This means of access can be useful as the return result is a bit neater, being a single object instead of two. 
+ * This means of access can be useful as the return result
+ * is a bit neater, being a single object instead of two. 
  * @param target 
  * @returns 
  */
