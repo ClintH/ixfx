@@ -3,6 +3,9 @@ import { sleep } from './Sleep.js';
 
 import { type AsyncPromiseOrGenerator } from './Types.js';
 
+/**
+ * Options for interval
+ */
 export type IntervalOpts = {
   /**
    * Sleep a fixed period of time regardless of how long each invocation of 'produce' takes
@@ -19,15 +22,17 @@ export type IntervalOpts = {
   readonly signal?: AbortSignal;
   /**
    * When to perform delay. Default is before 'produce' is invoked.
+   * Default: 'before'
    */
   readonly delay?: `before` | `after`;
 };
+
 /**
  * Generates values from `produce` with a time delay.
  * `produce` can be a simple function that returns a value, an async function, or a generator.
  * If `produce` returns _undefined_, generator exits.
  * 
- * @example Produce a random number every 500ms:
+ * @example Produce a random number every 500ms
  * ```
  * const randomGenerator = interval(() => Math.random(), 500);
  * for await (const r of randomGenerator) {
@@ -36,7 +41,7 @@ export type IntervalOpts = {
  * }
  * ```
  *
- * @example Return values from a generator every 500ms:
+ * @example Return values from a generator every 500ms
  * ```js
  * import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
  * import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
@@ -45,15 +50,17 @@ export type IntervalOpts = {
  * }
  * ```
  *
- * Options allow either fixed interval (wait this long between iterations), or a minimum interval (wait at least this long).
- * The latter is useful if `produce` takes some time - it will only wait the remaining time or not at all.
- *
- * If you just want to loop at a certain speed, consider using {@link continuously} instead.
+ * Options allow either fixed interval (wait this long between iterations), or a minimum interval (wait at least this long). The latter is useful if `produce` takes some time - it will only wait the remaining time or not at all.
  *
  * If the AbortSignal is triggered, an exception will be thrown, stopping iteration.
+ * 
+ * Alternatives:
+ * * {@link continuously}: loop that runs at a constant speed. Able to be started and stopped
+ * * {@link repeat}: run a function a certain number of times, collecting results
+ *
  * @template V Returns value of `produce` function
- * @param produce Function, generator to use
- * @param opts Options
+ * @param produce Function/generator to use
+ * @param opts Options for interval
  * @template V Data type
  * @returns
  */
@@ -61,8 +68,6 @@ export const interval = async function* <V>(
   produce: AsyncPromiseOrGenerator<V> | ArrayLike<V>,
   optsOrFixedMs: IntervalOpts | number = {}
 ): AsyncGenerator<V> {
-  //eslint-disable-next-line functional/no-let
-  let cancelled = false;
   const opts =
     typeof optsOrFixedMs === `number`
       ? { fixed: optsOrFixedMs }
@@ -70,12 +75,12 @@ export const interval = async function* <V>(
 
   const signal = opts.signal;
   const when = opts.delay ?? `before`;
-  //eslint-disable-next-line functional/no-let
+  const minIntervalMs = opts.minimum ? intervalToMs(opts.minimum) : undefined;
+
+  let cancelled = false;
   let sleepMs = intervalToMs(opts.fixed) ?? intervalToMs(opts.minimum, 0);
-  //eslint-disable-next-line functional/no-let
   let started = performance.now();
 
-  const minIntervalMs = opts.minimum ? intervalToMs(opts.minimum) : undefined;
   const doDelay = async () => {
     const elapsed = performance.now() - started;
     if (typeof minIntervalMs !== `undefined`) {
@@ -99,7 +104,6 @@ export const interval = async function* <V>(
   try {
     while (!cancelled) {
       if (when === `before`) await doDelay();
-      //if (cancelled) return;
       if (typeof produce === `function`) {
         // Returns V or Promise<V>
         const result = await produce();
