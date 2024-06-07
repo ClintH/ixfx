@@ -1,8 +1,6 @@
 import test from 'ava';
 import { QueueMutable } from '../../../collections/queue/QueueMutable.js';
-import { asResponsive } from '../../../collections/queue/Responsive.js';
 import { arrayValuesEqual } from '../../Include.js';
-import { sleep } from '../../../flow/Sleep.js';
 import { SyncWait } from '../../../flow/SyncWait.js';
 
 test(`events`, async t => {
@@ -43,7 +41,6 @@ test(`events`, async t => {
   await sw.forSignal();
   t.deepEqual(lastDequeuedData, { removed: `2`, finalData: [] });
 
-
   const qm3 = new QueueMutable<string>();
   qm3.enqueue(`1`, `2`);
   qm3.addEventListener(`removed`, event => {
@@ -59,23 +56,7 @@ test(`events`, async t => {
   qm3.removeWhere(v => v === `4`);
   await sw.forSignal();
   t.deepEqual(lastRemovedData, { removed: [ `4` ], finalData: [ `3`, `5` ] });
-
 });
-
-// test(`responsive`, async t => {
-//   const a = new QueueMutable<string>();
-//   const r = asResponsive(a);
-
-//   const seen: Array<ReadonlyArray<string>> = [];
-//   r.value(value => {
-//     seen.push(value);
-//   });
-
-//   a.enqueue(`1`);
-//   await sleep(20);
-//   console.log(seen);
-//   t.is(seen, [ [ `1` ] ]);
-// });
 
 test(`basic`, (t) => {
   const a = new QueueMutable<string>();
