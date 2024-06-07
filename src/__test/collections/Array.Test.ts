@@ -5,6 +5,7 @@ import {
   mergeByKey,
   ensureLength,
   remove,
+  piecewise,
   compareValues,
   compareValuesEqual,
   containsDuplicateValues,
@@ -17,6 +18,23 @@ import {
 } from '../../collections/arrays/index.js';
 import { arrayValuesEqual } from '../Include.js';
 import { valuesEqual } from '../../collections/arrays/ValuesEqual.js';
+
+test('piecewise', t => {
+  const r1 = [ ...piecewise([ 1, 2, 3, 4 ]) ];
+  t.deepEqual(r1, [
+    [ 1, 2 ], [ 2, 3 ], [ 3, 4 ]
+  ]);
+  const r2 = [ ...piecewise([ 1, 2, 3, 4, 5 ]) ];
+  t.deepEqual(r2, [
+    [ 1, 2 ], [ 2, 3 ], [ 3, 4 ], [ 4, 5 ]
+  ]);
+
+  t.throws(() => [ ...piecewise([]) ]);
+  t.throws(() => [ ...piecewise([ 1 ]) ]);
+  // @ts-expect-error
+  t.throws(() => [ ...piecewise('hello') ]);
+
+});
 
 test('without', t => {
 
