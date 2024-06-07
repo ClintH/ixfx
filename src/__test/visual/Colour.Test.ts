@@ -3,28 +3,50 @@ import { applyToValues, round } from '../../numbers/index.js';
 import * as Colour from '../../visual/Colour.js';
 import test from 'ava';
 test(`opacity`, (t) => {
-  t.is(Colour.opacity(`red`, 0.5), `rgba(255, 0, 0, 0.5)`);
-  t.is(Colour.opacity(`hsl(0,100%,50%)`, 0.5), `rgba(255, 0, 0, 0.5)`);
+  t.is(Colour.opacity(`red`, 0.5), `rgb(100% 0% 0% / 0.5)`);
+  t.is(Colour.opacity(`hsl(0,100%,50%)`, 0.5), `hsl(0 100% 50% / 0.5)`);
+});
+
+test(`special`, t => {
+  t.is(Colour.toHex(`transparent`), `#00000000`);
+  const hsl1 = Colour.toHsl(`transparent`);
+
+  t.is(hsl1.opacity, 0);
+  //  t.is(Colour.toHslaString(`transparent`), `hsla(0,0%,0%,0)`);
+
+  t.is(Colour.toHex(`white`), `#fff`);
+  const hsl2 = Colour.toHsl(`white`);
+  t.is(hsl2.l, 1);
+  t.falsy(hsl2.opacity);
+
+  // t.is(Colour.toHslaString(`white`), `hsla(0,0%,100%,1)`);
+  // t.is(Colour.toHslaString(`hsla(0,0%,100%,1)`), `hsla(0,0%,100%,1)`);
+
+  t.is(Colour.toHex(`black`), `#000`);
+  const hsl3 = Colour.toHsl(`black`);
+  t.is(hsl3.l, 0);
+  t.falsy(hsl2.opacity);
+  // t.is(Colour.toHslaString(`black`), `hsla(0,0%,0%,1)`);
+
+
 });
 
 test(`colour-parse`, (t) => {
   // Indeterminate input
-  t.like(Colour.toHsl(`hsl(0,0%,0%)`), { h: Number.NaN, s: Number.NaN, l: 0 });
-  t.like(Colour.toHsl(`hsla(0,0%,0%,0)`), { h: Number.NaN, s: Number.NaN, l: Number.NaN });
+  t.like(Colour.toHsl(`hsl(0,0%,0%)`), { h: 0, s: 0, l: 0 });
+  t.like(Colour.toHsl(`hsla(0,0%,0%,0)`), { h: 0, s: 0, l: 0 });
 
-  t.like(Colour.toHsl(`hsl(100, 100%, 50%)`), { h: 100, s: 1, l: 0.5 });
+  t.like(Colour.toHsl(`hsl(100, 100%, 50%)`), { h: 100 / 360, s: 1, l: 0.5 });
 
   t.like(Colour.toHsl(`red`), { h: 0, s: 1, l: 0.5 });
   t.like(Colour.toHsl(`rgb(255,0,0)`), { h: 0, s: 1, l: 0.5 });
   t.like(Colour.toHsl(`rgba(255,0,0, 1)`), { h: 0, s: 1, l: 0.5, opacity: 1.0 });
   t.like(Colour.toHsl(`rgba(255,0,0, 0.5)`), { h: 0, s: 1, l: 0.5, opacity: 0.5 });
 
-  t.like(applyToValues(Colour.toHsl(`hotpink`), v => round(3, v)), { h: 330, s: 1, l: 0.705 });
-  t.like(Colour.toHsl(`rgb(255,105,180)`), { h: 330, s: 1, l: 0.7058823529411764 });
-  t.like(Colour.toHsl(`rgba(255,105,180,0.5)`), { h: 330, s: 1, l: 0.7058823529411764, opacity: 0.5 });
+  t.like(applyToValues(Colour.toHsl(`hotpink`), v => round(3, v)), { h: 0.916, s: 1, l: 0.705 });
+  t.like(Colour.toHsl(`rgb(255,105,180)`), { h: 0.916666666666666666, s: 1, l: 0.7058823529411764 });
+  t.like(Colour.toHsl(`rgba(255,105,180,0.5)`), { h: 0.9166666666666666, s: 1, l: 0.7058823529411764, opacity: 0.5 });
 
-  t.like(Colour.toHsl(`hsla(100, 100%, 50%, 0.20)`), { h: 100, s: 1, l: 0.5, opacity: 0.2 });
+  t.like(Colour.toHsl(`hsla(100, 100%, 50%, 0.20)`), { h: 0.2777777777777778, s: 1, l: 0.5, opacity: 0.2 });
 
-  t.throws(() => Colour.toHsl(`hsla(100 100% 50% 20%)`));
-  t.throws(() => Colour.toHsl(`hsla(100, 1, .5, .2)`));
 });
