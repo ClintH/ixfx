@@ -24,10 +24,11 @@ type GuardResult = GuardResultFail | GuardResultOk;
 /**
  * Checks if `t` is not a number or within specified range.
  * Returns `[false, reason:string]` if invalid or `[true]` if valid.
+ * Use {@link throwNumberTest} to throw an error rather than return result.
  * 
- * Use an empty string for no special range constraints.
  * Alternatives: {@link integer} for additional integer check, {@link percent} for percentage-range.
  *
+ * * (empty, default): must be a number type and not NaN.
  * * positive: must be at least zero
  * * negative: must be zero or lower
  * * aboveZero: must be above zero
@@ -102,6 +103,24 @@ export const numberTest = (
   return [ true ];
 };
 
+/**
+ * Checks if `t` is not a number or within specified range.
+ * Throws if invalid. Use {@link numberTest} to test without throwing.
+ *
+* * (empty, default): must be a number type and not NaN.
+* * positive: must be at least zero
+* * negative: must be zero or lower
+* * aboveZero: must be above zero
+* * belowZero: must be below zero
+* * percentage: must be within 0-1, inclusive
+* * nonZero: can be anything except zero
+* * bipolar: can be -1 to 1, inclusive
+* 
+ * Alternatives: {@link integer} for additional integer check, {@link percent} for percentage-range.
+ * @param value Value to test
+ * @param range Range
+ * @param parameterName Name of parameter 
+ */
 export const throwNumberTest = (value?: unknown,
   range: NumberGuardRange = ``,
   parameterName = `?`) => {
