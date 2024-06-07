@@ -29,7 +29,7 @@
     "./guards.js": "./dist/guards.js",
     "./global.js": "./dist/global.js",
     "./immutable.js": "./dist/immutable.js",
-    "./iterables.js":"./dist/iterable.js",
+    "./iterables.js": "./dist/iterable.js",
     "./io.js": "./dist/io/js",
     "./keyValues.js": "./dist/keyValues.js",
     "./modulation.js": "./dist/modulation.js",
@@ -78,7 +78,10 @@
     "coverage:report": "c8 report"
   },
   "c8": {
-    "exclude": ["src/__test/**/*", "src/config/**/*"]
+    "exclude": [
+      "src/__test/**/*",
+      "src/config/**/*"
+    ]
   },
   "devDependencies": {
     "@ava/typescript": "^5.0.0",
@@ -115,6 +118,7 @@
     "@septh/ts-run": "^1.2.3",
     "@types/bezier-js": "^4.1.3",
     "bezier-js": "^6.1.4",
+    "colorjs.io": "^0.5.0",
     "d3-color": "^3.1.0",
     "json5": "^2.2.3",
     "lit": "^3.1.3",
