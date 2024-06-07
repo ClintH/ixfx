@@ -1,5 +1,22 @@
 A rough changelog between NPM releases
 
+# 0.21.0 24.06.07
+
+Collections
++ QueueMutable: Added events for changes.
++ Arrays.piecewise: Combine array elements into piecewise pairs.
++ Queue.asResponsive: wrap a QueueMutable as a Responsive object.
+
+Visual
+* Colour: use Color.js instead of d3 libraries for interpolation & colour parsing
+* Colour.resolveToString(): convert some kind of colour representation into a CSS string. Support CSS variables too.
+* BipolarView: Option to show recent values as a trail and flip y axis
+
+Flow
++ TaskQueueMutable: queue a bunch of functions and have them be run in sequence
++ SyncWait: simple synchronisation object that waits until a signal happens
+* updateOutdated: Use Interval type instead of millis
+
 # 0.20.3
 
 Data

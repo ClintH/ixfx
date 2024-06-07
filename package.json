@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.20.5",
+  "version": "0.21.0",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -107,15 +107,15 @@
     "tsup": "^8.1.0",
     "tsx": "^4.13.2",
     "typedoc": "^0.25.13",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
+    "typescript": "^5.4.5",
     "@types/bezier-js": "^4.1.3",
     "bezier-js": "^6.1.4",
     "colorjs.io": "^0.5.0",
     "json5": "^2.2.3",
     "lit": "^3.1.4",
     "lit-html": "^3.1.4"
+  },
+  "dependencies": {
   },
   "eslintIgnore": [
     "./dist/**/*"
