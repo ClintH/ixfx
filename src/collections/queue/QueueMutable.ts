@@ -1,10 +1,13 @@
-import { type IQueueMutable } from './IQueueMutable.js';
+import { type IQueueMutable, type IQueueMutableWithEvents, type QueueMutableEvents } from './IQueueMutable.js';
 import { enqueue, peek, dequeue, isEmpty, isFull } from './QueueFns.js';
 import { type QueueOpts } from './QueueTypes.js';
-import { without } from '../arrays/index.js';
 import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
+import { SimpleEventEmitter } from '../../Events.js';
+
 /**
- * Returns a mutable queue. Queues are useful if you want to treat 'older' or 'newer'
+ * Mutable queue that fires events when manipulated.
+ * 
+ * Queues are useful if you want to treat 'older' or 'newer'
  * items differently. _Enqueing_ adds items at the back of the queue, while
  * _dequeing_ removes items from the front (ie. the oldest).
  *
@@ -19,17 +22,36 @@ import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
  * const q = Queues.mutable({capacity: 5, discardPolicy: `newer`});
  * ```
  *
+ * Events can be used to monitor data flows.
+ * * 'enqueue': fires when item(s) are added
+ * * 'dequeue': fires when an item is dequeued from front
+ * * 'removed': fires when an item is dequeued, queue is cleared or .removeWhere is used to trim queue
+ * 
+ * Each of the event handlers return the state of the queue as the 'finalData'
+ * field.
+ * 
+ * ```js
+ * q.addEventListener(`enqueue`, e => {
+ *  // e.added, e.finalData
+ * });
+ * q.addEventListener(`removed`, e => {
+ *  // e.removed, e.finalData
+ * });
+ * q.addEventListener(`dequeue`, e=> {
+ *  // e.removed, e.finalData
+ * })
+ * ```
  * @template V Data type of items
  * @param opts
  * @param startingItems Items are added in array order. So first item will be at the front of the queue.
  */
-export class QueueMutable<V> implements IQueueMutable<V> {
+export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> implements IQueueMutable<V> {
   readonly opts: QueueOpts<V>;
-  // eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V>;
   eq: IsEqual<V>;
 
   constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
+    super();
     if (opts === undefined) throw new Error(`opts parameter undefined`);
     this.opts = opts;
     this.data = data;
@@ -37,7 +59,16 @@ export class QueueMutable<V> implements IQueueMutable<V> {
   }
 
   clear() {
+    const copy = [ ...this.data ];
     this.data = [];
+    this.fireEvent(`removed`, { finalData: this.data, removed: copy });
+    this.onClear();
+  }
+
+  /**
+   * Called when all data is cleared
+   */
+  protected onClear() { /** no-op */
   }
 
   at(index: number): V {
@@ -47,18 +78,15 @@ export class QueueMutable<V> implements IQueueMutable<V> {
     return v;
   }
 
-  /**
-   * Return a copy of the array
-   * @returns 
-   */
-  toArray() {
-    return [ ...this.data ];
+  enqueue(...toAdd: ReadonlyArray<V>): number {
+    this.data = enqueue(this.opts, this.data, ...toAdd);
+    const length = this.data.length;
+    this.onEnqueue(this.data, toAdd);
+    return length;
   }
 
-  enqueue(...toAdd: ReadonlyArray<V>): number {
-    /* eslint-disable-next-line functional/immutable-data */
-    this.data = enqueue(this.opts, this.data, ...toAdd);
-    return this.data.length;
+  protected onEnqueue(result: ReadonlyArray<V>, attemptedToAdd: ReadonlyArray<V>) {
+    this.fireEvent(`enqueue`, { added: attemptedToAdd, finalData: result });
   }
 
   dequeue(): V | undefined {
@@ -66,32 +94,35 @@ export class QueueMutable<V> implements IQueueMutable<V> {
     if (v === undefined) return;
     /* eslint-disable-next-line functional/immutable-data */
     this.data = dequeue(this.opts, this.data);
+    this.fireEvent(`dequeue`, { removed: v, finalData: this.data });
+    this.onRemoved([ v ], this.data);
     return v;
   }
 
-  /**
-   * Remove value from queue, regardless of position.
-   * Returns _true_ if something was removed.
-   * 
-   * See also {@link removeWhere} to remove based on a predicate
-   * @param value 
-   */
-  remove(value: V, comparer?: IsEqual<V>): boolean {
-    const length = this.data.length;
-    this.data = without(this.data, value, comparer ?? this.eq);
-    return this.data.length !== length;
+  protected onRemoved(removed: ReadonlyArray<V>, finalData: ReadonlyArray<V>) {
+    this.fireEvent(`removed`, { removed, finalData });
   }
 
   /**
    * Removes values that match `predicate`.
-   * See also {@link remove} if to remove a value based on equality checking.
    * @param predicate 
    * @returns Returns number of items removed.
    */
-  removeWhere(predicate: (item: V) => boolean) {
+  removeWhere(predicate: (item: V) => boolean): number {
     const countPre = this.data.length;
-    this.data = this.data.filter((element) => predicate(element));
+    const toRemove = this.data.filter(v => predicate(v));
+    if (toRemove.length === 0) return 0;
+    this.data = this.data.filter((element) => !predicate(element));
+    this.onRemoved(toRemove, this.data);
     return countPre - this.data.length;
+  }
+
+  /**
+ * Return a copy of the array
+ * @returns 
+ */
+  toArray(): Array<V> {
+    return [ ...this.data ];
   }
 
   get isEmpty(): boolean {
@@ -111,10 +142,16 @@ export class QueueMutable<V> implements IQueueMutable<V> {
   }
 }
 
+/**
+ * Creates a new QueueMutable
+ * @param opts 
+ * @param startingItems 
+ * @returns 
+ */
 export function mutable<V>(
   opts: QueueOpts<V> = {},
   ...startingItems: ReadonlyArray<V>
-): IQueueMutable<V> {
+): IQueueMutableWithEvents<V> {
   return new QueueMutable({ ...opts }, [ ...startingItems ]);
 }
 

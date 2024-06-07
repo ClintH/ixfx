@@ -1,4 +1,4 @@
-import type { IsEqual } from "../../IsEqual.js";
+import type { SimpleEventEmitter } from "../../Events.js";
 /**
  * Queue (mutable). See also {@link IQueueImmutable} for the immutable version.
  *
@@ -19,13 +19,32 @@ import type { IsEqual } from "../../IsEqual.js";
  *
  */
 
+export type QueueMutableEvents<V> = {
+  /**
+   * Data has been added
+   * * added: data attempted to be added. Note: not all of it may have been accepted into queue
+   * * finalData: actual state of queue
+   */
+  enqueue: { added: ReadonlyArray<V>, finalData: ReadonlyArray<V> }
+  /**
+   * Single item dequeued.
+   * When dequeing the 'removed' event also fires
+   */
+  dequeue: { removed: V, finalData: ReadonlyArray<V> }
+  /**
+   * One or more items removed due to dequeuing, clearing or removeWhere called
+   */
+  removed: { removed: ReadonlyArray<V>, finalData: ReadonlyArray<V> }
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface IQueueMutableWithEvents<V> extends IQueueMutable<V>, SimpleEventEmitter<QueueMutableEvents<V>> {
+
+}
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IQueueMutable<V> {
-  /**
-   * Returns true if queue is empty
-   */
-  get isEmpty(): boolean;
+
   /**
    * Dequeues (removes oldest item / item at front of queue)
    * @returns Item, or undefined if queue is empty
@@ -37,6 +56,11 @@ export interface IQueueMutable<V> {
    * @returns How many items were added
    */
   readonly enqueue: (...toAdd: ReadonlyArray<V>) => number;
+
+  /**
+ * Returns a copy of data in queue as an array
+ */
+  toArray(): ReadonlyArray<V>;
   /**
    * Returns front of queue (oldest item), or _undefined_ if queue is empty
    */
@@ -49,10 +73,11 @@ export interface IQueueMutable<V> {
    * Is queue full? Returns _false_ if no capacity has been set
    */
   get isFull(): boolean;
+
   /**
-   * Data in queue as an array
-   */
-  get data(): ReadonlyArray<V>;
+ * Returns true if queue is empty
+ */
+  get isEmpty(): boolean;
 
   /**
  * Removes values that match `predicate`.
@@ -61,15 +86,6 @@ export interface IQueueMutable<V> {
  * @returns Returns number of items removed.
  */
   removeWhere(predicate: (item: V) => boolean): number
-
-  /**
-   * Remove value from queue, regardless of position.
-   * Returns _true_ if something was removed.
-   * 
-   * See also {@link removeWhere} to remove based on a predicate
-   * @param value 
-   */
-  remove(value: V, comparer?: IsEqual<V>): boolean;
 
   at(index: number): V;
   clear(): void;
