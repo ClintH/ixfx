@@ -34,7 +34,7 @@ test(`syncWait`, async t => {
   const sw3 = new SyncWait();
   try {
     await sw3.forSignal(100);
-    t.fail(`Exception not thrown`);
+    t.fail(`Exception not thrown`)
   } catch (error) {
     t.pass(`Exception thrown`);
   }
