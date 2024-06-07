@@ -51,11 +51,12 @@ export type Timeout = HasCompletion & {
  * t.cancel();  // Cancel it from running
  * t.start();   // Schedule again after 1 minute
  * t.start(30*1000); // Cancel that, and now scheduled after 30s
- * t.isDone;    // True if a scheduled event is pending
+ * 
+ * // Get the current state of timeout
+ * t.runState;    // "idle", "scheduled" or "running"
  * ```
  *
- * Callback function receives any additional parameters passed in from start.
- * This can be useful for passing through event data:
+ * Callback function receives any additional parameters passed in from start. This can be useful for passing through event data:
  *
  * @example
  * ```js
