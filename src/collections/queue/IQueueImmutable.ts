@@ -32,7 +32,7 @@ export interface IQueueImmutable<V> {
   forEachFromFront(fn: (v: V) => void): void;
 
   /**
-   * Returns a new queue with items added
+   * Returns a new queue with item(s) added
    * @param toAdd Items to add
    */
   enqueue(...toAdd: ReadonlyArray<V>): IQueueImmutable<V>;
@@ -64,7 +64,7 @@ export interface IQueueImmutable<V> {
    */
   get peek(): V | undefined;
   /**
-   * Data in queue as an array
+   * Returns a copy of data in queue as an array
    */
-  get data(): ReadonlyArray<V>;
+  toArray(): Array<V>;
 }
