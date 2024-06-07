@@ -90,6 +90,7 @@ export const timeout = (
   let timer: ReturnType<typeof setTimeout>;
   let startedAt = 0;
   let startCount = 0;
+  let startCountTotal = 0;
   let state: HasCompletionRunStates = `idle`;
 
   const clear = () => {
@@ -133,6 +134,7 @@ export const timeout = (
         }
         const args_ = args ?? [];
         startCount++;
+        startCountTotal++;
         state = `running`;
         await callback(performance.now() - startedAt, ...args_);
         state = `idle`
@@ -157,6 +159,9 @@ export const timeout = (
     },
     get startCount() {
       return startCount;
+    },
+    get startCountTotal() {
+      return startCountTotal;
     }
   };
 };
