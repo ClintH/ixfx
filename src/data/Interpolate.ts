@@ -60,7 +60,7 @@ export type InterpolateOptions = {
  * * 'ignore': allow exceeding values. eg 1.5 will yield b*1.5.
  * * 'clamp': default behaviour of clamping interpolation amount to 0..1
  * 
- * To interpolate certain types: {@link Visual.Colour.interpolate | Visual.Colour.interpolate }, {@link Geometry.Points.interpolate | Geometry.Points.interpolate}.
+ * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Geometry.Points.interpolate}.
  * @param amount Interpolation amount, between 0 and 1 inclusive
  * @param a Start (ie when `amt` is 0)
  * @param b End (ie. when `amt` is 1)
@@ -69,6 +69,7 @@ export type InterpolateOptions = {
 export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
 export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
 export function interpolate(amountOrA: number, aOrB: number, bOrMissingOrOpts?: number | Partial<InterpolateOptions>, options?: Partial<InterpolateOptions>) {
+
   const a = bOrMissingOrOpts === undefined ? amountOrA : aOrB;
   const b = bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object` ? aOrB : bOrMissingOrOpts;
   // eslint-disable-next-line unicorn/no-negated-condition, @typescript-eslint/prefer-nullish-coalescing
@@ -78,7 +79,7 @@ export function interpolate(amountOrA: number, aOrB: number, bOrMissingOrOpts?: 
   throwNumberTest(a, ``, `a`);
   throwNumberTest(b, ``, `b`);
 
-  const index = (amount: number) => {
+  const calculate = (amount: number) => {
     if (limits === `clamp`) {
       amount = clamp(amount);
     } else if (limits === `wrap`) {
@@ -90,8 +91,8 @@ export function interpolate(amountOrA: number, aOrB: number, bOrMissingOrOpts?: 
     throwNumberTest(amount, ``, `amount`);
     return (1 - amount) * a + amount * b;
   }
-  if (bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object`) return index;
-  return index(amountOrA);
+  if (bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object`) return calculate;
+  return calculate(amountOrA);
 };
 
 
