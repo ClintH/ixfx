@@ -34,6 +34,7 @@ export * from './Retry.js';
 export * from './Types.js';
 export * from './RequestResponseMatch.js';
 export * from './TaskQueueMutable.js';
+export * from './SyncWait.js';
 
 import { repeatAwait, repeat } from './Repeat.js';
 export { repeatAwait, repeat, type RepeatPredicate } from './Repeat.js';
