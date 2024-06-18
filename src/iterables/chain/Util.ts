@@ -17,16 +17,6 @@ function* primitiveToGenerator(value: number | boolean | string) {
   yield value;
 }
 
-export const oncePromise = (target: EventTarget, name: string): Promise<any> => {
-  return new Promise(resolve => {
-    const handler = (...args: Array<any>) => {
-      target.removeEventListener(name, handler);
-      resolve(args);
-    };
-    target.addEventListener(name, handler);
-  });
-};
-
 /**
  * Wrap the primitive value as an async generator
  * @param value 
