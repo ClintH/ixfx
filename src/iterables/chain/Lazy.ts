@@ -1,13 +1,14 @@
 import type { Interval } from "../../flow/IntervalType.js";
-import { Async } from "../index.js";
-import { fromFunction } from "./FromFunction.js";
-import type { GenOrData, LazyChain, DelayOptions, Link, RankArrayOptions, RankFunction, RankOptions } from "./Types.js";
+import * as Async from "../IterableAsync.js";
+import { func as fromFunction } from "./from/Function.js";
+import type { GenOrData, LazyChain, DelayOptions, Link } from "./Types.js";
 import { isGenFactoryNoInput, resolveToAsyncGen } from "./Util.js";
 import * as L from './Links.js';
+import type { RankFunction, RankArrayOptions, RankOptions } from "../../data/BasicProcessors.js";
 
 const getLinkName = (c: Link<any, any>): string => {
-  return c._name;
-  //return `_name` in c ? c._name as string : c.name;
+  //return c._name;
+  return c._name ?? c.name;
 }
 
 export function lazy<In, Out>(): LazyChain<In, Out> {
@@ -44,8 +45,9 @@ export function lazy<In, Out>(): LazyChain<In, Out> {
       chained.push(L.transform(transformer));
       return w;
     },
-    flatten: (flattener: (values: Array<any>) => any) => {
-      chained.push(L.flatten(flattener));
+    reduce: (reducer: (values: Array<any>) => any) => {
+      // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-reduce
+      chained.push(L.reduce(reducer));
       return w;
     },
     drop: (predicate: (v: In) => boolean) => {
@@ -92,12 +94,12 @@ export function lazy<In, Out>(): LazyChain<In, Out> {
       chained.push(L.average());
       return w as unknown as LazyChain<any, number>;
     },
-    total: (): LazyChain<any, number> => {
-      chained.push(L.total());
+    sum: (): LazyChain<any, number> => {
+      chained.push(L.sum());
       return w as unknown as LazyChain<any, number>;
     },
-    tally: (): LazyChain<any, number> => {
-      chained.push(L.tally());
+    tally: (countArrayItems: boolean): LazyChain<any, number> => {
+      chained.push(L.tally(countArrayItems));
       return w as unknown as LazyChain<any, number>;
     },
     input(data: GenOrData<In>) {
