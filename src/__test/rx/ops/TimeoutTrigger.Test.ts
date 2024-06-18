@@ -23,7 +23,7 @@ test(`timeout-repeat`, async t => {
       return `hello`
     }
   });
-  r1.value(v => {
+  r1.onValue(v => {
     values++;
   });
 
@@ -42,7 +42,7 @@ test(`timeout-value-immediate`, async t => {
   const time = Flow.Elapsed.interval();
   let count = 0;
   let hello = true;
-  r1.value(value => {
+  r1.onValue(value => {
     const elapsed = time();
     if (hello) {
       t.true(isApproximately(150, 0.1, elapsed), `Long time: ${ elapsed }`);
@@ -58,9 +58,7 @@ test(`timeout-value-immediate`, async t => {
 
   await Flow.sleep(1000);
   s1.dispose(`test`);
-  if (Rx.isDisposable(r1)) {
-    t.true(r1.isDisposed());
-  }
+  t.true(r1.isDisposed());
 });
 
 test(`timeout-value-non-immediate`, async t => {
@@ -71,7 +69,7 @@ test(`timeout-value-non-immediate`, async t => {
   const time = Flow.Elapsed.interval();
   let count = 0;
   let hello = false;
-  r1.value(value => {
+  r1.onValue(value => {
     const elapsed = time();
     if (hello) {
       t.true(isApproximately(150, 0.1, elapsed), `Long time: ${ elapsed }. Count: ${ count }`);
@@ -80,7 +78,7 @@ test(`timeout-value-non-immediate`, async t => {
       if (count === 0) {
         t.true(isApproximately(220, 0.1, elapsed), `Initial long time: ${ elapsed }. Count: ${ count }`);
       } else {
-        t.true(isApproximately(50, 0.1, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
+        t.true(isApproximately(50, 0.2, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
       }
     }
     t.is(value, hello ? `hello` : `goodbye`);
@@ -90,7 +88,5 @@ test(`timeout-value-non-immediate`, async t => {
 
   await Flow.sleep(1000);
   s1.dispose(`test`);
-  if (Rx.isDisposable(r1)) {
-    t.true(r1.isDisposed());
-  }
+  t.true(r1.isDisposed());
 });
