@@ -17,6 +17,20 @@ import { resolveToGen } from "./Util.js";
  * const output = await Async.toArray(ch2);
  * // [ 2, 4, 6, 8, 10 ]
  * ```
+ * 
+ * @example Grab the x/y coordinate from pointermove
+ * ```js
+ * const c1 = Chains.run(
+ *  Chains.fromEvent(window, `pointermove`),
+ *  Chains.Links.transform(event => ({ x: event.x, y: event.y }))
+ * );
+ * 
+ * // Eg: print out data as it comes in
+ * Iterables.forEach(c1, coord => {
+ *   console.log(coord);
+ * });
+ * // Execution continues immediately
+ * ```
  * @param functions 
  * @returns 
  */
@@ -54,6 +68,20 @@ export function run<T1, T2, T3, T4, T5, T6, T7>(gen: GenOrData<T1> | GenFactoryN
  *);
  * const output = await Async.toArray(ch2);
  * // [ 2, 4, 6, 8, 10 ]
+ * ```
+ * 
+ * @example Grab the x/y coordinate from pointermove
+ * ```js
+ * const c1 = Chains.run(
+ *  Chains.fromEvent(window, `pointermove`),
+ *  Chains.Links.transform(event => ({ x: event.x, y: event.y }))
+ * );
+ * 
+ * // Eg: print out data as it comes in
+ * Iterables.forEach(c1, coord => {
+ *   console.log(coord);
+ * });
+ * // Execution continues immediately
  * ```
  * @param gen 
  * @param l0 
