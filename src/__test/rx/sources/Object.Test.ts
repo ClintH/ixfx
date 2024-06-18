@@ -2,22 +2,67 @@ import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 
+test(`diff-field`, async t => {
+  const o = Rx.From.object({
+    name: `bob`,
+    colour: {
+      h: 0.1,
+      s: 0.2,
+      l: 0.3
+    },
+    level: 2
+  });
+  let onName = 0;
+  let onColourS = 0;
+
+  o.onField(`name`, value => {
+    onName++;
+    if (onName === 1) t.is(value, `sally`);
+    if (onName === 2) t.is(value, `mary`);
+    t.true(onName <= 2);
+  });
+  o.onField(`colour.s`, value => {
+    onColourS++;
+    if (onColourS === 1) t.is(value, 0.5);
+    if (onColourS === 2) t.is(value, 0.9);
+    t.true(onColourS <= 2);
+  });
+
+  // Try setting objects
+  o.update({ name: 'sally' });
+  o.update({
+    colour: {
+      s: 0.5
+    }
+  });
+  await Flow.sleep(100);
+
+  // Try updating fields
+  o.updateField(`name`, `mary`);
+  o.updateField(`colour.s`, 0.9);
+  await Flow.sleep(50);
+
+  t.pass();
+});
+
 test(`update`, async t => {
   const o = Rx.From.object({ name: `bob`, level: 2 });
   let count = 0;
-  o.on(valueRaw => {
-    const value = valueRaw.value;
+  o.onValue(value => {
     if (count === 0) t.deepEqual(value, { name: `Jane`, level: 2 });
     if (count === 1) t.deepEqual(value, { name: `Jane`, level: 3 });
     count++;
   });
 
   // Won't change anything, nor trigger the above event handler
+  // since data is the same
   o.update({ name: `bob` });
   o.update({ level: 2 });
   t.deepEqual(o.last(), { name: `bob`, level: 2 });
+  await Flow.sleep(50);
   t.is(count, 0);
 
+  // Now will trigger a change
   o.update({ name: `Jane` });
   t.deepEqual(o.last(), { name: `Jane`, level: 2 });
   o.update({ level: 3 });
@@ -31,8 +76,8 @@ test(`update`, async t => {
   });
   o2.onDiff(diffMsg => {
     t.deepEqual(diffMsg.value, [
-      { path: '0', previous: '', value: 'a' },
-      { path: '1', previous: undefined, value: 'b' }
+      { path: '0', previous: '', value: 'a', state: `change` },
+      { path: '1', previous: undefined, value: 'b', state: `added` }
     ]);
     count++;
   })
@@ -78,11 +123,11 @@ test(`set`, async t => {
   o.onDiff(diffV => {
     const diff = diffV.value;
     if (count === 0) t.deepEqual(diff, [
-      { path: `name`, previous: `bob`, value: `jane` }
+      { path: `name`, previous: `bob`, value: `jane`, state: `change` }
     ]);
     if (count === 1) t.deepEqual(diff, [
-      { path: `name`, previous: `jane`, value: `mary` },
-      { path: `level`, previous: 2, value: 3 }
+      { path: `name`, previous: `jane`, value: `mary`, state: `change` },
+      { path: `level`, previous: 2, value: 3, state: `change` }
     ]);
 
     //console.log(diff);
