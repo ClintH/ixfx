@@ -1,4 +1,4 @@
-import * as Immutable from './Immutable.js';
+import { mapKeys } from './Immutable.js';
 import { isEqualDefault, type IsEqual } from './IsEqual.js';
 
 export type ChangeKind = `mutate` | `add` | `del`
@@ -100,8 +100,8 @@ export const compareArrays = <TValue>(a: Array<TValue>, b: Array<TValue>, eq: Is
   }
   const cc: CompareChangeSet<number> = {
     ...c,
-    added: Immutable.mapKeys(c.added, convert),
-    changed: Immutable.mapKeys(c.changed, convert),
+    added: mapKeys(c.added, convert),
+    changed: mapKeys(c.changed, convert),
     removed: c.removed.map(v => convert(v)),
     summary: c.summary.map(value => {
       return [ value[ 0 ], convert(value[ 1 ]), value[ 2 ] ];
