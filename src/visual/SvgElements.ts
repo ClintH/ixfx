@@ -1,13 +1,15 @@
 /* eslint-disable unicorn/no-null */
-import type { CirclePositioned } from '../geometry/circle/index.js';
-import type { Point } from '../geometry/point/index.js';
-import * as Lines from '../geometry/line/index.js';
+import type { CirclePositioned } from '../geometry/circle/CircleType.js';
+import type { Point } from '../geometry/point/PointType.js';
+import type { Line } from '../geometry/line/LineType.js';
+//import * as Lines from '../geometry/line/index.js';
+import { fromNumbers as LinesFromNumbers } from 'src/geometry/line/FromNumbers.js';
 import * as Svg from './Svg.js';
 import { getCssVariable } from './Colour.js';
 //import {Palette} from ".";
 
 const numberOrPercentage = (v: number): string => {
-  if (v >= 0 && v <= 1) return v * 100 + `%`;
+  if (v >= 0 && v <= 1) return `${ v * 100 }%`;
   return v.toString();
 };
 
@@ -140,7 +142,7 @@ export const groupUpdate = (
  * @returns
  */
 export const line = (
-  line: Lines.Line,
+  line: Line,
   parent: SVGElement,
   opts?: Svg.LineDrawingOpts,
   queryOrExisting?: string | SVGLineElement
@@ -162,7 +164,7 @@ export const line = (
  */
 export const lineUpdate = (
   lineEl: SVGLineElement,
-  line: Lines.Line,
+  line: Line,
   opts?: Svg.LineDrawingOpts
 ) => {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
@@ -341,7 +343,7 @@ export const grid = (
   //eslint-disable-next-line functional/no-let
   let y = 0;
   while (y < height) {
-    const horiz = Lines.fromNumbers(0, y, width, y);
+    const horiz = LinesFromNumbers(0, y, width, y);
     line(horiz, g);
     y += spacing;
   }
@@ -350,7 +352,7 @@ export const grid = (
   //eslint-disable-next-line functional/no-let
   let x = 0;
   while (x < width) {
-    const vert = Lines.fromNumbers(x, 0, x, height);
+    const vert = LinesFromNumbers(x, 0, x, height);
     line(vert, g);
     x += spacing;
   }

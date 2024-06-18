@@ -1,9 +1,9 @@
 import * as Drawing from "./Drawing.js";
 import * as Bipolar from "../data/Bipolar.js";
-import type { IQueueImmutable } from "../collections/queue/IQueueImmutable.js";
-import { Queues } from "../collections/index.js";
+import * as Queues from "../collections/queue/index.js";
+import * as Colour from "./Colour.js";
 import { type CirclePositioned } from "../geometry/index.js";
-import { Colour } from "./index.js";
+import type { IQueueImmutable } from "../collections/queue/IQueueImmutable.js";
 
 /**
  * Options

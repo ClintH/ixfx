@@ -1,7 +1,8 @@
 import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
 import { type ICircularArray } from '../collections/CircularArray.js';
 import { resolveEl } from '../dom/ResolveEl.js';
-import { Colour, Drawing } from './index.js';
+import * as Colour from './Colour.js';
+import * as Drawing from './Drawing.js';
 import {
   ofArrayMutable,
   ofCircularMutable,

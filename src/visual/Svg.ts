@@ -2,9 +2,9 @@
 
 import { markerPrebuilt } from './SvgMarkers.js';
 import * as Elements from './SvgElements.js';
-import type { Point } from '../geometry/point/index.js';
-import type { Line } from '../geometry/line/index.js';
-import type { CirclePositioned } from '../geometry/circle/index.js';
+import type { Point } from '../geometry/point/PointType.js';
+import type { Line } from '../geometry/line/LineType.js';
+import type { CirclePositioned } from '../geometry/circle/CircleType.js';
 import type { Rect } from '../geometry/rect/index.js';
 
 export type MarkerOpts = StrokeOpts &

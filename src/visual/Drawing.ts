@@ -1,9 +1,8 @@
 import * as Points from '../geometry/point/index.js';
-import * as Lines from '../geometry/line/index.js';
 import * as Triangles from '../geometry/triangle/index.js';
 import { throwArrayTest } from '../Guards.js';
 import * as Arcs from '../geometry/arc/index.js';
-import * as Beziers from '../geometry/Bezier.js';
+import * as Beziers from '../geometry/bezier/index.js';
 import * as Ellipses from '../geometry/Ellipse.js';
 import * as Colours from '../visual/Colour.js';
 import { resolveEl } from '../dom/ResolveEl.js';
@@ -12,15 +11,16 @@ import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
 import { StackImmutable } from '../collections/stack/StackImmutable.js';
 //import type { Point, CirclePositioned, Rect, RectPositioned } from '../geometry/Types.js';
 //import type { Line, Path, Triangle } from '../geometry/Types.js';
-import type { Point } from '../geometry/point/index.js';
-import type { Line } from '../geometry/line/index.js';
-import type { CirclePositioned } from '../geometry/circle/index.js';
+import type { Point } from '../geometry/point/PointType.js';
+import type { Line } from '../geometry/line/LineType.js';
+import type { CirclePositioned } from '../geometry/circle/CircleType.js';
 import type { Rect, RectPositioned } from '../geometry/rect/index.js';
-import type { Path } from '../geometry/path/index.js';
-import type { Triangle } from '../geometry/triangle/index.js';
+import type { Path } from '../geometry/path/PathType.js';
+import type { Triangle } from '../geometry/triangle/TriangleType.js';
 
 import { empty as RectsEmpty } from '../geometry/rect/index.js';
 import { corners as RectsCorners } from '../geometry/rect/Corners.js';
+import { isLine } from '../geometry/line/Guard.js';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 
@@ -437,7 +437,7 @@ export const paths = (
   const draw = (path: Path) => {
     // Call appropriate drawing function depending on the type of path
     if (Beziers.isQuadraticBezier(path)) quadraticBezier(ctx, path, opts);
-    else if (Lines.isLine(path)) line(ctx, path, opts);
+    else if (isLine(path)) line(ctx, path, opts);
     else throw new Error(`Unknown path type ${ JSON.stringify(path) }`);
   };
 
