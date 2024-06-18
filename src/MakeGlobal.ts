@@ -11,8 +11,7 @@ import * as Visual from './visual/index.js';
 import * as Dom from './dom/index.js';
 import * as Events from './Events.js';
 import * as Modulation from './modulation/index.js';
-import { Collections } from './index.js';
-export * as Collections from './collections/index.js';
+import * as Collections from './collections/index.js';
 try {
   if (typeof window !== `undefined`) {
     (window as any).Util = Util;
