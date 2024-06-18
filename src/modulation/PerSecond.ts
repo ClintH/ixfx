@@ -55,3 +55,7 @@ export const perSecond = (amount: number, options: Partial<{ max: number, min: n
     return x;
   }
 }
+
+export const perMinute = (amount: number, options: Partial<{ max: number, min: number }> = {}) => {
+  return perSecond(amount / 60, options);
+}
