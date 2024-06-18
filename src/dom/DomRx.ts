@@ -6,7 +6,7 @@ import * as Rx from '../rx/index.js';
  * @param timeoutMs
  * @returns
  */
-export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<UIEvent>({ elapsed: elapsed ?? 100 })(Rx.From.event(window, `resize`));
+export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<{ innerWidth: number, innerHeight: number }>({ elapsed: elapsed ?? 100 })(Rx.From.event(window, `resize`, { innerWidth: 0, innerHeight: 0 }));
 
 /**
  * Observe when document's class changes
