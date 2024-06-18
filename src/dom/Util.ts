@@ -1,10 +1,10 @@
-//import { Observable, debounceTime, fromEvent } from 'rxjs';
 import * as Points from '../geometry/point/index.js';
 import JSON5 from 'json5';
 import type { CardinalDirection } from '../geometry/Grid.js';
 import { cardinal } from '../geometry/rect/index.js';
-import type { Point } from '../geometry/point/index.js';
-import { resolveEl, resolveEls, type QueryOrElements } from './ResolveEl.js';
+import type { Point } from '../geometry/point/PointType.js';
+import { resolveEl } from './ResolveEl.js';
+import { getPointParameter } from '../geometry/point/GetPointParameter.js';
 
 export type PointSpaces = `viewport` | `screen` | `document`;
 
@@ -50,7 +50,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
   switch (reference) {
     case `viewport`: {
       return (a: Readonly<Point | number | Array<number>>, b?: number) => {
-        const pt = Points.getPointParameter(a, b);
+        const pt = getPointParameter(a, b);
         return Object.freeze({
           x: pt.x / window.innerWidth,
           y: pt.y / window.innerHeight,
@@ -59,7 +59,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
     }
     case `screen`: {
       return (a: Readonly<Point | number | Array<number>>, b?: number) => {
-        const pt = Points.getPointParameter(a, b);
+        const pt = getPointParameter(a, b);
         return Object.freeze({
           x: pt.x / screen.width,
           y: pt.y / screen.height,
@@ -68,7 +68,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
     }
     case `document`: {
       return (a: Readonly<Point | number | Array<number>>, b?: number) => {
-        const pt = Points.getPointParameter(a, b);
+        const pt = getPointParameter(a, b);
         return Object.freeze({
           x: pt.x / document.body.scrollWidth,
           y: pt.y / document.body.scrollHeight,
@@ -231,7 +231,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
   switch (targetSpace) {
     case `screen`: {
       return (a: Readonly<Point | Array<number> | number>, b?: number) => {
-        const pt = Points.getPointParameter(a, b);
+        const pt = getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.screenX,
           y: pt.y + window.screenY,
@@ -240,7 +240,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
     }
     case `document`: {
       return (a: Readonly<Point | Array<number> | number>, b?: number) => {
-        const pt = Points.getPointParameter(a, b);
+        const pt = getPointParameter(a, b);
         return Object.freeze({
           x: pt.x + window.scrollX,
           y: pt.y + window.scrollY,
@@ -249,7 +249,7 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
     }
     case `viewport`: {
       return (a: Readonly<Point | Array<number> | number>, b?: number) => {
-        const pt = Points.getPointParameter(a, b);
+        const pt = getPointParameter(a, b);
         return Object.freeze({
           x: pt.x,
           y: pt.y,
@@ -543,47 +543,7 @@ export const reconcileChildren = <V>(
   for (const p of prune) p.remove();
 };
 
-/**
- * Adds `cssClass` to element(s) if `value` is true.
- * ```js
- * setClass(`#someId`, true, `activated`);
- * ```
- * @param query 
- * @param value 
- * @param cssClass 
- * @returns 
- */
-export const setCssClass = (selectors: QueryOrElements, value: boolean, cssClass: string) => {
-  const elements = resolveEls(selectors);
-  if (elements.length === 0) return;
 
-  for (const element of elements) {
-    if (value) element.classList.add(cssClass);
-    else element.classList.remove(cssClass);
-  }
-};
-
-/**
- * Toggles a CSS class on all elements that match selector
- * @param selectors 
- * @param cssClass 
- * @returns 
- */
-export const setCssToggle = (selectors: QueryOrElements, cssClass: string) => {
-  const elements = resolveEls(selectors);
-  if (elements.length === 0) return;
-  for (const element of elements) {
-    element.classList.toggle(cssClass);
-  }
-}
-
-export const setCssDisplay = (selectors: QueryOrElements, value: string) => {
-  const elements = resolveEls(selectors);
-  if (elements.length === 0) return;
-  for (const element of elements) {
-    (element).style.display = value;
-  }
-};
 
 /**
  * Gets a HTML element by id, throwing an error if not found
@@ -597,51 +557,3 @@ export const byId = <V extends HTMLElement>(id: string): HTMLElement => {
   return element as V;
 }
 
-
-
-export const setHtml = (selectors: QueryOrElements, value: string | number) => {
-  const elements = resolveEls(selectors);
-  if (elements.length === 0) return;
-  if (typeof value === `number`) {
-    value = value.toString();
-  }
-  for (const element of elements) {
-    element.innerHTML = value;
-  }
-};
-
-export const setText = (selectors: QueryOrElements, value: string | number) => {
-  const elements = resolveEls(selectors);
-  if (elements.length === 0) return;
-  if (typeof value === `number`) {
-    value = value.toString();
-  }
-  for (const element of elements) {
-    element.textContent = value;
-  }
-};
-
-export const elRequery = (selectors: string) => {
-  ({
-    text: (value: string | number) => { setText(selectors, value); },
-    html: (value: string | number) => { setHtml(selectors, value); },
-    cssDisplay: (value: string) => { setCssDisplay(selectors, value); },
-    cssClass: (value: boolean, cssClass: string) => { setCssClass(selectors, value, cssClass); },
-    cssToggle: (cssClass: string) => { setCssToggle(selectors, cssClass); },
-    el: () => resolveEl(selectors),
-    els: () => resolveEls(selectors)
-  });
-}
-
-export const el = (selectors: QueryOrElements) => {
-  const elements = resolveEls(selectors);
-  return {
-    text: (value: string | number) => { setText(elements, value); },
-    html: (value: string | number) => { setHtml(elements, value); },
-    cssDisplay: (value: string) => { setCssDisplay(elements, value); },
-    cssClass: (value: boolean, cssClass: string) => { setCssClass(elements, value, cssClass); },
-    cssToggle: (cssClass: string) => { setCssToggle(elements, cssClass); },
-    el: () => elements[ 0 ],
-    els: () => elements
-  }
-}
