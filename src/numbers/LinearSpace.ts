@@ -1,7 +1,6 @@
 import { numberTest, throwFromResult } from "../Guards.js";
 import { round } from "./Round.js";
 
-
 /**
  * Generates a `step`-length series of values between `start` and `end` (inclusive).
  * Each value will be equally spaced.
