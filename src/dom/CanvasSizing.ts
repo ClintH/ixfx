@@ -40,7 +40,7 @@ export const parentSizeCanvas = (
   el.style.height = `100%`;
 
 
-  const ro = resizeObservable(parent, timeoutMs).value(
+  const ro = resizeObservable(parent, timeoutMs).onValue(
     entries => {
       const entry = entries.find((v) => v.target === parent);
       if (entry === undefined) return;
@@ -137,7 +137,7 @@ export const fullSizeCanvas = (
   }
 
   const r = windowResize();
-  r.value(update);
+  r.onValue(update);
 
   update();
   return r;

@@ -212,7 +212,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
           this.el.style.zIndex = this.opts.zIndex.toString();
         }
         const r = windowResize();
-        r.value(() => { this.#onWindowResize() });
+        r.onValue(() => { this.#onWindowResize() });
 
         this.#onWindowResize();
         break;
@@ -226,9 +226,9 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
           this.el.style.top = `0px`;
         }
         // const r = resizeObservable(parentEl);
-        // r.value(onParentResize);
+        // r.onValue(onParentResize);
         const r = windowResize();
-        r.value(() => { this.#onParentResize() });
+        r.onValue(() => { this.#onParentResize() });
         this.#onParentResize();
         break;
       }
