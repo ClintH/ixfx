@@ -3,7 +3,7 @@ import { compareArrays, type ChangeRecord } from "../../Compare.js";
 import { isEqualValueDefault } from "../../IsEqual.js";
 import * as Arrays from '../../collections/arrays/index.js';
 import { initStream } from "../InitStream.js";
-import type { ReactiveInitial, ReactiveDisposable, ReactiveNonInitial, ReactiveArray } from "../Types.js";
+import type { ReactiveInitial, ReactiveNonInitial, ReactiveArray, Reactive } from "../Types.js";
 import type { ArrayObjectOptions } from "./Types.js";
 
 /**
@@ -12,7 +12,7 @@ import type { ArrayObjectOptions } from "./Types.js";
  * @param options 
  * @returns 
  */
-export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayObjectOptions<V>> = {}): ReactiveDisposable<ReadonlyArray<V>> & ReactiveArray<V> & (ReactiveInitial<ReadonlyArray<V>> | ReactiveNonInitial<ReadonlyArray<V>>) {
+export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayObjectOptions<V>> = {}): Reactive<ReadonlyArray<V>> & ReactiveArray<V> & (ReactiveInitial<ReadonlyArray<V>> | ReactiveNonInitial<ReadonlyArray<V>>) {
   const eq = options.eq ?? isEqualValueDefault;
   const setEvent = initStream<Array<V>>();
   //const diffEvent = initStream<Array<Immutable.Change<any>>>();
@@ -102,7 +102,7 @@ export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Par
     last: () => value,
     on: setEvent.on,
     onArray: arrayEvent.on,
-    value: setEvent.value,
+    onValue: setEvent.onValue,
     setAt,
     push,
     deleteAt,
