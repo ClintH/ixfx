@@ -11,7 +11,7 @@ export type ReactiveProxied<V> = V & {
  * ```js
  * const { proxy, rx } = Rx.From.objectProxy({ colour: `red`, x: 10, y: 20 });
  * 
- * rx.value(v => {
+ * rx.onValue(v => {
  *  // Get notified when proxy is changed
  * });
  * 
