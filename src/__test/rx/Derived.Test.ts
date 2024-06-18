@@ -16,7 +16,7 @@ const genArray = (count: number) => {
 //   const counter = Rx.From.number(0);
 //   const isEven = Rx.From.pinged(counter, value => (value & 1) == 0);
 
-//   isEven.value(v => {
+//   isEven.onValue(v => {
 //     console.log(`isEven: ${ v }`);
 //   })
 //   for (let i = 0; i < 10; i++) {
