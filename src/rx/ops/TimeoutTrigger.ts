@@ -1,6 +1,6 @@
 import { intervalToMs } from "../../flow/IntervalType.js";
 import { initUpstream } from "../InitStream.js";
-import type { ReactiveOrSource, Reactive, ReactiveDisposable } from "../Types.js";
+import type { ReactiveOrSource, Reactive } from "../Types.js";
 import { isTrigger, resolveTriggerValue } from "../Util.js";
 import type { TimeoutTriggerOptions } from "../sources/Types.js";
 
@@ -29,7 +29,7 @@ import type { TimeoutTriggerOptions } from "../sources/Types.js";
  * @param source 
  * @param options 
  */
-export function timeoutTrigger<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutTriggerOptions<TTriggerValue>): ReactiveDisposable<TSource | TTriggerValue> & Reactive<TSource | TTriggerValue> {
+export function timeoutTrigger<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutTriggerOptions<TTriggerValue>): Reactive<TSource | TTriggerValue> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const immediate = options.immediate ?? true;
   const repeat = options.repeat ?? false;
@@ -63,7 +63,6 @@ export function timeoutTrigger<TSource, TTriggerValue>(source: ReactiveOrSource<
       events.set(v);
     },
     onDispose() {
-      console.log(`disposing`);
       if (timer) clearTimeout(timer);
     },
   });
