@@ -1,7 +1,9 @@
 import { type Dispatch, DispatchList } from "../flow/DispatchList.js";
 import { resolveSource } from "./ResolveSource.js";
-import type { InitLazyStreamOptions, InitStreamOptions, Passed, ReactiveOrSource, ReactiveStream, SignalKinds, UpstreamOptions } from "./Types.js";
+import type { InitLazyStreamInitedOptions, InitLazyStreamOptions, InitStreamOptions, Passed, ReactiveInitial, ReactiveOrSource, ReactiveStream, SignalKinds, UpstreamOptions } from "./Types.js";
 import { messageHasValue, messageIsSignal } from "./Util.js";
+import { cache } from "./index.js";
+
 
 /**
  * @ignore
@@ -9,7 +11,7 @@ import { messageHasValue, messageIsSignal } from "./Util.js";
  * @param options 
  * @returns 
  */
-export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Partial<UpstreamOptions<In>>) => {
+export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Partial<UpstreamOptions<In>>): ReactiveStream<Out> => {
   const lazy = options.lazy ?? `initial`;
   const disposeIfSourceDone = options.disposeIfSourceDone ?? true;
   const onValue = options.onValue ?? ((_v: In) => {/** no-op */ })
@@ -55,6 +57,10 @@ export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, opti
 }
 
 
+export function initLazyStreamWithInitial<V>(options: InitLazyStreamInitedOptions<V>): ReactiveStream<V> & ReactiveInitial<V> {
+  return cache<V>(initLazyStream<V>(options), options.initialValue) as ReactiveStream<V> & ReactiveInitial<V>;
+}
+
 export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStream<V> {
   const lazy = options.lazy ?? `initial`;
   const onStop = options.onStop ?? (() => { /* no-op*/ })
@@ -72,6 +78,7 @@ export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStrea
   if (lazy === `never`) onStart();
   return events;
 }
+
 /**
  * @ignore
  * @param options 
@@ -137,7 +144,7 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
       dispatcher?.notify({ signal, value: undefined, context });
     },
     on: (handler: Dispatch<Passed<V>>) => subscribe(handler),
-    value: (handler: (value: V) => void) => {
+    onValue: (handler: (value: V) => void) => {
       const unsub = subscribe(message => {
         if (messageHasValue(message)) {
           handler(message.value);
