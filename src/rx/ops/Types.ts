@@ -41,7 +41,7 @@ export type SwitcherOptions = {
 /**
  * Transform options
  */
-export type TransformOpts = InitStreamOptions;
+export type TransformOpts = InitStreamOptions & { traceInput: boolean, traceOutput: boolean };
 
 export type BatchOptions = InitStreamOptions & {
   /**
@@ -76,19 +76,25 @@ export type ThrottleOptions = InitStreamOptions & {
   elapsed: Interval
 }
 
-export type AnnotationElapsed = {
-  elapsedMs: number
-}
+// export type AnnotationElapsed = {
+//   elapsedMs: number
+// }
 
 export type SplitOptions = {
   quantity: number
 }
-export type FieldOptions<V> = InitStreamOptions & {
+export type FieldOptions<TSource, TValue> = InitStreamOptions & {
   /**
-   * If `field` is missing on a value, this value is used in its place.
+   * If `field` is missing on a value, it is query from this object instead.
+   * If this also is missing, `fallbackFieldValue` is attempted.
+   */
+  fallbackObject: TSource
+  /**
+   * If `field` is missing on a value and `fallbackObject` (if specified), 
+   * this value is used in its place.
    * If not set, no value is emitted when the field is missing.
    */
-  missingFieldDefault: V
+  fallbackFieldValue: TValue
 };
 
 export type SingleFromArrayOptions<V> = {
@@ -111,4 +117,24 @@ export type SingleFromArrayOptions<V> = {
    * If index exceeds length of array, _undefined_ is returned
    */
   at: number
+}
+
+
+export type OpAsAnnotation = {
+  annotate: true
+}
+
+export type OpMathOptions = Partial<InitStreamOptions> & {
+  annotate?: boolean
+  /**
+   * If _true_ (default) operations that return _undefined_ do not emit a value.
+   * If _false_, _undefined_ is potentially emitted
+   */
+  skipUndefined?: boolean
+  /**
+   * If _true_ (default) operations only emit a value if it has changed.
+   * In the case of `max()`, for example, a stream of '1, 2, 3, 2, 1' would emit '1, 2, 3'.
+   * If _false_ was used, same input would emit '1, 2, 3, 3, 3'
+   */
+  skipIdentical?: boolean
 }
