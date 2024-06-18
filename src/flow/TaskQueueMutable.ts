@@ -39,11 +39,11 @@ export type TaskQueueEvents = {
  * 
  * You can listen to events from the TaskQueue:
  * ```js
- * TaskQueue.instance.addEventListener(`started`, () => {
+ * TaskQueueMutable.shared.addEventListener(`started`, () => {
  *  // Queue was empty, now started processing
  * });
  * 
- * TaskQueue.instance.addEventListener(`empty`, () => {
+ * TaskQueueMutable.shared.addEventListener(`empty`, () => {
  *  // Queue has finished processing all items
  * });
  * ```

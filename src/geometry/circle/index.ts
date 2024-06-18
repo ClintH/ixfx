@@ -10,14 +10,18 @@ import type { Circle, CirclePositioned } from './CircleType.js';
 import type { CircularPath } from './CircularPath.js';
 
 const piPi = Math.PI * 2;
+export type * from './CircleType.js';
+export * from './CircularPath.js';
 export * from './DistanceCenter.js';
 export * from './DistanceFromExterior.js';
-export * from './Guard.js';
-export * from './ToPositioned.js';
 export * from './ExteriorPoints.js';
+export * from './Guard.js';
 export * from './InteriorPoints.js';
-
-
+export * from './Intersecting.js';
+export * from './Intersections.js';
+export * from './IsContainedBy.js';
+export * from './IsEqual.js';
+export * from './ToPositioned.js';
 
 /**
  * Returns a point on a circle at a specified angle in radians
