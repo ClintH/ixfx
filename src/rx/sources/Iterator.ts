@@ -3,7 +3,7 @@ import { nextWithTimeout } from "../../iterables/IterableAsync.js";
 import { intervalToMs } from "../../flow/IntervalType.js";
 import { initLazyStream } from "../InitStream.js";
 import { isAsyncIterable } from "../../iterables/Iterable.js";
-import type { Reactive, ReactiveDisposable } from "../Types.js";
+import type { Reactive } from "../Types.js";
 import type { GeneratorOptions } from "./Types.js";
 import { StateMachine } from "../../flow/index.js";
 
@@ -37,7 +37,7 @@ import { StateMachine } from "../../flow/index.js";
  * // Wrap the generator
  * const r = Rx.From.iterator(time);
  * // Get notified when there is a new value
- * r.value(v => {
+ * r.onValue(v => {
  *   console.log(v);
  * });
  * ```
@@ -46,9 +46,9 @@ import { StateMachine } from "../../flow/index.js";
  * If `signal` is given, this will also cancel waiting for the value.
  * @param source 
  */
-export function iterator<V>(source: IterableIterator<V> | Array<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V>, options: Partial<GeneratorOptions> = {}): ReactiveDisposable<V> & Reactive<V> {
+export function iterator<V>(source: IterableIterator<V> | Array<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V>, options: Partial<GeneratorOptions> = {}): Reactive<V> {
   const lazy = options.lazy ?? `very`;
-  const log = options.traceLifecycle ? (message: string) => { console.log(`Rx.From.Generator ${ message }`); } : (_: string) => {/* no-up */ }
+  const log = options.traceLifecycle ? (message: string) => { console.log(`Rx.From.iterator ${ message }`); } : (_: string) => {/* no-up */ }
 
   const readIntervalMs = intervalToMs(options.readInterval, 5);
   const readTimeoutMs = intervalToMs(options.readTimeout, 5 * 60 * 1000);
@@ -144,7 +144,7 @@ export function iterator<V>(source: IterableIterator<V> | Array<V> | AsyncIterab
     },
     onDispose(reason: string) {
       log(`onDispose (${ reason })`);
-      ourAc?.abort(`Rx.fromGenerator disposed (${ reason })`);
+      ourAc?.abort(`Rx.From.iterator disposed (${ reason })`);
       if (options.signal) options.signal.removeEventListener(`abort`, onExternalSignal);
     },
   });
