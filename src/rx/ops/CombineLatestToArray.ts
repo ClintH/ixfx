@@ -17,7 +17,7 @@ import { messageIsDoneSignal, messageHasValue } from "../Util.js";
  *  Rx.fromFunction(Math.random, { loop: true, interval: 200 })
  * ];
  * const r = Rx.combineLatestToArray(sources);
- * r.value(value => {
+ * r.onValue(value => {
  *  // Value will be an array of last value from each source:
  *  // [number,number]  
  * });
@@ -74,7 +74,9 @@ export function combineLatestToArray<const T extends ReadonlyArray<ReactiveOrSou
   }
 
   return {
+    dispose: event.dispose,
+    isDisposed: event.isDisposed,
     on: event.on,
-    value: event.value
+    onValue: event.onValue
   }
 }

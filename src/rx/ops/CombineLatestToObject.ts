@@ -2,8 +2,8 @@
 import { Maps } from "../../collections/index.js"
 import { initStream } from "../InitStream.js"
 import { resolveSource } from "../ResolveSource.js"
-import type { ReactiveOrSource, CombineLatestOptions, ReactiveDisposable, Reactive, RxValueTypeObject } from "../Types.js"
-import { messageIsDoneSignal, messageHasValue, isDisposable } from "../Util.js"
+import type { ReactiveOrSource, CombineLatestOptions, Reactive, RxValueTypeObject, ReactiveInitial } from "../Types.js"
+import { messageIsDoneSignal, messageHasValue } from "../Util.js"
 
 /**
  * Monitors input reactive values, storing values as they happen to an object.
@@ -18,7 +18,7 @@ import { messageIsDoneSignal, messageHasValue, isDisposable } from "../Util.js"
  *  slow: Rx.fromFunction(Math.random, { loop: true, interval: 200 })
  * ];
  * const r = Rx.combineLatestToObject(sources);
- * r.value(value => {
+ * r.onValue(value => {
  *  // 'value' will be an object containing the labelled latest
  *  // values from each source.
  *  // { fast: number, slow: number }
@@ -34,7 +34,7 @@ import { messageIsDoneSignal, messageHasValue, isDisposable } from "../Util.js"
  * @param options Options for merging 
  * @returns 
  */
-export function combineLatestToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<CombineLatestOptions> = {}): ReactiveDisposable<RxValueTypeObject<T>> & Reactive<RxValueTypeObject<T>> {
+export function combineLatestToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<CombineLatestOptions> = {}): Reactive<RxValueTypeObject<T>> & ReactiveInitial<RxValueTypeObject<T>> {
   type State<V> = {
     source: Reactive<V>
     done: boolean
@@ -47,10 +47,12 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
 
   const states = new Map<string, State<any>>();
   for (const [ key, source ] of Object.entries(reactiveSources)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const initialData = (`last` in source) ? (source as any).last() : undefined;
     const s: State<any> = {
       source: resolveSource(source),
       done: false,
-      data: undefined,
+      data: initialData,
       off: () => { /** no-op */ }
     }
     states.set(key, s);
@@ -97,15 +99,16 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
 
   return {
     on: event.on,
-    value: event.value,
+    onValue: event.onValue,
+    last() {
+      return getData()
+    },
     dispose(reason: string) {
       unsub();
       event.dispose(reason);
       if (disposeSources) {
         for (const v of states.values()) {
-          if (isDisposable(v.source)) {
-            v.source.dispose(`Part of disposed mergeToObject`)
-          }
+          v.source.dispose(`Part of disposed mergeToObject`)
         }
       }
     },
