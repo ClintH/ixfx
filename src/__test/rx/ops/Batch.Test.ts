@@ -2,7 +2,6 @@ import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { count } from '../../../numbers/Count.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
 test(`batch-limit`, async t => {
   // Even number of items per batch
   const amt1 = 20;
@@ -40,7 +39,7 @@ test(`batch-elapsed-0`, async t => {
   Rx.wrap(m)
     .transform(v => v / 10)
     .batch({ elapsed: batchElapsed, returnRemainder: false })
-    .value(v => {
+    .onValue(v => {
       results.push(v);
     });
 
