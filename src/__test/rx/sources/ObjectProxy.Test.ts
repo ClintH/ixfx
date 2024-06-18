@@ -4,7 +4,7 @@ import * as Flow from '../../../flow/index.js';
 test(`from-proxy-array`, async t => {
   const { proxy, rx } = Rx.From.objectProxy([ `one`, `two`, `three` ]);
   let step = 0;
-  rx.value(v => {
+  rx.onValue(v => {
     //console.log(`value`, v);
     switch (step) {
       case 0: {
@@ -33,7 +33,7 @@ test(`from-proxy-object`, async t => {
   const { proxy: person, rx: personRx } = Rx.From.objectProxy({ name: `jill` });
   let valueFired = 0;
 
-  personRx.value(v => {
+  personRx.onValue(v => {
     t.deepEqual(v, { name: "john" });
     valueFired++;
   });
@@ -42,7 +42,7 @@ test(`from-proxy-object`, async t => {
     valueFired++;
   });
   personRx.onDiff(diff => {
-    t.deepEqual(diff.value, [ { path: `name`, value: `john`, previous: `jill` } ]);
+    t.deepEqual(diff.value, [ { path: `name`, value: `john`, previous: `jill`, state: `change` } ]);
     valueFired++;
   })
 
@@ -60,7 +60,7 @@ test(`from-proxy-object`, async t => {
       street: `Test St`, number: 12
     }
   });
-  person2Rx.value(v => {
+  person2Rx.onValue(v => {
     valueFired++;
   });
   person2.address = { street: `West St`, number: 12 };
@@ -70,12 +70,12 @@ test(`from-proxy-object`, async t => {
 
   valueFired = 0;
   const { proxy: array, rx: arrayRx } = Rx.From.objectProxy([ `a`, `b`, `c` ]);
-  arrayRx.value(v => {
+  arrayRx.onValue(v => {
     t.deepEqual(v, [ `a`, `d`, `c` ]);
     valueFired++;
   });
   arrayRx.onDiff(diff => {
-    t.deepEqual(diff.value, [ { path: `1`, value: `d`, previous: `b` } ]);
+    t.deepEqual(diff.value, [ { path: `1`, value: `d`, previous: `b`, state: `change` } ]);
     valueFired++;
   });
 
