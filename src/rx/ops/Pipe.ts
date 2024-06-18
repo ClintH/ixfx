@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { initStream } from "../InitStream.js";
-import type { PipeSet, Reactive, ReactiveDisposable, Passed } from "../Types.js";
-import { isDisposable, messageHasValue, messageIsDoneSignal } from "../Util.js";
+import type { PipeSet, Reactive, Passed } from "../Types.js";
+import { messageHasValue, messageIsDoneSignal } from "../Util.js";
 
 /**
  * Pipes the output of one stream into another, in order.
@@ -11,12 +11,12 @@ import { isDisposable, messageHasValue, messageIsDoneSignal } from "../Util.js";
  * @param streams 
  * @returns 
  */
-export const pipe = <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>): Reactive<TOutput> & ReactiveDisposable<TOutput> => {
+export const pipe = <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>): Reactive<TOutput> => {
   const event = initStream<TOutput>();
   const unsubs: Array<() => void> = [];
   const performDispose = (reason: string) => {
     for (const s of streams) {
-      if (isDisposable(s) && !s.isDisposed) s.dispose(reason);
+      if (!s.isDisposed) s.dispose(reason);
     }
     for (const s of unsubs) {
       s();
@@ -44,7 +44,7 @@ export const pipe = <TInput, TOutput>(...streams: PipeSet<TInput, TOutput>): Rea
   }
   return {
     on: event.on,
-    value: event.value,
+    onValue: event.onValue,
     dispose(reason) {
       performDispose(reason);
     },

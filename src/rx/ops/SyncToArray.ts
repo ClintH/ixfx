@@ -134,8 +134,10 @@ export function syncToArray<const T extends ReadonlyArray<ReactiveOrSource<any>>
   });
 
   return {
+    dispose: event.dispose,
+    isDisposed: event.isDisposed,
     on: event.on,
-    value: event.value
+    onValue: event.onValue
   }
 
 }
