@@ -2,8 +2,8 @@
 
 import { type ToString } from '../Util.js';
 import { SimpleEventEmitter } from '../Events.js';
-import * as KeyValueUtil from '../KeyValue.js';
-import { KeyValues } from '../index.js';
+import * as KeyValues from '../KeyValue.js';
+import type { KeyValue } from '../PrimitiveTypes.js';
 
 export type FrequencyEventMap = {
   readonly change: { context: any };
@@ -107,7 +107,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
   /**
    * @returns Copy of entries as an array
    */
-  entries(): Array<KeyValueUtil.KeyValue> {
+  entries(): Array<KeyValue> {
     return [ ...this.#store.entries() ];
   }
 
@@ -126,8 +126,8 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
    */
   entriesSorted(
     sortStyle: KeyValues.SortSyles = `value`
-  ): ReadonlyArray<KeyValues.KeyValue> {
-    const s = KeyValueUtil.getSorter(sortStyle);
+  ): ReadonlyArray<KeyValue> {
+    const s = KeyValues.getSorter(sortStyle);
     return s(this.entries());
   }
 

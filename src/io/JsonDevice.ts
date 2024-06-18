@@ -8,9 +8,9 @@ import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
 import { retryFunction } from '../flow/Retry.js';
 import {
-  genericStateTransitionsInstance,
   type GenericStateTransitions,
-} from './index.js';
+} from './Types.js';
+import { genericStateTransitionsInstance } from './GenericStateTransitions.js';
 
 /**
  * Options for JsonDevice

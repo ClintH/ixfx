@@ -1,5 +1,5 @@
 import { clamp } from '../data/Clamp.js';
-import { intervalToMs, type Interval } from './index.js';
+import { intervalToMs, type Interval } from './IntervalType.js';
 
 /**
  * Creates a timer

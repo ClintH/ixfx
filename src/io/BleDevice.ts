@@ -8,10 +8,10 @@ import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
 import { retryFunction } from '../flow/Retry.js';
 import {
-  genericStateTransitionsInstance,
   type GenericStateTransitions,
   type IoEvents,
-} from './index.js';
+} from './Types.js';
+import { genericStateTransitionsInstance } from './GenericStateTransitions.js';
 
 export type Opts = {
   readonly service: string;

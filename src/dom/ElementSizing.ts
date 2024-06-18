@@ -1,4 +1,4 @@
-import type { Point } from "src/geometry/point/index.js";
+import type { Point } from "src/geometry/point/PointType.js";
 import { resolveEl } from "./ResolveEl.js";
 import { resizeObservable, windowResize } from "./DomRx.js";
 
@@ -43,7 +43,7 @@ export const fullSizeElement = <V extends HTMLElement>(
       onResized({ el, bounds });
     }
   };
-  r.value(update);
+  r.onValue(update);
 
   update();
   return r;
@@ -65,7 +65,7 @@ export const parentSize = <V extends HTMLElement | SVGSVGElement>(
   const parent = el.parentElement;
   if (parent === null) throw new Error(`Element has no parent`);
 
-  const ro = resizeObservable(parent, timeoutMs).value(
+  const ro = resizeObservable(parent, timeoutMs).onValue(
     (entries: ReadonlyArray<ResizeObserverEntry>) => {
       const entry = entries.find((v) => v.target === parent);
       if (entry === undefined) return;
@@ -73,8 +73,8 @@ export const parentSize = <V extends HTMLElement | SVGSVGElement>(
       const width = entry.contentRect.width;
       const height = entry.contentRect.height;
 
-      el.setAttribute(`width`, width + `px`);
-      el.setAttribute(`height`, height + `px`);
+      el.setAttribute(`width`, `${ width }px`);
+      el.setAttribute(`height`, `${ height }px`);
       if (onResized !== undefined) {
         const bounds = {
           min: Math.min(width, height),

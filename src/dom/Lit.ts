@@ -30,7 +30,7 @@ export { html as LitHtml } from 'lit-html';
  */
 export const lit = <T>(elOrQuery: string | HTMLElement, source: Reactive<T>, gen: (s: T | undefined) => TemplateResult<any>) => {
   const el = resolveEl(elOrQuery);
-  source.value(value => {
+  source.onValue(value => {
     render(gen(value), el);
   });
 

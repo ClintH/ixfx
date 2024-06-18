@@ -5,14 +5,19 @@ import {
   type TimestampedObject,
 } from './TrackedValue.js';
 import { ObjectTracker } from './ObjectTracker.js';
-import { Lines, Vectors } from '../geometry/index.js';
+import { length as LineLength } from '../geometry/line/Length.js';
+import { Vectors } from '../geometry/index.js';
+import { Empty as LinesEmpty } from 'src/geometry/line/index.js';
 import type { Coord as PolarCoord } from '../geometry/Polar.js';
-import type { Line, PolyLine } from '../geometry/line/index.js';
+import type { Line, PolyLine } from '../geometry/line/LineType.js';
+import type { Point } from '../geometry/point/PointType.js';
+import type { PointRelation, PointRelationResult } from '../geometry/point/PointRelation.js';
+import { joinPointsToLines } from '../geometry/line/JoinPointsToLines.js';
 
 /**
  * Information about seen points
  */
-export type PointTrack = Points.PointRelationResult & {
+export type PointTrack = PointRelationResult & {
   // readonly speedFromInitial:number
 };
 
@@ -32,18 +37,18 @@ export type PointTrackerResults = {
    * always maintains some time horizon
    */
   readonly fromInitial: PointTrack;
-  readonly values: ReadonlyArray<Points.Point>;
+  readonly values: ReadonlyArray<Point>;
 };
 
 /**
  * Point tracker. Create via `pointTracker()`.
  *
  */
-export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResults> {
+export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   /**
    * Function that yields the relation from initial point
    */
-  initialRelation: Points.PointRelation | undefined;
+  initialRelation: PointRelation | undefined;
 
   /**
    * Last result
@@ -102,7 +107,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * @param _p Point
    */
   computeResults(
-    _p: Array<TimestampedObject<Points.Point>>
+    _p: Array<TimestampedObject<Point>>
   ): PointTrackerResults {
     const currentLast = this.last;
 
@@ -123,7 +128,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
     // Compute relation from initial point to latest
     const initialRel: PointTrack = this.initialRelation(currentLast);
 
-    const speed = previousLast === undefined ? 0 : Lines.length(previousLast, currentLast) / (currentLast.at - previousLast.at);
+    const speed = previousLast === undefined ? 0 : LineLength(previousLast, currentLast) / (currentLast.at - previousLast.at);
 
     // Compute relation from current point to the previous
     const lastRel: PointTrack = {
@@ -146,7 +151,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    */
   get line(): PolyLine {
     if (this.values.length === 1) return [];
-    return Lines.joinPointsToLines(...this.values);
+    return joinPointsToLines(...this.values);
   }
 
   /**
@@ -161,7 +166,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    * Returns a vector of the initial/last points of the tracker.
    * Returns as a Cartesian coordinate
    */
-  get vectorCartesian(): Points.Point {
+  get vectorCartesian(): Point {
     return Vectors.fromLineCartesian(this.lineStartEnd);
   }
 
@@ -172,7 +177,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    */
   get lineStartEnd(): Line {
     const initial = this.initial;
-    if (this.values.length < 2 || !initial) return Lines.Empty;
+    if (this.values.length < 2 || !initial) return LinesEmpty;
     return {
       a: initial,
       b: this.last,
@@ -198,7 +203,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
    *
    * `Points.Placeholder` is returned if there's only one point so far.
    */
-  difference(): Points.Point {
+  difference(): Point {
     const initial = this.initial;
     return this.values.length >= 2 && initial !== undefined ? Points.subtract(this.last, initial) : Points.Placeholder;
   }
@@ -222,7 +227,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
   get length(): number {
     if (this.values.length === 1) return 0;
     const l = this.line;
-    return Lines.length(l);
+    return LineLength(l);
   }
 }
 
@@ -231,7 +236,7 @@ export class PointTracker extends ObjectTracker<Points.Point, PointTrackerResult
  * track added values.
  */
 export class TrackedPointMap extends TrackedValueMap<
-  Points.Point,
+  Point,
   PointTracker,
   PointTrackerResults
 > {

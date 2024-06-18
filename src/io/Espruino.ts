@@ -6,13 +6,12 @@ import { string as randomString } from '../random/String.js';
 import { waitFor } from '../flow/WaitFor.js';
 import {
   EspruinoSerialDevice,
-
 } from './EspruinoSerialDevice.js';
 import type {
   GenericStateTransitions,
   IoDataEvent,
   IoEvents,
-} from './index.js';
+} from './Types.js';
 
 export type EspruinoStates =
   | `ready`

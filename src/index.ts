@@ -16,7 +16,7 @@
  * @module
  */
 
-export * from './Results.js';
+
 
 /**
  * Processing streams of data. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
@@ -270,7 +270,6 @@ export * as Dom from './dom/index.js';
 
 export * as Events from './Events.js';
 
-export * from './Compare.js';
 
 /**
  * The Modulation module contains functions for, well, modulating data.
@@ -398,7 +397,5 @@ export * as Random from './random/index.js';
 export * as KeyValues from './KeyValue.js';
 
 export * as Util from './Util.js';
-export * from './IsEqual.js';
-
 
 export * as Immutable from './Immutable.js'

@@ -1,8 +1,7 @@
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from './StateMachine.js';
-
+import * as Elapsed from './Elapsed.js';
 import type { StateNames, Transitions, MachineState } from './StateMachine.js';
-import { Elapsed } from './index.js';
 
 export type StateChangeEvent<V extends Transitions> = {
   readonly newState: StateNames<V>;

@@ -1,28 +1,3 @@
-
-
-/**
- * Normalise module
- * * {@link array}: Normalises the contents of an array of known values.
- * * {@link stream}: Normalises a stream of unknown values.
- */
-export * as Normalise from './Normalise.js';
-
-export * from './FrequencyMutable.js';
-export * from './MovingAverage.js';
-export * from './NumberTracker.js';
-export * from './IntervalTracker.js';
-export * from './PointTracker.js';
-export * from './TrackedValue.js';
-export * from './TrackerBase.js';
-export * from './PrimitiveTracker.js';
-export * from './Clamp.js';
-export * from './Scale.js';
-export * from './Flip.js';
-export * as Graphs from './graphs/index.js'
-export * from './TrackUnique.js';
-export * from './Table.js';
-export * from './ResolveFields.js';
-
 /**
  * Work with bipolar values (-1...1)
  * 
@@ -40,9 +15,37 @@ export * from './ResolveFields.js';
  * * {@link towardZero}: Nudge a bipolar value towards zero
  */
 export * as Bipolar from './Bipolar.js';
-export * from './Interpolate.js';
-export * from './Wrap.js';
+
+export * from './Clamp.js';
 export * as Correlate from './Correlate.js';
+export * from './Flip.js';
+export * from './FrequencyMutable.js';
+export * from './Interpolate.js';
+export * from './MovingAverage.js';
+/**
+ * Normalise module
+ * * {@link array}: Normalises the contents of an array of known values.
+ * * {@link stream}: Normalises a stream of unknown values.
+ */
+export * as Normalise from './Normalise.js';
+
+export * from './NumberTracker.js';
+export * from './IntervalTracker.js';
+export * from './PointTracker.js';
 export * as Pool from './Pool.js';
+export * from './PrimitiveTracker.js';
+export * from './Process.js';
+export * from './Proportion.js';
+export * from './ResolveFields.js';
+export * from './Scale.js';
+export * from './Softmax.js';
+export * from './Table.js';
+export * from './TrackedValue.js';
+export * from './TrackerBase.js';
+export * from './TrackUnique.js';
 export * from './Types.js';
+export * from './Wrap.js';
+
+export * as Graphs from './graphs/index.js'
+
 export const piPi = Math.PI * 2;
