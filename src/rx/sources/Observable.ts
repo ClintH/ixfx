@@ -35,18 +35,20 @@ import { manual } from "../index.js";
  *  }
  * });
  * 
- * xy.value(value => {
+ * xy.onValue(value => {
  *  console.log(value);
  * });
  * ```
  * @param init 
  * @returns 
  */
-export function observable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined) {
+export function observable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined): Reactive<V> {
   const ow = observableWritable(init);
   return {
+    dispose: ow.dispose,
+    isDisposed: ow.isDisposed,
     on: ow.on,
-    value: ow.value
+    onValue: ow.onValue
   }
 }
 
@@ -55,7 +57,7 @@ export function observable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) 
  * @param init 
  * @returns 
  */
-export function observableWritable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined) {
+export function observableWritable<V>(init: (stream: Reactive<V> & ReactiveWritable<V>) => (() => void) | undefined): ReactiveWritable<V> & Reactive<V> {
   let onCleanup: (() => void) | undefined = () => {/** no-op */ };
   const ow = manual<V>({
     onFirstSubscribe() {
@@ -68,7 +70,7 @@ export function observableWritable<V>(init: (stream: Reactive<V> & ReactiveWrita
 
   return {
     ...ow,
-    value: (callback: (value: V) => void) => {
+    onValue: (callback: (value: V) => void) => {
       return ow.on(message => {
         if (messageHasValue(message)) {
           callback(message.value);
