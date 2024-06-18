@@ -1,6 +1,8 @@
 import { type ToString, toStringDefault } from '../Util.js';
 import { type IsEqual } from '../IsEqual.js';
 import { isIterable } from './Iterable.js';
+import type { ToArrayOptions } from './index.js';
+import { intervalToMs } from '../flow/IntervalType.js';
 export { slice } from './sync/Slice.js';
 export { reduce } from './sync/Reduce.js';
 
@@ -402,11 +404,15 @@ export function* fromIterable<T>(iterable: Iterable<T>) {
 //eslint-disable-next-line func-style
 export function toArray<V>(
   it: Iterable<V>,
-  count = Number.POSITIVE_INFINITY
+  options: Partial<ToArrayOptions> = {}
 ): Array<V> {
   const result: Array<V> = [];
+  const started = Date.now();
+  const maxItems = options.limit ?? Number.POSITIVE_INFINITY;
+  const maxElapsed = intervalToMs(options.elapsed, Number.POSITIVE_INFINITY);
   for (const v of it) {
-    if (result.length === count) break;
+    if (result.length >= maxItems) break;
+    if (Date.now() - started > maxElapsed) break;
     result.push(v);
   }
   return result;

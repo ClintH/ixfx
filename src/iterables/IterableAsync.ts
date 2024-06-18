@@ -3,6 +3,7 @@ import { toStringDefault, type IsEqual } from '../IsEqual.js';
 import { sleep, type SleepOpts } from '../flow/Sleep.js';
 import { isAsyncIterable, isIterable } from './Iterable.js';
 import type { ToString } from 'src/Util.js';
+import type { ToArrayOptions } from './index.js';
 
 /**
  * Yield values from `array`, one at a time.
@@ -410,19 +411,28 @@ export async function some<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promi
  * const data = await toArray(adsrIterable(opts, 10));
  * ```
  *
- * Note: If the iterator is infinite, be sure to provide a `count` or the function
- * will never return.
- *
+ * Note: If the iterator is infinite, be sure to provide limits via the options.
+ * ```js
+ * // Return maximum five items
+ * const data = await toArray(iterable, { limit: 5 });
+ * // Return results for a maximum of 5 seconds
+ * const data = await toArray(iterable, { elapsed: 5000 });
+ * ```
+ * Note that limits are ORed, `toArray` will finish if either of them is true.
+ * 
  * @param it Asynchronous iterable
  * @param count Number of items to return, by default all.
  * @returns
  */
-export async function toArray<V>(it: AsyncIterable<V>, count = Number.POSITIVE_INFINITY): Promise<Array<V>> {
+export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayOptions> = {}): Promise<Array<V>> {
   // https://2ality.com/2016/10/asynchronous-iteration.html
   const result = [];
   const iterator = it[ Symbol.asyncIterator ]();
+  const started = Date.now();
+  const maxItems = options.limit ?? Number.POSITIVE_INFINITY;
+  const maxElapsed = intervalToMs(options.elapsed, Number.POSITIVE_INFINITY);
 
-  while (result.length < count) {
+  while (result.length < maxItems && (Date.now() - started < maxElapsed)) {
     const r = await iterator.next();
     if (r.done) break;
     //eslint-disable-next-line functional/immutable-data
