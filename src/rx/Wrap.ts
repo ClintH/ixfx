@@ -1,11 +1,13 @@
 import * as Ops from "./ops/index.js";
 import { resolveSource } from "./ResolveSource.js";
 import { toArray, toArrayOrThrow } from "./ToArray.js";
-import type { ReactiveOrSource, Wrapped, ToArrayOptions, InitStreamOptions, Reactive, RxValueTypes, CombineLatestOptions, } from "./Types.js";
+import type { ReactiveOrSource, Wrapped, ToArrayOptions, InitStreamOptions, Reactive, RxValueTypes, CombineLatestOptions, ReactiveOp, } from "./Types.js";
 import type { BatchOptions, FieldOptions, FilterPredicate, DebounceOptions, SwitcherOptions, SplitOptions, ThrottleOptions, TransformOpts, SyncOptions, } from './ops/Types.js'
 import type { TimeoutTriggerOptions } from './sources/Types.js'
 import { messageHasValue } from "./Util.js";
 import { map as ImmutableMap } from '../Immutable.js';
+import * as Enacts from './sinks/index.js';
+import type { Processors } from "../data/Process.js";
 
 /**
  * Wrap a reactive source to allow for chained
@@ -21,7 +23,7 @@ import { map as ImmutableMap } from '../Immutable.js';
  * wrap(Rx.fromEvent<{ x: number, y: number }>(document.body, `pointerup`))
  *  .batch({ elapsed: 200 })
  *  .transform(v => v.length)
- *  .value(v => { console.log(v) });
+ *  .onValue(v => { console.log(v) });
  * ```
  * @param source 
  * @returns 
@@ -29,12 +31,14 @@ import { map as ImmutableMap } from '../Immutable.js';
 export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
   return {
     source: resolveSource(source),
-    annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation): Wrapped<TIn & TAnnotation> => {
+    enacts: {
+      setHtmlText: (options) => {
+        return Enacts.setHtmlText(source, options);
+      },
+    },
+    annotate: <TAnnotation>(transformer: (value: TIn) => TAnnotation): Wrapped<{ value: TIn, annotation: TAnnotation }> => {
       const a = Ops.annotate<TIn, TAnnotation>(source, transformer);
       return wrap(a);
-    },
-    annotateElapsed: () => {
-      return wrap(Ops.annotateElapsed<TIn>(source));
     },
     batch: (options: Partial<BatchOptions>): Wrapped<Array<TIn>> => {
       const w = wrap<Array<TIn>>(Ops.batch(source, options));
@@ -43,7 +47,7 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
     debounce: (options: Partial<DebounceOptions> = {}) => {
       return wrap(Ops.debounce<TIn>(source, options));
     },
-    field: <TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>> = {}) => {
+    field: <TSource, TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TSource, TFieldType>> = {}) => {
       // Ops.field requires TIn extends object
       // Would be good if `wrap` returns different versions depending on TIn, so .field
       // would not be present at all if we had Reactive<number>, for example
@@ -63,6 +67,21 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       const o = { ...sources };
       (o as any)[ name ] = source;
       return wrap(Ops.combineLatestToObject(o, options));
+    },
+    min: (options: Partial<Ops.OpMathOptions> = {}) => {
+      return wrap(Ops.min(source, options));
+    },
+    max: (options: Partial<Ops.OpMathOptions> = {}) => {
+      return wrap(Ops.max(source, options));
+    },
+    average: (options: Partial<Ops.OpMathOptions> = {}) => {
+      return wrap(Ops.average(source, options));
+    },
+    sum: (options: Partial<Ops.OpMathOptions> = {}) => {
+      return wrap(Ops.sum(source, options));
+    },
+    tally: (options: Partial<Ops.TallyOptions> = {}) => {
+      return wrap(Ops.tally(source, options));
     },
     split: (options: Partial<SplitOptions> = {}) => {
       const streams = Ops.split<TIn>(source, options).map(v => wrap(v));
@@ -89,6 +108,18 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       (o as any)[ name ] = source;
       return wrap(Ops.syncToObject(o, options));
     },
+    tapProcess: <T2, T3, T4, T5, T6>(...processors: Processors<TIn, T2, T3, T4, T5, T6>) => {
+      Ops.tapProcess(source, ...processors)
+      return wrap(source);
+    },
+    tapStream: (divergedStream) => {
+      Ops.tapStream(source, divergedStream);
+      return wrap(source);
+    },
+    tapOps: <TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<TIn, TOut>>) => {
+      Ops.tapOps(source, ...ops);
+      return wrap(source);
+    },
     throttle: (options: Partial<ThrottleOptions> = {}) => {
       return wrap(Ops.throttle<TIn>(source, options));
     },
@@ -104,7 +135,7 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
     toArrayOrThrow: (options: Partial<ToArrayOptions<TIn>>) => {
       return toArrayOrThrow(source, options);
     },
-    value: (callback: ((value: TIn) => void)) => {
+    onValue: (callback: ((value: TIn) => void)) => {
       const s = resolveSource(source);
       s.on(message => {
         if (messageHasValue(message)) callback(message.value);
