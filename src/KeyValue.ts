@@ -1,33 +1,7 @@
 
+import type { KeyValue } from './PrimitiveTypes.js';
 import { defaultComparer } from './Util.js';
 import { minMaxAvg as arrayMinMaxAg } from './collections/arrays/index.js';
-
-export type StringOrNumber = string | number | bigint;
-export type Primitive = string | number | bigint | boolean;
-export type PrimitiveOrObject = Primitive | object;
-
-export type BasicType = StringOrNumber | object;
-export type KeyValue = readonly [ key: string, value: StringOrNumber ];
-
-/**
- * Returns _true_ if `value` is number, string, bigint or boolean.
- * Returns _false_ if `value` is an object, null, undefined
- * @param value Value to check
- * @returns _True_ if value is number, string, bigint or boolean.
- */
-export function isPrimitive(value: any): value is Primitive {
-  if (typeof value === `number`) return true;
-  if (typeof value === `string`) return true;
-  if (typeof value === `bigint`) return true;
-  if (typeof value === `boolean`) return true;
-  return false;
-}
-
-export function isPrimitiveOrObject(value: any): value is PrimitiveOrObject {
-  if (isPrimitive(value)) return true;
-  if (typeof value === `object`) return true;
-  return false;
-}
 
 // const byKey = (reverse = false) => pipe(
 //   reverse ? reverseOrd(S.Ord) : S.Ord,
