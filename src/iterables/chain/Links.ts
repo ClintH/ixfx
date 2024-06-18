@@ -1,9 +1,11 @@
 import { intervalToMs, type Interval } from "../../flow/IntervalType.js";
 import { sleep } from "../../flow/Sleep.js";
-import type { Link, GenOrData, DelayOptions, RankFunction, RankOptions, RankArrayOptions } from "./Types.js";
+import type { Link, GenOrData, DelayOptions } from "./Types.js";
 import { resolveToGen } from "./Util.js";
 import { Elapsed } from "../../flow/index.js";
 import { throwIntegerTest } from "../../Guards.js";
+import * as BasicProcessors from '../../data/BasicProcessors.js';
+
 /**
  * Transform values from one type to another. Just like a map function.
  * @param transformer 
@@ -40,26 +42,26 @@ export function take<In>(limit: number): Link<In, In> {
 
 /**
  * Takes an array of values, flattening to a single one
- * using the provided `flattener` function.
+ * using the provided `reducer` function.
  * 
  * ```js
  * // Create a chain that flattens values
- * const flatten = Chains.flatten(values => Math.max(...values));
+ * const reduce = Chains.reduce(values => Math.max(...values));
  * // Feed it a single input (an array), get a single output back:
- * const result = await Chains.single(flatten, [ 1, 2, 3]); // 3
+ * const result = await Chains.single(reduce, [ 1, 2, 3]); // 3
  * ```
- * @param flattener Function to flatten array of values to a single value
+ * @param reducer Function to reduce array of values to a single value
  * @returns 
  */
-export function flatten<In, Out>(flattener: (v: Array<In>) => Out): Link<Array<In>, Out> {
-  async function* flatten(input: GenOrData<Array<In>>): AsyncGenerator<Out> {
+export function reduce<In, Out>(reducer: (v: Array<In>) => Out): Link<Array<In>, Out> {
+  async function* reduce(input: GenOrData<Array<In>>): AsyncGenerator<Out> {
     input = resolveToGen(input);
     for await (const value of input) {
-      yield flattener(value);
+      yield reducer(value);
     }
   }
-  flatten._name = `flatten`;
-  return flatten;
+  reduce._name = `reduce`;
+  return reduce;
 }
 
 /**
@@ -114,11 +116,11 @@ export function delay<In>(options: DelayOptions): Link<In, In> {
  * 
  * In the following example, only three values will be let through.
  * ```js
- * const chain = Chains.chain(
+ * const chain = Chains.run(
  *  // Produce values every 10ms for 350ms
- *  Chains.tick({ interval: 10, elapsed: 350 }),
+ *  Chains.From.timestamp({ interval: 10, elapsed: 350 }),
  *  // Only let a value through every 100ms
- *  Chains.debounce(100)
+ *  Chains.Links.debounce(100)
  * );
  * ```
  * @param rate 
@@ -144,16 +146,26 @@ export function debounce<In>(rate: Interval): Link<In, In> {
 /**
  * Returns a running tally of how many items have been
  * emitted from the input source.
+ * ```js
+ * const ch = Chains.run(
+ *  Chains.From.timestamp({ interval: 100 }),
+ *  Chains.Links.tally()
+ * );
  * 
- * This is different than {@link total} which adds up numeric values
+ * for await (const v of ch) {
+ *   // Produces: 1, 2, 3 ... every 100ms
+ * }
+ * ```
+ * This is different than {@link total} which adds up numeric values.
+ * By default it adds up individual array items
  * @returns 
  */
-export function tally<In>(): Link<In, number> {
+export function tally<In>(countArrayItems = true): Link<In, number> {
   async function* tally(input: GenOrData<In>): AsyncGenerator<number> {
     input = resolveToGen(input);
-    let count = 0;
-    for await (const _ of input) {
-      yield ++count;
+    const p = BasicProcessors.tally(countArrayItems);
+    for await (const v of input) {
+      yield p(v);
     }
   }
   tally._name = `tally`;
@@ -169,18 +181,11 @@ export function tally<In>(): Link<In, number> {
 export function min(): Link<number | Array<number>, number> {
   async function* min(input: GenOrData<number | Array<number>>): AsyncGenerator<number> {
     input = resolveToGen(input);
-    let min = Number.MAX_SAFE_INTEGER;
+    const p = BasicProcessors.min();
     for await (const value of input) {
-      const arrayValue = Array.isArray(value) ? value : [ value ]
-      for (const subValue of arrayValue) {
-        if (typeof subValue !== `number`) break;
-        min = Math.min(subValue, min);
-        yield min;
-      }
-
-      // if (typeof value !== `number`) break;
-      // min = Math.min(value, min);
-      // yield min;
+      const x = p(value);
+      if (x === undefined) continue;
+      yield x;
     }
   }
   min._name = `min`;
@@ -188,26 +193,42 @@ export function min(): Link<number | Array<number>, number> {
 }
 
 /**
- * Returns the largest value from the input
- * Non-numeric data is filtered out
+ * Returns the largest value from the input.
+ * - Non-numeric data is filtered out.
+ * - Looks inside of numeric arrays.
  * @returns 
  */
 export function max(): Link<number | Array<number>, number> {
   async function* max(input: GenOrData<number | Array<number>>): AsyncGenerator<number> {
     input = resolveToGen(input);
-    let max = Number.MIN_SAFE_INTEGER;
+    const p = BasicProcessors.max();
     for await (const value of input) {
-      const valueArray = Array.isArray(value) ? value : [ value ];
-      for (const subValue of valueArray) {
-        if (typeof subValue !== `number`) break;
-        max = Math.max(subValue, max);
-        yield max;
-      }
+      const x = p(value);
+      if (x === undefined) continue;
+      yield x;
     }
   }
   max._name = `max`;
   return max;
 }
+// export function max(): Link<number | Array<number>, number> {
+//   async function* max(input: GenOrData<number | Array<number>>): AsyncGenerator<number> {
+//     input = resolveToGen(input);
+//     let max = Number.MIN_SAFE_INTEGER;
+//     for await (const value of input) {
+//       const valueArray = Array.isArray(value) ? value : [ value ];
+//       for (const subValue of valueArray) {
+//         if (typeof subValue !== `number`) break;
+//         max = Math.max(subValue, max);
+//         yield max;
+//       }
+//     }
+//   }
+//   max._name = `max`;
+//   return max;
+// }
+
+
 
 /**
  * Emits the currently ranked 'highest' value from a stream. Only
@@ -227,43 +248,23 @@ export function max(): Link<number | Array<number>, number> {
  * ```js
  * // Rank based on a field
  * Chains.Links.rank((a,b) => {
- *  if (a.size > b.size) return `a`;
- *  if (a.size < b.size) return `b`;
+ *  if (a.size > b.size) return `a`; // Signals the first param is highest
+ *  if (a.size < b.size) return `b`; // Signals the second param is highest
  *  return `eq`;
  * });
  * ```
  * @param options 
  * @returns 
  */
-export function rank<In>(r: RankFunction<In>, options: Partial<RankOptions> = {}): Link<In, In> {
-  const includeType = options.includeType;
-  const emitEqualRanked = options.emitEqualRanked ?? false;
-  const emitRepeatHighest = options.emitRepeatHighest ?? false;
+export function rank<In>(r: BasicProcessors.RankFunction<In>, options: Partial<BasicProcessors.RankOptions> = {}): Link<In, In> {
   async function* rank(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
-    let best: In | undefined;
+    //let best: In | undefined;
+    const p = BasicProcessors.rank(r, options);
     for await (const value of input) {
-      let emit = false;
-      if (includeType && typeof value !== includeType) continue;
-      if (best === undefined) {
-        best = value;
-        emit = true;
-      } else {
-        const result = r(value, best);
-        //console.log(`result: ${ result } value: ${ JSON.stringify(value) } best: ${ JSON.stringify(best) }`);
-        if (result == `a`) {
-          // New value is the current best
-          best = value;
-          emit = true;
-        } else if (result === `eq` && emitEqualRanked) {
-          // New value is same rank as previous, but we have flag on
-          emit = true;
-        } else if (emitRepeatHighest) {
-          // Emit current highest due to flag
-          emit = true;
-        }
-      }
-      if (emit) yield best;
+      const x = p(value);
+      if (x === undefined) continue;
+      yield x;
     }
   }
   rank._name = `rank`;
@@ -304,7 +305,7 @@ export function rank<In>(r: RankFunction<In>, options: Partial<RankOptions> = {}
  * @param options 
  * @returns 
  */
-export function rankArray<In>(r: RankFunction<In>, options: Partial<RankArrayOptions> = {}): Link<Array<In>, In> {
+export function rankArray<In>(r: BasicProcessors.RankFunction<In>, options: Partial<BasicProcessors.RankArrayOptions> = {}): Link<Array<In>, In> {
   const includeType = options.includeType;
   const emitEqualRanked = options.emitEqualRanked ?? false;
   const emitRepeatHighest = options.emitRepeatHighest ?? false;
@@ -352,13 +353,11 @@ export function rankArray<In>(r: RankFunction<In>, options: Partial<RankArrayOpt
 export function average(): Link<number, number> {
   async function* average(input: GenOrData<number>): AsyncGenerator<number> {
     input = resolveToGen(input);
-    let total = 0;
-    let count = 0;
+    const p = BasicProcessors.average();
     for await (const value of input) {
-      if (typeof value !== `number`) break;
-      count++;
-      total += value;
-      yield total / count;
+      const x = p(value);
+      if (x === undefined) continue;
+      yield x;
     }
   }
   average._name = `average`;
@@ -370,18 +369,18 @@ export function average(): Link<number, number> {
  * Non-numeric values are filtered out.
  * @returns 
  */
-export function total(): Link<number, number> {
-  async function* average(input: GenOrData<number>): AsyncGenerator<number> {
+export function sum(): Link<number, number> {
+  async function* total(input: GenOrData<number>): AsyncGenerator<number> {
     input = resolveToGen(input);
-    let total = 0;
+    const p = BasicProcessors.sum();
     for await (const value of input) {
-      if (typeof value !== `number`) break;
-      total += value;
-      yield total;
+      const x = p(value);
+      if (x === undefined) continue;
+      yield x;
     }
   }
-  average._name = `average`;
-  return average;
+  total._name = `total`;
+  return total;
 }
 
 /**
