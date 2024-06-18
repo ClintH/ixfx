@@ -14,7 +14,7 @@ test('asPromise', async t => {
   const loops = 10;
   t.plan(loops);
   t.timeout(timeout * (loops + 2));
-  const tick = Chains.tick({ interval: timeout, loops });
+  const tick = Chains.From.timestamp({ interval: timeout, loops });
   const tickValue = Chains.asPromise(tick);
 
   let timer = setInterval(async () => {
@@ -33,7 +33,7 @@ test('asPromise', async t => {
 test(`fromFunction`, async t => {
   // Low-level
   let produced = 0;
-  const factory = Chains.fromFunction(() => {
+  const factory = Chains.From.func(() => {
     return produced++;
   });
   const f = factory();
@@ -50,7 +50,7 @@ test(`fromFunction`, async t => {
   // In context
   produced = 0;
   const ch1 = Chains.run(
-    Chains.fromFunction(() => produced++),
+    Chains.From.func(() => produced++),
     Chains.Links.transform(v => `x:${ v }`),
     Chains.Links.take(5)
   );
@@ -125,7 +125,7 @@ test(`chunk`, async t => {
 
 test(`flatten`, async t => {
   // Simple
-  const f = Chains.Links.flatten<string, string>(data => data.join(`-`));
+  const f = Chains.Links.reduce<string, string>(data => data.join(`-`));
   const r1 = await Chains.single(f, [ `a`, `b`, `c` ]);
   t.is(r1, `a-b-c`);
 
@@ -133,7 +133,7 @@ test(`flatten`, async t => {
     [ 1, 2, 3, 4, 5, 6 ],
     Chains.Links.transform(v => `x:${ v }`),
     Chains.Links.chunk(3),
-    Chains.Links.flatten(v => v.join(`-`))
+    Chains.Links.reduce(v => v.join(`-`))
   );
   const r2 = (await Chains.asArray(ch1)).join(`;`);
   t.is(r2, `x:1-x:2-x:3;x:4-x:5-x:6`)
@@ -145,8 +145,8 @@ test(`flatten`, async t => {
  */
 test(`combine-latest-to-object-break`, async t => {
   const c1 = Chains.combineLatestToObject({
-    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+    fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
+    slow: Chains.From.array([ 5, 6, 7 ], 25)
   }, { onSourceDone: `break`, afterEmit: `last` });
   const c1Array = await Chains.asArray(c1);
   // Slow chain doesn't get a chance to finish due to 'onSourceDone:break'
@@ -158,8 +158,8 @@ test(`combine-latest-to-object-break`, async t => {
   // Slow chain doesn't get a chance to finish due to 'onSourceDone:break'
   // Values set to undefined because afterEmit:undefined  
   const c2 = Chains.combineLatestToObject({
-    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+    fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
+    slow: Chains.From.array([ 5, 6, 7 ], 25)
   }, { onSourceDone: `break`, afterEmit: 'undefined' });
   const c2Array = await Chains.asArray(c2);
   t.deepEqual(c2Array, [
@@ -170,8 +170,8 @@ test(`combine-latest-to-object-break`, async t => {
 
 test(`combine-latest-to-object-allow`, async t => {
   const c1 = Chains.combineLatestToObject({
-    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+    fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
+    slow: Chains.From.array([ 5, 6, 7 ], 25)
   }, { onSourceDone: `allow`, finalValue: `last`, afterEmit: `last` });
   const c1Array = await Chains.asArray(c1);
 
@@ -188,8 +188,8 @@ test(`combine-latest-to-object-allow`, async t => {
   ]);
 
   const c2 = Chains.combineLatestToObject({
-    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+    fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
+    slow: Chains.From.array([ 5, 6, 7 ], 25)
   }, { onSourceDone: `allow`, finalValue: `undefined`, afterEmit: `last` });
   const c2Array = await Chains.asArray(c2);
 
@@ -207,8 +207,8 @@ test(`combine-latest-to-object-allow`, async t => {
   ]);
 
   const c3 = Chains.combineLatestToObject({
-    fast: Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    slow: Chains.fromArray([ 5, 6, 7 ], 25)
+    fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
+    slow: Chains.From.array([ 5, 6, 7 ], 25)
   }, { onSourceDone: `allow`, finalValue: `undefined`, afterEmit: `undefined` });
   const c3Array = await Chains.asArray(c3);
 
@@ -228,8 +228,8 @@ test(`combine-latest-to-object-allow`, async t => {
 
 test(`combine-latest-to-array`, async t => {
   const c1 = Chains.combineLatestToArray([
-    Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    Chains.fromArray([ 5, 6, 7 ], 25)
+    Chains.From.array([ 1, 2, 3, 4 ], 10),
+    Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `break`, afterEmit: `last` });
   const c1Array = await Chains.asArray(c1);
 
@@ -240,8 +240,8 @@ test(`combine-latest-to-array`, async t => {
   ]);
 
   const c1a = Chains.combineLatestToArray([
-    Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    Chains.fromArray([ 5, 6, 7 ], 25)
+    Chains.From.array([ 1, 2, 3, 4 ], 10),
+    Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `break`, afterEmit: 'undefined' });
   const c1aArray = await Chains.asArray(c1a);
 
@@ -251,8 +251,8 @@ test(`combine-latest-to-array`, async t => {
   ]);
 
   const c2 = Chains.combineLatestToArray([
-    Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    Chains.fromArray([ 5, 6, 7 ], 25)
+    Chains.From.array([ 1, 2, 3, 4 ], 10),
+    Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `allow`, finalValue: `last`, afterEmit: `last` });
   const c2Array = await Chains.asArray(c2);
 
@@ -263,8 +263,8 @@ test(`combine-latest-to-array`, async t => {
   ]);
 
   const c2a = Chains.combineLatestToArray([
-    Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    Chains.fromArray([ 5, 6, 7 ], 25)
+    Chains.From.array([ 1, 2, 3, 4 ], 10),
+    Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `allow`, finalValue: `last`, afterEmit: `undefined` });
   const c2aArray = await Chains.asArray(c2a);
   t.deepEqual(c2aArray, [
@@ -272,8 +272,8 @@ test(`combine-latest-to-array`, async t => {
   ]);
 
   const c3 = Chains.combineLatestToArray([
-    Chains.fromArray([ 1, 2, 3, 4 ], 10),
-    Chains.fromArray([ 5, 6, 7 ], 25)
+    Chains.From.array([ 1, 2, 3, 4 ], 10),
+    Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `allow`, finalValue: `undefined` });
   const c3Array = await Chains.asArray(c3);
   t.deepEqual(c3Array, [
@@ -284,19 +284,19 @@ test(`combine-latest-to-array`, async t => {
 
 test(`merge-flat`, async t => {
   const t1 = Chains.run(
-    Chains.tick({ interval: 50, loops: 10 }),
+    Chains.From.timestamp({ interval: 50, loops: 10 }),
     Chains.Links.tally(),
     Chains.Links.transform(v => `a:${ v }`)
   );
 
   const t2 = Chains.run(
-    Chains.tick({ interval: 10, loops: 9 }),
+    Chains.From.timestamp({ interval: 10, loops: 9 }),
     Chains.Links.tally(),
     Chains.Links.transform(v => `b:${ v }`)
   );
 
   const t3 = Chains.run(
-    Chains.tick({ interval: 30, loops: 8 }),
+    Chains.From.timestamp({ interval: 30, loops: 8 }),
     Chains.Links.tally(),
     Chains.Links.transform(v => `c:${ v }`)
   );
@@ -315,7 +315,7 @@ test(`merge-flat`, async t => {
 
 test(`addToArray`, async t => {
   const data: Array<number> = [];
-  Chains.addToArray(data, Chains.tick({ interval: 100, loops: 5 }));
+  Chains.addToArray(data, Chains.From.timestamp({ interval: 100, loops: 5 }));
 
   // Wait for all the data to arrive
   await sleep(505);
@@ -325,7 +325,7 @@ test(`addToArray`, async t => {
 
 
 test('asValue', async t => {
-  const tick = Chains.tick({ interval: 100 });
+  const tick = Chains.From.timestamp({ interval: 100 });
   const tickValue = Chains.asValue(tick);
   const v1 = await tickValue();
   t.falsy(v1);
@@ -336,7 +336,7 @@ test('asValue', async t => {
 
 test('asCallback', async t => {
   t.plan(5);
-  const tick = Chains.tick({ interval: 100, loops: 5 });
+  const tick = Chains.From.timestamp({ interval: 100, loops: 5 });
   const tickValue = Chains.asCallback(tick, v => {
     t.assert(true, `callback triggered`);
   });
@@ -367,16 +367,16 @@ test('take', async t => {
 });
 
 test(`syncToArray`, async t => {
-  const t1 = Chains.tick({ interval: 10, loops: 10 });
-  const t2 = Chains.tick({ interval: 20, loops: 5, asClockTime: true });
+  const t1 = Chains.From.timestamp({ interval: 10, loops: 10 });
+  const t2 = Chains.From.timestamp({ interval: 20, loops: 5, asClockTime: true });
   const ch1 = Chains.syncToArray([ t1, t2 ], { onSourceDone: `break` });
   const output1 = await Chains.asArray(ch1);
   // Expect the total length to be 5 because 'onSourceDone:break'
   t.is(output1.length, 5);
 
   const ch2 = Chains.syncToArray([
-    Chains.tick({ interval: 10, loops: 10 }),
-    Chains.tick({ interval: 20, loops: 5, asClockTime: true })
+    Chains.From.timestamp({ interval: 10, loops: 10 }),
+    Chains.From.timestamp({ interval: 20, loops: 5, asClockTime: true })
   ], { onSourceDone: `allow` });
 
   const ch2Array = await Chains.asArray(ch2);
@@ -410,7 +410,7 @@ test(`debounce`, async t => {
   t.plan(3);
   //const elapsed = Elapsed.since();
   const ch1 = Chains.run(
-    Chains.tick({ interval: 10, elapsed: 350 }),
+    Chains.From.timestamp({ interval: 10, elapsed: 350 }),
     Chains.Links.debounce(100)
   );
   for await (const v of ch1) {
@@ -537,7 +537,7 @@ test('tick', async t => {
   // Tick with interval
   const intervalMs = 50;
   const ch1 = Chains.run(
-    Chains.tick({ interval: intervalMs }),
+    Chains.From.timestamp({ interval: intervalMs }),
     Chains.Links.transform(v => v)
   );
   let tracker = intervalTracker();
@@ -552,7 +552,7 @@ test('tick', async t => {
   // Tick with max loops
   let loops = 10;
   const ch2 = Chains.run(
-    Chains.tick({ loops, interval: intervalMs }),
+    Chains.From.timestamp({ loops, interval: intervalMs }),
     Chains.Links.transform(v => v)
   );
   tracker = intervalTracker();
