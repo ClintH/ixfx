@@ -19,7 +19,7 @@ test(`from-array-lazy-never-breaking-reset`, async t => {
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `never` });
   let count = 0;
   const r1Data: number[] = [];
-  const r1Off = r1.value(v => {
+  const r1Off = r1.onValue(v => {
     count++;
     r1Data.push(v);
     if (count === 5) {
@@ -38,7 +38,7 @@ test(`from-array-lazy-initial-breaking-reset`, async t => {
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `initial` });
   let count = 0;
   const r1Data: number[] = [];
-  const r1Off = r1.value(v => {
+  const r1Off = r1.onValue(v => {
     count++;
     r1Data.push(v);
     if (count === 5) r1Off();
@@ -59,7 +59,7 @@ test(`from-array-lazy-very-breaking-continue`, async t => {
   const r1 = Rx.From.iterator(source(), { whenStopped: `continue`, lazy: `very` });
   let count = 0;
   const r1Data: number[] = [];
-  const r1Off = r1.value(v => {
+  const r1Off = r1.onValue(v => {
     count++;
     r1Data.push(v);
     if (count === 5) {
@@ -72,7 +72,7 @@ test(`from-array-lazy-very-breaking-continue`, async t => {
 
   count = 0;
   const r2Data: number[] = [];
-  const r2Off = r1.value(v => {
+  const r2Off = r1.onValue(v => {
     count++;
     r2Data.push(v);
     if (count === 5) {
@@ -90,7 +90,7 @@ test(`from-array-breaking-reset`, async t => {
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `very`, readInterval: 50 });
   let count = 0;
   const r1Data: number[] = [];
-  const r1Off = r1.value(v => {
+  const r1Off = r1.onValue(v => {
     count++;
     r1Data.push(v);
     if (count === 5) {
@@ -105,7 +105,7 @@ test(`from-array-breaking-reset`, async t => {
 
   count = 0;
   const r2Data: number[] = [];
-  const r2Off = r1.value(v => {
+  const r2Off = r1.onValue(v => {
     count++;
     r2Data.push(v);
     if (count === 5) {
@@ -220,7 +220,7 @@ test(`from-iterable-breaking-initial-reset`, async t => {
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `initial` });
   let count = 0;
   const r1Data: number[] = [];
-  const r1Off = r1.value(v => {
+  const r1Off = r1.onValue(v => {
     count++;
     r1Data.push(v);
     if (count === 5) r1Off();
@@ -240,7 +240,7 @@ test(`from-function`, async t => {
   const random = Iter.Async.fromFunction(Math.random);
   const r1 = Rx.From.iterator(random, { readInterval: 100 });
   let count = 0;
-  const off = r1.value(v => {
+  const off = r1.onValue(v => {
     count++;
     if (count == 5) {
       r1.dispose(`test dispose`);
