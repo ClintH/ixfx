@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { Immutable } from "../../index.js";
+import { DispatchList } from "../../flow/DispatchList.js";
+import * as Immutable from "../../Immutable.js";
 import { initStream } from "../InitStream.js";
-import type { ReactiveDiff, ReactiveInitial, ReactiveNonInitial, ReactiveDisposable } from "../Types.js";
+import type { ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
 import type { ObjectOptions } from "./Types.js";
 
+type ObjectFieldHandler = (value: any, fieldName: string) => void
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 export function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
+
 
 /**
  * Creates a Reactive wrapper with the shape of the input object.
@@ -46,14 +49,23 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
  *  { path: `level`, previous: 2, value: 3 }
  * ]
  * ```
+ * 
+ * You can also listen to updates on a field via `onField`.
+ * ```js
+ * o.onField(`name`, value => {
+ *  // Called whenever the 'name' field is updated
+ * });
+ * ```
  * @param initialValue  Initial value
  * @param options Options
  * @returns 
  */
-export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDisposable<V> & ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
+export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
   const eq = options.eq ?? Immutable.isEqualContextString;
   const setEvent = initStream<V>();
   const diffEvent = initStream<Array<Immutable.Change<any>>>();
+
+  const fieldChangeEvents = new Map<string, DispatchList<ObjectFieldHandler>>;
 
   let value: V | undefined = initialValue;
   let disposed = false;
@@ -65,27 +77,42 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
       if (diff.length === 0) return;
       diffEvent.set(diff);
     }
-
     value = v;
     setEvent.set(v);
   }
 
+  const fireFieldUpdate = (field: string, value: any) => {
+    const l = fieldChangeEvents.get(field.toLowerCase());
+    if (l === undefined) return;
+    l.notify(value);
+  }
+
   const update = (toMerge: Partial<V>) => {
+    //console.log(`Rx.From.object update: toMerge: ${ JSON.stringify(toMerge) } value: ${ JSON.stringify(value) }`);
     // eslint-disable-next-line unicorn/prefer-ternary
     if (value === undefined) {
       value = toMerge as V;
+      setEvent.set(value);
+      for (const [ k, v ] of Object.entries(toMerge as V)) {
+        fireFieldUpdate(k, v);
+      }
+      return value;
     } else {
-      const diff = Immutable.compareData(toMerge, value);
-      // console.log(`Rx.fromObject.update value: ${ JSON.stringify(value) }`);
-      // console.log(`Rx.fromObject.update  diff: ${ JSON.stringify(diff) }`);
-      if (diff.length === 0) return; // No changes
+      const diff = Immutable.compareData(value, toMerge);
+      const diffWithoutRemoved = diff.filter(d => d.state !== `removed`);
+      if (diffWithoutRemoved.length === 0) return value; // No changes
       value = {
         ...value,
         ...toMerge
       }
+      //console.log(`diff: ${ JSON.stringify(diff) }`);
       diffEvent.set(diff);
+      setEvent.set(value);
+      for (const d of diffWithoutRemoved) {
+        fireFieldUpdate(d.path, d.value);
+      }
+      return value;
     }
-    setEvent.set(value);
   }
 
   const updateField = (path: string, valueForField: any) => {
@@ -111,6 +138,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
 
     diffEvent.set(diff);
     setEvent.set(o);
+    fireFieldUpdate(path, valueForField);
     //console.log(`Rx.fromObject.updateField: path: '${ path }' value: '${ JSON.stringify(valueForField) }' o: ${ JSON.stringify(o) }`);
   }
 
@@ -133,8 +161,19 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     updateField,
     last: () => value,
     on: setEvent.on,
-    value: setEvent.value,
+    onValue: setEvent.onValue,
     onDiff: diffEvent.on,
+    onField(fieldName: string, handler: (value: any, fieldName: string) => void) {
+      let listeners = fieldChangeEvents.get(fieldName.toLowerCase());
+      if (listeners === undefined) {
+        listeners = new DispatchList();
+        fieldChangeEvents.set(fieldName.toLowerCase(), listeners);
+      }
+      const id = listeners.add((value) => {
+        setTimeout(() => { handler(value, fieldName) }, 1);
+      });
+      return () => listeners.remove(id);
+    },
     /**
      * Set the whole object
      */
