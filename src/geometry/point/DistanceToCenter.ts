@@ -2,9 +2,10 @@ import { distanceFromExterior as circleDistanceFromExterior } from "../circle/Di
 import { distance } from "./Distance.js";
 import { isPoint } from "./Guard.js";
 import { distanceFromExterior as rectDistanceFromExterior } from "../rect/Distance.js";
-import type { Point, PointCalculableShape } from "../Types.js";
+import type { Point } from "./PointType.js";
 import { isCirclePositioned } from "../circle/Guard.js";
 import { isRectPositioned } from "../rect/Guard.js";
+import type { PointCalculableShape } from "../shape/index.js";
 
 /**
  * Returns the distance from point `a` to the center of `shape`.

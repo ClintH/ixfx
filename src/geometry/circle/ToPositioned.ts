@@ -1,7 +1,8 @@
-import { Points } from "../index.js";
-import type { Circle, CirclePositioned } from "./index.js";
+import type { Circle, CirclePositioned } from "./CircleType.js";
 import { isCirclePositioned } from "./Guard.js";
-import type { Point } from "../Types.js";
+import type { Point } from '../point/PointType.js';
+import { getPointParameter } from "../point/GetPointParameter.js";
+
 
 /**
  * Returns a positioned version of a circle.
@@ -16,7 +17,7 @@ export const toPositioned = (circle: Circle | CirclePositioned, defaultPositionO
   if (isCirclePositioned(circle)) return circle;
 
   // Returns 0,0 if params are undefined
-  const pt = Points.getPointParameter(defaultPositionOrX, y);
+  const pt = getPointParameter(defaultPositionOrX, y);
   return Object.freeze({
     ...circle,
     ...pt

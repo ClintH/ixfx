@@ -2,11 +2,12 @@ import { Points, Polar } from '../index.js';
 import { Arrays } from '../../collections/index.js';
 import { defaultRandom, type RandomSource } from '../../random/Types.js';
 import { guard, isCircle, isCirclePositioned } from './Guard.js';
-import { fromCenter as RectsFromCenter } from '../rect/index.js';
-import type { Path } from '../path/index.js';
-import type { Point } from '../point/index.js';
-import type { Rect, RectPositioned } from '../rect/index.js';
-import type { Line } from '../line/index.js';
+import { fromCenter as RectsFromCenter } from '../rect/FromCenter.js';
+import type { Point } from '../point/PointType.js';
+import type { RectPositioned } from '../rect/index.js';
+import type { Line } from '../line/LineType.js';
+import type { Circle, CirclePositioned } from './CircleType.js';
+import type { CircularPath } from './CircularPath.js';
 
 const piPi = Math.PI * 2;
 export * from './DistanceCenter.js';
@@ -16,21 +17,7 @@ export * from './ToPositioned.js';
 export * from './ExteriorPoints.js';
 export * from './InteriorPoints.js';
 
-/**
- * A circle
- */
-export type Circle = {
-  readonly radius: number
-}
 
-/**
- * A {@link Circle} with position
- */
-export type CirclePositioned = Point & Circle;
-
-export type CircularPath = Circle & Path & {
-  readonly kind: `circular`
-};
 
 /**
  * Returns a point on a circle at a specified angle in radians
@@ -136,40 +123,13 @@ export const area = (circle: Circle) => {
  * @param circle
  * @returns 
  */
-export const bbox = (circle: CirclePositioned | Circle): RectPositioned | Rect => {
-  return isCirclePositioned(circle) ? RectsFromCenter(circle, circle.radius * 2, circle.radius * 2) : { width: circle.radius * 2, height: circle.radius * 2 };
+export const bbox = (circle: CirclePositioned | Circle): RectPositioned => {
+  return isCirclePositioned(circle) ?
+    RectsFromCenter(circle, circle.radius * 2, circle.radius * 2) :
+    { width: circle.radius * 2, height: circle.radius * 2, x: 0, y: 0 };
 };
 
-/**
- * Returns true if the two objects have the same values
- *
- * ```js
- * const circleA = { radius: 10, x: 5, y: 5 };
- * const circleB = { radius: 10, x: 5, y: 5 };
- * 
- * circleA === circleB; // false, because identity of objects is different
- * Circles.isEqual(circleA, circleB); // true, because values are the same
- * ```
- * 
- * Circles must both be positioned or not.
- * @param a
- * @param b
- * @returns
- */
-export const isEqual = (a: CirclePositioned | Circle, b: CirclePositioned | Circle): boolean => {
-  if (a.radius !== b.radius) return false;
 
-  if (isCirclePositioned(a) && isCirclePositioned(b)) {
-    if (a.x !== b.x) return false;
-    if (a.y !== b.y) return false;
-    if (a.z !== b.z) return false;
-    return true;
-  } else if (!isCirclePositioned(a) && !isCirclePositioned(b)) {
-    // no-op
-  } else return false; // one is positioned one not
-
-  return false;
-};
 
 export type RandomPointOpts = {
   /**
@@ -340,7 +300,7 @@ export const nearest = (circle: CirclePositioned | ReadonlyArray<CirclePositione
 export const toPath = (circle: CirclePositioned): CircularPath => {
   guard(circle);
 
-  return Object.freeze({
+  return {
     ...circle,
     nearest: (point: Point) => nearest(circle, point),
     /**
@@ -349,7 +309,7 @@ export const toPath = (circle: CirclePositioned): CircularPath => {
      * @returns {Point} X,y
      */
     interpolate: (t: number) => interpolate(circle, t),
-    bbox: () => bbox(circle) as RectPositioned,
+    bbox: () => bbox(circle),
     length: () => length(circle),
     toSvgString: (sweep = true) => toSvg(circle, sweep),
     relativePosition: (_point: Point, _intersectionThreshold: number) => {
@@ -359,7 +319,7 @@ export const toPath = (circle: CirclePositioned): CircularPath => {
       throw new Error(`Not implemented`)
     },
     kind: `circular`
-  });
+  };
 };
 
 /**

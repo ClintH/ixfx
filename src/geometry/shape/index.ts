@@ -1,22 +1,26 @@
 import { toCartesian } from '../Polar.js';
 import { throwIntegerTest } from '../../Guards.js';
 import { Triangles, Points } from '../index.js';
+import type { Triangle } from '../triangle/TriangleType.js';
 import { isCirclePositioned, isCircle } from '../circle/Guard.js';
 import type { RandomSource } from '../../random/Types.js';
 import { corners as RectsCorners } from '../rect/Corners.js';
-import { center as RectsCenter, fromTopLeft as RectsFromTopLeft } from '../rect/index.js';
+import { center as RectsCenter } from '../rect/Center.js';
+import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
 import { isIntersecting as CirclesIsIntersecting } from '../circle/Intersecting.js';
-import { randomPoint as circleRandomPoint, center as circleCenter, type Circle } from '../circle/index.js';
+import { randomPoint as circleRandomPoint, center as circleCenter } from '../circle/index.js';
 import { randomPoint as rectRandomPoint } from '../rect/index.js';
 import { isRect, isRectPositioned } from '../rect/Guard.js';
 
 import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';
-import type { Rect, Triangle, CirclePositioned, RectPositioned, PolyLine, Line } from '../Types.js';
+import type { Rect, RectPositioned, } from '../rect/RectTypes.js';
+import type { CirclePositioned, Circle } from '../circle/CircleType.js';
+import type { Line, PolyLine } from '../line/LineType.js';
 export type ContainsResult = `none` | `contained`;
-
+import type { Point, Point3d } from './../point/PointType.js';
 export type ShapePositioned = CirclePositioned | RectPositioned;
 
-export type Sphere = Points.Point3d & {
+export type Sphere = Point3d & {
   readonly radius: number;
 };
 
@@ -25,7 +29,7 @@ export type PointCalculableShape =
   | Line
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   | RectPositioned
-  | Points.Point
+  | Point
   | CirclePositioned
   ;
 
@@ -38,7 +42,7 @@ export type PointCalculableShape =
  */
 export const isIntersecting = (
   a: ShapePositioned,
-  b: ShapePositioned | Points.Point
+  b: ShapePositioned | Point
 ): boolean => {
   if (isCirclePositioned(a)) {
     return CirclesIsIntersecting(a, b);
@@ -68,7 +72,7 @@ export type RandomPointOpts = {
 export const randomPoint = (
   shape: ShapePositioned,
   opts: Partial<RandomPointOpts> = {}
-): Points.Point => {
+): Point => {
   if (isCirclePositioned(shape)) {
     return circleRandomPoint(shape, opts);
   } else if (isRectPositioned(shape)) {
@@ -91,7 +95,7 @@ export const randomPoint = (
  */
 export const center = (
   shape?: Rect | Triangle | Circle
-): Points.Point => {
+): Point => {
   if (shape === undefined) {
     return Object.freeze({ x: 0.5, y: 0.5 });
   } else if (isRect(shape)) {
@@ -138,9 +142,9 @@ export const starburst = (
   outerRadius: number,
   points = 5,
   innerRadius?: number,
-  origin: Points.Point = Points.Empty,
+  origin: Point = Points.Empty,
   opts?: { readonly initialAngleRadian?: number }
-): ReadonlyArray<Points.Point> => {
+): ReadonlyArray<Point> => {
   throwIntegerTest(points, `positive`, `points`);
   const angle = (Math.PI * 2) / points;
   const angleHalf = angle / 2;
@@ -197,10 +201,10 @@ export type ArrowOpts = {
  * @returns
  */
 export const arrow = (
-  origin: Points.Point,
+  origin: Point,
   from: `tip` | `tail` | `middle`,
   opts: ArrowOpts = {}
-): ReadonlyArray<Points.Point> => {
+): ReadonlyArray<Point> => {
   const tailLength = opts.tailLength ?? 10;
   const tailThickness = opts.tailThickness ?? Math.max(tailLength / 5, 5);
   const angleRadian = opts.angleRadian ?? 0;
@@ -209,7 +213,7 @@ export const arrow = (
   const triAngle = Math.PI / 2;
 
   let tri: Triangle;
-  let tailPoints: ReadonlyArray<Points.Point>;
+  let tailPoints: ReadonlyArray<Point>;
 
   if (from === `tip`) {
     tri = Triangles.equilateralFromVertex(origin, arrowSize, triAngle);

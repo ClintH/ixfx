@@ -1,5 +1,5 @@
 import { guard } from "./Guard.js";
-import type { RectPositioned, Rect } from "./index.js";
+import type { RectPositioned, Rect } from "./RectTypes.js";
 import { isRect, isRectPositioned, isPositioned } from "./Guard.js";
 
 /**

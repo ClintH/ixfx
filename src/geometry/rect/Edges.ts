@@ -1,9 +1,11 @@
 import { isPoint } from "../point/Guard.js";
 import { guard } from "./Guard.js";
-import type { Rect, RectPositioned } from "./index.js";
-import { joinPointsToLines as LinesJoinPointsToLines, type Line, length as LinesLength } from '../line/index.js';
-import type { Point } from '../point/index.js';
+import type { Rect, RectPositioned } from "./RectTypes.js";
+import { joinPointsToLines as LinesJoinPointsToLines } from '../line/JoinPointsToLines.js';
+
+import type { Point } from '../point/PointType.js';
 import { corners } from "./Corners.js";
+import type { Line } from "../line/LineType.js";
 
 /**
  * Returns four lines based on each corner.

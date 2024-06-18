@@ -1,5 +1,6 @@
-import { guard as guardPoint, type Point } from '../point/index.js';
-import type { Circle, CirclePositioned } from './index.js';
+import { guard as guardPoint } from '../point/Guard.js';
+import type { Point } from '../point/PointType.js';
+import type { Circle, CirclePositioned } from './CircleType.js';
 
 /**
  * Throws if radius is out of range. If x,y is present, these will be validated too.

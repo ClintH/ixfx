@@ -1,6 +1,6 @@
 
 import { isPoint } from './point/index.js';
-import type { Point } from './point/index.js';
+import type { Point } from './point/PointType.js';
 import { isRect } from './rect/Guard.js';
 import { placeholder as PlaceholderRect, type Rect } from './rect/index.js';
 

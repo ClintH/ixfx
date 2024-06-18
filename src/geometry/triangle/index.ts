@@ -3,15 +3,20 @@ import * as Points from '../point/index.js';
 import { throwNumberTest } from '../../Guards.js';
 import { radianToDegree } from '../Angles.js';
 import { guard } from './Guard.js';
-import { perimeter } from './Perimeter.js';
-import { area } from './Area.js';
 import { intersectsPoint as RectsIntersectsPoint } from '../rect/Intersects.js';
-import type { CirclePositioned, RectPositioned, Point } from '../Types.js';
-export * from './Guard.js';
+import type { RectPositioned } from '../Types.js';
+import type { Point } from '../point/PointType.js';
+import { getPointParameter } from '../point/GetPointParameter.js';
+import type { Triangle } from './TriangleType.js';
+
 export * from './Area.js';
+export * from './Centroid.js';
 export * from './Edges.js';
+export * from './InnerCircle.js';
+export * from './Guard.js';
 export * from './OuterCircle.js';
 export * from './Perimeter.js';
+export * from './Rotate.js';
 /**
  * Functions for working with equilateral triangles, defined by length
  */
@@ -32,11 +37,7 @@ export * as Isosceles from './Isosceles.js';
 *  - {@link Triangles.fromPoints}: Create from three `{x,y}` sets
 *  - {@link Triangles.fromRadius}: Equilateral triangle of a given radius and center
 */
-export type Triangle = {
-  readonly a: Point;
-  readonly b: Point;
-  readonly c: Point;
-};
+
 
 const piPi = Math.PI * 2;
 
@@ -97,7 +98,7 @@ export const isPlaceholder = (t: Triangle): boolean =>
  */
 export const apply = (
   t: Triangle,
-  fn: (p: Points.Point, label?: string) => Points.Point
+  fn: (p: Point, label?: string) => Point
 ) =>
   Object.freeze<Triangle>({
     ...t,
@@ -138,7 +139,7 @@ export const isEqual = (a: Triangle, b: Triangle): boolean =>
  * @param t
  * @returns Array of length three
  */
-export const corners = (t: Triangle): ReadonlyArray<Points.Point> => {
+export const corners = (t: Triangle): ReadonlyArray<Point> => {
   guard(t);
   return [ t.a, t.b, t.c ];
 };
@@ -238,40 +239,6 @@ export const isAcute = (t: Triangle): boolean =>
 export const isObtuse = (t: Triangle): boolean =>
   angles(t).some((v) => v > Math.PI / 2);
 
-/**
- * Returns simple centroid of triangle
- * @param t
- * @returns
- */
-export const centroid = (t: Triangle): Points.Point => {
-  guard(t);
-  const total = Points.reduce(
-    [ t.a, t.b, t.c ],
-    (p: Points.Point, accumulator: Points.Point) => ({
-      x: p.x + accumulator.x,
-      y: p.y + accumulator.y,
-    })
-  );
-  const div = {
-    x: total.x / 3,
-    y: total.y / 3,
-  };
-  return div;
-};
-
-/**
- * Returns the largest circle enclosed by triangle `t`.
- * @param t
- */
-export const innerCircle = (t: Triangle): CirclePositioned => {
-  const c = centroid(t);
-  const p = perimeter(t) / 2;
-  const a = area(t);
-  const radius = a / p;
-  return { radius, ...c };
-};
-
-
 
 /**
  * Returns an equilateral triangle centered at the origin.
@@ -290,7 +257,7 @@ export const innerCircle = (t: Triangle): CirclePositioned => {
  * @param opts Options
  */
 export const fromRadius = (
-  origin: Points.Point,
+  origin: Point,
   radius: number,
   opts: { readonly initialAngleRadian?: number } = {}
 ): Triangle => {
@@ -336,7 +303,7 @@ export const rotateByVertex = (
  * @returns
  */
 export const equilateralFromVertex = (
-  origin?: Points.Point,
+  origin?: Point,
   length = 10,
   angleRadian: number = Math.PI / 2
 ): Triangle => {
@@ -379,7 +346,7 @@ export const fromFlatArray = (coords: ReadonlyArray<number>): Triangle => {
  * @param points
  * @returns
  */
-export const fromPoints = (points: ReadonlyArray<Points.Point>): Triangle => {
+export const fromPoints = (points: ReadonlyArray<Point>): Triangle => {
   if (!Array.isArray(points)) throw new Error(`points expected as array`);
   if (points.length !== 3) {
     throw new Error(
@@ -432,12 +399,12 @@ export type BarycentricCoord = {
  */
 export const barycentricCoord = (
   t: Triangle,
-  a: Points.Point | number,
+  a: Point | number,
   b?: number
 ): BarycentricCoord => {
-  const pt = Points.getPointParameter(a, b);
+  const pt = getPointParameter(a, b);
 
-  const ab = (x: number, y: number, pa: Points.Point, pb: Points.Point) =>
+  const ab = (x: number, y: number, pa: Point, pb: Point) =>
     (pa.y - pb.y) * x + (pb.x - pa.x) * y + pa.x * pb.y - pb.x * pa.y;
 
   const alpha = ab(pt.x, pt.y, t.b, t.c) / ab(t.a.x, t.a.y, t.b, t.c);
@@ -460,7 +427,7 @@ export const barycentricCoord = (
 export const barycentricToCartestian = (
   t: Triangle,
   bc: BarycentricCoord
-): Points.Point => {
+): Point => {
   guard(t);
   const { a, b, c } = t;
 
@@ -483,12 +450,12 @@ export const barycentricToCartestian = (
  */
 export const intersectsPoint = (
   t: Triangle,
-  a: Points.Point | number,
+  a: Point | number,
   b?: number
 ): boolean => {
   const box = bbox(t);
 
-  const pt = Points.getPointParameter(a, b);
+  const pt = getPointParameter(a, b);
 
   // If it's not in the bounding box, can return false straight away
   if (!RectsIntersectsPoint(box, pt)) return false;
@@ -498,35 +465,4 @@ export const intersectsPoint = (
   return (
     0 <= bc.a && bc.a <= 1 && 0 <= bc.b && bc.b <= 1 && 0 <= bc.c && bc.c <= 1
   );
-};
-
-/**
- * Returns a triangle that is rotated by `angleRad`. By default it rotates
- * around its center but an arbitrary `origin` point can be provided.
- *
- * ```js
- * // Rotate triangle by 5 degrees
- * rotate(triangle, degreeToRadian(5));
- *
- * // Rotate by 90 degrees
- * rotate(triangle, Math.PI / 2);
- * ```
- * @param line Line to rotate
- * @param amountRadian Angle in radians to rotate by
- * @param origin Point to rotate around. If undefined, middle of line will be used
- * @returns
- */
-export const rotate = (
-  t: Triangle,
-  amountRadian?: number,
-  origin?: Points.Point
-): Triangle => {
-  if (amountRadian === undefined || amountRadian === 0) return t;
-  if (origin === undefined) origin = centroid(t);
-  return Object.freeze({
-    ...t,
-    a: Points.rotate(t.a, amountRadian, origin),
-    b: Points.rotate(t.b, amountRadian, origin),
-    c: Points.rotate(t.c, amountRadian, origin),
-  });
 };

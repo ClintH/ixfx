@@ -1,8 +1,8 @@
 import type { Point } from "bezier-js";
 import { guardPositioned } from "./Guard.js";
 import { intersectsPoint } from "./Intersects.js";
-import { center } from "./index.js";
-import type { RectPositioned } from "./index.js";
+import { center } from "./Center.js";
+import type { RectPositioned } from "./RectTypes.js";
 import { guard as PointsGuard } from '../point/Guard.js';
 
 import { distance as PointsDistance } from '../point/index.js';

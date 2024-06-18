@@ -1,5 +1,5 @@
 import { intersections as circleIntersections } from "./circle/Intersections.js";
-import type { CirclePositioned } from "./circle/index.js";
+import type { CirclePositioned } from "./circle/CircleType.js";
 import type { RectPositioned } from "./rect/index.js";
 
 export const circleRect = (a: CirclePositioned, b: RectPositioned) => {

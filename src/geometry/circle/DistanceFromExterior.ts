@@ -1,7 +1,8 @@
-import type { CirclePositioned } from "./index.js";
+import type { CirclePositioned } from "./CircleType.js";
 import { distanceCenter } from "./DistanceCenter.js";
-import { isPoint as PointsIsPoint, distance as PointsDistance, type Point } from "../point/index.js";
+import { isPoint as PointsIsPoint, distance as PointsDistance } from "../point/index.js";
 import { guardPositioned, isCirclePositioned } from "./Guard.js";
+import type { Point } from '../point/PointType.js';
 
 /**
  * Returns the distance between the exterior of two circles, or between the exterior of a circle and point.

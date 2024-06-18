@@ -1,10 +1,12 @@
 
-import { Points, Paths } from '../index.js';
+//import { Points, Paths } from '../index.js';
+import * as Paths from '../path/index.js';
+import { bbox as PointsBbox } from '../point/Bbox.js';
+import { isEqual as PointsIsEqual } from '../point/IsEqual.js';
 import type { CompoundPath, Dimensions, Path, RectPositioned } from '../Types.js';
-import type { Point } from '../point/index.js';
+import type { Point } from '../point/PointType.js';
 import { corners as RectsCorners } from '../rect/Corners.js';
 import { sortByNumericProperty } from '../../collections/arrays/SortByNumericProperty.js';
-
 
 /**
  * Returns a new compoundpath, replacing a path at a given index
@@ -58,7 +60,7 @@ export const interpolate = (paths: ReadonlyArray<Path>, t: number, useWidth?: bo
  * @param point 
  * @returns 
  */
-export const distanceToPoint = (paths: ReadonlyArray<Path>, point: Points.Point): number => {
+export const distanceToPoint = (paths: ReadonlyArray<Path>, point: Point): number => {
   if (paths.length === 0) return 0;
   let distances = paths.map((p, index) => ({ path: p, index, distance: p.distanceToPoint(point) }));
   distances = sortByNumericProperty(distances, `distance`);
@@ -74,7 +76,7 @@ export const distanceToPoint = (paths: ReadonlyArray<Path>, point: Points.Point)
  * @param dimensions Pre-computed dimensions
  * @returns 
  */
-export const relativePosition = (paths: ReadonlyArray<Path>, point: Points.Point, intersectionThreshold: number, dimensions?: Dimensions): number => {
+export const relativePosition = (paths: ReadonlyArray<Path>, point: Point, intersectionThreshold: number, dimensions?: Dimensions): number => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
@@ -131,7 +133,7 @@ export const bbox = (paths: ReadonlyArray<Path>): RectPositioned => {
   const boxes = paths.map(p => p.bbox());
   const corners = boxes.flatMap(b => RectsCorners(b));
 
-  return Points.bbox(...corners);
+  return PointsBbox(...corners);
 };
 
 /**
@@ -151,7 +153,7 @@ export const guardContinuous = (paths: ReadonlyArray<Path>) => {
   let lastPos = Paths.getEnd(paths[ 0 ]);
   for (let index = 1; index < paths.length; index++) {
     const start = Paths.getStart(paths[ index ]);
-    if (!Points.isEqual(start, lastPos)) throw new Error(`Path index ` + index + ` does not start at prior path end. Start: ` + start.x + `,` + start.y + ` expected: ` + lastPos.x + `,` + lastPos.y + ``);
+    if (!PointsIsEqual(start, lastPos)) throw new Error(`Path index ${ index } does not start at prior path end. Start: ${ start.x },${ start.y } expected: ${ lastPos.x },${ lastPos.y }`);
     lastPos = Paths.getEnd(paths[ index ]);
   }
 };
@@ -174,8 +176,8 @@ export const fromPaths = (...paths: ReadonlyArray<Path>): CompoundPath => {
     length: () => dims.totalLength,
     nearest: (_: Point) => { throw new Error(`not implemented`); },
     interpolate: (t: number, useWidth = false) => interpolate(paths, t, useWidth, dims),
-    relativePosition: (point: Points.Point, intersectionThreshold: number) => relativePosition(paths, point, intersectionThreshold, dims),
-    distanceToPoint: (point: Points.Point) => distanceToPoint(paths, point),
+    relativePosition: (point: Point, intersectionThreshold: number) => relativePosition(paths, point, intersectionThreshold, dims),
+    distanceToPoint: (point: Point) => distanceToPoint(paths, point),
     bbox: () => bbox(paths),
     toString: () => toString(paths),
     toSvgString: () => toSvgString(paths),

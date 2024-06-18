@@ -1,6 +1,9 @@
-import { isEqual } from "./index.js";
-import { subtract as PointsSubtract, sum as PointsSum, type Point } from "../point/index.js";
-import type { CirclePositioned } from "./index.js";
+import { isEqual } from "./IsEqual.js";
+import { sum as PointsSum } from "../point/Sum.js";
+import { subtract as PointsSubtract } from "../point/Subtract.js";
+import type { Point } from '../point/PointType.js';
+import type { CirclePositioned } from "./CircleType.js";
+
 /**
  * 
  * Returns the points of intersection betweeen `a` and `b`.

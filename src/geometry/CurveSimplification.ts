@@ -1,4 +1,4 @@
-import type { Point } from "./point/index.js";
+import type { Point } from "./point/PointType.js";
 import { distance } from "./point/Distance.js";
 /**
  * Simplifies a curve by dropping points based on shortest distance.

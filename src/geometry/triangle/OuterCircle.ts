@@ -1,8 +1,8 @@
-import { length as LinesLength } from '../line/index.js';
-import type { Triangle, CirclePositioned } from "../Types.js";
-
+import { length as LinesLength } from '../line/Length.js';
 import { edges } from "./Edges.js";
-import { centroid } from './index.js';
+import { centroid } from './Centroid.js';
+import type { Triangle } from "./TriangleType.js";
+import type { CirclePositioned } from '../circle/CircleType.js';
 
 /**
  * Returns the largest circle touching the corners of triangle `t`.

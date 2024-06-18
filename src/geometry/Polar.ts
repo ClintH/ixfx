@@ -1,9 +1,12 @@
 import { degreeToRadian, radianToDegree } from './Angles.js';
-import * as Points from './point/index.js';
+//import * as Points from './point/index.js';
 import { throwNumberTest } from '../Guards.js';
 //import type { PolarCoord } from './Types.js';
 
-import type { Point } from './point/index.js';
+import type { Point } from './point/PointType.js';
+import { subtract } from './point/Subtract.js';
+import { Empty } from './point/Empty.js';
+import { isPoint, guard as PointGuard } from './point/Guard.js';
 const _piPi = Math.PI * 2;
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
@@ -56,7 +59,7 @@ export const fromCartesian = (
   point: Point,
   origin: Point
 ): Coord => {
-  point = Points.subtract(point, origin);
+  point = subtract(point, origin);
   //eslint-disable-next-line functional/no-let
   //let a =  Math.atan2(point.y, point.x);
   //if (a < 0) a = Math.abs(a);
@@ -103,8 +106,8 @@ export const toCartesian: ToCartesian = (
   c?: Point
 ): Point => {
   if (isPolarCoord(a)) {
-    if (b === undefined) b = Points.Empty;
-    if (Points.isPoint(b)) {
+    if (b === undefined) b = Empty;
+    if (isPoint(b)) {
       return polarToCartesian(a.distance, a.angleRadian, b);
     }
     throw new Error(
@@ -116,8 +119,8 @@ export const toCartesian: ToCartesian = (
     );
   } else {
     if (typeof a === `number` && typeof b === `number`) {
-      if (c === undefined) c = Points.Empty;
-      if (!Points.isPoint(c)) {
+      if (c === undefined) c = Empty;
+      if (!isPoint(c)) {
         throw new Error(
           `Expecting (number, number, Point). Point param wrong type`
         );
@@ -397,9 +400,9 @@ export const clampMagnitude = (v: Coord, max = 1, min = 0): Coord => {
 const polarToCartesian = (
   distance: number,
   angleRadians: number,
-  origin: Point = Points.Empty
+  origin: Point = Empty
 ): Point => {
-  Points.guard(origin);
+  PointGuard(origin);
   return Object.freeze({
     x: origin.x + distance * Math.cos(angleRadians),
     y: origin.y + distance * Math.sin(angleRadians),

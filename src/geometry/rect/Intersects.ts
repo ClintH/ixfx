@@ -3,7 +3,9 @@ import { isPositioned, isRectPositioned } from "./Guard.js";
 import { isCirclePositioned } from '../circle/Guard.js';
 import * as Intersects from '../Intersects.js';
 import { isPoint } from "../point/Guard.js";
-import type { CirclePositioned, Rect, RectPositioned, Point } from "../Types.js";
+import type { Rect, RectPositioned } from "./RectTypes.js";
+import type { Point } from "../point/PointType.js";
+import type { CirclePositioned } from "../circle/CircleType.js";
 /**
  * Returns _true_ if `point` is within, or on boundary of `rect`.
  *

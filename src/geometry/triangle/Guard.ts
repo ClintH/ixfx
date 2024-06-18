@@ -1,5 +1,4 @@
-import type { Triangle } from "../Types.js";
-
+import type { Triangle } from "./TriangleType.js";
 import { guard as PointsGuard } from '../point/Guard.js'
 
 /**

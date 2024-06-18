@@ -1,28 +1,11 @@
 import { Bezier as BezierLibrary } from 'bezier-js';
-import { interpolate as LinesInterpolate } from './line/index.js';
-import { fromTopLeft as RectsFromTopLeft } from './rect/index.js';
-import type { Point } from '../geometry/point/index.js';
-import type { Path } from '../geometry/path/index.js';
-
-export type QuadraticBezier = {
-  readonly a: Point,
-  readonly b: Point,
-  readonly quadratic: Point
-}
-
-export type QuadraticBezierPath = Path & QuadraticBezier;
-export type CubicBezier = {
-  readonly a: Point,
-  readonly b: Point,
-  readonly cubic1: Point,
-  readonly cubic2: Point,
-}
-
-export type CubicBezierPath = Path & CubicBezier;
-
-export const isQuadraticBezier = (path: Path | QuadraticBezier | CubicBezier): path is QuadraticBezier => (path as QuadraticBezier).quadratic !== undefined;
-export const isCubicBezier = (path: Path | CubicBezier | QuadraticBezier): path is CubicBezier => (path as CubicBezier).cubic1 !== undefined && (path as CubicBezier).cubic2 !== undefined;
-
+import { interpolate as LinesInterpolate } from '../line/Interpolate.js';
+import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
+import type { Point } from '../point/PointType.js';
+import type { CubicBezier, CubicBezierPath, QuadraticBezier, QuadraticBezierPath } from './BezierType.js';
+import { isCubicBezier, isQuadraticBezier } from './Guard.js';
+export * from './BezierType.js';
+export * from './Guard.js';
 /**
  * Returns a new quadratic bezier with specified bend amount
  *

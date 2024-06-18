@@ -1,40 +1,16 @@
 import { degreeToRadian } from '../Angles.js';
-import { guard as guardPoint, isPoint } from '../point/index.js';
-import { Lines } from '../index.js';
-import { bbox as pointsBbox, distance as pointsDistance } from '../point/index.js';
+import { guard as guardPoint, isPoint } from '../point/Guard.js';
+import { distance as pointsDistance } from '../point/Distance.js';
+import { bbox as pointsBbox } from '../point/Bbox.js';
 import { toCartesian } from '../Polar.js';
-import type { Point } from '../point/index.js';
-import type { Line } from '../line/index.js';
+import type { Point } from '../point/PointType.js';
+import type { Line } from '../line/LineType.js';
 import type { Path } from '../path/index.js';
 import type { Rect, RectPositioned } from '../rect/index.js';
+import { fromPoints as LinesFromPoints } from '../line/FromPoints.js';
+import type { Arc, ArcPositioned } from './ArcType.js';
 
-/**
- * Arc, defined by radius, start and end point in radians, and whether it is counter-clockwise.
- */
-export type Arc = {
-  /**
-   * Radius of arc
-   */
-  readonly radius: number
-  /**
-   * Start radian
-   */
-  readonly startRadian: number
-  /**
-   * End radian
-   */
-  readonly endRadian: number
-  /**
-   * If true, arc is counter-clockwise
-   */
-  readonly counterClockwise?: boolean
-}
-
-/**
- * An {@link Geometry.Arcs.Arc} that also has a position, given in x, y
- */
-export type ArcPositioned = Point & Arc;
-
+export type * from './ArcType.js';
 
 /**
  * Returns true if parameter is an arc
@@ -104,7 +80,7 @@ export function fromDegrees(radius: number, startDegrees: number, endDegrees: nu
  * @param arc
  * @returns Line from start to end of arc
  */
-export const toLine = (arc: ArcPositioned): Line => Lines.fromPoints(
+export const toLine = (arc: ArcPositioned): Line => LinesFromPoints(
   point(arc, arc.startRadian),
   point(arc, arc.endRadian)
 );

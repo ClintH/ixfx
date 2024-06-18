@@ -1,9 +1,10 @@
-import type { CirclePositioned } from "./index.js";
+import type { CirclePositioned } from "./CircleType.js";
 import * as Intersects from '../Intersects.js';
 import { isContainedBy } from "./IsContainedBy.js";
 import { isCircle } from "./Guard.js";
 import { isRectPositioned } from "../rect/Guard.js";
-import { isEqual as PointsIsEqual, type Point } from "../point/index.js";
+import { isEqual as PointsIsEqual } from "../point/IsEqual.js";
+import type { Point } from '../point/PointType.js';
 import { isPoint } from '../point/Guard.js';
 import type { RectPositioned } from "../rect/index.js";
 

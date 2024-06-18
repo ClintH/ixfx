@@ -1,5 +1,20 @@
-import type { Point, Point3d } from "../Types.js";
+import type { Point, Point3d } from "./PointType.js";
 import { throwNumberTest } from '../../Guards.js';
+
+
+/**
+ * Returns true if p.x and p.y === null
+ * @param p
+ * @returns
+ */
+export const isNull = (p: Point) => p.x === null && p.y === null;
+
+/***
+ * Returns true if p.x or p.y isNaN
+ */
+export const isNaN = (p: Point) => Number.isNaN(p.x) || Number.isNaN(p.y);
+
+
 /**
  * Throws an error if point is invalid
  * @param p

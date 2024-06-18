@@ -1,6 +1,6 @@
 import { guard, isPoint3d } from "./Guard.js";
-import type { Point, Point3d } from '../Types.js';
-import { getPointParameter } from "./index.js";
+import type { Point, Point3d } from './PointType.js';
+import { getPointParameter } from "./GetPointParameter.js";
 
 export function distance(a: Point, b?: Point): number;
 export function distance(a: Point, x: number, y: number): number;

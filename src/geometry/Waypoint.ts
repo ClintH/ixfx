@@ -1,9 +1,11 @@
 import * as Lines from './line/index.js';
 import * as Points from './point/index.js';
-import type { CirclePositioned } from "./circle/index.js";
+import type { CirclePositioned } from "./circle/CircleType.js";
 import type { Path } from "./path/index.js";
-import type { Point } from "./point/index.js";
+import type { Point } from "./point/PointType.js";
 import { Arrays } from '../collections/index.js';
+import { joinPointsToLines } from './line/JoinPointsToLines.js';
+import { toPath } from './line/ToPath.js';
 
 export type Waypoint = CirclePositioned;
 
@@ -22,9 +24,9 @@ export const fromPoints = (
   waypoints: ReadonlyArray<Point>,
   opts: Partial<WaypointOpts> = {}
 ) => {
-  const lines = Lines.joinPointsToLines(...waypoints);
+  const lines = joinPointsToLines(...waypoints);
   return init(
-    lines.map((l) => Lines.toPath(l)),
+    lines.map((l) => toPath(l)),
     opts
   );
 };
@@ -44,7 +46,7 @@ export type WaypointResult = {
   /**
    * Nearest point on path. See also {@link distance}
    */
-  nearest: Points.Point
+  nearest: Point
   /**
    * Closest distance to path. See also {@link nearest}
    */
@@ -70,7 +72,7 @@ export type WaypointResult = {
  * const results = w({ x: 10, y: 20 });
  * ```
  */
-export type Waypoints = (pt: Points.Point) => Array<WaypointResult>
+export type Waypoints = (pt: Point) => Array<WaypointResult>
 
 /**
  * Initialise

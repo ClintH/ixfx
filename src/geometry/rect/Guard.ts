@@ -1,5 +1,6 @@
-import type { RectPositioned, Rect, PointCalculableShape, Point } from "../Types.js";
+import type { RectPositioned, Rect } from "./RectTypes.js";
 import { guard as PointsGuard } from '../point/Guard.js';
+import type { Point } from '../point/PointType.js';
 
 export const guardDim = (d: number, name = `Dimension`) => {
   if (d === undefined) throw new Error(`${ name } is undefined`);
@@ -92,5 +93,5 @@ export const isRect = (p: unknown): p is Rect => {
  * @returns
  */
 export const isRectPositioned = (
-  p: Rect | RectPositioned | PointCalculableShape
+  p: any
 ): p is RectPositioned => isRect(p) && isPositioned(p);

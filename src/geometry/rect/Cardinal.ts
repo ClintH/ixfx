@@ -1,6 +1,6 @@
-import type { RectPositioned } from "./index.js";
+import type { RectPositioned } from "./RectTypes.js";
 import type { CardinalDirection } from '../Grid.js';
-import type { Point } from "../point/index.js";
+import type { Point } from "../point/PointType.js";
 
 /**
  * Returns a point on cardinal direction, or 'center' for the middle.

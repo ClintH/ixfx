@@ -1,7 +1,7 @@
 import { guard } from "./Guard.js";
-import { length as LinesLength } from '../line/index.js';
+import { length as LinesLength } from '../line/Length.js';
 import { edges } from "./Edges.js";
-import type { Triangle } from "../Types.js";
+import type { Triangle } from "./TriangleType.js";
 
 /**
  * Calculates the area of a triangle

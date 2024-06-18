@@ -1,5 +1,5 @@
 
-import type { Point } from './point/index.js';
+import type { Point } from './point/PointType.js';
 import { degreeToRadian } from './Angles.js';
 import type { Path } from './path/index.js';
 

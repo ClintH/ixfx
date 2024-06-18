@@ -1,44 +1,22 @@
-
-import { guard as PointsGuard } from '../point/Guard.js';
-import { isEqual as PointsIsEqual, isPoint, type Point } from '../point/index.js';
-
-import { length as LinesLength } from '../line/index.js';
-
-import { edges } from './Edges.js';
-
-import { getRectPositioned, guard, guardDim, guardPositioned, isPositioned, isRect, isRectPositioned } from './Guard.js';
+import { isEqual as PointsIsEqual, isPoint } from '../point/index.js';
+import type { Point } from '../point/PointType.js';
+import { guard, isPositioned, isRect, isRectPositioned } from './Guard.js';
+import type { Rect, RectArray, RectPositioned, RectPositionedArray } from './RectTypes.js';
 export * from './Cardinal.js';
+export * from './Center.js';
 export * from './Corners.js';
 export * from './Distance.js';
 export * from './Edges.js';
+export * from './FromCenter.js';
 export * from './FromNumbers.js';
+export * from './FromTopLeft.js';
+export * from './Guard.js';
 export * from './Intersects.js';
 export * from './Multiply.js';
 export * from './Random.js';
+export * from './RectTypes.js';
 export * from './Subtract.js';
 export * from './Sum.js';
-export * from './Guard.js';
-
-
-/**
- * Rectangle as array: `[width, height]`
- */
-export type RectArray = readonly [ width: number, height: number ];
-
-/**
- * Positioned rectangle as array: `[x, y, width, height]`
- */
-export type RectPositionedArray = readonly [
-  x: number,
-  y: number,
-  width: number,
-  height: number
-];
-export type Rect = {
-  readonly width: number;
-  readonly height: number;
-};
-export type RectPositioned = Point & Rect;
 
 export const empty = Object.freeze({ width: 0, height: 0 });
 export const emptyPositioned = Object.freeze({
@@ -194,39 +172,7 @@ export const isEqual = (
 };
 
 
-/**
- * Initialises a rectangle based on its center, a width and height
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
- * // Rectangle with center at 50,50, width 100 height 200
- * Rects.fromCenter({x: 50, y:50}, 100, 200);
- * ```
- * @param origin
- * @param width
- * @param height
- * @returns
- */
-export const fromCenter = (
-  origin: Point,
-  width: number,
-  height: number
-): RectPositioned => {
-  PointsGuard(origin, `origin`);
 
-  guardDim(width, `width`);
-  guardDim(height, `height`);
-
-  const halfW = width / 2;
-  const halfH = height / 2;
-  return {
-    x: origin.x - halfW,
-    y: origin.y - halfH,
-    width: width,
-    height: height,
-  };
-};
 
 
 /**
@@ -339,31 +285,6 @@ export const clamp = (value: Rect, maximum: Rect): Rect => {
 }
 
 
-/**
- * Creates a rectangle from its top-left coordinate, a width and height.
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
- * // Rectangle at 50,50 with width of 100, height of 200.
- * const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
- * ```
- * @param origin
- * @param width
- * @param height
- * @returns
- */
-export const fromTopLeft = (
-  origin: Point,
-  width: number,
-  height: number
-): RectPositioned => {
-  guardDim(width, `width`);
-  guardDim(height, `height`);
-  PointsGuard(origin, `origin`);
-
-  return { x: origin.x, y: origin.y, width: width, height: height };
-};
 
 /**
  * Returns `rect` divided by the width,height of `normaliseBy`.
@@ -423,54 +344,6 @@ export const normaliseByRect = (
     height: rect.height / height,
   });
 };
-
-/**
- * Returns the center of a rectangle as a {@link Geometry.Point}.
- *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
- * const p = Rects.center({x:10, y:20, width:100, height:50});
- * const p2 = Rects.center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
- * ```
- * @param rect Rectangle
- * @param origin Optional origin. Overrides `rect` position if available. If no position is available 0,0 is used by default.
- * @returns
- */
-export const center = (
-  rect: RectPositioned | Rect,
-  origin?: Point
-): Point => {
-  guard(rect);
-  if (origin === undefined && isPoint(rect)) origin = rect;
-  else if (origin === undefined) origin = { x: 0, y: 0 }; // throw new Error(`Unpositioned rect needs origin param`);
-
-  const r = getRectPositioned(rect, origin);
-  return Object.freeze({
-    x: origin.x + rect.width / 2,
-    y: origin.y + rect.height / 2,
-  });
-};
-
-
-/**
- * Returns the length of each side of the rectangle (top, right, bottom, left)
- *
- * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * const rect = { width: 100, height: 100, x: 100, y: 100 };
- * // Yields: array of length four
- * const lengths = Rects.lengths(rect);
- * ```
- * @param rect
- * @returns
- */
-export const lengths = (rect: RectPositioned): ReadonlyArray<number> => {
-  guardPositioned(rect, `rect`);
-  return edges(rect).map((l) => LinesLength(l));
-};
-
 
 /**
  * Returns the perimeter of `rect` (ie. sum of all edges)

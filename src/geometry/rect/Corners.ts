@@ -1,6 +1,6 @@
-import { type Point } from "../point/index.js";
+import { type Point } from "../point/PointType.js";
 import { getRectPositioned } from "./Guard.js";
-import type { Rect, RectPositioned } from "./index.js";
+import type { Rect, RectPositioned } from "./RectTypes.js";
 
 /**
  * Returns the four corners of a rectangle as an array of Points.
