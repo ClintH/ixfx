@@ -1,8 +1,5 @@
+import { defaultKeyer } from '../../DefaultKeyer.js';
 import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
-import {
-  defaultKeyer,
-  type ToString,
-} from '../../Util.js';
 import { firstEntryByIterableValue } from './MapMultiFns.js';
 
 export class MapOfSimpleBase<V> {
@@ -16,7 +13,7 @@ export class MapOfSimpleBase<V> {
    * @param valueEq Compare values. By default uses JS logic for equality
    */
   constructor(
-    groupBy: ToString<V> = defaultKeyer,
+    groupBy: (value: V) => string = defaultKeyer,
     valueEq: IsEqual<V> = isEqualDefault<V>,
     initial: Array<[ string, ReadonlyArray<V> ]> = []
   ) {

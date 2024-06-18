@@ -1,8 +1,5 @@
+import { defaultKeyer } from '../../DefaultKeyer.js';
 import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
-import {
-  type ToString,
-  defaultKeyer
-} from '../../Util.js';
 import type { IMapOfMutable } from './IMapOfMutable.js';
 import { MapOfSimpleBase } from './MapOfSimpleBase.js';
 
@@ -30,8 +27,7 @@ import { MapOfSimpleBase } from './MapOfSimpleBase.js';
  */
 export class MapOfSimpleMutable<V>
   extends MapOfSimpleBase<V>
-  implements IMapOfMutable<V>
-{
+  implements IMapOfMutable<V> {
   addKeyedValues(key: string, ...values: ReadonlyArray<V>) {
     const existing = this.map.get(key);
     if (existing === undefined) {
@@ -130,6 +126,6 @@ export class MapOfSimpleMutable<V>
  * @returns New instance
  */
 export const ofSimpleMutable = <V>(
-  groupBy: ToString<V> = defaultKeyer,
+  groupBy: (value: V) => string = defaultKeyer,
   valueEq: IsEqual<V> = isEqualDefault<V>
 ): IMapOfMutable<V> => new MapOfSimpleMutable<V>(groupBy, valueEq);

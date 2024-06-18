@@ -1,5 +1,5 @@
 import { SimpleEventEmitter } from '../../Events.js';
-import type { ValueSetEventMap } from './index.js';
+import type { ValueSetEventMap } from './Types.js';
 
 /**
  * A Set which stores unique items determined by their value, rather

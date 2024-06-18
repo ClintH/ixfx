@@ -9,7 +9,7 @@ import * as Rx from '../../rx/index.js';
  * ```js
  * const queue = new QueueMutable();
  * const r = asResponsive(queue);
- * r.value(v => {
+ * r.onValue(v => {
  *  // v is an array of values
  * });
  * 

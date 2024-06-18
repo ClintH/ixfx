@@ -1,5 +1,6 @@
-import { type ToString, defaultKeyer, toStringDefault } from '../../Util.js';
-import { type ISetImmutable } from './index.js';
+import { defaultKeyer } from '../../DefaultKeyer.js';
+import { type ToString, toStringDefault } from '../../Util.js';
+import { type ISetImmutable } from './ISetImmutable.js';
 
 export class SetStringImmutable<V> implements ISetImmutable<V> {
   private store: Map<string, V>;
@@ -15,7 +16,7 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
     return this.store.size;
   }
 
-  add(...values: readonly V[]): ISetImmutable<V> {
+  add(...values: ReadonlyArray<V>): ISetImmutable<V> {
     const s = new Map<string, V>(this.store);
     for (const v of values) {
       const key = this.keyString(v);
@@ -36,8 +37,8 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
     return this.store.has(key);
   }
 
-  toArray(): V[] {
-    return [...this.store.values()];
+  toArray(): Array<V> {
+    return [ ...this.store.values() ];
   }
 
   *values() {

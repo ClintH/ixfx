@@ -1,4 +1,4 @@
-import { type EitherKey } from '../index.js';
+import { type EitherKey } from '../Types.js';
 import type { IMapBase } from './IMapBase.js';
 import { add, del, set } from './MapImmutableFns.js';
 

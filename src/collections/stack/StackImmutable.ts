@@ -3,7 +3,7 @@
 // -------------------------
 import type { IStackImmutable } from './IStackImmutable.js';
 import { push, pop, isEmpty, isFull, peek } from './StackFns.js';
-import type { StackOpts } from './index.js';
+import type { StackOpts } from './Types.js';
 
 export class StackImmutable<V> implements IStackImmutable<V> {
   private readonly opts: StackOpts;
@@ -31,7 +31,7 @@ export class StackImmutable<V> implements IStackImmutable<V> {
   }
 
   forEachFromTop(fn: (v: V) => void): void {
-    [...this.data].reverse().forEach(fn);
+    [ ...this.data ].reverse().forEach(fn);
   }
 
   get isEmpty(): boolean {
@@ -77,4 +77,4 @@ export class StackImmutable<V> implements IStackImmutable<V> {
 export const immutable = <V>(
   opts: StackOpts = {},
   ...startingItems: ReadonlyArray<V>
-): IStackImmutable<V> => new StackImmutable({ ...opts }, [...startingItems]);
+): IStackImmutable<V> => new StackImmutable({ ...opts }, [ ...startingItems ]);

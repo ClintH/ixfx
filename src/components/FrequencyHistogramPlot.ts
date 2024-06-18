@@ -1,5 +1,6 @@
 import { HistogramVis } from './HistogramVis.js';
 import * as KeyValueUtil from '../KeyValue.js';
+import type { KeyValue } from '../PrimitiveTypes.js';
 
 /**
  * Creates and drives a HistogramVis instance.
@@ -60,6 +61,6 @@ export class FrequencyHistogramPlot {
       return;
     }
 
-    this.el.data = this.#sorter === undefined ? [ ...data ] : this.#sorter(data as Array<KeyValueUtil.KeyValue>);
+    this.el.data = this.#sorter === undefined ? [ ...data ] : this.#sorter(data as Array<KeyValue>);
   }
 }

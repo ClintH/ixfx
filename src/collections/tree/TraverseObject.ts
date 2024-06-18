@@ -2,7 +2,7 @@ import { toStringAbbreviate } from '../../Text.js';
 import { nullUndef } from '../../Guards.js';
 import { last } from '../../iterables/IterableSync.js';
 import * as TreeArrayBacked from './TreeMutable.js';
-import { isPrimitive } from '../../KeyValue.js';
+import { isPrimitive } from '../../IsPrimitive.js';
 import type { TraversableTree, TreeNode, SimplifiedNode } from './Types.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
 export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: Array<string> }>;
@@ -57,7 +57,7 @@ export const prettyPrint = (
 };
 
 export const toStringDeep = (node: TreeNode<Entry | EntryStatic>, indent = 0) => {
-  let t = ` `.repeat(indent) + ` ` + node.value?.name;
+  let t = ` `.repeat(indent) + ` ${ node.value?.name }`;
   if (node.value !== undefined) {
     if (`sourceValue` in node.value && `nodeValue` in node.value) {
       let sourceValue = toStringAbbreviate(node.value?.sourceValue, 20);

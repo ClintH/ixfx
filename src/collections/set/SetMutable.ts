@@ -1,8 +1,9 @@
 // ✔ UNIT TESTED
-import { type ToString, defaultKeyer } from '../../Util.js';
+import type { ToString } from '../../Util.js';
+import { defaultKeyer } from '../../DefaultKeyer.js';
 import { SimpleEventEmitter } from '../../Events.js';
 import { type ISetMutable } from './ISetMutable.js';
-import { type ValueSetEventMap } from './index.js';
+import { type ValueSetEventMap } from './Types.js';
 
 /**
  * Creates a {@link ISetMutable}.
@@ -18,8 +19,7 @@ export const mutable = <V>(
  */
 export class SetStringMutable<V>
   extends SimpleEventEmitter<ValueSetEventMap<V>>
-  implements ISetMutable<V>
-{
+  implements ISetMutable<V> {
   // ✔ UNIT TESTED
   /* eslint-disable functional/prefer-readonly-type */
   store = new Map<string, V>();

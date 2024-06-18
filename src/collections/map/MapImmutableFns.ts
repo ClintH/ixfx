@@ -1,4 +1,4 @@
-import type { ArrayKeys, EitherKey, ObjectKeys } from '../index.js';
+import type { ArrayKeys, EitherKey, ObjectKeys } from '../Types.js';
 
 /**
  * Adds an array o [k,v] to the map, returning a new instance

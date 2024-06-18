@@ -1,6 +1,6 @@
 import type { IQueueImmutable } from './IQueueImmutable.js';
 import { peek, isFull, isEmpty, enqueue, dequeue } from './QueueFns.js';
-import { type QueueOpts } from './index.js';
+import { type QueueOpts } from './QueueTypes.js';
 
 // -------------------------------
 // Immutable
