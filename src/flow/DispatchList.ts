@@ -33,7 +33,7 @@ export class DispatchList<V> {
     this.#counter++;
     const once = options.once ?? false;
     const wrap: Wrap<V> = {
-      id: this.#id + `-` + this.#counter,
+      id: `${ this.#id } - ${ this.#counter }`,
       handler,
       once
     }
