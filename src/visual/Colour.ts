@@ -18,6 +18,17 @@ export type Spaces = `hsl` | `hsluv` | `rgb` | `srgb` | `lch` | `oklch` | `oklab
  */
 export type Colourish = Color | Hsl | Hsla | Rgb | Rgba | string;
 
+// export type ColourRgb = {
+//   space:`rgb`
+//   coords: Rgba
+// }
+// export type ColourHsl = {
+//   space:`hsl`;
+//   coords: Hsla;
+// }
+
+// export type Colour = ColourHsl|ColourRgb;
+
 /**
  * Options for interpolation
  */
@@ -74,6 +85,11 @@ export const toHsl = (colour: Colourish): Hsl => {
 };
 
 const hslToColorJs = (hsl: Hsl): Color => {
+  if (hsl.h > 1) throw new Error(`Expecting relative hue value 0..1. Got: ${ hsl.h }`);
+  if (hsl.s > 1) throw new Error(`Expecting relative saturation value 0..1. Got: ${ hsl.s }`);
+  if (hsl.l > 1) throw new Error(`Expecting relative lightness value 0..1. Got: ${ hsl.l }`);
+  if (hsl.opacity && hsl.opacity > 1) throw new Error(`Expecting relative opacity value 0..1. Got: ${ hsl.opacity }`);
+
   const coords: [ number, number, number ] = [
     hsl.h * 360,
     hsl.s * 100,
@@ -147,7 +163,7 @@ export const goldenAngleColour = (
 };
 
 /**
- * Returns a random hue component
+ * Returns a random hue component (0..359)
  * ```
  * // Generate hue
  * const h =randomHue(); // 0-359
@@ -162,6 +178,23 @@ export const randomHue = (rand: RandomSource = defaultRandom): number => {
   const r = rand();
   return r * 360;
 };
+
+/**
+ * Returns a Colorjs 'Color' object based on relative hue, saturation, lightness
+ * and opacity.
+ * @param h Hue (0..1)
+ * @param s Saturation (0..1) Default: 1
+ * @param l Lightness (0..1) Default: 0.5
+ * @param opacity Opacity (0..1) Default: 1
+ * @returns 
+ */
+export const fromHsla = (h: number, s = 1, l = 0.5, opacity = 1): Color => {
+  throwNumberTest(h, `percentage`, `h`);
+  throwNumberTest(s, `percentage`, `s`);
+  throwNumberTest(l, `percentage`, `l`);
+
+  return resolve({ h, s, l, opacity });
+}
 
 /**
  * Parses colour to `{ r, g, b }` where each field is on 0..1 scale.
@@ -197,6 +230,7 @@ export const resolve = (colour: Colourish): Color => {
     if (isHsl(colour)) return new Color(hslToColorJs(colour));
     if (isRgb(colour)) return new Color(rgbToColorJs(colour));
   }
+
   return colour;
 };
 
@@ -230,10 +264,15 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
 
 /**
  * Returns a colour in hex format `#000000`. 
+ * ```js
+ * canvas.fillStyle = Colour.toHex(`blue`);
+ * canvas.fillStyle = Colour.toHex({ h:0.5, s:0.1, l:1 });
+ * canvas.fillStyle = Colour.toHex({ r: 1, g: 0.3, b: 0 });
+ * ```
+ * 
  * Input colour can be a human-friendly colour name ("blue"), a HSL
  * colour (eg. "hsl(0, 50%, 50%)")", an object {h,s,l} or {r,g,b}.
- * Note that
- * '#' is included as a prefix.
+ * '#' is included in the return string.
  * 
  * Transparent colour is returned as #00000000
  * @param colour
@@ -241,8 +280,7 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
  */
 export const toHex = (colour: Colourish): string => {
   if (typeof colour === `string` && colour === `transparent`) return `#00000000`;
-  const c = resolve(colour);
-  return c.toString({ format: `hex` });
+  return resolve(colour).to(`srgb`).toString({ format: `hex`, collapse: false });
 };
 
 /**
@@ -411,6 +449,11 @@ export const cssLinearGradient = (colours: Array<Colourish>) => {
 const isHsl = (p: Colourish): p is Hsl => {
   if (p === undefined || p === null) return false;
   if (typeof p !== `object`) return false;
+
+  // Check if Colourjs
+  if ((p as Color).spaceId !== undefined) return false;
+  if ((p as Color).coords !== undefined) return false;
+
   if ((p as Hsl).h === undefined) return false;
   if ((p as Hsl).s === undefined) return false;
   if ((p as Hsl).l === undefined) return false;
