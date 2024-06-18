@@ -1,4 +1,4 @@
-import { numberTest, throwFromResult } from "../Guards.js";
+import { throwNumberTest } from "../util/GuardNumbers.js";
 import { round } from "./Round.js";
 
 /**
@@ -27,14 +27,14 @@ export function* linearSpace(
   steps: number,
   precision?: number
 ): IterableIterator<number> {
-  throwFromResult(numberTest(start, ``, `start`));
-  throwFromResult(numberTest(end, ``, `end`));
+  throwNumberTest(start, ``, `start`);
+  throwNumberTest(end, ``, `end`);
 
-  throwFromResult(numberTest(steps, ``, `steps`));
+  throwNumberTest(steps, ``, `steps`);
   const r = precision ? round(precision) : (v: number) => v;
   const step = (end - start) / (steps - 1);
 
-  throwFromResult(numberTest(step, ``, `step`));
+  throwNumberTest(step, ``, `step`);
   if (!Number.isFinite(step)) {
     throw new TypeError(`Calculated step value is infinite`);
   }

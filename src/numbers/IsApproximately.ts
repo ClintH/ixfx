@@ -1,4 +1,4 @@
-import { numberTest, throwFromResult } from "../Guards.js";
+import { throwNumberTest } from "../util/GuardNumbers.js";
 import { round } from "./Round.js";
 
 export function isApproximately(
@@ -44,13 +44,13 @@ export function isApproximately(
   rangePercent: number,
   v?: number
 ) {
-  throwFromResult(numberTest(rangePercent, `percentage`, `rangePercent`));
-  throwFromResult(numberTest(baseValue, ``, `baseValue`));
+  throwNumberTest(rangePercent, `percentage`, `rangePercent`);
+  throwNumberTest(baseValue, ``, `baseValue`);
 
   const diff = baseValue * rangePercent;
   const test = (v: number): boolean => {
     try {
-      throwFromResult(numberTest(v, ``, `v`));
+      throwNumberTest(v, ``, `v`);
 
       //eslint-disable-next-line functional/no-let
       let diffV = Math.abs(v - baseValue);

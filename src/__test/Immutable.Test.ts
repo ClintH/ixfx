@@ -1,7 +1,7 @@
 import test from 'ava';
 import { compareData, getPathsAndData, map, updateByPath, applyChanges, getField, getPaths, compareKeys } from '../Immutable.js';
 import { arrayValuesEqual } from './Include.js';
-import { isEqualValueDefault } from '../IsEqual.js';
+import { isEqualValueDefault } from '../util/IsEqual.js';
 
 test(`get-paths-and-data`, t => {
   const d1 = {

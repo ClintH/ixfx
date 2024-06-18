@@ -1,5 +1,5 @@
 // ✔ UNIT TESTED
-import type { ToString } from '../../Util.js';
+import type { ToString } from '../../util/index.js';
 import { defaultKeyer } from '../../DefaultKeyer.js';
 import { SimpleEventEmitter } from '../../Events.js';
 import { type ISetMutable } from './ISetMutable.js';

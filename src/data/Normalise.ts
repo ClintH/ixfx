@@ -1,7 +1,7 @@
 import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
-import { clamp } from './Clamp.js';
 import { scale } from './Scale.js';
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from "../util/GuardNumbers.js";
+import { clamp } from './Clamp.js';
 /**
  * Normalises numbers, adjusting min/max as new values are processed.
  * Normalised return values will be in the range of 0-1 (inclusive).
@@ -79,13 +79,12 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
  * @param minForced If provided, this will be min value used
  * @param maxForced If provided, this will be the max value used
  */
-export const array = (
-  values: readonly number[],
+export const array = (values: ReadonlyArray<number>,
   minForced?: number,
   maxForced?: number
 ) => {
   if (!Array.isArray(values)) {
-    throw new Error(`values param should be an array`);
+    throw new TypeError(`Param 'values' should be an array. Got: ${ typeof values }`);
   }
   const mma = minMaxAvg(values);
 

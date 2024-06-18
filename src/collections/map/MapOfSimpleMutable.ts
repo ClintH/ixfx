@@ -1,5 +1,5 @@
 import { defaultKeyer } from '../../DefaultKeyer.js';
-import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
+import { type IsEqual, isEqualDefault } from '../../util/IsEqual.js';
 import type { IMapOfMutable } from './IMapOfMutable.js';
 import { MapOfSimpleBase } from './MapOfSimpleBase.js';
 

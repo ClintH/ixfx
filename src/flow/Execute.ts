@@ -1,4 +1,4 @@
-import { defaultComparer, type Comparer } from '../Util.js';
+import { defaultComparer, type Comparer } from '../util/index.js';
 import { shuffle } from '../collections/arrays/index.js';
 
 export type ExpressionOrResult<ArgsType, ResultType> =

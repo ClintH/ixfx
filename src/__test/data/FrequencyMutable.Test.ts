@@ -4,7 +4,7 @@ import type { KeyValue } from '../../PrimitiveTypes.js';
 import { FrequencyMutable } from '../../data/FrequencyMutable.js';
 import { shuffle } from '../../collections/arrays/index.js';
 import { arrayValuesEqual } from '../Include.js';
-import { isEqualValueDefault } from '../../IsEqual.js';
+import { isEqualValueDefault } from '../../util/IsEqual.js';
 
 test(`sorting`, (t) => {
   const a: KeyValue[] = [

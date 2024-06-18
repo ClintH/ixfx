@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "../Guards.js";
+import { throwIntegerTest } from "../util/GuardNumbers.js";
 
 /**
  * Yields `amount` integers, counting by one from zero. If a negative amount is used,

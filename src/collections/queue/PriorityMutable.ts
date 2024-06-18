@@ -1,5 +1,5 @@
-import { throwNumberTest } from "../../Guards.js";
-import { isEqualDefault, type IsEqual } from "../../IsEqual.js";
+import { throwNumberTest } from "../../util/GuardNumbers.js";
+import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
 import { max as IterablesMax, min as IterablesMin } from "../Iterables.js";
 import type { IPriorityQueueMutable, PriorityItem } from "./IPriorityQueueMutable.js";
 import { QueueMutable } from "./QueueMutable.js";

@@ -1,7 +1,7 @@
 import type { Interval } from 'src/flow/IntervalType.js';
 import { wrap } from './Wrap.js';
 import { progress } from '../flow/Elapsed.js';
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 import { clamp } from './Clamp.js';
 export const piPi = Math.PI * 2;
 

@@ -1,6 +1,6 @@
 import type { Point } from './point/PointType.js';
 import { fromTopLeft as RectsFromTopLeft } from './rect/FromTopLeft.js';
-import { throwIntegerTest, throwNumberTest } from '../Guards.js';
+import { throwIntegerTest, throwNumberTest } from '../util/GuardNumbers.js';
 import { clampIndex } from '../data/Clamp.js';
 import { randomElement } from '../collections/arrays/index.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';

@@ -1,4 +1,4 @@
-import type { IsEqual } from '../../IsEqual.js';
+import type { IsEqual } from '../../util/IsEqual.js';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapOf<V> {

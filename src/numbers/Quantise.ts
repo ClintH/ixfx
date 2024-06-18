@@ -1,4 +1,4 @@
-import { integerTest, numberTest, throwFromResult } from "../Guards.js";
+import { throwIntegerTest, throwNumberTest } from "../util/GuardNumbers.js";
 
 /**
  * Rounds `v` by `every`. Middle values are rounded up by default.
@@ -22,8 +22,8 @@ export const quantiseEvery = (
   middleRoundsUp = true
 ) => {
   // Unit tested!
-  throwFromResult(numberTest(v, ``, `v`));
-  throwFromResult(integerTest(every, ``, `every`));
+  throwNumberTest(v, ``, `v`);
+  throwIntegerTest(every, ``, `every`);
 
   //eslint-disable-next-line functional/no-let
   let div = v / every;

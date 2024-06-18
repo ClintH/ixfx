@@ -1,6 +1,7 @@
 import type { CirclePositioned } from "./CircleType.js";
 import { distanceCenter } from "./DistanceCenter.js";
-import { isPoint as PointsIsPoint, distance as PointsDistance } from "../point/index.js";
+import { isPoint as PointsIsPoint } from "../point/Guard.js";
+import { distance as PointsDistance } from "../point/Distance.js";
 import { guardPositioned, isCirclePositioned } from "./Guard.js";
 import type { Point } from '../point/PointType.js';
 

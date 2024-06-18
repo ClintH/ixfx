@@ -2,7 +2,7 @@ import { angle } from "./Angle.js";
 import { centroid } from "./Centroid.js";
 import { distance } from "./Distance.js";
 import { getPointParameter } from "./GetPointParameter.js";
-import type { PointRelation } from "./PointRelation.js";
+import type { PointRelation } from "./PointRelationTypes.js";
 import type { Point } from "./PointType.js";
 
 /**

@@ -1,4 +1,4 @@
-import { isEqualDefault, type IsEqual } from "../../IsEqual.js";
+import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
 
 /**
  * Returns an array with value(s) omitted. If value is not found, result will be a copy of input.

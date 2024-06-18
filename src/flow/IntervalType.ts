@@ -1,4 +1,4 @@
-import { numberTest } from '../Guards.js';
+import { numberTest } from '../util/GuardNumbers.js';
 
 /**
  * Interval types allows for more expressive coding, rather than embedding millisecond values.

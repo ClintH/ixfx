@@ -1,9 +1,10 @@
 import { shuffle } from '../collections/arrays/index.js';
-import { numberTest as guardNumberTest, integerTest as guardIntegerTest, throwFromResult } from '../Guards.js';
+import { numberTest as guardNumberTest, integerTest as guardIntegerTest } from '../util/GuardNumbers.js';
 
 import { type RandomSource, defaultRandom, type RandomOptions } from './Types.js';
 import { floatSource } from './FloatSource.js';
 import { count } from '../numbers/Count.js';
+import { throwFromResult } from '../util/GuardThrowFromResult.js';
 
 export { randomElement as arrayElement } from '../collections/arrays/index.js';
 export { randomHue as hue } from '../visual/Colour.js';

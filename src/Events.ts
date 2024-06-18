@@ -80,7 +80,6 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
 
   /**
    * Fire event
-   * @private
    * @param type Type of event
    * @param args Arguments for event
    * @returns

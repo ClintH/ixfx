@@ -4,7 +4,7 @@ import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
 import * as TreeArrayBacked from '../../../collections/tree/TreeMutable.js';
 import * as TreePathed from '../../../collections/tree/Pathed.js';
 
-import { isEqualValueDefault } from '../../../IsEqual.js';
+import { isEqualValueDefault } from '../../../util/IsEqual.js';
 
 test(`tree-dotted-path`, t => {
   const root = TreePathed.addValueByPath({}, 'c');

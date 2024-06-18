@@ -1,5 +1,4 @@
-import type { ToString } from 'src/Util.js';
-import type { IsEqual } from '../../IsEqual.js';
+import type { IsEqual } from '../../util/IsEqual.js';
 export { ofArrayMutable } from './MapOfArrayMutable.js';
 export {
   ofSimpleMutable as mapOfSimpleMutable,
@@ -40,9 +39,9 @@ export type MapMultiOpts<V> = {
    *
    * @type {(ToString<V>|undefined)}
    */
-  readonly groupBy?: ToString<V> | undefined;
+  readonly groupBy?: ((value: V) => string) | undefined;
 };
 
 export type MapSetOpts<V> = MapMultiOpts<V> & {
-  readonly hash: ToString<V>;
+  readonly hash: (value: V) => string;
 };

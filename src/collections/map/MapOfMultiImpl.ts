@@ -1,7 +1,7 @@
 import {
   type IsEqual,
   isEqualDefault
-} from '../../IsEqual.js';
+} from '../../util/IsEqual.js';
 import type {
   MapArrayEvents,
   IMapOfMutableExtended,
@@ -9,7 +9,7 @@ import type {
 import type { MapMultiOpts, MultiValue } from './MapMulti.js';
 import { SimpleEventEmitter } from '../../Events.js';
 import type { IMapOf } from './IMapOf.js';
-import { toStringDefault, type ToString } from '../../Util.js';
+import { toStringDefault, type ToString } from '../../util/index.js';
 
 /**
  * @internal

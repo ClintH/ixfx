@@ -1,6 +1,6 @@
 import test from 'ava';
-import { changedDataFields, compareArrays, compareData } from '../Compare.js';
 import * as Immutable from '../Immutable.js';
+import { compareArrays, changedDataFields } from '../data/Compare.js';
 
 const objectEmpty = (o: object) => Object.entries(o).length === 0;
 

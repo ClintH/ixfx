@@ -4,7 +4,7 @@ import {
   isEqualValueDefault,
   isEqualValueIgnoreOrder,
   isEqualValuePartial
-} from '../IsEqual.js'
+} from '../util/IsEqual.js'
 
 
 test(`isEqualValuePartial`, t => {

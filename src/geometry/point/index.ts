@@ -25,7 +25,7 @@ export * from './Multiply.js';
 export * from './Normalise.js';
 export * from './NormaliseByRect.js';
 export * from './Pipeline.js';
-export * from './PointRelation.js';
+export * from './PointRelationTypes.js';
 export * from './PointType.js';
 export * from './ProgressBetween.js';
 export * from './Project.js';

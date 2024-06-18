@@ -1,4 +1,4 @@
-import { throwNumberTest } from "../../Guards.js";
+import { throwNumberTest } from "../../util/GuardNumbers.js";
 import type { Point } from "./PointType.js";
 import { guard } from "./Guard.js";
 import { fromCartesian as PolarFromCartesian } from "../Polar.js";

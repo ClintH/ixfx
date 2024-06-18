@@ -7,9 +7,8 @@ import { scale } from '../data/Scale.js';
 import * as Sg from './SceneGraph.js';
 
 import { textRect, textWidth } from './Drawing.js';
-import { ifNaN } from '../Util.js'
 import { getPaths, getField } from '../Immutable.js';
-import { throwNumberTest } from '../Guards.js';
+import { ifNaN, throwNumberTest } from '../util/GuardNumbers.js';
 import type { Rect, RectPositioned, PointCalculableShape } from '../geometry/Types.js';
 import type { Point } from '../geometry/point/PointType.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';

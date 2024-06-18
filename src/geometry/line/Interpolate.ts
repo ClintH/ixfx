@@ -1,4 +1,4 @@
-import { throwNumberTest, throwPercentTest } from "../../Guards.js";
+import { throwNumberTest, throwPercentTest } from "../../util/GuardNumbers.js";
 import type { Point } from "../point/PointType.js";
 import type { Line } from "./LineType.js";
 import { getPointParameter } from "./GetPointsParameter.js";

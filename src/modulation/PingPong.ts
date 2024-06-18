@@ -1,4 +1,4 @@
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 
 /**
  * Continually loops up and down between 0 and 1 by a specified interval.

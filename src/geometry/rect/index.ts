@@ -1,4 +1,6 @@
-import { isEqual as PointsIsEqual, isPoint } from '../point/index.js';
+import { isPoint } from '../point/Guard.js';
+import { isEqual as PointsIsEqual } from '../point/IsEqual.js';
+
 import type { Point } from '../point/PointType.js';
 import { guard, isPositioned, isRect, isRectPositioned } from './Guard.js';
 import type { Rect, RectArray, RectPositioned, RectPositionedArray } from './RectTypes.js';

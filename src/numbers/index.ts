@@ -2,6 +2,7 @@ export * from './Count.js';
 export * from './Generate.js';
 export * from './Ranges.js';
 export * from './Round.js';
+export * from './RelativeDifference.js';
 export * from './IsApproximately.js';
 export * from './LinearSpace.js';
 export * from './Guard.js';

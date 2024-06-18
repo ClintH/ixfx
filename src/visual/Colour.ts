@@ -1,7 +1,7 @@
 import Color, { type Range } from 'colorjs.io';
 
 import { defaultRandom, type RandomSource } from '../random/Types.js';
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 import { piecewise } from '../collections/arrays/index.js';
 import { scale as scaleNumber } from '../data/Scale.js';
 import { clamp } from '../data/Clamp.js';

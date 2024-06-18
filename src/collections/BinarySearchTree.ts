@@ -1,4 +1,4 @@
-import { type Comparer, defaultComparer } from '../Util.js';
+import { type Comparer, defaultComparer } from '../util/index.js';
 import { BinaryTreeNode } from './BinaryTreeNode.js';
 import { mutable } from './queue/QueueMutable.js';
 import { StackMutable } from './stack/StackMutable.js';
@@ -357,7 +357,7 @@ const stringBst = <V>(r: BinaryTreeNode<V> | undefined, indent = 0) => {
   return s;
 };
 
-const test = [30, 40, 10, 15, 12, 50];
+const test = [ 30, 40, 10, 15, 12, 50 ];
 const testTree = new BinarySearchTree<number>(defaultComparer);
 
 test.forEach((t, index) => {

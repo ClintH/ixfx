@@ -1,4 +1,4 @@
-import { isEqualDefault } from '../IsEqual.js'
+import { isEqualDefault } from '../util/IsEqual.js'
 
 export const max = <V>(iterable: Iterable<V>, scorer: (v: V) => number): V | undefined => {
   let highestValue: V | undefined;

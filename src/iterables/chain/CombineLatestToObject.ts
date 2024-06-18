@@ -1,7 +1,7 @@
 import type { GenOrData, GenFactoryNoInput, CombineLatestOptions, Gen, GenValueTypeObject } from "./Types.js";
 import { resolveToGen } from "./Util.js";
 import { Maps } from "../../collections/index.js"
-import { isEqualValueIgnoreOrder } from "../../IsEqual.js";
+import { isEqualValueIgnoreOrder } from "../../util/IsEqual.js";
 
 /**
  * Monitors sources, storing as they happen to an object.

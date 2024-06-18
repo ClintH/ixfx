@@ -1,4 +1,4 @@
-import { throwIntegerTest } from '../Guards.js';
+import { throwIntegerTest } from '../util/GuardNumbers.js';
 import { intervalToMs, type Interval } from './IntervalType.js';
 import type { HasCompletion, HasCompletionRunStates } from './Types.js';
 /**

@@ -1,4 +1,4 @@
-import * as Util from './Util.js';
+import * as Util from './util/index.js';
 import * as Random from './random/index.js';
 import * as Data from './data/index.js';
 import * as Geometry from './geometry/index.js';

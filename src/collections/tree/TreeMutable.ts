@@ -1,4 +1,4 @@
-import { isEqualDefault, type IsEqual } from "../../IsEqual.js"
+import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js"
 import { without } from '../arrays/Without.js';
 import { containsDuplicateInstances } from "../arrays/ContainsDuplicateInstances.js";
 import { QueueMutable } from "../queue/QueueMutable.js"

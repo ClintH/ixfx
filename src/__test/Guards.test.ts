@@ -1,5 +1,73 @@
 import test from 'ava';
-import { isStringArray, integerTest, integerParse, percentTest } from '../Guards.js';
+
+import { isStringArray } from '../util/GuardArrays.js';
+import { ifNaN, percentTest, integerTest, integerParse } from '../util/GuardNumbers.js';
+import { isPlainObjectOrPrimitive, isPlainObject } from '../util/GuardObject.js';
+import { isInteger } from '../util/IsInteger.js';
+
+
+test('isInteger', t => {
+  // Nunber inputs
+  t.true(isInteger(1));
+  t.true(isInteger(0));
+  t.false(isInteger(0.1));
+  t.false(isInteger(0.9));
+  t.false(isInteger(99.9));
+  t.false(isInteger(Number.NaN));
+
+  // String inputs
+  t.true(isInteger(`1`));
+  t.true(isInteger(`0`));
+  t.false(isInteger(`1.1`));
+
+  // @ts-expect-error
+  t.false(isInteger({}));
+  // @ts-expect-error
+  t.false(isInteger(false));
+  // @ts-expect-error
+  t.false(isInteger(true));
+  // @ts-expect-error
+  t.false(isInteger(new Map()));
+
+});
+
+test('isPlainObjectOrPrimitive', t => {
+  t.true(isPlainObjectOrPrimitive(`hello`));
+  t.true(isPlainObjectOrPrimitive(10));
+  t.true(isPlainObjectOrPrimitive({ hello: `there` }));
+  t.false(isPlainObjectOrPrimitive(undefined));
+  t.false(isPlainObjectOrPrimitive(null));
+  t.false(isPlainObjectOrPrimitive(Number));
+  if (typeof window !== `undefined`) {
+    t.false(isPlainObjectOrPrimitive(window));
+  }
+
+});
+
+test('isPlainObject', t => {
+  t.false(isPlainObject(undefined));
+  t.false(isPlainObject(null));
+  t.false(isPlainObject(`hello`));
+  t.false(isPlainObject(10));
+  t.false(isPlainObject(Number));
+  if (typeof window !== `undefined`) {
+    t.false(isPlainObject(window));
+  }
+  t.true(isPlainObject({ hello: `there` }));
+
+});
+
+test('ifNaN', (t) => {
+  t.is(ifNaN(Number.NaN, 10), 10);
+  t.is(ifNaN(200, 10), 200);
+  // @ts-ignore
+  t.throws(() => ifNaN(null, 10));
+  // @ts-ignore
+  t.throws(() => ifNaN(undefined, 10));
+  // @ts-ignore
+  t.throws(() => ifNaN('100', 10));
+});
+
 
 test(`isStringArray`, (t) => {
   t.true(isStringArray([ `a`, `b`, `c` ]));

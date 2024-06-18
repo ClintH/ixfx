@@ -1,7 +1,6 @@
 import { Arrays } from '../collections/index.js';
 import AudioVisualiser from './AudioVisualiser.js';
-import { throwNumberTest, throwIntegerTest } from '../Guards.js';
-import { isPowerOfTwo } from '../Util.js';
+import { throwNumberTest, throwIntegerTest, isPowerOfTwo } from '../util/GuardNumbers.js';
 
 /**
  * Options for audio processing
@@ -191,14 +190,15 @@ export class AudioAnalyser {
       );
     }
     if (this.fftSize < 32) throw new Error(`fftSize must be at least 32`);
-    if (this.fftSize > 32768) { throw new Error(`fftSize must be no greater than 32768`); }
+    if (this.fftSize > 32_768) { throw new Error(`fftSize must be no greater than 32768`); }
 
     this.analyse = analyse;
     this.paused = false;
 
     this.init();
 
-    const visualiserEl = document.getElementById(`audio-visualiser`);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const visualiserEl = document.querySelector(`#audio-visualiser`) as HTMLElement | null;
     if (visualiserEl) {
       const visualiser = new AudioVisualiser(visualiserEl, this);
       visualiser.setExpanded(this.showVis);
@@ -219,9 +219,9 @@ export class AudioAnalyser {
       .then((stream) => {
         this.onMicSuccess(stream);
       })
-      .catch((err) => {
+      .catch((error: unknown) => {
         this.#initInProgress = false;
-        console.error(err);
+        console.error(error);
       });
   }
 
@@ -232,16 +232,17 @@ export class AudioAnalyser {
   set paused(v: boolean) {
     if (v === this.#isPaused) return;
     this.#isPaused = v;
-    if (!v) {
+    if (v) {
+      if (this.debug) console.log(`Paused`);
+    } else {
       if (this.debug) console.log(`Unpaused`);
       window.requestAnimationFrame(this.analyseLoop.bind(this));
-    } else {
-      if (this.debug) console.log(`Paused`);
+
     }
   }
 
-  private setup(audioCtx: AudioContext, stream: MediaStream) {
-    const analyser = audioCtx.createAnalyser();
+  private setup(context: AudioContext, stream: MediaStream) {
+    const analyser = context.createAnalyser();
 
     // fftSize must be a power of 2. Higher values slower, more detailed
     // Range is 32-32768
@@ -253,7 +254,7 @@ export class AudioAnalyser {
     analyser.smoothingTimeConstant = this.smoothingTimeConstant;
 
     // Microphone -> analyser
-    const micSource = audioCtx.createMediaStreamSource(stream);
+    const micSource = context.createMediaStreamSource(stream);
     micSource.connect(analyser);
     return analyser;
   }
@@ -261,20 +262,20 @@ export class AudioAnalyser {
   // Microphone successfully initalised, now have access to audio data
   private onMicSuccess(stream: MediaStream) {
     try {
-      const audioCtx = new AudioContext();
+      const context = new AudioContext();
 
-      audioCtx.addEventListener(`statechange`, () => {
-        if (this.debug) console.log(`Audio context state: ${ audioCtx.state }`);
+      context.addEventListener(`statechange`, () => {
+        if (this.debug) console.log(`Audio context state: ${ context.state }`);
       });
 
-      this.audioCtx = audioCtx;
-      this.analyserNode = this.setup(audioCtx, stream);
+      this.audioCtx = context;
+      this.analyserNode = this.setup(context, stream);
 
       // Start loop
       window.requestAnimationFrame(this.analyseLoop.bind(this));
-    } catch (ex) {
+    } catch (error) {
       this.#initInProgress = false;
-      console.error(ex);
+      console.error(error);
     }
   }
 
@@ -293,8 +294,8 @@ export class AudioAnalyser {
     try {
       // Perform analysis
       this.analyse(a, this);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
 
     // Run again
@@ -313,7 +314,7 @@ export class AudioAnalyser {
   getFrequencyRangeMax(
     lowFreq: number,
     highFreq: number,
-    freqData: readonly number[]
+    freqData: ReadonlyArray<number>
   ): number {
     const samples = this.sliceByFrequency(lowFreq, highFreq, freqData);
     return Arrays.max(samples);
@@ -330,7 +331,7 @@ export class AudioAnalyser {
   sliceByFrequency(
     lowFreq: number,
     highFreq: number,
-    freqData: readonly number[]
+    freqData: ReadonlyArray<number>
   ) {
     const lowIndex = this.getIndexForFrequency(lowFreq);
     const highIndex = this.getIndexForFrequency(highFreq);
@@ -370,7 +371,7 @@ export class AudioAnalyser {
     const a = this.analyserNode;
     if (a === undefined) throw new Error(`Analyser not available`);
 
-    const nyquist = a.context.sampleRate / 2.0;
+    const nyquist = a.context.sampleRate / 2;
     const index = Math.round((freq / nyquist) * a.frequencyBinCount);
     if (index < 0) return 0;
     if (index >= a.frequencyBinCount) return a.frequencyBinCount - 1;

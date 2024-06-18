@@ -1,7 +1,7 @@
 import test from 'ava';
 import { immutable } from '../../../collections/map/index.js';
 import { arrayValuesEqual } from '../../Include.js';
-import { isEqualValueDefault } from '../../../IsEqual.js';
+import { isEqualValueDefault } from '../../../util/IsEqual.js';
 
 test(`immutableMap`, (t) => {
   const m = immutable();

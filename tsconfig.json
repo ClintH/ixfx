@@ -2,11 +2,6 @@
   "compilerOptions": {
     "outDir": "./etc/build",
     "baseUrl": ".",
-    "paths": {
-      "fp-ts/*": [
-        "node_modules/fp-ts/es6/*"
-      ]
-    },
     "lib": [
       "esnext",
       "dom",

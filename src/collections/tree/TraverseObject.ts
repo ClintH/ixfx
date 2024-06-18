@@ -1,9 +1,10 @@
 import { toStringAbbreviate } from '../../Text.js';
-import { nullUndef } from '../../Guards.js';
+
 import { last } from '../../iterables/IterableSync.js';
 import * as TreeArrayBacked from './TreeMutable.js';
 import { isPrimitive } from '../../IsPrimitive.js';
 import type { TraversableTree, TreeNode, SimplifiedNode } from './Types.js';
+import { throwNullUndef } from '../../util/GuardEmpty.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
 export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: Array<string> }>;
 export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
@@ -44,7 +45,7 @@ export const prettyPrint = (
   indent = 0,
   options: Partial<ChildrenOptions> = {}
 ): string => {
-  nullUndef(node, `node`);
+  throwNullUndef(node, `node`);
   const defaultName = options.name ?? `node`;
   const entry = getNamedEntry(node, defaultName);
   const t = `${ `  `.repeat(indent) } + name: ${ entry.name } value: ${ JSON.stringify(entry.nodeValue) }`;
@@ -127,14 +128,9 @@ export function* children<T extends object>(
   node: T,
   options: Partial<ChildrenOptions> = {}
 ): IterableIterator<Entry> {
-  // ✔️ Unit tested
-  nullUndef(node, `node`);
-  //let defaultName = options.name;
+  throwNullUndef(node, `node`);
 
   const filter = options.filter ?? `none`;
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  //const valueFor = (v: any) => v;// options.valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
 
   const filterByValue = (v: any): [ filter: boolean, isPrimitive: boolean ] => {
     if (filter === `none`) return [ true, isPrimitive(v) ];
@@ -262,8 +258,8 @@ export function* traceByPath<T extends object>(
   opts: PathOpts = {}
 ): Iterable<EntryWithAncestors> {
   // ✔️ Unit tested
-  nullUndef(path, `path`);
-  nullUndef(node, `node`);
+  throwNullUndef(path, `path`);
+  throwNullUndef(node, `node`);
 
   const separator = opts.separator ?? `.`;
   // const allowArrayIndexes = opts.allowArrayIndexes ?? true;

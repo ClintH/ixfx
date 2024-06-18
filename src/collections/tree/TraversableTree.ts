@@ -1,5 +1,5 @@
 import { toStringAbbreviate } from "../../Text.js";
-import { isEqualDefault, type IsEqual } from "../../IsEqual.js";
+import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
 import { QueueMutable } from "../queue/QueueMutable.js";
 import { StackMutable } from "../stack/StackMutable.js";
 import type { TraversableTree } from "./Types.js";

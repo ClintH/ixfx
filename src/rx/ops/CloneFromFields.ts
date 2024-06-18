@@ -1,4 +1,5 @@
-import { isPlainObjectOrPrimitive } from "../../Util.js";
+
+import { isPlainObjectOrPrimitive } from "../../util/GuardObject.js";
 import type { ReactiveOrSource } from "../Types.js";
 import { transform } from "./Transform.js";
 

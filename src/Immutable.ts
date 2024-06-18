@@ -1,9 +1,10 @@
 /** Utilities for working with immutable objects */
 import JSON5 from 'json5';
-import { isInteger, isPlainObjectOrPrimitive } from "./Util.js";
 import * as TraversableObject from './collections/tree/TraverseObject.js';
 import { isPrimitive } from './IsPrimitive.js';
 import { compareValues as IterableCompareValues } from './collections/Iterables.js';
+import { isPlainObjectOrPrimitive } from './util/GuardObject.js';
+import { isInteger } from './util/IsInteger.js';
 
 /**
  * Return _true_ if `a` and `b` ought to be considered equal
@@ -446,15 +447,7 @@ export const keysToNumbers = <T>(object: Record<any, T>, onInvalidKey: `throw` |
  */
 export const isEmptyEntries = (value: object) => [ ...Object.entries(value) ].length === 0;
 
-export const mapKeys = <TKey extends string | number | symbol>(object: Record<any, any>, mapFunction: (key: string) => TKey) => {
-  // @ts-expect-error
-  const destinationObject: Record<TKey, any> = {};
-  for (const entries of Object.entries(object)) {
-    const key = mapFunction(entries[ 0 ]);
-    destinationObject[ key ] = entries[ 1 ];
-  }
-  return destinationObject;
-}
+
 
 export type ReadonlyRemapObjectPropertyType<OriginalType, PropertyType> = {
   readonly [ Property in keyof OriginalType ]: PropertyType;

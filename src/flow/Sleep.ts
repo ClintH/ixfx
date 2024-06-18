@@ -1,4 +1,4 @@
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 import { type Interval, intervalToMs } from './IntervalType.js';
 
 export type SleepOpts<V> = Interval & Partial<{

@@ -1,4 +1,4 @@
-import { numberTest, throwNumberTest } from "src/Guards.js";
+import { throwNumberTest } from "../util/GuardNumbers.js";
 
 export type CycleOptions = {
   min: number

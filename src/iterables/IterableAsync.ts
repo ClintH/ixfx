@@ -1,9 +1,9 @@
 import { intervalToMs, type Interval } from '../flow/IntervalType.js';
-import { toStringDefault, type IsEqual } from '../IsEqual.js';
+import { type IsEqual } from '../util/IsEqual.js';
 import { sleep, type SleepOpts } from '../flow/Sleep.js';
 import { isAsyncIterable, isIterable } from './Iterable.js';
-import type { ToString } from 'src/Util.js';
-import type { ToArrayOptions } from './index.js';
+import { toStringDefault } from '../util/ToString.js';
+import type { ToArrayOptions } from './Types.js';
 
 /**
  * Yield values from `array`, one at a time.
@@ -495,7 +495,7 @@ export async function* unique<V>(
   }
 }
 
-export async function* uniqueByValue<T>(input: AsyncIterable<T>, toString: ToString<T> = toStringDefault, seen: Set<string> = new Set<string>()): AsyncGenerator<T> {
+export async function* uniqueByValue<T>(input: AsyncIterable<T>, toString: (value: T) => string = toStringDefault, seen: Set<string> = new Set<string>()): AsyncGenerator<T> {
   for await (const v of input) {
     const key = toString(v);
     if (seen.has(key)) continue;

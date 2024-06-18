@@ -2,7 +2,7 @@
 import test, { type ExecutionContext } from 'ava';
 import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
 import { compareValuesEqual } from '../collections/arrays/index.js';
-import { isEqualDefault } from '../IsEqual.js';
+import { isEqualDefault } from '../util/IsEqual.js';
 //test.todo('sf');
 
 export const areIntegers = (t: ExecutionContext, a: Array<number>) => {

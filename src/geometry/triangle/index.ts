@@ -1,6 +1,6 @@
 import * as Polar from '../Polar.js';
 import * as Points from '../point/index.js';
-import { throwNumberTest } from '../../Guards.js';
+import { throwNumberTest } from "../../util/GuardNumbers.js";
 import { radianToDegree } from '../Angles.js';
 import { guard } from './Guard.js';
 import { intersectsPoint as RectsIntersectsPoint } from '../rect/Intersects.js';

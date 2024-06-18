@@ -1,5 +1,5 @@
 import { defaultKeyer } from '../../DefaultKeyer.js';
-import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
+import { type IsEqual, isEqualDefault } from '../../util/IsEqual.js';
 import { firstEntryByIterableValue } from './MapMultiFns.js';
 
 export class MapOfSimpleBase<V> {

@@ -1,9 +1,9 @@
 import { sleep } from './Sleep.js';
 import { resolveLogOption } from '../debug/Logger.js';
 import { since, toString as elapsedToString } from './Elapsed.js';
-import { throwIntegerTest, throwNumberTest } from '../Guards.js';
+import { throwIntegerTest, throwNumberTest } from '../util/GuardNumbers.js';
 import { getErrorMessage } from '../debug/GetErrorMessage.js';
-import type { Result } from '../Results.js';
+import type { Result } from '../util/Results.js';
 /**
  * Result of backoff
  */

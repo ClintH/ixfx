@@ -1,4 +1,4 @@
-import { throwIntegerTest } from '../Guards.js';
+import { throwIntegerTest } from "../util/GuardNumbers.js";
 
 /**
  * Returns true for every _n_th call, eg 2 for every second call.
@@ -25,21 +25,18 @@ import { throwIntegerTest } from '../Guards.js';
  * @param callback
  * @returns Function which in turn returns true if nth call has been hit, false otherwise
  */
-export const everyNth = (
-  nth: number,
-  callback?: (...args: readonly unknown[]) => void
-) => {
+export const everyNth = <T>(nth: number, callback?: (data: T) => void) => {
   throwIntegerTest(nth, `positive`, `nth`);
 
-  //eslint-disable-next-line functional/no-let
   let counter = 0;
-  //eslint-disable-next-line functional/prefer-immutable-types
-  return (...args: unknown[]): boolean => {
-    if (++counter === nth) {
+
+  return (data: T) => {
+    counter++;
+    if (counter === nth) {
       counter = 0;
-      if (callback) callback(...args);
+      if (callback) callback(data);
       return true;
     }
     return false;
-  };
+  }
 };

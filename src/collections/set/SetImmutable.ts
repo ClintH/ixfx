@@ -1,5 +1,5 @@
 import { defaultKeyer } from '../../DefaultKeyer.js';
-import { type ToString, toStringDefault } from '../../Util.js';
+import { type ToString, toStringDefault } from '../../util/index.js';
 import { type ISetImmutable } from './ISetImmutable.js';
 
 export class SetStringImmutable<V> implements ISetImmutable<V> {

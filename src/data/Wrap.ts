@@ -1,4 +1,5 @@
-import { throwNumberTest, throwIntegerTest } from '../Guards.js';
+/* eslint-disable unicorn/prevent-abbreviations */
+import { throwNumberTest, throwIntegerTest } from '../util/GuardNumbers.js';
 
 /**
  * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
@@ -137,7 +138,6 @@ export const wrapRange = (
 ) => {
   //eslint-disable-next-line functional/no-let
   let r = 0;
-  // No wrapping
   const distF = Math.abs(b - a);
   // When b is wrapped forwards
   const distFwrap = Math.abs(max - a + b);
@@ -153,6 +153,7 @@ export const wrapRange = (
     r = a + fn(distMin);
   } else {
     // Forwards or backwards without wrapping
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (a > b) {
       // (240,120) -- backwards
       r = a - fn(distMin);

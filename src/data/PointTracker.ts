@@ -11,34 +11,9 @@ import { Empty as LinesEmpty } from 'src/geometry/line/index.js';
 import type { Coord as PolarCoord } from '../geometry/Polar.js';
 import type { Line, PolyLine } from '../geometry/line/LineType.js';
 import type { Point } from '../geometry/point/PointType.js';
-import type { PointRelation, PointRelationResult } from '../geometry/point/PointRelation.js';
+import type { PointRelation } from '../geometry/point/PointRelationTypes.js';
 import { joinPointsToLines } from '../geometry/line/JoinPointsToLines.js';
-
-/**
- * Information about seen points
- */
-export type PointTrack = PointRelationResult & {
-  // readonly speedFromInitial:number
-};
-
-/**
- * Results of point tracking
- */
-export type PointTrackerResults = {
-  /**
-   * Relation of last point to previous point
-   */
-  readonly fromLast: PointTrack;
-  /**
-   * Relation of last point to initial point.
-   * 
-   * When the tracker is reset or resizes (eg. if it reaches its capacity), the
-   * initial point will be the first new point. Thus, the initial point
-   * always maintains some time horizon
-   */
-  readonly fromInitial: PointTrack;
-  readonly values: ReadonlyArray<Point>;
-};
+import type { PointTrack, PointTrackerResults } from './Types.js';
 
 /**
  * Point tracker. Create via `pointTracker()`.
@@ -262,6 +237,7 @@ export class TrackedPointMap extends TrackedValueMap<
       const seens = events.map(subEvent => super.seen(subEvent.pointerId.toString(), subEvent));
       return Promise.all(seens);
     } else {
+      // eslint-disable-next-line unicorn/no-single-promise-in-promise-methods
       return Promise.all([ super.seen((event as PointerEvent).pointerId.toString(), event) ]);
     }
   }

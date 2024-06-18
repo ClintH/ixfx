@@ -1,7 +1,7 @@
 import test from 'ava';
 import { mapOfSimpleMutable } from '../../../collections/map/MapMulti.js';
 import { arrayValuesEqual } from '../../Include.js';
-import { isEqualValueDefault } from '../../../IsEqual.js';
+import { isEqualValueDefault } from '../../../util/IsEqual.js';
 
 test(`mapOfSimpleMutable`, (t) => {
   const m1 = mapOfSimpleMutable<string>();

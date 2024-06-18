@@ -1,4 +1,4 @@
-import { throwIntegerTest } from '../Guards.js';
+import { throwIntegerTest } from "../util/GuardNumbers.js";
 
 /**
  * The circular array is immutable. It keeps up to `capacity` items.
@@ -16,6 +16,8 @@ import { throwIntegerTest } from '../Guards.js';
  * @class CircularArray
  * @extends Array
  */
+
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface ICircularArray<V> extends Array<V> {
   /**

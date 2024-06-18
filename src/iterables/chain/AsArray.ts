@@ -1,7 +1,7 @@
 import type { GenFactoryNoInput } from "./Types.js"
 
 import { toArray as AsyncToArray } from "../IterableAsync.js";
-import type { ToArrayOptions } from "../index.js";
+import type { ToArrayOptions } from "../Types.js";
 
 /**
  * Async function that returns the chain as an array of values

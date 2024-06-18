@@ -1,6 +1,4 @@
-import { reduce as IterableReduce } from '../iterables/sync/Reduce.js';
-import { throwNumberTest } from '../Guards.js';
-
+import { throwNumberTest } from "../util/GuardNumbers.js";
 /**
  * Logic for continuing repeats
  */

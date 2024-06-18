@@ -3,7 +3,7 @@ import { sleep } from "../../flow/Sleep.js";
 import type { Link, GenOrData, DelayOptions } from "./Types.js";
 import { resolveToGen } from "./Util.js";
 import { Elapsed } from "../../flow/index.js";
-import { throwIntegerTest } from "../../Guards.js";
+import { throwIntegerTest } from "../../util/GuardNumbers.js";
 import * as BasicProcessors from '../../data/BasicProcessors.js';
 import type { RankArrayOptions, RankFunction, RankOptions } from "../../data/Types.js";
 

@@ -1,8 +1,8 @@
-import { type ToString, toStringDefault } from '../Util.js';
-import { type IsEqual } from '../IsEqual.js';
+import { type ToString, toStringDefault } from '../util/index.js';
+import { type IsEqual } from '../util/IsEqual.js';
 import { isIterable } from './Iterable.js';
-import type { ToArrayOptions } from './index.js';
 import { intervalToMs } from '../flow/IntervalType.js';
+import type { ToArrayOptions } from './Types.js';
 export { slice } from './sync/Slice.js';
 export { reduce } from './sync/Reduce.js';
 

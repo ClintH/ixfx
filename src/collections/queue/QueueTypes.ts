@@ -1,4 +1,4 @@
-import type { IsEqual } from "../../IsEqual.js";
+import type { IsEqual } from "../../util/IsEqual.js";
 
 export type QueueDiscardPolicy = `older` | `newer` | `additions`;
 

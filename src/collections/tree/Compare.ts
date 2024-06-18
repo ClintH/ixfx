@@ -1,4 +1,4 @@
-import { type IsEqual, isEqualValueIgnoreOrder } from "../../IsEqual.js";
+import { type IsEqual, isEqualValueIgnoreOrder } from "../../util/IsEqual.js";
 import * as TreeMutable from './TreeMutable.js';
 import type { TreeNode, TraversableTree } from './Types.js';
 

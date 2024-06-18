@@ -1,9 +1,9 @@
-import type { ToString } from '../../Util.js';
+import type { ToString } from '../../util/index.js';
 import type { IMapOf } from './IMapOf.js';
 import type { IMapOfImmutable } from './IMapOfImmutable.js';
 import { defaultKeyer } from '../../DefaultKeyer.js';
 import { MapOfSimpleBase } from './MapOfSimpleBase.js';
-import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
+import { type IsEqual, isEqualDefault } from '../../util/IsEqual.js';
 
 /**
  * Simple immutable MapOf

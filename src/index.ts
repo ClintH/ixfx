@@ -398,6 +398,6 @@ export * as Collections from './collections/index.js';
 export * as Random from './random/index.js';
 export * as KeyValues from './KeyValue.js';
 
-export * as Util from './Util.js';
+export * as Util from './util/index.js';
 
 export * as Immutable from './Immutable.js'

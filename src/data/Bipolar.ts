@@ -1,6 +1,6 @@
 
 import { type RandomOptions, type RandomSource } from '../random/Types.js';
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 import { interpolate } from './Interpolate.js';
 import { scaler as numberScaler } from './Scale.js';
 import { floatSource } from '../random/FloatSource.js';

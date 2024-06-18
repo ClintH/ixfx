@@ -1,5 +1,5 @@
 import { type RandomSource, defaultRandom } from '../../random/Types.js';
-import { sum as PointsSum } from '../point/index.js';
+import { sum as PointsSum } from '../point/Sum.js';
 import type { Point } from '../point/PointType.js';
 import { isPositioned } from './Guard.js';
 import type { Rect, RectPositioned } from './RectTypes.js';

@@ -1,4 +1,5 @@
-import { integerTest, throwFromResult } from './Guards.js';
+import { integerTest } from './util/GuardNumbers.js';
+import { throwFromResult } from './util/GuardThrowFromResult.js';
 export { string as random } from './random/String.js';
 
 /**

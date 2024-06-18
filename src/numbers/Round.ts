@@ -1,4 +1,4 @@
-import { throwFromResult, integerTest } from "../Guards.js";
+import { throwIntegerTest, throwNumberTest } from "../util/GuardNumbers.js";
 
 export function round(decimalPlaces: number, v: number): number;
 export function round(decimalPlaces: number): (v: number) => number;
@@ -22,7 +22,7 @@ export function round(decimalPlaces: number): (v: number) => number;
  * @returns
  */
 export function round(a: number, b?: number) {
-  throwFromResult(integerTest(a, `positive`, `decimalPlaces`));
+  throwIntegerTest(a, `positive`, `decimalPlaces`);
 
   //eslint-disable-next-line functional/no-let
   let rounder;
@@ -34,3 +34,20 @@ export function round(a: number, b?: number) {
 
   return b === undefined ? rounder : rounder(b);
 }
+
+
+/**
+ * Rounds `v` up to the nearest multiple of `multiple`
+ * ```
+ * roundMultiple(19, 20); // 20
+ * roundMultiple(21, 20); // 40
+ * ```
+ * @param v
+ * @param multiple
+ * @returns
+ */
+export const roundUpToMultiple = (v: number, multiple: number): number => {
+  throwNumberTest(v, `nonZero`, `v`);
+  throwNumberTest(multiple, `nonZero`, `multiple`);
+  return Math.ceil(v / multiple) * multiple;
+};

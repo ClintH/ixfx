@@ -1,7 +1,7 @@
 import { type IQueueMutable, type IQueueMutableWithEvents, type QueueMutableEvents } from './IQueueMutable.js';
 import { enqueue, peek, dequeue, isEmpty, isFull } from './QueueFns.js';
 import { type QueueOpts } from './QueueTypes.js';
-import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
+import { isEqualDefault, type IsEqual } from '../../util/IsEqual.js';
 import { SimpleEventEmitter } from '../../Events.js';
 
 /**

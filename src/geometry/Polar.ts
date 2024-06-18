@@ -1,13 +1,9 @@
 import { degreeToRadian, radianToDegree } from './Angles.js';
-//import * as Points from './point/index.js';
-import { throwNumberTest } from '../Guards.js';
-//import type { PolarCoord } from './Types.js';
-
+import { throwNumberTest } from "../util/GuardNumbers.js";
 import type { Point } from './point/PointType.js';
 import { subtract } from './point/Subtract.js';
 import { Empty } from './point/Empty.js';
 import { isPoint, guard as PointGuard } from './point/Guard.js';
-const _piPi = Math.PI * 2;
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 const EmptyCartesian = Object.freeze({ x: 0, y: 0 });

@@ -1,4 +1,4 @@
-import { toStringDefault, type ToString } from "../Util.js";
+import { toStringDefault, type ToString } from "../util/index.js";
 
 export type TrackUnique<T> = (value: T) => boolean
 

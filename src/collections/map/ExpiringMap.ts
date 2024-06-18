@@ -1,7 +1,7 @@
 import { SimpleEventEmitter } from '../../Events.js';
 import { sortByValueProperty } from './MapFns.js';
-import { throwIntegerTest } from '../../Guards.js';
 import { intervalToMs, type Interval } from '../../flow/IntervalType.js';
+import { throwIntegerTest } from '../../util/GuardNumbers.js';
 
 /**
  * Expiring map options

@@ -1,6 +1,6 @@
 
 import { type RandomOptions, type RandomSource, defaultRandom } from "./Types.js";
-import { numberTest as guardNumberTest, throwFromResult } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 /**
  * Returns a function that produces random float values.
  * Use {@link float} to produce a valued directly.
@@ -34,8 +34,8 @@ export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSou
   let min = options.min ?? 0;
   const source = options.source ?? defaultRandom;
 
-  throwFromResult(guardNumberTest(min, ``, `min`));
-  throwFromResult(guardNumberTest(max, ``, `max`));
+  throwNumberTest(min, ``, `min`);
+  throwNumberTest(max, ``, `max`);
 
   if (!options.min && max < 0) {
     min = max;

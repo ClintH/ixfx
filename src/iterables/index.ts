@@ -12,8 +12,9 @@ import { isAsyncIterable } from '../iterables/Iterable.js';
 import * as Chains from './chain/index.js';
 import type { Interval } from '../flow/IntervalType.js';
 
-import { toStringDefault } from '../Util.js';
+import { toStringDefault } from '../util/index.js';
 import type { GenFactoryNoInput } from './chain/Types.js';
+import type { ToArrayOptions } from './Types.js';
 
 export function combineLatestToArray(sources: Array<Chains.GenOrData<any> | GenFactoryNoInput<any>>, options: Partial<Chains.CombineLatestOptions> = {}): AsyncGenerator<Array<any>> {
   return Chains.combineLatestToArray(sources, options);
@@ -498,4 +499,3 @@ export function fromIterable<V>(iterable: Iterable<V> | AsyncIterable<V>, interv
 }
 
 
-export type ToArrayOptions = { limit: number, elapsed: Interval }

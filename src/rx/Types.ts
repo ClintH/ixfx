@@ -1,12 +1,12 @@
 import type { Primitive } from '../PrimitiveTypes.js';
-import type { ChangeRecord } from '../Compare.js';
 import type { Interval } from '../flow/IntervalType.js';
 import * as Immutable from '../Immutable.js';
 import type { BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions, OpMathOptions } from './ops/Types.js';
 import type { TimeoutTriggerOptions } from './sources/Types.js';
 import type { SetHtmlOptions } from './sinks/Dom.js';
-import type { Processors } from 'src/data/Process.js';
+import type { Processors } from '../data/Process.js';
 import type { TallyOptions } from './ops/Math.js';
+import type { ChangeRecord } from '../data/Compare.js';
 
 
 export type CombineLatestOptions = {

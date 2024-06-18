@@ -1,4 +1,4 @@
-import { throwNumberTest } from "../../Guards.js";
+import { throwNumberTest } from "../../util/GuardNumbers.js";
 import type { Rect } from "../rect/RectTypes.js";
 import { isRect } from "../rect/Guard.js";
 import { isPoint } from "./Guard.js";

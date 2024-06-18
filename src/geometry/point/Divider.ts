@@ -1,4 +1,4 @@
-import { throwNumberTest } from "../../Guards.js";
+import { throwNumberTest } from "../../util/GuardNumbers.js";
 import { getPointParameter } from "./GetPointParameter.js";
 import { guard, guardNonZeroPoint, isPoint } from "./Guard.js";
 import type { Point, Point3d } from "./PointType.js";

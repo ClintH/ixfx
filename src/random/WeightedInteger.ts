@@ -1,7 +1,7 @@
 import { clamp } from "../data/Clamp.js";
 import { type RandomSource, defaultRandom } from "./Types.js";
 import type { WeightedOptions } from "./Weighted.js";
-import { numberTest as guardNumberTest, throwFromResult } from '../Guards.js';
+import { throwNumberTest } from '../util/GuardNumbers.js';
 import { get as EasingGet } from '../modulation/Easing.js';
 export type WeightedIntegerOptions = WeightedOptions & Readonly<{
   min?: number;
@@ -47,14 +47,14 @@ export const weightedIntegerSource = (
   if (typeof easingName !== `string`) {
     throw new TypeError(`easing field expected to be string`);
   }
-  throwFromResult(guardNumberTest(max));
+  throwNumberTest(max);
 
   const easingFunction = EasingGet(easingName);
   if (easingFunction === undefined) {
     throw new Error(`Easing '${ easingName }' not found`);
   }
 
-  throwFromResult(guardNumberTest(min));
+  throwNumberTest(min);
   if (max <= min) throw new Error(`Max should be greater than min`);
 
   const compute = (): number => {

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { compareArrays, type ChangeRecord } from "../../Compare.js";
-import { isEqualValueDefault } from "../../IsEqual.js";
+import { isEqualValueDefault } from "../../util/IsEqual.js";
 import * as Arrays from '../../collections/arrays/index.js';
 import { initStream } from "../InitStream.js";
 import type { ReactiveInitial, ReactiveNonInitial, ReactiveArray, Reactive } from "../Types.js";
 import type { ArrayObjectOptions } from "./Types.js";
+import { compareArrays, type ChangeRecord } from "../../data/Compare.js";
 
 /**
  * Wraps an array object

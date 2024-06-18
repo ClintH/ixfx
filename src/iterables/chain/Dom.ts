@@ -3,7 +3,7 @@
 import type { GenOrData, Link } from "./Types.js";
 import { resolveToGen } from "./Util.js";
 import { resolveEl } from "../../dom/ResolveEl.js";
-import { toStringDefault } from "../../Util.js";
+import { toStringDefault } from "../../util/index.js";
 
 export type QueryOptions = {
   baseElement: HTMLElement;

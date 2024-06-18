@@ -1,6 +1,6 @@
 // ✔ UNIT TESTED
 
-import { type IsEqual, isEqualDefault } from '../../IsEqual.js';
+import { type IsEqual, isEqualDefault } from '../../util/IsEqual.js';
 import type { IMapOf } from './IMapOf.js';
 import type { IWithEntries } from './IMappish.js';
 

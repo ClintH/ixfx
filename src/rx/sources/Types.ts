@@ -1,7 +1,7 @@
 import type { IsEqualContext } from '../../Immutable.js';
 import type { Interval } from '../../flow/IntervalType.js';
 import type { InitLazyStreamOptions, Lazy } from '../Types.js';
-import type { IsEqual } from "../../IsEqual.js";
+import type { IsEqual } from "../../util/IsEqual.js";
 
 export type TriggerValue<TTriggerValue> = {
   value: TTriggerValue

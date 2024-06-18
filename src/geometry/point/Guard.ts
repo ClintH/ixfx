@@ -1,6 +1,5 @@
 import type { Point, Point3d } from "./PointType.js";
-import { throwNumberTest } from '../../Guards.js';
-
+import { throwNumberTest } from '../../util/GuardNumbers.js';
 
 /**
  * Returns true if p.x and p.y === null

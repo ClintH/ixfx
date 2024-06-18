@@ -4,15 +4,15 @@
  * See Also: NumericArrays.ts
  */
 
-import { throwIntegerTest } from '../../Guards.js';
+import { throwIntegerTest } from '../../util/GuardNumbers.js';
 import {
   type ToString,
   toStringDefault,
-} from '../../Util.js';
+} from '../../util/index.js';
 import {
   type IsEqual,
   isEqualDefault
-} from '../../IsEqual.js'
+} from '../../util/IsEqual.js'
 import { fromIterable as mapFromIterable } from '../map/MapFns.js';
 import { type RandomSource, defaultRandom } from '../../random/Types.js';
 import { weightedIndex } from '../../random/WeightedIndex.js';

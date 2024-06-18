@@ -1,5 +1,5 @@
 import { toCartesian } from '../Polar.js';
-import { throwIntegerTest } from '../../Guards.js';
+import { throwIntegerTest } from "../../util/GuardNumbers.js";
 import { Triangles, Points } from '../index.js';
 import type { Triangle } from '../triangle/TriangleType.js';
 import { isCirclePositioned, isCircle } from '../circle/Guard.js';
@@ -11,14 +11,14 @@ import { isIntersecting as CirclesIsIntersecting } from '../circle/Intersecting.
 import { randomPoint as circleRandomPoint, center as circleCenter } from '../circle/index.js';
 import { randomPoint as rectRandomPoint } from '../rect/index.js';
 import { isRect, isRectPositioned } from '../rect/Guard.js';
-
 import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';
 import type { Rect, RectPositioned, } from '../rect/RectTypes.js';
 import type { CirclePositioned, Circle } from '../circle/CircleType.js';
 import type { Line, PolyLine } from '../line/LineType.js';
-export type ContainsResult = `none` | `contained`;
 import type { Point, Point3d } from './../point/PointType.js';
+
 export type ShapePositioned = CirclePositioned | RectPositioned;
+export type ContainsResult = `none` | `contained`;
 
 export type Sphere = Point3d & {
   readonly radius: number;

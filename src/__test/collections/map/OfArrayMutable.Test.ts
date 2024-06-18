@@ -5,7 +5,7 @@ import {
 } from '../../../collections/map/MapOfArrayMutable.js';
 import type { IMapOfMutableExtended } from '../../../collections/map/IMapOfMutableExtended.js';
 import { arrayValueIncludes } from '../../Include.js';
-import { isEqualValueDefault } from '../../../IsEqual.js';
+import { isEqualValueDefault } from '../../../util/IsEqual.js';
 
 test(`withOpts`, (t) => {
   type Person = { readonly name: string; readonly city: string };

@@ -1,4 +1,4 @@
-import { type IsEqual, isEqualValueDefault } from "../../IsEqual.js";
+import { type IsEqual, isEqualValueDefault } from "../../util/IsEqual.js";
 
 /**
  * Returns _true_ if the contents of the array are all the same.

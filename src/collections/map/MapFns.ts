@@ -1,9 +1,9 @@
-import { isEqualDefault, type IsEqual } from '../../IsEqual.js';
+import { isEqualDefault, type IsEqual } from '../../util/IsEqual.js';
 import {
   toStringDefault,
   defaultComparer,
   type ToString,
-} from '../../Util.js';
+} from '../../util/index.js';
 import type { IWithEntries } from './IMappish.js';
 
 // ✔ UNIT TESTED!

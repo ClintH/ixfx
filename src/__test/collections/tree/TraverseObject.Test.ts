@@ -3,7 +3,7 @@ import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, ch
 import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
 import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
 import * as TreeCompare from '../../../collections/tree/Compare.js';
-import { isEqualValueDefault, isEqualValuePartial } from '../../../IsEqual.js';
+import { isEqualValueDefault, isEqualValuePartial } from '../../../util/IsEqual.js';
 
 function getTestMap() {
   const testMap = new Map();

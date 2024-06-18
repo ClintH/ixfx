@@ -1,4 +1,4 @@
-import { throwNumberTest } from '../Guards.js';
+import { throwNumberTest } from "../util/GuardNumbers.js";
 import { type NumberFunction } from './Types.js';
 
 /**
