@@ -1,4 +1,3 @@
-
 import type { IsEqualContext } from '../../Immutable.js';
 import type { Interval } from '../../flow/IntervalType.js';
 import type { InitLazyStreamOptions, Lazy } from '../Types.js';
@@ -200,8 +199,9 @@ export type GeneratorOptions = {
   whenStopped: `continue` | `reset`
 }
 
-export type EventOptions<V> = {
-  transform: (args?: Event | undefined) => V
+export type EventOptions = {
+  //initialValue?: V
+  //transform: (args?: Event | undefined) => V
   lazy?: Lazy
   /**
    * If true, log messages are emitted
@@ -214,3 +214,57 @@ export type EventOptions<V> = {
    */
   debugFiring?: boolean
 }
+
+export type EventTriggerOptions = EventOptions & {
+  /**
+   * If _true_ sends an initial trigger when starting
+   * Default: false
+   */
+  fireInitial: boolean
+}
+
+export type EventPluckedFieldOptions<T> = {
+  lazy?: Lazy
+  initialValue: T
+}
+
+export type EventPluckedFieldOptions2<TDomSource, TValueDestination> = {
+  lazy?: Lazy
+  initialValue: TValueDestination
+  domToValue: (value: TDomSource | undefined) => TValueDestination | undefined
+  valueToDom: (value: TValueDestination) => TDomSource
+}
+
+export type DomValueOptions = EventOptions & {
+  /**
+   * If true, the current value will be emitted even though it wasn't
+   * triggered by an event.
+   * Default: false
+   */
+  emitInitialValue: boolean
+  attributeName: string
+  fieldName: string
+  /**
+   * Respond to when value has changed or when value is changing
+   * Default: `changed`
+   */
+  when: `changed` | `progress`
+
+  fallbackValue: string
+}
+
+
+// export type DomValueAsNumberOptions = DomValueOptions<number> & {
+//   /**
+//    * If _true_, automatically converts values to be relative based on min and max, if available
+//    * Default: false
+//    */
+//   makeRelative?: boolean
+//   /**
+//    * If _true_, value is inverted based on max/min attributes.
+//    * Default: false.
+//    * 
+//    * eg if value is 300, min:0, max:300, value emitted will be 0.
+//    */
+//   invert?: boolean
+// } 
