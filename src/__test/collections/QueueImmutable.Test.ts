@@ -190,7 +190,8 @@ test(`bounded`, (t) => {
 });
 
 test(`bounded-2`, t => {
-  let q = immutable({ capacity: 5 });
+  const capacity = 5;
+  let q = immutable({ capacity });
   let xCount = 1;
   let yCount = 1;
   const gen = () => ({ x: xCount++, y: yCount++ });
@@ -201,6 +202,13 @@ test(`bounded-2`, t => {
   q = q.enqueue(gen());
   q = q.enqueue(gen());
   q = q.enqueue(gen());
-
-  console.log(q.toArray());
+  t.is(q.length, capacity);
+  t.true(q.isFull);
+  t.deepEqual(q.toArray(), [
+    { x: 1, y: 1 },
+    { x: 2, y: 2 },
+    { x: 3, y: 3 },
+    { x: 4, y: 4 },
+    { x: 5, y: 5 }
+  ]);
 });

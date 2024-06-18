@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'ava';
-import type { KeyValue } from '../../KeyValue.js';
+import type { KeyValue } from '../../PrimitiveTypes.js';
 import { FrequencyMutable } from '../../data/FrequencyMutable.js';
 import { shuffle } from '../../collections/arrays/index.js';
 import { arrayValuesEqual } from '../Include.js';
