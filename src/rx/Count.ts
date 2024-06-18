@@ -9,7 +9,7 @@ import { initLazyStream } from "./InitStream.js";
  * 
  * ```js
  * const r = Rx.count();
- * r.value(c => {
+ * r.onValue(c => {
  *  // 0, 1, 2, 3 ... every second
  * });
  * ```

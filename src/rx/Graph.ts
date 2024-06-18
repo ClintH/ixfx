@@ -77,11 +77,15 @@ export function prepare<V extends Record<string, any>>(_rx: V): Reactive<V> {
 
 
   const returnValue = {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    dispose: events.dispose,
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    isDisposed: events.isDisposed,
     graph: g,
     // eslint-disable-next-line @typescript-eslint/unbound-method
     on: events.on,
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    value: events.value
+    onValue: events.onValue
   }
   return returnValue;
 }
