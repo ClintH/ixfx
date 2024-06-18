@@ -1,11 +1,12 @@
 import test from 'ava';
 import { Scaler, Points, Rects } from '../../geometry/index.js';
+import type { Point } from '../../geometry/point/PointType.js';
 
 const testBasic = (
   abs: boolean,
   scaler: Scaler.ScalerCombined,
-  input: Points.Point,
-  expected: Points.Point
+  input: Point,
+  expected: Point
 ) => {
   const s = abs ? scaler.abs : scaler.rel;
   const t1 = s(input.x, input.y);
@@ -17,7 +18,7 @@ const testBasic = (
   return true;
 };
 
-const testEq = (expected: Points.Point, got: Points.Point) => {
+const testEq = (expected: Point, got: Point) => {
   if (Points.isEqual(expected, got)) return true;
   console.log(
     `got: ${ Points.toString(got) } expected: ${ Points.toString(expected) }`
@@ -28,9 +29,9 @@ const testEq = (expected: Points.Point, got: Points.Point) => {
 const testOverride = (
   abs: boolean,
   scaler: Scaler.ScalerCombined,
-  input: Points.Point,
+  input: Point,
   output: Rects.Rect,
-  expected: Points.Point
+  expected: Point
 ) => {
   const s = abs ? scaler.abs : scaler.rel;
   const t1 = s(input.x, input.y, output.width, output.height);

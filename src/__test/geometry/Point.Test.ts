@@ -1,6 +1,7 @@
 import test, { type ExecutionContext } from 'ava';
 
 import * as Points from '../../geometry/point/index.js';
+import { divide, divider } from '../../geometry/point/Divider.js';
 
 function closeTo(t: ExecutionContext<unknown>, input: number, target: number, percent: number = 0.001) {
   const diff = (Math.abs(target - input) / target);
@@ -147,27 +148,27 @@ test(`angle`, t => {
 });
 
 test(`divide`, t => {
-  t.like(Points.divide({ x: 5, y: 10 }, 2), { x: 2.5, y: 5 });
-  t.like(Points.divide({ x: 10, y: 5 }, { x: 5, y: 2 }), { x: 2, y: 2.5 });
-  t.like(Points.divide({ x: 10, y: 5 }, 5, 2), { x: 2, y: 2.5 });
+  t.like(divide({ x: 5, y: 10 }, 2), { x: 2.5, y: 5 });
+  t.like(divide({ x: 10, y: 5 }, { x: 5, y: 2 }), { x: 2, y: 2.5 });
+  t.like(divide({ x: 10, y: 5 }, 5, 2), { x: 2, y: 2.5 });
 
   // A contains 0
-  t.like(Points.divide({ x: 0, y: 5 }, { x: 5, y: 2 }), { x: 0, y: 2.5 });
-  t.like(Points.divide({ x: 10, y: 0 }, 5, 2), { x: 2, y: 0 });
+  t.like(divide({ x: 0, y: 5 }, { x: 5, y: 2 }), { x: 0, y: 2.5 });
+  t.like(divide({ x: 10, y: 0 }, 5, 2), { x: 2, y: 0 });
 
   // Should not throw if a contains a zero
-  // expect(() => Points.divide({x: 0, y: 5}, 1, 11)).toThrow();
-  // expect(() => Points.divide({x: 10, y: 0}, 1, 1)).toThrow();
+  // expect(() => divide({x: 0, y: 5}, 1, 11)).toThrow();
+  // expect(() => divide({x: 10, y: 0}, 1, 1)).toThrow();
 
   // B contains zero
-  t.like(Points.divide({ x: 10, y: 5 }, { x: 0, y: 10 }), { x: Infinity, y: 0.5 });
-  t.like(Points.divide({ x: 10, y: 5 }, { x: 10, y: 0 }), { x: 1, y: Infinity });
-  t.throws(() => Points.divide({ x: 10, y: 5 }, 0, 10));
-  t.throws(() => Points.divide({ x: 10, y: 5 }, 10, 0));
+  t.like(divide({ x: 10, y: 5 }, { x: 0, y: 10 }), { x: Infinity, y: 0.5 });
+  t.like(divide({ x: 10, y: 5 }, { x: 10, y: 0 }), { x: 1, y: Infinity });
+  t.throws(() => divide({ x: 10, y: 5 }, 0, 10));
+  t.throws(() => divide({ x: 10, y: 5 }, 10, 0));
 
   // B contains NaN
-  t.throws(() => Points.divide({ x: 10, y: 5 }, NaN, 2));
-  t.throws(() => Points.divide({ x: 10, y: 5 }, 2, NaN));
+  t.throws(() => divide({ x: 10, y: 5 }, NaN, 2));
+  t.throws(() => divide({ x: 10, y: 5 }, 2, NaN));
   t.pass();
 });
 
@@ -231,17 +232,17 @@ test(`subtract`, t => {
 
 
 test('divideFn', t => {
-  let f = Points.divider(100, 200);
+  let f = divider(100, 200);
   t.like(f(50, 100), { x: 0.5, y: 0.5 });
   t.like(f({ x: 50, y: 100 }), { x: 0.5, y: 0.5 });
   t.like(f([ 50, 100 ]), { x: 0.5, y: 0.5 });
 
-  f = Points.divider([ 100, 200 ]);
+  f = divider([ 100, 200 ]);
   t.like(f(50, 100), { x: 0.5, y: 0.5 });
   t.like(f({ x: 50, y: 100 }), { x: 0.5, y: 0.5 });
   t.like(f([ 50, 100 ]), { x: 0.5, y: 0.5 });
 
-  f = Points.divider({ x: 100, y: 200 });
+  f = divider({ x: 100, y: 200 });
   t.like(f(50, 100), { x: 0.5, y: 0.5 });
   t.like(f({ x: 50, y: 100 }), { x: 0.5, y: 0.5 });
   t.like(f([ 50, 100 ]), { x: 0.5, y: 0.5 });
@@ -250,19 +251,19 @@ test('divideFn', t => {
   t.like(f([]), { x: 0, y: 0 });
 
   // Dodgy input
-  t.throws(() => Points.divider(0, 1));
-  t.throws(() => Points.divider(1, 0));
-  t.throws(() => Points.divider(1, 1, 0));
-  t.throws(() => Points.divider({ x: 1, y: 0 }));
-  t.throws(() => Points.divider({ x: 0, y: 1 }));
-  t.throws(() => Points.divider(Number.NaN, Number.NaN));
+  t.throws(() => divider(0, 1));
+  t.throws(() => divider(1, 0));
+  t.throws(() => divider(1, 1, 0));
+  t.throws(() => divider({ x: 1, y: 0 }));
+  t.throws(() => divider({ x: 0, y: 1 }));
+  t.throws(() => divider(Number.NaN, Number.NaN));
 
   // Incorrect array length
-  t.throws(() => Points.divider([]));
-  t.throws(() => Points.divider([ 1, 2, 3, 4 ]));
+  t.throws(() => divider([]));
+  t.throws(() => divider([ 1, 2, 3, 4 ]));
 
 
-  const f2 = Points.divider({ x: 100, y: 200 });
+  const f2 = divider({ x: 100, y: 200 });
 
   t.throws(() => f2(Number.NaN));
   t.throws(() => f2([ 1, 2, 3, 4 ]));
