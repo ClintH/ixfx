@@ -1,10 +1,12 @@
 import * as Rx from '../rx/index.js';
-import { isPrimitive, type PrimitiveOrObject } from "../KeyValue.js";
+import { type PrimitiveOrObject } from "../PrimitiveTypes.js";
+import { isPrimitive } from '../IsPrimitive.js';
 
 type ValueType = string | number | boolean | object
 
 type FunctionType<V> = (() => V) | (() => Promise<V>);
 type ValueOrFunction<V> = ValueType | FunctionType<V> | Iterator<V> | AsyncIterator<V>;
+type Resolvable<V> = Promise<V> | Rx.Reactive<V> | Generator<V> | AsyncGenerator<V> | IterableIterator<V> | AsyncIterableIterator<V> | ((args: any) => V)
 
 export type PullRecord<T extends Record<string, PrimitiveOrObject | (() => any) | Rx.Reactive<any>>> =
   { [ K in keyof T ]:
@@ -23,22 +25,22 @@ export type PullRecord<T extends Record<string, PrimitiveOrObject | (() => any) 
     T[ K ] extends object ? T[ K ] :
     never };
 
-// export type PullRecord2<T extends Record<string, PrimitiveOrObject | ReactiveOrSource<any>>> =
-//   { [ K in keyof T ]:
-//     T[ K ] extends number ? number | undefined :
-
-//     T[ K ] extends string ? string | undefined :
-//     T[ K ] extends boolean ? boolean | undefined :
-//     T[ K ] extends bigint ? bigint | undefined :
-//     T[ K ] extends Reactive<infer V> ? V | undefined :
-//     T[ K ] extends Wrapped<infer V> ? V | undefined :
-//     T[ K ] extends Generator<infer V> ? V | undefined :
-//     T[ K ] extends AsyncGenerator<infer V> ? V | undefined :
-//     T[ K ] extends IterableIterator<infer V> ? V | undefined :
-//     T[ K ] extends AsyncIterableIterator<infer V> ? V | undefined :
-//     T[ K ] extends Array<infer V> ? V | undefined :
-//     T[ K ] extends object ? T[ K ] :
-//     never };
+export type PullRecordWithInitial<T extends Record<string, PrimitiveOrObject | (() => any) | Rx.Reactive<any>>> =
+  { [ K in keyof T ]:
+    T[ K ] extends number ? number :
+    T[ K ] extends string ? string :
+    T[ K ] extends boolean ? boolean :
+    T[ K ] extends bigint ? bigint :
+    T[ K ] extends () => Promise<any> ? Awaited<ReturnType<T[ K ]>> :
+    T[ K ] extends () => any ? ReturnType<T[ K ]> :
+    T[ K ] extends Rx.Reactive<infer V> ? V :
+    T[ K ] extends Generator<infer V> ? V :
+    T[ K ] extends AsyncGenerator<infer V> ? V :
+    T[ K ] extends IterableIterator<infer V> ? V :
+    T[ K ] extends AsyncIterableIterator<infer V> ? V :
+    T[ K ] extends Array<infer V> ? V :
+    T[ K ] extends object ? T[ K ] :
+    never };
 
 export type ResolveValue<V> =
   V extends () => Promise<any> ? Awaited<ReturnType<V>> :
@@ -131,7 +133,88 @@ export function fieldResolver<V extends object>(object: V) {
   return () => fieldResolve(object);
 }
 
-export function pull<T extends Record<string, PrimitiveOrObject | (() => any)>>(value: T): { compute: () => Promise<PullRecord<T>>, dispose: () => void } {
+type Updated<Type extends Record<string, any>> = Partial<{
+  [ Property in keyof Type ]: Resolvable<Type[ Property ]> | Updated<Type[ Property ]>
+}>
+
+/**
+ * Given an starting data-shape, `reactiveUpdate` allows you to selectively update
+ * fields or use a structured set of functions to update fields on-demand.
+ * 
+ * 
+ * ```js
+ * // Shape of the data to update & default values
+ * let state = {
+ *  size: 0,
+ *  text: `s_orig`,
+ *  missing: false
+ * }
+ * 
+ * // We want to update `size` and `text` fields on-demand (ie when .fetch is called)
+ * const updaters = {
+ *  size: () => Math.random(),
+ *  text: () => `1`,
+ * }
+ * // Put them together
+ * const r = Data.reactiveUpdate(state, updaters);
+ * 
+ * // Fetch a value, triggering updaters
+ * state = await r.fetch();
+ * 
+ * // Get the last value witout triggering
+ * state = await r.last();
+ * ```
+ * 
+ * Data can be updated manually:
+ * ```js
+ * // Update just the value of the 'missing' field
+ * r.update( { missing: true });
+ * ```
+ * 
+ * You can subscribe to changes to the object using `onValue`, `onDiff` & `onField`
+ * 
+ * ```js
+ * r.onValue(value => {
+ *  // Snapshot of whole data when anything changes
+ * });
+ * 
+ * r.onDiff(diff => {
+ *  // Set of changes that have been made
+ * });
+ * 
+ * r.onField(`size`, value => {
+ *  // Notified only when 'size' field changes
+ * });
+ * ```
+ * Caveats:
+ * * Updaters cannot be nested (ie a deeper object strcture)
+ * 
+ * @param schema 
+ * @param updaters 
+ * @returns 
+ * */
+export function reactiveUpdate<S extends Record<string, PrimitiveOrObject>>(schema: S, updaters?: Updated<S>) {
+  const current = Rx.From.object<S>(schema);
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  let fetch = async (): Promise<S> => { return current.last() };
+
+  const applyNewData = (data: Partial<S>): S => {
+    return current.update(data);
+  }
+
+  if (updaters !== undefined) {
+    const rx = pull(updaters as Required<S>);
+    fetch = async (): Promise<S> => {
+      const data = await rx.compute() as Partial<S>;
+      return applyNewData(data);
+    }
+  }
+  return { ...current, pull: fetch }
+}
+
+
+export function pull<T extends Record<string, PrimitiveOrObject | Resolvable<any>>>(value: T): { compute: () => Promise<PullRecord<T>>, dispose: () => void } {
   const sources: Record<string, Rx.Reactive<any>> = {};
   const fixedValues: Record<string, Array<any> | PrimitiveOrObject> = {};
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -140,13 +223,10 @@ export function pull<T extends Record<string, PrimitiveOrObject | (() => any)>>(
   for (const [ key, v ] of Object.entries(value)) {
     if (Array.isArray(v) || isPrimitive(v)) {
       fixedValues[ key ] = v;
-      // } else if (isIterable(v) || isAsyncIterable(v)) {
-      //   generators[ key ] = ChainFromIterable(v)();
     } else if (typeof v === `function`) {
       callers[ key ] = v;
     } else {
       try {
-        console.log(`pull: ${ key }`);
         const s = Rx.resolveSource(v as any);
         (sources as any)[ key ] = s;
       } catch {
@@ -158,18 +238,15 @@ export function pull<T extends Record<string, PrimitiveOrObject | (() => any)>>(
   // Merge sources to one Rx
   const latestToObjectRx = Rx.combineLatestToObject(sources, { onSourceDone: `allow` });
   let lastRxValue: Record<string, any> | undefined;
-  const latestToObjectOff = latestToObjectRx.value(v => {
+  const latestToObjectOff = latestToObjectRx.onValue(v => {
     lastRxValue = v;
   });
 
-  //let computeCallersCount = 0;
   const computeCallers = async () => {
     const r = {};
-    //computeCallersCount++;
     for (const [ key, value ] of Object.entries(callers)) {
       (r as any)[ key ] = await value();
     }
-    //console.log(`computeCallers: ${ computeCallersCount }`, r);
     return r;
   }
 
@@ -206,7 +283,7 @@ export function pull<T extends Record<string, PrimitiveOrObject | (() => any)>>(
 //   // }
 
 //   let lastRxValue: Record<string, any> | undefined;
-//   const off = r.value(v => {
+//   const off = r.onValue(v => {
 //     lastRxValue = v;
 //   });
 
