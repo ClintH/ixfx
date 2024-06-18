@@ -9,7 +9,7 @@ test(`responsive`, async t => {
   const sw = new SyncWait();
 
   let seen: Array<ReadonlyArray<string>> = [];
-  const off = r1.value(value => {
+  const off = r1.onValue(value => {
     seen.push(value);
     sw.signal();
   });
