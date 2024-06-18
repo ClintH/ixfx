@@ -4,7 +4,7 @@ import { func as fromFunction } from "./from/Function.js";
 import type { GenOrData, LazyChain, DelayOptions, Link } from "./Types.js";
 import { isGenFactoryNoInput, resolveToAsyncGen } from "./Util.js";
 import * as L from './Links.js';
-import type { RankFunction, RankArrayOptions, RankOptions } from "../../data/BasicProcessors.js";
+import type { RankFunction, RankArrayOptions, RankOptions } from "../../data/Types.js";
 
 const getLinkName = (c: Link<any, any>): string => {
   //return c._name;

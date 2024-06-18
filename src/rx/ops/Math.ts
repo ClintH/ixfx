@@ -2,8 +2,9 @@ import { initUpstream } from "../InitStream.js";
 import { toReadable } from "../ToReadable.js";
 import type { Reactive, ReactiveOrSource } from "../Types.js";
 import * as BasicProcessors from '../../data/BasicProcessors.js';
-import type { Process } from "src/data/Process.js";
+import type { Process } from "../../data/Process.js";
 import type { OpAsAnnotation, OpMathOptions } from "./Types.js";
+import type { RankFunction, RankOptions } from "../../data/Types.js";
 
 export function max(input: ReactiveOrSource<any>, options: OpMathOptions): Reactive<number>;
 export function max(input: ReactiveOrSource<any>, options: OpAsAnnotation & OpMathOptions): Reactive<{ value: number, max: number }>;
@@ -45,9 +46,9 @@ export function tally<TIn>(input: ReactiveOrSource<TIn>, options: Partial<TallyO
   return process(p, `tally`, input, options);
 }
 
-export function rank<TIn>(input: ReactiveOrSource<any>, rank: BasicProcessors.RankFunction<TIn>, options: Partial<BasicProcessors.RankOptions & OpMathOptions>): Reactive<TIn>;
-export function rank<TIn>(input: ReactiveOrSource<any>, rank: BasicProcessors.RankFunction<TIn>, options: OpAsAnnotation & Partial<BasicProcessors.RankOptions & OpMathOptions>): Reactive<{ value: TIn, rank: TIn }>;
-export function rank<TIn>(input: ReactiveOrSource<any>, rank: BasicProcessors.RankFunction<TIn>, options: Partial<BasicProcessors.RankOptions & OpMathOptions>): Reactive<TIn> | Reactive<{ value: TIn, rank: TIn }> {
+export function rank<TIn>(input: ReactiveOrSource<any>, rank: RankFunction<TIn>, options: Partial<RankOptions & OpMathOptions>): Reactive<TIn>;
+export function rank<TIn>(input: ReactiveOrSource<any>, rank: RankFunction<TIn>, options: OpAsAnnotation & Partial<RankOptions & OpMathOptions>): Reactive<{ value: TIn, rank: TIn }>;
+export function rank<TIn>(input: ReactiveOrSource<any>, rank: RankFunction<TIn>, options: Partial<RankOptions & OpMathOptions>): Reactive<TIn> | Reactive<{ value: TIn, rank: TIn }> {
   const p = BasicProcessors.rank(rank, options);
   return process(p, `rank`, input, options);
 }

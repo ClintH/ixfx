@@ -6,6 +6,7 @@ export * as Bluetooth from './NordicBleDevice.js';
 export * as AudioAnalysers from './AudioAnalyser.js';
 export * as AudioVisualisers from './AudioVisualiser.js';
 export * from './Types.js';
+export * from './GenericStateTransitions.js';
 
 export { StringReceiveBuffer } from './StringReceiveBuffer.js';
 export {

@@ -5,8 +5,8 @@ import type { ReactiveOrSource, Reactive, ReactiveWritable, ReactiveOp } from ".
 /**
  * 'Taps' the values from 'input', passing them to the 'process' function.
  * Return stream is the input stream, unaffected by what 'process' does.
- * @param input 
- * @param process 
+ * @param input Input stream
+ * @param processors List of processors
  * @returns 
  */
 export function tapProcess<In, T2, T3, T4, T5, T6>(input: ReactiveOrSource<In>, ...processors: Processors<In, T2, T3, T4, T5, T6>): Reactive<In> {
@@ -23,8 +23,8 @@ export function tapProcess<In, T2, T3, T4, T5, T6>(input: ReactiveOrSource<In>, 
 /**
  * 'Taps' the values from 'input', passing them to 'diverged'
  * Returns the original input stream, unaffected by what 'diverged' does.
- * @param input 
- * @param stream 
+ * @param input Input stream
+ * @param diverged Stream to write to 
  * @returns 
  */
 export function tapStream<In>(input: ReactiveOrSource<In>, diverged: ReactiveWritable<In>): Reactive<In> {
@@ -35,11 +35,16 @@ export function tapStream<In>(input: ReactiveOrSource<In>, diverged: ReactiveWri
   return inputStream;
 }
 
-
-export const tapOps = <TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<TIn, TOut>>): Reactive<TOut> => {
+/**
+ * Create a parallel 'tap' of processing
+ * @param input Input stream
+ * @param ops Series of ops to process data
+ * @returns 
+ */
+export const tapOps = <TIn, TOut>(input: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<TIn, TOut>>): Reactive<TOut> => {
   for (const op of ops) {
     // @ts-expect-error
-    source = op(source);
+    input = op(input);
   }
-  return source as any as Reactive<TOut>;
+  return input as any as Reactive<TOut>;
 }

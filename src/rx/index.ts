@@ -9,7 +9,7 @@ import { resolveSource } from './ResolveSource.js';
 import type { BatchOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
 import type { TimeoutTriggerOptions } from "./sources/Types.js";
 import * as SinkFns from './sinks/index.js';
-import type { RankFunction, RankOptions } from "src/data/BasicProcessors.js";
+import type { RankFunction, RankOptions } from "../data/Types.js";
 export * from './Chain.js';
 
 //#endregion
@@ -269,12 +269,7 @@ export const Ops = {
   },
 } as const;
 
-/**
- * Connects `ops` together, ready for a source.
- * Returns a function that takes a `source`.
- * @param ops 
- * @returns 
- */
+
 // export const chain = <TIn, TOut>(...ops: Array<ReactiveOp<TIn, TOut>>) => {
 //   return (source: ReactiveOrSource<TIn>) => {
 //     for (const op of ops) {

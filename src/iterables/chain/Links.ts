@@ -5,6 +5,7 @@ import { resolveToGen } from "./Util.js";
 import { Elapsed } from "../../flow/index.js";
 import { throwIntegerTest } from "../../Guards.js";
 import * as BasicProcessors from '../../data/BasicProcessors.js';
+import type { RankArrayOptions, RankFunction, RankOptions } from "../../data/Types.js";
 
 /**
  * Transform values from one type to another. Just like a map function.
@@ -156,7 +157,7 @@ export function debounce<In>(rate: Interval): Link<In, In> {
  *   // Produces: 1, 2, 3 ... every 100ms
  * }
  * ```
- * This is different than {@link total} which adds up numeric values.
+ * This is different than {@link sum} which adds up numeric values.
  * By default it adds up individual array items
  * @returns 
  */
@@ -256,7 +257,7 @@ export function max(): Link<number | Array<number>, number> {
  * @param options 
  * @returns 
  */
-export function rank<In>(r: BasicProcessors.RankFunction<In>, options: Partial<BasicProcessors.RankOptions> = {}): Link<In, In> {
+export function rank<In>(r: RankFunction<In>, options: Partial<RankOptions> = {}): Link<In, In> {
   async function* rank(input: GenOrData<In>): AsyncGenerator<In> {
     input = resolveToGen(input);
     //let best: In | undefined;
@@ -305,7 +306,7 @@ export function rank<In>(r: BasicProcessors.RankFunction<In>, options: Partial<B
  * @param options 
  * @returns 
  */
-export function rankArray<In>(r: BasicProcessors.RankFunction<In>, options: Partial<BasicProcessors.RankArrayOptions> = {}): Link<Array<In>, In> {
+export function rankArray<In>(r: RankFunction<In>, options: Partial<RankArrayOptions> = {}): Link<Array<In>, In> {
   const includeType = options.includeType;
   const emitEqualRanked = options.emitEqualRanked ?? false;
   const emitRepeatHighest = options.emitRepeatHighest ?? false;

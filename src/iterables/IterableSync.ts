@@ -394,11 +394,11 @@ export function* fromIterable<T>(iterable: Iterable<T>) {
  * const data = await toArray(adsrIterable(opts, 10));
  * ```
  *
- * Note: If the iterator is infinite, be sure to provide a `count` or the function
+ * Note: If the iterator is infinite, be sure to provide a limit via the options or the function
  * will never return.
  *
  * @param it Asynchronous iterable
- * @param count Number of items to return, by default all.
+ * @param options Options when converting to array.
  * @returns
  */
 //eslint-disable-next-line func-style

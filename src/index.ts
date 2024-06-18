@@ -1,3 +1,5 @@
+export type * from './PrimitiveTypes.js';
+
 /**
  * Select a namespace below for more
  *

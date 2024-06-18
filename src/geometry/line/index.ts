@@ -1,14 +1,38 @@
-import * as Arrays from '../../collections/arrays/index.js';
-import { minFast } from '../../collections/arrays/NumericArrays.js';
-import * as Points from '../point/index.js';
-
-import { distanceSingleLine } from './DistanceSingleLine.js';
-
 import type { Point } from '../point/PointType.js';
-import { guard, isLine } from './Guard.js';
 import type { Line } from './LineType.js';
+//import * as Points from '../point/index.js';
+import { normaliseByRect as PointsNormaliseByRect } from '../point/NormaliseByRect.js';
+import { minFast } from '../../collections/arrays/NumericArrays.js';
+import { distanceSingleLine } from './DistanceSingleLine.js';
+import { isLine } from './Guard.js';
 import { length } from './Length.js';
 import { interpolate } from './Interpolate.js';
+import { isPoint, isEmpty as PointIsEmpty, isPlaceholder as PointIsPlaceholder } from '../point/Guard.js';
+export * from './Angles.js';
+export * from './Bbox.js';
+export * from './DistanceSingleLine.js';
+export * from './Divide.js';
+export * from './FromFlatArray.js';
+export * from './FromNumbers.js';
+export * from './FromPoints.js';
+export * from './FromPointsToPath.js';
+export * from './GetPointsParameter.js';
+export * from './Guard.js';
+export * from './Interpolate.js';
+export * from './IsEqual.js';
+export * from './JoinPointsToLines.js';
+export * from './Length.js';
+export type * from './LinePathType.js';
+export type * from './LineType.js';
+export * from './Midpoint.js';
+export * from './Multiply.js';
+export * from './Nearest.js';
+export * from './RelativePosition.js';
+export * from './Rotate.js';
+export * from './Subtract.js';
+export * from './Sum.js';
+export * from './ToPath.js';
+export * from './ToString.js';
 
 //eslint-disable-next-line @typescript-eslint/naming-convention
 export const Empty = Object.freeze({
@@ -28,9 +52,9 @@ export const Placeholder = Object.freeze({
  * @param l 
  * @returns 
  */
-export const isEmpty = (l: Line): boolean => Points.isEmpty(l.a) && Points.isEmpty(l.b);
+export const isEmpty = (l: Line): boolean => PointIsEmpty(l.a) && PointIsEmpty(l.b);
 
-export const isPlaceholder = (l: Line): boolean => Points.isPlaceholder(l.a) && Points.isPlaceholder(l.b);
+export const isPlaceholder = (l: Line): boolean => PointIsPlaceholder(l.a) && PointIsPlaceholder(l.b);
 
 
 
@@ -107,8 +131,8 @@ export const angleRadian = (lineOrPoint: Line | Point, b?: Point): number => {
  */
 export const normaliseByRect = (line: Line, width: number, height: number): Line => Object.freeze({
   ...line,
-  a: Points.normaliseByRect(line.a, width, height),
-  b: Points.normaliseByRect(line.b, width, height)
+  a: PointsNormaliseByRect(line.a, width, height),
+  b: PointsNormaliseByRect(line.b, width, height)
 });
 
 
@@ -307,7 +331,7 @@ export const distance = (line: Line | ReadonlyArray<Line>, point: Point): number
 export const toFlatArray = (a: Point | Line, b: Point): ReadonlyArray<number> => {
   if (isLine(a)) {
     return [ a.a.x, a.a.y, a.b.x, a.b.y ];
-  } else if (Points.isPoint(a) && Points.isPoint(b)) {
+  } else if (isPoint(a) && isPoint(b)) {
     return [ a.x, a.y, b.x, b.y ];
   } else {
     throw new Error(`Expected single line parameter, or a and b points`);

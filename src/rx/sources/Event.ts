@@ -16,10 +16,11 @@ import { Elapsed } from "../../flow/index.js";
  * // on the change event args
  * eventField(el, `pointermove`, `x`);
  * ```
- * @param target 
- * @param eventName 
- * @param fieldName 
- * @param options 
+ * @param targetOrQuery Event target, HTML element or HTML query (eg '#someId') 
+ * @param eventName Name of event, eg. 'pointermove'
+ * @param fieldName Name of field, eg 'x'
+ * @param initialValue Initial data
+ * @param options Options for source
  */
 export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, initialValue: TFieldValue, options: Partial<EventOptions & FieldOptions<any, TFieldValue>> = {}) {
 
@@ -33,89 +34,6 @@ export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | st
   );
   return rxField;
 }
-
-// export function eventPluckedField3<T = string>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, options: Partial<EventPluckedFieldOptions<T>> = {}): Reactive<T> & ReactiveDisposable<T> {
-//   const target = (typeof targetOrQuery === `string` ? document.querySelector(targetOrQuery) : targetOrQuery);
-//   if (target === null && typeof targetOrQuery === `string`) throw new Error(`Element query could not be resolved '${ targetOrQuery }`);
-//   if (target === null) throw new Error(`Param 'target' is null`);
-
-//   const onFired = (event: any) => {
-//     let domValue: T;
-//     if (fieldName in event) {
-//       domValue = event[ fieldName ] as T;
-//     } else if (fieldName in target) {
-//       domValue = (target as any)[ fieldName ] as T;
-//     }
-//     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//     stream.set(domValue!);
-//   }
-
-//   const opts = {
-//     lazy: options.lazy ?? `very`,
-//     initialValue: undefined as T | undefined,
-//     onStart() {
-//       target.addEventListener(eventName, onFired);
-//     },
-//     onStop() {
-//       target.removeEventListener(eventName, onFired);
-//     }
-//   }
-
-//   let stream: ReactiveStream<T>;
-//   const initialValue = options.initialValue;
-//   // eslint-disable-next-line unicorn/prefer-ternary
-//   if (initialValue === undefined) {
-//     stream = initLazyStream<T>(opts);
-//   } else {
-//     stream = initLazyStreamWithInitial<T>({
-//       ...opts,
-//       initialValue
-//     });
-//   }
-//   return stream;
-// }
-// export function eventPluckedField<TDomSource, TValueDestination>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, options: Partial<EventPluckedFieldOptions<TDomSource, TValueDestination>> = {}): ReactiveInitial<TValueDestination> & ReactiveDisposable<TValueDestination> {
-//   const target = (typeof targetOrQuery === `string` ? document.querySelector(targetOrQuery) : targetOrQuery);
-//   if (target === null && typeof targetOrQuery === `string`) throw new Error(`Element query could not be resolved '${ targetOrQuery }`);
-//   if (target === null) throw new Error(`Param 'target' is null`);
-
-//   let currentValue: TValueDestination | undefined = options.initialValue;
-
-//   const onFired = (event: any) => {
-//     let domValue: TDomSource | undefined;
-//     if (fieldName in event) {
-//       domValue = event[ fieldName ] as TDomSource;
-//     } else if (fieldName in target) {
-//       domValue = (target as any)[ fieldName ] as TDomSource;
-//     }
-
-//     currentValue = options.domToValue ? options.domToValue(domValue) : domValue as TValueDestination;
-//     if (currentValue !== undefined) {
-//       stream.set(currentValue);
-//     }
-//   }
-
-//   const stream = initLazyStream<TValueDestination>({
-//     lazy: options.lazy ?? `very`,
-//     onStart() {
-//       target.addEventListener(eventName, onFired);
-//     },
-//     onStop() {
-//       target.removeEventListener(eventName, onFired);
-//     }
-//   });
-
-//   if (currentValue !== undefined) {
-//     stream.set(currentValue);
-//   }
-//   return {
-//     ...stream,
-//     last() {
-//       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//       return currentValue!;
-//     },
-//   };
-// }
 
 //export function event<V extends Record<string, any>>(target: EventTarget | null | string, name: string, options: EventOptions<V>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
 //export function event<V extends Record<string, any>>(target: EventTarget | null | string, name: string, options?: Optional<EventOptions<V>, `transform`>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
@@ -216,6 +134,16 @@ export type TriggerData = {
   total: number
 }
 
+/**
+ * Emits a value whenever event happens.
+ * Data emitted is `{ sinceLast, total }`, where 'sinceLast'
+ * is milliseconds since last event and 'total' is total number of 
+ * times event has been fired.
+ * @param targetOrQuery 
+ * @param name 
+ * @param options 
+ * @returns 
+ */
 export function eventTrigger(targetOrQuery: EventTarget | null | string, name: string, options: Partial<EventTriggerOptions> = {}): Reactive<TriggerData> {
   let target: EventTarget | null;
   if (typeof targetOrQuery === `string`) {

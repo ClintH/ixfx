@@ -1,16 +1,22 @@
 import { promiseFromEvent } from "../../../flow/PromiseFromEvent.js";
 import type { GenFactoryNoInput } from "../Types.js";
 
+/**
+ * Create an iterable from an event
+ * @param target Event source (eg HTML element)
+ * @param name Name of event (eg. 'pointermove')
+ * @returns 
+ */
 export function event<Out>(target: EventTarget, name: string): GenFactoryNoInput<Out> {
-  async function* fromEvent(): AsyncGenerator<Out> {
+  async function* event(): AsyncGenerator<Out> {
     while (true) {
       yield await promiseFromEvent(target, name) as Out;
     }
   }
-  fromEvent._name = `fromEvent`;
+  event._name = `event`;
   /* eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion */
-  fromEvent._type = `GenFactoryNoInput` as const;
-  return fromEvent;
+  event._type = `GenFactoryNoInput` as const;
+  return event;
 }
 
 

@@ -1,4 +1,4 @@
-import type { RankArrayOptions, RankFunction, RankOptions } from "../../data/BasicProcessors.js";
+import type { RankArrayOptions, RankFunction, RankOptions } from "../../data/Types.js";
 import type { Interval } from "../../flow/IntervalType.js";
 export type SyncOptions = {
 

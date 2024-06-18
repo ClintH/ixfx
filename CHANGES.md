@@ -1,5 +1,15 @@
 A rough changelog between NPM releases
 
+# 0.22.0 24.06.17
+
+Data
++ reactiveUpdate: given start object and a Record<string,Resolvable>, it can produce an updated merged object on demand. For example for state.
+
+Rx
++ Several new ops: min, max, average, sum, tally, rank, drop
++ 'tap' to do parallel processing
++ Reworked annotation op and added 'annotationWithOp'
+
 # 0.21.0 24.06.07
 
 Collections

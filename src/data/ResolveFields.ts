@@ -6,7 +6,7 @@ type ValueType = string | number | boolean | object
 
 type FunctionType<V> = (() => V) | (() => Promise<V>);
 type ValueOrFunction<V> = ValueType | FunctionType<V> | Iterator<V> | AsyncIterator<V>;
-type Resolvable<V> = Promise<V> | Rx.Reactive<V> | Generator<V> | AsyncGenerator<V> | IterableIterator<V> | AsyncIterableIterator<V> | ((args: any) => V)
+export type Resolvable<V> = Promise<V> | Rx.Reactive<V> | Generator<V> | AsyncGenerator<V> | IterableIterator<V> | AsyncIterableIterator<V> | ((args: any) => V)
 
 export type PullRecord<T extends Record<string, PrimitiveOrObject | (() => any) | Rx.Reactive<any>>> =
   { [ K in keyof T ]:

@@ -421,7 +421,7 @@ export async function some<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promi
  * Note that limits are ORed, `toArray` will finish if either of them is true.
  * 
  * @param it Asynchronous iterable
- * @param count Number of items to return, by default all.
+ * @param options Options when converting to array
  * @returns
  */
 export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayOptions> = {}): Promise<Array<V>> {

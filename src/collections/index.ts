@@ -1,11 +1,9 @@
-
-
 export {
   circularArray,
   type ICircularArray as CircularArray,
 } from './CircularArray.js';
 export * as Trees from './tree/index.js';
-
+export type * from './Types.js';
 export * as Iterables from './Iterables.js';
 
 /**
