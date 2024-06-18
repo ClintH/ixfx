@@ -9,6 +9,7 @@ import { afterMatch, beforeMatch } from "../Text.js";
 import { stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "../text/Segments.js";
 import { QueueMutable } from "../collections/index.js";
 import { object } from "./sources/Object.js";
+import * as Colour from '../visual/Colour.js';
 
 /**
  * Reactive stream of array of elements that match `query`.
@@ -23,7 +24,7 @@ export function fromDomQuery(query: string) {
 }
 
 /**
- * Updates an element's `textContent` when the source value changes
+ * Updates an element's `textContent` when the source value changes.
  * ```js
  * bindText(source, `#blah`);
  * ```
@@ -33,9 +34,102 @@ export function fromDomQuery(query: string) {
  * @param source 
  * @param bindOpts 
  */
-export const bindText = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElement | null, bindOpts: Partial<Rx.DomBindSourceValue<V>> = {}) => {
+export const bindText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts: Partial<Rx.DomBindSourceValue<TSource, string>> = {}) => {
   return bindElement(source, elOrQuery, { ...bindOpts, elField: `textContent` });
 }
+
+/**
+ * Updates an element's `value` (as well as the 'value' attribute) when the source value changes.
+ * Use {@link bindValueRange} when setting numeric values
+ * @param source 
+ * @param elOrQuery 
+ * @param bindOpts 
+ * @returns 
+ */
+export const bindValueText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts: Partial<Rx.DomBindSourceValue<TSource, string>> = {}) => {
+  return bindElement(source, elOrQuery, { ...bindOpts, elField: `value`, attribName: `value` });
+}
+
+/**
+ * Updates an element's `valueAsNumber` (as well as the 'value' attribute) when the source value changes.
+ * ```js
+ * // Create a reactive number, with a default value of 10
+ * const r1 = Rx.From.number(10);
+ * // Bind reactive to HTML input element with id 'inputRange'
+ * const b1 = Rx.Dom.bindValueRange(r1,`#inputRange`);
+ *
+ * // Demo: Change the reactive value every second
+ * // ...changing the reactive in turn updates the HTML
+ * setInterval(() => {
+ *  r1.set(Math.floor(Math.random()*100));
+ * }, 1000);
+ * ```
+ * @param source 
+ * @param elOrQuery 
+ * @param bindOpts 
+ * @returns 
+ */
+// export const bindValueRange = (source: Rx.Reactive<number>, elOrQuery: string | HTMLInputElement | null, bindOpts: Partial<Rx.DomBindInputOptions<number, number>> = {}) => {
+//   const el = validateElement(elOrQuery, `range`);
+//   const b = bindElement<number, number>(source, el, { ...bindOpts, elField: `valueAsNumber`, attribName: `value` });
+//   const twoway = bindOpts.twoway ?? false;
+
+//   const transformFromInput = bindOpts.transformFromInput ?? ((value) => {
+//     if (typeof value === `number`) return value;
+//     return Number.parseFloat(value);
+//   });
+//   const input = Rx.From.domValueAsNumber(el);
+//   return setupInput(b, input, source, twoway, transformFromInput);
+// }
+
+// export const bindValueColour = (source: Rx.Reactive<Colour.Colourish>, elOrQuery: string | HTMLInputElement | null, bindOpts: Partial<Rx.DomBindInputOptions<Colour.Colourish, string>> = {}) => {
+//   const el = validateElement(elOrQuery, `color`);
+//   const b = bindElement<Colour.Colourish, string>(source, el, {
+//     ...bindOpts,
+//     elField: `value`,
+//     attribName: `value`,
+//     transform(input) {
+//       console.log(`transform from: ${ JSON.stringify(input) } to hex`);
+//       const c = Colour.resolve(input);
+//       return c.to(`srgb`).toString({ format: `hex`, collapse: false });
+//     },
+//   });
+
+//   const twoway = bindOpts.twoway ?? false;
+
+//   const transformFromInput = bindOpts.transformFromInput ?? ((value) => {
+//     const x = Colour.toHsl(value);
+//     console.log(`transformFromInput: ${ value } x: ${ JSON.stringify(x) }`);
+//     return x;
+//   });
+
+//   const input = Rx.From.domValue<Colour.Hsl>(el, {
+//     domToValue: transformFromInput
+//   });
+//   return setupInput(b, input, source, twoway, transformFromInput);
+// }
+
+const setupInput = <TSource, TDestination>(b: PipeDomBinding, input: Rx.Reactive<TDestination>, source: Rx.Reactive<TSource>, twoway: boolean, transformFromInput: (value: TDestination) => TSource) => {
+  input.onValue(value => {
+    const v = transformFromInput(value);
+    if (twoway && Rx.isWritable(source)) {
+      source.set(v);
+    }
+  });
+  const dispose = () => {
+    input.dispose(`bindInput twoway dispose`);
+    b.remove(false);
+  }
+  return { ...b, dispose, input };
+}
+
+const validateElement = (elOrQuery: string | HTMLInputElement | null, type?: string): HTMLInputElement => {
+  const el = resolveEl(elOrQuery);
+  if (el.nodeName !== `INPUT`) throw new Error(`HTML INPUT element expected. Got: ${ el.nodeName }`);
+  if (type !== undefined && el.type !== type) throw new Error(`HTML INPUT element expected with type 'range'. Got: ${ el.type }`);
+  return el;
+}
+
 
 /**
  * Updates an element's `innerHTML` when the source value changes
@@ -49,7 +143,7 @@ export const bindText = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElem
  * @param bindOpts 
  * @returns 
  */
-export const bindHtml = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElement | null, bindOpts: DomBindSourceValue<V> = {}) => {
+export const bindHtml = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts: DomBindSourceValue<TSource, string> = {}) => {
   return bindElement(source, elOrQuery, { ...bindOpts, elField: `innerHTML` });
 }
 
@@ -156,7 +250,7 @@ export const bindHtml = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElem
  * @param source 
  * @param bindOpts 
  */
-export const bindElement = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLElement | null, ...binds: Array<DomBindSourceValue<V> & Rx.DomBindValueTarget>): PipeDomBinding => {
+export const bindElement = <TSource, TDestination>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, ...binds: Array<DomBindSourceValue<TSource, TDestination> & Rx.DomBindValueTarget>): PipeDomBinding => {
   if (elOrQuery === null) throw new Error(`Param 'elOrQuery' is null`);
   if (elOrQuery === undefined) throw new Error(`Param 'elOrQuery' is undefined`);
 
@@ -168,10 +262,10 @@ export const bindElement = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLE
     b = [ ...binds ];
   }
   const bb = b.map(bind => {
-    if (`element` in bind) return bind as DomBindResolvedSource<V>;
-    return { ...bind, element: el } as DomBindResolvedSource<V>
+    if (`element` in bind) return bind as DomBindResolvedSource<TSource, TDestination>;
+    return { ...bind, element: el } as DomBindResolvedSource<TSource, TDestination>
   });
-  return bind(source, ...bb);
+  return bind<TSource, TDestination>(source, ...bb);
 }
 
 const resolveBindUpdater = (bind: DomBindValueTarget, element: HTMLElement): (value: any) => void => {
@@ -222,11 +316,11 @@ const resolveBindUpdaterBase = (bind: DomBindValueTarget): (value: any, element:
   }
 }
 
-const resolveTransform = <V>(bind: DomBindSourceValue<V>) => {
+const resolveTransform = <TSource, TDestination>(bind: DomBindSourceValue<TSource, TDestination>) => {
   if (!bind.transform && !bind.transformValue) return;
   if (bind.transformValue) {
     if (bind.sourceField === undefined) throw new Error(`Expects 'sourceField' to be set when 'transformValue' is set`);
-    return (value: V) => {
+    return (value: TSource) => {
       const fieldValue = (value as any)[ bind.sourceField ]
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return bind.transformValue!(fieldValue);
@@ -234,7 +328,7 @@ const resolveTransform = <V>(bind: DomBindSourceValue<V>) => {
   } else if (bind.transform) {
     if (bind.sourceField !== undefined) throw new Error(`If 'transform' is set, 'sourceField' is ignored`);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (value: V) => bind.transform!(value);
+    return (value: TSource) => bind.transform!(value);
   }
 }
 
@@ -269,9 +363,9 @@ const resolveTransform = <V>(bind: DomBindSourceValue<V>) => {
  * @param bindsUnresolvedElements 
  * @returns 
  */
-export const bind = <V>(source: Rx.Reactive<V>, ...bindsUnresolvedElements: Array<Rx.DomBindUnresolvedSource<V>>): PipeDomBinding => {
-  const binds: Array<DomBindResolvedSource<V>> = bindsUnresolvedElements.map(bind => {
-    if (bind.element && bind.element !== undefined) return bind as DomBindResolvedSource<V>;
+export const bind = <TSource, TDestination>(source: Rx.Reactive<TSource>, ...bindsUnresolvedElements: Array<Rx.DomBindUnresolvedSource<TSource, TDestination>>): PipeDomBinding => {
+  const binds: Array<DomBindResolvedSource<TSource, TDestination>> = bindsUnresolvedElements.map(bind => {
+    if (bind.element && bind.element !== undefined) return bind as DomBindResolvedSource<TSource, TDestination>;
     if (bind.query) return {
       ...bind,
       element: resolveEl<HTMLElement>(bind.query)
@@ -285,7 +379,7 @@ export const bind = <V>(source: Rx.Reactive<V>, ...bindsUnresolvedElements: Arra
     sourceField: bind.sourceField
   }));
 
-  const update = (value: V) => {
+  const update = (value: TSource) => {
     for (const bind of bindsResolved) {
       if (bind.transformer) {
         bind.update(bind.transformer(value));
@@ -421,7 +515,7 @@ export const bindDiffUpdate = <V>(
   if (elOrQuery === undefined) throw new Error(`Param 'elOrQuery' is undefined`);
 
   const el = resolveEl(elOrQuery);
-  const binds = opts.binds;
+  //const binds = opts.binds;
   const update = (value: Array<Change<any>>) => {
     updater(value, el);
   }
