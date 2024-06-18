@@ -1,9 +1,13 @@
-import type { Primitive } from 'src/KeyValue.js';
+import type { Primitive } from '../PrimitiveTypes.js';
 import type { ChangeRecord } from '../Compare.js';
 import type { Interval } from '../flow/IntervalType.js';
 import * as Immutable from '../Immutable.js';
-import type { AnnotationElapsed, BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions } from './ops/Types.js';
+import type { BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions, OpMathOptions } from './ops/Types.js';
 import type { TimeoutTriggerOptions } from './sources/Types.js';
+import type { SetHtmlOptions } from './sinks/Dom.js';
+import type { Processors } from 'src/data/Process.js';
+import type { TallyOptions } from './ops/Math.js';
+
 
 export type CombineLatestOptions = {
   /**
@@ -64,23 +68,24 @@ export type UpstreamOptions<In> = {
 }
 
 
+//export type Processor = <TIn, TOptions>(source: ReactiveOrSource<TIn>) => (options: TOptions) => () => void;
+
 /**
  * Wrapped Reactive for object-oriented access
  */
 export type Wrapped<TIn> = {
+  enacts: {
+    setHtmlText: (options: SetHtmlOptions) => () => void
+  }
   source: Reactive<TIn>,
+
   /**
-   * Annotate values with a timestamp of elapsed time
-   * (uses `annotate`)
-   * @returns 
-   */
-  annotateElapsed: () => Wrapped<TIn & AnnotationElapsed>
-  /**
-   * Annotate values with some additional field(s)
+   * Annotate values with output from the `annotation` function.
+   * Returned values will be in the form `{ value:TIn, annotation:TAnnotation }`
    * @param transformer 
    * @returns 
    */
-  annotate: <TAnnotation>(transformer: (value: TIn) => TIn & TAnnotation) => Wrapped<TIn & TAnnotation>
+  annotate: <TAnnotation>(transformer: (value: TIn) => TAnnotation) => Wrapped<{ value: TIn, annotation: TAnnotation }>
   /**
   * Accumulate a batch of values, emitted as an array
   * @param options 
@@ -90,13 +95,14 @@ export type Wrapped<TIn> = {
 
   debounce: (options: Partial<DebounceOptions>) => Wrapped<TIn>
 
+
   /**
    * Pluck and emit a single field from values
    * @param fieldName 
    * @param options 
    * @returns 
    */
-  field: <TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TFieldType>>) => Wrapped<TFieldType>
+  field: <TSource, TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TSource, TFieldType>>) => Wrapped<TFieldType>
   /**
    * Throws away values that don't match `predicate`
    * @param predicate 
@@ -108,12 +114,18 @@ export type Wrapped<TIn> = {
   combineLatestToArray: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(sources: T, options: Partial<CombineLatestOptions>) => Wrapped<RxValueTypes<T>>
   combineLatestToObject: <const T extends Record<string, ReactiveOrSource<any>>>(sources: T, options: { name: string } & Partial<CombineLatestOptions>) => Wrapped<RxValueTypeObject<T>>
 
+  min: (options?: Partial<OpMathOptions>) => Wrapped<number>
+  max: (options?: Partial<OpMathOptions>) => Wrapped<number>
+  average: (options?: Partial<OpMathOptions>) => Wrapped<number>
+  sum: (options?: Partial<OpMathOptions>) => Wrapped<number>
+  tally: (options?: Partial<TallyOptions>) => Wrapped<number>
+
   /**
    * Converts one source stream into two, with values being emitted by both
    * @param options 
    * @returns 
    */
-  split: (options: Partial<SplitOptions>) => Array<Wrapped<TIn>>
+  split: (options?: Partial<SplitOptions>) => Array<Wrapped<TIn>>
   /**
  * Emits values when this stream and any additional streams produce a value. The resulting stream is
  * thus an array of values, each source at a given index.
@@ -138,6 +150,34 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => Record<K, Wrapped<TIn>>
+  /**
+   * Taps the stream, passing values to one or more 'processor' functions.
+   * This processing essentially happens in parallel, not affecting the main stream.
+   * 
+   * ```js
+   * // Stream of pointermove events with {x:0,y:0} as default
+   * const move = Rx.From.event(document.body, `pointermove`, {x:0,y:0});
+   * // Wrap it for fluent access
+   * const ptr = Rx.wrap(move)
+   *  .tapProcess(
+   *    // Create a string representation
+   *    v => `${v.x},${v.y}`
+   *    // Set to DOM
+   *    v => {
+   *      document.getElementById(`coords`).innerText = v;
+   *    }
+   *   )
+   *  .onValue(value => {
+   *    // 'value' will be original PointerEvent, since .tapProcess happened in parallel,
+   *    // not affecting stream
+   *  });
+   * ```
+   * @param processors One-five processing functions
+   * @returns 
+   */
+  tapProcess: <T2, T3, T4, T5, T6>(...processors: Processors<TIn, T2, T3, T4, T5, T6>) => Wrapped<TIn>
+  tapStream: (divergedStream: ReactiveWritable<TIn>) => Wrapped<TIn>
+  tapOps: <TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<TIn, TOut>>) => Wrapped<TIn>
   /**
    * Transforms all values
    * @param transformer 
@@ -171,7 +211,7 @@ export type Wrapped<TIn> = {
    * @param callback 
    * @returns 
    */
-  value: (callback: (value: TIn) => void) => void
+  onValue: (callback: (value: TIn) => void) => void
 
 }
 
@@ -210,6 +250,10 @@ export type InitLazyStreamOptions = Partial<InitStreamOptions> & {
   onStop: () => void
 };
 
+export type InitLazyStreamInitedOptions<T> = InitLazyStreamOptions & {
+  initialValue: T
+}
+
 export type CountOptions = { lazy: Lazy, amount: number, offset: number, interval: Interval, signal: AbortSignal }
 
 
@@ -240,7 +284,10 @@ export type Reactive<V> = {
    * @param handler 
    */
   on(handler: (value: Passed<V>) => void): Unsubscriber
-  value(handler: (value: V) => void): Unsubscriber
+  onValue(handler: (value: V) => void): Unsubscriber
+
+  dispose(reason: string): void
+  isDisposed(): boolean
 }
 
 export type Unsubscriber = () => void;
@@ -249,7 +296,7 @@ export type ReactiveNonInitial<V> = Reactive<V> & {
   last(): V | undefined
 }
 
-export type ReactiveWritable<V> = {
+export type ReactiveWritable<V> = Reactive<V> & {
   set(value: V): void
 }
 
@@ -261,11 +308,6 @@ export type ReactiveFinite = {
   isDone(): boolean
 }
 
-export type ReactiveDisposable<V> = Reactive<V> & {
-  dispose(reason: string): void
-  isDisposed(): boolean
-}
-
 export type ReactiveArray<V> = ReactiveWritable<Array<V>> & {
   push(value: V): void
   deleteAt(index: number): void
@@ -275,9 +317,20 @@ export type ReactiveArray<V> = ReactiveWritable<Array<V>> & {
   onArray(handler: (changes: Passed<Array<ChangeRecord<number>>>) => void): () => void
 }
 
-export type ReactiveDiff<V> = ReactiveDisposable<V> & ReactiveWritable<V> & {
+export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
   /**
-   * Diff information
+   * Notifies when the value of `fieldName` is changed.
+   * 
+   * Use the returned function to unsubscribe.
+   * @param fieldName 
+   * @param handler 
+   */
+  onField(fieldName: string, handler: (value: any, fieldName: string) => void): () => void
+  /**
+   * Notifies of which field(s) were changed.
+   * If you just care about the whole, changed data use the `value` event.
+   * 
+   * Use the returned function to unsubscribe.
    * @param handler 
    */
   onDiff(handler: (changes: Passed<Array<Immutable.Change<any>>>) => void): () => void
@@ -285,8 +338,9 @@ export type ReactiveDiff<V> = ReactiveDisposable<V> & ReactiveWritable<V> & {
    * Updates the reactive with some partial key-value pairs.
    * Keys omitted are left the same as the current value.
    * @param changedPart 
+   * @returns Returns new value
    */
-  update(changedPart: Record<string, any>): void
+  update(changedPart: Record<string, any>): V
   /**
    * Updates a particular field by its path
    * @param field 
@@ -295,7 +349,7 @@ export type ReactiveDiff<V> = ReactiveDisposable<V> & ReactiveWritable<V> & {
   updateField(field: string, value: any): void
 }
 
-export type ReactiveStream<V> = Reactive<V> & ReactiveDisposable<V> & ReactiveWritable<V> & {
+export type ReactiveStream<V> = Reactive<V> & ReactiveWritable<V> & {
   through(message: Passed<V>): void
   /**
    * Removes all the subscribers from this stream.
@@ -363,17 +417,22 @@ export type DomBindTargetNodeResolved = {
   element: HTMLElement
 }
 
-export type DomBindUnresolvedSource<V> = DomBindTargetNode & DomBindSourceValue<V> & DomBindValueTarget;
-export type DomBindResolvedSource<V> = DomBindTargetNodeResolved & DomBindSourceValue<V> & DomBindValueTarget;
+export type DomBindUnresolvedSource<TSource, TDestination> = DomBindTargetNode & DomBindSourceValue<TSource, TDestination> & DomBindValueTarget;
+export type DomBindResolvedSource<TSource, TDestination> = DomBindTargetNodeResolved & DomBindSourceValue<TSource, TDestination> & DomBindValueTarget;
 
-export type DomBindSourceValue<V> = {
+export type DomBindSourceValue<TSource, TDestination> = {
+  twoway?: boolean
   /**
    * Field from source value to pluck and use.
    * This will also be the value passed to the transform
    */
-  sourceField?: keyof V
-  transform?: (input: V) => string
-  transformValue?: (input: any) => string
+  sourceField?: keyof TSource
+  transform?: (input: TSource) => TDestination
+  transformValue?: (input: any) => TDestination
+}
+
+export type DomBindInputOptions<TSource, TDestination> = DomBindSourceValue<TSource, TDestination> & {
+  transformFromInput: (input: TDestination) => TSource
 }
 
 // export type PipeSet<In, Out> = [
@@ -483,4 +542,5 @@ export type PrimitiveValueTypeObject<T extends Record<string, Primitive>> =
     T[ K ] extends boolean ? boolean | undefined :
     T[ K ] extends bigint ? bigint | undefined :
     never };
+
 
