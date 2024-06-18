@@ -5,8 +5,8 @@ import * as Flow from '../../../flow/index.js';
 test(`event`, async t => {
   const target = new EventTarget();
 
-  const v1 = Rx.From.event(target, `hello`);
-  t.falsy(v1.last());
+  const v1 = Rx.From.event(target, `hello`, { detail: `test` });
+  t.deepEqual(v1.last(), { detail: `test` });
   const results: string[] = [];
   let gotDone = false
   v1.on(msg => {
