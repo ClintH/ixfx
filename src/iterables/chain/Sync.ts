@@ -23,9 +23,10 @@ import { resolveToGen } from "./Util.js";
  * 
  * Pace will be set by the slowest source. Alternatively, use {@link combineLatestToArray} where the rate is determined by fastest source.
  * 
- * Only complete results are sent. For example if source A & B finish and source C is still producing values,
- * synchronisation is not possible because A & B stopped producing values. Thus the stream will self-terminate
- * after `maximumWait` (2 seconds). The newer values from C are lost.
+ * Only complete results are sent. For example if source A & B finish and 
+ * source C is still producing values, synchronisation is not possible 
+ * because A & B stopped producing values. Thus the stream will terminate
+ * after `maximumWait` (2 seconds). Newer values from C are lost.
  */
 export async function* syncToArray(sources: Array<GenOrData<any> | GenFactoryNoInput<any>>, options: Partial<SyncOptions> = {}): AsyncGenerator<Array<any>> {
   const onSourceDone = options.onSourceDone ?? `break`;
