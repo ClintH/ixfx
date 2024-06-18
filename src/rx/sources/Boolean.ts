@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { initStream } from "../InitStream.js";
-import type { ReactiveDisposable, ReactiveWritable, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
+import type { ReactiveWritable, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
 
-export function boolean(initialValue: boolean): ReactiveDisposable<boolean> & ReactiveWritable<boolean> & ReactiveInitial<boolean>;
-export function boolean(): ReactiveDisposable<boolean> & ReactiveWritable<boolean> & ReactiveNonInitial<boolean>;
-export function boolean(initialValue?: boolean): ReactiveDisposable<boolean> & ReactiveWritable<boolean> & (ReactiveNonInitial<boolean> | ReactiveInitial<boolean>) {
+export function boolean(initialValue: boolean): ReactiveWritable<boolean> & ReactiveInitial<boolean>;
+export function boolean(): ReactiveWritable<boolean> & ReactiveNonInitial<boolean>;
+export function boolean(initialValue?: boolean): ReactiveWritable<boolean> & (ReactiveNonInitial<boolean> | ReactiveInitial<boolean>) {
   let value = initialValue;
   const events = initStream<boolean>();
 
@@ -18,7 +18,7 @@ export function boolean(initialValue?: boolean): ReactiveDisposable<boolean> & R
     isDisposed: events.isDisposed,
     last: () => value,
     on: events.on,
-    value: events.value,
+    onValue: events.onValue,
     set
   }
 }
