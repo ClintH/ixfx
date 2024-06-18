@@ -10,14 +10,14 @@ test(`get-paths-and-data`, t => {
   };
   const r1 = getPathsAndData(d1);
   arrayValuesEqual(t, r1, [
-    { path: `accel`, value: d1.accel },
-    { path: `accel.x`, value: 1 },
-    { path: `accel.y`, value: 2 },
-    { path: `accel.z`, value: 3 },
-    { path: `gyro`, value: d1.gyro },
-    { path: `gyro.x`, value: 4 },
-    { path: `gyro.y`, value: 5 },
-    { path: `gyro.z`, value: 6 }
+    { path: `accel`, value: d1.accel, state: `change` },
+    { path: `accel.x`, value: 1, state: `change` },
+    { path: `accel.y`, value: 2, state: `change` },
+    { path: `accel.z`, value: 3, state: `change` },
+    { path: `gyro`, value: d1.gyro, state: `change` },
+    { path: `gyro.x`, value: 4, state: `change` },
+    { path: `gyro.y`, value: 5, state: `change` },
+    { path: `gyro.z`, value: 6, state: `change` }
   ], isEqualValueDefault);
 
   const d2 = {
@@ -29,20 +29,20 @@ test(`get-paths-and-data`, t => {
   }
   const r2 = getPathsAndData(d2);
   arrayValuesEqual(t, r2, [
-    { path: `message`, value: `hello` },
-    { path: `profiles`, value: d2.profiles },
-    { path: `profiles.0`, value: d2.profiles[ 0 ] },
-    { path: `profiles.0.name`, value: d2.profiles[ 0 ].name },
+    { path: `message`, value: `hello`, state: `change` },
+    { path: `profiles`, value: d2.profiles, state: `change` },
+    { path: `profiles.0`, value: d2.profiles[ 0 ], state: `change` },
+    { path: `profiles.0.name`, value: d2.profiles[ 0 ].name, state: `change` },
 
-    { path: `profiles.0.animals`, value: d2.profiles[ 0 ].animals },
-    { path: `profiles.0.animals.0`, value: d2.profiles[ 0 ].animals[ 0 ] },
-    { path: `profiles.0.animals.1`, value: d2.profiles[ 0 ].animals[ 1 ] },
+    { path: `profiles.0.animals`, value: d2.profiles[ 0 ].animals, state: `change` },
+    { path: `profiles.0.animals.0`, value: d2.profiles[ 0 ].animals[ 0 ], state: `change` },
+    { path: `profiles.0.animals.1`, value: d2.profiles[ 0 ].animals[ 1 ], state: `change` },
 
-    { path: `profiles.1`, value: d2.profiles[ 1 ] },
-    { path: `profiles.1.name`, value: d2.profiles[ 1 ].name },
-    { path: `profiles.1.animals`, value: d2.profiles[ 1 ].animals },
-    { path: `profiles.1.animals.0`, value: d2.profiles[ 1 ].animals[ 0 ] },
-    { path: `profiles.1.animals.1`, value: d2.profiles[ 1 ].animals[ 1 ] },
+    { path: `profiles.1`, value: d2.profiles[ 1 ], state: `change` },
+    { path: `profiles.1.name`, value: d2.profiles[ 1 ].name, state: `change` },
+    { path: `profiles.1.animals`, value: d2.profiles[ 1 ].animals, state: `change` },
+    { path: `profiles.1.animals.0`, value: d2.profiles[ 1 ].animals[ 0 ], state: `change` },
+    { path: `profiles.1.animals.1`, value: d2.profiles[ 1 ].animals[ 1 ], state: `change` },
 
   ], isEqualValueDefault);
 });
@@ -198,7 +198,7 @@ test(`apply-changes`, t => {
     position: { x: 11, y: 22 }
   });
 
-  const d3 = applyChanges(test, [ { path: `position.y`, value: 22, previous: 20 } ]);
+  const d3 = applyChanges(test, [ { path: `position.y`, value: 22, previous: 20, state: `added` } ]);
   t.deepEqual(d3, {
     ...test,
     position: { x: 10, y: 22 }
@@ -208,24 +208,24 @@ test(`apply-changes`, t => {
 test(`compare-data-array`, t => {
   // Index 1 has a value when it didn't before
   const c1 = compareData([ `a` ], [ `a`, `a` ], { includeMissingFromA: true });
-  t.deepEqual(c1, [ { path: `1`, previous: undefined, value: `a` } ]);
+  t.deepEqual(c1, [ { path: `1`, previous: undefined, value: `a`, state: `added` } ]);
 
   // Indexes 1 & 2 are now undefined
   const c2 = compareData([ `a`, `a`, `a` ], [ `a` ], { includeMissingFromA: true });
-  t.deepEqual(c2, [ { path: `1`, previous: `a`, value: undefined }, { path: `2`, previous: `a`, value: undefined } ]);
+  t.deepEqual(c2, [ { path: `1`, previous: `a`, value: undefined, state: `removed` }, { path: `2`, previous: `a`, value: undefined, state: `removed` } ]);
 
   const c3 = compareData([], [ `a`, `a`, `a` ], { includeMissingFromA: true });
   t.deepEqual(c3, [
-    { path: `0`, previous: undefined, value: `a` },
-    { path: `1`, previous: undefined, value: `a` },
-    { path: `2`, previous: undefined, value: `a` }
+    { path: `0`, previous: undefined, value: `a`, state: `added` },
+    { path: `1`, previous: undefined, value: `a`, state: `added` },
+    { path: `2`, previous: undefined, value: `a`, state: `added` }
   ]);
 
   const c4 = compareData([ `a`, `a`, `a` ], [], { includeMissingFromA: true });
   t.deepEqual(c4, [
-    { path: `0`, previous: `a`, value: undefined },
-    { path: `1`, previous: `a`, value: undefined },
-    { path: `2`, previous: `a`, value: undefined }
+    { path: `0`, previous: `a`, value: undefined, state: `removed` },
+    { path: `1`, previous: `a`, value: undefined, state: `removed` },
+    { path: `2`, previous: `a`, value: undefined, state: `removed` }
   ]);
 
 });
@@ -250,7 +250,7 @@ test(`compare-data`, t => {
     value: false
   });
   t.is(c2.length, 1);
-  t.deepEqual(c2, [ { path: `msg`, previous: `hello`, value: `hello!` } ]);
+  t.deepEqual(c2, [ { path: `msg`, previous: `hello`, value: `hello!`, state: `change` } ]);
 
   const c3 = compareData(test, {
     msg: `hello`,
@@ -258,7 +258,7 @@ test(`compare-data`, t => {
     value: false
   });
   t.is(c3.length, 1);
-  t.deepEqual(c3, [ { path: `position.x`, previous: 10, value: 1 } ]);
+  t.deepEqual(c3, [ { path: `position.x`, previous: 10, value: 1, state: `change` } ]);
 
   const c4 = compareData(test, {
     msg: `hello`,
@@ -267,8 +267,8 @@ test(`compare-data`, t => {
   });
   t.is(c4.length, 2);
   t.deepEqual(c4, [
-    { path: `position.x`, previous: 10, value: 1 },
-    { path: `value`, previous: false, value: true }
+    { path: `position.x`, previous: 10, value: 1, state: `change` },
+    { path: `value`, previous: false, value: true, state: `change` }
   ]);
 
   const c5 = compareData(test, {
@@ -278,9 +278,9 @@ test(`compare-data`, t => {
   });
   t.is(c5.length, 3);
   t.deepEqual(c5, [
-    { path: `position.x`, previous: 10, value: 1 },
-    { path: `position.y`, previous: 20, value: 3 },
-    { path: `value`, previous: false, value: true }
+    { path: `position.x`, previous: 10, value: 1, state: `change` },
+    { path: `position.y`, previous: 20, value: 3, state: `change` },
+    { path: `value`, previous: false, value: true, state: `change` }
   ]);
 
   const test2 = {
@@ -300,7 +300,7 @@ test(`compare-data`, t => {
     sizes: [ 10, 20, 30 ]
   });
   t.is(cc2.length, 1);
-  t.deepEqual(cc2, [ { path: `colours.2`, previous: `blue`, value: undefined } ]);
+  t.deepEqual(cc2, [ { path: `colours.2`, previous: `blue`, value: undefined, state: `removed` } ]);
 
   // Remove from array start
   const cc3 = compareData(test2, {
@@ -309,9 +309,9 @@ test(`compare-data`, t => {
   });
   t.is(cc3.length, 3);
   t.deepEqual(cc3, [
-    { path: `colours.0`, previous: `red`, value: `green` },
-    { path: `colours.1`, previous: `green`, value: `blue` },
-    { path: `colours.2`, previous: `blue`, value: undefined }
+    { path: `colours.0`, previous: `red`, value: `green`, state: `change` },
+    { path: `colours.1`, previous: `green`, value: `blue`, state: `change` },
+    { path: `colours.2`, previous: `blue`, value: undefined, state: `removed` }
   ]);
 
   // Array re-arrange
@@ -321,9 +321,9 @@ test(`compare-data`, t => {
   });
   t.is(cc4.length, 3);
   t.deepEqual(cc4, [
-    { path: `colours.0`, previous: `red`, value: `blue` },
-    { path: `colours.1`, previous: `green`, value: `red` },
-    { path: `colours.2`, previous: `blue`, value: `green` }
+    { path: `colours.0`, previous: `red`, value: `blue`, state: `change` },
+    { path: `colours.1`, previous: `green`, value: `red`, state: `change` },
+    { path: `colours.2`, previous: `blue`, value: `green`, state: `change` }
   ]);
 });
 

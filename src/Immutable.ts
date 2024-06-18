@@ -2,7 +2,7 @@
 import JSON5 from 'json5';
 import { isInteger, isPlainObjectOrPrimitive } from "./Util.js";
 import * as TraversableObject from './collections/tree/TraverseObject.js';
-import { isPrimitive } from './KeyValue.js';
+import { isPrimitive } from './IsPrimitive.js';
 import { compareValues as IterableCompareValues } from './collections/Iterables.js';
 
 /**
@@ -27,6 +27,7 @@ export type Change<V> = {
   path: string
   previous?: V
   value: V
+  state: `change` | `added` | `removed`
 }
 
 export type CompareDataOptions<V> = {
@@ -72,10 +73,10 @@ export const compareKeys = (a: object, b: object) => {
 }
 
 /**
- * Scans object, producing a list of changed fields where B's value differs from A.
+ * Scans object, producing a list of changed fields where B's value (newer) differs from A (older).
  * 
  * Options:
- * - `deepEntries` (_false_): If _false_ Object.entries are used to scan the object. This won't work for some objects, eg event args
+ * - `deepEntries` (_false_): If _false_ Object.entries are used to scan the object. However this won't work for some objects, eg event args, thus _true_ is needed.
  * - `eq` (JSON.stringify): By-value comparison function
  * - `includeMissingFromA` (_false): If _true_ includes fields present on B but missing on A.
  * @param a 
@@ -88,21 +89,21 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
   if (a === undefined) {
     return [ {
       path: options.pathPrefix ?? ``,
-      value: b
+      value: b,
+      state: `added`
     } ]
-    //throw new Error(`Param 'a' undefined`);
   }
-  if (b === undefined) return [ { path: options.pathPrefix ?? ``, previous: a, value: undefined } ]
+  if (b === undefined) return [ { path: options.pathPrefix ?? ``, previous: a, value: undefined, state: `removed` } ]
   const pathPrefix = options.pathPrefix ?? ``;
   const deepProbe = options.deepEntries ?? false;
   const eq = options.eq ?? isEqualContextString;
   const includeMissingFromA = options.includeMissingFromA ?? false;
   const changes: Array<Change<any>> = [];
 
-  //console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ options.pathPrefix }`);
+  //  console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ options.pathPrefix }`);
 
   if (isPrimitive(a) && isPrimitive(b)) {
-    if (a !== b) changes.push({ path: options.pathPrefix ?? ``, value: b, previous: a });
+    if (a !== b) changes.push({ path: options.pathPrefix ?? ``, value: b, previous: a, state: `change` });
     return changes;
   }
 
@@ -125,7 +126,7 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
   const entriesAKeys = new Set<string>();
   for (const [ key, valueA ] of entriesA) {
     entriesAKeys.add(key);
-    //console.log(`Immutable.compareDataA key: ${ key } value: ${ valueA }`);
+    //  console.log(`Immutable.compareDataA key: ${ key } valueA: ${ valueA }`);
     if (typeof valueA === `object`) {
       changes.push(...compareData(valueA, b[ key ], { ...options, pathPrefix: key + `.` }));
     } else {
@@ -133,13 +134,12 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
       if (key in b) {
         const valueB = b[ key ];
         if (!eq(valueA, valueB, sub)) {
-          //console.log(`  value changed. A: ${ valueA } B: ${ valueB } sub: ${ sub }`)
-          changes.push({ path: sub, previous: valueA, value: valueB });
+          //      console.log(`  value changed. A: ${ valueA } B: ${ valueB } sub: ${ sub }`)
+          changes.push({ path: sub, previous: valueA, value: valueB, state: `change` });
         }
       } else {
-        changes.push({ path: sub, previous: valueA, value: undefined });
+        changes.push({ path: sub, previous: valueA, value: undefined, state: `removed` });
       }
-
     }
   }
 
@@ -149,22 +149,22 @@ export const compareData = <V extends Record<string, any>>(a: V, b: V, options: 
       if (entriesAKeys.has(key)) continue;
       // Key in B that's not in A
       //console.log(`Immutable.compareDataB key: ${ key } value: ${ valueB }`);
-      changes.push({ path: pathPrefix + key, previous: undefined, value: valueB });
+      changes.push({ path: pathPrefix + key, previous: undefined, value: valueB, state: `added` });
     }
   }
   return changes;
 }
 
 /**
- * Returns a copy of `a` with changes applied.
- * @param a 
+ * Returns a copy of `source` with `changes` applied.
+ * @param source 
  * @param changes 
  */
-export const applyChanges = <V extends Record<string, any>>(a: V, changes: Array<Change<any>>): V => {
+export const applyChanges = <V extends Record<string, any>>(source: V, changes: Array<Change<any>>): V => {
   for (const change of changes) {
-    a = updateByPath(a, change.path, change.value);
+    source = updateByPath(source, change.path, change.value);
   }
-  return a;
+  return source;
 }
 
 /**
@@ -537,7 +537,7 @@ const getPathsAndDataImpl = (o: object, prefix: string, result: Array<Change<any
   if (typeof o === `object`) {
     for (const entries of Object.entries(o)) {
       const sub = (prefix.length > 0 ? prefix + `.` : ``) + entries[ 0 ];
-      result.push({ path: sub, value: entries[ 1 ] });
+      result.push({ path: sub, value: entries[ 1 ], state: `change` });
       getPathsAndDataImpl(entries[ 1 ], sub, result, maxDepth - 1);
     }
   }
