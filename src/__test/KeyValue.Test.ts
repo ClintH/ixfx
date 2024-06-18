@@ -1,7 +1,8 @@
 
 /* eslint-disable */
 import test from 'ava';
-import { getSorter, type KeyValue } from '../KeyValue.js';
+import { getSorter } from '../KeyValue.js';
+import type { KeyValue } from '../PrimitiveTypes.js';
 
 test(`sorting`, (t) => {
   const a: KeyValue[] = [
