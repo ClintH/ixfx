@@ -83,6 +83,10 @@ export const array = <V>(sourceArray: Array<V>, options: Partial<ArrayOptions> =
   if (!lazy) c.start();
 
   return {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    dispose: s.dispose,
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    isDisposed: s.isDisposed,
     isDone() {
       return index === array.length;
     },
@@ -92,6 +96,6 @@ export const array = <V>(sourceArray: Array<V>, options: Partial<ArrayOptions> =
     // eslint-disable-next-line @typescript-eslint/unbound-method
     on: s.on,
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    value: s.value
+    onValue: s.onValue
   }
 }
