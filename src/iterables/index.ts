@@ -210,7 +210,8 @@ export function find<V>(it: Array<V> | Iterable<V> | AsyncIterable<V>, f: (v: V)
  * @param it
  * @param f
  */
-export function forEach<V>(it: Array<V> | AsyncIterable<V> | Iterable<V>, f: (v: V) => boolean | Promise<boolean>) {
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+export function forEach<V>(it: Array<V> | AsyncIterable<V> | Iterable<V>, f: (v: V) => boolean | Promise<boolean> | void | Promise<void>) {
   if (isAsyncIterable(it)) {
     return Async.forEach(it, f);
   } else {
@@ -408,8 +409,8 @@ export function* uniqueByValue<T>(input: AsyncIterable<T> | Iterable<T> | Array<
   return isAsyncIterable(input) ? Async.uniqueByValue(input, toString, seen) : Sync.uniqueByValue(input, toString, seen);
 }
 
-export function toArray<V>(it: AsyncIterable<V>, count?: number): Promise<Array<V>>;
-export function toArray<V>(it: Iterable<V>, count?: number): Array<V>;
+export function toArray<V>(it: AsyncIterable<V>, options?: Partial<ToArrayOptions>): Promise<Array<V>>;
+export function toArray<V>(it: Iterable<V>, options?: Partial<ToArrayOptions>): Array<V>;
 
 /**
  * Returns an array of values from an iterator.
@@ -426,8 +427,8 @@ export function toArray<V>(it: Iterable<V>, count?: number): Array<V>;
  * @returns
  */
 //eslint-disable-next-line func-style
-export function toArray<V>(it: Iterable<V> | AsyncIterable<V>, count = Number.POSITIVE_INFINITY): Array<V> | Promise<Array<V>> {
-  return isAsyncIterable(it) ? Async.toArray(it, count) : Sync.toArray(it, count);
+export function toArray<V>(it: Iterable<V> | AsyncIterable<V>, options: Partial<ToArrayOptions> = {}): Array<V> | Promise<Array<V>> {
+  return isAsyncIterable(it) ? Async.toArray(it, options) : Sync.toArray(it, options);
 }
 
 export function every<V>(it: Iterable<V> | Array<V>, f: (v: V) => boolean): boolean
@@ -495,3 +496,6 @@ export function fromIterable<V>(iterable: Iterable<V> | AsyncIterable<V>, interv
   if (isAsyncIterable(iterable) || interval !== undefined) return Async.fromIterable(iterable, interval);
   return Sync.fromIterable(iterable);
 }
+
+
+export type ToArrayOptions = { limit: number, elapsed: Interval }
