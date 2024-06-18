@@ -38,7 +38,7 @@ const addHandler = event => {
 const create = (text) => ({text, id: ++idIndex});
 
 // Responsive array
-const todos = Rx.fromArray([ create(`one`),create(`two`),create(`three`)]);
+const todos = Rx.From.array([ create(`one`),create(`two`),create(`three`)]);
 
 // Render array
 Rx.lit(`#test`, todos, todos => {

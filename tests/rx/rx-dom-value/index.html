@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rx-dom</title>
+</head>
+<style>
+  :root {
+    --size: 1em;
+  }
+  html,body {
+    height: 100%;
+  }
+  body {
+    background-color: silver;
+  }
+  #fields-size {
+    width: var(--size);
+    height: var(--size);
+    border: 1px solid black;
+    display: inline-block;
+  }
+  #creation {
+    div {
+      border: 1px solid blue;
+    }
+    span {
+      border: 1px solid green;
+    }
+  }
+  #creation {
+    display: flex;
+  }
+
+  #creation>section {
+    border: 1px solid lightblue;
+    padding: 1em;
+  }
+  </style>
+<body>
+  <input type="range" id="slider" value="50" min="0" max="100">
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

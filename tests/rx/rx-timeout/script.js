@@ -21,10 +21,20 @@ import * as Arrays from '../../../dist/arrays.js';
 // Solution: Timestamp data
 const p1 = Rx.cache(Rx.run(
   Rx.From.event(window, `pointermove`),
-  Rx.Ops.transform(event =>  Math.abs(event.movementX) + Math.abs(event.movementY)), 
+  Rx.Ops.transform(event =>  Math.abs(event.movementX) + Math.abs(event.movementY), { traceInput:true}), 
   Rx.Ops.annotate(value => ({ value, timestamp: Date.now() })),
-  Rx.Ops.batch({quantity:5})
+  Rx.Ops.batch({quantity:5}),
+  Rx.Ops.transform(data => {
+    const elapsed = data.at(-1).timestamp - data.at(0).timestamp;
+    let total = 0;
+    for (const d of data) {
+      total += d.value;
+    } 
+    return total/elapsed;
+  })
 ), []);
+
+
 setInterval(() => {
   const l = p1.last();
   if (l) {
@@ -41,6 +51,6 @@ setInterval(() => {
 //     Rx.Ops.batch({elapsed:100}),
 //     Rx.Ops.transform(value => Arrays.average(value))
 // );
-// p1.value(speed => {
+// p1.onValue(speed => {
 //   console.log(speed);
 // })

@@ -21,7 +21,7 @@ const settings = Object.freeze({
 //     if (!value) return { x: 0.5, y:0.5};
 //     return { x:value.x/window.innerWidth, y:value.y/window.innerHeight}
 //   });
-// r1.value(x => {
+// r1.onValue(x => {
 //   console.log(x);
 // })
 
@@ -30,7 +30,7 @@ const state2 = Data.pull({
   pingPong: pingPongPercent(settings.pingPongInterval),
   // Keep track of relative mouse coords
   mouse: Rx.transform(
-    Rx.fromEvent(document.body, `pointermove`), value => {
+    Rx.From.event(document.body, `pointermove`), value => {
       if (!value) return { x: 0.5, y:0.5};
       return { x:value.x/window.innerWidth, y:value.y/window.innerHeight}
   }),

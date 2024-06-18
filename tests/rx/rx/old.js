@@ -8,7 +8,7 @@
 //    size
 //    );
 
-// x.value(v => {
+// x.onValue(v => {
 //   console.log(v);
 // });
 // const value = x.lastValue();
@@ -37,7 +37,7 @@
 // }
 
 // const rxWindow = Pipes.rxWindow();
-// rxWindow.size.on.value(v => {
+// rxWindow.size.onValue(v => {
 //   console.log(v);
 // })
 
