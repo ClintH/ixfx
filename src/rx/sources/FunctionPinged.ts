@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../debug/GetErrorMessage.js";
-import { initLazyStream, initStream } from "../InitStream.js";
+import { initStream } from "../InitStream.js";
 import type { Reactive, Unsubscriber } from "../Types.js";
 import { messageHasValue, messageIsDoneSignal, messageIsSignal } from "../Util.js";
 import type { PingedFunctionOptions, PingedFunctionFunction } from "./Types.js";
