@@ -4,7 +4,7 @@ import * as Flow from '../../flow/index.js';
 import { count } from '../../numbers/Count.js';
 import { isApproximately } from '../../numbers/IsApproximately.js';
 
-test(`rx-field`, async t => {
+test(`field`, async t => {
   const data = [
     { name: `a` },
     { name: `b` },
@@ -30,7 +30,7 @@ test(`rx-field`, async t => {
   t.is(values2.length, data2.length - 1);
   t.deepEqual(values2, [ `a`, `b`, `d` ]);
 
-  // Again, but include missing fields as undefined
+  // With fallbackFieldValue
   const data3 = [
     { name: `a` },
     { name: `b` },
@@ -38,9 +38,19 @@ test(`rx-field`, async t => {
     { name: `d` }
   ];
   // @ts-expect-error
-  const f3 = Rx.field<{ name: string }, string>(data3, `name`, { missingFieldDefault: `` });
+  const f3 = Rx.field<{ name: string }, string>(data3, `name`, { fallbackFieldValue: `` });
   const values3 = await Rx.toArray(f3);
-  t.is(values3.length, data3.length);
   t.deepEqual(values3, [ `a`, `b`, ``, `d` ]);
+
+
+  // With fallbackFieldObject
+  const data4Fallback = {
+    name: `fallback`
+  }
+  // @ts-expect-error
+  const f4 = Rx.field<{ name: string }, string>(data3, `name`, { fallbackObject: data4Fallback });
+  const values4 = await Rx.toArray(f4);
+  t.deepEqual(values4, [ `a`, `b`, `fallback`, `d` ]);
+
 
 });
