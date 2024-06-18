@@ -1,9 +1,124 @@
-import type { Optional, Passed, ReactiveDisposable, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
+import type { Passed, Reactive, ReactiveInitial } from "../Types.js";
+import { field } from "../ops/Field.js";
 import { object } from "./Object.js";
-import type { EventOptions } from "./Types.js";
+import type { FieldOptions } from "../ops/Types.js";
+import type { EventOptions, EventTriggerOptions } from "./Types.js";
+import { initLazyStream } from "../InitStream.js";
+import { Elapsed } from "../../flow/index.js";
+/**
+ * Fired when `eventName` fires on `target`. 
+ * 
+ * Rather than whole event args being emitted on the stream,
+ * it plucks a field from the event args, or if that's missing, from the target.
+ * 
+ * ```js
+ * // Emits the the value of a field named 'x'
+ * // on the change event args
+ * eventField(el, `pointermove`, `x`);
+ * ```
+ * @param target 
+ * @param eventName 
+ * @param fieldName 
+ * @param options 
+ */
+export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, initialValue: TFieldValue, options: Partial<EventOptions & FieldOptions<any, TFieldValue>> = {}) {
 
-export function event<V extends Record<string, any>>(target: EventTarget | null, name: string, options: EventOptions<V>): ReactiveInitial<V> & ReactiveDisposable<V>;
-export function event<V extends Record<string, any>>(target: EventTarget | null, name: string, options?: Optional<EventOptions<V>, `transform`>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
+  const initial: Record<string, any> = {};
+  initial[ fieldName ] = initialValue;
+
+  const rxField = field<any, TFieldValue>(
+    event(targetOrQuery, eventName, initial, options),
+    fieldName,
+    options
+  );
+  return rxField;
+}
+
+// export function eventPluckedField3<T = string>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, options: Partial<EventPluckedFieldOptions<T>> = {}): Reactive<T> & ReactiveDisposable<T> {
+//   const target = (typeof targetOrQuery === `string` ? document.querySelector(targetOrQuery) : targetOrQuery);
+//   if (target === null && typeof targetOrQuery === `string`) throw new Error(`Element query could not be resolved '${ targetOrQuery }`);
+//   if (target === null) throw new Error(`Param 'target' is null`);
+
+//   const onFired = (event: any) => {
+//     let domValue: T;
+//     if (fieldName in event) {
+//       domValue = event[ fieldName ] as T;
+//     } else if (fieldName in target) {
+//       domValue = (target as any)[ fieldName ] as T;
+//     }
+//     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+//     stream.set(domValue!);
+//   }
+
+//   const opts = {
+//     lazy: options.lazy ?? `very`,
+//     initialValue: undefined as T | undefined,
+//     onStart() {
+//       target.addEventListener(eventName, onFired);
+//     },
+//     onStop() {
+//       target.removeEventListener(eventName, onFired);
+//     }
+//   }
+
+//   let stream: ReactiveStream<T>;
+//   const initialValue = options.initialValue;
+//   // eslint-disable-next-line unicorn/prefer-ternary
+//   if (initialValue === undefined) {
+//     stream = initLazyStream<T>(opts);
+//   } else {
+//     stream = initLazyStreamWithInitial<T>({
+//       ...opts,
+//       initialValue
+//     });
+//   }
+//   return stream;
+// }
+// export function eventPluckedField<TDomSource, TValueDestination>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, options: Partial<EventPluckedFieldOptions<TDomSource, TValueDestination>> = {}): ReactiveInitial<TValueDestination> & ReactiveDisposable<TValueDestination> {
+//   const target = (typeof targetOrQuery === `string` ? document.querySelector(targetOrQuery) : targetOrQuery);
+//   if (target === null && typeof targetOrQuery === `string`) throw new Error(`Element query could not be resolved '${ targetOrQuery }`);
+//   if (target === null) throw new Error(`Param 'target' is null`);
+
+//   let currentValue: TValueDestination | undefined = options.initialValue;
+
+//   const onFired = (event: any) => {
+//     let domValue: TDomSource | undefined;
+//     if (fieldName in event) {
+//       domValue = event[ fieldName ] as TDomSource;
+//     } else if (fieldName in target) {
+//       domValue = (target as any)[ fieldName ] as TDomSource;
+//     }
+
+//     currentValue = options.domToValue ? options.domToValue(domValue) : domValue as TValueDestination;
+//     if (currentValue !== undefined) {
+//       stream.set(currentValue);
+//     }
+//   }
+
+//   const stream = initLazyStream<TValueDestination>({
+//     lazy: options.lazy ?? `very`,
+//     onStart() {
+//       target.addEventListener(eventName, onFired);
+//     },
+//     onStop() {
+//       target.removeEventListener(eventName, onFired);
+//     }
+//   });
+
+//   if (currentValue !== undefined) {
+//     stream.set(currentValue);
+//   }
+//   return {
+//     ...stream,
+//     last() {
+//       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+//       return currentValue!;
+//     },
+//   };
+// }
+
+//export function event<V extends Record<string, any>>(target: EventTarget | null | string, name: string, options: EventOptions<V>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
+//export function event<V extends Record<string, any>>(target: EventTarget | null | string, name: string, options?: Optional<EventOptions<V>, `transform`>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
 
 /**
  * Subscribes to an event, emitting data
@@ -11,33 +126,9 @@ export function event<V extends Record<string, any>>(target: EventTarget | null,
  * @example Print x,y position of mouse as it moves
  * ```js
  * const r = Rx.From.event(document, `pointermove`);
- * r.value(event => {
+ * r.onValue(event => {
  *  const { x, y } = event;
  * });
- * ```
- * 
- * As a convienence, there is an in-built transform option, via `options.transform`. Event data
- * passes through this function before emitting. 
- * ```js
- * // Emit relative pixel values rather than absolute
- * Rx.From.event(document,`pointermove`, { 
- *  transform: (event) => ({ x: event.x/window.innerWidth, y:event.y/window.innerHeight })
- * })
- * ```
- * Providing the transform function also properly types the stream.
- * 
- * To create an initial value for an event stream, provide `options.transform`, and have it
- * return the default value if there is undefined input.
- * 
- * ```js
- * // Makes an initial value of {x:0.5,y:0.5},
- * // but later yields relative pixel values
- * Rx.From.event(document,`pointermove`, { 
- *  transform: (event) => {
- *    if (!event) return { x: 0.5, y: 0.5 }
- *    return { x: event.x / window.innerWidth, y: event.y / window.innerHeight }
- *  }
- * })
  * ```
  * 
  * If `options.lazy` is _true_ (default: _false_), event will only be subscribed to when the stream
@@ -45,26 +136,34 @@ export function event<V extends Record<string, any>>(target: EventTarget | null,
  * 
  * `options.debugFiring` and `options.debugLifecycle` can be turned on to troubleshoot behaviour
  * of the stream if necessary.
- * @param target Event emitter
+ * @param targetOrQuery Event emitter, HTML element or string. If a string, it will be queryed as a selector.
  * @param name Event name
  * @param options Options
  * @returns 
  */
-export function event<V extends Record<string, any>>(target: EventTarget | null, name: string, options: Partial<EventOptions<V>> = {}): (ReactiveInitial<V> | ReactiveNonInitial<V>) & ReactiveDisposable<V> {
-  // TODO could this have better typing to pick up on the proper eventargs?
-  if (target === null) throw new Error(`Param 'target' is null`);
-  const transform = options.transform;
-  const initialValue = transform ? transform() : undefined;
+// eslint-disable-next-line unicorn/prevent-abbreviations
+export function event<TEventArgs extends Record<string, any>>(targetOrQuery: EventTarget | null | string, name: string, initialValue: TEventArgs | undefined, options: Partial<EventOptions> = {}): ReactiveInitial<TEventArgs> & Reactive<TEventArgs> {
+  let target: EventTarget | null;
+  if (typeof targetOrQuery === `string`) {
+    target = document.querySelector(targetOrQuery);
+    if (target === null) throw new Error(`Target query did not resolve to an element. Query: '${ targetOrQuery }'`)
+  } else {
+    target = targetOrQuery;
+  }
+
+  if (target === null) throw new Error(`Param 'targetOrQuery' is null`);
+
   const debugLifecycle = options.debugLifecycle ?? false;
   const debugFiring = options.debugFiring ?? false;
-  const rxObject = initialValue ? object<V>(initialValue, { deepEntries: true }) : object<V>(undefined, { deepEntries: true });
   const lazy = options.lazy ?? false;
+  if (initialValue === undefined) initialValue = {} as TEventArgs;
+  const rxObject = object<TEventArgs>(initialValue, { deepEntries: true });
   let eventAdded = false;
   let disposed = false;
 
   const callback = (args: any) => {
     if (debugFiring) console.log(`Reactive.event '${ name }' firing '${ JSON.stringify(args) }`)
-    rxObject.set(transform ? transform(args) : args);
+    rxObject.set(args as TEventArgs);
   }
 
   const remove = () => {
@@ -72,7 +171,7 @@ export function event<V extends Record<string, any>>(target: EventTarget | null,
     eventAdded = false;
     target.removeEventListener(name, callback);
     if (debugLifecycle) {
-      console.log(`Reactive.event remove '${ name }'`);
+      console.log(`Rx.From.event remove '${ name }'`);
     }
   }
 
@@ -81,7 +180,7 @@ export function event<V extends Record<string, any>>(target: EventTarget | null,
     eventAdded = true;
     target.addEventListener(name, callback);
     if (debugLifecycle) {
-      console.log(`Reactive.event add '${ name }'`);
+      console.log(`Rx.From.event add '${ name }'`);
     }
   }
 
@@ -101,13 +200,66 @@ export function event<V extends Record<string, any>>(target: EventTarget | null,
     isDisposed() {
       return disposed;
     },
-    on: (handler: (v: Passed<V>) => void) => {
+    on: (handler: (v: Passed<TEventArgs>) => void) => {
       if (lazy) add();
       return rxObject.on(handler);
     },
-    value: (handler: (v: V) => void) => {
+    onValue: (handler: (v: TEventArgs) => void) => {
       if (lazy) add();
-      return rxObject.value(handler);
+      return rxObject.onValue(handler);
     }
   }
+}
+
+export type TriggerData = {
+  sinceLast: number
+  total: number
+}
+
+export function eventTrigger(targetOrQuery: EventTarget | null | string, name: string, options: Partial<EventTriggerOptions> = {}): Reactive<TriggerData> {
+  let target: EventTarget | null;
+  if (typeof targetOrQuery === `string`) {
+    target = document.querySelector(targetOrQuery);
+    if (target === null) throw new Error(`Target query did not resolve to an element. Query: '${ targetOrQuery }'`)
+  } else {
+    target = targetOrQuery;
+  }
+
+  if (target === null) throw new Error(`Param 'targetOrQuery' is null`);
+
+  const debugLifecycle = options.debugLifecycle ?? false;
+  const debugFiring = options.debugFiring ?? false;
+  const fireInitial = options.fireInitial ?? false;
+
+  let count = 0;
+  const elapsed = Elapsed.interval();
+
+  const stream = initLazyStream<TriggerData>({
+    lazy: options.lazy ?? `very`,
+    onStart() {
+      target.addEventListener(name, callback);
+      if (debugLifecycle) {
+        console.log(`Rx.From.eventTrigger add '${ name }'`);
+      }
+      if (fireInitial && count === 0) {
+        callback();
+      }
+    },
+    onStop() {
+      target.removeEventListener(name, callback);
+      if (debugLifecycle) {
+        console.log(`Rx.From.eventTrigger remove '${ name }'`);
+      }
+    },
+  });
+
+  const callback = (_args?: any) => {
+    if (debugFiring) console.log(`Rx.From.eventTrigger '${ name }' triggered'`)
+    stream.set({
+      sinceLast: elapsed(),
+      total: ++count
+    });
+  }
+
+  return stream;
 }
