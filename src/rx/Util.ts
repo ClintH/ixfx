@@ -1,5 +1,5 @@
 import { isIterable } from "../iterables/Iterable.js";
-import type { Passed, PassedSignal, PassedValue, Reactive, ReactiveDiff, ReactiveDisposable, ReactiveInitial, ReactiveOrSource, ReactiveWritable, Wrapped } from "./Types.js";
+import type { Passed, PassedSignal, PassedValue, Reactive, ReactiveDiff, ReactiveInitial, ReactiveOrSource, ReactiveWritable, Wrapped } from "./Types.js";
 import type { Trigger, TriggerValue, TriggerFunction, TriggerGenerator } from "./sources/Types.js";
 
 export function messageIsSignal<V>(message: Passed<V> | PassedSignal): message is PassedSignal {
@@ -36,13 +36,36 @@ export const hasLast = <V>(rx: Reactive<V> | ReactiveDiff<V> | object): rx is Re
   return false;
 }
 
+/**
+ * Returns _true_ if `rx` is a Reactive
+ * @param rx 
+ * @returns 
+ */
 export const isReactive = <V>(rx: object): rx is Reactive<V> => {
   if (typeof rx !== `object`) return false;
-  return (`on` in rx && `value` in rx)
+  if (rx === null) return false;
+  return (`on` in rx && `onValue` in rx)
 }
 
-export const isDisposable = <V>(v: Reactive<V> | ReactiveWritable<V>): v is ReactiveDisposable<V> => {
-  return (`isDisposed` in v && `dispose` in v);
+/**
+ * Returns true if `rx` is a disposable reactive.
+ * @param rx 
+ * @returns 
+ */
+// export const isDisposable = <V>(rx: Reactive<V> | ReactiveWritable<V>): rx is ReactiveDisposable<V> => {
+//   if (!isReactive(rx)) return false;
+//   return (`isDisposed` in rx && `dispose` in rx);
+// }
+
+/**
+ * Returns _true_ if `rx` is a writable Reactive
+ * @param rx 
+ * @returns 
+ */
+export const isWritable = <V>(rx: Reactive<V> | ReactiveWritable<V>): rx is ReactiveWritable<V> => {
+  if (!isReactive(rx)) return false;
+  if (`set` in rx) return true;
+  return false;
 }
 
 export const isWrapped = <T>(v: any): v is Wrapped<T> => {
@@ -52,11 +75,12 @@ export const isWrapped = <T>(v: any): v is Wrapped<T> => {
   return true;
 }
 
-export const opify = <V>(fn: (source: ReactiveOrSource<V>, ...args: Array<any>) => Reactive<V>, ...args: Array<any>) => {
-  return (source: ReactiveOrSource<V>) => {
+export const opify = <TIn, TOut = TIn>(fn: (source: ReactiveOrSource<TIn>, ...args: Array<any>) => Reactive<TOut>, ...args: Array<any>) => {
+  return (source: ReactiveOrSource<TIn>) => {
     return fn(source, ...args);
   }
 }
+
 export const isTriggerValue = <V>(t: Trigger<V>): t is TriggerValue<V> => (`value` in t);
 export const isTriggerFunction = <V>(t: Trigger<V>): t is TriggerFunction<V> => (`fn` in t);
 export const isTriggerGenerator = <V>(t: Trigger<V>): t is TriggerGenerator<V> => isIterable(t);
