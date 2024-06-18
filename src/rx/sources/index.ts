@@ -1,7 +1,9 @@
 export * from './Array.js';
 export * from './ArrayObject.js';
 export * from './Boolean.js';
+//export * from './Colour.js';
 export * from './Event.js';
+export * from './Dom.js';
 export * from './Function.js';
 export * from './FunctionPinged.js';
 export * from './Iterator.js';
@@ -10,4 +12,5 @@ export * from './Object.js';
 export * from './ObjectProxy.js';
 export * from './Observable.js';
 //export * from './Resolve.js';
+export * from './String.js';
 export * from './Types.js';
