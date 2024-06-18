@@ -1,3 +1,4 @@
+import type { RankArrayOptions, RankFunction, RankOptions } from "../../data/BasicProcessors.js";
 import type { Interval } from "../../flow/IntervalType.js";
 export type SyncOptions = {
 
@@ -66,7 +67,7 @@ export type GenOrData<V> = Array<V> | Gen<V>;
  */
 export type Link<In, Out> = {
   (input: GenOrData<In>): AsyncGenerator<Out>
-  _name: string
+  _name?: string
 }
 
 /**
@@ -171,38 +172,9 @@ export type TickOptions = {
 }
 
 
-/**
- * A rank function that compares A and B.
- * Returns the highest value, 'a' or 'b'. 
- * Returns 'eq' if values are equal
- */
-export type RankFunction<T> = (a: T, b: T) => `a` | `b` | `eq`
 
-export type RankOptions = {
-  /**
-   * If set, only values with this JS type are included
-   */
-  includeType?: `string` | `number` | `object` | `boolean`
-  /**
-   * If _true_, also emits values when they rank equal with current highest.
-   * _false_ by default
-   */
-  emitEqualRanked?: boolean
-  /**
-   * If _true_, emits the current highest value even if it hasn't changed.
-   * This means it will match the tempo of the incoming stream.
-   */
-  emitRepeatHighest?: boolean
-}
 
-export type RankArrayOptions = RankOptions & {
-  /**
-   * If _true_, it's only the highest _within_ an array that is considered,
-   * rather than tracking the higest between arrays
-   * Default: _false_
-   */
-  withinArrays?: boolean
-}
+
 
 
 /**
@@ -305,12 +277,12 @@ export type LazyChain<In, Out> = {
    * Gets the total of numerical values
    * @returns 
    */
-  total: () => LazyChain<In, number>
+  sum: () => LazyChain<In, number>
   /**
    * Emits a running tally of how many values have been emitted
    * @returns 
    */
-  tally: () => LazyChain<In, number>
+  tally: (countArrayItems: boolean) => LazyChain<In, number>
   /**
    * Ignore values that match `predicate` (opposite of `filter()`)
    * @param predicate 
@@ -328,7 +300,7 @@ export type LazyChain<In, Out> = {
    * @param flattener 
    * @returns 
    */
-  flatten: (flattener: (values: Array<any>) => any) => LazyChain<In, Out>
+  reduce: (reducer: (values: Array<any>) => any) => LazyChain<In, Out>
   /**
    * Transform an input value to an output
    * @param transformer 
