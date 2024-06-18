@@ -2,10 +2,11 @@
  * Acknowledgements: much of the work here is an adapation from Daniel Shiffman's excellent _The Nature of Code_ website.
  */
 import { Points, Polar } from '../geometry/index.js';
-import type { Point } from '../geometry/point/index.js';
+import type { Point } from '../geometry/point/PointType.js';
 import { clamp } from '../data/Clamp.js';
 import { interpolateAngle } from '../data/Interpolate.js';
 import { getEdgeX, getEdgeY, type Rect } from '../geometry/rect/index.js';
+import { divide as PointDivide } from '../geometry/point/Divider.js';
 
 /**
  * Logic for applying mass
@@ -440,7 +441,7 @@ const massApplyAccel = (
   let op;
   switch (mass) {
     case `dampen`: {
-      op = (mass: number) => Points.divide(vector, mass, mass);
+      op = (mass: number) => PointDivide(vector, mass, mass);
 
       break;
     }

@@ -271,13 +271,14 @@ export type EasingName = keyof typeof functions;
  * @param easingName eg `sineIn`
  * @returns Easing function
  */
-export const get = function (easingName: EasingName): EasingFn | undefined {
+export const get = function (easingName: EasingName): EasingFn {
   if (easingName === null) throw new Error(`easingName is null`);
   if (easingName === undefined) throw new Error(`easingName is undefined`);
   const name = easingName.toLocaleLowerCase();
   const found = Object.entries(functions).find(
     ([ k, _v ]) => k.toLocaleLowerCase() === name
   );
+  if (found === undefined) throw new Error(`easing not found ('${ easingName })`);
 
   if (found === undefined) return found;
   return found[ 1 ];
