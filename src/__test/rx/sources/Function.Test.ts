@@ -23,7 +23,7 @@ test(`from-pinged-function`, async t => {
   const r2 = Rx.From.pinged(pingConstant, r2Test.callback, { lazy: `very` });
   await Flow.sleep(50);
   t.true(r2Test.invoked() === 0, `Function does not run until there is a subscriber`);
-  const r2Off = r2.value(v => {
+  const r2Off = r2.onValue(v => {
 
   });
   await Flow.sleep(50);
@@ -39,7 +39,7 @@ test(`from-pinged-function`, async t => {
   const r3 = Rx.From.pinged(pingConstant, r3Test.callback, { lazy: `initial` });
   await Flow.sleep(50);
   t.true(r3Test.invoked() === 0, `Function does not run until subscriber`);
-  const r3Off = r3.value(v => {
+  const r3Off = r3.onValue(v => {
 
   });
   await Flow.sleep(50);
@@ -198,7 +198,7 @@ test(`loop`, async t => {
   const r2 = Rx.From.func(() => r2Invoked++, { lazy: `very`, interval: 10 });
   await Flow.sleep(50);
   t.is(r2Invoked, 0, `Very lazy function should not run`);
-  const r2Off = r2.value(v => {
+  const r2Off = r2.onValue(v => {
   });
   // Count executions for 50ms before unsub
   await Flow.sleep(50);
