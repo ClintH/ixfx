@@ -1,6 +1,10 @@
 import { numberTest, throwFromResult } from './Guards.js';
-export * as IterableAsync from './iterables/IterableAsync.js';
 
+export * from './IsEqual.js';
+export * from './Compare.js';
+export * from './Results.js';
+
+//export * as IterableAsync from './iterables/IterableAsync.js';
 
 export type ArrayLengthMutationKeys = `splice` | `push` | `pop` | `shift` | `unshift` | number
 export type ArrayItems<T extends Array<any>> = T extends Array<infer TItems> ? TItems : never
@@ -290,15 +294,7 @@ export const comparerInverse = <V>(comparer: Comparer<V>): Comparer<V> => {
   };
 };
 
-/**
- * If values are strings, uses that as the key.
- * Otherwise uses `JSON.stringify`.
- * @param a
- * @returns
- */
-export const defaultKeyer = <V>(a: V) => {
-  return typeof a === `string` ? a : JSON.stringify(a);
-};
+
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultToString = (object: any): string => {
