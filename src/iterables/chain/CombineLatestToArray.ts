@@ -11,8 +11,8 @@ import { isEqual as ArrayIsEqual } from "../../collections/arrays/index.js";
  * See {@link syncToArray} to have pace determined by slowest source, and only
  * send when each source has produce a new value compared to last time.
  * 
- * Set `onSourceDone` to choose behaviour if a source stops. By default it
- * is 'break', meaning the whole combined stream stops.
+ * Set `onSourceDone` to choose behaviour if a source stops. The default is
+ * 'break', meaning the whole combined stream stops.
  * 
  * If a source completes and onSourceDone = 'allow', the option
  * 'finalValue' sets the logic for what values get returned for the source.
