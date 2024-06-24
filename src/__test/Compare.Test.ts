@@ -1,6 +1,7 @@
 import test from 'ava';
-import * as Immutable from '../Immutable.js';
+import * as Immutable from '../data/Pathed.js';
 import { compareArrays, changedDataFields } from '../data/Compare.js';
+import { isEmptyEntries } from '../data/Util.js';
 
 const objectEmpty = (o: object) => Object.entries(o).length === 0;
 
@@ -9,8 +10,8 @@ test(`compare-data-array`, t => {
   const r1 = compareArrays([ `one`, `two`, `three` ], [ `one`, `two` ]);
   t.true(r1.isArray);
   t.true(r1.hasChanged);
-  t.true(Immutable.isEmptyEntries(r1.changed));
-  t.true(Immutable.isEmptyEntries(r1.added));
+  t.true(isEmptyEntries(r1.changed));
+  t.true(isEmptyEntries(r1.added));
   t.deepEqual(r1.removed, [ 2 ]);
   t.deepEqual(r1.summary, [ [ `del`, 2, `three` ] ]);
 
@@ -26,8 +27,8 @@ test(`compare-data-array`, t => {
   const r3 = compareArrays([ `one`, `two`, `three` ], [ `one`, `twotwo`, `three` ]);
   t.true(r3.isArray);
   t.true(r3.hasChanged);
-  t.true(Immutable.isEmptyEntries(r3.children));
-  t.true(Immutable.isEmptyEntries(r3.added));
+  t.true(isEmptyEntries(r3.children));
+  t.true(isEmptyEntries(r3.added));
   t.true(r3.removed.length === 0);
   t.deepEqual(r3.changed, { 1: 'twotwo' })
   t.deepEqual(r3.summary, [ [ `mutate`, 1, `twotwo` ] ]);
