@@ -400,4 +400,4 @@ export * as KeyValues from './KeyValue.js';
 
 export * as Util from './util/index.js';
 
-export * as Immutable from './Immutable.js'
+export * as Immutable from './data/Pathed.js'
