@@ -1,4 +1,4 @@
-import type { Point } from "src/geometry/point/PointType.js";
+import type { Point } from "../geometry/point/PointType.js";
 import { resolveEl } from "./ResolveEl.js";
 import { resizeObservable, windowResize } from "./DomRx.js";
 

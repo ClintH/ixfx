@@ -51,9 +51,7 @@ type Traversal = readonly [
 ];
 
 const getName = (t: Node, defaultValue = ``) => {
-  if (typeof t === `object` && `name` in t) {
-    if (t.name !== undefined) return t.name;
-  }
+  if (typeof t === `object` && `name` in t && t.name !== undefined) return t.name;
   return defaultValue;
 };
 
@@ -113,14 +111,14 @@ function* entries(n: Node) {
   }
 }
 
-for (const tn of iterateBreadth(t)) {
-  console.log(`Path: ${ tn[ 1 ] }`);
-  console.log(`Node: ${ JSON.stringify(tn[ 0 ]) }`);
-}
+// for (const tn of iterateBreadth(t)) {
+//   console.log(`Path: ${ tn[ 1 ] }`);
+//   console.log(`Node: ${ JSON.stringify(tn[ 0 ]) }`);
+// }
 
-console.log(`---`);
+// console.log(`---`);
 
-for (const tn of iterateDepth(t)) {
-  console.log(`Path: ${ tn[ 1 ] }`);
-  console.log(`Node: ${ JSON.stringify(tn[ 0 ]) }`);
-}
+// for (const tn of iterateDepth(t)) {
+//   console.log(`Path: ${ tn[ 1 ] }`);
+//   console.log(`Node: ${ JSON.stringify(tn[ 0 ]) }`);
+// }

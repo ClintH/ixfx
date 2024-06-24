@@ -1,4 +1,4 @@
-import { unique } from '../collections/arrays/index.js';
+import { unique } from '../collections/arrays/Unique.js';
 
 
 

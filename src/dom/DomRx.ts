@@ -1,4 +1,4 @@
-import type { Interval } from 'src/flow/IntervalType.js';
+import type { Interval } from '../flow/IntervalType.js';
 import * as Rx from '../rx/index.js';
 
 /**

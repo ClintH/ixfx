@@ -10,6 +10,7 @@ export * from './ForEach.js';
 export * from './Interval.js';
 export * from './IntervalType.js';
 export * from './PromiseFromEvent.js';
+export * from './PromiseWithResolvers.js';
 export * from './RateMinimum.js';
 export * from './Repeat.js';
 export * from './RequestResponseMatch.js';
@@ -33,6 +34,7 @@ export * from './Timer.js';
 export * from './Types.js';
 export * from './UpdateOutdated.js';
 export * from './WaitFor.js';
+export * from './WaitForValue.js';
 export type * from './Types.js';
 
 

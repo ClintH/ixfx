@@ -1,11 +1,11 @@
+import type { Rect } from '../geometry/rect/RectTypes.js';
+import { scaler, type ScaleBy, type ScalerCombined } from "../geometry/Scaler.js";
 import { resolveEl } from "./ResolveEl.js";
-import { Rects, Scaler } from '../geometry/index.js';
-import { type Rect } from '../geometry/rect/index.js';
-import { multiply as RectsMultiply } from "../geometry/rect/index.js";
+import { empty as RectsEmpty } from '../geometry/rect/Empty.js';
+import { multiply as RectsMultiply } from "../geometry/rect/Multiply.js";
 import { windowResize } from "./DomRx.js";
-import type { ScaleBy } from "../geometry/Scaler.js";
 import { SimpleEventEmitter } from "../Events.js";
-
+import { guard as RectsGuard } from '../geometry/rect/Guard.js';
 /**
  * Options
  */
@@ -102,8 +102,8 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   readonly el: HTMLCanvasElement;
   readonly opts: CanvasOpts
 
-  #scaler: Scaler.ScalerCombined;
-  #currentSize: Rect = Rects.empty;
+  #scaler: ScalerCombined;
+  #currentSize: Rect = RectsEmpty;
   #ctx: CanvasRenderingContext2D | undefined;
 
   constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts: Partial<CanvasOpts> = {}) {
@@ -113,8 +113,6 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     if (this.el.nodeName !== `CANVAS`) {
       throw new Error(`Expected CANVAS HTML element. Got: ${ this.el.nodeName }`);
     }
-
-
     this.opts = {
       fill: opts.fill ?? `none`,
       height: opts.height ?? -1,
@@ -127,8 +125,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
       skipCss: opts.skipCss ?? false
     }
 
-    this.#scaler = Scaler.scaler(`both`);
-
+    this.#scaler = scaler(`both`);
     this.#init();
   }
 
@@ -146,12 +143,12 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   };
 
   #setLogicalSize(logicalSize: Rect) {
-    Rects.guard(logicalSize, `logicalSize`);
+    RectsGuard(logicalSize, `logicalSize`);
 
     const ratio = window.devicePixelRatio || 1;
 
     // Scaler for going between relative and logical units
-    this.#scaler = Scaler.scaler(this.opts.scaleBy, logicalSize);
+    this.#scaler = scaler(this.opts.scaleBy, logicalSize);
 
     // Scaled logical size for DPI
     const pixelScaled = RectsMultiply(logicalSize, ratio, ratio);
