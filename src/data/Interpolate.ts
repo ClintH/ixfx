@@ -1,4 +1,4 @@
-import type { Interval } from 'src/flow/IntervalType.js';
+import type { Interval } from '../flow/IntervalType.js';
 import { wrap } from './Wrap.js';
 import { progress } from '../flow/Elapsed.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
