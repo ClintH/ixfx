@@ -388,17 +388,18 @@ export async function takeNextValue<V>(source: ReactiveOrSource<V>, maximumWait:
 }
 
 /**
- * Connects reactive A to B, passing through a transform function.
+ * Connects reactive A to B, optionally transforming the value as it does so.
  * 
  * Returns a function to unsubcribe A->B
  * @param a 
  * @param b 
  * @param transform 
  */
-export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform: (valueA: TA) => TB, closeBonA = false) => {
+export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform?: (valueA: TA) => TB, closeBonA = false) => {
   const unsub = a.on(message => {
     if (messageHasValue(message)) {
-      b.set(transform(message.value));
+      const value = transform ? transform(message.value) : message.value as TB;
+      b.set(value);
     } else if (messageIsDoneSignal(message)) {
       unsub();
       if (closeBonA) {
