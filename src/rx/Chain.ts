@@ -1,5 +1,6 @@
 import { resolveSource } from "./ResolveSource.js"
 import type { Reactive, ReactiveOp, ReactiveOrSource } from "./Types.js"
+import { isWritable } from "./Util.js"
 
 export type OpChain1<T1, T2> = [
   ReactiveOp<T1, T2>
@@ -95,6 +96,45 @@ export function run<T1, T2, T3, T4, T5, T6>(source: ReactiveOrSource<T1>, ...ops
     s = op(s);
   }
   return s as Reactive<T2 | T3 | T4 | T5 | T6>;
+  //const raw = chainer<T1, T2, T3, T4, T5, T6>(...ops);
+  //return raw(source);
+}
+
+export function runHead<T1, T2>(source: ReactiveOrSource<T1>, ...ops: OpChain1<T1, T2>): Reactive<T2>;
+export function runHead<T1, T2, T3>(source: ReactiveOrSource<T1>, ...ops: OpChain2<T1, T2, T3>): Reactive<T3>;
+export function runHead<T1, T2, T3, T4>(source: ReactiveOrSource<T1>, ...ops: OpChain3<T1, T2, T3, T4>): Reactive<T4>;
+export function runHead<T1, T2, T3, T4, T5>(source: ReactiveOrSource<T1>, ...ops: OpChain4<T1, T2, T3, T4, T5>): Reactive<T5>;
+export function runHead<T1, T2, T3, T4, T5, T6>(source: ReactiveOrSource<T1>, ...ops: OpChain5<T1, T2, T3, T4, T5, T6>): Reactive<T6>;
+
+
+/**
+ * Connects `source` to serially-connected set of ops. Values thus
+ * flow from `source` to each op in turn.
+ * 
+ * Returned result is the final reactive.
+ * 
+ * @param source 
+ * @param ops 
+ * @returns 
+ */
+export function runHead<T1, T2, T3, T4, T5, T6>(source: ReactiveOrSource<T1>, ...ops: OpChain1<T1, T2> | OpChain2<T1, T2, T3> | OpChain3<T1, T2, T3, T4> | OpChain4<T1, T2, T3, T4, T5> | OpChain5<T1, T2, T3, T4, T5, T6>): Reactive<T2 | T3 | T4 | T5 | T6> {
+  let originalSource = resolveSource(source);
+  let s = originalSource;
+  for (const op of ops) {
+    // @ts-ignore
+    s = op(s);
+  }
+  const rr = s as Reactive<T2 | T3 | T4 | T5 | T6>;
+  if (isWritable(originalSource)) {
+    return {
+      ...rr,
+      set(value: T1) {
+        originalSource.set(value);
+      }
+    } as any as Reactive<T2 | T3 | T4 | T5 | T6>
+  } else {
+    return rr;
+  }
   //const raw = chainer<T1, T2, T3, T4, T5, T6>(...ops);
   //return raw(source);
 }
