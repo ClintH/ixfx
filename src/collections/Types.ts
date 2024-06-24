@@ -4,3 +4,4 @@ export type ObjectKeys<K, V> = ReadonlyArray<{
   readonly value: V;
 }>;
 export type EitherKey<K, V> = ArrayKeys<K, V> | ObjectKeys<K, V>;
+

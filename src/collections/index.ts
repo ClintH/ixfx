@@ -1,10 +1,9 @@
 export {
   circularArray,
   type ICircularArray as CircularArray,
-} from './CircularArray.js';
+} from './arrays/CircularArray.js';
 export * as Trees from './tree/index.js';
 export type * from './Types.js';
-export * as Iterables from './Iterables.js';
 
 /**
  * Stacks store items in order.
@@ -96,7 +95,6 @@ export * as Queues from './queue/index.js';
 
 export { QueueMutable } from './queue/QueueMutable.js';
 export { QueueImmutable } from './queue/QueueImmutable.js';
-
 
 /**
  * Maps associate keys with values. Several helper functions are provided

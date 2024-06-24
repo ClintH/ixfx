@@ -1,35 +1,7 @@
-import { slice } from '../iterables/sync/Slice.js';
-import { filterBetween } from './FilterBetween.js';
+import { slice } from '../../iterables/sync/Slice.js';
+import { filterBetween } from './Filter.js';
+import type { MinMaxAvgOpts, MinMaxAvgTotal } from './Types.js';
 
-export type MinMaxAvgTotal = {
-  /**
-   * Smallest value in array
-   */
-  readonly min: number;
-  /**
-   * Total of all items
-   */
-  readonly total: number;
-  /**
-   * Largest value in array
-   */
-  readonly max: number;
-  /**
-   * Average value in array
-   */
-  readonly avg: number;
-};
-
-export type MinMaxAvgOpts = {
-  /**
-   * Start index, inclusive
-   */
-  readonly startIndex?: number;
-  /**
-   * End index, exclusive
-   */
-  readonly endIndex?: number;
-};
 /**
  * Returns the min, max, avg and total of the array or iterable.
  * Any values that are invalid are silently skipped over.

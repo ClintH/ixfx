@@ -1,38 +1,32 @@
 import test from 'ava';
-import {
-  sortByNumericProperty,
-  reducePairwise,
-  mergeByKey,
-  ensureLength,
-  remove,
-  piecewise,
-  compareValues,
-  compareValuesEqual,
-  containsDuplicateValues,
-  contains,
-  unique,
-  filterBetween,
-  flatten,
-  zip,
-  without
-} from '../../collections/arrays/index.js';
 import { arrayValuesEqual } from '../Include.js';
-import { valuesEqual } from '../../collections/arrays/ValuesEqual.js';
+import { pairwise, pairwiseReduce } from '../../collections/arrays/Pairwise.js';
+import { filterBetween, without } from '../../collections/arrays/Filter.js';
+import { flatten } from '../../collections/arrays/Flatten.js';
+import { contains, containsDuplicateValues } from '../../collections/arrays/Contains.js';
+import { unique } from '../../collections/arrays/Unique.js';
+import { compareValuesShallow, hasEqualValuesShallow } from '../../iterables/CompareValues.js';
+import { sortByNumericProperty } from '../../collections/arrays/SortByNumericProperty.js';
+import { mergeByKey } from '../../collections/arrays/MergeByKey.js';
+import { remove } from '../../collections/arrays/Remove.js';
+import { ensureLength } from '../../collections/arrays/EnsureLength.js';
+import { zip } from '../../collections/arrays/Zip.js';
+import { isContentsTheSame } from '../../collections/arrays/Equality.js';
 
-test('piecewise', t => {
-  const r1 = [ ...piecewise([ 1, 2, 3, 4 ]) ];
+test('pairwise', t => {
+  const r1 = [ ...pairwise([ 1, 2, 3, 4 ]) ];
   t.deepEqual(r1, [
     [ 1, 2 ], [ 2, 3 ], [ 3, 4 ]
   ]);
-  const r2 = [ ...piecewise([ 1, 2, 3, 4, 5 ]) ];
+  const r2 = [ ...pairwise([ 1, 2, 3, 4, 5 ]) ];
   t.deepEqual(r2, [
     [ 1, 2 ], [ 2, 3 ], [ 3, 4 ], [ 4, 5 ]
   ]);
 
-  t.throws(() => [ ...piecewise([]) ]);
-  t.throws(() => [ ...piecewise([ 1 ]) ]);
+  t.throws(() => [ ...pairwise([]) ]);
+  t.throws(() => [ ...pairwise([ 1 ]) ]);
   // @ts-expect-error
-  t.throws(() => [ ...piecewise('hello') ]);
+  t.throws(() => [ ...pairwise('hello') ]);
 
 });
 
@@ -162,28 +156,28 @@ test('contains', (t) => {
 test(`compare-values`, (t) => {
   const a = [ 'apples', 'oranges', 'pears' ];
   const b = [ 'pears', 'kiwis', 'bananas' ];
-  const r = compareValues(a, b);
+  const r = compareValuesShallow(a, b);
   t.like(r.shared, [ 'pears' ]);
   t.like(r.a, [ 'apples', 'oranges' ]);
   t.like(r.b, [ 'kiwis', 'bananas' ]);
-  t.false(compareValuesEqual(a, b));
+  t.false(hasEqualValuesShallow(a, b));
 
   const a1 = [ 'apples', 'oranges' ];
   const b1 = [ 'oranges', 'apples' ];
-  t.true(compareValuesEqual(a1, b1));
+  t.true(hasEqualValuesShallow(a1, b1));
 
   const aa = [ { name: 'John' }, { name: 'Mary' }, { name: 'Sue' } ];
   const bb = [ { name: 'John' }, { name: 'Mary' }, { name: 'Jane' } ];
   // @ts-ignore
-  const rr = compareValues(aa, bb, (a, b) => a.name === b.name);
+  const rr = compareValuesShallow(aa, bb, (a, b) => a.name === b.name);
   t.like(rr.shared, [ { name: 'John' }, { name: 'Mary' } ]);
   t.like(rr.a, [ { name: 'Sue' } ]);
   t.like(rr.b, [ { name: 'Jane' } ]);
-  t.false(compareValuesEqual(aa, bb, (a, b) => a.name === b.name));
+  t.false(hasEqualValuesShallow(aa, bb, (a, b) => a.name === b.name));
 
   const aa1 = [ { name: 'John' }, { name: 'Mary' } ];
   const bb1 = [ { name: 'Mary' }, { name: 'John' } ];
-  t.true(compareValuesEqual(aa1, bb1, (a, b) => a.name === b.name));
+  t.true(hasEqualValuesShallow(aa1, bb1, (a, b) => a.name === b.name));
 });
 
 test(`array-sort`, (t) => {
@@ -205,25 +199,25 @@ test(`array-sort`, (t) => {
   t.pass();
 });
 
-test(`array-reducePairwise`, (t) => {
+test(`pairwise-reduce`, (t) => {
   const reducer = (acc: string, a: string, b: string) => {
     return acc + `[${ a }-${ b }]`;
   };
 
-  const t1 = reducePairwise(`a b c d e f g`.split(` `), reducer, `!`);
+  const t1 = pairwiseReduce(`a b c d e f g`.split(` `), reducer, `!`);
   t.is(t1, `![a-b][b-c][c-d][d-e][e-f][f-g]`);
 
-  const t2 = reducePairwise(`a b c d e f`.split(` `), reducer, `!`);
+  const t2 = pairwiseReduce(`a b c d e f`.split(` `), reducer, `!`);
   t.is(t2, `![a-b][b-c][c-d][d-e][e-f]`);
 
-  const t3 = reducePairwise([], reducer, `!`);
+  const t3 = pairwiseReduce([], reducer, `!`);
   t.is(t3, `!`);
 
-  const t4 = reducePairwise([ `a` ], reducer, `!`);
+  const t4 = pairwiseReduce([ `a` ], reducer, `!`);
   t.is(t4, `!`);
 
   // @ts-ignore
-  t.throws(() => reducePairwise(`hello`, reducer, ``));
+  t.throws(() => pairwiseReduce(`hello`, reducer, ``));
 
   t.pass();
 });
@@ -294,23 +288,23 @@ test(`ensureLength`, (t) => {
   t.like(ensureLength([ 1, 2, 3 ], 5, `last`), [ 1, 2, 3, 3, 3 ]);
 });
 
-test(`valuesEqual`, (t) => {
+test(`isContentsTheSame`, (t) => {
   const a = [ 10, 10, 10 ];
   const b = [ `hello`, `hello`, `hello` ];
   const c = [ true, true, true ];
   const d = [ 100 ];
 
-  t.true(valuesEqual(a));
-  t.true(valuesEqual(b));
-  t.true(valuesEqual(c));
-  t.true(valuesEqual(d));
+  t.true(isContentsTheSame(a));
+  t.true(isContentsTheSame(b));
+  t.true(isContentsTheSame(c));
+  t.true(isContentsTheSame(d));
 
   const a1 = [ 10, 10, 11 ];
   const b1 = [ `Hello`, `hello` ];
   const c1 = [ true, false ];
-  t.false(valuesEqual(a1));
-  t.false(valuesEqual(b1));
-  t.false(valuesEqual(c1));
+  t.false(isContentsTheSame(a1));
+  t.false(isContentsTheSame(b1));
+  t.false(isContentsTheSame(c1));
 });
 
 // test(``, () => {

@@ -1,5 +1,5 @@
 import test from 'ava';
-import {circularArray} from '../../collections/CircularArray.js';
+import { circularArray } from '../../collections/arrays/CircularArray.js';
 
 test(`circularArray`, t => {
   const ca1 = circularArray<string>(5);
@@ -23,7 +23,7 @@ test(`circularArray`, t => {
   t.true(ca4 !== ca5);
   t.true(ca5 !== ca6);
 
-  t.like(ca6 as string[], [`a`, `b`, `c`, `d`, `e`]);
+  t.like(ca6 as string[], [ `a`, `b`, `c`, `d`, `e` ]);
 
   t.false(ca1.isFull);
   t.false(ca2.isFull);
@@ -44,7 +44,7 @@ test(`circularArray`, t => {
   t.true(ca7.length === 5);
   t.true(ca7.pointer === 1);
 
-  t.like(ca6 as string[], [`a`, `b`, `c`, `d`, `e`]);
-  t.like(ca7 as string[], [`f`, `b`, `c`, `d`, `e`]);
+  t.like(ca6 as string[], [ `a`, `b`, `c`, `d`, `e` ]);
+  t.like(ca7 as string[], [ `f`, `b`, `c`, `d`, `e` ]);
 
 });

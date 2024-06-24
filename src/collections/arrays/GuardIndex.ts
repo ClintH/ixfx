@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "../util/GuardNumbers.js";
+import { throwIntegerTest } from "../../util/GuardNumbers.js";
 import { guardArray } from "./GuardArray.js";
 /**
  * Throws if `index` is an invalid array index for `array`, and if

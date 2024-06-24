@@ -1,4 +1,4 @@
-import { guardArray } from '../GuardArray.js';
+import { guardArray } from './GuardArray.js';
 /**
  * Sorts an array of objects in ascending order
  * by the given property name, assuming it is a number.

@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
 import * as TreeTraverse from '../../../collections/tree/TraversableTree.js';
-import type { LabelledSingleValue } from 'src/collections/tree/Types.js';
+import type { LabelledSingleValue } from '../../../collections/tree/Types.js';
 
 test(`compute-max-depth`, t => {
   const r = TreeMutable.root();

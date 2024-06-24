@@ -1,23 +1,5 @@
 import type { SimpleEventEmitter } from "../../Events.js";
-/**
- * Queue (mutable). See also {@link IQueueImmutable} for the immutable version.
- *
- * Queues are useful if you want to treat 'older' or 'newer'
- * items differently. _Enqueing_ adds items at the back of the queue, while
- * _dequeing_ removes items from the front (ie. the oldest).
- *
- * ```js
- * const q = queue();       // Create
- * q.enqueue(`a`, `b`);     // Add two strings
- * const front = q.dequeue();  // `a` is at the front of queue (oldest)
- * ```
- *
- * @example Cap size to 5 items, throwing away newest items already in queue.
- * ```js
- * const q = queue({capacity: 5, discardPolicy: `newer`});
- * ```
- *
- */
+
 
 export type QueueMutableEvents<V> = {
   /**
@@ -42,6 +24,25 @@ export interface IQueueMutableWithEvents<V> extends IQueueMutable<V>, SimpleEven
 
 }
 
+/**
+ * Queue (mutable). See also {@link IQueueImmutable} for the immutable version.
+ *
+ * Queues are useful if you want to treat 'older' or 'newer'
+ * items differently. _Enqueing_ adds items at the back of the queue, while
+ * _dequeing_ removes items from the front (ie. the oldest).
+ *
+ * ```js
+ * const q = queue();       // Create
+ * q.enqueue(`a`, `b`);     // Add two strings
+ * const front = q.dequeue();  // `a` is at the front of queue (oldest)
+ * ```
+ *
+ * @example Cap size to 5 items, throwing away newest items already in queue.
+ * ```js
+ * const q = queue({capacity: 5, discardPolicy: `newer`});
+ * ```
+ *
+ */
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IQueueMutable<V> {
 

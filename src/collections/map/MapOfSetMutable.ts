@@ -1,5 +1,5 @@
 import { toStringDefault } from '../../util/index.js';
-import { without } from '../arrays/index.js';
+import { without } from '../arrays/Filter.js';
 import type { MapSetOpts, MultiValue } from './MapMulti.js';
 import { MapOfMutableImpl } from './MapOfMultiImpl.js';
 import {

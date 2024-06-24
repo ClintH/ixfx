@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "../util/GuardNumbers.js";
+import { throwIntegerTest } from "../../util/GuardNumbers.js";
 
 /**
  * The circular array is immutable. It keeps up to `capacity` items.
