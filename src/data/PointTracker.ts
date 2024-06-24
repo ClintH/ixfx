@@ -7,7 +7,7 @@ import {
 import { ObjectTracker } from './ObjectTracker.js';
 import { length as LineLength } from '../geometry/line/Length.js';
 import { Vectors } from '../geometry/index.js';
-import { Empty as LinesEmpty } from 'src/geometry/line/index.js';
+import { Empty as LinesEmpty } from '../geometry/line/index.js';
 import type { Coord as PolarCoord } from '../geometry/Polar.js';
 import type { Line, PolyLine } from '../geometry/line/LineType.js';
 import type { Point } from '../geometry/point/PointType.js';

@@ -1,6 +1,6 @@
 import type { Interval } from '../flow/IntervalType.js';
-import { averageWeighted } from '../collections/arrays/AverageWeighted.js';
-import { average } from '../collections/arrays/NumericArrays.js';
+import { averageWeighted } from '../numbers/AverageWeighted.js';
+import { average } from '../numbers/NumericArrays.js';
 import { QueueMutable } from '../collections/queue/QueueMutable.js';
 import { throwNumberTest, numberTest } from "../util/GuardNumbers.js";
 import { rateMinimum } from '../flow/RateMinimum.js';
