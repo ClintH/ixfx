@@ -1,6 +1,6 @@
-import type { IsEqualContext } from '../../Immutable.js';
+import type { IsEqualContext } from '../../data/Util.js';
 import type { Interval } from '../../flow/IntervalType.js';
-import type { InitLazyStreamOptions, Lazy } from '../Types.js';
+import type { InitLazyStreamOptions, Lazy, Reactive } from '../Types.js';
 import type { IsEqual } from "../../util/IsEqual.js";
 
 export type TriggerValue<TTriggerValue> = {
@@ -87,7 +87,7 @@ export type TimeoutTriggerOptions<TTriggerValue> = Trigger<TTriggerValue> & {
 /**
  * Options when creating a reactive object.
  */
-export type ObjectOptions<V> = {
+export type ObjectOptions<V extends Record<string, any>> = {
   /**
    * _false_ by default.
    * If _true_, inherited fields are included. This is necessary for event args, for example.
@@ -99,6 +99,7 @@ export type ObjectOptions<V> = {
    */
   eq: IsEqualContext<V>
 }
+
 
 export type PingedFunctionOptions = {
   /**
@@ -248,23 +249,20 @@ export type DomValueOptions = EventOptions & {
    * Respond to when value has changed or when value is changing
    * Default: `changed`
    */
-  when: `changed` | `progress`
-
+  when: `changed` | `changing`
   fallbackValue: string
+  upstreamSource?: Reactive<any>
+  upstreamFilter?: (value: any) => string
 }
 
-
-// export type DomValueAsNumberOptions = DomValueOptions<number> & {
-//   /**
-//    * If _true_, automatically converts values to be relative based on min and max, if available
-//    * Default: false
-//    */
-//   makeRelative?: boolean
-//   /**
-//    * If _true_, value is inverted based on max/min attributes.
-//    * Default: false.
-//    * 
-//    * eg if value is 300, min:0, max:300, value emitted will be 0.
-//    */
-//   invert?: boolean
-// } 
+export type DomNumberInputValueOptions = DomValueOptions & {
+  /**
+   * If true, sets up INPUT element to operate with relative values
+   */
+  relative?: boolean
+  /**
+   * If true, when setting up, sets max to be on left side
+   */
+  inverted?: boolean
+  upstreamSource?: Reactive<number>
+} 
