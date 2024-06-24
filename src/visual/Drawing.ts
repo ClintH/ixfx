@@ -15,7 +15,7 @@ import type { Rect, RectPositioned } from '../geometry/rect/index.js';
 import type { Path } from '../geometry/path/PathType.js';
 import type { Triangle } from '../geometry/triangle/TriangleType.js';
 
-import { empty as RectsEmpty } from '../geometry/rect/index.js';
+import { empty as RectsEmpty } from '../geometry/rect/Empty.js';
 import { corners as RectsCorners } from '../geometry/rect/Corners.js';
 import { isLine } from '../geometry/line/Guard.js';
 import { roundUpToMultiple } from '../numbers/Round.js';
@@ -60,6 +60,7 @@ export const getContext = (
   return ctx;
 };
 
+export type DrawingHelper = ReturnType<typeof makeHelper>
 /**
  * Makes a helper object that wraps together a bunch of drawing functions that all use the same drawing context
  * @param ctxOrCanvasEl Drawing context or canvs element reference
@@ -70,9 +71,9 @@ export const makeHelper = (
   ctxOrCanvasEl: CanvasContextQuery,
   canvasBounds?: Rect
 ) => {
-  // TODO: Is there a way of automagically defining makeHelper to avoid repetition and keep typesafety and JSDoc?
   const ctx = getContext(ctxOrCanvasEl);
   return {
+    ctx,
     paths(pathsToDraw: Array<Path>, opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
     },
