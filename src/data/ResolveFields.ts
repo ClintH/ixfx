@@ -1,6 +1,7 @@
 import * as Rx from '../rx/index.js';
 import { type PrimitiveOrObject } from "../PrimitiveTypes.js";
 import { isPrimitive } from '../IsPrimitive.js';
+import { mapObjectShallow } from './MapObject.js';
 
 type ValueType = string | number | boolean | object
 
@@ -199,6 +200,8 @@ export function reactiveUpdate<S extends Record<string, PrimitiveOrObject>>(sche
   // eslint-disable-next-line @typescript-eslint/require-await
   let fetch = async (): Promise<S> => { return current.last() };
 
+  let replaceSource = (field: Extract<keyof S, string>, source: Resolvable<any>, disposeOld: boolean) => { /** no-op */ }
+
   const applyNewData = (data: Partial<S>): S => {
     return current.update(data);
   }
@@ -209,30 +212,84 @@ export function reactiveUpdate<S extends Record<string, PrimitiveOrObject>>(sche
       const data = await rx.compute() as Partial<S>;
       return applyNewData(data);
     }
+    replaceSource = rx.replaceSource;
   }
-  return { ...current, pull: fetch }
+  return { ...current, pull: fetch, replaceSource }
+}
+
+export type ReactiveUpdate<T> = {
+  source?: Resolvable<T>
+  //factory?: () => Resolvable<T>
+  value: T
 }
 
 
-export function pull<T extends Record<string, PrimitiveOrObject | Resolvable<any>>>(value: T): { compute: () => Promise<PullRecord<T>>, dispose: () => void } {
+/**
+ * Given an key-value set of values or {@link Resolvable}, manually pull a composite set of values from it.
+ * ```js
+ * const data = {
+ *  name: `ace`,
+ *  x: Math.random,
+ * }
+ * const p = pull(data);
+ * 
+ * const v = await p.compute(); // Yields: { name: `ace`, x: 0.213 }
+ * ```
+ * 
+ * A {@link Resolveable} is a function, generator/iterable, promise or Reactive.
+ * 
+ * It's also possible to replace a source by key
+ * ```js
+ * p.replaceSource(`x`, () => { Math.random() / 2 });
+ * ```
+ * @param value 
+ * @returns 
+ */
+export function pull<T extends Record<string, PrimitiveOrObject | Resolvable<any>>>(value: T): {
+  replaceSource: (field: Extract<keyof T, string>, source: Resolvable<any>, disposeOld: boolean) => Rx.Reactive<any> | PrimitiveOrObject | Function,
+  compute: () => Promise<PullRecord<T>>,
+  dispose: () => void,
+  last: () => Partial<PullRecord<T>>
+} {
   const sources: Record<string, Rx.Reactive<any>> = {};
   const fixedValues: Record<string, Array<any> | PrimitiveOrObject> = {};
   // eslint-disable-next-line @typescript-eslint/ban-types
   const callers: Record<string, Function | (() => any)> = {};
 
-  for (const [ key, v ] of Object.entries(value)) {
-    if (Array.isArray(v) || isPrimitive(v)) {
-      fixedValues[ key ] = v;
-    } else if (typeof v === `function`) {
-      callers[ key ] = v;
+  const setSource = (field: string, source: Resolvable<any> | PrimitiveOrObject) => {
+    if (Array.isArray(source) || isPrimitive(source)) {
+      fixedValues[ field ] = source;
+    } else if (typeof source === `function`) {
+      callers[ field ] = source;
     } else {
       try {
-        const s = Rx.resolveSource(v as any);
-        (sources as any)[ key ] = s;
+        const s = Rx.resolveSource(source as any);
+        latestToObjectRx.replaceSource(field, s);
       } catch {
-        fixedValues[ key ] = v;
+        fixedValues[ field ] = source;
       }
     }
+  }
+
+  const removeSource = (field: string, disposeOld: boolean): Rx.Reactive<any> | PrimitiveOrObject | Function => {
+    if (field in sources) {
+      const s = sources[ field ];
+      delete sources[ field ];
+      if (disposeOld) s.dispose(`ResolveFields.pull.removeSource`);
+      return s;
+    } else if (field in fixedValues) {
+      const s = fixedValues[ field ];
+      delete fixedValues[ field ];
+      return s;
+    } else if (field in callers) {
+      const s = callers[ field ];
+      delete callers[ field ];
+      return s;
+    } else throw new Error(`Field '${ field }' not found`);
+  }
+
+  for (const [ key, v ] of Object.entries(value)) {
+    setSource(key, v);
   }
 
   // Merge sources to one Rx
@@ -250,49 +307,34 @@ export function pull<T extends Record<string, PrimitiveOrObject | Resolvable<any
     return r;
   }
 
-  const compute = async () => ({ ...fixedValues, ...lastRxValue, ...(await computeCallers()) } as PullRecord<T>);
+  let lastComputed: PullRecord<T> = mapObjectShallow<T, undefined>(value, args => {
+    return undefined;
+  }) as PullRecord<T>;
+
+  const compute = async () => {
+    lastComputed = { ...fixedValues, ...lastRxValue, ...(await computeCallers()) } as PullRecord<T>;
+    return lastComputed;
+  }
+
   const dispose = () => {
     latestToObjectOff();
     latestToObjectRx.dispose(`ResolveFields.dispose`);
   }
-  return { compute, dispose };
+  return {
+    last: () => lastComputed,
+    compute,
+    dispose,
+    /**
+     * Replaces a source, returning previous. This is useful if a source needs to be disposed.
+     * Throws an error if 'field' does not exist.
+     * @param field 
+     * @param source 
+     * @returns 
+     */
+    replaceSource: (field, source, disposeOld) => {
+      const existing = removeSource(field, disposeOld);
+      setSource(field, source);
+      return existing;
+    }
+  };
 }
-
-// export function push<T extends Record<string, Primitive | Rx.ReactiveOrSource<any>>>(value: T): { compute: () => Rx.RxPrimitiveValueTypeObject<T>, dispose: () => void } {
-//   const sources: Record<string, Rx.Reactive<any>> = {};
-//   //const interval = intervalToMs(options.interval, 100);
-//   const fixedValues: Record<string, Array<any> | Primitive> = {};
-
-//   // Convert dynamic things to a Reactive and stash under 'sources'
-//   // Stash fixed values to 'fixedValues'
-//   for (const [ key, v ] of Object.entries(value)) {
-//     if (Array.isArray(v) || isPrimitive(v)) {
-//       fixedValues[ key ] = v;
-//       continue;
-//     }
-//     const s = Rx.resolveSource(v);
-//     (sources as any)[ key ] = s;
-//   }
-
-//   // Merge sources to one Rx
-//   const r = Rx.mergeToObject(sources, { onSourceDone: `allow` });
-
-//   // Throttle data if necessary
-//   // if (interval > 0) {
-//   //   r = Rx.throttle(r, { elapsed: interval });
-//   // }
-
-//   let lastRxValue: Record<string, any> | undefined;
-//   const off = r.onValue(v => {
-//     lastRxValue = v;
-//   });
-
-//   const compute = () => ({ ...fixedValues, ...lastRxValue } as Rx.RxPrimitiveValueTypeObject<T>);
-//   const dispose = () => {
-//     off();
-//     if (Rx.isDisposable(r)) {
-//       r.dispose(`ResolveFields.dispose`);
-//     }
-//   }
-//   return { compute, dispose };
-// }
