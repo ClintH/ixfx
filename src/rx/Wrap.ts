@@ -5,7 +5,7 @@ import type { ReactiveOrSource, Wrapped, ToArrayOptions, InitStreamOptions, Reac
 import type { BatchOptions, FieldOptions, FilterPredicate, DebounceOptions, SwitcherOptions, SplitOptions, ThrottleOptions, TransformOpts, SyncOptions, } from './ops/Types.js'
 import type { TimeoutTriggerOptions } from './sources/Types.js'
 import { messageHasValue } from "./Util.js";
-import { map as ImmutableMap } from '../Immutable.js';
+import { mapObjectShallow } from '../data/MapObject.js';
 import * as Enacts from './sinks/index.js';
 import type { Processors } from "../data/Process.js";
 
@@ -89,12 +89,12 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
     },
     splitLabelled: <K extends keyof TIn>(...labels: Array<K>) => {
       const l = Ops.splitLabelled<TIn, keyof TIn>(source, labels);
-      const m = ImmutableMap<typeof l, Wrapped<TIn>>(l, v => wrap(v as Reactive<TIn>)) as Record<K, Wrapped<TIn>>;
+      const m = mapObjectShallow<typeof l, Wrapped<TIn>>(l, args => wrap(args.value as Reactive<TIn>)) as Record<K, Wrapped<TIn>>;
       return m;
     },
     switcher: <TRec extends Record<string, FilterPredicate<TIn>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}) => {
       const s = Ops.switcher<TIn, TRec, TLabel>(source, cases, options);
-      const m = ImmutableMap<typeof s, Wrapped<TIn>>(s, v => wrap(v as Reactive<TIn>));
+      const m = mapObjectShallow<typeof s, Wrapped<TIn>>(s, args => wrap(args.value as Reactive<TIn>));
       return m as Record<TLabel, Wrapped<TIn>>;
     },
     syncToArray: <const T extends ReadonlyArray<ReactiveOrSource<any>>>(additionalSources: T, options: Partial<SyncOptions> = {}) => {
