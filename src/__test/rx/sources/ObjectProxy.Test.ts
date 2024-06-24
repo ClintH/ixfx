@@ -42,7 +42,7 @@ test(`from-proxy-object`, async t => {
     valueFired++;
   });
   personRx.onDiff(diff => {
-    t.deepEqual(diff.value, [ { path: `name`, value: `john`, previous: `jill`, state: `change` } ]);
+    t.deepEqual(diff, [ { path: `name`, value: `john`, previous: `jill`, state: `change` } ]);
     valueFired++;
   })
 
@@ -75,7 +75,7 @@ test(`from-proxy-object`, async t => {
     valueFired++;
   });
   arrayRx.onDiff(diff => {
-    t.deepEqual(diff.value, [ { path: `1`, value: `d`, previous: `b`, state: `change` } ]);
+    t.deepEqual(diff, [ { path: `1`, value: `d`, previous: `b`, state: `change` } ]);
     valueFired++;
   });
 

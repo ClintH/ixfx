@@ -74,8 +74,8 @@ test(`update`, async t => {
     t.deepEqual(message.value, [ `a`, `b` ]);
     count++;
   });
-  o2.onDiff(diffMsg => {
-    t.deepEqual(diffMsg.value, [
+  o2.onDiff(value => {
+    t.deepEqual(value, [
       { path: '0', previous: '', value: 'a', state: `change` },
       { path: '1', previous: undefined, value: 'b', state: `added` }
     ]);
@@ -120,8 +120,7 @@ test(`set`, async t => {
 
     count++;
   });
-  o.onDiff(diffV => {
-    const diff = diffV.value;
+  o.onDiff(diff => {
     if (count === 0) t.deepEqual(diff, [
       { path: `name`, previous: `bob`, value: `jane`, state: `change` }
     ]);
