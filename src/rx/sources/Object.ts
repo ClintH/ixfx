@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { DispatchList } from "../../flow/DispatchList.js";
-import * as Immutable from "../../Immutable.js";
+import * as Immutable from "../../data/Pathed.js";
 import { initStream } from "../InitStream.js";
 import type { ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
 import type { ObjectOptions } from "./Types.js";
+import { isEqualContextString } from "src/data/Util.js";
 
 type ObjectFieldHandler = (value: any, fieldName: string) => void
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
@@ -61,9 +62,9 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
  * @returns 
  */
 export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
-  const eq = options.eq ?? Immutable.isEqualContextString;
+  const eq = options.eq ?? isEqualContextString;
   const setEvent = initStream<V>();
-  const diffEvent = initStream<Array<Immutable.Change<any>>>();
+  const diffEvent = initStream<Array<Immutable.PathDataChange<any>>>();
 
   const fieldChangeEvents = new Map<string, DispatchList<ObjectFieldHandler>>;
 
@@ -71,14 +72,12 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
   let disposed = false;
 
   const set = (v: V) => {
-    if (value !== undefined) {
-      const diff = Immutable.compareData(value, v, { ...options, includeMissingFromA: true });
-      //console.log(`Rx.fromObject.set diff`, diff);
-      if (diff.length === 0) return;
-      diffEvent.set(diff);
-    }
+    const diff = [ ...Immutable.compareData(value ?? {} as V, v, { ...options, includeMissingFromA: true }) ];
+    if (diff.length === 0) return;
     value = v;
     setEvent.set(v);
+    diffEvent.set(diff);
+
   }
 
   const fireFieldUpdate = (field: string, value: any) => {
@@ -98,7 +97,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
       }
       return value;
     } else {
-      const diff = Immutable.compareData(value, toMerge);
+      const diff = [ ...Immutable.compareData(value, toMerge) ];
       const diffWithoutRemoved = diff.filter(d => d.state !== `removed`);
       if (diffWithoutRemoved.length === 0) return value; // No changes
       value = {
@@ -106,8 +105,8 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
         ...toMerge
       }
       //console.log(`diff: ${ JSON.stringify(diff) }`);
-      diffEvent.set(diff);
       setEvent.set(value);
+      diffEvent.set(diff);
       for (const d of diffWithoutRemoved) {
         fireFieldUpdate(d.path, d.value);
       }
@@ -125,7 +124,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
       //console.log(`Rx.object.updateField identical existing: ${ existing } value: ${ valueForField } path: ${ path }`);
       return;
     }
-    let diff = Immutable.compareData(existing, valueForField, { ...options, includeMissingFromA: true });
+    let diff = [ ...Immutable.compareData(existing, valueForField, { ...options, includeMissingFromA: true }) ];
     diff = diff.map(d => {
       if (d.path.length > 0) return { ...d, path: path + `.` + d.path };
       return { ...d, path };
@@ -136,8 +135,8 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     value = o;
     //diffEvent.set([ { path, value: valueForField, previous: existing } ]);
 
-    diffEvent.set(diff);
     setEvent.set(o);
+    diffEvent.set(diff);
     fireFieldUpdate(path, valueForField);
     //console.log(`Rx.fromObject.updateField: path: '${ path }' value: '${ JSON.stringify(valueForField) }' o: ${ JSON.stringify(o) }`);
   }
@@ -162,7 +161,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     last: () => value,
     on: setEvent.on,
     onValue: setEvent.onValue,
-    onDiff: diffEvent.on,
+    onDiff: diffEvent.onValue,
     onField(fieldName: string, handler: (value: any, fieldName: string) => void) {
       let listeners = fieldChangeEvents.get(fieldName.toLowerCase());
       if (listeners === undefined) {
