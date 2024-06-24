@@ -1,6 +1,6 @@
 import type { GenOrData, GenFactoryNoInput, CombineLatestOptions, Gen } from "./Types.js";
 import { resolveToGen } from "./Util.js";
-import { isEqual as ArrayIsEqual } from "../../collections/arrays/index.js";
+import { isEqual as ArrayIsEqual } from "../../collections/arrays/Equality.js";
 
 /**
  * Monitors sources, storing as they happen to an array.

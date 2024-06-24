@@ -1,7 +1,7 @@
 
 import type { KeyValue } from './PrimitiveTypes.js';
 import { defaultComparer } from './util/index.js';
-import { minMaxAvg as arrayMinMaxAg } from './collections/arrays/index.js';
+import { minMaxAvg as arrayMinMaxAg } from './collections/arrays/MinMaxAvg.js';
 
 // const byKey = (reverse = false) => pipe(
 //   reverse ? reverseOrd(S.Ord) : S.Ord,

@@ -163,6 +163,14 @@ export const until = (it: Iterable<any>, callback: () => (void | boolean | never
   }
 }
 
+export const next = <T>(it: Generator<T>) => {
+  return () => {
+    const r = it.next();
+    if (r.done) return;
+    return r.value;
+  }
+}
+
 /**
  * Returns true if items in two iterables are equal, as
  * determined by the `equality` function.
