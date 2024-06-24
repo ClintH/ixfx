@@ -1,15 +1,13 @@
-import * as Immutable from "../Immutable.js";
+import * as Immutable from "../data/Pathed.js";
 import { resolveEl } from "../dom/ResolveEl.js";
 import * as Rx from "./index.js";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind } from './Types.js';
 import { hasLast, messageHasValue, messageIsSignal } from "./Util.js";
-import type { Change } from "../Immutable.js";
 import { getFromKeys } from "../collections/map/MapFns.js";
 import { afterMatch, beforeMatch } from "../Text.js";
 import { stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "../text/Segments.js";
 import { QueueMutable } from "../collections/index.js";
 import { object } from "./sources/Object.js";
-import * as Colour from '../visual/Colour.js';
 
 /**
  * Reactive stream of array of elements that match `query`.
@@ -508,7 +506,7 @@ export const bindUpdate = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLEl
 export const bindDiffUpdate = <V>(
   source: Rx.ReactiveDiff<V>,
   elOrQuery: string | HTMLElement | null,
-  updater: (diffs: Array<Change<any>>, el: HTMLElement) => void,
+  updater: (diffs: Array<Immutable.PathDataChange<any>>, el: HTMLElement) => void,
   opts: Partial<BindUpdateOpts<V>> = {}
 ): PipeDomBinding & { refresh: () => void } => {
   if (elOrQuery === null) throw new Error(`Param 'elOrQuery' is null`);
@@ -516,16 +514,12 @@ export const bindDiffUpdate = <V>(
 
   const el = resolveEl(elOrQuery);
   //const binds = opts.binds;
-  const update = (value: Array<Change<any>>) => {
+  const update = (value: Array<Immutable.PathDataChange<any>>) => {
     updater(value, el);
   }
 
-  const unsub = source.onDiff(message => {
-    if (Rx.messageHasValue(message)) {
-      update(message.value);
-    } else {
-      console.warn(message);
-    }
+  const unsub = source.onDiff(value => {
+    update(value);
   });
 
   const init = () => {
@@ -679,19 +673,19 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
     }
   }
 
-  const changes = (changes: Array<Immutable.Change<any>>) => {
+  const changes = (changes: Array<Immutable.PathDataChange<any> | Immutable.PathData<any>>) => {
     const queue = new QueueMutable({}, changes);
     let d = queue.dequeue();
     const seenPaths = new Set<string>();
     while (d !== undefined) {
       //for (const d of changes) {
       const path = d.path;
-      if (d.previous === undefined) {
+      if (!(`previous` in d) || d.previous === undefined) {
         // Create
         console.log(`Rx.Dom.elements.changes no previous. path: ${ path }`);
 
         create(path, d.value);
-        const subdata = Immutable.getPathsAndData(d.value, Number.MAX_SAFE_INTEGER, path);
+        const subdata = [ ...Immutable.getPathsAndData(d.value, Number.MAX_SAFE_INTEGER, path) ];
         console.log(subdata);
         for (const dd of subdata) {
           if (!seenPaths.has(dd.path)) {
@@ -726,11 +720,9 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
   /**
    * Source has changed
    */
-  source.onDiff(message => {
-    if (message.value) {
-      console.log(`Rx.Dom.elements diff ${ JSON.stringify(message.value) } `);
-      changes(message.value);
-    }
+  source.onDiff(value => {
+    //console.log(`Rx.Dom.elements diff ${ JSON.stringify(value) } `);
+    changes(value);
   });
 
   // Source has an initial value, use that
@@ -739,7 +731,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
     // Get data of value as a set of paths and data
     // but only at first level of depth, because changes() will probe
     // deeper itself
-    changes(Immutable.getPathsAndData(last as object, 1));
+    changes([ ...Immutable.getPathsAndData(last as object, 1) ]);
   }
 };
 
