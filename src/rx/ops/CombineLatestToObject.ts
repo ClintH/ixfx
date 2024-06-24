@@ -2,8 +2,24 @@
 import { Maps } from "../../collections/index.js"
 import { initStream } from "../InitStream.js"
 import { resolveSource } from "../ResolveSource.js"
-import type { ReactiveOrSource, CombineLatestOptions, Reactive, RxValueTypeObject, ReactiveInitial } from "../Types.js"
-import { messageIsDoneSignal, messageHasValue } from "../Util.js"
+import type { ReactiveOrSource, CombineLatestOptions, Reactive, RxValueTypeObject, ReactiveInitial, RxValueTypeRx, ReactiveDiff } from "../Types.js"
+import { messageIsDoneSignal, messageHasValue, isWritable } from "../Util.js"
+import { object } from "../sources/Object.js"
+
+export type CombineLatestToObject<T extends Record<string, ReactiveOrSource<any>>> = {
+  hasSource: (field: string) => boolean,
+  replaceSource: (field: Extract<keyof T, string>, source: ReactiveOrSource<any>) => void
+  /**
+   * Reactive sources being combined
+   */
+  sources: RxValueTypeRx<T>
+  /**
+   * Updates writable sources with values.
+   * @param data 
+   * @returns Keys and values set to writable source(s)
+   */
+  setWith: (data: Partial<RxValueTypeObject<T>>) => Partial<RxValueTypeObject<T>>
+} & ReactiveDiff<RxValueTypeObject<T>> & ReactiveInitial<RxValueTypeObject<T>>;
 
 /**
  * Monitors input reactive values, storing values as they happen to an object.
@@ -34,7 +50,7 @@ import { messageIsDoneSignal, messageHasValue } from "../Util.js"
  * @param options Options for merging 
  * @returns 
  */
-export function combineLatestToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<CombineLatestOptions> = {}): Reactive<RxValueTypeObject<T>> & ReactiveInitial<RxValueTypeObject<T>> {
+export function combineLatestToObject<const T extends Record<string, ReactiveOrSource<any>>>(reactiveSources: T, options: Partial<CombineLatestOptions> = {}): CombineLatestToObject<T> {// { sources: RxValueTypeRx<T> } & Reactive<RxValueTypeObject<T>> & ReactiveInitial<RxValueTypeObject<T>> {
   type State<V> = {
     source: Reactive<V>
     done: boolean
@@ -42,7 +58,7 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
     off: () => void
   }
   const disposeSources = options.disposeSources ?? true;
-  const event = initStream<RxValueTypeObject<T>>();
+  const event = object<RxValueTypeObject<T>>(undefined);
   const onSourceDone = options.onSourceDone ?? `break`;
 
   const states = new Map<string, State<any>>();
@@ -57,6 +73,7 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
     }
     states.set(key, s);
   }
+  const sources = Object.fromEntries(Object.entries(states).map(entry => [ entry[ 0 ], entry[ 1 ].source ])) as RxValueTypeRx<T>;
   // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
   const someUnfinished = () => Maps.some(states, v => !v.done);
 
@@ -65,16 +82,18 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
     for (const state of states.values()) state.off();
   }
 
-  const getData = (): RxValueTypeObject<T> => {
+  const getData = () => {
     const r = {};
     for (const [ key, state ] of states) {
-      (r as any)[ key ] = state.data;
+      const d = state.data;
+      if (d !== undefined) {
+        (r as any)[ key ] = state.data;
+      }
     }
     return r as RxValueTypeObject<T>;
   }
 
-  for (const state of states.values()) {
-    //console.log(`Rx.MergeToObject loop`);
+  const wireUpState = (state: State<any>) => {
     state.off = state.source.on(message => {
       if (messageIsDoneSignal(message)) {
         state.done = true;
@@ -97,9 +116,38 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
     });
   }
 
+  for (const state of states.values()) {
+    wireUpState(state);
+  }
+
   return {
-    on: event.on,
-    onValue: event.onValue,
+    ...event,
+    hasSource(field: string) {
+      return states.has(field)
+    },
+    replaceSource(field, source) {
+      const state = states.get(field);
+      if (state === undefined) throw new Error(`Field does not exist: '${ field }'`);
+      state.off();
+      const s = resolveSource(source);
+      state.source = s;
+      wireUpState(state);
+    },
+    setWith(data) {
+      let written = {};
+      for (const [ key, value ] of Object.entries(data)) {
+        const state = states.get(key);
+        if (state !== undefined) {
+          if (isWritable(state.source)) {
+            state.source.set(value);
+            (written as any)[ key ] = value;
+          }
+          state.data = value;
+        }
+      }
+      return written;
+    },
+    sources,
     last() {
       return getData()
     },
@@ -111,9 +159,6 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
           v.source.dispose(`Part of disposed mergeToObject`)
         }
       }
-    },
-    isDisposed() {
-      return event.isDisposed()
-    },
+    }
   }
 }
