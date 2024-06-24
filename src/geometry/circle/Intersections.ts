@@ -3,6 +3,58 @@ import { sum as PointsSum } from "../point/Sum.js";
 import { subtract as PointsSubtract } from "../point/Subtract.js";
 import type { Point } from '../point/PointType.js';
 import type { CirclePositioned } from "./CircleType.js";
+import type { Line } from "../line/LineType.js";
+
+/**
+ * Returns the point(s) of intersection between a circle and line.
+ * 
+ * ```js
+ * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
+ * const circle = { radius: 5, x: 5, y: 5 };
+ * const line = { a: { x: 0, y: 0 }, b: { x: 10, y: 10 } };
+ * const pts = Circles.intersectionLine(circle, line);
+ * ```
+ * @param circle 
+ * @param line 
+ * @returns Point(s) of intersection, or empty array
+ */
+export const intersectionLine = (circle: CirclePositioned, line: Line): ReadonlyArray<Point> => {
+  const v1 = {
+    x: line.b.x - line.a.x,
+    y: line.b.y - line.a.y
+  };
+  const v2 = {
+    x: line.a.x - circle.x,
+    y: line.a.y - circle.y
+  };
+
+  const b = (v1.x * v2.x + v1.y * v2.y) * -2;
+  const c = 2 * (v1.x * v1.x + v1.y * v1.y);
+
+  const d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - circle.radius * circle.radius));
+  if (Number.isNaN(d)) return []; // no intercept
+
+  const u1 = (b - d) / c;  // these represent the unit distance of point one and two on the line
+  const u2 = (b + d) / c;
+
+  const returnValue = [];
+  if (u1 <= 1 && u1 >= 0) {  // add point if on the line segment
+    //eslint-disable-next-line functional/immutable-data
+    returnValue.push({
+      x: line.a.x + v1.x * u1,
+      y: line.a.y + v1.y * u1
+    });
+  }
+  if (u2 <= 1 && u2 >= 0) {  // second add point if on the line segment
+    //eslint-disable-next-line functional/immutable-data
+    returnValue.push({
+      x: line.a.x + v1.x * u2,
+      y: line.a.y + v1.y * u2
+    });
+  }
+  return returnValue;
+};
+
 
 /**
  * 

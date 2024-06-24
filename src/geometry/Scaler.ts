@@ -1,8 +1,9 @@
 
-import { isPoint } from './point/index.js';
 import type { Point } from './point/PointType.js';
+import type { Rect } from './rect/index.js';
+import { isPoint } from './point/index.js';
 import { isRect } from './rect/Guard.js';
-import { placeholder as PlaceholderRect, type Rect } from './rect/index.js';
+import { placeholder as PlaceholderRect } from './rect/Placeholder.js';
 
 /**
  * A scale function that takes an input value to scale.
@@ -48,8 +49,8 @@ export type ScalerCombined = {
 
   readonly height: number;
 
+  computeScale(): Point
 };
-
 
 export type ScaleBy = `both` | `min` | `max` | `width` | `height`;
 
@@ -57,7 +58,7 @@ export type ScaleBy = `both` | `min` | `max` | `width` | `height`;
  * Returns a set of scaler functions, to convert to and from ranges.
  *
  * ```js
- * const scaler = Scaler.scaler(`both`, window.innerWidth, window.innerHeight);
+ * const scaler = Scaler.scaler(`both`, {width:window.innerWidth, height:window.innerHeight});
  * // Assuming screen of 800x400...
  * scaler.abs(400,200);          // Yields { x:0.5, y:0.5 }
  * scaler.abs({ x:400, y:200 }); // Yields { x:0.5, y:0.5 }
@@ -222,6 +223,7 @@ export const scaler = (
   };
 
   return {
+    computeScale,
     rel: scaleRel,
     abs: scaleAbs,
     width: defaultBounds.width,

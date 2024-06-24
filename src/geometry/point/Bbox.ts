@@ -1,7 +1,7 @@
 import type { RectPositioned } from "../rect/RectTypes.js";
 import { findMinimum } from "./FindMinimum.js";
 import type { Point } from "./PointType.js";
-import { maxFromCorners as RectsMaxFromCorners } from '../rect/index.js';
+import { maxFromCorners as RectsMaxFromCorners } from '../rect/Max.js';
 /**
  * Returns the minimum rectangle that can enclose all provided points
  * @param points

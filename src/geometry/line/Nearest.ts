@@ -1,7 +1,7 @@
 import type { Point } from "../point/PointType.js";
 import type { Line } from "./LineType.js";
 import { distance as PointsDistance } from "../point/Distance.js";
-import { minIndex } from "../../collections/arrays/NumericArrays.js";
+import { minIndex } from "../../numbers/NumericArrays.js";
 /**
  * Returns the nearest point on `line` closest to `point`.
  * 

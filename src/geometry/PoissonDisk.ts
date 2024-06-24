@@ -1,8 +1,8 @@
-import * as Rects from './rect/index.js';
 import * as Grids from './Grid.js';
-import * as Points from './point/index.js';
-import { Arrays } from '../collections/index.js';
 import type { Point, RectPositioned } from "./Types.js";
+import { randomPluck } from '../collections/arrays/Random.js';
+import { distance as PointsDistance } from './point/Distance.js';
+import { randomPoint as RectsRandomPoint } from './rect/Random.js';
 export type PoissonDiskOpts = {
   readonly radius?: number;
   readonly limit?: number;
@@ -20,7 +20,7 @@ const isPointValid = (
   for (const p of Grids.visitNeigbours(grid, reference, `undefined`)) {
     const pointInGrid = ar[ p.y ][ p.x ];
     if (pointInGrid) {
-      const distribution = Points.distance(point, pointInGrid);
+      const distribution = PointsDistance(point, pointInGrid);
       if (distribution < radius) return false;
     }
   }
@@ -41,7 +41,7 @@ export const poissonDisk = (
     size: size,
   };
 
-  const randomPoint = () => Rects.randomPoint(rect);
+  const randomPoint = () => RectsRandomPoint(rect);
   const ar = Grids.toArray<Point>(grid);
   const arUpdater = Grids.array2dUpdater<Point>(grid, ar);
   const active: Array<Point> = [];
@@ -53,7 +53,7 @@ export const poissonDisk = (
 
   while (active.length > 0) {
     if (!growthPoint) {
-      growthPoint = Arrays.randomPluck(active, true).value;
+      growthPoint = randomPluck(active, true).value;
     }
     if (growthPoint) {
       const reference = Grids.cellAtPoint(grid, growthPoint);

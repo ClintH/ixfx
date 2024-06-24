@@ -1,4 +1,4 @@
-import { dotProduct as ArraysDotProduct } from '../../collections/arrays/index.js';
+import { dotProduct as ArraysDotProduct } from '../../numbers/NumericArrays.js';
 import type { Point } from './PointType.js';
 import { toArray } from './ToArray.js';
 

@@ -1,11 +1,10 @@
-import * as Lines from './line/index.js';
-import * as Points from './point/index.js';
 import type { CirclePositioned } from "./circle/CircleType.js";
-import type { Path } from "./path/index.js";
+import type { Path } from "./path/PathType.js";
 import type { Point } from "./point/PointType.js";
-import { Arrays } from '../collections/index.js';
 import { joinPointsToLines } from './line/JoinPointsToLines.js';
 import { toPath } from './line/ToPath.js';
+import { distance as PointsDistance } from "./point/Distance.js";
+import { sortByNumericProperty } from "../collections/arrays/SortByNumericProperty.js";
 
 export type Waypoint = CirclePositioned;
 
@@ -90,7 +89,7 @@ export const init = (paths: ReadonlyArray<Path>, opts: Partial<WaypointOpts> = {
   const checkUnordered = (pt: Point): Array<WaypointResult> => {
     const results = paths.map((p, index) => {
       const nearest = p.nearest(pt);
-      const distance = Points.distance(pt, nearest);
+      const distance = PointsDistance(pt, nearest);
 
       // Relative position of nearest point on this path segment
       const positionRelative = p.relativePosition(nearest, maxDistanceFromLine);;
@@ -98,7 +97,7 @@ export const init = (paths: ReadonlyArray<Path>, opts: Partial<WaypointOpts> = {
     });
 
     const filtered = results.filter((v) => v.distance <= maxDistanceFromLine);
-    const sorted = Arrays.sortByNumericProperty(filtered, `distance`);
+    const sorted = sortByNumericProperty(filtered, `distance`);
 
     // Assign ranks
     // eslint-disable-next-line unicorn/no-for-loop

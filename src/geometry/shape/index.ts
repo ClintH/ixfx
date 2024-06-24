@@ -8,8 +8,9 @@ import { corners as RectsCorners } from '../rect/Corners.js';
 import { center as RectsCenter } from '../rect/Center.js';
 import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
 import { isIntersecting as CirclesIsIntersecting } from '../circle/Intersecting.js';
-import { randomPoint as circleRandomPoint, center as circleCenter } from '../circle/index.js';
-import { randomPoint as rectRandomPoint } from '../rect/index.js';
+import { randomPoint as circleRandomPoint } from '../circle/Random.js';
+import { center as circleCenter } from '../circle/Center.js';
+import { randomPoint as rectRandomPoint } from '../rect/Random.js';
 import { isRect, isRectPositioned } from '../rect/Guard.js';
 import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';
 import type { Rect, RectPositioned, } from '../rect/RectTypes.js';
@@ -58,7 +59,7 @@ export const isIntersecting = (
 //   Nw, Ne, Sw, Se
 // }
 
-export type RandomPointOpts = {
+export type ShapeRandomPointOpts = {
   readonly randomSource: RandomSource;
 };
 
@@ -71,7 +72,7 @@ export type RandomPointOpts = {
  */
 export const randomPoint = (
   shape: ShapePositioned,
-  opts: Partial<RandomPointOpts> = {}
+  opts: Partial<ShapeRandomPointOpts> = {}
 ): Point => {
   if (isCirclePositioned(shape)) {
     return circleRandomPoint(shape, opts);

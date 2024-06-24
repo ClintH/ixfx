@@ -17,6 +17,10 @@ export function degreeToRadian(angleInDegrees: number | ReadonlyArray<number>): 
   return Array.isArray(angleInDegrees) ? angleInDegrees.map(v => v * (Math.PI / 180)) : (angleInDegrees as number) * (Math.PI / 180);
 }
 
+export function radianInvert(angleInRadians: number) {
+  return (angleInRadians + Math.PI) % (2 * Math.PI);
+}
+
 /**
  * Convert angle in radians to angle in degrees
  * @param angleInRadians

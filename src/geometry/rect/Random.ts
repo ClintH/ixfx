@@ -30,7 +30,7 @@ export const random = (rando?: RandomSource): RectPositioned => {
   });
 };
 
-export type RandomPointOpts = {
+export type RectRandomPointOpts = {
   readonly strategy?: `naive`;
   readonly randomSource?: RandomSource;
   readonly margin?: { readonly x: number; readonly y: number };
@@ -50,7 +50,7 @@ export type RandomPointOpts = {
  */
 export const randomPoint = (
   within: Rect | RectPositioned,
-  opts: RandomPointOpts = {}
+  opts: RectRandomPointOpts = {}
 ): Point => {
   // TODO: Does not implement uniform distribution
   // See: https://math.stackexchange.com/questions/366474/find-coordinates-of-n-points-uniformly-distributed-in-a-rectangle
