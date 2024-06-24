@@ -11,10 +11,10 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import { Arrays } from '../collections/index.js';
 import { numberTracker } from '../data/NumberTracker.js';
 import { AudioAnalyser } from './AudioAnalyser.js';
 import type { Point } from '../geometry/point/PointType.js';
+import { minMaxAvg } from '../collections/arrays/MinMaxAvg.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {
@@ -115,7 +115,7 @@ export default class AudioVisualiser {
 
     const pointer = this.getPointerRelativeTo(canvas);
     const width = canvasWidth / bins;
-    const minMax = Arrays.minMaxAvg(freq);
+    const minMax = minMaxAvg(freq);
 
     //eslint-disable-next-line functional/no-let
     for (let i = 0; i < bins; i++) {

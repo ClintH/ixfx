@@ -1,6 +1,6 @@
-import { Arrays } from '../collections/index.js';
 import AudioVisualiser from './AudioVisualiser.js';
 import { throwNumberTest, throwIntegerTest, isPowerOfTwo } from '../util/GuardNumbers.js';
+import { max, maxFast } from '../numbers/NumericArrays.js';
 
 /**
  * Options for audio processing
@@ -133,7 +133,7 @@ export const peakLevel = (
   new AudioAnalyser((node, analyser) => {
     const wave = new Float32Array(node.fftSize);
     node.getFloatTimeDomainData(wave);
-    onData(Arrays.maxFast(wave), analyser);
+    onData(maxFast(wave), analyser);
   }, opts);
 
 /**
@@ -317,7 +317,7 @@ export class AudioAnalyser {
     freqData: ReadonlyArray<number>
   ): number {
     const samples = this.sliceByFrequency(lowFreq, highFreq, freqData);
-    return Arrays.max(samples);
+    return max(samples);
   }
 
   /**
