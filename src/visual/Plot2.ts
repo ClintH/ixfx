@@ -1,19 +1,19 @@
-import { minIndex } from '../collections/arrays/NumericArrays.js';
-import * as Arrays from '../collections/arrays/index.js';
+import { minIndex } from '../numbers/NumericArrays.js';
 import * as Points from '../geometry/point/index.js';
 import { clamp } from '../data/Clamp.js';
 import { flip } from '../data/Flip.js';
 import { scale } from '../data/Scale.js';
 import * as Sg from './SceneGraph.js';
-
 import { textRect, textWidth } from './Drawing.js';
-import { getPaths, getField } from '../Immutable.js';
+import { getPaths, getField } from '../data/Pathed.js';
 import { ifNaN, throwNumberTest } from '../util/GuardNumbers.js';
 import type { Rect, RectPositioned, PointCalculableShape } from '../geometry/Types.js';
 import type { Point } from '../geometry/point/PointType.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
 import { scaleCanvas } from './ScaleCanvas.js';
 import { parentSizeCanvas } from '../dom/CanvasSizing.js';
+import type { MinMaxAvgTotal } from '../collections/arrays/Types.js';
+import { minMaxAvg } from '../collections/arrays/MinMaxAvg.js';
 
 /**
  * 
@@ -111,7 +111,7 @@ class ArrayDataSource implements DataSource {
   dirty = false;
   type = `array`;
 
-  private _range: Arrays.MinMaxAvgTotal | undefined;
+  private _range: MinMaxAvgTotal | undefined;
 
   constructor(series: Series) {
     this.series = series;
@@ -136,7 +136,7 @@ class ArrayDataSource implements DataSource {
   get range(): DataRange {
     if (!this.dirty && this._range !== undefined) return this._range;
     this.dirty = false;
-    const updatedRange = Arrays.minMaxAvg(this.data);
+    const updatedRange = minMaxAvg(this.data);
     if (this._range === undefined || updatedRange.max !== this._range.max || updatedRange.min !== this._range.min) {
       this._range = updatedRange;
       return { ...this._range, changed: true };

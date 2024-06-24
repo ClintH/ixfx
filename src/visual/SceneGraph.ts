@@ -1,13 +1,18 @@
-import { Arrays } from '../collections/index.js';
-import { Points } from '../geometry/index.js';
-import * as Rects from '../geometry/rect/index.js';
+// #region imports
 import { intersectsPoint as RectsIntersectsPoint } from '../geometry/rect/Intersects.js';
 import { isPlaceholder as RectsIsPlaceholder } from '../geometry/rect/Guard.js';
-import { placeholderPositioned as RectsPlaceholderPositioned, placeholder as RectsPlaceholder, emptyPositioned as RectsEmptyPositioned } from '../geometry/rect/index.js';
+import { emptyPositioned as RectsEmptyPositioned } from '../geometry/rect/Empty.js';
+import { placeholderPositioned as RectsPlaceholderPositioned, placeholder as RectsPlaceholder } from '../geometry/rect/Placeholder.js';
 import { hue as randomHue } from '../random/index.js';
 import type { Point } from '../geometry/point/PointType.js';
 import type { Rect, RectPositioned } from '../geometry/rect/index.js';
-
+import { isEqualSize as RectIsEqualSize } from '../geometry/rect/IsEqual.js';
+import { isEqual as PointsIsEqual } from '../geometry/point/IsEqual.js';
+import { Empty as PointsEmpty } from '../geometry/point/Empty.js';
+import { withoutUndefined } from '../collections/arrays/Filter.js';
+import { clamp as RectsClamp } from '../geometry/rect/Clamp.js';
+import { subtract as PointsSubtract } from '../geometry/point/Subtract.js';
+// #endregion
 export type Measurement = {
   actual: Rect;
   ref: Box;
@@ -358,7 +363,7 @@ export abstract class Box {
   protected measureApply(m: Measurement) {
     this._needsMeasuring = false;
 
-    const different = this._measuredSize === undefined ? true : !Rects.isEqualSize(m.actual, this._measuredSize);
+    const different = this._measuredSize === undefined ? true : !RectIsEqualSize(m.actual, this._measuredSize);
     if (different) {
       //this.debugLog(`measureApply: Size is different than previous. Actual: ${ JSON.stringify(m.actual) } current: ${ JSON.stringify(this._measuredSize) }`);
       this._needsLayoutX = true;
@@ -379,7 +384,7 @@ export abstract class Box {
   protected layoutApply(l: Layout) {
     this._needsLayoutX = false;
 
-    const different = this._layoutPosition === undefined ? true : !Points.isEqual(l.actual, this._layoutPosition);
+    const different = this._layoutPosition === undefined ? true : !PointsIsEqual(l.actual, this._layoutPosition);
     // if (different) {
     //   this.debugLog(`layoutApply. Position different than previous. ${ JSON.stringify(l.actual) }`);
     // }
@@ -408,7 +413,7 @@ export abstract class Box {
   layoutStart(measureState: MeasureState, layoutState: LayoutState, force: boolean, parent?: Layout): Layout | undefined {
     const m: Layout = {
       ref: this,
-      actual: Points.Empty,
+      actual: PointsEmpty,
       children: [],
     };
     // Stash away measurement by id
@@ -424,7 +429,7 @@ export abstract class Box {
     m.actual = currentPosition;
 
     m.children = this.children.map((c) => c.layoutStart(measureState, layoutState, force, m));
-    if (Arrays.withoutUndefined(m.children).length < this.children.length) {
+    if (withoutUndefined(m.children).length < this.children.length) {
       return undefined; // One of the children did not resolve
     }
     return m;
@@ -498,7 +503,7 @@ export abstract class Box {
     }
 
     m.children = this.children.map((c) => c.measureStart(opts, force, m));
-    if (Arrays.withoutUndefined(m.children).length < this.children.length) {
+    if (withoutUndefined(m.children).length < this.children.length) {
       //this.debugLog(`measureStart: Child failed measureStart`);
       return undefined; // One of the children did not resolve
     }
@@ -523,7 +528,7 @@ export abstract class Box {
     const context = parent ? parent.actual : opts.bounds;
     const desired = opts.resolveBox(this._desiredRect);
 
-    size = desired ? Rects.clamp(desired, context) : context;
+    size = desired ? RectsClamp(desired, context) : context;
 
     if (RectsIsPlaceholder(size)) {
       return `Box.measureSelf - No size for box?`;
@@ -676,7 +681,7 @@ export class CanvasBox extends Box {
   private notifyClick(p: Point) {
     if (RectsIsPlaceholder(this.canvasRegion)) return;
     if (RectsIntersectsPoint(this.canvasRegion, p)) {
-      const pp = Points.subtract(p, this.canvasRegion.x, this.canvasRegion.y);
+      const pp = PointsSubtract(p, this.canvasRegion.x, this.canvasRegion.y);
       this.onClick(pp);
       // TODO: Only call `notifyClick` if child is within range?
       for (const c of this.children) (c as CanvasBox).notifyClick(pp);
@@ -701,7 +706,7 @@ export class CanvasBox extends Box {
   private notifyPointerMove(p: Point) {
     if (RectsIsPlaceholder(this.canvasRegion)) return;
     if (RectsIntersectsPoint(this.canvasRegion, p)) {
-      const pp = Points.subtract(p, this.canvasRegion.x, this.canvasRegion.y);
+      const pp = PointsSubtract(p, this.canvasRegion.x, this.canvasRegion.y);
       this.onPointerMove(pp);
       for (const c of this.children) (c as CanvasBox).notifyPointerMove(pp);
     }

@@ -3,7 +3,7 @@ import type { CirclePositioned } from '../geometry/circle/CircleType.js';
 import type { Point } from '../geometry/point/PointType.js';
 import type { Line } from '../geometry/line/LineType.js';
 //import * as Lines from '../geometry/line/index.js';
-import { fromNumbers as LinesFromNumbers } from 'src/geometry/line/FromNumbers.js';
+import { fromNumbers as LinesFromNumbers } from '../geometry/line/FromNumbers.js';
 import * as Svg from './Svg.js';
 import { getCssVariable } from './Colour.js';
 //import {Palette} from ".";
