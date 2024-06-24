@@ -2,7 +2,7 @@ import Color, { type Range } from 'colorjs.io';
 
 import { defaultRandom, type RandomSource } from '../random/Types.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
-import { piecewise } from '../collections/arrays/index.js';
+import { pairwise } from '../collections/arrays/Pairwise.js';
 import { scale as scaleNumber } from '../data/Scale.js';
 import { clamp } from '../data/Clamp.js';
 
@@ -392,8 +392,7 @@ const interpolatorInit = (colours: Array<Colourish>) => {
   if (!Array.isArray(colours)) throw new Error(`Param 'colours' is not an array as expected. Got: ${ typeof colours }`);
   if (colours.length < 2) throw new Error(`Param 'colours' should be at least two in length. Got: ${ colours.length }`);
   const c = colours.map(colour => resolve(colour));
-  const pieces = [ ...piecewise(c) ];
-  return pieces;
+  return [ ...pairwise(c) ];
 }
 
 /**
