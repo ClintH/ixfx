@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { isEqualValueDefault } from "../../util/IsEqual.js";
-import * as Arrays from '../../collections/arrays/index.js';
 import { initStream } from "../InitStream.js";
 import type { ReactiveInitial, ReactiveNonInitial, ReactiveArray, Reactive } from "../Types.js";
 import type { ArrayObjectOptions } from "./Types.js";
 import { compareArrays, type ChangeRecord } from "../../data/Compare.js";
-
+import { remove as ArraysRemove } from '../../collections/arrays/Remove.js';
+import { insertAt as ArraysInsertAt } from "../../collections/arrays/InsertAt.js";
 /**
  * Wraps an array object
  * @param initialValue 
@@ -42,7 +42,7 @@ export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Par
   }
 
   const deleteAt = (index: number) => {
-    const valueChanged = Arrays.remove(value, index);
+    const valueChanged = ArraysRemove(value, index);
     if (valueChanged.length === value.length) return; // no change
     const diff = compareArrays<V>(value as Array<V>, valueChanged, eq);
     //console.log(diff.summary);
@@ -62,7 +62,7 @@ export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Par
   }
 
   const insertAt = (index: number, v: V) => {
-    const valueChanged = Arrays.insertAt(value, index, v);
+    const valueChanged = ArraysInsertAt(value, index, v);
     const diff = compareArrays<V>(value as Array<V>, valueChanged, eq);
     value = valueChanged;
     setEvent.set([ ...value ]);

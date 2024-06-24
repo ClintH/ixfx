@@ -1,4 +1,4 @@
-import { shuffle } from "../../collections/arrays/index.js";
+import { shuffle } from "../../collections/arrays/Random.js";
 import { initUpstream } from "../InitStream.js";
 import type { ReactiveOrSource, Reactive } from "../Types.js";
 import type { SingleFromArrayOptions } from "./Types.js";
