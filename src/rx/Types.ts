@@ -1,6 +1,6 @@
 import type { Primitive } from '../PrimitiveTypes.js';
 import type { Interval } from '../flow/IntervalType.js';
-import * as Immutable from '../Immutable.js';
+import * as Immutable from '../data/Pathed.js';
 import type { BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions, OpMathOptions } from './ops/Types.js';
 import type { TimeoutTriggerOptions } from './sources/Types.js';
 import type { SetHtmlOptions } from './sinks/Dom.js';
@@ -288,6 +288,8 @@ export type Reactive<V> = {
 
   dispose(reason: string): void
   isDisposed(): boolean
+  set?(value: V): void
+
 }
 
 export type Unsubscriber = () => void;
@@ -333,7 +335,7 @@ export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
    * Use the returned function to unsubscribe.
    * @param handler 
    */
-  onDiff(handler: (changes: Passed<Array<Immutable.Change<any>>>) => void): () => void
+  onDiff(changes: (changes: Array<Immutable.PathDataChange<any>>) => void): () => void
   /**
    * Updates the reactive with some partial key-value pairs.
    * Keys omitted are left the same as the current value.
@@ -525,6 +527,16 @@ export type RxValueTypes<T extends ReadonlyArray<ReactiveOrSource<any>>> =
     never };
 
 export type RxValueTypeObject<T extends Record<string, ReactiveOrSource<any>>> =
+  { [ K in keyof T ]: T[ K ] extends Reactive<infer V> ? V :
+    T[ K ] extends Wrapped<infer V> ? V :
+    T[ K ] extends Generator<infer V> ? V :
+    T[ K ] extends AsyncGenerator<infer V> ? V :
+    T[ K ] extends IterableIterator<infer V> ? V :
+    T[ K ] extends AsyncIterableIterator<infer V> ? V :
+    T[ K ] extends Array<infer V> ? V :
+    never };
+
+export type RxValueTypeObjectOrUndefined<T extends Record<string, ReactiveOrSource<any>>> =
   { [ K in keyof T ]: T[ K ] extends Reactive<infer V> ? V | undefined :
     T[ K ] extends Wrapped<infer V> ? V | undefined :
     T[ K ] extends Generator<infer V> ? V | undefined :
@@ -534,6 +546,15 @@ export type RxValueTypeObject<T extends Record<string, ReactiveOrSource<any>>> =
     T[ K ] extends Array<infer V> ? V | undefined :
     never };
 
+export type RxValueTypeRx<T extends Record<string, ReactiveOrSource<any>>> =
+  { [ K in keyof T ]: T[ K ] extends Reactive<infer V> ? Reactive<V> :
+    T[ K ] extends Wrapped<infer V> ? Reactive<V> :
+    T[ K ] extends Generator<infer V> ? Reactive<V> :
+    T[ K ] extends AsyncGenerator<infer V> ? Reactive<V> :
+    T[ K ] extends IterableIterator<infer V> ? Reactive<V> :
+    T[ K ] extends AsyncIterableIterator<infer V> ? Reactive<V> :
+    T[ K ] extends Array<infer V> ? Reactive<V> :
+    never };
 
 export type PrimitiveValueTypeObject<T extends Record<string, Primitive>> =
   { [ K in keyof T ]:
