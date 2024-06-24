@@ -1,6 +1,6 @@
 import { mapKeys } from '../util/MapKeys.js';
 import { isEqualDefault, type IsEqual } from '../util/IsEqual.js';
-
+import { compareValuesShallow as IterableCompareValues } from '../iterables/CompareValues.js';
 export type ChangeKind = `mutate` | `add` | `del`
 export type ChangeRecord<TKey extends string | number | symbol> = [ kind: ChangeKind, path: TKey, value: any ];
 
@@ -33,6 +33,26 @@ export type CompareChangeSet<TKey extends string | number> = {
    * Summary of changes
    */
   summary: Array<ChangeRecord<TKey>>
+}
+
+/**
+ * Compares the keys of two objects, returning a set of those in
+ * common, and those in either A or B exclusively.
+ * ```js
+ * const a = { colour: `red`, intensity: 5 };
+ * const b = { colour: `pink`, size: 10 };
+ * const c = compareKeys(a, b);
+ * // c.shared = [ `colour` ]
+ * // c.a = [ `intensity` ]
+ * // c.b = [ `size`  ]
+ * ```
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const compareKeys = (a: object, b: object) => {
+  const c = IterableCompareValues(Object.keys(a), Object.keys(b));
+  return c;
 }
 
 /**
@@ -111,8 +131,10 @@ export const compareArrays = <TValue>(a: Array<TValue>, b: Array<TValue>, eq: Is
 }
 
 /**
- * Compares A to B. Assumes they are simple objects, essentially key-value pairs, where the values are primitive values or other simple objects. It also works with arrays.
+ * Compares A to B. Assumes they are simple objects, essentially key-value pairs, where the 
+ * values are primitive values or other simple objects. It also works with arrays.
  * 
+ * Uses === equality semantics by default.
  * @param a 
  * @param b 
  */
