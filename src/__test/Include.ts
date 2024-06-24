@@ -1,8 +1,9 @@
 /* eslint-disable */
-import test, { type ExecutionContext } from 'ava';
-import { minMaxAvg } from '../collections/arrays/NumericArrays.js';
-import { compareValuesEqual } from '../collections/arrays/index.js';
+import { type ExecutionContext } from 'ava';
 import { isEqualDefault } from '../util/IsEqual.js';
+import { isContentsTheSame } from '../collections/arrays/Equality.js';
+import { minMaxAvg } from '../collections/arrays/MinMaxAvg.js';
+import { hasEqualValuesShallow } from '../iterables/CompareValues.js';
 //test.todo('sf');
 
 export const areIntegers = (t: ExecutionContext, a: Array<number>) => {
@@ -17,7 +18,7 @@ export const arrayValuesEqual = <V>(
   b: Iterable<V>,
   eq = isEqualDefault<V>
 ) => {
-  if (compareValuesEqual(a, b, eq)) {
+  if (hasEqualValuesShallow(a, b, eq)) {
     t.assert(true);
   } else {
     t.fail(`Arrays not equal. A: ${ JSON.stringify(a) } B: ${ JSON.stringify(b) }`);

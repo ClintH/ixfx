@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as Dg from '../../../data/graphs/DirectedGraph.js';
 import { arrayValuesEqual } from '../../Include.js';
-import { compareValuesEqual } from '../../../collections/arrays/index.js';
+import { hasEqualValuesShallow } from '../../../iterables/CompareValues.js';
 
 const linearGraph = () => {
   return Dg.graph(
@@ -134,7 +134,7 @@ test(`cycles`, t => {
     [ `g`, `f` ],
     [ `a`, `b`, `e` ],
     [ `c`, `d`, `h` ]
-  ], compareValuesEqual);
+  ], hasEqualValuesShallow);
 });
 
 test(`connect`, t => {

@@ -2,8 +2,6 @@ import test from 'ava';
 import { interpolate, interpolatorInterval, interpolatorStepped } from '../../data/Interpolate.js';
 import { round } from '../../numbers/Round.js';
 import { delayLoop } from '../../flow/Delay.js';
-import { arrayValuesEqual } from '../Include.js';
-import { compareValuesEqual } from '../../collections/Iterables.js';
 
 test(`basic`, t => {
   t.is(interpolate(0, 0, 100), 0);

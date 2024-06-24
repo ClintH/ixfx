@@ -1,6 +1,7 @@
 import test from 'ava';
 
 import * as Rects from '../../geometry/rect/index.js';
+import { getRectPositionedParameter } from '../../geometry/rect/GetRectPositionedParameter.js';
 
 test(`corners`, t => {
   const r1 = Rects.corners({ x: 10, y: 10, width: 20, height: 5 });
@@ -15,27 +16,27 @@ test(`corners`, t => {
 test(`getRectPositionedParameter`, t => {
 
   // x,y,w,h
-  const r1 = Rects.getRectPositionedParameter(1, 2, 3, 4);
+  const r1 = getRectPositionedParameter(1, 2, 3, 4);
   t.deepEqual(r1, { x: 1, y: 2, width: 3, height: 4 });
 
   // Point,w,h
-  const r2 = Rects.getRectPositionedParameter({ x: 1, y: 2 }, 3, 4);
+  const r2 = getRectPositionedParameter({ x: 1, y: 2 }, 3, 4);
   t.deepEqual(r2, { x: 1, y: 2, width: 3, height: 4 });
 
   // Point,Rect
-  const r3 = Rects.getRectPositionedParameter({ x: 1, y: 2 }, { width: 3, height: 4 });
+  const r3 = getRectPositionedParameter({ x: 1, y: 2 }, { width: 3, height: 4 });
   t.deepEqual(r3, { x: 1, y: 2, width: 3, height: 4 });
 
   // RectPositioned
-  const r4 = Rects.getRectPositionedParameter({ x: 1, y: 2, width: 3, height: 4 });
+  const r4 = getRectPositionedParameter({ x: 1, y: 2, width: 3, height: 4 });
   t.deepEqual(r4, { x: 1, y: 2, width: 3, height: 4 });
 
   // x,y,Rect
-  const r5 = Rects.getRectPositionedParameter(1, 2, { width: 3, height: 4 });
+  const r5 = getRectPositionedParameter(1, 2, { width: 3, height: 4 });
   t.deepEqual(r5, { x: 1, y: 2, width: 3, height: 4 });
 
   // Rect,Point
-  const r6 = Rects.getRectPositionedParameter({ width: 3, height: 4 }, { x: 1, y: 2 });
+  const r6 = getRectPositionedParameter({ width: 3, height: 4 }, { x: 1, y: 2 });
   t.deepEqual(r6, { x: 1, y: 2, width: 3, height: 4 });
 
 

@@ -2,7 +2,7 @@
 import test from 'ava';
 import type { KeyValue } from '../../PrimitiveTypes.js';
 import { FrequencyMutable } from '../../data/FrequencyMutable.js';
-import { shuffle } from '../../collections/arrays/index.js';
+import { shuffle } from '../../collections/arrays/Random.js';
 import { arrayValuesEqual } from '../Include.js';
 import { isEqualValueDefault } from '../../util/IsEqual.js';
 
