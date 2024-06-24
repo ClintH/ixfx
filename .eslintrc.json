@@ -39,9 +39,13 @@
       "ignore": [
         ".*Opts$",
         "ctx",
+        "args*",
+        "Args*",
         "el",
-        "fn",
+        "fn*",
+        "*Fn",
         "opts",
+        "dest",
         ".*El$"
       ],
       "allowList":{"args":true}}],

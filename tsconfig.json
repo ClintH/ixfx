@@ -12,10 +12,10 @@
       "@types/w3c-web-serial"
     ],
     "target": "esnext",
-    "module": "NodeNext",
+    "moduleResolution": "bundler",
+    "module": "es2022",
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
-    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "alwaysStrict": true,
     "strict": true,
@@ -24,7 +24,8 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "removeComments": false,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true
   },
   "include": [
     "./src"

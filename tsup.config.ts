@@ -16,7 +16,6 @@ export default defineConfig({
     global: `./src/MakeGlobal.ts`,
     geometry: `./src/geometry/index.ts`,
     guards: `./src/util/guards.ts`,
-    immutable: './src/Immutable.ts',
     iterables: './src/iterables/index.ts',
     io: './src/io/index.ts',
     keyValues: `./src/KeyValue.ts`,
