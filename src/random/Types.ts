@@ -21,3 +21,10 @@ export type RandomOptions = Readonly<{
   min?: number;
   source?: RandomSource;
 }>
+
+export type GenerateRandomOptions = RandomOptions & Readonly<{
+  /**
+   * If true, number range is looped
+   */
+  loop?: boolean;
+}>;

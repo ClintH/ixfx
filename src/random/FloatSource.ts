@@ -47,3 +47,26 @@ export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSou
 
   return () => source() * (max - min) + min;
 };
+
+/**
+ * Returns a random float between `max` (exclusive) and 0 (inclusive). Max is 1 if unspecified.
+ * Use {@link floatSource} to get a function that produces values. This is used internally.
+ *
+ * ```js
+ * // Random number between 0..1 (but not including 1)
+ * // (this would be identical to Math.random())
+ * const v = float();
+ * // Random float between 0..100 (but not including 100)
+ * const v = float(100);
+ * ```
+ *
+ * Options can be used:
+ * ```js
+ * // Random float between 20..40 (possibly including 20, but always lower than 40)
+ * const v = float({ min: 20, max: 40 });
+ * ```
+ * @param maxOrOptions Maximum value (exclusive) or options
+ * @returns Random number
+ */
+export const float = (maxOrOptions: number | RandomOptions = 1): number =>
+  floatSource(maxOrOptions)();
