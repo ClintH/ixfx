@@ -103,11 +103,7 @@ export const makeHelper = (
     },
     dot(
       dotPosition: Point | Array<Point>,
-      opts?: DrawingOpts & {
-        radius: number;
-        outlined?: boolean;
-        filled?: boolean;
-      }
+      opts?: DotOpts
     ): void {
       dot(ctx, dotPosition, opts);
     },
@@ -562,6 +558,13 @@ export const copyToImg = (canvasEl: HTMLCanvasElement): HTMLImageElement => {
   return img;
 };
 
+export type DotOpts = DrawingOpts & {
+  readonly radius?: number;
+  readonly stroke?: boolean;
+  readonly filled?: boolean;
+  readonly strokeWidth?: number;
+}
+
 /**
  * Draws filled circle(s) at provided point(s)
  * @param ctx
@@ -571,32 +574,35 @@ export const copyToImg = (canvasEl: HTMLCanvasElement): HTMLImageElement => {
 export const dot = (
   ctx: CanvasRenderingContext2D,
   pos: Point | ReadonlyArray<Point>,
-  opts?: DrawingOpts & {
-    readonly radius?: number;
-    readonly outlined?: boolean;
-    readonly filled?: boolean;
-  }
+  opts?: DotOpts
 ) => {
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
 
   applyOpts(ctx, opts);
 
-  ctx.beginPath();
+  const makePath = () => {
+    ctx.beginPath();
 
-  // x&y for arc is the center of circle
-  if (Array.isArray(pos)) {
-    for (const p of pos) {
+    // x&y for arc is the center of circle
+    if (Array.isArray(pos)) {
+      for (const p of pos) {
+        ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
+      }
+    } else {
+      const p = pos as Point;
       ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
     }
-  } else {
-    const p = pos as Point;
-    ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
   }
-
-  //eslint-disable-next-line functional/immutable-data
-  if (opts.filled || !opts.outlined) ctx.fill();
-  if (opts.outlined) ctx.stroke();
+  makePath();
+  if (opts.filled || !opts.stroke) {
+    ctx.fill();
+  }
+  if (opts.stroke) {
+    if (opts.strokeWidth) ctx.lineWidth = opts.strokeWidth;
+    //makePath();
+    ctx.stroke();
+  }
 };
 
 /**
