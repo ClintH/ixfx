@@ -37,6 +37,15 @@ export type InterpolationOpts = {
   hue: `longer` | `shorter` | `increasing` | `decreasing` | `raw`
 };
 
+export const toHsla = (colour: Colourish): Hsla => {
+  const hsl = toHsl(colour);
+  if (`opacity` in hsl) return hsl as Hsla;
+  else return {
+    ...hsl,
+    opacity: 1
+  }
+}
+
 /**
  * Parses colour to `{ h, s, l }`, each field being on 0..1 scale.
  * 
