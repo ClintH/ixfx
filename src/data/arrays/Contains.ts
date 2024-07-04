@@ -1,6 +1,6 @@
 import { toStringDefault } from "../../util/ToString.js";
 import { isEqualDefault } from "../../util/IsEqual.js";
-import { fromIterable as mapFromIterable } from '../map/MapFns.js';
+import { fromIterable as mapFromIterable } from '../../data/maps/MapFns.js';
 
 /**
  * Returns _true_ if contents of `needles` is contained by `haystack`.

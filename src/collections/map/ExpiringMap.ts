@@ -1,5 +1,5 @@
 import { SimpleEventEmitter } from '../../Events.js';
-import { sortByValueProperty } from './MapFns.js';
+import { sortByValueProperty } from '../../data/maps/MapFns.js';
 import { intervalToMs, type Interval } from '../../flow/IntervalType.js';
 import { throwIntegerTest } from '../../util/GuardNumbers.js';
 

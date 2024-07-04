@@ -255,17 +255,26 @@ export function pull<T extends Record<string, PrimitiveOrObject | Resolvable<any
   const fixedValues: Record<string, Array<any> | PrimitiveOrObject> = {};
   // eslint-disable-next-line @typescript-eslint/ban-types
   const callers: Record<string, Function | (() => any)> = {};
+  let initialised = false;
 
   const setSource = (field: string, source: Resolvable<any> | PrimitiveOrObject) => {
     if (Array.isArray(source) || isPrimitive(source)) {
+      //console.log(`setSource: ${ field } is fixed`);
       fixedValues[ field ] = source;
     } else if (typeof source === `function`) {
+      //console.log(`setSource: ${ field } is func`);
       callers[ field ] = source;
     } else {
       try {
         const s = Rx.resolveSource(source as any);
-        latestToObjectRx.replaceSource(field, s);
-      } catch {
+        //console.log(`setSource: ${ field } is Rx`);
+        if (initialised) {
+          latestToObjectRx.replaceSource(field, s);
+        } else {
+          sources[ field ] = s;
+        }
+      } catch (_e) {
+        //console.log(`setSource: ${ field } is dunno`, e);
         fixedValues[ field ] = source;
       }
     }
@@ -294,10 +303,15 @@ export function pull<T extends Record<string, PrimitiveOrObject | Resolvable<any
 
   // Merge sources to one Rx
   const latestToObjectRx = Rx.combineLatestToObject(sources, { onSourceDone: `allow` });
+  initialised = true;
   let lastRxValue: Record<string, any> | undefined;
+
+  // Record latest value
   const latestToObjectOff = latestToObjectRx.onValue(v => {
     lastRxValue = v;
   });
+  // See if we can pull the value from those that have one
+  lastRxValue = latestToObjectRx.last();
 
   const computeCallers = async () => {
     const r = {};

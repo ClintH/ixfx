@@ -18,7 +18,7 @@ import { isRectPositioned } from "../rect/Guard.js";
  *
  * @example Find closest shape to point
  * ```
- * import {minIndex} from '../collections/arrays.js';
+ * import {minIndex} from '../data/arrays.js';
  * const shapes = [ some shapes... ]; // Shapes to compare against
  * const pt = { x: 10, y: 10 };       // Comparison point
  * const distances = shapes.map(v => distanceToExterior(pt, v));

@@ -124,8 +124,9 @@ export const rgbReducer: KernelReduce<Rgb> = (values: ReadonlyArray<ScalarAndVal
     r: r,
     g: g,
     b: b,
-    opacity: 255
-  };
+    opacity: 255,
+    space: `srgb`
+  } as const;
   return result;
 };
 export const identityKernel = [

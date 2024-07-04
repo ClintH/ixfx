@@ -1,8 +1,8 @@
 /* eslint-disable */
 import { type ExecutionContext } from 'ava';
 import { isEqualDefault } from '../util/IsEqual.js';
-import { isContentsTheSame } from '../collections/arrays/Equality.js';
-import { minMaxAvg } from '../collections/arrays/MinMaxAvg.js';
+import { isContentsTheSame } from '../data/arrays/Equality.js';
+import { minMaxAvg } from '../data/arrays/MinMaxAvg.js';
 import { hasEqualValuesShallow } from '../iterables/CompareValues.js';
 //test.todo('sf');
 

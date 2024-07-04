@@ -2,21 +2,20 @@ import Color, { type Range } from 'colorjs.io';
 
 import { defaultRandom, type RandomSource } from '../random/Types.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
-import { pairwise } from '../collections/arrays/Pairwise.js';
+import { pairwise } from '../data/arrays/Pairwise.js';
 import { scale as scaleNumber } from '../data/Scale.js';
 import { clamp } from '../data/Clamp.js';
 
-export type Hsl = { h: number; s: number; l: number; opacity?: number };
-export type Hsla = Hsl & { opacity: number };
-export type Rgb = { r: number; g: number; b: number; opacity?: number };
-export type Rgba = Rgb & { opacity: number };
+export type Hsl = { h: number; s: number; l: number; opacity: number, space?: `hsl` };
+export type Rgb = { r: number; g: number; b: number; opacity: number, space?: `srgb` };
 export type Spaces = `hsl` | `hsluv` | `rgb` | `srgb` | `lch` | `oklch` | `oklab` | `okhsl` | `p3` | `lab` | `hcl` | `cubehelix`;
 
+export type OkLch = { l: number, c: number, h: number, opacity: number, space: `oklch` }
 
 /**
  * A representation of colour. Eg: `blue`, `rgb(255,0,0)`, `hsl(20,100%,50%)`
  */
-export type Colourish = Color | Hsl | Hsla | Rgb | Rgba | string;
+export type Colourish = Color | Hsl | OkLch | Rgb | string;
 
 // export type ColourRgb = {
 //   space:`rgb`
@@ -37,32 +36,42 @@ export type InterpolationOpts = {
   hue: `longer` | `shorter` | `increasing` | `decreasing` | `raw`
 };
 
-export const toHsla = (colour: Colourish): Hsla => {
-  const hsl = toHsl(colour);
-  if (`opacity` in hsl) return hsl as Hsla;
-  else return {
-    ...hsl,
-    opacity: 1
-  }
-}
+// export const toHsl = (colour: Colourish): Hsla => {
+//   const hsl = toHsl(colour);
+//   if (`opacity` in hsl) return hsl as Hsla;
+//   else return {
+//     ...hsl,
+//     opacity: 1
+//   }
+// }
 
 /**
  * Parses colour to `{ h, s, l }`, each field being on 0..1 scale.
  * 
  * Note that some colours will return NaN for h,s or l. This is because they have
- * indeterminate hue. For example white, black and transparent.
+ * indeterminate hue. For example white, black and transparent. Use 'safe = true'
+ * to ensure a safe colour is returned.
  * @param colour
+ * @param safe When true, returned colour will not include NaN. Default: false
  * @returns
  */
-export const toHsl = (colour: Colourish): Hsl => {
-  if (typeof colour === `string` && colour === `transparent`) return { h: 0, s: 0, l: 0, opacity: 0 };
+export const toHsl = (colour: Colourish, safe = false): Hsl => {
+  if (typeof colour === `string` && colour === `transparent`) return { h: 0, s: 0, l: 0, opacity: 0, space: `hsl` };
   const c = resolve(colour);
   const hsl = c.hsl;
+  //console.log(hsl);
+  let hue = hsl[ 0 ];
+  if (Number.isNaN(hue) && safe) hue = 0;
+
+  let sat = hsl[ 1 ];
+  if (Number.isNaN(sat) && safe) sat = 0;
   const parsedHsl = {
-    h: hsl[ 0 ] / 360,
-    s: hsl[ 1 ] / 100,
-    l: hsl[ 2 ] / 100
-  }
+    h: hue / 360,
+    s: sat / 100,
+    l: hsl[ 2 ] / 100,
+    opacity: 1,
+    space: `hsl`
+  } as const
   if (c.alpha !== 1) {
     if (`type` in (c.alpha as any)) {
       //const alphaType = (c.alpha as any).type;
@@ -94,17 +103,30 @@ export const toHsl = (colour: Colourish): Hsl => {
 };
 
 const hslToColorJs = (hsl: Hsl): Color => {
-  if (hsl.h > 1) throw new Error(`Expecting relative hue value 0..1. Got: ${ hsl.h }`);
-  if (hsl.s > 1) throw new Error(`Expecting relative saturation value 0..1. Got: ${ hsl.s }`);
-  if (hsl.l > 1) throw new Error(`Expecting relative lightness value 0..1. Got: ${ hsl.l }`);
-  if (hsl.opacity && hsl.opacity > 1) throw new Error(`Expecting relative opacity value 0..1. Got: ${ hsl.opacity }`);
+  throwNumberTest(hsl.h, `percentage`, `hsl.h`);
+  throwNumberTest(hsl.s, `percentage`, `hsl.s`);
+  throwNumberTest(hsl.l, `percentage`, `hsl.l`);
+  throwNumberTest(hsl.opacity, `percentage`, `hsl.opacity`);
 
   const coords: [ number, number, number ] = [
     hsl.h * 360,
     hsl.s * 100,
     hsl.l * 100
   ];
-  return `opacity` in hsl ? new Color(`hsl`, coords, hsl.opacity) : new Color(`hsl`, coords);
+  return new Color(`hsl`, coords, hsl.opacity);
+}
+
+const oklchToColorJs = (oklch: OkLch) => {
+  throwNumberTest(oklch.l, `percentage`, `oklch.l`);
+  throwNumberTest(oklch.c, `percentage`, `oklch.c`);
+  throwNumberTest(oklch.h, `percentage`, `oklch.h`);
+  throwNumberTest(oklch.opacity, `percentage`, `oklch.opacity`);
+  const coords: [ number, number, number ] = [
+    oklch.l,
+    oklch.c * 0.4,
+    oklch.h * 360
+  ]
+  return new Color(`oklch`, coords, oklch.opacity);
 }
 
 const rgbToColorJs = (rgb: Rgb): Color => {
@@ -197,12 +219,12 @@ export const randomHue = (rand: RandomSource = defaultRandom): number => {
  * @param opacity Opacity (0..1) Default: 1
  * @returns 
  */
-export const fromHsla = (h: number, s = 1, l = 0.5, opacity = 1): Color => {
+export const fromHsl = (h: number, s = 1, l = 0.5, opacity = 1): Color => {
   throwNumberTest(h, `percentage`, `h`);
   throwNumberTest(s, `percentage`, `s`);
   throwNumberTest(l, `percentage`, `l`);
 
-  return resolve({ h, s, l, opacity });
+  return resolve({ h, s, l, opacity, space: `hsl` });
 }
 
 /**
@@ -216,8 +238,8 @@ export const toRgb = (colour: Colourish): Rgb => {
   const c = resolve(colour);
   const rgb = c.srgb;
   return c.alpha < 1 ?
-    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: c.alpha } :
-    { r: rgb.r, g: rgb.g, b: rgb.b };
+    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: c.alpha, space: `srgb` } :
+    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: 1, space: `srgb` };
 };
 
 /**
@@ -238,6 +260,7 @@ export const resolve = (colour: Colourish): Color => {
   } else {
     if (isHsl(colour)) return new Color(hslToColorJs(colour));
     if (isRgb(colour)) return new Color(rgbToColorJs(colour));
+    if (isOklch(colour)) return new Color(oklchToColorJs(colour));
   }
 
   return colour;
@@ -322,7 +345,7 @@ export const opacity = (colour: Colourish, amt: number): string => {
  * // Fetch --accent variable, or use `yellow` if not found.
  * getCssVariable(`accent`, `yellow`);
  * ```
- * @param name Name of variable. Omit the `--`
+ * @param name Name of variable. Leading '--' is unnecessary
  * @param fallbackColour Fallback colour if not found
  * @param root  Element to search variable from
  * @returns Colour or fallback.
@@ -333,6 +356,7 @@ export const getCssVariable = (
   root?: HTMLElement
 ): string => {
   if (root === undefined) root = document.body;
+  if (name.startsWith(`--`)) name = name.substring(2);
   const fromCss = getComputedStyle(root).getPropertyValue(`--${ name }`).trim();
   if (fromCss === undefined || fromCss.length === 0) return fallbackColour;
   return fromCss;
@@ -462,15 +486,33 @@ const isHsl = (p: Colourish): p is Hsl => {
   if ((p as Color).spaceId !== undefined) return false;
   if ((p as Color).coords !== undefined) return false;
 
-  if ((p as Hsl).h === undefined) return false;
-  if ((p as Hsl).s === undefined) return false;
-  if ((p as Hsl).l === undefined) return false;
+  const space = p.space;
+  if (space !== `hsl` && space !== undefined) return false;
+  const pp = p as Hsl;
+  if (pp.h === undefined) return false;
+  if (pp.s === undefined) return false;
+  if (pp.l === undefined) return false;
   return true;
 };
+
+const isOklch = (p: Colourish): p is OkLch => {
+  if (p === undefined || p === null) return false;
+  if (typeof p !== `object`) return false;
+
+  // Check if Colourjs
+  if ((p as Color).spaceId !== undefined) return false;
+  if ((p as Color).coords !== undefined) return false;
+  if (p.space !== `oklch`) return false;
+  if (p.l === undefined) return false;
+  if (p.c === undefined) return false;
+  if (p.h === undefined) return false;
+  return true;
+}
 
 const isRgb = (p: Colourish): p is Rgb => {
   if (p === undefined || p === null) return false;
   if (typeof p !== `object`) return false;
+  if (p.space !== `srgb` && p.space !== undefined) return false;
   if ((p as Rgb).r === undefined) return false;
   if ((p as Rgb).g === undefined) return false;
   if ((p as Rgb).b === undefined) return false;

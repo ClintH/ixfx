@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/array-type,@typescript-eslint/no-invalid-void-type,@typescript-eslint/prefer-for-of */
 import { defaultComparer, type Comparer } from '../util/index.js';
-import { shuffle } from '../collections/arrays/Random.js';
+import { shuffle } from '../data/arrays/Random.js';
 
 export type ExpressionOrResult<ArgsType, ResultType> =
   | ResultType

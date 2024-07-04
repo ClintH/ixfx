@@ -2,9 +2,9 @@ import type { Point } from './point/PointType.js';
 import { fromTopLeft as RectsFromTopLeft } from './rect/FromTopLeft.js';
 import { throwIntegerTest, throwNumberTest } from '../util/GuardNumbers.js';
 import { clampIndex } from '../data/Clamp.js';
-import { randomElement } from '../collections/arrays/Random.js';
+import { randomElement } from '../data/arrays/Random.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
-import { zipKeyValue } from '../collections/map/MapFns.js';
+import { zipKeyValue } from '../data/maps/MapFns.js';
 import type { RectPositioned } from './rect/RectTypes.js';
 
 export type GridVisual = Grid & {

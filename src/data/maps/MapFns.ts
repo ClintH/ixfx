@@ -4,7 +4,7 @@ import {
   defaultComparer,
   type ToString,
 } from '../../util/index.js';
-import type { IWithEntries } from './IMappish.js';
+import type { IWithEntries } from '../../data/maps/IMappish.js';
 
 // ✔ UNIT TESTED!
 /**

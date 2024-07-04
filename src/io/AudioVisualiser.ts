@@ -14,7 +14,7 @@
 import { numberTracker } from '../data/NumberTracker.js';
 import { AudioAnalyser } from './AudioAnalyser.js';
 import type { Point } from '../geometry/point/PointType.js';
-import { minMaxAvg } from '../collections/arrays/MinMaxAvg.js';
+import { minMaxAvg } from '../data/arrays/MinMaxAvg.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {

@@ -12,10 +12,11 @@ export const accessor = (image: ImageData): Grids.CellAccessor<Rgb> => {
     }
     const pxIndex = index * 4;
     return {
-      r: data[pxIndex],
-      g: data[pxIndex + 1],
-      b: data[pxIndex + 2],
-      opacity: data[pxIndex + 3],
+      r: data[ pxIndex ],
+      g: data[ pxIndex + 1 ],
+      b: data[ pxIndex + 2 ],
+      opacity: data[ pxIndex + 3 ],
+      space: `srgb`
     };
   };
   return fn;

@@ -9,7 +9,7 @@ import type { Rect, RectPositioned } from '../geometry/rect/index.js';
 import { isEqualSize as RectIsEqualSize } from '../geometry/rect/IsEqual.js';
 import { isEqual as PointsIsEqual } from '../geometry/point/IsEqual.js';
 import { Empty as PointsEmpty } from '../geometry/point/Empty.js';
-import { withoutUndefined } from '../collections/arrays/Filter.js';
+import { withoutUndefined } from '../data/arrays/Filter.js';
 import { clamp as RectsClamp } from '../geometry/rect/Clamp.js';
 import { subtract as PointsSubtract } from '../geometry/point/Subtract.js';
 // #endregion

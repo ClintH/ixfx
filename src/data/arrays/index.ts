@@ -1,7 +1,5 @@
-export * from './AdditionalValues.js';
 export * from './ArrayCycle.js';
 export * from './Chunks.js';
-export * from './CircularArray.js';
 export * from './Contains.js';
 export * from './ContainsDuplicateInstances.js';
 export * from './EnsureLength.js';
@@ -24,7 +22,4 @@ export type * from './Types.js';
 export * from './Unique.js';
 export * from './Until.js';
 export * from './Zip.js';
-export * from '../../numbers/NumericArrays.js';
-export * from '../../numbers/AverageWeighted.js';
-export * from '../../numbers/NumericArrays.js';
 // export { compareValues, compareValuesEqual } from '../Iterables.js';

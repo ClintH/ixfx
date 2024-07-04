@@ -10,6 +10,6 @@ export * from './Weighted.js';
 export * from './WeightedIndex.js';
 export * from './WeightedInteger.js';
 
-export { randomElement as arrayElement } from '../collections/arrays/Random.js';
+export { randomElement as arrayElement } from '../data/arrays/Random.js';
 export { randomHue as hue } from '../visual/Colour.js';
-export { randomIndex as arrayIndex } from '../collections/arrays/Random.js';
+export { randomIndex as arrayIndex } from '../data/arrays/Random.js';

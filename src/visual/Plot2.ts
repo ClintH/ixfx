@@ -12,8 +12,8 @@ import type { Point } from '../geometry/point/PointType.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
 import { scaleCanvas } from './ScaleCanvas.js';
 import { parentSizeCanvas } from '../dom/CanvasSizing.js';
-import type { MinMaxAvgTotal } from '../collections/arrays/Types.js';
-import { minMaxAvg } from '../collections/arrays/MinMaxAvg.js';
+import type { MinMaxAvgTotal } from '../data/arrays/Types.js';
+import { minMaxAvg } from '../data/arrays/MinMaxAvg.js';
 
 /**
  * 

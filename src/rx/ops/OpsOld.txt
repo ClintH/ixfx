@@ -3,7 +3,7 @@ import { intervalToMs } from "../flow/IntervalType.js";
 import { QueueMutable } from "../collections/index.js";
 import { continuously } from "../flow/Continuously.js";
 import { isPlainObjectOrPrimitive } from "../Util.js";
-import { shuffle } from "../collections/arrays/index.js";
+import { shuffle } from "../data/arrays/index.js";
 import { timeout } from "../flow/Timeout.js";
 import type { AnnotationElapsed, BatchOptions, WithValueOptions, DebounceOptions, FieldOptions, FilterPredicate, InitStreamOptions, Passed, PipeSet, Reactive, ReactiveDisposable, ReactiveInitial, ReactiveOrSource, ReactiveStream, ReactiveWritable, ResolveOptions, SingleFromArrayOptions, SplitOptions, SwitcherOptions, ThrottleOptions, TimeoutTriggerOptions, TransformOpts } from "./Types.js";
 import { isDisposable, isTrigger, messageHasValue, messageIsDoneSignal, resolveTriggerValue } from "./Util.js";

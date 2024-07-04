@@ -60,3 +60,69 @@ export * from './Wrap.js';
 export * as Graphs from './graphs/index.js'
 
 export const piPi = Math.PI * 2;
+
+/**
+ * Arrays are a list of data. ixfx provides a number of functions for working with arrays in an immutable manner.
+ * This means that the input array is not changed.
+ *
+ * Import example:
+ * ```js
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * ```
+ * 
+ * For arrays of numbers:
+ * * {@link average}, {@link max}, {@link min}, {@link total}: Calculate average/max/min/total
+ * * {@link averageWeighted}: Calculate average, but applies a weighting function, eg to favour items at beginning of array
+ * * {@link minMaxAvg}: Find smallest, largest and average
+ * * {@link maxIndex}, {@link minIndex}: Return index of largest/smallest value
+ * * {@link dotProduct}: Returns the dot-product between two arrays
+ * * {@link weight}: Applies a weighting function to all values based on their index
+ *
+ * Randomisation
+ * * {@link randomIndex}: Return a random array index
+ * * {@link randomElement}: Return a random value
+ * * {@link randomPluck}: Remove a random element from an array, returning it and the new array
+ * * {@link shuffle}: Returns a randomly-sorted copy of arra
+ *
+ * Finding/accessing
+ * * {@link filterBetween}: Same as `Array.filter` but only looks within a specified index range
+ * * {@link sample}: Returns a new array with a random sampling of input
+ * * {@link valuesEqual}: Returns true if all the values in the array are identical
+ *
+ * Changing the shape
+ * * {@link ensureLength}: Returns a copy of array with designated length, either padding it out or truncating as necessary
+ * * {@link groupBy}: Groups data into a new Map
+ * * {@link interleave}: Flattens several arrays into one, interleaving their values.
+ * * {@link remove}: Remove an item by index
+ * * {@link without}: Returns an array with specified value omitted
+ * * {@link zip}: Groups together elements from several arrays based on their index
+ */
+export * as Arrays from './arrays/index.js';
+
+/**
+ * Maps associate keys with values. Several helper functions are provided
+ * for working with the standard JS Map class.
+ *
+ * Import example
+ * ```js
+ * import { Maps } from 'https://unpkg.com/ixfx/dist/data.js';
+ * ```
+ * 
+ * Overview:
+ * * {@link getOrGenerate}: Solves a common scenario of wanting a value by a particular key, or generating it if it doesn't exist
+ * * {@link filter}: Yields values in map that match a predicate
+ * * {@link find}: Finds the first value that matches a predicate, or _undefined_ if nothing found
+ * * {@link hasAnyValue}: Searches through all keys, returning true if any occurence of _value_ was found
+ *
+ * Transformations:
+ * * {@link toArray}: Returns the values of the map as an array
+ * * {@link mapToArray}: Applies a function to convert a map's values to an array
+ * * {@link toObject}: Coverts a Map to a plain object, useful for JSON serialising.
+ * * {@link mapToObjectTransform}: Converts a map to a plain object, but applying a function to values
+ * * {@link transformMap}: Like `Array.map`, but for Maps. Useful for generating a map as a transform of an input map.
+ * * {@link zipKeyValue}: Given an array of keys and values, combines them together into a map
+ * 
+ * 
+ * See also ixfx's Collections module for custom map implementations.
+ */
+export * as Maps from './maps/index.js'

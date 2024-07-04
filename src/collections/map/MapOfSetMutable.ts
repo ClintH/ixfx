@@ -1,5 +1,5 @@
 import { toStringDefault } from '../../util/index.js';
-import { without } from '../arrays/Filter.js';
+import { without } from '../../data/arrays/Filter.js';
 import type { MapSetOpts, MultiValue } from './MapMulti.js';
 import { MapOfMutableImpl } from './MapOfMultiImpl.js';
 import {
@@ -8,7 +8,7 @@ import {
   find as mapFind,
   filter as mapFilter,
   addKeepingExisting,
-} from './MapFns.js';
+} from '../../data/maps/MapFns.js';
 import type { IMapOfMutableExtended } from './IMapOfMutableExtended.js';
 
 /**

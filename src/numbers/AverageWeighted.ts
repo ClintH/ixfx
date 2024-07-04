@@ -1,4 +1,4 @@
-import { zip } from '../collections/arrays/Zip.js';
+import { zip } from '../data/arrays/Zip.js';
 import { weight } from './NumericArrays.js';
 /**
  * Computes an average of an array with a set of weights applied.

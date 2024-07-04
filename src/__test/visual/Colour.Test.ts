@@ -12,22 +12,14 @@ test(`special`, t => {
   const hsl1 = Colour.toHsl(`transparent`);
 
   t.is(hsl1.opacity, 0);
-  //  t.is(Colour.toHslaString(`transparent`), `hsla(0,0%,0%,0)`);
 
   t.is(Colour.toHex(`white`), `#ffffff`);
   const hsl2 = Colour.toHsl(`white`);
   t.is(hsl2.l, 1);
-  t.falsy(hsl2.opacity);
-
-  // t.is(Colour.toHslaString(`white`), `hsla(0,0%,100%,1)`);
-  // t.is(Colour.toHslaString(`hsla(0,0%,100%,1)`), `hsla(0,0%,100%,1)`);
 
   t.is(Colour.toHex(`black`), `#000000`);
   const hsl3 = Colour.toHsl(`black`);
   t.is(hsl3.l, 0);
-  t.falsy(hsl2.opacity);
-  // t.is(Colour.toHslaString(`black`), `hsla(0,0%,0%,1)`);
-
 
 });
 

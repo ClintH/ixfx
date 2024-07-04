@@ -4,8 +4,8 @@ import { initStream } from "../InitStream.js";
 import type { ReactiveInitial, ReactiveNonInitial, ReactiveArray, Reactive } from "../Types.js";
 import type { ArrayObjectOptions } from "./Types.js";
 import { compareArrays, type ChangeRecord } from "../../data/Compare.js";
-import { remove as ArraysRemove } from '../../collections/arrays/Remove.js';
-import { insertAt as ArraysInsertAt } from "../../collections/arrays/InsertAt.js";
+import { remove as ArraysRemove } from '../../data/arrays/Remove.js';
+import { insertAt as ArraysInsertAt } from "../../data/arrays/InsertAt.js";
 /**
  * Wraps an array object
  * @param initialValue 

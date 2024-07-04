@@ -1,6 +1,6 @@
 import * as Grids from './Grid.js';
 import type { Point, RectPositioned } from "./Types.js";
-import { randomPluck } from '../collections/arrays/Random.js';
+import { randomPluck } from '../data/arrays/Random.js';
 import { distance as PointsDistance } from './point/Distance.js';
 import { randomPoint as RectsRandomPoint } from './rect/Random.js';
 export type PoissonDiskOpts = {

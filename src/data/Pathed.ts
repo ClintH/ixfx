@@ -324,7 +324,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): V =
  *
  * Use {@link getField} to fetch data based on a path
  *
- * If object is _null_ or _undefined_, not results are returned.
+ * If object is _null_ or _undefined_, no results are returned.
  * 
  * If `onlyLeaves` is _true_ (default: _false_), only 'leaf' nodes are included. 
  * Leaf nodes are those that contain a primitive value.

@@ -1,4 +1,4 @@
-import { getOrGenerateSync } from '../collections/map/GetOrGenerate.js';
+import { getOrGenerateSync } from '../data/maps/GetOrGenerate.js';
 import type { MessageLogger, LogMessage } from "./Types.js";
 /**
  * Returns a console logging function which prefixes messages. This is

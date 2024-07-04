@@ -3,7 +3,7 @@ import { resolveEl } from "../dom/ResolveEl.js";
 import * as Rx from "./index.js";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind } from './Types.js';
 import { hasLast, messageHasValue, messageIsSignal } from "./Util.js";
-import { getFromKeys } from "../collections/map/MapFns.js";
+import { getFromKeys } from "../data/maps/MapFns.js";
 import { afterMatch, beforeMatch } from "../Text.js";
 import { stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "../text/Segments.js";
 import { QueueMutable } from "../collections/index.js";

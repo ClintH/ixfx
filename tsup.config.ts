@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: {
-    arrays: `./src/collections/arrays/index.ts`,
+    arrays: `./src/data/arrays/index.ts`,
     bundle: `./src/index.ts`,
     collections: `./src/collections/index.ts`,
     components: `./src/components/index.ts`,

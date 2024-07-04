@@ -1,10 +1,10 @@
 import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
 
 /**
- * Yield values from an iterable not present in the other.
+ * Yield additional values from `values` which are not in `source`.
  *
- * Assuming that `input` array is unique values, this function
- * yields items from `values` which are not present in `input`.
+ * Assuming that `source` is a set of unique values, this function
+ * yields items from `values` which are not present in `source`.
  *
  * Duplicate items in `values` are ignored - only the first is yielded.
  *
@@ -25,20 +25,18 @@ import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
  *  // 4, 5
  * }
  * To combine one or more iterables, keeping only unique items, use {@link unique}
- * @param input
+ * @param source
  * @param values
  */
 export function* additionalValues<V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
-  input: Array<V>,
-  //eslint-disable-next-line functional/prefer-readonly-type
+  source: Iterable<V>,
   values: Iterable<V>,
   eq: IsEqual<V> = isEqualDefault
 ): Iterable<V> {
-  // Keep track of values already yielded
+  const sourceArray = Array.isArray(source) ? source : [ ...source ];
   const yielded: Array<V> = [];
   for (const v of values) {
-    const found = input.find((index) => eq(index, v));
+    const found = sourceArray.find((index) => eq(index, v));
     if (!found) {
       const alreadyYielded = yielded.find((ii) => eq(ii, v));
       if (!alreadyYielded) {

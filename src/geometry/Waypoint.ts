@@ -4,7 +4,7 @@ import type { Point } from "./point/PointType.js";
 import { joinPointsToLines } from './line/JoinPointsToLines.js';
 import { toPath } from './line/ToPath.js';
 import { distance as PointsDistance } from "./point/Distance.js";
-import { sortByNumericProperty } from "../collections/arrays/SortByNumericProperty.js";
+import { sortByNumericProperty } from "../data/arrays/SortByNumericProperty.js";
 
 export type Waypoint = CirclePositioned;
 

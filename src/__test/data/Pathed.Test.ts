@@ -8,7 +8,7 @@ test(`get-paths-and-data`, t => {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
   };
-  const r1 = getPathsAndData(d1);
+  const r1 = [ ...getPathsAndData(d1) ];
   arrayValuesEqual(t, r1, [
     { path: `accel`, value: d1.accel },
     { path: `accel.x`, value: 1 },
@@ -27,7 +27,7 @@ test(`get-paths-and-data`, t => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  const r2 = getPathsAndData(d2);
+  const r2 = [ ...getPathsAndData(d2) ];
   arrayValuesEqual(t, r2, [
     { path: `message`, value: `hello` },
     { path: `profiles`, value: d2.profiles },
@@ -52,7 +52,7 @@ test('get-paths', (t) => {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
   };
-  const paths = getPaths(d);
+  const paths = [ ...getPaths(d) ];
 
   arrayValuesEqual(t, paths, [
     `accel`,
@@ -65,7 +65,7 @@ test('get-paths', (t) => {
     `gyro.z`,
   ]);
 
-  const paths2 = getPaths(d, true);
+  const paths2 = [ ...getPaths(d, true) ];
   arrayValuesEqual(t, paths2, [
     `accel.x`,
     `accel.y`,
@@ -75,10 +75,9 @@ test('get-paths', (t) => {
     `gyro.z`,
   ]);
 
-  //@ts-ignore
-  t.throws(() => getPaths(undefined));
-
-  t.deepEqual(getPaths(null), []);
+  t.deepEqual([ ...getPaths(null) ], []);
+  // @ts-expect-error
+  t.deepEqual([ ...getPaths(undefined) ], []);
 
   const d2 = {
     message: `hello`,
@@ -87,7 +86,7 @@ test('get-paths', (t) => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  const d2R = getPaths(d2);
+  const d2R = [ ...getPaths(d2) ];
   arrayValuesEqual(t, d2R, [
     `message`,
     `profiles`,
@@ -177,21 +176,21 @@ test(`apply-changes`, t => {
 
 test(`compare-data-array`, t => {
   // Index 1 has a value when it didn't before
-  const c1 = compareData([ `a` ], [ `a`, `a` ], { includeMissingFromA: true });
+  const c1 = [ ...compareData([ `a` ], [ `a`, `a` ], { includeMissingFromA: true }) ];
   t.deepEqual(c1, [ { path: `1`, previous: undefined, value: `a`, state: `added` } ]);
 
   // Indexes 1 & 2 are now undefined
-  const c2 = compareData([ `a`, `a`, `a` ], [ `a` ], { includeMissingFromA: true });
+  const c2 = [ ...compareData([ `a`, `a`, `a` ], [ `a` ], { includeMissingFromA: true }) ];
   t.deepEqual(c2, [ { path: `1`, previous: `a`, value: undefined, state: `removed` }, { path: `2`, previous: `a`, value: undefined, state: `removed` } ]);
 
-  const c3 = compareData([], [ `a`, `a`, `a` ], { includeMissingFromA: true });
+  const c3 = [ ...compareData([], [ `a`, `a`, `a` ], { includeMissingFromA: true }) ];
   t.deepEqual(c3, [
     { path: `0`, previous: undefined, value: `a`, state: `added` },
     { path: `1`, previous: undefined, value: `a`, state: `added` },
     { path: `2`, previous: undefined, value: `a`, state: `added` }
   ]);
 
-  const c4 = compareData([ `a`, `a`, `a` ], [], { includeMissingFromA: true });
+  const c4 = [ ...compareData([ `a`, `a`, `a` ], [], { includeMissingFromA: true }) ];
   t.deepEqual(c4, [
     { path: `0`, previous: `a`, value: undefined, state: `removed` },
     { path: `1`, previous: `a`, value: undefined, state: `removed` },
@@ -299,7 +298,7 @@ test(`compare-data-deep-a`, t => {
   t.is(c1.length, 0);
 
   // 2. Deep value change
-  const c2 = compareData(t1, {
+  const c2 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -309,11 +308,11 @@ test(`compare-data-deep-a`, t => {
         }
       }
     }
-  });
+  }) ];
   t.deepEqual(c2, [ { path: `a.b.c.d.value`, previous: 1, value: 2, state: `change` } ]);
 
   // 3. Deep value delete
-  const c3 = compareData(t1, {
+  const c3 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -323,11 +322,11 @@ test(`compare-data-deep-a`, t => {
         }
       }
     }
-  });
+  }) ];
   t.deepEqual(c3, [ { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` } ]);
 
   // 4. Deep value add, including missing false
-  const c4 = compareData(t1, {
+  const c4 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -338,11 +337,11 @@ test(`compare-data-deep-a`, t => {
         }
       }
     }
-  }, { includeMissingFromA: false });
+  }, { includeMissingFromA: false }) ];
   t.deepEqual(c4, [ { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` } ]);
 
   // 5. Deep value add, including missing false
-  const c5 = compareData(t1, {
+  const c5 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -353,7 +352,7 @@ test(`compare-data-deep-a`, t => {
         }
       }
     }
-  }, { includeMissingFromA: true });
+  }, { includeMissingFromA: true }) ];
   t.deepEqual(c5, [
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d.wow`, previous: undefined, value: true, state: `added` }
@@ -390,7 +389,7 @@ test(`compare-data-deep-with-parents`, t => {
   t.is(c1.length, 0);
 
   // 2. Deep value change
-  const c2 = compareData(t1, {
+  const c2 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -400,11 +399,11 @@ test(`compare-data-deep-with-parents`, t => {
         }
       }
     }
-  });
+  }) ];
   t.deepEqual(c2, [ { path: `a.b.c.d.value`, previous: 1, value: 2, state: `change` } ]);
 
   // 3. Deep value delete
-  const c3 = compareData(t1, {
+  const c3 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -414,7 +413,7 @@ test(`compare-data-deep-with-parents`, t => {
         }
       }
     }
-  }, { includeParents: true });
+  }, { includeParents: true }) ];
   t.deepEqual(c3, [
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d`, previous: { value: 1 }, value: {}, state: `change` },
@@ -424,7 +423,7 @@ test(`compare-data-deep-with-parents`, t => {
   ]);
 
   // 4. Deep value add, including missing false
-  const c4 = compareData(t1, {
+  const c4 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -435,7 +434,7 @@ test(`compare-data-deep-with-parents`, t => {
         }
       }
     }
-  }, { includeParents: true, includeMissingFromA: false });
+  }, { includeParents: true, includeMissingFromA: false }) ];
   t.deepEqual(c4, [
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d`, previous: { value: 1 }, value: { wow: true }, state: `change` },
@@ -445,7 +444,7 @@ test(`compare-data-deep-with-parents`, t => {
   ]);
 
   // 5. Deep value add, including missing false
-  const c5 = compareData(t1, {
+  const c5 = [ ...compareData(t1, {
     a: {
       b: {
         c: {
@@ -456,7 +455,7 @@ test(`compare-data-deep-with-parents`, t => {
         }
       }
     }
-  }, { includeParents: true, includeMissingFromA: true });
+  }, { includeParents: true, includeMissingFromA: true }) ];
   t.deepEqual(c5, [
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d.wow`, previous: undefined, value: true, state: `added` },
@@ -481,17 +480,17 @@ test(`compare-data-arrays`, t => {
   t.is(cc1.length, 0);
 
   // Remove from array end
-  const cc2 = compareData(test2, {
+  const cc2 = [ ...compareData(test2, {
     colours: [ `red`, `green` ],
     sizes: [ 10, 20, 30 ]
-  });
+  }) ];
   t.deepEqual(cc2, [ { path: `colours.2`, previous: `blue`, value: undefined, state: `removed` } ]);
 
   // Remove from array start
-  const cc3 = compareData(test2, {
+  const cc3 = [ ...compareData(test2, {
     colours: [ `green`, `blue` ],
     sizes: [ 10, 20, 30 ]
-  });
+  }) ];
   t.deepEqual(cc3, [
     { path: `colours.0`, previous: `red`, value: `green`, state: `change` },
     { path: `colours.1`, previous: `green`, value: `blue`, state: `change` },
@@ -499,10 +498,10 @@ test(`compare-data-arrays`, t => {
   ]);
 
   // Array re-arrange
-  const cc4 = compareData(test2, {
+  const cc4 = [ ...compareData(test2, {
     colours: [ `blue`, `red`, `green` ],
     sizes: [ 10, 20, 30 ]
-  });
+  }) ];
   t.deepEqual(cc4, [
     { path: `colours.0`, previous: `red`, value: `blue`, state: `change` },
     { path: `colours.1`, previous: `green`, value: `red`, state: `change` },

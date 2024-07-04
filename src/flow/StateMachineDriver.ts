@@ -2,7 +2,7 @@ import * as StateMachine from './StateMachine.js';
 import * as Execute from './Execute.js';
 import { type MachineState } from './StateMachine.js';
 import { defaultComparer } from '../util/index.js';
-import { randomElement } from '../collections/arrays/Random.js';
+import { randomElement } from '../data/arrays/Random.js';
 import * as Logger from '../debug/Logger.js';
 
 export type Result<V extends StateMachine.Transitions> = {

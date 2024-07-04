@@ -117,14 +117,14 @@ test(`set`, async t => {
     const v = value.value;
     if (count === 0) t.deepEqual(v, { name: `jane`, level: 2 });
     if (count === 1) t.deepEqual(v, { name: `mary`, level: 3 });
-
     count++;
   });
   o.onDiff(diff => {
-    if (count === 0) t.deepEqual(diff, [
+    //console.log(`count:${ count }`, diff);
+    if (count === 1) t.deepEqual(diff, [
       { path: `name`, previous: `bob`, value: `jane`, state: `change` }
     ]);
-    if (count === 1) t.deepEqual(diff, [
+    else if (count === 2) t.deepEqual(diff, [
       { path: `name`, previous: `jane`, value: `mary`, state: `change` },
       { path: `level`, previous: 2, value: 3, state: `change` }
     ]);

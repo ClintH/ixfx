@@ -3,7 +3,7 @@ import test from 'ava';
 import {
   getClosestIntegerKey,
   mergeByKey,
-} from '../../../collections/map/MapFns.js';
+} from '../../../data/maps/MapFns.js';
 import { ofSimple } from '../../../collections/map/MapOfSimple.js';
 
 /**

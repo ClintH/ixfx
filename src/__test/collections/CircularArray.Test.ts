@@ -1,5 +1,5 @@
 import test from 'ava';
-import { circularArray } from '../../collections/arrays/CircularArray.js';
+import { circularArray } from '../../collections/CircularArray.js';
 
 test(`circularArray`, t => {
   const ca1 = circularArray<string>(5);

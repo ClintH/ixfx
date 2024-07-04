@@ -1,5 +1,17 @@
 A rough changelog between NPM releases
 
+# 0.23.2 24.07.04
+
+Collections/Data
+* Try to keep 'Collections' module as collection data structures, moving array/map helper functions to Data module.
+
+Data
+* Broke out functions from Immutable module. Functions about pathed access live under 'Pathed'
+ 
+Visuals
+* Drawing.dot options
+* Made Hsl and Rgb have opacity fields  
+
 # 0.22.0 24.06.17
 
 Data

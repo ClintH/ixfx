@@ -1,7 +1,7 @@
 export {
   circularArray,
   type ICircularArray as CircularArray,
-} from './arrays/CircularArray.js';
+} from './CircularArray.js';
 export * as Trees from './tree/index.js';
 export type * from './Types.js';
 
@@ -24,44 +24,6 @@ export * as Stacks from './stack/index.js';
 
 export { StackMutable } from './stack/StackMutable.js';
 export { StackImmutable } from './stack/StackImmutable.js';
-
-/**
- * Arrays are a list of data. ixfx provides a number of functions for working with arrays in an immutable manner.
- * This means that the input array is not changed.
- *
- * Import example:
- * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * ```
- * 
- * For arrays of numbers:
- * * {@link average}, {@link max}, {@link min}, {@link total}: Calculate average/max/min/total
- * * {@link averageWeighted}: Calculate average, but applies a weighting function, eg to favour items at beginning of array
- * * {@link minMaxAvg}: Find smallest, largest and average
- * * {@link maxIndex}, {@link minIndex}: Return index of largest/smallest value
- * * {@link dotProduct}: Returns the dot-product between two arrays
- * * {@link weight}: Applies a weighting function to all values based on their index
- *
- * Randomisation
- * * {@link randomIndex}: Return a random array index
- * * {@link randomElement}: Return a random value
- * * {@link randomPluck}: Remove a random element from an array, returning it and the new array
- * * {@link shuffle}: Returns a randomly-sorted copy of arra
- *
- * Finding/accessing
- * * {@link filterBetween}: Same as `Array.filter` but only looks within a specified index range
- * * {@link sample}: Returns a new array with a random sampling of input
- * * {@link valuesEqual}: Returns true if all the values in the array are identical
- *
- * Changing the shape
- * * {@link ensureLength}: Returns a copy of array with designated length, either padding it out or truncating as necessary
- * * {@link groupBy}: Groups data into a new Map
- * * {@link interleave}: Flattens several arrays into one, interleaving their values.
- * * {@link remove}: Remove an item by index
- * * {@link without}: Returns an array with specified value omitted
- * * {@link zip}: Groups together elements from several arrays based on their index
- */
-export * as Arrays from './arrays/index.js';
 
 /**
  * Sets store unique items.

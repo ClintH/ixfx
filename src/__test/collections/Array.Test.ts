@@ -1,17 +1,17 @@
 import test from 'ava';
 import { arrayValuesEqual } from '../Include.js';
-import { pairwise, pairwiseReduce } from '../../collections/arrays/Pairwise.js';
-import { filterBetween, without } from '../../collections/arrays/Filter.js';
-import { flatten } from '../../collections/arrays/Flatten.js';
-import { contains, containsDuplicateValues } from '../../collections/arrays/Contains.js';
-import { unique } from '../../collections/arrays/Unique.js';
+import { pairwise, pairwiseReduce } from '../../data/arrays/Pairwise.js';
+import { filterBetween, without } from '../../data/arrays/Filter.js';
+import { flatten } from '../../data/arrays/Flatten.js';
+import { contains, containsDuplicateValues } from '../../data/arrays/Contains.js';
+import { unique } from '../../data/arrays/Unique.js';
 import { compareValuesShallow, hasEqualValuesShallow } from '../../iterables/CompareValues.js';
-import { sortByNumericProperty } from '../../collections/arrays/SortByNumericProperty.js';
-import { mergeByKey } from '../../collections/arrays/MergeByKey.js';
-import { remove } from '../../collections/arrays/Remove.js';
-import { ensureLength } from '../../collections/arrays/EnsureLength.js';
-import { zip } from '../../collections/arrays/Zip.js';
-import { isContentsTheSame } from '../../collections/arrays/Equality.js';
+import { sortByNumericProperty } from '../../data/arrays/SortByNumericProperty.js';
+import { mergeByKey } from '../../data/arrays/MergeByKey.js';
+import { remove } from '../../data/arrays/Remove.js';
+import { ensureLength } from '../../data/arrays/EnsureLength.js';
+import { zip } from '../../data/arrays/Zip.js';
+import { isContentsTheSame } from '../../data/arrays/Equality.js';
 
 test('pairwise', t => {
   const r1 = [ ...pairwise([ 1, 2, 3, 4 ]) ];

@@ -5,7 +5,6 @@ import type { DomNumberInputValueOptions, DomValueOptions } from "./Types.js";
 import { resolveEl } from '../../dom/ResolveEl.js';
 import { transform } from '../ops/Transform.js';
 import { hasLast } from '../Util.js';
-import { Visual } from 'src/index.js';
 
 /**
  * Reactive getting/setting of values to a HTML INPUT element.
@@ -60,7 +59,7 @@ export function domHslInputValue(targetOrQuery: HTMLInputElement | string, optio
   const input = domInputValue(targetOrQuery, {
     ...options,
     upstreamFilter(value) {
-      return (typeof value === `object`) ? Visual.Colour.toHex(value) : value;
+      return (typeof value === `object`) ? Colour.toHex(value) : value;
     },
   });
   const rx = transform(input, v => {

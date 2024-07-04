@@ -1,4 +1,4 @@
-import { zipKeyValue } from "../../collections/map/MapFns.js";
+import { zipKeyValue } from "../../data/maps/MapFns.js";
 import type { ReactiveOrSource, Reactive, RxValueTypeObject } from "../Types.js";
 import { syncToArray } from "./SyncToArray.js";
 import { transform } from "./Transform.js";

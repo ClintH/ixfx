@@ -1,4 +1,4 @@
-import type { IMappish } from './IMappish.js';
+import type { IDictionary } from './IMappish.js';
 export type GetOrGenerate<K, V, Z> = (key: K, args?: Z) => Promise<V>;
 
 /**
@@ -9,7 +9,7 @@ export type GetOrGenerate<K, V, Z> = (key: K, args?: Z) => Promise<V>;
  */
 //eslint-disable-next-line functional/prefer-readonly-type
 export const getOrGenerateSync =
-  <K, V, Z>(map: IMappish<K, V>, fn: (key: K, args?: Z) => V) =>
+  <K, V, Z>(map: IDictionary<K, V>, fn: (key: K, args?: Z) => V) =>
     (key: K, args?: Z): V => {
       //eslint-disable-next-line functional/no-let
       let value = map.get(key);
@@ -40,7 +40,7 @@ export const getOrGenerateSync =
 //eslint-disable-next-line functional/prefer-readonly-type
 export const getOrGenerate =
   <K, V, Z>(
-    map: IMappish<K, V>,
+    map: IDictionary<K, V>,
     fn: (key: K, args?: Z) => Promise<V> | V
   ): GetOrGenerate<K, V, Z> =>
     async (key: K, args?: Z): Promise<V> => {

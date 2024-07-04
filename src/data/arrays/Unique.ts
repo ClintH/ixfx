@@ -1,5 +1,5 @@
 import { isEqualDefault } from "../../util/IsEqual.js";
-import { additionalValues } from "./AdditionalValues.js";
+import { additionalValues } from "../../iterables/sync/AdditionalValues.js";
 
 /**
  * Combines the values of one or more arrays, removing duplicates

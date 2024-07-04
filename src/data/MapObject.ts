@@ -1,7 +1,4 @@
-import { compareValuesShallow } from "src/iterables/CompareValues.js";
-import type { RecursiveReplace, RemapObjectPropertyType } from "../TsUtil.js";
-import { compareData } from "./Compare.js";
-import * as Pathed from './Pathed.js';
+import type { RemapObjectPropertyType } from "../TsUtil.js";
 
 /**
  * Maps the top-level properties of an object through a map function.

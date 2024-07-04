@@ -2,7 +2,7 @@ import type { GenerateRandomOptions, RandomOptions, RandomSource } from "./Types
 import { numberTest as guardNumberTest, integerTest as guardIntegerTest } from '../util/GuardNumbers.js';
 import { throwFromResult } from '../util/GuardThrowFromResult.js';
 import { count } from "../numbers/Count.js";
-import { shuffle } from "../collections/arrays/Random.js";
+import { shuffle } from "../data/arrays/Random.js";
 
 /**
  * Returns a function that produces a random integer between `max` (exclusive) and 0 (inclusive)

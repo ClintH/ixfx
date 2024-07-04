@@ -1,4 +1,4 @@
-import * as JSON5 from 'json5';
+//import { stringify } from 'json5';
 
 /**
  * Returns _true_ if Object.entries() is empty for `value`
@@ -22,5 +22,5 @@ export type IsEqualContext<V> = (a: V, b: V, path: string) => boolean
  * @returns 
  */
 export const isEqualContextString: IsEqualContext<any> = (a: any, b: any, _path: string): boolean => {
-  return JSON5.stringify(a) === JSON5.stringify(b);
+  return JSON.stringify(a) === JSON.stringify(b);
 }

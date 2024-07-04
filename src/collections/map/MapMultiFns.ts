@@ -2,7 +2,7 @@
 
 import { type IsEqual, isEqualDefault } from '../../util/IsEqual.js';
 import type { IMapOf } from './IMapOf.js';
-import type { IWithEntries } from './IMappish.js';
+import type { IWithEntries } from '../../data/maps/IMappish.js';
 
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.

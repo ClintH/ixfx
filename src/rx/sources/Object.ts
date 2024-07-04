@@ -4,7 +4,7 @@ import * as Immutable from "../../data/Pathed.js";
 import { initStream } from "../InitStream.js";
 import type { ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
 import type { ObjectOptions } from "./Types.js";
-import { isEqualContextString } from "src/data/Util.js";
+import { isEqualContextString } from "../../data/Util.js";
 
 type ObjectFieldHandler = (value: any, fieldName: string) => void
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
