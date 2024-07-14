@@ -275,7 +275,7 @@ export class Series {
 }
 
 export class PlotArea extends Sg.CanvasBox {
-  paddingPx = 5;
+  paddingPx = 0;
   piPi = Math.PI * 2;
   // If pointer is more than this distance away from a data point, it's ignored
   pointerDistanceThreshold = 20;
@@ -284,7 +284,6 @@ export class PlotArea extends Sg.CanvasBox {
 
   constructor(private plot: Plot, region: RectPositioned) {
     super(plot, `PlotArea`, region);
-
   }
 
   clear() {
@@ -738,7 +737,7 @@ export class AxisY extends Sg.CanvasBox {
   private _maxDigits = 1;
 
   seriesToShow: string | undefined;
-  paddingPx = 2;
+  paddingPx = 3;
   colour?: string;
 
   lastRange: DataRange;
@@ -850,7 +849,7 @@ export class AxisY extends Sg.CanvasBox {
     ctx.lineWidth = strokeWidth;
     const lineX = v.width - strokeWidth / 2;
     ctx.moveTo(lineX, plotArea.paddingPx + strokeWidth);
-    ctx.lineTo(lineX, plotArea.canvasRegion.height + paddingPx + strokeWidth + strokeWidth);
+    ctx.lineTo(lineX, plotArea.canvasRegion.height + paddingPx);// + strokeWidth + strokeWidth);
     ctx.stroke();
 
     ctx.textBaseline = `top`;
@@ -926,8 +925,8 @@ export class Plot extends Sg.CanvasBox {
     const { ctx, element, bounds } = scaleCanvas(canvasElementOrQuery);
     super(undefined, `Plot`);//bounds);
     this._canvasEl = element;
+    this.bounds = bounds;
     this._ctx = ctx;
-
     if (opts.autoSize) {
       parentSizeCanvas(element, (event) => {
         this.drawingInvalidated(`resize`);
