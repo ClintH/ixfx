@@ -1,24 +1,34 @@
 import { type Dispatch, DispatchList } from "../flow/DispatchList.js";
 import { resolveSource } from "./ResolveSource.js";
-import type { InitLazyStreamInitedOptions, InitLazyStreamOptions, InitStreamOptions, Passed, ReactiveInitial, ReactiveOrSource, ReactiveStream, SignalKinds, UpstreamOptions } from "./Types.js";
+import type { InitLazyStreamInitedOptions, InitLazyStreamOptions, InitStreamOptions, Passed, ReactiveInitialStream, ReactiveOrSource, ReactiveStream, SignalKinds, UpstreamOptions } from "./Types.js";
 import { messageHasValue, messageIsSignal } from "./Util.js";
-import { cache } from "./index.js";
+import { cache } from "./Cache.js";
 
 
 /**
+ * Initialise a stream based on an upstream source.
+ * Calls initLazyStream under the hood.
+ * 
+ * Options:
+ * * onValue: called when upstream emits a value (default: does nothing with upstream value)
+ * * lazy: laziness of stream (default: 'initial')
+ * * disposeIfSourceDone: disposes stream if upstream disposes (default: true)
  * @ignore
  * @param upstreamSource 
  * @param options 
  * @returns 
  */
-export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, options: Partial<UpstreamOptions<In>>): ReactiveStream<Out> => {
+export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, options: Partial<UpstreamOptions<In>>): ReactiveStream<Out> {
   const lazy = options.lazy ?? `initial`;
   const disposeIfSourceDone = options.disposeIfSourceDone ?? true;
   const onValue = options.onValue ?? ((_v: In) => {/** no-op */ })
+  //const initialValue = options.initialValue;
   const source = resolveSource(upstreamSource);
   let unsub: undefined | (() => void);
+  //let lastValue: Out | undefined;
 
   const start = () => {
+
     if (unsub !== undefined) return;
 
     if (options.onStart) options.onStart();
@@ -26,11 +36,14 @@ export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, opti
       if (messageIsSignal(value)) {
         if (value.signal === `done`) {
           stop();
+          events.signal(value.signal, value.context);
           if (disposeIfSourceDone) events.dispose(`Upstream source has completed (${ value.context ?? `` })`);
         } else {
-          events.through(value);
+          //events.through_(value);
+          events.signal(value.signal, value.context);
         }
       } else if (messageHasValue(value)) {
+        //lastValue = value.value;
         onValue(value.value);
       }
     });
@@ -43,6 +56,10 @@ export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, opti
     if (options.onStop) options.onStop();
   }
 
+  //const initOpts = 
+  // const events:ReactiveInitialStream<Out>|ReactiveStream<Out> = ((`initialValue` in options) && options.initialValue !== undefined) ?
+  //   initLazyStreamWithInitial<Out>({ ...initOpts, initialValue: options.initialValue }) :
+  //   initLazyStream<Out>(initOpts);
   const events = initLazyStream<Out>({
     ...options,
     lazy,
@@ -57,8 +74,10 @@ export const initUpstream = <In, Out>(upstreamSource: ReactiveOrSource<In>, opti
 }
 
 
-export function initLazyStreamWithInitial<V>(options: InitLazyStreamInitedOptions<V>): ReactiveStream<V> & ReactiveInitial<V> {
-  return cache<V>(initLazyStream<V>(options), options.initialValue) as ReactiveStream<V> & ReactiveInitial<V>;
+export function initLazyStreamWithInitial<V>(options: InitLazyStreamInitedOptions<V>): ReactiveInitialStream<V> {
+  const r = initLazyStream<V>(options);
+  const c = cache<V, typeof r>(r, options.initialValue);
+  return c;
 }
 
 export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStream<V> {
@@ -80,6 +99,11 @@ export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStrea
 }
 
 /**
+ * Initialises a new stream.
+ * 
+ * Options:
+ * * onFirstSubscribe: Called when there is a subscriber after there have been no subscribers.
+ * * onNoSubscribers: Called when there are no more subscribers. 'onFirstSubscriber' will be called next time a subscriber is added.
  * @ignore
  * @param options 
  * @returns 
@@ -127,7 +151,7 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
     isDisposed: () => {
       return disposed
     },
-    reset: () => {
+    removeAllSubscribers: () => {
       dispatcher?.clear();
       isEmpty();
     },
@@ -135,10 +159,10 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
       if (disposed) throw new Error(`Disposed, cannot set`);
       dispatcher?.notify({ value: v });
     },
-    through: (pass: Passed<V>) => {
-      if (disposed) throw new Error(`Disposed, cannot through`);
-      dispatcher?.notify(pass)
-    },
+    // through: (pass: Passed<V>) => {
+    //   if (disposed) throw new Error(`Disposed, cannot through`);
+    //   dispatcher?.notify(pass)
+    // },
     signal: (signal: SignalKinds, context?: string) => {
       if (disposed) throw new Error(`Disposed, cannot signal`);
       dispatcher?.notify({ signal, value: undefined, context });
