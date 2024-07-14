@@ -10,37 +10,6 @@ const cos = Math.cos;
 //eslint-disable-next-line @typescript-eslint/naming-convention
 const pi = Math.PI;
 const sin = Math.sin;
-/*
-type RelativeTimer = {
-  reset(): void
-  elapsed(): number
-  isDone(): boolean
-}
-
-type TimerSource = (upperBound: number) => RelativeTimer;
-
-const msRelativeTimer = function (upperBound: number): RelativeTimer {
-  let start = performance.now();
-  return {
-    reset: () => {
-      start = performance.now();
-    },
-    elapsed: () => clamp((performance.now() - start) / upperBound),
-    isDone: () => (performance.now() - start) >= upperBound,
-  };
-};
-
-const tickRelativeTimer = function (upperBound: number): RelativeTimer {
-  let start = 0;
-  return {
-    reset: () => {
-      start = 0;
-    },
-    elapsed: () => clamp(start++ / upperBound),
-    isDone: () => start >= upperBound,
-  };
-};
-*/
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export type EasingFn = (x: number) => number;
@@ -137,7 +106,7 @@ const create = function (
 ): Easing {
   const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
   if (fn === undefined) {
-    const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: ${ nameOrFunction }`) : new Error(`Easing function not found`);
+    const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: '${ nameOrFunction }'`) : new Error(`Easing function not found`);
     throw error;
   }
 
@@ -256,8 +225,6 @@ export type EasingName = keyof typeof functions;
 
 /**
  * Returns an easing function by name, or _undefined_ if not found.
- * This is a manual way of working with easing functions. If you want to
- * ease over time or ticks, use `Flow.Timer.msElapsedTimer` or `Flow.Timer.ticksElapsedTimer`.
  *
  * ```js
  * const fn = Easings.get(`sineIn`);
@@ -265,8 +232,7 @@ export type EasingName = keyof typeof functions;
  * fn(0.5);
  * ```
  *
- * This function is useful if trying to resolve an easing by string. If you
- * know in advance what easing to use, you could also access it via
+ * If you know in advance what easing to use, you could also access it via
  * `Easings.functions.NAME`, eg `Easings.functions.sineIn`.
  * @param easingName eg `sineIn`
  * @returns Easing function
@@ -321,9 +287,6 @@ export const gaussian = (standardDeviation = 0.4): EasingFn => {
     const v = f * pow(Math.E, p); // * (2/pi);//0.62;
     if (v > 1) return 1;
     if (v < 0) return 0;
-
-    //if (v >1) console.log(v);
-    //if (v < 0) console.log(v);
     return v;
   };
 };
@@ -350,7 +313,6 @@ const arch = (x: number): number => x * (1 - x) * 4;
 /**
  * Weighted average
  * 
- * `slowDownFactor` 
  * @param currentValue 
  * @param targetValue 
  * @param slowDownFactor 
