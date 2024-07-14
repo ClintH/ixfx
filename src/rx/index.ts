@@ -298,22 +298,7 @@ export const Ops = {
 //   }
 // }
 
-export function cache<T>(r: Reactive<T>, initialValue: T) {
-  let lastValue: T = initialValue;
-  r.onValue(value => {
-    lastValue = value;
-  });
-  return {
-    ...r,
-    last() {
-      return lastValue
-    },
-    reset() {
-      // @ts-expect-error
-      lastValue = undefined;
-    }
-  }
-}
+
 
 // export function runWithInitial<TIn, TOut>(initial: TOut, source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<any, any>>): ReactiveInitial<TOut> & ReactiveDisposable<TOut> {
 //   let lastValue = initial;
