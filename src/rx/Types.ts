@@ -23,6 +23,10 @@ export type CombineLatestOptions = {
    * Default: 'break'
    */
   onSourceDone: `allow` | `break`
+  /**
+   * If _true_ (default), emits a value when initialised.
+   */
+  emitInitial: boolean
 }
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
@@ -67,6 +71,9 @@ export type UpstreamOptions<In> = {
   onDispose: (reason: string) => void
 }
 
+export type UpstreamInitialOptions<In> = UpstreamOptions<In> & {
+  initialValue: In
+}
 
 //export type Processor = <TIn, TOptions>(source: ReactiveOrSource<TIn>) => (options: TOptions) => () => void;
 
@@ -352,11 +359,11 @@ export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
 }
 
 export type ReactiveStream<V> = Reactive<V> & ReactiveWritable<V> & {
-  through(message: Passed<V>): void
+  //through_(message: Passed<V>): void
   /**
    * Removes all the subscribers from this stream.
    */
-  reset(): void
+  removeAllSubscribers(): void
   /**
    * Dispatches a signal
    * @param signal 
@@ -364,6 +371,8 @@ export type ReactiveStream<V> = Reactive<V> & ReactiveWritable<V> & {
    */
   signal(signal: SignalKinds, context?: string): void
 }
+
+export type ReactiveInitialStream<V> = ReactiveStream<V> & ReactiveInitial<V>;
 
 export type DomBindValueTarget = {
   /**
@@ -452,11 +461,30 @@ export type InitStreamOptions = {
    * Optional label to associate with this stream. Useful for debugging.
    */
   debugLabel: string
+  /**
+   * Called when there is a subscriber after there were no subscribers.
+   * Useful for 'startup' types of things that we want to run only when someone is actually listening.
+   * 
+   * During the lifeycle of a stream, this could be called multiple times. Eg if all subscribers are removed
+   * next time someone subscribes it will get called again.
+   * @returns 
+   */
   onFirstSubscribe: () => void
+  /**
+   * Called when there are no longer any subscribers. Useful for shutting down
+   * activities now that no-one is listening.
+   * 
+   * During the lifecycle of a stream, this could be called multiple times.
+   * @returns
+   */
   onNoSubscribers: () => void
+  /**
+   * Called whenever the stream disposes. Useful for cleaning up.
+   * @param reason 
+   * @returns 
+   */
   onDispose: (reason: string) => void
 }
-
 
 
 export type DomCreateOptions = {
