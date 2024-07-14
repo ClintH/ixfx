@@ -126,7 +126,7 @@ export const fromScalar = (scalarValue: number) => {
 };
 
 /**
- * Scale a number to -1..1 range
+ * Scale & clamp a number to bipolar range (-1..1)
  * ```js
  * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
  * 
@@ -147,7 +147,8 @@ export const scale = (inputValue: number, inMin: number, inMax: number) => {
 }
 
 /**
- * Scale a number, clamped to -1..1 range
+ * Scale a number to bipolar range (-1..1). Not clamped to scale.
+ * 
  * ```js
  * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
  * 
@@ -157,13 +158,12 @@ export const scale = (inputValue: number, inMin: number, inMax: number) => {
  * Bipolar.scale(0, 0, 100);   // -1
  * ```
  * 
- * Return value is clamped.
  * @param inputValue Value to scale
  * @param inMin Minimum of scale
  * @param inMax Maximum of scale
  * @returns Bipolar value on -1..1 scale
  */
-export const scaleClamped = (inputValue: number, inMin: number, inMax: number) => {
+export const scaleUnclamped = (inputValue: number, inMin: number, inMax: number) => {
   return numberScaler(inMin, inMax, -1, 1)(inputValue);
 }
 
