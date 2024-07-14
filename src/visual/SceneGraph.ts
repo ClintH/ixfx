@@ -406,8 +406,7 @@ export abstract class Box {
    */
   debugLog(m: any) {
     if (!this.debugLayout) return;
-    console.log(this.id, m);
-
+    console.log(`SceneGraph[${ this.id }]`, m);
   }
 
   layoutStart(measureState: MeasureState, layoutState: LayoutState, force: boolean, parent?: Layout): Layout | undefined {
@@ -632,7 +631,7 @@ export class CanvasLayoutState extends LayoutState {
  * A Box that exists on a HTMLCanvasElement
  */
 export class CanvasBox extends Box {
-  readonly bounds: RectPositioned | undefined;
+  protected bounds: RectPositioned | undefined;
   constructor(
     parent: CanvasBox | undefined,
     //canvasElement: HTMLCanvasElement,
