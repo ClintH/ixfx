@@ -5,8 +5,9 @@ import {Oscillators} from '../../../dist/modulation.js';
 
 const canvasEl = document.getElementById(`plot`);
 let p = new Plot2.Plot(canvasEl, {
-  autoSize: true
+  autoSize: false
 });
+p.debugLayout = true;
 
 //const testSeriesA = p.createSeries(`testa`, `array`, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 //const testSeriesB = p.createSeries(`testb`, `stream`);
