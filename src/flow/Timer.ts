@@ -10,7 +10,7 @@ export type TimerSource = () => Timer;
  * A timer instance.
  * {@link CompletionTimer} also contains an 'isDone' field.
  * 
- * See: {@link msElapsedTimer}, {@link ticksElapsedTimer}, {@link frequencyTimer}
+ * Implementations: {@link msElapsedTimer}, {@link ticksElapsedTimer}, {@link frequencyTimer}
  */
 export type Timer = {
   reset(): void
@@ -18,10 +18,13 @@ export type Timer = {
 };
 
 /**
- * A {@link Timer} that has a sense of completion.
+ * A {@link Timer} that has a sense of completion, when `isDone` returns _true_.
  * See {@link relativeTimer}
  */
 export type CompletionTimer = Timer & {
+  /**
+   * Returns _true_ if this timer has completed.
+   */
   get isDone(): boolean
 }
 
