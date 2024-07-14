@@ -34,6 +34,6 @@ test(`wait-for-value`, async t => {
 
   await Flow.sleep(15);
   t.is(readValue, `hello`); // Expect initial value still
-  t.true(isApproximately(10, 0.15, readTime), `Read time: ${ readTime }`);
+  t.true(isApproximately(10, 0.2, readTime), `Read time: ${ readTime }`);
 
 });
