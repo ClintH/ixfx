@@ -1,56 +1,56 @@
 import type { Process } from "./Process.js";
 import type { RankFunction, RankOptions } from "./Types.js";
 
-export const max = (): Process<number | Array<number>, number | undefined> => {
+export const max = (): Process<number | Array<number>, number> => {
   let max = Number.MIN_SAFE_INTEGER;
   const compute = (value: number | Array<number>) => {
     const valueArray = Array.isArray(value) ? value : [ value ];
     for (const subValue of valueArray) {
       if (typeof subValue !== `number`) break;
       max = Math.max(subValue, max);
-      return max;
     }
+    return max;
   }
   return compute;
 }
 
-export const min = (): Process<number | Array<number>, number | undefined> => {
+export const min = (): Process<number | Array<number>, number> => {
   let min = Number.MAX_SAFE_INTEGER;
   const compute = (value: number | Array<number>) => {
     const valueArray = Array.isArray(value) ? value : [ value ];
     for (const subValue of valueArray) {
       if (typeof subValue !== `number`) break;
       min = Math.min(subValue, min);
-      return min;
     }
+    return min;
   }
   return compute;
 }
 
-export const sum = (): Process<number | Array<number>, number | undefined> => {
+export const sum = (): Process<number | Array<number>, number> => {
   let t = 0;
   const compute = (value: number | Array<number>) => {
     const valueArray = Array.isArray(value) ? value : [ value ];
     for (const subValue of valueArray) {
-      if (typeof subValue !== `number`) break;
+      if (typeof subValue !== `number`) continue;
       t += subValue;
-      return t;
     }
+    return t;
   }
   return compute;
 }
 
-export const average = (): Process<number | Array<number>, number | undefined> => {
+export const average = (): Process<number | Array<number>, number> => {
   let total = 0;
   let tally = 0;
   const compute = (value: number | Array<number>) => {
     const valueArray = Array.isArray(value) ? value : [ value ];
     for (const subValue of valueArray) {
-      if (typeof subValue !== `number`) break;
+      if (typeof subValue !== `number`) continue;
       tally++;
       total += subValue;
-      return total / tally;
     }
+    return total / tally;
   }
   return compute;
 }
