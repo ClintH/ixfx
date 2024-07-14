@@ -1,6 +1,7 @@
 import * as DiGraph from "../data/graphs/DirectedGraph.js";
 import { initStream } from "./InitStream.js";
 import type { Reactive } from "./Types.js";
+import { isReactive } from "./Util.js";
 type RxNodeBase = {
   type: `primitive` | `rx` | `object`
 }
@@ -17,13 +18,13 @@ type RxNodePrimitive = RxNodeBase & {
 
 type RxNode = RxNodeRx | RxNodePrimitive;
 
-function isReactive(o: object): o is Reactive<any> {
-  if (typeof o !== `object`) return false;
-  if (`on` in o) {
-    return (typeof o.on === `function`);
-  }
-  return false;
-}
+// function isReactive(o: object): o is Reactive<any> {
+//   if (typeof o !== `object`) return false;
+//   if (`on` in o) {
+//     return (typeof o.on === `function`);
+//   }
+//   return false;
+// }
 
 /**
  * Build a graph of reactive dependencies for `rx`
@@ -44,7 +45,7 @@ export function prepare<V extends Record<string, any>>(_rx: V): Reactive<V> {
       if (isReactive(value)) {
         nodes.set(subPath, { value, type: `rx` });
         value.on(v => {
-          console.log(`Reactive.prepare value: ${ JSON.stringify(v) } path: ${ subPath }`);
+          console.log(`Rx.prepare value: ${ JSON.stringify(v) } path: ${ subPath }`);
         });
       } else {
         const valueType = typeof value;
@@ -54,7 +55,7 @@ export function prepare<V extends Record<string, any>>(_rx: V): Reactive<V> {
         } else if (valueType === `object`) {
           process(value, subPath)
         } else if (valueType === `function`) {
-          console.log(`Reactive.process - not handling functions`);
+          console.log(`Rx.process - not handling functions`);
         }
       }
     }
