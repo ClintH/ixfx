@@ -60,6 +60,8 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
   const disposeSources = options.disposeSources ?? true;
   const event = object<RxValueTypeObject<T>>(undefined);
   const onSourceDone = options.onSourceDone ?? `break`;
+  const emitInitial = options.emitInitial ?? true;
+  let emitInitialDone = false;
 
   const states = new Map<string, State<any>>();
   for (const [ key, source ] of Object.entries(reactiveSources)) {
@@ -90,7 +92,16 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
         (r as any)[ key ] = state.data;
       }
     }
+    //console.log(`Rx.Ops.CombineLatestToObject getData`, r);
+
     return r as RxValueTypeObject<T>;
+  }
+
+  const trigger = () => {
+    emitInitialDone = true;
+    const d = getData();
+    //console.log(`Rx.Ops.combineLatestToObject trigger`, d);
+    event.set(d);
   }
 
   const wireUpState = (state: State<any>) => {
@@ -111,7 +122,7 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
         }
       } else if (messageHasValue(message)) {
         state.data = message.value;
-        event.set(getData());
+        trigger();
       }
     });
   }
@@ -120,6 +131,10 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
     wireUpState(state);
   }
 
+  if (!emitInitialDone && emitInitial) {
+    //console.log(`Rx.Ops.CombineLatestToObject emitting initial`);
+    trigger();
+  }
   return {
     ...event,
     hasSource(field: string) {
