@@ -1,6 +1,6 @@
 import type { IsEqualContext } from '../../data/Util.js';
 import type { Interval } from '../../flow/IntervalType.js';
-import type { InitLazyStreamOptions, Lazy, Reactive } from '../Types.js';
+import type { CombineLatestOptions, InitLazyStreamOptions, Lazy, Reactive, UpstreamOptions } from '../Types.js';
 import type { IsEqual } from "../../util/IsEqual.js";
 
 export type TriggerValue<TTriggerValue> = {
@@ -265,4 +265,10 @@ export type DomNumberInputValueOptions = DomValueOptions & {
    */
   inverted?: boolean
   upstreamSource?: Reactive<number>
-} 
+}
+
+export type DerivedFunction<TOutput> = (...args: any[]) => TOutput;
+export type DerivedOptions<TResult, T> = {
+  ignoreIdentical: boolean
+  eq: (a: TResult, b: TResult) => boolean
+} & CombineLatestOptions & UpstreamOptions<T>;
