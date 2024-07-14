@@ -170,6 +170,7 @@ export function eventTrigger(targetOrQuery: EventTarget | null | string, name: s
         console.log(`Rx.From.eventTrigger add '${ name }'`);
       }
       if (fireInitial && count === 0) {
+        if (debugLifecycle || debugFiring) console.log(`Rx.From.eventTrigger: firing initial`);
         callback();
       }
     },
