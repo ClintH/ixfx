@@ -12,6 +12,16 @@ export type RepeatPredicate = (
  * Calls and waits for the async function `fn` repeatedly, yielding each result asynchronously.
  * Use {@link repeat} if `fn` does not need to be awaited.
  * 
+ * ```js
+ * // Eg. iterate
+ * const r = Flow.repeat(5, async () => Math.random());
+ * for await (const v of r) {
+ * 
+ * }
+ * // Eg read into array
+ * const results = await Array.fromAsync(Flow.repeatAwait(5, async () => Math.random()));
+ * ```
+ * 
  * The number of repeats is determined by the first parameter. If it's a:
  * - number: how many times to repeat
  * - function: it gets called before each repeat, if it returns _false_ repeating stops.
@@ -46,7 +56,7 @@ export type RepeatPredicate = (
  * 
  * In the above cases we're not using the return value from `fn`. This would look like:
  * ```js
- * const g = Flow.repeatAwait(5, () => Math.random);
+ * const g = Flow.repeatAwait(5, async () => Math.random);
  * for await (const v of g) {
  *  // Loops 5 times, v is the return value of calling `fn` (Math.random)
  * }
@@ -56,7 +66,7 @@ export type RepeatPredicate = (
  * @template V Return type of repeating function
  * @returns Asynchronous generator of `fn` results.
  */
-export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined>): AsyncGenerator<V> {
+export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined>): AsyncIterable<V> {
   return typeof countOrPredicate === `number` ? repeatTimesAwaited(countOrPredicate, fn) : repeatWhileAwaited(countOrPredicate, fn);
 }
 
