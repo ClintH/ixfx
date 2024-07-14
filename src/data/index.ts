@@ -44,7 +44,7 @@ export * from './MonitorChanges.js';
 export * from './PointTracker.js';
 export * as Pool from './Pool.js';
 export * from './PrimitiveTracker.js';
-export * from './Process.js';
+export * as Process from './Process.js';
 export * from './Proportion.js';
 export * from './ResolveFields.js';
 export * from './Scale.js';
