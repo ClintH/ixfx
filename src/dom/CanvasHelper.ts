@@ -6,10 +6,18 @@ import { multiply as RectsMultiply } from "../geometry/rect/Multiply.js";
 import { windowResize } from "./DomRx.js";
 import { SimpleEventEmitter } from "../Events.js";
 import { guard as RectsGuard } from '../geometry/rect/Guard.js';
+
+export type CanvasEvents = {
+  /**
+   * Fired when canvas is resized
+   */
+  resize: { size: Rect, helper: CanvasHelper, ctx: CanvasRenderingContext2D }
+}
+
 /**
  * Options
  */
-export type CanvasOpts = {
+export type CanvasHelperOpts = {
   /**
    * If _true_ (default) canvas is cleared when a resize happens
    */
@@ -57,12 +65,6 @@ export type CanvasOpts = {
   readonly draw?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void
 };
 
-export type CanvasEvents = {
-  /**
-   * Fired when canvas is resized
-   */
-  resize: { size: Rect, helper: CanvasHelper, ctx: CanvasRenderingContext2D }
-}
 
 /**
  * A wrapper for the CANVAS element that scales the canvas for high-DPI displays
@@ -100,13 +102,13 @@ export type CanvasEvents = {
  */
 export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   readonly el: HTMLCanvasElement;
-  readonly opts: CanvasOpts
+  readonly opts: CanvasHelperOpts
 
   #scaler: ScalerCombined;
   #currentSize: Rect = RectsEmpty;
   #ctx: CanvasRenderingContext2D | undefined;
 
-  constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts: Partial<CanvasOpts> = {}) {
+  constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts: Partial<CanvasHelperOpts> = {}) {
     super();
     if (!domQueryOrEl) throw new Error(`Param 'domQueryOrEl' is null or undefined`);
     this.el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
