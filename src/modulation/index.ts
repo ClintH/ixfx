@@ -2,8 +2,9 @@ import * as Easings from './Easing.js';
 import * as Envelopes from './Envelope.js';
 import * as Forces from './Forces.js';
 import * as Oscillators from './Oscillator.js';
-export * from './PerSecond.js';
 export * from './PingPong.js';
+export * from './Waveforms.js';
+export * as Sources from './sources/index.js';
 
 /**
  * Easings module
