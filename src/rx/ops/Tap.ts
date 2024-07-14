@@ -1,4 +1,4 @@
-import { processChain, type Processors } from "../../data/Process.js";
+import * as Process from "../../data/Process.js";
 import { resolveSource } from "../ResolveSource.js";
 import type { ReactiveOrSource, Reactive, ReactiveWritable, ReactiveOp } from "../Types.js";
 
@@ -9,11 +9,10 @@ import type { ReactiveOrSource, Reactive, ReactiveWritable, ReactiveOp } from ".
  * @param processors List of processors
  * @returns 
  */
-export function tapProcess<In, T2, T3, T4, T5, T6>(input: ReactiveOrSource<In>, ...processors: Processors<In, T2, T3, T4, T5, T6>): Reactive<In> {
+export function tapProcess<In, T2, T3, T4, T5, T6>(input: ReactiveOrSource<In>, ...processors: Process.Processors<In, T2, T3, T4, T5, T6>): Reactive<In> {
   const inputStream = resolveSource(input);
-
   // @ts-expect-error
-  const chain = processChain(...processors);
+  const chain = Process.chain(...processors);
   inputStream.onValue(value => {
     chain(value);
   });
