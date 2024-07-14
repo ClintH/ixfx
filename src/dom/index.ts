@@ -22,3 +22,4 @@ export * from './SetProperty.js';
 export * from './Util.js';
 
 
+export type * from './CanvasHelper.js';
