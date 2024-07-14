@@ -9,11 +9,11 @@ import { hasLast } from '../Util.js';
 /**
  * Reactive getting/setting of values to a HTML INPUT element.
  * 
- * Sets the 'type' attribute of element to 'range'.
- * 
  * Options:
- * - relative: if _true_, sets min/max values of attribute. Default: _false_
- * - inverted:  if _true_ flips min/max. Default: _false_
+ * - relative: if _true_, values are 0..1 (default: false)
+ * - inverted: if _true_, values are 1..0 (default: false)
+ * 
+ * If element is missing a 'type' attribute, this will be set to 'range'.
  * @param targetOrQuery 
  * @param options 
  * @returns 
@@ -38,8 +38,9 @@ export function domNumberInputValue(targetOrQuery: HTMLInputElement | string, op
       el.step = "0.1";
     }
   }
-  //el.setAttribute(`type`, `range`);
-  el.type = `range`;
+  if (el.getAttribute(`type`) === null) {
+    el.type = `range`;
+  }
 
   const set = (value: number) => {
     input.set(value.toString());
