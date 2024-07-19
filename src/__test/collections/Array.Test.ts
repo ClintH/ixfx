@@ -6,7 +6,7 @@ import { flatten } from '../../data/arrays/Flatten.js';
 import { contains, containsDuplicateValues } from '../../data/arrays/Contains.js';
 import { unique } from '../../data/arrays/Unique.js';
 import { compareValuesShallow, hasEqualValuesShallow } from '../../iterables/CompareValues.js';
-import { sortByNumericProperty } from '../../data/arrays/SortByNumericProperty.js';
+import { sortByNumericProperty } from '../../data/arrays/Sort.js';
 import { mergeByKey } from '../../data/arrays/MergeByKey.js';
 import { remove } from '../../data/arrays/Remove.js';
 import { ensureLength } from '../../data/arrays/EnsureLength.js';

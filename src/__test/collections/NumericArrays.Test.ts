@@ -1,7 +1,7 @@
 import test from 'ava';
 import { average } from '../../numbers/NumericArrays.js';
 import { count } from '../../numbers/Count.js';
-import { minMaxAvg } from '../../data/arrays/MinMaxAvg.js';
+import { minMaxAvg } from '../../numbers/MinMaxAvg.js';
 
 test(`minMaxAvg`, (t) => {
   const startIndex = 5;
