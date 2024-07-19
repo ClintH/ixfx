@@ -1,4 +1,5 @@
 import type { RemapObjectPropertyType } from "../TsUtil.js";
+import type { ResolveValue } from "./ResolveFields.js";
 
 /**
  * Maps the top-level properties of an object through a map function.
@@ -65,7 +66,7 @@ export const mapObjectShallow = <
   const entries = Object.entries(object);
   const mapped = entries.map(([ sourceField, sourceFieldValue ], index) => [
     sourceField,
-    mapFunction({ value: sourceFieldValue, field: sourceField, index }),
+    mapFunction({ value: sourceFieldValue, field: sourceField, index, path: sourceField }),
   ]) as Array<MapResult>;
   // @ts-expect-error
   return Object.fromEntries(mapped);
@@ -73,8 +74,22 @@ export const mapObjectShallow = <
 
 export type MapObjectArgs = {
   field: string
+  path: string
   value: any
   index: number
 }
 
-
+export function mapObjectByObject(data: any, mapper: Record<string, (value: any, context: any) => any>) {
+  const entries = Object.entries(data);
+  let index = 0;
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[ i ];
+    if (e[ 0 ] in mapper) {
+      const m = mapper[ e[ 0 ] ];
+      e[ 1 ] = (typeof m === `object`) ?
+        mapObjectByObject(e[ 1 ], m) :
+        m(e[ 1 ], data);
+    }
+  }
+  return Object.fromEntries(entries);
+}

@@ -1,5 +1,21 @@
 import test from 'ava';
-import { mapObjectShallow } from '../../data/MapObject.js';
+import { mapObjectShallow, mapObjectByObject } from '../../data/MapObject.js';
+
+test(`by-object`, t => {
+  const a = {
+    name: `john`,
+    size: 10
+  };
+  const r1 = mapObjectByObject(a, {
+    // Should be ignored
+    blah: () => 10,
+    name: (value: string) => value.toUpperCase(),
+  });
+  t.deepEqual(r1, {
+    name: `JOHN`,
+    size: 10 // Size carries forward
+  });
+});
 
 test('callback', t => {
   const t1 = {
