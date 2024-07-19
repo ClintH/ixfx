@@ -6,7 +6,7 @@ import { transform } from "./Transform.js";
 /**
  * Create a new object from input, based on cloning fields rather than a destructured copy.
  * This is useful for event args.
- * @param input 
+ * @param source 
  * @returns 
  */
 export const cloneFromFields = <In>(source: ReactiveOrSource<In>) => {

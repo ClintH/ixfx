@@ -22,22 +22,22 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
   const lazy = options.lazy ?? `initial`;
   const disposeIfSourceDone = options.disposeIfSourceDone ?? true;
   const onValue = options.onValue ?? ((_v: In) => {/** no-op */ })
-  //const initialValue = options.initialValue;
   const source = resolveSource(upstreamSource);
   let unsub: undefined | (() => void);
-  //let lastValue: Out | undefined;
-
-  const start = () => {
-
+  const debugLabel = options.debugLabel ? `[${ options.debugLabel }]` : ``;
+  //console.log(`initUpstream${ debugLabel } creating`);
+  const onStart = () => {
+    //console.log(`Rx.initStream${ debugLabel } start unsub ${ unsub !== undefined }`);
     if (unsub !== undefined) return;
-
     if (options.onStart) options.onStart();
+
     unsub = source.on(value => {
+      //console.log(`Rx.initStream${ debugLabel } onValue`, value);
       if (messageIsSignal(value)) {
         if (value.signal === `done`) {
           stop();
           events.signal(value.signal, value.context);
-          if (disposeIfSourceDone) events.dispose(`Upstream source has completed (${ value.context ?? `` })`);
+          if (disposeIfSourceDone) events.dispose(`Upstream source ${ debugLabel } has completed (${ value.context ?? `` })`);
         } else {
           //events.through_(value);
           events.signal(value.signal, value.context);
@@ -49,7 +49,8 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
     });
   }
 
-  const stop = () => {
+  const onStop = () => {
+    //console.log(`Rx.initStream${ debugLabel } stop`);
     if (unsub === undefined) return;
     unsub();
     unsub = undefined;
@@ -60,15 +61,13 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
   // const events:ReactiveInitialStream<Out>|ReactiveStream<Out> = ((`initialValue` in options) && options.initialValue !== undefined) ?
   //   initLazyStreamWithInitial<Out>({ ...initOpts, initialValue: options.initialValue }) :
   //   initLazyStream<Out>(initOpts);
+  //console.log(`initUpstream${ debugLabel } creating initLazyStream`);
+
   const events = initLazyStream<Out>({
     ...options,
     lazy,
-    onStart() {
-      start();
-    },
-    onStop() {
-      stop();
-    }
+    onStart,
+    onStop
   });
   return events;
 }
@@ -84,14 +83,20 @@ export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStrea
   const lazy = options.lazy ?? `initial`;
   const onStop = options.onStop ?? (() => { /* no-op*/ })
   const onStart = options.onStart ?? (() => {/* no-op*/ })
-
+  const debugLabel = options.debugLabel ? `[${ options.debugLabel }]` : ``;
   const events = initStream<V>({
     ...options,
     onFirstSubscribe() {
-      if (lazy !== `never`) onStart();
+      if (lazy !== `never`) {
+        //console.log(`initLazyStream${ debugLabel } onFirstSubscribe, lazy: ${ lazy }. Calling onStart`);
+        onStart();
+      }
     },
     onNoSubscribers() {
-      if (lazy === `very`) onStop();
+      if (lazy === `very`) {
+        //console.log(`initLazyStream${ debugLabel } onNoSubscribers, lazy: ${ lazy }. Calling onStop`);
+        onStop();
+      }
     },
   });
   if (lazy === `never`) onStart();
@@ -115,6 +120,7 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
   let emptySubscriptions = true;
   const onFirstSubscribe = options.onFirstSubscribe ?? undefined;
   const onNoSubscribers = options.onNoSubscribers ?? undefined;
+  const debugLabel = options.debugLabel ? `[${ options.debugLabel }]` : ``;
 
   const isEmpty = () => {
     if (dispatcher === undefined) return;
@@ -127,13 +133,15 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
   }
 
   const subscribe = (handler: Dispatch<Passed<V>>) => {
-    if (disposed) throw new Error(`Disposed, cannot subscribe`);
+    if (disposed) throw new Error(`Disposed, cannot subscribe ${ debugLabel }`);
     if (dispatcher === undefined) dispatcher = new DispatchList();
+    //console.log(`initStream${ debugLabel } subscribe handler:`, handler);
     const id = dispatcher.add(handler);
     emptySubscriptions = false;
     if (!firstSubscribe) {
       firstSubscribe = true;
-      if (onFirstSubscribe) setTimeout(() => { onFirstSubscribe() }, 10);
+      //if (onFirstSubscribe) setTimeout(() => { onFirstSubscribe() }, 10);
+      if (onFirstSubscribe) onFirstSubscribe();
     }
     return () => {
       dispatcher?.remove(id);
@@ -156,7 +164,7 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
       isEmpty();
     },
     set: (v: V) => {
-      if (disposed) throw new Error(`Disposed, cannot set`);
+      if (disposed) throw new Error(`${ debugLabel } Disposed, cannot set`);
       dispatcher?.notify({ value: v });
     },
     // through: (pass: Passed<V>) => {
@@ -164,12 +172,13 @@ export function initStream<V>(options: Partial<InitStreamOptions> = {}): Reactiv
     //   dispatcher?.notify(pass)
     // },
     signal: (signal: SignalKinds, context?: string) => {
-      if (disposed) throw new Error(`Disposed, cannot signal`);
+      if (disposed) throw new Error(`${ debugLabel } Disposed, cannot signal`);
       dispatcher?.notify({ signal, value: undefined, context });
     },
     on: (handler: Dispatch<Passed<V>>) => subscribe(handler),
     onValue: (handler: (value: V) => void) => {
       const unsub = subscribe(message => {
+        //console.log(`initStream${ debugLabel } onValue wrapper`, message);
         if (messageHasValue(message)) {
           handler(message.value);
         }

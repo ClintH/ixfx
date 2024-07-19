@@ -11,7 +11,7 @@ export const isEmptyEntries = (value: object) => [ ...Object.entries(value) ].le
  * Return _true_ if `a` and `b` ought to be considered equal
  * at a given path
  */
-export type IsEqualContext<V> = (a: V, b: V, path: string) => boolean
+export type IsEqualContext<V> = (a: V, b: V | undefined, path: string) => boolean
 
 /**
  * Returns _true_ if `a` and `b are equal based on their JSON representations.
