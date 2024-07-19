@@ -55,44 +55,75 @@ export type InterpolateOptions = {
  * Usually interpolation amount is on a 0...1 scale, inclusive. What is the interpolation result
  * if this scale is exceeded? By default it is clamped to 0..1, so the return value is always between `a` and `b` (inclusive).
  * 
- * Alternatively, set the `limits` option:
+ * Alternatively, set the `limits` option to process `amount`:
  * * 'wrap': wrap amount, eg 1.5 is the same as 0.5, 2 is the same as 1
  * * 'ignore': allow exceeding values. eg 1.5 will yield b*1.5.
  * * 'clamp': default behaviour of clamping interpolation amount to 0..1
  * 
- * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Geometry.Points.interpolate}.
+ * To interpolate certain types: {@link Colour.interpolator | Visual.Colour.interpolator }, {@link Points.interpolate | Points.interpolate}.
  * @param amount Interpolation amount, between 0 and 1 inclusive
  * @param a Start (ie when `amt` is 0)
  * @param b End (ie. when `amt` is 1)
  * @returns Interpolated value which will be between `a` and `b`.
  */
+export function interpolate(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
 export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
 export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
-export function interpolate(amountOrA: number, aOrB: number, bOrMissingOrOpts?: number | Partial<InterpolateOptions>, options?: Partial<InterpolateOptions>) {
+export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
+  let opts: Partial<InterpolateOptions> = {};
 
-  const a = bOrMissingOrOpts === undefined ? amountOrA : aOrB;
-  const b = bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object` ? aOrB : bOrMissingOrOpts;
-  // eslint-disable-next-line unicorn/no-negated-condition, @typescript-eslint/prefer-nullish-coalescing
-  const opts = options !== undefined ? options : (typeof bOrMissingOrOpts === `number` ? {} : bOrMissingOrOpts);
-  const limits = opts?.limits ?? `clamp`;
-
-  throwNumberTest(a, ``, `a`);
-  throwNumberTest(b, ``, `b`);
-
-  const calculate = (amount: number) => {
-    if (limits === `clamp`) {
+  const handleAmount = (amount: number) => {
+    if (opts.limits === undefined || opts.limits === `clamp`) {
       amount = clamp(amount);
-    } else if (limits === `wrap`) {
+    } else if (opts.limits === `wrap`) {
       if (amount > 1) amount = amount % 1;
       else if (amount < 0) {
         amount = 1 + (amount % 1);
       }
     }
-    throwNumberTest(amount, ``, `amount`);
-    return (1 - amount) * a + amount * b;
+    return amount;
   }
-  if (bOrMissingOrOpts === undefined || typeof bOrMissingOrOpts === `object`) return calculate;
-  return calculate(amountOrA);
+
+  if (typeof pos1 !== `number`) throw new TypeError(`First param is expected to be a number. Got: ${ typeof pos1 }`);
+  if (typeof pos2 === `number`) {
+    let amount: number | undefined;
+    let a: number;
+    let b: number;
+    if (pos3 === undefined || typeof pos3 === `object`) {
+      //interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
+      a = pos1;
+      b = pos2;
+      opts = pos3 ?? {};
+
+      throwNumberTest(a, ``, `a`);
+      throwNumberTest(b, ``, `b`);
+      return (amount: number) => {
+        let amt = handleAmount(amount);
+        return (1 - amt) * a + amt * b
+      }
+    } else if (typeof pos3 === `number`) {
+      //interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
+      a = pos2;
+      b = pos3;
+      opts = pos4 ?? {};
+      amount = handleAmount(pos1);
+      throwNumberTest(a, ``, `a`);
+      throwNumberTest(b, ``, `b`);
+      throwNumberTest(amount, ``, `amount`);
+      return (1 - amount) * a + amount * b;
+    } else {
+      throw new Error(`Values for a and b not defined`);
+    }
+  } else if (pos2 === undefined || typeof pos2 === `object`) {
+    //interpolate(amount: number, options?: Partial<InterpolateOptions>): (a:number,b:number)=>number;
+    let amount = handleAmount(pos1);
+    opts = pos2 ?? {};
+    throwNumberTest(amount, ``, `amount`);
+
+    return (aValue: number, bValue: number) => {
+      return (1 - amount) * aValue + amount * bValue
+    }
+  }
 };
 
 
