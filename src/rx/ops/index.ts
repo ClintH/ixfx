@@ -3,10 +3,12 @@ export * from './Batch.js';
 export * from './CloneFromFields.js';
 export * from './CombineLatestToArray.js';
 export * from './CombineLatestToObject.js';
+export * from './ComputeWithPrevious.js';
 export * from './Debounce.js';
 export * from './Elapsed.js';
 export * from './Field.js';
 export * from './Filter.js';
+export * from './Interpolate.js';
 export * from './Math.js';
 export * from './Pipe.js';
 export * from './SingleFromArray.js'

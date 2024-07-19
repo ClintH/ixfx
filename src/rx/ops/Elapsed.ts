@@ -5,8 +5,6 @@ import { transform } from "./Transform.js";
  * Emits time in milliseconds since last message.
  * If it is the first value, 0 is used.
  * @param input 
- * @param transformer 
- * @param options 
  * @returns 
  */
 export const elapsed = <In>(input: ReactiveOrSource<In>) => {
