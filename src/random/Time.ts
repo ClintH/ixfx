@@ -28,7 +28,7 @@ import type { RandomOptions, RandomSource } from "./Types.js";
  * // Random timeout of up to 5 mins
  * setTimeout(() => { ... }, minutesMsSource(5));
  * ```
- * @param maxMinutesOrOpts
+ * @param maxMinutesOrOptions
  * @see {@link minutesMs}
  * @returns Function that produces a random value
  */
@@ -59,7 +59,7 @@ export const minutesMsSource = (
  * ```
  * @inheritDoc minutesMsSource
  *
- * @param maxMinutesOrOpts
+ * @param maxMinutesOrOptions
  * @see {@link minutesMsSource}
  * @returns Milliseconds
  */
@@ -94,7 +94,7 @@ export const minutesMs = (maxMinutesOrOptions: number | RandomOptions): number =
  * // Random timeout of up to 5 seconds
  * setTimeout(() => { ...}, secondsMsSource(5));
  * ```
- * @param maxSecondsOrOpts Maximum seconds, or options.
+ * @param maxSecondsOrOptions Maximum seconds, or options.
  * @returns Milliseconds
  */
 export const secondsMsSource = (
@@ -121,7 +121,7 @@ export const secondsMsSource = (
  * secondsMs({ max:5, min:1 });
  * ```
  * @inheritDoc secondsMsSource
- * @param maxSecondsOrOpts
+ * @param maxSecondsOrOptions
  * @returns
  */
 export const secondsMs = (maxSecondsOrOptions: number | RandomOptions): number =>

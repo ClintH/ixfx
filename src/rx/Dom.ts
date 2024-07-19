@@ -26,8 +26,6 @@ export function fromDomQuery(query: string) {
  * ```js
  * bindText(source, `#blah`);
  * ```
- * 
- * Uses {@link bindElement}, with `{elField:'textContent'}` as the options
  * @param elOrQuery 
  * @param source 
  * @param bindOpts 
@@ -244,9 +242,9 @@ export const bindHtml = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: strin
  * ```
  * 
  * If several fields need to be updated based on a new value, consider using {@link bindUpdate} instead.
- * @param elOrQuery 
- * @param source 
- * @param bindOpts 
+ * @param elOrQuery Element to update to, or query string such as '#someid'
+ * @param source Source of data
+ * @param binds Bindings
  */
 export const bindElement = <TSource, TDestination>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, ...binds: Array<DomBindSourceValue<TSource, TDestination> & Rx.DomBindValueTarget>): PipeDomBinding => {
   if (elOrQuery === null) throw new Error(`Param 'elOrQuery' is null`);

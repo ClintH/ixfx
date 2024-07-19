@@ -5,7 +5,7 @@ import type { RandomSource } from "./Types.js";
  * ```js
  * const id = shortGuid();
  * ```
- * @param opts Options.
+ * @param options Options.
  * @returns
  */
 export const shortGuid = (options: Readonly<{ source?: RandomSource }> = {}) => {

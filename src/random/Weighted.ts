@@ -24,7 +24,7 @@ export type WeightedOptions = Readonly<{
  * Random.weighted();          // quadIn easing by default, which skews toward low values
  * Random.weighted(`quadOut`); // quadOut favours high values
  * ```
- * @param easingNameOrOpts Options. Uses 'quadIn' by default.
+ * @param easingNameOrOptions Options. Uses 'quadIn' by default.
  * @see {@link weightedSource} Returns a function rather than value
  * @returns Random number (0-1)
  */
@@ -45,7 +45,7 @@ export const weighted = (
  * const r2 = Random.weightedSource(`quadOut`); // quadOut favours high values
  * r2(); // Produce a value
  * ```
- * @param easingName Easing name or options `quadIn` by default.
+ * @param easingNameOrOptions Easing name or options `quadIn` by default.
  * @see {@link weighted} Returns value instead of function
  * @returns Function which returns a weighted random value
  */

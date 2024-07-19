@@ -1,3 +1,4 @@
+export * from './Chance.js';
 export * from './FloatSource.js';
 export * from './Gaussian.js';
 export * from './Guid.js';

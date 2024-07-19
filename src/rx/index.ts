@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 //#region imports
-import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet } from "./Types.js";
-import { messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
-import * as OpFns from './ops/index.js';
-import { initStream } from "./InitStream.js";
-import { type Interval, intervalToMs } from '../flow/IntervalType.js';
-import { resolveSource } from './ResolveSource.js';
+import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./Types.js";
 import type { BatchOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
-import type { TimeoutTriggerOptions } from "./sources/Types.js";
-import * as SinkFns from './sinks/index.js';
 import type { RankFunction, RankOptions } from "../data/Types.js";
-export * from './Chain.js';
+import type { TimeoutTriggerOptions } from "./sources/Types.js";
+import { type Interval, intervalToMs } from '../flow/IntervalType.js';
+import { messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
+import { initStream } from "./InitStream.js";
+import { resolveSource } from './ResolveSource.js';
+import * as SinkFns from './sinks/index.js';
+import * as OpFns from './ops/index.js';
 
 //#endregion
 
 //#region exports
+export * from './Chain.js';
 export * from './ops/index.js';
 export * from './sinks/index.js';
 export * from './Graph.js';
@@ -164,20 +164,27 @@ export const Ops = {
    */
   filter: <V>(predicate: (value: V) => boolean) => opify(OpFns.filter, predicate),
   /**
+   * Every upstream value is considered the target for interpolation.
+   * Output value interpolates by a given amount toward the target.
+   * @param options 
+   * @returns 
+   */
+  interpolate: <TIn = number>(options?: Partial<OpFns.OpInterpolateOptions>) => opify<TIn, ReactivePingable<number>>(OpFns.interpolate as any, options),
+  /**
  * Outputs the minimum numerical value of the stream.
  * A value is only emitted when minimum decreases.
  * @returns 
  */
-  min: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, number>(OpFns.min, options),
+  min: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.min, options),
   /**
    * Outputs the maxium numerical value of the stream.
    * A value is only emitted when maximum increases.
    * @returns 
    */
-  max: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, number>(OpFns.max, options),
-  sum: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, number>(OpFns.sum, options),
-  average: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, number>(OpFns.average, options),
-  tally: <TIn>(options?: OpFns.TallyOptions) => opify<TIn, number>(OpFns.tally, options),
+  max: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.max, options),
+  sum: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.sum, options),
+  average: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.average, options),
+  tally: <TIn>(options?: OpFns.TallyOptions) => opify<TIn, Reactive<number>>(OpFns.tally, options),
   rank: <TIn>(rank: RankFunction<TIn>, options?: RankOptions & OpFns.OpMathOptions) => opify<TIn>(OpFns.rank, rank, options),
 
   pipe: <TInput, TOutput>(...streams: Array<Reactive<any> & ReactiveWritable<any>>) => {
