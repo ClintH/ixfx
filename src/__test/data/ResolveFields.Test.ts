@@ -1,5 +1,5 @@
 import test from 'ava';
-import { fieldResolve } from '../../data/ResolveFields.js';
+import { resolveFields } from '../../data/ResolveFields.js';
 import * as Numbers from '../../numbers/index.js';
 import * as Flow from '../../flow/index.js';
 import * as Rx from '../../rx/index.js';
@@ -14,7 +14,7 @@ test('resolve-fields-async', async t => {
     }
   };
 
-  const r = await fieldResolve(s);
+  const r = await resolveFields(s);
   t.is(typeof r.length, `number`);
   t.is(typeof r.random, `number`);
   t.is(r.length, 10);
@@ -28,7 +28,7 @@ test('resolve-fields-async', async t => {
 
   // Each time we call resolveFields, r1.gen should match for index
   for (let i = 0; i < c + 1; i++) {
-    const r1 = await fieldResolve(s1);
+    const r1 = await resolveFields(s1);
     t.is(r1.colour, `red`);
     if (i === c) {
       // Test if generator ends
@@ -47,7 +47,7 @@ test(`field-resolve`, async t => {
     length: 10,
     random: Math.random
   };
-  const r = await fieldResolve(s);
+  const r = await resolveFields(s);
   t.is(typeof r.length, `number`);
   t.is(typeof r.random, `number`);
   t.is(r.length, 10);
@@ -65,7 +65,7 @@ test(`field-resolve`, async t => {
 
   // Each time we call resolveFields, r1.gen should match for index
   for (let i = 0; i < c + 1; i++) {
-    const r1 = await fieldResolve(s1);
+    const r1 = await resolveFields(s1);
     t.is(r1.colour, `red`);
     if (i === c) {
       // Test if generator ends
