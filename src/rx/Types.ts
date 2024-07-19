@@ -67,7 +67,7 @@ export type UpstreamOptions<In> = {
    * @returns
    */
   onStop: () => void
-
+  debugLabel: string
   onDispose: (reason: string) => void
 }
 
@@ -253,6 +253,7 @@ export type ToArrayOptions<V> = {
 export type Lazy = `initial` | `never` | `very`
 export type InitLazyStreamOptions = Partial<InitStreamOptions> & {
   lazy: Lazy
+  debugLabel?: string
   onStart: () => void
   onStop: () => void
 };
@@ -262,8 +263,6 @@ export type InitLazyStreamInitedOptions<T> = InitLazyStreamOptions & {
 }
 
 export type CountOptions = { lazy: Lazy, amount: number, offset: number, interval: Interval, signal: AbortSignal }
-
-
 export type ReactiveOrSource<V> = Wrapped<V> | Reactive<V> | IterableIterator<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V> | Array<V> | (() => V)
 
 export type BindUpdateOpts<V> = {
@@ -276,7 +275,7 @@ export type BindUpdateOpts<V> = {
 export type Reactive<V> = {
   /**
    * Subscribes to a reactive. Receives
-   * data as well as signals. Use `value` if you
+   * data as well as signals. Use `onValue` if you
    * just care about values.
    * 
    * Return result unsubscribes.
@@ -291,12 +290,20 @@ export type Reactive<V> = {
    * @param handler 
    */
   on(handler: (value: Passed<V>) => void): Unsubscriber
+  /**
+   * Subscribes to a reactive's values.
+   * Returns a function that unsubscribes.
+   * @param handler
+   */
   onValue(handler: (value: V) => void): Unsubscriber
 
   dispose(reason: string): void
   isDisposed(): boolean
   set?(value: V): void
+}
 
+export type ReactivePingable<V> = Reactive<V> & {
+  ping(): void
 }
 
 export type Unsubscriber = () => void;
@@ -325,6 +332,7 @@ export type ReactiveArray<V> = ReactiveWritable<Array<V>> & {
   insertAt(index: number, value: V): void
   onArray(handler: (changes: Passed<Array<ChangeRecord<number>>>) => void): () => void
 }
+export type ObjectFieldHandler = { value: any, fieldName: string, pattern: string };
 
 export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
   /**
@@ -334,13 +342,13 @@ export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
    * @param fieldName 
    * @param handler 
    */
-  onField(fieldName: string, handler: (value: any, fieldName: string) => void): () => void
+  onField(fieldName: string, handler: (result: ObjectFieldHandler) => void): () => void
   /**
    * Notifies of which field(s) were changed.
    * If you just care about the whole, changed data use the `value` event.
    * 
    * Use the returned function to unsubscribe.
-   * @param handler 
+   * @param changes 
    */
   onDiff(changes: (changes: Array<Immutable.PathDataChange<any>>) => void): () => void
   /**
