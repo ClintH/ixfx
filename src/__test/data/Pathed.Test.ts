@@ -96,16 +96,22 @@ test('get-paths', (t) => {
 });
 
 test('get-field', (t) => {
-  t.is(getField({ name: { first: `Thom`, last: `Yorke` } }, `name.first`), `Thom`);
-  t.is(getField({ colours: [ `red`, `green`, `blue` ] }, `colours.1`), `green`);
-  t.falsy(getField({ colours: [ `red`, `green`, `blue` ] }, `colours.3`));
+  const t1 = getField({ name: { first: `Thom`, last: `Yorke` } }, `name.first`);
+  t.is(t1.value, `Thom`);
+  const t2 = getField({ colours: [ `red`, `green`, `blue` ] }, `colours.1`);
+  t.is(t2.value, `green`);
+  const t3 = getField({ colours: [ `red`, `green`, `blue` ] }, `colours.3`);
+  t.false(t3.success);
   const d = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
   };
-  t.is(getField(d, `accel.x`), 1);
-  t.is(getField(d, `gyro.z`), 6);
-  t.like(getField(d, `gyro`), { x: 4, y: 5, z: 6 });
+  const t4 = getField(d, `accel.x`);
+  t.is(t4.value, 1);
+  const t5 = getField<number>(d, `gyro.z`);
+  t.is(t5.value, 6);
+  const t6 = getField(d, `gyro`);
+  t.like(t6.value, { x: 4, y: 5, z: 6 });
 
   const d2 = {
     message: `hello`,
@@ -114,7 +120,15 @@ test('get-field', (t) => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  t.is(getField(d2, `profiles.1.animals.1`), `rabbit`);
+  const d2a = getField(d2, `profiles.1.animals.1`);
+  t.is(d2a.value, `rabbit`);
+
+  t.false(getField(d2, `profiles.1.animals.2`).success);
+  t.false(getField(d2, `profiles.1.animals.hello`).success);
+  t.false(getField(d2, `profiles.-1.animals.1`).success);
+  t.false(getField(d2, `profiles.2.animals.2`).success);
+  t.false(getField(d2, `profiles.1.animalz`).success);
+  t.false(getField(d2, `message.1`).success);
 
   t.throws(() => getField(d, ``))
   // @ts-expect-error
@@ -133,15 +147,15 @@ test('get-field', (t) => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  t.deepEqual(getField(d3, `profiles`), d3.profiles);
-  t.deepEqual(getField(d3, `profiles.0`), d3.profiles[ 0 ]);
-  t.deepEqual(getField(d3, `profiles.0.animals`), d3.profiles[ 0 ].animals);
-  t.deepEqual(getField(d3, `profiles.0.animals.1`), d3.profiles[ 0 ].animals[ 1 ]);
+  t.deepEqual(getField(d3, `profiles`).value, d3.profiles);
+  t.deepEqual(getField(d3, `profiles.0`).value, d3.profiles[ 0 ]);
+  t.deepEqual(getField(d3, `profiles.0.animals`).value, d3.profiles[ 0 ].animals);
+  t.deepEqual(getField(d3, `profiles.0.animals.1`).value, d3.profiles[ 0 ].animals[ 1 ]);
 });
 
 
 
-test(`apply-changes`, t => {
+test(`apply - changes`, t => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -174,7 +188,7 @@ test(`apply-changes`, t => {
   });
 });
 
-test(`compare-data-array`, t => {
+test(`compare - data - array`, t => {
   // Index 1 has a value when it didn't before
   const c1 = [ ...compareData([ `a` ], [ `a`, `a` ], { includeMissingFromA: true }) ];
   t.deepEqual(c1, [ { path: `1`, previous: undefined, value: `a`, state: `added` } ]);
@@ -183,7 +197,7 @@ test(`compare-data-array`, t => {
   const c2 = [ ...compareData([ `a`, `a`, `a` ], [ `a` ], { includeMissingFromA: true }) ];
   t.deepEqual(c2, [ { path: `1`, previous: `a`, value: undefined, state: `removed` }, { path: `2`, previous: `a`, value: undefined, state: `removed` } ]);
 
-  const c3 = [ ...compareData([], [ `a`, `a`, `a` ], { includeMissingFromA: true }) ];
+  const c3 = [ ...compareData([], [ `a`, `a`, `a` ] as any, { includeMissingFromA: true }) ];
   t.deepEqual(c3, [
     { path: `0`, previous: undefined, value: `a`, state: `added` },
     { path: `1`, previous: undefined, value: `a`, state: `added` },
@@ -199,7 +213,7 @@ test(`compare-data-array`, t => {
 
 });
 
-test(`compare-data`, t => {
+test(`compare - data`, t => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -270,7 +284,56 @@ test(`compare-data`, t => {
   ]);
 });
 
-test(`compare-data-deep-a`, t => {
+test(`compare - data - undefined`, t => {
+  const test = {
+    msg: `hello`,
+    position: { x: 10, y: 20 },
+    value: false
+  }
+  // Key doesn't exist
+  const c1 = [ ...compareData(test, {
+    position: { x: 10, y: 20 },
+    value: false
+  }) ]
+  // Expect it picks up on 'msg' removal
+  t.deepEqual(c1, [
+    {
+      path: 'msg',
+      previous: 'hello',
+      value: undefined,
+      state: 'removed'
+    }
+  ])
+
+  // Value is undefined, treating it as removal
+  const c2 = [ ...compareData(test, {
+    msg: undefined,
+    position: { x: 10, y: 20 },
+    value: false
+  }, { undefinedValueMeansRemoved: true }) ]
+  // Expect it treats 'msg' as being removed
+  t.deepEqual(c2, [
+    {
+      path: 'msg',
+      previous: 'hello',
+      value: undefined,
+      state: 'removed'
+    }
+  ])
+
+  // Value is undefined, treating undefined as a value
+  const c3 = [ ...compareData(test, {
+    msg: undefined,
+    position: { x: 10, y: 20 },
+    value: false
+  }, { undefinedValueMeansRemoved: false }) ]
+  // Expect it treats the value as changed
+  t.deepEqual(c3, [
+    { path: 'msg', previous: 'hello', value: undefined, state: 'change' }
+  ])
+
+});
+test(`compare - data - deep - a`, t => {
   const t1 = {
     a: {
       b: {
@@ -361,7 +424,7 @@ test(`compare-data-deep-a`, t => {
 
 });
 
-test(`compare-data-deep-with-parents`, t => {
+test(`compare - data - deep -with-parents`, t => {
   const t1 = {
     a: {
       b: {
@@ -467,7 +530,7 @@ test(`compare-data-deep-with-parents`, t => {
 
 
 });
-test(`compare-data-arrays`, t => {
+test(`compare - data - arrays`, t => {
   const test2 = {
     colours: [ `red`, `green`, `blue` ],
     sizes: [ 10, 20, 30 ]
@@ -509,7 +572,7 @@ test(`compare-data-arrays`, t => {
   ]);
 });
 
-test(`update-by-path`, t => {
+test(`update - by - path`, t => {
   const a = {
     position: { x: 10, y: 20 },
     message: `hello`

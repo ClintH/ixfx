@@ -4,6 +4,7 @@ import { isPlainObjectOrPrimitive } from '../util/GuardObject.js';
 import { isInteger } from '../util/IsInteger.js';
 import { isEqualContextString, type IsEqualContext } from './Util.js';
 import { compareKeys } from './Compare.js';
+import type { Result } from '../util/Results.js';
 
 export type PathData<V> = {
   path: string
@@ -16,6 +17,17 @@ export type PathDataChange<V> = PathData<V> & {
 }
 
 export type CompareDataOptions<V> = {
+  /**
+   * If _true_, it treats the B value as a partial
+   * version of B. Only the things present in B are compared.
+   * Omissions from B are not treated as removed keys.
+   */
+  asPartial: boolean
+  /**
+   * If _true_ (default), if a value is undefined,
+   * it signals that the key itself is removed.
+   */
+  undefinedValueMeansRemoved: boolean
   pathPrefix: string
   /**
    * Comparison function for values. By default uses
@@ -51,6 +63,9 @@ export type CompareDataOptions<V> = {
 }
 
 const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean) => {
+  if (target === undefined) throw new Error(`Param 'target' is undefined`);
+  if (target === null) throw new Error(`Param 'target' is null`);
+  if (typeof target !== `object`) throw new Error(`Param 'target' is not an object (got: ${ typeof target })`);
   if (deepProbe) {
     const entries: Array<[ key: string, value: any ]> = [];
     for (const field in target) {
@@ -72,13 +87,13 @@ const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean
  * - `deepEntries` (_false_): If _false_ Object.entries are used to scan the object. However this won't work for some objects, eg event args, thus _true_ is needed.
  * - `eq` (JSON.stringify): By-value comparison function
  * - `includeMissingFromA` (_false): If _true_ includes fields present on B but missing on A.
- * @param a 
- * @param b 
- * @param pathPrefix 
- * @param options
+ * - `asPartial` (_false): If _true_, treats B as a partial update to B. This means that things missing from B are not considered removals.
+ * @param a 'Old' value
+ * @param b 'New' value
+ * @param options Options for comparison
  * @returns 
  */
-export function* compareData<V extends Record<string, any>>(a: V, b: V, options: Partial<CompareDataOptions<V>> = {}): Generator<PathDataChange<any>> {
+export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>, options: Partial<CompareDataOptions<V>> = {}): Generator<PathDataChange<any>> {
   if (a === undefined) {
     yield {
       path: options.pathPrefix ?? ``,
@@ -91,45 +106,71 @@ export function* compareData<V extends Record<string, any>>(a: V, b: V, options:
     yield { path: options.pathPrefix ?? ``, previous: a, value: undefined, state: `removed` }
     return;
   }
+  const asPartial = options.asPartial ?? false;
+  const undefinedValueMeansRemoved = options.undefinedValueMeansRemoved ?? false;
   const pathPrefix = options.pathPrefix ?? ``;
   const deepEntries = options.deepEntries ?? false;
   const eq = options.eq ?? isEqualContextString;
   const includeMissingFromA = options.includeMissingFromA ?? false;
   const includeParents = options.includeParents ?? false;
-  //const changes: Array<PathDataChange<any>> = [];
 
-  //console.log(`Immutable.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ pathPrefix }`);
+  //console.log(`Pathed.compareData: a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } prefix: ${ pathPrefix }`);
 
   if (isPrimitive(a) && isPrimitive(b)) {
     if (a !== b) yield { path: pathPrefix, value: b, previous: a, state: `change` };
     return;
   }
-
+  if (isPrimitive(b)) {
+    yield { path: pathPrefix, value: b, previous: a, state: `change` };
+    return;
+  }
   const entriesA = getEntries(a, deepEntries);
   const entriesAKeys = new Set<string>();
   for (const [ key, valueA ] of entriesA) {
     entriesAKeys.add(key);
-    //console.log(`Immutable.compareDataA key: ${ key } valueA: ${ JSON.stringify(valueA) }`);
-    if (typeof valueA === `object`) {
-      const sub = [ ...compareData(valueA, b[ key ], {
-        ...options,
-        pathPrefix: pathPrefix + key + `.`
-      }) ];
-      if (sub.length > 0) {
-        for (const s of sub) yield s;
-        if (includeParents) {
-          yield { path: pathPrefix + key, value: b[ key ], previous: valueA, state: `change` };
+
+    const keyOfAInB = key in b;
+    const valueOfKeyInB = b[ key ];
+    //console.log(`Pathed.compareData Pathed.compareDataA key: ${ key } valueA: ${ JSON.stringify(valueA) }`);
+
+    if (typeof valueA === `object` && valueA !== null) {
+      if (keyOfAInB) {
+        //console.log(`Pathed.compareData key ${ key } exists in B. value:`, valueB);
+        if (valueOfKeyInB === undefined) {
+          throw new Error(`Pathed.compareData Value for key ${ key } is undefined`);
+        } else {
+          const sub = [ ...compareData(valueA, valueOfKeyInB, {
+            ...options,
+            pathPrefix: pathPrefix + key + `.`
+          }) ];
+          if (sub.length > 0) {
+            for (const s of sub) yield s;
+            if (includeParents) {
+              yield { path: pathPrefix + key, value: b[ key ], previous: valueA, state: `change` };
+            }
+          }
         }
+      } else {
+        if (asPartial) continue;
+        //throw new Error(`Key does not exist in B. Key: '${ key }'. B: ${ JSON.stringify(b) } A: ${ JSON.stringify(a) }`);
+        yield { path: pathPrefix + key, value: undefined, previous: valueA, state: `removed` }
       }
     } else {
       const subPath = pathPrefix + key;
-      if (key in b) {
-        const valueB = b[ key ];
-        if (!eq(valueA, valueB, subPath)) {
-          //console.log(`  value changed. A: ${ valueA } B: ${ valueB } subPath: ${ subPath }`)
-          yield { path: subPath, previous: valueA, value: valueB, state: `change` };
+      if (keyOfAInB) {
+        // B contains key from A
+        if (valueOfKeyInB === undefined && undefinedValueMeansRemoved) {
+          //console.error(`Pathed.compareData (2) value for B is undefined. key: ${ key }. B: ${ JSON.stringify(b) } A: ${ JSON.stringify(a) }`);
+          yield { path: subPath, previous: valueA, value: undefined, state: `removed` };
+        } else {
+          if (!eq(valueA, valueOfKeyInB, subPath)) {
+            //console.log(`Pathed.compareData  value changed. A: ${ valueA } B: ${ valueB } subPath: ${ subPath }`)
+            yield { path: subPath, previous: valueA, value: valueOfKeyInB, state: `change` };
+          }
         }
       } else {
+        // B does not contain key from A
+        if (asPartial) continue; // Ignore
         yield { path: subPath, previous: valueA, value: undefined, state: `removed` };
       }
     }
@@ -140,7 +181,7 @@ export function* compareData<V extends Record<string, any>>(a: V, b: V, options:
     for (const [ key, valueB ] of entriesB) {
       if (entriesAKeys.has(key)) continue;
       // Key in B that's not in A
-      //console.log(`Immutable.compareDataB key: ${ key } value: ${ valueB }`);
+      //console.log(`Pathed.compareDataB key: ${ key } value: ${ valueB }`);
       yield { path: pathPrefix + key, previous: undefined, value: valueB, state: `added` };
     }
   }
@@ -215,7 +256,7 @@ export const updateByPath = <V extends Record<string, any>>(target: V, path: str
 
 const updateByPathImpl = (o: any, split: Array<string>, value: any, allowShapeChange: boolean): any => {
   if (split.length === 0) {
-    //console.log(`Immutable.updateByPathImpl o: ${ JSON.stringify(o) } value: ${ JSON.stringify(value) }`);
+    //console.log(`Pathed.updateByPathImpl o: ${ JSON.stringify(o) } value: ${ JSON.stringify(value) }`);
 
     if (allowShapeChange) return value; // yolo
 
@@ -272,41 +313,46 @@ const updateByPathImpl = (o: any, split: Array<string>, value: any, allowShapeCh
  * @param path 
  * @returns 
  */
-export const getField = <V>(object: Record<string, any>, path: string): V => {
-  if (typeof path !== `string`) throw new Error(`Parameter 'path' ought to be a string. Got: '${ typeof path }'`);
-  if (path.length === 0) throw new Error(`Parameter 'path' is empty`);
-  if (object === undefined) throw new Error(`Parameter 'object' is undefined`);
-  if (object === null) throw new Error(`Parameter 'object' is null`);
+export const getField = <V>(object: Record<string, any>, path: string): Result<V> => {
+  if (typeof path !== `string`) throw new Error(`Param 'path' ought to be a string. Got: '${ typeof path }'`);
+  if (path.length === 0) throw new Error(`Param string 'path' is empty`);
+  if (object === undefined) throw new Error(`Param 'object' is undefined`);
+  if (object === null) throw new Error(`Param 'object' is null`);
 
   const split = path.split(`.`);
   const v = getFieldImpl<V>(object, split);
   return v;
 }
 
-const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): V => {
-  if (object === undefined) throw new Error(`Parameter 'object' is undefined`);
-  if (split.length === 0) throw new Error(`Path run out`);
+const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): Result<V> => {
+  if (object === undefined) throw new Error(`Param 'object' is undefined`);
+  if (split.length === 0) throw new Error(`Path has run out`);
   const start = split.shift();
   if (!start) throw new Error(`Unexpected empty split path`);
 
   const isInt = isInteger(start);
   if (isInt && Array.isArray(object)) { //(arrayStart === 0 && arrayEnd === start.length - 1 && Array.isArray(o)) {
     const index = Number.parseInt(start); //start.slice(1, -1));
+    //console.log(`getFieldImpl index: ${ index } value: ${ object[ index ] }`);
+    if (typeof object[ index ] === `undefined`) {
+      return { success: false, error: `Index ${ index } is not present` };
+    }
     // eslint-disable-next-line unicorn/prefer-ternary
     if (split.length === 0) {
-      return object[ index ] as V;
+      return { value: object[ index ] as V, success: true };
     } else {
       return getFieldImpl(object[ index ], split);
     }
-  } else if (start in object) {
+  } else if (typeof object === `object` && start in object) {
+    //console.log(`start in object. Start: ${ start } Len: ${ split.length } Object`, object);
     // eslint-disable-next-line unicorn/prefer-ternary
     if (split.length === 0) {
-      return object[ start ] as V;
+      return { value: object[ start ] as V, success: true };
     } else {
       return getFieldImpl(object[ start ], split);
     }
   } else {
-    throw new Error(`Path '${ start }' not found in data`);
+    return { success: false, error: `Path '${ start }' not found` };
   }
 }
 
