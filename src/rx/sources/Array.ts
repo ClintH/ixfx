@@ -19,7 +19,7 @@ export const of = <V>(source: Array<V> | Iterable<V>, options: Partial<ArrayOpti
  * See also {@link arrayObject} which monitors changes to array values.
  *
  * Reads items from an array with a given interval, by default 5ms
- * @param array 
+ * @param sourceArray 
  * @param options 
  * @returns 
  */

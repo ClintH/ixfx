@@ -8,14 +8,14 @@ import type { SplitOptions } from "./Types.js";
  * By default these are lazy and dispose if the upstream source closes.
  * 
  * See also {@link splitLabelled} to split into named streams.
- * @param source 
- * @param quantity 
+ * @param rxOrSource 
+ * @param options 
  * @returns 
  */
-export const split = <T>(r: ReactiveOrSource<T>, options: Partial<SplitOptions> = {}) => {
+export const split = <T>(rxOrSource: ReactiveOrSource<T>, options: Partial<SplitOptions> = {}) => {
   const quantity = options.quantity ?? 2;
   const outputs: Array<ReactiveStream<T>> = [];
-  const source = resolveSource(r);
+  const source = resolveSource(rxOrSource);
   for (let index = 0; index < quantity; index++) {
     outputs.push(initUpstream(source, { disposeIfSourceDone: true, lazy: `initial` }));
   }
@@ -32,12 +32,12 @@ export const split = <T>(r: ReactiveOrSource<T>, options: Partial<SplitOptions> 
  * ```
  * 
  * See also {@link split} to get an unlabelled split
- * @param source 
+ * @param rxOrSource 
  * @param labels 
  * @returns 
  */
-export const splitLabelled = <T, K extends PropertyKey>(r: ReactiveOrSource<T>, labels: Array<K>): Record<K, Reactive<T>> => {
-  const source = resolveSource(r);
+export const splitLabelled = <T, K extends PropertyKey>(rxOrSource: ReactiveOrSource<T>, labels: Array<K>): Record<K, Reactive<T>> => {
+  const source = resolveSource(rxOrSource);
   const t: Partial<Record<K, Reactive<T>>> = {}
   for (const label of labels) {
     t[ label ] = initUpstream(source, { lazy: `initial`, disposeIfSourceDone: true });

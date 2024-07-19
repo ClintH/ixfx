@@ -24,10 +24,10 @@ export type SetHtmlOptions = (SetHtmlOptionsQuery | SetHtmlOptionsElement) & {
  * const rxSource = Rx.From.string('hello');
  * const rxSet = Rx.Sinks.setHtmlText(rxSource, { query: })
  * ```
- * @param input 
- * @param options 
+ * @param rxOrSource 
+ * @param optionsOrElementOrQuery 
  */
-export const setHtmlText = (input: ReactiveOrSource<any>, optionsOrElementOrQuery: SetHtmlOptions | string | HTMLElement) => {
+export const setHtmlText = (rxOrSource: ReactiveOrSource<any>, optionsOrElementOrQuery: SetHtmlOptions | string | HTMLElement) => {
   let el: HTMLElement | null | undefined;
   let options: SetHtmlOptions | undefined;
   if (typeof optionsOrElementOrQuery === `string`) {
@@ -51,7 +51,7 @@ export const setHtmlText = (input: ReactiveOrSource<any>, optionsOrElementOrQuer
   }
   if (el === null || el === undefined) throw new Error(`Element could not be resolved.`);
 
-  const stream = resolveSource(input);
+  const stream = resolveSource(rxOrSource);
   const setter = setProperty(options.asHtml ? `innerHTML` : `textContent`, el);
   const off = stream.onValue(value => {
     setter(value)

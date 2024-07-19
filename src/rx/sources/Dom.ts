@@ -64,12 +64,12 @@ export function domHslInputValue(targetOrQuery: HTMLInputElement | string, optio
     },
   });
   const rx = transform(input, v => {
-    return Colour.toHsl(v);
+    return Colour.toHsl(v, true);
   });
   return {
     ...rx,
     last() {
-      return Colour.toHsl(input.last())
+      return Colour.toHsl(input.last(), true)
     },
     set(value) {
       input.set(Colour.toHex(value));
