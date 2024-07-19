@@ -102,18 +102,20 @@ export const toHsl = (colour: Colourish, safe = false): Hsl => {
   // throw new Error(`Could not resolve colour ${ colour }`);
 };
 
-const hslToColorJs = (hsl: Hsl): Color => {
-  throwNumberTest(hsl.h, `percentage`, `hsl.h`);
+const hslToColorJs = (hsl: Hsl, safe: boolean): Color => {
+  let h = hsl.h === null ? (safe ? 0 : null) : hsl.h;
+  let opacity = hsl.opacity === undefined ? 1 : hsl.opacity;
+  throwNumberTest(h, `percentage`, `hsl.h`);
   throwNumberTest(hsl.s, `percentage`, `hsl.s`);
   throwNumberTest(hsl.l, `percentage`, `hsl.l`);
-  throwNumberTest(hsl.opacity, `percentage`, `hsl.opacity`);
+  throwNumberTest(opacity, `percentage`, `hsl.opacity`);
 
   const coords: [ number, number, number ] = [
-    hsl.h * 360,
+    h! * 360,
     hsl.s * 100,
     hsl.l * 100
   ];
-  return new Color(`hsl`, coords, hsl.opacity);
+  return new Color(`hsl`, coords, opacity);
 }
 
 const oklchToColorJs = (oklch: OkLch) => {
@@ -150,17 +152,6 @@ export const toString = (colour: Colourish): string => {
   return c.display();
 }
 
-/**
- * Returns a colour in hsla(0-360,100%,1) form.
- * See also: {@link toString}
- * @param colour 
- * @returns 
- */
-// export const toHslaString = (colour: Colourish): string => {
-//   if (typeof colour === `string` && colour === `transparent`) return `hsla(0,0%,0%,0)`;
-//   const c = resolve(colour);
-//   return c.toString({ format: `hsl` });
-// }
 
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
@@ -250,7 +241,7 @@ export const toRgb = (colour: Colourish): Rgb => {
  * @param colour Colour to resolve
  * @returns Color.js Color object
  */
-export const resolve = (colour: Colourish): Color => {
+export const resolve = (colour: Colourish, safe: boolean = false): Color => {
   if (typeof colour === `string`) {
     if (colour.startsWith(`--`)) {
       // Resolve CSS variable
@@ -258,7 +249,7 @@ export const resolve = (colour: Colourish): Color => {
     }
     return new Color(colour);
   } else {
-    if (isHsl(colour)) return new Color(hslToColorJs(colour));
+    if (isHsl(colour)) return new Color(hslToColorJs(colour, safe));
     if (isRgb(colour)) return new Color(rgbToColorJs(colour));
     if (isOklch(colour)) return new Color(oklchToColorJs(colour));
   }
@@ -281,7 +272,7 @@ export const resolve = (colour: Colourish): Color => {
  * // Try a CSS variable, a object property or finally fallback to red.
  * element.style.backgroundColor = resolveToString('--some-var', opts.background, `red`);
  * ```
- * @param colour 
+ * @param colours Array of colours to resolve
  * @returns 
  */
 export const resolveToString = (...colours: Array<Colourish | undefined>): string => {
@@ -310,9 +301,9 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
  * @param colour
  * @returns Hex format, including #
  */
-export const toHex = (colour: Colourish): string => {
+export const toHex = (colour: Colourish, safe = false): string => {
   if (typeof colour === `string` && colour === `transparent`) return `#00000000`;
-  return resolve(colour).to(`srgb`).toString({ format: `hex`, collapse: false });
+  return resolve(colour, safe).to(`srgb`).toString({ format: `hex`, collapse: false });
 };
 
 /**
@@ -362,25 +353,7 @@ export const getCssVariable = (
   return fromCss;
 };
 
-/**
- * Interpolates between two colours, returning a string in the form `rgb(r,g,b)`
- *
- * @example
- * ```js
- * // Get 50% between blue and red
- * interpolate(0.5, `blue`, `red`);
- *
- * // Get midway point, with specified colour space
- * interpolate(0.5, `hsl(200, 100%, 50%)`, `pink`, {space: `hcl`});
- * ```
- *
- * [Named colours](https://html-color-codes.info/color-names/)
- * @param amount Amount (0 = from, 0.5 halfway, 1= to)
- * @param from Starting colour
- * @param to Final colour
- * @param optsOrSpace Options for interpolation, or string name for colour space, eg `hsl`.
- * @returns String representation of colour, eg. `rgb(r,g,b)`
- */
+
 // export const interpolate = (
 //   amount: number,
 //   from: Colourish,
@@ -402,6 +375,7 @@ export const getCssVariable = (
 //   if (inter === undefined) throw new Error(`Could not handle colour/space`);
 //   return inter(amount);
 // };
+
 
 export const interpolator = (colours: Array<Colourish>, opts: Partial<InterpolationOpts> = {}) => {
   const space = opts.space ?? `lch`;

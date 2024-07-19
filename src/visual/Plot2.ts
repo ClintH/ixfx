@@ -12,8 +12,9 @@ import type { Point } from '../geometry/point/PointType.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
 import { scaleCanvas } from './ScaleCanvas.js';
 import { parentSizeCanvas } from '../dom/CanvasSizing.js';
-import type { MinMaxAvgTotal } from '../data/arrays/Types.js';
-import { minMaxAvg } from '../data/arrays/MinMaxAvg.js';
+import { minMaxAvg } from '../numbers/MinMaxAvg.js';
+import type { MinMaxAvgTotal } from '../numbers/Types.js';
+import { throwResult } from 'src/util/Results.js';
 
 /**
  * 
@@ -1027,7 +1028,9 @@ export class Plot extends Sg.CanvasBox {
         s.drawingStyle = `line`;
         seriesCreated = true;
       }
-      s.add(getField(o, p));
+      const f = getField(o, p);
+      throwResult(f);
+      s.add(f.value as number);
     }
     if (seriesCreated) this.legend.layoutInvalidated(`new series`);
     this.update();

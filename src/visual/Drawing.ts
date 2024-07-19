@@ -82,7 +82,7 @@ export const makeHelper = (
     },
     rect(
       rectsToDraw: RectPositioned | Array<RectPositioned>,
-      opts?: DrawingOpts & { filled?: boolean }
+      opts?: RectOpts
     ): void {
       rect(ctx, rectsToDraw, opts);
     },
@@ -806,6 +806,12 @@ export const triangle = (
 //   ctx.restore();
 // }
 
+export type RectOpts = DrawingOpts & {
+  readonly stroke?: boolean;
+  readonly filled?: boolean;
+  readonly strokeWidth?: number;
+}
+
 /**
  * Draws one or more rectangles.
  * 
@@ -816,21 +822,20 @@ export const triangle = (
 export const rect = (
   ctx: CanvasRenderingContext2D,
   toDraw: Rect | RectPositioned | ReadonlyArray<RectPositioned>,
-  opts: DrawingOpts & {
-    readonly filled?: boolean;
-    readonly stroked?: boolean;
-  } = {}
+  opts: RectOpts = {}
 ) => {
   applyOpts(ctx, opts);
 
   const filled = opts.filled ?? (opts.fillStyle === undefined ? false : true);
-  const stroked = opts.stroked ?? (opts.strokeStyle === undefined ? false : true);
+  const stroke = opts.stroke ?? (opts.strokeStyle === undefined ? false : true);
   const draw = (d: RectPositioned | Rect) => {
     const x = `x` in d ? d.x : 0;
     const y = `y` in d ? d.y : 0;
     if (filled) ctx.fillRect(x, y, d.width, d.height);
-    if (stroked ?? true) ctx.strokeRect(x, y, d.width, d.height);
-
+    if (stroke) {
+      if (opts.strokeWidth) ctx.lineWidth = opts.strokeWidth;
+      ctx.strokeRect(x, y, d.width, d.height);
+    }
     if (opts.debug) {
       pointLabels(ctx, RectsCorners(d), undefined, [ `NW`, `NE`, `SE`, `SW` ]);
     }

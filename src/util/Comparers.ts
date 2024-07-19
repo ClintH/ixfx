@@ -55,7 +55,7 @@ export const jsComparer = (x: any, y: any): CompareResult => {
 
 /**
  * Inverts the source comparer.
- * @param fn
+ * @param comparer
  * @returns
  */
 export const comparerInverse = <V>(comparer: Comparer<V>): Comparer<V> => {

@@ -75,11 +75,18 @@ export const isWrapped = <T>(v: any): v is Wrapped<T> => {
   return true;
 }
 
-export const opify = <TIn, TOut = TIn>(fn: (source: ReactiveOrSource<TIn>, ...args: Array<any>) => Reactive<TOut>, ...args: Array<any>) => {
+// export const opify = <TIn, TOut = TIn,>(fn: (source: ReactiveOrSource<TIn>, ...args: Array<any>) => Reactive<TOut>, ...args: Array<any>) => {
+//   return (source: ReactiveOrSource<TIn>) => {
+//     return fn(source, ...args);
+//   }
+// }
+
+export const opify = <TIn, TRxOut = Reactive<TIn>>(fn: (source: ReactiveOrSource<TIn>, ...args: Array<any>) => TRxOut, ...args: Array<any>) => {
   return (source: ReactiveOrSource<TIn>) => {
     return fn(source, ...args);
   }
 }
+
 
 export const isTriggerValue = <V>(t: Trigger<V>): t is TriggerValue<V> => (`value` in t);
 export const isTriggerFunction = <V>(t: Trigger<V>): t is TriggerFunction<V> => (`fn` in t);

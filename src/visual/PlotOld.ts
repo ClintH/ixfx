@@ -9,7 +9,7 @@ import {
 } from '../collections/map/index.js';
 import type { Rect, Point } from '../geometry/Types.js';
 import { parentSizeCanvas } from '../dom/CanvasSizing.js';
-import { minMaxAvg } from '../data/arrays/MinMaxAvg.js';
+import { minMaxAvg } from '../numbers/MinMaxAvg.js';
 
 export type Plotter = {
   add(value: number, series?: string, skipDrawing?: boolean): void;

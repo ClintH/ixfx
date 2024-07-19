@@ -1,4 +1,5 @@
 export type * from './ArrayTypes.js';
+export type * from './GuardTypes.js';
 export * from './Comparers.js';
 export * as Guards from './guards.js';
 export * from './IsEqual.js';

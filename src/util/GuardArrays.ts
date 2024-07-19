@@ -4,7 +4,7 @@ import { throwFromResult } from "./GuardThrowFromResult.js";
 /**
  * Throws an error if parameter is not an array
  * @param value
- * @param paramName
+ * @param parameterName
  */
 export const arrayTest = (value: unknown, parameterName = `?`): GuardResult => {
   if (!Array.isArray(value)) {

@@ -63,35 +63,35 @@ export type BipolarView = (x: number, y: number) => void;
  * p(1, 0.5);
  * ```
  * @param elementQuery 
- * @param opts 
+ * @param options 
  * @returns 
  */
-export const init = (elementQuery: string, opts: BipolarViewOptions = {}): BipolarView => {
+export const init = (elementQuery: string, options: BipolarViewOptions = {}): BipolarView => {
   const element = document.querySelector<HTMLCanvasElement>(elementQuery);
   if (!element) throw new Error(`Element query could not be found (${ elementQuery })`);
-  const labels = opts.labels ?? [ `x`, `y` ];
-  const labelPrecision = opts.labelPrecision ?? 2;
-  const asPercentages = opts.asPercentages ?? false;
-  const displayLastValues = opts.displayLastValues ?? 0;
+  const labels = options.labels ?? [ `x`, `y` ];
+  const labelPrecision = options.labelPrecision ?? 2;
+  const asPercentages = options.asPercentages ?? false;
+  const displayLastValues = options.displayLastValues ?? 0;
   // Flags
-  const showWhiskers = opts.showWhiskers ?? true;
-  const showDot = opts.showDot ?? true;
-  const showLabels = opts.showLabels ?? true;
-  const yAxisBottomNegative = opts.yAxisBottomNegative ?? true;
+  const showWhiskers = options.showWhiskers ?? true;
+  const showDot = options.showDot ?? true;
+  const showLabels = options.showLabels ?? true;
+  const yAxisBottomNegative = options.yAxisBottomNegative ?? true;
   // Colours
-  const axisColour = Colour.resolveToString(opts.axisColour, `silver`);
-  const bgColour = Colour.resolveToString(opts.bgColour, `white`);
-  const whiskerColour = Colour.resolveToString(opts.whiskerColour, `black`);
-  const dotColour = Colour.resolveToString(opts.dotColour, opts.whiskerColour, `black`);
-  const labelColour = Colour.resolveToString(opts.labelColour, opts.axisColour, `silver`);
+  const axisColour = Colour.resolveToString(options.axisColour, `silver`);
+  const bgColour = Colour.resolveToString(options.bgColour, `white`);
+  const whiskerColour = Colour.resolveToString(options.whiskerColour, `black`);
+  const dotColour = Colour.resolveToString(options.dotColour, options.whiskerColour, `black`);
+  const labelColour = Colour.resolveToString(options.labelColour, options.axisColour, `silver`);
 
   // Sizes
-  const axisWidth = (opts.axisWidth ?? 1 * window.devicePixelRatio);
-  const dotRadius = (opts.dotRadius ?? 5 * window.devicePixelRatio);
-  const pad = (opts.padding ?? 10 * window.devicePixelRatio);
-  const whiskerSize = (opts.whiskerSize ?? 5 * window.devicePixelRatio);
-  const width = (opts.width ?? getNumericAttribute(element, `width`, 200) * window.devicePixelRatio);
-  const height = (opts.height ?? getNumericAttribute(element, `height`, 200) * window.devicePixelRatio);
+  const axisWidth = (options.axisWidth ?? 1 * window.devicePixelRatio);
+  const dotRadius = (options.dotRadius ?? 5 * window.devicePixelRatio);
+  const pad = (options.padding ?? 10 * window.devicePixelRatio);
+  const whiskerSize = (options.whiskerSize ?? 5 * window.devicePixelRatio);
+  const width = (options.width ?? getNumericAttribute(element, `width`, 200) * window.devicePixelRatio);
+  const height = (options.height ?? getNumericAttribute(element, `height`, 200) * window.devicePixelRatio);
 
   let lastValues: IQueueImmutable<CirclePositioned> | undefined;
   if (displayLastValues > 0) {
@@ -126,8 +126,8 @@ export const init = (elementQuery: string, opts: BipolarViewOptions = {}): Bipol
     labels[ 1 ] = ``;
   }
 
-  const renderBackground: Render = opts.renderBackground ?? ((ctx, width, height): void => {
-    if (opts.bgColour === `transparent`) {
+  const renderBackground: Render = options.renderBackground ?? ((ctx, width, height): void => {
+    if (options.bgColour === `transparent`) {
       ctx.clearRect(0, 0, width, height);
     } else {
       ctx.fillStyle = bgColour;

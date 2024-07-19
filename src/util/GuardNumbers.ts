@@ -72,7 +72,7 @@ export const integerParse = (
  * Returns `[false, reason:string]` if invalid or `[true]` if valid.
  * Use {@link throwNumberTest} to throw an error rather than return result.
  * 
- * Alternatives: {@link integer} for additional integer check, {@link percent} for percentage-range.
+ * Alternatives: {@link integerTest} for additional integer check, {@link percentTest} for percentage-range.
  *
  * * (empty, default): must be a number type and not NaN.
  * * positive: must be at least zero
@@ -83,7 +83,7 @@ export const integerParse = (
  * * nonZero: can be anything except zero
  * * bipolar: can be -1 to 1, inclusive
  * @param value Value to check
- * @param paramName Name of parameter (for more helpful exception messages)
+ * @param parameterName Name of parameter (for more helpful exception messages)
  * @param range Range to enforce
  * @returns
  */
@@ -162,7 +162,7 @@ export const numberTest = (
 * * nonZero: can be anything except zero
 * * bipolar: can be -1 to 1, inclusive
 * 
- * Alternatives: {@link integer} for additional integer check, {@link percent} for percentage-range.
+ * Alternatives: {@link integerTest} for additional integer check, {@link percentTest} for percentage-range.
  * @param value Value to test
  * @param range Range
  * @param parameterName Name of parameter 
@@ -179,7 +179,7 @@ export const throwNumberTest = (value?: unknown,
  *
  * This is the same as calling ```number(t, `percentage`)```
  * @param value Value to check
- * @param paramName Param name for customising exception message
+ * @param parameterName Param name for customising exception message
  * @returns
  */
 export const percentTest = (value: number, parameterName = `?`): GuardResult =>
@@ -190,7 +190,7 @@ export const throwPercentTest = (value: number, parameterName = `?`) => {
 }
 /**
  * Checks if `value` an integer and meets additional criteria.
- * See {@link number} for guard details, or use that if integer checking is not required.
+ * See {@link numberTest} for guard details, or use that if integer checking is not required.
  *
  * Note:
  * * `bipolar` will mean -1, 0 or 1.
@@ -201,7 +201,7 @@ export const throwPercentTest = (value: number, parameterName = `?`) => {
  * * percentage: must be within 0-1, inclusive
  * * nonZero: can be anything except zero
  * @param value Value to check
- * @param paramName Param name for customising exception message
+ * @param parameterName Param name for customising exception message
  * @param range Guard specifier.
  */
 export const integerTest = (

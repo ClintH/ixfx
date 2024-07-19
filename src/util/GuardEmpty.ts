@@ -2,7 +2,7 @@ import type { GuardResult } from "./GuardTypes.js";
 /**
  * Throws if `value` is _undefined_ or _null_.
  * @param value
- * @param paramName
+ * @param parameterName
  */
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const nullUndef = (value: any, parameterName = `?`): GuardResult => {
