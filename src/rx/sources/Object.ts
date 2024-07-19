@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { DispatchList } from "../../flow/DispatchList.js";
-import * as Immutable from "../../data/Pathed.js";
+import * as Pathed from "../../data/Pathed.js";
 import { initStream } from "../InitStream.js";
-import type { ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
+import type { ObjectFieldHandler, ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
 import type { ObjectOptions } from "./Types.js";
 import { isEqualContextString } from "../../data/Util.js";
+import { throwResult } from "../../util/Results.js";
+import { wildcard } from "../../Text.js";
 
-type ObjectFieldHandler = (value: any, fieldName: string) => void
+//type ObjectFieldHandler = (value: any, fieldName: string) => void
+
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 export function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
 
@@ -64,26 +67,36 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
 export function object<V extends Record<string, any>>(initialValue?: V, options: Partial<ObjectOptions<V>> = {}): ReactiveDiff<V> & (ReactiveInitial<V> | ReactiveNonInitial<V>) {
   const eq = options.eq ?? isEqualContextString;
   const setEvent = initStream<V>();
-  const diffEvent = initStream<Array<Immutable.PathDataChange<any>>>();
+  const diffEvent = initStream<Array<Pathed.PathDataChange<any>>>();
 
-  const fieldChangeEvents = new Map<string, DispatchList<ObjectFieldHandler>>;
+  //const fieldChangeEvents = new Map<string, DispatchList<ObjectFieldHandler>>;
+  const fieldChangeEvents: Array<[ matcher: (value: string) => boolean, pattern: string, DispatchList<ObjectFieldHandler> ]> = [];
 
   let value: V | undefined = initialValue;
   let disposed = false;
 
   const set = (v: V) => {
-    const diff = [ ...Immutable.compareData(value ?? {} as V, v, { ...options, includeMissingFromA: true }) ];
+    const diff = [ ...Pathed.compareData(value ?? {} as V, v, { ...options, includeMissingFromA: true }) ];
     if (diff.length === 0) return;
     value = v;
     setEvent.set(v);
     diffEvent.set(diff);
-
   }
 
   const fireFieldUpdate = (field: string, value: any) => {
-    const l = fieldChangeEvents.get(field.toLowerCase());
-    if (l === undefined) return;
-    l.notify(value);
+    for (const [ matcher, pattern, list ] of fieldChangeEvents) {
+      if (matcher(field)) {
+        list.notify({ fieldName: field, pattern, value });
+      }
+    }
+    //const l = fieldChangeEvents.get(field.toLowerCase());
+    //if (l === undefined) return;
+    //l.notify(value);
+  }
+
+  const updateCompareOptions: Partial<Pathed.CompareDataOptions<V>> = {
+    asPartial: true,
+    includeParents: true
   }
 
   const update = (toMerge: Partial<V>) => {
@@ -97,17 +110,17 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
       }
       return value;
     } else {
-      const diff = [ ...Immutable.compareData(value, toMerge) ];
-      const diffWithoutRemoved = diff.filter(d => d.state !== `removed`);
-      if (diffWithoutRemoved.length === 0) return value; // No changes
+      const diff = [ ...Pathed.compareData(value, toMerge, updateCompareOptions) ];
+      //const diffWithoutRemoved = diff.filter(d => d.state !== `removed`);
+      if (diff.length === 0) return value; // No changes
       value = {
         ...value,
         ...toMerge
       }
-      //console.log(`diff: ${ JSON.stringify(diff) }`);
       setEvent.set(value);
       diffEvent.set(diff);
-      for (const d of diffWithoutRemoved) {
+      //console.log(`diff`, diff);
+      for (const d of diff) {
         fireFieldUpdate(d.path, d.value);
       }
       return value;
@@ -118,20 +131,22 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     if (value === undefined) throw new Error(`Cannot update value when it has not already been set`);
     //console.log(`Rx.fromObject.updateField path: ${ path } value: ${ JSON.stringify(valueForField) }`);
 
-    const existing = Immutable.getField<any>(value, path);
+    const existing = Pathed.getField<any>(value, path);
+    throwResult(existing); // Eg if path not found
+
     //console.log(`Rx.fromObject.updateField path: ${ path } existing: ${ JSON.stringify(existing) }`);
-    if (eq(existing, valueForField, path)) {
+    if (eq(existing.value, valueForField, path)) {
       //console.log(`Rx.object.updateField identical existing: ${ existing } value: ${ valueForField } path: ${ path }`);
       return;
     }
-    let diff = [ ...Immutable.compareData(existing, valueForField, { ...options, includeMissingFromA: true }) ];
+    let diff = [ ...Pathed.compareData(existing.value, valueForField, { ...options, includeMissingFromA: true }) ];
     diff = diff.map(d => {
       if (d.path.length > 0) return { ...d, path: path + `.` + d.path };
       return { ...d, path };
     })
 
     //console.log(`Rx.fromObject.updateField diff path: ${ path }`, diff);
-    const o = Immutable.updateByPath(value, path, valueForField, true);
+    const o = Pathed.updateByPath(value, path, valueForField, true);
     value = o;
     //diffEvent.set([ { path, value: valueForField, previous: existing } ]);
 
@@ -162,16 +177,21 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     on: setEvent.on,
     onValue: setEvent.onValue,
     onDiff: diffEvent.onValue,
-    onField(fieldName: string, handler: (value: any, fieldName: string) => void) {
-      let listeners = fieldChangeEvents.get(fieldName.toLowerCase());
-      if (listeners === undefined) {
-        listeners = new DispatchList();
-        fieldChangeEvents.set(fieldName.toLowerCase(), listeners);
-      }
-      const id = listeners.add((value) => {
-        setTimeout(() => { handler(value, fieldName) }, 1);
-      });
+    onField(fieldPattern: string, handler: (result: ObjectFieldHandler) => void) {
+      const matcher = wildcard(fieldPattern);
+      const listeners = new DispatchList<ObjectFieldHandler>();
+      fieldChangeEvents.push([ matcher, fieldPattern, listeners ]);
+      const id = listeners.add(handler);
       return () => listeners.remove(id);
+      // let listeners = fieldChangeEvents.get(fieldName.toLowerCase());
+      // if (listeners === undefined) {
+      //   listeners = new DispatchList();
+      //   fieldChangeEvents.set(fieldName.toLowerCase(), listeners);
+      // }
+      // const id = listeners.add((value) => {
+      //   setTimeout(() => { handler(value, fieldName) }, 1);
+      // });
+      // return () => listeners.remove(id);
     },
     /**
      * Set the whole object
