@@ -1,5 +1,24 @@
 A rough changelog between NPM releases
 
+# 0.24.3 24.07.19
+
+Rx
+* Rx.From.object: onField event can subscribe with a wildcard
++ Rx.Ops.interpolate: slowly converge on upstream value
++ Rx.Ops.computeWithPrevious: generate value based on current and previous
+
+Data.mapObjectByObject: Remap properties of an object using a second map as a structured set of functions.
+
+
+# 0.24.0 24.07.14
+
+Rx
++ Sources.derived: calculate and emit a value when one of many dependency values change
+
+Modulation
++ 'Sources' sub-module with alternative implementations of waves (sine,saw,tri,sqr). These use a simpler clock mechanism at the cost of not being able to track completion or resetting.
+
+
 # 0.23.2 24.07.04
 
 Collections/Data
