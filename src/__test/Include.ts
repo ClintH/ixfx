@@ -2,7 +2,7 @@
 import { type ExecutionContext } from 'ava';
 import { isEqualDefault } from '../util/IsEqual.js';
 import { isContentsTheSame } from '../data/arrays/Equality.js';
-import { minMaxAvg } from '../data/arrays/MinMaxAvg.js';
+import { minMaxAvg } from '../numbers/MinMaxAvg.js';
 import { hasEqualValuesShallow } from '../iterables/CompareValues.js';
 //test.todo('sf');
 

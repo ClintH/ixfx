@@ -44,7 +44,7 @@ test(`pull-2`, async t => {
     return r;
   });
   const p1Data = await Iter.toArray(p1Loop);
-
+  //console.log(p1Data);
   let count = 1;
   for (const d of p1Data) {
     if (count === 1) t.falsy(d.random);

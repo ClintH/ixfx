@@ -14,20 +14,27 @@ test(`diff-field`, async t => {
   });
   let onName = 0;
   let onColourS = 0;
-
+  let onColour = 0;
   o.onField(`name`, value => {
     onName++;
-    if (onName === 1) t.is(value, `sally`);
-    if (onName === 2) t.is(value, `mary`);
+    if (onName === 1) t.is(value.value, `sally`);
+    if (onName === 2) t.is(value.value, `mary`);
     t.true(onName <= 2);
   });
   o.onField(`colour.s`, value => {
     onColourS++;
-    if (onColourS === 1) t.is(value, 0.5);
-    if (onColourS === 2) t.is(value, 0.9);
+    if (onColourS === 1) t.is(value.value, 0.5);
+    if (onColourS === 2) t.is(value.value, 0.9);
     t.true(onColourS <= 2);
   });
 
+  o.onField(`colour.*`, value => {
+    onColour++;
+    if (onColour === 1) t.is(value.value, { h: 0.1, s: 0.5, l: 0.3 });
+    if (onColour === 2) t.is(value.value, { h: 0.1, s: 0.9, l: 0.3 });
+    t.true(onColour <= 2);
+
+  });
   // Try setting objects
   o.update({ name: 'sally' });
   o.update({
