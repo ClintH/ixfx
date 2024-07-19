@@ -1,4 +1,4 @@
-import { sortByNumericProperty } from "../data/arrays/SortByNumericProperty.js";
+import { sortByNumericProperty } from "../data/arrays/Sort.js";
 import type { RandomSource } from "../random/Types.js";
 import { randomPoint as ShapesRandomPoint, type ShapePositioned } from "./shape/index.js";
 import { isIntersecting as CirclesIsIntersecting } from "./circle/Intersecting.js";

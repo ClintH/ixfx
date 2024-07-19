@@ -182,20 +182,20 @@ export type ContinuouslyOpts = Readonly<{
  * continuously(callback, intervalMs, { fireBeforeWait: true });
  * ```
  * @param callback Function to run. If it returns false, loop exits.
- * @param opts Additional options
- * @param interval Speed of loop
+ * @param options Additional options
+ * @param interval Speed of loop (default: 0)
  * @returns
  */
 export const continuously = (
   callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback,
   interval?: Interval,
-  opts: Partial<ContinuouslyOpts> = {}
+  options: Partial<ContinuouslyOpts> = {}
 ): Continuously => {
   let intervalMs = intervalToMs(interval, 0);
   throwIntegerTest(intervalMs, `positive`, `interval`);
-  const fireBeforeWait = opts.fireBeforeWait ?? false;
-  const onStartCalled = opts.onStartCalled;
-  const signal = opts.signal;
+  const fireBeforeWait = options.fireBeforeWait ?? false;
+  const onStartCalled = options.onStartCalled;
+  const signal = options.signal;
 
   let disposed = false;
   let runState: HasCompletionRunStates = `idle`;

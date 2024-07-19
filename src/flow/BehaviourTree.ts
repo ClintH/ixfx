@@ -1,8 +1,13 @@
+
+
 export type TaskState = `Failed` | `Running` | `Success`;
 export type Task = {
   readonly state: TaskState
 }
-
+export type Traversal = readonly [
+  node: BtNode,
+  path: string
+];
 
 // Sequence runs children until the first one fails (serial)
 // Selector runs children until the first succeeds
@@ -13,20 +18,20 @@ export type Task = {
  * Conditions might abort sibling nodes, as in example: https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/ArtificialIntelligence/BehaviorTrees/BehaviorTreesOverview/
  */
 
-export type NodeBase = {
+export type BtNodeBase = {
   readonly name?: string
 }
 
-export type SeqNode = NodeBase & {
-  readonly seq: ReadonlyArray<Node>
+export type SeqNode = BtNodeBase & {
+  readonly seq: ReadonlyArray<BtNode>
 }
-export type SelNode = NodeBase & {
-  readonly sel: ReadonlyArray<Node>
+export type SelNode = BtNodeBase & {
+  readonly sel: ReadonlyArray<BtNode>
 }
 
-export type Node = SeqNode | SelNode | string;
+export type BtNode = SeqNode | SelNode | string;
 
-const t: Node = {
+const t: BtNode = {
   name: `root`,
   seq: [
     `walk_to_door`,
@@ -45,18 +50,15 @@ const t: Node = {
   ]
 };
 
-type Traversal = readonly [
-  node: Node,
-  path: string
-];
 
-const getName = (t: Node, defaultValue = ``) => {
+
+const getName = (t: BtNode, defaultValue = ``) => {
   if (typeof t === `object` && `name` in t && t.name !== undefined) return t.name;
   return defaultValue;
 };
 
 //eslint-disable-next-line func-style
-export function* iterateBreadth(t: Node, pathPrefix?: string): Generator<Traversal> {
+export function* iterateBreadth(t: BtNode, pathPrefix?: string): Generator<Traversal> {
   if (typeof pathPrefix === `undefined`) {
     pathPrefix = getName(t);
   }
@@ -72,7 +74,7 @@ export function* iterateBreadth(t: Node, pathPrefix?: string): Generator<Travers
 }
 
 //eslint-disable-next-line func-style
-export function* iterateDepth(t: Node, pathPrefix?: string): Generator<Traversal> {
+export function* iterateDepth(t: BtNode, pathPrefix?: string): Generator<Traversal> {
   if (typeof pathPrefix === `undefined`) {
     pathPrefix = getName(t);
   }
@@ -89,17 +91,17 @@ type ValidateOpts = {
 }
 
 //eslint-disable-next-line func-style
-function isSeqNode(n: Node): n is SeqNode {
+function isSeqNode(n: BtNode): n is SeqNode {
   return (n as SeqNode).seq !== undefined;
 }
 
 //eslint-disable-next-line func-style
-function isSelNode(n: Node): n is SelNode {
+function isSelNode(n: BtNode): n is SelNode {
   return (n as SelNode).sel !== undefined;
 }
 
 //eslint-disable-next-line func-style
-function* entries(n: Node) {
+function* entries(n: BtNode) {
   if (isSeqNode(n)) {
     yield* n.seq.entries();
   } else if (isSelNode(n)) {

@@ -48,7 +48,7 @@ export const time = function (
  * t.reset();   // Reset to 0
  * t.isDone;    // _True_ if finished
  * ```
- * @param nameOrFn Name of easing, or an easing function
+ * @param nameOrFunction Name of easing, or an easing function
  * @param durationTicks Duration in ticks
  * @returns Easing
  */
@@ -94,7 +94,7 @@ export type Easing = HasCompletion & {
  * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const e = Easings.create(`circInOut`, 1000, msElapsedTimer);
  * ```
- * @param nameOrFn Name of easing, or an easing function
+ * @param nameOrFunction Name of easing, or an easing function
  * @param duration Duration (meaning depends on timer source)
  * @param timerSource Timer source. Eg {@link tickRelativeTimer}, {@link msRelativeTimer}
  * @returns
@@ -159,7 +159,6 @@ const create = function (
  * ```
  * @param b
  * @param d
- * @param t
  * @returns Value
  */
 export const fromCubicBezier =

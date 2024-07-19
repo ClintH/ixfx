@@ -60,7 +60,7 @@ export type IntervalOpts = {
  *
  * @template V Returns value of `produce` function
  * @param produce Function/generator to use
- * @param opts Options for interval
+ * @param optsOrFixedMs Options for interval, or millisecond delay
  * @template V Data type
  * @returns
  */

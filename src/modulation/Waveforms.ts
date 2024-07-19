@@ -204,7 +204,7 @@ export type WaveShaperFeedback = {
 /**
  * Returns a wave-shaping modulator from a source and shaper
  * @param sourceFn 
- * @param shaper 
+ * @param shaperFn 
  * @returns 
  */
 export function waveFromSource(sourceFn: ModSettable, shaperFn: WaveformShaper, invert = false) {

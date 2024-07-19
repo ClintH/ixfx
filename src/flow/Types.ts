@@ -25,6 +25,8 @@ export type HasCompletion = {
   get startCountTotal(): number
 };
 
+
+
 export type AsyncPromiseOrGenerator<V> =
   | (() => Promise<V> | Promise<undefined>)
   | (() => V | undefined)

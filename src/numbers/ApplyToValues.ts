@@ -10,7 +10,7 @@
  * 
  * // Yields: { name: 'john', x: 20, y: 40 }
  * ```
- * @param obj 
+ * @param object 
  * @param apply 
  * @returns 
  */

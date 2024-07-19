@@ -16,14 +16,14 @@ import { intervalToMs, type Interval } from './flow/IntervalType.js';
  * // Exception is thrown if neither fires within 1 second
  * const event = await eventRace(document.body, [`pointermove`, `pointerdown`], { timeout: 1000 });
  * ```
- * @param target 
- * @param eventNames 
- * @param opts 
+ * @param target Event source
+ * @param eventNames Event name(s)
+ * @param options Options
  * @returns 
  */
-export const eventRace = (target: EventTarget, eventNames: Array<string>, opts: Partial<{ timeout: Interval, signal: AbortSignal }> = {}) => {
-  const intervalMs = intervalToMs(opts.timeout, 60 * 1000);
-  const signal = opts.signal;
+export const eventRace = (target: EventTarget, eventNames: Array<string>, options: Partial<{ timeout: Interval, signal: AbortSignal }> = {}) => {
+  const intervalMs = intervalToMs(options.timeout, 60 * 1000);
+  const signal = options.signal;
   let triggered = false;
   let disposed = false;
   let timeout: ReturnType<typeof setTimeout> | undefined;

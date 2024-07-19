@@ -45,17 +45,17 @@ export type RectRandomPointOpts = {
  * const pt = randomPoint({width: 5, height: 10});
  * ```'
  * @param within Rectangle to generate a point within
- * @param opts Options
+ * @param options Options
  * @returns
  */
 export const randomPoint = (
   within: Rect | RectPositioned,
-  opts: RectRandomPointOpts = {}
+  options: RectRandomPointOpts = {}
 ): Point => {
   // TODO: Does not implement uniform distribution
   // See: https://math.stackexchange.com/questions/366474/find-coordinates-of-n-points-uniformly-distributed-in-a-rectangle
-  const rand = opts.randomSource ?? defaultRandom;
-  const margin = opts.margin ?? { x: 0, y: 0 };
+  const rand = options.randomSource ?? defaultRandom;
+  const margin = options.margin ?? { x: 0, y: 0 };
 
   const x = rand() * (within.width - margin.x - margin.x);
   const y = rand() * (within.height - margin.y - margin.y);

@@ -18,8 +18,8 @@ export type TicksModSettableOptions = ModSettableOptions & {
  * Other examples:
  * * totalTicks: 20, value goes up by 0.05
  * * totalTicks: 1, value goes up by 1
- * @param total Positive, integer value. How many ticks to complete a cycle
- * @param oneShot If true, source does not repeat.
+ * @param totalTicks Positive, integer value. How many ticks to complete a cycle
+ * @param options
  * @returns 
  */
 export function ticks(totalTicks: number, options: Partial<TicksModSettableOptions> = {}): ModSettable {

@@ -5,7 +5,7 @@ import type { Circle, CirclePositioned } from './CircleType.js';
 /**
  * Throws if radius is out of range. If x,y is present, these will be validated too.
  * @param circle 
- * @param paramName 
+ * @param parameterName 
  */
 export const guard = (circle: CirclePositioned | Circle, parameterName = `circle`) => {
   if (isCirclePositioned(circle)) {
@@ -19,7 +19,7 @@ export const guard = (circle: CirclePositioned | Circle, parameterName = `circle
 /**
  * Throws if `circle` is not positioned or has dodgy fields
  * @param circle 
- * @param paramName 
+ * @param parameterName 
  * @returns 
  */
 export const guardPositioned = (circle: CirclePositioned, parameterName = `circle`) => {

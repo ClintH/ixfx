@@ -8,6 +8,8 @@ export * as Async from '../iterables/IterableAsync.js';
 export * as Sync from '../iterables/IterableSync.js';
 export * as Chains from './chain/index.js';
 export * from './Iterable.js';
+export type * from './Types.js';
+
 import { isAsyncIterable } from '../iterables/Iterable.js';
 import * as Chains from './chain/index.js';
 import type { Interval } from '../flow/IntervalType.js';

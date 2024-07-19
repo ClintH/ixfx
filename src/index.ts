@@ -297,12 +297,10 @@ export * as Events from './Events.js';
  */
 export * as Modulation from './modulation/index.js';
 
+export * from './TsUtil.js';
+
 /**
  * This module includes a variety of techniques for storing and retrieving data.
- *
- * Helper functions for working with in-built Javascript collections
- * * {@link Maps}
- * * {@link Arrays}
  *
  * ### MutableSet
  * Like a regular array, a set can store many items. However, duplicate items are ignored - it

@@ -43,7 +43,7 @@ export type PointSpaces = `viewport` | `screen` | `document`;
  * });
  * ```
  *
- * @param opts
+ * @param reference
  * @returns
  */
 export const pointScaler = (reference: PointSpaces = `viewport`) => {
@@ -147,8 +147,7 @@ export type ElPositionOpts = {
  * mapAndScale(document.getElementById('blah')); // Yields: { x,y }
  * ```
  * @param domQueryOrEl
- * @param coordinateSpace
- * @param scaled
+ * @param options
  * @returns
  */
 // eslint-disable-next-line unicorn/prevent-abbreviations
@@ -267,7 +266,6 @@ export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
 
 /**
  * Position element by relative coordinate. Relative to window dimensions by default
- * @param element DOM element to position, or query
  * @param relativePos Window-relative coordinate. 0.5/0.5 is middle of window.
  */
 export const positionFromMiddle = (
@@ -447,7 +445,7 @@ export const clear = (parent: Readonly<HTMLElement>) => {
 
 /**
  * Copies string representation of object to clipboard
- * @param obj
+ * @param object
  * @returns Promise
  */
 export const copyToClipboard = (object: object) => {
@@ -475,8 +473,8 @@ export const copyToClipboard = (object: object) => {
  * * Every child of `parent` and `element`, has a `data-sort` attribute. This is the basis for sorting.
  * * `parent` starts off empty or pre-sorted.
  * * Order of `parent`'s children is not changed (ie it always remains sorted)
- * @param parent 
- * @param element 
+ * @param parent Parent to insert into
+ * @param element Element to insert
  */
 export const insertSorted = (parent: HTMLElement, element: HTMLElement) => {
   const elSort = element.getAttribute(`data-sort`) ?? ``;

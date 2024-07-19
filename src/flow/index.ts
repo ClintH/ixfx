@@ -1,4 +1,4 @@
-export * from './BehaviourTree.js';
+export * as BehaviourTree from './BehaviourTree.js';
 export * from './Continuously.js';
 export * from './Debounce.js';
 export * from './Delay.js';

@@ -57,7 +57,7 @@ export type DelayOpts = Interval & {
  *
  * @template V
  * @param callback What to run after interval
- * @param opts Options for delay. By default delay is before `callback` is executed.
+ * @param optsOrMillis Options for delay, or millisecond delay. By default delay is before `callback` is executed.
  * @return Returns result of `callback`.
  */
 export const delay = async <V>(

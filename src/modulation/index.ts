@@ -5,6 +5,7 @@ import * as Oscillators from './Oscillator.js';
 export * from './PingPong.js';
 export * from './Waveforms.js';
 export * as Sources from './sources/index.js';
+export type * from './Types.js';
 
 /**
  * Easings module

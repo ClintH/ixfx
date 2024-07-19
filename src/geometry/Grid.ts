@@ -186,7 +186,7 @@ export const cellEquals = (
  * Throws an exception if any of the cell's parameters are invalid
  * @private
  * @param cell
- * @param paramName
+ * @param parameterName
  * @param grid
  */
 export const guardCell = (
@@ -217,7 +217,7 @@ export const guardCell = (
 /**
  * Throws an exception if any of the grid's parameters are invalid
  * @param grid
- * @param paramName
+ * @param parameterName
  */
 const guardGrid = (grid: Grid, parameterName = `Param`) => {
   if (grid === undefined) {

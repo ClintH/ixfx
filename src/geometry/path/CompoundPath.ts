@@ -6,7 +6,7 @@ import { isEqual as PointsIsEqual } from '../point/IsEqual.js';
 import type { CompoundPath, Dimensions, Path, RectPositioned } from '../Types.js';
 import type { Point } from '../point/PointType.js';
 import { corners as RectsCorners } from '../rect/Corners.js';
-import { sortByNumericProperty } from '../../data/arrays/SortByNumericProperty.js';
+import { sortByNumericProperty } from '../../data/arrays/Sort.js';
 
 /**
  * Returns a new compoundpath, replacing a path at a given index

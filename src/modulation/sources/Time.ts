@@ -14,7 +14,7 @@ import type { ModSettableOptions, ModSettable, ModSettableFeedback } from "../Ty
  * When using `startAtRelative`, the starting position will be set backward by the relative amount. A value
  * of 0.5, for example, will set the timer back 50% of the interval, meaning the cycle will start half way through.
  * @param interval 
- * @param oneShot 
+ * @param options 
  * @returns 
  */
 export function elapsed(interval: Interval, options: Partial<ModSettableOptions> = {}): ModSettable {
@@ -58,7 +58,7 @@ export function elapsed(interval: Interval, options: Partial<ModSettableOptions>
 /**
  * Counts beats based on a BPM
  * @param bpm 
- * @param oneShot 
+ * @param options 
  * @returns 
  */
 export function bpm(bpm: number, options: Partial<ModSettableOptions>): ModSettable {
@@ -69,7 +69,7 @@ export function bpm(bpm: number, options: Partial<ModSettableOptions>): ModSetta
 /**
  * Counts based on hertz (oscillations per second)
  * @param hz 
- * @param oneShot 
+ * @param options 
  * @returns 
  */
 export function hertz(hz: number, options: Partial<ModSettableOptions>): ModSettable {

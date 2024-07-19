@@ -280,7 +280,7 @@ export type TargetOpts = {
  * const t = Forces.apply(t, Forces.targetForce(targetPos));
  * ```
  * @param targetPos
- * @param diminishBy Scales acceleration. Defaults to 0.001.
+ * @param opts
  * @returns
  */
 export const targetForce = (targetPos: Point, opts: TargetOpts = {}) => {

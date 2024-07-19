@@ -110,23 +110,23 @@ export const frequencyTimerSource =
  * ```
  *
  * @private
- * @param total Total
- * @param opts Options
+ * @param total Total time (milliseconds)
+ * @param options Options
  * @returns Timer
  */
 export const relativeTimer = (
   total: number,
-  opts: Partial<RelativeTimerOpts> = {}
+  options: Partial<RelativeTimerOpts> = {}
 ): ModulationTimer => {
 
-  const clampValue = opts.clampValue ?? false;
-  const wrapValue = opts.wrapValue ?? false;
+  const clampValue = options.clampValue ?? false;
+  const wrapValue = options.wrapValue ?? false;
   if (clampValue && wrapValue) throw new Error(`clampValue and wrapValue cannot both be enabled`);
 
   let modulationAmount = 1;
 
   // Create and starts timer
-  const timer = opts.timer ?? msElapsedTimer();
+  const timer = options.timer ?? msElapsedTimer();
 
   const computeElapsed = () => {
     let v = timer.elapsed / (total * modulationAmount);

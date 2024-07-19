@@ -179,22 +179,22 @@ export type RetryTask<T> = {
  * abort('Cancel!'); // Trigger abort
  * ```
  * @param callback Function to run
- * @param opts Options
+ * @param options Options
  * @returns
  */
-export const retryFunction = <T>(callback: () => Promise<T | undefined>, opts: Partial<RetryOpts<T>> = {}) => {
+export const retryFunction = <T>(callback: () => Promise<T | undefined>, options: Partial<RetryOpts<T>> = {}) => {
   const task: RetryTask<T> = {
     async probe() {
       try {
         const v = await callback();
-        if (v === undefined) return { value: opts.taskValueFallback, success: false };
+        if (v === undefined) return { value: options.taskValueFallback, success: false };
         return { value: v, success: true };
       } catch (error) {
         return { success: false, message: getErrorMessage(error) };
       }
     },
   }
-  return retryTask(task, opts);
+  return retryTask(task, options);
 }
 
 /**
