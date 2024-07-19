@@ -61,7 +61,7 @@ export const contains = <V>(
  * * {@link containsDuplicateInstances}: Compare based on reference, rather than value
  * * {@link unique} Get unique set of values in an array
  * @param array Array to examine
- * @param comparer Comparer, uses JSON.toString by default
+ * @param keyFunction Function to generate key string for object, uses JSON.stringify by default.
  * @returns
  */
 export const containsDuplicateValues = <V>(

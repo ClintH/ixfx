@@ -46,7 +46,7 @@ export type BipolarWrapper = {
  * const x = +v+10;
  * // x = 11
  * ```
- * @param startingValue 
+ * @param startingValueOrBipolar Initial numeric value or BipolarWrapper instance
  * @returns 
  */
 export const immutable = (startingValueOrBipolar: number | BipolarWrapper = 0): BipolarWrapper => {
@@ -182,7 +182,7 @@ export const scaleUnclamped = (inputValue: number, inMin: number, inMax: number)
  * 
  * Consider using {@link random} if you just want a one-off random
  * value.
- * @param source 
+ * @param maxOrOptions Maximum value (number) or options for random generation
  * @returns 
  */
 export const randomSource = (maxOrOptions?: number | RandomOptions): RandomSource => {

@@ -56,7 +56,6 @@ export * from './TrackUnique.js';
 export * from './Types.js';
 export * from './Util.js';
 export * from './Wrap.js';
-
 export * as Graphs from './graphs/index.js'
 
 export const piPi = Math.PI * 2;
@@ -67,16 +66,12 @@ export const piPi = Math.PI * 2;
  *
  * Import example:
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * import { minMaxAvg } from 'https://unpkg.com/ixfx/dist/arrays.js';
  * ```
  * 
  * For arrays of numbers:
- * * {@link average}, {@link max}, {@link min}, {@link total}: Calculate average/max/min/total
- * * {@link averageWeighted}: Calculate average, but applies a weighting function, eg to favour items at beginning of array
  * * {@link minMaxAvg}: Find smallest, largest and average
- * * {@link maxIndex}, {@link minIndex}: Return index of largest/smallest value
- * * {@link dotProduct}: Returns the dot-product between two arrays
- * * {@link weight}: Applies a weighting function to all values based on their index
+ * * See also {@link Numbers} module for working with numbers in general.
  *
  * Randomisation
  * * {@link randomIndex}: Return a random array index
@@ -87,7 +82,6 @@ export const piPi = Math.PI * 2;
  * Finding/accessing
  * * {@link filterBetween}: Same as `Array.filter` but only looks within a specified index range
  * * {@link sample}: Returns a new array with a random sampling of input
- * * {@link valuesEqual}: Returns true if all the values in the array are identical
  *
  * Changing the shape
  * * {@link ensureLength}: Returns a copy of array with designated length, either padding it out or truncating as necessary

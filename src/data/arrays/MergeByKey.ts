@@ -37,7 +37,7 @@ import type { MergeReconcile } from "./Types.js";
  * with older keypoints. But if a keypoint is not present, for it to be
  * passed through.
  *
- * @param keyFn Function to generate a unique key for data
+ * @param keyFunction Function to generate a unique key for data
  * @param reconcile Returns value to decide 'winner' when keys conflict.
  * @param arrays Arrays of data to merge
  */

@@ -310,11 +310,11 @@ export class TrackedPointMap extends TrackedValueMap<
  * * `sampleLimit`: How many samples to store
  * * `storeIntermediate`: If _true_, all points are stored internally
  * * `resetAfterSamples`: If set above 0, it will automatically reset after the given number of samples have been seen
- * @param opts
+ * @param options
  * @returns
  */
-export const pointsTracker = (opts: TrackOpts = {}) =>
-  new TrackedPointMap(opts);
+export const pointsTracker = (options: TrackOpts = {}) =>
+  new TrackedPointMap(options);
 
 /**
  * A tracked point. Create via {@link pointTracker}. Mutable. Useful for monitoring how

@@ -146,7 +146,7 @@ export type SelectOpts = {
  * b.disabled = true / false;
  * ```
  * @param domQueryOrEl Query string or element instance
- * @param onClick Callback when button is clicked
+ * @param onClickHandler Callback when button is clicked
  * @returns
  */
 export const button = (
@@ -262,10 +262,10 @@ export type SelectHandler = {
   get isSelectedPlaceholder(): boolean;
   /**
    * Set options
-   * @param opts Options
+   * @param options Options
    * @param preSelect Item to preselect
    */
-  setOpts(opts: ReadonlyArray<string>, preSelect?: string): void;
+  setOpts(options: ReadonlyArray<string>, preSelect?: string): void;
   /**
    * Select item by index
    * @param index Index
@@ -312,21 +312,20 @@ export type SelectHandler = {
  * ```
  * @param domQueryOrEl Query (eg `#id`) or element
  * @param onChanged Callback when a selection is made
- * @param opts Options
+ * @param options Options
  * @return
  */
 export const select = (
-  //eslint-disable-next-line functional/prefer-immutable-types
   domQueryOrEl: string | HTMLSelectElement,
   onChanged?: (currentValue: string) => void,
-  opts: SelectOpts = {}
+  options: SelectOpts = {}
 ): SelectHandler => {
   const el = resolveEl(domQueryOrEl);
   const {
     placeholderOpt,
     shouldAddChoosePlaceholder = false,
     autoSelectAfterChoice = -1,
-  } = opts;
+  } = options;
 
   const change = () => {
     if (onChanged !== undefined) onChanged(el.value);
@@ -352,7 +351,7 @@ export const select = (
     },
     get isSelectedPlaceholder(): boolean {
       return (
-        (shouldAddChoosePlaceholder || opts.placeholderOpt !== undefined) &&
+        (shouldAddChoosePlaceholder || options.placeholderOpt !== undefined) &&
         el.selectedIndex === 0
       );
     },

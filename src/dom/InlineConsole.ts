@@ -15,9 +15,9 @@ export type InlineConsoleOptions = LogOpts;
  * 
  * console.log(`Hello`); // message is displayed in the inline console
  * ```
- * @param opts 
+ * @param options 
  */
-export const inlineConsole = (opts: InlineConsoleOptions = {}) => {
+export const inlineConsole = (options: InlineConsoleOptions = {}) => {
   const original = {
     log: console.log,
     error: console.error,
@@ -34,7 +34,7 @@ export const inlineConsole = (opts: InlineConsoleOptions = {}) => {
 
   document.body.prepend(logElement);
 
-  const logger = log(logElement, opts);
+  const logger = log(logElement, options);
 
   const visibility = (show: boolean) => {
     logElement.style.display = show ? `block` : `none`;

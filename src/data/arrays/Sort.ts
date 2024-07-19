@@ -28,3 +28,15 @@ export const sortByNumericProperty = <V, K extends keyof V>(
   if (av > bv) return 1;
   return 0;
 });
+
+export const sortByProperty = <V, K extends keyof V>(
+  data: ReadonlyArray<V> | Array<V>,
+  propertyName: K
+) => [ ...data ].sort((a, b) => {
+  guardArray(data, `data`);
+  const av = a[ propertyName ];
+  const bv = b[ propertyName ];
+  if (av < bv) return -1;
+  if (av > bv) return 1;
+  return 0;
+});

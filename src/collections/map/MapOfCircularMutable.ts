@@ -24,11 +24,11 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
  * ```
  *
  *
- * @param opts
+ * @param options
  * @returns
  */
 export const ofCircularMutable = <V>(
-  opts: MapCircularOpts<V>
+  options: MapCircularOpts<V>
 ): IMapOfMutableExtended<V, ICircularArray<V>> => {
   const comparer = isEqualDefault;
 
@@ -37,7 +37,7 @@ export const ofCircularMutable = <V>(
       return `circular`;
     },
     add: (destination, values) => {
-      if (destination === undefined) destination = circularArray<V>(opts.capacity);
+      if (destination === undefined) destination = circularArray<V>(options.capacity);
       for (const v of values) {
         //values.forEach(v => dest = dest?.add(v));
         destination = destination.add(v);
@@ -53,5 +53,5 @@ export const ofCircularMutable = <V>(
       source.find((v) => comparer(v, value)) !== undefined,
     without: (source, value) => source.filter((v) => !comparer(v, value)),
   };
-  return new MapOfMutableImpl<V, ICircularArray<V>>(t, opts);
+  return new MapOfMutableImpl<V, ICircularArray<V>>(t, options);
 };

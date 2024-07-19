@@ -18,8 +18,8 @@
  * For clamping `{ x, y }` points, consider {@link Geometry.Points.clamp | Geometry.Points.clamp}.
  * For clamping bipolar values: {@link Bipolar.clamp}
  * @param value Value to clamp
- * @param Minimum value (inclusive)
- * @param Maximum value (inclusive)
+ * @param min value (inclusive)
+ * @param max value (inclusive)
  * @returns Clamped value
  */
 export const clamp = (value: number, min = 0, max = 1) => {

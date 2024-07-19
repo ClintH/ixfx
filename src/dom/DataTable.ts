@@ -116,18 +116,18 @@ export type DataFormatter = (data: object, path: string) => string | undefined;
  * Rows are keyed by the map key. Rows with keys not found in the map are deleted.
  * @param t Table
  * @param data Map of data
- * @param opts Options
+ * @param options Options
  * @returns
  */
 const updateElement = (
   //eslint-disable-next-line functional/prefer-immutable-types
   t: HTMLTableElement,
   data: object,
-  opts: DataTableOpts = {}
+  options: DataTableOpts = {}
 ) => {
-  const precision = opts.precision ?? 2;
-  const idPrefix = opts.idPrefix ?? ``;
-  const objectsAsTables = opts.objectsAsTables ?? false;
+  const precision = options.precision ?? 2;
+  const idPrefix = options.idPrefix ?? ``;
+  const objectsAsTables = options.objectsAsTables ?? false;
 
   if (data === undefined) {
     //eslint-disable-next-line functional/immutable-data
@@ -168,16 +168,16 @@ const updateElement = (
 
     // Format the value as HTML
     let valueHTML: string | undefined;
-    if (opts.formatter) {
-      valueHTML = opts.formatter(value, key);
+    if (options.formatter) {
+      valueHTML = options.formatter(value, key);
     }
 
     // If there's no formatter, or not handled...
     if (valueHTML === undefined) {
       if (typeof value === `object`) {
-        valueHTML = objectsAsTables ? toTableSimple(value, opts) : JSON5.stringify(value);
+        valueHTML = objectsAsTables ? toTableSimple(value, options) : JSON5.stringify(value);
       } else if (typeof value === `number`) {
-        valueHTML = opts.roundNumbers ? Math.round(value).toString() : value.toFixed(precision);
+        valueHTML = options.roundNumbers ? Math.round(value).toString() : value.toFixed(precision);
       } else if (typeof value === `boolean`) {
         valueHTML = value ? `true` : `false`;
       } else if (typeof value === `string`) {

@@ -35,13 +35,13 @@ import type { IMapOfMutableExtended } from './IMapOfMutableExtended.js';
  * map.add(`hello`, {age:40, name: `Mary`});
  * map.add(`hello`, {age:29, name: `Mary`}); // Value ignored as same name exists
  * ```
- * @param opts
+ * @param options
  * @returns
  */
 export const ofSetMutable = <V>(
-  opts?: MapSetOpts<V>
+  options?: MapSetOpts<V>
 ): IMapOfMutableExtended<V, ReadonlyMap<string, V>> => {
-  const hash = opts?.hash ?? toStringDefault;
+  const hash = options?.hash ?? toStringDefault;
   const comparer = (a: V, b: V) => hash(a) === hash(b);
 
   const t: MultiValue<V, ReadonlyMap<string, V>> = {
@@ -57,6 +57,6 @@ export const ofSetMutable = <V>(
     has: (source, value) => mapHasAnyValue(source, value, comparer),
     without: (source, value) => without(mapToArray(source), value, comparer),
   };
-  const m = new MapOfMutableImpl<V, ReadonlyMap<string, V>>(t, opts);
+  const m = new MapOfMutableImpl<V, ReadonlyMap<string, V>>(t, options);
   return m;
 };

@@ -251,8 +251,8 @@ export const sortByValue = <K, V>(
  * const sorted = Maps.sortByValue(m, `name`);
  * ```
  * @param map Map to sort
- * @param prop Property of value
- * @param compareFn Comparer. If unspecified, uses a default.
+ * @param property Property of value
+ * @param compareFunction Comparer. If unspecified, uses a default.
  */
 export const sortByValueProperty = <K, V, Z>(
   map: ReadonlyMap<K, V>,
@@ -344,7 +344,7 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
  * const map = Maps.fromIterable(data, v => v.fruit);
  * ```
  * @param data Input data
- * @param keyFn Function which returns a string id. By default uses the JSON value of the object.
+ * @param keyFunction Function which returns a string id. By default uses the JSON value of the object.
  * @param allowOverwrites When set to _true_, items with same id will silently overwrite each other, with last write wins. _false_ by default.
  * @returns
  */

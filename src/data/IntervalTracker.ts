@@ -46,7 +46,7 @@ export class IntervalTracker extends NumberTracker {
  * // Reset after 100 samples
  * const t = intervalTracker({ resetAfterSamples: 100} );
  * ```
- * @param opts Options for tracker
+ * @param options Options for tracker
  * @returns New interval tracker
  */
-export const intervalTracker = (opts?: TrackOpts) => new IntervalTracker(opts);
+export const intervalTracker = (options?: TrackOpts) => new IntervalTracker(options);

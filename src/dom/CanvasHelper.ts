@@ -96,9 +96,6 @@ export type CanvasHelperOpts = {
  * }
  * const canvas = new CanvasHelper(`#my-canvas`, { fill: `viewport`, draw });
  * ```
- * @param domQueryOrEl Canvas element to wrap
- * @param opts Options
- * @returns 
  */
 export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   readonly el: HTMLCanvasElement;
@@ -323,7 +320,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   }
 
   /**
-   * Returns a {@link Scaler} that converts from relative to absolute
+   * Returns a Scaler that converts from relative to absolute
    * coordinates.
    * This is based on the canvas size.
    * 
@@ -339,7 +336,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   }
 
   /**
-   * Returns a {@link Scaler} that converts from absolute
+   * Returns a Scaler that converts from absolute
    * to relative coordinates.
    * This is based on the canvas size.
    * 

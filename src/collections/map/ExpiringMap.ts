@@ -62,11 +62,11 @@ export type ExpiringMapEvents<K, V> = {
 
 /**
  * Create a ExpiringMap instance
- * @param opts
+ * @param options Options when creating map
  * @returns
  */
-export const create = <K, V>(opts: Opts = {}): ExpiringMap<K, V> =>
-  new ExpiringMap(opts);
+export const create = <K, V>(options: Opts = {}): ExpiringMap<K, V> =>
+  new ExpiringMap(options);
 /***
  * A map that can have a capacity limit. The elapsed time for each get/set
  * operation is maintained allowing for items to be automatically removed.

@@ -71,10 +71,10 @@ export class StackImmutable<V> implements IStackImmutable<V> {
  * s = s.pop();
  * s.peek;        // 3
  * ```
- * @param opts Options
+ * @param options Options
  * @param startingItems List of items to add to stack. Items will be pushed 'left to right', ie array index 0 will be bottom of the stack.
  */
 export const immutable = <V>(
-  opts: StackOpts = {},
+  options: StackOpts = {},
   ...startingItems: ReadonlyArray<V>
-): IStackImmutable<V> => new StackImmutable({ ...opts }, [ ...startingItems ]);
+): IStackImmutable<V> => new StackImmutable({ ...options }, [ ...startingItems ]);

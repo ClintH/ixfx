@@ -3,7 +3,7 @@ import { guardArray } from "./GuardArray.js";
 
 
 /**
- * Returns _true_ if the two arrays have the same items at same indexes. Use {@link isEqualValues} to
+ * Returns _true_ if the two arrays have the same items at same indexes. Use {@link isEqualDefault} to
  * compare values regardless of position.
  * 
  * Returns _false_ if arrays are of different length.

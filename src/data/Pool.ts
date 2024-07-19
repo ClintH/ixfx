@@ -337,23 +337,23 @@ export class Pool<V> {
    * Constructor.
    *
    * By default, no capacity limit, one user per resource
-   * @param opts Pool options
+   * @param options Pool options
    */
-  constructor(opts: Opts<V> = {}) {
-    this.capacity = opts.capacity ?? -1;
-    this.fullPolicy = opts.fullPolicy ?? `error`;
-    this.capacityPerResource = opts.capacityPerResource ?? 1;
-    this.userExpireAfterMs = opts.userExpireAfterMs ?? -1;
+  constructor(options: Opts<V> = {}) {
+    this.capacity = options.capacity ?? -1;
+    this.fullPolicy = options.fullPolicy ?? `error`;
+    this.capacityPerResource = options.capacityPerResource ?? 1;
+    this.userExpireAfterMs = options.userExpireAfterMs ?? -1;
     this.resourcesWithoutUserExpireAfterMs =
-      opts.resourcesWithoutUserExpireAfterMs ?? -1;
+      options.resourcesWithoutUserExpireAfterMs ?? -1;
 
-    this.generateResource = opts.generate;
-    this.freeResource = opts.free;
+    this.generateResource = options.generate;
+    this.freeResource = options.free;
 
     this._users = new Map();
     this._resources = [];
 
-    this.log = Debug.logSet(`Pool`, opts.debug ?? false);
+    this.log = Debug.logSet(`Pool`, options.debug ?? false);
 
     // If we have a time-based expiry, set an interval to
     // automatically do the housekeeping
@@ -675,7 +675,7 @@ export class Pool<V> {
 
 /**
  * Creates an instance of a Pool
- * @param opts
+ * @param options
  * @returns
  */
-export const create = <V>(opts: Opts<V> = {}): Pool<V> => new Pool<V>(opts);
+export const create = <V>(options: Opts<V> = {}): Pool<V> => new Pool<V>(options);

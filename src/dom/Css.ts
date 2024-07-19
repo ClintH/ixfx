@@ -5,7 +5,7 @@ import { resolveEls, type QueryOrElements } from "./ResolveEl.js";
  * ```js
  * setClass(`#someId`, true, `activated`);
  * ```
- * @param query 
+ * @param selectors 
  * @param value 
  * @param cssClass 
  * @returns 

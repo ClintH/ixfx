@@ -41,12 +41,12 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * ```js
  * const map = ofArrayMutable({comparer: (a, b) => a.name === b.name });
  * ```
- * @param opts
+ * @param options Optiosn for mutable array
  * @template V Data type of items
  * @returns {@link IMapOfMutableExtended}
  */
 export const ofArrayMutable = <V>(
-  opts: MapArrayOpts<V> = {}
+  options: MapArrayOpts<V> = {}
 ): IMapOfMutableExtended<V, ReadonlyArray<V>> => {
   // const toStringFunction = opts.toString === undefined ?  
   // const comparer =
@@ -62,10 +62,10 @@ export const ofArrayMutable = <V>(
   //   return r;
   // };
 
-  const convertToString = opts.convertToString;
+  const convertToString = options.convertToString;
   const toStringFunction: IsEqual<V> = typeof convertToString === `undefined` ? isEqualDefault : (a: V, b: V) => convertToString(a) === convertToString(b)
 
-  const comparer = opts.comparer ?? toStringFunction;
+  const comparer = options.comparer ?? toStringFunction;
 
   const t: MultiValue<V, ReadonlyArray<V>> = {
     get name() {
@@ -84,6 +84,6 @@ export const ofArrayMutable = <V>(
     without: (source, value) => source.filter((v) => !comparer(v, value)),
     //[Symbol.iterator]: (source) => source[Symbol.iterator]()
   };
-  const m = new MapOfMutableImpl<V, ReadonlyArray<V>>(t, opts);
+  const m = new MapOfMutableImpl<V, ReadonlyArray<V>>(t, options);
   return m;
 };

@@ -49,7 +49,7 @@ export const randomIndex = <V>(
  * @template V Type of array
  * @param array Array to pluck item from
  * @param mutate If _true_, changes input array. _False_ by default.
- * @param random Random generatr. `Math.random` by default.
+ * @param rand Random generatr. `Math.random` by default.
  * @return Returns an object `{value:V|undefined, array:V[]}`
  *
  */

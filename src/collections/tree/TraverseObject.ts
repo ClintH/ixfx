@@ -37,7 +37,7 @@ export function prettyPrintEntries(entries: ReadonlyArray<Entry>) {
  * ```
  * @param indent
  * @param node
- * @param defaultName
+ * @param options
  * @returns
  */
 export const prettyPrint = (
@@ -206,16 +206,16 @@ function childByName<T extends object>(
  * ```
  * @param path Path, eg `jane.address.postcode`
  * @param node Node to look within
- * @param opts Options for parsing path. By default '.' is used as a separator
+ * @param options Options for parsing path. By default '.' is used as a separator
  * @returns
  */
 export function getByPath<T extends object>(
   path: string,
   node: T,
-  opts: PathOpts = {}
+  options: PathOpts = {}
 ): Entry {
   // ✔️ Unit tested
-  const v = last(traceByPath(path, node, opts));
+  const v = last(traceByPath(path, node, options));
   if (!v) throw new Error(`Could not trace path: ${ path } `);
   return v;
 }
@@ -249,19 +249,19 @@ export function getByPath<T extends object>(
  * 
  * @param path Path to traverse
  * @param node Starting node
- * @param opts Options for path traversal logic
+ * @param options Options for path traversal logic
  * @returns
  */
 export function* traceByPath<T extends object>(
   path: string,
   node: T,
-  opts: PathOpts = {}
+  options: PathOpts = {}
 ): Iterable<EntryWithAncestors> {
   // ✔️ Unit tested
   throwNullUndef(path, `path`);
   throwNullUndef(node, `node`);
 
-  const separator = opts.separator ?? `.`;
+  const separator = options.separator ?? `.`;
   // const allowArrayIndexes = opts.allowArrayIndexes ?? true;
   const pathSplit = path.split(separator);
 
@@ -315,11 +315,12 @@ export function* traceByPath<T extends object>(
   * c1[ 0 ].getIdentity() === c2[ 0 ].getIdentity(); // true
  * ```
  * @param node 
- * @param defaultName 
+ * @param options
+ * @param ancestors 
  * @param parent 
  * @returns 
  */
-export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: Array<string> = [], parent?: TraversableTree<EntryStatic> | undefined,): TraversableTree<EntryStatic> => {
+export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: Array<string> = [], parent?: TraversableTree<EntryStatic> | undefined): TraversableTree<EntryStatic> => {
   const name = options.name ?? `object`;
   const t: TraversableTree<EntryStatic> = {
     *children() {
@@ -343,7 +344,7 @@ export const asDynamicTraversable = <T extends object>(node: T, options: Partial
 /**
  * Reads all fields and sub-fields of `node`, returning as a 'wrapped' tree structure.
  * @param node 
- * @param defaultName 
+ * @param options 
  * @returns 
  */
 export const createWrapped = <T extends object>(node: T, options: Partial<CreateOptions>): TreeArrayBacked.WrappedNode<any> => {
@@ -379,7 +380,7 @@ export type CreateOptions = {
 /**
  * Reads all fields and sub-fields of `node`, returning as a basic tree structure
  * @param node 
- * @param defaultName 
+ * @param options 
  * @returns 
  */
 export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): TreeNode<EntryStatic> => {

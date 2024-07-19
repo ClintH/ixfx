@@ -84,14 +84,14 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  * ```
  *
  * @template V Data type of items
- * @param opts
+ * @param options
  * @param startingItems Index 0 is the front of the queue
  * @returns A new queue
  */
 export const immutable = <V>(
-  opts: QueueOpts<V> = {},
+  options: QueueOpts<V> = {},
   ...startingItems: ReadonlyArray<V>
 ): IQueueImmutable<V> => {
-  opts = { ...opts }; // Make a copy of options
-  return new QueueImmutable(opts, [ ...startingItems ]); // Make a copy of array so it can't be modified
+  options = { ...options }; // Make a copy of options
+  return new QueueImmutable(options, [ ...startingItems ]); // Make a copy of array so it can't be modified
 };

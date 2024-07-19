@@ -63,10 +63,10 @@ export type DataWithId<V> = V & {
  *  { id:`1`, x:101, y:200 }
  * ]
  * ```
- * @param similarityFn
- * @param lastData
- * @param newData
- * @param opts
+ * @param similarityFn Function to compute similarity
+ * @param lastData Old data
+ * @param newData New data
+ * @param options Options
  * @returns
  */
 //eslint-disable-next-line functional/immutable-data
@@ -74,28 +74,28 @@ export const align = <V>(
   similarityFn: Similarity<V>,
   lastData: readonly DataWithId<V>[] | undefined,
   newData: readonly DataWithId<V>[],
-  opts: AlignOpts = {}
+  options: AlignOpts = {}
 ): readonly DataWithId<V>[] => {
-  const matchThreshold = opts.matchThreshold ?? 0;
-  const debug = opts.debug ?? false;
+  const matchThreshold = options.matchThreshold ?? 0;
+  const debug = options.debug ?? false;
   const results = new Map();
   const newThings: DataWithId<V>[] = [];
 
   const lastMap = new Map();
   lastData?.forEach((d, index) => {
     if (d === undefined) {
-      throw new Error(`'lastData' contains undefined (index: ${index})`);
+      throw new Error(`'lastData' contains undefined (index: ${ index })`);
     }
     lastMap.set(d.id, d);
   });
 
   //eslint-disable-next-line functional/no-let
   for (let i = 0; i < newData.length; i++) {
-    const newD = newData[i];
+    const newD = newData[ i ];
 
     if (!lastData || lastData.length === 0) {
       // No last data to compare to
-      if (debug) console.debug(`Correlate.align() new id: ${newD.id}`);
+      if (debug) console.debug(`Correlate.align() new id: ${ newD.id }`);
 
       //eslint-disable-next-line functional/immutable-data
       newThings.push(newD);
@@ -111,7 +111,7 @@ export const align = <V>(
 
     if (scoredLastValues.length === 0) {
       if (debug) {
-        console.debug(`Correlate.align() no valid last values id: ${newD.id}`);
+        console.debug(`Correlate.align() no valid last values id: ${ newD.id }`);
       }
       //eslint-disable-next-line functional/immutable-data
       newThings.push(newD);
@@ -121,11 +121,11 @@ export const align = <V>(
     scoredLastValues.sort(orderScore);
 
     // Top-ranked match is pretty low, must be something new
-    const top = scoredLastValues[0];
+    const top = scoredLastValues[ 0 ];
     if (top.score < matchThreshold) {
       if (debug) {
         console.debug(
-          `Correlate.align() new item does not reach threshold. Top score: ${top.score} id: ${newD.id}`
+          `Correlate.align() new item does not reach threshold. Top score: ${ top.score } id: ${ newD.id }`
         );
       }
       //eslint-disable-next-line functional/immutable-data
@@ -141,7 +141,7 @@ export const align = <V>(
     // The new item is considered the same as top ranked
     if (debug && top.id !== newD.id) {
       console.log(
-        `Correlate.align() Remapped ${newD.id} -> ${top.id} (score: ${top.score})`
+        `Correlate.align() Remapped ${ newD.id } -> ${ top.id } (score: ${ top.score })`
       );
     }
     //eslint-disable-next-line functional/immutable-data
@@ -175,18 +175,16 @@ export const align = <V>(
  * const aligned = aligner(lastData);
  *
  * ```
- * @param fn
- * @param opts
+ * @param fn Function to compute similarity
+ * @param options Options
  * @returns
  */
-export const alignById = <V>(fn: Similarity<V>, opts: AlignOpts = {}) => {
-  //eslint-disable-next-line functional/no-let
+export const alignById = <V>(fn: Similarity<V>, options: AlignOpts = {}) => {
   let lastData: readonly DataWithId<V>[] = [];
 
-  //eslint-disable-next-line functional/prefer-immutable-types
   const compute = (newData: DataWithId<V>[]) => {
-    lastData = align(fn, lastData, newData, opts);
-    return [...lastData];
+    lastData = align(fn, lastData, newData, options);
+    return [ ...lastData ];
   };
   return compute;
 };

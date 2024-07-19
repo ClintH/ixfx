@@ -49,9 +49,8 @@ export type Log = {
  * const l = log(`#dataStream`, { capacity: 100 });
  * ```
  *
- * @param {(HTMLElement | string | undefined)} elOrId Element or id of element
- * @param {LogOpts} opts
- * @returns {Log}
+ * @param domQueryOrElement Element or id of element
+ * @param opts
  */
 export const log = (
   //eslint-disable-next-line functional/prefer-immutable-types

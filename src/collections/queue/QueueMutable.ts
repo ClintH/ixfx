@@ -42,18 +42,16 @@ import { SimpleEventEmitter } from '../../Events.js';
  * })
  * ```
  * @template V Data type of items
- * @param opts
- * @param startingItems Items are added in array order. So first item will be at the front of the queue.
  */
 export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> implements IQueueMutable<V> {
-  readonly opts: QueueOpts<V>;
+  readonly options: QueueOpts<V>;
   data: ReadonlyArray<V>;
   eq: IsEqual<V>;
 
   constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
     super();
     if (opts === undefined) throw new Error(`opts parameter undefined`);
-    this.opts = opts;
+    this.options = opts;
     this.data = data;
     this.eq = opts.eq ?? isEqualDefault;
   }
@@ -79,7 +77,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
   }
 
   enqueue(...toAdd: ReadonlyArray<V>): number {
-    this.data = enqueue(this.opts, this.data, ...toAdd);
+    this.data = enqueue(this.options, this.data, ...toAdd);
     const length = this.data.length;
     this.onEnqueue(this.data, toAdd);
     return length;
@@ -90,10 +88,10 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
   }
 
   dequeue(): V | undefined {
-    const v = peek(this.opts, this.data);
+    const v = peek(this.options, this.data);
     if (v === undefined) return;
     /* eslint-disable-next-line functional/immutable-data */
-    this.data = dequeue(this.opts, this.data);
+    this.data = dequeue(this.options, this.data);
     this.fireEvent(`dequeue`, { removed: v, finalData: this.data });
     this.onRemoved([ v ], this.data);
     return v;
@@ -126,11 +124,11 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
   }
 
   get isEmpty(): boolean {
-    return isEmpty(this.opts, this.data);
+    return isEmpty(this.options, this.data);
   }
 
   get isFull(): boolean {
-    return isFull(this.opts, this.data);
+    return isFull(this.options, this.data);
   }
 
   get length(): number {
@@ -138,20 +136,20 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
   }
 
   get peek(): V | undefined {
-    return peek(this.opts, this.data);
+    return peek(this.options, this.data);
   }
 }
 
 /**
  * Creates a new QueueMutable
- * @param opts 
+ * @param options 
  * @param startingItems 
  * @returns 
  */
 export function mutable<V>(
-  opts: QueueOpts<V> = {},
+  options: QueueOpts<V> = {},
   ...startingItems: ReadonlyArray<V>
 ): IQueueMutableWithEvents<V> {
-  return new QueueMutable({ ...opts }, [ ...startingItems ]);
+  return new QueueMutable({ ...options }, [ ...startingItems ]);
 }
 

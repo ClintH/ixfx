@@ -95,9 +95,7 @@ export type MovingAverageTimedOptions = Readonly<{
  * every time a value is added, a bit like the `debounce` function.
  * 
  * Use an AbortSignal to cancel the timer associated with the `movingAverageTimed` function.
- * @param updateRateMs
- * @param value
- * @param scaling
+ * @param options
  * @returns
  */
 export const movingAverageTimed = (options: MovingAverageTimedOptions) => {

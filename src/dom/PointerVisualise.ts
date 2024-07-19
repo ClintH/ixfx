@@ -31,18 +31,18 @@ export type Opts = {
  * Options
  * * touchRadius/mouseRadius: size of circle for these kinds of pointer events
  * * trace: if true, intermediate events are captured and displayed
- * @param elOrQuery
- * @param opts
+ * @param elOrQuery Element to monitor
+ * @param options Options
  */
 export const pointerVisualise = (
   //eslint-disable-next-line functional/prefer-immutable-types
   elOrQuery: HTMLElement | string,
-  opts: Opts = {}
+  options: Opts = {}
 ) => {
-  const touchRadius = opts.touchRadius ?? 45;
-  const mouseRadius = opts.touchRadius ?? 20;
-  const trace = opts.trace ?? false;
-  const hue = opts.hue ?? 100;
+  const touchRadius = options.touchRadius ?? 45;
+  const mouseRadius = options.touchRadius ?? 20;
+  const trace = options.trace ?? false;
+  const hue = options.hue ?? 100;
 
   const startFillStyle = `hsla(${ hue }, 100%, 10%, 10%)`;
 

@@ -3,7 +3,7 @@ import * as Rx from '../rx/index.js';
 
 /**
  * Returns an Reactive for window resize. Default 100ms debounce.
- * @param timeoutMs
+ * @param elapsed
  * @returns
  */
 export const windowResize = (elapsed?: Interval) => Rx.Ops.debounce<{ innerWidth: number, innerHeight: number }>({ elapsed: elapsed ?? 100 })(Rx.From.event(window, `resize`, { innerWidth: 0, innerHeight: 0 }));
