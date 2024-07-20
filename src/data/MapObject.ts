@@ -1,5 +1,4 @@
 import type { RemapObjectPropertyType } from "../TsUtil.js";
-import type { ResolveValue } from "./ResolveFields.js";
 
 /**
  * Maps the top-level properties of an object through a map function.
@@ -81,7 +80,6 @@ export type MapObjectArgs = {
 
 export function mapObjectByObject(data: any, mapper: Record<string, (value: any, context: any) => any>) {
   const entries = Object.entries(data);
-  let index = 0;
   for (let i = 0; i < entries.length; i++) {
     const e = entries[ i ];
     if (e[ 0 ] in mapper) {
