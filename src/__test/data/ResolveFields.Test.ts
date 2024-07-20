@@ -1,9 +1,45 @@
 import test from 'ava';
+import { resolve } from '../../data/Resolve.js';
 import { resolveFields } from '../../data/ResolveFields.js';
 import * as Numbers from '../../numbers/index.js';
 import * as Flow from '../../flow/index.js';
 import * as Rx from '../../rx/index.js';
 import { interval } from '../../flow/index.js';
+
+test(`resolve`, async t => {
+  // Basic values
+  t.is(await resolve(`hello`), `hello`);
+  t.is(await resolve(10), 10);
+  t.deepEqual(await resolve({ name: 'bob' }), { name: 'bob' });
+  t.true(await resolve(true));
+  t.false(await resolve(false));
+
+  // Async & sync functions
+  t.is(await resolve(() => 'hello'), 'hello');
+  t.is(await resolve(async () => Promise.resolve('there')), 'there');
+
+  // Synchronous generator
+  const gen = Numbers.count(3);
+  t.is(await resolve(gen), 0);
+  t.is(await resolve(gen), 1);
+  t.is(await resolve(gen), 2);
+  t.falsy(await resolve(gen));
+
+  // Iterator
+  const iter = [ 1, 2, 3 ].values();
+  t.is(await resolve(iter), 1);
+  t.is(await resolve(iter), 2);
+  t.is(await resolve(iter), 3);
+  t.falsy(await resolve(iter));
+
+  const rx = Rx.From.number(10);
+  t.is(await resolve(rx), 10);
+  rx.set(11);
+  t.is(await resolve(rx), 11);
+  rx.dispose(`test dispose`);
+  t.is(await resolve(rx), 11);
+
+});
 
 test('resolve-fields-async', async t => {
   const s = {
@@ -42,7 +78,7 @@ test('resolve-fields-async', async t => {
 });
 
 
-test(`field-resolve`, async t => {
+test(`resolve-fields`, async t => {
   const s = {
     length: 10,
     random: Math.random

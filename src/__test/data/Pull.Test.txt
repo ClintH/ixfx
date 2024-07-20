@@ -1,6 +1,6 @@
 import test from "ava";
 import * as Rx from '../../rx/index.js';
-import { pull } from "../../data/ResolveFields.js";
+import { pull } from "../../data/Pull.js";
 import * as Mod from '../../modulation/index.js';
 import * as Iter from '../../iterables/index.js';
 import * as Flow from '../../flow/index.js';
