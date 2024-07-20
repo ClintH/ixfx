@@ -1,5 +1,5 @@
 import { isIterable } from "../iterables/Iterable.js";
-import type { Passed, PassedSignal, PassedValue, Reactive, ReactiveDiff, ReactiveInitial, ReactiveOrSource, ReactiveWritable, Wrapped } from "./Types.js";
+import type { Passed, PassedSignal, PassedValue, Reactive, ReactiveDiff, ReactiveInitial, ReactiveOrSource, ReactivePingable, ReactiveWritable, Wrapped } from "./Types.js";
 import type { Trigger, TriggerValue, TriggerFunction, TriggerGenerator } from "./sources/Types.js";
 
 export function messageIsSignal<V>(message: Passed<V> | PassedSignal): message is PassedSignal {
@@ -25,10 +25,17 @@ export function messageHasValue<V>(v: Passed<V> | PassedSignal): v is PassedValu
   return false;
 }
 
+export const isPingable = <V>(rx: Reactive<V> | ReactiveDiff<V> | object): rx is ReactivePingable<V> => {
+  if (!isReactive(rx)) return false;
+  if (`ping` in rx) {
+    return true;
+  }
+  return false;
+}
 
 export const hasLast = <V>(rx: Reactive<V> | ReactiveDiff<V> | object): rx is ReactiveInitial<V> => {
   if (!isReactive(rx)) return false;
-  if (`last`) {
+  if (`last` in rx) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const v = (rx as any).last();
     if (v !== undefined) return true;
