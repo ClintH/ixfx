@@ -3,6 +3,8 @@ import type { PointRelationResult } from "../geometry/point/PointRelationTypes.j
 
 export type NumberFunction = () => number;
 
+export type ValueType = string | number | boolean | object
+
 /**
  * Information about seen points
  */
