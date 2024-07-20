@@ -1,3 +1,4 @@
+import { isContentsTheSame } from "./Equality.js";
 
 /**
  * Zip combines the elements of two or more arrays based on their index.
@@ -23,9 +24,6 @@
  * @param arrays
  * @returns Zipped together array
  */
-
-import { isContentsTheSame } from "./Equality.js";
-
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const zip = (
   ...arrays: Array<Array<any>> | ReadonlyArray<Array<any>> | ReadonlyArray<ReadonlyArray<any>>
