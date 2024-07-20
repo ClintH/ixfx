@@ -46,6 +46,8 @@ export * as Pool from './Pool.js';
 export * from './PrimitiveTracker.js';
 export * as Process from './Process.js';
 export * from './Proportion.js';
+export * from './Pull.js';
+export * from './Resolve.js';
 export * from './ResolveFields.js';
 export * from './Scale.js';
 export * from './Softmax.js';
