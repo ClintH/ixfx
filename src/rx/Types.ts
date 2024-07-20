@@ -7,6 +7,7 @@ import type { SetHtmlOptions } from './sinks/Dom.js';
 import type { Processors } from '../data/Process.js';
 import type { TallyOptions } from './ops/Math.js';
 import type { ChangeRecord } from '../data/Compare.js';
+import type { RecursivePartial } from 'src/TsUtil.js';
 
 
 export type CombineLatestOptions = {
@@ -357,7 +358,7 @@ export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
    * @param changedPart 
    * @returns Returns new value
    */
-  update(changedPart: Record<string, any>): V
+  update(changedPart: RecursivePartial<V>): V
   /**
    * Updates a particular field by its path
    * @param field 
