@@ -10,6 +10,12 @@ export type RecursiveReplace<TShape, TFieldValue> = {
   : RecursiveReplace<TShape[ P ], TFieldValue>;
 };
 
+export type RecursivePartial<T> = {
+  [ P in keyof T ]?:
+  T[ P ] extends (infer U)[] ? RecursivePartial<U>[] :
+  T[ P ] extends object | undefined ? RecursivePartial<T[ P ]> :
+  T[ P ];
+};
 
 export type ReadonlyRemapObjectPropertyType<OriginalType, PropertyType> = {
   readonly [ Property in keyof OriginalType ]: PropertyType;
