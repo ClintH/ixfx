@@ -4,10 +4,10 @@ import { guardIndex } from "./GuardIndex.js";
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  *
  * ```js
- * import { remove } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const v = [ 100, 20, 50 ];
- * const vv = remove(2);
+ * const vv = Arrays.remove(2);
  *
  * Yields:
  *  v: [ 100, 20, 50 ]

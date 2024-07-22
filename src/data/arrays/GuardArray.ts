@@ -2,8 +2,8 @@
  * Throws an error if `array` parameter is not a valid array
  *
  * ```js
- * import { guardArray } from 'https://unpkg.com/ixfx/dist/arrays.js';
- * guardArray(someVariable);
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
+ * Arrays.guardArray(someVariable);
  * ```
  * @private
  * @param array

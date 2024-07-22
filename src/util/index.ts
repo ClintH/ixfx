@@ -9,3 +9,4 @@ export * from './MapKeys.js';
 export * from './Platform.js';
 export * from './Results.js';
 export * from './ToString.js';
+export * from './KeyValue.js';

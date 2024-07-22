@@ -4,11 +4,11 @@ import { isContentsTheSame } from "./Equality.js";
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
  *
  * ```js
- * import { interleave } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const a = [`a`, `b`, `c`];
  * const b = [`1`, `2`, `3`];
- * const c = interleave(a, b);
+ * const c = Arrays.interleave(a, b);
  * // Yields:
  * // [`a`, `1`, `b`, `2`, `c`, `3`]
  * ```

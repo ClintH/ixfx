@@ -9,27 +9,53 @@
  * @module
  */
 
-import { numberTracker } from '../data/NumberTracker.js';
-import { type TrackedValueOpts as TrackedValueOptions } from '../data/TrackedValue.js';
+
 export * from './ApplyToValues.js';
 export * from './AverageWeighted.js'
+/**
+ * Work with bipolar values (-1...1)
+ * 
+ * Import:
+ * ```js
+ * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
+ * ```
+ * 
+ * Overview:
+ * * {@link clamp}: Clamp on -1..1 scale
+ * * {@link fromScalar}: Convert from 0..1 to -1..1
+ * * {@link immutable}: Immutable wrapper around a value
+ * * {@link random}: Create a random bipolar value
+ * * {@link scale}: Scale a value to -1..1 (clamped)
+ * * {@link scaleUnclamped} As {@link scale} but allowed to go outside of -1...1 range
+ * * {@link toScalar}: Convert -1..1 to 0..1
+ * * {@link towardZero}: Nudge a bipolar value towards zero
+ */
+export * as Bipolar from './Bipolar.js';
+
+export * from './Clamp.js';
 export * from './Count.js';
 export * from './Filter.js';
+export * from './Flip.js';
 export * from './Generate.js';
 export * from './Guard.js';
+export * from './Interpolate.js';
 export * from './IsApproximately.js';
 export * from './LinearSpace.js';
 export * from './MinMaxAvg.js';
+export * from './MovingAverage.js';
+
+/**
+ * Normalise module
+ * * {@link array}: Normalises the contents of an array of known values.
+ * * {@link stream}: Normalises a stream of unknown values.
+ */
+export * as Normalise from './Normalise.js';
 export * from './NumericArrays.js';
+export * from './Proportion.js';
 export * from './Quantise.js';
 export * from './RelativeDifference.js';
 export * from './Round.js';
+export * from './Scale.js';
+export * from './Softmax.js';
 export type * from './Types.js';
-export * from '../modulation/PingPong.js';
-export * from '../modulation/Jitter.js';
-export { integer as randomInteger, integerUniqueGen as randomUniqueInteger } from '../random/Integer.js';
-
-/**
- * Alias for [Data.numberTracker](https://clinth.github.io/ixfx/classes/Data.numberTracker-1.html)
- */
-export const tracker = (options?: TrackedValueOptions) => numberTracker(options);
+export * from './Wrap.js';

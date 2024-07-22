@@ -1,4 +1,4 @@
-import { wrap as wrapNumber } from '../../data/Wrap.js';
+import { wrap as wrapNumber } from '../../numbers/Wrap.js';
 import { guard } from './Guard.js';
 import type { Point } from "./PointType.js";
 

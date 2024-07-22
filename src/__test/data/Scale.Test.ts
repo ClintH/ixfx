@@ -1,5 +1,5 @@
 import test from 'ava';
-import { scale } from '../../data/Scale.js';
+import { scale } from '../../numbers/Scale.js';
 
 test(`scale`, (t) => {
   t.is(scale(50, 0, 100, 0, 1), 0.5);

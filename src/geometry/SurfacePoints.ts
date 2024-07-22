@@ -3,7 +3,7 @@ import type { Circle, CirclePositioned } from './circle/CircleType.js';
 import type { Sphere } from './shape/index.js';
 
 import { toPositioned as circleToPositioned } from './circle/ToPositioned.js';
-import { scale } from '../data/Scale.js';
+import { scale } from '../numbers/Scale.js';
 import { linearSpace } from '../numbers/LinearSpace.js';
 const cos = Math.cos;
 const sin = Math.sin;

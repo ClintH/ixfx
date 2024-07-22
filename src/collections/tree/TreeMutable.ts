@@ -25,6 +25,8 @@ export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>) => {
  * Converts `TreeNode` to `SimplifiedNode`, removing the 'parent' fields.
  * This can be useful because if you have the whole tree, the parent field
  * is redundant and because it makes circular references can make dumping to console etc more troublesome.
+ * 
+ * Recursive: strips parentage of all children and so on too.
  * @param node 
  * @returns 
  */

@@ -52,18 +52,18 @@ test('flatten', (t) => {
 test('filterBetween', (t) => {
   const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 
-  const r1 = filterBetween(numbers, () => true, 5, 7);
+  const r1 = [ ...filterBetween(numbers, () => true, 5, 7) ];
   t.like(r1, numbers.slice(5, 7));
 
-  const r2 = filterBetween(numbers, () => true, 5);
+  const r2 = [ ...filterBetween(numbers, () => true, 5) ];
   t.like(r2, numbers.slice(5));
 
-  const r3 = filterBetween<number>(
+  const r3 = [ ...filterBetween<number>(
     numbers,
     (d) => typeof d === `number` && !Number.isNaN(d),
     5,
     7
-  );
+  ) ];
   t.like(r3, numbers.slice(5, 7));
 });
 
@@ -180,7 +180,7 @@ test(`compare-values`, (t) => {
   t.true(hasEqualValuesShallow(aa1, bb1, (a, b) => a.name === b.name));
 });
 
-test(`array-sort`, (t) => {
+test(`sort`, (t) => {
   const data = [
     { size: 10, colour: `red` },
     { size: 20, colour: `blue` },
@@ -222,7 +222,7 @@ test(`pairwise-reduce`, (t) => {
   t.pass();
 });
 
-test(`array-mergeByKey`, (t) => {
+test(`mergeByKey`, (t) => {
   const a1 = [ `1-1`, `1-2`, `1-3`, `1-4` ];
   const a2 = [ `2-1`, `2-2`, `2-3`, `2-5` ];
 

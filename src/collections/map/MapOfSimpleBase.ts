@@ -1,6 +1,6 @@
 import { defaultKeyer } from '../../DefaultKeyer.js';
 import { type IsEqual, isEqualDefault } from '../../util/IsEqual.js';
-import { firstEntryByIterableValue } from './MapMultiFns.js';
+import { firstEntryByValue } from './MapMultiFns.js';
 
 export class MapOfSimpleBase<V> {
   protected map: Map<string, ReadonlyArray<V>>;
@@ -42,7 +42,7 @@ export class MapOfSimpleBase<V> {
   }
 
   firstKeyByValue(value: V, eq: IsEqual<V> = isEqualDefault) {
-    const entry = firstEntryByIterableValue(this, value, eq);
+    const entry = firstEntryByValue(this, value, eq);
     if (entry) return entry[ 0 ];
   }
 

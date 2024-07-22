@@ -11,7 +11,7 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import { numberTracker } from '../data/NumberTracker.js';
+import { number as numberTracker } from '../trackers/NumberTracker.js';
 import { AudioAnalyser } from './AudioAnalyser.js';
 import type { Point } from '../geometry/point/PointType.js';
 import { minMaxAvg } from '../numbers/MinMaxAvg.js';

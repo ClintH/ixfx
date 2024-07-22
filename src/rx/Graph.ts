@@ -1,4 +1,4 @@
-import * as DiGraph from "../data/graphs/DirectedGraph.js";
+import * as DiGraph from "../collections/graphs/DirectedGraph.js";
 import { initStream } from "./InitStream.js";
 import type { Reactive } from "./Types.js";
 import { isReactive } from "./Util.js";

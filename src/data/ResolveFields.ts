@@ -26,6 +26,8 @@ export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
  * for the return object. If the property is a function or generator, its value
  * is used instead. Async functions and generators are also usable.
  * 
+ * Not recursive.
+ * 
  * In the below example, the function for the property `random` is invoked.
  * ```js
  * const state = {

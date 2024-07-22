@@ -9,13 +9,13 @@
  *  - 'last': repeat with last element from `data`
  *
  * ```js
- * import { ensureLength } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
- * ensureLength([1,2,3], 2); // [1,2]
- * ensureLength([1,2,3], 5, `undefined`); // [1,2,3,undefined,undefined]
- * ensureLength([1,2,3], 5, `repeat`);    // [1,2,3,1,2]
- * ensureLength([1,2,3], 5, `first`);     // [1,2,3,1,1]
- * ensureLength([1,2,3], 5, `last`);      // [1,2,3,3,3]
+ * Arrays.ensureLength([1,2,3], 2); // [1,2]
+ * Arrays.ensureLength([1,2,3], 5, `undefined`); // [1,2,3,undefined,undefined]
+ * Arrays.ensureLength([1,2,3], 5, `repeat`);    // [1,2,3,1,2]
+ * Arrays.ensureLength([1,2,3], 5, `first`);     // [1,2,3,1,1]
+ * Arrays.ensureLength([1,2,3], 5, `last`);      // [1,2,3,3,3]
  * ```
  * @param data Input array to expand
  * @param length Desired length

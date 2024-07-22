@@ -12,18 +12,18 @@ import type { IWithEntries } from '../../data/maps/IMappish.js';
  * map.set('hello', ['a', 'b', 'c']);
  * map.set('there', ['d', 'e', 'f']);
  *
- * const entry = firstEntryByIterablePredicate(map, (value, key) => {
+ * const entry = firstEntry(map, (value, key) => {
  *  return (value === 'e');
  * });
  * // Entry is: ['there', ['d', 'e', 'f']]
  * ```
  *
- * An alternative is {@link firstEntryByIterableValue} to search by value.
+ * An alternative is {@link firstEntryByValue} to search by value.
  * @param map Map to search
  * @param predicate Filter function returns true when there is a match of value
  * @returns Entry, or _undefined_ if `filter` function never returns _true_
  */
-export const firstEntryByIterablePredicate = <K, V>(
+export const firstEntry = <K, V>(
   map: IWithEntries<K, Iterable<V>>,
   predicate: (value: V, key: K) => boolean
 ): readonly [ key: K, value: Iterable<V> ] | undefined => {
@@ -57,17 +57,17 @@ export const lengthMax = <V>(map: IMapOf<V>): number => {
  * map.set('hello', ['a', 'b', 'c']);
  * map.set('there', ['d', 'e', 'f']);
  *
- * const entry = firstEntryByIterableValue(map, 'e');
+ * const entry = firstEntryByValue(map, 'e');
  * // Entry is: ['there', ['d', 'e', 'f']]
  * ```
  *
- * An alternative is {@link firstEntryByIterablePredicate} to search by predicate function.
+ * An alternative is {@link firstEntry} to search by predicate function.
  * @param map Map to search
  * @param value Value to seek
  * @param isEqual Filter function which checks equality. Uses JS comparer by default.
  * @returns Entry, or _undefined_ if `value` not found.
  */
-export const firstEntryByIterableValue = <K, V>(
+export const firstEntryByValue = <K, V>(
   map: IWithEntries<K, Iterable<V>>,
   value: V,
   isEqual: IsEqual<V> = isEqualDefault

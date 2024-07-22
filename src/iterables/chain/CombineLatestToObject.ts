@@ -1,6 +1,6 @@
 import type { GenOrData, GenFactoryNoInput, CombineLatestOptions, Gen, GenValueTypeObject } from "./Types.js";
 import { resolveToGen } from "./Util.js";
-import { Maps } from "../../collections/index.js"
+import * as MapFns from "../../data/maps/MapFns.js"
 import { isEqualValueIgnoreOrder } from "../../util/IsEqual.js";
 
 /**
@@ -44,9 +44,9 @@ export async function* combineLatestToObject<const T extends Record<string, GenO
   }
 
   // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
-  const isDone = () => !Maps.some(states, v => !v.done);
+  const isDone = () => !MapFns.some(states, v => !v.done);
   // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
-  const isWaiting = () => Maps.some(states, v => v.waiting !== undefined);
+  const isWaiting = () => MapFns.some(states, v => v.waiting !== undefined);
   const allEmpty = (d: object) => {
     for (const v of Object.values(d)) {
       if (v !== undefined) return false;

@@ -2,7 +2,6 @@
 import { immutable as immutableMap, type IMapImmutable } from "../../collections/map/Map.js"
 import { Table } from "../Table.js"
 
-
 export type Vertex = Readonly<{
   id: string
 }>

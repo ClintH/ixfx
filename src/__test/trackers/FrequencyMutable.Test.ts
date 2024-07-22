@@ -1,7 +1,7 @@
 /* eslint-disable */
 import test from 'ava';
 import type { KeyValue } from '../../PrimitiveTypes.js';
-import { FrequencyMutable } from '../../data/FrequencyMutable.js';
+import { FrequencyTracker } from '../../trackers/FrequencyMutable.js';
 import { shuffle } from '../../data/arrays/Random.js';
 import { arrayValuesEqual } from '../Include.js';
 import { isEqualValueDefault } from '../../util/IsEqual.js';
@@ -19,7 +19,7 @@ test(`sorting`, (t) => {
   const aSeries = shuffle(a.flatMap(kv => Array(kv[ 1 ]).fill(kv[ 0 ])));
 
   // Test it can count properly
-  const h = new FrequencyMutable();
+  const h = new FrequencyTracker();
   aSeries.forEach(d => {
     h.add(d);
   })
@@ -50,7 +50,7 @@ test(`sorting`, (t) => {
 
 test(`events-add`, t => {
   t.plan(2);
-  const h2 = new FrequencyMutable();
+  const h2 = new FrequencyTracker();
   h2.addEventListener(`change`, ev => {
     t.assert(true);
   });
@@ -59,7 +59,7 @@ test(`events-add`, t => {
 });
 
 test(`events-clear`, t => {
-  const h2 = new FrequencyMutable();
+  const h2 = new FrequencyTracker();
   h2.add('hello', 'there');
 
   h2.addEventListener(`change`, ev => {

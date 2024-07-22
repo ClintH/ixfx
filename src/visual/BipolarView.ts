@@ -1,5 +1,5 @@
 import * as Drawing from "./Drawing.js";
-import * as Bipolar from "../data/Bipolar.js";
+import * as Bipolar from "../numbers/Bipolar.js";
 import * as Queues from "../collections/queue/index.js";
 import * as Colour from "./Colour.js";
 import { type CirclePositioned } from "../geometry/index.js";

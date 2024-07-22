@@ -1,13 +1,13 @@
 /**
- * Returns all items in `data` for as long as `predicate` returns true.
+ * Yields all items in `data` for as long as `predicate` returns true.
  *
- * `predicate` returns an array of `[stop:boolean, acc:A]`. The first value
+ * `predicate` yields arrays of `[stop:boolean, acc:A]`. The first value
  * is _true_ when the iteration should stop, and the `acc` is the accumulated value.
  * This allows `until` to be used to carry over some state from item to item.
  *
  * @example Stop when we hit an item with value of 3
  * ```js
- * const v = Arrays.until([1,2,3,4,5], v => [v === 3, 0]);
+ * const v = [...until([1,2,3,4,5], v => [v === 3, 0])];
  * // [ 1, 2 ]
  * ```
  *
@@ -21,13 +21,13 @@
  * @param predicate
  * @returns
  */
-export const until = <V, A>(
+export function* until<V, A>(
   //eslint-disable-next-line functional/prefer-readonly-type
   data: ReadonlyArray<V> | Array<V>,
   predicate: (v: V, accumulator: A) => readonly [ stop: boolean, acc: A ],
   initial: A
-): Array<V> => {
-  const returnValue = [];
+): Generator<V> {
+  //const returnValue = [];
   //eslint-disable-next-line functional/no-let
   let total = initial;
   //eslint-disable-next-line functional/no-let
@@ -38,7 +38,9 @@ export const until = <V, A>(
     total = accumulator;
 
     //eslint-disable-next-line functional/immutable-data
-    returnValue.push(datum);
+    //returnValue.push(datum);
+    yield datum;
+
   }
-  return returnValue;
+  //return returnValue;
 };

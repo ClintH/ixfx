@@ -3,8 +3,8 @@
  */
 import { Points, Polar } from '../geometry/index.js';
 import type { Point } from '../geometry/point/PointType.js';
-import { clamp } from '../data/Clamp.js';
-import { interpolateAngle } from '../data/Interpolate.js';
+import { clamp } from '../numbers/Clamp.js';
+import { interpolateAngle } from '../numbers/Interpolate.js';
 import { getEdgeX, getEdgeY, type Rect } from '../geometry/rect/index.js';
 import { divide as PointDivide } from '../geometry/point/Divider.js';
 

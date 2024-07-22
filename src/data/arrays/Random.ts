@@ -6,10 +6,10 @@ import { guardArray } from "./GuardArray.js";
  * Returns a random array index.
  *
  * ```js
- * import { randomIndex } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const v = [`blue`, `red`, `orange`];
- * randomIndex(v); // Yields 0, 1 or 2
+ * Arrays.randomIndex(v); // Yields 0, 1 or 2
  * ```
  *
  * Use {@link randomElement} if you want a value from `array`, not index.
@@ -30,19 +30,19 @@ export const randomIndex = <V>(
  *
  * @example Without changing source
  * ```js
- * import { randomPluck } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const data = [100, 20, 40];
- * const {value, array} = randomPluck(data);
+ * const {value, array} = Arrays.randomPluck(data);
  * // value: 20, array: [100, 40], data: [100, 20, 40];
  * ```
  *
  * @example Mutating source
  * ```js
- * import { randomPluck } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const data = [100, 20, 40];
- * const {value} = randomPluck(data, true);
+ * const {value} = Arrays.randomPluck(data, true);
  * // value: 20, data: [100, 40];
  * ```
  *
@@ -85,10 +85,10 @@ export const randomPluck = <V>(
  * Returns random element.
  *
  * ```js
- * import { randomElement } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const v = [`blue`, `red`, `orange`];
- * randomElement(v); // Yields `blue`, `red` or `orange`
+ * Arrays.randomElement(v); // Yields `blue`, `red` or `orange`
  * ```
  *
  * Use {@link randomIndex} if you want a random index within `array`.
@@ -131,10 +131,10 @@ export const randomElementWeightedSource = <V>(array: ArrayLike<V>, weightings: 
  * Returns a shuffled copy of the input array.
  * @example
  * ```js
- * import { shuffle } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const d = [1, 2, 3, 4];
- * const s = shuffle(d);
+ * const s = Arrays.shuffle(d);
  * // d: [1, 2, 3, 4], s: [3, 1, 2, 4]
  * ```
  * @param dataToShuffle

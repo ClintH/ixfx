@@ -1,7 +1,7 @@
 import type { Point } from './point/PointType.js';
 import { fromTopLeft as RectsFromTopLeft } from './rect/FromTopLeft.js';
 import { throwIntegerTest, throwNumberTest } from '../util/GuardNumbers.js';
-import { clampIndex } from '../data/Clamp.js';
+import { clampIndex } from '../numbers/Clamp.js';
 import { randomElement } from '../data/arrays/Random.js';
 import { type ISetMutable, mutable } from '../collections/set/index.js';
 import { zipKeyValue } from '../data/maps/MapFns.js';

@@ -1,5 +1,5 @@
 import test from 'ava';
-import { Table } from '../../data/Table.js';
+import { Table } from '../../collections/Table.js';
 test(`table`, test => {
   const t = new Table<number>();
   t.appendRow(1, 2, 3);

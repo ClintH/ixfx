@@ -20,6 +20,11 @@ export type PathOpts = {
 
 };
 
+/**
+ * Helper function to get a 'friendly' string representation of an array of {@link Entry}.
+ * @param entries 
+ * @returns 
+ */
 export function prettyPrintEntries(entries: ReadonlyArray<Entry>) {
   if (entries.length === 0) return `(empty)`;
   let t = ``;
@@ -57,6 +62,12 @@ export const prettyPrint = (
   ) : t;
 };
 
+/**
+ * Returns a debug string representation of the node (recursive)
+ * @param node 
+ * @param indent 
+ * @returns 
+ */
 export const toStringDeep = (node: TreeNode<Entry | EntryStatic>, indent = 0) => {
   let t = ` `.repeat(indent) + ` ${ node.value?.name }`;
   if (node.value !== undefined) {
@@ -296,12 +307,13 @@ export function* traceByPath<T extends object>(
 
 /**
  * Returns a projection of `node` as a dynamic traversable.
-
+ * This means that the tree structure is dynamically created as last-minute as possible.
+ * 
  * Note that the object identity of TraversableTree return results is not stable.
  * This is because they are created on-the-fly by reading fields of `node`.
  * 
  * ```js
-  * const c1 = [ ...asDynamicTraversable(someObject).children() ];
+ * const c1 = [ ...asDynamicTraversable(someObject).children() ];
  * const c2 = [ ...asDynamicTraversable(someObject).children() ];
  * 
  * // Object identity is not the same
@@ -312,7 +324,7 @@ export function* traceByPath<T extends object>(
  * 
  * Instead .getIdentity() to get a stable identity:
  * ```js
-  * c1[ 0 ].getIdentity() === c2[ 0 ].getIdentity(); // true
+ * c1[ 0 ].getIdentity() === c2[ 0 ].getIdentity(); // true
  * ```
  * @param node 
  * @param options
@@ -378,7 +390,11 @@ export type CreateOptions = {
   valuesAtLeaves: boolean
 }
 /**
- * Reads all fields and sub-fields of `node`, returning as a basic tree structure
+ * Reads all fields and sub-fields of `node`, returning as a basic tree structure.
+ * The structure is a snapshot of the object. If the object changes afterwards, the tree will
+ * remain the same.
+ * 
+ * Alternatively, consider {@link asDynamicTraversable} which reads the object dynamically.
  * @param node 
  * @param options 
  * @returns 
@@ -402,6 +418,12 @@ const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Par
   return r;
 }
 
+/**
+ * Returns a copy of `node` with its (and all its children's) parent information removed.
+ * @param node 
+ * @param options 
+ * @returns 
+ */
 export const createSimplified = <T extends object>(node: T, options: Partial<CreateOptions> = {}): SimplifiedNode<EntryStatic> => {
   return TreeArrayBacked.stripParentage(create(node, options));
 }

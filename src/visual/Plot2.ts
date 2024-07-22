@@ -1,8 +1,8 @@
 import { minIndex } from '../numbers/NumericArrays.js';
 import * as Points from '../geometry/point/index.js';
-import { clamp } from '../data/Clamp.js';
-import { flip } from '../data/Flip.js';
-import { scale } from '../data/Scale.js';
+import { clamp } from '../numbers/Clamp.js';
+import { flip } from '../numbers/Flip.js';
+import { scale } from '../numbers/Scale.js';
 import * as Sg from './SceneGraph.js';
 import { textRect, textWidth } from './Drawing.js';
 import { getPaths, getField } from '../data/Pathed.js';

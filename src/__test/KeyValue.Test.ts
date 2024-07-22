@@ -1,7 +1,7 @@
 
 /* eslint-disable */
 import test from 'ava';
-import { getSorter } from '../KeyValue.js';
+import { getSorter } from '../util/KeyValue.js';
 import type { KeyValue } from '../PrimitiveTypes.js';
 
 test(`sorting`, (t) => {

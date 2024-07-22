@@ -1,5 +1,5 @@
 import test from 'ava';
-import { interpolate, interpolatorInterval, interpolatorStepped } from '../../data/Interpolate.js';
+import { interpolate, interpolatorInterval, interpolatorStepped } from '../../numbers/Interpolate.js';
 import { round } from '../../numbers/Round.js';
 import { delayLoop } from '../../flow/Delay.js';
 

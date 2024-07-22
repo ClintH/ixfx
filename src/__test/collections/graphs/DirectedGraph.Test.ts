@@ -1,5 +1,5 @@
 import test from 'ava';
-import * as Dg from '../../../data/graphs/DirectedGraph.js';
+import * as Dg from '../../../collections/graphs/DirectedGraph.js';
 import { arrayValuesEqual } from '../../Include.js';
 import { hasEqualValuesShallow } from '../../../iterables/CompareValues.js';
 

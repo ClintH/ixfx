@@ -1,6 +1,6 @@
 // Easings from https://easings.net/
 import { msElapsedTimer, relativeTimer, ticksElapsedTimer, type TimerSource } from '../flow/Timer.js';
-import { interpolate } from '../data/Interpolate.js';
+import { interpolate } from '../numbers/Interpolate.js';
 import type { HasCompletion } from '../flow/Types.js';
 
 

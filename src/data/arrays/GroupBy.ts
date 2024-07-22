@@ -7,7 +7,7 @@
  *
  * @example
  * ```js
- * import { groupBy } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const data = [
  *  { age: 39, city: `London` }
@@ -18,7 +18,7 @@
  *
  * // Whatever the function returns will be the designated group
  * // for an item
- * const map = groupBy(data, item => data.city);
+ * const map = Arrays.groupBy(data, item => data.city);
  * ```
  *
  * This yields a Map with keys London, Stockholm and Copenhagen, and the corresponding values.

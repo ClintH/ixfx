@@ -3,8 +3,8 @@ import Color, { type Range } from 'colorjs.io';
 import { defaultRandom, type RandomSource } from '../random/Types.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
 import { pairwise } from '../data/arrays/Pairwise.js';
-import { scale as scaleNumber } from '../data/Scale.js';
-import { clamp } from '../data/Clamp.js';
+import { scale as scaleNumber } from '../numbers/Scale.js';
+import { clamp } from '../numbers/Clamp.js';
 
 export type Hsl = { h: number; s: number; l: number; opacity: number, space?: `hsl` };
 export type Rgb = { r: number; g: number; b: number; opacity: number, space?: `srgb` };

@@ -1,4 +1,4 @@
-import { clamp } from '../data/Clamp.js';
+import { clamp } from '../numbers/Clamp.js';
 import { intervalToMs, type Interval } from './IntervalType.js';
 
 /**

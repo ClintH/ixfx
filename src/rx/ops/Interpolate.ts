@@ -1,7 +1,7 @@
 import { initUpstream } from "../InitStream.js";
 import { toReadable } from "../ToReadable.js";
 import type { ReactiveOrSource, ReactivePingable } from "../Types.js";
-import { interpolate as interpolateFunction } from "../../data/Interpolate.js";
+import { interpolate as interpolateFunction } from "../../numbers/Interpolate.js";
 import { hasLast } from "../Util.js";
 
 export type OpInterpolateOptions = {

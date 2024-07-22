@@ -1,9 +1,9 @@
 import test from 'ava';
-import { trackUnique, trackUniqueInstances } from '../../data/TrackUnique.js';
+import { unique, uniqueInstances } from '../../trackers/TrackUnique.js';
 
 test('track-unique', t => {
   // String
-  const a = trackUnique<string>();
+  const a = unique<string>();
   const v1 = `hello`;
   t.true(a(v1));
   t.true(a(`there`));
@@ -18,7 +18,7 @@ test('track-unique', t => {
 
   // Simple object using default stringify
   type Person = { name: string, colour: string }
-  const b = trackUnique<Person>();
+  const b = unique<Person>();
   const v2 = { name: `jane`, colour: `red` };
   t.true(b(v2));
   t.false(b({ name: `jane`, colour: `red` }));
@@ -27,7 +27,7 @@ test('track-unique', t => {
   t.true(b({ name: `bob`, colour: `red` }));
 
   // Custom stringify using just name
-  const c = trackUnique<Person>(v => v.name);
+  const c = unique<Person>(v => v.name);
   t.true(c(v2));
   t.false(c(v2));
   t.false(c({ name: `jane`, colour: `blue` }));
@@ -37,7 +37,7 @@ test('track-unique', t => {
 
 test(`track-unique-refs`, t => {
   // String
-  const a = trackUniqueInstances<string>();
+  const a = uniqueInstances<string>();
   const v1 = `hello`;
   t.true(a(v1));
   t.true(a(`there`));
@@ -52,7 +52,7 @@ test(`track-unique-refs`, t => {
 
   // Simple object
   type Person = { name: string, colour: string }
-  const b = trackUniqueInstances<Person>();
+  const b = uniqueInstances<Person>();
   const v2 = { name: `jane`, colour: `red` };
   t.true(b(v2));
   t.true(b({ name: `jane`, colour: `red` }));

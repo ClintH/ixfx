@@ -246,18 +246,18 @@ export class TrackedPointMap extends TrackedValueMap<
 /**
  * Track several named points over time, eg a TensorFlow body pose point.
  * Call `seen()` to track a point. Mutable. If you want to compare
- * a single coordinate with a reference coordinate,  may be a better choice.
+ * a single coordinate with a reference coordinate, {@link point} may be a better choice.
  *
  * See also:
  * * {@link Geometry.Points.relation}: Compute relation info between two points
- * * {@link Data.pointTracker}: Track relation between points over time
+ * * {@link Trackers.point}: Track relation between points over time
  * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
  * 
  * Basic usage
  * ```js
- * import { pointsTracker } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { points } from 'https://unpkg.com/ixfx/dist/trackers.js';
  *
- * const pt = pointsTracker();
+ * const pt = points();
  *
  * // Track a point under a given id
  * document.addEventListener(`pointermove`, e => {
@@ -313,24 +313,24 @@ export class TrackedPointMap extends TrackedValueMap<
  * @param options
  * @returns
  */
-export const pointsTracker = (options: TrackOpts = {}) =>
+export const points = (options: TrackOpts = {}) =>
   new TrackedPointMap(options);
 
 /**
- * A tracked point. Create via {@link pointTracker}. Mutable. Useful for monitoring how
+ * A tracked point. Create via {@link Trackers.point}. Mutable. Useful for monitoring how
  * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
  * track the pointer as it moves until pointerup.
  *
  * See also
  * * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
- * * {@link pointsTracker}: Track several points, useful for multi-touch.
+ * * {@link points}: Track several points, useful for multi-touch.
  * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
  * 
  * ```js
- * import { pointTracker } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { point } from 'https://unpkg.com/ixfx/dist/trackers.js';
  *
  * // Create a tracker on a pointerdown
- * const t = pointTracker();
+ * const t = point();
  *
  * // ...and later, tell it when a point is seen (eg. pointermove)
  * const nfo = t.seen({x: evt.x, y:evt.y});
@@ -359,18 +359,18 @@ export const pointsTracker = (options: TrackOpts = {}) =>
  *
  * ```js
  * // Keep only the last 10 points
- * const t = pointTracker({
+ * const t = point({
  *  sampleLimit: 10
  * });
  *
  * // Store all 'seen' points
- * const t = pointTracker({
+ * const t = point({
  *  storeIntermediate: true
  * });
  *
  * // In this case, the whole tracker is automatically
  * // reset after 10 samples
- * const t = pointTracker({
+ * const t = point({
  *  resetAfterSamples: 10
  * })
  * ```
@@ -378,4 +378,4 @@ export const pointsTracker = (options: TrackOpts = {}) =>
  * When using a buffer limited by `sampleLimit`, the 'initial' point will be the oldest in the
  * buffer, not actually the very first point seen.
  */
-export const pointTracker = (opts: TrackOpts = {}) => new PointTracker(opts);
+export const point = (opts: TrackOpts = {}) => new PointTracker(opts);

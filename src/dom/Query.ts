@@ -1,4 +1,4 @@
-import { trackUniqueInstances } from "../data/TrackUnique.js";
+import { uniqueInstances } from "../trackers/TrackUnique.js";
 export type ElementQueryOptions = {
   /**
    * If true, elements are only returned once, even if that match several queries
@@ -24,7 +24,7 @@ export async function* query(queryOrElement: string | HTMLElement | Array<string
   }
 
   const ensureUnique = options ?? false;
-  const isUnique = ensureUnique ? trackUniqueInstances<HTMLElement>() : (_: HTMLElement) => true;
+  const isUnique = ensureUnique ? uniqueInstances<HTMLElement>() : (_: HTMLElement) => true;
 
   if (Array.isArray(queryOrElement)) {
     for (const item of queryOrElement) {

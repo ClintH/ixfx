@@ -2,6 +2,12 @@ import type { Interval } from "../../../flow/IntervalType.js";
 import { sleep } from "../../../flow/Sleep.js";
 import type { GenFactoryNoInput } from "../Types.js";
 
+/**
+ * Creates a chain from an array, reading values at a given interval
+ * @param it 
+ * @param delay 
+ * @returns 
+ */
 export function array<Out>(it: Array<Out>, delay: Interval = 5): GenFactoryNoInput<Out> {
   async function* fromArray(): AsyncGenerator<Out> {
     for (const v of it) {

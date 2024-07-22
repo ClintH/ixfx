@@ -4,10 +4,10 @@ export type TrackUnique<T> = (value: T) => boolean
 
 /**
  * Tracks unique values. Returns _true_ if value is unique.
- * Alternatively: {@link trackUniqueInstances}
+ * Alternatively: {@link uniqueInstances}
  * 
  * ```js
- * const t = trackUnique();
+ * const t = unique();
  * t(`hello`); // true
  * t(`hello`); // false
  * ```
@@ -18,7 +18,7 @@ export type TrackUnique<T> = (value: T) => boolean
  * for more complicated objects.
  * 
  * ```js
- * const t = trackUnique(p => p.name);
+ * const t = unique(p => p.name);
  * t({ name:`John`, level:2 }); // true
  * 
  * // Since we're judging uniques by name only
@@ -28,7 +28,7 @@ export type TrackUnique<T> = (value: T) => boolean
  * Return function throws an error if `value` is null or undefined.
  * @returns 
  */
-export const trackUnique = <T>(toString: ToString<T> = toStringDefault): TrackUnique<T> => {
+export const unique = <T>(toString: ToString<T> = toStringDefault): TrackUnique<T> => {
   const set = new Set<string>();
 
   return (value: T) => {
@@ -44,9 +44,9 @@ export const trackUnique = <T>(toString: ToString<T> = toStringDefault): TrackUn
 
 /**
  * Tracks unique object instances. Returns _true_ if value is unique.
- * Alternatively: {@link trackUnique} to track by value.
+ * Alternatively: {@link unique} to track by value.
  */
-export const trackUniqueInstances = <T>(): TrackUnique<T> => {
+export const uniqueInstances = <T>(): TrackUnique<T> => {
 
   const set = new Set<T>();
   return (value: T) => {

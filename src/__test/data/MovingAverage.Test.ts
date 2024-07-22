@@ -1,5 +1,5 @@
 import test from 'ava';
-import { movingAverage } from '../../data/MovingAverage.js';
+import { movingAverage } from '../../numbers/MovingAverage.js';
 
 test(`moving-average`, (t) => {
   const ma = movingAverage(5);

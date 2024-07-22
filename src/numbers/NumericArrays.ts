@@ -2,10 +2,10 @@
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  *
  * // Six items
- * Arrays.weight([1,1,1,1,1,1], Easings.gaussian());
+ * Numbers.weight([1,1,1,1,1,1], Easings.gaussian());
  *
  * // Yields:
  * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
@@ -19,7 +19,7 @@
  * how values are weighted:
  *
  * ```js
- * Arrays.weight([1,1,1,1,1,1], (relativePos) => relativePos);
+ * Numbers.weight([1,1,1,1,1,1], (relativePos) => relativePos);
  * // Yields:
  * // [0, 0.2, 0.4, 0.6, 0.8, 1]
  * ```
@@ -80,10 +80,10 @@ export const dotProduct = (
  *
  * @example
  * ```
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  *
  * // Average of a list
- * const avg = Arrays.average([1, 1.4, 0.9, 0.1]);
+ * const avg = Numbers.average([1, 1.4, 0.9, 0.1]);
  *
  * // Average of a variable
  * let data = [100,200];
@@ -107,8 +107,8 @@ export const average = (data: ReadonlyArray<number>): number => {
  * Undefined and non-numbers are silently ignored.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.min([10, 20, 0]); // Yields 0
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
+ * Numbers.min([10, 20, 0]); // Yields 0
  * ```
  * @param data
  * @returns Minimum number
@@ -119,9 +119,9 @@ export const min = (data: ReadonlyArray<number>): number =>
 /**
  * Returns the index of the largest value.
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
  * const v = [ 10, 40, 5 ];
- * Arrays.maxIndex(v); // Yields 1
+ * Numbers.maxIndex(v); // Yields 1
  * ```
  * @param data Array of numbers
  * @returns Index of largest value
@@ -138,9 +138,9 @@ export const maxIndex = (data: ReadonlyArray<number>): number =>
  * Returns the index of the smallest value.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
  * const v = [ 10, 40, 5 ];
- * Arrays.minIndex(v); // Yields 2
+ * Numbers.minIndex(v); // Yields 2
  * ```
  * @param data Array of numbers
  * @returns Index of smallest value
@@ -158,8 +158,8 @@ export const minIndex = (...data: ReadonlyArray<number>): number =>
  * Undefined and non-numbers are silently ignored.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.max(100, 200, 50); // 200
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * Numbers.max(100, 200, 50); // 200
  * ```
  * @param data List of numbers
  * @returns Maximum number
@@ -172,8 +172,8 @@ export const max = (data: ReadonlyArray<number>): number =>
  * Undefined and non-numbers are silently ignored.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.total([1, 2, 3]); // 6
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * Numbers.total([1, 2, 3]); // 6
  * ```
  * @param data Array of numbers
  * @returns Total
@@ -193,8 +193,8 @@ export const total = (data: ReadonlyArray<number>): number =>
  * For most uses, {@link max} should suffice.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.maxFast([ 10, 0, 4 ]); // 10
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * Numbers.maxFast([ 10, 0, 4 ]); // 10
  * ```
  * @param data
  * @returns Maximum
@@ -216,8 +216,8 @@ export const maxFast = (data: ReadonlyArray<number> | Float32Array): number => {
  * For most uses, {@link total} should suffice.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.totalFast([ 10, 0, 4 ]); // 14
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * Numbers.totalFast([ 10, 0, 4 ]); // 14
  * ```
  * @param data
  * @returns Maximum
@@ -239,8 +239,8 @@ export const totalFast = (data: ReadonlyArray<number> | Float32Array): number =>
  * For most uses, {@link max} should suffice.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/collections.js';
- * Arrays.minFast([ 10, 0, 100 ]); // 0
+ * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * Numbers.minFast([ 10, 0, 100 ]); // 0
  * ```
  * @param data
  * @returns Maximum

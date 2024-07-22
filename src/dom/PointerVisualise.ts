@@ -1,6 +1,6 @@
 import {
-  pointsTracker,
-} from '../data/PointTracker.js';
+  points,
+} from '../trackers/PointTracker.js';
 import { resolveEl as resolveElement } from './ResolveEl.js';
 import * as Svg from '../visual/Svg.js';
 import { fullSizeElement } from './ElementSizing.js';
@@ -50,7 +50,7 @@ export const pointerVisualise = (
   let currentHue = hue;
 
   const el = resolveElement(elOrQuery);
-  const tracker = pointsTracker({
+  const tracker = points({
     storeIntermediate: trace,
   });
 

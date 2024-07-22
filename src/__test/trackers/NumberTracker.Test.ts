@@ -1,4 +1,4 @@
-import { numberTracker } from '../../data/NumberTracker.js';
+import { number as numberTracker } from '../../trackers/NumberTracker.js';
 import test from 'ava';
 
 test(`numberTracker`, (t) => {

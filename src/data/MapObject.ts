@@ -78,6 +78,28 @@ export type MapObjectArgs = {
   index: number
 }
 
+/**
+ * Maps the contents of `data` using `mapper` as a structured set of map functions.
+ * ```js
+ * const a = {
+ *  person: {
+ *    size: 20
+ *  }
+ *  hello: `there`
+ * }
+ * mapObjectByObject(a, {
+ *  person: {
+ *    size: (value, context) => {
+ *      return value * 2
+ *    }
+ *  }
+ * });
+ * // Yields: { person: { size: 40 }, hello: `there` }
+ * ```
+ * @param data 
+ * @param mapper 
+ * @returns 
+ */
 export function mapObjectByObject(data: any, mapper: Record<string, (value: any, context: any) => any>) {
   const entries = Object.entries(data);
   for (let i = 0; i < entries.length; i++) {

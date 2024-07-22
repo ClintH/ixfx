@@ -2,7 +2,7 @@ import type { Interval } from '../flow/IntervalType.js';
 import { wrap } from './Wrap.js';
 import { progress } from '../flow/Elapsed.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
-import { clamp } from './Clamp.js';
+import { clamp } from '../numbers/Clamp.js';
 export const piPi = Math.PI * 2;
 
 export type InterpolateOptions = {

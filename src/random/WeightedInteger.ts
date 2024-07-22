@@ -1,4 +1,4 @@
-import { clamp } from "../data/Clamp.js";
+import { clamp } from "../numbers/Clamp.js";
 import { type RandomSource, defaultRandom } from "./Types.js";
 import type { WeightedOptions } from "./Weighted.js";
 import { throwNumberTest } from '../util/GuardNumbers.js';

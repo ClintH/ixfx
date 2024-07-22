@@ -39,7 +39,7 @@ import type { Point } from "./PointType.js";
  *
  * Note that intermediate values are not stored. It keeps the initial
  * and most-recent point. If you want to compute something over a set
- * of prior points, you may want to use {@link Data.pointsTracker}
+ * of prior points, you may want to use {@link Trackers.points}
  * @param a Initial point, or x value
  * @param b y value, if first option is a number.
  * @returns

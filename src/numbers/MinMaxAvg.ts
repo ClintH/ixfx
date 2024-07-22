@@ -78,12 +78,12 @@ export const minMaxAvg = (
   const startIndex = opts.startIndex ?? 0;
   const endIndex = opts.endIndex ?? data.length;
 
-  const validNumbers = filterBetween<number>(
+  const validNumbers = [ ...filterBetween<number>(
     data,
     (d) => typeof d === `number` && !Number.isNaN(d),
     startIndex,
     endIndex
-  );
+  ) ];
   const total = validNumbers.reduce((accumulator, v) => accumulator + v, 0);
   return {
     total: total,

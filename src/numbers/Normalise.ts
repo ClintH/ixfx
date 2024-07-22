@@ -2,7 +2,7 @@
 import { scale } from './Scale.js';
 import { throwNumberTest } from "../util/GuardNumbers.js";
 import { clamp } from './Clamp.js';
-import { minMaxAvg } from '../numbers/MinMaxAvg.js';
+import { minMaxAvg } from './MinMaxAvg.js';
 /**
  * Normalises numbers, adjusting min/max as new values are processed.
  * Normalised return values will be in the range of 0-1 (inclusive).

@@ -4,19 +4,19 @@ import { throwIntegerTest } from '../../util/GuardNumbers.js';
  *
  * @example By percentage - get half of the items
  * ```
- * import { sample } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const list = [1,2,3,4,5,6,7,8,9,10];
- * const sub = sample(list, 0.5);
+ * const sub = Arrays.sample(list, 0.5);
  * // Yields: [2, 4, 6, 8, 10]
  * ```
  *
  * @example By steps - every third
  * ```
- * import { sample } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const list = [1,2,3,4,5,6,7,8,9,10];
- * const sub = sample(list, 3);
+ * const sub = Arrays.sample(list, 3);
  * // Yields:
  * // [3, 6, 9]
  * ```

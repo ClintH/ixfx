@@ -1,5 +1,5 @@
 import test from 'ava';
-import { clamp, clampIndex } from '../../data/Clamp.js';
+import { clamp, clampIndex } from '../../numbers/Clamp.js';
 
 test(`clamp-inclusivity`, (t) => {
   t.is(clamp(0, 0, 1), 0);

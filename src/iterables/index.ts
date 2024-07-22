@@ -6,6 +6,23 @@ import * as Async from '../iterables/IterableAsync.js';
 import * as Sync from '../iterables/IterableSync.js';
 export * as Async from '../iterables/IterableAsync.js';
 export * as Sync from '../iterables/IterableSync.js';
+
+/**
+ * Chains use generators as a way of processing data.
+ * 
+ * To create, {@link From}, processing operators are {@link Links}.
+ * To run: {@link run}
+ * 
+ * Utility
+ * * {@link addToArray}: add values from a source to an array as they are emitted
+ * * {@link asArray}: wait for source to complete, collecting results into an array
+ * * {@link mergeFlat}: combine serveral sources into one, interleaving values
+ * * {@link asCallback}: passes a value to a callback whenever it is emitted
+ * * {@link asPromise}: Treat chain as a promise, yeidling the final result.
+ * * {@link asValue}: Return the most recent value
+ * * {@link syncToArray}: Wait for all sources to produce a value
+ * * {@link combineLatestToArray}, {@link combineLatestToObject}: Emit values as array/oject as soon as one source changes
+ */
 export * as Chains from './chain/index.js';
 export * from './Iterable.js';
 export type * from './Types.js';
@@ -18,6 +35,12 @@ import { toStringDefault } from '../util/index.js';
 import type { GenFactoryNoInput } from './chain/Types.js';
 import type { ToArrayOptions } from './Types.js';
 
+/**
+ * {@inheritDoc Chains.combineLatestToArray}
+ * @param sources 
+ * @param options 
+ * @returns 
+ */
 export function combineLatestToArray(sources: Array<Chains.GenOrData<any> | GenFactoryNoInput<any>>, options: Partial<Chains.CombineLatestOptions> = {}): AsyncGenerator<Array<any>> {
   return Chains.combineLatestToArray(sources, options);
 }

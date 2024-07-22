@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { Maps } from "../../collections/index.js"
+import * as MapFns from "../../data/maps/MapFns.js"
 import { initStream } from "../InitStream.js"
 import { resolveSource } from "../ResolveSource.js"
 import type { ReactiveOrSource, CombineLatestOptions, Reactive, RxValueTypeObject, ReactiveInitial, RxValueTypeRx, ReactiveDiff } from "../Types.js"
@@ -77,7 +77,7 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
   }
   const sources = Object.fromEntries(Object.entries(states).map(entry => [ entry[ 0 ], entry[ 1 ].source ])) as RxValueTypeRx<T>;
   // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
-  const someUnfinished = () => Maps.some(states, v => !v.done);
+  const someUnfinished = () => MapFns.some(states, v => !v.done);
 
   const unsub = () => {
     //console.log(`Rx.MergeToObject.unsub states: ${ [ ...states.keys() ].join(`,`) }`);

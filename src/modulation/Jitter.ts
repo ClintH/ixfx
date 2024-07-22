@@ -2,7 +2,7 @@ import {
   float as randomFloat
 } from '../random/index.js';
 import { floatSource as randomFloatFunction } from '../random/FloatSource.js';
-import { clamp } from '../data/Clamp.js';
+import { clamp } from '../numbers/Clamp.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
 import { defaultRandom, type RandomSource } from '../random/Types.js';
 

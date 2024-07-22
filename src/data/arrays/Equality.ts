@@ -46,20 +46,20 @@ export const isEqual = <V>(arrayA: Array<V>, arrayB: Array<V>, eq = isEqualDefau
  * 
  * @example Uses default equality function:
  * ```js
- * import { isContentsTheSame } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const a1 = [ 10, 10, 10 ];
- * isContentsTheSame(a1); // True
+ * Arrays.isContentsTheSame(a1); // True
  *
  * const a2 = [ { name:`Jane` }, { name:`John` } ];
- * isContentsTheSame(a2); // True, even though object references are different
+ * Arrays.isContentsTheSame(a2); // True, even though object references are different
  * ```
  *
  * If we want to compare by value for objects that aren't readily
  * converted to JSON, you need to provide a function:
  *
  * ```js
- * isContentsTheSame(someArray, (a, b) => {
+ * Arrays.isContentsTheSame(someArray, (a, b) => {
  *  return (a.eventType === b.eventType);
  * });
  * ```

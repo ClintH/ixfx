@@ -1,5 +1,5 @@
 import { throwNumberTest } from "../util/GuardNumbers.js";
-import { type NumberFunction } from './Types.js';
+import { type NumberFunction } from '../data/Types.js';
 
 /**
  * Scales a percentage-scale number, ie: `v * t`.

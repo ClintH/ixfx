@@ -1,5 +1,5 @@
 import test from 'ava';
-import { immutable, fromScalar, clamp, towardZero } from '../../data/Bipolar.js';
+import { immutable, fromScalar, clamp, towardZero } from '../../numbers/Bipolar.js';
 
 test('bipolar', t => {
   const b = immutable(1);

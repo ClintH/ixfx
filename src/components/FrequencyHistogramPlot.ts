@@ -1,5 +1,5 @@
 import { HistogramVis } from './HistogramVis.js';
-import * as KeyValueUtil from '../KeyValue.js';
+import * as KeyValueUtil from '../util/KeyValue.js';
 import type { KeyValue } from '../PrimitiveTypes.js';
 
 /**

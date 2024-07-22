@@ -4,12 +4,12 @@ import { isContentsTheSame } from "./Equality.js";
  * Zip combines the elements of two or more arrays based on their index.
  *
  * ```js
- * import { zip } from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const a = [1,2,3];
  * const b = [`red`, `blue`, `green`];
  *
- * const c = zip(a, b);
+ * const c = Arrays.zip(a, b);
  * // Yields:
  * // [
  * //   [1, `red`],

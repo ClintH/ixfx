@@ -37,7 +37,7 @@ export const gaussian = (skew = 1) => gaussianSource(skew)();
  * @example Pass the random number generator elsewhere
  * ```js
  * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
- * import * as Arrays from 'https://unpkg.com/ixfx/dist/arrays.js';
+ * import Arrays from 'https://unpkg.com/ixfx/dist/data.js';
  * const r = Random.gaussianFn(10);
  *
  * // Randomise array with gaussian distribution

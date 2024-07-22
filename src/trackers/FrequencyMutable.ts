@@ -2,14 +2,14 @@
 
 import { type ToString } from '../util/index.js';
 import { SimpleEventEmitter } from '../Events.js';
-import * as KeyValues from '../KeyValue.js';
+import * as KeyValues from '../util/KeyValue.js';
 import type { KeyValue } from '../PrimitiveTypes.js';
 
 export type FrequencyEventMap = {
   readonly change: { context: any };
 };
 
-export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
+export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   readonly #store: Map<string, number>;
   readonly #keyString: ToString<V>;
 
@@ -155,7 +155,7 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
  * unlike a Map it does not store the data. By default compares
  * items by value (via JSON.stringify).
  *
- * Create with {@link frequencyMutable}.
+ * Create with {@link frequency}.
  *
  * Fires `change` event when items are added or it is cleared.
  *
@@ -190,5 +190,5 @@ export class FrequencyMutable<V> extends SimpleEventEmitter<FrequencyEventMap> {
  * ```
  * @template V Type of items
  */
-export const frequencyMutable = <V>(keyString?: ToString<V> | undefined) =>
-  new FrequencyMutable<V>(keyString);
+export const frequency = <V>(keyString?: ToString<V> | undefined) =>
+  new FrequencyTracker<V>(keyString);

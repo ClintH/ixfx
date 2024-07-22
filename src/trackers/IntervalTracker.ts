@@ -20,9 +20,9 @@ export class IntervalTracker extends NumberTracker {
  * records the interval between each call to `mark`.
  *
  * ```js
- * import { intervalTracker } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { interval } from 'https://unpkg.com/ixfx/dist/trackers.js';
  *
- * const t = intervalTracker();
+ * const t = interval();
  *
  * // Call `mark` to record an interval
  * t.mark();
@@ -40,9 +40,9 @@ export class IntervalTracker extends NumberTracker {
  *
  * ```
  * // Reset after 100 samples
- * const t = intervalTracker({ resetAfterSamples: 100} );
+ * const t = interval({ resetAfterSamples: 100} );
  * ```
  * @param options Options for tracker
  * @returns New interval tracker
  */
-export const intervalTracker = (options?: TrackOpts) => new IntervalTracker(options);
+export const interval = (options?: TrackOpts) => new IntervalTracker(options);

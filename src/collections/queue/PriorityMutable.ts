@@ -91,6 +91,16 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
   }
 }
 
+/**
+ * Creates a {@link PriorityMutable} queue.
+ * 
+ * Options:
+ * * eq: Equality function
+ * * capacity: limit on number of items
+ * * discardPolicy: what to do if capacity is reached
+ * @param opts 
+ * @returns 
+ */
 export function priority<V>(
   opts: QueueOpts<PriorityItem<V>> = {}
 ): IPriorityQueueMutable<V> {

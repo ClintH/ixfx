@@ -1,4 +1,4 @@
-import { PrimitiveTracker, type TimestampedPrimitive } from './PrimitiveTracker.js';
+import { PrimitiveTracker, type TimestampedPrimitive } from './PrimitiveTracker.js'
 import {
   type TrackedValueOpts as TrackOpts,
 } from './TrackedValue.js';
@@ -92,9 +92,9 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * Usage:
  *
  * ```js
- * import { numberTracker } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { number } from 'https://unpkg.com/ixfx/dist/trackers.js';
  *
- * const t = numberTracker();
+ * const t = number();
  * t.seen(10);
  *
  * t.avg / t.min/ t.max
@@ -114,13 +114,13 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * Trackers can automatically reset after a given number of samples
  * ```
  * // reset after 100 samples
- * const t = numberTracker({ resetAfterSamples: 100 });
+ * const t = number({ resetAfterSamples: 100 });
  * ```
  *
  * To store values, use the `storeIntermediate` option:
  *
  * ```js
- * const t = numberTracker({ storeIntermediate: true });
+ * const t = number({ storeIntermediate: true });
  * ```
  *
  * Difference between last value and initial value:
@@ -134,4 +134,4 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * t.timestampes; // array of millisecond times, indexes correspond to t.values
  * ```
  */
-export const numberTracker = (opts: TrackOpts = {}) => new NumberTracker(opts);
+export const number = (opts: TrackOpts = {}) => new NumberTracker(opts);

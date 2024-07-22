@@ -1,5 +1,5 @@
 import test from 'ava';
-import * as G from '../../../data/graphs/UndirectedGraph.js';
+import * as G from '../../../collections/graphs/UndirectedGraph.js';
 
 test(`edgesForVertex`, t => {
   const g = G.graph(

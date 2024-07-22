@@ -3,7 +3,7 @@ import * as Chains from '../../iterables/chain/index.js';
 import { count } from '../../numbers/Count.js';
 import * as Async from '../../iterables/IterableAsync.js'
 import { sleep } from '../../flow/Sleep.js';
-import { intervalTracker } from '../../data/IntervalTracker.js';
+import { interval as intervalTracker } from '../../trackers/IntervalTracker.js';
 import { isApproximately } from '../../numbers/IsApproximately.js';
 
 const getNumberData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);

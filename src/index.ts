@@ -23,42 +23,44 @@ export type * from './PrimitiveTypes.js';
 /**
  * Processing streams of data. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
  *
- * * {@link clamp}: Restrict a number to a given range
- * * {@link clampIndex}: Restrict a number to be within the size of an array
- * * {@link flip}: Invert a relative number
- * * {@link interpolate}: Mix between two numbers by an amount
- * * {@link interpolateAngle}: Mix between two angles by an amount
- * * {@link scale}: Scale a value from an input range to an output range
- * * {@link wrap}: Wraps a value to be within a range
- * * {@link wrapInteger}: Wraps an integer to be within a range
- * * {@link Bipolar}: Module for working with bipolar values
+ * Sub-modules:
+ * * {@link Data.Arrays} helpers for working with arrays
+ * * {@link Data.Correlate} simple data correlation
+ * * {@link Data.Maps} helpers for working with maps
+ * * {@link Data.Pathed}: compare objects, access value by string path
+ * * {@link Data.Pool}: allocate resources within a pool
+ * * {@link Data.Process}: process values
  * 
- * ### Averaging
- * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
- *
- * ### Normalise sub-module
- * * {@link Normalise.stream | Normalise.stream}: Normalises a stream of values
- * * {@link Normalise.array | Normalise.array}: Normalises an array of values
- *
- * ### Trackers
- * Trackers are useful for tracking a series of data over time.
- * * {@link numberTracker}: Tracks min, max and average of a stream of numbers
- * * {@link intervalTracker}: Tracks min, max and average time interval between events
- * * {@link pointTracker}: Tracks the spatial change of x,y coordinates. Useful for tracking a mouse cursor, for example.
- * * {@link pointsTracker}: Tracks changes in multiple x,y coordinates. Useful for tracking each finger touch on a screen, for example.
- * * {@link frequencyMutable}: Count occurences of a value
- *
- * * {@link Pool.Pool}: Manage a shared set of resources
+ * Comparing
+ * * {@link Data.changedDataFields}: set of fields that have changed between two objects
+ * * {@link Data.compareData}: produce a list of changes between two objects
+ * * {@link Data.compareArrays}: compare contents of an array
+ * * {@link Data.compareKeys}: compare keys of two objects
+ * 
+ * Etc
+ * * {@link keysToNumbers}: Convert keys of an object to number data type
+ * * {@link mapObjectByObject}: Map values of an object using a structured set of map functions. Allows you to use different map functions for different keys.
+ * * {@link mapObjectShallow}: Maps top-level values of an object through a common function.
+ * * {@link resolve}: For an input value, iterator/generator or function, it will return a value
+ * * {@link resolveFields}: Like {@link resolve} but works on all the top-level values of an object.
+ * 
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
- * import {movingAverage} from '../../ixfx/dist/data.js';
+ * import { resolve } from '../../ixfx/dist/data.js';
  * // Import from web
- * import {movingAverage} from 'https://unpkg.com/ixfx/dist/data.js'
+ * import { resolve } from 'https://unpkg.com/ixfx/dist/data.js'
  * ```
  */
 export * as Data from './data/index.js';
 
+/**
+ * A few functions for helping with debugging
+ * * {@link fpsCounter}: Compute frames-per-second
+ * * {@link getErrorMessage}: Get an error as a string
+ * * {@link logger}: Log to console
+ * * {@link logSet}: log, warn and error loggers
+ */
 export * as Debug from './debug/index.js';
 
 export * as Rx from './rx/index.js';
@@ -114,7 +116,17 @@ export * as Text from './Text.js';
 
 
 /**
- * Input and output to devices, sensors and actuators
+ * Input and output to devices, sensors and actuators.
+ * 
+ * Modules:
+ * * {@link AudioAnalysers}: Process audio
+ * * {@link AudioVisualisers}: Visualise audio
+ * * {@link Bluetooth}: Connect to devices via BLE
+ * * {@link Camera}: Get frames from the device's camera
+ * * {@link Espruino}: Connect to Espruino devices via USB or BLE
+ * * {@link Serial}: Connect to devices via USB serial
+ * * {@link VideoFile}: Get frames from a video file
+ * 
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
@@ -129,8 +141,9 @@ export * as Io from './io/index.js';
  * Control execution
  *
  * Logic-oriented
- *  * {@link StateMachine}: Manage state transitions
- *
+ * * {@link StateMachine}: Manage state transitions
+ * * {@link everyNth}: Returns _true_ for every nth call
+ * 
  * Rate-oriented
  * * {@link debounce}: Only handle invocation after a minimum time has elapsed
  * * {@link throttle}: Only handle invocations at a maximum rate
@@ -138,17 +151,32 @@ export * as Io from './io/index.js';
  * Time-oriented
  * * {@link timeout}: Run code after a specified time delay
  * * {@link sleep}: Using `async await`, delay execution for a period
+ * * {@link sleepWhile}: Keep sleeping until a predicate returns _true_
  * * {@link delay}: Using `async await`, run a given callback after a period
  * * {@link interval}: Generates values from a given function with a given delay
  * * {@link waitFor}: Calls a function and have the possibility to cancel if it takes too long
- *
+ * * {@link rateMinimum}: Ensures that a function is called at a set rate
+ * 
  * Iteration over values
  * * {@link forEach} / {@link forEachAsync}: Loop over an iterable or array, with the possibility of early exit
- * * {@link repeat}: Runs a function a given number of times, yielding results as they come in
+ * * {@link repeat} / @{link repeatAwait}: Runs a function a given number of times, yielding results as they come in
  *
  * Monitoring
  * * {@link Elapsed.progress}: Track completion of a time duration
- *
+ * * {@link hasElapsed}: Returns _true_ when certain time has passed
+ * * {@link retryFunction}: Keep calling a function until it returns a value
+ * * {@link retryTask}: Keep trying a task until it succeeds
+ * * {@link waitFor}: Try to run something but take action if it fails or doesn't return
+ * * {@link singleItem}: Wait for a single value to be produced
+ * * {@link SyncWait}: Simple synchronisation
+ * * {@link RequestResponseMatch}: Housekeeping of matching requests from A with responses from B and handling failures
+ * 
+ * Executing
+ * * {@link run}: Run a series of async expressions, returning result / {@link runSingle}
+ * * {@link runOnce}: Wrap a function so it only gets called once
+ * * {@link DispatchList}: Simple foundation for publish/subscribe events
+ * * {@link TaskQueueMutable}: Task queue
+ * 
  * Loops
  * * {@link continuously}: Run code in a loop, as fast as possible or with a delay between each execution
  * * {@link delayLoop}: A generator that yields at a given rate
@@ -156,7 +184,11 @@ export * as Io from './io/index.js';
  * Timers
  * * {@link msElapsedTimer}: Timer that returns elapsed time since initial invocation
  * * {@link ticksElapsedTimer}: Timer based on manual 'ticks'
- *
+ * * {@link backoffGenerator}: Compute increasingly-larger timeout values
+ * 
+ * Etc
+ * * {@link promiseFromEvent}: Create a promise from an event
+ * * {@link promiseWithResolvers}
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
@@ -202,12 +234,15 @@ export * as Flow from './flow/index.js';
  * * {@link flatten} For an input iterator of arrays, returns a flattened set of values
  * * {@link slice} Take a slice of an iterable
  * * {@link zip} Combines items at same position from iterables
+ * 
+ * Values
  * * {@link fill} Yields a fixed value for every value from an iterable
+ * * {@link combineLatestToArray} Yield an array of values whenever a source iterable changes
+ * * {@link reduce} Reduce an interable
  * 
  * Iterating
  * * {@link forEach} Runs a function for each value of iterable (S)
  * * {@link until} Calls a function for each value of an iterable. Value itself is ignored (unlike a {@link forEach}) (S)
- * 
  * 
  *  * @example Importing
  * ```js
@@ -220,12 +255,60 @@ export * as Flow from './flow/index.js';
 export * as Iterables from './iterables/index.js';
 
 /**
- * Generating numbers
+ * 
+ * Sub-modules
+ * * {@link Numbers.Normalise}: normalise values
+ * * {@link Numbers.Bipolar}: helpers for working with -1...1 bipolar values
+ * 
+ * Working with scalar values
+ * * {@link Numbers.Normalise}: normalise values
+ * * {@link proportion}: Scales one scalar by another
+ * * {@link wrap}: Wraps a value to be within a range
+ * * {@link flip}: Flips a percentage-scale number (eg 1 => 0, 0.5 => 0.5, 0 => 1) 
+ * 
+ * Averaging/rounding
+ * * {@link average}: Basic mathematical average
+ * * {@link averageWeighted}: Weighted average
+ * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
+ * * {@link movingAverageTimed}: Automatically add values at a given rate
+ * * {@link noiseFilter}: Noise filter
+ * * {@link round}, {@link roundUpToMultiple}
+ * * {@link quantiseEvery}: Rounds a value to the nearest given value
+ * 
+ * Calculating
+ * * {@link dotProduct}
+ * * {@link min}, {@link max}, {@link minIndex}, {@link maxIndex}
+ * * {@link total}
+ * * {@link relativeDifference}: Returns the relative difference from some initial value
+ * * {@link weight} Weighs an array of numbers according to their position
+ * 
+ * Generators/iterators
  * * {@link count}: Generate a set numbers, counting by one
  * * {@link numericPercent}: Generate a range of numbers on the percentage scale of 0-1
  * * {@link numericRange}: Generate a range of numbers
- * * {@link pingPong} / {@link pingPongPercent}: Generate numbers that repeat up and down between the set limits
- * * {@link randomUniqueInteger}: Random unique integer
+ * * {@link filter}: Filter a generator, only yielding those which are numbers
+ * * {@link linearSpace}: Generates series of values between start and end
+ * 
+ * Clamping:
+ * * {@link clamp}: Restrict a number to a given range
+ * * {@link clampIndex}: Restrict a number to be within the size of an array
+ * 
+ * Scaling:
+ * * {@link scale}: Scale a value from an input range to an output range. {@link scaler} returns a function to scale values.
+ * * {@link scaleClamped}: Scale a value from an input range to an output range, clamping so that output range is a hard limit
+ * * {@link scalePercent}: Scale input percentage to an output range
+ * * {@link scalePercentages}: Scale input percentage to an output percentage range
+ * 
+ * Interpolate
+ * * {@link interpolate}: Interpolate from A to B by a given amount
+ * * {@link interpolateAngle}: Interpolate angle
+ * * {@link interpolatorInterval}: Interpolate automatically over time
+ * * {@link interpolatorStepped}: Interpolate automatically stepwise
+ * 
+ * Etc
+ * * {@link applyToValues}: Applies a function to every key of an object which is a number
+ * * {@link isApproximately}: _True_ if number is roughly within a range
+ * * {@link isValid}: _True_ if input is a number, {@link validNumbers}
  */
 export * as Numbers from './numbers/index.js';
 
@@ -253,20 +336,30 @@ export * as Visual from './visual/index.js';
 /**
  * DOM module has some functions for easing DOM manipulation.
  *
- * * {@link copyToClipboard}: Attempt to copy a string representation to clipboard
  * * {@link fullSizeCanvas}: Keeps a canvas element at maximum size
- * * {@link parentSize}: Sets width/height of an element according to size of parent
- * * {@link getTranslation}: Returns the CSS translation of an element
  * * {@link pointerVisualise}: Shows pointer events for debugging purposes
- *
- * Components
- * * {@link DataTable}: Creates a HTML table from an object/map of objects
- * * {@link log}: log to DOM
- *
- * Basic DOM manipulation
- * * {@link clear}: remove all child nodes from a parent
+*
+* Components
+* * {@link DataTable}: Creates a HTML table from an object/map of objects
+* * {@link log}: log to DOM
+*
+* Basic DOM manipulation
+* * {@link clear}: remove all child nodes from a parent
+* * Create DOM elements: {@link createAfter}, {@link createIn}
+* 
+* Position/size
+* * {@link cardinalPosition}: Get the corner x,y of an element
+* * {@link parentSize}: Sets width/height of an element according to size of parent
+ * * {@link getTranslation}: Returns the CSS translation of an element
+ * 
+ * Etc
+ * * {@link copyToClipboard}: Attempt to copy a string representation to clipboard
+ * * {@link cycleCssClass}: Given an array of css classes cycle between them each time function is called
+ * 
+ * Getting DOM references
  * * {@link resolveEl}: resolve an element by query or instance
- * * Create DOM elements: {@link createAfter}, {@link createIn}
+ * * {@link byId}: Gets an element by id, or throws an error
+ * 
  */
 export * as Dom from './dom/index.js';
 
@@ -302,50 +395,50 @@ export * from './TsUtil.js';
 /**
  * This module includes a variety of techniques for storing and retrieving data.
  *
- * ### MutableSet
+ * ## Ranked collections
+ * 
+ * ### Queues
+ * A queue has the logic of waiting in line at the bakery. First in, first out.
+ * * {@link Queues.immutable}: Create a {@link Queues.IQueueImmutable immutable queue}.
+ * * {@link Queues.mutable}: Create a {@link Queues.IQueueMutable mutable queue}. Has events that fire when queue is manipulated.
+ * * {@link Queues.priority}: Create a {@link Queues.IPriorityQueueMutable priority queue}
+ * 
+ * ### Stacks
+ * A stack has the logic of stacked plates. First in, last out.
+ * * {@link Stacks.immutable}: Create a {@link Stacks.IStackImmutable immutable queue}.
+ * * {@link Stacks.mutable}: Create a {@link Stacks.IStackMutable mutable stack}.
+ * 
+ * ## Sets
  * Like a regular array, a set can store many items. However, duplicate items are ignored - it
  * only keeps unique items. ixfx's {@link Sets.ISetMutable} allows for considering items as identical by value, not
  * just by reference as the default JS Set operates
  *
- * * {@link Sets.mutable}: Create a {@link Sets.ISetMutable}
+ * * {@link Sets.mutable}: Create a {@link Sets.ISetMutable mutable set}.
+ * * {@link Sets.immutable}: Create an {@link Sets.ISetImmutable immutable set}.
+ * * {@link Sets.MassiveSet}: Regular JS sets have a restriction on capacity. This implementation can store more.
  *
- * ### CircularArray
- * {@link circularArray} extends a regular array, but only keeps the last _x_ number of items.
- *
- * ## Ordered collections
- *
- * {@link Queues}: a list of ordered data, like a bakery queue
- * * Create with {@link Queues.immutable} or {@link Queues.mutable}
- *
- * {@link Stacks}: a list of ordered data, like a stack of plates
- * * Create with {@link Stacks.immutable} or {@link Stacks.mutable}
- *
- * Both queue and stack come in mutable and immutable varieties and can limit items
- * stored in varies ways.
- *
- * ### Map
- *
- * {@link Maps.IMapImmutable} is a slight variant of the usual JS Map. It allows for a custom logic for computing keys
- * for items based on a function.
- *
- * * Create with {@link Maps.immutable} or {@link Maps.mutable}
- *
- * {@link Maps.ExpiringMap} has the same semantics as a regular map, but can automatically remove items if they haven't been set/get for a given interval, and/or if a capacity limit is reached.
- *
- * * Create with {@link Maps.expiringMap}
- *
- * ### Map-of
- *
- * {@link Maps.IMapOf} allows for several values to be stored under a single key. Unlike a regular JS Map
- * which only allows a single value per key. IMapOfMutable also has events for listening to changes
- * in the data.
- *
- * * {@link Maps.ofArrayMutable}: Holds any number of items under a given key
- * * {@link Maps.ofSetMutable}: Holds any number of **unique** items under a given key
- * * {@link Maps.ofCircularMutable}: Holds the most recent _x_ items under a given key
- *
- * For cases where events are not needed consider {@link Maps.mapOfSimpleMutable}. This is a bit more lightweight.
- *
+ * ## Maps
+ * * {@link Maps.immutable}: Create a {@link Maps.IMapImmutable immutable map}.
+ * * {@link Maps.mutable}: Create a {@link Maps.IMapMutable mutable map}.
+ * * {@link Maps.ExpiringMap}: A map that can have a capacity limit and automatically expire key/value pairs.
+ * * {@link Maps.NumberMap}: A map that associates keys with numeric values, including some helper functions.
+ * * {@link Maps.ofArrayMutable}: Stores multiple values for a key in an array.
+ * * {@link Maps.ofCircularMutable}: Stores multiple values for a key in a circular array.
+ * * {@link Maps.ofSetMutable}: Stores multiple values for a key in a Set.
+ * 
+ * ## Trees
+ * * {@link Trees.Mutable.root}: Create a root tree node
+ * * {@link Trees.Mutable.rootWrapped}: Create a root tree node for object-oriented access
+ * * {@link Trees.FromObject.create}: Create a tree structure from the basis of an object's structure.
+ * * {@link Trees.FromObject.createWrapped}: Create a tree structure from the basis of an object's structure, wrapped for object-oriented access.
+ * 
+ * ## Graphs
+ * * {@link Graphs.Directed}
+ * * {@link Graphs.Undirected}
+ * 
+ * ## Etc
+ * * {@link Table}
+ * * {@link circularArray}
  * @example Importing
  * ```js
  * // If library is stored two directories up under `ixfx/`
@@ -355,10 +448,6 @@ export * from './TsUtil.js';
  * ```
  */
 export * as Collections from './collections/index.js';
-
-// -----------------------------
-// Minor modules
-// -----------------------------
 
 /**
  * Totally rando.
@@ -394,8 +483,14 @@ export * as Collections from './collections/index.js';
  * ```
  */
 export * as Random from './random/index.js';
-export * as KeyValues from './KeyValue.js';
-
 export * as Util from './util/index.js';
 
-export * as Immutable from './data/Pathed.js'
+/**
+ * Trackers are useful for tracking a series of data over time.
+ * * {@link number}: Tracks min, max and average of a stream of numbers
+ * * {@link interval}: Tracks min, max and average time interval between events
+ * * {@link point}: Tracks the spatial change of x,y coordinates. Useful for tracking a mouse cursor, for example.
+ * * {@link points}: Tracks changes in multiple x,y coordinates. Useful for tracking each finger touch on a screen, for example.
+ * * {@link frequency}: Count occurences of a value
+ */
+export * as Trackers from './trackers/index.js';

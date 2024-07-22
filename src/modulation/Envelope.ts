@@ -3,7 +3,7 @@ import { msElapsedTimer, type TimerSource } from '../flow/index.js';
 import { type Timer } from '../flow/Timer.js';
 import type { Path } from '../geometry/path/index.js';
 import * as Bezier from '../geometry/bezier/index.js';
-import { scale } from '../data/Scale.js';
+import { scale } from '../numbers/Scale.js';
 import { interval } from '../flow/Interval.js';
 import { StateMachineWithEvents } from '../flow/StateMachineWithEvents.js';
 

@@ -7,12 +7,11 @@ import { promiseWithResolvers } from "./PromiseWithResolvers.js";
  * ```js
  * const q = Flow.waitForValue();
  * 
- * // In some part of the code:
- * // wait for a value to be added
- * const value = await q.add();
+ * // In some part of the code add a value
+ * const value = q.add();
  * 
- * // Somewhere else
- * q.get(value);
+ * // Somewhere else, wait for value
+ * await q.get(value);
  * ```
  * 
  * It is not possible to `add` a second item, however

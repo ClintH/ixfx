@@ -1,5 +1,5 @@
 import test from 'ava';
-import { wrap, wrapInteger } from '../../data/Wrap.js';
+import { wrap, wrapInteger } from '../../numbers/Wrap.js';
 
 test(`wrap`, (t) => {
   t.is(wrap(10.5, 5, 10), 5.5);

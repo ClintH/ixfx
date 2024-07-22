@@ -17,5 +17,3 @@ export { NumberMap } from './NumberMap.js';
 export * from './MapMulti.js';
 
 export type { IDictionary as IMappish, IWithEntries } from '../../data/maps/IMappish.js';
-export * from '../../data/maps/MapFns.js';
-export * from '../../data/maps/GetOrGenerate.js';
