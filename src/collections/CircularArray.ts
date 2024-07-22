@@ -14,7 +14,6 @@ import { throwIntegerTest } from "../util/GuardNumbers.js";
  * a.pointer; // The current position in array it will write to
  * ```
  * @class CircularArray
- * @extends Array
  */
 
 
@@ -33,7 +32,6 @@ export interface ICircularArray<V> extends Array<V> {
    *
    * @param value Thing to add
    * @returns Circular with item added
-   * @memberof Circular
    */
   add(value: V): ICircularArray<V>;
 

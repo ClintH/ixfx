@@ -153,11 +153,11 @@ export type ElPositionOpts = {
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export const positionFn = (
   domQueryOrEl: Readonly<string | HTMLElement>,
-  opts: ElPositionOpts = {}
+  options: ElPositionOpts = {}
 ): (() => Point) => {
-  const targetSpace = opts.target ?? `viewport`;
-  const relative = opts.relative ?? false;
-  const anchor = opts.anchor ?? `nw`;
+  const targetSpace = options.target ?? `viewport`;
+  const relative = options.relative ?? false;
+  const anchor = options.anchor ?? `nw`;
 
   const el = resolveEl(domQueryOrEl);
   const vpToSpace = viewportToSpace(targetSpace);

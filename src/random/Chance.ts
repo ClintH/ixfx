@@ -2,9 +2,9 @@ import { throwNumberTest } from "../util/GuardNumbers.js";
 import type { RandomSource } from "./Types.js";
 
 /**
- * Chance of returning `a` or `b`, based on probability `p`.
+ * Chance of returning `a` or `b`, based on threshold `p`.
  * 
- * `p` sets the weighting for picking `b`. The higher the value (up to 1),
+ * `p` sets the threshold for picking `b`. The higher the value (up to 1),
  * the more likely `b` will be picked.
  * 
  * ```js
@@ -14,11 +14,10 @@ import type { RandomSource } from "./Types.js";
  * chance(0.9, 100, 110);
  * ```
  * 
- * All parameters can be either a function returning a value, or a value.
- * @param p 
- * @param initial 
- * @param compute 
- * @param randomSource 
+ * @param p Threshold to choose option B (value or function)
+ * @param a Value or function for option A
+ * @param b Value or function for option B
+ * @param randomSource Source of random numbers
  * @returns 
  */
 export const chance = <T>(p: number | (() => number), a: T | (() => T), b: T | (() => T), randomSource?: RandomSource): T => {

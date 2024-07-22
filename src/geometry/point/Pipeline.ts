@@ -7,14 +7,14 @@ import type { Point } from "./PointType.js";
  * ```
  *
  * If you want to make a reusable pipeline of functions, consider {@link pipeline} instead.
- * @param pt
- * @param pipeline
+ * @param point
+ * @param pipelineFns
  * @returns
  */
 export const pipelineApply = (
-  pt: Point,
+  point: Point,
   ...pipelineFns: ReadonlyArray<(pt: Point) => Point>
-): Point => pipeline(...pipelineFns)(pt); // pipeline.reduce((prev, curr) => curr(prev), pt);
+): Point => pipeline(...pipelineFns)(point); // pipeline.reduce((prev, curr) => curr(prev), pt);
 
 /**
  * Returns a pipeline function that takes a point to be transformed through a series of functions

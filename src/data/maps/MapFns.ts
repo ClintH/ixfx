@@ -626,7 +626,7 @@ export type MergeReconcile<V> = (a: V, b: V) => V;
  * Merges maps left to right, using the provided
  * `reconcile` function to choose a winner when keys overlap.
  *
- * There's also [Arrays.mergeByKey](functions/Collections.Arrays.mergeByKey.html) if you don't already have a map.
+ * There's also {@link Data.Arrays.mergeByKey Arrays.mergeByKey} if you don't already have a map.
  *
  * For example, if we have the map A:
  * 1 => `A-1`, 2 => `A-2`, 3 => `A-3`

@@ -9,8 +9,7 @@ import type { Point } from "./PointType.js";
  * a === b        // False, because a and be are different objects
  * isEqual(a, b)   // True, because a and b are same value
  * ```
- * @param a
- * @param b
+ * @param p Points
  * @returns _True_ if points are equal
  */
 export const isEqual = (...p: ReadonlyArray<Point>): boolean => {

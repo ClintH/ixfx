@@ -289,7 +289,7 @@ export type MatchOptions = {
  * If `source` is _undefined_, an error is thrown.
  * @param source
  * @param match
- * @param startPos
+ * @param options
  * @returns
  */
 export const beforeMatch = (
@@ -314,7 +314,7 @@ export const beforeMatch = (
  * If `source` is _undefined_, an error is thrown.
  * @param source
  * @param match
- * @param startPos
+ * @param options
  * @returns
  */
 export const afterMatch = (

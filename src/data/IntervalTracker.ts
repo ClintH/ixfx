@@ -3,10 +3,6 @@ import { type TrackedValueOpts as TrackOpts } from './TrackedValue.js';
 
 /**
  * A `Tracker` that tracks interval between calls to `mark()`
- *
- * @export
- * @class IntervalTracker
- * @extends {ValueTracker}
  */
 export class IntervalTracker extends NumberTracker {
   lastMark = 0;

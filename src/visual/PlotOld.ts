@@ -648,7 +648,7 @@ const canvasSizeFromPlot = (
  * By default, will attempt to use CSS variable `--series[seriesName]` for axis colours.
  *  `--series[name]-axis` for titles. Eg `--seriesX`. For data added without a named series,
  * it will use `--series` and `--series-axis`.
- * @param parentElOrQuery
+ * @param parentElementOrQuery
  * @param opts
  * @return Plotter instance
  */

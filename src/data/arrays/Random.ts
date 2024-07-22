@@ -94,7 +94,7 @@ export const randomPluck = <V>(
  * Use {@link randomIndex} if you want a random index within `array`.
  *
  * @param array
- * @params rand Random generator. `Math.random` by default.
+ * @param rand Random generator. `Math.random` by default.
  * @returns
  */
 export const randomElement = <V>(

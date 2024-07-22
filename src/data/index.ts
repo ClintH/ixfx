@@ -40,7 +40,7 @@ export * as Normalise from './Normalise.js';
  * 
  */
 export * as Pathed from './Pathed.js'
-export * from './MonitorChanges.js';
+//export * from './MonitorChanges.js';
 export * from './PointTracker.js';
 export * as Pool from './Pool.js';
 export * from './PrimitiveTracker.js';

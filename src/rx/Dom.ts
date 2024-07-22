@@ -35,8 +35,7 @@ export const bindText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: strin
 }
 
 /**
- * Updates an element's `value` (as well as the 'value' attribute) when the source value changes.
- * Use {@link bindValueRange} when setting numeric values
+ * Updates an element's `value` (as well as the 'value' attribute) when the source value changes.s
  * @param source 
  * @param elOrQuery 
  * @param bindOpts 

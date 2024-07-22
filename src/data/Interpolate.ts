@@ -9,6 +9,10 @@ export type InterpolateOptions = {
   limits: `clamp` | `wrap` | `ignore`
 }
 
+
+export function interpolate(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
+export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
+export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
  *
@@ -60,15 +64,8 @@ export type InterpolateOptions = {
  * * 'ignore': allow exceeding values. eg 1.5 will yield b*1.5.
  * * 'clamp': default behaviour of clamping interpolation amount to 0..1
  * 
- * To interpolate certain types: {@link Colour.interpolator | Visual.Colour.interpolator }, {@link Points.interpolate | Points.interpolate}.
- * @param amount Interpolation amount, between 0 and 1 inclusive
- * @param a Start (ie when `amt` is 0)
- * @param b End (ie. when `amt` is 1)
- * @returns Interpolated value which will be between `a` and `b`.
+ * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Points.interpolate}.
  */
-export function interpolate(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
-export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
-export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
 export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
   let opts: Partial<InterpolateOptions> = {};
 

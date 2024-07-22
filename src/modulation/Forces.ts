@@ -100,7 +100,7 @@ export const guard = (t: ForceAffected, name = `t`) => {
  * of 0.9 for example reduces velocity by 10%. A value of 1.1 will increase velocity by
  * 10% with each bounce.
  * @param bounds Constraints of area
- * @params dampen How much to dampen velocity by. Defaults to 1 meaning there is no damping.
+ * @param dampen How much to dampen velocity by. Defaults to 1 meaning there is no damping.
  * @returns A function that can perform bounce logic
  */
 export const constrainBounce = (

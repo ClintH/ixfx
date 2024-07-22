@@ -130,8 +130,8 @@ export const cloneState = <V extends Transitions>(
  * StateMachineLight.done(sm); // false
  * StateMachineLight.possible(sm); // [ 'shirt' ]
  * ```
- * @param sm
- * @param initialState
+ * @param stateMachine Settings for state machine
+ * @param initialState Initial state name
  * @returns
  */
 export const init = <V extends Transitions>(

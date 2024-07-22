@@ -318,14 +318,14 @@ export const oppositeFromHypotenuse = (
  * ```js
  * opposite = Math.tan(angle) * adjacent
  * ```
- * @param angleRad
- * @param adjacent
+ * @param angleRadian
+ * @param hypotenuse
  * @returns
  */
 export const adjacentFromHypotenuse = (
-  angleRad: number,
+  angleRadian: number,
   hypotenuse: number
-): number => Math.cos(angleRad) * hypotenuse;
+): number => Math.cos(angleRadian) * hypotenuse;
 
 /**
  * Returns the adjecent length of a right-angle triangle,
@@ -340,14 +340,14 @@ export const adjacentFromHypotenuse = (
  * ```js
  * opposite = Math.tan(angle) * adjacent
  * ```
- * @param angleRad
+ * @param angleRadian
  * @param opposite
  * @returns
  */
 export const adjacentFromOpposite = (
-  angleRad: number,
+  angleRadian: number,
   opposite: number
-): number => opposite / Math.tan(angleRad);
+): number => opposite / Math.tan(angleRadian);
 
 /**
  * Returns the hypotenuse length of a right-angle triangle,
@@ -364,14 +364,14 @@ export const adjacentFromOpposite = (
  * ```js
  * opposite = Math.tan(angle) * adjacent
  * ```
- * @param angleRad
- * @param adjacent
+ * @param angleRadian
+ * @param opposite
  * @returns
  */
 export const hypotenuseFromOpposite = (
-  angleRad: number,
+  angleRadian: number,
   opposite: number
-): number => opposite / Math.sin(angleRad);
+): number => opposite / Math.sin(angleRadian);
 
 /**
  * Returns the hypotenuse length of a right-angle triangle,
@@ -388,11 +388,11 @@ export const hypotenuseFromOpposite = (
  * ```js
  * opposite = Math.tan(angle) * adjacent
  * ```
- * @param angleRad
+ * @param angleRadian
  * @param adjacent
  * @returns
  */
 export const hypotenuseFromAdjacent = (
-  angleRad: number,
+  angleRadian: number,
   adjacent: number
-): number => adjacent / Math.cos(angleRad);
+): number => adjacent / Math.cos(angleRadian);

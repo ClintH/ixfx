@@ -178,14 +178,14 @@ export const relativeTimer = (
  * }, 1000);
  * ```
  * @param frequency
- * @param timer
+ * @param options
  * @returns
  */
 export const frequencyTimer = (
   frequency: number,
-  opts: Partial<TimerOpts> = {}
+  options: Partial<TimerOpts> = {}
 ): ModulationTimer => {
-  const timer = opts.timer ?? msElapsedTimer();
+  const timer = options.timer ?? msElapsedTimer();
   const cyclesPerSecond = frequency / 1000;
   let modulationAmount = 1;
 

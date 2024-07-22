@@ -30,7 +30,7 @@ export type CanvasContextQuery =
 
 /**
  * Gets a 2d drawing context from canvas element or query, or throws an error
- * @param canvasElCtxOrQuery Canvas element reference or DOM query
+ * @param canvasElementContextOrQuery Canvas element reference or DOM query
  * @returns Drawing context.
  */
 export const getContext = (

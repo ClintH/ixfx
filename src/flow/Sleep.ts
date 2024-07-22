@@ -55,7 +55,6 @@ if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
  * console.log(`Awake`); // This line doesn't get called because an exception is thrown when aborting
  * ```
  * @param optsOrMillis Milliseconds to sleep, or options
- * @param signal
  * @return
  */
 export const sleep = <V>(
@@ -110,7 +109,7 @@ export const sleep = <V>(
  * @param predicate 
  * @param checkInterval 
  */
-export const sleepWhile = async (predicate: () => boolean, checkInterval = 100) => {
+export const sleepWhile = async (predicate: () => boolean, checkInterval: Interval = 100) => {
   while (predicate()) {
     await sleep(checkInterval);
   }

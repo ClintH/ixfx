@@ -324,7 +324,6 @@ export const distance = (line: Line | ReadonlyArray<Line>, point: Point): number
  * Lines.toFlatArray(line);
  * Lines.toFlatArray(pointA, pointB);
  * ```
- * @export
  * @param {Point} a
  * @param {Point} b
  * @returns {number[]}

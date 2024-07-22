@@ -49,23 +49,18 @@ export const validNumbers = (data: ReadonlyArray<number>) =>
   data.filter((d) => typeof d === `number` && !Number.isNaN(d));
 
 /**
- * Returns the dot product of two arbitrary-sized arrays. Assumed they are of the same length.
- * @param a
- * @param b
+ * Returns the dot product of arbitrary-sized arrays. Assumed they are of the same length.
+ * @param values
  * @returns
  */
 export const dotProduct = (
   values: ReadonlyArray<ReadonlyArray<number>>
 ): number => {
-  //eslint-disable-next-line functional/no-let
   let r = 0;
   const length = values[ 0 ].length;
 
-  //eslint-disable-next-line functional/no-let
   for (let index = 0; index < length; index++) {
-    //eslint-disable-next-line functional/no-let
     let t = 0;
-    //eslint-disable-next-line functional/no-let
     for (const [ p, value ] of values.entries()) {
       if (p === 0) t = value[ index ];
       else {
@@ -95,7 +90,7 @@ export const dotProduct = (
  * Arrays.average(data);
  * ```
  *
- * See also: [Numbers.average](Numbers.average.html) which takes a list of parameters
+ * See also: {@link Numbers.average} which takes a list of parameters
  * @param data Data to average.
  * @returns Average of array
  */

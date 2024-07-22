@@ -121,8 +121,8 @@ export const until = async (it: AsyncIterable<any> | Iterable<any>, callback: ()
  * ...
  * ac.abort(); // Trigger signal at some point
  * ```
- * @param gen 
- * @param maximumRepeats 
+ * @param genCreator 
+ * @param repeatsOrSignal 
  */
 export const repeat = async function*<T>(genCreator: () => Iterable<T> | AsyncIterable<T>, repeatsOrSignal: number | AbortSignal): AsyncGenerator<T> {
   const repeats = typeof repeatsOrSignal === `number` ? repeatsOrSignal : Number.POSITIVE_INFINITY;

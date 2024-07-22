@@ -34,10 +34,9 @@ export function multiply(a: Point, rectOrPoint: Rect | Point): Point;
  * multiply(pt, 10, 100); // Scale pt by x:10, y:100
  * multiply(pt, Math.min(window.innerWidth, window.innerHeight)); // Scale both x,y by viewport with or height, whichever is smaller
  * ```
- * @export
- * @parama Point to scale
+ * @param a Point to scale
  * @param x Scale factor for x axis
- * @param [y] Scale factor for y axis (if not specified, the x value is used)
+ * @param y Scale factor for y axis (if not specified, the x value is used)
  * @returns Scaled point
  */
 export function multiply(a: Point, x: number, y?: number): Point;

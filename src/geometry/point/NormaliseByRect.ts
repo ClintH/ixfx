@@ -6,16 +6,21 @@ import type { Point } from "./PointType.js";
 
 /**
  * Normalises a point by a given width and height
- * @param pt Point
+ * @param point Point
  * @param width Width
  * @param height Height
  */
 export function normaliseByRect(
-  pt: Point,
+  point: Point,
   width: number,
   height: number
 ): Point;
 
+/**
+ * Normalises a point by a given rect's width and height
+ * @param pt 
+ * @param rect 
+ */
 export function normaliseByRect(pt: Point, rect: Rect): Point;
 
 /**

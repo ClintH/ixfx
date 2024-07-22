@@ -297,7 +297,7 @@ export type LazyChain<In, Out> = {
   duration: (period: Interval) => LazyChain<In, Out>
   /**
    * Flatten values in an array into a single value
-   * @param flattener 
+   * @param reducer 
    * @returns 
    */
   reduce: (reducer: (values: Array<any>) => any) => LazyChain<In, Out>

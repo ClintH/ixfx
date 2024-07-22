@@ -249,8 +249,8 @@ export class TrackedPointMap extends TrackedValueMap<
  * a single coordinate with a reference coordinate,  may be a better choice.
  *
  * See also:
- * * [Geometry.Points.relation](Geometry.Points.relation.html): Compute relation info between two points
- * * [Data.pointTracker](Data.pointTracker-1.html): Track relation between points over time
+ * * {@link Geometry.Points.relation}: Compute relation info between two points
+ * * {@link Data.pointTracker}: Track relation between points over time
  * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
  * 
  * Basic usage

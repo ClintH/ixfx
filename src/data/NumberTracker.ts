@@ -133,6 +133,5 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * t.values; // array of numbers
  * t.timestampes; // array of millisecond times, indexes correspond to t.values
  * ```
- * @class NumberTracker
  */
 export const numberTracker = (opts: TrackOpts = {}) => new NumberTracker(opts);

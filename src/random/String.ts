@@ -7,7 +7,7 @@ import { defaultRandom, type StringOptions } from "./Types.js";
  * string();  // Random string of length 5
  * string(4); // eg. `4afd`
  * ```
- * @param length Length of random string
+ * @param lengthOrOptions Length of random string, or options.
  * @returns Random string
  */
 export const string = (lengthOrOptions: number | StringOptions = 5) => {

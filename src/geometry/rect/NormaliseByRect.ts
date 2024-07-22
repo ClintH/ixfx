@@ -19,8 +19,8 @@ import type { Rect, RectPositioned } from "./RectTypes.js";
  * ```js
  * const n = Rects.normaliseByRect(object, 640, 320);
  * ```
- * @param rect
- * @param normaliseBy
+ * @param rect Rectangle
+ * @param normaliseByOrWidth Rectangle of maximum bounds, or just a width
  * @returns
  */
 export const normaliseByRect = (

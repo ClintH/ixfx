@@ -34,8 +34,8 @@ export type Timeout = HasCompletion & {
  * Returns a {@link Timeout} that can be triggered, cancelled and reset. Use {@link continuously} for interval-
  * based loops.
  *
- * Once `start()` is called, `callback` will be scheduled to execute after `timeoutMs`.
- * If `start()` is called again, the waiting period will be reset to `timeoutMs`.
+ * Once `start()` is called, `callback` will be scheduled to execute after `interval`.
+ * If `start()` is called again, the waiting period will be reset to `interval`.
  *
  * @example Essential functionality
  * ```js
@@ -74,7 +74,7 @@ export type Timeout = HasCompletion & {
  * If you don't expect to need to control the timeout, consider using {@link delay},
  * which can run a given function after a specified delay.
  * @param callback
- * @param timeoutMs
+ * @param interval
  * @returns {@link Timeout}
  */
 export const timeout = (

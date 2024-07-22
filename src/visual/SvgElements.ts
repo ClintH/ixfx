@@ -210,11 +210,12 @@ export const textPathUpdate = (
 
 /**
  * Creates or reuses a SVGTextPathElement.
- * @param pathRef
+ * @param pathReference
  * @param text
  * @param parent
  * @param opts
- * @param queryOrExisting
+ * @param textQueryOrExisting
+ * @param pathQueryOrExisting
  * @returns
  */
 export const textPath = (

@@ -4,7 +4,7 @@ import type { MergeReconcile } from "./Types.js";
  * Merges arrays left to right, using the provided
  * `reconcile` function to choose a winner when keys overlap.
  *
- * There's also [Maps.mergeByKey](functions/Collections.Maps.mergeByKey.html) if the input data is in Map form.
+ * There's also {@link Data.Maps.mergeByKey} if the input data is in Map form.
  *
  * For example, if we have the array A:
  * [`A-1`, `A-2`, `A-3`]

@@ -505,7 +505,7 @@ export const getLine = (start: Cell, end: Cell): ReadonlyArray<Cell> => {
  * @param grid Grid
  * @param steps Distance
  * @param start Start poiint
- * @param bound Logic for if bounds of grid are exceeded
+ * @param bounds Logic for if bounds of grid are exceeded
  * @returns Cells corresponding to cardinals
  */
 export const offsetCardinals = (
@@ -744,10 +744,10 @@ const neighbourList = (
  *  }
  *  setTimeout(run, delayMs);
  * ```
- * @param neighbourSelect Select neighbour to visit
+ * @param logic Logic for selecting next cell
  * @param grid Grid to visit
  * @param start Starting cell
- * @param visited Optional tracker of visited cells
+ * @param opts Options
  * @returns Cells
  */
 export const visitor = function* (
@@ -1246,8 +1246,9 @@ export function* visitArray<V>(
  * Bounds logic is applied to cell.x/y separately. Wrapping
  * only ever happens in same col/row.
  * @see cellFromIndex
- * @param colsOrGrid
- * @param cell
+ * @param grid Grid
+ * @param cell Cell to get index for
+ * @param wrap Logic for if we hit bounds of grid
  * @returns
  */
 export const indexFromCell = (

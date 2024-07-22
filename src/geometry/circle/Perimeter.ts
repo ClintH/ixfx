@@ -18,17 +18,17 @@ const piPi = Math.PI * 2;
  * @param point
  * @returns Point `{ x, y }`
  */
-export const nearest = (circle: CirclePositioned | ReadonlyArray<CirclePositioned>, b: Point): Point => {
+export const nearest = (circle: CirclePositioned | ReadonlyArray<CirclePositioned>, point: Point): Point => {
   const n = (a: CirclePositioned): Point => {
-    const l = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
-    const x = a.x + (a.radius * ((b.x - a.x) / l));
-    const y = a.y + (a.radius * ((b.y - a.y) / l));
+    const l = Math.sqrt(Math.pow(point.x - a.x, 2) + Math.pow(point.y - a.y, 2));
+    const x = a.x + (a.radius * ((point.x - a.x) / l));
+    const y = a.y + (a.radius * ((point.y - a.y) / l));
     return { x, y };
   };
 
   if (Array.isArray(circle)) {
     const pts = circle.map(l => n(l));
-    const dists = pts.map(p => PointsDistance(p, b));
+    const dists = pts.map(p => PointsDistance(p, point));
     return Object.freeze<Point>(pts[ minIndex(...dists) ]);
   } else {
     return Object.freeze<Point>(n(circle as CirclePositioned));
@@ -53,7 +53,7 @@ export const nearest = (circle: CirclePositioned | ReadonlyArray<CirclePositione
  * ```
  * @param circle
  * @param angleRadian Angle in radians
- * @param Origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
+ * @param origin or offset of calculated point. By default uses center of circle or 0,0 if undefined
  * @returns Point oo circle
  */
 export const pointOnPerimeter = (circle: Circle | CirclePositioned, angleRadian: number, origin?: Point): Point => {

@@ -19,7 +19,6 @@ export * from './RunOnce.js';
 export * from './Sleep.js';
 /**
  * State Machine
- * See [here for usage](../classes/Flow.StateMachine.StateMachine.html).
  *
  * * {@link StateMachine.driver}: Drive a state machine
  * * {@link StateMachine.init}: Create a state machine from initial state and machine description

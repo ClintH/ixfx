@@ -38,7 +38,7 @@ export const themeChange = () => {
 }
 
 /**
- * Observe when element resizes. Specify `timeoutMs` to debounce, uses 100ms by default.
+ * Observe when element resizes. Specify `interval` to debounce, uses 100ms by default.
  *
  * ```
  * const o = resizeObservable(myEl, 500);
@@ -47,12 +47,12 @@ export const themeChange = () => {
  * });
  * ```
  * @param elem
- * @param timeoutMs Tiemout before event gets triggered
+ * @param interval Tiemout before event gets triggered
  * @returns
  */
 export const resizeObservable = (
   elem: Readonly<Element>,
-  timeout?: Interval
+  interval?: Interval
 ) => {
   if (elem === null) {
     throw new Error(`elem parameter is null. Expected element to observe`);
@@ -71,5 +71,5 @@ export const resizeObservable = (
       ro.unobserve(elem);
     };
   });
-  return Rx.Ops.debounce<Array<ResizeObserverEntry>>({ elapsed: timeout ?? 100 })(m);
+  return Rx.Ops.debounce<Array<ResizeObserverEntry>>({ elapsed: interval ?? 100 })(m);
 }

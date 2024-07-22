@@ -13,22 +13,22 @@ import { rotate as PointsRotate } from "../point/index.js";
  * // Rotate by 90 degrees
  * rotate(triangle, Math.PI / 2);
  * ```
- * @param line Line to rotate
+ * @param triangle Triangle to rotate
  * @param amountRadian Angle in radians to rotate by
- * @param origin Point to rotate around. If undefined, middle of line will be used
+ * @param origin Point to rotate around. If undefined, middle of triangle will be used
  * @returns
  */
 export const rotate = (
-  t: Triangle,
+  triangle: Triangle,
   amountRadian?: number,
   origin?: Point
 ): Triangle => {
-  if (amountRadian === undefined || amountRadian === 0) return t;
-  if (origin === undefined) origin = centroid(t);
+  if (amountRadian === undefined || amountRadian === 0) return triangle;
+  if (origin === undefined) origin = centroid(triangle);
   return Object.freeze({
-    ...t,
-    a: PointsRotate(t.a, amountRadian, origin),
-    b: PointsRotate(t.b, amountRadian, origin),
-    c: PointsRotate(t.c, amountRadian, origin),
+    ...triangle,
+    a: PointsRotate(triangle.a, amountRadian, origin),
+    b: PointsRotate(triangle.b, amountRadian, origin),
+    c: PointsRotate(triangle.c, amountRadian, origin),
   });
 };

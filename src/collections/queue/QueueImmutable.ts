@@ -13,7 +13,6 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
    * Creates an instance of Queue.
    * @param {QueueOpts} opts Options foor queue
    * @param {V[]} data Initial data. Index 0 is front of queue
-   * @memberof Queue
    */
   constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
     if (opts === undefined) throw new Error(`opts parameter undefined`);

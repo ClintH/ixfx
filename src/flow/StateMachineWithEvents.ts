@@ -98,7 +98,6 @@ export class StateMachineWithEvents<
    * If machine is finalised, no error is thrown and null is returned.
    *
    * @returns {(string|null)} Returns new state, or null if machine is finalised
-   * @memberof StateMachine
    */
   next(): string | null {
     const p = StateMachine.possible(this.#sm);
@@ -151,8 +150,6 @@ export class StateMachineWithEvents<
    * Use `isValid()` to check validity without changing.
    *
    * If `newState` is the same as current state, the request is ignored silently.
-   *
-   * @memberof StateMachine
    */
   set state(newState: StateNames<V>) {
     const priorState = this.#sm.value;

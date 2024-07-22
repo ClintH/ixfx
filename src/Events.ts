@@ -96,9 +96,8 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * Adds event listener
    *
    * @template K
-   * @param {K} type
-   * @param {Listener<Events>} listener
-   * @memberof SimpleEventEmitter
+   * @param type
+   * @param listener
    */
   addEventListener<K extends keyof Events>(
     type: K,
@@ -114,8 +113,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   /**
    * Remove event listener
    *
-   * @param {Listener<Events>} listener
-   * @memberof SimpleEventEmitter
+   * @param listener
    */
   removeEventListener<K extends keyof Events>(
     type: K,
@@ -131,7 +129,6 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   /**
    * Clear all event listeners
    * @private
-   * @memberof SimpleEventEmitter
    */
   clearEventListeners() {
     this.#listeners.clear();

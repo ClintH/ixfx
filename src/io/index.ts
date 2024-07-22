@@ -21,7 +21,7 @@ export { Codec } from './Codec.js';
  * See [demos](https://clinth.github.io/ixfx-demos/io/)
  *
  * Overview:
- * * {@link puck}: Connects a [Espruino BLE Device](../classes/Io.Espruino.EspruinoBleDevice.html).
+ * * {@link puck}: Connects a {@link Io.Espruino.EspruinoBleDevice | Espruino BLE Device}.
  * * {@link Espruino.connectBle}: Connect to a generic Espruino via BLE
  */
 export * as Espruino from './Espruino.js';
