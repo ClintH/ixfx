@@ -4,21 +4,49 @@ for working with the standard JS Map class.</p>
 <pre><code class="js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">Maps</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/data.js&#39;</span><span class="hl-2">;</span>
 </code><button type="button">Copy</button></pre>
 
-<p>Overview:</p>
+<p>Adding</p>
 <ul>
+<li><a href="../functions/Data.Maps.addKeepingExisting.html" class="tsd-kind-function">addKeepingExisting</a> Adds items to a map only if their key does not exist already</li>
+<li><a href="../functions/Data.Maps.addObject.html" class="tsd-kind-function">addObject</a>: Adds an object, assuming each top-level property of an object is a key</li>
 <li><a href="../functions/Data.Maps.getOrGenerate-1.html" class="tsd-kind-function">getOrGenerate</a>: Solves a common scenario of wanting a value by a particular key, or generating it if it doesn't exist</li>
-<li><a href="../functions/Data.Maps.filter.html" class="tsd-kind-function">filter</a>: Yields values in map that match a predicate</li>
+</ul>
+<p>Deleting</p>
+<ul>
+<li><a href="../functions/Data.Maps.deleteByValue.html" class="tsd-kind-function">deleteByValue</a></li>
+</ul>
+<p>Finding/Iterating</p>
+<ul>
+<li><a href="../functions/Data.Maps.filter.html" class="tsd-kind-function">filter</a>: Yield values that return <em>true</em> for predicate</li>
 <li><a href="../functions/Data.Maps.find.html" class="tsd-kind-function">find</a>: Finds the first value that matches a predicate, or <em>undefined</em> if nothing found</li>
 <li><a href="../functions/Data.Maps.hasAnyValue.html" class="tsd-kind-function">hasAnyValue</a>: Searches through all keys, returning true if any occurence of <em>value</em> was found</li>
+<li>hasKeyVAlue: <em>true</em> if value is stored under a key</li>
+<li>firstEntry: Returns first entry which matches predicate</li>
+<li><a href="../functions/Data.Maps.firstEntryByValue.html" class="tsd-kind-function">firstEntryByValue</a>: Returns first entry where value matches</li>
+<li><a href="../functions/Data.Maps.getClosestIntegerKey.html" class="tsd-kind-function">getClosestIntegerKey</a>: Assuming numeric keys, find the closest to a target value</li>
+<li><a href="../functions/Data.Maps.getFromKeys.html" class="tsd-kind-function">getFromKeys</a>: Given an iterable of keys, returns the first value where the key is present</li>
+<li><a href="../functions/Data.Maps.some.html" class="tsd-kind-function">some</a>: <em>true</em> if predicate is true for any value in map</li>
 </ul>
-<p>Transformations:</p>
+<p>Transforming values</p>
 <ul>
-<li><a href="../functions/Data.Maps.toArray.html" class="tsd-kind-function">toArray</a>: Returns the values of the map as an array</li>
 <li><a href="../functions/Data.Maps.mapToArray.html" class="tsd-kind-function">mapToArray</a>: Applies a function to convert a map's values to an array</li>
-<li><a href="../functions/Data.Maps.toObject.html" class="tsd-kind-function">toObject</a>: Coverts a Map to a plain object, useful for JSON serialising.</li>
 <li><a href="../functions/Data.Maps.mapToObjectTransform.html" class="tsd-kind-function">mapToObjectTransform</a>: Converts a map to a plain object, but applying a function to values</li>
 <li><a href="../functions/Data.Maps.transformMap.html" class="tsd-kind-function">transformMap</a>: Like <code>Array.map</code>, but for Maps. Useful for generating a map as a transform of an input map.</li>
+</ul>
+<p>Creating</p>
+<ul>
+<li><a href="../functions/Data.Maps.fromIterable.html" class="tsd-kind-function">fromIterable</a>: Generates a map from an interable</li>
+<li><a href="../functions/Data.Maps.fromObject.html" class="tsd-kind-function">fromObject</a></li>
 <li><a href="../functions/Data.Maps.zipKeyValue.html" class="tsd-kind-function">zipKeyValue</a>: Given an array of keys and values, combines them together into a map</li>
+</ul>
+<p>To some other data</p>
+<ul>
+<li><a href="../functions/Data.Maps.toArray.html" class="tsd-kind-function">toArray</a>: Returns the values of the map as an array</li>
+<li><a href="../functions/Data.Maps.toObject.html" class="tsd-kind-function">toObject</a>: Coverts a Map to a plain object, useful for JSON serialising.</li>
+</ul>
+<p>Etc</p>
+<ul>
+<li><a href="../functions/Data.Maps.sortByValue.html" class="tsd-kind-function">sortByValue</a>: Returns a sorted set of entries</li>
+<li><a href="../functions/Data.Maps.sortByValueProperty.html" class="tsd-kind-function">sortByValueProperty</a>: Returns a sorted set of entries</li>
 </ul>
 <p>See also ixfx's Collections module for custom map implementations.</p>
 </div><div class="tsd-comment tsd-typography"></div></section><section class="tsd-panel-group tsd-index-group"><section class="tsd-panel tsd-index-panel"><h3 class="tsd-index-heading uppercase">Index</h3><section class="tsd-index-section"><h3 class="tsd-index-heading">Interfaces</h3><div class="tsd-index-list"><a href="../interfaces/Data.Maps.IDictionary.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-256"></use></svg><span>IDictionary</span></a>
@@ -30,8 +58,8 @@ for working with the standard JS Map class.</p>
 <a href="../functions/Data.Maps.deleteByValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>delete<wbr/>By<wbr/>Value</span></a>
 <a href="../functions/Data.Maps.filter.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>filter</span></a>
 <a href="../functions/Data.Maps.find.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>find</span></a>
-<a href="../functions/Data.Maps.firstEntryByIterablePredicate.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>first<wbr/>Entry<wbr/>By<wbr/>Iterable<wbr/>Predicate</span></a>
 <a href="../functions/Data.Maps.firstEntryByIterableValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>first<wbr/>Entry<wbr/>By<wbr/>Iterable<wbr/>Value</span></a>
+<a href="../functions/Data.Maps.firstEntryByValue.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>first<wbr/>Entry<wbr/>By<wbr/>Value</span></a>
 <a href="../functions/Data.Maps.fromIterable.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>from<wbr/>Iterable</span></a>
 <a href="../functions/Data.Maps.fromObject.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>from<wbr/>Object</span></a>
 <a href="../functions/Data.Maps.getClosestIntegerKey.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-64"></use></svg><span>get<wbr/>Closest<wbr/>Integer<wbr/>Key</span></a>

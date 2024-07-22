@@ -2,6 +2,7 @@
 that has a basic value (string, number, boolean, object), the value is set
 for the return object. If the property is a function or generator, its value
 is used instead. Async functions and generators are also usable.</p>
+<p>Not recursive.</p>
 <p>In the below example, the function for the property <code>random</code> is invoked.</p>
 <pre><code class="js"><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">state</span><span class="hl-2"> = {</span><br/><span class="hl-2"> </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">10</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-7">random</span><span class="hl-3">:</span><span class="hl-2"> () </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">Math</span><span class="hl-2">.</span><span class="hl-7">random</span><span class="hl-2">();</span><br/><span class="hl-2">}</span><br/><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">x</span><span class="hl-2"> = </span><span class="hl-7">resolveFields</span><span class="hl-2">(</span><span class="hl-3">state</span><span class="hl-2">);</span><br/><span class="hl-0">// { length: 10, random: 0.1235 }</span>
 </code><button type="button">Copy</button></pre>

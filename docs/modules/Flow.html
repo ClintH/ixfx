@@ -2,6 +2,7 @@
 <p>Logic-oriented</p>
 <ul>
 <li><a href="Flow.StateMachine.html" class="tsd-kind-namespace">StateMachine</a>: Manage state transitions</li>
+<li><a href="../functions/Flow.everyNth.html" class="tsd-kind-function">everyNth</a>: Returns <em>true</em> for every nth call</li>
 </ul>
 <p>Rate-oriented</p>
 <ul>
@@ -12,18 +13,34 @@
 <ul>
 <li><a href="../functions/Flow.timeout-1.html" class="tsd-kind-function">timeout</a>: Run code after a specified time delay</li>
 <li><a href="../functions/Flow.sleep.html" class="tsd-kind-function">sleep</a>: Using <code>async await</code>, delay execution for a period</li>
+<li><a href="../functions/Flow.sleepWhile.html" class="tsd-kind-function">sleepWhile</a>: Keep sleeping until a predicate returns <em>true</em></li>
 <li><a href="../functions/Flow.delay.html" class="tsd-kind-function">delay</a>: Using <code>async await</code>, run a given callback after a period</li>
 <li><a href="../functions/Flow.interval-1.html" class="tsd-kind-function">interval</a>: Generates values from a given function with a given delay</li>
 <li><a href="../functions/Flow.waitFor.html" class="tsd-kind-function">waitFor</a>: Calls a function and have the possibility to cancel if it takes too long</li>
+<li><a href="../functions/Flow.rateMinimum.html" class="tsd-kind-function">rateMinimum</a>: Ensures that a function is called at a set rate</li>
 </ul>
 <p>Iteration over values</p>
 <ul>
 <li><a href="../functions/Flow.forEach.html" class="tsd-kind-function">forEach</a> / <a href="../functions/Flow.forEachAsync.html" class="tsd-kind-function">forEachAsync</a>: Loop over an iterable or array, with the possibility of early exit</li>
-<li><a href="../functions/Flow.repeat.html" class="tsd-kind-function">repeat</a>: Runs a function a given number of times, yielding results as they come in</li>
+<li><a href="../functions/Flow.repeat.html" class="tsd-kind-function">repeat</a> / @{link repeatAwait}: Runs a function a given number of times, yielding results as they come in</li>
 </ul>
 <p>Monitoring</p>
 <ul>
 <li><a href="../functions/Flow.Elapsed.progress.html" class="tsd-kind-function">Elapsed.progress</a>: Track completion of a time duration</li>
+<li><a href="../functions/Flow.hasElapsed.html" class="tsd-kind-function">hasElapsed</a>: Returns <em>true</em> when certain time has passed</li>
+<li><a href="../functions/Flow.retryFunction.html" class="tsd-kind-function">retryFunction</a>: Keep calling a function until it returns a value</li>
+<li><a href="../functions/Flow.retryTask-1.html" class="tsd-kind-function">retryTask</a>: Keep trying a task until it succeeds</li>
+<li><a href="../functions/Flow.waitFor.html" class="tsd-kind-function">waitFor</a>: Try to run something but take action if it fails or doesn't return</li>
+<li><a href="../functions/Flow.singleItem.html" class="tsd-kind-function">singleItem</a>: Wait for a single value to be produced</li>
+<li><a href="../classes/Flow.SyncWait.html" class="tsd-kind-class">SyncWait</a>: Simple synchronisation</li>
+<li><a href="../classes/Flow.RequestResponseMatch.html" class="tsd-kind-class">RequestResponseMatch</a>: Housekeeping of matching requests from A with responses from B and handling failures</li>
+</ul>
+<p>Executing</p>
+<ul>
+<li><a href="../functions/Flow.run.html" class="tsd-kind-function">run</a>: Run a series of async expressions, returning result / <a href="../functions/Flow.runSingle.html" class="tsd-kind-function">runSingle</a></li>
+<li><a href="../functions/Flow.runOnce.html" class="tsd-kind-function">runOnce</a>: Wrap a function so it only gets called once</li>
+<li><a href="../classes/Flow.DispatchList.html" class="tsd-kind-class">DispatchList</a>: Simple foundation for publish/subscribe events</li>
+<li><a href="../classes/Flow.TaskQueueMutable.html" class="tsd-kind-class">TaskQueueMutable</a>: Task queue</li>
 </ul>
 <p>Loops</p>
 <ul>
@@ -34,6 +51,12 @@
 <ul>
 <li><a href="../functions/Flow.msElapsedTimer.html" class="tsd-kind-function">msElapsedTimer</a>: Timer that returns elapsed time since initial invocation</li>
 <li><a href="../functions/Flow.ticksElapsedTimer.html" class="tsd-kind-function">ticksElapsedTimer</a>: Timer based on manual 'ticks'</li>
+<li><a href="../functions/Flow.backoffGenerator.html" class="tsd-kind-function">backoffGenerator</a>: Compute increasingly-larger timeout values</li>
+</ul>
+<p>Etc</p>
+<ul>
+<li><a href="../functions/Flow.promiseFromEvent.html" class="tsd-kind-function">promiseFromEvent</a>: Create a promise from an event</li>
+<li><a href="../functions/Flow.promiseWithResolvers.html" class="tsd-kind-function">promiseWithResolvers</a></li>
 </ul>
 </div><div class="tsd-comment tsd-typography"><h4 class="tsd-anchor-link"><a id="Example: Importing" class="tsd-anchor"></a>Example: Importing<a href="#Example: Importing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="js"><span class="hl-0">// If library is stored two directories up under `ixfx/`</span><br/><span class="hl-1">import</span><span class="hl-2"> {</span><span class="hl-3">continuously</span><span class="hl-2">, </span><span class="hl-3">stateMachine</span><span class="hl-2">} </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;../../ixfx/dist/flow.js&#39;</span><span class="hl-2">;</span><br/><span class="hl-0">// Import from web</span><br/><span class="hl-1">import</span><span class="hl-2"> {</span><span class="hl-3">continuosly</span><span class="hl-2">, </span><span class="hl-3">stateMachine</span><span class="hl-2">} </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/flow.js&#39;</span>
 </code><button type="button">Copy</button></pre>
