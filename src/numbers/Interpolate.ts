@@ -5,6 +5,12 @@ import { throwNumberTest } from '../util/GuardNumbers.js';
 import { clamp } from '../numbers/Clamp.js';
 export const piPi = Math.PI * 2;
 
+/**
+ * What to do if interpolation amount exceeds 0..1 range
+ * * clamp: lock to A & B (inclusive) Default.
+ * * wrap: wrap from end to start again
+ * * ignore: allow return values outside of A..B range
+ */
 export type InterpolateOptions = {
   limits: `clamp` | `wrap` | `ignore`
 }
@@ -20,7 +26,7 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  *
  * @example Get the halfway point between 30 and 60
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * interpolate(0.5, 30, 60);
  * ```
  *
@@ -28,7 +34,7 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * would start at 0 and you would keep interpolating up to `1`
  * @example
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * import { percentPingPong } from 'https://unpkg.com/ixfx/dist/modulation.js'
  *
  * // Go back and forth between 0 and 1 by 0.1

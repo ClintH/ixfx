@@ -94,7 +94,7 @@ export const makeHelper = (
     },
     connectedPoints(
       pointsToDraw: Array<Point>,
-      opts?: DrawingOpts & { loop?: boolean }
+      opts?: DrawingOpts & Partial<ConnectedPointsOptions>
     ): void {
       connectedPoints(ctx, pointsToDraw, opts);
     },
@@ -443,6 +443,12 @@ export const paths = (
   }
 };
 
+export type ConnectedPointsOptions = {
+  readonly lineWidth: number
+  readonly loop: boolean
+  readonly fillStyle: string
+  readonly strokeStyle: string
+}
 /**
  * Draws a line between all the given points.
  * If a fillStyle is specified, it will be filled.
@@ -456,12 +462,7 @@ export const paths = (
 export const connectedPoints = (
   ctx: CanvasRenderingContext2D,
   pts: ReadonlyArray<Point>,
-  opts: {
-    readonly lineWidth?: number
-    readonly loop?: boolean
-    readonly fillStyle?: string
-    readonly strokeStyle?: string
-  } = {}
+  opts: Partial<ConnectedPointsOptions> = {}
 ) => {
   const shouldLoop = opts.loop ?? false;
 
@@ -573,36 +574,55 @@ export type DotOpts = DrawingOpts & {
  */
 export const dot = (
   ctx: CanvasRenderingContext2D,
-  pos: Point | ReadonlyArray<Point>,
+  pos: Point | Array<Point | CirclePositioned> | CirclePositioned,
   opts?: DotOpts
 ) => {
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
+  const positions = Array.isArray(pos) ? pos : [ pos ];
+  let stroke = opts.stroke ? opts.stroke : opts.strokeStyle !== undefined;
+  let filled = opts.filled ? opts.filled : opts.fillStyle !== undefined;
+  if (!stroke && !filled) filled = true;
 
   applyOpts(ctx, opts);
 
-  const makePath = () => {
+  for (const pos of positions) {
     ctx.beginPath();
-
-    // x&y for arc is the center of circle
-    if (Array.isArray(pos)) {
-      for (const p of pos) {
-        ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
-      }
+    if (`radius` in pos) {
+      ctx.arc(pos.x, pos.y, pos.radius, 0, 2 * Math.PI);
     } else {
-      const p = pos as Point;
-      ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
+      ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+    }
+    if (filled) {
+      ctx.fill();
+    }
+    if (stroke) {
+      ctx.stroke();
     }
   }
-  makePath();
-  if (opts.filled || !opts.stroke) {
-    ctx.fill();
-  }
-  if (opts.stroke) {
-    if (opts.strokeWidth) ctx.lineWidth = opts.strokeWidth;
-    //makePath();
-    ctx.stroke();
-  }
+
+  // const makePath = () => {
+  //   ctx.beginPath();
+
+  //   // x&y for arc is the center of circle
+  //   if (Array.isArray(pos)) {
+  //     for (const p of pos) {
+  //       ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
+  //     }
+  //   } else {
+  //     const p = pos as Point;
+  //     ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
+  //   }
+  // }
+  // makePath();
+  // if (opts.filled || !opts.stroke) {
+  //   ctx.fill();
+  // }
+  // if (opts.stroke) {
+  //   if (opts.strokeWidth) ctx.lineWidth = opts.strokeWidth;
+  //   //makePath();
+  //   ctx.stroke();
+  // }
 };
 
 /**

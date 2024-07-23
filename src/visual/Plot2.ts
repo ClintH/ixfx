@@ -47,6 +47,7 @@ export type DataSource = {
   clear(): void;
 }
 
+export type ScalingOption = `normalise` | `independent`
 /**
  * Plot options
  */
@@ -67,6 +68,7 @@ export type Opts = {
    * Width for axis lines
    */
   axisStrokeWidth?: number;
+  scaling: ScalingOption
 };
 
 /**
@@ -94,6 +96,8 @@ export type SeriesOpts = {
    * to the current data range.
    */
   visualRangeStretch?: boolean;
+
+  formattedPrecision?: number
 };
 
 export type DataPoint = {
@@ -181,7 +185,7 @@ export class Series {
   width = 3;
   dataHitPoint: DataHitPoint | undefined;
   tooltip?: string;
-  precision = 2;
+  formattedPrecision: number;
 
   readonly axisRange: DataRange;
 
@@ -205,7 +209,7 @@ export class Series {
     this.axisRange = opts.axisRange ?? { min: Number.NaN, max: Number.NaN };
     this._visualRange = { ...this.axisRange };
     this._visualRangeStretch = opts.visualRangeStretch ?? true;
-
+    this.formattedPrecision = opts.formattedPrecision ?? -1;
     if (sourceType === `array`) {
       this.source = new ArrayDataSource(this);
     } else if (sourceType === `stream`) {
@@ -214,10 +218,24 @@ export class Series {
   }
 
   formatValue(v: number) {
-    return v.toFixed(this.precision);
+    if (this.formattedPrecision < 0) {
+      // Auto
+      if (Math.abs(v) < 100) return v.toFixed(2);
+      return Math.floor(v).toString();
+    } else {
+      return v.toFixed(this.formattedPrecision);
+    }
   }
 
-  get visualRange(): DataRange {
+  get visualFormatted() {
+    const d = this.visualDataRange;
+    const min = this.formatValue(d.min);
+    const max = this.formatValue(d.max);
+    const longest = min.length > max.length ? min : max;
+    return { min, max, longest };
+  }
+
+  get visualDataRange(): DataRange {
     let vr = this._visualRange;
     const sourceRange = this.source.range;
     let changed = false;
@@ -246,7 +264,7 @@ export class Series {
 
   scaleValue(value: number): number {
     if (this.source === undefined) return value;
-    const r = this.visualRange;
+    const r = this.visualDataRange;
     if (r.changed) {
       this.plot.notify(`range-change`, this.plot.plotArea);
     }
@@ -389,8 +407,10 @@ export class PlotArea extends Sg.CanvasBox {
     //ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
 
     // Using -1 for y to catch a few random peaks from sharp lines
-    ctx.clearRect(0, -1, this.canvasRegion.width, this.canvasRegion.height);
 
+    ctx.clearRect(0, -1, this.canvasRegion.width, this.canvasRegion.height + 5);
+    //ctx.strokeStyle = `red`;
+    //ctx.strokeRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
     for (const series of seriesCopy) {
       if (series.source.type === `array` || series.source.type === `stream`) {
         const arraySeries = series.source as ArrayDataSource;
@@ -525,35 +545,30 @@ export class Legend extends Sg.CanvasBox {
     const yAxis = opts.measurements.get(`AxisY`);
     const yAxisWidth = yAxis?.actual.width ?? 0;
 
-    let x = padding;
+    let rowX = padding;
     let y = padding;
     const availableWidth = opts.bounds.width - yAxisWidth - padding;
-
-    //let rows = 1;
     let rowHeight = 0;
+    ctx.textBaseline = `middle`;
     for (const s of series) {
-      const startX = x;
-      x += sample.width + padding;
-      ctx.textBaseline = `middle`;
-
+      let labelWidth = sample.width + padding;
       const text = textRect(ctx, s.name, padding, widthSnapping);
-
-      x += textWidth(ctx, s.name, padding, widthSnapping);
+      labelWidth += textWidth(ctx, s.name, padding, widthSnapping);
 
       if (s.tooltip) {
-        x += textWidth(ctx, s.tooltip, padding, widthSnapping);
+        labelWidth += textWidth(ctx, s.tooltip, padding, widthSnapping);
       }
-      const r = { width: 10, height: 10, x: startX, y };
 
-      this.labelMeasurements.set(s.name, r)
       rowHeight = Math.min(sample.height + padding + padding, text.height + padding + padding);
-      x += padding;
-      if (x > availableWidth) {
-        x = padding;
-        y += rowHeight;
-        //rows++;
+      labelWidth += padding;
 
+      if (rowX + labelWidth > availableWidth) {
+        rowX = padding;
+        y += rowHeight;
       }
+      const r = { width: 10, height: 10, x: rowX, y };
+      rowX = rowX + labelWidth;
+      this.labelMeasurements.set(s.name, r)
     }
 
     return {
@@ -685,6 +700,7 @@ export class AxisX extends Sg.CanvasBox {
     ctx.strokeStyle = colour;
 
     ctx.clearRect(0, 0, v.width, v.height);
+
     //ctx.fillStyle = `hsla(200,50%,50%,0.5)`;
     //ctx.fillRect(0, 0, v.width, v.height);
     //this.debugLog(`drawSelf: ${ v.width } x ${ v.height } padding: ${ this.paddingPx }`);
@@ -733,20 +749,25 @@ const isRangeEqual = (a: DataRange, b: DataRange) =>
   a.max === b.max && a.min === b.min;
 const isRangeSinglePoint = (a: DataRange) => a.max === a.min;
 
-export class AxisY extends Sg.CanvasBox {
-  // Number of digits axis will be expected to show as a data legend
-  private _maxDigits = 1;
+//export type AxisYStyle = `common`;
 
-  seriesToShow: string | undefined;
+export class AxisY extends Sg.CanvasBox {
+  // Total character width of label
+  private _minCharLength = 3;
+
+  //seriesToShow: string | undefined;
   paddingPx = 3;
   colour?: string;
+  //style: AxisYStyle;
 
+  showDataLabels: boolean;
   lastRange: DataRange;
   lastPlotAreaHeight = 0;
 
   constructor(private plot: Plot, region: RectPositioned) {
     super(plot, `AxisY`, region);
     this.lastRange = { min: 0, max: 0 };
+    this.showDataLabels = true;
   }
 
   clear() {
@@ -755,7 +776,7 @@ export class AxisY extends Sg.CanvasBox {
   }
 
   protected measurePreflight(): void {
-    //this.debugLog(`measurePreflight`);
+    this.debugLog(`measurePreflight`);
     // const series = this.getSeries();
     // if (
     //   series !== undefined &&
@@ -781,28 +802,72 @@ export class AxisY extends Sg.CanvasBox {
   }
 
   protected measureSelf(copts: Sg.CanvasMeasureState): Rect {
-    //this.debugLog(`measureSelf. needsLayout: ${ this._needsLayoutX } needsDrawing: ${ this._needsDrawing }`);
+    this.debugLog(`measureSelf. needsLayout: ${ this._needsLayoutX } needsDrawing: ${ this._needsDrawing }`);
 
     if (copts.ctx === undefined) throw new Error(`opts.ctx is undefined`);
 
+    //const paddingPx = this.paddingPx;
+    //let width = this.plot.axisStrokeWidth + paddingPx;
+
+    switch (this.plot.scaling) {
+      case `normalise`:
+        return this.#measureNormalise(copts);
+      default:
+        return this.#measureIndependent(copts);
+    }
+    // const series = this.getSeries();
+    // if (series !== undefined) {
+    //   const r = series.visualRange;
+    //   this._maxDigits =
+    //     Math.ceil(r.max).toString().length + series.precision + 1;
+
+    //   const textToMeasure = `9`.repeat(this._maxDigits);
+    //   width += textWidth(copts.ctx, textToMeasure, paddingPx * 2);
+    // }
+    // const w = copts.resolveToPx(this.desiredRegion?.width, width, width);
+    // return {
+    //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    //   width: w!,
+    //   height: copts.bounds.height,
+    // };
+  }
+
+  #measureIndependent(copts: Sg.CanvasMeasureState): Rect {
+    const paddingPx = this.paddingPx;
+    let width = this.plot.axisStrokeWidth + paddingPx;
+    if (this.showDataLabels) {
+      for (const s of this.plot.seriesArray()) {
+        const r = s.visualFormatted;
+        let chars = Math.max(r.longest.length, this._minCharLength);
+        width += textWidth(copts.ctx, `9`.repeat(chars + 1), paddingPx);
+      }
+    }
+    //const w = copts.resolveToPx(this.desiredRegion?.width, width, width);
+
+    return {
+      width,
+      height: copts.bounds.height
+    }
+  }
+
+  /**
+   * Single data display
+   * @param copts 
+   * @returns 
+   */
+  #measureNormalise(copts: Sg.CanvasMeasureState): Rect {
     const paddingPx = this.paddingPx;
     let width = this.plot.axisStrokeWidth + paddingPx;
 
-    const series = this.getSeries();
-    if (series !== undefined) {
-      const r = series.visualRange;
-      this._maxDigits =
-        Math.ceil(r.max).toString().length + series.precision + 1;
-
-      const textToMeasure = `9`.repeat(this._maxDigits);
-      width += textWidth(copts.ctx, textToMeasure, paddingPx * 2);
+    if (this.showDataLabels) {
+      width += textWidth(copts.ctx, `100%`, paddingPx * 2);
     }
     const w = copts.resolveToPx(this.desiredRegion?.width, width, width);
+
     return {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       width: w!,
-      height: copts.bounds.height,
-    };
+      height: copts.bounds.height
+    }
   }
 
   protected layoutSelf(_measureState: Sg.MeasureState, _layoutState: Sg.LayoutState, _parent?: Sg.Layout | undefined): Point {
@@ -810,42 +875,52 @@ export class AxisY extends Sg.CanvasBox {
   }
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
-    const s = this.getSeries();
-    if (s === undefined) {
-      if (this.seriesToShow === undefined) return;
-      console.warn(`Plot AxisY series '${ this.seriesToShow }' is missing.`);
-    } else {
-      this.seriesAxis(s, ctx);
+    switch (this.plot.scaling) {
+      case `normalise`:
+        this.#drawNormalised(ctx);
+        break;
+      default:
+        this.#drawIndependent(ctx);
     }
+
+    // const s = this.getSeries();
+    // console.log(s?.visualRange);
+    // if (s === undefined) {
+    //   if (this.seriesToShow === undefined) return;
+    //   console.warn(`Plot AxisY series '${ this.seriesToShow }' is missing.`);
+    // } else {
+    //   this.seriesAxis(s, ctx);
+    // }
   }
 
-  getSeries(): Series | undefined {
-    return this.seriesToShow === undefined ?
-      // Pick first series
-      this.plot.seriesArray()[ 0 ] :
-      // Try designated series name
-      this.plot.series.get(this.seriesToShow);
-  }
+  // getSeries(): Series | undefined {
+  //   return this.seriesToShow === undefined ?
+  //     // Pick first series
+  //     this.plot.seriesArray()[ 0 ] :
+  //     // Try designated series name
+  //     this.plot.series.get(this.seriesToShow);
+  // }
 
-  seriesAxis(series: Series, ctx: CanvasRenderingContext2D) {
+  /**
+  * Draw all the axis on a common scale
+  * @param ctx 
+  */
+  #drawNormalised(ctx: CanvasRenderingContext2D) {
     const plot = this.plot;
     const plotArea = plot.plotArea;
     const v = this.canvasRegion;
     const paddingPx = this.paddingPx;
-    const r = series.visualRange;
     const strokeWidth = plot.axisStrokeWidth;
-
     const colour = this.colour ?? plot.axisStrokeColour;
     ctx.strokeStyle = colour;
     ctx.fillStyle = colour;
-
-    if (Number.isNaN(r.min) && Number.isNaN(r.max)) return; // Empty
-    this.lastRange = r;
     ctx.clearRect(0, 0, v.width, v.height);
 
-    // ctx.fillStyle = `yellow`;
-    // ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+    //console.log(`height: ${ this.canvasRegion.height }`);
+    //ctx.fillStyle = `yellow`;
+    //ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
 
+    // Vertical line
     ctx.beginPath();
     ctx.lineWidth = strokeWidth;
     const lineX = v.width - strokeWidth / 2;
@@ -853,28 +928,118 @@ export class AxisY extends Sg.CanvasBox {
     ctx.lineTo(lineX, plotArea.canvasRegion.height + paddingPx);// + strokeWidth + strokeWidth);
     ctx.stroke();
 
-    ctx.textBaseline = `top`;
-    const fromRight = v.width - paddingPx * 4;
-
+    // Labels
     ctx.fillStyle = plot.axisTextColour;
-    if (isRangeSinglePoint(r)) {
-      this.debugLog(`rangeSinglePoint`);
-      drawText(ctx, series.formatValue(r.max), (size) => [
-        fromRight - size.width,
-        plotArea.computeY(series, r.max) - paddingPx * 4,
-      ]);
-    } else {
-      // Draw min/max data labels
-      drawText(ctx, series.formatValue(r.max), (size) => [
-        fromRight - size.width,
-        plotArea.computeY(series, r.max) + strokeWidth / 2,
-      ]);
-      drawText(ctx, series.formatValue(r.min), (size) => [
-        fromRight - size.width,
-        plotArea.computeY(series, r.min) - 5,
-      ]);
+    ctx.textBaseline = `top`;
+
+    const labelWidth = this.canvasRegion.width - strokeWidth - paddingPx;
+    let m = ctx.measureText(`0%`);
+    ctx.fillText(`0%`, labelWidth - m.width, plotArea.canvasRegion.height - paddingPx);
+    m = ctx.measureText(`100%`);
+    ctx.fillText(`100%`, labelWidth - m.width, plotArea.canvasRegion.y);
+  }
+
+  #drawIndependent(ctx: CanvasRenderingContext2D) {
+    const plot = this.plot;
+    const plotArea = plot.plotArea;
+    const v = this.canvasRegion;
+    const paddingPx = this.paddingPx;
+    const strokeWidth = plot.axisStrokeWidth;
+    const colour = this.colour ?? plot.axisStrokeColour;
+    ctx.strokeStyle = colour;
+    ctx.fillStyle = colour;
+    ctx.clearRect(0, 0, v.width, v.height);
+
+    //ctx.fillStyle = `yellow`;
+    //ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+
+    // Vertical line
+    ctx.beginPath();
+    ctx.lineWidth = strokeWidth;
+    const lineX = v.width - strokeWidth / 2;
+    ctx.moveTo(lineX, plotArea.paddingPx + strokeWidth);
+    ctx.lineTo(lineX, plotArea.canvasRegion.height + paddingPx);// + strokeWidth + strokeWidth);
+    ctx.stroke();
+
+    const swatchSize = 10;
+    let xOffset = paddingPx;
+    const middleY = (plotArea.canvasRegion.height - paddingPx) / 2;
+    for (const s of this.plot.seriesArray()) {
+      ctx.textBaseline = `top`;
+      const r = s.visualFormatted;
+      let actualWidth = 0;
+      let xPre = xOffset;
+      if (isRangeSinglePoint(s.visualDataRange)) {
+        ctx.fillStyle = plot.axisTextColour;
+
+        let m = ctx.measureText(r.max);
+        //let txtHeight = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+        //ctx.textBaseline = `top`;
+        ctx.fillText(r.max, xOffset, middleY + swatchSize);
+        actualWidth = m.width;
+        xOffset += m.width + paddingPx;
+      } else {
+        ctx.fillStyle = plot.axisTextColour;
+        let m1 = ctx.measureText(r.min);
+        ctx.fillText(r.min, xOffset, plotArea.canvasRegion.height - paddingPx);
+        let m2 = ctx.measureText(r.max);
+        ctx.fillText(r.max, xOffset, plotArea.canvasRegion.y);
+        actualWidth = Math.max(m1.width, m2.width);
+        xOffset += actualWidth + paddingPx;
+      }
+      ctx.fillStyle = s.colour;
+      ctx.fillRect(xPre + (actualWidth / 2 - swatchSize / 2), middleY - (swatchSize / 2), swatchSize, swatchSize);
     }
   }
+
+  // seriesAxis(series: Series, ctx: CanvasRenderingContext2D) {
+  //   const plot = this.plot;
+  //   const plotArea = plot.plotArea;
+  //   const v = this.canvasRegion;
+  //   const paddingPx = this.paddingPx;
+  //   const r = series.visualRange;
+  //   const strokeWidth = plot.axisStrokeWidth;
+
+  //   const colour = this.colour ?? plot.axisStrokeColour;
+  //   ctx.strokeStyle = colour;
+  //   ctx.fillStyle = colour;
+
+  //   if (Number.isNaN(r.min) && Number.isNaN(r.max)) return; // Empty
+  //   this.lastRange = r;
+  //   ctx.clearRect(0, 0, v.width, v.height);
+
+  //   // ctx.fillStyle = `yellow`;
+  //   // ctx.fillRect(0, 0, this.canvasRegion.width, this.canvasRegion.height);
+
+  //   ctx.beginPath();
+  //   ctx.lineWidth = strokeWidth;
+  //   const lineX = v.width - strokeWidth / 2;
+  //   ctx.moveTo(lineX, plotArea.paddingPx + strokeWidth);
+  //   ctx.lineTo(lineX, plotArea.canvasRegion.height + paddingPx);// + strokeWidth + strokeWidth);
+  //   ctx.stroke();
+
+  //   ctx.textBaseline = `top`;
+  //   const fromRight = v.width - paddingPx * 4;
+
+  //   ctx.fillStyle = plot.axisTextColour;
+  //   if (isRangeSinglePoint(r)) {
+  //     this.debugLog(`rangeSinglePoint`);
+  //     drawText(ctx, series.formatValue(r.max), (size) => [
+  //       fromRight - size.width,
+  //       plotArea.computeY(series, r.max) - paddingPx * 4,
+  //     ]);
+  //   } else {
+  //     // Draw min/max data labels
+  //     drawText(ctx, series.formatValue(r.max), (size) => [
+  //       fromRight - size.width,
+  //       plotArea.computeY(series, r.max) + strokeWidth / 2,
+  //     ]);
+  //     drawText(ctx, series.formatValue(r.min), (size) => [
+  //       fromRight - size.width,
+  //       plotArea.computeY(series, r.min) - 5,
+  //     ]);
+  //   }
+  // }
 }
 
 const drawText = (
@@ -917,22 +1082,32 @@ export class Plot extends Sg.CanvasBox {
 
   axisStrokeWidth: number;
   series: Map<string, Series>;
+  scaling: ScalingOption;
   private _frozen = false;
   private _canvasEl: HTMLCanvasElement;
   private _ctx: CanvasRenderingContext2D;
 
   defaultSeriesOpts?: SeriesOpts;
-  constructor(canvasElementOrQuery: HTMLCanvasElement | string, opts: Opts = {}) {
+  constructor(canvasElementOrQuery: HTMLCanvasElement | string, opts: Partial<Opts> = {}) {
     const { ctx, element, bounds } = scaleCanvas(canvasElementOrQuery);
     super(undefined, `Plot`);//bounds);
     this._canvasEl = element;
     this.bounds = bounds;
+    this.scaling = opts.scaling ?? `normalise`;
     this._ctx = ctx;
     if (opts.autoSize) {
       parentSizeCanvas(element, (event) => {
+        this.bounds = element.getBoundingClientRect();
+        this.plotArea.bounds = this.bounds;
+        this.legend.bounds = this.bounds;
+        this.axisX.bounds = this.bounds;
+        this.axisY.bounds = this.bounds;
+        ctx.clearRect(0, 0, this.bounds.width, this.bounds.height);
         this.drawingInvalidated(`resize`);
         this.layoutInvalidated(`resize`);
+
         this.update(event.ctx, true);
+
       });
     }
 

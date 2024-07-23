@@ -141,7 +141,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     return this.#ctx;
   };
 
-  #setLogicalSize(logicalSize: Rect) {
+  setLogicalSize(logicalSize: Rect) {
     RectsGuard(logicalSize, `logicalSize`);
 
     const ratio = window.devicePixelRatio || 1;
@@ -182,17 +182,21 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * @returns 
    */
   #onParentResize() {
-    const parentEl = this.el.parentElement;
-    if (!parentEl) return;
+    let parentEl = this.el.parentElement;
+    if (!parentEl) {
+      console.warn(`No parent element`);
+      return;
+    }
     const bounds = parentEl.getBoundingClientRect();
-    this.#setLogicalSize({ width: bounds.width, height: bounds.height });
+    this.setLogicalSize({ width: bounds.width, height: bounds.height });
   }
+
 
   /**
    * Notified that window has changed size
    */
   #onWindowResize() {
-    this.#setLogicalSize({
+    this.setLogicalSize({
       width: window.innerWidth,
       height: window.innerHeight,
     });
@@ -214,8 +218,9 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
         break;
       }
       case `parent`: {
-        const parentEl = this.el.parentElement;
-        if (!parentEl) throw new Error(`Canvas element has no parent?!`);
+        //let parentEl = this.el.parentElement;
+        //if (parentEl === undefined) parentEl = this.el.shadowRoot;
+        //if (!parentEl) throw new Error(`Canvas element has no parent?!`);
         if (!this.opts.skipCss) {
           this.el.style.position = `relative`;
           this.el.style.left = `0px`;
@@ -234,7 +239,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
         if (this.opts.width > 0) width = this.opts.width;
         if (this.opts.height > 0) height = this.opts.height;
         const desiredSize = { width, height };
-        this.#setLogicalSize(desiredSize);
+        this.setLogicalSize(desiredSize);
         break;
       }
       default: {
@@ -265,6 +270,12 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     }
   }
 
+  fill(colour?: string) {
+    if (this.#ctx) {
+      if (colour) this.#ctx.fillStyle = colour;
+      this.#ctx.fillRect(0, 0, this.width, this.height);
+    }
+  }
   /**
    * Gets the drawing context
    */

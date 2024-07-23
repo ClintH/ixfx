@@ -413,18 +413,23 @@ export function* getPaths(object: object | null, onlyLeaves = false): Generator<
  * @param prefix Manually set a path prefix if it's necessary
  * @returns 
  */
-export function* getPathsAndData(o: object, maxDepth = Number.MAX_SAFE_INTEGER, prefix = ``): Generator<PathData<any>> {
+export function* getPathsAndData(o: object, onlyLeaves = false, maxDepth = Number.MAX_SAFE_INTEGER, prefix = ``): Generator<PathData<any>> {
   if (o === null) return;
   if (o === undefined) return;
-  yield* getPathsAndDataImpl(o, prefix, maxDepth);
+  yield* getPathsAndDataImpl(o, prefix, onlyLeaves, maxDepth);
 }
 
-function* getPathsAndDataImpl(o: object, prefix: string, maxDepth: number): Generator<PathData<any>> {
+function* getPathsAndDataImpl(o: object, prefix: string, onlyLeaves = false, maxDepth: number): Generator<PathData<any>> {
   if (maxDepth <= 0) return;
   if (typeof o !== `object`) return;
   for (const entries of Object.entries(o)) {
     const sub = (prefix.length > 0 ? prefix + `.` : ``) + entries[ 0 ];
-    yield { path: sub, value: entries[ 1 ] };
-    yield* getPathsAndDataImpl(entries[ 1 ], sub, maxDepth - 1);
+    const value = entries[ 1 ];
+    const leaf = (typeof value !== `object`);
+
+    if (onlyLeaves && leaf || !onlyLeaves) {
+      yield { path: sub, value };
+    }
+    yield* getPathsAndDataImpl(value, sub, onlyLeaves, maxDepth - 1);
   }
 }

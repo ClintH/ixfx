@@ -15,6 +15,9 @@
 
     #container {
       height: 10em;
+      border: 2px solid gray;
+      height:30vw;
+      width:50vw;
     }
   </style>
   <section>
@@ -22,9 +25,11 @@
     <button id="btnToggle">Auto data</button>
     <button id="btnToggleYAxis">Y Axis</button>
 
-    <div id="container">
+    <!-- <div id="container">
       <canvas id="plot">
-    </div>
+    </div> -->
+    <div id="container">
+     <plot-element line-width="5" data-width="10" render="line" id="plot"></plot-element> 
     </div>
   </section>
   <script type="module" src="script2.js"></script>

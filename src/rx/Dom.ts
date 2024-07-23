@@ -682,7 +682,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
         console.log(`Rx.Dom.elements.changes no previous. path: ${ path }`);
 
         create(path, d.value);
-        const subdata = [ ...Immutable.getPathsAndData(d.value, Number.MAX_SAFE_INTEGER, path) ];
+        const subdata = [ ...Immutable.getPathsAndData(d.value, false, Number.MAX_SAFE_INTEGER, path) ];
         console.log(subdata);
         for (const dd of subdata) {
           if (!seenPaths.has(dd.path)) {
@@ -728,7 +728,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
     // Get data of value as a set of paths and data
     // but only at first level of depth, because changes() will probe
     // deeper itself
-    changes([ ...Immutable.getPathsAndData(last as object, 1) ]);
+    changes([ ...Immutable.getPathsAndData(last as object, false, 1) ]);
   }
 };
 

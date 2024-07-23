@@ -631,7 +631,7 @@ export class CanvasLayoutState extends LayoutState {
  * A Box that exists on a HTMLCanvasElement
  */
 export class CanvasBox extends Box {
-  protected bounds: RectPositioned | undefined;
+  bounds: RectPositioned | undefined;
   constructor(
     parent: CanvasBox | undefined,
     //canvasElement: HTMLCanvasElement,
@@ -742,6 +742,10 @@ export class CanvasBox extends Box {
     return this.bounds === undefined && this._parent ? (this._parent as CanvasBox).bounds : this.bounds;
   }
 
+  unsetBounds() {
+    this.bounds = undefined;
+  }
+
   /**
    * Update begins.
    * @returns MeasureState
@@ -817,6 +821,9 @@ export class CanvasBox extends Box {
       ctx.save();
       const v = this.canvasRegion;
       ctx.translate(v.x, v.y);
+      ctx.beginPath();
+      ctx.rect(0, 0, v.width, v.height);
+      ctx.clip();
 
       if (this.debugLayout) {
         //ctx.clearRect(0,0,v.width,v.height);
