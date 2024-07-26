@@ -1,7 +1,7 @@
-import { ticks } from "./sources/Ticks.js";
+import { ticks } from "./source/Ticks.js";
 import { throwIntegerTest } from "../util/GuardNumbers.js";
 import type { ModSettable, ModSettableFeedback, ModSettableOptions } from "./Types.js";
-import * as Sources from './sources/index.js';
+import * as Sources from './source/index.js';
 export type WaveformShaper = (position: number) => number;
 
 export type Waveforms = `sine` | `sine-bipolar` | `saw` | `triangle` | `square` | `arc`;
