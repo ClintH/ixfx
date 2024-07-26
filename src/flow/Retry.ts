@@ -1,9 +1,10 @@
 import { sleep } from './Sleep.js';
 import { resolveLogOption } from '../debug/Logger.js';
-import { since, toString as elapsedToString } from './Elapsed.js';
+import { since } from './Stopwatch.js';
 import { throwIntegerTest, throwNumberTest } from '../util/GuardNumbers.js';
 import { getErrorMessage } from '../debug/GetErrorMessage.js';
 import type { Result } from '../util/Results.js';
+import { elapsedToHumanString } from './IntervalType.js';
 /**
  * Result of backoff
  */
@@ -257,7 +258,7 @@ export const retryTask = async <V>(
       return { success: result.success, value: result.value, attempts, elapsed: startedAt() };
     }
     log({
-      msg: `retry attempts: ${ attempts } t: ${ elapsedToString(t) }`,
+      msg: `retry attempts: ${ attempts } t: ${ elapsedToHumanString(t) }`,
     });
 
     // Did not succeed.

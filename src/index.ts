@@ -307,7 +307,7 @@ export * as Iterables from './iterables/index.js';
  * 
  * Etc
  * * {@link applyToValues}: Applies a function to every key of an object which is a number
- * * {@link isApproximately}: _True_ if number is roughly within a range
+ * * {@link isApprox}: _True_ if number is roughly within a range
  * * {@link isValid}: _True_ if input is a number, {@link validNumbers}
  */
 export * as Numbers from './numbers/index.js';
@@ -381,10 +381,10 @@ export * as Events from './Events.js';
  * @example Importing
  * ```
  * // If library is stored two directories up under `ixfx/`
- * import {adsr, defaultAdsrOpts} from '../../ixfx/dist/modulation.js';
+ * import { adsr } from '../../ixfx/dist/modulation.js';
  *
  * // Import from web
- * import {adsr, defaultAdsrOpts} from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import { adsr } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * ```
  *
  */

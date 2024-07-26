@@ -1,6 +1,6 @@
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from './StateMachine.js';
-import * as Elapsed from './Elapsed.js';
+import * as Elapsed from './Stopwatch.js';
 import type { StateNames, Transitions, MachineState } from './StateMachine.js';
 
 export type StateChangeEvent<V extends Transitions> = {
@@ -59,6 +59,8 @@ export class StateMachineWithEvents<
     this.#sm = StateMachine.init(m, opts.initial);
     this.#smInitial = StateMachine.cloneState(this.#sm);
   }
+
+
 
   #setIsDone(v: boolean) {
     if (this.#isDone === v) return;
