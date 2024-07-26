@@ -40,3 +40,4 @@ export const everyNth = <T>(nth: number, callback?: (data: T) => void) => {
     return false;
   }
 };
+
