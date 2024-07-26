@@ -94,6 +94,7 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   annotate: <TAnnotation>(transformer: (value: TIn) => TAnnotation) => Wrapped<{ value: TIn, annotation: TAnnotation }>
+  annotateWithOp: <TOut>(op: ReactiveOp<TIn, TOut>) => Wrapped<{ value: TIn, annotation: TOut }>
   /**
   * Accumulate a batch of values, emitted as an array
   * @param options 
