@@ -11,7 +11,7 @@
  * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
  * ```
  *
- * `fn` is expected to map (0..1) => (0..1), such as an {@link Modulation.Easings.EasingFn}. The input to the
+ * `fn` is expected to map (0..1) => (0..1), such as an easing function. The input to the
  * `fn` is the relative position of an element. Thus the first element will be 0, the middle 0.5 and so on.
  * The output of `fn` is then multiplied by the original value.
  *
