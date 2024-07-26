@@ -63,7 +63,6 @@ export const integerParse = (
   } catch {
     return defaultValue;
   }
-  return Number.parseInt(value);
 };
 
 
