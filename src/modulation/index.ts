@@ -1,10 +1,12 @@
-import * as Easings from './Easing.js';
-import * as Envelopes from './Envelope.js';
+import * as Easings from './easing/index.js';
+import * as Envelopes from './envelope/index.js';
 import * as Forces from './Forces.js';
 import * as Oscillators from './Oscillator.js';
 export * from './PingPong.js';
 export * from './Waveforms.js';
-export * as Sources from './sources/index.js';
+export * as Sources from './source/index.js';
+export * from './Spring.js';
+
 export type * from './Types.js';
 
 /**
@@ -36,9 +38,7 @@ export type * from './Types.js';
 /**
  * Envelopes
  */
-export * from './Envelope.js';
-
-export * as Envelopes from './Envelope.js';
+export * as Envelopes from './envelope/index.js';
 
 /**
  * Forces module can help to compute basic physical forces like gravity, friction, springs etc.
@@ -104,6 +104,6 @@ try {
 }
 
 export { type Jitterer, type JitterOpts, jitter, jitterAbsolute } from './Jitter.js';
-export * as Easings from './Easing.js';
+export * as Easings from './easing/index.js';
 export * as Forces from './Forces.js';
 export * as Oscillators from './Oscillator.js';
