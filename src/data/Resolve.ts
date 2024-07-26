@@ -1,11 +1,14 @@
 import { hasLast, isReactive } from "../rx/Util.js";
 import type { ReactiveNonInitial } from "../rx/Types.js";
 import type { ValueType } from "./Types.js";
+import { getErrorMessage } from "../debug/GetErrorMessage.js";
 
 /**
  * Something that can resolve to a value
  */
-export type ResolveToValue<V> = ValueType | Promise<V> | ReactiveNonInitial<V> | Generator<V> | AsyncGenerator<V> | IterableIterator<V> | AsyncIterableIterator<V> | ((args: any) => V)
+export type ResolveToValueSync<V> = ValueType | ReactiveNonInitial<V> | Generator<V> | IterableIterator<V> | ((args: any) => V)
+export type ResolveToValueAsync<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V>;
+export type ResolveToValue<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
 
 /**
  * Resolves `r` to a value, where `r` is:
@@ -13,7 +16,6 @@ export type ResolveToValue<V> = ValueType | Promise<V> | ReactiveNonInitial<V> |
  * * a/sync function
  * * a/sync generator/iterator
  * * ReactiveNonInitial
- * 
  * ```js
  * await resolve(10);       // 10
  * await resolve(() => 10); // 10
@@ -63,3 +65,96 @@ export async function resolve<V extends ValueType>(r: ResolveToValue<V>, ...args
     return r as V;
   }
 }
+
+export function resolveSync<V extends ValueType>(r: ResolveToValueSync<V>, ...args: any): V {
+  if (typeof r === `object`) {
+    if (`next` in r) {
+      const tag = (r as any)[ Symbol.toStringTag ];
+      if (tag === `Generator` || tag == `Array Iterator`) {
+        const v = r.next();
+        if (`done` in v && `value` in v) return v.value as V;
+        return v as V;
+      } else if (tag === `AsyncGenerator`) {
+        throw new Error(`resolveSync cannot work with an async generator`);
+      } else {
+        throw new Error(`Object has 'next' prop, but does not have 'Generator' or 'Array Iterator' string tag symbol. Got: '${ tag }'`);
+      }
+    } else if (isReactive<V>(r)) {
+      if (hasLast(r)) return r.last();
+      throw new Error(`Reactive does not have last value`);
+    } else {
+      // Some regular object
+      return r as V;
+    }
+  } else if (typeof r === `function`) {
+    return r(args) as V;
+  } else {
+    // Primitive value?
+    return r as V;
+  }
+}
+
+/**
+ * Resolves a value as per {@link resolve}, however
+ * If an error is thrown or the resolution results in _undefined_ 
+ * or NaN, `fallbackValue` is returned instead.
+ * 
+ * `null` is an allowed return value.
+ * 
+ * ```js
+ * // Function returns undefined 50% of the time or 0
+ * const fn = () => {
+ *  if (Math.random() >= 0.5) return; // undefined
+ *  return 0;
+ * }
+ * const r = resolveWithFallback(fn, 1);
+ * const value = r(); // Always 0 or 1
+ * ```
+ * @param p Thing to resolve
+ * @param fallbackValue Fallback value if an error happens, undefined or NaN
+ * @param args 
+ * @returns 
+ */
+export async function resolveWithFallback<T extends ValueType>(p: ResolveToValue<T>, fallback: ResolveFallbackOpts<T>, ...args: any) {
+  let errored = false;
+  let fallbackValue = fallback.value;
+  const overrideWithLast = fallback.overrideWithLast ?? false;
+  if (fallbackValue === undefined) throw new Error(`Needs a fallback value`);
+
+  try {
+    const r = await resolve(p, ...args);
+    if (typeof r === `undefined`) return fallbackValue;
+    if (typeof r === `number` && Number.isNaN(r)) return fallbackValue;
+    if (overrideWithLast) fallbackValue = r;
+    return r;
+  } catch (error) {
+    if (!errored) {
+      errored = true;
+      console.warn(`resolveWithFallback swallowed an error. Additional errors not reported.`, getErrorMessage(error));
+    }
+    return fallbackValue;
+  }
+}
+
+export function resolveWithFallbackSync<T extends ValueType>(p: ResolveToValueSync<T>, fallback: ResolveFallbackOpts<T>, ...args: any) {
+  let errored = false;
+  let fallbackValue = fallback.value;
+  const overrideWithLast = fallback.overrideWithLast ?? false;
+  if (fallbackValue === undefined) throw new Error(`Needs a fallback value`);
+
+  try {
+    const r = resolveSync(p, ...args);
+    if (typeof r === `undefined`) return fallbackValue;
+    if (typeof r === `number` && Number.isNaN(r)) return fallbackValue;
+    if (overrideWithLast) fallbackValue = r;
+    return r;
+  } catch (error) {
+    if (!errored) {
+      errored = true;
+      console.warn(`resolveWithFallbackSync swallowed an error. Additional errors not reported.`, getErrorMessage(error));
+    }
+    return fallbackValue;
+  }
+}
+
+export type ResolveFallbackOpts<T> = { value: T, overrideWithLast?: boolean }
