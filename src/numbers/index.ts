@@ -39,7 +39,7 @@ export * from './Flip.js';
 export * from './Generate.js';
 export * from './Guard.js';
 export * from './Interpolate.js';
-export * from './IsApproximately.js';
+export * from './IsApprox.js';
 export * from './LinearSpace.js';
 export * from './MinMaxAvg.js';
 export * from './MovingAverage.js';
