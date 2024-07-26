@@ -1,0 +1,1 @@
+export type EaseValue = (v: number) => number
