@@ -1,5 +1,5 @@
 import { defaultRandom, type RandomSource } from './Types.js';
-import { type EasingName, get as EasingGet } from '../modulation/Easing.js';
+import { type EasingName, get as EasingGet } from '../modulation/easing/index.js';
 /**
  * Options for producing weighted distribution
  */

@@ -2,7 +2,7 @@ import { clamp } from "../numbers/Clamp.js";
 import { type RandomSource, defaultRandom } from "./Types.js";
 import type { WeightedOptions } from "./Weighted.js";
 import { throwNumberTest } from '../util/GuardNumbers.js';
-import { get as EasingGet } from '../modulation/Easing.js';
+import { get as EasingGet } from '../modulation/easing/index.js';
 export type WeightedIntegerOptions = WeightedOptions & Readonly<{
   min?: number;
   max: number;
