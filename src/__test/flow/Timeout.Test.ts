@@ -1,7 +1,7 @@
 import test from 'ava';
 import { timeout } from '../../flow/Timeout.js';
 import { sleep } from '../../flow/Sleep.js';
-import { isApproximately } from '../../numbers/IsApproximately.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 
 /**
  * Tests a single firing
@@ -32,7 +32,7 @@ test(`args`, async t => {
   t.plan(2);
   const a = timeout((elapsed, args) => {
     t.deepEqual(args, `hello`);
-    t.true(isApproximately(delay, 0.02)(elapsed!));
+    t.true(isApprox(0.02, delay)(elapsed!));
   }, delay);
   a.start(undefined, [ `hello` ]);
   await sleep(delay + 20);
@@ -53,7 +53,7 @@ test(`start`, async t => {
   t.is(a.runState, `scheduled`);
   await sleep(delayChange + 10);
   let elapsed = stop - start;
-  t.true(isApproximately(delayChange, 0.02)(elapsed));
+  t.true(isApprox(0.02, delayChange)(elapsed));
   t.is(aFired, 1);
   t.is(a.runState, `idle`);
 
@@ -62,7 +62,7 @@ test(`start`, async t => {
   a.start();
   t.is(a.runState, `scheduled`);
   await sleep(delayChange + 10);
-  t.true(isApproximately(delayChange, 0.1, elapsed));
+  t.true(isApprox(0.1, delayChange, elapsed));
   t.is(aFired, 2);
   t.is(a.runState, `idle`);
 
