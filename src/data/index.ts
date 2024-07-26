@@ -97,8 +97,8 @@ export * as Arrays from './arrays/index.js';
  * * {@link filter}: Yield values that return _true_ for predicate
  * * {@link find}: Finds the first value that matches a predicate, or _undefined_ if nothing found
  * * {@link hasAnyValue}: Searches through all keys, returning true if any occurence of _value_ was found
- * * {@link hasKeyVAlue}: _true_ if value is stored under a key
- * * {@link firstEntry}: Returns first entry which matches predicate
+ * * {@link hasKeyValue}: _true_ if value is stored under a key
+ * * {@link firstEntryByPredicate}: Returns first entry which matches predicate
  * * {@link firstEntryByValue}: Returns first entry where value matches
  * * {@link getClosestIntegerKey}: Assuming numeric keys, find the closest to a target value
  * * {@link getFromKeys}: Given an iterable of keys, returns the first value where the key is present

@@ -45,7 +45,6 @@ export const mix = (
  * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * Easings.crossFade(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
  * ```
- * @param amt
  * @param easingA
  * @param easingB
  * @returns Numeric value

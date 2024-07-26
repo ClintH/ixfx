@@ -137,7 +137,7 @@ export const time = (
  * Produce easing values with each invocation. When the easing is complete, the final
  * value continues to return. Timer starts when return function is first invoked.
  * 
- * If you need to check if an easing is done or reset it, consider {@link ticksEasing}.
+ * If you need to check if an easing is done or reset it, consider {@link tickEasing}.
  * 
  * ```js
  * // Quad-in easing over 100 ticks
@@ -206,7 +206,7 @@ const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number))
  * 'Ease' from `0` to `1` over a delicious curve. Commonly used for animation
  * and basic modelling of physical motion.
  *
- * Create via {@link tick} or {@link time}, call `compute` to calculate the next
+ * Create via {@link tickEasing} or {@link timeEasing}, call `compute` to calculate the next
  * value in the progression, until you reach `1` or `isDone` returns true.
  *
  */
@@ -235,7 +235,7 @@ export type Easer = HasCompletion & {
  *
  * ```js
  * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
- * const e = Easings.create(`circInOut`, 1000, msElapsedTimer);
+ * const e = Easings.create(`circInOut`, 1000, elapsedMillisecondsAbsolute);
  * ```
  * @param nameOrFunction Name of easing, or an easing function
  * @param duration Duration (meaning depends on timer source)

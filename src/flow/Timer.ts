@@ -35,7 +35,7 @@ export type ModulationTimer = CompletionTimer & {
 
 export type TimerOpts = {
   /**
-   * Timer to use. By default {@link msElapsedTimer}.
+   * Timer to use. By default {@link elapsedMillisecondsAbsolute}.
    */
   readonly timer: Timer;
 };
@@ -61,8 +61,6 @@ export type RelativeTimerOpts = TimerOpts & {
  * // Will return _true_ when it has
  * oneSecond();
  * ```
- *
- * See also {@link Elapsed.progress}.
  * @param elapsed
  * @returns
  */
@@ -139,7 +137,7 @@ export function ofTotal(
  * See also {@link hasElapsed}.
  * 
  * Is a simple wrapper around {@link relative}.
- * @param duration
+ * @param totalTicks
  * @returns
  */
 export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: boolean, readonly wrapValue?: boolean } = {}
@@ -182,7 +180,7 @@ export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: b
  * ```
  *
  * Options:
- * * timer: timer to use. If not specified, `msElapsedTimer()` is used.
+ * * timer: timer to use. If not specified, `elapsedMillisecondsAbsolute()` is used.
  * * clampValue: if _true_, return value is clamped to 0..1 (default: _false_)
  * * wrapValue: if _true_, return value wraps around continously from 0..1..0 etc. (default: _false_)
  * 

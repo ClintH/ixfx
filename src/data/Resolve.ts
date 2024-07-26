@@ -111,7 +111,7 @@ export function resolveSync<V extends ValueType>(r: ResolveToValueSync<V>, ...ar
  * const value = r(); // Always 0 or 1
  * ```
  * @param p Thing to resolve
- * @param fallbackValue Fallback value if an error happens, undefined or NaN
+ * @param fallback Fallback value if an error happens, undefined or NaN
  * @param args 
  * @returns 
  */

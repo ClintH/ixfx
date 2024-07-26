@@ -162,7 +162,6 @@ export * as Io from './io/index.js';
  * * {@link repeat} / @{link repeatAwait}: Runs a function a given number of times, yielding results as they come in
  *
  * Monitoring
- * * {@link Elapsed.progress}: Track completion of a time duration
  * * {@link hasElapsed}: Returns _true_ when certain time has passed
  * * {@link retryFunction}: Keep calling a function until it returns a value
  * * {@link retryTask}: Keep trying a task until it succeeds
@@ -182,8 +181,8 @@ export * as Io from './io/index.js';
  * * {@link delayLoop}: A generator that yields at a given rate
  *
  * Timers
- * * {@link msElapsedTimer}: Timer that returns elapsed time since initial invocation
- * * {@link ticksElapsedTimer}: Timer based on manual 'ticks'
+ * * {@link elapsedMillisecondsAbsolute}: Timer that returns elapsed time since initial invocation
+ * * {@link elapsedTicksAbsolute}: Timer based on manual 'ticks'
  * * {@link backoffGenerator}: Compute increasingly-larger timeout values
  * 
  * Etc
@@ -375,7 +374,6 @@ export * as Events from './Events.js';
  * * {@link Forces}: Forces such as bouncing, gravity, attraction/repulsion, springs
  *
  * Functions:
- * * {@link adsr}: Modulate over a series of ADSR stages (ie. an envelope)
  * * {@link jitter}: Jitter a value
  *
  * @example Importing

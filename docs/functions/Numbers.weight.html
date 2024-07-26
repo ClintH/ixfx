@@ -2,7 +2,7 @@
 <pre><code class="js"><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">Numbers</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&#39;https://unpkg.com/ixfx/dist/numbers.js&#39;</span><span class="hl-2">;</span><br/><br/><span class="hl-0">// Six items</span><br/><span class="hl-3">Numbers</span><span class="hl-2">.</span><span class="hl-7">weight</span><span class="hl-2">([</span><span class="hl-8">1</span><span class="hl-2">,</span><span class="hl-8">1</span><span class="hl-2">,</span><span class="hl-8">1</span><span class="hl-2">,</span><span class="hl-8">1</span><span class="hl-2">,</span><span class="hl-8">1</span><span class="hl-2">,</span><span class="hl-8">1</span><span class="hl-2">], </span><span class="hl-3">Easings</span><span class="hl-2">.</span><span class="hl-7">gaussian</span><span class="hl-2">());</span><br/><br/><span class="hl-0">// Yields:</span><br/><span class="hl-0">// [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]</span>
 </code><button type="button">Copy</button></pre>
 
-<p><code>fn</code> is expected to map (0..1) =&gt; (0..1), such as an <a href="../types/Modulation.Easings.EasingFn.html" class="tsd-kind-type-alias">Modulation.Easings.EasingFn</a>. The input to the
+<p><code>fn</code> is expected to map (0..1) =&gt; (0..1), such as an easing function. The input to the
 <code>fn</code> is the relative position of an element. Thus the first element will be 0, the middle 0.5 and so on.
 The output of <code>fn</code> is then multiplied by the original value.</p>
 <p>In the below example (which is also the default if <code>fn</code> is not specified), the relative position is

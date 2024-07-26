@@ -187,7 +187,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
  * @param a Start value. Default: 0
  * @param b End value. Default: 1
  * @param startInterpolationAt Starting interpolation amount. Default: 0
- * @param options: Options for interpolation
+ * @param options Options for interpolation
  * @returns 
  */
 export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<InterpolateOptions>) => {

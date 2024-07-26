@@ -130,7 +130,7 @@ export const deleteByValue = <K, V>(
  * map.set('hello', 'a');
  * map.set('there', 'b');
  *
- * const entry = firstEntryByValue(map, (value, key) => {
+ * const entry = firstEntryByPredicate(map, (value, key) => {
  *  return (value === 'b');
  * });
  * // Entry is: ['there', 'b']
@@ -141,7 +141,7 @@ export const deleteByValue = <K, V>(
  * @param predicate Filter function returns true when there is a match of value
  * @returns Entry, or _undefined_ if `filter` function never returns _true_
  */
-export const firstEntryByValue = <K, V>(
+export const firstEntryByPredicate = <K, V>(
   map: IWithEntries<K, V>,
   predicate: (value: V, key: K) => boolean
 ): readonly [ key: K, value: V ] | undefined => {
@@ -151,14 +151,14 @@ export const firstEntryByValue = <K, V>(
 };
 
 /**
- * Finds first entry by iterable value.
+ * Finds first entry by value.
  *
  * ```js
  * const map = new Map();
  * map.set('hello', 'a');
  * map.set('there', 'b');
  *
- * const entry = firstEntryByIterableValue(map, 'b');
+ * const entry = firstEntryByValue(map, 'b');
  * // Entry is: ['there', 'b']
  * ```
  *
@@ -168,7 +168,7 @@ export const firstEntryByValue = <K, V>(
  * @param isEqual Filter function which checks equality. Uses JS comparer by default.
  * @returns Entry, or _undefined_ if `value` not found.
  */
-export const firstEntryByIterableValue = <K, V>(
+export const firstEntryByValue = <K, V>(
   map: IWithEntries<K, V>,
   value: V,
   isEqual: IsEqual<V> = isEqualDefault
