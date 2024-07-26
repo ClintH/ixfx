@@ -1,4 +1,5 @@
 import { numberTest } from '../util/GuardNumbers.js';
+import { round } from '../numbers/Round.js';
 
 /**
  * Interval types allows for more expressive coding, rather than embedding millisecond values.
@@ -22,7 +23,7 @@ import { numberTest } from '../util/GuardNumbers.js';
  * Wherever ixfx takes an Interval, you can also just provide a number instead.
  * This will be taken as a millisecond value.
  * 
- * Use {@link intervalToMs} to convert to milliseconds. Use {@link Elapsed.toString} to get a human-readable representation of the Interval.s
+ * Use {@link intervalToMs} to convert to milliseconds.
  */
 export type Interval =
   | number
@@ -100,3 +101,38 @@ export function isInterval(interval: number | Interval | undefined): interval is
   if (hasMillis || hasSecs || hasHours || hasMins) return true;
   return false;
 }
+
+/**
+ * Returns a human-readable representation
+ * of some elapsed milliseconds
+ * 
+ * ```js
+ * elapsedToHumanString(10);      // `10ms`
+ * elapsedToHumanString(2000);    // `2s`
+ * elapsedToHumanString(65*1000); // `1mins`
+ * ```
+ * @param millisOrFunction Milliseconds as a number, {@link Interval} or function that resolve to a number
+ * @param rounding Rounding (default: 2)
+ * @returns 
+ */
+export const elapsedToHumanString = (millisOrFunction: number | (() => number) | Interval, rounding = 2): string => {
+  let interval: number | undefined = {} = 0;
+  if (typeof millisOrFunction === `function`) {
+    const intervalResult = millisOrFunction();
+    return elapsedToHumanString(intervalResult);
+  } else if (typeof millisOrFunction === `number`) {
+    interval = millisOrFunction;
+  } else if (typeof millisOrFunction === `object`) {
+    interval = intervalToMs(interval);
+  }
+
+  let ms = intervalToMs(interval);
+  if (typeof ms === `undefined`) return `(undefined)`;
+  if (ms < 1000) return `${ round(rounding, ms) }ms`;
+  ms /= 1000;
+  if (ms < 120) return `${ ms.toFixed(1) }secs`;
+  ms /= 60;
+  if (ms < 60) return `${ ms.toFixed(2) }mins`;
+  ms /= 60;
+  return `${ ms.toFixed(2) }hrs`;
+};

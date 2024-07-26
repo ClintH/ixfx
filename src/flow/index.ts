@@ -3,7 +3,7 @@ export * from './Continuously.js';
 export * from './Debounce.js';
 export * from './Delay.js';
 export * from './DispatchList.js';
-export * as Elapsed from './Elapsed.js';
+export * as Elapsed from './Stopwatch.js';
 export * from './Every.js';
 export * from './Execute.js';
 export * from './ForEach.js';

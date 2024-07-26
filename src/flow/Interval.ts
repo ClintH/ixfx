@@ -1,31 +1,47 @@
+import type { ValueType } from '../data/Types.js';
+import { resolve, type ResolveToValue } from '../data/Resolve.js';
 import { intervalToMs, type Interval } from './IntervalType.js';
 import { sleep } from './Sleep.js';
-
-import { type AsyncPromiseOrGenerator } from './Types.js';
 
 /**
  * Options for interval
  */
-export type IntervalOpts = {
+export type IntervalOpts = Readonly<{
   /**
    * Sleep a fixed period of time regardless of how long each invocation of 'produce' takes
    */
-  readonly fixed?: Interval;
+  fixed: Interval;
   /**
    * Minimum interval. That is, only sleep if there is time left over after 'produce'
    * is invoked.
    */
-  readonly minimum?: Interval;
+  minimum: Interval;
   /**
    * Optional signal to abort
    */
-  readonly signal?: AbortSignal;
+  signal: AbortSignal;
   /**
    * When to perform delay. Default is before 'produce' is invoked.
    * Default: 'before'
    */
-  readonly delay?: `before` | `after`;
-};
+  delay: `before` | `after`;
+
+  /**
+   * Maximum times to repeat (default: no limit)
+   */
+  repeats: number
+  /**
+   * Function to call when initialising
+   * @returns 
+   */
+  onStart: () => void
+
+  /**
+   * Function to call when done (or an error occurs)
+   * @returns 
+   */
+  onComplete: (withError: boolean) => void
+}>;
 
 /**
  * Generates values from `produce` with a time delay.
@@ -64,9 +80,9 @@ export type IntervalOpts = {
  * @template V Data type
  * @returns
  */
-export const interval = async function* <V>(
-  produce: AsyncPromiseOrGenerator<V> | ArrayLike<V>,
-  optsOrFixedMs: IntervalOpts | number = {}
+export const interval = async function* <V extends ValueType>(
+  produce: ResolveToValue<V> | ArrayLike<V>,
+  optsOrFixedMs: Partial<IntervalOpts> | number = {}
 ): AsyncGenerator<V> {
   const opts =
     typeof optsOrFixedMs === `number`
@@ -75,12 +91,14 @@ export const interval = async function* <V>(
 
   const signal = opts.signal;
   const when = opts.delay ?? `before`;
+  const repeats = opts.repeats ?? undefined;
   const minIntervalMs = opts.minimum ? intervalToMs(opts.minimum) : undefined;
+  const onStart = opts.onStart ?? (() => {/* no-op*/ })
+  const onComplete = opts.onComplete ?? (() => {/* no-op*/ })
 
   let cancelled = false;
-  let sleepMs = intervalToMs(opts.fixed) ?? intervalToMs(opts.minimum, 0);
+  let sleepMs = intervalToMs(opts.fixed, intervalToMs(opts.minimum, 0));
   let started = performance.now();
-
   const doDelay = async () => {
     const elapsed = performance.now() - started;
     if (typeof minIntervalMs !== `undefined`) {
@@ -96,33 +114,45 @@ export const interval = async function* <V>(
   // Get an iterator over array
   if (Array.isArray(produce)) produce = produce.values();
 
-  const isGenerator =
-    typeof produce === `object` &&
-    `next` in produce &&
-    typeof produce.next === `function`;
+  // const isGenerator =
+  //   typeof produce === `object` &&
+  //   `next` in produce &&
+  //   typeof produce.next === `function`;
+
+  onStart();
+
+  let errored = true;
+  let count = 0;
 
   try {
     while (!cancelled) {
       if (when === `before`) await doDelay();
-      if (typeof produce === `function`) {
-        // Returns V or Promise<V>
-        const result = await produce();
-        if (typeof result === `undefined`) return; // Done
-        yield result;
-      } else if (isGenerator) {
-        // Generator
-        const result = await (produce as AsyncGenerator<V>).next();
-        if (result.done) return;
-        yield result.value;
-      } else {
-        throw new Error(
-          `produce param does not seem to return a value/Promise and is not a generator?`
-        );
-      }
+      const result = await resolve<V>(produce);
+      if (typeof result === `undefined`) break; // Done
+      yield result;
+      // if (typeof produce === `function`) {
+      //   // Returns V or Promise<V>
+      //   const result = await produce();
+      //   if (typeof result === `undefined`) break; // Done
+      //   yield result;
+      // } else if (isGenerator) {
+      //   // Generator
+      //   const result = await (produce as AsyncGenerator<V>).next();
+      //   if (result.done) break;
+      //   yield result.value;
+      // } else {
+      //   throw new Error(
+      //     `produce param does not seem to return a value/Promise and is not a generator?`
+      //   );
+      // }
 
       if (when === `after`) await doDelay();
+      count++;
+      if (repeats !== undefined && repeats >= count) break;
     }
+    errored = false
   } finally {
     cancelled = true;
+    onComplete(errored);
   }
 };
