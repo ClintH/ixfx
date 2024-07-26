@@ -1,7 +1,7 @@
 import test from 'ava';
 import { retryFunction, backoffGenerator } from '../../flow/Retry.js';
 import { Elapsed, sleep } from '../../flow/index.js';
-import { isApproximately } from '../../numbers/IsApproximately.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 
 test('backoffGenerator', async t => {
   // Use 1 as value, 1.1 as power
@@ -113,7 +113,7 @@ test('predelay', async (t) => {
     if (firstInvoke) {
       // Test that predelayMs has elapsed
       const elapsedValue = elapsed();
-      t.true(isApproximately(predelayMs, 0.06, elapsedValue), elapsedValue.toString());
+      t.true(isApprox(0.06, predelayMs, elapsedValue), elapsedValue.toString());
       firstInvoke = true;
     }
   };
