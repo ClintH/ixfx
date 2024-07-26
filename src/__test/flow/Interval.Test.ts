@@ -1,15 +1,23 @@
 import test from 'ava';
-import { intervalToMs, isInterval } from '../../flow/IntervalType.js';
 import { Elapsed, interval } from '../../flow/index.js';
-import { isApproximately } from '../../numbers/IsApproximately.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 import { count } from '../../numbers/Count.js';
 
-test('interval-function', async (t) => {
+test('function', async (t) => {
   const rateMs = 50;
   const maxLoops = 5;
-  const randomGenerator = interval(Math.random, { fixed: rateMs });
+  let startCalled = 0;
+  let completeCalled = 0;
+  const randomGenerator = interval(Math.random, {
+    fixed: rateMs,
+    onStart() {
+      startCalled++;
+    },
+    onComplete(withError) {
+      completeCalled++;
+    }
+  });
 
-  //eslint-disable-next-line functional/no-let
   let produced = 0;
   const elapsed = Elapsed.since();
 
@@ -22,31 +30,46 @@ test('interval-function', async (t) => {
   }
 
   t.is(produced, maxLoops);
-  t.true(isApproximately(maxLoops * rateMs, 0.1, elapsed()));
+  t.true(isApprox(0.1, maxLoops * rateMs, elapsed()));
+  t.is(startCalled, 1);
+  t.is(completeCalled, 1);
 });
 
-test('interval-array', async (t) => {
+test('array', async (t) => {
+  let startCalled = 0;
+  let completeCalled = 0;
+  let errors = 0;
   const opts = {
     fixed: 50,
     delay: 'before',
+    onStart() {
+      startCalled++;
+    },
+    onComplete(withError: boolean) {
+      if (withError) errors++;
+      completeCalled++;
+    }
   } as const;
   const list = [ 'thom', 'jonny', 'colin', 'ed', 'phil' ];
   const iterateResult = [];
   const elapsed = Elapsed.once();
   for await (const i of interval(list, opts)) {
     if (typeof i !== 'string') t.fail(`Expected string type. Got: ${ typeof i }`);
-    //eslint-disable-next-line functional/immutable-data
     iterateResult.push(i);
   }
 
   t.like(list, iterateResult);
   t.true(
-    isApproximately((list.length + 1) * opts.fixed, 0.1, elapsed()),
+    isApprox(0.1, (list.length + 1) * opts.fixed, elapsed()),
     `Elapsed: ${ elapsed() }`
   );
+
+  t.is(errors, 0);
+  t.is(startCalled, 1);
+  t.is(completeCalled, 1);
 });
 
-test('interval-generator', async (t) => {
+test('generator', async (t) => {
   // A generator that counts to 5
   const counter = count(5);
   const created = [];
@@ -55,63 +78,9 @@ test('interval-generator', async (t) => {
     if (typeof v !== `number`) {
       t.fail(`Expected number return type, got ${ typeof v }`);
     }
-    //eslint-disable-next-line functional/immutable-data
     created.push(v);
   }
   t.like(created, [ 0, 1, 2, 3, 4 ]);
 });
 
-test('interval-type', (t) => {
-  t.true(isInterval(10));
-  t.true(isInterval({ millis: 100 }));
-  t.true(isInterval({ secs: 10 }));
-  t.true(isInterval({ mins: 10 }));
-  t.true(isInterval({ hours: 1 }));
 
-  t.true(isInterval({ secs: 10, millis: 100 }));
-  t.true(isInterval({ mins: 10, secs: 10, millis: 100 }));
-  t.true(isInterval({ hours: 2, mins: 10, secs: 10, millis: 100 }));
-
-  // @ts-ignore
-  t.false(isInterval({ millis: false }));
-  // @ts-ignore
-  t.false(isInterval({ millis: 'hello' }));
-  // @ts-ignore
-  t.false(isInterval({ millis: undefined }));
-  // @ts-ignore
-  t.false(isInterval({ millis: null }));
-  // @ts-ignore
-  t.false(isInterval({ millis: Number.NaN }));
-
-  t.false(isInterval(Number.NaN));
-
-  // @ts-ignore
-  t.false(isInterval(undefined));
-  // @ts-ignore
-  t.false(isInterval(null));
-  // @ts-ignore
-  t.false(isInterval('hello'));
-  // @ts-ignore
-  t.false(isInterval(false));
-  // @ts-ignore
-  t.false(isInterval(true));
-  // @ts-ignore
-  t.false(isInterval({ gorp: 10 }));
-});
-
-test('interval-type-to-ms', (t) => {
-  t.is(intervalToMs({ millis: 1000 }), 1000);
-
-  t.is(intervalToMs({ secs: 1 }), 1000);
-
-  t.is(intervalToMs({ millis: 1000, secs: 1 }), 2000);
-
-  t.is(intervalToMs({ mins: 1 }), 60 * 1000);
-  t.is(intervalToMs({ mins: 1, secs: 1 }), 60 * 1000 + 1000);
-
-  t.is(intervalToMs({ hours: 1 }), 60 * 60 * 1000);
-  t.is(
-    intervalToMs({ hours: 1, mins: 1, secs: 1 }),
-    60 * 60 * 1000 + 60 * 1000 + 1000
-  );
-});
