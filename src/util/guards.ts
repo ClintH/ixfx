@@ -4,3 +4,4 @@ export * from './GuardFunction.js';
 export * from './GuardNumbers.js';
 export * from './GuardObject.js';
 export * from './GuardThrowFromResult.js';
+export * from './GuardString.js';
