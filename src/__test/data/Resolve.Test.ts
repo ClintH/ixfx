@@ -1,10 +1,36 @@
 import test from 'ava';
-import { resolve } from '../../data/Resolve.js';
+import { resolve, resolveWithFallback } from '../../data/Resolve.js';
 import { resolveFields } from '../../data/ResolveFields.js';
 import * as Numbers from '../../numbers/index.js';
 import * as Flow from '../../flow/index.js';
 import * as Rx from '../../rx/index.js';
 import { interval } from '../../flow/index.js';
+
+test(`with-fallback`, async t => {
+  let triggered = 0;
+  let errored = 0;
+  const fn = () => {
+    if (Math.random() >= 0.5) {
+      triggered++;
+      return; // undefined
+    } else if (Math.random() > 0.5) {
+      errored++;
+      throw new Error(`Test error`);
+    }
+    return 0;
+  }
+  while (triggered < 5 && errored < 5) {
+    const value = await resolveWithFallback(fn, { value: 1 });
+    const isZeroOrOne = value === 0 || value === 1;
+    t.true(isZeroOrOne);
+    t.false(typeof value === `undefined`);
+  }
+});
+
+test(`arrays`, async t => {
+  const data = [ `a`, `b`, `c` ];
+  t.deepEqual(await resolve(data), data);
+});
 
 test(`resolve`, async t => {
   // Basic values
