@@ -77,6 +77,16 @@ export const eventRace = (target: EventTarget, eventNames: Array<string>, option
 
 export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   readonly #listeners = ofSimpleMutable<Listener<Events>>();
+  #disposed = false;
+
+  dispose() {
+    if (this.#disposed) return;
+    this.clearEventListeners();
+  }
+
+  get isDisposed() {
+    return this.#disposed;
+  }
 
   /**
    * Fire event
@@ -85,6 +95,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @returns
    */
   protected fireEvent<K extends keyof Events>(type: K, args: Events[ K ]) {
+    if (this.#disposed) throw new Error(`Disposed`);
     const listeners = this.#listeners.get(type as string);
     //console.log(`Firing ${type as string}`);
     for (const l of listeners) {
@@ -103,6 +114,8 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
     type: K,
     listener: (event: Events[ K ], sender: SimpleEventEmitter<Events>) => void
   ): void {
+    if (this.#disposed) throw new Error(`Disposed`);
+
     // (this: any, ev: Events[K]) => any): void {
     this.#listeners.addKeyedValues(
       type as string,
@@ -119,6 +132,8 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
     type: K,
     listener: (event: Events[ K ], sender: SimpleEventEmitter<Events>) => void
   ) {
+    if (this.#disposed) return;
+
     // listener: Listener<Events>): void {
     this.#listeners.deleteKeyValue(
       type as string,
@@ -131,6 +146,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @private
    */
   clearEventListeners() {
+    if (this.#disposed) return;
     this.#listeners.clear();
   }
 }
