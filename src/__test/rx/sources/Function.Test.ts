@@ -1,8 +1,7 @@
 import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
-import * as Iter from '../../../iterables/index.js';
+import { isApprox } from '../../../numbers/IsApprox.js';
 
 test(`from-pinged-function`, async t => {
 
@@ -146,7 +145,7 @@ test(`func-lazy-initial`, async t => {
   r2Off();
 
   // Expect the same number of results since we listened for 500ms both times
-  t.true(isApproximately(results1, 0.1, results2), `results1: ${ results1 } results2: ${ results2 }`);
+  t.true(isApprox(0.1, results1, results2), `results1: ${ results1 } results2: ${ results2 }`);
 
   // Since producer is lazy, we expect # produced to be at least results1+2
   t.true(results1 + results2 <= produced);
@@ -172,7 +171,7 @@ test(`from-function-limits`, async t => {
   const r3Func = createTest();
   const r3 = Rx.From.func(r3Func.callback, { interval: 50, maximumRepeats: 5 });
   const r3Value = await Rx.toArray(r3, { maximumWait: 500 });
-  t.true(isApproximately(5 * 50, 0.1, elapsed()), `Elapsed ${ elapsed() }`);
+  t.true(isApprox(0.1, 5 * 50, elapsed()), `Elapsed ${ elapsed() }`);
   t.deepEqual(r3Value, [ 1, 2, 3, 4, 5 ]);
 
 

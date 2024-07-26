@@ -1,7 +1,6 @@
 import test from 'ava';
 import * as Rx from '../../rx/index.js';
 import * as Flow from '../../flow/index.js';
-import { isApproximately, count } from '../../numbers/index.js';
 import * as Iter from '../../iterables/index.js';
 import { interval } from '../../flow/index.js';
 

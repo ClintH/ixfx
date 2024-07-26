@@ -1,9 +1,5 @@
 import test from 'ava';
-
 import * as Rx from '../../../rx/index.js';
-import * as Flow from '../../../flow/index.js';
-import { count } from '../../../numbers/Count.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
 test(`sync-to-object`, async t => {
   const s1 = [ 0, 1, 2, 3, 4 ];
   const s2 = [ 10, 11, 12, 13, 14 ];

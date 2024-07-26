@@ -1,6 +1,6 @@
 import test from "ava";
 import * as Flow from "../../flow/index.js";
-import { isApproximately } from "../../numbers/IsApproximately.js";
+import { isApprox } from "../../numbers/IsApprox.js";
 
 test(`wait-for-value`, async t => {
   const q1 = new Flow.WaitForValue<string>();
@@ -18,7 +18,7 @@ test(`wait-for-value`, async t => {
   }, 200)
 
   await Flow.sleep(210);
-  t.true(isApproximately(200, 0.1, readTime), `Read time: ${ readTime }`);
+  t.true(isApprox(0.1, 200, readTime), `Read time: ${ readTime }`);
   t.is(readValue, `hello`);
 
   // Reusing
@@ -34,6 +34,6 @@ test(`wait-for-value`, async t => {
 
   await Flow.sleep(15);
   t.is(readValue, `hello`); // Expect initial value still
-  t.true(isApproximately(10, 0.2, readTime), `Read time: ${ readTime }`);
+  t.true(isApprox(0.2, 10, readTime), `Read time: ${ readTime }`);
 
 });

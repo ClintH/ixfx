@@ -2,8 +2,7 @@ import test from 'ava';
 
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
-import { count } from '../../../numbers/Count.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
+import { isApprox } from '../../../numbers/IsApprox.js';
 
 test(`timeout-repeat`, async t => {
   // Emit 'goodbye' every 1s
@@ -16,7 +15,7 @@ test(`timeout-repeat`, async t => {
     repeat: true,
     fn() {
       const elapsed = time();
-      const ok = isApproximately(50, 0.1, elapsed);
+      const ok = isApprox(0.1, 50, elapsed);
       if (!ok && !r1.isDisposed()) {
         t.fail(`Elapsed: ${ elapsed }`);
       }
@@ -45,10 +44,10 @@ test(`timeout-value-immediate`, async t => {
   r1.onValue(value => {
     const elapsed = time();
     if (hello) {
-      t.true(isApproximately(150, 0.1, elapsed), `Long time: ${ elapsed }`);
+      t.true(isApprox(0.1, 150, elapsed), `Long time: ${ elapsed }`);
     } else {
       if (count > 1) { // First one can be a bit slow
-        t.true(isApproximately(50, 0.1, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
+        t.true(isApprox(0.1, 50, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
       }
     }
     t.is(value, hello ? `hello` : `goodbye`);
@@ -72,13 +71,13 @@ test(`timeout-value-non-immediate`, async t => {
   r1.onValue(value => {
     const elapsed = time();
     if (hello) {
-      t.true(isApproximately(150, 0.1, elapsed), `Long time: ${ elapsed }. Count: ${ count }`);
+      t.true(isApprox(0.1, 150, elapsed), `Long time: ${ elapsed }. Count: ${ count }`);
     } else {
       // In non immediate case we expect a long initial wait
       if (count === 0) {
-        t.true(isApproximately(220, 0.1, elapsed), `Initial long time: ${ elapsed }. Count: ${ count }`);
+        t.true(isApprox(0.1, 220, elapsed), `Initial long time: ${ elapsed }. Count: ${ count }`);
       } else {
-        t.true(isApproximately(50, 0.2, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
+        t.true(isApprox(0.2, 50, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
       }
     }
     t.is(value, hello ? `hello` : `goodbye`);

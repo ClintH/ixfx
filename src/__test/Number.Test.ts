@@ -1,7 +1,7 @@
 import test from 'ava';
 import {
   average,
-  isApproximately,
+  isApprox,
   linearSpace,
   quantiseEvery,
   round,
@@ -29,8 +29,22 @@ test('apply', t => {
 
 });
 
-test('isApproximately', (t) => {
-  const closeTo100 = isApproximately(100, 0.1);
+test('is-approx', (t) => {
+
+  // Check for divide by zero errors
+  t.true(isApprox(0.1, 0, 0.05));
+  t.true(isApprox(0.1, 0, -0.05));
+  t.true(isApprox(0.1, 0, 0));
+  t.false(isApprox(0.1, 0, 0.11));
+  t.false(isApprox(0.1, 0, -0.11));
+  t.true(isApprox(0, 0, 0));
+  t.false(isApprox(0, 0, 0.1));
+  // True due to rounding
+  t.true(isApprox(0, 0, 0.000000001));
+
+
+
+  const closeTo100 = isApprox(0.1, 100);
   t.true(closeTo100(100));
   t.true(closeTo100(101));
   t.true(closeTo100(90));
@@ -42,29 +56,34 @@ test('isApproximately', (t) => {
   t.false(closeTo100(Number.MAX_SAFE_INTEGER));
   t.false(closeTo100(Number.MIN_SAFE_INTEGER));
 
-  t.throws(() => isApproximately(100, Number.NaN));
-  // @ts-ignore
-  t.throws(() => isApproximately(100, false));
+  t.throws(() => isApprox(Number.NaN, 100, 10));
+  t.throws(() => isApprox(0, Number.NaN, 10));
+  t.false(isApprox(0, 100, Number.NaN));
 
-  t.throws(() => isApproximately(Number.NaN, 0.1));
-  // @ts-ignore
-  t.throws(() => isApproximately({ hello: 'there' }, 0.1));
-  // @ts-ignore
-  t.throws(() => isApproximately('100', 0.1));
-  // @ts-ignore
-  t.throws(() => isApproximately(true, 0.1));
 
-  const exact100 = isApproximately(100, 0);
+  t.throws(() => isApprox(Number.NaN, 100));
+  // @ts-ignore
+  t.throws(() => isApprox(false, 100));
+
+  t.throws(() => isApprox(0.1, Number.NaN));
+  // @ts-ignore
+  t.throws(() => isApprox(0.1, { hello: 'there' }));
+  // @ts-ignore
+  t.throws(() => isApprox(0.1, '100'));
+  // @ts-ignore
+  t.throws(() => isApprox(0.1, true));
+
+  const exact100 = isApprox(0, 100);
   t.true(exact100(100));
   t.false(exact100(101));
   t.false(exact100(99));
 
-  t.true(isApproximately(1, 0.1, 1.01));
-  t.true(isApproximately(1, 0.1, 1.1));
+  t.true(isApprox(0.1, 1, 1.01));
+  t.true(isApprox(0.1, 1, 1.1));
 
-  t.true(isApproximately(1, 0.1, 1));
-  t.true(isApproximately(1, 0.1, 0.99));
-  t.false(isApproximately(1, 0.1, 0));
+  t.true(isApprox(0.1, 1, 1));
+  t.true(isApprox(0.1, 1, 0.99));
+  t.false(isApprox(0.1, 1, 0));
 });
 
 test(`round`, (t) => {

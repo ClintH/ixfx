@@ -2,12 +2,15 @@ import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 
 test(`annotate-op`, async t => {
-  const r1 = Rx.run(
-    Rx.From.array([ 1, 2, 3 ]),
-    Rx.Ops.annotateWithOp(
-      Rx.Ops.sum()
-    )
-  );
+  const r1 = Rx.wrap([ 1, 2, 3 ]).annotateWithOp(Rx.Ops.sum());
+
+  // const r1 = Rx.run(
+  //   Rx.From.array([ 1, 2, 3 ]),
+  //   Rx.Ops.annotateWithOp(
+  //     Rx.Ops.sum()
+  //   )
+  // );
+
   const r1D = await Rx.toArray(r1);
   t.deepEqual(r1D, [
     { value: 1, annotation: 1 },

@@ -14,5 +14,34 @@
       "symbolIcon.colorForeground": "#a8a8a8",
       "symbolIcon.constantForeground": "#a8a8a8"
     },}
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build fast",
+        "type": "shell",
+        "command": "npm run build:fast",
+        "problemMatcher": []
+      },
+      {
+        "label": "Build",
+        "type": "shell",
+        "command": "npm run build",
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Typescheck",
+        "type": "shell",
+        "command": "npm run typecheck",
+        "problemMatcher": [
+          "$tsc"
+        ]
+      }
+    ]
   }
 }

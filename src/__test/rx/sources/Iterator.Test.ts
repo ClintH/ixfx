@@ -2,7 +2,7 @@ import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import * as Iter from '../../../iterables/index.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
+import { isApprox } from '../../../numbers/IsApprox.js';
 import { count } from '../../../numbers/Count.js';
 import { interval } from '../../../flow/index.js';
 
@@ -140,7 +140,7 @@ test(`from-async`, async t => {
   let elapsed = performance.now() - start;
   t.is(countProgress, 0);
   t.deepEqual(r2Data, [ 4, 3, 2, 1, 0 ]);
-  t.true(isApproximately((runCount + 1) * intervalPeriod, 0.1)(elapsed), `Elapsed: ${ elapsed }`);
+  t.true(isApprox(0.1, (runCount + 1) * intervalPeriod, elapsed), `Elapsed: ${ elapsed }`);
 });
 
 test(`generator-lazy`, async t => {
@@ -195,7 +195,7 @@ test(`generator-async`, async t => {
   const sleepFor = valueRateMs * (valueCount + 2);
   await Flow.sleep(sleepFor);
   const elapsed = Date.now() - start;
-  //t.true(isApproximately(valueRateMs * valueCount, 0.1)(elapsed));
+  //t.true(isApprox(0.1, valueRateMs * valueCount, elapsed));
   t.true(source.isDisposed());
 });
 

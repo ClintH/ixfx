@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
+import { isApprox } from '../../../numbers/IsApprox.js';
 
 /**
  * Tests read rate
@@ -24,7 +24,7 @@ test(`array-interval`, async t => {
       if (read.length === a1.length) {
         const elapsed = start();
         const expectedTime = rateMs * (a1.length + 1);
-        t.true(isApproximately(expectedTime, 0.2, elapsed), `Elapsed time ${ elapsed } vs. ${ expectedTime }`);
+        t.true(isApprox(0.2, expectedTime, elapsed), `Elapsed time ${ elapsed } vs. ${ expectedTime }`);
       }
     } else if (msg.signal === `done`) {
       seenClose = true;

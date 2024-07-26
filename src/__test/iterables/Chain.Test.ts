@@ -4,7 +4,7 @@ import { count } from '../../numbers/Count.js';
 import * as Async from '../../iterables/IterableAsync.js'
 import { sleep } from '../../flow/Sleep.js';
 import { interval as intervalTracker } from '../../trackers/IntervalTracker.js';
-import { isApproximately } from '../../numbers/IsApproximately.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 
 const getNumberData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
 const getStringData = () => getNumberData().map(v => v.toString());
@@ -530,7 +530,7 @@ test('delay', async t => {
   for await (const v of ch) {
     tracker.mark();
   }
-  t.true(isApproximately(interval, 0.01)(tracker.avg));
+  t.true(isApprox(0.01, interval)(tracker.avg));
 });
 
 test('tick', async t => {
@@ -547,7 +547,7 @@ test('tick', async t => {
     if (count++ > 20) break;
   }
   // Check that interval between iterations is about right
-  t.true(isApproximately(intervalMs, 0.01)(tracker.avg))
+  t.true(isApprox(0.01, intervalMs)(tracker.avg))
 
   // Tick with max loops
   let loops = 10;
@@ -565,6 +565,6 @@ test('tick', async t => {
   t.is(loops, count);
 
   // Check that interval between iterations is about right
-  t.true(isApproximately(intervalMs, 0.01)(tracker.avg))
+  t.true(isApprox(0.01, intervalMs)(tracker.avg))
 
 });

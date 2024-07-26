@@ -1,6 +1,5 @@
 import * as IterableSync from '../../iterables/IterableSync.js';
 import test from 'ava';
-import { isApproximately } from '../../numbers/IsApproximately.js';
 import { count } from '../../numbers/Count.js';
 test(`until`, t => {
   let triggered = 0;

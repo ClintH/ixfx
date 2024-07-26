@@ -1,8 +1,6 @@
 import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
-import { count } from '../../../numbers/Count.js';
-import { isApproximately } from '../../../numbers/IsApproximately.js';
 test(`take-next-value`, async t => {
   const s1 = Rx.From.array([ 1, 2, 3, 4, 5 ], { interval: 100 });
   const r1 = await Rx.takeNextValue(s1);

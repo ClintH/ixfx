@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as Rx from '../../rx/index.js';
 import * as Flow from '../../flow/index.js';
-import { isApproximately } from '../../numbers/IsApproximately.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 import * as Iter from '../../iterables/index.js';
 test(`count`, async t => {
   // Test 1: limit
@@ -18,7 +18,7 @@ test(`count`, async t => {
   const r5 = Rx.count({ amount: 5, interval: 200 });
   const r5Time = Flow.Elapsed.once();
   const r5Data = await Rx.toArray(r5);
-  t.true(isApproximately(200 * 5, 0.1, r5Time()), `Elapsed: ${ r5Time() }`);
+  t.true(isApprox(0.1, 200 * 5, r5Time()), `Elapsed: ${ r5Time() }`);
 
 
 })
