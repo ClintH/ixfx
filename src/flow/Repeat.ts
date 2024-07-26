@@ -66,7 +66,7 @@ export type RepeatPredicate = (
  * @template V Return type of repeating function
  * @returns Asynchronous generator of `fn` results.
  */
-export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined>): AsyncIterable<V> {
+export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined> | V): AsyncIterable<V> {
   return typeof countOrPredicate === `number` ? repeatTimesAwaited(countOrPredicate, fn) : repeatWhileAwaited(countOrPredicate, fn);
 }
 
@@ -130,7 +130,7 @@ export function repeat<V>(countOrPredicate: number | RepeatPredicate, fn: (repea
  * @param fn 
  * @template V Return type of repeating function
  */
-async function* repeatWhileAwaited<V>(predicate: RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined>): AsyncGenerator<V> {
+async function* repeatWhileAwaited<V>(predicate: RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined> | V): AsyncGenerator<V> {
   let repeats = 0;
   let valuesProduced = 0;
   while (predicate(repeats, valuesProduced)) {
@@ -182,6 +182,8 @@ async function* repeatTimesAwaited<V>(count: number, fn: (repeats: number, value
 
 /**
  * Calls `fn`, `count` times. Assumes a synchronous function. Yields result of `fn`.
+ * 
+ * Note that if `fn` returns _undefined_ repeats will stop.
  * @template V Return type of repeating function
  * @param count Number of times to run
  * @param fn Function to run
@@ -191,6 +193,7 @@ function* repeatTimes<V>(count: number, fn: (repeats: number, valuesProduced: nu
   let valuesProduced = 0;
   let repeats = 0;
   while (count-- > 0) {
+    //console.log(`Flow.repeatTimes count: ${ count } repeats: ${ repeats } values: ${ valuesProduced }`);
     repeats++;
     const v = fn(repeats, valuesProduced);
     if (v === undefined) continue;
