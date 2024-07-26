@@ -40,6 +40,11 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       const a = Ops.annotate<TIn, TAnnotation>(source, transformer);
       return wrap(a);
     },
+    annotateWithOp: <TOut>(op: ReactiveOp<TIn, TOut>): Wrapped<{ value: TIn, annotation: TOut }> => {
+      const a = Ops.annotateWithOp<TIn, TOut>(source, op);
+      return wrap(a);
+    },
+
     batch: (options: Partial<BatchOptions>): Wrapped<Array<TIn>> => {
       const w = wrap<Array<TIn>>(Ops.batch(source, options));
       return w;
