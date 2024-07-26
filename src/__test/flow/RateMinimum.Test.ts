@@ -1,7 +1,6 @@
 import test from 'ava';
 import { rateMinimum } from '../../flow/RateMinimum.js';
 import { sleep } from '../../flow/Sleep.js';
-import { isApproximately } from '../../numbers/IsApproximately.js';
 
 
 // In this case we don't expect fallback
