@@ -14,7 +14,7 @@ import * as OpFns from './ops/index.js';
 //#endregion
 
 //#region exports
-export * from './Chain.js';
+//export * from './Chain.js';
 export * from './ops/index.js';
 export * from './sinks/index.js';
 export * from './Graph.js';
@@ -29,6 +29,17 @@ export * as Dom from './Dom.js';
 export * as From from './sources/index.js';
 //#endregion
 
+export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: Array<ReactiveOp<any, any>>) {
+  let s = resolveSource(source);
+  for (const op of ops) {
+    // @ts-ignore
+    s = op(s);
+  }
+  return s;
+  //return s as Reactive<T2 | T3 | T4 | T5 | T6>;
+  //const raw = chainer<T1, T2, T3, T4, T5, T6>(...ops);
+  //return raw(source);
+}
 /**
  * Initialises a reactive that pipes values to listeners directly.
  * @returns 
