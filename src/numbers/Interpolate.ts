@@ -1,18 +1,27 @@
 import type { Interval } from '../flow/IntervalType.js';
 import { wrap } from './Wrap.js';
-import { progress } from '../flow/Elapsed.js';
+import { ofTotal } from '../flow/Timer.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
 import { clamp } from '../numbers/Clamp.js';
+import { get as getEasing, type EasingName } from '../modulation/easing/index.js';
 export const piPi = Math.PI * 2;
 
 /**
+ * 
+ * Limit
  * What to do if interpolation amount exceeds 0..1 range
  * * clamp: lock to A & B (inclusive) Default.
  * * wrap: wrap from end to start again
  * * ignore: allow return values outside of A..B range
+ * 
+ * Easing: name of easing function for non-linear interpolation
+ * 
+ * Transform: name of function to transform `amount` prior to interpolate. 
  */
 export type InterpolateOptions = {
   limits: `clamp` | `wrap` | `ignore`
+  easing: EasingName,
+  transform: (v: number) => number
 }
 
 
@@ -70,15 +79,22 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * * 'ignore': allow exceeding values. eg 1.5 will yield b*1.5.
  * * 'clamp': default behaviour of clamping interpolation amount to 0..1
  * 
+ * Interpolation can be non-linear using 'easing' option or 'transform' funciton.
+ * ```js
+ * interpolate(0.1, 0, 100, { easing: `quadIn` });
+ * ```
  * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Points.interpolate}.
  */
 export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
-  let opts: Partial<InterpolateOptions> = {};
+  //let opts: Partial<InterpolateOptions> = {};
+  let amountProcess: undefined | ((v: number) => number);
+  let limits: InterpolateOptions[ 'limits' ] = `clamp`;
 
   const handleAmount = (amount: number) => {
-    if (opts.limits === undefined || opts.limits === `clamp`) {
+    if (amountProcess) amount = amountProcess(amount);
+    if (limits === undefined || limits === `clamp`) {
       amount = clamp(amount);
-    } else if (opts.limits === `wrap`) {
+    } else if (limits === `wrap`) {
       if (amount > 1) amount = amount % 1;
       else if (amount < 0) {
         amount = 1 + (amount % 1);
@@ -87,45 +103,54 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
     return amount;
   }
 
+  const doTheEase = (_amt: number, _a: number, _b: number) => {
+    throwNumberTest(_a, ``, `a`);
+    throwNumberTest(_b, ``, `b`);
+    throwNumberTest(_amt, ``, `amount`);
+    _amt = handleAmount(_amt);
+    return (1 - _amt) * _a + _amt * _b
+  }
+
+
+  const readOpts = (o: Partial<InterpolateOptions> = {}) => {
+    if (o.easing) {
+      const easingFn = getEasing(o.easing);
+      if (!easingFn) throw new Error(`Easing function '${ o.easing }' not found`);
+      amountProcess = easingFn;
+    } else if (o.transform) {
+      if (typeof o.transform !== `function`) throw new Error(`Param 'transform' is expected to be a function. Got: ${ typeof o.transform }`);
+      amountProcess = o.transform;
+    }
+    limits = o.limits ?? `clamp`;
+  }
+
+  const rawEase = (_amt: number, _a: number, _b: number) => (1 - _amt) * _a + _amt * _b
+
   if (typeof pos1 !== `number`) throw new TypeError(`First param is expected to be a number. Got: ${ typeof pos1 }`);
   if (typeof pos2 === `number`) {
-    let amount: number | undefined;
     let a: number;
     let b: number;
     if (pos3 === undefined || typeof pos3 === `object`) {
       //interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
       a = pos1;
       b = pos2;
-      opts = pos3 ?? {};
-
-      throwNumberTest(a, ``, `a`);
-      throwNumberTest(b, ``, `b`);
-      return (amount: number) => {
-        let amt = handleAmount(amount);
-        return (1 - amt) * a + amt * b
-      }
+      readOpts(pos3);
+      return (amount: number) => doTheEase(amount, a, b);
     } else if (typeof pos3 === `number`) {
       //interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
       a = pos2;
       b = pos3;
-      opts = pos4 ?? {};
-      amount = handleAmount(pos1);
-      throwNumberTest(a, ``, `a`);
-      throwNumberTest(b, ``, `b`);
-      throwNumberTest(amount, ``, `amount`);
-      return (1 - amount) * a + amount * b;
+      readOpts(pos4);
+      return doTheEase(pos1, a, b);
     } else {
-      throw new Error(`Values for a and b not defined`);
+      throw new Error(`Values for 'a' and 'b' not defined`);
     }
   } else if (pos2 === undefined || typeof pos2 === `object`) {
     //interpolate(amount: number, options?: Partial<InterpolateOptions>): (a:number,b:number)=>number;
     let amount = handleAmount(pos1);
-    opts = pos2 ?? {};
+    readOpts(pos2);
     throwNumberTest(amount, ``, `amount`);
-
-    return (aValue: number, bValue: number) => {
-      return (1 - amount) * aValue + amount * bValue
-    }
+    return (aValue: number, bValue: number) => rawEase(amount, aValue, bValue);
   }
 };
 
@@ -162,15 +187,16 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
  * @param a Start value. Default: 0
  * @param b End value. Default: 1
  * @param startInterpolationAt Starting interpolation amount. Default: 0
+ * @param options: Options for interpolation
  * @returns 
  */
-export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0) => {
+export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<InterpolateOptions>) => {
   let amount = startInterpolationAt;
   return (retargetB?: number, retargetA?: number) => {
     if (retargetB !== undefined) b = retargetB;
     if (retargetA !== undefined) a = retargetA;
     if (amount >= 1) return b;
-    const value = interpolate(amount, a, b);
+    const value = interpolate(amount, a, b, options);
     amount += incrementAmount;
     return value;
   }
@@ -198,19 +224,20 @@ export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, start
  * const v = interpolatorInterval({secs:10}, 100, 200);
  * v(); // Compute current value
  * ```
- * @param duration
- * @param a 
- * @param b 
+ * @param duration Duration for interpolation
+ * @param a Start point
+ * @param b End point
+ * @param options Options for interpolation
  * @returns 
  */
-export const interpolatorInterval = (duration: Interval, a = 0, b = 1) => {
-  const durationProgression = progress(duration, { clampValue: true });
+export const interpolatorInterval = (duration: Interval, a = 0, b = 1, options?: Partial<InterpolateOptions>) => {
+  const durationProgression = ofTotal(duration, { clampValue: true });
   return (retargetB?: number, retargetA?: number) => {
     const amount = durationProgression();
     if (retargetB !== undefined) b = retargetB;
     if (retargetA !== undefined) a = retargetA;
     if (amount >= 1) return b;
-    const value = interpolate(amount, a, b);
+    const value = interpolate(amount, a, b, options);
     return value;
   }
 }
@@ -223,16 +250,17 @@ export const interpolatorInterval = (duration: Interval, a = 0, b = 1) => {
  * interpolateAngle(0.5, Math.PI, Math.PI/2);
  * ```
  * @param amount
- * @param aRadians
- * @param bRadians
+ * @param aRadians Start angle (radian)
+ * @param bRadians End angle (radian)
  * @returns
  */
 export const interpolateAngle = (
   amount: number,
   aRadians: number,
-  bRadians: number
+  bRadians: number,
+  options?: Partial<InterpolateOptions>
 ): number => {
   const t = wrap(bRadians - aRadians, 0, piPi);
-  return interpolate(amount, aRadians, aRadians + (t > Math.PI ? t - piPi : t));
+  return interpolate(amount, aRadians, aRadians + (t > Math.PI ? t - piPi : t), options);
 };
 
