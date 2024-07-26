@@ -10,7 +10,6 @@ import type { DrawingHelper } from "src/visual/Drawing.js";
 import { Colour, Drawing } from "src/visual/index.js";
 import { Pathed } from "src/data/index.js";
 
-console.log(`PlotElement`);
 /**
  * Attributes
  * * streaming: true/false (default: true)
@@ -401,7 +400,3 @@ export class PlotSeries {
     this.maxSeen = Number.MIN_SAFE_INTEGER;
   }
 }
-
-try {
-  customElements.define(`plot-element`, PlotElement);
-} catch {}
