@@ -1,26 +1,13 @@
-import * as Easings from './easing/index.js';
-import * as Envelopes from './envelope/index.js';
-import * as Forces from './Forces.js';
-import * as Oscillators from './Oscillator.js';
-export * from './PingPong.js';
-export * from './Waveforms.js';
-export * as Sources from './source/index.js';
-export * from './Spring.js';
-
-export type * from './Types.js';
-
 /**
  * Easings module
  *
  * [See the guide](https://clinth.github.io/ixfx-docs/modulation/easing/)
  *
  * Overview:
+ * * {@link Easings.create}: Create an easing with provided settings
  * * {@link Easings.time}: Ease by time
- * * {@link Easings.tick}: Ease by tick
+ * * {@link Easings.ticks}: Ease by tick
  * * {@link Easings.get}: Get an easing function by name
- * * {@link Easings.crossfade}: Mix two synchronised easing functions (a slight shortcut over `mix`)
- * * {@link Easings.mix}: Mix two easing functions
- * * {@link Easings.gaussian}: Gaussian distribution (rough bell curve)
  *
  * @example Importing
  * ```js
@@ -33,12 +20,12 @@ export type * from './Types.js';
  * Easings.time(...);
  * ```
  */
-
-
-/**
- * Envelopes
- */
+export * as Easings from './easing/index.js';
 export * as Envelopes from './envelope/index.js';
+export * as Sources from './source/index.js';
+
+export * from './CubicBezier.js'
+export * from './Drift.js';
 
 /**
  * Forces module can help to compute basic physical forces like gravity, friction, springs etc.
@@ -55,8 +42,12 @@ export * as Envelopes from './envelope/index.js';
  * ```
  *
  */
-
-
+export * as Forces from './Forces.js';
+export * from './Gaussian.js';
+export * from './Jitter.js';
+export * from './Mix.js';
+export * from './ModulatorTimed.js';
+export * from './Noop.js';
 /**
  * Oscillators module has waveshapes for producing values with a specified frequency.
  *
@@ -89,21 +80,12 @@ export * as Envelopes from './envelope/index.js';
  * ```
  *
  */
-
-
-try {
-  if (typeof window !== `undefined`) {
-    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
-    (window as any).ixfx = {
-      ...(window as any).ixfx,
-      Modulation: { Forces, Envelopes, Oscillators, Easings },
-    };
-  }
-} catch {
-  /* no-op */
-}
-
-export { type Jitterer, type JitterOpts, jitter, jitterAbsolute } from './Jitter.js';
-export * as Easings from './easing/index.js';
-export * as Forces from './Forces.js';
-export * as Oscillators from './Oscillator.js';
+import * as Oscillators from './Oscillator.js';
+export * from './PingPong.js';
+export * from './Spring.js';
+export type * from './Types.js';
+//import * as Easings from './easing/index.js';
+//import * as Envelopes from './envelope/index.js';
+//import * as Forces from './Forces.js';
+export * from './Waveforms.js';
+export * from './WeightedAverage.js';

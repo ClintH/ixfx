@@ -1,37 +1,25 @@
-import * as Timer from '../../flow/Timer.js';
-import type { HasCompletion } from '../../flow/Types.js';
 import * as Named from './EasingsNamed.js';
 import { throwStringTest } from '../../util/GuardString.js';
-import { intervalToMs, type Interval } from '../../flow/IntervalType.js';
-import type { EaseValue } from './Types.js';
-
-export type * from './Types.js';
-export * from './Factories.js';
+import { type Interval } from '../../flow/IntervalType.js';
+import type { Modulate, ModulatorTimed } from '../Types.js';
+export type { Modulate } from '../Types.js';
 export * as Named from './EasingsNamed.js';
+import * as ModTimed from '../ModulatorTimed.js';
 
 /**
  * Easing name
  */
 export type EasingName = keyof typeof Named;
 
-
-/**
- * A 'no-op' function. Returns the input value without modification.
- * Useful for when some default is needed
- * @param v 
- * @returns 
- */
-export const noop: EaseValue = (v: number) => v;
-
-export type Options = (EasingTickOptions | EasingTimeOptions) & {
+export type Options = (TickOptions | TimeOptions) & {
   name?: EasingName
-  fn?: EaseValue
+  fn?: Modulate
 }
 
-export type EasingTimeOptions = {
+export type TimeOptions = {
   duration: Interval
 }
-export type EasingTickOptions = {
+export type TickOptions = {
   ticks: number
 }
 
@@ -82,6 +70,8 @@ export const create = (options: Options): () => number => {
  * t.reset();   // Reset to 0
  * t.isDone;    // _True_ if finished
  * ```
+ * 
+ * Thisi function is just a wrapper around Modulator.timedModulator.
  * @param nameOrFunction Name of easing, or an easing function
  * @param duration Duration
  * @returns Easing
@@ -89,18 +79,19 @@ export const create = (options: Options): () => number => {
 export const timeEasing = (
   nameOrFunction: EasingName | ((v: number) => number),
   duration: Interval
-): Easer => {
+): ModulatorTimed => {
   const fn = resolveEasingName(nameOrFunction);
-  const timer = Timer.elapsedMillisecondsAbsolute();
-  const durationMs = intervalToMs(duration);
-  if (durationMs === undefined) throw new Error(`Param 'duration' not provided`);
-  const relativeTimer = Timer.relative(
-    durationMs,
-    {
-      timer,
-      clampValue: true
-    });
-  return Timer.timerWithFunction(fn, relativeTimer);
+  return ModTimed.timeModulator(fn, duration);
+  // const timer = Timer.elapsedMillisecondsAbsolute();
+  // const durationMs = intervalToMs(duration);
+  // if (durationMs === undefined) throw new Error(`Param 'duration' not provided`);
+  // const relativeTimer = Timer.relative(
+  //   durationMs,
+  //   {
+  //     timer,
+  //     clampValue: true
+  //   });
+  // return Timer.timerWithFunction(fn, relativeTimer);
 };
 
 /**
@@ -116,6 +107,8 @@ export const timeEasing = (
  * // Keep calling e() to get the current value
  * e();
  * ```
+ * 
+ * This function is just a wrapper around Modulate.time
  * @param nameOrFunction Easing name or a function that produces 0..1 scale
  * @param duration Duration
  * @returns 
@@ -125,11 +118,12 @@ export const time = (
   duration: Interval
 ): () => number => {
   const fn = resolveEasingName(nameOrFunction);
-  let relative: undefined | (() => number);
-  return () => {
-    if (relative === undefined) relative = Timer.ofTotal(duration, { clampValue: true });
-    return fn(relative());
-  }
+  return ModTimed.time(fn, duration);
+  // let relative: undefined | (() => number);
+  // return () => {
+  //   if (relative === undefined) relative = Timer.ofTotal(duration, { clampValue: true });
+  //   return fn(relative());
+  // }
 }
 
 
@@ -146,6 +140,8 @@ export const time = (
  * // Keep calling e() to get the current value
  * e();
  * ```
+ * 
+ * This is just a wrapper around Modulator.ticks
  * @param nameOrFunction Easing name or a function that produces 0..1 scale
  * @param totalTicks Total length of ticks
  * @returns 
@@ -155,11 +151,12 @@ export const ticks = (
   totalTicks: number
 ): () => number => {
   const fn = resolveEasingName(nameOrFunction);
-  let relative: undefined | (() => number);
-  return () => {
-    if (relative === undefined) relative = Timer.ofTotalTicks(totalTicks, { clampValue: true });
-    return fn(relative());
-  }
+  return ModTimed.ticks(fn, totalTicks);
+  // let relative: undefined | (() => number);
+  // return () => {
+  //   if (relative === undefined) relative = Timer.ofTotalTicks(totalTicks, { clampValue: true });
+  //   return fn(relative());
+  // }
 }
 /**
  * Creates an easing based on ticks. 
@@ -182,19 +179,20 @@ export const ticks = (
 export const tickEasing = (
   nameOrFunction: EasingName | ((v: number) => number),
   durationTicks: number
-): Easer => {
+): ModulatorTimed => {
   const fn = resolveEasingName(nameOrFunction);
-  const timer = Timer.elapsedTicksAbsolute();
-  const relativeTimer = Timer.relative(
-    durationTicks,
-    {
-      timer,
-      clampValue: true
-    });
-  return Timer.timerWithFunction(fn, relativeTimer);
+  return ModTimed.tickModulator(fn, durationTicks);
+  // const timer = Timer.elapsedTicksAbsolute();
+  // const relativeTimer = Timer.relative(
+  //   durationTicks,
+  //   {
+  //     timer,
+  //     clampValue: true
+  //   });
+  // return Timer.timerWithFunction(fn, relativeTimer);
 };
 
-const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number)): EaseValue => {
+const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number)): Modulate => {
   const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
   if (fn === undefined) {
     const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: '${ nameOrFunction }'`) : new Error(`Easing function not found`);
@@ -202,33 +200,7 @@ const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number))
   }
   return fn;
 }
-/**
- * 'Ease' from `0` to `1` over a delicious curve. Commonly used for animation
- * and basic modelling of physical motion.
- *
- * Create via {@link tickEasing} or {@link timeEasing}, call `compute` to calculate the next
- * value in the progression, until you reach `1` or `isDone` returns true.
- *
- */
-export type Easer = HasCompletion & {
-  /**
-   * Computes the current value of the easing
-   *
-   * @returns {number}
-   */
-  compute(): number;
 
-  /**
-   * Reset the easing
-   */
-  reset(): void;
-  /**
-   * Returns true if the easing is complete
-   *
-   * @returns {boolean}
-   */
-  get isDone(): boolean;
-};
 
 /**
  * Creates a new easing by name
@@ -303,7 +275,7 @@ let easingsMap: Map<string, ((v: number) => number)> | undefined;
  * @param easingName eg `sineIn`
  * @returns Easing function
  */
-export const get = function (easingName: EasingName): EaseValue {
+export const get = function (easingName: EasingName): Modulate {
   throwStringTest(easingName, `non-empty`, `easingName`);
 
   const found = cacheEasings().get(easingName.toLowerCase());
