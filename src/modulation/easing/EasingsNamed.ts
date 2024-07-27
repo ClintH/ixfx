@@ -1,4 +1,4 @@
-import { gaussian } from "./Factories.js";
+import { gaussian } from "../Gaussian.js";
 // Easings from https://easings.net/
 
 const sqrt = Math.sqrt;
