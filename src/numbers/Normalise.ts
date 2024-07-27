@@ -23,7 +23,7 @@ import { minMaxAvg } from './MinMaxAvg.js';
  * be that value normalised to 1 at one time is different to what normalises to 1
  * at a later time.
  *
- * If you already know what to expect of the number range, passingin `minDefault`
+ * If you already know what to expect of the number range, passing in `minDefault`
  * and `maxDefault` primes the normalisation.
  * ```js
  * const s = Normalise.stream();
@@ -34,15 +34,13 @@ import { minMaxAvg } from './MinMaxAvg.js';
  * s(5); // 0.5, because we're expecting range 0-10
  * ```
  *
- * Note that if a value exceeds the default range, normalisation adjusts.
+ * If a value exceeds the default range, normalisation adjusts.
  * Errors are thrown if min/max defaults are NaN or if one attempts to
  * normalise NaN.
  * @returns
  */
 export const stream = (minDefault?: number, maxDefault?: number) => {
-  //eslint-disable-next-line functional/no-let
   let min = minDefault ?? Number.MAX_SAFE_INTEGER;
-  //eslint-disable-next-line functional/no-let
   let max = maxDefault ?? Number.MIN_SAFE_INTEGER;
 
   throwNumberTest(minDefault);
