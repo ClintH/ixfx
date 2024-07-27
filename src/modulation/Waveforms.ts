@@ -1,8 +1,6 @@
-import { ticks } from "./source/Ticks.js";
 import { throwIntegerTest } from "../util/GuardNumbers.js";
-import type { ModSettable, ModSettableFeedback, ModSettableOptions } from "./Types.js";
+import type { ModSettable, ModSettableFeedback, ModSettableOptions, Modulate } from "./Types.js";
 import * as Sources from './source/index.js';
-export type WaveformShaper = (position: number) => number;
 
 export type Waveforms = `sine` | `sine-bipolar` | `saw` | `triangle` | `square` | `arc`;
 /**
@@ -53,7 +51,7 @@ export type WaveOptions = ModSettableOptions & {
  * @param period 
  * @returns 
  */
-export function triangleShaper(period = 1): WaveformShaper {
+export function triangleShape(period = 1): Modulate {
   period = 1 / period;
   const halfPeriod = period / 2;
   return (t: number) => {
@@ -71,7 +69,7 @@ export function triangleShaper(period = 1): WaveformShaper {
  * @param period 
  * @returns 
  */
-export function squareShaper(period = 1): WaveformShaper {
+export function squareShape(period = 1): Modulate {
   period = 1 / period;
   const halfPeriod = period / 2;
   return (t: number) => {
@@ -103,7 +101,7 @@ export function squareShaper(period = 1): WaveformShaper {
  * @param period 
  * @returns 
  */
-export function sineShape(period = 1): WaveformShaper {
+export function sineShape(period = 1): Modulate {
   period = period * (Math.PI * 2);
   return (t: number) => {
     const v = (Math.sin(t * period) + 1) / 2;
@@ -117,12 +115,12 @@ export function sineShape(period = 1): WaveformShaper {
  * @param period 
  * @returns 
  */
-export function arcShape(period = 1): WaveformShaper {
+export function arcShape(period = 1): Modulate {
   period = period * (Math.PI * 2);
   return (t: number) => Math.abs(Math.sin(t * period));
 }
 
-export function sineBipolarShape(period = 1): WaveformShaper {
+export function sineBipolarShape(period = 1): Modulate {
   period = period * (Math.PI * 2);
   return (t: number) => Math.sin(t * period);
 }
@@ -177,10 +175,10 @@ export function wave(options: Partial<WaveOptions>) {
       shaperFn = sineBipolarShape(period);
       break;
     case `square`:
-      shaperFn = squareShaper(period);
+      shaperFn = squareShape(period);
       break;
     case `triangle`:
-      shaperFn = triangleShaper(period);
+      shaperFn = triangleShape(period);
       break;
     case `arc`:
       shaperFn = arcShape(period);
@@ -207,7 +205,7 @@ export type WaveShaperFeedback = {
  * @param shaperFn 
  * @returns 
  */
-export function waveFromSource(sourceFn: ModSettable, shaperFn: WaveformShaper, invert = false) {
+export function waveFromSource(sourceFn: ModSettable, shaperFn: Modulate, invert = false) {
   return (feedback?: Partial<WaveShaperFeedback>) => {
     let v = sourceFn(feedback?.clock);
     if (feedback?.override) v = feedback.override;
