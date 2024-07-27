@@ -56,7 +56,6 @@ export class PlotElement extends LitElement {
   #drawing: DrawingHelper | undefined;
 
   #legendColour: string = ``;
-  //#backgroundColour: string = ``
   canvasEl: Ref<HTMLCanvasElement> = createRef();
 
   constructor() {
@@ -376,6 +375,12 @@ export class PlotSeries {
     this.data = [];
     this.resetScale();
   }
+
+  /**
+   * Returns a copy of the data scaled by the current
+   * range of the data
+   * @returns 
+   */
   getScaled() {
     const r = this.maxSeen - this.minSeen;
     const s = Numbers.scaler(this.minSeen, this.maxSeen);
