@@ -368,21 +368,13 @@ export * as Events from './Events.js';
 /**
  * The Modulation module contains functions for, well, modulating data.
  *
- * Sub-modules:
- * * {@link Easings}: Ease from `0` to `1` over a specified duration.
- * * {@link Oscillators}: Waveforms
- * * {@link Forces}: Forces such as bouncing, gravity, attraction/repulsion, springs
- *
- * Functions:
- * * {@link jitter}: Jitter a value
- *
  * @example Importing
  * ```
  * // If library is stored two directories up under `ixfx/`
- * import { adsr } from '../../ixfx/dist/modulation.js';
+ * import * as Modulation from '../../ixfx/dist/modulation.js';
  *
  * // Import from web
- * import { adsr } from 'https://unpkg.com/ixfx/dist/modulation.js'
+ * import * as Modulation from 'https://unpkg.com/ixfx/dist/modulation.js'
  * ```
  *
  */
