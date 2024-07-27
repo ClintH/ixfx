@@ -4,8 +4,11 @@ import * as Data from '../../../dist/data.js';
 
 import { count } from '../../../dist/numbers.js'
 import {Plot2} from '../../../dist/visual.js';
-import {interpolate, Process} from '../../../dist/data.js';
+import {interpolate} from '../../../dist/numbers.js';
 import * as Mod from '../../../dist/modulation.js';
+
+const names = [...Mod.Easings.getEasingNames()];
+console.log(names);
 
 // const tt = Mod.Sources.ticks(10);
 // while (true) {

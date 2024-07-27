@@ -56,6 +56,8 @@ export class PlotElement extends LitElement {
   #drawing: DrawingHelper | undefined;
 
   #legendColour: string = ``;
+  #hue = 0;
+
   canvasEl: Ref<HTMLCanvasElement> = createRef();
 
   constructor() {
@@ -155,7 +157,7 @@ export class PlotElement extends LitElement {
   plot(value: number, seriesName: string = ``) {
     let s = this.#series.get(seriesName.toLowerCase());
     if (s === undefined) {
-      s = new PlotSeries(seriesName, this);
+      s = new PlotSeries(seriesName, this.colourGenerator(seriesName), this);
       this.#series.set(seriesName.toLowerCase(), s);
     }
     s.push(value);
@@ -167,6 +169,12 @@ export class PlotElement extends LitElement {
     for (const p of Pathed.getPathsAndData(value, true)) {
       this.plot(p.value, p.path);
     }
+  }
+
+  colourGenerator(series: string): Colour.Colourish {
+    const c = Colour.fromHsl(this.#hue, 0.9, 0.4);
+    this.#hue = Numbers.wrap(this.#hue + 0.1);
+    return c;
   }
 
   draw() {
@@ -360,15 +368,10 @@ export class PlotElement extends LitElement {
 
 export class PlotSeries {
   data: number[] = [];
-  colour: Colourish;
   minSeen = Number.MAX_SAFE_INTEGER;
   maxSeen = Number.MIN_SAFE_INTEGER;
 
-  static hue = 0;
-
-  constructor(public name: string, private plot: PlotElement) {
-    this.colour = Colour.fromHsl(PlotSeries.hue, 0.9, 0.4);
-    PlotSeries.hue = Numbers.wrap(PlotSeries.hue + 0.1);
+  constructor(public name: string, public colour: Colourish, private plot: PlotElement) {
   }
 
   clear() {

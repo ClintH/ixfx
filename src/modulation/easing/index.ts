@@ -2,7 +2,6 @@ import * as Named from './EasingsNamed.js';
 import { throwStringTest } from '../../util/GuardString.js';
 import { type Interval } from '../../flow/IntervalType.js';
 import type { Modulate, ModulatorTimed } from '../Types.js';
-export type { Modulate } from '../Types.js';
 export * as Named from './EasingsNamed.js';
 import * as ModTimed from '../ModulatorTimed.js';
 
@@ -26,6 +25,7 @@ export type TickOptions = {
 /**
  * Creates an easing function
  * ```js
+ * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const e = Easings.create({ duration: 1000, name: `quadIn` });
  * const e = Easings.create({ ticks: 100, name: `sineOut` });
  * const e = Easings.create({ 
@@ -101,6 +101,7 @@ export const timeEasing = (
  * If you need to check if an easing is done or reset it, consider {@link timeEasing}.
  * 
  * ```js
+ * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * // Quad-in easing over one second
  * const e = Easings.time(`quadIn`, 1000);
  * 
@@ -134,6 +135,7 @@ export const time = (
  * If you need to check if an easing is done or reset it, consider {@link tickEasing}.
  * 
  * ```js
+ * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * // Quad-in easing over 100 ticks
  * const e = Easings.ticks(`quadIn`, 100);
  * 
@@ -268,6 +270,7 @@ let easingsMap: Map<string, ((v: number) => number)> | undefined;
  * easing is not found.
  *
  * ```js
+ * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const fn = Easings.get(`sineIn`);
  * // Returns 'eased' transformation of 0.5
  * fn(0.5);
@@ -301,5 +304,5 @@ function cacheEasings() {
  */
 export function* getEasingNames(): Iterable<string> {
   const map = cacheEasings();
-  yield* Object.keys(map.values);
+  yield* map.keys();
 };

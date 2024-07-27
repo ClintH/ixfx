@@ -57,7 +57,6 @@ export * from './Noop.js';
  * * {@link Oscillators.sineBipolar}: Sine wave with range of -1 to 1
  * * {@link Oscillators.square}: Square wave
  * * {@link Oscillators.triangle}: Triangle wave
- * * {@link Oscillators.spring}: Spring oscillator
  *
  * @example On-demand sampling
  * ```js
@@ -80,7 +79,7 @@ export * from './Noop.js';
  * ```
  *
  */
-import * as Oscillators from './Oscillator.js';
+export * as Oscillators from './Oscillator.js';
 export * from './PingPong.js';
 export * from './Spring.js';
 export type * from './Types.js';
