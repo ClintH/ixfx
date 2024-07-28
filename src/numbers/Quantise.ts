@@ -10,10 +10,16 @@ import { throwIntegerTest, throwNumberTest } from "../util/GuardNumbers.js";
  * quantiseEvery(4, 10);   // 0
  * quantiseEvery(100, 10); // 100
  * ```
+ * 
+ * Also works with decimals
+ * ```js
+ * quantiseEvery(1.123, 0.1); // 1.1
+ * quantiseEvery(1.21, 0.1);  // 1.2
+ * ```
  *
- * @param v
- * @param every
- * @param middleRoundsUp
+ * @param v Value to quantise
+ * @param every Number to quantise to
+ * @param middleRoundsUp If _true_ (default), the exact middle rounds up to next step.
  * @returns
  */
 export const quantiseEvery = (
@@ -21,14 +27,23 @@ export const quantiseEvery = (
   every: number,
   middleRoundsUp = true
 ) => {
-  // Unit tested!
+
+  const everyStr = every.toString();
+  const decimal = everyStr.indexOf(`.`);
+  let multiplier = 1;
+  if (decimal >= 0) {
+    let d = everyStr.substring(decimal + 1).length;
+    multiplier = 10 * d;
+    every = Math.floor(multiplier * every);
+    v = v * multiplier;
+  }
   throwNumberTest(v, ``, `v`);
   throwIntegerTest(every, ``, `every`);
 
-  //eslint-disable-next-line functional/no-let
   let div = v / every;
   const divModule = div % 1;
   div = Math.floor(div);
   if ((divModule === 0.5 && middleRoundsUp) || divModule > 0.5) div++;
-  return every * div;
+  const vv = (every * div) / multiplier;
+  return vv;
 };

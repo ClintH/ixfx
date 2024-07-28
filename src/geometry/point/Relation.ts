@@ -1,4 +1,4 @@
-import { angle } from "./Angle.js";
+import { angleRadian } from "./Angle.js";
 import { centroid } from "./Centroid.js";
 import { distance } from "./Distance.js";
 import { getPointParameter } from "./GetPointParameter.js";
@@ -68,7 +68,7 @@ export const relation = (a: Point | number, b?: number): PointRelation => {
     lastPoint = p;
 
     return Object.freeze({
-      angle: angle(p, start),
+      angle: angleRadian(p, start),
       distanceFromStart,
       distanceFromLast,
       speed,

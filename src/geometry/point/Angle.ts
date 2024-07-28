@@ -15,7 +15,7 @@ import type { Point } from "./PointType.js";
  * @param c
  * @returns
  */
-export const angle = (a: Point, b?: Point, c?: Point) => {
+export const angleRadian = (a: Point, b?: Point, c?: Point) => {
   guard(a, `a`);
 
   if (b === undefined) {

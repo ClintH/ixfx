@@ -168,9 +168,9 @@ export const lengths = (t: Triangle): ReadonlyArray<number> => {
 export const angles = (t: Triangle): ReadonlyArray<number> => {
   guard(t);
   return [
-    Points.angle(t.a, t.b),
-    Points.angle(t.b, t.c),
-    Points.angle(t.c, t.a),
+    Points.angleRadian(t.a, t.b),
+    Points.angleRadian(t.b, t.c),
+    Points.angleRadian(t.c, t.a),
   ];
 };
 

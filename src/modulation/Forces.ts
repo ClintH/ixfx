@@ -597,7 +597,7 @@ export const angleFromAccelerationForce =
 export const angleFromVelocityForce =
   (interpolateAmt = 1) =>
     (t: ForceAffected) => {
-      const a = Points.angle(t.velocity ?? Points.Empty);
+      const a = Points.angleRadian(t.velocity ?? Points.Empty);
       return Object.freeze({
         ...t,
         angle:
@@ -728,7 +728,7 @@ export const pendulumForce =
       if (angle === undefined) {
         // eslint-disable-next-line unicorn/prefer-ternary
         if (t.position) {
-          angle = Points.angle(pinnedAt, t.position) - Math.PI / 2;
+          angle = Points.angleRadian(pinnedAt, t.position) - Math.PI / 2;
         } else {
           angle = 0; // Position wherever
         }

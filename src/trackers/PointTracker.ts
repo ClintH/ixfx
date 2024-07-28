@@ -191,7 +191,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   angleFromStart(): number | undefined {
     const initial = this.initial;
     if (initial !== undefined && this.values.length > 2) {
-      return Points.angle(initial, this.last);
+      return Points.angleRadian(initial, this.last);
     }
   }
 
