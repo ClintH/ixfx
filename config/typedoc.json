@@ -9,5 +9,9 @@
   "cleanOutputDir": true,
   "excludePrivate": true,
   "excludeInternal": true,
-  "exclude": "**/*+(.test).ts"
+  "exclude": "**/*+(.test).ts",
+  "validation": {
+    "invalidLink": true,
+    "notExported": true
+  }
 }
