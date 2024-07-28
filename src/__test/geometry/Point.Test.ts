@@ -141,9 +141,9 @@ test(`length`, t => {
 
 test(`angle`, t => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
-  closeTo(t, Points.angle({ x: 0, y: 10 }), 1.5708); // 90 degrees
-  closeTo(t, Points.angle({ x: 10, y: 0 }), 0); // 0 degrees
-  closeTo(t, Points.angle({ x: 2, y: 5 }), 1.190290375284613456); // 68 degrees
+  closeTo(t, Points.angleRadian({ x: 0, y: 10 }), 1.5708); // 90 degrees
+  closeTo(t, Points.angleRadian({ x: 10, y: 0 }), 0); // 0 degrees
+  closeTo(t, Points.angleRadian({ x: 2, y: 5 }), 1.190290375284613456); // 68 degrees
   t.pass();
 });
 
@@ -185,6 +185,16 @@ test(`multiply`, t => {
   t.throws(() => Points.multiply({ x: 10, y: 5 }, NaN, 2));
   t.throws(() => Points.multiply({ x: 10, y: 5 }, 2, NaN));
   t.pass();
+});
+
+test(`quantise`, t => {
+  t.deepEqual(Points.quantiseEvery({ x: 0, y: 0.1 }, { x: 0.1, y: 0.1 }), { x: 0, y: 0.1 });
+  t.deepEqual(Points.quantiseEvery({ x: 0, y: 0.123 }, { x: 0.1, y: 0.1 }), { x: 0, y: 0.1 });
+  t.deepEqual(Points.quantiseEvery({ x: 0.1, y: 0.18 }, { x: 0.1, y: 0.1 }), { x: 0.1, y: 0.2 });
+
+  t.deepEqual(Points.quantiseEvery({ x: 0.5, y: 0.123 }, { x: 0.5, y: 0.1 }), { x: 0.5, y: 0.1 });
+  t.deepEqual(Points.quantiseEvery({ x: 0.9, y: 0.123 }, { x: 0.5, y: 0.1 }), { x: 1, y: 0.1 });
+
 });
 
 test(`sum`, t => {

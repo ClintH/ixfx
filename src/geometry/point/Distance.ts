@@ -8,7 +8,7 @@ export function distance(a: Point, x: number, y: number): number;
 /**
  * Calculate distance between two points.
  *
- * ```js`
+ * ```js
  * // Distance between two points
  * const ptA = { x: 0.5, y:0.8 };
  * const ptB = { x: 1, y: 0.4 };
@@ -20,7 +20,7 @@ export function distance(a: Point, x: number, y: number): number;
  * const ptC = { x: 0.5, y:0.5, z: 0.3 };
  * // With x,y,z as parameters:
  * distance(ptC, 0.5, 0.8, 0.1);
- * ``
+ * ```
  * @param a First point
  * @param xOrB Second point, or x coord
  * @param y y coord, if x coord is given

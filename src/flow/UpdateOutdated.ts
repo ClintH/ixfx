@@ -32,7 +32,7 @@ export type UpdateFailPolicy = `fast` | `slow` | `backoff`;
  * @param fn Async function to call. Must return a value.
  * @param interval Maximum age of cached result
  * @param updateFail `slow` by default
- * @template V Type of return value
+ * @typeParam V - Return type of `fn`
  * @returns Value
  */
 export const updateOutdated = <V>(

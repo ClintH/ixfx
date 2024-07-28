@@ -55,7 +55,7 @@ export type DelayOpts = Interval & {
  * If you want to be able to cancel or re-run a delayed function, consider using
  * {@link timeout} instead.
  *
- * @template V
+ * @typeParam V - Type of callback return value
  * @param callback What to run after interval
  * @param optsOrMillis Options for delay, or millisecond delay. By default delay is before `callback` is executed.
  * @return Returns result of `callback`.
@@ -197,15 +197,21 @@ async function* delayAnimationLoop() {
 
 /**
  * Async generator that loops at a given interval.
- * Alternatives:
- * * {@link delay} to run a single function after a delay
- * * {@link sleep} pause execution
- * * {@link interval} iterate over an iterable with a given delay
- * * {@link continuously} to start/stop/adjust a constantly running loop
- *
- * @example Loop runs every second
+ * 
+ * @example 
+ * For Await loop every second
+ * ```js
+ * const loop = delayLoop(1000);
+ * // Or: const loop = delayLoop({ secs: 1 });
+ * for await (const o of loop) {
+ *  // Do something...
+ *  // Warning: loops forever
+ * }
  * ```
- * // Loop forever
+ * 
+ * @example 
+ * Loop runs every second
+ * ```js
  * (async () => {
  *  const loop = delayLoop(1000);
  *  // or: loop = delayLoop({ secs: 1 });
@@ -217,19 +223,15 @@ async function* delayAnimationLoop() {
  *  }
  * })();
  * ```
+ * 
+ * Alternatives:
+ * * {@link delay} to run a single function after a delay
+ * * {@link sleep} pause execution
+ * * {@link interval} iterate over an iterable with a given delay
+ * * {@link continuously} to start/stop/adjust a constantly running loop
  *
- * @example For Await loop every second
- * ```
- * const loop = delayLoop(1000);
- * // Or: const loop = delayLoop({ secs: 1 });
- * for await (const o of loop) {
- *  // Do something...
- *  // Warning: loops forever
- * }
- * ```
  * @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
  */
-//eslint-disable-next-line func-style
 export async function* delayLoop(timeout: Interval) {
   const timeoutMs = intervalToMs(timeout);
   if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);

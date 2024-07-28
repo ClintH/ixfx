@@ -1,5 +1,5 @@
 import test from "ava";
-import { QueueMutable } from "../../../collections/index.js";
+import { QueueMutable } from "../../../collections/queue/QueueMutable.js";
 import { asResponsive } from "../../../collections/queue/Responsive.js";
 import { SyncWait } from "../../../flow/SyncWait.js";
 

@@ -333,6 +333,7 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): ReadonlyArray<V> =>
 
 
 /**
+ * import { Maps } from 'https://unpkg.com/ixfx/dist/data.js';
  * Returns a Map from an iterable. By default throws an exception
  * if iterable contains duplicate values.
  *
@@ -371,6 +372,7 @@ export const fromIterable = <V>(
  * Assumes the top-level properties of the object is the key.
  *
  * ```js
+ * import { Maps } from 'https://unpkg.com/ixfx/dist/data.js';
  * const data = {
  *  Sally: { name: `Sally`, colour: `red` },
  *  Bob: { name: `Bob`, colour: `pink` }
@@ -400,9 +402,10 @@ export const fromObject = <V>(data: any): ReadonlyMap<string, V> => {
  * each top-level property is a key:
  *
  * ```js
+ * import { Maps } from 'https://unpkg.com/ixfx/dist/data.js';
  * const data = {
- *  Sally: { name: `Sally`, colour: `red` },
- *  Bob: { name: `Bob`, colour: `pink` }
+ *  Sally: { colour: `red` },
+ *  Bob:   { colour: `pink` }
  * };
  * const map = new Map();
  * Maps.addObject(map, data);

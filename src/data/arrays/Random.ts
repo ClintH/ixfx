@@ -46,7 +46,7 @@ export const randomIndex = <V>(
  * // value: 20, data: [100, 40];
  * ```
  *
- * @template V Type of array
+ * @typeParam V - Type of items in array
  * @param array Array to pluck item from
  * @param mutate If _true_, changes input array. _False_ by default.
  * @param rand Random generatr. `Math.random` by default.
@@ -140,7 +140,7 @@ export const randomElementWeightedSource = <V>(array: ArrayLike<V>, weightings: 
  * @param dataToShuffle
  * @param rand Random generator. `Math.random` by default.
  * @returns Copy with items moved around randomly
- * @template V Type of array items
+ * @typeParam V - Type of array items
  */
 export const shuffle = <V>(
   dataToShuffle: ReadonlyArray<V>,

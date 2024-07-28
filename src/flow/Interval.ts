@@ -48,8 +48,9 @@ export type IntervalOpts = Readonly<{
  * `produce` can be a simple function that returns a value, an async function, or a generator.
  * If `produce` returns _undefined_, generator exits.
  * 
- * @example Produce a random number every 500ms
- * ```
+ * @example
+ * Produce a random number every 500ms
+ * ```js
  * const randomGenerator = interval(() => Math.random(), 500);
  * for await (const r of randomGenerator) {
  *  // Random value every 1 second
@@ -57,7 +58,8 @@ export type IntervalOpts = Readonly<{
  * }
  * ```
  *
- * @example Return values from a generator every 500ms
+ * @example
+ * Return values from a generator every 500ms
  * ```js
  * import { interval } from 'https://unpkg.com/ixfx/dist/flow.js'
  * import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
@@ -70,15 +72,13 @@ export type IntervalOpts = Readonly<{
  *
  * If the AbortSignal is triggered, an exception will be thrown, stopping iteration.
  * 
- * Alternatives:
- * * {@link continuously}: loop that runs at a constant speed. Able to be started and stopped
- * * {@link repeat}: run a function a certain number of times, collecting results
+ * @see {@link continuously}: loop that runs at a constant speed. Able to be started and stopped
+ * @see {@link repeat}: run a function a certain number of times, collecting results
  *
- * @template V Returns value of `produce` function
  * @param produce Function/generator to use
  * @param optsOrFixedMs Options for interval, or millisecond delay
- * @template V Data type
- * @returns
+ * @typeParam V - Data type
+ * @returns Returns value of `produce` function
  */
 export const interval = async function* <V extends ValueType>(
   produce: ResolveToValue<V> | ArrayLike<V>,

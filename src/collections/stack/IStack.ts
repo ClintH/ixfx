@@ -24,7 +24,7 @@
  *
  * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
  * @class Stack
- * @template V
+ * @typeParam V - Type of stored items
  */
 export interface IStack<V> {
   /**

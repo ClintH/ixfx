@@ -93,7 +93,7 @@ export const trimQueue = <V>(
 /**
  * Adds to the back of the queue (last array index)
  * Last item of `toAdd` will potentially be the new end of the queue (depending on capacity limit and overflow policy)
- * @template V
+ * @typeParam V - Type of values
  * @param {QueueOpts} opts
  * @param {V[]} queue
  * @param {...V[]} toAdd
@@ -139,7 +139,7 @@ export const dequeue = <V>(
 /**
  * Returns front of queue (oldest item), or undefined if queue is empty
  *
- * @template V
+ * @typeParam V - Type of values stored
  * @param {QueueOpts} opts
  * @param {V[]} queue
  * @returns {(V | undefined)}

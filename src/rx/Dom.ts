@@ -6,7 +6,7 @@ import { hasLast, messageHasValue, messageIsSignal } from "./Util.js";
 import { getFromKeys } from "../data/maps/MapFns.js";
 import { afterMatch, beforeMatch } from "../Text.js";
 import { stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "../text/Segments.js";
-import { QueueMutable } from "../collections/index.js";
+import { QueueMutable } from "../collections/queue/QueueMutable.js";
 import { object } from "./sources/Object.js";
 
 /**

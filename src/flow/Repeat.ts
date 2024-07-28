@@ -63,7 +63,7 @@ export type RepeatPredicate = (
  * ```
  * @param countOrPredicate Number of times to repeat, or a function that returns _false_ to stop the loop.
  * @param fn Function to execute. Asynchronous functions will be awited
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  * @returns Asynchronous generator of `fn` results.
  */
 export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined> | V): AsyncIterable<V> {
@@ -115,7 +115,7 @@ export function repeatAwait<V>(countOrPredicate: number | RepeatPredicate, fn: (
  * * {@link Flow.interval} - if you want to repeatedly call something with an interval between
  * @param countOrPredicate Numnber of repeats, or a function that returns _false_ for when to stop.
  * @param fn Function to execute. Asynchronous functions will be awited
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  * @returns Asynchronous generator of `fn` results.
  */
 export function repeat<V>(countOrPredicate: number | RepeatPredicate, fn: (repeats: number, valuesProduced: number) => V | undefined): Generator<V> {
@@ -128,7 +128,7 @@ export function repeat<V>(countOrPredicate: number | RepeatPredicate, fn: (repea
  * Yields result of `fn` asynchronously
  * @param predicate 
  * @param fn 
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  */
 async function* repeatWhileAwaited<V>(predicate: RepeatPredicate, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined> | V): AsyncGenerator<V> {
   let repeats = 0;
@@ -146,7 +146,7 @@ async function* repeatWhileAwaited<V>(predicate: RepeatPredicate, fn: (repeats: 
  * Calls `fn` until `predicate` returns _false_. Yields result of `fn`.
  * @param predicate Determiner for whether repeating continues
  * @param fn Function to call
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  */
 function* repeatWhile<V>(predicate: RepeatPredicate, fn: (repeats: number, valuesProduced: number) => V | undefined): Generator<V> {
   let repeats = 0;
@@ -165,7 +165,7 @@ function* repeatWhile<V>(predicate: RepeatPredicate, fn: (repeats: number, value
  * Yields result of `fn` asynchronously
  * @param count Number of times to run
  * @param fn Function to run
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  */
 async function* repeatTimesAwaited<V>(count: number, fn: (repeats: number, valuesProduced: number) => Promise<V | undefined> | V | undefined) {
   throwNumberTest(count, `positive`, `count`);
@@ -184,7 +184,7 @@ async function* repeatTimesAwaited<V>(count: number, fn: (repeats: number, value
  * Calls `fn`, `count` times. Assumes a synchronous function. Yields result of `fn`.
  * 
  * Note that if `fn` returns _undefined_ repeats will stop.
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  * @param count Number of times to run
  * @param fn Function to run
  */
@@ -218,7 +218,7 @@ function* repeatTimes<V>(count: number, fn: (repeats: number, valuesProduced: nu
  * @param fn Function to call
  * @param initial Initial value
  * @param reduce Function to reduce value
- * @template V Return type of repeating function
+ * @typeParam V - Return type of repeating function
  * @returns Final result
  */
 // export const repeatReduce = <V>(

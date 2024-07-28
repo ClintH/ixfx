@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { QueueMutable, StackMutable } from "../../collections/index.js"
+import { StackMutable } from "../stack/StackMutable.js"
+import { QueueMutable } from "../queue/QueueMutable.js"
 import { PriorityMutable } from "../../collections/queue/PriorityMutable.js"
 import { immutable as immutableMap, type IMapImmutable } from "../../collections/map/Map.js"
 import { NumberMap } from "../../collections/map/NumberMap.js"

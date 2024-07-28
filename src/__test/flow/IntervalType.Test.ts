@@ -67,4 +67,21 @@ test('interval-type-to-ms', (t) => {
     intervalToMs({ hours: 1, mins: 1, secs: 1 }),
     60 * 60 * 1000 + 60 * 1000 + 1000
   );
+
+  t.is(intervalToMs(undefined, 10), 10);
+  t.throws(() => intervalToMs(undefined));
+  // @ts-expect-error
+  t.throws(() => intervalToMs(null));
+  // @ts-expect-error
+  t.is(intervalToMs(null, 10), 10);
+  // @ts-expect-error
+  t.throws(() => intervalToMs(`hello`));
+  // @ts-expect-error
+  t.is(intervalToMs(`hello`, 10), 10);
+  // @ts-expect-error
+  t.throws(() => intervalToMs({ blerg: 10 }));
+  // @ts-expect-error
+  t.is(intervalToMs({ blerg: 10 }, 10), 10);
+
+
 });

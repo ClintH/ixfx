@@ -188,7 +188,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
  * // All people with name `Samantha` will be counted in same group
  * fh.add({name:`Samantha`, city:`Brisbane`});
  * ```
- * @template V Type of items
+ * @typeParam V - Type of items
  */
 export const frequency = <V>(keyString?: ToString<V> | undefined) =>
   new FrequencyTracker<V>(keyString);

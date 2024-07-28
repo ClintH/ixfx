@@ -42,7 +42,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  * const map = ofArrayMutable({comparer: (a, b) => a.name === b.name });
  * ```
  * @param options Optiosn for mutable array
- * @template V Data type of items
+ * @typeParam V - Data type of items
  * @returns {@link IMapOfMutableExtended}
  */
 export const ofArrayMutable = <V>(

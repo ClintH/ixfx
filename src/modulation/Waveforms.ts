@@ -128,6 +128,7 @@ export function sineBipolarShape(period = 1): Modulate {
 /**
  * Creates a wave modulator. Defaults to 5-second sine wave. 
  * ```js
+ * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * // Triangle wave that has a single cycle over two seconds
  * const m = wave({ secs: 2, shape: `triangle`});
  * 

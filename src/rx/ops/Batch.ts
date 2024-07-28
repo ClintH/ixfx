@@ -1,4 +1,4 @@
-import { QueueMutable } from "../../collections/index.js";
+import { QueueMutable } from "../../collections/queue/QueueMutable.js";
 import { timeout } from "../../flow/Timeout.js";
 import { initUpstream } from "../InitStream.js";
 import type { ReactiveOrSource, Reactive } from "../Types.js";

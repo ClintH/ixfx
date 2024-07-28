@@ -5,8 +5,18 @@ import {
   linearSpace,
   quantiseEvery,
   round,
-  applyToValues
+  applyToValues,
+  averageWeighted,
+  weight
 } from '../numbers/index.js';
+import { gaussian } from '../modulation/Gaussian.js';
+
+test('weight', t => {
+  // Six items
+  let r1 = weight([ 1, 1, 1, 1, 1, 1 ], gaussian());
+  r1 = r1.map(r => round(2, r));
+  t.deepEqual(r1, [ 0.02, 0.24, 0.85, 0.85, 0.24, 0.02 ]);
+});
 
 test('apply', t => {
   const o = {
@@ -118,6 +128,12 @@ test(`linearSpace`, (t) => {
 });
 
 test(`quantiseEvery`, (t) => {
+  t.is(quantiseEvery(1.11, 0.10), 1.10);
+  t.is(quantiseEvery(1, 0.1), 1.0);
+  t.is(quantiseEvery(1.19, 0.1), 1.2);
+  t.is(quantiseEvery(1.2, 0.1), 1.2);
+
+
   t.is(quantiseEvery(11, 10), 10);
   t.is(quantiseEvery(25, 10), 30);
   t.is(quantiseEvery(0, 10), 0);
@@ -131,6 +147,12 @@ test(`quantiseEvery`, (t) => {
   t.throws(() => quantiseEvery(`string`, 10));
   // @ts-ignore
   t.throws(() => quantiseEvery(10, Number.NaN));
+});
+
+test(`averageWeighted`, t => {
+
+  const r = round(2, averageWeighted([ 1, 2, 3 ], gaussian())); // 2.0
+  t.is(r, 2.01);
 });
 
 test(`average`, (t) => {

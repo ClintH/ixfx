@@ -93,13 +93,13 @@ export const create = <K, V>(options: Opts = {}): ExpiringMap<K, V> =>
  * map.elapsedSet(`fruit`);
  * ```
  *
- * Last set/get time for a key can be manually reset using `touch(key)`.
+ * Last set/get time for a key can be manually reset using {@link touch}.
  *
  *
  * Events:
- * * `expired`: when an item is automatically removed.
- * * `removed`: when an item is manually or automatically removed.
- * * `newKey`: when a new key is added
+ * * 'expired': when an item is automatically removed.
+ * * 'removed': when an item is manually or automatically removed.
+ * * 'newKey': when a new key is added
  *
  * ```js
  * map.addEventListener(`expired`, evt => {
@@ -108,7 +108,8 @@ export const create = <K, V>(options: Opts = {}): ExpiringMap<K, V> =>
  * ```
  * The map can automatically remove items based on elapsed intervals.
  *
- * @example Automatically delete items that haven't been accessed for one second
+ * @example
+ * Automatically delete items that haven't been accessed for one second
  * ```js
  * const map = new ExpiringMap({
  *  autoDeleteElapsed: 1000,
@@ -116,13 +117,16 @@ export const create = <K, V>(options: Opts = {}): ExpiringMap<K, V> =>
  * });
  * ```
  *
- * @example Automatically delete the oldest item if we reach a capacity limit
- * ```
+ * @example
+ * Automatically delete the oldest item if we reach a capacity limit
+ * ```js
  * const map = new ExpiringMap({
  *  capacity: 5,
  *  evictPolicy: `oldestSet`
  * });
  * ```
+ * @typeParam K - Type of keys
+ * @typeParam V - Type of values
  */
 export class ExpiringMap<K, V> extends SimpleEventEmitter<
   ExpiringMapEvents<K, V>

@@ -4,10 +4,10 @@ import { round } from '../numbers/Round.js';
 /**
  * Interval types allows for more expressive coding, rather than embedding millisecond values.
  * 
- * That is, we can use `{ mins: 5 }` to mean 5 minutes rather than 5*60*1000 
+ * That is, we can use `{ mins: 5 }` to mean 5 minutes rather than `5*60*1000` 
  * or worse, 300000, for the same value.
  *
- * Examples:
+ * @example
  * ```js
  * { hours: 1 };  // 1 hour
  * { mins: 5 };   // 5 mins
@@ -15,15 +15,17 @@ import { round } from '../numbers/Round.js';
  * { millis: 5 }; // 5 milliseconds
  * ```
  * 
- * Fields are be combined, adding the value.
+ * If several fields are used, this sums their value
  * ```js
  * { secs: 2, millis: 1 }; // equal 2001 milliseconds.
  * ```
  * 
- * Wherever ixfx takes an Interval, you can also just provide a number instead.
+ * Wherever ixfx takes an `Interval`, you can also just provide a number instead.
  * This will be taken as a millisecond value.
  * 
- * Use {@link intervalToMs} to convert to milliseconds.
+ * @see {@link intervalToMs} to convert to milliseconds.
+ * @see {@link isInterval} check whether input is an Interval type
+ * @see {@link elapsedToHumanString} render interval in human-friendly form
  */
 export type Interval =
   | number
@@ -34,42 +36,42 @@ export type Interval =
     readonly mins?: number;
   };
 
-export function intervalToMs(interval: Interval | undefined): number | undefined;
-export function intervalToMs(
-  interval: Interval | undefined,
-  defaultNumber: number
-): number;
+// export function intervalToMs(interval: Interval | undefined): number | undefined;
+// export function intervalToMs(
+//   interval: Interval | undefined,
+//   defaultNumber: number
+// ): number;
 
 
 /**
  * Return the millisecond value of an Interval.
+ * 
  * ```js
  * intervalToMs(100); // 100
  * intervalToMs({ millis: 100 }); // 100
  * ```
  *
  * Use `defaultNumber` to return a default in the case of
- * undefined or invalid input.
+ * _undefined_ or invalid input.
  *
  * ```js
- * intervalToMs(undefined); // undefined
+ * intervalToMs(undefined);      // throws error
  * intervalToMs(undefined, 100); // 100
  * ```
  *
  * If no default is provided, an exception is thrown.
  * @param interval Interval
- * @param defaultNumber Default value if `i` is undefined
- * @returns Milliseconds, or undefined
+ * @param defaultNumber Default value if `interval` is _undefined_ or invalid
+ * @returns Milliseconds
  */
 export function intervalToMs(
   interval: Interval | undefined,
   defaultNumber?: number
-): number | undefined {
+): number {
   if (isInterval(interval)) {
     // Number given, must be millis?
     if (typeof interval === `number`) return interval;
 
-    //eslint-disable-next-line functional/no-let
     let ms = interval.millis ?? 0;
     ms += (interval.hours ?? 0) * 60 * 60 * 1000;
     ms += (interval.mins ?? 0) * 60 * 1000;
@@ -81,6 +83,11 @@ export function intervalToMs(
   }
 }
 
+/**
+ * Returns _true_ if `interval` matches the {@link Interval} type.
+ * @param interval 
+ * @returns _True_ if `interval` is an {@link Interval}.
+ */
 export function isInterval(interval: number | Interval | undefined): interval is Interval {
   if (interval === undefined) return false;
   if (interval === null) return false;
@@ -106,6 +113,7 @@ export function isInterval(interval: number | Interval | undefined): interval is
  * Returns a human-readable representation
  * of some elapsed milliseconds
  * 
+ * @example
  * ```js
  * elapsedToHumanString(10);      // `10ms`
  * elapsedToHumanString(2000);    // `2s`

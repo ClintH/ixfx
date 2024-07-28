@@ -23,7 +23,7 @@ import { MapOfSimpleBase } from './MapOfSimpleBase.js';
  *
  * Constructor takes a `valueEq` parameter, which compares values. This is used when checking
  * if a value exists under a key, for example.
- * @template V Type of items
+ * @typeParam V - Type of items
  */
 export class MapOfSimpleMutable<V>
   extends MapOfSimpleBase<V>
@@ -122,7 +122,7 @@ export class MapOfSimpleMutable<V>
  * const hellos = m.get(`hello`); // Get list of items under `hello`
  * ```
  *
- * @template V Type of items
+ * @typeParam V - Type of items
  * @returns New instance
  */
 export const ofSimpleMutable = <V>(

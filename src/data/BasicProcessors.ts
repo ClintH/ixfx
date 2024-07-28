@@ -1,6 +1,10 @@
 import type { Process } from "./Process.js";
 import type { RankFunction, RankOptions } from "./Types.js";
 
+/**
+ * Outputs the current largest-seen value
+ * @returns 
+ */
 export const max = (): Process<number | Array<number>, number> => {
   let max = Number.MIN_SAFE_INTEGER;
   const compute = (value: number | Array<number>) => {
@@ -14,6 +18,10 @@ export const max = (): Process<number | Array<number>, number> => {
   return compute;
 }
 
+/**
+ * Outputs the current smallest-seen value
+ * @returns
+ */
 export const min = (): Process<number | Array<number>, number> => {
   let min = Number.MAX_SAFE_INTEGER;
   const compute = (value: number | Array<number>) => {
@@ -27,6 +35,10 @@ export const min = (): Process<number | Array<number>, number> => {
   return compute;
 }
 
+/**
+ * Returns a sum of values
+ * @returns 
+ */
 export const sum = (): Process<number | Array<number>, number> => {
   let t = 0;
   const compute = (value: number | Array<number>) => {
@@ -40,6 +52,10 @@ export const sum = (): Process<number | Array<number>, number> => {
   return compute;
 }
 
+/**
+ * Returns the current average of input values
+ * @returns 
+ */
 export const average = (): Process<number | Array<number>, number> => {
   let total = 0;
   let tally = 0;
@@ -55,6 +71,11 @@ export const average = (): Process<number | Array<number>, number> => {
   return compute;
 }
 
+/**
+ * Returns the tally (ie number of) values
+ * @param countArrayItems 
+ * @returns 
+ */
 export const tally = (countArrayItems: boolean): Process<any, number> => {
   let t = 0;
   const compute = (value: number | Array<number>) => {
@@ -69,6 +90,13 @@ export const tally = (countArrayItems: boolean): Process<any, number> => {
   return compute;
 }
 
+/**
+ * Returns the 'best' value seen so far as determined by a ranking function.
+ * This is similar to min/max but usable for objects.
+ * @param r 
+ * @param options 
+ * @returns 
+ */
 export function rank<In>(r: RankFunction<In>, options: Partial<RankOptions> = {}) {
   const includeType = options.includeType;
   const emitEqualRanked = options.emitEqualRanked ?? false;

@@ -120,7 +120,7 @@ export function* filterBetween<V>(
  *
  * Consider {@link remove} to remove an item by index.
  *
- * @template V Type of array items
+ * @typeParam V - Type of array items
  * @param sourceArray Source array
  * @param toRemove Value(s) to remove
  * @param comparer Comparison function. If not provided `Util.isEqualDefault` is used, which compares using `===`

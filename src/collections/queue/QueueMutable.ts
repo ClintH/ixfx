@@ -41,7 +41,7 @@ import { SimpleEventEmitter } from '../../Events.js';
  *  // e.removed, e.finalData
  * })
  * ```
- * @template V Data type of items
+ * @typeParam V - Data type of items
  */
 export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> implements IQueueMutable<V> {
   readonly options: QueueOpts<V>;

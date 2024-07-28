@@ -104,21 +104,20 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   }
 
   /**
-   * Adds event listener
-   *
-   * @template K
-   * @param type
-   * @param listener
+   * Adds event listener.
+   * 
+   * @throws Error if emitter is disposed
+   * @typeParam K - Events
+   * @param name Event name
+   * @param listener Event handler
    */
   addEventListener<K extends keyof Events>(
-    type: K,
+    name: K,
     listener: (event: Events[ K ], sender: SimpleEventEmitter<Events>) => void
   ): void {
     if (this.#disposed) throw new Error(`Disposed`);
-
-    // (this: any, ev: Events[K]) => any): void {
     this.#listeners.addKeyedValues(
-      type as string,
+      name as string,
       listener as Listener<Events>
     );
   }

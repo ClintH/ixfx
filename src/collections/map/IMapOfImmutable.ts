@@ -44,8 +44,8 @@ import type { IMapOf } from './IMapOf.js';
  * map.debugString();   // Returns a human-readable string dump of the contents
  * ```
  *
- * @template V Values stored under keys
- * @template M Type of data structure managing values
+ * @typeParam V - Values stored under keys
+ * @typeParam M - Type of data structure managing values
  */
 export interface IMapOfImmutable<V> extends IMapOf<V> {
   /**

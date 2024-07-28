@@ -7,8 +7,8 @@ import { add, del, set, has } from './MapImmutableFns.js';
  *
  * It is a wrapper around the in-built Map type, but adds roughly the same API as {@link IMapImmutable}.
  *
- * @template K Type of map keys. Typically `string`
- * @template V Type of stored values
+ * @typeParam K - Type of map keys. Typically `string`
+ * @typeParam V - Type of stored values
  */
 //eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapMutable<K, V> extends IMapBase<K, V> {

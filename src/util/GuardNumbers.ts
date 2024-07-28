@@ -212,7 +212,7 @@ export const integerTest = (
   const r = numberTest(value, range, parameterName);
   if (!r[ 0 ]) return r;
   if (!Number.isInteger(value)) {
-    return [ false, `Parameter ${ parameterName } is not an integer` ];
+    return [ false, `Param '${ parameterName }' is not an integer` ];
   }
   return [ true ];
 };

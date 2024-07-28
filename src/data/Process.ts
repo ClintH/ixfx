@@ -48,8 +48,8 @@ export function chain<T1, T2, T3, T4, T5, T6>(...processors: [ Process<T1, T2>, 
  * 
  * ```js
  * const p = chain(
- *  (value:string) => value.tUpperCase(), // Convert to uppercase
- *  (value:string) => value.at(0) === 'A) // If first letter is an A, return true
+ *  (value:string) => value.toUpperCase(), // Convert to uppercase
+ *  (value:string) => value.at(0) === 'A') // If first letter is an A, return true
  * );
  * p('apple'); // True
  * ```
@@ -153,6 +153,7 @@ export function seenToUndefinedByKey<TIn>(toString?: (value: TIn) => string): Pr
  * chain(100); // Prints 'v:100'
  * chain(90);  // Nothing happens max value has not changed
  * chain(110); // Prints 'v:110'
+ * ```
  * @param fn 
  * @returns 
  */

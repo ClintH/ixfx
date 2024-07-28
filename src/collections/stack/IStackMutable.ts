@@ -24,7 +24,7 @@ import type { IStack } from './IStack.js';
  * ```
  *
  * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
- * @template V
+ * @typeParam V - Type of stored items
  */
 export interface IStackMutable<V> extends IStack<V> {
   /**

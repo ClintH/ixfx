@@ -90,7 +90,7 @@ export const pop = <V>(
 /**
  * Peek at the top of the stack (end of array)
  *
- * @template V
+ * @typeParam V - Type of stored items
  * @param {StackOpts} opts
  * @param {V[]} stack
  * @returns {(V | undefined)}

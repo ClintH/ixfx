@@ -1,4 +1,4 @@
-export { create as expiringMap, ExpiringMap } from './ExpiringMap.js';
+export { create as expiringMap } from './ExpiringMap.js';
 export type {
   ExpiringMapEvent,
   ExpiringMapEvents,

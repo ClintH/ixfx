@@ -1,7 +1,7 @@
 import { intervalToMs, type Interval } from "../flow/IntervalType.js";
 import type { Modulate, ModulatorTimed } from "./Types.js";
 import * as Timer from '../flow/Timer.js';
-import { throwFunctionTest } from "src/util/GuardFunction.js";
+import { throwFunctionTest } from "../util/GuardFunction.js";
 
 /**
  * Produce values over time. When the modulate is complete, the final

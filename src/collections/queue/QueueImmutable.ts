@@ -72,6 +72,7 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  * _dequeing_ removes items from the front (ie. the oldest).
  *
  * ```js
+ * import { Queues } from "https://unpkg.com/ixfx/dist/collections.js"
  * let q = Queues.immutable();           // Create
  * q = q.enqueue(`a`, `b`);   // Add two strings
  * const front = q.peek();    // `a` is at the front of queue (oldest)
@@ -82,7 +83,7 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  * const q = Queues.immutable({capacity: 5, discardPolicy: `newer`});
  * ```
  *
- * @template V Data type of items
+ * @typeParam V - Type of values stored
  * @param options
  * @param startingItems Index 0 is the front of the queue
  * @returns A new queue

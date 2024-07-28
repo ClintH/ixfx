@@ -49,7 +49,7 @@ import type { ISet } from './ISet.js';
  * s = s.delete({name:`Barry`, city:`London`});
  * ```
  *
- * @template V Type of data stored
+ * @typeParam V - Type of data stored
  */
 export interface ISetImmutable<V> extends ISet<V> {
   add(...values: ReadonlyArray<V>): ISetImmutable<V>;

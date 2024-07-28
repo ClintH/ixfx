@@ -70,7 +70,9 @@ export type ContinuouslyAsyncCallback = (
 
 export type OnStartCalled = `continue` | `cancel` | `reset` | `dispose`;
 
-//eslint-disable-next-line functional/no-mixed-types
+/**
+ * Options for {@link continuously}
+ */
 export type ContinuouslyOpts = Readonly<{
   /**
    * Abort signal to exit loop
@@ -78,7 +80,7 @@ export type ContinuouslyOpts = Readonly<{
   signal: AbortSignal;
   /**
    * If _true_, callback runs before waiting period.
-   * Default: _false_
+   * @defaultValue false
    */
   fireBeforeWait: boolean;
   /**
@@ -105,15 +107,14 @@ export type ContinuouslyOpts = Readonly<{
 }>;
 
 /**
- * Returns a {@link Continuously} that continuously at `intervalMs`, executing `callback`.
+ * Returns a {@link Continuously} that continually executes `callback` at `interval` rate.
+ * 
  * By default, first the sleep period happens and then the callback happens.
- * Use {@link Timeout} for a single event.
  *
- * If callback returns _false_, loop exits.
+ * Call `start` to begin/reset loop. The looping stops when `cancel` is called, or when `callback` returns _false_.
  *
- * Call `start` to begin/reset loop. `cancel` stops loop.
- *
- * @example Animation loop
+ * @example
+ * Animation loop
  * ```js
  * const draw = () => {
  *  // Draw on canvas
@@ -123,21 +124,23 @@ export type ContinuouslyOpts = Readonly<{
  * continuously(draw).start();
  * ```
  *
- * @example With delay
+ * @example
+ * With delay
  * ```js
  * const fn = () => {
- *  console.log(`1 minute`);
+ *  // Runs after one minute
  * }
- * const c = continuously(fn, 60*1000);
+ * const c = continuously(fn, { mins: 1 } );
  * c.start(); // Runs `fn` every minute
  * ```
  *
- * @example Control a 'continuously'
+ * @example
+ * Control a 'continuously'
  * ```js
  * c.cancel();   // Stop the loop, cancelling any up-coming calls to `fn`
  * c.elapsedMs;  // How many milliseconds have elapsed since start
  * c.ticks;      // How many iterations of loop since start
- * c.interval; // Get/set speed of loop. Change kicks-in at next loop.
+ * c.interval;   // Get/set speed of loop. Change kicks-in at next loop.
  *               // Use .start() to reset to new interval immediately
  * ```
  *
@@ -181,10 +184,11 @@ export type ContinuouslyOpts = Readonly<{
  * ```js
  * continuously(callback, intervalMs, { fireBeforeWait: true });
  * ```
- * @param callback Function to run. If it returns false, loop exits.
- * @param options Additional options
- * @param interval Speed of loop (default: 0)
- * @returns
+ * @param callback - Function to run. If it returns _false_, loop exits.
+ * @param options - {@link ContinuouslyOpts ContinuouslyOpts}
+ * @param interval - Speed of loop (default: 0)
+ * @returns Instance to control looping.
+ * @see {@link Timeout} if you want to trigger something once.
  */
 export const continuously = (
   callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback,

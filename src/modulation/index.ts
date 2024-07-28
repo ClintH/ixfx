@@ -52,11 +52,11 @@ export * from './Noop.js';
  * Oscillators module has waveshapes for producing values with a specified frequency.
  *
  * Overview
- * * {@link Oscillators.saw}: 'Sawtooth' wave
- * * {@link Oscillators.sine}: Sine wave
- * * {@link Oscillators.sineBipolar}: Sine wave with range of -1 to 1
- * * {@link Oscillators.square}: Square wave
- * * {@link Oscillators.triangle}: Triangle wave
+ * * {@link saw}: 'Sawtooth' wave
+ * * {@link sine}: Sine wave
+ * * {@link sineBipolar}: Sine wave with range of -1 to 1
+ * * {@link square}: Square wave
+ * * {@link triangle}: Triangle wave
  *
  * @example On-demand sampling
  * ```js

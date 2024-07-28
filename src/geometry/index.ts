@@ -1,5 +1,6 @@
 export * as Waypoints from './Waypoint.js';
 export * as Layouts from './Layout.js';
+
 export * as Circles from './circle/index.js';
 export * as Lines from './line/index.js';
 export * as Rects from './rect/index.js';

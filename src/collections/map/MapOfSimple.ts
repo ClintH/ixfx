@@ -87,7 +87,7 @@ export class MapOfSimple<V>
  * const hellos = m.get(`hello`); // Get list of items under `hello`
  * ```
  *
- * @template V Type of items
+ * @typeParam V - Type of items
  * @returns New instance
  */
 export const ofSimple = <V>(

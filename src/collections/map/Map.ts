@@ -16,8 +16,8 @@ import { add, del, set } from './MapImmutableFns.js';
  * // m is still empty, only m2 contains a value.
  * ```
  *
- * @template K Type of map keys. Typically `string`
- * @template V Type of stored values
+ * @typeParam K - Type of map keys. Typically `string`
+ * @typeParam V - Type of stored values
  */
 //eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapImmutable<K, V> extends IMapBase<K, V> {

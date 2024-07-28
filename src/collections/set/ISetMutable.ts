@@ -47,14 +47,15 @@ import type { ValueSetEventMap } from './Types.js';
  * set.has(people[1]);   // True, key of object is found (Sally-Bristol)
  * ```
  *
- * @example Events
+ * @example
+ * Events
  * ```js
  * set.addEventListener(`add`, ev => {
  *  console.log(`New item added: ${ev.value}`);
  * });
  * ```
  *
- * @template V Type of data stored
+ * @typeParam V - Type of data stored
  */
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface ISetMutable<V>
