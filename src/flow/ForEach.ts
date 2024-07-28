@@ -17,7 +17,7 @@ import { sleep } from "./Sleep.js";
  * Use {@link forEachAsync} if you want to use an async `iterator` and async `fn`.
  * 
  * Alternatives:
- * * {@link repeat}/{@link repeatAwait}: if you want to call something a given number of times and get the result
+ * * {@link repeat}/{@link repeatSync}: if you want to call something a given number of times and get the result
  * @param iterator Iterable or array
  * @typeParam V Type of iterable
  * @param fn Function to call for each item. If function returns _false_, iteration cancels

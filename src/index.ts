@@ -153,7 +153,6 @@ export * as Io from './io/index.js';
  * * {@link sleep}: Using `async await`, delay execution for a period
  * * {@link sleepWhile}: Keep sleeping until a predicate returns _true_
  * * {@link delay}: Using `async await`, run a given callback after a period
- * * {@link interval}: Generates values from a given function with a given delay
  * * {@link waitFor}: Calls a function and have the possibility to cancel if it takes too long
  * * {@link rateMinimum}: Ensures that a function is called at a set rate
  * 
@@ -410,7 +409,7 @@ export * from './TsUtil.js';
  * ## Maps
  * * {@link Maps.immutable}: Create a {@link Maps.IMapImmutable immutable map}.
  * * {@link Maps.mutable}: Create a {@link Maps.IMapMutable mutable map}.
- * * {@link Maps.ExpiringMap}: A map that can have a capacity limit and automatically expire key/value pairs.
+ * * {@link ExpiringMap}: A map that can have a capacity limit and automatically expire key/value pairs.
  * * {@link Maps.NumberMap}: A map that associates keys with numeric values, including some helper functions.
  * * {@link Maps.ofArrayMutable}: Stores multiple values for a key in an array.
  * * {@link Maps.ofCircularMutable}: Stores multiple values for a key in a circular array.

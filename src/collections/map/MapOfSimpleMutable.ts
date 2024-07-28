@@ -7,7 +7,7 @@ import { MapOfSimpleBase } from './MapOfSimpleBase.js';
  * A simple mutable map of arrays, without events. It can store multiple values
  * under the same key.
  *
- * For a fancier approaches, consider {@link ofArrayMutable}, {@link ofCircularMutable} or {@link ofSetMutable}.
+ * For a fancier approaches, consider ofArrayMutable, ofCircularMutable or ofSetMutable.
  *
  * @example
  * ```js

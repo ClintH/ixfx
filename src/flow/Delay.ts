@@ -227,7 +227,6 @@ async function* delayAnimationLoop() {
  * Alternatives:
  * * {@link delay} to run a single function after a delay
  * * {@link sleep} pause execution
- * * {@link interval} iterate over an iterable with a given delay
  * * {@link continuously} to start/stop/adjust a constantly running loop
  *
  * @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.

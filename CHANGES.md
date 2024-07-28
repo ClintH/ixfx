@@ -1,5 +1,25 @@
 A rough changelog between NPM releases
 
+# 0.27.2 24.07.28
+
+Flow.interval/Flow.repeat: integrated into one: Flow.repeat
+
+Data
++ resolveSync: Synchronous version of Data.resolve
+
+Events
++ Added .dispose
+
+Numbers.Normalise / Numbers.weigh
+* Fixed bugs
+
+Geometry
+* Renamed Points.angle to Points.angleRadian
+
+Modulation
+* Unified easings, waveforms. Lots of other re-factoring
++ mix: mix modulators
+
 # 0.24.3 24.07.19
 
 Rx
