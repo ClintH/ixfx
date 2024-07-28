@@ -2,10 +2,10 @@
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
- *
+ * import { weight } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * // Six items
- * Numbers.weight([1,1,1,1,1,1], Easings.gaussian());
+ * weight([1,1,1,1,1,1], gaussian());
  *
  * // Yields:
  * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
@@ -19,7 +19,7 @@
  * how values are weighted:
  *
  * ```js
- * Numbers.weight([1,1,1,1,1,1], (relativePos) => relativePos);
+ * weight([1,1,1,1,1,1], (relativePos) => relativePos);
  * // Yields:
  * // [0, 0.2, 0.4, 0.6, 0.8, 1]
  * ```
@@ -34,8 +34,12 @@ export const weight = (
   fn?: (relativePos: number) => number
 ): Array<number> => {
   const f = fn ?? ((x: number) => x);
-  return validNumbers(data).map(
-    (v: number, index: number) => v * f(index / (validNumbers.length - 1))
+  const valid = validNumbers(data);
+  return valid.map(
+    (v: number, index: number) => {
+      const x = v * f(index / (valid.length - 1));
+      return x;
+    }
   );
 };
 
@@ -79,18 +83,18 @@ export const dotProduct = (
  * Use {@link minMaxAvg} if you want min, max and total as well.
  *
  * @example
- * ```
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * ```js
+ * import * as Numbers from 'https://unpkg.com/ixfx/dist/numbers.js';
  *
  * // Average of a list
  * const avg = Numbers.average([1, 1.4, 0.9, 0.1]);
  *
  * // Average of a variable
- * let data = [100,200];
- * Arrays.average(data);
+ * const data = [100,200];
+ * Numbers.average(data);
  * ```
  *
- * See also: {@link Numbers.average} which takes a list of parameters
+ * @see {@link averageWeighted} To weight items based on position in array
  * @param data Data to average.
  * @returns Average of array
  */
