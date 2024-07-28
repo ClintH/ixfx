@@ -4,7 +4,7 @@ import * as Flow from '../../../flow/index.js';
 import * as Iter from '../../../iterables/index.js';
 import { isApprox } from '../../../numbers/IsApprox.js';
 import { count } from '../../../numbers/Count.js';
-import { interval } from '../../../flow/index.js';
+import { repeat } from '../../../flow/Repeat.js';
 
 test(`from-array`, async t => {
   const d1 = [ 1, 2, 3, 4, 5 ];
@@ -131,10 +131,10 @@ test(`from-async`, async t => {
   const runCount = 5;
   let countProgress = runCount;
   const intervalPeriod = 100;
-  const r2 = interval(() => {
+  const r2 = repeat(() => {
     if (countProgress === 0) return;
     return --countProgress;
-  }, intervalPeriod);
+  }, { delayMinimum: intervalPeriod });
   let start = performance.now();
   const r2Data = await Rx.toArray(r2);
   let elapsed = performance.now() - start;
@@ -150,10 +150,10 @@ test(`generator-lazy`, async t => {
 
   // Keep track of how many times its called.
   // Runs every 100ms
-  const time = Flow.interval(() => {
+  const time = Flow.repeat(() => {
     produceCount++;
     return Math.random();
-  }, { fixed: 100, signal: ac.signal });
+  }, { delay: 100, signal: ac.signal });
 
   // Reactive from a generator
   const r = Rx.From.iterator(time);
@@ -178,7 +178,7 @@ test(`generator-async`, async t => {
   // Produce values every 100ms
   const valueRateMs = 100;
   const valueCount = 10;
-  const valuesOverTime = Flow.interval(() => Math.random(), valueRateMs);
+  const valuesOverTime = Flow.repeat(() => Math.random(), { delayMinimum: valueRateMs });
 
   const source = Rx.From.iterator(valuesOverTime);
   const values1: number[] = [];

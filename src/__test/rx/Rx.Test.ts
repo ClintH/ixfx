@@ -1,8 +1,5 @@
 import test from 'ava';
 import * as Rx from '../../rx/index.js';
-import * as Flow from '../../flow/index.js';
-import * as Iter from '../../iterables/index.js';
-import { interval } from '../../flow/index.js';
 
 // const r = Rx.object({ name: `bob`, level: 2 });
 // r.on(value => {

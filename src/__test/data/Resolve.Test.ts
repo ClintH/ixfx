@@ -4,7 +4,7 @@ import { resolveFields } from '../../data/ResolveFields.js';
 import * as Numbers from '../../numbers/index.js';
 import * as Flow from '../../flow/index.js';
 import * as Rx from '../../rx/index.js';
-import { interval } from '../../flow/index.js';
+import { repeat } from '../../flow/Repeat.js';
 
 test(`with-fallback`, async t => {
   let triggered = 0;
@@ -84,7 +84,7 @@ test('resolve-fields-async', async t => {
   const c = 5;
   const s1 = {
     colour: `red`,
-    gen: interval(Numbers.count(c), 100),
+    gen: repeat(Numbers.count(c), { delay: 100 }),
     rand: Math.random
   };
 

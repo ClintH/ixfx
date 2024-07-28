@@ -1,7 +1,6 @@
 import test from 'ava';
 import * as Envelopes from '../../modulation/envelope/index.js';
-import { repeat, interval, sleep, Elapsed } from '../../flow/index.js';
-import { rangeCheck, someNearnessMany } from '../Include.js';
+import { sleep, Elapsed } from '../../flow/index.js';
 import { isApprox } from 'src/numbers/IsApprox.js';
 
 test(`as-iterator`, async t => {

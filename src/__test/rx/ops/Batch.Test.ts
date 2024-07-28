@@ -48,7 +48,7 @@ test(`batch-elapsed-0`, async t => {
   const arr = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
   const arrInterval = 50;
 
-  for await (const v of Flow.interval(arr, arrInterval)) {
+  for await (const v of Flow.repeat(arr, { delayMinimum: arrInterval })) {
     m.set(v);
   }
   let elapsed = Date.now() - start;
@@ -84,7 +84,7 @@ test(`batched-elapsed-2`, async t => {
   const interval = 50
   const values = count(amt);
   // Iterate over values with an interval
-  const valuesOverTime = Flow.interval(values, interval);
+  const valuesOverTime = Flow.repeat(values, { delayMinimum: interval });
 
   // Batch read over elapsed ms
   const batch = Rx.batch(valuesOverTime, { elapsed: elapsed });
