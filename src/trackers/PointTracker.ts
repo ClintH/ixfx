@@ -16,7 +16,7 @@ import { joinPointsToLines } from '../geometry/line/JoinPointsToLines.js';
 import type { PointTrack, PointTrackerResults } from './Types.js';
 
 /**
- * Point tracker. Create via `pointTracker()`.
+ * Point tracker. Create via `Trackers.point()`.
  *
  */
 export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {

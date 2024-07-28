@@ -18,7 +18,7 @@ import type { Triangle } from '../geometry/triangle/TriangleType.js';
 import { empty as RectsEmpty } from '../geometry/rect/Empty.js';
 import { corners as RectsCorners } from '../geometry/rect/Corners.js';
 import { isLine } from '../geometry/line/Guard.js';
-import { roundUpToMultiple } from '../numbers/Round.js';
+import { quantiseEvery } from '../numbers/Quantise.js';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const PIPI = Math.PI * 2;
 
@@ -884,10 +884,6 @@ export const textWidth = (
   padding = 0,
   widthMultiple?: number
 ): number => {
-  // if (text === undefined || text === null || text.length === 0) return 0;
-  // const m = ctx.measureText(text);
-  // if (widthMultiple) return roundUpToMultiple(m.width, widthMultiple) + padding;
-  // return m.width + padding;
   const rect = textRect(ctx, text, padding, widthMultiple);
   return rect.width;
 };
@@ -898,7 +894,7 @@ export const textRect = (ctx: CanvasRenderingContext2D,
   if (text === undefined || text === null || text.length === 0) return RectsEmpty;
   const m = ctx.measureText(text);
 
-  const width = (widthMultiple) ? roundUpToMultiple(m.width, widthMultiple) + padding : m.width + padding;
+  const width = (widthMultiple) ? quantiseEvery(m.width, widthMultiple) + padding : m.width + padding;
 
   return {
     width: width,

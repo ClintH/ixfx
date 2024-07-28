@@ -7,7 +7,7 @@ import { getErrorMessage } from "../debug/GetErrorMessage.js";
  * Something that can resolve to a value
  */
 export type ResolveToValueSync<V> = ValueType | ReactiveNonInitial<V> | Generator<V> | IterableIterator<V> | ((args: any) => V)
-export type ResolveToValueAsync<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V>;
+export type ResolveToValueAsync<V> = AsyncGenerator<V> | AsyncIterableIterator<V> | Promise<V> | ((args: any) => Promise<V>);
 export type ResolveToValue<V> = ResolveToValueAsync<V> | ResolveToValueSync<V>;
 
 /**

@@ -86,7 +86,6 @@ export abstract class PrimitiveTracker<
     //const now = Date.now();
     if (this.storeIntermediate) {
       this.values.push(...rawValues);
-      //this.timestamps.push(...repeat(p.length, () => now));
       this.timestamps.push(...values.map(v => v.at));
     } else switch (this.values.length) {
       case 0: {

@@ -21,18 +21,18 @@ import { weight } from './NumericArrays.js';
  *
  * ```js
  * import { weight,averageWeighted } from 'https://unpkg.com/ixfx/dist/numbers.js';
- * import { Easings } from 'https://unpkg.com/ixfx/dist/modulation.js';
- * averageWeighted[1,2,3], Easings.gaussian()); // 2.0
+ * import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * averageWeighted[1,2,3], gaussian()); // 2.0
  * ```
  *
  * This is the same as:
  *
  * ```js
  * import { weight,averageWeighted } from 'https://unpkg.com/ixfx/dist/numbers.js';
- * import { Easings } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
  *
  * const data = [1,2,3];
- * const w = weight(data, Easings.gaussian());
+ * const w = weight(data, gaussian());
  * const avg = averageWeighted(data, w); // 2.0
  * ```
  * @param data Data to average

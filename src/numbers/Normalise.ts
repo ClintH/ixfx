@@ -11,7 +11,7 @@ import { minMaxAvg } from './MinMaxAvg.js';
  *
  * @example
  * ```js
- * import {Normalise} from 'https://unpkg.com/ixfx/dist/data.js'
+ * import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'
  * const s = Normalise.stream();
  * s(2);    // 1 (because 2 is highest seen)
  * s(1);    // 0 (because 1 is the lowest so far)
@@ -43,8 +43,8 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
   let min = minDefault ?? Number.MAX_SAFE_INTEGER;
   let max = maxDefault ?? Number.MIN_SAFE_INTEGER;
 
-  throwNumberTest(minDefault);
-  throwNumberTest(maxDefault);
+  throwNumberTest(min);
+  throwNumberTest(max);
 
   return (v: number): number => {
     throwNumberTest(v);
@@ -59,7 +59,7 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
  * as the normalisation range. [Read more in the docs](https://clinth.github.io/ixfx-docs/data/normalising/)
  *
  * ```js
- * import {Normalise} from 'https://unpkg.com/ixfx/dist/data.js'
+ * import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
  * Normalise.array([5,1,0,9,10]);
  * ```

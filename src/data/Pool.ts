@@ -317,6 +317,14 @@ export class Resource<V> {
 
 /**
  * Resource pool
+ * It does the housekeeping of managing a limited set of resources which are shared by 'users'. 
+ * All resources in the Pool are meant to be the same kind of object.
+ * 
+ * An example is an audio sketch driven by TensorFlow. We might want to allocate a sound oscillator per detected human body. A naive implementation would be to make an oscillator for each detected body. However, because poses appear/disappear unpredictably, it's a lot of extra work to maintain the binding between pose and oscillator.
+ * 
+ * Instead, we might use the Pool to allocate oscillators to poses. This will allow us to limit resources and clean up automatically if they haven't been used for a while.
+ * 
+ * Resources can be added manually with `addResource()`, or automatically by providing a `generate()` function in the Pool options. They can then be accessed via a _user key_. This is meant to associated with a single 'user' of a resource. For example, if we are associating oscillators with TensorFlow poses, the 'user key' might be the id of the pose.
  */
 export class Pool<V> {
   private _resources: Array<Resource<V>>;
@@ -415,8 +423,8 @@ export class Pool<V> {
   }
 
   /**
-   * Adds a resource to the pool.
-   * Throws an error if the capacity limit is reached.
+   * Adds a shared resource to the pool
+   * @throws Error if the capacity limit is reached or resource is null
    * @param resource
    * @returns
    */
@@ -424,7 +432,7 @@ export class Pool<V> {
     if (resource === undefined) {
       throw new Error(`Cannot add undefined resource`);
     }
-    if (resource === null) throw new Error(`Cannot add null resource`);
+    if (resource === null) throw new TypeError(`Cannot add null resource`);
 
     if (this.capacity > 0 && this._resources.length === this.capacity) {
       throw new Error(
@@ -580,11 +588,12 @@ export class Pool<V> {
   }
 
   /**
+   * Allocates a resource for `userKey`
    * @internal
    * @param userKey
    * @returns
    */
-  private _findUser(userKey: string): PoolUser<V> | undefined {
+  #allocateResource(userKey: string): PoolUser<V> | undefined {
     // Sort items by number of users per pool item
     const sorted = this.getResourcesSortedByUse();
     //eslint-disable-next-line functional/no-let
@@ -630,10 +639,20 @@ export class Pool<V> {
   }
 
   /**
-   * Gets a pool item based on a user key.
+   * Gets a pool item based on a 'user' key.
+   * 
    * The same key should return the same pool item,
    * for as long as it still exists.
+   * 
+   * If a 'user' already has a resource, it will 'keep alive' their use.
+   * If a 'user' does not already have resource
+   *  - if there is capacity, a resource is allocated to user
+   *  - if pool is full
+   *    - fullPolicy = 'error': an error is thrown
+   *    - fullPolicy = 'evictOldestUser': evicts an older user
+   *    - Throw error
    * @param userKey
+   * @throws Error If all resources are used and fullPolicy = 'error'
    * @returns
    */
   use(userKey: string): PoolUser<V> {
@@ -645,7 +664,7 @@ export class Pool<V> {
 
     this.maintain();
 
-    const match = this._findUser(userKey);
+    const match = this.#allocateResource(userKey);
     if (match) return match;
 
     // Throw an error if all items are being used
@@ -661,7 +680,7 @@ export class Pool<V> {
       if (users.length > 0) {
         this.release(users[ 0 ].key, `evictedOldestUser`);
 
-        const match2 = this._findUser(userKey);
+        const match2 = this.#allocateResource(userKey);
         if (match2) return match2;
       }
     }

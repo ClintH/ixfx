@@ -815,21 +815,6 @@ export class AxisY extends Sg.CanvasBox {
       default:
         return this.#measureIndependent(copts);
     }
-    // const series = this.getSeries();
-    // if (series !== undefined) {
-    //   const r = series.visualRange;
-    //   this._maxDigits =
-    //     Math.ceil(r.max).toString().length + series.precision + 1;
-
-    //   const textToMeasure = `9`.repeat(this._maxDigits);
-    //   width += textWidth(copts.ctx, textToMeasure, paddingPx * 2);
-    // }
-    // const w = copts.resolveToPx(this.desiredRegion?.width, width, width);
-    // return {
-    //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    //   width: w!,
-    //   height: copts.bounds.height,
-    // };
   }
 
   #measureIndependent(copts: Sg.CanvasMeasureState): Rect {

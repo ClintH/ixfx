@@ -155,13 +155,13 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
  * unlike a Map it does not store the data. By default compares
  * items by value (via JSON.stringify).
  *
- * Create with {@link frequency}.
+ * Create with {@link Trackers.frequency}.
  *
  * Fires `change` event when items are added or it is cleared.
  *
  * Overview
  * ```
- * const fh = frequencyMutable();
+ * const fh = Trackers.frequency();
  * fh.add(value); // adds a value
  * fh.clear();    // clears all data
  * fh.keys() / .values() // returns an iterator for keys and values
@@ -170,7 +170,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
  *
  * Usage
  * ```
- * const fh = frequencyMutable();
+ * const fh = Trackers.frequency();
  * fh.add(`apples`); // Count an occurence of `apples`
  * fh.add(`oranges)`;
  * fh.add(`apples`);
@@ -184,7 +184,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
  *
  * Custom key string
  * ```
- * const fh = frequencyMutable( person => person.name);
+ * const fh = Trackers.frequency( person => person.name);
  * // All people with name `Samantha` will be counted in same group
  * fh.add({name:`Samantha`, city:`Brisbane`});
  * ```

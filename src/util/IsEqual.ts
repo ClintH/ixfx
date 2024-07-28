@@ -112,7 +112,7 @@ export const isEqualValuePartial = <T1 extends Record<string, any>, T2 extends R
  * 
  * There is an overhead to ordering fields. Use {@link isEqualValueDefault} if it's not possible that field ordering will change.
  * @returns True if the contents of `a` and `b` are equal
- * @paramType T - Type of objects being compared
+ * @typeParam T - Type of objects being compared
  */
 export const isEqualValueIgnoreOrder = <T>(a: T, b: T): boolean => {
   // ✔ UNIT TESTED

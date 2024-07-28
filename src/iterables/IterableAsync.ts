@@ -110,14 +110,14 @@ export const until = async (it: AsyncIterable<any> | Iterable<any>, callback: ()
  * }
  * ```
  * 
- * Limiting the number of repeats can be done by passing in a number or AbortSignal as a second parameter.
+ * Limiting the number of repeats can be done by passing in extra parameters
  * ```js
- * repeat(generator, 5); // Iterate over `generator` five times
+ * repeat(generator, { count: 5} ); // Iterate over `generator` five times
  * ```
  * 
  * ```js
  * const ac = new AbortController();
- * repeat(generator, ac.signal); // Pass in signal
+ * repeat(generator, { signal: ac.signal }); // Pass in signal
  * ...
  * ac.abort(); // Trigger signal at some point
  * ```

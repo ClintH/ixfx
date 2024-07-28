@@ -9,6 +9,7 @@ export function round(decimalPlaces: number): (v: number) => number;
  * If one parameter is given, it's the decimal places,
  * and a rounding function is returned:
  * ```js
+ * import { round } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * const r = round(2);
  * r(10.12355); // 10.12
  * ```
@@ -46,8 +47,8 @@ export function round(a: number, b?: number) {
  * @param multiple
  * @returns
  */
-export const roundUpToMultiple = (v: number, multiple: number): number => {
-  throwNumberTest(v, `nonZero`, `v`);
-  throwNumberTest(multiple, `nonZero`, `multiple`);
-  return Math.ceil(v / multiple) * multiple;
-};
+// export const roundUpToMultiple = (v: number, multiple: number): number => {
+//   throwNumberTest(v, `nonZero`, `v`);
+//   throwNumberTest(multiple, `nonZero`, `multiple`);
+//   return Math.ceil(v / multiple) * multiple;
+// };

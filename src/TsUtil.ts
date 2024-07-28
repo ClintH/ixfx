@@ -23,3 +23,13 @@ export type ReadonlyRemapObjectPropertyType<OriginalType, PropertyType> = {
 export type RemapObjectPropertyType<OriginalType, PropertyType> = {
   [ Property in keyof OriginalType ]: PropertyType;
 };
+
+
+// eg RequireOnlyOne<someType, 'prop1'|'prop2'>
+export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
+  Pick<T, Exclude<keyof T, Keys>>
+  & {
+    [ K in Keys ]-?:
+    Required<Pick<T, K>>
+    & Partial<Record<Exclude<Keys, K>, undefined>>
+  }[ Keys ]

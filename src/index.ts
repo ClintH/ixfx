@@ -271,7 +271,7 @@ export * as Iterables from './iterables/index.js';
  * * {@link movingAverage}: Calculates an average-over-time ({@link movingAverageLight} is a coarser, less memory-intensive version)
  * * {@link movingAverageTimed}: Automatically add values at a given rate
  * * {@link noiseFilter}: Noise filter
- * * {@link round}, {@link roundUpToMultiple}
+ * * {@link round}
  * * {@link quantiseEvery}: Rounds a value to the nearest given value
  * 
  * Calculating
