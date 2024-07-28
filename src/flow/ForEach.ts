@@ -4,17 +4,18 @@ import { sleep } from "./Sleep.js";
  * Iterates over `iterator` (iterable/array), calling `fn` for each value.
  * If `fn` returns _false_, iterator cancels.
  *
- * Over the default JS `forEach` function, this one allows you to exit the
+ * Over the default JS `forEachSync` function, this one allows you to exit the
  * iteration early.
  *
  * @example
  * ```js
- * forEach(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
- * forEach(count(5), i => console.log(i));      // Prints 0 1 2 3 4
- * forEach([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4
+ * import { forEachSync } from "https://unpkg.com/ixfx/dist/flow.js"
+ * forEachSync(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
+ * forEachSync(count(5), i => console.log(i));      // Prints 0 1 2 3 4
+ * forEachSync([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4
  * ```
  *
- * Use {@link forEachAsync} if you want to use an async `iterator` and async `fn`.
+ * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
  * 
  * Alternatives:
  * * {@link repeat}/{@link repeatSync}: if you want to call something a given number of times and get the result
@@ -22,7 +23,7 @@ import { sleep } from "./Sleep.js";
  * @typeParam V Type of iterable
  * @param fn Function to call for each item. If function returns _false_, iteration cancels
  */
-export const forEach = <V>(
+export const forEachSync = <V>(
   iterator: IterableIterator<V> | ReadonlyArray<V>,
   fn: (v?: V) => boolean
 ) => {
@@ -36,16 +37,17 @@ export const forEach = <V>(
  * Iterates over an async iterable or array, calling `fn` for each value, with optional
  * interval between each loop. If the async `fn` returns _false_, iterator cancels.
  *
- * Use {@link forEach} for a synchronous version.
+ * Use {@link forEachSync} for a synchronous version.
  *
  * ```
+ * import { forEach } from "https://unpkg.com/ixfx/dist/flow.js"
  * // Prints items from array every second
- * await forEachAsync([0,1,2,3], i => console.log(i), 1000);
+ * await forEach([0,1,2,3], i => console.log(i), 1000);
  * ```
  *
  * ```
  * // Retry up to five times, with 5 seconds between each attempt
- * await forEachAsync(count(5), i=> {
+ * await forEach(count(5), i=> {
  *  try {
  *    await doSomething();
  *    return false; // Succeeded, exit early
@@ -59,7 +61,7 @@ export const forEach = <V>(
  * @param fn Function to invoke on each item. If it returns _false_ loop ends.
  * @typeParam V Type of iterable
  */
-export const forEachAsync = async function <V>(
+export const forEach = async function <V>(
   iterator: AsyncIterableIterator<V> | ReadonlyArray<V>,
   fn: (v?: V) => Promise<boolean> | Promise<void>,
   intervalMs?: number

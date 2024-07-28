@@ -157,7 +157,7 @@ export * as Io from './io/index.js';
  * * {@link rateMinimum}: Ensures that a function is called at a set rate
  * 
  * Iteration over values
- * * {@link forEach} / {@link forEachAsync}: Loop over an iterable or array, with the possibility of early exit
+ * * {@link forEach} / {@link forEachSync}: Loop over an iterable or array, with the possibility of early exit
  * * {@link repeat} / @{link repeatAwait}: Runs a function a given number of times, yielding results as they come in
  *
  * Monitoring
