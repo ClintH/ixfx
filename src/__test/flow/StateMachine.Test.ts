@@ -59,7 +59,7 @@ test('routine', (t) => {
   t.like(StateMachine.possible(l), [ 'coffee', 'phone' ]);
   t.true(StateMachine.isValidTransition(l, 'phone'));
   t.true(StateMachine.isValidTransition(l, 'coffee'));
-  t.false(StateMachine.done(l));
+  t.false(StateMachine.isDone(l));
 
   t.false(StateMachine.isValidTransition(l, 'breakfast'));
   t.throws(() => StateMachine.to(l, 'breakfast'));
@@ -88,7 +88,7 @@ test('routine', (t) => {
   t.like(StateMachine.possible(l1), [ 'breakfast', 'teeth' ]);
 
   t.true(StateMachine.isValidTransition(l1, 'teeth'));
-  t.false(StateMachine.done(l1));
+  t.false(StateMachine.isDone(l1));
 
   t.false(StateMachine.isValidTransition(l1, 'wakeup'));
   t.throws(() => StateMachine.to(l1, 'wakeup'));
@@ -105,8 +105,8 @@ test('routine', (t) => {
   t.true(l1.value === 'coffee');
   t.like(StateMachine.possible(l2), [ 'coffee', 'teeth' ]);
 
-  t.false(StateMachine.done(l2));
-  t.false(StateMachine.done(l1));
+  t.false(StateMachine.isDone(l2));
+  t.false(StateMachine.isDone(l1));
 
   t.true(StateMachine.isValidTransition(l2, 'coffee'));
   t.true(StateMachine.isValidTransition(l2, 'coffee'));
@@ -114,7 +114,7 @@ test('routine', (t) => {
   // l3: teeth
   const l3 = StateMachine.to(l2, 'teeth');
   t.true(l3.value === 'teeth');
-  t.false(StateMachine.done(l3));
+  t.false(StateMachine.isDone(l3));
   t.like(StateMachine.possible(l3), [ 'bike' ]);
 
   // l4: bike
@@ -122,10 +122,10 @@ test('routine', (t) => {
   t.true(l4.value === 'bike');
   t.true(isEmptyArray(StateMachine.possible(l4)));
   t.like(l4.visited, [ 'coffee', 'breakfast', 'teeth' ]);
-  t.false(StateMachine.done(l1));
-  t.false(StateMachine.done(l2));
-  t.false(StateMachine.done(l3));
-  t.true(StateMachine.done(l4));
+  t.false(StateMachine.isDone(l1));
+  t.false(StateMachine.isDone(l2));
+  t.false(StateMachine.isDone(l3));
+  t.true(StateMachine.isDone(l4));
 
   t.throws(() => StateMachine.to(l4, 'teeth'));
   t.throws(() => StateMachine.to(l4, 'wakeup'));
@@ -285,8 +285,8 @@ test('default', (t) => {
     const l3 = StateMachine.to(l2, 'off');
   });
 
-  t.false(StateMachine.done(l));
-  t.false(StateMachine.done(l2));
+  t.false(StateMachine.isDone(l));
+  t.false(StateMachine.isDone(l2));
 
   const l3 = StateMachine.to(l2, 'on');
   t.like(l3.visited, [ 'on', 'off' ]);

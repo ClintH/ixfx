@@ -127,7 +127,7 @@ export const cloneState = <V extends Transitions>(
  * sm = StateMachine.to(sm, 'shoes');
  * sm.state; // 'shoes'
  * sm.visited; // [ 'pants' ]
- * StateMachineLight.done(sm); // false
+ * StateMachineLight.isDdone(sm); // false
  * StateMachineLight.possible(sm); // [ 'shirt' ]
  * ```
  * @param stateMachine Settings for state machine
@@ -222,11 +222,11 @@ export const validateMachine = <V extends Transitions>(
 // };
 
 /**
- * Returns _true_ if `sm` is in its final state.
+ * Returns _true_ if MachineState `sm` is in its final state.
  * @param sm
  * @returns
  */
-export const done = <V extends Transitions>(sm: MachineState<V>): boolean => {
+export const isDone = <V extends Transitions>(sm: MachineState<V>): boolean => {
   return possible(sm).length === 0;
 };
 

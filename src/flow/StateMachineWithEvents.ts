@@ -114,7 +114,7 @@ export class StateMachineWithEvents<
    * @returns
    */
   get isDone(): boolean {
-    return StateMachine.done(this.#sm);
+    return StateMachine.isDone(this.#sm);
   }
 
   /**
@@ -167,7 +167,7 @@ export class StateMachineWithEvents<
       this.fireEvent(`change`, { newState: newState, priorState: priorState });
     }, 1);
 
-    if (StateMachine.done(this.#sm)) this.#setIsDone(true);
+    if (StateMachine.isDone(this.#sm)) this.#setIsDone(true);
   }
 
   get state(): string {
