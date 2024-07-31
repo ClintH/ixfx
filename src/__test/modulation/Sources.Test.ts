@@ -51,7 +51,7 @@ test(`ticks`, t => {
 
 test(`elapsed`, async t => {
   const s1 = Mod.Sources.elapsed(500);
-  const s1Results = await Array.from(Flow.repeatSync(async () => {
+  const s1Results = await Array.fromAsync(Flow.repeat(async () => {
     await Flow.sleep(100);
     return round(1, s1())
   }, { count: 10 }));
