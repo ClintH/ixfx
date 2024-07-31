@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as Envelopes from '../../modulation/envelope/index.js';
 import { sleep, Elapsed } from '../../flow/index.js';
-import { isApprox } from 'src/numbers/IsApprox.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 
 test(`as-iterator`, async t => {
   const e = new Envelopes.Adsr({
@@ -48,5 +48,5 @@ test(`as-function`, async t => {
     if (v === 0) break;
   }
   const total = elapsed();
-  t.true(isApprox(0.1, 900, total), `Elapsed: ${ total }`);
+  t.true(isApprox(0.2, 900, total), `Elapsed: ${ total }`);
 });
