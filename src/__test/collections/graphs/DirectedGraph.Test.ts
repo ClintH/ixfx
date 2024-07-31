@@ -20,6 +20,19 @@ const circularGraph = () => {
   )
 }
 
+test(`errors`, t => {
+  // @ts-expect-error
+  let g = t.throws(() => Dg.graph(undefined));
+  // @ts-expect-error
+  g = t.throws(() => Dg.graph(null));
+
+  // @ts-expect-error
+  const g = t.throws(() => Dg.graph(10));
+  // @ts-expect-error
+  const g = t.throws(() => Dg.graph("blah"));
+
+})
+
 test(`toAdjacencyMatrix`, t => {
   // Directed
   const g = Dg.graph(
