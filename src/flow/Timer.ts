@@ -55,17 +55,19 @@ export type RelativeTimerOpts = TimerOpts & {
  * A function that returns _true_ when an interval has elapsed
  *
  * ```js
+ * import { hasElapsed } from "https://unpkg.com/ixfx/dist/flow.js"
  * const oneSecond = hasElapsed(1000);
  * 
  * // Keep calling to check if time has elapsed.
  * // Will return _true_ when it has
  * oneSecond();
  * ```
+ * 
  * @param elapsed
  * @returns
  */
 export function hasElapsed(elapsed: Interval): () => boolean {
-  const t = relative(intervalToMs(elapsed, 0), { timer: elapsedMillisecondsAbsolute() });
+  const t = relative(intervalToMs(elapsed, 0), { timer: elapsedMillisecondsAbsolute(), clampValue: true });
   return () => t.isDone;
 }
 
@@ -79,7 +81,8 @@ export function hasElapsed(elapsed: Interval): () => boolean {
  * Starts when return function is first invoked.
  *
  * ```js
- * const timer = Timer.ofTotal(1000);
+ * import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
+ * const timer = Flow.ofTotal(1000);
  * 
  * // Call timer() to find out the completion
  * timer(); // Returns 0..1
@@ -87,18 +90,18 @@ export function hasElapsed(elapsed: Interval): () => boolean {
  *
  * Note that timer can exceed 1 (100%). To cap it:
  * ```js
- * Timer.ofTotal(1000, { clampValue: true });
+ * Flow.ofTotal(1000, { clampValue: true });
  * ```
  *
  * Takes an {@link Interval} for more expressive time:
  * ```js
- * const timer = Timer.ofTotal({ mins: 4 });
+ * const timer = Flow.ofTotal({ mins: 4 });
  * ```
- * 
- * See also {@link hasElapsed}.
  * 
  * Is a simple wrapper around {@link relative}.
  * @param duration
+ * @see {@link ofTotalTicks} - Use ticks instead of time
+ * @see {@link hasElapsed} - Simple _true/false_ if interval has elapsed
  * @returns
  */
 export function ofTotal(
@@ -125,18 +128,19 @@ export function ofTotal(
  * Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
  *
  * ```js
- * const timer = Timer.ofTotalTicks(1000);
+ * import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
+ * const timer = Flow.ofTotalTicks(1000);
  * timer(); // Returns 0..1
  * ```
  *
  * Note that timer can exceed 1 (100%). To cap it:
  * ```js
- * Timer.ofTotal(1000, { clampValue: true });
+ * Flow.ofTotalTicks(1000, { clampValue: true });
  * ```
  *
- * See also {@link hasElapsed}.
- * 
- * Is a simple wrapper around {@link relative}.
+ * This is a a simple wrapper around {@link relative}.
+ * @see {@link ofTotal}
+ * @see {@link hasElapsed}: Simple _true/false_ if interval has elapsed
  * @param totalTicks
  * @returns
  */
