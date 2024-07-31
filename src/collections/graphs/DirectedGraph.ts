@@ -6,6 +6,7 @@ import { immutable as immutableMap, type IMapImmutable } from "../../collections
 import { NumberMap } from "../../collections/map/NumberMap.js"
 import * as Sync from "../../iterables/IterableSync.js"
 import { Table } from "../Table.js"
+import { throwStringTest } from "../../util/GuardString.js"
 
 export type DistanceCompute = (graph: DirectedGraph, edge: Edge) => number;
 
@@ -75,13 +76,48 @@ export type ConnectOptions = Readonly<{
 }>
 
 /**
- * Directed graph. Immutable
+ * Directed graph. Immutable.
  * 
  * Consists of {@link Vertex|vertices}, which all have zero or more outgoing {@link Edge|Edges}.
  */
 export type DirectedGraph = Readonly<{
   vertices: IMapImmutable<string, Vertex>
 }>
+
+/**
+ * Returns _true_ if graph contains `key`.
+ * 
+ * ```js
+ * // Same as
+ * g.vertices.has(key)
+ * ```
+ * @param graph
+ * @param key 
+ * @returns 
+ */
+export function hasKey(graph: DirectedGraph, key: string): boolean {
+  throwGraphTest(graph);
+  return graph.vertices.has(key);
+}
+
+/**
+ * Returns {@link Vertex} under `key`, or _undefined_
+ * if not found.
+ * 
+ * ```js
+ * // Same as
+ * g.vertices.get(key)
+ * ```
+ * @param graph 
+ * @param key 
+ * @returns 
+ */
+export function get(graph: DirectedGraph, key: string): Vertex | undefined {
+  throwGraphTest(graph);
+  throwStringTest(key, `non-empty`, `key`);
+  return graph.vertices.get(key);
+
+}
 
 // export function fromAdjacenyMatrix(m: Array<Array<boolean>>): DirectedGraph {
 //   let g = graph();
@@ -97,6 +133,8 @@ export type DirectedGraph = Readonly<{
  * @returns 
  */
 export function toAdjacencyMatrix(graph: DirectedGraph): Table<boolean> {
+  throwGraphTest(graph);
+
   const v = [ ...graph.vertices.values() ];
   //const m: Array<Array<boolean>> = [];
   const table = new Table<boolean>();
@@ -140,6 +178,7 @@ export const dumpGraph = (graph: DirectedGraph | Iterable<Vertex>): string => {
  * @returns 
  */
 const debugGraphToArray = (graph: DirectedGraph | Iterable<Vertex>): Array<string> => {
+
   const r: Array<string> = [];
   const vertices = (`vertices` in graph) ? graph.vertices.values() : graph;
 
@@ -162,6 +201,8 @@ export const distance = (graph: DirectedGraph, edge: Edge): number => {
  * @param graph 
  */
 export function* edges(graph: DirectedGraph) {
+  throwGraphTest(graph);
+
   const vertices = [ ...graph.vertices.values() ];
   for (const vertex of vertices) {
     for (const edge of vertex.out) {
@@ -175,19 +216,38 @@ export function* edges(graph: DirectedGraph) {
  * @param graph 
  */
 export function* vertices(graph: DirectedGraph) {
+  throwGraphTest(graph);
+
   const vertices = [ ...graph.vertices.values() ];
   for (const vertex of vertices) {
     yield vertex;
   }
 }
 
+function testGraph(g: DirectedGraph, paramName = `graph`) {
+  if (g === undefined) return [ false, `Param '${ paramName }' is undefined. Expected Graph` ];
+  if (g === null) return [ false, `Param '${ paramName }' is null. Expected Graph` ];
+  if (typeof g === `object`) {
+    if (!(`vertices` in g)) return [ false, `Param '${ paramName }.vertices' does not exist. Is it a Graph type?` ]
+  } else {
+    return [ false, `Param '${ paramName } is type '${ typeof g }'. Expected an object Graph` ];
+  }
+  return [ true ];
+}
+
+function throwGraphTest(g: DirectedGraph, paramName = `graph`) {
+  const r = testGraph(g, paramName);
+  if (r[ 0 ]) return;
+  throw new Error(r[ 1 ] as string)
+}
 /**
- * Iterate over all the vertices connectd to `context` vertex
+ * Iterate over all the vertices connected to `context` vertex
  * @param graph Graph
- * @param context id or Vertex
+ * @param context id or Vertex.
  * @returns 
  */
 export function* adjacentVertices(graph: DirectedGraph, context: Vertex | string | undefined) {
+  throwGraphTest(graph);
   if (context === undefined) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
   if (vertex === undefined) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
@@ -221,6 +281,8 @@ export const vertexHasOut = (vertex: Vertex, outIdOrVertex: string | Vertex): bo
  * @returns 
  */
 export const hasNoOuts = (graph: DirectedGraph, vertex: string | Vertex): boolean => {
+  throwGraphTest(graph);
+
   const context = typeof vertex === `string` ? graph.vertices.get(vertex) : vertex;
   if (context === undefined) return false;
   return context.out.length === 0;
@@ -235,6 +297,8 @@ export const hasNoOuts = (graph: DirectedGraph, vertex: string | Vertex): boolea
  * @returns 
  */
 export const hasOnlyOuts = (graph: DirectedGraph, vertex: string | Vertex, ...outIdOrVertex: Array<string | Vertex>): boolean => {
+  throwGraphTest(graph);
+
   const context = resolveVertex(graph, vertex);
   const outs = outIdOrVertex.map(o => resolveVertex(graph, o));
 
@@ -260,6 +324,8 @@ export const hasOnlyOuts = (graph: DirectedGraph, vertex: string | Vertex, ...ou
  * @returns 
  */
 export const hasOut = (graph: DirectedGraph, vertex: string | Vertex, outIdOrVertex: string | Vertex): boolean => {
+  throwGraphTest(graph);
+
   const context = resolveVertex(graph, vertex);
   const outId = typeof outIdOrVertex === `string` ? outIdOrVertex : outIdOrVertex.id;
   return context.out.some(edge => edge.id === outId);
@@ -280,6 +346,8 @@ export const hasOut = (graph: DirectedGraph, vertex: string | Vertex, outIdOrVer
  * @returns 
  */
 export const getOrCreate = (graph: DirectedGraph, id: string): Readonly<{ graph: DirectedGraph, vertex: Vertex }> => {
+  throwGraphTest(graph);
+
   const v = graph.vertices.get(id);
   if (v !== undefined) return { graph, vertex: v };
 
@@ -295,6 +363,8 @@ export const getOrCreate = (graph: DirectedGraph, id: string): Readonly<{ graph:
  * @returns 
  */
 export const getOrFail = (graph: DirectedGraph, id: string): Vertex => {
+  throwGraphTest(graph);
+
   const v = graph.vertices.get(id);
   if (v === undefined) throw new Error(`Vertex '${ id }' not found in graph`);
   return v;
@@ -307,6 +377,8 @@ export const getOrFail = (graph: DirectedGraph, id: string): Vertex => {
  * @returns 
  */
 export const updateGraphVertex = (graph: DirectedGraph, vertex: Vertex): DirectedGraph => {
+  throwGraphTest(graph);
+
   const gr = {
     ...graph,
     vertices: graph.vertices.set(vertex.id, vertex)
@@ -335,6 +407,8 @@ export const distanceDefault = (graph: DirectedGraph, edge: Edge): number => {
  * @returns 
  */
 export function disconnect(graph: DirectedGraph, from: string | Vertex, to: string | Vertex): DirectedGraph {
+  throwGraphTest(graph);
+
   const fromV = resolveVertex(graph, from);
   const toV = resolveVertex(graph, to);
 
@@ -354,6 +428,8 @@ export function disconnect(graph: DirectedGraph, from: string | Vertex, to: stri
  * @returns 
  */
 export function connectTo(graph: DirectedGraph, from: string, to: string, weight?: number): { graph: DirectedGraph, edge: Edge } {
+  throwGraphTest(graph);
+
   const fromResult = getOrCreate(graph, from);
   graph = fromResult.graph;
   const toResult = getOrCreate(graph, to);
@@ -375,32 +451,57 @@ export function connectTo(graph: DirectedGraph, from: string, to: string, weight
 }
 
 /**
- * Connect from -> to. By default unidirectional.
- * Returns a new graph with the connection
+ * Connect from -> to. Same as {@link connectWithEdges}, but this version just returns the graph.
+ * 
+ * By default unidirectional, meaning a connection is made only from->to. Use `bidi` option to set a bidirection connection, adding also to->from.
+ * 
+ * Returns a result of `{ graph, edges }`, where `graph` is the new {@link DirectedGraph} and `edges`
+ * is an array of {@link Edge Edges}. One for unidirectional, or two for bidirectional.
  * @param graph 
  * @param options 
  * @returns 
  */
 export function connect(graph: DirectedGraph, options: ConnectOptions): DirectedGraph {
+  const result = connectWithEdges(graph, options);
+  return result.graph;
+}
+
+/**
+ * Connect from -> to. Same as {@link connect} except you get back the edges as well. 
+ * 
+ * By default unidirectional, meaning a connection is made only from->to. Use `bidi` option to set a bidirection connection, adding also to->from.
+ * 
+ * Returns a result of `{ graph, edges }`, where `graph` is the new {@link DirectedGraph} and `edges`
+ * is an array of {@link Edge Edges}. One for unidirectional, or two for bidirectional.
+ * @param graph 
+ * @param options 
+ * @returns 
+ */
+export function connectWithEdges(graph: DirectedGraph, options: ConnectOptions): { graph: DirectedGraph, edges: Edge[] } {
+  throwGraphTest(graph);
+
   const { to, weight, from } = options;
   const bidi = options.bidi ?? false;
   const toList = Array.isArray(to) ? to : [ to ];
 
+  let edges: Edge[] = []
   // Connect from -> to
   for (const toSingle of toList) {
     const result = connectTo(graph, from, toSingle, weight);
     graph = result.graph;
+    edges.push(result.edge);
   }
 
-  if (!bidi) return graph;
+  if (!bidi) return { graph, edges };
 
   // Bidirectional connection
   // Connect to -> from
   for (const toSingle of toList) {
     const result = connectTo(graph, toSingle, from, weight);
     graph = result.graph;
+    edges.push(result.edge);
   }
-  return graph;
+  return { graph, edges };
 }
 
 /**
@@ -433,6 +534,8 @@ const debugDumpVertex = (v: Vertex): Array<string> => {
  * @returns 
  */
 export function areAdjacent(graph: DirectedGraph, a: Vertex, b: Vertex) {
+  throwGraphTest(graph);
+
   if (hasOut(graph, a, b.id)) return true;
   if (hasOut(graph, b, a.id)) return true;
 }
@@ -445,6 +548,10 @@ export function areAdjacent(graph: DirectedGraph, a: Vertex, b: Vertex) {
  * @returns 
  */
 function resolveVertex(graph: DirectedGraph, idOrVertex: string | Vertex): Vertex {
+  throwGraphTest(graph);
+
+  if (idOrVertex === undefined) throw new Error(`Param 'idOrVertex' is undefined. Expected string or Vertex`);
+
   const v = typeof idOrVertex === `string` ? graph.vertices.get(idOrVertex) : idOrVertex;
   if (v === undefined) throw new Error(`Id not found ${ idOrVertex as string }`);
   return v;
@@ -458,6 +565,8 @@ function resolveVertex(graph: DirectedGraph, idOrVertex: string | Vertex): Verte
  * @returns 
  */
 export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, targetIdOrVertex?: string | Vertex) {
+  throwGraphTest(graph);
+
   const start = resolveVertex(graph, startIdOrVertex);
   const target = targetIdOrVertex === undefined ? undefined : resolveVertex(graph, targetIdOrVertex);
 
@@ -483,6 +592,8 @@ export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, tar
  * @param startIdOrVertex 
  */
 export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex) {
+  throwGraphTest(graph);
+
   const source = resolveVertex(graph, startIdOrVertex);
 
   const s = new StackMutable<Vertex>();
@@ -511,6 +622,8 @@ export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex) {
  * @returns 
  */
 export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) => {
+  throwGraphTest(graph);
+
   const source = typeof sourceOrId === `string` ? graph.vertices.get(sourceOrId) : sourceOrId;
   if (source === undefined) throw new Error(`source vertex not found`);
 
@@ -568,6 +681,8 @@ export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) 
  * @returns 
  */
 export const clone = (graph: DirectedGraph): DirectedGraph => {
+  throwGraphTest(graph);
+
   const g: DirectedGraph = {
     vertices: immutableMap<string, Vertex>([ ...graph.vertices.entries() ])
   }
@@ -576,6 +691,17 @@ export const clone = (graph: DirectedGraph): DirectedGraph => {
 
 /**
  * Create a graph
+ * ```js
+ * let g = graph();
+ * ```
+ * 
+ * Can optionally provide initial connections:
+ * ```js
+ * let g = graph(
+ *  { from: `a`, to: `b` },
+ *  { from: `b`, to: `c` }
+ * )
+ * ```
  * @param initialConnections 
  * @returns 
  */
@@ -603,6 +729,8 @@ type TarjanVertex = Vertex & {
  * @param graph 
  */
 export function isAcyclic(graph: DirectedGraph): boolean {
+  throwGraphTest(graph);
+
   const cycles = getCycles(graph);
   return cycles.length === 0;
 }
@@ -613,6 +741,8 @@ export function isAcyclic(graph: DirectedGraph): boolean {
  * @param graph 
  */
 export function topologicalSort(graph: DirectedGraph): DirectedGraph {
+  throwGraphTest(graph);
+
   const indegrees = new NumberMap(0);
 
   // Increment indegrees for each edge leading to a vertex
@@ -674,6 +804,8 @@ export function graphFromVertices(vertices: Iterable<Vertex>): DirectedGraph {
  * @returns 
  */
 export function getCycles(graph: DirectedGraph): Array<Array<Vertex>> {
+  throwGraphTest(graph);
+
   let index = 0;
   const stack = new StackMutable<TarjanVertex>();
   const vertices = new Map<string, TarjanVertex>();
@@ -734,6 +866,8 @@ export function getCycles(graph: DirectedGraph): Array<Array<Vertex>> {
  * @returns 
  */
 export function transitiveReduction(graph: DirectedGraph) {
+  throwGraphTest(graph);
+
   for (const u of vertices(graph)) {
     for (const v of adjacentVertices(graph, u)) {
       for (const v1 of dfs(graph, v)) {
