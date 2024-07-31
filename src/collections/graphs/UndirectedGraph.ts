@@ -47,17 +47,40 @@ export const getOrCreate = (graph: Graph, id: string): Readonly<{ graph: Graph, 
 }
 
 function resolveVertex(graph: Graph, idOrVertex: string | Vertex): Vertex {
+  if (idOrVertex === undefined) throw new Error(`Param 'idOrVertex' is undefined. Expected string or Vertex`);
+  if (graph === undefined) throw new Error(`Param 'graph' is undefined. Expected Graph`);
   const v = typeof idOrVertex === `string` ? graph.vertices.get(idOrVertex) : idOrVertex;
   if (v === undefined) throw new Error(`Id not found ${ idOrVertex as string }`);
   return v;
 }
 
+/**
+ * Returns _true/false_ if there is a connection between `a` and `b` in `graph`.
+ * Use {@link getConnection} if you want to the edge.
+ * @param graph Graph to search 
+ * @param a
+ * @param b
+ * @returns _true_ if edge exists 
+ */
 export const hasConnection = (graph: Graph, a: string | Vertex, b: string | Vertex): boolean => {
   const edge = getConnection(graph, a, b);
   return edge !== undefined;
 }
 
+/**
+ * Gets the connection, if it exists between `a` and `b` in `graph`.
+ * If it doesn't exist, _undefined_ is returned.
+ * Use {@link hasConnection} for a simple true/false if edge exists.
+ * @param graph Graph
+ * @param a 
+ * @param b 
+ * @returns 
+ */
 export const getConnection = (graph: Graph, a: string | Vertex, b: string | Vertex): Edge | undefined => {
+  if (a === undefined) throw new Error(`Param 'a' is undefined. Expected string or Vertex`);
+  if (b === undefined) throw new Error(`Param 'b' is undefined. Expected string or Vertex`);
+  if (graph === undefined) throw new Error(`Param 'graph' is undefined. Expected Graph`);
+
   const aa = resolveVertex(graph, a);
   const bb = resolveVertex(graph, b);
   for (const edge of graph.edges) {
@@ -68,7 +91,8 @@ export const getConnection = (graph: Graph, a: string | Vertex, b: string | Vert
 }
 
 /**
- * Connect A <-> B
+ * Connects A with B, returning the changed graph and created edge.
+ * If the connection already exists, the original graph & edge is returned.
  * @param graph 
  * @param a 
  * @param b 
@@ -96,16 +120,54 @@ export function connectTo(graph: Graph, a: string, b: string, weight?: number): 
   return { graph: graphChanged, edge }
 }
 
+
+/**
+ * Makes a connection between `options.a` and one or more nodes in `options.b`.
+ * Same as {@link connectWithEdges} but only the {@link Graph} is returned.
+ * 
+ * ```js
+ * let g = graph(); // Create an empty graph
+ * // Make a connection between `red` and `orange`
+ * g = connect(g, { a: `red`, b: `orange` });
+ * 
+ * // Make a connection between `red` and `orange as well as `red` and `yellow`.
+ * g = connect(g, { a: `red`, b: [`orange`, `yellow`] })
+ * ```
+ * @param graph Initial graph
+ * @param options Options
+ */
 export function connect(graph: Graph, options: ConnectOptions): Graph {
+  const result = connectWithEdges(graph, options);
+  return result.graph;
+}
+
+/**
+ * Makes a connection between `options.a` and one or more nodes in `options.b`.
+ * Same as {@link connect} but graph and edges are returned.
+ * 
+ * ```js
+ * let g = graph(); // Create an empty graph
+ * 
+ * // Make a connection between `red` and `orange`
+ * result = connectWithEdges(g, { a: `red`, b: `orange` });
+ * 
+ * // Make a connection between `red` and `orange as well as `red` and `yellow`.
+ * result = connectWithEdges(g, { a: `red`, b: [`orange`, `yellow`] })
+ * ```
+ * @param graph Initial graph
+ * @param options Options
+ */
+export function connectWithEdges(graph: Graph, options: ConnectOptions): { graph: Graph, edges: Edge[] } {
   const { a, weight, b } = options;
   const destinations = Array.isArray(b) ? b : [ b ];
-
+  let edges: Edge[] = [];
   for (const destination of destinations) {
     const result = connectTo(graph, a, destination, weight);
     graph = result.graph;
+    edges.push(result.edge);
   }
 
-  return graph;
+  return { graph, edges };
 }
 
 export const graph = (...initialConnections: Array<ConnectOptions>): Graph => {
