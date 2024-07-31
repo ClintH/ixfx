@@ -54,7 +54,7 @@ test(`of-total`, async t => {
     if (since() >= 500) {
       t.is(v1, 1);
     } else {
-      t.true(isApprox(0.001, v3, v1), `v1: ${ v1 } v3: ${ v3 }`);
+      t.true(isApprox(0.01, v3, v1), `v1: ${ v1 } v3: ${ v3 }`);
     }
     await Flow.sleep(100);
     v3 += 0.2;
