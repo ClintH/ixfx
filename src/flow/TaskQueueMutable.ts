@@ -25,12 +25,14 @@ export type TaskQueueEvents = {
  * so you don't create it directly. Rather, use:
  * 
  * ```js
- * const queue = TaskQueueMutable.instance;
+ * import { TaskQueueMutable } from "https://unpkg.com/ixfx/dist/flow.js"
+ * const queue = TaskQueueMutable.shared;
  * ```
  *
  * @example Usage
  * ```js
- * const queue = TaskQueueMutable.instance;
+ * import { TaskQueueMutable, sleep } from "https://unpkg.com/ixfx/dist/flow.js"
+ * const queue = TaskQueueMutable.shared;
  * q.enqueue(async () => {
  *  // Takes one second to run
  *  await sleep(1000);
