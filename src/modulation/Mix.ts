@@ -1,4 +1,4 @@
-import { interpolate } from "src/numbers/Interpolate.js";
+import { interpolate } from "../numbers/Interpolate.js";
 import type { Modulate } from "./Types.js";
 
 /**

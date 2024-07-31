@@ -17,7 +17,7 @@ export * from './AverageWeighted.js'
  * 
  * Import:
  * ```js
- * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { Bipolar } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * ```
  * 
  * Overview:

@@ -69,7 +69,6 @@ export const scaler = (
   return (v: number): number => {
     if (inMin === inMax) return oMax;
 
-    //eslint-disable-next-line functional/no-let
     let a = (v - inMin) / (inMax - inMin);
     if (easing !== undefined) a = easing(a);
     return a * (oMax - oMin) + oMin;

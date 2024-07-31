@@ -126,7 +126,7 @@ export const fromScalar = (scalarValue: number) => {
 };
 
 /**
- * Scale & clamp a number to bipolar range (-1..1)
+ * Scale & clamp resulting number to bipolar range (-1..1)
  * ```js
  * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
  * 
