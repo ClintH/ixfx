@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.27.2",
+  "version": "0.27.3",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -14,11 +14,10 @@
   "module": "./dist/bundle.js",
   "exports": {
     ".": "./dist/bundle.js",
+    "./arrays.js": "./dist/arrays.js",
     "./collections.js": "./dist/collections.js",
     "./chains.js":"./dist/iterables/chain.js",
-    "./arrays.js": "./dist/arrays.js",
     "./components.js": "./dist/components.js",
-    "./webcomponents.js": "./dist/webcomponents.js",
     "./data.js": "./dist/data.js",
     "./debug.js": "./dist/debug.js",
     "./dom.js": "./dist/dom.js",
@@ -43,6 +42,7 @@
     "./trackers.js": "./dist/trackers.js",
     "./trees.js": "./dist/trees.js",
     "./util.js": "./dist/util.js",
+    "./webcomponents.js": "./dist/webcomponents.js",
     "./visual.js": "./dist/visual.js"
   },
   "browsersList": [
