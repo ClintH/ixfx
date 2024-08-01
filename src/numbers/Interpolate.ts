@@ -31,7 +31,7 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
  *
- * [ixfx Guide](https://clinth.github.io/ixfx-docs/modulation/interpolate/)
+ * [ixfx Guide on Interpolation](https://ixfx.fun/data/interpolation/overview/)
  *
  * @example Get the halfway point between 30 and 60
  * ```js

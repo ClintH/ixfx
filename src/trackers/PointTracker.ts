@@ -251,7 +251,7 @@ export class TrackedPointMap extends TrackedValueMap<
  * See also:
  * * {@link Geometry.Points.relation}: Compute relation info between two points
  * * {@link Trackers.point}: Track relation between points over time
- * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
+ * * [ixfx Guide to Point Tracker](https://ixfx.fun/geometry/tracking/)
  * 
  * Basic usage
  * ```js
@@ -324,7 +324,7 @@ export const points = (options: TrackOpts = {}) =>
  * See also
  * * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
  * * {@link points}: Track several points, useful for multi-touch.
- * * [Guide to Trackers](https://clinth.github.io/ixfx-docs/data/trackers/)
+ * * [ixfx Guide to Point Tracker](https://ixfx.fun/geometry/tracking/)
  * 
  * ```js
  * import { point } from 'https://unpkg.com/ixfx/dist/trackers.js';

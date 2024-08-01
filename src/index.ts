@@ -18,10 +18,8 @@ export type * from './PrimitiveTypes.js';
  * @module
  */
 
-
-
 /**
- * Processing streams of data. [Read more in the docs](https://clinth.github.io/ixfx-docs/temporal/normalising/)
+ * Processing streams of data. [Read more in the Guide](https://ixfx.fun/cleaning/normal/)
  *
  * Sub-modules:
  * * {@link Data.Arrays} helpers for working with arrays

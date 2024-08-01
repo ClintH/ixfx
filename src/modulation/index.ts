@@ -1,7 +1,7 @@
 /**
  * Easings module
  *
- * [See the guide](https://clinth.github.io/ixfx-docs/modulation/easing/)
+ * [See the guide](https://ixfx.fun/modulation/easings/introduction/)
  *
  * Overview:
  * * {@link Easings.create}: Create an easing with provided settings

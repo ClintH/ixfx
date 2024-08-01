@@ -16,7 +16,7 @@
     ".": "./dist/bundle.js",
     "./arrays.js": "./dist/arrays.js",
     "./collections.js": "./dist/collections.js",
-    "./chains.js":"./dist/iterables/chain.js",
+    "./chains.js": "./dist/iterables/chain.js",
     "./components.js": "./dist/components.js",
     "./data.js": "./dist/data.js",
     "./debug.js": "./dist/debug.js",
@@ -67,9 +67,6 @@
     "demos": "rimraf ../ixfx-demos/ixfx/ && rimraf dist && npm run build && npm run demos:copy",
     "demos:watch": "concurrently \"npm run dev\"  \"npm run typings:watch\"",
     "demos:copy": "copyfiles --up 1 ./dist/* ../ixfx-demos/ixfx/",
-    "docs": "typedoc --customCss ./config/custom.css --options ./config/typedoc.json",
-    "docs:watch": "typedoc --customCss ./config/custom.css --watch --options ./config/typedoc.json",
-    "docs:copyIcons": "copyfiles --up 1 ./config/*.png ./docs/assets/",
     "lint": "eslint src/**",
     "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
     "test": "tsc && ava --config ./config/ava.config.js --timeout=20s --no-worker-threads -c=1",
@@ -111,7 +108,6 @@
     "source-map-support": "^0.5.21",
     "tsup": "^8.1.0",
     "tsx": "^4.16.2",
-    "typedoc": "^0.26.5",
     "typescript": "^5.5.3"
   },
   "dependencies": {

@@ -79,7 +79,7 @@ export type EspruinoBleOpts = {
 
 /**
  * Instantiates a Puck.js. See {@link EspruinoBleDevice} for more info.
- * [Online demos](https://clinth.github.io/ixfx-demos/io/)
+ * [Online demos](https://demos.ixfx.fun/io/)
  *
  * If `opts.name` is specified, this will the the Bluetooth device sought.
  *

@@ -7,7 +7,7 @@ import { minMaxAvg } from './MinMaxAvg.js';
  * Normalises numbers, adjusting min/max as new values are processed.
  * Normalised return values will be in the range of 0-1 (inclusive).
  *
- * [Read more in the docs](https://clinth.github.io/ixfx-docs/data/normalising/)
+ * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
  * @example
  * ```js
@@ -56,7 +56,7 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
 
 /**
  * Normalises an array. By default uses the actual min/max of the array
- * as the normalisation range. [Read more in the docs](https://clinth.github.io/ixfx-docs/data/normalising/)
+ * as the normalisation range. [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
  * ```js
  * import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'

@@ -18,7 +18,7 @@ export { Codec } from './Codec.js';
 /**
  * Espruino-based devices connected via Bluetooth LE
  *
- * See [demos](https://clinth.github.io/ixfx-demos/io/)
+ * See [demos](https://demos.ixfx.fun/io/)
  *
  * Overview:
  * * {@link puck}: Connects a {@link Io.Espruino.EspruinoBleDevice | Espruino BLE Device}.

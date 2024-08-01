@@ -41,7 +41,7 @@ export class AdsrIterator implements Iterator<number> {
  * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,
  * usually in response to an intial trigger.
  *
- * [See the ixfx Guide on Envelopes](https://clinth.github.io/ixfx-docs/modulation/envelope/).
+ * [See the ixfx Guide on Envelopes](https://ixfx.fun/modulation/envelopes/introduction/).
  *
  * @example Setup
  * ```js
@@ -53,7 +53,7 @@ export class AdsrIterator implements Iterator<number> {
  * });
  * ```
  *
- * [Options for envelope](https://clinth.github.io/ixfx/types/Modulation.Envelopes.AdsrOpts.html) are as follows:
+ * Options for envelope are as follows:
  *
  * ```js
  * initialLevel?: number
