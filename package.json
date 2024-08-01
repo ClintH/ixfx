@@ -64,9 +64,9 @@
     "prepublishOnly": "npm run clean && npm run build",
     "typings": "tsc --project config/tsconfig.pkg.json",
     "typings:watch": "tsc --watch --project config/tsconfig.pkg.json",
-    "demos": "rimraf ../ixfx-demos/ixfx/ && rimraf dist && npm run build && npm run demos:copy",
+    "demos": "rimraf ../ixfxfun/demos/ixfx/ && rimraf dist && npm run build && npm run demos:copy",
     "demos:watch": "concurrently \"npm run dev\"  \"npm run typings:watch\"",
-    "demos:copy": "copyfiles --up 1 ./dist/* ../ixfx-demos/ixfx/",
+    "demos:copy": "copyfiles --up 1 ./dist/* ../ixfxfun/demos/ixfx/",
     "lint": "eslint src/**",
     "tsc-files": "tsc --noEmit --listFiles | xargs stat -f \"%z %N\" | npx webtreemap-cli",
     "test": "tsc && ava --config ./config/ava.config.js --timeout=20s --no-worker-threads -c=1",
@@ -111,7 +111,6 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@microsoft/api-extractor": "7.47.2",
     "tsimp": "2.0.11"
   },
   "eslintIgnore": [

@@ -40,7 +40,7 @@ If you want to contribute to ixfx or build it yourself, please see [BUILDING.md]
 ## Credits
 
 Bundles
-* [Colorjs](https://colorjs.io/), [d3-color](https://github.com/d3/d3-color/) by Lea Verou, Chris Lilley et al.
+* [Colorjs](https://colorjs.io/) by Lea Verou, Chris Lilley et al.
 * Easing functions by [Andrey Sitnik and Ivan Solovev](https://easings.net/)
 * [Bezier.js](https://github.com/Pomax/bezierjs)
 * [Underdash](https://surma.github.io/underdash/) by Surma
