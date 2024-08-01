@@ -430,9 +430,13 @@ export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayO
   const iterator = it[ Symbol.asyncIterator ]();
   const started = Date.now();
   const maxItems = options.limit ?? Number.POSITIVE_INFINITY;
+  const whileFunc = options.while;
   const maxElapsed = intervalToMs(options.elapsed, Number.POSITIVE_INFINITY);
 
   while (result.length < maxItems && (Date.now() - started < maxElapsed)) {
+    if (whileFunc) {
+      if (!whileFunc(result.length)) break;
+    }
     const r = await iterator.next();
     if (r.done) break;
     //eslint-disable-next-line functional/immutable-data

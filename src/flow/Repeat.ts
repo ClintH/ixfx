@@ -29,6 +29,12 @@ export type RepeatDelayOpts = RepeatOpts & Readonly<Partial<{
  */
 export type RepeatOpts = Partial<Readonly<{
   /**
+   * If specified, repeating stops if this function returns false
+   * @param count
+   * @returns 
+   */
+  while: (count: number) => boolean
+  /**
    * By default, if the callback returns
    * _undefined_ the repeating exits. Set this to _true_ to
    * ignore undefined values
@@ -104,6 +110,7 @@ export async function* repeat<T extends ValueType>(
   const count = opts.count ?? undefined;
   const allowUndefined = opts.allowUndefined ?? false;
   const minIntervalMs = opts.delayMinimum ? intervalToMs(opts.delayMinimum) : undefined;
+  const whileFunc = opts.while;
 
   let cancelled = false;
   let sleepMs = intervalToMs(opts.delay, intervalToMs(opts.delayMinimum, 0));
@@ -138,6 +145,11 @@ export async function* repeat<T extends ValueType>(
         yield result;
         if (delayWhen === `after` || delayWhen === `both`) await doDelay();
         if (count !== undefined && loopedTimes >= count) cancelled = true;
+      }
+      if (whileFunc) {
+        if (!whileFunc(loopedTimes)) {
+          cancelled = true;
+        }
       }
     }
     errored = false

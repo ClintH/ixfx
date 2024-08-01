@@ -1,7 +1,8 @@
 import type { AsyncPromiseOrGenerator } from 'src/flow/Types.js';
 import { Adsr } from './Adsr.js';
-import type { EnvelopeOpts } from './Types.js';
+import type { AdsrIterableOpts, EnvelopeOpts } from './Types.js';
 import { resolveWithFallback, resolveWithFallbackSync } from '../../data/Resolve.js';
+import { repeat } from 'src/flow/Repeat.js';
 
 export * from './Types.js';
 export * from './Adsr.js';
@@ -69,23 +70,19 @@ export const adsr = (opts: EnvelopeOpts = {}) => {
  * @param opts Envelope options
  * @returns
  */
-// export async function* adsrIterable(
-//   opts: AdsrIterableOpts
-// ): AsyncGenerator<number> {
-//   const envelope = adsr(opts.env);
-//   const sampleRateMs = opts.sampleRateMs ?? 100;
-//   envelope.trigger();
+export async function* adsrIterable(
+  opts: AdsrIterableOpts
+): AsyncGenerator<number> {
+  const envelope = new Adsr(opts.env);
+  const sampleRateMs = opts.sampleRateMs ?? 100;
+  envelope.trigger();
 
-//   for await (const v of interval<number>(
-//     () => {
-//       if (envelope.isDone) return;
-//       return envelope.value;
-//     },
-//     {
-//       fixed: sampleRateMs,
-//       signal: opts.signal,
-//     }
-//   )) {
-//     yield v;
-//   }
-// }
+  const r = repeat<number>(() => envelope.value, {
+    while: () => !envelope.isDone,
+    delay: sampleRateMs,
+    signal: opts.signal,
+  })
+  for await (const v of r) {
+    yield v;
+  }
+}

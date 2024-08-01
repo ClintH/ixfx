@@ -416,9 +416,13 @@ export function toArray<V>(
 ): Array<V> {
   const result: Array<V> = [];
   const started = Date.now();
+  const whileFunc = options.while;
   const maxItems = options.limit ?? Number.POSITIVE_INFINITY;
   const maxElapsed = intervalToMs(options.elapsed, Number.POSITIVE_INFINITY);
   for (const v of it) {
+    if (whileFunc) {
+      if (!whileFunc(result.length)) break;
+    }
     if (result.length >= maxItems) break;
     if (Date.now() - started > maxElapsed) break;
     result.push(v);
