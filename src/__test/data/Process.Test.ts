@@ -4,7 +4,7 @@ import * as Process from '../../data/Process.js';
 
 test('seen', t => {
   const c1Results: string[] = [];
-  const c1 = Process.chain(
+  const c1 = Process.flow(
     Process.seenToUndefined(),
     v => {
       c1Results.push(v as string);
@@ -16,7 +16,7 @@ test('seen', t => {
   t.deepEqual(c1Results, [ `hello`, undefined, `bye` ]);
 
   const c2Results: any[] = [];
-  const c2 = Process.chain(
+  const c2 = Process.flow(
     Process.seenToUndefinedByKey(),
     v => {
       c2Results.push(v);
@@ -27,13 +27,13 @@ test('seen', t => {
   c2({ name: `a` });
   t.deepEqual(c2Results, [ { name: 'a' }, { name: 'b' }, undefined ]);
 
-  const c3 = Process.chain(
+  const c3 = Process.flow(
     Process.seenLastToUndefined
   )
 });
 
 test(`basic`, t => {
-  const c1 = Process.chain(Basic.max(), Process.seenLastToUndefined());
+  const c1 = Process.flow(Basic.max(), Process.seenLastToUndefined());
   t.is(c1(100), 100);
   t.falsy(c1(90));
   // @ts-expect-error
@@ -41,7 +41,7 @@ test(`basic`, t => {
   t.is(c1(110), 110);
 
   const c2Results: number[] = [];
-  const c2 = Process.chain(
+  const c2 = Process.flow(
     Basic.max(),
     Process.seenLastToUndefined(),
     Process.ifNotUndefined(v => {
@@ -54,7 +54,7 @@ test(`basic`, t => {
   t.deepEqual(c2Results, [ 100, 110 ]);
 
   const c3Results: number[] = [];
-  const c3 = Process.chain(
+  const c3 = Process.flow(
     Basic.max(),
     Process.seenLastToUndefined(),
     Process.cancelIfUndefined(),
@@ -69,7 +69,7 @@ test(`basic`, t => {
 });
 
 test(`math`, t => {
-  const c1 = Process.chain(Basic.max());
+  const c1 = Process.flow(Basic.max());
   t.is(c1(100), 100);
   t.is(c1(110), 110);
   t.is(c1(90), 110);
@@ -81,7 +81,7 @@ test(`math`, t => {
   t.is(c1(`hello`), 110);
 
 
-  const c2 = Process.chain(Basic.min());
+  const c2 = Process.flow(Basic.min());
   t.is(c2(100), 100);
   t.is(c2(110), 100);
   t.is(c2(90), 90);
@@ -92,7 +92,7 @@ test(`math`, t => {
   // @ts-expect-error
   t.is(c2(`hello`), 90);
 
-  const c3 = Process.chain(Basic.sum());
+  const c3 = Process.flow(Basic.sum());
   t.is(c3(10), 10);
   t.is(c3(20), 30);
   t.is(c3(30), 60);
@@ -103,7 +103,7 @@ test(`math`, t => {
   // @ts-expect-error
   t.is(c3(`hello`), 60);
 
-  const c4 = Process.chain(Basic.tally(false));
+  const c4 = Process.flow(Basic.tally(false));
   t.is(c4(100), 1);
   t.is(c4(110), 2);
   t.is(c4(90), 3);

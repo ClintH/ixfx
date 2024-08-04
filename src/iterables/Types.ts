@@ -16,3 +16,11 @@ export type ToArrayOptions = {
    */
   elapsed: Interval
 }
+
+export type ForEachOptions = {
+  /**
+   * Interval after each iteration.
+   * Only works with asynchronous forEach.
+   */
+  interval?: Interval
+}

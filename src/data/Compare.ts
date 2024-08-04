@@ -107,6 +107,14 @@ const compareResultToObject = (r: CompareChangeSet<any>, b: object): Record<stri
   return output;
 }
 
+/**
+ * Produces a {@link CompareChangeSet} between two arrays.
+ * 
+ * @param a Earlier array to compare
+ * @param b Later array to compare
+ * @param eq Equality comparison for values
+ * @returns Change set.
+ */
 export const compareArrays = <TValue>(a: Array<TValue>, b: Array<TValue>, eq: IsEqual<TValue> = isEqualDefault<TValue>): CompareChangeSet<number> => {
   if (!Array.isArray(a)) throw new Error(`Param 'a' is not an array`);
   if (!Array.isArray(b)) throw new Error(`Param 'b' is not an array`);

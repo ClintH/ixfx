@@ -237,7 +237,7 @@ test(`from-iterable-breaking-initial-reset`, async t => {
 
 // Iterator that never ends
 test(`from-function`, async t => {
-  const random = Iter.Async.fromFunction(Math.random);
+  const random = Iter.fromFunction(Math.random);
   const r1 = Rx.From.iterator(random, { readInterval: 100 });
   let count = 0;
   const off = r1.onValue(v => {

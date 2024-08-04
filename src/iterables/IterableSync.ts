@@ -213,11 +213,32 @@ export function* fill<V>(it: Iterable<V>, v: V) {
   for (const _ of it) yield v;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export function forEach<V>(it: Iterable<V>, f: (v: V) => boolean | void) {
-  // https://surma.github.io/underdash/
-  for (const v of it) {
-    const result = f(v);
+/**
+ * Iterates over `iterator` (iterable/array), calling `fn` for each value.
+ * If `fn` returns _false_, iterator cancels.
+ *
+ * Over the default JS `forEach` function, this one allows you to exit the
+ * iteration early.
+ *
+ * @example
+ * ```js
+ * import { Sync } from "https://unpkg.com/ixfx/dist/iterables.js"
+ * Sync.forEach(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
+ * Sync.forEach(count(5), i => console.log(i));      // Prints 0 1 2 3 4
+ * Sync.forEach([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4
+ * ```
+ *
+ * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
+ * 
+ * Alternatives:
+ * * {@link repeat}/{@link repeatSync}: if you want to call something a given number of times and get the result
+ * @param iterator Iterable or array
+ * @typeParam T Type of iterable's values
+ * @param fn Function to call for each item. If function returns _false_, iteration cancels
+ */
+export function forEach<T>(iterator: Iterable<T> | Array<T>, fn: (v: T) => boolean | void) {
+  for (const v of iterator) {
+    const result = fn(v);
     if (typeof result === `boolean` && !result) break;
   }
 }

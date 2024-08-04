@@ -36,18 +36,18 @@ export type Processors5<T1, T2, T3, T4, T5, T6> = [
 ]
 export type Processors<T1, T2, T3, T4, T5, T6> = Processors1<T1, T2> | Processors2<T1, T2, T3> | Processors3<T1, T2, T3, T4> | Processors4<T1, T2, T3, T4, T5> | Processors5<T1, T2, T3, T4, T5, T6>;
 
-export function chain<T1, T2>(...processors: [ Process<T1, T2> ]): (value: T1) => T2;
-export function chain<T1, T2, T3>(...processors: [ Process<T1, T2>, Process<T2, T3> ]): (value: T1) => T3;
-export function chain<T1, T2, T3, T4>(...processors: [ Process<T1, T2>, Process<T2, T3>, Process<T3, T4> ]): (value: T1) => T4;
-export function chain<T1, T2, T3, T4, T5>(...processors: [ Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5> ]): (value: T1) => T5;
-export function chain<T1, T2, T3, T4, T5, T6>(...processors: [ Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>, Process<T5, T6> ]): (value: T1) => T6;
+export function flow<T1, T2>(...processors: [ Process<T1, T2> ]): (value: T1) => T2;
+export function flow<T1, T2, T3>(...processors: [ Process<T1, T2>, Process<T2, T3> ]): (value: T1) => T3;
+export function flow<T1, T2, T3, T4>(...processors: [ Process<T1, T2>, Process<T2, T3>, Process<T3, T4> ]): (value: T1) => T4;
+export function flow<T1, T2, T3, T4, T5>(...processors: [ Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5> ]): (value: T1) => T5;
+export function flow<T1, T2, T3, T4, T5, T6>(...processors: [ Process<T1, T2>, Process<T2, T3>, Process<T3, T4>, Process<T4, T5>, Process<T5, T6> ]): (value: T1) => T6;
 
 /**
- * Creates a chain of data processors (up to 5 are supported).
- * The chain is encapsulated in a function that accepts an input value an returns an output.
+ * Creates a flow of data processors (up to 5 are supported).
+ * The flow is encapsulated in a function that accepts an input value an returns an output.
  * 
  * ```js
- * const p = chain(
+ * const p = flow(
  *  (value:string) => value.toUpperCase(), // Convert to uppercase
  *  (value:string) => value.at(0) === 'A') // If first letter is an A, return true
  * );
@@ -58,7 +58,7 @@ export function chain<T1, T2, T3, T4, T5, T6>(...processors: [ Process<T1, T2>, 
  * @param processors 
  * @returns 
  */
-export function chain<T1, T2, T3, T4, T5, T6>(...processors: Processors<T1, T2, T3, T4, T5, T6>): (value: T1) => T2 | T3 | T4 | T5 | T6 {
+export function flow<T1, T2, T3, T4, T5, T6>(...processors: Processors<T1, T2, T3, T4, T5, T6>): (value: T1) => T2 | T3 | T4 | T5 | T6 {
   return (value: T1) => {
     let v = value;
     for (const p of processors) {
@@ -140,19 +140,19 @@ export function seenToUndefinedByKey<TIn>(toString?: (value: TIn) => string): Pr
 }
 /**
  * Calls a function if the input value is not undefined.
- * Return value from function is passed to next function in chain.
+ * Return value from function is passed to next function in flow.
  * 
  * ```js
- * const chain = Process.chain(
+ * const flow = Process.flow(
  *  Process.max(),
  *  Process.seenLastToUndefined(),
  *  Process.ifNotUndefined(v => {
  *    console.log(`v:`, v);
  *  })
  * );
- * chain(100); // Prints 'v:100'
- * chain(90);  // Nothing happens max value has not changed
- * chain(110); // Prints 'v:110'
+ * flow(100); // Prints 'v:100'
+ * flow(90);  // Nothing happens max value has not changed
+ * flow(110); // Prints 'v:110'
  * ```
  * @param fn 
  * @returns 
@@ -173,11 +173,11 @@ export class CancelError extends Error {
 }
 
 /**
- * Cancels the remaining chain operations if _undefined_ is an input.
+ * Cancels the remaining flow operations if _undefined_ is an input.
  * See also {@link ifUndefined} or {@link ifNotUndefined}.
  * 
  * ```js
- * const c3 = Process.chain(
+ * const c3 = Process.flow(
  *  Basic.max(),
  *  Process.seenLastToUndefined(),
  *  Process.cancelIfUndefined(),

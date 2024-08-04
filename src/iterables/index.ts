@@ -33,7 +33,7 @@ import type { Interval } from '../flow/IntervalType.js';
 
 import { toStringDefault } from '../util/index.js';
 import type { GenFactoryNoInput } from './chain/Types.js';
-import type { ToArrayOptions } from './Types.js';
+import type { ForEachOptions, ToArrayOptions } from './Types.js';
 
 /**
  * {@inheritDoc Chains.combineLatestToArray}
@@ -232,16 +232,16 @@ export function find<V>(it: Array<V> | Iterable<V> | AsyncIterable<V>, f: (v: V)
  * });
  * ```
  * 
- * When using an async iterable, `f` can also be async.
- * @param it
- * @param f
+ * When using an async iterable, `fn` can also be async.
+ * @param it Iterable or array
+ * @param fn Function to execute
  */
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export function forEach<V>(it: Array<V> | AsyncIterable<V> | Iterable<V>, f: (v: V) => boolean | Promise<boolean> | void | Promise<void>) {
+export function forEach<T>(it: Array<T> | AsyncIterable<T> | Iterable<T>, fn: (v: T | undefined) => boolean | Promise<boolean> | void | Promise<void>, options: Partial<ForEachOptions> = {}) {
   if (isAsyncIterable(it)) {
-    return Async.forEach(it, f);
+    return Async.forEach(it, fn, options);
   } else {
-    Sync.forEach(it, f as (v: V) => boolean);
+    Sync.forEach(it, fn as (v: T) => boolean);
   }
 }
 
@@ -523,4 +523,42 @@ export function fromIterable<V>(iterable: Iterable<V> | AsyncIterable<V>, interv
   return Sync.fromIterable(iterable);
 }
 
+/**
+ * Access `callback` as an iterable:
+ * ```js
+ * const fn = () => Math.random();
+ * for (const v of fromFunction(fn)) {
+ *  // Generate infinite random numbers
+ * }
+ * ```
+ * 
+ * Use {@link fromFunctionAwaited} to await `callback`.
+ * @param callback Function that generates a value
+ */
+export function* fromFunction<T>(callback: () => T) {
+  while (true) {
+    const v = callback();
+    yield v;
+  }
+}
 
+/**
+ * Access awaited `callback` as an iterable:
+ * ```js
+ * const fn = () => Math.random();
+ * for await (const v of fromFunctionAwaited(fn)) {
+ *  // Generate infinite random numbers
+ * }
+ * ```
+ * 
+ * `callback` can be async, result is awaited.
+ * This requires the use of `for await`.
+ * Use {@link fromFunction} otherwise;
+ * @param callback 
+ */
+export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
+  while (true) {
+    const v = await callback();
+    yield v;
+  }
+}

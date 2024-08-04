@@ -6,7 +6,6 @@ export * from './DispatchList.js';
 export * as Elapsed from './Stopwatch.js';
 export * from './Every.js';
 export * from './Execute.js';
-export * from './ForEach.js';
 export * from './IntervalType.js';
 export * from './PromiseFromEvent.js';
 export * from './PromiseWithResolvers.js';

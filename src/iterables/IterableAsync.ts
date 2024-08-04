@@ -3,7 +3,7 @@ import { type IsEqual } from '../util/IsEqual.js';
 import { sleep, type SleepOpts } from '../flow/Sleep.js';
 import { isAsyncIterable, isIterable } from './Iterable.js';
 import { toStringDefault } from '../util/ToString.js';
-import type { ToArrayOptions } from './Types.js';
+import type { ForEachOptions, ToArrayOptions } from './Types.js';
 
 /**
  * Yield values from `array`, one at a time.
@@ -231,14 +231,65 @@ export async function* flatten<V>(it: AsyncIterable<V>) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export async function forEach<V>(it: AsyncIterable<V>, f: (v: V) => void | boolean | Promise<boolean | void>) {
-  // https://surma.github.io/underdash/
-  for await (const v of it) {
-    const result = await f(v);
-    if (typeof result === `boolean` && !result) break;
+/**
+ * Iterates over an async iterable or array, calling `fn` for each value, with optional
+ * interval between each loop. If the async `fn` returns _false_, iterator cancels.
+ *
+ * Use {@link forEachSync} for a synchronous version.
+ *
+ * ```
+ * import { forEach } from "https://unpkg.com/ixfx/dist/flow.js"
+ * // Prints items from array every second
+ * await forEach([0,1,2,3], i => console.log(i), 1000);
+ * ```
+ *
+ * ```
+ * // Retry up to five times, with 5 seconds between each attempt
+ * await forEach(count(5), i=> {
+ *  try {
+ *    await doSomething();
+ *    return false; // Succeeded, exit early
+ *  } catch (ex) {
+ *    console.log(ex);
+ *    return true; // Keep trying
+ *  }
+ * }, 5000);
+ * ```
+ * @param iterator Iterable thing to loop over
+ * @param fn Function to invoke on each item. If it returns _false_ loop ends.
+ * @param options Options
+ * @typeParam V Type of iterable
+ */
+export const forEach = async function <T>(
+  iterator: AsyncIterable<T> | Array<T>,
+  fn: (v?: T) => Promise<boolean> | Promise<void> | boolean | void,
+  options: Partial<ForEachOptions> = {}
+) {
+  const interval = options.interval;
+  if (Array.isArray(iterator)) {
+    // Handle array
+    for (const x of iterator) {
+      const r = await fn(x);
+      if (typeof r === `boolean` && !r) break;
+      if (interval) await sleep(interval);
+    }
+  } else {
+    // Handle an async iterator
+    for await (const x of iterator) {
+      const r = await fn(x);
+      if (typeof r === `boolean` && !r) break;
+      if (interval) await sleep(interval);
+    }
   }
-}
+};
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+// export async function forEach<V>(it: AsyncIterable<V>, f: (v: V) => void | boolean | Promise<boolean | void>) {
+//   // https://surma.github.io/underdash/
+//   for await (const v of it) {
+//     const result = await f(v);
+//     if (typeof result === `boolean` && !result) break;
+//   }
+// }
 
 /**
  * Maps an iterable through function `f`
@@ -445,45 +496,6 @@ export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayO
   return result;
 }
 
-/**
- * Access awaited `callback` as an iterable:
- * ```js
- * const fn = () => Math.random();
- * for await (const v of fromFunctionAwaited(fn)) {
- *  // Generate infinite random numbers
- * }
- * ```
- * 
- * `callback` can be async, result is awaited.
- * This requires the use of `for await`.
- * Use {@link fromFunction} otherwise;
- * @param callback 
- */
-export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
-  while (true) {
-    const v = await callback();
-    yield v;
-  }
-}
-
-/**
- * Access `callback` as an iterable:
- * ```js
- * const fn = () => Math.random();
- * for (const v of fromFunctionAwaited(fn)) {
- *  // Generate infinite random numbers
- * }
- * ```
- * 
- * Use {@link fromFunctionAwaited} to await `callback`.
- * @param callback 
- */
-export function* fromFunction<T>(callback: () => T) {
-  while (true) {
-    const v = callback();
-    yield v;
-  }
-}
 
 export async function* unique<V>(
   iterable: AsyncIterable<V> | Array<AsyncIterable<V>>
