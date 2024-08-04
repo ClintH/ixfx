@@ -231,7 +231,7 @@ export function* fill<V>(it: Iterable<V>, v: V) {
  * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
  * 
  * Alternatives:
- * * {@link repeat}/{@link repeatSync}: if you want to call something a given number of times and get the result
+ * * {@link Flow.repeat}/{@link Flow.repeatSync}: if you want to call something a given number of times and get the result
  * @param iterator Iterable or array
  * @typeParam T Type of iterable's values
  * @param fn Function to call for each item. If function returns _false_, iteration cancels

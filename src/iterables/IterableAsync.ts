@@ -235,8 +235,6 @@ export async function* flatten<V>(it: AsyncIterable<V>) {
  * Iterates over an async iterable or array, calling `fn` for each value, with optional
  * interval between each loop. If the async `fn` returns _false_, iterator cancels.
  *
- * Use {@link forEachSync} for a synchronous version.
- *
  * ```
  * import { forEach } from "https://unpkg.com/ixfx/dist/flow.js"
  * // Prints items from array every second
