@@ -2,6 +2,11 @@ import type { RectPositioned, Rect } from "./RectTypes.js";
 import { guard as PointsGuard } from '../point/Guard.js';
 import type { Point } from '../point/PointType.js';
 
+/**
+ * Throws an error if the dimensions of the rectangle are undefined, NaN or negative.
+ * @param d 
+ * @param name 
+ */
 export const guardDim = (d: number, name = `Dimension`) => {
   if (d === undefined) throw new Error(`${ name } is undefined`);
   if (Number.isNaN(d)) throw new Error(`${ name } is NaN`);
@@ -31,12 +36,15 @@ export const guard = (rect: Rect, name = `rect`) => {
 /**
  * Returns a positioned rect or if it's not possible, throws an error.
  * 
+ * If `rect` does not have a position, `origin` is used.
  * If `rect` is positioned and `origin` is provided, returned result uses `origin` as x,y instead.
  * ```js
  * // Returns input because it's positioned
- * getRectPositioned({x:1,y:2,width:10,height:20});
- * // Returns {x:1,y:2,width:10,height:20}
- * getRectPositioned({width:10,height:20}, {x:1, y:2 }); 
+ * getRectPositioned({ x:1, y:2, width:10, height:20 });
+ * 
+ * // Returns { x:1, y:2, width:10, height:20 }
+ * getRectPositioned({ width:10, height:20 }, { x:1, y:2 });
+ *  
  * // Throws, because we have no point
  * getRectPositioned({width:10,height:20})
  * ```
@@ -54,44 +62,63 @@ export const getRectPositioned = (rect: Rect | RectPositioned, origin?: Point): 
 
 }
 
+/**
+ * Throws an error if `rect` is does not have a position, or
+ * is an invalid rectangle
+ * @param rect 
+ * @param name 
+ */
 export const guardPositioned = (rect: RectPositioned, name = `rect`) => {
   if (!isPositioned(rect)) throw new Error(`Expected ${ name } to have x,y`);
   guard(rect, name);
 };
 
+/**
+ * Returns _true_ if `rect` has width and height values of 0.
+ * Use Rects.Empty or Rects.EmptyPositioned to generate an empty rectangle.
+ * @param rect 
+ * @returns 
+ */
 export const isEmpty = (rect: Rect): boolean =>
   rect.width === 0 && rect.height === 0;
+
+/**
+ * Returns _true_ if `rect` is a placeholder, with both width and height values of NaN.
+ * Use Rects.Placeholder or Rects.PlaceholderPositioned to generate a placeholder.
+ * @param rect 
+ * @returns 
+ */
 export const isPlaceholder = (rect: Rect): boolean =>
   Number.isNaN(rect.width) && Number.isNaN(rect.height);
 
 /**
- * Returns _true_ if `p` has a position (x,y)
- * @param p Point, Rect or RectPositiond
+ * Returns _true_ if `rect` has position (x,y) fields.
+ * @param rect Point, Rect or RectPositiond
  * @returns
  */
 export const isPositioned = (
-  p: Point | Rect | RectPositioned
-): p is Point =>
-  (p as Point).x !== undefined && (p as Point).y !== undefined;
+  rect: Point | Rect | RectPositioned
+): rect is Point =>
+  (rect as Point).x !== undefined && (rect as Point).y !== undefined;
 
 /**
- * Returns _true_ if `p` has width and height.
- * @param p
+ * Returns _true_ if `rect` has width and height fields.
+ * @param rect
  * @returns
  */
-export const isRect = (p: unknown): p is Rect => {
-  if (p === undefined) return false;
-  if ((p as Rect).width === undefined) return false;
-  if ((p as Rect).height === undefined) return false;
+export const isRect = (rect: unknown): rect is Rect => {
+  if (rect === undefined) return false;
+  if ((rect as Rect).width === undefined) return false;
+  if ((rect as Rect).height === undefined) return false;
   return true;
 };
 
 /**
- * Returns _true_ if `p` is a positioned rectangle
+ * Returns _true_ if `rect` is a positioned rectangle
  * Having width, height, x and y properties.
- * @param p
+ * @param rect
  * @returns
  */
 export const isRectPositioned = (
-  p: any
-): p is RectPositioned => isRect(p) && isPositioned(p);
+  rect: any
+): rect is RectPositioned => isRect(rect) && isPositioned(rect);
