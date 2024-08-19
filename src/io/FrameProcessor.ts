@@ -11,11 +11,11 @@ type State = `ready` | `initialised` | `disposed`;
 //eslint-disable-next-line functional/no-mixed-types
 export type FrameProcessorOpts = {
   /**
-   * If true, capture canvas will be shown
+   * If true, capture canvas will be shown. Default: false
    */
   readonly showCanvas?: boolean;
   /**
-   * If true, raw source will be shown
+   * If true, raw source will be shown. Default: false.
    */
   readonly showPreview?: boolean;
   /**
@@ -42,7 +42,29 @@ export type FrameProcessorOpts = {
 
 /**
  * Frame Processor
- * Simplifies grabbing frames from a source
+ * Simplifies grabbing frames from a camera or video file.
+ * 
+ * First, create:
+ * ```js
+ * import { FrameProcessor } from 'https://unpkg.com/ixfx/dist/io.js'
+ * const fp = new FrameProcessor();
+ * ```
+ * 
+ * Then either use the camera or a video file:
+ * ```js
+ * fp.useCamera(constraints);
+ * // or:
+ * gp.useVideo(file);
+ * ```
+ * 
+ * With `useCamera`, optionally specify {@link Io.Camera.Constraints} to pick which camera and resolution.
+ * 
+ * ```js
+ * fp.getFrame(); // Gets the last frame
+ * fp.dispose(); // Close down camera/file
+ * ```
+ * 
+ * See {@link FrameProcessorOpts} for details on available options.
  */
 export class FrameProcessor {
   private _source: Sources;
