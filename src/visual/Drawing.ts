@@ -15,7 +15,7 @@ import type { Rect, RectPositioned } from '../geometry/rect/index.js';
 import type { Path } from '../geometry/path/PathType.js';
 import type { Triangle } from '../geometry/triangle/TriangleType.js';
 
-import { empty as RectsEmpty } from '../geometry/rect/Empty.js';
+import { Empty as RectsEmpty } from '../geometry/rect/Empty.js';
 import { corners as RectsCorners } from '../geometry/rect/Corners.js';
 import { isLine } from '../geometry/line/Guard.js';
 import { quantiseEvery } from '../numbers/Quantise.js';

@@ -1,8 +1,8 @@
 // #region imports
 import { intersectsPoint as RectsIntersectsPoint } from '../geometry/rect/Intersects.js';
 import { isPlaceholder as RectsIsPlaceholder } from '../geometry/rect/Guard.js';
-import { emptyPositioned as RectsEmptyPositioned } from '../geometry/rect/Empty.js';
-import { placeholderPositioned as RectsPlaceholderPositioned, placeholder as RectsPlaceholder } from '../geometry/rect/Placeholder.js';
+import { EmptyPositioned as RectsEmptyPositioned } from '../geometry/rect/Empty.js';
+import { PlaceholderPositioned as RectsPlaceholderPositioned, Placeholder as RectsPlaceholder } from '../geometry/rect/Placeholder.js';
 import { hue as randomHue } from '../random/index.js';
 import type { Point } from '../geometry/point/PointType.js';
 import type { Rect, RectPositioned } from '../geometry/rect/index.js';
