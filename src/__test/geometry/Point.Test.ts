@@ -215,13 +215,21 @@ test(`sum`, t => {
 });
 
 test(`compareByX`, t => {
+  t.is(Points.compareByX({ x: 10, y: 100 }, { x: 10, y: 200 }), 0);
   t.true(Points.compareByX({ x: 100, y: 0 }, { x: 50, y: 0 }) > 0);
   t.true(Points.compareByX({ x: 10, y: 0 }, { x: 10, y: 0 }) === 0);
   t.true(Points.compareByX({ x: 60, y: 0 }, { x: 50, y: 0 }) > 0);
   t.true(Points.compareByX({ x: -100, y: 0 }, { x: 50, y: 0 }) < 0);
   t.true(Points.compareByX({ x: 0, y: 0 }, { x: 50, y: 0 }) < 0);
+});
 
-  t.pass();
+test(`compareByY`, t => {
+  t.is(Points.compareByY({ x: 100, y: 1 }, { x: 1000, y: 1 }), 0);
+  t.true(Points.compareByY({ y: 100, x: 0 }, { y: 50, x: 0 }) > 0);
+  t.true(Points.compareByY({ y: 10, x: 0 }, { y: 10, x: 0 }) === 0);
+  t.true(Points.compareByY({ y: 60, x: 0 }, { y: 50, x: 0 }) > 0);
+  t.true(Points.compareByY({ y: -100, x: 0 }, { y: 50, x: 0 }) < 0);
+  t.true(Points.compareByY({ y: 0, x: 0 }, { y: 50, x: 0 }) < 0);
 });
 
 test(`subtract`, t => {
