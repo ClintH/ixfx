@@ -1,4 +1,5 @@
 export * from './Area.js';
+export * from './Apply.js';
 export * from './Cardinal.js';
 export * from './Center.js';
 export * from './Corners.js';
@@ -16,7 +17,8 @@ export * from './IsEqual.js';
 export * from './Lengths.js';
 export * from './Max.js';
 export * from './Multiply.js';
-export * from './NormaliseByRect.js';
+export * from './Divide.js';
+//export * from './NormaliseByRect.js';
 export * from './Random.js';
 export type * from './RectTypes.js';
 export * from './Subtract.js';
