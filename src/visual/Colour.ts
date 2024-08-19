@@ -382,6 +382,26 @@ export const getCssVariable = (
 // };
 
 
+/**
+ * Returns a function to interpolate between colours
+ * ```js
+ * import { Colour } from 'https://unpkg.com/ixfx/dist/visual.js'
+ * const i = interpolator([`orange`, `yellow`, `red`]);
+ * 
+ * // Get a random colour on the above spectrum
+ * i(Math.random());
+ * ```
+ * 
+ * Results will vary depending on the colour space used, play with the options.
+ * When using a hue-based colour space, the `hue` option sets the logic for how hue values wrap.
+ * 
+ * ```js
+ * interpolator([`orange`, `yellow`, `red`], { space: `hsl`, hue: `longer })
+ * ```
+ * @param colours Colours to interpolate between
+ * @param opts Options for interpolation
+ * @returns 
+ */
 export const interpolator = (colours: Array<Colourish>, opts: Partial<InterpolationOpts> = {}) => {
   const space = opts.space ?? `lch`;
   const hue = opts.hue ?? `shorter`;
