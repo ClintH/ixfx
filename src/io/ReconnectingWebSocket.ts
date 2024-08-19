@@ -54,6 +54,48 @@ export type ReconnectingOptions = {
   onError: (error: any) => void
 }
 
+/**
+ * Maintains a web socket connection. Connects automatically.
+ * 
+ * The essential usage is:
+ * ```js
+ * import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+ * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
+ *  onMessage: (msg) => {
+ *    // Do something with received message...
+ *  }
+ * }
+ * 
+ * // Send some data
+ * ws.send(JSON.stringify(someData));
+ * 
+ * // Check state of connection
+ * ws.isConnected(); 
+ * ```
+ * 
+ * More options can be provided to monitor state
+ * ```js
+ * import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+ * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
+ *  onError: (err) => {
+ *    console.error(err)
+ *  },
+ *  onMessage: (msg) => {
+ *    // Received data
+ *    console.log(msg);
+ *  },
+ *  onConnected: () => {
+ *    // Connected!
+ *  },
+ *  onDisconnected: () => {
+ *    // Disconnected :(
+ *  }
+ * });
+ * ```
+ * @param url 
+ * @param opts 
+ * @returns 
+ */
 export const reconnectingWebsocket = (url: string | URL, opts: Partial<ReconnectingOptions> = {}): ReconnectingWebsocket => {
   const startDelayMs = intervalToMs(opts.startDelay, 2000);
   const maxDelayMs = intervalToMs(opts.maxDelay, startDelayMs * 10);
