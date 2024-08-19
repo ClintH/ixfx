@@ -6,6 +6,11 @@ const startTimeoutMs = 10_000;
 
 /**
  * Print available media devices to console
+ * 
+ * ```js
+ * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
+ * camera.dumpDevices(); // Will print results to console
+ * ```
  * @param filterKind Defaults `videoinput`
  */
 export const dumpDevices = async (filterKind = `videoinput`) => {
@@ -73,10 +78,12 @@ export type StartResult = {
  *
  *
  * ```js
- * import {Camera} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+ * 
  * try
  *  const { videoEl, dispose } = await Camera.start();
- *  for await (const frame of frames(videoEl)) {
+ *  for await (const frame of Video.frames(videoEl)) {
  *   // Do something with pixels...
  *  }
  * } catch (ex) {
@@ -89,13 +96,14 @@ export type StartResult = {
  *
  * _Constraints_ can be specified to select a camera and resolution:
  * ```js
- * import {Camera} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
  * try
  *  const { videoEl, dispose } = await Camera.start({
  *    facingMode: `environment`,
  *    max: { width: 640, height: 480 }
  *  });
- *  for await (const frame of frames(videoEl)) {
+ *  for await (const frame of Video.frames(videoEl)) {
  *   // Do something with pixels...
  *  }
  * } catch (ex) {
@@ -185,22 +193,18 @@ const startWithVideoEl = async (
   }
 
   if (constraints.facingMode) {
-    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
     (c.video as any).facingMode = constraints.facingMode;
   }
 
   if (constraints.deviceId) {
-    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
     (c.video as any).deviceId = constraints.deviceId;
   }
 
   if (idealResolution) {
-    //eslint-disable-next-line functional/immutable-data
     c.video.width = {
       ...c.video.width,
       ideal: idealResolution.width,
     };
-    //eslint-disable-next-line functional/immutable-data
     c.video.height = {
       ...c.video.height,
       ideal: idealResolution.height,
@@ -208,12 +212,10 @@ const startWithVideoEl = async (
   }
 
   if (maxResolution) {
-    //eslint-disable-next-line functional/immutable-data
     c.video.width = {
       ...c.video.width,
       max: maxResolution.width,
     };
-    //eslint-disable-next-line functional/immutable-data
     c.video.height = {
       ...c.video.height,
       max: maxResolution.height,
@@ -221,12 +223,10 @@ const startWithVideoEl = async (
   }
 
   if (minResolution) {
-    //eslint-disable-next-line functional/immutable-data
     c.video.width = {
       ...c.video.width,
       min: minResolution.width,
     };
-    //eslint-disable-next-line functional/immutable-data
     c.video.height = {
       ...c.video.height,
       min: minResolution.height,
