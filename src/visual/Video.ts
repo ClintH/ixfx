@@ -17,7 +17,15 @@ export type ManualCapturer = {
 
 //eslint-disable-next-line functional/no-mixed-types
 export type CaptureOpts = {
+  /**
+   * Delay between reading frames.
+   * Default: 0, reading as fast as possible
+   */
   readonly maxIntervalMs?: number;
+  /**
+   * Whether to show the created capture canvas.
+   * Default: false
+   */
   readonly showCanvas?: boolean;
   readonly workerScript?: string;
   readonly onFrame?: (pixels: ImageData) => void;
@@ -70,7 +78,7 @@ export type FramesOpts = {
  * Generator that yields frames from a video element as [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
  *
  * ```js
- * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
  *
  * const ctx = canvasEl.getContext(`2d`);
  * for await (const frame of Video.frames(videoEl)) {
@@ -100,7 +108,7 @@ export async function* frames(
   // TODO: When ImageBitmap has possibility to get pixels, that might also help to avoid having to write to hidden canvas
 
   const maxIntervalMs = opts.maxIntervalMs ?? 0;
-  
+
   const showCanvas = opts.showCanvas ?? false;
   //eslint-disable-next-line functional/no-let
   let canvasEl = opts.canvasEl;
@@ -227,9 +235,7 @@ export const capture = (
   }
   canvasEl.width = w;
   canvasEl.height = h;
-  //eslint-disable-next-line functional/no-let
   let c: CanvasRenderingContext2D | null = null;
-  //eslint-disable-next-line functional/no-let
   let worker: Worker | undefined;
   if (opts.workerScript) {
     worker = new Worker(opts.workerScript);
@@ -265,7 +271,7 @@ export const capture = (
           height: h,
           channels: 4,
         },
-        [pixels!.data.buffer]
+        [ pixels!.data.buffer ]
       );
     }
     if (onFrame) {
