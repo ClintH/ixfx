@@ -1,8 +1,8 @@
 import type { Rect } from '../geometry/rect/RectTypes.js';
 import { scaler, type ScaleBy, type ScalerCombined } from "../geometry/Scaler.js";
 import { resolveEl } from "./ResolveEl.js";
-import { empty as RectsEmpty } from '../geometry/rect/Empty.js';
-import { multiply as RectsMultiply } from "../geometry/rect/Multiply.js";
+import { Empty as RectsEmpty } from '../geometry/rect/Empty.js';
+import { multiplyScalar as RectsMultiplyScalar } from "../geometry/rect/Multiply.js";
 import { windowResize } from "./DomRx.js";
 import { SimpleEventEmitter } from "../Events.js";
 import { guard as RectsGuard } from '../geometry/rect/Guard.js';
@@ -150,7 +150,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     this.#scaler = scaler(this.opts.scaleBy, logicalSize);
 
     // Scaled logical size for DPI
-    const pixelScaled = RectsMultiply(logicalSize, ratio, ratio);
+    const pixelScaled = RectsMultiplyScalar(logicalSize, ratio);
 
     // Canvas will actually be much larger, based on DPI
     this.el.width = pixelScaled.width;
