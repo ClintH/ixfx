@@ -3,6 +3,7 @@ export type NumberGuardRange =
    * No range checking
    */
   | ``
+  | `finite`
   /**
    * Can be any number, except zero
    */
