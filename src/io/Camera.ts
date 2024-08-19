@@ -81,10 +81,10 @@ export type StartResult = {
  * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
  * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
  * 
- * try
+ * try {
  *  const { videoEl, dispose } = await Camera.start();
  *  for await (const frame of Video.frames(videoEl)) {
- *   // Do something with pixels...
+ *    // Do something with pixels...
  *  }
  * } catch (ex) {
  *  console.error(`Video could not be started`);
@@ -98,18 +98,23 @@ export type StartResult = {
  * ```js
  * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
  * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
- * try
+ * 
+ * try {
  *  const { videoEl, dispose } = await Camera.start({
  *    facingMode: `environment`,
  *    max: { width: 640, height: 480 }
  *  });
+ *  
  *  for await (const frame of Video.frames(videoEl)) {
- *   // Do something with pixels...
+ *    // Do something with pixels...
  *  }
  * } catch (ex) {
- *  console.error(`Video could not be started`);
+ *  // Can happen if user cancels camera request, for example.
+ *  console.error(`Video could not be started`, ex);
  * }
  * ```
+ * 
+ * An alternative to Video.frames is Video.capture.
  * @param constraints
  * @returns Returns `{ videoEl, dispose }`, where `videoEl` is the created VIDEO element, and `dispose` is a function for removing the element and stopping the video.
  */
