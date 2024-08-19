@@ -1,9 +1,4 @@
-/**
- * Demonstates starting a video stream and drawing the result to a canvas
- * 
- * This technique works well if you only want to show processed pixels, and the
- * output matches the input dimensions.
- */
+
 import {reconnectingWebsocket} from '../../../dist/io.js';
 
 // const ws = new WebSocket(`ws://localhost:8080`);
