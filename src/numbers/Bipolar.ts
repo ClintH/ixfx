@@ -50,11 +50,12 @@ export type BipolarWrapper = {
  * @returns 
  */
 export const immutable = (startingValueOrBipolar: number | BipolarWrapper = 0): BipolarWrapper => {
+  if (typeof startingValueOrBipolar === `undefined`) throw new Error(`Start value is undefined`)
   const startingValue = (typeof startingValueOrBipolar === `number`) ? startingValueOrBipolar : startingValueOrBipolar.value;
 
-  if (startingValue > 1) throw new Error(`Cannot be larger than 1`);
-  if (startingValue < -1) throw new Error(`Cannot be smaller than -1`);
-  if (Number.isNaN(startingValue)) throw new Error(`startingValue is NaN`);
+  if (startingValue > 1) throw new Error(`Start value cannot be larger than 1`);
+  if (startingValue < -1) throw new Error(`Start value cannot be smaller than -1`);
+  if (Number.isNaN(startingValue)) throw new Error(`Start value is NaN`);
 
   const v = startingValue;
   return {
@@ -223,8 +224,8 @@ export const random = (maxOrOptions?: number | RandomOptions): number => {
  * @returns Clamped value on -1..1 scale
  */
 export const clamp = (bipolarValue: number): number => {
-  if (typeof bipolarValue !== `number`) throw new Error(`Parameter must be a number. Got: ${ typeof bipolarValue }`);
-  if (Number.isNaN(bipolarValue)) throw new Error(`v parameter is NaN`);
+  if (typeof bipolarValue !== `number`) throw new Error(`Param 'bipolarValue' must be a number. Got: ${ typeof bipolarValue }`);
+  if (Number.isNaN(bipolarValue)) throw new Error(`Param 'bipolarValue' is NaN`);
   if (bipolarValue > 1) return 1;
   if (bipolarValue < -1) return -1;
   return bipolarValue;
