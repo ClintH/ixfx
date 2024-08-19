@@ -1,8 +1,8 @@
-export const placeholder = Object.freeze({
+export const Placeholder = Object.freeze({
   width: Number.NaN,
   height: Number.NaN,
 });
-export const placeholderPositioned = Object.freeze({
+export const PlaceholderPositioned = Object.freeze({
   x: Number.NaN,
   y: Number.NaN,
   width: Number.NaN,
