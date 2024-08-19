@@ -43,7 +43,31 @@ export type CardinalDirection =
   | `nw`;
 export type CardinalDirectionOptional = CardinalDirection | ``;
 
-export type BoundsLogic = `unbounded` | `undefined` | `stop` | `wrap`;
+/**
+ * Bounds logic
+ * * Unbounded: attempts to read beyond limits
+ * * Undefined: returns _undefined_ when reading beyond limits
+ * * Stop: returns cell value at edge of limits
+ * * Wrap: Wrap-around cell positions
+ * 
+ */
+export type BoundsLogic =
+  /**
+   * Unbounded: attempts to read beyond limits
+   */
+  `unbounded` |
+  /**
+   * Undefined: returns _undefined_ when reading beyond limits
+   */
+  `undefined` |
+  /**
+   * Stop: returns cell value at edge of limits
+   */
+  `stop` |
+  /**
+   * Wrap-around cell positions
+   */
+  `wrap`;
 
 export type VisitorLogic = {
   readonly options?: IdentifyNeighbours;
