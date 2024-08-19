@@ -86,7 +86,6 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Points.interpolate}.
  */
 export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
-  //let opts: Partial<InterpolateOptions> = {};
   let amountProcess: undefined | ((v: number) => number);
   let limits: InterpolateOptions[ 'limits' ] = `clamp`;
 

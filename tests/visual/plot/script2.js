@@ -5,7 +5,8 @@ import * as Components from '../../../dist/components.js';
 //Components.PlotElement;
 
 const p = /** @type Components.PlotElement*/(document.getElementById(`plot`));
-p.autoRedraw = false;
+p.seriesRanges.set(`gyro.x`, [-35,35]);
+
 // const p = new Plot2.Plot(`#plot`, {
 //   scaling:`normalise`,
 //   autoSize:true

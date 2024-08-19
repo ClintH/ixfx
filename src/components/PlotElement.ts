@@ -20,7 +20,8 @@ import { Pathed } from "src/data/index.js";
  * * line-width: stroke width of drawing line (default:2)
  * 
  * * render: 'dot' or 'line' (default: 'dot')
- * 
+ * * hide-legend: If added, legend is not shown
+ * * manual-draw: If added, automatic drawning is disabled
  * Styling variables
  * * --legend-fg: legend foreground text
  */
@@ -28,6 +29,9 @@ import { Pathed } from "src/data/index.js";
 export class PlotElement extends LitElement {
   @property({ attribute: `streaming`, type: Boolean })
   streaming = true;
+
+  @property({ attribute: `hide-legend`, type: Boolean })
+  hideLegend = false;
 
   @property({ attribute: `max-length`, type: Number })
   maxLength = 500;
@@ -47,7 +51,8 @@ export class PlotElement extends LitElement {
   @property({ attribute: `render`, type: String })
   renderStyle = `dot`
 
-  autoRedraw = true;
+  @property({ attribute: `manual-draw`, type: Boolean })
+  manualDraw = false;
   padding = 5;
 
   paused = false;
@@ -60,6 +65,8 @@ export class PlotElement extends LitElement {
 
   canvasEl: Ref<HTMLCanvasElement> = createRef();
 
+  seriesRanges: Map<string, [ min: number, max: number ]> = new Map();
+
   constructor() {
     super();
   }
@@ -71,6 +78,7 @@ export class PlotElement extends LitElement {
   get seriesCount() {
     return this.#series.size;
   }
+
   /**
    * Delete a series.
    * Returns _true_ if there was a series to delete
@@ -147,28 +155,28 @@ export class PlotElement extends LitElement {
 
   updateColours() {
     this.#legendColour = Colour.getCssVariable(`legend-fg`, `black`);
-    //this.#backgroundColour = Colour.getCssVariable(`background`, `white`);
   }
 
-  // protected updated(_changedProperties: PropertyValues): void {
-  //   this.#setupCanvas();
-  // }
-
-  plot(value: number, seriesName: string = ``) {
+  plot(value: number, seriesName: string = ``, skipDrawing = false) {
     let s = this.#series.get(seriesName.toLowerCase());
     if (s === undefined) {
       s = new PlotSeries(seriesName, this.colourGenerator(seriesName), this);
       this.#series.set(seriesName.toLowerCase(), s);
     }
     s.push(value);
-    if (this.autoRedraw) this.draw();
+    if (!this.manualDraw && !skipDrawing) this.draw();
     return s;
   }
 
+  /**
+   * Draw a set of key-value pairs as a batch.
+   * @param value 
+   */
   plotObject(value: object) {
     for (const p of Pathed.getPathsAndData(value, true)) {
-      this.plot(p.value, p.path);
+      this.plot(p.value, p.path, true);
     }
+    this.draw();
   }
 
   colourGenerator(series: string): Colour.Colourish {
@@ -203,10 +211,12 @@ export class PlotElement extends LitElement {
     }
 
     // Draw legend
-    ctx.save();
-    ctx.translate(cl.x + padding, cl.y + padding);
-    this.drawLegend(cl, d);
-    ctx.restore();
+    if (!this.hideLegend) {
+      ctx.save();
+      ctx.translate(cl.x + padding, cl.y + padding);
+      this.drawLegend(cl, d);
+      ctx.restore();
+    }
 
     ctx.save();
     ctx.translate(cp.x + padding, cp.y + padding);
@@ -215,11 +225,11 @@ export class PlotElement extends LitElement {
 
     // Draw data
     for (const series of this.#series.values()) {
-
-      const data = globalScaler === undefined ?
-        series.getScaled() :
-        series.getScaledBy(globalScaler);
-
+      const seriesScale = this.seriesRanges.get(series.name);
+      const data = seriesScale !== undefined ? series.getScaledBy(Numbers.scaler(seriesScale[ 0 ], seriesScale[ 1 ])) :
+        globalScaler === undefined ?
+          series.getScaled() :
+          series.getScaledBy(globalScaler);
       const colour = Colour.resolveToString(series.colour);
       switch (this.renderStyle) {
         case `line`:
@@ -316,6 +326,12 @@ export class PlotElement extends LitElement {
   #swatchSize = 10;
 
   computeLegend(c: CanvasHelper, maxWidth: number, padding: number) {
+    if (this.hideLegend) {
+      return {
+        bounds: { width: 0, height: 0 },
+        parts: []
+      }
+    }
     const ctx = c.ctx;
 
     const series = [ ...this.#series.values() ];

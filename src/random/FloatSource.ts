@@ -26,7 +26,7 @@ import { throwNumberTest } from '../util/GuardNumbers.js';
  * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
-export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSource => {
+export const floatSource = (maxOrOptions: (number | RandomOptions) = 1): RandomSource => {
   const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   //eslint-disable-next-line functional/no-let
   let max = options.max;
@@ -68,5 +68,5 @@ export const floatSource = (maxOrOptions: number | RandomOptions = 1): RandomSou
  * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
-export const float = (maxOrOptions: number | RandomOptions = 1): number =>
+export const float = (maxOrOptions: (number | RandomOptions) = 1): number =>
   floatSource(maxOrOptions)();
