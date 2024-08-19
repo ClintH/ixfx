@@ -74,6 +74,7 @@ export const integerParse = (
  * Alternatives: {@link integerTest} for additional integer check, {@link percentTest} for percentage-range.
  *
  * * (empty, default): must be a number type and not NaN.
+ * * finite: must be a number, not NaN and not infinite
  * * positive: must be at least zero
  * * negative: must be zero or lower
  * * aboveZero: must be above zero
@@ -102,6 +103,11 @@ export const numberTest = (
     return [ false, `Parameter '${ parameterName }' is not a number (${ JSON.stringify(value) })` ];
   }
   switch (range) {
+    case `finite`: {
+      if (!Number.isFinite(value)) {
+        return [ false, `Parameter '${ parameterName } must be finite` ];
+      }
+    }
     case `positive`: {
       if (value < 0) {
         return [ false, `Parameter '${ parameterName }' must be at least zero (${ value })` ];
