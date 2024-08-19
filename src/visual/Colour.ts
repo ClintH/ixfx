@@ -280,7 +280,12 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
     if (colour === undefined) continue;
     if (colour === null) continue;
     const c = resolve(colour);
-    return c.display();
+    try {
+      return c.display();
+    } catch (ex) {
+      if (typeof colour === `string`) return colour
+      throw ex;
+    }
   }
   return `rebeccapurple`;
 }
