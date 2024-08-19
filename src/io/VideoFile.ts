@@ -21,11 +21,8 @@ export type StartResult = {
  */
 export const start = async (file: File): Promise<StartResult> => {
   const videoEl = document.createElement(`VIDEO`) as HTMLVideoElement;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.style.display = `none`;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.playsInline = true;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.muted = true;
 
   videoEl.classList.add(`ixfx-video`);
@@ -77,9 +74,7 @@ const startWithVideoEl = async (
 
   const url = URL.createObjectURL(file);
 
-  //eslint-disable-next-line functional/immutable-data
   videoEl.src = url;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.loop = true;
 
   // Clean-up function
