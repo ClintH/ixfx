@@ -10,15 +10,15 @@
  * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
  * const data = [
- *  { age: 39, city: `London` }
- *  { age: 14, city: `Copenhagen` }
- *  { age: 23, city: `Stockholm` }
+ *  { age: 39, city: `London` },
+ *  { age: 14, city: `Copenhagen` },
+ *  { age: 23, city: `Stockholm` },
  *  { age: 56, city: `London` }
  * ];
  *
  * // Whatever the function returns will be the designated group
  * // for an item
- * const map = Arrays.groupBy(data, item => data.city);
+ * const map = Arrays.groupBy(data, item => item.city);
  * ```
  *
  * This yields a Map with keys London, Stockholm and Copenhagen, and the corresponding values.
