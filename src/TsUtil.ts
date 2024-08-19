@@ -33,3 +33,8 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
     Required<Pick<T, K>>
     & Partial<Record<Exclude<Keys, K>, undefined>>
   }[ Keys ]
+
+
+// Everything but first, eg Rest<Parameters<sometype>>
+//export type Rest<T extends any[]> = ((...p: T) => void) extends ((p1: infer P1, ...rest: infer R) => void) ? R : never;
+export type Rest<T extends any[]> = T extends [ infer A, ...infer R ] ? R : never;
