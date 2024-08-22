@@ -19,6 +19,17 @@ export const of = <V>(source: Array<V> | Iterable<V>, options: Partial<ArrayOpti
  * See also {@link arrayObject} which monitors changes to array values.
  *
  * Reads items from an array with a given interval, by default 5ms
+ * 
+ * ```js
+ * const data = [`apples`, `oranges`, `pears` ];
+ * const rx = Rx.From.array(data);
+ * rx.onValue(v => {
+ *  // v will be each fruit in turn
+ * })
+ * ```
+ * 
+ * Note that there is the possibility of missing values since there is delay between subscribing and when items start getting emitted.
+ * If a new subscriber connects to the reactive, they won't get values already emitted.
  * @param sourceArray 
  * @param options 
  * @returns 

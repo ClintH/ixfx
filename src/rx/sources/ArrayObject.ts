@@ -7,7 +7,9 @@ import { compareArrays, type ChangeRecord } from "../../data/Compare.js";
 import { remove as ArraysRemove } from '../../data/arrays/Remove.js';
 import { insertAt as ArraysInsertAt } from "../../data/arrays/InsertAt.js";
 /**
- * Wraps an array object
+ * Wraps an array object.
+ * 
+ * It returns an reactive along with some array-ish functions to manipulating it.
  * @param initialValue 
  * @param options 
  * @returns 

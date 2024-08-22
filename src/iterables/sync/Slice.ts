@@ -5,6 +5,7 @@ export function* slice<V>(
 ) {
   // https://surma.github.io/underdash/
   const iit = it[ Symbol.iterator ]();
+  if (end < start) throw new Error(`Param 'end' should be more than 'start'`);
 
   for (; start > 0; start--, end--) iit.next();
 

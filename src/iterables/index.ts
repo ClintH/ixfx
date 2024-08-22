@@ -119,6 +119,23 @@ export function until(it: AsyncIterable<any>, f: () => Promise<boolean> | Promis
 export function until(it: Iterable<any>, f: () => boolean | never): void;
 export function until(it: Iterable<any>, f: () => Promise<boolean>): Promise<undefined>;
 
+/**
+* Loops over a generator until it finishes, calling `callback`.
+* Useful if you don't care about the value generator produces, just the number of loops.
+* 
+* ```js
+* until(count(5), () => {
+* // do something 5 times
+* });
+* ```
+* 
+* If you want the value from the generator, use a `for of` loop as usual.
+* If `callback` explicitly returns _false_, the generator is aborted.
+* 
+* This does not work for infinite generators, `callback` will never be called.
+* @param it Generator to run
+* @param callback Code to call for each iteration
+*/
 export function until(it: AsyncIterable<any> | Iterable<any>, callback: () => Promise<boolean> | never | boolean | Promise<undefined>): Promise<undefined> | undefined {
   if (isAsyncIterable(it)) {
     return Async.until(it, callback);
@@ -338,10 +355,17 @@ export function reduce<V>(it: AsyncIterable<V> | Iterable<V> | Array<V>, f: (acc
 export function slice<V>(it: AsyncIterable<V>, start?: number, end?: number): AsyncGenerator<V>;
 export function slice<V>(it: Iterable<V> | Array<V>, start?: number, end?: number): Generator<V>;
 /**
- * Returns a section from an iterable
+ * Returns a section from an iterable.
+ * 
+ * 'end' is the end index, not the number of items.
+ * 
+ * ```js
+ * // Return five items from step 10
+ * slice(it, 10, 15);
+ * ```
  * @param it Iterable
- * @param start Start index
- * @param end Exclusive end index (or until completion)
+ * @param start Start step
+ * @param end Exclusive end step (or until completion)
  */
 export function slice<V>(
   it: Iterable<V> | AsyncIterable<V> | Array<V>,
@@ -562,3 +586,35 @@ export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
     yield v;
   }
 }
+
+
+/**
+ * Calls `callback` whenever the generator produces a value.
+ * 
+ * When using `asCallback`, call it with `await` to let generator 
+ * run its course before continuing:
+ * ```js
+ * await asCallback(tick({ interval:1000, loops:5 }), x => {
+ *  // Gets called 5 times, with 1000ms interval
+ * });
+ * console.log(`Hi`); // Prints after 5 seconds
+ * ```
+ * 
+ * Or if you skip the `await`, code continues and callback will still run:
+ * ```js
+ * asCallback(tick({ interval: 1000, loops: 5}), x => {
+ *  // Gets called 5 times, with 1000ms interval
+ * });
+ * console.log(`Hi`); // Prints immediately
+ * ```
+ * @param valueToWrap 
+ * @param callback 
+ */
+export function asCallback<V>(input: AsyncIterable<V> | Iterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
+  if (isAsyncIterable(input)) {
+    return Async.asCallback(input, callback);
+  } else {
+    return Sync.asCallback(input, callback);
+  }
+}
+

@@ -380,6 +380,35 @@ export async function reduce<V>(
   return start;
 }
 
+/**
+ * Calls `callback` whenever the async generator produces a value.
+ * 
+ * When using `asCallback`, call it with `await` to let generator 
+ * run its course before continuing:
+ * ```js
+ * await asCallback(tick({ interval:1000, loops:5 }), x => {
+ *  // Gets called 5 times, with 1000ms interval
+ * });
+ * console.log(`Hi`); // Prints after 5 seconds
+ * ```
+ * 
+ * Or if you skip the `await`, code continues and callback will still run:
+ * ```js
+ * asCallback(tick({ interval: 1000, loops: 5}), x => {
+ *  // Gets called 5 times, with 1000ms interval
+ * });
+ * console.log(`Hi`); // Prints immediately
+ * ```
+ * @param valueToWrap 
+ * @param callback 
+ */
+export async function asCallback<V>(input: AsyncIterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
+  for await (const value of input) {
+    callback(value);
+  }
+  if (onDone) onDone();
+}
+
 export async function* slice<V>(
   it: AsyncIterable<V>,
   start = 0,
@@ -387,6 +416,7 @@ export async function* slice<V>(
 ) {
   // https://surma.github.io/underdash/
   const iit = it[ Symbol.asyncIterator ]();
+  if (end < start) throw new Error(`Param 'end' should be more than 'start'`);
 
   for (; start > 0; start--, end--) await iit.next();
 

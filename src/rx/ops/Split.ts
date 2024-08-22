@@ -27,7 +27,7 @@ export const split = <T>(rxOrSource: ReactiveOrSource<T>, options: Partial<Split
  * Returns an object with keys according to `labels`.
  * Each value is a stream which echos the values from `source`.
  * ```js
- * const [a,b,c] = splitLabelled(source, `a`, `b`, `c`);
+ * const { a, b, c} = splitLabelled(source, `a`, `b`, `c`);
  * // a, b, c are Reactive types
  * ```
  * 

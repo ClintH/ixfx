@@ -27,12 +27,11 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
  * 
  * ```js
  * const o = Rx.From.object({ name: `bob`, level: 2 });
- * o.on(value => {
- *  const changed = value.value;
+ * o.onValue(changed => {
  * });
  * o.set({ name: `mary`, level: 3 });
  * 
- * // `on` will get called, with `changed` having a value of:
+ * // `onValue` will get called, with `changed` having a value of:
  * // { name: `mary`, level: 3 }
  * ```
  * 
