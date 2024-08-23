@@ -36,7 +36,7 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
 
   const promise = new Promise<Array<V | undefined>>((resolve, reject) => {
     const done = () => {
-      clearTimeout(maxWait)
+      clearTimeout(maxWait);
       unsub();
       if (read.length < limit && underThreshold === `throw`) {
         reject(new Error(`Threshold not reached. Wanted: ${ limit } got: ${ read.length }. Maximum wait: ${ maximumWait }`));
