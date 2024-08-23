@@ -607,7 +607,7 @@ export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
  * });
  * console.log(`Hi`); // Prints immediately
  * ```
- * @param valueToWrap 
+ * @param input 
  * @param callback 
  */
 export function asCallback<V>(input: AsyncIterable<V> | Iterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
