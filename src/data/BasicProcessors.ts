@@ -90,6 +90,8 @@ export const tally = (countArrayItems: boolean): Process<any, number> => {
   return compute;
 }
 
+
+
 /**
  * Returns the 'best' value seen so far as determined by a ranking function.
  * This is similar to min/max but usable for objects.
