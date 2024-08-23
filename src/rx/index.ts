@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 //#region imports
 import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./Types.js";
-import type { BatchOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
+import type { ChunkOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
 import type { RankFunction, RankOptions } from "../data/Types.js";
-import type { TimeoutTriggerOptions } from "./sources/Types.js";
+import type { TimeoutPingOptions, TimeoutValueOptions } from "./sources/Types.js";
 import { type Interval, intervalToMs } from '../flow/IntervalType.js';
 import { messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
 import { initStream } from "./InitStream.js";
@@ -101,14 +101,14 @@ export const Ops = {
    */
   annotateWithOp: <TIn, TAnnotation>(annotatorOp: ReactiveOp<TIn, TAnnotation>) => opify(OpFns.annotateWithOp, annotatorOp),
   /**
-   * Takes a stream of values and batches them up (by quantity or time elapsed),
+   * Takes a stream of values and chunks them up (by quantity or time elapsed),
    * emitting them as an array.
    * @param options 
    * @returns 
    */
-  batch: <V>(options: Partial<BatchOptions>): ReactiveOp<V, Array<V>> => {
+  chunk: <V>(options: Partial<ChunkOptions>): ReactiveOp<V, Array<V>> => {
     return (source: ReactiveOrSource<V>) => {
-      return OpFns.batch(source, options);
+      return OpFns.chunk(source, options);
     }
   },
 
@@ -266,9 +266,15 @@ export const Ops = {
    * @param options 
    * @returns 
    */
-  timeoutTrigger: <V, TTriggerValue>(options: TimeoutTriggerOptions<TTriggerValue>) => {
+  timeoutValue: <V, TTriggerValue>(options: TimeoutValueOptions<TTriggerValue>) => {
     return (source: ReactiveOrSource<V>) => {
-      return OpFns.timeoutTrigger<V, TTriggerValue>(source, options);
+      return OpFns.timeoutValue<V, TTriggerValue>(source, options);
+    }
+  },
+
+  timeoutPing: <V>(options: TimeoutPingOptions) => {
+    return (source: ReactivePingable<V>) => {
+      return OpFns.timeoutPing(source, options);
     }
   },
   transform: <In, Out>(transformer: ((value: In) => Out), options: Partial<OpFns.TransformOpts> = {}): ReactiveOp<In, Out> => {
