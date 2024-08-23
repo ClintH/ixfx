@@ -43,22 +43,22 @@ export type SwitcherOptions = {
  */
 export type TransformOpts = InitStreamOptions & { traceInput: boolean, traceOutput: boolean };
 
-export type BatchOptions = InitStreamOptions & {
+export type ChunkOptions = InitStreamOptions & {
   /**
    * If _true_ (default) remaining results are yielded
-   * if source closes. If _false_, only batches that meet
+   * if source closes. If _false_, only chunks that meet
    * `elapsed` or `quantity` are emitted.
    */
   returnRemainder: boolean
   /**
-   * Amount of time to gather results for a batch.
-   * 'elapsed' and 'quantity' is ORed. Meaning a batch will the minimum of
+   * Amount of time to gather results for a chunk.
+   * 'elapsed' and 'quantity' is ORed. Meaning a chunk will the minimum of
    * 'elapsed' and 'quantity'
    */
   elapsed: Interval
   /**
-   * Number of items to gather for a batch.
-   * 'elapsed' and 'quantity' is ORed. Meaning a batch will the minimum of
+   * Number of items to gather for a chunk.
+   * 'elapsed' and 'quantity' is ORed. Meaning a chunk will the minimum of
    * 'elapsed' and 'quantity'
    */
   quantity: number
