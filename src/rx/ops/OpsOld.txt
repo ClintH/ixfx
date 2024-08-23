@@ -5,7 +5,7 @@ import { continuously } from "../flow/Continuously.js";
 import { isPlainObjectOrPrimitive } from "../Util.js";
 import { shuffle } from "../data/arrays/index.js";
 import { timeout } from "../flow/Timeout.js";
-import type { AnnotationElapsed, BatchOptions, WithValueOptions, DebounceOptions, FieldOptions, FilterPredicate, InitStreamOptions, Passed, PipeSet, Reactive, ReactiveDisposable, ReactiveInitial, ReactiveOrSource, ReactiveStream, ReactiveWritable, ResolveOptions, SingleFromArrayOptions, SplitOptions, SwitcherOptions, ThrottleOptions, TimeoutTriggerOptions, TransformOpts } from "./Types.js";
+import type { AnnotationElapsed, BatchOptions, WithValueOptions, DebounceOptions, FieldOptions, FilterPredicate, InitStreamOptions, Passed, PipeSet, Reactive, ReactiveDisposable, ReactiveInitial, ReactiveOrSource, ReactiveStream, ReactiveWritable, ResolveOptions, SingleFromArrayOptions, SplitOptions, SwitcherOptions, ThrottleOptions, TimeoutValueOptions, TransformOpts } from "./Types.js";
 import { isDisposable, isTrigger, messageHasValue, messageIsDoneSignal, resolveTriggerValue } from "./Util.js";
 import { initStream, initUpstream } from "./InitStream.js";
 import { resolveSource } from "./ResolveSource.js";
