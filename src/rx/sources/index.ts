@@ -6,7 +6,6 @@ export * from './Derived.js';
 export * from './Dom.js';
 export * from './Event.js';
 export * from './Function.js';
-export * from './FunctionPinged.js';
 export * from './Iterator.js';
 export * from './Number.js';
 export * from './Object.js';
