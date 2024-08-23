@@ -1,5 +1,16 @@
 A rough changelog between NPM releases
 
+# 0.29.0 24.08.23
+
++ Numbers.difference
++ Rx.writable
++ Rx.timeoutPing: ping a source if it hasn't emitted a value lately
++ Rx.valueToPing: ping a target if a source emits any value
++ ImageDataGrid.byRow / byColumn
+* Rx.From.func: integrated manual pingable logic, obsoleting Rx.from.pinged 
+* Renamed Rx.Ops.batch to Rx.Ops.chunk
+* Renamed Rx.Ops.timeoutTrigger to Rx.Ops.timeoutValue
+
 # 0.27.2 24.07.28
 
 Flow.interval/Flow.repeat: integrated into one: Flow.repeat
