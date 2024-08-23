@@ -399,7 +399,7 @@ export async function reduce<V>(
  * });
  * console.log(`Hi`); // Prints immediately
  * ```
- * @param valueToWrap 
+ * @param input 
  * @param callback 
  */
 export async function asCallback<V>(input: AsyncIterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
