@@ -34,7 +34,7 @@ export function* uniqueByValue<T>(input: Iterable<T>, toString: ToString<T> = to
  * });
  * console.log(`Hi`); // Prints immediately
  * ```
- * @param valueToWrap 
+ * @param input 
  * @param callback 
  */
 export function asCallback<V>(input: Iterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
