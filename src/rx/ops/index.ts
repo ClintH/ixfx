@@ -1,5 +1,5 @@
 export * from './Annotate.js';
-export * from './Batch.js';
+export * from './Chunk.js';
 export * from './CloneFromFields.js';
 export * from './CombineLatestToArray.js';
 export * from './CombineLatestToObject.js';
@@ -18,7 +18,9 @@ export * from './SyncToArray.js';
 export * from './SyncToObject.js';
 export * from './Tap.js';
 export * from './Throttle.js';
-export * from './TimeoutTrigger.js';
+export * from './TimeoutValue.js';
+export * from './TimeoutPing.js';
 export * from './Transform.js';
 export * from './Types.js';
+export * from './ValueToPing.js';
 export * from './WithValue.js';
