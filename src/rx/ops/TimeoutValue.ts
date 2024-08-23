@@ -2,11 +2,11 @@ import { intervalToMs } from "../../flow/IntervalType.js";
 import { initUpstream } from "../InitStream.js";
 import type { ReactiveOrSource, Reactive } from "../Types.js";
 import { isTrigger, resolveTriggerValue } from "../Util.js";
-import type { TimeoutTriggerOptions } from "../sources/Types.js";
+import type { TimeoutValueOptions } from "../sources/Types.js";
 
 /**
  * Emits a value if `source` does not emit a value after `interval`
- * has elapsed. For example, this allows you to reset a reactive to some
+ * has elapsed. This can be useful to reset a reactive to some
  * 'zero' state if nothing is going on.
  * 
  * If `source` emits faster than the `interval`, it won't get triggered.
@@ -15,13 +15,13 @@ import type { TimeoutTriggerOptions } from "../sources/Types.js";
  * 
  * ```js
  * // Emit 'hello' if 'source' doesn't emit a value after 1 minute
- * const r = Rx.timeoutTrigger(source, { value: 'hello', interval: { mins: 1 } });
+ * const r = Rx.timeoutValue(source, { value: 'hello', interval: { mins: 1 } });
  * ```
  * 
  * Can also emit results from a function or generator
  * ```js
  * // Emits a random number if 'source' doesn't emit a value after 500ms
- * const r = Rx.timeoutTrigger(source, { fn: Math.random, interval: 500 });
+ * const r = Rx.timeoutValue(source, { fn: Math.random, interval: 500 });
  * ```
  * 
  * If `immediate` option is _true_ (default), the timer starts from stream initialisation.
@@ -29,7 +29,7 @@ import type { TimeoutTriggerOptions } from "../sources/Types.js";
  * @param source 
  * @param options 
  */
-export function timeoutTrigger<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutTriggerOptions<TTriggerValue>): Reactive<TSource | TTriggerValue> {
+export function timeoutValue<TSource, TTriggerValue>(source: ReactiveOrSource<TSource>, options: TimeoutValueOptions<TTriggerValue>): Reactive<TSource | TTriggerValue> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const immediate = options.immediate ?? true;
   const repeat = options.repeat ?? false;
