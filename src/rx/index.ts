@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 //#region imports
-import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./Types.js";
+import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable, ReactiveStream } from "./Types.js";
 import type { ChunkOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
 import type { RankFunction, RankOptions } from "../data/Types.js";
 import type { TimeoutPingOptions, TimeoutValueOptions } from "./sources/Types.js";
 import { type Interval, intervalToMs } from '../flow/IntervalType.js';
-import { messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
+import { isWritable, messageHasValue, messageIsDoneSignal, opify } from "./Util.js";
 import { initStream } from "./InitStream.js";
 import { resolveSource } from './ResolveSource.js';
 import * as SinkFns from './sinks/index.js';
@@ -40,6 +40,28 @@ export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: Array<Reac
   //const raw = chainer<T1, T2, T3, T4, T5, T6>(...ops);
   //return raw(source);
 }
+
+export function writable<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<any, any>>): ReactiveWritable<TIn, TOut> {
+  let s = resolveSource(source);
+  const head = s;
+  for (const op of ops) {
+    // @ts-ignore
+    s = op(s);
+  }
+  let ss = s as any as Reactive<TOut>;
+  return {
+    ...ss,
+    set(value: TIn) {
+      if (isWritable(head)) {
+        head.set(value);
+      } else throw new Error(`Original source is not writable`);
+    }
+  } as ReactiveWritable<TIn, TOut>
+  //return s as Reactive<T2 | T3 | T4 | T5 | T6>;
+  //const raw = chainer<T1, T2, T3, T4, T5, T6>(...ops);
+  //return raw(source);
+}
+
 /**
  * Initialises a reactive that pipes values to listeners directly.
  * @returns 
@@ -273,7 +295,7 @@ export const Ops = {
   },
 
   timeoutPing: <V>(options: TimeoutPingOptions) => {
-    return (source: ReactivePingable<V>) => {
+    return (source: ReactiveOrSource<V>) => {
       return OpFns.timeoutPing(source, options);
     }
   },
