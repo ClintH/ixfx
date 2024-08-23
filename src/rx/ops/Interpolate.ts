@@ -31,7 +31,9 @@ export function interpolate(input: ReactiveOrSource<number>, options: Partial<Op
 
   return computeWithPrevious<number>(input, (previous, target) => {
     const v = i(previous, target);
-    if (v / target >= snapAt) return target;
+    if (target > previous) {
+      if (v / target >= snapAt) return target;
+    }
     return v;
   });
 }
