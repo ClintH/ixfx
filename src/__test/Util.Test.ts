@@ -1,5 +1,5 @@
 import test from 'ava';
-import { relativeDifference } from '../numbers/RelativeDifference.js';
+import { relativeDifference } from '../numbers/Difference.js';
 import { toStringDefault } from '../util/ToString.js';
 test('relativeDifference', (t) => {
   const rel = relativeDifference(100);

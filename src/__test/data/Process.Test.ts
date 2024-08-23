@@ -1,6 +1,7 @@
 import test from "ava";
 import * as Basic from '../../data/BasicProcessors.js';
 import * as Process from '../../data/Process.js';
+import { isApprox } from "../../numbers/IsApprox.js";
 
 test('seen', t => {
   const c1Results: string[] = [];
@@ -112,3 +113,4 @@ test(`math`, t => {
   t.is(c4(`hello`), 6);
 
 })
+

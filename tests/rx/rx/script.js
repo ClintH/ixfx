@@ -1,6 +1,8 @@
 import * as Rx from '../../../dist/rx.js'; 
 import * as Data from '../../../dist/data.js';
 import* as Dom from '../../../dist/dom.js';
+import {Points} from '../../../dist/geometry.js';
+
 const generateRect = () => ({width:window.innerWidth, height:window.innerHeight});
 
 // function testObject() {
@@ -17,12 +19,24 @@ const generateRect = () => ({width:window.innerWidth, height:window.innerHeight}
 //   return o;
 // }
 
-const move = Rx.From.event(document.body, `pointermove`, {x:0,y:0});
-Rx.wrap(move)
-  .tapProcess(
-    value => `${value.x},${value.y}`,
-    Dom.setText(`#lblXy`)
-  );
+const rx = Rx.run(
+  Rx.From.event(document, `pointermove`, {x:0,y:0}),
+  Rx.Ops.transform(v => ({x:v.x, y:v.y})),
+  Rx.Ops.transform(v => Points.divide(v, window.innerWidth, window.innerHeight))
+);
+rx.onValue(v => {
+  console.log(v);
+})
+
+
+// const move = Rx.From.event(document.body, `pointermove`, {x:0,y:0});
+// Rx.wrap(move)
+//   .tapProcess(
+//     value => `${value.x},${value.y}`,
+//     Dom.setText(`#lblXy`)
+//   );
+
+
 
 
 
@@ -38,20 +52,20 @@ Rx.wrap(move)
 // });
 // Rx.Dom.bindText(clicks, `#lblClicks`);
 
-function testDoubleClickDetection() {
-  const btnClicksChunk = Rx.chunk(btnClicks,{ elapsed: 200});
-  const btnClickSwitch= Rx.switcher( btnClicksChunk, {
-    single: v=> v.length == 1,
-    double: v=> v.length == 2,
-    more: v=>v.length > 2
-  });
-  btnClickSwitch.single.on(msg => {
-    console.log(`single!`);
-  });
-  btnClickSwitch.double.on(msg => {
-    console.log(`double!`);
-  });
-}
+// function testDoubleClickDetection() {
+//   const btnClicksChunk = Rx.chunk(btnClicks,{ elapsed: 200});
+//   const btnClickSwitch= Rx.switcher( btnClicksChunk, {
+//     single: v=> v.length == 1,
+//     double: v=> v.length == 2,
+//     more: v=>v.length > 2
+//   });
+//   btnClickSwitch.single.on(msg => {
+//     console.log(`single!`);
+//   });
+//   btnClickSwitch.double.on(msg => {
+//     console.log(`double!`);
+//   });
+// }
 
 // const btnClickCount = Rx.transform(btnClicksChunk, v => ({length:v.length, paths:v.map(event=>event.composedPath())}));
 // btnClickCount.on(msg => {
