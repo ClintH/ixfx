@@ -53,7 +53,7 @@ export * as Normalise from './Normalise.js';
 export * from './NumericArrays.js';
 export * from './Proportion.js';
 export * from './Quantise.js';
-export * from './RelativeDifference.js';
+export * from './Difference.js';
 export * from './Round.js';
 export * from './Scale.js';
 export * from './Softmax.js';
