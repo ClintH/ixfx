@@ -1,19 +1,21 @@
 import { getErrorMessage } from "../../debug/GetErrorMessage.js";
 import { initStream } from "../InitStream.js";
-import type { Reactive, Unsubscriber } from "../Types.js";
+import type { Reactive, ReactivePingable, Unsubscriber } from "../Types.js";
 import { messageHasValue, messageIsDoneSignal, messageIsSignal } from "../Util.js";
 import type { PingedFunctionOptions, PingedFunctionFunction } from "./Types.js";
 
 
 /**
- * Creates a reactive with `callback` as a value source. This gets called whenever `source` emits a value.
+ * Runs a function and emits a value whenever an upstream source emits a value.
+ * The upstream value is ignored, it's just used as a trigger.
  *
  * @param callback 
  * @param source 
  * @param options 
  * @returns 
  */
-export function pinged<T, TSource>(source: Reactive<TSource>, callback: PingedFunctionFunction<T, TSource>, options: Partial<PingedFunctionOptions> = {}) {
+/*
+export function pinged<T, TSource>(source: Reactive<TSource>, callback: PingedFunctionFunction<T, TSource>, options: Partial<PingedFunctionOptions> = {}): ReactivePingable<T> {
   const closeOnError = options.closeOnError ?? true;
   const lazy = options.lazy ?? `initial`;
 
@@ -80,4 +82,4 @@ export function pinged<T, TSource>(source: Reactive<TSource>, callback: PingedFu
 
   if (lazy === `never`) start();
   return events;
-}
+}*/
