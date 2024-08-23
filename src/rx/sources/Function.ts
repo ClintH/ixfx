@@ -3,13 +3,12 @@ import { continuously } from "../../flow/Continuously.js";
 import { intervalToMs } from "../../flow/IntervalType.js";
 import { sleep } from "../../flow/Sleep.js";
 import { initLazyStream } from "../InitStream.js";
+import type { ReactivePingable } from "../Types.js";
 import type { FunctionFunction, FunctionOptions } from "./Types.js";
 
 
 /**
  * Produces a reactive from the basis of a function. `callback` is executed, with its result emitted via the returned reactive.
- * 
- * See also {@link Rx.From.pinged} to trigger a function whenever another Reactive emits a value.
  * 
  * ```js
  * // Produce a random number every second
@@ -45,85 +44,88 @@ import type { FunctionFunction, FunctionOptions } from "./Types.js";
  * @returns 
  */
 // eslint-disable-next-line unicorn/prevent-abbreviations
-export function func<V>(callback: FunctionFunction<V>, options: Partial<FunctionOptions> = {}) {
+export function func<V>(callback: FunctionFunction<V>, options: Partial<FunctionOptions> = {}): ReactivePingable<V> {
   const maximumRepeats = options.maximumRepeats ?? Number.MAX_SAFE_INTEGER;
   const closeOnError = options.closeOnError ?? true;
-  const interval = intervalToMs(options.interval, 1);
-  const loop = options.interval !== undefined;
-  const predelay = intervalToMs(options.predelay, 1);
+  const intervalMs = options.interval ? intervalToMs(options.interval) : -1;
+  let manual = options.manual ?? false;
+
+  // If niether interval or manual is set, assume manual
+  if (options.interval === undefined && options.manual === undefined) manual = true;
+
+  if (manual && options.interval) throw new Error(`If option 'manual' is set, option 'interval' cannot be used`);
+  const predelay = intervalToMs(options.predelay, 0);
   const lazy = options.lazy ?? `very`;
   const signal = options.signal;
 
   const internalAbort = new AbortController();
   const internalAbortCallback = (reason: string) => { internalAbort.abort(reason) };
   let sentResults = 0;
-  if (options.maximumRepeats && !loop) throw new Error(`'maximumRepeats' has no purpose if 'loop' is not set to true`);
-
-
-
-  // const events = initStream<V>({
-  //   onFirstSubscribe() {
-  //     if (run.runState === `idle`) run.start();
-  //   },
-  //   onNoSubscribers() {
-  //     console.log(`Rx.fromFunction onNoSubscribers. lazy: ${ lazy }`);
-  //     if (lazy === `very`) {
-  //       run.cancel();
-  //     }
-  //   },
-  // })
+  let enabled = false;
 
   const done = (reason: string) => {
-    //console.log(`Rx.fromFunction done ${ reason }`);
     events.dispose(reason);
-    run.cancel();
+    enabled = false;
+    if (run) run.cancel();
   }
 
-  const run = continuously(async () => {
+  const ping = async () => {
+    if (!enabled) return false;
     if (predelay) await sleep(predelay);
-
+    if (sentResults >= maximumRepeats) {
+      done(`Maximum repeats reached ${ maximumRepeats.toString() }`);
+      return false;
+    }
+    //console.log(`sent: ${ sentResults } max: ${ maximumRepeats }`);
     try {
       if (signal?.aborted) {
         done(`Signal (${ signal.aborted })`);
         return false;
       }
       const value = await callback(internalAbortCallback);
-      events.set(value);
       sentResults++;
-
+      events.set(value);
+      return true;
     } catch (error) {
       if (closeOnError) {
         done(`Function error: ${ getErrorMessage(error) }`);
         return false;
       } else {
         events.signal(`warn`, getErrorMessage(error));
+        return true;
       }
     }
-    if (!loop) {
-      done(`fromFunction done`);
-      return false; // Stop loop
-    }
+  }
+
+  const run = manual ? undefined : continuously(async () => {
+    const pingResult = await ping();
+    if (!pingResult) return false;
+
+    // if (!loop) {
+    //   done(`fromFunction done`);
+    //   return false; // Stop loop
+    // }
     if (internalAbort.signal.aborted) {
       done(`callback function aborted (${ internalAbort.signal.reason })`);
       return false
     }
-    if (sentResults >= maximumRepeats) {
-      done(`Maximum repeats reached ${ maximumRepeats.toString() }`);
-      return false; // Stop loop
-    }
 
-  }, interval);
+  }, intervalMs);
 
   const events = initLazyStream<V>({
     lazy,
     onStart() {
-      run.start();
+      enabled = true;
+      if (run) run.start();
     },
     onStop() {
-      run.cancel();
+      console.log(`onStop`);
+      enabled = false;
+      if (run) run.cancel();
     },
   });
 
-  if (lazy === `never`) run.start();
-  return events;
+  if (lazy === `never` && run) run.start();
+  return { ...events, ping };
 }
+
