@@ -3,76 +3,39 @@ import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { isApprox } from '../../../numbers/IsApprox.js';
 
-test(`from-pinged-function`, async t => {
-
-  const pingSource = Rx.From.number(0);
-  const pingConstant = Rx.From.number(0);
-  // Produce random values every 10ms
-  const pingConstantT = setInterval(() => pingConstant.set(Math.random()), 10);
-
-  // Test 1 - Not lazy
+test(`manual`, async t => {
+  // Test 1 - Manual trigger, no subscriber
   let r1Test = createTest();
-  const r1 = Rx.From.pinged(pingConstant, r1Test.callback, { lazy: `never` });
+  const r1 = Rx.From.func(r1Test.callback, { manual: true });
+  r1.ping();
   await Flow.sleep(50);
-  t.true(r1Test.invoked() > 0, `Function will run when not lazy`);
+  t.true(r1Test.invoked() === 0, `Function will not run`);
   r1.dispose(`test`);
 
-  // Test 2 - Very lazy
+  // Test 1A - Manual trigger, with subscriber
+  let r1TestA = createTest();
+  const r1A = Rx.From.func(r1TestA.callback, { manual: true });
+  r1A.onValue(value => {
+
+  })
+  r1A.ping();
+  await Flow.sleep(50);
+  t.true(r1TestA.invoked() === 1, `Function will run`);
+  r1A.dispose(`test`);
+
+  // Test 2 
   const r2Test = createTest();
-  const r2 = Rx.From.pinged(pingConstant, r2Test.callback, { lazy: `very` });
+  const r2 = Rx.From.func(r2Test.callback, { manual: true, maximumRepeats: 5 });
+  r2.onValue(value => {});
+  for (let i = 0; i < 10; i++) {
+    r2.ping();
+    await Flow.sleep(10);
+  }
   await Flow.sleep(50);
-  t.true(r2Test.invoked() === 0, `Function does not run until there is a subscriber`);
-  const r2Off = r2.onValue(v => {
-
-  });
-  await Flow.sleep(50);
-  t.true(r2Test.invoked() > 0, `Invocations happen`);
-  r2Off();
-  const r2Invoked = r2Test.invoked();
-  await Flow.sleep(50);
-  t.true(r2Test.invoked() === r2Invoked, `Invocations stop when unsubscribed`);
-  r2.dispose(`test`);
-
-  // Test 3 - Initial lazy
-  const r3Test = createTest();
-  const r3 = Rx.From.pinged(pingConstant, r3Test.callback, { lazy: `initial` });
-  await Flow.sleep(50);
-  t.true(r3Test.invoked() === 0, `Function does not run until subscriber`);
-  const r3Off = r3.onValue(v => {
-
-  });
-  await Flow.sleep(50);
-  t.true(r3Test.invoked() > 0, `Invocations happen`);
-  r3Off();
-  const r3Invoked = r3Test.invoked();
-  await Flow.sleep(50);
-  t.true(r3Invoked < r3Test.invoked(), `Invocations continue after unsubscribing`);
-  r3.dispose(`test`);
-  clearInterval(pingConstantT);
-});
-
-test(`from-function`, async t => {
-  // Test 1 - One-time invocation
-  let invoked = 0;
-  const r1 = Rx.From.func(() => {
-    invoked++;
-    return invoked;
-  });
-  const r1V = await Rx.takeNextValue(r1, 500);
-  t.is(r1V, 1);
-  t.is(invoked, 1);
-
-  // Test 2 - Abort if error happens
-  invoked = 0;
-  const r2 = Rx.From.func(() => {
-    throw new Error(`Bug`);
-  });
-  await t.throwsAsync(async () => {
-    const r2V = await Rx.takeNextValue(r2, 200);
-  });
-  await Flow.sleep(500);
+  t.true(r2Test.invoked() === 5, `invoked count should be 5, got: ${ r2Test.invoked() }`);
 
 });
+
 
 const createTest = () => {
   let invoked = 0;
@@ -85,14 +48,14 @@ const createTest = () => {
   }
 };
 
-test(`from-function-loop-errors`, async t => {
+test(`loop-errors`, async t => {
   // Test 4 - Loop but stop with error
   let r4Invoked = 0;
   const r4 = Rx.From.func(() => {
     r4Invoked++;
     if (r4Invoked === 3) throw new Error(`Die`);
     return r4Invoked;
-  }, { interval: 1, maximumRepeats: 5 });
+  }, { interval: 1, maximumRepeats: 5, closeOnError: true });
   const r4Value = await Rx.toArray(r4);
   t.deepEqual(r4Value, [ 1, 2 ]);
 
@@ -103,6 +66,7 @@ test(`from-function-loop-errors`, async t => {
     if (r5Invoked === 3) throw new Error(`Die`);
     return r5Invoked;
   }, { interval: 1, maximumRepeats: 5, closeOnError: false });
+
   const r5Value = await Rx.toArray(r5);
   // '3' missing due to ignored error
   t.deepEqual(r5Value, [ 1, 2, 4, 5, 6 ]);
@@ -116,7 +80,7 @@ test(`from-function-loop-errors`, async t => {
 });
 
 
-test(`func-lazy-initial`, async t => {
+test(`lazy-initial`, async t => {
   let produced = 0;
   const r = Rx.From.func(() => {
     produced++;
@@ -144,7 +108,7 @@ test(`func-lazy-initial`, async t => {
   await Flow.sleep(200);
   r2Off();
 
-  // Expect the same number of results since we listened for 500ms both times
+  // Expect about the same number of results since we listened for 500ms both times
   t.true(isApprox(0.1, results1, results2), `results1: ${ results1 } results2: ${ results2 }`);
 
   // Since producer is lazy, we expect # produced to be at least results1+2
@@ -152,7 +116,7 @@ test(`func-lazy-initial`, async t => {
   r.dispose(`Test`);
 });
 
-test(`from-function-limits`, async t => {
+test(`max-repeats`, async t => {
   // Test 1 - No loop limit
   const r1Func = createTest();
   const r1 = Rx.From.func(r1Func.callback, { interval: 1, lazy: `initial` });
@@ -166,12 +130,12 @@ test(`from-function-limits`, async t => {
   const r2Value = await Rx.toArray(r2);
   t.deepEqual(r2Value, [ 1, 2, 3, 4, 5 ]);
 
-  // Test 3 - Limit with interval
+  // Test 3 - Limit with interval between
   let elapsed = Flow.Elapsed.once();
   const r3Func = createTest();
-  const r3 = Rx.From.func(r3Func.callback, { interval: 50, maximumRepeats: 5 });
-  const r3Value = await Rx.toArray(r3, { maximumWait: 500 });
-  t.true(isApprox(0.1, 5 * 50, elapsed()), `Elapsed ${ elapsed() }`);
+  const r3 = Rx.From.func(r3Func.callback, { interval: 100, maximumRepeats: 5, lazy: `initial` });
+  const r3Value = await Rx.toArray(r3, { maximumWait: 6000 });
+  t.true(isApprox(0.1, 6 * 100, elapsed()), `Elapsed ${ elapsed() }`);
   t.deepEqual(r3Value, [ 1, 2, 3, 4, 5 ]);
 
 

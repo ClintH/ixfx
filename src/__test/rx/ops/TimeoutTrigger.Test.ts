@@ -10,7 +10,7 @@ test(`timeout-repeat`, async t => {
   const time = Flow.Elapsed.interval();
 
   let values = 0;
-  const r1 = Rx.timeoutTrigger(s1, {
+  const r1 = Rx.timeoutValue(s1, {
     interval: 50,
     repeat: true,
     fn() {
@@ -37,7 +37,7 @@ test(`timeout-value-immediate`, async t => {
   const s1 = Rx.From.func(() => 'goodbye', { interval: 200 });
 
   // Emit 'hello' if we don't get anything from s1 after 150ms
-  const r1 = Rx.timeoutTrigger(s1, { value: 'hello', interval: 150, immediate: true });
+  const r1 = Rx.timeoutValue(s1, { value: 'hello', interval: 150, immediate: true });
   const time = Flow.Elapsed.interval();
   let count = 0;
   let hello = true;
@@ -64,7 +64,7 @@ test(`timeout-value-non-immediate`, async t => {
   // Emit 'goodbye' every 200ms
   const s1 = Rx.From.func(() => 'goodbye', { interval: 200 });
   // Emit 'hello' if we don't get anything from s1 after 150ms
-  const r1 = Rx.timeoutTrigger(s1, { fn: () => 'hello', interval: 150, immediate: false });
+  const r1 = Rx.timeoutValue(s1, { fn: () => 'hello', interval: 150, immediate: false });
   const time = Flow.Elapsed.interval();
   let count = 0;
   let hello = false;
