@@ -3,7 +3,7 @@ import { timeout } from "../../flow/Timeout.js";
 import { initUpstream } from "../InitStream.js";
 import type { ReactiveOrSource, Reactive } from "../Types.js";
 import { toReadable } from "../ToReadable.js";
-import type { BatchOptions } from "./Types.js";
+import type { ChunkOptions } from "./Types.js";
 
 /**
  * Queue from `source`, emitting when thresholds are reached. 
@@ -14,16 +14,16 @@ import type { BatchOptions } from "./Types.js";
  * By default options are OR'ed together.
  *
  * ```js
- * // Emit data in batches of 5 items
- * batch(source, { quantity: 5 });
- * // Emit data every second
- * batch(source, { elapsed: 1000 });
+ * // Emit data in chunks of 5 items
+ * chunk(source, { quantity: 5 });
+ * // Emit a chunk of data every second
+ * chunk(source, { elapsed: 1000 });
  * ```
- * @param batchSource 
+ * @param source 
  * @param options 
  * @returns 
  */
-export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<BatchOptions> = {}): Reactive<Array<V>> {
+export function chunk<V>(source: ReactiveOrSource<V>, options: Partial<ChunkOptions> = {}): Reactive<Array<V>> {
   const queue = new QueueMutable<V>();
   const quantity = options.quantity ?? 0;
   //const logic = options.logic ?? `or`;
@@ -51,7 +51,7 @@ export function batch<V>(batchSource: ReactiveOrSource<V>, options: Partial<Batc
       }
     },
   }
-  const upstream = initUpstream<V, Array<V>>(batchSource, upstreamOpts);
+  const upstream = initUpstream<V, Array<V>>(source, upstreamOpts);
 
   const send = () => {
     if (queue.isEmpty) return;
