@@ -2,8 +2,8 @@ import * as Ops from "./ops/index.js";
 import { resolveSource } from "./ResolveSource.js";
 import { toArray, toArrayOrThrow } from "./ToArray.js";
 import type { ReactiveOrSource, Wrapped, ToArrayOptions, InitStreamOptions, Reactive, RxValueTypes, CombineLatestOptions, ReactiveOp, } from "./Types.js";
-import type { BatchOptions, FieldOptions, FilterPredicate, DebounceOptions, SwitcherOptions, SplitOptions, ThrottleOptions, TransformOpts, SyncOptions, } from './ops/Types.js'
-import type { TimeoutTriggerOptions } from './sources/Types.js'
+import type { ChunkOptions, FieldOptions, FilterPredicate, DebounceOptions, SwitcherOptions, SplitOptions, ThrottleOptions, TransformOpts, SyncOptions, } from './ops/Types.js'
+import type { TimeoutPingOptions, TimeoutValueOptions } from './sources/Types.js'
 import { messageHasValue } from "./Util.js";
 import { mapObjectShallow } from '../data/MapObject.js';
 import * as Enacts from './sinks/index.js';
@@ -14,14 +14,14 @@ import type { Processors } from "../data/Process.js";
  * function calls.
  * 
  * Example:
- * For every `pointerup` event on the body, batch the events over
+ * For every `pointerup` event on the body, chunk the events over
  * periods of 200ms, get the number of events in that period,
  * and print it out.
  * 
  * eg. detecting single or double-clicks
  * ```js
  * wrap(Rx.fromEvent<{ x: number, y: number }>(document.body, `pointerup`))
- *  .batch({ elapsed: 200 })
+ *  .chunk({ elapsed: 200 })
  *  .transform(v => v.length)
  *  .onValue(v => { console.log(v) });
  * ```
@@ -45,8 +45,8 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
       return wrap(a);
     },
 
-    batch: (options: Partial<BatchOptions>): Wrapped<Array<TIn>> => {
-      const w = wrap<Array<TIn>>(Ops.batch(source, options));
+    chunk: (options: Partial<ChunkOptions>): Wrapped<Array<TIn>> => {
+      const w = wrap<Array<TIn>>(Ops.chunk(source, options));
       return w;
     },
     debounce: (options: Partial<DebounceOptions> = {}) => {
@@ -131,8 +131,11 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
     transform: <TOut>(transformer: (value: TIn) => TOut, options: Partial<TransformOpts> = {}) => {
       return wrap(Ops.transform(source, transformer, options));
     },
-    timeoutTrigger: <TTrigger>(options: TimeoutTriggerOptions<TTrigger>) => {
-      return wrap(Ops.timeoutTrigger<TIn, TTrigger>(source, options));
+    timeoutValue: <TTrigger>(options: TimeoutValueOptions<TTrigger>) => {
+      return wrap(Ops.timeoutValue<TIn, TTrigger>(source, options));
+    },
+    timeoutPing: (options: TimeoutPingOptions) => {
+      return wrap(Ops.timeoutPing(source, options));
     },
     toArray: (options: Partial<ToArrayOptions<TIn>>) => {
       return toArray(source, options);

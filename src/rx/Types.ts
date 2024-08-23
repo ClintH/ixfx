@@ -1,8 +1,8 @@
 import type { Primitive } from '../PrimitiveTypes.js';
 import type { Interval } from '../flow/IntervalType.js';
 import * as Immutable from '../data/Pathed.js';
-import type { BatchOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions, OpMathOptions } from './ops/Types.js';
-import type { TimeoutTriggerOptions } from './sources/Types.js';
+import type { ChunkOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions, OpMathOptions } from './ops/Types.js';
+import type { TimeoutPingOptions, TimeoutValueOptions } from './sources/Types.js';
 import type { SetHtmlOptions } from './sinks/Dom.js';
 import type { Processors } from '../data/Process.js';
 import type { TallyOptions } from './ops/Math.js';
@@ -96,11 +96,11 @@ export type Wrapped<TIn> = {
   annotate: <TAnnotation>(transformer: (value: TIn) => TAnnotation) => Wrapped<{ value: TIn, annotation: TAnnotation }>
   annotateWithOp: <TOut>(op: ReactiveOp<TIn, TOut>) => Wrapped<{ value: TIn, annotation: TOut }>
   /**
-  * Accumulate a batch of values, emitted as an array
+  * Accumulate a chunk of values, emitted as an array
   * @param options 
   * @returns 
   */
-  batch: (options: Partial<BatchOptions>) => Wrapped<Array<TIn>>
+  chunk: (options: Partial<ChunkOptions>) => Wrapped<Array<TIn>>
 
   debounce: (options: Partial<DebounceOptions>) => Wrapped<TIn>
 
@@ -201,7 +201,39 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   throttle: (options: Partial<ThrottleOptions>) => Wrapped<TIn>
-  timeoutTrigger: <TTriggerValue>(options: TimeoutTriggerOptions<TTriggerValue>) => Wrapped<TIn | TTriggerValue>
+  /**
+   * Emits a value if `source` does not emit a value after `interval`
+   * has elapsed. This can be useful to reset a reactive to some
+   * 'zero' state if nothing is going on.
+   * 
+   * If `source` emits faster than the `interval`, it won't get triggered.
+   * 
+   * Default for 'timeout': 1000s.
+   * 
+   * ```js
+   * // Emit 'hello' if 'source' doesn't emit a value after 1 minute
+   * const r = Rx.timeoutValue(source, { value: 'hello', interval: { mins: 1 } });
+   * ```
+   * 
+   * Can also emit results from a function or generator
+   * ```js
+   * // Emits a random number if 'source' doesn't emit a value after 500ms
+   * const r = Rx.timeoutValue(source, { fn: Math.random, interval: 500 });
+   * ```
+   * 
+   * If `immediate` option is _true_ (default), the timer starts from stream initialisation.
+   * Otherwise it won't start until it observes the first value from `source`.
+   * @param options 
+   */
+  timeoutValue: <TTriggerValue>(options: TimeoutValueOptions<TTriggerValue>) => Wrapped<TIn | TTriggerValue>
+  /**
+   * 'Pings' reactive (if it supports it) if a value is not received within a given interval.
+   * Behaviour can be stopped using an abort signal.
+   * @param options 
+   * @returns 
+   */
+  timeoutPing: (options: TimeoutPingOptions) => Wrapped<TIn>
+
   /**
    * Copies values from source into an array, throwing
    * an error if expected number of items is not reached
@@ -304,6 +336,16 @@ export type Reactive<V> = {
   set?(value: V): void
 }
 
+/**
+ * A reactive that can be 'pinged' to produce a value.
+ * 
+ * Use {@link isPingable} to check if a reactive is pingable.
+ * 
+ * Pingable reactives are returned from
+ * * interpolate
+ * * computeWithPrevious
+ * * valueToPing
+ */
 export type ReactivePingable<V> = Reactive<V> & {
   ping(): void
 }
