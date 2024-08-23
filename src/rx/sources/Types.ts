@@ -61,7 +61,14 @@ export type TriggerGenerator<TTriggerValue> = {
  */
 export type Trigger<TTriggerValue> = TriggerValue<TTriggerValue> | TriggerFunction<TTriggerValue> | TriggerGenerator<TTriggerValue>;
 
-export type TimeoutTriggerOptions<TTriggerValue> = Trigger<TTriggerValue> & {
+export type TimeoutPingOptions = Interval & {
+  /**
+   * If abort signals, it will disable
+   */
+  abort?: AbortSignal
+};
+
+export type TimeoutValueOptions<TTriggerValue> = Trigger<TTriggerValue> & {
   /**
    * Whether to repeatedly trigger even if upstream source doesn't emit values.
    * When _false_ (default) it will emit a max of one value after a source value if `interval` is reached.
@@ -100,6 +107,30 @@ export type ObjectOptions<V extends Record<string, any>> = {
   eq: IsEqualContext<V>
 }
 
+export type ValueToPingOptions<TUpstream> = {
+  /**
+   * If set, this function acts as a threshold gate.
+   * If the function returns _true_ the upstream value will trigger a ping
+   * Otherwise the value won't trigger a ping.
+   * 
+   * By default all values trigger a ping.
+   * @param value 
+   * @returns 
+   */
+  gate: (value: TUpstream) => boolean
+  /**
+   * Laziness
+   * * start: only begins on first subscriber. Keeps running even when there are no subscribers
+   * * very: only begins on first subscriber. Stops looping if there are no subscribers
+   * * never: begins calling function when initalised and doesn't stop until Reactive is disposed
+   */
+  lazy: Lazy,
+  /**
+    * If specified, signal is checked to prevent function execution.
+    * Also used for aborting a looped fromFunction.
+  */
+  signal: AbortSignal
+}
 
 export type PingedFunctionOptions = {
   /**
@@ -116,9 +147,9 @@ export type PingedFunctionOptions = {
    */
   lazy: Lazy,
   /**
- * If specified, a time before invoking function.
- * If `repeat` is used, this is in addition to `interval` time.
- */
+    * If specified, a time before invoking function.
+    * If `repeat` is used, this is in addition to `interval` time.
+    */
   predelay: Interval,
   /***
 * If specified, signal is checked to prevent function execution.
@@ -153,6 +184,13 @@ export type FunctionOptions = Partial<InitLazyStreamOptions> & {
    * * never: begins calling function when initalised and doesn't stop until Reactive is disposed
    */
   lazy: Lazy
+  /**
+   * If _true_, no automatic calling of function will happen, it will only
+   * be executed if the reactive gets a ping
+   * When this is set, 'interval' is ignored. 'maximumRepeats' and 'predelay' still apply.
+   * Default: _false_
+  */
+  manual: boolean
   /**
    * If specified, sets an upper limit of how many times we loop
    * (if this is also enabled)
