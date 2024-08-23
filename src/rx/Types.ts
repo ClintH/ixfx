@@ -356,8 +356,8 @@ export type ReactiveNonInitial<V> = Reactive<V> & {
   last(): V | undefined
 }
 
-export type ReactiveWritable<V> = Reactive<V> & {
-  set(value: V): void
+export type ReactiveWritable<TIn, TOut = TIn> = Reactive<TOut> & {
+  set(value: TIn): void
 }
 
 export type ReactiveInitial<V> = Reactive<V> & {
