@@ -4,26 +4,30 @@ import type { ReactiveOrSource, Reactive, ReactivePingable } from "../Types.js";
 import { hasLast } from "../Util.js";
 
 /**
- * From the basis of an input stream of values, run a function over
- * each value. The function takes in the last value from the stream as well as the current.
+ * When there is a value from `input`, or the reactive is pinged,
+ * this reactive emits the result of `fn`.
+ * 
+ * `fn` is provided the previous value as well as the most recent value.
+ * 
+ * If no previous value is available, the current value is emitted and `fn` is not called.
  * @param input 
  * @param fn 
  * @returns 
  */
 export function computeWithPrevious<TIn>(input: ReactiveOrSource<TIn>, fn: (previous: TIn, current: TIn) => TIn): ReactivePingable<TIn> {
   let previousValue: TIn | undefined;
-  let target: TIn | undefined;
+  let currentValue: TIn | undefined;
   if (hasLast(input)) {
-    target = previousValue = input.last();
+    currentValue = previousValue = input.last();
   }
 
   const trigger = () => {
-    if (previousValue === undefined && target !== undefined) {
-      previousValue = target;
+    if (previousValue === undefined && currentValue !== undefined) {
+      previousValue = currentValue;
       upstream.set(previousValue);
-    } else if (previousValue !== undefined && target !== undefined) {
-      const vv = fn(previousValue, target);
-      console.log(`vv: ${ vv } prev: ${ previousValue } target: ${ target }`)
+    } else if (previousValue !== undefined && currentValue !== undefined) {
+      const vv = fn(previousValue, currentValue);
+      //console.log(`vv: ${ vv } prev: ${ previousValue } target: ${ target }`)
       previousValue = vv;
       upstream.set(vv);
     }
@@ -33,17 +37,17 @@ export function computeWithPrevious<TIn>(input: ReactiveOrSource<TIn>, fn: (prev
     lazy: "very",
     debugLabel: `computeWithPrevious`,
     onValue(value) {
-      console.log(`onValue ${ value }`);
-      target = value;
+      //console.log(`onValue ${ value }`);
+      currentValue = value;
       trigger();
     },
   })
-  if (target) trigger();
+  if (currentValue) trigger();
 
   return {
     ...toReadable(upstream),
     ping: () => {
-      if (target !== undefined) trigger()
+      if (currentValue !== undefined) trigger()
     }
   }
 }
