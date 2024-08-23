@@ -39,8 +39,8 @@ Rx.wrap(move)
 // Rx.Dom.bindText(clicks, `#lblClicks`);
 
 function testDoubleClickDetection() {
-  const btnClicksBatch = Rx.batch(btnClicks,{ elapsed: 200});
-  const btnClickSwitch= Rx.switcher( btnClicksBatch, {
+  const btnClicksChunk = Rx.chunk(btnClicks,{ elapsed: 200});
+  const btnClickSwitch= Rx.switcher( btnClicksChunk, {
     single: v=> v.length == 1,
     double: v=> v.length == 2,
     more: v=>v.length > 2
@@ -53,7 +53,7 @@ function testDoubleClickDetection() {
   });
 }
 
-// const btnClickCount = Rx.transform(btnClicksBatch, v => ({length:v.length, paths:v.map(event=>event.composedPath())}));
+// const btnClickCount = Rx.transform(btnClicksChunk, v => ({length:v.length, paths:v.map(event=>event.composedPath())}));
 // btnClickCount.on(msg => {
 //   console.log(msg.value);
 // });

@@ -43,8 +43,8 @@ function testNumber() {
   // Update x quite fast
   setInterval(() => x.set(Math.random()), 100); 
 
-  // const batched = Rx.batch(x, { elapsed: 1000 });
-  // batched.on(data => {
+  // const chunked = Rx.chunk(x, { elapsed: 1000 });
+  // chunked.on(data => {
   //   console.log(data);
   // })
 
