@@ -2,10 +2,16 @@ import { round } from '../numbers/Round.js';
 import { resolveEl as resolveElement } from './ResolveEl.js';
 import JSON5 from 'json5';
 
-export type FormattingOptions = {
-  readonly precision?: number
-  readonly roundNumbers?: number
-}
+export type NumberFormattingOptions = Readonly<{
+  precision?: number
+  roundNumbers?: number
+  leftPadding?: number
+}>
+
+export type FormattingOptions = Readonly<{
+  numbers: NumberFormattingOptions
+}>
+
 export type DataTableOpts = FormattingOptions & {
   readonly formatter?: DataFormatter
   readonly objectsAsTables?: boolean
@@ -17,17 +23,26 @@ export type DataTable<V> = {
   remove(): boolean;
 };
 
+const padding = (v: string, options: NumberFormattingOptions): string => {
+  if (options.leftPadding) {
+    if (v.length < options.leftPadding) return '&nbsp;'.repeat(options.leftPadding - v.length) + v;
+  }
+  return v;
+}
+
+const convertNumber = (v: number, o: NumberFormattingOptions): string => {
+  v = (o.roundNumbers !== undefined) ? round(o.roundNumbers, v) : v;
+  let asStr = (o.precision !== undefined) ? v.toFixed(o.precision) : v.toString();
+  asStr = padding(asStr.toString(), o);
+  return asStr;
+}
+
 const toHtmlSimple = (v: any, options: FormattingOptions): string => {
   if (v === null) return `(null)`;
   if (v === undefined) return `(undefined)`;
   if (typeof v === `boolean`) return v ? `true` : `false`;
   if (typeof v === `string`) return `"${ v }"`;
-  if (typeof v === `number`) {
-    let vAsNumber = v;
-    if (options.roundNumbers !== undefined) vAsNumber = round(options.roundNumbers, v)
-    if (options.precision !== undefined) return vAsNumber.toFixed(options.precision);
-    return vAsNumber.toString();
-  }
+  if (typeof v === `number`) return convertNumber(v, options.numbers);
   if (typeof v === `object`) return toTableSimple(v, options);
   return JSON5.stringify(v);
 }
@@ -61,6 +76,10 @@ export const fromList = (
   ) as HTMLDivElement;
   parent.append(container);
 
+  const options: DataTableOpts = {
+    numbers: {},
+    objectsAsTables: true
+  }
   const remove = () => {
     if (!container) return false;
     container.remove();
@@ -83,7 +102,7 @@ export const fromList = (
         parent.append(t);
       }
 
-      updateElement(t as HTMLTableElement, value);
+      updateElement(t as HTMLTableElement, value, options);
     }
 
     // Remove tables that aren't present in map
@@ -123,9 +142,10 @@ const updateElement = (
   //eslint-disable-next-line functional/prefer-immutable-types
   t: HTMLTableElement,
   data: object,
-  options: DataTableOpts = {}
+  options: DataTableOpts
 ) => {
-  const precision = options.precision ?? 2;
+  const numberFormatting = options.numbers ?? {}
+  //const precision = options.precision ?? 2;
   const idPrefix = options.idPrefix ?? ``;
   const objectsAsTables = options.objectsAsTables ?? false;
 
@@ -177,7 +197,10 @@ const updateElement = (
       if (typeof value === `object`) {
         valueHTML = objectsAsTables ? toTableSimple(value, options) : JSON5.stringify(value);
       } else if (typeof value === `number`) {
-        valueHTML = options.roundNumbers ? Math.round(value).toString() : value.toFixed(precision);
+        valueHTML = convertNumber(value, numberFormatting);
+        //let vv = (options.roundNumbers) ? round(options.roundNumbers, value) : value;
+        //let vvStr = vv.toFixed(precision);
+        //valueHTML = padding(vvStr, options);
       } else if (typeof value === `boolean`) {
         valueHTML = value ? `true` : `false`;
       } else if (typeof value === `string`) {
@@ -222,10 +245,17 @@ const updateElement = (
 export const fromObject = (
   parentOrQuery: HTMLElement | string,
   data?: object,
-  opts?: DataTableOpts
+  opts: Partial<DataTableOpts> = {}
 ): DataTable<object> => {
+
   const parent = resolveElement(parentOrQuery);
   const idPrefix = opts?.idPrefix ?? Math.floor(Math.random() * 1000).toString();
+  const options: DataTableOpts = {
+    numbers: {},
+    objectsAsTables: true,
+    idPrefix: ``,
+    ...opts
+  }
 
   let t: HTMLTableElement | undefined = document.createElement(`table`);
   parent.append(t);
@@ -238,11 +268,11 @@ export const fromObject = (
   };
 
   // Update already if there's initial data
-  if (data) updateElement(t, data, opts);
+  if (data) updateElement(t, data, options);
 
   const update = (d: object) => {
     if (!t) throw new Error(`Table disposed`);
-    updateElement(t, d, { ...opts, idPrefix });
+    updateElement(t, d, { ...options, idPrefix });
   };
 
   return { remove, update };

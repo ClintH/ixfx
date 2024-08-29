@@ -1,7 +1,8 @@
-import { fromObject } from "./DataTable.js";
+import { fromObject, type FormattingOptions } from "./DataTable.js";
 
-export type DataDisplayOptions = {
+export type DataDisplayOptions = FormattingOptions & {
   theme?: `dark` | `light`
+
 }
 
 // TODO Visually show data which has changed since last update
@@ -25,7 +26,7 @@ export class DataDisplay {
    * Constructor
    * @param options Options
    */
-  constructor(options: DataDisplayOptions = {}) {
+  constructor(options: Partial<DataDisplayOptions> = {}) {
     const theme = options.theme ?? `dark`;
 
     const existing = document.querySelector(`#ixfx-data-display`);
@@ -87,7 +88,7 @@ export class DataDisplay {
 
     this.dataTable = fromObject(container, undefined, {
       objectsAsTables: true,
-      roundNumbers: 2
+      ...options
     });
   }
 
