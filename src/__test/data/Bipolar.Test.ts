@@ -1,5 +1,5 @@
 import test from 'ava';
-import { immutable, fromScalar, clamp, towardZero } from '../../numbers/Bipolar.js';
+import { immutable, fromScalar, clamp, towardZero, scale } from '../../numbers/Bipolar.js';
 
 test('bipolar', t => {
   const b = immutable(1);
@@ -49,3 +49,14 @@ test(`scalarToBipolar`, (t) => {
   t.throws(() => fromScalar(1.01));
   t.throws(() => fromScalar(-0.01));
 });
+
+test(`scale`, t => {
+  t.is(scale(-10, -10, 10), -1);
+  t.is(scale(0, -10, 10), 0);
+  t.is(scale(10, -10, 10), 1);
+  t.is(scale(-5, -10, 10), -0.5);
+  t.is(scale(5, -10, 10), 0.5);
+
+
+
+})
