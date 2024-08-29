@@ -226,6 +226,12 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
   get(key: K): V | undefined {
     const v = this.store.get(key);
     if (v) {
+      if (this.autoDeletePolicy === `either` || this.autoDeletePolicy === `get`) {
+        this.store.set(key, {
+          ...v,
+          lastGet: performance.now(),
+        });
+      }
       return v.value;
     }
   }
