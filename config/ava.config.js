@@ -2,7 +2,7 @@ export default {
   files: [
     './src/__test/**/*.Test.ts',
   ],
-  failFast: true,
+  failFast: false,
   // typescript: {
   //   rewritePaths: {
   //     "src/": "etc/build/"

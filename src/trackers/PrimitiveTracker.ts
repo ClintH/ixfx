@@ -1,7 +1,7 @@
 //import { repeat } from '../flow/index.js';
 
 import type { TrackedValueOpts } from './TrackedValue.js';
-import { TrackerBase } from './TrackerBase.js';
+import { TrackerBase, type TrimReason } from './TrackerBase.js';
 
 export type TimestampedPrimitive<V extends number | string> = {
   at: number
@@ -12,16 +12,11 @@ export abstract class PrimitiveTracker<
   V extends number | string,
   TResult
 > extends TrackerBase<V, TResult> {
-
-  //computeResults(_p: Timestamped[]): TResult;
-
   values: Array<V>;
   timestamps: Array<number>;
-  //data: Array<TimestampedPrimitive<V>>;
 
   constructor(opts?: TrackedValueOpts) {
     super(opts);
-    //this.data = [];
     this.values = [];
     this.timestamps = [];
   }
@@ -33,13 +28,12 @@ export abstract class PrimitiveTracker<
    */
   trimStore(limit: number): number {
     if (limit >= this.values.length) return this.values.length;
-    //this.data = this.data.slice(-limit);
     this.values = this.values.slice(-limit);
     this.timestamps = this.timestamps.slice(-limit);
     return this.values.length;
   }
 
-  onTrimmed() {
+  onTrimmed(reason: TrimReason) {
     // no-op
   }
 

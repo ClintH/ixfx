@@ -78,7 +78,7 @@ export const isWritable = <V>(rx: Reactive<V> | ReactiveWritable<V>): rx is Reac
 export const isWrapped = <T>(v: any): v is Wrapped<T> => {
   if (typeof v !== `object`) return false;
   if (!(`source` in v)) return false;
-  if (!(`annotateElapsed` in v)) return false;
+  if (!(`annotate` in v)) return false;
   return true;
 }
 

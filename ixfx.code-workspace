@@ -13,7 +13,9 @@
       "symbolIcon.classForeground": "#a8a8a8",
       "symbolIcon.colorForeground": "#a8a8a8",
       "symbolIcon.constantForeground": "#a8a8a8"
-    },}
+    },
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
   },
   "tasks": {
     "version": "2.0.0",
