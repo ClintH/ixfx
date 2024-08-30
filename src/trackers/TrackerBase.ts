@@ -53,8 +53,11 @@ export abstract class TrackerBase<V, SeenResultType> {
   }
 
   /**
-   * Calculate results
+   * Adds a value, returning computed result.
    *  
+   * At this point, we check if the buffer is larger than `resetAfterSamples`. If so, `reset()` is called.
+   * If not, we check `sampleLimit`. If the buffer is twice as large as sample limit, `trimStore()` is
+   * called to take it down to sample limit, and `onTrimmed()` is called.
    * @param p 
    * @returns 
    */
@@ -63,7 +66,7 @@ export abstract class TrackerBase<V, SeenResultType> {
       this.reset();
     } else if (this.sampleLimit > 0 && this.seenCount > this.sampleLimit * 2) {
       this.seenCount = this.trimStore(this.sampleLimit);
-      this.onTrimmed();
+      this.onTrimmed(`resize`);
     }
 
     this.seenCount += p.length;
@@ -100,6 +103,12 @@ export abstract class TrackerBase<V, SeenResultType> {
    */
   abstract onReset(): void;
 
-  abstract onTrimmed(): void;
+
+  /**
+   * Notification that buffer has been trimmed
+   */
+  abstract onTrimmed(reason: TrimReason): void;
   abstract trimStore(limit: number): number;
 }
+
+export type TrimReason = `reset` | `resize`
