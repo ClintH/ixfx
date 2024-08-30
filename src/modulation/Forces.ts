@@ -124,18 +124,18 @@ export const constrainBounce = (
 
     if (x > maxX) {
       x = maxX;
-      velocity = Points.invert(Points.multiply(velocity, dampen), `x`);
+      velocity = Points.invert(Points.multiplyScalar(velocity, dampen), `x`);
     } else if (x < minX) {
       x = minX;
-      velocity = Points.invert(Points.multiply(velocity, dampen), `x`);
+      velocity = Points.invert(Points.multiplyScalar(velocity, dampen), `x`);
     }
 
     if (y > maxY) {
       y = maxY;
-      velocity = Points.multiply(Points.invert(velocity, `y`), dampen);
+      velocity = Points.multiplyScalar(Points.invert(velocity, `y`), dampen);
     } else if (position.y < minY) {
       y = minY;
-      velocity = Points.invert(Points.multiply(velocity, dampen), `y`);
+      velocity = Points.invert(Points.multiplyScalar(velocity, dampen), `y`);
     }
 
     return Object.freeze({
@@ -256,7 +256,7 @@ export const computeAttractionForce = (
   const d = clamp(Points.distance(f), distributionRangeMin, distributionRangeMax);
 
   // Multiply vector by gravity, scaled by mass of things and distance
-  return Points.multiply(
+  return Points.multiplyScalar(
     f,
     (gravity * (attractor.mass ?? 1) * (attractee.mass ?? 1)) / (d * d)
   );
@@ -495,7 +495,7 @@ export const magnitudeForce =
 
       const mag = Points.distance(Points.normalise(t.velocity));
       const magSq = force * mag * mag;
-      const vv = Points.multiply(Points.invert(t.velocity), magSq);
+      const vv = Points.multiplyScalar(Points.invert(t.velocity), magSq);
       return Object.freeze({
         ...t,
         acceleration: massApplyAccel(vv, t, mass),
@@ -530,7 +530,7 @@ export const velocityForce = (
   const pipeline = Points.pipeline(
     // Points.normalise,
     Points.invert,
-    (v: Point) => Points.multiply(v, force)
+    (v: Point) => Points.multiplyScalar(v, force)
   );
 
   return (t: ForceAffected): ForceAffected => {
@@ -649,7 +649,7 @@ export const springForce =
       const stretch = Math.abs(restingLength - mag);
 
       const f = Points.pipelineApply(direction, Points.normalise, (p) =>
-        Points.multiply(p, -k * stretch)
+        Points.multiplyScalar(p, -k * stretch)
       );
 
       const accel = massApplyAccel(f, t, `dampen`);
@@ -798,7 +798,7 @@ export const computeAccelerationToTarget = (
   }
 
   // Diminish vector to make a meaningful acceleration
-  return Points.multiply(direction, diminishBy);
+  return Points.multiplyScalar(direction, diminishBy);
 };
 
 /**
