@@ -3,6 +3,7 @@ import {
   type TrackedValueOpts as TrackOpts,
 } from './TrackedValue.js';
 import { minFast, maxFast, totalFast } from '../numbers/NumericArrays.js';
+import type { TrimReason } from './TrackerBase.js';
 
 export type NumberTrackerResults = {
   readonly total: number
@@ -54,7 +55,12 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
     super.onReset();
   }
 
-  onTrimmed() {
+  /**
+   * When trimmed, recomputes to set total/min/max to be based on
+   * current values.
+   * @param reason 
+   */
+  onTrimmed(reason: TrimReason) {
     this.min = minFast(this.values);
     this.max = maxFast(this.values);
     this.total = totalFast(this.values);
