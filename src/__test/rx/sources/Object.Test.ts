@@ -28,10 +28,18 @@ test(`diff-field`, async t => {
     t.true(onColourS <= 2);
   });
 
-  o.onField(`colour.*`, value => {
+  o.onField(`colour.*`, (value) => {
     onColour++;
-    if (onColour === 1) t.is(value.value, { h: 0.1, s: 0.5, l: 0.3 });
-    if (onColour === 2) t.is(value.value, { h: 0.1, s: 0.9, l: 0.3 });
+    //if (onColour === 1) t.is(value.value, { h: 0.1, s: 0.5, l: 0.3 });
+    if (onColour === 1) {
+      t.is(value.value, 0.5);
+      t.is(value.fieldName, `colour.s`);
+    }
+    //if (onColour === 2) t.is(value.value, { h: 0.1, s: 0.9, l: 0.3 });
+    if (onColour === 2) {
+      t.is(value.value, 0.9);
+      t.is(value.fieldName, `colour.s`);
+    }
     t.true(onColour <= 2);
 
   });
