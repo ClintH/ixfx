@@ -1,90 +1,40 @@
-import { throwNumberTest } from "../../util/GuardNumbers.js";
-import { guard, isPoint } from "./Guard.js";
-import type { Point } from "./PointType.js";
+import { getTwoPointParameters } from "./GetPointParameter.js";
+import { guard, isPoint3d } from "./Guard.js";
+import type { Point, Point3d } from "./PointType.js";
+import type { Writeable } from "../../TsUtil.js";
 
-/**
- * Returns `a` minus `b`
- *
- * ie.
- * ```js
- * return {
- *   x: a.x - b.x,
- *   y: a.y - b.y
- * };
- * ```
- * @param a Point a
- * @param b Point b
- * @returns Point
- */
 export function subtract(a: Point, b: Point): Point;
+export function subtract(a: Point3d, b: Point3d): Point3d;
+export function subtract(a: Point, x: number, y: number): Point;
+export function subtract(a: Point3d, x: number, y: number, z: number): Point3d;
+export function subtract(ax: number, ay: number, bx: number, by: number): Point;
+export function subtract(ax: number, ay: number, az: number, bx: number, by: number, bz: number): Point3d;
 
 /**
- * Returns `a` minus the given coordinates.
+ * Returns a Point with the x,y,z values of two points subtracted (a-b).
+ * 
+ * `z` parameter is used if present. Uses a default value of 0 for 'z' when subtracting a 2D point with a 3D one.
  *
- * ie:
+ * Examples:
+ *
  * ```js
- * return {
- *  x: a.x - x,
- *  y: a.y - y
- * }
+ * subtract(ptA, ptB);
+ * subtract(x1, y1, x2, y2);
+ * subtract(ptA, x2, y2);
  * ```
- * @param a Point
- * @param x X coordinate
- * @param y Y coordinate (if omitted, x is used as well)
  */
-export function subtract(a: Point, x: number, y?: number): Point;
-
-/**
- * Subtracts two sets of x,y pairs.
- *
- * If first parameter is a Point, any additional properties of it
- * are included in returned Point.
- * @param x1
- * @param y1
- * @param x2
- * @param y2
- */
-export function subtract(x1: number, y1: number, x2: number, y2: number): Point;
-
-//eslint-disable-next-line func-style
 export function subtract(
-  a: Point | number,
-  b: Point | number,
-  c?: number,
-  d?: number
-): Point {
-  if (isPoint(a)) {
-    guard(a, `a`);
-    if (isPoint(b)) {
-      guard(b, `b`);
-      return Object.freeze({
-        ...a,
-        x: a.x - b.x,
-        y: a.y - b.y,
-      });
-    } else {
-      if (c === undefined) c = b;
-      return Object.freeze({
-        ...a,
-        x: a.x - b,
-        y: a.y - c,
-      });
-    }
-  } else {
-    throwNumberTest(a, ``, `a`);
-    if (typeof b !== `number`) {
-      throw new TypeError(`Second parameter is expected to by y value`);
-    }
-    throwNumberTest(b, ``, `b`);
-
-    if (Number.isNaN(c)) throw new Error(`Third parameter is NaN`);
-    if (Number.isNaN(d)) throw new Error(`Fourth parameter is NaN`);
-
-    if (c === undefined) c = 0;
-    if (d === undefined) d = 0;
-    return Object.freeze({
-      x: a - c,
-      y: b - d,
-    });
-  }
-}
+  a1: Point | Point3d | number, ab2: Point | Point3d | number, ab3?: number, ab4?: number, ab5?: number, ab6?: number
+): Point | Point3d {
+  const [ ptA, ptB ] = getTwoPointParameters(a1 as any, ab2 as any, ab3 as any, ab4 as any, ab5 as any, ab6 as any);
+  guard(ptA, `a`);
+  guard(ptB, `b`);
+  let pt: Writeable<Point> = {
+    x: ptA.x - ptB.x,
+    y: ptA.y - ptB.y,
+  };
+  if (isPoint3d(ptA) || isPoint3d(ptB)) {
+    pt.z = (ptA.z ?? 0) - (ptB.z ?? 0);
+  };
+  return Object.freeze(pt);
+};

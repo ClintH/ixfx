@@ -42,11 +42,15 @@ export function guard(p: Point, name = `Point`) {
   }
   if (typeof p.x !== `number`) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    throw new TypeError(`'${ name }.x' must be a number. Got ${ p.x }`);
+    throw new TypeError(`'${ name }.x' must be a number. Got ${ typeof p.x }`);
   }
   if (typeof p.y !== `number`) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    throw new TypeError(`'${ name }.y' must be a number. Got ${ p.y }`);
+    throw new TypeError(`'${ name }.y' must be a number. Got ${ typeof p.y }`);
+  }
+  if (p.z !== undefined) {
+    if (typeof p.z !== `number`) throw new TypeError(`${ name }.z must be a number. Got: ${ typeof p.z }`)
+    if (Number.isNaN(p.z)) throw new Error(`'${ name }.z' is NaN`);
   }
 
   if (p.x === null) throw new Error(`'${ name }.x' is null`);
@@ -72,6 +76,13 @@ export const guardNonZeroPoint = (pt: Point | Point3d, name = `pt`) => {
   return true;
 };
 
+/**
+ * Returns _true_ if `p` has x & y properties.
+ * Returns _false_ if `p` is undefined, null or does not contain properties.
+ * Use {@link isPoint3d} to check further check for `z`.
+ * @param p 
+ * @returns 
+ */
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export function isPoint(p: number | unknown): p is Point {
   if (p === undefined) return false;
@@ -81,6 +92,12 @@ export function isPoint(p: number | unknown): p is Point {
   return true;
 }
 
+/**
+ * Returns _true_ if `p` has x, y, & z properties.
+ * Returns _false_ if `p` is undefined, null or does not contain properties.
+ * @param p 
+ * @returns 
+ */
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export const isPoint3d = (p: Point | unknown): p is Point3d => {
   if (p === undefined) return false;

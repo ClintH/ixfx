@@ -7,6 +7,8 @@ export function distance(a: Point, x: number, y: number): number;
 
 /**
  * Calculate distance between two points.
+ * If both points have a `z` property, the distance is 3D distance is calculated.
+ * If only one point has a `z`, it is ignored.
  *
  * ```js
  * // Distance between two points

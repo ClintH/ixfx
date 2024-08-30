@@ -2,6 +2,7 @@ import test, { type ExecutionContext } from 'ava';
 
 import * as Points from '../../geometry/point/index.js';
 import { divide, divider } from '../../geometry/point/Divider.js';
+import { isApprox } from '../../numbers/IsApprox.js';
 
 function closeTo(t: ExecutionContext<unknown>, input: number, target: number, percent: number = 0.001) {
   const diff = (Math.abs(target - input) / target);
@@ -100,11 +101,11 @@ test(`wrap`, t => {
 
 test(`clamp`, t => {
   // Within range
-  t.like(Points.clamp({ x: 50, y: 50 }, 0, 100), { x: 50, y: 50 });
-  t.like(Points.clamp(50, 50, 0, 100), { x: 50, y: 50 });
+  t.like(Points.clamp({ x: 10, y: 20 }, 0, 100), { x: 10, y: 20 });
+  t.like(Points.clamp({ x: 10, y: 20, z: 30 }, 0, 100), { x: 10, y: 20, z: 30 });
 
   t.like(Points.clamp({ x: 100, y: 100 }, 0, 100), { x: 100, y: 100 });
-  t.like(Points.clamp(100, 100, 0, 100), { x: 100, y: 100 });
+  t.like(Points.clamp({ x: 100, y: 100, z: 100 }, 0, 100), { x: 100, y: 100, z: 100 });
 
   // Out of range x
   t.like(Points.clamp({ x: 101, y: 100 }, 0, 100), { x: 100, y: 100 });
@@ -113,6 +114,11 @@ test(`clamp`, t => {
   // Out of range y
   t.like(Points.clamp({ x: 100, y: 101 }, 0, 100), { x: 100, y: 100 });
   t.like(Points.clamp({ x: 100, y: -1 }, 0, 100), { x: 100, y: 0 });
+
+  // Out of range z
+  t.like(Points.clamp({ x: 10, y: 20, z: 101 }, 0, 100), { x: 10, y: 20, z: 100 });
+  t.like(Points.clamp({ x: 10, y: 20, z: -1 }, 0, 100), { x: 10, y: 20, z: 0 });
+
 
 });
 
@@ -131,15 +137,24 @@ test(`clampMagnitude`, t => {
 
 
 });
-test(`length`, t => {
+
+test(`distance`, t => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
-  closeTo(t, Points.distance({ x: 5, y: 2 }), 5.385164807134504);
-  closeTo(t, Points.distance({ x: -5, y: 2 }), 5.385164807134504);
-  closeTo(t, Points.distance({ x: 5, y: -2 }), 5.385164807134504);
+  const approx = isApprox(0.001);
+  t.true(approx(Points.distance({ x: 5, y: 2 }), 5.385164807134504))
+  t.true(approx(Points.distance({ x: -5, y: 2 }), 5.385164807134504));
+  t.true(approx(Points.distance({ x: 5, y: -2 }), 5.385164807134504));
+
+  // Expected results from: https://www.calculatorsoup.com/calculators/geometry-solids/distance-two-points.php
+  t.true(approx(Points.distance({ x: 7, y: 4, z: 3 }, { x: 17, y: 6, z: 2 }), 10.246));
+  t.true(approx(Points.distance({ x: 0, y: 0, z: 0 }, { x: 17, y: 6, z: 2 }), 18.138));
+  t.true(approx(Points.distance({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }), 0));
+  t.true(approx(Points.distance({ x: 35, y: 10, z: 90 }, { x: -30, y: -12, z: -20 }), 129.649));
+
   t.pass();
 });
 
-test(`angle`, t => {
+test(`angleRadian`, t => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
   closeTo(t, Points.angleRadian({ x: 0, y: 10 }), 1.5708); // 90 degrees
   closeTo(t, Points.angleRadian({ x: 10, y: 0 }), 0); // 0 degrees
@@ -148,7 +163,7 @@ test(`angle`, t => {
 });
 
 test(`divide`, t => {
-  t.like(divide({ x: 5, y: 10 }, 2), { x: 2.5, y: 5 });
+  t.like(divide({ x: 5, y: 10 }, 2, 2), { x: 2.5, y: 5 });
   t.like(divide({ x: 10, y: 5 }, { x: 5, y: 2 }), { x: 2, y: 2.5 });
   t.like(divide({ x: 10, y: 5 }, 5, 2), { x: 2, y: 2.5 });
 
@@ -161,8 +176,8 @@ test(`divide`, t => {
   // expect(() => divide({x: 10, y: 0}, 1, 1)).toThrow();
 
   // B contains zero
-  t.like(divide({ x: 10, y: 5 }, { x: 0, y: 10 }), { x: Infinity, y: 0.5 });
-  t.like(divide({ x: 10, y: 5 }, { x: 10, y: 0 }), { x: 1, y: Infinity });
+  t.throws(() => t.like(divide({ x: 10, y: 5 }, { x: 0, y: 10 }), { x: Infinity, y: 0.5 }));
+  t.throws(() => t.like(divide({ x: 10, y: 5 }, { x: 10, y: 0 }), { x: 1, y: Infinity }));
   t.throws(() => divide({ x: 10, y: 5 }, 0, 10));
   t.throws(() => divide({ x: 10, y: 5 }, 10, 0));
 
@@ -174,13 +189,15 @@ test(`divide`, t => {
 
 
 test(`multiply`, t => {
-  t.like(Points.multiply({ x: 5, y: 10 }, 2), { x: 10, y: 20 });
+  t.deepEqual(Points.multiply({ x: 5, y: 10 }, 2, 3), { x: 10, y: 30 });
+  t.deepEqual(Points.multiply({ x: 5, y: 10, z: 15 }, 2, 3, 4), { x: 10, y: 30, z: 60 });
 
-  t.like(Points.multiply({ x: 2, y: 3 }, { x: 0.5, y: 2 }), { x: 1, y: 6 });
-  t.like(Points.multiply({ x: 2, y: 3 }, 0.5, 2), { x: 1, y: 6 });
+  t.deepEqual(Points.multiply({ x: 2, y: 3 }, { x: 0.5, y: 2 }), { x: 1, y: 6 });
+  t.deepEqual(Points.multiply({ x: 2, y: 3 }, 0.5, 2), { x: 1, y: 6 });
+  t.deepEqual(Points.multiply({ x: 5, y: 10, z: 15 }, { x: 2, y: 3, z: 4 }), { x: 10, y: 30, z: 60 });
 
-  t.like(Points.multiply({ x: 2, y: 3 }, 0, 2), { x: 0, y: 6 });
-  t.like(Points.multiply({ x: 2, y: 3 }, 2, 0), { x: 4, y: 0 });
+  t.deepEqual(Points.multiply({ x: 2, y: 3 }, 0, 2), { x: 0, y: 6 });
+  t.deepEqual(Points.multiply({ x: 2, y: 3 }, 2, 0), { x: 4, y: 0 });
 
   t.throws(() => Points.multiply({ x: 10, y: 5 }, NaN, 2));
   t.throws(() => Points.multiply({ x: 10, y: 5 }, 2, NaN));
@@ -198,14 +215,20 @@ test(`quantise`, t => {
 });
 
 test(`sum`, t => {
-  t.like(Points.sum({ x: 5, y: 10 }, 1), { x: 6, y: 11 });
+  t.like(Points.sum({ x: 5, y: 10 }, 1, 2), { x: 6, y: 12 });
+  t.like(Points.sum({ x: 5, y: 10, z: 15 }, 1, 2, 3), { x: 6, y: 12, z: 18 });
 
   t.like(Points.sum(5, 10, 1, 2), { x: 6, y: 12 });
+  t.like(Points.sum(5, 10, 15, 1, 2, 3), { x: 6, y: 12, z: 18 });
   t.like(Points.sum(1, 2, 0, 0), { x: 1, y: 2 });
 
   t.like(Points.sum({ x: 5, y: 10 }, -1, -2), { x: 4, y: 8 });
+  t.like(Points.sum({ x: 5, y: 10, z: 15 }, -1, -2, -3), { x: 4, y: 8, z: 12 });
   t.like(Points.sum({ x: 5, y: 10 }, { x: 1, y: 2 }), { x: 6, y: 12 });
 
+  t.deepEqual(Points.sum({ x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 }), { x: 5, y: 7, z: 9 });
+  t.deepEqual(Points.sum(1, 2, 3, 4, 5, 6), { x: 5, y: 7, z: 9 });
+  t.deepEqual(Points.sum(1, 2, 3, 4), { x: 4, y: 6 });
 
   t.throws(() => Points.sum(NaN, 2, 0, 0));
   t.throws(() => Points.sum(1, NaN, 0, 0));
@@ -233,13 +256,16 @@ test(`compareByY`, t => {
 });
 
 test(`subtract`, t => {
-  t.like(Points.subtract({ x: 5, y: 10 }, 1), { x: 4, y: 9 });
+  t.deepEqual(Points.subtract({ x: 5, y: 10 }, 1, 2), { x: 4, y: 8 });
+  t.deepEqual(Points.subtract({ x: 5, y: 10, z: 15 }, 1, 2, 3), { x: 4, y: 8, z: 12 });
 
-  t.like(Points.subtract(5, 10, 1, 2), { x: 4, y: 8 });
-  t.like(Points.subtract(1, 2, 0, 0), { x: 1, y: 2 });
+  t.deepEqual(Points.subtract(5, 10, 1, 2), { x: 4, y: 8 });
+  t.deepEqual(Points.subtract(5, 10, 15, 1, 2, 3), { x: 4, y: 8, z: 12 });
+  t.deepEqual(Points.subtract(1, 2, 0, 0), { x: 1, y: 2 });
 
-  t.like(Points.subtract({ x: 5, y: 10 }, -1, -2), { x: 6, y: 12 });
-  t.like(Points.subtract({ x: 5, y: 10 }, { x: 1, y: 2 }), { x: 4, y: 8 });
+  t.deepEqual(Points.subtract({ x: 5, y: 10 }, -1, -2), { x: 6, y: 12 });
+  t.deepEqual(Points.subtract({ x: 5, y: 10 }, { x: 1, y: 2 }), { x: 4, y: 8 });
+  t.deepEqual(Points.subtract({ x: 5, y: 10, z: 15 }, { x: 1, y: 2, z: 3 }), { x: 4, y: 8, z: 12 });
 
   t.throws(() => Points.subtract(NaN, 2, 0, 0));
   t.throws(() => Points.subtract(1, NaN, 0, 0));
@@ -291,3 +317,43 @@ test('divideFn', t => {
 
   t.pass();
 });
+
+test(`getTwoPointParams`, t => {
+  let r = Points.getTwoPointParameters({ x: 1, y: 2 }, { x: 3, y: 4 });
+  t.deepEqual(r, [ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
+
+  r = Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 });
+  t.deepEqual(r, [ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
+
+  r = Points.getTwoPointParameters({ x: 1, y: 2 }, 3, 4);
+  t.deepEqual(r, [ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
+
+  r = Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4, 5, 6);
+  t.deepEqual(r, [ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
+
+  r = Points.getTwoPointParameters(1, 2, 3, 4, 5, 6);
+  t.deepEqual(r, [ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
+
+  r = Points.getTwoPointParameters(1, 2, 3, 4);
+  t.deepEqual(r, [ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
+
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2 }));
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2 }, 1));
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4));
+
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4, 5));
+
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters());
+
+
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters(1, 2));
+  // @ts-ignore
+  t.throws(() => Points.getTwoPointParameters(1, 2, 3));
+
+})

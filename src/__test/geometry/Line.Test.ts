@@ -63,12 +63,8 @@ test('basic', (t) => {
     a: { x: 10, y: 2 }, b: { x: 5, y: 1 }
   });
   t.deepEqual(divide(l, { x: 1, y: 1 }), l);
-  t.deepEqual(divide(l, { x: 0, y: 10 }), {
-    a: { x: Number.POSITIVE_INFINITY, y: 2 }, b: { x: Number.POSITIVE_INFINITY, y: 1 }
-  });
-  t.deepEqual(divide(l, { x: 2, y: 0 }), {
-    a: { x: 10, y: Number.POSITIVE_INFINITY }, b: { x: 5, y: Number.POSITIVE_INFINITY }
-  });
+  t.throws(() => divide(l, { x: 0, y: 10 }));
+  t.throws(() => divide(l, { x: 2, y: 0 }));
 
   // Multiply
   t.deepEqual(multiply(l, { x: 2, y: 10 }), {

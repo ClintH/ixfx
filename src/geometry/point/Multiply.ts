@@ -1,92 +1,43 @@
-import { throwNumberTest } from "../../util/GuardNumbers.js";
-import { isRect } from "../rect/Guard.js";
-import type { Rect } from "../rect/RectTypes.js";
-import { guard as RectsGuard } from '../rect/Guard.js'
+import { getTwoPointParameters } from "./GetPointParameter.js";
+import { guard, isPoint3d } from "./Guard.js";
 import type { Point, Point3d } from "./PointType.js";
-import { guard, isPoint, isPoint3d } from "./Guard.js";
+import type { Writeable } from "../../TsUtil.js";
+
+export function multiply(a: Point, b: Point): Point;
+export function multiply(a: Point3d, b: Point3d): Point3d;
+export function multiply(a: Point, x: number, y: number): Point;
+export function multiply(a: Point3d, x: number, y: number, z: number): Point3d;
+export function multiply(ax: number, ay: number, bx: number, by: number): Point;
+export function multiply(ax: number, ay: number, az: number, bx: number, by: number, bz: number): Point3d;
 
 /**
- * Multiply by a width,height or x,y
- * ```
- * return {
- *  x: a.x * rect.width,
- *  y: a.y * rect.height
- * };
- * ```
- * @param a
- * @param rectOrPoint
- */
-export function multiply(a: Point, rectOrPoint: Rect | Point): Point;
-
-/**
- * Returns `a` multipled by some x and/or y scaling factor
+ * Returns a Point with the x,y,z values of two points multiply (a/b).
+ * 
+ * `z` parameter is used, if present. Uses a default value of 0 for 'z' when multiplying a 2D point with a 3D one.
  *
- * ie.
- * ```js
- * return {
- *  x: a.x * x
- *   y: a.y * y
- * }
- * ```
+ * Examples:
  *
- * Usage:
  * ```js
- * multiply(pt, 10, 100); // Scale pt by x:10, y:100
- * multiply(pt, Math.min(window.innerWidth, window.innerHeight)); // Scale both x,y by viewport with or height, whichever is smaller
+ * multiply(ptA, ptB);
+ * multiply(x1, y1, x2, y2);
+ * multiply(ptA, x2, y2);
  * ```
- * @param a Point to scale
- * @param x Scale factor for x axis
- * @param y Scale factor for y axis (if not specified, the x value is used)
- * @returns Scaled point
  */
-export function multiply(a: Point, x: number, y?: number): Point;
-
-/**
- * Returns `a` multiplied by `b` point, or given x and y.
- * ie.
- * ```js
- * return {
- *   x: a.x * b.x,
- *   y: a.y * b.y
- * };
- * ```
- * @param a
- * @param bOrX
- * @param y
- * @returns
- */
-/* eslint-disable func-style */
 export function multiply(
-  a: Point,
-  bOrX: Rect | Point | number,
-  y?: number
-): Point {
-  // ✔️ Unit tested
-
-  guard(a, `a`);
-  if (typeof bOrX === `number`) {
-    if (typeof y === `undefined`) y = bOrX;
-    throwNumberTest(y, ``, `y`);
-    throwNumberTest(bOrX, ``, `x`);
-    return Object.freeze({ x: a.x * bOrX, y: a.y * y });
-  } else if (isPoint(bOrX)) {
-    guard(bOrX, `b`);
-    return Object.freeze({
-      x: a.x * bOrX.x,
-      y: a.y * bOrX.y,
-    });
-  } else if (isRect(bOrX)) {
-    RectsGuard(bOrX, `rect`);
-    return Object.freeze({
-      x: a.x * bOrX.width,
-      y: a.y * bOrX.height,
-    });
-  } else {
-    throw new Error(
-      `Invalid arguments. a: ${ JSON.stringify(a) } b: ${ JSON.stringify(bOrX) }`
-    );
-  }
-}
+  a1: Point | Point3d | number, ab2: Point | Point3d | number, ab3?: number, ab4?: number, ab5?: number, ab6?: number
+): Point | Point3d {
+  const [ ptA, ptB ] = getTwoPointParameters(a1 as any, ab2 as any, ab3 as any, ab4 as any, ab5 as any, ab6 as any);
+  guard(ptA, `a`);
+  guard(ptB, `b`);
+  let pt: Writeable<Point> = {
+    x: ptA.x * ptB.x,
+    y: ptA.y * ptB.y,
+  };
+  if (isPoint3d(ptA) || isPoint3d(ptB)) {
+    pt.z = (ptA.z ?? 0) * (ptB.z ?? 0);
+  };
+  return Object.freeze(pt);
+};
 
 /**
  * Multiplies all components by `v`.
