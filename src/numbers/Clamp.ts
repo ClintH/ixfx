@@ -24,9 +24,9 @@
  */
 export const clamp = (value: number, min = 0, max = 1) => {
   // ✔ UNIT TESTED
-  if (Number.isNaN(value)) throw new Error(`'value' parameter is NaN`);
-  if (Number.isNaN(min)) throw new Error(`'min' parameter is NaN`);
-  if (Number.isNaN(max)) throw new Error(`'max' parameter is NaN`);
+  if (Number.isNaN(value)) throw new Error(`Param 'value' is NaN`);
+  if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
+  if (Number.isNaN(max)) throw new Error(`Param 'max' is NaN`);
 
   if (value < min) return min;
   if (value > max) return max;
