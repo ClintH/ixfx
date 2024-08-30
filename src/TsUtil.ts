@@ -24,6 +24,9 @@ export type RemapObjectPropertyType<OriginalType, PropertyType> = {
   [ Property in keyof OriginalType ]: PropertyType;
 };
 
+export type Writeable<T> = { -readonly [ P in keyof T ]: T[ P ] };
+export type DeepWriteable<T> = { -readonly [ P in keyof T ]: DeepWriteable<T[ P ]> };
+
 
 // eg RequireOnlyOne<someType, 'prop1'|'prop2'>
 export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
