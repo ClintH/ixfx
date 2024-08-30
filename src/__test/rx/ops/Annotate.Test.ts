@@ -3,14 +3,6 @@ import * as Rx from '../../../rx/index.js';
 
 test(`annotate-op`, async t => {
   const r1 = Rx.wrap([ 1, 2, 3 ]).annotateWithOp(Rx.Ops.sum());
-
-  // const r1 = Rx.run(
-  //   Rx.From.array([ 1, 2, 3 ]),
-  //   Rx.Ops.annotateWithOp(
-  //     Rx.Ops.sum()
-  //   )
-  // );
-
   const r1D = await Rx.toArray(r1);
   t.deepEqual(r1D, [
     { value: 1, annotation: 1 },
@@ -51,26 +43,4 @@ test(`annotate`, async t => {
     { value: 3, annotation: { blah: 1 } }
   ]);
 
-  // const c1 = Rx.chainer(
-  //   Rx.Ops.average(),
-  //   Rx.Ops.transform(v => {
-  //     return 'hello';
-  //   })
-  // )
-  // const r1 = Rx.run(
-  //   Rx.From.array([ { value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }, { value: 6 } ]),
-  //   Rx.Ops.transform(v => {
-  //     return v.value * 2;
-  //   }),
-  //   Rx.Ops.average(),
-  //   Rx.Ops.transform(v => {
-  //     return `x:${ v }`;
-  //   }))
-
-  // const r1 = Rx.run(
-  //   Rx.From.array([ 1, 2, 3, 4, 5, 6 ]),
-  //   Rx.Ops.annotate(f => {
-
-  //   })
-  // )
 });
