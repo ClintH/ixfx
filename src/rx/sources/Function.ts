@@ -119,7 +119,7 @@ export function func<V>(callback: FunctionFunction<V>, options: Partial<Function
       if (run) run.start();
     },
     onStop() {
-      console.log(`onStop`);
+
       enabled = false;
       if (run) run.cancel();
     },
