@@ -1,8 +1,8 @@
-import type { AsyncPromiseOrGenerator } from 'src/flow/Types.js';
+
 import { Adsr } from './Adsr.js';
 import type { AdsrIterableOpts, EnvelopeOpts } from './Types.js';
-import { resolveWithFallback, resolveWithFallbackSync } from '../../data/Resolve.js';
-import { repeat } from 'src/flow/Repeat.js';
+import { resolveWithFallbackSync } from '../../data/Resolve.js';
+import { repeat } from '../../flow/Repeat.js';
 
 export * from './Types.js';
 export * from './Adsr.js';
