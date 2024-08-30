@@ -1,12 +1,10 @@
 import type { TimestampedObject, TrackedValueOpts } from './TrackedValue.js';
-import { TrackerBase } from './TrackerBase.js';
+import { TrackerBase, type TrimReason } from './TrackerBase.js';
 
 /**
  * A tracked value of type `V`.
  */
 export abstract class ObjectTracker<V extends object, SeenResultType> extends TrackerBase<V, SeenResultType> {
-  //abstract onSeen(_p: Array<V>): SeenResultType;
-
   values: Array<TimestampedObject<V>>;
 
   constructor(opts: TrackedValueOpts = {}) {
@@ -14,7 +12,7 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
     this.values = [];
   }
 
-  onTrimmed() {
+  onTrimmed(reason: TrimReason) {
     // no-op
   }
 
@@ -87,7 +85,7 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
   }
 
   /**
-   * Returns the initial value
+   * Returns the oldest value in the buffer
    */
   get initial() {
     return this.values.at(0);
