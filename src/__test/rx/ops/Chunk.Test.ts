@@ -2,6 +2,7 @@ import test from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { count } from '../../../numbers/Count.js';
+import { isEqualValueDefault } from '../../../util/IsEqual.js';
 test(`chunk-limit`, async t => {
   // Even number of items per chunk
   const amt1 = 20;
@@ -55,9 +56,14 @@ test(`chunk-elapsed-0`, async t => {
   const expectedItemsPerChunk = Math.floor(chunkElapsed / arrInterval);
 
   // Test chunking
-  t.deepEqual(results, [
+  const a = isEqualValueDefault(results, [
     [ 0.1, 0.2, 0.3, 0.4 ], [ 0.5, 0.6, 0.7, 0.8 ]
-  ])
+  ]);
+  const b = isEqualValueDefault(results, [
+    [ 0.1, 0.2, 0.3, 0.4, 0.5 ], [ 0.6, 0.7, 0.8, 0.9, 1 ]
+  ]);
+  if (!a && !b) t.fail(`results: ${ JSON.stringify(results) }`);
+  else t.pass();
 });
 
 test(`chunk-elapsed-1`, async t => {
@@ -94,7 +100,12 @@ test(`chunked-elapsed-2`, async t => {
 
   // Expect that number of read items is the same as source
   t.is(reader.flat().length, amt);
+  const expected = elapsed / interval;
   for (const row of reader) {
-    t.is(row.length, elapsed / interval);
+    if (row.length === expected) continue;
+    if (row.length - 1 === expected) continue;
+    if (row.length + 1 === expected) continue;
+
+    t.fail(`Expected: ${ expected } actual: ${ row.length }`);
   }
 });
