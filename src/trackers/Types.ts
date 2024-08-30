@@ -11,18 +11,22 @@ export type PointTrack = PointRelationResult & {
 /**
  * Results of point tracking
  */
-export type PointTrackerResults = {
+export type PointTrackerResults = Readonly<{
   /**
    * Relation of last point to previous point
    */
-  readonly fromLast: PointTrack;
+  fromLast: PointTrack;
   /**
-   * Relation of last point to initial point.
-   * 
-   * When the tracker is reset or resizes (eg. if it reaches its capacity), the
-   * initial point will be the first new point. Thus, the initial point
-   * always maintains some time horizon
+   * Relation of last point to 'initial' point.
+   * This will be the oldest point in the buffer of the tracker.
    */
-  readonly fromInitial: PointTrack;
-  readonly values: ReadonlyArray<Point>;
-};
+  fromInitial: PointTrack;
+  /**
+   * Relation of last point to a 'mark' point,
+   * which is manually set.
+   * 
+   * Will give _undefined_ if `.mark()` has not been called on tracker.
+   */
+  fromMark: PointTrack | undefined;
+  values: ReadonlyArray<Point>;
+}>;
