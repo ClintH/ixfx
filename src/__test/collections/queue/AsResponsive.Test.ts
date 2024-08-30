@@ -18,16 +18,16 @@ test(`responsive`, async t => {
   // Enqueuing
   qm1.enqueue(`1`);
   await sw.forSignal();
-  t.deepEqual(seen, [ [ `1` ] ]);
+  t.deepEqual(seen, [ [], [ `1` ] ]);
 
   qm1.enqueue(`2`);
   await sw.forSignal();
-  t.deepEqual(seen, [ [ `1` ], [ `1`, `2` ] ]);
+  t.deepEqual(seen, [ [], [ `1` ], [ `1`, `2` ] ]);
 
   // Enqueuing multiple
   qm1.enqueue(`3`, `4`);
   await sw.forSignal();
-  t.deepEqual(seen, [ [ `1` ], [ `1`, `2` ], [ `1`, `2`, `3`, `4` ] ]);
+  t.deepEqual(seen, [ [], [ `1` ], [ `1`, `2` ], [ `1`, `2`, `3`, `4` ] ]);
 
   // Dequeuing
   seen = []; // Reset changelog
