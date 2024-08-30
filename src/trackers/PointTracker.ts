@@ -10,47 +10,33 @@ import { Vectors } from '../geometry/index.js';
 import { Empty as LinesEmpty } from '../geometry/line/index.js';
 import type { Coord as PolarCoord } from '../geometry/Polar.js';
 import type { Line, PolyLine } from '../geometry/line/LineType.js';
-import type { Point } from '../geometry/point/PointType.js';
+import type { Point, Point3d } from '../geometry/point/PointType.js';
 import type { PointRelation } from '../geometry/point/PointRelationTypes.js';
 import { joinPointsToLines } from '../geometry/line/JoinPointsToLines.js';
 import type { PointTrack, PointTrackerResults } from './Types.js';
+import type { TrimReason } from './TrackerBase.js';
 
 /**
  * Point tracker. Create via `Trackers.point()`.
  *
  */
 export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
-  /**
-   * Function that yields the relation from initial point
-   */
   initialRelation: PointRelation | undefined;
-
-  /**
-   * Last result
-   */
+  markRelation: PointRelation | undefined;
   lastResult: PointTrackerResults | undefined;
 
   constructor(opts: TrackOpts = {}) {
     super(opts);
   }
 
-  onTrimmed(): void {
+  /**
+   * Notification that buffer has been knocked down to `sampleLimit`.
+   * 
+   * This will reset the `initialRelation`, which will use the new oldest value.
+   */
+  onTrimmed(reason: TrimReason): void {
     // Force new relation calculations
     this.initialRelation = undefined;
-  }
-
-  /**
-   * Returns the last x coord
-   */
-  get x() {
-    return this.last.x;
-  }
-
-  /**
-   * Returns the last y coord
-   */
-  get y() {
-    return this.last.y;
   }
 
   /**
@@ -60,8 +46,15 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
     super.onReset();
     this.lastResult = undefined;
     this.initialRelation = undefined;
+    this.markRelation = undefined
   }
 
+  /**
+   * Adds a PointerEvent along with its
+   * coalesced events, if available.
+   * @param p 
+   * @returns 
+   */
   seenEvent(p: PointerEvent): PointTrackerResults {
     if (`getCoalescedEvents` in p) {
       const events = p.getCoalescedEvents();
@@ -71,6 +64,14 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
       // @ts-expect-error
       return this.seen({ x: p.clientX, y: p.clientY });
     }
+  }
+
+  /**
+   * Makes a 'mark' in the tracker, allowing you to compare values
+   * to this point.
+   */
+  mark() {
+    this.markRelation = Points.relation(this.last);
   }
 
   /**
@@ -91,6 +92,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
 
     if (this.initialRelation === undefined && this.initial) {
       // Don't yet have an initial relation function
+      // Use the oldest point in the buffer (this.initial)
       this.initialRelation = Points.relation(this.initial);
     } else if (this.initialRelation === undefined) {
       // Don't have an initial relation, but also don't have an initial point :()
@@ -103,6 +105,8 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
     // Compute relation from initial point to latest
     const initialRel: PointTrack = this.initialRelation(currentLast);
 
+    const markRel: PointTrack | undefined = (this.markRelation !== undefined) ? this.markRelation(currentLast) : undefined;
+
     const speed = previousLast === undefined ? 0 : LineLength(previousLast, currentLast) / (currentLast.at - previousLast.at);
 
     // Compute relation from current point to the previous
@@ -114,6 +118,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
     const r: PointTrackerResults = {
       fromInitial: initialRel,
       fromLast: lastRel,
+      fromMark: markRel,
       values: [ ...this.values ],
     };
     this.lastResult = r;
@@ -174,11 +179,11 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
 
   /**
    * Difference between last point and the initial point, calculated
-   * as a simple subtraction of x & y.
+   * as a simple subtraction of x,y & z.
    *
    * `Points.Placeholder` is returned if there's only one point so far.
    */
-  difference(): Point {
+  difference(): Point | Point3d {
     const initial = this.initial;
     return this.values.length >= 2 && initial !== undefined ? Points.subtract(this.last, initial) : Points.Placeholder;
   }
@@ -204,6 +209,27 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
     const l = this.line;
     return LineLength(l);
   }
+
+  /**
+ * Returns the last x coord
+ */
+  get x() {
+    return this.last.x;
+  }
+
+  /**
+   * Returns the last y coord
+   */
+  get y() {
+    return this.last.y;
+  }
+
+  /**
+   * Returns the last z coord (or _undefined_ if not available)
+   */
+  get z() {
+    return this.last.z;
+  }
 }
 
 /**
@@ -215,6 +241,7 @@ export class TrackedPointMap extends TrackedValueMap<
   PointTracker,
   PointTrackerResults
 > {
+
   constructor(opts: TrackOpts = {}) {
     super((key, start) => {
       if (start === undefined) throw new Error(`Requires start point`);
