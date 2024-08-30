@@ -26,6 +26,15 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
   let unsub: undefined | (() => void);
   const debugLabel = options.debugLabel ? `[${ options.debugLabel }]` : ``;
   //console.log(`initUpstream${ debugLabel } creating`);
+
+  const onStop = () => {
+    //console.log(`Rx.initStream${ debugLabel } stop`);
+    if (unsub === undefined) return;
+    unsub();
+    unsub = undefined;
+    if (options.onStop) options.onStop();
+  }
+
   const onStart = () => {
     //console.log(`Rx.initStream${ debugLabel } start unsub ${ unsub !== undefined }`);
     if (unsub !== undefined) return;
@@ -35,7 +44,7 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
       //console.log(`Rx.initStream${ debugLabel } onValue`, value);
       if (messageIsSignal(value)) {
         if (value.signal === `done`) {
-          stop();
+          onStop();
           events.signal(value.signal, value.context);
           if (disposeIfSourceDone) events.dispose(`Upstream source ${ debugLabel } has completed (${ value.context ?? `` })`);
         } else {
@@ -49,13 +58,7 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
     });
   }
 
-  const onStop = () => {
-    //console.log(`Rx.initStream${ debugLabel } stop`);
-    if (unsub === undefined) return;
-    unsub();
-    unsub = undefined;
-    if (options.onStop) options.onStop();
-  }
+
 
   //const initOpts = 
   // const events:ReactiveInitialStream<Out>|ReactiveStream<Out> = ((`initialValue` in options) && options.initialValue !== undefined) ?
