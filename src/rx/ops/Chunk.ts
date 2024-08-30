@@ -26,10 +26,8 @@ import type { ChunkOptions } from "./Types.js";
 export function chunk<V>(source: ReactiveOrSource<V>, options: Partial<ChunkOptions> = {}): Reactive<Array<V>> {
   const queue = new QueueMutable<V>();
   const quantity = options.quantity ?? 0;
-  //const logic = options.logic ?? `or`;
   const returnRemainder = options.returnRemainder ?? true;
 
-  //let lastFire = performance.now();
   const upstreamOpts = {
     ...options,
     onStop() {
@@ -53,7 +51,10 @@ export function chunk<V>(source: ReactiveOrSource<V>, options: Partial<ChunkOpti
   }
   const upstream = initUpstream<V, Array<V>>(source, upstreamOpts);
 
+  //let testElapsed = performance.now();
   const send = () => {
+    //console.log(`Elapsed: ${ performance.now() - testElapsed }`);
+    //testElapsed = performance.now();
     if (queue.isEmpty) return;
 
     // Reset timer
@@ -62,7 +63,7 @@ export function chunk<V>(source: ReactiveOrSource<V>, options: Partial<ChunkOpti
     // Fire queued data
     const data = queue.toArray();
     queue.clear();
-    upstream.set(data);
+    setTimeout(() => upstream.set(data));
   }
 
   const timer = options.elapsed ? timeout(send, options.elapsed) : undefined
