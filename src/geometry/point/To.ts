@@ -1,5 +1,5 @@
 import { guard } from "./Guard.js";
-import type { Point } from "./PointType.js";
+import type { Point, Point3d } from "./PointType.js";
 
 /**
  * Returns a point with rounded x,y coordinates. By default uses `Math.round` to round.
@@ -24,6 +24,36 @@ export const toIntegerValues = (
     y: rounder(pt.y),
   });
 };
+
+/**
+ * Returns a copy of `pt` with `z` field omitted.
+ * If it didn't have one to begin within, a copy is still returned.
+ * @param pt 
+ * @returns 
+ */
+export const to2d = (pt: Point): Point => {
+  guard(pt, `pt`);
+  let copy = {
+    ...pt
+  };
+  delete copy.z;
+  return Object.freeze(copy);
+}
+
+/**
+ * Returns a copy of `pt` with a `z` field set.
+ * Defaults to a z value of 0.
+ * @param pt Point
+ * @param z Z-value, defaults to 0
+ * @returns 
+ */
+export const to3d = (pt: Point, z: number = 0): Point3d => {
+  guard(pt, `pt`);
+  return Object.freeze({
+    ...pt,
+    z
+  });
+}
 
 /**
  * Returns a human-friendly string representation `(x, y)`.
