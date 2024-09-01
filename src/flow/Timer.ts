@@ -33,6 +33,7 @@ export type ModulationTimer = CompletionTimer & {
   mod(amt: number): void;
 };
 
+
 export type TimerOpts = {
   /**
    * Timer to use. By default {@link elapsedMillisecondsAbsolute}.
@@ -160,6 +161,40 @@ export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: b
 }
 
 /**
+ * Returns a {@link ModulationTimer} that is always at 100%.
+ * Opposite: {@link timerNeverDone}.
+ * @returns 
+ */
+export const timerAlwaysDone = (): ModulationTimer => ({
+  elapsed: 1,
+  isDone: true,
+  reset() {
+
+  },
+  mod(amt) {
+
+  },
+})
+
+/**
+ * Returns a {@link ModulationTimer} that is always at 0%.
+ * Opposite: {@link timerAlwaysDone}.
+ * @returns 
+ */
+export const timerNeverDone = (): ModulationTimer => (
+  {
+    elapsed: 0,
+    isDone: false,
+    reset() {
+
+    },
+    mod() {
+
+    }
+  }
+);
+
+/**
  * Wraps a timer, returning a relative elapsed value based on
  * a given total. ie. percentage complete toward a total value.
  * This is useful because other parts of code don't need to know
@@ -196,6 +231,8 @@ export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: b
  * const t = Timer.relative(1000, { timer: ticksElapsedTimer(); clampValue:true });
  * ```
  *
+ * If `total` is Infinity, a 'always completed; timer is returned. Use a value of `NaN` for a
+ * timer that always returns 0.
  * @private
  * @param total Total (of milliseconds or ticks, depending on timer source)
  * @param options Options
@@ -205,6 +242,12 @@ export const relative = (
   total: number,
   options: Partial<RelativeTimerOpts> = {}
 ): ModulationTimer => {
+
+  if (!Number.isFinite(total)) {
+    return timerAlwaysDone()
+  } else if (Number.isNaN(total)) {
+    return timerNeverDone();
+  }
 
   const clampValue = options.clampValue ?? false;
   const wrapValue = options.wrapValue ?? false;

@@ -346,7 +346,7 @@ export const cycleCssClass = (
  */
 export const getTranslation = (
   domQueryOrEl: Readonly<string | HTMLElement>
-): Point => {
+): Points.Point3d => {
   // Source:
   // https://raw.githubusercontent.com/zellwk/javascript/master/src/browser/dom/translate-values.js
 
