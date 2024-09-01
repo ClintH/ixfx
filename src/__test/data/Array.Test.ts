@@ -12,6 +12,25 @@ import { remove } from '../../data/arrays/Remove.js';
 import { ensureLength } from '../../data/arrays/EnsureLength.js';
 import { zip } from '../../data/arrays/Zip.js';
 import { isContentsTheSame } from '../../data/arrays/Equality.js';
+import { atWrap } from '../../data/arrays/AtWrap.js';
+
+test(`atWrap`, t => {
+  const arr = [ 1, 2, 3 ];
+  t.is(atWrap(arr, 0), 1);
+  t.is(atWrap(arr, 1), 2);
+  t.is(atWrap(arr, 2), 3);
+  t.is(atWrap(arr, 3), 1);
+  t.is(atWrap(arr, 4), 2);
+  t.is(atWrap(arr, 5), 3);
+  t.is(atWrap(arr, 6), 1);
+  t.is(atWrap(arr, 7), 2);
+
+  t.is(atWrap(arr, -1), 3);
+  t.is(atWrap(arr, -2), 2);
+  t.is(atWrap(arr, -3), 1);
+  t.is(atWrap(arr, -4), 3);
+
+});
 
 test('pairwise', t => {
   const r1 = [ ...pairwise([ 1, 2, 3, 4 ]) ];
