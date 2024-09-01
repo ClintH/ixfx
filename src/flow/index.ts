@@ -23,15 +23,15 @@ export * from './Sleep.js';
  * * {@link fromList}: Create a state machine from a simple list of states
  */
 export * as StateMachine from './StateMachine.js';
+export * from './Stopwatch.js';
 export * from './SyncWait.js';
 export * from './TaskQueueMutable.js';
 export * from './Throttle.js';
 export * from './Timeout.js';
 export * from './Timer.js';
-export * from './Types.js';
+export type * from './Types.js';
 export * from './UpdateOutdated.js';
 export * from './WaitFor.js';
 export * from './WaitForValue.js';
-export type * from './Types.js';
 
 
