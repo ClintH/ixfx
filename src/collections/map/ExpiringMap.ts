@@ -138,7 +138,8 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
 
   private autoDeleteElapsedMs: number;
   private autoDeletePolicy;
-
+  private autoDeleteTimer: ReturnType<typeof setInterval> | undefined;
+  private disposed = false;
   constructor(opts: Opts = {}) {
     super();
     this.capacity = opts.capacity ?? -1;
@@ -155,13 +156,21 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     this.autoDeletePolicy = opts.autoDeletePolicy ?? `none`;
 
     if (this.autoDeleteElapsedMs > 0) {
-      setInterval(
+      this.autoDeleteTimer = setInterval(
         () => { this.#maintain(); },
         Math.max(1000, this.autoDeleteElapsedMs * 2)
       );
     }
   }
 
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    if (this.autoDeleteTimer) {
+      clearInterval(this.autoDeleteTimer)
+      this.autoDeleteTimer = undefined;
+    }
+  }
   /**
    * Returns the number of keys being stored.
    */
@@ -320,7 +329,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     const entries = [ ...this.store.entries() ];
     const prune: Array<[ k: K, v: V ]> = [];
     const intervalMs = intervalToMs(interval, 1000);
-    const now = Date.now();
+    const now = performance.now();
     for (const entry of entries) {
       const elapsedGet = now - entry[ 1 ].lastGet;
       const elapsedSet = now - entry[ 1 ].lastSet;
@@ -391,7 +400,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     //this.keyCount++;
     this.store.set(key, {
       lastGet: 0,
-      lastSet: Date.now(),
+      lastSet: performance.now(),
       value: value,
     });
 
