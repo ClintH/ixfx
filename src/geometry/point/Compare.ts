@@ -1,4 +1,4 @@
-import type { Point } from "./PointType.js";
+import type { Point, Point3d } from "./PointType.js";
 
 /**
  * Returns -2 if both x & y of a is less than b
@@ -64,5 +64,26 @@ export const compareByX = (a: Point, b: Point): number => {
 export const compareByY = (a: Point, b: Point): number => {
   if (a.y === b.y) return 0;
   if (a.y < b.y) return -1;
+  return 1;
+}
+
+/**
+ * Compares points based on Z value. XY values are ignored.
+ * Returns values:
+ * * 0: If a.z === b.z
+ * * 1: A is below B (ie. a.z > b.z)
+ * * -1: A is above B (ie. a.z < b.z)
+ *
+ * @example Sorting by Y
+ * ```js
+ * arrayOfPoints.sort(Points.compareByZ);
+ * ```
+ * @param a
+ * @param b
+ * @returns
+ */
+export const compareByZ = (a: Point3d, b: Point3d): number => {
+  if (a.z === b.z) return 0;
+  if (a.z < b.z) return -1;
   return 1;
 }
