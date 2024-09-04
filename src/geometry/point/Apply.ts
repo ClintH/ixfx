@@ -1,8 +1,17 @@
-import { guard } from "./Guard.js";
-import type { Point } from "./PointType.js";
+import { guard, isPoint3d } from "./Guard.js";
+import type { Point, Point3d } from "./PointType.js";
+
+// type PointFields = `x` | `y`;
+// type Point3dFields = PointFields & 'z';
+
+export type PointApplyFn = (v: number, field: `x` | `y`) => number;
+export type Point3dApplyFn = (v: number, field: `x` | `y` | `z`) => number;
+
+export function apply(pt: Point3d, fn: Point3dApplyFn): Point3d
+export function apply(pt: Point, fn: PointApplyFn): Point;
 
 /**
- * Applies `fn` on `x` and `y` fields, returning all other fields as well
+ * Applies `fn` on x,y & z (if present) fields, returning all other fields as well
  * ```js
  * const p = {x:1.234, y:4.9};
  * const p2 = Points.apply(p, Math.round);
@@ -22,12 +31,19 @@ import type { Point } from "./PointType.js";
  * @param fn
  * @returns
  */
-export const apply = (
+export function apply(
   pt: Point,
-  fn: (v: number, field?: string) => number
-): Point => {
+  fn: Point3dApplyFn | PointApplyFn
+): Point {
   guard(pt, `pt`);
-
+  if (isPoint3d(pt)) {
+    return Object.freeze<Point3d>({
+      ...pt,
+      x: fn(pt.x, `x`),
+      y: fn(pt.y, `y`),
+      z: (fn as Point3dApplyFn)(pt.z, `z`)
+    });
+  }
   return Object.freeze<Point>({
     ...pt,
     x: fn(pt.x, `x`),

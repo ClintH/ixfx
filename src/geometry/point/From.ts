@@ -1,36 +1,53 @@
-import type { Point } from "./PointType.js";
+import type { Point, Point3d } from "./PointType.js";
+
+export function from(x: number, y: number, z: number): Point3d;
+export function from(x: number, y: number): Point;
+export function from(arr: [ x: number, y: number, z: number ]): Point3d;
+export function from(arr: [ x: number, y: number ]): Point;
 
 /**
- * Returns a point from two coordinates or an array of [x,y]
+ * Returns a point from two or three coordinates or an array of [x,y] or [x,y,z].
  * @example
  * ```js
- * let p = from([10, 5]); // yields {x:10, y:5}
- * let p = from(10, 5);   // yields {x:10, y:5}
- * let p = from(10);      // yields {x:10, y:0} 0 is used for default y
- * let p = from();        // yields {x:0, y:0}  0 used for default x & y
+ * let p = from([10, 5]);    // yields {x:10, y:5}
+ * let p = from([10, 5, 2]); // yields: {x:10, y:5, z:2}
+ * let p = from(10, 5);      // yields {x:10, y:5}
+ * let p = from(10, 5, 2);   // yields: {x:10, y:5, z:2}
  * ```
  * @param xOrArray
  * @param [y]
  * @returns Point
  */
-export const from = (
+export function from(
   xOrArray?: number | ReadonlyArray<number>,
-  y?: number
-): Point => {
+  y?: number,
+  z?: number
+): Point {
   if (Array.isArray(xOrArray)) {
-    if (xOrArray.length !== 2) {
-      throw new Error(`Expected array of length two, got ${ xOrArray.length }`);
+    if (xOrArray.length === 3) {
+      return Object.freeze({
+        x: xOrArray[ 0 ],
+        y: xOrArray[ 1 ],
+        z: xOrArray[ 2 ]
+      });
+    } else if (xOrArray.length === 2) {
+      return Object.freeze({
+        x: xOrArray[ 0 ],
+        y: xOrArray[ 1 ],
+      });
+    } else {
+      throw new Error(`Expected array of length two or three, got ${ xOrArray.length }`);
     }
-    return Object.freeze({
-      x: xOrArray[ 0 ],
-      y: xOrArray[ 1 ],
-    });
   } else {
-    if (xOrArray === undefined) xOrArray = 0;
+    if (xOrArray === undefined) throw new Error(`Requires an array of [x,y] or x,y parameters at least`)
     else if (Number.isNaN(xOrArray)) throw new Error(`x is NaN`);
-    if (y === undefined) y = 0;
+    if (y === undefined) throw new Error(`Param 'y' is missing`);
     else if (Number.isNaN(y)) throw new Error(`y is NaN`);
-    return Object.freeze({ x: xOrArray as number, y: y });
+    if (z === undefined) {
+      return Object.freeze({ x: xOrArray as number, y: y });
+    } else {
+      return Object.freeze({ x: xOrArray as number, y, z })
+    }
   }
 };
 

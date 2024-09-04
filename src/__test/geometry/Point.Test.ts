@@ -11,6 +11,29 @@ function closeTo(t: ExecutionContext<unknown>, input: number, target: number, pe
   t.fail(`Value: ${ input } target: ${ target } diff%: ${ diff * 100 }`);
 }
 
+test(`abs`, t => {
+  t.deepEqual(Points.abs({ x: 1, y: 2 }), { x: 1, y: 2 });
+  t.deepEqual(Points.abs({ x: -1, y: 2 }), { x: 1, y: 2 });
+  t.deepEqual(Points.abs({ x: 1, y: -2 }), { x: 1, y: 2 });
+
+  t.deepEqual(Points.abs({ x: 1, y: 2, z: 3 }), { x: 1, y: 2, z: 3 });
+  t.deepEqual(Points.abs({ x: -1, y: 2, z: 3 }), { x: 1, y: 2, z: 3 });
+  t.deepEqual(Points.abs({ x: 1, y: -2, z: 3 }), { x: 1, y: 2, z: 3 });
+});
+
+test(`apply`, t => {
+  const f = (v: number, field: string) => {
+    if (field === `x`) return v * 2;
+    if (field === `y`) return v * 3;
+    if (field === `z`) return v * 10;
+    return v;
+  }
+
+  t.deepEqual(Points.apply({ x: 1, y: 2, z: 3 }, f), { x: 2, y: 6, z: 30 });
+  t.deepEqual(Points.apply({ x: 1, y: 2 }, f), { x: 2, y: 6 });
+});
+
+
 test(`withinRange`, t => {
 
   t.true(Points.withinRange({ x: -1, y: -1 }, Points.Empty, 1));
@@ -76,6 +99,18 @@ test(`normaliseByRect`, t => {
   t.like(Points.normaliseByRect({ x: 50, y: 50 }, 100, 100), { x: 0.5, y: 0.5 });
 });
 
+test(`placeholder`, t => {
+  t.true(Points.isPlaceholder(Points.Placeholder));
+  t.true(Points.isPlaceholder(Points.Placeholder3d));
+  t.true(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN }));
+  t.true(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN, z: Number.NaN }));
+  t.false(Points.isPlaceholder({ x: Number.NaN, y: 1 }));
+  t.false(Points.isPlaceholder({ x: 1, y: Number.NaN }));
+  t.false(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN, z: 1 }));
+  t.false(Points.isPlaceholder({ x: 0, y: Number.NaN, z: Number.NaN }));
+  t.false(Points.isPlaceholder({ x: Number.NaN, y: 0, z: Number.NaN }));
+
+});
 test(`wrap`, t => {
   // Within range
   t.like(Points.wrap({ x: 0, y: 0 }, { x: 100, y: 100 }), { x: 0, y: 0 });
@@ -187,7 +222,36 @@ test(`divide`, t => {
   t.pass();
 });
 
+test(`empty`, t => {
+  t.true(Points.isEmpty(Points.Empty));
+  t.true(Points.isEmpty(Points.Empty3d));
+  t.true(Points.isEmpty({ x: 0, y: 0 }));
+  t.true(Points.isEmpty({ x: 0, y: 0, z: 0 }));
 
+  t.false(Points.isEmpty(Points.Placeholder));
+  t.false(Points.isEmpty({ x: 0, y: 1 }));
+  t.false(Points.isEmpty({ x: 1, y: 0 }));
+  t.false(Points.isEmpty({ x: 0, y: 0, z: 1 }));
+});
+
+test(`from`, t => {
+  t.deepEqual(Points.from([ 10, 5 ]), { x: 10, y: 5 });
+  t.deepEqual(Points.from(10, 5), { x: 10, y: 5 });
+
+  t.deepEqual(Points.from([ 10, 5, 2 ]), { x: 10, y: 5, z: 2 });
+  t.deepEqual(Points.from(10, 5, 2), { x: 10, y: 5, z: 2 });
+
+  // @ts-ignore
+  t.throws(() => Points.from());
+  // @ts-ignore
+  t.throws(() => Points.from(10));
+  // @ts-ignore
+  t.throws(() => Points.from([ 10 ]));
+  // @ts-ignore
+  t.throws(() => Points.from([]));
+
+
+})
 test(`multiply`, t => {
   t.deepEqual(Points.multiply({ x: 5, y: 10 }, 2, 3), { x: 10, y: 30 });
   t.deepEqual(Points.multiply({ x: 5, y: 10, z: 15 }, 2, 3, 4), { x: 10, y: 30, z: 60 });
@@ -211,6 +275,8 @@ test(`quantise`, t => {
 
   t.deepEqual(Points.quantiseEvery({ x: 0.5, y: 0.123 }, { x: 0.5, y: 0.1 }), { x: 0.5, y: 0.1 });
   t.deepEqual(Points.quantiseEvery({ x: 0.9, y: 0.123 }, { x: 0.5, y: 0.1 }), { x: 1, y: 0.1 });
+
+  t.deepEqual(Points.quantiseEvery({ x: 0.9, y: 0.1, z: 0.123 }, { x: 0.5, y: 0.1, z: 0.1 }), { x: 1, y: 0.1, z: 0.1 });
 
 });
 

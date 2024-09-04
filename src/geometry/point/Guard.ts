@@ -2,17 +2,26 @@ import type { Point, Point3d } from "./PointType.js";
 import { throwNumberTest } from '../../util/GuardNumbers.js';
 
 /**
- * Returns true if p.x and p.y === null
+ * Returns true if xy (and z, if present) are _null_.
  * @param p
  * @returns
  */
-export const isNull = (p: Point) => p.x === null && p.y === null;
+export const isNull = (p: Point) => {
+  if (isPoint3d(p)) {
+    if (p.z !== null) return false;
+  }
+  return p.x === null && p.y === null;
+}
 
 /***
- * Returns true if p.x or p.y isNaN
+ * Returns true if xy (and z, if present) isNaN
  */
-export const isNaN = (p: Point) => Number.isNaN(p.x) || Number.isNaN(p.y);
-
+export const isNaN = (p: Point) => {
+  if (isPoint3d(p)) {
+    if (!Number.isNaN(p.z)) return false;
+  }
+  return Number.isNaN(p.x) || Number.isNaN(p.y)
+}
 
 /**
  * Throws an error if point is invalid
@@ -109,20 +118,30 @@ export const isPoint3d = (p: Point | unknown): p is Point3d => {
 };
 
 /**
- * Returns true if both x and y is 0.
+ * Returns true if both xy (and z, if present) are 0.
  * Use `Points.Empty` to return an empty point.
  * @param p
  * @returns
  */
-export const isEmpty = (p: Point) => p.x === 0 && p.y === 0;
+export const isEmpty = (p: Point) => {
+  if (isPoint3d(p)) {
+    if (p.z !== 0) return false;
+  }
+  return p.x === 0 && p.y === 0
+
+}
 
 /**
- * Returns true if point is a placeholder, where both x and y
+ * Returns true if point is a placeholder, where xy (and z, if present)
  * are `NaN`.
  *
  * Use Points.Placeholder to return a placeholder point.
  * @param p
  * @returns
  */
-export const isPlaceholder = (p: Point) =>
-  Number.isNaN(p.x) && Number.isNaN(p.y);
+export const isPlaceholder = (p: Point) => {
+  if (isPoint3d(p)) {
+    if (!Number.isNaN(p.z)) return false;
+  }
+  return Number.isNaN(p.x) && Number.isNaN(p.y);
+}
