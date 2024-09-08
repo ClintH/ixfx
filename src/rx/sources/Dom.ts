@@ -49,6 +49,7 @@ export function domNumberInputValue(targetOrQuery: HTMLInputElement | string, op
   return {
     ...rx,
     last() {
+      //console.log(`domNumberInputValue last: ${ input.last() }`);
       return Number.parseFloat(input.last())
     },
     set
@@ -120,12 +121,13 @@ export function domInputValue(targetOrQuery: HTMLInputElement | string, options:
     let value: string | null | undefined;
     if (attribName) {
       value = el.getAttribute(attribName);
+      //console.log(`  attrib: ${ attribName } value: ${ value }`);
     }
     if (fieldName) {
       value = (el as any)[ fieldName ]
     }
     if (value === undefined || value === null) value = fallbackValue;
-    //console.log(`domInputValue readValue: ${ value }`);
+    //console.log(`domInputValue readValue: ${ value }. attrib: ${ attribName } field: ${ fieldName }`);
     return value;
   }
 
