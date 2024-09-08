@@ -1,6 +1,41 @@
 A rough changelog between NPM releases
 
-# 0.29.0 24.08.23
+# 0.30.0 2024.09.08
+
+Collections
++ MapOfSimpleMutable.setValues: set all values for a key
+* ExpiringMap: bug fix for expiry logic
+
+Data
+* Arrays.atWrap - access array by index, wrapping around if need be
+
+Dom
+* DragDrop: lots of improvements
+* DataTable: improved formatting of numbers to avoid layout jumping
+
+Geometry
++ Rects.encompass: return a rectangle as least as big as input, but also big enough to encompass provided point(s)
++ Rects.dividerByLargestDimension: returns a function that divides a number or point by largest dimension of a rect
++ Rects.nearestInternal: nearest point within or on perimeter of rectangle to a point
++ Bezier.interpolator: Function to interpolate along bezier 
++ Points.to2d, Points.to3d
+* Wider support for Point3d in Points module
+
+Modulation
++ line: Easing based on warping of a line
+
+Numbers
+* round: takes round up/down option
+
+Visuals
++ Plot.CartesianCanvasPlot: plot x,y coordinates
+* Drawing.rect takes 'crossed' option to draw diagonals of a rectangle
+
+Trackers
+* Added manual 'mark' for ObjectTracker and PointTracker for explicit comparison points.
+  
+
+# 0.29.0 2024.08.23
 
 + Numbers.difference
 + Rx.writable
@@ -11,7 +46,7 @@ A rough changelog between NPM releases
 * Renamed Rx.Ops.batch to Rx.Ops.chunk
 * Renamed Rx.Ops.timeoutTrigger to Rx.Ops.timeoutValue
 
-# 0.27.2 24.07.28
+# 0.27.2 2024.07.28
 
 Flow.interval/Flow.repeat: integrated into one: Flow.repeat
 
@@ -31,7 +66,7 @@ Modulation
 * Unified easings, waveforms. Lots of other re-factoring
 + mix: mix modulators
 
-# 0.24.3 24.07.19
+# 0.24.3 2024.07.19
 
 Rx
 * Rx.From.object: onField event can subscribe with a wildcard
@@ -41,7 +76,7 @@ Rx
 Data.mapObjectByObject: Remap properties of an object using a second map as a structured set of functions.
 
 
-# 0.24.0 24.07.14
+# 0.24.0 2024.07.14
 
 Rx
 + Sources.derived: calculate and emit a value when one of many dependency values change
@@ -50,7 +85,7 @@ Modulation
 + 'Sources' sub-module with alternative implementations of waves (sine,saw,tri,sqr). These use a simpler clock mechanism at the cost of not being able to track completion or resetting.
 
 
-# 0.23.2 24.07.04
+# 0.23.2 2024.07.04
 
 Collections/Data
 * Try to keep 'Collections' module as collection data structures, moving array/map helper functions to Data module.
@@ -62,7 +97,7 @@ Visuals
 * Drawing.dot options
 * Made Hsl and Rgb have opacity fields  
 
-# 0.22.0 24.06.17
+# 0.22.0 2024.06.17
 
 Data
 + reactiveUpdate: given start object and a Record<string,Resolvable>, it can produce an updated merged object on demand. For example for state.
@@ -72,7 +107,7 @@ Rx
 + 'tap' to do parallel processing
 + Reworked annotation op and added 'annotationWithOp'
 
-# 0.21.0 24.06.07
+# 0.21.0 2024.06.07
 
 Collections
 + QueueMutable: Added events for changes.
@@ -104,7 +139,7 @@ Flow
 * Sleep: improved used of AbortSignal
 * Debounce: use Interval instead of ms
 
-# 0.20.0 24.04.06
+# 0.20.0 2024.04.06
 
 * Refactor to remove 'Generators' module. Functions moved to Numbers, Text & Iterables modules.
 * Data.ResolveFields: given a Record<string,v>, returns a Record<string,x>. Where v is a value,function,reactive,iterable and x is a primitive value or object. Essentially it resolve each field where there are dynamic fields to a value.
@@ -135,13 +170,13 @@ Rx
  + syncToObject: Only emit values when all input reactives produce a value, yield an object
  + cache: Guarantee a value from a readable reactive
 + 
-# 0.19.0 24.03.24
+# 0.19.0 2024.03.24
 
 Dom
 + CanvasHelper class instead of 'fullScreenCanvas' function
 
 
-# 0.18.6 07.03.24
+# 0.18.6 2024.03.07
 
 Io
 + reconnectingWebSocket: handle reconnecting a websocket
@@ -150,7 +185,7 @@ Flow
 + RequestResponseMatch: house-keeping of matching a responses to requests, with timeout 
 + interpolatorStepped & interpolatorInterval: step from A to B over a given number of steps or a duration
   
-# 0.18.3 04.03.24
+# 0.18.3 2024.03.04
 
 Generators
 * stringSegmentsStartToStart et al.: step through a 'segments' of a string. Unlike .split(), segments are generated on demand
@@ -184,13 +219,14 @@ Dom
 Collections
 * QueueMutable gains .at, .removeWhere, .remove
 
-# 0.17.0 02.02.24
+# 0.17.0 2024.02.02
+
 Data
 * Improved unit tests of reactive module
 * Added 'Reactive.Dom' sub-module for updating HTML elements based on reactive instances
 * Added 'Reactive.to', for passing values between reactives with a transform function
 
-# 0.16.0 24.11.23
+# 0.16.0 2023.11.23
 
 Text.untilMatch: options for how to handle when there is no match. Before the source string is returned. Now it can optionally throw an error or yield a fallback.
 
@@ -205,7 +241,8 @@ IterableSync
 Modulation
 * jitter: Bug fix with min/max value polarity
 
-# 0.15.0 09.11.23
+# 0.15.0 2023.11.09
+
 Collections
 * Major changes to Trees module
 * Arrays.cycle: cycle through elements of array
@@ -213,7 +250,7 @@ Collections
 Data
 * trackUnique: Returns _true_ when a new value is seen
  
-# 0.14.2 24.10.23
+# 0.14.2 2023.10.23
 
 * Bug fixes with Plot2 and SceneGraph, StringWriteBuffer
 * Immutable.getPaths has option to only return leaf fields
@@ -221,7 +258,7 @@ Data
 * Renamed Chains.chain to Chains.run
 * Added Chains.prepare to decouple data source and chain
 
-# 0.14.0 17.10.23
+# 0.14.0 2023.10.17
 
 * Util.isPlainObjectOrPrimitive: returns false if it's something like 'window' or 'document'
 * Util.isPlainObject: returns true if it's a simple {...} object
@@ -237,12 +274,12 @@ Data
 * Moved Arrays.compareValueEqual. compareValues to Iterables
 * Vector.fromRadians, Vector.toRadians
 
-# 0.12.1 17.09.23
+# 0.12.1 2023.09.17
 
 * Dom.DataDisplay: easily display state
 * Data.noiseFilter wip
   
-# 0.12.0 16.09.23
+# 0.12.0 2023.09.16
 
 * Data.Chains: process a series of async generators
 * Data.Pipes: Stream-like data processing
@@ -255,26 +292,26 @@ Data
 * Async iterables: Async.fromArray, Async.fromIterable
 * Util.isMap, Util.isSet
 
-# 0.11.7 04.09.23
+# 0.11.7 2023.09.04
 
 * Dom.inlineConsole(): adds a DIV that captures and displays unhandled errors, console.log, console.warn & console.error
 * Export Envelopes as sub-module of modulation
 * Easing.smoothstep
 
-# 0.11.5 26.08.23
+# 0.11.5 2023.08.26
 
 * PlotBipolar
 * Data.Bipolar module
   
-# 0.10.5 25.08.23
+# 0.10.5 2023.08.25
 
 * Linting
  
-# 0.10.1 19.08.23
+# 0.10.1 2023.08.19
 
 Small fixes
 
-# 0.10.0 17.08.23
+# 0.10.0 2023.08.17
 
 Flow/
 
@@ -288,7 +325,7 @@ Arrays/
 - containsDuplicateValues: returns _true_ if array contains repeated values
 - additionalValues: yields the values of one iterable which are not present in the source array.
 
-# 0.9.0 23.07.23
+# 0.9.0 2023.07.23
 
 Lots of refactors and minor improvements
 
@@ -297,14 +334,14 @@ Lots of refactors and minor improvements
 - Preferring a style that returns functions, and takes single arguments
 - Map.getClosestIntegerKey: Assuming a Map with number keys, returns the closest key for a given value
 
-# 0.8.9 23.06.09
+# 0.8.9 2023.06.09
 
 Random/
 
 - Test refactor so all functions take a single parameter
 - generateIntegerUnique: randomly walk a range of integers without repeating
 
-# 0.8.6 23.05.06
+# 0.8.6 2023.05.06
 
 Guards/integerParse: Parse a value to an integer that follows given bounds, or return a default value
 
@@ -321,7 +358,7 @@ IterableSync
 - first/last: return first or last item of an iterable
 -
 
-# 0.8.5 23.05.05
+# 0.8.5 2023.05.05
 
 Collections/TreeNode
 
@@ -337,13 +374,13 @@ text
 - betweenChomp: Return part of string before a given start and end match, eg '[' and ']', as well as a copy of the string with all of that removed.
 - Improved test coverage
 
-# 0.8.4 23.03.06
+# 0.8.4 2023.03.06
 
 Collections/MultiValue
 
 - Favour iterables rather than array return values
 
-# 0.8.3 23.02.25
+# 0.8.3 2023.02.25
 
 Collections/Array
 
@@ -354,7 +391,7 @@ Collections/MapMulti
 
 - Added 'removeValue' function that remove value regardless of key it is stored under
 
-# 0.8.2 23.02.19
+# 0.8.2 2023.02.19
 
 Collections/Array
 
@@ -375,7 +412,7 @@ Flow/
   - `onStartCalled`: return value determines whether a call to .start() continues as normal, cancels, resets or disposes loop
   - disposable: if true, the loop will throw an error if a start is attempted
 
-# 0.8.0 23.02.03
+# 0.8.0 2023.02.03
 
 Geometry/
 
@@ -399,7 +436,7 @@ Collections/
 - Numbers/rounder: Returns a function to round numbers. Numbers.round() wraps this.
 - Debug/logger / Deubg/logSet: can provide a colour key instead of colouring based on prefix
 
-# 0.7.1 22.11.04
+# 0.7.1 2022.11.04
 
 - Util/mapObject: Like a regular map function, but for object properties.
 - Arrays/pushUnique: add items to an array, but only if they don't already exist
@@ -407,7 +444,7 @@ Collections/
 - Maps/addObject: add property-value pairs of an object to a map
 - Collections/SetImmutable: immutable Set
 
-# 0.7.0 22.11.02
+# 0.7.0 2022.11.02
 
 - Collections/ExpiringMap: a map which can automatically drop elements which
   aren't updated/set after some period
@@ -424,11 +461,11 @@ Collections/
 - Flow/repeatReduce: call a function repeatedly, reducing down to a single value
 - Util/defaultComparer: follow default semantics for Array.sort
 
-# 0.6.7 22.10.18
+# 0.6.7 2022.10.18
 
 - Bug fix for Correlate.align
 
-# 0.6.6 22.10.17
+# 0.6.6 2022.10.17
 
 - Arrays/mergeByKey: merge two arrays with a custom key-generation function and
   reconciler.
@@ -449,11 +486,11 @@ Collections/
   point
 - Arrays.until Returns all items in source array until predicate returns true
 
-# 0.6.5 22.10.13
+# 0.6.5 2022.10.13
 
 - Bug fix for accessing camera on iOS
 
-# 0.6.4 22.10.09
+# 0.6.4 2022.10.09
 
 - Flow.StateMachine.drive: 'driver' for changing states somewhat automatically.
   Each state has a set of handler(s) which are executed whilst the machine is in
@@ -467,17 +504,17 @@ Collections/
 - Geometry/Vector: wrapper for Points.Point and Polar.Coords for vector
   (magnitude/direction) processing
 
-# 0.6.3 22.09.27
+# 0.6.3 2022.09.27
 
 - Added type guards for Normalise.stream
 - EspruinoSerialDevice: Use USB.println instead of Serial.println for reporting
   eval results
 
-# 0.6.2 22.09.18
+# 0.6.2 2022.09.18
 
 - Bug fix for Espruino eval
 
-# 0.6.1 22.09.14
+# 0.6.1 2022.09.14
 
 dom/Util - cycleCssClass
 
@@ -493,13 +530,13 @@ geometry/Point - quantiseEvery
 
 - Uses Numbers.quantiseEvery to quantise x and y
 
-# 0.6.0 22.08.31
+# 0.6.0 2022.08.31
 
 data/MovingAverage
 
 - Moving average with timed automatic decay.
 
-# 0.5.8 22.08.20
+# 0.5.8 2022.08.20
 
 visual/Plot2
 
@@ -509,14 +546,14 @@ flow/Continuously
 
 - Bug fix so it works in a worker
 
-# 0.5.5 22.08.19
+# 0.5.5 2022.08.19
 
 io/EspruinoBleDevice
 
 - Name-based filtering
 - Auto-reconnect stub
 
-# 0.5.4 22.08.19
+# 0.5.4 2022.08.19
 
 geometry/Lines
 
@@ -526,7 +563,7 @@ io/FrameProcessor
 
 - Allow pre-existing canvas element to be used as capture buffer
 
-# 0.5.3 22.08.17
+# 0.5.3 2022.08.17
 
 data/Scale
 
@@ -544,13 +581,13 @@ geometry/Point
 
 - centroid() skips undefined points
 
-# 0.5.0 22.08.15
+# 0.5.0 2022.08.15
 
 IterableSync helper functions
 
 Numbers module
 
-# 0.4.0 22.08.13
+# 0.4.0 2022.08.13
 
 geometry/Rects
 
@@ -577,7 +614,7 @@ geometry/Shape, Circle
 
 - center()
 
-# 0.3.01 22.08.01
+# 0.3.01 2022.08.01
 
 io/Camera
 
@@ -603,7 +640,7 @@ flow/Continuously
 
 geometry/TriangleIsosceles
 
-# 0.3.00 22.07.12
+# 0.3.00 2022.07.12
 
 geometry/Triangle, TriangleEquilateral, TriangleRight
 
@@ -628,7 +665,7 @@ dom/ErrorHandler
 
 - defaultErrorHandler() - show errors on screen
 
-# 0.1.00 22.06.22
+# 0.1.00 2022.06.22
 
 dom/PointerVisualise
 
@@ -649,7 +686,7 @@ relativeDifference()
 
 IterableAsync helper functions
 
-# 0.0.24 22.06.17
+# 0.0.24 2022.06.17
 
 modulation/Envelope
 
@@ -692,4 +729,4 @@ temporal/MovingAverage
 
 - movingAverageLight
 
-# 0.0.22 22.05.22
+# 0.0.22 2022.05.22
