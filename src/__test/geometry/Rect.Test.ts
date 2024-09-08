@@ -3,6 +3,23 @@ import test from 'ava';
 import * as Rects from '../../geometry/rect/index.js';
 import { getRectPositionedParameter } from '../../geometry/rect/GetRectPositionedParameter.js';
 
+test(`encompass`, t => {
+  t.deepEqual(Rects.encompass({ x: 0, y: 0, width: 0, height: 0 }, { x: 0, y: 0 }), { x: 0, y: 0, width: 0, height: 0 });
+
+  t.deepEqual(Rects.encompass({ x: 0, y: 0, width: 0, height: 0 }, { x: 10, y: 0 }), { x: 0, y: 0, width: 10, height: 0 });
+  t.deepEqual(Rects.encompass({ x: 0, y: 0, width: 0, height: 0 }, { x: 0, y: 10 }), { x: 0, y: 0, width: 0, height: 10 });
+  t.deepEqual(Rects.encompass({ x: 0, y: 0, width: 0, height: 0 }, { x: -10, y: 0 }), { x: -10, y: 0, width: 10, height: 0 });
+  t.deepEqual(Rects.encompass({ x: 0, y: 0, width: 0, height: 0 }, { x: 0, y: -10 }), { x: 0, y: -10, width: 0, height: 10 });
+
+  t.deepEqual(Rects.encompass({ x: 10, y: 10, width: 10, height: 10 }, { x: 10, y: 10 }), { x: 10, y: 10, width: 10, height: 10 });
+  t.deepEqual(Rects.encompass({ x: 10, y: 10, width: 10, height: 10 }, { x: 0, y: 0 }), { x: 0, y: 0, width: 20, height: 20 });
+
+  t.deepEqual(Rects.encompass({ x: 10, y: 10, width: 10, height: 10 }, { x: 0, y: 0 }, { x: -10, y: -10 }), { x: -10, y: -10, width: 30, height: 30 });
+
+
+
+});
+
 test(`subtract`, t => {
   // Rectangle by w/h
   t.deepEqual(Rects.subtract({ width: 1, height: 8 }, 2, 4), { width: -1, height: 4 });
