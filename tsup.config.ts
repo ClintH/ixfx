@@ -36,6 +36,7 @@ export default defineConfig({
   },
   dts: true,
   experimentalDts: false,
+  sourcemap: true,
   noExternal: [ `bezier-js`, `colorjs.io`, `json5`, `lit-html` ],
   platform: `browser`,
   target: `es2022`,
