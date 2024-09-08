@@ -81,7 +81,7 @@ export function divider(a: Point3d | Point | number | Array<number>, b?: number,
     aa: Point3d | Point | number | Array<number>,
     bb?: number,
     cc?: number
-  ): Point | Point3d => {
+  ): Point => {
     const dividend = getPointParameter(aa, bb, cc);
 
     return typeof dividend.z === `undefined` ? Object.freeze({
