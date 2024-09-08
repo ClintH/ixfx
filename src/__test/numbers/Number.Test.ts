@@ -8,8 +8,8 @@ import {
   applyToValues,
   averageWeighted,
   weight
-} from '../numbers/index.js';
-import { gaussian } from '../modulation/Gaussian.js';
+} from '../../numbers/index.js';
+import { gaussian } from '../../modulation/Gaussian.js';
 
 test('weight', t => {
   // Six items
@@ -107,6 +107,9 @@ test(`round`, (t) => {
   t.is(r(100), 100);
   t.is(r(100.12345678), 100.123);
   t.is(r(0.00000000001), 0);
+
+  const r2 = round(1, true);
+  t.is(r2(0.9999), 1);
 });
 
 test(`linearSpace`, (t) => {
