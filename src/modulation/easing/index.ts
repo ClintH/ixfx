@@ -3,6 +3,8 @@ import { throwStringTest } from '../../util/GuardString.js';
 import { type Interval } from '../../flow/IntervalType.js';
 import type { Modulate, ModulatorTimed } from '../Types.js';
 export * as Named from './EasingsNamed.js';
+export * from './Line.js';
+
 import * as ModTimed from '../ModulatorTimed.js';
 
 /**
@@ -306,3 +308,4 @@ export function* getEasingNames(): Iterable<string> {
   const map = cacheEasings();
   yield* map.keys();
 };
+
