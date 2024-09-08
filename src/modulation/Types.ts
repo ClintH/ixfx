@@ -44,7 +44,7 @@ export type ModSource = (feedback?: any) => number
  * * {@link wave}: Generate different wave shapes
  * * Raw access to waves: {@link arcShape}, {@link sineShape},{@link sineBipolarShape}, {@link triangleShape}, {@link squareShape}
  * * {@link Easings}: Easing functions
- * * {link springShape}: Spring
+ * * {@link springShape}: Spring
  */
 export type Modulate = (v: number) => number
 

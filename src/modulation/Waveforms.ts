@@ -137,6 +137,21 @@ export function sineBipolarShape(period = 1): Modulate {
  * const v = m();
  * ```
  * 
+ * @example
+ * ```js
+ * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { resolveFields } from 'https://unpkg.com/ixfx/dist/data.js';
+ * 
+ * const state = {
+ *  intensity: wave({secs: 2, shape: `sine` }),
+ *  someOtherState: 10
+ * }
+ * 
+ * const use = async () {
+ *  const { intensity } = await resolveFields(state);
+ *  // Do something with intensity value...
+ * }
+ * ```
  * @param options 
  * @returns 
  */
@@ -190,6 +205,10 @@ export function wave(options: Partial<WaveOptions>) {
   return waveFromSource(sourceFn, shaperFn, invert);
 }
 
+/**
+ * Wave shaper feedback.
+ * Feedback allows you to dynamically control tempo for advanced uses.
+ */
 export type WaveShaperFeedback = {
   /**
    * Data to feedback to clock source

@@ -363,16 +363,29 @@ export * as Events from './Events.js';
 
 /**
  * The Modulation module contains functions for, well, modulating data.
+ * [See the ixfx Guide](https://ixfx.fun/modulation/overview/)
  *
- * @example Importing
- * ```
- * // If library is stored two directories up under `ixfx/`
- * import * as Modulation from '../../ixfx/dist/modulation.js';
- *
- * // Import from web
- * import * as Modulation from 'https://unpkg.com/ixfx/dist/modulation.js'
- * ```
- *
+ * Modulators can also be animated using {@link ticks} or {@link time}. Rather than modulating a value, the input is essentially a completion value.
+ * 
+ * Simple modulators take in a value and return result as a number
+ * * {@link springShape}: Spring physics
+ * * {@link squareShape}, {@link sineShape}, {@link sineBipolarShape} {@link triangleShape}: waveforms. Use {@wave} to have these run over time
+ * * {@link cubicBezierShape}, {@link arcShape}
+ * 
+ * Sources
+ * * {@link wave}: Modulate a wave over time
+ * * {@link jitter}: Jitter values randomly
+ * * {@link gaussian}: Modulate on bell-curve
+ * * {@link pingPong}, {@link pingPongPercent}: produce values that bounce between an upper and lower
+ * 
+ * Utilities for mixing/applying modulation
+ * * {@link crossfade}
+ * * {@link mix}
+ * * {@link mixModulators}
+ * 
+ * Temporality: run modulators over time
+ * * {@link ticks}: Step a modulator over a total number of ticks
+ * * {@link time}: Step a modulator over a total duration of time
  */
 export * as Modulation from './modulation/index.js';
 

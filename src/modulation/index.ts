@@ -1,18 +1,18 @@
 /**
  * Easings module
  *
- * [See the guide](https://ixfx.fun/modulation/easings/introduction/)
+ * [See the ixfx Guide](https://ixfx.fun/modulation/easings/introduction/)
  *
  * Overview:
  * * {@link Easings.create}: Create an easing with provided settings
  * * {@link Easings.time}: Ease by time
  * * {@link Easings.ticks}: Ease by tick
  * * {@link Easings.get}: Get an easing function by name
- *
+ * * {@link Easings.line}: Get an easing function that uses a warped line
+ * 
  * @example Importing
  * ```js
- * // If library is stored two directories up under `ixfx/`
- * import { Easings } from '../../ixfx/dist/modulation.js';
+ * import { Easings } from 'ixfx/modulation.js';
  * Easings.time(...);
  *
  * // Import from web
@@ -21,6 +21,16 @@
  * ```
  */
 export * as Easings from './easing/index.js';
+
+/**
+ * Envelopes module.
+ * [See the ixfx Guide](https://ixfx.fun/modulation/overview/).
+ * 
+ * Quick overview:
+ * * {@link Adsr}: Create an envelope object for maximum control
+ * * {@link adsr}: A function that yields values as envelope runs
+ * * {@link adsrIterable}: A generator that yields values over an envelope
+ */
 export * as Envelopes from './envelope/index.js';
 export * as Sources from './source/index.js';
 
@@ -29,11 +39,11 @@ export * from './Drift.js';
 
 /**
  * Forces module can help to compute basic physical forces like gravity, friction, springs etc.
- *
+ * [See the ixfx Guide](https://ixfx.fun/modulation/forces/introduction/).
+ * 
  * @example Importing
  * ```js
- * // If library is stored two directories up under `ixfx/`
- * import { Forces } from '../../ixfx/dist/modulation.js';
+ * import { Forces } from 'ixfx/modulation.js';
  * Forces.attractionForce(...);
  *
  * // Import from web
@@ -69,8 +79,7 @@ export * from './Noop.js';
  *
  * @example Importing
  * ```js
- * // If library is stored two directories up under `ixfx/`
- * import { Oscillators } from '../../ixfx/dist/modulation.js';
+ * import { Oscillators } from 'ixfx/modulation.js';
  * Oscillators.saw(...);
  *
  * // Import from web
@@ -83,8 +92,5 @@ export * as Oscillators from './Oscillator.js';
 export * from './PingPong.js';
 export * from './Spring.js';
 export type * from './Types.js';
-//import * as Easings from './easing/index.js';
-//import * as Envelopes from './envelope/index.js';
-//import * as Forces from './Forces.js';
 export * from './Waveforms.js';
 export * from './WeightedAverage.js';
