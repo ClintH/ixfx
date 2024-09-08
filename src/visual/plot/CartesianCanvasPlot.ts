@@ -1,0 +1,539 @@
+import type { Point } from "../../geometry/point/PointType.js";
+import type { DataSet } from "./DataSet.js";
+import type { Line, RectPositioned } from "../../geometry/Types.js";
+import { CanvasHelper } from "../../dom/CanvasHelper.js";
+import * as Rects from '../../geometry/rect/index.js';
+import * as Cart from './Cartesian.js';
+import { Colour } from "../index.js";
+import { round } from "src/numbers/Round.js";
+import { resolveEl } from "src/dom/ResolveEl.js";
+import { Points } from "src/geometry/index.js";
+
+type Scaler = (pt: Point) => Point;
+
+type DataRangeDependencies = {
+  /**
+   * Converts a data value to relative value (0..1)
+   */
+  valueToRelative: Scaler
+  /**
+   * Converts a relative value to element-based coordinates
+   * (ie 0,0 is top-left of CANVAS)
+   */
+  relativeToElementSpace: Scaler
+  /**
+   * Converts canvas coordinate to relative
+   */
+  elementSpaceToRelative: Scaler,
+  /**
+   * Converts relative coordinate to value
+   */
+  relativeToValue: Scaler
+  range: Cart.PointMinMax
+}
+
+/**
+ * Simple plotting of cartesian values.
+ * 
+ * ```js
+ * // Create the data set
+ * const ds = new Plot.DataSet();
+ * 
+ * // Create plotter, providing a CANVAS element and the dataset
+ * const p = new Plot.CartesianCanvasPlot(`#plot`, ds);
+ * 
+ * // Add data
+ * ds.add({ x:1, y:1 });
+ * 
+ * // Request it to draw the current data
+ * p.draw();
+ * ```
+ * 
+ * Series
+ * ```js
+ * // Add a value to the `alpha` series
+ * ds.add({x:1,y:1}, `alpha`);
+ * ```
+ * 
+ * Series can have metadata associated with it in the DataSet
+ * ```js
+ * // Use 'pink' by default for the series 'alpha'
+ * ds.setMeta(`alpha`, { colour: `pink` });
+ * ``
+ * 
+ */
+export class CartesianCanvasPlot {
+  helper;
+  #data;
+  #lastDataChange;
+
+  actualDataRange: RectPositioned = Rects.EmptyPositioned;
+  visibleRange: RectPositioned = Rects.PlaceholderPositioned;
+  show: Cart.ShowOptions;
+  whiskerLength: number;
+  axisRounder = round(1, true);
+
+  /**
+   * List of lines to draw after drawing everything else.
+   * Lines are given in value-coordinate space
+   */
+  overlayLines: (Line & Cart.LineStyle)[] = [];
+
+  renderArea: RectPositioned & { dimensionMin: number } = { ...Rects.EmptyPositioned, dimensionMin: 0 };
+  margin;
+
+  #grid: Cart.GridStyle
+  #rangeMode;
+
+  #currentRange?: DataRangeDependencies;
+
+  #axisStyle: Cart.LineStyle;
+  #valueStyle;
+  #connectStyle;
+  #rangeManual: Cart.PointMinMax | undefined;
+  #textStyle: Cart.TextStyle;
+
+  constructor(domQueryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, Cart.SeriesMeta>, options: Partial<Cart.CartesianPlotOptions> = {}) {
+    if (!data) throw new TypeError(`Param 'data' is undefined`);
+    if (typeof data !== `object`) throw new TypeError(`Param 'data' is not an object. Got: ${ typeof data }`);
+    this.#data = data;
+    this.#lastDataChange = 0;
+    this.#rangeMode = options.range ?? `auto`;
+    this.#valueStyle = options.valueStyle ?? `dot`;
+    this.#connectStyle = options.connectStyle ?? ``;
+    this.whiskerLength = options.whiskerLength ?? 5;
+    this.show = {
+      axes: true,
+      axisValues: true,
+      grid: true,
+      whiskers: true,
+      ...options.show
+    };
+
+    this.#axisStyle = {
+      colour: `black`,
+      width: 2,
+      ...options.axisStyle
+    };
+    this.#textStyle = {
+      colour: `black`,
+      size: `1em`,
+      font: `system-ui`,
+      ...options.textStyle
+    };
+
+    this.#grid = {
+      increments: 0.1,
+      major: 5,
+      colour: `whitesmoke`,
+      width: 1,
+      ...options.grid
+    }
+
+    this.margin = options.margin ?? 0;
+
+    this.helper = new CanvasHelper(domQueryOrEl, {
+      width: 500,
+      height: 400
+    });
+    this.helper.el.addEventListener(`click`, event => {
+      const { x, y } = event;
+      const value = this.screenToValue(event);
+
+      console.log(`orig: ${ x }x${ y } -> ${ value.x }x${ value.y }`);
+
+    });
+    this.computeRenderArea();
+  }
+
+  computeRenderArea() {
+    const m = this.margin;
+    const width = this.helper.width - m - m;
+    const height = this.helper.height - m - m;
+
+    this.renderArea = {
+      x: m,
+      y: m,
+      width, height,
+      dimensionMin: Math.min(width, height)
+    };
+    return this.renderArea;
+  }
+
+  getCurrentRange() {
+    if (this.#data.lastChange === this.#lastDataChange && this.#currentRange) return this.#currentRange;
+    this.#lastDataChange = this.#data.lastChange;
+    const r = this.#createRange();
+    this.#currentRange = r;
+    return r;
+  }
+
+  #createRange(): DataRangeDependencies {
+    // Compute scale of data
+    const range = this.getDataRange(); // actual data range, or user-provided
+
+    //console.log(`getScaler mm`, mm);
+    const valueToRelative = Cart.relativeCompute(range);
+    const relativeToValue = Cart.absoluteCompute(range);
+    let xOffset = this.renderArea.x;//(this.renderArea.width / 2) + ;
+    let yOffset = this.renderArea.y;//(this.renderArea.height / 2) ;
+    if (this.renderArea.dimensionMin === this.renderArea.height) {
+      // Landscape
+      xOffset += (this.renderArea.width / 2) - (this.renderArea.dimensionMin / 2);
+    } else if (this.renderArea.dimensionMin === this.renderArea.width && this.renderArea.width !== this.renderArea.height) {
+      // Portrait
+      yOffset += (this.renderArea.height / 2) - (this.renderArea.dimensionMin / 2);
+    }
+
+    const relativeToElementSpace = (pt: Point) => {
+      let { x, y } = pt;
+      if (x === Number.NEGATIVE_INFINITY) x = 0;
+      else if (x === Number.POSITIVE_INFINITY) x = 1;
+      if (y === Number.NEGATIVE_INFINITY) y = 0;
+      else if (y === Number.POSITIVE_INFINITY) y = 1;
+      x = x * this.renderArea.dimensionMin;
+      y = (1 - y) * this.renderArea.dimensionMin;
+
+      x += xOffset;
+      y += yOffset;
+
+      return { x, y }
+    };
+
+    const elementSpaceToRelative = (pt: Point) => {
+      let { x, y } = pt;
+      x -= xOffset;
+      y -= yOffset;
+
+      x /= this.renderArea.dimensionMin;
+      y /= this.renderArea.dimensionMin;
+      return { x, y: (1 - y) }
+    }
+
+    return {
+      valueToRelative, relativeToElementSpace, elementSpaceToRelative, relativeToValue, range
+    }
+  }
+
+  /**
+   * Converts a point in data space to viewport space
+   * @param pt 
+   */
+  valueToViewport(pt: Point): Point {
+    const c = this.getCurrentRange();
+    const rel = c.valueToRelative(pt);
+    const canvas = c.relativeToElementSpace(rel);
+    const el = this.helper.el;
+    const bounds = el.getBoundingClientRect();
+    return {
+      x: canvas.x + bounds.left,
+      y: canvas.y + bounds.top
+    }
+  }
+
+  /**
+   * Positions an element at the viewport location of `data` point.
+   * Ensure the element has `position:absolute` set.
+   * @param data 
+   * @param elOrQuery 
+   * @param by 
+   */
+  positionAt(data: Point, elOrQuery: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery: HTMLElement | string) {
+    const el = resolveEl(elOrQuery);
+    let { x, y } = this.valueToViewport(data);
+
+    if (by === `middle`) {
+      const bounds = el.getBoundingClientRect();
+      x -= bounds.width / 2;
+      y -= bounds.height / 2;
+    } else if (by === `top-left`) {
+
+    } else throw new Error(`Param 'by' expected to be 'middle' or 'top-left'.`);
+    if (relativeToQuery) {
+      const relativeTo = resolveEl(relativeToQuery);
+      const bounds = relativeTo.getBoundingClientRect();
+      x -= bounds.left;
+      y -= bounds.top;
+    }
+    el.style.left = `${ x }px`;
+    el.style.top = `${ y }px`;
+  }
+
+  /**
+   * When range is auto, returns the range of the data
+   * Otherwise returns the user-provided range.
+   * @returns 
+   */
+  getDataRange(): Cart.PointMinMax {
+    if (this.#rangeMode === `auto`) {
+      return Cart.computeMinMax([ ...this.#data.getValues() ]);
+    } else {
+      if (!this.#rangeManual) {
+        this.#rangeManual = Cart.computeMinMax([ this.#rangeMode.max, this.#rangeMode.min ]);
+      }
+      return this.#rangeManual;
+    }
+  }
+
+  #valueToElementSpace(a: Point, debug: boolean) {
+    const ds = this.getCurrentRange();
+    // Scale relative to total dimensions of data
+    const rel = ds.valueToRelative(a) as Point;
+
+    // Scale relative to viewport
+    const scr = ds.relativeToElementSpace(rel);
+    if (debug) console.log(`orig: ${ a.x }x${ a.y } rel: ${ rel.x }x${ rel.y } scr: ${ scr.x }x${ scr.y }`);
+    return {
+      ...a,
+      x: scr.x,
+      y: scr.y
+    }
+  }
+
+  /**
+   * Converts a point in pixel coordinates to a value.
+   * Useful for converting from user input coordinates.
+   * @param a 
+   * @returns 
+   */
+  screenToValue(a: Point) {
+    const ds = this.getCurrentRange();
+    const bounds = this.helper.el.getBoundingClientRect();
+    const elem = Points.subtract(a, bounds);
+    const rel = ds.elementSpaceToRelative(elem);
+    const val = ds.relativeToValue(rel) as Point;
+    return val;
+  }
+
+  valueToScreen(a: Point) {
+    const ds = this.getCurrentRange();
+    const rel = ds.valueToRelative(a);
+    const scr = ds.relativeToElementSpace(rel);
+    const bounds = this.helper.el.getBoundingClientRect();
+    //console.log(`valueToScreen: ${ a.x }x${ a.y } - ${ scr.x }x${ scr.y }`);
+    return {
+      x: scr.x + bounds.x,
+      y: scr.y + bounds.y
+    }
+  }
+
+  valueRectToScreen(a: Point, b: Point): RectPositioned {
+    a = this.valueToScreen(a);
+    b = this.valueToScreen(b);
+    return {
+      x: a.x,
+      y: b.y,
+      width: b.x - a.x,
+      height: a.y - b.y
+    }
+  }
+
+  /**
+   * Compute screen coordinates based on two points in value space
+   * @param valueA 
+   * @param valueB 
+   */
+  #computeScreenLine(valueA: Point, valueB: Point, debug: boolean = false): Line {
+    valueA = this.#valueToElementSpace(valueA, debug) as Point;
+    valueB = this.#valueToElementSpace(valueB, debug) as Point;
+    return { a: valueA, b: valueB };
+  }
+
+  getDefaultMeta(): Cart.SeriesMeta {
+    return {
+      colour: Colour.goldenAngleColour(this.#data.metaCount),
+      lineWidth: 2,
+      dotRadius: 5
+    }
+  }
+
+  draw() {
+    this.helper.clear();
+    const ctx = this.helper.ctx;
+    //this.helper.drawBounds(`whitesmoke`);
+    //Drawing.rect(ctx, this.renderArea, { strokeStyle: `whitesmoke` });
+
+    this.#useGrid();
+    if (this.show.axes) this.#drawAxes();
+
+    let count = 0;
+    for (const [ k, v ] of this.#data.getEntries()) {
+      let meta = this.#data.getMeta(k);
+      if (!meta) {
+        meta = this.getDefaultMeta();
+        this.#data.setMeta(k, meta);
+      }
+      this.#drawSeries(k, v, meta);
+      count++;
+    }
+
+    for (const line of this.overlayLines) {
+      this.drawLine(line, line.colour, line.width);
+    }
+  }
+
+  /**
+   * Draws a line in value-coordinate space
+   * @param line 
+   * @param colour 
+   * @param width 
+   */
+  drawLine(line: Line, colour: string, width: number) {
+    const l = this.#computeScreenLine(line.a, line.b);
+    this.#drawLineAbsolute(l, colour, width);
+  }
+
+  setMeta(series: string, meta: Partial<Cart.SeriesMeta>) {
+    this.#data.setMeta(series, {
+      ...this.getDefaultMeta(),
+      ...meta
+    })
+  }
+
+  #drawAxes() {
+    const { colour, width } = this.#axisStyle;
+    let yAxis = this.#computeScreenLine({ x: 0, y: Number.NEGATIVE_INFINITY }, { x: 0, y: Number.POSITIVE_INFINITY }, false);
+    let xAxis = this.#computeScreenLine({ x: Number.NEGATIVE_INFINITY, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }, false);
+    this.#drawLineAbsolute(xAxis, colour, width, false);
+    this.#drawLineAbsolute(yAxis, colour, width, false);
+  }
+
+
+  #drawYAxisValues(yPoints: Point[]) {
+    const { ctx } = this.helper;
+
+    ctx.font = this.#textStyle.size + " " + this.#textStyle.font;
+    ctx.fillStyle = this.#textStyle.colour;
+    ctx.textBaseline = `middle`;
+
+
+    for (const p of yPoints) {
+      if (p.x === 0 && p.y === 0) continue;
+      const scr = this.#valueToElementSpace(p, false);
+      const val = this.axisRounder(p.y);
+      const label = val.toString();
+      const measure = ctx.measureText(label);
+      let x = scr.x - measure.width - (this.whiskerLength / 2) - 5;
+      let y = scr.y;
+      ctx.fillText(label, x, y);
+    }
+  }
+
+  #drawXAxisValues(xPoints: Point[]) {
+    const { ctx } = this.helper;
+
+    ctx.font = this.#textStyle.size + " " + this.#textStyle.font;
+    ctx.fillStyle = this.#textStyle.colour;
+    ctx.textBaseline = `top`;
+    for (const p of xPoints) {
+      const scr = this.#valueToElementSpace(p, false);
+      const val = this.axisRounder(p.x);
+      const label = val.toString();
+      const measure = ctx.measureText(label);
+      let x = scr.x - measure.width / 2;
+      let y = scr.y + measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent + (this.whiskerLength / 2);
+      ctx.fillText(label, x, y);
+    }
+  }
+
+  #drawWhisker(p: Cart.AxisMark, vertical: boolean) {
+    const whiskerHalfLength = this.whiskerLength / 2;
+    const v = vertical ? { x: p.x, y: 0 } : { y: p.y, x: 0 }
+    const scr = this.#valueToElementSpace(v, false);
+
+    const line = vertical ? {
+      a: { x: scr.x, y: scr.y - whiskerHalfLength },
+      b: { x: scr.x, y: scr.y + whiskerHalfLength },
+    } :
+      {
+        a: { y: scr.y, x: scr.x - whiskerHalfLength },
+        b: { y: scr.y, x: scr.x + whiskerHalfLength },
+      }
+    this.#drawLineAbsolute(line, this.#axisStyle.colour, this.#axisStyle.width, false);
+  }
+
+  #drawGridline(p: Cart.AxisMark, vertical: boolean) {
+    const line = vertical ?
+      this.#computeScreenLine({ x: p.x, y: Number.NEGATIVE_INFINITY }, { x: p.x, y: Number.POSITIVE_INFINITY }) :
+      this.#computeScreenLine({ y: p.y, x: Number.NEGATIVE_INFINITY }, { y: p.y, x: Number.POSITIVE_INFINITY }, false);
+    this.#drawLineAbsolute(line, this.#grid.colour, p.major ? this.#grid.width * 2 : this.#grid.width);
+  }
+
+  #useGrid() {
+    const g = this.#grid;
+    const showGrid = this.show.grid;
+    const showWhiskers = this.show.whiskers;
+    const showValues = this.show.axisValues;
+    const mm = this.getCurrentRange().range; // actual data range, or user-provided
+    const { increments, colour: strokeStyle, width: strokeWidth, major } = g;
+
+    // Vertical lines
+    const axisMarks = Cart.computeAxisMark(mm, increments, major);
+    for (const p of axisMarks.x) {
+      if (showGrid) this.#drawGridline(p, true);
+      if (showWhiskers && p.major) this.#drawWhisker(p, true);
+    }
+
+    // Horizontal lines
+    for (const p of axisMarks.y) {
+      if (showGrid) this.#drawGridline(p, false);
+      if (showWhiskers && p.major) this.#drawWhisker(p, false);
+    }
+
+    if (showValues) {
+      this.#drawXAxisValues(axisMarks.x.filter(p => p.major));
+      this.#drawYAxisValues(axisMarks.y.filter(p => p.major));
+    }
+  }
+
+  #drawSeries(name: string, series: Cart.PlotPoint[], meta: Cart.SeriesMeta) {
+    if (this.#connectStyle === `line`) {
+      this.#drawConnected(series, meta.colour, meta.lineWidth);
+    }
+
+    if (this.#valueStyle === `dot`) {
+      for (const v of series) {
+        this.#drawDot(v, meta.colour, meta.dotRadius);
+      }
+    }
+  }
+
+  #drawConnected(dots: Cart.PlotPoint[], colour: string, width: number) {
+    const ctx = this.helper.ctx;
+    ctx.beginPath();
+    for (let i = 0; i < dots.length; i++) {
+      const dot = this.#valueToElementSpace(dots[ i ], false);
+      if (i === 0) ctx.moveTo(dot.x, dot.y);
+      ctx.lineTo(dot.x, dot.y);
+    }
+    ctx.strokeStyle = Colour.resolveToString(colour);
+    ctx.lineWidth = width;
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  #drawDot(originalDot: Cart.PlotPoint, fallbackColour: string, fallbackRadius: number) {
+    const ctx = this.helper.ctx;
+    const dot = this.#valueToElementSpace(originalDot, false);
+    const radius = originalDot.radius ?? fallbackRadius;
+    //console.log(`dot ${ dot.x }x${ dot.y } (from ${ originalDot.x }x${ originalDot.y })`);
+    ctx.fillStyle = Colour.resolveToString(originalDot.fillStyle ?? fallbackColour);
+    ctx.beginPath();
+    ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+  }
+
+
+  #drawLineAbsolute(line: Line, colour: string, width: number, debug = false) {
+    if (debug) console.log(line);
+    const ctx = this.helper.ctx;
+    ctx.beginPath();
+    ctx.moveTo(line.a.x, line.a.y);
+    ctx.lineTo(line.b.x, line.b.y);
+    ctx.strokeStyle = Colour.resolveToString(colour);
+    ctx.lineWidth = width;
+    ctx.stroke();
+    ctx.closePath();
+  }
+}
