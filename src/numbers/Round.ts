@@ -1,7 +1,7 @@
 import { throwIntegerTest, throwNumberTest } from "../util/GuardNumbers.js";
 
-export function round(decimalPlaces: number, v: number): number;
-export function round(decimalPlaces: number): (v: number) => number;
+export function round(decimalPlaces: number, v: number, roundUp?: boolean): number;
+export function round(decimalPlaces: number, roundUp?: boolean): (v: number) => number;
 
 /**
  * Rounds a number.
@@ -22,18 +22,23 @@ export function round(decimalPlaces: number): (v: number) => number;
  * @param decimalPlaces
  * @returns
  */
-export function round(a: number, b?: number) {
+export function round(a: number, b?: number | boolean, roundUp?: boolean) {
   throwIntegerTest(a, `positive`, `decimalPlaces`);
 
-  //eslint-disable-next-line functional/no-let
+  let up = (typeof b === `boolean`) ? b : (roundUp ?? false)
   let rounder;
-  if (a === 0) rounder = Math.round;
-  else {
+  if (a === 0) {
+    rounder = Math.round;
+  } else {
     const p = Math.pow(10, a);
-    rounder = (v: number) => Math.floor(v * p) / p;
+    if (up) {
+      rounder = (v: number) => Math.ceil(v * p) / p;
+    } else {
+      rounder = (v: number) => Math.floor(v * p) / p;
+    }
   }
-
-  return b === undefined ? rounder : rounder(b);
+  if (typeof b === `number`) return rounder(b);
+  return rounder;
 }
 
 
