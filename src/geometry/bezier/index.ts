@@ -4,6 +4,7 @@ import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
 import type { Point } from '../point/PointType.js';
 import type { CubicBezier, CubicBezierPath, QuadraticBezier, QuadraticBezierPath } from './BezierType.js';
 import { isCubicBezier, isQuadraticBezier } from './Guard.js';
+import { to2d } from '../point/To.js';
 export * from './BezierType.js';
 export * from './Guard.js';
 /**
@@ -17,7 +18,9 @@ export const quadraticBend = (a: Point, b: Point, bend = 0): QuadraticBezier => 
 
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.
- * Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve
+ * Bend of -1 will pull curve down, 1 will pull curve up. 0 is no curve.
+ * 
+ * Use {@link interpolator} to calculate a point along the curve.
  * @param {Point} start Start of curve
  * @param {Point} end End of curve
  * @param {number} [bend=0] Bend amount, -1 to 1
@@ -52,10 +55,32 @@ export const quadraticSimple = (start: Point, end: Point, bend = 0): QuadraticBe
  * @param amt Amount
  * @returns Point
  */
-export const computeQuadraticSimple = (start: Point, end: Point, bend: number, amt: number): Point => {
-  const q = quadraticSimple(start, end, bend);
-  const bzr = new BezierLibrary(q.a, q.quadratic, q.b);
-  return bzr.compute(amt);
+// export const computeQuadraticSimple = (start: Point, end: Point, bend: number, amt: number): Point => {
+//   const q = quadraticSimple(start, end, bend);
+//   const bzr = new BezierLibrary(q.a, q.quadratic, q.b);
+//   return bzr.compute(amt);
+// };
+
+/**
+ * Interpolate cubic or quadratic bezier
+ * ```js
+ * const i = interpolator(myBezier);
+ * 
+ * // Get point at 50%
+ * i(0.5); // { x, y }
+ * ```
+ * @param q 
+ * @returns 
+ */
+export const interpolator = (q: QuadraticBezier | CubicBezier): (amount: number) => Point => {
+  //console.log(q);
+  //if (isCubicBezier(q)) console.log(`is cubic`);
+  //const bzr = isCubicBezier(q) ? new BezierLibrary(to2d(q.a), to2d(q.cubic1), to2d(q.cubic2), to2d(q.b)) : new BezierLibrary(q.a, q.quadratic, q.b);
+  const bzr = isCubicBezier(q) ?
+    new BezierLibrary(q.a.x, q.a.y, q.cubic1.x, q.cubic1.y, q.cubic2.x, q.cubic2.y, q.b.x, q.b.y) :
+    new BezierLibrary(q.a, q.quadratic, q.b);
+
+  return (amount: number) => bzr.compute(amount);
 };
 
 //https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
