@@ -826,11 +826,16 @@ export const triangle = (
 //   ctx.restore();
 // }
 
-export type RectOpts = DrawingOpts & {
-  readonly stroke?: boolean;
-  readonly filled?: boolean;
-  readonly strokeWidth?: number;
-}
+
+export type RectOpts = DrawingOpts & Readonly<Partial<{
+  stroke: boolean
+  filled: boolean
+  strokeWidth: number
+  /**
+   * If true, diagonals are drawn
+   */
+  crossed: boolean
+}>>
 
 /**
  * Draws one or more rectangles.
@@ -855,6 +860,14 @@ export const rect = (
     if (stroke) {
       if (opts.strokeWidth) ctx.lineWidth = opts.strokeWidth;
       ctx.strokeRect(x, y, d.width, d.height);
+    }
+    if (opts.crossed) {
+      ctx.moveTo(x, y);
+      ctx.lineTo(d.width, d.height);
+      ctx.stroke();
+      ctx.moveTo(0, d.height);
+      ctx.lineTo(d.width, 0);
+      ctx.stroke();
     }
     if (opts.debug) {
       pointLabels(ctx, RectsCorners(d), undefined, [ `NW`, `NE`, `SE`, `SW` ]);
