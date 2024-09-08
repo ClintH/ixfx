@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cubic-bezier</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+      font-family: system-ui;
+      color:silver;
+      background-color: hsl(0,0%,10%);
+    }
+    field {
+      display: inline-block;
+    }
+    fieldset {
+      border: none;
+      border-top:1px solid hsl(0,0%,30%);
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+    }
+
+    .handle {
+      border: 3px solid white;
+      border-radius: 50%;
+      width: 2rem;
+      height:2rem;
+      position: relative;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #container {
+      display:grid;
+    }
+    #container>* {
+      grid-area:1/1;
+    }
+
+    #point-a,#point-b {
+      background-color: blue;
+      color:white;
+    }
+    #point-cubic1,#point-cubic2 {
+      background-color: red;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="container">
+      <canvas id="plot"></canvas>
+      <div class="handle" id="point-a">A</div>
+      <div class="handle" id="point-b">B</div>
+
+      <div class="handle" id="point-cubic1">1</div>
+      <div class="handle" id="point-cubic2">2</div>
+    </div>
+    <div>
+      <fieldset>
+        <legend>A</legend>
+        <label for="range-a-x">X</label>
+        <input type="number" min="0" max="1" step="0.01" id="a-x">
+        <label for="a-y">Y</label>
+        <input type="number" min="0" max="1" step="0.01" id="a-y">
+      </fieldset>
+
+      <fieldset>
+        <legend>B</legend>
+        <label for="b-x">X</label>
+        <input type="number" min="0" max="1" step="0.01" id="b-x">
+
+        <label for="b-y">Y</label>
+        <input type="number" min="0" max="1" step="0.01" id="b-y">
+
+      </fieldset>
+      <fieldset>
+        <legend>Cubic 1</legend>
+        <label for="cubic1-x">X</label>
+        <input type="number" min="0" max="1" step="0.01" id="cubic1-x">
+        <label for="cubic1-y">Y</label>
+        <input type="number" min="0" max="1" step="0.01" id="cubic1-y">
+      </fieldset>
+      <fieldset>
+        <legend>Cubic 2</legend>
+        <label for="cubic2-x">X</label>
+        <input type="number" min="0" max="1" step="0.01" id="cubic2-x">
+        <label for="cubic2-y">Y</label>
+        <input type="number" min="0" max="1" step="0.01" id="cubic2-y">
+      </fieldset>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
