@@ -6,6 +6,7 @@ import { multiplyScalar as RectsMultiplyScalar } from "../geometry/rect/Multiply
 import { windowResize } from "./DomRx.js";
 import { SimpleEventEmitter } from "../Events.js";
 import { guard as RectsGuard } from '../geometry/rect/Guard.js';
+import { Drawing } from 'src/visual/index.js';
 
 export type CanvasEvents = {
   /**
@@ -344,6 +345,12 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    */
   get toAbsolute() {
     return this.#scaler.abs;
+  }
+
+  drawBounds(strokeStyle = `green`) {
+    Drawing.rect(this.#getContext(),
+      { x: 0, y: 0, width: this.width, height: this.height },
+      { crossed: true, strokeStyle, strokeWidth: 2 })
   }
 
   /**
