@@ -22,3 +22,4 @@ export const divide = (line: Line, point: Point): Line => Object.freeze({
   a: PointDivide(line.a, point),
   b: PointDivide(line.b, point)
 });
+
