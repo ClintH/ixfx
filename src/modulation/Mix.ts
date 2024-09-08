@@ -19,9 +19,10 @@ export const mix = (amount: number, original: number, modulation: number) => {
   return base + (original * m);
 };
 
+
 /**
- * Returns a mix of two modulate functions which are
- * both given the same input value.
+ * Returns a modulator that mixes between two modulation functions.
+ * Both modulators are given the same input value.
  *
  * ```js
  * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
