@@ -67,6 +67,7 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
   for (const [ key, source ] of Object.entries(reactiveSources)) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const initialData = (`last` in source) ? (source as any).last() : undefined;
+    //console.log(`initialData: ${ initialData } src: ${ (source as any).last() }`);
     const s: State<any> = {
       source: resolveSource(source),
       done: false,
