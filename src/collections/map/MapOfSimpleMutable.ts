@@ -28,6 +28,7 @@ import { MapOfSimpleBase } from './MapOfSimpleBase.js';
 export class MapOfSimpleMutable<V>
   extends MapOfSimpleBase<V>
   implements IMapOfMutable<V> {
+
   addKeyedValues(key: string, ...values: ReadonlyArray<V>) {
     const existing = this.map.get(key);
     if (existing === undefined) {
@@ -37,6 +38,15 @@ export class MapOfSimpleMutable<V>
     }
   }
 
+  /**
+   * Set `values` to `key`.
+   * Previous data stored under `key` is thrown away.
+   * @param key 
+   * @param values 
+   */
+  setValues(key: string, values: ReadonlyArray<V>) {
+    this.map.set(key, values);
+  }
 
   /**
    * Adds a value, automatically extracting a key via the
