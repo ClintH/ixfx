@@ -1,6 +1,6 @@
 A rough changelog between NPM releases
 
-# 0.30.1 2024.09.10
+# 0.30.2 2024.09.10
 
 Data
 + resolveFieldsSync: synchronous version of Data.resolveFields
@@ -11,6 +11,9 @@ Rx
 Modulation
 * Envelope: fixed 'shouldLoop' bug
 + timingSourceFactory: returns a function which creates one of the relative timers
+
+Trackers
++ rate: Tracks the rate of events, eg clicks per second
 
 # 0.30.0 2024.09.08
 
