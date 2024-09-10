@@ -1,5 +1,5 @@
 import type { ReactiveNonInitial } from "src/rx/Types.js";
-import { resolve, type ResolveToValue } from "./Resolve.js";
+import { resolve, resolveSync, type ResolveToValue } from "./Resolve.js";
 import { zip } from "./arrays/Zip.js";
 
 export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
@@ -25,6 +25,8 @@ export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
  * that has a basic value (string, number, boolean, object), the value is set
  * for the return object. If the property is a function or generator, its value
  * is used instead. Async functions and generators are also usable.
+ * 
+ * Use {@link resolveFieldsSync} for a synchronous version.
  * 
  * Not recursive.
  * 
@@ -66,6 +68,17 @@ export async function resolveFields<T extends Record<string, ResolveToValue<any>
   const entries = zip(keys, results);
   return Object.fromEntries(entries) as ResolvedObject<T>;
 }
+
+export function resolveFieldsSync<T extends Record<string, ResolveToValue<any>>>(object: T): ResolvedObject<T> {
+  const entries: [ key: string, value: any ][] = [];
+  for (const entry of Object.entries(object)) {
+    const resolvable = entry[ 1 ] as ResolveToValue<typeof entry[ 1 ]>;
+    const value = resolveSync(resolvable);
+    entries.push([ entry[ 0 ], value ]);
+  }
+  return Object.fromEntries(entries) as ResolvedObject<T>;
+}
+
 
 /**
  * Returns a function that resolves `object`.
