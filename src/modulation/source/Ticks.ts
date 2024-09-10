@@ -12,8 +12,11 @@ export type TicksModSettableOptions = ModSettableOptions & {
  *
  * Ie. if totalTicks = 10, we get: 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
  * 
- * Use 'exclusiveStart' or 'exclusiveEnd' to shift range. Eg 'exclusiveStart' will begin at 0.1 and
- * include 1.0, while 'exclusiveEnd' will start at 0 and run up to and including 0.9.
+ * Use 'exclusiveStart' and 'exclusiveEnd' flags to shift range. Eg, with `totalTicks` of 10: 
+ * * 'exclusiveStart:true': first value is 0.1, last value is 1.0 (10 values total)
+ * * 'exclusiveEnd:true': first value is 0, last value is 0.9 (10 values total)
+ * * If both are true, first value is 0.1, last value is 0.9 (9 values total)
+ * * If both are false (or not set), we get the case described earlier, first value is 0, last value is 1 (11 values total)
  * 
  * Other examples:
  * * totalTicks: 20, value goes up by 0.05
