@@ -1,5 +1,17 @@
 A rough changelog between NPM releases
 
+# 0.30.1 2024.09.10
+
+Data
++ resolveFieldsSync: synchronous version of Data.resolveFields
+
+Rx
+* Ops.tapProcess: fixed bug
+  
+Modulation
+* Envelope: fixed 'shouldLoop' bug
++ timingSourceFactory: returns a function which creates one of the relative timers
+
 # 0.30.0 2024.09.08
 
 Collections
