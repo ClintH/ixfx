@@ -369,7 +369,7 @@ export * as Events from './Events.js';
  * 
  * Simple modulators take in a value and return result as a number
  * * {@link springShape}: Spring physics
- * * {@link squareShape}, {@link sineShape}, {@link sineBipolarShape} {@link triangleShape}: waveforms. Use {@wave} to have these run over time
+ * * {@link squareShape}, {@link sineShape}, {@link sineBipolarShape} {@link triangleShape}: waveforms. Use {@link wave} to have these run over time
  * * {@link cubicBezierShape}, {@link arcShape}
  * 
  * Sources
