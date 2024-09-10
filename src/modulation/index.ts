@@ -37,6 +37,7 @@ export * as Sources from './source/index.js';
 export * from './CubicBezier.js'
 export * from './Drift.js';
 
+
 /**
  * Forces module can help to compute basic physical forces like gravity, friction, springs etc.
  * [See the ixfx Guide](https://ixfx.fun/modulation/forces/introduction/).
@@ -91,6 +92,8 @@ export * from './Noop.js';
 export * as Oscillators from './Oscillator.js';
 export * from './PingPong.js';
 export * from './Spring.js';
+export * from './TimingSourceFactory.js';
+
 export type * from './Types.js';
 export * from './Waveforms.js';
 export * from './WeightedAverage.js';
