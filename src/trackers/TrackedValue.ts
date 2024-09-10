@@ -33,7 +33,7 @@ export type TrackedValueOpts = {
   readonly sampleLimit?: number;
 
   /**
-   * If true
+   * If _true_, prints debug info
    */
   readonly debug?: boolean
 };
