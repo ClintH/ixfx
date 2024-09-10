@@ -8,29 +8,8 @@ import { Colour } from "../index.js";
 import { round } from "src/numbers/Round.js";
 import { resolveEl } from "src/dom/ResolveEl.js";
 import { Points } from "src/geometry/index.js";
+import type { GridStyle, LineStyle, SeriesMeta, ShowOptions, TextStyle } from "./Types.js";
 
-type Scaler = (pt: Point) => Point;
-
-type DataRangeDependencies = {
-  /**
-   * Converts a data value to relative value (0..1)
-   */
-  valueToRelative: Scaler
-  /**
-   * Converts a relative value to element-based coordinates
-   * (ie 0,0 is top-left of CANVAS)
-   */
-  relativeToElementSpace: Scaler
-  /**
-   * Converts canvas coordinate to relative
-   */
-  elementSpaceToRelative: Scaler,
-  /**
-   * Converts relative coordinate to value
-   */
-  relativeToValue: Scaler
-  range: Cart.PointMinMax
-}
 
 /**
  * Simple plotting of cartesian values.
@@ -69,7 +48,7 @@ export class CartesianCanvasPlot {
 
   actualDataRange: RectPositioned = Rects.EmptyPositioned;
   visibleRange: RectPositioned = Rects.PlaceholderPositioned;
-  show: Cart.ShowOptions;
+  show: ShowOptions;
   whiskerLength: number;
   axisRounder = round(1, true);
 
@@ -77,23 +56,23 @@ export class CartesianCanvasPlot {
    * List of lines to draw after drawing everything else.
    * Lines are given in value-coordinate space
    */
-  overlayLines: (Line & Cart.LineStyle)[] = [];
+  overlayLines: (Line & LineStyle)[] = [];
 
   renderArea: RectPositioned & { dimensionMin: number } = { ...Rects.EmptyPositioned, dimensionMin: 0 };
   margin;
 
-  #grid: Cart.GridStyle
+  #grid: GridStyle
   #rangeMode;
 
-  #currentRange?: DataRangeDependencies;
+  #currentRange?: Cart.CartesianDataRange;
 
-  #axisStyle: Cart.LineStyle;
+  #axisStyle: LineStyle;
   #valueStyle;
   #connectStyle;
   #rangeManual: Cart.PointMinMax | undefined;
-  #textStyle: Cart.TextStyle;
+  #textStyle: TextStyle;
 
-  constructor(domQueryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, Cart.SeriesMeta>, options: Partial<Cart.CartesianPlotOptions> = {}) {
+  constructor(domQueryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: Partial<Cart.CartesianPlotOptions> = {}) {
     if (!data) throw new TypeError(`Param 'data' is undefined`);
     if (typeof data !== `object`) throw new TypeError(`Param 'data' is not an object. Got: ${ typeof data }`);
     this.#data = data;
@@ -168,7 +147,7 @@ export class CartesianCanvasPlot {
     return r;
   }
 
-  #createRange(): DataRangeDependencies {
+  #createRange(): Cart.CartesianDataRange {
     // Compute scale of data
     const range = this.getDataRange(); // actual data range, or user-provided
 
@@ -339,7 +318,7 @@ export class CartesianCanvasPlot {
     return { a: valueA, b: valueB };
   }
 
-  getDefaultMeta(): Cart.SeriesMeta {
+  getDefaultMeta(): SeriesMeta {
     return {
       colour: Colour.goldenAngleColour(this.#data.metaCount),
       lineWidth: 2,
@@ -383,7 +362,7 @@ export class CartesianCanvasPlot {
     this.#drawLineAbsolute(l, colour, width);
   }
 
-  setMeta(series: string, meta: Partial<Cart.SeriesMeta>) {
+  setMeta(series: string, meta: Partial<SeriesMeta>) {
     this.#data.setMeta(series, {
       ...this.getDefaultMeta(),
       ...meta
@@ -486,7 +465,7 @@ export class CartesianCanvasPlot {
     }
   }
 
-  #drawSeries(name: string, series: Cart.PlotPoint[], meta: Cart.SeriesMeta) {
+  #drawSeries(name: string, series: Cart.PlotPoint[], meta: SeriesMeta) {
     if (this.#connectStyle === `line`) {
       this.#drawConnected(series, meta.colour, meta.lineWidth);
     }

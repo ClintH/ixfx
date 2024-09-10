@@ -1,41 +1,38 @@
 
 import { scaler } from "src/numbers/Scale.js";
 import type { Point } from "../../geometry/point/PointType.js";
+import type { GridStyle, LineStyle, ShowOptions, TextStyle } from "./Types.js";
 
 export type PointMinMax = { min: Point, max: Point, width: number, height: number, minDim: number, maxDim: number };
 
-export type TextStyle = {
-  font: string
-  colour: string
-  size: string
-}
-
-export type LineStyle = {
-  colour: string
-  width: number
-}
-
-export type GridStyle = LineStyle & {
-  increments: number,
-  major: number
-}
-
-export type ShowOptions = {
-  axes: boolean
-  axisValues: boolean
-  grid: boolean
-  whiskers: boolean
-}
 export type PlotPoint = Point & {
   fillStyle?: string
   radius?: number
 }
 
-export type SeriesMeta = {
-  colour: string
-  lineWidth: number
-  dotRadius: number
+export type CartesianScaler = (pt: Point) => Point;
+
+export type CartesianDataRange = {
+  /**
+   * Converts a data value to relative value (0..1)
+   */
+  valueToRelative: CartesianScaler
+  /**
+   * Converts a relative value to element-based coordinates
+   * (ie 0,0 is top-left of CANVAS)
+   */
+  relativeToElementSpace: CartesianScaler
+  /**
+   * Converts canvas coordinate to relative
+   */
+  elementSpaceToRelative: CartesianScaler,
+  /**
+   * Converts relative coordinate to value
+   */
+  relativeToValue: CartesianScaler
+  range: PointMinMax
 }
+
 
 export type CartesianPlotOptions = {
 
