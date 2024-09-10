@@ -12,7 +12,7 @@ import type { ReactiveOrSource, Reactive, ReactiveWritable, ReactiveOp } from ".
 export function tapProcess<In, T2, T3, T4, T5, T6>(input: ReactiveOrSource<In>, ...processors: Process.Processors<In, T2, T3, T4, T5, T6>): Reactive<In> {
   const inputStream = resolveSource(input);
   // @ts-expect-error
-  const chain = Process.chain(...processors);
+  const chain = Process.flow(...processors);
   inputStream.onValue(value => {
     chain(value);
   });
