@@ -70,16 +70,25 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
   get isDisposed() {
     return this.#disposed;
   }
-  protected switchStateIfNeeded(): boolean {
+
+  /**
+   * Changes state based on timer status
+   * @returns _True_ if state was changed
+   */
+  protected switchStateIfNeeded(allowLooping: boolean): boolean {
     if (this.#timer === undefined) return false;
     let elapsed = this.#timer.elapsed;
     const wasHeld = this.#holdingInitial && !this.#holding;
 
     // Change through states for as long as needed
     let hasChanged = false;
+    //console.log(`AdsrBase.switchStateIfNeeded elapsed: ${ elapsed } wasHeld: ${ wasHeld }`);
+    let state = this.#sm.state;
     do {
       hasChanged = false;
-      switch (this.#sm.state) {
+      state = this.#sm.state;
+      //console.log(`  AdsrBase.switchStateIfNeeded: ${ state }`);
+      switch (state) {
         case `attack`: {
           if (elapsed > this.attackDuration || wasHeld) {
             this.#sm.next();
@@ -111,28 +120,29 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
           break;
         }
         case `complete`: {
-          if (this.shouldLoop) {
+          if (this.shouldLoop && allowLooping) {
             this.trigger(this.#holdingInitial);
           }
         }
       }
-    } while (hasChanged);
+    } while (hasChanged && state !== `complete`);
     return hasChanged;
   }
 
   /**
-   * Computes a stage progress from 0-1
+   * Computes a stage's progress from 0-1
    * @param allowStateChange
    * @returns
    */
   protected computeRaw(
-    allowStateChange = true
+    allowStateChange = true,
+    allowLooping = true
   ): [ stage: string | undefined, amount: number, prevStage: string ] {
     if (this.#timer === undefined) {
       return [ undefined, 0, this.#sm.state ];
     }
     // Change state if necessary based on elapsed time
-    if (allowStateChange) this.switchStateIfNeeded();
+    if (allowStateChange) this.switchStateIfNeeded(allowLooping);
 
     const previousStage = this.#sm.state;
     const elapsed = this.#timer.elapsed;
@@ -157,7 +167,7 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
         break;
       }
       case `complete`: {
-        return [ undefined, 1, previousStage ];
+        return [ `complete`, 1, previousStage ];
       }
       default: {
         throw new Error(`State machine in unknown state: ${ state }`);
@@ -178,12 +188,18 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
   }
 
   /**
-   * Triggers envelope.
+   * Triggers envelope, optionally _holding_ it.
+   * 
+   * If `hold` is _false_ (default), envelope will run through all stages,
+   * but sustain stage won't have an affect.
+   * 
+   * If `hold` is _true_, it will run to, and stay at the sustain stage. 
+   * Use {@link release} to later release the envelope.
    *
-   * If event is already trigged,
-   * it will be _retriggered_. If`opts.retriggered` is false (default)
-   * envelope starts again at `opts.initialValue`. Otherwise it starts at
-   * the current value.
+   * If event is already trigged it will be _retriggered_. 
+   * Initial value depends on `opts.retrigger`
+   * * _false_ (default): envelope continues at current value.
+   * * _true_: envelope value resets to `opts.initialValue`.
    *
    * @param hold If _true_ envelope will hold at sustain stage
    */

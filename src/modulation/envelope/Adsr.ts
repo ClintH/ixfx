@@ -70,7 +70,7 @@ export class AdsrIterator implements Iterator<number> {
  * shouldLoop: boolean
  * ```
  *
- * If `retrigger` is false, re-triggers will continue at current level
+ * If `retrigger` is _false_ (default), a re-triggered envelope continues at current value
  * rather than resetting to `initialLevel`.
  *
  * If `shouldLoop` is true, envelope loops until `release()` is called.
@@ -183,7 +183,9 @@ export class Adsr extends AdsrBase implements Iterable<number> {
   protected onTrigger() {
     this.initialLevelOverride = undefined;
     if (!this.retrigger) {
-      const [ _stage, scaled, _raw ] = this.compute();
+      const [ _stage, scaled, _raw ] = this.compute(true, false);
+      //console.log(`Adsr stage: ${ _stage } scaled: ${ scaled } raw: ${ _raw }`);
+
       if (!Number.isNaN(scaled) && scaled > 0) {
         this.initialLevelOverride = scaled;
       }
@@ -209,9 +211,12 @@ export class Adsr extends AdsrBase implements Iterable<number> {
    * @param allowStateChange If true (default) envelope will be allowed to change state if necessary before returning value
    */
   compute(
-    allowStateChange = true
+    allowStateChange = true,
+    allowLooping = true
   ): [ stage: string | undefined, scaled: number, raw: number ] {
-    const [ stage, amt ] = super.computeRaw(allowStateChange);
+    const [ stage, amt ] = super.computeRaw(allowStateChange, allowLooping);
+    //console.log(`Adsr.compute: stage: ${ stage } amt: ${ amt }!`);
+    // Stage is undefined when envelope is complete or underlying timer is undefined
     if (stage === undefined) return [ undefined, Number.NaN, Number.NaN ];
     let v;
     switch (stage) {
