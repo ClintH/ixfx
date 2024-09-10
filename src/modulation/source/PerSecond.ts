@@ -2,7 +2,7 @@ import type { ModSource } from "../Types.js";
 
 /**
  * Returns a proportion of `amount` depending on elapsed time.
- * The idea being that cumulatively, `amount` is yielded every second.
+ * Cumulatively, `amount` is yielded every second.
  * 
  * ```js
  * // Calculate a proportion of 0.1 every second
@@ -17,7 +17,7 @@ import type { ModSource } from "../Types.js";
  * ```js
  * const settings = {
  *  ageMod: perSecond(0.1);
-* };
+ * };
  * 
  * let state = {
  *  age: 1
@@ -36,16 +36,18 @@ import type { ModSource } from "../Types.js";
  * });
  * ```
  * 
- * Options:
- * * max: if specified, the max return value
- * * min: if specified, the min return value
+ * Use the `clamp` option so the returned value never exceeds `amount`.
+ * Alternatively, `min`/`max` options allow you to set arbitrary limits.
  * @param amount
  * @returns 
  */
-export const perSecond = (amount: number, options: Partial<{ max: number, min: number }> = {}): ModSource => {
+export const perSecond = (amount: number, options: Partial<{ clamp: boolean, max: number, min: number }> = {}): ModSource => {
   const perMilli = amount / 1000;
-  const min = options.min ?? Number.MIN_SAFE_INTEGER;
-  const max = options.max ?? Number.MAX_SAFE_INTEGER;
+  let min = options.min ?? Number.MIN_SAFE_INTEGER;
+  let max = options.max ?? Number.MAX_SAFE_INTEGER;
+  const clamp = options.clamp ?? false;
+  if (clamp && options.max) throw new Error(`Use either 'max' or 'clamp', not both.`);
+  if (clamp) max = amount;
   let called = performance.now();
 
   return () => {
@@ -65,6 +67,6 @@ export const perSecond = (amount: number, options: Partial<{ max: number, min: n
  * @param options 
  * @returns 
  */
-export const perMinute = (amount: number, options: Partial<{ max: number, min: number }> = {}): ModSource => {
+export const perMinute = (amount: number, options: Partial<{ clamp: boolean, max: number, min: number }> = {}): ModSource => {
   return perSecond(amount / 60, options);
 }
