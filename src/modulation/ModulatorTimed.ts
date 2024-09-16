@@ -4,7 +4,7 @@ import * as Timer from '../flow/Timer.js';
 import { throwFunctionTest } from "../util/GuardFunction.js";
 
 /**
- * Produce values over time. When the modulate is complete, the final
+ * Produce values over time. When the modulate function is complete, the final
  * value continues to return. Timer starts when return function is first invoked.
  * 
  * ```js
