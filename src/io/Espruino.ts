@@ -113,7 +113,9 @@ export const puck = async (opts: EspruinoBleOpts = {}) => {
     optionalServices: [ NordicDefaults.service ],
   });
 
-  console.log(device.name);
+  if (opts.debug) {
+    console.log(`Espruino.puck device name: ${ device.name }`);
+  }
   const d = new EspruinoBleDevice(device, { name, debug });
   await d.connect();
   return d;
