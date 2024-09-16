@@ -1,6 +1,7 @@
 export * from './Abs.js';
 export * from './Angle.js';
 export * from './Apply.js';
+export * from './Averager.js';
 export * from './Bbox.js';
 export * from './Centroid.js';
 export * from './Clamp.js';
