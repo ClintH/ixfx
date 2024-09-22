@@ -46,12 +46,12 @@ export type DataAnalyser = (
  *  // Demo: Get FFT value for a particular frequency (1KHz)
  *  const amt = freq[analyser.getIndexForFrequency(1000)];
  * }
- * basic(onData, {fftSize: 512});
+ * analyserBasic(onData, {fftSize: 512});
  * ```
  *
  * An `Analyser` instance is returned and can be controlled:
  * ```js
- * const analyser = basic(onData);
+ * const analyser = analyserBasic(onData);
  * analyser.paused = true;
  * ```
  *
@@ -61,7 +61,7 @@ export type DataAnalyser = (
  * @param opts Options
  * @returns Analyser instance
  */
-export const basic = (
+export const analyserBasic = (
   onData: (
     freq: Float32Array,
     wave: Float32Array,
@@ -93,7 +93,7 @@ export const basic = (
  *    console.log(`${i}. frequency: ${f} amount: ${freq[i]}`);
  *  }
  * }
- * freq(onData, {fftSize:512});
+ * analyserFrequency(onData, {fftSize:512});
  * ```
  *
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
@@ -102,7 +102,7 @@ export const basic = (
  * @param opts
  * @returns
  */
-export const freq = (
+export const analyserFrequency = (
   onData: (freq: Float32Array, analyser: AudioAnalyser) => void,
   opts: Opts = {}
 ): AudioAnalyser =>
@@ -116,7 +116,7 @@ export const freq = (
  * Basic audio analyser which reports the peak sound level.
  *
  * ```js
- * peakLevel(level => {
+ * analyserPeakLevel(level => {
  *  console.log(level);
  * });
  * ```
@@ -126,7 +126,7 @@ export const freq = (
  * @param opts
  * @returns
  */
-export const peakLevel = (
+export const analyserPeakLevel = (
   onData: (level: number, analyser: AudioAnalyser) => void,
   opts: Opts = {}
 ): AudioAnalyser =>
