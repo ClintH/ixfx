@@ -1,5 +1,21 @@
 A rough changelog between NPM releases
 
+# 0.31.0 2024.09.22
+
+Geometry
++ radiansSum/degreesSum: add angles with wrap-around logic
++ radianArc/degreeArc: calculate span of angles with wrap-around logic
+
+Geometry.Arcs
++ getStartEnd: calculate x,y of arc start & end
++ angularSize: calculate angular size of arc
++ fromCircle: using a circle as input, make an arc
++ fromCircleAmount: using a circle, start angle and span of arc, make an arc
+* Made 'clockwise' explicit on arcs to avoid confusion
+
+Geometry.Points
++ averager: calculate average of points, with selectable algorithm
+
 # 0.30.2 2024.09.10
 
 Data
