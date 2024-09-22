@@ -1,8 +1,6 @@
-import type { Path } from '../../geometry/path/index.js';
 import * as Points from '../../geometry/point/index.js';
 import * as Bezier from '../../geometry/bezier/index.js';
-import { sine } from '../Oscillator.js';
-import { scale } from 'src/numbers/Scale.js';
+import { scale } from '../../numbers/Scale.js';
 
 /**
  * Interpolates points along a line.
