@@ -1,7 +1,7 @@
 import type { Point } from "../point/PointType.js"
 
 /**
- * Arc, defined by radius, start and end point in radians, and whether it is counter-clockwise.
+ * Arc, defined by radius, start and end point in radians and direction
  */
 export type Arc = {
   /**
@@ -17,12 +17,12 @@ export type Arc = {
    */
   readonly endRadian: number
   /**
-   * If true, arc is counter-clockwise
+   * If true, arc runs in clockwise direction
    */
-  readonly counterClockwise?: boolean
+  readonly clockwise: boolean
 }
 
 /**
- * An {@link Geometry.Arcs.Arc} that also has a position, given in x, y
+ * An {@link Geometry.Arcs.Arc} that also has a center position, given in x, y
  */
 export type ArcPositioned = Point & Arc;
