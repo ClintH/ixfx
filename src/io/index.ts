@@ -3,8 +3,8 @@
  */
 export * as Bluetooth from './NordicBleDevice.js';
 
-export * as AudioAnalysers from './AudioAnalyser.js';
-export * as AudioVisualisers from './AudioVisualiser.js';
+export * as Audio from './audio/index.js';
+
 export * from './Types.js';
 export * from './GenericStateTransitions.js';
 

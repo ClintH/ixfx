@@ -11,10 +11,10 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import { number as numberTracker } from '../trackers/NumberTracker.js';
-import { AudioAnalyser } from './AudioAnalyser.js';
-import type { Point } from '../geometry/point/PointType.js';
-import { minMaxAvg } from '../numbers/MinMaxAvg.js';
+import { number as numberTracker } from '../../trackers/NumberTracker.js';
+import { AudioAnalyser } from './Analyser.js';
+import type { Point } from '../../geometry/point/PointType.js';
+import { minMaxAvg } from '../../numbers/MinMaxAvg.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export default class AudioVisualiser {

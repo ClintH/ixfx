@@ -1,6 +1,6 @@
-import AudioVisualiser from './AudioVisualiser.js';
-import { throwNumberTest, throwIntegerTest, isPowerOfTwo } from '../util/GuardNumbers.js';
-import { max, maxFast } from '../numbers/NumericArrays.js';
+import AudioVisualiser from './Visualiser.js';
+import { throwNumberTest, throwIntegerTest, isPowerOfTwo } from '../../util/GuardNumbers.js';
+import { max, maxFast } from '../../numbers/NumericArrays.js';
 
 /**
  * Options for audio processing
