@@ -167,7 +167,7 @@ type Interpolate = {
  * @param arc Arc
  * @param amount Relative position 0-1
  * @param origin If arc is not positioned, pass in an origin
- * @params allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
+ * @param allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
  * @returns 
  */
 export const interpolate: Interpolate = (amount: number, arc: ArcPositioned | Arc, allowOverflow?: boolean, origin?: Point): Point => {

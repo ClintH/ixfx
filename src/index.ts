@@ -117,8 +117,7 @@ export * as Text from './Text.js';
  * Input and output to devices, sensors and actuators.
  * 
  * Modules:
- * * {@link AudioAnalysers}: Process audio
- * * {@link AudioVisualisers}: Visualise audio
+ * * {@link Audio}: Process, visualise & generate audio
  * * {@link Bluetooth}: Connect to devices via BLE
  * * {@link Camera}: Get frames from the device's camera
  * * {@link Espruino}: Connect to Espruino devices via USB or BLE

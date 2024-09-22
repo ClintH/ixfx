@@ -1,6 +1,7 @@
-import AudioVisualiser from './Visualiser.js';
+
 import { throwNumberTest, throwIntegerTest, isPowerOfTwo } from '../../util/GuardNumbers.js';
 import { max, maxFast } from '../../numbers/NumericArrays.js';
+import { AudioVisualiser } from './Visualiser.js';
 
 /**
  * Options for audio processing
@@ -36,7 +37,7 @@ export type DataAnalyser = (
 ) => void;
 
 /**
- * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link peakLevel} if you want sound level, or {@link freq} if you just want FFT results.
+ * Basic audio analyser. Returns back waveform and FFT analysis. Use {@link analyserPeakLevel} if you want sound level, or {@link analyserFrequency} if you just want FFT results.
  *
  * ```js
  * const onData = (freq, wave, analyser) => {
@@ -57,7 +58,7 @@ export type DataAnalyser = (
  *
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
  *
- * @param onData Handler for data
+* @param onData Handler for data
  * @param opts Options
  * @returns Analyser instance
  */
@@ -83,7 +84,7 @@ export const analyserBasic = (
   }, opts);
 
 /**
- * Basic audio analyser. Returns FFT analysis. Use {@link peakLevel} if you want the sound level, or {@link basic} if you also want the waveform.
+ * Basic audio analyser. Returns FFT analysis. Use {@link analyserPeakLevel} if you want the sound level, or {@link analyserBasic} if you also want the waveform.
  *
  * ```js
  * const onData = (freq, analyser) => {
@@ -149,10 +150,10 @@ export const analyserPeakLevel = (
  * const a = new Analyser(myAnalysis);
  * ```
  *
- * Two helper functions provide ready-to-use Analysers:
- * * {@link peakLevel} peak decibel reading
- * * {@link freq} FFT results
- * * {@link basic} FFT results and waveform
+ * Helper functions provide ready-to-use Analysers:
+ * * {@link analyserPeakLevel} peak decibel reading
+ * * {@link analyserFrequency} FFT results
+ * * {@link analyserBasic} FFT results and waveform
  *
  * Note: Browers won't allow microphone access unless the call has come from a user-interaction, eg pointerup event handler.
  *

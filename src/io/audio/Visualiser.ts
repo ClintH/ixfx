@@ -17,7 +17,7 @@ import type { Point } from '../../geometry/point/PointType.js';
 import { minMaxAvg } from '../../numbers/MinMaxAvg.js';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
-export default class AudioVisualiser {
+export class AudioVisualiser {
   freqMaxRange = 200;
   audio: AudioAnalyser;
   parent: HTMLElement;
