@@ -11,3 +11,4 @@ export { type Line, type PolyLine } from "./line/LineType.js";
 export { type Point, type Point3d } from "./point/PointType.js";
 export type { PointCalculableShape, ShapePositioned } from './shape/index.js';
 export type { Triangle } from './triangle/TriangleType.js'
+export type { Arc, ArcPositioned } from './arc/ArcType.js';
