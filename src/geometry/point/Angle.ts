@@ -1,3 +1,4 @@
+import { piPi } from "../../numbers/Interpolate.js";
 import { guard } from "./Guard.js";
 import type { Point } from "./PointType.js";
 
@@ -10,6 +11,9 @@ import type { Point } from "./PointType.js";
  * Same for under `a`.
  *
  * Providing a third point `c` gives the interior angle, where `b` is the middle point.
+ * 
+ * See also {@link angleRadianCircle} which returns coordinates on 0..Math.Pi*2
+ * range. This avoids negative numbers.
  * @param a
  * @param b
  * @param c
@@ -29,3 +33,25 @@ export const angleRadian = (a: Point, b?: Point, c?: Point) => {
   guard(c, `c`);
   return Math.atan2(b.y - a.y, b.x - a.x) - Math.atan2(c.y - a.y, c.x - a.x);
 };
+
+/**
+ * Returns the angle between point(s) using a radian circle system.
+ * ```
+ *       90deg
+ *       Pi/2
+ *        |
+ * Pi  ---+--- 0
+ * 180    |
+ *       3PI/2
+ *       270deg
+ * ```
+ * @param a 
+ * @param b 
+ * @param c 
+ * @returns 
+ */
+export const angleRadianCircle = (a: Point, b?: Point, c?: Point) => {
+  const angle = angleRadian(a, b, c);
+  if (angle < 0) return angle + piPi
+  return angle;
+}

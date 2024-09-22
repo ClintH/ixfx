@@ -2,6 +2,9 @@ A rough changelog between NPM releases
 
 # 0.31.0 2024.09.22
 
+Io.Audio
++ Added simple audio graph creation from an oscillator or AUDIO element
+
 Geometry
 + radiansSum/degreesSum: add angles with wrap-around logic
 + radianArc/degreeArc: calculate span of angles with wrap-around logic
@@ -15,7 +18,8 @@ Geometry.Arcs
 
 Geometry.Points
 + averager: calculate average of points, with selectable algorithm
-
++ angleRadianCircle: angle between point(s) based on a circle, rather than bipolar -180...180 range of angleRadian
+  
 # 0.30.2 2024.09.10
 
 Data

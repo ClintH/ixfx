@@ -3,6 +3,7 @@ import test, { type ExecutionContext } from 'ava';
 import * as Points from '../../geometry/point/index.js';
 import { divide, divider } from '../../geometry/point/Divider.js';
 import { isApprox } from '../../numbers/IsApprox.js';
+import { radianToDegree } from '../../geometry/Angles.js';
 
 function closeTo(t: ExecutionContext<unknown>, input: number, target: number, percent: number = 0.001) {
   const diff = (Math.abs(target - input) / target);
@@ -10,6 +11,18 @@ function closeTo(t: ExecutionContext<unknown>, input: number, target: number, pe
   if (diff <= percent) return;
   t.fail(`Value: ${ input } target: ${ target } diff%: ${ diff * 100 }`);
 }
+
+test(`angleRadianCircle`, t => {
+  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 1 })), 45);
+  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: -1 })), 225);
+  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 0 })), 0);
+  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: 1 })), 135);
+  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: -1 })), 315);
+  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 0, y: 1 })), 90);
+
+
+});
+
 
 test(`abs`, t => {
   t.deepEqual(Points.abs({ x: 1, y: 2 }), { x: 1, y: 2 });
