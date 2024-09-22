@@ -1,4 +1,4 @@
-import { degreeToRadian } from '../Angles.js';
+import { degreeToRadian, radianArc, radiansSum } from '../Angles.js';
 import { guard as guardPoint, isPoint } from '../point/Guard.js';
 import { distance as pointsDistance } from '../point/Distance.js';
 import { bbox as pointsBbox } from '../point/Bbox.js';
@@ -9,6 +9,7 @@ import type { Path } from '../path/index.js';
 import type { Rect, RectPositioned } from '../rect/index.js';
 import { fromPoints as LinesFromPoints } from '../line/FromPoints.js';
 import type { Arc, ArcPositioned } from './ArcType.js';
+import type { CirclePositioned } from '../Types.js';
 
 export type * from './ArcType.js';
 
@@ -17,7 +18,7 @@ export type * from './ArcType.js';
  * @param p Arc or number
  * @returns 
  */
-export const isArc = (p: unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined;
+export const isArc = (p: unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined && (p as Arc).clockwise !== undefined;
 
 /**
  * Returns true if parameter has a positioned (x,y) 
@@ -35,7 +36,7 @@ const piPi = Math.PI * 2;
  * @param endDegrees End angle in degrees
  * @returns Arc
  */
-export function fromDegrees(radius: number, startDegrees: number, endDegrees: number): Arc;
+export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean): Arc;
 
 /**
  * Returns an arc from degrees, rather than radians
@@ -43,8 +44,9 @@ export function fromDegrees(radius: number, startDegrees: number, endDegrees: nu
  * @param startDegrees Start angle in degrees
  * @param endDegrees End angle in degrees
  * @param origin Optional center of arc
+ * @param clockwise Whether arc moves in clockwise direction
  * @returns Arc
- */export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin: Point): ArcPositioned
+ */export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean, origin: Point): ArcPositioned
 
 /**
  * Returns an arc from degrees, rather than radians
@@ -52,14 +54,15 @@ export function fromDegrees(radius: number, startDegrees: number, endDegrees: nu
  * @param startDegrees Start angle in degrees
  * @param endDegrees End angle in degrees
  * @param origin Optional center of arc
+ * @param clockwise Whether arc moves in clockwise direction
  * @returns Arc
  */
-//eslint-disable-next-line func-style
-export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, origin?: Point): Arc | ArcPositioned {
+export function fromDegrees(radius: number, startDegrees: number, endDegrees: number, clockwise: boolean, origin?: Point): Arc | ArcPositioned {
   const a: Arc = {
     radius,
     startRadian: degreeToRadian(startDegrees),
-    endRadian: degreeToRadian(endDegrees)
+    endRadian: degreeToRadian(endDegrees),
+    clockwise
   };
   if (isPoint(origin)) {
     guardPoint(origin);
@@ -86,15 +89,36 @@ export const toLine = (arc: ArcPositioned): Line => LinesFromPoints(
 );
 
 /**
- * Calculates a coordinate on an arc, based on an angle
+ * Return start and end points of `arc`.
+ * `origin` will override arc's origin, if defined.
+ * 
+ * See also: 
+ * * {@link point} - get point on arc by angle
+ * * {@link interpolate} - get point on arc by interpolation percentage
+ * @param arc 
+ * @param origin 
+ * @returns 
+ */
+export const getStartEnd = (arc: ArcPositioned | Arc, origin?: Point): [ start: Point, end: Point ] => {
+  guard(arc);
+  const start = point(arc, arc.startRadian, origin);
+  const end = point(arc, arc.endRadian, origin);
+  return [ start, end ];
+}
+
+/**
+ * Calculates a coordinate on an arc, based on an angle.
+ * `origin` will override arc's origin, if defined.
+ * 
+ * See also:
+ * * {@link getStartEnd} - get start and end of arc
+ * * {@link interpolate} - get point on arc by interpolation percentage
  * @param arc Arc
  * @param angleRadian Angle of desired coordinate 
  * @param origin Origin of arc (0,0 used by default)
  * @returns Coordinate
  */
 export const point = (arc: Arc | ArcPositioned, angleRadian: number, origin?: Point): Point => {
-  if (angleRadian > arc.endRadian) throw new Error(`angleRadian beyond end angle of arc`);
-  if (angleRadian < arc.startRadian) throw new Error(`angleRadian beyond start angle of arc`);
 
   if (origin === undefined) {
     origin = isPositioned(arc) ? arc : { x: 0, y: 0 };
@@ -110,40 +134,63 @@ export const point = (arc: Arc | ArcPositioned, angleRadian: number, origin?: Po
  * @param arc 
  */
 export const guard = (arc: Arc | ArcPositioned) => {
-  if (arc === undefined) throw new Error(`Arc is undefined`);
+  if (arc === undefined) throw new TypeError(`Arc is undefined`);
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);
   }
-  if (arc.radius === undefined) throw new Error(`Arc radius is undefined (${ JSON.stringify(arc) })`);
-  if (typeof arc.radius !== `number`) throw new Error(`Radius must be a number`);
-  if (Number.isNaN(arc.radius)) throw new Error(`Radius is NaN`);
-  if (arc.radius <= 0) throw new Error(`Radius must be greater than zero`);
+  if (arc.radius === undefined) throw new TypeError(`Arc radius is undefined (${ JSON.stringify(arc) })`);
+  if (typeof arc.radius !== `number`) throw new TypeError(`Radius must be a number`);
+  if (Number.isNaN(arc.radius)) throw new TypeError(`Radius is NaN`);
+  if (arc.radius <= 0) throw new TypeError(`Radius must be greater than zero`);
 
-  if (arc.startRadian === undefined) throw new Error(`Arc is missing 'startRadian' field`);
-  if (arc.endRadian === undefined) throw new Error(`Arc is missing 'startRadian' field`);
-  if (Number.isNaN(arc.endRadian)) throw new Error(`Arc endRadian is NaN`);
-  if (Number.isNaN(arc.startRadian)) throw new Error(`Arc endRadian is NaN`);
+  if (arc.startRadian === undefined) throw new TypeError(`Arc is missing 'startRadian' field`);
+  if (arc.endRadian === undefined) throw new TypeError(`Arc is missing 'startRadian' field`);
+  if (Number.isNaN(arc.endRadian)) throw new TypeError(`Arc endRadian is NaN`);
+  if (Number.isNaN(arc.startRadian)) throw new TypeError(`Arc endRadian is NaN`);
 
-  if (arc.startRadian >= arc.endRadian) throw new Error(`startRadian is expected to be les than endRadian`);
+  if (arc.clockwise === undefined) throw new TypeError(`Arc is missing 'clockwise field`);
+  if (arc.startRadian >= arc.endRadian) throw new TypeError(`startRadian is expected to be les than endRadian`);
 };
 
 
 type Interpolate = {
-  (amount: number, arc: Arc, origin: Point): Point;
-  (amount: number, arc: ArcPositioned): Point;
+  (amount: number, arc: Arc, allowOverflow: boolean, origin: Point): Point;
+  (amount: number, arc: ArcPositioned, allowOverflow?: boolean): Point;
 };
 
 /**
- * Compute relative position on arc
+ * Compute relative position on arc.
+ * 
+ * See also:
+ * * {@link getStartEnd} - get start and end of arc
+ * * {@link point} - get point on arc by angle
  * @param arc Arc
  * @param amount Relative position 0-1
  * @param origin If arc is not positioned, pass in an origin
+ * @params allowOverflow If _true_ allows point to overflow arc dimensions (default: _false_)
  * @returns 
  */
-export const interpolate: Interpolate = (amount: number, arc: ArcPositioned | Arc, origin?: Point): Point => {
+export const interpolate: Interpolate = (amount: number, arc: ArcPositioned | Arc, allowOverflow?: boolean, origin?: Point): Point => {
   guard(arc);
-  return point(arc, arc.startRadian + ((arc.endRadian - arc.startRadian) * amount), origin);
+  const overflowOk = allowOverflow ?? false;
+  if (!overflowOk) {
+    if (amount < 0) throw new Error(`Param 'amount' is under zero, and overflow is not allowed`);
+    if (amount > 1) throw new Error(`Param 'amount' is above 1 and overflow is not allowed`);
+  }
+  const span = angularSize(arc); // angular size
+  const rel = span * amount;
+  const angle = radiansSum(arc.startRadian, rel, arc.clockwise);
+  //console.log(`interpolate span: ${ span.toFixed(2) } rel: ${ rel.toFixed(2) } angle: ${ angle.toFixed(2) } amt: ${ amount.toFixed(2) } cw: ${ arc.clockwise } start: ${ arc.startRadian }`);
+  return point(arc, angle, origin);
+  //return point(arc, arc.startRadian + ((arc.endRadian - arc.startRadian) * amount), origin);
 };
+
+/**
+ * Returns the angular size of arc.
+ * Eg if arc runs from 45-315deg in clockwise direction, size will be 90deg.
+ * @param arc 
+ */
+export const angularSize = (arc: Arc) => radianArc(arc.startRadian, arc.endRadian, arc.clockwise)
 
 /**
  * Creates a {@link Geometry.Path} instance from the arc. This wraps up some functions for convienence.
@@ -169,6 +216,40 @@ export const toPath = (arc: ArcPositioned): Path => {
     kind: `arc`
   });
 };
+
+/**
+ * Returns an arc based on a circle using start and end angles.
+ * If you don't have the end angle, but rather the size of the arc, use {@link fromCircleAmount}
+ * @param circle Circle
+ * @param startRadian Start radian
+ * @param endRadian End radian
+ * @param clockwise Whether arc goes in a clockwise direction (default: true)
+ * @returns 
+ */
+export const fromCircle = (circle: CirclePositioned, startRadian: number, endRadian: number, clockwise = true): ArcPositioned => {
+  const a: ArcPositioned = Object.freeze({
+    ...circle,
+    endRadian,
+    startRadian,
+    clockwise
+  });
+  return a;
+}
+
+/**
+ * Returns an arc based on a circle, a start angle, and the size of the arc.
+ * See {@link fromCircle} if you already have start and end angles.
+ * @param circle Circle to base off
+ * @param startRadian Starting angle
+ * @param sizeRadian Size of arc
+ * @param clockwise Whether arc moves in clockwise direction (default: true)
+ * @returns 
+ */
+export const fromCircleAmount = (circle: CirclePositioned, startRadian: number, sizeRadian: number, clockwise = true): ArcPositioned => {
+  const endRadian = radiansSum(startRadian, sizeRadian, clockwise);
+  return fromCircle(circle, startRadian, endRadian)
+}
+
 
 /**
  * Calculates the length of the arc
@@ -206,7 +287,8 @@ type ToSvg = {
    */
   (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): ReadonlyArray<string>;
   /**
-   * SVG path for non-positioned arc
+   * SVG path for non-positioned arc.
+   * If `arc` does have a position, `origin` will override it.
    */
   (arc: Arc, origin: Point, opts?: SvgOpts): ReadonlyArray<string>;
   /**
@@ -224,7 +306,13 @@ type ToSvg = {
 export const toSvg: ToSvg = (a: Point | Arc | ArcPositioned, b?: number | Point | SvgOpts, c?: number | SvgOpts, d?: number, e?: SvgOpts) => {
   if (isArc(a)) {
     if (isPositioned(a)) {
-      return toSvgFull(a, a.radius, a.startRadian, a.endRadian, b as SvgOpts);
+      if (isPoint(b)) {
+        // Passing in a origin override
+        return toSvgFull(b, a.radius, a.startRadian, a.endRadian, c as SvgOpts)
+      } else {
+        // Using origin in arc
+        return toSvgFull(a, a.radius, a.startRadian, a.endRadian, b as SvgOpts);
+      }
     } else {
       return isPoint(b) ? toSvgFull(b, a.radius, a.startRadian, a.endRadian, c as SvgOpts) : toSvgFull({ x: 0, y: 0 }, a.radius, a.startRadian, a.endRadian);
     }
@@ -306,17 +394,17 @@ export const distanceCenter = (a: ArcPositioned, b: ArcPositioned): number => po
  */
 export const isEqual = (a: Arc | ArcPositioned, b: Arc | ArcPositioned): boolean => {
   if (a.radius !== b.radius) return false;
+  if (a.endRadian !== b.endRadian) return false;
+  if (a.startRadian !== b.startRadian) return false;
+  if (a.clockwise !== b.clockwise) return false;
 
   if (isPositioned(a) && isPositioned(b)) {
     if (a.x !== b.x) return false;
     if (a.y !== b.y) return false;
     if (a.z !== b.z) return false;
-    return true;
   } else if (!isPositioned(a) && !isPositioned(b)) {
     // no-op
   } else return false; // one is positioned one not
 
-  if (a.endRadian !== b.endRadian) return false;
-  if (a.startRadian !== b.startRadian) return false;
   return true;
 };
