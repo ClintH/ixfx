@@ -1,4 +1,4 @@
-import * as Grids from './Grid.js';
+import * as Grids from './grid/index.js';
 import type { Point, RectPositioned } from "./Types.js";
 import { randomPluck } from '../data/arrays/Random.js';
 import { distance as PointsDistance } from './point/Distance.js';
@@ -12,12 +12,11 @@ const isPointValid = (
   radius: number,
   grid: Grids.Grid & Grids.GridVisual,
   point: Point,
-  reference: Grids.Cell,
+  reference: Grids.GridCell,
   ar: ReadonlyArray<ReadonlyArray<Point>>
 ) => {
-  //const cellForPoint = Grids.cellAtPoint(grid, point);
-  // if (!cellForPoint) throw new Error(`Cell could not be calculated for point ${JSON.stringify(point)}`);
-  for (const p of Grids.visitNeigbours(grid, reference, `undefined`)) {
+  const iter = Grids.Visit.create(`neighbours`, { start: reference });
+  for (const p of iter(grid)) {
     const pointInGrid = ar[ p.y ][ p.x ];
     if (pointInGrid) {
       const distribution = PointsDistance(point, pointInGrid);
@@ -42,12 +41,10 @@ export const poissonDisk = (
   };
 
   const randomPoint = () => RectsRandomPoint(rect);
-  const ar = Grids.toArray<Point>(grid);
-  const arUpdater = Grids.array2dUpdater<Point>(grid, ar);
+  const ar = Grids.toArray2d<Point>(grid);
+  const arUpdater = Grids.Array2d.setMutate<Point>(ar);
   const active: Array<Point> = [];
-  //eslint-disable-next-line functional/no-let
   let growthPoint: Point | undefined = randomPoint();
-  //eslint-disable-next-line functional/immutable-data
   active.push(growthPoint);
   arUpdater(growthPoint, growthPoint);
 
@@ -64,9 +61,7 @@ export const poissonDisk = (
           ) } grid: ${ JSON.stringify(grid) }`
         );
       }
-      //eslint-disable-next-line functional/no-let
       let added = false;
-      //eslint-disable-next-line functional/no-let
       for (let index = 0; index < limit; index++) {
         const r = randomPoint();
         if (isPointValid(radius, grid, r, reference, ar)) {
