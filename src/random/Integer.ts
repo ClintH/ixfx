@@ -41,9 +41,7 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
     throw new TypeError(`maxOrOptions is undefined`);
   }
   const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
-  //eslint-disable-next-line functional/no-let
   let max = Math.floor(options.max);
-  //eslint-disable-next-line functional/no-let
   let min = Math.floor(options.min ?? 0);
 
   // If we just get -5 as the max, invert so
