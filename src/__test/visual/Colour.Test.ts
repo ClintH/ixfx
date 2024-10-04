@@ -3,8 +3,8 @@ import { applyToValues, round } from '../../numbers/index.js';
 import * as Colour from '../../visual/Colour.js';
 import test from 'ava';
 test(`opacity`, (t) => {
-  t.is(Colour.opacity(`red`, 0.5), `rgb(100% 0% 0% / 0.5)`);
-  t.is(Colour.opacity(`hsl(0,100%,50%)`, 0.5), `hsl(0 100% 50% / 0.5)`);
+  t.is(Colour.multiplyOpacity(`red`, 0.5), `rgb(100% 0% 0% / 0.5)`);
+  t.is(Colour.multiplyOpacity(`hsl(0,100%,50%)`, 0.5), `hsl(0 100% 50% / 0.5)`);
 });
 
 test(`special`, t => {
