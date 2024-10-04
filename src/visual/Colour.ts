@@ -5,9 +5,29 @@ import { throwNumberTest } from '../util/GuardNumbers.js';
 import { pairwise } from '../data/arrays/Pairwise.js';
 import { scale as scaleNumber } from '../numbers/Scale.js';
 import { clamp } from '../numbers/Clamp.js';
+import type { Result } from 'src/util/Results.js';
 
+/**
+ * HSL in relative 0..1 range for each field
+ */
 export type Hsl = { h: number; s: number; l: number; opacity: number, space?: `hsl` };
-export type Rgb = { r: number; g: number; b: number; opacity: number, space?: `srgb` };
+
+/**
+ * Rgb.
+ * Units determine how to interperet rgb values.
+ * * 'relative': 0..1 range
+ * * '8bit': 0..255 range
+ */
+export type Rgb = { r: number; g: number; b: number; opacity: number, unit: `relative` | `8bit`, space?: `srgb` };
+
+export type RgbRelative = Rgb & { unit: `relative` };
+
+
+/**
+ * RGB in 0...255 range
+ */
+export type Rgb8Bit = Rgb & { unit: `8bit` };
+
 export type Spaces = `hsl` | `hsluv` | `rgb` | `srgb` | `lch` | `oklch` | `oklab` | `okhsl` | `p3` | `lab` | `hcl` | `cubehelix`;
 
 export type OkLch = { l: number, c: number, h: number, opacity: number, space: `oklch` }
@@ -132,13 +152,21 @@ const oklchToColorJs = (oklch: OkLch) => {
 }
 
 const rgbToColorJs = (rgb: Rgb): Color => {
+  let { r, g, b, opacity } = rgb;
+  if (rgb.unit === `8bit`) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    opacity /= 255;
+  }
+
   const coords: [ number, number, number ] = [
-    rgb.r,
-    rgb.g,
-    rgb.b
+    r,
+    g,
+    b
   ];
-  return `opacity` in rgb ?
-    new Color(`srgb`, coords, rgb.opacity) :
+  return rgb.opacity !== undefined ?
+    new Color(`srgb`, coords, opacity) :
     new Color(`srgb`, coords);
 }
 
@@ -229,8 +257,8 @@ export const toRgb = (colour: Colourish): Rgb => {
   const c = resolve(colour);
   const rgb = c.srgb;
   return c.alpha < 1 ?
-    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: c.alpha, space: `srgb` } :
-    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: 1, space: `srgb` };
+    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: c.alpha, space: `srgb`, unit: `relative` } :
+    { r: rgb.r, g: rgb.g, b: rgb.b, opacity: 1, space: `srgb`, unit: `relative` };
 };
 
 /**
@@ -250,11 +278,13 @@ export const resolve = (colour: Colourish, safe: boolean = false): Color => {
     return new Color(colour);
   } else {
     if (isHsl(colour)) return new Color(hslToColorJs(colour, safe));
-    if (isRgb(colour)) return new Color(rgbToColorJs(colour));
+    const rgb = parseRgbObject(colour);
+
+    if (rgb.success) return new Color(rgbToColorJs(rgb.value!));
     if (isOklch(colour)) return new Color(oklchToColorJs(colour));
   }
 
-  return colour;
+  return colour as Color;
 };
 
 /**
@@ -308,19 +338,25 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
  */
 export const toHex = (colour: Colourish, safe = false): string => {
   if (typeof colour === `string` && colour === `transparent`) return `#00000000`;
-  return resolve(colour, safe).to(`srgb`).toString({ format: `hex`, collapse: false });
+  const c = resolve(colour, safe);
+  if (`to` in c) {
+    return c.to(`srgb`).toString({ format: `hex`, collapse: false });
+  } else {
+    throw new Error(`Could not parse colour: ${ JSON.stringify(colour) }`);
+  }
 };
 
 /**
  * Returns a variation of colour with its opacity multiplied by `amt`.
+ * Value will be clamped to 0..1
  *
  * ```js
  * // Return a colour string for blue that is 50% opaque
- * opacity(`blue`, 0.5);
+ * multiplyOpacity(`blue`, 0.5);
  * // eg: `rgba(0,0,255,0.5)`
  *
  * // Returns a colour string that is 50% more opaque
- * opacity(`hsla(200,100%,50%,50%`, 0.5);
+ * multiplyOpacity(`hsla(200,100%,50%,50%`, 0.5);
  * // eg: `hsla(200,100%,50%,25%)`
  * ```
  *
@@ -329,11 +365,21 @@ export const toHex = (colour: Colourish, safe = false): string => {
  * @param amt Amount to multiply opacity by
  * @returns String representation of colour
  */
-export const opacity = (colour: Colourish, amt: number): string => {
+export const multiplyOpacity = (colour: Colourish, amt: number): string => {
   const c = resolve(colour);
-  c.alpha *= amt;
+  const alpha = clamp(c.alpha * amt);
+  c.alpha = alpha;
   return c.toString();
 };
+
+export const multiplySaturation = (colour: Colourish, amt: number): string => {
+  const c = resolve(colour);
+  console.log(`c.s: ${ c.s }`);
+  c.s = c.s * amt;
+  console.log(`final: ${ c.s }`);
+  return c.toString();
+};
+
 
 /**
  * Gets a CSS variable.
@@ -508,12 +554,65 @@ const isOklch = (p: Colourish): p is OkLch => {
   return true;
 }
 
-const isRgb = (p: Colourish): p is Rgb => {
-  if (p === undefined || p === null) return false;
-  if (typeof p !== `object`) return false;
-  if (p.space !== `srgb` && p.space !== undefined) return false;
-  if ((p as Rgb).r === undefined) return false;
-  if ((p as Rgb).g === undefined) return false;
-  if ((p as Rgb).b === undefined) return false;
-  return true;
+/**
+ * Tries to parse an object in forms:
+ * `{r,g,b}`, `{red,green,blue}`.
+ * Uses 'opacity', 'space' and 'unit' fields where available.
+ * 
+ * If 'units' is not specified, it tries to guess if it's relative (0..1) or
+ * 8-bit (0..255).
+ * 
+ * Normalises to an Rgb structure if it can, or returns an error.
+ * @param p 
+ * @returns 
+ */
+export const parseRgbObject = (p: any): Result<Rgb> => {
+  if (p === undefined || p === null) return { success: false, error: `Undefined/null` }
+  if (typeof p !== `object`) return { success: false, error: `Not an object` };
+
+  let space = p.space ?? `srgb`;
+  let { r, g, b, opacity } = p;
+  if (r !== undefined || g !== undefined || b !== undefined) {
+    // Short field names
+  } else {
+    // Check for long field names
+    let { red, green, blue } = p;
+    if (red !== undefined || green !== undefined || blue !== undefined) {
+      r = red;
+      g = green;
+      blue = blue;
+    } else return { success: false, error: `Does not contain r,g,b or red,green,blue` }
+  }
+
+  let unit = p.unit;
+  if (unit === `relative`) {
+    if (r > 1 || r < 0) return { success: false, error: `Relative units, but 'r' exceeds 0..1` };
+    if (g > 1 || g < 0) return { success: false, error: `Relative units, but 'g' exceeds 0..1` };
+    if (b > 1 || b < 0) return { success: false, error: `Relative units, but 'b' exceeds 0..1` };
+    if (opacity > 1 || opacity < 0) return { success: false, error: `Relative units, but opacity exceeds 0..1` };
+  } else if (unit === `8bit`) {
+    if (r > 255 || r < 0) return { success: false, error: `8bit units, but r exceeds 0..255` };
+    if (g > 255 || g < 0) return { success: false, error: `8bit units, but g exceeds 0..255` };
+    if (b > 255 || b < 0) return { success: false, error: `8bit units, but b exceeds 0..255` };
+    if (opacity > 255 || opacity < 0) return { success: false, error: `8bit units, but opacity exceeds 0..255` };
+  } else if (!unit) {
+    if (r > 1 || g > 1 || b > 1) {
+      if (r <= 255 && g <= 255 && b <= 255) {
+        unit = `8bit`;
+      } else return { success: false, error: `Unknown units, outside 0..255 range` };
+    } else if (r <= 1 && g <= 1 && b <= 1) {
+      if (r >= 0 && g >= 0 && b >= 0) {
+        unit = `relative`;
+      } else return { success: false, error: `Unknown units, outside of 0..1 range` };
+    } else return { success: false, error: `Unknown units for r,g,b,opacity values` };
+  }
+  if (opacity === undefined) {
+    if (unit === `8bit`) opacity = 255;
+    else opacity = 1;
+  }
+
+  const c = {
+    r, g, b, opacity, unit, space
+  }
+  return { success: true, value: c };
 };
