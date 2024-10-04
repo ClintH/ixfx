@@ -1,5 +1,5 @@
 import type { RectPositioned } from "./RectTypes.js";
-import type { CardinalDirection } from '../Grid.js';
+import type { GridCardinalDirection } from '../grid/index.js';
 import type { Point } from "../point/PointType.js";
 
 /**
@@ -14,7 +14,7 @@ import type { Point } from "../point/PointType.js";
  */
 export const cardinal = (
   rect: RectPositioned,
-  card: CardinalDirection | `center`
+  card: GridCardinalDirection | `center`
 ): Point => {
   const { x, y, width, height } = rect;
   switch (card) {
