@@ -6,7 +6,7 @@ export * as Lines from './line/index.js';
 export * as Rects from './rect/index.js';
 export * as Points from './point/index.js';
 export * as Paths from './path/index.js';
-export * as Grids from './Grid.js';
+export * as Grids from './grid/index.js';
 export * as Beziers from './bezier/index.js';
 export * as Compound from './path/CompoundPath.js';
 export * as Ellipses from './Ellipse.js';
