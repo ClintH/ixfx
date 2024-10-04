@@ -19,6 +19,7 @@ export * from './PointerVisualise.js';
 export * from './Query.js';
 export * from './ResolveEl.js';
 export * from './SetProperty.js';
+export * from './TabbedPanels.js';
 export * from './Util.js';
 
 
