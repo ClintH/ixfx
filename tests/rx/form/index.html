@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>rx/form</title>
+</head>
+<style>
+  :root {
+    --size: 1em;
+  }
+  html,body {
+    height: 100%;
+  }
+  body {
+    background-color: silver;
+  }
+ 
+  form {
+    display:grid;
+    grid-auto-columns: repeat(2, auto);
+    gap: 0.25em;
+  }
+  label {
+    padding-top: 1ch;
+  }
+  </style>
+<body>
+  <h1>rx-dom</h1>
+  <form>
+    <label>Radio</label>
+    <fieldset>
+      <label for="radio-fm">FM:</label>
+      <input type="radio" name="radio" value="fm">
+      <label for="radio-am">AM:</label>
+      <input type="radio" name="radio" value="am">
+    </fieldset>
+
+    <label for="flavours">Flavours:</label>
+    <select name="flavours">
+      <option>Strawberry</option>
+      <option>Chocolate</option>
+      <option>Blueberry</option>
+    </select>
+    <label for="name">Name:</label>
+    <input name="name" type="text">
+
+    <label for="whendate">When date:</label>
+    <input name="whendate" type="date">
+
+    <label for="whentime">When time:</label>
+    <input name="whentime" type="time">
+    
+    <label for="colour">Colour:</label>
+    <input name="colour" type="color">
+    
+
+    <label for="email">Email:</label>
+    <input name="email" type="email">
+    
+
+    <label for="size">Size</label>
+    <input name="size" type="number">
+    
+    <label for="zork">Zork</label>
+    <input name="zork" type="range">
+    
+    <label for="checked">Checkbox</label>
+    <input name="checked" type="checkbox">
+    
+  </form>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

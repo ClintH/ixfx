@@ -1,7 +1,7 @@
 import * as Colour from '../../visual/Colour.js';
 import type { ReactiveInitial, ReactiveWritable, Reactive } from "../Types.js";
 import { eventTrigger } from "./Event.js";
-import type { DomNumberInputValueOptions, DomValueOptions } from "./Types.js";
+import type { DomFormOptions, DomNumberInputValueOptions, DomValueOptions } from "./Types.js";
 import { resolveEl } from '../../dom/ResolveEl.js';
 import { transform } from '../ops/Transform.js';
 import { hasLast } from '../Util.js';
@@ -170,6 +170,223 @@ export function domInputValue(targetOrQuery: HTMLInputElement | string, options:
     set(value) {
       setValue(value);
     },
+    dispose(reason) {
+      upstreamSourceUnsub();
+      rxValues.dispose(reason);
+      rxEvents.dispose(reason);
+    },
+  }
+}
+
+/**
+ * Listens for data changes from elements within a HTML form element.
+ * Input elements must have a 'name' attribute.
+ * 
+ * Simple usage:
+ * ```js
+ * const rx = Rx.From.domForm(`#my-form`);
+ * rx.onValue(value => {
+ *  // Object containing values from form
+ * });
+ * 
+ * rx.last(); // Read current values of form
+ * ```
+ * 
+ * UI can be updated
+ * ```js
+ * // Set using an object of key-value pairs
+ * rx.set({
+ *  size: 'large'
+ * });
+ * 
+ * // Or set a single name-value pair
+ * rx.setNamedValue(`size`, `large`);
+ * ```
+ * 
+ * If an 'upstream' reactive is provided, this is used to set initial values of the UI, overriding
+ * whatever may be in the HTML. Upstream changes modify UI elements, but UI changes do not modify the upstream
+ * source.
+ * 
+ * ```js
+ * // Create a reactive object
+ * const obj = Rx.From.object({
+ *  when: `2024-10-03`,
+ *  size: 12,
+ *  checked: true
+ * });
+ * 
+ * // Use this as initial values for a HTML form
+ * // (assuming appropriate INPUT/SELECT elements exist)
+ * const rx = Rx.From.domForm(`form`, { 
+ *  upstreamSource: obj
+ * });
+ * 
+ * // Listen for changes in the UI
+ * rx.onValue(value => {
+ *  
+ * });
+ * ```
+ * @param formElOrQuery 
+ * @param options 
+ * @returns 
+ */
+export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormElement | string, options: Partial<DomFormOptions<T>> = {}): {
+  setNamedValue: (name: string, value: any) => void,
+  el: HTMLFormElement
+} & ReactiveInitial<T> & ReactiveWritable<T> {
+  const formEl = resolveEl<HTMLFormElement>(formElOrQuery);
+  const when = options.when ?? `changed`;
+  const eventName = when === `changed` ? `change` : `input`;
+
+  const emitInitialValue = options.emitInitialValue ?? false;
+  const upstreamSource = options.upstreamSource;
+
+  const typeHints = new Map<string, string>();
+
+  let upstreamSourceUnsub = () => {}
+
+  const readValue = () => {
+    const fd = new FormData(formEl);
+    const entries = [];
+    for (const [ k, v ] of fd.entries()) {
+      const vStr = v.toString();
+
+      // Get type hint for key
+      let typeHint = typeHints.get(k);
+      if (!typeHint) {
+        // If not found, use the kind of input element as a hint
+        const el = getFormElement(k, vStr);
+        if (el) {
+          if (el.type === `range` || el.type === `number`) {
+            typeHint = `number`;
+          } else if (el.type === `color`) {
+            typeHint = `colour`;
+          } else if (el.type === `checkbox` && (v === `true` || v === `on`)) {
+            typeHint = `boolean`;
+          } else {
+            typeHint = `string`;
+          }
+          typeHints.set(k, typeHint);
+        }
+      }
+
+      if (typeHint === `number`) {
+        entries.push([ k, Number.parseFloat(vStr) ]);
+      } else if (typeHint === `boolean`) {
+        const vBool = (vStr === `true`) ? true : false;
+        entries.push([ k, vBool ]);
+      } else if (typeHint === `colour`) {
+        const vRgb = Colour.resolve(vStr, true);
+        entries.push([ k, Colour.toRgb(vRgb) ]);
+      } else {
+        entries.push([ k, v.toString() ]);
+      }
+    }
+
+    // Checkboxes that aren't checked don't give a value, so find those
+    for (const el of formEl.querySelectorAll<HTMLInputElement>(`input[type="checkbox"]`)) {
+      if (!el.checked && el.value === `true`) {
+        entries.push([ el.name, false ]);
+      }
+    }
+    const asObj = Object.fromEntries(entries);
+    //console.log(`readValue`, asObj);
+    return asObj;
+  }
+
+  const getFormElement = (name: string, value: string): HTMLSelectElement | HTMLInputElement | undefined => {
+    const el = formEl.querySelector(`[name="${ name }"]`) as HTMLInputElement | null;
+    if (!el) {
+      console.warn(`Form does not contain an element with name="${ name }"`);
+      return;
+    }
+    if (el.type === `radio`) {
+      // Get right radio option
+      const radioEl = formEl.querySelector(`[name="${ name }"][value="${ value }"]`) as HTMLInputElement | null;
+      if (!radioEl) {
+        console.warn(`Form does not contain radio option for name=${ name } value=${ value }`);
+        return;
+      }
+      return radioEl;
+    }
+    return el;
+  }
+  const setNamedValue = (name: string, value: any) => {
+    const el = getFormElement(name, value);
+    if (!el) return;
+
+    //let typeHint = typeHints.get(name);
+    // if (typeHint) {
+    //   console.log(`${ name } hint: ${ typeHint } input type: ${ el.type }`);
+    // } else {
+    //   console.warn(`Rx.Sources.Dom.domForm no type hint for: ${ name }`);
+    // }
+    if (el.nodeName === `INPUT` || el.nodeName === `SELECT`) {
+      if (el.type === `color`) {
+        if (typeof value === `object`) {
+          // Try to parse colour if value is an object
+          const c = Colour.resolve(value, true);
+          value = Colour.toHex(c);
+        }
+      } else if (el.type === `checkbox`) {
+        if (typeof value === `boolean`) {
+          el.checked = value;
+          return;
+        } else {
+          console.warn(`Rx.Sources.domForm: Trying to set non boolean type to a checkbox. Name: ${ name } Value: ${ value } (${ typeof value })`);
+        }
+      } else if (el.type === `radio`) {
+        el.checked = true;
+        return;
+      }
+      el.value = value;
+    }
+  }
+
+  const setFromUpstream = (value: T) => {
+    //console.log(`setUpstream`, value);
+    for (const [ name, v ] of Object.entries(value)) {
+      let hint = typeHints.get(name);
+      if (!hint) {
+        hint = typeof v;
+        if (hint === `object`) {
+          const rgb = Colour.parseRgbObject(v);
+          if (rgb.success) {
+            hint = `colour`;
+          }
+        }
+        typeHints.set(name, hint);
+      }
+      const valueFiltered = options.upstreamFilter ? options.upstreamFilter(name, v) : v;
+      setNamedValue(name, valueFiltered);
+    }
+  }
+
+  if (upstreamSource) {
+    upstreamSourceUnsub = upstreamSource.onValue(setFromUpstream);
+    if (hasLast(upstreamSource)) {
+      setFromUpstream(upstreamSource.last());
+    }
+  }
+
+  // Input element change event stream
+  const rxEvents = eventTrigger(formEl, eventName, {
+    fireInitial: emitInitialValue,
+    debugFiring: options.debugFiring ?? false,
+    debugLifecycle: options.debugLifecycle ?? false,
+  });
+
+  // Transform to get values
+  const rxValues = transform(rxEvents, _trigger => readValue());
+
+  return {
+    ...rxValues,
+    el: formEl,
+    last() {
+      return readValue()
+    },
+    set: setFromUpstream,
+    setNamedValue,
     dispose(reason) {
       upstreamSourceUnsub();
       rxValues.dispose(reason);
