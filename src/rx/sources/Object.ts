@@ -8,8 +8,6 @@ import { isEqualContextString } from "../../data/Util.js";
 import { throwResult } from "../../util/Results.js";
 import { wildcard } from "../../Text.js";
 
-//type ObjectFieldHandler = (value: any, fieldName: string) => void
-
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 export function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
 
@@ -128,7 +126,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
 
   const updateField = (path: string, valueForField: any) => {
     if (value === undefined) throw new Error(`Cannot update value when it has not already been set`);
-    //console.log(`Rx.fromObject.updateField path: ${ path } value: ${ JSON.stringify(valueForField) }`);
+    //console.log(`Rx.Sources.Object.updateField path: ${ path } value: ${ JSON.stringify(valueForField) }`);
 
     const existing = Pathed.getField<any>(value, path);
     throwResult(existing); // Eg if path not found
