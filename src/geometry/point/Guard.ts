@@ -14,7 +14,7 @@ export const isNull = (p: Point) => {
 }
 
 /***
- * Returns true if xy (and z, if present) isNaN
+ * Returns true if either x, y, z isNaN.
  */
 export const isNaN = (p: Point) => {
   if (isPoint3d(p)) {
