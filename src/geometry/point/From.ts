@@ -1,3 +1,4 @@
+import { guard } from "./Guard.js";
 import type { Point, Point3d } from "./PointType.js";
 
 export function from(x: number, y: number, z: number): Point3d;
@@ -50,6 +51,36 @@ export function from(
     }
   }
 };
+
+/**
+ * Parses a point as a string, in the form 'x,y' or 'x,y,z'.
+ * eg '10,15' will be returned as `{ x: 10, y: 15 }`.
+ * 
+ * Throws an error if `str` is not a string.
+ * 
+ * ```js
+ * Points.fromString(`10,15`);  // { x:10, y:15 }
+ * Points.fromString(`a,10`);   // { x:NaN, y:10 }
+ * ```
+ * 
+ * Use {@link Points.isNaN} to check if returned point has NaN for either coordinate.
+ * @param str 
+ */
+export const fromString = (str: string): Point => {
+  if (typeof str !== `string`) throw new TypeError(`Param 'str' ought to be a string. Got: ${ typeof str }`);
+  const comma = str.indexOf(`,`);
+  const x = Number.parseFloat(str.substring(0, comma));
+  const nextComma = str.indexOf(',', comma + 1);
+  if (nextComma > 0) {
+    // z component
+    const y = Number.parseFloat(str.substring(comma + 1, nextComma - comma + 2));
+    const z = Number.parseFloat(str.substring(nextComma + 1));
+    return { x, y, z };
+  } else {
+    const y = Number.parseFloat(str.substring(comma + 1));
+    return { x, y };
+  }
+}
 
 
 /**
