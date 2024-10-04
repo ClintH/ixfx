@@ -1,5 +1,29 @@
 A rough changelog between NPM releases
 
+#
+
+Iterables
++ iterableController: use an iterator with start/pause/restart semantics and a callback for values.
++ 
+Numbers
++ differenceFromLast: compare against the previous value
++ differenceFromFixed: compare against a fixed value
+
+Geometry.Points
++ fromString: parse 'x,y,z' string as a Point
+
+Geometry.Grids
+* Large refactor
++ Grids.Array1d, Grids.Array2d for array-backed grids and array access using {x,y} coordinates 
+Rx
++ domForm: reactive that emits value when form element(s) change
++ merged: output a value from any source stream
+
+Colour
+* .opacity renamed to .multiplyOpacity
+* 
++ Random.mersenneTwister for repeatable random numbers using
+
 # 0.31.0 2024.09.22
 
 Io.Audio
