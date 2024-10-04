@@ -286,7 +286,7 @@ export type ToArrayOptions<V> = {
  */
 export type Lazy = `initial` | `never` | `very`
 export type InitLazyStreamOptions = Partial<InitStreamOptions> & {
-  lazy: Lazy
+  lazy?: Lazy
   debugLabel?: string
   onStart: () => void
   onStop: () => void
