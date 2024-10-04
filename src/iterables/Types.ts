@@ -1,5 +1,15 @@
 import type { Interval } from "../flow/IntervalType.js";
 
+
+export type IteratorControllerOptions<T> = Readonly<{
+  delay?: Interval
+  onValue: (value: T) => boolean | void
+  iterator: () => IterableIterator<T>
+}>
+
+export type IteratorControllerState = `stopped` | `running` | `paused`
+
+
 export type ToArrayOptions = {
   /**
    * If set `toArray` continues until reaching this many results

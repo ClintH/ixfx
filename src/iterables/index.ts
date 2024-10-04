@@ -6,6 +6,7 @@ import * as Async from '../iterables/IterableAsync.js';
 import * as Sync from '../iterables/IterableSync.js';
 export * as Async from '../iterables/IterableAsync.js';
 export * as Sync from '../iterables/IterableSync.js';
+export * from './Controller.js';
 
 /**
  * Chains use generators as a way of processing data.
@@ -33,7 +34,7 @@ import type { Interval } from '../flow/IntervalType.js';
 
 import { toStringDefault } from '../util/index.js';
 import type { GenFactoryNoInput } from './chain/Types.js';
-import type { ForEachOptions, ToArrayOptions } from './Types.js';
+import type { ForEachOptions, ToArrayOptions, IteratorControllerOptions, IteratorControllerState } from './Types.js';
 
 /**
  * {@inheritDoc Chains.combineLatestToArray}
