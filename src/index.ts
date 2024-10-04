@@ -273,7 +273,7 @@ export * as Iterables from './iterables/index.js';
  * * {@link dotProduct}
  * * {@link min}, {@link max}, {@link minIndex}, {@link maxIndex}
  * * {@link total}
- * * {@link relativeDifference}: Returns the relative difference from some initial value
+ * * {@link differenceFromLast}: Returns the relative difference from some initial value
  * * {@link weight} Weighs an array of numbers according to their position
  * 
  * Generators/iterators
