@@ -29,7 +29,7 @@ export class AdsrIterator implements Iterator<number> {
     const c = this.adsr.compute();
     return {
       value: c[ 1 ],
-      done: c[ 0 ] === undefined
+      done: c[ 0 ] === `complete`
     }
   }
 
