@@ -182,7 +182,7 @@ export const wrap = <T>(array: T[], cols: number): GridArray1d<T> => {
 
 /**
  * Creates a 1-dimensional array to fit a grid of rows x cols.
- * Use {@link create} if you want to create this array and wrap it for grid access.
+ * Use {@link createArray} if you want to create this array and wrap it for grid access.
  * 
  * ```js
  * // Creates an array filled with 0, sized for a grid 10 rows by 20 columns
@@ -192,7 +192,7 @@ export const wrap = <T>(array: T[], cols: number): GridArray1d<T> => {
  * const arr = createArray(0, { rows: 10, cols: 20 });
  * ```
  * @param rowsOrGrid Number of rows, or a grid to use the settings of
- * @param cols Columns
+ * @param columns Columns
  */
 export const createArray = <T>(initialValue: T, rowsOrGrid: number | Grid, columns?: number): T[] => {
   const rows = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
@@ -219,8 +219,8 @@ export const createArray = <T>(initialValue: T, rowsOrGrid: number | Grid, colum
  * return wrapMutable(arr, cols);
  * ```
  * @param initialValue 
- * @param rows 
- * @param cols 
+ * @param rowsOrGrid 
+ * @param columns 
  * @returns 
  */
 export const createMutable = <T>(initialValue: T, rowsOrGrid: number | Grid, columns?: number): GridArray1d<T> => {
@@ -230,55 +230,3 @@ export const createMutable = <T>(initialValue: T, rowsOrGrid: number | Grid, col
   const arr = createArray(initialValue, rows, cols);
   return wrapMutable(arr, cols);
 }
-
-/**
- * Visits a grid packed into an array.
- *
- * By default visits left-to-right, top-to-bottom:
- * ```js
- * const data = [1, 2, 3, 4, 5, 6];
- * const cols = 2;
- * for (const [value,index] of visitArray(data, cols)) {
- *  // Yields: 1, 2, 3, 4, 5, 6
- * }
- * ```
- *
- * @param array Array
- * @param cols Columns
- * @param iteratorFunction Visitor function
- * @param opts Options
- */
-// export function* visitArray<V>(
-//   array: ReadonlyArray<V>,
-//   cols: number,
-//   iteratorFunction?: CreateVisitor,
-//   opts: Partial<VisitorOpts> = {}
-// ): IterableIterator<readonly [ data: V, index: number ]> {
-//   if (typeof array === `undefined`) {
-//     throw new TypeError(`First parameter is undefined, expected an array`);
-//   }
-//   if (array === null) throw new Error(`First parameter is null, expected an array`);
-//   if (!Array.isArray(array)) throw new Error(`First parameter should be an array`);
-
-//   throwIntegerTest(cols, `aboveZero`, `cols`);
-
-
-//   const accessor = 
-//   if (array.length === 0) return;
-
-//   const wrap = opts.boundsWrap ?? `stop`;
-//   const rows = Math.ceil(array.length / cols);
-//   const grid: Grid = {
-//     cols,
-//     rows,
-//   };
-
-
-//   if (iteratorFunction === undefined) iteratorFunction = cells;
-//   const iter = iteratorFunction(grid, { x: 0, y: 0 }, opts);
-//   for (const cell of iter) {
-//     const index = indexFromCell(grid, cell, wrap);
-//     if (index === undefined) return undefined;
-//     yield [ array[ index ], index ];
-//   }
-// }

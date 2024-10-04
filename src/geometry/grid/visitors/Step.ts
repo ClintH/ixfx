@@ -4,15 +4,20 @@ import type { Grid, GridCell, GridVisitorOpts, GridCreateVisitor } from "../Type
 
 /**
  * Runs the provided `visitor` for `steps`, returning the cell we end at
- *
  * ```js
- * // Get a cell 10 steps away (row-wise) from start
- * const cell = step(grid, start, 10, visitorRow);
+ * // Create visitor & stepper
+ * const visitor = Grids.Visit.create(`row`);
+ * const stepper = Grids.Visit.stepper(grid, visitor);
+ * 
+ * // Step by 10
+ * stepper(10); // GridCell {x,y}
+ * 
+ * // Step by another 2
+ * stepper(2);
  * ```
  * @param grid Grid to traverse
  * @param start Start point
- * @param steps Number of steps
- * @param visitor Visitor function
+ * @param createVisitor Visitor function
  * @returns
  */
 export const stepper = (

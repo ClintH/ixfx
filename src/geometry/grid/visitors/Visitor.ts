@@ -19,7 +19,7 @@ import type { GridNeighbourSelectionLogic, Grid, GridCell, GridVisitorOpts, Grid
  *  }
  * ```
  *
- * If you want to keep tabs on the visitor, pass in a {@link ISetMutable} instance. This gets
+ * If you want to keep tabs on the visitor, pass in a {@link Collections.Sets.ISetMutable} instance. This gets
  * updated as cells are visited to make sure we don't visit the same one twice. If a set is not passed
  * in, one will be created internally.
  * ```js
@@ -39,8 +39,7 @@ import type { GridNeighbourSelectionLogic, Grid, GridCell, GridVisitorOpts, Grid
  *  setTimeout(run, delayMs);
  * ```
  * @param logic Logic for selecting next cell
- * @param grid Grid to visit
- * @param start Starting cell
+ * @param grid Grid to visitl
  * @param opts Options
  * @returns Cells
  */
@@ -56,10 +55,6 @@ export function* visitByNeighbours(
 
   const v = opts.visited ?? mutable<GridCell>(cellKeyString);
   const possibleNeighbours = logic.getNeighbours ?? ((g: Grid, c: GridCell) => neighbourList(g, c, crossDirections, `undefined`));
-
-  // if (!isCell(start)) {
-  //   throw new Error(`'start' parameter is undefined or not a cell`);
-  // }
 
   let cellQueue: Array<GridCell> = [ start ];
   let moveQueue: Array<GridNeighbour> = [];

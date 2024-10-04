@@ -1,6 +1,6 @@
 A rough changelog between NPM releases
 
-#
+# 0.33.0 2024.10.04
 
 Iterables
 + iterableController: use an iterator with start/pause/restart semantics and a callback for values.

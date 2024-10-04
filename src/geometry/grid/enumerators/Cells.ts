@@ -20,7 +20,7 @@ import { values } from "../Values.js";
  * ```
  * 
  * See also:
- * * {@link cellsValues}: Iterate over cell values
+ * * {@link cellValues}: Iterate over cell values
  * * {@link cellsAndValues}: Iterate over pairs of cell coordinates and cell values
  * @param grid Grid to iterate over
  * @param start Starting cell position (default: {x:0,y:0})
@@ -77,7 +77,7 @@ export function* cellValues<T>(grid: GridReadable<T>, start?: GridCell, wrap = t
  * 
  * See also:
  * * {@link cells}: Iterate over cell coordinates
- * * {@link cellsValues}: Iterate over cell values
+ * * {@link cellValues}: Iterate over cell values
  * @param grid 
  * @param start 
  * @param wrap 

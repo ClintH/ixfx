@@ -1,18 +1,7 @@
 import type { GridNeighbour, GridNeighbourSelectionLogic, GridVisitorOpts } from "../Types.js";
 
-// export const columnWithGrid = (
-//   grid: Grid,
-//   start: Cell,
-//   opts: VisitorOpts = {}
-// ): VisitGenerator => {
-
-//   return visitor(logic, grid, start, opts);
-// };
-
 /**
  * Visits cells running down columns, left-to-right.
- * @param grid Grid to traverse
- * @param start Start cell
  * @param opts Options
  * @returns Visitor generator
  */

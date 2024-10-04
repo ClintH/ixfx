@@ -30,7 +30,7 @@ export * from './plot/CartesianCanvasPlot.js';
  * Overview
  * * {@link interpolator}: Blend colours
  * * {@link scale}: Produce colour scale
- * * {@link opacity}: Give a colour opacity
+ * * {@link multiplyOpacity}: Modify opacity with a scalar
  * * {@link randomHue}: Generate a random hue
  * * {@link goldenAngleColour}: Pick perceptually different shades
  *
