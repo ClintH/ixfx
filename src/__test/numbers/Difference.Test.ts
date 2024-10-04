@@ -1,8 +1,32 @@
 import test from "ava";
-import { differenceFromLast } from "../../numbers/Difference.js";
+import { differenceFromLast, differenceFromFixed } from "../../numbers/Difference.js";
 import { isApprox } from "../../numbers/IsApprox.js";
 
-test(`difference`, t => {
+test(`differenceFromFixed`, t => {
+  const d1 = differenceFromFixed(100, `absolute`);
+  t.is(d1(100), 0);
+  t.is(d1(150), 50);
+  t.is(d1(50), 50);
+
+  const d2 = differenceFromFixed(100, `numerical`);
+  t.is(d2(100), 0);
+  t.is(d2(150), 50);
+  t.is(d2(50), -50);
+
+  const d3 = differenceFromFixed(100, `relativeSigned`);
+  t.is(d3(100), 0);
+  t.is(d3(150), 0.50);
+  t.is(d3(10), -0.90);
+
+  const d4 = differenceFromFixed(100, `relative`);
+  t.is(d4(100), 0);
+  t.is(d4(150), 0.50);
+  t.is(d4(10), 0.90);
+
+
+});
+
+test(`differenceFromLast`, t => {
   const approx = isApprox(0.1);
 
   const d1 = differenceFromLast(`absolute`);

@@ -12,6 +12,16 @@ function closeTo(t: ExecutionContext<unknown>, input: number, target: number, pe
   t.fail(`Value: ${ input } target: ${ target } diff%: ${ diff * 100 }`);
 }
 
+test(`from-string`, t => {
+  t.deepEqual(Points.fromString(`10,20`), { x: 10, y: 20 });
+  t.deepEqual(Points.fromString(`10,20,30`), { x: 10, y: 20, z: 30 });
+  t.deepEqual(Points.fromString(`10,20,`), { x: 10, y: 20, z: NaN });
+  t.deepEqual(Points.fromString(`10,a`), { x: 10, y: NaN });
+  t.deepEqual(Points.fromString(`b,20`), { x: NaN, y: 20 });
+  t.deepEqual(Points.fromString(`asdf`), { x: NaN, y: NaN });
+
+});
+
 test(`angleRadianCircle`, t => {
   t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 1 })), 45);
   t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: -1 })), 225);

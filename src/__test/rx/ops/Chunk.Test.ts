@@ -55,14 +55,17 @@ test(`chunk-elapsed-0`, async t => {
   let elapsed = Date.now() - start;
   const expectedItemsPerChunk = Math.floor(chunkElapsed / arrInterval);
 
-  // Test chunking
+  // Test chunking - could be a few alternates depending on timing
   const a = isEqualValueDefault(results, [
     [ 0.1, 0.2, 0.3, 0.4 ], [ 0.5, 0.6, 0.7, 0.8 ]
   ]);
   const b = isEqualValueDefault(results, [
     [ 0.1, 0.2, 0.3, 0.4, 0.5 ], [ 0.6, 0.7, 0.8, 0.9, 1 ]
   ]);
-  if (!a && !b) t.fail(`results: ${ JSON.stringify(results) }`);
+  const c = isEqualValueDefault(results, [
+    [ 0.1, 0.2, 0.3, 0.4, 0.5 ], [ 0.6, 0.7, 0.8, 0.9 ]
+  ]);
+  if (!a && !b && !c) t.fail(`results: ${ JSON.stringify(results) }`);
   else t.pass();
 });
 

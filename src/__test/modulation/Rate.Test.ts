@@ -14,7 +14,7 @@ function arrayIsApprox(t: ExecutionContext, values: number[], baseValue: number,
 test(`per-second`, async t => {
   const r1 = perSecond(1000);
   const r1R = await Array.fromAsync(Flow.repeat(r1, { count: 4, delay: 100 }));
-  arrayIsApprox(t, r1R, 100);
+  arrayIsApprox(t, r1R, 100, 0.02);
 
   const r2 = perSecond(1000);
   const r2R = await Array.fromAsync(Flow.repeat(r2, { count: 2, delay: 500 }));

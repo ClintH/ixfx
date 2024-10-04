@@ -1,5 +1,5 @@
 import test from 'ava';
-import { float } from '../random/index.js';
+import { float, mersenneTwister } from '../random/index.js';
 import { equalUnordered, rangeCheck, rangeCheckInteger } from './Include.js';
 import { weightedInteger } from '../random/WeightedInteger.js';
 import { integer, integerUniqueGen } from '../random/Integer.js';
@@ -12,6 +12,42 @@ const repeat = <V>(count: number, fn: () => V): V[] => {
   return ret;
 }
 
+test(`mersenne-twister-seed`, t => {
+  let tests = 10_000;
+  const mt1 = mersenneTwister(100);
+  let r1 = [];
+  for (let i = 0; i < tests; i++) {
+    r1.push(mt1.float());
+  }
+
+  const mt2 = mersenneTwister(100);
+  let r2 = [];
+  for (let i = 0; i < tests; i++) {
+    r2.push(mt2.float());
+  }
+
+  for (let i = 0; i < tests; i++) {
+    t.is(r1[ i ], r2[ i ]);
+  }
+
+})
+
+test(`mersenne-twister-integer`, t => {
+  const mt = mersenneTwister();
+  let tests = 10_000;
+  for (let i = 0; i < tests; i++) {
+    let v = mt.integer(10);
+    t.true(v < 10, `V is < 10`);
+
+  }
+
+  for (let i = 0; i < tests; i++) {
+    let v = mt.integer(10, 5);
+    t.true(v >= 5, `V is >= 5`);
+    t.true(v < 10, `V is < 10`);
+  }
+
+})
 test(`integerUniqueGen`, async t => {
   const d = [ ...integerUniqueGen(10) ];
   equalUnordered(t, d, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]);

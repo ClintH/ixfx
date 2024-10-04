@@ -6,7 +6,5 @@ test(`tick`, async t => {
   const e1 = Easings.tickEasing(`sineIn`, 10)
   t.false(e1.isDone);
   const e1D = Array.from(repeatSync(e1.compute, { count: 11 }));
-  console.log(e1D);
   t.true(e1.isDone);
-
 })
