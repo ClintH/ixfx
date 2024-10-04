@@ -14,7 +14,7 @@ import { insertAt as ArraysInsertAt } from "../../data/arrays/InsertAt.js";
  * @param options 
  * @returns 
  */
-export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayObjectOptions<V>> = {}): Reactive<ReadonlyArray<V>> & ReactiveArray<V> & (ReactiveInitial<ReadonlyArray<V>> | ReactiveNonInitial<ReadonlyArray<V>>) {
+export function arrayObject<V>(initialValue: ReadonlyArray<V> = [], options: Partial<ArrayObjectOptions<V>> = {}): ReactiveArray<V> & ReactiveInitial<ReadonlyArray<V>> {
   const eq = options.eq ?? isEqualValueDefault;
   const setEvent = initStream<Array<V>>();
   //const diffEvent = initStream<Array<Immutable.Change<any>>>();
