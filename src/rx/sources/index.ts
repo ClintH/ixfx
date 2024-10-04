@@ -7,6 +7,7 @@ export * from './Dom.js';
 export * from './Event.js';
 export * from './Function.js';
 export * from './Iterator.js';
+export * from './Merged.js';
 export * from './Number.js';
 export * from './Object.js';
 export * from './ObjectProxy.js';
