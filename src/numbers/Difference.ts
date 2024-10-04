@@ -1,24 +1,40 @@
+export type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `absolute`
+
 /**
- * Returns the relative difference from the `initial` value
+ * Returns the difference from the `initial` value. Defaults to absolute difference.
  * ```js
- * const rel = relativeDifference(100);
- * rel(100); // 1
- * rel(150); // 1.5
- * rel(50);  // 0.5
+ * const rel = differenceFromFixed(100);
+ * rel(100); // 0
+ * rel(150); // 50
+ * rel(50);  // 50
  * ```
  *
- * The code for this is simple:
+ * 'numerical' gives sign:
  * ```js
- * const relativeDifference = (initial) => (v) => v/initial
+ * const rel = differenceFromFixed(100, `numerical`);
+ * rel(100); // 0
+ * rel(150); // 50
+ * rel(50); // -50
  * ```
- * @param {number} initial
- * @returns
+ * 
+ * 'relative' gives proportion to initial
+ * ```js
+ * const rel = differenceFromFixed(100, `relative`);
+ * rel(100); // 0
+ * rel(150); // 0.5
+ * rel(10);  // 0.90
+ * ```
+ * 
+ * Using 'relativeSigned', we get negative relative result
+ * when value is below the initial value.
+ * 
+ * Use {@link differenceFromLast} to compare against the last value,
+ * rather than the same fixed value.
+ * @param {number} initial Value to compare against
+ * @returns Difference from initial value
  */
-export const relativeDifference = (initial: number) => (v: number) =>
-  v / initial;
+export const differenceFromFixed = (initial: number, kind: DifferenceKind = `absolute`) => (value: number) => differenceFrom(kind, value, initial);
 
-
-export type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `absolute`
 
 /**
  * Returns a function which yields difference compared to last value.
@@ -30,6 +46,8 @@ export type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `abso
  * * 'numerical': numerical difference, with sign, so you can see if difference is higher or lower
  * * 'relative': difference divided by last value, giving a proportional difference. Unsigned.
  * * 'relativeSigned': as above, but with sign
+ * 
+ * Use {@link differenceFromFixed} to compare against a fixed value instead of the last value.
  * 
  * ```js
  * let d = differenceFromLast(`absolute`);
@@ -69,24 +87,48 @@ export type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `abso
  */
 export const differenceFromLast = (kind: DifferenceKind = `absolute`, initialValue = Number.NaN): (v: number) => number => {
   let lastValue = initialValue;
-  const compute = (v: number) => {
-    if (Number.isNaN(lastValue)) {
-      lastValue = v;
-      return 0;
-    }
-    const d = v - lastValue;
-    let r = 0;
-    if (kind === `absolute`) {
-      r = Math.abs(d);
-    } else if (kind === `numerical`) {
-      r = d;
-    } else if (kind === `relative`) {
-      r = Math.abs(d / lastValue);
-    } else if (kind === `relativeSigned`) {
-      r = d / lastValue;
-    } else throw new TypeError(`Unknown kind: '${ kind }' Expected: 'absolute', 'relative', 'relativeSigned' or 'numerical'`);
-    lastValue = v;
-    return r;
+  return (value: number) => {
+    const x = differenceFrom(kind, value, lastValue);
+    lastValue = value;
+    return x;
   }
-  return compute;
+}
+//   const compute = (v: number) => {
+//     if (Number.isNaN(lastValue)) {
+//       lastValue = v;
+//       return 0;
+//     }
+//     const d = v - lastValue;
+//     let r = 0;
+//     if (kind === `absolute`) {
+//       r = Math.abs(d);
+//     } else if (kind === `numerical`) {
+//       r = d;
+//     } else if (kind === `relative`) {
+//       r = Math.abs(d / lastValue);
+//     } else if (kind === `relativeSigned`) {
+//       r = d / lastValue;
+//     } else throw new TypeError(`Unknown kind: '${ kind }' Expected: 'absolute', 'relative', 'relativeSigned' or 'numerical'`);
+//     lastValue = v;
+//     return r;
+//   }
+//   return compute;
+// }
+
+const differenceFrom = (kind: DifferenceKind = `absolute`, value: number, from: number) => {
+  if (Number.isNaN(from)) {
+    return 0;
+  }
+  const d = value - from;
+  let r = 0;
+  if (kind === `absolute`) {
+    r = Math.abs(d);
+  } else if (kind === `numerical`) {
+    r = d;
+  } else if (kind === `relative`) {
+    r = Math.abs(d / from);
+  } else if (kind === `relativeSigned`) {
+    r = d / from;
+  } else throw new TypeError(`Unknown kind: '${ kind }' Expected: 'absolute', 'relative', 'relativeSigned' or 'numerical'`);
+  return r;
 }
