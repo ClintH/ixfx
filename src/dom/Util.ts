@@ -1,6 +1,6 @@
 import * as Points from '../geometry/point/index.js';
 import JSON5 from 'json5';
-import type { CardinalDirection } from '../geometry/Grid.js';
+import type { GridCardinalDirection } from '../geometry/grid/index.js';
 import { cardinal } from '../geometry/rect/index.js';
 import type { Point } from '../geometry/point/PointType.js';
 import { resolveEl } from './ResolveEl.js';
@@ -86,7 +86,7 @@ export const pointScaler = (reference: PointSpaces = `viewport`) => {
 export type ElPositionOpts = {
   readonly target?: PointSpaces;
   readonly relative?: boolean;
-  readonly anchor?: CardinalDirection | `center`;
+  readonly anchor?: GridCardinalDirection | `center`;
 };
 
 /**
@@ -182,7 +182,7 @@ export const positionFn = (
  */
 export const cardinalPosition = (
   domQueryOrEl: Readonly<string | HTMLElement>,
-  anchor: CardinalDirection | `center` = `nw`
+  anchor: GridCardinalDirection | `center` = `nw`
 ): Point => {
   const el = resolveEl(domQueryOrEl);
   return cardinal(el.getBoundingClientRect(), anchor);
