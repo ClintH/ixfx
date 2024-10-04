@@ -293,6 +293,23 @@ export type DomValueOptions = EventOptions & {
   upstreamFilter?: (value: any) => string
 }
 
+export type DomFormOptions<T extends Record<string, any>> = EventOptions & {
+  //initialValue: T | undefined,
+  /**
+   * If true, the current value will be emitted even though it wasn't
+   * triggered by an event.
+   * Default: false
+   */
+  emitInitialValue: boolean
+  /**
+   * Respond to when value has changed or when value is changing
+   * Default: `changed`
+   */
+  when: `changed` | `changing`
+  upstreamSource?: Reactive<T>
+  upstreamFilter?: (name: string, value: any) => string
+}
+
 export type DomNumberInputValueOptions = DomValueOptions & {
   /**
    * If true, sets up INPUT element to operate with relative values
