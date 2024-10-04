@@ -670,8 +670,8 @@ const cubicBezier = (
     stack = stack.push(
       optsOp({
         ...opts,
-        strokeStyle: Colours.opacity(opts.strokeStyle ?? `silver`, 0.6),
-        fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4),
+        strokeStyle: Colours.multiplyOpacity(opts.strokeStyle ?? `silver`, 0.6),
+        fillStyle: Colours.multiplyOpacity(opts.fillStyle ?? `yellow`, 0.4),
       })
     );
 
@@ -724,8 +724,8 @@ const quadraticBezier = (
     stack = stack.push(
       optsOp({
         ...opts,
-        strokeStyle: Colours.opacity(opts.strokeStyle ?? `silver`, 0.6),
-        fillStyle: Colours.opacity(opts.fillStyle ?? `yellow`, 0.4),
+        strokeStyle: Colours.multiplyOpacity(opts.strokeStyle ?? `silver`, 0.6),
+        fillStyle: Colours.multiplyOpacity(opts.fillStyle ?? `yellow`, 0.4),
       })
     );
     connectedPoints(ctx, [ a, quadratic, b ]);

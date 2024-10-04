@@ -516,7 +516,7 @@ const drawSeriesData = (
   }
 
   const colourTransform = (c: string) => {
-    if (translucentPlot) return Colour.opacity(c, 0.2);
+    if (translucentPlot) return Colour.multiplyOpacity(c, 0.2);
     return c;
   };
 

@@ -181,7 +181,7 @@ export const init = (elementQuery: string, options: BipolarViewOptions = {}): Bi
         let opacity = 1;
         // eslint-disable-next-line unicorn/no-array-for-each
         lastValues.forEach(d => {
-          const colour = Colour.opacity(dotColour, opacity);
+          const colour = Colour.multiplyOpacity(dotColour, opacity);
           Drawing.circle(ctx, d, { fillStyle: colour });
           opacity -= opacityStep;
         });
