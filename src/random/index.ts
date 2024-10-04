@@ -5,6 +5,7 @@ export * from './Guid.js';
 export * from './Integer.js';
 export * from './NonZero.js';
 export * from './String.js';
+export * from './Seeded.js';
 export * from './Time.js';
 export type * from './Types.js';
 export * from './Weighted.js';
