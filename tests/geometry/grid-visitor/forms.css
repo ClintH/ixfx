@@ -1,0 +1,64 @@
+ button,
+ fieldset,
+ input,
+ legend,
+ select,
+ textarea {
+   appearance: none;
+   background-color: transparent;
+   border: none;
+   padding: 0;
+   margin: 0;
+   box-sizing: border-box;
+ }
+
+ input,
+ select,
+ textarea {
+   border: 1px solid var(--chrome-5);
+   background-color: var(--chrome-inactive-3);
+   color: var(--chrome-inactive-5);
+   border-radius: var(--radius);
+ }
+
+ input[type="text"],
+ input[type="email"],
+ select,
+ textarea {
+   font: 1.25rem / 1.5 sans-serif;
+   display: block;
+   width: 100%;
+   padding: 0.5rem 0.75rem;
+ }
+
+ textarea {
+   min-height: 10rem;
+ }
+
+ input[type="radio"],
+ input[type="checkbox"] {
+   height: 1.5em;
+   width: 1.5em;
+   vertical-align: middle;
+   align-self: center;
+ }
+
+ input[type="radio"] {
+   border-radius: 50%;
+ }
+
+ input[type="radio"]:checked,
+ input[type="checkbox"]:checked {
+   background-color: var(--chrome-active-3);
+ }
+
+ form {
+   display: grid;
+   gap: 1ch;
+   grid-template-columns: repeat(2, auto);
+   align-items: baseline;
+ }
+
+ label {
+   user-select: none;
+ }

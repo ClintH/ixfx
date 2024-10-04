@@ -1,0 +1,60 @@
+@import url("./forms.css");
+@import url("./tabset.css");
+
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --accent-hue: 100;
+  --radius: 0.25rem;
+  --chrome-hue: 100;
+  --chrome-sat: 15%;
+  --chrome-1: hsl(var(--chrome-hue), var(--chrome-sat), 95%);
+  --chrome-2: hsl(var(--chrome-hue), var(--chrome-sat), 90%);
+  --chrome-3: hsl(var(--chrome-hue), var(--chrome-sat), 80%);
+  --chrome-5: hsl(var(--chrome-hue), var(--chrome-sat), 10%);
+
+  --chrome-inactive-3: hsl(var(--chrome-hue), var(--chrome-sat), 99%);
+  --chrome-inactive-5: hsl(var(--chrome-hue), var(--chrome-sat), 1%);
+
+  --chrome-active-1: hsl(var(--chrome-hue), calc(var(--chrome-sat) + 60%), 90%);
+  --chrome-active-2: hsl(var(--chrome-hue), calc(var(--chrome-sat) + 60%), 80%);
+  --chrome-active-3: hsl(var(--chrome-hue), calc(var(--chrome-sat) + 60%), 50%);
+  --chrome-active-5: hsl(var(--chrome-hue), calc(var(--chrome-sat) + 60%), 10%);
+  --chrome-padding: 0.5rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: var(--chrome-1);
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+#grid {
+  border: 2px solid whitesmoke;
+  width: max-content;
+}
+
+section {
+  display: flex;
+  vertical-align: auto;
+  padding: 1rem;
+  width: max-content;
+  flex-direction: column;
+}
+
+#coords {
+  padding-top: 2em;
+}
+
+#tools {
+  background-color: var(--chrome-1);
+}

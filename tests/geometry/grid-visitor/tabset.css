@@ -1,0 +1,41 @@
+ .ixfx-tabset {
+   background-color: var(--chrome-3);
+   width: 20em;
+   border-radius: var(--radius);
+
+   fieldset {
+     border: none;
+     padding: 0;
+     margin: 0;
+   }
+
+   input[type="radio"] {
+     display: none;
+   }
+
+   input[type="radio"]:checked+label {
+     background-color: var(--chrome-3);
+   }
+
+   input[type="radio"]:not(:checked):hover+label {
+     background: color-mix(in srgb, var(--chrome-3) 40%, transparent);
+   }
+
+   label {
+     cursor: pointer;
+     display: inline-block;
+     padding: var(--chrome-padding);
+   }
+
+   .ixfx-tabset-controls {
+     background-color: var(--chrome-2);
+   }
+
+   .ixfx-tabset-controls label {
+     border-right: 1px solid var(--chrome-1);
+   }
+
+   .ixfx-tabset-host {
+     padding: var(--chrome-padding);
+   }
+ }
