@@ -6,7 +6,7 @@ import { multiplyScalar as RectsMultiplyScalar } from "../geometry/rect/Multiply
 import { windowResize } from "./DomRx.js";
 import { SimpleEventEmitter } from "../Events.js";
 import { guard as RectsGuard } from '../geometry/rect/Guard.js';
-import { Drawing } from 'src/visual/index.js';
+import { Drawing, ImageDataGrid } from 'src/visual/index.js';
 
 export type CanvasEvents = {
   /**
@@ -57,6 +57,9 @@ export type CanvasHelperOpts = {
    * By default, fullscreen canvas will be given -1
    */
   readonly zIndex: number
+
+  readonly colourSpace: PredefinedColorSpace;
+
   /**
    * If specified, this function be called in an animation loop.
    * @param ctx 
@@ -122,7 +125,8 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
       onResize: opts.onResize,
       clearOnResize: opts.clearOnResize ?? true,
       draw: opts.draw,
-      skipCss: opts.skipCss ?? false
+      skipCss: opts.skipCss ?? false,
+      colourSpace: `srgb`
     }
 
     this.#scaler = scaler(`both`);
@@ -141,6 +145,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     }
     return this.#ctx;
   };
+
 
   setLogicalSize(logicalSize: Rect) {
     RectsGuard(logicalSize, `logicalSize`);
@@ -375,4 +380,54 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   get center() {
     return { x: this.width / 2, y: this.height / 2 }
   }
+
+  getImageData(): ImageData {
+    const data = this.ctx.getImageData(0, 0, this.width, this.height, { colorSpace: this.opts.colourSpace });
+    if (!data) throw new Error(`Could not get image data from context`);
+    return data;
+  }
+
+  /**
+   * Returns the canvas frame data as a writable grid.
+   * When editing, make as many edits as needed before calling
+   * `flip`, which writes buffer back to the canvas.
+   * ```js
+   * const g = helper.getWritableBuffer();
+   * // Get {r,g,b,opacity} of pixel 10,10
+   * const pixel = g.get({x:10,y:10});
+   * 
+   * // Set a colour to pixel 10,10
+   * g.set({r: 0.5, g:1, b:0, opacity:0}, {x:10,y:10});
+   * 
+   * // Write buffer to canvas
+   * g.flip();
+   * ```
+   * @returns
+   */
+  getWritableBuffer() {
+    const ctx = this.ctx;
+    let data = this.getImageData();
+    const grid = ImageDataGrid.grid(data);
+    const get = ImageDataGrid.accessor(data);
+    const set = ImageDataGrid.setter(data);
+
+    const flip = () => {
+      ctx.putImageData(data, 0, 0);
+    }
+
+    return { grid, get, set, flip };
+  }
+}
+
+export const imageDataAsGrid = (canvas: HTMLCanvasElement, colorSpace: PredefinedColorSpace = `srgb`) => {
+  const ctx = canvas.getContext(`2d`);
+  if (!ctx) throw new Error(`Could not create context`);
+
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height, { colorSpace });
+  if (!data) throw new Error(`Could not get image data from context`);
+
+  const get = ImageDataGrid.accessor(data);
+  const set = ImageDataGrid.setter(data);
+
+
 }
