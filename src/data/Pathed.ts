@@ -335,7 +335,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): Res
     const index = Number.parseInt(start); //start.slice(1, -1));
     //console.log(`getFieldImpl index: ${ index } value: ${ object[ index ] }`);
     if (typeof object[ index ] === `undefined`) {
-      return { success: false, error: `Index ${ index } is not present` };
+      return { success: false, error: `Index '${ index }' does not exist. Length: ${ object.length }` };
     }
     // eslint-disable-next-line unicorn/prefer-ternary
     if (split.length === 0) {
