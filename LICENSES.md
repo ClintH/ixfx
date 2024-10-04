@@ -1,3 +1,10 @@
+Mersenne Twister
+https://github.com/jawj/mtwist
+© Copyright 2014 – 2021 George MacKerron 
+MIT License
+
+---
+
 Ramer Douglas Peucker implementation
 
 Marius Karthaus
