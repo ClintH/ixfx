@@ -5,10 +5,11 @@ import { CanvasHelper } from "../../dom/CanvasHelper.js";
 import * as Rects from '../../geometry/rect/index.js';
 import * as Cart from './Cartesian.js';
 import { Colour } from "../index.js";
-import { round } from "src/numbers/Round.js";
-import { resolveEl } from "src/dom/ResolveEl.js";
-import { Points } from "src/geometry/index.js";
+import { round } from "../../numbers/Round.js";
+import { resolveEl } from "../../dom/ResolveEl.js";
+import { Points } from "../../geometry/index.js";
 import type { GridStyle, LineStyle, SeriesMeta, ShowOptions, TextStyle } from "./Types.js";
+import type { RecursivePartial } from "../../TsUtil.js";
 
 
 /**
@@ -56,7 +57,7 @@ export class CartesianCanvasPlot {
    * List of lines to draw after drawing everything else.
    * Lines are given in value-coordinate space
    */
-  overlayLines: (Line & LineStyle)[] = [];
+  overlayLines: Array<Line & LineStyle> = [];
 
   renderArea: RectPositioned & { dimensionMin: number } = { ...Rects.EmptyPositioned, dimensionMin: 0 };
   margin;
@@ -72,7 +73,7 @@ export class CartesianCanvasPlot {
   #rangeManual: Cart.PointMinMax | undefined;
   #textStyle: TextStyle;
 
-  constructor(domQueryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: Partial<Cart.CartesianPlotOptions> = {}) {
+  constructor(domQueryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) {
     if (!data) throw new TypeError(`Param 'data' is undefined`);
     if (typeof data !== `object`) throw new TypeError(`Param 'data' is not an object. Got: ${ typeof data }`);
     this.#data = data;
@@ -112,8 +113,14 @@ export class CartesianCanvasPlot {
     this.margin = options.margin ?? 0;
 
     this.helper = new CanvasHelper(domQueryOrEl, {
-      width: 500,
-      height: 400
+      resizeLogic: options.canvasResize ?? `none`,
+      coordinateScale: options.coordinateScale ?? `both`,
+      width: options.canvasWidth,
+      height: options.canvasHeight,
+      onResize: (ctx, size, helper) => {
+        this.computeRenderArea();
+        this.draw();
+      },
     });
     this.helper.el.addEventListener(`click`, event => {
       const { x, y } = event;
@@ -136,6 +143,7 @@ export class CartesianCanvasPlot {
       width, height,
       dimensionMin: Math.min(width, height)
     };
+    //console.log(`computeRenderArea`, this.renderArea);
     return this.renderArea;
   }
 
@@ -151,7 +159,6 @@ export class CartesianCanvasPlot {
     // Compute scale of data
     const range = this.getDataRange(); // actual data range, or user-provided
 
-    //console.log(`getScaler mm`, mm);
     const valueToRelative = Cart.relativeCompute(range);
     const relativeToValue = Cart.absoluteCompute(range);
     let xOffset = this.renderArea.x;//(this.renderArea.width / 2) + ;
@@ -217,22 +224,23 @@ export class CartesianCanvasPlot {
    * @param elOrQuery 
    * @param by 
    */
-  positionAt(data: Point, elOrQuery: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery: HTMLElement | string) {
+  positionAt(data: Point, elOrQuery: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery?: HTMLElement | string) {
     const el = resolveEl(elOrQuery);
     let { x, y } = this.valueToViewport(data);
-
     if (by === `middle`) {
       const bounds = el.getBoundingClientRect();
       x -= bounds.width / 2;
       y -= bounds.height / 2;
     } else if (by === `top-left`) {
-
+      // no-op
     } else throw new Error(`Param 'by' expected to be 'middle' or 'top-left'.`);
     if (relativeToQuery) {
       const relativeTo = resolveEl(relativeToQuery);
       const bounds = relativeTo.getBoundingClientRect();
-      x -= bounds.left;
-      y -= bounds.top;
+
+      //console.log(`Plot relativeTo: ${ relativeTo.scrollTop } y:  ${ bounds.y }`);
+      x -= bounds.x;
+      y -= bounds.y;
     }
     el.style.left = `${ x }px`;
     el.style.top = `${ y }px`;
@@ -257,7 +265,7 @@ export class CartesianCanvasPlot {
   #valueToElementSpace(a: Point, debug: boolean) {
     const ds = this.getCurrentRange();
     // Scale relative to total dimensions of data
-    const rel = ds.valueToRelative(a) as Point;
+    const rel = ds.valueToRelative(a);
 
     // Scale relative to viewport
     const scr = ds.relativeToElementSpace(rel);
@@ -280,8 +288,8 @@ export class CartesianCanvasPlot {
     const bounds = this.helper.el.getBoundingClientRect();
     const elem = Points.subtract(a, bounds);
     const rel = ds.elementSpaceToRelative(elem);
-    const val = ds.relativeToValue(rel) as Point;
-    return val;
+    const value = ds.relativeToValue(rel);
+    return value;
   }
 
   valueToScreen(a: Point) {
@@ -289,7 +297,6 @@ export class CartesianCanvasPlot {
     const rel = ds.valueToRelative(a);
     const scr = ds.relativeToElementSpace(rel);
     const bounds = this.helper.el.getBoundingClientRect();
-    //console.log(`valueToScreen: ${ a.x }x${ a.y } - ${ scr.x }x${ scr.y }`);
     return {
       x: scr.x + bounds.x,
       y: scr.y + bounds.y
@@ -312,7 +319,7 @@ export class CartesianCanvasPlot {
    * @param valueA 
    * @param valueB 
    */
-  #computeScreenLine(valueA: Point, valueB: Point, debug: boolean = false): Line {
+  #computeScreenLine(valueA: Point, valueB: Point, debug = false): Line {
     valueA = this.#valueToElementSpace(valueA, debug) as Point;
     valueB = this.#valueToElementSpace(valueB, debug) as Point;
     return { a: valueA, b: valueB };
@@ -328,14 +335,14 @@ export class CartesianCanvasPlot {
 
   draw() {
     this.helper.clear();
-    const ctx = this.helper.ctx;
+    //const ctx = this.helper.ctx;
     //this.helper.drawBounds(`whitesmoke`);
     //Drawing.rect(ctx, this.renderArea, { strokeStyle: `whitesmoke` });
 
     this.#useGrid();
     if (this.show.axes) this.#drawAxes();
 
-    let count = 0;
+    //let count = 0;
     for (const [ k, v ] of this.#data.getEntries()) {
       let meta = this.#data.getMeta(k);
       if (!meta) {
@@ -343,7 +350,7 @@ export class CartesianCanvasPlot {
         this.#data.setMeta(k, meta);
       }
       this.#drawSeries(k, v, meta);
-      count++;
+      //count++;
     }
 
     for (const line of this.overlayLines) {
@@ -371,17 +378,17 @@ export class CartesianCanvasPlot {
 
   #drawAxes() {
     const { colour, width } = this.#axisStyle;
-    let yAxis = this.#computeScreenLine({ x: 0, y: Number.NEGATIVE_INFINITY }, { x: 0, y: Number.POSITIVE_INFINITY }, false);
-    let xAxis = this.#computeScreenLine({ x: Number.NEGATIVE_INFINITY, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }, false);
+    const yAxis = this.#computeScreenLine({ x: 0, y: Number.NEGATIVE_INFINITY }, { x: 0, y: Number.POSITIVE_INFINITY }, false);
+    const xAxis = this.#computeScreenLine({ x: Number.NEGATIVE_INFINITY, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }, false);
     this.#drawLineAbsolute(xAxis, colour, width, false);
     this.#drawLineAbsolute(yAxis, colour, width, false);
   }
 
 
-  #drawYAxisValues(yPoints: Point[]) {
+  #drawYAxisValues(yPoints: Array<Point>) {
     const { ctx } = this.helper;
 
-    ctx.font = this.#textStyle.size + " " + this.#textStyle.font;
+    ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
     ctx.fillStyle = this.#textStyle.colour;
     ctx.textBaseline = `middle`;
 
@@ -389,28 +396,28 @@ export class CartesianCanvasPlot {
     for (const p of yPoints) {
       if (p.x === 0 && p.y === 0) continue;
       const scr = this.#valueToElementSpace(p, false);
-      const val = this.axisRounder(p.y);
-      const label = val.toString();
+      const value = this.axisRounder(p.y);
+      const label = value.toString();
       const measure = ctx.measureText(label);
-      let x = scr.x - measure.width - (this.whiskerLength / 2) - 5;
-      let y = scr.y;
+      const x = scr.x - measure.width - (this.whiskerLength / 2) - 5;
+      const y = scr.y;
       ctx.fillText(label, x, y);
     }
   }
 
-  #drawXAxisValues(xPoints: Point[]) {
+  #drawXAxisValues(xPoints: Array<Point>) {
     const { ctx } = this.helper;
 
-    ctx.font = this.#textStyle.size + " " + this.#textStyle.font;
+    ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
     ctx.fillStyle = this.#textStyle.colour;
     ctx.textBaseline = `top`;
     for (const p of xPoints) {
       const scr = this.#valueToElementSpace(p, false);
-      const val = this.axisRounder(p.x);
-      const label = val.toString();
+      const value = this.axisRounder(p.x);
+      const label = value.toString();
       const measure = ctx.measureText(label);
-      let x = scr.x - measure.width / 2;
-      let y = scr.y + measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent + (this.whiskerLength / 2);
+      const x = scr.x - measure.width / 2;
+      const y = scr.y + measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent + (this.whiskerLength / 2);
       ctx.fillText(label, x, y);
     }
   }
@@ -444,7 +451,7 @@ export class CartesianCanvasPlot {
     const showWhiskers = this.show.whiskers;
     const showValues = this.show.axisValues;
     const mm = this.getCurrentRange().range; // actual data range, or user-provided
-    const { increments, colour: strokeStyle, width: strokeWidth, major } = g;
+    const { increments, major } = g;
 
     // Vertical lines
     const axisMarks = Cart.computeAxisMark(mm, increments, major);
@@ -465,7 +472,7 @@ export class CartesianCanvasPlot {
     }
   }
 
-  #drawSeries(name: string, series: Cart.PlotPoint[], meta: SeriesMeta) {
+  #drawSeries(name: string, series: Array<Cart.PlotPoint>, meta: SeriesMeta) {
     if (this.#connectStyle === `line`) {
       this.#drawConnected(series, meta.colour, meta.lineWidth);
     }
@@ -477,12 +484,12 @@ export class CartesianCanvasPlot {
     }
   }
 
-  #drawConnected(dots: Cart.PlotPoint[], colour: string, width: number) {
+  #drawConnected(dots: Array<Cart.PlotPoint>, colour: string, width: number) {
     const ctx = this.helper.ctx;
     ctx.beginPath();
-    for (let i = 0; i < dots.length; i++) {
-      const dot = this.#valueToElementSpace(dots[ i ], false);
-      if (i === 0) ctx.moveTo(dot.x, dot.y);
+    for (const [ index, dot_ ] of dots.entries()) {
+      const dot = this.#valueToElementSpace(dot_, false);
+      if (index === 0) ctx.moveTo(dot.x, dot.y);
       ctx.lineTo(dot.x, dot.y);
     }
     ctx.strokeStyle = Colour.resolveToString(colour);
