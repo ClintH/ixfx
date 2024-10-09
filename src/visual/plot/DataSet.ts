@@ -21,7 +21,7 @@ export class DataSet<TValue, TSeriesMeta> {
     this.lastChange = performance.now();
   }
 
-  set(series: string, data: TValue[]) {
+  set(series: string, data: Array<TValue>) {
     this.#data.setValues(series, data);
   }
 
@@ -46,15 +46,15 @@ export class DataSet<TValue, TSeriesMeta> {
   }
 
   *getValues() {
-    return yield* this.#data.valuesFlat();
+    yield* this.#data.valuesFlat();
   }
 
   *getEntries() {
-    return yield* this.#data.entries();
+    yield* this.#data.entries();
   }
 
   *getSeries() {
-    return yield* this.#data.values();
+    yield* this.#data.values();
   }
 
   add(value: TValue, series = `default`) {
