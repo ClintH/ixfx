@@ -1,6 +1,7 @@
 
 export * from './Compare.js';
 export * as Correlate from './Correlate.js';
+export * from './CloneFromFields.js';
 export * from './KeysToNumbers.js';
 export * from './MapObject.js';
 
