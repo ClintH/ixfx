@@ -12,6 +12,7 @@ import type {
   IoDataEvent,
   IoEvents,
 } from './Types.js';
+import { getErrorMessage } from 'src/debug/GetErrorMessage.js';
 
 export type EspruinoStates =
   | `ready`
@@ -114,7 +115,7 @@ export const puck = async (opts: EspruinoBleOpts = {}) => {
   });
 
   if (opts.debug) {
-    console.log(`Espruino.puck device name: ${ device.name }`);
+    console.info(`Espruino.puck device name: ${ device.name }`);
   }
   const d = new EspruinoBleDevice(device, { name, debug });
   await d.connect();
@@ -129,8 +130,9 @@ export const bangle = async (opts: EspruinoBleOpts = {}) => {
     filters: getFilters(opts, `Bangle.js`),
     optionalServices: [ NordicDefaults.service ],
   });
-
-  console.log(device.name);
+  if (opts.debug) {
+    console.info(`Espruino.bangle device name: ${ device.name }`);
+  }
   const d = new EspruinoBleDevice(device, { name, debug });
   await d.connect();
   return d;
@@ -200,15 +202,12 @@ export const serial = async (
  * @returns
  */
 const getFilters = (opts: EspruinoBleOpts, defaultNamePrefix: string) => {
-  //eslint-disable-next-line functional/no-let
   const filters: Array<BluetoothLEScanFilter> = [];
 
   if (opts.filters) {
-    //eslint-disable-next-line functional/immutable-data
     filters.push(...opts.filters);
   } else if (opts.name) {
     // Name filter
-    //eslint-disable-next-line functional/immutable-data
     filters.push({ name: opts.name });
     console.info(`Filtering Bluetooth devices by name '${ opts.name }'`);
   } else {
@@ -374,7 +373,7 @@ export const deviceEval = async (
   const assumeExclusive = opts.assumeExclusive ?? true;
 
   if (typeof code !== `string`) {
-    throw new TypeError(`code parameter should be a string`);
+    throw new TypeError(`Param 'code' should be a string. Got: ${ typeof code }`);
   }
 
   return new Promise((resolve, reject) => {
@@ -383,9 +382,7 @@ export const deviceEval = async (
 
     const onData = (d: IoDataEvent) => {
       try {
-        //eslint-disable-next-line functional/no-let
-        let cleaned = d.data;
-
+        let cleaned = d.data.trim();
         // Prefixed with angled bracket sometimes?
         if (cleaned.startsWith(`>{`) && cleaned.endsWith(`}`)) {
           cleaned = cleaned.slice(1);
@@ -396,6 +393,7 @@ export const deviceEval = async (
 
         // Check for reply field, and that it matches
         if (`reply` in dd) {
+
           if (dd.reply === id) {
             done(); // Stop waiting for result
             if (`result` in dd) {
@@ -411,11 +409,11 @@ export const deviceEval = async (
         // If there was a syntax error, response won't be JSON
         if (assumeExclusive) {
           // Fail with unexpected reply as the message
-          done(d.data);
+          done(`Unexpected reply: ${ d.data }. Error: ${ getErrorMessage(error) }`);
         } else {
           // Unexpected reply, but we cannot be sure if it's in response to eval or
           // some other code running on board. So just warn and eventually timeout
-          warn(error as string);
+          warn(getErrorMessage(error));
         }
       }
     };
@@ -435,7 +433,7 @@ export const deviceEval = async (
       (reason: string) => {
         reject(new Error(reason));
       },
-      () => {
+      (_success) => {
         // If we got a response or there was a timeout, remove event listeners
         device.removeEventListener(`data`, onData);
         device.removeEventListener(`change`, onStateChange);
