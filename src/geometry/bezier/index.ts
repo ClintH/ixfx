@@ -14,7 +14,7 @@ export * from './Guard.js';
  * @param {number} [bend=0] Bend amount, from -1 to 1
  * @returns {QuadraticBezier}
  */
-export const quadraticBend = (a: Point, b: Point, bend = 0): QuadraticBezier => quadraticSimple(a, b, bend);
+// export const quadraticBend = (a: Point, b: Point, bend = 0): QuadraticBezier => quadraticSimple(a, b, bend);
 
 /**
  * Creates a simple quadratic bezier with a specified amount of 'bend'.
@@ -31,7 +31,6 @@ export const quadraticSimple = (start: Point, end: Point, bend = 0): QuadraticBe
   if (bend < -1 || bend > 1) throw new Error(`Expects bend range of -1 to 1`);
 
   const middle = LinesInterpolate(0.5, start, end);
-  // eslint-disable-next-line functional/no-let
   let target = middle;
   if (end.y < start.y) {
     // Upward slope
