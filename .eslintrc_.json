@@ -43,7 +43,6 @@
         "Args*",
         "el",
         "fn*",
-        "*Fn",
         "opts",
         "dest",
         ".*El$"
@@ -57,7 +56,7 @@
       }
     ],
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-    "@typescript-eslint/ban-ts-comment": ["off"],
+    "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/array-type": ["error", { "default":"generic" }],
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-argument": "off",
