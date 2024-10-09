@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>circle-packing</title>
+  <title>text metrics</title>
 </head>
 
 <body>
@@ -15,19 +15,20 @@
 
     html,
     body {
-      height: 100vh;
-      width:100vw;
+      height: 100%;
       margin: 0;
       padding: 0;
       overflow: hidden;
     }
 
-    #plot {
+    canvas {
       border: 2px solid whitesmoke;
+   
     }
+    
   </style>
-  <canvas id="plot">
-    <script type="module" src="script.js"></script>
+  <canvas></canvas>
+  <script type="module" src="script.js"></script>
 </body>
 
 </html>

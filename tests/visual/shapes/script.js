@@ -1,12 +1,17 @@
 import {CanvasHelper} from '../../../dist/dom.js';
 import {Drawing} from '../../../dist/visual.js';
 import {degreeToRadian, Points, Lines, Shapes, Triangles, Rects} from '../../../dist/geometry.js';
-import {dotProduct} from '../../../dist/arrays.js';
+import {dotProduct} from '../../../dist/numbers.js';
 
 let ptr = {x: 0, y: 0};
 let ptrClick = {x: 300, y: 200};
 
-const canvas = new CanvasHelper(`#plot`, {fill:`viewport`,onResize:() => { draw(); }});
+//const canvas = new CanvasHelper(`#plot`, {fill:`viewport`,onResize:() => { draw(); }});
+
+const canvas = new CanvasHelper(`#plot`, {
+  resizeLogic:`both`,
+  onResize:() => draw()
+});
 
 console.log(dotProduct([
   [1, 2, 3], [1, 2, 3]

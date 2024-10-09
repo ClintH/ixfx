@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>canvas-helper</title>
+</head>
+
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,body {
+      margin:0;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      border: 1px solid black;
+    }
+    #container {
+      width:90vw;
+      height: 90vh;
+      border: 1px solid rgb(136, 136, 136);
+      display:flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+  <div id="container">
+    <canvas id="canvas"></canvas>
+  </div>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

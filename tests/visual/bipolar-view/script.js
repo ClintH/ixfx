@@ -1,4 +1,3 @@
-import {parentSizeCanvas} from '../../../dist/dom.js';
 import { BipolarView } from '../../../dist/visual.js';
 
 /**

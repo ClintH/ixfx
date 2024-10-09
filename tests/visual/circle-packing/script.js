@@ -3,9 +3,10 @@ import {Drawing} from '../../../dist/visual.js';
 import * as Flow from '../../../dist/flow.js';
 import * as Random from '../../../dist/random.js';
 import {Layouts, Circles, degreeToRadian, Points, Lines, Shapes, Triangles, Rects} from '../../../dist/geometry.js';
-import {dotProduct} from '../../../dist/arrays.js';
+import {dotProduct} from '../../../dist/numbers.js';
+import { Iterables } from '../../../dist/bundle.js';
 
-const canvas = new CanvasHelper(`#plot`, {fill:`viewport`, onResize: () => draw()});
+const canvas = new CanvasHelper(`#plot`, {resizeLogic:`both`, onResize: () => draw()});
 
 let ptr = {x: 0, y: 0};
 let ptrClick = {x: 300, y: 200};
@@ -16,7 +17,9 @@ const radiusRandom = Random.gaussianSource(4);
 const radiusMin = 2;
 const circleQuantity = 500;
 
-const circlesToPack = [...Flow.repeat(circleQuantity,  () =>  ({ hue: Math.random(), radius: (radiusRandom() * 200)+ radiusMin }))];
+const make = await Flow.repeat(  () =>  ({ hue: Math.random(), radius: (radiusRandom() * 200)+ radiusMin }), { count:circleQuantity})
+
+const circlesToPack = await Iterables.Async.toArray(make);
 
 const drawDistribution = () => {
   const amt = 500;
@@ -40,10 +43,10 @@ const draw = () => {
 }
 
 
-document.addEventListener(`keyup`, () => {
-  canvas.clear();
-  draw();
-})
+// document.addEventListener(`keyup`, () => {
+//   canvas.clear();
+//   draw();
+// })
 // document.addEventListener(`pointermove`, evt => {
 //   ptr = {
 //     x: evt.x,

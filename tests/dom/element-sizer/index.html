@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>canvas-helper-buffer</title>
+</head>
+
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,body {
+      margin:0;
+    }
+    canvas {
+      border: 1px solid black;
+    }
+    div {
+      border: 1px solid silver;
+    }
+    section {
+      display:flex;
+      padding:1em;
+    }
+    #c1,#c2,#c3 {
+      width: 50vw;
+      height:100px;
+      overflow: hidden;
+    }
+    #o1,#o2,#o3,#o4,#o5 {
+      flex-grow:1;
+    }
+    #d1,#d2,#d3,#d4,#d5 {
+      height: 20vh;
+      width: 100px;
+      overflow: hidden;
+    }
+    #dd1,#dd2,#dd3,#dd4,#dd5 {
+      flex-grow:1;
+    }
+  </style>
+  <h1>element-size</h1>
+  <section>
+    <div id="c1">
+      <canvas></canvas>
+    </div>
+    <div id="o1">both</div>
+  </section>
+
+  <section>
+    <div id="c2">
+      <canvas></canvas>
+    </div>
+    <div id="o2">width</div>
+  </section>
+
+  <section>
+    <div id="c3">
+      <canvas></canvas>
+    </div>
+    <div id="o3">height</div>
+  </section>
+
+  <hr>
+  <section>
+    <div id="d1">
+      <canvas></canvas>
+    </div>
+    <div id="dd1">both</div>
+  </section>
+
+  <section>
+    <div id="d2">
+      <canvas></canvas>
+    </div>
+    <div id="dd2">width</div>
+  </section>
+
+  <section>
+    <div id="d3">
+      <canvas></canvas>
+    </div>
+    <div id="dd3">height</div>
+  </section>
+
+  <section>
+    <div id="d4">
+      <canvas></canvas>
+    </div>
+    <div id="dd4">min</div>
+  </section>
+
+  <section>
+    <div id="d5">
+      <canvas></canvas>
+    </div>
+    <div id="dd5">max</div>
+  </section>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

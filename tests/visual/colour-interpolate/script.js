@@ -1,4 +1,4 @@
-import {parentSizeCanvas} from '../../../dist/dom.js';
+
 import { Colour } from '../../../dist/visual.js';
 
 const canvasWidth = 400;
@@ -19,7 +19,7 @@ const drawInterpolation = () => {
   let h = 200;
   while (v <= max) {
     const colour = ci(v);
-    ctx.fillStyle = Colour.toHslaString(colour);
+    ctx.fillStyle = Colour.toString(colour);
     ctx.fillRect(x, y, w, h);
     x += w;
     v += step;

@@ -1,9 +1,7 @@
-import {parentSizeCanvas} from '../../../dist/dom.js';
 import { Plot } from '../../../dist/visual.js';
 import {Easings} from '../../../dist/modulation.js';
 
 const ds = new Plot.DataSet();
-
 
 const p = new Plot.CartesianCanvasPlot(`#plot`, ds, {
   margin: 20,
@@ -45,7 +43,11 @@ const line = Easings.line(1);
 
 let resolution = 0.06;
 for (let x=0;x<1;x+=resolution) {
-  ds.add({x,y:line(x)});
+  const p = line(x);
+  //const pt = {x,y:p};
+
+  //console.log(pt);
+  ds.add(p);
 }
 
 p.draw();

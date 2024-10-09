@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>plot-element</title>
+  </head>
+  <body>
+    <style>
+      * {
+      box-sizing: border-box;
+    }
+
+    #container {
+      height: 10em;
+      border: 2px solid gray;
+      height:30vw;
+      width:90vw;
+      z-index: 0;
+    }
+    #plot {
+    }
+    </style>
+    <section>
+      <h1>plot-element</h1>
+      <button id="btnToggle">Auto data</button>
+      <div id="container">
+        <plot-element line-width="5" data-width="10" render="line" id="plot"></plot-element>
+      </div>
+    </section>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
