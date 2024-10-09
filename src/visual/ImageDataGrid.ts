@@ -1,5 +1,6 @@
 import * as Grids from '../geometry/grid/index.js';
 import type { Rgb, Rgb8Bit } from './Colour.js';
+import { toRgb8bit } from './Colour.js';
 
 
 export const grid = (image: ImageData): Grids.Grid => {
@@ -26,9 +27,7 @@ export const accessor = (image: ImageData): Grids.GridCellAccessor<Rgb8Bit> => {
 
   const fn: Grids.GridCellAccessor<Rgb8Bit> = (cell: Grids.GridCell, bounds = `undefined`) => {
     const index = Grids.indexFromCell(g, cell, bounds);
-    if (index === undefined) {
-      return undefined;
-    }
+    if (index === undefined) return;
     const pxIndex = index * 4;
     return {
       r: data[ pxIndex ],
@@ -47,20 +46,19 @@ export const accessor = (image: ImageData): Grids.GridCellAccessor<Rgb8Bit> => {
  * @param image 
  * @returns 
  */
-export const setter = (image: ImageData): Grids.GridCellSetter<Rgb8Bit> => {
+export const setter = (image: ImageData): Grids.GridCellSetter<Rgb> => {
   const g = grid(image);
   const data = image.data;
 
-  const fn: Grids.GridCellSetter<Rgb8Bit> = (value: Rgb8Bit, cell: Grids.GridCell, bounds = `undefined`) => {
+  const fn: Grids.GridCellSetter<Rgb> = (value: Rgb, cell: Grids.GridCell, bounds = `undefined`) => {
     const index = Grids.indexFromCell(g, cell, bounds);
-    if (index === undefined) {
-      return undefined;
-    }
+    if (index === undefined) throw new Error(`Cell out of range. ${ cell.x },${ cell.y }`);
+    const pixel = toRgb8bit(value);
     const pxIndex = index * 4;
-    data[ pxIndex ] = value.r;
-    data[ pxIndex + 1 ] = value.g;
-    data[ pxIndex + 2 ] = value.b;
-    data[ pxIndex + 3 ] = value.opacity;
+    data[ pxIndex ] = pixel.r;
+    data[ pxIndex + 1 ] = pixel.g;
+    data[ pxIndex + 2 ] = pixel.b;
+    data[ pxIndex + 3 ] = pixel.opacity ?? 255;
   };
   return fn;
 }
@@ -83,7 +81,7 @@ export function* byRow(image: ImageData) {
 
   const v = Grids.As.rows(g, { x: 0, y: 0 });
   for (const row of v) {
-    let pixels = row.map(p => a(p, `undefined`));
+    const pixels = row.map(p => a(p, `undefined`));
     yield pixels
   }
 }
@@ -98,7 +96,7 @@ export function* byColumn(image: ImageData) {
 
   //Grids.visitorRow
   for (let x = 0; x < g.cols; x++) {
-    let col: Rgb8Bit[] = [];
+    const col: Array<Rgb8Bit> = [];
     for (let y = 0; y < g.rows; y++) {
       const p = a({ x, y }, `undefined`);
       if (p) col.push(p);
