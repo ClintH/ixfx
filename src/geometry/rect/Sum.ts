@@ -1,4 +1,4 @@
-import { apply } from "./Apply.js";
+import { applyMerge } from "./Apply.js";
 import { getRectPositioned, isPositioned } from "./Guard.js";
 import type { Rect, RectPositioned } from "./RectTypes.js";
 
@@ -82,7 +82,7 @@ export function sum(rect: RectPositioned, width: number, height: number): RectPo
 //eslint-disable-next-line func-style
 export function sum(a: Rect, b: Rect | number, c?: number): Rect {
   // @ts-ignore
-  return apply(sumOp, a, b, c);
+  return applyMerge(sumOp, a, b, c);
 }
 
 /**

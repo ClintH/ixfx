@@ -1,5 +1,5 @@
 import type { RectPositioned, Rect } from "./RectTypes.js";
-import { apply, applyDim, applyScalar } from "./Apply.js";
+import { applyMerge, applyDim, applyScalar } from "./Apply.js";
 
 const divideOp = (a: number, b: number) => a / b;
 
@@ -73,7 +73,7 @@ export function divide(
   c?: number
 ): RectPositioned | Rect {
   // @ts-ignore
-  return apply(divideOp, a, b, c) as RectPositioned | Rect;
+  return applyMerge(divideOp, a, b, c) as RectPositioned | Rect;
 }
 
 

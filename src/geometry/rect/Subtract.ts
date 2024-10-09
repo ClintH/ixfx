@@ -1,4 +1,4 @@
-import { apply } from "./Apply.js";
+import { applyMerge } from "./Apply.js";
 import { isPositioned } from "./Guard.js";
 import type { Rect, RectPositioned } from "./RectTypes.js";
 
@@ -55,7 +55,7 @@ export function subtract(a: RectPositioned, width: number, height: number): Rect
  */
 export function subtract(a: Rect | undefined, b: Rect | number, c?: number): Rect {
   // @ts-ignore
-  return apply(subtractOp, a, b, c);
+  return applyMerge(subtractOp, a, b, c);
 }
 
 /**

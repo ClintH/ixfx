@@ -1,5 +1,5 @@
 import type { RectPositioned, Rect } from "./RectTypes.js";
-import { apply, applyDim, applyScalar } from "./Apply.js";
+import { applyMerge, applyDim, applyScalar } from "./Apply.js";
 
 const multiplyOp = (a: number, b: number) => a * b;
 
@@ -80,7 +80,7 @@ export function multiply(
   c?: number
 ): RectPositioned | Rect {
   // @ts-ignore
-  return apply(multiplyOp, a, b, c) as RectPositioned | Rect;
+  return applyMerge(multiplyOp, a, b, c) as RectPositioned | Rect;
 }
 
 
