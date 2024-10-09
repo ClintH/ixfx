@@ -31,12 +31,10 @@
     }
   ],
   "eslint.codeActionsOnSave.mode": "problems",
-  "eslint.format.enable": false,
+  "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "[javascript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
+  "prettier.enable": false,
   "editor.formatOnPaste": false,
   "editor.formatOnSave": true,
   "editor.formatOnType": false,

@@ -4,7 +4,7 @@ A rough changelog between NPM releases
 
 Iterables
 + iterableController: use an iterator with start/pause/restart semantics and a callback for values.
-+ 
+  
 Numbers
 + differenceFromLast: compare against the previous value
 + differenceFromFixed: compare against a fixed value
@@ -21,7 +21,6 @@ Rx
 
 Colour
 * .opacity renamed to .multiplyOpacity
-* 
 + Random.mersenneTwister for repeatable random numbers using
 
 # 0.31.0 2024.09.22
