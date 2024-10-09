@@ -81,7 +81,7 @@ export const makeHelper = (
       line(ctx, lineToDraw, opts);
     },
     rect(
-      rectsToDraw: RectPositioned | Array<RectPositioned>,
+      rectsToDraw: Rect | Array<Rect> | RectPositioned | Array<RectPositioned>,
       opts?: RectOpts
     ): void {
       rect(ctx, rectsToDraw, opts);
@@ -580,7 +580,7 @@ export const dot = (
   if (opts === undefined) opts = {};
   const radius = opts.radius ?? 10;
   const positions = Array.isArray(pos) ? pos : [ pos ];
-  let stroke = opts.stroke ? opts.stroke : opts.strokeStyle !== undefined;
+  const stroke = opts.stroke ? opts.stroke : opts.strokeStyle !== undefined;
   let filled = opts.filled ? opts.filled : opts.fillStyle !== undefined;
   if (!stroke && !filled) filled = true;
 
@@ -846,7 +846,7 @@ export type RectOpts = DrawingOpts & Readonly<Partial<{
  */
 export const rect = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Rect | RectPositioned | ReadonlyArray<RectPositioned>,
+  toDraw: Rect | Array<Rect> | RectPositioned | Array<RectPositioned>,
   opts: RectOpts = {}
 ) => {
   applyOpts(ctx, opts);
@@ -859,9 +859,11 @@ export const rect = (
     if (filled) ctx.fillRect(x, y, d.width, d.height);
     if (stroke) {
       if (opts.strokeWidth) ctx.lineWidth = opts.strokeWidth;
+      //if (opts.strokeStyle) ctx.strokeStyle = opts.strokeStyle;
       ctx.strokeRect(x, y, d.width, d.height);
     }
     if (opts.crossed) {
+      ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(d.width, d.height);
       ctx.stroke();
@@ -938,13 +940,14 @@ export const textBlock = (
   lines: ReadonlyArray<string>,
   opts: DrawingOpts & {
     readonly anchor: Point;
+    readonly align?: `top` | `center`
     readonly anchorPadding?: number;
     readonly bounds?: RectPositioned;
   }
 ) => {
   applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;
-
+  const align = opts.align ?? `top`;
   const anchor = opts.anchor;
   const bounds = opts.bounds ?? { x: 0, y: 0, width: 1_000_000, height: 1_000_000 };
 
@@ -955,7 +958,7 @@ export const textBlock = (
   // Get width and height
   const widths = blocks.map((tm) => tm.width);
   const heights = blocks.map(
-    (tm) => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent
+    (tm) => tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent + 3
   );
 
   // Find extremes
@@ -977,6 +980,12 @@ export const textBlock = (
 
   if (y < bounds.y) y = bounds.y + anchorPadding;
 
+  // eslint-disable-next-line unicorn/prefer-ternary
+  if (align === `top`) {
+    ctx.textBaseline = `top`;
+  } else {
+    ctx.textBaseline = `middle`;
+  }
   for (const [ index, line ] of lines.entries()) {
     ctx.fillText(line, x, y);
     y += heights[ index ];
