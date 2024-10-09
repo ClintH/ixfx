@@ -2,7 +2,7 @@ import * as Drawing from './Drawing.js';
 import * as Svg from './Svg.js';
 //import * as Plot from './Plot.js';
 
-import * as Plot2 from './Plot2.js';
+//import * as Plot2 from './Plot2.js';
 
 import * as Palette from './Palette.js';
 import * as Colour from './Colour.js';
@@ -14,14 +14,11 @@ export * as BipolarView from './BipolarView.js';
 export * as Palette from './Palette.js';
 export * as Drawing from './Drawing.js';
 export * as Svg from './Svg.js';
-//export * as Plot from './Plot.js';
+//export * as Plot2 from './Plot2.js';
 
-
-export * as Plot2 from './Plot2.js';
-export * as PlotOld from './PlotOld.js';
 export * as Plot from './plot/index.js';
 export * as SceneGraph from './SceneGraph.js';
-export * from './ScaleCanvas.js';
+//export * from './ScaleCanvas.js';
 export * from './plot/CartesianCanvasPlot.js';
 
 /**
@@ -63,12 +60,10 @@ export * as Video from './Video.js';
 
 try {
   if (typeof window !== `undefined`) {
-    //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
     (window as any).ixfx = {
       ...(window as any).ixfx,
       Visuals: {
         SceneGraph,
-        Plot2,
         Drawing,
         Svg,
         Palette,
