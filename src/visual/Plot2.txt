@@ -10,11 +10,11 @@ import { ifNaN, throwNumberTest } from '../util/GuardNumbers.js';
 import type { Rect, RectPositioned, PointCalculableShape } from '../geometry/Types.js';
 import type { Point } from '../geometry/point/PointType.js';
 import { subtract as RectsSubtract } from '../geometry/rect/Subtract.js';
-import { scaleCanvas } from './ScaleCanvas.js';
-import { parentSizeCanvas } from '../dom/CanvasSizing.js';
 import { minMaxAvg } from '../numbers/MinMaxAvg.js';
 import type { MinMaxAvgTotal } from '../numbers/Types.js';
 import { throwResult } from 'src/util/Results.js';
+import { ElementSizer, type ElementResizeLogic } from 'src/dom/ElementSizing.js';
+import { CanvasHelper } from 'src/dom/CanvasHelper.js';
 
 /**
  * 
@@ -53,9 +53,9 @@ export type ScalingOption = `normalise` | `independent`
  */
 export type Opts = {
   /**
-   * If true, Canvas will be resized to fit parent
+   * Governs whether plot will be resized to fit parent
    */
-  autoSize?: boolean;
+  resizeLogic?: ElementResizeLogic;
   /**
    * Colour for axis lines & labels
    */
@@ -450,12 +450,10 @@ export class PlotArea extends Sg.CanvasBox {
       return [ closest, distances[ index ] ];
     };
 
-    // eslint-disable-next-line unicorn/prefer-switch
     if (series.drawingStyle === `line`) {
       let y = 0;
       ctx.beginPath();
 
-      // eslint-disable-next-line unicorn/no-for-loop
       for (let index = 0; index < d.length; index++) {
         const scaled = clamp(series.scaleValue(d[ index ]));
         y = padding + this.paddingPx + v.height * flip(scaled);
@@ -473,7 +471,7 @@ export class PlotArea extends Sg.CanvasBox {
     } else if (series.drawingStyle === `dotted`) {
       let y = 0;
       ctx.fillStyle = series.colour;
-      // eslint-disable-next-line unicorn/no-for-loop
+
       for (let index = 0; index < d.length; index++) {
         const scaled = series.scaleValue(d[ index ]);
         y = padding + v.height * flip(scaled);
@@ -486,7 +484,7 @@ export class PlotArea extends Sg.CanvasBox {
     } else if (series.drawingStyle === `bar`) {
       ctx.fillStyle = series.colour;
       const interBarPadding = Math.ceil(pxPerPt * 0.1);
-      // eslint-disable-next-line unicorn/no-for-loop
+
       for (let index = 0; index < d.length; index++) {
         const scaled = series.scaleValue(d[ index ]);
         const h = v.height * scaled;
@@ -810,10 +808,12 @@ export class AxisY extends Sg.CanvasBox {
     //let width = this.plot.axisStrokeWidth + paddingPx;
 
     switch (this.plot.scaling) {
-      case `normalise`:
+      case `normalise`: {
         return this.#measureNormalise(copts);
-      default:
+      }
+      default: {
         return this.#measureIndependent(copts);
+      }
     }
   }
 
@@ -823,7 +823,7 @@ export class AxisY extends Sg.CanvasBox {
     if (this.showDataLabels) {
       for (const s of this.plot.seriesArray()) {
         const r = s.visualFormatted;
-        let chars = Math.max(r.longest.length, this._minCharLength);
+        const chars = Math.max(r.longest.length, this._minCharLength);
         width += textWidth(copts.ctx, `9`.repeat(chars + 1), paddingPx);
       }
     }
@@ -861,11 +861,13 @@ export class AxisY extends Sg.CanvasBox {
 
   protected drawSelf(ctx: CanvasRenderingContext2D): void {
     switch (this.plot.scaling) {
-      case `normalise`:
+      case `normalise`: {
         this.#drawNormalised(ctx);
         break;
-      default:
+      }
+      default: {
         this.#drawIndependent(ctx);
+      }
     }
 
     // const s = this.getSeries();
@@ -953,11 +955,11 @@ export class AxisY extends Sg.CanvasBox {
       ctx.textBaseline = `top`;
       const r = s.visualFormatted;
       let actualWidth = 0;
-      let xPre = xOffset;
+      const xPre = xOffset;
       if (isRangeSinglePoint(s.visualDataRange)) {
         ctx.fillStyle = plot.axisTextColour;
 
-        let m = ctx.measureText(r.max);
+        const m = ctx.measureText(r.max);
         //let txtHeight = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
         //ctx.textBaseline = `top`;
         ctx.fillText(r.max, xOffset, middleY + swatchSize);
@@ -965,9 +967,9 @@ export class AxisY extends Sg.CanvasBox {
         xOffset += m.width + paddingPx;
       } else {
         ctx.fillStyle = plot.axisTextColour;
-        let m1 = ctx.measureText(r.min);
+        const m1 = ctx.measureText(r.min);
         ctx.fillText(r.min, xOffset, plotArea.canvasRegion.height - paddingPx);
-        let m2 = ctx.measureText(r.max);
+        const m2 = ctx.measureText(r.max);
         ctx.fillText(r.max, xOffset, plotArea.canvasRegion.y);
         actualWidth = Math.max(m1.width, m2.width);
         xOffset += actualWidth + paddingPx;
@@ -1068,33 +1070,51 @@ export class Plot extends Sg.CanvasBox {
   axisStrokeWidth: number;
   series: Map<string, Series>;
   scaling: ScalingOption;
-  private _frozen = false;
-  private _canvasEl: HTMLCanvasElement;
-  private _ctx: CanvasRenderingContext2D;
-
   defaultSeriesOpts?: SeriesOpts;
+
+  #frozen = false;
+  #canvas: CanvasHelper;
+
   constructor(canvasElementOrQuery: HTMLCanvasElement | string, opts: Partial<Opts> = {}) {
-    const { ctx, element, bounds } = scaleCanvas(canvasElementOrQuery);
+    //const { ctx, element, bounds } = scaleCanvas(canvasElementOrQuery);
     super(undefined, `Plot`);//bounds);
-    this._canvasEl = element;
-    this.bounds = bounds;
+    //const autoSize = opts.autoSize ?? false;
+
+    this.#canvas = new CanvasHelper(canvasElementOrQuery, {
+      resizeLogic: opts.resizeLogic
+    });
+
+    //this._canvasEl = element;
+    //this.bounds = bounds;
     this.scaling = opts.scaling ?? `normalise`;
-    this._ctx = ctx;
-    if (opts.autoSize) {
-      parentSizeCanvas(element, (event) => {
-        this.bounds = element.getBoundingClientRect();
-        this.plotArea.bounds = this.bounds;
-        this.legend.bounds = this.bounds;
-        this.axisX.bounds = this.bounds;
-        this.axisY.bounds = this.bounds;
-        ctx.clearRect(0, 0, this.bounds.width, this.bounds.height);
-        this.drawingInvalidated(`resize`);
-        this.layoutInvalidated(`resize`);
-
-        this.update(event.ctx, true);
-
-      });
-    }
+    //this._ctx = ctx;
+    //if (opts.autoSize) {
+    // const er = new ElementSizer(element, {
+    //   onSetSize: (size, el) => {
+    //     this.bounds = element.getBoundingClientRect();
+    //     this.plotArea.bounds = this.bounds;
+    //     this.legend.bounds = this.bounds;
+    //     this.axisX.bounds = this.bounds;
+    //     this.axisY.bounds = this.bounds;
+    //     ctx.clearRect(0, 0, this.bounds.width, this.bounds.height);
+    //     this.drawingInvalidated(`resize`);
+    //     this.layoutInvalidated(`resize`);
+    //     this.update(ctx, true);
+    //   },
+    //   stretch: `both`
+    // })
+    // parentSizeCanvas(element, (event) => {
+    //   this.bounds = element.getBoundingClientRect();
+    //   this.plotArea.bounds = this.bounds;
+    //   this.legend.bounds = this.bounds;
+    //   this.axisX.bounds = this.bounds;
+    //   this.axisY.bounds = this.bounds;
+    //   ctx.clearRect(0, 0, this.bounds.width, this.bounds.height);
+    //   this.drawingInvalidated(`resize`);
+    //   this.layoutInvalidated(`resize`);
+    //   this.update(event.ctx, true);
+    // });
+    //}
 
     this.axisStrokeColour = opts.axisStrokeColour ?? `black`;
     this.axisTextColour = opts.axisTextColour ?? `black`;
@@ -1102,6 +1122,8 @@ export class Plot extends Sg.CanvasBox {
 
     this.axisStrokeWidth = opts.axisStrokeWidth ?? 3;
     this.series = new Map();
+    const bounds = this.#canvas.getRectangle();
+    console.log(`Plot bounds`, bounds);
     this.plotArea = new PlotArea(this, bounds);
     this.legend = new Legend(this, bounds);
     this.axisX = new AxisX(this, bounds);
@@ -1115,7 +1137,7 @@ export class Plot extends Sg.CanvasBox {
   }
 
   update(ctx?: CanvasRenderingContext2D, force = false) {
-    if (ctx === undefined) ctx = this._ctx;
+    if (ctx === undefined) ctx = this.#canvas.ctx;
     super.update(ctx, force);
     // this.plotArea.update(ctx, force);
     // this.axisX.update(ctx, force);
@@ -1149,17 +1171,18 @@ export class Plot extends Sg.CanvasBox {
   }
 
   get frozen(): boolean {
-    return this._frozen;
+    return this.#frozen;
   }
 
   set frozen(v: boolean) {
-    this._frozen = v;
+    this.#frozen = v;
     if (v) {
-      this._canvasEl.classList.add(`frozen`);
-      this._canvasEl.title = `Plot frozen. Tap to unfreeze`;
+
+      this.#canvas.el.classList.add(`frozen`);
+      this.#canvas.el.title = `Plot frozen. Tap to unfreeze`;
     } else {
-      this._canvasEl.title = ``;
-      this._canvasEl.classList.remove(`frozen`);
+      this.#canvas.el.title = ``;
+      this.#canvas.el.classList.remove(`frozen`);
     }
   }
 
