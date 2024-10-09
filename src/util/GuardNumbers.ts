@@ -48,7 +48,7 @@ export const ifNaN = (v: number, fallback: number): number => {
  * @returns
  */
 export const integerParse = (
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   value: any,
   range: NumberGuardRange = ``,
   defaultValue: number = Number.NaN
@@ -107,6 +107,7 @@ export const numberTest = (
       if (!Number.isFinite(value)) {
         return [ false, `Parameter '${ parameterName } must be finite` ];
       }
+      break;
     }
     case `positive`: {
       if (value < 0) {
