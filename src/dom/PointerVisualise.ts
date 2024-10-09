@@ -3,7 +3,7 @@ import {
 } from '../trackers/PointTracker.js';
 import { resolveEl as resolveElement } from './ResolveEl.js';
 import * as Svg from '../visual/Svg.js';
-import { fullSizeElement } from './ElementSizing.js';
+import { ElementSizer } from './ElementSizing.js';
 
 export type Opts = {
   readonly touchRadius?: number;
@@ -72,7 +72,16 @@ export const pointerVisualise = (
   svg.style.pointerEvents = `none`;
   svg.style.touchAction = `none`;
 
-  fullSizeElement(svg);
+  // const er = new ElementSizer(svg, {
+  //   containerEl:document.body,
+  //   stretch:`both`,
+  //   onSetSize(size) {
+  //     svg.setAttribute(`width`, size.width.toString());
+  //     svg.setAttribute(`height`, size.height.toString());
+  //   },
+  // })
+  const er = ElementSizer.svgViewport(svg);
+  //fullSizeElement(svg);
   let pointerCount = 0;
 
   //eslint-disable-next-line functional/prefer-immutable-types
