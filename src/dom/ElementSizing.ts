@@ -1,92 +1,191 @@
-import type { Point } from "../geometry/point/PointType.js";
-import { resolveEl } from "./ResolveEl.js";
+import type { Reactive } from "src/rx/Types.js";
+import type { Rect } from "../geometry/rect/RectTypes.js";
+import * as Rects from '../geometry/rect/index.js';
 import { resizeObservable, windowResize } from "./DomRx.js";
-
-// eslint-disable-next-line unicorn/prevent-abbreviations
-export type ElementResizeArgs<V extends HTMLElement | SVGSVGElement> = {
-  readonly el: V;
-  readonly bounds: {
-    readonly width: number;
-    readonly height: number;
-    readonly center: Point;
-    readonly min: number;
-    readonly max: number;
-  };
-};
-
-
-export const fullSizeElement = <V extends HTMLElement>(
-  domQueryOrEl: string | V,
-  onResized?: (args: ElementResizeArgs<V>) => void
-) => {
-  const el = resolveEl<V>(domQueryOrEl);
-
-  const r = windowResize();
-  const update = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    el.setAttribute(`width`, width.toString());
-    el.setAttribute(`height`, height.toString());
-
-    if (onResized !== undefined) {
-      const bounds = {
-        min: Math.min(width, height),
-        max: Math.max(width, height),
-        width,
-        height,
-        center: {
-          x: width / 2,
-          y: height / 2,
-        },
-      };
-      onResized({ el, bounds });
-    }
-  };
-  r.onValue(update);
-
-  update();
-  return r;
-};
+import { resolveEl } from "./ResolveEl.js";
 
 /**
- * Sets width/height atributes on the given element according to the size of its parent.
- * @param domQueryOrEl Elememnt to resize
- * @param onResized Callback when resize happens
- * @param timeoutMs Timeout for debouncing events
- * @returns
+ * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
+ * * height: use height of parent, set width based on original aspect ratio of element. Assumes parent has a determined height.
+ * * both: use height & width of parent, so the element adopts the ratio of the parent. Be sure that parent has a width and height set.
+ * * min: use the smallest dimension of parent
+ * * max: use the largest dimension of parent
  */
-export const parentSize = <V extends HTMLElement | SVGSVGElement>(
-  domQueryOrEl: string | V,
-  onResized?: (args: ElementResizeArgs<V>) => void,
-  timeoutMs = 100
-) => {
-  const el = resolveEl<V>(domQueryOrEl);
-  const parent = el.parentElement;
-  if (parent === null) throw new Error(`Element has no parent`);
+export type ElementResizeLogic = `width` | `height` | `both` | `none` | `min` | `max`;
 
-  const ro = resizeObservable(parent, timeoutMs).onValue(
-    (entries: ReadonlyArray<ResizeObserverEntry>) => {
-      const entry = entries.find((v) => v.target === parent);
-      if (entry === undefined) return;
+export type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
+  stretch?: ElementResizeLogic
+  naturalSize?: Rect
+  // el: HTMLElement | string
+  containerEl?: HTMLElement | string
+  onSetSize: (size: Rect, el: T) => void
+}
 
-      const width = entry.contentRect.width;
-      const height = entry.contentRect.height;
+export class ElementSizer<T extends HTMLElement | SVGElement> {
+  #stretch: ElementResizeLogic;
+  #size: Rect;
+  #naturalSize: Rect;
+  #naturalRatio: number;
+  #viewport: Rects.RectPositioned;
+  #onSetSize;
+  #el: T;
+  #containerEl: HTMLElement;
+  #disposed = false;
+  #resizeObservable: Reactive<any> | undefined;
 
-      el.setAttribute(`width`, `${ width }px`);
-      el.setAttribute(`height`, `${ height }px`);
-      if (onResized !== undefined) {
-        const bounds = {
-          min: Math.min(width, height),
-          max: Math.max(width, height),
-          width,
-          height,
-          center: { x: width / 2, y: height / 2 },
-        };
-        onResized({ el, bounds });
-      }
+  constructor(elOrQuery: T | string, options: ElementSizerOptions<T>) {
+    this.#el = resolveEl(elOrQuery);
+    this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement!;
+
+    this.#stretch = options.stretch ?? `none`;
+    this.#onSetSize = options.onSetSize;
+    this.#size = Rects.Empty;
+
+    let naturalSize = options.naturalSize;
+    if (naturalSize === undefined) {
+      naturalSize = this.#el.getBoundingClientRect();
     }
-  );
+    this.#naturalRatio = 1;
+    this.#naturalSize = naturalSize;
+    this.setNaturalSize(naturalSize);
+    this.#viewport = Rects.EmptyPositioned;
 
-  return ro;
-};
+    if (this.#containerEl === document.body) {
+      this.#byViewport();
+    } else {
+      this.#byContainer();
+    }
+  }
+
+  dispose(reason?: string) {
+    if (this.#disposed) return;
+    this.#disposed = true;
+    if (this.#resizeObservable) {
+      this.#resizeObservable.dispose(`ElementSizing (${ reason })`);
+      this.#resizeObservable = undefined;
+    }
+  }
+
+  static canvasParent(canvasElementOrQuery: HTMLCanvasElement | string, options: ElementSizerOptions<HTMLCanvasElement>): ElementSizer<HTMLCanvasElement> {
+    const el = resolveEl<HTMLCanvasElement>(canvasElementOrQuery);
+    const er = new ElementSizer<HTMLCanvasElement>(el, {
+      ...options,
+      onSetSize(size, el) {
+        console.log(`canvasParent.onSetSize`);
+        el.width = size.width;
+        el.height = size.height;
+        if (options.onSetSize) options.onSetSize(size, el);
+        //el.setAttribute(`width`, size.width.toString());
+        //el.setAttribute(`height`, size.height.toString());
+      },
+    });
+    return er;
+  }
+
+  static canvasViewport(canvasElementOrQuery: HTMLCanvasElement | string, options: ElementSizerOptions<HTMLCanvasElement>): ElementSizer<HTMLCanvasElement> {
+    const opts: ElementSizerOptions<HTMLCanvasElement> = { ...options, containerEl: document.body }
+    return this.canvasParent(canvasElementOrQuery, opts);
+
+  }
+
+  static svgViewport(svg: SVGElement): ElementSizer<SVGElement> {
+    const er = new ElementSizer<SVGElement>(svg, {
+      containerEl: document.body,
+      stretch: `both`,
+      onSetSize(size) {
+        svg.setAttribute(`width`, size.width.toString());
+        svg.setAttribute(`height`, size.height.toString());
+      },
+    });
+    return er;
+  }
+
+
+  #byContainer() {
+    // Listen for resize
+    const r = resizeObservable(this.#containerEl);
+    r.onValue((v) => { this.#onParentResize(v); });
+
+    // Get current value
+    const current = this.#getStretchSize(this.#containerEl.getBoundingClientRect());
+    this.size = current;
+
+    this.#resizeObservable = r;
+  }
+
+  #byViewport() {
+    const r = windowResize();
+    r.onValue(v => {
+      this.#onViewportResize();
+    });
+
+    this.#resizeObservable = r;
+    this.#onViewportResize();
+  }
+
+  #onViewportResize() {
+    this.size = { width: window.innerWidth, height: window.innerHeight };
+    this.#viewport = {
+      x: 0, y: 0,
+      ...this.size
+    };
+  }
+  /**
+   * Sets the 'natural' size of an element.
+   * This can also be specified when creating ElementSizer.
+   * @param size 
+   */
+  setNaturalSize(size: Rect) {
+    this.#naturalSize = size;
+    this.#naturalRatio = size.width / size.height;
+  }
+
+  get naturalSize() {
+    return this.#naturalSize;
+  }
+
+  get viewport() {
+    return this.#viewport;
+  }
+
+  #getStretchSize(parentSize: Rect) {
+    let { width, height } = parentSize;
+
+    let stretch = this.#stretch;
+    if (stretch === `min`) {
+      stretch = width < height ? `width` : `height`;
+    } else if (stretch === `max`) {
+      stretch = width > height ? `width` : `height`;
+    }
+
+    if (stretch === `width`) {
+      height = width / this.#naturalRatio;
+    } else if (stretch === `height`) {
+      width = height * this.#naturalRatio;
+    }
+
+    return { width, height };
+  }
+
+
+  #onParentResize(args: Array<ResizeObserverEntry>) {
+    const box = args[ 0 ].contentBoxSize[ 0 ];
+    const parentSize = { width: box.inlineSize, height: box.blockSize };
+    this.size = this.#getStretchSize(parentSize);
+    this.#viewport = {
+      x: 0, y: 0,
+      width: parentSize.width,
+      height: parentSize.height
+    }
+  }
+
+  set size(size: Rect) {
+    Rects.guard(size, `size`);
+    this.#size = size;
+    this.#onSetSize(size, this.#el);
+  }
+
+  get size() {
+    return this.#size;
+  }
+}
