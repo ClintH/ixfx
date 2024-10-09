@@ -1,7 +1,9 @@
 
-import { scaler } from "src/numbers/Scale.js";
+import { scaler } from "../../numbers/Scale.js";
 import type { Point } from "../../geometry/point/PointType.js";
 import type { GridStyle, LineStyle, ShowOptions, TextStyle } from "./Types.js";
+import type { ScaleBy } from "../../geometry/Scaler.js";
+import type { ElementResizeLogic } from "../../dom/ElementSizing.js";
 
 export type PointMinMax = { min: Point, max: Point, width: number, height: number, minDim: number, maxDim: number };
 
@@ -35,7 +37,10 @@ export type CartesianDataRange = {
 
 
 export type CartesianPlotOptions = {
-
+  canvasWidth: number
+  canvasHeight: number
+  canvasResize: ElementResizeLogic
+  coordinateScale: ScaleBy
   show: Partial<ShowOptions>
   /**
    * If 'auto' (default), range of plot is based on data.
@@ -60,7 +65,7 @@ export type CartesianPlotOptions = {
   /**
    * How values are drawn. Default: 'dot'
    */
-  valueStyle: `dot` | '',
+  valueStyle: `dot` | ``,
   /**
    * How values are connected. Default: '' (no connecting)
    * Values are connected in order of dataset.
@@ -70,7 +75,7 @@ export type CartesianPlotOptions = {
   whiskerLength: number
 }
 
-export const computeMinMax = (mm: Point[]): PointMinMax => {
+export const computeMinMax = (mm: Array<Point>): PointMinMax => {
   const x = mm.map(m => m.x);
   const y = mm.map(m => m.y);
   const minX = Math.min(...x);
@@ -110,9 +115,9 @@ export const absoluteCompute = (minMax: PointMinMax) => {
 export type AxisMark = Point & {
   major: boolean
 }
-export const computeAxisMark = (mm: PointMinMax, increments: number, major: number): { x: AxisMark[], y: AxisMark[] } => {
+export const computeAxisMark = (mm: PointMinMax, increments: number, major: number): { x: Array<AxisMark>, y: Array<AxisMark> } => {
   // Vertical
-  const xValues: AxisMark[] = [];
+  const xValues: Array<AxisMark> = [];
   let count = 0;
 
   for (let x = mm.min.x; x < mm.max.x; x += increments) {
@@ -123,7 +128,7 @@ export const computeAxisMark = (mm: PointMinMax, increments: number, major: numb
 
   // Horizontal
   count = 0;
-  const yValues: AxisMark[] = [];
+  const yValues: Array<AxisMark> = [];
   for (let y = mm.min.y; y < mm.max.y; y += increments) {
     const isMajor = count % major === 0;
     yValues.push({ x: 0, y, major: isMajor })
