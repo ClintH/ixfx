@@ -1,14 +1,15 @@
+
 import { css, html, LitElement, type PropertyValues } from "lit";
 import { customElement } from "lit/decorators/custom-element.js";
 import { property } from "lit/decorators/property.js";
 import { createRef, type Ref, ref } from "lit/directives/ref.js";
-import { CanvasHelper } from "src/dom/CanvasHelper.js";
-import type { Rect, RectPositioned } from "src/geometry/Types.js";
+import { CanvasHelper } from "../dom/CanvasHelper.js";
+import type { Rect, RectPositioned } from "../geometry/Types.js";
 import * as Numbers from '../numbers/index.js';
-import type { Colourish } from "src/visual/Colour.js";
-import type { DrawingHelper } from "src/visual/Drawing.js";
-import { Colour, Drawing } from "src/visual/index.js";
-import { Pathed } from "src/data/index.js";
+import type { Colourish } from "../visual/Colour.js";
+import type { DrawingHelper } from "../visual/Drawing.js";
+import { Colour, Drawing } from "../visual/index.js";
+import { Pathed } from "../data/index.js";
 
 /**
  * Attributes
@@ -22,6 +23,7 @@ import { Pathed } from "src/data/index.js";
  * * render: 'dot' or 'line' (default: 'dot')
  * * hide-legend: If added, legend is not shown
  * * manual-draw: If added, automatic drawning is disabled
+ * 
  * Styling variables
  * * --legend-fg: legend foreground text
  */
@@ -56,20 +58,15 @@ export class PlotElement extends LitElement {
   padding = 5;
 
   paused = false;
-  #series: Map<string, PlotSeries> = new Map();
+  #series = new Map<string, PlotSeries>();
   #canvas: CanvasHelper | undefined;
   #drawing: DrawingHelper | undefined;
 
-  #legendColour: string = ``;
+  #legendColour = ``;
   #hue = 0;
 
   canvasEl: Ref<HTMLCanvasElement> = createRef();
-
-  seriesRanges: Map<string, [ min: number, max: number ]> = new Map();
-
-  constructor() {
-    super();
-  }
+  seriesRanges = new Map<string, [ min: number, max: number ]>();
 
   get series() {
     return [ ...this.#series.values() ];
@@ -157,7 +154,9 @@ export class PlotElement extends LitElement {
     this.#legendColour = Colour.getCssVariable(`legend-fg`, `black`);
   }
 
-  plot(value: number, seriesName: string = ``, skipDrawing = false) {
+  plot(value: number, seriesName = ``, skipDrawing = false) {
+    if (typeof value !== 'number') throw new Error(`Can only add numbers. Got: ${ typeof value }`);
+
     let s = this.#series.get(seriesName.toLowerCase());
     if (s === undefined) {
       s = new PlotSeries(seriesName, this.colourGenerator(seriesName), this);
@@ -226,17 +225,19 @@ export class PlotElement extends LitElement {
     // Draw data
     for (const series of this.#series.values()) {
       const seriesScale = this.seriesRanges.get(series.name);
-      const data = seriesScale !== undefined ? series.getScaledBy(Numbers.scaler(seriesScale[ 0 ], seriesScale[ 1 ])) :
-        globalScaler === undefined ?
-          series.getScaled() :
-          series.getScaledBy(globalScaler);
+      const data = seriesScale === undefined ? (globalScaler === undefined ?
+        series.getScaled() :
+        series.getScaledBy(globalScaler)) :
+        series.getScaledBy(Numbers.scaler(seriesScale[ 0 ], seriesScale[ 1 ]));
       const colour = Colour.resolveToString(series.colour);
       switch (this.renderStyle) {
-        case `line`:
+        case `line`: {
           this.drawLineSeries(data, cp, d, colour);
           break;
-        default:
+        }
+        default: {
           this.drawDotSeries(data, cp, d, colour);
+        }
       }
     }
     ctx.restore();
@@ -248,7 +249,7 @@ export class PlotElement extends LitElement {
     const padding = this.padding;
     let x = 0;
     let y = padding;
-    let swatchSize = 10;
+    const swatchSize = 10;
     const ctx = d.ctx;
 
     for (const series of this.#series.values()) {
@@ -268,7 +269,7 @@ export class PlotElement extends LitElement {
     }
   }
 
-  drawLineSeries(data: number[], cp: Rect, d: DrawingHelper, colour: string) {
+  drawLineSeries(data: Array<number>, cp: Rect, d: DrawingHelper, colour: string) {
     const pointWidth = this.streaming ? this.dataWidth : (cp.width / data.length);
     let x = 0;
     if (this.streaming) x = cp.width - (pointWidth * data.length);
@@ -291,7 +292,7 @@ export class PlotElement extends LitElement {
     });
   }
 
-  drawDotSeries(data: number[], cp: Rect, d: DrawingHelper, colour: string) {
+  drawDotSeries(data: Array<number>, cp: Rect, d: DrawingHelper, colour: string) {
     const pointWidth = this.streaming ? this.dataWidth : cp.width / data.length;
     let x = 0;
     if (this.streaming) x = cp.width - (pointWidth * data.length);
@@ -383,12 +384,11 @@ export class PlotElement extends LitElement {
 
 
 export class PlotSeries {
-  data: number[] = [];
+  data: Array<number> = [];
   minSeen = Number.MAX_SAFE_INTEGER;
   maxSeen = Number.MIN_SAFE_INTEGER;
 
-  constructor(public name: string, public colour: Colourish, private plot: PlotElement) {
-  }
+  constructor(public name: string, public colour: Colourish, private plot: PlotElement) {}
 
   clear() {
     this.data = [];
@@ -402,15 +402,27 @@ export class PlotSeries {
    */
   getScaled() {
     const r = this.maxSeen - this.minSeen;
-    const s = Numbers.scaler(this.minSeen, this.maxSeen);
+    let min = this.minSeen;
+    let max = this.maxSeen;
+    if (Number.isNaN(min)) min = 0;
+    if (Number.isNaN(max)) max = 1;
+
+    const s = Numbers.scaler(min, max);
     return this.getScaledBy(s);
   }
 
   getScaledBy(scaler: (v: number) => number) {
-    return this.data.map(v => Numbers.clamp(scaler(v)));
+    return this.data.map(v => {
+      if (typeof v !== `number`) throw new Error(`Data should just be numbers. Got: ${ typeof v }`);
+      if (Number.isNaN(v)) throw new Error(`data contains NaN`);
+      const scaled = scaler(v);
+      if (Number.isNaN(scaled)) throw new Error(`NaN. v: ${ v } scaled: ${ scaled }`);
+      return Numbers.clamp(scaled)
+    });
   }
 
   push(value: number) {
+    if (typeof value !== 'number') throw new Error(`Can only add numbers. Got: ${ typeof value }`);
     this.data.push(value);
     if (this.data.length > this.plot.maxLength && this.plot.streaming) {
       this.data = this.data.slice(1);
