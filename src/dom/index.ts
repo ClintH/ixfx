@@ -1,5 +1,4 @@
 export * from './CanvasHelper.js';
-export * from './CanvasSizing.js';
 export * from './Css.js';
 export * as Variables from './CssVariables.js';
 export * from './DataDisplay.js';
