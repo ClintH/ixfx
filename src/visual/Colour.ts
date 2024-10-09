@@ -5,7 +5,7 @@ import { throwNumberTest } from '../util/GuardNumbers.js';
 import { pairwise } from '../data/arrays/Pairwise.js';
 import { scale as scaleNumber } from '../numbers/Scale.js';
 import { clamp } from '../numbers/Clamp.js';
-import type { Result } from 'src/util/Results.js';
+import { throwResult, type Result } from 'src/util/Results.js';
 
 /**
  * HSL in relative 0..1 range for each field
@@ -18,7 +18,7 @@ export type Hsl = { h: number; s: number; l: number; opacity: number, space?: `h
  * * 'relative': 0..1 range
  * * '8bit': 0..255 range
  */
-export type Rgb = { r: number; g: number; b: number; opacity: number, unit: `relative` | `8bit`, space?: `srgb` };
+export type Rgb = { r: number; g: number; b: number; opacity?: number, unit: `relative` | `8bit`, space?: `srgb` };
 
 export type RgbRelative = Rgb & { unit: `relative` };
 
@@ -123,8 +123,8 @@ export const toHsl = (colour: Colourish, safe = false): Hsl => {
 };
 
 const hslToColorJs = (hsl: Hsl, safe: boolean): Color => {
-  let h = hsl.h === null ? (safe ? 0 : null) : hsl.h;
-  let opacity = hsl.opacity === undefined ? 1 : hsl.opacity;
+  const h = hsl.h === null ? (safe ? 0 : null) : hsl.h;
+  const opacity = hsl.opacity === undefined ? 1 : hsl.opacity;
   throwNumberTest(h, `percentage`, `hsl.h`);
   throwNumberTest(hsl.s, `percentage`, `hsl.s`);
   throwNumberTest(hsl.l, `percentage`, `hsl.l`);
@@ -153,11 +153,12 @@ const oklchToColorJs = (oklch: OkLch) => {
 
 const rgbToColorJs = (rgb: Rgb): Color => {
   let { r, g, b, opacity } = rgb;
+
   if (rgb.unit === `8bit`) {
     r /= 255;
     g /= 255;
     b /= 255;
-    opacity /= 255;
+    if (opacity !== undefined) opacity /= 255;
   }
 
   const coords: [ number, number, number ] = [
@@ -165,9 +166,9 @@ const rgbToColorJs = (rgb: Rgb): Color => {
     g,
     b
   ];
-  return rgb.opacity !== undefined ?
-    new Color(`srgb`, coords, opacity) :
-    new Color(`srgb`, coords);
+  return opacity === undefined ?
+    new Color(`srgb`, coords) :
+    new Color(`srgb`, coords, opacity);
 }
 
 /**
@@ -269,7 +270,7 @@ export const toRgb = (colour: Colourish): Rgb => {
  * @param colour Colour to resolve
  * @returns Color.js Color object
  */
-export const resolve = (colour: Colourish, safe: boolean = false): Color => {
+export const resolve = (colour: Colourish, safe = false): Color => {
   if (typeof colour === `string`) {
     if (colour.startsWith(`--`)) {
       // Resolve CSS variable
@@ -312,9 +313,9 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
     const c = resolve(colour);
     try {
       return c.display();
-    } catch (ex) {
+    } catch (error) {
       if (typeof colour === `string`) return colour
-      throw ex;
+      throw error;
     }
   }
   return `rebeccapurple`;
@@ -345,6 +346,32 @@ export const toHex = (colour: Colourish, safe = false): string => {
     throw new Error(`Could not parse colour: ${ JSON.stringify(colour) }`);
   }
 };
+
+/**
+ * Ensures `rgb` uses 0..255 scale for r,g & b values.
+ * If `rgb` is already in 8-bit scale (ie it has unit:'8bit')
+ * it is returned.
+ * @param rgb 
+ * @returns 
+ */
+export const toRgb8bit = (rgb: Rgb): Rgb8Bit => {
+  const result = parseRgbObject(rgb);
+  throwResult(result);
+
+  if (rgb.unit === `8bit`) return rgb as Rgb8Bit;
+
+  const { r, g, b, opacity } = rgb;
+
+  const t: Rgb8Bit = {
+    r: r * 255,
+    g: g * 255,
+    b: b * 255,
+    unit: `8bit`,
+    space: rgb.space
+  }
+  if (opacity !== undefined) return { ...t, opacity: opacity * 255 };
+  return t;
+}
 
 /**
  * Returns a variation of colour with its opacity multiplied by `amt`.
@@ -398,7 +425,7 @@ export const getCssVariable = (
   root?: HTMLElement
 ): string => {
   if (root === undefined) root = document.body;
-  if (name.startsWith(`--`)) name = name.substring(2);
+  if (name.startsWith(`--`)) name = name.slice(2);
   const fromCss = getComputedStyle(root).getPropertyValue(`--${ name }`).trim();
   if (fromCss === undefined || fromCss.length === 0) return fallbackColour;
   return fromCss;
@@ -570,7 +597,7 @@ export const parseRgbObject = (p: any): Result<Rgb> => {
   if (p === undefined || p === null) return { success: false, error: `Undefined/null` }
   if (typeof p !== `object`) return { success: false, error: `Not an object` };
 
-  let space = p.space ?? `srgb`;
+  const space = p.space ?? `srgb`;
   let { r, g, b, opacity } = p;
   if (r !== undefined || g !== undefined || b !== undefined) {
     // Short field names
@@ -607,8 +634,7 @@ export const parseRgbObject = (p: any): Result<Rgb> => {
     } else return { success: false, error: `Unknown units for r,g,b,opacity values` };
   }
   if (opacity === undefined) {
-    if (unit === `8bit`) opacity = 255;
-    else opacity = 1;
+    opacity = unit === `8bit` ? 255 : 1;
   }
 
   const c = {
