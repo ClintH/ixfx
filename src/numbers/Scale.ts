@@ -63,6 +63,9 @@ export const scaler = (
   easing?: (v: number) => number
 ): ((v: number) => number) => {
 
+  throwNumberTest(inMin, `finite`, `inMin`);
+  throwNumberTest(inMax, `finite`, `inMax`);
+
   const oMax = outMax ?? 1;
   const oMin = outMin ?? 0;
 
