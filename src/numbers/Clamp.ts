@@ -34,6 +34,28 @@ export const clamp = (value: number, min = 0, max = 1) => {
 };
 
 /**
+ * Returns a function that clamps values.
+ * 
+ * ```js
+ * const c = clamper(0,100);
+ * c(50);   // 50
+ * c(101); // 100
+ * c(-5);  // 0
+ * ```
+ * @param min Minimum value. Default: 0
+ * @param max Maximum value. Default: 1
+ */
+export const clamper = (min: number = 0, max: number = 1) => {
+  if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
+  if (Number.isNaN(max)) throw new Error(`Param 'max' is NaN`);
+  return (v: number) => {
+    if (v > max) return max;
+    if (v < min) return min;
+    return v;
+  }
+}
+
+/**
  * Clamps integer `v` between 0 (inclusive) and array length or length (exclusive).
  * Returns value then will always be at least zero, and a valid array index.
  *
@@ -42,9 +64,6 @@ export const clamp = (value: number, min = 0, max = 1) => {
  * // Array of length 4
  * const myArray = [`a`, `b`, `c`, `d`];
  * clampIndex(0, myArray);    // 0
- * clampIndex(4, myArray);    // 3
- * clampIndex(-1, myArray);   // 0
- *
  * clampIndex(5, 3); // 2
  * ```
  *
@@ -57,7 +76,6 @@ export const clamp = (value: number, min = 0, max = 1) => {
  * @param arrayOrLength Array, or length of bounds (must be an integer)
  * @returns Clamped value, minimum will be 0, maximum will be one less than `length`.
  */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const clampIndex = (
   v: number,
   arrayOrLength: number | ReadonlyArray<any>
