@@ -313,9 +313,10 @@ export const resolveToString = (...colours: Array<Colourish | undefined>): strin
     const c = resolve(colour);
     try {
       return c.display();
-    } catch (error) {
-      if (typeof colour === `string`) return colour
-      throw error;
+    } catch (_error) {
+      return c.toString();
+      //if (typeof colour === `string`) return colour
+      //throw Error(`${ getErrorMessage(error) } Value: '${ colour }' (${ typeof colour })`);
     }
   }
   return `rebeccapurple`;
@@ -393,17 +394,20 @@ export const toRgb8bit = (rgb: Rgb): Rgb8Bit => {
  * @returns String representation of colour
  */
 export const multiplyOpacity = (colour: Colourish, amt: number): string => {
+  throwNumberTest(amt, `percentage`, `amt`);
+
   const c = resolve(colour);
-  const alpha = clamp(c.alpha * amt);
+  const alpha = clamp((c.alpha ?? 0) * amt);
   c.alpha = alpha;
   return c.toString();
 };
 
 export const multiplySaturation = (colour: Colourish, amt: number): string => {
+  throwNumberTest(amt, `percentage`, `amt`);
   const c = resolve(colour);
-  console.log(`c.s: ${ c.s }`);
-  c.s = c.s * amt;
-  console.log(`final: ${ c.s }`);
+  //console.log(`c.s: ${ c.s }`);
+  c.s = (c.s ?? 0) * amt;
+  //console.log(`final: ${ c.s }`);
   return c.toString();
 };
 
@@ -479,7 +483,7 @@ export const interpolator = (colours: Array<Colourish>, opts: Partial<Interpolat
   const space = opts.space ?? `lch`;
   const hue = opts.hue ?? `shorter`;
   const pieces = interpolatorInit(colours);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+
   const ranges = pieces.map(piece => (piece[ 0 ] as any).range(piece[ 1 ], { space, hue })) as Array<Range>;
 
   return (amt: number) => {
@@ -527,7 +531,7 @@ export const scale = (colours: Array<Colourish>, numberOfSteps: number, opts: Pa
   const pieces = interpolatorInit(colours);
   const stepsPerPair = Math.floor(numberOfSteps / pieces.length);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+
   const steps = pieces.map(piece => (piece[ 0 ] as any).steps(piece[ 1 ],
     { space, hue, steps: stepsPerPair, outputSpace: `srgb` }
   )) as Array<Color>;
@@ -603,11 +607,11 @@ export const parseRgbObject = (p: any): Result<Rgb> => {
     // Short field names
   } else {
     // Check for long field names
-    let { red, green, blue } = p;
+    const { red, green, blue } = p;
     if (red !== undefined || green !== undefined || blue !== undefined) {
       r = red;
       g = green;
-      blue = blue;
+      b = blue;
     } else return { success: false, error: `Does not contain r,g,b or red,green,blue` }
   }
 
