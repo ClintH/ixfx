@@ -71,7 +71,6 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     const er = new ElementSizer<HTMLCanvasElement>(el, {
       ...options,
       onSetSize(size, el) {
-        console.log(`canvasParent.onSetSize`);
         el.width = size.width;
         el.height = size.height;
         if (options.onSetSize) options.onSetSize(size, el);
@@ -82,10 +81,14 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     return er;
   }
 
-  static canvasViewport(canvasElementOrQuery: HTMLCanvasElement | string, options: ElementSizerOptions<HTMLCanvasElement>): ElementSizer<HTMLCanvasElement> {
+  static canvasViewport(canvasElementOrQuery: HTMLCanvasElement | string, options: { zIndex?: number } & ElementSizerOptions<HTMLCanvasElement>): ElementSizer<HTMLCanvasElement> {
+    const el = resolveEl<HTMLCanvasElement>(canvasElementOrQuery);
+    el.style.position = `absolute`;
+    el.style.zIndex = (options.zIndex ?? 0).toString();
+    el.style.left = `0px`;
+    el.style.top = `0px`;
     const opts: ElementSizerOptions<HTMLCanvasElement> = { ...options, containerEl: document.body }
     return this.canvasParent(canvasElementOrQuery, opts);
-
   }
 
   static svgViewport(svg: SVGElement): ElementSizer<SVGElement> {
