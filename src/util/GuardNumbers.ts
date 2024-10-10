@@ -105,7 +105,7 @@ export const numberTest = (
   switch (range) {
     case `finite`: {
       if (!Number.isFinite(value)) {
-        return [ false, `Parameter '${ parameterName } must be finite` ];
+        return [ false, `Parameter '${ parameterName } must be finite (Got: ${ value })` ];
       }
       break;
     }
