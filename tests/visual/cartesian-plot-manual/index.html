@@ -19,26 +19,14 @@
       padding: 0;
       overflow: hidden;
     }
-
-    body {
-      display:flex;
-      vertical-align: center;
-      background-color: blanchedalmond;
-      justify-content: center;
-    align-items: center;
-    }
-
     canvas {
       border: 2px solid whitesmoke;
     }
-    #container {
-      background-color: antiquewhite;
-      height:90vh;
-      width:90vw;
-      display:flex;
-      align-items: center;
-      justify-content: center;
+    #pointer {
+      padding: 2em;
+      font-family: monospace;
     }
+
     .point {
       position: absolute;
       width:10px;
@@ -46,16 +34,8 @@
       background-color: red;
       border-radius: 50%;
     }
-    #pointer {
-      padding: 2em;
-      font-family: monospace;
-      position: absolute;
-      left:0;
-      top:0;
-    }
     </style>
-    <div id="container">
-    </div>
+    <canvas></canvas>
     <div id="pointer">?</div>
     <div class="point" id="point-a"></div>
     <script type="module" src="script.js"></script>

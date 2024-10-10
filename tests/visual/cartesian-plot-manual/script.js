@@ -2,20 +2,15 @@ import { Plot, CanvasSource, CanvasRegion } from '../../../dist/visual.js';
 import { Easings } from '../../../dist/modulation.js';
 import { ElementSizer } from '../../../dist/dom.js';
 
+const ds = new Plot.DataSet();
+const source = new CanvasSource(`canvas`, `min`);
+const region = source.createRelative({ x: 0, y: 0, width: 1, height: 1 }, `independent`);
 
-const region = {
-  x: 0.2,
-  y: 0.2,
-  width: 0.6,
-  height: 0.5
-}
-const p = Plot.insert({ parent: `#container`, region }, {
-  visualPadding: 20,
+const p = new Plot.CartesianCanvasPlot(region, ds, {
+  visualPadding: 30,
   grid: {
     increments: 0.1
   },
-  //range: { min: { x: -1, y: -1 }, max: { x: 1, y: 1 } },
-  range: { min: { x: 0, y: 0 }, max: { x: 1, y: 1 } },
   connectStyle: `line`,
   valueStyle: `dot`,
   textStyle: {
@@ -26,7 +21,7 @@ const p = Plot.insert({ parent: `#container`, region }, {
     colour: `gray`
   },
   show: {
-    grid: false,
+    grid: true,
     axes: true,
     axisValues: true,
     whiskers: true
@@ -36,9 +31,6 @@ const p = Plot.insert({ parent: `#container`, region }, {
 p.setMeta(`alpha`, {
   colour: `purple`
 });
-p.onInvalidated = () => {
-  p.positionElementAt({ x: 1, y: 1 }, `#point-a`, `middle`);
-}
 
 // ds.add({x:1,y:1, fillStyle:`red`}, `alpha`);
 // ds.add({x:0.5,y:0.5, fillStyle:`green`}, `alpha`);
@@ -49,18 +41,26 @@ p.onInvalidated = () => {
 // ds.add({x:0.2,y:0.4}, `beta`);
 //ds.add({x:-1,y:-1, fillStyle:`purple`});
 
-const line = Easings.line(1);
+const line = Easings.line(0.5);
 
 let resolution = 0.06;
-for (let x = 0; x < 1; x += resolution) {
-  const pt = line(x);
-  //const pt = {x,y:p};
+for (let x = 0; x <= 1; x += resolution) {
+  const p = line(x);
 
-  //console.log(pt);
-  p.dataSet.add(pt);
+  // console.log(p.y);
+  ds.add(p);
 }
 
-p.draw();
+//p.draw();
+
+const es = ElementSizer.canvasViewport(`canvas`, {
+  onSetSize: (size, el) => {
+    source.setLogicalSize(size);
+    p.invalidateRange();
+    p.draw();
+    p.positionElementAt({ x: 1, y: 0.5 }, `#point-a`, `middle`);
+  }
+});
 
 const ptToStr = (pt) => `${pt.x.toFixed(2)},${pt.y.toFixed(2)}`;
 
@@ -68,14 +68,11 @@ window.addEventListener(`pointermove`, event => {
   const el = document.getElementById(`pointer`);
   if (!el) return;
 
-  const source = p.canvasSource;
-  const region = p.canvasRegion;
-
   const raw = { x: event.x, y: event.y };
-  const sourceRel = source.toRelPoint(raw, `screen`, `independent`, false);
+  const sourceRel = source.toRelPoint(raw, `screen`, `independent`);
   const regionRel = region.toRelPoint(raw, `screen`, `independent`);
-  const regionClamp = region.absToRegionPoint(raw, `screen`, false);
-  const screenToValue = p.pointToValue(raw, `screen`, false);
+  const regionClamp = region.absToRegionPoint(raw, `screen`, true);
+  const screenToValue = p.pointToValue(raw, `screen`, true);
 
   el.innerHTML = `
     Raw: ${ptToStr(raw)}<br>
