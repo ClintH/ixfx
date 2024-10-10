@@ -1,67 +1,124 @@
 import type { Point } from "../../geometry/point/PointType.js";
-import type { DataSet } from "./DataSet.js";
+import { DataSet } from "./DataSet.js";
 import type { Line, RectPositioned } from "../../geometry/Types.js";
-import { CanvasHelper } from "../../dom/CanvasHelper.js";
 import * as Rects from '../../geometry/rect/index.js';
 import * as Cart from './Cartesian.js';
 import { Colour } from "../index.js";
 import { round } from "../../numbers/Round.js";
-import { resolveEl } from "../../dom/ResolveEl.js";
-import { Points } from "../../geometry/index.js";
 import type { GridStyle, LineStyle, SeriesMeta, ShowOptions, TextStyle } from "./Types.js";
 import type { RecursivePartial } from "../../TsUtil.js";
+import type { CanvasRegion } from "../../visual/CanvasRegion.js";
+import { CanvasSource } from "../../visual/CanvasRegion.js";
+import { resolveEl } from "../../dom/ResolveEl.js";
+import { ElementSizer } from "../../dom/ElementSizing.js";
+import { Points } from "src/geometry/index.js";
+
+export type InsertOptions = (InsertOptionsViewport | InsertOptionsParent) & {
+  region?: RectPositioned
+};
+
+export type InsertOptionsViewport = {
+  fill: `viewport`
+
+}
+export type InsertOptionsParent = {
+  fill?: `parent`
+  parent: HTMLElement | string
+}
+
+export const insert = (insertOptions: InsertOptions, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) => {
+
+  const parentEl = (insertOptions.fill === `viewport`) ? document.body : resolveEl(insertOptions.parent);
+  const canvasEl = document.createElement(`canvas`);
+  parentEl.prepend(canvasEl);
+
+  const ds = new DataSet<Cart.PlotPoint, SeriesMeta>();
+
+  const source = new CanvasSource(canvasEl, `min`);
+  const rect = insertOptions.region ?? { x: 0, y: 0, width: 1, height: 1 };
+  const region = source.createRelative(rect, `independent`);
+  const p = new CartesianCanvasPlot(region, ds, options);
+
+  if (insertOptions.fill === `viewport`) {
+    ElementSizer.canvasViewport(canvasEl, {
+      onSetSize: (size, _el) => {
+        source.setLogicalSize(size);
+        p.invalidateRange();
+        p.draw();
+      }
+    });
+  } else {
+    ElementSizer.canvasParent(canvasEl, {
+      onSetSize: (size, _el) => {
+        source.setLogicalSize(size);
+        p.invalidateRange();
+        p.draw();
+      }
+    });
+  }
+  return p;
+}
 
 
 /**
  * Simple plotting of cartesian values.
  * 
+ * Create a plot that fills screen
  * ```js
- * // Create the data set
- * const ds = new Plot.DataSet();
- * 
- * // Create plotter, providing a CANVAS element and the dataset
- * const p = new Plot.CartesianCanvasPlot(`#plot`, ds);
+ * const p = Plot.insert({fill`viewport});
+ * const dataSet = p.dataSet;
  * 
  * // Add data
- * ds.add({ x:1, y:1 });
+ * ds.add({ x: 1, y: 2 });
  * 
- * // Request it to draw the current data
+ * // Draw
  * p.draw();
  * ```
- * 
- * Series
+ *
+ * Create a plot that fills a container
  * ```js
+ * const p = Plot.insert({parent:`#someel`});
+ * ```
+ * 
+ * Add data using the created data set
+ * ```js
+ * 
  * // Add a value to the `alpha` series
- * ds.add({x:1,y:1}, `alpha`);
+ * p.dataSet.add({x:1,y:1}, `alpha`);
+ * ```
+ * 
+ * Set default series formatting
+ * ```js
+ * p.setMeta(`default`, {
+ *  colour: `hsl(50,100%,50%)`,
+ *  lineWidth: 10
+ * });
  * ```
  * 
  * Series can have metadata associated with it in the DataSet
  * ```js
  * // Use 'pink' by default for the series 'alpha'
- * ds.setMeta(`alpha`, { colour: `pink` });
+ * p.setMeta(`alpha`, { colour: `pink` });
  * ``
  * 
  */
 export class CartesianCanvasPlot {
-  helper;
   #data;
   #lastDataChange;
+  #canvasRegion;
 
   actualDataRange: RectPositioned = Rects.EmptyPositioned;
   visibleRange: RectPositioned = Rects.PlaceholderPositioned;
   show: ShowOptions;
   whiskerLength: number;
   axisRounder = round(1, true);
+  onInvalidated: undefined | (() => void);
 
   /**
    * List of lines to draw after drawing everything else.
    * Lines are given in value-coordinate space
    */
   overlayLines: Array<Line & LineStyle> = [];
-
-  renderArea: RectPositioned & { dimensionMin: number } = { ...Rects.EmptyPositioned, dimensionMin: 0 };
-  margin;
-
   #grid: GridStyle
   #rangeMode;
 
@@ -72,16 +129,22 @@ export class CartesianCanvasPlot {
   #connectStyle;
   #rangeManual: Cart.PointMinMax | undefined;
   #textStyle: TextStyle;
+  #visualPadding: number;
+  #visualClear: `region` | `canvas`;
 
-  constructor(domQueryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) {
+  constructor(cr: CanvasRegion, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) {
     if (!data) throw new TypeError(`Param 'data' is undefined`);
     if (typeof data !== `object`) throw new TypeError(`Param 'data' is not an object. Got: ${ typeof data }`);
+    this.onInvalidated = options.onInvalidated as undefined | (() => void);
     this.#data = data;
+    this.#canvasRegion = cr;
     this.#lastDataChange = 0;
+    this.#visualClear = options.clear ?? `region`;
     this.#rangeMode = options.range ?? `auto`;
     this.#valueStyle = options.valueStyle ?? `dot`;
     this.#connectStyle = options.connectStyle ?? ``;
     this.whiskerLength = options.whiskerLength ?? 5;
+    this.#visualPadding = options.visualPadding ?? 20;
     this.show = {
       axes: true,
       axisValues: true,
@@ -109,42 +172,6 @@ export class CartesianCanvasPlot {
       width: 1,
       ...options.grid
     }
-
-    this.margin = options.margin ?? 0;
-
-    this.helper = new CanvasHelper(domQueryOrEl, {
-      resizeLogic: options.canvasResize ?? `none`,
-      coordinateScale: options.coordinateScale ?? `both`,
-      width: options.canvasWidth,
-      height: options.canvasHeight,
-      onResize: (ctx, size, helper) => {
-        this.computeRenderArea();
-        this.draw();
-      },
-    });
-    this.helper.el.addEventListener(`click`, event => {
-      const { x, y } = event;
-      const value = this.screenToValue(event);
-
-      console.log(`orig: ${ x }x${ y } -> ${ value.x }x${ value.y }`);
-
-    });
-    this.computeRenderArea();
-  }
-
-  computeRenderArea() {
-    const m = this.margin;
-    const width = this.helper.width - m - m;
-    const height = this.helper.height - m - m;
-
-    this.renderArea = {
-      x: m,
-      y: m,
-      width, height,
-      dimensionMin: Math.min(width, height)
-    };
-    //console.log(`computeRenderArea`, this.renderArea);
-    return this.renderArea;
   }
 
   getCurrentRange() {
@@ -152,33 +179,48 @@ export class CartesianCanvasPlot {
     this.#lastDataChange = this.#data.lastChange;
     const r = this.#createRange();
     this.#currentRange = r;
+    if (this.onInvalidated) this.onInvalidated();
     return r;
+  }
+
+  invalidateRange() {
+    this.#currentRange = undefined;
   }
 
   #createRange(): Cart.CartesianDataRange {
     // Compute scale of data
     const range = this.getDataRange(); // actual data range, or user-provided
 
-    const valueToRelative = Cart.relativeCompute(range);
-    const relativeToValue = Cart.absoluteCompute(range);
-    let xOffset = this.renderArea.x;//(this.renderArea.width / 2) + ;
-    let yOffset = this.renderArea.y;//(this.renderArea.height / 2) ;
-    if (this.renderArea.dimensionMin === this.renderArea.height) {
+    const absDataToRelative = Cart.relativeCompute(range);
+    const relDataToAbs = Cart.absoluteCompute(range);
+    const cr = this.#canvasRegion;
+    const padding = this.#visualPadding;
+
+    // Offsets are in canvas coordinates, not region
+    // eg 0,0 is top-left corner of canvas
+    let xOffset = cr.x + padding;
+    let yOffset = cr.y + padding;
+
+    const allowedHeight = cr.height - (padding * 2);
+    const allowedWidth = cr.width - (padding * 2);
+    const dimensionMin = Math.min(allowedHeight, allowedWidth);;
+
+    if (allowedWidth >= allowedHeight) {
       // Landscape
-      xOffset += (this.renderArea.width / 2) - (this.renderArea.dimensionMin / 2);
-    } else if (this.renderArea.dimensionMin === this.renderArea.width && this.renderArea.width !== this.renderArea.height) {
+      xOffset += (allowedWidth / 2) - (dimensionMin / 2);
+    } else {
       // Portrait
-      yOffset += (this.renderArea.height / 2) - (this.renderArea.dimensionMin / 2);
+      yOffset += (allowedHeight / 2) - (dimensionMin / 2);
     }
 
-    const relativeToElementSpace = (pt: Point) => {
+    const relDataToCanvas = (pt: Point) => {
       let { x, y } = pt;
       if (x === Number.NEGATIVE_INFINITY) x = 0;
       else if (x === Number.POSITIVE_INFINITY) x = 1;
       if (y === Number.NEGATIVE_INFINITY) y = 0;
       else if (y === Number.POSITIVE_INFINITY) y = 1;
-      x = x * this.renderArea.dimensionMin;
-      y = (1 - y) * this.renderArea.dimensionMin;
+      x = x * dimensionMin;
+      y = (1 - y) * dimensionMin;
 
       x += xOffset;
       y += yOffset;
@@ -186,47 +228,43 @@ export class CartesianCanvasPlot {
       return { x, y }
     };
 
-    const elementSpaceToRelative = (pt: Point) => {
+    const canvasToRelData = (pt: Point) => {
       let { x, y } = pt;
       x -= xOffset;
       y -= yOffset;
+      x = x / dimensionMin;
+      y = 1 - (y / dimensionMin);
+      return { x, y }
+    };
 
-      x /= this.renderArea.dimensionMin;
-      y /= this.renderArea.dimensionMin;
-      return { x, y: (1 - y) }
+    // Convert region-space to plot area relative
+    const regionSpaceToRelative = (pt: Point) => {
+      let { x, y } = pt;
+      x = x - cr.x + this.#visualPadding;
+      y = (dimensionMin + this.#visualPadding) - y;
+      x /= dimensionMin;
+      y = (y / dimensionMin);
+      return { x, y }
     }
 
     return {
-      valueToRelative, relativeToElementSpace, elementSpaceToRelative, relativeToValue, range
+      absDataToRelative, relDataToCanvas, canvasToRelData, regionSpaceToRelative, relDataToAbs, range
     }
   }
 
-  /**
-   * Converts a point in data space to viewport space
-   * @param pt 
-   */
-  valueToViewport(pt: Point): Point {
-    const c = this.getCurrentRange();
-    const rel = c.valueToRelative(pt);
-    const canvas = c.relativeToElementSpace(rel);
-    const el = this.helper.el;
-    const bounds = el.getBoundingClientRect();
-    return {
-      x: canvas.x + bounds.left,
-      y: canvas.y + bounds.top
-    }
-  }
 
   /**
    * Positions an element at the viewport location of `data` point.
    * Ensure the element has `position:absolute` set.
    * @param data 
-   * @param elOrQuery 
+   * @param elementToPosition 
    * @param by 
    */
-  positionAt(data: Point, elOrQuery: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery?: HTMLElement | string) {
-    const el = resolveEl(elOrQuery);
-    let { x, y } = this.valueToViewport(data);
+  positionElementAt(data: Point, elementToPosition: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery?: HTMLElement | string) {
+    const el = resolveEl(elementToPosition);
+    let { x, y } = this.valueToScreenSpace(data);
+    // x -= this.canvasSource.offset.x;
+    // y -= this.canvasSource.offset.y;
     if (by === `middle`) {
       const bounds = el.getBoundingClientRect();
       x -= bounds.width / 2;
@@ -262,66 +300,97 @@ export class CartesianCanvasPlot {
     }
   }
 
-  #valueToElementSpace(a: Point, debug: boolean) {
-    const ds = this.getCurrentRange();
-    // Scale relative to total dimensions of data
-    const rel = ds.valueToRelative(a);
+  valueToScreenSpace(dataPoint: Point) {
+    const region = this.valueToRegionSpace(dataPoint);
+    const offset = this.canvasSource.offset;
+    const scr = {
+      x: region.x + offset.x,
+      y: region.y + offset.y
+    }
+    return scr;
+  }
 
-    // Scale relative to viewport
-    const scr = ds.relativeToElementSpace(rel);
-    if (debug) console.log(`orig: ${ a.x }x${ a.y } rel: ${ rel.x }x${ rel.y } scr: ${ scr.x }x${ scr.y }`);
+  valueToRegionSpace(dataValue: Point, debug = false) {
+    const ds = this.getCurrentRange();
+
+    // Scale absolute value relative to total dimensions of data
+    const rel = ds.absDataToRelative(dataValue);
+
+    // Scale relative data value to canvas space
+    const region = ds.relDataToCanvas(rel);
+
+    if (debug) console.log(`orig: ${ dataValue.x }x${ dataValue.y } rel: ${ rel.x }x${ rel.y } region: ${ region.x }x${ region.y }`);
     return {
-      ...a,
-      x: scr.x,
-      y: scr.y
+      ...dataValue,
+      x: region.x,
+      y: region.y
     }
   }
+
+  // #regionSpaceToValue(scr: Point, clamped: boolean) {
+  //   const ds = this.getCurrentRange();
+
+  //   const rel = ds.regionSpaceToRelative(scr);
+  //   //console.log(`regionSpaceToRelative ${ rel.x.toFixed(2) },${ rel.y.toFixed(2) }`);
+
+  //   const value = ds.relDataToAbs(rel);
+  //   //if (debug) console.log(`orig: ${ a.x }x${ a.y } rel: ${ rel.x }x${ rel.y } scr: ${ scr.x }x${ scr.y }`);
+
+  //   const pt = {
+  //     ...scr,
+  //     x: value.x,
+  //     y: value.y
+  //   }
+  //   if (clamped) return clamp(pt);
+  //   return pt;
+  // }
 
   /**
    * Converts a point in pixel coordinates to a value.
    * Useful for converting from user input coordinates.
-   * @param a 
+   * @param point 
    * @returns 
    */
-  screenToValue(a: Point) {
+  pointToValue(point: Point, _source: `screen`) {
     const ds = this.getCurrentRange();
-    const bounds = this.helper.el.getBoundingClientRect();
-    const elem = Points.subtract(a, bounds);
-    const rel = ds.elementSpaceToRelative(elem);
-    const value = ds.relativeToValue(rel);
-    return value;
+
+    // Apply offset
+    const canvasPoint = Points.subtract(point, this.canvasSource.offset);
+
+    const v = ds.canvasToRelData(canvasPoint);
+    return ds.relDataToAbs(v);
   }
 
-  valueToScreen(a: Point) {
-    const ds = this.getCurrentRange();
-    const rel = ds.valueToRelative(a);
-    const scr = ds.relativeToElementSpace(rel);
-    const bounds = this.helper.el.getBoundingClientRect();
-    return {
-      x: scr.x + bounds.x,
-      y: scr.y + bounds.y
-    }
-  }
+  // valueToScreen(a: Point) {
+  //   const ds = this.getCurrentRange();
+  //   const rel = ds.valueToRelative(a);
+  //   const scr = ds.relativeToElementSpace(rel);
+  //   const bounds = this.helper.el.getBoundingClientRect();
+  //   return {
+  //     x: scr.x + bounds.x,
+  //     y: scr.y + bounds.y
+  //   }
+  // }
 
-  valueRectToScreen(a: Point, b: Point): RectPositioned {
-    a = this.valueToScreen(a);
-    b = this.valueToScreen(b);
-    return {
-      x: a.x,
-      y: b.y,
-      width: b.x - a.x,
-      height: a.y - b.y
-    }
-  }
+  // valueRectToScreen(a: Point, b: Point): RectPositioned {
+  //   a = this.valueToScreen(a);
+  //   b = this.valueToScreen(b);
+  //   return {
+  //     x: a.x,
+  //     y: b.y,
+  //     width: b.x - a.x,
+  //     height: a.y - b.y
+  //   }
+  // }
 
   /**
-   * Compute screen coordinates based on two points in value space
+   * Compute canvas-relative coordinates based on two points in value space
    * @param valueA 
    * @param valueB 
    */
-  #computeScreenLine(valueA: Point, valueB: Point, debug = false): Line {
-    valueA = this.#valueToElementSpace(valueA, debug) as Point;
-    valueB = this.#valueToElementSpace(valueB, debug) as Point;
+  #valueLineToCanvasSpace(valueA: Point, valueB: Point, debug = false): Line {
+    valueA = this.valueToRegionSpace(valueA, debug) as Point;
+    valueB = this.valueToRegionSpace(valueB, debug) as Point;
     return { a: valueA, b: valueB };
   }
 
@@ -334,7 +403,12 @@ export class CartesianCanvasPlot {
   }
 
   draw() {
-    this.helper.clear();
+    if (this.#visualClear === `region`) {
+      this.#canvasRegion.clear();
+    } else {
+      this.canvasSource.clear();
+    }
+
     //const ctx = this.helper.ctx;
     //this.helper.drawBounds(`whitesmoke`);
     //Drawing.rect(ctx, this.renderArea, { strokeStyle: `whitesmoke` });
@@ -342,7 +416,7 @@ export class CartesianCanvasPlot {
     this.#useGrid();
     if (this.show.axes) this.#drawAxes();
 
-    //let count = 0;
+    //let seriesCount = 0;
     for (const [ k, v ] of this.#data.getEntries()) {
       let meta = this.#data.getMeta(k);
       if (!meta) {
@@ -350,9 +424,9 @@ export class CartesianCanvasPlot {
         this.#data.setMeta(k, meta);
       }
       this.#drawSeries(k, v, meta);
-      //count++;
+      //seriesCount++;
     }
-
+    //console.log(`series count: ${ seriesCount }`);
     for (const line of this.overlayLines) {
       this.drawLine(line, line.colour, line.width);
     }
@@ -365,8 +439,8 @@ export class CartesianCanvasPlot {
    * @param width 
    */
   drawLine(line: Line, colour: string, width: number) {
-    const l = this.#computeScreenLine(line.a, line.b);
-    this.#drawLineAbsolute(l, colour, width);
+    const l = this.#valueLineToCanvasSpace(line.a, line.b);
+    this.#drawLineCanvasSpace(l, colour, width);
   }
 
   setMeta(series: string, meta: Partial<SeriesMeta>) {
@@ -378,15 +452,19 @@ export class CartesianCanvasPlot {
 
   #drawAxes() {
     const { colour, width } = this.#axisStyle;
-    const yAxis = this.#computeScreenLine({ x: 0, y: Number.NEGATIVE_INFINITY }, { x: 0, y: Number.POSITIVE_INFINITY }, false);
-    const xAxis = this.#computeScreenLine({ x: Number.NEGATIVE_INFINITY, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }, false);
-    this.#drawLineAbsolute(xAxis, colour, width, false);
-    this.#drawLineAbsolute(yAxis, colour, width, false);
+    // Axis coordinates in canvas-space
+    const yAxis = this.#valueLineToCanvasSpace({ x: 0, y: Number.NEGATIVE_INFINITY }, { x: 0, y: Number.POSITIVE_INFINITY }, false);
+    const xAxis = this.#valueLineToCanvasSpace({ x: Number.NEGATIVE_INFINITY, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }, false);
+
+    //console.log(`x axis: ${ xAxis.a.x }-${ xAxis.b.x }`);
+    this.#drawLineCanvasSpace(xAxis, colour, width, false);
+    this.#drawLineCanvasSpace(yAxis, colour, width, false);
   }
 
 
   #drawYAxisValues(yPoints: Array<Point>) {
-    const { ctx } = this.helper;
+    //const { ctx } = this.helper;
+    const ctx = this.#canvasRegion.context;
 
     ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
     ctx.fillStyle = this.#textStyle.colour;
@@ -395,29 +473,29 @@ export class CartesianCanvasPlot {
 
     for (const p of yPoints) {
       if (p.x === 0 && p.y === 0) continue;
-      const scr = this.#valueToElementSpace(p, false);
+      const reg = this.valueToRegionSpace(p, false);
       const value = this.axisRounder(p.y);
       const label = value.toString();
       const measure = ctx.measureText(label);
-      const x = scr.x - measure.width - (this.whiskerLength / 2) - 5;
-      const y = scr.y;
+      const x = reg.x - measure.width - (this.whiskerLength / 2) - 5;
+      const y = reg.y;
       ctx.fillText(label, x, y);
     }
   }
 
   #drawXAxisValues(xPoints: Array<Point>) {
-    const { ctx } = this.helper;
-
+    //const { ctx } = this.helper;
+    const ctx = this.#canvasRegion.context;
     ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
     ctx.fillStyle = this.#textStyle.colour;
     ctx.textBaseline = `top`;
     for (const p of xPoints) {
-      const scr = this.#valueToElementSpace(p, false);
+      const reg = this.valueToRegionSpace(p, false);
       const value = this.axisRounder(p.x);
       const label = value.toString();
       const measure = ctx.measureText(label);
-      const x = scr.x - measure.width / 2;
-      const y = scr.y + measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent + (this.whiskerLength / 2);
+      const x = reg.x - measure.width / 2;
+      const y = reg.y + measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent + (this.whiskerLength / 2);
       ctx.fillText(label, x, y);
     }
   }
@@ -425,24 +503,24 @@ export class CartesianCanvasPlot {
   #drawWhisker(p: Cart.AxisMark, vertical: boolean) {
     const whiskerHalfLength = this.whiskerLength / 2;
     const v = vertical ? { x: p.x, y: 0 } : { y: p.y, x: 0 }
-    const scr = this.#valueToElementSpace(v, false);
+    const reg = this.valueToRegionSpace(v, false);
 
     const line = vertical ? {
-      a: { x: scr.x, y: scr.y - whiskerHalfLength },
-      b: { x: scr.x, y: scr.y + whiskerHalfLength },
+      a: { x: reg.x, y: reg.y - whiskerHalfLength },
+      b: { x: reg.x, y: reg.y + whiskerHalfLength },
     } :
       {
-        a: { y: scr.y, x: scr.x - whiskerHalfLength },
-        b: { y: scr.y, x: scr.x + whiskerHalfLength },
+        a: { y: reg.y, x: reg.x - whiskerHalfLength },
+        b: { y: reg.y, x: reg.x + whiskerHalfLength },
       }
-    this.#drawLineAbsolute(line, this.#axisStyle.colour, this.#axisStyle.width, false);
+    this.#drawLineCanvasSpace(line, this.#axisStyle.colour, this.#axisStyle.width, false);
   }
 
   #drawGridline(p: Cart.AxisMark, vertical: boolean) {
     const line = vertical ?
-      this.#computeScreenLine({ x: p.x, y: Number.NEGATIVE_INFINITY }, { x: p.x, y: Number.POSITIVE_INFINITY }) :
-      this.#computeScreenLine({ y: p.y, x: Number.NEGATIVE_INFINITY }, { y: p.y, x: Number.POSITIVE_INFINITY }, false);
-    this.#drawLineAbsolute(line, this.#grid.colour, p.major ? this.#grid.width * 2 : this.#grid.width);
+      this.#valueLineToCanvasSpace({ x: p.x, y: Number.NEGATIVE_INFINITY }, { x: p.x, y: Number.POSITIVE_INFINITY }) :
+      this.#valueLineToCanvasSpace({ y: p.y, x: Number.NEGATIVE_INFINITY }, { y: p.y, x: Number.POSITIVE_INFINITY }, false);
+    this.#drawLineCanvasSpace(line, this.#grid.colour, p.major ? this.#grid.width * 2 : this.#grid.width);
   }
 
   #useGrid() {
@@ -477,18 +555,21 @@ export class CartesianCanvasPlot {
       this.#drawConnected(series, meta.colour, meta.lineWidth);
     }
 
+    //let valueCount = 0;
     if (this.#valueStyle === `dot`) {
       for (const v of series) {
         this.#drawDot(v, meta.colour, meta.dotRadius);
+        //valueCount++;
       }
     }
+    //console.log(`valueCount: ${ valueCount }`);
   }
 
   #drawConnected(dots: Array<Cart.PlotPoint>, colour: string, width: number) {
-    const ctx = this.helper.ctx;
+    const ctx = this.#canvasRegion.context;
     ctx.beginPath();
     for (const [ index, dot_ ] of dots.entries()) {
-      const dot = this.#valueToElementSpace(dot_, false);
+      const dot = this.valueToRegionSpace(dot_, false);
       if (index === 0) ctx.moveTo(dot.x, dot.y);
       ctx.lineTo(dot.x, dot.y);
     }
@@ -499,21 +580,31 @@ export class CartesianCanvasPlot {
   }
 
   #drawDot(originalDot: Cart.PlotPoint, fallbackColour: string, fallbackRadius: number) {
-    const ctx = this.helper.ctx;
-    const dot = this.#valueToElementSpace(originalDot, false);
+    const colour = Colour.resolveToString(originalDot.fillStyle ?? fallbackColour);
+    const pos = this.valueToRegionSpace(originalDot);
     const radius = originalDot.radius ?? fallbackRadius;
-    //console.log(`dot ${ dot.x }x${ dot.y } (from ${ originalDot.x }x${ originalDot.y })`);
-    ctx.fillStyle = Colour.resolveToString(originalDot.fillStyle ?? fallbackColour);
-    ctx.beginPath();
-    ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.closePath();
+    this.#canvasRegion.drawCircles([
+      { ...pos, radius }
+    ], colour);
+
+    // const ctx = this.helper.ctx;
+    // const dot = this.#valueToElementSpace(originalDot, false);
+    // const radius = originalDot.radius ?? fallbackRadius;
+    // //console.log(`dot ${ dot.x }x${ dot.y } (from ${ originalDot.x }x${ originalDot.y })`);
+    // ctx.fillStyle = Colour.resolveToString(originalDot.fillStyle ?? fallbackColour);
+    // ctx.beginPath();
+    // ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+    // ctx.fill();
+    // ctx.closePath();
   }
 
 
-  #drawLineAbsolute(line: Line, colour: string, width: number, debug = false) {
+  #drawLineCanvasSpace(line: Line, colour: string, width: number, debug = false) {
     if (debug) console.log(line);
-    const ctx = this.helper.ctx;
+    const ctx = this.#canvasRegion.context;
+
+    colour = Colour.resolveToString(colour);
+    //this.#canvasRegion.drawConnectedPoints([ line.a, line.b ], colour, width);
     ctx.beginPath();
     ctx.moveTo(line.a.x, line.a.y);
     ctx.lineTo(line.b.x, line.b.y);
@@ -521,5 +612,17 @@ export class CartesianCanvasPlot {
     ctx.lineWidth = width;
     ctx.stroke();
     ctx.closePath();
+  }
+
+  get dataSet() {
+    return this.#data;
+  }
+
+  get canvasRegion() {
+    return this.#canvasRegion;
+  }
+
+  get canvasSource() {
+    return this.#canvasRegion.source;
   }
 }

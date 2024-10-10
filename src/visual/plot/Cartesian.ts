@@ -2,8 +2,6 @@
 import { scaler } from "../../numbers/Scale.js";
 import type { Point } from "../../geometry/point/PointType.js";
 import type { GridStyle, LineStyle, ShowOptions, TextStyle } from "./Types.js";
-import type { ScaleBy } from "../../geometry/Scaler.js";
-import type { ElementResizeLogic } from "../../dom/ElementSizing.js";
 
 export type PointMinMax = { min: Point, max: Point, width: number, height: number, minDim: number, maxDim: number };
 
@@ -18,29 +16,37 @@ export type CartesianDataRange = {
   /**
    * Converts a data value to relative value (0..1)
    */
-  valueToRelative: CartesianScaler
+  absDataToRelative: CartesianScaler
   /**
    * Converts a relative value to element-based coordinates
    * (ie 0,0 is top-left of CANVAS)
    */
-  relativeToElementSpace: CartesianScaler
+  relDataToCanvas: CartesianScaler
+  canvasToRelData: CartesianScaler
   /**
    * Converts canvas coordinate to relative
    */
-  elementSpaceToRelative: CartesianScaler,
+  regionSpaceToRelative: CartesianScaler,
   /**
    * Converts relative coordinate to value
    */
-  relativeToValue: CartesianScaler
+  relDataToAbs: CartesianScaler
   range: PointMinMax
 }
 
 
 export type CartesianPlotOptions = {
-  canvasWidth: number
-  canvasHeight: number
-  canvasResize: ElementResizeLogic
-  coordinateScale: ScaleBy
+  clear: `region` | `canvas`
+  onInvalidated: () => void
+  /**
+ * Margin around whole plot area. Use
+ * to avoid dots being cut off by edge of canvas
+ */
+  visualPadding: number
+  // canvasWidth: number
+  // canvasHeight: number
+  // canvasResize: ElementResizeLogic
+  // coordinateScale: ScaleBy
   show: Partial<ShowOptions>
   /**
    * If 'auto' (default), range of plot is based on data.
@@ -49,11 +55,7 @@ export type CartesianPlotOptions = {
    * 
    */
   range: `auto` | { min: Point, max: Point }
-  /**
-   * Margin around whole plot area. Use
-   * to avoid dots being cut off by edge of canvas
-   */
-  margin: number
+
   /**
    * Gridline setting
    */
@@ -95,6 +97,9 @@ export const computeMinMax = (mm: Array<Point>): PointMinMax => {
 }
 
 export const relativeCompute = (minMax: PointMinMax) => {
+  if (!Number.isFinite(minMax.height)) {
+    return (point: Point) => point;
+  }
   const xScale = scaler(minMax.min.x, minMax.max.x);
   const yScale = scaler(minMax.min.y, minMax.max.y);
   return (point: Point) => ({
