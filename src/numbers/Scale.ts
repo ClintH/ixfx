@@ -1,4 +1,4 @@
-import { clamp } from './Clamp.js';
+import { clamp, clamper } from './Clamp.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
 
 /**
@@ -53,6 +53,7 @@ export const scale = (
  * @param outMin Output minimum. If not specified, 0
  * @param outMax Output maximum. If not specified, 1
  * @param easing Easing function
+ * @param clamped If true, value is clamped. Default: false
  * @returns
  */
 export const scaler = (
@@ -60,7 +61,8 @@ export const scaler = (
   inMax: number,
   outMin?: number,
   outMax?: number,
-  easing?: (v: number) => number
+  easing?: (v: number) => number,
+  clamped?: boolean
 ): ((v: number) => number) => {
 
   throwNumberTest(inMin, `finite`, `inMin`);
@@ -68,13 +70,16 @@ export const scaler = (
 
   const oMax = outMax ?? 1;
   const oMin = outMin ?? 0;
+  const clampFunction = clamped ? clamper(outMin, outMax) : undefined;
 
   return (v: number): number => {
     if (inMin === inMax) return oMax;
 
     let a = (v - inMin) / (inMax - inMin);
     if (easing !== undefined) a = easing(a);
-    return a * (oMax - oMin) + oMin;
+    const x = a * (oMax - oMin) + oMin;
+    if (clampFunction) return clampFunction(x);
+    return x;
   };
 };
 
@@ -179,3 +184,32 @@ export const scalerPercent = (outMin: number, outMax: number) => {
     return scale(v, 0, 1, outMin, outMax);
   };
 };
+
+export type ScalerTwoWay = {
+  out: (v: number) => number
+  in: (v: number) => number
+}
+
+/**
+ * Returns a two-way scaler
+ * ```js
+ * // Input range 0..100, output range 0..1
+ * const s = scalerTwoWay(0,100,0,1);
+ * 
+ * // Scale from input to output
+ * s.out(50); // 0.5
+ * 
+ * // Scale from output range to input
+ * s.in(1); // 100
+ * ```
+ * @param inMin 
+ * @param inMax 
+ * @param outMin 
+ * @param outMax 
+ * @returns 
+ */
+export const scalerTwoWay = (inMin: number, inMax: number, outMin: number = 0, outMax: number = 1, clamped = false, easing?: (v: number) => number): ScalerTwoWay => {
+  const toOut = scaler(inMin, inMax, outMin, outMax, easing, clamped);
+  const toIn = scaler(outMin, outMax, inMin, inMax, easing, clamped);
+  return { out: toOut, in: toIn };
+}
