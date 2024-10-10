@@ -6,9 +6,11 @@ import * as Svg from './Svg.js';
 
 import * as Palette from './Palette.js';
 import * as Colour from './Colour.js';
+
 import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
 
+export * from './CanvasRegion.js';
 export * as ImageDataGrid from './ImageDataGrid.js';
 export * as BipolarView from './BipolarView.js';
 export * as Palette from './Palette.js';
