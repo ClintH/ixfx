@@ -29,7 +29,6 @@ export function distance(a: Point, x: number, y: number): number;
  * @param z Optional z coord, if x and y are given.
  * @returns
  */
-//eslint-disable-next-line func-style
 export function distance(
   a: Point | Point3d,
   xOrB?: Point | Point3d | number,

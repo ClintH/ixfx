@@ -59,7 +59,7 @@ export function guard(p: Point, name = `Point`) {
   }
   if (p.z !== undefined) {
     if (typeof p.z !== `number`) throw new TypeError(`${ name }.z must be a number. Got: ${ typeof p.z }`)
-    if (Number.isNaN(p.z)) throw new Error(`'${ name }.z' is NaN`);
+    if (Number.isNaN(p.z)) throw new Error(`'${ name }.z' is NaN. Got: ${ JSON.stringify(p) }`);
   }
 
   if (p.x === null) throw new Error(`'${ name }.x' is null`);

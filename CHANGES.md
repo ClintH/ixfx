@@ -1,5 +1,15 @@
 A rough changelog between NPM releases
 
+# 0.33.3 2024.10.13
+
+Numbers
++ clamper: function that clamps between min/max
++ scalerTwoWay: function that scales back and forth between ranges
+* NumericArrays.total: fixed bug
+
+Visual
++ CanvasRegion: manage a patch of drawing area
+ 
 # 0.33.0 2024.10.04
 
 Iterables

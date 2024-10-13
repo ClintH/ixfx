@@ -105,12 +105,15 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
 
 
   #byContainer() {
+    const c = this.#containerEl;
+    if (!c) throw new Error(`No container element`);
+
     // Listen for resize
-    const r = resizeObservable(this.#containerEl);
+    const r = resizeObservable(c);
     r.onValue((v) => { this.#onParentResize(v); });
 
     // Get current value
-    const current = this.#getStretchSize(this.#containerEl.getBoundingClientRect());
+    const current = this.#getStretchSize(c.getBoundingClientRect());
     this.size = current;
 
     this.#resizeObservable = r;

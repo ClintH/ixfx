@@ -131,7 +131,7 @@ export const min = (data: ReadonlyArray<number>): number =>
  * @returns Index of largest value
  */
 export const maxIndex = (data: ReadonlyArray<number>): number =>
-  // eslint-disable-next-line unicorn/no-array-reduce
+
   data.reduce(
     (bestIndex, value, index, array) =>
       value > array[ bestIndex ] ? index : bestIndex,
@@ -150,7 +150,7 @@ export const maxIndex = (data: ReadonlyArray<number>): number =>
  * @returns Index of smallest value
  */
 export const minIndex = (...data: ReadonlyArray<number>): number =>
-  // eslint-disable-next-line unicorn/no-array-reduce
+
   data.reduce(
     (bestIndex, value, index, array) =>
       value < array[ bestIndex ] ? index : bestIndex,
@@ -183,11 +183,10 @@ export const max = (data: ReadonlyArray<number>): number =>
  * @returns Total
  */
 export const total = (data: ReadonlyArray<number>): number =>
-  // eslint-disable-next-line unicorn/no-array-reduce
   data.reduce((previous, current) => {
     if (typeof current !== `number`) return previous;
     if (Number.isNaN(current)) return previous;
-    if (Number.isFinite(current)) return previous;
+    if (!Number.isFinite(current)) return previous;
     return previous + current;
   }, 0);
 
@@ -203,11 +202,8 @@ export const total = (data: ReadonlyArray<number>): number =>
  * @param data
  * @returns Maximum
  */
-//eslint-disable-next-line functional/prefer-immutable-types
 export const maxFast = (data: ReadonlyArray<number> | Float32Array): number => {
-  //eslint-disable-next-line functional/no-let
   let m = Number.MIN_SAFE_INTEGER;
-  //eslint-disable-next-line functional/no-let
   for (const datum of data) {
     m = Math.max(m, datum);
   }
@@ -226,11 +222,8 @@ export const maxFast = (data: ReadonlyArray<number> | Float32Array): number => {
  * @param data
  * @returns Maximum
  */
-//eslint-disable-next-line functional/prefer-immutable-types
 export const totalFast = (data: ReadonlyArray<number> | Float32Array): number => {
-  //eslint-disable-next-line functional/no-let
   let m = 0;
-  //eslint-disable-next-line functional/no-let
   for (const datum of data) {
     m += datum;
   }
@@ -249,11 +242,8 @@ export const totalFast = (data: ReadonlyArray<number> | Float32Array): number =>
  * @param data
  * @returns Maximum
  */
-//eslint-disable-next-line functional/prefer-immutable-types
 export const minFast = (data: ReadonlyArray<number> | Float32Array): number => {
-  //eslint-disable-next-line functional/no-let
   let m = Number.MIN_SAFE_INTEGER;
-  //eslint-disable-next-line functional/no-let
   for (const datum of data) {
     m = Math.min(m, datum);
   }

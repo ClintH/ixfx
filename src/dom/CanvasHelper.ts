@@ -266,7 +266,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
 
 
   #init() {
-    //console.log(`init`, this.opts);
+    console.log(`init`, this.opts);
 
     // If there is a 'draw' callback, set up an animation loop
     const d = this.opts.draw;

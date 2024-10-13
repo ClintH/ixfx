@@ -7,7 +7,8 @@ import {
   round,
   applyToValues,
   averageWeighted,
-  weight
+  weight,
+  total
 } from '../../numbers/index.js';
 import { gaussian } from '../../modulation/Gaussian.js';
 
@@ -158,6 +159,17 @@ test(`averageWeighted`, t => {
   t.is(r, 2.01);
 });
 
+test(`total`, t => {
+
+  t.is(total([ 1, 2, 3 ]), 6);
+  t.is(total([ 1, 2, -3 ]), 0);
+  t.is(total([ 1, 2, Number.NaN, 3 ]), 6);
+  // @ts-expect-error
+  t.is(total([ 1, 2, null, 3 ]), 6);
+  // @ts-expect-error
+  t.is(total([ 1, 2, {}, 3 ]), 6);
+});
+
 test(`average`, (t) => {
   const a = [ 1 ];
   t.is(average(a), 1);
@@ -172,6 +184,7 @@ test(`average`, (t) => {
   // @ts-ignore
   t.is(average(d), 0.5);
 
+  // eslint-disable-next-line unicorn/prevent-abbreviations
   const e = [ 1, 1.4, 0.9, 0.1 ];
   t.is(average(e), 0.85);
 });

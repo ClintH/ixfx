@@ -1,4 +1,4 @@
-import { Plot2 } from '../../../dist/visual.js';
+
 import { continuously } from '../../../dist/flow.js';
 import * as Random from '../../../dist/random.js';
 import * as Components from '../../../dist/components.js';

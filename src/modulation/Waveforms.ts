@@ -1,6 +1,8 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 import { throwIntegerTest } from "../util/GuardNumbers.js";
 import type { ModSettable, ModSettableFeedback, ModSettableOptions, Modulate } from "./Types.js";
 import * as Sources from './source/index.js';
+export type WaveModulator = (feedback?: Partial<WaveShaperFeedback>) => number;
 
 export type Waveforms = `sine` | `sine-bipolar` | `saw` | `triangle` | `square` | `arc`;
 /**
@@ -225,7 +227,7 @@ export type WaveShaperFeedback = {
  * @param shaperFn 
  * @returns 
  */
-export function waveFromSource(sourceFn: ModSettable, shaperFn: Modulate, invert = false) {
+export function waveFromSource(sourceFn: ModSettable, shaperFn: Modulate, invert = false): WaveModulator {
   return (feedback?: Partial<WaveShaperFeedback>) => {
     let v = sourceFn(feedback?.clock);
     if (feedback?.override) v = feedback.override;
@@ -234,3 +236,4 @@ export function waveFromSource(sourceFn: ModSettable, shaperFn: Modulate, invert
     return v;
   }
 }
+
