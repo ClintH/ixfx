@@ -330,7 +330,7 @@ export * as Visual from './visual/index.js';
 /**
  * DOM module has some functions for easing DOM manipulation.
  *
- * * {@link fullSizeCanvas}: Keeps a canvas element at maximum size
+ * * {@link CanvasHelper}: Helps to size a canvas for high-DPI displays
  * * {@link pointerVisualise}: Shows pointer events for debugging purposes
 *
 * Components
@@ -343,7 +343,7 @@ export * as Visual from './visual/index.js';
 * 
 * Position/size
 * * {@link cardinalPosition}: Get the corner x,y of an element
-* * {@link parentSize}: Sets width/height of an element according to size of parent
+* * {@link ElementSizer}: Sets width/height of an element according to size of parent
  * * {@link getTranslation}: Returns the CSS translation of an element
  * 
  * Etc

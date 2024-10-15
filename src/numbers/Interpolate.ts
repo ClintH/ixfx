@@ -24,10 +24,68 @@ export type InterpolateOptions = {
   transform: (v: number) => number
 }
 
-
+/**
+ * Returns an interpolation function with a fixed interpolation amount. This
+ * function will need the A and B values to interpolate between (ie start and end)
+ * 
+ * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
+ * 
+ * ```js
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * 
+ * // Create function
+ * const fn = interpolate(0.1);
+ * 
+ * // Later, use to interpolate between a and b
+ * fn(50, 100); // 10% of 50..100 range
+ * ```
+ * 
+ * This is useful if you have a fixed interpolation amount, but varying A and B values.
+ * @param amount Interpolation value (0..1 usually)
+ * @param options Options
+ */
 export function interpolate(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
+
+/**
+ * Interpolates between `a` and `b` by `amount`.
+ * 
+ * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
+ * 
+ * ```js
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * 
+ * // Get the value at 10% of range between 50-100
+ * const fn = interpolate(0.1, 50, 100);
+ * ```
+ * 
+ * This is useful if you have dynamic interpolation amount as well as A & B values.
+ * Consider using `interpolate(amount)` if you have a fixed interpolation amount.
+ * @param amount Interpolation value (0..1 usually)
+ * @param a Starting value (corresponding to an interpolation of 0)
+ * @param b End value (corresponding to an interpolation value of 1)
+ * @param options Options
+ */
 export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
+
+/**
+ * Returns an interpolation function with a fixed A and B values.
+ * The returned function requires an interpolation amount. This is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
+ * 
+ * ```js
+ * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * 
+ * // Create function to interpolate between 50..100
+ * const fn = interpolate(50, 100);
+ * 
+ * // Later, use to interpolate
+ * fn(0.1); // 10% of 50..100 range
+ * ```
+ * @param a Starting value (corresponding to an interpolation of 0)
+ * @param b End value (corresponding to an interpolation value of 1)
+ * @param options Options
+ */
 export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
+
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
  *
@@ -39,37 +97,8 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * interpolate(0.5, 30, 60);
  * ```
  *
- * Interpolation is often used for animation. In that case, `amount`
- * would start at 0 and you would keep interpolating up to `1`
- * @example
- * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
- * import { percentPingPong } from 'https://unpkg.com/ixfx/dist/modulation.js'
- *
- * // Go back and forth between 0 and 1 by 0.1
- * let pp = percentPingPong(0.1);
- * continuously(() => {
- *  // Get position in ping-pong
- *  const amt = pp.next().value;
- *  // interpolate between Math.PI and Math.PI*2
- *  const v = interpolate(amt, Math.PI, Math.PI*2);
- *  // do something with v...
- * }).start();
- * ```
- *
  * See also {@link interpolatorStepped} and {@link interpolatorInterval} for functions
  * which help to manage progression from A->B over steps or interval.
- * 
- * If two parameters are given, it instead returns a function which interpolates:
- * ```js
- * const i = interpolate(100, 200);
- * i(0.5); // 150
- * 
- * // Compared to:
- * interpolate(0.5, 100, 200); // 150
- * ```
- * 
- * This is useful if you want to reuse the interpolator with fixed `a` and `b` values.
  * 
  * Usually interpolation amount is on a 0...1 scale, inclusive. What is the interpolation result
  * if this scale is exceeded? By default it is clamped to 0..1, so the return value is always between `a` and `b` (inclusive).
@@ -84,6 +113,10 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * interpolate(0.1, 0, 100, { easing: `quadIn` });
  * ```
  * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Points.interpolate}.
+ * 
+ * There are a few variations when calling `interpolate`, depending on what parameters are fixed.
+ * * `interpolate(amount)`: returns a function that needs a & b 
+ * * `interpolate(a, b)`:  returns a function that needs the interpolation amount
  */
 export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
   let amountProcess: undefined | ((v: number) => number);
@@ -113,9 +146,9 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
 
   const readOpts = (o: Partial<InterpolateOptions> = {}) => {
     if (o.easing) {
-      const easingFn = getEasing(o.easing);
-      if (!easingFn) throw new Error(`Easing function '${ o.easing }' not found`);
-      amountProcess = easingFn;
+      const easer = getEasing(o.easing);
+      if (!easer) throw new Error(`Easing function '${ o.easing }' not found`);
+      amountProcess = easer;
     } else if (o.transform) {
       if (typeof o.transform !== `function`) throw new Error(`Param 'transform' is expected to be a function. Got: ${ typeof o.transform }`);
       amountProcess = o.transform;
@@ -146,7 +179,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
     }
   } else if (pos2 === undefined || typeof pos2 === `object`) {
     //interpolate(amount: number, options?: Partial<InterpolateOptions>): (a:number,b:number)=>number;
-    let amount = handleAmount(pos1);
+    const amount = handleAmount(pos1);
     readOpts(pos2);
     throwNumberTest(amount, ``, `amount`);
     return (aValue: number, bValue: number) => rawEase(amount, aValue, bValue);

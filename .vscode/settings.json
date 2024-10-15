@@ -36,7 +36,7 @@
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "prettier.enable": false,
   "editor.formatOnPaste": false,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.formatOnType": false,
   "editor.formatOnSaveMode": "file",
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,

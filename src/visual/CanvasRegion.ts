@@ -208,7 +208,7 @@ export class CanvasRegion {
    * Eg if the region had an x,y of 100,100, `toAbsRegion({x:0,y:0})`
    * will return 0,0.
    *
-   * @param rel 
+   * @param regionRel 
    * @param scaleBy 
    * @returns 
    */
