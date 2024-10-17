@@ -24,10 +24,10 @@ export function subtract(a: RectPositioned, b: Rect): RectPositioned;
  * Subtracts a width/height from `a`, returning result.
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * const rect = { width: 100, height: 100 };
  *
- * // Yields: { width: -100, height: -100 }
+ * const rect = { width: 100, height: 100 };
  * Rects.subtract(rect, 200, 200);
+ * // Yields: { width: -100, height: -100 }
  * ```
  * @param a
  * @param width
@@ -59,12 +59,58 @@ export function subtract(a: Rect | undefined, b: Rect | number, c?: number): Rec
 }
 
 /**
- * Subtracts x,y,width,height of a-b.
+ * Subtracts a width & height from `a`. Leaves x & y as-is.
  * ```js
- * subtractOffset({x:100,y:100,width:100,height:100}, {x:10, y:20, width: 30, height: 40});
+ * const rect = { x: 10, y: 20, width: 100, height: 200 };
+ * subtractSize(rect, { width: 50, height: 100 });
+ * subtractSize(rec, 50, 100);
+ * // Both yields: { x:10, y: 20, width: 50, height: 100 }
+ * ```
+ * @param a Rectangle
+ * @param b Rectangle to subtract by, or width
+ * @param c Height, if second parameter is width
+ */
+export function subtractSize(a:RectPositioned, b:Rect|number, c?:number):RectPositioned;
+
+
+/**
+ * Subtracts a width & height from `a`.
+ * ```js
+ * const rect = { width: 100, height: 200 };
+ * subtractSize(rect, { width: 50, height: 100 });
+ * subtractSize(rec, 50, 100);
+ * // Both yields: { width: 50, height: 100 }
+ * ```
+ * @param a Rectangle
+ * @param b Rectangle to subtract by, or width
+ * @param c Height, if second parameter is width
+ */
+export function subtractSize(a:Rect, b:Rect|number, c?:number):Rect;
+
+
+
+export function subtractSize(a:Rect|RectPositioned, b:Rect|number, c?:number):Rect|RectPositioned {
+  const w = typeof b === `number` ? b : b.width;
+  const h = typeof b === `number`? c : b.height;
+  if (h === undefined) throw new Error(`Expected height as third parameter`);
+  const r = {
+      ...a,
+      width: a.width-w,
+      height: a.height-h
+    };
+  return r;
+}
+
+/**
+ * Subtracts A-B. Applies to x, y, width & height
+ * ```js
+ * subtractOffset(
+ *  { x:100, y:100, width:100, height:100 }, 
+ *  { x:10, y:20,   width: 30, height: 40 }
+ * );
  * // Yields: {x: 90, y: 80, width: 70, height: 60 }
  * ```
- * If either `a` or `b` are missing x & y, 0 is used
+ * If either `a` or `b` are missing x & y, 0 is used.
  * @param a 
  * @param b 
  * @returns 
