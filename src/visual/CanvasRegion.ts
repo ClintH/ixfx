@@ -1,9 +1,34 @@
-import { piPi } from "src/data/index.js";
-import { Points, Rects } from "src/geometry/index.js";
-import type { CirclePositioned, Point, Rect, RectPositioned } from "src/geometry/Types.js";
-import { scalerTwoWay } from "src/numbers/Scale.js";
-import { resolveEl } from "../dom/ResolveEl.js";
-import { clamp } from "src/numbers/Clamp.js";
+import { piPi } from "../data/index.js";
+import { Points, Rects } from "../geometry/index.js";
+import type { CirclePositioned, Point, Rect, RectPositioned } from "../geometry/Types.js";
+import { scalerTwoWay } from "../numbers/Scale.js";
+import { resolveEl, resolveElementTry } from "../dom/ResolveEl.js";
+import { clamp } from "../numbers/Clamp.js";
+import { resultErrorToString } from "../util/Results.js";
+
+export type CanvasRegionSpecRelativePositioned = {
+  relativePositioned:RectPositioned
+  scale?: `independent` 
+}
+
+export type CanvasRegionSpecAbsolutePositioned = {
+  absPositioned:RectPositioned
+}
+
+export type CanvasRegionSpecRelativeSized = {
+  relativeSize: Rect
+  scale?:`independent`
+  /**
+   * Cardinal directions, or 'center' (default)
+   */
+  position:`center`|`n`|`s`
+}
+
+export type CanvasRegionSpecMatched = {
+  match:HTMLElement|string
+}
+
+export type CanvasRegionSpec = { marginPx?:number} & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
 
 export class CanvasSource {
   #canvasEl: HTMLCanvasElement;
@@ -59,13 +84,12 @@ export class CanvasSource {
   }
 
   #add(region: CanvasRegion) {
+    if (!region) throw new Error(`Param 'region' is undefined/null`);
+    if (this.#regions.includes(region)) throw new Error(`Region already exists`);
     this.#regions.push(region);
     return region;
   }
 
-  createFixedAbsolute(canvasCoordsRect: RectPositioned) {
-    return this.#add(new CanvasRegion(this, () => canvasCoordsRect))
-  }
 
   toAbsPoint(pt: Point, kind: `independent` = `independent`) {
     let { x, y } = pt;
@@ -105,8 +129,6 @@ export class CanvasSource {
     return { x, y };
   }
 
-
-
   toAbsRect(rect: Rect | RectPositioned, kind: `independent` = `independent`) {
     let { width, height } = rect;
     switch (kind) {
@@ -124,27 +146,112 @@ export class CanvasSource {
     return { width, height }
   }
 
-  createRelative(rect: RectPositioned, kind: `independent` = `independent`) {
-    let compute: undefined | ((source: CanvasSource) => RectPositioned);
-    switch (kind) {
-      case `independent`:
-        compute = (source: CanvasSource): RectPositioned => ({
-          x: rect.x * source.width,
-          y: rect.y * source.height,
-          width: rect.width * source.width,
-          height: rect.height * source.height
-        })
-        break;
+
+  /**
+   * Creates a region
+   * 
+   * Absolute positioned. Uses source coordinates which don't change
+   * ```js
+   * source.createRegion({ 
+   *  absPositioned: { x: 0, y: 0, width: 100, height: 100} 
+   * });
+   * ```
+   * 
+   * Relative positioned. Uses coordiantes relative to source dimensions.
+   * Updated if source changes.
+   * ```js
+   * source.createRegion({
+   *  relativePositioned: { x: 0, y:0, width: 1, height: 0.5 },
+   *  scale: `independent`
+   * });
+   * ```
+   * 
+   * Relative sized. Uses size relative to source dimension. By default centers.
+   * ```js
+   * source.createRegion({
+   *  relativeSize: { width: 0.5, height: 0.5 }
+   *  position: `center`
+   * })
+   * ```
+   * @param spec 
+   * @returns 
+   */
+  createRegion(spec:CanvasRegionSpec) {
+    const marginPx = spec.marginPx ?? 0;
+    const marginPx2 = marginPx*2;
+    if (`absPositioned` in spec) {
+      const rect = Rects.subtractSize(spec.absPositioned, marginPx, marginPx);
+      return this.#add(new CanvasRegion(this, () => rect))
     }
-    // const compute = (source: CanvasSource) => {
-    //   return {
-    //     x: source.sizeScaler.abs(rect.x),
-    //     y: source.sizeScaler.abs(rect.y),
-    //     width: source.sizeScaler.abs(rect.width),
-    //     height: source.sizeScaler.abs(rect.height),
-    //   }
-    // };
-    return this.#add(new CanvasRegion(this, compute));
+
+    if (`relativePositioned` in spec) {
+      let compute:  ((source: CanvasSource) => RectPositioned);
+      const rect = spec.relativePositioned;
+      switch (spec.scale) {
+        case `independent`:
+          compute = (source: CanvasSource): RectPositioned => ({
+            x: (rect.x * source.width) + marginPx,
+            y: (rect.y * source.height) + marginPx,
+            width: (rect.width * source.width) - marginPx2,
+            height: (rect.height * source.height) - marginPx2
+          });
+          break;
+        default:
+          throw new Error(`Param 'kind' unknown (${spec.scale})`);
+      }
+      return this.#add(new CanvasRegion(this, compute));
+    }
+
+    if (`relativeSize` in spec) {
+      let compute:  ((source: CanvasSource) => RectPositioned);
+      const rect = spec.relativeSize;
+      const position = spec.position;
+  
+      switch (spec.scale) {
+        case `independent`:
+          compute = (source: CanvasSource): RectPositioned => {
+            const width = (rect.width * source.width) - marginPx2;
+            const height = (rect.height * source.height) -marginPx2;
+            let x = source.width/2-width/2;
+            let y = source.height/2-height/2;
+            switch (position) {
+              case `n`:
+                y = 0;
+                break;
+              case `s`:
+                y = source.height-height;
+                break;
+              default:
+                /** no-op, */
+            }
+            x += marginPx;
+            y += marginPx;
+            return {width, height, x, y }
+          }
+          break;
+        default:
+          throw new Error(`Param 'kind' unknown (${spec.scale})`);
+      }
+      return this.#add(new CanvasRegion(this, compute));
+    }
+
+    if (`match` in spec) {
+      const result = resolveElementTry(spec.match);
+      if (!result.success) {
+        throw new Error(`Could not resolve match element. ${resultErrorToString(result)}`);
+      }
+      const compute = (_source:CanvasSource):RectPositioned => {
+        const bounds = result.value.getBoundingClientRect();
+        return {
+          x: bounds.x + marginPx, 
+          y: bounds.y + marginPx,
+          width: bounds.width-marginPx2, 
+          height: bounds.height-marginPx2
+        }
+      }
+      return this.#add(new CanvasRegion(this, compute));
+    }
+    throw new Error(`Spec doesn't seem valid`);
   }
 
   clear() {
@@ -197,6 +304,10 @@ export class CanvasRegion {
     this.#r = regionCompute(source);
   }
 
+  /**
+   * Calls the original `regionCompute` function passed in to the constructor
+   * to recompute the absolute region
+   */
   recomputeRegion() {
     this.#r = this.#regionCompute(this.source);
   }
@@ -223,6 +334,11 @@ export class CanvasRegion {
     }
   }
 
+  /**
+   * Returns a copy of `p` offset by the region's x & y
+   * @param p 
+   * @returns 
+   */
   applyRegionOffset(p: Point) {
     return {
       x: p.x + this.#r.x,
@@ -230,11 +346,27 @@ export class CanvasRegion {
     }
   }
 
+  /**
+   * Draws a line from a series of points.
+   * Assumes region-relative, % coordinates (ie 0..1 scale)
+   * @param relativePoints Points to connect, in region-relative coordinates
+   * @param strokeStyle Stroke style
+   * @param lineWidth Line with
+   */
   drawConnectedPointsRelative(relativePoints: Array<Point>, strokeStyle: string, lineWidth = 1) {
     const points = relativePoints.map(p => this.toAbsRegion(p));
     this.drawConnectedPoints(points, strokeStyle, lineWidth);
   }
 
+  /**
+   * Draws connected points in absolute coordinates,
+   * however with 0,0 being the top-left of the region.
+   * 
+   * Thus, this will apply the region offset before drawing.
+   * @param points Points to draw
+   * @param strokeStyle Stroke style
+   * @param lineWidth Line width
+   */
   drawConnectedPoints(points: Array<Point>, strokeStyle: string, lineWidth = 1) {
     const c = this.context;
     c.save();
