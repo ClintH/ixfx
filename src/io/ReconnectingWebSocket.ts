@@ -142,9 +142,9 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
         try {
           const wss = new WebSocket(url);
           const r = await eventRace(wss, [ `open`, `error` ], { timeout: 1000 });
-          return r.type === `open` ? { success: true, value: wss } : { success: false, value: undefined };
+          return r.type === `open` ? { success: true, value: wss } : { success: false, error: `Could not open` };
         } catch (error) {
-          return { success: false, message: getErrorMessage(error) }
+          return { success: false, error: getErrorMessage(error) }
         }
       },
     }, { predelayMs: startDelayMs, limitAttempts: opts.limitAttempts });
@@ -153,11 +153,9 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
     ws = retry.value;
     let result = false;
     if (retry.success && ws) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      ws.addEventListener(`error`, onError);
+      //      ws.addEventListener(`error`, onError);
       if (opts.onMessage) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        ws.addEventListener(`message`, onMessage);
+        //        ws.addEventListener(`message`, onMessage);
       }
       result = true;
       currentState = StateMachine.to(currentState, `open`);

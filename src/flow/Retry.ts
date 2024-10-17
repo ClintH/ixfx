@@ -188,10 +188,10 @@ export const retryFunction = <T>(callback: () => Promise<T | undefined>, options
     async probe() {
       try {
         const v = await callback();
-        if (v === undefined) return { value: options.taskValueFallback, success: false };
+        if (v === undefined) return { value: options.taskValueFallback,error:`Fallback`, success: false };
         return { value: v, success: true };
       } catch (error) {
-        return { success: false, message: getErrorMessage(error) };
+        return { success: false, error: error as Error };
       }
     },
   }

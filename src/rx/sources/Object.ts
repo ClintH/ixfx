@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/unbound-method */
+ 
 import { DispatchList } from "../../flow/DispatchList.js";
 import * as Pathed from "../../data/Pathed.js";
 import { initStream } from "../InitStream.js";
@@ -98,7 +98,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
 
   const update = (toMerge: Partial<V>) => {
     //console.log(`Rx.From.object update: toMerge: ${ JSON.stringify(toMerge) } value: ${ JSON.stringify(value) }`);
-    // eslint-disable-next-line unicorn/prefer-ternary
+     
     if (value === undefined) {
       value = toMerge as V;
       setEvent.set(value);
@@ -129,7 +129,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
     //console.log(`Rx.Sources.Object.updateField path: ${ path } value: ${ JSON.stringify(valueForField) }`);
 
     const existing = Pathed.getField<any>(value, path);
-    throwResult(existing); // Eg if path not found
+    if (!throwResult(existing)) return // Eg if path not found
 
     //console.log(`Rx.fromObject.updateField path: ${ path } existing: ${ JSON.stringify(existing) }`);
     if (eq(existing.value, valueForField, path)) {
