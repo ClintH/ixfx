@@ -33,9 +33,18 @@
       justify-content: center;
       align-items: center;
     }
+    #targetEl {
+      border:2px solid purple;
+      width:50%;
+      height:50%;
+      background-color: aqua;
+      opacity:0.1;
+    }
     </style>
+    <canvas id="canvas" width="100" height="100"></canvas>
     <div id="container">
-      <canvas id="canvas" width="800" height="300"></canvas>
+      <div id="targetEl">
+      </div>
     </div>
     <script type="module" src="script.js"></script>
   </body>
