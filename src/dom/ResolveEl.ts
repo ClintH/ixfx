@@ -1,3 +1,4 @@
+import { resultToError, type Result } from "src/util/Results.js";
 
 /**
  * Resolves either a string or HTML element to an element.
@@ -11,24 +12,28 @@
  * @returns
  */
 export const resolveEl = <V extends Element>(domQueryOrEl: string | V | null | undefined): V => {
+  const r = resolveElementTry(domQueryOrEl);
+  if (r.success) return r.value;
+  throw resultToError(r);
+}
+
+export const resolveElementTry = <V extends Element>(domQueryOrEl: string | V | null | undefined): Result<V> => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {
-      const error = domQueryOrEl.startsWith(`#`) ? new Error(
-        `Query '${ domQueryOrEl }' did not match anything. Try '#id', 'div', or '.class'`
-      ) : new Error(
-        `Query '${ domQueryOrEl }' did not match anything. Did you mean '#${ domQueryOrEl }?`
-      );
-      throw error;
+      const error = domQueryOrEl.startsWith(`#`) ? `Query '${ domQueryOrEl }' did not match anything. Try '#id', 'div', or '.class'`
+       : `Query '${ domQueryOrEl }' did not match anything. Did you mean '#${ domQueryOrEl }?`;
+      return {success:false,error};
+
     }
     domQueryOrEl = d as V;
   } else if (domQueryOrEl === null) {
-    throw new Error(`Param 'domQueryOrEl' is null`);
+    return {success:false,error:`Param 'domQueryOrEl' is null`};
   } else if (domQueryOrEl === undefined) {
-    throw new Error(`Param 'domQueryOrEl' is undefined`);
+    return {success:false,error:`Param 'domQueryOrEl' is undefined`};
   }
   const el = domQueryOrEl;
-  return el;
+  return {success:true,value:el};
 };
 
 export type QueryOrElements = string | Array<Element> | Array<HTMLElement> | HTMLElement | Element
