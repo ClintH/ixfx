@@ -7,39 +7,40 @@ import { Colour } from "../index.js";
 import { round } from "../../numbers/Round.js";
 import type { GridStyle, LineStyle, SeriesMeta, ShowOptions, TextStyle } from "./Types.js";
 import type { RecursivePartial } from "../../TsUtil.js";
-import type { CanvasRegion } from "../../visual/CanvasRegion.js";
+import type { CanvasRegion, CanvasRegionSpec } from "../../visual/CanvasRegion.js";
 import { CanvasSource } from "../../visual/CanvasRegion.js";
 import { resolveEl } from "../../dom/ResolveEl.js";
 import { ElementSizer } from "../../dom/ElementSizing.js";
 import { Points } from "src/geometry/index.js";
 
-export type InsertOptions = (InsertOptionsViewport | InsertOptionsParent) & {
-  region?: RectPositioned
+export type InsertOptions = {
+  region?: CanvasRegionSpec
+  /**
+   * Parent to insert CANVAS element into.
+   * If undefined, it will be added to the body.
+   */
+  parent?:HTMLElement|string
+  /**
+   * How canvas should be sized
+   */
+  canvasResizeTo:`parent`|`viewport`
 };
 
-export type InsertOptionsViewport = {
-  fill: `viewport`
-
-}
-export type InsertOptionsParent = {
-  fill?: `parent`
-  parent: HTMLElement | string
-}
 
 export const insert = (insertOptions: InsertOptions, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) => {
 
-  const parentEl = (insertOptions.fill === `viewport`) ? document.body : resolveEl(insertOptions.parent);
+  const parentEl = (insertOptions.parent === undefined) ? document.body : resolveEl(insertOptions.parent);
   const canvasEl = document.createElement(`canvas`);
   parentEl.prepend(canvasEl);
 
   const ds = new DataSet<Cart.PlotPoint, SeriesMeta>();
 
   const source = new CanvasSource(canvasEl, `min`);
-  const rect = insertOptions.region ?? { x: 0, y: 0, width: 1, height: 1 };
-  const region = source.createRelative(rect, `independent`);
+  const spec = insertOptions.region ?? ({ relativePositioned: { x: 0, y: 0, width: 1, height: 1 } });
+  const region = source.createRegion(spec);
   const p = new CartesianCanvasPlot(region, ds, options);
 
-  if (insertOptions.fill === `viewport`) {
+  if (insertOptions.canvasResizeTo === `viewport`) {
     ElementSizer.canvasViewport(canvasEl, {
       onSetSize: (size, _el) => {
         source.setLogicalSize(size);
@@ -48,6 +49,7 @@ export const insert = (insertOptions: InsertOptions, options: RecursivePartial<C
       }
     });
   } else {
+    // Parent
     ElementSizer.canvasParent(canvasEl, {
       onSetSize: (size, _el) => {
         source.setLogicalSize(size);
