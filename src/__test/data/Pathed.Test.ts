@@ -1,7 +1,8 @@
-import test from 'ava';
+import test, { type ExecutionContext } from 'ava';
 import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../data/Pathed.js';
 import { arrayValuesEqual } from '../Include.js';
 import { isEqualValueDefault } from '../../util/IsEqual.js';
+import { resultToValue, type Result } from '../../util/Results.js';
 
 test(`get-paths-and-data`, t => {
   const d1 = {
@@ -95,11 +96,20 @@ test('get-paths', (t) => {
   ])
 });
 
+function testResult<T>(t:ExecutionContext, result:Result<T>, value:T ) {
+  if (result.success) {
+    t.is(result.value, value);
+  } else {
+    t.fail(`Result not successful ${result.error}`);
+  }
+}
+
 test('get-field', (t) => {
-  const t1 = getField({ name: { first: `Thom`, last: `Yorke` } }, `name.first`);
-  t.is(t1.value, `Thom`);
+  const t1 = getField<string>({ name: { first: `Thom`, last: `Yorke` } }, `name.first`);
+  testResult(t, t1, `Thom`);
+
   const t2 = getField({ colours: [ `red`, `green`, `blue` ] }, `colours.1`);
-  t.is(t2.value, `green`);
+  testResult(t, t2, `green`);
   const t3 = getField({ colours: [ `red`, `green`, `blue` ] }, `colours.3`);
   t.false(t3.success);
   const d = {
@@ -107,12 +117,11 @@ test('get-field', (t) => {
     gyro: { x: 4, y: 5, z: 6 },
   };
   const t4 = getField(d, `accel.x`);
-  t.is(t4.value, 1);
+  testResult(t, t4, 1);
   const t5 = getField<number>(d, `gyro.z`);
-  t.is(t5.value, 6);
+  testResult(t, t5, 6);
   const t6 = getField(d, `gyro`);
-  t.like(t6.value, { x: 4, y: 5, z: 6 });
-
+  testResult(t, t6,  { x: 4, y: 5, z: 6 });
   const d2 = {
     message: `hello`,
     profiles: [
@@ -121,7 +130,7 @@ test('get-field', (t) => {
     ]
   }
   const d2a = getField(d2, `profiles.1.animals.1`);
-  t.is(d2a.value, `rabbit`);
+  testResult(t, d2a, `rabbit`);
 
   t.false(getField(d2, `profiles.1.animals.2`).success);
   t.false(getField(d2, `profiles.1.animals.hello`).success);
@@ -147,10 +156,10 @@ test('get-field', (t) => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  t.deepEqual(getField(d3, `profiles`).value, d3.profiles);
-  t.deepEqual(getField(d3, `profiles.0`).value, d3.profiles[ 0 ]);
-  t.deepEqual(getField(d3, `profiles.0.animals`).value, d3.profiles[ 0 ].animals);
-  t.deepEqual(getField(d3, `profiles.0.animals.1`).value, d3.profiles[ 0 ].animals[ 1 ]);
+  t.deepEqual(resultToValue(getField(d3, `profiles`)), d3.profiles);
+  t.deepEqual(resultToValue(getField(d3, `profiles.0`)), d3.profiles[ 0 ]);
+  t.deepEqual(resultToValue(getField(d3, `profiles.0.animals`)), d3.profiles[ 0 ].animals);
+  t.deepEqual(resultToValue(getField(d3, `profiles.0.animals.1`)), d3.profiles[ 0 ].animals[ 1 ]);
 });
 
 
