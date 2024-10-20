@@ -7,16 +7,27 @@ import { get as getEasing, type EasingName } from '../modulation/easing/index.js
 export const piPi = Math.PI * 2;
 
 /**
+ * Interpolation options.
  * 
- * Limit
- * What to do if interpolation amount exceeds 0..1 range
+ * Limit: What to do if interpolation amount exceeds 0..1 range
  * * clamp: lock to A & B (inclusive) Default.
  * * wrap: wrap from end to start again
  * * ignore: allow return values outside of A..B range
  * 
  * Easing: name of easing function for non-linear interpolation
  * 
- * Transform: name of function to transform `amount` prior to interpolate. 
+ * Transform: name of function to transform `amount` prior to interpolate. This is useful for creating non-linear interpolation results.
+ * 
+ * For example:
+ * ```js
+ * // Divide interpolation amount in half
+ * const interpolatorInterval({ mins: 1 }, 10, 100, {
+ *  transform: (amount) => amount * Math.random()
+ * });
+ * ```
+ * In the above example, the results would get more random over time.
+ * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result. 
+ * 
  */
 export type InterpolateOptions = {
   limits: `clamp` | `wrap` | `ignore`

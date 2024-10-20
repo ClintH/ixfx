@@ -95,8 +95,8 @@ export * as SurfacePoints from './SurfacePoints.js';
  * Triangle processing.
  * 
  * Helpers for creating:
- * - {@link Triangles.fromFlatArray}: Create from `[ x1, y1, x2, y2, x3, y3 ]`
- * - {@link Triangles.fromPoints}: Create from three `{ x, y }` sets
+ * - {@link Triangles.fromFlatArray}: Create from `[ aX, aY, bX, bY, cX, cY ]`
+ * - {@link Triangles.fromPoints}: Create from an array of three Points.
  * - {@link Triangles.fromRadius}: Equilateral triangle of a given radius and center
  * 
  * There are sub-modules for dealing with particular triangles:
@@ -118,7 +118,7 @@ export * as SurfacePoints from './SurfacePoints.js';
  * - {@link corners}: Corner positions
  * - {@link innerCircle}: Largest circle to fit within triangle
  * - {@link outerCircle}: Largest circle to enclose triangle
- * - {@link toFlatArray}
+ * - {@link toFlatArray}: Returns an array of coordinates: `[aX, aY, bX, bY, cX, cY]`
  * 
  * Comparisons
  * - {@link intersectsPoint}: Whether a point intersects triangle

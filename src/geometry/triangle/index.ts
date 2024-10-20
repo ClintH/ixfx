@@ -44,7 +44,7 @@ const piPi = Math.PI * 2;
 /**
  * A triangle consisting of three empty points (Points.Empty)
  */
-//eslint-disable-next-line @typescript-eslint/naming-convention
+ 
 export const Empty = Object.freeze({
   a: { x: 0, y: 0 },
   b: { x: 0, y: 0 },
@@ -54,7 +54,7 @@ export const Empty = Object.freeze({
 /**
  * A triangle consisting of three placeholder points (Points.Placeholder)
  */
-//eslint-disable-next-line @typescript-eslint/naming-convention
+ 
 export const Placeholder = Object.freeze({
   a: { x: Number.NaN, y: Number.NaN },
   b: { x: Number.NaN, y: Number.NaN },
@@ -275,24 +275,7 @@ export const fromRadius = (
   return fromPoints(points);
 };
 
-/**
- * Rotates the vertices of the triangle around one point (by default, `b`).
- * @param triangle Triangle
- * @param vertex Name of vertex: a, b or c.
- */
-export const rotateByVertex = (
-  triangle: Triangle,
-  amountRadian: number,
-  vertex: `a` | `b` | `c` = `b`
-): Triangle => {
-  const origin =
-    vertex === `a` ? triangle.a : (vertex === `b` ? triangle.b : triangle.c);
-  return Object.freeze({
-    a: Points.rotate(triangle.a, amountRadian, origin),
-    b: Points.rotate(triangle.b, amountRadian, origin),
-    c: Points.rotate(triangle.c, amountRadian, origin),
-  });
-};
+
 
 /**
  * Returns a triangle anchored at `origin` with a given `length` and `angleRadian`.
