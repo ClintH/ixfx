@@ -37,7 +37,7 @@ export type GridCardinalDirection =
 export type GridCardinalDirectionOptional = GridCardinalDirection | ``;
 
 export type GridArray1d<T> = GridReadable<T> & GridWritable<T> & {
-  array: T[]
+  array: Array<T>
 }
 
 /**
@@ -122,7 +122,13 @@ export type GridCellSetter<TValue> = (value: TValue, cell: GridCell, wrap?: Grid
 
 /**
  * Shape of a grid and a function to read values from it, based on
- * cell location
+ * cell location.
+ * 
+ * These functions create a GridReadable:
+ * * {@link Grids.Array1d.wrap}: wrap an array and read as a grid
+ * * {@link Grids.Array1d.wrapMutable}: wrap and modify an array as a grid
+ * * {@link Grids.Array2d.wrap}: wrap a two-dimensional grid
+ * * {@link Grids.Array2d.wrapMutable}
  */
 export type GridReadable<T> = Grid & {
   get: GridCellAccessor<T>

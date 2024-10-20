@@ -2,12 +2,37 @@ import * as Grids from '../geometry/grid/index.js';
 import type { Rgb, Rgb8Bit } from './Colour.js';
 import { toRgb8bit } from './Colour.js';
 
-
+/**
+ * Returns a {@link Grids.Grid} based on the provided `image`
+ * @param image ImageData
+ * @returns Grid
+ */
 export const grid = (image: ImageData): Grids.Grid => {
   const g = { rows: image.width, cols: image.height };
   return g;
 }
 
+/**
+ * Returns an object that allows get/set grid semantics on the underlying `image` data.
+ * Uses 8-bit sRGB values, meaning 0..255 range for red, green, blue & opacity.
+ * 
+ * ```js
+ * // Get CANVAS element, drawing context and then image data
+ * const canvasEl = document.querySelector(`#my-canvas`);
+ * const ctx = canvasEl.getContext(`2d`);
+ * const imageData = ctx.getImageData();
+ * 
+ * // Now that we have image data, we can wrap it:
+ * const asGrid = ImageDataGrid.wrap(imageData);
+ * asGrid.get({ x:10, y: 20 }); // Get pixel at 10,20
+ * asGrid.set(colour, { x:10, y: 20 }); // Set pixel value
+ * 
+ * // Display changes back on the canvas
+ * ctx.putImageData(imageData, 0, 0)
+ * ```
+ * @param image 
+ * @returns 
+ */
 export const wrap = (image: ImageData): Grids.GridWritable<Rgb8Bit> & Grids.GridReadable<Rgb8Bit> => {
   return {
     ...grid(image),

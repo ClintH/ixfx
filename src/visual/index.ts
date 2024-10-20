@@ -11,6 +11,11 @@ import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
 
 export * from './CanvasRegion.js';
+
+/**
+ * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link Geometry.Grid} type.
+ * This is useful because it's otherwise a one-dimensional array listing each rgba in turn.
+ */
 export * as ImageDataGrid from './ImageDataGrid.js';
 export * as BipolarView from './BipolarView.js';
 export * as Palette from './Palette.js';

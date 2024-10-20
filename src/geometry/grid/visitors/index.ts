@@ -25,6 +25,10 @@ export type VisitorTypes = `row` | `column` | `neighbours` | `breadth` | `depth`
  * * 'row': left-to-right, top-to-bottom
  * * 'column': top-to-bottom, left-to-right
  * * 'neighbours': neighbours surrounding cell (eight)
+ * * 'breadth`: breadth-first
+ * * 'depth': depth-first
+ * * 'random': any random cell in grid
+ * * 'random-contiguous': any random cell neighbouring an already visited cell
  * @param type 
  * @param opts 
  * @returns 

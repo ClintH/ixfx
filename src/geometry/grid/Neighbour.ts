@@ -23,6 +23,14 @@ const isNeighbour = (
 /**
  * Gets a list of neighbours for `cell` (using {@link neighbours}), filtering
  * results to only those that are valid neighbours (using {@link isNeighbour})
+ * 
+ * ```js
+ * // Get all eight surrounding cells
+ * const n = Grids.neighbourList(grid, cell, Grids.allDirections);
+ * 
+ * // Get north, east, south, west cells
+ * const n = Grids.neighbourList(grid, cell, Grids.crossDirections);
+ * ```
  * @param grid Grid
  * @param cell Cell
  * @param directions Directions 
