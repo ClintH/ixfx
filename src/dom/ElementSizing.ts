@@ -3,6 +3,7 @@ import type { Rect } from "../geometry/rect/RectTypes.js";
 import * as Rects from '../geometry/rect/index.js';
 import { resizeObservable, windowResize } from "./DomRx.js";
 import { resolveEl } from "./ResolveEl.js";
+import { getBoundingClientRectWithBorder, getComputedPixels } from "./Css.js";
 
 /**
  * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
@@ -74,8 +75,6 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
         el.width = size.width;
         el.height = size.height;
         if (options.onSetSize) options.onSetSize(size, el);
-        //el.setAttribute(`width`, size.width.toString());
-        //el.setAttribute(`height`, size.height.toString());
       },
     });
     return er;
@@ -110,10 +109,12 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
 
     // Listen for resize
     const r = resizeObservable(c);
-    r.onValue((v) => { this.#onParentResize(v); });
+    r.onValue((v) => { 
+      this.#onParentResize(v); 
+    });
 
     // Get current value
-    const current = this.#getStretchSize(c.getBoundingClientRect());
+    const current = this.#computeSizeBasedOnParent(c.getBoundingClientRect());
     this.size = current;
 
     this.#resizeObservable = r;
@@ -154,7 +155,7 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     return this.#viewport;
   }
 
-  #getStretchSize(parentSize: Rect) {
+  #computeSizeBasedOnParent(parentSize: Rect) {
     let { width, height } = parentSize;
 
     let stretch = this.#stretch;
@@ -170,6 +171,13 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
       width = height * this.#naturalRatio;
     }
 
+    // If we have a border, take that into account
+    if (this.#el instanceof HTMLElement) {
+      const b = getComputedPixels(this.#el, `borderTopWidth`, `borderLeftWidth`, `borderRightWidth`, `borderBottomWidth`);
+      width -= (b.borderLeftWidth+b.borderRightWidth);
+      height -= (b.borderTopWidth+b.borderBottomWidth);
+    }
+
     return { width, height };
   }
 
@@ -177,7 +185,7 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   #onParentResize(args: Array<ResizeObserverEntry>) {
     const box = args[ 0 ].contentBoxSize[ 0 ];
     const parentSize = { width: box.inlineSize, height: box.blockSize };
-    this.size = this.#getStretchSize(parentSize);
+    this.size = this.#computeSizeBasedOnParent(parentSize);
     this.#viewport = {
       x: 0, y: 0,
       width: parentSize.width,
