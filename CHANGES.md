@@ -1,5 +1,13 @@
 A rough changelog between NPM releases
 
+# 0.33.4 2025.10.21
+
+Dom.Css
++ getComputedPixels: returns a parsed pixel values for a set of CSS properties via getComputedStyle
+
+Geometry.Rects
++ subtractSize: keep x & y, just change size
+
 # 0.33.3 2024.10.13
 
 Numbers
