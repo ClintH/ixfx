@@ -3,8 +3,8 @@
  * Recursive.
  */
 export type RecursiveReplace<TShape, TFieldValue> = {
-  [ P in keyof TShape ]: TShape[ P ] extends (infer U)[]
-  ? RecursiveReplace<U, TFieldValue>[]
+  [ P in keyof TShape ]: TShape[ P ] extends Array<infer U>
+  ? Array<RecursiveReplace<U, TFieldValue>>
   : TShape[ P ] extends number | string | symbol | undefined
   ? TFieldValue
   : RecursiveReplace<TShape[ P ], TFieldValue>;
@@ -12,10 +12,12 @@ export type RecursiveReplace<TShape, TFieldValue> = {
 
 export type RecursivePartial<T> = {
   [ P in keyof T ]?:
-  T[ P ] extends (infer U)[] ? RecursivePartial<U>[] :
+  T[ P ] extends Array<infer U> ? Array<RecursivePartial<U>> :
   T[ P ] extends object | undefined ? RecursivePartial<T[ P ]> :
   T[ P ];
 };
+
+
 
 export type ReadonlyRemapObjectPropertyType<OriginalType, PropertyType> = {
   readonly [ Property in keyof OriginalType ]: PropertyType;
@@ -39,5 +41,5 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
 
 
 // Everything but first, eg Rest<Parameters<sometype>>
-//export type Rest<T extends any[]> = ((...p: T) => void) extends ((p1: infer P1, ...rest: infer R) => void) ? R : never;
-export type Rest<T extends any[]> = T extends [ infer A, ...infer R ] ? R : never;
+//export type Rest<TArray<any>nds any[]> = ((...p: T) => void) extends ((p1: infer P1, ...rest: infer R) => void) ? R : never;
+export type Rest<T extends Array<any>> = T extends [ infer A, ...infer R ] ? R : never;
