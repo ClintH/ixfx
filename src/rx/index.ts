@@ -177,7 +177,6 @@ export const Ops = {
   /**
    * Every upstream value is considered the target for interpolation.
    * Output value interpolates by a given amount toward the target.
-   * @param options 
    * @returns 
    */
   elapsed: <V>(): ReactiveOp<V, number> => opify(OpFns.elapsed),
@@ -443,8 +442,7 @@ export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform?:
         b.dispose(`Source closed (${ message.context ?? `` })`);
       }
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.warn(`Unsupported message: ${ JSON.stringify(message) }`);
+      // eslint-disable-nex Unsupported message: ${ JSON.stringify(message) }`);
     }
 
   });
