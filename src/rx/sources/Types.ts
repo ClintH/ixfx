@@ -3,10 +3,39 @@ import type { Interval } from '../../flow/IntervalType.js';
 import type { CombineLatestOptions, InitLazyStreamOptions, Lazy, Reactive, UpstreamOptions } from '../Types.js';
 import type { IsEqual } from "../../util/IsEqual.js";
 
+
 export type TriggerValue<TTriggerValue> = {
   value: TTriggerValue
 }
-
+/**
+ * Options for the 'count' source.
+ */
+export type CountOptions = { 
+  /**
+   * Determines when counting starts
+   * @defaultValue 'initial'
+   */
+  lazy: Lazy, 
+  /**
+   * Amount to increment by
+   * @defaultValue 1
+   */
+  amount: number, 
+  /**
+   * Where to begin counting
+   * @defaultValue 0
+   */
+  offset: number, 
+  /**
+   * How long to wait before incrementing.
+   * @defaultValue 1 second
+   */
+  interval: Interval, 
+  /**
+   * Abort signal to trigger the source to close.
+   */
+  signal: AbortSignal
+}
 /**
  * Function which returns a result. Or promised result.
  * 
@@ -322,7 +351,7 @@ export type DomNumberInputValueOptions = DomValueOptions & {
   upstreamSource?: Reactive<number>
 }
 
-export type DerivedFunction<TOutput> = (...args: any[]) => TOutput;
+export type DerivedFunction<TOutput> = (...args: Array<any>) => TOutput;
 export type DerivedOptions<TResult, T> = {
   ignoreIdentical: boolean
   eq: (a: TResult, b: TResult) => boolean

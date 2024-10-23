@@ -1,14 +1,14 @@
-import { intervalToMs } from "../flow/IntervalType.js";
-import { continuously } from "../flow/Continuously.js";
+import { intervalToMs } from "../../flow/IntervalType.js";
+import { continuously } from "../../flow/Continuously.js";
 import type { CountOptions } from "./Types.js";
-import { initLazyStream } from "./InitStream.js";
+import { initLazyStream } from "../InitStream.js";
 
 /**
  * Produces an incrementing value. By default starts at 0 and counts
  * forever, incrementing every second.
  * 
  * ```js
- * const r = Rx.count();
+ * const r = Rx.From.count();
  * r.onValue(c => {
  *  // 0, 1, 2, 3 ... every second
  * });
@@ -16,7 +16,7 @@ import { initLazyStream } from "./InitStream.js";
  * 
  * The `limit` is exclusive
  * ```js
- * const r = Rx.count({limit:5});
+ * const r = Rx.From.count({limit:5});
  * // Yields 0,1,2,3,4
  * ```
  * 
@@ -28,13 +28,13 @@ import { initLazyStream } from "./InitStream.js";
  * 
  * ```js
  * // Count 10, 12, 14 ... every 500ms
- * const r = Rx.count({ start: 10, amount: 2, interval: 500 });
+ * const r = Rx.From.count({ start: 10, amount: 2, interval: 500 });
  * ```
  * 
  * In addition to setting `limit` (which is exclusive), you can stop with an abort signal
  * ```js
  * const ac = new AbortController();
- * const r = Rx.count({signal:ac.signal});
+ * const r = Rx.From.count({signal:ac.signal});
  * ...
  * ac.abort(`stop`);
  * ```

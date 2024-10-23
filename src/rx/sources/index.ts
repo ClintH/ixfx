@@ -2,6 +2,7 @@ export * from './Array.js';
 export * from './ArrayObject.js';
 export * from './Boolean.js';
 export * from './Colour.js';
+export * from './Count.js';
 export * from './Derived.js';
 export * from './Dom.js';
 export * from './Event.js';

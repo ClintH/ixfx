@@ -296,7 +296,7 @@ export type InitLazyStreamInitedOptions<T> = InitLazyStreamOptions & {
   initialValue: T
 }
 
-export type CountOptions = { lazy: Lazy, amount: number, offset: number, interval: Interval, signal: AbortSignal }
+
 export type ReactiveOrSource<V> = Wrapped<V> | Reactive<V> | IterableIterator<V> | AsyncIterableIterator<V> | Generator<V> | AsyncGenerator<V> | Array<V> | (() => V)
 
 export type BindUpdateOpts<V> = {
