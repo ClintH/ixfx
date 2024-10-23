@@ -5,7 +5,7 @@ import { throwNumberTest } from '../util/GuardNumbers.js';
 import { pairwise } from '../data/arrays/Pairwise.js';
 import { scale as scaleNumber } from '../numbers/Scale.js';
 import { clamp } from '../numbers/Clamp.js';
-import { throwResult, type Result } from 'src/util/Results.js';
+import { throwResult, type Result } from '../util/Results.js';
 
 /**
  * HSL in relative 0..1 range for each field

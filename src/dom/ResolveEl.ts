@@ -1,4 +1,4 @@
-import { resultToError, type Result } from "src/util/Results.js";
+import { resultToError, type Result } from "../util/Results.js";
 
 /**
  * Resolves either a string or HTML element to an element.

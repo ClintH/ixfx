@@ -4,7 +4,7 @@
 //   error?: Error | string
 // }
 
-import { getErrorMessage } from "src/debug/GetErrorMessage.js"
+import { getErrorMessage } from "../debug/GetErrorMessage.js"
 
 export type ResultOk<T> = {
   success: true
