@@ -13,11 +13,16 @@ export function degreeToRadian(angleInDegrees: number): number;
  */
 export function degreeToRadian(angleInDegrees: ReadonlyArray<number>): ReadonlyArray<number>;
 
-//eslint-disable-next-line func-style
+ 
 export function degreeToRadian(angleInDegrees: number | ReadonlyArray<number>): number | ReadonlyArray<number> {
   return Array.isArray(angleInDegrees) ? angleInDegrees.map(v => v * (Math.PI / 180)) : (angleInDegrees as number) * (Math.PI / 180);
 }
 
+/**
+ * Inverts the angle so it points in the opposite direction of a unit circle
+ * @param angleInRadians 
+ * @returns 
+ */
 export function radianInvert(angleInRadians: number) {
   return (angleInRadians + Math.PI) % (2 * Math.PI);
 }
@@ -35,7 +40,7 @@ export function radianToDegree(angleInRadians: number): number;
  */
 export function radianToDegree(angleInRadians: ReadonlyArray<number>): ReadonlyArray<number>;
 
-//eslint-disable-next-line func-style
+ 
 export function radianToDegree(angleInRadians: number | ReadonlyArray<number>): number | ReadonlyArray<number> {
   return Array.isArray(angleInRadians) ? angleInRadians.map(v => v * 180 / Math.PI) : (angleInRadians as number) * 180 / Math.PI;
 }
@@ -76,14 +81,14 @@ export const radiansFromAxisX = (point: Point): number => Math.atan2(point.x, po
  */
 export const radiansSum = (start: number, amount: number, clockwise = true) => {
   if (clockwise) {
+    let x = start + amount;
+    if (x >= piPi) x = x % piPi;
+    return x;
+  } else {
     const x = start - amount;
     if (x < 0) {
       return piPi + x;
     }
-    return x;
-  } else {
-    let x = start + amount;
-    if (x >= piPi) x = x % piPi;
     return x;
   }
 }

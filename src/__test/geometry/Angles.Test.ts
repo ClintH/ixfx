@@ -30,34 +30,34 @@ test(`degreeArc`, t => {
 });
 
 test(`radiansSum`, t => {
-  t.is(radiansSum(3.14, 1.57, true), 1.57);
+  t.is(radiansSum(3.14, 1.57, false), 1.57);
 
-
-  // From zero CW
-  t.is(degreesSum(0, 90, true), 270);
-  t.is(degreesSum(0, 180, true), 180);
-  t.is(degreesSum(0, 270, true), 90);
-  t.is(degreesSum(0, 360, true), 0);
 
   // From zero CCW
-  t.is(degreesSum(0, 90, false), 90);
+  t.is(degreesSum(0, 90, false), 270);
   t.is(degreesSum(0, 180, false), 180);
-  t.is(degreesSum(0, 270, false), 270);
+  t.is(degreesSum(0, 270, false), 90);
   t.is(degreesSum(0, 360, false), 0);
 
-  // Pre zero CW
-  t.is(degreesSum(45, 45, true), 0);
-  t.is(degreesSum(45, 90, true), 315);
-  t.is(degreesSum(45, 180, true), 225);
-  t.is(degreesSum(45, 270, true), 135);
-  t.is(degreesSum(45, 360, true), 45);
+  // From zero CW
+  t.is(degreesSum(0, 90, true), 90);
+  t.is(degreesSum(0, 180, true), 180);
+  t.is(degreesSum(0, 270, true), 270);
+  t.is(degreesSum(0, 360, true), 0);
 
-  // Post zero CCW
-  t.is(degreesSum(315, 45, false), 0);
-  t.is(degreesSum(315, 90, false), 45);
-  t.is(Math.ceil(degreesSum(315, 180, false)), 135);
-  t.is(Math.floor(degreesSum(315, 270, false)), 225);
-  t.is(Math.ceil(degreesSum(315, 360, false)), 315);
+  // Pre zero CCW
+  t.is(degreesSum(45, 45, false), 0);
+  t.is(degreesSum(45, 90, false), 315);
+  t.is(degreesSum(45, 180, false), 225);
+  t.is(degreesSum(45, 270, false), 135);
+  t.is(degreesSum(45, 360, false), 45);
+
+  // Post zero CW
+  t.is(degreesSum(315, 45, true), 0);
+  t.is(degreesSum(315, 90, true), 45);
+  t.is(Math.ceil(degreesSum(315, 180, true)), 135);
+  t.is(Math.floor(degreesSum(315, 270, true)), 225);
+  t.is(Math.ceil(degreesSum(315, 360, true)), 315);
 
 
 });
