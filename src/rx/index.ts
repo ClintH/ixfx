@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/unbound-method */
+ 
 //#region imports
-import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable, ReactiveStream } from "./Types.js";
+import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./Types.js";
 import type { ChunkOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
 import type { RankFunction, RankOptions } from "../data/Types.js";
 import type { TimeoutPingOptions, TimeoutValueOptions } from "./sources/Types.js";
@@ -13,8 +13,6 @@ import * as OpFns from './ops/index.js';
 
 //#endregion
 
-//#region exports
-//export * from './Chain.js';
 export * from './ops/index.js';
 export * from './sinks/index.js';
 export * from './Graph.js';
@@ -24,10 +22,8 @@ export * from './ToGenerator.js';
 export * from './Util.js';
 export * from './Wrap.js';
 export * from './ResolveSource.js';
-export * from './Count.js';
 export * as Dom from './Dom.js';
 export * as From from './sources/index.js';
-//#endregion
 
 export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: Array<ReactiveOp<any, any>>) {
   let s = resolveSource(source);
@@ -36,9 +32,6 @@ export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: Array<Reac
     s = op(s);
   }
   return s;
-  //return s as Reactive<T2 | T3 | T4 | T5 | T6>;
-  //const raw = chainer<T1, T2, T3, T4, T5, T6>(...ops);
-  //return raw(source);
 }
 
 export function writable<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array<ReactiveOp<any, any>>): ReactiveWritable<TIn, TOut> {
@@ -48,7 +41,7 @@ export function writable<TIn, TOut>(source: ReactiveOrSource<TIn>, ...ops: Array
     // @ts-ignore
     s = op(s);
   }
-  let ss = s as any as Reactive<TOut>;
+  const ss = s as any as Reactive<TOut>;
   return {
     ...ss,
     set(value: TIn) {
@@ -175,6 +168,18 @@ export const Ops = {
       return OpFns.debounce(source, options);
     }
   },
+  /**
+   * Drops values from the input stream that match `predicate`
+   * @param predicate If it returns _true_ value is ignored
+   * @returns 
+   */
+    drop: <V>(predicate: (value: V) => boolean) => opify(OpFns.drop, predicate),
+  /**
+   * Every upstream value is considered the target for interpolation.
+   * Output value interpolates by a given amount toward the target.
+   * @param options 
+   * @returns 
+   */
   elapsed: <V>(): ReactiveOp<V, number> => opify(OpFns.elapsed),
   /**
    * Yields the value of a field from an input stream of values.
@@ -192,7 +197,7 @@ export const Ops = {
   },
   /**
    * Filters the input stream, only re-emitting values that pass the predicate
-   * @param predicate 
+   * @param predicate If it returns _true_ value is allowed through
    * @returns 
    */
   filter: <V>(predicate: (value: V) => boolean) => opify(OpFns.filter, predicate),
@@ -417,6 +422,7 @@ export async function takeNextValue<V>(source: ReactiveOrSource<V>, maximumWait:
   });
   return p;
 }
+
 
 /**
  * Connects reactive A to B, optionally transforming the value as it does so.
