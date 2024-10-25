@@ -1,6 +1,6 @@
-import type { RectPositioned } from "../rect/RectTypes.js";
+import type { Rect3dPositioned, RectPositioned } from "../rect/RectTypes.js";
 import { findMinimum } from "./FindMinimum.js";
-import type { Point } from "./PointType.js";
+import type { Point, Point3d } from "./PointType.js";
 import { maxFromCorners as RectsMaxFromCorners } from '../rect/Max.js';
 /**
  * Returns the minimum rectangle that can enclose all provided points
@@ -27,3 +27,19 @@ export const bbox = (...points: ReadonlyArray<Point>): RectPositioned => {
   const bottomLeft = { x: leftMost.x, y: bottomMost.y };
   return RectsMaxFromCorners(topLeft, topRight, bottomRight, bottomLeft);
 };
+
+export const bbox3d = (...points: ReadonlyArray<Point3d>): Rect3dPositioned => {
+  const box = bbox(...points);
+  const zMin = findMinimum((a:Point3d,b:Point3d) => {
+    return a.z < b.z ? a: b
+  }, ...points);
+  const zMax = findMinimum((a:Point3d,b:Point3d) => {
+    return a.z > b.z ? a: b
+  }, ...points);
+  
+  return {
+    ...box,
+    z:zMin.z,
+    depth:zMax.z-zMin.z
+  }
+}
