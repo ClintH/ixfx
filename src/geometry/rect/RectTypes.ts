@@ -1,4 +1,4 @@
-import type { Point } from "../point/PointType.js";
+import type { Point, Point3d } from "../point/PointType.js";
 
 /**
  * Rectangle as array: `[width, height]`
@@ -18,4 +18,10 @@ export type Rect = {
   readonly width: number;
   readonly height: number;
 };
+
+export type Rect3d = Rect & {
+  readonly depth:number
+}
+
 export type RectPositioned = Point & Rect;
+export type Rect3dPositioned = Point3d & Rect3d;
