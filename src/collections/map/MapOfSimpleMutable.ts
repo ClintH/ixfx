@@ -82,7 +82,6 @@ export class MapOfSimpleMutable<V>
    * @returns
    */
   deleteByValue(value: V): boolean {
-    //eslint-disable-next-line functional/no-let
     let del = false;
     const entries = [ ...this.map.entries() ];
     for (const keyEntries of entries) {

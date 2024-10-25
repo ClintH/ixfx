@@ -1,4 +1,9 @@
 A rough changelog between NPM releases
+# 0.33.6 2025.10.25
+
+Geometry
+* Points.bbox3d: Calculate 3d bounding box
+* Rects3d, Rect3dPositioned: 3d rectangles
 
 # 0.33.4 2025.10.21
 

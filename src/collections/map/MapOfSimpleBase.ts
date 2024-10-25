@@ -51,7 +51,6 @@ export class MapOfSimpleBase<V> {
    * @returns
    */
   debugString(): string {
-    // eslint-disable-next-line functional/no-let
     let r = ``;
     const keys = [ ...this.map.keys() ];
     keys.every((k) => {
@@ -91,7 +90,6 @@ export class MapOfSimpleBase<V> {
    */
   *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
     for (const key of this.map.keys()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       for (const value of this.map.get(key)!) {
         yield [ key, value ];
       }

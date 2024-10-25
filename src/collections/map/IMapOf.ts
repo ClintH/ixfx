@@ -25,6 +25,7 @@ export interface IMapOf<V> {
    */
   entriesFlat(): IterableIterator<readonly [ key: string, value: V ]>;
 
+  entries():IterableIterator<[key:string,value:Array<V>]>;
   /**
    * Iteates over all keys and the count of values therein
    */

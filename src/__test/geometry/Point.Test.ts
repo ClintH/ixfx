@@ -12,6 +12,23 @@ function closeTo(t: ExecutionContext<unknown>, input: number, target: number, pe
   t.fail(`Value: ${ input } target: ${ target } diff%: ${ diff * 100 }`);
 }
 
+test(`bbox-3d`, t=> {
+  const r1 = Points.bbox3d(
+    {x:0,y:0,z:0},
+    {x:1,y:1,z:1},
+    {x:2,y:2,z:2}
+  );
+  t.deepEqual(r1,{ x: 0, y: 0, width: 2, height: 2, z: 0, depth: 2 })
+
+  const r2 = Points.bbox3d(
+    {x:0,y:0,z:0},
+    {x:1,y:1,z:-1},
+    {x:2,y:2,z:2}
+  );
+  t.deepEqual(r2,{ x: 0, y: 0, width: 2, height: 2, z: -1, depth: 3 })
+
+});
+
 test(`from-string`, t => {
   t.deepEqual(Points.fromString(`10,20`), { x: 10, y: 20 });
   t.deepEqual(Points.fromString(`10,20,30`), { x: 10, y: 20, z: 30 });

@@ -39,7 +39,7 @@ export type CssVariableByQueryOption = CssVariable & {
  * CSS variable by element reference
  */
 export type CssVariableByObjectOption = CssVariable & {
-  object: object | object[]
+  object: object | Array<object>
 }
 
 /**
@@ -197,8 +197,8 @@ export const setFromVariables = (context: HTMLElement | string, ...options: Arra
 export function getWithFallback<T extends Record<string, string | number>>(fallback: T, elt?: Element): T {
   const styles = getComputedStyle(elt ?? document.body);
   const entries = Object.entries(fallback);
-  const filledEntries = entries.map(e => {
-    return [ e[ 0 ], getFromStyles(styles, e[ 0 ], e[ 1 ]) ]
+  const filledEntries = entries.map(entry => {
+    return [ entry[ 0 ], getFromStyles(styles, entry[ 0 ], entry[ 1 ]) ]
   })
   return Object.fromEntries(filledEntries) as T;
 }
@@ -223,14 +223,14 @@ export function getWithFallback<T extends Record<string, string | number>>(fallb
  * @param vars 
  * @param stylesOrEl 
  */
-export function setVariables<T extends Record<string, string | number>>(vars: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {
+export function setVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {
   const styles = stylesOrEl === undefined ? document.body.style :
     isHtmlElement(stylesOrEl) ? stylesOrEl.style : stylesOrEl;
 
-  for (const [ key, value ] of Object.entries(vars)) {
-    let varName = key.replaceAll('_', '-');
-    if (!varName.startsWith(`--`)) varName = `--` + varName;
-    styles.setProperty(varName, value.toString());
+  for (const [ key, value ] of Object.entries(variables)) {
+    let variableName = key.replaceAll('_', '-');
+    if (!variableName.startsWith(`--`)) variableName = `--` + variableName;
+    styles.setProperty(variableName, value.toString());
   }
 }
 
