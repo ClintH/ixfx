@@ -22,23 +22,11 @@
   "[typescript]": {
     "typescript.preferences.importModuleSpecifierEnding": "js"
   },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
   "eslint.workingDirectories": [
     {
       "mode": "auto"
     }
   ],
-  "eslint.codeActionsOnSave.mode": "problems",
-  "eslint.format.enable": true,
-  "eslint.lintTask.enable": true,
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "prettier.enable": false,
-  "editor.formatOnPaste": false,
-  "editor.formatOnSave": false,
-  "editor.formatOnType": false,
-  "editor.formatOnSaveMode": "file",
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
   "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
