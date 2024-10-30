@@ -99,11 +99,14 @@ export const create = <T>(pathOpts: Partial<PathOpts> = {}) => {
     return valuesByPath(path, root, pathOpts);
   }
 
+  const getRoot = () => {
+    return root;
+  }
   const clearValues = (path: string): boolean => {
     if (root === undefined) return false;
     return clearValuesByPath(path, root, pathOpts);
   }
-  return { add, prettyPrint, remove, getValue, getValues, hasPath, childrenLength, getNode, clearValues }
+  return { getRoot, add, prettyPrint, remove, getValue, getValues, hasPath, childrenLength, getNode, clearValues }
 }
 
 /**
