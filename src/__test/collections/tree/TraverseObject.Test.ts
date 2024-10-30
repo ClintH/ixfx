@@ -1,8 +1,7 @@
 import test from 'ava';
-import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children, toStringDeep } from '../../../collections/tree/TraverseObject.js';
+import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../../collections/tree/TraverseObject.js';
 import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
 import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
-import * as TreeCompare from '../../../collections/tree/Compare.js';
 import { isEqualValueDefault, isEqualValuePartial } from '../../../util/IsEqual.js';
 
 function getTestMap() {
@@ -22,8 +21,8 @@ function getTestMap() {
   return testMap;
 }
 
-function getTestObj() {
-  const testObj = {
+function getTestObject() {
+  const testObject = {
     name: 'Jill',
     address: {
       street: 'Blah St',
@@ -40,15 +39,13 @@ function getTestObj() {
       { name: 'Sam' }
     ]
   } as const;
-  return testObj;
+  return testObject;
 }
 
-
-
 test(`as-tree`, t => {
-  const r1 = create(getTestObj(), { name: `test` });
+  const r1 = create(getTestObject(), { name: `test` });
   //onsole.log(toStringDeep(r1));
-  t.deepEqual(r1.value?.value, getTestObj());
+  t.deepEqual(r1.value?.value, getTestObject());
   t.is(r1.childrenStore.length, 3);
   t.deepEqual(r1.childrenStore[ 0 ].value, { name: `name`, value: `Jill`, ancestors: [ `test` ] });
   t.deepEqual(r1.childrenStore[ 1 ].value, {
@@ -73,11 +70,11 @@ test(`as-tree`, t => {
 });
 
 test(`follow-value`, t => {
-  const r1 = asDynamicTraversable(getTestObj(), { name: `obj` });
+  const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
 
   let callbackCount = 0;
   let iterCount = 0;
-  for (const fv of TraversableTree.followValue(r1, (node) => {
+  for (const _fv of TraversableTree.followValue(r1, (_node) => {
     callbackCount++;
     return false;
   })) {
@@ -113,7 +110,7 @@ test(`follow-value`, t => {
 })
 
 test(`as-traversable-object`, t => {
-  const r1 = asDynamicTraversable(getTestObj(), { name: `obj` });
+  const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
   //onsole.log(TraversableTree.toStringDeep(r1));
   t.true(TraversableTree.hasChildValue(r1, { name: `name`, value: `Jill`, ancestors: [ "obj" ] }, isEqualValueDefault));
 
@@ -134,11 +131,11 @@ test(`as-traversable-object`, t => {
 
   t.true(TraversableTree.hasAnyChildValue(r1, { name: `number`, value: 35, ancestors: [ "obj", "kids", "0", "address" ] }, isEqualValueDefault));
 
-  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', value: 'John', ancestors: [] }, isEqualValuePartial);
+  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', value: 'John' }, isEqualValuePartial);
   t.truthy(r1a);
   if (r1a !== undefined) {
     t.true(TraversableTree.hasAnyChild(r1, r1a));
-    const parents = [ ...TraversableTree.parents(r1a) ];
+    // const parents = [ ...TraversableTree.parents(r1a) ];
     t.true(TraversableTree.hasAnyParent(r1a, r1));
   }
 });
@@ -154,7 +151,7 @@ test(`as-traversable-array`, t => {
 
 
 test('direct-children', (t) => {
-  t.like([ ...children(getTestObj()) ], [
+  t.like([ ...children(getTestObject()) ], [
     { name: "name", nodeValue: "Jill" },
     { name: "address", sourceValue: { number: 27, street: "Blah St" } },
     {
@@ -173,14 +170,14 @@ test('direct-children', (t) => {
     }
   ]);
 
-  const simpleObj = {
+  const simpleObject = {
     colour: {
       r: 0.5,
       g: 0.5,
       b: 0.5
     }
   }
-  t.like([ ...children(simpleObj) ], [
+  t.like([ ...children(simpleObject) ], [
     {
       name: "colour", sourceValue: {
         b: 0.5,
@@ -198,7 +195,7 @@ test('direct-children', (t) => {
 });
 
 test('trace-by-path', (t) => {
-  const o = getTestObj();
+  const o = getTestObject();
   const opts: PathOpts = {
     separator: '.'
   }
@@ -303,8 +300,8 @@ test('get-by-path', (t) => {
       colour: 'red'
     }
   }
-  const e = getByPath('jane.address.postcode', people);
-  t.like(e, { name: "postcode", nodeValue: 1000 });
+  const postcode = getByPath('jane.address.postcode', people);
+  t.like(postcode, { name: "postcode", nodeValue: 1000 });
   t.like(getByPath('jane.address.country', people), { name: 'country', nodeValue: undefined });
   t.like(getByPath('jane.address.country.state', people), { name: 'country', nodeValue: undefined });
 
@@ -352,7 +349,7 @@ test(`tree-object-compare`, t => {
 
   let valueChanged = 0;
   let childChanged = 0;
-  let changedNode;
+  //let changedNode;
 
   // Top level changes
   for (const diff2Kid of diff2.childrenStore) {
@@ -360,7 +357,7 @@ test(`tree-object-compare`, t => {
     if (v === undefined) continue;
     if (v.valueChanged) valueChanged++;
     if (v.childChanged) childChanged++;
-    if (v.childChanged) changedNode = diff2Kid;
+    //if (v.childChanged) changedNode = diff2Kid;
   }
 
   t.is(valueChanged, 0);
