@@ -2,7 +2,8 @@ import { toStringAbbreviate } from "../../Text.js";
 import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
 import { QueueMutable } from "../queue/QueueMutable.js";
 import { StackMutable } from "../stack/StackMutable.js";
-import type { TraversableTree } from "./Types.js";
+import { isTraversable } from "./index.js";
+import type { TraversableTree, TreeNode } from "./Types.js";
 
 export const childrenLength = <T>(tree: TraversableTree<T>): number => {
   return [ ...tree.children() ].length;
@@ -15,20 +16,20 @@ export const childrenLength = <T>(tree: TraversableTree<T>): number => {
  * @param eq Equality comparison function {@link isEqualDefault} used by default
  * @returns
  */
-export const hasAnyParent = <T>(
-  child: TraversableTree<T>,
-  possibleParent: TraversableTree<T>,
-  eq?: IsEqual<TraversableTree<T>>
+export const hasAnyParent = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  child: T,
+  possibleParent: T,
+  eq?: IsEqual<T>
 ): boolean => {
   return hasParent(child, possibleParent, eq, Number.MAX_SAFE_INTEGER);
 };
 
-export const hasAnyParentValue = <T>(
-  child: TraversableTree<T>,
-  possibleParentValue: T,
-  eq?: IsEqual<T>
+export const hasAnyParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  child: T,
+  possibleParentValue: TV,
+  eq?: IsEqual<TV>
 ): boolean => {
-  return hasParentValue(child, possibleParentValue, eq, Number.MAX_SAFE_INTEGER);
+  return hasParentValue<T, TV>(child, possibleParentValue, eq, Number.MAX_SAFE_INTEGER);
 };
 
 export const findAnyParentByValue = <TValue>(
@@ -48,43 +49,53 @@ export const findAnyParentByValue = <TValue>(
  * @param eq Equality comparison function. {@link isEqualDefault} used by default.
  * @returns
  */
-export const hasParent = <T>(
-  child: TraversableTree<T>,
-  possibleParent: TraversableTree<T>,
-  eq: IsEqual<TraversableTree<T>> = isEqualDefault<TraversableTree<T>>,
+export const hasParent = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  child: T,
+  possibleParent: T,
+  eq: IsEqual<T> = isEqualDefault<T>,
   maxDepth = 0
 ): boolean => {
   if (maxDepth < 0) return false;
-  const p = child.getParent();
+  const isChildTrav = isTraversable(child);
+  const isParentTrav = isTraversable(possibleParent);
+  const p = (isChildTrav ? child.getParent() : child.parent) as T;
   if (p === undefined) return false;
-  if (eq(p, possibleParent)) return true;
-  if (eq(p.getIdentity(), possibleParent.getIdentity())) return true;
+  if (eq(p as T, possibleParent)) return true;
+
+  const pId = isChildTrav ? (p as TraversableTree<TV>).getIdentity() : (p as TreeNode<TV>).value;
+  const ppId = isParentTrav ? (possibleParent as TraversableTree<TV>).getIdentity() : (possibleParent as TreeNode<TV>).value;
+
+  if (eq(pId, ppId)) return true;
+  //if (eq(p.getIdentity(), possibleParent.getIdentity())) return true;
   return hasParent(p, possibleParent, eq, maxDepth - 1);
 };
 
-export const hasParentValue = <TValue>(
-  child: TraversableTree<TValue>,
-  possibleParentValue: TValue,
-  eq: IsEqual<TValue> = isEqualDefault<TValue>,
+export const hasParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  child: T,
+  possibleParentValue: TV,
+  eq: IsEqual<TV> = isEqualDefault<TV>,
   maxDepth = 0
 ): boolean => {
   if (maxDepth < 0) return false;
-  const p = child.getParent();
+  const p = `getParent` in child ? child.getParent() : child.parent;
   if (p === undefined) return false;
-  if (eq(p.getValue(), possibleParentValue)) return true;
+  const value = `getValue` in p ? p.getValue() : p.value;
+  if (eq(value!, possibleParentValue)) return true;
   return hasParentValue(p, possibleParentValue, eq, maxDepth - 1);
 };
 
-export const findParentByValue = <TValue>(
-  child: TraversableTree<TValue>,
-  possibleParentValue: TValue,
-  eq: IsEqual<TValue> = isEqualDefault<TValue>,
+export const findParentByValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  child: T,
+  possibleParentValue: TV,
+  eq: IsEqual<TV> = isEqualDefault<TV>,
   maxDepth = 0
-): TraversableTree<TValue> | undefined => {
+): T | undefined => {
   if (maxDepth < 0) return;
-  const p = child.getParent();
+  const p = (`getParent` in child ? child.getParent() : child.parent) as T | undefined;
   if (p === undefined) return;
-  if (eq(p.getValue(), possibleParentValue)) return p;
+  const value = `getValue` in p ? p.getValue() : p.value;
+
+  if (eq(value!, possibleParentValue)) return p;
   return findParentByValue(p, possibleParentValue, eq, maxDepth - 1);
 };
 
@@ -123,10 +134,10 @@ export const couldAddChild = <T>(
  * @param eq Equality function, or {@link isEqualDefault} if undefined.
  * @returns
  */
-export const hasAnyChild = <T>(
-  parent: TraversableTree<T>,
-  possibleChild: TraversableTree<T>,
-  eq: IsEqual<TraversableTree<T>> = isEqualDefault
+export const hasAnyChild = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  parent: T,
+  possibleChild: T,
+  eq: IsEqual<T> = isEqualDefault
 ): boolean => {
   return hasChild(parent, possibleChild, eq, Number.MAX_SAFE_INTEGER);
 };
@@ -157,20 +168,22 @@ export const hasAnyChildValue = <T>(
  * @param eq Equality function, or {@link isEqualDefault} if undefined.
  * @returns
  */
-export const hasChild = <T>(
-  parent: TraversableTree<T>,
-  possibleChild: TraversableTree<T>,
-  eq: IsEqual<TraversableTree<T>> = isEqualDefault,
+export const hasChild = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
+  parent: T,
+  possibleChild: T,
+  eq: IsEqual<T> = isEqualDefault,
   maxDepth = 0
 ): boolean => {
 
   if (maxDepth < 0) return false;
   if (eq(parent, possibleChild)) return true;
-  if (eq(parent.getIdentity(), possibleChild.getIdentity())) return true;
+  const pId = `getIdentity` in parent ? parent.getIdentity() : parent.value;
+  const pcId = `getIdentity` in possibleChild ? possibleChild.getIdentity() : possibleChild.value;
+  if (eq(pId, pcId)) return true;
   for (const c of breadthFirst(parent, maxDepth)) {
+    const cId = `getIdentity` in c ? c.getIdentity() : c.value;
     if (eq(c, possibleChild)) return true;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    if (eq(c.getIdentity(), possibleChild.getIdentity())) return true;
+    if (eq(cId, pcId)) return true;
   }
   return false;
 };
@@ -210,6 +223,9 @@ export function* siblings<T>(node: TraversableTree<T>): IterableIterator<Travers
   }
 }
 
+// export function parents<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>>;
+// export function parents<T>(node: TraversableTree<T>): IterableIterator<TraversableTree<T>>;
+
 /**
  * Iterates over parents of `node`, starting with immediate parent
  * 
@@ -221,34 +237,88 @@ export function* siblings<T>(node: TraversableTree<T>): IterableIterator<Travers
  * @param node Node to begin from
  * @returns 
  */
-export function* parents<T>(node: TraversableTree<T>): IterableIterator<TraversableTree<T>> {
-  let p = node.getParent();
-  while (p !== undefined) {
-    yield p;
-    p = p.getParent();
+export function* parents<T extends TraversableTree<TV> | TreeNode<TV>, TV>(node: T): IterableIterator<T> {
+  if (isTraversable(node)) {
+    let p = node.getParent();
+    while (p !== undefined) {
+      yield p as T;
+      p = p.getParent();
+    }
+  } else {
+    let p = node.parent;
+    while (p !== undefined) {
+      yield p as T;
+      p = p.parent
+    }
   }
 }
 
+// export function findAnyChildByValue<TValue>(parent: TraversableTree<TValue>,
+//   possibleValue: TValue,
+//   eq?: IsEqual<TValue>
+// ): TraversableTree<TValue> | undefined;
+// export function findAnyChildByValue<TValue>(parent: TreeNode<TValue>,
+//   possibleValue: TValue,
+//   eq?: IsEqual<TValue>
+// ): TreeNode<TValue> | undefined;
 
-export const findAnyChildByValue = <TValue>(parent: TraversableTree<TValue>,
-  possibleValue: TValue,
-  eq: IsEqual<TValue> = isEqualDefault
-): TraversableTree<TValue> | undefined => {
+/**
+ * Descends `parent`, breadth-first, looking for a particular value.
+ * Returns _undefined_ if not found.
+ * @param parent 
+ * @param possibleValue 
+ * @param eq 
+ * @returns 
+ */
+export function findAnyChildByValue<T extends TraversableTree<TV> | TreeNode<TV>, TV>(parent: T,
+  possibleValue: TV,
+  eq: IsEqual<TV> = isEqualDefault
+): T | undefined {
   return findChildByValue(parent, possibleValue, eq, Number.MAX_SAFE_INTEGER);
 };
 
-export const findChildByValue = <TValue>(parent: TraversableTree<TValue>,
-  possibleValue: TValue,
-  eq: IsEqual<TValue> = isEqualDefault,
+// export function findChildByValue<T extends TraversableTree<TV> | TreeNode<TV>, TV>(parent: T,
+//   possibleValue: TV,
+//   eq?: IsEqual<TV>,
+//   maxDepth?: number
+// ): TraversableTree<TV> | undefined;
+
+// export function findChildByValue<TValue>(parent: TreeNode<TValue>,
+//   possibleValue: TValue,
+//   eq?: IsEqual<TValue>,
+//   maxDepth?: number
+// ): TreeNode<TValue> | undefined;
+
+/**
+ * Searches breadth-first for `possibleValue` under and including `parent`.
+ * `maxDepth` sets he maximum level to which the tree is searched.
+ * @param parent 
+ * @param possibleValue 
+ * @param eq 
+ * @param maxDepth 
+ * @returns 
+ */
+export function findChildByValue<T extends TraversableTree<TV> | TreeNode<TV>, TV>(parent: T,
+  possibleValue: TV,
+  eq: IsEqual<TV> = isEqualDefault,
   maxDepth = 0
-): TraversableTree<TValue> | undefined => {
+): T | undefined {
 
   if (maxDepth < 0) return;
-  if (eq(parent.getValue(), possibleValue)) return parent;
+  const isTraver = isTraversable(parent);
+  if (isTraver) {
+    if (eq(parent.getValue(), possibleValue)) return parent;
+  } else {
+    if (eq(parent.value!, possibleValue)) return parent;
+  }
 
-  for (const d of breadthFirst(parent, maxDepth)) {
+  for (const d of breadthFirst<T, TV>(parent, maxDepth)) {
     // This child matches
-    if (eq(d.getValue(), possibleValue)) return d;
+    if (isTraver) {
+      if (eq((d as TraversableTree<TV>).getValue(), possibleValue)) return d;
+    } else {
+      if (eq((d as TreeNode<TV>).value!, possibleValue)) return d;
+    }
   }
   return;
 };
@@ -264,18 +334,22 @@ export const findChildByValue = <TValue>(parent: TraversableTree<TValue>,
  * @param root Root node 
  * @returns 
  */
-export function* depthFirst<T extends TraversableTree<any>>(root: T): Generator<T> {
+export function* depthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(root: T): Generator<T> {
   if (!root) return;
   const stack = new StackMutable<T>();
   let entry: T | undefined = root;
   while (entry) {
-    const entries = [ ...entry.children() ] as Array<T>;
+    const entries = isTraversable(entry) ?
+      [ ...entry.children() ] as Array<T> :
+      [ ...entry.childrenStore ] as Array<T>
     stack.push(...entries);
     if (stack.isEmpty) break;
     entry = stack.pop();
     if (entry) yield entry;
   }
 }
+//export function breadthFirst<T>(root: TraversableTree<T>, depth?: number): IterableIterator<TraversableTree<T>>;
+//export function breadthFirst<T>(root: TreeNode<T>, depth?: number): IterableIterator<TreeNode<T>>;
 
 /**
  * Iterates over the children of `root`, breadth-first
@@ -289,17 +363,22 @@ export function* depthFirst<T extends TraversableTree<any>>(root: T): Generator<
  * @param depth How many levels to traverse 
  * @returns 
  */
-export function* breadthFirst<T>(root: TraversableTree<T>, depth = Number.MAX_SAFE_INTEGER): IterableIterator<TraversableTree<T>> {
+export function* breadthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(root: T, depth = Number.MAX_SAFE_INTEGER): IterableIterator<T> {
   if (!root) return;
-  const queue = new QueueMutable<TraversableTree<T>>();
-  let entry: TraversableTree<T> | undefined = root;
+  const isTrav = isTraversable(root);
+  const queue = isTrav ? new QueueMutable<TraversableTree<T>>() : new QueueMutable<TreeNode<T>>();
+
+  let entry: T | undefined = root;
   while (entry) {
     if (depth < 0) return;
-    for (const c of entry.children()) {
-      yield c;
-      queue.enqueue(c);
+    if (entry !== undefined) {
+      const kids = `childrenStore` in entry ? entry.childrenStore : entry.children();
+      for (const c of kids) {
+        yield c as any;
+        queue.enqueue(c as any);
+      }
     }
-    entry = queue.dequeue();
+    entry = queue.dequeue() as any as T;
     depth--;
   }
 }
