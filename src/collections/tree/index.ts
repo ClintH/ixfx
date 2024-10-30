@@ -18,7 +18,6 @@ export const toTraversable = <T>(node: TreeNode<T> | TraversableTree<T> | object
 
 export const isTreeNode = (node: any): node is TreeNode<any> => {
   if (`parent` in node && `childrenStore` in node && `value` in node) {
-    // eslint-disable-next-line unicorn/no-lonely-if
     if (Array.isArray(node.childrenStore)) return true;
   }
   return false;
