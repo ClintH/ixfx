@@ -7,7 +7,9 @@ import type { TraversableTree, TreeNode, SimplifiedNode } from './Types.js';
 import { throwNullUndef } from '../../util/GuardEmpty.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
 export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: Array<string> }>;
-export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
+//export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
+export type EntryStatic = Readonly<{ name: string, value: any, ancestors: Array<string> }>
+
 
 /**
  * Options for parsing a path
@@ -79,7 +81,7 @@ export const toStringDeep = (node: TreeNode<Entry | EntryStatic>, indent = 0) =>
     } else if (`value` in node.value && node.value.value !== undefined) t += ` = ${ node.value.value }`;
 
     if (`ancestors` in node.value) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       t += ` (ancestors: ${ (node.value.ancestors!).join(`, `) })`;
     }
   }
@@ -91,7 +93,13 @@ export const toStringDeep = (node: TreeNode<Entry | EntryStatic>, indent = 0) =>
 }
 
 export type ChildrenOptions = Readonly<{
+  /**
+   * If set, only uses leaves or branches. 'none' means there is no filter.
+   */
   filter: `none` | `leaves` | `branches`
+  /**
+   * Default name to use. This is necessary in some cases, eg a root object.
+   */
   name: string
 }>;
 
@@ -326,10 +334,10 @@ export function* traceByPath<T extends object>(
  * ```js
  * c1[ 0 ].getIdentity() === c2[ 0 ].getIdentity(); // true
  * ```
- * @param node 
- * @param options
- * @param ancestors 
- * @param parent 
+ * @param node Object to read
+ * @param options Options when creating traversable
+ * @param ancestors Do not use
+ * @param parent Do not use
  * @returns 
  */
 export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: Array<string> = [], parent?: TraversableTree<EntryStatic> | undefined): TraversableTree<EntryStatic> => {
@@ -401,7 +409,7 @@ export type CreateOptions = {
  */
 export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): TreeNode<EntryStatic> => {
   const valuesAtLeaves = options.valuesAtLeaves ?? false;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
   const valueFor = valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
   return createImpl(node, valueFor(node), options, []);
 }
