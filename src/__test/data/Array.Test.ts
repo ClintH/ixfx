@@ -14,21 +14,22 @@ import { zip } from '../../data/arrays/Zip.js';
 import { isContentsTheSame } from '../../data/arrays/Equality.js';
 import { atWrap } from '../../data/arrays/AtWrap.js';
 
-test(`atWrap`, t => {
-  const arr = [ 1, 2, 3 ];
-  t.is(atWrap(arr, 0), 1);
-  t.is(atWrap(arr, 1), 2);
-  t.is(atWrap(arr, 2), 3);
-  t.is(atWrap(arr, 3), 1);
-  t.is(atWrap(arr, 4), 2);
-  t.is(atWrap(arr, 5), 3);
-  t.is(atWrap(arr, 6), 1);
-  t.is(atWrap(arr, 7), 2);
 
-  t.is(atWrap(arr, -1), 3);
-  t.is(atWrap(arr, -2), 2);
-  t.is(atWrap(arr, -3), 1);
-  t.is(atWrap(arr, -4), 3);
+test(`atWrap`, t => {
+  const array = [ 1, 2, 3 ];
+  t.is(atWrap(array, 0), 1);
+  t.is(atWrap(array, 1), 2);
+  t.is(atWrap(array, 2), 3);
+  t.is(atWrap(array, 3), 1);
+  t.is(atWrap(array, 4), 2);
+  t.is(atWrap(array, 5), 3);
+  t.is(atWrap(array, 6), 1);
+  t.is(atWrap(array, 7), 2);
+
+  t.is(atWrap(array, -1), 3);
+  t.is(atWrap(array, -2), 2);
+  t.is(atWrap(array, -3), 1);
+  t.is(atWrap(array, -4), 3);
 
 });
 
@@ -219,8 +220,8 @@ test(`sort`, (t) => {
 });
 
 test(`pairwise-reduce`, (t) => {
-  const reducer = (acc: string, a: string, b: string) => {
-    return acc + `[${ a }-${ b }]`;
+  const reducer = (accumulator: string, a: string, b: string) => {
+    return accumulator + `[${ a }-${ b }]`;
   };
 
   const t1 = pairwiseReduce(`a b c d e f g`.split(` `), reducer, `!`);
@@ -245,12 +246,12 @@ test(`mergeByKey`, (t) => {
   const a1 = [ `1-1`, `1-2`, `1-3`, `1-4` ];
   const a2 = [ `2-1`, `2-2`, `2-3`, `2-5` ];
 
-  const keyFn = (v: string) => v.substr(-1, 1);
-  const reconcileFn = (a: string, b: string) => {
+  const keyFunction = (v: string) => v.substr(-1, 1);
+  const reconcileFunction = (a: string, b: string) => {
     return b.replace(`-`, `!`);
   };
 
-  const t1 = mergeByKey(keyFn, reconcileFn, a1, a2);
+  const t1 = mergeByKey(keyFunction, reconcileFunction, a1, a2);
 
   t.is(t1.length, 5);
   t.true(t1.includes(`2!1`));
@@ -260,8 +261,8 @@ test(`mergeByKey`, (t) => {
   t.true(t1.includes(`2-5`));
 
   // Test with empty second param
-  const a4: string[] = [];
-  const t2 = mergeByKey(keyFn, reconcileFn, a1, a4);
+  const a4: Array<string> = [];
+  const t2 = mergeByKey(keyFunction, reconcileFunction, a1, a4);
   t.is(t2.length, 4);
   t.true(t2.includes(`1-1`));
   t.true(t2.includes(`1-2`));
@@ -269,7 +270,7 @@ test(`mergeByKey`, (t) => {
   t.true(t2.includes(`1-4`));
 
   // Test with empty first param
-  const t3 = mergeByKey(keyFn, reconcileFn, a4, a1);
+  const t3 = mergeByKey(keyFunction, reconcileFunction, a4, a1);
   t.is(t3.length, 4);
   t.true(t3.includes(`1-1`));
   t.true(t3.includes(`1-2`));
