@@ -32,11 +32,15 @@ export const numericComparer = (x: number, y: number): CompareResult => {
  * [ 10, 20, 5, 100 ].sort(jsComparer); // same as .sort()
  * // Yields: [10, 100, 20, 5]
  * ```
+ * 
+ * Returns -1 if x is less than y
+ * Returns 1 if x is greater than y
+ * Returns 0 if x is the same as y
  * @param x
  * @param y
  * @returns
  */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const jsComparer = (x: any, y: any): CompareResult => {
   // ✔️ Unit tested
 
@@ -70,14 +74,17 @@ export const comparerInverse = <V>(comparer: Comparer<V>): Comparer<V> => {
  * logic of string comparison.
  *
  * Is an ascending sort:
- *  b, a, c -> a, b, c
- *  10, 5, 100 -> 5, 10, 100
+ * * b, a, c -> a, b, c
+ * * 10, 5, 100 -> 5, 10, 100
+ * 
+ * Returns -1 if x is less than y
+ * Returns 1 if x is greater than y
+ * Returns 0 if x is the same as y
  * @param x
  * @param y
  * @see {@link comparerInverse} Inverted order
  * @returns
  */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const defaultComparer = (x: any, y: any): CompareResult => {
   if (typeof x === `number` && typeof y === `number`) {
     return numericComparer(x, y);
