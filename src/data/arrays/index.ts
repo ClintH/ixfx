@@ -24,4 +24,5 @@ export type * from './Types.js';
 export * from './Unique.js';
 export * from './Until.js';
 export * from './Zip.js';
+export * as Sorted from './SortedArray.js';
 // export { compareValues, compareValuesEqual } from '../Iterables.js';
