@@ -1,11 +1,17 @@
 A rough changelog between NPM releases
-# 0.33.6 2025.10.25
+
+# 0.33.7 2025.01.02
+
+Arrays.Sorted
+* Functions for working with sorted arrays
+
+# 0.33.6 2024.10.25
 
 Geometry
 * Points.bbox3d: Calculate 3d bounding box
 * Rects3d, Rect3dPositioned: 3d rectangles
 
-# 0.33.4 2025.10.21
+# 0.33.4 2024.10.21
 
 Dom.Css
 + getComputedPixels: returns a parsed pixel values for a set of CSS properties via getComputedStyle
