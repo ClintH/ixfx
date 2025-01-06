@@ -1,7 +1,7 @@
 import { defaultComparer, type Comparer } from "../../util/Comparers.js";
 
 /**
- * Returns a immutable wrapper around an array, initially unsorted.
+ * Returns an immutable wrapper around an array, initially unsorted.
  * Sorts data and passes to {@link wrapSorted}.
  * @param unsortedData 
  * @param comparer 
