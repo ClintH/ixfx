@@ -11,7 +11,7 @@ test(`indexOf`, t => {
   t.is(Sorted.indexOf(array1, 6), -1);
 });
 
-test(`removeionIndex`, t => {
+test(`insertionIndex`, t => {
   const array1 = [ 1, 2, 3, 4, 5 ];
   t.is(Sorted.insertionIndex(array1, 0), 0);
   t.is(Sorted.insertionIndex(array1, -10), 0);
