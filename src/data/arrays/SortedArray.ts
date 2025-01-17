@@ -212,3 +212,96 @@ export const remove = <T>(data: Array<T>, toRemove: T, comparer: Comparer<T> = d
   const post = data.slice(index + 1);
   return [ ...pre, ...post ];
 }
+
+/**
+ * Merges two sorted arrays, returning result.
+ * 
+ * ```js
+ * const a = [ 4, 7, 10 ]
+ * const b = [ 1, 2, 9, 11 ]
+ * const c = merge(a, b);
+ * // [ 1, 2, 4, 7, 9, 10, 11 ]
+ * ```
+ * 
+ * Undefined behaviour if either input array is not sorted.
+ * 
+ * By default uses Javascript comparision semantics. 
+ * Passing in `comparer` is needed when working with an array of objects.
+ * @param a Sorted array
+ * @param b Sorted array
+ * @param comparer Comparator
+ */
+export const merge = <T>(a: Array<T>, b: Array<T>, comparer: Comparer<T> = defaultComparer): Array<T> => {
+  // Adapted from https://github.com/larrybotha/building-algorithms-using-typescript/blob/master/src/09-merge-sort-algorithm.ts
+  const t: Array<T> = [];
+  let aIndex = 0;
+  let bIndex = 0;
+
+  while (aIndex + bIndex < a.length + b.length) {
+    const aItem = a[ aIndex ];
+    const bItem = b[ bIndex ];
+    const comp = comparer(aItem, bItem);
+    if (aItem === undefined) {
+      t.push(bItem);
+      bIndex++;
+    } else if (bItem === undefined) {
+      t.push(aItem);
+      aIndex++;
+    } else if (comp < 0) {
+
+      t.push(aItem);
+      aIndex++;
+    } else {
+
+      t.push(bItem);
+
+      bIndex++;
+    }
+  }
+  return t;
+}
+
+const sortMerge = <T>(data: Array<T> | ReadonlyArray<T>, comparer: Comparer<T> = defaultComparer): Array<T> => {
+  // Adapted from https://github.com/larrybotha/building-algorithms-using-typescript/blob/master/src/09-merge-sort-algorithm.ts
+  if (data.length <= 1) return [ ...data ];
+  const mIndex = Math.floor(data.length / 2);
+  const a = data.slice(0, mIndex);
+  const b = data.slice(mIndex);
+  return merge(sortMerge(a, comparer), sortMerge(b, comparer), comparer);
+}
+
+export type SortAlgorithm = `default` | `merge`;
+
+/**
+ * Returns a sorted version of `data` using a specified algorithm. Original array is left as-is
+ * ```js
+ * const data = [ 10, 2, 9, 5 ]
+ * sort(data, `merge`); // [ 2, 5, 9, 20 ]
+ * ```
+ * 
+ * By default uses in-built semantics for comparison. But a function can be provided.
+ * Return 0 if `a` and `b` are equal, above 0 if `a` is considered higher than `b` or below zero if `b` is considered higher than `a`.
+ * 
+ * In the below example, the default sorting semantics are reversed:
+ * ```js 
+ * const reverse = (a, b) => {
+ *   if (a === b) return 0;
+ *   if (a > b) return -1; 
+ *   if (a < b) return 1;
+ *   return 0; // equal
+ * }
+ * sort(data, reverse); // [ 20, 9, 5, 2 ]
+ * ```
+ * @param data 
+ * @param algo 
+ * @param comparer 
+ * @returns Sorted array
+ */
+export const sort = <T>(data: Array<T> | ReadonlyArray<T>, algo: SortAlgorithm = `default`, comparer: Comparer<T> = defaultComparer): Array<T> => {
+  switch (algo) {
+    case `merge`:
+      return sortMerge(data, comparer);
+    case "default":
+      return data.toSorted(comparer);
+  }
+}

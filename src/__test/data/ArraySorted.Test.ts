@@ -47,3 +47,28 @@ test(`remove`, t => {
   t.deepEqual(Sorted.remove(array2, 3), []);
 
 });
+
+test(`merge`, t => {
+  const a = [ 4, 7, 10 ]
+  const b = [ 1, 2, 9, 11 ]
+  t.deepEqual(Sorted.merge(a, b), [ 1, 2, 4, 7, 9, 10, 11 ]);
+
+  t.deepEqual(Sorted.merge([ 1, 2, 3 ], [ 4, 5, 6 ]), [ 1, 2, 3, 4, 5, 6 ]);
+  t.deepEqual(Sorted.merge([ 4, 5, 6 ], [ 1, 2, 3 ]), [ 1, 2, 3, 4, 5, 6 ]);
+  t.deepEqual(Sorted.merge([ 1, 2, 3 ], [ 1, 2, 3 ]), [ 1, 1, 2, 2, 3, 3 ]);
+});
+
+test(`sort-merge`, t => {
+  t.deepEqual(Sorted.sort([ 10, 2, 5, 9 ]), [ 2, 5, 9, 10 ]);
+  t.deepEqual(Sorted.sort([ 10, 2, 5, 9 ], `merge`), [ 2, 5, 9, 10 ]);
+
+  const rev = (a: number, b: number): number => {
+    if (a === b) return 0;
+    if (a > b) return -1;
+    return 1;
+  }
+  t.deepEqual(Sorted.sort([ 10, 2, 5, 9 ], `default`, rev), [ 10, 9, 5, 2 ]);
+  t.deepEqual(Sorted.sort([ 10, 2, 5, 9 ], `merge`, rev), [ 10, 9, 5, 2 ]);
+
+
+});
