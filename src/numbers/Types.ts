@@ -27,3 +27,10 @@ export type MinMaxAvgOpts = {
    */
   readonly endIndex?: number;
 };
+
+export type NumberScaler = (v: number) => number;
+
+export type NumberScalerTwoWay = {
+  out: NumberScaler
+  in: NumberScaler
+}
