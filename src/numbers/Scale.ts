@@ -1,5 +1,6 @@
 import { clamp, clamper } from './Clamp.js';
 import { throwNumberTest } from '../util/GuardNumbers.js';
+import type { NumberScaler, NumberScalerTwoWay } from './Types.js';
 
 /**
  * Scales `v` from an input range to an output range (aka `map`)
@@ -63,7 +64,7 @@ export const scaler = (
   outMax?: number,
   easing?: (v: number) => number,
   clamped?: boolean
-): ((v: number) => number) => {
+): NumberScaler => {
 
   throwNumberTest(inMin, `finite`, `inMin`);
   throwNumberTest(inMax, `finite`, `inMax`);
@@ -82,6 +83,12 @@ export const scaler = (
     return x;
   };
 };
+
+/**
+ * Returns a 'null' scaler that does nothing - the input value is returned as output.
+ * @returns 
+ */
+export const scalerNull = (): NumberScaler => (v: number) => v;
 
 /**
  * As {@link scale}, but result is clamped to be
@@ -185,10 +192,7 @@ export const scalerPercent = (outMin: number, outMax: number) => {
   };
 };
 
-export type ScalerTwoWay = {
-  out: (v: number) => number
-  in: (v: number) => number
-}
+
 
 /**
  * Returns a two-way scaler
@@ -208,7 +212,7 @@ export type ScalerTwoWay = {
  * @param outMax 
  * @returns 
  */
-export const scalerTwoWay = (inMin: number, inMax: number, outMin: number = 0, outMax: number = 1, clamped = false, easing?: (v: number) => number): ScalerTwoWay => {
+export const scalerTwoWay = (inMin: number, inMax: number, outMin: number = 0, outMax: number = 1, clamped = false, easing?: (v: number) => number): NumberScalerTwoWay => {
   const toOut = scaler(inMin, inMax, outMin, outMax, easing, clamped);
   const toIn = scaler(outMin, outMax, inMin, inMax, easing, clamped);
   return { out: toOut, in: toIn };
