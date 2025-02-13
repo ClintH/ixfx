@@ -4,6 +4,7 @@ export * as Correlate from './Correlate.js';
 export * from './CloneFromFields.js';
 export * from './KeysToNumbers.js';
 export * from './MapObject.js';
+export * from './Filters.js';
 
 /**
  * Means of accessing, creating and comparing objects
@@ -18,6 +19,7 @@ export * from './Resolve.js';
 export * from './ResolveFields.js';
 export * from './Types.js';
 export * from './Util.js';
+export * from './RecordMerge.js';
 export const piPi = Math.PI * 2;
 
 /**
