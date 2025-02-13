@@ -1,5 +1,5 @@
 import * as TimeSources from './source/Time.js';
-import type { ModSettableOptions } from './Types.js';
+import type { ModSettable, ModSettableOptions } from './Types.js';
 
 export type TimingSources = `elapsed` | `hertz` | `bpm`
 
@@ -30,7 +30,7 @@ export type TimingSources = `elapsed` | `hertz` | `bpm`
  * @param options Options to pass to timer.
  * @returns 
  */
-export const timingSourceFactory = (source: TimingSources, duration: number, options: Partial<ModSettableOptions> = {}) => {
+export const timingSourceFactory = (source: TimingSources, duration: number, options: Partial<ModSettableOptions> = {}): TimingSourceFactory => {
   switch (source) {
     case `elapsed`:
       return () => TimeSources.elapsed(duration, options)
@@ -42,3 +42,5 @@ export const timingSourceFactory = (source: TimingSources, duration: number, opt
       throw new Error(`Unknown source '${ source }'. Expected: 'elapsed', 'hertz' or 'bpm'`);
   }
 }
+
+export type TimingSourceFactory = () => ModSettable
