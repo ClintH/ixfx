@@ -1,5 +1,5 @@
 import { unique } from '../data/arrays/Unique.js';
-
+export type * from './StateMachineTypes.js';
 
 
 /**
