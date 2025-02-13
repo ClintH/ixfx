@@ -3,11 +3,13 @@ export { ofArrayMutable } from './MapOfArrayMutable.js';
 export {
   ofSimpleMutable as mapOfSimpleMutable
 } from './MapOfSimpleMutable.js';
+export * from './MapOfSimple.js';
 export { MapOfMutableImpl } from './MapOfMultiImpl.js';
 export type {
   IMapOfMutableExtended,
   MapArrayEvents,
 } from './IMapOfMutableExtended.js';
+
 
 /**
  * @private
