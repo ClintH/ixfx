@@ -40,7 +40,7 @@ export type CanvasEvents = {
 /**
  * CanvasHelper options
  */
-export type CanvasHelperOpts = Readonly<{
+export type CanvasHelperOptions = Readonly<{
   /**
    * Automatic canvas resizing logic.
    */
@@ -134,7 +134,7 @@ export type CanvasHelperOpts = Readonly<{
  */
 export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   readonly el: HTMLCanvasElement;
-  readonly opts: CanvasHelperOpts
+  readonly opts: CanvasHelperOptions
 
   #scaler: ScalerCombined;
   #scalerSize: ScalerCombined;
@@ -145,7 +145,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   #resizer: ElementSizer<HTMLCanvasElement> | undefined;
   #disposed = false;
 
-  constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts: Partial<CanvasHelperOpts> = {}) {
+  constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts: Partial<CanvasHelperOptions> = {}) {
     super();
     if (!domQueryOrEl) throw new Error(`Param 'domQueryOrEl' is null or undefined`);
     this.el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
@@ -266,7 +266,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
 
 
   #init() {
-    console.log(`init`, this.opts);
+    //console.log(`init`, this.opts);
 
     // If there is a 'draw' callback, set up an animation loop
     const d = this.opts.draw;
