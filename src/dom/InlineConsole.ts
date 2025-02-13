@@ -1,8 +1,20 @@
 import { getErrorMessage } from '../debug/GetErrorMessage.js';
 import { afterMatch } from '../Text.js';
 import { log, type LogOpts } from './Log.js';
+import { resolveEl } from './ResolveEl.js';
 
-export type InlineConsoleOptions = LogOpts;
+export type InlineConsoleOptions = LogOpts & Partial<{
+  /**
+   * If true, styling is not applied
+   */
+  witholdCss: boolean,
+  /**
+   * If provided, entries are added to this element.
+   * By default a new element, #ixfx-log is created and added
+   * to the document.
+   */
+  insertIntoEl: string | HTMLElement
+}>;
 
 /**
  * Adds an inline console to the page. A DIV is added to display log messages.
@@ -23,16 +35,24 @@ export const inlineConsole = (options: InlineConsoleOptions = {}) => {
     error: console.error,
     warn: console.warn
   };
+  const witholdCss = options.witholdCss ?? false;
+  const insertIntoEl = options.insertIntoEl;
 
-  const logElement = document.createElement(`DIV`);
-  logElement.id = `ixfx-log`;
-  logElement.style.position = `fixed`;
-  logElement.style.left = `0px`;
-  logElement.style.top = `0px`;
-  logElement.style.pointerEvents = `none`;
-  logElement.style.display = `none`;
-
-  document.body.prepend(logElement);
+  let logElement: HTMLElement | undefined;
+  if (insertIntoEl) {
+    logElement = resolveEl(insertIntoEl);
+  } else {
+    logElement = document.createElement(`DIV`);
+    logElement.id = `ixfx-log`;
+    document.body.prepend(logElement);
+  }
+  if (!witholdCss) {
+    logElement.style.position = `fixed`;
+    logElement.style.left = `0px`;
+    logElement.style.top = `0px`;
+    logElement.style.pointerEvents = `none`;
+    logElement.style.display = `none`;
+  }
 
   const logger = log(logElement, options);
 
@@ -66,14 +86,15 @@ export const inlineConsole = (options: InlineConsoleOptions = {}) => {
     visibility(true);
   }
 
-  //eslint-disable-next-line unicorn/prefer-add-event-listener
   window.onerror = (event, source, lineno, _colno, error) => {
     const abbreviatedSource = source === undefined ? `` : afterMatch(source, `/`, { fromEnd: true });
-    //const eventString = typeof event === `string` ? event : JSON.stringify(event).toString();
     const eventString = getErrorMessage(error);
-    //const errorString = error === undefined ? `` : error.message;
-
     logger.error(eventString + ` (${ abbreviatedSource }:${ lineno })`);
     visibility(true);
-  }
+  };
+
+  window.addEventListener('unhandledrejection', function (e) {
+    logger.error(e.reason);
+    visibility(true);
+  })
 }
