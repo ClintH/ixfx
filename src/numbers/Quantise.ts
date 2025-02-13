@@ -28,11 +28,11 @@ export const quantiseEvery = (
   middleRoundsUp = true
 ) => {
 
-  const everyStr = every.toString();
-  const decimal = everyStr.indexOf(`.`);
+  const everyString = every.toString();
+  const decimal = everyString.indexOf(`.`);
   let multiplier = 1;
   if (decimal >= 0) {
-    let d = everyStr.substring(decimal + 1).length;
+    const d = everyString.substring(decimal + 1).length;
     multiplier = 10 * d;
     every = Math.floor(multiplier * every);
     v = v * multiplier;
