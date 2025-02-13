@@ -3,8 +3,20 @@ import type { Point, RectPositioned } from "./Types.js";
 import { randomPluck } from '../data/arrays/Random.js';
 import { distance as PointsDistance } from './point/Distance.js';
 import { randomPoint as RectsRandomPoint } from './rect/Random.js';
+
+/**
+ * Options for poisson disk
+ */
 export type PoissonDiskOpts = {
+  /**
+   * Radius of disk
+   * @defaultValue 1
+   */
   readonly radius?: number;
+  /**
+   * Number of points
+   * @defaultValue 10
+   */
   readonly limit?: number;
 };
 
@@ -25,12 +37,25 @@ const isPointValid = (
   }
   return true;
 };
-// https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm
-// http://extremelearning.com.au/an-improved-version-of-bridsons-algorithm-n-for-poisson-disc-sampling/
+
+/**
+ * Generates a poisson disk distribution of points within a given `rect` area.
+ * 
+ * ```js
+ * // Create up to 50 points aiming for a distance of 3 between them
+ * const rect = { x: 10, y: 10, width: 100, height: 100 };     // RectPositioned
+ * const points = poissonDisk(rect, { radius: 3, limit: 50 }); // Point[]
+ * ```
+ * @param rect 
+ * @param opts 
+ * @returns 
+ */
 export const poissonDisk = (
   rect: RectPositioned,
   opts: PoissonDiskOpts
 ) => {
+  // https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm
+  // http://extremelearning.com.au/an-improved-version-of-bridsons-algorithm-n-for-poisson-disc-sampling/
   const radius = opts.radius ?? 1;
   const limit = opts.limit ?? 10;
   const size = Math.floor(radius / Math.sqrt(2));
@@ -77,4 +102,5 @@ export const poissonDisk = (
       if (!added) growthPoint = undefined;
     }
   }
+  return ar.flat();
 };
