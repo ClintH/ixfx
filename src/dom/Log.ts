@@ -17,7 +17,6 @@ export type Log = {
   error(messageOrError: unknown): void;
   log(message?: string | object | number): HTMLElement | undefined;
   warn(message?: string | object | number): HTMLElement | undefined;
-  //eslint-disable-next-line functional/prefer-immutable-types
   append(el: HTMLElement): void;
   dispose(): void;
   readonly isEmpty: boolean;
@@ -53,24 +52,19 @@ export type Log = {
  * @param opts
  */
 export const log = (
-  //eslint-disable-next-line functional/prefer-immutable-types
   domQueryOrElement: HTMLElement | string,
   opts: LogOpts = {}
 ): Log => {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const {
     capacity = 0,
     monospaced = true,
     timestamp = false,
     collapseDuplicates = true,
-    css = ``,
+    css = ``
   } = opts;
 
-  // eslint-disable-next-line functional/no-let
   let added = 0;
-  // eslint-disable-next-line functional/no-let
   let lastLog: string | undefined;
-  // eslint-disable-next-line functional/no-let
   let lastLogRepeats = 0;
 
   const parentElement = resolveEl<HTMLElement>(domQueryOrElement);
