@@ -125,7 +125,7 @@ export function ofTotal(
 }
 
 /**
- * Returns a function that returns the percentage of timer completion.
+ * Returns a function that returns the percentage (0..1) of timer completion.
  * Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
  *
  * ```js
@@ -428,8 +428,9 @@ export const elapsedTicksAbsolute = (): Timer & { peek: number } => {
 
 
 /**
- * Wraps `timer`, computing a value for based on its elapsed value.
+ * Wraps `timer`, computing a value based on its elapsed value.
  * `fn` creates this value.
+ * 
  * ```js
  * const t = timerWithFunction(v=>v/2, relativeTimer(1000));
  * t.compute();
