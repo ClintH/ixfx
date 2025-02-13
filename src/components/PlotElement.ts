@@ -77,6 +77,23 @@ export class PlotElement extends LitElement {
   }
 
   /**
+   * Returns a `PlotElement` instance based on a query
+   * ```js
+   * PlotElement.fromQuery(`#someplot`); // PlotElement
+   * ```
+   * 
+   * Throws an error if query does not match.
+   * @param query 
+   * @returns 
+   */
+  static fromQuery(query: string): PlotElement {
+    const el = document.querySelector(query);
+    if (!el) throw new Error(`Query does not match an element`);
+    if (el.nodeName === 'PLOT-ELEMENT') return el as PlotElement;
+    throw new Error(`Elment is not a PlotElement ('${ el.nodeName }')`);
+  }
+
+  /**
    * Delete a series.
    * Returns _true_ if there was a series to delete
    * @param name 
