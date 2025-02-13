@@ -12,6 +12,7 @@ export { ofSetMutable } from './MapOfSetMutable.js';
 export { ofCircularMutable } from './MapOfCircularMutable.js';
 export type { MapCircularOpts } from './MapOfCircularMutable.js';
 export type { IMapOfMutable } from './IMapOfMutable.js';
+export type { IMapOfImmutable } from './IMapOfImmutable.js';
 export type { MapArrayOpts } from './MapOfArrayMutable.js';
 export { NumberMap } from './NumberMap.js';
 export * from './MapMulti.js';
