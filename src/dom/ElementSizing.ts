@@ -14,14 +14,36 @@ import { getBoundingClientRectWithBorder, getComputedPixels } from "./Css.js";
  */
 export type ElementResizeLogic = `width` | `height` | `both` | `none` | `min` | `max`;
 
+/**
+ * Options
+ */
 export type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
+  /**
+   * @defaultValue 'none'
+   */
   stretch?: ElementResizeLogic
   naturalSize?: Rect
-  // el: HTMLElement | string
+  /**
+   * If not specified, the element's parent is used
+   */
   containerEl?: HTMLElement | string
   onSetSize: (size: Rect, el: T) => void
 }
 
+/**
+ * Consider using static methods:
+ * 
+ * ```js
+ * // Resize an <SVG> element to match viewport
+ * Dom.ElementSizer.svgViewport(svg);
+ * 
+ * // Resize canvas to match its parent
+ * Dom.ElementSizer.canvasParent(canvas);
+ * 
+ * // Resize canvas to match viewport
+ * Dom.ElementSizer.canvasViewport(canvas);
+ * ```
+ */
 export class ElementSizer<T extends HTMLElement | SVGElement> {
   #stretch: ElementResizeLogic;
   #size: Rect;
@@ -90,13 +112,19 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     return this.canvasParent(canvasElementOrQuery, opts);
   }
 
-  static svgViewport(svg: SVGElement): ElementSizer<SVGElement> {
+  /**
+   * Size an SVG element to match viewport
+   * @param svg 
+   * @returns 
+   */
+  static svgViewport(svg: SVGElement, onSizeSet?: (size: Rect) => void): ElementSizer<SVGElement> {
     const er = new ElementSizer<SVGElement>(svg, {
       containerEl: document.body,
       stretch: `both`,
       onSetSize(size) {
         svg.setAttribute(`width`, size.width.toString());
         svg.setAttribute(`height`, size.height.toString());
+        if (onSizeSet) onSizeSet(size);
       },
     });
     return er;
@@ -109,8 +137,8 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
 
     // Listen for resize
     const r = resizeObservable(c);
-    r.onValue((v) => { 
-      this.#onParentResize(v); 
+    r.onValue((v) => {
+      this.#onParentResize(v);
     });
 
     // Get current value
@@ -174,8 +202,8 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     // If we have a border, take that into account
     if (this.#el instanceof HTMLElement) {
       const b = getComputedPixels(this.#el, `borderTopWidth`, `borderLeftWidth`, `borderRightWidth`, `borderBottomWidth`);
-      width -= (b.borderLeftWidth+b.borderRightWidth);
-      height -= (b.borderTopWidth+b.borderBottomWidth);
+      width -= (b.borderLeftWidth + b.borderRightWidth);
+      height -= (b.borderTopWidth + b.borderBottomWidth);
     }
 
     return { width, height };
