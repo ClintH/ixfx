@@ -1,34 +1,33 @@
-import * as Lines from '../../../src/geometry/line.js';
+import * as Lines from '../../../src/geometry/line/index.js';
 import * as Rects from '../../../src/geometry/rect/index.js';
-import * as Beziers from '../../../src/geometry/Bezier.js';
+import * as Beziers from '../../../src/geometry/bezier/index.js';
 import * as Drawing from '../../../src/visual/Drawing.js';
-import * as Compound from '../../src/geometry/CompoundPath';
+import * as Compound from '../../../src/geometry/path/CompoundPath.js';
 // /// <reference path="../../public/lib/svg.3.1.1.d.ts"/>
 // import * as Svgjs from '../../public/lib/svg.esm';
 import { SVG, Svg } from '@svgdotjs/svg.js';
-import { pingPongPercent } from '../../src/Generators';
-import * as Palette from '../../src/colour/Palette';
+import * as Palette from '../../../src/visual/Palette.js';
+import * as Mod from '../../../src/modulation/index.js';
 
 // Drawing properties
-const colours = new Palette.Palette();
+const colours = Palette.create();
 const bgColour = colours.get(`background-color`);
 const lineDrawOptions = { strokeStyle: colours.get(`muted-color`) };
 const dotDrawOptions = { radius: 3, fillStyle: colours.get(`primary`) };
 
 const pingPongInterval = 0.01;
 
-const setup = (idPrefix: string, size: Rects.Rect): [ CanvasRenderingContext2D, Svg | undefined ] => {
+const setup = (idPrefix: string, size: Rects.Rect): [ CanvasRenderingContext2D, Svg ] => {
   const canvasElement = document.getElementById(idPrefix + `Canvas`) as HTMLCanvasElement;
   if (canvasElement === undefined) throw new Error(`canvasEl is undefined`);
   canvasElement.width = size.width;
   canvasElement.height = size.height;
 
-  const context = canvasElement.getContext(`2d`);          // get drawing context
+  const context = canvasElement.getContext(`2d`)!;          // get drawing context
 
   // Setup SVG
-  const svgElement = document.getElementById(idPrefix + `Svg`);
-  let svg: Svg | undefined;
-  if (svgElement !== null) svg = SVG().addTo(svgElement).size(size.width, size.height);
+  const svgElement = document.getElementById(idPrefix + `Svg`)!;
+  let svg: Svg = SVG().addTo(svgElement).size(size.width, size.height)!;
   return [ context, svg ];
 };
 
@@ -61,7 +60,7 @@ const testCubic = () => {
   // svg.line(path.toFlatArray()).attr({stroke: lineDrawOpts.strokeStyle});
   // const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
-  const progression = pingPongPercent(pingPongInterval); // Loop back and forth between 0 and 1
+  const progression = Mod.pingPongPercent(pingPongInterval); // Loop back and forth between 0 and 1
   let amt = 0;
 
   const redraw = () => {
@@ -71,7 +70,7 @@ const testCubic = () => {
     drawHelper.bezier(bezier, { ...lineDrawOptions, debug: true });
 
     // Calc x,y along long at a given amt and draw a dot there
-    const dotPos = path.compute(amt);
+    const dotPos = path.interpolate(amt);
     drawHelper.dot(dotPos, dotDrawOptions);
 
     // Move SVG dot, need to adjust so it's positioned by its center
@@ -96,12 +95,13 @@ const testQuadratic = () => {
   const bezier = Beziers.quadratic({ x: 5, y: 10 }, { x: 330, y: 100 }, { x: 170, y: 20 });
   const path = Beziers.toPath(bezier);
 
+
   // Use Svg.js to make SVG for the line
-  svg.path(path.toSvgString()).attr({ fill: `transparent`, stroke: lineDrawOptions.strokeStyle });
+  svg.path(path.toSvgString().join('')).attr({ fill: `transparent`, stroke: lineDrawOptions.strokeStyle });
   //const dotSvg = svg.circle(dotDrawOpts.radius * 2).attr({fill: dotDrawOpts.fillStyle});
 
   // Loop back and forth between 0 and 1
-  const progression = pingPongPercent(pingPongInterval);
+  const progression = Mod.pingPongPercent(pingPongInterval);
   let amt = 0;
 
   const redraw = () => {
@@ -111,7 +111,7 @@ const testQuadratic = () => {
     drawHelper.bezier(bezier, { ...lineDrawOptions, debug: true });
 
     // Calc x,y along long at a given amt and draw a dot there
-    const dotPos = path.compute(amt);
+    const dotPos = path.interpolate(amt);
     drawHelper.dot(dotPos, dotDrawOptions);
 
     // Move SVG dot. Since position is from top-left corner, we need to adjust
@@ -145,11 +145,11 @@ const testMultiPath = () => {
   const multiPath = Compound.fromPaths(l3, l4, Beziers.toPath(b1), Beziers.toPath(b2));
 
   // Use Svg.js to make SVG for the line
-  svg.path(multiPath.toSvgString()).attr({ fill: `transparent`, margin: `10px`, stroke: lineDrawOptions.strokeStyle });
+  svg.path(multiPath.toSvgString().join(` `)).attr({ fill: `transparent`, margin: `10px`, stroke: lineDrawOptions.strokeStyle });
   const dotSvg = svg.circle(dotDrawOptions.radius * 2).attr({ fill: dotDrawOptions.fillStyle });
 
   // Loop back and forth between 0 and 1
-  const progression = pingPongPercent(pingPongInterval);
+  const progression = Mod.pingPongPercent(pingPongInterval);
   let amt = 0;
 
   const redraw = () => {
@@ -158,7 +158,7 @@ const testMultiPath = () => {
     drawHelper.paths(multiPath.segments, lineDrawOptions);
 
     // Calc x,y along long at a given amt and draw a dot there
-    const dotPos = multiPath.compute(amt);
+    const dotPos = multiPath.interpolate(amt);
     drawHelper.dot(dotPos, dotDrawOptions);
 
     // Move SVG dot. Since position is from top-left corner, we need to adjust
