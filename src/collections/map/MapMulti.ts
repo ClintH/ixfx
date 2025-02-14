@@ -11,6 +11,8 @@ export type {
 } from './IMapOfMutableExtended.js';
 
 
+export * from './MapMultiFns.js';
+
 /**
  * @private
  */
