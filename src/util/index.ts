@@ -5,6 +5,7 @@ export * as Guards from './guards.js';
 export * from './IsEqual.js';
 export * from './IsEqualTrace.js';
 export * from './IsInteger.js';
+export * from './IsPrimitive.js';
 export * from './MapKeys.js';
 export * from './Platform.js';
 export * from './Results.js';
