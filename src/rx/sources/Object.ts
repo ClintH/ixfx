@@ -1,4 +1,4 @@
- 
+
 import { DispatchList } from "../../flow/DispatchList.js";
 import * as Pathed from "../../data/Pathed.js";
 import { initStream } from "../InitStream.js";
@@ -6,7 +6,7 @@ import type { ObjectFieldHandler, ReactiveDiff, ReactiveInitial, ReactiveNonInit
 import type { ObjectOptions } from "./Types.js";
 import { isEqualContextString } from "../../data/Util.js";
 import { throwResult } from "../../util/Results.js";
-import { wildcard } from "../../Text.js";
+import { wildcard } from "../../text/Text.js";
 
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 export function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;
@@ -98,7 +98,7 @@ export function object<V extends Record<string, any>>(initialValue?: V, options:
 
   const update = (toMerge: Partial<V>) => {
     //console.log(`Rx.From.object update: toMerge: ${ JSON.stringify(toMerge) } value: ${ JSON.stringify(value) }`);
-     
+
     if (value === undefined) {
       value = toMerge as V;
       setEvent.set(value);
