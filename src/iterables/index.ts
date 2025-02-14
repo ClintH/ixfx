@@ -7,6 +7,7 @@ import * as Sync from '../iterables/IterableSync.js';
 export * as Async from '../iterables/IterableAsync.js';
 export * as Sync from '../iterables/IterableSync.js';
 export * from './Controller.js';
+export * from './CompareValues.js';
 
 /**
  * Chains use generators as a way of processing data.

@@ -2,7 +2,7 @@ import * as Util from './util/index.js';
 import * as Random from './random/index.js';
 import * as Data from './data/index.js';
 import * as Geometry from './geometry/index.js';
-import * as Text from './Text.js';
+import * as Text from './text/Text.js';
 import * as Numbers from './numbers/index.js';
 import * as Io from './io/index.js';
 import * as Flow from './flow/index.js';
