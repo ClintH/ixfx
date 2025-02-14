@@ -1,4 +1,4 @@
-import { toStringAbbreviate } from "../../Text.js";
+import { toStringAbbreviate } from "../../text/Text.js";
 import { isEqualDefault, type IsEqual } from "../../util/IsEqual.js";
 import { QueueMutable } from "../queue/QueueMutable.js";
 import { StackMutable } from "../stack/StackMutable.js";

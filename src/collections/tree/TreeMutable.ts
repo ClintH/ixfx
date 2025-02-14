@@ -4,7 +4,7 @@ import { containsDuplicateInstances } from "../../data/arrays/ContainsDuplicateI
 import { QueueMutable } from "../queue/QueueMutable.js"
 import { StackMutable } from "../stack/StackMutable.js"
 import { compare as treeCompare } from './Compare.js';
-import { toStringAbbreviate } from "../../Text.js"
+import { toStringAbbreviate } from "../../text/Text.js"
 import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree } from "./Types.js"
 
 /**
