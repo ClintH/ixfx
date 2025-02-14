@@ -61,6 +61,7 @@ export * as Data from './data/index.js';
  */
 export * as Debug from './debug/index.js';
 
+
 export * as Rx from './rx/index.js';
 
 /**
@@ -110,7 +111,7 @@ export * as Geometry from './geometry/index.js';
  * import {between} from 'https://unpkg.com/ixfx/dist/text.js'
  * ```
  */
-export * as Text from './Text.js';
+export * as Text from './text/index.js';
 
 
 /**
