@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ES2024",
+    "moduleResolution": "node",
+    "module": "ES2022"
+  },
+  "include": [
+    "../tests/**/*.ts"
+  ],
+}
