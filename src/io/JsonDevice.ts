@@ -2,7 +2,7 @@
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from '../flow/StateMachine.js';
 import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
-import { indexOfCharCode, omitChars } from '../Text.js';
+import { indexOfCharCode, omitChars } from '../text/Text.js';
 import { Codec } from './Codec.js';
 import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';

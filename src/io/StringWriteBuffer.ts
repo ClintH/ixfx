@@ -4,7 +4,7 @@ import {
   type Continuously,
   continuously
 } from '../flow/index.js';
-import { splitByLength } from '../Text.js';
+import { splitByLength } from '../text/Text.js';
 
 export type Opts = {
   readonly chunkSize?: number;
