@@ -21,6 +21,7 @@ export * from './Max.js';
 export * from './Multiply.js';
 export * from './Nearest.js';
 export * from './Placeholder.js';
+export * from './Perimeter.js';
 export * from './NormaliseByRect.js';
 export * from './Random.js';
 export type * from './RectTypes.js';
