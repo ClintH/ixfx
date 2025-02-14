@@ -1,4 +1,4 @@
-import * as Text from "../Text.js"
+import * as Text from "../text/Text.js"
 import { resolveEl } from "./ResolveEl.js"
 import { isHtmlElement } from "../dom/TsUtil.js";
 

@@ -1,6 +1,6 @@
 import * as Rx from '../rx/index.js';
 import { type PrimitiveOrObject } from "../PrimitiveTypes.js";
-import { isPrimitive } from '../IsPrimitive.js';
+import { isPrimitive } from '../util/IsPrimitive.js';
 import { mapObjectShallow } from './MapObject.js';
 import * as Pathed from './Pathed.js';
 import type { ValueType } from './Types.js';

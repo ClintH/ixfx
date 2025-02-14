@@ -1,5 +1,5 @@
 import { getErrorMessage } from '../debug/GetErrorMessage.js';
-import { afterMatch } from '../Text.js';
+import { afterMatch } from '../text/Text.js';
 import { log, type LogOpts } from './Log.js';
 import { resolveEl } from './ResolveEl.js';
 

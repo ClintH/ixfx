@@ -1,5 +1,5 @@
 import * as TraversableObject from '../collections/tree/TraverseObject.js';
-import { isPrimitive } from '../IsPrimitive.js';
+import { isPrimitive } from '../util/IsPrimitive.js';
 import { isPlainObjectOrPrimitive } from '../util/GuardObject.js';
 import { isInteger } from '../util/IsInteger.js';
 import { isEqualContextString, type IsEqualContext } from './Util.js';

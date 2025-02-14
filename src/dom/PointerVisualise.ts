@@ -2,7 +2,7 @@ import {
   points,
 } from '../trackers/PointTracker.js';
 import { resolveEl as resolveElement } from './ResolveEl.js';
-import * as Svg from '../visual/Svg.js';
+import * as Svg from '../visual/svg/index.js';
 import { ElementSizer } from './ElementSizing.js';
 
 export type Opts = {
