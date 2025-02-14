@@ -1,8 +1,8 @@
-import { toStringAbbreviate } from '../../Text.js';
+import { toStringAbbreviate } from '../../text/Text.js';
 
 import { last } from '../../iterables/IterableSync.js';
 import * as TreeArrayBacked from './TreeMutable.js';
-import { isPrimitive } from '../../IsPrimitive.js';
+import { isPrimitive } from '../../util/IsPrimitive.js';
 import type { TraversableTree, TreeNode, SimplifiedNode } from './Types.js';
 import { throwNullUndef } from '../../util/GuardEmpty.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
