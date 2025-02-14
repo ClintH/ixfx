@@ -1,5 +1,5 @@
 import * as Drawing from './Drawing.js';
-import * as Svg from './Svg.js';
+import * as Svg from './svg/index.js';
 //import * as Plot from './Plot.js';
 
 //import * as Plot2 from './Plot2.js';
@@ -20,7 +20,7 @@ export * as ImageDataGrid from './ImageDataGrid.js';
 export * as BipolarView from './BipolarView.js';
 export * as Palette from './Palette.js';
 export * as Drawing from './Drawing.js';
-export * as Svg from './Svg.js';
+export * as Svg from './svg/index.js';
 //export * as Plot2 from './Plot2.js';
 
 export * as Plot from './plot/index.js';

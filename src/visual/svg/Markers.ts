@@ -1,10 +1,6 @@
-import {
-  createOrResolve,
-  type MarkerOpts,
-  createEl,
-  type DrawingOpts,
-  applyOpts,
-} from './Svg.js';
+import { applyOpts } from "./Apply.js";
+import { createEl, createOrResolve } from "./create.js";
+import type { DrawingOpts, MarkerOpts } from "./Types.js";
 
 export const createMarker = (
   id: string,
@@ -45,10 +41,10 @@ export const markerPrebuilt = (
   const defsEl = createOrResolve<SVGDefsElement>(parent, `defs`, `defs`);
 
   //eslint-disable-next-line functional/no-let
-  let defEl = defsEl.querySelector(`#${opts.id}`) as SVGElement | null;
+  let defEl = defsEl.querySelector(`#${ opts.id }`) as SVGElement | null;
 
   if (defEl !== null) {
-    return `url(#${opts.id})`;
+    return `url(#${ opts.id })`;
   }
 
   if (opts.id === `triangle`) {
@@ -68,11 +64,11 @@ export const markerPrebuilt = (
       if (opts) applyOpts(tri, opts);
       return tri;
     });
-  } else throw new Error(`Do not know how to make ${opts.id}`);
+  } else throw new Error(`Do not know how to make ${ opts.id }`);
 
   //eslint-disable-next-line functional/immutable-data
   defEl.id = opts.id;
   defsEl.appendChild(defEl);
 
-  return `url(#${opts.id})`;
+  return `url(#${ opts.id })`;
 };

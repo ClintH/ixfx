@@ -74,7 +74,7 @@ export const makeHelper = (
   const ctx = getContext(ctxOrCanvasEl);
   return {
     ctx,
-    paths(pathsToDraw: Array<Path>, opts?: DrawingOpts): void {
+    paths(pathsToDraw: Array<Path> | ReadonlyArray<Path>, opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
     },
     line(lineToDraw: Line | Array<Line>, opts?: DrawingOpts): void {
