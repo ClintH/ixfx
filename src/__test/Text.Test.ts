@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'ava';
-import { startsEnds, abbreviate, beforeMatch, afterMatch, between, betweenChomp, omitChars, splitByLength, beforeAfterMatch, wildcard } from '../Text.js';
+import { startsEnds, abbreviate, beforeMatch, afterMatch, between, betweenChomp, omitChars, splitByLength, beforeAfterMatch, wildcard } from '../text/Text.js';
 
 test('wildcard', t => {
   t.true(wildcard(`bird*`)(`bird123`));

@@ -1,6 +1,6 @@
 import test from 'ava';
 import * as Trees from '../../../collections/tree/index.js';
-import { toStringAbbreviate } from '../../../Text.js';
+import { toStringAbbreviate } from '../../../text/Text.js';
 
 function getTestObj() {
   const testObj = {
