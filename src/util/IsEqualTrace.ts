@@ -1,4 +1,4 @@
-import { toStringAbbreviate } from "../Text.js";
+import { toStringAbbreviate } from "../text/Text.js";
 import type { IsEqual } from "./IsEqual.js";
 
 
