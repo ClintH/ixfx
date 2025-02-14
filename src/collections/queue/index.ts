@@ -6,3 +6,4 @@ export { immutable } from './QueueImmutable.js';
 export { mutable } from './QueueMutable.js';
 export type * from './QueueTypes.js';
 export * from './Responsive.js';
+export * from './QueueFns.js';
