@@ -1,4 +1,4 @@
-import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
+import { afterMatch, beforeAfterMatch, beforeMatch } from './Text.js';
 /**
  * Returns chunks of `source`, broken up by `delimiter` (default '.').
  * 

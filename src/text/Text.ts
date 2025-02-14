@@ -1,6 +1,6 @@
-import { integerTest } from './util/GuardNumbers.js';
-import { throwFromResult } from './util/GuardThrowFromResult.js';
-export { string as random } from './random/String.js';
+import { integerTest } from '../util/GuardNumbers.js';
+import { throwFromResult } from '../util/GuardThrowFromResult.js';
+export { string as random } from '../random/String.js';
 
 /**
  * Given a long string, abbreviates it with ...
