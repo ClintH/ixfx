@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-useless-template-literals */
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from '../flow/StateMachine.js';
 
@@ -37,7 +36,7 @@ const reconnect = async () => {
     // range.
     const abortController = new AbortController();
     await device.watchAdvertisements({ signal: abortController.signal });
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+
     device.addEventListener(`advertisementreceived`, async (event) => {
       console.log(event);
       // Stop the scan to conserve power on mobile devices.
@@ -182,30 +181,28 @@ export class BleDevice extends SimpleEventEmitter<
     const rx = this.rx;
     if (rx === undefined) return;
 
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     const view = (event.target as any).value as DataView;
     if (view === undefined) return;
 
-    //eslint-disable-next-line functional/no-let
-    let string_ = this.codec.fromBuffer(view.buffer);
+    let text = this.codec.fromBuffer(view.buffer as ArrayBuffer);
 
     // Check for flow control chars
-    const plzStop = indexOfCharCode(string_, 19);
-    const plzStart = indexOfCharCode(string_, 17);
+    const plzStop = indexOfCharCode(text, 19);
+    const plzStart = indexOfCharCode(text, 17);
 
     // Remove if found
     if (plzStart && plzStop < plzStart) {
       this.verbose(`Tx plz start`);
-      string_ = omitChars(string_, plzStart, 1);
+      text = omitChars(text, plzStart, 1);
       this.txBuffer.paused = false;
     }
     if (plzStop && plzStop > plzStart) {
       this.verbose(`Tx plz stop`);
-      string_ = omitChars(string_, plzStop, 1);
+      text = omitChars(text, plzStop, 1);
       this.txBuffer.paused = true;
     }
 
-    this.rxBuffer.add(string_);
+    this.rxBuffer.add(text);
   }
 
   protected verbose(m: string) {
