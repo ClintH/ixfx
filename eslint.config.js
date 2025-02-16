@@ -47,7 +47,7 @@ export default tseslint.config(
         "ignore": [
           ".*Opts$",
           "ctx",
-          "*mod*",
+          "mod*",
           "args*",
           "Args*",
           "el",
