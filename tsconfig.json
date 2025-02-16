@@ -5,6 +5,7 @@
     "lib": [
       "esnext",
       "dom",
+      "ES2024.SharedMemory",
       "DOM.Iterable"
     ],
     "types": [
