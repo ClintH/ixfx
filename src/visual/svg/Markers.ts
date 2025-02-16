@@ -1,5 +1,5 @@
 import { applyOpts } from "./Apply.js";
-import { createEl, createOrResolve } from "./create.js";
+import { createEl, createOrResolve } from "./Create.js";
 import type { DrawingOpts, MarkerOpts } from "./Types.js";
 
 export const createMarker = (
