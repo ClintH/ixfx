@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-useless-template-literals */
 import { SimpleEventEmitter } from '../Events.js';
 import * as StateMachine from '../flow/StateMachine.js';
 import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
@@ -82,7 +81,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     // Transmit buffer
     this.txBuffer = new StringWriteBuffer(async (data) => {
       // When we have data to actually write to device
-      // eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression
+
       await this.writeInternal(data);
     }, config);
 
@@ -128,7 +127,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
    */
   protected abstract writeInternal(txt: string): void;
 
-  // eslint-disable-next-line @typescript-eslint/require-await
+
   async close() {
     if (this.states.state !== `connected`) return;
 
@@ -186,12 +185,11 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     //const rx = this.rx;
     //if (rx === undefined) return;
 
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const view = (event.target as any).value as DataView;
     if (view === undefined) return;
 
-    //eslint-disable-next-line functional/no-let
-    let string_ = this.codec.fromBuffer(view.buffer);
+    let string_ = this.codec.fromBuffer(view.buffer as ArrayBuffer);
 
     // Check for flow control chars
     const plzStop = indexOfCharCode(string_, 19);
