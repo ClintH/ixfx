@@ -19,7 +19,7 @@ import { Empty as RectsEmpty } from '../geometry/rect/Empty.js';
 import { corners as RectsCorners } from '../geometry/rect/Corners.js';
 import { isLine } from '../geometry/line/Guard.js';
 import { quantiseEvery } from '../numbers/Quantise.js';
-// eslint-disable-next-line @typescript-eslint/naming-convention
+
 const PIPI = Math.PI * 2;
 
 export type CanvasContextQuery =
@@ -52,7 +52,7 @@ export const getContext = (
       ? canvasElementContextOrQuery
       : canvasElementContextOrQuery instanceof HTMLCanvasElement
         ? canvasElementContextOrQuery.getContext(`2d`)
-        // eslint-disable-next-line unicorn/no-nested-ternary
+
         : typeof canvasElementContextOrQuery === `string`
           ? resolveEl<HTMLCanvasElement>(canvasElementContextOrQuery).getContext(`2d`)
           : canvasElementContextOrQuery;
@@ -182,7 +182,6 @@ const applyOpts = (
   if (ctx === undefined) throw new Error(`ctx undefined`);
 
   // Create a drawing stack, pushing an op generated from drawing options
-  //eslint-disable-next-line functional/immutable-data
   const stack = drawingStack(ctx).push(optsOp(opts), ...additionalOps);
 
   // Apply stack to context
@@ -253,9 +252,7 @@ const coloringOp = (
   fillStyle: string | CanvasGradient | CanvasPattern | undefined
 ): StackOp => {
   const apply = (ctx: CanvasRenderingContext2D) => {
-    // eslint-disable-next-line functional/immutable-data
     if (fillStyle) ctx.fillStyle = fillStyle;
-    // eslint-disable-next-line functional/immutable-data
     if (strokeStyle) ctx.strokeStyle = strokeStyle;
   };
   return apply;
@@ -267,11 +264,8 @@ const lineOp = (
   lineCap: CanvasLineCap | undefined
 ): StackOp => {
   const apply = (ctx: CanvasRenderingContext2D) => {
-    // eslint-disable-next-line functional/immutable-data
     if (lineWidth) ctx.lineWidth = lineWidth;
-    // eslint-disable-next-line functional/immutable-data
     if (lineJoin) ctx.lineJoin = lineJoin;
-    // eslint-disable-next-line functional/immutable-data
     if (lineCap) ctx.lineCap = lineCap;
   };
   return apply;
@@ -291,14 +285,12 @@ export const drawingStack = (
 
   const push = (...ops: Array<StackOp>): DrawingStack => {
     if (stk === undefined) stk = new StackImmutable<StackOp>();
-    //eslint-disable-next-line functional/immutable-data
     const s = stk.push(...ops);
     for (const o of ops) o(ctx);
     return drawingStack(ctx, s);
   };
 
   const pop = (): DrawingStack => {
-    //eslint-disable-next-line functional/immutable-data
     const s = stk?.pop();
     return drawingStack(ctx, s);
   };
@@ -371,7 +363,6 @@ export const circle = (
     ctx.beginPath();
     ctx.arc(c.x, c.y, c.radius, 0, PIPI);
     if (opts.strokeStyle) ctx.stroke();
-    //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
   };
 
@@ -405,7 +396,6 @@ export const ellipse = (
     const endAngle = ellipse.endAngle ?? PIPI;
     ctx.ellipse(ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, rotation, startAngle, endAngle);
     if (opts.strokeStyle) ctx.stroke();
-    //eslint-disable-next-line functional/immutable-data
     if (opts.fillStyle) ctx.fill();
   };
 
@@ -491,7 +481,6 @@ export const connectedPoints = (
     ctx.stroke();
   }
   if (opts.fillStyle) {
-    //eslint-disable-next-line functional/immutable-data
     ctx.fill();
   }
 };
@@ -554,7 +543,6 @@ export const translatePoint = (
  */
 export const copyToImg = (canvasEl: HTMLCanvasElement): HTMLImageElement => {
   const img = document.createElement(`img`);
-  //eslint-disable-next-line functional/immutable-data
   img.src = canvasEl.toDataURL(`image/jpeg`);
   return img;
 };
@@ -648,7 +636,6 @@ const cubicBezier = (
   bezierToDraw: Beziers.CubicBezier,
   opts: DrawingOpts = {}
 ) => {
-  // eslint-disable-next-line functional/no-let
   let stack = applyOpts(ctx, opts);
 
   const { a, b, cubic1, cubic2 } = bezierToDraw;
@@ -666,7 +653,6 @@ const cubicBezier = (
   ctx.stroke();
 
   if (isDebug) {
-    //eslint-disable-next-line functional/immutable-data
     stack = stack.push(
       optsOp({
         ...opts,
@@ -692,7 +678,6 @@ const cubicBezier = (
     dot(ctx, cubic2, { radius: 3 });
     dot(ctx, a, { radius: 3 });
     dot(ctx, b, { radius: 3 });
-    //eslint-disable-next-line functional/immutable-data
     stack = stack.pop();
     stack.apply();
   }
@@ -705,7 +690,6 @@ const quadraticBezier = (
 ) => {
   const { a, b, quadratic } = bezierToDraw;
   const isDebug = opts.debug ?? false;
-  // eslint-disable-next-line functional/no-let
   let stack = applyOpts(ctx, opts);
 
   ctx.beginPath();
@@ -720,7 +704,6 @@ const quadraticBezier = (
      * ctx.fillStyle = opts.strokeStyle ?? `gray`;
      * ctx.strokeStyle = opts.strokeStyle ?? `gray`;
      */
-    //eslint-disable-next-line functional/immutable-data
     stack = stack.push(
       optsOp({
         ...opts,
@@ -740,7 +723,6 @@ const quadraticBezier = (
      * ctx.fillStyle = fs;
      * ctx.strokeStyle = ss;
      */
-    //eslint-disable-next-line functional/immutable-data
     stack = stack.pop();
     stack.apply();
   }
@@ -952,7 +934,6 @@ export const textBlock = (
   const bounds = opts.bounds ?? { x: 0, y: 0, width: 1_000_000, height: 1_000_000 };
 
   // Measure each line
-  //eslint-disable-next-line functional/prefer-tacit
   const blocks = lines.map((l) => ctx.measureText(l));
 
   // Get width and height
@@ -965,7 +946,6 @@ export const textBlock = (
   const maxWidth = Math.max(...widths);
   const totalHeight = heights.reduce((accumulator, value) => accumulator + value, 0);
 
-  // eslint-disable-next-line functional/no-let
   let { x, y } = anchor;
 
   if (anchor.x + maxWidth > bounds.width) {
@@ -980,7 +960,6 @@ export const textBlock = (
 
   if (y < bounds.y) y = bounds.y + anchorPadding;
 
-  // eslint-disable-next-line unicorn/prefer-ternary
   if (align === `top`) {
     ctx.textBaseline = `top`;
   } else {
