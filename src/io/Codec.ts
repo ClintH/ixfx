@@ -7,11 +7,11 @@ export class Codec {
 
   /**
    * Convert string to Uint8Array buffer
-   * @param str
+   * @param text
    * @returns
    */
-  toBuffer(str: string) {
-    return this.enc.encode(str);
+  toBuffer(text: string) {
+    return this.enc.encode(text);
   }
 
   /**
@@ -19,7 +19,7 @@ export class Codec {
    * @param buffer
    * @returns
    */
-  fromBuffer(buffer: ArrayBuffer) {
+  fromBuffer(buffer: AllowSharedBufferSource) {
     return this.dec.decode(buffer);
   }
 }
