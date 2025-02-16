@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/no-null */
+
 import type { CirclePositioned } from '../../geometry/circle/CircleType.js';
 import type { Point } from '../../geometry/point/PointType.js';
 import type { Line } from '../../geometry/line/LineType.js';
@@ -10,7 +10,7 @@ import { getCssVariable } from '../Colour.js';
 import type { CircleDrawingOpts, LineDrawingOpts, PathDrawingOpts, TextDrawingOpts, TextPathDrawingOpts } from './Types.js';
 import { applyOpts } from './Apply.js';
 import { applyStrokeOpts } from './Stroke.js';
-import { createEl, createOrResolve } from './create.js';
+import { createEl, createOrResolve } from './Create.js';
 import { applyPathOpts } from './Path.js';
 //import {Palette} from ".";
 
