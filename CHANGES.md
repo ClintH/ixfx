@@ -1,5 +1,10 @@
 A rough changelog between NPM releases
 
+# 0.34.0 2025 02.27
+
+* Refactored Visual.Svg, Visual.Colour, Geometry.Polar
++ Geometry.Polar.Ray: a line based in polar coordinates
+
 # 0.33.7 2025.01.02
 
 + Arrays.Sorted
