@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/unbound-method */
-import type Color from "colorjs.io";
-import * as Colour from '../../visual/Colour.js';
+//import * as ColorJs from "colorjs.io";
+
+import * as Colour from '../../visual/colour/index.js';
 import { initStream } from "../InitStream.js";
 import type { ReactiveWritable, ReactiveInitial, ReactiveNonInitial } from "../Types.js";
 
-export type ReactiveColour = ReactiveWritable<Color> & {
+export type ReactiveColour = ReactiveWritable<Colour.Colourish> & {
   setHsl: (hsl: Colour.Hsl) => void;
 }
 
-export function colour(initialValue: Color): ReactiveColour & ReactiveInitial<Color>;
-export function colour(): ReactiveColour & ReactiveNonInitial<Color>;
-export function colour(initialValue?: Color): ReactiveColour & (ReactiveNonInitial<Color> | ReactiveInitial<Color>) {
+export function colour(initialValue: Colour.Colourish): ReactiveColour & ReactiveInitial<Colour.Colourish>;
+export function colour(): ReactiveColour & ReactiveNonInitial<Colour.Colourish>;
+export function colour(initialValue?: Colour.Colourish): ReactiveColour & (ReactiveNonInitial<Colour.Colourish> | ReactiveInitial<Colour.Colourish>) {
   let value = initialValue;
-  const events = initStream<Color>();
+  const events = initStream<Colour.Colourish>();
 
-  const set = (v: Color) => {
+  const set = (v: Colour.Colourish) => {
     value = v;
     events.set(v);
   }
@@ -27,7 +27,7 @@ export function colour(initialValue?: Color): ReactiveColour & (ReactiveNonIniti
     onValue: events.onValue,
     set,
     setHsl: (hsl: Colour.Hsl) => {
-      set(Colour.resolve(hsl))
+      set(hsl);
     }
   }
 }

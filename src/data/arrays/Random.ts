@@ -65,13 +65,11 @@ export const randomPluck = <V>(
   if (mutate) {
     return {
       value: array[ index ],
-      //eslint-disable-next-line functional/immutable-data
       array: array.splice(index, 1),
     };
   } else {
     // Copy array, remove item from that
     const t = [ ...array ];
-    //eslint-disable-next-line functional/immutable-data
     t.splice(index, 1);
     return {
       value: array[ index ],
@@ -147,7 +145,6 @@ export const shuffle = <V>(
   rand: RandomSource = Math.random
 ): Array<V> => {
   const array = [ ...dataToShuffle ];
-  // eslint-disable-next-line  functional/no-let
   for (let index = array.length - 1; index > 0; index--) {
     const index_ = Math.floor(rand() * (index + 1));
     [ array[ index ], array[ index_ ] ] = [ array[ index_ ], array[ index ] ];

@@ -96,3 +96,11 @@ npm run lint
 ## Coding conventions
 
 ESLint rules enforce most conventions.
+
+# Verification
+
+```
+npm run knip
+npx --yes @arethetypeswrong/cli --format ascii --profile esm-only --pack .
+npx publint
+```

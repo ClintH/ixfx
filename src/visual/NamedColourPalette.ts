@@ -1,8 +1,8 @@
 /**
- * Manage a set of colours. Uses CSS variables as a fallback if colour is not added
+ * Manage a set of named colours. Uses CSS variables as a fallback if colour is not added
  *
  */
-export type Palette = {
+export type NamedColourPalette = {
   setElementBase(el: Element): void;
   has(key: string): boolean;
 
@@ -37,21 +37,19 @@ export type Palette = {
   alias(from: string, to: string): void;
 };
 
-export const create = (fallbacks?: readonly string[]): Palette =>
-  new PaletteImpl(fallbacks);
+export const create = (fallbacks?: ReadonlyArray<string>): NamedColourPalette =>
+  new NamedColourPaletteImpl(fallbacks);
 
-class PaletteImpl {
-  /* eslint-disable-next-line functional/prefer-readonly-type */
+class NamedColourPaletteImpl {
   readonly #store: Map<string, string> = new Map();
-  /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #aliases: Map<string, string> = new Map();
 
-  readonly fallbacks: readonly string[];
+  readonly fallbacks: ReadonlyArray<string>;
   #lastFallback = 0;
 
   #elementBase: Element;
 
-  constructor(fallbacks?: readonly string[]) {
+  constructor(fallbacks?: ReadonlyArray<string>) {
     if (fallbacks !== undefined) this.fallbacks = fallbacks;
     else this.fallbacks = [ `red`, `blue`, `green`, `orange` ];
     this.#elementBase = document.body;
@@ -76,10 +74,9 @@ class PaletteImpl {
     const c = this.#store.get(key);
     if (c !== undefined) return c;
 
-    const varName = `--` + key;
-    // eslint-disable-next-line functional/no-let
+    const variableName = `--` + key;
     let fromCss = getComputedStyle(this.#elementBase)
-      .getPropertyValue(varName)
+      .getPropertyValue(variableName)
       .trim();
 
     // Not found

@@ -1,4 +1,4 @@
-import { toCartesian } from '../Polar.js';
+import { toCartesian } from '../polar/index.js';
 import { throwIntegerTest } from "../../util/GuardNumbers.js";
 import { Triangles, Points } from '../index.js';
 import type { Triangle } from '../triangle/TriangleType.js';
@@ -28,7 +28,7 @@ export type Sphere = Point3d & {
 export type PointCalculableShape =
   | PolyLine
   | Line
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
   | RectPositioned
   | Point
   | CirclePositioned

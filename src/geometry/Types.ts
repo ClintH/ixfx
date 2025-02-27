@@ -1,4 +1,4 @@
-import { type Coord as PolarCoord } from './Polar.js';
+import { type Coord as PolarCoord } from './polar/index.js';
 import type { Point } from './point/PointType.js';
 export type Vector = Point | PolarCoord;
 

@@ -29,19 +29,20 @@ export * from './Midpoint.js';
 export * from './Multiply.js';
 export * from './Nearest.js';
 export * from './RelativePosition.js';
+export * from './Reverse.js';
 export * from './Rotate.js';
 export * from './Subtract.js';
 export * from './Sum.js';
 export * from './ToPath.js';
 export * from './ToString.js';
 
-//eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const Empty = Object.freeze({
   a: Object.freeze({ x: 0, y: 0 }),
   b: Object.freeze({ x: 0, y: 0 })
 });
 
-//eslint-disable-next-line @typescript-eslint/naming-convention
+
 export const Placeholder = Object.freeze({
   a: Object.freeze({ x: Number.NaN, y: Number.NaN }),
   b: Object.freeze({ x: Number.NaN, y: Number.NaN })
@@ -260,7 +261,7 @@ export const extendFromA = (line: Line, distance: number): Line => {
  * Uses [Bresenham's line algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
  * @param line Line
  */
-//eslint-disable-next-line func-style
+
 export function* pointsOf(line: Line): Generator<Point> {
   // Via https://play.ertdfgcvb.xyz/#/src/demos/dyna
   const { a, b } = line;
@@ -349,7 +350,7 @@ export const toFlatArray = (a: Point | Line, b: Point): ReadonlyArray<number> =>
  * ```
  * @param lines 
  */
-//eslint-disable-next-line func-style
+
 export function* asPoints(lines: Iterable<Line>) {
   for (const l of lines) {
     yield l.a;

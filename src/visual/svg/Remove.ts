@@ -1,3 +1,9 @@
+/**
+ * Removes an SVG element from a parent
+ * @param parent Parent
+ * @param queryOrExisting Query or existing element 
+ * @returns 
+ */
 export const remove = <V extends SVGElement>(
   parent: SVGElement,
   queryOrExisting: string | V
@@ -11,6 +17,10 @@ export const remove = <V extends SVGElement>(
   }
 };
 
+/**
+ * Removes all children of `parent`, but not `parent` itself.
+ * @param parent 
+ */
 export const clear = (parent: SVGElement) => {
   let c = parent.lastElementChild;
   while (c) {

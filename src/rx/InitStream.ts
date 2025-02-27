@@ -75,13 +75,26 @@ export function initUpstream<In, Out>(upstreamSource: ReactiveOrSource<In>, opti
   return events;
 }
 
-
+/**
+ * Initialises a lazy stream with an initial value.
+ * Uses {@link initLazyStream} and {@link cache} together.
+ * @param options 
+ * @returns 
+ */
 export function initLazyStreamWithInitial<V>(options: InitLazyStreamInitedOptions<V>): ReactiveInitialStream<V> {
   const r = initLazyStream<V>(options);
   const c = cache<V, typeof r>(r, options.initialValue);
   return c;
 }
 
+/**
+ * Initialises a lazy stream
+ * Consider also: {@link initLazyStreamWithInitial}
+ * 
+ * Uses {@link lazyStream} internally.
+ * @param options 
+ * @returns 
+ */
 export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStream<V> {
   const lazy = options.lazy ?? `initial`;
   const onStop = options.onStop ?? (() => { /* no-op*/ })
@@ -112,6 +125,9 @@ export function initLazyStream<V>(options: InitLazyStreamOptions): ReactiveStrea
  * Options:
  * * onFirstSubscribe: Called when there is a subscriber after there have been no subscribers.
  * * onNoSubscribers: Called when there are no more subscribers. 'onFirstSubscriber' will be called next time a subscriber is added.
+ * 
+ * Alternatives:
+ * * {@link initLazyStream} - a stream with callbacks for when there is some/none subscribers
  * @ignore
  * @param options 
  * @returns 

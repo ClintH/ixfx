@@ -96,11 +96,11 @@ test('get-paths', (t) => {
   ])
 });
 
-function testResult<T>(t:ExecutionContext, result:Result<T>, value:T ) {
+function testResult<T>(t: ExecutionContext, result: Result<T>, value: T) {
   if (result.success) {
-    t.is(result.value, value);
+    t.deepEqual(result.value, value);
   } else {
-    t.fail(`Result not successful ${result.error}`);
+    t.fail(`Result not successful ${ result.error }`);
   }
 }
 
@@ -121,7 +121,7 @@ test('get-field', (t) => {
   const t5 = getField<number>(d, `gyro.z`);
   testResult(t, t5, 6);
   const t6 = getField(d, `gyro`);
-  testResult(t, t6,  { x: 4, y: 5, z: 6 });
+  testResult(t, t6, { x: 4, y: 5, z: 6 });
   const d2 = {
     message: `hello`,
     profiles: [

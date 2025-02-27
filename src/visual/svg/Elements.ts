@@ -6,12 +6,14 @@ import type { Line } from '../../geometry/line/LineType.js';
 import { fromNumbers as LinesFromNumbers } from '../../geometry/line/FromNumbers.js';
 //import * as Svg from './index.js';
 
-import { getCssVariable } from '../Colour.js';
+import { getCssVariable } from '../colour/index.js';
 import type { CircleDrawingOpts, LineDrawingOpts, PathDrawingOpts, TextDrawingOpts, TextPathDrawingOpts } from './Types.js';
 import { applyOpts } from './Apply.js';
 import { applyStrokeOpts } from './Stroke.js';
 import { createEl, createOrResolve } from './Create.js';
 import { applyPathOpts } from './Path.js';
+import type { PolarRay } from 'src/geometry/polar/Types.js';
+import { toCartesian as polarRayToCartesian } from 'src/geometry/polar/Ray.js';
 //import {Palette} from ".";
 
 const numberOrPercentage = (v: number): string => {
@@ -183,6 +185,18 @@ export const lineUpdate = (
   return lineEl;
 };
 
+export const polarRayUpdate = (lineEl: SVGLineElement, ray: PolarRay, opts?: LineDrawingOpts) => {
+  const l = polarRayToCartesian(ray);
+  lineEl.setAttributeNS(null, `x1`, l.a.x.toString());
+  lineEl.setAttributeNS(null, `y1`, l.a.y.toString());
+  lineEl.setAttributeNS(null, `x2`, l.b.x.toString());
+  lineEl.setAttributeNS(null, `y2`, l.b.y.toString());
+  if (opts) applyOpts(lineEl, opts);
+  if (opts) applyPathOpts(lineEl, opts);
+  if (opts) applyStrokeOpts(lineEl, opts);
+  return lineEl;
+}
+
 /**
  * Updates an existing SVGTextPathElement instance with text and drawing options
  * @param el
@@ -206,7 +220,6 @@ export const textPathUpdate = (
   }
 
   if (text) {
-    //eslint-disable-next-line functional/immutable-data
     el.textContent = text;
   }
   if (opts) applyOpts(el, opts);
@@ -268,7 +281,6 @@ export const textUpdate = (
     el.setAttributeNS(null, `y`, pos.y.toString());
   }
   if (text) {
-    //eslint-disable-next-line functional/immutable-data
     el.textContent = text;
   }
 
@@ -282,9 +294,7 @@ export const textUpdate = (
     const userSelect = opts.userSelect ?? true;
 
     if (!userSelect) {
-      //eslint-disable-next-line functional/immutable-data
       el.style.userSelect = `none`;
-      //eslint-disable-next-line functional/immutable-data
       el.style.webkitUserSelect = `none`;
     }
   }
@@ -347,7 +357,6 @@ export const grid = (
   applyStrokeOpts(g, opts);
 
   // Horizontals
-  //eslint-disable-next-line functional/no-let
   let y = 0;
   while (y < height) {
     const horiz = LinesFromNumbers(0, y, width, y);
@@ -356,7 +365,6 @@ export const grid = (
   }
 
   // Verticals
-  //eslint-disable-next-line functional/no-let
   let x = 0;
   while (x < width) {
     const vert = LinesFromNumbers(x, 0, x, height);

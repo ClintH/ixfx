@@ -4,7 +4,7 @@ import { throwArrayTest } from '../util/GuardArrays.js';
 import * as Arcs from '../geometry/arc/index.js';
 import * as Beziers from '../geometry/bezier/index.js';
 import * as Ellipses from '../geometry/Ellipse.js';
-import * as Colours from '../visual/Colour.js';
+import * as Colours from './colour/index.js';
 import { resolveEl } from '../dom/ResolveEl.js';
 import type { IStackImmutable } from '../collections/stack/IStackImmutable.js';
 import { StackImmutable } from '../collections/stack/StackImmutable.js';

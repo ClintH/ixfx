@@ -1,4 +1,4 @@
-import * as Polar from '../Polar.js';
+import * as Polar from '../polar/index.js';
 import * as Points from '../point/index.js';
 import { throwNumberTest } from "../../util/GuardNumbers.js";
 import { radianToDegree } from '../Angles.js';
@@ -44,7 +44,7 @@ const piPi = Math.PI * 2;
 /**
  * A triangle consisting of three empty points (Points.Empty)
  */
- 
+
 export const Empty = Object.freeze({
   a: { x: 0, y: 0 },
   b: { x: 0, y: 0 },
@@ -54,7 +54,7 @@ export const Empty = Object.freeze({
 /**
  * A triangle consisting of three placeholder points (Points.Placeholder)
  */
- 
+
 export const Placeholder = Object.freeze({
   a: { x: Number.NaN, y: Number.NaN },
   b: { x: Number.NaN, y: Number.NaN },

@@ -1,4 +1,4 @@
-import type { Rgb, Rgb8Bit } from '../visual/Colour.js';
+import type { Rgb, Rgb8Bit } from '../visual/colour/index.js';
 import * as ImageDataGrid from '../visual/ImageDataGrid.js';
 import * as Grids from './grid/index.js';
 
@@ -7,7 +7,7 @@ export type Kernel<T> = ReadonlyArray<ReadonlyArray<T>>;
 export type CellValueScalar<TCell, TKernel> = Grids.GridCellAndValue<TCell> & { kernel: TKernel };
 
 export type KernelCompute = <V>(offset: Grids.GridCell, value: V) => V;
-export type KernelReduce<TCell, TKernel> = (values: CellValueScalar<TCell, TKernel>[]) => TCell | undefined;
+export type KernelReduce<TCell, TKernel> = (values: Array<CellValueScalar<TCell, TKernel>>) => TCell | undefined;
 
 /**
  * Multiply every element of kernel by the same `scalar` value.
@@ -31,7 +31,7 @@ export const multiply = (kernel: Kernel<number>, scalar: number): Kernel<number>
 
 
 export function convolveCell<TCell, TKernel>(cell: Grids.GridCell, kernel: Kernel2dArray<TKernel>, source: Grids.GridReadable<TCell>, reduce: KernelReduce<TCell, TKernel>): TCell | undefined {
-  const valuesAtKernelPos: CellValueScalar<TCell, TKernel>[] = kernel.map(o => {
+  const valuesAtKernelPos: Array<CellValueScalar<TCell, TKernel>> = kernel.map(o => {
     // For a kernel cell vector, get the position in the source grid
     const pos = Grids.offset(source, cell, o.cell, `stop`); // `stop` avoids fringing at extents of image
 
@@ -111,7 +111,7 @@ export const kernel2dToArray = <T>(kernel: Kernel<T>, origin?: Grids.GridCell): 
   return offsets;
 };
 
-export const rgbReducer: KernelReduce<Rgb8Bit, number> = (values: CellValueScalar<Rgb8Bit, number>[]) => {
+export const rgbReducer: KernelReduce<Rgb8Bit, number> = (values: Array<CellValueScalar<Rgb8Bit, number>>) => {
   let r = 0;
   let g = 0;
   let b = 0;

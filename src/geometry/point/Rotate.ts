@@ -1,8 +1,8 @@
 import { throwNumberTest } from "../../util/GuardNumbers.js";
 import type { Point } from "./PointType.js";
 import { guard } from "./Guard.js";
-import { fromCartesian as PolarFromCartesian } from "../Polar.js";
-import { rotate as PolarRotate, toCartesian as PolarToCartesian } from "../Polar.js";
+import { fromCartesian as PolarFromCartesian } from "../polar/index.js";
+import { rotate as PolarRotate, toCartesian as PolarToCartesian } from "../polar/index.js";
 /**
  * Rotate a single point by a given amount in radians
  * @param pt

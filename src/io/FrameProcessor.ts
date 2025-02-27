@@ -1,14 +1,14 @@
-export type Sources = `` | `camera` | `video`;
+
 import * as Camera from './Camera.js';
 import * as VideoFile from './VideoFile.js';
 import * as Video from '../visual/Video.js';
+import type { FrameProcessorSources } from './Types.js';
 
 type State = `ready` | `initialised` | `disposed`;
 
 /**
  * Frame procesor options
  */
-//eslint-disable-next-line functional/no-mixed-types
 export type FrameProcessorOpts = {
   /**
    * If true, capture canvas will be shown. Default: false
@@ -67,7 +67,7 @@ export type FrameProcessorOpts = {
  * See {@link FrameProcessorOpts} for details on available options.
  */
 export class FrameProcessor {
-  private _source: Sources;
+  private _source: FrameProcessorSources;
   private _state: State;
   private _teardownNeeded = false;
 

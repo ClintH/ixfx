@@ -1,5 +1,5 @@
 import type { Point } from "../point/PointType.js"
-import * as Polar from "../Polar.js";
+import * as Polar from "../polar/index.js";
 import { radianInvert } from "../Angles.js";
 
 /**

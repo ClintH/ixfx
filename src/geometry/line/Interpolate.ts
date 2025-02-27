@@ -3,6 +3,7 @@ import type { Point } from "../point/PointType.js";
 import type { Line } from "./LineType.js";
 import { getPointParameter } from "./GetPointsParameter.js";
 import { length } from "./Length.js";
+import { reverse } from "./Reverse.js";
 /**
  * Calculates a point in-between `a` and `b`.
  * 
@@ -53,7 +54,6 @@ export function interpolate(amount: number, line: Line, allowOverflow?: boolean)
  * @param allowOverflow If true, interpolation amount is permitted to exceed 0..1, extending the line.
  * @returns 
  */
-//eslint-disable-next-line func-style
 export function interpolate(amount: number, aOrLine: Point | Line, pointBOrAllowOverflow?: Point | boolean, allowOverflow?: boolean): Point {
 
   if (typeof pointBOrAllowOverflow === `boolean`) {
@@ -61,7 +61,7 @@ export function interpolate(amount: number, aOrLine: Point | Line, pointBOrAllow
     pointBOrAllowOverflow = undefined;
   }
 
-  // eslint-disable-next-line unicorn/no-negated-condition
+
   if (!allowOverflow) throwPercentTest(amount, `amount`);
   else throwNumberTest(amount, ``, `amount`);
 
@@ -81,4 +81,22 @@ export function interpolate(amount: number, aOrLine: Point | Line, pointBOrAllow
     x: x,
     y: y
   });
+}
+
+/**
+ * Returns the point along a line from its start (A)
+ * @param line Line
+ * @param distance Distance
+ * @param fromA If _true_ (default) returns from A. Use _false_ to calculate from end
+ * @returns 
+ */
+export function pointAtDistance(line: Line, distance: number, fromA = true): Point {
+  if (!fromA) line = reverse(line);
+
+  const dx = line.b.x - line.a.x;
+  const dy = line.b.y - line.a.y;
+  const theta = Math.atan2(dy, dx);
+  const xp = distance * Math.cos(theta);
+  const yp = distance * Math.sin(theta);
+  return { x: xp + line.a.x, y: yp + line.a.y };
 }

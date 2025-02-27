@@ -1,6 +1,6 @@
 import test from 'ava';
 import { Points } from '../../geometry/index.js';
-import * as Polar from '../../geometry/Polar.js';
+import * as Polar from '../../geometry/polar/index.js';
 import { degreeToRadian } from '../../geometry/Angles.js';
 import type { Point } from '../../geometry/point/PointType.js';
 

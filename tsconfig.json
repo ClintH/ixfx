@@ -2,16 +2,8 @@
   "compilerOptions": {
     "outDir": "./etc/build",
     "baseUrl": ".",
-    "lib": [
-      "esnext",
-      "dom",
-      "ES2024.SharedMemory",
-      "DOM.Iterable"
-    ],
-    "types": [
-      "@types/web-bluetooth",
-      "@types/w3c-web-serial"
-    ],
+    "lib": ["esnext", "dom", "ES2024.SharedMemory", "DOM.Iterable"],
+    "types": ["@types/web-bluetooth", "@types/w3c-web-serial"],
     "target": "esnext",
     "moduleResolution": "bundler",
     "declaration": true,
@@ -31,7 +23,5 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": [
-    "./src"
-  ]
+  "include": ["./src"]
 }

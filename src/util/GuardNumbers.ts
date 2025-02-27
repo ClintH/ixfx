@@ -229,3 +229,22 @@ export const throwIntegerTest = (value: number | undefined,
   parameterName = `?`) => {
   throwFromResult(integerTest(value, range, parameterName));
 }
+
+export const numberInclusiveRangeTest = (value: number | undefined, min: number, max: number, parameterName = `?`): GuardResult => {
+  if (typeof value !== `number`) {
+    return [ false, `Param '${ parameterName }' is not a number type. Got type: '${ typeof value }' value: '${ JSON.stringify(value) }'` ];
+  }
+  if (Number.isNaN(value)) {
+    return [ false, `Param '${ parameterName }' is not within range ${ min }-${ max }. Got: NaN` ];
+  }
+  if (Number.isFinite(value)) {
+    if (value < min) {
+      return [ false, `Param '${ parameterName }' is below range ${ min }-${ max }. Got: ${ value }` ];
+    } else if (value > max) {
+      return [ false, `Param '${ parameterName }' is above range ${ min }-${ max }. Got: ${ value }` ];
+    }
+    return [ true ];
+  } else {
+    return [ false, `Param '${ parameterName }' is not within range ${ min }-${ max }. Got: infinite` ];
+  }
+}

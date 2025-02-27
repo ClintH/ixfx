@@ -79,7 +79,7 @@ export * as Vectors from './Vector.js';
  * 
  * Comparisons: {@link isAntiParallel}, {@link isOpposite}, {@link isParallel}, {@link isPolarCoord}
  */
-export * as Polar from './Polar.js';
+export * as Polar from './polar/index.js';
 
 /**
  * Functions for producing points within a shape.

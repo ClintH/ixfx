@@ -20,7 +20,6 @@ const jsonData = (object: unknown) => {
         return;
       }
 
-      // eslint-disable-next-line functional/no-let
       for (const [ index, element ] of o.entries()) {
         if (!Array.isArray(element)) {
           console.error(`Histogram array should consist of inner arrays`);
@@ -133,27 +132,18 @@ export class HistogramVis extends LitElement {
     }
   `;
 
-  // static properties = {
-  //   showXAxis: { attribute: false}
-  // };
-
-  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare data: ReadonlyArray<KeyValue>;
 
-  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare showDataLabels: boolean;
 
-  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare height: string;
 
-  // eslint-disable-next-line functional/prefer-readonly-type
   @property()
   declare showXAxis: boolean;
 
-  // eslint-disable-next-line functional/prefer-readonly-type
   @property({ converter: jsonData, type: Object })
   declare json: ReadonlyArray<KeyValue> | undefined;
 
@@ -247,8 +237,8 @@ export class HistogramVis extends LitElement {
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface HTMLElementTagNameMap {
-    // eslint-disable-next-line quotes
     readonly 'histogram-vis': HistogramVis;
   }
 }

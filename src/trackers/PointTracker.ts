@@ -8,7 +8,7 @@ import { ObjectTracker } from './ObjectTracker.js';
 import { length as LineLength } from '../geometry/line/Length.js';
 import { Vectors } from '../geometry/index.js';
 import { Empty as LinesEmpty } from '../geometry/line/index.js';
-import type { Coord as PolarCoord } from '../geometry/Polar.js';
+import type { Coord as PolarCoord } from '../geometry/polar/index.js';
 import type { Line, PolyLine } from '../geometry/line/LineType.js';
 import type { Point, Point3d } from '../geometry/point/PointType.js';
 import type { PointRelation } from '../geometry/point/PointRelationTypes.js';
@@ -87,7 +87,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   ): PointTrackerResults {
     const currentLast = this.last;
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     const previousLast = this.values.at(-2);
 
     if (this.initialRelation === undefined && this.initial) {
@@ -264,7 +264,7 @@ export class TrackedPointMap extends TrackedValueMap<
       const seens = events.map(subEvent => super.seen(subEvent.pointerId.toString(), subEvent));
       return Promise.all(seens);
     } else {
-      // eslint-disable-next-line unicorn/no-single-promise-in-promise-methods
+
       return Promise.all([ super.seen((event as PointerEvent).pointerId.toString(), event) ]);
     }
   }

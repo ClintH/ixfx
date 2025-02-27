@@ -51,7 +51,7 @@ export const objectProxy = <V extends object>(target: V): { proxy: V, rx: Reacti
     set(target, p, newValue, _receiver) {
 
       const isArray = Array.isArray(target);
-      console.log(`Rx.Sources.object set. Target: ${ JSON.stringify(target) } (${ typeof target } array: ${ Array.isArray(target) }) p: ${ JSON.stringify(p) } (${ typeof p }) newValue: ${ JSON.stringify(newValue) } recv: ${ _receiver }`);
+      //console.log(`Rx.Sources.object set. Target: ${ JSON.stringify(target) } (${ typeof target } array: ${ Array.isArray(target) }) p: ${ JSON.stringify(p) } (${ typeof p }) newValue: ${ JSON.stringify(newValue) } recv: ${ _receiver }`);
 
       // Ignore length if target is array
       if (isArray && p === `length`) return true;

@@ -1,4 +1,4 @@
- 
+
 //#region imports
 import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./Types.js";
 import type { ChunkOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/Types.js";
@@ -22,8 +22,10 @@ export * from './ToGenerator.js';
 export * from './Util.js';
 export * from './Wrap.js';
 export * from './ResolveSource.js';
+export * from './Cache.js';
 export * as Dom from './Dom.js';
 export * as From from './sources/index.js';
+export * from './InitStream.js';
 
 export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: Array<ReactiveOp<any, any>>) {
   let s = resolveSource(source);
@@ -173,7 +175,7 @@ export const Ops = {
    * @param predicate If it returns _true_ value is ignored
    * @returns 
    */
-    drop: <V>(predicate: (value: V) => boolean) => opify(OpFns.drop, predicate),
+  drop: <V>(predicate: (value: V) => boolean) => opify(OpFns.drop, predicate),
   /**
    * Every upstream value is considered the target for interpolation.
    * Output value interpolates by a given amount toward the target.

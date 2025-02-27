@@ -253,7 +253,6 @@ export type Wrapped<TIn> = {
    * @returns 
    */
   onValue: (callback: (value: TIn) => void) => void
-
 }
 
 export type ToArrayOptions<V> = {
@@ -306,6 +305,9 @@ export type BindUpdateOpts<V> = {
   }>
 }
 
+/**
+ * A Reactive
+ */
 export type Reactive<V> = {
   /**
    * Subscribes to a reactive. Receives
@@ -331,8 +333,19 @@ export type Reactive<V> = {
    */
   onValue(handler: (value: V) => void): Unsubscriber
 
+  /**
+   * Disposes the reactive, providing a reason for debug tracing
+   * @param reason 
+   */
   dispose(reason: string): void
+  /**
+   * Returns _true_ if Reactive is disposed
+   */
   isDisposed(): boolean
+  /**
+   * Optional 'set' to write a value. Use {@link ReactiveWritable} if you want this non-optional
+   * @param value 
+   */
   set?(value: V): void
 }
 
@@ -356,7 +369,14 @@ export type ReactiveNonInitial<V> = Reactive<V> & {
   last(): V | undefined
 }
 
+/**
+ * A stream that can be written to
+ */
 export type ReactiveWritable<TIn, TOut = TIn> = Reactive<TOut> & {
+  /**
+   * Sets a value
+   * @param value Value to write
+   */
   set(value: TIn): void
 }
 
@@ -410,8 +430,10 @@ export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
   updateField(field: string, value: any): void
 }
 
+/**
+ * A reactive stream which can be read and written to
+ */
 export type ReactiveStream<V> = Reactive<V> & ReactiveWritable<V> & {
-  //through_(message: Passed<V>): void
   /**
    * Removes all the subscribers from this stream.
    */

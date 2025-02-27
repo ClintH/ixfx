@@ -6,7 +6,7 @@ import { createRef, type Ref, ref } from "lit/directives/ref.js";
 import { CanvasHelper } from "../dom/CanvasHelper.js";
 import type { Rect, RectPositioned } from "../geometry/Types.js";
 import * as Numbers from '../numbers/index.js';
-import type { Colourish } from "../visual/Colour.js";
+import type { Colourish } from "../visual/colour/index.js";
 import type { DrawingHelper } from "../visual/Drawing.js";
 import { Colour, Drawing } from "../visual/index.js";
 import { Pathed } from "../data/index.js";
@@ -196,7 +196,7 @@ export class PlotElement extends LitElement {
   }
 
   colourGenerator(series: string): Colour.Colourish {
-    const c = Colour.fromHsl(this.#hue, 0.9, 0.4);
+    const c = Colour.hslFromRelativeValues(this.#hue, 0.9, 0.4);
     this.#hue = Numbers.wrap(this.#hue + 0.1);
     return c;
   }
@@ -246,7 +246,7 @@ export class PlotElement extends LitElement {
         series.getScaled() :
         series.getScaledBy(globalScaler)) :
         series.getScaledBy(Numbers.scaler(seriesScale[ 0 ], seriesScale[ 1 ]));
-      const colour = Colour.resolveToString(series.colour);
+      const colour = Colour.toString(series.colour);
       switch (this.renderStyle) {
         case `line`: {
           this.drawLineSeries(data, cp, d, colour);
@@ -270,7 +270,7 @@ export class PlotElement extends LitElement {
     const ctx = d.ctx;
 
     for (const series of this.#series.values()) {
-      ctx.fillStyle = Colour.resolveToString(series.colour);
+      ctx.fillStyle = Colour.toString(series.colour);
       ctx.fillRect(x, y, swatchSize, swatchSize);
       ctx.fillStyle = textColour;
       x += swatchSize + padding;

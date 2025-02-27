@@ -5,7 +5,6 @@ export default defineConfig({
     arrays: `./src/data/arrays/index.ts`,
     bundle: `./src/index.ts`,
     collections: `./src/collections/index.ts`,
-    chains: './src/iterables/chain/index.ts',
     components: `./src/components/index.ts`,
     webcomponents: `./src/web-components/index.ts`,
     data: `./src/data/index.ts`,

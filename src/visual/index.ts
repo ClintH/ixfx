@@ -4,8 +4,8 @@ import * as Svg from './svg/index.js';
 
 //import * as Plot2 from './Plot2.js';
 
-import * as Palette from './Palette.js';
-import * as Colour from './Colour.js';
+import * as NamedColourPalette from './NamedColourPalette.js';
+import * as Colour from './colour/index.js';
 
 import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
@@ -18,7 +18,7 @@ export * from './CanvasRegion.js';
  */
 export * as ImageDataGrid from './ImageDataGrid.js';
 export * as BipolarView from './BipolarView.js';
-export * as Palette from './Palette.js';
+export * as NamedColourPalette from './NamedColourPalette.js';
 export * as Drawing from './Drawing.js';
 export * as Svg from './svg/index.js';
 //export * as Plot2 from './Plot2.js';
@@ -46,7 +46,7 @@ export * from './plot/CartesianCanvasPlot.js';
  * * {@link toHsl}: to a `{h, s, l}` object
  * * {@link toRgb}: to a `{r, g, b}` object
  */
-export * as Colour from './Colour.js';
+export * as Colour from './colour/index.js';
 
 /**
  * Working with video, either playback from a file or stream from a video camera.
@@ -73,7 +73,7 @@ try {
         SceneGraph,
         Drawing,
         Svg,
-        Palette,
+        NamedColourPalette,
         Colour,
         Video,
       },

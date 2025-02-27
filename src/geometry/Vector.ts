@@ -3,7 +3,7 @@ import type { Point } from './point/PointType.js';
 import { normalise as PointsNormalise } from './point/Normalise.js';
 import { isPoint } from './point/Guard.js';
 //import * as Points from './point/index.js'
-import * as Polar from './Polar.js';
+import * as Polar from './polar/index.js';
 import type { Vector } from './Types.js';
 import { divide as PointDivide } from './point/Divider.js';
 import { guard as LinesGuard } from './line/Guard.js';
@@ -15,7 +15,7 @@ import { toString as PointsToString } from './point/To.js';
 import { clampMagnitude as PointsClampMagnitude } from './point/Magnitude.js';
 import { distance as PointsDistance } from './point/Distance.js';
 import { Empty as PointEmpty } from './point/Empty.js';
-//eslint-disable-next-line @typescript-eslint/naming-convention
+
 const EmptyCartesian = Object.freeze({ x: 0, y: 0 });
 
 const piPi = Math.PI * 2;
@@ -109,7 +109,7 @@ export const normalise = (v: Vector): Vector => {
   } else if (isCartesian(v)) {
     return PointsNormalise(v);
   }
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
   throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
@@ -133,7 +133,7 @@ export const toPolar = (v: Vector, origin = PointEmpty): Polar.Coord => {
   } else if (isCartesian(v)) {
     return Polar.fromCartesian(v, origin);
   }
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
   throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
@@ -149,7 +149,7 @@ export const toCartesian = (v: Vector): Point => {
   } else if (isCartesian(v)) {
     return v;
   }
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
   throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 
@@ -165,7 +165,7 @@ export const toString = (v: Vector, digits?: number) => {
   } else if (isCartesian(v)) {
     return PointsToString(v, digits);
   }
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
   throw new Error(`Expected polar/cartesian vector. Got: ${ v }`);
 };
 

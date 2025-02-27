@@ -1,6 +1,6 @@
 import * as Grids from '../geometry/grid/index.js';
-import type { Rgb, Rgb8Bit } from './Colour.js';
-import { toRgb8bit } from './Colour.js';
+import type { Rgb, Rgb8Bit } from './colour/index.js';
+import { toRgb8bit } from './colour/index.js';
 
 /**
  * Returns a {@link Grids.Grid} based on the provided `image`

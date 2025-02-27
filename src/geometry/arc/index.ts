@@ -2,7 +2,7 @@ import { degreeToRadian, radianArc, radiansSum } from '../Angles.js';
 import { guard as guardPoint, isPoint } from '../point/Guard.js';
 import { distance as pointsDistance } from '../point/Distance.js';
 import { bbox as pointsBbox } from '../point/Bbox.js';
-import { toCartesian } from '../Polar.js';
+import { toCartesian } from '../polar/index.js';
 import type { Point } from '../point/PointType.js';
 import type { Line } from '../line/LineType.js';
 import type { Path } from '../path/index.js';

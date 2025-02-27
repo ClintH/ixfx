@@ -1,8 +1,8 @@
-import test from 'ava';
+import test, { type ExecutionContext } from 'ava';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 
-test(`from-proxy-array`, async t => {
+test(`from-proxy-array`, async (t: ExecutionContext<any>) => {
   const { proxy, rx } = Rx.From.arrayProxy([ `one`, `two`, `three` ]);
   let step = 0;
   rx.onValue(v => {
@@ -56,7 +56,7 @@ test(`from-proxy-array-as-object`, async t => {
   await Flow.sleep(50);
 });
 
-test(`from-proxy-object`, async t => {
+test(`from-proxy-object-1`, async (t: ExecutionContext<any>) => {
   const { proxy: person, rx: personRx } = Rx.From.objectProxy({ name: `jill` });
   let valueFired = 0;
 
@@ -78,12 +78,13 @@ test(`from-proxy-object`, async t => {
   person.name = `john`;
   t.is(person.name, `john`);
   t.is(personRx.last().name, `john`);
+  t.is(valueFired, 3);
 
   // @ts-ignore
   t.throws(() => proxy.age = 12);
 });
 
-test(`from-proxy-object`, async t => {
+test(`from-proxy-object-2`, async t => {
   let valueFired = 0;
   const { proxy: person, rx: personRx } = Rx.From.objectProxy({
     name: `jill`,
@@ -91,17 +92,37 @@ test(`from-proxy-object`, async t => {
       street: `Test St`, number: 12
     }
   });
-  personRx.onValue(v => {
+  personRx.onValue(_v => {
     valueFired++;
   });
-  person.address = { street: `West St`, number: 12 };
 
+  // Change one thing
+  person.address = { street: `West St`, number: 12 };
   await Flow.sleep(50);
-  t.is(valueFired, 4);
+  t.is(valueFired, 1);
+  t.deepEqual(person, {
+    name: `jill`,
+    address: {
+      street: `West St`, number: 12
+    }
+  });
+
+  // Change two things
+  valueFired = 0;
+  person.name = `jane`;
+  person.address = { street: `North St`, number: 13 };
+  t.is(valueFired, 2);
+  t.deepEqual(person, {
+    name: `jane`,
+    address: {
+      street: `North St`, number: 13
+    }
+  });
+
 });
 
 // Update single element within array
-test(`from-object-array-as-object-2`, async t => {
+test(`from-object-array-as-object-2`, async (t: ExecutionContext<any>) => {
   let valueFired = 0;
   const { proxy: array, rx: arrayRx } = Rx.From.objectProxy([ `a`, `b`, `c` ]);
   arrayRx.onValue(v => {

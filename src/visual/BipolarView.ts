@@ -1,7 +1,7 @@
 import * as Drawing from "./Drawing.js";
 import * as Bipolar from "../numbers/Bipolar.js";
 import * as Queues from "../collections/queue/index.js";
-import * as Colour from "./Colour.js";
+import * as Colour from "./colour/index.js";
 import { type CirclePositioned } from "../geometry/index.js";
 import type { IQueueImmutable } from "../collections/queue/IQueueImmutable.js";
 
@@ -79,11 +79,11 @@ export const init = (elementQuery: string, options: BipolarViewOptions = {}): Bi
   const showLabels = options.showLabels ?? true;
   const yAxisBottomNegative = options.yAxisBottomNegative ?? true;
   // Colours
-  const axisColour = Colour.resolveToString(options.axisColour, `silver`);
-  const bgColour = Colour.resolveToString(options.bgColour, `white`);
-  const whiskerColour = Colour.resolveToString(options.whiskerColour, `black`);
-  const dotColour = Colour.resolveToString(options.dotColour, options.whiskerColour, `black`);
-  const labelColour = Colour.resolveToString(options.labelColour, options.axisColour, `silver`);
+  const axisColour = Colour.toStringFirst(options.axisColour, `silver`);
+  const bgColour = Colour.toStringFirst(options.bgColour, `white`);
+  const whiskerColour = Colour.toStringFirst(options.whiskerColour, `black`);
+  const dotColour = Colour.toStringFirst(options.dotColour, options.whiskerColour, `black`);
+  const labelColour = Colour.toStringFirst(options.labelColour, options.axisColour, `silver`);
 
   // Sizes
   const axisWidth = (options.axisWidth ?? 1 * window.devicePixelRatio);

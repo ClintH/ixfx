@@ -11,9 +11,20 @@ export type IoEvents<StateMachineTransitions extends Transitions> = {
   readonly change: StateChangeEvent<StateMachineTransitions>;
 };
 
-//eslint-disable-next-line @typescript-eslint/naming-convention
+
 export type GenericStateTransitions = Readonly<
   typeof genericStateTransitionsInstance
 >;
 
+export type BleDeviceOptions = {
+  readonly service: string;
+  readonly rxGattCharacteristic: string;
+  readonly txGattCharacteristic: string;
+  readonly chunkSize: number;
+  readonly name: string;
+  readonly connectAttempts: number;
+  readonly debug: boolean;
+};
 export { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
+
+export type FrameProcessorSources = `` | `camera` | `video`;

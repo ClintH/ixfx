@@ -2,7 +2,7 @@ import type { Point } from "../point/PointType.js";
 import type { Circle, CirclePositioned, CircleRandomPointOpts } from "./CircleType.js";
 import { isCirclePositioned } from "./Guard.js";
 import { sum as PointsSum } from "../point/Sum.js";
-import { toCartesian as PolarToCartesian } from "../Polar.js";
+import { toCartesian as PolarToCartesian } from "../polar/index.js";
 const piPi = Math.PI * 2;
 /**
  * Returns a random point within a circle.
@@ -38,7 +38,7 @@ export const randomPoint = (within: Circle | CirclePositioned, opts: Partial<Cir
       return PointsSum(offset, PolarToCartesian(Math.sqrt(rand()) * radius, rand() * piPi));
     }
     default: {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
       throw new Error(`Unknown strategy '${ strategy }'. Expects 'uniform' or 'naive'`);
     }
   }

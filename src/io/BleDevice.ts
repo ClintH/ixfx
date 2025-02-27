@@ -7,20 +7,13 @@ import { StringReceiveBuffer } from './StringReceiveBuffer.js';
 import { StringWriteBuffer } from './StringWriteBuffer.js';
 import { retryFunction } from '../flow/Retry.js';
 import {
+  type BleDeviceOptions,
   type GenericStateTransitions,
   type IoEvents,
 } from './Types.js';
 import { genericStateTransitionsInstance } from './GenericStateTransitions.js';
 
-export type Opts = {
-  readonly service: string;
-  readonly rxGattCharacteristic: string;
-  readonly txGattCharacteristic: string;
-  readonly chunkSize: number;
-  readonly name: string;
-  readonly connectAttempts: number;
-  readonly debug: boolean;
-};
+
 
 const reconnect = async () => {
   console.log(`Connect?`);
@@ -65,7 +58,7 @@ export class BleDevice extends SimpleEventEmitter<
 
   constructor(
     private device: BluetoothDevice,
-    private config: Opts
+    private config: BleDeviceOptions
   ) {
     super();
     this.verboseLogging = config.debug;

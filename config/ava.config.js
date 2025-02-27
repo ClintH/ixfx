@@ -11,10 +11,10 @@ export default {
   // },
   extensions: {
     ts: "module",
-    js:true
+    js: true
   },
   nodeArguments: [
     "--import=tsimp",
-    "--trace-warnings"
+    //"--trace-warnings"
   ]
 }; 

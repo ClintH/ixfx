@@ -19,11 +19,11 @@ export type InsertOptions = {
    * Parent to insert CANVAS element into.
    * If undefined, it will be added to the body.
    */
-  parent?:HTMLElement|string
+  parent?: HTMLElement | string
   /**
    * How canvas should be sized
    */
-  canvasResizeTo:`parent`|`viewport`
+  canvasResizeTo: `parent` | `viewport`
 };
 
 
@@ -575,14 +575,14 @@ export class CartesianCanvasPlot {
       if (index === 0) ctx.moveTo(dot.x, dot.y);
       ctx.lineTo(dot.x, dot.y);
     }
-    ctx.strokeStyle = Colour.resolveToString(colour);
+    ctx.strokeStyle = Colour.toString(colour);
     ctx.lineWidth = width;
     ctx.stroke();
     ctx.closePath();
   }
 
   #drawDot(originalDot: Cart.PlotPoint, fallbackColour: string, fallbackRadius: number) {
-    const colour = Colour.resolveToString(originalDot.fillStyle ?? fallbackColour);
+    const colour = Colour.toString(originalDot.fillStyle ?? fallbackColour);
     const pos = this.valueToRegionSpace(originalDot);
     const radius = originalDot.radius ?? fallbackRadius;
     this.#canvasRegion.drawCircles([
@@ -605,12 +605,12 @@ export class CartesianCanvasPlot {
     if (debug) console.log(line);
     const ctx = this.#canvasRegion.context;
 
-    colour = Colour.resolveToString(colour);
+    colour = Colour.toString(colour);
     //this.#canvasRegion.drawConnectedPoints([ line.a, line.b ], colour, width);
     ctx.beginPath();
     ctx.moveTo(line.a.x, line.a.y);
     ctx.lineTo(line.b.x, line.b.y);
-    ctx.strokeStyle = Colour.resolveToString(colour);
+    ctx.strokeStyle = Colour.toString(colour);
     ctx.lineWidth = width;
     ctx.stroke();
     ctx.closePath();

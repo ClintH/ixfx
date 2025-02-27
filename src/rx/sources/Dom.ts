@@ -1,4 +1,4 @@
-import * as Colour from '../../visual/Colour.js';
+import * as Colour from '../../visual/colour/index.js';
 import type { ReactiveInitial, ReactiveWritable, Reactive } from "../Types.js";
 import { eventTrigger } from "./Event.js";
 import type { DomFormOptions, DomNumberInputValueOptions, DomValueOptions } from "./Types.js";
@@ -249,13 +249,13 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
     const fd = new FormData(formEl);
     const entries = [];
     for (const [ k, v ] of fd.entries()) {
-      const vStr = v.toString();
+      const vString = v.toString();
 
       // Get type hint for key
       let typeHint = typeHints.get(k);
       if (!typeHint) {
         // If not found, use the kind of input element as a hint
-        const el = getFormElement(k, vStr);
+        const el = getFormElement(k, vString);
         if (el) {
           if (el.type === `range` || el.type === `number`) {
             typeHint = `number`;
@@ -271,12 +271,12 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
       }
 
       if (typeHint === `number`) {
-        entries.push([ k, Number.parseFloat(vStr) ]);
+        entries.push([ k, Number.parseFloat(vString) ]);
       } else if (typeHint === `boolean`) {
-        const vBool = (vStr === `true`) ? true : false;
+        const vBool = (vString === `true`) ? true : false;
         entries.push([ k, vBool ]);
       } else if (typeHint === `colour`) {
-        const vRgb = Colour.resolve(vStr, true);
+        const vRgb = Colour.toString(vString);
         entries.push([ k, Colour.toRgb(vRgb) ]);
       } else {
         entries.push([ k, v.toString() ]);
@@ -289,9 +289,9 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
         entries.push([ el.name, false ]);
       }
     }
-    const asObj = Object.fromEntries(entries);
+    const asObject = Object.fromEntries(entries);
     //console.log(`readValue`, asObj);
-    return asObj;
+    return asObject;
   }
 
   const getFormElement = (name: string, value: string): HTMLSelectElement | HTMLInputElement | undefined => {
@@ -325,8 +325,8 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
       if (el.type === `color`) {
         if (typeof value === `object`) {
           // Try to parse colour if value is an object
-          const c = Colour.resolve(value, true);
-          value = Colour.toHex(c);
+          //const c = Colour.resolve(value, true);
+          value = Colour.toHex(value);
         }
       } else if (el.type === `checkbox`) {
         if (typeof value === `boolean`) {
