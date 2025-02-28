@@ -3,12 +3,11 @@ import type { ColourInterpolationOpts, Colourish } from "./Types.js";
 import { pairwise } from '../../data/arrays/Pairwise.js';
 import { scale as scaleNumber } from '../../numbers/Scale.js';
 import { structuredToColorJsConstructor } from "./ResolveToColorJs.js";
-import { toString as colourToString } from "./ToString.js";
+import { toString as colourToString } from "./ToHex.js";
 import Color from "colorjs.io";
 /**
  * Returns a function to interpolate between colours
  * ```js
- * import { Colour } from 'https://unpkg.com/ixfx/dist/visual.js'
  * const i = interpolator([`orange`, `yellow`, `red`]);
  * 
  * // Get a random colour on the above spectrum
@@ -33,14 +32,22 @@ export const interpolator = (colours: Array<Colourish>, opts: Partial<ColourInte
   //const ranges = pieces.map(piece => (piece[ 0 ] as any).range(piece[ 1 ], { space, hue })) as Array<Range>;
   const ranges = pieces.map(piece => piece[ 0 ].range(piece[ 1 ], { space, hue }));
 
-  return (amt: number) => {
+  return (amt: number): string => {
     amt = clamp(amt);
 
     // Scale to 0..1 to 0...ranges.length
     const s = scaleNumber(amt, 0, 1, 0, ranges.length);
     const index = Math.floor(s);
     const amtAdjusted = s - index;
-    return ranges[ index ](amtAdjusted);
+    const range = ranges[ index ];
+
+    // If we're at the end, return the last colour
+
+    if (index === 1) return colourToString(colours.at(-1)!);
+
+    const colour = range(amtAdjusted);
+    return colour.display();
+
   }
 }
 
@@ -70,14 +77,10 @@ export const cssLinearGradient = (colours: Array<Colourish>) => {
 /**
  * Produces a stepped scale of colours.
  * 
- * Return result is an array of Color.js 'Colour' objects.
  * ```js
- * import { Colour } from 'ixfx/visual'
- * const steps = Colour.scale(['red','green'], 10);
+ * const steps = Colour.scale([ `red`, `green` ], 10);
  * for (const step of steps) {
- *  // Get a 'hsla(...)' string representation of colour
- *  // This can be used with the canvas, setting DOM properties etc.
- *  const css = Colour.toString(step);
+ *  // A CSS colour string
  * }
  * ```
  * 
@@ -88,7 +91,7 @@ export const cssLinearGradient = (colours: Array<Colourish>) => {
  * @param opts 
  * @returns 
  */
-export const scale = (colours: Array<Colourish>, numberOfSteps: number, opts: Partial<ColourInterpolationOpts> = {}) => {
+export const scale = (colours: Array<Colourish>, numberOfSteps: number, opts: Partial<ColourInterpolationOpts> = {}): Array<string> => {
   const space = opts.space ?? `lch`;
   const hue = opts.hue ?? `shorter`;
   const pieces = interpolatorInit(colours);
@@ -99,5 +102,5 @@ export const scale = (colours: Array<Colourish>, numberOfSteps: number, opts: Pa
     { space, hue, steps: stepsPerPair, outputSpace: `srgb` }
   )) as Array<Color>;
 
-  return steps.flat();
+  return steps.flat().map(c => c.display());
 }
