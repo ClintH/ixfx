@@ -6,5 +6,5 @@ export * from './Oklch.js';
 export * from './ResolveCss.js';
 export * from './ResolveToColorJs.js';
 export * from './Rgb.js';
-export * from './ToString.js';
+export * from './ToHex.js';
 export type * from './Types.js';

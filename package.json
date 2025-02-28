@@ -1,6 +1,6 @@
 {
   "name": "ixfx",
-  "version": "0.34.0",
+  "version": "0.34.2",
   "description": "A framework for programming interactivity",
   "homepage": "https://github.com/clinth/ixfx/",
   "keywords": [
@@ -17,6 +17,7 @@
     "./arrays.js": "./dist/arrays.js",
     "./collections.js": "./dist/collections.js",
     "./components.js": "./dist/components.js",
+    "./colour.js": "./dist/colour.js",
     "./data.js": "./dist/data.js",
     "./debug.js": "./dist/debug.js",
     "./dom.js": "./dist/dom.js",

@@ -6,6 +6,7 @@ export default defineConfig({
     bundle: `./src/index.ts`,
     collections: `./src/collections/index.ts`,
     components: `./src/components/index.ts`,
+    colour: './src/visual/colour/index.ts',
     webcomponents: `./src/web-components/index.ts`,
     data: `./src/data/index.ts`,
     dom: `./src/dom/index.ts`,

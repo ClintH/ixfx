@@ -4,10 +4,12 @@ import { hslToRelative, isHsl } from "./Hsl.js";
 import Color, { type ColorConstructor } from 'colorjs.io';
 import { isOklch } from "./Oklch.js";
 import { resolveCss } from "./ResolveCss.js";
+import { numberInclusiveRangeTest } from "../../util/GuardNumbers.js";
+import { throwFromResult } from "../../util/GuardThrowFromResult.js";
 import type { Result } from "../../util/Results.js";
 /**
  * Converts to relative Rgb value.
- * All parameters are 0..255 scale
+ * RGB are 0..255 scale, opacity is always 0..1 scale
  * @param r 
  * @param g 
  * @param b 
@@ -18,7 +20,7 @@ const relativeFromAbsolute = (r: number, g: number, b: number, opacity = 255): R
   r = clamp(r / 255);
   g = clamp(g / 255);
   b = clamp(b / 255);
-  opacity = clamp(opacity / 255);
+  opacity = clamp(opacity);
   return {
     r, g, b, opacity, unit: `relative`, space: `srgb`
   }
@@ -29,33 +31,10 @@ const rgbToRelative = (rgb: Rgb): RgbRelative => {
   return relativeFromAbsolute(rgb.r, rgb.g, rgb.b, rgb.opacity);
 }
 
-// const rgbToColorJs = (rgb: Rgb): ColorJs.ColorObject => {
-//   let { r, g, b, opacity } = rgb;
 
-//   if (rgb.unit === `8bit`) {
-//     r /= 255;
-//     g /= 255;
-//     b /= 255;
-//     if (opacity !== undefined) opacity /= 255;
-//   }
-
-//   const coords: [ number, number, number ] = [
-//     r,
-//     g,
-//     b
-//   ];
-//   return opacity === undefined ?
-//     new ColorJs.default(`srgb`, coords) :
-//     new ColorJs.default(`srgb`, coords, opacity);
-// }
-
-export const isRgb = (p: Colourish): p is Rgb => {
+export const isRgb = (p: Colourish, validate = false): p is Rgb => {
   if (p === undefined || p === null) return false;
   if (typeof p !== `object`) return false;
-
-  // Check if Colourjs
-  //if ((p as ColorJs.ColorObject).spaceId !== undefined) return false;
-  //if ((p as ColorJs.ColorObject).coords !== undefined) return false;
 
   const space = p.space;
   if (space !== `srgb` && space !== undefined) return false;
@@ -63,6 +42,21 @@ export const isRgb = (p: Colourish): p is Rgb => {
   if (pp.r === undefined) return false;
   if (pp.g === undefined) return false;
   if (pp.b === undefined) return false;
+
+  if (validate) {
+    if (`opacity` in pp) {
+      throwFromResult(numberInclusiveRangeTest(pp.opacity, 0, 1, `opacity`));
+    }
+    if (pp.unit === `relative`) {
+      throwFromResult(numberInclusiveRangeTest(pp.r, 0, 1, `r`));
+      throwFromResult(numberInclusiveRangeTest(pp.g, 0, 1, `g`));
+      throwFromResult(numberInclusiveRangeTest(pp.b, 0, 1, `b`));
+    } else if (pp.unit === `8bit`) {
+      throwFromResult(numberInclusiveRangeTest(pp.r, 0, 255, `r`));
+      throwFromResult(numberInclusiveRangeTest(pp.g, 0, 255, `g`));
+      throwFromResult(numberInclusiveRangeTest(pp.b, 0, 255, `b`));
+    }
+  }
   return true;
 };
 

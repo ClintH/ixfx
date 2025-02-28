@@ -1,6 +1,6 @@
-export type HslRelative = { h: number; s: number; l: number; opacity: number, space?: `hsl`, unit: `relative` };
+export type HslRelative = { h: number; s: number; l: number; opacity?: number, space?: `hsl`, unit: `relative` };
 
-export type HslAbsolute = { h: number; s: number; l: number; opacity: number, space?: `hsl`, unit: `absolute` };
+export type HslAbsolute = { h: number; s: number; l: number; opacity?: number, space?: `hsl`, unit: `absolute` };
 
 /**
  * HSL value.
@@ -12,7 +12,7 @@ export type Hsl = HslRelative | HslAbsolute;
 /**
  * Rgb.
  * Units determine how to interperet rgb values.
- * * 'relative': 0..1 range
+ * * 'relative': 0..1 range for RGB & opacity
  * * '8bit': 0..255 range for RGB & opacity
  */
 //export type Rgb = { r: number; g: number; b: number; opacity?: number, unit: `relative` | `8bit`, space?: `srgb` };

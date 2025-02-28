@@ -8,10 +8,10 @@ import { resolveCss } from "./ResolveCss.js";
 
 export const structuredToColorJsConstructor = (colour: Colourish): ColorConstructor => {
 
-  if (isHsl(colour)) {
+  if (isHsl(colour, true)) {
     return hslToColorJs(colour);
   }
-  if (isRgb(colour)) {
+  if (isRgb(colour, true)) {
     return rgbToColorJs(colour);
   }
   if (isOklch(colour)) {

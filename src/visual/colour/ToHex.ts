@@ -33,7 +33,7 @@ export const toHex = (colour: Colourish): string => {
  */
 export const toString = (colour: Colourish): string => {
   const c = structuredToColorJs(colour);
-  return c.display();
+  return c.display().toString();
 }
 
 /**

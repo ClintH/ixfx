@@ -113,6 +113,7 @@ export * as Geometry from './geometry/index.js';
  */
 export * as Text from './text/index.js';
 
+export * as Colour from './visual/colour/index.js';
 
 /**
  * Input and output to devices, sensors and actuators.

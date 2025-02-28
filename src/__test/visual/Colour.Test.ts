@@ -44,3 +44,50 @@ test(`colour-parse`, (t) => {
   t.like(Colour.toHsl(`hsla(100, 100%, 50%, 0.20)`), { h: 0.2777777777777778, s: 1, l: 0.5, opacity: 0.2 });
 
 });
+
+test(`rgb-validate`, t => {
+  // Values exceed relative range
+  t.throws(() => Colour.toString({ r: 255, g: 0, b: 0, unit: `relative` }));
+  t.throws(() => Colour.toString({ r: 0, g: 2, b: 0, unit: `relative` }));
+  t.throws(() => Colour.toString({ r: 0, g: 0, b: 2, unit: `relative` }));
+  t.throws(() => Colour.toString({ r: 0, g: 0, b: 0, opacity: 10, unit: `relative` }));
+
+  // Values exceed 8bit range
+  t.throws(() => Colour.toString({ r: 256, g: 0, b: 0, unit: `8bit` }));
+  t.throws(() => Colour.toString({ r: 0, g: -1, b: 0, unit: `8bit` }));
+  t.throws(() => Colour.toString({ r: 0, g: 0, b: 300, unit: `8bit` }));
+  t.throws(() => Colour.toString({ r: 0, g: 0, b: 0, opacity: 10, unit: `8bit` }));
+});
+
+test(`hsl-validate`, t => {
+  // Values exceed relative range
+  t.throws(() => Colour.toString({ h: 1.1, s: 0, l: 0, unit: `relative` }));
+  t.throws(() => Colour.toString({ h: 0, s: 2, l: 0, unit: `relative` }));
+  t.throws(() => Colour.toString({ h: 0, s: 0, l: 2, unit: `relative` }));
+  t.throws(() => Colour.toString({ h: 0, s: 0, l: 0, opacity: 10, unit: `relative` }));
+
+  // Values exceed absolute range
+  t.notThrows(() => Colour.toString({ h: 361, s: 0, l: 0, unit: `absolute` })); // angles wrap
+  t.throws(() => Colour.toString({ h: 0, s: -1, l: 0, unit: `absolute` }));
+  t.throws(() => Colour.toString({ h: 0, s: 0, l: 200, unit: `absolute` }));
+  t.throws(() => Colour.toString({ h: 0, s: 0, l: 0, opacity: 10, unit: `absolute` }));
+});
+
+test(`to-string`, t => {
+
+  t.is(Colour.toString(`black`), `rgb(0% 0% 0%)`);
+  t.is(Colour.toString({ r: 0, g: 0, b: 0, unit: `relative` }), `rgb(0% 0% 0%)`);
+  t.is(Colour.toString({ r: 1, g: 1, b: 1, unit: `relative` }), `rgb(100% 100% 100%)`);
+  t.is(Colour.toString({ r: 1, g: 1, b: 1, opacity: 0.5, unit: `relative` }), `rgb(100% 100% 100% / 0.5)`);
+
+  t.is(Colour.toString({ r: 0, g: 0, b: 0, unit: `8bit` }), `rgb(0% 0% 0%)`);
+  t.is(Colour.toString({ r: 255, g: 255, b: 255, unit: `8bit` }), `rgb(100% 100% 100%)`);
+  t.is(Colour.toString({ r: 255, g: 255, b: 255, opacity: 0.5, unit: `8bit` }), `rgb(100% 100% 100% / 0.5)`);
+
+  t.is(Colour.toString({ h: 0, s: 0, l: 0, unit: `relative` }), `hsl(0 0% 0%)`);
+  t.is(Colour.toString({ h: 0, s: 0, l: 0, opacity: 0.5, unit: `relative` }), `hsl(0 0% 0% / 0.5)`);
+
+  t.is(Colour.toString({ h: 200, s: 0, l: 0, unit: `absolute` }), `hsl(200 0% 0%)`);
+  t.is(Colour.toString({ h: 200, s: 100, l: 100, opacity: 0.5, unit: `absolute` }), `hsl(200 100% 100% / 0.5)`);
+
+});

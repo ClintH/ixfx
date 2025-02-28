@@ -1,33 +1,11 @@
-import * as Drawing from './Drawing.js';
-import * as Svg from './svg/index.js';
-//import * as Plot from './Plot.js';
 
-//import * as Plot2 from './Plot2.js';
+
+import * as Svg from './svg/index.js';
+export * as Svg from './svg/index.js';
 
 import * as NamedColourPalette from './NamedColourPalette.js';
+
 import * as Colour from './colour/index.js';
-
-import * as SceneGraph from './SceneGraph.js';
-import * as Video from './Video.js';
-
-export * from './CanvasRegion.js';
-
-/**
- * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link Geometry.Grid} type.
- * This is useful because it's otherwise a one-dimensional array listing each rgba in turn.
- */
-export * as ImageDataGrid from './ImageDataGrid.js';
-export * as BipolarView from './BipolarView.js';
-export * as NamedColourPalette from './NamedColourPalette.js';
-export * as Drawing from './Drawing.js';
-export * as Svg from './svg/index.js';
-//export * as Plot2 from './Plot2.js';
-
-export * as Plot from './plot/index.js';
-export * as SceneGraph from './SceneGraph.js';
-//export * from './ScaleCanvas.js';
-export * from './plot/CartesianCanvasPlot.js';
-
 /**
  * Colour interpolation, scale generation and parsing
  *
@@ -46,7 +24,35 @@ export * from './plot/CartesianCanvasPlot.js';
  * * {@link toHsl}: to a `{h, s, l}` object
  * * {@link toRgb}: to a `{r, g, b}` object
  */
+
 export * as Colour from './colour/index.js';
+
+export type * from './Types.js';
+
+import * as SceneGraph from './SceneGraph.js';
+import * as Video from './Video.js';
+
+export * from './CanvasRegion.js';
+
+/**
+ * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link Geometry.Grid} type.
+ * This is useful because it's otherwise a one-dimensional array listing each rgba in turn.
+ */
+export * as ImageDataGrid from './ImageDataGrid.js';
+export * as BipolarView from './BipolarView.js';
+export * as NamedColourPalette from './NamedColourPalette.js';
+
+import * as Drawing from './Drawing.js';
+export * as Drawing from './Drawing.js';
+
+//export * as Plot2 from './Plot2.js';
+
+export * as Plot from './plot/index.js';
+export * as SceneGraph from './SceneGraph.js';
+//export * from './ScaleCanvas.js';
+export * from './plot/CartesianCanvasPlot.js';
+
+
 
 /**
  * Working with video, either playback from a file or stream from a video camera.

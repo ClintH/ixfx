@@ -7,7 +7,7 @@ export const resolveCss = (colour: string, fallback?: string): string => {
         if (!fallback) throw new Error(`Variable not found: ${ colour }`);
         return fallback;
       }
-      return colour;
+      return value;
     }
   }
   return colour;
