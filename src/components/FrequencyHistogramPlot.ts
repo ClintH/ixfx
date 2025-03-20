@@ -1,6 +1,6 @@
-import { HistogramVis } from './HistogramVis.js';
-import * as KeyValueUtil from '../util/KeyValue.js';
-import type { KeyValue } from '../PrimitiveTypes.js';
+import type { HistogramVis } from "./HistogramVis.js";
+import * as KeyValues from "../util/KeyValue.js";
+import type { KeyValue } from "../PrimitiveTypes.js";
 
 /**
  * Creates and drives a HistogramVis instance.
@@ -25,42 +25,45 @@ import type { KeyValue } from '../PrimitiveTypes.js';
  * @class FrequencyHistogramPlot
  */
 export class FrequencyHistogramPlot {
-  readonly el: HistogramVis | undefined;
-  #sorter: KeyValueUtil.KeyValueSorter | undefined;
-  constructor(el: HistogramVis) {
-    this.el = el;
-  }
+	readonly el: HistogramVis | undefined;
+	#sorter: KeyValues.KeyValueSorter | undefined;
+	constructor(el: HistogramVis) {
+		this.el = el;
+	}
 
-  setAutoSort(
-    sortStyle: `value` | `value-reverse` | `key` | `key-reverse`
-  ): void {
-    this.#sorter = KeyValueUtil.getSorter(sortStyle);
-  }
+	setAutoSort(
+		sortStyle: `value` | `value-reverse` | `key` | `key-reverse`,
+	): void {
+		this.#sorter = KeyValues.getSorter(sortStyle);
+	}
 
-  clear() {
-    if (this.el === undefined) return;
-    this.el.data = [];
-  }
+	clear() {
+		if (this.el === undefined) return;
+		this.el.data = [];
+	}
 
-  // init() {
-  //   if (this.el !== undefined) return; // already inited
-  //   // eslint-disable-next-line functional/immutable-data
-  //   this.el = document.createElement(`histogram-vis`);
-  //   this.parentEl.appendChild(this.el);
-  // }
+	// init() {
+	//   if (this.el !== undefined) return; // already inited
+	//   // eslint-disable-next-line functional/immutable-data
+	//   this.el = document.createElement(`histogram-vis`);
+	//   this.parentEl.appendChild(this.el);
+	// }
 
-  dispose() {
-    const el = this.el;
-    if (el === undefined) return; // already disposed
-    el.remove();
-  }
+	dispose() {
+		const el = this.el;
+		if (el === undefined) return; // already disposed
+		el.remove();
+	}
 
-  update(data: ReadonlyArray<readonly [ key: string, count: number ]>) {
-    if (this.el === undefined) {
-      console.warn(`FrequencyHistogramPlot this.el undefined`);
-      return;
-    }
+	update(data: ReadonlyArray<readonly [key: string, count: number]>) {
+		if (this.el === undefined) {
+			console.warn(`FrequencyHistogramPlot this.el undefined`);
+			return;
+		}
 
-    this.el.data = this.#sorter === undefined ? [ ...data ] : this.#sorter(data as Array<KeyValue>);
-  }
+		this.el.data =
+			this.#sorter === undefined
+				? [...data]
+				: this.#sorter(data as Array<KeyValue>);
+	}
 }
