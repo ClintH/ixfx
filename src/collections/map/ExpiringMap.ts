@@ -293,11 +293,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
 
   private findEvicteeKey(): K | undefined {
     if (this.evictPolicy === `none`) return;
-    //eslint-disable-next-line functional/no-let
     let sortBy = ``;
     if (this.evictPolicy === `oldestGet`) sortBy = `lastGet`;
     else if (this.evictPolicy === `oldestSet`) sortBy = `lastSet`;
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     else throw new Error(`Unknown eviction policy ${ this.evictPolicy }`);
     const sorted = sortByValueProperty(this.store, sortBy);
     return sorted[ 0 ][ 0 ];
