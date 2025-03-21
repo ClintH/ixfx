@@ -29,7 +29,7 @@ export * as Colour from './colour/index.js';
 
 export type * from './Types.js';
 
-import * as SceneGraph from './SceneGraph.js';
+//import * as SceneGraph from './SceneGraph.js';
 import * as Video from './Video.js';
 
 export * from './CanvasRegion.js';
@@ -48,7 +48,7 @@ export * as Drawing from './Drawing.js';
 //export * as Plot2 from './Plot2.js';
 
 export * as Plot from './plot/index.js';
-export * as SceneGraph from './SceneGraph.js';
+//export * as SceneGraph from './SceneGraph.js';
 //export * from './ScaleCanvas.js';
 export * from './plot/CartesianCanvasPlot.js';
 
@@ -76,7 +76,6 @@ try {
     (window as any).ixfx = {
       ...(window as any).ixfx,
       Visuals: {
-        SceneGraph,
         Drawing,
         Svg,
         NamedColourPalette,
