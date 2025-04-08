@@ -1,8 +1,6 @@
-
-import expect from 'expect';
-/* eslint-disable */
-import { getSorter } from '../util/KeyValue.js';
-import type { KeyValue } from '../PrimitiveTypes.js';
+import { test, expect } from 'vitest';
+import type { KeyValue } from '../src/types.js';
+import { getSorter } from '../src/key-value.js';
 
 test(`sorting`, () => {
   const a: KeyValue[] = [

@@ -1,6 +1,6 @@
-import { toStringDefault } from "../util/ToString.js";
-import { isEqualDefault } from "../util/IsEqual.js";
-import { fromIterable as mapFromIterable } from '../maps/MapFns.js';
+import { isEqualDefault } from "./util/is-equal.js";
+import { toStringDefault } from "./util/to-string.js";
+
 
 /**
  * Returns _true_ if contents of `needles` is contained by `haystack`.
@@ -65,14 +65,15 @@ export const contains = <V>(
  * @returns
  */
 export const containsDuplicateValues = <V>(
-  array: Array<V> | ReadonlyArray<V>,
+  data: Iterable<V>,
   keyFunction = toStringDefault<V>
 ): boolean => {
-  if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
-  try {
-    const _ = mapFromIterable(array, keyFunction);
-  } catch {
-    return true;
+  if (typeof data !== `object`) throw new Error(`Param 'data' is expected to be an Iterable. Got type: ${ typeof data }`);
+  const set = new Set<string>();
+  for (const v of data) {
+    const str = keyFunction(v);
+    if (set.has(str)) return true;
+    set.add(str);
   }
   return false;
 };

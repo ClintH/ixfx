@@ -1,5 +1,5 @@
-import expect from 'expect';
-import { toStringDefault } from '../util/ToString.js';
+import { test, expect } from 'vitest';
+import { toStringDefault } from '../src/to-string.js';
 
 test(`toStringDefault`, () => {
   const a = {

@@ -1,11 +1,23 @@
-import expect from 'expect';
+import { test, expect } from 'vitest';
+import { ifNaN, percentTest, integerTest, integerParse, isInteger, integerArrayTest } from '../src/numbers.js';
 
-import { isStringArray } from '../util/GuardArrays.js';
-import { ifNaN, percentTest, integerTest, integerParse } from '../util/GuardNumbers.js';
-import { isPlainObjectOrPrimitive, isPlainObject } from '../util/GuardObject.js';
-import { isInteger } from '../util/IsInteger.js';
+test('ifNaN', () => {
+  expect(ifNaN(Number.NaN, 10)).toBe(10);
+  expect(ifNaN(200, 10)).toBe(200);
+  // @ts-ignore
+  expect(() => ifNaN(null, 10)).toThrow();
+  // @ts-ignore
+  expect(() => ifNaN(undefined, 10)).toThrow();
+  // @ts-ignore
+  expect(() => ifNaN('100', 10)).toThrow();
+});
+
+test(`integerArrayTest`, () => {
+  expect(integerArrayTest([ 1, 2, 3 ])[ 0 ]).toBeTruthy()
+  expect(integerArrayTest([ 1, 2.3, 3 ])[ 0 ]).toBeFalsy();
 
 
+})
 test('isInteger', () => {
   // Nunber inputs
   expect(isInteger(1)).toBe(true);
@@ -29,53 +41,6 @@ test('isInteger', () => {
   // @ts-expect-error
   expect(isInteger(new Map())).toBe(false);
 
-});
-
-test('isPlainObjectOrPrimitive', () => {
-  expect(isPlainObjectOrPrimitive(`hello`)).toBe(true);
-  expect(isPlainObjectOrPrimitive(10)).toBe(true);
-  expect(isPlainObjectOrPrimitive({ hello: `there` })).toBe(true);
-  expect(isPlainObjectOrPrimitive(undefined)).toBe(false);
-  expect(isPlainObjectOrPrimitive(null)).toBe(false);
-  expect(isPlainObjectOrPrimitive(Number)).toBe(false);
-  if (typeof window !== `undefined`) {
-    expect(isPlainObjectOrPrimitive(window)).toBe(false);
-  }
-
-});
-
-test('isPlainObject', () => {
-  expect(isPlainObject(undefined)).toBe(false);
-  expect(isPlainObject(null)).toBe(false);
-  expect(isPlainObject(`hello`)).toBe(false);
-  expect(isPlainObject(10)).toBe(false);
-  expect(isPlainObject(Number)).toBe(false);
-  if (typeof window !== `undefined`) {
-    expect(isPlainObject(window)).toBe(false);
-  }
-  expect(isPlainObject({ hello: `there` })).toBe(true);
-
-});
-
-test('ifNaN', () => {
-  expect(ifNaN(Number.NaN, 10)).toBe(10);
-  expect(ifNaN(200, 10)).toBe(200);
-  // @ts-ignore
-  expect(() => ifNaN(null, 10)).toThrow();
-  // @ts-ignore
-  expect(() => ifNaN(undefined, 10)).toThrow();
-  // @ts-ignore
-  expect(() => ifNaN('100', 10)).toThrow();
-});
-
-
-test(`isStringArray`, () => {
-  expect(isStringArray([ `a`, `b`, `c` ])).toBe(true);
-  expect(isStringArray([ 'a' ])).toBe(true);
-  expect(isStringArray([ `a`, `b`, false ])).toBe(false);
-  expect(isStringArray([ `a`, `b`, null ])).toBe(false);
-  expect(isStringArray([ `a`, `b`, true ])).toBe(false);
-  expect(isStringArray([ `a`, `b`, {} ])).toBe(false);
 });
 
 test(`percent`, () => {

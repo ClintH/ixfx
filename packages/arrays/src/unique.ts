@@ -32,11 +32,11 @@ export const uniqueDeep = <V>(
     | readonly V[]
     | readonly (readonly V[])[],
   comparer = isEqualDefault<V>
-): readonly V[] => {
+): V[] => {
   const t: V[] = [];
-  const contains = (v:V) => {
+  const contains = (v: V) => {
     for (const tValue of t) {
-      if (comparer(tValue,v)) return true;
+      if (comparer(tValue, v)) return true;
     }
     return false;
   }
@@ -82,9 +82,9 @@ export const unique = <V>(
     | readonly V[]
     | readonly (readonly V[])[],
   toString = toStringDefault
-): readonly V[] => {
+): V[] => {
   const matching = new Set<string>();
-  const t:V[] = [];
+  const t: V[] = [];
   const flattened = arrays.flat(10) as V[];
   for (const a of flattened) {
     const stringRepresentation = toString(a);

@@ -1,4 +1,4 @@
-import type { MergeReconcile } from "./Types.js";
+import type { MergeReconcile } from "../../../holding/core/src/arrays/Types.js";
 
 /**
  * Merges arrays left to right, using the provided

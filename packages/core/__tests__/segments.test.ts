@@ -1,5 +1,5 @@
-import expect from 'expect';
-import { stringSegmentsLastToWhole, stringSegmentsFirstToWhole, stringSegmentsWholeToFirst, stringSegmentsWholeToEnd } from '../../text/Segments.js';
+import { test, expect } from 'vitest';
+import { stringSegmentsLastToWhole, stringSegmentsFirstToWhole, stringSegmentsWholeToFirst, stringSegmentsWholeToEnd } from '../src/text.js';
 
 test(`stringSegmentsEndToStart`, () => {
   const result = [ ...stringSegmentsLastToWhole(`a.b.c.d`, `.`) ];

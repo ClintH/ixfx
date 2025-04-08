@@ -1,4 +1,4 @@
-import { defaultComparer, type Comparer } from "../util/Comparers.js";
+import { defaultComparer, type Comparer } from "@ixfxfun/core";
 
 /**
  * Returns an immutable wrapper around an array, initially unsorted.

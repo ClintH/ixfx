@@ -6,8 +6,9 @@
 export type RandomSource = () => number;
 
 
-export type WeightedOptions = RandomOptions &  Readonly<{
-  easingFunction: (v:number)=>number
+export type WeightedOptions = RandomOptions & Readonly<{
+  easingFunction: (v: number) => number
+  easing?: string
 }>;
 
 export type StringOptions = Readonly<{

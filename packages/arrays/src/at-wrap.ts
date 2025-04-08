@@ -1,4 +1,4 @@
-import { throwNumberTest } from "../util/GuardNumbers.js"
+import { throwNumberTest } from "@ixfxfun/guards"
 
 export const atWrap = <V>(array: Array<V>, index: number) => {
   throwNumberTest(index, ``, `index`);

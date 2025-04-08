@@ -71,13 +71,13 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
  * Use {@link integerSource} to return a function instead.
  *
  * ```js
- * integer(10);  // Random number 0-9
+ * integer(10);  // Random number 0,1..9
  * ```
  *
  * If a negative value is given, this is assumed to be the
  * minimum (inclusive), with 0 as the max (inclusive)
  * ```js
- * integer(-5);  // Random number from -5 to 0
+ * integer(-5);  // Random number -5,-4,...0
  * ```
  *
  * Specify options for a custom minimum or source of random:

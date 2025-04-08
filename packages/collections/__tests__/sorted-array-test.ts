@@ -1,5 +1,5 @@
-import expect from 'expect';
-import { Sorted } from '../../data/arrays/index.js';
+import { test, expect } from 'vitest';
+import * as Sorted from '../src/sorted-array.js';
 
 test(`indexOf`, () => {
   const array1 = [ 1, 2, 3, 4, 5 ];

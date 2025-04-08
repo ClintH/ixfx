@@ -224,6 +224,24 @@ export const integerTest = (
   return [ true ];
 };
 
+export const integerArrayTest = (numbers: Iterable<number>): GuardResult => {
+  for (const v of numbers) {
+    if (Math.abs(v) % 1 !== 0) return [ false, `Value is not an integer: ${ v }` ];
+  }
+  return [ true ];
+};
+
+/**
+ * Returns _true_ if `value` is an integer in number or string form
+ * @param value 
+ * @returns 
+ */
+export const isInteger = (value: number | string): boolean => {
+  if (typeof value === `string`) value = Number.parseFloat(value);
+  const r = integerTest(value);
+  return r[ 0 ];
+}
+
 export const throwIntegerTest = (value: number | undefined,
   range: NumberGuardRange = ``,
   parameterName = `?`) => {

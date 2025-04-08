@@ -1,119 +1,144 @@
-import expect from 'expect';
-import * as Immutable from '../data/Pathed.js';
-import { compareArrays, changedDataFields } from '../data/Compare.js';
-import { isEmptyEntries } from '../data/Util.js';
+import { test, expect, describe } from 'vitest';
+import { compareArrays, changedObjectDataFields } from '../src/records/compare.js';
+import { isEmptyEntries } from '../src/is-equal.js';
+import { compareIterableValuesShallow } from '../src/iterable-compare-values-shallow.js';
 
 const objectEmpty = (o: object) => Object.entries(o).length === 0;
 
-test(`compare-data-array`, () => {
-  // Removing an item
-  const r1 = compareArrays([ `one`, `two`, `three` ], [ `one`, `two` ]);
-  expect(r1.isArray).toBe(true);
-  expect(r1.hasChanged).toBe(true);
-  expect(isEmptyEntries(r1.changed)).toBe(true);
-  expect(isEmptyEntries(r1.added)).toBe(true);
-  expect(r1.removed).toEqual([ 2 ]);
-  expect(r1.summary).toEqual([ [ `del`, 2, `three` ] ]);
+describe(`compare`, () => {
 
-  // Adding
-  const r2 = compareArrays([ `one`, `two`, `three` ], [ `one`, `apple`, `two`, `three` ]);
-  expect(r2.isArray).toBe(true);
-  expect(r2.hasChanged).toBe(true);
-  expect(r2.added).toEqual({ 3: 'three' });
-  expect(r2.changed).toEqual({ 1: `apple`, 2: 'two' });
-  expect(r2.summary).toEqual(
-    [ [ `mutate`, 1, `apple` ], [ `mutate`, 2, `two` ], [ `add`, 3, `three` ] ]
-  );
+  test(`compare-array`, () => {
+    // Removing an item
+    const r1 = compareArrays([ `one`, `two`, `three` ], [ `one`, `two` ]);
+    expect(r1.isArray).toBe(true);
+    expect(r1.hasChanged).toBe(true);
+    expect(isEmptyEntries(r1.changed)).toBe(true);
+    expect(isEmptyEntries(r1.added)).toBe(true);
+    expect(r1.removed).toEqual([ 2 ]);
+    expect(r1.summary).toEqual([ [ `del`, 2, `three` ] ]);
 
-  // Changing
-  const r3 = compareArrays([ `one`, `two`, `three` ], [ `one`, `twotwo`, `three` ]);
-  expect(r3.isArray).toBe(true);
-  expect(r3.hasChanged).toBe(true);
-  expect(isEmptyEntries(r3.children)).toBe(true);
-  expect(isEmptyEntries(r3.added)).toBe(true);
-  expect(r3.removed.length === 0).toBe(true);
-  expect(r3.changed).toEqual({ 1: 'twotwo' })
-  expect(r3.summary).toEqual([ [ `mutate`, 1, `twotwo` ] ]);
+    // Adding
+    const r2 = compareArrays([ `one`, `two`, `three` ], [ `one`, `apple`, `two`, `three` ]);
+    expect(r2.isArray).toBe(true);
+    expect(r2.hasChanged).toBe(true);
+    expect(r2.added).toEqual({ 3: 'three' });
+    expect(r2.changed).toEqual({ 1: `apple`, 2: 'two' });
+    expect(r2.summary).toEqual(
+      [ [ `mutate`, 1, `apple` ], [ `mutate`, 2, `two` ], [ `add`, 3, `three` ] ]
+    );
 
-  // Not chaging
-  const r5 = compareArrays([ `one`, `two`, `three` ], [ `one`, `two`, `three` ]);
-  expect(r5.hasChanged).toBe(false);
+    // Changing
+    const r3 = compareArrays([ `one`, `two`, `three` ], [ `one`, `twotwo`, `three` ]);
+    expect(r3.isArray).toBe(true);
+    expect(r3.hasChanged).toBe(true);
+    expect(isEmptyEntries(r3.children)).toBe(true);
+    expect(isEmptyEntries(r3.added)).toBe(true);
+    expect(r3.removed.length === 0).toBe(true);
+    expect(r3.changed).toEqual({ 1: 'twotwo' })
+    expect(r3.summary).toEqual([ [ `mutate`, 1, `twotwo` ] ]);
 
-});
+    // Not chaging
+    const r5 = compareArrays([ `one`, `two`, `three` ], [ `one`, `two`, `three` ]);
+    expect(r5.hasChanged).toBe(false);
 
-test('changedDataFields', () => {
-  const a = {
-    position: { x: 1, y: 1 },
-    message: `hello`,
-    v: 10,
-    flag: true
-  };
-
-  const r1 = changedDataFields(a, { ...a });
-  expect(objectEmpty(r1)).toBe(true);
-
-  const r2 = changedDataFields(a, {
-    ...a,
-    message: `hello!`,
   });
-  expect(Object.entries(r2).length).toBe(1);
-  expect((r2 as any).message).toBe(`hello!`);
 
-  const r3 = changedDataFields(a, {
-    ...a,
-    position: { x: 10, y: 1 },
-    message: `hello!`,
+  test('changedObjectDataFields', () => {
+    const a = {
+      position: { x: 1, y: 1 },
+      message: `hello`,
+      v: 10,
+      flag: true
+    };
+
+    const r1 = changedObjectDataFields(a, { ...a });
+    expect(objectEmpty(r1)).toBe(true);
+
+    const r2 = changedObjectDataFields(a, {
+      ...a,
+      message: `hello!`,
+    });
+    expect(Object.entries(r2).length).toBe(1);
+    expect((r2 as any).message).toBe(`hello!`);
+
+    const r3 = changedObjectDataFields(a, {
+      ...a,
+      position: { x: 10, y: 1 },
+      message: `hello!`,
+    });
+    expect(Object.entries(r3).length).toBe(2);
+    expect((r3 as any).message).toBe(`hello!`);
+    expect((r3 as any).position).toEqual({ x: 10 });
+    //console.log(`changedObjectDataFields done`);
   });
-  expect(Object.entries(r3).length).toBe(2);
-  expect((r3 as any).message).toBe(`hello!`);
-  expect((r3 as any).position).toEqual({ x: 10 });
-  //console.log(`changedDataFields done`);
-});
 
-test(`changedDataFields-array`, () => {
-  // Arrays
-  const a = {
-    value: 10,
-    colours: [ `red`, `blue`, `green` ]
-  };
-  const rr1 = changedDataFields(a, structuredClone(a));
-  expect(objectEmpty(rr1)).toBe(true);
+  test(`changedObjectDataFields-array`, () => {
+    // Arrays
+    const a = {
+      value: 10,
+      colours: [ `red`, `blue`, `green` ]
+    };
+    const rr1 = changedObjectDataFields(a, structuredClone(a));
+    expect(objectEmpty(rr1)).toBe(true);
 
-  // Additional value
-  const r2 = changedDataFields(a, {
-    ...a,
-    colours: [ `red`, `blue`, `green`, `yellow` ]
+    // Additional value
+    const r2 = changedObjectDataFields(a, {
+      ...a,
+      colours: [ `red`, `blue`, `green`, `yellow` ]
+    });
+    expect(r2).toEqual({ colours: [ `red`, `blue`, `green`, `yellow` ] });
+
+    // Changed order
+    const r3 = changedObjectDataFields(a, {
+      ...a,
+      colours: [ `green`, `red`, `blue` ]
+    });
+    expect(r3).toEqual({ colours: [ `green`, `red`, `blue` ] });
+
+    // Removed from end
+    const r4a = changedObjectDataFields(a, {
+      ...a,
+      colours: [ `red`, `blue` ]
+    });
+    expect(r4a).toEqual({ colours: [ `red`, `blue` ] });
+
+    // Remove from beginning
+    const r4b = changedObjectDataFields(a, {
+      ...a,
+      colours: [ `blue`, `green` ]
+    });
+    expect(r4b).toEqual({ colours: [ `blue`, `green` ] });
+
+    // Remove from middle
+    const r4c = changedObjectDataFields(a, {
+      ...a,
+      colours: [ `red`, `green` ]
+    });
+    expect(r4c).toEqual({ colours: [ `red`, `green` ] });
+
   });
-  expect(r2).toEqual({ colours: [ `red`, `blue`, `green`, `yellow` ] });
 
-  // Changed order
-  const r3 = changedDataFields(a, {
-    ...a,
-    colours: [ `green`, `red`, `blue` ]
+
+
+  test(`compare-values`, () => {
+    const a = [ 'apples', 'oranges', 'pears' ];
+    const b = [ 'pears', 'kiwis', 'bananas' ];
+    const r = compareIterableValuesShallow(a, b);
+    expect(r.shared).toEqual([ 'pears' ]);
+    expect(r.a).toEqual([ 'apples', 'oranges' ]);
+    expect(r.b).toEqual([ 'kiwis', 'bananas' ]);
+
+    const a1 = [ 'apples', 'oranges' ];
+    const b1 = [ 'oranges', 'apples' ];
+
+    const aa = [ { name: 'John' }, { name: 'Mary' }, { name: 'Sue' } ];
+    const bb = [ { name: 'John' }, { name: 'Mary' }, { name: 'Jane' } ];
+    const rr = compareIterableValuesShallow(aa, bb, (a, b) => a.name === b.name);
+    expect(rr.shared).toEqual([ { name: 'John' }, { name: 'Mary' } ]);
+    expect(rr.a).toEqual([ { name: 'Sue' } ]);
+    expect(rr.b).toEqual([ { name: 'Jane' } ]);
+
   });
-  expect(r3).toEqual({ colours: [ `green`, `red`, `blue` ] });
-
-  // Removed from end
-  const r4a = changedDataFields(a, {
-    ...a,
-    colours: [ `red`, `blue` ]
-  });
-  expect(r4a).toEqual({ colours: [ `red`, `blue` ] });
-
-  // Remove from beginning
-  const r4b = changedDataFields(a, {
-    ...a,
-    colours: [ `blue`, `green` ]
-  });
-  expect(r4b).toEqual({ colours: [ `blue`, `green` ] });
-
-  // Remove from middle
-  const r4c = changedDataFields(a, {
-    ...a,
-    colours: [ `red`, `green` ]
-  });
-  expect(r4c).toEqual({ colours: [ `red`, `green` ] });
-
 });
 
 // test(`compareData-array`, t => {

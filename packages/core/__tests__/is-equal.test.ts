@@ -1,11 +1,10 @@
-import expect from 'expect';
+import { test, expect } from 'vitest';
 import {
   isEqualDefault,
   isEqualValueDefault,
   isEqualValueIgnoreOrder,
   isEqualValuePartial
-} from '../util/IsEqual.js'
-
+} from '../src/is-equal.js'
 
 test(`isEqualValuePartial`, () => {
   const obj1 = {
