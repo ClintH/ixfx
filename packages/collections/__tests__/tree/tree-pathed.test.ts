@@ -1,10 +1,9 @@
-import expect from 'expect';
-import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children, prettyPrint } from '../../../collections/tree/TraverseObject.js';
-import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
-import * as TreeArrayBacked from '../../../collections/tree/TreeMutable.js';
-import * as TreePathed from '../../../collections/tree/Pathed.js';
+import { test, expect } from 'vitest';
 
-import { isEqualValueDefault } from '../../../util/IsEqual.js';
+import * as TreeArrayBacked from '../../src/tree/TreeMutable.js';
+import * as TreePathed from '../../src/tree/Pathed.js';
+import { isEqualValueDefault } from '@ixfxfun/core';
+
 
 test(`tree-dotted-path`, () => {
   const root = TreePathed.addValueByPath({}, 'c');

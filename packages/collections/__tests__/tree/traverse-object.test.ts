@@ -1,8 +1,9 @@
-import expect from 'expect';
-import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../../collections/tree/TraverseObject.js';
-import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
-import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
-import { isEqualValueDefault, isEqualValuePartial } from '../../../util/IsEqual.js';
+import { test, expect } from 'vitest';
+import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../src/tree/TraverseObject.js';
+import * as TraversableTree from '../../src/tree/TraversableTree.js';
+import * as TreeMutable from '../../src/tree/TreeMutable.js';
+import { isEqualValueDefault, isEqualValuePartial } from '@ixfxfun/core';
+
 
 function getTestMap() {
   const testMap = new Map();
@@ -86,7 +87,7 @@ test(`follow-value`, () => {
   callbackCount = 0;
   iterCount = 0;
   const pathSplit = `kids.1.name`.split('.');
-  const results = [];
+  const results: any[] = [];
   for (const fv of TraversableTree.followValue(r1, (node) => {
     callbackCount++;
     if (node.name === pathSplit[ 0 ]) {
@@ -99,8 +100,13 @@ test(`follow-value`, () => {
     results.push(fv);
   }
 
-  t.like(results, [
-    { name: `kids`, ancestors: [ `obj` ] },
+  expect(results).toEqual([
+    {
+      name: `kids`, ancestors: [ `obj` ], value: [
+        { address: { number: 35, street: "West St" }, name: "John" },
+        { name: "Sam" }
+      ]
+    },
     { name: `1`, value: { name: `Sam` }, ancestors: [ `obj`, `kids` ] },
     { name: `name`, value: `Sam`, ancestors: [ `obj`, `kids`, `1` ] }
   ]);
@@ -159,11 +165,11 @@ test(`as-traversable-array`, () => {
 
 
 test('direct-children', () => {
-  t.like([ ...children(getTestObject()) ], [
-    { name: "name", nodeValue: "Jill" },
-    { name: "address", sourceValue: { number: 27, street: "Blah St" } },
+  expect([ ...children(getTestObject()) ]).toEqual([
+    { name: "name", nodeValue: "Jill", sourceValue: "Jill" },
+    { name: "address", nodeValue: undefined, sourceValue: { number: 27, street: "Blah St" } },
     {
-      name: "kids", sourceValue: [
+      name: "kids", nodeValue: undefined, sourceValue: [
         {
           address: {
             number: 35,
@@ -185,7 +191,7 @@ test('direct-children', () => {
       b: 0.5
     }
   }
-  t.like([ ...children(simpleObject) ], [
+  expect([ ...children(simpleObject) ]).toEqual([
     {
       name: "colour", sourceValue: {
         b: 0.5,
@@ -195,7 +201,7 @@ test('direct-children', () => {
     } ]);
 
   const colours = [ { r: 1, g: 0, b: 0 }, { r: 0, g: 1, b: 0 }, { r: 0, g: 0, b: 1 } ];
-  t.like([ ...children(colours, { name: 'colours' }) ], [
+  expect([ ...children(colours, { name: 'colours' }) ]).toEqual([
     { name: "0", sourceValue: { r: 1, g: 0, b: 0 } },
     { name: "1", sourceValue: { r: 0, g: 1, b: 0 } },
     { name: "2", sourceValue: { r: 0, g: 0, b: 1 } },
@@ -207,25 +213,35 @@ test('trace-by-path', () => {
   const opts: PathOpts = {
     separator: '.'
   }
-  t.like([ ...traceByPath('kids.1', o, opts) ],
+  expect([ ...traceByPath('kids.1', o, opts) ]).toEqual(
     [
-      { name: "kids", ancestors: [], nodeValue: undefined },
+      {
+        name: "kids", ancestors: [], nodeValue: undefined, sourceValue: [
+          { address: { number: 35, street: "West St" }, name: "John" },
+          { name: "Sam" }
+        ]
+      },
       { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" } }
     ]);
 
-  t.like([ ...traceByPath('kids.1.name', o, opts) ],
+  expect([ ...traceByPath('kids.1.name', o, opts) ]).toEqual(
     [
-      { name: "kids", ancestors: [], nodeValue: undefined },
-      { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" } },
-      { name: "name", ancestors: [ `kids`, `1` ], nodeValue: "Sam" }
+      {
+        name: "kids", ancestors: [], nodeValue: undefined, sourceValue: [
+          { address: { number: 35, street: "West St" }, name: "John" },
+          { name: "Sam" }
+        ]
+      },
+      { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" }, nodeValue: undefined },
+      { name: "name", ancestors: [ `kids`, `1` ], nodeValue: "Sam", sourceValue: "Sam" }
     ]);
 
-  t.like([ ...traceByPath('address.street', o, opts) ], [
-    { name: "address", sourceValue: { "number": 27, "street": "Blah St" } },
-    { name: "street", nodeValue: "Blah St" }
+  expect([ ...traceByPath('address.street', o, opts) ]).toEqual([
+    { name: "address", sourceValue: { "number": 27, "street": "Blah St" }, ancestors: [] },
+    { name: "street", nodeValue: "Blah St", sourceValue: "Blah St", ancestors: [ "address" ] }
   ]);
 
-  t.like([ ...traceByPath('kids.0.address.street', o, opts) ], [
+  expect([ ...traceByPath('kids.0.address.street', o, opts) ]).toEqual([
     {
       name: "kids", sourceValue: [
         {
@@ -253,13 +269,13 @@ test('trace-by-path', () => {
         number: 35
       }, ancestors: [ `kids`, `0` ]
     },
-    { name: "street", nodeValue: "West St", ancestors: [ `kids`, `0`, `address` ] }
+    { name: "street", nodeValue: "West St", sourceValue: "West St", ancestors: [ `kids`, `0`, `address` ] }
   ]);
 
 
   const t2 = getTestMap();
 
-  t.like([ ...traceByPath('jill.address.street', t2, opts) ], [
+  expect([ ...traceByPath('jill.address.street', t2, opts) ]).toEqual([
     {
       name: "jill", sourceValue: {
         address: {
@@ -274,11 +290,11 @@ test('trace-by-path', () => {
         number: 27
       }, ancestors: [ `jill` ]
     },
-    { name: "street", nodeValue: "Blah St", ancestors: [ `jill`, `address` ] }
+    { name: "street", nodeValue: "Blah St", sourceValue: "Blah St", ancestors: [ `jill`, `address` ] }
   ]);
 
   // Unknown path
-  t.like([ ...traceByPath('jill.address.street2', t2, opts) ], [
+  expect([ ...traceByPath('jill.address.street2', t2, opts) ]).toEqual([
     {
       name: "jill", sourceValue: {
         address: {
@@ -309,15 +325,15 @@ test('get-by-path', () => {
     }
   }
   const postcode = getByPath('jane.address.postcode', people);
-  t.like(postcode, { name: "postcode", nodeValue: 1000 });
-  t.like(getByPath('jane.address.country', people), { name: 'country', nodeValue: undefined });
-  t.like(getByPath('jane.address.country.state', people), { name: 'country', nodeValue: undefined });
+  expect(postcode).toEqual({ ancestors: [ "jane", "address" ], name: "postcode", nodeValue: 1000, sourceValue: 1000 });
+  expect(getByPath('jane.address.country', people)).toEqual({ ancestors: [ "jane", "address" ], name: 'country', nodeValue: undefined, sourceValue: undefined });
+  expect(getByPath('jane.address.country.state', people)).toEqual({ ancestors: [ "jane", "address" ], name: 'country', nodeValue: undefined, sourceValue: undefined });
 
-  t.like([ ...traceByPath('jane.address.street.toofar', people) ], [
-    { name: "jane", sourceValue: { address: { postcode: 1000, street: 'West St', city: 'Blahville' }, colour: 'red' } },
-    { name: "address", sourceValue: { postcode: 1000, street: 'West St', city: 'Blahville' } },
-    { name: "street", nodeValue: "West St" },
-    { name: "toofar", nodeValue: undefined }
+  expect([ ...traceByPath('jane.address.street.toofar', people) ]).toEqual([
+    { name: "jane", sourceValue: { address: { postcode: 1000, street: 'West St', city: 'Blahville' }, colour: 'red' }, ancestors: [], nodeValue: undefined },
+    { name: "address", sourceValue: { postcode: 1000, street: 'West St', city: 'Blahville' }, ancestors: [ "jane" ], nodeValue: undefined },
+    { name: "street", nodeValue: "West St", ancestors: [ "jane", "address" ], sourceValue: "West St" },
+    { name: "toofar", nodeValue: undefined, ancestors: [ "jane", "address", "street" ], sourceValue: undefined }
   ]);
 
 });

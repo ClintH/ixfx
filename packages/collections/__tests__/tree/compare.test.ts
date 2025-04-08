@@ -1,6 +1,6 @@
-import expect from 'expect';
-import * as Trees from '../../../collections/tree/index.js';
-import { toStringAbbreviate } from '../../../text/Text.js';
+import { expect, test } from 'vitest';
+import * as Trees from '../../src/tree/index.js';
+//import { toStringAbbreviate } from '../../../text/Text.js';
 
 function getTestObj() {
   const testObj = {

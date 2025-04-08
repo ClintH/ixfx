@@ -1,8 +1,5 @@
-import expect from 'expect';
-/* eslint-disable */
-import { StackImmutable } from '../../../collections/stack/StackImmutable.js';
-import { arrayValuesEqual } from '../../Include.js';
-
+import { test, expect } from 'vitest';
+import { StackImmutable } from '../../src/stack/StackImmutable.js';
 test(`enumeration`, () => {
   let s = new StackImmutable<string>();
   s = s.push(`a`);
@@ -43,8 +40,8 @@ test(`basic`, () => {
 
   // Tests immutability and stack ordering
   expect(a.data.length === 0).toBe(true);
-  arrayValuesEqual(t, b.data, [ `test` ]);
-  arrayValuesEqual(t, c.data, [
+  expect(b.data).toEqual([ `test` ]);
+  expect(c.data).toEqual([
     `test`,
     `test0`,
     `test1`,
@@ -62,7 +59,7 @@ test(`basic`, () => {
     `test13`,
     `test14`,
   ]);
-  arrayValuesEqual(t, d.data, [
+  expect(d.data).toEqual([
     `test`,
     `test0`,
     `test1`,
@@ -100,7 +97,7 @@ test(`bounded`, () => {
     [ `test0`, `test1` ]
   );
   e = e.push(`test2`, `test3`, `test4`); // Only test2 should make it in
-  arrayValuesEqual(t, e.data, [ `test0`, `test1`, `test2` ]);
+  expect(e.data).toEqual([ `test0`, `test1`, `test2` ]);
 
   // Discard additions: already full
   e = new StackImmutable<string>({ capacity: 3, discardPolicy: `additions` }, [
@@ -109,7 +106,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   e = e.push(`test3`, `test4`, `test5`); // Nothing can get in
-  arrayValuesEqual(t, e.data, [ `test0`, `test1`, `test2` ]);
+  expect(e.data).toEqual([ `test0`, `test1`, `test2` ]);
 
   // Discard additions: let everything in
   e = new StackImmutable<string>({ capacity: 6, discardPolicy: `additions` }, [
@@ -118,7 +115,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   e = e.push(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, e.data, [
+  expect(e.data).toEqual([
     `test0`,
     `test1`,
     `test2`,
@@ -134,7 +131,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, f.data, [ `test2`, `test3`, `test4`, `test5` ]);
+  expect(f.data).toEqual([ `test2`, `test3`, `test4`, `test5` ]);
 
   // Older items are discarded - complete flush
   f = new StackImmutable<string>({ capacity: 4, discardPolicy: `older` }, [
@@ -143,7 +140,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`, `test4`, `test5`, `test6`, `test7`);
-  arrayValuesEqual(t, f.data, [ `test4`, `test5`, `test6`, `test7` ]);
+  expect(f.data).toEqual([ `test4`, `test5`, `test6`, `test7` ]);
 
   // Older items are discarded  - exact flush
   f = new StackImmutable<string>({ capacity: 3, discardPolicy: `older` }, [
@@ -152,7 +149,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, f.data, [ `test3`, `test4`, `test5` ]);
+  expect(f.data).toEqual([ `test3`, `test4`, `test5` ]);
 
   // Newer items are discarded - partial flush
   f = new StackImmutable<string>({ capacity: 4, discardPolicy: `newer` }, [
@@ -161,7 +158,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, f.data, [ `test0`, `test3`, `test4`, `test5` ]);
+  expect(f.data).toEqual([ `test0`, `test3`, `test4`, `test5` ]);
 
   // Newer items are discarded - complete flush
   f = new StackImmutable<string>({ capacity: 4, discardPolicy: `newer` }, [
@@ -170,7 +167,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`, `test4`, `test5`, `test6`, `test7`);
-  arrayValuesEqual(t, f.data, [ `test4`, `test5`, `test6`, `test7` ]);
+  expect(f.data).toEqual([ `test4`, `test5`, `test6`, `test7` ]);
 
   // Newer items are discarded - exact flush
   f = new StackImmutable<string>({ capacity: 3, discardPolicy: `newer` }, [
@@ -179,7 +176,7 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`, `test4`, `test5`);
-  arrayValuesEqual(t, f.data, [ `test3`, `test4`, `test5` ]);
+  expect(f.data).toEqual([ `test3`, `test4`, `test5` ]);
 
   // New items are discarded - Full, add one extra item
   f = new StackImmutable<string>({ capacity: 3, discardPolicy: `newer` }, [
@@ -188,5 +185,5 @@ test(`bounded`, () => {
     `test2`,
   ]);
   f = f.push(`test3`);
-  arrayValuesEqual(t, f.data, [ `test0`, `test1`, `test3` ]);
+  expect(f.data).toEqual([ `test0`, `test1`, `test3` ]);
 });

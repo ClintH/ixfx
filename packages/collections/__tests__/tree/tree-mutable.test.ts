@@ -1,7 +1,7 @@
-import expect from 'expect';
-import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
-import * as TreeTraverse from '../../../collections/tree/TraversableTree.js';
-import type { LabelledSingleValue } from '../../../collections/tree/Types.js';
+import { test, expect } from 'vitest';
+import * as TreeMutable from '../../src/tree/TreeMutable.js';
+import * as TreeTraverse from '../../src/tree/TraversableTree.js';
+import type { LabelledSingleValue } from '../../src/tree/Types.js';
 
 test(`compute-max-depth`, () => {
   const r = TreeMutable.root();
