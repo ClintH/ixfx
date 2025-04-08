@@ -1,8 +1,8 @@
-import test from "ava";
+import expect from 'expect';
 
 import * as Rx from '../../rx/index.js';
 import * as Flow from '../../flow/index.js';
-test(`basic`, async t => {
+test(`basic`, async () => {
   const counter = Rx.From.number(0);
   let x = 100;
   const target = Rx.From.func(() => {
@@ -20,10 +20,10 @@ test(`basic`, async t => {
     await Flow.sleep(10);
   }
   // Set 5 values, expect 5 values triggered
-  t.deepEqual(vtpValues, [ 100, 101, 102, 103, 104 ]);
+  expect(vtpValues).toEqual([ 100, 101, 102, 103, 104 ]);
 });
 
-test(`signal`, async t => {
+test(`signal`, async () => {
   const counter = Rx.From.number(0);
   const ac = new AbortController();
 
@@ -45,11 +45,11 @@ test(`signal`, async t => {
 
   }
   // Set 5 values, expect 5 values triggered
-  t.deepEqual(vtpValues, [ 100, 101, 102, 103, 104 ]);
+  expect(vtpValues).toEqual([ 100, 101, 102, 103, 104 ]);
 });
 
 
-test(`gated`, async t => {
+test(`gated`, async () => {
   const counter = Rx.From.number(0);
   let x = 100;
   const target = Rx.From.func(() => {
@@ -67,5 +67,5 @@ test(`gated`, async t => {
     await Flow.sleep(10);
   }
   // Expect only 5 entries even though we set 10 values since we gate based on odd/even
-  t.deepEqual(vtpValues, [ 100, 101, 102, 103, 104 ]);
+  expect(vtpValues).toEqual([ 100, 101, 102, 103, 104 ]);
 });

@@ -1,4 +1,4 @@
-import test, { type ExecutionContext } from 'ava';
+import expect from 'expect';
 
 import * as Points from '../../geometry/point/index.js';
 import { divide, divider } from '../../geometry/point/Divider.js';
@@ -12,56 +12,56 @@ function closeTo(t: ExecutionContext<unknown>, input: number, target: number, pe
   t.fail(`Value: ${ input } target: ${ target } diff%: ${ diff * 100 }`);
 }
 
-test(`bbox-3d`, t=> {
+test(`bbox-3d`, () => {
   const r1 = Points.bbox3d(
     {x:0,y:0,z:0},
     {x:1,y:1,z:1},
     {x:2,y:2,z:2}
   );
-  t.deepEqual(r1,{ x: 0, y: 0, width: 2, height: 2, z: 0, depth: 2 })
+  expect(r1).toEqual({ x: 0, y: 0, width: 2, height: 2, z: 0, depth: 2 })
 
   const r2 = Points.bbox3d(
     {x:0,y:0,z:0},
     {x:1,y:1,z:-1},
     {x:2,y:2,z:2}
   );
-  t.deepEqual(r2,{ x: 0, y: 0, width: 2, height: 2, z: -1, depth: 3 })
+  expect(r2).toEqual({ x: 0, y: 0, width: 2, height: 2, z: -1, depth: 3 })
 
 });
 
-test(`from-string`, t => {
-  t.deepEqual(Points.fromString(`10,20`), { x: 10, y: 20 });
-  t.deepEqual(Points.fromString(`10,20,30`), { x: 10, y: 20, z: 30 });
-  t.deepEqual(Points.fromString(`10,20,`), { x: 10, y: 20, z: NaN });
-  t.deepEqual(Points.fromString(`10,a`), { x: 10, y: NaN });
-  t.deepEqual(Points.fromString(`b,20`), { x: NaN, y: 20 });
-  t.deepEqual(Points.fromString(`asdf`), { x: NaN, y: NaN });
+test(`from-string`, () => {
+  expect(Points.fromString(`10,20`)).toEqual({ x: 10, y: 20 });
+  expect(Points.fromString(`10,20,30`)).toEqual({ x: 10, y: 20, z: 30 });
+  expect(Points.fromString(`10,20,`)).toEqual({ x: 10, y: 20, z: NaN });
+  expect(Points.fromString(`10,a`)).toEqual({ x: 10, y: NaN });
+  expect(Points.fromString(`b,20`)).toEqual({ x: NaN, y: 20 });
+  expect(Points.fromString(`asdf`)).toEqual({ x: NaN, y: NaN });
 
 });
 
-test(`angleRadianCircle`, t => {
-  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 1 })), 45);
-  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: -1 })), 225);
-  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 0 })), 0);
-  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: 1 })), 135);
-  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: -1 })), 315);
-  t.is(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 0, y: 1 })), 90);
+test(`angleRadianCircle`, () => {
+  expect(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 1 }))).toBe(45);
+  expect(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: -1 }))).toBe(225);
+  expect(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: 0 }))).toBe(0);
+  expect(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: -1, y: 1 }))).toBe(135);
+  expect(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 1, y: -1 }))).toBe(315);
+  expect(radianToDegree(Points.angleRadianCircle({ x: 0, y: 0 }, { x: 0, y: 1 }))).toBe(90);
 
 
 });
 
 
-test(`abs`, t => {
-  t.deepEqual(Points.abs({ x: 1, y: 2 }), { x: 1, y: 2 });
-  t.deepEqual(Points.abs({ x: -1, y: 2 }), { x: 1, y: 2 });
-  t.deepEqual(Points.abs({ x: 1, y: -2 }), { x: 1, y: 2 });
+test(`abs`, () => {
+  expect(Points.abs({ x: 1, y: 2 })).toEqual({ x: 1, y: 2 });
+  expect(Points.abs({ x: -1, y: 2 })).toEqual({ x: 1, y: 2 });
+  expect(Points.abs({ x: 1, y: -2 })).toEqual({ x: 1, y: 2 });
 
-  t.deepEqual(Points.abs({ x: 1, y: 2, z: 3 }), { x: 1, y: 2, z: 3 });
-  t.deepEqual(Points.abs({ x: -1, y: 2, z: 3 }), { x: 1, y: 2, z: 3 });
-  t.deepEqual(Points.abs({ x: 1, y: -2, z: 3 }), { x: 1, y: 2, z: 3 });
+  expect(Points.abs({ x: 1, y: 2, z: 3 })).toEqual({ x: 1, y: 2, z: 3 });
+  expect(Points.abs({ x: -1, y: 2, z: 3 })).toEqual({ x: 1, y: 2, z: 3 });
+  expect(Points.abs({ x: 1, y: -2, z: 3 })).toEqual({ x: 1, y: 2, z: 3 });
 });
 
-test(`apply`, t => {
+test(`apply`, () => {
   const f = (v: number, field: string) => {
     if (field === `x`) return v * 2;
     if (field === `y`) return v * 3;
@@ -69,43 +69,43 @@ test(`apply`, t => {
     return v;
   }
 
-  t.deepEqual(Points.apply({ x: 1, y: 2, z: 3 }, f), { x: 2, y: 6, z: 30 });
-  t.deepEqual(Points.apply({ x: 1, y: 2 }, f), { x: 2, y: 6 });
+  expect(Points.apply({ x: 1, y: 2, z: 3 }, f)).toEqual({ x: 2, y: 6, z: 30 });
+  expect(Points.apply({ x: 1, y: 2 }, f)).toEqual({ x: 2, y: 6 });
 });
 
 
-test(`withinRange`, t => {
+test(`withinRange`, () => {
 
-  t.true(Points.withinRange({ x: -1, y: -1 }, Points.Empty, 1));
-  t.true(Points.withinRange({ x: 1, y: 1 }, Points.Empty, 1));
-  t.false(Points.withinRange({ x: 1, y: 1 }, Points.Empty, 0));
-  t.false(Points.withinRange({ x: 2, y: 2 }, Points.Empty, 1));
+  expect(Points.withinRange({ x: -1, y: -1 }, Points.Empty, 1)).toBe(true);
+  expect(Points.withinRange({ x: 1, y: 1 }, Points.Empty, 1)).toBe(true);
+  expect(Points.withinRange({ x: 1, y: 1 }, Points.Empty, 0)).toBe(false);
+  expect(Points.withinRange({ x: 2, y: 2 }, Points.Empty, 1)).toBe(false);
 
   // Both coords have to be within range
-  t.false(Points.withinRange({ x: 1, y: 1 }, { x: 100, y: 1 }, 1));
-  t.false(Points.withinRange({ x: 1, y: 1 }, { x: 1, y: 100 }, 1));
+  expect(Points.withinRange({ x: 1, y: 1 }, { x: 100, y: 1 }, 1)).toBe(false);
+  expect(Points.withinRange({ x: 1, y: 1 }, { x: 1, y: 100 }, 1)).toBe(false);
 
-  t.true(Points.withinRange({ x: 100, y: 100 }, { x: 101, y: 101 }, 1));
-  t.true(Points.withinRange({ x: 100, y: 100 }, { x: 105, y: 101 }, { x: 5, y: 1 }));
-  t.false(Points.withinRange({ x: 100, y: 100 }, { x: 105, y: 105 }, { x: 5, y: 1 }));
+  expect(Points.withinRange({ x: 100, y: 100 }, { x: 101, y: 101 }, 1)).toBe(true);
+  expect(Points.withinRange({ x: 100, y: 100 }, { x: 105, y: 101 }, { x: 5, y: 1 })).toBe(true);
+  expect(Points.withinRange({ x: 100, y: 100 }, { x: 105, y: 105 }, { x: 5, y: 1 })).toBe(false);
 
   // With point as range
-  t.true(Points.withinRange(Points.Empty, Points.Empty, Points.Empty));
-  t.true(Points.withinRange(Points.Empty, { x: 1, y: 100 }, { x: 1, y: 100 }));
+  expect(Points.withinRange(Points.Empty, Points.Empty, Points.Empty)).toBe(true);
+  expect(Points.withinRange(Points.Empty, { x: 1, y: 100 }, { x: 1, y: 100 })).toBe(true);
 
-  t.throws(() => Points.withinRange(Points.Empty, Points.Placeholder, 1));
+  expect(() => Points.withinRange(Points.Empty, Points.Placeholder, 1)).toThrow();
   // @ts-expect-error
-  t.throws(() => Points.withinRange(Points.Empty, Points.Empty, false));
-  t.throws(() => Points.withinRange(Points.Empty, Points.Empty, Number.NaN));
+  expect(() => Points.withinRange(Points.Empty, Points.Empty, false)).toThrow();
+  expect(() => Points.withinRange(Points.Empty, Points.Empty, Number.NaN)).toThrow();
   // @ts-expect-error
-  t.throws(() => Points.withinRange({}, Points.Empty, 1));
+  expect(() => Points.withinRange({}, Points.Empty, 1)).toThrow();
   // @ts-expect-error
-  t.throws(() => Points.withinRange(Points.Empty, {}, 1));
+  expect(() => Points.withinRange(Points.Empty, {}, 1)).toThrow();
 
 
 });
 
-test(`round`, t => {
+test(`round`, () => {
   t.like(Points.round({ x: 1.12345, y: 2.6789 }, 2), { x: 1.12, y: 2.67 });
   t.like(Points.round({ x: -1.12345, y: -2.6789 }, 2), { x: -1.13, y: -2.68 });
 
@@ -118,15 +118,14 @@ test(`round`, t => {
 
 })
 
-test(`normalise`, t => {
+test(`normalise`, () => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
   t.like(Points.round(Points.normalise({ x: 5, y: 2 }), 2), { x: 0.92, y: 0.37 });
   t.like(Points.round(Points.normalise({ x: -5, y: 2 }), 2), { x: -0.93, y: 0.37 });
   t.like(Points.round(Points.normalise({ x: 5, y: -2 }), 2), { x: 0.92, y: -0.38 });
-  t.pass();
 });
 
-test(`normaliseByRect`, t => {
+test(`normaliseByRect`, () => {
   t.like(Points.normaliseByRect(100, 100, 100, 100), { x: 1, y: 1 });
   t.like(Points.normaliseByRect(0, 0, 100, 100), { x: 0, y: 0 });
   t.like(Points.normaliseByRect(50, 50, 100, 100), { x: 0.5, y: 0.5 });
@@ -139,19 +138,19 @@ test(`normaliseByRect`, t => {
   t.like(Points.normaliseByRect({ x: 50, y: 50 }, 100, 100), { x: 0.5, y: 0.5 });
 });
 
-test(`placeholder`, t => {
-  t.true(Points.isPlaceholder(Points.Placeholder));
-  t.true(Points.isPlaceholder(Points.Placeholder3d));
-  t.true(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN }));
-  t.true(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN, z: Number.NaN }));
-  t.false(Points.isPlaceholder({ x: Number.NaN, y: 1 }));
-  t.false(Points.isPlaceholder({ x: 1, y: Number.NaN }));
-  t.false(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN, z: 1 }));
-  t.false(Points.isPlaceholder({ x: 0, y: Number.NaN, z: Number.NaN }));
-  t.false(Points.isPlaceholder({ x: Number.NaN, y: 0, z: Number.NaN }));
+test(`placeholder`, () => {
+  expect(Points.isPlaceholder(Points.Placeholder)).toBe(true);
+  expect(Points.isPlaceholder(Points.Placeholder3d)).toBe(true);
+  expect(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN })).toBe(true);
+  expect(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN, z: Number.NaN })).toBe(true);
+  expect(Points.isPlaceholder({ x: Number.NaN, y: 1 })).toBe(false);
+  expect(Points.isPlaceholder({ x: 1, y: Number.NaN })).toBe(false);
+  expect(Points.isPlaceholder({ x: Number.NaN, y: Number.NaN, z: 1 })).toBe(false);
+  expect(Points.isPlaceholder({ x: 0, y: Number.NaN, z: Number.NaN })).toBe(false);
+  expect(Points.isPlaceholder({ x: Number.NaN, y: 0, z: Number.NaN })).toBe(false);
 
 });
-test(`wrap`, t => {
+test(`wrap`, () => {
   // Within range
   t.like(Points.wrap({ x: 0, y: 0 }, { x: 100, y: 100 }), { x: 0, y: 0 });
 
@@ -174,7 +173,7 @@ test(`wrap`, t => {
 
 });
 
-test(`clamp`, t => {
+test(`clamp`, () => {
   // Within range
   t.like(Points.clamp({ x: 10, y: 20 }, 0, 100), { x: 10, y: 20 });
   t.like(Points.clamp({ x: 10, y: 20, z: 30 }, 0, 100), { x: 10, y: 20, z: 30 });
@@ -197,47 +196,50 @@ test(`clamp`, t => {
 
 });
 
-test(`clampMagnitude`, t => {
+test(`clampMagnitude`, () => {
   const pt = { x: 100, y: 100 };
   const distance = Points.distance(pt);
 
   t.like(Points.clampMagnitude(pt, distance), pt);
 
   const half = Points.clampMagnitude(pt, distance / 2);
-  t.is(Points.distance(half), distance / 2);
+  expect(Points.distance(half)).toBe(distance / 2);
 
 
   const double = Points.clampMagnitude(pt, distance * 2, distance * 2);
-  t.is(Points.distance(double), distance * 2);
+  expect(Points.distance(double)).toBe(distance * 2);
 
 
 });
 
-test(`distance`, t => {
+test(`distance`, () => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
   const approx = isApprox(0.001);
-  t.true(approx(Points.distance({ x: 5, y: 2 }), 5.385164807134504))
-  t.true(approx(Points.distance({ x: -5, y: 2 }), 5.385164807134504));
-  t.true(approx(Points.distance({ x: 5, y: -2 }), 5.385164807134504));
+  expect(approx(Points.distance({ x: 5, y: 2 }), 5.385164807134504)).toBe(true)
+  expect(approx(Points.distance({ x: -5, y: 2 }), 5.385164807134504)).toBe(true);
+  expect(approx(Points.distance({ x: 5, y: -2 }), 5.385164807134504)).toBe(true);
 
   // Expected results from: https://www.calculatorsoup.com/calculators/geometry-solids/distance-two-points.php
-  t.true(approx(Points.distance({ x: 7, y: 4, z: 3 }, { x: 17, y: 6, z: 2 }), 10.246));
-  t.true(approx(Points.distance({ x: 0, y: 0, z: 0 }, { x: 17, y: 6, z: 2 }), 18.138));
-  t.true(approx(Points.distance({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }), 0));
-  t.true(approx(Points.distance({ x: 35, y: 10, z: 90 }, { x: -30, y: -12, z: -20 }), 129.649));
-
-  t.pass();
+  expect(
+    approx(Points.distance({ x: 7, y: 4, z: 3 }, { x: 17, y: 6, z: 2 }), 10.246)
+  ).toBe(true);
+  expect(
+    approx(Points.distance({ x: 0, y: 0, z: 0 }, { x: 17, y: 6, z: 2 }), 18.138)
+  ).toBe(true);
+  expect(approx(Points.distance({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }), 0)).toBe(true);
+  expect(
+    approx(Points.distance({ x: 35, y: 10, z: 90 }, { x: -30, y: -12, z: -20 }), 129.649)
+  ).toBe(true);
 });
 
-test(`angleRadian`, t => {
+test(`angleRadian`, () => {
   // Expected results from https://calculator.academy/normalize-vector-calculator/#f1p1|f2p0
   closeTo(t, Points.angleRadian({ x: 0, y: 10 }), 1.5708); // 90 degrees
   closeTo(t, Points.angleRadian({ x: 10, y: 0 }), 0); // 0 degrees
   closeTo(t, Points.angleRadian({ x: 2, y: 5 }), 1.190290375284613456); // 68 degrees
-  t.pass();
 });
 
-test(`divide`, t => {
+test(`divide`, () => {
   t.like(divide({ x: 5, y: 10 }, 2, 2), { x: 2.5, y: 5 });
   t.like(divide({ x: 10, y: 5 }, { x: 5, y: 2 }), { x: 2, y: 2.5 });
   t.like(divide({ x: 10, y: 5 }, 5, 2), { x: 2, y: 2.5 });
@@ -251,76 +253,80 @@ test(`divide`, t => {
   // expect(() => divide({x: 10, y: 0}, 1, 1)).toThrow();
 
   // B contains zero
-  t.throws(() => t.like(divide({ x: 10, y: 5 }, { x: 0, y: 10 }), { x: Infinity, y: 0.5 }));
-  t.throws(() => t.like(divide({ x: 10, y: 5 }, { x: 10, y: 0 }), { x: 1, y: Infinity }));
-  t.throws(() => divide({ x: 10, y: 5 }, 0, 10));
-  t.throws(() => divide({ x: 10, y: 5 }, 10, 0));
+  expect(
+    () => t.like(divide({ x: 10, y: 5 }, { x: 0, y: 10 }), { x: Infinity, y: 0.5 })
+  ).toThrow();
+  expect(
+    () => t.like(divide({ x: 10, y: 5 }, { x: 10, y: 0 }), { x: 1, y: Infinity })
+  ).toThrow();
+  expect(() => divide({ x: 10, y: 5 }, 0, 10)).toThrow();
+  expect(() => divide({ x: 10, y: 5 }, 10, 0)).toThrow();
 
   // B contains NaN
-  t.throws(() => divide({ x: 10, y: 5 }, NaN, 2));
-  t.throws(() => divide({ x: 10, y: 5 }, 2, NaN));
-  t.pass();
+  expect(() => divide({ x: 10, y: 5 }, NaN, 2)).toThrow();
+  expect(() => divide({ x: 10, y: 5 }, 2, NaN)).toThrow();
 });
 
-test(`empty`, t => {
-  t.true(Points.isEmpty(Points.Empty));
-  t.true(Points.isEmpty(Points.Empty3d));
-  t.true(Points.isEmpty({ x: 0, y: 0 }));
-  t.true(Points.isEmpty({ x: 0, y: 0, z: 0 }));
+test(`empty`, () => {
+  expect(Points.isEmpty(Points.Empty)).toBe(true);
+  expect(Points.isEmpty(Points.Empty3d)).toBe(true);
+  expect(Points.isEmpty({ x: 0, y: 0 })).toBe(true);
+  expect(Points.isEmpty({ x: 0, y: 0, z: 0 })).toBe(true);
 
-  t.false(Points.isEmpty(Points.Placeholder));
-  t.false(Points.isEmpty({ x: 0, y: 1 }));
-  t.false(Points.isEmpty({ x: 1, y: 0 }));
-  t.false(Points.isEmpty({ x: 0, y: 0, z: 1 }));
+  expect(Points.isEmpty(Points.Placeholder)).toBe(false);
+  expect(Points.isEmpty({ x: 0, y: 1 })).toBe(false);
+  expect(Points.isEmpty({ x: 1, y: 0 })).toBe(false);
+  expect(Points.isEmpty({ x: 0, y: 0, z: 1 })).toBe(false);
 });
 
-test(`from`, t => {
-  t.deepEqual(Points.from([ 10, 5 ]), { x: 10, y: 5 });
-  t.deepEqual(Points.from(10, 5), { x: 10, y: 5 });
+test(`from`, () => {
+  expect(Points.from([ 10, 5 ])).toEqual({ x: 10, y: 5 });
+  expect(Points.from(10, 5)).toEqual({ x: 10, y: 5 });
 
-  t.deepEqual(Points.from([ 10, 5, 2 ]), { x: 10, y: 5, z: 2 });
-  t.deepEqual(Points.from(10, 5, 2), { x: 10, y: 5, z: 2 });
+  expect(Points.from([ 10, 5, 2 ])).toEqual({ x: 10, y: 5, z: 2 });
+  expect(Points.from(10, 5, 2)).toEqual({ x: 10, y: 5, z: 2 });
 
   // @ts-ignore
-  t.throws(() => Points.from());
+  expect(() => Points.from()).toThrow();
   // @ts-ignore
-  t.throws(() => Points.from(10));
+  expect(() => Points.from(10)).toThrow();
   // @ts-ignore
-  t.throws(() => Points.from([ 10 ]));
+  expect(() => Points.from([ 10 ])).toThrow();
   // @ts-ignore
-  t.throws(() => Points.from([]));
+  expect(() => Points.from([])).toThrow();
 
 
 })
-test(`multiply`, t => {
-  t.deepEqual(Points.multiply({ x: 5, y: 10 }, 2, 3), { x: 10, y: 30 });
-  t.deepEqual(Points.multiply({ x: 5, y: 10, z: 15 }, 2, 3, 4), { x: 10, y: 30, z: 60 });
+test(`multiply`, () => {
+  expect(Points.multiply({ x: 5, y: 10 }, 2, 3)).toEqual({ x: 10, y: 30 });
+  expect(Points.multiply({ x: 5, y: 10, z: 15 }, 2, 3, 4)).toEqual({ x: 10, y: 30, z: 60 });
 
-  t.deepEqual(Points.multiply({ x: 2, y: 3 }, { x: 0.5, y: 2 }), { x: 1, y: 6 });
-  t.deepEqual(Points.multiply({ x: 2, y: 3 }, 0.5, 2), { x: 1, y: 6 });
-  t.deepEqual(Points.multiply({ x: 5, y: 10, z: 15 }, { x: 2, y: 3, z: 4 }), { x: 10, y: 30, z: 60 });
+  expect(Points.multiply({ x: 2, y: 3 }, { x: 0.5, y: 2 })).toEqual({ x: 1, y: 6 });
+  expect(Points.multiply({ x: 2, y: 3 }, 0.5, 2)).toEqual({ x: 1, y: 6 });
+  expect(Points.multiply({ x: 5, y: 10, z: 15 }, { x: 2, y: 3, z: 4 })).toEqual({ x: 10, y: 30, z: 60 });
 
-  t.deepEqual(Points.multiply({ x: 2, y: 3 }, 0, 2), { x: 0, y: 6 });
-  t.deepEqual(Points.multiply({ x: 2, y: 3 }, 2, 0), { x: 4, y: 0 });
+  expect(Points.multiply({ x: 2, y: 3 }, 0, 2)).toEqual({ x: 0, y: 6 });
+  expect(Points.multiply({ x: 2, y: 3 }, 2, 0)).toEqual({ x: 4, y: 0 });
 
-  t.throws(() => Points.multiply({ x: 10, y: 5 }, NaN, 2));
-  t.throws(() => Points.multiply({ x: 10, y: 5 }, 2, NaN));
-  t.pass();
+  expect(() => Points.multiply({ x: 10, y: 5 }, NaN, 2)).toThrow();
+  expect(() => Points.multiply({ x: 10, y: 5 }, 2, NaN)).toThrow();
 });
 
-test(`quantise`, t => {
-  t.deepEqual(Points.quantiseEvery({ x: 0, y: 0.1 }, { x: 0.1, y: 0.1 }), { x: 0, y: 0.1 });
-  t.deepEqual(Points.quantiseEvery({ x: 0, y: 0.123 }, { x: 0.1, y: 0.1 }), { x: 0, y: 0.1 });
-  t.deepEqual(Points.quantiseEvery({ x: 0.1, y: 0.18 }, { x: 0.1, y: 0.1 }), { x: 0.1, y: 0.2 });
+test(`quantise`, () => {
+  expect(Points.quantiseEvery({ x: 0, y: 0.1 }, { x: 0.1, y: 0.1 })).toEqual({ x: 0, y: 0.1 });
+  expect(Points.quantiseEvery({ x: 0, y: 0.123 }, { x: 0.1, y: 0.1 })).toEqual({ x: 0, y: 0.1 });
+  expect(Points.quantiseEvery({ x: 0.1, y: 0.18 }, { x: 0.1, y: 0.1 })).toEqual({ x: 0.1, y: 0.2 });
 
-  t.deepEqual(Points.quantiseEvery({ x: 0.5, y: 0.123 }, { x: 0.5, y: 0.1 }), { x: 0.5, y: 0.1 });
-  t.deepEqual(Points.quantiseEvery({ x: 0.9, y: 0.123 }, { x: 0.5, y: 0.1 }), { x: 1, y: 0.1 });
+  expect(Points.quantiseEvery({ x: 0.5, y: 0.123 }, { x: 0.5, y: 0.1 })).toEqual({ x: 0.5, y: 0.1 });
+  expect(Points.quantiseEvery({ x: 0.9, y: 0.123 }, { x: 0.5, y: 0.1 })).toEqual({ x: 1, y: 0.1 });
 
-  t.deepEqual(Points.quantiseEvery({ x: 0.9, y: 0.1, z: 0.123 }, { x: 0.5, y: 0.1, z: 0.1 }), { x: 1, y: 0.1, z: 0.1 });
+  expect(
+    Points.quantiseEvery({ x: 0.9, y: 0.1, z: 0.123 }, { x: 0.5, y: 0.1, z: 0.1 })
+  ).toEqual({ x: 1, y: 0.1, z: 0.1 });
 
 });
 
-test(`sum`, t => {
+test(`sum`, () => {
   t.like(Points.sum({ x: 5, y: 10 }, 1, 2), { x: 6, y: 12 });
   t.like(Points.sum({ x: 5, y: 10, z: 15 }, 1, 2, 3), { x: 6, y: 12, z: 18 });
 
@@ -332,56 +338,54 @@ test(`sum`, t => {
   t.like(Points.sum({ x: 5, y: 10, z: 15 }, -1, -2, -3), { x: 4, y: 8, z: 12 });
   t.like(Points.sum({ x: 5, y: 10 }, { x: 1, y: 2 }), { x: 6, y: 12 });
 
-  t.deepEqual(Points.sum({ x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 }), { x: 5, y: 7, z: 9 });
-  t.deepEqual(Points.sum(1, 2, 3, 4, 5, 6), { x: 5, y: 7, z: 9 });
-  t.deepEqual(Points.sum(1, 2, 3, 4), { x: 4, y: 6 });
+  expect(Points.sum({ x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 })).toEqual({ x: 5, y: 7, z: 9 });
+  expect(Points.sum(1, 2, 3, 4, 5, 6)).toEqual({ x: 5, y: 7, z: 9 });
+  expect(Points.sum(1, 2, 3, 4)).toEqual({ x: 4, y: 6 });
 
-  t.throws(() => Points.sum(NaN, 2, 0, 0));
-  t.throws(() => Points.sum(1, NaN, 0, 0));
-  t.throws(() => Points.sum(1, 2, NaN, 0));
-  t.throws(() => Points.sum(1, 2, 0, NaN));
-  t.pass();
+  expect(() => Points.sum(NaN, 2, 0, 0)).toThrow();
+  expect(() => Points.sum(1, NaN, 0, 0)).toThrow();
+  expect(() => Points.sum(1, 2, NaN, 0)).toThrow();
+  expect(() => Points.sum(1, 2, 0, NaN)).toThrow();
 });
 
-test(`compareByX`, t => {
-  t.is(Points.compareByX({ x: 10, y: 100 }, { x: 10, y: 200 }), 0);
-  t.true(Points.compareByX({ x: 100, y: 0 }, { x: 50, y: 0 }) > 0);
-  t.true(Points.compareByX({ x: 10, y: 0 }, { x: 10, y: 0 }) === 0);
-  t.true(Points.compareByX({ x: 60, y: 0 }, { x: 50, y: 0 }) > 0);
-  t.true(Points.compareByX({ x: -100, y: 0 }, { x: 50, y: 0 }) < 0);
-  t.true(Points.compareByX({ x: 0, y: 0 }, { x: 50, y: 0 }) < 0);
+test(`compareByX`, () => {
+  expect(Points.compareByX({ x: 10, y: 100 }, { x: 10, y: 200 })).toBe(0);
+  expect(Points.compareByX({ x: 100, y: 0 }, { x: 50, y: 0 }) > 0).toBe(true);
+  expect(Points.compareByX({ x: 10, y: 0 }, { x: 10, y: 0 }) === 0).toBe(true);
+  expect(Points.compareByX({ x: 60, y: 0 }, { x: 50, y: 0 }) > 0).toBe(true);
+  expect(Points.compareByX({ x: -100, y: 0 }, { x: 50, y: 0 }) < 0).toBe(true);
+  expect(Points.compareByX({ x: 0, y: 0 }, { x: 50, y: 0 }) < 0).toBe(true);
 });
 
-test(`compareByY`, t => {
-  t.is(Points.compareByY({ x: 100, y: 1 }, { x: 1000, y: 1 }), 0);
-  t.true(Points.compareByY({ y: 100, x: 0 }, { y: 50, x: 0 }) > 0);
-  t.true(Points.compareByY({ y: 10, x: 0 }, { y: 10, x: 0 }) === 0);
-  t.true(Points.compareByY({ y: 60, x: 0 }, { y: 50, x: 0 }) > 0);
-  t.true(Points.compareByY({ y: -100, x: 0 }, { y: 50, x: 0 }) < 0);
-  t.true(Points.compareByY({ y: 0, x: 0 }, { y: 50, x: 0 }) < 0);
+test(`compareByY`, () => {
+  expect(Points.compareByY({ x: 100, y: 1 }, { x: 1000, y: 1 })).toBe(0);
+  expect(Points.compareByY({ y: 100, x: 0 }, { y: 50, x: 0 }) > 0).toBe(true);
+  expect(Points.compareByY({ y: 10, x: 0 }, { y: 10, x: 0 }) === 0).toBe(true);
+  expect(Points.compareByY({ y: 60, x: 0 }, { y: 50, x: 0 }) > 0).toBe(true);
+  expect(Points.compareByY({ y: -100, x: 0 }, { y: 50, x: 0 }) < 0).toBe(true);
+  expect(Points.compareByY({ y: 0, x: 0 }, { y: 50, x: 0 }) < 0).toBe(true);
 });
 
-test(`subtract`, t => {
-  t.deepEqual(Points.subtract({ x: 5, y: 10 }, 1, 2), { x: 4, y: 8 });
-  t.deepEqual(Points.subtract({ x: 5, y: 10, z: 15 }, 1, 2, 3), { x: 4, y: 8, z: 12 });
+test(`subtract`, () => {
+  expect(Points.subtract({ x: 5, y: 10 }, 1, 2)).toEqual({ x: 4, y: 8 });
+  expect(Points.subtract({ x: 5, y: 10, z: 15 }, 1, 2, 3)).toEqual({ x: 4, y: 8, z: 12 });
 
-  t.deepEqual(Points.subtract(5, 10, 1, 2), { x: 4, y: 8 });
-  t.deepEqual(Points.subtract(5, 10, 15, 1, 2, 3), { x: 4, y: 8, z: 12 });
-  t.deepEqual(Points.subtract(1, 2, 0, 0), { x: 1, y: 2 });
+  expect(Points.subtract(5, 10, 1, 2)).toEqual({ x: 4, y: 8 });
+  expect(Points.subtract(5, 10, 15, 1, 2, 3)).toEqual({ x: 4, y: 8, z: 12 });
+  expect(Points.subtract(1, 2, 0, 0)).toEqual({ x: 1, y: 2 });
 
-  t.deepEqual(Points.subtract({ x: 5, y: 10 }, -1, -2), { x: 6, y: 12 });
-  t.deepEqual(Points.subtract({ x: 5, y: 10 }, { x: 1, y: 2 }), { x: 4, y: 8 });
-  t.deepEqual(Points.subtract({ x: 5, y: 10, z: 15 }, { x: 1, y: 2, z: 3 }), { x: 4, y: 8, z: 12 });
+  expect(Points.subtract({ x: 5, y: 10 }, -1, -2)).toEqual({ x: 6, y: 12 });
+  expect(Points.subtract({ x: 5, y: 10 }, { x: 1, y: 2 })).toEqual({ x: 4, y: 8 });
+  expect(Points.subtract({ x: 5, y: 10, z: 15 }, { x: 1, y: 2, z: 3 })).toEqual({ x: 4, y: 8, z: 12 });
 
-  t.throws(() => Points.subtract(NaN, 2, 0, 0));
-  t.throws(() => Points.subtract(1, NaN, 0, 0));
-  t.throws(() => Points.subtract(1, 2, NaN, 0));
-  t.throws(() => Points.subtract(1, 2, 0, NaN));
-  t.pass();
+  expect(() => Points.subtract(NaN, 2, 0, 0)).toThrow();
+  expect(() => Points.subtract(1, NaN, 0, 0)).toThrow();
+  expect(() => Points.subtract(1, 2, NaN, 0)).toThrow();
+  expect(() => Points.subtract(1, 2, 0, NaN)).toThrow();
 });
 
 
-test('divideFn', t => {
+test('divideFn', () => {
   let f = divider(100, 200);
   t.like(f(50, 100), { x: 0.5, y: 0.5 });
   t.like(f({ x: 50, y: 100 }), { x: 0.5, y: 0.5 });
@@ -401,65 +405,63 @@ test('divideFn', t => {
   t.like(f([]), { x: 0, y: 0 });
 
   // Dodgy input
-  t.throws(() => divider(0, 1));
-  t.throws(() => divider(1, 0));
-  t.throws(() => divider(1, 1, 0));
-  t.throws(() => divider({ x: 1, y: 0 }));
-  t.throws(() => divider({ x: 0, y: 1 }));
-  t.throws(() => divider(Number.NaN, Number.NaN));
+  expect(() => divider(0, 1)).toThrow();
+  expect(() => divider(1, 0)).toThrow();
+  expect(() => divider(1, 1, 0)).toThrow();
+  expect(() => divider({ x: 1, y: 0 })).toThrow();
+  expect(() => divider({ x: 0, y: 1 })).toThrow();
+  expect(() => divider(Number.NaN, Number.NaN)).toThrow();
 
   // Incorrect array length
-  t.throws(() => divider([]));
-  t.throws(() => divider([ 1, 2, 3, 4 ]));
+  expect(() => divider([])).toThrow();
+  expect(() => divider([ 1, 2, 3, 4 ])).toThrow();
 
 
   const f2 = divider({ x: 100, y: 200 });
 
-  t.throws(() => f2(Number.NaN));
-  t.throws(() => f2([ 1, 2, 3, 4 ]));
+  expect(() => f2(Number.NaN)).toThrow();
+  expect(() => f2([ 1, 2, 3, 4 ])).toThrow();
 
   // @ts-ignore
-  t.throws(() => f2({ x: 0, b: 2 }));
-
-  t.pass();
+  expect(() => f2({ x: 0, b: 2 })).toThrow();
 });
 
-test(`getTwoPointParams`, t => {
+test(`getTwoPointParams`, () => {
   let r = Points.getTwoPointParameters({ x: 1, y: 2 }, { x: 3, y: 4 });
-  t.deepEqual(r, [ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
+  expect(r).toEqual([ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
 
   r = Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 });
-  t.deepEqual(r, [ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
+  expect(r).toEqual([ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
 
   r = Points.getTwoPointParameters({ x: 1, y: 2 }, 3, 4);
-  t.deepEqual(r, [ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
+  expect(r).toEqual([ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
 
   r = Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4, 5, 6);
-  t.deepEqual(r, [ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
+  expect(r).toEqual([ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
 
   r = Points.getTwoPointParameters(1, 2, 3, 4, 5, 6);
-  t.deepEqual(r, [ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
+  expect(r).toEqual([ { x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 } ]);
 
   r = Points.getTwoPointParameters(1, 2, 3, 4);
-  t.deepEqual(r, [ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
+  expect(r).toEqual([ { x: 1, y: 2 }, { x: 3, y: 4 } ]);
 
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2 }));
+  expect(() => Points.getTwoPointParameters({ x: 1, y: 2 })).toThrow();
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2 }, 1));
+  expect(() => Points.getTwoPointParameters({ x: 1, y: 2 }, 1)).toThrow();
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4));
+  expect(() => Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4)).toThrow();
 
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4, 5));
+  expect(() => Points.getTwoPointParameters({ x: 1, y: 2, z: 3 }, 4, 5)).toThrow();
 
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters());
+  expect(() => Points.getTwoPointParameters()).toThrow();
 
 
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters(1, 2));
+  expect(() => Points.getTwoPointParameters(1, 2)).toThrow();
   // @ts-ignore
-  t.throws(() => Points.getTwoPointParameters(1, 2, 3));
+  expect(() => Points.getTwoPointParameters(1, 2, 3)).toThrow();
 
 })

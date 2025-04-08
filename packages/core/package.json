@@ -1,0 +1,92 @@
+{
+	"name": "@ixfxfun/core",
+	"version": "0.35.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./text": {
+			"types": "./src/text.ts",
+			"import": "./src/text.ts"
+		},
+		"./arrays": {
+			"types": "./src/arrays/index.ts",
+			"import": "./src/arrays/index.ts"
+		},
+		"./numbers": {
+			"types": "./src/numbers/index.ts",
+			"import": "./src/numbers/index.ts"
+		},
+		"./records": {
+			"types": "./src/records/index.ts",
+			"import": "./src/records/index.ts"
+		},
+		"./maps": {
+			"types": "./src/maps.ts",
+			"import": "./src/maps.ts"
+		},
+		"./debug": {
+			"types": "./src/debug/index.ts",
+			"import": "./src/debug/index.ts"
+		},
+		"./process": {
+			"types": "./src/process/index.ts",
+			"import": "./src/process/index.ts"
+		},
+		"./trackers": {
+			"types": "./src/trackers/index.ts",
+			"import": "./src/trackers/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfxfun/guards":"workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./text": {
+				"types": "./src/text.d.ts",
+				"import": "./src/text.js"
+			},
+			"./arrays": {
+				"types": "./src/arrays/index.d.ts",
+				"import": "./src/arrays/index.js"
+			},
+			"./numbers": {
+				"types": "./src/numbers/index.d.ts",
+				"import": "./src/numbers/index.js"
+			},
+			"./records": {
+				"types": "./src/records/index.d.ts",
+				"import": "./src/records/index.js"
+			},
+			"./maps": {
+				"types": "./src/maps.d.ts",
+				"import": "./src/maps.js"
+			},
+			"./debug": {
+				"types": "./src/debug/index.d.ts",
+				"import": "./src/debug/index.js"
+			},
+			"./process": {
+				"types": "./src/process/index.d.ts",
+				"import": "./src/process/index.js"
+			},
+			"./trackers": {
+				"types": "./src/trackers/index.d.ts",
+				"import": "./src/trackers/index.js"
+			}
+		}
+	}
+}

@@ -1,87 +1,84 @@
-import test from 'ava';
+import expect from 'expect';
 import { intervalToMs, isInterval, elapsedToHumanString } from '../../flow/IntervalType.js';
 
 
-test('elapsedToHumanString', (t) => {
-  t.is(elapsedToHumanString(100), '100ms');
-  t.is(elapsedToHumanString(10 * 1000), '10.0secs');
+test('elapsedToHumanString', () => {
+  expect(elapsedToHumanString(100)).toBe('100ms');
+  expect(elapsedToHumanString(10 * 1000)).toBe('10.0secs');
 
   const fn = () => 100;
-  t.is(elapsedToHumanString(fn), '100ms');
+  expect(elapsedToHumanString(fn)).toBe('100ms');
 
   const elapsed = () => 0;
-  t.is(elapsedToHumanString(elapsed, 0), '0ms');
+  expect(elapsedToHumanString(elapsed, 0)).toBe('0ms');
 });
 
 
-test('interval-type', (t) => {
-  t.true(isInterval(10));
-  t.true(isInterval({ millis: 100 }));
-  t.true(isInterval({ secs: 10 }));
-  t.true(isInterval({ mins: 10 }));
-  t.true(isInterval({ hours: 1 }));
+test('interval-type', () => {
+  expect(isInterval(10)).toBe(true);
+  expect(isInterval({ millis: 100 })).toBe(true);
+  expect(isInterval({ secs: 10 })).toBe(true);
+  expect(isInterval({ mins: 10 })).toBe(true);
+  expect(isInterval({ hours: 1 })).toBe(true);
 
-  t.true(isInterval({ secs: 10, millis: 100 }));
-  t.true(isInterval({ mins: 10, secs: 10, millis: 100 }));
-  t.true(isInterval({ hours: 2, mins: 10, secs: 10, millis: 100 }));
-
-  // @ts-ignore
-  t.false(isInterval({ millis: false }));
-  // @ts-ignore
-  t.false(isInterval({ millis: 'hello' }));
-  // @ts-ignore
-  t.false(isInterval({ millis: undefined }));
-  // @ts-ignore
-  t.false(isInterval({ millis: null }));
-  // @ts-ignore
-  t.false(isInterval({ millis: Number.NaN }));
-
-  t.false(isInterval(Number.NaN));
+  expect(isInterval({ secs: 10, millis: 100 })).toBe(true);
+  expect(isInterval({ mins: 10, secs: 10, millis: 100 })).toBe(true);
+  expect(isInterval({ hours: 2, mins: 10, secs: 10, millis: 100 })).toBe(true);
 
   // @ts-ignore
-  t.false(isInterval(undefined));
+  expect(isInterval({ millis: false })).toBe(false);
   // @ts-ignore
-  t.false(isInterval(null));
+  expect(isInterval({ millis: 'hello' })).toBe(false);
   // @ts-ignore
-  t.false(isInterval('hello'));
+  expect(isInterval({ millis: undefined })).toBe(false);
   // @ts-ignore
-  t.false(isInterval(false));
+  expect(isInterval({ millis: null })).toBe(false);
   // @ts-ignore
-  t.false(isInterval(true));
+  expect(isInterval({ millis: Number.NaN })).toBe(false);
+
+  expect(isInterval(Number.NaN)).toBe(false);
+
   // @ts-ignore
-  t.false(isInterval({ gorp: 10 }));
+  expect(isInterval(undefined)).toBe(false);
+  // @ts-ignore
+  expect(isInterval(null)).toBe(false);
+  // @ts-ignore
+  expect(isInterval('hello')).toBe(false);
+  // @ts-ignore
+  expect(isInterval(false)).toBe(false);
+  // @ts-ignore
+  expect(isInterval(true)).toBe(false);
+  // @ts-ignore
+  expect(isInterval({ gorp: 10 })).toBe(false);
 });
 
-test('interval-type-to-ms', (t) => {
-  t.is(intervalToMs({ millis: 1000 }), 1000);
+test('interval-type-to-ms', () => {
+  expect(intervalToMs({ millis: 1000 })).toBe(1000);
 
-  t.is(intervalToMs({ secs: 1 }), 1000);
+  expect(intervalToMs({ secs: 1 })).toBe(1000);
 
-  t.is(intervalToMs({ millis: 1000, secs: 1 }), 2000);
+  expect(intervalToMs({ millis: 1000, secs: 1 })).toBe(2000);
 
-  t.is(intervalToMs({ mins: 1 }), 60 * 1000);
-  t.is(intervalToMs({ mins: 1, secs: 1 }), 60 * 1000 + 1000);
+  expect(intervalToMs({ mins: 1 })).toBe(60 * 1000);
+  expect(intervalToMs({ mins: 1, secs: 1 })).toBe(60 * 1000 + 1000);
 
-  t.is(intervalToMs({ hours: 1 }), 60 * 60 * 1000);
-  t.is(
-    intervalToMs({ hours: 1, mins: 1, secs: 1 }),
-    60 * 60 * 1000 + 60 * 1000 + 1000
-  );
+  expect(intervalToMs({ hours: 1 })).toBe(60 * 60 * 1000);
+  expect(intervalToMs({ hours: 1, mins: 1, secs: 1 })).toBe(60 * 60 * 1000 + 60 * 1000 + 1000);
 
-  t.is(intervalToMs(undefined, 10), 10);
-  t.throws(() => intervalToMs(undefined));
+  expect(intervalToMs(undefined, 10)).toBe(10);
+  expect(() => intervalToMs(undefined)).toThrow();
   // @ts-expect-error
-  t.throws(() => intervalToMs(null));
+  expect(() => intervalToMs(null)).toThrow();
   // @ts-expect-error
-  t.is(intervalToMs(null, 10), 10);
+  expect(intervalToMs(null, 10)).toBe(10);
   // @ts-expect-error
-  t.throws(() => intervalToMs(`hello`));
+  expect(() => intervalToMs(`hello`)).toThrow();
   // @ts-expect-error
-  t.is(intervalToMs(`hello`, 10), 10);
+  expect(intervalToMs(`hello`, 10)).toBe(10);
   // @ts-expect-error
-  t.throws(() => intervalToMs({ blerg: 10 }));
+  expect(() => intervalToMs({ blerg: 10 })).toThrow();
   // @ts-expect-error
-  t.is(intervalToMs({ blerg: 10 }, 10), 10);
+  expect(intervalToMs({ blerg: 10 }, 10)).toBe(10);
 
 
 });

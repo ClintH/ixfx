@@ -1,9 +1,9 @@
-import test from 'ava';
+import expect from 'expect';
 import { stringSegmentsLastToWhole, stringSegmentsFirstToWhole, stringSegmentsWholeToFirst, stringSegmentsWholeToEnd } from '../../text/Segments.js';
 
-test(`stringSegmentsEndToStart`, t => {
+test(`stringSegmentsEndToStart`, () => {
   const result = [ ...stringSegmentsLastToWhole(`a.b.c.d`, `.`) ];
-  t.deepEqual(result, [
+  expect(result).toEqual([
     `d`,
     `c.d`,
     `b.c.d`,
@@ -11,9 +11,9 @@ test(`stringSegmentsEndToStart`, t => {
   ]);
 });
 
-test(`stringSegmentsStartToEnd`, t => {
+test(`stringSegmentsStartToEnd`, () => {
   const result = [ ...stringSegmentsFirstToWhole(`a.b.c.d`, `.`) ];
-  t.deepEqual(result, [
+  expect(result).toEqual([
     `a`,
     `a.b`,
     `a.b.c`,
@@ -21,9 +21,9 @@ test(`stringSegmentsStartToEnd`, t => {
   ]);
 });
 
-test(`stringSegmentsStartToStart`, t => {
+test(`stringSegmentsStartToStart`, () => {
   const result = [ ...stringSegmentsWholeToFirst(`a.b.c.d`, `.`) ];
-  t.deepEqual(result, [
+  expect(result).toEqual([
     `a.b.c.d`,
     `a.b.c`,
     `a.b`,
@@ -31,9 +31,9 @@ test(`stringSegmentsStartToStart`, t => {
   ]);
 });
 
-test(`stringSegmentsEndToEnd`, t => {
+test(`stringSegmentsEndToEnd`, () => {
   const result = [ ...stringSegmentsWholeToEnd(`a.b.c.d`, `.`) ];
-  t.deepEqual(result, [
+  expect(result).toEqual([
     `a.b.c.d`,
     `b.c.d`,
     `c.d`,

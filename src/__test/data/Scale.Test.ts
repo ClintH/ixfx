@@ -1,13 +1,13 @@
-import test from 'ava';
+import expect from 'expect';
 import { scale } from '../../numbers/Scale.js';
 
-test(`scale`, (t) => {
-  t.is(scale(50, 0, 100, 0, 1), 0.5);
-  t.is(scale(100, 0, 100, 0, 1), 1);
-  t.is(scale(0, 0, 100, 0, 1), 0);
+test(`scale`, () => {
+  expect(scale(50, 0, 100, 0, 1)).toBe(0.5);
+  expect(scale(100, 0, 100, 0, 1)).toBe(1);
+  expect(scale(0, 0, 100, 0, 1)).toBe(0);
 
-  t.is(scale(0, 0, 1, -5, 5), -5);
-  t.is(scale(0.5, 0, 1, -5, 5), 0);
-  t.is(scale(1, 0, 1, -5, 5), 5);
+  expect(scale(0, 0, 1, -5, 5)).toBe(-5);
+  expect(scale(0.5, 0, 1, -5, 5)).toBe(0);
+  expect(scale(1, 0, 1, -5, 5)).toBe(5);
 
 });

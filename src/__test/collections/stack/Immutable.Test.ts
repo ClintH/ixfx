@@ -1,9 +1,9 @@
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
 import { StackImmutable } from '../../../collections/stack/StackImmutable.js';
 import { arrayValuesEqual } from '../../Include.js';
 
-test(`enumeration`, (t) => {
+test(`enumeration`, () => {
   let s = new StackImmutable<string>();
   s = s.push(`a`);
   s = s.push(`b`);
@@ -11,23 +11,23 @@ test(`enumeration`, (t) => {
 
   let result = '';
   s.forEach((v) => (result += v));
-  t.is(result, `abc`);
+  expect(result).toBe(`abc`);
 
   result = '';
   s.forEachFromTop((v) => (result += v));
-  t.is(result, `cba`);
+  expect(result).toBe(`cba`);
 });
 
-test(`basic`, (t) => {
+test(`basic`, () => {
   // Empty stack
   let aa = new StackImmutable<string>();
-  t.true(aa.isEmpty);
-  t.false(aa.isFull);
-  t.falsy(aa.peek);
-  t.throws(() => aa.pop());
+  expect(aa.isEmpty).toBe(true);
+  expect(aa.isFull).toBe(false);
+  expect(aa.peek).toBeFalsy();
+  expect(() => aa.pop()).toThrow();
   aa = aa.push(`something`);
-  t.falsy(aa.isEmpty);
-  t.falsy(aa.isFull);
+  expect(aa.isEmpty).toBeFalsy();
+  expect(aa.isFull).toBeFalsy();
 
   // Unbounded Stack
   const a = new StackImmutable<string>();
@@ -35,14 +35,14 @@ test(`basic`, (t) => {
   let c = b;
   for (let i = 0; i < 15; i++) {
     c = c.push(`test` + i);
-    t.is(c.peek, `test` + i);
+    expect(c.peek).toBe(`test` + i);
   }
 
   // Take two off and add two more
   const d = c.pop().pop().push(`new1`).push(`new2`);
 
   // Tests immutability and stack ordering
-  t.true(a.data.length === 0);
+  expect(a.data.length === 0).toBe(true);
   arrayValuesEqual(t, b.data, [ `test` ]);
   arrayValuesEqual(t, c.data, [
     `test`,
@@ -81,18 +81,18 @@ test(`basic`, (t) => {
     `new2`,
   ]);
 
-  t.is(a.length, 0);
-  t.is(b.length, 1);
-  t.is(c.length, 16);
-  t.is(d.length, 16);
+  expect(a.length).toBe(0);
+  expect(b.length).toBe(1);
+  expect(c.length).toBe(16);
+  expect(d.length).toBe(16);
 
-  t.falsy(a.peek);
-  t.is(b.peek, `test`);
-  t.is(c.peek, `test14`);
-  t.is(d.peek, `new2`);
+  expect(a.peek).toBeFalsy();
+  expect(b.peek).toBe(`test`);
+  expect(c.peek).toBe(`test14`);
+  expect(d.peek).toBe(`new2`);
 });
 
-test(`bounded`, (t) => {
+test(`bounded`, () => {
   // Test different overflow logic for bounded stacks
   // Discard additions: let something in
   let e = new StackImmutable<string>(

@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../rx/index.js';
 
 // const r = Rx.object({ name: `bob`, level: 2 });
@@ -39,11 +39,11 @@ import * as Rx from '../../rx/index.js';
 // });
 
 
-test(`rx-manual`, t => {
+test(`rx-manual`, () => {
   const v = Rx.manual();
-  t.plan(1);
+  expect.assertions(1);
   v.on(msg => {
-    t.deepEqual(msg.value, `hello`);
+    expect(msg.value).toEqual(`hello`);
   });
   v.set(`hello`);
 });

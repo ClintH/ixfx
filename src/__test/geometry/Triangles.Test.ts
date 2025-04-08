@@ -1,11 +1,11 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Teq from '../../geometry/triangle/Equilateral.js';
 import * as Tra from '../../geometry/triangle/Right.js';
 import * as Tis from '../../geometry/triangle/Isosceles.js';
 import { degreeToRadian } from '../../geometry/Angles.js';
 import { closeTo } from '../Include.js';
 
-test(`equilateral`, (tst) => {
+test(`equilateral`, () => {
   const t: Teq.TriangleEquilateral = {
     length: 10,
   };
@@ -17,7 +17,7 @@ test(`equilateral`, (tst) => {
   closeTo(tst, Teq.incircle(t).radius, 2.8867513459481287);
 });
 
-test(`isosceles`, (tst) => {
+test(`isosceles`, () => {
   // https://rechneronline.de/pi/isosceles-triangle.php
   const t = { legs: 20, base: 10 };
 
@@ -34,7 +34,7 @@ test(`isosceles`, (tst) => {
   closeTo(tst, medians[ 2 ], 19.365, 3);
 });
 
-test(`rightAngle`, (tst) => {
+test(`rightAngle`, () => {
   // https://rechneronline.de/pi/right-triangle.php
   const t = { opposite: 10, adjacent: 15 };
 

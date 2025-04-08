@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { float, mersenneTwister } from '../random/index.js';
 import { equalUnordered, rangeCheck, rangeCheckInteger } from './Include.js';
 import { weightedInteger } from '../random/WeightedInteger.js';
@@ -12,7 +12,7 @@ const repeat = <V>(count: number, fn: () => V): V[] => {
   return ret;
 }
 
-test(`mersenne-twister-seed`, t => {
+test(`mersenne-twister-seed`, () => {
   let tests = 10_000;
   const mt1 = mersenneTwister(100);
   let r1 = [];
@@ -27,34 +27,33 @@ test(`mersenne-twister-seed`, t => {
   }
 
   for (let i = 0; i < tests; i++) {
-    t.is(r1[ i ], r2[ i ]);
+    expect(r1[ i ]).toBe(r2[ i ]);
   }
 
 })
 
-test(`mersenne-twister-integer`, t => {
+test(`mersenne-twister-integer`, () => {
   const mt = mersenneTwister();
   let tests = 10_000;
   for (let i = 0; i < tests; i++) {
     let v = mt.integer(10);
-    t.true(v < 10, `V is < 10`);
+    expect(v < 10).toBe(true);
 
   }
 
   for (let i = 0; i < tests; i++) {
     let v = mt.integer(10, 5);
-    t.true(v >= 5, `V is >= 5`);
-    t.true(v < 10, `V is < 10`);
+    expect(v >= 5).toBe(true);
+    expect(v < 10).toBe(true);
   }
 
 })
-test(`integerUniqueGen`, async t => {
+test(`integerUniqueGen`, async () => {
   const d = [ ...integerUniqueGen(10) ];
   equalUnordered(t, d, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]);
-  t.pass();
 });
 
-test(`integer`, t => {
+test(`integer`, () => {
   const runs = 10 * 1000;
   // Max-0 range
   rangeCheckInteger(t, repeat(runs, () => integer(5)), {
@@ -83,16 +82,14 @@ test(`integer`, t => {
   });
 
   // Dodgy input
-  t.throws(() => integer({ max: 5, min: 10 }));
-  t.throws(() => integer(0));
-  t.throws(() => integer(Number.NaN));
+  expect(() => integer({ max: 5, min: 10 })).toThrow();
+  expect(() => integer(0)).toThrow();
+  expect(() => integer(Number.NaN)).toThrow();
   // @ts-ignore
-  t.throws(() => integer('hello'));
-  t.pass();
-
+  expect(() => integer('hello')).toThrow();
 });
 
-test('float', async t => {
+test('float', async () => {
   const runs = 10 * 1000;
 
   rangeCheck(t, repeat(runs, () => float(10)), {
@@ -109,10 +106,9 @@ test('float', async t => {
     lowerExcl: -10,
     upperExcl: 10
   });
-  t.pass();
 });
 
-test(`weightedInteger`, t => {
+test(`weightedInteger`, () => {
   const test1 = repeat(1000, () => weightedInteger(10));
   rangeCheck(t, test1, { lowerIncl: 0, upperExcl: 10 });
 
@@ -124,25 +120,25 @@ test(`weightedInteger`, t => {
   rangeCheck(t, test3, { lowerIncl: 0, upperExcl: 20 });
 
   // Error: max is greater than min
-  t.throws(() => weightedInteger({ min: 10, max: 5 }));
+  expect(() => weightedInteger({ min: 10, max: 5 })).toThrow();
 
   // Error: easing not found
   // @ts-ignore
-  t.throws(() => weightedInteger({ max: 10, easing: `madeUpEasing` }));
+  expect(() => weightedInteger({ max: 10, easing: `madeUpEasing` })).toThrow();
 
   // Error: wrong param for second types
   // @ts-ignore
-  t.throws(() => weightedInteger({ max: 0, easing: false }));
+  expect(() => weightedInteger({ max: 0, easing: false })).toThrow();
 
   // Error: no params
   // @ts-ignore
-  t.throws(() => weightedInteger());
+  expect(() => weightedInteger()).toThrow();
 
   // Error: string param
   // @ts-ignore
-  t.throws(() => weightedInteger(`blah`));
+  expect(() => weightedInteger(`blah`)).toThrow();
 
   // Error: NaN
-  t.throws(() => weightedInteger(Number.NaN));
+  expect(() => weightedInteger(Number.NaN)).toThrow();
 
 });

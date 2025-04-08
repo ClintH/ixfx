@@ -1,9 +1,9 @@
-import test from "ava";
+import expect from 'expect';
 import * as Basic from '../../data/BasicProcessors.js';
 import * as Process from '../../data/Process.js';
 import { isApprox } from "../../numbers/IsApprox.js";
 
-test('seen', t => {
+test('seen', () => {
   const c1Results: string[] = [];
   const c1 = Process.flow(
     Process.seenToUndefined(),
@@ -14,7 +14,7 @@ test('seen', t => {
   c1('hello');
   c1('hello');
   c1('bye');
-  t.deepEqual(c1Results, [ `hello`, undefined, `bye` ]);
+  expect(c1Results).toEqual([ `hello`, undefined, `bye` ]);
 
   const c2Results: any[] = [];
   const c2 = Process.flow(
@@ -26,20 +26,20 @@ test('seen', t => {
   c2({ name: `a` });
   c2({ name: `b` });
   c2({ name: `a` });
-  t.deepEqual(c2Results, [ { name: 'a' }, { name: 'b' }, undefined ]);
+  expect(c2Results).toEqual([ { name: 'a' }, { name: 'b' }, undefined ]);
 
   const c3 = Process.flow(
     Process.seenLastToUndefined
   )
 });
 
-test(`basic`, t => {
+test(`basic`, () => {
   const c1 = Process.flow(Basic.max(), Process.seenLastToUndefined());
-  t.is(c1(100), 100);
-  t.falsy(c1(90));
+  expect(c1(100)).toBe(100);
+  expect(c1(90)).toBeFalsy();
   // @ts-expect-error
-  t.falsy(c1(null));
-  t.is(c1(110), 110);
+  expect(c1(null)).toBeFalsy();
+  expect(c1(110)).toBe(110);
 
   const c2Results: number[] = [];
   const c2 = Process.flow(
@@ -52,7 +52,7 @@ test(`basic`, t => {
   c2(100);
   c2(90);
   c2(110);
-  t.deepEqual(c2Results, [ 100, 110 ]);
+  expect(c2Results).toEqual([ 100, 110 ]);
 
   const c3Results: number[] = [];
   const c3 = Process.flow(
@@ -66,51 +66,51 @@ test(`basic`, t => {
   c3(100);
   c3(90);
   c3(110);
-  t.deepEqual(c3Results, [ 100, 110 ]);
+  expect(c3Results).toEqual([ 100, 110 ]);
 });
 
-test(`math`, t => {
+test(`math`, () => {
   const c1 = Process.flow(Basic.max());
-  t.is(c1(100), 100);
-  t.is(c1(110), 110);
-  t.is(c1(90), 110);
+  expect(c1(100)).toBe(100);
+  expect(c1(110)).toBe(110);
+  expect(c1(90)).toBe(110);
   // @ts-expect-error
-  t.is(c1(undefined), 110);
+  expect(c1(undefined)).toBe(110);
   // @ts-expect-error
-  t.is(c1(null), 110);
+  expect(c1(null)).toBe(110);
   // @ts-expect-error
-  t.is(c1(`hello`), 110);
+  expect(c1(`hello`)).toBe(110);
 
 
   const c2 = Process.flow(Basic.min());
-  t.is(c2(100), 100);
-  t.is(c2(110), 100);
-  t.is(c2(90), 90);
+  expect(c2(100)).toBe(100);
+  expect(c2(110)).toBe(100);
+  expect(c2(90)).toBe(90);
   // @ts-expect-error
-  t.is(c2(undefined), 90);
+  expect(c2(undefined)).toBe(90);
   // @ts-expect-error
-  t.is(c2(null), 90);
+  expect(c2(null)).toBe(90);
   // @ts-expect-error
-  t.is(c2(`hello`), 90);
+  expect(c2(`hello`)).toBe(90);
 
   const c3 = Process.flow(Basic.sum());
-  t.is(c3(10), 10);
-  t.is(c3(20), 30);
-  t.is(c3(30), 60);
+  expect(c3(10)).toBe(10);
+  expect(c3(20)).toBe(30);
+  expect(c3(30)).toBe(60);
   // @ts-expect-error
-  t.is(c3(undefined), 60);
+  expect(c3(undefined)).toBe(60);
   // @ts-expect-error
-  t.is(c3(null), 60);
+  expect(c3(null)).toBe(60);
   // @ts-expect-error
-  t.is(c3(`hello`), 60);
+  expect(c3(`hello`)).toBe(60);
 
   const c4 = Process.flow(Basic.tally(false));
-  t.is(c4(100), 1);
-  t.is(c4(110), 2);
-  t.is(c4(90), 3);
-  t.is(c4(undefined), 4);
-  t.is(c4(null), 5);
-  t.is(c4(`hello`), 6);
+  expect(c4(100)).toBe(1);
+  expect(c4(110)).toBe(2);
+  expect(c4(90)).toBe(3);
+  expect(c4(undefined)).toBe(4);
+  expect(c4(null)).toBe(5);
+  expect(c4(`hello`)).toBe(6);
 
 })
 

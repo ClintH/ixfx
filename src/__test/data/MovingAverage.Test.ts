@@ -1,7 +1,7 @@
-import test from 'ava';
+import expect from 'expect';
 import { movingAverage } from '../../numbers/MovingAverage.js';
 
-test(`moving-average`, (t) => {
+test(`moving-average`, () => {
   const ma = movingAverage(5);
   const r1 = ma(1);
   const r2 = ma(2);
@@ -11,18 +11,18 @@ test(`moving-average`, (t) => {
   const r6 = ma();
   const r7 = ma(Number.NaN);
 
-  t.is(r1, 1);
-  t.is(r2, 1.5);
-  t.is(r3, 2);
-  t.is(r4, 2.5);
-  t.is(r5, 3);
-  t.is(r5, r6);
-  t.is(r5, r7);
+  expect(r1).toBe(1);
+  expect(r2).toBe(1.5);
+  expect(r3).toBe(2);
+  expect(r4).toBe(2.5);
+  expect(r5).toBe(3);
+  expect(r5).toBe(r6);
+  expect(r5).toBe(r7);
 
   // Saturate with five values
   ma(5);
   ma(5);
   ma(5);
   const r8 = ma(5);
-  t.is(r8, 5);
+  expect(r8).toBe(5);
 });

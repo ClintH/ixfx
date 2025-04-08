@@ -1,10 +1,10 @@
 
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
 import { getSorter } from '../util/KeyValue.js';
 import type { KeyValue } from '../PrimitiveTypes.js';
 
-test(`sorting`, (t) => {
+test(`sorting`, () => {
   const a: KeyValue[] = [
     [ `apples`, 10 ],
     [ `orange`, 2 ],
@@ -12,26 +12,26 @@ test(`sorting`, (t) => {
   ];
 
   // Sort by numeric value
-  t.deepEqual(getSorter(`value`)(a), [
+  expect(getSorter(`value`)(a)).toEqual([
     [ `zebras`, 0 ],
     [ `orange`, 2 ],
     [ `apples`, 10 ]
   ]);
 
-  t.deepEqual(getSorter(`value-reverse`)(a), [
+  expect(getSorter(`value-reverse`)(a)).toEqual([
     [ `apples`, 10 ],
     [ `orange`, 2 ],
     [ `zebras`, 0 ]
   ]);
 
   // Sort by key
-  t.deepEqual(getSorter(`key`)(a), [
+  expect(getSorter(`key`)(a)).toEqual([
     [ `apples`, 10 ],
     [ `orange`, 2 ],
     [ `zebras`, 0 ]
   ]);
 
-  t.deepEqual(getSorter(`key-reverse`)(a), [
+  expect(getSorter(`key-reverse`)(a)).toEqual([
     [ `zebras`, 0 ],
     [ `orange`, 2 ],
     [ `apples`, 10 ]
@@ -45,7 +45,7 @@ test(`sorting`, (t) => {
   ];
 
   // Sort by string value
-  t.deepEqual(getSorter(`value`)(b), [
+  expect(getSorter(`value`)(b)).toEqual([
     [ `d`, `four` ],
     [ `a`, `one` ],
     [ `c`, `three` ],

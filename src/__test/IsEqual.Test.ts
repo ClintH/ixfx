@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import {
   isEqualDefault,
   isEqualValueDefault,
@@ -7,7 +7,7 @@ import {
 } from '../util/IsEqual.js'
 
 
-test(`isEqualValuePartial`, t => {
+test(`isEqualValuePartial`, () => {
   const obj1 = {
     name: `blah`,
     address: {
@@ -16,22 +16,24 @@ test(`isEqualValuePartial`, t => {
     }
   };
 
-  t.true(isEqualValuePartial(obj1, { name: `blah` }));
-  t.false(isEqualValuePartial(obj1, { name: `nope` }));
-  t.true(isEqualValuePartial(obj1, { address: { number: 35 } }));
-  t.true(isEqualValuePartial(obj1, { address: { number: 35, street: `West` } }));
-  t.false(isEqualValuePartial(obj1, { address: { number: 35, streetWrong: `West` } }));
-  t.false(isEqualValuePartial(obj1, { address: { number: 35, street: `North` } }));
-  t.true(isEqualValuePartial(obj1, {
+  expect(isEqualValuePartial(obj1, { name: `blah` })).toBe(true);
+  expect(isEqualValuePartial(obj1, { name: `nope` })).toBe(false);
+  expect(isEqualValuePartial(obj1, { address: { number: 35 } })).toBe(true);
+  expect(isEqualValuePartial(obj1, { address: { number: 35, street: `West` } })).toBe(true);
+  expect(
+    isEqualValuePartial(obj1, { address: { number: 35, streetWrong: `West` } })
+  ).toBe(false);
+  expect(isEqualValuePartial(obj1, { address: { number: 35, street: `North` } })).toBe(false);
+  expect(isEqualValuePartial(obj1, {
     name: `blah`,
     address: {
       street: `West`,
       number: 35
     }
-  }));
+  })).toBe(true);
 });
 
-test(`isEqualValueIgnoreOrder`, t => {
+test(`isEqualValueIgnoreOrder`, () => {
   // Objects
   const obj1 = {
     name: 'blah',
@@ -39,8 +41,8 @@ test(`isEqualValueIgnoreOrder`, t => {
   const obj2 = {
     name: 'blah',
   };
-  t.true(isEqualValueIgnoreOrder(obj1, obj1));
-  t.true(isEqualValueIgnoreOrder(obj1, obj2));
+  expect(isEqualValueIgnoreOrder(obj1, obj1)).toBe(true);
+  expect(isEqualValueIgnoreOrder(obj1, obj2)).toBe(true);
 
   const obj3 = {
     name: `a`,
@@ -60,15 +62,15 @@ test(`isEqualValueIgnoreOrder`, t => {
     size: 20,
     name: `a`
   }
-  t.true(isEqualValueIgnoreOrder(obj3, obj4));
+  expect(isEqualValueIgnoreOrder(obj3, obj4)).toBe(true);
 })
 
-test('isEqual', (t) => {
+test('isEqual', () => {
   // Booleans
-  t.true(isEqualDefault(false, false));
-  t.true(isEqualDefault(true, true));
-  t.false(isEqualDefault(true, false));
-  t.false(isEqualDefault(false, true));
+  expect(isEqualDefault(false, false)).toBe(true);
+  expect(isEqualDefault(true, true)).toBe(true);
+  expect(isEqualDefault(true, false)).toBe(false);
+  expect(isEqualDefault(false, true)).toBe(false);
 
   // Objects
   const obj1 = {
@@ -77,34 +79,34 @@ test('isEqual', (t) => {
   const obj2 = {
     name: 'blah',
   };
-  t.true(isEqualDefault(obj1, obj1));
-  t.false(isEqualDefault(obj1, obj2));
+  expect(isEqualDefault(obj1, obj1)).toBe(true);
+  expect(isEqualDefault(obj1, obj2)).toBe(false);
 
   // Numbers
-  t.true(isEqualDefault(10, 10));
-  t.false(isEqualDefault(Number.NaN, Number.NaN));
+  expect(isEqualDefault(10, 10)).toBe(true);
+  expect(isEqualDefault(Number.NaN, Number.NaN)).toBe(false);
 
   // Strings
-  t.true(isEqualDefault('hello', 'hello'));
-  t.false(isEqualDefault('HELLO', 'hello'));
-  t.false(isEqualDefault('hello', 'there'));
-  t.false(isEqualDefault('hello', undefined));
-  t.false(isEqualDefault('hello', null));
-  t.false(isEqualDefault('hello', ''));
+  expect(isEqualDefault('hello', 'hello')).toBe(true);
+  expect(isEqualDefault('HELLO', 'hello')).toBe(false);
+  expect(isEqualDefault('hello', 'there')).toBe(false);
+  expect(isEqualDefault('hello', undefined)).toBe(false);
+  expect(isEqualDefault('hello', null)).toBe(false);
+  expect(isEqualDefault('hello', '')).toBe(false);
 
   // Arrays
   const arr1 = [ 'hello', 'there' ];
   const arr2 = [ 'hello', 'there' ];
-  t.true(isEqualDefault(arr1, arr1));
-  t.false(isEqualDefault(arr1, arr2));
+  expect(isEqualDefault(arr1, arr1)).toBe(true);
+  expect(isEqualDefault(arr1, arr2)).toBe(false);
 });
 
-test('isEqualValueDefault', (t) => {
+test('isEqualValueDefault', () => {
   // Booleans
-  t.true(isEqualValueDefault(false, false));
-  t.true(isEqualValueDefault(true, true));
-  t.false(isEqualValueDefault(true, false));
-  t.false(isEqualValueDefault(false, true));
+  expect(isEqualValueDefault(false, false)).toBe(true);
+  expect(isEqualValueDefault(true, true)).toBe(true);
+  expect(isEqualValueDefault(true, false)).toBe(false);
+  expect(isEqualValueDefault(false, true)).toBe(false);
 
   // Objects
   const obj1 = {
@@ -113,30 +115,30 @@ test('isEqualValueDefault', (t) => {
   const obj2 = {
     name: 'blah',
   };
-  t.true(isEqualValueDefault(obj1, obj1));
-  t.true(isEqualValueDefault(obj1, obj2));
+  expect(isEqualValueDefault(obj1, obj1)).toBe(true);
+  expect(isEqualValueDefault(obj1, obj2)).toBe(true);
 
   // Numbers
-  t.true(isEqualValueDefault(10, 10));
-  t.true(isEqualValueDefault(Number.NaN, Number.NaN));
+  expect(isEqualValueDefault(10, 10)).toBe(true);
+  expect(isEqualValueDefault(Number.NaN, Number.NaN)).toBe(true);
 
   // Strings
-  t.true(isEqualValueDefault('hello', 'hello'));
-  t.false(isEqualValueDefault('HELLO', 'hello'));
-  t.false(isEqualValueDefault('hello', 'there'));
-  t.false(isEqualValueDefault('hello', undefined));
-  t.false(isEqualValueDefault('hello', null));
-  t.false(isEqualValueDefault('hello', ''));
+  expect(isEqualValueDefault('hello', 'hello')).toBe(true);
+  expect(isEqualValueDefault('HELLO', 'hello')).toBe(false);
+  expect(isEqualValueDefault('hello', 'there')).toBe(false);
+  expect(isEqualValueDefault('hello', undefined)).toBe(false);
+  expect(isEqualValueDefault('hello', null)).toBe(false);
+  expect(isEqualValueDefault('hello', '')).toBe(false);
 
   // Arrays
   const arr1 = [ 'hello', 'there' ];
   const arr2 = [ 'hello', 'there' ];
-  t.true(isEqualValueDefault(arr1, arr1));
-  t.true(isEqualValueDefault(arr1, arr2));
+  expect(isEqualValueDefault(arr1, arr1)).toBe(true);
+  expect(isEqualValueDefault(arr1, arr2)).toBe(true);
 });
 
 // Default isEqual tests by reference
-test(`isEqualDefault`, (t) => {
+test(`isEqualDefault`, () => {
   const a = {
     name: "Blah blah",
     age: 30,
@@ -155,11 +157,11 @@ test(`isEqualDefault`, (t) => {
   const bb = "Blah blah";
   const c = "BLAH BLAH";
 
-  t.true(isEqualDefault(a, a));
-  t.falsy(isEqualDefault(a, b as any));
-  t.falsy(isEqualDefault(a, aa)); // Same content but different references, false
+  expect(isEqualDefault(a, a)).toBe(true);
+  expect(isEqualDefault(a, b as any)).toBeFalsy();
+  expect(isEqualDefault(a, aa)).toBeFalsy(); // Same content but different references, false
 
-  t.true(isEqualDefault(b, b));
-  t.true(isEqualDefault(b, bb)); // Strings work by value using ===
-  t.falsy(isEqualDefault(b, c));
+  expect(isEqualDefault(b, b)).toBe(true);
+  expect(isEqualDefault(b, bb)).toBe(true); // Strings work by value using ===
+  expect(isEqualDefault(b, c)).toBeFalsy();
 });

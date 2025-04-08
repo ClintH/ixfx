@@ -1,56 +1,55 @@
-import test from 'ava';
+import expect from 'expect';
 import { interpolate, interpolatorInterval, interpolatorStepped } from '../../numbers/Interpolate.js';
 import { round } from '../../numbers/Round.js';
 import { delayLoop } from '../../flow/Delay.js';
 
-test(`basic`, t => {
-  t.is(interpolate(0, 0, 100), 0);
-  t.is(interpolate(0.5, 0, 100), 50);
-  t.is(interpolate(1, 0, 100), 100);
+test(`basic`, () => {
+  expect(interpolate(0, 0, 100)).toBe(0);
+  expect(interpolate(0.5, 0, 100)).toBe(50);
+  expect(interpolate(1, 0, 100)).toBe(100);
 
-  t.is(interpolate(0, 100, 0), 100);
-  t.is(interpolate(0.5, 100, 0), 50);
-  t.is(interpolate(1, 100, 0), 0);
+  expect(interpolate(0, 100, 0)).toBe(100);
+  expect(interpolate(0.5, 100, 0)).toBe(50);
+  expect(interpolate(1, 100, 0)).toBe(0);
 
-  t.is(interpolate(0, 0, -100), 0);
-  t.is(interpolate(0.5, 0, -100), -50);
-  t.is(interpolate(1, 0, -100), -100);
+  expect(interpolate(0, 0, -100)).toBe(0);
+  expect(interpolate(0.5, 0, -100)).toBe(-50);
+  expect(interpolate(1, 0, -100)).toBe(-100);
 
   const f = interpolate(0, 100);
-  t.true(typeof f === `function`, typeof f);
-  t.is(f(0), 0);
-  t.is(f(0.5), 50);
-  t.is(f(1), 100);
+  expect(typeof f === `function`).toBe(true);
+  expect(f(0)).toBe(0);
+  expect(f(0.5)).toBe(50);
+  expect(f(1)).toBe(100);
 
 });
 
-test(`limits`, t => {
+test(`limits`, () => {
   // Default is clamp
-  t.is(interpolate(1.1, 0, 100), 100);
-  t.is(interpolate(-0.1, 0, 100), 0);
+  expect(interpolate(1.1, 0, 100)).toBe(100);
+  expect(interpolate(-0.1, 0, 100)).toBe(0);
 
   // Clamp
-  t.is(interpolate(1.1, 0, 100, { limits: `clamp` }), 100);
-  t.is(interpolate(-0.1, 0, 100, { limits: `clamp` }), 0);
+  expect(interpolate(1.1, 0, 100, { limits: `clamp` })).toBe(100);
+  expect(interpolate(-0.1, 0, 100, { limits: `clamp` })).toBe(0);
 
   // Ignore
-  t.is(Math.floor(interpolate(1.1, 0, 100, { limits: `ignore` })), 110);
-  t.is(interpolate(-0.1, 0, 100, { limits: `ignore` }), -10);
-  t.is(interpolate(0, 0, 100, { limits: `ignore` }), 0);
-  t.is(interpolate(0.5, 0, 100, { limits: `ignore` }), 50);
-  t.is(interpolate(1, 0, 100, { limits: `ignore` }), 100);
+  expect(Math.floor(interpolate(1.1, 0, 100, { limits: `ignore` }))).toBe(110);
+  expect(interpolate(-0.1, 0, 100, { limits: `ignore` })).toBe(-10);
+  expect(interpolate(0, 0, 100, { limits: `ignore` })).toBe(0);
+  expect(interpolate(0.5, 0, 100, { limits: `ignore` })).toBe(50);
+  expect(interpolate(1, 0, 100, { limits: `ignore` })).toBe(100);
 
   // Wrap
-  t.is(Math.floor(interpolate(1.1, 0, 100, { limits: `wrap` })), 10);
-  t.is(Math.floor(interpolate(-0.1, 0, 100, { limits: `wrap` })), 90);
-  t.is(interpolate(0, 0, 100, { limits: `wrap` }), 0);
-  t.is(interpolate(0.5, 0, 100, { limits: `wrap` }), 50);
-  t.is(interpolate(1, 0, 100, { limits: `wrap` }), 100);
+  expect(Math.floor(interpolate(1.1, 0, 100, { limits: `wrap` }))).toBe(10);
+  expect(Math.floor(interpolate(-0.1, 0, 100, { limits: `wrap` }))).toBe(90);
+  expect(interpolate(0, 0, 100, { limits: `wrap` })).toBe(0);
+  expect(interpolate(0.5, 0, 100, { limits: `wrap` })).toBe(50);
+  expect(interpolate(1, 0, 100, { limits: `wrap` })).toBe(100);
 });
 
 
-test(`interpolatorInterval`, async t => {
-
+test(`interpolatorInterval`, async () => {
   const v = interpolatorInterval(100);
   let values = [];
 
@@ -59,11 +58,9 @@ test(`interpolatorInterval`, async t => {
     values.push(round(1, value));
     if (value >= 1) break;
   }
-  // TODO: Not a proper test. We lose a random value here and there due to timing
-  t.pass();
 });
 
-test(`interpolatorStepped`, (t) => {
+test(`interpolatorStepped`, () => {
   const v = interpolatorStepped(0.1, 100, 200);
   let values = [];
   while (true) {
@@ -71,14 +68,14 @@ test(`interpolatorStepped`, (t) => {
     values.push(value);
     if (value >= 200) break;
   }
-  t.is(values.length, 12);
-  t.is(values[ 0 ], 100);
-  t.is(values.at(-1), 200);
+  expect(values.length).toBe(12);
+  expect(values[ 0 ]).toBe(100);
+  expect(values.at(-1)).toBe(200);
 
   // Re-targeting
   const v2 = interpolatorStepped(0.1, 100, 200);
-  t.is(v2(), 100); // amount: 0
-  t.is(v2(300), 120); // amount: 0.1 of 200 (100->300)
-  t.is(v2(), 140); // amount: 0.2 of 200 (100->300)
-  t.is(round(1, v2(1, 0)), 0.3); // amount: 0.3 of 1 (0-1)
+  expect(v2()).toBe(100); // amount: 0
+  expect(v2(300)).toBe(120); // amount: 0.1 of 200 (100->300)
+  expect(v2()).toBe(140); // amount: 0.2 of 200 (100->300)
+  expect(round(1, v2(1, 0))).toBe(0.3); // amount: 0.3 of 1 (0-1)
 });

@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { isApprox } from '../../../numbers/IsApprox.js';
@@ -6,15 +6,15 @@ import { isApprox } from '../../../numbers/IsApprox.js';
 /**
  * Tests read rate
  */
-test(`array-interval`, async t => {
+test(`array-interval`, async () => {
   const a1 = [ 1, 2, 3, 4, 5 ];
   const rateMs = 50;
 
   // Default options
   let start = Flow.Elapsed.once();
   const v1 = Rx.From.array(a1, { lazy: `initial`, interval: rateMs });
-  t.false(v1.isDone());
-  t.is(v1.last(), 1);
+  expect(v1.isDone()).toBe(false);
+  expect(v1.last()).toBe(1);
 
   let read: number[] = [];
   let seenClose = false;
@@ -24,7 +24,7 @@ test(`array-interval`, async t => {
       if (read.length === a1.length) {
         const elapsed = start();
         const expectedTime = rateMs * (a1.length + 1);
-        t.true(isApprox(0.2, expectedTime, elapsed), `Elapsed time ${ elapsed } vs. ${ expectedTime }`);
+        expect(isApprox(0.2, expectedTime, elapsed)).toBe(true);
       }
     } else if (msg.signal === `done`) {
       seenClose = true;
@@ -32,16 +32,16 @@ test(`array-interval`, async t => {
   });
   await Flow.sleep((a1.length + 1) * rateMs);
   v1Off();
-  t.deepEqual(read, a1);
-  t.true(seenClose, `Done message`);
-  t.true(v1.isDone());
+  expect(read).toEqual(a1);
+  expect(seenClose).toBe(true);
+  expect(v1.isDone()).toBe(true);
 });
 
 /**
  * Continue iterating through same array when there's a subscriber
  * Lazy: very
  */
-test(`array-when-stopped-continue-lazy-very`, async t => {
+test(`array-when-stopped-continue-lazy-very`, async () => {
   const a1 = [ 1, 2, 3, 4, 5 ];
 
   // whenStopped: continue  lazy: initial 
@@ -62,9 +62,9 @@ test(`array-when-stopped-continue-lazy-very`, async t => {
 
   // Should only have two items, because we unsubscribed
   await Flow.sleep(200);
-  t.deepEqual(read, [ 1, 2 ]);
-  t.false(seenClose, `Done signal`); // Array is not done
-  t.false(v2.isDone());
+  expect(read).toEqual([ 1, 2 ]);
+  expect(seenClose).toBe(false); // Array is not done
+  expect(v2.isDone()).toBe(false);
 
   // 2. keep reading, expecting data to continue and complete, matching input array
   const v2Off2 = v2.on(msg => {
@@ -75,14 +75,14 @@ test(`array-when-stopped-continue-lazy-very`, async t => {
     }
   });
   await Flow.sleep(200);
-  t.true(seenClose, `Done signal`);
-  t.deepEqual(read, a1);
-  t.true(v2.isDone());
+  expect(seenClose).toBe(true);
+  expect(read).toEqual(a1);
+  expect(v2.isDone()).toBe(true);
   v2Off2();
 });
 
 
-test(`array-when-stopped-continue-lazy-initial`, async t => {
+test(`array-when-stopped-continue-lazy-initial`, async () => {
   const a1 = [ 1, 2, 3, 4, 5 ];
 
   // whenStopped: continue  lazy: initial 
@@ -105,9 +105,9 @@ test(`array-when-stopped-continue-lazy-initial`, async t => {
   while (read.length != 2) {
     await Flow.sleep(10);
   }
-  t.deepEqual(read, [ 1, 2 ]);
-  t.false(seenClose, `Done signal`); // Array is not done
-  t.false(v2.isDone());
+  expect(read).toEqual([ 1, 2 ]);
+  expect(seenClose).toBe(false); // Array is not done
+  expect(v2.isDone()).toBe(false);
 
   // 2. keep reading, expecting data to continue and complete, matching input array
   const v2Off2 = v2.on(msg => {
@@ -118,9 +118,9 @@ test(`array-when-stopped-continue-lazy-initial`, async t => {
     }
   });
   await Flow.sleep(200);
-  t.true(seenClose, `Done signal`);
-  t.deepEqual(read, a1);
-  t.true(v2.isDone());
+  expect(seenClose).toBe(true);
+  expect(read).toEqual(a1);
+  expect(v2.isDone()).toBe(true);
   v2Off2();
 });
 
@@ -128,17 +128,17 @@ test(`array-when-stopped-continue-lazy-initial`, async t => {
  * Reset stepping through array
  * Very lazy, so when unsubscribed, it won't progress
  */
-test(`array-when-stopped-reset-lazy-very`, async t => {
+test(`array-when-stopped-reset-lazy-very`, async () => {
   const a1 = [ 1, 2, 3, 4, 5 ];
   let read: number[] = [];
   let seenClose = false;
 
-  t.throws(() => {
+  expect(() => {
     Rx.From.array(a1, { whenStopped: `reset`, lazy: `initial`, interval: 20 });
-  });
-  t.throws(() => {
+  }).toThrow();
+  expect(() => {
     Rx.From.array(a1, { whenStopped: `reset`, lazy: `never`, interval: 20 });
-  });
+  }).toThrow();
 
   // WhenStopped: 'reset',  lazy: 'initial'
   // 1. Read two items
@@ -154,8 +154,8 @@ test(`array-when-stopped-reset-lazy-very`, async t => {
     }
   });
   await Flow.sleep(50);
-  t.deepEqual(read, [ 1, 2 ]);
-  t.false(v1.isDone());
+  expect(read).toEqual([ 1, 2 ]);
+  expect(v1.isDone()).toBe(false);
 
   // 2. Continue reading. Expect final data to reset back to 1, 2... 
   seenClose = false;
@@ -164,8 +164,8 @@ test(`array-when-stopped-reset-lazy-very`, async t => {
     if (msg.signal === `done`) seenClose = true;
   });
   await Flow.sleep(200);
-  t.deepEqual(read, [ 1, 2, 1, 2, 3, 4, 5 ]);
-  t.true(seenClose, `Done signal`);
-  t.true(v1.isDone());
+  expect(read).toEqual([ 1, 2, 1, 2, 3, 4, 5 ]);
+  expect(seenClose).toBe(true);
+  expect(v1.isDone()).toBe(true);
   v1Off2();
 });

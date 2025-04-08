@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../../collections/tree/TraverseObject.js';
 import * as TraversableTree from '../../../collections/tree/TraversableTree.js';
 import * as TreeMutable from '../../../collections/tree/TreeMutable.js';
@@ -42,19 +42,19 @@ function getTestObject() {
   return testObject;
 }
 
-test(`as-tree`, t => {
+test(`as-tree`, () => {
   const r1 = create(getTestObject(), { name: `test` });
   //onsole.log(toStringDeep(r1));
-  t.deepEqual(r1.value?.value, getTestObject());
-  t.is(r1.childrenStore.length, 3);
-  t.deepEqual(r1.childrenStore[ 0 ].value, { name: `name`, value: `Jill`, ancestors: [ `test` ] });
-  t.deepEqual(r1.childrenStore[ 1 ].value, {
+  expect(r1.value?.value).toEqual(getTestObject());
+  expect(r1.childrenStore.length).toBe(3);
+  expect(r1.childrenStore[ 0 ].value).toEqual({ name: `name`, value: `Jill`, ancestors: [ `test` ] });
+  expect(r1.childrenStore[ 1 ].value).toEqual({
     name: `address`, value: {
       street: 'Blah St',
       number: 27
     }, ancestors: [ `test` ]
   });
-  t.deepEqual(r1.childrenStore[ 2 ].value, {
+  expect(r1.childrenStore[ 2 ].value).toEqual({
     name: `kids`, value: [
       {
         name: 'John',
@@ -69,7 +69,7 @@ test(`as-tree`, t => {
 
 });
 
-test(`follow-value`, t => {
+test(`follow-value`, () => {
   const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
 
   let callbackCount = 0;
@@ -80,8 +80,8 @@ test(`follow-value`, t => {
   })) {
     iterCount++;
   };
-  t.is(callbackCount, 3);
-  t.is(iterCount, 0);
+  expect(callbackCount).toBe(3);
+  expect(iterCount).toBe(0);
 
   callbackCount = 0;
   iterCount = 0;
@@ -104,53 +104,61 @@ test(`follow-value`, t => {
     { name: `1`, value: { name: `Sam` }, ancestors: [ `obj`, `kids` ] },
     { name: `name`, value: `Sam`, ancestors: [ `obj`, `kids`, `1` ] }
   ]);
-  t.is(iterCount, 3);
-  t.is(callbackCount, 6);
+  expect(iterCount).toBe(3);
+  expect(callbackCount).toBe(6);
 
 })
 
-test(`as-traversable-object`, t => {
+test(`as-traversable-object`, () => {
   const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
   //onsole.log(TraversableTree.toStringDeep(r1));
-  t.true(TraversableTree.hasChildValue(r1, { name: `name`, value: `Jill`, ancestors: [ "obj" ] }, isEqualValueDefault));
+  expect(
+    TraversableTree.hasChildValue(r1, { name: `name`, value: `Jill`, ancestors: [ "obj" ] }, isEqualValueDefault)
+  ).toBe(true);
 
-  t.true(TraversableTree.hasChildValue(r1, {
+  expect(TraversableTree.hasChildValue(r1, {
     name: `address`, value: {
       street: 'Blah St',
       number: 27
     },
     ancestors: [ "obj" ]
-  }, isEqualValueDefault));
-  t.false(TraversableTree.hasChildValue(r1, {
+  }, isEqualValueDefault)).toBe(true);
+  expect(TraversableTree.hasChildValue(r1, {
     // @ts-ignore
     name: `address`, address: {
       street: 'West St',
       number: 35
     }
-  }, isEqualValueDefault));
+  }, isEqualValueDefault)).toBe(false);
 
-  t.true(TraversableTree.hasAnyChildValue(r1, { name: `number`, value: 35, ancestors: [ "obj", "kids", "0", "address" ] }, isEqualValueDefault));
+  expect(
+    TraversableTree.hasAnyChildValue(r1, { name: `number`, value: 35, ancestors: [ "obj", "kids", "0", "address" ] }, isEqualValueDefault)
+  ).toBe(true);
 
   const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', value: 'John' }, isEqualValuePartial);
-  t.truthy(r1a);
+  expect(r1a).toBeTruthy();
   if (r1a !== undefined) {
-    t.true(TraversableTree.hasAnyChild(r1, r1a));
+    expect(TraversableTree.hasAnyChild(r1, r1a)).toBe(true);
     // const parents = [ ...TraversableTree.parents(r1a) ];
-    t.true(TraversableTree.hasAnyParent(r1a, r1));
+    expect(TraversableTree.hasAnyParent(r1a, r1)).toBe(true);
   }
 });
 
-test(`as-traversable-array`, t => {
+test(`as-traversable-array`, () => {
   const r1 = asDynamicTraversable([ 1, 2, 3, 4, 5 ], { name: `test` });
   const breadthFirst = [ ...TraversableTree.breadthFirst(r1) ];
-  t.is(breadthFirst.length, 5);
-  t.true(TraversableTree.hasChildValue(r1, { name: `1`, value: 2, ancestors: [ `test` ] }, isEqualValuePartial));
-  t.false(TraversableTree.hasChildValue(r1, { name: `0`, value: 10, ancestors: [ `test` ] }, isEqualValuePartial));
-  t.is(TraversableTree.childrenLength(r1), 5);
+  expect(breadthFirst.length).toBe(5);
+  expect(
+    TraversableTree.hasChildValue(r1, { name: `1`, value: 2, ancestors: [ `test` ] }, isEqualValuePartial)
+  ).toBe(true);
+  expect(
+    TraversableTree.hasChildValue(r1, { name: `0`, value: 10, ancestors: [ `test` ] }, isEqualValuePartial)
+  ).toBe(false);
+  expect(TraversableTree.childrenLength(r1)).toBe(5);
 })
 
 
-test('direct-children', (t) => {
+test('direct-children', () => {
   t.like([ ...children(getTestObject()) ], [
     { name: "name", nodeValue: "Jill" },
     { name: "address", sourceValue: { number: 27, street: "Blah St" } },
@@ -194,7 +202,7 @@ test('direct-children', (t) => {
   ]);
 });
 
-test('trace-by-path', (t) => {
+test('trace-by-path', () => {
   const o = getTestObject();
   const opts: PathOpts = {
     separator: '.'
@@ -289,7 +297,7 @@ test('trace-by-path', (t) => {
   ]);
 });
 
-test('get-by-path', (t) => {
+test('get-by-path', () => {
   const people = {
     jane: {
       address: {
@@ -314,7 +322,7 @@ test('get-by-path', (t) => {
 
 });
 
-test(`tree-object-compare`, t => {
+test(`tree-object-compare`, () => {
   const generate = () => ({
     person: {
       name: `Jane`,
@@ -336,16 +344,16 @@ test(`tree-object-compare`, t => {
   const tree1 = create(v1, { valuesAtLeaves: true });
   const tree2 = create(v2, { valuesAtLeaves: true });
   const diff1 = TreeMutable.compare(tree1, create(v1, { valuesAtLeaves: true }));
-  t.is(diff1.value?.added.length, 0);
-  t.is(diff1.value?.removed.length, 0);
-  t.false(diff1.value?.childChanged);
-  t.false(diff1.value?.valueChanged);
+  expect(diff1.value?.added.length).toBe(0);
+  expect(diff1.value?.removed.length).toBe(0);
+  expect(diff1.value?.childChanged).toBe(false);
+  expect(diff1.value?.valueChanged).toBe(false);
 
   const diff2 = TreeMutable.compare(tree1, tree2);
-  t.is(diff2.value?.added.length, 0);
-  t.is(diff2.value?.removed.length, 0);
-  t.true(diff2.value?.childChanged);
-  t.false(diff2.value?.valueChanged);
+  expect(diff2.value?.added.length).toBe(0);
+  expect(diff2.value?.removed.length).toBe(0);
+  expect(diff2.value?.childChanged).toBe(true);
+  expect(diff2.value?.valueChanged).toBe(false);
 
   let valueChanged = 0;
   let childChanged = 0;
@@ -360,8 +368,8 @@ test(`tree-object-compare`, t => {
     //if (v.childChanged) changedNode = diff2Kid;
   }
 
-  t.is(valueChanged, 0);
-  t.is(childChanged, 1);
+  expect(valueChanged).toBe(0);
+  expect(childChanged).toBe(1);
 
   // if (changedNode) {
   //   for (const diff2KidKid of changedNode?.childrenStore) {

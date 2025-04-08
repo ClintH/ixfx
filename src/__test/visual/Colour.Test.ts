@@ -1,31 +1,31 @@
 
+import expect from 'expect';
 import { applyToValues, round } from '../../numbers/index.js';
 import * as Colour from '../../visual/colour/index.js';
-import test from 'ava';
-test(`opacity`, (t) => {
-  t.is(Colour.multiplyOpacity(`red`, 0.5), `rgb(100% 0% 0% / 0.5)`);
-  t.is(Colour.multiplyOpacity(`hsl(0,100%,50%)`, 0.5), `hsl(0 100% 50% / 0.5)`);
+test(`opacity`, () => {
+  expect(Colour.multiplyOpacity(`red`, 0.5)).toBe(`rgb(100% 0% 0% / 0.5)`);
+  expect(Colour.multiplyOpacity(`hsl(0,100%,50%)`, 0.5)).toBe(`hsl(0 100% 50% / 0.5)`);
 });
 
-test(`special`, t => {
-  t.is(Colour.toHex(`transparent`), `#00000000`);
+test(`special`, () => {
+  expect(Colour.toHex(`transparent`)).toBe(`#00000000`);
   const hsl1 = Colour.toHsl(`transparent`);
 
-  t.is(hsl1.opacity, 0);
+  expect(hsl1.opacity).toBe(0);
 
-  t.is(Colour.toHex(`white`), `#ffffff`);
+  expect(Colour.toHex(`white`)).toBe(`#ffffff`);
   const hsl2a = Colour.toHsl(`white`);
-  t.is(hsl2a.l, 1);
+  expect(hsl2a.l).toBe(1);
 
-  t.throws(() => Colour.toHsl(`white`, false)); // disable safe
+  expect(() => Colour.toHsl(`white`, false)).toThrow(); // disable safe
 
-  t.is(Colour.toHex(`black`), `#000000`);
+  expect(Colour.toHex(`black`)).toBe(`#000000`);
   const hsl3 = Colour.toHsl(`black`);
-  t.is(hsl3.l, 0);
+  expect(hsl3.l).toBe(0);
 
 });
 
-test(`colour-parse`, (t) => {
+test(`colour-parse`, () => {
   // Indeterminate input
   //t.like(Colour.toHsl(`hsl(0,0%,0%)`), { h: 0, s: 0, l: 0 });
   //t.like(Colour.toHsl(`hsla(0,0%,0%,0)`), { h: 0, s: 0, l: 0 });
@@ -45,49 +45,51 @@ test(`colour-parse`, (t) => {
 
 });
 
-test(`rgb-validate`, t => {
+test(`rgb-validate`, () => {
   // Values exceed relative range
-  t.throws(() => Colour.toString({ r: 255, g: 0, b: 0, unit: `relative` }));
-  t.throws(() => Colour.toString({ r: 0, g: 2, b: 0, unit: `relative` }));
-  t.throws(() => Colour.toString({ r: 0, g: 0, b: 2, unit: `relative` }));
-  t.throws(() => Colour.toString({ r: 0, g: 0, b: 0, opacity: 10, unit: `relative` }));
+  expect(() => Colour.toString({ r: 255, g: 0, b: 0, unit: `relative` })).toThrow();
+  expect(() => Colour.toString({ r: 0, g: 2, b: 0, unit: `relative` })).toThrow();
+  expect(() => Colour.toString({ r: 0, g: 0, b: 2, unit: `relative` })).toThrow();
+  expect(() => Colour.toString({ r: 0, g: 0, b: 0, opacity: 10, unit: `relative` })).toThrow();
 
   // Values exceed 8bit range
-  t.throws(() => Colour.toString({ r: 256, g: 0, b: 0, unit: `8bit` }));
-  t.throws(() => Colour.toString({ r: 0, g: -1, b: 0, unit: `8bit` }));
-  t.throws(() => Colour.toString({ r: 0, g: 0, b: 300, unit: `8bit` }));
-  t.throws(() => Colour.toString({ r: 0, g: 0, b: 0, opacity: 10, unit: `8bit` }));
+  expect(() => Colour.toString({ r: 256, g: 0, b: 0, unit: `8bit` })).toThrow();
+  expect(() => Colour.toString({ r: 0, g: -1, b: 0, unit: `8bit` })).toThrow();
+  expect(() => Colour.toString({ r: 0, g: 0, b: 300, unit: `8bit` })).toThrow();
+  expect(() => Colour.toString({ r: 0, g: 0, b: 0, opacity: 10, unit: `8bit` })).toThrow();
 });
 
-test(`hsl-validate`, t => {
+test(`hsl-validate`, () => {
   // Values exceed relative range
-  t.throws(() => Colour.toString({ h: 1.1, s: 0, l: 0, unit: `relative` }));
-  t.throws(() => Colour.toString({ h: 0, s: 2, l: 0, unit: `relative` }));
-  t.throws(() => Colour.toString({ h: 0, s: 0, l: 2, unit: `relative` }));
-  t.throws(() => Colour.toString({ h: 0, s: 0, l: 0, opacity: 10, unit: `relative` }));
+  expect(() => Colour.toString({ h: 1.1, s: 0, l: 0, unit: `relative` })).toThrow();
+  expect(() => Colour.toString({ h: 0, s: 2, l: 0, unit: `relative` })).toThrow();
+  expect(() => Colour.toString({ h: 0, s: 0, l: 2, unit: `relative` })).toThrow();
+  expect(() => Colour.toString({ h: 0, s: 0, l: 0, opacity: 10, unit: `relative` })).toThrow();
 
   // Values exceed absolute range
-  t.notThrows(() => Colour.toString({ h: 361, s: 0, l: 0, unit: `absolute` })); // angles wrap
-  t.throws(() => Colour.toString({ h: 0, s: -1, l: 0, unit: `absolute` }));
-  t.throws(() => Colour.toString({ h: 0, s: 0, l: 200, unit: `absolute` }));
-  t.throws(() => Colour.toString({ h: 0, s: 0, l: 0, opacity: 10, unit: `absolute` }));
+  expect(() => Colour.toString({ h: 361, s: 0, l: 0, unit: `absolute` })).not.toThrow(); // angles wrap
+  expect(() => Colour.toString({ h: 0, s: -1, l: 0, unit: `absolute` })).toThrow();
+  expect(() => Colour.toString({ h: 0, s: 0, l: 200, unit: `absolute` })).toThrow();
+  expect(() => Colour.toString({ h: 0, s: 0, l: 0, opacity: 10, unit: `absolute` })).toThrow();
 });
 
-test(`to-string`, t => {
+test(`to-string`, () => {
 
-  t.is(Colour.toString(`black`), `rgb(0% 0% 0%)`);
-  t.is(Colour.toString({ r: 0, g: 0, b: 0, unit: `relative` }), `rgb(0% 0% 0%)`);
-  t.is(Colour.toString({ r: 1, g: 1, b: 1, unit: `relative` }), `rgb(100% 100% 100%)`);
-  t.is(Colour.toString({ r: 1, g: 1, b: 1, opacity: 0.5, unit: `relative` }), `rgb(100% 100% 100% / 0.5)`);
+  expect(Colour.toString(`black`)).toBe(`rgb(0% 0% 0%)`);
+  expect(Colour.toString({ r: 0, g: 0, b: 0, unit: `relative` })).toBe(`rgb(0% 0% 0%)`);
+  expect(Colour.toString({ r: 1, g: 1, b: 1, unit: `relative` })).toBe(`rgb(100% 100% 100%)`);
+  expect(Colour.toString({ r: 1, g: 1, b: 1, opacity: 0.5, unit: `relative` })).toBe(`rgb(100% 100% 100% / 0.5)`);
 
-  t.is(Colour.toString({ r: 0, g: 0, b: 0, unit: `8bit` }), `rgb(0% 0% 0%)`);
-  t.is(Colour.toString({ r: 255, g: 255, b: 255, unit: `8bit` }), `rgb(100% 100% 100%)`);
-  t.is(Colour.toString({ r: 255, g: 255, b: 255, opacity: 0.5, unit: `8bit` }), `rgb(100% 100% 100% / 0.5)`);
+  expect(Colour.toString({ r: 0, g: 0, b: 0, unit: `8bit` })).toBe(`rgb(0% 0% 0%)`);
+  expect(Colour.toString({ r: 255, g: 255, b: 255, unit: `8bit` })).toBe(`rgb(100% 100% 100%)`);
+  expect(Colour.toString({ r: 255, g: 255, b: 255, opacity: 0.5, unit: `8bit` })).toBe(`rgb(100% 100% 100% / 0.5)`);
 
-  t.is(Colour.toString({ h: 0, s: 0, l: 0, unit: `relative` }), `hsl(0 0% 0%)`);
-  t.is(Colour.toString({ h: 0, s: 0, l: 0, opacity: 0.5, unit: `relative` }), `hsl(0 0% 0% / 0.5)`);
+  expect(Colour.toString({ h: 0, s: 0, l: 0, unit: `relative` })).toBe(`hsl(0 0% 0%)`);
+  expect(Colour.toString({ h: 0, s: 0, l: 0, opacity: 0.5, unit: `relative` })).toBe(`hsl(0 0% 0% / 0.5)`);
 
-  t.is(Colour.toString({ h: 200, s: 0, l: 0, unit: `absolute` }), `hsl(200 0% 0%)`);
-  t.is(Colour.toString({ h: 200, s: 100, l: 100, opacity: 0.5, unit: `absolute` }), `hsl(200 100% 100% / 0.5)`);
+  expect(Colour.toString({ h: 200, s: 0, l: 0, unit: `absolute` })).toBe(`hsl(200 0% 0%)`);
+  expect(
+    Colour.toString({ h: 200, s: 100, l: 100, opacity: 0.5, unit: `absolute` })
+  ).toBe(`hsl(200 100% 100% / 0.5)`);
 
 });

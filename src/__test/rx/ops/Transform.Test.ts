@@ -1,12 +1,12 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
-test(`transform`, async t => {
+test(`transform`, async () => {
   // Simple array as source
   const data = [ 1, 2, 3, 4, 5 ];
   const values = Rx.transform(data, (v => v + '!'));
   const valuesArray = await Rx.toArray(values);
-  t.is(valuesArray.length, data.length);
+  expect(valuesArray.length).toBe(data.length);
   for (let i = 0; i < data.length; i++) {
-    t.is(valuesArray[ i ], data[ i ] + '!');
+    expect(valuesArray[ i ]).toBe(data[ i ] + '!');
   }
 });

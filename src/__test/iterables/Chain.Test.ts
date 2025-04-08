@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Chains from '../../iterables/chain/index.js';
 import { count } from '../../numbers/Count.js';
 import * as Async from '../../iterables/IterableAsync.js'
@@ -9,10 +9,10 @@ import { isApprox } from '../../numbers/IsApprox.js';
 const getNumberData = () => Array.from([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]);
 const getStringData = () => getNumberData().map(v => v.toString());
 
-test('asPromise', async t => {
+test('asPromise', async () => {
   const timeout = 100;
   const loops = 10;
-  t.plan(loops);
+  expect.assertions(loops);
   t.timeout(timeout * (loops + 2));
   const tick = Chains.From.timestamp({ interval: timeout, loops });
   const tickValue = Chains.asPromise(tick);
@@ -30,7 +30,7 @@ test('asPromise', async t => {
 });
 
 
-test(`fromFunction`, async t => {
+test(`fromFunction`, async () => {
   // Low-level
   let produced = 0;
   const factory = Chains.From.func(() => {
@@ -39,13 +39,13 @@ test(`fromFunction`, async t => {
   const f = factory();
   let count = 0;
   for await (const v of f) {
-    t.is(v, count);
+    expect(v).toBe(count);
     count++;
     if (count === 5) break;
   }
 
   const r1 = await Chains.single(factory, 10);
-  t.is(r1, 5);
+  expect(r1).toBe(5);
 
   // In context
   produced = 0;
@@ -55,15 +55,15 @@ test(`fromFunction`, async t => {
     Chains.Links.take(5)
   );
   const ch1Result = (await Chains.asArray(ch1)).join(` `);
-  t.deepEqual(ch1Result, `x:0 x:1 x:2 x:3 x:4`);
+  expect(ch1Result).toEqual(`x:0 x:1 x:2 x:3 x:4`);
 });
 
-test(`lazy`, async t => {
+test(`lazy`, async done => {
   // Make sure input is not called on too early
   let produced = 0;
   let fired = false;
   const l1 = Chains.lazy().fromFunction(() => {
-    if (!fired) t.fail(`Lazy function used before fired`);
+    if (!fired) done.fail(`Lazy function used before fired`);
     if (produced === 5) return;
     return produced++;
   });
@@ -71,23 +71,23 @@ test(`lazy`, async t => {
   setTimeout(async () => {
     fired = true;
     const x = await l1.asArray([]);
-    t.deepEqual(x, [ 0, 1, 2, 3, 4 ]);
+    expect(x).toEqual([ 0, 1, 2, 3, 4 ]);
   }, 200);
 
 
   const l3 = await Chains.lazy().max().input([ 4, 0, 10 ]).lastOutput();
-  t.is(l3, 10);
+  expect(l3).toBe(10);
   await sleep(250);
 });
 
-test(`chunk`, async t => {
+test(`chunk`, async () => {
   // Chunk of 1
   const ch1 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
     Chains.Links.chunk(1)
   );
   const r1 = await Chains.asArray(ch1);
-  t.deepEqual(r1, [ [ 1 ], [ 2 ], [ 3 ], [ 4 ], [ 5 ], [ 6 ] ]);
+  expect(r1).toEqual([ [ 1 ], [ 2 ], [ 3 ], [ 4 ], [ 5 ], [ 6 ] ]);
 
   // Chunk of 2
   const ch2 = Chains.run(
@@ -95,7 +95,7 @@ test(`chunk`, async t => {
     Chains.Links.chunk(2)
   );
   const r2 = await Chains.asArray(ch2);
-  t.deepEqual(r2, [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]);
+  expect(r2).toEqual([ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]);
 
   // Chunk of 4 - with remainders
   const ch3 = Chains.run(
@@ -103,7 +103,7 @@ test(`chunk`, async t => {
     Chains.Links.chunk(4)
   );
   const r3 = await Chains.asArray(ch3);
-  t.deepEqual(r3, [ [ 1, 2, 3, 4 ], [ 5, 6 ] ]);
+  expect(r3).toEqual([ [ 1, 2, 3, 4 ], [ 5, 6 ] ]);
 
   // Chunk of 4 - suppress remainders
   const ch4 = Chains.run(
@@ -111,7 +111,7 @@ test(`chunk`, async t => {
     Chains.Links.chunk(4, false)
   );
   const r4 = await Chains.asArray(ch4);
-  t.deepEqual(r4, [ [ 1, 2, 3, 4 ] ]);
+  expect(r4).toEqual([ [ 1, 2, 3, 4 ] ]);
 
   // Throw for zero-sized chunk
   await t.throwsAsync(async () => {
@@ -123,11 +123,11 @@ test(`chunk`, async t => {
   });
 });
 
-test(`flatten`, async t => {
+test(`flatten`, async () => {
   // Simple
   const f = Chains.Links.reduce<string, string>(data => data.join(`-`));
   const r1 = await Chains.single(f, [ `a`, `b`, `c` ]);
-  t.is(r1, `a-b-c`);
+  expect(r1).toBe(`a-b-c`);
 
   const ch1 = Chains.run(
     [ 1, 2, 3, 4, 5, 6 ],
@@ -136,14 +136,14 @@ test(`flatten`, async t => {
     Chains.Links.reduce(v => v.join(`-`))
   );
   const r2 = (await Chains.asArray(ch1)).join(`;`);
-  t.is(r2, `x:1-x:2-x:3;x:4-x:5-x:6`)
+  expect(r2).toBe(`x:1-x:2-x:3;x:4-x:5-x:6`)
 
 });
 
 /**
  * Merge to object, breaking when stream stops
  */
-test(`combine-latest-to-object-break`, async t => {
+test(`combine-latest-to-object-break`, async () => {
   const c1 = Chains.combineLatestToObject({
     fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
     slow: Chains.From.array([ 5, 6, 7 ], 25)
@@ -151,7 +151,7 @@ test(`combine-latest-to-object-break`, async t => {
   const c1Array = await Chains.asArray(c1);
   // Slow chain doesn't get a chance to finish due to 'onSourceDone:break'
   // Values get repeated because afterEmit:last
-  t.deepEqual(c1Array, [
+  expect(c1Array).toEqual([
     { fast: 1, slow: undefined }, { fast: 2, slow: undefined }, { fast: 2, slow: 5 }, { fast: 3, slow: 5 }, { fast: 4, slow: 5 }
   ]);
 
@@ -162,13 +162,13 @@ test(`combine-latest-to-object-break`, async t => {
     slow: Chains.From.array([ 5, 6, 7 ], 25)
   }, { onSourceDone: `break`, afterEmit: 'undefined' });
   const c2Array = await Chains.asArray(c2);
-  t.deepEqual(c2Array, [
+  expect(c2Array).toEqual([
     { fast: 1, slow: undefined }, { fast: 2, slow: undefined }, { fast: undefined, slow: 5 }, { fast: 3, slow: undefined }, { fast: 4, slow: undefined }
   ]);
 
 });
 
-test(`combine-latest-to-object-allow`, async t => {
+test(`combine-latest-to-object-allow`, async () => {
   const c1 = Chains.combineLatestToObject({
     fast: Chains.From.array([ 1, 2, 3, 4 ], 10),
     slow: Chains.From.array([ 5, 6, 7 ], 25)
@@ -177,7 +177,7 @@ test(`combine-latest-to-object-allow`, async t => {
 
   // Allow source to finish without closing.
   // Expect last values to be carried forward becase of afterEmit: last and finalValue:last
-  t.deepEqual(c1Array, [
+  expect(c1Array).toEqual([
     { fast: 1, slow: undefined },
     { fast: 2, slow: undefined },
     { fast: 2, slow: 5 },
@@ -195,7 +195,7 @@ test(`combine-latest-to-object-allow`, async t => {
 
   // Allow source to finish without closing.
   // Expect last values to be undefined forward becase of afterEmit: last and finalValue:undefined
-  t.deepEqual(c2Array, [
+  expect(c2Array).toEqual([
     { fast: 1, slow: undefined },
     { fast: 2, slow: undefined },
     { fast: 2, slow: 5 },
@@ -214,7 +214,7 @@ test(`combine-latest-to-object-allow`, async t => {
 
   // Allow source to finish without closing.
   // Expect last values to be undefined forward becase of afterEmit: undefined and finalValue:undefined
-  t.deepEqual(c3Array, [
+  expect(c3Array).toEqual([
     { fast: 1, slow: undefined },
     { fast: 2, slow: undefined },
     { fast: undefined, slow: 5 },
@@ -226,7 +226,7 @@ test(`combine-latest-to-object-allow`, async t => {
 });
 
 
-test(`combine-latest-to-array`, async t => {
+test(`combine-latest-to-array`, async () => {
   const c1 = Chains.combineLatestToArray([
     Chains.From.array([ 1, 2, 3, 4 ], 10),
     Chains.From.array([ 5, 6, 7 ], 25)
@@ -235,7 +235,7 @@ test(`combine-latest-to-array`, async t => {
 
   // Second chain a bit slow, second doesn't get a chance to finish due to 'onSourceDone:break'
   // Values get repeated because afterEmit:last
-  t.deepEqual(c1Array, [
+  expect(c1Array).toEqual([
     [ 1, undefined ], [ 2, undefined ], [ 2, 5 ], [ 3, 5 ], [ 4, 5 ]
   ]);
 
@@ -246,7 +246,7 @@ test(`combine-latest-to-array`, async t => {
   const c1aArray = await Chains.asArray(c1a);
 
   // afterEmit:undefined
-  t.deepEqual(c1aArray, [
+  expect(c1aArray).toEqual([
     [ 1, undefined ], [ 2, undefined ], [ undefined, 5 ], [ 3, undefined ], [ 4, undefined ]
   ]);
 
@@ -257,7 +257,7 @@ test(`combine-latest-to-array`, async t => {
   const c2Array = await Chains.asArray(c2);
 
   // Second chain a bit slow, second doesn't get a chance to finish due to 'onSourceDone:break'
-  t.deepEqual(c2Array, [
+  expect(c2Array).toEqual([
     [ 1, undefined ], [ 2, undefined ], [ 2, 5 ], [ 3, 5 ], [ 4, 5 ],
     [ 4, 6 ], [ 4, 7 ]
   ]);
@@ -267,7 +267,7 @@ test(`combine-latest-to-array`, async t => {
     Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `allow`, finalValue: `last`, afterEmit: `undefined` });
   const c2aArray = await Chains.asArray(c2a);
-  t.deepEqual(c2aArray, [
+  expect(c2aArray).toEqual([
     [ 1, undefined ], [ 2, undefined ], [ undefined, 5 ], [ 3, undefined ], [ 4, undefined ], [ undefined, 6 ], [ undefined, 7 ]
   ]);
 
@@ -276,13 +276,13 @@ test(`combine-latest-to-array`, async t => {
     Chains.From.array([ 5, 6, 7 ], 25)
   ], { onSourceDone: `allow`, finalValue: `undefined` });
   const c3Array = await Chains.asArray(c3);
-  t.deepEqual(c3Array, [
+  expect(c3Array).toEqual([
     [ 1, undefined ], [ 2, undefined ], [ 2, 5 ], [ 3, 5 ],
     [ 4, 5 ], [ undefined, 5 ], [ undefined, 6 ], [ undefined, 7 ]
   ]);
 });
 
-test(`merge-flat`, async t => {
+test(`merge-flat`, async () => {
   const t1 = Chains.run(
     Chains.From.timestamp({ interval: 50, loops: 10 }),
     Chains.Links.tally(),
@@ -302,10 +302,10 @@ test(`merge-flat`, async t => {
   );
 
   const output = await Chains.asArray(Chains.mergeFlat(t1, t2, t3));
-  t.true(output.includes(`a:10`));
-  t.true(output.includes(`b:9`));
-  t.true(output.includes(`c:8`));
-  t.is(output.length, 10 + 9 + 8);
+  expect(output.includes(`a:10`)).toBe(true);
+  expect(output.includes(`b:9`)).toBe(true);
+  expect(output.includes(`c:8`)).toBe(true);
+  expect(output.length).toBe(10 + 9 + 8);
 
   // for await (const v of Chains.merge(t1, t2, t3)) {
   //   console.log(v);
@@ -313,29 +313,29 @@ test(`merge-flat`, async t => {
   //await sleep(5000);
 });
 
-test(`addToArray`, async t => {
+test(`addToArray`, async () => {
   const data: Array<number> = [];
   Chains.addToArray(data, Chains.From.timestamp({ interval: 100, loops: 5 }));
 
   // Wait for all the data to arrive
   await sleep(505);
-  t.is(data.length, 5);
+  expect(data.length).toBe(5);
 });
 
 
 
-test('asValue', async t => {
+test('asValue', async () => {
   const tick = Chains.From.timestamp({ interval: 100 });
   const tickValue = Chains.asValue(tick);
   const v1 = await tickValue();
-  t.falsy(v1);
+  expect(v1).toBeFalsy();
   await sleep(100);
   const v2 = await tickValue();
-  t.truthy(v2);
+  expect(v2).toBeTruthy();
 });
 
-test('asCallback', async t => {
-  t.plan(5);
+test('asCallback', async () => {
+  expect.assertions(5);
   const tick = Chains.From.timestamp({ interval: 100, loops: 5 });
   const tickValue = Chains.asCallback(tick, v => {
     t.assert(true, `callback triggered`);
@@ -343,36 +343,36 @@ test('asCallback', async t => {
   await sleep(5 * 102);
 });
 
-test('transform', async t => {
+test('transform', async () => {
   const tr = Chains.Links.transform<string, number>(v => Number.parseInt(v));
   const output = await Async.toArray(tr([ `1`, `2`, `3` ]));
   const expected = [ 1, 2, 3 ];
-  t.deepEqual(output, expected);
+  expect(output).toEqual(expected);
 })
 
-test('filter', async t => {
+test('filter', async () => {
   const data = getNumberData();
   const out1 = await Async.toArray(Chains.Links.filter<number>(v => v % 2 === 0)(data));
-  t.deepEqual(out1, [ 2, 4, 6, 8, 10 ]);
+  expect(out1).toEqual([ 2, 4, 6, 8, 10 ]);
 });
 
-test('take', async t => {
+test('take', async () => {
   const inputData = getNumberData();
   const limit = 5;
   const output = await Async.toArray(Chains.Links.take(limit)(inputData));
-  t.deepEqual(output, inputData.slice(0, limit));
+  expect(output).toEqual(inputData.slice(0, limit));
 
   const output2 = await Async.toArray(Chains.Links.take(0)(inputData));
-  t.is(output2.length, 0);
+  expect(output2.length).toBe(0);
 });
 
-test(`syncToArray`, async t => {
+test(`syncToArray`, async () => {
   const t1 = Chains.From.timestamp({ interval: 10, loops: 10 });
   const t2 = Chains.From.timestamp({ interval: 20, loops: 5, asClockTime: true });
   const ch1 = Chains.syncToArray([ t1, t2 ], { onSourceDone: `break` });
   const output1 = await Chains.asArray(ch1);
   // Expect the total length to be 5 because 'onSourceDone:break'
-  t.is(output1.length, 5);
+  expect(output1.length).toBe(5);
 
   const ch2 = Chains.syncToArray([
     Chains.From.timestamp({ interval: 10, loops: 10 }),
@@ -380,14 +380,14 @@ test(`syncToArray`, async t => {
   ], { onSourceDone: `allow` });
 
   const ch2Array = await Chains.asArray(ch2);
-  t.is(ch2Array.length, 10);
+  expect(ch2Array.length).toBe(10);
 
   const ch3 = Chains.syncToArray([
     Async.withDelay([ 1, 2, 3 ], 10),
     Async.withDelay([ 4, 5, 6 ], 15)
   ], { onSourceDone: `allow` });
   const ch3Array = await Chains.asArray(ch3);
-  t.deepEqual(ch3Array, [ [ 1, 4 ], [ 2, 5 ], [ 3, 6 ] ]);
+  expect(ch3Array).toEqual([ [ 1, 4 ], [ 2, 5 ], [ 3, 6 ] ]);
 
   const ch4 = Chains.syncToArray([
     Async.withDelay([ 1, 2, 3, 4 ], 10),
@@ -395,7 +395,7 @@ test(`syncToArray`, async t => {
   ], { onSourceDone: `allow`, finalValue: `last` });
   const ch4Array = await Chains.asArray(ch4);
   // Expect repeat of '7' because of 'finalValue:last'
-  t.deepEqual(ch4Array, [
+  expect(ch4Array).toEqual([
     [ 1, 5 ], [ 2, 6 ], [ 3, 7 ], [ 4, 7 ], [ 4, 7 ]
   ]);
 
@@ -406,8 +406,8 @@ test(`syncToArray`, async t => {
   await t.throwsAsync(async () => await Chains.asArray(ch5));
 });
 
-test(`debounce`, async t => {
-  t.plan(3);
+test(`debounce`, async () => {
+  expect.assertions(3);
   //const elapsed = Elapsed.since();
   const ch1 = Chains.run(
     Chains.From.timestamp({ interval: 10, elapsed: 350 }),
@@ -418,14 +418,14 @@ test(`debounce`, async t => {
   }
 });
 
-test('chain', async t => {
+test('chain', async () => {
   // Input array, transform
   const ch1 = Chains.run(
     [ `1`, `2`, `3` ],
     Chains.Links.transform(v => Number.parseInt(v))
   );
   const out1 = await Async.toArray(ch1);
-  t.deepEqual(out1, [ 1, 2, 3 ]);
+  expect(out1).toEqual([ 1, 2, 3 ]);
 
   // Input array, transform & filter
   const data = getStringData();
@@ -435,7 +435,7 @@ test('chain', async t => {
     Chains.Links.filter(v => v % 2 === 0)
   );
   const out2 = await Async.toArray(ch2);
-  t.deepEqual(out2, [ 2, 4, 6, 8, 10 ]);
+  expect(out2).toEqual([ 2, 4, 6, 8, 10 ]);
 
   // Generator input
   const ch3 = Chains.run(
@@ -443,10 +443,10 @@ test('chain', async t => {
     Chains.Links.filter(v => v % 2 === 0)
   );
   const out3 = await Async.toArray(ch3);
-  t.deepEqual(out3, [ 2, 4, 6, 8, 10 ])
+  expect(out3).toEqual([ 2, 4, 6, 8, 10 ])
 })
 
-test(`rank-array`, async t => {
+test(`rank-array`, async () => {
   const values = [ [ 1, 2, 3 ], [ 3, 2, 1 ], [ 1, 2, 1 ], [ 1, 1, 1 ] ];
 
   const ranker = (a: number, b: number) => {
@@ -460,21 +460,21 @@ test(`rank-array`, async t => {
     values,
     Chains.Links.rankArray(ranker));
   const out1 = await Async.toArray(ch1);
-  t.deepEqual(out1, [ 3 ])
+  expect(out1).toEqual([ 3 ])
 
   // Also emit equal ranked
   const ch2 = Chains.run(
     values,
     Chains.Links.rankArray(ranker, { emitEqualRanked: true }));
   const out2 = await Async.toArray(ch2);
-  t.deepEqual(out2, [ 3, 3 ])
+  expect(out2).toEqual([ 3, 3 ])
 
   // Always emit max
   const ch3 = Chains.run(
     values,
     Chains.Links.rankArray(ranker, { emitRepeatHighest: true }));
   const out3 = await Async.toArray(ch3);
-  t.deepEqual(out3, [ 3, 3, 3, 3 ]);
+  expect(out3).toEqual([ 3, 3, 3, 3 ]);
 
   // -- Within arrays
   // const values = [ [1,2,3], [3,2,1], [1,2,1], [1,1,1] ];
@@ -482,10 +482,10 @@ test(`rank-array`, async t => {
     values,
     Chains.Links.rankArray(ranker, { withinArrays: true }));
   const out4 = await Async.toArray(ch4);
-  t.deepEqual(out4, [ 3, 3, 2, 1 ])
+  expect(out4).toEqual([ 3, 3, 2, 1 ])
 });
 
-test(`rank`, async t => {
+test(`rank`, async () => {
   const objects: Array<{ size: number }> = [
     { size: 4 }, { size: 2 }, { size: 10 }, { size: 10 }, { size: 1 }, { size: 4 }, { size: 11 }
   ]
@@ -501,24 +501,26 @@ test(`rank`, async t => {
     objects,
     Chains.Links.rank(ranker));
   const out1 = await Async.toArray(ch1);
-  t.deepEqual(out1, [ { size: 4 }, { size: 10 }, { size: 11 } ])
+  expect(out1).toEqual([ { size: 4 }, { size: 10 }, { size: 11 } ])
 
   // Also emit equal ranked
   const ch2 = Chains.run(
     objects,
     Chains.Links.rank(ranker, { emitEqualRanked: true }));
   const out2 = await Async.toArray(ch2);
-  t.deepEqual(out2, [ { size: 4 }, { size: 10 }, { size: 10 }, { size: 11 } ])
+  expect(out2).toEqual([ { size: 4 }, { size: 10 }, { size: 10 }, { size: 11 } ])
 
   // Always emit max
   const ch3 = Chains.run(
     objects,
     Chains.Links.rank(ranker, { emitRepeatHighest: true }));
   const out3 = await Async.toArray(ch3);
-  t.deepEqual(out3, [ { size: 4 }, { size: 4 }, { size: 10 }, { size: 10 }, { size: 10 }, { size: 10 }, { size: 11 } ])
+  expect(out3).toEqual(
+    [ { size: 4 }, { size: 4 }, { size: 10 }, { size: 10 }, { size: 10 }, { size: 10 }, { size: 11 } ]
+  )
 });
 
-test('delay', async t => {
+test('delay', async () => {
   const interval = 200;
   const ch = Chains.run(
     [ `1`, `2`, `3` ],
@@ -530,10 +532,10 @@ test('delay', async t => {
   for await (const v of ch) {
     tracker.mark();
   }
-  t.true(isApprox(0.01, interval)(tracker.avg));
+  expect(isApprox(0.01, interval)(tracker.avg)).toBe(true);
 });
 
-test('tick', async t => {
+test('tick', async () => {
   // Tick with interval
   const intervalMs = 50;
   const ch1 = Chains.run(
@@ -547,7 +549,7 @@ test('tick', async t => {
     if (count++ > 20) break;
   }
   // Check that interval between iterations is about right
-  t.true(isApprox(0.01, intervalMs)(tracker.avg))
+  expect(isApprox(0.01, intervalMs)(tracker.avg)).toBe(true)
 
   // Tick with max loops
   let loops = 10;
@@ -562,9 +564,9 @@ test('tick', async t => {
     count++;
   }
   // Check that loops is right
-  t.is(loops, count);
+  expect(loops).toBe(count);
 
   // Check that interval between iterations is about right
-  t.true(isApprox(0.01, intervalMs)(tracker.avg))
+  expect(isApprox(0.01, intervalMs)(tracker.avg)).toBe(true)
 
 });

@@ -1,29 +1,29 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
-test(`rx-boolean`, t => {
+test(`rx-boolean`, done => {
   const nonInit = Rx.From.boolean();
-  t.falsy(nonInit.last(), "Undefined initial value");
-  t.false(Rx.hasLast(nonInit), "No last value");
-  t.plan(10);
+  expect(nonInit.last()).toBeFalsy();
+  expect(Rx.hasLast(nonInit)).toBe(false);
+  expect.assertions(10);
   let count = 0;
   nonInit.on(v => {
     count++;
     if (count === 1) {
-      t.is(v.value, true);
+      expect(v.value).toBe(true);
     } else if (count === 2) {
-      t.is(v.value, false);
-    } else t.fail(`Unexpectedly called three times`);
+      expect(v.value).toBe(false);
+    } else done.fail(`Unexpectedly called three times`);
 
   });
   nonInit.set(true);
-  t.is(nonInit.last(), true);
-  t.true(Rx.hasLast(nonInit));
+  expect(nonInit.last()).toBe(true);
+  expect(Rx.hasLast(nonInit)).toBe(true);
 
   nonInit.set(false);
-  t.is(nonInit.last(), false);
-  t.true(Rx.hasLast(nonInit));
+  expect(nonInit.last()).toBe(false);
+  expect(Rx.hasLast(nonInit)).toBe(true);
 
   const x = Rx.From.boolean(false);
-  t.is(x.last(), false);
-  t.true(Rx.hasLast(x));
+  expect(x.last()).toBe(false);
+  expect(Rx.hasLast(x)).toBe(true);
 });

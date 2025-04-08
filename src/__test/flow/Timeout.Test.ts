@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { timeout } from '../../flow/Timeout.js';
 import { sleep } from '../../flow/Sleep.js';
 import { isApprox } from '../../numbers/IsApprox.js';
@@ -6,39 +6,39 @@ import { isApprox } from '../../numbers/IsApprox.js';
 /**
  * Tests a single firing
  */
-test('basic', async (t) => {
+test('basic', async () => {
   const delay = 100;
   let fired = false;
   const a = timeout(() => {
     fired = true;
   }, delay);
 
-  t.is(a.startCount, 0);
-  t.is(a.runState, `idle`);
-  t.false(fired);
+  expect(a.startCount).toBe(0);
+  expect(a.runState).toBe(`idle`);
+  expect(fired).toBe(false);
   a.start();
-  t.is(a.runState, `scheduled`);
-  t.is(a.startCount, 0);
+  expect(a.runState).toBe(`scheduled`);
+  expect(a.startCount).toBe(0);
 
   setTimeout(() => {
-    t.true(fired);
-    t.is(a.runState, `idle`);
-    t.is(a.startCount, 1);
+    expect(fired).toBe(true);
+    expect(a.runState).toBe(`idle`);
+    expect(a.startCount).toBe(1);
   }, delay + 20)
 });
 
-test(`args`, async t => {
+test(`args`, async () => {
   const delay = 100;
-  t.plan(2);
+  expect.assertions(2);
   const a = timeout((elapsed, args) => {
-    t.deepEqual(args, `hello`);
-    t.true(isApprox(0.02, delay)(elapsed!));
+    expect(args).toEqual(`hello`);
+    expect(isApprox(0.02, delay)(elapsed!)).toBe(true);
   }, delay);
   a.start(undefined, [ `hello` ]);
   await sleep(delay + 20);
 });
 
-test(`start`, async t => {
+test(`start`, async () => {
   const delay = 10;
   const delayChange = 200;
   let aFired = 0;
@@ -50,20 +50,20 @@ test(`start`, async t => {
   }, delay);
   a.start(delayChange);
 
-  t.is(a.runState, `scheduled`);
+  expect(a.runState).toBe(`scheduled`);
   await sleep(delayChange + 10);
   let elapsed = stop - start;
-  t.true(isApprox(0.02, delayChange)(elapsed));
-  t.is(aFired, 1);
-  t.is(a.runState, `idle`);
+  expect(isApprox(0.02, delayChange)(elapsed)).toBe(true);
+  expect(aFired).toBe(1);
+  expect(a.runState).toBe(`idle`);
 
   // Test starting again
   start = Date.now();
   a.start();
-  t.is(a.runState, `scheduled`);
+  expect(a.runState).toBe(`scheduled`);
   await sleep(delayChange + 10);
-  t.true(isApprox(0.1, delayChange, elapsed));
-  t.is(aFired, 2);
-  t.is(a.runState, `idle`);
+  expect(isApprox(0.1, delayChange, elapsed)).toBe(true);
+  expect(aFired).toBe(2);
+  expect(a.runState).toBe(`idle`);
 
 })

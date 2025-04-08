@@ -1,7 +1,7 @@
-import test from 'ava';
+import expect from 'expect';
 import { jsComparer, numericComparer, comparerInverse, defaultComparer } from '../util/Comparers.js';
 
-test('jsComparer', (t) => {
+test('jsComparer', () => {
   const r1 = [ 1, 2, 3, 4 ];
   const r1SortedA = [ ...r1 ].sort();
   const r1SortedB = [ ...r1 ].sort(jsComparer);
@@ -24,7 +24,7 @@ test('jsComparer', (t) => {
   t.like(r4SortedA, r4SortedB);
 });
 
-test('numericComparer', (t) => {
+test('numericComparer', () => {
   t.like([ 10, -20, 5, -100 ].sort(numericComparer), [ -100, -20, 5, 10 ]);
   t.like([ 10, 20, 5, 100 ].sort(numericComparer), [ 5, 10, 20, 100 ]);
   t.like([ 10, 20, 0, 0, 100 ].sort(numericComparer), [ 0, 0, 10, 20, 100 ]);
@@ -44,7 +44,7 @@ test('numericComparer', (t) => {
   );
 });
 
-test('defaultComparer', (t) => {
+test('defaultComparer', () => {
   t.like([ 10, -20, 5, -100 ].sort(defaultComparer), [ -100, -20, 5, 10 ]);
   t.like([ 10, 20, 5, 100 ].sort(defaultComparer), [ 5, 10, 20, 100 ]);
   t.like([ 10, 20, 0, 0, 100 ].sort(defaultComparer), [ 0, 0, 10, 20, 100 ]);

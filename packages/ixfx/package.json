@@ -1,0 +1,47 @@
+{
+	"name": "@ixfxfun/ixfx",
+	"version": "0.35.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./rx": {
+			"types": "./src/rx/index.ts",
+			"import": "./src/rx/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfxfun/arrays": "workspace:^",
+		"@ixfxfun/dom": "workspace:^",
+		"@ixfxfun/core": "workspace:^",
+		"@ixfxfun/flow": "workspace:^",
+		"@ixfxfun/guards": "workspace:^",
+		"@ixfxfun/collections": "workspace:^",
+		"@ixfxfun/events": "workspace:^",
+		"@ixfxfun/random": "workspace:^",
+		"@ixfxfun/iterables": "workspace:^",
+		"@ixfxfun/visual": "workspace:^",
+		"@ixfxfun/numbers": "workspace:^",
+		"@ixfxfun/modulation": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./rx": {
+				"types": "./dist/src/rx/index.d.ts",
+				"import": "./dist/src/rx/index.js"
+			}
+		}
+	}
+}

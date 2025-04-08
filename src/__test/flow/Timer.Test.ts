@@ -1,21 +1,21 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Timer from '../../flow/Timer.js';
 import { sleep } from '../../flow/Sleep.js';
 import { isApprox } from '../../numbers/IsApprox.js';
 import { round } from '../../numbers/Round.js';
 import * as Flow from '../../flow/index.js';
 
-test(`of-total`, async t => {
+test(`of-total`, async () => {
   const r1 = Timer.ofTotal(500, { clampValue: false });
   let since = Flow.Elapsed.since();
   for (let i = 0; i < 10; i++) {
     const v = r1();
     if (since() >= 500) {
       // if total time has elapsed, expect r1() to be above 1
-      t.true(v > 1);
+      expect(v > 1).toBe(true);
     } else {
       // if total time hasn't elapsed, expect it to be below
-      t.true(v < 1);
+      expect(v < 1).toBe(true);
     }
     await Flow.sleep(100);
   }
@@ -26,10 +26,10 @@ test(`of-total`, async t => {
     const v = r2();
     if (since() >= 500) {
       // if total time has elapsed, expect r2() to be above 1
-      t.is(v, 1);
+      expect(v).toBe(1);
     } else {
       // if total time hasn't elapsed, expect it to be below
-      t.true(v < 1);
+      expect(v < 1).toBe(true);
     }
     await Flow.sleep(100);
   }
@@ -39,7 +39,7 @@ test(`of-total`, async t => {
   let v2 = 0;
   for (let i = 1; i < 7; i++) {
     const v1 = round(4, r3());
-    t.true(isApprox(0.15, v2, v1), `v1: ${ v1 } v2: ${ v2 }`);
+    expect(isApprox(0.15, v2, v1)).toBe(true);
     await Flow.sleep(100);
     v2 += 0.2;
     // Wrapping point
@@ -52,29 +52,29 @@ test(`of-total`, async t => {
   for (let i = 1; i < 15; i++) {
     const v1 = round(2, r4());
     if (since() >= 500) {
-      t.is(v1, 1);
+      expect(v1).toBe(1);
     } else {
-      t.true(isApprox(0.01, v3, v1), `v1: ${ v1 } v3: ${ v3 }`);
+      expect(isApprox(0.01, v3, v1)).toBe(true);
     }
     await Flow.sleep(100);
     v3 += 0.2;
   }
 });
 
-test('of-total-ticks', async (t) => {
+test('of-total-ticks', async () => {
   let totalTicks = 100;
   const r1 = Timer.ofTotalTicks(totalTicks, { clampValue: false, wrapValue: false });
   for (let i = 1; i < 100; i++) {
     const v1 = r1();
     const v2 = i / 100;
-    t.is(v1, v2);
+    expect(v1).toBe(v2);
   }
 
   // clamp:false
   for (let i = 0; i < 30; i++) {
     const v1 = round(3, r1());
     const v2 = round(3, 1 + (i / totalTicks));
-    t.is(v1, v2);
+    expect(v1).toBe(v2);
   }
 
   totalTicks = 10;
@@ -83,7 +83,7 @@ test('of-total-ticks', async (t) => {
   for (let i = 0; i < totalTicks; i++) r2();
   for (let i = 1; i < (totalTicks * 2); i++) {
     // Expect to return 1 since clampValue:true
-    t.is(r2(), 1);
+    expect(r2()).toBe(1);
   }
 
   totalTicks = 10;
@@ -96,7 +96,7 @@ test('of-total-ticks', async (t) => {
     const v2 = i / 10;
 
     // Let value be a bit off due to rounding
-    t.true(isApprox(0.001, v2, v1), `v1: ${ v1 } v2: ${ v2 }`);
+    expect(isApprox(0.001, v2, v1)).toBe(true);
   }
 
 });

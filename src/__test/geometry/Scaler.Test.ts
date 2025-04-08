@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { Scaler, Points, Rects } from '../../geometry/index.js';
 import type { Point } from '../../geometry/point/PointType.js';
 
@@ -48,462 +48,352 @@ const testOverride = (
   return true;
 };
 
-test(`height`, (t) => {
+test(`height`, () => {
   const w = 800;
   const h = 600;
 
   const s = Scaler.scaler(`height`, { width: w, height: h });
 
   // Make relative
-  t.true(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(false, s, { x: h, y: h }, { x: 1, y: 1 }));
-  t.true(
-    testBasic(false, s, { x: 2 * h, y: 2 * h }, { x: 2, y: 2 })
-  );
-  t.true(
-    testBasic(false, s, { x: h / 2, y: h / 2 }, { x: 0.5, y: 0.5 })
-  );
+  expect(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(false, s, { x: h, y: h }, { x: 1, y: 1 })).toBe(true);
+  expect(testBasic(false, s, { x: 2 * h, y: 2 * h }, { x: 2, y: 2 })).toBe(true);
+  expect(testBasic(false, s, { x: h / 2, y: h / 2 }, { x: 0.5, y: 0.5 })).toBe(true);
 
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 300, y: 300 },
-      { width: 400, height: 300 },
-      { x: 1, y: 1 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 150, y: 150 },
-      { width: 400, height: 300 },
-      { x: 0.5, y: 0.5 }
-    )
-  );
+  expect(testOverride(
+    false,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 300, y: 300 },
+    { width: 400, height: 300 },
+    { x: 1, y: 1 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 150, y: 150 },
+    { width: 400, height: 300 },
+    { x: 0.5, y: 0.5 }
+  )).toBe(true);
 
   // Make absolute
-  t.true(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(true, s, { x: 1, y: 1 }, { x: h, y: h }));
-  t.true(
-    testBasic(true, s, { x: 0.5, y: 0.5 }, { x: h / 2, y: h / 2 })
-  );
-  t.true(
-    testBasic(true, s, { x: 2, y: 2 }, { x: h * 2, y: h * 2 })
-  );
+  expect(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(true, s, { x: 1, y: 1 }, { x: h, y: h })).toBe(true);
+  expect(testBasic(true, s, { x: 0.5, y: 0.5 }, { x: h / 2, y: h / 2 })).toBe(true);
+  expect(testBasic(true, s, { x: 2, y: 2 }, { x: h * 2, y: h * 2 })).toBe(true);
 
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 1, y: 1 },
-      { width: 400, height: 300 },
-      { x: 300, y: 300 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0.5, y: 0.5 },
-      { width: 400, height: 300 },
-      { x: 150, y: 150 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 2, y: 2 },
-      { width: 400, height: 300 },
-      { x: 600, y: 600 }
-    )
-  );
+  expect(testOverride(
+    true,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 1, y: 1 },
+    { width: 400, height: 300 },
+    { x: 300, y: 300 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 0.5, y: 0.5 },
+    { width: 400, height: 300 },
+    { x: 150, y: 150 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 2, y: 2 },
+    { width: 400, height: 300 },
+    { x: 600, y: 600 }
+  )).toBe(true);
 });
 
-test(`min`, (t) => {
+test(`min`, () => {
   const w = 800;
   const h = 600;
 
   const s = Scaler.scaler(`min`, { width: w, height: h });
 
   // Make relative
-  t.true(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(false, s, { x: h, y: h }, { x: 1, y: 1 }));
-  t.true(
-    testBasic(false, s, { x: 2 * h, y: 2 * h }, { x: 2, y: 2 })
-  );
-  t.true(
-    testBasic(false, s, { x: h / 2, y: h / 2 }, { x: 0.5, y: 0.5 })
-  );
+  expect(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(false, s, { x: h, y: h }, { x: 1, y: 1 })).toBe(true);
+  expect(testBasic(false, s, { x: 2 * h, y: 2 * h }, { x: 2, y: 2 })).toBe(true);
+  expect(testBasic(false, s, { x: h / 2, y: h / 2 }, { x: 0.5, y: 0.5 })).toBe(true);
 
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 300, y: 300 },
-      { width: 400, height: 300 },
-      { x: 1, y: 1 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 150, y: 150 },
-      { width: 400, height: 300 },
-      { x: 0.5, y: 0.5 }
-    )
-  );
+  expect(testOverride(
+    false,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 300, y: 300 },
+    { width: 400, height: 300 },
+    { x: 1, y: 1 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 150, y: 150 },
+    { width: 400, height: 300 },
+    { x: 0.5, y: 0.5 }
+  )).toBe(true);
 
   // Make absolute
-  t.true(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(true, s, { x: 1, y: 1 }, { x: h, y: h }));
-  t.true(
-    testBasic(true, s, { x: 0.5, y: 0.5 }, { x: h / 2, y: h / 2 })
-  );
-  t.true(
-    testBasic(true, s, { x: 2, y: 2 }, { x: h * 2, y: h * 2 })
-  );
+  expect(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(true, s, { x: 1, y: 1 }, { x: h, y: h })).toBe(true);
+  expect(testBasic(true, s, { x: 0.5, y: 0.5 }, { x: h / 2, y: h / 2 })).toBe(true);
+  expect(testBasic(true, s, { x: 2, y: 2 }, { x: h * 2, y: h * 2 })).toBe(true);
 
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 1, y: 1 },
-      { width: 400, height: 300 },
-      { x: 300, y: 300 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0.5, y: 0.5 },
-      { width: 400, height: 300 },
-      { x: 150, y: 150 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 2, y: 2 },
-      { width: 400, height: 300 },
-      { x: 600, y: 600 }
-    )
-  );
+  expect(testOverride(
+    true,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 1, y: 1 },
+    { width: 400, height: 300 },
+    { x: 300, y: 300 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 0.5, y: 0.5 },
+    { width: 400, height: 300 },
+    { x: 150, y: 150 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 2, y: 2 },
+    { width: 400, height: 300 },
+    { x: 600, y: 600 }
+  )).toBe(true);
 });
 
-test(`max`, (t) => {
+test(`max`, () => {
   const w = 800;
   const h = 600;
 
   const s = Scaler.scaler(`max`, { width: w, height: h });
 
   // Make relative
-  t.true(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(false, s, { x: w, y: w }, { x: 1, y: 1 }));
-  t.true(
-    testBasic(false, s, { x: 2 * w, y: 2 * w }, { x: 2, y: 2 })
-  );
-  t.true(
-    testBasic(false, s, { x: w / 2, y: w / 2 }, { x: 0.5, y: 0.5 })
-  );
+  expect(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(false, s, { x: w, y: w }, { x: 1, y: 1 })).toBe(true);
+  expect(testBasic(false, s, { x: 2 * w, y: 2 * w }, { x: 2, y: 2 })).toBe(true);
+  expect(testBasic(false, s, { x: w / 2, y: w / 2 }, { x: 0.5, y: 0.5 })).toBe(true);
 
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 400, y: 400 },
-      { width: 400, height: 300 },
-      { x: 1, y: 1 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 200, y: 200 },
-      { width: 400, height: 300 },
-      { x: 0.5, y: 0.5 }
-    )
-  );
+  expect(testOverride(
+    false,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 400, y: 400 },
+    { width: 400, height: 300 },
+    { x: 1, y: 1 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 200, y: 200 },
+    { width: 400, height: 300 },
+    { x: 0.5, y: 0.5 }
+  )).toBe(true);
 
   // Make absolute
-  t.true(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(true, s, { x: 1, y: 1 }, { x: w, y: w }));
-  t.true(
-    testBasic(true, s, { x: 0.5, y: 0.5 }, { x: w / 2, y: w / 2 })
-  );
-  t.true(
-    testBasic(true, s, { x: 2, y: 2 }, { x: w * 2, y: w * 2 })
-  );
+  expect(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(true, s, { x: 1, y: 1 }, { x: w, y: w })).toBe(true);
+  expect(testBasic(true, s, { x: 0.5, y: 0.5 }, { x: w / 2, y: w / 2 })).toBe(true);
+  expect(testBasic(true, s, { x: 2, y: 2 }, { x: w * 2, y: w * 2 })).toBe(true);
 
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 1, y: 1 },
-      { width: 400, height: 300 },
-      { x: 400, y: 400 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0.5, y: 0.5 },
-      { width: 400, height: 300 },
-      { x: 200, y: 200 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 2, y: 2 },
-      { width: 400, height: 300 },
-      { x: 800, y: 800 }
-    )
-  );
+  expect(testOverride(
+    true,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 1, y: 1 },
+    { width: 400, height: 300 },
+    { x: 400, y: 400 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 0.5, y: 0.5 },
+    { width: 400, height: 300 },
+    { x: 200, y: 200 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 2, y: 2 },
+    { width: 400, height: 300 },
+    { x: 800, y: 800 }
+  )).toBe(true);
 });
 
-test(`width`, (t) => {
+test(`width`, () => {
   const w = 800;
   const h = 600;
 
   const s = Scaler.scaler(`width`, { width: w, height: h });
 
   // Make relative
-  t.true(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(false, s, { x: w, y: w }, { x: 1, y: 1 }));
-  t.true(
-    testBasic(false, s, { x: 2 * w, y: 2 * w }, { x: 2, y: 2 })
-  );
-  t.true(
-    testBasic(false, s, { x: w / 2, y: w / 2 }, { x: 0.5, y: 0.5 })
-  );
+  expect(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(false, s, { x: w, y: w }, { x: 1, y: 1 })).toBe(true);
+  expect(testBasic(false, s, { x: 2 * w, y: 2 * w }, { x: 2, y: 2 })).toBe(true);
+  expect(testBasic(false, s, { x: w / 2, y: w / 2 }, { x: 0.5, y: 0.5 })).toBe(true);
 
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 400, y: 400 },
-      { width: 400, height: 300 },
-      { x: 1, y: 1 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 200, y: 200 },
-      { width: 400, height: 300 },
-      { x: 0.5, y: 0.5 }
-    )
-  );
+  expect(testOverride(
+    false,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 400, y: 400 },
+    { width: 400, height: 300 },
+    { x: 1, y: 1 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 200, y: 200 },
+    { width: 400, height: 300 },
+    { x: 0.5, y: 0.5 }
+  )).toBe(true);
 
   // Make absolute
-  t.true(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(true, s, { x: 1, y: 1 }, { x: w, y: w }));
-  t.true(
-    testBasic(true, s, { x: 0.5, y: 0.5 }, { x: w / 2, y: w / 2 })
-  );
-  t.true(
-    testBasic(true, s, { x: 2, y: 2 }, { x: w * 2, y: w * 2 })
-  );
+  expect(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(true, s, { x: 1, y: 1 }, { x: w, y: w })).toBe(true);
+  expect(testBasic(true, s, { x: 0.5, y: 0.5 }, { x: w / 2, y: w / 2 })).toBe(true);
+  expect(testBasic(true, s, { x: 2, y: 2 }, { x: w * 2, y: w * 2 })).toBe(true);
 
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 1, y: 1 },
-      { width: 400, height: 300 },
-      { x: 400, y: 400 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0.5, y: 0.5 },
-      { width: 400, height: 300 },
-      { x: 200, y: 200 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 2, y: 2 },
-      { width: 400, height: 300 },
-      { x: 800, y: 800 }
-    )
-  );
+  expect(testOverride(
+    true,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 1, y: 1 },
+    { width: 400, height: 300 },
+    { x: 400, y: 400 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 0.5, y: 0.5 },
+    { width: 400, height: 300 },
+    { x: 200, y: 200 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 2, y: 2 },
+    { width: 400, height: 300 },
+    { x: 800, y: 800 }
+  )).toBe(true);
 });
 
-test(`both`, (t) => {
+test(`both`, () => {
   const w = 800;
   const h = 600;
 
   const s = Scaler.scaler(`both`, { width: w, height: h });
 
   // Make relative
-  t.true(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(false, s, { x: w, y: h }, { x: 1, y: 1 }));
-  t.true(
-    testBasic(false, s, { x: 2 * w, y: 2 * h }, { x: 2, y: 2 })
-  );
-  t.true(
-    testBasic(false, s, { x: w / 2, y: h / 2 }, { x: 0.5, y: 0.5 })
-  );
+  expect(testBasic(false, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(false, s, { x: w, y: h }, { x: 1, y: 1 })).toBe(true);
+  expect(testBasic(false, s, { x: 2 * w, y: 2 * h }, { x: 2, y: 2 })).toBe(true);
+  expect(testBasic(false, s, { x: w / 2, y: h / 2 }, { x: 0.5, y: 0.5 })).toBe(true);
 
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 400, y: 300 },
-      { width: 400, height: 300 },
-      { x: 1, y: 1 }
-    )
-  );
-  t.true(
-    testOverride(
-      false,
-      s,
-      { x: 200, y: 150 },
-      { width: 400, height: 300 },
-      { x: 0.5, y: 0.5 }
-    )
-  );
+  expect(testOverride(
+    false,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 400, y: 300 },
+    { width: 400, height: 300 },
+    { x: 1, y: 1 }
+  )).toBe(true);
+  expect(testOverride(
+    false,
+    s,
+    { x: 200, y: 150 },
+    { width: 400, height: 300 },
+    { x: 0.5, y: 0.5 }
+  )).toBe(true);
 
   // Make absolute
-  t.true(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 }));
-  t.true(testBasic(true, s, { x: 1, y: 1 }, { x: w, y: h }));
-  t.true(
-    testBasic(true, s, { x: 0.5, y: 0.5 }, { x: w / 2, y: h / 2 })
-  );
-  t.true(
-    testBasic(true, s, { x: 2, y: 2 }, { x: w * 2, y: h * 2 })
-  );
+  expect(testBasic(true, s, { x: 0, y: 0 }, { x: 0, y: 0 })).toBe(true);
+  expect(testBasic(true, s, { x: 1, y: 1 }, { x: w, y: h })).toBe(true);
+  expect(testBasic(true, s, { x: 0.5, y: 0.5 }, { x: w / 2, y: h / 2 })).toBe(true);
+  expect(testBasic(true, s, { x: 2, y: 2 }, { x: w * 2, y: h * 2 })).toBe(true);
 
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0, y: 0 },
-      { width: 400, height: 300 },
-      { x: 0, y: 0 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 1, y: 1 },
-      { width: 400, height: 300 },
-      { x: 400, y: 300 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 0.5, y: 0.5 },
-      { width: 400, height: 300 },
-      { x: 200, y: 150 }
-    )
-  );
-  t.true(
-    testOverride(
-      true,
-      s,
-      { x: 2, y: 2 },
-      { width: 400, height: 300 },
-      { x: 800, y: 600 }
-    )
-  );
+  expect(testOverride(
+    true,
+    s,
+    { x: 0, y: 0 },
+    { width: 400, height: 300 },
+    { x: 0, y: 0 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 1, y: 1 },
+    { width: 400, height: 300 },
+    { x: 400, y: 300 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 0.5, y: 0.5 },
+    { width: 400, height: 300 },
+    { x: 200, y: 150 }
+  )).toBe(true);
+  expect(testOverride(
+    true,
+    s,
+    { x: 2, y: 2 },
+    { width: 400, height: 300 },
+    { x: 800, y: 600 }
+  )).toBe(true);
 });

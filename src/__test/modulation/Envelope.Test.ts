@@ -1,9 +1,9 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Envelopes from '../../modulation/envelope/index.js';
 import { sleep, Elapsed } from '../../flow/index.js';
 import { isApprox } from '../../numbers/IsApprox.js';
 
-test(`as-iterator`, async t => {
+test(`as-iterator`, async done => {
   const e = new Envelopes.Adsr({
     attackDuration: 100,
     decayDuration: 100,
@@ -19,17 +19,17 @@ test(`as-iterator`, async t => {
     if (cc[ 0 ] === `decay`) seenD = true;
     if (cc[ 0 ] === `release`) seenR = true;
     await sleep(50);
-    if (elapsed() > 5000) t.fail(`Did not complete in time`);
+    if (elapsed() > 5000) done.fail(`Did not complete in time`);
   }
   // Check all stages seen
-  t.true(seenA, `attack`);
-  t.true(seenD, `decay`);
-  t.true(seenR, `release`);
+  expect(seenA).toBe(true);
+  expect(seenD).toBe(true);
+  expect(seenR).toBe(true);
   const finalTime = elapsed();
-  t.true(finalTime > 300 && finalTime < 320, `Final time: ${ finalTime }`);
+  expect(finalTime > 300 && finalTime < 320).toBe(true);
 });
 
-test(`as-function`, async t => {
+test(`as-function`, async done => {
   // TODO: Not really testing much
   const e = Envelopes.adsr({
     attackDuration: 300,
@@ -44,9 +44,9 @@ test(`as-function`, async t => {
   while (true) {
     const v = await e();
     await sleep(100);
-    if (elapsed() > 2000) t.fail(`Envelope took too long: ${ elapsed() }`);
+    if (elapsed() > 2000) done.fail(`Envelope took too long: ${ elapsed() }`);
     if (v === 0) break;
   }
   const total = elapsed();
-  t.true(isApprox(0.2, 900, total), `Elapsed: ${ total }`);
+  expect(isApprox(0.2, 900, total)).toBe(true);
 });

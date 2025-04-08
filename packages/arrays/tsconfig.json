@@ -1,0 +1,7 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "dist"
+	},
+	"include": ["src/**/*", "__tests__/**/*", "../numbers/__tests__/numeric-arrays.test.ts"]
+}

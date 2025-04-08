@@ -1,7 +1,7 @@
-import test from 'ava';
+import expect from 'expect';
 import { toStringDefault } from '../util/ToString.js';
 
-test(`toStringDefault`, (t) => {
+test(`toStringDefault`, () => {
   const a = {
     name: "Blah blah",
     age: 30,
@@ -19,6 +19,6 @@ test(`toStringDefault`, (t) => {
   const b = "Blah blah";
   const bb = "Blah blah";
 
-  t.is(toStringDefault(a), toStringDefault(aa));
-  t.is(toStringDefault(b), toStringDefault(bb));
+  expect(toStringDefault(a)).toBe(toStringDefault(aa));
+  expect(toStringDefault(b)).toBe(toStringDefault(bb));
 })

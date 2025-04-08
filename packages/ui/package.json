@@ -1,0 +1,33 @@
+{
+	"name": "@ixfxfun/ui",
+	"version": "0.35.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfxfun/core": "workspace:^",
+		"@ixfxfun/collections": "workspace:^",
+		"@ixfxfun/dom": "workspace:^",
+		"@ixfxfun/visual": "workspace:^",
+		"@ixfxfun/rx": "workspace:^"
+
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			}
+		}
+	}
+}

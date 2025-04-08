@@ -1,0 +1,66 @@
+{
+	"name": "@ixfxfun/geometry",
+	"version": "0.35.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./rect": {
+			"types": "./src/rect/index.ts",
+			"import": "./src/rect/index.ts"
+		},
+		"./circle": {
+			"types": "./src/circle/index.ts",
+			"import": "./src/circle/index.ts"
+		},
+		"./line": {
+			"types": "./src/line/index.ts",
+			"import": "./src/line/index.ts"
+		},
+		"./point": {
+			"types": "./src/point/index.ts",
+			"import": "./src/point/index.ts"
+		}
+	},
+	"dependencies": {
+		"bezier-js":"latest",
+		"@ixfxfun/arrays": "workspace:^",
+		"@ixfxfun/core": "workspace:^",
+		"@ixfxfun/guards": "workspace:^",
+		"@ixfxfun/numbers": "workspace:^",
+		"@ixfxfun/random": "workspace:^",
+		"@ixfxfun/collections": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./rect": {
+				"types": "./dist/src/rect/index.d.ts",
+				"import": "./dist/src/rect/index.js"
+			},
+			"./circle": {
+				"types": "./dist/src/circle/index.d.ts",
+				"import": "./dist/src/circle/index.js"
+			},
+			"./line": {
+				"types": "./dist/src/line/index.d.ts",
+				"import": "./dist/src/line/index.js"
+			},
+			"./point": {
+				"types": "./dist/src/point/index.d.ts",
+				"import": "./dist/src/point/index.js"
+			}
+		}
+	}
+}

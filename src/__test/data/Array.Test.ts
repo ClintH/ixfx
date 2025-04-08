@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { arrayValuesEqual } from '../Include.js';
 import { pairwise, pairwiseReduce } from '../../data/arrays/Pairwise.js';
 import { filterBetween, without } from '../../data/arrays/Filter.js';
@@ -15,61 +15,57 @@ import { isContentsTheSame } from '../../data/arrays/Equality.js';
 import { atWrap } from '../../data/arrays/AtWrap.js';
 
 
-test(`atWrap`, t => {
+test(`atWrap`, () => {
   const array = [ 1, 2, 3 ];
-  t.is(atWrap(array, 0), 1);
-  t.is(atWrap(array, 1), 2);
-  t.is(atWrap(array, 2), 3);
-  t.is(atWrap(array, 3), 1);
-  t.is(atWrap(array, 4), 2);
-  t.is(atWrap(array, 5), 3);
-  t.is(atWrap(array, 6), 1);
-  t.is(atWrap(array, 7), 2);
+  expect(atWrap(array, 0)).toBe(1);
+  expect(atWrap(array, 1)).toBe(2);
+  expect(atWrap(array, 2)).toBe(3);
+  expect(atWrap(array, 3)).toBe(1);
+  expect(atWrap(array, 4)).toBe(2);
+  expect(atWrap(array, 5)).toBe(3);
+  expect(atWrap(array, 6)).toBe(1);
+  expect(atWrap(array, 7)).toBe(2);
 
-  t.is(atWrap(array, -1), 3);
-  t.is(atWrap(array, -2), 2);
-  t.is(atWrap(array, -3), 1);
-  t.is(atWrap(array, -4), 3);
+  expect(atWrap(array, -1)).toBe(3);
+  expect(atWrap(array, -2)).toBe(2);
+  expect(atWrap(array, -3)).toBe(1);
+  expect(atWrap(array, -4)).toBe(3);
 
 });
 
-test('pairwise', t => {
+test('pairwise', () => {
   const r1 = [ ...pairwise([ 1, 2, 3, 4 ]) ];
-  t.deepEqual(r1, [
+  expect(r1).toEqual([
     [ 1, 2 ], [ 2, 3 ], [ 3, 4 ]
   ]);
   const r2 = [ ...pairwise([ 1, 2, 3, 4, 5 ]) ];
-  t.deepEqual(r2, [
+  expect(r2).toEqual([
     [ 1, 2 ], [ 2, 3 ], [ 3, 4 ], [ 4, 5 ]
   ]);
 
-  t.throws(() => [ ...pairwise([]) ]);
-  t.throws(() => [ ...pairwise([ 1 ]) ]);
+  expect(() => [ ...pairwise([]) ]).toThrow();
+  expect(() => [ ...pairwise([ 1 ]) ]).toThrow();
   // @ts-expect-error
-  t.throws(() => [ ...pairwise('hello') ]);
+  expect(() => [ ...pairwise('hello') ]).toThrow();
 
 });
 
-test('without', t => {
+test('without', () => {
 
-  t.deepEqual(without([ `a`, `b`, `c` ], `b`), [ `a`, `c` ]);
-  t.deepEqual(without([ `a`, `b`, `c` ], [ `b`, `c` ]), [ `a` ]);
-  t.deepEqual(without([ `a`, `b`, `c` ], [ `a`, `b`, `c` ]), []);
-  t.deepEqual(without([ `a`, `b`, `c` ], `d`), [ `a`, `b`, `c` ]);
-
-});
-
-test('flatten', (t) => {
-  t.deepEqual(
-    flatten([ 1, [ 2, 3 ], [ [ 4 ] ] ]),
-    [ 1, 2, 3, [ 4 ] ]);
-  t.deepEqual(
-    flatten([ 1, 2, 3, 4 ]),
-    [ 1, 2, 3, 4 ]);
+  expect(without([ `a`, `b`, `c` ], `b`)).toEqual([ `a`, `c` ]);
+  expect(without([ `a`, `b`, `c` ], [ `b`, `c` ])).toEqual([ `a` ]);
+  expect(without([ `a`, `b`, `c` ], [ `a`, `b`, `c` ])).toEqual([]);
+  expect(without([ `a`, `b`, `c` ], `d`)).toEqual([ `a`, `b`, `c` ]);
 
 });
 
-test('filterBetween', (t) => {
+test('flatten', () => {
+  expect(flatten([ 1, [ 2, 3 ], [ [ 4 ] ] ])).toEqual([ 1, 2, 3, [ 4 ] ]);
+  expect(flatten([ 1, 2, 3, 4 ])).toEqual([ 1, 2, 3, 4 ]);
+
+});
+
+test('filterBetween', () => {
   const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 
   const r1 = [ ...filterBetween(numbers, () => true, 5, 7) ];
@@ -87,56 +83,48 @@ test('filterBetween', (t) => {
   t.like(r3, numbers.slice(5, 7));
 });
 
-test('containsDuplicateValues', (t) => {
-  t.true(containsDuplicateValues([ 1, 2, 3, 1 ]));
-  t.false(containsDuplicateValues([ 1, 2, 3, 4 ]));
-  t.true(containsDuplicateValues([ 'a', 'b', 'c', 'a' ]));
-  t.false(containsDuplicateValues([ 'a', 'b', 'c', 'd' ]));
-  t.true(
-    containsDuplicateValues([
-      { name: 'Bob' },
-      { name: 'Sally' },
-      { name: 'Bob' },
-    ])
-  );
-  t.false(
-    containsDuplicateValues([
-      { name: 'Bob' },
-      { name: 'Sally' },
-      { name: 'Jane' },
-    ])
-  );
-  t.true(
-    containsDuplicateValues(
-      [
-        { name: 'Bob', colour: 'red' },
-        { name: 'Sally', colour: 'blue' },
-        { name: 'Jane', colour: 'red' },
-      ],
-      (v) => v.colour
-    )
-  );
-  t.false(
-    containsDuplicateValues(
-      [
-        { name: 'Bob', colour: 'red' },
-        { name: 'Sally', colour: 'blue' },
-        { name: 'Jane', colour: 'red' },
-      ],
-      (v) => v.name
-    )
-  );
-  t.false(containsDuplicateValues([]));
+test('containsDuplicateValues', () => {
+  expect(containsDuplicateValues([ 1, 2, 3, 1 ])).toBe(true);
+  expect(containsDuplicateValues([ 1, 2, 3, 4 ])).toBe(false);
+  expect(containsDuplicateValues([ 'a', 'b', 'c', 'a' ])).toBe(true);
+  expect(containsDuplicateValues([ 'a', 'b', 'c', 'd' ])).toBe(false);
+  expect(containsDuplicateValues([
+    { name: 'Bob' },
+    { name: 'Sally' },
+    { name: 'Bob' },
+  ])).toBe(true);
+  expect(containsDuplicateValues([
+    { name: 'Bob' },
+    { name: 'Sally' },
+    { name: 'Jane' },
+  ])).toBe(false);
+  expect(containsDuplicateValues(
+    [
+      { name: 'Bob', colour: 'red' },
+      { name: 'Sally', colour: 'blue' },
+      { name: 'Jane', colour: 'red' },
+    ],
+    (v) => v.colour
+  )).toBe(true);
+  expect(containsDuplicateValues(
+    [
+      { name: 'Bob', colour: 'red' },
+      { name: 'Sally', colour: 'blue' },
+      { name: 'Jane', colour: 'red' },
+    ],
+    (v) => v.name
+  )).toBe(false);
+  expect(containsDuplicateValues([])).toBe(false);
 
   //@ts-ignore
-  t.throws(() => containsDuplicateValues(undefined));
+  expect(() => containsDuplicateValues(undefined)).toThrow();
   //@ts-ignore
-  t.throws(() => containsDuplicateValues(null));
+  expect(() => containsDuplicateValues(null)).toThrow();
   //@ts-ignore
-  t.throws(() => containsDuplicateValues('hello'));
+  expect(() => containsDuplicateValues('hello')).toThrow();
 });
 
-test('unique', (t) => {
+test('unique', () => {
   const a = [ 1, 2, 3, 1, 2, 3, 4 ];
   arrayValuesEqual(t, unique(a), [ 1, 2, 3, 4 ]);
 
@@ -163,28 +151,28 @@ test('unique', (t) => {
   );
 });
 
-test('contains', (t) => {
+test('contains', () => {
   const a = [ 'apples', 'oranges', 'pears', 'mandarins' ];
   const b = [ 'pears', 'apples' ];
-  t.true(contains(a, b));
-  t.true(contains(a, []));
+  expect(contains(a, b)).toBe(true);
+  expect(contains(a, [])).toBe(true);
 
   const c = [ 'pears', 'bananas' ];
-  t.false(contains(a, c));
+  expect(contains(a, c)).toBe(false);
 });
 
-test(`compare-values`, (t) => {
+test(`compare-values`, () => {
   const a = [ 'apples', 'oranges', 'pears' ];
   const b = [ 'pears', 'kiwis', 'bananas' ];
   const r = compareValuesShallow(a, b);
   t.like(r.shared, [ 'pears' ]);
   t.like(r.a, [ 'apples', 'oranges' ]);
   t.like(r.b, [ 'kiwis', 'bananas' ]);
-  t.false(hasEqualValuesShallow(a, b));
+  expect(hasEqualValuesShallow(a, b)).toBe(false);
 
   const a1 = [ 'apples', 'oranges' ];
   const b1 = [ 'oranges', 'apples' ];
-  t.true(hasEqualValuesShallow(a1, b1));
+  expect(hasEqualValuesShallow(a1, b1)).toBe(true);
 
   const aa = [ { name: 'John' }, { name: 'Mary' }, { name: 'Sue' } ];
   const bb = [ { name: 'John' }, { name: 'Mary' }, { name: 'Jane' } ];
@@ -193,14 +181,14 @@ test(`compare-values`, (t) => {
   t.like(rr.shared, [ { name: 'John' }, { name: 'Mary' } ]);
   t.like(rr.a, [ { name: 'Sue' } ]);
   t.like(rr.b, [ { name: 'Jane' } ]);
-  t.false(hasEqualValuesShallow(aa, bb, (a, b) => a.name === b.name));
+  expect(hasEqualValuesShallow(aa, bb, (a, b) => a.name === b.name)).toBe(false);
 
   const aa1 = [ { name: 'John' }, { name: 'Mary' } ];
   const bb1 = [ { name: 'Mary' }, { name: 'John' } ];
-  t.true(hasEqualValuesShallow(aa1, bb1, (a, b) => a.name === b.name));
+  expect(hasEqualValuesShallow(aa1, bb1, (a, b) => a.name === b.name)).toBe(true);
 });
 
-test(`sort`, (t) => {
+test(`sort`, () => {
   const data = [
     { size: 10, colour: `red` },
     { size: 20, colour: `blue` },
@@ -216,33 +204,30 @@ test(`sort`, (t) => {
     { size: 10, colour: `orange` },
     { size: 20, colour: `blue` },
   ]);
-  t.pass();
 });
 
-test(`pairwise-reduce`, (t) => {
+test(`pairwise-reduce`, () => {
   const reducer = (accumulator: string, a: string, b: string) => {
     return accumulator + `[${ a }-${ b }]`;
   };
 
   const t1 = pairwiseReduce(`a b c d e f g`.split(` `), reducer, `!`);
-  t.is(t1, `![a-b][b-c][c-d][d-e][e-f][f-g]`);
+  expect(t1).toBe(`![a-b][b-c][c-d][d-e][e-f][f-g]`);
 
   const t2 = pairwiseReduce(`a b c d e f`.split(` `), reducer, `!`);
-  t.is(t2, `![a-b][b-c][c-d][d-e][e-f]`);
+  expect(t2).toBe(`![a-b][b-c][c-d][d-e][e-f]`);
 
   const t3 = pairwiseReduce([], reducer, `!`);
-  t.is(t3, `!`);
+  expect(t3).toBe(`!`);
 
   const t4 = pairwiseReduce([ `a` ], reducer, `!`);
-  t.is(t4, `!`);
+  expect(t4).toBe(`!`);
 
   // @ts-ignore
-  t.throws(() => pairwiseReduce(`hello`, reducer, ``));
-
-  t.pass();
+  expect(() => pairwiseReduce(`hello`, reducer, ``)).toThrow();
 });
 
-test(`mergeByKey`, (t) => {
+test(`mergeByKey`, () => {
   const a1 = [ `1-1`, `1-2`, `1-3`, `1-4` ];
   const a2 = [ `2-1`, `2-2`, `2-3`, `2-5` ];
 
@@ -253,45 +238,44 @@ test(`mergeByKey`, (t) => {
 
   const t1 = mergeByKey(keyFunction, reconcileFunction, a1, a2);
 
-  t.is(t1.length, 5);
-  t.true(t1.includes(`2!1`));
-  t.true(t1.includes(`2!2`));
-  t.true(t1.includes(`2!3`));
-  t.true(t1.includes(`1-4`));
-  t.true(t1.includes(`2-5`));
+  expect(t1.length).toBe(5);
+  expect(t1.includes(`2!1`)).toBe(true);
+  expect(t1.includes(`2!2`)).toBe(true);
+  expect(t1.includes(`2!3`)).toBe(true);
+  expect(t1.includes(`1-4`)).toBe(true);
+  expect(t1.includes(`2-5`)).toBe(true);
 
   // Test with empty second param
   const a4: Array<string> = [];
   const t2 = mergeByKey(keyFunction, reconcileFunction, a1, a4);
-  t.is(t2.length, 4);
-  t.true(t2.includes(`1-1`));
-  t.true(t2.includes(`1-2`));
-  t.true(t2.includes(`1-3`));
-  t.true(t2.includes(`1-4`));
+  expect(t2.length).toBe(4);
+  expect(t2.includes(`1-1`)).toBe(true);
+  expect(t2.includes(`1-2`)).toBe(true);
+  expect(t2.includes(`1-3`)).toBe(true);
+  expect(t2.includes(`1-4`)).toBe(true);
 
   // Test with empty first param
   const t3 = mergeByKey(keyFunction, reconcileFunction, a4, a1);
-  t.is(t3.length, 4);
-  t.true(t3.includes(`1-1`));
-  t.true(t3.includes(`1-2`));
-  t.true(t3.includes(`1-3`));
-  t.true(t3.includes(`1-4`));
+  expect(t3.length).toBe(4);
+  expect(t3.includes(`1-1`)).toBe(true);
+  expect(t3.includes(`1-2`)).toBe(true);
+  expect(t3.includes(`1-3`)).toBe(true);
+  expect(t3.includes(`1-4`)).toBe(true);
 });
 
-test(`remove`, (t) => {
+test(`remove`, () => {
   t.like(remove([ 1, 2, 3 ], 2), [ 1, 2 ]);
   t.like(remove([ 1, 2, 3 ], 0), [ 2, 3 ]);
   t.like(remove([ 1, 2, 3 ], 1), [ 1, 3 ]);
 
   // Index past length
-  t.throws(() => remove([ 1, 2, 3 ], 3));
+  expect(() => remove([ 1, 2, 3 ], 3)).toThrow();
   // Not an array
   // @ts-ignore
-  t.throws(() => remove(10, 3));
-  t.pass();
+  expect(() => remove(10, 3)).toThrow();
 });
 
-test(`ensureLength`, (t) => {
+test(`ensureLength`, () => {
   t.like(ensureLength([ 1, 2, 3 ], 2), [ 1, 2 ]);
   t.like(ensureLength([ 1, 2, 3 ], 3), [ 1, 2, 3 ]);
   t.like(ensureLength([ 1, 2, 3 ], 5, `undefined`), [
@@ -308,23 +292,23 @@ test(`ensureLength`, (t) => {
   t.like(ensureLength([ 1, 2, 3 ], 5, `last`), [ 1, 2, 3, 3, 3 ]);
 });
 
-test(`isContentsTheSame`, (t) => {
+test(`isContentsTheSame`, () => {
   const a = [ 10, 10, 10 ];
   const b = [ `hello`, `hello`, `hello` ];
   const c = [ true, true, true ];
   const d = [ 100 ];
 
-  t.true(isContentsTheSame(a));
-  t.true(isContentsTheSame(b));
-  t.true(isContentsTheSame(c));
-  t.true(isContentsTheSame(d));
+  expect(isContentsTheSame(a)).toBe(true);
+  expect(isContentsTheSame(b)).toBe(true);
+  expect(isContentsTheSame(c)).toBe(true);
+  expect(isContentsTheSame(d)).toBe(true);
 
   const a1 = [ 10, 10, 11 ];
   const b1 = [ `Hello`, `hello` ];
   const c1 = [ true, false ];
-  t.false(isContentsTheSame(a1));
-  t.false(isContentsTheSame(b1));
-  t.false(isContentsTheSame(c1));
+  expect(isContentsTheSame(a1)).toBe(false);
+  expect(isContentsTheSame(b1)).toBe(false);
+  expect(isContentsTheSame(c1)).toBe(false);
 });
 
 // test(``, () => {
@@ -337,7 +321,7 @@ test(`isContentsTheSame`, (t) => {
 
 // });
 
-test(`zip`, (t) => {
+test(`zip`, () => {
   const a = [ 10, 11, 12, 13 ];
   const b = [ `apples`, `oranges`, `pears`, `grapes` ];
   const c = [ true, false, true, false ];
@@ -352,13 +336,13 @@ test(`zip`, (t) => {
 
   // Throw if sizes are different
   const d = [ 100, 200, 300 ];
-  t.throws(() => zip(a, d));
+  expect(() => zip(a, d)).toThrow();
 
   // Throw if not array
   // @ts-expect-error
-  t.throws(() => zip(a, `potato`));
+  expect(() => zip(a, `potato`)).toThrow();
   // @ts-expect-error
-  t.throws(() => zip(undefined));
+  expect(() => zip(undefined)).toThrow();
   // @ts-expect-error
-  t.throws(() => zip(`hello`));
+  expect(() => zip(`hello`)).toThrow();
 });

@@ -1,12 +1,12 @@
-import test from 'ava';
+import expect from 'expect';
 import { retryFunction, backoffGenerator } from '../../flow/Retry.js';
 import { Elapsed, sleep } from '../../flow/index.js';
 import { isApprox } from '../../numbers/IsApprox.js';
 
-test('backoffGenerator', async t => {
+test('backoffGenerator', async () => {
   // Use 1 as value, 1.1 as power
   const g1 = [ ...backoffGenerator({ limitAttempts: 5 }) ];
-  t.deepEqual(g1, [
+  expect(g1).toEqual([
     1,
     2,
     4.143546925072586,
@@ -16,7 +16,7 @@ test('backoffGenerator', async t => {
 
   // Test count, initialValue
   const g2 = [ ...backoffGenerator({ limitAttempts: 4, startAt: 10 }) ];
-  t.deepEqual(g2, [
+  expect(g2).toEqual([
     10,
     22.589254117941675,
     53.441876248368075,
@@ -25,20 +25,19 @@ test('backoffGenerator', async t => {
 
   // Test power
   const g3 = [ ...backoffGenerator({ limitAttempts: 4, startAt: 1, power: 2 }) ];
-  t.deepEqual(g3, [ 1, 2, 6, 42 ]);
-  t.pass();
+  expect(g3).toEqual([ 1, 2, 6, 42 ]);
 
   // @ts-expect-error
-  t.throws(() => [ ...backoffGenerator({ limitAttempts: `hi` }) ]);
-  t.throws(() => [ ...backoffGenerator({ limitAttempts: Number.NaN }) ]);
-  t.throws(() => [ ...backoffGenerator({ limitValue: Number.NaN }) ]);
-  t.throws(() => [ ...backoffGenerator({ power: Number.NaN }) ]);
+  expect(() => [ ...backoffGenerator({ limitAttempts: `hi` }) ]).toThrow();
+  expect(() => [ ...backoffGenerator({ limitAttempts: Number.NaN }) ]).toThrow();
+  expect(() => [ ...backoffGenerator({ limitValue: Number.NaN }) ]).toThrow();
+  expect(() => [ ...backoffGenerator({ power: Number.NaN }) ]).toThrow();
 });
 
 /**
  * Tests returning an eventual value
  */
-test('basic', async (t) => {
+test('basic', async () => {
   const expectedCount = 3;
   let timesInvoked = 0;
   const fn = async () => {
@@ -47,9 +46,9 @@ test('basic', async (t) => {
   };
 
   const result = await retryFunction(fn, { limitAttempts: expectedCount * 2, startAt: 100 });
-  t.is(timesInvoked, expectedCount);
-  t.is(result.attempts, expectedCount);
-  t.true(result.success);
+  expect(timesInvoked).toBe(expectedCount);
+  expect(result.attempts).toBe(expectedCount);
+  expect(result.success).toBe(true);
 
   t.like(result.value, { name: 'Sue' });
 });
@@ -57,7 +56,7 @@ test('basic', async (t) => {
 /**
  * Tests that 'count' opt is honoured
  */
-test('count', async (t) => {
+test('count', async () => {
   t.timeout(4 * 1000);
   const expectedCount = 3;
   let timesInvoked = 0;
@@ -65,11 +64,11 @@ test('count', async (t) => {
     timesInvoked++;
   };
   const result = await retryFunction(fn, { limitAttempts: expectedCount, startAt: 100 });
-  t.is(timesInvoked, expectedCount);
-  t.is(result.attempts, expectedCount);
-  t.false(result.success);
-  t.true(result.elapsed < 3500);
-  t.true(result.value === undefined);
+  expect(timesInvoked).toBe(expectedCount);
+  expect(result.attempts).toBe(expectedCount);
+  expect(result.success).toBe(false);
+  expect(result.elapsed < 3500).toBe(true);
+  expect(result.value === undefined).toBe(true);
 
   // Test parameter sanitising
   await t.throwsAsync(retryFunction(fn, { limitAttempts: 0 }));
@@ -80,7 +79,7 @@ test('count', async (t) => {
 /**
  * Tests aborting retry after some iterations
  */
-test('abort', async (t) => {
+test('abort', async () => {
   const abortController = new AbortController();
   let timesInvoked = 0;
   const abortAfter = 5;
@@ -96,16 +95,16 @@ test('abort', async (t) => {
     startAt: 1,
   });
 
-  t.is(result.attempts, abortAfter);
-  t.false(result.success);
-  t.is(result.value, undefined);
-  t.is(result.message, 'Test abort');
+  expect(result.attempts).toBe(abortAfter);
+  expect(result.success).toBe(false);
+  expect(result.value).toBe(undefined);
+  expect(result.message).toBe('Test abort');
 });
 
 /**
  * Tests that predelay opt is honoured
  */
-test('predelay', async (t) => {
+test('predelay', async () => {
   let firstInvoke = true;
   const elapsed = Elapsed.since();
   const predelayMs = 200;
@@ -113,7 +112,7 @@ test('predelay', async (t) => {
     if (firstInvoke) {
       // Test that predelayMs has elapsed
       const elapsedValue = elapsed();
-      t.true(isApprox(0.06, predelayMs, elapsedValue), elapsedValue.toString());
+      expect(isApprox(0.06, predelayMs, elapsedValue)).toBe(true);
       firstInvoke = true;
     }
   };
@@ -121,19 +120,19 @@ test('predelay', async (t) => {
   const r = await retryFunction(fn, { limitAttempts: 3, startAt: 1, predelayMs, taskValueFallback: 5 });
 
   // 'fn' above never returns a value, so we'd expect a fail result
-  t.false(r.success);
+  expect(r.success).toBe(false);
 });
 
 /**
  * Tests aborting during predelay and fallback value
  */
-test('predelay-abort', async (t) => {
+test('predelay-abort', async done => {
   let firstInvoke = true;
   const predelayMs = 5000;
   const abort = new AbortController();
   const fn = async () => {
     // no-op
-    t.fail(`Should not be executed`);
+    done.fail(`Should not be executed`);
   };
 
   setTimeout(() => {
@@ -143,6 +142,6 @@ test('predelay-abort', async (t) => {
   const r = await retryFunction<string>(fn, { count: 3, startAt: 1, taskValueFallback: `hello`, predelayMs, abort: abort.signal });
 
   await sleep(200);
-  t.false(r.success);
-  t.is(r.value, `hello`);
+  expect(r.success).toBe(false);
+  expect(r.value).toBe(`hello`);
 });

@@ -1,8 +1,8 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Grids from '../../../geometry/grid/index.js';
 import { By } from '../../../geometry/grid/index.js';
 
-test(`cells`, (t) => {
+test(`cells`, () => {
   const g = { rows: 3, cols: 3 };
 
   // Starting from 0,0
@@ -13,7 +13,7 @@ test(`cells`, (t) => {
   ];
 
   const r1 = [ ...By.cells(g, { x: 0, y: 0 }, true) ];
-  t.deepEqual(r1, e1);
+  expect(r1).toEqual(e1);
 
   // Starting from middle
   const e2 = [
@@ -23,7 +23,7 @@ test(`cells`, (t) => {
     { x: 0, y: 1 }
   ];
   const r2 = [ ...By.cells(g, { x: 1, y: 1 }, true) ];
-  t.deepEqual(r2, e2);
+  expect(r2).toEqual(e2);
 
   // Starting from end
   const e3 = [
@@ -38,10 +38,10 @@ test(`cells`, (t) => {
     { x: 1, y: 2 }
   ];
   const r3 = [ ...By.cells(g, { x: 2, y: 2 }, true) ];
-  t.deepEqual(r3, e3);
+  expect(r3).toEqual(e3);
 });
 
-test(`cell-no-wrap`, t => {
+test(`cell-no-wrap`, () => {
   const g = { rows: 3, cols: 3 };
 
   // Starting from top
@@ -57,12 +57,12 @@ test(`cell-no-wrap`, t => {
     { x: 2, y: 2 }
   ];
   const r1 = [ ...By.cells(g, { x: 0, y: 0 }, false) ];
-  t.deepEqual(r1, e1);
+  expect(r1).toEqual(e1);
 
   // From end
   const e2 = [ { x: 2, y: 2 } ];
   const r2 = [ ...By.cells(g, { x: 2, y: 2 }, false) ];
-  t.deepEqual(r2, e2);
+  expect(r2).toEqual(e2);
 
   // From middle
   const e3 = [
@@ -73,7 +73,7 @@ test(`cell-no-wrap`, t => {
     { x: 2, y: 2 }
   ]
   const r3 = [ ...By.cells(g, { x: 1, y: 1 }, false) ];
-  t.deepEqual(r3, e3);
+  expect(r3).toEqual(e3);
 });
 
 

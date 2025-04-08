@@ -1,0 +1,7 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "dist"
+	},
+	"include": ["src/**/*", "__tests__/**/*", "../visual/src/convolve-2d.ts"]
+}

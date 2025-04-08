@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { resolve, resolveWithFallback } from '../../data/Resolve.js';
 import { resolveFields } from '../../data/ResolveFields.js';
 import * as Numbers from '../../numbers/index.js';
@@ -6,7 +6,7 @@ import * as Flow from '../../flow/index.js';
 import * as Rx from '../../rx/index.js';
 import { repeat } from '../../flow/Repeat.js';
 
-test(`with-fallback`, async t => {
+test(`with-fallback`, async () => {
   let triggered = 0;
   let errored = 0;
   const fn = () => {
@@ -22,52 +22,52 @@ test(`with-fallback`, async t => {
   while (triggered < 5 && errored < 5) {
     const value = await resolveWithFallback(fn, { value: 1 });
     const isZeroOrOne = value === 0 || value === 1;
-    t.true(isZeroOrOne);
-    t.false(typeof value === `undefined`);
+    expect(isZeroOrOne).toBe(true);
+    expect(typeof value === `undefined`).toBe(false);
   }
 });
 
-test(`arrays`, async t => {
+test(`arrays`, async () => {
   const data = [ `a`, `b`, `c` ];
-  t.deepEqual(await resolve(data), data);
+  expect(await resolve(data)).toEqual(data);
 });
 
-test(`resolve`, async t => {
+test(`resolve`, async () => {
   // Basic values
-  t.is(await resolve(`hello`), `hello`);
-  t.is(await resolve(10), 10);
-  t.deepEqual(await resolve({ name: 'bob' }), { name: 'bob' });
-  t.true(await resolve(true));
-  t.false(await resolve(false));
+  expect(await resolve(`hello`)).toBe(`hello`);
+  expect(await resolve(10)).toBe(10);
+  expect(await resolve({ name: 'bob' })).toEqual({ name: 'bob' });
+  expect(await resolve(true)).toBe(true);
+  expect(await resolve(false)).toBe(false);
 
   // Async & sync functions
-  t.is(await resolve(() => 'hello'), 'hello');
-  t.is(await resolve(async () => Promise.resolve('there')), 'there');
+  expect(await resolve(() => 'hello')).toBe('hello');
+  expect(await resolve(async () => Promise.resolve('there'))).toBe('there');
 
   // Synchronous generator
   const gen = Numbers.count(3);
-  t.is(await resolve(gen), 0);
-  t.is(await resolve(gen), 1);
-  t.is(await resolve(gen), 2);
-  t.falsy(await resolve(gen));
+  expect(await resolve(gen)).toBe(0);
+  expect(await resolve(gen)).toBe(1);
+  expect(await resolve(gen)).toBe(2);
+  expect(await resolve(gen)).toBeFalsy();
 
   // Iterator
   const iter = [ 1, 2, 3 ].values();
-  t.is(await resolve(iter), 1);
-  t.is(await resolve(iter), 2);
-  t.is(await resolve(iter), 3);
-  t.falsy(await resolve(iter));
+  expect(await resolve(iter)).toBe(1);
+  expect(await resolve(iter)).toBe(2);
+  expect(await resolve(iter)).toBe(3);
+  expect(await resolve(iter)).toBeFalsy();
 
   const rx = Rx.From.number(10);
-  t.is(await resolve(rx), 10);
+  expect(await resolve(rx)).toBe(10);
   rx.set(11);
-  t.is(await resolve(rx), 11);
+  expect(await resolve(rx)).toBe(11);
   rx.dispose(`test dispose`);
-  t.is(await resolve(rx), 11);
+  expect(await resolve(rx)).toBe(11);
 
 });
 
-test('resolve-fields-async', async t => {
+test('resolve-fields-async', async () => {
   const s = {
     length: 10,
     random: async () => {
@@ -77,9 +77,9 @@ test('resolve-fields-async', async t => {
   };
 
   const r = await resolveFields(s);
-  t.is(typeof r.length, `number`);
-  t.is(typeof r.random, `number`);
-  t.is(r.length, 10);
+  expect(typeof r.length).toBe(`number`);
+  expect(typeof r.random).toBe(`number`);
+  expect(r.length).toBe(10);
 
   const c = 5;
   const s1 = {
@@ -91,28 +91,28 @@ test('resolve-fields-async', async t => {
   // Each time we call resolveFields, r1.gen should match for index
   for (let i = 0; i < c + 1; i++) {
     const r1 = await resolveFields(s1);
-    t.is(r1.colour, `red`);
+    expect(r1.colour).toBe(`red`);
     if (i === c) {
       // Test if generator ends
-      t.falsy(r1.gen);
+      expect(r1.gen).toBeFalsy();
     } else {
-      t.is(typeof r1.gen, `number`);
-      t.is(r1.gen, i);
+      expect(typeof r1.gen).toBe(`number`);
+      expect(r1.gen).toBe(i);
     }
   }
 
 });
 
 
-test(`resolve-fields`, async t => {
+test(`resolve-fields`, async () => {
   const s = {
     length: 10,
     random: Math.random
   };
   const r = await resolveFields(s);
-  t.is(typeof r.length, `number`);
-  t.is(typeof r.random, `number`);
-  t.is(r.length, 10);
+  expect(typeof r.length).toBe(`number`);
+  expect(typeof r.random).toBe(`number`);
+  expect(r.length).toBe(10);
 
   const c = 5;
   const s1 = {
@@ -128,13 +128,13 @@ test(`resolve-fields`, async t => {
   // Each time we call resolveFields, r1.gen should match for index
   for (let i = 0; i < c + 1; i++) {
     const r1 = await resolveFields(s1);
-    t.is(r1.colour, `red`);
+    expect(r1.colour).toBe(`red`);
     if (i === c) {
       // Test if generator ends
-      t.falsy(r1.gen);
+      expect(r1.gen).toBeFalsy();
     } else {
-      t.is(typeof r1.gen, `number`);
-      t.is(r1.gen, i);
+      expect(typeof r1.gen).toBe(`number`);
+      expect(r1.gen).toBe(i);
     }
   }
 });

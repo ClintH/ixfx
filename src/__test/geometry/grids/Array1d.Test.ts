@@ -1,44 +1,44 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Grids from '../../../geometry/grid/index.js';
 import { Array1d } from '../../../geometry/grid/index.js';
 import { By } from '../../../geometry/grid/index.js';
 
-test(`wrap`, t => {
+test(`wrap`, () => {
   const data = [
     1, 2, 3,
     4, 5, 6
   ];
   const w = Array1d.wrap(data, 3);
-  t.is(w.cols, 3);
-  t.is(w.rows, 2);
-  t.is(w.get({ x: 0, y: 0 }), 1);
-  t.is(w.get({ x: 0, y: 1 }), 4);
+  expect(w.cols).toBe(3);
+  expect(w.rows).toBe(2);
+  expect(w.get({ x: 0, y: 0 })).toBe(1);
+  expect(w.get({ x: 0, y: 1 })).toBe(4);
 
   w.set(10, { x: 0, y: 0 });
   w.set(20, { x: 2, y: 1 });
-  t.deepEqual(w.array, [ 10, 2, 3, 4, 5, 20 ]);
-  t.false(data === w.array);
+  expect(w.array).toEqual([ 10, 2, 3, 4, 5, 20 ]);
+  expect(data === w.array).toBe(false);
 
 });
 
-test(`wrap-mutable`, t => {
+test(`wrap-mutable`, () => {
   const data = [
     1, 2, 3,
     4, 5, 6
   ];
   const w = Array1d.wrapMutable(data, 3);
-  t.is(w.cols, 3);
-  t.is(w.rows, 2);
-  t.is(w.get({ x: 0, y: 0 }), 1);
-  t.is(w.get({ x: 0, y: 1 }), 4);
+  expect(w.cols).toBe(3);
+  expect(w.rows).toBe(2);
+  expect(w.get({ x: 0, y: 0 })).toBe(1);
+  expect(w.get({ x: 0, y: 1 })).toBe(4);
 
   w.set(10, { x: 0, y: 0 });
   w.set(20, { x: 2, y: 1 });
-  t.deepEqual(w.array, [ 10, 2, 3, 4, 5, 20 ]);
-  t.true(data === w.array);
+  expect(w.array).toEqual([ 10, 2, 3, 4, 5, 20 ]);
+  expect(data === w.array).toBe(true);
 });
 
-test(`visit`, (t) => {
+test(`visit`, () => {
   const data = [ 1, 2, 3, 4, 5, 6 ];
   const cols = 2;
 
@@ -48,40 +48,40 @@ test(`visit`, (t) => {
   // Test default visitor: left-to-right, top-to-bottom
   const r1 = Array.from(it);
   //t.deepEqual(r1, [ [ 1, 0 ], [ 2, 1 ], [ 3, 2 ], [ 4, 3 ], [ 5, 4 ], [ 6, 5 ] ]);
-  t.deepEqual(r1, [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]);
+  expect(r1).toEqual([ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ] ]);
 });
 
-test(`access`, t => {
+test(`access`, () => {
   const arr = [
     1, 2, 3,
     4, 5, 6
   ]
   const a = Array1d.access(arr, 3);
-  t.is(a({ x: 0, y: 0 }, `undefined`), 1);
-  t.is(a({ x: 2, y: 1 }, `undefined`), 6);
+  expect(a({ x: 0, y: 0 }, `undefined`)).toBe(1);
+  expect(a({ x: 2, y: 1 }, `undefined`)).toBe(6);
 
-  t.falsy(a({ x: 3, y: 2 }, `undefined`));
-  t.falsy(a({ x: 0, y: -1 }, `undefined`));
+  expect(a({ x: 3, y: 2 }, `undefined`)).toBeFalsy();
+  expect(a({ x: 0, y: -1 }, `undefined`)).toBeFalsy();
 });
 
-test(`mutate`, t => {
+test(`mutate`, () => {
   const arr = [
     1, 2, 3,
     4, 5, 6
   ]
   const a = Array1d.setMutate(arr, 3);
   a(10, { x: 0, y: 0 }, `undefined`);
-  t.deepEqual(arr, [
+  expect(arr).toEqual([
     10, 2, 3,
     4, 5, 6
   ]);
 
   a(20, { x: 2, y: 1 }, `undefined`);
-  t.deepEqual(arr, [
+  expect(arr).toEqual([
     10, 2, 3,
     4, 5, 20
   ]);
-  t.throws(() => a(10, { x: 3, y: 2 }, `undefined`))
-  t.throws(() => a(10, { x: 3, y: -2 }, `undefined`))
+  expect(() => a(10, { x: 3, y: 2 }, `undefined`)).toThrow()
+  expect(() => a(10, { x: 3, y: -2 }, `undefined`)).toThrow()
 
 });

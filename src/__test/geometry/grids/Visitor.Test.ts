@@ -1,8 +1,8 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Grids from '../../../geometry/grid/index.js';
 import { As } from '../../../geometry/grid/index.js';
 
-test(`step-row`, (t) => {
+test(`step-row`, () => {
   const grid: Grids.Grid = { cols: 5, rows: 5 };
   const start = { x: 2, y: 2 };
   /**
@@ -16,37 +16,37 @@ test(`step-row`, (t) => {
   const stepper = Grids.Visit.stepper(grid, visitor, start);
   //const visitorSteps = (steps: number) => Grids.Visit.step(grid, start, steps, visitor);
 
-  t.throws(() => stepper(0.5));
-  t.throws(() => stepper(NaN));
+  expect(() => stepper(0.5)).toThrow();
+  expect(() => stepper(NaN)).toThrow();
 
   // Go nowhere
-  t.deepEqual(stepper(0), { x: 2, y: 2 });
+  expect(stepper(0)).toEqual({ x: 2, y: 2 });
 
   // Easy case - move to right
-  t.deepEqual(stepper(1), { x: 3, y: 2 });
+  expect(stepper(1)).toEqual({ x: 3, y: 2 });
 
   // Wrap to next/prev row
-  t.deepEqual(stepper(3), { x: 1, y: 3 });
-  t.deepEqual(stepper(-3), { x: 3, y: 2 });
+  expect(stepper(3)).toEqual({ x: 1, y: 3 });
+  expect(stepper(-3)).toEqual({ x: 3, y: 2 });
 
   // To corners
-  t.deepEqual(stepper(12), { x: 0, y: 0 });
-  t.deepEqual(stepper(-12), { x: 3, y: 2 });
+  expect(stepper(12)).toEqual({ x: 0, y: 0 });
+  expect(stepper(-12)).toEqual({ x: 3, y: 2 });
 
   // Past corners
-  t.deepEqual(stepper(13), { x: 1, y: 0 });
-  t.deepEqual(stepper(-13), { x: 3, y: 2 });
+  expect(stepper(13)).toEqual({ x: 1, y: 0 });
+  expect(stepper(-13)).toEqual({ x: 3, y: 2 });
 
   // Full loop
-  t.deepEqual(stepper(-25), { x: 3, y: 2 });
-  t.deepEqual(stepper(25), { x: 3, y: 2 });
+  expect(stepper(-25)).toEqual({ x: 3, y: 2 });
+  expect(stepper(25)).toEqual({ x: 3, y: 2 });
 
   // Full loop and a bit
-  t.deepEqual(stepper(-30, true), { x: 2, y: 1 });
-  t.deepEqual(stepper(30), { x: 2, y: 2 });
+  expect(stepper(-30, true)).toEqual({ x: 2, y: 1 });
+  expect(stepper(30)).toEqual({ x: 2, y: 2 });
 });
 
-test(`step-column`, (t) => {
+test(`step-column`, () => {
   const grid: Grids.Grid = { cols: 5, rows: 5 };
   const start = { x: 2, y: 2 };
   //const visitor = Grids.Visit.create(`column`);
@@ -63,33 +63,33 @@ test(`step-column`, (t) => {
 
   //const visitorSteps = (steps: number) => Grids.Visit.step(grid, start, steps, visitor);
 
-  t.throws(() => stepper(0.5));
-  t.throws(() => stepper(NaN));
+  expect(() => stepper(0.5)).toThrow();
+  expect(() => stepper(NaN)).toThrow();
 
   // Go nowhere
-  t.deepEqual(stepper(0), { x: 2, y: 2 });
+  expect(stepper(0)).toEqual({ x: 2, y: 2 });
 
   // Easy case - move down/up
-  t.deepEqual(stepper(1), { x: 2, y: 3 });
-  t.deepEqual(stepper(-1), { x: 2, y: 2 });
+  expect(stepper(1)).toEqual({ x: 2, y: 3 });
+  expect(stepper(-1)).toEqual({ x: 2, y: 2 });
 
   // Wrap to next/prev row
-  t.deepEqual(stepper(3), { x: 3, y: 0 });
-  t.deepEqual(stepper(-3), { x: 2, y: 2 });
+  expect(stepper(3)).toEqual({ x: 3, y: 0 });
+  expect(stepper(-3)).toEqual({ x: 2, y: 2 });
 
   // To corners
-  t.deepEqual(stepper(12), { x: 4, y: 4 });
-  t.deepEqual(stepper(-12), { x: 2, y: 2 });
+  expect(stepper(12)).toEqual({ x: 4, y: 4 });
+  expect(stepper(-12)).toEqual({ x: 2, y: 2 });
 
   // Past corners
-  t.deepEqual(stepper(13), { x: 0, y: 0 });
-  t.deepEqual(stepper(-13), { x: 2, y: 2 });
+  expect(stepper(13)).toEqual({ x: 0, y: 0 });
+  expect(stepper(-13)).toEqual({ x: 2, y: 2 });
 
   // Full loop
-  t.deepEqual(stepper(-25), { x: 2, y: 2 });
-  t.deepEqual(stepper(25), { x: 2, y: 2 });
+  expect(stepper(-25)).toEqual({ x: 2, y: 2 });
+  expect(stepper(25)).toEqual({ x: 2, y: 2 });
 
   // Full loop and a bit
-  t.deepEqual(stepper(-30), { x: 1, y: 2 });
-  t.deepEqual(stepper(30), { x: 2, y: 2 });
+  expect(stepper(-30)).toEqual({ x: 1, y: 2 });
+  expect(stepper(30)).toEqual({ x: 2, y: 2 });
 });

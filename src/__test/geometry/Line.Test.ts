@@ -1,5 +1,4 @@
-import test from 'ava';
-/* eslint-disable */
+import expect from 'expect';
 import * as Lines from '../../geometry/line/index.js';
 import { fromNumbers } from '../../geometry/line/FromNumbers.js';
 import { fromFlatArray } from '../../geometry/line/FromFlatArray.js';
@@ -12,11 +11,13 @@ import { multiply } from '../../geometry/line/Multiply.js';
 import { joinPointsToLines } from '../../geometry/line/JoinPointsToLines.js';
 import { fromPointsToPath } from '../../geometry/line/FromPointsToPath.js';
 
-test('basic', (t) => {
-  t.deepEqual(Empty, { a: { x: 0, y: 0 }, b: { x: 0, y: 0 } });
-  t.true(isEmpty(Empty));
-  t.deepEqual(Placeholder, { a: { x: Number.NaN, y: Number.NaN }, b: { x: Number.NaN, y: Number.NaN } });
-  t.true(isPlaceholder(Lines.Placeholder));
+test('basic', () => {
+  expect(Empty).toEqual({ a: { x: 0, y: 0 }, b: { x: 0, y: 0 } });
+  expect(isEmpty(Empty)).toBe(true);
+  expect(Placeholder).toEqual(
+    { a: { x: Number.NaN, y: Number.NaN }, b: { x: Number.NaN, y: Number.NaN } }
+  );
+  expect(isPlaceholder(Lines.Placeholder)).toBe(true);
 
   const l = {
     a: { x: 20, y: 20 },
@@ -27,75 +28,75 @@ test('basic', (t) => {
     b: { x: 11, y: 11 }
   }
 
-  t.deepEqual(fromNumbers(20, 30, 40, 50), {
+  expect(fromNumbers(20, 30, 40, 50)).toEqual({
     a: { x: 20, y: 30 }, b: { x: 40, y: 50 }
   });
-  t.deepEqual(fromFlatArray([ 20, 30, 40, 50 ]), {
+  expect(fromFlatArray([ 20, 30, 40, 50 ])).toEqual({
     a: { x: 20, y: 30 }, b: { x: 40, y: 50 }
   });
 
   const a = { x: 1, y: 2 };
   const b = { x: 3, y: 4 };
-  t.deepEqual(fromPoints(a, b), {
+  expect(fromPoints(a, b)).toEqual({
     a, b
   });
   const path = fromPointsToPath(a, b);
-  t.deepEqual(path.a, a);
-  t.deepEqual(path.b, b);
-  t.deepEqual(path.kind, 'line');
+  expect(path.a).toEqual(a);
+  expect(path.b).toEqual(b);
+  expect(path.kind).toEqual('line');
 
   const pointsParam = getPointParameter(a, b);
-  t.deepEqual(pointsParam[ 0 ], a);
-  t.deepEqual(pointsParam[ 1 ], b);
+  expect(pointsParam[ 0 ]).toEqual(a);
+  expect(pointsParam[ 1 ]).toEqual(b);
 
   const pointsParam2 = getPointParameter(l);
-  t.deepEqual(pointsParam2[ 0 ], l.a);
-  t.deepEqual(pointsParam2[ 1 ], l.b);
+  expect(pointsParam2[ 0 ]).toEqual(l.a);
+  expect(pointsParam2[ 1 ]).toEqual(l.b);
 
-  t.true(isEqual(l, l));
-  t.false(isEqual(l, ll));
+  expect(isEqual(l, l)).toBe(true);
+  expect(isEqual(l, ll)).toBe(false);
 
-  t.deepEqual([ ...asPoints([ l, ll ]) ], [ l.a, l.b, ll.a, ll.b ]);
+  expect([ ...asPoints([ l, ll ]) ]).toEqual([ l.a, l.b, ll.a, ll.b ]);
 
 
   // Divide
-  t.deepEqual(divide(l, { x: 2, y: 10 }), {
+  expect(divide(l, { x: 2, y: 10 })).toEqual({
     a: { x: 10, y: 2 }, b: { x: 5, y: 1 }
   });
-  t.deepEqual(divide(l, { x: 1, y: 1 }), l);
-  t.throws(() => divide(l, { x: 0, y: 10 }));
-  t.throws(() => divide(l, { x: 2, y: 0 }));
+  expect(divide(l, { x: 1, y: 1 })).toEqual(l);
+  expect(() => divide(l, { x: 0, y: 10 })).toThrow();
+  expect(() => divide(l, { x: 2, y: 0 })).toThrow();
 
   // Multiply
-  t.deepEqual(multiply(l, { x: 2, y: 10 }), {
+  expect(multiply(l, { x: 2, y: 10 })).toEqual({
     a: { x: 40, y: 200 }, b: { x: 20, y: 100 }
   });
-  t.deepEqual(multiply(l, { x: 1, y: 1 }), l);
-  t.deepEqual(multiply(l, { x: 2, y: 0 }), {
+  expect(multiply(l, { x: 1, y: 1 })).toEqual(l);
+  expect(multiply(l, { x: 2, y: 0 })).toEqual({
     a: { x: 40, y: 0 }, b: { x: 20, y: 0 }
   });
-  t.deepEqual(multiply(l, { x: 0, y: 10 }), {
+  expect(multiply(l, { x: 0, y: 10 })).toEqual({
     a: { x: 0, y: 200 }, b: { x: 0, y: 100 }
   });
 
 
 });
 
-test(`joinPointsToLines`, (t) => {
+test(`joinPointsToLines`, () => {
   const ptA = { x: 0, y: 0 };
   const ptB = { x: 1, y: 1 };
   const ptC = { x: 2, y: 2 };
 
   const lA = joinPointsToLines(ptA, ptB);
-  t.is(lA.length, 1);
-  t.deepEqual(lA[ 0 ].a, ptA);
-  t.deepEqual(lA[ 0 ].b, ptB);
+  expect(lA.length).toBe(1);
+  expect(lA[ 0 ].a).toEqual(ptA);
+  expect(lA[ 0 ].b).toEqual(ptB);
 
   const lB = joinPointsToLines(ptA, ptB, ptC);
-  t.deepEqual(lB.length, 2);
-  t.deepEqual(lB[ 0 ].a, ptA);
-  t.deepEqual(lB[ 0 ].b, ptB);
-  t.deepEqual(lB[ 1 ].a, ptB);
-  t.deepEqual(lB[ 1 ].b, ptC);
+  expect(lB.length).toEqual(2);
+  expect(lB[ 0 ].a).toEqual(ptA);
+  expect(lB[ 0 ].b).toEqual(ptB);
+  expect(lB[ 1 ].a).toEqual(ptB);
+  expect(lB[ 1 ].b).toEqual(ptC);
 
 });

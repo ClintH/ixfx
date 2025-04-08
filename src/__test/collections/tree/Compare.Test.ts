@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Trees from '../../../collections/tree/index.js';
 import { toStringAbbreviate } from '../../../text/Text.js';
 
@@ -33,25 +33,25 @@ const countChildChanges = (n: Trees.DiffNode<any>): number => {
   return totalChanged;
 }
 
-test('tree-compare', t => {
+test('tree-compare', () => {
   const t1 = Trees.FromObject.create(getTestObj(), { valuesAtLeaves: true });
 
   // Comparing same object --- no expected changes
   const r1 = Trees.Mutable.compare(t1, t1);
-  t.is(r1.value?.added.length, 0);
-  t.is(r1.value?.removed.length, 0);
-  t.false(r1.value?.childChanged);
-  t.false(r1.value?.valueChanged);
+  expect(r1.value?.added.length).toBe(0);
+  expect(r1.value?.removed.length).toBe(0);
+  expect(r1.value?.childChanged).toBe(false);
+  expect(r1.value?.valueChanged).toBe(false);
 
   // Compare object with top-level field value change
   const v2 = getTestObj();
   v2.name = `Jane`;
   const t2 = Trees.FromObject.create(v2, { valuesAtLeaves: true });
   const r2 = Trees.Mutable.compare(t1, t2);
-  t.is(r2.value?.added.length, 1);
-  t.is(r2.value?.removed.length, 1);
-  t.true(r2.value?.childChanged);
-  t.is(countChildChanges(r2), 1);
+  expect(r2.value?.added.length).toBe(1);
+  expect(r2.value?.removed.length).toBe(1);
+  expect(r2.value?.childChanged).toBe(true);
+  expect(countChildChanges(r2)).toBe(1);
 
 
   // Compare deep field value change
@@ -62,6 +62,6 @@ test('tree-compare', t => {
   const t3 = Trees.FromObject.create(v3, { valuesAtLeaves: true });
 
   const r3 = Trees.Mutable.compare(t1, t3);
-  t.is(countChildChanges(r3), 4);
+  expect(countChildChanges(r3)).toBe(4);
 
 });

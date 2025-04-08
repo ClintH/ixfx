@@ -1,61 +1,61 @@
-import test from 'ava';
+import expect from 'expect';
 import { immutable, fromScalar, clamp, towardZero, scale } from '../../numbers/Bipolar.js';
 
-test('bipolar', t => {
+test('bipolar', () => {
   const b = immutable(1);
 
-  t.is(+b + 10, 11);
+  expect(+b + 10).toBe(11);
 
-  t.is(immutable(0.5).inverse().value, -0.5);
-  t.is(immutable(0.5).add(0.1).value, 0.6);
-  t.is(immutable(0.1).multiply(2).value, 0.2);
-  t.is(immutable(-1).asScalar(), 0);
-  t.is(immutable(0).asScalar(), 0.5);
-  t.is(immutable(1).asScalar(), 1);
+  expect(immutable(0.5).inverse().value).toBe(-0.5);
+  expect(immutable(0.5).add(0.1).value).toBe(0.6);
+  expect(immutable(0.1).multiply(2).value).toBe(0.2);
+  expect(immutable(-1).asScalar()).toBe(0);
+  expect(immutable(0).asScalar()).toBe(0.5);
+  expect(immutable(1).asScalar()).toBe(1);
 
 });
 
-test(`bipolarTowardsZero`, t => {
-  t.is(towardZero(-1, 0.1), -0.9);
-  t.is(towardZero(1, 0.1), 0.9);
-  t.is(towardZero(0, 0.1), 0);
-  t.is(towardZero(0.9, 10), 0);
-  t.is(towardZero(-0.9, 10), 0);
+test(`bipolarTowardsZero`, () => {
+  expect(towardZero(-1, 0.1)).toBe(-0.9);
+  expect(towardZero(1, 0.1)).toBe(0.9);
+  expect(towardZero(0, 0.1)).toBe(0);
+  expect(towardZero(0.9, 10)).toBe(0);
+  expect(towardZero(-0.9, 10)).toBe(0);
 });
 
-test(`clamp`, t => {
-  t.is(clamp(0), 0);
-  t.is(clamp(1), 1);
-  t.is(clamp(-1), -1);
-  t.is(clamp(1.1), 1);
-  t.is(clamp(-1.1), -1);
+test(`clamp`, () => {
+  expect(clamp(0)).toBe(0);
+  expect(clamp(1)).toBe(1);
+  expect(clamp(-1)).toBe(-1);
+  expect(clamp(1.1)).toBe(1);
+  expect(clamp(-1.1)).toBe(-1);
 
-  t.throws(() => clamp(NaN));
+  expect(() => clamp(NaN)).toThrow();
   // @ts-expect-error
-  t.throws(() => clamp(false));
+  expect(() => clamp(false)).toThrow();
   // @ts-expect-error
-  t.throws(() => clamp("hello"));
+  expect(() => clamp("hello")).toThrow();
 
 });
 
-test(`scalarToBipolar`, (t) => {
-  t.is(fromScalar(1), 1);
-  t.is(fromScalar(0), -1);
-  t.is(fromScalar(0.5), 0);
+test(`scalarToBipolar`, () => {
+  expect(fromScalar(1)).toBe(1);
+  expect(fromScalar(0)).toBe(-1);
+  expect(fromScalar(0.5)).toBe(0);
 
-  t.throws(() => fromScalar(Number.NaN));
+  expect(() => fromScalar(Number.NaN)).toThrow();
   // @ts-expect-error
-  t.throws(() => fromScalar(true));
-  t.throws(() => fromScalar(1.01));
-  t.throws(() => fromScalar(-0.01));
+  expect(() => fromScalar(true)).toThrow();
+  expect(() => fromScalar(1.01)).toThrow();
+  expect(() => fromScalar(-0.01)).toThrow();
 });
 
-test(`scale`, t => {
-  t.is(scale(-10, -10, 10), -1);
-  t.is(scale(0, -10, 10), 0);
-  t.is(scale(10, -10, 10), 1);
-  t.is(scale(-5, -10, 10), -0.5);
-  t.is(scale(5, -10, 10), 0.5);
+test(`scale`, () => {
+  expect(scale(-10, -10, 10)).toBe(-1);
+  expect(scale(0, -10, 10)).toBe(0);
+  expect(scale(10, -10, 10)).toBe(1);
+  expect(scale(-5, -10, 10)).toBe(-0.5);
+  expect(scale(5, -10, 10)).toBe(0.5);
 
 
 

@@ -1,11 +1,11 @@
-import test from 'ava';
+import expect from 'expect';
 import { rateMinimum } from '../../flow/RateMinimum.js';
 import { sleep } from '../../flow/Sleep.js';
 
 
 // In this case we don't expect fallback
 // to be triggered because rm() is being invoked faster than rateMin's interval
-test(`rateMinimum-0`, async t => {
+test(`rateMinimum-0`, async () => {
   let fallbackCalled = 0;
   let wtcCalled = 0;
   const rm = rateMinimum({
@@ -23,7 +23,7 @@ test(`rateMinimum-0`, async t => {
   const t1 = setInterval(() => {
     rm(Math.random());
     if (wtcCalled >= 10) {
-      t.is(fallbackCalled, 0);
+      expect(fallbackCalled).toBe(0);
       clearInterval(t1);
     }
   }, 50);
@@ -31,7 +31,7 @@ test(`rateMinimum-0`, async t => {
 });
 
 // In this case we expect fallback to be triggered half the times
-test(`rateMinimum-1`, async t => {
+test(`rateMinimum-1`, async () => {
   let fallbackCalled = 0;
   let wtcCalled = 0;
   const rm = rateMinimum({
@@ -48,7 +48,7 @@ test(`rateMinimum-1`, async t => {
   const t1 = setInterval(() => {
     rm(Math.random());
     if (wtcCalled >= 10) {
-      t.is(fallbackCalled, 5, `fallbackCalled: ${ fallbackCalled }`);
+      expect(fallbackCalled).toBe(5);
       clearInterval(t1);
     }
   }, 150);

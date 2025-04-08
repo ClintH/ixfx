@@ -1,21 +1,21 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { count } from '../../../numbers/Count.js';
 import { isEqualValueDefault } from '../../../util/IsEqual.js';
 import { rangeInclusive } from '../../../numbers/Filter.js';
-test(`chunk-limit`, async t => {
+test(`chunk-limit`, async () => {
   // Even number of items per chunk
   const amt1 = 20;
   const values1 = count(amt1);
   const limit1 = 5;
   const b1 = Rx.chunk(values1, { quantity: limit1 });
   const reader1 = await Rx.toArray(b1);
-  t.is(reader1.flat().length, amt1);
-  t.is(reader1.length, Math.ceil(amt1 / limit1));
+  expect(reader1.flat().length).toBe(amt1);
+  expect(reader1.length).toBe(Math.ceil(amt1 / limit1));
   for (const row of reader1) {
     t.assert(row !== undefined);
-    t.is(row!.length, limit1);
+    expect(row!.length).toBe(limit1);
   }
 
   //Remainders
@@ -24,17 +24,17 @@ test(`chunk-limit`, async t => {
   const limit2 = 6;
   const b2 = Rx.chunk(values2, { quantity: limit2 });
   const reader2 = await Rx.toArray(b2);
-  t.is(reader2.flat().length, amt2);
+  expect(reader2.flat().length).toBe(amt2);
   for (let index = 0; index < reader2.length; index++) {
     if (index === reader2.length - 1) {
-      t.is(reader2[ index ]!.length, amt2 % limit2);
+      expect(reader2[ index ]!.length).toBe(amt2 % limit2);
     } else {
-      t.is(reader2[ index ]!.length, limit2);
+      expect(reader2[ index ]!.length).toBe(limit2);
     }
   }
 })
 
-test(`chunk-elapsed-0`, async t => {
+test(`chunk-elapsed-0`, async done => {
   const m = Rx.manual<number>();
   const results: Array<Array<number>> = [];
   const chunkElapsed = 200;
@@ -66,11 +66,11 @@ test(`chunk-elapsed-0`, async t => {
   const c = isEqualValueDefault(results, [
     [ 0.1, 0.2, 0.3, 0.4, 0.5 ], [ 0.6, 0.7, 0.8, 0.9 ]
   ]);
-  if (!a && !b && !c) t.fail(`results: ${ JSON.stringify(results) }`);
-  else t.pass();
+  if (!a && !b && !c)
+    done.fail(`results: ${ JSON.stringify(results) }`);
 });
 
-test(`chunk-elapsed-1`, async t => {
+test(`chunk-elapsed-1`, async () => {
   // Read all items within the elapsed period
   const amt = 20;
   const started = Date.now();
@@ -82,12 +82,12 @@ test(`chunk-elapsed-1`, async t => {
   const reader = await Rx.toArray(chunk);
   const readElapsed = Date.now() - started;
   // Check that that toArray yielded all the emitted values
-  t.is(reader.flat().length, amt);
+  expect(reader.flat().length).toBe(amt);
   // Expect that time to drain source isn't so long
-  t.true(readElapsed < 500, `Reading shouldn't take full time since source ends`);
+  expect(readElapsed < 500).toBe(true);
 });
 
-test(`chunked-elapsed-2`, async t => {
+test(`chunked-elapsed-2`, async () => {
   // Read items in gulps
   const amt = 20;
   const elapsed = 200;
@@ -105,10 +105,10 @@ test(`chunked-elapsed-2`, async t => {
 
   // Expect that number of read items is the same as source
 
-  t.is(reader.flat().length, amt);
+  expect(reader.flat().length).toBe(amt);
   const expected = elapsed / interval;
   const r = rangeInclusive(expected - 1, expected + 1);
   for (const row of reader) {
-    t.true(r(row.length), JSON.stringify(row));
+    expect(r(row.length)).toBe(true);
   }
 });

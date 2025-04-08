@@ -1,54 +1,68 @@
-import test from 'ava';
+import expect from 'expect';
 
 import * as Shape from '../../geometry/shape/index.js';
 import { Circles, Rects } from '../../geometry/index.js';
 
-test(`random-point`, t => {
+test(`random-point`, () => {
   // @ts-expect-error
-  t.throws(() => Shape.randomPoint({ x: 10, y: 20 }));
+  expect(() => Shape.randomPoint({ x: 10, y: 20 })).toThrow();
 
   const shape1 = { x: 10, y: 10, radius: 10 };
   const r1 = Shape.randomPoint(shape1);
-  t.true(Shape.isIntersecting(shape1, r1));
+  expect(Shape.isIntersecting(shape1, r1)).toBe(true);
 
   const shape2 = { x: 10, y: 10, width: 5, height: 5 };
   const r2 = Shape.randomPoint(shape2);
-  t.true(Shape.isIntersecting(shape2, r2));
+  expect(Shape.isIntersecting(shape2, r2)).toBe(true);
 });
 
-test(`center`, t => {
+test(`center`, () => {
   const shape1 = { x: 10, y: 10, radius: 10 };
   const r1 = Shape.center(shape1);
-  t.deepEqual(Circles.center(shape1), r1);
+  expect(Circles.center(shape1)).toEqual(r1);
 
   const shape2 = { x: 10, y: 10, width: 5, height: 5 };
   const r2 = Shape.center(shape2);
-  t.deepEqual(Rects.center(shape2), r2);
+  expect(Rects.center(shape2)).toEqual(r2);
 
 });
 
-test(`corners`, t => {
+test(`corners`, () => {
 
   // Rectangle -> Point
-  t.true(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 100, y: 100 }));
-  t.true(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 101, y: 101 }));
-  t.false(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 99, y: 99 }));
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 100, y: 100 })
+  ).toBe(true);
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 101, y: 101 })
+  ).toBe(true);
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 99, y: 99 })
+  ).toBe(false);
 
   // Rectangle -> Circle
-  t.true(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 100, y: 100, radius: 5 }));
-  t.true(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 101, y: 101, radius: 5 }));
-  t.true(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 99, y: 99, radius: 5 }));
-  t.false(Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 90, y: 90, radius: 5 }));
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 100, y: 100, radius: 5 })
+  ).toBe(true);
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 101, y: 101, radius: 5 })
+  ).toBe(true);
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 99, y: 99, radius: 5 })
+  ).toBe(true);
+  expect(
+    Shape.isIntersecting({ x: 100, y: 100, width: 5, height: 5 }, { x: 90, y: 90, radius: 5 })
+  ).toBe(false);
 
   // Circle -> Point
-  t.true(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 100, y: 100 }));
-  t.true(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 101, y: 101 }));
-  t.true(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 99, y: 99 }));
-  t.false(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 90, y: 90 }));
+  expect(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 100, y: 100 })).toBe(true);
+  expect(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 101, y: 101 })).toBe(true);
+  expect(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 99, y: 99 })).toBe(true);
+  expect(Shape.isIntersecting({ x: 100, y: 100, radius: 5 }, { x: 90, y: 90 })).toBe(false);
 
   // @ts-expect-error
-  t.throws(() => Shape.isIntersecting(null, null));
+  expect(() => Shape.isIntersecting(null, null)).toThrow();
   // @ts-expect-error
-  t.throws(() => Shape.isIntersecting({ width: 10, height: 20 }, { x: 10, y: 20 }));
+  expect(() => Shape.isIntersecting({ width: 10, height: 20 }, { x: 10, y: 20 })).toThrow();
 
 });

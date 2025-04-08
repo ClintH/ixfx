@@ -1,11 +1,11 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Grids from '../../../geometry/grid/index.js';
 
-test(`offset-1`, t => {
+test(`offset-1`, () => {
   const grid = { rows: 3, cols: 3 };
   const start = { x: 0, y: 0 }
   const r1 = Grids.offsetCardinals(grid, start, 1, `undefined`);
-  t.deepEqual(r1, {
+  expect(r1).toEqual({
     n: undefined,
     ne: undefined,
     nw: undefined,
@@ -17,7 +17,7 @@ test(`offset-1`, t => {
   });
 
   const r2 = Grids.offsetCardinals(grid, start, 1, `wrap`);
-  t.deepEqual(r2, {
+  expect(r2).toEqual({
     n: { x: 0, y: 2 },
     ne: { x: 1, y: 2 },
     nw: { x: 2, y: 2 },
@@ -29,7 +29,7 @@ test(`offset-1`, t => {
   });
 
   const r3 = Grids.offsetCardinals(grid, start, 1, `unbounded`);
-  t.deepEqual(r3, {
+  expect(r3).toEqual({
     n: { x: 0, y: -1 },
     ne: { x: 1, y: -1 },
     nw: { x: -1, y: -1 },
@@ -41,7 +41,7 @@ test(`offset-1`, t => {
   });
 
   const r4 = Grids.offsetCardinals(grid, start, 1, `stop`);
-  t.deepEqual(r4, {
+  expect(r4).toEqual({
     n: { x: 0, y: 0 },
     ne: { x: 1, y: 0 },
     nw: { x: 0, y: 0 },
@@ -53,11 +53,11 @@ test(`offset-1`, t => {
   });
 });
 
-test(`offset-2`, t => {
+test(`offset-2`, () => {
   const grid = { rows: 3, cols: 3 };
   const start = { x: 1, y: 1 }
   const r1 = Grids.offsetCardinals(grid, start, 2, `undefined`);
-  t.deepEqual(r1, {
+  expect(r1).toEqual({
     n: undefined,
     ne: undefined,
     nw: undefined,
@@ -70,7 +70,7 @@ test(`offset-2`, t => {
 
 
   const r2 = Grids.offsetCardinals(grid, start, 2, `wrap`);
-  t.deepEqual(r2, {
+  expect(r2).toEqual({
     n: { x: 1, y: 2 },
     ne: { x: 0, y: 2 },
     nw: { x: 2, y: 2 },
@@ -82,7 +82,7 @@ test(`offset-2`, t => {
   });
 
   const r3 = Grids.offsetCardinals(grid, start, 2, `unbounded`);
-  t.deepEqual(r3, {
+  expect(r3).toEqual({
     n: { x: 1, y: -1 },
     ne: { x: 3, y: -1 },
     nw: { x: -1, y: -1 },
@@ -94,7 +94,7 @@ test(`offset-2`, t => {
   });
 
   const r4 = Grids.offsetCardinals(grid, start, 2, `stop`);
-  t.deepEqual(r4, {
+  expect(r4).toEqual({
     n: { x: 1, y: 0 },
     ne: { x: 2, y: 0 },
     nw: { x: 0, y: 0 },

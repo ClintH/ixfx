@@ -1,7 +1,7 @@
-import test from 'ava';
+import expect from 'expect';
 import { mapObjectShallow, mapObjectByObject } from '../../data/MapObject.js';
 
-test(`by-object`, t => {
+test(`by-object`, () => {
   const a = {
     name: `john`,
     size: 10
@@ -11,13 +11,13 @@ test(`by-object`, t => {
     blah: () => 10,
     name: (value: string) => value.toUpperCase(),
   });
-  t.deepEqual(r1, {
+  expect(r1).toEqual({
     name: `JOHN`,
     size: 10 // Size carries forward
   });
 });
 
-test('callback', t => {
+test('callback', () => {
   const t1 = {
     name: `jane`,
     size: 10,
@@ -40,18 +40,18 @@ test('callback', t => {
     indexes.push(args.index);
   });
 
-  t.deepEqual(values, [ `jane`, 10, true, {
+  expect(values).toEqual([ `jane`, 10, true, {
     b: {
       c: {
         deepField: `true`
       }
     }
   } ]);
-  t.deepEqual(fields, [ `name`, `size`, `flag`, `a` ]);
-  t.deepEqual(indexes, [ 0, 1, 2, 3 ]);
+  expect(fields).toEqual([ `name`, `size`, `flag`, `a` ]);
+  expect(indexes).toEqual([ 0, 1, 2, 3 ]);
 });
 
-test('results', (t) => {
+test('results', () => {
   const o1a = {
     x: 10,
     y: 20,
@@ -60,9 +60,9 @@ test('results', (t) => {
   // Convert fields to strings
   const o1b = mapObjectShallow<typeof o1a, string>(o1a, (args) => args.value.toString());
   // Test conversion
-  t.deepEqual(o1b, { x: '10', y: '20' });
+  expect(o1b).toEqual({ x: '10', y: '20' });
   // Test original was not changed
-  t.deepEqual(o1a, { x: 10, y: 20 });
+  expect(o1a).toEqual({ x: 10, y: 20 });
 
   // Changes per-field
   const o2a = { width: 100, height: 250, colour: 'red' };
@@ -72,7 +72,7 @@ test('results', (t) => {
     return args.value;
   });
   // Test per-field change
-  t.deepEqual(o2b, { width: 300, height: 500, colour: 'red' });
+  expect(o2b).toEqual({ width: 300, height: 500, colour: 'red' });
   // Test original was not changed
   t.like(o2a, { width: 100, height: 250, colour: 'red' });
 });

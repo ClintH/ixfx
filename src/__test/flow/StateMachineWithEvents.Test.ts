@@ -1,10 +1,6 @@
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
-import {
-  fromListBidirectional,
-  fromList,
-  WithEvents,
-} from '../../flow/StateMachine.js';
+import { fromListBidirectional, fromList, WithEvents } from '../../flow/StateMachine.js';
 import { arrayValuesEqual, eventPromise } from '../Include.js';
 
 const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);
@@ -17,182 +13,182 @@ const createMulti = () => ({
 });
 
 // Test that machine throws an error for an unknown state
-test(`transitions`, (t) => {
+test(`transitions`, () => {
   const m = createAdsr();
 
   // Should throw creating a machine with invalid initial state
-  t.throws(() => {
+  expect(() => {
     new WithEvents(m, { initial: `blah` });
-  });
+  }).toThrow();
 
   const sm = new WithEvents(m, { initial: `attack` });
 
   // Shouldn't be possible to set to undefined
-  t.throws(() => {
+  expect(() => {
     // @ts-ignore
     sm.state = undefined;
-  });
+  }).toThrow();
 
-  t.throws(() => {
+  expect(() => {
     // @ts-ignore
     sm.state = null;
-  });
+  }).toThrow();
 
   // Invalid state
-  t.throws(() => {
+  expect(() => {
     sm.state = `blah`;
-  });
+  }).toThrow();
 
   // State is defined, but invalid from intial state of attack
-  t.throws(() => {
+  expect(() => {
     sm.state = `release`;
-  });
+  }).toThrow();
 });
 
 // Tests that transitions defined as arrays can be navigated
 // Also tests .next() function for progressing
-test(`paths`, (t) => {
+test(`paths`, () => {
   const m = createMulti();
   const debug = false;
   let sm = new WithEvents(m, { initial: `awake` });
 
   // Try one path
-  t.throws(() => {
+  expect(() => {
     sm.state = `brushTeeth`;
-  });
+  }).toThrow();
   sm.state = `coffee`;
   sm.state = `brushTeeth`;
-  t.true(sm.isDone);
+  expect(sm.isDone).toBe(true);
 
   // Try a different valid path
   sm = new WithEvents(m, { initial: `awake` });
   sm.state = `breakfast`;
   sm.state = `coffee`;
   sm.state = `brushTeeth`;
-  t.true(sm.isDone);
+  expect(sm.isDone).toBe(true);
 
   // Try auto-progression
   sm = new WithEvents(m, { initial: `awake`, debug: debug });
-  t.false(sm.isDone);
+  expect(sm.isDone).toBe(false);
 
-  t.true(sm.next() === `breakfast`);
-  t.false(sm.isDone);
+  expect(sm.next() === `breakfast`).toBe(true);
+  expect(sm.isDone).toBe(false);
 
-  t.true(sm.next() === `coffee`);
-  t.falsy(sm.isDone);
+  expect(sm.next() === `coffee`).toBe(true);
+  expect(sm.isDone).toBeFalsy();
 
-  t.true(sm.next() === `brushTeeth`);
-  t.true(sm.isDone);
+  expect(sm.next() === `brushTeeth`).toBe(true);
+  expect(sm.isDone).toBe(true);
 
-  t.true(sm.next() === null);
-  t.true(sm.isDone);
+  expect(sm.next() === null).toBe(true);
+  expect(sm.isDone).toBe(true);
 });
 
-test('fromList', (t) => {
+test('fromList', () => {
   const trans = fromList('one', 'two', 'three');
   const m = new WithEvents(trans);
   arrayValuesEqual(t, m.statesDefined, [ 'one', 'two', 'three' ]);
 
   // Now in 'one'
-  t.true(m.state === `one`);
-  t.true(m.isValid('two'));
-  t.false(m.isValid('three'));
-  t.false(m.isDone);
+  expect(m.state === `one`).toBe(true);
+  expect(m.isValid('two')).toBe(true);
+  expect(m.isValid('three')).toBe(false);
+  expect(m.isDone).toBe(false);
 
-  t.false(m.isDone);
+  expect(m.isDone).toBe(false);
   arrayValuesEqual(t, m.statesPossible, [ 'two' ]);
 
   // Now in 'two'
-  t.true(m.next() === `two`);
-  t.true(m.isValid('three'));
-  t.false(m.isValid('two'));
-  t.false(m.isValid('one'));
-  t.throws(() => (m.state = `one`));
-  t.false(m.isDone);
+  expect(m.next() === `two`).toBe(true);
+  expect(m.isValid('three')).toBe(true);
+  expect(m.isValid('two')).toBe(false);
+  expect(m.isValid('one')).toBe(false);
+  expect(() => (m.state = `one`)).toThrow();
+  expect(m.isDone).toBe(false);
 
   // Now in 'three'
-  t.true(m.next() === `three`);
-  t.true(m.isDone);
-  t.false(m.isValid('three'));
-  t.false(m.isValid('three'));
-  t.false(m.isValid('one'));
-  t.throws(() => (m.state = `one`));
-  t.throws(() => (m.state = `two`));
+  expect(m.next() === `three`).toBe(true);
+  expect(m.isDone).toBe(true);
+  expect(m.isValid('three')).toBe(false);
+  expect(m.isValid('three')).toBe(false);
+  expect(m.isValid('one')).toBe(false);
+  expect(() => (m.state = `one`)).toThrow();
+  expect(() => (m.state = `two`)).toThrow();
 
-  t.true(m.next() === null);
+  expect(m.next() === null).toBe(true);
 });
 
-test('fromListBidirectional', (t) => {
+test('fromListBidirectional', () => {
   const trans = fromListBidirectional('one', 'two', 'three');
   const m = new WithEvents(trans);
   arrayValuesEqual(t, m.statesDefined, [ 'one', 'two', 'three' ]);
 
   // State: 'one'
-  t.true(m.state === `one`);
-  t.false(m.isValid(`one`));
-  t.true(m.isValid(`two`));
-  t.false(m.isValid(`three`));
+  expect(m.state === `one`).toBe(true);
+  expect(m.isValid(`one`)).toBe(false);
+  expect(m.isValid(`two`)).toBe(true);
+  expect(m.isValid(`three`)).toBe(false);
 
-  t.false(m.isDone);
+  expect(m.isDone).toBe(false);
   arrayValuesEqual(t, m.statesPossible, [ 'two' ]);
 
   // State: 'two'
-  t.true(m.next() === `two`);
-  t.true(m.isValid(`one`));
-  t.false(m.isValid(`two`));
-  t.true(m.isValid(`three`));
+  expect(m.next() === `two`).toBe(true);
+  expect(m.isValid(`one`)).toBe(true);
+  expect(m.isValid(`two`)).toBe(false);
+  expect(m.isValid(`three`)).toBe(true);
   arrayValuesEqual(t, m.statesPossible, [ 'one', 'three' ]);
 
   // State: 'one'
   m.state = `one`;
-  t.false(m.isDone);
-  t.true(m.state === `one`);
-  t.throws(() => (m.state = `three`));
+  expect(m.isDone).toBe(false);
+  expect(m.state === `one`).toBe(true);
+  expect(() => (m.state = `three`)).toThrow();
 
   // State: 'two'
   m.state = `two`;
-  t.true(m.state === `two`);
-  t.false(m.isDone);
+  expect(m.state === `two`).toBe(true);
+  expect(m.isDone).toBe(false);
 
   // State: 'three'
   m.state = `three`;
-  t.true(m.state === `three`);
-  t.false(m.isDone);
-  t.false(m.isValid(`one`));
-  t.true(m.isValid(`two`));
-  t.false(m.isValid(`three`));
+  expect(m.state === `three`).toBe(true);
+  expect(m.isDone).toBe(false);
+  expect(m.isValid(`one`)).toBe(false);
+  expect(m.isValid(`two`)).toBe(true);
+  expect(m.isValid(`three`)).toBe(false);
   arrayValuesEqual(t, m.statesPossible, [ 'two' ]);
 
   // State: 'two'
   m.state = `two`;
-  t.true(m.state === `two`);
-  t.false(m.isDone);
+  expect(m.state === `two`).toBe(true);
+  expect(m.isDone).toBe(false);
 
   // State: 'three'
   m.state = `three`;
 
   // Not done because it can always go back
-  t.false(m.isDone);
+  expect(m.isDone).toBe(false);
 });
 
-test('validation', (t) => {
+test('validation', () => {
   // @ts-ignore
-  t.throws(() => fromList([ 'one', 'two' ]));
-  t.throws(() => fromList());
+  expect(() => fromList([ 'one', 'two' ])).toThrow();
+  expect(() => fromList()).toThrow();
 
   // @ts-ignore
-  t.throws(() => fromListBidirectional([ 'one', 'two' ]));
-  t.throws(() => fromList());
+  expect(() => fromListBidirectional([ 'one', 'two' ])).toThrow();
+  expect(() => fromList()).toThrow();
 });
 
 // // Tests that machine finalises after all states transition
-test(`finalisation`, (t) => {
+test(`finalisation`, () => {
   const m = createAdsr();
   const sm = new WithEvents(m, { initial: `attack` });
   sm.state = `decay`;
   sm.state = `sustain`;
   sm.state = `release`; // Finalises
-  t.true(sm.isDone);
+  expect(sm.isDone).toBe(true);
   arrayValuesEqual(t, sm.statesDefined, [
     'attack',
     'decay',
@@ -204,15 +200,14 @@ test(`finalisation`, (t) => {
   const states = Object.keys(m);
   for (const state of states) {
     if (state === `release`) continue;
-    t.throws(() => {
+    expect(() => {
       sm.state = state; // Should throw
-    });
+    }).toThrow();
   }
-  t.pass();
 });
 
 // Test that all event ransitions happen, and there are no unexpected transitions
-test('event - stop', async (t) => {
+test('event - stop', async () => {
   const trans = createAdsr();
   const sm = new WithEvents(trans, { initial: `attack` });
 
@@ -228,10 +223,9 @@ test('event - stop', async (t) => {
       // ought to trigger stop
     },
   });
-  t.pass();
 });
 
-test(`event - change`, async (t) => {
+test(`event - change`, async () => {
   const trans = createAdsr();
   const sm = new WithEvents(trans, { initial: `attack` });
 
@@ -256,5 +250,4 @@ test(`event - change`, async (t) => {
       return false;
     },
   });
-  t.pass();
 });

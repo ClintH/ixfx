@@ -1,19 +1,19 @@
-import test from 'ava';
+import expect from 'expect';
 import { keysToNumbers } from '../../data/KeysToNumbers.js';
 
-test('keys-to-numbers', t => {
+test('keys-to-numbers', () => {
   const oGood = {
     '1': 'hello',
     '2': 'goodbye'
   }
   const r1 = keysToNumbers(oGood, `ignore`);
-  t.deepEqual(r1, { 1: 'hello', 2: 'goodbye' });
+  expect(r1).toEqual({ 1: 'hello', 2: 'goodbye' });
 
   const r2 = keysToNumbers(oGood, `keep`);
-  t.deepEqual(r2, { 1: 'hello', 2: 'goodbye' });
+  expect(r2).toEqual({ 1: 'hello', 2: 'goodbye' });
 
   const r3 = keysToNumbers(oGood, `throw`);
-  t.deepEqual(r3, { 1: 'hello', 2: 'goodbye' });
+  expect(r3).toEqual({ 1: 'hello', 2: 'goodbye' });
 
   const oBad = {
     '1': 'hello',
@@ -21,12 +21,12 @@ test('keys-to-numbers', t => {
     str: true
   }
   const r4 = keysToNumbers(oBad, `ignore`);
-  t.deepEqual(r4, { 1: 'hello', 2: 'goodbye' });
+  expect(r4).toEqual({ 1: 'hello', 2: 'goodbye' });
 
   const r5 = keysToNumbers(oBad, `keep`);
-  t.deepEqual(r5, { 1: 'hello', 2: 'goodbye', str: true });
+  expect(r5).toEqual({ 1: 'hello', 2: 'goodbye', str: true });
 
-  t.throws(() => keysToNumbers(oBad, `throw`));
+  expect(() => keysToNumbers(oBad, `throw`)).toThrow();
 
 
 });

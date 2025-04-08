@@ -1,9 +1,9 @@
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
 import * as StateMachine from '../../flow/StateMachine.js';
 import { isEmptyArray } from '../Include.js';
 
-test('normaliseTargets', (t) => {
+test('normaliseTargets', () => {
   let a = StateMachine.normaliseTargets('hello');
   t.like(a, [ { state: 'hello' } ]);
 
@@ -21,27 +21,26 @@ test('normaliseTargets', (t) => {
   t.like(a, [ { state: null } ]);
 
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets(undefined));
+  expect(() => StateMachine.normaliseTargets(undefined)).toThrow();
 
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets(10));
+  expect(() => StateMachine.normaliseTargets(10)).toThrow();
 
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets([ false, true ]));
+  expect(() => StateMachine.normaliseTargets([ false, true ])).toThrow();
 
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets([ 'someState', null ]));
+  expect(() => StateMachine.normaliseTargets([ 'someState', null ])).toThrow();
   // @ts-ignore
-  t.throws(() => StateMachine.normaliseTargets({ someObj: 'hi' }));
-  t.throws(() =>
+  expect(() => StateMachine.normaliseTargets({ someObj: 'hi' })).toThrow();
+  expect(() =>
     // @ts-ignore
-    StateMachine.normaliseTargets([ { state: 'ok' }, { someObj: 'hi' } ])
-  );
+    StateMachine.normaliseTargets([ { state: 'ok' }, { someObj: 'hi' } ])).toThrow();
 
   //t.like(StateMachine.normaliseTargets(['hello','there'], {}))
 });
 
-test('routine', (t) => {
+test('routine', () => {
   const sm = {
     wakeup: [ 'coffee', 'phone' ],
     coffee: [ 'breakfast', 'teeth' ],
@@ -53,26 +52,26 @@ test('routine', (t) => {
 
   // Try with default state - which should be wakeup
   const l = StateMachine.init(sm);
-  t.true(l.value === 'wakeup');
-  t.true(isEmptyArray(l.visited));
+  expect(l.value === 'wakeup').toBe(true);
+  expect(isEmptyArray(l.visited)).toBe(true);
 
   t.like(StateMachine.possible(l), [ 'coffee', 'phone' ]);
-  t.true(StateMachine.isValidTransition(l, 'phone'));
-  t.true(StateMachine.isValidTransition(l, 'coffee'));
-  t.false(StateMachine.isDone(l));
+  expect(StateMachine.isValidTransition(l, 'phone')).toBe(true);
+  expect(StateMachine.isValidTransition(l, 'coffee')).toBe(true);
+  expect(StateMachine.isDone(l)).toBe(false);
 
-  t.false(StateMachine.isValidTransition(l, 'breakfast'));
-  t.throws(() => StateMachine.to(l, 'breakfast'));
-  t.false(StateMachine.isValidTransition(l, 'teeth'));
-  t.throws(() => StateMachine.to(l, 'teeth'));
-  t.false(StateMachine.isValidTransition(l, 'wakeup'));
-  t.throws(() => StateMachine.to(l, 'wakeup'));
-  t.false(StateMachine.isValidTransition(l, 'bike'));
-  t.throws(() => StateMachine.to(l, 'bike'));
+  expect(StateMachine.isValidTransition(l, 'breakfast')).toBe(false);
+  expect(() => StateMachine.to(l, 'breakfast')).toThrow();
+  expect(StateMachine.isValidTransition(l, 'teeth')).toBe(false);
+  expect(() => StateMachine.to(l, 'teeth')).toThrow();
+  expect(StateMachine.isValidTransition(l, 'wakeup')).toBe(false);
+  expect(() => StateMachine.to(l, 'wakeup')).toThrow();
+  expect(StateMachine.isValidTransition(l, 'bike')).toBe(false);
+  expect(() => StateMachine.to(l, 'bike')).toThrow();
   // @ts-ignore
-  t.false(StateMachine.isValidTransition(l, 'blah'));
+  expect(StateMachine.isValidTransition(l, 'blah')).toBe(false);
   // @ts-ignore
-  t.throws(() => StateMachine.to(l, 'blah'));
+  expect(() => StateMachine.to(l, 'blah')).toThrow();
 
   const ll1 = StateMachine.to(l, 'phone');
   const ll2 = StateMachine.to(ll1, 'teeth');
@@ -81,95 +80,95 @@ test('routine', (t) => {
 
   // Try with initial state further along
   const l1 = StateMachine.init(sm, 'coffee');
-  t.true(isEmptyArray(l1.visited));
+  expect(isEmptyArray(l1.visited)).toBe(true);
 
-  t.true(l1.value === 'coffee');
-  t.true(StateMachine.isValidTransition(l1, 'breakfast'));
+  expect(l1.value === 'coffee').toBe(true);
+  expect(StateMachine.isValidTransition(l1, 'breakfast')).toBe(true);
   t.like(StateMachine.possible(l1), [ 'breakfast', 'teeth' ]);
 
-  t.true(StateMachine.isValidTransition(l1, 'teeth'));
-  t.false(StateMachine.isDone(l1));
+  expect(StateMachine.isValidTransition(l1, 'teeth')).toBe(true);
+  expect(StateMachine.isDone(l1)).toBe(false);
 
-  t.false(StateMachine.isValidTransition(l1, 'wakeup'));
-  t.throws(() => StateMachine.to(l1, 'wakeup'));
+  expect(StateMachine.isValidTransition(l1, 'wakeup')).toBe(false);
+  expect(() => StateMachine.to(l1, 'wakeup')).toThrow();
 
-  t.false(StateMachine.isValidTransition(l1, 'phone'));
-  t.throws(() => StateMachine.to(l1, 'phone'));
+  expect(StateMachine.isValidTransition(l1, 'phone')).toBe(false);
+  expect(() => StateMachine.to(l1, 'phone')).toThrow();
 
-  t.false(StateMachine.isValidTransition(l1, 'bike'));
-  t.throws(() => StateMachine.to(l1, 'bike'));
+  expect(StateMachine.isValidTransition(l1, 'bike')).toBe(false);
+  expect(() => StateMachine.to(l1, 'bike')).toThrow();
 
   // l2: breakfast
   const l2 = StateMachine.to(l1, 'breakfast');
-  t.true(l2.value === 'breakfast');
-  t.true(l1.value === 'coffee');
+  expect(l2.value === 'breakfast').toBe(true);
+  expect(l1.value === 'coffee').toBe(true);
   t.like(StateMachine.possible(l2), [ 'coffee', 'teeth' ]);
 
-  t.false(StateMachine.isDone(l2));
-  t.false(StateMachine.isDone(l1));
+  expect(StateMachine.isDone(l2)).toBe(false);
+  expect(StateMachine.isDone(l1)).toBe(false);
 
-  t.true(StateMachine.isValidTransition(l2, 'coffee'));
-  t.true(StateMachine.isValidTransition(l2, 'coffee'));
+  expect(StateMachine.isValidTransition(l2, 'coffee')).toBe(true);
+  expect(StateMachine.isValidTransition(l2, 'coffee')).toBe(true);
 
   // l3: teeth
   const l3 = StateMachine.to(l2, 'teeth');
-  t.true(l3.value === 'teeth');
-  t.false(StateMachine.isDone(l3));
+  expect(l3.value === 'teeth').toBe(true);
+  expect(StateMachine.isDone(l3)).toBe(false);
   t.like(StateMachine.possible(l3), [ 'bike' ]);
 
   // l4: bike
   const l4 = StateMachine.to(l3, 'bike');
-  t.true(l4.value === 'bike');
-  t.true(isEmptyArray(StateMachine.possible(l4)));
+  expect(l4.value === 'bike').toBe(true);
+  expect(isEmptyArray(StateMachine.possible(l4))).toBe(true);
   t.like(l4.visited, [ 'coffee', 'breakfast', 'teeth' ]);
-  t.false(StateMachine.isDone(l1));
-  t.false(StateMachine.isDone(l2));
-  t.false(StateMachine.isDone(l3));
-  t.true(StateMachine.isDone(l4));
+  expect(StateMachine.isDone(l1)).toBe(false);
+  expect(StateMachine.isDone(l2)).toBe(false);
+  expect(StateMachine.isDone(l3)).toBe(false);
+  expect(StateMachine.isDone(l4)).toBe(true);
 
-  t.throws(() => StateMachine.to(l4, 'teeth'));
-  t.throws(() => StateMachine.to(l4, 'wakeup'));
+  expect(() => StateMachine.to(l4, 'teeth')).toThrow();
+  expect(() => StateMachine.to(l4, 'wakeup')).toThrow();
 });
 
-test('validation', (t) => {
-  t.throws(() => {
+test('validation', () => {
+  expect(() => {
     // @ts-ignore
     StateMachine.init(undefined);
-  });
+  }).toThrow();
 
-  t.throws(() => {
+  expect(() => {
     // @ts-ignore
     StateMachine.init('hello');
-  });
+  }).toThrow();
 
-  t.throws(() => {
+  expect(() => {
     // @ts-ignore
     StateMachine.init(null);
-  });
+  }).toThrow();
 
   // Fails because 'there' does not exist as top-level
-  t.throws(() => {
+  expect(() => {
     StateMachine.init({
       hello: 'there',
     });
-  });
-  t.throws(() => {
+  }).toThrow();
+  expect(() => {
     StateMachine.init({
       states: {
         hello: 'there',
       },
     });
-  });
+  }).toThrow();
 
   // Fails because 'hello' is defined twice
-  t.throws(() => {
+  expect(() => {
     StateMachine.init({
       hello: 'there',
       // @ts-ignore
       hello: 'you',
     });
-  });
-  t.throws(() => {
+  }).toThrow();
+  expect(() => {
     StateMachine.init({
       states: {
         hello: 'there',
@@ -177,46 +176,46 @@ test('validation', (t) => {
         hello: 'you',
       },
     });
-  });
+  }).toThrow();
 
   // Target state repeated
-  t.throws(() => {
+  expect(() => {
     const d: StateMachine.Transitions = {
       a: [ 'b', 'b' ],
       b: 'a',
     };
     StateMachine.init(d);
-  });
+  }).toThrow();
 
   // Target states contains undefined state
-  t.throws(() => {
+  expect(() => {
     const d: StateMachine.Transitions = {
       a: [ 'b', 'c' ],
       b: 'a',
     };
     StateMachine.init(d);
-  });
+  }).toThrow();
 
   // Target states contains invalid data
-  t.throws(() => {
+  expect(() => {
     const d: StateMachine.Transitions = {
       // @ts-ignore
       a: [ false, 'b' ],
       b: null,
     };
     StateMachine.init(d);
-  });
-  t.throws(() => {
+  }).toThrow();
+  expect(() => {
     const d: StateMachine.Transitions = {
       // @ts-ignore
       a: [ 'b', { someObject: 'true' } ],
       b: null,
     };
     StateMachine.init(d);
-  });
+  }).toThrow();
 });
 
-test('next', (t) => {
+test('next', () => {
   const smOnOff = {
     on: 'off',
     off: 'on',
@@ -225,8 +224,8 @@ test('next', (t) => {
   const a = StateMachine.init(smOnOff, 'on');
   const b = StateMachine.next(a);
   const c = StateMachine.next(b);
-  t.is(b.value, 'off');
-  t.is(c.value, 'on');
+  expect(b.value).toBe('off');
+  expect(c.value).toBe('on');
 
   const smSeq = {
     a: 'b',
@@ -236,15 +235,15 @@ test('next', (t) => {
   const aa = StateMachine.init(smSeq, 'a');
   const bb = StateMachine.next(aa);
   const cc = StateMachine.next(bb);
-  t.is(aa.value, 'a');
-  t.is(bb.value, 'b');
-  t.is(cc.value, 'c');
+  expect(aa.value).toBe('a');
+  expect(bb.value).toBe('b');
+  expect(cc.value).toBe('c');
 
   // Can't go past c
-  t.throws(() => StateMachine.next(cc));
+  expect(() => StateMachine.next(cc)).toThrow();
 });
 
-test('default', (t) => {
+test('default', () => {
   const sm = {
     on: 'off',
     off: 'on',
@@ -259,15 +258,15 @@ test('default', (t) => {
     on: [ { state: 'off' } ],
   });
 
-  t.true(l.value === `on`);
-  t.true(isEmptyArray(l.visited));
+  expect(l.value === `on`).toBe(true);
+  expect(isEmptyArray(l.visited)).toBe(true);
 
   t.like(StateMachine.possible(l), [ 'off' ]);
 
   // l2: Off
   const l2 = StateMachine.to(l, 'off');
   t.like(StateMachine.possible(l2), [ 'on' ]);
-  t.true(l2.value === 'off');
+  expect(l2.value === 'off').toBe(true);
   // Check that machine definition has not changed
   t.like(l.machine, {
     off: [ { state: 'on' } ],
@@ -275,18 +274,18 @@ test('default', (t) => {
   });
   t.like(l2.visited, [ 'on' ]);
 
-  t.throws(() => {
+  expect(() => {
     // @ts-ignore
     const l3 = StateMachine.to(l2, 'asdf');
-  });
+  }).toThrow();
 
-  t.throws(() => {
+  expect(() => {
     // @ts-ignore
     const l3 = StateMachine.to(l2, 'off');
-  });
+  }).toThrow();
 
-  t.false(StateMachine.isDone(l));
-  t.false(StateMachine.isDone(l2));
+  expect(StateMachine.isDone(l)).toBe(false);
+  expect(StateMachine.isDone(l2)).toBe(false);
 
   const l3 = StateMachine.to(l2, 'on');
   t.like(l3.visited, [ 'on', 'off' ]);

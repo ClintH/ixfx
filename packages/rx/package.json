@@ -1,0 +1,59 @@
+{
+	"name": "@ixfxfun/rx",
+	"version": "0.35.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./from": {
+			"types": "./src/from/index.ts",
+			"import": "./src/from/index.ts"
+		},
+		"./from/*": {
+			"types": "./src/from/*.ts",
+			"import": "./src/from/*.ts"
+		},
+		"./op/*": {
+			"types": "./src/ops/*.ts",
+			"import": "./src/ops/*.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfxfun/arrays": "workspace:^",
+		"@ixfxfun/collections": "workspace:^",
+		"@ixfxfun/core": "workspace:^",
+		"@ixfxfun/dom": "workspace:^",
+		"@ixfxfun/flow": "workspace:^",
+		"@ixfxfun/guards": "workspace:^",
+		"@ixfxfun/iterables": "workspace:^",
+		"@ixfxfun/modulation": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./from": {
+				"types": "./dist/src/from/index.d.ts",
+				"import": "./dist/src/from/index.js"
+			},
+			"./from/*": {
+				"types": "./dist/src/from/*.d.ts",
+				"import": "./dist/src/from/*.js"
+			},
+			"./op/*": {
+				"types": "./dist/src/ops/*.d.ts",
+				"import": "./dist/src/ops/*.js"
+			}
+		}
+	}
+}

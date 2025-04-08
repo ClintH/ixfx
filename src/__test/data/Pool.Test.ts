@@ -1,8 +1,8 @@
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
 import * as Pool from '../../data/Pool.js';
 
-test(`sharing`, (t) => {
+test(`sharing`, () => {
   let generated = 0;
   const p = new Pool.Pool<string>({
     capacity: 3,
@@ -21,13 +21,13 @@ test(`sharing`, (t) => {
   const data = used.map(u => u.data);
 
   // Expect to see each resource being used twice due to capacityPerResource:2
-  t.deepEqual(data, [ `random-1`, `random-1`, `random-2`, `random-2`, `random-3`, `random-3` ]);
+  expect(data).toEqual([ `random-1`, `random-1`, `random-2`, `random-2`, `random-3`, `random-3` ]);
 
   // Expect an error if we ask for another resource
-  t.throws(() => p.use(`g`));
+  expect(() => p.use(`g`)).toThrow();
 });
 
-test(`removing-resources`, (t) => {
+test(`removing-resources`, () => {
   const p = new Pool.Pool<string>({
     capacity: 3,
     debug: false,
@@ -51,26 +51,26 @@ test(`removing-resources`, (t) => {
   const rD = p.addResource(`d`);
   const rE = p.addResource(`e`);
 
-  t.falsy(p.hasResource(`a`));
-  t.falsy(p.hasResource(`b`));
-  t.true(p.hasResource(`c`));
+  expect(p.hasResource(`a`)).toBeFalsy();
+  expect(p.hasResource(`b`)).toBeFalsy();
+  expect(p.hasResource(`c`)).toBe(true);
 
-  t.true(uA.isDisposed);
-  t.true(uB.isDisposed);
-  t.falsy(uC.isDisposed);
+  expect(uA.isDisposed).toBe(true);
+  expect(uB.isDisposed).toBe(true);
+  expect(uC.isDisposed).toBeFalsy();
 
-  t.false(p.hasUser(`a`));
-  t.false(p.hasUser(`b`));
-  t.true(p.hasUser(`c`));
+  expect(p.hasUser(`a`)).toBe(false);
+  expect(p.hasUser(`b`)).toBe(false);
+  expect(p.hasUser(`c`)).toBe(true);
 
   p.maintain();
 
-  t.falsy(p.hasUser(`a`));
-  t.falsy(p.hasUser(`b`));
-  t.truthy(p.hasUser(`c`));
+  expect(p.hasUser(`a`)).toBeFalsy();
+  expect(p.hasUser(`b`)).toBeFalsy();
+  expect(p.hasUser(`c`)).toBeTruthy();
 });
 
-test(`evictOldestUser`, (t) => {
+test(`evictOldestUser`, () => {
   //eslint-disable-next-line functional/no-let
   let generated = 0;
   const p = new Pool.Pool<string>({
@@ -87,14 +87,14 @@ test(`evictOldestUser`, (t) => {
   const uD = p.use(`d`);
   const uE = p.use(`e`);
 
-  t.falsy(p.hasUser(`a`));
-  t.falsy(p.hasUser(`b`));
-  t.truthy(p.hasUser(`c`));
-  t.truthy(p.hasUser(`d`));
-  t.truthy(p.hasUser(`e`));
+  expect(p.hasUser(`a`)).toBeFalsy();
+  expect(p.hasUser(`b`)).toBeFalsy();
+  expect(p.hasUser(`c`)).toBeTruthy();
+  expect(p.hasUser(`d`)).toBeTruthy();
+  expect(p.hasUser(`e`)).toBeTruthy();
 });
 
-test(`generate`, (t) => {
+test(`generate`, () => {
   //eslint-disable-next-line functional/no-let
   let generated = 0;
   const p = new Pool.Pool<string>({
@@ -114,15 +114,15 @@ test(`generate`, (t) => {
   const uD = p.useValue(`d`);
   const uE = p.useValue(`e`);
 
-  t.is(uC, `fella`);
-  t.is(uE, `random-2`);
+  expect(uC).toBe(`fella`);
+  expect(uE).toBe(`random-2`);
 
-  t.throws(() => {
+  expect(() => {
     const uF = p.use(`f`);
-  });
+  }).toThrow();
 });
 
-test(`basic`, (t) => {
+test(`basic`, () => {
   const p = new Pool.Pool<string>({
     capacity: 5,
     debug: false,
@@ -137,28 +137,28 @@ test(`basic`, (t) => {
   const resB = p.use(`b`);
   const resC = p.use(`c`);
 
-  t.is(resA.data, `hello`);
-  t.is(resB.data, `there`);
-  t.is(resC.data, `fella`);
+  expect(resA.data).toBe(`hello`);
+  expect(resB.data).toBe(`there`);
+  expect(resC.data).toBe(`fella`);
 
   const resAa = p.use(`a`);
   const resBb = p.use(`b`);
   const resCc = p.use(`c`);
 
-  t.is(rA.usersCount, 1);
-  t.is(rB.usersCount, 1);
-  t.is(rC.usersCount, 1);
+  expect(rA.usersCount).toBe(1);
+  expect(rB.usersCount).toBe(1);
+  expect(rC.usersCount).toBe(1);
 
-  t.is(resAa.data, `hello`);
-  t.is(resBb.data, `there`);
-  t.is(resCc.data, `fella`);
+  expect(resAa.data).toBe(`hello`);
+  expect(resBb.data).toBe(`there`);
+  expect(resCc.data).toBe(`fella`);
 
-  t.throws(() => {
+  expect(() => {
     const resD = p.use(`d`);
-  });
+  }).toThrow();
 });
 
-test(`release`, (t) => {
+test(`release`, () => {
   const p = new Pool.Pool<string>({
     capacity: 5,
     debug: false,
@@ -174,6 +174,6 @@ test(`release`, (t) => {
   const resC = p.use(`c`);
 
   p.release(`a`);
-  t.falsy(p.hasUser(`a`));
-  t.is(rA.usersCount, 0);
+  expect(p.hasUser(`a`)).toBeFalsy();
+  expect(rA.usersCount).toBe(0);
 });

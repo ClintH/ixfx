@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import * as StateMachine from '../../flow/StateMachine.js';
 import { type StatesHandler, init } from '../../flow/StateMachineDriver.js';
 function createBasic() {
@@ -33,7 +33,7 @@ function createBasic() {
   return { states, handlers };
 }
 
-test('no-target', async (t) => {
+test('no-target', async () => {
   const { states } = createBasic();
   const handlers = [
     {
@@ -47,13 +47,13 @@ test('no-target', async (t) => {
   ];
 
   const driver = await init(states, { handlers, debug: false });
-  t.is(driver.getValue(), 'init');
+  expect(driver.getValue()).toBe('init');
   await driver.run();
-  t.is(driver.getValue(), 'one');
+  expect(driver.getValue()).toBe('one');
   await driver.run();
-  t.is(driver.getValue(), 'two');
+  expect(driver.getValue()).toBe('two');
   await driver.run();
-  t.is(driver.getValue(), 'three');
+  expect(driver.getValue()).toBe('three');
 
   // Throws because handler for state 'three' tries to go to an undefined state
   await t.throwsAsync(driver.run());
@@ -76,30 +76,30 @@ test('no-target', async (t) => {
   await t.throwsAsync(() => init(states, handlers2));
 });
 
-test('no-fallback', async (t) => {
+test('no-fallback', async () => {
   const { states, handlers } = createBasic();
   const driver = await init(states, { handlers, debug: false });
 
-  t.is(driver.getValue(), `init`);
+  expect(driver.getValue()).toBe(`init`);
   await driver.run(); // init -> .next
-  t.is(driver.getValue(), 'one');
+  expect(driver.getValue()).toBe('one');
 
   // In state 'one', which has no handler, nor is there a fallback
   // thus, will stay in same state.
   await driver.run();
-  t.is(driver.getValue(), 'one');
+  expect(driver.getValue()).toBe('one');
 
   // Manually move it
   driver.to('two');
   driver.to('three');
 
   // Should now resume since there is a handler for state 'three'
-  t.is(driver.getValue(), 'three');
+  expect(driver.getValue()).toBe('three');
   await driver.run();
-  t.is(driver.getValue(), 'four');
+  expect(driver.getValue()).toBe('four');
 });
 
-test('basic', async (t) => {
+test('basic', async () => {
   const { states, handlers } = createBasic();
 
   //eslint-disable-next-line functional/immutable-data
@@ -116,21 +116,21 @@ test('basic', async (t) => {
     ],
   });
   const driver = await init(states, { handlers, debug: false });
-  t.is(driver.getValue(), `init`);
+  expect(driver.getValue()).toBe(`init`);
   await driver.run(); // init -> .next
-  t.is(driver.getValue(), 'one');
+  expect(driver.getValue()).toBe('one');
 
   // In state 'one',  but now we have __fallback defined
   await driver.run();
-  t.is(driver.getValue(), 'two');
+  expect(driver.getValue()).toBe('two');
   await driver.run();
-  t.is(driver.getValue(), 'three');
+  expect(driver.getValue()).toBe('three');
   await driver.run();
-  t.is(driver.getValue(), 'four');
+  expect(driver.getValue()).toBe('four');
   await driver.run();
-  t.is(driver.getValue(), 'five');
+  expect(driver.getValue()).toBe('five');
 
   // In final state, can't drive it further
   await t.throwsAsync(driver.run());
-  t.is(driver.getValue(), 'five');
+  expect(driver.getValue()).toBe('five');
 });

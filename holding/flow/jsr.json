@@ -1,0 +1,16 @@
+{
+	"name": "@ixfx/collections",
+	"version": "0.35.0",
+	"license": "MIT",
+	"imports": {
+
+	},
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"publish": {
+		"exclude": [
+			"package.json"
+		]
+	}
+}

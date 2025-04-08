@@ -1,10 +1,10 @@
-import test, { type ExecutionContext } from 'ava';
+import expect from 'expect';
 import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../data/Pathed.js';
 import { arrayValuesEqual } from '../Include.js';
 import { isEqualValueDefault } from '../../util/IsEqual.js';
 import { resultToValue, type Result } from '../../util/Results.js';
 
-test(`get-paths-and-data`, t => {
+test(`get-paths-and-data`, () => {
   const d1 = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
@@ -48,7 +48,7 @@ test(`get-paths-and-data`, t => {
   ], isEqualValueDefault);
 });
 
-test('get-paths', (t) => {
+test('get-paths', () => {
   const d = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
@@ -76,9 +76,9 @@ test('get-paths', (t) => {
     `gyro.z`,
   ]);
 
-  t.deepEqual([ ...getPaths(null) ], []);
+  expect([ ...getPaths(null) ]).toEqual([]);
   // @ts-expect-error
-  t.deepEqual([ ...getPaths(undefined) ], []);
+  expect([ ...getPaths(undefined) ]).toEqual([]);
 
   const d2 = {
     message: `hello`,
@@ -98,20 +98,20 @@ test('get-paths', (t) => {
 
 function testResult<T>(t: ExecutionContext, result: Result<T>, value: T) {
   if (result.success) {
-    t.deepEqual(result.value, value);
+    expect(result.value).toEqual(value);
   } else {
     t.fail(`Result not successful ${ result.error }`);
   }
 }
 
-test('get-field', (t) => {
+test('get-field', () => {
   const t1 = getField<string>({ name: { first: `Thom`, last: `Yorke` } }, `name.first`);
   testResult(t, t1, `Thom`);
 
   const t2 = getField({ colours: [ `red`, `green`, `blue` ] }, `colours.1`);
   testResult(t, t2, `green`);
   const t3 = getField({ colours: [ `red`, `green`, `blue` ] }, `colours.3`);
-  t.false(t3.success);
+  expect(t3.success).toBe(false);
   const d = {
     accel: { x: 1, y: 2, z: 3 },
     gyro: { x: 4, y: 5, z: 6 },
@@ -132,22 +132,22 @@ test('get-field', (t) => {
   const d2a = getField(d2, `profiles.1.animals.1`);
   testResult(t, d2a, `rabbit`);
 
-  t.false(getField(d2, `profiles.1.animals.2`).success);
-  t.false(getField(d2, `profiles.1.animals.hello`).success);
-  t.false(getField(d2, `profiles.-1.animals.1`).success);
-  t.false(getField(d2, `profiles.2.animals.2`).success);
-  t.false(getField(d2, `profiles.1.animalz`).success);
-  t.false(getField(d2, `message.1`).success);
+  expect(getField(d2, `profiles.1.animals.2`).success).toBe(false);
+  expect(getField(d2, `profiles.1.animals.hello`).success).toBe(false);
+  expect(getField(d2, `profiles.-1.animals.1`).success).toBe(false);
+  expect(getField(d2, `profiles.2.animals.2`).success).toBe(false);
+  expect(getField(d2, `profiles.1.animalz`).success).toBe(false);
+  expect(getField(d2, `message.1`).success).toBe(false);
 
-  t.throws(() => getField(d, ``))
+  expect(() => getField(d, ``)).toThrow()
   // @ts-expect-error
-  t.throws(() => getField(undefined));
+  expect(() => getField(undefined)).toThrow();
   // @ts-expect-error
-  t.throws(() => getField(null));
+  expect(() => getField(null)).toThrow();
   // @ts-expect-error
-  t.throws(() => getField(false));
+  expect(() => getField(false)).toThrow();
   // @ts-expect-error
-  t.throws(() => getField(10));
+  expect(() => getField(10)).toThrow();
 
   const d3 = {
     message: `hello`,
@@ -156,15 +156,15 @@ test('get-field', (t) => {
       { name: `Jane`, animals: [ `snake`, `rabbit` ] }
     ]
   }
-  t.deepEqual(resultToValue(getField(d3, `profiles`)), d3.profiles);
-  t.deepEqual(resultToValue(getField(d3, `profiles.0`)), d3.profiles[ 0 ]);
-  t.deepEqual(resultToValue(getField(d3, `profiles.0.animals`)), d3.profiles[ 0 ].animals);
-  t.deepEqual(resultToValue(getField(d3, `profiles.0.animals.1`)), d3.profiles[ 0 ].animals[ 1 ]);
+  expect(resultToValue(getField(d3, `profiles`))).toEqual(d3.profiles);
+  expect(resultToValue(getField(d3, `profiles.0`))).toEqual(d3.profiles[ 0 ]);
+  expect(resultToValue(getField(d3, `profiles.0.animals`))).toEqual(d3.profiles[ 0 ].animals);
+  expect(resultToValue(getField(d3, `profiles.0.animals.1`))).toEqual(d3.profiles[ 0 ].animals[ 1 ]);
 });
 
 
 
-test(`apply - changes`, t => {
+test(`apply - changes`, () => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -175,7 +175,7 @@ test(`apply - changes`, t => {
     msg: `hello!`,
   }) ];
   const d1R = applyChanges(test, d1);
-  t.deepEqual(d1R, {
+  expect(d1R).toEqual({
     ...test,
     msg: `hello!`
   });
@@ -185,36 +185,38 @@ test(`apply - changes`, t => {
     position: { x: 11, y: 22 }
   }) ];
   const d2R = applyChanges(test, d2);
-  t.deepEqual(d2R, {
+  expect(d2R).toEqual({
     ...test,
     position: { x: 11, y: 22 }
   });
 
   const d3 = applyChanges(test, [ { path: `position.y`, value: 22, previous: 20, state: `added` } ]);
-  t.deepEqual(d3, {
+  expect(d3).toEqual({
     ...test,
     position: { x: 10, y: 22 }
   });
 });
 
-test(`compare - data - array`, t => {
+test(`compare - data - array`, () => {
   // Index 1 has a value when it didn't before
   const c1 = [ ...compareData([ `a` ], [ `a`, `a` ], { includeMissingFromA: true }) ];
-  t.deepEqual(c1, [ { path: `1`, previous: undefined, value: `a`, state: `added` } ]);
+  expect(c1).toEqual([ { path: `1`, previous: undefined, value: `a`, state: `added` } ]);
 
   // Indexes 1 & 2 are now undefined
   const c2 = [ ...compareData([ `a`, `a`, `a` ], [ `a` ], { includeMissingFromA: true }) ];
-  t.deepEqual(c2, [ { path: `1`, previous: `a`, value: undefined, state: `removed` }, { path: `2`, previous: `a`, value: undefined, state: `removed` } ]);
+  expect(c2).toEqual(
+    [ { path: `1`, previous: `a`, value: undefined, state: `removed` }, { path: `2`, previous: `a`, value: undefined, state: `removed` } ]
+  );
 
   const c3 = [ ...compareData([], [ `a`, `a`, `a` ] as any, { includeMissingFromA: true }) ];
-  t.deepEqual(c3, [
+  expect(c3).toEqual([
     { path: `0`, previous: undefined, value: `a`, state: `added` },
     { path: `1`, previous: undefined, value: `a`, state: `added` },
     { path: `2`, previous: undefined, value: `a`, state: `added` }
   ]);
 
   const c4 = [ ...compareData([ `a`, `a`, `a` ], [], { includeMissingFromA: true }) ];
-  t.deepEqual(c4, [
+  expect(c4).toEqual([
     { path: `0`, previous: `a`, value: undefined, state: `removed` },
     { path: `1`, previous: `a`, value: undefined, state: `removed` },
     { path: `2`, previous: `a`, value: undefined, state: `removed` }
@@ -222,7 +224,7 @@ test(`compare - data - array`, t => {
 
 });
 
-test(`compare - data`, t => {
+test(`compare - data`, () => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -235,7 +237,7 @@ test(`compare - data`, t => {
     position: { x: 10, y: 20 },
     value: false
   }) ];
-  t.is(c1.length, 0);
+  expect(c1.length).toBe(0);
 
   // Top-level change
   const c2 = [ ...compareData(test, {
@@ -243,8 +245,8 @@ test(`compare - data`, t => {
     position: { x: 10, y: 20 },
     value: false
   }) ];
-  t.is(c2.length, 1);
-  t.deepEqual(c2, [ { path: `msg`, previous: `hello`, value: `hello!`, state: `change` } ]);
+  expect(c2.length).toBe(1);
+  expect(c2).toEqual([ { path: `msg`, previous: `hello`, value: `hello!`, state: `change` } ]);
 
   // Second-level change - default, not including parents
   const c3a = [ ...compareData(test, {
@@ -252,7 +254,7 @@ test(`compare - data`, t => {
     position: { x: 1, y: 20 },
     value: false
   }, { includeParents: false }) ];
-  t.deepEqual(c3a, [
+  expect(c3a).toEqual([
     { path: `position.x`, previous: 10, value: 1, state: `change` }
   ]);
 
@@ -262,7 +264,7 @@ test(`compare - data`, t => {
     position: { x: 1, y: 20 },
     value: false
   }, { includeParents: true }) ];
-  t.deepEqual(c3b, [
+  expect(c3b).toEqual([
     { path: `position.x`, previous: 10, value: 1, state: `change` },
     { path: `position`, previous: { x: 10, y: 20 }, value: { x: 1, y: 20 }, state: `change` },
   ]);
@@ -273,8 +275,8 @@ test(`compare - data`, t => {
     position: { x: 1, y: 20 },
     value: true
   }) ];
-  t.is(c4.length, 2);
-  t.deepEqual(c4, [
+  expect(c4.length).toBe(2);
+  expect(c4).toEqual([
     { path: `position.x`, previous: 10, value: 1, state: `change` },
     { path: `value`, previous: false, value: true, state: `change` }
   ]);
@@ -285,15 +287,15 @@ test(`compare - data`, t => {
     position: { x: 1, y: 3 },
     value: true
   }) ];
-  t.is(c5.length, 3);
-  t.deepEqual(c5, [
+  expect(c5.length).toBe(3);
+  expect(c5).toEqual([
     { path: `position.x`, previous: 10, value: 1, state: `change` },
     { path: `position.y`, previous: 20, value: 3, state: `change` },
     { path: `value`, previous: false, value: true, state: `change` }
   ]);
 });
 
-test(`compare - data - undefined`, t => {
+test(`compare - data - undefined`, () => {
   const test = {
     msg: `hello`,
     position: { x: 10, y: 20 },
@@ -305,7 +307,7 @@ test(`compare - data - undefined`, t => {
     value: false
   }) ]
   // Expect it picks up on 'msg' removal
-  t.deepEqual(c1, [
+  expect(c1).toEqual([
     {
       path: 'msg',
       previous: 'hello',
@@ -321,7 +323,7 @@ test(`compare - data - undefined`, t => {
     value: false
   }, { undefinedValueMeansRemoved: true }) ]
   // Expect it treats 'msg' as being removed
-  t.deepEqual(c2, [
+  expect(c2).toEqual([
     {
       path: 'msg',
       previous: 'hello',
@@ -337,12 +339,12 @@ test(`compare - data - undefined`, t => {
     value: false
   }, { undefinedValueMeansRemoved: false }) ]
   // Expect it treats the value as changed
-  t.deepEqual(c3, [
+  expect(c3).toEqual([
     { path: 'msg', previous: 'hello', value: undefined, state: 'change' }
   ])
 
 });
-test(`compare - data - deep - a`, t => {
+test(`compare - data - deep - a`, () => {
   const t1 = {
     a: {
       b: {
@@ -367,7 +369,7 @@ test(`compare - data - deep - a`, t => {
       }
     }
   }) ];
-  t.is(c1.length, 0);
+  expect(c1.length).toBe(0);
 
   // 2. Deep value change
   const c2 = [ ...compareData(t1, {
@@ -381,7 +383,7 @@ test(`compare - data - deep - a`, t => {
       }
     }
   }) ];
-  t.deepEqual(c2, [ { path: `a.b.c.d.value`, previous: 1, value: 2, state: `change` } ]);
+  expect(c2).toEqual([ { path: `a.b.c.d.value`, previous: 1, value: 2, state: `change` } ]);
 
   // 3. Deep value delete
   const c3 = [ ...compareData(t1, {
@@ -395,7 +397,9 @@ test(`compare - data - deep - a`, t => {
       }
     }
   }) ];
-  t.deepEqual(c3, [ { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` } ]);
+  expect(c3).toEqual(
+    [ { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` } ]
+  );
 
   // 4. Deep value add, including missing false
   const c4 = [ ...compareData(t1, {
@@ -410,7 +414,9 @@ test(`compare - data - deep - a`, t => {
       }
     }
   }, { includeMissingFromA: false }) ];
-  t.deepEqual(c4, [ { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` } ]);
+  expect(c4).toEqual(
+    [ { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` } ]
+  );
 
   // 5. Deep value add, including missing false
   const c5 = [ ...compareData(t1, {
@@ -425,7 +431,7 @@ test(`compare - data - deep - a`, t => {
       }
     }
   }, { includeMissingFromA: true }) ];
-  t.deepEqual(c5, [
+  expect(c5).toEqual([
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d.wow`, previous: undefined, value: true, state: `added` }
   ]);
@@ -433,7 +439,7 @@ test(`compare - data - deep - a`, t => {
 
 });
 
-test(`compare - data - deep -with-parents`, t => {
+test(`compare - data - deep -with-parents`, () => {
   const t1 = {
     a: {
       b: {
@@ -458,7 +464,7 @@ test(`compare - data - deep -with-parents`, t => {
       }
     }
   }, { includeParents: true }) ];
-  t.is(c1.length, 0);
+  expect(c1.length).toBe(0);
 
   // 2. Deep value change
   const c2 = [ ...compareData(t1, {
@@ -472,7 +478,7 @@ test(`compare - data - deep -with-parents`, t => {
       }
     }
   }) ];
-  t.deepEqual(c2, [ { path: `a.b.c.d.value`, previous: 1, value: 2, state: `change` } ]);
+  expect(c2).toEqual([ { path: `a.b.c.d.value`, previous: 1, value: 2, state: `change` } ]);
 
   // 3. Deep value delete
   const c3 = [ ...compareData(t1, {
@@ -486,7 +492,7 @@ test(`compare - data - deep -with-parents`, t => {
       }
     }
   }, { includeParents: true }) ];
-  t.deepEqual(c3, [
+  expect(c3).toEqual([
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d`, previous: { value: 1 }, value: {}, state: `change` },
     { path: `a.b.c`, previous: { d: { value: 1 } }, value: { d: {} }, state: `change` },
@@ -507,7 +513,7 @@ test(`compare - data - deep -with-parents`, t => {
       }
     }
   }, { includeParents: true, includeMissingFromA: false }) ];
-  t.deepEqual(c4, [
+  expect(c4).toEqual([
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d`, previous: { value: 1 }, value: { wow: true }, state: `change` },
     { path: `a.b.c`, previous: { d: { value: 1 } }, value: { d: { wow: true } }, state: `change` },
@@ -528,7 +534,7 @@ test(`compare - data - deep -with-parents`, t => {
       }
     }
   }, { includeParents: true, includeMissingFromA: true }) ];
-  t.deepEqual(c5, [
+  expect(c5).toEqual([
     { path: `a.b.c.d.value`, previous: 1, value: undefined, state: `removed` },
     { path: `a.b.c.d.wow`, previous: undefined, value: true, state: `added` },
     { path: `a.b.c.d`, previous: { value: 1 }, value: { wow: true }, state: `change` },
@@ -539,7 +545,7 @@ test(`compare - data - deep -with-parents`, t => {
 
 
 });
-test(`compare - data - arrays`, t => {
+test(`compare - data - arrays`, () => {
   const test2 = {
     colours: [ `red`, `green`, `blue` ],
     sizes: [ 10, 20, 30 ]
@@ -549,21 +555,23 @@ test(`compare - data - arrays`, t => {
     colours: [ `red`, `green`, `blue` ],
     sizes: [ 10, 20, 30 ]
   }) ];
-  t.is(cc1.length, 0);
+  expect(cc1.length).toBe(0);
 
   // Remove from array end
   const cc2 = [ ...compareData(test2, {
     colours: [ `red`, `green` ],
     sizes: [ 10, 20, 30 ]
   }) ];
-  t.deepEqual(cc2, [ { path: `colours.2`, previous: `blue`, value: undefined, state: `removed` } ]);
+  expect(cc2).toEqual(
+    [ { path: `colours.2`, previous: `blue`, value: undefined, state: `removed` } ]
+  );
 
   // Remove from array start
   const cc3 = [ ...compareData(test2, {
     colours: [ `green`, `blue` ],
     sizes: [ 10, 20, 30 ]
   }) ];
-  t.deepEqual(cc3, [
+  expect(cc3).toEqual([
     { path: `colours.0`, previous: `red`, value: `green`, state: `change` },
     { path: `colours.1`, previous: `green`, value: `blue`, state: `change` },
     { path: `colours.2`, previous: `blue`, value: undefined, state: `removed` }
@@ -574,34 +582,34 @@ test(`compare - data - arrays`, t => {
     colours: [ `blue`, `red`, `green` ],
     sizes: [ 10, 20, 30 ]
   }) ];
-  t.deepEqual(cc4, [
+  expect(cc4).toEqual([
     { path: `colours.0`, previous: `red`, value: `blue`, state: `change` },
     { path: `colours.1`, previous: `green`, value: `red`, state: `change` },
     { path: `colours.2`, previous: `blue`, value: `green`, state: `change` }
   ]);
 });
 
-test(`update - by - path`, t => {
+test(`update - by - path`, () => {
   const a = {
     position: { x: 10, y: 20 },
     message: `hello`
   };
   const r1 = updateByPath(a, `message`, `there`);
-  t.is(a.message, `hello`);
-  t.is(r1.message, `there`);
+  expect(a.message).toBe(`hello`);
+  expect(r1.message).toBe(`there`);
 
   const r2 = updateByPath(a, `position.x`, 20);
-  t.is(a.position.x, 10);
-  t.is(r2.position.x, 20);
+  expect(a.position.x).toBe(10);
+  expect(r2.position.x).toBe(20);
 
   // If missing keys are used: root
-  t.throws(() => {
+  expect(() => {
     updateByPath(a, `notfound`, 100)
-  });
+  }).toThrow();
   // missing sub-key
-  t.throws(() => {
+  expect(() => {
     updateByPath(a, `position.notfound`, 100)
-  });
+  }).toThrow();
 
   // Arrays
   const aa = {
@@ -610,10 +618,10 @@ test(`update - by - path`, t => {
   };
   const rr1 = updateByPath(aa, `colours.1`, `pink`);
 
-  t.deepEqual(rr1, { flag: true, colours: [ `red`, `pink`, `blue` ] });
+  expect(rr1).toEqual({ flag: true, colours: [ `red`, `pink`, `blue` ] });
 
   const rr2 = updateByPath(aa, `colours`, [ `orange`, `black` ]);
-  t.deepEqual(rr2, { flag: true, colours: [ `orange`, `black` ] })
+  expect(rr2).toEqual({ flag: true, colours: [ `orange`, `black` ] })
 
   // Deeper nesting
   const aaa = {
@@ -629,9 +637,9 @@ test(`update - by - path`, t => {
     ]
   }
   const rrr1 = updateByPath(aaa, `profile.jane.colours.0`, `yellow`);
-  t.is(rrr1.profile.jane.colours[ 0 ], `yellow`);
+  expect(rrr1.profile.jane.colours[ 0 ]).toBe(`yellow`);
   const rrr2 = updateByPath(aaa, `widgets.1.size`, 30);
-  t.is(rrr2.widgets[ 1 ].size, 30);
+  expect(rrr2.widgets[ 1 ].size).toBe(30);
 
   // Array values which are objects
   const b = {
@@ -641,16 +649,15 @@ test(`update - by - path`, t => {
     ]
   }
   const b1 = updateByPath(b, `values.1.size`, 22);
-  t.deepEqual(b1,
-    {
-      values: [
-        { colour: `red`, size: 10 },
-        { colour: `green`, size: 22 }
-      ]
-    });
+  expect(b1).toEqual({
+    values: [
+      { colour: `red`, size: 10 },
+      { colour: `green`, size: 22 }
+    ]
+  });
 
   const b2 = updateByPath(b, `values.1`, { colour: `pink`, size: 5 });
-  t.deepEqual(b2, {
+  expect(b2).toEqual({
     values: [
       { colour: `red`, size: 10 },
       { colour: `pink`, size: 5 }
@@ -658,48 +665,48 @@ test(`update - by - path`, t => {
   });
 
   // Throw because we're changing the shape from an object to a string
-  t.throws(() => {
+  expect(() => {
     updateByPath(b, `values`, `hello`)
-  });
+  }).toThrow();
 
   const b3 = updateByPath(b, `values`, `hello`, true);
-  t.deepEqual(b3, {
+  expect(b3).toEqual({
     values: `hello`
   });
 
 
 
   // Expect to throw because 'number' is missing
-  t.throws(() => {
+  expect(() => {
     updateByPath({
       name: `jill`, address: {
         street: `Test St`, number: 12
       }
     }, `address`, { street: `West St` });
-  });
+  }).toThrow();
 
   const c1 = updateByPath({
     name: `jill`, address: {
       street: `Test St`, number: 12
     }
   }, `address`, { street: `West St`, number: 12 });
-  t.deepEqual(c1, {
+  expect(c1).toEqual({
     name: `jill`, address: {
       street: `West St`, number: 12
     }
   });
 
   const c2 = updateByPath([ `a`, `b`, `c` ], `2`, `d`);
-  t.deepEqual(c2, [ `a`, `b`, `d` ]);
+  expect(c2).toEqual([ `a`, `b`, `d` ]);
 
   // Throws because array index is out of bounds
-  t.throws(() => {
+  expect(() => {
     updateByPath([ `a`, `b`, `c` ], `3`, `d`);
-  });
+  }).toThrow();
   // Allowed
   const c3 = updateByPath([ `a`, `b`, `c` ], `3`, `d`, true);
 
-  t.deepEqual(c3, [ `a`, `b`, `c`, `d` ]);
+  expect(c3).toEqual([ `a`, `b`, `c`, `d` ]);
 
 });
 

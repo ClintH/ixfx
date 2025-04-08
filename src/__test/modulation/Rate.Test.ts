@@ -1,4 +1,4 @@
-import test, { type ExecutionContext } from "ava";
+import expect from 'expect';
 import { perSecond } from '../../modulation/source/PerSecond.js';
 import * as Flow from '../../flow/index.js';
 import { round } from "../../numbers/Round.js";
@@ -7,11 +7,11 @@ import { isApprox } from "../../numbers/IsApprox.js";
 
 function arrayIsApprox(t: ExecutionContext, values: number[], baseValue: number, pc = 0.015) {
   for (const v of values) {
-    t.true(isApprox(pc, baseValue, v), `baseValue: ${ baseValue } value: ${ v } pc: ${ pc }`);
+    expect(isApprox(pc, baseValue, v)).toBe(true);
   }
 
 }
-test(`per-second`, async t => {
+test(`per-second`, async () => {
   const r1 = perSecond(1000);
   const r1R = await Array.fromAsync(Flow.repeat(r1, { count: 4, delay: 100 }));
   arrayIsApprox(t, r1R, 100, 0.02);
@@ -26,10 +26,10 @@ test(`per-second`, async t => {
 
   await Flow.sleep(2000);
   const r3R = r3();
-  t.true(isApprox(0.01, 2000, r3R), `v: ${ r3R }`);
+  expect(isApprox(0.01, 2000, r3R)).toBe(true);
 
   // Overflow clamped
   const r4R = r4();
-  t.true(isApprox(0.01, 1000, r4R), `v: ${ r4R }`);
+  expect(isApprox(0.01, 1000, r4R)).toBe(true);
 
 })

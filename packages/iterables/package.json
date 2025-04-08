@@ -1,0 +1,45 @@
+{
+	"name": "@ixfxfun/iterables",
+	"version": "0.35.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./sync": {
+			"types": "./src/sync.ts",
+			"import": "./src/sync.ts"
+		},
+		"./async": {
+			"types": "./src/async.ts",
+			"import": "./src/async.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfxfun/numbers": "workspace:^",
+		"@ixfxfun/core": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./sync": {
+				"types": "./dist/src/sync.d.ts",
+				"import": "./dist/src/sync.js"
+			},
+			"./async": {
+				"types": "./dist/src/async.d.ts",
+				"import": "./dist/src/async.js"
+			}
+		}
+	}
+}

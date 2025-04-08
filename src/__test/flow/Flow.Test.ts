@@ -1,11 +1,11 @@
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
 import { continuously } from '../../flow/Continuously.js';
 import { JSDOM } from 'jsdom';
 import { sleep } from '../../flow/Sleep.js';
 import { SyncWait } from '../../flow/SyncWait.js';
 
-test(`syncWait`, async t => {
+test(`syncWait`, async done => {
   const sw = new SyncWait();
   let signalled = false;
   setTimeout(() => {
@@ -14,7 +14,7 @@ test(`syncWait`, async t => {
   }, 100);
 
   await sw.forSignal();
-  t.true(signalled);
+  expect(signalled).toBe(true);
 
   signalled = false;
   setTimeout(() => {
@@ -23,7 +23,7 @@ test(`syncWait`, async t => {
   }, 100);
 
   await sw.forSignal();
-  t.true(signalled);
+  expect(signalled).toBe(true);
 
   // Test signal before wait
   const sw2 = new SyncWait();
@@ -34,13 +34,11 @@ test(`syncWait`, async t => {
   const sw3 = new SyncWait();
   try {
     await sw3.forSignal(100);
-    t.fail(`Exception not thrown`)
-  } catch (error) {
-    t.pass(`Exception thrown`);
-  }
+    done.fail(`Exception not thrown`)
+  } catch (error) {}
 });
 
-test(`sleep`, async t => {
+test(`sleep`, async () => {
   const ac = new AbortController();
 
   setTimeout(() => {
@@ -51,14 +49,14 @@ test(`sleep`, async t => {
   });
 });
 
-test('continuously', async (t) => {
+test('continuously', async () => {
   const dom = new JSDOM();
   // @ts-ignore
   global.window = dom.window;
   const loopCount = 5;
   const duration = 200;
   const expectedElapsed = loopCount * duration;
-  t.plan(loopCount + 5); // +5 for additional asserts 
+  expect.assertions(loopCount + 5); // +5 for additional asserts 
 
   let loops = loopCount;
   let startedAt = Date.now();
@@ -69,16 +67,16 @@ test('continuously', async (t) => {
   };
 
   const c = continuously(fn, 50);
-  t.is(c.startCount, 0);
-  t.is(c.runState, `idle`);
+  expect(c.startCount).toBe(0);
+  expect(c.runState).toBe(`idle`);
   c.start();
-  t.is(c.runState, `scheduled`);
+  expect(c.runState).toBe(`scheduled`);
 
   //return new Promise(async (resolve, reject) => {
   await sleep(expectedElapsed + 50);
-  t.true(c.startCountTotal > 0, `startCount: ${ c.startCountTotal }`);
+  expect(c.startCountTotal > 0).toBe(true);
   const elapsed = Date.now() - startedAt;
-  t.true(Math.abs(elapsed - expectedElapsed) < 100, `Elapsed time too long: ${ elapsed }, expected: ${ expectedElapsed }`);
+  expect(Math.abs(elapsed - expectedElapsed) < 100).toBe(true);
 
   //  resolve();
   //});

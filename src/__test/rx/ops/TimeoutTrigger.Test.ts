@@ -1,10 +1,10 @@
-import test from 'ava';
+import expect from 'expect';
 
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import { isApprox } from '../../../numbers/IsApprox.js';
 
-test(`timeout-repeat`, async t => {
+test(`timeout-repeat`, async done => {
   // Emit 'goodbye' every 1s
   const s1 = Rx.From.func(() => 'goodbye', { interval: { secs: 2 } });
   const time = Flow.Elapsed.interval();
@@ -17,7 +17,7 @@ test(`timeout-repeat`, async t => {
       const elapsed = time();
       const ok = isApprox(0.1, 50, elapsed);
       if (!ok && !r1.isDisposed()) {
-        t.fail(`Elapsed: ${ elapsed }`);
+        done.fail(`Elapsed: ${ elapsed }`);
       }
       return `hello`
     }
@@ -29,10 +29,10 @@ test(`timeout-repeat`, async t => {
   await Flow.sleep(1000);
   r1.dispose(`test`);
   // Expect 19 values
-  t.is(values, 19);
+  expect(values).toBe(19);
 });
 
-test(`timeout-value-immediate`, async t => {
+test(`timeout-value-immediate`, async () => {
   // Emit 'goodbye' every 200ms
   const s1 = Rx.From.func(() => 'goodbye', { interval: 200 });
 
@@ -44,23 +44,23 @@ test(`timeout-value-immediate`, async t => {
   r1.onValue(value => {
     const elapsed = time();
     if (hello) {
-      t.true(isApprox(0.1, 150, elapsed), `Long time: ${ elapsed }`);
+      expect(isApprox(0.1, 150, elapsed)).toBe(true);
     } else {
       if (count > 1) { // First one can be a bit slow
-        t.true(isApprox(0.1, 50, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
+        expect(isApprox(0.1, 50, elapsed)).toBe(true)
       }
     }
-    t.is(value, hello ? `hello` : `goodbye`);
+    expect(value).toBe(hello ? `hello` : `goodbye`);
     count++;
     hello = !hello;
   });
 
   await Flow.sleep(1000);
   s1.dispose(`test`);
-  t.true(r1.isDisposed());
+  expect(r1.isDisposed()).toBe(true);
 });
 
-test(`timeout-value-non-immediate`, async t => {
+test(`timeout-value-non-immediate`, async () => {
   // Emit 'goodbye' every 200ms
   const s1 = Rx.From.func(() => 'goodbye', { interval: 200 });
   // Emit 'hello' if we don't get anything from s1 after 150ms
@@ -71,21 +71,21 @@ test(`timeout-value-non-immediate`, async t => {
   r1.onValue(value => {
     const elapsed = time();
     if (hello) {
-      t.true(isApprox(0.1, 150, elapsed), `Long time: ${ elapsed }. Count: ${ count }`);
+      expect(isApprox(0.1, 150, elapsed)).toBe(true);
     } else {
       // In non immediate case we expect a long initial wait
       if (count === 0) {
-        t.true(isApprox(0.1, 220, elapsed), `Initial long time: ${ elapsed }. Count: ${ count }`);
+        expect(isApprox(0.1, 220, elapsed)).toBe(true);
       } else {
-        t.true(isApprox(0.2, 50, elapsed), `Short time: ${ elapsed }. Count: ${ count }`)
+        expect(isApprox(0.2, 50, elapsed)).toBe(true)
       }
     }
-    t.is(value, hello ? `hello` : `goodbye`);
+    expect(value).toBe(hello ? `hello` : `goodbye`);
     count++;
     hello = !hello;
   });
 
   await Flow.sleep(1000);
   s1.dispose(`test`);
-  t.true(r1.isDisposed());
+  expect(r1.isDisposed()).toBe(true);
 });

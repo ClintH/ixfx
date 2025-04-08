@@ -1,9 +1,9 @@
-import test from 'ava';
+import expect from 'expect';
 import { jitter, jitterAbsolute } from '../../modulation/Jitter.js';
 import { repeatSync } from '../../flow/Repeat.js';
 import { rangeCheck, someNearnessMany } from '../Include.js';
 
-test(`relative-absolute`, t => {
+test(`relative-absolute`, () => {
   const tests = 10 * 1000;
 
   // 50% relative jitter of a value of 50
@@ -16,10 +16,9 @@ test(`relative-absolute`, t => {
     lowerExcl: 25,
     upperExcl: 75,
   });
-  t.pass();
 });
 
-test('absolute-absolute', (t) => {
+test('absolute-absolute', () => {
   const tests = 10 * 1000;
 
   // -50..50 absolute jitter, not clamped
@@ -34,11 +33,9 @@ test('absolute-absolute', (t) => {
     lowerExcl: 0,
     upperExcl: 100,
   });
-
-  t.pass();
 });
 
-test('relative', (t) => {
+test('relative', () => {
   const tests = 10 * 1000;
 
   // 50% relative jitter of a value of 0.5
@@ -51,10 +48,9 @@ test('relative', (t) => {
     lowerExcl: 0.25,
     upperExcl: 0.75,
   });
-  t.pass();
 });
 
-test('absolute', async (t) => {
+test('absolute', async () => {
   const tests = 10 * 1000;
 
   // 50% absolute jitter, clamped
@@ -68,6 +64,4 @@ test('absolute', async (t) => {
     lowerExcl: 0,
     upperExcl: 1,
   });
-
-  t.pass();
 });

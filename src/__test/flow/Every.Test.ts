@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import { everyNth } from '../../flow/index.js';
 
 function countMatches<V>(data: readonly V[], nth: number) {
@@ -11,19 +11,19 @@ function countMatches<V>(data: readonly V[], nth: number) {
   return count;
 }
 
-test(`everyNth`, (t) => {
+test(`everyNth`, () => {
   const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  t.is(countMatches(data, 0), 0);
-  t.is(countMatches(data, 1), 10);
-  t.is(countMatches(data, 2), 5);
-  t.is(countMatches(data, 10), 1);
+  expect(countMatches(data, 0)).toBe(0);
+  expect(countMatches(data, 1)).toBe(10);
+  expect(countMatches(data, 2)).toBe(5);
+  expect(countMatches(data, 10)).toBe(1);
 
   // Error: not a number
   // @ts-ignore
-  t.throws(() => everyNth(undefined));
+  expect(() => everyNth(undefined)).toThrow();
 
   // Error: not an integer
   // @ts-ignore
-  t.throws(() => everyNth(1.5));
+  expect(() => everyNth(1.5)).toThrow();
 });

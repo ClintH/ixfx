@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 
 import { isStringArray } from '../util/GuardArrays.js';
 import { ifNaN, percentTest, integerTest, integerParse } from '../util/GuardNumbers.js';
@@ -6,148 +6,148 @@ import { isPlainObjectOrPrimitive, isPlainObject } from '../util/GuardObject.js'
 import { isInteger } from '../util/IsInteger.js';
 
 
-test('isInteger', t => {
+test('isInteger', () => {
   // Nunber inputs
-  t.true(isInteger(1));
-  t.true(isInteger(0));
-  t.false(isInteger(0.1));
-  t.false(isInteger(0.9));
-  t.false(isInteger(99.9));
-  t.false(isInteger(Number.NaN));
+  expect(isInteger(1)).toBe(true);
+  expect(isInteger(0)).toBe(true);
+  expect(isInteger(0.1)).toBe(false);
+  expect(isInteger(0.9)).toBe(false);
+  expect(isInteger(99.9)).toBe(false);
+  expect(isInteger(Number.NaN)).toBe(false);
 
   // String inputs
-  t.true(isInteger(`1`));
-  t.true(isInteger(`0`));
-  t.false(isInteger(`1.1`));
+  expect(isInteger(`1`)).toBe(true);
+  expect(isInteger(`0`)).toBe(true);
+  expect(isInteger(`1.1`)).toBe(false);
 
   // @ts-expect-error
-  t.false(isInteger({}));
+  expect(isInteger({})).toBe(false);
   // @ts-expect-error
-  t.false(isInteger(false));
+  expect(isInteger(false)).toBe(false);
   // @ts-expect-error
-  t.false(isInteger(true));
+  expect(isInteger(true)).toBe(false);
   // @ts-expect-error
-  t.false(isInteger(new Map()));
+  expect(isInteger(new Map())).toBe(false);
 
 });
 
-test('isPlainObjectOrPrimitive', t => {
-  t.true(isPlainObjectOrPrimitive(`hello`));
-  t.true(isPlainObjectOrPrimitive(10));
-  t.true(isPlainObjectOrPrimitive({ hello: `there` }));
-  t.false(isPlainObjectOrPrimitive(undefined));
-  t.false(isPlainObjectOrPrimitive(null));
-  t.false(isPlainObjectOrPrimitive(Number));
+test('isPlainObjectOrPrimitive', () => {
+  expect(isPlainObjectOrPrimitive(`hello`)).toBe(true);
+  expect(isPlainObjectOrPrimitive(10)).toBe(true);
+  expect(isPlainObjectOrPrimitive({ hello: `there` })).toBe(true);
+  expect(isPlainObjectOrPrimitive(undefined)).toBe(false);
+  expect(isPlainObjectOrPrimitive(null)).toBe(false);
+  expect(isPlainObjectOrPrimitive(Number)).toBe(false);
   if (typeof window !== `undefined`) {
-    t.false(isPlainObjectOrPrimitive(window));
+    expect(isPlainObjectOrPrimitive(window)).toBe(false);
   }
 
 });
 
-test('isPlainObject', t => {
-  t.false(isPlainObject(undefined));
-  t.false(isPlainObject(null));
-  t.false(isPlainObject(`hello`));
-  t.false(isPlainObject(10));
-  t.false(isPlainObject(Number));
+test('isPlainObject', () => {
+  expect(isPlainObject(undefined)).toBe(false);
+  expect(isPlainObject(null)).toBe(false);
+  expect(isPlainObject(`hello`)).toBe(false);
+  expect(isPlainObject(10)).toBe(false);
+  expect(isPlainObject(Number)).toBe(false);
   if (typeof window !== `undefined`) {
-    t.false(isPlainObject(window));
+    expect(isPlainObject(window)).toBe(false);
   }
-  t.true(isPlainObject({ hello: `there` }));
+  expect(isPlainObject({ hello: `there` })).toBe(true);
 
 });
 
-test('ifNaN', (t) => {
-  t.is(ifNaN(Number.NaN, 10), 10);
-  t.is(ifNaN(200, 10), 200);
+test('ifNaN', () => {
+  expect(ifNaN(Number.NaN, 10)).toBe(10);
+  expect(ifNaN(200, 10)).toBe(200);
   // @ts-ignore
-  t.throws(() => ifNaN(null, 10));
+  expect(() => ifNaN(null, 10)).toThrow();
   // @ts-ignore
-  t.throws(() => ifNaN(undefined, 10));
+  expect(() => ifNaN(undefined, 10)).toThrow();
   // @ts-ignore
-  t.throws(() => ifNaN('100', 10));
+  expect(() => ifNaN('100', 10)).toThrow();
 });
 
 
-test(`isStringArray`, (t) => {
-  t.true(isStringArray([ `a`, `b`, `c` ]));
-  t.true(isStringArray([ 'a' ]));
-  t.false(isStringArray([ `a`, `b`, false ]));
-  t.false(isStringArray([ `a`, `b`, null ]));
-  t.false(isStringArray([ `a`, `b`, true ]));
-  t.false(isStringArray([ `a`, `b`, {} ]));
+test(`isStringArray`, () => {
+  expect(isStringArray([ `a`, `b`, `c` ])).toBe(true);
+  expect(isStringArray([ 'a' ])).toBe(true);
+  expect(isStringArray([ `a`, `b`, false ])).toBe(false);
+  expect(isStringArray([ `a`, `b`, null ])).toBe(false);
+  expect(isStringArray([ `a`, `b`, true ])).toBe(false);
+  expect(isStringArray([ `a`, `b`, {} ])).toBe(false);
 });
 
-test(`percent`, (t) => {
-  t.false(percentTest(2)[ 0 ]);
-  t.false(percentTest(-2)[ 0 ]);
-  t.false(percentTest(Number.NaN)[ 0 ]);
+test(`percent`, () => {
+  expect(percentTest(2)[ 0 ]).toBe(false);
+  expect(percentTest(-2)[ 0 ]).toBe(false);
+  expect(percentTest(Number.NaN)[ 0 ]).toBe(false);
   // @ts-expect-error
-  t.false(percentTest(`string`)[ 0 ]);
+  expect(percentTest(`string`)[ 0 ]).toBe(false);
   // @ts-expect-error
-  t.false(percentTest(true)[ 0 ]);
+  expect(percentTest(true)[ 0 ]).toBe(false);
   // @ts-expect-error
-  t.false(percentTest(false)[ 0 ]);
+  expect(percentTest(false)[ 0 ]).toBe(false);
   // @ts-expect-error
-  t.false(percentTest({ a: true })[ 0 ]);
+  expect(percentTest({ a: true })[ 0 ]).toBe(false);
 
-  t.true(percentTest(1)[ 0 ]);
-  t.true(percentTest(0)[ 0 ]);
-  t.true(percentTest(0.5)[ 0 ]);
+  expect(percentTest(1)[ 0 ]).toBe(true);
+  expect(percentTest(0)[ 0 ]).toBe(true);
+  expect(percentTest(0.5)[ 0 ]).toBe(true);
 });
 
-test(`integer`, (t) => {
+test(`integer`, () => {
   // @ts-ignore
-  t.false(integerTest(`string`)[ 0 ]);
+  expect(integerTest(`string`)[ 0 ]).toBe(false);
   // @ts-ignore
-  t.false(integerTest(true)[ 0 ]);
+  expect(integerTest(true)[ 0 ]).toBe(false);
   // @ts-ignore
-  t.false(integerTest(false)[ 0 ]);
+  expect(integerTest(false)[ 0 ]).toBe(false);
   // @ts-ignore
-  t.false(integerTest({ a: true })[ 0 ]);
+  expect(integerTest({ a: true })[ 0 ]).toBe(false);
 
-  t.false(integerTest(-0.5)[ 0 ]);
-  t.false(integerTest(0.5)[ 0 ]);
-  t.false(integerTest(Number.NaN)[ 0 ]);
+  expect(integerTest(-0.5)[ 0 ]).toBe(false);
+  expect(integerTest(0.5)[ 0 ]).toBe(false);
+  expect(integerTest(Number.NaN)[ 0 ]).toBe(false);
 
-  t.true(integerTest(0)[ 0 ]);
-  t.true(integerTest(1)[ 0 ]);
-  t.true(integerTest(100)[ 0 ]);
+  expect(integerTest(0)[ 0 ]).toBe(true);
+  expect(integerTest(1)[ 0 ]).toBe(true);
+  expect(integerTest(100)[ 0 ]).toBe(true);
 });
 
-test(`integerParse`, (t) => {
-  t.is(integerParse(`10`, `positive`), 10);
-  t.is(integerParse(`10.89`, `positive`), 10);
-  t.is(integerParse(`0`, `positive`, 0), 0);
-  t.is(integerParse(`-10`, `positive`, 0), 0);
+test(`integerParse`, () => {
+  expect(integerParse(`10`, `positive`)).toBe(10);
+  expect(integerParse(`10.89`, `positive`)).toBe(10);
+  expect(integerParse(`0`, `positive`, 0)).toBe(0);
+  expect(integerParse(`-10`, `positive`, 0)).toBe(0);
 
-  t.is(integerParse(`-10`, `negative`), -10);
-  t.is(integerParse(`-10.99`, `negative`), -10);
-  t.is(integerParse(`0`, `negative`), 0);
-  t.true(Number.isNaN(integerParse(`10`, `negative`)));
-  t.is(integerParse(`10`, `negative`, 0), 0);
+  expect(integerParse(`-10`, `negative`)).toBe(-10);
+  expect(integerParse(`-10.99`, `negative`)).toBe(-10);
+  expect(integerParse(`0`, `negative`)).toBe(0);
+  expect(Number.isNaN(integerParse(`10`, `negative`))).toBe(true);
+  expect(integerParse(`10`, `negative`, 0)).toBe(0);
 
-  t.is(integerParse(`10`, `aboveZero`), 10);
-  t.true(Number.isNaN(integerParse(`0`, `aboveZero`)));
-  t.true(Number.isNaN(integerParse(`-10`, `aboveZero`)));
+  expect(integerParse(`10`, `aboveZero`)).toBe(10);
+  expect(Number.isNaN(integerParse(`0`, `aboveZero`))).toBe(true);
+  expect(Number.isNaN(integerParse(`-10`, `aboveZero`))).toBe(true);
 
-  t.true(integerParse(`-10`, `belowZero`) === -10);
-  t.true(Number.isNaN(integerParse(`0`, `belowZero`)));
-  t.true(Number.isNaN(integerParse(`10`, `belowZero`)));
+  expect(integerParse(`-10`, `belowZero`) === -10).toBe(true);
+  expect(Number.isNaN(integerParse(`0`, `belowZero`))).toBe(true);
+  expect(Number.isNaN(integerParse(`10`, `belowZero`))).toBe(true);
 
-  t.true(integerParse(`-1`, `bipolar`) === -1);
-  t.true(integerParse(`1`, `bipolar`) === 1);
-  t.true(integerParse(`0`, `bipolar`) === 0);
-  t.true(Number.isNaN(integerParse(`-2`, `bipolar`)));
-  t.true(Number.isNaN(integerParse(`2`, `bipolar`)));
+  expect(integerParse(`-1`, `bipolar`) === -1).toBe(true);
+  expect(integerParse(`1`, `bipolar`) === 1).toBe(true);
+  expect(integerParse(`0`, `bipolar`) === 0).toBe(true);
+  expect(Number.isNaN(integerParse(`-2`, `bipolar`))).toBe(true);
+  expect(Number.isNaN(integerParse(`2`, `bipolar`))).toBe(true);
 
-  t.is(integerParse(`-10`, `nonZero`), -10);
-  t.true(Number.isNaN(integerParse(`0`, `aboveZero`)));
-  t.is(integerParse(`10`, `aboveZero`), 10);
+  expect(integerParse(`-10`, `nonZero`)).toBe(-10);
+  expect(Number.isNaN(integerParse(`0`, `aboveZero`))).toBe(true);
+  expect(integerParse(`10`, `aboveZero`)).toBe(10);
 
-  t.is(integerParse(`1`, `percentage`), 1);
-  t.is(integerParse(`0`, `percentage`), 0);
-  t.true(Number.isNaN(integerParse(`-1`, `percentage`)));
-  t.true(Number.isNaN(integerParse(`-2`, `percentage`)));
-  t.true(Number.isNaN(integerParse(`2`, `percentage`)));
+  expect(integerParse(`1`, `percentage`)).toBe(1);
+  expect(integerParse(`0`, `percentage`)).toBe(0);
+  expect(Number.isNaN(integerParse(`-1`, `percentage`))).toBe(true);
+  expect(Number.isNaN(integerParse(`-2`, `percentage`))).toBe(true);
+  expect(Number.isNaN(integerParse(`2`, `percentage`))).toBe(true);
 });
