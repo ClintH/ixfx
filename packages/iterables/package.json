@@ -22,7 +22,9 @@
 		}
 	},
 	"dependencies": {
+		"@ixfxfun/arrays": "workspace:^",
 		"@ixfxfun/numbers": "workspace:^",
+		"@ixfxfun/process": "workspace:^",
 		"@ixfxfun/core": "workspace:^"
 	},
 	"publishConfig": {

@@ -1,8 +1,7 @@
-import { sleep } from '@ixfxfun/core';
-import { resolveLogOption } from '@ixfxfun/core/debug';
-import { since } from './stopwatch.js';
+import { elapsedSince, sleep } from '@ixfxfun/core';
+import { resolveLogOption } from '@ixfxfun/debug';
 import { throwIntegerTest, throwNumberTest } from '@ixfxfun/guards';
-import { getErrorMessage } from '@ixfxfun/core/debug';
+import { getErrorMessage } from '@ixfxfun/debug';
 import type { Result } from '@ixfxfun/core';
 import { elapsedToHumanString } from '@ixfxfun/core';
 /**
@@ -188,7 +187,7 @@ export const retryFunction = <T>(callback: () => Promise<T | undefined>, options
     async probe() {
       try {
         const v = await callback();
-        if (v === undefined) return { value: options.taskValueFallback,error:`Fallback`, success: false };
+        if (v === undefined) return { value: options.taskValueFallback, error: `Fallback`, success: false };
         return { value: v, success: true };
       } catch (error) {
         return { success: false, error: error as Error };
@@ -225,7 +224,7 @@ export const retryTask = async <V>(
   const signal = opts.abort;
   const log = resolveLogOption(opts.log);
   const predelayMs = opts.predelayMs ?? 0;
-  const startedAt = since();
+  const startedAt = elapsedSince();
 
   let attempts = 0;
   const initialValue = opts.startAt ?? 1000;
@@ -258,7 +257,7 @@ export const retryTask = async <V>(
       return { success: result.success, value: result.value, attempts, elapsed: startedAt() };
     }
     log({
-      msg: `retry attempts: ${ attempts } t: ${ elapsedToHumanString(t) }`,
+      msg: `retry attempts: ${ attempts.toString() } t: ${ elapsedToHumanString(t) }`,
     });
 
     // Did not succeed.
@@ -281,7 +280,7 @@ export const retryTask = async <V>(
   }
 
   return {
-    message: `Giving up after ${ attempts } attempts.`,
+    message: `Giving up after ${ attempts.toString() } attempts.`,
     success: false,
     attempts,
     value: opts.taskValueFallback,

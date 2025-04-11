@@ -1,10 +1,11 @@
-import { applyMerge } from "./Apply.js";
-import { getRectPositioned, isPositioned } from "./Guard.js";
+import { applyMerge } from "./apply.js";
+import { getRectPositioned, isPositioned } from "./guard.js";
 import type { Rect, RectPositioned } from "./rect-types.js";
 
 const sumOp = (a: number, b: number) => a + b;
 /**
  * Sums width/height of `b` with `a` (ie: a + b), returning result.
+ * x/y of second parameter are ignored
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 100, height: 100 };
@@ -16,7 +17,7 @@ const sumOp = (a: number, b: number) => a + b;
  * @param a
  * @param b
  */
-export function sum(a: Rect, b: Rect): Rect;
+export function sum(a: Rect, b: Rect | RectPositioned): Rect;
 
 /**
  * Sums width/height of `b` with `a`, returning result.
@@ -31,7 +32,7 @@ export function sum(a: Rect, b: Rect): Rect;
  * @param a 
  * @param b 
  */
-export function sum(a: RectPositioned, b: Rect): RectPositioned;
+export function sum(a: RectPositioned, b: Rect | RectPositioned): RectPositioned;
 
 /**
  * Sums width/height of `rect` with given `width` and `height`
@@ -80,7 +81,7 @@ export function sum(rect: RectPositioned, width: number, height: number): RectPo
  * @returns
  */
 //eslint-disable-next-line func-style
-export function sum(a: Rect, b: Rect | number, c?: number): Rect {
+export function sum(a: Rect, b: RectPositioned | Rect | number, c?: number): Rect {
   // @ts-ignore
   return applyMerge(sumOp, a, b, c);
 }

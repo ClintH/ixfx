@@ -1,11 +1,11 @@
 //import {Colour} from '@ixfxfun/visual';
 import type { ReactiveInitial, ReactiveWritable, Reactive } from "@ixfxfun/rx";
-import { eventTrigger } from "../../../rx/src/from/event.js";
-import type {  DomFormOptions, DomNumberInputValueOptions, DomValueOptions } from "./dom-types.js";
+import type { DomFormOptions, DomNumberInputValueOptions, DomValueOptions } from "./dom-types.js";
 import { resolveEl } from '@ixfxfun/dom';
 import { transform } from '@ixfxfun/rx';
 import { hasLast } from '@ixfxfun/rx';
 import { Colour } from "@ixfxfun/visual";
+import { eventTrigger } from "@ixfxfun/rx/from";
 //import type { Colourish } from '@ixfxfun/visual/colour';
 
 /**
@@ -62,7 +62,7 @@ export function domHslInputValue(targetOrQuery: HTMLInputElement | string, optio
 
   const input = domInputValue(targetOrQuery, {
     ...options,
-    upstreamFilter:(value) => {
+    upstreamFilter: (value) => {
       return (typeof value === `object`) ? Colour.toHex(value as Colour.HslRelative) : value as string;
     },
   });
@@ -247,9 +247,9 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
 
   let upstreamSourceUnsub = () => {}
 
-  const readValue = ():T => {
+  const readValue = (): T => {
     const fd = new FormData(formEl);
-    const entries:[string,unknown][] = [];
+    const entries: [ string, unknown ][] = [];
     for (const [ k, v ] of fd.entries()) {
       const vString = v.toString();
 

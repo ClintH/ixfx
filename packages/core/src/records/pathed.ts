@@ -1,5 +1,5 @@
-import {recordEntriesDepthFirst} from "@ixfxfun/core/records";
-import { isPrimitive,isInteger,isEqualContextString } from '@ixfxfun/core';
+import { recordEntriesDepthFirst } from "@ixfxfun/core/records";
+import { isPrimitive, isInteger, isEqualContextString } from '@ixfxfun/core';
 import { isPlainObjectOrPrimitive } from '@ixfxfun/guards';
 import type { IsEqualContext } from '@ixfxfun/core';
 import { compareObjectKeys } from './compare.js';
@@ -66,7 +66,7 @@ const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean
   if (target === null) throw new Error(`Param 'target' is null`);
   if (typeof target !== `object`) throw new Error(`Param 'target' is not an object (got: ${ typeof target })`);
   if (deepProbe) {
-    const entries: Array<[ key: string, value: any ]> = [];
+    const entries: [ key: string, value: any ][] = [];
     for (const field in target) {
       const value = (target as any)[ field ];
       if (isPlainObjectOrPrimitive(value as unknown)) {
@@ -93,7 +93,7 @@ const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean
  * @returns 
  */
 export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>, options: Partial<CompareDataOptions<V>> = {}): Generator<PathDataChange<any>> {
-  if (a === undefined) {
+  if (typeof a === `undefined`) {
     yield {
       path: options.pathPrefix ?? ``,
       value: b,
@@ -101,7 +101,7 @@ export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>,
     };
     return;
   }
-  if (b === undefined) {
+  if (typeof b === `undefined`) {
     yield { path: options.pathPrefix ?? ``, previous: a, value: undefined, state: `removed` }
     return;
   }
@@ -191,7 +191,7 @@ export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>,
  * @param source 
  * @param changes 
  */
-export const applyChanges = <V extends Record<string, any>>(source: V, changes: Array<PathDataChange<any>>): V => {
+export const applyChanges = <V extends Record<string, any>>(source: V, changes: PathDataChange<any>[]): V => {
   for (const change of changes) {
     source = updateByPath(source, change.path, change.value);
   }
@@ -253,7 +253,7 @@ export const updateByPath = <V extends Record<string, any>>(target: V, path: str
   return r as V;
 }
 
-const updateByPathImpl = (o: any, split: Array<string>, value: any, allowShapeChange: boolean): any => {
+const updateByPathImpl = (o: any, split: string[], value: any, allowShapeChange: boolean): any => {
   if (split.length === 0) {
     //console.log(`Pathed.updateByPathImpl o: ${ JSON.stringify(o) } value: ${ JSON.stringify(value) }`);
 
@@ -285,7 +285,7 @@ const updateByPathImpl = (o: any, split: Array<string>, value: any, allowShapeCh
     if (index >= o.length && !allowShapeChange) throw new Error(`Array index ${ index.toString() } is outside of the existing length of ${ o.length.toString() }. Use allowShapeChange=true to permit this.`);
     const copy = [ ...o ];
     copy[ index ] = updateByPathImpl(copy[ index ], split, value, allowShapeChange);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return copy;
   } else if (start in o) {
     const copy = { ...o };
@@ -323,7 +323,7 @@ export const getField = <V>(object: Record<string, any>, path: string): Result<V
   return v;
 }
 
-const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): Result<V> => {
+const getFieldImpl = <V>(object: Record<string, any>, split: string[]): Result<V> => {
   if (object === undefined) throw new Error(`Param 'object' is undefined`);
   if (split.length === 0) throw new Error(`Path has run out`);
   const start = split.shift();
@@ -336,7 +336,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): Res
     if (typeof object[ index ] === `undefined`) {
       return { success: false, error: `Index '${ index }' does not exist. Length: ${ object.length }` };
     }
-    // eslint-disable-next-line unicorn/prefer-ternary
+
     if (split.length === 0) {
       return { value: object[ index ] as V, success: true };
     } else {
@@ -344,7 +344,7 @@ const getFieldImpl = <V>(object: Record<string, any>, split: Array<string>): Res
     }
   } else if (typeof object === `object` && start in object) {
     //console.log(`start in object. Start: ${ start } Len: ${ split.length } Object`, object);
-    // eslint-disable-next-line unicorn/prefer-ternary
+
     if (split.length === 0) {
       return { value: object[ start ] as V, success: true };
     } else {

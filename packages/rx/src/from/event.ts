@@ -4,7 +4,7 @@ import { object } from "./object.js";
 import type { FieldOptions } from "../ops/types.js";
 import type { EventSourceOptions, EventSourceTriggerOptions } from "./types.js";
 import { initLazyStream } from "../init-stream.js";
-import { Elapsed } from "@ixfxfun/flow";
+import { elapsedInterval } from "@ixfxfun/core/elapsed";
 /**
  * Fired when `eventName` fires on `target`. 
  * 
@@ -59,7 +59,7 @@ export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | st
  * @param options Options
  * @returns 
  */
- 
+
 export function event<TEventArgs extends Record<string, any>>(targetOrQuery: EventTarget | null | string, name: string, initialValue: TEventArgs | undefined, options: Partial<EventSourceOptions> = {}): ReactiveInitial<TEventArgs> & Reactive<TEventArgs> {
   let target: EventTarget | null;
   if (typeof targetOrQuery === `string`) {
@@ -74,6 +74,7 @@ export function event<TEventArgs extends Record<string, any>>(targetOrQuery: Eve
   const debugLifecycle = options.debugLifecycle ?? false;
   const debugFiring = options.debugFiring ?? false;
   const lazy = options.lazy ?? false;
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   if (initialValue === undefined) initialValue = {} as TEventArgs;
   const rxObject = object<TEventArgs>(initialValue, { deepEntries: true });
   let eventAdded = false;
@@ -160,7 +161,7 @@ export function eventTrigger(targetOrQuery: EventTarget | null | string, name: s
   const fireInitial = options.fireInitial ?? false;
 
   let count = 0;
-  const elapsed = Elapsed.interval();
+  const elapsed = elapsedInterval();
 
   const stream = initLazyStream<TriggerData>({
     lazy: options.lazy ?? `very`,

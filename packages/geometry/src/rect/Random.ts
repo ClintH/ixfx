@@ -1,7 +1,7 @@
 import { type RandomSource } from '@ixfxfun/random';
 import { sum as PointsSum } from '../point/sum.js';
 import type { Point } from '../point/point-type.js';
-import { isPositioned } from './Guard.js';
+import { isPositioned } from './guard.js';
 import type { Rect, RectPositioned } from './rect-types.js';
 /**
  * Returns a random positioned Rect on a 0..1 scale.

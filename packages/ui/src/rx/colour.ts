@@ -1,5 +1,5 @@
-import { initStream } from "../../../rx/src/init-stream.js";
-import type { ReactiveWritable, ReactiveInitial, ReactiveNonInitial } from "../../../rx/src/types.js";
+
+import { initStream, type ReactiveInitial, type ReactiveNonInitial, type ReactiveWritable } from "@ixfxfun/rx";
 import type { HslRelative } from "@ixfxfun/visual/colour";
 
 export type ReactiveColour = ReactiveWritable<HslRelative> & {

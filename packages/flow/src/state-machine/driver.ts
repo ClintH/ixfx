@@ -1,55 +1,11 @@
 import * as Execute from '../execute.js';
-import { type Machine, type MachineState, type StateNames, type Transitions } from './types.js';
+import { type DriverOptions, type DriverResult, type DriverRunner, type DriverStatesHandler, type Machine, type MachineState, type StateNames, type Transitions } from './types.js';
 import { defaultComparer } from '@ixfxfun/core';
 import { randomElement } from '@ixfxfun/arrays';
-import * as Debug from '@ixfxfun/core/debug';
+import * as Debug from '@ixfxfun/debug';
 import { init as machineInit, reset as machineReset, next as machineNext, to as machineTo } from './state-machine.js';
 
-export type Result<V extends Transitions> = {
-  /**
-   * Score of this result. This is used when a state
-   * has multiple handlers returning results separately.
-   * If not defined, 0 is used.
-   */
-  readonly score?: number;
 
-  //readonly state?: StateMachine.StateNames<V>;
-  /**
-   * If specified,the state to transition to. Use
-   * _true_ to attempt to automatically advance machine.
-   * This field is 2nd priority.
-   */
-  readonly next?: StateNames<V> | boolean;
-  /**
-   * If true, resets the machine.
-   * This flag is 1st priority, taking precedence over the `next` field.
-   */
-  readonly reset?: boolean;
-};
-
-//eslint-disable-next-line functional/no-mixed-types
-export type Runner<V extends Transitions> = {
-  readonly run: () => Promise<MachineState<V> | undefined>;
-  readonly getValue: () => StateNames<V>;
-  readonly reset: () => void;
-  readonly to: (
-    state: StateNames<V>
-  ) => MachineState<V>;
-};
-
-export type StatesHandler<V extends Transitions> = {
-  readonly if:
-  | readonly StateNames<V>[]
-  //eslint-disable-next-line functional/prefer-readonly-type
-  | StateNames<V>[]
-  | StateNames<V>;
-  readonly then: readonly ExpressionOrResult<V>[] | ExpressionOrResult<V>;
-  /**
-   * Logic for choosing which result, if there are multiple expressions.
-   * By default 'highest' (for highest ranked result)
-   */
-  readonly resultChoice?: `first` | `highest` | `lowest` | `random`;
-};
 
 // export type Prerequisite<V extends StateMachine.Transitions> =
 //   | readonly StateMachine.StateNames<V>[]
@@ -65,27 +21,13 @@ export type StatesHandler<V extends Transitions> = {
 //   readonly condition?: Prerequisite<V>;
 // };
 
-export type DriverOpts<V extends Transitions> = {
-  readonly handlers: readonly StatesHandler<V>[];
-  //readonly prereqs?: StatePrerequisites<V>;
-  readonly debug?: Debug.LogOption;
-  /**
-   * If _true_ execution of handlers is shuffled each time
-   */
-  readonly shuffleHandlers?: boolean;
-};
+
 
 // async function run<V extends StateMachine.Transitions>(
 //   machine: StateMachine.Machine<V>,
 //   handlers: readonly StatesHandler<V>[]
 // );
 
-export type ExpressionOrResult<T extends Transitions> =
-  | Result<T>
-  | ((
-    machine?: MachineState<T>
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  ) => Result<T> | undefined | void);
 
 /**
  * Drives a state machine.
@@ -96,16 +38,15 @@ export type ExpressionOrResult<T extends Transitions> =
  * @param handlersOrOpts
  * @returns
  */
-// eslint-disable-next-line @typescript-eslint/require-await
-export async function init<V extends Transitions>(
+export async function driver<V extends Transitions>(
   machine: Machine<V> | Transitions,
-  handlersOrOpts: readonly StatesHandler<V>[] | DriverOpts<V>
-): Promise<Runner<V>> {
-  const opts: DriverOpts<V> = Array.isArray(handlersOrOpts)
+  handlersOrOpts: readonly DriverStatesHandler<V>[] | DriverOptions<V>
+): Promise<DriverRunner<V>> {
+  const opts: DriverOptions<V> = Array.isArray(handlersOrOpts)
     ? {
-      handlers: handlersOrOpts as readonly StatesHandler<V>[],
+      handlers: handlersOrOpts as readonly DriverStatesHandler<V>[],
     }
-    : (handlersOrOpts as DriverOpts<V>);
+    : (handlersOrOpts as DriverOptions<V>);
 
   const debug = Debug.resolveLogOption(opts.debug, {
     category: `StateMachineDriver`,
@@ -113,7 +54,7 @@ export async function init<V extends Transitions>(
 
   // Index handlers by state, making sure there are not multiple
   // handlers for a given state.
-  const byState = new Map<string, StatesHandler<V>>();
+  const byState = new Map<string, DriverStatesHandler<V>>();
   for (const h of opts.handlers) {
     const ifBlock = Array.isArray(h.if) ? h.if : [ h.if ];
     for (const state of ifBlock) {
@@ -142,7 +83,7 @@ export async function init<V extends Transitions>(
   //   },
   // ];
 
-  const runOpts: Execute.RunOpts<Result<V>> = {
+  const runOpts: Execute.RunOpts<DriverResult<V>> = {
     // Rank results by score
     rank: (a, b) => {
       return defaultComparer(a.score ?? 0, b.score ?? 0);
@@ -187,7 +128,7 @@ export async function init<V extends Transitions>(
       handler.resultChoice === `first`
         ? {
           ...runOpts,
-          stop: (latest: Result<V> | undefined) => {
+          stop: (latest: DriverResult<V> | undefined) => {
             if (!latest) return false;
             if (`reset` in latest) return true;
             if (`next` in latest && latest.next !== undefined) return true;
@@ -196,7 +137,7 @@ export async function init<V extends Transitions>(
         }
         : runOpts;
 
-    const results = await Execute.run<MachineState<V>, Result<V>>(
+    const results = await Execute.run<MachineState<V>, DriverResult<V>>(
       handler.then,
       runOptionsForHandler,
       sm
@@ -208,7 +149,7 @@ export async function init<V extends Transitions>(
 
     // Apply selection logic
     //eslint-disable-next-line functional/no-let
-    let r: Result<V> | undefined;
+    let r: DriverResult<V> | undefined;
     switch (handler.resultChoice ?? `highest`) {
       case `highest`: {
         r = results.at(-1);

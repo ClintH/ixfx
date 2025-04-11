@@ -1,7 +1,7 @@
 import type { RectPositioned } from "../rect/rect-types.js";
 import { guardCell } from "./guards.js";
 import type { GridCell, GridVisual } from "./types.js";
-import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
+import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import type { Point } from "../point/point-type.js";
 import { throwIntegerTest, throwNumberTest } from '@ixfxfun/guards';
 import { cells } from "./enumerators/cells.js";

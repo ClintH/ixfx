@@ -35,8 +35,8 @@ const sorterByValueIndex = (index: number, reverse = false) => {
   }
 }
 
-export type SortSyles = `value` | `value-reverse` | `key` | `key-reverse`;
-export const getSorter = (sortStyle: SortSyles): KeyValueSorter => {
+export type KeyValueSortSyles = `value` | `value-reverse` | `key` | `key-reverse`;
+export const keyValueSorter = (sortStyle: KeyValueSortSyles): KeyValueSorter => {
   switch (sortStyle) {
     case `value`: {
       return sorterByValueIndex(1, false);

@@ -1,7 +1,7 @@
 import { bbox as PointsBbox } from '../point/bbox.js';
 import { isEqual as PointsIsEqual } from '../point/is-equal.js';
 import type { Point } from '../point/point-type.js';
-import { corners as RectsCorners } from '../rect/Corners.js';
+import { corners as RectsCorners } from '../rect/corners.js';
 import { sortByNumericProperty } from '@ixfxfun/arrays';
 import { getEnd, getStart } from './start-end.js';
 import type { CompoundPath, Dimensions, Path } from './path-type.js';

@@ -1,6 +1,6 @@
 import type { CirclePositioned, Circle } from "./circle-type.js";
 import { isCirclePositioned } from "./guard.js";
-import { fromCenter as RectsFromCenter } from '../rect/FromCenter.js';
+import { fromCenter as RectsFromCenter } from '../rect/from-center.js';
 import type { RectPositioned } from "../rect/rect-types.js";
 /**
  * Computes a bounding box that encloses circle

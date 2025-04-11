@@ -1,11 +1,11 @@
 import type { RectPositioned, Rect } from "./rect-types.js";
-import { applyMerge, applyDim, applyScalar } from "./Apply.js";
+import { applyMerge, applyDim, applyScalar } from "./apply.js";
 
 const divideOp = (a: number, b: number) => a / b;
 
 /**
  * Divides positioned `rect` by width/height. Useful for normalising a value.
- *
+ * x & y value of second parameter are ignored
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  *
@@ -45,7 +45,7 @@ export function divide(rect: Rect, width: number, height: number): Rect;
  * @param a 
  * @param b 
  */
-export function divide(a: RectPositioned, b: Rect): RectPositioned;
+export function divide(a: RectPositioned, b: Rect | RectPositioned): RectPositioned;
 
 /**
  * Divides rect `a` by width and height of rect `b`.

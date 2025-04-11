@@ -1,8 +1,8 @@
 import type { Point } from "../point/point-type.js";
 import { equilateralFromVertex } from "../triangle/create.js";
 import type { Triangle } from "../triangle/triangle-type.js";
-import { corners as RectsCorners } from '../rect/Corners.js';
-import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
+import { corners as RectsCorners } from '../rect/corners.js';
+import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import { rotate as PointsRotate } from "../point/rotate.js";
 export type ArrowOpts = {
   readonly arrowSize?: number;

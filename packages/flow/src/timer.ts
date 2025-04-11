@@ -1,6 +1,5 @@
 import { clamp } from '@ixfxfun/numbers';
-import { intervalToMs, type Interval } from '@ixfxfun/core';
-import type { HasCompletion } from './types.js';
+import { intervalToMs, type HasCompletion, type Interval } from '@ixfxfun/core';
 
 /**
  * Creates a timer
@@ -117,9 +116,7 @@ export function ofTotal(
   };
   let t: ModulationTimer | undefined;
   return () => {
-    if (!t) {
-      t = relative(totalMs, timerOpts);
-    }
+    t ??= relative(totalMs, timerOpts);
     return t.elapsed;
   }
 }
@@ -153,9 +150,7 @@ export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: b
   };
   let t: ModulationTimer | undefined;
   return () => {
-    if (!t) {
-      t = relative(totalTicks, timerOpts);
-    }
+    t ??= relative(totalTicks, timerOpts);
     return t.elapsed;
   }
 }
@@ -168,7 +163,7 @@ export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: b
 export const timerAlwaysDone = (): ModulationTimer => ({
   elapsed: 1,
   isDone: true,
-  reset() {
+  reset(): void {
 
   },
   mod(amt) {

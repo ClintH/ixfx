@@ -1,15 +1,15 @@
 import { throwIntegerTest, integerTest } from '@ixfxfun/guards';
-import { type HasCompletion, type HasCompletionRunStates } from './types.js';
+import { type HasCompletion, type HasCompletionRunStates } from '@ixfxfun/core/continuously';
 
 import { intervalToMs, type Interval } from '@ixfxfun/core';
 
 export type TimeoutSyncCallback = (
   elapsedMs?: number,
-  ...args: ReadonlyArray<unknown>
+  ...args: readonly unknown[]
 ) => void;
 export type TimeoutAsyncCallback = (
   elapsedMs?: number,
-  ...args: ReadonlyArray<unknown>
+  ...args: readonly unknown[]
 ) => Promise<void>;
 
 /**
@@ -23,7 +23,7 @@ export type Timeout = HasCompletion & {
    * @param altTimeoutMs Optional override for the interval. Use _undefined_ to use the original interval
    * @param args 
    */
-  start(altTimeoutMs?: number, args?: ReadonlyArray<unknown>): void;
+  start(altTimeoutMs?: number, args?: readonly unknown[]): void;
   /**
    * Cancels the timer, aborting any scheduled execution.
    */
@@ -101,7 +101,7 @@ export const timeout = (
 
   const start = async (
     altInterval: Interval = interval,
-    args: Array<unknown>
+    args: unknown[]
   ): Promise<void> => {
     const p = new Promise<void>((resolve, reject) => {
       startedAt = performance.now();
@@ -151,7 +151,7 @@ export const timeout = (
   };
 
   return {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+
     start,
     cancel,
     get runState() {

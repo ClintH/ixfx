@@ -29,9 +29,9 @@ export const contains = <V>(
   }
 
   for (const needle of needles) {
-    //eslint-disable-next-line functional/no-let
     let found = false;
     for (const element of haystack) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       if (eq(needle, element)) {
         found = true;
         break;
@@ -71,9 +71,26 @@ export const containsDuplicateValues = <V>(
   if (typeof data !== `object`) throw new Error(`Param 'data' is expected to be an Iterable. Got type: ${ typeof data }`);
   const set = new Set<string>();
   for (const v of data) {
-    const str = keyFunction(v);
-    if (set.has(str)) return true;
-    set.add(str);
+    const string_ = keyFunction(v);
+    if (set.has(string_)) return true;
+    set.add(string_);
   }
   return false;
 };
+
+/**
+ * Returns _true_ if array contains duplicate instances based on `===` equality checking
+ * Use {@link containsDuplicateValues} if you'd rather compare by value.
+ * @param array 
+ * @returns 
+ */
+export const containsDuplicateInstances = <V>(array: V[] | readonly V[]): boolean => {
+  if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
+  for (let index = 0; index < array.length; index++) {
+    for (let x = 0; x < array.length; x++) {
+      if (index === x) continue;
+      if (array[ index ] === array[ x ]) return true;
+    }
+  }
+  return false;
+}

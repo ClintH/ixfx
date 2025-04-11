@@ -1,9 +1,9 @@
 import type { RandomSource } from "@ixfxfun/random";
 import type { ShapePositioned } from "./shape-type.js";
 import { isCircle, isCirclePositioned } from "../circle/guard.js";
-import { isRect, isRectPositioned } from "../rect/Guard.js";
+import { isRect, isRectPositioned } from "../rect/guard.js";
 import { randomPoint as circleRandomPoint } from '../circle/random.js';
-import { randomPoint as rectRandomPoint } from '../rect/Random.js';
+import { randomPoint as rectRandomPoint } from '../rect/random.js';
 import type { Point } from "../point/point-type.js";
 import type { Rect } from "../rect/rect-types.js";
 import type { Triangle } from "../triangle/triangle-type.js";
@@ -11,7 +11,7 @@ import type { Circle } from "../circle/circle-type.js";
 import { center as circleCenter } from '../circle/center.js';
 import { isTriangle } from "../triangle/guard.js";
 import { centroid as triangleCentroid } from "../triangle/centroid.js";
-import { center as rectCenter } from '../rect/Center.js';
+import { center as rectCenter } from '../rect/center.js';
 
 export type ShapeRandomPointOpts = {
   readonly randomSource: RandomSource;

@@ -1,7 +1,7 @@
 import * as Grids from './grid/index.js';
 import { randomPluck } from '@ixfxfun/random';
 import { distance as PointsDistance } from './point/distance.js';
-import { randomPoint as RectsRandomPoint } from './rect/Random.js';
+import { randomPoint as RectsRandomPoint } from './rect/random.js';
 import type { Point } from './point/point-type.js';
 import type { RectPositioned } from './rect/rect-types.js';
 

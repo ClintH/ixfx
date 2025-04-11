@@ -1,7 +1,7 @@
 import { SimpleEventEmitter } from '@ixfxfun/events';
 import * as StateMachine from './state-machine.js';
-import * as Elapsed from '../stopwatch.js';
 import type { StateNames, Transitions, MachineState } from './types.js';
+import { elapsedInfinity, elapsedSince } from '@ixfxfun/core/elapsed';
 
 export type StateChangeEvent<V extends Transitions> = {
   readonly newState: StateNames<V>;
@@ -45,7 +45,7 @@ export class StateMachineWithEvents<
   #debug: boolean;
   #isDoneNeedsFiring = false;
   #isDone = false;
-  #changedAt = Elapsed.infinity();
+  #changedAt = elapsedInfinity();
 
   /**
    * Create a state machine with initial state, description and options
@@ -84,14 +84,14 @@ export class StateMachineWithEvents<
    * If list is empty, no states are possible. Otherwise lists
    * possible states, including 'null' for terminal
    */
-  get statesPossible(): ReadonlyArray<StateNames<V> | null> {
+  get statesPossible(): readonly (StateNames<V> | null)[] {
     return StateMachine.possible(this.#sm);
   }
 
   /**
    * Return a list of all defined states
    */
-  get statesDefined(): ReadonlyArray<StateNames<V>> {
+  get statesDefined(): readonly StateNames<V>[] {
     return Object.keys(this.#sm.machine);
   }
 
@@ -123,9 +123,7 @@ export class StateMachineWithEvents<
   reset() {
     this.#setIsDone(false);
     this.#sm = StateMachine.cloneState(this.#smInitial);
-
-    //eslint-disable-next-line functional/immutable-data
-    this.#changedAt = Elapsed.since();
+    this.#changedAt = elapsedSince();
   }
 
   /**
@@ -162,7 +160,7 @@ export class StateMachineWithEvents<
     if (this.#debug) {
       console.log(`StateMachine: ${ priorState } -> ${ newState }`);
     }
-    this.#changedAt = Elapsed.since();
+    this.#changedAt = elapsedSince();
     setTimeout(() => {
       this.fireEvent(`change`, { newState: newState, priorState: priorState });
     }, 1);

@@ -1,6 +1,9 @@
 export * from './comparers.js';
 export * from './count.js';
+export * from './continuously.js';
 export * from './default-keyer.js';
+export * from './elapsed.js';
+export * from './filters.js';
 export * from './is-equal-test.js';
 export * from './is-equal.js';
 export * from './is-integer.js';
@@ -11,6 +14,7 @@ export * from './key-value.js';
 export * from './interval-type.js';
 export * from './to-string.js';
 export * from './platform.js';
+export * from './promise-from-event.js';
 export * from './reactive-core.js';
 export * from './resolve-core.js';
 export * from './results.js';

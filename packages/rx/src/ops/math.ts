@@ -1,7 +1,7 @@
 import { initUpstream } from "../init-stream.js";
 import { toReadable } from "../to-readable.js";
 import type { Reactive, ReactiveOrSource } from "../types.js";
-import * as Proc from '@ixfxfun/core/process';
+import * as Proc from '@ixfxfun/process';
 import type { OpAsAnnotation, OpMathOptions } from "./types.js";
 import type { RankFunction, RankOptions } from "@ixfxfun/core";
 

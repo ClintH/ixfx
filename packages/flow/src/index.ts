@@ -1,23 +1,24 @@
 export * from './behaviour-tree.js';
-export * from './continuously.js';
+export * from '../../core/src/continuously.js';
 export * from './delay.js';
 export * from './dispatch-list.js';
 export * from './every.js';
 export * from './execute.js';
 export * from './promise-with-resolvers.js';
-export * from './promise-from-event.js';
+export * from '../../core/src/promise-from-event.js';
 export * from './rate-minimum.js';
 export * from './repeat.js';
 export * from './req-resp-match.js';
 export * from './retry.js';
 export * from './run-once.js';
-export * as Elapsed from './stopwatch.js';
 export * from './sync-wait.js';
 export * from './task-queue-mutable.js';
 export * from './throttle.js';
 export * from './timeout.js';
 export * from './timer.js';
 export type * from './types.js'
+export type * from '@ixfxfun/core/continuously';
 export * from './update-outdated.js';
 export * from './wait-for-value.js';
 export * from './wait-for.js';
+export { sleep } from '@ixfxfun/core';

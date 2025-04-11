@@ -1,12 +1,12 @@
 import type { RectPositioned, Rect } from "./rect-types.js";
-import { applyMerge, applyDim, applyScalar } from "./Apply.js";
+import { applyMerge, applyDim, applyScalar } from "./apply.js";
 
 const multiplyOp = (a: number, b: number) => a * b;
 
 
 /**
  * Multiplies positioned `rect` by width/height. Useful for denormalising a value.
- *
+ * x/y value of second parameter are ignored.
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  *
@@ -52,7 +52,7 @@ export function multiply(rect: Rect, width: number, height: number): Rect;
  * @param a 
  * @param b 
  */
-export function multiply(a: RectPositioned, b: Rect): RectPositioned;
+export function multiply(a: RectPositioned, b: Rect | RectPositioned): RectPositioned;
 
 /**
  * Multiplies rect `a` by width and height of rect `b`.

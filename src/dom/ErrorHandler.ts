@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../debug/GetErrorMessage.js";
+import { getErrorMessage } from "@ixfxfun/debug";
 
 /**
  * Creates an error handler to show errors on-screen.

@@ -1,10 +1,10 @@
-import type { Interval,Primitive } from '@ixfxfun/core';
+import type { Interval, Primitive } from '@ixfxfun/core';
 //import * as Immutable from '../data/Pathed.js';
 
 import type { ChunkOptions, DebounceOptions, FieldOptions, FilterPredicate, SplitOptions, SyncOptions, SwitcherOptions, TransformOpts, ThrottleOptions, OpMathOptions } from './ops/types.js';
 import type { TimeoutPingOptions, TimeoutValueOptions } from './from/types.js';
 import type { SetHtmlOptions } from './sinks/dom.js';
-import type { Processors } from '@ixfxfun/core/process';
+import type { Processors } from '@ixfxfun/process';
 import type { TallyOptions } from './ops/math.js';
 import type { ChangeRecord } from '@ixfxfun/core/records';
 import type { RecursivePartial } from '@ixfxfun/core';

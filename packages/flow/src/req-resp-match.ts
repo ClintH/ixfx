@@ -1,5 +1,5 @@
 import { SimpleEventEmitter } from "@ixfxfun/events"
-import { continuously } from "./continuously.js"
+import { continuously } from "../../core/src/continuously.js"
 
 export type RequestResponseOptions<TRequest, TResp> = {
   timeoutMs: number
@@ -171,7 +171,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
    * @param callback 
    * @returns 
    */
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+
   request(request: TRequest, callback?: (error: boolean, response: TResp | string) => void): void | Promise<TResp> {
     if (callback !== undefined) { this.#requestCallback(request, callback); return; }
     return this.#requestAwait(request);

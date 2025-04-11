@@ -4,11 +4,9 @@ import { getPathsAndData, type PathData, type PathDataChange } from "@ixfxfun/co
 import * as Rx from "@ixfxfun/rx";
 import * as RxFrom from "@ixfxfun/rx/from";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind, DomBindUnresolvedSource } from './dom-types.js';
-import { hasLast, messageHasValue, messageIsSignal } from "../../../rx/src/util.js";
 import { getFromKeys } from "@ixfxfun/core/maps";
 import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "@ixfxfun/core/text";
 import { QueueMutable } from "@ixfxfun/collections";
-import { object } from "../../../rx/src/from/object.js";
 
 /**
  * Reactive stream of array of elements that match `query`.
@@ -18,7 +16,7 @@ import { object } from "../../../rx/src/from/object.js";
 export function fromDomQuery(query: string) {
   const elements = [ ...document.querySelectorAll(query) ] as HTMLElement[];
 
-  return object(elements);
+  return Rx.From.object(elements);
   /// TODO: MutationObserver to update element list
 }
 
@@ -251,7 +249,7 @@ export const bindElement = <TSource, TDestination>(source: Rx.Reactive<TSource>,
   if (elOrQuery === undefined) throw new Error(`Param 'elOrQuery' is undefined`);
 
   const el = resolveEl(elOrQuery);
-  let b:DomBindValueTarget[] = [];
+  let b: DomBindValueTarget[] = [];
   if (binds.length === 0) {
     b.push({ elField: `textContent` });
   } else {
@@ -393,14 +391,14 @@ export const bind = <TSource, TDestination>(source: Rx.Reactive<TSource>, ...bin
     }
   }
   const unsub = source.on(message => {
-    if (messageHasValue(message)) {
+    if (Rx.messageHasValue(message)) {
       update(message.value);
-    } else if (messageIsSignal(message)) {
+    } else if (Rx.messageIsSignal(message)) {
       console.warn(message);
     }
   });
 
-  if (hasLast(source)) {
+  if (Rx.hasLast(source)) {
     update(source.last());
   }
 
@@ -446,7 +444,7 @@ export const bindUpdate = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLEl
   }
 
   const unsub = source.on(message => {
-    if (messageHasValue(message)) {
+    if (Rx.messageHasValue(message)) {
       console.log(message);
       update(message.value);
     } else {
@@ -454,7 +452,7 @@ export const bindUpdate = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLEl
     }
   });
 
-  if (hasLast(source)) {
+  if (Rx.hasLast(source)) {
     update(source.last());
   }
 
@@ -724,7 +722,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
   });
 
   // Source has an initial value, use that
-  if (hasLast(source)) {
+  if (Rx.hasLast(source)) {
     const last = source.last();
     // Get data of value as a set of paths and data
     // but only at first level of depth, because changes() will probe

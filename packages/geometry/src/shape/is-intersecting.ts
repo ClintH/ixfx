@@ -1,6 +1,6 @@
 import { isCirclePositioned } from "../circle/guard.js";
 import type { Point } from "../point/point-type.js";
-import { isRectPositioned } from "../rect/Guard.js";
+import { isRectPositioned } from "../rect/guard.js";
 import type { ShapePositioned } from "./shape-type.js";
 import { isIntersecting as CirclesIsIntersecting } from '../circle/intersecting.js';
 import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';

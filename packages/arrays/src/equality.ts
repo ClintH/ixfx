@@ -2,8 +2,7 @@ import { isEqualDefault, isEqualValueDefault, type IsEqual } from "./util/is-equ
 import { guardArray } from "@ixfxfun/guards";
 
 /**
- * Returns _true_ if the two arrays have the same items at same indexes. Use {@link isEqualDefault} to
- * compare values regardless of position.
+ * Returns _true_ if the two arrays have the same items at same indexes. 
  * 
  * Returns _false_ if arrays are of different length.
  * By default uses === semantics for equality checking.
@@ -24,16 +23,17 @@ import { guardArray } from "@ixfxfun/guards";
  * ```
  * @param arrayA 
  * @param arrayB 
- * @param eq 
+ * @param equality Function to compare values
  */
-export const isEqual = <V>(arrayA: Array<V>, arrayB: Array<V>, eq = isEqualDefault<V>): boolean => {
+export const isEqual = <V>(arrayA: V[], arrayB: V[], equality = isEqualDefault<V>): boolean => {
+  // TODO: 'eq' function could be a key-generating function too
   guardArray(arrayA, `arrayA`);
   guardArray(arrayB, `arrayB`);
 
   if (arrayA.length !== arrayB.length) return false;
-  // eslint-disable-next-line unicorn/no-for-loop
+
   for (let indexA = 0; indexA < arrayA.length; indexA++) {
-    if (!(eq(arrayA[ indexA ], arrayB[ indexA ]))) return false;
+    if (!(equality(arrayA[ indexA ], arrayB[ indexA ]))) return false;
   }
   return true;
 }
@@ -69,10 +69,10 @@ export const isEqual = <V>(arrayA: Array<V>, arrayB: Array<V>, eq = isEqualDefau
  * @returns
  */
 export const isContentsTheSame = <V>(
-  array: ReadonlyArray<V> | Array<V>,
+  array: readonly V[] | V[],
   equality?: IsEqual<V>
 ): boolean => {
-  // Unit tested
+  // TODO: 'equality' function could be a key-generating function too
 
   if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array.`);
   if (array.length === 0) return true;

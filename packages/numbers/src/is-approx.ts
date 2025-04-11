@@ -102,3 +102,10 @@ export function isApprox(
     return test(baseValue, v);
   }
 }
+
+export const isCloseTo = (a: number, b: number, precision: number = 3) => {
+  const aa = a.toPrecision(precision);
+  const bb = b.toPrecision(precision);
+  if (aa !== bb) return [ false, `A is not close enough to B. A: ${ a } B: ${ b } Precision: ${ precision }` ];
+  else return [ true ];
+}

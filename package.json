@@ -3,14 +3,18 @@
 	"scripts": {
 		"build": "tsc --build",
 		"clean": "pnpm --recursive exec rm -rf dist",
+		"rebuild":"pnpm run clean && pnpm  run build",
 		"test": "vitest --api",
-		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint"
+		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint",
+		"demos": "rm -rf ../ixfxfun/demos/ixfx/ && npm run demos:copy",
+		"demos:copy": "copyfiles --up 1 ./packages/ixfx/dist/**/* ../ixfxfun/demos/"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.12",
 		"@eslint/js": "9.24.0",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
 		"@types/node": "^22.14.0",
+		"copyfiles": "2.4.1",
 		"eslint": "9.24.0",
 		"eslint-plugin-unicorn": "58.0.0",
 		"globals": "16.0.0",

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/array-type,@typescript-eslint/no-invalid-void-type,@typescript-eslint/prefer-for-of */
 import { defaultComparer, type Comparer } from '@ixfxfun/core';
 import { shuffle } from '@ixfxfun/arrays';
 
@@ -8,7 +7,6 @@ export type ExpressionOrResult<ArgsType, ResultType> =
     args: ArgsType | undefined
   ) => Promise<ResultType | undefined> | ResultType | undefined | void);
 
-//eslint-disable-next-line functional/no-mixed-types
 export type RunOpts<ResultType> = {
   /**
    * If provided, filters the set of results prior to returning.
@@ -47,7 +45,7 @@ export type RunSingleOpts<V> = RunOpts<V> & {
  *
  * @example Run three functions, returning the highest-ranked result.
  * ```js
- * const result = run([
+ * const result = runSingle([
  *  () => 10,
  *  () => 2,
  *  () => 3
@@ -109,7 +107,7 @@ export type RunSingleOpts<V> = RunOpts<V> & {
  * @returns
  */
 export const run = async <ArgsType, ResultType>(
-  expressions: //eslint-disable-next-line functional/prefer-readonly-type
+  expressions:
     | ExpressionOrResult<ArgsType, ResultType>[]
     | ExpressionOrResult<ArgsType, ResultType>
     | readonly ExpressionOrResult<ArgsType, ResultType>[],
@@ -118,7 +116,6 @@ export const run = async <ArgsType, ResultType>(
 ): Promise<ResultType[]> => {
   const results: ResultType[] = [];
   const compareFn = opts.rank ?? defaultComparer;
-  //eslint-disable-next-line functional/no-let
   let expressionsArray = Array.isArray(expressions)
     ? (expressions as ExpressionOrResult<ArgsType, ResultType>[])
     : [ expressions as ExpressionOrResult<ArgsType, ResultType> ];
@@ -126,7 +123,7 @@ export const run = async <ArgsType, ResultType>(
 
   for (let i = 0; i < expressionsArray.length; i++) {
     const exp = expressionsArray[ i ];
-    //eslint-disable-next-line functional/no-let
+
     let r: ResultType;
     if (typeof exp === 'function') {
       // @ts-ignore
@@ -135,9 +132,7 @@ export const run = async <ArgsType, ResultType>(
       r = exp;
     }
     if (r !== undefined) {
-      //eslint-disable-next-line functional/immutable-data
       results.push(r);
-      //eslint-disable-next-line functional/immutable-data
       results.sort(compareFn);
     }
 

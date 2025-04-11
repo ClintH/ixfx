@@ -43,7 +43,7 @@ export type PointTrackerResults = Readonly<{
    * Will give _undefined_ if `.mark()` has not been called on tracker.
    */
   fromMark: PointTrack | undefined;
-  values: ReadonlyArray<Point>;
+  values: readonly Point[];
 }>;
 
 
@@ -65,7 +65,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * 
    * This will reset the `initialRelation`, which will use the new oldest value.
    */
-  onTrimmed(reason: TrimReason): void {
+  onTrimmed(_reason: TrimReason): void {
     // Force new relation calculations
     this.initialRelation = undefined;
   }
@@ -86,14 +86,13 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * @param p 
    * @returns 
    */
-  seenEvent(p: PointerEvent): PointTrackerResults {
+  seenEvent(p: PointerEvent | MouseEvent): PointTrackerResults {
     if (`getCoalescedEvents` in p) {
       const events = p.getCoalescedEvents();
       const asPoints = events.map(event => ({ x: event.clientX, y: event.clientY }));
       return this.seen(...asPoints);
     } else {
-      // @ts-expect-error
-      return this.seen({ x: p.clientX, y: p.clientY });
+      return this.seen({ x: (p).clientX, y: (p).clientY });
     }
   }
 
@@ -114,7 +113,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * @param _p Point
    */
   computeResults(
-    _p: Array<TimestampedObject<Point>>
+    _p: TimestampedObject<Point>[]
   ): PointTrackerResults {
     const currentLast = this.last;
 
@@ -289,7 +288,7 @@ export class TrackedPointMap extends TrackedValueMap<
    * Track a PointerEvent
    * @param event
    */
-  seenEvent(event: PointerEvent): Promise<Array<PointTrackerResults>> {
+  seenEvent(event: PointerEvent): Promise<PointTrackerResults[]> {
     if (`getCoalescedEvents` in event) {
       const events = event.getCoalescedEvents();
       const seens = events.map(subEvent => super.seen(subEvent.pointerId.toString(), subEvent));

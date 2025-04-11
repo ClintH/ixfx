@@ -1,4 +1,4 @@
-import { guard } from "./Guard.js";
+import { guard } from "./guard.js";
 import type { Rect } from "./rect-types.js";
 
 /**

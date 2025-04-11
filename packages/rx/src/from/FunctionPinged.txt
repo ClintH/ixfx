@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../../debug/GetErrorMessage.js";
+import { getErrorMessage } from "@ixfxfun/debug";
 import { initStream } from "../InitStream.js";
 import type { Reactive, ReactivePingable, Unsubscriber } from "../Types.js";
 import { messageHasValue, messageIsDoneSignal, messageIsSignal } from "../Util.js";

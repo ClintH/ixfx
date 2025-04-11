@@ -21,7 +21,7 @@ export * from './util.js';
 export * from './wrap.js';
 export * from './resolve-source.js';
 export * from './cache.js';
-//export * as From from './sources/index.js';
+export * as From from './from/index.js';
 export * from './init-stream.js';
 
 export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: ReactiveOp<any, any>[]) {

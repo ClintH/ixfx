@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import type { KeyValue } from '../src/types.js';
-import { getSorter } from '../src/key-value.js';
+import { keyValueSorter } from '../src/key-value.js';
 
 test(`sorting`, () => {
   const a: KeyValue[] = [
@@ -10,26 +10,26 @@ test(`sorting`, () => {
   ];
 
   // Sort by numeric value
-  expect(getSorter(`value`)(a)).toEqual([
+  expect(keyValueSorter(`value`)(a)).toEqual([
     [ `zebras`, 0 ],
     [ `orange`, 2 ],
     [ `apples`, 10 ]
   ]);
 
-  expect(getSorter(`value-reverse`)(a)).toEqual([
+  expect(keyValueSorter(`value-reverse`)(a)).toEqual([
     [ `apples`, 10 ],
     [ `orange`, 2 ],
     [ `zebras`, 0 ]
   ]);
 
   // Sort by key
-  expect(getSorter(`key`)(a)).toEqual([
+  expect(keyValueSorter(`key`)(a)).toEqual([
     [ `apples`, 10 ],
     [ `orange`, 2 ],
     [ `zebras`, 0 ]
   ]);
 
-  expect(getSorter(`key-reverse`)(a)).toEqual([
+  expect(keyValueSorter(`key-reverse`)(a)).toEqual([
     [ `zebras`, 0 ],
     [ `orange`, 2 ],
     [ `apples`, 10 ]
@@ -43,7 +43,7 @@ test(`sorting`, () => {
   ];
 
   // Sort by string value
-  expect(getSorter(`value`)(b)).toEqual([
+  expect(keyValueSorter(`value`)(b)).toEqual([
     [ `d`, `four` ],
     [ `a`, `one` ],
     [ `c`, `three` ],

@@ -1,11 +1,12 @@
-import { applyMerge } from "./Apply.js";
-import { isPositioned } from "./Guard.js";
+import { applyMerge } from "./apply.js";
+import { isPositioned } from "./guard.js";
 import type { Rect, RectPositioned } from "./rect-types.js";
 
 const subtractOp = (a: number, b: number) => a - b;
 
 /**
  * Subtracts width/height of `b` from `a` (ie: a - b), returning result.
+ * x,y of second parameter is ignored.
  * ```js
  * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 100, height: 100 };
@@ -17,8 +18,8 @@ const subtractOp = (a: number, b: number) => a - b;
  * @param a
  * @param b
  */
-export function subtract(a: Rect, b: Rect): Rect;
-export function subtract(a: RectPositioned, b: Rect): RectPositioned;
+export function subtract(a: Rect, b: Rect | RectPositioned): Rect;
+export function subtract(a: RectPositioned, b: Rect | RectPositioned): RectPositioned;
 
 /**
  * Subtracts a width/height from `a`, returning result.
@@ -53,7 +54,7 @@ export function subtract(a: RectPositioned, width: number, height: number): Rect
  * @param c
  * @returns
  */
-export function subtract(a: Rect | undefined, b: Rect | number, c?: number): Rect {
+export function subtract(a: Rect | undefined, b: RectPositioned | Rect | number, c?: number): Rect {
   // @ts-ignore
   return applyMerge(subtractOp, a, b, c);
 }
@@ -70,7 +71,7 @@ export function subtract(a: Rect | undefined, b: Rect | number, c?: number): Rec
  * @param b Rectangle to subtract by, or width
  * @param c Height, if second parameter is width
  */
-export function subtractSize(a:RectPositioned, b:Rect|number, c?:number):RectPositioned;
+export function subtractSize(a: RectPositioned, b: Rect | number, c?: number): RectPositioned;
 
 
 /**
@@ -85,19 +86,19 @@ export function subtractSize(a:RectPositioned, b:Rect|number, c?:number):RectPos
  * @param b Rectangle to subtract by, or width
  * @param c Height, if second parameter is width
  */
-export function subtractSize(a:Rect, b:Rect|number, c?:number):Rect;
+export function subtractSize(a: Rect, b: Rect | number, c?: number): Rect;
 
 
 
-export function subtractSize(a:Rect|RectPositioned, b:Rect|number, c?:number):Rect|RectPositioned {
+export function subtractSize(a: Rect | RectPositioned, b: Rect | number, c?: number): Rect | RectPositioned {
   const w = typeof b === `number` ? b : b.width;
-  const h = typeof b === `number`? c : b.height;
+  const h = typeof b === `number` ? c : b.height;
   if (h === undefined) throw new Error(`Expected height as third parameter`);
   const r = {
-      ...a,
-      width: a.width-w,
-      height: a.height-h
-    };
+    ...a,
+    width: a.width - w,
+    height: a.height - h
+  };
   return r;
 }
 

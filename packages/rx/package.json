@@ -29,11 +29,13 @@
 		"@ixfxfun/arrays": "workspace:^",
 		"@ixfxfun/collections": "workspace:^",
 		"@ixfxfun/core": "workspace:^",
+		"@ixfxfun/debug": "workspace:^",
 		"@ixfxfun/dom": "workspace:^",
 		"@ixfxfun/flow": "workspace:^",
 		"@ixfxfun/guards": "workspace:^",
 		"@ixfxfun/iterables": "workspace:^",
-		"@ixfxfun/modulation": "workspace:^"
+		"@ixfxfun/modulation": "workspace:^",
+		"@ixfxfun/process": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

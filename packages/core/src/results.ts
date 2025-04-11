@@ -4,7 +4,7 @@
 //   error?: Error | string
 // }
 
-import { getErrorMessage } from "./debug/index.js"
+import { getErrorMessage } from "@ixfxfun/debug"
 
 export type ResultOk<T> = {
   success: true
@@ -28,17 +28,17 @@ export function throwResult<T>(result: Result<T>): result is ResultOk<T> {
   throw result.error;
 }
 
-export function resultToError(result:ResultError):Error {
+export function resultToError(result: ResultError): Error {
   if (typeof result.error === `string`) return new Error(result.error);
   else return result.error
 }
 
-export function resultToValue<T>(result:Result<T>):T {
+export function resultToValue<T>(result: Result<T>): T {
   if (result.success) return result.value;
   else throw resultToError(result);
 }
 
-export function resultErrorToString(result:ResultError):string {
+export function resultErrorToString(result: ResultError): string {
   if (typeof result.error === `string`) return result.error;
   else return getErrorMessage(result.error);
 }

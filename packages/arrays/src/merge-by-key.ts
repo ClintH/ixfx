@@ -1,4 +1,4 @@
-import type { MergeReconcile } from "../../../holding/core/src/arrays/Types.js";
+import type { MergeReconcile } from "./types.js";
 
 /**
  * Merges arrays left to right, using the provided
@@ -44,14 +44,13 @@ import type { MergeReconcile } from "../../../holding/core/src/arrays/Types.js";
 export const mergeByKey = <V>(
   keyFunction: (value: V) => string,
   reconcile: MergeReconcile<V>,
-  ...arrays: ReadonlyArray<ReadonlyArray<V>>
-): Array<V> => {
+  ...arrays: readonly (readonly V[])[]
+): V[] => {
   const result = new Map<string, V>();
   for (const m of arrays) {
     for (const mv of m) {
       if (mv === undefined) continue;
       const mk = keyFunction(mv);
-      //eslint-disable-next-line functional/no-let
       let v = result.get(mk);
       v = v ? reconcile(v, mv) : mv;
       result.set(mk, v);

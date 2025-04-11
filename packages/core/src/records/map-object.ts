@@ -52,14 +52,12 @@ import type { RemapObjectPropertyType } from "../ts-util.js";
  * ```
  */
 export const mapObjectShallow = <
-  TSource extends Record<string, unknown>,
+  TSource extends Record<string, any>,
   TFieldValue,
 >(
-   
   object: TSource,
-   
   mapFunction: (args: MapObjectArgs) => TFieldValue
-   
+
 ): RemapObjectPropertyType<TSource, TFieldValue> => {
   type MapResult = [ field: string, value: TFieldValue ];
   const entries = Object.entries(object);
@@ -73,7 +71,7 @@ export const mapObjectShallow = <
 export type MapObjectArgs = {
   field: string
   path: string
-  value: unknown
+  value: any
   index: number
 }
 
@@ -99,7 +97,7 @@ export type MapObjectArgs = {
  * @param mapper 
  * @returns 
  */
-export function mapObjectByObject(data: object, mapper: Record<string, (value: unknown, context: unknown) => unknown>) {
+export function mapObjectByObject(data: object, mapper: Record<string, (value: any, context: any) => any>) {
   const entries = Object.entries(data);
   for (const entry of entries) {
     if (entry[ 0 ] in mapper) {

@@ -1,7 +1,7 @@
 import { hasLast, isReactive } from "@ixfxfun/rx";
 import type { ReactiveNonInitial } from "@ixfxfun/rx";
 import type { BasicType } from "@ixfxfun/core";
-import { getErrorMessage } from "@ixfxfun/core/debug";
+import { getErrorMessage } from "@ixfxfun/debug";
 
 /**
  * Something that can resolve to a value

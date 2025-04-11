@@ -12,10 +12,6 @@
 			"types": "./src/index.ts",
 			"import": "./src/index.ts"
 		},
-		"./geometry": {
-			"types": "./src/geometry/index.ts",
-			"import": "./src/geometry/index.ts"
-		},
 		"./colour": {
 			"types": "./src/colour/index.ts",
 			"import": "./src/colour/index.ts"
@@ -39,10 +35,6 @@
 			".": {
 				"types": "./dist/src/index.d.ts",
 				"import": "./dist/src/index.js"
-			},
-			"./geometry": {
-				"types": "./dist/src/geometry/index.d.ts",
-				"import": "./dist/src/geometry/index.js"
 			},
 			"./colour": {
 				"types": "./dist/src/colour/index.d.ts",

@@ -1,10 +1,10 @@
 import { isPoint } from "../point/guard.js";
-import { guard } from "./Guard.js";
+import { guard } from "./guard.js";
 import type { Rect, RectPositioned } from "./rect-types.js";
 import { joinPointsToLines as LinesJoinPointsToLines } from '../line/join-points-to-lines.js';
 
 import type { Point } from '../point/point-type.js';
-import { corners } from "./Corners.js";
+import { corners } from "./corners.js";
 import type { Line } from "../line/line-type.js";
 
 /**

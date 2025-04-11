@@ -1,5 +1,5 @@
 import { intervalToMs } from "@ixfxfun/core";
-import { getErrorMessage} from "@ixfxfun/core/debug";
+import { getErrorMessage } from "@ixfxfun/debug";
 import { continuously } from "@ixfxfun/flow";
 import { sleep } from "@ixfxfun/core";
 import { initLazyStream } from "../init-stream.js";
@@ -43,7 +43,7 @@ import type { FunctionFunction, FunctionOptions } from "./types.js";
  * @param options 
  * @returns 
  */
- 
+
 export function func<V>(callback: FunctionFunction<V>, options: Partial<FunctionOptions> = {}): ReactivePingable<V> {
   const maximumRepeats = options.maximumRepeats ?? Number.MAX_SAFE_INTEGER;
   const closeOnError = options.closeOnError ?? true;

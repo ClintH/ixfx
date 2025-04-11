@@ -1,6 +1,6 @@
 import { Bezier as BezierLibrary } from 'bezier-js';
 import { interpolate as LinesInterpolate } from '../line/interpolate.js';
-import { fromTopLeft as RectsFromTopLeft } from '../rect/FromTopLeft.js';
+import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import type { Point } from '../point/point-type.js';
 import type { CubicBezier, CubicBezierPath, QuadraticBezier, QuadraticBezierPath } from './bezier-type.js';
 import { isCubicBezier, isQuadraticBezier } from './guard.js';

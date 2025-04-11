@@ -1,4 +1,4 @@
-import { getErrorMessage } from '../debug/GetErrorMessage.js';
+import { getErrorMessage } from '@ixfxfun/debug';
 import { afterMatch } from '../text/Text.js';
 import { log, type LogOpts } from './Log.js';
 import { resolveEl } from './ResolveEl.js';

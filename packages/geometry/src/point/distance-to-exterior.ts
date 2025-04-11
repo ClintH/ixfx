@@ -1,6 +1,6 @@
 import { distanceFromExterior as rectDistanceFromExterior } from "../rect/distance.js";
 import { isCirclePositioned } from "../circle/guard.js";
-import { isRectPositioned } from "../rect/Guard.js";
+import { isRectPositioned } from "../rect/guard.js";
 import type { Point } from "./point-type.js";
 import type { PointCalculableShape } from "../shape/shape-type.js";
 import { isPoint } from "./guard.js";

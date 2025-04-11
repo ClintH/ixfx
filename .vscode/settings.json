@@ -13,11 +13,7 @@
   ],
   "search.exclude": {
     "**/node_modules": true,
-    "**/etc": true,
-    "**/dist": true,
-    "**/build": true,
-    "**/docs": true,
-    "**/.tsimp":true
+    "**/dist": true
   },
   "[typescript]": {
     "typescript.preferences.importModuleSpecifierEnding": "js"

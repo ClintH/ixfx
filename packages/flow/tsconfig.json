@@ -3,5 +3,5 @@
 	"compilerOptions": {
 		"outDir": "dist"
 	},
-	"include": ["src/**/*", "__tests__/**/*"]
+	"include": ["src/**/*", "__tests__/**/*", "../core/src/continuously.ts", "../core/src/promise-from-event.ts"]
 }

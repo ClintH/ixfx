@@ -8,7 +8,7 @@ import type { TimeoutPingOptions, TimeoutValueOptions } from './from/types.js'
 import { messageHasValue } from "./util.js";
 import { mapObjectShallow } from '@ixfxfun/core/records';
 import * as Enacts from './sinks/index.js';
-import type { Processors } from "@ixfxfun/core/process";
+import type { Processors } from "@ixfxfun/process";
 
 /**
  * Wrap a reactive source to allow for chained
@@ -53,7 +53,7 @@ export function wrap<TIn>(source: ReactiveOrSource<TIn>): Wrapped<TIn> {
     // debounce: (options: Partial<DebounceOptions> = {}) => {
     //   return wrap(Ops.debounce<TIn>(source, options));
     // },
-    debounce:(options:Partial<DebounceOptions> ={}) => {
+    debounce: (options: Partial<DebounceOptions> = {}) => {
       return wrap(Reactives.debounce(source, options));
     },
     field: <TSource, TFieldType>(fieldName: keyof TIn, options: Partial<FieldOptions<TSource, TFieldType>> = {}) => {

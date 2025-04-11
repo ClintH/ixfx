@@ -1,6 +1,9 @@
 export * from './compare.js';
+export * from './clone-from-fields.js';
 export * from './map-object.js';
 export * from './traverse.js';
+export * from './merge.js';
+export * from './keys-to-numbers.js';
 export type * from '../types-compare.js';
 export * from './pathed.js';
 
@@ -20,11 +23,11 @@ export * from './pathed.js';
  * @param mapFunction 
  * @returns 
  */
-export const mapObjectKeys = <TKeySource extends string | number | symbol, TKeyDestination extends string|number|symbol>(object: Record<TKeySource, unknown>, mapFunction: (key: TKeySource) => TKeyDestination) => {
+export const mapObjectKeys = <TKeySource extends string | number | symbol, TKeyDestination extends string | number | symbol>(object: Record<TKeySource, unknown>, mapFunction: (key: TKeySource) => TKeyDestination) => {
   const destinationObject = {};
   for (const entries of Object.entries(object)) {
     const key = mapFunction(entries[ 0 ] as TKeySource);
     (destinationObject as Record<TKeyDestination, unknown>)[ key ] = entries[ 1 ];
   }
-  return destinationObject as Record<TKeyDestination,unknown>;
+  return destinationObject as Record<TKeyDestination, unknown>;
 }

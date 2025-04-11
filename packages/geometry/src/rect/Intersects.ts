@@ -1,5 +1,5 @@
-import { guard } from "./Guard.js";
-import { isPositioned, isRectPositioned } from "./Guard.js";
+import { guard } from "./guard.js";
+import { isPositioned, isRectPositioned } from "./guard.js";
 import { isCirclePositioned } from '../circle/guard.js';
 import * as Intersects from '../intersects.js';
 import { isPoint } from "../point/guard.js";

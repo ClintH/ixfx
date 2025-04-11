@@ -1,6 +1,6 @@
-import { guardPositioned } from "./Guard.js";
+import { guardPositioned } from "./guard.js";
 import { intersectsPoint } from "./Intersects.js";
-import { center } from "./Center.js";
+import { center } from "./center.js";
 import type { RectPositioned } from "./rect-types.js";
 import { type Point } from '../point/point-type.js';
 import { guard as PointsGuard } from '../point/guard.js';

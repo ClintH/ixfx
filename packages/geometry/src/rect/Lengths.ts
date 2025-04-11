@@ -1,7 +1,7 @@
 import { length as LinesLength } from '../line/length.js';
 
-import { edges } from './Edges.js';
-import { guardPositioned } from './Guard.js';
+import { edges } from './edges.js';
+import { guardPositioned } from './guard.js';
 import type { RectPositioned } from './rect-types.js';
 /**
  * Returns the length of each side of the rectangle (top, right, bottom, left)

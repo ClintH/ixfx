@@ -1,7 +1,6 @@
 import { unique } from '@ixfxfun/arrays';
 import type { Machine, MachineState, StateNames, StateTarget, StateTargetStrict, TransitionCondition, Transitions, TransitionsStrict } from './types.js';
 
-
 /**
  * Clones machine state
  * @param toClone
@@ -49,7 +48,7 @@ export const init = <V extends Transitions>(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     (initialState!) ?? Object.keys(machine.states)[ 0 ];
   if (typeof machine.states[ state ] === `undefined`) {
-    throw new TypeError(`Initial state ('${state}') not found`);
+    throw new TypeError(`Initial state ('${ state }') not found`);
   }
 
   // Normalise states
@@ -439,7 +438,7 @@ export const fromListBidirectional = (
       if (states.length > 1) {
         v.push(states[ index - 1 ] as string);
       } else {
-        t[ states[ index ] as string] = null;
+        t[ states[ index ] as string ] = null;
       }
     } else {
       v.push(states[ index + 1 ] as string);

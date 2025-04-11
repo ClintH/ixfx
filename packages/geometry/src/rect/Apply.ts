@@ -1,6 +1,6 @@
-import { guard } from "./Guard.js";
+import { guard } from "./guard.js";
 import type { RectPositioned, Rect } from "./rect-types.js";
-import { isRect, isRectPositioned, isPositioned } from "./Guard.js";
+import { isRect, isRectPositioned, isPositioned } from "./guard.js";
 
 /**
  * An operation between two fields of a rectangle.

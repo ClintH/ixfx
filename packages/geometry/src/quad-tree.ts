@@ -1,7 +1,7 @@
 import { type TraversableTree } from '@ixfxfun/collections/tree';
 import * as Shapes from './shape/index.js';
 import type { Point } from './point/point-type.js';
-import { fromTopLeft as RectsFromTopLeft } from './rect/FromTopLeft.js';
+import { fromTopLeft as RectsFromTopLeft } from './rect/from-top-left.js';
 import { intersectsPoint as RectsIntersectsPoint } from './rect/Intersects.js';
 import { fromNumbers as PointsFromNumbers } from './point/from.js';
 import type { ShapePositioned } from './shape/index.js';

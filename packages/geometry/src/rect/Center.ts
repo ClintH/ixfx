@@ -1,6 +1,6 @@
 import { isPoint } from "../point/guard.js";
 import type { Point } from "../point/point-type.js";
-import { getRectPositioned, guard } from "./Guard.js";
+import { getRectPositioned, guard } from "./guard.js";
 import type { Rect, RectPositioned } from "./rect-types.js";
 
 /**

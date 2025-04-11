@@ -20,6 +20,7 @@
 	"dependencies": {
 		"@ixfxfun/arrays": "workspace:^",
 		"@ixfxfun/core": "workspace:^",
+		"@ixfxfun/debug": "workspace:^",
 		"@ixfxfun/collections": "workspace:^",
 		"@ixfxfun/events": "workspace:^",
 		"@ixfxfun/guards": "workspace:^",
