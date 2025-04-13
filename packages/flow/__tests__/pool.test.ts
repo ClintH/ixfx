@@ -7,7 +7,7 @@ test(`sharing`, () => {
     capacity: 3,
     fullPolicy: `error`,
     capacityPerResource: 2,
-    generate: () => `random-${ ++generated }`,
+    generate: () => `random-${ (++generated).toString() }`,
   });
 
   const used: any[] = [];
@@ -17,6 +17,7 @@ test(`sharing`, () => {
   used.push(p.use(`d`));
   used.push(p.use(`e`));
   used.push(p.use(`f`));
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   const data = used.map(u => u.data);
 
   // Expect to see each resource being used twice due to capacityPerResource:2
@@ -70,14 +71,13 @@ test(`removing-resources`, () => {
 });
 
 test(`evictOldestUser`, () => {
-  //eslint-disable-next-line functional/no-let
   let generated = 0;
   const p = new Pool.Pool<string>({
     capacity: 3,
     debug: false,
     fullPolicy: `evictOldestUser`,
     capacityPerResource: 1,
-    generate: () => `random-${ ++generated }`,
+    generate: () => `random-${ (++generated).toString() }`,
   });
 
   const uA = p.use(`a`);

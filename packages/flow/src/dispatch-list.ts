@@ -7,7 +7,7 @@ type Wrap<V> = {
 }
 
 export class DispatchList<V> {
-  #handlers: Array<Wrap<V>>
+  #handlers: Wrap<V>[]
   #counter = 0;
   readonly #id = Math.floor(Math.random() * 100);
   constructor() {

@@ -1,5 +1,5 @@
 import { intervalToMs } from "@ixfxfun/core";
-import { continuously } from "@ixfxfun/flow";
+import { continuously } from "@ixfxfun/core";
 import type { CountOptions } from "./types.js";
 import { initLazyStream } from "../init-stream.js";
 

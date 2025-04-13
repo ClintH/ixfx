@@ -1,14 +1,10 @@
 export * from './correlate.js';
 export * from './moving-average.js';
 export * from './numbers-compute.js';
-export * from './pool.js';
-export * from './resolve-fields.js';
-export * from './weighted-random.js';
-import * as arrays from '@ixfxfun/arrays';
-export { arrays }
-// export * as dom from '@ixfxfun/dom';
-// export * as debug from '@ixfxfun/debug';
-// export * from '@ixfxfun/core';
+export * as arrays from '@ixfxfun/arrays';
+export * as dom from '@ixfxfun/dom';
+export * as debug from '@ixfxfun/debug';
+export * from '@ixfxfun/core';
 
 // "@ixfxfun/arrays": "workspace:^",
 // "@ixfxfun/dom": "workspace:^",

@@ -1,7 +1,5 @@
-//import type { ReactiveNonInitial } from "src/rx/Types.js";
-import { zip } from "@ixfxfun/arrays";
-import { resolve, resolveSync, type ResolveToValue } from "../../core/src/resolve-core.js";
-import type { ReactiveNonInitial } from "../../core/src/types-reactive.js";
+import { resolve, resolveSync, type ReactiveNonInitial, type ResolveToValue } from "@ixfxfun/core";
+import { zip } from "./util/zip.js";
 // import { zip } from "./arrays/Zip.js";
 
 export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
@@ -17,7 +15,7 @@ export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
     T[ K ] extends AsyncGenerator<infer V> ? V :
     T[ K ] extends IterableIterator<infer V> ? V :
     T[ K ] extends AsyncIterableIterator<infer V> ? V :
-    T[ K ] extends Array<infer V> ? V : // array needed?
+    T[ K ] extends (infer V)[] ? V : // array needed?
     T[ K ] extends object ? T[ K ] : never
   };
 

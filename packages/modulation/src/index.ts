@@ -1,4 +1,4 @@
-export * as Envelopes from './envelope/index.js';
+export * as Modulation from './envelope/index.js';
 export * as Sources from './source/index.js';
 export * from './cubic-bezier.js'
 export * from './drift.js';
@@ -16,3 +16,4 @@ export * from './timing-source-factory.js';
 export type * from './types.js';
 export * from './waveforms.js';
 export * from './weighted-average.js';
+export * from './weighted-random.js';

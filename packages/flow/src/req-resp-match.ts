@@ -1,5 +1,6 @@
+/* eslint-disable unicorn/prevent-abbreviations */
+import { continuously } from "@ixfxfun/core"
 import { SimpleEventEmitter } from "@ixfxfun/events"
-import { continuously } from "../../core/src/continuously.js"
 
 export type RequestResponseOptions<TRequest, TResp> = {
   timeoutMs: number
@@ -146,7 +147,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
     const now = Date.now();
     for (const v of values) {
       const expire = now - v.expiresAt;
-      console.log(`${ v.id } Expires in: ${ Math.floor(expire / 1000) }s`);
+      console.log(`${ v.id } Expires in: ${ Math.floor(expire / 1000).toString() }s`);
     }
   }
 

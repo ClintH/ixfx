@@ -61,12 +61,12 @@ export class SyncWait {
    */
   async forSignal(maximumWaitMs?: number) {
     let p = this.#promise;
-    if (!p) p = this.#initPromise();
+    p ??= this.#initPromise();
     if (maximumWaitMs) {
       const reject = this.#reject;
       setTimeout(() => {
         if (reject) {
-          reject(`Timeout elapsed ${ maximumWaitMs }`);
+          reject(`Timeout elapsed ${ maximumWaitMs.toString() }`);
         }
       }, maximumWaitMs);
     }

@@ -31,9 +31,7 @@ export const throttle = (
   ) => void | Promise<unknown>,
   intervalMinMs: number
 ) => {
-  //eslint-disable-next-line functional/no-let
   let trigger = 0;
-  //eslint-disable-next-line functional/prefer-immutable-types
   return async (...args: unknown[]) => {
     const elapsed = performance.now() - trigger;
     if (elapsed >= intervalMinMs) {

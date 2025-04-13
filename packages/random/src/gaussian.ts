@@ -6,15 +6,15 @@ import type { RandomSource } from "./types.js";
  * 
  * @example Random number between 0..1 with gaussian distribution
  * ```js
- * Random.gaussian();
+ * gaussian();
  * ```
  * 
  * @example Distribution can be skewed
  * ```js
- * Random.gaussian(10);
+ * gaussian(10);
  * ```
  * 
- * Use {@link gaussianSource} if you want a function
+ * Use {@link gaussianSource} if you want a function with skew value baked-in.
  * @param skew Skew factor. Defaults to 1, no skewing. Above 1 will skew to left, below 1 will skew to right
  * @returns 
  */
@@ -26,7 +26,7 @@ export const gaussian = (skew = 1) => gaussianSource(skew)();
  * Random number between 0..1 with gaussian distribution
  * ```js
  * // Create function
- * const r = Random.gaussianFn();
+ * const r = gaussianSource();
  *
  * // Generate random value
  * r();
@@ -35,11 +35,13 @@ export const gaussian = (skew = 1) => gaussianSource(skew)();
  * @example
  * Pass the random number generator elsewhere
  * ```js
- * const r = Random.gaussianFn(10);
+ * const r = gaussianSource(10);
  *
  * // Randomise array with gaussian distribution
  * Arrays.shuffle(r);
  * ```
+ * 
+ * If you want to fit a value to a gaussian curve, see Modulation.gaussian instead.
  * @param skew
  * @returns
  */
@@ -51,7 +53,6 @@ export const gaussianSource = (skew = 1): RandomSource => {
   const compute = (): number => {
     const u = calculateNonZero();
     const v = calculateNonZero();
-    //eslint-disable-next-line functional/no-let
     let result = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 
     result = result / 10 + 0.5; // Translate to 0 -> 1

@@ -6,6 +6,7 @@ export * from './ensure-length.js'
 export * from './equality.js';
 export * from './filter.js';
 export * from './flatten.js';
+export * from './frequency.js';
 export * from './group-by.js';
 export * from './unique.js';
 export * from './insert-at.js';

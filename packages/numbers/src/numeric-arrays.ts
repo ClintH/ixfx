@@ -2,10 +2,8 @@
  * Applies a function `fn` to the elements of an array, weighting them based on their relative position.
  *
  * ```js
- * import { weight } from 'https://unpkg.com/ixfx/dist/numbers.js';
- * import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * // Six items
- * weight([1,1,1,1,1,1], gaussian());
+ * weight([1,1,1,1,1,1], Modulation.gaussian());
  *
  * // Yields:
  * // [0.02, 0.244, 0.85, 0.85, 0.244, 0.02]
@@ -24,21 +22,25 @@
  * // [0, 0.2, 0.4, 0.6, 0.8, 1]
  * ```
  *
- * Non-numbers in `data` will be silently ignored (this filtering happens first, so relative index values are sane still).
- *
+ * Throws TypeError if `data` is not an array or for any element not a number.
  * @param data Array of numbers
  * @param fn Returns a weighting based on the given relative position. If unspecified, `(x) => x` is used.
  */
 export const weight = (
-  data: Array<number> | ReadonlyArray<number>,
+  data: number[] | readonly number[],
   fn?: (relativePos: number) => number
-): Array<number> => {
-  const f = fn ?? ((x: number) => x);
-  const valid = validNumbers(data);
-  return valid.map(
-    (v: number, index: number) => {
-      const x = v * f(index / (valid.length - 1));
-      return x;
+): number[] => {
+  if (!Array.isArray(data)) throw new TypeError(`Param 'data' is expected to be an array. Got type: ${ typeof data }`);
+  const weightingFunction = fn ?? ((x: number) => x);
+  return data.map(
+    (value: number, index: number) => {
+      if (typeof value !== `number`) throw new TypeError(`Param 'data' contains non-number at index: '${ index }'. Type: '${ typeof value }' value: '${ value }'`);
+      const relativePos = index / (data.length - 1);
+      const weightForPosition = weightingFunction(relativePos);
+      if (typeof weightForPosition !== `number`) throw new TypeError(`Weighting function returned type '${ typeof weightForPosition }' rather than number for input: '${ relativePos }'`);
+      const finalResult = value * weightForPosition;
+      //console.log(`finalResult: ${ finalResult.toFixed(2) } rel: ${ relativePos.toFixed(2) } weightForPosition: ${ weightForPosition.toFixed(2) } input: ${ value } index: ${ index }`);
+      return finalResult;
     }
   );
 };
@@ -49,7 +51,7 @@ export const weight = (
  * @param data
  * @returns
  */
-export const validNumbers = (data: ReadonlyArray<number>) =>
+export const validNumbers = (data: readonly number[]) =>
   data.filter((d) => typeof d === `number` && !Number.isNaN(d));
 
 /**
@@ -58,7 +60,7 @@ export const validNumbers = (data: ReadonlyArray<number>) =>
  * @returns
  */
 export const dotProduct = (
-  values: ReadonlyArray<ReadonlyArray<number>>
+  values: readonly (readonly number[])[]
 ): number => {
   let r = 0;
   const length = values[ 0 ].length;
@@ -98,7 +100,7 @@ export const dotProduct = (
  * @param data Data to average.
  * @returns Average of array
  */
-export const average = (data: ReadonlyArray<number>): number => {
+export const average = (data: readonly number[]): number => {
   // ✔ UNIT TESTED
   if (data === undefined) throw new Error(`data parameter is undefined`);
   const valid = validNumbers(data);
@@ -117,7 +119,7 @@ export const average = (data: ReadonlyArray<number>): number => {
  * @param data
  * @returns Minimum number
  */
-export const min = (data: ReadonlyArray<number>): number =>
+export const min = (data: readonly number[]): number =>
   Math.min(...validNumbers(data));
 
 /**
@@ -130,7 +132,7 @@ export const min = (data: ReadonlyArray<number>): number =>
  * @param data Array of numbers
  * @returns Index of largest value
  */
-export const maxIndex = (data: ReadonlyArray<number>): number =>
+export const maxIndex = (data: readonly number[]): number =>
 
   data.reduce(
     (bestIndex, value, index, array) =>
@@ -149,7 +151,7 @@ export const maxIndex = (data: ReadonlyArray<number>): number =>
  * @param data Array of numbers
  * @returns Index of smallest value
  */
-export const minIndex = (...data: ReadonlyArray<number>): number =>
+export const minIndex = (...data: readonly number[]): number =>
 
   data.reduce(
     (bestIndex, value, index, array) =>
@@ -168,7 +170,7 @@ export const minIndex = (...data: ReadonlyArray<number>): number =>
  * @param data List of numbers
  * @returns Maximum number
  */
-export const max = (data: ReadonlyArray<number>): number =>
+export const max = (data: readonly number[]): number =>
   Math.max(...validNumbers(data));
 
 /**
@@ -182,7 +184,7 @@ export const max = (data: ReadonlyArray<number>): number =>
  * @param data Array of numbers
  * @returns Total
  */
-export const total = (data: ReadonlyArray<number>): number =>
+export const total = (data: readonly number[]): number =>
   data.reduce((previous, current) => {
     if (typeof current !== `number`) return previous;
     if (Number.isNaN(current)) return previous;
@@ -202,7 +204,7 @@ export const total = (data: ReadonlyArray<number>): number =>
  * @param data
  * @returns Maximum
  */
-export const maxFast = (data: ReadonlyArray<number> | Float32Array): number => {
+export const maxFast = (data: readonly number[] | Float32Array): number => {
   let m = Number.MIN_SAFE_INTEGER;
   for (const datum of data) {
     m = Math.max(m, datum);
@@ -222,7 +224,7 @@ export const maxFast = (data: ReadonlyArray<number> | Float32Array): number => {
  * @param data
  * @returns Maximum
  */
-export const totalFast = (data: ReadonlyArray<number> | Float32Array): number => {
+export const totalFast = (data: readonly number[] | Float32Array): number => {
   let m = 0;
   for (const datum of data) {
     m += datum;
@@ -242,7 +244,7 @@ export const totalFast = (data: ReadonlyArray<number> | Float32Array): number =>
  * @param data
  * @returns Maximum
  */
-export const minFast = (data: ReadonlyArray<number> | Float32Array): number => {
+export const minFast = (data: readonly number[] | Float32Array): number => {
   let m = Number.MIN_SAFE_INTEGER;
   for (const datum of data) {
     m = Math.min(m, datum);

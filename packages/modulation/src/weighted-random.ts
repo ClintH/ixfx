@@ -1,5 +1,5 @@
-import {  type RandomSource } from '@ixfxfun/random';
-import { type EasingName, get as EasingGet } from '@ixfxfun/modulation/easing';
+import type { RandomSource } from "@ixfxfun/random";
+import { get, type EasingName } from "./easing/index.js";
 
 /**
  * Options for producing weighted distribution
@@ -59,8 +59,8 @@ export const weightedSource = (
       : easingNameOrOptions;
   const source = options.source ?? Math.random;
   const easingName = options.easing ?? `quadIn`;
-  const easingFunction = EasingGet(easingName);
-  if (easingFunction === undefined) {
+  const easingFunction = get(easingName);
+  if (typeof easingFunction === `undefined`) {
     throw new Error(`Easing function '${ easingName }' not found.`);
   }
 

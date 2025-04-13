@@ -1,51 +1,85 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { test, expect, assert } from 'vitest';
 import * as R from '../src/index.js';
-import { integerArrayTest, rangeIntegerTest, rangeTest } from '@ixfxfun/guards';
+import { rangeIntegerTest, rangeTest } from '@ixfxfun/guards';
+import { frequencyByGroup } from '../src/util/frequency.js';
 
+const groupByTens = (v: number) => Math.floor(v * 10);
 const repeat = <V>(count: number, fn: () => V): V[] => {
-  let ret: any[] = [];
+  const returnValue: V[] = [];
   while (count-- > 0) {
-    ret.push(fn());
+    returnValue.push(fn());
   }
-  return ret;
+  return returnValue;
 }
 
+test(`gaussian`, () => {
+  const tests = 10_000;
+  const r1: number[] = [];
+  const g = R.gaussianSource();
+  while (r1.length < tests) {
+    r1.push(g());
+  };
+
+  const frequency = [ ...frequencyByGroup(groupByTens, r1).entries() ];
+  for (const entry of frequency) {
+    entry[ 1 ] = Math.floor((entry[ 1 ] / tests) * 100);
+  }
+  frequency.sort((a, b) => a[ 0 ] > b[ 0 ] ? 1 : a[ 0 ] === b[ 0 ] ? 0 : -1);
+
+  expect(frequency.at(0)![ 1 ]).toBe(0);
+  expect(frequency.at(-1)![ 1 ]).toBe(0);
+
+  expect(frequency.at(1)![ 1 ]).toBeOneOf([ 2, 1, 0 ]);
+  expect(frequency.at(-2)![ 1 ]).toBeOneOf([ 2, 1, 0 ]);
+
+  expect(frequency.at(2)![ 1 ]).toBeOneOf([ 14, 13, 12 ]);
+  expect(frequency.at(-3)![ 1 ]).toBeOneOf([ 14, 13, 12 ]);
+
+  expect(frequency.at(3)![ 1 ]).toBeOneOf([ 35, 34, 33 ]);
+  expect(frequency.at(-4)![ 1 ]).toBeOneOf([ 35, 34, 33 ]);
+
+});
+
 test(`mersenne-twister-seed`, () => {
-  let tests = 10_000;
+  const tests = 10_000;
   const mt1 = R.mersenneTwister(100);
-  let r1: number[] = [];
-  for (let i = 0; i < tests; i++) {
+  const r1: number[] = [];
+  for (let index = 0; index < tests; index++) {
     r1.push(mt1.float());
   }
 
   const mt2 = R.mersenneTwister(100);
-  let r2: number[] = [];
-  for (let i = 0; i < tests; i++) {
+  const r2: number[] = [];
+  for (let index = 0; index < tests; index++) {
     r2.push(mt2.float());
   }
 
-  for (let i = 0; i < tests; i++) {
-    expect(r1[ i ]).toBe(r2[ i ]);
+  for (let index = 0; index < tests; index++) {
+    expect(r1[ index ]).toBe(r2[ index ]);
   }
 })
 
 test(`mersenne-twister-integer`, () => {
   const mt = R.mersenneTwister();
-  let tests = 10_000;
-  for (let i = 0; i < tests; i++) {
-    let v = mt.integer(10);
+  const tests = 10_000;
+  for (let index = 0; index < tests; index++) {
+    const v = mt.integer(10);
     expect(v < 10).toBe(true);
 
   }
 
-  for (let i = 0; i < tests; i++) {
-    let v = mt.integer(10, 5);
+  for (let index = 0; index < tests; index++) {
+    const v = mt.integer(10, 5);
     expect(v >= 5).toBe(true);
     expect(v < 10).toBe(true);
   }
 
 })
-test(`integerUniqueGen`, async () => {
+test(`integerUniqueGen`, () => {
   const d = [ ...R.integerUniqueGen(10) ];
   assert.sameMembers(d, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]);
 });
@@ -85,11 +119,11 @@ test(`integer`, () => {
   expect(() => R.integer({ max: 5, min: 10 })).toThrow();
   expect(() => R.integer(0)).toThrow();
   expect(() => R.integer(Number.NaN)).toThrow();
-  // @ts-ignore
+  // @ts-expect-error
   expect(() => integer('hello')).toThrow();
 });
 
-test('float', async () => {
+test('float', () => {
   const runs = 10 * 1000;
 
   expect(rangeTest(repeat(runs, () => R.float(10)), {

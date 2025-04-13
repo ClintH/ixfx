@@ -1,5 +1,6 @@
-import type { HasCompletion } from "@ixfxfun/flow"
+import type { HasCompletion } from "@ixfxfun/core"
 
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type ModSettableOptions = {
   /**
    * Starting absolute value of source.
@@ -15,6 +16,7 @@ export type ModSettableOptions = {
    */
   cycleLimit: number
 }
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type ModSettableFeedback = {
   /**
    * If set, resets absolute position of clock
@@ -25,7 +27,7 @@ export type ModSettableFeedback = {
    */
   resetAtRelative: number
 }
-
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type ModSettable = (feedback?: Partial<ModSettableFeedback>) => number
 
 /**
@@ -35,6 +37,7 @@ export type ModSettable = (feedback?: Partial<ModSettableFeedback>) => number
  * 
  * See Modulation.Sources for more.
  */
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type ModSource = (feedback?: any) => number
 
 /**

@@ -23,6 +23,7 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
       // "@typescript-eslint/ban-ts-comment": "off",
       // "@typescript-eslint/array-type": ["error", { "default": "generic" }],
       // "@typescript-eslint/no-unsafe-member-access": "off",

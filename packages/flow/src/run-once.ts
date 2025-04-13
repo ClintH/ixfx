@@ -13,9 +13,7 @@
  * @returns
  */
 export const runOnce = (onRun: () => boolean): (() => boolean) => {
-  //eslint-disable-next-line functional/no-let
   let run = false;
-  //eslint-disable-next-line functional/no-let
   let success = false;
   return () => {
     if (run) return success;

@@ -49,7 +49,7 @@ export const movingAverage = (
     discardPolicy: `older`,
   });
 
-  return (v?: number | undefined) => {
+  return (v?: number) => {
     const r = numberTest(v);
     if (r[ 0 ] && v !== undefined) {
       q.enqueue(v);

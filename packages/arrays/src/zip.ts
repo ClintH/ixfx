@@ -25,12 +25,12 @@ import { isContentsTheSame } from "./equality.js";
  * @returns Zipped together array
  */
 export const zip = (
-  ...arrays: Array<Array<any>> | ReadonlyArray<Array<any>> | ReadonlyArray<ReadonlyArray<any>>
-): Array<any> => {
+  ...arrays: any[][] | readonly any[][] | readonly (readonly any[])[]
+): any[] => {
   if (arrays.some((a) => !Array.isArray(a))) {
     throw new Error(`All parameters must be an array`);
   }
-  const lengths = arrays.map((a) => a.length);
+  const lengths = arrays.map((a) => (a as any[]).length);
   if (!isContentsTheSame(lengths)) {
     throw new Error(`Arrays must be of same length`);
   }
@@ -39,6 +39,7 @@ export const zip = (
   const length = lengths[ 0 ];
 
   for (let index = 0; index < length; index++) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     returnValue.push(arrays.map((a) => a[ index ]));
   }
   return returnValue;

@@ -1,5 +1,5 @@
 
-import { continuously } from "@ixfxfun/flow";
+import { continuously } from "@ixfxfun/core";
 import { intervalToMs } from "@ixfxfun/core";
 import { initLazyStream } from "../init-stream.js";
 import type { Reactive, ReactiveFinite, ReactiveInitial } from "../types.js";

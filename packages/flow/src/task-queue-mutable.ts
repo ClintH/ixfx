@@ -1,6 +1,6 @@
 import { SimpleEventEmitter } from '@ixfxfun/events';
 import { Queues } from '@ixfxfun/collections';
-import { continuously } from '../../core/src/continuously.js';
+import { continuously } from '@ixfxfun/core';
 
 export type AsyncTask = () => Promise<void>;
 

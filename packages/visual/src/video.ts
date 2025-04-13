@@ -1,21 +1,18 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion,functional/immutable-data */
-import { continuously, delayLoop } from '@ixfxfun/flow';
+import { continuously } from '@ixfxfun/core';
+import { delayLoop } from '@ixfxfun/flow';
 
-//eslint-disable-next-line functional/no-mixed-types
 export type Capturer = {
   start(): void;
   cancel(): void;
   readonly canvasEl: HTMLCanvasElement;
 };
 
-//eslint-disable-next-line functional/no-mixed-types
 export type ManualCapturer = {
   capture(): ImageData;
   readonly canvasEl: HTMLCanvasElement;
   dispose(): void;
 };
 
-//eslint-disable-next-line functional/no-mixed-types
 export type CaptureOpts = {
   /**
    * Delay between reading frames.
@@ -31,7 +28,6 @@ export type CaptureOpts = {
   readonly onFrame?: (pixels: ImageData) => void;
 };
 
-//eslint-disable-next-line functional/no-mixed-types
 export type ManualCaptureOpts = {
   /**
    * If true, the intermediate canvas is shown
@@ -99,7 +95,7 @@ export type FramesOpts = {
  * @param sourceVideoEl
  * @param opts
  */
-//eslint-disable-next-line func-style
+
 export async function* frames(
   sourceVideoEl: HTMLVideoElement,
   opts: FramesOpts = {}
@@ -110,9 +106,7 @@ export async function* frames(
   const maxIntervalMs = opts.maxIntervalMs ?? 0;
 
   const showCanvas = opts.showCanvas ?? false;
-  //eslint-disable-next-line functional/no-let
   let canvasEl = opts.canvasEl;
-  //eslint-disable-next-line functional/no-let
   let w, h;
   w = h = 0;
 
@@ -135,7 +129,6 @@ export async function* frames(
     canvasEl.height = h;
   };
 
-  //eslint-disable-next-line functional/no-let
   let c: CanvasRenderingContext2D | null = null;
 
   const looper = delayLoop(maxIntervalMs);
@@ -254,7 +247,6 @@ export const capture = (
     if (c === null) c = canvasEl.getContext(`2d`);
     if (c === null) return;
     c.drawImage(sourceVideoEl, 0, 0, w, h);
-    //eslint-disable-next-line functional/no-let
     let pixels: ImageData | undefined;
 
     if (getPixels) {
@@ -285,8 +277,8 @@ export const capture = (
   }, maxIntervalMs);
 
   return {
-    start: () => loop.start(),
-    cancel: () => loop.cancel(),
+    start: () => { loop.start(); },
+    cancel: () => { loop.cancel(); },
     canvasEl,
   };
 };
@@ -303,7 +295,6 @@ export const manualCapture = (
 
   // Create canvas if necessary
   const definedCanvasEl = opts.canvasEl !== undefined;
-  //eslint-disable-next-line functional/no-let
   let canvasEl = opts.canvasEl;
   if (!canvasEl) {
     canvasEl = document.createElement(`CANVAS`) as HTMLCanvasElement;
@@ -316,18 +307,15 @@ export const manualCapture = (
   canvasEl.height = h;
 
   const capture = (): ImageData => {
-    //eslint-disable-next-line functional/no-let
     let c: CanvasRenderingContext2D | undefined | null;
 
     // Draw current frame from video element to canvas
-    if (!c) c = canvasEl?.getContext(`2d`, { willReadFrequently: true });
+    if (!c) c = canvasEl.getContext(`2d`, { willReadFrequently: true });
     if (!c) throw new Error(`Could not create graphics context`);
     c.drawImage(sourceVideoEl, 0, 0, w, h);
 
-    //eslint-disable-next-line functional/no-let
     const pixels = c.getImageData(0, 0, w, h);
 
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     (pixels as any).currentTime = sourceVideoEl.currentTime;
 
     if (opts.postCaptureDraw) opts.postCaptureDraw(c, w, h);
@@ -337,7 +325,7 @@ export const manualCapture = (
   const dispose = (): void => {
     if (definedCanvasEl) return; // we didn't create it
     try {
-      canvasEl?.remove();
+      canvasEl.remove();
     } catch (_) {
       // no-op
     }

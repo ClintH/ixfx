@@ -6,8 +6,7 @@
 		"rebuild":"pnpm run clean && pnpm  run build",
 		"test": "vitest --api",
 		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint",
-		"demos": "rm -rf ../ixfxfun/demos/ixfx/ && npm run demos:copy",
-		"demos:copy": "copyfiles --up 1 ./packages/ixfx/dist/**/* ../ixfxfun/demos/"
+		"demos": "rm -rf ../ixfxfun/demos/_lib/ && npm run demos:copy"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.12",

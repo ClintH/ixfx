@@ -1,8 +1,10 @@
 import { throwIntegerTest } from '@ixfxfun/guards';
 /**
- * Samples array
+ * Samples values from an array. If `amount` is less or equal to 1, it's treated as a percentage to sample.
+ * Otherwise it's treated as every _n_th value to sample.
  *
- * @example By percentage - get half of the items
+ * @example 
+ * By percentage - get half of the items
  * ```
  * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
@@ -11,7 +13,8 @@ import { throwIntegerTest } from '@ixfxfun/guards';
  * // Yields: [2, 4, 6, 8, 10]
  * ```
  *
- * @example By steps - every third
+ * @example
+ * By steps - every third value
  * ```
  * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
  *
@@ -25,6 +28,7 @@ import { throwIntegerTest } from '@ixfxfun/guards';
  * @returns
  */
 export const sample = <V>(array: ArrayLike<V>, amount: number): V[] => {
+  if (!Array.isArray(array)) throw new TypeError(`Param 'array' is not actually an array. Got type: ${ typeof array }`);
   let subsampleSteps = 1;
   if (amount <= 1) {
     // Subsample based on a percentage

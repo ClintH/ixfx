@@ -1,16 +1,14 @@
 import { test, expect } from 'vitest';
 import { resolve, resolveWithFallback } from '../../core/src/resolve-core.js';
-//import { resolveFields } from '../../ixfx/src/resolve-fields.js';
+
 
 import * as Numbers from '@ixfxfun/numbers';
 import * as Flow from '@ixfxfun/flow';
 import * as Rx from '@ixfxfun/rx';
-//import * as RxFrom from '@ixfxfun/rx/from';
 
 
 import { count, sleep } from '@ixfxfun/core';
-import { resolveFields } from '../src/resolve-fields.js';
-// import { repeat } from '../../flow/Repeat.js';
+import { resolveFields } from '../../core/src/resolve-fields.js';
 
 test(`with-fallback`, async () => {
   let triggered = 0;
@@ -95,15 +93,15 @@ test('resolve-fields-async', async () => {
   };
 
   // Each time we call resolveFields, r1.gen should match for index
-  for (let i = 0; i < c + 1; i++) {
+  for (let index = 0; index < c + 1; index++) {
     const r1 = await resolveFields(s1);
     expect(r1.colour).toBe(`red`);
-    if (i === c) {
+    if (index === c) {
       // Test if generator ends
       expect(r1.gen).toBeFalsy();
     } else {
       expect(typeof r1.gen).toBe(`number`);
-      expect(r1.gen).toBe(i);
+      expect(r1.gen).toBe(index);
     }
   }
 
@@ -132,15 +130,15 @@ test(`resolve-fields`, async () => {
   };
 
   // Each time we call resolveFields, r1.gen should match for index
-  for (let i = 0; i < c + 1; i++) {
+  for (let index = 0; index < c + 1; index++) {
     const r1 = await resolveFields(s1);
     expect(r1.colour).toBe(`red`);
-    if (i === c) {
+    if (index === c) {
       // Test if generator ends
       expect(r1.gen).toBeFalsy();
     } else {
       expect(typeof r1.gen).toBe(`number`);
-      expect(r1.gen).toBe(i);
+      expect(r1.gen).toBe(index);
     }
   }
 });
