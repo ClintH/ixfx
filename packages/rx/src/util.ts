@@ -1,4 +1,4 @@
-import { isIterable } from "@ixfxfun/iterables";
+import { isIterable } from "@ixfx/iterables";
 import type { Passed, PassedSignal, PassedValue, Reactive, ReactiveDiff, ReactiveInitial, ReactiveOrSource, ReactivePingable, ReactiveWritable, Wrapped } from "./types.js";
 import type { Trigger, TriggerValue, TriggerFunction, TriggerGenerator } from "./from/types.js";
 

@@ -1,9 +1,9 @@
-import { elapsedSince, sleep } from '@ixfxfun/core';
-import { resolveLogOption } from '@ixfxfun/debug';
-import { throwIntegerTest, throwNumberTest } from '@ixfxfun/guards';
-import { getErrorMessage } from '@ixfxfun/debug';
-import type { Result } from '@ixfxfun/core';
-import { elapsedToHumanString } from '@ixfxfun/core';
+import { elapsedSince, sleep } from '@ixfx/core';
+import { resolveLogOption } from '@ixfx/debug';
+import { throwIntegerTest, throwNumberTest } from '@ixfx/guards';
+import { getErrorMessage } from '@ixfx/debug';
+import type { Result } from '@ixfx/core';
+import { elapsedToHumanString } from '@ixfx/core';
 /**
  * Result of backoff
  */

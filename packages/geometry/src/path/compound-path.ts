@@ -2,7 +2,7 @@ import { bbox as PointsBbox } from '../point/bbox.js';
 import { isEqual as PointsIsEqual } from '../point/is-equal.js';
 import type { Point } from '../point/point-type.js';
 import { corners as RectsCorners } from '../rect/corners.js';
-import { sortByNumericProperty } from '@ixfxfun/arrays';
+import { sortByNumericProperty } from '@ixfx/arrays';
 import { getEnd, getStart } from './start-end.js';
 import type { CompoundPath, Dimensions, Path } from './path-type.js';
 import type { RectPositioned } from '../rect/rect-types.js';
@@ -31,7 +31,7 @@ export const setSegment = (compoundPath: CompoundPath, index: number, path: Path
  * @param dimensions Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-export const interpolate = (paths: ReadonlyArray<Path>, t: number, useWidth?: boolean, dimensions?: Dimensions) => {
+export const interpolate = (paths: readonly Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
@@ -59,7 +59,7 @@ export const interpolate = (paths: ReadonlyArray<Path>, t: number, useWidth?: bo
  * @param point 
  * @returns 
  */
-export const distanceToPoint = (paths: ReadonlyArray<Path>, point: Point): number => {
+export const distanceToPoint = (paths: readonly Path[], point: Point): number => {
   if (paths.length === 0) return 0;
   let distances = paths.map((p, index) => ({ path: p, index, distance: p.distanceToPoint(point) }));
   distances = sortByNumericProperty(distances, `distance`);
@@ -75,7 +75,7 @@ export const distanceToPoint = (paths: ReadonlyArray<Path>, point: Point): numbe
  * @param dimensions Pre-computed dimensions
  * @returns 
  */
-export const relativePosition = (paths: ReadonlyArray<Path>, point: Point, intersectionThreshold: number, dimensions?: Dimensions): number => {
+export const relativePosition = (paths: readonly Path[], point: Point, intersectionThreshold: number, dimensions?: Dimensions): number => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
@@ -107,7 +107,7 @@ export const relativePosition = (paths: ReadonlyArray<Path>, point: Point, inter
  * @param paths
  * @returns
  */
-export const computeDimensions = (paths: ReadonlyArray<Path>): Dimensions => {
+export const computeDimensions = (paths: readonly Path[]): Dimensions => {
   const widths = paths.map(l => l.bbox().width);
   const lengths = paths.map(l => l.length());
   let totalLength = 0;
@@ -128,7 +128,7 @@ export const computeDimensions = (paths: ReadonlyArray<Path>): Dimensions => {
  * @param paths
  * @returns
  */
-export const bbox = (paths: ReadonlyArray<Path>): RectPositioned => {
+export const bbox = (paths: readonly Path[]): RectPositioned => {
   const boxes = paths.map(p => p.bbox());
   const corners = boxes.flatMap(b => RectsCorners(b));
 
@@ -141,14 +141,14 @@ export const bbox = (paths: ReadonlyArray<Path>): RectPositioned => {
  * @param paths
  * @returns
  */
-export const toString = (paths: ReadonlyArray<Path>): string => paths.map(p => p.toString()).join(`, `);
+export const toString = (paths: readonly Path[]): string => paths.map(p => p.toString()).join(`, `);
 
 /**
  * Throws an error if paths are not connected together, in order
  *
  * @param paths
  */
-export const guardContinuous = (paths: ReadonlyArray<Path>) => {
+export const guardContinuous = (paths: readonly Path[]) => {
   let lastPos = getEnd(paths[ 0 ]);
   for (let index = 1; index < paths.length; index++) {
     const start = getStart(paths[ index ]);
@@ -157,7 +157,7 @@ export const guardContinuous = (paths: ReadonlyArray<Path>) => {
   }
 };
 
-export const toSvgString = (paths: ReadonlyArray<Path>): ReadonlyArray<string> => paths.flatMap(p => p.toSvgString());
+export const toSvgString = (paths: readonly Path[]): readonly string[] => paths.flatMap(p => p.toSvgString());
 
 /**
  * Create a compoundpath from an array of paths.
@@ -166,7 +166,7 @@ export const toSvgString = (paths: ReadonlyArray<Path>): ReadonlyArray<string> =
  * @param paths
  * @returns
  */
-export const fromPaths = (...paths: ReadonlyArray<Path>): CompoundPath => {
+export const fromPaths = (...paths: readonly Path[]): CompoundPath => {
   guardContinuous(paths); // Throws an error if paths are not connected
   const dims = computeDimensions(paths);
 

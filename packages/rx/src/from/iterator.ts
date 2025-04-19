@@ -1,11 +1,11 @@
- 
-import { nextWithTimeout } from "@ixfxfun/iterables/async";
-import { intervalToMs } from "@ixfxfun/core";
+
+import { nextWithTimeout } from "@ixfx/iterables/async";
+import { intervalToMs } from "@ixfx/core";
 import { initLazyStream } from "../init-stream.js";
-import { isAsyncIterable } from "@ixfxfun/iterables";
+import { isAsyncIterable } from "@ixfx/iterables";
 import type { Reactive } from "../types.js";
 import type { GeneratorOptions } from "./types.js";
-import * as StateMachine from "@ixfxfun/flow/state-machine";
+import * as StateMachine from "@ixfx/flow/state-machine";
 
 /**
  * Creates a Reactive from an AsyncGenerator or Generator
@@ -63,7 +63,7 @@ export function iterator<V>(source: IterableIterator<V> | V[] | AsyncIterableIte
     processing_result: [ `queued`, `disposed`, `stopping` ],
     queued: [ `wait_for_next`, `disposed`, `stopping` ],
     stopping: `idle`,
-     
+
     disposed: null
   }, `idle`);
 

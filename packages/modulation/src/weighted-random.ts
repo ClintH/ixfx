@@ -1,4 +1,4 @@
-import type { RandomSource } from "@ixfxfun/random";
+import type { RandomSource } from "@ixfx/random";
 import { get, type EasingName } from "./easing/index.js";
 
 /**

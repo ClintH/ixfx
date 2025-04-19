@@ -3,7 +3,7 @@ import { func as fromFunction } from "./from/function.js";
 import type { GenOrData, LazyChain, DelayOptions, Link } from "./types.js";
 import { isGenFactoryNoInput, resolveToAsyncGen } from "./utility.js";
 import * as L from './links.js';
-import type { RankFunction, RankArrayOptions, RankOptions, Interval } from "@ixfxfun/core";
+import type { RankFunction, RankArrayOptions, RankOptions, Interval } from "@ixfx/core";
 import { Async } from "../index.js";
 
 const getLinkName = (c: Link<any, any>): string => {

@@ -1,5 +1,5 @@
-import { continuously } from '@ixfxfun/core';
-import { delayLoop } from '@ixfxfun/flow';
+import { continuously } from '@ixfx/core';
+import { delayLoop } from '@ixfx/flow';
 
 export type Capturer = {
   start(): void;

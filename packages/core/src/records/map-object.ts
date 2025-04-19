@@ -1,4 +1,4 @@
-import type { RemapObjectPropertyType } from "../ts-util.js";
+import type { RemapObjectPropertyType } from "../ts-utility.js";
 
 /**
  * Maps the top-level properties of an object through a map function.

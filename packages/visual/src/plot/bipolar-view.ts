@@ -1,8 +1,8 @@
 import * as Drawing from "../drawing.js";
-import {Bipolar} from "@ixfxfun/numbers";
-import {Queues} from "@ixfxfun/collections/";
+import { Bipolar } from "@ixfx/numbers";
+import { Queues } from "@ixfx/collections/";
 import * as Colour from "../colour/index.js";
-import { type CirclePositioned } from "@ixfxfun/geometry/circle";
+import { type CirclePositioned } from "@ixfx/geometry/circle";
 
 /**
  * Options

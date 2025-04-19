@@ -1,4 +1,4 @@
-import { throwNumberTest, throwPercentTest } from "@ixfxfun/guards";
+import { throwNumberTest, throwPercentTest } from "@ixfx/guards";
 import type { Point } from "../point/point-type.js";
 import type { Line } from "./line-type.js";
 import { getPointParameter } from "./get-points-parameter.js";

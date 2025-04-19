@@ -1,4 +1,4 @@
-import { observable } from "@ixfxfun/rx/from/observable";
+import { observable } from "@ixfx/rx/from/observable";
 
 /**
  * Observe when a class changes on a target element, by default the document.
@@ -12,7 +12,7 @@ import { observable } from "@ixfxfun/rx/from/observable";
  * ```
  */
 export const cssClassChange = (target = document.documentElement) => {
-  const m = observable<Array<MutationRecord>>(stream => {
+  const m = observable<MutationRecord[]>(stream => {
     const ro = new MutationObserver((entries) => {
       stream.set(entries);
     });

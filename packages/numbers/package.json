@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/numbers",
-	"version": "0.35.0",
+	"name": "@ixfx/numbers",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -14,8 +14,8 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/arrays": "workspace:^",
-		"@ixfxfun/guards": "workspace:^"
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/guards": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

@@ -1,4 +1,4 @@
-import type { Interval } from '@ixfxfun/core';
+import type { Interval } from '@ixfx/core';
 
 import {
   timeout,
@@ -74,10 +74,10 @@ export const debounce = (
 ): DebouncedFunction => {
   const t = timeout(callback, interval);
   //eslint-disable-next-line functional/prefer-immutable-types
-  return (...args: Array<unknown>) => { t.start(undefined, args); };
+  return (...args: unknown[]) => { t.start(undefined, args); };
 };
 
 /**
  * Debounced function
  */
-export type DebouncedFunction = (...args: ReadonlyArray<unknown>) => void;
+export type DebouncedFunction = (...args: readonly unknown[]) => void;

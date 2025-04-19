@@ -1,4 +1,4 @@
-import type { HasCompletion } from "@ixfxfun/core"
+import type { HasCompletion } from "@ixfx/core"
 
 // eslint-disable-next-line unicorn/prevent-abbreviations
 export type ModSettableOptions = {
@@ -49,7 +49,7 @@ export type ModSource = (feedback?: any) => number
  * * {@link Easings}: Easing functions
  * * {@link springShape}: Spring
  */
-export type Modulate = (v: number) => number
+export type ModulationFunction = (v: number) => number
 
 export type ModulatorTimed = HasCompletion & {
   /**

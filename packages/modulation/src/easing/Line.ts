@@ -1,5 +1,5 @@
-import {Points, Beziers} from '@ixfxfun/geometry';
-import { scale } from '@ixfxfun/numbers';
+import { Points, Beziers } from '@ixfx/geometry';
+import { scale } from '@ixfx/numbers';
 
 /**
  * Interpolates points along a line.
@@ -7,7 +7,7 @@ import { scale } from '@ixfxfun/numbers';
  * @param bend -1...1. -1 will pull line up, 1 will push it down.
  * @returns 
  */
-export const line = (bend: number = 0, warp: number = 0) => {
+export const line = (bend = 0, warp = 0) => {
   const max = 1;
   const cubicB = {
     x: scale(bend, -1, 1, 0, max),

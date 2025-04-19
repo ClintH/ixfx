@@ -1,7 +1,7 @@
 import * as Async from "../async.js";
 import type { GenOrData, GenFactoryNoInput, Gen } from "./types.js";
 import { isAsyncIterable } from "../index.js";
-import { sleep } from "@ixfxfun/core";
+import { sleep } from "@ixfx/core";
 
 export function isGenFactoryNoInput<Out>(c: any): c is GenFactoryNoInput<Out> {
   if (!(`_type` in c)) return false;

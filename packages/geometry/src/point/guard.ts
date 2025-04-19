@@ -1,5 +1,5 @@
 import type { Point, Point3d } from "./point-type.js";
-import { throwNumberTest } from '@ixfxfun/guards';
+import { throwNumberTest } from '@ixfx/guards';
 
 /**
  * Returns true if xy (and z, if present) are _null_.
@@ -50,11 +50,11 @@ export function guard(p: Point, name = `Point`) {
     );
   }
   if (typeof p.x !== `number`) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
     throw new TypeError(`'${ name }.x' must be a number. Got ${ typeof p.x }`);
   }
   if (typeof p.y !== `number`) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
     throw new TypeError(`'${ name }.y' must be a number. Got ${ typeof p.y }`);
   }
   if (p.z !== undefined) {

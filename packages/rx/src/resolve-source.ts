@@ -1,4 +1,4 @@
-import { isAsyncIterable, isIterable } from "@ixfxfun/iterables";
+import { isAsyncIterable, isIterable } from "@ixfx/iterables";
 import { func } from "./from/function.js";
 import { iterator } from "./from/iterator.js";
 import type { GeneratorOptions, FunctionOptions } from "./from/types.js";
@@ -30,7 +30,7 @@ export const resolveSource = <V>(source: ReactiveOrSource<V>, options: Partial<R
   if (isReactive(source)) return source;
   const generatorOptions = options.generator ?? { lazy: `initial`, interval: 5 }
   const functionOptions = options.function ?? { lazy: `very` }
-   
+
   if (Array.isArray(source)) {
     return iterator(source.values(), generatorOptions);
   } else if (typeof source === `function`) {

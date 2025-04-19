@@ -1,4 +1,4 @@
-import {Grids} from '@ixfxfun/geometry';
+import { Grids } from '@ixfx/geometry';
 import type { Rgb, Rgb8Bit } from './colour/index.js';
 import { toRgb8bit } from './colour/index.js';
 
@@ -121,7 +121,7 @@ export function* byColumn(image: ImageData) {
 
   //Grids.visitorRow
   for (let x = 0; x < g.cols; x++) {
-    const col: Array<Rgb8Bit> = [];
+    const col: Rgb8Bit[] = [];
     for (let y = 0; y < g.rows; y++) {
       const p = a({ x, y }, `undefined`);
       if (p) col.push(p);

@@ -1,8 +1,8 @@
 import * as Execute from '../execute.js';
 import { type DriverOptions, type DriverResult, type DriverRunner, type DriverStatesHandler, type Machine, type MachineState, type StateNames, type Transitions } from './types.js';
-import { defaultComparer } from '@ixfxfun/core';
-import { randomElement } from '@ixfxfun/arrays';
-import * as Debug from '@ixfxfun/debug';
+import { defaultComparer } from '@ixfx/core';
+import { randomElement } from '@ixfx/arrays';
+import * as Debug from '@ixfx/debug';
 import { init as machineInit, reset as machineReset, next as machineNext, to as machineTo } from './state-machine.js';
 
 

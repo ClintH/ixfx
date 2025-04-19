@@ -4,7 +4,7 @@ import { object } from "./object.js";
 import type { FieldOptions } from "../ops/types.js";
 import type { EventSourceOptions, EventSourceTriggerOptions } from "./types.js";
 import { initLazyStream } from "../init-stream.js";
-import { elapsedInterval } from "@ixfxfun/core/elapsed";
+import { elapsedInterval } from "@ixfx/core/elapsed";
 /**
  * Fired when `eventName` fires on `target`. 
  * 

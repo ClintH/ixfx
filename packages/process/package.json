@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/process",
-	"version": "0.35.0",
+	"name": "@ixfx/process",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -17,8 +17,7 @@
 			"import": "./src/basic.ts"
 		}
 	},
-	"dependencies": {
-	},
+	"dependencies": {},
 	"publishConfig": {
 		"main": "dist/src/index.js",
 		"exports": {

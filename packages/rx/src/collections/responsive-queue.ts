@@ -1,4 +1,4 @@
-import type { IQueueMutableWithEvents, QueueMutableEvents } from "@ixfxfun/collections/queue";
+import type { IQueueMutableWithEvents, QueueMutableEvents } from "@ixfx/collections/queue";
 import { manual } from "../index.js";
 
 
@@ -23,7 +23,7 @@ import { manual } from "../index.js";
  * @returns 
  */
 export function asResponsive<T>(queue: IQueueMutableWithEvents<T>) {
-  const events = manual<ReadonlyArray<T>>({
+  const events = manual<readonly T[]>({
     onNoSubscribers() {
       queue.removeEventListener(`removed`, onRemoved);
       queue.removeEventListener(`enqueue`, onEnqueue);
@@ -42,7 +42,7 @@ export function asResponsive<T>(queue: IQueueMutableWithEvents<T>) {
     events.set(event.finalData);
   }
 
-  const set = (data: Array<T>) => {
+  const set = (data: T[]) => {
     queue.enqueue(...data);
   }
 

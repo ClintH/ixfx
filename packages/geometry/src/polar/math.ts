@@ -1,6 +1,6 @@
 import { guard } from "./guard.js";
 import type { Coord } from "./types.js";
-import { throwNumberTest } from "@ixfxfun/guards"
+import { throwNumberTest } from "@ixfx/guards"
 
 export const normalise = (c: Coord): Coord => {
   //guard(v, `v`);

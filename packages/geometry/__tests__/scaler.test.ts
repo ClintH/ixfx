@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
-import { Scaler, Points, Rects } from '../src/index.js';
+import { Points, Rects } from '../src/index.js';
 import type { Point } from '../src/point/point-type.js';
-
+import * as Scaler from '../src/scaler.js';
 const testBasic = (
   abs: boolean,
   scaler: Scaler.ScalerCombined,

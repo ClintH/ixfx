@@ -1,9 +1,9 @@
 /**
  * Acknowledgements: much of the work here is an adapation from Daniel Shiffman's excellent _The Nature of Code_ website.
  */
-import { Points, Polar, Rects } from '@ixfxfun/geometry';
-import { clamp } from '@ixfxfun/numbers';
-import { interpolateAngle } from '@ixfxfun/numbers';
+import { Points, Polar, Rects } from '@ixfx/geometry';
+import { clamp } from '@ixfx/numbers';
+import { interpolateAngle } from '@ixfx/numbers';
 
 /**
  * Logic for applying mass
@@ -169,7 +169,7 @@ export const constrainBounce = (
  */
 export const attractionForce =
   (
-    attractors: ReadonlyArray<ForceAffected>,
+    attractors: readonly ForceAffected[],
     gravity: number,
     distanceRange: { readonly min?: number; readonly max?: number } = {}
   ) =>
@@ -344,7 +344,7 @@ export const targetForce = (targetPos: Points.Point, opts: TargetOpts = {}) => {
  */
 export const apply = (
   t: ForceAffected,
-  ...accelForces: ReadonlyArray<ForceKind>
+  ...accelForces: readonly ForceKind[]
 ): ForceAffected => {
   if (t === undefined) throw new Error(`t parameter is undefined`);
 
@@ -454,7 +454,7 @@ const massApplyAccel = (
     }
     default: {
       throw new Error(
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
         `Unknown 'mass' parameter '${ mass }. Expected 'dampen', 'multiply' or 'ignored'`
       );
     }
@@ -723,7 +723,7 @@ export const pendulumForce =
 
       let angle = t.angle;
       if (angle === undefined) {
-        // eslint-disable-next-line unicorn/prefer-ternary
+
         if (t.position) {
           angle = Points.angleRadian(pinnedAt, t.position) - Math.PI / 2;
         } else {

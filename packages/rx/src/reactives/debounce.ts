@@ -1,5 +1,5 @@
-import { type Reactive, intervalToMs } from "@ixfxfun/core";
-import { timeout } from "@ixfxfun/flow";
+import { type Reactive, intervalToMs } from "@ixfx/core";
+import { timeout } from "@ixfx/flow";
 import { initUpstream } from "../init-stream.js";
 import type { DebounceOptions } from "../ops/types.js";
 import { toReadable } from "../to-readable.js";

@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/arrays",
-	"version": "0.35.0",
+	"name": "@ixfx/arrays",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -14,7 +14,7 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/guards": "workspace:^"
+		"@ixfx/guards": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

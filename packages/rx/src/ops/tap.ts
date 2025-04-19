@@ -1,4 +1,4 @@
-import type { Processors } from "@ixfxfun/process";
+import type { Processors } from "@ixfx/process";
 import { resolveSource } from "../resolve-source.js";
 import type { ReactiveOrSource, Reactive, ReactiveWritable, ReactiveOp } from "../types.js";
 

@@ -1,4 +1,4 @@
-import { movingAverageLight as mal } from "@ixfxfun/numbers"
+import { movingAverageLight as mal } from "@ixfx/numbers"
 import { isPoint3d } from "./guard.js";
 import type { Point } from "./point-type.js";
 
@@ -38,10 +38,10 @@ export function averager(kind: PointAverageKinds, opts: any): PointAverager {
   }
 
   return (point: Point) => {
-    let ax = x(point.x);
-    let ay = y(point.y);
+    const ax = x(point.x);
+    const ay = y(point.y);
     if (isPoint3d(point)) {
-      let az = z(point.z);
+      const az = z(point.z);
       return Object.freeze({
         x: ax,
         y: ay,

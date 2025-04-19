@@ -1,10 +1,10 @@
-import { zipKeyValue } from "@ixfxfun/core/maps";
+import { zipKeyValue } from "@ixfx/core/maps";
 import { allDirections, getVectorFromCardinal } from "./directions.js";
 import type { GridBoundsLogic, GridCardinalDirection, GridCell, Grid, GridNeighbour, GridNeighbourMaybe, GridNeighbours } from "./types.js";
-import { randomElement } from "@ixfxfun/random";
+import { randomElement } from "@ixfx/random";
 import { offset } from "./offset.js";
 
-export const randomNeighbour = (nbos: ReadonlyArray<GridNeighbour>) => randomElement(nbos); // .filter(isNeighbour));
+export const randomNeighbour = (nbos: readonly GridNeighbour[]) => randomElement(nbos); // .filter(isNeighbour));
 
 /**
  * Returns _true_ if `n` is a Neighbour type, eliminating NeighbourMaybe possibility
@@ -40,15 +40,15 @@ const isNeighbour = (
 export const neighbourList = (
   grid: Grid,
   cell: GridCell,
-  directions: ReadonlyArray<GridCardinalDirection>,
+  directions: readonly GridCardinalDirection[],
   bounds: GridBoundsLogic
-): ReadonlyArray<GridNeighbour> => {
+): readonly GridNeighbour[] => {
   // Get neighbours for cell
   const cellNeighbours = neighbours(grid, cell, bounds, directions);
 
   // Filter out undefined cells
   const entries = Object.entries(cellNeighbours);
-  return (entries as Array<GridNeighbourMaybe>).filter(n => isNeighbour(n));
+  return (entries as GridNeighbourMaybe[]).filter(n => isNeighbour(n));
 };
 
 /**
@@ -83,7 +83,7 @@ export const neighbours = (
   grid: Grid,
   cell: GridCell,
   bounds: GridBoundsLogic = `undefined`,
-  directions?: ReadonlyArray<GridCardinalDirection>
+  directions?: readonly GridCardinalDirection[]
 ): GridNeighbours => {
   const directories = directions ?? allDirections;
   const points = directories.map((c) =>

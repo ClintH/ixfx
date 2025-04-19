@@ -1,6 +1,6 @@
 import type { Rect } from '../geometry/rect/index.js';
 import { waitFor } from '../flow/WaitFor.js';
-import { getErrorMessage } from '@ixfxfun/debug';
+import { getErrorMessage } from '@ixfx/debug';
 
 const startTimeoutMs = 10_000;
 

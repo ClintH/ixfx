@@ -1,5 +1,5 @@
 import { clamp, clamper } from './clamp.js';
-import { throwNumberTest } from '@ixfxfun/guards';
+import { throwNumberTest } from '@ixfx/guards';
 import type { NumberScaler, NumberScalerTwoWay } from './types.js';
 
 /**
@@ -212,7 +212,7 @@ export const scalerPercent = (outMin: number, outMax: number) => {
  * @param outMax 
  * @returns 
  */
-export const scalerTwoWay = (inMin: number, inMax: number, outMin: number = 0, outMax: number = 1, clamped = false, easing?: (v: number) => number): NumberScalerTwoWay => {
+export const scalerTwoWay = (inMin: number, inMax: number, outMin = 0, outMax = 1, clamped = false, easing?: (v: number) => number): NumberScalerTwoWay => {
   const toOut = scaler(inMin, inMax, outMin, outMax, easing, clamped);
   const toIn = scaler(outMin, outMax, inMin, inMax, easing, clamped);
   return { out: toOut, in: toIn };

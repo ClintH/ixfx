@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/dom",
-	"version": "0.35.0",
+	"name": "@ixfx/dom",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -13,12 +13,17 @@
 			"import": "./src/index.ts"
 		}
 	},
+	"devDependencies": {
+		"json5": "latest"
+	},
 	"dependencies": {
-		"@ixfxfun/core": "workspace:^",
-		"@ixfxfun/collections": "workspace:^",
-		"@ixfxfun/geometry": "workspace:^",
-		"@ixfxfun/guards": "workspace:^"
-
+		"@ixfx/core": "workspace:^",
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/geometry": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/random": "workspace:^",
+		"@ixfx/numbers": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

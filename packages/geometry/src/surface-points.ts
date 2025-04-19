@@ -3,7 +3,7 @@ import type { Circle, CirclePositioned } from './circle/circle-type.js';
 import type { Sphere } from './shape/index.js';
 
 import { toPositioned as circleToPositioned } from './circle/to-positioned.js';
-import { scale,linearSpace } from '@ixfxfun/numbers';
+import { scale, linearSpace } from '@ixfx/numbers';
 const cos = Math.cos;
 const sin = Math.sin;
 const asin = Math.asin;

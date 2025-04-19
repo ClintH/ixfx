@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { isEqualValueDefault } from "@ixfxfun/core";
+import { isEqualValueDefault } from "@ixfx/core";
 import { initStream } from "../init-stream.js";
 import type { ReactiveInitial, ReactiveNonInitial, ReactiveArray, Reactive } from "../types.js";
 import type { ArrayObjectOptions } from "./types.js";
-import { compareArrays, type ChangeRecord } from "@ixfxfun/core/records";
-import { remove as ArraysRemove,insertAt as ArraysInsertAt } from '@ixfxfun/arrays';
+import { compareArrays, type ChangeRecord } from "@ixfx/core/records";
+import { remove as ArraysRemove, insertAt as ArraysInsertAt } from '@ixfx/arrays';
 /**
  * Wraps an array object.
  * 

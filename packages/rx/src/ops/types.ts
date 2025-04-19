@@ -1,4 +1,4 @@
-import type { Interval } from '@ixfxfun/core';
+import type { Interval } from '@ixfx/core';
 import type { InitStreamOptions } from '../types.js';
 export type SyncOptions = {
 

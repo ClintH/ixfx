@@ -1,4 +1,4 @@
-import { toStringDefault } from "@ixfxfun/core";
+import { toStringDefault } from "@ixfx/core";
 import type { GenOrData, Link } from "./types.js";
 import { resolveToGen } from "./utility.js";
 import { resolveEl } from "../util/dom.js";

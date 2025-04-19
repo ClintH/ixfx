@@ -1,4 +1,4 @@
-import { intervalToMs } from "@ixfxfun/core";
+import { intervalToMs } from "@ixfx/core";
 import { initUpstream } from "../init-stream.js";
 import type { ReactiveOrSource, Reactive } from "../types.js";
 import { isTrigger, resolveTriggerValue } from "../util.js";

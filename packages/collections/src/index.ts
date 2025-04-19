@@ -3,7 +3,10 @@ export {
   type ICircularArray as CircularArray,
 } from './circular-array.js';
 export * as Trees from './tree/index.js';
+export * from './tree/types.js';
+
 export type * from './types.js';
+
 
 /**
  * Stacks store items in order, like a stack of plates.
@@ -16,9 +19,11 @@ export { StackImmutable } from './stack/StackImmutable.js';
  * Sets store unique items.
  */
 export * as Sets from './set/index.js';
-
+export * from './set/Types.js';
 export { SetStringMutable } from './set/set-mutable.js';
 export { SetStringImmutable } from './set/SetImmutable.js';
+export type { ISetImmutable } from './set/ISetImmutable.js';
+export * from './set/ISetMutable.js';
 
 
 /**

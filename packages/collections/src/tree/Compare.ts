@@ -1,6 +1,6 @@
-import { type IsEqual, isEqualValueIgnoreOrder } from "@ixfxfun/core";
-import * as TreeMutable from './TreeMutable.js';
-import type { TreeNode, TraversableTree } from './Types.js';
+import { type IsEqual, isEqualValueIgnoreOrder } from "@ixfx/core";
+import * as TreeMutable from './tree-mutable.js';
+import type { TreeNode, TraversableTree } from './types.js';
 
 export type DiffAnnotation<T> = {
   /**
@@ -22,18 +22,18 @@ export type DiffAnnotation<T> = {
   /**
    * List of new children
    */
-  added: Array<TraversableTree<T>>
+  added: TraversableTree<T>[]
   /**
    * List of removed children
    */
-  removed: Array<TraversableTree<T>>
+  removed: TraversableTree<T>[]
 }
 
 export type DiffNode<T> = TreeNode<DiffAnnotation<T>> & {
   toString: () => string
 };
 
-export const compare = <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq: IsEqual<T> = isEqualValueIgnoreOrder, parent?: DiffNode<T> | undefined): DiffNode<T> => {
+export const compare = <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq: IsEqual<T> = isEqualValueIgnoreOrder, parent?: DiffNode<T>): DiffNode<T> => {
   const valueEqual = valueOrIdentityEqual(a, b, eq);
   // if (!valueEqual) {
   //   nsole.log(`changed compare a: ${ toStringSingle(a) } b: ${ toStringSingle(b) }`);
@@ -80,8 +80,8 @@ const compareChildren = <T>(a: TraversableTree<T>, b: TraversableTree<T>, eq: Is
   const childrenOfA = [ ...a.children() ];
   const childrenOfB = [ ...b.children() ];
 
-  const identical: Array<[ a: TraversableTree<T>, b: TraversableTree<T> ]> = []
-  const removed: Array<TraversableTree<T>> = [];
+  const identical: [ a: TraversableTree<T>, b: TraversableTree<T> ][] = []
+  const removed: TraversableTree<T>[] = [];
   for (const childA of childrenOfA) {
     let foundIndex = -1;
     for (const [ index, childOfB ] of childrenOfB.entries()) {
@@ -110,7 +110,7 @@ const valueOrIdentityEqual = <T>(a: TraversableTree<T>, b: TraversableTree<T>, e
   return false;
 }
 
-const toStringSingle = <T>(n: TraversableTree<T>):string => {
+const toStringSingle = <T>(n: TraversableTree<T>): string => {
   return JSON.stringify(n.getValue());
 }
 
@@ -126,7 +126,7 @@ const toString = <T>(n: DiffNode<T>, indent = 0): string => {
 const toStringDiff = <T>(n: DiffAnnotation<T> | undefined, indent: number): string => {
   const spaces = ` `.repeat(indent);
   if (n === undefined) return `${ spaces }(undefined)`;
-  const t:string[] = [];
+  const t: string[] = [];
   t.push(`a: ${ toStringSingle(n.a) } b: ${ toStringSingle(n.b) }`);
   if (n.valueChanged) t.push(`Value changed. Child changed: ${ n.childChanged }`);
   else t.push(`Value unchanged. Child changed: ${ n.childChanged }`);

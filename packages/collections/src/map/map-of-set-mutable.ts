@@ -1,5 +1,5 @@
-import { toStringDefault } from '@ixfxfun/core';
-import { without } from '@ixfxfun/arrays';
+import { toStringDefault } from '@ixfx/core';
+import { without } from '@ixfx/arrays';
 import type { MapSetOpts, MultiValue } from './map-multi.js';
 import { MapOfMutableImpl } from './map-of-multi-impl.js';
 import {
@@ -8,7 +8,7 @@ import {
   find as mapFind,
   filter as mapFilter,
   addKeepingExisting,
-} from '@ixfxfun/core/maps';
+} from '@ixfx/core/maps';
 import type { IMapOfMutableExtended } from './imap-of-mutable-extended.js';
 
 /**

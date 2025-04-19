@@ -1,4 +1,4 @@
-import { type RandomSource } from '@ixfxfun/random';
+import { type RandomSource } from '@ixfx/random';
 import type { Point, Point3d } from './point-type.js';
 
 /**

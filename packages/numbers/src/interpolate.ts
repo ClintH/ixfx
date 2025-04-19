@@ -1,5 +1,5 @@
 import { wrap } from './wrap.js';
-import { throwNumberTest } from '@ixfxfun/guards';
+import { throwNumberTest } from '@ixfx/guards';
 import { clamp } from './clamp.js';
 import { piPi } from './pi-pi.js';
 

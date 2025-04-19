@@ -1,8 +1,8 @@
-import { defaultKeyer, type IsEqual, isEqualDefault } from '@ixfxfun/core';
+import { defaultKeyer, type IsEqual, isEqualDefault } from '@ixfx/core';
 import { firstEntryByValue } from './map-multi-fns.js';
 
 export class MapOfSimpleBase<V> {
-  protected map: Map<string, ReadonlyArray<V>>;
+  protected map: Map<string, readonly V[]>;
   protected readonly groupBy;
   protected valueEq;
 
@@ -14,7 +14,7 @@ export class MapOfSimpleBase<V> {
   constructor(
     groupBy: (value: V) => string = defaultKeyer,
     valueEq: IsEqual<V> = isEqualDefault<V>,
-    initial: Array<[ string, ReadonlyArray<V> ]> = []
+    initial: [ string, readonly V[] ][] = []
   ) {
     this.groupBy = groupBy;
     this.valueEq = valueEq;
@@ -98,7 +98,7 @@ export class MapOfSimpleBase<V> {
   /**
    * Iterate over keys and array of values for that key
    */
-  *entries(): IterableIterator<[ key: string, value: Array<V> ]> {
+  *entries(): IterableIterator<[ key: string, value: V[] ]> {
     for (const [ k, v ] of this.map.entries()) {
       yield [ k, [ ...v ] ];
     }
@@ -137,7 +137,7 @@ export class MapOfSimpleBase<V> {
    * Yields the values for each key in sequence, returning an array.
    * Use {@link valuesFlat} to iterate over all keys regardless of key.
    */
-  *values(): IterableIterator<ReadonlyArray<V>> {
+  *values(): IterableIterator<readonly V[]> {
     for (const entries of this.map) {
       yield entries[ 1 ];
     }

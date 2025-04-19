@@ -1,4 +1,4 @@
-import { intervalToMs } from "@ixfxfun/core";
+import { intervalToMs } from "@ixfx/core";
 import type { ReactiveOrSource, ToArrayOptions } from "./types.js";
 import { resolveSource } from "./resolve-source.js";
 import { messageHasValue, messageIsDoneSignal } from "./util.js";

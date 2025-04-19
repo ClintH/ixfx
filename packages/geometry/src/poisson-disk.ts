@@ -1,5 +1,5 @@
 import * as Grids from './grid/index.js';
-import { randomPluck } from '@ixfxfun/random';
+import { randomPluck } from '@ixfx/random';
 import { distance as PointsDistance } from './point/distance.js';
 import { randomPoint as RectsRandomPoint } from './rect/random.js';
 import type { Point } from './point/point-type.js';
@@ -26,7 +26,7 @@ const isPointValid = (
   grid: Grids.Grid & Grids.GridVisual,
   point: Point,
   reference: Grids.GridCell,
-  ar: ReadonlyArray<ReadonlyArray<Point>>
+  ar: readonly (readonly Point[])[]
 ) => {
   const iter = Grids.Visit.create(`neighbours`, { start: reference });
   for (const p of iter(grid)) {
@@ -69,7 +69,7 @@ export const poissonDisk = (
   const randomPoint = () => RectsRandomPoint(rect);
   const ar = Grids.toArray2d<Point>(grid);
   const arUpdater = Grids.Array2d.setMutate<Point>(ar);
-  const active: Array<Point> = [];
+  const active: Point[] = [];
   let growthPoint: Point | undefined = randomPoint();
   active.push(growthPoint);
   arUpdater(growthPoint, growthPoint);

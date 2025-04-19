@@ -1,4 +1,4 @@
-import {Directed} from "@ixfxfun/collections/graph";
+import { Directed } from "@ixfx/collections/graph";
 import { initStream } from "./init-stream.js";
 import type { Reactive } from "./types.js";
 import { isReactive } from "./util.js";
@@ -49,7 +49,7 @@ export function prepare<V extends Record<string, any>>(_rx: V): Reactive<V> {
         });
       } else {
         const valueType = typeof value;
-         
+
         if (valueType === `bigint` || valueType === `boolean` || valueType === `number` || valueType === `string`) {
           nodes.set(subPath, { type: `primitive`, value });
         } else if (valueType === `object`) {

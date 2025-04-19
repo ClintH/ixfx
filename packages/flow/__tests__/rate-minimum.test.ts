@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { rateMinimum } from '../src/rate-minimum.js';
-import { sleep } from '@ixfxfun/core';
+import { sleep } from '@ixfx/core';
 
 // In this case we don't expect fallback
 // to be triggered because rm() is being invoked faster than rateMin's interval

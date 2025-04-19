@@ -1,5 +1,5 @@
-import { intervalToMs, type Interval } from '@ixfxfun/core';
-import { sleep } from '@ixfxfun/core';
+import { intervalToMs, type Interval } from '@ixfx/core';
+import { sleep } from '@ixfx/core';
 
 /**
  * Delay options
@@ -172,7 +172,7 @@ export const delay = async <V>(
  * ```
  *
  */
-//eslint-disable-next-line func-style
+
 async function* delayAnimationLoop() {
   let resolve: ((value?: undefined) => void) | undefined;
   let p = new Promise<undefined>((r) => (resolve = r));

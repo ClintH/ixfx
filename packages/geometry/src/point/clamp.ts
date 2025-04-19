@@ -1,5 +1,5 @@
-import { clamp as clampNumber } from '@ixfxfun/numbers';
-import { throwNumberTest } from "@ixfxfun/guards";
+import { clamp as clampNumber } from '@ixfx/numbers';
+import { throwNumberTest } from "@ixfx/guards";
 import { isPoint, isPoint3d } from "./guard.js";
 import type { Point, Point3d } from "./point-type.js";
 
@@ -14,8 +14,8 @@ export function clamp(a: Point3d, min?: number, max?: number): Point3d;
  */
 export function clamp(
   a: Point,
-  min: number = 0,
-  max: number = 1
+  min = 0,
+  max = 1
 ): Point {
 
   if (isPoint3d(a)) {

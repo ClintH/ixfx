@@ -1,7 +1,7 @@
-import { isPlainObjectOrPrimitive } from "@ixfxfun/guards";
+import { isPlainObjectOrPrimitive } from "@ixfx/guards";
 
 export const cloneFromFields = <T extends object>(source: T) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const entries: [ key: string, value: any ][] = [];
   for (const field in source) {
     const value = (source)[ field ];

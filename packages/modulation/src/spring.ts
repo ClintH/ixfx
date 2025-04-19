@@ -1,5 +1,5 @@
-import * as Flow from '@ixfxfun/flow';
-import type { Modulate, SpringOptions } from './types.js';
+import * as Flow from '@ixfx/flow';
+import type { ModulationFunction, SpringOptions } from './types.js';
 
 /**
  * Produces values according to rough spring physics.
@@ -37,7 +37,7 @@ import type { Modulate, SpringOptions } from './types.js';
  */
 export function* spring(
   opts: SpringOptions = {},
-  timerOrFreq?: Flow.Timer | number | undefined
+  timerOrFreq?: Flow.Timer | number
 ) {
   if (timerOrFreq === undefined) timerOrFreq = Flow.elapsedMillisecondsAbsolute();
   else if (typeof timerOrFreq === `number`) {
@@ -104,7 +104,7 @@ export function* spring(
  * @returns 
  */
 export function springValue(opts: SpringOptions = {},
-  timerOrFreq?: Flow.Timer | number | undefined) {
+  timerOrFreq?: Flow.Timer | number) {
   const s = spring(opts, timerOrFreq);
   return () => {
     const v = s.next();
@@ -120,7 +120,7 @@ export function springValue(opts: SpringOptions = {},
  * @param opts 
  * @returns 
  */
-export const springShape = (opts: SpringOptions = {}): Modulate => {
+export const springShape = (opts: SpringOptions = {}): ModulationFunction => {
   /** MIT License github.com/pushkine/ */
   const from = 0;
   const to = 1;

@@ -1,6 +1,6 @@
-import { intervalToMs } from "@ixfxfun/core"
+import { intervalToMs } from "@ixfx/core"
 import type { IteratorControllerState, IteratorControllerOptions } from "./types.js"
-import { continuously } from "@ixfxfun/core/continuously";
+import { continuously } from "@ixfx/core/continuously";
 
 export type IteratorController = {
   get state(): IteratorControllerState

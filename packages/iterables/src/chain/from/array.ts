@@ -1,4 +1,4 @@
-import { type Interval, sleep } from "@ixfxfun/core";
+import { type Interval, sleep } from "@ixfx/core";
 import type { GenFactoryNoInput } from "../types.js";
 
 /**

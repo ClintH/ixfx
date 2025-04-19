@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { run, runSingle } from '../src/execute.js';
-import { comparerInverse, defaultComparer } from '@ixfxfun/core';
+import { comparerInverse, defaultComparer } from '@ixfx/core';
 //import { comparerInverse, defaultComparer } from '../../util/index.js';
 test('multiple', async () => {
   // Return numbers, use default sorting

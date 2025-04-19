@@ -1,11 +1,11 @@
 
-import { DispatchList } from "@ixfxfun/flow";
-import * as Pathed from "@ixfxfun/core/records";
+import { DispatchList } from "@ixfx/flow";
+import * as Pathed from "@ixfx/core/records";
 import { initStream } from "../init-stream.js";
 import type { ObjectFieldHandler, ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../types.js";
 import type { ObjectOptions } from "./types.js";
-import { throwResult,isEqualContextString } from "@ixfxfun/core";
-import { wildcard } from "@ixfxfun/core/text";
+import { throwResult, isEqualContextString } from "@ixfx/core";
+import { wildcard } from "@ixfx/core/text";
 
 export function object<V extends Record<string, any>>(initialValue: V, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveInitial<V>;
 export function object<V extends Record<string, any>>(initialValue: undefined, options?: Partial<ObjectOptions<V>>): ReactiveDiff<V> & ReactiveNonInitial<V>;

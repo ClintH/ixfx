@@ -1,4 +1,4 @@
-import { throwIntegerTest, throwNumberTest } from "@ixfxfun/guards";
+import { throwIntegerTest, throwNumberTest } from "@ixfx/guards";
 
 /**
  * Rounds `v` by `every`. Middle values are rounded up by default.

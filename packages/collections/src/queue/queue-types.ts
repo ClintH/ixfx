@@ -1,4 +1,4 @@
-import type { IsEqual } from "@ixfxfun/core";
+import type { IsEqual } from "@ixfx/core";
 
 export type QueueDiscardPolicy = `older` | `newer` | `additions`;
 

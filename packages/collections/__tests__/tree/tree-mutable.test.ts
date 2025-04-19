@@ -1,15 +1,15 @@
 import { test, expect } from 'vitest';
-import * as TreeMutable from '../../src/tree/TreeMutable.js';
-import * as TreeTraverse from '../../src/tree/TraversableTree.js';
-import type { LabelledSingleValue } from '../../src/tree/Types.js';
+import * as TreeMutable from '../../src/tree/tree-mutable.js';
+import * as TreeTraverse from '../../src/tree/traversable-tree.js';
+import type { LabelledSingleValue } from '../../src/tree/types.js';
 
 test(`compute-max-depth`, () => {
   const r = TreeMutable.root();
   expect(TreeMutable.computeMaxDepth(r)).toBe(0);
 });
 
-const getTestObj = () => {
-  const obj = {
+const getTestObject = () => {
+  const object = {
     colour: { r: 1, g: 2, b: 3 },
     pressure: 10,
     address: {
@@ -22,18 +22,18 @@ const getTestObj = () => {
       }
     }
   }
-  return obj;
+  return object;
 }
 test(`from-plain-object`, () => {
-  const obj = getTestObj();
-  const tree = TreeMutable.fromPlainObject(obj);
+  const object = getTestObject();
+  const tree = TreeMutable.fromPlainObject(object);
   expect(TreeMutable.childrenLength(tree)).toBe(4);
   expect(TreeMutable.computeMaxDepth(tree)).toBe(3);
-  expect(() => TreeMutable.throwTreeTest(tree)).not.toThrow();
+  expect(() => { TreeMutable.throwTreeTest(tree); }).not.toThrow();
 });
 
 test(`tree-follow`, () => {
-  const tree = TreeMutable.fromPlainObject(getTestObj());
+  const tree = TreeMutable.fromPlainObject(getTestObject());
 
   // Should return no values
   const falsePred = (v: any, depth: number) => false;
@@ -61,7 +61,7 @@ test(`tree-follow`, () => {
   // Test path that doesn't complete
   const path2 = 'nested.nested2.notfound'.split('.');
   const nestedPred2 = (v: LabelledSingleValue<any>, depth: number) => {
-    if (v?.label === path2[ 0 ]) {
+    if (v.label === path2[ 0 ]) {
       path2.shift();
       return true;
     }
@@ -104,7 +104,7 @@ test('array-backed-tree', () => {
   expect(TreeMutable.value(r)).toBe(rootValue);
 
   // Can't add self as a child
-  expect(() => TreeMutable.add(r, r)).toThrow();
+  expect(() => { TreeMutable.add(r, r); }).toThrow();
 
   // Not a child of self
   expect(TreeMutable.hasChild(r, r)).toBeFalsy();
@@ -134,10 +134,10 @@ test('array-backed-tree', () => {
   expect(TreeMutable.hasAnyParent(c1c1, r)).toBe(true);
 
   // Cannot add grandchild
-  expect(() => TreeMutable.add(r, c1c1)).toThrow();
+  expect(() => { TreeMutable.add(r, c1c1); }).toThrow();
 
   // Cannot add grandparent to child
-  expect(() => TreeMutable.add(c1c1, r)).toThrow();
+  expect(() => { TreeMutable.add(c1c1, r); }).toThrow();
 
   // --------------
   // Remove node

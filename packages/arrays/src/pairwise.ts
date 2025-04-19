@@ -1,4 +1,4 @@
-import { guardArray } from "@ixfxfun/guards";
+import { guardArray } from "@ixfx/guards";
 
 /**
  * Combines values in pairwise fashion.
@@ -15,7 +15,7 @@ import { guardArray } from "@ixfxfun/guards";
  * ```
  * @param values 
  */
-export function* pairwise<T>(values: Array<T>) {
+export function* pairwise<T>(values: T[]) {
   guardArray(values, `values`);
 
   if (values.length < 2) throw new Error(`Array needs to have at least two entries. Length: ${ values.length }`);
@@ -50,7 +50,7 @@ export function* pairwise<T>(values: Array<T>) {
  * @returns
  */
 export const pairwiseReduce = <V, X>(
-  array: ReadonlyArray<V>,
+  array: readonly V[],
   reducer: (accumulator: X, a: V, b: V) => X,
   initial: X
 ) => {

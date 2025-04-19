@@ -1,4 +1,4 @@
-import { zip } from '@ixfxfun/arrays';
+import { zip } from '@ixfx/arrays';
 import { weight } from './numeric-arrays.js';
 /**
  * Computes an average of an array with a set of weights applied.
@@ -34,13 +34,13 @@ import { weight } from './numeric-arrays.js';
  * @see {@link average} Compute averages without weighting.
  */
 export const averageWeighted = (
-  data: Array<number> | ReadonlyArray<number>,
-  weightings: Array<number> | ReadonlyArray<number> | ((value: number) => number)
+  data: number[] | readonly number[],
+  weightings: number[] | readonly number[] | ((value: number) => number)
 ): number => {
   if (typeof weightings === `function`) weightings = weight(data, weightings);
   const ww = zip(data, weightings);
   const [ totalV, totalW ] = ww.reduce(
-    (accumulator: Array<number>, v: Array<number>) => [ accumulator[ 0 ] + v[ 0 ] * v[ 1 ], accumulator[ 1 ] + v[ 1 ] ],
+    (accumulator: number[], v: number[]) => [ accumulator[ 0 ] + v[ 0 ] * v[ 1 ], accumulator[ 1 ] + v[ 1 ] ],
     [ 0, 0 ]
   );
   return totalV / totalW;

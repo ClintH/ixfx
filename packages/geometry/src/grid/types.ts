@@ -1,4 +1,4 @@
-import type { ISetMutable } from "@ixfxfun/collections/set";
+import type { ISetMutable } from "@ixfx/collections";
 
 export type GridVisual = Grid & {
   readonly size: number;
@@ -37,7 +37,7 @@ export type GridCardinalDirection =
 export type GridCardinalDirectionOptional = GridCardinalDirection | ``;
 
 export type GridArray1d<T> = GridReadable<T> & GridWritable<T> & {
-  array: Array<T>
+  array: T[]
 }
 
 /**
@@ -142,7 +142,7 @@ export type GridWritable<T> = Grid & {
  * Neighbour selector logic. For a given set of `neighbours` pick one to visit next.
  */
 export type GridNeighbourSelector = (
-  neighbours: ReadonlyArray<GridNeighbour>
+  neighbours: readonly GridNeighbour[]
 ) => GridNeighbour | undefined;
 
 /**
@@ -151,4 +151,4 @@ export type GridNeighbourSelector = (
 export type GridIdentifyNeighbours = (
   grid: Grid,
   origin: GridCell
-) => ReadonlyArray<GridNeighbour>;
+) => readonly GridNeighbour[];

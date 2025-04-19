@@ -4,7 +4,7 @@
 //   error?: Error | string
 // }
 
-import { getErrorMessage } from "@ixfxfun/debug"
+import { getErrorMessage } from "@ixfx/debug"
 
 export type ResultOk<T> = {
   success: true

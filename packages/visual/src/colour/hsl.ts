@@ -1,12 +1,12 @@
-import { numberInclusiveRangeTest, throwNumberTest } from '@ixfxfun/guards';
+import { numberInclusiveRangeTest, throwNumberTest } from '@ixfx/guards';
 import Color from 'colorjs.io';
 import type { Colourish, Hsl, HslAbsolute, HslRelative } from './types.js';
-import { clamp } from '@ixfxfun/numbers';
+import { clamp } from '@ixfx/numbers';
 import { isRgb, toRgbRelative } from './rgb.js';
 import { isOklch } from './oklch.js';
 import { resolveCss } from './resolve-css.js';
 import type { ColorConstructor } from 'colorjs.io';
-import { throwFromResult } from '@ixfxfun/guards';
+import { throwFromResult } from '@ixfx/guards';
 
 export const hslToColorJs = (hsl: Hsl): ColorConstructor => {
   const abs = hslToAbsolute(hsl);
@@ -113,7 +113,7 @@ export const hslToAbsolute = (hsl: Hsl, safe = true): HslAbsolute => {
 //   return resolve({ h, s, l, opacity, space: `hsl` });
 // }
 
-export const hslFromRelativeValues = (h: number = 1, s: number = 1, l: number = 0.5, opacity = 1): HslRelative => {
+export const hslFromRelativeValues = (h = 1, s = 1, l = 0.5, opacity = 1): HslRelative => {
   return {
     h, s, l, opacity, unit: `relative`, space: `hsl`
   }

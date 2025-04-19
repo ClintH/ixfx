@@ -1,6 +1,6 @@
 
 import { test, expect, describe } from 'vitest';
-import { applyToValues, round } from '@ixfxfun/numbers';
+import { applyToValues, round } from '@ixfx/numbers';
 import * as Colour from '../src/colour/index.js';
 
 describe(`colour`, () => {

@@ -1,5 +1,5 @@
-import { QueueMutable } from "@ixfxfun/collections";
-import { timeout } from "@ixfxfun/flow";
+import { QueueMutable } from "@ixfx/collections";
+import { timeout } from "@ixfx/flow";
 import { initUpstream } from "../init-stream.js";
 import type { ReactiveOrSource, Reactive } from "../types.js";
 import { toReadable } from "../to-readable.js";

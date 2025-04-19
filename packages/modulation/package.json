@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/modulation",
-	"version": "0.35.0",
+	"name": "@ixfx/modulation",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -18,13 +18,13 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/core": "workspace:^",
-		"@ixfxfun/events": "workspace:^",
-		"@ixfxfun/geometry": "workspace:^",
-		"@ixfxfun/numbers": "workspace:^",
-		"@ixfxfun/guards": "workspace:^",
-		"@ixfxfun/random": "workspace:^",
-		"@ixfxfun/flow": "workspace:^"
+		"@ixfx/core": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/geometry": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/random": "workspace:^",
+		"@ixfx/flow": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

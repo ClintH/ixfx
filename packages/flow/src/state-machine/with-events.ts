@@ -1,7 +1,7 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
+import { SimpleEventEmitter } from '@ixfx/events';
 import * as StateMachine from './state-machine.js';
 import type { StateNames, Transitions, MachineState } from './types.js';
-import { elapsedInfinity, elapsedSince } from '@ixfxfun/core/elapsed';
+import { elapsedInfinity, elapsedSince } from '@ixfx/core/elapsed';
 
 export type StateChangeEvent<V extends Transitions> = {
   readonly newState: StateNames<V>;

@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 import type { Rect } from "../rect/rect-types.js";
 import { isRect } from "../rect/guard.js";
 import { isPoint } from "./guard.js";

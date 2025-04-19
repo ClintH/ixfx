@@ -1,11 +1,11 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
+import { SimpleEventEmitter } from '@ixfx/events';
 import type { IMapOfMutable } from './imap-of-mutable.js';
 
 /**
  * Events from mapArray
  */
 export type MapArrayEvents<V> = {
-  readonly addedValues: { readonly values: ReadonlyArray<V> };
+  readonly addedValues: { readonly values: readonly V[] };
   readonly addedKey: { readonly key: string };
   readonly clear: boolean;
   readonly deleteKey: { readonly key: string };

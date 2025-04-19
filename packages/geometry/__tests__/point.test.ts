@@ -3,9 +3,9 @@ import { test, expect, assert, describe } from 'vitest';
 import * as Points from '../src/point/index.js';
 import { divide, divider } from '../src/point/divider.js';
 import { radianToDegree } from '../src/angles.js';
-import { isApprox } from '@ixfxfun/numbers';
+import { isApprox } from '@ixfx/numbers';
 
-function closeToPercent(input: number, target: number, percent: number = 0.001) {
+function closeToPercent(input: number, target: number, percent = 0.001) {
   const diff = (Math.abs(target - input) / target);
   if (target === input) return [ true ];
   if (diff <= percent) return [ true ];

@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
 import { timeout } from '../src/timeout.js';
-import { isApprox } from '@ixfxfun/numbers';
-import { sleep } from '@ixfxfun/core';
+import { isApprox } from '@ixfx/numbers';
+import { sleep } from '@ixfx/core';
 
 /**
  * Tests a single firing
@@ -55,7 +55,7 @@ test(`start`, async () => {
 
   expect(a.runState).toBe(`scheduled`);
   await sleep(delayChange + 10);
-  let elapsed = stop - start;
+  const elapsed = stop - start;
   expect(isApprox(0.02, delayChange)(elapsed)).toBe(true);
   expect(aFired).toBe(1);
   expect(a.runState).toBe(`idle`);

@@ -3,7 +3,7 @@ import { guardCell } from "./guards.js";
 import type { GridCell, GridVisual } from "./types.js";
 import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import type { Point } from "../point/point-type.js";
-import { throwIntegerTest, throwNumberTest } from '@ixfxfun/guards';
+import { throwIntegerTest, throwNumberTest } from '@ixfx/guards';
 import { cells } from "./enumerators/cells.js";
 
 /**

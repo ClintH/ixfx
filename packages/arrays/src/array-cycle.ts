@@ -28,7 +28,7 @@
  * @param options Array to cycle over 
  * @returns 
  */
-export const cycle = <T>(options: ReadonlyArray<T> | Array<T>) => {
+export const cycle = <T>(options: readonly T[] | T[]) => {
   const opts = [ ...options ];
   let index = 0;
   const next = () => {

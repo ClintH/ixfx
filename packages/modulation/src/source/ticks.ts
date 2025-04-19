@@ -1,7 +1,7 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
-import type { ModSettable, ModSettableFeedback, ModSettableOptions } from "../types.js";
+import { throwIntegerTest } from "@ixfx/guards";
+import type { ModSettable as ModuleSettable, ModSettableFeedback as ModuleSettableFeedback, ModSettableOptions as ModuleSettableOptions } from "../types.js";
 
-export type TicksModSettableOptions = ModSettableOptions & {
+export type TicksModSettableOptions = ModuleSettableOptions & {
   exclusiveStart: boolean
   exclusiveEnd: boolean
 }
@@ -25,7 +25,7 @@ export type TicksModSettableOptions = ModSettableOptions & {
  * @param options
  * @returns 
  */
-export function ticks(totalTicks: number, options: Partial<TicksModSettableOptions> = {}): ModSettable {
+export function ticks(totalTicks: number, options: Partial<TicksModSettableOptions> = {}): ModuleSettable {
   throwIntegerTest(totalTicks, `aboveZero`, `totalTicks`);
   const exclusiveStart = options.exclusiveStart ?? false;
   const exclusiveEnd = options.exclusiveEnd ?? false;
@@ -43,7 +43,7 @@ export function ticks(totalTicks: number, options: Partial<TicksModSettableOptio
     v = Math.round(options.startAtRelative * totalTicksForReal);
   }
 
-  return (feedback?: Partial<ModSettableFeedback>) => {
+  return (feedback?: Partial<ModuleSettableFeedback>) => {
     if (feedback) {
       if (feedback.resetAt !== undefined) {
         v = feedback.resetAt;
@@ -54,7 +54,7 @@ export function ticks(totalTicks: number, options: Partial<TicksModSettableOptio
     }
     if (cycleCount >= cycleLimit) return 1;
 
-    let current = v / totalTicks;
+    const current = v / totalTicks;
     v++;
     if (v > endPoint) {
       cycleCount++;

@@ -1,9 +1,9 @@
 import { initUpstream } from "../init-stream.js";
 import { toReadable } from "../to-readable.js";
 import type { Reactive, ReactiveOrSource } from "../types.js";
-import * as Proc from '@ixfxfun/process';
+import * as Proc from '@ixfx/process';
 import type { OpAsAnnotation, OpMathOptions } from "./types.js";
-import type { RankFunction, RankOptions } from "@ixfxfun/core";
+import type { RankFunction, RankOptions } from "@ixfx/core";
 
 export function max(input: ReactiveOrSource<any>, options: OpMathOptions): Reactive<number>;
 export function max(input: ReactiveOrSource<any>, options: OpAsAnnotation & OpMathOptions): Reactive<{ value: number, max: number }>;

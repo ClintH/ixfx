@@ -1,4 +1,4 @@
-import type { Modulate } from "./types.js";
+import type { ModulationFunction } from "./types.js";
 
 /**
  * Creates an easing function using a simple cubic bezier defined by two points.
@@ -17,7 +17,7 @@ import type { Modulate } from "./types.js";
  * @returns Value
  */
 export const cubicBezierShape =
-  (b: number, d: number): Modulate =>
+  (b: number, d: number): ModulationFunction =>
     (t: number) => {
       const s = 1 - t;
       const s2 = s * s;

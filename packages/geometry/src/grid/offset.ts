@@ -1,4 +1,4 @@
-//import { clampIndex } from '@ixfxfun/numbers';
+//import { clampIndex } from '@ixfx/numbers';
 import { applyBounds } from './apply-bounds.js';
 //import { guardCell, guardGrid } from './guards.js';
 import type { Grid, GridCell, GridBoundsLogic } from './types.js';

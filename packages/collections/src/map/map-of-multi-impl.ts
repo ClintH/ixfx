@@ -1,15 +1,15 @@
 import {
   type IsEqual,
   isEqualDefault
-} from '@ixfxfun/core';
+} from '@ixfx/core';
 import type {
   MapArrayEvents,
   IMapOfMutableExtended,
 } from './imap-of-mutable-extended.js';
 import type { MapMultiOpts, MultiValue } from './map-multi.js';
-import { SimpleEventEmitter } from '@ixfxfun/events';
+import { SimpleEventEmitter } from '@ixfx/events';
 import type { IMapOf } from './imap-of.js';
-import { toStringDefault, type ToString } from '@ixfxfun/core';
+import { toStringDefault, type ToString } from '@ixfx/core';
 
 /**
  * @internal
@@ -84,7 +84,7 @@ export class MapOfMutableImpl<V, M>
   }
 
   //eslint-disable-next-line functional/prefer-immutable-types
-  addKeyedValues(key: string, ...values: Array<V>) {
+  addKeyedValues(key: string, ...values: V[]) {
     const set = this.#map.get(key);
     if (set === undefined) {
       this.#map.set(key, this.type.add(undefined, values));
@@ -97,12 +97,12 @@ export class MapOfMutableImpl<V, M>
     }
   }
   //eslint-disable-next-line functional/prefer-immutable-types
-  set(key: string, values: Array<V>) {
+  set(key: string, values: V[]) {
     this.addKeyedValues(key, ...values);
     return this;
   }
 
-  addValue(...values: ReadonlyArray<V>) {
+  addValue(...values: readonly V[]) {
     for (const v of values) this.addKeyedValues(this.groupBy(v), v);
   }
 
@@ -222,7 +222,7 @@ export class MapOfMutableImpl<V, M>
     }
   }
 
-  *entries(): IterableIterator<[ key: string, value: Array<V> ]> {
+  *entries(): IterableIterator<[ key: string, value: V[] ]> {
     for (const [ k, v ] of this.#map.entries()) {
       const temporary = [ ...this.type.iterable(v) ];
       yield [ k, temporary ];

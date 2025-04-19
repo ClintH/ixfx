@@ -1,7 +1,7 @@
-import { continuously, intervalToMs } from "@ixfxfun/core";
-import { getErrorMessage } from "@ixfxfun/debug";
+import { continuously, intervalToMs } from "@ixfx/core";
+import { getErrorMessage } from "@ixfx/debug";
 
-import { sleep } from "@ixfxfun/core";
+import { sleep } from "@ixfx/core";
 import { initLazyStream } from "../init-stream.js";
 import type { ReactivePingable } from "../types.js";
 import type { FunctionFunction, FunctionOptions } from "./types.js";

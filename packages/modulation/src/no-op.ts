@@ -1,4 +1,4 @@
-import type { Modulate } from "./types.js";
+import type { ModulationFunction } from "./types.js";
 
 /**
  * A 'no-op' function. Returns the input value without modification.
@@ -6,4 +6,4 @@ import type { Modulate } from "./types.js";
  * @param v 
  * @returns 
  */
-export const noop: Modulate = (v: number) => v;
+export const noop: ModulationFunction = (v: number) => v;

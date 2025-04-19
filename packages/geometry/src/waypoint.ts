@@ -4,7 +4,7 @@ import type { Point } from "./point/point-type.js";
 import { joinPointsToLines } from './line/join-points-to-lines.js';
 import { toPath } from './line/to-path.js';
 import { distance as PointsDistance } from "./point/distance.js";
-import { sortByNumericProperty } from "@ixfxfun/arrays";
+import { sortByNumericProperty } from "@ixfx/arrays";
 
 export type Waypoint = CirclePositioned;
 
@@ -20,7 +20,7 @@ export type WaypointOpts = {
  * @returns 
  */
 export const fromPoints = (
-  waypoints: ReadonlyArray<Point>,
+  waypoints: readonly Point[],
   opts: Partial<WaypointOpts> = {}
 ) => {
   const lines = joinPointsToLines(...waypoints);
@@ -71,7 +71,7 @@ export type WaypointResult = {
  * const results = w({ x: 10, y: 20 });
  * ```
  */
-export type Waypoints = (pt: Point) => Array<WaypointResult>
+export type Waypoints = (pt: Point) => WaypointResult[]
 
 /**
  * Initialise
@@ -82,11 +82,11 @@ export type Waypoints = (pt: Point) => Array<WaypointResult>
  * @param opts 
  * @returns 
  */
-export const init = (paths: ReadonlyArray<Path>, opts: Partial<WaypointOpts> = {}): Waypoints => {
+export const init = (paths: readonly Path[], opts: Partial<WaypointOpts> = {}): Waypoints => {
   //const enforceOrder = opts.enforceOrder ?? true;
   const maxDistanceFromLine = opts.maxDistanceFromLine ?? 0.1;
 
-  const checkUnordered = (pt: Point): Array<WaypointResult> => {
+  const checkUnordered = (pt: Point): WaypointResult[] => {
     const results = paths.map((p, index) => {
       const nearest = p.nearest(pt);
       const distance = PointsDistance(pt, nearest);
@@ -100,7 +100,7 @@ export const init = (paths: ReadonlyArray<Path>, opts: Partial<WaypointOpts> = {
     const sorted = sortByNumericProperty(filtered, `distance`);
 
     // Assign ranks
-    // eslint-disable-next-line unicorn/no-for-loop
+
     for (let rank = 0; rank < sorted.length; rank++) {
       sorted[ rank ].rank = rank;
     }

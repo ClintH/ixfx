@@ -1,28 +1,13 @@
-import * as Named from './EasingsNamed.js';
-import { throwStringTest } from '@ixfxfun/guards';
-import { type Interval } from '@ixfxfun/core';
-import type { Modulate, ModulatorTimed } from '../types.js';
-export * as Named from './EasingsNamed.js';
-export * from './Line.js';
+import * as Named from './easings-named.js';
+import { throwStringTest } from '@ixfx/guards';
+import { type Interval } from '@ixfx/core';
+import type { ModulationFunction, ModulatorTimed } from '../types.js';
+export * as Named from './easings-named.js';
+export * from './line.js';
+export type * from './types.js';
+import * as ModuleTimed from '../modulator-timed.js';
+import type { EasingName, EasingOptions } from './types.js';
 
-import * as ModTimed from '../modulator-timed.js';
-
-/**
- * Easing name
- */
-export type EasingName = keyof typeof Named;
-
-export type Options = (TickOptions | TimeOptions) & {
-  name?: EasingName
-  fn?: Modulate
-}
-
-export type TimeOptions = {
-  duration: Interval
-}
-export type TickOptions = {
-  ticks: number
-}
 
 /**
  * Creates an easing function
@@ -41,10 +26,10 @@ export type TickOptions = {
  * @param options 
  * @returns 
  */
-export const create = (options: Options): () => number => {
-  let name = resolveEasingName(options.name ?? `quintIn`);
+export const create = (options: EasingOptions): () => number => {
+  const name = resolveEasingName(options.name ?? `quintIn`);
   const fn = name ?? options.fn;
-  if (!fn) throw new Error(`Either 'name' or 'fn' must be set`);
+  if (typeof fn === `undefined`) throw new Error(`Either 'name' or 'fn' must be set`);
 
   if (`duration` in options) {
     return time(fn, options.duration);
@@ -83,7 +68,7 @@ export const timeEasing = (
   duration: Interval
 ): ModulatorTimed => {
   const fn = resolveEasingName(nameOrFunction);
-  return ModTimed.timeModulator(fn, duration);
+  return ModuleTimed.timeModulator(fn, duration);
   // const timer = Timer.elapsedMillisecondsAbsolute();
   // const durationMs = intervalToMs(duration);
   // if (durationMs === undefined) throw new Error(`Param 'duration' not provided`);
@@ -121,7 +106,7 @@ export const time = (
   duration: Interval
 ): () => number => {
   const fn = resolveEasingName(nameOrFunction);
-  return ModTimed.time(fn, duration);
+  return ModuleTimed.time(fn, duration);
   // let relative: undefined | (() => number);
   // return () => {
   //   if (relative === undefined) relative = Timer.ofTotal(duration, { clampValue: true });
@@ -155,7 +140,7 @@ export const ticks = (
   totalTicks: number
 ): () => number => {
   const fn = resolveEasingName(nameOrFunction);
-  return ModTimed.ticks(fn, totalTicks);
+  return ModuleTimed.ticks(fn, totalTicks);
   // let relative: undefined | (() => number);
   // return () => {
   //   if (relative === undefined) relative = Timer.ofTotalTicks(totalTicks, { clampValue: true });
@@ -185,7 +170,7 @@ export const tickEasing = (
   durationTicks: number
 ): ModulatorTimed => {
   const fn = resolveEasingName(nameOrFunction);
-  return ModTimed.tickModulator(fn, durationTicks);
+  return ModuleTimed.tickModulator(fn, durationTicks);
   // const timer = Timer.elapsedTicksAbsolute();
   // const relativeTimer = Timer.relative(
   //   durationTicks,
@@ -196,9 +181,9 @@ export const tickEasing = (
   // return Timer.timerWithFunction(fn, relativeTimer);
 };
 
-const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number)): Modulate => {
+const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number)): ModulationFunction => {
   const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
-  if (fn === undefined) {
+  if (typeof fn === `undefined`) {
     const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: '${ nameOrFunction }'`) : new Error(`Easing function not found`);
     throw error;
   }
@@ -280,7 +265,7 @@ let easingsMap: Map<string, ((v: number) => number)> | undefined;
  * @param easingName eg `sineIn`
  * @returns Easing function
  */
-export const get = function (easingName: EasingName): Modulate {
+export const get = function (easingName: EasingName): ModulationFunction {
   throwStringTest(easingName, `non-empty`, `easingName`);
 
   const found = cacheEasings().get(easingName.toLowerCase());

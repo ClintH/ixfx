@@ -1,5 +1,5 @@
 import type { ReactiveOrSource, ReactivePingable } from "../types.js";
-import { interpolate as interpolateFunction, type InterpolateOptions } from "@ixfxfun/modulation";
+import { interpolate as interpolateFunction, type InterpolateOptions } from "@ixfx/modulation";
 import { computeWithPrevious } from "./compute-with-previous.js";
 
 export type OpInterpolateOptions = InterpolateOptions & {

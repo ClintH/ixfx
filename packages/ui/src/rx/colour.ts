@@ -1,6 +1,6 @@
 
-import { initStream, type ReactiveInitial, type ReactiveNonInitial, type ReactiveWritable } from "@ixfxfun/rx";
-import type { HslRelative } from "@ixfxfun/visual/colour";
+import { initStream, type ReactiveInitial, type ReactiveNonInitial, type ReactiveWritable } from "@ixfx/rx";
+import type { HslRelative } from "@ixfx/visual/colour";
 
 export type ReactiveColour = ReactiveWritable<HslRelative> & {
   setHsl: (hsl: HslRelative) => void;

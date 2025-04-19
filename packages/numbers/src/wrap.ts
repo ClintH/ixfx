@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { throwNumberTest, throwIntegerTest } from '@ixfxfun/guards';
+import { throwNumberTest, throwIntegerTest } from '@ixfx/guards';
 
 /**
  * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
@@ -153,7 +153,7 @@ export const wrapRange = (
     r = a + fn(distMin);
   } else {
     // Forwards or backwards without wrapping
-    // eslint-disable-next-line unicorn/prefer-ternary
+
     if (a > b) {
       // (240,120) -- backwards
       r = a - fn(distMin);

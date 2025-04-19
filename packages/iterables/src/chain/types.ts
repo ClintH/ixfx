@@ -1,4 +1,4 @@
-import type { Interval, RankFunction, RankOptions, RankArrayOptions } from "@ixfxfun/core"
+import type { Interval, RankFunction, RankOptions, RankArrayOptions } from "@ixfx/core"
 
 export type SyncOptions = {
 

@@ -1,5 +1,5 @@
-import { clamp } from '@ixfxfun/numbers';
-import { intervalToMs, type HasCompletion, type Interval } from '@ixfxfun/core';
+import { clamp } from '@ixfx/numbers';
+import { intervalToMs, type HasCompletion, type Interval } from '@ixfx/core';
 
 /**
  * Creates a timer

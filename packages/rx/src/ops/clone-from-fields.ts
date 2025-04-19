@@ -1,5 +1,5 @@
 
-import { isPlainObjectOrPrimitive } from "@ixfxfun/guards";
+import { isPlainObjectOrPrimitive } from "@ixfx/guards";
 import type { ReactiveOrSource } from "../types.js";
 import { transform } from "./transform.js";
 

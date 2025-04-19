@@ -2,9 +2,9 @@
 
 import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./types.js";
 import type { ChunkOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/types.js";
-import type { RankFunction, RankOptions } from "@ixfxfun/core";
+import type { RankFunction, RankOptions } from "@ixfx/core";
 import type { TimeoutPingOptions, TimeoutValueOptions } from "./from/types.js";
-import { type Interval, intervalToMs } from '@ixfxfun/core';
+import { type Interval, intervalToMs } from '@ixfx/core';
 import { isWritable, messageHasValue, messageIsDoneSignal, opify } from "./util.js";
 import { initStream } from "./init-stream.js";
 import { resolveSource } from './resolve-source.js';

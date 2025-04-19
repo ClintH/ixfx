@@ -1,5 +1,5 @@
-import  { Paths, Beziers } from '@ixfxfun/geometry';
-import { scale } from '@ixfxfun/numbers';
+import { Paths, Beziers } from '@ixfx/geometry';
+import { scale } from '@ixfx/numbers';
 import { AdsrBase } from './AdsrBase.js';
 import type { EnvelopeOpts } from './Types.js';
 
@@ -20,7 +20,7 @@ export class AdsrIterator implements Iterator<number> {
 
   }
 
-  next(...args: [] | [ undefined ]): IteratorResult<number, any> {
+  next(...args: [] | [ undefined ]): IteratorResult<number> {
     if (!this.adsr.hasTriggered) {
       this.adsr.trigger();
     }

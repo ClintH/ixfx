@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'vitest';
 import * as Modulation from '../src/index.js';
-import * as Numbers from '@ixfxfun/numbers';
+import * as Numbers from '@ixfx/numbers';
 
 describe(`weighted`, () => {
   test(`averageWeighted-gaussian`, () => {

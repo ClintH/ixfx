@@ -1,8 +1,6 @@
 import { test, expect, assert } from 'vitest';
-import { continuously } from '../../core/src/continuously.js';
-//import { JSDOM } from 'jsdom';
 
-import { sleep } from '@ixfxfun/core';
+import { continuously, sleep } from '@ixfx/core';
 
 test('continuously', async () => {
   //const dom = new JSDOM();

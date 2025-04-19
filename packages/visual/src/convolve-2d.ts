@@ -1,13 +1,13 @@
 import * as ImageDataGrid from './image-data-grid.js';
-import {Grids} from '@ixfxfun/geometry';
+import { Grids } from '@ixfx/geometry';
 import type { Rgb8Bit } from './colour/types.js';
 
-export type Kernel<T> = ReadonlyArray<ReadonlyArray<T>>;
+export type Kernel<T> = readonly (readonly T[])[];
 //export type CellWithValue<V> = readonly [ cell: Grids.Cell, value: V | undefined ];
 export type CellValueScalar<TCell, TKernel> = Grids.GridCellAndValue<TCell> & { kernel: TKernel };
 
 export type KernelCompute = <V>(offset: Grids.GridCell, value: V) => V;
-export type KernelReduce<TCell, TKernel> = (values: Array<CellValueScalar<TCell, TKernel>>) => TCell | undefined;
+export type KernelReduce<TCell, TKernel> = (values: CellValueScalar<TCell, TKernel>[]) => TCell | undefined;
 
 /**
  * Multiply every element of kernel by the same `scalar` value.
@@ -19,7 +19,7 @@ export type KernelReduce<TCell, TKernel> = (values: Array<CellValueScalar<TCell,
 export const multiply = (kernel: Kernel<number>, scalar: number): Kernel<number> => {
   const rows = kernel.length;
   const cols = kernel[ 0 ].length;
-  const copy: Array<Array<number>> = [];
+  const copy: number[][] = [];
   for (let row = 0; row < rows; row++) {
     copy[ row ] = [];
     for (let col = 0; col < cols; col++) {
@@ -31,7 +31,7 @@ export const multiply = (kernel: Kernel<number>, scalar: number): Kernel<number>
 
 
 export function convolveCell<TCell, TKernel>(cell: Grids.GridCell, kernel: Kernel2dArray<TKernel>, source: Grids.GridReadable<TCell>, reduce: KernelReduce<TCell, TKernel>): TCell | undefined {
-  const valuesAtKernelPos: Array<CellValueScalar<TCell, TKernel>> = kernel.map(o => {
+  const valuesAtKernelPos: CellValueScalar<TCell, TKernel>[] = kernel.map(o => {
     // For a kernel cell vector, get the position in the source grid
     const pos = Grids.offset(source, cell, o.cell, `stop`); // `stop` avoids fringing at extents of image
 
@@ -78,7 +78,7 @@ export function* convolve<TCell, TKernel>(kernel: Kernel<TKernel>, source: Grids
   }
 }
 
-export type Kernel2dArray<T> = Array<Grids.GridCellAndValue<T>>;
+export type Kernel2dArray<T> = Grids.GridCellAndValue<T>[];
 
 /**
  * For a given kernel, returns an array of offsets. These
@@ -111,7 +111,7 @@ export const kernel2dToArray = <T>(kernel: Kernel<T>, origin?: Grids.GridCell): 
   return offsets;
 };
 
-export const rgbReducer: KernelReduce<Rgb8Bit, number> = (values: Array<CellValueScalar<Rgb8Bit, number>>) => {
+export const rgbReducer: KernelReduce<Rgb8Bit, number> = (values: CellValueScalar<Rgb8Bit, number>[]) => {
   let r = 0;
   let g = 0;
   let b = 0;

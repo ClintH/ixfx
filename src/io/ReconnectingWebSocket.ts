@@ -2,7 +2,7 @@ import { retryTask } from "../flow/Retry.js"
 import { intervalToMs, type Interval } from "../flow/IntervalType.js"
 import { eventRace } from "../Events.js"
 import { StateMachine } from "../flow/index.js"
-import { getErrorMessage } from "@ixfxfun/debug"
+import { getErrorMessage } from "@ixfx/debug"
 
 export type ReconnectingWebsocket = {
   /**

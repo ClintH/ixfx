@@ -1,7 +1,7 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
-import { sortByValueProperty } from '@ixfxfun/core/maps';
-import { intervalToMs, type Interval } from '@ixfxfun/core';
-import { throwIntegerTest } from '@ixfxfun/guards';
+import { SimpleEventEmitter } from '@ixfx/events';
+import { sortByValueProperty } from '@ixfx/core/maps';
+import { intervalToMs, type Interval } from '@ixfx/core';
+import { throwIntegerTest } from '@ixfx/guards';
 
 /**
  * Expiring map options
@@ -201,7 +201,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    */
   elapsedSet(key: K): number | undefined {
     const v = this.store.get(key);
-    if (!v) return v;
+    if (typeof v === `undefined`) return;
     return Date.now() - v.lastSet;
   }
 
@@ -212,7 +212,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    */
   elapsedGet(key: K): number | undefined {
     const v = this.store.get(key);
-    if (!v) return v;
+    if (typeof v === `undefined`) return;
     return Date.now() - v.lastGet;
   }
 
@@ -323,9 +323,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
   deleteWithElapsed(
     interval: Interval,
     property: `get` | `set` | `either`
-  ): Array<[ k: K, v: V ]> {
+  ): [ k: K, v: V ][] {
     const entries = [ ...this.store.entries() ];
-    const prune: Array<[ k: K, v: V ]> = [];
+    const prune: [ k: K, v: V ][] = [];
     const intervalMs = intervalToMs(interval, 1000);
     const now = performance.now();
     for (const entry of entries) {

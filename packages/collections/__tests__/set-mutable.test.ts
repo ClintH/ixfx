@@ -1,6 +1,6 @@
 import { test, expect, vi } from 'vitest';
 import { mutable } from '../src/set/index.js';
-import { sleep } from '@ixfxfun/core';
+import { sleep } from '@ixfx/core';
 
 test(`mutableValueSet`, () => {
   const barry = { name: `Barry`, city: `London` };
@@ -8,7 +8,7 @@ test(`mutableValueSet`, () => {
   const barryCase = { name: `BARRY`, city: `London` };
   const sally = { name: `Sally`, city: `Bristol` };
   const sallyOther = { name: `Sally`, city: `Manchester` };
-  const sallyMoreProps = { name: `Sally`, city: `Bristol`, age: 27 };
+  const sallyMoreProperties = { name: `Sally`, city: `Bristol`, age: 27 };
 
   const people = [
     { name: `Barry`, city: `London` },
@@ -25,11 +25,11 @@ test(`mutableValueSet`, () => {
   expect(set.has(barryOther)).toBe(false);
   expect(set.has(barryCase)).toBe(false);
   expect(set.has(sallyOther)).toBe(false);
-  expect(set.has(sallyMoreProps)).toBe(false);
+  expect(set.has(sallyMoreProperties)).toBe(false);
   expect(set.toArray()).toEqual(people);
 
   expect(set.delete(barry)).toBe(true);
-  expect(set.delete(sallyMoreProps)).toBe(false);
+  expect(set.delete(sallyMoreProperties)).toBe(false);
 
   // Test custom key generator
   const set2 = mutable<Person>(item => (item.name.toLocaleUpperCase() + `-` + item.city.toLocaleUpperCase()));
@@ -39,21 +39,21 @@ test(`mutableValueSet`, () => {
   expect(set2.has(barryOther)).toBe(false);
   expect(set2.has(barryCase)).toBe(true); // <-- different than JSON case
   expect(set2.has(sallyOther)).toBe(false);
-  expect(set2.has(sallyMoreProps)).toBe(true); // <-- different than JSON case
+  expect(set2.has(sallyMoreProperties)).toBe(true); // <-- different than JSON case
   expect(set2.toArray()).toEqual(people);
 
   expect(set2.delete(barry)).toBe(true);
-  expect(set2.delete(sallyMoreProps)).toBe(true);
+  expect(set2.delete(sallyMoreProperties)).toBe(true);
 });
 
 test('mutableSet add event', () => {
   // Test events
   const set = mutable<string>();
-  const addFn = vi.fn();
+  const addFunction = vi.fn();
 
-  set.addEventListener(`add`, addFn);
+  set.addEventListener(`add`, addFunction);
   set.add(`a`, `b`, `c`, `d`, `e`, `f`);
-  expect(addFn).toBeCalledTimes(6);
+  expect(addFunction).toBeCalledTimes(6);
 });
 
 test('mutableSet delete event', () => {
@@ -71,10 +71,10 @@ test('mutableSet delete event', () => {
 
 test('mutableSet clear event', async () => {
   const set = mutable<string>();
-  const callbackFn = vi.fn();
-  set.addEventListener(`clear`, callbackFn);
+  const callbackFunction = vi.fn();
+  set.addEventListener(`clear`, callbackFunction);
   set.add(`a`, `b`, `c`, `d`, `e`, `f`);
   set.clear();
   await sleep(100);
-  expect(callbackFn).toBeCalledTimes(1);
+  expect(callbackFunction).toBeCalledTimes(1);
 });

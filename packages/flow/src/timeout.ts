@@ -1,7 +1,7 @@
-import { throwIntegerTest, integerTest } from '@ixfxfun/guards';
-import { type HasCompletion, type HasCompletionRunStates } from '@ixfxfun/core/continuously';
+import { throwIntegerTest, integerTest } from '@ixfx/guards';
+import { type HasCompletion, type HasCompletionRunStates } from '@ixfx/core';
 
-import { intervalToMs, type Interval } from '@ixfxfun/core';
+import { intervalToMs, type Interval } from '@ixfx/core';
 
 export type TimeoutSyncCallback = (
   elapsedMs?: number,

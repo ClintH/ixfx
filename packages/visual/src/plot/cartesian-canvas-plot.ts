@@ -1,19 +1,19 @@
 
 import { DataSet } from "./DataSet.js";
 import * as Cart from './cartesian.js';
-import { round } from "@ixfxfun/numbers";
+import { round } from "@ixfx/numbers";
 import type { GridStyle, LineStyle, SeriesMeta, ShowOptions, TextStyle } from "./types.js";
-import type { RecursivePartial } from "@ixfxfun/core";
+import type { RecursivePartial } from "@ixfx/core";
 import type { CanvasRegion, CanvasRegionSpec } from "../canvas-region.js";
 import { CanvasSource } from "../canvas-region.js";
-import { resolveEl } from "@ixfxfun/dom";
-import { ElementSizer } from "@ixfxfun/dom";
-import type { RectPositioned } from "@ixfxfun/geometry/rect";
-import { Points, Rects } from "@ixfxfun/geometry";
-import type { Line } from "@ixfxfun/geometry/line";
-import type { Point } from "@ixfxfun/geometry/point";
+import { resolveEl } from "@ixfx/dom";
+import { ElementSizer } from "@ixfx/dom";
+import type { RectPositioned } from "@ixfx/geometry/rect";
+import { Points, Rects } from "@ixfx/geometry";
+import type { Line } from "@ixfx/geometry/line";
+import type { Point } from "@ixfx/geometry/point";
 import { goldenAngleColour } from "../colour/generate.js";
-import { toString as ColourToString} from "../colour/to-hex.js";
+import { toString as ColourToString } from "../colour/to-hex.js";
 export type InsertOptions = {
   region?: CanvasRegionSpec
   /**
@@ -121,7 +121,7 @@ export class CartesianCanvasPlot {
    * List of lines to draw after drawing everything else.
    * Lines are given in value-coordinate space
    */
-  overlayLines: Array<Line & LineStyle> = [];
+  overlayLines: (Line & LineStyle)[] = [];
   #grid: GridStyle
   #rangeMode;
 
@@ -465,7 +465,7 @@ export class CartesianCanvasPlot {
   }
 
 
-  #drawYAxisValues(yPoints: Array<Point>) {
+  #drawYAxisValues(yPoints: Point[]) {
     //const { ctx } = this.helper;
     const ctx = this.#canvasRegion.context;
 
@@ -486,7 +486,7 @@ export class CartesianCanvasPlot {
     }
   }
 
-  #drawXAxisValues(xPoints: Array<Point>) {
+  #drawXAxisValues(xPoints: Point[]) {
     //const { ctx } = this.helper;
     const ctx = this.#canvasRegion.context;
     ctx.font = this.#textStyle.size + ` ` + this.#textStyle.font;
@@ -553,7 +553,7 @@ export class CartesianCanvasPlot {
     }
   }
 
-  #drawSeries(name: string, series: Array<Cart.PlotPoint>, meta: SeriesMeta) {
+  #drawSeries(name: string, series: Cart.PlotPoint[], meta: SeriesMeta) {
     if (this.#connectStyle === `line`) {
       this.#drawConnected(series, meta.colour, meta.lineWidth);
     }
@@ -568,7 +568,7 @@ export class CartesianCanvasPlot {
     //console.log(`valueCount: ${ valueCount }`);
   }
 
-  #drawConnected(dots: Array<Cart.PlotPoint>, colour: string, width: number) {
+  #drawConnected(dots: Cart.PlotPoint[], colour: string, width: number) {
     const ctx = this.#canvasRegion.context;
     ctx.beginPath();
     for (const [ index, dot_ ] of dots.entries()) {

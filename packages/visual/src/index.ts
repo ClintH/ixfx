@@ -1,5 +1,5 @@
-
-
+export * from './canvas-helper.js';
+export * from './pointer-visualise.js';
 // import * as Svg from './svg/index.js';
 // export * as Svg from './svg/index.js';
 

@@ -1,5 +1,5 @@
-import type { ToString } from '@ixfxfun/core';
-import { type IsEqual, isEqualDefault } from '@ixfxfun/core';
+import type { ToString } from '@ixfx/core';
+import { type IsEqual, isEqualDefault } from '@ixfx/core';
 import { type IMapOfMutableExtended } from './imap-of-mutable-extended.js';
 import { type MapMultiOpts, type MultiValue } from './map-multi.js';
 import { MapOfMutableImpl } from './map-of-multi-impl.js';
@@ -47,7 +47,7 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  */
 export const ofArrayMutable = <V>(
   options: MapArrayOpts<V> = {}
-): IMapOfMutableExtended<V, ReadonlyArray<V>> => {
+): IMapOfMutableExtended<V, readonly V[]> => {
   // const toStringFunction = opts.toString === undefined ?  
   // const comparer =
   //   opts.comparer === undefined
@@ -67,7 +67,7 @@ export const ofArrayMutable = <V>(
 
   const comparer = options.comparer ?? toStringFunction;
 
-  const t: MultiValue<V, ReadonlyArray<V>> = {
+  const t: MultiValue<V, readonly V[]> = {
     get name() {
       return `array`;
     },
@@ -84,6 +84,6 @@ export const ofArrayMutable = <V>(
     without: (source, value) => source.filter((v) => !comparer(v, value)),
     //[Symbol.iterator]: (source) => source[Symbol.iterator]()
   };
-  const m = new MapOfMutableImpl<V, ReadonlyArray<V>>(t, options);
+  const m = new MapOfMutableImpl<V, readonly V[]>(t, options);
   return m;
 };

@@ -1,6 +1,6 @@
 
 import { scale } from './scale.js';
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 import { clamp } from './clamp.js';
 import { numberArrayCompute } from './number-array-compute.js';
 /**

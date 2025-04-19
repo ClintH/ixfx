@@ -1,5 +1,5 @@
 
-import { intervalToMs, type SleepOpts } from "@ixfxfun/core";
+import { intervalToMs, type SleepOpts } from "@ixfx/core";
 import * as Async from "../async.js";
 import type { GenOrData, GenFactoryNoInput, SyncOptions } from "./types.js";
 import { resolveToGen } from "./utility.js";

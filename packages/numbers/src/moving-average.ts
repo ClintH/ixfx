@@ -1,4 +1,7 @@
-import { throwNumberTest, numberTest } from "@ixfxfun/guards";
+import { throwNumberTest, numberTest } from "@ixfx/guards";
+import { BasicQueueMutable } from "./util/queue-mutable.js";
+import { averageWeighted } from "./average-weighted.js";
+import { average } from "./numeric-arrays.js";
 const PiPi = Math.PI * 2;
 
 /**
@@ -36,6 +39,59 @@ export const movingAverageLight = (scaling = 3): (value?: number) => number => {
       average = average + (v - average) / Math.min(count, scaling);
     }
     return average;
+  }
+};
+
+/**
+ * Creates a moving average for a set number of `samples`.
+ * It returns a function which in turn yields an average value.
+ * 
+ * Moving average are useful for computing the average over a recent set of numbers.
+ * A lower number of samples produces a computed value that is lower-latency yet more jittery.
+ * A higher number of samples produces a smoother computed value which takes longer to respond to
+ * changes in data.
+ *
+ * Sample size is considered with respect to the level of latency/smoothness trade-off, and also
+ * the rate at which new data is added to the moving average.
+ *
+ *
+ * ```js
+ * const ma = movingAverage(10);
+ * ma(10); // 10
+ * ma(5);  // 7.5
+ * ```
+ *
+ * A weighting function can be provided to shape how the average is
+ * calculated - eg privileging the most recent data over older data.
+ * It uses `Arrays.averageWeighted` under the hood.
+ *
+ * ```js
+ * import { movingAverage } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * 
+ * // Give more weight to data in middle of sampling window
+ * const ma = movingAverage(100, gaussian());
+ * ```
+ *
+ * Because it keeps track of `samples` previous data, there is a memory impact. A lighter version is {@link movingAverageLight} which does not keep a buffer of prior data, but can't be as easily fine-tuned.
+ * @param samples Number of samples to compute average from
+ * @param weighter Optional weighting function
+ * @returns
+ */
+export const movingAverage = (
+  samples = 100,
+  weighter?: (v: number) => number
+): (value?: number) => number => {
+  const q = new BasicQueueMutable<number>();
+  return (v?: number) => {
+    const r = numberTest(v);
+    if (r[ 0 ] && v !== undefined) {
+      q.enqueue(v);
+      while (q.size > samples) {
+        q.dequeue();
+      }
+    }
+    return weighter === undefined ? average(q.data) : averageWeighted(q.data, weighter);
   }
 };
 
@@ -113,7 +169,7 @@ export const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault =
   let timestampLast = 0;
 
   const compute = (value: number, timestamp?: number) => {
-    if (timestamp === undefined) timestamp = performance.now();
+    timestamp ??= performance.now();
     const timeDelta = timestamp - timestampLast;
 
     // Filtered derivative

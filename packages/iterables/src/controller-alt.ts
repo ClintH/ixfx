@@ -1,5 +1,5 @@
-import { continuously } from "@ixfxfun/core/continuously"
-import { intervalToMs } from "@ixfxfun/core"
+import { continuously } from "@ixfx/core/continuously"
+import { intervalToMs } from "@ixfx/core"
 import type { IteratorControllerOptions, IteratorControllerState } from "./types.js"
 
 export type IteratorController = {

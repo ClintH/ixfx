@@ -1,4 +1,4 @@
-import { compareIterableValuesShallow, isEqualDefault, type IsEqual } from "@ixfxfun/core";
+import { compareIterableValuesShallow, isEqualDefault, type IsEqual } from "@ixfx/core";
 
 /**
  * Returns the 'max' of some iterable using the provided scoring function.

@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { throwIntegerTest } from "@ixfx/guards";
 import { guardGrid } from "./guards.js";
 import { offset } from "./offset.js";
 import type { Grid, GridCell, GridBoundsLogic } from "./types.js";

@@ -1,4 +1,4 @@
-import { guardIndex } from "@ixfxfun/guards";
+import { guardIndex } from "@ixfx/guards";
 
 /**
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.

@@ -1,4 +1,4 @@
-import type { IsEqual } from '@ixfxfun/core';
+import type { IsEqual } from '@ixfx/core';
 export { ofArrayMutable } from './map-of-array-mutable.js';
 export {
   ofSimpleMutable as mapOfSimpleMutable
@@ -20,11 +20,11 @@ export type MultiValue<V, M> = {
   get name(): string;
   has(source: M, value: V, eq: IsEqual<V>): boolean;
   add(destination: M | undefined, values: Iterable<V>): M;
-  toArray(source: M): ReadonlyArray<V>;
+  toArray(source: M): readonly V[];
   iterable(source: M): IterableIterator<V>;
   find(source: M, predicate: (v: V) => boolean): V | undefined;
   filter(source: M, predicate: (v: V) => boolean): Iterable<V>; // ReadonlyArray<V>
-  without(source: M, value: V): ReadonlyArray<V>;
+  without(source: M, value: V): readonly V[];
   count(source: M): number;
   //[Symbol.iterator](source:M, key:string):IterableIterator<V>;//[source:M, value:V]>
 };

@@ -1,14 +1,14 @@
 import { test, expect } from 'vitest';
-import { QueueMutable } from "@ixfxfun/collections";
+import { QueueMutable } from "@ixfx/collections";
 import { asResponsive } from "../../src/collections/responsive-queue.js";
-import { SyncWait } from "@ixfxfun/flow";
+import { SyncWait } from "@ixfx/flow";
 
 test(`responsive`, async () => {
   const qm1 = new QueueMutable<string>();
   const r1 = asResponsive(qm1);
   const sw = new SyncWait();
 
-  let seen: Array<ReadonlyArray<string>> = [];
+  let seen: (readonly string[])[] = [];
   const off = r1.onValue(value => {
     seen.push(value);
     sw.signal();

@@ -1,4 +1,4 @@
-import type { Interval } from "@ixfxfun/core";
+import type { Interval } from "@ixfx/core";
 
 export type WithEvents = {
   addEventListener(type: string, callbackfn: any): void;

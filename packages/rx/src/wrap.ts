@@ -6,9 +6,9 @@ import type { ReactiveOrSource, Wrapped, ToArrayOptions, InitStreamOptions, Reac
 import type { ChunkOptions, FieldOptions, FilterPredicate, DebounceOptions, SwitcherOptions, SplitOptions, ThrottleOptions, TransformOpts, SyncOptions, } from './ops/types.js'
 import type { TimeoutPingOptions, TimeoutValueOptions } from './from/types.js'
 import { messageHasValue } from "./util.js";
-import { mapObjectShallow } from '@ixfxfun/core/records';
+import { mapObjectShallow } from '@ixfx/core/records';
 import * as Enacts from './sinks/index.js';
-import type { Processors } from "@ixfxfun/process";
+import type { Processors } from "@ixfx/process";
 
 /**
  * Wrap a reactive source to allow for chained

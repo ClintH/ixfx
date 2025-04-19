@@ -1,4 +1,4 @@
-import { numberTest } from '@ixfxfun/guards';
+import { numberTest } from '@ixfx/guards';
 import { round } from './util/round.js';
 import type { Interval } from './types.js';
 

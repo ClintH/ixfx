@@ -74,3 +74,15 @@ npm run knip
 npx --yes @arethetypeswrong/cli --format ascii --profile esm-only --pack .
 npx publint
 ```
+
+# Publishing
+
+Add changeset
+```
+npx @changesets/cli
+```
+
+Version & publish
+```
+npx @changesets/cli version && npx @changesets/cli publish
+```

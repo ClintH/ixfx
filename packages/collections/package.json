@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/collections",
-	"version": "0.35.0",
+	"name": "@ixfx/collections",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -34,11 +34,11 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/arrays": "workspace:^",
-		"@ixfxfun/events": "workspace:^",
-		"@ixfxfun/core": "workspace:^",
-		"@ixfxfun/guards": "workspace:^",
-		"@ixfxfun/iterables": "workspace:^"
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/iterables": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

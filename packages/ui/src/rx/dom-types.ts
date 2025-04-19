@@ -1,5 +1,5 @@
-import type { Reactive } from "@ixfxfun/rx"
-import type { EventSourceOptions } from "@ixfxfun/rx/from"
+import type { Reactive } from "@ixfx/rx"
+import type { EventSourceOptions } from "@ixfx/rx/from"
 
 export type DomBindValueTarget = {
   /**

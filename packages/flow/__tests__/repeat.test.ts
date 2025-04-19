@@ -1,8 +1,7 @@
 import { test, expect } from 'vitest';
+import { isApprox } from '@ixfx/numbers';
+import { count, elapsedOnce, elapsedSince } from '@ixfx/core';
 import { repeat } from '../src/repeat.js';
-import * as Elapsed from '../../core/src/elapsed.js';
-import { isApprox } from '@ixfxfun/numbers';
-import { count } from '@ixfxfun/core';
 
 test('function', async done => {
   const rateMs = 50;
@@ -20,7 +19,7 @@ test('function', async done => {
   });
 
   let produced = 0;
-  const elapsed = Elapsed.elapsedSince();
+  const elapsed = elapsedSince();
 
   for await (const r of randomGenerator) {
     expect(r).toBeTypeOf(`number`);
@@ -34,7 +33,7 @@ test('function', async done => {
   expect(completeCalled).toBe(1);
 });
 
-test('array', async done => {
+test('array', async () => {
   let startCalled = 0;
   let completeCalled = 0;
   let errors = 0;
@@ -51,7 +50,7 @@ test('array', async done => {
   } as const;
   const list = [ 'thom', 'jonny', 'colin', 'ed', 'phil' ];
   const iterateResult: any[] = [];
-  const elapsed = Elapsed.elapsedOnce();
+  const elapsed = elapsedOnce();
   for await (const index of repeat(list, opts)) {
     expect(index).toBeTypeOf(`string`);
     //if (typeof i !== 'string') done.fail(`Expected string type. Got: ${ typeof i }`);
@@ -66,7 +65,7 @@ test('array', async done => {
   expect(completeCalled).toBe(1);
 });
 
-test('generator', async done => {
+test('generator', async () => {
   // A generator that counts to 5
   const counter = count(5);
   const created: any[] = [];

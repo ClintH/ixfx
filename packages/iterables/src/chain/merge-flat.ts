@@ -1,4 +1,4 @@
-import { sleep } from "@ixfxfun/core";
+import { sleep } from "@ixfx/core";
 import { QueueMutable } from "../util/queueMutable.js";
 import type { GenFactoryNoInput, GenOrData } from "./types.js";
 import { resolveToAsyncGen } from "./utility.js";

@@ -1,8 +1,8 @@
 import { test, expect, assert } from 'vitest';
 import { retryFunction, backoffGenerator } from '../src/index.js';
-import { isApprox } from '@ixfxfun/numbers';
-import { sleep } from '@ixfxfun/core';
-import * as Elapsed from "@ixfxfun/core/elapsed";
+import { isApprox } from '@ixfx/numbers';
+import { sleep } from '@ixfx/core';
+import * as Elapsed from "@ixfx/core/elapsed";
 
 test('backoffGenerator', async () => {
   // Use 1 as value, 1.1 as power

@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfxfun/guards';
+import { throwNumberTest } from '@ixfx/guards';
 
 /**
  * Continually loops up and down between 0 and 1 by a specified interval.

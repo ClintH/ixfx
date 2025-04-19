@@ -1,5 +1,5 @@
-import { throwNumberTest } from '@ixfxfun/guards';
-import {  type RandomSource } from '@ixfxfun/random';
+import { throwNumberTest } from '@ixfx/guards';
+import { type RandomSource } from '@ixfx/random';
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
  * It's useful for generating perceptually different shades as the index increments.

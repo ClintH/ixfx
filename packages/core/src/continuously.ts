@@ -1,5 +1,5 @@
-import { throwIntegerTest } from '@ixfxfun/guards';
-import { intervalToMs, type Interval } from '@ixfxfun/core';
+import { throwIntegerTest } from '@ixfx/guards';
+import { intervalToMs, type Interval } from '@ixfx/core';
 
 export type HasCompletionRunStates = `idle` | `scheduled` | `running`;
 export type HasCompletion = {

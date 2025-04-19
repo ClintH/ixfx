@@ -1,4 +1,4 @@
-import { defaultKeyer, type IsEqual, isEqualDefault } from '@ixfxfun/core';
+import { defaultKeyer, type IsEqual, isEqualDefault } from '@ixfx/core';
 import type { IMapOfMutable } from './imap-of-mutable.js';
 import { MapOfSimpleBase } from './map-of-simple-base.js';
 
@@ -28,7 +28,7 @@ export class MapOfSimpleMutable<V>
   extends MapOfSimpleBase<V>
   implements IMapOfMutable<V> {
 
-  addKeyedValues(key: string, ...values: ReadonlyArray<V>) {
+  addKeyedValues(key: string, ...values: readonly V[]) {
     const existing = this.map.get(key);
     if (existing === undefined) {
       this.map.set(key, values);
@@ -43,7 +43,7 @@ export class MapOfSimpleMutable<V>
    * @param key 
    * @param values 
    */
-  setValues(key: string, values: ReadonlyArray<V>) {
+  setValues(key: string, values: readonly V[]) {
     this.map.set(key, values);
   }
 
@@ -52,7 +52,7 @@ export class MapOfSimpleMutable<V>
    * `groupBy` function assigned in the constructor options.
    * @param values Adds several values
    */
-  addValue(...values: ReadonlyArray<V>) {
+  addValue(...values: readonly V[]) {
     for (const v of values) {
       const key = this.groupBy(v);
       this.addKeyedValues(key, v);

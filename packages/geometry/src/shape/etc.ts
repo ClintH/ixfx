@@ -1,4 +1,4 @@
-import type { RandomSource } from "@ixfxfun/random";
+import type { RandomSource } from "@ixfx/random";
 import type { ShapePositioned } from "./shape-type.js";
 import { isCircle, isCirclePositioned } from "../circle/guard.js";
 import { isRect, isRectPositioned } from "../rect/guard.js";

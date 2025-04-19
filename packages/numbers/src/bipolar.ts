@@ -1,7 +1,7 @@
-//import { floatSource,type RandomOptions, type RandomSource } from '@ixfxfun/random';
-import { throwNumberTest } from '@ixfxfun/guards';
-import { interpolate, scaler as numberScaler } from '@ixfxfun/numbers';
-import type { BipolarWrapper} from './types.js';
+//import { floatSource,type RandomOptions, type RandomSource } from '@ixfx/random';
+import { throwNumberTest } from '@ixfx/guards';
+import { interpolate, scaler as numberScaler } from '@ixfx/numbers';
+import type { BipolarWrapper } from './types.js';
 
 
 /**

@@ -1,6 +1,6 @@
 import type { ColorConstructor } from "colorjs.io";
 import type { Colourish, OkLch } from "./types.js";
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 export const oklchToColorJs = (lch: OkLch): ColorConstructor => {
   throwNumberTest(lch.l, `percentage`, `lch.l`);
   throwNumberTest(lch.c, `percentage`, `lch.c`);

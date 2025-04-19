@@ -3,24 +3,33 @@
 	"scripts": {
 		"build": "tsc --build",
 		"clean": "pnpm --recursive exec rm -rf dist",
-		"rebuild":"pnpm run clean && pnpm  run build",
+		"rebuild": "pnpm run clean && pnpm run build",
 		"test": "vitest --api",
-		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint",
-		"demos": "rm -rf ../ixfxfun/demos/_lib/ && npm run demos:copy"
+		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.12",
 		"@eslint/js": "9.24.0",
+		"@microsoft/api-extractor": "7.52.4",
+		"@parcel/transformer-typescript-types": "2.14.4",
+		"@rslib/core": "0.6.5",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
 		"@types/node": "^22.14.0",
 		"copyfiles": "2.4.1",
 		"eslint": "9.24.0",
 		"eslint-plugin-unicorn": "58.0.0",
 		"globals": "16.0.0",
+		"hereby": "1.10.0",
+		"pkgroll": "2.12.1",
 		"publint": "^0.3.10",
+		"rolldown": "1.0.0-beta.7",
 		"typescript": "5.8.3",
 		"typescript-eslint": "8.29.1",
-		"vitest": "^3.0.4"
+		"vitest": "^3.0.4",
+		"del": "8.0.0",
+		"execa": "9.5.2",
+		"tsup": "8.2.0"
 	},
-	"packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808"
+	"packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808",
+	"type": "module"
 }

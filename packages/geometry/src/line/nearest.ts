@@ -1,7 +1,7 @@
 import type { Point } from "../point/point-type.js";
 import type { Line } from "./line-type.js";
 import { distance as PointsDistance } from "../point/distance.js";
-import { minIndex } from "@ixfxfun/numbers";
+import { minIndex } from "@ixfx/numbers";
 /**
  * Returns the nearest point on `line` closest to `point`.
  * 
@@ -15,7 +15,7 @@ import { minIndex } from "@ixfxfun/numbers";
  * @param point
  * @returns Point `{ x, y }`
  */
-export const nearest = (line: Line | ReadonlyArray<Line>, point: Point): Point => {
+export const nearest = (line: Line | readonly Line[], point: Point): Point => {
 
   const n = (line: Line): Point => {
     const { a, b } = line;

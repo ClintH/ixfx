@@ -1,4 +1,4 @@
-import { type Dispatch, DispatchList } from "@ixfxfun/flow";
+import { type Dispatch, DispatchList } from "@ixfx/flow";
 import { resolveSource } from "./resolve-source.js";
 import type { InitLazyStreamInitedOptions, InitLazyStreamOptions, InitStreamOptions, Passed, ReactiveInitialStream, ReactiveOrSource, ReactiveStream, SignalKinds, UpstreamOptions } from "./types.js";
 import { messageHasValue, messageIsSignal } from "./util.js";

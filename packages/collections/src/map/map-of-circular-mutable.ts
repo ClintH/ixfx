@@ -1,4 +1,4 @@
-import { isEqualDefault } from '@ixfxfun/core';
+import { isEqualDefault } from '@ixfx/core';
 import { type ICircularArray, circularArray } from '../circular-array.js';
 import type { MapMultiOpts, MultiValue } from './map-multi.js';
 import { MapOfMutableImpl } from './map-of-multi-impl.js';

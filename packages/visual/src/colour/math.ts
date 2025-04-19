@@ -1,5 +1,5 @@
-import { clamp } from '@ixfxfun/numbers';
-import { throwNumberTest } from '@ixfxfun/guards';
+import { clamp } from '@ixfx/numbers';
+import { throwNumberTest } from '@ixfx/guards';
 import { structuredToColorJs } from './resolve-to-color.js';
 import type { Colourish } from './types.js';
 /**

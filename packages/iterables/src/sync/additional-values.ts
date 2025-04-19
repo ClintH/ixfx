@@ -1,4 +1,4 @@
-import { isEqualDefault, type IsEqual } from "@ixfxfun/core";
+import { isEqualDefault, type IsEqual } from "@ixfx/core";
 
 /**
  * Yield additional values from `values` which are not in `source`.
@@ -34,7 +34,7 @@ export function* additionalValues<V>(
   eq: IsEqual<V> = isEqualDefault
 ): Iterable<V> {
   const sourceArray = Array.isArray(source) ? source : [ ...source ];
-  const yielded: Array<V> = [];
+  const yielded: V[] = [];
   for (const v of values) {
     const found = sourceArray.find((index) => eq(index, v));
     if (!found) {

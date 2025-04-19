@@ -1,4 +1,4 @@
-import { shuffle } from "@ixfxfun/arrays";
+import { shuffle } from "@ixfx/arrays";
 import { initUpstream } from "../init-stream.js";
 import type { ReactiveOrSource, Reactive } from "../types.js";
 import type { SingleFromArrayOptions } from "./types.js";

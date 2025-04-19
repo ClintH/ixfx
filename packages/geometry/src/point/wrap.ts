@@ -1,4 +1,4 @@
-import { wrap as wrapNumber } from '@ixfxfun/numbers';
+import { wrap as wrapNumber } from '@ixfx/numbers';
 import { guard } from './guard.js';
 import type { Point } from "./point-type.js";
 

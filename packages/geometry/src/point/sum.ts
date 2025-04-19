@@ -1,7 +1,7 @@
 import { getTwoPointParameters } from "./get-point-parameter.js";
 import { guard, isPoint3d } from "./guard.js";
 import type { Point, Point3d } from "./point-type.js";
-import type { Writeable } from "@ixfxfun/core";
+import type { Writeable } from "@ixfx/core";
 
 export function sum(a: Point, b: Point): Point;
 export function sum(a: Point3d, b: Point3d): Point3d;
@@ -29,7 +29,7 @@ export function sum(
   const [ ptA, ptB ] = getTwoPointParameters(a1 as any, ab2 as any, ab3 as any, ab4 as any, ab5 as any, ab6 as any);
   guard(ptA, `a`);
   guard(ptB, `b`);
-  let pt: Writeable<Point> = {
+  const pt: Writeable<Point> = {
     x: ptA.x + ptB.x,
     y: ptA.y + ptB.y,
   };

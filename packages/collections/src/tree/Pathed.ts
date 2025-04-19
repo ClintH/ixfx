@@ -1,5 +1,5 @@
-import * as TreeArrayBacked from "./TreeMutable.js";
-import type { LabelledValue, LabelledNode, TreeNode } from "./Types.js";
+import * as TreeArrayBacked from "./tree-mutable.js";
+import type { LabelledValue, LabelledNode, TreeNode } from "./types.js";
 /**
  * Options for parsing a path
  */
@@ -94,7 +94,7 @@ export const create = <T>(pathOpts: Partial<PathOpts> = {}) => {
     return c.childrenStore.length;
   }
 
-  const getValues = (path: string): Array<T> => {
+  const getValues = (path: string): T[] => {
     if (root === undefined) return [];
     return valuesByPath(path, root, pathOpts);
   }
@@ -130,7 +130,7 @@ export const create = <T>(pathOpts: Partial<PathOpts> = {}) => {
  * @param path
  * @param pathOpts
  */
-export const addValueByPath = <T>(value: T, path: string, node?: LabelledNode<T> | undefined, pathOpts: Partial<PathOpts> = {}): LabelledNode<T> => {
+export const addValueByPath = <T>(value: T, path: string, node?: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): LabelledNode<T> => {
   const separator = pathOpts.separator ?? `.`;
   const duplicatePath = pathOpts.duplicates ?? `overwrite`;
   const split = path.split(separator);
@@ -225,7 +225,7 @@ export const valueByPath = <T>(path: string, node: LabelledNode<T>, pathOpts: Pa
   return values[ 0 ];
 }
 
-const getValuesFromNode = <T>(c: LabelledNode<T>): Array<T> => {
+const getValuesFromNode = <T>(c: LabelledNode<T>): T[] => {
   if (c.value === undefined) return [];
   if (`values` in c.value) return c.value.values;
   if (`value` in c.value) {
@@ -248,7 +248,7 @@ const findChildByPath = <T>(path: string, node: LabelledNode<T>, pathOpts: Parti
   return c;
 }
 
-export const valuesByPath = <T>(path: string, node: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): Array<T> => {
+export const valuesByPath = <T>(path: string, node: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): T[] => {
   const separator = pathOpts.separator ?? `.`;
   const split = path.split(separator);
   let c: LabelledNode<T> | undefined = node;

@@ -1,4 +1,4 @@
-import { setProperty } from "@ixfxfun/dom";
+import { setProperty } from "@ixfx/dom";
 import { resolveSource } from "../resolve-source.js";
 import type { ReactiveOrSource } from "../types.js";
 
@@ -34,7 +34,7 @@ export const setHtmlText = (rxOrSource: ReactiveOrSource<any>, optionsOrElementO
     options = { query: optionsOrElementOrQuery };
   }
   if (typeof optionsOrElementOrQuery === `object`) {
-     
+
     if (`nodeName` in optionsOrElementOrQuery) {
       options = { el: optionsOrElementOrQuery };
     } else {

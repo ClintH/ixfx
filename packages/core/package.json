@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/core",
-	"version": "0.35.0",
+	"name": "@ixfx/core",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -54,8 +54,8 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/debug":"workspace:^",
-		"@ixfxfun/guards":"workspace:^"
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/guards": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

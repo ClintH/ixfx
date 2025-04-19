@@ -1,6 +1,6 @@
-import type { Interval } from "@ixfxfun/core";
-import { observable } from "@ixfxfun/rx/from";
-import { debounce} from "@ixfxfun/rx/op/debounce";
+import type { Interval } from "@ixfx/core";
+import { observable } from "@ixfx/rx/from";
+import { debounce } from "@ixfx/rx/op/debounce";
 
 /**
  * Observe when element resizes. Specify `interval` to debounce, uses 100ms by default.
@@ -26,7 +26,7 @@ export const browserResizeObservable = (
     throw new Error(`Param 'elem' is undefined. Expected element to observe`);
   }
 
-  const m = observable<Array<ResizeObserverEntry>>(stream => {
+  const m = observable<ResizeObserverEntry[]>(stream => {
     const ro = new ResizeObserver((entries) => {
       stream.set(entries);
     });
@@ -37,7 +37,7 @@ export const browserResizeObservable = (
     };
   });
   //return debounce({ elapsed: interval ?? 100 })(m);
-  return debounce<Array<ResizeObserverEntry>>({ elapsed: interval ?? 100 })(m);
+  return debounce<ResizeObserverEntry[]>({ elapsed: interval ?? 100 })(m);
 }
 
 /**

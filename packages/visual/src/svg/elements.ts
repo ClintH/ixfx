@@ -3,7 +3,7 @@
 //import type { Point } from '../../geometry/point/PointType.js';
 //import type { Line } from '../../geometry/line/LineType.js';
 //import * as Lines from '../geometry/line/index.js';
-import {Lines,Polar } from '@ixfxfun/geometry';
+import { Lines, Polar } from '@ixfx/geometry';
 //import * as Svg from './index.js';
 
 import { getCssVariable } from '../colour/index.js';
@@ -12,9 +12,9 @@ import { applyOpts } from './apply.js';
 import { applyStrokeOpts } from './stroke.js';
 import { createEl, createOrResolve } from './create.js';
 import { applyPathOpts } from './path.js';
-import type { CirclePositioned } from '@ixfxfun/geometry/circle';
-import type { Line } from '@ixfxfun/geometry/line';
-import type { Point } from '@ixfxfun/geometry/point';
+import type { CirclePositioned } from '@ixfx/geometry/circle';
+import type { Line } from '@ixfx/geometry/line';
+import type { Point } from '@ixfx/geometry/point';
 //import type { PolarRay } from 'src/geometry/polar/Types.js';
 //import { toCartesian as polarRayToCartesian } from 'src/geometry/polar/Ray.js';
 //import {Palette} from ".";
@@ -40,7 +40,7 @@ const numberOrPercentage = (v: number): string => {
  * @returns
  */
 export const path = (
-  svgOrArray: string | ReadonlyArray<string>,
+  svgOrArray: string | readonly string[],
   parent: SVGElement,
   opts?: PathDrawingOpts,
   queryOrExisting?: string | SVGPathElement
@@ -122,7 +122,7 @@ export const circle = (
  * @returns
  */
 export const group = (
-  children: ReadonlyArray<SVGElement>,
+  children: readonly SVGElement[],
   parent: SVGElement,
   queryOrExisting?: string | SVGGElement
 ): SVGGElement => {
@@ -132,7 +132,7 @@ export const group = (
 
 export const groupUpdate = (
   elem: SVGGElement,
-  children: ReadonlyArray<SVGElement>
+  children: readonly SVGElement[]
 ) => {
   for (const c of children) {
     if (c.parentNode !== elem) {

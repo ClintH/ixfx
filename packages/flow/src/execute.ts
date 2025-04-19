@@ -1,5 +1,5 @@
-import { defaultComparer, type Comparer } from '@ixfxfun/core';
-import { shuffle } from '@ixfxfun/arrays';
+import { defaultComparer, type Comparer } from '@ixfx/core';
+import { shuffle } from '@ixfx/arrays';
 
 export type ExpressionOrResult<ArgsType, ResultType> =
   | ResultType
@@ -115,14 +115,14 @@ export const run = async <ArgsType, ResultType>(
   args?: ArgsType
 ): Promise<ResultType[]> => {
   const results: ResultType[] = [];
-  const compareFn = opts.rank ?? defaultComparer;
+  const compareFunction = opts.rank ?? defaultComparer;
   let expressionsArray = Array.isArray(expressions)
-    ? (expressions as ExpressionOrResult<ArgsType, ResultType>[])
+    ? (expressions)
     : [ expressions as ExpressionOrResult<ArgsType, ResultType> ];
   if (opts.shuffle) expressionsArray = shuffle(expressionsArray);
 
-  for (let i = 0; i < expressionsArray.length; i++) {
-    const exp = expressionsArray[ i ];
+  for (let index = 0; index < expressionsArray.length; index++) {
+    const exp = expressionsArray[ index ];
 
     let r: ResultType;
     if (typeof exp === 'function') {
@@ -133,7 +133,7 @@ export const run = async <ArgsType, ResultType>(
     }
     if (r !== undefined) {
       results.push(r);
-      results.sort(compareFn);
+      results.sort(compareFunction);
     }
 
     if (typeof opts.stop !== 'undefined') {

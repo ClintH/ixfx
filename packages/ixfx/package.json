@@ -1,20 +1,26 @@
 {
-	"name": "@ixfxfun/ixfx",
-	"version": "0.35.0",
+	"name": "@ixfx/ixfx",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
-	"files": [
-		"dist/"
-	],
+	"homepage": "https://clinth.github.io/ixfx/",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/clinth/ixfx.git"
+	},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
 			"import": "./src/index.ts"
 		},
 		"./numbers": {
-			"types": "./src/numbers/index.ts",
-			"import": "./src/numbers/index.ts"
+			"types": "./src/numbers.ts",
+			"import": "./src/numbers.ts"
+		},
+		"./visual": {
+			"types": "./src/visual.ts",
+			"import": "./src/visual.ts"
 		},
 		"./rx": {
 			"types": "./src/rx/index.ts",
@@ -22,23 +28,25 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/arrays": "workspace:^",
-		"@ixfxfun/dom": "workspace:^",
-		"@ixfxfun/debug": "workspace:^",
-		"@ixfxfun/core": "workspace:^",
-		"@ixfxfun/flow": "workspace:^",
-		"@ixfxfun/guards": "workspace:^",
-		"@ixfxfun/collections": "workspace:^",
-		"@ixfxfun/events": "workspace:^",
-		"@ixfxfun/random": "workspace:^",
-		"@ixfxfun/rx": "workspace:^",
-		"@ixfxfun/iterables": "workspace:^",
-		"@ixfxfun/visual": "workspace:^",
-		"@ixfxfun/numbers": "workspace:^",
-		"@ixfxfun/modulation": "workspace:^"
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/dom": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/flow": "workspace:^",
+		"@ixfx/geometry": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/iterables": "workspace:^",
+		"@ixfx/modulation": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/random": "workspace:^",
+		"@ixfx/rx": "workspace:^",
+		"@ixfx/visual": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",
+		"types": "dist/src/index.d.ts",
 		"exports": {
 			".": {
 				"types": "./dist/src/index.d.ts",
@@ -49,8 +57,12 @@
 				"import": "./dist/src/rx/index.js"
 			},
 			"./numbers": {
-				"types": "./dist/src/numbers/index.d.ts",
-				"import": "./dist/src/numbers/index.js"
+				"types": "./dist/src/numbers.d.ts",
+				"import": "./dist/src/numbers.js"
+			},
+			"./visual": {
+				"types": "./dist/src/visual.d.ts",
+				"import": "./dist/src/visual.js"
 			}
 		}
 	}

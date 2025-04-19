@@ -1,6 +1,6 @@
-import { throwNumberTest } from "@ixfxfun/guards";
-import { isEqualDefault, type IsEqual } from "@ixfxfun/core";
-import { max as IterablesMax, min as IterablesMin, last as IterablesLast } from "@ixfxfun/iterables";
+import { throwNumberTest } from "@ixfx/guards";
+import { isEqualDefault, type IsEqual } from "@ixfx/core";
+import { max as IterablesMax, min as IterablesMin, last as IterablesLast } from "@ixfx/iterables";
 import type { IPriorityQueueMutable, PriorityItem } from "./ipriority-queue-mutable.js";
 import { QueueMutable } from "./queue-mutable.js";
 import type { QueueOpts } from "./queue-types.js";

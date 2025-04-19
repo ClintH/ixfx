@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { throwIntegerTest } from "@ixfx/guards";
 
 export function round(decimalPlaces: number, v: number, roundUp?: boolean): number;
 export function round(decimalPlaces: number, roundUp?: boolean): (v: number) => number;
@@ -25,7 +25,7 @@ export function round(decimalPlaces: number, roundUp?: boolean): (v: number) => 
 export function round(a: number, b?: number | boolean, roundUp?: boolean) {
   throwIntegerTest(a, `positive`, `decimalPlaces`);
 
-  let up = (typeof b === `boolean`) ? b : (roundUp ?? false)
+  const up = (typeof b === `boolean`) ? b : (roundUp ?? false)
   let rounder;
   if (a === 0) {
     rounder = Math.round;

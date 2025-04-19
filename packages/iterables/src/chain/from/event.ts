@@ -1,4 +1,4 @@
-import { promiseFromEvent } from "@ixfxfun/core";
+import { promiseFromEvent } from "@ixfx/core";
 import type { GenFactoryNoInput } from "../types.js";
 
 /**

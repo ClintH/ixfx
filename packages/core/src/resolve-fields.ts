@@ -1,4 +1,4 @@
-import { resolve, resolveSync, type ReactiveNonInitial, type ResolveToValue } from "@ixfxfun/core";
+import { resolve, resolveSync, type ReactiveNonInitial, type ResolveToValue } from "@ixfx/core";
 import { zip } from "./util/zip.js";
 // import { zip } from "./arrays/Zip.js";
 

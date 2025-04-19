@@ -1,4 +1,4 @@
-import { integerTest,throwFromResult } from '@ixfxfun/guards';
+import { integerTest, throwFromResult } from '@ixfx/guards';
 //export { string as random } from './random/String.js';
 
 //import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
@@ -300,7 +300,7 @@ export const omitChars = (
 export const splitByLength = (
   source: string | null,
   length: number
-): ReadonlyArray<string> => {
+): readonly string[] => {
   throwFromResult(integerTest(length, `aboveZero`, `length`));
   if (source === null) throw new Error(`source parameter null`);
   if (typeof source !== `string`) {
@@ -309,7 +309,7 @@ export const splitByLength = (
 
   // ✔ Unit tested
   const chunks = Math.ceil(source.length / length);
-  const returnValue: Array<string> = [];
+  const returnValue: string[] = [];
   //eslint-disable-next-line functional/no-let
   let start = 0;
 
@@ -508,7 +508,7 @@ export const beforeAfterMatch = (source: string, match: string, options: Partial
  */
 export const unwrap = (
   source: string,
-  ...wrappers: ReadonlyArray<string>
+  ...wrappers: readonly string[]
 ): string => {
   //eslint-disable-next-line functional/no-let
   let matched = false;
@@ -564,7 +564,7 @@ export type LineSpan = {
  * @returns Span
  */
 export const lineSpan = (
-  ranges: ReadonlyArray<Range>,
+  ranges: readonly Range[],
   start: number,
   end: number
 ): LineSpan => {
@@ -618,12 +618,12 @@ export const lineSpan = (
 export const splitRanges = (
   source: string,
   split: string
-): ReadonlyArray<Range> => {
+): readonly Range[] => {
   //eslint-disable-next-line functional/no-let
   let start = 0;
   //eslint-disable-next-line functional/no-let
   let text = ``;
-  const ranges: Array<Range> = [];
+  const ranges: Range[] = [];
   //eslint-disable-next-line functional/no-let
   let index = 0;
   //eslint-disable-next-line functional/no-let,unicorn/prevent-abbreviations
@@ -667,7 +667,7 @@ export const splitRanges = (
  */
 export const countCharsFromStart = (
   source: string,
-  ...chars: ReadonlyArray<string>
+  ...chars: readonly string[]
 ): number => {
   //eslint-disable-next-line functional/no-let
   let counted = 0;
@@ -702,7 +702,7 @@ export const startsEnds = (
   end: string = start
 ): boolean => source.startsWith(start) && source.endsWith(end);
 
-//eslint-disable-next-line no-useless-escape
+
 export const htmlEntities = (source: string): string =>
   source.replaceAll(/[&<>\u00A0-\u9999]/g, (index) => `&#${ index.codePointAt(0) };`);
 

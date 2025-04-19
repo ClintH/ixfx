@@ -2,7 +2,7 @@ import type { Point } from '../point/point-type.js';
 import type { Line } from './line-type.js';
 //import * as Points from '../point/index.js';
 import { normaliseByRect as PointsNormaliseByRect } from '../point/normalise-by-rect.js';
-import { minFast } from '@ixfxfun/numbers';
+import { minFast } from '@ixfx/numbers';
 import { distanceSingleLine } from './distance-single-line.js';
 import { isLine } from './guard.js';
 import { length } from './length.js';
@@ -307,7 +307,7 @@ export function* pointsOf(line: Line): Generator<Point> {
  * @param point Point to check against
  * @returns Distance
  */
-export const distance = (line: Line | ReadonlyArray<Line>, point: Point): number => {
+export const distance = (line: Line | readonly Line[], point: Point): number => {
   if (Array.isArray(line)) {
     const distances = line.map(l => distanceSingleLine(l, point));
     return minFast(distances);
@@ -330,7 +330,7 @@ export const distance = (line: Line | ReadonlyArray<Line>, point: Point): number
  * @param {Point} b
  * @returns {number[]}
  */
-export const toFlatArray = (a: Point | Line, b: Point): ReadonlyArray<number> => {
+export const toFlatArray = (a: Point | Line, b: Point): readonly number[] => {
   if (isLine(a)) {
     return [ a.a.x, a.a.y, a.b.x, a.b.y ];
   } else if (isPoint(a) && isPoint(b)) {
@@ -369,4 +369,4 @@ export function* asPoints(lines: Iterable<Line>) {
  * @param b 
  * @returns 
  */
-export const toSvgString = (a: Point, b: Point): ReadonlyArray<string> => [ `M${ a.x } ${ a.y } L ${ b.x } ${ b.y }` ];
+export const toSvgString = (a: Point, b: Point): readonly string[] => [ `M${ a.x } ${ a.y } L ${ b.x } ${ b.y }` ];

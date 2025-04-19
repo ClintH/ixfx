@@ -1,8 +1,8 @@
 // ✔ UNIT TESTED
 
-import { type IsEqual, isEqualDefault } from '@ixfxfun/core';
+import { type IsEqual, isEqualDefault } from '@ixfx/core';
 import type { IMapOf } from './imap-of.js';
-import type { IWithEntries } from '@ixfxfun/core';
+import type { IWithEntries } from '@ixfx/core';
 
 /**
  * Finds first entry by iterable value. Expects a map with an iterable as values.
@@ -28,8 +28,8 @@ export const firstEntry = <K, V>(
   predicate: (value: V, key: K) => boolean
 ): readonly [ key: K, value: Iterable<V> ] | undefined => {
   for (const e of map.entries()) {
-    const val = e[ 1 ];
-    for (const subValue of val) {
+    const value = e[ 1 ];
+    for (const subValue of value) {
       if (predicate(subValue, e[ 0 ])) return e;
     }
   }
@@ -73,8 +73,8 @@ export const firstEntryByValue = <K, V>(
   isEqual: IsEqual<V> = isEqualDefault
 ): readonly [ key: K, value: Iterable<V> ] | undefined => {
   for (const e of map.entries()) {
-    const val = e[ 1 ];
-    for (const subValue of val) {
+    const value_ = e[ 1 ];
+    for (const subValue of value_) {
       if (isEqual(subValue, value)) return e;
     }
   }

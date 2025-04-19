@@ -1,4 +1,4 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
+import { SimpleEventEmitter } from '@ixfx/events';
 import type { ValueSetEventMap } from './Types.js';
 
 /**
@@ -67,7 +67,7 @@ export interface ISetMutable<V>
    * @param values Value(s) to add
    * @returns _true_ if something new was added
    */
-  add(...values: ReadonlyArray<V>): boolean;
+  add(...values: readonly V[]): boolean;
 
   /**
    * Iterate over values
@@ -100,7 +100,7 @@ export interface ISetMutable<V>
   /**
    * Returns an array of values
    */
-  toArray(): ReadonlyArray<V>;
+  toArray(): readonly V[];
 
   /**
    * Returns the number of items stored in the set

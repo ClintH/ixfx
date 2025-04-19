@@ -1,4 +1,4 @@
-import { isEqualValueDefault } from "@ixfxfun/core";
+import { isEqualValueDefault } from "@ixfx/core";
 import { cache } from "../cache.js";
 import { initUpstream } from "../init-stream.js";
 import { type CombineLatestToObject, combineLatestToObject } from "../ops/combine-latest-to-object.js";

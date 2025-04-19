@@ -1,4 +1,4 @@
-import { MapOfSimpleMutable } from "@ixfxfun/collections";
+import { MapOfSimpleMutable } from "@ixfx/collections";
 
 export class DataSet<TValue, TSeriesMeta> {
   #data;
@@ -21,7 +21,7 @@ export class DataSet<TValue, TSeriesMeta> {
     this.lastChange = performance.now();
   }
 
-  set(series: string, data: Array<TValue>) {
+  set(series: string, data: TValue[]) {
     this.#data.setValues(series, data);
   }
 

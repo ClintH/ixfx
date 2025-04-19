@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest';
-import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../src/tree/TraverseObject.js';
-import * as TraversableTree from '../../src/tree/TraversableTree.js';
-import * as TreeMutable from '../../src/tree/TreeMutable.js';
-import { isEqualValueDefault, isEqualValuePartial } from '@ixfxfun/core';
+import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../src/tree/traverse-object.js';
+import * as TraversableTree from '../../src/tree/traversable-tree.js';
+import * as TreeMutable from '../../src/tree/tree-mutable.js';
+import { isEqualValueDefault, isEqualValuePartial } from '@ixfx/core';
 
 
 function getTestMap() {

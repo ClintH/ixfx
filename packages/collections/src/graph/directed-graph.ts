@@ -4,9 +4,9 @@ import { QueueMutable } from "../queue/queue-mutable.js"
 import { PriorityMutable } from "../queue/priority-mutable.js"
 import { immutable as immutableMap, type IMapImmutable } from "../map/map.js"
 import { NumberMap } from "../map/number-map.js"
-import * as Sync from "@ixfxfun/iterables/sync"
+import * as Sync from "@ixfx/iterables/sync"
 import { Table } from "../table.js"
-import { throwStringTest } from "@ixfxfun/guards"
+import { throwStringTest } from "@ixfx/guards"
 
 export type DistanceCompute = (graph: DirectedGraph, edge: Edge) => number;
 
@@ -20,7 +20,7 @@ export type DistanceCompute = (graph: DirectedGraph, edge: Edge) => number;
  * {@link Edge} type. They must be unique.
  */
 export type Vertex = Readonly<{
-  out: ReadonlyArray<Edge>
+  out: readonly Edge[]
   id: string
 }>
 
@@ -64,7 +64,7 @@ export type ConnectOptions = Readonly<{
   /**
    * To, or destination of connection. Can be multiple vertices for quick use
    */
-  to: string | Array<string>
+  to: string | string[]
   /**
    * If true, edges in opposite direction are made as well
    */
@@ -146,7 +146,7 @@ export function toAdjacencyMatrix(graph: DirectedGraph): Table<boolean> {
   //   row[ index ] = false;
   // }
 
-  // eslint-disable-next-line @typescript-eslint/prefer-for-of, unicorn/prevent-abbreviations
+  // eslint-disable-next-line unicorn/prevent-abbreviations
   for (let i = 0; i < v.length; i++) {
     //m[ i ] = [ ...row ];
     table.setRow(i, v.length, false);
@@ -177,9 +177,9 @@ export const dumpGraph = (graph: DirectedGraph | Iterable<Vertex>): string => {
  * @param graph 
  * @returns 
  */
-const debugGraphToArray = (graph: DirectedGraph | Iterable<Vertex>): Array<string> => {
+const debugGraphToArray = (graph: DirectedGraph | Iterable<Vertex>): string[] => {
 
-  const r: Array<string> = [];
+  const r: string[] = [];
   const vertices = (`vertices` in graph) ? graph.vertices.values() : graph;
 
   for (const v of vertices) {
@@ -224,19 +224,19 @@ export function* vertices(graph: DirectedGraph) {
   }
 }
 
-function testGraph(g: DirectedGraph, paramName = `graph`) {
-  if (g === undefined) return [ false, `Param '${ paramName }' is undefined. Expected Graph` ];
-  if (g === null) return [ false, `Param '${ paramName }' is null. Expected Graph` ];
+function testGraph(g: DirectedGraph, parameterName = `graph`) {
+  if (g === undefined) return [ false, `Param '${ parameterName }' is undefined. Expected Graph` ];
+  if (g === null) return [ false, `Param '${ parameterName }' is null. Expected Graph` ];
   if (typeof g === `object`) {
-    if (!(`vertices` in g)) return [ false, `Param '${ paramName }.vertices' does not exist. Is it a Graph type?` ]
+    if (!(`vertices` in g)) return [ false, `Param '${ parameterName }.vertices' does not exist. Is it a Graph type?` ]
   } else {
-    return [ false, `Param '${ paramName } is type '${ typeof g }'. Expected an object Graph` ];
+    return [ false, `Param '${ parameterName } is type '${ typeof g }'. Expected an object Graph` ];
   }
   return [ true ];
 }
 
-function throwGraphTest(g: DirectedGraph, paramName = `graph`) {
-  const r = testGraph(g, paramName);
+function throwGraphTest(g: DirectedGraph, parameterName = `graph`) {
+  const r = testGraph(g, parameterName);
   if (r[ 0 ]) return;
   throw new Error(r[ 1 ] as string)
 }
@@ -296,7 +296,7 @@ export const hasNoOuts = (graph: DirectedGraph, vertex: string | Vertex): boolea
  * @param outIdOrVertex 
  * @returns 
  */
-export const hasOnlyOuts = (graph: DirectedGraph, vertex: string | Vertex, ...outIdOrVertex: Array<string | Vertex>): boolean => {
+export const hasOnlyOuts = (graph: DirectedGraph, vertex: string | Vertex, ...outIdOrVertex: (string | Vertex)[]): boolean => {
   throwGraphTest(graph);
 
   const context = resolveVertex(graph, vertex);
@@ -487,7 +487,7 @@ export function connectWithEdges(graph: DirectedGraph, options: ConnectOptions):
   const bidi = options.bidi ?? false;
   const toList = Array.isArray(to) ? to : [ to ];
 
-  let edges: Edge[] = []
+  const edges: Edge[] = []
   // Connect from -> to
   for (const toSingle of toList) {
     const result = connectTo(graph, from, toSingle, weight);
@@ -512,7 +512,7 @@ export function connectWithEdges(graph: DirectedGraph, options: ConnectOptions):
  * @param v 
  * @returns 
  */
-const debugDumpVertex = (v: Vertex): Array<string> => {
+const debugDumpVertex = (v: Vertex): string[] => {
   const r = [
     v.id
   ]
@@ -641,7 +641,7 @@ export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) 
   for (const v of vertices) {
     if (v.id !== source.id) {
       distances.set(v.id, Number.MAX_SAFE_INTEGER);
-      // eslint-disable-next-line unicorn/no-null
+
       previous.set(v.id, null);
     }
     pq.enqueueWithPriority(v.id, Number.MAX_SAFE_INTEGER);
@@ -662,8 +662,8 @@ export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) 
     }
   }
 
-  const pathTo = (id: string): Array<Edge> => {
-    const path: Array<Edge> = [];
+  const pathTo = (id: string): Edge[] => {
+    const path: Edge[] = [];
     while (true) {
       if (id === source.id) break;
       const v = previous.get(id);
@@ -708,7 +708,7 @@ export const clone = (graph: DirectedGraph): DirectedGraph => {
  * @param initialConnections 
  * @returns 
  */
-export const graph = (...initialConnections: Array<ConnectOptions>): DirectedGraph => {
+export const graph = (...initialConnections: ConnectOptions[]): DirectedGraph => {
   let g: DirectedGraph = {
     vertices: immutableMap()
   }
@@ -763,7 +763,7 @@ export function topologicalSort(graph: DirectedGraph): DirectedGraph {
     vertexCount++;
   }
 
-  const topOrder: Array<Vertex> = [];
+  const topOrder: Vertex[] = [];
   while (!queue.isEmpty) {
     // Add to topological order
     const u = queue.dequeue()!;
@@ -790,7 +790,7 @@ export function topologicalSort(graph: DirectedGraph): DirectedGraph {
  * @returns 
  */
 export function graphFromVertices(vertices: Iterable<Vertex>): DirectedGraph {
-  // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
+
   const keyValues = Sync.map(vertices, f => {
     return [ f.id, f ] as [ string, Vertex ]
   });
@@ -806,13 +806,13 @@ export function graphFromVertices(vertices: Iterable<Vertex>): DirectedGraph {
  * @param graph 
  * @returns 
  */
-export function getCycles(graph: DirectedGraph): Array<Array<Vertex>> {
+export function getCycles(graph: DirectedGraph): Vertex[][] {
   throwGraphTest(graph);
 
   let index = 0;
   const stack = new StackMutable<TarjanVertex>();
   const vertices = new Map<string, TarjanVertex>();
-  const scc: Array<Array<Vertex>> = [];
+  const scc: Vertex[][] = [];
 
   for (const v of graph.vertices.values()) {
     vertices.set(v.id, {
@@ -841,7 +841,7 @@ export function getCycles(graph: DirectedGraph): Array<Array<Vertex>> {
     }
 
     if (vertex.lowlink === vertex.index) {
-      const stronglyConnected: Array<Vertex> = [];
+      const stronglyConnected: Vertex[] = [];
       let w: TarjanVertex | undefined;
       while (vertex !== w) {
         w = stack.pop()!;

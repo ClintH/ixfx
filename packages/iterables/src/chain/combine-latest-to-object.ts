@@ -1,7 +1,7 @@
-import { isEqualValueIgnoreOrder } from "@ixfxfun/core";
+import { isEqualValueIgnoreOrder } from "@ixfx/core";
 import type { GenOrData, GenFactoryNoInput, CombineLatestOptions, Gen, GenValueTypeObject } from "./types.js";
 import { resolveToGen } from "./utility.js";
-import * as MapFns from "@ixfxfun/core/maps";
+import * as MapFns from "@ixfx/core/maps";
 
 /**
  * Monitors sources, storing as they happen to an object.

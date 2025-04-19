@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest';
 import * as Timer from '../src/timer.js';
-import * as Elapsed from '@ixfxfun/core/elapsed';
-import { sleep } from '@ixfxfun/core';
-import { isApprox, round } from '@ixfxfun/numbers';
+import * as Elapsed from '@ixfx/core/elapsed';
+import { sleep } from '@ixfx/core';
+import { isApprox, round } from '@ixfx/numbers';
 
 test(`of-total`, async () => {
   const r1 = Timer.ofTotal(500, { clampValue: false });

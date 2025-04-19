@@ -1,4 +1,4 @@
-import { elapsedSince, intervalToMs, sleep } from "@ixfxfun/core";
+import { elapsedSince, intervalToMs, sleep } from "@ixfx/core";
 import type { GenFactoryNoInput, TickOptions } from "../types.js";
 
 /**

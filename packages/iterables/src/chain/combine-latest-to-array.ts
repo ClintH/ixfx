@@ -1,4 +1,4 @@
-import { isEqual } from "@ixfxfun/arrays";
+import { isEqual } from "@ixfx/arrays";
 import type { GenOrData, GenFactoryNoInput, CombineLatestOptions, Gen } from "./types.js";
 import { resolveToGen } from "./utility.js";
 

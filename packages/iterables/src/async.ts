@@ -1,5 +1,5 @@
-import { intervalToMs, type Interval, type IsEqual, toStringDefault } from '@ixfxfun/core';
-import { sleep, type SleepOpts } from '@ixfxfun/core';
+import { intervalToMs, type Interval, type IsEqual, toStringDefault } from '@ixfx/core';
+import { sleep, type SleepOpts } from '@ixfx/core';
 import type { ForEachOptions, ToArrayOptions } from './types.js';
 import { isAsyncIterable, isIterable } from './guard.js';
 
@@ -11,7 +11,7 @@ import { isAsyncIterable, isIterable } from './guard.js';
  * @param array Array of values
  * @param interval Interval (defaults: 1ms)
  */
-export async function* fromArray<V>(array: Array<V>, interval: Interval = 1): AsyncGenerator<V> {
+export async function* fromArray<V>(array: V[], interval: Interval = 1): AsyncGenerator<V> {
   for (const v of array) {
     yield v;
     await sleep(interval);
@@ -46,7 +46,7 @@ export async function* chunks<V>(it: AsyncIterable<V>, size: number) {
 }
 
 
-export async function* concat<V>(...its: ReadonlyArray<AsyncIterable<V>>) {
+export async function* concat<V>(...its: readonly AsyncIterable<V>[]) {
   // Source: https://surma.github.io/underdash/
   for await (const it of its) yield* it;
 }
@@ -257,7 +257,7 @@ export async function* flatten<V>(it: AsyncIterable<V>) {
  * @typeParam V Type of iterable
  */
 export const forEach = async function <T>(
-  iterator: AsyncIterable<T> | Array<T>,
+  iterator: AsyncIterable<T> | T[],
   fn: (v?: T) => Promise<boolean> | Promise<void> | boolean | void,
   options: Partial<ForEachOptions> = {}
 ) {
@@ -278,7 +278,7 @@ export const forEach = async function <T>(
     }
   }
 };
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+
 // export async function forEach<V>(it: AsyncIterable<V>, f: (v: V) => void | boolean | Promise<boolean | void>) {
 //   // https://surma.github.io/underdash/
 //   for await (const v of it) {
@@ -319,7 +319,7 @@ export async function last<V>(it: AsyncIterable<V>, opts: Partial<{ abort: Abort
  * @param it
  * @param f
  */
-//eslint-disable-next-line func-style
+
 export async function* map<V, X>(it: AsyncIterable<V>, f: (v: V) => X) {
   // https://surma.github.io/underdash/
 
@@ -468,7 +468,7 @@ export async function nextWithTimeout<V>(it: AsyncIterableIterator<V> | Iterable
   const value: IteratorResult<V> | undefined = await Promise.race([
     (async () => {
       await sleep({ millis: ms, signal: options.signal });
-      // eslint-disable-next-line unicorn/no-useless-undefined
+
       return undefined;
     })(),
     (async () => {
@@ -519,18 +519,18 @@ export async function some<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promi
  * @param options Options when converting to array
  * @returns
  */
-export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayOptions> = {}): Promise<Array<V>> {
+export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayOptions> = {}): Promise<V[]> {
   // https://2ality.com/2016/10/asynchronous-iteration.html
   const result: V[] = [];
   const iterator = it[ Symbol.asyncIterator ]();
   const started = Date.now();
   const maxItems = options.limit ?? Number.POSITIVE_INFINITY;
-  const whileFunc = options.while;
+  const whileFunction = options.while;
   const maxElapsed = intervalToMs(options.elapsed, Number.POSITIVE_INFINITY);
 
   while (result.length < maxItems && (Date.now() - started < maxElapsed)) {
-    if (whileFunc) {
-      if (!whileFunc(result.length)) break;
+    if (whileFunction) {
+      if (!whileFunction(result.length)) break;
     }
     const r = await iterator.next();
     if (r.done) break;
@@ -542,10 +542,10 @@ export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayO
 
 
 export async function* unique<V>(
-  iterable: AsyncIterable<V> | Array<AsyncIterable<V>>
+  iterable: AsyncIterable<V> | AsyncIterable<V>[]
 ) {
-  const buffer: Array<any> = [];
-  const itera: Array<AsyncIterable<V>> = Array.isArray(iterable) ? iterable : [ iterable ];
+  const buffer: any[] = [];
+  const itera: AsyncIterable<V>[] = Array.isArray(iterable) ? iterable : [ iterable ];
   for await (const it of itera) {
     for await (const v of it) {
       if (buffer.includes(v)) continue;
@@ -572,7 +572,7 @@ export async function* uniqueByValue<T>(input: AsyncIterable<T>, toString: (valu
  * @param it
  * @param f
  */
-//eslint-disable-next-line func-style
+
 // export async function* unique<V>(
 //   it: AsyncIterable<V>,
 //   f: (id: V) => V = (id) => id
@@ -597,7 +597,7 @@ export async function* uniqueByValue<T>(input: AsyncIterable<T>, toString: (valu
  * @param its
  * @returns
  */
-export async function* zip<V>(...its: ReadonlyArray<AsyncIterable<V>>) {
+export async function* zip<V>(...its: readonly AsyncIterable<V>[]) {
   // https://surma.github.io/underdash/
   const iits = its.map((it) => it[ Symbol.asyncIterator ]());
 

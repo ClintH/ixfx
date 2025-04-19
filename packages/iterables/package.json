@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/iterables",
-	"version": "0.35.0",
+	"name": "@ixfx/iterables",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -22,10 +22,11 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/arrays": "workspace:^",
-		"@ixfxfun/numbers": "workspace:^",
-		"@ixfxfun/process": "workspace:^",
-		"@ixfxfun/core": "workspace:^"
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/process": "workspace:^",
+		"@ixfx/core": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

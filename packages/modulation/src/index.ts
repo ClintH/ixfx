@@ -2,6 +2,8 @@ export * as Modulation from './envelope/index.js';
 export * as Sources from './source/index.js';
 export * from './cubic-bezier.js'
 export * from './drift.js';
+export * as Easings from './easing/index.js'
+export type * from './easing/types.js';
 export * as Forces from './forces.js';
 export * from './gaussian.js';
 export * from './interpolate.js';

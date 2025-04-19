@@ -1,7 +1,7 @@
 import { isEqualDefault, type IsEqual } from "./util/is-equal.js";
-import { guardArray,guardIndex } from "@ixfxfun/guards";
+import { guardArray, guardIndex } from "@ixfx/guards";
 
-export const withoutUndefined = <V>(data: ReadonlyArray<V> | Array<V>): Array<V> => {
+export const withoutUndefined = <V>(data: readonly V[] | V[]): V[] => {
   return data.filter(v => v !== undefined);
 }
 
@@ -20,11 +20,11 @@ export const withoutUndefined = <V>(data: ReadonlyArray<V> | Array<V>): Array<V>
  * @returns Array of two elements. The first is items that match `filter`, the second is items that do not.
  */
 export const filterAB = <V>(
-  data: ReadonlyArray<V>,
+  data: readonly V[],
   filter: (a: V) => boolean
-): [ a: Array<V>, b: Array<V> ] => {
-  const a: Array<V> = [];
-  const b: Array<V> = [];
+): [ a: V[], b: V[] ] => {
+  const a: V[] = [];
+  const b: V[] = [];
   for (const datum of data) {
     //eslint-disable-next-line functional/immutable-data
     if (filter(datum)) a.push(datum);
@@ -54,11 +54,11 @@ export const filterAB = <V>(
  * @param endIndex End index (by default runs until end)
  */
 export function* filterBetween<V>(
-  array: ReadonlyArray<V> | Array<V>,
+  array: readonly V[] | V[],
   predicate: (
     value: V,
     index: number,
-    array: ReadonlyArray<V> | Array<V>
+    array: readonly V[] | V[]
   ) => boolean,
   startIndex?: number,
   endIndex?: number
@@ -127,12 +127,12 @@ export function* filterBetween<V>(
  */
 export const without = <V>(
   //eslint-disable-next-line functional/prefer-readonly-type
-  sourceArray: ReadonlyArray<V> | Array<V>,
-  toRemove: V | Array<V>,
+  sourceArray: readonly V[] | V[],
+  toRemove: V | V[],
   comparer: IsEqual<V> = isEqualDefault
-): Array<V> => {
+): V[] => {
   if (Array.isArray(toRemove)) {
-    const returnArray:V[] = []
+    const returnArray: V[] = []
     for (const source of sourceArray) {
       if (!toRemove.some(v => comparer(source, v))) {
         returnArray.push(source);

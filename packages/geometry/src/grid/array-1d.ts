@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { throwIntegerTest } from "@ixfx/guards";
 import { indexFromCell } from "./index.js";
 import type { GridCellAccessor, GridCell, GridBoundsLogic, Grid, GridCellSetter, GridReadable, GridWritable, GridArray1d } from "./types.js";
 
@@ -21,7 +21,7 @@ import type { GridCellAccessor, GridCell, GridBoundsLogic, Grid, GridCellSetter,
  * @returns 
  */
 export const access = <V>(
-  array: ReadonlyArray<V>,
+  array: readonly V[],
   cols: number
 ): GridCellAccessor<V> => {
   const grid = gridFromArrayDimensions(array, cols);
@@ -33,7 +33,7 @@ export const access = <V>(
   return fn;
 };
 
-const accessWithGrid = <T>(grid: Grid, array: ReadonlyArray<T> | Array<T>, cell: GridCell, wrap: GridBoundsLogic) => {
+const accessWithGrid = <T>(grid: Grid, array: readonly T[] | T[], cell: GridCell, wrap: GridBoundsLogic) => {
   const index = indexFromCell(grid, cell, wrap);
   if (index === undefined) return undefined;
   return array[ index ];
@@ -95,7 +95,7 @@ const setWithGrid = <V>(
 ) => {
   const index = indexFromCell(grid, cell, wrap);
   if (index === undefined) throw new RangeError(`Cell (${ cell.x },${ cell.y }) is out of range of grid cols: ${ grid.cols } rows: ${ grid.rows }`);
-  let copy = [ ...array ];
+  const copy = [ ...array ];
   copy[ index ] = value;
   array = copy;
   return copy;
@@ -107,7 +107,7 @@ const setWithGrid = <V>(
  * @param cols 
  * @returns 
  */
-const gridFromArrayDimensions = <T>(array: ReadonlyArray<T> | Array<T>, cols: number): Grid => {
+const gridFromArrayDimensions = <T>(array: readonly T[] | T[], cols: number): Grid => {
   const grid = { cols, rows: Math.ceil(array.length / cols) };
   return grid;
 }
@@ -201,10 +201,10 @@ export const createArray = <T>(initialValue: T, rowsOrGrid: number | Grid, colum
   throwIntegerTest(rows, `aboveZero`, `rows`);
   throwIntegerTest(cols, `aboveZero`, `cols`);
 
-  let t: T[] = [];
-  let total = rows * cols;
-  for (let i = 0; i < total; i++) {
-    t[ i ] = initialValue;
+  const t: T[] = [];
+  const total = rows * cols;
+  for (let index = 0; index < total; index++) {
+    t[ index ] = initialValue;
   }
   return t;
 }
@@ -227,6 +227,6 @@ export const createMutable = <T>(initialValue: T, rowsOrGrid: number | Grid, col
   const rows = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
   const cols = typeof rowsOrGrid === `object` ? rowsOrGrid.cols : columns;
   if (!cols) throw new Error(`Parameter 'columns' missing`);
-  const arr = createArray(initialValue, rows, cols);
-  return wrapMutable(arr, cols);
+  const array = createArray(initialValue, rows, cols);
+  return wrapMutable(array, cols);
 }

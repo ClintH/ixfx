@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/visual",
-	"version": "0.35.0",
+	"name": "@ixfx/visual",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -17,17 +17,20 @@
 			"import": "./src/colour/index.ts"
 		}
 	},
+	"devDependencies": {
+		"colorjs.io": "latest"
+	},
 	"dependencies": {
-		"colorjs.io":"latest",
-		"@ixfxfun/arrays": "workspace:^",
-		"@ixfxfun/core": "workspace:^",
-		"@ixfxfun/dom": "workspace:^",
-		"@ixfxfun/flow": "workspace:^",
-		"@ixfxfun/collections": "workspace:^",
-		"@ixfxfun/guards": "workspace:^",
-		"@ixfxfun/geometry": "workspace:^",
-		"@ixfxfun/numbers": "workspace:^",
-		"@ixfxfun/random": "workspace:^"
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/dom": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/flow": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/geometry": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/random": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

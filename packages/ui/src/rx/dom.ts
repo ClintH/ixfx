@@ -1,12 +1,12 @@
-//import * as Immutable from "@ixfxfun/core/records";
-import { resolveEl } from "@ixfxfun/dom";
-import { getPathsAndData, type PathData, type PathDataChange } from "@ixfxfun/core/records";
-import * as Rx from "@ixfxfun/rx";
-import * as RxFrom from "@ixfxfun/rx/from";
+//import * as Immutable from "@ixfx/core/records";
+import { resolveEl } from "@ixfx/dom";
+import { getPathsAndData, type PathData, type PathDataChange } from "@ixfx/core/records";
+import * as Rx from "@ixfx/rx";
+import * as RxFrom from "@ixfx/rx/from";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind, DomBindUnresolvedSource } from './dom-types.js';
-import { getFromKeys } from "@ixfxfun/core/maps";
-import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "@ixfxfun/core/text";
-import { QueueMutable } from "@ixfxfun/collections";
+import { getFromKeys } from "@ixfx/core/maps";
+import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "@ixfx/core/text";
+import { QueueMutable } from "@ixfx/collections";
 
 /**
  * Reactive stream of array of elements that match `query`.

@@ -1,35 +1,35 @@
-import { scalerTwoWay,clamp } from "@ixfxfun/numbers";
-import { resolveEl, resolveElementTry } from "@ixfxfun/dom";
-import { resultErrorToString } from "@ixfxfun/core";
-import type { Rect, RectPositioned } from "@ixfxfun/geometry/rect";
-import type { Point } from "@ixfxfun/geometry/point";
-import { Points, Rects } from "@ixfxfun/geometry";
-import type { CirclePositioned } from "@ixfxfun/geometry/circle";
+import { scalerTwoWay, clamp } from "@ixfx/numbers";
+import { resolveEl, resolveElementTry } from "@ixfx/dom";
+import { resultErrorToString } from "@ixfx/core";
+import type { Rect, RectPositioned } from "@ixfx/geometry/rect";
+import type { Point } from "@ixfx/geometry/point";
+import { Points, Rects } from "@ixfx/geometry";
+import type { CirclePositioned } from "@ixfx/geometry/circle";
 import { piPi } from "./pi-pi.js";
 
 export type CanvasRegionSpecRelativePositioned = {
-  relativePositioned:RectPositioned
-  scale?: `independent` 
+  relativePositioned: RectPositioned
+  scale?: `independent`
 }
 
 export type CanvasRegionSpecAbsolutePositioned = {
-  absPositioned:RectPositioned
+  absPositioned: RectPositioned
 }
 
 export type CanvasRegionSpecRelativeSized = {
   relativeSize: Rect
-  scale?:`independent`
+  scale?: `independent`
   /**
    * Cardinal directions, or 'center' (default)
    */
-  position:`center`|`n`|`s`
+  position: `center` | `n` | `s`
 }
 
 export type CanvasRegionSpecMatched = {
-  match:HTMLElement|string
+  match: HTMLElement | string
 }
 
-export type CanvasRegionSpec = { marginPx?:number} & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
+export type CanvasRegionSpec = { marginPx?: number } & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
 
 export class CanvasSource {
   #canvasEl: HTMLCanvasElement;
@@ -39,7 +39,7 @@ export class CanvasSource {
   #logicalSize: Rect;
   #pixelScaling;
 
-  #regions: Array<CanvasRegion> = [];
+  #regions: CanvasRegion[] = [];
 
   constructor(canvasElementOrQuery: HTMLCanvasElement | string, sizeBasis: `min` | `max` = `min`) {
     this.#canvasEl = resolveEl<HTMLCanvasElement>(canvasElementOrQuery);
@@ -177,16 +177,16 @@ export class CanvasSource {
    * @param spec 
    * @returns 
    */
-  createRegion(spec:CanvasRegionSpec) {
+  createRegion(spec: CanvasRegionSpec) {
     const marginPx = spec.marginPx ?? 0;
-    const marginPx2 = marginPx*2;
+    const marginPx2 = marginPx * 2;
     if (`absPositioned` in spec) {
       const rect = Rects.subtractSize(spec.absPositioned, marginPx, marginPx);
       return this.#add(new CanvasRegion(this, () => rect))
     }
 
     if (`relativePositioned` in spec) {
-      let compute:  ((source: CanvasSource) => RectPositioned);
+      let compute: ((source: CanvasSource) => RectPositioned);
       const rect = spec.relativePositioned;
       switch (spec.scale) {
         case `independent`:
@@ -198,40 +198,40 @@ export class CanvasSource {
           });
           break;
         default:
-          throw new Error(`Param 'kind' unknown (${spec.scale})`);
+          throw new Error(`Param 'kind' unknown (${ spec.scale })`);
       }
       return this.#add(new CanvasRegion(this, compute));
     }
 
     if (`relativeSize` in spec) {
-      let compute:  ((source: CanvasSource) => RectPositioned);
+      let compute: ((source: CanvasSource) => RectPositioned);
       const rect = spec.relativeSize;
       const position = spec.position;
-  
+
       switch (spec.scale) {
         case `independent`:
           compute = (source: CanvasSource): RectPositioned => {
             const width = (rect.width * source.width) - marginPx2;
-            const height = (rect.height * source.height) -marginPx2;
-            let x = source.width/2-width/2;
-            let y = source.height/2-height/2;
+            const height = (rect.height * source.height) - marginPx2;
+            let x = source.width / 2 - width / 2;
+            let y = source.height / 2 - height / 2;
             switch (position) {
               case `n`:
                 y = 0;
                 break;
               case `s`:
-                y = source.height-height;
+                y = source.height - height;
                 break;
               default:
-                /** no-op, */
+              /** no-op, */
             }
             x += marginPx;
             y += marginPx;
-            return {width, height, x, y }
+            return { width, height, x, y }
           }
           break;
         default:
-          throw new Error(`Param 'kind' unknown (${spec.scale})`);
+          throw new Error(`Param 'kind' unknown (${ spec.scale })`);
       }
       return this.#add(new CanvasRegion(this, compute));
     }
@@ -239,15 +239,15 @@ export class CanvasSource {
     if (`match` in spec) {
       const result = resolveElementTry(spec.match);
       if (!result.success) {
-        throw new Error(`Could not resolve match element. ${resultErrorToString(result)}`);
+        throw new Error(`Could not resolve match element. ${ resultErrorToString(result) }`);
       }
-      const compute = (_source:CanvasSource):RectPositioned => {
+      const compute = (_source: CanvasSource): RectPositioned => {
         const bounds = result.value.getBoundingClientRect();
         return {
-          x: bounds.x + marginPx, 
+          x: bounds.x + marginPx,
           y: bounds.y + marginPx,
-          width: bounds.width-marginPx2, 
-          height: bounds.height-marginPx2
+          width: bounds.width - marginPx2,
+          height: bounds.height - marginPx2
         }
       }
       return this.#add(new CanvasRegion(this, compute));
@@ -354,7 +354,7 @@ export class CanvasRegion {
    * @param strokeStyle Stroke style
    * @param lineWidth Line with
    */
-  drawConnectedPointsRelative(relativePoints: Array<Point>, strokeStyle: string, lineWidth = 1) {
+  drawConnectedPointsRelative(relativePoints: Point[], strokeStyle: string, lineWidth = 1) {
     const points = relativePoints.map(p => this.toAbsRegion(p));
     this.drawConnectedPoints(points, strokeStyle, lineWidth);
   }
@@ -368,7 +368,7 @@ export class CanvasRegion {
    * @param strokeStyle Stroke style
    * @param lineWidth Line width
    */
-  drawConnectedPoints(points: Array<Point>, strokeStyle: string, lineWidth = 1) {
+  drawConnectedPoints(points: Point[], strokeStyle: string, lineWidth = 1) {
     const c = this.context;
     c.save();
     c.translate(this.#r.x, this.#r.y);
@@ -394,7 +394,7 @@ export class CanvasRegion {
    * @param baseline 
    * @param align 
    */
-  fillTextRelative(text: string, relPos: Point, fillStyle: string = `black`, font: string, baseline: CanvasTextBaseline = `alphabetic`, align: CanvasTextAlign = `start`) {
+  fillTextRelative(text: string, relPos: Point, fillStyle = `black`, font: string, baseline: CanvasTextBaseline = `alphabetic`, align: CanvasTextAlign = `start`) {
     const point = this.toAbsRegion(relPos);
     this.fillTextRelative(text, point, fillStyle, font, baseline, align);
   }
@@ -407,7 +407,7 @@ export class CanvasRegion {
    * @param baseline 
    * @param align 
    */
-  fillText(text: string, point: Point, fillStyle: string = `black`, font: string, baseline: CanvasTextBaseline = `alphabetic`, align: CanvasTextAlign = `start`) {
+  fillText(text: string, point: Point, fillStyle = `black`, font: string, baseline: CanvasTextBaseline = `alphabetic`, align: CanvasTextAlign = `start`) {
     const c = this.context;
     c.save();
     c.translate(this.#r.x, this.#r.y);
@@ -421,7 +421,7 @@ export class CanvasRegion {
     c.restore();
   }
 
-  drawCircles(relativeCircles: Array<CirclePositioned>, fillStyle: string, strokeStyle: string = ``, lineWidth = 1) {
+  drawCircles(relativeCircles: CirclePositioned[], fillStyle: string, strokeStyle = ``, lineWidth = 1) {
     const circles = relativeCircles.map(c => {
       return {
         ...this.toAbsRegion(c),
@@ -455,7 +455,7 @@ export class CanvasRegion {
     c.clearRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
   }
 
-  fill(fillStyle: string = `white`) {
+  fill(fillStyle = `white`) {
     const c = this.context;
     c.fillStyle = fillStyle;
     c.fillRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);

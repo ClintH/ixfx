@@ -1,4 +1,4 @@
-import { intervalToMs, type Interval } from "@ixfxfun/core";
+import { intervalToMs, type Interval } from "@ixfx/core";
 
 export type UpdateFailPolicy = `fast` | `slow` | `backoff`;
 /**

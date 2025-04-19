@@ -1,9 +1,9 @@
-import { clamp, wrap, type BasicInterpolateOptions } from "@ixfxfun/numbers";
-import { ofTotal } from "@ixfxfun/flow";
-import { throwNumberTest } from '@ixfxfun/guards';
+import { clamp, wrap, type BasicInterpolateOptions } from "@ixfx/numbers";
+import { ofTotal } from "@ixfx/flow";
+import { throwNumberTest } from '@ixfx/guards';
 
 import { get as getEasing, type EasingName } from './easing/index.js';
-import type { Interval } from "@ixfxfun/core";
+import type { Interval } from "@ixfx/core";
 import { piPi } from "./util/pi-pi.js";
 
 
@@ -30,7 +30,7 @@ import { piPi } from "./util/pi-pi.js";
  * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result. 
  * 
  */
-export type InterpolateOptions = BasicInterpolateOptions& {
+export type InterpolateOptions = BasicInterpolateOptions & {
   easing: EasingName,
 }
 

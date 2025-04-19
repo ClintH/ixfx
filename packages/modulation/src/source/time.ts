@@ -1,6 +1,6 @@
-import { type Interval, intervalToMs } from "@ixfxfun/core";
-import { throwNumberTest } from "@ixfxfun/guards";
-import type { ModSettableOptions, ModSettable, ModSettableFeedback } from "../types.js";
+import { type Interval, intervalToMs } from "@ixfx/core";
+import { throwNumberTest } from "@ixfx/guards";
+import type { ModSettableOptions as ModuleSettableOptions, ModSettable as ModuleSettable, ModSettableFeedback as ModuleSettableFeedback } from "../types.js";
 
 /**
  * Returns the percentage of time toward `interval`. See also: {@link bpm}, {@link hertz} which are the same but
@@ -20,7 +20,7 @@ import type { ModSettableOptions, ModSettable, ModSettableFeedback } from "../ty
  * @param options 
  * @returns
  */
-export function elapsed(interval: Interval, options: Partial<ModSettableOptions> = {}): ModSettable {
+export function elapsed(interval: Interval, options: Partial<ModuleSettableOptions> = {}): ModuleSettable {
   const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
   const limitValue = 1;
   let start = options.startAt ?? performance.now();
@@ -31,7 +31,7 @@ export function elapsed(interval: Interval, options: Partial<ModSettableOptions>
     start = performance.now() - (intervalMs * options.startAtRelative);
   }
   //let stopAt = cycleLimit > 0 ? (intervalMs + start) : Number.MAX_SAFE_INTEGER;
-  return (feedback?: Partial<ModSettableFeedback>) => {
+  return (feedback?: Partial<ModuleSettableFeedback>) => {
     if (feedback) {
       if (feedback.resetAt !== undefined) {
         start = feedback.resetAt;
@@ -65,7 +65,7 @@ export function elapsed(interval: Interval, options: Partial<ModSettableOptions>
  * @param options 
  * @returns 
  */
-export function bpm(bpm: number, options: Partial<ModSettableOptions> = {}): ModSettable {
+export function bpm(bpm: number, options: Partial<ModuleSettableOptions> = {}): ModuleSettable {
   const interval = (60 * 1000) / bpm; // milliseconds between beats.
   return elapsed(interval, options);
 }
@@ -77,7 +77,7 @@ export function bpm(bpm: number, options: Partial<ModSettableOptions> = {}): Mod
  * @param options 
  * @returns 
  */
-export function hertz(hz: number, options: Partial<ModSettableOptions> = {}): ModSettable {
+export function hertz(hz: number, options: Partial<ModuleSettableOptions> = {}): ModuleSettable {
   const interval = 1000 / hz;
   return elapsed(interval, options);
 }

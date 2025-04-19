@@ -1,4 +1,4 @@
-import type { IsEqual,Interval ,IsEqualContext} from "@ixfxfun/core";
+import type { IsEqual, Interval, IsEqualContext } from "@ixfx/core";
 import type { CombineLatestOptions, InitLazyStreamOptions, Lazy, Reactive, UpstreamOptions } from '../types.js';
 
 
@@ -8,27 +8,27 @@ export type TriggerValue<TTriggerValue> = {
 /**
  * Options for the 'count' source.
  */
-export type CountOptions = { 
+export type CountOptions = {
   /**
    * Determines when counting starts
    * @defaultValue 'initial'
    */
-  lazy: Lazy, 
+  lazy: Lazy,
   /**
    * Amount to increment by
    * @defaultValue 1
    */
-  amount: number, 
+  amount: number,
   /**
    * Where to begin counting
    * @defaultValue 0
    */
-  offset: number, 
+  offset: number,
   /**
    * How long to wait before incrementing.
    * @defaultValue 1 second
    */
-  interval: Interval, 
+  interval: Interval,
   /**
    * Abort signal to trigger the source to close.
    */

@@ -2,7 +2,7 @@ import { test, expect } from 'vitest';
 /* eslint-disable */
 //import { getClosestIntegerKey, mergeByKey } from '../../../data/maps/MapFns.js';
 import { ofSimple } from '../../src/map/map-of-simple.js';
-import { getClosestIntegerKey, mergeByKey } from '@ixfxfun/core/maps';
+import { getClosestIntegerKey, mergeByKey } from '@ixfx/core/maps';
 
 /**
  * Test immutable mapOf

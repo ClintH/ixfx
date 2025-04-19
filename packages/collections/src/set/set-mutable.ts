@@ -1,6 +1,6 @@
 // ✔ UNIT TESTED
-import { defaultKeyer, type ToString } from '@ixfxfun/core';
-import { SimpleEventEmitter } from '@ixfxfun/events';//'../../Events.js';
+import { defaultKeyer, type ToString } from '@ixfx/core';
+import { SimpleEventEmitter } from '@ixfx/events';//'../../Events.js';
 import { type ISetMutable } from './ISetMutable.js';
 import { type ValueSetEventMap } from './Types.js';
 
@@ -10,7 +10,7 @@ import { type ValueSetEventMap } from './Types.js';
  * @returns
  */
 export const mutable = <V>(
-  keyString?: ToString<V> | undefined
+  keyString?: ToString<V>
 ): ISetMutable<V> => new SetStringMutable(keyString);
 
 /**
@@ -44,7 +44,7 @@ export class SetStringMutable<V>
    * Adds one or more items to set. `add` event is fired for each item
    * @param values items to add
    */
-  add(...values: Array<V>): boolean {
+  add(...values: V[]): boolean {
     //eslint-disable-next-line functional/no-let
     let somethingAdded = false;
     for (const value of values) {
@@ -97,7 +97,7 @@ export class SetStringMutable<V>
    * Returns array copy of set
    * @returns Array copy of set
    */
-  toArray(): Array<V> {
+  toArray(): V[] {
     return [ ...this.store.values() ];
   }
 }

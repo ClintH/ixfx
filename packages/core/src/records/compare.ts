@@ -1,5 +1,5 @@
-import { mapObjectKeys } from '@ixfxfun/core/records';
-import { compareIterableValuesShallow, isEqualDefault, type IsEqual } from '@ixfxfun/core';
+import { mapObjectKeys } from '@ixfx/core/records';
+import { compareIterableValuesShallow, isEqualDefault, type IsEqual } from '@ixfx/core';
 import type { ChangeRecord, CompareChangeSet } from '../types-compare.js';
 
 
@@ -51,7 +51,7 @@ export const changedObjectDataFields = (a: object, b: object) => {
   return output;
 }
 
-const compareResultToObject = <TKey extends string|number>(r: CompareChangeSet<TKey>, b: object): Record<string, unknown> | object[] => {
+const compareResultToObject = <TKey extends string | number>(r: CompareChangeSet<TKey>, b: object): Record<string, unknown> | object[] => {
   const output = {}
 
   if (r.isArray) {
@@ -91,7 +91,7 @@ export const compareArrays = <TValue>(a: TValue[], b: TValue[], eq: IsEqual<TVal
   const c = compareObjectData(a, b, false, eq);
   if (!c.isArray) throw new Error(`Change set does not have arrays as parameters`);
 
-  const convert = (key: string):number => {
+  const convert = (key: string): number => {
     if (key.startsWith(`_`)) {
       return Number.parseInt(key.slice(1));
     } else throw new Error(`Unexpected key '${ key }'`);
@@ -116,7 +116,7 @@ export const compareArrays = <TValue>(a: TValue[], b: TValue[], eq: IsEqual<TVal
  * @param a 
  * @param b 
  */
-export const compareObjectData = <T>(a: object|null, b: object|null, assumeSameShape = false, eq: IsEqual<T> = isEqualDefault): CompareChangeSet<string> => {
+export const compareObjectData = <T>(a: object | null, b: object | null, assumeSameShape = false, eq: IsEqual<T> = isEqualDefault): CompareChangeSet<string> => {
   a ??= {};
   b ??= {};
   const entriesA = Object.entries(a);
@@ -155,7 +155,7 @@ export const compareObjectData = <T>(a: object|null, b: object|null, assumeSameS
     }
 
     if (typeof aValue === `object`) {
-      const r = compareObjectData(aValue, bValue, assumeSameShape, eq);
+      const r = compareObjectData(aValue, bValue as object, assumeSameShape, eq);
       if (r.hasChanged) hasChanged = true;
       children[ outputKey ] = r;
       const childSummary = r.summary.map(sum => { return [ sum[ 0 ], outputKey + `.` + sum[ 1 ], sum[ 2 ] ] }) as ChangeRecord<string>[];

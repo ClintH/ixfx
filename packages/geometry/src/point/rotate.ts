@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 import type { Point } from "./point-type.js";
 import { guard } from "./guard.js";
 import { fromCartesian as PolarFromCartesian } from "../polar/index.js";
@@ -18,16 +18,16 @@ export function rotate(pt: Point, amountRadian: number, origin?: Point): Point;
  * @param origin Origin to rotate around. Defaults to 0,0
  */
 export function rotate(
-  pt: ReadonlyArray<Point>,
+  pt: readonly Point[],
   amountRadian: number,
   origin?: Point
-): ReadonlyArray<Point>;
+): readonly Point[];
 
 export function rotate(
-  pt: Point | ReadonlyArray<Point>,
+  pt: Point | readonly Point[],
   amountRadian: number,
   origin?: Point
-): Point | ReadonlyArray<Point> {
+): Point | readonly Point[] {
   if (origin === undefined) origin = { x: 0, y: 0 };
   guard(origin, `origin`);
   throwNumberTest(amountRadian, ``, `amountRadian`);
@@ -40,7 +40,7 @@ export function rotate(
     pt = [ pt as Point ];
   }
 
-  const ptAr = pt as ReadonlyArray<Point>;
+  const ptAr = pt as readonly Point[];
   for (const [ index, p ] of ptAr.entries()) guard(p, `pt[${ index }]`);
 
   const asPolar = ptAr.map((p) => PolarFromCartesian(p, origin));

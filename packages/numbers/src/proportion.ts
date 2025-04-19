@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 
 /**
  * Scales a percentage-scale number, ie: `v * t`.

@@ -1,4 +1,4 @@
-import { zipKeyValue } from "@ixfxfun/core/maps";
+import { zipKeyValue } from "@ixfx/core/maps";
 import type { ReactiveOrSource, Reactive, RxValueTypeObject } from "../types.js";
 import { syncToArray } from "./sync-to-array.js";
 import { transform } from "./transform.js";

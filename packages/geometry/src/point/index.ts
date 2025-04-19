@@ -27,6 +27,7 @@ export * from './normalise.js';
 export * from './normalise-by-rect.js';
 export * from './pipeline.js';
 export * from './point-relation-types.js';
+export * from './point-tracker.js';
 export * from './point-type.js';
 export * from './progress-between.js';
 export * from './project.js';

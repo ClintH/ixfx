@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { intervalToMs } from "@ixfxfun/core";
+import { intervalToMs } from "@ixfx/core";
 import { initStream } from "../init-stream.js";
 import { resolveSource } from "../resolve-source.js";
 import type { ReactiveOrSource, Reactive, RxValueTypes } from "../types.js";
@@ -56,7 +56,7 @@ export function syncToArray<const T extends readonly ReactiveOrSource<any>[]>(re
   }
 
   const isDataSetComplete = () => {
-     
+
     for (let index = 0; index < data.length; index++) {
       if (onSourceDone === `allow` && states[ index ].done) continue;
       if (data[ index ] === undefined) return false;

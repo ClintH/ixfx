@@ -1,4 +1,4 @@
-import type { LogOption } from "@ixfxfun/debug";
+import type { LogOption } from "@ixfx/debug";
 
 export type DriverOptions<V extends Transitions> = {
   readonly handlers: readonly DriverStatesHandler<V>[];
@@ -148,9 +148,7 @@ export type MachineState<V extends Transitions> = {
 export type StateEvent = (args: unknown, sender: any) => void;
 export type StateHandler = string | StateEvent | null;
 
-export interface State {
-  readonly [ event: string ]: StateHandler;
-}
+export type State = Readonly<Record<string, StateHandler>>
 
 // export interface MachineDescription {
 //   readonly [key: string]: string | readonly string[] | null;

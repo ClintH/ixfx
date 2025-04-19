@@ -1,6 +1,6 @@
-import  { Polar } from "@ixfxfun/geometry";
-import type { Line } from "@ixfxfun/geometry/line";
-import type { Point } from "@ixfxfun/geometry/point";
+import { Polar } from "@ixfx/geometry";
+import type { Line } from "@ixfx/geometry/line";
+import type { Point } from "@ixfx/geometry/point";
 // import type { Line } from "../../geometry/line/LineType.js";
 // import type { Point } from "../../geometry/point/PointType.js";
 // import { fromLine as polarRayFromLine } from "../../geometry/polar/Ray.js";

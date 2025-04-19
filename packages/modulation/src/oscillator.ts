@@ -1,4 +1,4 @@
-import * as Flow from '@ixfxfun/flow';
+import * as Flow from '@ixfx/flow';
 const piPi = Math.PI * 2;
 
 /**
@@ -26,7 +26,7 @@ const piPi = Math.PI * 2;
  * ```
  *
  */
-//eslint-disable-next-line func-style
+
 export function* sine(timerOrFreq: Flow.Timer | number) {
   if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
   if (typeof timerOrFreq === `number`) {
@@ -43,7 +43,7 @@ export function* sine(timerOrFreq: Flow.Timer | number) {
  * Bipolar sine (-1 to 1)
  * @param timerOrFreq
  */
-//eslint-disable-next-line func-style
+
 export function* sineBipolar(timerOrFreq: Flow.Timer | number) {
   if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
 
@@ -67,7 +67,7 @@ export function* sineBipolar(timerOrFreq: Flow.Timer | number) {
  * const v = osc.next().value;
  * ```
  */
-//eslint-disable-next-line func-style
+
 export function* triangle(timerOrFreq: Flow.Timer | number) {
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Flow.frequencyTimer(timerOrFreq);
@@ -104,7 +104,7 @@ export function* triangle(timerOrFreq: Flow.Timer | number) {
  * const v = osc.next().value;
  * ```
  */
-//eslint-disable-next-line func-style
+
 export function* saw(timerOrFreq: Flow.Timer | number) {
   if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
 
@@ -130,7 +130,7 @@ export function* saw(timerOrFreq: Flow.Timer | number) {
  * osc.next().value;
  * ```
  */
-//eslint-disable-next-line func-style
+
 export function* square(timerOrFreq: Flow.Timer | number) {
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Flow.frequencyTimer(timerOrFreq);

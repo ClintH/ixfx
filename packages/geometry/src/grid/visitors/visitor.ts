@@ -1,4 +1,4 @@
-import { mutable } from '@ixfxfun/collections/set';
+import { mutable } from '@ixfx/collections/set';
 import { crossDirections } from "../directions.js";
 import { guardGrid, guardCell, isCell } from "../guards.js";
 import { cellEquals } from "../is-equal.js";
@@ -56,8 +56,8 @@ export function* visitByNeighbours(
   const v = opts.visited ?? mutable<GridCell>(cellKeyString);
   const possibleNeighbours = logic.getNeighbours ?? ((g: Grid, c: GridCell) => neighbourList(g, c, crossDirections, `undefined`));
 
-  let cellQueue: Array<GridCell> = [ start ];
-  let moveQueue: Array<GridNeighbour> = [];
+  let cellQueue: GridCell[] = [ start ];
+  let moveQueue: GridNeighbour[] = [];
   let current: GridCell | undefined = undefined;
 
   while (cellQueue.length > 0) {

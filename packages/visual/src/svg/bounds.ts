@@ -1,4 +1,4 @@
-import {type Rect } from '@ixfxfun/geometry/rect';
+import { type Rect } from '@ixfx/geometry/rect';
 /**
  * Get the bounds of an SVG element (determined by its width/height attribs)
  * @param svg

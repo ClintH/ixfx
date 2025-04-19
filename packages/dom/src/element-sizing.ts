@@ -1,7 +1,7 @@
 import { resolveEl } from "./resolve-el.js";
-import {  getComputedPixels } from "./css.js";
-import {Rects} from "@ixfxfun/geometry";
-import type { Rect } from "@ixfxfun/geometry/rect";
+import { getComputedPixels } from "./css.js";
+import { Rects } from "@ixfx/geometry";
+import type { Rect } from "@ixfx/geometry/rect";
 
 /**
  * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
@@ -206,7 +206,7 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   }
 
 
-  #onParentResize(args: Array<ResizeObserverEntry>) {
+  #onParentResize(args: ResizeObserverEntry[]) {
     const box = args[ 0 ].contentBoxSize[ 0 ];
     const parentSize = { width: box.inlineSize, height: box.blockSize };
     this.size = this.#computeSizeBasedOnParent(parentSize);

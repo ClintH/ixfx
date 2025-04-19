@@ -3,7 +3,7 @@ import * as Teq from '../src/triangle/equilateral.js';
 import * as Tra from '../src/triangle/right.js';
 import * as Tis from '../src/triangle/isosceles.js';
 import { degreeToRadian } from '../src/angles.js';
-import { isCloseTo } from '@ixfxfun/numbers';
+import { isCloseTo } from '@ixfx/numbers';
 
 test(`equilateral`, () => {
   const t: Teq.TriangleEquilateral = {

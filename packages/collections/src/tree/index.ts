@@ -1,13 +1,13 @@
-import { asDynamicTraversable as ObjectToTraversable } from './TraverseObject.js';
-import { asDynamicTraversable as TreeNodeToTraversable } from './TreeMutable.js';
-import type { TraversableTree, TreeNode } from './Types.js';
+import { asDynamicTraversable as ObjectToTraversable } from './traverse-object.js';
+import { asDynamicTraversable as TreeNodeToTraversable } from './tree-mutable.js';
+import type { TraversableTree, TreeNode } from './types.js';
 
-export * as Mutable from './TreeMutable.js';
-export * as Pathed from './Pathed.js'
-export * as FromObject from './TraverseObject.js';
-export * as Traverse from './TraversableTree.js';
-export * from './Compare.js';
-export type * from './Types.js';
+export * as Mutable from './tree-mutable.js';
+export * as Pathed from './pathed.js'
+export * as FromObject from './traverse-object.js';
+export * as Traverse from './traversable-tree.js';
+export * from './compare.js';
+export type * from './types.js';
 
 export const toTraversable = <T>(node: TreeNode<T> | TraversableTree<T> | object) => {
   if (isTraversable(node)) return node;

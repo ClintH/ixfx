@@ -1,11 +1,11 @@
-import { clamp } from "@ixfxfun/numbers";
+import { clamp } from "@ixfx/numbers";
 import type { Colourish, Rgb, Rgb8Bit, RgbRelative } from "./types.js";
 import { hslToRelative, isHsl } from "./hsl.js";
 import Color, { type ColorConstructor } from 'colorjs.io';
 import { isOklch } from "./oklch.js";
 import { resolveCss } from "./resolve-css.js";
-import { numberInclusiveRangeTest,throwFromResult } from "@ixfxfun/guards";
-import type { Result } from "@ixfxfun/core";
+import { numberInclusiveRangeTest, throwFromResult } from "@ixfx/guards";
+import type { Result } from "@ixfx/core";
 /**
  * Converts to relative Rgb value.
  * RGB are 0..255 scale, opacity is always 0..1 scale

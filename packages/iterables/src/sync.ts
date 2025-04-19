@@ -1,5 +1,5 @@
-import { type ToString, toStringDefault } from '@ixfxfun/core';
-import { type IsEqual, intervalToMs } from '@ixfxfun/core';
+import { type ToString, toStringDefault } from '@ixfx/core';
+import { type IsEqual, intervalToMs } from '@ixfx/core';
 import { isIterable } from './guard.js';
 //import { intervalToMs } from '../flow/IntervalType.js';
 import type { ToArrayOptions } from './types.js';
@@ -140,7 +140,7 @@ export function* chunksOverlapping<V>(it: Iterable<V>, size: number) {
 
 export function* chunks<V>(it: Iterable<V>, size: number) {
   //eslint-disable-next-line functional/no-let
-  let buffer:V[] = [];
+  let buffer: V[] = [];
 
   for (const v of it) {
     //eslint-disable-next-line functional/immutable-data
@@ -214,7 +214,7 @@ export function equals<V>(
 ) {
   //it1 = it1[Symbol.iterator]();
   //it2 = it2[Symbol.iterator]();
-   
+
   while (true) {
     const index1 = it1.next(),
       index2 = it2.next();
@@ -237,7 +237,7 @@ export function every<V>(it: Iterable<V>, f: (v: V) => boolean) {
 export function* fill<V>(it: Iterable<V>, v: V) {
   // https://surma.github.io/underdash/
 
-   
+
   for (const _ of it) yield v;
 }
 
@@ -324,7 +324,7 @@ export function* flatten<V>(it: Iterable<V>) {
  * @param it
  * @param f
  */
- 
+
 export function* map<V, X>(it: Iterable<V>, f: (v: V) => X) {
   // https://surma.github.io/underdash/
 
@@ -426,7 +426,7 @@ export function* unique<V>(
  * @param its
  * @returns
  */
- 
+
 export function* zip<V>(...its: readonly Iterable<V>[]) {
   // https://surma.github.io/underdash/
   const iits = its.map((it) => it[ Symbol.iterator ]());
@@ -458,7 +458,7 @@ export function* fromIterable<T>(iterable: Iterable<T>) {
  * @param options Options when converting to array.
  * @returns
  */
- 
+
 export function toArray<V>(
   it: Iterable<V>,
   options: Partial<ToArrayOptions> = {}

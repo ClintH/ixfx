@@ -1,9 +1,9 @@
-import { recordEntriesDepthFirst } from "@ixfxfun/core/records";
-import { isPrimitive, isInteger, isEqualContextString } from '@ixfxfun/core';
-import { isPlainObjectOrPrimitive } from '@ixfxfun/guards';
-import type { IsEqualContext } from '@ixfxfun/core';
+import { recordEntriesDepthFirst } from "@ixfx/core/records";
+import { isPrimitive, isInteger, isEqualContextString } from '@ixfx/core';
+import { isPlainObjectOrPrimitive } from '@ixfx/guards';
+import type { IsEqualContext } from '@ixfx/core';
 import { compareObjectKeys } from './compare.js';
-import type { Result } from '@ixfxfun/core';
+import type { Result } from '@ixfx/core';
 
 export type PathData<V> = {
   path: string

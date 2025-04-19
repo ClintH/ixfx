@@ -1,7 +1,7 @@
 
-import { scaler } from "@ixfxfun/numbers";
+import { scaler } from "@ixfx/numbers";
 import type { GridStyle, LineStyle, ShowOptions, TextStyle } from "./types.js";
-import type { Point } from "@ixfxfun/geometry/point";
+import type { Point } from "@ixfx/geometry/point";
 
 export type PointMinMax = { min: Point, max: Point, width: number, height: number, minDim: number, maxDim: number };
 
@@ -77,7 +77,7 @@ export type CartesianPlotOptions = {
   whiskerLength: number
 }
 
-export const computeMinMax = (mm: Array<Point>): PointMinMax => {
+export const computeMinMax = (mm: Point[]): PointMinMax => {
   const x = mm.map(m => m.x);
   const y = mm.map(m => m.y);
   const minX = Math.min(...x);
@@ -120,9 +120,9 @@ export const absoluteCompute = (minMax: PointMinMax) => {
 export type AxisMark = Point & {
   major: boolean
 }
-export const computeAxisMark = (mm: PointMinMax, increments: number, major: number): { x: Array<AxisMark>, y: Array<AxisMark> } => {
+export const computeAxisMark = (mm: PointMinMax, increments: number, major: number): { x: AxisMark[], y: AxisMark[] } => {
   // Vertical
-  const xValues: Array<AxisMark> = [];
+  const xValues: AxisMark[] = [];
   let count = 0;
 
   for (let x = mm.min.x; x < mm.max.x; x += increments) {
@@ -133,7 +133,7 @@ export const computeAxisMark = (mm: PointMinMax, increments: number, major: numb
 
   // Horizontal
   count = 0;
-  const yValues: Array<AxisMark> = [];
+  const yValues: AxisMark[] = [];
   for (let y = mm.min.y; y < mm.max.y; y += increments) {
     const isMajor = count % major === 0;
     yValues.push({ x: 0, y, major: isMajor })

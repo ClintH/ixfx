@@ -2,7 +2,7 @@
 import { getPointParameter, getTwoPointParameters } from "./get-point-parameter.js";
 import { guard, guardNonZeroPoint, isPoint3d } from "./guard.js";
 import type { Point, Point3d } from "./point-type.js";
-import type { Writeable } from "@ixfxfun/core";
+import type { Writeable } from "@ixfx/core";
 
 export function divide(a: Point, b: Point): Point;
 export function divide(a: Point3d, b: Point3d): Point3d;
@@ -33,7 +33,7 @@ export function divide(
   if (ptB.x === 0) throw new TypeError('Cannot divide by zero (b.x is 0)');
   if (ptB.y === 0) throw new TypeError('Cannot divide by zero (b.y is 0)');
 
-  let pt: Writeable<Point> = {
+  const pt: Writeable<Point> = {
     x: ptA.x / ptB.x,
     y: ptA.y / ptB.y,
   };
@@ -74,12 +74,12 @@ export function divide(
  * @returns
  */
 //eslint-disable-next-line functional/prefer-readonly-type
-export function divider(a: Point3d | Point | number | Array<number>, b?: number, c?: number) {
+export function divider(a: Point3d | Point | number | number[], b?: number, c?: number) {
   const divisor = getPointParameter(a, b, c);
   guardNonZeroPoint(divisor, `divisor`);
 
   return (
-    aa: Point3d | Point | number | Array<number>,
+    aa: Point3d | Point | number | number[],
     bb?: number,
     cc?: number
   ): Point => {

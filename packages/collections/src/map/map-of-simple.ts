@@ -1,7 +1,7 @@
-import type { ToString, IsEqual } from '@ixfxfun/core';
+import type { ToString, IsEqual } from '@ixfx/core';
 import type { IMapOf } from './imap-of.js';
 import type { IMapOfImmutable } from './imap-of-immutable.js';
-import { defaultKeyer, isEqualDefault } from '@ixfxfun/core';
+import { defaultKeyer, isEqualDefault } from '@ixfx/core';
 import { MapOfSimpleBase } from './map-of-simple-base.js';
 
 /**
@@ -10,24 +10,24 @@ import { MapOfSimpleBase } from './map-of-simple-base.js';
 export class MapOfSimple<V>
   extends MapOfSimpleBase<V>
   implements IMapOf<V>, IMapOfImmutable<V> {
-  addKeyedValues(key: string, ...values: ReadonlyArray<V>): IMapOfImmutable<V> {
+  addKeyedValues(key: string, ...values: readonly V[]): IMapOfImmutable<V> {
     //const asEntries = values.map(v => [key, v]) as [string, V[]][];
     //return this.addBatch(asEntries);
     return this.addBatch([ [ key, values ] ]);
   }
 
-  addValue(...values: ReadonlyArray<V>): IMapOfImmutable<V> {
-    const asEntries = values.map((v) => [ this.groupBy(v), v ]) as Array<[
+  addValue(...values: readonly V[]): IMapOfImmutable<V> {
+    const asEntries = values.map((v) => [ this.groupBy(v), v ]) as [
       string,
-      Array<V>
-    ]>;
+      V[]
+    ][];
     return this.addBatch(asEntries);
   }
 
   //eslint-disable-next-line functional/prefer-immutable-types
-  addBatch(entries: Array<[ key: string, value: ReadonlyArray<V> ]>): IMapOfImmutable<V> {
+  addBatch(entries: [ key: string, value: readonly V[] ][]): IMapOfImmutable<V> {
     // Deep copy Map
-    const temporary = new Map<string, Array<V>>(
+    const temporary = new Map<string, V[]>(
       [ ...this.map.entries() ].map((e) => [ e[ 0 ], [ ...e[ 1 ] ] ])
     );
 
@@ -59,8 +59,8 @@ export class MapOfSimple<V>
     const eqFunction = eq ?? this.valueEq;
     const x = entries.map((entry) => {
       const key = entry[ 0 ];
-      const values = entry[ 1 ].filter((vv) => !eqFunction(vv, value)) as ReadonlyArray<V>;
-      return [ key, values ] as [ string, Array<V> ];
+      const values = entry[ 1 ].filter((vv) => !eqFunction(vv, value)) as readonly V[];
+      return [ key, values ] as [ string, V[] ];
     });
     return new MapOfSimple<V>(this.groupBy, this.valueEq, x);
   }

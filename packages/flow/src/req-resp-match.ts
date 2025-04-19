@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { continuously } from "@ixfxfun/core"
-import { SimpleEventEmitter } from "@ixfxfun/events"
+import { continuously } from "@ixfx/core"
+import { SimpleEventEmitter } from "@ixfx/events"
 
 export type RequestResponseOptions<TRequest, TResp> = {
   timeoutMs: number

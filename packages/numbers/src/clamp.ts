@@ -45,7 +45,7 @@ export const clamp = (value: number, min = 0, max = 1) => {
  * @param min Minimum value. Default: 0
  * @param max Maximum value. Default: 1
  */
-export const clamper = (min: number = 0, max: number = 1) => {
+export const clamper = (min = 0, max = 1) => {
   if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
   if (Number.isNaN(max)) throw new Error(`Param 'max' is NaN`);
   return (v: number) => {
@@ -78,7 +78,7 @@ export const clamper = (min: number = 0, max: number = 1) => {
  */
 export const clampIndex = (
   v: number,
-  arrayOrLength: number | ReadonlyArray<any>
+  arrayOrLength: number | readonly any[]
 ): number => {
   // ✔ UNIT TESTED
   if (!Number.isInteger(v)) {

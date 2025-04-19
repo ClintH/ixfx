@@ -1,4 +1,4 @@
-import { defaultComparer, type Comparer } from "@ixfxfun/core";
+import { defaultComparer, type Comparer } from "@ixfx/core";
 
 /**
  * Returns an immutable wrapper around an array, initially unsorted.
@@ -7,7 +7,7 @@ import { defaultComparer, type Comparer } from "@ixfxfun/core";
  * @param comparer 
  * @returns 
  */
-export const wrapUnsorted = <T>(unsortedData: Array<T>, comparer: Comparer<T> = defaultComparer) => wrapSorted(unsortedData.toSorted(comparer));
+export const wrapUnsorted = <T>(unsortedData: T[], comparer: Comparer<T> = defaultComparer) => wrapSorted(unsortedData.toSorted(comparer));
 
 /**
  * Returns an immutable wrapper around a sorted array.
@@ -38,7 +38,7 @@ export const wrapUnsorted = <T>(unsortedData: Array<T>, comparer: Comparer<T> = 
  * @param comparer 
  * @returns 
  */
-export const wrapSorted = <T>(sortedData: Array<T>, comparer: Comparer<T> = defaultComparer) => {
+export const wrapSorted = <T>(sortedData: T[], comparer: Comparer<T> = defaultComparer) => {
   const store = [ ...sortedData ];
   return {
     /**
@@ -119,7 +119,7 @@ export const wrapSorted = <T>(sortedData: Array<T>, comparer: Comparer<T> = defa
  * @param comparer Comparer (by default uses JS semantics)
  * @returns Index of sought item or -1 if not found.
  */
-export const indexOf = <T>(data: Array<T>, sought: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
+export const indexOf = <T>(data: T[], sought: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
   if (end <= start) return -1;
   const mid = Math.floor((start + end) / 2);
   const result = comparer(data[ mid ], sought);
@@ -148,7 +148,7 @@ export const indexOf = <T>(data: Array<T>, sought: T, start = 0, end = data.leng
  * @param end 
  * @param comparer 
  */
-export const insertionIndex = <T>(data: Array<T>, toInsert: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
+export const insertionIndex = <T>(data: T[], toInsert: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
   const mid = Math.floor((start + end) / 2);
 
   const result = comparer(data[ mid ], toInsert);
@@ -183,7 +183,7 @@ export const insertionIndex = <T>(data: Array<T>, toInsert: T, start = 0, end = 
  * @param comparer Comparer, uses JS default semantics if not specified.
  * @returns 
  */
-export const insert = <T>(sortedArray: Array<T>, toInsert: T, comparer: Comparer<T> = defaultComparer) => {
+export const insert = <T>(sortedArray: T[], toInsert: T, comparer: Comparer<T> = defaultComparer) => {
   const index = insertionIndex(sortedArray, toInsert, 0, sortedArray.length, comparer);
   const pre = sortedArray.slice(0, index);
   const post = sortedArray.slice(index);
@@ -205,7 +205,7 @@ export const insert = <T>(sortedArray: Array<T>, toInsert: T, comparer: Comparer
  * @param comparer 
  * @returns 
  */
-export const remove = <T>(data: Array<T>, toRemove: T, comparer: Comparer<T> = defaultComparer) => {
+export const remove = <T>(data: T[], toRemove: T, comparer: Comparer<T> = defaultComparer) => {
   const index = indexOf(data, toRemove, 0, data.length, comparer);
   if (index === -1) return data;
   const pre = data.slice(0, index);
@@ -231,9 +231,9 @@ export const remove = <T>(data: Array<T>, toRemove: T, comparer: Comparer<T> = d
  * @param b Sorted array
  * @param comparer Comparator
  */
-export const merge = <T>(a: Array<T>, b: Array<T>, comparer: Comparer<T> = defaultComparer): Array<T> => {
+export const merge = <T>(a: T[], b: T[], comparer: Comparer<T> = defaultComparer): T[] => {
   // Adapted from https://github.com/larrybotha/building-algorithms-using-typescript/blob/master/src/09-merge-sort-algorithm.ts
-  const t: Array<T> = [];
+  const t: T[] = [];
   let aIndex = 0;
   let bIndex = 0;
 
@@ -261,7 +261,7 @@ export const merge = <T>(a: Array<T>, b: Array<T>, comparer: Comparer<T> = defau
   return t;
 }
 
-const sortMerge = <T>(data: Array<T> | ReadonlyArray<T>, comparer: Comparer<T> = defaultComparer): Array<T> => {
+const sortMerge = <T>(data: T[] | readonly T[], comparer: Comparer<T> = defaultComparer): T[] => {
   // Adapted from https://github.com/larrybotha/building-algorithms-using-typescript/blob/master/src/09-merge-sort-algorithm.ts
   if (data.length <= 1) return [ ...data ];
   const mIndex = Math.floor(data.length / 2);
@@ -297,7 +297,7 @@ export type SortAlgorithm = `default` | `merge`;
  * @param comparer 
  * @returns Sorted array
  */
-export const sort = <T>(data: Array<T> | ReadonlyArray<T>, algo: SortAlgorithm = `default`, comparer: Comparer<T> = defaultComparer): Array<T> => {
+export const sort = <T>(data: T[] | readonly T[], algo: SortAlgorithm = `default`, comparer: Comparer<T> = defaultComparer): T[] => {
   switch (algo) {
     case `merge`:
       return sortMerge(data, comparer);

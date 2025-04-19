@@ -1,5 +1,5 @@
-import { zipKeyValue } from "@ixfxfun/core/maps";
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { zipKeyValue } from "@ixfx/core/maps";
+import { throwIntegerTest } from "@ixfx/guards";
 import { guardCell, guardGrid } from "./guards.js";
 import type { GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, Grid, GridNeighbours } from "./types.js";
 import { offset } from "./offset.js";
@@ -16,7 +16,7 @@ export const allDirections = Object.freeze([
   `se`,
   `sw`,
   `w`,
-]) as ReadonlyArray<GridCardinalDirection>;
+]) as readonly GridCardinalDirection[];
 
 /**
  * Returns a list of + shaped directions: n, e, s, w
@@ -26,7 +26,7 @@ export const crossDirections = Object.freeze([
   `e`,
   `s`,
   `w`,
-]) as ReadonlyArray<GridCardinalDirection>;
+]) as readonly GridCardinalDirection[];
 
 /**
  * Returns cells that correspond to the cardinal directions at a specified distance

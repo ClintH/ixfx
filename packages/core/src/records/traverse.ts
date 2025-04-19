@@ -1,9 +1,9 @@
-import { throwNullUndef } from '@ixfxfun/guards';
+import { throwNullUndef } from '@ixfx/guards';
 import { isPrimitive } from '../is-primitive.js';
 
 export type RecordEntry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
-export type RecordEntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: Array<string> }>;
-export type RecordEntryStatic = Readonly<{ name: string, value: any, ancestors: Array<string> }>
+export type RecordEntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: string[] }>;
+export type RecordEntryStatic = Readonly<{ name: string, value: any, ancestors: string[] }>
 
 /**
  * Options for parsing a path
@@ -31,7 +31,7 @@ export type RecordChildrenOptions = Readonly<{
  * @param entries 
  * @returns 
  */
-export function prettyPrintEntries(entries: ReadonlyArray<RecordEntry>) {
+export function prettyPrintEntries(entries: readonly RecordEntry[]) {
   if (entries.length === 0) return `(empty)`;
   let t = ``;
   for (const [ index, entry ] of entries.entries()) {
@@ -146,7 +146,7 @@ export function* recordChildren<T extends object>(
   }
 }
 
-export function* recordEntriesDepthFirst<T extends object>(node: T, options: Partial<RecordChildrenOptions> = {}, ancestors: Array<string> = []): IterableIterator<RecordEntryWithAncestors> {
+export function* recordEntriesDepthFirst<T extends object>(node: T, options: Partial<RecordChildrenOptions> = {}, ancestors: string[] = []): IterableIterator<RecordEntryWithAncestors> {
   for (const c of recordChildren(node, options)) {
     //onsole.log(`depthFirst name: ${ c.name } nodeValue: ${ toStringAbbreviate(c.nodeValue) }`)
     yield { ...c, ancestors: [ ...ancestors ] };
@@ -200,7 +200,7 @@ export function getRecordEntryByPath<T extends object>(
   node: T,
   options: PathOpts = {}
 ): RecordEntry {
-  const paths = [...traceRecordEntryByPath(path, node, options)];
+  const paths = [ ...traceRecordEntryByPath(path, node, options) ];
   if (paths.length === 0) throw new Error(`Could not trace path: ${ path } `);
   return paths.at(-1) as RecordEntry;
 }
@@ -249,7 +249,7 @@ export function* traceRecordEntryByPath<T extends object>(
   const separator = options.separator ?? `.`;
   const pathSplit = path.split(separator);
 
-  const ancestors: Array<string> = [];
+  const ancestors: string[] = [];
   for (const p of pathSplit) {
     const entry = recordEntryChildByName(p, node);
     if (!entry) {

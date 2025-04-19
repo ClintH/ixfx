@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.

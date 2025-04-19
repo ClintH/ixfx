@@ -1,10 +1,10 @@
-import { throwArrayTest } from '@ixfxfun/guards';
-import {Colour} from '@ixfxfun/visual';
-import { resolveEl } from '@ixfxfun/dom';
-import type { IStackImmutable } from '@ixfxfun/collections/stack';
-import { StackImmutable } from '@ixfxfun/collections/stack';
-import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths } from '@ixfxfun/geometry';
-import { quantiseEvery } from '@ixfxfun/numbers';
+import { throwArrayTest } from '@ixfx/guards';
+import { Colour } from '@ixfx/visual';
+import { resolveEl } from '@ixfx/dom';
+import type { IStackImmutable } from '@ixfx/collections/stack';
+import { StackImmutable } from '@ixfx/collections/stack';
+import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths } from '@ixfx/geometry';
+import { quantiseEvery } from '@ixfx/numbers';
 
 // import type { Point } from '../geometry/point/PointType.js';
 // import type { Line } from '../geometry/line/LineType.js';
@@ -72,14 +72,14 @@ export const makeHelper = (
   const ctx = getContext(ctxOrCanvasEl);
   return {
     ctx,
-    paths(pathsToDraw: Array<Paths.Path> | ReadonlyArray<Paths.Path>, opts?: DrawingOpts): void {
+    paths(pathsToDraw: Paths.Path[] | readonly Paths.Path[], opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
     },
-    line(lineToDraw: Lines.Line | Array<Lines.Line>, opts?: DrawingOpts): void {
+    line(lineToDraw: Lines.Line | Lines.Line[], opts?: DrawingOpts): void {
       line(ctx, lineToDraw, opts);
     },
     rect(
-      rectsToDraw: Rects.Rect | Array<Rects.Rect> | Rects.RectPositioned | Array<Rects.RectPositioned>,
+      rectsToDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[],
       opts?: RectOpts
     ): void {
       rect(ctx, rectsToDraw, opts);
@@ -91,35 +91,34 @@ export const makeHelper = (
       bezier(ctx, bezierToDraw, opts);
     },
     connectedPoints(
-      pointsToDraw: Array<Points.Point>,
+      pointsToDraw: Points.Point[],
       opts?: DrawingOpts & Partial<ConnectedPointsOptions>
     ): void {
       connectedPoints(ctx, pointsToDraw, opts);
     },
-    pointLabels(pointsToDraw: Array<Points.Point>, opts?: DrawingOpts): void {
+    pointLabels(pointsToDraw: Points.Point[], opts?: DrawingOpts): void {
       pointLabels(ctx, pointsToDraw, opts);
     },
     dot(
-      dotPosition: Points.Point | Array<Points.Point>,
+      dotPosition: Points.Point | Points.Point[],
       opts?: DotOpts
     ): void {
       dot(ctx, dotPosition, opts);
     },
     circle(
-      circlesToDraw: Circles.CirclePositioned | Array<
-      Circles.CirclePositioned>,
+      circlesToDraw: Circles.CirclePositioned | Circles.CirclePositioned[],
       opts: DrawingOpts
     ): void {
       circle(ctx, circlesToDraw, opts);
     },
     arc(
-      arcsToDraw: Arcs.ArcPositioned | Array<Arcs.ArcPositioned>,
+      arcsToDraw: Arcs.ArcPositioned | Arcs.ArcPositioned[],
       opts: DrawingOpts
     ): void {
       arc(ctx, arcsToDraw, opts);
     },
     textBlock(
-      lines: Array<string>,
+      lines: string[],
       opts: DrawingOpts & {
         anchor: Points.Point;
         anchorPadding?: number;
@@ -175,7 +174,7 @@ const optsOp = (opts: DrawingOpts): StackOp =>
 const applyOpts = (
   ctx: CanvasRenderingContext2D,
   opts: DrawingOpts = {},
-  ...additionalOps: ReadonlyArray<StackOp>
+  ...additionalOps: readonly StackOp[]
 ): DrawingStack => {
   if (ctx === undefined) throw new Error(`ctx undefined`);
 
@@ -195,7 +194,7 @@ const applyOpts = (
  */
 export const arc = (
   ctx: CanvasRenderingContext2D,
-  arcs: Arcs.ArcPositioned | ReadonlyArray<Arcs.ArcPositioned>,
+  arcs: Arcs.ArcPositioned | readonly Arcs.ArcPositioned[],
   opts: DrawingOpts = {}
 ) => {
   applyOpts(ctx, opts);
@@ -227,7 +226,7 @@ export type DrawingStack = {
    * @param ops Operation to add
    * @returns stack with added op
    */
-  push(...ops: ReadonlyArray<StackOp>): DrawingStack;
+  push(...ops: readonly StackOp[]): DrawingStack;
   /**
    * Pops an operatiomn
    * @returns Drawing stack with item popped
@@ -281,7 +280,7 @@ export const drawingStack = (
 ): DrawingStack => {
   if (stk === undefined) stk = new StackImmutable<StackOp>();
 
-  const push = (...ops: Array<StackOp>): DrawingStack => {
+  const push = (...ops: StackOp[]): DrawingStack => {
     if (stk === undefined) stk = new StackImmutable<StackOp>();
     const s = stk.push(...ops);
     for (const o of ops) o(ctx);
@@ -310,7 +309,7 @@ export const drawingStack = (
  */
 export const lineThroughPoints = (
   ctx: CanvasRenderingContext2D,
-  points: ReadonlyArray<Points.Point>,
+  points: readonly Points.Point[],
   opts?: DrawingOpts
 ): void => {
   applyOpts(ctx, opts);
@@ -352,7 +351,7 @@ export const lineThroughPoints = (
  */
 export const circle = (
   ctx: CanvasRenderingContext2D,
-  circlesToDraw: Circles.CirclePositioned | ReadonlyArray<Circles.CirclePositioned>,
+  circlesToDraw: Circles.CirclePositioned | readonly Circles.CirclePositioned[],
   opts: DrawingOpts = {}
 ) => {
   applyOpts(ctx, opts);
@@ -382,7 +381,7 @@ export const ellipse = (
   ctx: CanvasRenderingContext2D,
   ellipsesToDraw:
     | Ellipses.EllipsePositioned
-    | ReadonlyArray<Ellipses.EllipsePositioned>,
+    | readonly Ellipses.EllipsePositioned[],
   opts: DrawingOpts = {}
 ) => {
   applyOpts(ctx, opts);
@@ -412,7 +411,7 @@ export const ellipse = (
  */
 export const paths = (
   ctx: CanvasRenderingContext2D,
-  pathsToDraw: ReadonlyArray<Paths.Path> | Paths.Path,
+  pathsToDraw: readonly Paths.Path[] | Paths.Path,
   opts: { readonly strokeStyle?: string; readonly debug?: boolean } = {}
 ) => {
   applyOpts(ctx, opts);
@@ -449,7 +448,7 @@ export type ConnectedPointsOptions = {
  */
 export const connectedPoints = (
   ctx: CanvasRenderingContext2D,
-  pts: ReadonlyArray<Points.Point>,
+  pts: readonly Points.Point[],
   opts: Partial<ConnectedPointsOptions> = {}
 ) => {
   const shouldLoop = opts.loop ?? false;
@@ -492,9 +491,9 @@ export const connectedPoints = (
  */
 export const pointLabels = (
   ctx: CanvasRenderingContext2D,
-  pts: ReadonlyArray<Points.Point>,
+  pts: readonly Points.Point[],
   opts: { readonly fillStyle?: string } = {},
-  labels?: ReadonlyArray<string>
+  labels?: readonly string[]
 ) => {
   if (pts.length === 0) return;
 
@@ -560,7 +559,7 @@ export type DotOpts = DrawingOpts & {
  */
 export const dot = (
   ctx: CanvasRenderingContext2D,
-  pos: Points.Point | Array<Points.Point | Circles.CirclePositioned> | Circles.CirclePositioned,
+  pos: Points.Point | (Points.Point | Circles.CirclePositioned)[] | Circles.CirclePositioned,
   opts?: DotOpts
 ) => {
   if (opts === undefined) opts = {};
@@ -739,7 +738,7 @@ const quadraticBezier = (
  */
 export const line = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Lines.Line | ReadonlyArray<Lines.Line>,
+  toDraw: Lines.Line | readonly Lines.Line[],
   opts: LineOpts & DrawingOpts = {}
 ) => {
   const isDebug = opts.debug ?? false;
@@ -775,7 +774,7 @@ export const line = (
  */
 export const triangle = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Triangles.Triangle | ReadonlyArray<Triangles.Triangle>,
+  toDraw: Triangles.Triangle | readonly Triangles.Triangle[],
   opts: DrawingOpts & { readonly filled?: boolean } = {}
 ) => {
   applyOpts(ctx, opts);
@@ -826,7 +825,7 @@ export type RectOpts = DrawingOpts & Readonly<Partial<{
  */
 export const rect = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Rects.Rect | Array<Rects.Rect> | Rects.RectPositioned | Array<Rects.RectPositioned>,
+  toDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[],
   opts: RectOpts = {}
 ) => {
   applyOpts(ctx, opts);
@@ -917,7 +916,7 @@ export const textHeight = (
  */
 export const textBlock = (
   ctx: CanvasRenderingContext2D,
-  lines: ReadonlyArray<string>,
+  lines: readonly string[],
   opts: DrawingOpts & {
     readonly anchor: Points.Point;
     readonly align?: `top` | `center`
@@ -977,7 +976,7 @@ export type VertAlign = `top` | `center` | `bottom`;
  */
 export const textBlockAligned = (
   ctx: CanvasRenderingContext2D,
-  text: ReadonlyArray<string> | string,
+  text: readonly string[] | string,
   opts: DrawingOpts & {
     readonly bounds: Rects.RectPositioned;
     readonly horiz?: HorizAlign;

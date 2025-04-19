@@ -1,4 +1,4 @@
-import { throwFromResult, numberTest as guardNumberTest, integerTest as guardIntegerTest } from "@ixfxfun/guards";
+import { throwFromResult, numberTest as guardNumberTest, integerTest as guardIntegerTest } from "@ixfx/guards";
 import type { GenerateRandomOptions, RandomOptions, RandomSource } from "./types.js";
 import { count } from "./util/count.js";
 import { shuffle } from "./arrays.js";

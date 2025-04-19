@@ -1,4 +1,4 @@
-import type { Interval } from "@ixfxfun/core";
+import type { Interval } from "@ixfx/core";
 import { timeout } from "./timeout.js";
 
 export type RateMinimumOptions<TInput> = Readonly<{

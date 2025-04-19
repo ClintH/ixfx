@@ -1,0 +1,44 @@
+{
+
+	"compilerOptions": {
+		"outDir": "dist",
+		"target": "ES2024",
+		"moduleResolution": "bundler",
+		"lib": ["ESNext", "DOM", "DOM.Iterable",  "ESNext.AsyncIterable", "ESNext.Iterator"],
+		"module": "ESNext",
+		"paths": {
+			"@ixfx/arrays":["../packages/arrays/dist/src"],
+			"@ixfx/debug":["../packages/debug/dist/src"],
+			"@ixfx/geometry":["../packages/geometry/dist/src"],
+			"@ixfx/geometry/*":["../packages/arrays/dist/src/*"],
+
+			"@ixfx/dom":["../packages/dom/dist/src"],
+			"@ixfx/random":["../packages/random/dist/src"],
+			"@ixfx/events":["../packages/events/dist/src"],
+			"@ixfx/process":["../packages/process/dist/src"],
+			
+			"@ixfx/core":["../packages/core/dist/src"],
+			"@ixfx/modulation":["../packages/modulation/dist/src"],
+			"@ixfx/numbers":["../packages/numbers/dist/src"],
+			"@ixfx/rx":["../packages/rx/dist/src"],
+			"@ixfx/visual":["../packages/visual/dist/src"]
+		},
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"declaration": true,
+		"declarationMap": true,
+		"allowJs": true,
+		"checkJs": true,
+		"incremental": false,
+		/* Linting */
+		"strict": true,
+		"noUnusedLocals": false,
+		"noImplicitAny": false,
+		"noUnusedParameters": false,
+		"noFallthroughCasesInSwitch": true
+	},
+	"include": ["src/**/*", "__testsx__/**/*"],
+	
+}

@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { throwIntegerTest } from "@ixfx/guards";
 
 /**
  * Yields `amount` integers, counting by one from zero. If a negative amount is used,

@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { throwIntegerTest } from "@ixfx/guards";
 
 /**
  * Returns true for every _n_th call, eg 2 for every second call.

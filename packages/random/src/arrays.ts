@@ -1,4 +1,4 @@
-import { guardArray } from "@ixfxfun/guards";
+import { guardArray } from "@ixfx/guards";
 import { weightedIndex } from "./weighted-index.js";
 import type { RandomSource } from "./types.js";
 
@@ -52,7 +52,7 @@ export const randomPluck = <V>(
   mutate = false,
   rand: RandomSource = Math.random
 ): { readonly value: V | undefined; readonly array: V[] } => {
-  if (typeof array ===`undefined`) throw new Error(`Param 'array' is undefined`);
+  if (typeof array === `undefined`) throw new Error(`Param 'array' is undefined`);
   if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array`);
   if (array.length === 0) return { value: undefined, array: [] };
   const index = randomIndex(array, rand);

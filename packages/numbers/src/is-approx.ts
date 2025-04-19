@@ -1,4 +1,4 @@
-import { numberTest, throwNumberTest } from "@ixfxfun/guards";
+import { numberTest, throwNumberTest } from "@ixfx/guards";
 import { round } from "./round.js";
 
 /**
@@ -103,7 +103,7 @@ export function isApprox(
   }
 }
 
-export const isCloseTo = (a: number, b: number, precision: number = 3) => {
+export const isCloseTo = (a: number, b: number, precision = 3) => {
   const aa = a.toPrecision(precision);
   const bb = b.toPrecision(precision);
   if (aa !== bb) return [ false, `A is not close enough to B. A: ${ a } B: ${ b } Precision: ${ precision }` ];

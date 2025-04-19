@@ -1,4 +1,4 @@
-import type { IsEqual } from '@ixfxfun/core';
+import type { IsEqual } from '@ixfx/core';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapOf<V> {
@@ -25,7 +25,7 @@ export interface IMapOf<V> {
    */
   entriesFlat(): IterableIterator<readonly [ key: string, value: V ]>;
 
-  entries():IterableIterator<[key:string,value:Array<V>]>;
+  entries(): IterableIterator<[ key: string, value: V[] ]>;
   /**
    * Iteates over all keys and the count of values therein
    */
@@ -61,5 +61,5 @@ export interface IMapOf<V> {
    * @param value Value to seek
    * @returns Key, or undefined if value not found
    */
-  firstKeyByValue(value: V, eq?: IsEqual<V> | undefined): string | undefined;
+  firstKeyByValue(value: V, eq?: IsEqual<V>): string | undefined;
 }

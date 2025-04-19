@@ -1,6 +1,6 @@
-import { clamp,scale as scaleNumber } from "@ixfxfun/numbers";
+import { clamp, scale as scaleNumber } from "@ixfx/numbers";
 import type { ColourInterpolationOpts, Colourish } from "./types.js";
-import { pairwise } from '@ixfxfun/arrays';
+import { pairwise } from '@ixfx/arrays';
 import { structuredToColorJsConstructor } from "./resolve-to-color.js";
 import { toString as colourToString } from "./to-hex.js";
 import Color from "colorjs.io";
@@ -23,7 +23,7 @@ import Color from "colorjs.io";
  * @param opts Options for interpolation
  * @returns 
  */
-export const interpolator = (colours: Array<Colourish>, opts: Partial<ColourInterpolationOpts> = {}) => {
+export const interpolator = (colours: Colourish[], opts: Partial<ColourInterpolationOpts> = {}) => {
   const space = opts.space ?? `lch`;
   const hue = opts.hue ?? `shorter`;
   const pieces = interpolatorInit(colours);
@@ -50,7 +50,7 @@ export const interpolator = (colours: Array<Colourish>, opts: Partial<ColourInte
   }
 }
 
-const interpolatorInit = (colours: Array<Colourish>) => {
+const interpolatorInit = (colours: Colourish[]) => {
   if (!Array.isArray(colours)) throw new Error(`Param 'colours' is not an array as expected. Got: ${ typeof colours }`);
   if (colours.length < 2) throw new Error(`Param 'colours' should be at least two in length. Got: ${ colours.length }`);
   const c = colours.map(colour => {
@@ -68,7 +68,7 @@ const interpolatorInit = (colours: Array<Colourish>) => {
  * @param colours 
  * @returns 
  */
-export const cssLinearGradient = (colours: Array<Colourish>) => {
+export const cssLinearGradient = (colours: Colourish[]) => {
   const c = colours.map(c => colourToString(c));
   return `linear-gradient(to right, ${ c.join(`, `) })`;
 }
@@ -90,7 +90,7 @@ export const cssLinearGradient = (colours: Array<Colourish>) => {
  * @param opts 
  * @returns 
  */
-export const scale = (colours: Array<Colourish>, numberOfSteps: number, opts: Partial<ColourInterpolationOpts> = {}): Array<string> => {
+export const scale = (colours: Colourish[], numberOfSteps: number, opts: Partial<ColourInterpolationOpts> = {}): string[] => {
   const space = opts.space ?? `lch`;
   const hue = opts.hue ?? `shorter`;
   const pieces = interpolatorInit(colours);
@@ -99,7 +99,7 @@ export const scale = (colours: Array<Colourish>, numberOfSteps: number, opts: Pa
 
   const steps = pieces.map(piece => (piece[ 0 ] as any).steps(piece[ 1 ],
     { space, hue, steps: stepsPerPair, outputSpace: `srgb` }
-  )) as Array<Color>;
+  )) as Color[];
 
   return steps.flat().map(c => c.display());
 }

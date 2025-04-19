@@ -1,4 +1,3 @@
-//import { getOrGenerateSync } from '../../core/src/maps.js';
 import type { MessageLogger, LogMessage } from "./types.js";
 import { getOrGenerateSync } from "./util.js";
 
@@ -37,7 +36,7 @@ import { getOrGenerateSync } from "./util.js";
 
 
 
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const logger =
   (
     prefix: string,
@@ -100,7 +99,7 @@ export const logSet = (prefix: string, verbose = true, colourKey?: string) => {
     };
   }
   return {
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     log: (_: any) => {
       /** no-op */
     },

@@ -1,6 +1,6 @@
 {
-	"name": "@ixfxfun/rx",
-	"version": "0.35.0",
+	"name": "@ixfx/rx",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -26,16 +26,16 @@
 		}
 	},
 	"dependencies": {
-		"@ixfxfun/arrays": "workspace:^",
-		"@ixfxfun/collections": "workspace:^",
-		"@ixfxfun/core": "workspace:^",
-		"@ixfxfun/debug": "workspace:^",
-		"@ixfxfun/dom": "workspace:^",
-		"@ixfxfun/flow": "workspace:^",
-		"@ixfxfun/guards": "workspace:^",
-		"@ixfxfun/iterables": "workspace:^",
-		"@ixfxfun/modulation": "workspace:^",
-		"@ixfxfun/process": "workspace:^"
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/dom": "workspace:^",
+		"@ixfx/flow": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/iterables": "workspace:^",
+		"@ixfx/modulation": "workspace:^",
+		"@ixfx/process": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

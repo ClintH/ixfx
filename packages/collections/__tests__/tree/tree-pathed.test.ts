@@ -1,8 +1,8 @@
 import { test, expect } from 'vitest';
 
-import * as TreeArrayBacked from '../../src/tree/TreeMutable.js';
-import * as TreePathed from '../../src/tree/Pathed.js';
-import { isEqualValueDefault } from '@ixfxfun/core';
+import * as TreeArrayBacked from '../../src/tree/tree-mutable.js';
+import * as TreePathed from '../../src/tree/pathed.js';
+import { isEqualValueDefault } from '@ixfx/core';
 
 
 test(`tree-dotted-path`, () => {

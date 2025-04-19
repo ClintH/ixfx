@@ -9,13 +9,13 @@ export * as Sync from './sync.js';
 export * from './compare-values.js';
 export * from './from-event.js';
 export * from './guard.js';
-export type * from './types.js';
+export * from './types.js';
 
 import { isAsyncIterable } from './guard.js';
 //import * as Chains from './chain/index.js';
 // import type { Interval } from '../flow/IntervalType.js';
 
-import { toStringDefault, type Interval } from '@ixfxfun/core';
+import { toStringDefault, type Interval } from '@ixfx/core';
 //import type { GenFactoryNoInput } from './chain/Types.js';
 import type { ForEachOptions, ToArrayOptions, IteratorControllerOptions, IteratorControllerState } from './types.js';
 

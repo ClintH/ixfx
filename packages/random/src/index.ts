@@ -8,7 +8,7 @@ export * from './non-zero.js';
 export * from './seeded.js';
 export * from './string.js';
 export * from './time.js';
-export type * from './types.js';
+export * from './types.js';
 export * from './weighted-index.js';
 export * from './weighted-integer.js';
 export * from './weighted.js';

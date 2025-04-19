@@ -1,5 +1,5 @@
 
-import type { RectPositioned } from "@ixfxfun/geometry/rect";
+import type { RectPositioned } from "@ixfx/geometry/rect";
 import { resolveEl, resolveEls, type QueryOrElements } from "./resolve-el.js";
 
 // const tw = getComputedStyle(this.#el).borderTopWidth;
@@ -7,28 +7,26 @@ import { resolveEl, resolveEls, type QueryOrElements } from "./resolve-el.js";
 // const leftW = getComputedStyle(this.#el).borderLeftWidth;
 // const rightW = getComputedStyle(this.#el).borderRightWidth;
 
-type ComputedPixelsMap<T extends ReadonlyArray<keyof CSSStyleDeclaration>> = {
-  [Key in T[number]]: number
-}
+type ComputedPixelsMap<T extends readonly (keyof CSSStyleDeclaration)[]> = Record<T[ number ], number>
 
 /**
  * Returns the value of `getBoundingClientRect` plus the width of all the borders
  * @param elOrQuery 
  * @returns 
  */
-export const getBoundingClientRectWithBorder = (elOrQuery:SVGElement|HTMLElement|string):RectPositioned => {
+export const getBoundingClientRectWithBorder = (elOrQuery: SVGElement | HTMLElement | string): RectPositioned => {
   let el = resolveEl(elOrQuery);
   const size = el.getBoundingClientRect();
   if (el instanceof SVGElement) {
-    el = el.parentElement as HTMLElement;
+    el = el.parentElement!;
   }
   const border = getComputedPixels(el, `borderTopWidth`, `borderLeftWidth`, `borderRightWidth`, `borderBottomWidth`);
 
   return {
     x: size.x,
     y: size.y,
-    width: size.width +border.borderLeftWidth+border.borderRightWidth,
-    height: size.height+border.borderTopWidth+border.borderBottomWidth
+    width: size.width + border.borderLeftWidth + border.borderRightWidth,
+    height: size.height + border.borderTopWidth + border.borderBottomWidth
   }
 }
 
@@ -45,19 +43,19 @@ export const getBoundingClientRectWithBorder = (elOrQuery:SVGElement|HTMLElement
  * @param properties 
  * @returns 
  */
-export const getComputedPixels = <T extends ReadonlyArray<keyof CSSStyleDeclaration>>(elOrQuery:HTMLElement|string, ...properties:T):ComputedPixelsMap<T> => {
+export const getComputedPixels = <T extends readonly (keyof CSSStyleDeclaration)[]>(elOrQuery: HTMLElement | string, ...properties: T): ComputedPixelsMap<T> => {
   const s = getComputedStyle(resolveEl(elOrQuery));
   const returnValue = {};
   for (const property of properties) {
-    const v = s[property];
+    const v = s[ property ];
     if (typeof v === `string`) {
       if (v.endsWith(`px`)) {
-        (returnValue as any)[property] = Number.parseFloat(v.substring(0,v.length-2));
+        (returnValue as any)[ property ] = Number.parseFloat(v.substring(0, v.length - 2));
       } else {
-        throw new Error(`Property '${String(property)}' does not end in 'px'. Value: ${v}`);
+        throw new Error(`Property '${ String(property) }' does not end in 'px'. Value: ${ v }`);
       }
     } else {
-      throw new Error(`Property '${String(property)}' is not type string. Got: ${typeof v} Value: ${v}`);
+      throw new Error(`Property '${ String(property) }' is not type string. Got: ${ typeof v } Value: ${ v }`);
     }
   }
   return returnValue as ComputedPixelsMap<T>;

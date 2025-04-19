@@ -1,4 +1,4 @@
-import { guardArray } from '@ixfxfun/guards';
+import { guardArray } from '@ixfx/guards';
 /**
  * Sorts an array of objects in ascending order
  * by the given property name, assuming it is a number.
@@ -18,7 +18,7 @@ import { guardArray } from '@ixfxfun/guards';
  * @param propertyName
  */
 export const sortByNumericProperty = <V, K extends keyof V>(
-  data: ReadonlyArray<V> | Array<V>,
+  data: readonly V[] | V[],
   propertyName: K
 ) => [ ...data ].sort((a, b) => {
   guardArray(data, `data`);
@@ -30,7 +30,7 @@ export const sortByNumericProperty = <V, K extends keyof V>(
 });
 
 export const sortByProperty = <V, K extends keyof V>(
-  data: ReadonlyArray<V> | Array<V>,
+  data: readonly V[] | V[],
   propertyName: K
 ) => [ ...data ].sort((a, b) => {
   guardArray(data, `data`);

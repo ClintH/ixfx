@@ -1,0 +1,202 @@
+import { execa } from "execa";
+import { task } from "hereby";
+import { readdir } from "fs/promises";
+import { resolve } from "path";
+import { existsSync } from "fs";
+import { build as tsupBuild } from 'tsup'
+
+const demosBaseDir = `../ixfxfun/demos`;
+
+const byPkgStaging = `./bundles-by-package`;
+const byPkgDestRel = `${demosBaseDir}/bundle`;
+const byPkgDestAbs = resolve(byPkgDestRel);
+
+const demosLibDestinationRelative = `../ixfxfun/demos/_lib`;
+const demosLibDestination = resolve(demosLibDestinationRelative);
+
+const distSuffix = `dist/src/`;
+
+async function* getPackages() {
+  if (!existsSync(demosLibDestination)) {
+    throw new Error(`Destination path doesn't exist: ${demosLibDestinationRelative}`);
+  }
+  let dirs = (await readdir('./packages/', { withFileTypes: true }))
+    .filter(dir => dir.isDirectory());
+  for (const dir of dirs) {
+    yield dir;
+  }
+}
+
+export const build = task({
+  name: "build",
+  run: async () => {
+    await execa("pnpm", ["run", "rebuild"]);
+  },
+});
+
+
+async function tsupBundleByPackage(name) {
+  const entry = {}
+  entry[name] = `./packages/${name}/src/index.ts`
+  return tsupBuild({
+    // @ts-ignore
+    entry,
+    sourcemap: true,
+    dts: {
+      resolve: [/(.*)/]
+    },
+    format: `esm`,
+    target: `es2024`,
+    outDir: `${byPkgStaging}/`,
+    clean: false,
+    noExternal: [/(.*)/],
+    platform: `browser`,
+    splitting: false,
+    silent: true
+  })
+}
+
+export const bundleTsupClean = task({
+  name: "bundleTsupClean",
+  run: async () => {
+    for await (const dir of getPackages()) {
+      await execa(`rm`, [
+        `-rf`,
+        `./bundle/${dir.name}`]);
+      await execa(`rm`, [
+        `-rf`,
+        `${byPkgDestAbs}/${dir.name}`]);
+    }
+  }
+});
+
+export const tsupBundleByPackagesClean = task({
+  name: `tsupBundleByPackagesClean`,
+  run: async () => {
+    // Remove from destination
+    await execa(`rm`, [
+      `-rf`,
+      `${byPkgDestAbs}`]);
+  }
+});
+
+
+// export const tsupBundleByPackagesCopy = task({
+//   name: `tsupBundleByPackagesCopy`,
+//   run: async () => {
+//     // Copy
+//     await execa(`cp`, [
+//       `-r`,
+//       `${byPkgStaging}`,
+//       `${demosBaseDir}/`]);
+//   }
+// });
+
+export const tsupBundleByPackagesBuild = task({
+  name: "tsupBundleByPackagesBuild",
+  dependencies: [tsupBundleByPackagesClean],
+  run: async () => {
+    console.log(`Bundling packages...`);
+    for await (const dir of getPackages()) {
+      console.log(` - ${dir.name}`);
+      await tsupBundleByPackage(dir.name);
+      // Remove prev from output
+      // await execa(`rm`, [
+      //   `-rf`,
+      //   `./bundle/${dir.name}`]);
+
+    }
+  }
+});
+
+export const tsupBundleByPackages = task({
+  name: "tsupBundleByPackages",
+  dependencies: [tsupBundleByPackagesBuild],
+  run: async () => {
+    // Copy
+    await execa(`cp`, [
+      `-r`,
+      `${byPkgStaging}`,
+      `${demosBaseDir}/`]);
+    // await execa("tsup", [
+    //   `./packages/ixfx/src/index.ts`,
+    //   `--dts`,
+    //   `--format`,
+    //   `esm`,
+    //   `--sourcemap`,
+    //   `--target=chrome135`,
+    //   `--outfile=./bundle/out.js`
+    // ]);
+    // await tsupBuild({
+    //   entry: ['./packages/ixfx/src/index.ts'],
+    //   sourcemap: true,
+    //   dts: {
+    //     resolve: [/(.*)/]
+    //   },
+    //   format: `esm`,
+    //   target: `es2024`,
+    //   outDir: `./bundle`,
+    //   clean: true,
+    //   noExternal: [/(.*)/],
+    //   platform: `browser`,
+    //   splitting: false
+    // })
+
+    // await execa("esbuild", [
+    //   `./packages/ixfx/src/index.ts`,
+    //   `--bundle`,
+    //   `--sourcemap`,
+    //   `--target=chrome135`,
+    //   `--outfile=./bundle/out.js`
+    // ]);
+
+    // await execa("tsc", [
+    //   `--declaration`,
+    //   `./packages/ixfx/src/index.ts`,
+    //   `--emitDeclarationOnly`,
+    //   `--outDir`,
+    //   `./bundle`
+    // ]);
+
+  },
+});
+
+
+
+export const demosClean = task({
+  name: "demosClean",
+  run: async () => {
+    let deleted = [];
+    for await (const dir of getPackages()) {
+      await execa(`rm`, [
+        `-rf`,
+        `${demosLibDestination}/${dir.name}`]);
+      deleted.push(dir.name);
+    }
+    console.log(`Deleted: ${deleted.join(`,`)}`);
+  }
+});
+
+export const demosCopy = task({
+  name: "demosCopy",
+  dependencies: [build, demosClean],
+  run: async () => {
+    for await (const dir of getPackages()) {
+      console.log(` - ${dir.name}`);
+      const src = `./packages/${dir.name}/${distSuffix}`;
+      if (existsSync(src)) {
+        await execa("cp", [
+          `-r`,
+          src,
+          `${demosLibDestination}/${dir.name}`]);
+      } else {
+        console.log(`    Compiled output missing: ${src}`);
+      }
+    }
+  },
+});
+
+
+
+export default demosCopy;
+

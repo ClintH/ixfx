@@ -1,7 +1,7 @@
-import { intervalToMs, type Interval } from "@ixfxfun/core";
-import type { Modulate, ModulatorTimed } from "./types.js";
-import * as Flow from '@ixfxfun/flow';
-import { throwFunctionTest } from "@ixfxfun/guards";
+import { intervalToMs, type Interval } from "@ixfx/core";
+import type { ModulationFunction, ModulatorTimed } from "./types.js";
+import * as Flow from '@ixfx/flow';
+import { throwFunctionTest } from "@ixfx/guards";
 
 /**
  * Produce values over time. When the modulate function is complete, the final
@@ -23,7 +23,7 @@ import { throwFunctionTest } from "@ixfxfun/guards";
  * @returns 
  */
 export const time = (
-  fn: Modulate,
+  fn: ModulationFunction,
   duration: Interval
 ): () => number => {
   throwFunctionTest(fn, `fn`);
@@ -59,7 +59,7 @@ export const time = (
  * @returns ModulatorTimed
  */
 export const timeModulator = (
-  fn: Modulate,
+  fn: ModulationFunction,
   duration: Interval
 ): ModulatorTimed => {
   throwFunctionTest(fn, `fn`);
@@ -96,7 +96,7 @@ export const timeModulator = (
  * @returns 
  */
 export const ticks = (
-  fn: Modulate,
+  fn: ModulationFunction,
   totalTicks: number
 ): () => number => {
   throwFunctionTest(fn, `fn`);
@@ -131,7 +131,7 @@ export const ticks = (
  * @returns ModulatorTimed
  */
 export const tickModulator = (
-  fn: Modulate,
+  fn: ModulationFunction,
   durationTicks: number
 ): ModulatorTimed => {
   throwFunctionTest(fn, `fn`);

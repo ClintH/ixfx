@@ -1,9 +1,9 @@
 
-import { type Interval, intervalToMs, sleep, type RankFunction, type RankOptions, type RankArrayOptions, elapsedSince } from "@ixfxfun/core";
-import { throwIntegerTest } from "../../../guards/src/numbers.js";
+import { type Interval, intervalToMs, sleep, type RankFunction, type RankOptions, type RankArrayOptions, elapsedSince } from "@ixfx/core";
+import { throwIntegerTest } from "@ixfx/guards";
 import type { Link, GenOrData, DelayOptions } from "./types.js";
 import { resolveToGen } from "./utility.js";
-import * as BasicProcessors from "@ixfxfun/process/basic";
+import * as BasicProcessors from "@ixfx/process/basic";
 
 /**
  * Transform values from one type to another. Just like a map function.

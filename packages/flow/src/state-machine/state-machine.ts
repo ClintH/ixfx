@@ -1,4 +1,4 @@
-import { unique } from '@ixfxfun/arrays';
+import { unique } from '@ixfx/arrays';
 import type { Machine, MachineState, StateNames, StateTarget, StateTargetStrict, TransitionCondition, Transitions, TransitionsStrict } from './types.js';
 
 /**
@@ -251,7 +251,7 @@ const validateAndNormaliseTransitions = (
       for (const target of targets) {
         if (seenStates.has(target.state)) {
           throw new Error(
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
             `Target state '${ target.state }' already exists for '${ topLevelState }'`
           );
         }

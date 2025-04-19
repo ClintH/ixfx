@@ -1,4 +1,4 @@
-import { defaultKeyer,type ToString, toStringDefault } from '@ixfxfun/core';
+import { defaultKeyer, type ToString, toStringDefault } from '@ixfx/core';
 import { type ISetImmutable } from './ISetImmutable.js';
 
 export class SetStringImmutable<V> implements ISetImmutable<V> {
@@ -15,7 +15,7 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
     return this.store.size;
   }
 
-  add(...values: ReadonlyArray<V>): ISetImmutable<V> {
+  add(...values: readonly V[]): ISetImmutable<V> {
     const s = new Map<string, V>(this.store);
     for (const v of values) {
       const key = this.keyString(v);
@@ -36,7 +36,7 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
     return this.store.has(key);
   }
 
-  toArray(): Array<V> {
+  toArray(): V[] {
     return [ ...this.store.values() ];
   }
 

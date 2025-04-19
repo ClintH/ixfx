@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { expiringMap } from '../../src/map/index.js';
-import { sleep } from '@ixfxfun/core';
+import { sleep } from '@ixfx/core';
 
 test('get', async () => {
   const m = expiringMap<string, string>({ autoDeletePolicy: `get`, autoDeleteElapsedMs: 200 });

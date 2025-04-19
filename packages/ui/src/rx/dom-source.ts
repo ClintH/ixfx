@@ -1,12 +1,12 @@
-//import {Colour} from '@ixfxfun/visual';
-import type { ReactiveInitial, ReactiveWritable, Reactive } from "@ixfxfun/rx";
+//import {Colour} from '@ixfx/visual';
+import type { ReactiveInitial, ReactiveWritable, Reactive } from "@ixfx/rx";
 import type { DomFormOptions, DomNumberInputValueOptions, DomValueOptions } from "./dom-types.js";
-import { resolveEl } from '@ixfxfun/dom';
-import { transform } from '@ixfxfun/rx';
-import { hasLast } from '@ixfxfun/rx';
-import { Colour } from "@ixfxfun/visual";
-import { eventTrigger } from "@ixfxfun/rx/from";
-//import type { Colourish } from '@ixfxfun/visual/colour';
+import { resolveEl } from '@ixfx/dom';
+import { transform } from '@ixfx/rx';
+import { hasLast } from '@ixfx/rx';
+import { Colour } from "@ixfx/visual";
+import { eventTrigger } from "@ixfx/rx/from";
+//import type { Colourish } from '@ixfx/visual/colour';
 
 /**
  * Reactive getting/setting of values to a HTML INPUT element.
@@ -385,7 +385,7 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
     ...rxValues,
     el: formEl,
     last() {
-      return readValue() as T
+      return readValue()
     },
     set: setFromUpstream,
     setNamedValue,

@@ -1,4 +1,4 @@
-import { round as roundNumber } from '@ixfxfun/numbers';
+import { round as roundNumber } from '@ixfx/numbers';
 import { getPointParameter } from './get-point-parameter.js';
 import type { Point } from './point-type.js';
 

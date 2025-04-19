@@ -1,5 +1,5 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
-import * as Debug from '@ixfxfun/debug';
+import { SimpleEventEmitter } from '@ixfx/events';
+import * as Debug from '@ixfx/debug';
 /**
  * Policy for when the pool is fully used
  */
@@ -185,7 +185,7 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
 export class Resource<V> {
   #state: PoolState;
   #data: V;
-  #users: Array<PoolUser<V>>;
+  #users: PoolUser<V>[];
   readonly #capacityPerResource;
   readonly #resourcesWithoutUserExpireAfterMs;
   #lastUsersChange: number;
@@ -327,7 +327,7 @@ export class Resource<V> {
  * Resources can be added manually with `addResource()`, or automatically by providing a `generate()` function in the Pool options. They can then be accessed via a _user key_. This is meant to associated with a single 'user' of a resource. For example, if we are associating oscillators with TensorFlow poses, the 'user key' might be the id of the pose.
  */
 export class Pool<V> {
-  private _resources: Array<Resource<V>>;
+  private _resources: Resource<V>[];
   private _users: Map<string, PoolUser<V>>;
 
   readonly capacity: number;
@@ -455,7 +455,7 @@ export class Pool<V> {
     let changed = false;
 
     // Find all disposed resources
-    const nuke: Array<Resource<V>> = [];
+    const nuke: Resource<V>[] = [];
     for (const p of this._resources) {
       if (p.isDisposed) {
         this.log.log(`Maintain, disposed resource: ${ JSON.stringify(p.data) }`);
@@ -475,7 +475,7 @@ export class Pool<V> {
     }
 
     // Find 'users' to clean up
-    const userKeysToRemove: Array<string> = [];
+    const userKeysToRemove: string[] = [];
     for (const [ key, user ] of this._users.entries()) {
       if (!user.isValid) {
         this.log.log(

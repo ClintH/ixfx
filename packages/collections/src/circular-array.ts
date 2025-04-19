@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfxfun/guards";
+import { throwIntegerTest } from "@ixfx/guards";
 
 /**
  * The circular array is immutable. It keeps up to `capacity` items.

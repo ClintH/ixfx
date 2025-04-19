@@ -1,7 +1,7 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
-import { elapsedMillisecondsAbsolute, type Timer, type TimerSource } from '@ixfxfun/flow';
+import { SimpleEventEmitter } from '@ixfx/events';
+import { elapsedMillisecondsAbsolute, type Timer, type TimerSource } from '@ixfx/flow';
 import { adsrStateTransitions, type AdsrEvents, type AdsrStateTransitions, type AdsrTimingOpts } from './Types.js';
-import { StateMachineWithEvents } from '@ixfxfun/flow/state-machine';
+import { StateMachineWithEvents } from '@ixfx/flow/state-machine';
 
 export const defaultAdsrTimingOpts = Object.freeze({
   attackDuration: 600,

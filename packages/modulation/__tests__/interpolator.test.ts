@@ -1,11 +1,11 @@
 import { test } from 'vitest';
 import { interpolatorInterval } from '../src/interpolate.js';
-import { delayLoop } from '@ixfxfun/flow';
-import { round } from '@ixfxfun/numbers';
+import { delayLoop } from '@ixfx/flow';
+import { round } from '@ixfx/numbers';
 
 test(`interpolatorInterval`, async () => {
   const v = interpolatorInterval(100);
-  let values: number[] = [];
+  const values: number[] = [];
 
   for await (const _ of delayLoop(9)) {
     const value = v();

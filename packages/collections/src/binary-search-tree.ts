@@ -1,4 +1,4 @@
-import { type Comparer, defaultComparer } from '@ixfxfun/core';
+import { type Comparer, defaultComparer } from '@ixfx/core';
 import { BinaryTreeNode } from './binary-tree-node.js';
 import { mutable } from './queue/queue-mutable.js';
 import { StackMutable } from './stack/StackMutable.js';
@@ -86,7 +86,7 @@ export class BinarySearchTree<V> {
   ): { found?: BinaryTreeNode<V>; parent?: BinaryTreeNode<V> } {
     if (!node) return { found: node, parent };
 
-    const comp = this.comparer(value, node?.value);
+    const comp = this.comparer(value, node.value);
 
     if (comp === 0) {
       return { found: node, parent };
@@ -104,7 +104,7 @@ export class BinarySearchTree<V> {
    * @returns {BinaryTreeNode} right-most node (max value)
    */
   getRightmost(node = this.root): BinaryTreeNode<V> | undefined {
-    if (!node || !node.right) {
+    if (!node?.right) {
       return node;
     }
     return this.getRightmost(node.right);
@@ -116,7 +116,7 @@ export class BinarySearchTree<V> {
    * @returns {BinaryTreeNode} left-most node (min value)
    */
   getLeftmost(node = this.root): BinaryTreeNode<V> | undefined {
-    if (!node || !node.left) {
+    if (!node?.left) {
       return node;
     }
     return this.getLeftmost(node.left);
@@ -246,11 +246,11 @@ export class BinarySearchTree<V> {
    */
   *inOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (!node) return;
-    if (node && node.left) {
+    if (node.left) {
       yield* this.inOrderTraversal(node.left);
     }
     yield node;
-    if (node && node.right) {
+    if (node.right) {
       yield* this.inOrderTraversal(node.right);
     }
   }

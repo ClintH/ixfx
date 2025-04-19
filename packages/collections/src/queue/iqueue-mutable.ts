@@ -1,4 +1,4 @@
-import type { SimpleEventEmitter } from '@ixfxfun/events';//"../../Events.js";
+import type { SimpleEventEmitter } from '@ixfx/events';//"../../Events.js";
 
 export type QueueMutableEvents<V> = {
   /**
@@ -6,16 +6,16 @@ export type QueueMutableEvents<V> = {
    * * added: data attempted to be added. Note: not all of it may have been accepted into queue
    * * finalData: actual state of queue
    */
-  enqueue: { added: ReadonlyArray<V>, finalData: ReadonlyArray<V> }
+  enqueue: { added: readonly V[], finalData: readonly V[] }
   /**
    * Single item dequeued.
    * When dequeing the 'removed' event also fires
    */
-  dequeue: { removed: V, finalData: ReadonlyArray<V> }
+  dequeue: { removed: V, finalData: readonly V[] }
   /**
    * One or more items removed due to dequeuing, clearing or removeWhere called
    */
-  removed: { removed: ReadonlyArray<V>, finalData: ReadonlyArray<V> }
+  removed: { removed: readonly V[], finalData: readonly V[] }
 }
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -57,12 +57,12 @@ export interface IQueueMutable<V> {
    * If a capacity is set, not all items might be added.
    * @returns How many items were added
    */
-  readonly enqueue: (...toAdd: ReadonlyArray<V>) => number;
+  readonly enqueue: (...toAdd: readonly V[]) => number;
 
   /**
  * Returns a copy of data in queue as an array
  */
-  toArray(): ReadonlyArray<V>;
+  toArray(): readonly V[];
   /**
    * Returns front of queue (oldest item), or _undefined_ if queue is empty
    */

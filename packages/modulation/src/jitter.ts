@@ -1,7 +1,7 @@
-import { throwNumberTest } from '@ixfxfun/guards';
-import { clamp } from '@ixfxfun/numbers';
-import { floatSource as randomFloatFunction,float as randomFloat } from '@ixfxfun/random';
-import type {  RandomSource } from '@ixfxfun/random';
+import { throwNumberTest } from '@ixfx/guards';
+import { clamp } from '@ixfx/numbers';
+import { floatSource as randomFloatFunction, float as randomFloat } from '@ixfx/random';
+import type { RandomSource } from '@ixfx/random';
 
 export type JitterOpts = {
   readonly relative?: number;

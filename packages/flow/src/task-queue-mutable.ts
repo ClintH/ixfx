@@ -1,6 +1,6 @@
-import { SimpleEventEmitter } from '@ixfxfun/events';
-import { Queues } from '@ixfxfun/collections';
-import { continuously } from '@ixfxfun/core';
+import { SimpleEventEmitter } from '@ixfx/events';
+import { Queues } from '@ixfx/collections';
+import { continuously } from '@ixfx/core';
 
 export type AsyncTask = () => Promise<void>;
 

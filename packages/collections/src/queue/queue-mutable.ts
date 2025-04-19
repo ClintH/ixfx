@@ -1,8 +1,8 @@
 import { type IQueueMutable, type IQueueMutableWithEvents, type QueueMutableEvents } from './iqueue-mutable.js';
 import { enqueue, peek, dequeue, isEmpty, isFull } from './queue-fns.js';
 import { type QueueOpts } from './queue-types.js';
-import { isEqualDefault, type IsEqual } from '@ixfxfun/core';
-import { SimpleEventEmitter } from '@ixfxfun/events'; //'../../Events.js';
+import { isEqualDefault, type IsEqual } from '@ixfx/core';
+import { SimpleEventEmitter } from '@ixfx/events'; //'../../Events.js';
 
 /**
  * Mutable queue that fires events when manipulated.
@@ -45,10 +45,10 @@ import { SimpleEventEmitter } from '@ixfxfun/events'; //'../../Events.js';
  */
 export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> implements IQueueMutable<V> {
   readonly options: QueueOpts<V>;
-  data: ReadonlyArray<V>;
+  data: readonly V[];
   eq: IsEqual<V>;
 
-  constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
+  constructor(opts: QueueOpts<V> = {}, data: readonly V[] = []) {
     super();
     if (opts === undefined) throw new Error(`opts parameter undefined`);
     this.options = opts;
@@ -76,14 +76,14 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
     return v;
   }
 
-  enqueue(...toAdd: ReadonlyArray<V>): number {
+  enqueue(...toAdd: readonly V[]): number {
     this.data = enqueue(this.options, this.data, ...toAdd);
     const length = this.data.length;
     this.onEnqueue(this.data, toAdd);
     return length;
   }
 
-  protected onEnqueue(result: ReadonlyArray<V>, attemptedToAdd: ReadonlyArray<V>) {
+  protected onEnqueue(result: readonly V[], attemptedToAdd: readonly V[]) {
     this.fireEvent(`enqueue`, { added: attemptedToAdd, finalData: result });
   }
 
@@ -97,7 +97,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
     return v;
   }
 
-  protected onRemoved(removed: ReadonlyArray<V>, finalData: ReadonlyArray<V>) {
+  protected onRemoved(removed: readonly V[], finalData: readonly V[]) {
     this.fireEvent(`removed`, { removed, finalData });
   }
 
@@ -119,7 +119,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
  * Return a copy of the array
  * @returns 
  */
-  toArray(): Array<V> {
+  toArray(): V[] {
     return [ ...this.data ];
   }
 
@@ -148,7 +148,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
  */
 export function mutable<V>(
   options: QueueOpts<V> = {},
-  ...startingItems: ReadonlyArray<V>
+  ...startingItems: readonly V[]
 ): IQueueMutableWithEvents<V> {
   return new QueueMutable({ ...options }, [ ...startingItems ]);
 }

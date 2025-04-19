@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
 import * as Flow from "../src/index.js";
-import * as Elapsed from "@ixfxfun/core/elapsed";
-import { isApprox } from '@ixfxfun/numbers';
+import * as Elapsed from "@ixfx/core/elapsed";
+import { isApprox } from '@ixfx/numbers';
 
 test(`wait-for-value`, async () => {
   const q1 = new Flow.WaitForValue<string>();

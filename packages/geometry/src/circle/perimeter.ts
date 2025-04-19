@@ -2,7 +2,7 @@ import type { Point } from "../point/point-type.js";
 import type { Circle, CirclePositioned } from "./circle-type.js";
 import { guard, isCirclePositioned } from "./guard.js";
 import { distance as PointsDistance } from "../point/distance.js";
-import { minIndex } from "@ixfxfun/numbers";
+import { minIndex } from "@ixfx/numbers";
 const piPi = Math.PI * 2;
 
 /**
@@ -18,7 +18,7 @@ const piPi = Math.PI * 2;
  * @param point
  * @returns Point `{ x, y }`
  */
-export const nearest = (circle: CirclePositioned | ReadonlyArray<CirclePositioned>, point: Point): Point => {
+export const nearest = (circle: CirclePositioned | readonly CirclePositioned[], point: Point): Point => {
   const n = (a: CirclePositioned): Point => {
     const l = Math.sqrt(Math.pow(point.x - a.x, 2) + Math.pow(point.y - a.y, 2));
     const x = a.x + (a.radius * ((point.x - a.x) / l));

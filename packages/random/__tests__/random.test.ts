@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { test, expect, assert } from 'vitest';
 import * as R from '../src/index.js';
-import { rangeIntegerTest, rangeTest } from '@ixfxfun/guards';
+import { rangeIntegerTest, rangeTest } from '@ixfx/guards';
 import { frequencyByGroup } from '../src/util/frequency.js';
 
 const groupByTens = (v: number) => Math.floor(v * 10);

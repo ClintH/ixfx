@@ -1,5 +1,5 @@
- 
-import * as MapFns from "@ixfxfun/core/maps"
+
+import * as MapFns from "@ixfx/core/maps"
 import { resolveSource } from "../resolve-source.js"
 import type { ReactiveOrSource, CombineLatestOptions, Reactive, RxValueTypeObject, ReactiveInitial, RxValueTypeRx, ReactiveDiff } from "../types.js"
 import { messageIsDoneSignal, messageHasValue, isWritable } from "../util.js"
@@ -76,7 +76,7 @@ export function combineLatestToObject<const T extends Record<string, ReactiveOrS
     states.set(key, s);
   }
   const sources = Object.fromEntries(Object.entries(states).map(entry => [ entry[ 0 ], entry[ 1 ].source ])) as RxValueTypeRx<T>;
-   
+
   const someUnfinished = () => MapFns.some(states, v => !v.done);
 
   const unsub = () => {

@@ -1,7 +1,7 @@
-//import { hasLast, isReactive } from "@ixfxfun/rx";
-//import type { ReactiveNonInitial } from "@ixfxfun/rx";
-import type { BasicType } from "@ixfxfun/core";
-import { getErrorMessage } from "@ixfxfun/debug";
+//import { hasLast, isReactive } from "@ixfx/rx";
+//import type { ReactiveNonInitial } from "@ixfx/rx";
+import type { BasicType } from "@ixfx/core";
+import { getErrorMessage } from "@ixfx/debug";
 import type { ReactiveNonInitial } from "./types-reactive.js";
 import { hasLast, isReactive } from "./reactive-core.js";
 

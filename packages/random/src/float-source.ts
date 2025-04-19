@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfxfun/guards';
+import { throwNumberTest } from '@ixfx/guards';
 import { type RandomOptions, type RandomSource } from "./types.js";
 
 /**

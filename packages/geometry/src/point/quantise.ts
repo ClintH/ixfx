@@ -1,4 +1,4 @@
-import { quantiseEvery as quantiseEveryNumber } from '@ixfxfun/numbers';
+import { quantiseEvery as quantiseEveryNumber } from '@ixfx/numbers';
 import { guard, isPoint3d } from './guard.js';
 import type { Point, Point3d } from './point-type.js';
 

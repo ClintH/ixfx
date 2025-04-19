@@ -1,7 +1,7 @@
-import type { BasicType } from '@ixfxfun/core';
-import { resolve, resolveSync, type ResolveToValue, type ResolveToValueSync } from '@ixfxfun/core';
-import { intervalToMs, type Interval } from '@ixfxfun/core';
-import { sleep } from '@ixfxfun/core';
+import type { BasicType } from '@ixfx/core';
+import { resolve, resolveSync, type ResolveToValue, type ResolveToValueSync } from '@ixfx/core';
+import { intervalToMs, type Interval } from '@ixfx/core';
+import { sleep } from '@ixfx/core';
 
 export type RepeatDelayOpts = RepeatOpts & Readonly<Partial<{
   /**

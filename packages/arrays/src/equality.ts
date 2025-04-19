@@ -1,5 +1,5 @@
 import { isEqualDefault, isEqualValueDefault, type IsEqual } from "./util/is-equal.js";
-import { guardArray } from "@ixfxfun/guards";
+import { guardArray } from "@ixfx/guards";
 
 /**
  * Returns _true_ if the two arrays have the same items at same indexes. 

@@ -3,14 +3,16 @@
 		"target": "ESNext",
 		"lib": ["ESNext", "DOM", "DOM.Iterable",  "ESNext.AsyncIterable", "ESNext.Iterator"],
 		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"moduleResolution": "nodenext",
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
 		"verbatimModuleSyntax": true,
 		"isolatedModules": true,
 		"declaration": true,
+		"declarationMap": true,
 		"allowJs": true,
 		"checkJs": true,
+		"incremental": false,
 		/* Linting */
 		"strict": true,
 		"noUnusedLocals": false,
@@ -36,6 +38,7 @@
     { "path": "packages/process" },
     { "path": "packages/random" },
     { "path": "packages/rx" },
+    { "path": "packages/trackers" },
     { "path": "packages/ui" },
     { "path": "packages/visual" }
 	]

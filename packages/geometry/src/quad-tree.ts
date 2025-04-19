@@ -1,4 +1,4 @@
-import { type TraversableTree } from '@ixfxfun/collections/tree';
+import { type TraversableTree } from '@ixfx/collections';
 import * as Shapes from './shape/index.js';
 import type { Point } from './point/point-type.js';
 import { fromTopLeft as RectsFromTopLeft } from './rect/from-top-left.js';
@@ -42,7 +42,7 @@ export type QuadTreeItem = Point | ShapePositioned;
  * @param opts Options
  * @returns New quad tree
  */
-export const quadTree = (bounds: RectPositioned, initialData: ReadonlyArray<QuadTreeItem> = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode => {
+export const quadTree = (bounds: RectPositioned, initialData: readonly QuadTreeItem[] = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode => {
   const o: QuadTreeOpts = {
     maxItems: opts.maxItems ?? 4,
     maxLevels: opts.maxLevels ?? 4
@@ -61,9 +61,9 @@ export const quadTree = (bounds: RectPositioned, initialData: ReadonlyArray<Quad
  * To create, you probably want the {@link quadTree} function.
  * 
  */
-export class QuadTreeNode implements TraversableTree<Array<QuadTreeItem>> {
-  #items: Array<QuadTreeItem> = [];
-  #children: Array<QuadTreeNode> = [];
+export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
+  #items: QuadTreeItem[] = [];
+  #children: QuadTreeNode[] = [];
   #parent: QuadTreeNode | undefined;
   /**
    * Constructor

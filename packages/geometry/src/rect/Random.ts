@@ -1,4 +1,4 @@
-import { type RandomSource } from '@ixfxfun/random';
+import { type RandomSource } from '@ixfx/random';
 import { sum as PointsSum } from '../point/sum.js';
 import type { Point } from '../point/point-type.js';
 import { isPositioned } from './guard.js';

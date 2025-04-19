@@ -1,4 +1,4 @@
-// import { Point } from '@ixfxfun/geometry';
+// import { Point } from '@ixfx/geometry';
 // import type { Line } from '../../geometry/line/LineType.js';
 // import type { CirclePositioned } from '../../geometry/circle/CircleType.js';
 import type { CircleDrawingOpts, DrawingOpts, LineDrawingOpts, PathDrawingOpts, StrokeOpts, TextDrawingOpts } from './types.js';
@@ -6,9 +6,9 @@ import { applyOpts } from './apply.js';
 import { applyStrokeOpts } from './stroke.js';
 import { remove } from './remove.js';
 import * as Elements from './elements.js';
-import type { Point } from '@ixfxfun/geometry/point';
-import type { CirclePositioned } from '@ixfxfun/geometry/circle';
-import type { Line } from '@ixfxfun/geometry/line';
+import type { Point } from '@ixfx/geometry/point';
+import type { CirclePositioned } from '@ixfx/geometry/circle';
+import type { Line } from '@ixfx/geometry/line';
 
 /**
  * Helper to make SVG elements with a common parent.
@@ -74,7 +74,7 @@ export type SvgHelper = {
    * @param queryOrExisting DOM query to look up existing element, or the element instance
    */
   path(
-    svgString: string | ReadonlyArray<string>,
+    svgString: string | readonly string[],
     opts?: PathDrawingOpts,
     queryOrExisting?: string | SVGPathElement
   ): SVGPathElement;
@@ -159,7 +159,7 @@ export const makeHelper = (
       queryOrExisting?: string | SVGCircleElement
     ) => Elements.circle(circle, parent, opts, queryOrExisting),
     path: (
-      svgString: string | ReadonlyArray<string>,
+      svgString: string | readonly string[],
       opts?: PathDrawingOpts,
       queryOrExisting?: string | SVGPathElement
     ) => Elements.path(svgString, parent, opts, queryOrExisting),

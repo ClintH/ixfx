@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfxfun/guards";
+import { throwNumberTest } from "@ixfx/guards";
 import type { Triangle } from "./triangle-type.js";
 import { fromNumbers as PointsFromNumbers } from "../point/from.js";
 import { guard as PointGuard } from "../point/guard.js";
@@ -47,7 +47,7 @@ export const fromRadius = (
  * @param coords
  * @returns
  */
-export const fromFlatArray = (coords: ReadonlyArray<number>): Triangle => {
+export const fromFlatArray = (coords: readonly number[]): Triangle => {
   if (!Array.isArray(coords)) throw new Error(`coords expected as array`);
   if (coords.length !== 6) {
     throw new Error(
@@ -63,7 +63,7 @@ export const fromFlatArray = (coords: ReadonlyArray<number>): Triangle => {
  * @param points
  * @returns
  */
-export const fromPoints = (points: ReadonlyArray<Point>): Triangle => {
+export const fromPoints = (points: readonly Point[]): Triangle => {
   if (!Array.isArray(points)) throw new Error(`points expected as array`);
   if (points.length !== 3) {
     throw new Error(
