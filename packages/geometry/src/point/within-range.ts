@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import type { Point } from "./point-type.js";
 import { guard } from "./guard.js";
 
@@ -30,7 +30,7 @@ export const withinRange = (
   guard(b, `b`);
 
   if (typeof maxRange === `number`) {
-    throwNumberTest(maxRange, `positive`, `maxRange`);
+    resultThrow(numberTest(maxRange, `positive`, `maxRange`));
     maxRange = { x: maxRange, y: maxRange };
   } else {
     guard(maxRange, `maxRange`);

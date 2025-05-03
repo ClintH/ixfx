@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { resultThrow, integerTest } from "@ixfx/guards";
 import type { ModSettable as ModuleSettable, ModSettableFeedback as ModuleSettableFeedback, ModSettableOptions as ModuleSettableOptions, ModulationFunction } from "./types.js";
 import * as Sources from './source/index.js';
 export type WaveModulator = (feedback?: Partial<WaveShaperFeedback>) => number;
@@ -162,7 +162,7 @@ export function wave(options: Partial<WaveOptions>) {
   const period = options.period ?? 1;
   let sourceFunction;
 
-  throwIntegerTest(period, `aboveZero`, `period`);
+  resultThrow(integerTest(period, `aboveZero`, `period`));
 
   const sourceOptions = {
     ...options

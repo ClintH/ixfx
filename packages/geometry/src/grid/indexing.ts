@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 import { guardGrid } from "./guards.js";
 import { offset } from "./offset.js";
 import type { Grid, GridCell, GridBoundsLogic } from "./types.js";
@@ -136,7 +136,7 @@ export const cellFromIndex = (
 ): GridCell => {
   let cols = 0;
   cols = typeof colsOrGrid === `number` ? colsOrGrid : colsOrGrid.cols;
-  throwIntegerTest(cols, `aboveZero`, `colsOrGrid`);
+  resultThrow(integerTest(cols, `aboveZero`, `colsOrGrid`));
 
   return {
     x: index % cols,

@@ -3,7 +3,7 @@ import { guardCell } from "./guards.js";
 import type { GridCell, GridVisual } from "./types.js";
 import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import type { Point } from "../point/point-type.js";
-import { throwIntegerTest, throwNumberTest } from '@ixfx/guards';
+import { integerTest, numberTest, resultThrow } from '@ixfx/guards';
 import { cells } from "./enumerators/cells.js";
 
 /**
@@ -40,7 +40,7 @@ export const cellAtPoint = (
   position: Point
 ): GridCell | undefined => {
   const size = grid.size;
-  throwNumberTest(size, `positive`, `grid.size`);
+  resultThrow(numberTest(size, `positive`, `grid.size`));
   if (position.x < 0 || position.y < 0) return;
   const x = Math.floor(position.x / size);
   const y = Math.floor(position.y / size);

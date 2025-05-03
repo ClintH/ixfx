@@ -58,24 +58,24 @@ export function domNumberInputValue(targetOrQuery: HTMLInputElement | string, op
   };
 }
 
-export function domHslInputValue(targetOrQuery: HTMLInputElement | string, options: Partial<DomValueOptions> = {}): ReactiveInitial<Colour.HslRelative> & Reactive<Colour.HslRelative> & ReactiveWritable<Colour.HslRelative> {
+export function domHslInputValue(targetOrQuery: HTMLInputElement | string, options: Partial<DomValueOptions> = {}): ReactiveInitial<Colour.HslScalar> & Reactive<Colour.HslScalar> & ReactiveWritable<Colour.HslScalar> {
 
   const input = domInputValue(targetOrQuery, {
     ...options,
     upstreamFilter: (value) => {
-      return (typeof value === `object`) ? Colour.toHex(value as Colour.HslRelative) : value as string;
+      return (typeof value === `object`) ? Colour.toCssColour(value as Colour.HslScalar) : value as string;
     },
   });
   const rx = transform(input, v => {
-    return Colour.toHsl(v, true);
+    return Colour.HslSpace.fromCssScalar(v, { ensureSafe: true });
   });
   return {
     ...rx,
     last() {
-      return Colour.toHsl(input.last(), true)
+      return Colour.HslSpace.fromCssScalar(input.last(), { ensureSafe: true })
     },
     set(value) {
-      input.set(Colour.toHex(value));
+      input.set(Colour.HslSpace.toCss(value));
     },
   };
 }
@@ -278,8 +278,8 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
         const vBool = (vString === `true`) ? true : false;
         entries.push([ k, vBool ]);
       } else if (typeHint === `colour`) {
-        const vRgb = Colour.toString(vString);
-        entries.push([ k, Colour.toRgb(vRgb) ]);
+        const vRgb = Colour.toCssColour(vString);
+        entries.push([ k, Colour.RgbSpace.fromCss(vRgb) ]);
       } else {
         entries.push([ k, v.toString() ]);
       }
@@ -297,14 +297,14 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
   }
 
   const getFormElement = (name: string, value: string): HTMLSelectElement | HTMLInputElement | undefined => {
-    const el = formEl.querySelector(`[name="${ name }"]`) as HTMLInputElement | null;
+    const el = formEl.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${ name }"]`);
     if (!el) {
       console.warn(`Form does not contain an element with name="${ name }"`);
       return;
     }
     if (el.type === `radio`) {
       // Get right radio option
-      const radioEl = formEl.querySelector(`[name="${ name }"][value="${ value }"]`) as HTMLInputElement | null;
+      const radioEl = formEl.querySelector<HTMLInputElement>(`[name="${ name }"][value="${ value }"]`);
       if (!radioEl) {
         console.warn(`Form does not contain radio option for name=${ name } value=${ value }`);
         return;
@@ -327,8 +327,7 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
       if (el.type === `color`) {
         if (typeof value === `object`) {
           // Try to parse colour if value is an object
-          //const c = Colour.resolve(value, true);
-          value = Colour.toHex(value);
+          value = Colour.toCssColour(value);
         }
       } else if (el.type === `checkbox`) {
         if (typeof value === `boolean`) {
@@ -352,10 +351,12 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
       if (!hint) {
         hint = typeof v;
         if (hint === `object`) {
-          const rgb = Colour.parseRgbObject(v);
-          if (rgb.success) {
-            hint = `colour`;
-          }
+          const rgb = Colour.toColour(v);
+          hint = `colour`;
+          // const rgb = Colour.toColour(v);
+          // if (rgb.success) {
+          //   hint = `colour`;
+          // }
         }
         typeHints.set(name, hint);
       }

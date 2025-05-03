@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Returns true for every _n_th call, eg 2 for every second call.
@@ -26,7 +26,7 @@ import { throwIntegerTest } from "@ixfx/guards";
  * @returns Function which in turn returns true if nth call has been hit, false otherwise
  */
 export const everyNth = <T>(nth: number, callback?: (data: T) => void) => {
-  throwIntegerTest(nth, `positive`, `nth`);
+  resultThrow(integerTest(nth, `positive`, `nth`));
 
   let counter = 0;
 

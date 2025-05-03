@@ -1,16 +1,17 @@
-import type { GuardResult } from "./types.js";
+import type { Result } from "./types.js";
 
-export const isFunction = (object: unknown): object is (...args: Array<any>) => any => object instanceof Function;
+export const isFunction = (object: unknown): object is (...args: any[]) => any => object instanceof Function;
 
-export const functionTest = (value: unknown, parameterName = `?`): GuardResult => {
-  if (value === undefined) return [ false, `Param '${ parameterName }' is undefined. Expected: function.` ];
-  if (value === null) return [ false, `Param '${ parameterName }' is null. Expected: function.` ];
-  if (typeof value !== `function`) return [ false, `Param '${ parameterName }' is type '${ typeof value }'. Expected: function` ];
-  return [ true ];
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export const functionTest = (value: unknown, parameterName = `?`): Result<Function, string> => {
+  if (value === undefined) return { success: false, error: `Param '${ parameterName }' is undefined. Expected: function.` };
+  if (value === null) return { success: false, error: `Param '${ parameterName }' is null. Expected: function.` };
+  if (typeof value !== `function`) return { success: false, error: `Param '${ parameterName }' is type '${ typeof value }'. Expected: function` };
+  return { success: true, value };
 }
 
-export const throwFunctionTest = (value: unknown, parameterName = `?`) => {
-  const [ ok, msg ] = functionTest(value, parameterName);
-  if (ok) return;
-  throw new TypeError(msg);
-}
+// export const throwFunctionTest = (value: unknown, parameterName = `?`) => {
+//   const [ ok, message ] = functionTest(value, parameterName);
+//   if (ok) return;
+//   throw new TypeError(message);
+// }

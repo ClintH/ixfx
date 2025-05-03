@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import type { Rect } from "../rect/rect-types.js";
 import { isRect } from "../rect/guard.js";
 import { isPoint } from "./guard.js";
@@ -54,8 +54,10 @@ export function normaliseByRect(
   // ✔️ Unit tested
   if (isPoint(a)) {
     if (typeof b === `number` && c !== undefined) {
-      throwNumberTest(b, `positive`, `width`);
-      throwNumberTest(c, `positive`, `height`);
+      resultThrow(
+        numberTest(b, `positive`, `width`),
+        numberTest(c, `positive`, `height`)
+      );
     } else {
       if (!isRect(b)) {
         throw new Error(`Expected second parameter to be a rect`);
@@ -68,7 +70,7 @@ export function normaliseByRect(
       y: a.y / c,
     });
   } else {
-    throwNumberTest(a, `positive`, `x`);
+    resultThrow(numberTest(a, `positive`, `x`));
     if (typeof b !== `number`) {
       throw new TypeError(`Expecting second parameter to be a number (width)`);
     }
@@ -76,10 +78,10 @@ export function normaliseByRect(
       throw new TypeError(`Expecting third parameter to be a number (height)`);
     }
 
-    throwNumberTest(b, `positive`, `y`);
-    throwNumberTest(c, `positive`, `width`);
+    resultThrow(numberTest(b, `positive`, `y`));
+    resultThrow(numberTest(c, `positive`, `width`));
     if (d === undefined) throw new Error(`Expected height parameter`);
-    throwNumberTest(d, `positive`, `height`);
+    resultThrow(numberTest(d, `positive`, `height`));
     return Object.freeze({
       x: a / c,
       y: b / d,

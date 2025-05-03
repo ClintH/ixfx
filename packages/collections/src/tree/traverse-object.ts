@@ -4,7 +4,7 @@ import { last } from '@ixfx/iterables/sync';
 import * as TreeArrayBacked from './tree-mutable.js';
 import { isPrimitive } from '@ixfx/core'; //'../../util/IsPrimitive.js';
 import type { TraversableTree, TreeNode, SimplifiedNode } from './types.js';
-import { throwNullUndef } from '@ixfx/guards' //'../../util/GuardEmpty.js';
+import { nullUndefTest, resultThrow } from '@ixfx/guards' //'../../util/GuardEmpty.js';
 export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
 export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: string[] }>;
 //export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
@@ -52,7 +52,7 @@ export const prettyPrint = (
   indent = 0,
   options: Partial<ChildrenOptions> = {}
 ): string => {
-  throwNullUndef(node, `node`);
+  resultThrow(nullUndefTest(node, `node`));
   const defaultName = options.name ?? `node`;
   const entry = getNamedEntry(node, defaultName);
   const t = `${ `  `.repeat(indent) } + name: ${ entry.name } value: ${ JSON.stringify(entry.nodeValue) }`;
@@ -147,7 +147,7 @@ export function* children<T extends object>(
   node: T,
   options: Partial<ChildrenOptions> = {}
 ): IterableIterator<Entry> {
-  throwNullUndef(node, `node`);
+  resultThrow(nullUndefTest(node, `node`));
 
   const filter = options.filter ?? `none`;
 
@@ -276,9 +276,10 @@ export function* traceByPath<T extends object>(
   node: T,
   options: PathOpts = {}
 ): Iterable<EntryWithAncestors> {
-  // ✔️ Unit tested
-  throwNullUndef(path, `path`);
-  throwNullUndef(node, `node`);
+  resultThrow(
+    nullUndefTest(path, `path`),
+    nullUndefTest(node, `node`)
+  );
 
   const separator = options.separator ?? `.`;
   // const allowArrayIndexes = opts.allowArrayIndexes ?? true;

@@ -1,5 +1,5 @@
 import * as Named from './easings-named.js';
-import { throwStringTest } from '@ixfx/guards';
+import { stringTest, resultThrow } from '@ixfx/guards';
 import { type Interval } from '@ixfx/core';
 import type { ModulationFunction, ModulatorTimed } from '../types.js';
 export * as Named from './easings-named.js';
@@ -266,7 +266,7 @@ let easingsMap: Map<string, ((v: number) => number)> | undefined;
  * @returns Easing function
  */
 export const get = function (easingName: EasingName): ModulationFunction {
-  throwStringTest(easingName, `non-empty`, `easingName`);
+  resultThrow(stringTest(easingName, `non-empty`, `easingName`));
 
   const found = cacheEasings().get(easingName.toLowerCase());
   if (found === undefined) throw new Error(`Easing not found: '${ easingName }'`);

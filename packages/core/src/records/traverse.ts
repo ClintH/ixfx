@@ -1,4 +1,4 @@
-import { throwNullUndef } from '@ixfx/guards';
+import { resultThrow, nullUndefTest } from '@ixfx/guards';
 import { isPrimitive } from '../is-primitive.js';
 
 export type RecordEntry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
@@ -56,7 +56,7 @@ export const recordEntryPrettyPrint = (
   indent = 0,
   options: Partial<RecordChildrenOptions> = {}
 ): string => {
-  throwNullUndef(node, `node`);
+  resultThrow(nullUndefTest(node, `node`));
   const defaultName = options.name ?? `node`;
   const entry = getNamedRecordEntry(node, defaultName);
   const t = `${ `  `.repeat(indent) } + name: ${ entry.name } value: ${ JSON.stringify(entry.nodeValue) }`;
@@ -114,7 +114,7 @@ export function* recordChildren<T extends object>(
   node: T,
   options: Partial<RecordChildrenOptions> = {}
 ): IterableIterator<RecordEntry> {
-  throwNullUndef(node, `node`);
+  resultThrow(nullUndefTest(node, `node`));
 
   const filter = options.filter ?? `none`;
 
@@ -242,10 +242,10 @@ export function* traceRecordEntryByPath<T extends object>(
   node: T,
   options: PathOpts = {}
 ): Iterable<RecordEntryWithAncestors> {
-  // ✔️ Unit tested
-  throwNullUndef(path, `path`);
-  throwNullUndef(node, `node`);
-
+  resultThrow(
+    nullUndefTest(path, `path`),
+    nullUndefTest(node, `node`)
+  );
   const separator = options.separator ?? `.`;
   const pathSplit = path.split(separator);
 

@@ -77,12 +77,8 @@ npx publint
 
 # Publishing
 
-Add changeset
 ```
-npx @changesets/cli
-```
-
-Version & publish
-```
-npx @changesets/cli version && npx @changesets/cli publish
+pnpm changeset version
+pnpm install
+pnpm publish -r
 ```

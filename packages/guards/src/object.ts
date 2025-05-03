@@ -1,5 +1,7 @@
+import type { Result } from "./types.js";
+
 /**
- * Returns _true_ if `value` is a plain object
+ * Tests_if `value` is a plain object
  * 
  * ```js
  * isPlainObject(`text`); // false
@@ -9,24 +11,26 @@
  * @param value 
  * @returns 
  */
-export const isPlainObject = (value: unknown) => {
-  if (typeof value !== `object` || value === null) return false;
+export const testPlainObject = (value: unknown): Result<object, string> => {
+  if (typeof value !== `object` || value === null) return { success: false, error: `Value is null or not object type` };
   const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+  const t = (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+  if (t) return { success: true, value };
+  return { success: false, error: `Fancy object` };
 }
 
 /**
- * Returns _true_ if `value` is primitive value or plain object
+ * Tests if `value` is primitive value (bigint,number,string or boolean) or plain object
  * @param value 
  * @returns 
  */
-export const isPlainObjectOrPrimitive = (value: unknown) => {
+export const testPlainObjectOrPrimitive = (value: unknown): Result<object | bigint | number | string | boolean, string> => {
   const t = typeof value;
-  if (t === `symbol`) return false;
-  if (t === `function`) return false;
-  if (t === `bigint`) return true;
-  if (t === `number`) return true;
-  if (t === `string`) return true;
-  if (t === `boolean`) return true;
-  return isPlainObject(value);
+  if (t === `symbol`) return { success: false, error: `Symbol type` };
+  if (t === `function`) return { success: false, error: `Function type` };
+  if (t === `bigint`) return { success: true, value: value as bigint };
+  if (t === `number`) return { success: true, value: value as number };
+  if (t === `string`) return { success: true, value: value as string };
+  if (t === `boolean`) return { success: true, value: value as boolean };
+  return testPlainObject(value);
 }

@@ -1,5 +1,5 @@
 import { isEqualDefault, isEqualValueDefault, type IsEqual } from "./util/is-equal.js";
-import { guardArray } from "@ixfx/guards";
+import { arrayTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Returns _true_ if the two arrays have the same items at same indexes. 
@@ -27,8 +27,10 @@ import { guardArray } from "@ixfx/guards";
  */
 export const isEqual = <V>(arrayA: V[], arrayB: V[], equality = isEqualDefault<V>): boolean => {
   // TODO: 'eq' function could be a key-generating function too
-  guardArray(arrayA, `arrayA`);
-  guardArray(arrayB, `arrayB`);
+  resultThrow(
+    arrayTest(arrayA, `arrayA`),
+    arrayTest(arrayB, `arrayB`)
+  );
 
   if (arrayA.length !== arrayB.length) return false;
 

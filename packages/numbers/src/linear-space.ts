@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import { round } from "./round.js";
 
 /**
@@ -27,19 +27,20 @@ export function* linearSpace(
   steps: number,
   precision?: number
 ): IterableIterator<number> {
-  throwNumberTest(start, ``, `start`);
-  throwNumberTest(end, ``, `end`);
 
-  throwNumberTest(steps, ``, `steps`);
+  resultThrow(
+    numberTest(start, ``, `start`),
+    numberTest(end, ``, `end`),
+    numberTest(steps, ``, `steps`)
+  );
   const r = precision ? round(precision) : (v: number) => v;
   const step = (end - start) / (steps - 1);
 
-  throwNumberTest(step, ``, `step`);
+  resultThrow(numberTest(step, ``, `step`));
   if (!Number.isFinite(step)) {
     throw new TypeError(`Calculated step value is infinite`);
   }
 
-  //eslint-disable-next-line functional/no-let
   for (let index = 0; index < steps; index++) {
     const v = start + step * index;
     yield r(v);

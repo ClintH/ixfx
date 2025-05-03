@@ -1,6 +1,6 @@
 
 import { scale } from './scale.js';
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import { clamp } from './clamp.js';
 import { numberArrayCompute } from './number-array-compute.js';
 /**
@@ -43,11 +43,12 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
   let min = minDefault ?? Number.MAX_SAFE_INTEGER;
   let max = maxDefault ?? Number.MIN_SAFE_INTEGER;
 
-  throwNumberTest(min);
-  throwNumberTest(max);
-
+  resultThrow(
+    numberTest(min),
+    numberTest(max)
+  );
   return (v: number): number => {
-    throwNumberTest(v);
+    resultThrow(numberTest(v));
     min = Math.min(min, v);
     max = Math.max(max, v);
     return scale(v, min, max);

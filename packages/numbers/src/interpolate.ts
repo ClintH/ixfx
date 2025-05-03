@@ -1,5 +1,5 @@
 import { wrap } from './wrap.js';
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 import { clamp } from './clamp.js';
 import { piPi } from './pi-pi.js';
 
@@ -134,9 +134,11 @@ export function interpolate(pos1: number, pos2?: number | Partial<BasicInterpola
   }
 
   const doTheEase = (_amt: number, _a: number, _b: number) => {
-    throwNumberTest(_a, ``, `a`);
-    throwNumberTest(_b, ``, `b`);
-    throwNumberTest(_amt, ``, `amount`);
+    resultThrow(
+      numberTest(_a, ``, `a`),
+      numberTest(_b, ``, `b`),
+      numberTest(_amt, ``, `amount`)
+    );
     _amt = handleAmount(_amt);
     return (1 - _amt) * _a + _amt * _b
   }
@@ -175,7 +177,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<BasicInterpola
     //interpolate(amount: number, options?: Partial<InterpolateOptions>): (a:number,b:number)=>number;
     const amount = handleAmount(pos1);
     readOpts(pos2);
-    throwNumberTest(amount, ``, `amount`);
+    resultThrow(numberTest(amount, ``, `amount`));
     return (aValue: number, bValue: number) => rawEase(amount, aValue, bValue);
   }
 };

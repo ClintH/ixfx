@@ -1,18 +1,18 @@
 
 import { initStream, type ReactiveInitial, type ReactiveNonInitial, type ReactiveWritable } from "@ixfx/rx";
-import type { HslRelative } from "@ixfx/visual/colour";
+import type { HslScalar } from "@ixfx/visual/colour";
 
-export type ReactiveColour = ReactiveWritable<HslRelative> & {
-  setHsl: (hsl: HslRelative) => void;
+export type ReactiveColour = ReactiveWritable<HslScalar> & {
+  setHsl: (hsl: HslScalar) => void;
 }
 
-export function colour(initialValue: HslRelative): ReactiveColour & ReactiveInitial<HslRelative>;
-export function colour(): ReactiveColour & ReactiveNonInitial<HslRelative>;
-export function colour(initialValue?: HslRelative): ReactiveColour & (ReactiveNonInitial<HslRelative> | ReactiveInitial<HslRelative>) {
+export function colour(initialValue: HslScalar): ReactiveColour & ReactiveInitial<HslScalar>;
+export function colour(): ReactiveColour & ReactiveNonInitial<HslScalar>;
+export function colour(initialValue?: HslScalar): ReactiveColour & (ReactiveNonInitial<HslScalar> | ReactiveInitial<HslScalar>) {
   let value = initialValue;
-  const events = initStream<HslRelative>();
+  const events = initStream<HslScalar>();
 
-  const set = (v: HslRelative) => {
+  const set = (v: HslScalar) => {
     value = v;
     events.set(v);
   }
@@ -24,7 +24,7 @@ export function colour(initialValue?: HslRelative): ReactiveColour & (ReactiveNo
     on: events.on,
     onValue: events.onValue,
     set,
-    setHsl: (hsl: HslRelative) => {
+    setHsl: (hsl: HslScalar) => {
       set(hsl);
     }
   }

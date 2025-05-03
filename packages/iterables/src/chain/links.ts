@@ -1,6 +1,6 @@
 
 import { type Interval, intervalToMs, sleep, type RankFunction, type RankOptions, type RankArrayOptions, elapsedSince } from "@ixfx/core";
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 import type { Link, GenOrData, DelayOptions } from "./types.js";
 import { resolveToGen } from "./utility.js";
 import * as BasicProcessors from "@ixfx/process/basic";
@@ -397,7 +397,7 @@ export function sum(): Link<number, number> {
  * @returns 
  */
 export function chunk<In>(size: number, returnRemainders = true): Link<In, In[]> {
-  throwIntegerTest(size, `aboveZero`, `size`);
+  resultThrow(integerTest(size, `aboveZero`, `size`));
   async function* chunk(input: GenOrData<In>): AsyncGenerator<In[]> {
     input = resolveToGen(input);
     let buffer: In[] = [];

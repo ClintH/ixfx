@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Flips a percentage-scale number: `1 - v`.
@@ -16,6 +16,6 @@ import { throwNumberTest } from "@ixfx/guards";
  */
 export const flip = (v: number | (() => number)) => {
   if (typeof v === `function`) v = v();
-  throwNumberTest(v, `percentage`, `v`);
+  resultThrow(numberTest(v, `percentage`, `v`));
   return 1 - v;
 };

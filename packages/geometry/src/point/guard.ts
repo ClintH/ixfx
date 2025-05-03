@@ -1,5 +1,5 @@
 import type { Point, Point3d } from "./point-type.js";
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 
 /**
  * Returns true if xy (and z, if present) are _null_.
@@ -76,12 +76,15 @@ export function guard(p: Point, name = `Point`) {
  */
 export const guardNonZeroPoint = (pt: Point | Point3d, name = `pt`) => {
   guard(pt, name);
-  throwNumberTest(pt.x, `nonZero`, `${ name }.x`);
-  throwNumberTest(pt.y, `nonZero`, `${ name }.y`);
-  if (typeof pt.z !== `undefined`) {
-    throwNumberTest(pt.z, `nonZero`, `${ name }.z`);
-  }
-
+  resultThrow(
+    numberTest(pt.x, `nonZero`, `${ name }.x`),
+    numberTest(pt.y, `nonZero`, `${ name }.y`),
+    () => {
+      if (typeof pt.z !== `undefined`) {
+        return numberTest(pt.z, `nonZero`, `${ name }.z`);
+      }
+    }
+  );
   return true;
 };
 

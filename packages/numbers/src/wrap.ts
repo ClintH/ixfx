@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { throwNumberTest, throwIntegerTest } from '@ixfx/guards';
+import { numberTest, integerTest, resultThrow } from '@ixfx/guards';
 
 /**
  * Wraps an integer number within a specified range, defaulting to degrees (0-360). Use {@link wrap} for floating-point wrapping.
@@ -45,9 +45,11 @@ import { throwNumberTest, throwIntegerTest } from '@ixfx/guards';
  * @returns
  */
 export const wrapInteger = (v: number, min = 0, max = 360) => {
-  throwIntegerTest(v, undefined, `v`);
-  throwIntegerTest(min, undefined, `min`);
-  throwIntegerTest(max, undefined, `max`);
+  resultThrow(
+    integerTest(v, undefined, `v`),
+    integerTest(min, undefined, `min`),
+    integerTest(max, undefined, `max`)
+  );
 
   if (v === min) return min;
   if (v === max) return min; // Wraps
@@ -85,10 +87,11 @@ export const wrapInteger = (v: number, min = 0, max = 360) => {
  * @returns
  */
 export const wrap = (v: number, min = 0, max = 1) => {
-  throwNumberTest(v, ``, `min`);
-  throwNumberTest(min, ``, `min`);
-  throwNumberTest(max, ``, `max`);
-
+  resultThrow(
+    numberTest(v, ``, `min`),
+    numberTest(min, ``, `min`),
+    numberTest(max, ``, `max`)
+  );
   if (v === min) return min;
   if (v === max) return min; // Wraps
 
@@ -136,7 +139,6 @@ export const wrapRange = (
   a: number,
   b: number
 ) => {
-  //eslint-disable-next-line functional/no-let
   let r = 0;
   const distF = Math.abs(b - a);
   // When b is wrapped forwards

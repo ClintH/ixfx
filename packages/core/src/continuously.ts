@@ -1,4 +1,4 @@
-import { throwIntegerTest } from '@ixfx/guards';
+import { integerTest, resultThrow } from '@ixfx/guards';
 import { intervalToMs, type Interval } from '@ixfx/core';
 
 export type HasCompletionRunStates = `idle` | `scheduled` | `running`;
@@ -223,7 +223,7 @@ export const continuously = (
   options: Partial<ContinuouslyOpts> = {}
 ): Continuously => {
   let intervalMs = intervalToMs(interval, 0);
-  throwIntegerTest(intervalMs, `positive`, `interval`);
+  resultThrow(integerTest(intervalMs, `positive`, `interval`));
   const fireBeforeWait = options.fireBeforeWait ?? false;
   const onStartCalled = options.onStartCalled;
   const signal = options.signal;
@@ -288,7 +288,7 @@ export const continuously = (
       cancel();
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     if (cancelled) return; // has been cancelled
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     schedule(loop);
@@ -364,7 +364,7 @@ export const continuously = (
     },
     set interval(interval: Interval) {
       const ms = intervalToMs(interval, 0);
-      throwIntegerTest(ms, `positive`, `interval`);
+      resultThrow(integerTest(ms, `positive`, `interval`));
       intervalMs = ms;
       intervalUsed = interval;
     },

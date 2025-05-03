@@ -1,5 +1,5 @@
 //import { floatSource,type RandomOptions, type RandomSource } from '@ixfx/random';
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 import { interpolate, scaler as numberScaler } from '@ixfx/numbers';
 import type { BipolarWrapper } from './types.js';
 
@@ -101,7 +101,7 @@ export const toScalar = (bipolarValue: number) => {
  * @returns Bipolar value on -1..1 scale
  */
 export const fromScalar = (scalarValue: number) => {
-  throwNumberTest(scalarValue, `percentage`, `v`);
+  resultThrow(numberTest(scalarValue, `percentage`, `v`));
   return (scalarValue * 2) - 1;
 };
 

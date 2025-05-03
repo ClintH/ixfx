@@ -1,6 +1,6 @@
 import { test, expect, assert, type TestContext } from 'vitest';
 import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../src/records/pathed.js';
-import { resultToValue, type Result } from '../../src/results.js';
+import { resultToValue, type Result } from '@ixfx/guards';
 
 
 test(`get-paths-and-data`, () => {
@@ -95,7 +95,7 @@ test('get-paths', () => {
   ])
 });
 
-function testResult<T>(t: TestContext & object, result: Result<T>, value: T) {
+function testResult<T>(t: TestContext & object, result: Result<T, any>, value: T) {
   if (result.success) {
     expect(result.value).toEqual(value);
   } else {

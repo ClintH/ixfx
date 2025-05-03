@@ -1,4 +1,4 @@
-import { throwArrayTest } from '@ixfx/guards';
+import { arrayTest, resultThrow } from '@ixfx/guards';
 import { Colour } from '@ixfx/visual';
 import { resolveEl } from '@ixfx/dom';
 import type { IStackImmutable } from '@ixfx/collections/stack';
@@ -453,8 +453,8 @@ export const connectedPoints = (
 ) => {
   const shouldLoop = opts.loop ?? false;
 
+  resultThrow(arrayTest(pts, `pts`));
 
-  throwArrayTest(pts);
   if (pts.length === 0) return;
 
   // Throw an error if any point is invalid

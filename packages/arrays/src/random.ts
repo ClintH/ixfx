@@ -1,4 +1,4 @@
-import { guardArray } from "@ixfx/guards";
+import { arrayTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Returns a shuffled copy of the input array.
@@ -17,7 +17,7 @@ export const shuffle = <V>(
   dataToShuffle: readonly V[],
   rand: () => number = Math.random
 ): V[] => {
-  guardArray(dataToShuffle, `dataToShuffle`);
+  resultThrow(arrayTest(dataToShuffle, `dataToShuffle`));
 
   const array = [ ...dataToShuffle ];
   for (let index = array.length - 1; index > 0; index--) {
@@ -45,6 +45,6 @@ export const randomElement = <V>(
   array: ArrayLike<V>,
   rand: () => number = Math.random
 ): V => {
-  guardArray(array, `array`);
+  resultThrow(arrayTest(array, `array`));
   return array[ Math.floor(rand() * array.length) ];
 };

@@ -1,8 +1,8 @@
 import { elapsedSince, sleep } from '@ixfx/core';
 import { resolveLogOption } from '@ixfx/debug';
-import { throwIntegerTest, throwNumberTest } from '@ixfx/guards';
+import { integerTest, numberTest, resultThrow } from '@ixfx/guards';
 import { getErrorMessage } from '@ixfx/debug';
-import type { Result } from '@ixfx/core';
+import type { Result } from '@ixfx/guards';
 import { elapsedToHumanString } from '@ixfx/core';
 /**
  * Result of backoff
@@ -93,11 +93,13 @@ export function* backoffGenerator(options: Partial<BackoffOptions> = {}) {
   const limitValue = options.limitValue;
   const power = options.power ?? 1.1;
   let value = startAt;
-  throwIntegerTest(limitAttempts, `aboveZero`, `limitAttempts`);
-  throwNumberTest(startAt, ``, `startAt`);
-  throwNumberTest(limitAttempts, ``, `limitAttempts`);
-  if (limitValue !== undefined) throwNumberTest(limitValue, ``, `limitValue`);
-  throwNumberTest(power, ``, `power`);
+  resultThrow(
+    integerTest(limitAttempts, `aboveZero`, `limitAttempts`),
+    numberTest(startAt, ``, `startAt`),
+    numberTest(limitAttempts, ``, `limitAttempts`),
+    () => (limitValue !== undefined) ? numberTest(limitValue, ``, `limitValue`) : undefined,
+    numberTest(power, ``, `power`)
+  );
 
   while (limitAttempts > 0) {
     // Value has climbed to the limit
@@ -139,7 +141,7 @@ export type RetryTask<T> = {
    * complete and retrying stops
    * @returns 
    */
-  probe: (attempts: number) => Promise<Result<T>>
+  probe: (attempts: number) => Promise<Result<T, any>>
 }
 
 /**

@@ -1,0 +1,2 @@
+
+export * from '@ixfx/arrays';

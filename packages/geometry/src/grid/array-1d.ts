@@ -1,7 +1,6 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 import { indexFromCell } from "./index.js";
 import type { GridCellAccessor, GridCell, GridBoundsLogic, Grid, GridCellSetter, GridReadable, GridWritable, GridArray1d } from "./types.js";
-
 
 /**
  * Returns a {@link GridCellAccessor} to get values from `array`
@@ -198,8 +197,10 @@ export const createArray = <T>(initialValue: T, rowsOrGrid: number | Grid, colum
   const rows = typeof rowsOrGrid === `number` ? rowsOrGrid : rowsOrGrid.rows;
   const cols = typeof rowsOrGrid === `object` ? rowsOrGrid.cols : columns;
   if (!cols) throw new Error(`Parameter 'columns' missing`);
-  throwIntegerTest(rows, `aboveZero`, `rows`);
-  throwIntegerTest(cols, `aboveZero`, `cols`);
+  resultThrow(
+    integerTest(rows, `aboveZero`, `rows`),
+    integerTest(cols, `aboveZero`, `cols`)
+  );
 
   const t: T[] = [];
   const total = rows * cols;

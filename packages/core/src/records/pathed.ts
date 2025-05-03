@@ -1,9 +1,9 @@
 import { recordEntriesDepthFirst } from "@ixfx/core/records";
 import { isPrimitive, isInteger, isEqualContextString } from '@ixfx/core';
-import { isPlainObjectOrPrimitive } from '@ixfx/guards';
+import { testPlainObjectOrPrimitive } from '@ixfx/guards';
 import type { IsEqualContext } from '@ixfx/core';
 import { compareObjectKeys } from './compare.js';
-import type { Result } from '@ixfx/core';
+import type { Result } from '@ixfx/guards';
 
 export type PathData<V> = {
   path: string
@@ -69,7 +69,7 @@ const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean
     const entries: [ key: string, value: any ][] = [];
     for (const field in target) {
       const value = (target as any)[ field ];
-      if (isPlainObjectOrPrimitive(value as unknown)) {
+      if (testPlainObjectOrPrimitive(value as unknown)) {
         entries.push([ field, value ]);
       }
     }
@@ -312,7 +312,7 @@ const updateByPathImpl = (o: any, split: string[], value: any, allowShapeChange:
  * @param path 
  * @returns 
  */
-export const getField = <V>(object: Record<string, any>, path: string): Result<V> => {
+export const getField = <V>(object: Record<string, any>, path: string): Result<V, any> => {
   if (typeof path !== `string`) throw new Error(`Param 'path' ought to be a string. Got: '${ typeof path }'`);
   if (path.length === 0) throw new Error(`Param string 'path' is empty`);
   if (object === undefined) throw new Error(`Param 'object' is undefined`);
@@ -323,7 +323,7 @@ export const getField = <V>(object: Record<string, any>, path: string): Result<V
   return v;
 }
 
-const getFieldImpl = <V>(object: Record<string, any>, split: string[]): Result<V> => {
+const getFieldImpl = <V>(object: Record<string, any>, split: string[]): Result<V, any> => {
   if (object === undefined) throw new Error(`Param 'object' is undefined`);
   if (split.length === 0) throw new Error(`Path has run out`);
   const start = split.shift();

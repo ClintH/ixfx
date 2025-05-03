@@ -1,5 +1,5 @@
 
-import { isPlainObjectOrPrimitive } from "@ixfx/guards";
+import { testPlainObjectOrPrimitive } from "@ixfx/guards";
 import type { ReactiveOrSource } from "../types.js";
 import { transform } from "./transform.js";
 
@@ -14,7 +14,7 @@ export const cloneFromFields = <In>(source: ReactiveOrSource<In>) => {
     const entries: [ key: string, value: any ][] = [];
     for (const field in v) {
       const value = (v)[ field ];
-      if (isPlainObjectOrPrimitive(value as unknown)) {
+      if (testPlainObjectOrPrimitive(value as unknown)) {
         entries.push([ field, value ]);
       }
     }

@@ -1,5 +1,5 @@
 import { clamp, clamper } from './clamp.js';
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 import type { NumberScaler, NumberScalerTwoWay } from './types.js';
 
 /**
@@ -66,9 +66,10 @@ export const scaler = (
   clamped?: boolean
 ): NumberScaler => {
 
-  throwNumberTest(inMin, `finite`, `inMin`);
-  throwNumberTest(inMax, `finite`, `inMax`);
-
+  resultThrow(
+    numberTest(inMin, `finite`, `inMin`),
+    numberTest(inMax, `finite`, `inMax`)
+  );
   const oMax = outMax ?? 1;
   const oMin = outMin ?? 0;
   const clampFunction = clamped ? clamper(outMin, outMax) : undefined;
@@ -110,8 +111,8 @@ export const scaleClamped = (
   outMax?: number,
   easing?: (v: number) => number
 ): number => {
-  if (outMax === undefined) outMax = 1;
-  if (outMin === undefined) outMin = 0;
+  if (typeof outMax === `undefined`) outMax = 1;
+  if (typeof outMin === `undefined`) outMin = 0;
   if (inMin === inMax) return outMax;
 
   const x = scale(v, inMin, inMax, outMin, outMax, easing);
@@ -152,9 +153,11 @@ export const scalePercentages = (
   outMin: number,
   outMax = 1
 ): number => {
-  throwNumberTest(percentage, `percentage`, `v`);
-  throwNumberTest(outMin, `percentage`, `outMin`);
-  throwNumberTest(outMax, `percentage`, `outMax`);
+  resultThrow(
+    numberTest(percentage, `percentage`, `v`),
+    numberTest(outMin, `percentage`, `outMin`),
+    numberTest(outMax, `percentage`, `outMax`)
+  );
   return scale(percentage, 0, 1, outMin, outMax);
 };
 
@@ -187,7 +190,7 @@ export const scalePercent = (
  */
 export const scalerPercent = (outMin: number, outMax: number) => {
   return (v: number) => {
-    throwNumberTest(v, `percentage`, `v`);
+    resultThrow(numberTest(v, `percentage`, `v`));
     return scale(v, 0, 1, outMin, outMax);
   };
 };

@@ -1,4 +1,4 @@
-import { resultToError, type Result } from "@ixfx/core";
+import { resultToError, type Result } from "@ixfx/guards";
 
 /**
  * Resolves either a string or HTML element to an element.
@@ -17,7 +17,7 @@ export const resolveEl = <V extends Element>(domQueryOrEl: string | V | null | u
   throw resultToError(r);
 }
 
-export const resolveElementTry = <V extends Element>(domQueryOrEl: string | V | null | undefined): Result<V> => {
+export const resolveElementTry = <V extends Element>(domQueryOrEl: string | V | null | undefined): Result<V, string> => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
     if (d === null) {

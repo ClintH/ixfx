@@ -2,7 +2,10 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "dist",
-		"rootDir": "."
+		"rootDir": ".",
+		"paths": {
+			"colorjs": ["./node_modules/colorjs.io/src/index.js"]
+		}
 	},
 	"include": ["src/**/*", "__tests__/**/*"]
 }

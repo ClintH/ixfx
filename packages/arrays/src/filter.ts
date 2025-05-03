@@ -1,5 +1,5 @@
 import { isEqualDefault, type IsEqual } from "./util/is-equal.js";
-import { guardArray, guardIndex } from "@ixfx/guards";
+import { arrayIndexTest, arrayTest, resultThrow } from "@ixfx/guards";
 
 export const withoutUndefined = <V>(data: readonly V[] | V[]): V[] => {
   return data.filter(v => v !== undefined);
@@ -26,9 +26,7 @@ export const filterAB = <V>(
   const a: V[] = [];
   const b: V[] = [];
   for (const datum of data) {
-    //eslint-disable-next-line functional/immutable-data
     if (filter(datum)) a.push(datum);
-    //eslint-disable-next-line functional/immutable-data
     else b.push(datum);
   }
   return [ a, b ];
@@ -63,20 +61,16 @@ export function* filterBetween<V>(
   startIndex?: number,
   endIndex?: number
 ): Generator<V> {
-  guardArray(array);
+  resultThrow(arrayTest(array, `array`));
   if (typeof startIndex === `undefined`) startIndex = 0;
   if (typeof endIndex === `undefined`) endIndex = array.length; //- 1;
-  guardIndex(array, startIndex, `startIndex`);
-  guardIndex(array, endIndex - 1, `endIndex`);
 
-  //const t: Array<V> = [];
+  resultThrow(arrayIndexTest(array, startIndex, `startIndex`));
+  resultThrow(arrayIndexTest(array, endIndex - 1, `endIndex`));
 
-  //eslint-disable-next-line functional/no-let
   for (let index = startIndex; index < endIndex; index++) {
-    //eslint-disable-next-line functional/immutable-data
     if (predicate(array[ index ], index, array)) yield array[ index ];//t.push(array[ index ]);
   }
-  //return t;
 };
 
 
@@ -126,7 +120,6 @@ export function* filterBetween<V>(
  * @return Copy of array without value.
  */
 export const without = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
   sourceArray: readonly V[] | V[],
   toRemove: V | V[],
   comparer: IsEqual<V> = isEqualDefault

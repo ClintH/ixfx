@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import type { Triangle } from "./triangle-type.js";
 import { fromNumbers as PointsFromNumbers } from "../point/from.js";
 import { guard as PointGuard } from "../point/guard.js";
@@ -26,7 +26,7 @@ export const fromRadius = (
   radius: number,
   opts: { readonly initialAngleRadian?: number } = {}
 ): Triangle => {
-  throwNumberTest(radius, `positive`, `radius`);
+  resultThrow(numberTest(radius, `positive`, `radius`));
   PointGuard(origin, `origin`);
 
   const initialAngleRadian = opts.initialAngleRadian ?? 0;

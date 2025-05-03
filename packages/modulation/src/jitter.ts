@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfx/guards';
+import { resultThrow, numberTest } from '@ixfx/guards';
 import { clamp } from '@ixfx/numbers';
 import { floatSource as randomFloatFunction, float as randomFloat } from '@ixfx/random';
 import type { RandomSource } from '@ixfx/random';
@@ -112,11 +112,11 @@ export const jitter = (options: JitterOpts = {}): Jitterer => {
   const clamped = options.clamped ?? true;
   let r = (_: number) => 0;
   if (options.absolute !== undefined) {
-    throwNumberTest(
+    resultThrow(numberTest(
       options.absolute,
       clamped ? `percentage` : `bipolar`,
       `opts.absolute`
-    );
+    ));
     const absRand = randomFloatFunction({
       min: -options.absolute,
       max: options.absolute,
@@ -127,11 +127,11 @@ export const jitter = (options: JitterOpts = {}): Jitterer => {
     throw new TypeError(`Either absolute or relative jitter amount is required.`);
   } else {
     const rel = options.relative ?? 0.1;
-    throwNumberTest(
+    resultThrow(numberTest(
       rel,
       clamped ? `percentage` : `bipolar`,
       `opts.relative`
-    );
+    ));
     r = (v: number) =>
       v +
       randomFloat({
@@ -142,8 +142,7 @@ export const jitter = (options: JitterOpts = {}): Jitterer => {
   }
 
   const compute = (value: number) => {
-    throwNumberTest(value, clamped ? `percentage` : `bipolar`, `value`);
-    //eslint-disable-next-line functional/no-let
+    resultThrow(numberTest(value, clamped ? `percentage` : `bipolar`, `value`));
     let v = r(value);
     if (clamped) v = clamp(v);
     return v;

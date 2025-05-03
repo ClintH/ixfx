@@ -26,18 +26,11 @@ export default tseslint.config(
       "@typescript-eslint/restrict-template-expressions": "off",
       // "@typescript-eslint/ban-ts-comment": "off",
       // "@typescript-eslint/array-type": ["error", { "default": "generic" }],
-      // "@typescript-eslint/no-unsafe-member-access": "off",
-      // "@typescript-eslint/no-unsafe-argument": "off",
-      // "@typescript-eslint/no-unsafe-assignment": "off",
-      // "@typescript-eslint/no-unnecessary-condition": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        {
-          "argsIgnorePattern": "^_",
-          "varsIgnorePattern": "^_",
-          "caughtErrorsIgnorePattern": "^_"
-        }
-      ],
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+      "@typescript-eslint/no-unused-vars": "off",
       // 'unicorn/better-regex': 'error',
       // 'unicorn/consistent-destructuring': 'off',
       // 'unicorn/no-thenable': 'off',

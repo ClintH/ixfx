@@ -1,7 +1,7 @@
 import { intervalToMs, type Interval } from "@ixfx/core";
 import type { ModulationFunction, ModulatorTimed } from "./types.js";
 import * as Flow from '@ixfx/flow';
-import { throwFunctionTest } from "@ixfx/guards";
+import { functionTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Produce values over time. When the modulate function is complete, the final
@@ -26,10 +26,10 @@ export const time = (
   fn: ModulationFunction,
   duration: Interval
 ): () => number => {
-  throwFunctionTest(fn, `fn`);
+  resultThrow(functionTest(fn, `fn`));
   let relative: undefined | (() => number);
   return () => {
-    if (relative === undefined) relative = Flow.ofTotal(duration, { clampValue: true });
+    if (typeof relative === `undefined`) relative = Flow.ofTotal(duration, { clampValue: true });
     return fn(relative());
   }
 }
@@ -62,7 +62,7 @@ export const timeModulator = (
   fn: ModulationFunction,
   duration: Interval
 ): ModulatorTimed => {
-  throwFunctionTest(fn, `fn`);
+  resultThrow(functionTest(fn, `fn`));
 
   const timer = Flow.elapsedMillisecondsAbsolute();
   const durationMs = intervalToMs(duration);
@@ -99,11 +99,11 @@ export const ticks = (
   fn: ModulationFunction,
   totalTicks: number
 ): () => number => {
-  throwFunctionTest(fn, `fn`);
+  resultThrow(functionTest(fn, `fn`));
 
   let relative: undefined | (() => number);
   return () => {
-    if (relative === undefined) relative = Flow.ofTotalTicks(totalTicks, { clampValue: true });
+    if (typeof relative === `undefined`) relative = Flow.ofTotalTicks(totalTicks, { clampValue: true });
     return fn(relative());
   }
 }
@@ -134,7 +134,7 @@ export const tickModulator = (
   fn: ModulationFunction,
   durationTicks: number
 ): ModulatorTimed => {
-  throwFunctionTest(fn, `fn`);
+  resultThrow(functionTest(fn, `fn`));
   const timer = Flow.elapsedTicksAbsolute();
   const relativeTimer = Flow.relative(
     durationTicks,

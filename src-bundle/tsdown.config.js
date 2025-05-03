@@ -7,26 +7,41 @@ const dir = path.dirname(fileURLToPath(import.meta.url))
 
 const entry = {
   index: './src/index.ts',
-  // dom: './src/dom.ts',
-  // geometry: './src/geometry.ts',
-  // modulation: './src/modulation.ts',
-  // numbers: './src/numbers.ts',
-  // rx: './src/rx.ts',
-  // visual: './src/visual.ts'
+  arrays: './src/arrays.ts',
+  collections: './src/collections.ts',
+  core: './src/core.ts',
+  debug: './src/debug.ts',
+  dom: './src/dom.ts',
+  events: './src/events.ts',
+  flow: './src/flow.ts',
+  guards: './src/guards.ts',
+  iterables: './src/iterables.ts',
+  geometry: './src/geometry.ts',
+  modulation: './src/modulation.ts',
+  numbers: './src/numbers.ts',
+  process: './src/process.ts',
+  random: './src/random.ts',
+  rx: './src/rx.ts',
+  trackers: './src/trackers.ts',
+  ui: './src/ui.ts',
+  visual: './src/visual.ts'
 }
 
 export default defineConfig({
   entry,
-  clean: true,
-  noExternal: [
-    `@ixfxfun/core`,
-    `@ixfxfun/dom`,
-    `@ixfxfun/geometry`,
-    `@ixfxfun/modulation`,
-    `@ixfxfun/numbers`,
-    `@ixfxfun/rx`,
-    `@ixfxfun/visual`
-  ],
+  clean: false,
+  // noExternal: [
+  //   `@ixfxfun/core`,
+  //   `@ixfxfun/dom`,
+  //   `@ixfxfun/geometry`,
+  //   `@ixfxfun/modulation`,
+  //   `@ixfxfun/numbers`,
+  //   `@ixfxfun/rx`,
+  //   `@ixfxfun/visual`
+  // ],
+  // noExternal: [
+  //   "colorjs"
+  // ],
   platform: `browser`,
   sourcemap: true,
   outDir: `./tsdown`,
@@ -39,4 +54,5 @@ export default defineConfig({
   //   resolve: !0
   // },
   treeshake: true,
+
 })

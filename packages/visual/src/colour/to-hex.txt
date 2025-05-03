@@ -1,7 +1,8 @@
-import Color from "colorjs.io";
-import { structuredToColorJs, structuredToColorJsConstructor } from "./resolve-to-color.js";
+//import {convert} from "colorizr";
+//import { structuredToColorJs, structuredToColorJsConstructor } from "./resolve-to-color.js";
+import { toColour } from "./resolve-to-color.js";
 import type { Colourish } from "./types.js";
-
+import * as C from "colorizr";
 /**
  * Returns a colour in hex format `#000000`. 
  * ```js
@@ -18,12 +19,17 @@ import type { Colourish } from "./types.js";
  * @param colour
  * @returns Hex format, including #
  */
-export const toHex = (colour: Colourish): string => {
-  if (typeof colour === `string` && colour === `transparent`) return `#00000000`;
-  const cc = structuredToColorJsConstructor(colour);
+export const toHex = (colourish: Colourish): string => {
+  if (typeof colourish === `string` && colourish === `transparent`) return `#00000000`;
+  const colour = toColour(colourish);
+  
+  switch (colour.space) {
+    case `hsl`:
+      return C.hsl2hex(colour)
+  }
 
-  const c = new Color(cc.spaceId, cc.coords, cc.alpha)
-  return c.to(`srgb`).toString({ format: `hex`, collapse: false });
+  // const c = new Color(cc.spaceId, cc.coords, cc.alpha)
+  // return c.to(`srgb`).toString({ format: `hex`, collapse: false });
 };
 
 /**
@@ -54,7 +60,7 @@ export const toString = (colour: Colourish): string => {
  * @param colours Array of colours to resolve
  * @returns 
  */
-export const toStringFirst = (...colours: Array<Colourish | undefined>): string => {
+export const toStringFirst = (...colours: (Colourish | undefined)[]): string => {
   for (const colour of colours) {
     if (colour === undefined) continue;
     if (colour === null) continue;

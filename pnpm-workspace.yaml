@@ -3,3 +3,5 @@ packages:
   - docs/**
 ignoredBuiltDependencies:
   - esbuild
+onlyBuiltDependencies:
+  - rolldown

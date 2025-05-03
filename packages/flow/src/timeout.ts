@@ -1,4 +1,4 @@
-import { throwIntegerTest, integerTest } from '@ixfx/guards';
+import { integerTest, resultToError, resultIsError, resultThrow } from '@ixfx/guards';
 import { type HasCompletion, type HasCompletionRunStates } from '@ixfx/core';
 
 import { intervalToMs, type Interval } from '@ixfx/core';
@@ -85,8 +85,7 @@ export const timeout = (
     throw new Error(`callback parameter is undefined`);
   }
   const intervalMs = intervalToMs(interval);
-  throwIntegerTest(intervalMs, `aboveZero`, `interval`);
-
+  resultThrow(integerTest(intervalMs, `aboveZero`, `interval`));
   let timer: ReturnType<typeof setTimeout>;
   let startedAt = 0;
   let startCount = 0;
@@ -107,8 +106,8 @@ export const timeout = (
       startedAt = performance.now();
       const altTimeoutMs = intervalToMs(altInterval);
       const it = integerTest(altTimeoutMs, `aboveZero`, `altTimeoutMs`);
-      if (!it[ 0 ]) {
-        reject(new Error(it[ 1 ]));
+      if (resultIsError(it)) {
+        reject(resultToError(it));
         return;
       }
 

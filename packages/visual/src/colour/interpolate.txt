@@ -1,9 +1,10 @@
 import { clamp, scale as scaleNumber } from "@ixfx/numbers";
 import type { ColourInterpolationOpts, Colourish } from "./types.js";
 import { pairwise } from '@ixfx/arrays';
-import { structuredToColorJsConstructor } from "./resolve-to-color.js";
-import { toString as colourToString } from "./to-hex.js";
-import Color from "colorjs.io";
+//import { structuredToColorJsConstructor } from "./resolve-to-color.js";
+//import Color from "./colorjs.js"
+
+import { toHex } from "./to-hex.js";
 /**
  * Returns a function to interpolate between colours
  * ```js
@@ -42,7 +43,7 @@ export const interpolator = (colours: Colourish[], opts: Partial<ColourInterpola
 
     // If we're at the end, return the last colour
 
-    if (index === 1) return colourToString(colours.at(-1)!);
+    if (index === 1) return toHex(colours.at(-1)!);
 
     const colour = range(amtAdjusted);
     return colour.display();
@@ -69,7 +70,7 @@ const interpolatorInit = (colours: Colourish[]) => {
  * @returns 
  */
 export const cssLinearGradient = (colours: Colourish[]) => {
-  const c = colours.map(c => colourToString(c));
+  const c = colours.map(c => toHex(c));
   return `linear-gradient(to right, ${ c.join(`, `) })`;
 }
 

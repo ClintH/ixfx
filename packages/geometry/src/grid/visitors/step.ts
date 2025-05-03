@@ -1,6 +1,6 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 import { guardCell, guardGrid } from "../guards.js";
-import type { Grid, GridCell, GridVisitorOpts, GridCreateVisitor } from "../types.js";
+import type { Grid, GridCell, GridCreateVisitor } from "../types.js";
 
 /**
  * Runs the provided `visitor` for `steps`, returning the cell we end at
@@ -28,7 +28,7 @@ export const stepper = (
 ) => {
   guardGrid(grid, `grid`);
   guardCell(start, `start`);
-  throwIntegerTest(resolution, ``, `resolution`)
+  resultThrow(integerTest(resolution, ``, `resolution`));
 
   // Create a list of steps
   const steps: GridCell[] = [];
@@ -41,7 +41,7 @@ export const stepper = (
   }
 
   return (step: number, fromStart = false) => {
-    throwIntegerTest(step, ``, `step`)
+    resultThrow(integerTest(step, ``, `step`));
     if (fromStart) position = step;
     else position += step;
     //position = position % steps.length;

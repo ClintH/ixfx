@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 import { type RandomSource } from '@ixfx/random';
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
@@ -21,11 +21,12 @@ export const goldenAngleColour = (
   lightness = 0.75,
   alpha = 1
 ) => {
-  throwNumberTest(index, `positive`, `index`);
-  throwNumberTest(saturation, `percentage`, `saturation`);
-  throwNumberTest(lightness, `percentage`, `lightness`);
-  throwNumberTest(alpha, `percentage`, `alpha`);
-
+  resultThrow(
+    numberTest(index, `positive`, `index`),
+    numberTest(saturation, `percentage`, `saturation`),
+    numberTest(lightness, `percentage`, `lightness`),
+    numberTest(alpha, `percentage`, `alpha`)
+  );
   // Via Stackoverflow
   const hue = index * 137.508; // use golden angle approximation
   return alpha === 1 ? `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%)` : `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%,${ alpha * 100 }%)`;

@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfx/guards';
+import { resultThrow, numberTest } from '@ixfx/guards';
 
 /**
  * Continually loops up and down between 0 and 1 by a specified interval.
@@ -35,14 +35,16 @@ export const pingPongPercent = function (
   start?: number,
   rounding?: number
 ) {
-  if (lower === undefined) lower = 0;
-  if (upper === undefined) upper = 1;
-  if (start === undefined) start = lower;
+  if (typeof lower === `undefined`) lower = 0;
+  if (typeof upper === `undefined`) upper = 1;
+  if (typeof start === `undefined`) start = lower;
 
-  throwNumberTest(interval, `bipolar`, `interval`);
-  throwNumberTest(upper, `bipolar`, `end`);
-  throwNumberTest(start, `bipolar`, `offset`);
-  throwNumberTest(lower, `bipolar`, `start`);
+  resultThrow(
+    numberTest(interval, `bipolar`, `interval`),
+    numberTest(upper, `bipolar`, `end`),
+    numberTest(start, `bipolar`, `offset`),
+    numberTest(lower, `bipolar`, `start`)
+  );
   return pingPong(interval, lower, upper, start, rounding);
 };
 
@@ -82,7 +84,7 @@ export const pingPong = function* (
 
   if (rounding === undefined && interval <= 1 && interval >= 0) {
     rounding = 10 / interval;
-  } else if (rounding === undefined) rounding = 1234;
+  } else if (typeof rounding === `undefined`) rounding = 1234;
 
   if (Number.isNaN(interval)) throw new Error(`interval parameter is NaN`);
   if (Number.isNaN(lower)) throw new Error(`lower parameter is NaN`);
@@ -96,7 +98,6 @@ export const pingPong = function* (
     throw new Error(`Interval should be between -${ distance } and ${ distance }`);
   }
 
-  //eslint-disable-next-line functional/no-let
   let incrementing = interval > 0;
 
   // Scale up values by rounding factor

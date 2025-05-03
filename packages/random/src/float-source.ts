@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 import { type RandomOptions, type RandomSource } from "./types.js";
 
 /**
@@ -75,8 +75,10 @@ export const floatSource = (maxOrOptions: (number | RandomOptions) = 1): RandomS
   let min = options.min ?? 0;
   const source = options.source ?? Math.random;
 
-  throwNumberTest(min, ``, `min`);
-  throwNumberTest(max, ``, `max`);
+  resultThrow(
+    numberTest(min, ``, `min`),
+    numberTest(max, ``, `max`)
+  );
 
   if (!options.min && max < 0) {
     min = max;

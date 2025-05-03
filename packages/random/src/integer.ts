@@ -1,4 +1,4 @@
-import { throwFromResult, numberTest as guardNumberTest, integerTest as guardIntegerTest } from "@ixfx/guards";
+import { numberTest, integerTest, resultThrow } from "@ixfx/guards";
 import type { GenerateRandomOptions, RandomOptions, RandomSource } from "./types.js";
 import { count } from "./util/count.js";
 import { shuffle } from "./arrays.js";
@@ -54,8 +54,10 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
     throw new Error(`Min value is greater than max (min: ${ min.toString() } max: ${ max.toString() })`);
   }
 
-  throwFromResult(guardNumberTest(min, ``, `min`));
-  throwFromResult(guardNumberTest(max, ``, `max`));
+  resultThrow(
+    numberTest(min, ``, `min`),
+    numberTest(max, ``, `max`)
+  );
 
   if (max === min) {
     throw new Error(`Max and min values cannot be the same (${ max.toString() })`);
@@ -135,8 +137,11 @@ export function* integerUniqueGen(
   const source = options.source ?? Math.random;
   const loop = options.loop ?? false;
 
-  throwFromResult(guardIntegerTest(min, ``, `min`));
-  throwFromResult(guardIntegerTest(max, ``, `max`));
+  resultThrow(
+    integerTest(min, ``, `min`),
+    integerTest(max, ``, `max`)
+  )
+
   if (min > max) {
     throw new Error(`Min value is greater than max. Min: ${ min.toString() } Max: ${ max.toString() }`);
   }
@@ -144,7 +149,7 @@ export function* integerUniqueGen(
   const origRange = [ ...count(max - min, min) ];
   let numberRange = shuffle(origRange);
   let index = 0;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   while (true) {
     if (index === numberRange.length) {
       if (loop) numberRange = shuffle(origRange, source);

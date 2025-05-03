@@ -1,4 +1,4 @@
-import { throwIntegerTest } from '@ixfx/guards';
+import { resultThrow, integerTest } from '@ixfx/guards';
 /**
  * Samples values from an array. If `amount` is less or equal to 1, it's treated as a percentage to sample.
  * Otherwise it's treated as every _n_th value to sample.
@@ -38,7 +38,7 @@ export const sample = <V>(array: ArrayLike<V>, amount: number): V[] => {
     subsampleSteps = amount;
   }
 
-  throwIntegerTest(subsampleSteps, `positive`, `amount`);
+  resultThrow(integerTest(subsampleSteps, `positive`, `amount`));
   if (subsampleSteps > array.length - 1) {
     throw new Error(`Subsample steps exceeds array length`);
   }

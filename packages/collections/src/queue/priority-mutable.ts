@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import { isEqualDefault, type IsEqual } from "@ixfx/core";
 import { max as IterablesMax, min as IterablesMin, last as IterablesLast } from "@ixfx/iterables";
 import type { IPriorityQueueMutable, PriorityItem } from "./ipriority-queue-mutable.js";
@@ -37,7 +37,7 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
    * @param priority Priority (higher numeric value means higher priority)
    */
   enqueueWithPriority(item: V, priority: number) {
-    throwNumberTest(priority, `positive`)
+    resultThrow(numberTest(priority, `positive`));
     super.enqueue({ item, priority });
   }
 

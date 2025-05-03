@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import type { RandomSource } from "./types.js";
 
 /**
@@ -28,7 +28,8 @@ export const chance = <T>(p: number | (() => number), a: T | (() => T), b: T | (
   }
 
   const pp = resolve(p);
-  throwNumberTest(pp, `percentage`, `p`);
+
+  resultThrow(numberTest(pp, `percentage`, `p`));
 
   if (source() <= pp) {
     return resolve(b);

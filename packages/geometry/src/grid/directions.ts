@@ -1,5 +1,5 @@
 import { zipKeyValue } from "@ixfx/core/maps";
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 import { guardCell, guardGrid } from "./guards.js";
 import type { GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, Grid, GridNeighbours } from "./types.js";
 import { offset } from "./offset.js";
@@ -45,7 +45,7 @@ export const offsetCardinals = (
 ): GridNeighbours => {
   guardGrid(grid, `grid`);
   guardCell(start, `start`);
-  throwIntegerTest(steps, `aboveZero`, `steps`);
+  resultThrow(integerTest(steps, `aboveZero`, `steps`));
 
   const directions = allDirections;
   const vectors = directions.map((d) => getVectorFromCardinal(d, steps));
@@ -76,7 +76,6 @@ export const getVectorFromCardinal = (
   cardinal: GridCardinalDirectionOptional,
   multiplier = 1
 ): GridCell => {
-  // eslint-disable-next-line functional/no-let
   let v;
   switch (cardinal) {
     case `n`: {

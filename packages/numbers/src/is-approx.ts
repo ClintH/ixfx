@@ -1,4 +1,4 @@
-import { numberTest, throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import { round } from "./round.js";
 
 /**
@@ -74,7 +74,7 @@ export function isApprox(
   baseValue?: number,
   v?: number
 ) {
-  throwNumberTest(rangePercent, `percentage`, `rangePercent`);
+  resultThrow(numberTest(rangePercent, `percentage`, `rangePercent`));
 
   // Round percentages to avoid floating point nonsense
   const range = Math.floor(rangePercent * 100);
@@ -95,7 +95,7 @@ export function isApprox(
   };
 
   if (baseValue === undefined) return test;
-  throwNumberTest(baseValue, ``, `baseValue`);
+  resultThrow(numberTest(baseValue, ``, `baseValue`));
   if (v === undefined) {
     return (value: number) => test(baseValue, value);
   } else {

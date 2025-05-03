@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 
 /**
  * The circular array is immutable. It keeps up to `capacity` items.
@@ -44,16 +44,13 @@ export interface ICircularArray<V> extends Array<V> {
 }
 
 class CircularArray<V> extends Array {
-  // ✔ Class is unit tested!
-  /* eslint-disable-next-line functional/prefer-readonly-type */
   #capacity: number;
-  /* eslint-disable-next-line functional/prefer-readonly-type */
   #pointer: number;
 
   constructor(capacity = 0) {
     super();
     // Allowed to create with capacity zero
-    throwIntegerTest(capacity, `positive`, `capacity`);
+    resultThrow(integerTest(capacity, `positive`, `capacity`));
 
     // Can't throw because .filter won't use ctor proprly
     this.#capacity = capacity;
@@ -67,16 +64,12 @@ class CircularArray<V> extends Array {
    */
   add(value: V): CircularArray<V> {
     const ca = CircularArray.from(this) as CircularArray<V>;
-    /* eslint-disable-next-line functional/immutable-data */
     ca[ this.#pointer ] = value;
-    /* eslint-disable-next-line functional/immutable-data */
     ca.#capacity = this.#capacity;
     if (this.#capacity > 0) {
-      /* eslint-disable-next-line functional/immutable-data */
       ca.#pointer =
         this.#pointer + 1 === this.#capacity ? 0 : this.#pointer + 1;
     } else {
-      /* eslint-disable-next-line functional/immutable-data */
       ca.#pointer = this.#pointer + 1;
     }
     return ca;

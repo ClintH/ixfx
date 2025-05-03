@@ -1,4 +1,4 @@
-import { guardIndex } from "@ixfx/guards";
+import { arrayIndexTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
@@ -23,14 +23,13 @@ import { guardIndex } from "@ixfx/guards";
  * @returns
  */
 export const remove = <V>(
-  //eslint-disable-next-line functional/prefer-readonly-type
   data: readonly V[] | V[],
   index: number
 ): V[] => {
-  // ✔️ Unit tested
   if (!Array.isArray(data)) {
     throw new TypeError(`'data' parameter should be an array`);
   }
-  guardIndex(data, index, `index`);
+  resultThrow(arrayIndexTest(data, index, `index`));
+
   return [ ...data.slice(0, index), ...data.slice(index + 1) ];
 };

@@ -6,7 +6,7 @@ import { immutable as immutableMap, type IMapImmutable } from "../map/map.js"
 import { NumberMap } from "../map/number-map.js"
 import * as Sync from "@ixfx/iterables/sync"
 import { Table } from "../table.js"
-import { throwStringTest } from "@ixfx/guards"
+import { resultThrow, stringTest, type Result } from "@ixfx/guards"
 
 export type DistanceCompute = (graph: DirectedGraph, edge: Edge) => number;
 
@@ -96,7 +96,7 @@ export type DirectedGraph = Readonly<{
  * @returns 
  */
 export function hasKey(graph: DirectedGraph, key: string): boolean {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
   return graph.vertices.has(key);
 }
 
@@ -113,8 +113,9 @@ export function hasKey(graph: DirectedGraph, key: string): boolean {
  * @returns 
  */
 export function get(graph: DirectedGraph, key: string): Vertex | undefined {
-  throwGraphTest(graph);
-  throwStringTest(key, `non-empty`, `key`);
+  resultThrow(graphTest(graph));
+
+  resultThrow(stringTest(key, `non-empty`, `key`));
   return graph.vertices.get(key);
 
 }
@@ -133,7 +134,7 @@ export function get(graph: DirectedGraph, key: string): Vertex | undefined {
  * @returns 
  */
 export function toAdjacencyMatrix(graph: DirectedGraph): Table<boolean> {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const v = [ ...graph.vertices.values() ];
   //const m: Array<Array<boolean>> = [];
@@ -201,7 +202,7 @@ export const distance = (graph: DirectedGraph, edge: Edge): number => {
  * @param graph 
  */
 export function* edges(graph: DirectedGraph) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const vertices = [ ...graph.vertices.values() ];
   for (const vertex of vertices) {
@@ -216,7 +217,7 @@ export function* edges(graph: DirectedGraph) {
  * @param graph 
  */
 export function* vertices(graph: DirectedGraph) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const vertices = [ ...graph.vertices.values() ];
   for (const vertex of vertices) {
@@ -224,22 +225,25 @@ export function* vertices(graph: DirectedGraph) {
   }
 }
 
-function testGraph(g: DirectedGraph, parameterName = `graph`) {
-  if (g === undefined) return [ false, `Param '${ parameterName }' is undefined. Expected Graph` ];
-  if (g === null) return [ false, `Param '${ parameterName }' is null. Expected Graph` ];
+function graphTest(g: DirectedGraph, parameterName = `graph`): Result<DirectedGraph, string> {
+  if (g === undefined) return { success: false, error: `Param '${ parameterName }' is undefined. Expected Graph` };
+  if (g === null) return { success: false, error: `Param '${ parameterName }' is null. Expected Graph` };
   if (typeof g === `object`) {
-    if (!(`vertices` in g)) return [ false, `Param '${ parameterName }.vertices' does not exist. Is it a Graph type?` ]
+    if (!(`vertices` in g)) return {
+      success: false, error: `Param '${ parameterName }.vertices' does not exist. Is it a Graph type?`
+    };
   } else {
-    return [ false, `Param '${ parameterName } is type '${ typeof g }'. Expected an object Graph` ];
+    return { success: false, error: `Param '${ parameterName } is type '${ typeof g }'. Expected an object Graph` };
   }
-  return [ true ];
+  return { success: true, value: g };
 }
 
-function throwGraphTest(g: DirectedGraph, parameterName = `graph`) {
-  const r = testGraph(g, parameterName);
-  if (r[ 0 ]) return;
-  throw new Error(r[ 1 ] as string)
-}
+// function throwGraphTest(g: DirectedGraph, parameterName = `graph`) {
+//   const r = testGraph(g, parameterName);
+//   if (r[ 0 ]) return;
+//   throw new Error(r[ 1 ] as string)
+// }
+
 /**
  * Iterate over all the vertices connected to `context` vertex
  * @param graph Graph
@@ -247,7 +251,7 @@ function throwGraphTest(g: DirectedGraph, parameterName = `graph`) {
  * @returns 
  */
 export function* adjacentVertices(graph: DirectedGraph, context: Vertex | string | undefined) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
   if (context === undefined) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
   if (vertex === undefined) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
@@ -281,8 +285,7 @@ export const vertexHasOut = (vertex: Vertex, outIdOrVertex: string | Vertex): bo
  * @returns 
  */
 export const hasNoOuts = (graph: DirectedGraph, vertex: string | Vertex): boolean => {
-  throwGraphTest(graph);
-
+  resultThrow(graphTest(graph));
   const context = typeof vertex === `string` ? graph.vertices.get(vertex) : vertex;
   if (context === undefined) return false;
   return context.out.length === 0;
@@ -297,7 +300,7 @@ export const hasNoOuts = (graph: DirectedGraph, vertex: string | Vertex): boolea
  * @returns 
  */
 export const hasOnlyOuts = (graph: DirectedGraph, vertex: string | Vertex, ...outIdOrVertex: (string | Vertex)[]): boolean => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const context = resolveVertex(graph, vertex);
   const outs = outIdOrVertex.map(o => resolveVertex(graph, o));
@@ -324,7 +327,7 @@ export const hasOnlyOuts = (graph: DirectedGraph, vertex: string | Vertex, ...ou
  * @returns 
  */
 export const hasOut = (graph: DirectedGraph, vertex: string | Vertex, outIdOrVertex: string | Vertex): boolean => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const context = resolveVertex(graph, vertex);
   const outId = typeof outIdOrVertex === `string` ? outIdOrVertex : outIdOrVertex.id;
@@ -346,7 +349,7 @@ export const hasOut = (graph: DirectedGraph, vertex: string | Vertex, outIdOrVer
  * @returns 
  */
 export const getOrCreate = (graph: DirectedGraph, id: string): Readonly<{ graph: DirectedGraph, vertex: Vertex }> => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const v = graph.vertices.get(id);
   if (v !== undefined) return { graph, vertex: v };
@@ -363,7 +366,7 @@ export const getOrCreate = (graph: DirectedGraph, id: string): Readonly<{ graph:
  * @returns 
  */
 export const getOrFail = (graph: DirectedGraph, id: string): Vertex => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const v = graph.vertices.get(id);
   if (v === undefined) throw new Error(`Vertex '${ id }' not found in graph`);
@@ -377,7 +380,7 @@ export const getOrFail = (graph: DirectedGraph, id: string): Vertex => {
  * @returns 
  */
 export const updateGraphVertex = (graph: DirectedGraph, vertex: Vertex): DirectedGraph => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const gr = {
     ...graph,
@@ -407,7 +410,7 @@ export const distanceDefault = (graph: DirectedGraph, edge: Edge): number => {
  * @returns 
  */
 export function disconnect(graph: DirectedGraph, from: string | Vertex, to: string | Vertex): DirectedGraph {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const fromV = resolveVertex(graph, from);
   const toV = resolveVertex(graph, to);
@@ -428,7 +431,7 @@ export function disconnect(graph: DirectedGraph, from: string | Vertex, to: stri
  * @returns 
  */
 export function connectTo(graph: DirectedGraph, from: string, to: string, weight?: number): { graph: DirectedGraph, edge: Edge } {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const fromResult = getOrCreate(graph, from);
   graph = fromResult.graph;
@@ -481,7 +484,7 @@ export function connect(graph: DirectedGraph, options: ConnectOptions): Directed
  * @returns 
  */
 export function connectWithEdges(graph: DirectedGraph, options: ConnectOptions): { graph: DirectedGraph, edges: Edge[] } {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const { to, weight, from } = options;
   const bidi = options.bidi ?? false;
@@ -537,7 +540,7 @@ const debugDumpVertex = (v: Vertex): string[] => {
  * @returns 
  */
 export function areAdjacent(graph: DirectedGraph, a: Vertex, b: Vertex) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   if (hasOut(graph, a, b.id)) return true;
   if (hasOut(graph, b, a.id)) return true;
@@ -551,7 +554,7 @@ export function areAdjacent(graph: DirectedGraph, a: Vertex, b: Vertex) {
  * @returns 
  */
 function resolveVertex(graph: DirectedGraph, idOrVertex: string | Vertex): Vertex {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   if (idOrVertex === undefined) throw new Error(`Param 'idOrVertex' is undefined. Expected string or Vertex`);
 
@@ -568,7 +571,7 @@ function resolveVertex(graph: DirectedGraph, idOrVertex: string | Vertex): Verte
  * @returns 
  */
 export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, targetIdOrVertex?: string | Vertex) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const start = resolveVertex(graph, startIdOrVertex);
   const target = targetIdOrVertex === undefined ? undefined : resolveVertex(graph, targetIdOrVertex);
@@ -595,7 +598,7 @@ export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, tar
  * @param startIdOrVertex 
  */
 export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const source = resolveVertex(graph, startIdOrVertex);
 
@@ -625,7 +628,7 @@ export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex) {
  * @returns 
  */
 export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const source = typeof sourceOrId === `string` ? graph.vertices.get(sourceOrId) : sourceOrId;
   if (source === undefined) throw new Error(`source vertex not found`);
@@ -684,7 +687,7 @@ export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) 
  * @returns 
  */
 export const clone = (graph: DirectedGraph): DirectedGraph => {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const g: DirectedGraph = {
     vertices: immutableMap<string, Vertex>([ ...graph.vertices.entries() ])
@@ -732,7 +735,7 @@ type TarjanVertex = Vertex & {
  * @param graph 
  */
 export function isAcyclic(graph: DirectedGraph): boolean {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const cycles = getCycles(graph);
   return cycles.length === 0;
@@ -744,7 +747,7 @@ export function isAcyclic(graph: DirectedGraph): boolean {
  * @param graph 
  */
 export function topologicalSort(graph: DirectedGraph): DirectedGraph {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   const indegrees = new NumberMap(0);
 
@@ -807,7 +810,7 @@ export function graphFromVertices(vertices: Iterable<Vertex>): DirectedGraph {
  * @returns 
  */
 export function getCycles(graph: DirectedGraph): Vertex[][] {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   let index = 0;
   const stack = new StackMutable<TarjanVertex>();
@@ -869,7 +872,7 @@ export function getCycles(graph: DirectedGraph): Vertex[][] {
  * @returns 
  */
 export function transitiveReduction(graph: DirectedGraph) {
-  throwGraphTest(graph);
+  resultThrow(graphTest(graph));
 
   for (const u of vertices(graph)) {
     for (const v of adjacentVertices(graph, u)) {

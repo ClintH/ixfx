@@ -20,7 +20,7 @@ export * from './promise-from-event.js';
 export * from './reactive-core.js';
 export * from './resolve-core.js';
 export * from './resolve-fields.js';
-export * from './results.js';
+//export * from './results.js';
 export * from './sleep.js';
 
 // tsup doesn't like 'export type *'?

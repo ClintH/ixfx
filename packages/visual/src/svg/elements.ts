@@ -5,8 +5,8 @@
 //import * as Lines from '../geometry/line/index.js';
 import { Lines, Polar } from '@ixfx/geometry';
 //import * as Svg from './index.js';
-
-import { getCssVariable } from '../colour/index.js';
+import { toStringFirst as ColourStringFirst } from '../colour/conversion.js';
+//import { getCssVariable } from '../colour/index.js';
 import type { CircleDrawingOpts, LineDrawingOpts, PathDrawingOpts, TextDrawingOpts, TextPathDrawingOpts } from './types.js';
 import { applyOpts } from './apply.js';
 import { applyStrokeOpts } from './stroke.js';
@@ -298,7 +298,6 @@ export const textUpdate = (
 
     if (!userSelect) {
       el.style.userSelect = `none`;
-      el.style.webkitUserSelect = `none`;
     }
   }
   return el;
@@ -350,7 +349,7 @@ export const grid = (
   opts: LineDrawingOpts = {}
 ) => {
   if (!opts.strokeStyle) {
-    opts = { ...opts, strokeStyle: getCssVariable(`bg-dim`, `silver`) };
+    opts = { ...opts, strokeStyle: ColourStringFirst(`bg-dim`, `silver`) };
   }
   if (!opts.strokeWidth) opts = { ...opts, strokeWidth: 1 };
 

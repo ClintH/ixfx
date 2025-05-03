@@ -1,5 +1,4 @@
-import type { GuardResult } from "./types.js";
-import { throwFromResult } from "./throw-from-result.js";
+import type { Result } from "./types.js";
 
 export type StringGuardRange = `` | `non-empty`
 
@@ -8,17 +7,17 @@ export type StringGuardRange = `` | `non-empty`
  * @param value
  * @param parameterName
  */
-export const stringTest = (value: unknown, range: StringGuardRange = ``, parameterName = `?`): GuardResult => {
-  if (typeof value !== `string`) return [ false, `Param '${ parameterName } is not type string. Got: ${ typeof value }` ];
+export const stringTest = (value: unknown, range: StringGuardRange = ``, parameterName = `?`): Result<string, string> => {
+  if (typeof value !== `string`) return { success: false, error: `Param '${ parameterName } is not type string. Got: ${ typeof value }` };
   switch (range) {
     case `non-empty`:
-      if (value.length === 0) return [ false, `Param '${ parameterName } is empty` ];
+      if (value.length === 0) return { success: false, error: `Param '${ parameterName } is empty` };
       break;
   }
-  return [ true ];
+  return { success: true, value };
 };
 
-export const throwStringTest = (value: unknown, range: StringGuardRange = ``, parameterName = `?`) => {
-  throwFromResult(stringTest(value, range, parameterName));
-}
+// export const throwStringTest = (value: unknown, range: StringGuardRange = ``, parameterName = `?`) => {
+//   throwFromResult(stringTest(value, range, parameterName));
+// }
 

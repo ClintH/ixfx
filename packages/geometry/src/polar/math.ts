@@ -1,6 +1,6 @@
 import { guard } from "./guard.js";
 import type { Coord } from "./types.js";
-import { throwNumberTest } from "@ixfx/guards"
+import { numberTest, resultThrow } from "@ixfx/guards"
 
 export const normalise = (c: Coord): Coord => {
   //guard(v, `v`);
@@ -57,7 +57,7 @@ export const dotProduct = (a: Coord, b: Coord): number => {
  */
 export const multiply = (v: Coord, amt: number): Coord => {
   guard(v);
-  throwNumberTest(amt, ``, `amt`);
+  resultThrow(numberTest(amt, ``, `amt`));
   return Object.freeze({
     ...v,
     distance: v.distance * amt,
@@ -73,7 +73,7 @@ export const multiply = (v: Coord, amt: number): Coord => {
  */
 export const divide = (v: Coord, amt: number): Coord => {
   guard(v);
-  throwNumberTest(amt, ``, `amt`);
+  resultThrow(numberTest(amt, ``, `amt`));
   return Object.freeze({
     ...v,
     distance: v.distance / amt,

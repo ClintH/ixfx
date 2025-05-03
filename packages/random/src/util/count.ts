@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Yields `amount` integers, counting by one from zero. If a negative amount is used,
@@ -34,10 +34,10 @@ import { throwIntegerTest } from "@ixfx/guards";
  * @param offset Added to result
  */
 export function* count(amount: number, offset = 0): Generator<number, void, void> {
-  // Unit tested.
-  throwIntegerTest(amount, ``, `amount`);
-  throwIntegerTest(offset, ``, `offset`);
-
+  resultThrow(
+    integerTest(amount, ``, `amount`),
+    integerTest(offset, ``, `offset`)
+  );
   if (amount === 0) return;
 
   let index = 0;

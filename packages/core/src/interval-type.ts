@@ -45,7 +45,7 @@ export function intervalToMs(
     return ms;
   } else {
     if (typeof defaultNumber !== `undefined`) return defaultNumber;
-    throw new Error(`Not a valid interval: ${ interval }`);
+    throw new Error(`Not a valid interval: ${ JSON.stringify(interval) }`);
   }
 }
 
@@ -55,22 +55,22 @@ export function intervalToMs(
  * @returns _True_ if `interval` is an {@link Interval}.
  */
 export function isInterval(interval: number | Interval | undefined): interval is Interval {
-  if (interval === undefined) return false;
+  if (typeof interval === `undefined`) return false;
   if (interval === null) return false;
   if (typeof interval === `number`) {
     if (Number.isNaN(interval)) return false;
     if (!Number.isFinite(interval)) return false;
     return true;
-  } else if (typeof interval !== `object`) return false;
-
+  }
+  if (typeof interval !== `object`) return false;
   const hasMillis = `millis` in interval;
   const hasSecs = `secs` in interval;
   const hasMins = `mins` in interval;
   const hasHours = `hours` in interval;
-  if (hasMillis && !numberTest(interval.millis)[ 0 ]) return false;
-  if (hasSecs && !numberTest(interval.secs)[ 0 ]) return false;
-  if (hasMins && !numberTest(interval.mins)[ 0 ]) return false;
-  if (hasHours && !numberTest(interval.hours)[ 0 ]) return false;
+  if (hasMillis && !numberTest(interval.millis).success) return false;
+  if (hasSecs && !numberTest(interval.secs).success) return false;
+  if (hasMins && !numberTest(interval.mins).success) return false;
+  if (hasHours && !numberTest(interval.hours).success) return false;
   if (hasMillis || hasSecs || hasHours || hasMins) return true;
   return false;
 }
@@ -90,7 +90,7 @@ export function isInterval(interval: number | Interval | undefined): interval is
  * @returns 
  */
 export const elapsedToHumanString = (millisOrFunction: number | (() => number) | Interval, rounding = 2): string => {
-  let interval: number | undefined = {} = 0;
+  let interval: number | undefined = 0;
   if (typeof millisOrFunction === `function`) {
     const intervalResult = millisOrFunction();
     return elapsedToHumanString(intervalResult);

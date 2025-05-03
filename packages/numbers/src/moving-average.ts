@@ -1,4 +1,4 @@
-import { throwNumberTest, numberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import { BasicQueueMutable } from "./util/queue-mutable.js";
 import { averageWeighted } from "./average-weighted.js";
 import { average } from "./numeric-arrays.js";
@@ -27,13 +27,13 @@ const PiPi = Math.PI * 2;
  * @returns Function that adds to average.
  */
 export const movingAverageLight = (scaling = 3): (value?: number) => number => {
-  throwNumberTest(scaling, `aboveZero`, `scaling`);
+  resultThrow(numberTest(scaling, `aboveZero`, `scaling`));
   let average = 0;
   let count = 0;
 
   return (v?: number) => {
     const r = numberTest(v, ``, `v`);
-    if (r[ 0 ] && v !== undefined) {
+    if (r.success && v !== undefined) {
       // Valid number
       count++;
       average = average + (v - average) / Math.min(count, scaling);
@@ -85,7 +85,7 @@ export const movingAverage = (
   const q = new BasicQueueMutable<number>();
   return (v?: number) => {
     const r = numberTest(v);
-    if (r[ 0 ] && v !== undefined) {
+    if (r.success && v !== undefined) {
       q.enqueue(v);
       while (q.size > samples) {
         q.dequeue();

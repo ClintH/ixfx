@@ -1,4 +1,4 @@
-import { throwNumberTest } from '@ixfx/guards';
+import { numberTest, resultThrow } from '@ixfx/guards';
 import { intervalToMs } from './interval-type.js';
 import type { Interval } from './types.js';
 
@@ -10,6 +10,7 @@ export type SleepOpts<V> = Interval & Partial<{
 if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
 
   if (typeof window === `undefined`) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     globalThis.requestAnimationFrame = (callback) => {
       setTimeout(callback, 1);
@@ -64,7 +65,7 @@ export const sleep = <V>(
   const timeoutMs = intervalToMs(optsOrMillis, 1);
   const signal = optsOrMillis.signal;
   const value = optsOrMillis.value;
-  throwNumberTest(timeoutMs, `positive`, `timeoutMs`);
+  resultThrow(numberTest(timeoutMs, `positive`, `timeoutMs`));
 
 
   if (timeoutMs === 0) {

@@ -1,5 +1,5 @@
 import { type Interval, intervalToMs } from "@ixfx/core";
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import type { ModSettableOptions as ModuleSettableOptions, ModSettable as ModuleSettable, ModSettableFeedback as ModuleSettableFeedback } from "../types.js";
 
 /**
@@ -27,7 +27,7 @@ export function elapsed(interval: Interval, options: Partial<ModuleSettableOptio
   let cycleCount = 0;
   const intervalMs = intervalToMs(interval, 1000);
   if (options.startAtRelative) {
-    throwNumberTest(options.startAtRelative, `percentage`, `startAtRelative`);
+    resultThrow(numberTest(options.startAtRelative, `percentage`, `startAtRelative`));
     start = performance.now() - (intervalMs * options.startAtRelative);
   }
   //let stopAt = cycleLimit > 0 ? (intervalMs + start) : Number.MAX_SAFE_INTEGER;
@@ -38,7 +38,7 @@ export function elapsed(interval: Interval, options: Partial<ModuleSettableOptio
         if (start === 0) start = performance.now();
       }
       if (feedback.resetAtRelative !== undefined) {
-        throwNumberTest(feedback.resetAtRelative, `percentage`, `resetAtRelative`);
+        resultThrow(numberTest(feedback.resetAtRelative, `percentage`, `resetAtRelative`));
         start = performance.now() - (intervalMs * feedback.resetAtRelative);
       }
     }

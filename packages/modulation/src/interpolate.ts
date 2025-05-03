@@ -1,11 +1,9 @@
 import { clamp, wrap, type BasicInterpolateOptions } from "@ixfx/numbers";
 import { ofTotal } from "@ixfx/flow";
-import { throwNumberTest } from '@ixfx/guards';
-
+import { numberTest, resultThrow } from '@ixfx/guards';
 import { get as getEasing, type EasingName } from './easing/index.js';
 import type { Interval } from "@ixfx/core";
 import { piPi } from "./util/pi-pi.js";
-
 
 /**
  * Interpolation options.
@@ -146,9 +144,11 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
   }
 
   const doTheEase = (_amt: number, _a: number, _b: number) => {
-    throwNumberTest(_a, ``, `a`);
-    throwNumberTest(_b, ``, `b`);
-    throwNumberTest(_amt, ``, `amount`);
+    resultThrow(
+      numberTest(_a, ``, `a`),
+      numberTest(_b, ``, `b`),
+      numberTest(_amt, ``, `amount`)
+    );
     _amt = handleAmount(_amt);
     return (1 - _amt) * _a + _amt * _b
   }
@@ -191,7 +191,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
     //interpolate(amount: number, options?: Partial<InterpolateOptions>): (a:number,b:number)=>number;
     const amount = handleAmount(pos1);
     readOpts(pos2);
-    throwNumberTest(amount, ``, `amount`);
+    resultThrow(numberTest(amount, ``, `amount`));
     return (aValue: number, bValue: number) => rawEase(amount, aValue, bValue);
   }
 };

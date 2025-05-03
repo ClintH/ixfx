@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
@@ -66,7 +66,7 @@ export const numericRange = function* (
   repeating = false,
   rounding?: number
 ) {
-  throwNumberTest(interval, `nonZero`);
+  resultThrow(numberTest(interval, `nonZero`));
 
   const negativeInterval = interval < 0;
   if (end === undefined) {
@@ -126,8 +126,10 @@ export const numericPercent = function (
   start = 0,
   end = 1
 ) {
-  throwNumberTest(interval, `percentage`, `interval`);
-  throwNumberTest(start, `percentage`, `start`);
-  throwNumberTest(end, `percentage`, `end`);
+  resultThrow(
+    numberTest(interval, `percentage`, `interval`),
+    numberTest(start, `percentage`, `start`),
+    numberTest(end, `percentage`, `end`)
+  );
   return numericRange(interval, start, end, repeating);
 };

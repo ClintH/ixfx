@@ -1,4 +1,4 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { integerTest, resultThrow } from "@ixfx/guards";
 import { toCartesian } from "../polar/conversions.js";
 import { Empty as PointEmpty } from "../point/empty.js";
 import type { Point } from "../point/point-type.js";
@@ -38,7 +38,7 @@ export const starburst = (
   origin: Point = PointEmpty,
   opts?: { readonly initialAngleRadian?: number }
 ): readonly Point[] => {
-  throwIntegerTest(points, `positive`, `points`);
+  resultThrow(integerTest(points, `positive`, `points`));
   const angle = (Math.PI * 2) / points;
   const angleHalf = angle / 2;
 

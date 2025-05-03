@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 import type { Point } from "./point-type.js";
 import { guard } from "./guard.js";
 import { fromCartesian as PolarFromCartesian } from "../polar/index.js";
@@ -28,9 +28,9 @@ export function rotate(
   amountRadian: number,
   origin?: Point
 ): Point | readonly Point[] {
-  if (origin === undefined) origin = { x: 0, y: 0 };
+  if (typeof origin === `undefined`) origin = { x: 0, y: 0 };
   guard(origin, `origin`);
-  throwNumberTest(amountRadian, ``, `amountRadian`);
+  resultThrow(numberTest(amountRadian, ``, `amountRadian`));
   const arrayInput = Array.isArray(pt);
 
   // no-op

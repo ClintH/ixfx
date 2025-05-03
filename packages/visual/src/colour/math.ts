@@ -1,38 +1,40 @@
+import type { Colour, Colourish, Hsl, Rgb } from './types.js';
+import { toColour, toCssColour } from './conversion.js';
+import { HslSpace } from './hsl.js';
+import { SrgbSpace } from './srgb.js';
 import { clamp } from '@ixfx/numbers';
-import { throwNumberTest } from '@ixfx/guards';
-import { structuredToColorJs } from './resolve-to-color.js';
-import type { Colourish } from './types.js';
-/**
- * Returns a variation of colour with its opacity multiplied by `amt`.
- * Value will be clamped to 0..1
- *
- * ```js
- * // Return a colour string for blue that is 50% opaque
- * multiplyOpacity(`blue`, 0.5);
- * // eg: `rgba(0,0,255,0.5)`
- *
- * // Returns a colour string that is 50% more opaque
- * multiplyOpacity(`hsla(200,100%,50%,50%`, 0.5);
- * // eg: `hsla(200,100%,50%,25%)`
- * ```
- *
- * [Named colours](https://html-color-codes.info/color-names/)
- * @param colour A valid CSS colour
- * @param amt Amount to multiply opacity by
- * @returns String representation of colour
- */
-export const multiplyOpacity = (colour: Colourish, amt: number): string => {
-  throwNumberTest(amt, `percentage`, `amt`);
 
-  const c = structuredToColorJs(colour);
-  const alpha = clamp((c.alpha ?? 0) * amt);
-  c.alpha = alpha;
-  return c.toString();
+export function multiplyOpacity(colourish: string, amount: number): string {
+  return withOpacity(colourish, o => clamp(o * amount));
+}
+
+export function withOpacity(colourish: string, fn: (scalarOpacity: number) => number): string;
+export function withOpacity(colourish: Hsl, fn: (scalarOpacity: number) => number): Hsl;
+export function withOpacity(colourish: Rgb, fn: (scalarOpacity: number) => number): Rgb;
+export function withOpacity(colourish: Colourish, fn: (scalarOpacity: number) => number): Colourish {
+  const colour = toColour(colourish);
+  let result: Colour | undefined;
+  switch (colour.space) {
+    case `hsl`:
+      result = HslSpace.withOpacity(colour, fn);
+      break;
+    case `srgb`:
+      result = SrgbSpace.withOpacity(colour, fn);
+      break;
+    default:
+      throw new Error(`Unknown space: '${ colour.space }'. Expected hsl, srgb, oklch`)
+  }
+  if (!result) throw new Error(`Is colour in correct form?`);
+  if (typeof colourish === `string`) {
+    // Convert back to string if input was a string
+    return toCssColour(result);
+  }
+  return result;
 };
 
-export const multiplySaturation = (colour: Colourish, amt: number): string => {
-  throwNumberTest(amt, `percentage`, `amt`);
-  const c = structuredToColorJs(colour);
-  c.s = (c.s ?? 0) * amt;
-  return c.toString();
-};
+// export const multiplySaturation = (colour: Colourish, amt: number): string => {
+//   throwNumberTest(amt, `percentage`, `amt`);
+//   const c = structuredToColorJs(colour);
+//   c.s = (c.s ?? 0) * amt;
+//   return c.toString();
+// };

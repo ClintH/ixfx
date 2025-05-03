@@ -1,4 +1,4 @@
-import { throwNumberTest } from "@ixfx/guards";
+import { numberTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Scales a percentage-scale number, ie: `v * t`.
@@ -15,7 +15,9 @@ export const proportion = (
   if (typeof v === `function`) v = v();
   if (typeof t === `function`) t = t();
 
-  throwNumberTest(v, `percentage`, `v`);
-  throwNumberTest(t, `percentage`, `t`);
+  resultThrow(
+    numberTest(v, `percentage`, `v`),
+    numberTest(t, `percentage`, `t`)
+  );
   return v * t;
 };

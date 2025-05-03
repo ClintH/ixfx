@@ -1,24 +1,18 @@
-import type { GuardResult } from "./types.js";
-/**
- * Throws if `value` is _undefined_ or _null_.
- * @param value
- * @param parameterName
- */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const nullUndef = (value: any, parameterName = `?`): GuardResult => {
+import type { Result } from "./types.js";
+
+export const nullUndefTest = <TValue>(value: TValue, parameterName = `?`): Result<TValue, string> => {
   if (typeof value === `undefined`) {
-    return [ false, `${ parameterName } param is undefined` ];
+    return { success: false, error: `${ parameterName } param is undefined` };
   }
-  if (value === null) return [ false, `${ parameterName } param is null` ];
-  return [ true ];
+  if (value === null) return { success: false, error: `${ parameterName } param is null` };
+  return { success: true, value };
 };
 
-export const throwNullUndef = (value: any, parameterName = `?`) => {
-  const r = nullUndef(value, parameterName);
-  if (r[ 0 ]) return;
-  throw new Error(r[ 1 ]);
-}
+// export const throwNullUndef = (value: any, parameterName = `?`) => {
+//   const r = nullUndef(value, parameterName);
+//   if (r[ 0 ]) return;
+//   throw new Error(r[ 1 ]);
+// }
 
-/** Throws an error if parameter is not defined */
-export const defined = <T>(argument: T | undefined): argument is T =>
+export const isDefined = <T>(argument: T | undefined): argument is T =>
   argument !== undefined;

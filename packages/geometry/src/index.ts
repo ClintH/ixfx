@@ -4,6 +4,8 @@ export * as Circles from './circle/index.js';
 export * as Lines from './line/index.js';
 export * as Rects from './rect/index.js';
 export * as Points from './point/index.js';
+export * from './point/point-tracker.js';
+
 export * as Paths from './path/index.js';
 export * as Grids from './grid/index.js';
 export * as Beziers from './bezier/index.js';

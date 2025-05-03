@@ -8,23 +8,25 @@
 		"dist/"
 	],
 	"dependencies": {
-		"tsdown": "0.8.1"
+		"tsdown": "0.10.1"
 	},
 	"devDependencies": {
-		"@ixfx/arrays": "latest",
-		"@ixfx/collections": "latest",
-		"@ixfx/core": "latest",
-		"@ixfx/debug": "latest",
-		"@ixfx/dom": "latest",
-		"@ixfx/events": "latest",
-		"@ixfx/flow": "latest",
-		"@ixfx/geometry": "latest",
-		"@ixfx/guards": "latest",
-		"@ixfx/iterables": "latest",
-		"@ixfx/modulation": "latest",
-		"@ixfx/numbers": "latest",
-		"@ixfx/random": "latest",
-		"@ixfx/rx": "latest",
-		"@ixfx/visual": "latest"
+		"@ixfx/arrays": "file:../packages/arrays/dist/src",
+		"@ixfx/collections": "file:../packages/collections/dist/src",
+		"@ixfx/core": "file:../packages/core/dist/src",
+		"@ixfx/debug": "file:../packages/debug/dist/src",
+		"@ixfx/dom": "file:../packages/dom/dist/src",
+		"@ixfx/events": "file:../packages/events/dist/src",
+		"@ixfx/flow": "file:../packages/flow/dist/src",
+		"@ixfx/geometry": "file:../packages/geometry/dist/src",
+		"@ixfx/guards": "file:../packages/guards/dist/src",
+		"@ixfx/iterables": "file:../packages/iterables/dist/src",
+		"@ixfx/numbers": "file:../packages/numbers/dist/src",
+		"@ixfx/process": "file:../packages/process/dist/src",
+		"@ixfx/random": "file:../packages/random/dist/src",
+		"@ixfx/rx": "file:../packages/rx/dist/src",
+		"@ixfx/trackers": "file:../packages/trackers/dist/src",
+		"@ixfx/ui": "file:../packages/ui/dist/src",
+		"@ixfx/visual": "file:../packages/visual/dist/src"
 	}
 }

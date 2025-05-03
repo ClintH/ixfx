@@ -1,6 +1,6 @@
 import { Grids } from '@ixfx/geometry';
-import type { Rgb, Rgb8Bit } from './colour/index.js';
-import { toRgb8bit } from './colour/index.js';
+import { SrgbSpace } from './colour/srgb.js';
+import type { Rgb, Rgb8Bit } from './colour/types.js';
 
 /**
  * Returns a {@link Grids.Grid} based on the provided `image`
@@ -78,7 +78,7 @@ export const setter = (image: ImageData): Grids.GridCellSetter<Rgb> => {
   const fn: Grids.GridCellSetter<Rgb> = (value: Rgb, cell: Grids.GridCell, bounds = `undefined`) => {
     const index = Grids.indexFromCell(g, cell, bounds);
     if (index === undefined) throw new Error(`Cell out of range. ${ cell.x },${ cell.y }`);
-    const pixel = toRgb8bit(value);
+    const pixel = SrgbSpace.to8bit(value);
     const pxIndex = index * 4;
     data[ pxIndex ] = pixel.r;
     data[ pxIndex + 1 ] = pixel.g;
@@ -119,7 +119,6 @@ export function* byColumn(image: ImageData) {
   const a = accessor(image);
   const g = grid(image);
 
-  //Grids.visitorRow
   for (let x = 0; x < g.cols; x++) {
     const col: Rgb8Bit[] = [];
     for (let y = 0; y < g.rows; y++) {

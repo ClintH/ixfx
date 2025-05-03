@@ -1,7 +1,7 @@
 import { SimpleEventEmitter } from '@ixfx/events';
 import { sortByValueProperty } from '@ixfx/core/maps';
 import { intervalToMs, type Interval } from '@ixfx/core';
-import { throwIntegerTest } from '@ixfx/guards';
+import { integerTest, resultThrow } from '@ixfx/guards';
 
 /**
  * Expiring map options
@@ -144,7 +144,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     super();
     this.capacity = opts.capacity ?? -1;
 
-    throwIntegerTest(this.capacity, `nonZero`, `capacity`);
+    resultThrow(integerTest(this.capacity, `nonZero`, `capacity`));
     this.store = new Map();
     //this.keyCount = 0;
 

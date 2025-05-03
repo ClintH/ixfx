@@ -1,4 +1,4 @@
-import { guardArray } from "@ixfx/guards";
+import { arrayTest, resultThrow } from "@ixfx/guards";
 import { weightedIndex } from "./weighted-index.js";
 import type { RandomSource } from "./types.js";
 
@@ -91,7 +91,7 @@ export const randomElement = <V>(
   array: ArrayLike<V>,
   rand: RandomSource = Math.random
 ): V => {
-  guardArray(array, `array`);
+  resultThrow(arrayTest(array, `array`));
   return array[ Math.floor(rand() * array.length) ];
 };
 

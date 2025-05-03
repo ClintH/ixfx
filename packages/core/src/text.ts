@@ -1,4 +1,4 @@
-import { integerTest, throwFromResult } from '@ixfx/guards';
+import { integerTest, resultThrow } from '@ixfx/guards';
 //export { string as random } from './random/String.js';
 
 //import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
@@ -143,8 +143,7 @@ export function* stringSegmentsWholeToFirst(source: string, delimiter = `.`) {
  * @returns 
  */
 export const abbreviate = (source: string, maxLength = 15) => {
-  // ✔️ Unit tested
-  throwFromResult(integerTest(maxLength, `aboveZero`, `maxLength`));
+  resultThrow(integerTest(maxLength, `aboveZero`, `maxLength`));
   if (typeof source !== `string`) throw new Error(`Parameter 'source' is not a string`);
 
   if (source.length > maxLength && source.length > 3) {
@@ -193,7 +192,7 @@ export const between = (
   const startPos = source.indexOf(start);
   if (startPos < 0) return;
 
-  if (end === undefined) end = start;
+  if (typeof end === `undefined`) end = start;
 
   const endPos = lastEndMatch
     ? source.lastIndexOf(end)
@@ -229,7 +228,7 @@ export const betweenChomp = (
   const startPos = source.indexOf(start);
   if (startPos < 0) return [ source, undefined ];
 
-  if (end === undefined) end = start;
+  if (typeof end === `undefined`) end = start;
 
   const endPos = lastEndMatch
     ? source.lastIndexOf(end)
@@ -254,7 +253,6 @@ export const indexOfCharCode = (
   start = 0,
   end = source.length - 1
 ): number => {
-  //eslint-disable-next-line functional/no-let
   for (let index = start; index <= end; index++) {
     if (source.codePointAt(index) === code) return index;
   }
@@ -301,7 +299,7 @@ export const splitByLength = (
   source: string | null,
   length: number
 ): readonly string[] => {
-  throwFromResult(integerTest(length, `aboveZero`, `length`));
+  resultThrow(integerTest(length, `aboveZero`, `length`));
   if (source === null) throw new Error(`source parameter null`);
   if (typeof source !== `string`) {
     throw new TypeError(`source parameter not a string`);
@@ -310,12 +308,9 @@ export const splitByLength = (
   // ✔ Unit tested
   const chunks = Math.ceil(source.length / length);
   const returnValue: string[] = [];
-  //eslint-disable-next-line functional/no-let
   let start = 0;
 
-  //eslint-disable-next-line functional/no-let
   for (let c = 0; c < chunks; c++) {
-    //eslint-disable-next-line functional/immutable-data
     returnValue.push(source.slice(start, start + length));
     start += length;
   }
@@ -510,7 +505,6 @@ export const unwrap = (
   source: string,
   ...wrappers: readonly string[]
 ): string => {
-  //eslint-disable-next-line functional/no-let
   let matched = false;
   do {
     matched = false;
@@ -568,11 +562,8 @@ export const lineSpan = (
   start: number,
   end: number
 ): LineSpan => {
-  //eslint-disable-next-line functional/no-let
   let s = -1;
-  //eslint-disable-next-line functional/no-let
   let endPos = -1;
-  //eslint-disable-next-line functional/no-let
   for (const [ index, r ] of ranges.entries()) {
     s = index;
     if (r.text.length === 0) continue;
@@ -581,7 +572,6 @@ export const lineSpan = (
     }
   }
 
-  //eslint-disable-next-line functional/no-let
   for (let index = s; index < ranges.length; index++) {
     const r = ranges[ index ];
     endPos = index;
@@ -619,19 +609,13 @@ export const splitRanges = (
   source: string,
   split: string
 ): readonly Range[] => {
-  //eslint-disable-next-line functional/no-let
   let start = 0;
-  //eslint-disable-next-line functional/no-let
   let text = ``;
   const ranges: Range[] = [];
-  //eslint-disable-next-line functional/no-let
   let index = 0;
-  //eslint-disable-next-line functional/no-let,unicorn/prevent-abbreviations
-  for (let i = 0; i < source.length; i++) {
-    if (source.indexOf(split, i) === i) {
-      //eslint-disable-next-line functional/no-let
-      const end = i;
-      //eslint-disable-next-line functional/immutable-data
+  for (let index_ = 0; index_ < source.length; index_++) {
+    if (source.indexOf(split, index_) === index_) {
+      const end = index_;
       ranges.push({
         text,
         start,
@@ -642,11 +626,10 @@ export const splitRanges = (
       text = ``;
       index++;
     } else {
-      text += source.charAt(i);
+      text += source.charAt(index_);
     }
   }
   if (start < source.length) {
-    //eslint-disable-next-line functional/immutable-data
     ranges.push({ text, start, index, end: source.length });
   }
   return ranges;
@@ -669,9 +652,7 @@ export const countCharsFromStart = (
   source: string,
   ...chars: readonly string[]
 ): number => {
-  //eslint-disable-next-line functional/no-let
   let counted = 0;
-  //eslint-disable-next-line functional/no-let
   for (let index = 0; index < source.length; index++) {
     if (chars.includes(source.charAt(index))) {
       counted++;

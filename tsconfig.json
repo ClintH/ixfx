@@ -8,10 +8,11 @@
 		"allowSyntheticDefaultImports": true,
 		"verbatimModuleSyntax": true,
 		"isolatedModules": true,
+		"removeComments": false,
 		"declaration": true,
 		"declarationMap": true,
 		"allowJs": true,
-		"checkJs": true,
+		"checkJs": false,
 		"incremental": false,
 		/* Linting */
 		"strict": true,

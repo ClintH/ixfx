@@ -10,6 +10,7 @@ import type { Rect, RectPositioned } from '../rect/rect-types.js';
 import { fromPoints as LinesFromPoints } from '../line/from-points.js';
 import type { Arc, ArcPositioned } from './arc-type.js';
 import type { CirclePositioned } from '../circle/circle-type.js';
+import { piPi } from '../pi.js';
 
 export type * from './arc-type.js';
 
@@ -18,16 +19,16 @@ export type * from './arc-type.js';
  * @param p Arc or number
  * @returns 
  */
-export const isArc = (p: unknown): p is Arc => (p as Arc).startRadian !== undefined && (p as Arc).endRadian !== undefined && (p as Arc).clockwise !== undefined;
+export const isArc = (p: unknown): p is Arc => typeof (p as Arc).startRadian !== `undefined` && typeof (p as Arc).endRadian !== `undefined` && typeof (p as Arc).clockwise !== `undefined`;
 
 /**
  * Returns true if parameter has a positioned (x,y) 
  * @param p Point, Arc or ArcPositiond
  * @returns 
  */
-export const isPositioned = (p: Point | Arc | ArcPositioned): p is Point => (p as Point).x !== undefined && (p as Point).y !== undefined;
+export const isPositioned = (p: Point | Arc | ArcPositioned): p is Point => typeof (p as Point).x !== `undefined` && typeof (p as Point).y !== `undefined`;
 
-const piPi = Math.PI * 2;
+//const piPi = Math.PI * 2;
 
 /**
  * Returns an arc from degrees, rather than radians
@@ -120,7 +121,7 @@ export const getStartEnd = (arc: ArcPositioned | Arc, origin?: Point): [ start: 
  */
 export const point = (arc: Arc | ArcPositioned, angleRadian: number, origin?: Point): Point => {
 
-  if (origin === undefined) {
+  if (typeof origin === `undefined`) {
     origin = isPositioned(arc) ? arc : { x: 0, y: 0 };
   }
   return {
@@ -134,21 +135,21 @@ export const point = (arc: Arc | ArcPositioned, angleRadian: number, origin?: Po
  * @param arc 
  */
 export const guard = (arc: Arc | ArcPositioned) => {
-  if (arc === undefined) throw new TypeError(`Arc is undefined`);
+  if (typeof arc === `undefined`) throw new TypeError(`Arc is undefined`);
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);
   }
-  if (arc.radius === undefined) throw new TypeError(`Arc radius is undefined (${ JSON.stringify(arc) })`);
+  if (typeof arc.radius === `undefined`) throw new TypeError(`Arc radius is undefined (${ JSON.stringify(arc) })`);
   if (typeof arc.radius !== `number`) throw new TypeError(`Radius must be a number`);
   if (Number.isNaN(arc.radius)) throw new TypeError(`Radius is NaN`);
   if (arc.radius <= 0) throw new TypeError(`Radius must be greater than zero`);
 
-  if (arc.startRadian === undefined) throw new TypeError(`Arc is missing 'startRadian' field`);
-  if (arc.endRadian === undefined) throw new TypeError(`Arc is missing 'startRadian' field`);
+  if (typeof arc.startRadian === `undefined`) throw new TypeError(`Arc is missing 'startRadian' field`);
+  if (typeof arc.endRadian === `undefined`) throw new TypeError(`Arc is missing 'startRadian' field`);
   if (Number.isNaN(arc.endRadian)) throw new TypeError(`Arc endRadian is NaN`);
   if (Number.isNaN(arc.startRadian)) throw new TypeError(`Arc endRadian is NaN`);
 
-  if (arc.clockwise === undefined) throw new TypeError(`Arc is missing 'clockwise field`);
+  if (typeof arc.clockwise === `undefined`) throw new TypeError(`Arc is missing 'clockwise field`);
   if (arc.startRadian >= arc.endRadian) throw new TypeError(`startRadian is expected to be les than endRadian`);
 };
 
@@ -202,7 +203,7 @@ export const toPath = (arc: ArcPositioned): Path => {
 
   return Object.freeze({
     ...arc,
-    nearest: (point: Point) => { throw new Error(`not implemented`); },
+    nearest: (_point: Point) => { throw new Error(`not implemented`); },
     interpolate: (amount: number) => interpolate(amount, arc),
     bbox: () => bbox(arc) as RectPositioned,
     length: () => length(arc),
@@ -285,16 +286,16 @@ type ToSvg = {
    * @param startRadian Start
    * @param endRadian End
    */
-  (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): ReadonlyArray<string>;
+  (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): readonly string[];
   /**
    * SVG path for non-positioned arc.
    * If `arc` does have a position, `origin` will override it.
    */
-  (arc: Arc, origin: Point, opts?: SvgOpts): ReadonlyArray<string>;
+  (arc: Arc, origin: Point, opts?: SvgOpts): readonly string[];
   /**
    * SVG path for positioned arc
    */
-  (arc: ArcPositioned, opts?: SvgOpts): ReadonlyArray<string>;
+  (arc: ArcPositioned, opts?: SvgOpts): readonly string[];
 };
 
 
@@ -347,7 +348,7 @@ export type SvgOpts = {
   readonly sweep?: boolean
 }
 
-const toSvgFull = (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): ReadonlyArray<string> => {
+const toSvgFull = (origin: Point, radius: number, startRadian: number, endRadian: number, opts?: SvgOpts): readonly string[] => {
   // https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
   // A rx ry x-axis-rotation large-arc-flag sweep-flag x y
   // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
@@ -365,7 +366,6 @@ const toSvgFull = (origin: Point, radius: number, startRadian: number, endRadian
     A ${ radius } ${ radius } 0 ${ largeArc ? `1` : `0` } ${ sweep ? `1` : `0` } ${ end.x } ${ end.y },
   `];
 
-  //eslint-disable-next-line functional/immutable-data
   if (isFullCircle) d.push(`z`);
 
   return d;

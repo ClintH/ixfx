@@ -1,4 +1,4 @@
-import { throwIntegerTest, throwNumberTest } from "@ixfx/guards";
+import { integerTest, numberTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Rounds `v` by `every`. Middle values are rounded up by default.
@@ -37,8 +37,11 @@ export const quantiseEvery = (
     every = Math.floor(multiplier * every);
     v = v * multiplier;
   }
-  throwNumberTest(v, ``, `v`);
-  throwIntegerTest(every, ``, `every`);
+
+  resultThrow(
+    numberTest(v, ``, `v`),
+    integerTest(every, ``, `every`)
+  );
 
   let div = v / every;
   const divModule = div % 1;

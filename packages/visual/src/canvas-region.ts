@@ -1,6 +1,6 @@
 import { scalerTwoWay, clamp } from "@ixfx/numbers";
 import { resolveEl, resolveElementTry } from "@ixfx/dom";
-import { resultErrorToString } from "@ixfx/core";
+import { resultErrorToString } from "@ixfx/guards";
 import type { Rect, RectPositioned } from "@ixfx/geometry/rect";
 import type { Point } from "@ixfx/geometry/point";
 import { Points, Rects } from "@ixfx/geometry";
@@ -37,7 +37,7 @@ export class CanvasSource {
   #sizeBasis: `min` | `max`;
   #sizeScaler;
   #logicalSize: Rect;
-  #pixelScaling;
+  #pixelScaling: number;
 
   #regions: CanvasRegion[] = [];
 
@@ -292,9 +292,9 @@ export class CanvasSource {
  * Draws on a canvas, constrained to a specific region
  */
 export class CanvasRegion {
-  source;
-  #regionCompute;
-  #r;
+  source: CanvasSource;
+  #regionCompute: (parent: CanvasSource) => RectPositioned;
+  #r: RectPositioned;
 
   /**
    * Creates, using coordinate in canvas coordinates

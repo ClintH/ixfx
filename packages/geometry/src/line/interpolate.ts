@@ -1,4 +1,4 @@
-import { throwNumberTest, throwPercentTest } from "@ixfx/guards";
+import { numberTest, percentTest, resultThrow } from "@ixfx/guards";
 import type { Point } from "../point/point-type.js";
 import type { Line } from "./line-type.js";
 import { getPointParameter } from "./get-points-parameter.js";
@@ -62,8 +62,8 @@ export function interpolate(amount: number, aOrLine: Point | Line, pointBOrAllow
   }
 
 
-  if (!allowOverflow) throwPercentTest(amount, `amount`);
-  else throwNumberTest(amount, ``, `amount`);
+  if (!allowOverflow) resultThrow(percentTest(amount, `amount`));
+  else resultThrow(numberTest(amount, ``, `amount`));
 
   const [ a, b ] = getPointParameter(aOrLine, pointBOrAllowOverflow);
 

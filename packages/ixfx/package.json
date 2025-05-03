@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/ixfx",
-	"version": "0.37.0",
+	"version": "0.38.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -9,22 +9,25 @@
 		"type": "git",
 		"url": "git+https://github.com/clinth/ixfx.git"
 	},
+	"files": [
+		"dist/*"
+	],
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
-			"import": "./src/index.ts"
+			"types": "./index.ts",
+			"import": "./index.ts"
 		},
 		"./numbers": {
-			"types": "./src/numbers.ts",
-			"import": "./src/numbers.ts"
+			"types": "./numbers.ts",
+			"import": "./numbers.ts"
 		},
 		"./visual": {
-			"types": "./src/visual.ts",
-			"import": "./src/visual.ts"
+			"types": "./visual.ts",
+			"import": "./visual.ts"
 		},
 		"./rx": {
-			"types": "./src/rx/index.ts",
-			"import": "./src/rx/index.ts"
+			"types": "./rx/index.ts",
+			"import": "./rx/index.ts"
 		}
 	},
 	"dependencies": {
@@ -45,25 +48,28 @@
 		"@ixfx/visual": "workspace:^"
 	},
 	"publishConfig": {
-		"main": "dist/src/index.js",
-		"types": "dist/src/index.d.ts",
+		"main": "dist/index.js",
+		"types": "dist/index.d.ts",
 		"exports": {
 			".": {
-				"types": "./dist/src/index.d.ts",
-				"import": "./dist/src/index.js"
+				"types": "./dist/index.d.ts",
+				"import": "./dist/index.js"
 			},
 			"./rx": {
-				"types": "./dist/src/rx/index.d.ts",
-				"import": "./dist/src/rx/index.js"
+				"types": "./dist/rx/index.d.ts",
+				"import": "./dist/rx/index.js"
 			},
 			"./numbers": {
-				"types": "./dist/src/numbers.d.ts",
-				"import": "./dist/src/numbers.js"
+				"types": "./dist/numbers.d.ts",
+				"import": "./dist/numbers.js"
 			},
 			"./visual": {
-				"types": "./dist/src/visual.d.ts",
-				"import": "./dist/src/visual.js"
+				"types": "./dist/visual.d.ts",
+				"import": "./dist/visual.js"
 			}
 		}
+	},
+	"devDependencies": {
+		"esbuild": "0.25.2"
 	}
 }

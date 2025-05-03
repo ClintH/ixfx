@@ -1,0 +1,109 @@
+//import type { ColorConstructor } from "./colorjs.types.js";
+//import Color from "./colorjs.js";
+import { hslFromCss, hslToCss, hslToScalar, isHsl } from "./hsl.js";
+import type { Colourish, Colour } from "./types.js";
+import { isRgb, rgbFromCss, rgbToCss } from "./rgb.js";
+import { isOklch, oklchToCss } from "./oklch.js";
+import { convert, hex2hsl } from "colorizr";
+import { cssDefinedHexColours } from "./css-colours.js";
+
+export const toCssString = (colour: Colourish): string => {
+  if (isHsl(colour)) {
+    return hslToCss(colour);
+  }
+  if (isRgb(colour)) {
+    return rgbToCss(colour);
+  }
+  if (isOklch(colour)) {
+    return oklchToCss(colour);
+  }
+
+  if (typeof colour !== `string`) throw new Error(`Param 'colour' is not in the expected format`);
+
+  // Assume string is already in CSS format
+  return colour;
+}
+
+const hexStringToColour = (hexString: string): Colour => {
+  const hsl = hex2hsl(hexString);
+  return hslToScalar({ ...hsl, opacity: hsl.alpha ?? 1, unit: `absolute`, space: `hsl` });
+}
+
+export const stringToColour = (colour: string): Colour => {
+  if (colour.startsWith(`#`)) {
+    return hexStringToColour(colour);
+  }
+  if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
+    return hexStringToColour(cssDefinedHexColours[ colour ] as string);
+  }
+
+  if (colour.startsWith(`--`)) {
+    const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
+    if (fromCss.startsWith(`#`)) {
+      return hexStringToColour(fromCss);
+    } else {
+      if (fromCss.startsWith(`rgb`)) return rgbFromCss(fromCss);
+      if (fromCss.startsWith(`hsl`)) return hslFromCss(fromCss);
+
+    }
+  }
+  throw new Error(`String colour is not a hex colour nor well-defined colour name`);
+
+}
+
+export const toColour = (colour: Colourish): Colour => {
+  if (typeof colour === `string`) return stringToColour(colour);
+
+
+  if (isHsl(colour)) return colour;
+  if (isRgb(colour)) return colour;
+  if (isOklch(colour)) return colour;
+  throw new Error(`Input value not in a parseable format`);
+}
+
+/**
+ * Gets a CSS variable.
+ * ```
+ * // Fetch --accent variable, or use `yellow` if not found.
+ * getCssVariable(`accent`, `yellow`);
+ * ```
+ * @param name Name of variable. Leading '--' is unnecessary
+ * @param fallbackColour Fallback colour if not found
+ * @param root  Element to search variable from
+ * @returns Colour or fallback.
+ */
+const getCssVariable = (
+  name: string,
+  fallbackColour = `black`,
+  root?: HTMLElement
+): string => {
+  if (typeof root === `undefined`) root = document.body;
+  if (name.startsWith(`--`)) name = name.slice(2);
+  const fromCss = getComputedStyle(root).getPropertyValue(`--${ name }`).trim();
+  if (fromCss === undefined || fromCss.length === 0) return fallbackColour;
+  return fromCss;
+};
+
+// export const structuredToColorJsConstructor = (colour: Colourish): ColorConstructor => {
+
+//   if (isHsl(colour, true)) {
+//     return hslToColorJs(colour);
+//   }
+//   if (isRgb(colour, true)) {
+//     return rgbToColorJs(colour);
+//   }
+//   if (isOklch(colour)) {
+//     return oklchToColorJs(colour);
+//   }
+//   const c = new Color(resolveCss(colour));
+//   return {
+//     alpha: c.alpha,
+//     coords: c.coords,
+//     spaceId: c.spaceId
+//   }
+// }
+
+// export const structuredToColorJs = (colour: Colourish): Color => {
+//   const cc = structuredToColorJsConstructor(colour);
+//   return new Color(cc.spaceId, cc.coords, cc.alpha);
+// }

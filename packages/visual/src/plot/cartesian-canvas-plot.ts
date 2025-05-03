@@ -13,7 +13,7 @@ import { Points, Rects } from "@ixfx/geometry";
 import type { Line } from "@ixfx/geometry/line";
 import type { Point } from "@ixfx/geometry/point";
 import { goldenAngleColour } from "../colour/generate.js";
-import { toString as ColourToString } from "../colour/to-hex.js";
+import { toCssColour as ColourToString } from "../colour/conversion.js";
 export type InsertOptions = {
   region?: CanvasRegionSpec
   /**
@@ -108,7 +108,7 @@ export const insert = (insertOptions: InsertOptions, options: RecursivePartial<C
 export class CartesianCanvasPlot {
   #data;
   #lastDataChange;
-  #canvasRegion;
+  #canvasRegion: CanvasRegion;
 
   actualDataRange: RectPositioned = Rects.EmptyPositioned;
   visibleRange: RectPositioned = Rects.PlaceholderPositioned;

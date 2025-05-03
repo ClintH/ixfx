@@ -1,6 +1,7 @@
-import { throwIntegerTest } from "@ixfx/guards";
+import { resultThrow, integerTest } from "@ixfx/guards";
 import type { ModSettable as ModuleSettable, ModSettableFeedback as ModuleSettableFeedback, ModSettableOptions as ModuleSettableOptions } from "../types.js";
 
+// eslint-disable-next-line unicorn/prevent-abbreviations
 export type TicksModSettableOptions = ModuleSettableOptions & {
   exclusiveStart: boolean
   exclusiveEnd: boolean
@@ -26,7 +27,7 @@ export type TicksModSettableOptions = ModuleSettableOptions & {
  * @returns 
  */
 export function ticks(totalTicks: number, options: Partial<TicksModSettableOptions> = {}): ModuleSettable {
-  throwIntegerTest(totalTicks, `aboveZero`, `totalTicks`);
+  resultThrow(integerTest(totalTicks, `aboveZero`, `totalTicks`));
   const exclusiveStart = options.exclusiveStart ?? false;
   const exclusiveEnd = options.exclusiveEnd ?? false;
   const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
