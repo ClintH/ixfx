@@ -54,8 +54,6 @@ export type Hsl = HslScalar | HslAbsolute;
  * * 'relative': 0..1 range for RGB & opacity
  * * '8bit': 0..255 range for RGB & opacity
  */
-//export type Rgb = { r: number; g: number; b: number; opacity?: number, unit: `scalar` | `8bit`, space?: `srgb` };
-
 export type RgbBase = { r: number; g: number; b: number; opacity?: number, space?: `srgb` };
 export type RgbScalar = RgbBase & { unit: `scalar` };
 
@@ -69,13 +67,57 @@ export const isRgb = (v: any): v is Rgb => {
   }
   return false;
 }
+
+/**
+ * If the input object has r,g&b properties, it will return a fully-
+ * formed Rgb type with `unit` and `space` properties.
+ * 
+ * If it lacks these basic three properties or they are out of range,
+ *  _undefined_ is returned.
+ * 
+ * If RGB values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
+ * If RGB values exceed 255, _undefined_ returned.
+ * @param v 
+ * @returns 
+ */
+export const tryParseObjectToRgb = (v: any): Rgb | undefined => {
+  if (!(`r` in v && `g` in v && `b` in v)) return;
+  if (!(`unit` in v)) {
+    if (v.r <= 1 && v.g <= 1 && v.b <= 1) {
+      v.unit = `scalar`;
+    } else if (v.r > 255 && v.g <= 255 && v.b <= 255) {
+      return; // out of range
+    } else {
+      v.unit = `8bit`;
+    }
+  }
+  if (!(`space` in v)) {
+    v.space = `srgb`;
+  }
+  return v as Rgb;
+}
+
+export const tryParseObjectToHsl = (v: any): Hsl | undefined => {
+  if (!(`h` in v && `s` in v && `l` in v)) return;
+  if (!(`unit` in v)) {
+    if (v.r <= 1 && v.g <= 1 && v.b <= 1) {
+      v.unit = `scalar`;
+    } else if (v.s > 100 && v.l <= 100) {
+      return; // out of range
+    } else {
+      v.unit = `absolute`;
+    }
+  }
+  if (!(`space` in v)) {
+    v.space = `hsl`;
+  }
+  return v as Hsl;
+}
 /**
  * RGB in 0...255 range, including opacity.
  */
 export type Rgb8Bit = RgbBase & { unit: `8bit` };
 export type Rgb = RgbScalar | Rgb8Bit;
-
-// export type Spaces = `hsl` | `hsluv` | `rgb` | `srgb` | `lch` | `oklch` | `oklab` | `okhsl` | `p3` | `lab` | `hcl` | `cubehelix`;
 
 export type LchBase = {
   /**

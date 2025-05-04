@@ -18,6 +18,7 @@
 		}
 	},
 	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
 		"@ixfx/core": "workspace:^",
 		"@ixfx/events": "workspace:^",
 		"@ixfx/geometry": "workspace:^",

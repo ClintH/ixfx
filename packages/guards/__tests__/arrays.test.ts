@@ -1,15 +1,28 @@
 import { test, expect } from 'vitest';
-
-import { arrayStringsTest } from '../src/arrays.js';
-import { ifNaN, percentTest, integerTest, integerParse, isInteger } from '../src/numbers.js';
-import { testPlainObjectOrPrimitive, testPlainObject } from '../src/object.js';
-
+import { arrayIndexTest, arrayStringsTest } from '../src/arrays.js';
 
 test(`isStringArray`, () => {
-  expect(arrayStringsTest([ `a`, `b`, `c` ])).toBe(true);
-  expect(arrayStringsTest([ 'a' ])).toBe(true);
-  expect(arrayStringsTest([ `a`, `b`, false ])).toBe(false);
-  expect(arrayStringsTest([ `a`, `b`, null ])).toBe(false);
-  expect(arrayStringsTest([ `a`, `b`, true ])).toBe(false);
-  expect(arrayStringsTest([ `a`, `b`, {} ])).toBe(false);
+  expect(arrayStringsTest([ `a`, `b`, `c` ]).success).toBeTruthy();
+  expect(arrayStringsTest([ 'a' ]).success).toBeTruthy();
+  expect(arrayStringsTest([ `a`, `b`, false ]).success).toBeFalsy();
+  expect(arrayStringsTest([ `a`, `b`, null ]).success).toBeFalsy();
+  expect(arrayStringsTest([ `a`, `b`, true ]).success).toBeFalsy();
+  expect(arrayStringsTest([ `a`, `b`, {} ]).success).toBeFalsy();
 });
+
+
+test(`arrayIndexTest`, () => {
+  expect(arrayIndexTest([ 1, 2, 3 ], -1).success).toBeFalsy();
+
+  expect(arrayIndexTest([ 1, 2, 3 ], 0).success).toBeTruthy();
+  expect(arrayIndexTest([ 1, 2, 3 ], 1).success).toBeTruthy();
+  expect(arrayIndexTest([ 1, 2, 3 ], 2).success).toBeTruthy();
+  expect(arrayIndexTest([ 1, 2, 3 ], 3).success).toBeFalsy();
+
+  expect(arrayIndexTest([ 1, 2, 3 ], false as any as number).success).toBeFalsy();
+  expect(arrayIndexTest([ 1, 2, 3 ], {} as any as number).success).toBeFalsy();
+  expect(arrayIndexTest([ 1, 2, 3 ], Number.NaN).success).toBeFalsy();
+  expect(arrayIndexTest([ 1, 2, 3 ], `hello` as any as number).success).toBeFalsy();
+
+
+})

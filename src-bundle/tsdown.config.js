@@ -18,6 +18,7 @@ const entry = {
   iterables: './src/iterables.ts',
   geometry: './src/geometry.ts',
   modulation: './src/modulation.ts',
+  easings: './src/easings.ts',
   numbers: './src/numbers.ts',
   process: './src/process.ts',
   random: './src/random.ts',
@@ -29,7 +30,7 @@ const entry = {
 
 export default defineConfig({
   entry,
-  clean: false,
+  clean: true,
   // noExternal: [
   //   `@ixfxfun/core`,
   //   `@ixfxfun/dom`,
@@ -44,7 +45,7 @@ export default defineConfig({
   // ],
   platform: `browser`,
   sourcemap: true,
-  outDir: `./tsdown`,
+  outDir: `../../ixfxfun/demos/ixfx`,
   format: ['esm'],
   dts: {
     resolve: !0

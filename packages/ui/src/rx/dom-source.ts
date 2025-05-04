@@ -75,7 +75,7 @@ export function domHslInputValue(targetOrQuery: HTMLInputElement | string, optio
       return Colour.HslSpace.fromCssScalar(input.last(), { ensureSafe: true })
     },
     set(value) {
-      input.set(Colour.HslSpace.toCss(value));
+      input.set(Colour.HslSpace.toCssString(value));
     },
   };
 }
@@ -279,7 +279,7 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
         entries.push([ k, vBool ]);
       } else if (typeHint === `colour`) {
         const vRgb = Colour.toCssColour(vString);
-        entries.push([ k, Colour.RgbSpace.fromCss(vRgb) ]);
+        entries.push([ k, Colour.RgbSpace.fromCss8bit(vRgb) ]);
       } else {
         entries.push([ k, v.toString() ]);
       }

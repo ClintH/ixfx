@@ -1,11 +1,9 @@
-import expect from 'expect';
-import { perSecond } from '../../modulation/source/PerSecond.js';
-import * as Flow from '../../flow/index.js';
-import { round } from "../../numbers/Round.js";
-import * as Arrays from '../../data/arrays/index.js';
-import { isApprox } from "../../numbers/IsApprox.js";
+import { test, expect } from 'vitest';
+import { perSecond } from '../src/source/per-second.js';
+import * as Flow from '@ixfx/flow';
+import { isApprox } from "@ixfx/numbers";
 
-function arrayIsApprox(t: ExecutionContext, values: number[], baseValue: number, pc = 0.015) {
+function arrayIsApprox(values: number[], baseValue: number, pc = 0.015) {
   for (const v of values) {
     expect(isApprox(pc, baseValue, v)).toBe(true);
   }
@@ -14,11 +12,11 @@ function arrayIsApprox(t: ExecutionContext, values: number[], baseValue: number,
 test(`per-second`, async () => {
   const r1 = perSecond(1000);
   const r1R = await Array.fromAsync(Flow.repeat(r1, { count: 4, delay: 100 }));
-  arrayIsApprox(t, r1R, 100, 0.02);
+  arrayIsApprox(r1R, 100, 0.02);
 
   const r2 = perSecond(1000);
   const r2R = await Array.fromAsync(Flow.repeat(r2, { count: 2, delay: 500 }));
-  arrayIsApprox(t, r2R, 500);
+  arrayIsApprox(r2R, 500);
 
   // Overflow
   const r3 = perSecond(1000);

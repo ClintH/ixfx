@@ -139,5 +139,6 @@ export const cssDefinedHexColours = {
   "white": "#ffffff",
   "whitesmoke": "#f5f5f5",
   "yellow": "#ffff00",
-  "yellowgreen": "#9acd32"
+  "yellowgreen": "#9acd32",
+  "transparent": "#00000000"
 }

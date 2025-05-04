@@ -1,46 +1,65 @@
 import * as C from "colorizr";
-import { isColourish, isHsl, isRgb, type Colour, type Colourish } from "./types.js";
+import { isColourish, isHsl, isRgb, tryParseObjectToHsl, tryParseObjectToRgb, type Colour, type Colourish } from "./types.js";
 import { SrgbSpace } from "./srgb.js";
 import { HslSpace } from './hsl.js';
 import { cssDefinedHexColours } from "./css-colours.js";
 
-const hexStringToColour = (hexString: string): Colour => {
-  const rgb = C.hex2rgb(hexString);
-  return SrgbSpace.fromLibrary(rgb);
-}
 
 export const toCssColour = (colour: any): string => {
   if (typeof colour === `string`) return colour;
 
   if (isHsl(colour)) {
-    return HslSpace.toCss(colour);
+    return HslSpace.toCssString(colour);
   }
   if (isRgb(colour)) {
-    return SrgbSpace.toCss(colour);
+    return SrgbSpace.toCssString(colour);
   }
+
+  const asRgb = tryParseObjectToRgb(colour);
+  if (asRgb) return SrgbSpace.toCssString(asRgb);
+
+  const asHsl = tryParseObjectToHsl(colour);
+  if (asHsl) return HslSpace.toCssString(asHsl);
 
   throw new Error(`Unknown colour format: '${ JSON.stringify(colour) }'`);
 
 }
 
+/**
+ * Converts from some kind of colour that is legal in CSS
+ * 
+ * Handles: hex format, CSS variables, colour names
+ * to an object
+ * @param colour 
+ * @returns 
+ */
 export const fromCssColour = (colour: string): Colour => {
   if (colour.startsWith(`#`)) {
-    return hexStringToColour(colour);
+    return SrgbSpace.fromHexString(colour);
   }
 
   if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
-    return hexStringToColour(cssDefinedHexColours[ colour ] as string);
+    return SrgbSpace.fromHexString(cssDefinedHexColours[ colour ] as string);
   }
-
   if (colour.startsWith(`--`)) {
     const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
-    if (fromCss.length === 0) throw new Error(`Variable missing: ${ colour }`);
-    if (fromCss.startsWith(`#`)) hexStringToColour(fromCss);
-    if (fromCss.startsWith(`rgb`)) return SrgbSpace.fromCss(fromCss);
-    if (fromCss.startsWith(`hsl`)) return HslSpace.fromCssScalar(fromCss);
-    throw new Error(`CSS variable value not a hex, rgb or hsl colour function: '${ fromCss }'`);
+    if (fromCss.length === 0 || fromCss === null) throw new Error(`Variable missing: ${ colour }`);
+    return fromCssColour(fromCss);
   }
-  throw new Error(`String colour is not a hex colour nor well-defined colour name`);
+  colour = colour.toLowerCase();
+  if (colour.startsWith(`hsl(`) || colour.startsWith(`hsla(`)) {
+    return HslSpace.fromCssAbsolute(colour);
+  }
+  if (colour.startsWith(`rgb(`) || colour.startsWith(`rgba(`)) {
+    return SrgbSpace.fromCss8bit(colour);
+  }
+
+  throw new Error(`String colour is not a hex colour nor well-defined colour name: '${ colour }'`);
+}
+
+export const convert = (colour: string, destination: 'hex' | 'hsl' | 'oklab' | 'oklch' | 'srgb' | `rgb`): string => {
+  if (destination === `srgb`) destination = `rgb`;
+  return C.convert(colour, destination);
 }
 
 export const guard = (colour: Colour) => {

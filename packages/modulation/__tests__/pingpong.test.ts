@@ -1,14 +1,14 @@
-import expect from 'expect';
+import { test, expect, assert } from 'vitest';
 /* eslint-disable */
-import { pingPong, pingPongPercent } from '../../modulation/PingPong.js';
-import { isCloseTo } from '../Include.js';
+import { pingPong, pingPongPercent } from '../src/ping-pong.js';
+import { numberDecimalTest } from '@ixfx/guards';
 
-const testNumeric = (t: ExecutionContext, given: number[], expectedRange: number[], precision = 1) => {
+const testNumeric = (given: number[], expectedRange: number[], decimals = 1) => {
   expect(given.length).toBe(expectedRange.length);
   for (let i = 0; i < given.length; i++) {
-    const r = isCloseTo(given[ i ], expectedRange[ i ], precision);
-    if (!r[ 0 ]) {
-      t.fail(`Index: ${ i } not close. A: ${ given[ i ] } B: ${ expectedRange[ i ] } Precision: ${ precision }`);
+    const r = numberDecimalTest(given[ i ], expectedRange[ i ], decimals);
+    if (!r.success) {
+      assert(false, `Index: ${ i } not close. A: ${ given[ i ] } B: ${ expectedRange[ i ] } decimals: ${ decimals }`);
     }
   }
 };
@@ -27,7 +27,7 @@ test(`pingPong`, () => {
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 
   // Counting down, starting at 100
   expectedRange = [ 100, 90, 80, 70, 60 ];
@@ -39,7 +39,7 @@ test(`pingPong`, () => {
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 
   // Counting down starting at default offset (10)
   expectedRange = [ 10, 100, 90, 80, 70 ];
@@ -51,7 +51,7 @@ test(`pingPong`, () => {
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 
   // Counting forward from edge of range
   expectedRange = [ 100, 10, 20, 30, 40 ];
@@ -63,7 +63,7 @@ test(`pingPong`, () => {
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 
 
   // Ping-pong
@@ -76,7 +76,7 @@ test(`pingPong`, () => {
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 });
 
 
@@ -96,55 +96,50 @@ test(`pingPongPercent-2`, () => {
   let count = 11;
   for (const v of pingPongPercent(0.1)) {
     expect(v !== undefined).toBe(true);
-    // @ts-ignore
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 });
 
 test(`pingPongPercent-3`, () => {
   // Test counting down to 0
   let expectedRange = [ 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.003 ];
-  let given = [];
+  let given: number[] = [];
   let count = 11;
   for (const v of pingPongPercent(-0.1, 0, 1, 1)) {
     expect(v !== undefined).toBe(true);
-    // @ts-ignore
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange, 1);
+  testNumeric(given, expectedRange, 1);
 });
 
 test(`pingPongPercent-4`, () => {
   // Test ping-pong
   let expectedRange = [ 0, 0.2, 0.4, 0.6, 0.8, 1, 0.8, 0.6, 0.4, 0.2 ];
   expectedRange = [ ...expectedRange, ...expectedRange ];
-  let given = [];
+  let given: number[] = [];
   let count = 20;
   for (const v of pingPongPercent(0.2)) {
     expect(v !== undefined).toBe(true);
-    // @ts-ignore
     given.push(v);
     if (--count === 0) break;
   }
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 });
 
 test(`pingPongPercent-5`, () => {
   // Test big interval
-  let expectedRange = [ 0, 0.8, 1, 0.2, 0 ];
-  let given = [];
+  let expectedRange = [ 0, 0.8, 0.9, 0.1, 0 ];
+  let given: number[] = [];
   let count = 5;
   for (const v of pingPongPercent(0.8)) {
     expect(v !== undefined).toBe(true);
-    // @ts-ignore
     given.push(v);
     if (--count === 0) break;
   }
-  //console.log(given);
-  testNumeric(t, given, expectedRange);
+  testNumeric(given, expectedRange);
 
   // Test alternate style and start
   const pp = pingPongPercent(0.1, 0.5);

@@ -2,7 +2,7 @@ import { test, expect, assert } from 'vitest';
 import * as Arrays from '../src/index.js';
 import { mergeByKey } from '../src/merge-by-key.js';
 
-test(`atWrap`, () => {
+test(`at-wrap`, () => {
   const array = [ 1, 2, 3 ];
   expect(Arrays.atWrap(array, 0)).toBe(1);
   expect(Arrays.atWrap(array, 1)).toBe(2);
@@ -32,8 +32,7 @@ test('pairwise', () => {
 
   expect(() => [ ...Arrays.pairwise([]) ]).toThrow();
   expect(() => [ ...Arrays.pairwise([ 1 ]) ]).toThrow();
-  // @ts-expect-error
-  expect(() => [ ...pairwise('hello') ]).toThrow();
+  expect(() => [ ...Arrays.pairwise('hello' as any as []) ]).toThrow();
 
 });
 
@@ -103,12 +102,9 @@ test('containsDuplicateValues', () => {
   )).toBe(false);
   expect(Arrays.containsDuplicateValues([])).toBe(false);
 
-  //@ts-ignore
-  expect(() => Arrays.containsDuplicateValues(undefined)).toThrow();
-  //@ts-ignore
-  expect(() => Arrays.containsDuplicateValues(null)).toThrow();
-  //@ts-ignore
-  expect(() => Arrays.containsDuplicateValues('hello')).toThrow();
+  expect(() => Arrays.containsDuplicateValues(undefined as any as [])).toThrow();
+  expect(() => Arrays.containsDuplicateValues(null as any as [])).toThrow();
+  expect(() => Arrays.containsDuplicateValues('hello' as any as [])).toThrow();
 });
 
 type Person = {
@@ -190,8 +186,7 @@ test(`pairwise-reduce`, () => {
   const t4 = Arrays.pairwiseReduce([ `a` ], reducer, `!`);
   expect(t4).toBe(`!`);
 
-  // @ts-ignore
-  expect(() => pairwiseReduce(`hello`, reducer, ``)).toThrow();
+  expect(() => Arrays.pairwiseReduce(`hello` as any as [], reducer, ``)).toThrow();
 });
 
 test(`mergeByKey`, () => {
@@ -213,7 +208,7 @@ test(`mergeByKey`, () => {
   expect(t1.includes(`2-5`)).toBe(true);
 
   // Test with empty second param
-  const a4: Array<string> = [];
+  const a4: string[] = [];
   const t2 = mergeByKey(keyFunction, reconcileFunction, a1, a4);
   expect(t2.length).toBe(4);
   expect(t2.includes(`1-1`)).toBe(true);
@@ -237,8 +232,7 @@ test(`remove`, () => {
   // Index past length
   expect(() => Arrays.remove([ 1, 2, 3 ], 3)).toThrow();
   // Not an array
-  // @ts-ignore
-  expect(() => remove(10, 3)).toThrow();
+  expect(() => Arrays.remove(10 as any as [], 3)).toThrow();
 });
 
 test(`ensureLength`, () => {
@@ -305,10 +299,7 @@ test(`zip`, () => {
   expect(() => Arrays.zip(a, d)).toThrow();
 
   // Throw if not array
-  // @ts-expect-error
-  expect(() => zip(a, `potato`)).toThrow();
-  // @ts-expect-error
-  expect(() => zip(undefined)).toThrow();
-  // @ts-expect-error
-  expect(() => zip(`hello`)).toThrow();
+  expect(() => Arrays.zip(a, `potato` as any as [])).toThrow();
+  expect(() => Arrays.zip(undefined as any as [])).toThrow();
+  expect(() => Arrays.zip(`hello` as any as [])).toThrow();
 });

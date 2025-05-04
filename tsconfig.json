@@ -33,7 +33,6 @@
     { "path": "packages/geometry" },
     { "path": "packages/guards" },
     { "path": "packages/iterables" },
-    { "path": "packages/ixfx" },
     { "path": "packages/modulation" },
     { "path": "packages/numbers" },
     { "path": "packages/process" },

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { test, expect, assert } from 'vitest';
 import * as R from '../src/index.js';
@@ -91,29 +91,29 @@ test(`integer`, () => {
     minInclusive: 0,
     maxExclusive: 5
   });
-  expect(r1[ 0 ], r1[ 1 ]).toBeTruthy();
+  expect(r1.success).toBeTruthy();
 
   const r2 = rangeIntegerTest(repeat(runs, () => R.integer(-5)), {
     minInclusive: -5,
     maxInclusive: 0
   });
-  expect(r2[ 0 ], r2[ 1 ]).toBeTruthy();
+  expect(r2.success).toBeTruthy();
 
   // Max-min
   expect(rangeIntegerTest(repeat(runs, () => R.integer({ max: 10, min: 5 })), {
     minInclusive: 5,
     maxExclusive: 10
-  })[ 0 ]).toBeTruthy();
+  }).success).toBeTruthy();
 
   expect(rangeIntegerTest(repeat(runs, () => R.integer({ max: -5, min: -10 })), {
     minInclusive: -10,
     maxExclusive: -5
-  })[ 0 ]).toBeTruthy();
+  }).success).toBeTruthy();
 
   expect(rangeIntegerTest(repeat(runs, () => R.integer({ max: 5, min: -5 })), {
     minInclusive: -5,
     maxExclusive: 5
-  })[ 0 ]).toBeTruthy();
+  }).success).toBeTruthy();
 
   // Dodgy input
   expect(() => R.integer({ max: 5, min: 10 })).toThrow();
@@ -129,16 +129,16 @@ test('float', () => {
   expect(rangeTest(repeat(runs, () => R.float(10)), {
     minInclusive: 0,
     maxExclusive: 10
-  })[ 0 ]).toBeTruthy();
+  }).success).toBeTruthy();
 
   expect(rangeTest(repeat(runs, () => R.float(-10)), {
     minInclusive: -10,
     maxExclusive: 0
-  })[ 0 ]).toBeTruthy();
+  }).success).toBeTruthy();
 
   expect(rangeTest(repeat(runs, () => R.float({ min: -10, max: 10 })), {
     minInclusive: -10,
     maxExclusive: 10
-  })[ 0 ]).toBeTruthy();
+  }).success).toBeTruthy();
 });
 

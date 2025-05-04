@@ -10,6 +10,9 @@
 	"dependencies": {
 		"tsdown": "0.10.1"
 	},
+	"scripts": {
+		"build": "tsdown "
+	},
 	"devDependencies": {
 		"@ixfx/arrays": "file:../packages/arrays/dist/src",
 		"@ixfx/collections": "file:../packages/collections/dist/src",

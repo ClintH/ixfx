@@ -15,6 +15,10 @@
 		"./colour": {
 			"types": "./src/colour/index.ts",
 			"import": "./src/colour/index.ts"
+		},
+		"./drawing": {
+			"types": "./src/drawing/index.ts",
+			"import": "./src/drawing/index.ts"
 		}
 	},
 	"dependencies": {
@@ -40,6 +44,10 @@
 			"./colour": {
 				"types": "./dist/src/colour/index.d.ts",
 				"import": "./dist/src/colour/index.js"
+			},
+			"./drawing": {
+				"types": "./dist/src/drawing/index.d.ts",
+				"import": "./dist/src/drawing/index.js"
 			}
 		}
 	}

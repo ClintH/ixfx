@@ -1,4 +1,4 @@
-import { numberTest, resultThrow } from "@ixfx/guards";
+import { numberTest, resultThrow, type Result } from "@ixfx/guards";
 import { round } from "./round.js";
 
 /**
@@ -103,9 +103,41 @@ export function isApprox(
   }
 }
 
-export const isCloseTo = (a: number, b: number, precision = 3) => {
-  const aa = a.toPrecision(precision);
-  const bb = b.toPrecision(precision);
-  if (aa !== bb) return [ false, `A is not close enough to B. A: ${ a } B: ${ b } Precision: ${ precision }` ];
-  else return [ true ];
+// export const isCloseTo = (a: number, b: number, precision = 3):Result<number,string> => {
+//   const aa = a.toPrecision(precision);
+//   const bb = b.toPrecision(precision);
+//   if (aa !== bb) return [ false, `A is not close enough to B. A: ${ a } B: ${ b } Precision: ${ precision }` ];
+//   else return [ true ];
+// }
+
+/**
+ * Yields a function that checks if a value is close to any target value
+ * ```js
+ * const c = isCloseToAny(1, 10, 20, 30, 40);
+ * c(11); // True - within 1 range of 10
+ * c(19); // True - within 1 range of 20
+ * c(0);  // False
+ * ```
+ * 
+ * Returned function accepts multiple values, returning
+ * _true_ if any of them are within range
+ * ```js
+ * c(0, 1, 11); // Would return true based on 11
+ * ```
+ * @param allowedRangePercentage 
+ * @param targets 
+ * @returns 
+ */
+export const isCloseToAny = (allowedRangeAbsolute: number, ...targets: number[]) => {
+  const targetsMin = targets.map(t => t - allowedRangeAbsolute);
+  const targetsMax = targets.map(t => t + allowedRangeAbsolute);
+
+  return (...values: number[]) => {
+    for (const v of values) {
+      for (let index = 0; index < targets.length; index++) {
+        if (v >= targetsMin[ index ] && v <= targetsMax[ index ]) return true;
+      }
+    }
+    return false;
+  }
 }

@@ -263,6 +263,9 @@ importers:
 
   packages/modulation:
     dependencies:
+      '@ixfx/arrays':
+        specifier: workspace:^
+        version: link:../arrays
       '@ixfx/core':
         specifier: workspace:^
         version: link:../core

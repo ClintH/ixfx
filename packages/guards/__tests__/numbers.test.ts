@@ -1,23 +1,45 @@
 import { test, expect } from 'vitest';
-import { ifNaN, percentTest, integerTest, integerParse, isInteger, integerArrayTest } from '../src/numbers.js';
+import { ifNaN, percentTest, integerTest, integerParse, isInteger, integerArrayTest, numberDecimalTest } from '../src/numbers.js';
 
 test('ifNaN', () => {
   expect(ifNaN(Number.NaN, 10)).toBe(10);
   expect(ifNaN(200, 10)).toBe(200);
-  // @ts-ignore
   expect(() => ifNaN(null, 10)).toThrow();
-  // @ts-ignore
   expect(() => ifNaN(undefined, 10)).toThrow();
-  // @ts-ignore
   expect(() => ifNaN('100', 10)).toThrow();
 });
 
 test(`integerArrayTest`, () => {
-  expect(integerArrayTest([ 1, 2, 3 ])[ 0 ]).toBeTruthy()
-  expect(integerArrayTest([ 1, 2.3, 3 ])[ 0 ]).toBeFalsy();
+  expect(integerArrayTest([ 1, 2, 3 ]).success).toBeTruthy()
+  expect(integerArrayTest([ 1, 2.3, 3 ]).success).toBeFalsy();
 
 
 })
+
+test(`numberDecimalTest`, () => {
+  expect(numberDecimalTest(10, 10, 0).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.1234, 0).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10, 0).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.5, 0).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 9, 0).success).toBeFalsy();
+
+  expect(numberDecimalTest(10.1234, 10.1234, 4).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.12345, 4).success).toBeTruthy();
+
+  expect(numberDecimalTest(10.1234, 10.1235, 3).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.123, 3).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.124, 3).success).toBeFalsy();
+
+  expect(numberDecimalTest(10.1234, 10.1234, 2).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.12356, 2).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.124, 2).success).toBeTruthy();
+  expect(numberDecimalTest(10.1234, 10.2, 2).success).toBeFalsy();
+  expect(numberDecimalTest(10.1234, 11, 2).success).toBeFalsy();
+
+
+
+});
+
 test('isInteger', () => {
   // Nunber inputs
   expect(isInteger(1)).toBe(true);
@@ -44,40 +66,36 @@ test('isInteger', () => {
 });
 
 test(`percent`, () => {
-  expect(percentTest(2)[ 0 ]).toBe(false);
-  expect(percentTest(-2)[ 0 ]).toBe(false);
-  expect(percentTest(Number.NaN)[ 0 ]).toBe(false);
+  expect(percentTest(2).success).toBe(false);
+  expect(percentTest(-2).success).toBe(false);
+  expect(percentTest(Number.NaN).success).toBe(false);
   // @ts-expect-error
-  expect(percentTest(`string`)[ 0 ]).toBe(false);
+  expect(percentTest(`string`).success).toBe(false);
   // @ts-expect-error
-  expect(percentTest(true)[ 0 ]).toBe(false);
+  expect(percentTest(true).success).toBe(false);
   // @ts-expect-error
-  expect(percentTest(false)[ 0 ]).toBe(false);
+  expect(percentTest(false).success).toBe(false);
   // @ts-expect-error
-  expect(percentTest({ a: true })[ 0 ]).toBe(false);
+  expect(percentTest({ a: true }).success).toBe(false);
 
-  expect(percentTest(1)[ 0 ]).toBe(true);
-  expect(percentTest(0)[ 0 ]).toBe(true);
-  expect(percentTest(0.5)[ 0 ]).toBe(true);
+  expect(percentTest(1).success).toBe(true);
+  expect(percentTest(0).success).toBe(true);
+  expect(percentTest(0.5).success).toBe(true);
 });
 
 test(`integer`, () => {
-  // @ts-ignore
-  expect(integerTest(`string`)[ 0 ]).toBe(false);
-  // @ts-ignore
-  expect(integerTest(true)[ 0 ]).toBe(false);
-  // @ts-ignore
-  expect(integerTest(false)[ 0 ]).toBe(false);
-  // @ts-ignore
-  expect(integerTest({ a: true })[ 0 ]).toBe(false);
+  expect(integerTest(`string`).success).toBe(false);
+  expect(integerTest(true).success).toBe(false);
+  expect(integerTest(false).success).toBe(false);
+  expect(integerTest({ a: true }).success).toBe(false);
 
-  expect(integerTest(-0.5)[ 0 ]).toBe(false);
-  expect(integerTest(0.5)[ 0 ]).toBe(false);
-  expect(integerTest(Number.NaN)[ 0 ]).toBe(false);
+  expect(integerTest(-0.5).success).toBe(false);
+  expect(integerTest(0.5).success).toBe(false);
+  expect(integerTest(Number.NaN).success).toBe(false);
 
-  expect(integerTest(0)[ 0 ]).toBe(true);
-  expect(integerTest(1)[ 0 ]).toBe(true);
-  expect(integerTest(100)[ 0 ]).toBe(true);
+  expect(integerTest(0).success).toBe(true);
+  expect(integerTest(1).success).toBe(true);
+  expect(integerTest(100).success).toBe(true);
 });
 
 test(`integerParse`, () => {

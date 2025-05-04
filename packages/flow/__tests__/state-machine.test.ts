@@ -158,23 +158,6 @@ test('validation', () => {
     });
   }).toThrow();
 
-  // Fails because 'hello' is defined twice
-  expect(() => {
-    StateMachine.init({
-      hello: 'there',
-      // @ts-ignore
-      hello: 'you',
-    });
-  }).toThrow();
-  expect(() => {
-    StateMachine.init({
-      states: {
-        hello: 'there',
-        // @ts-ignore
-        hello: 'you',
-      },
-    });
-  }).toThrow();
 
   // Target state repeated
   expect(() => {

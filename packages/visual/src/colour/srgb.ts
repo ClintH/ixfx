@@ -1,7 +1,8 @@
 import * as C from "colorizr";
-import type { Rgb, Rgb8Bit, RgbScalar } from "./types.js";
+import type { ParsingOptions, Rgb, Rgb8Bit, RgbScalar } from "./types.js";
 import { numberInclusiveRangeTest, numberTest } from "@ixfx/guards";
 import { resultThrow } from "@ixfx/guards";
+import { cssDefinedHexColours } from "./css-colours.js";
 
 const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
   switch (value.unit) {
@@ -18,19 +19,51 @@ const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value:
   }
 }
 
-const fromCss = (value: string): Rgb8Bit => {
-  if (value.startsWith(`rgb`)) throw new Error(`Expecting CSS string in the form of 'rgb(...)'. Got: '${ value }'`);
+const fromHexString = (hexString: string): Rgb8Bit => SrgbSpace.fromLibrary(C.hex2rgb(hexString));
+const srgbTansparent: Rgb8Bit = Object.freeze({
+  r: 0, g: 0, b: 0, opacity: 0, unit: `8bit`, space: `srgb`
+});
+
+const fromCss8bit = (value: string, options: ParsingOptions<Rgb8Bit> = {}): Rgb8Bit => {
+  value = value.toLowerCase();
+  if (value.startsWith(`#`)) {
+    return fromHexString(value);
+
+  }
+  if (value === `transparent`) return srgbTansparent;
+  if (typeof cssDefinedHexColours[ value ] !== `undefined`) {
+    return fromHexString(cssDefinedHexColours[ value ] as string);
+  }
+
+  if (!value.startsWith(`rgb(`) && !value.startsWith(`rgba(`)) {
+    try {
+      const converted = C.convert(value, `rgb`);
+      value = converted;
+    } catch (e) {
+      if (options.fallbackString) {
+        value = options.fallbackString;
+      } else {
+        throw e;
+      }
+    }
+  }
   const c = C.extractColorParts(value);
   if (c.model !== `rgb`) throw new Error(`Expecting RGB colour space. Got: ${ c.model }`);
   return fromLibrary(c as any as C.RGB);
 }
 
-const toCss = (rgb: Rgb): string => {
+const toCssString = (rgb: Rgb): string => {
   guard(rgb);
   switch (rgb.unit) {
     case `8bit`:
+      if (rgb.opacity === undefined || rgb.opacity === 255) {
+        return `rgb(${ rgb.r } ${ rgb.b } ${ rgb.g })`;
+      }
       return `rgb(${ rgb.r } ${ rgb.b } ${ rgb.g } / ${ (rgb.opacity ?? 255) / 255 })`;
     case `scalar`:
+      if (rgb.opacity === undefined || rgb.opacity === 1) {
+        return `rgb(${ rgb.r * 100 }% ${ rgb.b * 100 }% ${ rgb.g * 100 }%)`;
+      }
       return `rgb(${ rgb.r * 100 }% ${ rgb.b * 100 }% ${ rgb.g * 100 }% / ${ (rgb.opacity ?? 1) * 100 }%)`;
     default:
 
@@ -114,4 +147,4 @@ const guard = (rgb: Rgb) => {
   }
 }
 
-export const SrgbSpace = { withOpacity, toCss, fromCss, toLibrary, fromLibrary, guard, toScalar, to8bit };
+export const SrgbSpace = { withOpacity, toCssString, fromHexString, fromCss8bit, toLibrary, fromLibrary, guard, toScalar, to8bit };

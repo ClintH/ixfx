@@ -43,9 +43,6 @@ export * as ImageDataGrid from './image-data-grid.js';
 //export * as BipolarView from '../../dom/src/plot/BipolarView.js';
 //export * as NamedColourPalette from './named-colour-palette.js';
 
-//import * as Drawing from '../../dom/src/Drawing.js';
-//export * as Drawing from '../../dom/src/Drawing.js';
-
 //export * as Plot2 from './Plot2.js';
 
 //export * as Plot from './plot/index.js';

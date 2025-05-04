@@ -11,19 +11,17 @@ export const isPowerOfTwo = (x: number) => Math.log2(x) % 1 === 0;
 
 /**
  * Returns `fallback` if `v` is NaN, otherwise returns `v`.
- *
- * Throws if `v` is not a number type.
+ * 
+ * Throws if `v` is not a number type, null or undefined
  * @param v
  * @param fallback
  * @returns
  */
-export const ifNaN = (v: number, fallback: number): number => {
-  // ✔️ Unit tested
-
-  if (Number.isNaN(v)) return fallback;
+export const ifNaN = (v: unknown, fallback: number): number => {
   if (typeof v !== `number`) {
     throw new TypeError(`v is not a number. Got: ${ typeof v }`);
   }
+  if (Number.isNaN(v)) return fallback;
   return v;
 };
 
@@ -57,7 +55,7 @@ export const integerParse = (
   try {
     const parsed = Number.parseInt(typeof value === `number` ? value.toString() : value);
     const r = integerTest(parsed, range, `parsed`);
-    return r[ 0 ] ? parsed : defaultValue;
+    return r.success ? parsed : defaultValue;
   } catch {
     return defaultValue;
   }
@@ -182,6 +180,34 @@ export const numberTest = (
 // }
 
 /**
+ * Compares two numbers with a given number of decimal places
+ * ```js
+ * a: 10.123 b: 10.1    decimals: 1 = true
+ * a: 10.123 b: 10.2    decimals: 0 = true
+ * a: 10.123 b: 10.14   decimals: 1 = true
+ * a: 10.123 b: 10.14   decimals: 2 = false
+ * ``
+ * @param a 
+ * @param b 
+ * @param decimals How many decimals to include
+ * @returns 
+ */
+export const numberDecimalTest = (a: number, b: number, decimals = 3): Result<number, string> => {
+  if (decimals === 0) {
+    a = Math.floor(a);
+    b = Math.floor(b);
+    if (a === b) return { success: true, value: a };
+    return { success: false, error: `A is not identical to B` };
+  }
+
+  const mult = Math.pow(10, decimals);
+  const aa = Math.floor(a * mult);
+  const bb = Math.floor(b * mult);
+  if (aa !== bb) return { success: false, error: `A is not close enough to B. A: ${ a } B: ${ b } Decimals: ${ decimals }` };
+  return { success: true, value: a }
+}
+
+/**
  * Returns test of `value` being in the range of 0-1.
  * Equiv to `number(value, `percentage`);`
  *
@@ -213,7 +239,7 @@ export const percentTest = (value: number, parameterName = `?`): Result<number, 
  * @param range Guard specifier.
  */
 export const integerTest = (
-  value: number | undefined,
+  value: unknown,
   range: NumberGuardRange = ``,
   parameterName = `?`
 ): Result<number, string> => {

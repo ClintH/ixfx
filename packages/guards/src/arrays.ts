@@ -1,5 +1,5 @@
 import type { Result } from "./types.js";
-import { integerTest } from "./numbers.js";
+import { integerTest, numberInclusiveRangeTest } from "./numbers.js";
 import { resultsCollate, resultThrow } from "./result.js";
 
 /**
@@ -32,16 +32,8 @@ export const arrayIndexTest = <V>(
   return resultsCollate(
     arrayTest(array),
     integerTest(index, `positive`, name),
+    numberInclusiveRangeTest(index, 0, array.length - 1, name)
   )
-  // const t = ;
-  // if (!t.success) return t;
-
-  // throwIntegerTest(index, `positive`, name);
-  // if (index > array.length - 1) {
-  //   throw new Error(
-  //     `'${ name }' ${ index } beyond array max of ${ array.length - 1 }`
-  //   );
-  // }
 };
 
 /**
@@ -51,7 +43,7 @@ export const arrayIndexTest = <V>(
  */
 export const arrayStringsTest = (value: unknown): Result<string[], string> => {
   if (!Array.isArray(value)) return { success: false, error: `Value is not an array` };
-  if (!value.some((v) => typeof v !== `string`)) {
+  if (value.some((v) => typeof v !== `string`)) {
     return { success: false, error: `Contains something not a string` };
   }
   return { success: true, value };

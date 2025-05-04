@@ -47,7 +47,7 @@ export type TrackedValueOpts = {
  *
  * @example Sub-class
  * ```js
- * export class TrackedPointMap extends TrackedValueMap<Points.Point> {
+ * export class PointsTracker extends TrackedValueMap<Points.Point> {
  *  constructor(opts:TrackOpts = {}) {
  *   super((key, start) => {
  *    if (start === undefined) throw new Error(`Requires start point`);
@@ -91,9 +91,9 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @param values Values(s)
    * @returns Information about start to last value
    */
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   //eslint-disable-next-line functional/prefer-immutable-types
-  public async seen(id: string, ...values: Array<V>): Promise<TResult> {
+  public async seen(id: string, ...values: V[]): Promise<TResult> {
     const trackedValue = await this.getTrackedValue(id, ...values);
 
     // Pass it over to the TrackedValue
@@ -109,7 +109,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @returns
    */
   //eslint-disable-next-line functional/prefer-immutable-types
-  protected async getTrackedValue(id: string, ...values: Array<V>) {
+  protected async getTrackedValue(id: string, ...values: V[]) {
     if (id === null) throw new Error(`id parameter cannot be null`);
     if (id === undefined) throw new Error(`id parameter cannot be undefined`);
 

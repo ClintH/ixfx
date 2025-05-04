@@ -2,6 +2,7 @@ import * as C from "colorizr";
 import type { Hsl, HslAbsolute, HslScalar, ParsingOptions } from "./types.js";
 import { numberInclusiveRangeTest, numberTest } from "@ixfx/guards";
 import { resultThrow } from "@ixfx/guards";
+import { cssDefinedHexColours } from "./css-colours.js";
 
 const withOpacity = <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
   switch (value.unit) {
@@ -18,10 +19,34 @@ const withOpacity = <T extends Hsl>(value: T, fn: (opacityScalar: number, value:
   }
 }
 
+
+const hslTransparent = Object.freeze({
+  h: 0, s: 0, l: 0, opacity: 0, unit: `absolute`, space: `hsl`
+});
+const fromHexString = (hexString: string): HslAbsolute => fromLibrary(C.hex2hsl(hexString))
+
 const fromCssAbsolute = (value: string, options: ParsingOptions<HslAbsolute> = {}): HslAbsolute => {
-  if (value.startsWith(`hsl`)) {
-    if (options.fallbackString) value = options.fallbackString;
-    else throw new Error(`Expecting CSS string in the form of 'hsl(...) or hsla(...)'. Got: '${ value }'`);
+  value = value.toLowerCase();
+  if (value.startsWith(`#`)) {
+    return fromHexString(value);
+
+  }
+  if (value === `transparent`) return hslTransparent;
+  if (typeof cssDefinedHexColours[ value ] !== `undefined`) {
+    return fromHexString(cssDefinedHexColours[ value ] as string);
+  }
+
+  if (!value.startsWith(`hsl(`) && !value.startsWith(`hsla(`)) {
+    try {
+      const converted = C.convert(value, `hsl`);
+      value = converted;
+    } catch (e) {
+      if (options.fallbackString) {
+        value = options.fallbackString;
+      } else {
+        throw e;
+      }
+    }
   }
   const c = C.extractColorParts(value);
   if (c.model !== `hsl`) {
@@ -34,11 +59,11 @@ const fromCssAbsolute = (value: string, options: ParsingOptions<HslAbsolute> = {
 const fromCssScalar = (value: string, options: ParsingOptions<HslAbsolute> = {}): HslScalar => toScalar(fromCssAbsolute(value, options));
 
 
-const toCss = (hsl: Hsl): string => {
+const toCssString = (hsl: Hsl): string => {
   const abs = toAbsolute(hsl);
   let css = `hsl(${ abs.h }deg ${ abs.s }% ${ abs.l }%`;
-  if (`opacity` in abs && abs.opacity !== undefined) {
-    css += ` / ${ abs.opacity / 100 }`;
+  if (`opacity` in abs && abs.opacity !== undefined && abs.opacity < 100) {
+    css += ` / ${ abs.opacity }%`;
   }
   css += ')';
   return css;
@@ -59,16 +84,16 @@ const fromLibrary = (hsl: C.HSL, parsingOptions: ParsingOptions<HslAbsolute> = {
     if (parsingOptions.fallbackColour) return parsingOptions.fallbackColour;
   }
   resultThrow(
-    numberInclusiveRangeTest(hsl.h, 0, 255, `h`),
-    numberInclusiveRangeTest(hsl.s, 0, 255, `s`),
-    numberInclusiveRangeTest(hsl.l, 0, 255, `l`),
-    numberInclusiveRangeTest(hsl.alpha, 0, 100, `alpha`),
+    numberInclusiveRangeTest(hsl.h, 0, 360, `h`),
+    numberInclusiveRangeTest(hsl.s, 0, 100, `s`),
+    numberInclusiveRangeTest(hsl.l, 0, 100, `l`),
+    () => hsl.alpha !== undefined ? numberInclusiveRangeTest(hsl.alpha, 0, 100, `alpha`) : { success: true, value: hsl },
   );
   return {
     h: hsl.h,
     s: hsl.s,
     l: hsl.l,
-    opacity: hsl.alpha ?? 100,
+    opacity: (hsl.alpha ?? 1) * 100,
     unit: `absolute`,
     space: `hsl`
   }
@@ -81,7 +106,7 @@ const toAbsolute = (hsl: Hsl): HslAbsolute => {
     h: hsl.h * 360,
     s: hsl.s * 100,
     l: hsl.l * 100,
-    opacity: hsl.opacity ?? 100,
+    opacity: (hsl.opacity ?? 1) * 100,
     unit: `absolute`,
     space: `hsl`
   }
@@ -128,4 +153,4 @@ const guard = (hsl: Hsl) => {
   }
 }
 
-export const HslSpace = { withOpacity, fromCssAbsolute, fromCssScalar, toCss, toLibrary, fromLibrary, guard, toScalar, toAbsolute };
+export const HslSpace = { withOpacity, fromHexString, fromCssAbsolute, fromCssScalar, toCssString, toLibrary, fromLibrary, guard, toScalar, toAbsolute };

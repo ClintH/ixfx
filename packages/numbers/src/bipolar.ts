@@ -1,8 +1,7 @@
 //import { floatSource,type RandomOptions, type RandomSource } from '@ixfx/random';
 import { numberTest, resultThrow } from '@ixfx/guards';
-import { interpolate, scaler as numberScaler } from '@ixfx/numbers';
+import { interpolate, scaler as numberScaler, scale as numberScale } from '@ixfx/numbers';
 import type { BipolarWrapper } from './types.js';
-
 
 /**
  * Wrapper for bipolar-based values. Immutable.
@@ -59,29 +58,36 @@ export const immutable = (startingValueOrBipolar: number | BipolarWrapper = 0): 
     interpolate: (amt: number, b: number) => {
       return immutable(clamp(interpolate(amt, v, b)));
     },
-    asScalar: () => {
-      return toScalar(v);
+    asScalar: (max = 1, min = 0) => {
+      return toScalar(v, max, min);
     }
   }
 }
 
 /**
- * Converts bipolar value to a scalar
+ * Converts bipolar value to a scalar. That is, converts from
+ * -1..1 range to 0..1.
+ * 
  * ```js
- * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
  * Bipolar.toScalar(-1); // 0.0
  * Bipolar.toScalar( 0); // 0.5
  * Bipolar.toScalar( 1); // 1.0
+ * ```
+ * 
+ * Range can be changed:
+ * ```js
+ * Bipolar.toScalar(0, 100); // Uses 0..100 scale, so output is 50
+ * Bipolar.toScalar(0, 100, 50); // Uses 50..1000 scale, so output is 75
  * ```
  * 
  * Throws an error if `bipolarValue` is not a number or NaN
  * @param bipolarValue Value to convert to scalar
  * @returns Scalar value on 0..1 range.
  */
-export const toScalar = (bipolarValue: number) => {
+export const toScalar = (bipolarValue: number, max = 1, min = 0) => {
   if (typeof bipolarValue !== `number`) throw new Error(`Expected v to be a number. Got: ${ typeof bipolarValue }`);
   if (Number.isNaN(bipolarValue)) throw new Error(`Parameter is NaN`);
-  return (bipolarValue + 1) / 2;
+  return numberScale(bipolarValue, -1, 1, min, max);
 }
 
 /**
@@ -96,7 +102,7 @@ export const toScalar = (bipolarValue: number) => {
  * Bipolar.fromScalar(0.5); // 0
  * ```
  * 
- * Throws an error if `scalarValue` is not on 0..1 scale.
+ * Throws an error if `scalarValue` is outside 0..1 scale.
  * @param scalarValue Scalar value to convert
  * @returns Bipolar value on -1..1 scale
  */
@@ -106,10 +112,8 @@ export const fromScalar = (scalarValue: number) => {
 };
 
 /**
- * Scale & clamp resulting number to bipolar range (-1..1)
+ * Scale & clamp value to bipolar range (-1..1).
  * ```js
- * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
- * 
  * // Scale 100 on 0..100 scale
  * Bipolar.scale(100, 0, 100); // 1
  * Bipolar.scale(50, 0, 100);  // 0
@@ -127,15 +131,13 @@ export const scale = (inputValue: number, inMin: number, inMax: number) => {
 }
 
 /**
- * Scale a number to bipolar range (-1..1). Not clamped to scale.
+ * Scale a number to bipolar range (-1..1). Not clamped, so we might exceed range.
  * 
  * ```js
- * import { Bipolar } from 'https://unpkg.com/ixfx/dist/data.js';
- * 
  * // Scale 100 on 0..100 scale
- * Bipolar.scale(100, 0, 100); // 1
- * Bipolar.scale(50, 0, 100);  // 0
- * Bipolar.scale(0, 0, 100);   // -1
+ * Bipolar.scaleUnclamped(100, 0, 100); // 1
+ * Bipolar.scaleUnclamped(50, 0, 100);  // 0
+ * Bipolar.scaleUnclamped(0, 0, 100);   // -1
  * ```
  * 
  * @param inputValue Value to scale

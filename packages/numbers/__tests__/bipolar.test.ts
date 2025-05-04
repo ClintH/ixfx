@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect } from 'vitest';
-import { immutable, fromScalar, clamp, towardZero, scale } from '../src/bipolar.js';
+import { immutable, fromScalar, clamp, towardZero, scale, toScalar } from '../src/bipolar.js';
 
 test('bipolar', () => {
   const b = immutable(1);
@@ -12,6 +13,21 @@ test('bipolar', () => {
   expect(immutable(-1).asScalar()).toBe(0);
   expect(immutable(0).asScalar()).toBe(0.5);
   expect(immutable(1).asScalar()).toBe(1);
+
+});
+
+test(`bipolarToScalar`, () => {
+  expect(toScalar(-1)).toBe(0);
+  expect(toScalar(0)).toBe(0.5);
+  expect(toScalar(1)).toBe(1);
+
+  expect(toScalar(-1, 100)).toBe(0);
+  expect(toScalar(0, 100)).toBe(50);
+  expect(toScalar(1, 100)).toBe(100);
+
+  expect(toScalar(-1, 100, 50)).toBe(50);
+  expect(toScalar(0, 100, 50)).toBe(75);
+  expect(toScalar(1, 100, 50)).toBe(100);
 
 });
 

@@ -20,6 +20,7 @@
 			"@ixfx/guards":["../packages/guards/dist/src"],
 			"@ixfx/iterables":["../packages/iterables/dist/src"],
 			"@ixfx/modulation":["../packages/modulation/dist/src"],
+			"@ixfx/modulation/*":["../packages/modulation/dist/src/*"],
 			"@ixfx/numbers":["../packages/numbers/dist/src"],
 			"@ixfx/process":["../packages/process/dist/src"],
 			"@ixfx/random":["../packages/random/dist/src"],
@@ -27,6 +28,7 @@
 			"@ixfx/trackers":["../packages/trackers/dist/src"],
 			"@ixfx/ui":["../packages/ui/dist/src"],
 			"@ixfx/visual":["../packages/visual/dist/src"],
+			"@ixfx/visual/*":["../packages/visual/dist/src/*"],
 
 			// "@ixfx/geometry/*":["../packages/arrays/dist/src/*"],
 			// "colorjs": ["../packages/visual/lib/colorjs/index.js"]
