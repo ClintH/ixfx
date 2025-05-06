@@ -44,7 +44,7 @@ describe(`colour`, () => {
 
     expect(Colour.HslSpace.fromCssScalar(`hsla(100, 100%, 50%, 0.2)`)).toEqual({ h: 0.2777777777777778, s: 1, l: 0.5, opacity: 0.2, space: "hsl", unit: "scalar" });
 
-    expect(Colour.RgbSpace.fromCss8bit(`hsl(100,100%,50%)`)).toEqual({ r: 85, g: 255, b: 0, opacity: 255, space: `srgb`, unit: `8bit` });
+    expect(Colour.SrgbSpace.fromCss8bit(`hsl(100,100%,50%)`)).toEqual({ r: 85, g: 255, b: 0, opacity: 255, space: `srgb`, unit: `8bit` });
   });
 
   test(`rgb-validate`, () => {

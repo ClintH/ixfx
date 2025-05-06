@@ -11,10 +11,10 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import { number as numberTracker } from '../../trackers/NumberTracker.js';
-import { AudioAnalyser } from './Analyser.js';
-import type { Point } from '../../geometry/point/PointType.js';
-import { minMaxAvg } from '../../numbers/MinMaxAvg.js';
+import { number as numberTracker } from '@ixfx/trackers';
+import { AudioAnalyser } from './analyser.js';
+import type { Point } from '@ixfx/geometry/point';
+import { numberArrayCompute } from '@ixfx/numbers';
 
 // TODO: This is an adaption of old code. Needs to be smartened up further
 export class AudioVisualiser {
@@ -32,14 +32,14 @@ export class AudioVisualiser {
   freqTracker;
   el: HTMLElement;
 
-  constructor(parentElem: HTMLElement, audio: AudioAnalyser) {
+  constructor(parentElement: HTMLElement, audio: AudioAnalyser) {
     this.audio = audio;
-    this.parent = parentElem;
+    this.parent = parentElement;
     this.waveTracker = numberTracker();
     this.freqTracker = numberTracker();
 
     // Add HTML
-    parentElem.innerHTML = `
+    parentElement.innerHTML = `
     <section>
       <button id="rendererComponentToggle">🔼</button>
       <div>
@@ -63,14 +63,14 @@ export class AudioVisualiser {
       </div>
     </section>
     `;
-    this.el = parentElem.children[ 0 ] as HTMLElement;
+    this.el = parentElement.children[ 0 ] as HTMLElement;
 
     document
       .getElementById(`rendererComponentToggle`)
       ?.addEventListener(`click`, () => {
         this.setExpanded(!this.isExpanded());
       });
-    this.el.addEventListener(`pointermove`, (e) => this.onPointer(e));
+    this.el.addEventListener(`pointermove`, (e) => { this.onPointer(e); });
     //this.el.addEventListener(`touchbegin`, (e) => this.onPointer(e));
     this.el.addEventListener(`pointerup`, () => {
       this.pointerDelaying = false;
@@ -115,20 +115,19 @@ export class AudioVisualiser {
 
     const pointer = this.getPointerRelativeTo(canvas);
     const width = canvasWidth / bins;
-    const minMax = minMaxAvg(freq);
+    const minMax = numberArrayCompute(freq);
 
-    //eslint-disable-next-line functional/no-let
-    for (let i = 0; i < bins; i++) {
-      if (!Number.isFinite(freq[ i ])) continue;
+    for (let index = 0; index < bins; index++) {
+      if (!Number.isFinite(freq[ index ])) continue;
 
-      const value = freq[ i ] - minMax.min;
+      const value = freq[ index ] - minMax.min;
       const valueRelative = value / this.freqMaxRange;
       const height = Math.abs(canvasHeight * valueRelative);
       const offset = canvasHeight - height;
 
-      const hue = (i / bins) * 360;
-      const left = i * width;
-      g.fillStyle = `hsl(` + hue + `, 100%, 50%)`;
+      const hue = (index / bins) * 360;
+      const left = index * width;
+      g.fillStyle = `hsl(${ hue }, 100%, 50%)`;
 
       // Show info about data under pointer
       if (
@@ -138,10 +137,10 @@ export class AudioVisualiser {
         pointer.x <= left + width
       ) {
         // Keep track of data
-        if (this.freqTracker.id !== i.toString()) {
-          this.freqTracker = numberTracker({ id: i.toString() });
+        if (this.freqTracker.id !== index.toString()) {
+          this.freqTracker = numberTracker({ id: index.toString() });
         }
-        this.freqTracker.seen(freq[ i ]);
+        this.freqTracker.seen(freq[ index ]);
 
         const freqMma = this.freqTracker.getMinMaxAvg();
 
@@ -149,16 +148,16 @@ export class AudioVisualiser {
         g.fillStyle = `black`;
         if (this.audio) {
           g.fillText(
-            `Frequency (${ i }) at pointer: ${ this.audio
-              .getFrequencyAtIndex(i)
+            `Frequency (${ index }) at pointer: ${ this.audio
+              .getFrequencyAtIndex(index)
               .toLocaleString(`en`) } - ${ this.audio
-                .getFrequencyAtIndex(i + 1)
+                .getFrequencyAtIndex(index + 1)
                 .toLocaleString(`en`) }`,
             2,
             10
           );
         }
-        g.fillText(`Raw value: ${ freq[ i ].toFixed(2) }`, 2, 20);
+        g.fillText(`Raw value: ${ freq[ index ].toFixed(2) }`, 2, 20);
         g.fillText(`Min: ${ freqMma.min.toFixed(2) }`, 2, 40);
         g.fillText(`Max: ${ freqMma.max.toFixed(2) }`, 60, 40);
         g.fillText(`Avg: ${ freqMma.avg.toFixed(2) }`, 120, 40);
@@ -168,22 +167,22 @@ export class AudioVisualiser {
   }
 
   isExpanded() {
-    const contentsElem = this.el.querySelector(`div`);
-    if (contentsElem === null) throw new Error(`contents div not found`);
-    return contentsElem.style.display === ``;
+    const contentsElement = this.el.querySelector(`div`);
+    if (contentsElement === null) throw new Error(`contents div not found`);
+    return contentsElement.style.display === ``;
   }
 
   setExpanded(value: boolean) {
-    const contentsElem = this.el.querySelector(`div`);
+    const contentsElement = this.el.querySelector(`div`);
     const button = this.el.querySelector(`button`);
 
     if (button === null) throw new Error(`Button element not found`);
-    if (contentsElem === null) throw new Error(`Contents element not found`);
+    if (contentsElement === null) throw new Error(`Contents element not found`);
     if (value) {
-      contentsElem.style.display = ``;
+      contentsElement.style.display = ``;
       button.innerText = `🔼`;
     } else {
-      contentsElem.style.display = `none`;
+      contentsElement.style.display = `none`;
       button.innerText = `🔽`;
     }
   }
@@ -250,18 +249,18 @@ export class AudioVisualiser {
     let x = 0;
 
     //eslint-disable-next-line functional/no-let
-    for (let i = 0; i < bins; i++) {
-      const height = wave[ i ] * canvasHeight;
+    for (let index = 0; index < bins; index++) {
+      const height = wave[ index ] * canvasHeight;
       const y = bipolar ? canvasHeight / 2 - height : canvasHeight - height;
 
-      if (i === 0) {
+      if (index === 0) {
         g.moveTo(x, y);
       } else {
         g.lineTo(x, y);
       }
       x += width;
 
-      if (this.pointerDown) this.waveTracker.seen(wave[ i ]);
+      if (this.pointerDown) this.waveTracker.seen(wave[ index ]);
     }
     g.lineTo(canvasWidth, bipolar ? canvasHeight / 2 : canvasHeight); //canvas.height / 2);
     g.stroke();
@@ -305,12 +304,12 @@ export class AudioVisualiser {
   }
 
   // Keeps track of last pointer position in page coordinate space
-  onPointer(evt: MouseEvent | PointerEvent) {
+  onPointer(event: MouseEvent | PointerEvent) {
     this.lastPointer = {
-      x: evt.pageX,
-      y: evt.pageY,
+      x: event.pageX,
+      y: event.pageY,
     };
-    evt.preventDefault();
+    event.preventDefault();
   }
 
   // getMinMax(data, start = 0, end = data.length) {

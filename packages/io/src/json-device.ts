@@ -1,15 +1,15 @@
-import { SimpleEventEmitter } from '../Events.js';
-import * as StateMachine from '../flow/StateMachine.js';
-import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
-import { indexOfCharCode, omitChars } from '../text/Text.js';
-import { Codec } from './Codec.js';
-import { StringReceiveBuffer } from './StringReceiveBuffer.js';
-import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retryFunction } from '../flow/Retry.js';
+import { SimpleEventEmitter } from '@ixfx/events';
+import { StateMachineWithEvents, type StateChangeEvent } from '@ixfx/flow/state-machine';
+//import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
+import { indexOfCharCode, omitChars } from '@ixfx/core/text';
+import { retryFunction } from '@ixfx/flow';
+import { Codec } from './codec.js';
+import { StringReceiveBuffer } from './string-receive-buffer.js';
+import { StringWriteBuffer } from './string-write-buffer.js';
 import {
   type GenericStateTransitions,
-} from './Types.js';
-import { genericStateTransitionsInstance } from './GenericStateTransitions.js';
+} from './types.js';
+import { genericStateTransitionsInstance } from './generic-state-transitions.js';
 
 /**
  * Options for JsonDevice
@@ -58,7 +58,7 @@ export type JsonDeviceEvents = {
 };
 
 export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
-  states: StateMachine.WithEvents<GenericStateTransitions>;
+  states: StateMachineWithEvents<GenericStateTransitions>;
   codec: Codec;
 
   verboseLogging = false;
@@ -82,6 +82,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.txBuffer = new StringWriteBuffer(async (data) => {
       // When we have data to actually write to device
 
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await this.writeInternal(data);
     }, config);
 
@@ -91,7 +92,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     });
 
     this.codec = new Codec();
-    this.states = new StateMachine.WithEvents(genericStateTransitionsInstance, {
+    this.states = new StateMachineWithEvents(genericStateTransitionsInstance, {
       initial: `ready`,
     });
 
@@ -128,6 +129,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   protected abstract writeInternal(txt: string): void;
 
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async close() {
     if (this.states.state !== `connected`) return;
 
@@ -211,14 +213,14 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
   }
 
   protected verbose(m: string) {
-    if (this.verboseLogging) console.info(`${ this.name }`, m);
+    if (this.verboseLogging) console.info(this.name, m);
   }
 
   protected log(m: string) {
-    console.log(`${ this.name }`, m);
+    console.log(this.name, m);
   }
 
   protected warn(m: unknown) {
-    console.warn(`${ this.name }`, m);
+    console.warn(this.name, m);
   }
 }

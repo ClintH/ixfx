@@ -11,7 +11,7 @@
 		"tsdown": "0.10.1"
 	},
 	"scripts": {
-		"build": "tsdown "
+		"build": "tsdown"
 	},
 	"devDependencies": {
 		"@ixfx/arrays": "file:../packages/arrays/dist/src",
@@ -24,6 +24,7 @@
 		"@ixfx/geometry": "file:../packages/geometry/dist/src",
 		"@ixfx/guards": "file:../packages/guards/dist/src",
 		"@ixfx/iterables": "file:../packages/iterables/dist/src",
+		"@ixfx/io": "file:../packages/io/dist/src",
 		"@ixfx/numbers": "file:../packages/numbers/dist/src",
 		"@ixfx/process": "file:../packages/process/dist/src",
 		"@ixfx/random": "file:../packages/random/dist/src",

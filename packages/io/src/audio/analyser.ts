@@ -1,7 +1,7 @@
 
-import { throwNumberTest, throwIntegerTest, isPowerOfTwo } from '../../util/GuardNumbers.js';
-import { max, maxFast } from '../../numbers/NumericArrays.js';
-import { AudioVisualiser } from './Visualiser.js';
+import { numberTest, integerTest, isPowerOfTwo, resultThrow } from '@ixfx/guards';
+import { max, maxFast } from '@ixfx/numbers';
+import { AudioVisualiser } from './visualiser.js';
 
 /**
  * Options for audio processing
@@ -178,11 +178,13 @@ export class AudioAnalyser {
     this.debug = opts.debug ?? false;
     this.smoothingTimeConstant = opts.smoothingTimeConstant ?? 0.8;
 
-    throwIntegerTest(this.fftSize, `positive`, `opts.fftSize`);
-    throwNumberTest(
-      this.smoothingTimeConstant,
-      `percentage`,
-      `opts.smoothingTimeConstant`
+    resultThrow(
+      integerTest(this.fftSize, `positive`, `opts.fftSize`),
+      numberTest(
+        this.smoothingTimeConstant,
+        `percentage`,
+        `opts.smoothingTimeConstant`
+      )
     );
 
     if (!isPowerOfTwo(this.fftSize)) {
@@ -315,7 +317,7 @@ export class AudioAnalyser {
   getFrequencyRangeMax(
     lowFreq: number,
     highFreq: number,
-    freqData: ReadonlyArray<number>
+    freqData: readonly number[]
   ): number {
     const samples = this.sliceByFrequency(lowFreq, highFreq, freqData);
     return max(samples);
@@ -332,7 +334,7 @@ export class AudioAnalyser {
   sliceByFrequency(
     lowFreq: number,
     highFreq: number,
-    freqData: ReadonlyArray<number>
+    freqData: readonly number[]
   ) {
     const lowIndex = this.getIndexForFrequency(lowFreq);
     const highIndex = this.getIndexForFrequency(highFreq);
@@ -353,7 +355,7 @@ export class AudioAnalyser {
     if (a === undefined) throw new Error(`Analyser not available`);
     if (ctx === undefined) throw new Error(`Audio context not available`);
 
-    throwIntegerTest(index, `positive`, `index`);
+    resultThrow(integerTest(index, `positive`, `index`));
     if (index > a.frequencyBinCount) {
       throw new Error(
         `Index ${ index } exceeds frequency bin count ${ a.frequencyBinCount }`

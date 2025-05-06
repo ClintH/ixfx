@@ -1,7 +1,9 @@
-import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
+import { type StateChangeEvent } from '@ixfx/flow/state-machine';
+import { type Transitions } from '@ixfx/flow/state-machine';
+import type { genericStateTransitionsInstance } from './generic-state-transitions.js';
 
-import { type Transitions } from '../flow/StateMachine.js';
-import type { genericStateTransitionsInstance } from './GenericStateTransitions.js';
+export { type StateChangeEvent } from '@ixfx/flow/state-machine';
+
 export type IoDataEvent = {
   readonly data: string;
 };
@@ -25,6 +27,6 @@ export type BleDeviceOptions = {
   readonly connectAttempts: number;
   readonly debug: boolean;
 };
-export { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
+
 
 export type FrameProcessorSources = `` | `camera` | `video`;

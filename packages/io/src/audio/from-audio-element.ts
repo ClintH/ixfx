@@ -1,7 +1,7 @@
-import { resolveEl } from "src/dom/ResolveEl.js";
+import { resolveEl } from "@ixfx/dom";
 
-import { shortGuid } from "src/random/Guid.js";
-import type { BasicAudioElement } from "./Types.js";
+import { shortGuid } from "@ixfx/random";
+import type { BasicAudioElement } from "./types.js";
 
 /**
  * Scans page for <AUDIO> elements and creates playable controllers for them.

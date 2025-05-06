@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { degreeToRadian, radianToDegree, degreeArc, degreesSum, radiansSum } from '../src/angles.js';
+import { degreeToRadian, radianToDegree, degreeArc, degreesSum, radiansSum, angleParse, radianToTurn, turnToRadian, turnToDegree, degreeToTurn, degreeToGradian, gradianToDegree, gradianToRadian, angleConvert, radianToGradian } from '../src/angles.js';
 
 
 test(`degreeArc`, () => {
@@ -62,7 +62,7 @@ test(`radiansSum`, () => {
 
 });
 
-test(`degreeToRadian`, () => {
+test(`degree-to-radian`, () => {
   expect(degreeToRadian(30).toPrecision(4)).toBe('0.5236');
   expect(degreeToRadian(45).toPrecision(4)).toBe('0.7854');
   expect(degreeToRadian(60).toPrecision(4)).toBe('1.047');
@@ -76,7 +76,7 @@ test(`degreeToRadian`, () => {
   expect(degreeToRadian(360).toPrecision(4)).toBe('6.283');
 });
 
-test(`radianToDegree`, () => {
+test(`radian-to-degree`, () => {
   expect(radianToDegree(0)).toBe(0);
   expect(Math.round(radianToDegree(0.5235))).toBe(30);
   expect(Math.round(radianToDegree(0.7853))).toBe(45);
@@ -87,3 +87,78 @@ test(`radianToDegree`, () => {
   expect(Math.round(radianToDegree(4.7123))).toBe(270);
   expect(Math.round(radianToDegree(6.2831))).toBe(360);
 });
+
+test(`radian-to-turn`, () => {
+  // https://www.unitconverters.net/angle/radian-to-turn.htm
+  expect(radianToTurn(1)).toEqual(0.15915494309189535);
+  expect(radianToTurn(0.01)).toEqual(0.0015915494309189536);
+});
+
+test(`degree-to-turn`, () => {
+  expect(degreeToTurn(1)).toEqual(0.002777777777777778);
+  expect(degreeToTurn(360)).toEqual(1);
+  expect(degreeToTurn(540)).toEqual(1.5);
+
+});
+
+test(`turn-to-radian`, () => {
+  expect(turnToRadian(1)).toEqual(6.283185307179586);
+  expect(turnToRadian(10)).toEqual(62.83185307179586);
+});
+
+test(`turn-to-degree`, () => {
+  expect(turnToDegree(1, true)).toEqual(0);
+  expect(turnToDegree(1, false)).toEqual(360);
+  expect(turnToDegree(1.5, true)).toEqual(180);
+  expect(turnToDegree(1.5, false)).toEqual(540);
+});
+
+test(`degree-to-gradian`, () => {
+  expect(degreeToGradian(0)).toEqual(0);
+  expect(Math.ceil(degreeToGradian(90))).toEqual(100);
+  expect(Math.ceil(degreeToGradian(360))).toEqual(400);
+  expect(Math.ceil(degreeToGradian(720))).toEqual(800);
+});
+
+test(`gradian-to-degree`, () => {
+  expect(gradianToDegree(800, true)).toEqual(0);
+  expect(gradianToDegree(800, false)).toEqual(720);
+  expect(gradianToDegree(0, false)).toEqual(0);
+  expect(gradianToDegree(100, false)).toEqual(90);
+  expect(gradianToDegree(400, false)).toEqual(360);
+  expect(gradianToDegree(400, true)).toEqual(0);
+});
+
+test(`gradian-to-radian`, () => {
+  expect(gradianToRadian(10)).toEqual(0.157079633);
+  expect(gradianToRadian(400)).toEqual(6.283185319999999);
+
+})
+
+test(`angle-parse`, () => {
+  expect(angleParse(`100`)).toEqual({ value: 100, unit: `deg` });
+  expect(angleParse(100)).toEqual({ value: 100, unit: `deg` });
+  expect(angleParse(`100deg`)).toEqual({ value: 100, unit: `deg` });
+  expect(angleParse(`10rad`)).toEqual({ value: 10, unit: `rad` });
+  expect(angleParse(`1turn`)).toEqual({ value: 1, unit: `turn` });
+  expect(angleParse(`20grad`)).toEqual({ value: 20, unit: `grad` });
+
+  expect(() => angleParse(`asf`)).toThrow();
+  expect(() => angleParse(``)).toThrow();
+  expect(() => angleParse(false as any as string)).toThrow();
+  expect(() => angleParse({ blorp: true } as any as string)).toThrow();
+});
+
+test(`angle-convert`, () => {
+  expect(angleConvert(100, `deg`)).toEqual({ value: 100, unit: `deg` });
+  expect(angleConvert(100, `rad`)).toEqual({ value: degreeToRadian(100), unit: `rad` });
+  expect(angleConvert(100, `turn`)).toEqual({ value: degreeToTurn(100), unit: `turn` });
+  expect(angleConvert(100, `grad`)).toEqual({ value: degreeToGradian(100), unit: `grad` });
+
+  expect(angleConvert(`4rad`, `deg`)).toEqual({ value: radianToDegree(4), unit: `deg` });
+  expect(angleConvert(`4rad`, `rad`)).toEqual({ value: 4, unit: `rad` });
+  expect(angleConvert(`4rad`, `turn`)).toEqual({ value: radianToTurn(4), unit: `turn` });
+  expect(angleConvert(`4rad`, `grad`)).toEqual({ value: radianToGradian(4), unit: `grad` });
+
+  expect(() => angleConvert(100, `blorp` as any as `deg`)).toThrow();
+})

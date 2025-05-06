@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { isApprox } from '@ixfx/numbers';
-import { count, elapsedOnce, elapsedSince } from '@ixfx/core';
+import { isApprox, count } from '@ixfx/numbers';
+import { elapsedOnce, elapsedSince } from '@ixfx/core';
 import { repeat } from '../src/repeat.js';
 
 test('function', async done => {

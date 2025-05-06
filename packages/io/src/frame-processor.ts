@@ -1,8 +1,7 @@
-
-import * as Camera from './Camera.js';
-import * as VideoFile from './VideoFile.js';
-import * as Video from '../visual/Video.js';
-import type { FrameProcessorSources } from './Types.js';
+import { Video } from '@ixfx/visual';
+import * as Camera from './camera.js';
+import * as VideoFile from './video-file.js';
+import type { FrameProcessorSources } from './types.js';
 
 type State = `ready` | `initialised` | `disposed`;
 

@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { count, } from '../src/count.js';
+import { count } from '../src/count.js';
 
 test(`count`, (t) => {
   expect(() => [ ...count(0.5) ]).throws();

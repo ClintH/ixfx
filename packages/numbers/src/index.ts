@@ -1,9 +1,12 @@
 export * from './apply-to-values.js';
 export * from './average-weighted.js';
 export * from './clamp.js';
+
+export * from './count.js';
 export * from './difference.js';
 export * from './filter.js';
 export * from './flip.js';
+export * from './generate.js';
 export * from './guard.js';
 export * from './is-approx.js';
 export * as Bipolar from './bipolar.js';

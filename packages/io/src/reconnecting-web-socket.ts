@@ -1,7 +1,7 @@
-import { retryTask } from "../flow/Retry.js"
-import { intervalToMs, type Interval } from "../flow/IntervalType.js"
-import { eventRace } from "../Events.js"
-import { StateMachine } from "../flow/index.js"
+import { retryTask } from "@ixfx/flow"
+import { intervalToMs, type Interval } from "@ixfx/core"
+import { eventRace } from "@ixfx/events"
+import * as StateMachine from "@ixfx/flow/state-machine"
 import { getErrorMessage } from "@ixfx/debug"
 
 export type ReconnectingWebsocket = {
@@ -141,7 +141,7 @@ export const reconnectingWebsocket = (url: string | URL, opts: Partial<Reconnect
       async probe(_attempts: number) {
         try {
           const wss = new WebSocket(url);
-          const r = await eventRace(wss, [ `open`, `error` ], { timeout: 1000 });
+          const r = await eventRace(wss, [ `open`, `error` ], { timeoutMs: 1000 });
           return r.type === `open` ? { success: true, value: wss } : { success: false, error: `Could not open` };
         } catch (error) {
           return { success: false, error: getErrorMessage(error) }

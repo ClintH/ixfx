@@ -1,5 +1,5 @@
-import { type EvalOpts, type Options, deviceEval } from './Espruino.js';
-import { NordicBleDevice } from './NordicBleDevice.js';
+import { type EvalOpts, type Options, deviceEval } from './espruino.js';
+import { NordicBleDevice } from './nordic-ble-device.js';
 
 /**
  * An Espruino BLE-connection

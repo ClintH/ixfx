@@ -1,7 +1,6 @@
 /**
  * Result from starting a camera
  */
-//eslint-disable-next-line functional/no-mixed-types
 export type StartResult = {
   /**
    * Call dispose to stop the camera feed and remove any created resources,
@@ -82,13 +81,13 @@ const startWithVideoEl = async (
     videoEl.pause();
   };
 
-  const ret = { videoEl, dispose };
+  const returnValue = { videoEl, dispose };
   const p = new Promise<StartResult>((resolve, reject) => {
     videoEl.addEventListener(`loadedmetadata`, () => {
       videoEl
         .play()
         .then(() => {
-          resolve(ret);
+          resolve(returnValue);
         })
         .catch((ex) => {
           reject(ex);

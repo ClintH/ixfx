@@ -1,5 +1,4 @@
 export * from './comparers.js';
-export * from './count.js';
 export * from './continuously.js';
 export * from './correlate.js';
 export * from './default-keyer.js';

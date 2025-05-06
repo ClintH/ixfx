@@ -1,4 +1,4 @@
-import { BleDevice } from './BleDevice.js';
+import { BleDevice } from './ble-device.js';
 
 export const defaultOpts = {
   chunkSize: 20,

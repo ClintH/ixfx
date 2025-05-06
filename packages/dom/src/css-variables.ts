@@ -59,7 +59,7 @@ export type CssVariableOption = CssVariable & (CssVariableByObjectOption | CssVa
  * ```js
  * // Array of arrays is treated as a set of key-value pairs
  * const options = [ [`indicator-fill`, `gray`], [`backdrop-fill`, `whitesmoke`] ]
- * const attrs = parseAsAttributes(options);
+ * const attrs = parseCssVariablesAsAttributes(options);
  * Yields:
  * [
  *  { variable: `indicator-fill`, attribute: `fill`, id: `indicator`, defaultValue: `gray` }
@@ -72,7 +72,7 @@ export type CssVariableOption = CssVariable & (CssVariableByObjectOption | CssVa
  * @param options 
  * @returns 
  */
-export const parseAsAttributes = (options: (string | string[])[]): (CssVariable & CssVariableByIdOption)[] => {
+export const parseCssVariablesAsAttributes = (options: (string | string[])[]): (CssVariable & CssVariableByIdOption)[] => {
   return options.map(opt => {
     let defaultValue;
     // Nested array, treat second element as default value, name as first
@@ -106,7 +106,7 @@ export const parseAsAttributes = (options: (string | string[])[]): (CssVariable 
  *  { element: someEl, variable: `hue`, field: `blah` }
  * ]
  * 
- * setFromVariables(document.body, ...options);
+ * setFromCssVariables(document.body, ...options);
  * ```
  * 
  * The first parameter is the context for which CSS variable values are fetched
@@ -114,7 +114,7 @@ export const parseAsAttributes = (options: (string | string[])[]): (CssVariable 
  * @param context Context element which is needed for relative querying. Otherwise use document.body
  * @param options Details of what to do
  */
-export const setFromVariables = (context: HTMLElement | string, ...options: CssVariableOption[]) => {
+export const setFromCssVariables = (context: HTMLElement | string, ...options: CssVariableOption[]) => {
   const contextEl = resolveEl(context);
   const style = window.getComputedStyle(contextEl);
 
@@ -177,8 +177,8 @@ export const setFromVariables = (context: HTMLElement | string, ...options: CssV
  * 
  * ```js
  * // Fetch styles
- * const styles = getWithFallback({
- *  my_var: `red`
+ * const styles = getCssVariablesWithFallback({
+ *  my_var: `red` // reads CSS variable '--my-var' 
  * }, element);
  * 
  * // Access --my-var, or if it doesn't exist returns 'red'
@@ -194,13 +194,35 @@ export const setFromVariables = (context: HTMLElement | string, ...options: CssV
  * @param elt 
  * @returns 
  */
-export function getWithFallback<T extends Record<string, string | number>>(fallback: T, elt?: Element): T {
+export function getCssVariablesWithFallback<T extends Record<string, string | number>>(fallback: T, elt?: Element): T {
   const styles = getComputedStyle(elt ?? document.body);
   const entries = Object.entries(fallback);
   const filledEntries = entries.map(entry => {
-    return [ entry[ 0 ], getFromStyles(styles, entry[ 0 ], entry[ 1 ]) ]
+    return [ entry[ 0 ], getCssVariablesFromStyles(styles, entry[ 0 ], entry[ 1 ]) ]
   })
   return Object.fromEntries(filledEntries) as T;
+}
+
+/**
+ * Returns the value of a CSS variable. If it is no defined, returns `fallbackValue`;
+ * ```js
+ * // Returns the value of --fg, or 'white' otherwise
+ * getCssVariable(`--fg`, `white`);
+ * ```
+ * 
+ * `--` prefix can be omitted:
+ * ```js
+ * getCssVariable(`fg`, `white`);
+ * ```
+ * @param cssVariable 
+ * @param fallbackValue 
+ * @returns 
+ */
+export function getCssVariable(cssVariable: string, fallbackValue: string): string {
+  if (!cssVariable.startsWith(`--`)) cssVariable = `--${ cssVariable }`;
+  const fromCss = getComputedStyle(document.body).getPropertyValue(cssVariable).trim();
+  if (fromCss.length === 0) return fallbackValue;
+  return fromCss;
 }
 
 /**
@@ -212,18 +234,18 @@ export function getWithFallback<T extends Record<string, string | number>>(fallb
  * }
  * 
  * // Set to document.body
- * setVariables(vars);
+ * setCssVariables(vars);
  * 
  * // Set to an element
- * setVariables(vars, elem);
+ * setCssVariables(vars, elem);
  * 
  * // Or to a CSSStyleDeclaration
- * setVariables(vars, styles);
+ * setCssVariables(vars, styles);
  * ```
  * @param vars 
  * @param stylesOrEl 
  */
-export function setVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {
+export function setCssVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {
   const styles = stylesOrEl === undefined ? document.body.style :
     isHtmlElement(stylesOrEl) ? stylesOrEl.style : stylesOrEl;
 
@@ -238,16 +260,16 @@ export function setVariables<T extends Record<string, string | number>>(variable
  * Returns a CSS variable from a CSS style declaration, or returning `fallback`.
  * ```js
  * // These will all access --my-var
- * getFromStyles(getComputedStyle(element), `--my-var`, `red`);
- * getFromStyles(getComputedStyle(element), `my-var`, `red`);
- * getFromStyles(getComputedStyle(element), `my_var`, `red`);
+ * getCssVariablesFromStyles(getComputedStyle(element), `--my-var`, `red`);
+ * getCssVariablesFromStyles(getComputedStyle(element), `my-var`, `red`);
+ * getCssVariablesFromStyles(getComputedStyle(element), `my_var`, `red`);
  * ```
  * @param styles 
  * @param name 
  * @param fallback 
  * @returns 
  */
-export function getFromStyles<T extends string | number>(styles: CSSStyleDeclaration, name: string, fallback: T): T {
+export function getCssVariablesFromStyles<T extends string | number>(styles: CSSStyleDeclaration, name: string, fallback: T): T {
   if (!name.startsWith(`--`)) name = `--` + name;
   name = name.replaceAll(`_`, `-`);
 

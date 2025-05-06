@@ -1,5 +1,3 @@
-import type { CssAngle } from "@ixfx/dom";
-
 export type HslBase = {
   /**
    * Hue

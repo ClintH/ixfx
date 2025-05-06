@@ -1,19 +1,21 @@
-import { EspruinoBleDevice } from './EspruinoBleDevice.js';
-import { defaultOpts as NordicDefaults } from './NordicBleDevice.js';
-import { type StateChangeEvent } from '../flow/StateMachineWithEvents.js';
-import { type ISimpleEventEmitter } from '../ISimpleEventEmitter.js';
-import { string as randomString } from '../random/String.js';
-import { waitFor } from '../flow/WaitFor.js';
+import { type StateChangeEvent } from '@ixfx/flow/state-machine';
+import { type ISimpleEventEmitter } from '@ixfx/events';
+import { string as randomString } from '@ixfx/random';
+import { waitFor } from '@ixfx/flow';
+import { EspruinoBleDevice } from './espruino-ble-device.js';
+import { defaultOpts as NordicDefaults } from './nordic-ble-device.js';
+import { getErrorMessage } from '@ixfx/debug';
 import {
   EspruinoSerialDevice,
-} from './EspruinoSerialDevice.js';
+} from './espruino-serial-device.js';
 import type {
   GenericStateTransitions,
   IoDataEvent,
   IoEvents,
-} from './Types.js';
-import { getErrorMessage } from 'src/debug/GetErrorMessage.js';
+} from './types.js';
 
+export { type EspruinoSerialDeviceOpts, EspruinoSerialDevice } from './espruino-serial-device.js';
+export { EspruinoBleDevice } from './espruino-ble-device.js';
 export type EspruinoStates =
   | `ready`
   | `connecting`
@@ -75,7 +77,7 @@ export type EspruinoBleOpts = {
   /**
    * If specified, these filtering options are used instead
    */
-  readonly filters?: ReadonlyArray<BluetoothLEScanFilter>;
+  readonly filters?: readonly BluetoothLEScanFilter[];
 };
 
 /**
@@ -202,7 +204,7 @@ export const serial = async (
  * @returns
  */
 const getFilters = (opts: EspruinoBleOpts, defaultNamePrefix: string) => {
-  const filters: Array<BluetoothLEScanFilter> = [];
+  const filters: BluetoothLEScanFilter[] = [];
 
   if (opts.filters) {
     filters.push(...opts.filters);
@@ -445,6 +447,3 @@ export const deviceEval = async (
     device.write(source);
   });
 };
-
-export { type EspruinoSerialDeviceOpts, EspruinoSerialDevice } from './EspruinoSerialDevice.js';
-export { EspruinoBleDevice } from './EspruinoBleDevice.js';

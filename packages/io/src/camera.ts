@@ -1,5 +1,5 @@
-import type { Rect } from '../geometry/rect/index.js';
-import { waitFor } from '../flow/WaitFor.js';
+import type { Rect } from '@ixfx/geometry/rect';
+import { waitFor } from '@ixfx/flow';
 import { getErrorMessage } from '@ixfx/debug';
 
 const startTimeoutMs = 10_000;

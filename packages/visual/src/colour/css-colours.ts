@@ -1,3 +1,39 @@
+import * as SrgbSpace from "./srgb.js";
+import * as HslSpace from './hsl.js';
+import type { Colour } from "./types.js";
+
+/**
+ * Converts from some kind of colour that is legal in CSS
+ * 
+ * Handles: hex format, CSS variables, colour names
+ * to an object
+ * @param colour 
+ * @returns 
+ */
+export const fromCssColour = (colour: string): Colour => {
+  if (colour.startsWith(`#`)) {
+    return SrgbSpace.fromHexString(colour);
+  }
+
+  if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
+    return SrgbSpace.fromHexString(cssDefinedHexColours[ colour ] as string);
+  }
+  if (colour.startsWith(`--`)) {
+    const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
+    if (fromCss.length === 0 || fromCss === null) throw new Error(`Variable missing: ${ colour }`);
+    return fromCssColour(fromCss);
+  }
+  colour = colour.toLowerCase();
+  if (colour.startsWith(`hsl(`) || colour.startsWith(`hsla(`)) {
+    return HslSpace.fromCssAbsolute(colour);
+  }
+  if (colour.startsWith(`rgb(`) || colour.startsWith(`rgba(`)) {
+    return SrgbSpace.fromCss8bit(colour);
+  }
+
+  throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour name: '${ colour }'`);
+}
+
 export const cssDefinedHexColours = {
   "aliceblue": "#f0f8ff",
   "antiquewhite": "#faebd7",

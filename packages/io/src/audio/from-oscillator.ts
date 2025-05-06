@@ -1,5 +1,5 @@
-import { shortGuid } from "../../random/Guid.js";
-import type { AudioOscillatorOptions, BasicAudioOscillator } from "./Types.js";
+import { shortGuid } from "@ixfx/random";
+import type { AudioOscillatorOptions, BasicAudioOscillator } from "./types.js";
 
 /**
  * Initialise audio with an oscillator source

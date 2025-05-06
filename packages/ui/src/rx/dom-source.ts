@@ -279,7 +279,7 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
         entries.push([ k, vBool ]);
       } else if (typeHint === `colour`) {
         const vRgb = Colour.toCssColour(vString);
-        entries.push([ k, Colour.RgbSpace.fromCss8bit(vRgb) ]);
+        entries.push([ k, Colour.SrgbSpace.fromCss8bit(vRgb) ]);
       } else {
         entries.push([ k, v.toString() ]);
       }

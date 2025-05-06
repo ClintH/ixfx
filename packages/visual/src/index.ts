@@ -5,6 +5,7 @@ export * from './pointer-visualise.js';
 
 import * as NamedColourPalette from './named-colour-palette.js';
 
+
 import * as Colour from './colour/index.js';
 /**
  * Colour interpolation, scale generation and parsing

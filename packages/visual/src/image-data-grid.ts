@@ -1,5 +1,5 @@
 import { Grids } from '@ixfx/geometry';
-import { SrgbSpace } from './colour/srgb.js';
+import * as SrgbSpace from './colour/srgb.js';
 import type { Rgb, Rgb8Bit } from './colour/types.js';
 
 /**

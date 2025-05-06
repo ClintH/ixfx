@@ -1,5 +1,5 @@
-import { deviceEval, type EvalOpts } from './Espruino.js';
-import { Device as SerialDevice, type SerialOpts } from './Serial.js';
+import { deviceEval, type EvalOpts } from './espruino.js';
+import { Device as SerialDevice, type SerialOpts } from './serial.js';
 
 export type EspruinoSerialDeviceOpts = SerialOpts & {
   readonly evalTimeoutMs?: number;

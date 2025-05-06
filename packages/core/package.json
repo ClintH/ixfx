@@ -24,14 +24,6 @@
 			"types": "./src/text.ts",
 			"import": "./src/text.ts"
 		},
-		"./arrays": {
-			"types": "./src/arrays/index.ts",
-			"import": "./src/arrays/index.ts"
-		},
-		"./numbers": {
-			"types": "./src/numbers/index.ts",
-			"import": "./src/numbers/index.ts"
-		},
 		"./records": {
 			"types": "./src/records/index.ts",
 			"import": "./src/records/index.ts"
@@ -39,14 +31,6 @@
 		"./maps": {
 			"types": "./src/maps.ts",
 			"import": "./src/maps.ts"
-		},
-		"./debug": {
-			"types": "./src/debug/index.ts",
-			"import": "./src/debug/index.ts"
-		},
-		"./process": {
-			"types": "./src/process/index.ts",
-			"import": "./src/process/index.ts"
 		},
 		"./trackers": {
 			"types": "./src/trackers/index.ts",
@@ -76,14 +60,6 @@
 				"types": "./dist/src/text.d.ts",
 				"import": "./dist/src/text.js"
 			},
-			"./arrays": {
-				"types": "./dist/src/arrays/index.d.ts",
-				"import": "./dist/src/arrays/index.js"
-			},
-			"./numbers": {
-				"types": "./dist/src/numbers/index.d.ts",
-				"import": "./dist/src/numbers/index.js"
-			},
 			"./records": {
 				"types": "./dist/src/records/index.d.ts",
 				"import": "./dist/src/records/index.js"
@@ -91,14 +67,6 @@
 			"./maps": {
 				"types": "./dist/src/maps.d.ts",
 				"import": "./dist/src/maps.js"
-			},
-			"./debug": {
-				"types": "./dist/src/debug/index.d.ts",
-				"import": "./dist/src/debug/index.js"
-			},
-			"./process": {
-				"types": "./dist/src/process/index.d.ts",
-				"import": "./dist/src/process/index.js"
 			},
 			"./trackers": {
 				"types": "./dist/src/trackers/index.d.ts",

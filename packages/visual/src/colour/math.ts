@@ -1,7 +1,7 @@
 import type { Colour, Colourish, Hsl, Rgb } from './types.js';
 import { toColour, toCssColour } from './conversion.js';
-import { HslSpace } from './hsl.js';
-import { SrgbSpace } from './srgb.js';
+import * as HslSpace from './hsl.js';
+import * as SrgbSpace from './srgb.js';
 import { clamp } from '@ixfx/numbers';
 
 export function multiplyOpacity(colourish: string, amount: number): string {

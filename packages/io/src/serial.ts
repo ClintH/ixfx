@@ -1,10 +1,10 @@
 import {
   type JsonDeviceOpts,
   JsonDevice,
-} from './JsonDevice.js';
+} from './json-device.js';
 
 export type SerialOpts = JsonDeviceOpts & {
-  readonly filters?: ReadonlyArray<SerialPortFilter>;
+  readonly filters?: readonly SerialPortFilter[];
   readonly baudRate?: number;
   /**
    * End-of-line string sequence. \r\n by default.
@@ -96,8 +96,9 @@ export class Device extends JsonDevice {
   }
 
   async onConnectAttempt(): Promise<void> {
-    //eslint-disable-next-line functional/no-let
-    let reqOpts: SerialPortRequestOptions = {};
+    let reqOpts: SerialPortRequestOptions = {
+      filters: []
+    };
     const openOpts: SerialOptions = {
       baudRate: this.baudRate,
     };
@@ -147,4 +148,4 @@ export class Device extends JsonDevice {
   }
 }
 
-export { type JsonDeviceEvents, type JsonDataEvent, type JsonDeviceOpts } from './JsonDevice.js';
+export { type JsonDeviceEvents, type JsonDataEvent, type JsonDeviceOpts } from './json-device.js';

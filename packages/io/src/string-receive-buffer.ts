@@ -2,7 +2,7 @@
  * Receives text
  */
 export class StringReceiveBuffer {
-  buffer: string = ``;
+  buffer = ``;
   stream: WritableStream<string> | undefined;
 
   constructor(
@@ -40,32 +40,32 @@ export class StringReceiveBuffer {
     });
   }
 
-  addImpl(str: string): string {
+  addImpl(string_: string): string {
     // Look for separator in new string
-    const pos = str.indexOf(this.separator);
+    const pos = string_.indexOf(this.separator);
     if (pos < 0) {
       // Not found, just add to buffer and return
-      this.buffer += str;
+      this.buffer += string_;
       return ``;
     }
 
     // Found! Trigger callback for existing buffer and part of new string
-    const part = str.substring(0, pos);
+    const part = string_.substring(0, pos);
     try {
       this.onData(this.buffer + part);
-      str = str.substring(part.length + this.separator.length);
+      string_ = string_.substring(part.length + this.separator.length);
     } catch (ex) {
       console.warn(ex);
     }
 
     this.buffer = ``;
 
-    return str;
+    return string_;
   }
 
-  add(str: string) {
-    while (str.length > 0) {
-      str = this.addImpl(str);
+  add(string_: string) {
+    while (string_.length > 0) {
+      string_ = this.addImpl(string_);
     }
   }
 }

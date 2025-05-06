@@ -4,7 +4,7 @@ import { numberInclusiveRangeTest, numberTest } from "@ixfx/guards";
 import { resultThrow } from "@ixfx/guards";
 import { cssDefinedHexColours } from "./css-colours.js";
 
-const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
+export const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
   switch (value.unit) {
     case `8bit`:
       return {
@@ -19,12 +19,12 @@ const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value:
   }
 }
 
-const fromHexString = (hexString: string): Rgb8Bit => SrgbSpace.fromLibrary(C.hex2rgb(hexString));
+export const fromHexString = (hexString: string): Rgb8Bit => fromLibrary(C.hex2rgb(hexString));
 const srgbTansparent: Rgb8Bit = Object.freeze({
   r: 0, g: 0, b: 0, opacity: 0, unit: `8bit`, space: `srgb`
 });
 
-const fromCss8bit = (value: string, options: ParsingOptions<Rgb8Bit> = {}): Rgb8Bit => {
+export const fromCss8bit = (value: string, options: ParsingOptions<Rgb8Bit> = {}): Rgb8Bit => {
   value = value.toLowerCase();
   if (value.startsWith(`#`)) {
     return fromHexString(value);
@@ -39,11 +39,11 @@ const fromCss8bit = (value: string, options: ParsingOptions<Rgb8Bit> = {}): Rgb8
     try {
       const converted = C.convert(value, `rgb`);
       value = converted;
-    } catch (e) {
+    } catch (error) {
       if (options.fallbackString) {
         value = options.fallbackString;
       } else {
-        throw e;
+        throw error;
       }
     }
   }
@@ -52,7 +52,7 @@ const fromCss8bit = (value: string, options: ParsingOptions<Rgb8Bit> = {}): Rgb8
   return fromLibrary(c as any as C.RGB);
 }
 
-const toCssString = (rgb: Rgb): string => {
+export const toCssString = (rgb: Rgb): string => {
   guard(rgb);
   switch (rgb.unit) {
     case `8bit`:
@@ -92,7 +92,7 @@ const fromLibrary = (rgb: C.RGB): Rgb8Bit => {
   }
 }
 
-const to8bit = (rgb: Rgb): Rgb8Bit => {
+export const to8bit = (rgb: Rgb): Rgb8Bit => {
   guard(rgb);
   if (rgb.unit === `8bit`) return rgb;
   return {
@@ -105,7 +105,7 @@ const to8bit = (rgb: Rgb): Rgb8Bit => {
   }
 }
 
-const toScalar = (rgb: Rgb): RgbScalar => {
+export const toScalar = (rgb: Rgb): RgbScalar => {
   guard(rgb);
   if (rgb.unit === `scalar`) return rgb;
   return {
@@ -118,7 +118,7 @@ const toScalar = (rgb: Rgb): RgbScalar => {
   }
 }
 
-const guard = (rgb: Rgb) => {
+export const guard = (rgb: Rgb) => {
   const { r, g, b, opacity, space, unit } = rgb;
   if (space !== `srgb`) throw new Error(`Space is expected to be 'srgb'. Got: ${ space }`);
   if (unit === `8bit`) {
@@ -147,4 +147,4 @@ const guard = (rgb: Rgb) => {
   }
 }
 
-export const SrgbSpace = { withOpacity, toCssString, fromHexString, fromCss8bit, toLibrary, fromLibrary, guard, toScalar, to8bit };
+//export const SrgbSpace = { withOpacity, toCssString, fromHexString, fromCss8bit, toLibrary, fromLibrary, guard, toScalar, to8bit };

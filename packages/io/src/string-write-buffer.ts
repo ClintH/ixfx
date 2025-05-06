@@ -1,10 +1,10 @@
-import type { Interval } from '../flow/IntervalType.js';
-import { QueueMutable } from '../collections/queue/QueueMutable.js';
+import type { Interval } from '@ixfx/core';
+import { QueueMutable } from '@ixfx/collections/queue';
 import {
   type Continuously,
   continuously
-} from '../flow/index.js';
-import { splitByLength } from '../text/Text.js';
+} from '@ixfx/core';
+import { splitByLength } from '@ixfx/core/text';
 
 export type Opts = {
   readonly chunkSize?: number;
@@ -102,7 +102,7 @@ export class StringWriteBuffer {
   }
 
   private createWritable() {
-    // eslint-disable-next-line unicorn/no-this-assignment,@typescript-eslint/no-this-alias
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const b = this;
     return new WritableStream<string>({
       write(chunk) {

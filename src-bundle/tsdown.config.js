@@ -12,13 +12,14 @@ const entry = {
   core: './src/core.ts',
   debug: './src/debug.ts',
   dom: './src/dom.ts',
+  easings: './src/easings.ts',
   events: './src/events.ts',
   flow: './src/flow.ts',
   guards: './src/guards.ts',
-  iterables: './src/iterables.ts',
   geometry: './src/geometry.ts',
+  iterables: './src/iterables.ts',
+  io: './src/io.ts',
   modulation: './src/modulation.ts',
-  easings: './src/easings.ts',
   numbers: './src/numbers.ts',
   process: './src/process.ts',
   random: './src/random.ts',
@@ -31,18 +32,6 @@ const entry = {
 export default defineConfig({
   entry,
   clean: true,
-  // noExternal: [
-  //   `@ixfxfun/core`,
-  //   `@ixfxfun/dom`,
-  //   `@ixfxfun/geometry`,
-  //   `@ixfxfun/modulation`,
-  //   `@ixfxfun/numbers`,
-  //   `@ixfxfun/rx`,
-  //   `@ixfxfun/visual`
-  // ],
-  // noExternal: [
-  //   "colorjs"
-  // ],
   platform: `browser`,
   sourcemap: true,
   outDir: `../../ixfxfun/demos/ixfx`,

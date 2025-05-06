@@ -1,8 +1,8 @@
 import * as C from "colorizr";
 import { isColourish, isHsl, isRgb, tryParseObjectToHsl, tryParseObjectToRgb, type Colour, type Colourish } from "./types.js";
-import { SrgbSpace } from "./srgb.js";
-import { HslSpace } from './hsl.js';
-import { cssDefinedHexColours } from "./css-colours.js";
+import * as  SrgbSpace from "./srgb.js";
+import * as HslSpace from './hsl.js';
+import { fromCssColour } from "./css-colours.js";
 
 
 export const toCssColour = (colour: any): string => {
@@ -25,37 +25,7 @@ export const toCssColour = (colour: any): string => {
 
 }
 
-/**
- * Converts from some kind of colour that is legal in CSS
- * 
- * Handles: hex format, CSS variables, colour names
- * to an object
- * @param colour 
- * @returns 
- */
-export const fromCssColour = (colour: string): Colour => {
-  if (colour.startsWith(`#`)) {
-    return SrgbSpace.fromHexString(colour);
-  }
 
-  if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
-    return SrgbSpace.fromHexString(cssDefinedHexColours[ colour ] as string);
-  }
-  if (colour.startsWith(`--`)) {
-    const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
-    if (fromCss.length === 0 || fromCss === null) throw new Error(`Variable missing: ${ colour }`);
-    return fromCssColour(fromCss);
-  }
-  colour = colour.toLowerCase();
-  if (colour.startsWith(`hsl(`) || colour.startsWith(`hsla(`)) {
-    return HslSpace.fromCssAbsolute(colour);
-  }
-  if (colour.startsWith(`rgb(`) || colour.startsWith(`rgba(`)) {
-    return SrgbSpace.fromCss8bit(colour);
-  }
-
-  throw new Error(`String colour is not a hex colour nor well-defined colour name: '${ colour }'`);
-}
 
 export const convert = (colour: string, destination: 'hex' | 'hsl' | 'oklab' | 'oklch' | 'srgb' | `rgb`): string => {
   if (destination === `srgb`) destination = `rgb`;

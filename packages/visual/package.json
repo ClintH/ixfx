@@ -19,6 +19,10 @@
 		"./drawing": {
 			"types": "./src/drawing/index.ts",
 			"import": "./src/drawing/index.ts"
+		},
+		"./svg": {
+			"types": "./src/svg/index.ts",
+			"import": "./src/svg/index.ts"
 		}
 	},
 	"dependencies": {
@@ -48,6 +52,10 @@
 			"./drawing": {
 				"types": "./dist/src/drawing/index.d.ts",
 				"import": "./dist/src/drawing/index.js"
+			},
+			"./svg": {
+				"types": "./dist/src/svg/index.d.ts",
+				"import": "./dist/src/svg/index.js"
 			}
 		}
 	}

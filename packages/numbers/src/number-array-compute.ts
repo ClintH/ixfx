@@ -9,7 +9,7 @@ import type { NumbersComputeOptions, NumbersComputeResult } from "./types.js";
  * @param opts 
  * @returns 
  */
-export const numberArrayCompute = (data: number[], opts: NumbersComputeOptions = {}): NumbersComputeResult => {
+export const numberArrayCompute = (data: number[] | readonly number[], opts: NumbersComputeOptions = {}): NumbersComputeResult => {
   if (data.length === 0) {
     return {
       total: Number.NaN,

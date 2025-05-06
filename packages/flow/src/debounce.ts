@@ -73,7 +73,6 @@ export const debounce = (
   interval: Interval
 ): DebouncedFunction => {
   const t = timeout(callback, interval);
-  //eslint-disable-next-line functional/prefer-immutable-types
   return (...args: unknown[]) => { t.start(undefined, args); };
 };
 

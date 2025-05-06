@@ -1,6 +1,6 @@
 import { expect, describe, test } from 'vitest';
 import * as N from '../src/index.js';
-import { count } from '@ixfx/core';
+import { count } from '@ixfx/numbers';
 
 
 describe(`numbers-compute`, async () => {

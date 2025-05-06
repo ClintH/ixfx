@@ -1,17 +1,18 @@
-import { SimpleEventEmitter } from '../Events.js';
-import * as StateMachine from '../flow/StateMachine.js';
 
-import { indexOfCharCode, omitChars } from '../text/Text.js';
-import { Codec } from './Codec.js';
-import { StringReceiveBuffer } from './StringReceiveBuffer.js';
-import { StringWriteBuffer } from './StringWriteBuffer.js';
-import { retryFunction } from '../flow/Retry.js';
+import { SimpleEventEmitter } from '@ixfx/events';
+import { StateMachineWithEvents } from '@ixfx/flow/state-machine';
+import { retryFunction } from '@ixfx/flow';
+import { indexOfCharCode, omitChars } from '@ixfx/core/text';
+
+import { Codec } from './codec.js';
+import { StringReceiveBuffer } from './string-receive-buffer.js';
+import { StringWriteBuffer } from './string-write-buffer.js';
 import {
   type BleDeviceOptions,
   type GenericStateTransitions,
   type IoEvents,
-} from './Types.js';
-import { genericStateTransitionsInstance } from './GenericStateTransitions.js';
+} from './types.js';
+import { genericStateTransitionsInstance } from './generic-state-transitions.js';
 
 
 
@@ -46,7 +47,7 @@ const reconnect = async () => {
 export class BleDevice extends SimpleEventEmitter<
   IoEvents<GenericStateTransitions>
 > {
-  states: StateMachine.WithEvents<GenericStateTransitions>;
+  states: StateMachineWithEvents<GenericStateTransitions>;
   codec: Codec;
   rx: BluetoothRemoteGATTCharacteristic | undefined;
   tx: BluetoothRemoteGATTCharacteristic | undefined;
@@ -71,7 +72,7 @@ export class BleDevice extends SimpleEventEmitter<
     });
 
     this.codec = new Codec();
-    this.states = new StateMachine.WithEvents<GenericStateTransitions>(
+    this.states = new StateMachineWithEvents<GenericStateTransitions>(
       genericStateTransitionsInstance,
       {
         initial: `ready`,
@@ -199,14 +200,14 @@ export class BleDevice extends SimpleEventEmitter<
   }
 
   protected verbose(m: string) {
-    if (this.verboseLogging) console.info(`${ this.config.name }`, m);
+    if (this.verboseLogging) console.info(this.config.name, m);
   }
 
   protected log(m: string) {
-    console.log(`${ this.config.name }`, m);
+    console.log(this.config.name, m);
   }
 
   protected warn(m: unknown) {
-    console.warn(`${ this.config.name }`, m);
+    console.warn(this.config.name, m);
   }
 }
