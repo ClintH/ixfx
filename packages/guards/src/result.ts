@@ -9,6 +9,21 @@ export const getErrorMessage = (ex: unknown): string => {
 };
 
 /**
+ * Throws an error if any result is a failure.
+ * Error message will be the combined from all errors.
+ * @param results 
+ * @returns 
+ */
+export const throwIfFailed = (...results: Result<any, any>[]) => {
+  const failed = results.filter(r => resultIsError(r));// as ResultError<any>[];
+  if (failed.length === 0) return;
+
+  const messages = failed.map(f => resultErrorToString(f));
+  throw new Error(messages.join(`, `));
+}
+
+
+/**
  * If `result` is an error, throws it, otherwise ignored.
  * @param result 
  * @returns 
@@ -108,19 +123,6 @@ export function resultErrorToString(result: ResultError<any>): string {
   return JSON.stringify(result.error);
 }
 
-/**
- * Throws an error if any result is a failure.
- * Error message will be the combined from all errors.
- * @param results 
- * @returns 
- */
-export const throwIfFailed = (...results: Result<any, any>[]) => {
-  const failed = results.filter(r => resultIsError(r));// as ResultError<any>[];
-  if (failed.length === 0) return;
-
-  const messages = failed.map(f => resultErrorToString(f));
-  throw new Error(messages.join(`, `));
-}
 
 
 

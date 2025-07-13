@@ -121,7 +121,6 @@ export const toAbsolute = (hsl: Hsl): HslAbsolute => {
     unit: `absolute`,
     space: `hsl`
   }
-
 }
 
 /**
@@ -186,7 +185,7 @@ export const guard = (hsl: Hsl) => {
       numberInclusiveRangeTest(l, 0, 100, `l`),
       () => {
         if (typeof opacity === `number`) {
-          return numberInclusiveRangeTest(opacity, 0, 100, `s`);
+          return numberInclusiveRangeTest(opacity, 0, 100, `opacity`);
         }
       });
   } else if (unit === `scalar`) {
