@@ -1,0 +1,25 @@
+export * from './apply-to-values.js';
+export * from './average-weighted.js';
+export * from './clamp.js';
+
+export * from './count.js';
+export * from './difference.js';
+export * from './filter.js';
+export * from './flip.js';
+export * from './generate.js';
+export * from './guard.js';
+export * from './is-approx.js';
+export * as Bipolar from './bipolar.js';
+export * from './interpolate.js';
+export * from './linear-space.js';
+export * from './moving-average.js';
+export * from './normalise.js';
+export * from './number-array-compute.js';
+export * from './numeric-arrays.js';
+export * from './proportion.js';
+export * from './quantise.js';
+export * from './round.js';
+export * from './scale.js';
+export * from './softmax.js';
+export * from './wrap.js';
+export type * from './types.js';

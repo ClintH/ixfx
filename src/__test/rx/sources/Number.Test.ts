@@ -1,20 +1,20 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 
-test(`rx-number`, t => {
+test(`rx-number`, () => {
   const nonInit = Rx.From.number();
-  t.falsy(nonInit.last(), "Undefined initial value");
-  t.false(Rx.hasLast(nonInit), "No last value");
-  t.plan(8);
+  expect(nonInit.last()).toBeFalsy();
+  expect(Rx.hasLast(nonInit)).toBe(false);
+  expect.assertions(8);
   nonInit.on(v => {
-    t.is(v.value, 10);
+    expect(v.value).toBe(10);
   });
   nonInit.set(10);
-  t.is(nonInit.last(), 10);
-  t.true(Rx.hasLast(nonInit));
+  expect(nonInit.last()).toBe(10);
+  expect(Rx.hasLast(nonInit)).toBe(true);
 
   const x = Rx.From.number(5);
-  t.truthy(x.last());
-  t.true(Rx.hasLast(x));
-  t.is(x.last(), 5);
+  expect(x.last()).toBeTruthy();
+  expect(Rx.hasLast(x)).toBe(true);
+  expect(x.last()).toBe(5);
 });

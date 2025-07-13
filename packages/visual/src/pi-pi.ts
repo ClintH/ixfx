@@ -1,0 +1,1 @@
+export const piPi = Math.PI*2;

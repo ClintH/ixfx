@@ -1,10 +1,10 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 
-test(`annotate-op`, async t => {
+test(`annotate-op`, async () => {
   const r1 = Rx.wrap([ 1, 2, 3 ]).annotateWithOp(Rx.Ops.sum());
   const r1D = await Rx.toArray(r1);
-  t.deepEqual(r1D, [
+  expect(r1D).toEqual([
     { value: 1, annotation: 1 },
     { value: 2, annotation: 3 },
     { value: 3, annotation: 6 },
@@ -18,7 +18,7 @@ test(`annotate-op`, async t => {
     )
   );
   const r2D = await Rx.toArray(r2);
-  t.deepEqual(r2D, [
+  expect(r2D).toEqual([
     { value: 4, annotation: 4 },
     { value: 2, annotation: 4 },
     { value: 3, annotation: 4 },
@@ -28,7 +28,7 @@ test(`annotate-op`, async t => {
 
 });
 
-test(`annotate`, async t => {
+test(`annotate`, async () => {
   const createObjects = () => {
     return [ 1, 2, 3 ];
   }
@@ -37,7 +37,7 @@ test(`annotate`, async t => {
     return { blah: 4 - n }
   });
   const data = await Rx.toArray(annotated);
-  t.deepEqual(data, [
+  expect(data).toEqual([
     { value: 1, annotation: { blah: 3 } },
     { value: 2, annotation: { blah: 2 } },
     { value: 3, annotation: { blah: 1 } }

@@ -1,7 +1,7 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../rx/index.js';
 
-test(`field`, async t => {
+test(`field`, async () => {
   const data = [
     { name: `a` },
     { name: `b` },
@@ -10,8 +10,8 @@ test(`field`, async t => {
   ];
   const f = Rx.field<{ name: string }, string>(data, `name`);
   const values1 = await Rx.toArrayOrThrow(f);
-  t.is(values1.length, data.length);
-  t.deepEqual(values1, [ `a`, `b`, `c`, `d` ]);
+  expect(values1.length).toBe(data.length);
+  expect(values1).toEqual([ `a`, `b`, `c`, `d` ]);
 
   // Check with some values that don't have field
   const data2 = [
@@ -24,8 +24,8 @@ test(`field`, async t => {
   // @ts-expect-error
   const f2 = Rx.field<{ name: string }, string>(data2, `name`);
   const values2 = await Rx.toArray(f2);
-  t.is(values2.length, data2.length - 1);
-  t.deepEqual(values2, [ `a`, `b`, `d` ]);
+  expect(values2.length).toBe(data2.length - 1);
+  expect(values2).toEqual([ `a`, `b`, `d` ]);
 
   // With fallbackFieldValue
   const data3 = [
@@ -37,7 +37,7 @@ test(`field`, async t => {
   // @ts-expect-error
   const f3 = Rx.field<{ name: string }, string>(data3, `name`, { fallbackFieldValue: `` });
   const values3 = await Rx.toArray(f3);
-  t.deepEqual(values3, [ `a`, `b`, ``, `d` ]);
+  expect(values3).toEqual([ `a`, `b`, ``, `d` ]);
 
 
   // With fallbackFieldObject
@@ -47,7 +47,7 @@ test(`field`, async t => {
   // @ts-expect-error
   const f4 = Rx.field<{ name: string }, string>(data3, `name`, { fallbackObject: data4Fallback });
   const values4 = await Rx.toArray(f4);
-  t.deepEqual(values4, [ `a`, `b`, `fallback`, `d` ]);
+  expect(values4).toEqual([ `a`, `b`, `fallback`, `d` ]);
 
 
 });

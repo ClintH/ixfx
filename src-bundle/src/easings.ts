@@ -1,0 +1,1 @@
+export * from '@ixfx/modulation/easing/index.js';

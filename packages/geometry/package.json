@@ -1,0 +1,124 @@
+{
+	"name": "@ixfx/geometry",
+	"version": "0.37.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./arc": {
+			"types": "./src/arc/index.ts",
+			"import": "./src/arc/index.ts"
+		},
+		"./bezier": {
+			"types": "./src/bezier/index.ts",
+			"import": "./src/bezier/index.ts"
+		},
+		"./circle": {
+			"types": "./src/circle/index.ts",
+			"import": "./src/circle/index.ts"
+		},
+		"./grid": {
+			"types": "./src/grid/index.ts",
+			"import": "./src/grid/index.ts"
+		},
+		"./line": {
+			"types": "./src/line/index.ts",
+			"import": "./src/line/index.ts"
+		},
+		"./path": {
+			"types": "./src/path/index.ts",
+			"import": "./src/path/index.ts"
+		},
+		"./point": {
+			"types": "./src/point/index.ts",
+			"import": "./src/point/index.ts"
+		},
+		"./polar": {
+			"types": "./src/polar/index.ts",
+			"import": "./src/polar/index.ts"
+		},
+		"./rect": {
+			"types": "./src/rect/index.ts",
+			"import": "./src/rect/index.ts"
+		},
+		"./shape": {
+			"types": "./src/shape/index.ts",
+			"import": "./src/shape/index.ts"
+		},
+		"./triangle": {
+			"types": "./src/triangle/index.ts",
+			"import": "./src/triangle/index.ts"
+		}
+	},
+	"devDependencies": {
+		"bezier-js": "latest"
+	},
+	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/random": "workspace:^",
+		"@ixfx/collections": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./arc": {
+				"types": "./dist/src/arc/index.d.ts",
+				"import": "./dist/src/arc/index.js"
+			},
+			"./bezier": {
+				"types": "./dist/src/bezier/index.d.ts",
+				"import": "./dist/src/bezier/index.js"
+			},
+			"./circle": {
+				"types": "./dist/src/circle/index.d.ts",
+				"import": "./dist/src/circle/index.js"
+			},
+			"./grid": {
+				"types": "./dist/src/grid/index.d.ts",
+				"import": "./dist/src/grid/index.js"
+			},
+			"./line": {
+				"types": "./dist/src/line/index.d.ts",
+				"import": "./dist/src/line/index.js"
+			},
+			"./path": {
+				"types": "./dist/src/path/index.d.ts",
+				"import": "./dist/src/path/index.js"
+			},
+			"./point": {
+				"types": "./dist/src/point/index.d.ts",
+				"import": "./dist/src/point/index.js"
+			},
+			"./polar": {
+				"types": "./dist/src/polar/index.d.ts",
+				"import": "./dist/src/polar/index.js"
+			},
+			"./rect": {
+				"types": "./dist/src/rect/index.d.ts",
+				"import": "./dist/src/rect/index.js"
+			},
+			"./shape": {
+				"types": "./dist/src/shape/index.d.ts",
+				"import": "./dist/src/shape/index.js"
+			},
+			"./triangle": {
+				"types": "./dist/src/triangle/index.d.ts",
+				"import": "./dist/src/triangle/index.js"
+			}
+		}
+	}
+}

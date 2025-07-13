@@ -1,7 +1,7 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 
-test(`combine-latest-as-array`, async t => {
+test(`combine-latest-as-array`, async () => {
   const s1 = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
   const s2 = [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ];
   const createSources = () => ([
@@ -14,7 +14,7 @@ test(`combine-latest-as-array`, async t => {
   const r1Array = await Rx.toArray(r1);
 
   // Since source 1 runs and completes before source 2 even has a chance to produce:
-  t.deepEqual(r1Array, [
+  expect(r1Array).toEqual([
     [ 0, undefined ], [ 1, undefined ], [ 2, undefined ], [ 3, undefined ], [ 4, undefined ], [ 5, undefined ], [ 6, undefined ], [ 7, undefined ], [ 8, undefined ], [ 9, undefined ]
   ])
 
@@ -24,14 +24,14 @@ test(`combine-latest-as-array`, async t => {
 
   // First half array will be first source, with _undefined_ for second source since it's too slow
   for (let i = 0; i < 1; i++) {
-    t.is(r2Array[ i ][ 0 ], i);
-    t.falsy(r2Array[ i ][ 1 ]);
+    expect(r2Array[ i ][ 0 ]).toBe(i);
+    expect(r2Array[ i ][ 1 ]).toBeFalsy();
   }
 
   // Second half of array will be last value of first source along with second source values
   for (let i = 10; i < 20; i++) {
-    t.is(r2Array[ i ][ 0 ], 9);
-    t.is(r2Array[ i ][ 1 ], i);
+    expect(r2Array[ i ][ 0 ]).toBe(9);
+    expect(r2Array[ i ][ 1 ]).toBe(i);
 
   }
 });

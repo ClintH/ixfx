@@ -1,62 +1,62 @@
-import test from 'ava';
+import expect from 'expect';
 import { unique, uniqueInstances } from '../../trackers/TrackUnique.js';
 
-test('track-unique', t => {
+test('track-unique', () => {
   // String
   const a = unique<string>();
   const v1 = `hello`;
-  t.true(a(v1));
-  t.true(a(`there`));
-  t.false(a(`hello`));
-  t.false(a(v1));
+  expect(a(v1)).toBe(true);
+  expect(a(`there`)).toBe(true);
+  expect(a(`hello`)).toBe(false);
+  expect(a(v1)).toBe(false);
   // @ts-expect-error
-  t.true(a(24)); // not the right type, but still unique
+  expect(a(24)).toBe(true); // not the right type, but still unique
   // @ts-expect-error
-  t.throws(() => a(undefined));
+  expect(() => a(undefined)).toThrow();
   //@ts-expect-error
-  t.throws(() => a(null));
+  expect(() => a(null)).toThrow();
 
   // Simple object using default stringify
   type Person = { name: string, colour: string }
   const b = unique<Person>();
   const v2 = { name: `jane`, colour: `red` };
-  t.true(b(v2));
-  t.false(b({ name: `jane`, colour: `red` }));
-  t.false(b(v2));
-  t.true(b({ name: `jane`, colour: `blue` }));
-  t.true(b({ name: `bob`, colour: `red` }));
+  expect(b(v2)).toBe(true);
+  expect(b({ name: `jane`, colour: `red` })).toBe(false);
+  expect(b(v2)).toBe(false);
+  expect(b({ name: `jane`, colour: `blue` })).toBe(true);
+  expect(b({ name: `bob`, colour: `red` })).toBe(true);
 
   // Custom stringify using just name
   const c = unique<Person>(v => v.name);
-  t.true(c(v2));
-  t.false(c(v2));
-  t.false(c({ name: `jane`, colour: `blue` }));
-  t.true(c({ name: `bob`, colour: `red` }));
+  expect(c(v2)).toBe(true);
+  expect(c(v2)).toBe(false);
+  expect(c({ name: `jane`, colour: `blue` })).toBe(false);
+  expect(c({ name: `bob`, colour: `red` })).toBe(true);
 
 });
 
-test(`track-unique-refs`, t => {
+test(`track-unique-refs`, () => {
   // String
   const a = uniqueInstances<string>();
   const v1 = `hello`;
-  t.true(a(v1));
-  t.true(a(`there`));
-  t.false(a(`hello`)); // same value but not same obj
-  t.false(a(v1));
+  expect(a(v1)).toBe(true);
+  expect(a(`there`)).toBe(true);
+  expect(a(`hello`)).toBe(false); // same value but not same obj
+  expect(a(v1)).toBe(false);
   // @ts-expect-error
-  t.true(a(24)); // not right type, but still unique
+  expect(a(24)).toBe(true); // not right type, but still unique
   // @ts-expect-error
-  t.throws(() => a(undefined));
+  expect(() => a(undefined)).toThrow();
   //@ts-expect-error
-  t.throws(() => a(null));
+  expect(() => a(null)).toThrow();
 
   // Simple object
   type Person = { name: string, colour: string }
   const b = uniqueInstances<Person>();
   const v2 = { name: `jane`, colour: `red` };
-  t.true(b(v2));
-  t.true(b({ name: `jane`, colour: `red` }));
-  t.false(b(v2));
-  t.true(b({ name: `jane`, colour: `blue` }));
-  t.true(b({ name: `bob`, colour: `red` }));
+  expect(b(v2)).toBe(true);
+  expect(b({ name: `jane`, colour: `red` })).toBe(true);
+  expect(b(v2)).toBe(false);
+  expect(b({ name: `jane`, colour: `blue` })).toBe(true);
+  expect(b({ name: `bob`, colour: `red` })).toBe(true);
 });

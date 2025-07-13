@@ -1,6 +1,6 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
-test(`sync-to-object`, async t => {
+test(`sync-to-object`, async () => {
   const s1 = [ 0, 1, 2, 3, 4 ];
   const s2 = [ 10, 11, 12, 13, 14 ];
   const createSources = () => ({
@@ -12,12 +12,12 @@ test(`sync-to-object`, async t => {
   const r1 = Rx.syncToObject(createSources(), { onSourceDone: `break` });
   const r1Array = await Rx.toArray(r1);
   // Since first source finishes before second has a chance to begin, we'll get an empty array
-  t.deepEqual(r1Array, []);
+  expect(r1Array).toEqual([]);
 
   // Test 2: Allow source completion; setting to completed stream value to _undefined_
   const r2 = Rx.syncToObject(createSources(), { onSourceDone: `allow`, finalValue: `undefined` });
   const r2Array = await Rx.toArray(r2);
-  t.deepEqual(r2Array, [
+  expect(r2Array).toEqual([
     { fast: undefined, slow: 10 },
     { fast: undefined, slow: 11 },
     { fast: undefined, slow: 12 },
@@ -28,7 +28,7 @@ test(`sync-to-object`, async t => {
   // Test 3: Allow source completion; using last value from stream
   const r3 = Rx.syncToObject(createSources(), { onSourceDone: `allow`, finalValue: `last` });
   const r3Array = await Rx.toArray(r3);
-  t.deepEqual(r3Array, [
+  expect(r3Array).toEqual([
     { fast: 4, slow: 10 },
     { fast: 4, slow: 11 },
     { fast: 4, slow: 12 },
@@ -48,14 +48,12 @@ test(`sync-to-object`, async t => {
 
   // Hard to do testing since it is so timing dependent.
   if (r4Array[ 0 ]?.fast === 0) {
-    t.deepEqual(r4Array, [
+    expect(r4Array).toEqual([
       { fast: 0, slow: 10 }, { fast: 3, slow: 11 }
     ])
   } else {
-    if (r4Array[ 0 ]?.fast === 1 && r4Array[ 0 ]?.slow === 10) {
-      t.pass();
-    } else {
-      t.deepEqual(r4Array, [
+    if (r4Array[ 0 ]?.fast === 1 && r4Array[ 0 ]?.slow === 10) {} else {
+      expect(r4Array).toEqual([
         { fast: 1, slow: 10 }, { fast: 3, slow: 11 }
       ]);
     }

@@ -1,21 +1,8 @@
 # Development
 
-## Build scripts
-
-Type-check and compile to `./etc/build/`
-
 ```
-npm run build
-npm run develop // continually rebuild just with tsc
-npm run dev     // continually rebuild & bundle with tsup
-```
-
-Build Typescript sources, running a single file with source map support. Note
-that the path is the intermediate build path, rather than the `./src/` path, and
-the `JS` extension is used.
-
-```
-npm run run -- ./etc/build/StateMachine.js
+pnpm run clean
+pnpm run build
 ```
 
 ## Using a local copy of ixfx
@@ -57,40 +44,18 @@ Cleans and builds for packaging:
 npm run publish
 ```
 
-## Docs
-
-Generate API docs to `./docs` so they are picked up by GH pages.
-
-```
-npm run docs
-npm run docs:watch // Auto-rebuilt as source changes
-```
-
 ## Testing
-
-The `tests` folder contains Jest unit tests.
 
 Run all tests:
 
 ```
-npm run test
+pnpm run test
 ```
 
 Run a single test:
 
 ```
-npm run test -- --match="name-of-test"
-```
-
-Run a single test file:
-```
-npx ava --config ./config/ava.config.js ./src/__test/NAME_OF_FILE.ts
-```
-
-ESLint report:
-
-```
-npm run lint
+npx vitest run packages/flow/__tests__/retry.test.ts
 ```
 
 ## Coding conventions
@@ -99,8 +64,21 @@ ESLint rules enforce most conventions.
 
 # Verification
 
+Verify packages
+```
+pnpm run publint
+```
+
 ```
 npm run knip
 npx --yes @arethetypeswrong/cli --format ascii --profile esm-only --pack .
 npx publint
+```
+
+# Publishing
+
+```
+pnpm changeset version
+pnpm install
+pnpm publish -r
 ```

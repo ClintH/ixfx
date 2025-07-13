@@ -1,6 +1,6 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
-test(`combine-latest-to-object`, async t => {
+test(`combine-latest-to-object`, async () => {
   const s1 = [ 0, 1, 2, 3, 4 ];
   const s2 = [ 10, 11, 12, 13, 14 ];
   const createSources = () => ({
@@ -13,16 +13,16 @@ test(`combine-latest-to-object`, async t => {
   const r1Array = await Rx.toArray(r1);
   if (r1Array[ 0 ]?.slow === 10) {
     if (r1Array.length === 5) {
-      t.deepEqual(r1Array, [
+      expect(r1Array).toEqual([
         { fast: 0, slow: 10 }, { fast: 1, slow: 10 }, { fast: 2, slow: 10 }, { fast: 3, slow: 10 }, { fast: 4, slow: 10 }
       ]);
     } else {
-      t.deepEqual(r1Array, [
+      expect(r1Array).toEqual([
         { fast: 1, slow: 10 }, { fast: 2, slow: 10 }, { fast: 3, slow: 10 }, { fast: 4, slow: 10 }
       ]);
     }
   } else {
-    t.deepEqual(r1Array, [
+    expect(r1Array).toEqual([
       { fast: 0, slow: undefined }, { fast: 1, slow: undefined }, { fast: 2, slow: undefined }, { fast: 3, slow: undefined }, { fast: 4, slow: undefined }
     ]);
   }
@@ -58,6 +58,6 @@ test(`combine-latest-to-object`, async t => {
   const opt2ASame = JSON.stringify(opt2) === JSON.stringify(r2Array);
   // Sometimes we miss the first value
   const opt2BSame = JSON.stringify(opt2.slice(1)) === JSON.stringify(r2Array);
-  t.true(opt1Same || opt2ASame || opt2BSame);
+  expect(opt1Same || opt2ASame || opt2BSame).toBe(true);
 
 });

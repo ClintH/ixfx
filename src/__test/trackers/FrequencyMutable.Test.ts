@@ -1,12 +1,12 @@
+import expect from 'expect';
 /* eslint-disable */
-import test from 'ava';
 import type { KeyValue } from '../../PrimitiveTypes.js';
 import { FrequencyTracker } from '../../trackers/FrequencyMutable.js';
 import { shuffle } from '../../data/arrays/Random.js';
 import { arrayValuesEqual } from '../Include.js';
 import { isEqualValueDefault } from '../../util/IsEqual.js';
 
-test(`sorting`, (t) => {
+test(`sorting`, () => {
   const a: KeyValue[] = [
     [ `apple`, 10 ],
     [ `orange`, 2 ],
@@ -26,8 +26,8 @@ test(`sorting`, (t) => {
   arrayValuesEqual(t, h.toArray(), a, isEqualValueDefault);
 
   // Test frequencyOf
-  t.is(h.frequencyOf(`pineapple`), 9);
-  t.true(h.frequencyOf(`notfound`) === undefined);
+  expect(h.frequencyOf(`pineapple`)).toBe(9);
+  expect(h.frequencyOf(`notfound`) === undefined).toBe(true);
 
   // Test iterators
   const aKeys = Array.from(h.keys());
@@ -38,18 +38,18 @@ test(`sorting`, (t) => {
 
   // Should work
   h.add(null);
-  t.is(h.frequencyOf(null), 1);
+  expect(h.frequencyOf(null)).toBe(1);
 
   // Should throw
-  t.throws(() => h.add(undefined));
+  expect(() => h.add(undefined)).toThrow();
 
   h.clear();
-  t.true(h.toArray().length === 0);
+  expect(h.toArray().length === 0).toBe(true);
 
 });
 
-test(`events-add`, t => {
-  t.plan(2);
+test(`events-add`, () => {
+  expect.assertions(2);
   const h2 = new FrequencyTracker();
   h2.addEventListener(`change`, ev => {
     t.assert(true);
@@ -58,7 +58,7 @@ test(`events-add`, t => {
   h2.add('there');
 });
 
-test(`events-clear`, t => {
+test(`events-clear`, () => {
   const h2 = new FrequencyTracker();
   h2.add('hello', 'there');
 

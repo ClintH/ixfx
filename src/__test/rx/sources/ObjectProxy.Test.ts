@@ -1,19 +1,19 @@
-import test, { type ExecutionContext } from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 
-test(`from-proxy-array`, async (t: ExecutionContext<any>) => {
+test(`from-proxy-array`, async () => {
   const { proxy, rx } = Rx.From.arrayProxy([ `one`, `two`, `three` ]);
   let step = 0;
   rx.onValue(v => {
     //console.log(`value`, v);
     switch (step) {
       case 0: {
-        t.deepEqual(v, [ `one`, `two`, `three`, `four` ]);
+        expect(v).toEqual([ `one`, `two`, `three`, `four` ]);
         break;
       }
       case 1: {
-        t.deepEqual(v, [ `one`, `two`, `three` ]);
+        expect(v).toEqual([ `one`, `two`, `three` ]);
         break;
       }
     }
@@ -29,25 +29,25 @@ test(`from-proxy-array`, async (t: ExecutionContext<any>) => {
   await Flow.sleep(50);
 });
 
-test(`from-proxy-array-as-object`, async t => {
+test(`from-proxy-array-as-object`, async () => {
   const { proxy, rx } = Rx.From.objectProxy([ `one`, `two`, `three` ]);
   let step = 0;
   rx.onValue(v => {
     //console.log(`value`, v);
     switch (step) {
       case 0: {
-        t.deepEqual(v, [ `one`, `two`, `three`, `four` ]);
+        expect(v).toEqual([ `one`, `two`, `three`, `four` ]);
         break;
       }
       case 1: {
-        t.deepEqual(v, [ `one`, `two`, `three` ]);
+        expect(v).toEqual([ `one`, `two`, `three` ]);
         break;
       }
     }
   })
 
   // Not allowed to change shape of array
-  t.throws(() => proxy.push(`four`));
+  expect(() => proxy.push(`four`)).toThrow();
   await Flow.sleep(50);
 
   // Step 1: [one, two, three]
@@ -56,35 +56,35 @@ test(`from-proxy-array-as-object`, async t => {
   await Flow.sleep(50);
 });
 
-test(`from-proxy-object-1`, async (t: ExecutionContext<any>) => {
+test(`from-proxy-object-1`, async () => {
   const { proxy: person, rx: personRx } = Rx.From.objectProxy({ name: `jill` });
   let valueFired = 0;
 
   personRx.onValue(v => {
-    t.deepEqual(v, { name: "john" });
+    expect(v).toEqual({ name: "john" });
     valueFired++;
   });
   personRx.on(v => {
-    t.deepEqual(v.value, { name: `john` });
+    expect(v.value).toEqual({ name: `john` });
     valueFired++;
   });
   personRx.onDiff(diff => {
-    t.deepEqual(diff, [ { path: `name`, value: `john`, previous: `jill`, state: `change` } ]);
+    expect(diff).toEqual([ { path: `name`, value: `john`, previous: `jill`, state: `change` } ]);
     valueFired++;
   })
 
-  t.is(person.name, `jill`);
-  t.is(personRx.last().name, `jill`);
+  expect(person.name).toBe(`jill`);
+  expect(personRx.last().name).toBe(`jill`);
   person.name = `john`;
-  t.is(person.name, `john`);
-  t.is(personRx.last().name, `john`);
-  t.is(valueFired, 3);
+  expect(person.name).toBe(`john`);
+  expect(personRx.last().name).toBe(`john`);
+  expect(valueFired).toBe(3);
 
   // @ts-ignore
-  t.throws(() => proxy.age = 12);
+  expect(() => proxy.age = 12).toThrow();
 });
 
-test(`from-proxy-object-2`, async t => {
+test(`from-proxy-object-2`, async () => {
   let valueFired = 0;
   const { proxy: person, rx: personRx } = Rx.From.objectProxy({
     name: `jill`,
@@ -99,8 +99,8 @@ test(`from-proxy-object-2`, async t => {
   // Change one thing
   person.address = { street: `West St`, number: 12 };
   await Flow.sleep(50);
-  t.is(valueFired, 1);
-  t.deepEqual(person, {
+  expect(valueFired).toBe(1);
+  expect(person).toEqual({
     name: `jill`,
     address: {
       street: `West St`, number: 12
@@ -111,8 +111,8 @@ test(`from-proxy-object-2`, async t => {
   valueFired = 0;
   person.name = `jane`;
   person.address = { street: `North St`, number: 13 };
-  t.is(valueFired, 2);
-  t.deepEqual(person, {
+  expect(valueFired).toBe(2);
+  expect(person).toEqual({
     name: `jane`,
     address: {
       street: `North St`, number: 13
@@ -122,20 +122,20 @@ test(`from-proxy-object-2`, async t => {
 });
 
 // Update single element within array
-test(`from-object-array-as-object-2`, async (t: ExecutionContext<any>) => {
+test(`from-object-array-as-object-2`, async () => {
   let valueFired = 0;
   const { proxy: array, rx: arrayRx } = Rx.From.objectProxy([ `a`, `b`, `c` ]);
   arrayRx.onValue(v => {
-    t.deepEqual(v, [ `a`, `d`, `c` ]);
+    expect(v).toEqual([ `a`, `d`, `c` ]);
     valueFired++;
   });
   arrayRx.onDiff(diff => {
-    t.deepEqual(diff, [ { path: `1`, value: `d`, previous: `b`, state: `change` } ]);
+    expect(diff).toEqual([ { path: `1`, value: `d`, previous: `b`, state: `change` } ]);
     valueFired++;
   });
 
   array[ 1 ] = `d`;
-  t.deepEqual(array, [ `a`, `d`, `c` ]);
+  expect(array).toEqual([ `a`, `d`, `c` ]);
   await Flow.sleep(50);
-  t.is(valueFired, 2);
+  expect(valueFired).toBe(2);
 });

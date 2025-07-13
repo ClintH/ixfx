@@ -1,44 +1,44 @@
+import expect from 'expect';
 import { number as numberTracker } from '../../trackers/NumberTracker.js';
-import test from 'ava';
 
-test(`numberTracker`, (t) => {
+test(`numberTracker`, () => {
   const a = numberTracker({ id: `test` });
-  t.true(a.id === `test`);
-  t.true(a.total === 0);
+  expect(a.id === `test`).toBe(true);
+  expect(a.total === 0).toBe(true);
 
   a.seen(10);
   a.seen(10);
   a.seen(10);
 
-  t.true(a.avg === 10);
-  t.true(a.min === 10);
-  t.true(a.max === 10);
-  t.true(a.total === 30);
-  t.true(a.last === 10);
-  t.true(a.seenCount === 3);
+  expect(a.avg === 10).toBe(true);
+  expect(a.min === 10).toBe(true);
+  expect(a.max === 10).toBe(true);
+  expect(a.total === 30).toBe(true);
+  expect(a.last === 10).toBe(true);
+  expect(a.seenCount === 3).toBe(true);
 
   a.seen(100);
-  t.true(a.avg === 32.5);
-  t.true(a.min === 10);
-  t.true(a.max === 100);
-  t.true(a.total === 130);
-  t.true(a.last === 100);
-  t.true(a.seenCount === 4);
+  expect(a.avg === 32.5).toBe(true);
+  expect(a.min === 10).toBe(true);
+  expect(a.max === 100).toBe(true);
+  expect(a.total === 130).toBe(true);
+  expect(a.last === 100).toBe(true);
+  expect(a.seenCount === 4).toBe(true);
 });
 
 
-test(`multiple`, t => {
+test(`multiple`, () => {
   const a = numberTracker();
   const r1 = a.seen(10, 10, 10);
-  t.is(r1.total, 30);
-  t.is(r1.max, 10);
-  t.is(r1.min, 10);
-  t.is(r1.avg, 10);
+  expect(r1.total).toBe(30);
+  expect(r1.max).toBe(10);
+  expect(r1.min).toBe(10);
+  expect(r1.avg).toBe(10);
 
   const b = numberTracker();
   const r2 = b.seen(10, 20, 30);
-  t.is(r2.total, 60);
-  t.is(r2.min, 10);
-  t.is(r2.max, 30);
-  t.is(r2.avg, 20);
+  expect(r2.total).toBe(60);
+  expect(r2.min).toBe(10);
+  expect(r2.max).toBe(30);
+  expect(r2.avg).toBe(20);
 });

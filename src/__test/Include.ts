@@ -1,5 +1,5 @@
+import expect from 'expect';
 /* eslint-disable */
-import { type ExecutionContext } from 'ava';
 import { isEqualDefault } from '../util/IsEqual.js';
 import { isContentsTheSame } from '../data/arrays/Equality.js';
 import { minMaxAvg } from '../numbers/MinMaxAvg.js';
@@ -8,7 +8,7 @@ import { hasEqualValuesShallow } from '../iterables/CompareValues.js';
 
 export const areIntegers = (t: ExecutionContext, a: Array<number>) => {
   for (let i = 0; i < a.length; i++) {
-    t.is(Math.abs(a[ i ]) % 1, 0, `Integer ${ a[ i ] }`);
+    expect(Math.abs(a[ i ]) % 1).toBe(0);
   }
 };
 
@@ -137,7 +137,7 @@ export const equalUnordered = (
   //   t.fail(`length ${a.length} expected ${b.length}`);
   //   return;
   // }
-  t.is(a.length, b.length, `Array length`);
+  expect(a.length).toBe(b.length);
 
   const aa = [ ...a ].sort();
   const bb = [ ...b ].sort();
@@ -147,7 +147,7 @@ export const equalUnordered = (
 
     //   return;
     // }
-    t.is(aa[ i ], bb[ i ], `Contents at ${ i }`);
+    expect(aa[ i ]).toBe(bb[ i ]);
   }
 };
 
@@ -226,22 +226,22 @@ export const rangeCheck = (
   const { min, max } = minMaxAvg(v);
   if (expected.lowerExcl !== undefined) {
     if (min < expected.lowerExcl) {
-      t.is(min, expected.lowerExcl, 'Lower exclusive');
+      expect(min).toBe(expected.lowerExcl);
     }
   }
   if (expected.lowerIncl !== undefined) {
     if (min >= expected.lowerIncl) {
-      t.is(min, expected.lowerIncl, 'Lower inclusive');
+      expect(min).toBe(expected.lowerIncl);
     }
   }
   if (expected.upperExcl !== undefined) {
     if (max > expected.upperExcl) {
-      t.is(max, expected.upperExcl, 'Upper exclusive');
+      expect(max).toBe(expected.upperExcl);
     }
   }
   if (expected.upperIncl !== undefined) {
     if (max <= expected.upperIncl) {
-      t.is(max, expected.upperIncl, 'Upper inclusive');
+      expect(max).toBe(expected.upperIncl);
     }
   }
 };

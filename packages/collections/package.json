@@ -1,0 +1,72 @@
+{
+	"name": "@ixfx/collections",
+	"version": "0.37.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./stack": {
+			"types": "./src/stack/index.ts",
+			"import": "./src/stack/index.ts"
+		},
+		"./set": {
+			"types": "./src/set/index.ts",
+			"import": "./src/set/index.ts"
+		},
+		"./graph": {
+			"types": "./src/graph/index.ts",
+			"import": "./src/graph/index.ts"
+		},
+		"./tree": {
+			"types": "./src/tree/index.ts",
+			"import": "./src/tree/index.ts"
+		},
+		"./queue": {
+			"types": "./src/queue/index.ts",
+			"import": "./src/queue/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/iterables": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./stack": {
+				"types": "./dist/src/stack/index.d.ts",
+				"import": "./dist/src/stack/index.js"
+			},
+			"./set": {
+				"types": "./dist/src/set/index.d.ts",
+				"import": "./dist/src/set/index.js"
+			},
+			"./graph": {
+				"types": "./dist/src/graph/index.d.ts",
+				"import": "./dist/src/graph/index.js"
+			},
+			"./tree": {
+				"types": "./dist/src/tree/index.d.ts",
+				"import": "./dist/src/tree/index.js"
+			},
+			"./queue": {
+				"types": "./dist/src/queue/index.d.ts",
+				"import": "./dist/src/queue/index.js"
+			}
+		}
+	}
+}

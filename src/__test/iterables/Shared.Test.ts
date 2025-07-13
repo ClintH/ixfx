@@ -1,9 +1,9 @@
-import test from "ava";
+import expect from 'expect';
 import * as Iter from '../../iterables/index.js';
 import { count } from "../../numbers/Count.js";
 import { sleep } from "../../flow/Sleep.js";
 
-test(`controller-basic`, async t => {
+test(`controller-basic`, async () => {
   let createdIterators = 0;
   let values = 0;
   const ic1 = Iter.iteratorController({
@@ -16,17 +16,17 @@ test(`controller-basic`, async t => {
     },
   });
   await sleep(100);
-  t.is(values, 0);
-  t.is(createdIterators, 0);
-  t.is(ic1.state, `stopped`);
+  expect(values).toBe(0);
+  expect(createdIterators).toBe(0);
+  expect(ic1.state).toBe(`stopped`);
   ic1.start();
-  t.is(ic1.state, `running`);
+  expect(ic1.state).toBe(`running`);
   await sleep(100);
-  t.is(createdIterators, 1);
-  t.is(values, 5);
+  expect(createdIterators).toBe(1);
+  expect(values).toBe(5);
 });
 
-test(`controller-delay`, async t => {
+test(`controller-delay`, async () => {
   let createdIterators = 0;
   let values: number[] = [];
   const ic1 = Iter.iteratorController({
@@ -41,12 +41,12 @@ test(`controller-delay`, async t => {
   });
   ic1.start();
   await sleep(210);
-  t.is(createdIterators, 1);
-  t.is(values.length, 4);
+  expect(createdIterators).toBe(1);
+  expect(values.length).toBe(4);
   ic1.cancel();
 });
 
-test(`controller-restart`, async t => {
+test(`controller-restart`, async () => {
   let createdIterators = 0;
   let values: number[] = [];
   const ic1 = Iter.iteratorController({
@@ -61,19 +61,19 @@ test(`controller-restart`, async t => {
   });
   ic1.start();
   await sleep(210);
-  t.is(createdIterators, 1);
-  t.is(values.length, 4);
+  expect(createdIterators).toBe(1);
+  expect(values.length).toBe(4);
   ic1.restart();
   await sleep(50);
-  t.is(ic1.state, `running`);
-  t.is(createdIterators, 2);
+  expect(ic1.state).toBe(`running`);
+  expect(createdIterators).toBe(2);
 
   await sleep(210);
-  t.deepEqual(values, [ 0, 1, 2, 3, 0, 1, 2, 3, 4 ]);
+  expect(values).toEqual([ 0, 1, 2, 3, 0, 1, 2, 3, 4 ]);
   ic1.cancel();
 });
 
-test(`controller-pause-resume`, async t => {
+test(`controller-pause-resume`, async () => {
   let createdIterators = 0;
   let values: number[] = [];
   const ic1 = Iter.iteratorController({
@@ -89,28 +89,28 @@ test(`controller-pause-resume`, async t => {
   ic1.start();
   await sleep(210);
   ic1.pause();
-  t.is(createdIterators, 1);
-  t.is(values.length, 4);
-  t.is(ic1.state, `paused`);
+  expect(createdIterators).toBe(1);
+  expect(values.length).toBe(4);
+  expect(ic1.state).toBe(`paused`);
 
   // Test that nothing happens while paused
   await sleep(110);
-  t.is(createdIterators, 1);
-  t.is(values.length, 4);
-  t.is(ic1.state, `paused`);
+  expect(createdIterators).toBe(1);
+  expect(values.length).toBe(4);
+  expect(ic1.state).toBe(`paused`);
 
   // Continue, test that we don't create a new iterator
   // and that total values is 8
   ic1.start();
   await sleep(210);
   ic1.cancel();
-  t.is(createdIterators, 1);
-  t.is(values.length, 8);
-  t.is(ic1.state, `stopped`);
+  expect(createdIterators).toBe(1);
+  expect(values.length).toBe(8);
+  expect(ic1.state).toBe(`stopped`);
 });
 
 
-test(`fromFunctionAwaited`, async t => {
+test(`fromFunctionAwaited`, async () => {
   let count = 0;
   let executed = 0;
   const results: Array<number> = [];
@@ -123,7 +123,7 @@ test(`fromFunctionAwaited`, async t => {
     count++;
     if (count === 5) break;
   }
-  t.is(count, 5);
-  t.is(executed, 5);
-  t.deepEqual(results, [ 1, 2, 3, 4, 5 ]);
+  expect(count).toBe(5);
+  expect(executed).toBe(5);
+  expect(results).toEqual([ 1, 2, 3, 4, 5 ]);
 });

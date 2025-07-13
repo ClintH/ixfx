@@ -1,0 +1,14 @@
+import { type Coord as PolarCoord } from './polar/index.js';
+import type { Point } from './point/point-type.js';
+export type Vector = Point | PolarCoord;
+
+export type * from './rect/rect-types.js';
+export type * from './path/path-type.js';
+export type * from './grid/types.js';
+export type { Circle, CirclePositioned } from "./circle/circle-type.js";
+export type { CircularPath } from './circle/circular-path.js';
+export type * from "./line/line-type.js";
+export { type Point, type Point3d } from "./point/point-type.js";
+export type { PointCalculableShape, ShapePositioned } from './shape/index.js';
+export type { Triangle } from './triangle/triangle-type.js'
+export type { Arc, ArcPositioned } from './arc/arc-type.js';

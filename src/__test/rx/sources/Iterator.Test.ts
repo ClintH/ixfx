@@ -1,4 +1,4 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 import * as Iter from '../../../iterables/index.js';
@@ -6,15 +6,15 @@ import { isApprox } from '../../../numbers/IsApprox.js';
 import { count } from '../../../numbers/Count.js';
 import { repeat } from '../../../flow/Repeat.js';
 
-test(`from-array`, async t => {
+test(`from-array`, async () => {
   const d1 = [ 1, 2, 3, 4, 5 ];
   const r1 = Rx.From.iterator(d1);
   const r1Data = await Rx.toArray(r1);
-  t.deepEqual(r1Data, d1);
+  expect(r1Data).toEqual(d1);
 });
 
 // Lazy: Never, whenStopped: reset
-test(`from-array-lazy-never-breaking-reset`, async t => {
+test(`from-array-lazy-never-breaking-reset`, async () => {
   const source = () => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ];
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `never` });
   let count = 0;
@@ -27,13 +27,13 @@ test(`from-array-lazy-never-breaking-reset`, async t => {
     }
   });
   await Flow.sleep(100);
-  t.is(count, 5);
-  t.deepEqual(r1Data, [ 1, 2, 3, 4, 5 ]);
-  t.true(r1.isDisposed());
+  expect(count).toBe(5);
+  expect(r1Data).toEqual([ 1, 2, 3, 4, 5 ]);
+  expect(r1.isDisposed()).toBe(true);
 });
 
 // Lazy: Initial, whenStopped: reset
-test(`from-array-lazy-initial-breaking-reset`, async t => {
+test(`from-array-lazy-initial-breaking-reset`, async () => {
   const source = () => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ];
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `initial` });
   let count = 0;
@@ -44,17 +44,17 @@ test(`from-array-lazy-initial-breaking-reset`, async t => {
     if (count === 5) r1Off();
   });
   await Flow.sleep(100);
-  t.is(count, 5);
-  t.deepEqual(r1Data, [ 1, 2, 3, 4, 5 ]);
+  expect(count).toBe(5);
+  expect(r1Data).toEqual([ 1, 2, 3, 4, 5 ]);
 
   // Expect the reactive to dispose
   // It continues running through source until end, since lazy:initial
   await Flow.sleep(100);
-  t.true(r1.isDisposed());
+  expect(r1.isDisposed()).toBe(true);
 });
 
 // Lazy: Very, whenStopped: continue
-test(`from-array-lazy-very-breaking-continue`, async t => {
+test(`from-array-lazy-very-breaking-continue`, async () => {
   const source = () => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ];
   const r1 = Rx.From.iterator(source(), { whenStopped: `continue`, lazy: `very` });
   let count = 0;
@@ -67,8 +67,8 @@ test(`from-array-lazy-very-breaking-continue`, async t => {
     }
   });
   await Flow.sleep(100);
-  t.is(count, 5);
-  t.deepEqual(r1Data, [ 1, 2, 3, 4, 5 ]);
+  expect(count).toBe(5);
+  expect(r1Data).toEqual([ 1, 2, 3, 4, 5 ]);
 
   count = 0;
   const r2Data: number[] = [];
@@ -80,12 +80,12 @@ test(`from-array-lazy-very-breaking-continue`, async t => {
     }
   });
   await Flow.sleep(100);
-  t.is(count, 5);
-  t.deepEqual(r2Data, [ 6, 7, 8, 9, 10 ]);
+  expect(count).toBe(5);
+  expect(r2Data).toEqual([ 6, 7, 8, 9, 10 ]);
   r2Off();
 });
 
-test(`from-array-breaking-reset`, async t => {
+test(`from-array-breaking-reset`, async () => {
   const source = () => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ];
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `very`, readInterval: 50 });
   let count = 0;
@@ -100,8 +100,8 @@ test(`from-array-breaking-reset`, async t => {
 
   await Flow.sleepWhile(() => count < 5, 50);
 
-  t.is(count, 5);
-  t.deepEqual(r1Data, [ 1, 2, 3, 4, 5 ]);
+  expect(count).toBe(5);
+  expect(r1Data).toEqual([ 1, 2, 3, 4, 5 ]);
 
   count = 0;
   const r2Data: number[] = [];
@@ -114,19 +114,19 @@ test(`from-array-breaking-reset`, async t => {
   });
   await Flow.sleepWhile(() => count < 5, 50);
 
-  t.is(count, 5);
-  t.deepEqual(r2Data, [ 1, 2, 3, 4, 5 ]);
+  expect(count).toBe(5);
+  expect(r2Data).toEqual([ 1, 2, 3, 4, 5 ]);
   r2Off();
 });
 
 // Synchronous generator
-test(`from-sync-iterator`, async t => {
+test(`from-sync-iterator`, async () => {
   const r1 = Rx.From.iterator(count(5));
   const r1Data = await Rx.toArray(r1);
-  t.deepEqual(r1Data, [ 0, 1, 2, 3, 4 ]);
+  expect(r1Data).toEqual([ 0, 1, 2, 3, 4 ]);
 });
 
-test(`from-async`, async t => {
+test(`from-async`, async () => {
   // Asynchronous generator
   const runCount = 5;
   let countProgress = runCount;
@@ -138,12 +138,12 @@ test(`from-async`, async t => {
   let start = performance.now();
   const r2Data = await Rx.toArray(r2);
   let elapsed = performance.now() - start;
-  t.is(countProgress, 0);
-  t.deepEqual(r2Data, [ 4, 3, 2, 1, 0 ]);
-  t.true(isApprox(0.1, (runCount + 1) * intervalPeriod, elapsed), `Elapsed: ${ elapsed }`);
+  expect(countProgress).toBe(0);
+  expect(r2Data).toEqual([ 4, 3, 2, 1, 0 ]);
+  expect(isApprox(0.1, (runCount + 1) * intervalPeriod, elapsed)).toBe(true);
 });
 
-test(`generator-lazy`, async t => {
+test(`generator-lazy`, async () => {
   let produceCount = 0;
   let consumeCount = 0;
   const ac = new AbortController();
@@ -170,11 +170,11 @@ test(`generator-lazy`, async t => {
   }, 1500);
 
   await Flow.sleep(1000);
-  t.is(consumeCount, produceCount);
+  expect(consumeCount).toBe(produceCount);
 
 })
 
-test(`generator-async`, async t => {
+test(`generator-async`, async () => {
   // Produce values every 100ms
   const valueRateMs = 100;
   const valueCount = 10;
@@ -191,15 +191,15 @@ test(`generator-async`, async t => {
       return;
     }
   });
-  t.false(source.isDisposed());
+  expect(source.isDisposed()).toBe(false);
   const sleepFor = valueRateMs * (valueCount + 2);
   await Flow.sleep(sleepFor);
   const elapsed = Date.now() - start;
   //t.true(isApprox(0.1, valueRateMs * valueCount, elapsed));
-  t.true(source.isDisposed());
+  expect(source.isDisposed()).toBe(true);
 });
 
-test(`generator-sync`, async t => {
+test(`generator-sync`, async () => {
   const values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
   const source = Rx.From.iterator(values.values(), { lazy: `initial` });
   const readValues: number[] = [];
@@ -210,11 +210,11 @@ test(`generator-sync`, async t => {
   });
 
   await Flow.sleep(1000);
-  t.true(readValues.length === values.length);
+  expect(readValues.length === values.length).toBe(true);
 });
 
 // Lazy: Initial, whenStopped: reset
-test(`from-iterable-breaking-initial-reset`, async t => {
+test(`from-iterable-breaking-initial-reset`, async () => {
   const source = () => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ];
 
   const r1 = Rx.From.iterator(source(), { whenStopped: `reset`, lazy: `initial` });
@@ -226,17 +226,17 @@ test(`from-iterable-breaking-initial-reset`, async t => {
     if (count === 5) r1Off();
   });
   await Flow.sleep(100);
-  t.is(count, 5);
-  t.deepEqual(r1Data, [ 1, 2, 3, 4, 5 ]);
+  expect(count).toBe(5);
+  expect(r1Data).toEqual([ 1, 2, 3, 4, 5 ]);
 
   // Expect the reactive to dispose
   // It continues running through source until end, since lazy:initial
   await Flow.sleep(100);
-  t.true(r1.isDisposed());
+  expect(r1.isDisposed()).toBe(true);
 });
 
 // Iterator that never ends
-test(`from-function`, async t => {
+test(`from-function`, async done => {
   const random = Iter.fromFunction(Math.random);
   const r1 = Rx.From.iterator(random, { readInterval: 100 });
   let count = 0;
@@ -245,10 +245,10 @@ test(`from-function`, async t => {
     if (count == 5) {
       r1.dispose(`test dispose`);
     } else if (count > 5) {
-      t.fail(`Still producing values`);
+      done.fail(`Still producing values`);
     }
   });
   await Flow.sleep(500);
-  t.is(count, 5);
+  expect(count).toBe(5);
   off();
 });

@@ -1,10 +1,10 @@
-import test from 'ava';
+import expect from 'expect';
 import * as Rx from '../../../rx/index.js';
 import * as Flow from '../../../flow/index.js';
 
 const sleepBetweenMs = 50;
 
-test(`dispose`, async t => {
+test(`dispose`, async () => {
   const a = Rx.From.number(10);
   const b = Rx.From.string(`test1`);
 
@@ -24,12 +24,12 @@ test(`dispose`, async t => {
   a.dispose(`test a dispose`);
   await Flow.sleep(sleepBetweenMs);
 
-  t.false(c2.isDisposed());
-  t.true(c1.isDisposed());
+  expect(c2.isDisposed()).toBe(false);
+  expect(c1.isDisposed()).toBe(true);
 
 });
 
-test(`basic`, async t => {
+test(`basic`, async () => {
   const a = Rx.From.number(10);
   const b = Rx.From.string(`test1`);
   let values: any[] = [];
@@ -52,7 +52,7 @@ test(`basic`, async t => {
 
   b.set('test2')
   await Flow.sleep(sleepBetweenMs);
-  t.is(count, 3);
+  expect(count).toBe(3);
 
   // If input values don't change, we won't expect them
   // to trigger, and thus no new dervived value
@@ -61,12 +61,12 @@ test(`basic`, async t => {
 
   b.set('test2');
   await Flow.sleep(sleepBetweenMs);
-  t.is(count, 3);
+  expect(count).toBe(3);
 
-  t.deepEqual(values, [ 'test1:10', 'test1:11', 'test2:11' ]);
+  expect(values).toEqual([ 'test1:10', 'test1:11', 'test2:11' ]);
 });
 
-test(`allow-identical`, async t => {
+test(`allow-identical`, async () => {
   const a = Rx.From.number(10);
   const b = Rx.From.string(`test1`);
   const sleepBetweenMs = 50;
@@ -99,10 +99,10 @@ test(`allow-identical`, async t => {
   b.set('test3');
   await Flow.sleep(sleepBetweenMs);
 
-  t.deepEqual(values, [ 'test1:10', 'test1:11', 'test2:11', 'bloop', 'bloop' ]);
+  expect(values).toEqual([ 'test1:10', 'test1:11', 'test2:11', 'bloop', 'bloop' ]);
 });
 
-test(`disallow-identical`, async t => {
+test(`disallow-identical`, async () => {
   const a = Rx.From.number(10);
   const b = Rx.From.string(`test1`);
   const sleepBetweenMs = 50;
@@ -135,7 +135,7 @@ test(`disallow-identical`, async t => {
   b.set('test3');
   await Flow.sleep(sleepBetweenMs);
 
-  t.deepEqual(values, [ 'test1:10', 'test1:11', 'test2:11', 'bloop' ]);
+  expect(values).toEqual([ 'test1:10', 'test1:11', 'test2:11', 'bloop' ]);
 });
 
 

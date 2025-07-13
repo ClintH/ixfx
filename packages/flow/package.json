@@ -1,0 +1,42 @@
+{
+	"name": "@ixfx/flow",
+	"version": "0.37.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./state-machine": {
+			"types": "./src/state-machine/index.ts",
+			"import": "./src/state-machine/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/numbers": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./state-machine": {
+				"types": "./dist/src/state-machine/index.d.ts",
+				"import": "./dist/src/state-machine/index.js"
+			}
+		}
+	}
+}

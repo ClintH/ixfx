@@ -1,0 +1,77 @@
+{
+	"name": "@ixfx/core",
+	"version": "0.37.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		},
+		"./elapsed": {
+			"types": "./src/elapsed.ts",
+			"import": "./src/elapsed.ts"
+		},
+		"./continuously": {
+			"types": "./src/continuously.ts",
+			"import": "./src/continuously.ts"
+		},
+		"./text": {
+			"types": "./src/text.ts",
+			"import": "./src/text.ts"
+		},
+		"./records": {
+			"types": "./src/records/index.ts",
+			"import": "./src/records/index.ts"
+		},
+		"./maps": {
+			"types": "./src/maps.ts",
+			"import": "./src/maps.ts"
+		},
+		"./trackers": {
+			"types": "./src/trackers/index.ts",
+			"import": "./src/trackers/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/guards": "workspace:^"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			},
+			"./elapsed": {
+				"types": "./dist/src/elapsed.d.ts",
+				"import": "./dist/src/elapsed.js"
+			},
+			"./continuously": {
+				"types": "./dist/src/continuously.d.ts",
+				"import": "./dist/src/continuously.js"
+			},
+			"./text": {
+				"types": "./dist/src/text.d.ts",
+				"import": "./dist/src/text.js"
+			},
+			"./records": {
+				"types": "./dist/src/records/index.d.ts",
+				"import": "./dist/src/records/index.js"
+			},
+			"./maps": {
+				"types": "./dist/src/maps.d.ts",
+				"import": "./dist/src/maps.js"
+			},
+			"./trackers": {
+				"types": "./dist/src/trackers/index.d.ts",
+				"import": "./dist/src/trackers/index.js"
+			}
+		}
+	}
+}

@@ -1,0 +1,44 @@
+{
+	"name": "@ixfx/io",
+	"version": "0.37.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./src/index.ts"
+		}
+	},
+	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/dom": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/debug": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/flow": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/random": "workspace:^",
+		"@ixfx/trackers": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/geometry": "workspace:^",
+		"@ixfx/visual": "workspace:^"
+	},
+	"devDependencies": {
+		"@types/dom-serial":"latest",
+		"@types/web-bluetooth":"latest"
+	},
+	"publishConfig": {
+		"main": "dist/src/index.js",
+		"exports": {
+			".": {
+				"types": "./dist/src/index.d.ts",
+				"import": "./dist/src/index.js"
+			}
+		}
+	}
+}
