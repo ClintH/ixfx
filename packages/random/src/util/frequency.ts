@@ -2,8 +2,8 @@
  * Computes the frequency of values by a grouping function.
  * ```js
  * const data = [1,2,3,4,5,6,7,8,9,10];
- * // Returns 'odd' or 'even' for an input value
  * 
+ * // Returns 'odd' or 'even' for an input value
  * const groupBy = v => v % 2 === 0 ? `even`:`odd`;
  * 
  * const data = frequencyByGroup(groupBy, data);
