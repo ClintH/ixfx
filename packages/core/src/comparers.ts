@@ -23,6 +23,7 @@ export const numericComparer = (x: number, y: number): CompareResult => {
   return -1;
 };
 
+
 /**
  * Default sort comparer, following same sematics as Array.sort.
  * Consider using {@link defaultComparer} to get more logical sorting of numbers.

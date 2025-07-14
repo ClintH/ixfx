@@ -7,7 +7,7 @@ import {
   toArray as mapToArray,
   find as mapFind,
   filter as mapFilter,
-  addKeepingExisting,
+  addValue as mapAddValue
 } from '@ixfx/core/maps';
 import type { IMapOfMutableExtended } from './imap-of-mutable-extended.js';
 
@@ -23,17 +23,17 @@ import type { IMapOfMutableExtended } from './imap-of-mutable-extended.js';
  *
  * @example Only storing the newest three items per key
  * ```js
- * const map = mapOfSetMutable();
- * map.add(`hello`, [1, 2, 3, 1, 2, 3]);
+ * const map = ofSetMutable();
+ * map.addKeyedValues(`hello`, [1, 2, 3, 1, 2, 3]);
  * const hello = map.get(`hello`); // [1, 2, 3]
  * ```
  *
  * @example
  * ```js
  * const hash = (v) => v.name; // Use name as the key
- * const map = mapOfSetMutable(hash);
- * map.add(`hello`, {age:40, name: `Mary`});
- * map.add(`hello`, {age:29, name: `Mary`}); // Value ignored as same name exists
+ * const map = ofSetMutable({hash});
+ * map.addValue({age:40, name: `Mary`});
+ * map.addValue({age:29, name: `Mary`}); // Value ignored as same name exists
  * ```
  * @param options
  * @returns
@@ -49,7 +49,7 @@ export const ofSetMutable = <V>(
       return `set`;
     },
     iterable: (source) => source.values(),
-    add: (dest, values) => addKeepingExisting(dest, hash, ...values),
+    add: (dest, values) => mapAddValue(dest, hash, `skip`, ...values),
     count: (source) => source.size,
     find: (source, predicate) => mapFind(source, predicate),
     filter: (source, predicate) => mapFilter(source, predicate),

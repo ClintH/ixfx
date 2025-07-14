@@ -3,7 +3,7 @@ import { isEqualDefault, type IsEqual } from './is-equal.js';
 import {
   toStringDefault,
 } from './to-string.js';
-import type { IDictionary,  IWithEntries, ToString } from './types.js';
+import type { IDictionary, IWithEntries, ToString } from './types.js';
 
 /**
  * Gets the closest integer key to `target` in `data`.
@@ -48,13 +48,13 @@ export const getClosestIntegerKey = (
  * // Iterate, yielding: `a.b.c.d`, `b.c.d`, `c.d`, `d`
  * const keys = Text.segmentsFromEnd(`a.b.c.d`);
  * // Gets first value that matches a key (starting from most precise)
- * const value = getFromKeys(data, keys);
+ * const value = findBySomeKey(data, keys);
  * ```
  * @param data 
  * @param keys 
  * @returns 
  */
-export const getFromKeys = <T>(data: ReadonlyMap<string, T>, keys: Iterable<string>): T | undefined => {
+export const findBySomeKey = <T>(data: ReadonlyMap<string, T>, keys: Iterable<string>): T | undefined => {
   for (const key of keys) {
     if (data.has(key)) return data.get(key);
   }
@@ -73,14 +73,14 @@ export const getFromKeys = <T>(data: ReadonlyMap<string, T>, keys: Iterable<stri
  * @param map Map to search
  * @param key Key to search
  * @param value Value to search
- * @param comparer Function to determine match
+ * @param comparer Function to determine match. By default uses === comparison.
  * @returns True if key is found
  */
 export const hasKeyValue = <K, V>(
   map: ReadonlyMap<K, V>,
   key: K,
   value: V,
-  comparer: IsEqual<V>
+  comparer: IsEqual<V> = isEqualDefault
 ): boolean => {
   if (!map.has(key)) return false;
   const values = [ ...map.values() ];
@@ -96,20 +96,20 @@ export const hasKeyValue = <K, V>(
  * const colourComparer = (a, b) => a.colour === b.colour;
  *
  * // Deletes all values where .colour = `red`
- * deleteByValueMutate(map, { colour: `red` }, colourComparer);
+ * deleteByValueCompareMutate(map, { colour: `red` }, colourComparer);
  * ```
  * @param map
  * @param value
- * @param comparer
+ * @param comparer Uses === equality by default. Use isEqualValueDefault to compare by value
  */
-export const deleteByValueMutate = <K, V>(
+export const deleteByValueCompareMutate = <K, V>(
   map: Map<K, V>,
   value: V,
   comparer: IsEqual<V> = isEqualDefault
 ) => {
-  for (const entry of Object.entries(map)) {
-    if (comparer(entry[ 1 ] as V, value)) {
-      map.delete(entry[ 0 ] as K);
+  for (const entry of map.entries()) {
+    if (comparer(entry[ 1 ], value)) {
+      map.delete(entry[ 0 ]);
     }
   }
 };
@@ -122,18 +122,18 @@ export const deleteByValueMutate = <K, V>(
  * map.set('hello', 'a');
  * map.set('there', 'b');
  *
- * const entry = firstEntryByPredicate(map, (value, key) => {
+ * const entry = findEntryByPredicate(map, (value, key) => {
  *  return (value === 'b');
  * });
  * // Entry is: ['there', 'b']
  * ```
  *
- * An alternative is {@link firstEntryByValue} to search by value.
+ * An alternative is {@link findEntryByValue} to search by value.
  * @param map Map to search
  * @param predicate Filter function returns true when there is a match of value
  * @returns Entry, or _undefined_ if `filter` function never returns _true_
  */
-export const firstEntryByPredicate = <K, V>(
+export const findEntryByPredicate = <K, V>(
   map: IWithEntries<K, V>,
   predicate: (value: V, key: K) => boolean
 ): readonly [ key: K, value: V ] | undefined => {
@@ -150,17 +150,18 @@ export const firstEntryByPredicate = <K, V>(
  * map.set('hello', 'a');
  * map.set('there', 'b');
  *
- * const entry = firstEntryByValue(map, 'b');
+ * const entry = findEntryByValue(map, 'b');
  * // Entry is: ['there', 'b']
  * ```
  *
- * An alternative is {@link firstEntryByValue} to search by predicate function.
+ * Uses JS's === comparison by default. Consider using {@link isEqualValueDefault} to match by value.
+ * An alternative is {@link findEntryByValue} to search by predicate function.
  * @param map Map to search
  * @param value Value to seek
  * @param isEqual Filter function which checks equality. Uses JS comparer by default.
  * @returns Entry, or _undefined_ if `value` not found.
  */
-export const firstEntryByValue = <K, V>(
+export const findEntryByValue = <K, V>(
   map: IWithEntries<K, V>,
   value: V,
   isEqual: IsEqual<V> = isEqualDefault
@@ -178,32 +179,140 @@ export const firstEntryByValue = <K, V>(
  * Uses provided {@link ToString} function to create keys for items. Item is only added if it doesn't already exist.
  * Thus the older item wins out, versus normal `Map.set` where the newest wins.
  *
- *
+ * Returns a copy of the input map.
  * @example
  * ```js
- * import { Maps } from "https://unpkg.com/ixfx/dist/collections.js";
  * const map = new Map();
  * const peopleArray = [ _some people objects..._];
- * Maps.addKeepingExisting(map, p => p.name, ...peopleArray);
+ * addKeepingExisting(map, p => p.name, ...peopleArray);
  * ```
  * @param set
  * @param hasher
  * @param values
  * @returns
  */
-export const addKeepingExisting = <V>(
-  set: ReadonlyMap<string, V> | undefined,
+// export const addKeepingExisting = <V>(
+//   set: ReadonlyMap<string, V> | undefined,
+//   hasher: ToString<V>,
+//   ...values: readonly V[]
+// ) => {
+//   const s = set === undefined ? new Map() : new Map(set);
+//   for (const v of values) {
+//     const hashResult = hasher(v);
+//     if (s.has(hashResult)) continue;
+//     s.set(hashResult, v);
+//   }
+//   return s;
+// };
+
+/**
+ * Mutates `map`, adding each value to it using a
+ * function to produce a key. Use {@link addValue} for an immutable version.
+ * ```
+ * const map = new Map();
+ * addValueMutate(map, v=>v.name, { name:`Jane`, size:10 }, { name:`Bob`, size: 9 });
+ * // Map consists of entries:
+ * // [ `Jane`, { name:`Jane`, size:10 } ],
+ * // [ `Bob` { name:`Bob`, size: 9 } ]
+ * ```
+ * 
+ * Uses {@link addValueMutator} under the hood.
+ * @param map Map to modify. If _undefined_, a new map is created
+ * @param hasher Function to generate a string key for a given object value
+ * @param values Values to add
+ * @param collisionPolicy What to do if the key already exists
+ * @returns Map instance
+ */
+export const addValueMutate = <V>(
+  map: Map<string, V> | undefined,
   hasher: ToString<V>,
+  collisionPolicy: `overwrite` | `skip` | `throw`,
   ...values: readonly V[]
 ) => {
-  const s = set === undefined ? new Map() : new Map(set);
+  const m = map ?? new Map<string, V>();
+  const f = addValueMutator(m, hasher, collisionPolicy);
+  f(...values);
+  return m;
+};
+
+/**
+ * Adds values to a map, returning a new, modified copy and leaving the original
+ * intact.
+ * 
+ * Use {@link addValueMutate} for a mutable 
+ * @param map Map to start with, or _undefined_ to automatically create a map 
+ * @param hasher Function to create keys for values
+ * @param collisionPolicy What to do if a key already exists
+ * @param values Values to add
+ * @returns A new map containing values
+ */
+export const addValue = <V>(
+  map: Map<string, V> | ReadonlyMap<string, V> | undefined,
+  hasher: ToString<V>,
+  collisionPolicy: `overwrite` | `skip` | `throw`,
+  ...values: readonly V[]
+) => {
+  const m = map === undefined ? new Map<string, V>() : new Map<string, V>(map);
   for (const v of values) {
     const hashResult = hasher(v);
-    if (s.has(hashResult)) continue;
-    s.set(hashResult, v);
+    if (collisionPolicy !== `overwrite`) {
+      if (m.has(hashResult)) {
+        if (collisionPolicy === `throw`) throw new Error(`Key '${ hashResult }' already in map`);
+        if (collisionPolicy === `skip`) continue;
+      }
+    }
+    m.set(hashResult, v);
   }
-  return s;
+  return m;
 };
+
+/**
+ * Returns a function that adds values to a map, using a hashing function to produce a key.
+ * Use {@link addValueMutate} if you don't need a reusable function.
+ * 
+ * ```js
+ * const map = new Map(); // Create map
+ * const mutate = addValueMutator(map, v=>v.name); // Create a mutator using default 'overwrite' policy
+ * mutate( { name:`Bob`, size:10 }, { name: `Alice`, size: 2 }); // Add values to map
+ * mutate( {name: `Bob`, size: 11 }); // Change the value stored under key `Bob`.
+ * map.get(`Bob`); // { name: `Bob`, size: 11 }
+ * ```
+ * 
+ * The 'collision policy' determines what to do if the key already exists. The default behaviour
+ * is to overwrite the key, just as Map.set would.
+ * ```js
+ * const map = new Map();
+ * const mutate = addValueMutator(map, v=>v.name, `skip`);
+ * mutate( { name:`Bob`,size:10 }, { name: `Alice`, size: 2 }); // Add values to map
+ * mutate( { name:`Bob`, size: 20 }); // This value would be skipped because map already contains 'Bob'
+ * map.get(`Bob`); // { name: `Bob`, size: 10 }
+ * ``` 
+ *
+ * @param map Map to modify
+ * @param hasher Hashing function to make a key for a value
+ * @param collisionPolicy What to do if a value is already stored under a key
+ * @returns Function
+ */
+export const addValueMutator = <V>(
+  map: Map<string, V>,
+  hasher: ToString<V>,
+  collisionPolicy: `overwrite` | `skip` | `throw` = `overwrite`
+) => {
+  return (...values: readonly V[]) => {
+    for (const v of values) {
+      const hashResult = hasher(v);
+      if (collisionPolicy !== `overwrite`) {
+        if (map.has(hashResult)) {
+          if (collisionPolicy === `throw`) throw new Error(`Key '${ hashResult }' already in map`);
+          if (collisionPolicy === `skip`) continue;
+        }
+      }
+      map.set(hashResult, v);
+    }
+    return map;
+  }
+};
+
 
 /**
  * Returns a array of entries from a map, sorted by value.
@@ -233,14 +342,15 @@ export const sortByValue = <K, V>(
   return [ ...map.entries() ].sort((a, b) => f(a[ 1 ], b[ 1 ]));
 };
 
+
 /**
  * Returns an array of entries from a map, sorted by a property of the value
  *
  * ```js
- * cosnt m = new Map();
+ * const m = new Map();
  * m.set(`4491`, { name: `Bob` });
  * m.set(`2319`, { name: `Alice` });
- * const sorted = Maps.sortByValue(m, `name`);
+ * const sorted = sortByValueProperty(m, `name`);
  * ```
  * @param map Map to sort
  * @param property Property of value
@@ -292,18 +402,18 @@ export const hasAnyValue = <K, V>(
  * @example All people over thirty
  * ```js
  * // for-of loop
- * for (const v of filter(people, person => person.age > 30)) {
+ * for (const v of filterValues(people, person => person.age > 30)) {
  *
  * }
  * // If you want an array
- * const overThirty = Array.from(filter(people, person => person.age > 30));
+ * const overThirty = Array.from(filterValues(people, person => person.age > 30));
  * ```
  * @param map Map
  * @param predicate Filtering predicate
  * @returns Values that match predicate
  */
- 
-export function* filter<V>(
+
+export function* filterValues<V>(
   map: ReadonlyMap<string, V>,
   predicate: (v: V) => boolean
 ) {
@@ -324,36 +434,37 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): readonly V[] =>
 
 
 /**
- * import { Maps } from 'https://unpkg.com/ixfx/dist/data.js';
  * Returns a Map from an iterable. By default throws an exception
  * if iterable contains duplicate values.
  *
  * ```js
  * const data = [
- *  { fruit: `granny-smith`, family: `apple`, colour: `green` }
+ *  { fruit: `granny-smith`, family: `apple`, colour: `green` },
  *  { fruit: `mango`, family: `stone-fruit`, colour: `orange` }
  * ];
- * const map = Maps.fromIterable(data, v => v.fruit);
+ * const map = fromIterable(data, v => v.fruit);
+ * map.get(`granny-smith`); // { fruit: `granny-smith`, family: `apple`, colour: `green` }
  * ```
  * @param data Input data
  * @param keyFunction Function which returns a string id. By default uses the JSON value of the object.
- * @param allowOverwrites When set to _true_, items with same id will silently overwrite each other, with last write wins. _false_ by default.
+ * @param collisionPolicy By default, values with same key overwrite previous (`overwrite`)
  * @returns
  */
 export const fromIterable = <V>(
   data: Iterable<V>,
   keyFunction = toStringDefault<V>,
-  allowOverwrites = false
+  collisionPolicy: `overwrite` | `skip` | `throw` = `overwrite`
 ): ReadonlyMap<string, V> => {
   const m = new Map<string, V>();
   for (const d of data) {
-    const id = keyFunction(d);
-    if (m.has(id) && !allowOverwrites) {
-      throw new Error(
-        `id ${ id } is already used and new data will overwrite it. `
+    const key = keyFunction(d);
+    if (m.has(key)) {
+      if (collisionPolicy === `throw`) throw new Error(
+        `Key '${ key }' is already used and new data will overwrite it. `
       );
+      if (collisionPolicy === `skip`) continue;
     }
-    m.set(id, d);
+    m.set(key, d);
   }
   return m;
 };
@@ -371,16 +482,16 @@ export const fromIterable = <V>(
  * map.get(`Sally`); // { name: `Sally`, colour: `red` }
  * ```
  *
- * To add an object to an existing map, use {@link addObjectMutate}.
+ * To add an object to an existing map, use {@link addObjectEntriesMutate}.
  * @param data
  * @returns
  */
-export const fromObject = <V>(data: object|object[]): ReadonlyMap<string, V> => {
+export const fromObject = <V>(data: object | object[]): ReadonlyMap<string, V> => {
   const map = new Map<string, V>();
   if (Array.isArray(data)) {
-    for (const d of data) addObjectMutate<V>(map, d as object);
+    for (const d of data) addObjectEntriesMutate<V>(map, d as object);
   } else {
-    addObjectMutate<V>(map, data);
+    addObjectEntriesMutate<V>(map, data);
   }
   return map;
 };
@@ -395,7 +506,7 @@ export const fromObject = <V>(data: object|object[]): ReadonlyMap<string, V> => 
  *  Bob:   { colour: `pink` }
  * };
  * const map = new Map();
- * addObject(map, data);
+ * addObjectEntriesMutate(map, data);
  *
  * map.get(`Sally`); // { name: `Sally`, colour: `red` }
  * ```
@@ -404,7 +515,7 @@ export const fromObject = <V>(data: object|object[]): ReadonlyMap<string, V> => 
  * @param map
  * @param data
  */
-export const addObjectMutate = <V>(map: Map<string, V>, data: object) => {
+export const addObjectEntriesMutate = <V>(map: Map<string, V>, data: object) => {
   const entries = Object.entries(data);
   for (const [ key, value ] of entries) {
     map.set(key, value as V);
@@ -412,6 +523,7 @@ export const addObjectMutate = <V>(map: Map<string, V>, data: object) => {
 };
 /**
  * Returns the first found value that matches `predicate` or _undefined_.
+ * To get an entry see {@link findEntryByPredicate}
  *
  * Use {@link some} if you don't care about the value, just whether it appears.
  * Use {@link filter} to get all value(s) that match `predicate`.
@@ -424,8 +536,8 @@ export const addObjectMutate = <V>(map: Map<string, V>, data: object) => {
  * @param predicate Function that returns true for a matching value
  * @returns Found value or _undefined_
  */
-export const find = <V>(
-  map: ReadonlyMap<string, V>,
+export const findValue = <K, V>(
+  map: ReadonlyMap<K, V>,
   predicate: (v: V) => boolean
 ): V | undefined => [ ...map.values() ].find(v => predicate(v));
 
@@ -567,8 +679,8 @@ export const toObject = <T>(
  *
  * @example Get an array of ages from a map of Person objects
  * ```js
- * let person = { age: 29, name: `John`};
- * map.add(person.name, person);
+ * const person = { age: 29, name: `John`};
+ * map.set(person.name, person);
  *
  * const ages = mapToArray(map, (key, person) => person.age);
  * // [29, ...]
@@ -599,8 +711,8 @@ export const mapToArray = <K, V, R>(
 //#endregion
 
 /**
- * Returns a result of a merged into b.
- * B is always the 'newer' data that takes
+ * Returns a result of `a` merged into `b`.
+ * `b` is always the 'newer' data that takes
  * precedence.
  */
 export type MergeReconcile<V> = (a: V, b: V) => V;
@@ -615,7 +727,7 @@ export type MergeReconcile<V> = (a: V, b: V) => V;
  * 1 => `A-1`, 2 => `A-2`, 3 => `A-3`
  *
  * And map B:
- * 2 => `B-1`, 2 => `B-2`, 4 => `B-4`
+ * 1 => `B-1`, 2 => `B-2`, 4 => `B-4`
  *
  * If they are merged with the reconile function:
  * ```js
