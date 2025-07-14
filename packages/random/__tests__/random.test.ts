@@ -25,6 +25,8 @@ test(`gaussian`, () => {
   };
 
   const frequency = [ ...frequencyByGroup(groupByTens, r1).entries() ];
+  //console.log(frequency);
+
   for (const entry of frequency) {
     entry[ 1 ] = Math.floor((entry[ 1 ] / tests) * 100);
   }
