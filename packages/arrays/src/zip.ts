@@ -1,4 +1,4 @@
-import { isContentsTheSame } from "./equality.js";
+import { containsIdenticalValues } from "./equality.js";
 
 /**
  * Zip combines the elements of two or more arrays based on their index.
@@ -31,7 +31,7 @@ export const zip = (
     throw new Error(`All parameters must be an array`);
   }
   const lengths = arrays.map((a) => (a as any[]).length);
-  if (!isContentsTheSame(lengths)) {
+  if (!containsIdenticalValues(lengths)) {
     throw new Error(`Arrays must be of same length`);
   }
 
@@ -39,7 +39,7 @@ export const zip = (
   const length = lengths[ 0 ];
 
   for (let index = 0; index < length; index++) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     returnValue.push(arrays.map((a) => a[ index ]));
   }
   return returnValue;
