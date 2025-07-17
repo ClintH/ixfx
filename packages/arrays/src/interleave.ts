@@ -1,4 +1,4 @@
-import { isContentsTheSame } from "./equality.js";
+import { containsIdenticalValues } from "./equality.js";
 
 /**
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
@@ -22,7 +22,7 @@ export const interleave = <V>(
     throw new Error(`All parameters must be an array`);
   }
   const lengths = arrays.map(a => (a as V[]).length);
-  if (!isContentsTheSame(lengths)) {
+  if (!containsIdenticalValues(lengths)) {
     throw new Error(`Arrays must be of same length`);
   }
 
