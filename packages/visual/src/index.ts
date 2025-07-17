@@ -7,24 +7,6 @@ import * as NamedColourPalette from './named-colour-palette.js';
 
 
 import * as Colour from './colour/index.js';
-/**
- * Colour interpolation, scale generation and parsing
- *
- * Overview
- * * {@link interpolator}: Blend colours
- * * {@link scale}: Produce colour scale
- * * {@link multiplyOpacity}: Modify opacity with a scalar
- * * {@link randomHue}: Generate a random hue
- * * {@link goldenAngleColour}: Pick perceptually different shades
- *
- * CSS
- * * {@link getCssVariable}: Parse a CSS-defined colour
- *
- * Conversions: convert from 'blue', 'rgb(255,0,0)',  'hsl(0, 100%, 50%)' etc:
- * * {@link toHex}: to a hex format string
- * * {@link toHsl}: to a `{h, s, l}` object
- * * {@link toRgb}: to a `{r, g, b}` object
- */
 
 export * as Colour from './colour/index.js';
 
@@ -37,7 +19,7 @@ import * as Video from './video.js';
 
 
 /**
- * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link Geometry.Grid} type.
+ * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link @ixfx/geometry.Grid} type.
  * This is useful because it's otherwise a one-dimensional array listing each rgba in turn.
  */
 export * as ImageDataGrid from './image-data-grid.js';

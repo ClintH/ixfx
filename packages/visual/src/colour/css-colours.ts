@@ -4,9 +4,16 @@ import type { Colour } from "./types.js";
 
 /**
  * Converts from some kind of colour that is legal in CSS
+ * into a structured Colour type.
  * 
  * Handles: hex format, CSS variables, colour names
- * to an object
+ * ```js
+ * fromCssColour(`#ffffff`);
+ * fromCssColour(`blue`);
+ * fromCssColour(`--some-variable`);
+ * fromCssColour(`hsl(50, 50%, 50%)`);
+ * fromCssColour(`rgb(50, 100, 100)`);
+ * ```
  * @param colour 
  * @returns 
  */
