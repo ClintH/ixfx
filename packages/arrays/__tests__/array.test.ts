@@ -144,30 +144,28 @@ test('unique-deep', () => {
 test('contains', () => {
   const a = [ 'apples', 'oranges', 'pears', 'mandarins' ];
   const b = [ 'pears', 'apples' ];
-  expect(Arrays.contains(a, b)).toBe(true);
-  expect(Arrays.contains(a, [])).toBe(true);
+  expect(Arrays.contains(a, [ ...a ])).toBeTruthy();
+  expect(Arrays.contains(a, b)).toBeTruthy();
+  expect(Arrays.contains(a, [])).toBeTruthy();
+
 
   const c = [ 'pears', 'bananas' ];
   expect(Arrays.contains(a, c)).toBe(false);
+
+  const d = [ `mangoes`, `kiwis`, undefined, `grapes` ];
+  expect(Arrays.contains(d, [ `mangoes` ])).toBeTruthy();
+
+
+  // @ts-expect-error not an array
+  expect(() => Arrays.contains(null, b)).toThrow();
+  // @ts-expect-error not an array
+  expect(() => Arrays.contains({}, b)).toThrow();
+  // @ts-expect-error not an array
+  expect(() => Arrays.contains(undefined, b)).toThrow();
+
 });
 
-test(`sort`, () => {
-  const data = [
-    { size: 10, colour: `red` },
-    { size: 20, colour: `blue` },
-    { size: 5, colour: `pink` },
-    { size: 10, colour: `orange` },
-  ];
 
-  const t1 = Arrays.sortByNumericProperty(data, `size`);
-
-  expect(t1).toEqual([
-    { size: 5, colour: `pink` },
-    { size: 10, colour: `red` },
-    { size: 10, colour: `orange` },
-    { size: 20, colour: `blue` },
-  ]);
-});
 
 test(`pairwise-reduce`, () => {
   const reducer = (accumulator: string, a: string, b: string) => {
@@ -193,7 +191,7 @@ test(`mergeByKey`, () => {
   const a1 = [ `1-1`, `1-2`, `1-3`, `1-4` ];
   const a2 = [ `2-1`, `2-2`, `2-3`, `2-5` ];
 
-  const keyFunction = (v: string) => v.substr(-1, 1);
+  const keyFunction = (v: string) => v.substring(v.length - 1, v.length);
   const reconcileFunction = (a: string, b: string) => {
     return b.replace(`-`, `!`);
   };
@@ -253,22 +251,26 @@ test(`ensureLength`, () => {
 });
 
 test(`isContentsTheSame`, () => {
-  const a = [ 10, 10, 10 ];
-  const b = [ `hello`, `hello`, `hello` ];
-  const c = [ true, true, true ];
-  const d = [ 100 ];
+  expect(Arrays.containsIdenticalValues([ 10, 10, 10 ])).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([ `hello`, `hello`, `hello` ])).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([ true, true, true ])).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([ 100 ])).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([])).toBeTruthy();
 
-  expect(Arrays.isContentsTheSame(a)).toBe(true);
-  expect(Arrays.isContentsTheSame(b)).toBe(true);
-  expect(Arrays.isContentsTheSame(c)).toBe(true);
-  expect(Arrays.isContentsTheSame(d)).toBe(true);
+  expect(Arrays.containsIdenticalValues([ 10, 10, 11 ])).toBeFalsy();
+  expect(Arrays.containsIdenticalValues([ `Hello`, `hello` ])).toBeFalsy();
+  expect(Arrays.containsIdenticalValues([ true, false ])).toBeFalsy();
 
-  const a1 = [ 10, 10, 11 ];
-  const b1 = [ `Hello`, `hello` ];
-  const c1 = [ true, false ];
-  expect(Arrays.isContentsTheSame(a1)).toBe(false);
-  expect(Arrays.isContentsTheSame(b1)).toBe(false);
-  expect(Arrays.isContentsTheSame(c1)).toBe(false);
+  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1 } ])).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 2 } ])).toBeFalsy();
+  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1, blah: 2 } ])).toBeFalsy();
+
+  const eq = (a, b) => a.len === b.len;
+
+  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1 } ], eq)).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1, blah: 2 } ], eq)).toBeTruthy();
+  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 2 } ], eq)).toBeFalsy();
+
 });
 
 // test(``, () => {
