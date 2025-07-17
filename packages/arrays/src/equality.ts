@@ -41,26 +41,22 @@ export const isEqual = <V>(arrayA: V[], arrayB: V[], equality = isEqualDefault<V
 }
 
 /**
- * Returns _true_ if all values in the array are the same
+ * Returns _true_ if all values in the array are the same. Uses value-based equality checking by default.
  * 
- * Uses value-based equality checking by default.
- * 
- * @example Uses default equality function:
+ * @example Using default equality function
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const a1 = [ 10, 10, 10 ];
- * Arrays.isContentsTheSame(a1); // True
+ * containsIdenticalValues(a1); // True
  *
  * const a2 = [ { name:`Jane` }, { name:`John` } ];
- * Arrays.isContentsTheSame(a2); // True, even though object references are different
+ * containsIdenticalValues(a2); // True, even though object references are different
  * ```
  *
  * If we want to compare by value for objects that aren't readily
  * converted to JSON, you need to provide a function:
  *
  * ```js
- * Arrays.isContentsTheSame(someArray, (a, b) => {
+ * containsIdenticalValues(someArray, (a, b) => {
  *  return (a.eventType === b.eventType);
  * });
  * ```
@@ -70,7 +66,7 @@ export const isEqual = <V>(arrayA: V[], arrayB: V[], equality = isEqualDefault<V
  * @param equality Equality checker. Uses string-conversion checking by default
  * @returns
  */
-export const isContentsTheSame = <V>(
+export const containsIdenticalValues = <V>(
   array: readonly V[] | V[],
   equality?: IsEqual<V>
 ): boolean => {
