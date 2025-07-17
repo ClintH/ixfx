@@ -1,15 +1,14 @@
-import { isEqualDefault, type IsEqual } from "./util/is-equal.js";
+
 import { arrayIndexTest, arrayTest, resultThrow } from "@ixfx/guards";
 
-export const withoutUndefined = <V>(data: readonly V[] | V[]): V[] => {
-  return data.filter(v => v !== undefined);
-}
+
 
 /**
  * Returns two separate arrays of everything that `filter` returns _true_,
- * and everything it returns _false_ on. The in-built Array.filter() in
- * constrast only returns things that `filter` returns _true_ for.
- *
+ * and everything it returns _false_ on. 
+ * 
+ * Same idea as the in-built Array.filter, but that only returns values for one case.
+ * 
  * ```js
  * const [ matching, nonMatching ] = filterAB(data, v => v.enabled);
  * // `matching` is a list of items from `data` where .enabled is true
@@ -73,66 +72,3 @@ export function* filterBetween<V>(
   }
 };
 
-
-/**
- * Returns an array with value(s) omitted. If value is not found, result will be a copy of input.
- * Value checking is completed via the provided `comparer` function.
- * By default checking whether `a === b`. To compare based on value, use the `isEqualValueDefault` comparer.
- *
- * @example
- * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
- * const data = [100, 20, 40];
- * const filtered = Arrays.without(data, 20); // [100, 40]
- * ```
- *
- * @example Using value-based comparison
- * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
- * const data = [{name: `Alice`}, {name:`Sam`}];
- *
- * // This wouldn't work as expected, because the default comparer uses instance,
- * // not value:
- * Arrays.without(data, {name: `Alice`});
- *
- * // So instead we can use a value comparer:
- * Arrays.without(data, {name:`Alice`}, isEqualValueDefault);
- * ```
- *
- * @example Use a function
- * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
- * const data = [{name: `Alice`}, {name:`Sam`}];
- * Arrays.without(data, {name:`ALICE`}, (a, b) => {
- *  return (a.name.toLowerCase() === b.name.toLowerCase());
- * });
- * ```
- *
- * Consider {@link remove} to remove an item by index.
- *
- * @typeParam V - Type of array items
- * @param sourceArray Source array
- * @param toRemove Value(s) to remove
- * @param comparer Comparison function. If not provided `Util.isEqualDefault` is used, which compares using `===`
- * @return Copy of array without value.
- */
-export const without = <V>(
-  sourceArray: readonly V[] | V[],
-  toRemove: V | V[],
-  comparer: IsEqual<V> = isEqualDefault
-): V[] => {
-  if (Array.isArray(toRemove)) {
-    const returnArray: V[] = []
-    for (const source of sourceArray) {
-      if (!toRemove.some(v => comparer(source, v))) {
-        returnArray.push(source);
-      }
-    }
-    return returnArray;
-  } else {
-    return sourceArray.filter((v) => !comparer(v, toRemove));
-  }
-}
