@@ -29,15 +29,44 @@ export const sortByNumericProperty = <V, K extends keyof V>(
   return 0;
 });
 
+/**
+ * Sorts an array of objects by some named property.
+ * 
+ * ```js
+ * const data = [
+ *  { size: 10, colour: `red` },
+ *  { size: 20, colour: `blue` },
+ *  { size: 5, colour: `pink` }
+ * ];
+ * sortByProperty(data, `colour`);
+ * 
+ * Yields [
+ *  { size: 20, colour: `blue` },
+ *  { size: 5, colour: `pink` }
+ *  { size: 10, colour: `red` },
+ * ]
+ * ```
+ * 
+ * You can also provide a custom comparer that is passed property values.
+ * This function should return 0 if values are equal, 1 if `a > b` and -1 if `a < b`.
+ * @param data 
+ * @param propertyName 
+ * @returns 
+ */
 export const sortByProperty = <V, K extends keyof V>(
   data: readonly V[] | V[],
-  propertyName: K
+  propertyName: K,
+  comparer?: (a: any, b: any) => number
 ) => [ ...data ].sort((a, b) => {
   resultThrow(arrayTest(data, `data`));
 
   const av = a[ propertyName ];
   const bv = b[ propertyName ];
-  if (av < bv) return -1;
-  if (av > bv) return 1;
-  return 0;
+  if (comparer === undefined) {
+    if (av < bv) return -1;
+    if (av > bv) return 1;
+    return 0;
+  } else {
+    return comparer(av, bv);
+  }
 });
