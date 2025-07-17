@@ -1,4 +1,4 @@
-export * from './array-cycle.js';
+export * from './cycle.js';
 export * from './at-wrap.js';
 export * from './chunks.js';
 export * from './contains.js';
@@ -21,4 +21,5 @@ export * from './sort.js';
 export type * from './types.js';
 export * from './unique.js';
 export * from './until.js';
+export * from './without.js';
 export * from './zip.js';
