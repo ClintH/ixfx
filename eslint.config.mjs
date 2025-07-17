@@ -44,6 +44,7 @@ export default tseslint.config(
           ".*Opts$",
           "ctx",
           "mod*",
+          "Mod*",
           "args*",
           "Args*",
           "el",

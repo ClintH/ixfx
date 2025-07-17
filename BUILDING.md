@@ -6,36 +6,6 @@ pnpm run build
 pnpm run test
 ```
 
-## Using a local copy of ixfx
-
-If you're working in other repositories, but want to use a local copy of `ixfx`.
-
-```
-(in ixfx repo)
-npm link
-
-(in remote repo)
-npm link ixfx
-```
-
-In remote repo, it should be possible to consume the library:
-
-```
-import { Geometry } from 'ixfx/geometry';
-```
-
-If you're working on [demos](https://github.com/ClintH/ixfx-demos), you can
-build & copy files, assuming `ixfx-demos` is cloned in the same parent folder as
-`ixfx`:
-
-```
-npm run demos
-```
-
-Once that is done you can use a live server in `ixfx-demos` to run the demos.
-
-Another suggestion is to symlink `ixfx-demos\ixfx` to `ixfx\dist` so the demos
-are always using the latest changes to the library.
 
 ## Deploying
 
@@ -79,7 +49,8 @@ npx publint
 # Publishing
 
 ```
+# make a changeset
+pnpm changeset
 pnpm changeset version
-pnpm install
 pnpm publish -r
 ```
