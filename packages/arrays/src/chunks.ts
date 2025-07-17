@@ -1,6 +1,6 @@
 
 /**
- * Return `arr` broken up into chunks of `size`
+ * Return `array` broken up into chunks of `size` values
  *
  * ```js
  * chunks([1,2,3,4,5,6,7,8,9,10], 3);

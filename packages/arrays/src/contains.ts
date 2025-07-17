@@ -3,7 +3,8 @@ import { toStringDefault } from "./util/to-string.js";
 
 
 /**
- * Returns _true_ if contents of `needles` is contained by `haystack`.
+ * Returns _true_ if all value in `needles` is contained in `haystack`.
+ * 
  * ```js
  * const a = ['apples','oranges','pears','mandarins'];
  * const b = ['pears', 'apples'];
@@ -12,8 +13,10 @@ import { toStringDefault } from "./util/to-string.js";
  * const c = ['pears', 'bananas'];
  * contains(a, b); // False ('bananas' does not exist in a)
  * ```
- * @param haystack
- * @param needles
+ * 
+ * If `needles` is empty, `contains` will return true.
+ * @param haystack Array to search
+ * @param needles Things to look for
  * @param eq
  */
 export const contains = <V>(
@@ -25,7 +28,7 @@ export const contains = <V>(
     throw new TypeError(`Expects haystack parameter to be an array`);
   }
   if (!Array.isArray(needles)) {
-    throw new TypeError(`Expects needles parameter to be an array`);
+    throw new TypeError(`Expects needles parameter to be an array. Got: ${ typeof needles }`);
   }
 
   for (const needle of needles) {
@@ -59,8 +62,9 @@ export const contains = <V>(
  * 
  * See also:
  * * {@link containsDuplicateInstances}: Compare based on reference, rather than value
- * * {@link unique} Get unique set of values in an array
- * @param array Array to examine
+ * * {@link unique}: Get unique set of values in an array
+ * * {@link isContentsTheSame}: Returns _true_ if every item in array is the same
+ * @param data Array to examine
  * @param keyFunction Function to generate key string for object, uses JSON.stringify by default.
  * @returns
  */

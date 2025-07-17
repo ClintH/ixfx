@@ -19,7 +19,7 @@ import { toStringDefault } from "./util/to-string.js";
  * 
  * See also:
  * * {@link intersection}: Overlap between two arrays
- * * {@link additionalValues}: Yield values from an iterable not present in the other
+ * * Iterables.additionalValues: Yield values from an iterable not present in the other
  * * {@link containsDuplicateValues}: Returns true if array contains duplicates
  * @param arrays
  * @param comparer
@@ -69,10 +69,10 @@ export const uniqueDeep = <V>(
  * 
  * See also:
  * * {@link intersection}: Overlap between two arrays
- * * {@link additionalValues}: Yield values from an iterable not present in the other
+ * * Iterables.additionalValues: Yield values from an iterable not present in the other
  * * {@link containsDuplicateValues}: Returns true if array contains duplicates
- * @param arrays
- * @param comparer
+ * @param arrays Array (or array of arrays) to examine
+ * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
  * @returns
  */
 export const unique = <V>(

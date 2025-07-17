@@ -1,17 +1,14 @@
 import { resultThrow, arrayTest } from "@ixfx/guards";
 
 /**
- * Combines values in pairwise fashion.
+ * Yields pairs made up of overlapping items from the input array.
+ * 
  * Throws an error if there are less than two entries.
  * 
  * ```js
  * pairwise([1, 2, 3, 4, 5]);
  * Yields:
- * [[1,2],[2,3],[3,4],[4,5] ]
- * 
- * pairwise([ 1, 2, 3, 4 ]);
- * Yields:
- * [1,2],[2,3],[3,4]
+ * [ [1,2], [2,3], [3,4], [4,5] ]
  * ```
  * @param values 
  */
