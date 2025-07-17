@@ -30,9 +30,9 @@ export type MapArrayOpts<V> = MapMultiOpts<V> & {
  *
  * Takes options:
  * * `comparer`: {@link IsEqual}
- * * `toString`: {@link Util.ToString}
+ * * `toString`: Util.ToString
  *
- * A custom {@link Util.ToString} function can be provided as the `convertToString` opion. This is then used when checking value equality (`has`, `without`)
+ * A custom Util.ToString function can be provided as the `convertToString` opion. This is then used when checking value equality (`has`, `without`)
  * ```js
  * const map = ofArrayMutable({ convertToString:(v) => v.name}); // Compare values based on their `name` field;
  * ```

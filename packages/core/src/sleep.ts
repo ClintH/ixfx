@@ -37,7 +37,7 @@ if (typeof window === `undefined` || !(`requestAnimationFrame` in window)) {
  *
  * If a timeout of 0 is given, `requestAnimationFrame` is used instead of `setTimeout`.
  *
- * {@link delay} and {@link sleep} are similar. `delay()` takes a parameter of what code to execute after the timeout, while `sleep()` just resolves after the timeout.
+ * `Flow.delay()` and {@link sleep} are similar. `Flow.delay()` takes a parameter of what code to execute after the timeout, while `sleep()` just resolves after the timeout.
  *
  * A value can be provided, which is returned on awaking:
  * ```js

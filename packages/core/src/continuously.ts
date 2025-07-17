@@ -215,7 +215,7 @@ export type ContinuouslyOpts = Readonly<{
  * @param options - {@link ContinuouslyOpts ContinuouslyOpts}
  * @param interval - Speed of loop (default: 0)
  * @returns Instance to control looping.
- * @see {@link Timeout} if you want to trigger something once.
+ * @see Flow.timeout if you want to trigger something once.
  */
 export const continuously = (
   callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback,

@@ -35,7 +35,7 @@ export const compareObjectKeys = (a: object, b: object) => {
  * changedDataFields(a, { msg: `hi!!` });       // { msg: `hi!!`, v: undefined }
  * ```
  * 
- * Under the hood, we use {@link compareObjectData}(a, b, true). If B has additional or removed fields,
+ * Under the hood, we use {@link compareResultToObject}(a, b, true). If B has additional or removed fields,
  * this is considered an error.
  * 
  * If a field is an array, the whole array is returned, rather than a diff.

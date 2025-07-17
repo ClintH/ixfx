@@ -63,7 +63,7 @@ export type DataWithId<V> = V & {
  *  { id:`1`, x:101, y:200 }
  * ]
  * ```
- * @param similarityFn Function to compute similarity
+ * @param similarityFunction Function to compute similarity
  * @param lastData Old data
  * @param newData New data
  * @param options Options

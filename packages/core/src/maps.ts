@@ -530,7 +530,7 @@ export const addObjectEntriesMutate = <V>(map: Map<string, V>, data: object) => 
  *
  * @example First person over thirty
  * ```js
- * const overThirty = find(people, person => person.age > 30);
+ * const overThirty = findValue(people, person => person.age > 30);
  * ```
  * @param map Map to search
  * @param predicate Function that returns true for a matching value

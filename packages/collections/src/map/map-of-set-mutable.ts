@@ -5,8 +5,8 @@ import { MapOfMutableImpl } from './map-of-multi-impl.js';
 import {
   hasAnyValue as mapHasAnyValue,
   toArray as mapToArray,
-  find as mapFind,
-  filter as mapFilter,
+  findValue as mapFindValue,
+  filterValues as mapFilterValues,
   addValue as mapAddValue
 } from '@ixfx/core/maps';
 import type { IMapOfMutableExtended } from './imap-of-mutable-extended.js';
@@ -18,7 +18,7 @@ import type { IMapOfMutableExtended } from './imap-of-mutable-extended.js';
  *
  * Options: `{ hash: toStringFn } }`
  *
- * `hash` is a {@link Util.ToString} function: `(object) => string`. By default it uses
+ * `hash` is Util.ToString function: `(object) => string`. By default it uses
  * `JSON.stringify`.
  *
  * @example Only storing the newest three items per key
@@ -51,8 +51,8 @@ export const ofSetMutable = <V>(
     iterable: (source) => source.values(),
     add: (dest, values) => mapAddValue(dest, hash, `skip`, ...values),
     count: (source) => source.size,
-    find: (source, predicate) => mapFind(source, predicate),
-    filter: (source, predicate) => mapFilter(source, predicate),
+    find: (source, predicate) => mapFindValue(source, predicate),
+    filter: (source, predicate) => mapFilterValues(source, predicate),
     toArray: (source) => mapToArray(source),
     has: (source, value) => mapHasAnyValue(source, value, comparer),
     without: (source, value) => without(mapToArray(source), value, comparer),
