@@ -1,0 +1,19 @@
+{
+    "extends": ["../../typedoc.base.jsonc"],
+        "entryPoints": ["src/index.ts"],
+        "outputs": [
+        {
+            "name": "json",
+            "path": "./docs.json"
+        },
+    ],
+    "externalSymbolLinkMappings": { 
+        "@ixfx/core": { 
+            "isEqualDefault": "#",
+            "isEqual": "#" ,
+            "IsEqual": "#" ,
+
+        },
+            
+    }
+}

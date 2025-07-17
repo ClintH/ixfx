@@ -1,0 +1,22 @@
+{
+    "extends": ["../../typedoc.base.jsonc"],
+    "entryPoints": ["src/index.ts"],
+        "outputs": [
+        {
+            "name": "json",
+            "path": "./docs.json"
+        },
+    ],
+    "externalSymbolLinkMappings": { 
+        "@ixfx/flow": { 
+            "relative": "#"
+        },
+        "@ixfx/core": { 
+            "Interval": "#",
+            "defaultComparer": "#"
+        },
+        "@ixfx/numbers": { 
+            "movingAverageLight": "#"
+        },
+    }
+}
