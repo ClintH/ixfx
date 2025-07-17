@@ -53,7 +53,6 @@ export const fromPointPolar = (
 ): Polar.Coord => {
   pt = PointsSubtract(pt, origin);
 
-  //eslint-disable-next-line functional/no-let
   let direction = Math.atan2(pt.y, pt.x);
   if (angleNormalisation === `unipolar` && direction < 0) direction += piPi;
   else if (angleNormalisation === `bipolar`) {

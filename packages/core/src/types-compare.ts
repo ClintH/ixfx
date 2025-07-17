@@ -2,7 +2,7 @@ export type ChangeKind = `mutate` | `add` | `del`
 export type ChangeRecord<TKey extends string | number | symbol> = [ kind: ChangeKind, path: TKey, value: unknown ];
 
 /**
- * Result of {@link compareObjectData}
+ * Result of compareObjectData
  */
 export type CompareChangeSet<TKey extends string | number> = {
   /**
@@ -12,7 +12,7 @@ export type CompareChangeSet<TKey extends string | number> = {
   /**
    * Results for child objects
    */
-  children: Record<TKey, CompareChangeSet<string|number>>
+  children: Record<TKey, CompareChangeSet<string | number>>
   /**
    * Values that have changed
    */

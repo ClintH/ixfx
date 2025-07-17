@@ -3,8 +3,8 @@ import type { Point, Point3d } from "./point-type.js";
 
 export function from(x: number, y: number, z: number): Point3d;
 export function from(x: number, y: number): Point;
-export function from(arr: [ x: number, y: number, z: number ]): Point3d;
-export function from(arr: [ x: number, y: number ]): Point;
+export function from(array: [ x: number, y: number, z: number ]): Point3d;
+export function from(array: [ x: number, y: number ]): Point;
 
 /**
  * Returns a point from two or three coordinates or an array of [x,y] or [x,y,z].
@@ -20,7 +20,7 @@ export function from(arr: [ x: number, y: number ]): Point;
  * @returns Point
  */
 export function from(
-  xOrArray?: number | ReadonlyArray<number>,
+  xOrArray?: number | readonly number[],
   y?: number,
   z?: number
 ): Point {
@@ -64,20 +64,20 @@ export function from(
  * ```
  * 
  * Use {@link Points.isNaN} to check if returned point has NaN for either coordinate.
- * @param str 
+ * @param string_ 
  */
-export const fromString = (str: string): Point => {
-  if (typeof str !== `string`) throw new TypeError(`Param 'str' ought to be a string. Got: ${ typeof str }`);
-  const comma = str.indexOf(`,`);
-  const x = Number.parseFloat(str.substring(0, comma));
-  const nextComma = str.indexOf(',', comma + 1);
+export const fromString = (string_: string): Point => {
+  if (typeof string_ !== `string`) throw new TypeError(`Param 'str' ought to be a string. Got: ${ typeof string_ }`);
+  const comma = string_.indexOf(`,`);
+  const x = Number.parseFloat(string_.substring(0, comma));
+  const nextComma = string_.indexOf(',', comma + 1);
   if (nextComma > 0) {
     // z component
-    const y = Number.parseFloat(str.substring(comma + 1, nextComma - comma + 2));
-    const z = Number.parseFloat(str.substring(nextComma + 1));
+    const y = Number.parseFloat(string_.substring(comma + 1, nextComma - comma + 2));
+    const z = Number.parseFloat(string_.substring(nextComma + 1));
     return { x, y, z };
   } else {
-    const y = Number.parseFloat(str.substring(comma + 1));
+    const y = Number.parseFloat(string_.substring(comma + 1));
     return { x, y };
   }
 }
@@ -99,17 +99,16 @@ export const fromString = (str: string): Point => {
  * @returns
  */
 export const fromNumbers = (
-  ...coords: ReadonlyArray<ReadonlyArray<number>> | ReadonlyArray<number>
-): ReadonlyArray<Point> => {
-  const pts: Array<Point> = [];
+  ...coords: readonly (readonly number[])[] | readonly number[]
+): readonly Point[] => {
+  const pts: Point[] = [];
 
   if (Array.isArray(coords[ 0 ])) {
     // [[x,y],[x,y]...]
-    for (const coord of (coords as Array<Array<number>>)) {
+    for (const coord of (coords as number[][])) {
       if (!(coord.length % 2 === 0)) {
         throw new Error(`coords array should be even-numbered`);
       }
-      //eslint-disable-next-line  functional/immutable-data
       pts.push(Object.freeze({ x: coord[ 0 ], y: coord[ 1 ] }));
     }
   } else {
@@ -119,7 +118,6 @@ export const fromNumbers = (
     }
 
     for (let index = 0; index < coords.length; index += 2) {
-      //eslint-disable-next-line  functional/immutable-data
       pts.push(
         Object.freeze({ x: coords[ index ] as number, y: coords[ index + 1 ] as number })
       );

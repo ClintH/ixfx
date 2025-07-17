@@ -15,8 +15,6 @@ import type { Point } from "./point-type.js";
  * It computes angle, average, centroid, distance and speed.
  * 
  * ```js
- * import { Points } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * // Reference point: 50,50
  * const t = Points.relation({x:50,y:50}); // t is a function
  *
@@ -39,7 +37,7 @@ import type { Point } from "./point-type.js";
  *
  * Note that intermediate values are not stored. It keeps the initial
  * and most-recent point. If you want to compute something over a set
- * of prior points, you may want to use {@link Trackers.points}
+ * of prior points, you may want to use {@link PointsTracker}
  * @param a Initial point, or x value
  * @param b y value, if first option is a number.
  * @returns

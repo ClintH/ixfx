@@ -7,7 +7,7 @@ import { isIntersecting as RectsIsIntersecting } from '../rect/Intersects.js';
 
 /**
  * Returns the intersection result between a and b.
- * `a` can be a {@link CirclePositioned} or {@link RectPositioned}
+ * `a` can be a {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
  * `b` can be as above or a {@link Point}.
  * @param a
  * @param b

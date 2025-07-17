@@ -7,7 +7,7 @@ import { resolveEl, resolveEls, type QueryOrElements } from "./resolve-el.js";
 // const leftW = getComputedStyle(this.#el).borderLeftWidth;
 // const rightW = getComputedStyle(this.#el).borderRightWidth;
 
-type ComputedPixelsMap<T extends readonly (keyof CSSStyleDeclaration)[]> = Record<T[ number ], number>
+export type ComputedPixelsMap<T extends readonly (keyof CSSStyleDeclaration)[]> = Record<T[ number ], number>
 
 /**
  * Returns the value of `getBoundingClientRect` plus the width of all the borders

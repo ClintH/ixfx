@@ -8,12 +8,16 @@ export * from './corners.js';
 export * from './create.js';
 export * from './edges.js';
 export * from './from.js';
-export * from './kinds.js';
 export * from './inner-circle.js';
-export * from './guard.js';
+export * from './intersects.js';
+export * from './kinds.js';
+export * from './lengths.js';
+export * from './math.js';
 export * from './outer-circle.js';
 export * from './perimeter.js';
 export * from './rotate.js';
+export * from './to.js';
+export * from './guard.js';
 /**
  * Functions for working with equilateral triangles, defined by length
  */

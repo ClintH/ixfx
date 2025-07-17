@@ -19,7 +19,7 @@ import type { GridNeighbourSelectionLogic, Grid, GridCell, GridVisitorOpts, Grid
  *  }
  * ```
  *
- * If you want to keep tabs on the visitor, pass in a {@link Collections.Sets.ISetMutable} instance. This gets
+ * If you want to keep tabs on the visitor, pass in a @ixfx/collections.Sets.ISetMutable instance. This gets
  * updated as cells are visited to make sure we don't visit the same one twice. If a set is not passed
  * in, one will be created internally.
  * ```js

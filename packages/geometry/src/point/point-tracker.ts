@@ -2,8 +2,8 @@ import {
   TrackedValueMap,
   type TrackedValueOpts as TrackOpts,
   type TimestampedObject,
-} from '@ixfx/core/trackers';
-import { ObjectTracker } from '@ixfx/core/trackers';
+} from '@ixfx/trackers';
+import { ObjectTracker } from '@ixfx/trackers';
 import { length as LineLength } from '../line/length.js';
 import * as Vectors from '../vector.js';
 import { Empty as LinesEmpty } from '../line/index.js';
@@ -12,7 +12,7 @@ import type { Line, PolyLine } from '../line/line-type.js';
 import type { Point, Point3d } from './point-type.js';
 import type { PointRelation } from './point-relation-types.js';
 import { joinPointsToLines } from '../line/join-points-to-lines.js';
-import type { TrimReason } from '@ixfx/core/trackers';
+import type { TrimReason } from '@ixfx/trackers';
 import type { PointRelationResult } from "./point-relation-types.js";
 import { relation } from './relation.js';
 import { distance } from './distance.js';
@@ -58,7 +58,7 @@ export type PointTrackerResults = Readonly<{
  *
  * See also
  * * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
- * * {@link points}: Track several points, useful for multi-touch.
+ * * {@link PointsTracker}: Track several points, useful for multi-touch.
  * * [ixfx Guide to Point Tracker](https://ixfx.fun/geometry/tracking/)
  * 
  * ```js

@@ -19,7 +19,7 @@ export type ShapeRandomPointOpts = {
 
 /**
  * Returns a random point within a shape.
- * `shape` can be {@link CirclePositioned} or {@link RectPositioned}
+ * `shape` can be {@link Circles.CirclePositioned} or {@link Rects.RectPositioned}
  * @param shape 
  * @param opts 
  * @returns 

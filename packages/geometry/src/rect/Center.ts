@@ -4,7 +4,7 @@ import { getRectPositioned, guard } from "./guard.js";
 import type { Rect, RectPositioned } from "./rect-types.js";
 
 /**
- * Returns the center of a rectangle as a {@link Geometry.Point}.
+ * Returns the center of a rectangle as a {@link Point}.
  *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
  *
  * ```js

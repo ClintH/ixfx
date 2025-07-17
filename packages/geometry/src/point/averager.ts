@@ -7,7 +7,7 @@ export type PointAverageKinds = `moving-average-light`;
 
 
 /**
- * Uses {@link Numbers.movingAverageLight} to keep track of 
+ * Uses =@ixfx/numbers#movingAverageLight to keep track of 
  * average x, y and z values.
  * ```js
  * // Create averager

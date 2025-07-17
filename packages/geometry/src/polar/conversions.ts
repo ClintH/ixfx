@@ -1,18 +1,13 @@
 import type { Point } from "../point/point-type.js";
 import { guard, isPolarCoord } from "./guard.js";
-import type { Coord } from "./types.js";
+import type { Coord, PolarToCartesian } from "./types.js";
 import { subtract as subtractPoint } from "../point/subtract.js";
 import { guard as guardPoint } from "../point/guard.js";
 import { Empty as EmptyPoint } from '../point/empty.js';
 import { isPoint } from "../point/guard.js";
 import { radianToDegree } from "../angles.js";
-/**
- * Converts to Cartesian coordiantes
- */
-type ToCartesian = {
-  (point: Coord, origin?: Point): Point;
-  (distance: number, angleRadians: number, origin?: Point): Point;
-};
+
+
 /**
  * Converts to Cartesian coordinate from polar.
  *
@@ -36,7 +31,7 @@ type ToCartesian = {
  * @param c
  * @returns
  */
-export const toCartesian: ToCartesian = (
+export const toCartesian: PolarToCartesian = (
   a: Coord | number,
   b?: Point | number,
   c?: Point

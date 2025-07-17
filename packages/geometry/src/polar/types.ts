@@ -1,6 +1,14 @@
 import type { Point } from "../point/point-type.js"
 
 /**
+ * Converts to Cartesian coordiantes
+ */
+export type PolarToCartesian = {
+  (point: Coord, origin?: Point): Point;
+  (distance: number, angleRadians: number, origin?: Point): Point;
+};
+
+/**
  * A polar ray is a line in polar coordinates
  * It consists of an angle (in radians) with a given offset and length.
  */

@@ -1,11 +1,8 @@
 import type { Point } from "../point/point-type.js";
-import type { Circle, CirclePositioned } from "./circle-type.js";
+import type { Circle, CirclePositioned, CircleToSvg } from "./circle-type.js";
 import { isCircle, isCirclePositioned } from "./guard.js";
 
-type ToSvg = {
-  (circleOrRadius: Circle | number, sweep: boolean, origin: Point): ReadonlyArray<string>;
-  (circle: CirclePositioned, sweep: boolean): ReadonlyArray<string>;
-};
+
 
 
 /**
@@ -15,7 +12,7 @@ type ToSvg = {
  * @param origin Origin of path. Required if first parameter is just a radius or circle is non-positioned
  * @returns 
  */
-export const toSvg: ToSvg = (a: CirclePositioned | number | Circle, sweep: boolean, origin?: Point): ReadonlyArray<string> => {
+export const toSvg: CircleToSvg = (a: CirclePositioned | number | Circle, sweep: boolean, origin?: Point): readonly string[] => {
   if (isCircle(a)) {
     if (origin !== undefined) {
       return toSvgFull(a.radius, origin, sweep);
@@ -30,7 +27,7 @@ export const toSvg: ToSvg = (a: CirclePositioned | number | Circle, sweep: boole
   }
 };
 
-const toSvgFull = (radius: number, origin: Point, sweep: boolean): ReadonlyArray<string> => {
+const toSvgFull = (radius: number, origin: Point, sweep: boolean): readonly string[] => {
   // https://stackoverflow.com/questions/5737975/circle-drawing-with-svgs-arc-path
   const { x, y } = origin;
   const s = sweep ? `1` : `0`;

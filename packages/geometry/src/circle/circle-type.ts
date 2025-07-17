@@ -7,6 +7,10 @@ export type Circle = {
   readonly radius: number
 }
 
+export type CircleToSvg = {
+  (circleOrRadius: Circle | number, sweep: boolean, origin: Point): readonly string[];
+  (circle: CirclePositioned, sweep: boolean): readonly string[];
+};
 /**
  * A {@link Circle} with position
  */

@@ -2,6 +2,7 @@ import { type Line } from "../line/line-type.js";
 import { type Point } from '../point/point-type.js';
 import { distance } from '../point/distance.js';
 import { angleRadian } from '../point/angle.js';
+import { toString as pointToString } from '../point/To.js';
 import { type PolarRay } from "./types.js";
 import { toCartesian as polarToCartesian } from "./conversions.js";
 
@@ -54,8 +55,18 @@ const getOrigin = (ray: PolarRay, origin?: Point): Point => {
 //   return angle;//return (angle < 0) ? scale(angle, -90, 0, 0, piPi) : angle;
 // }
 
+/**
+ * Returns a string representation of the ray
+ * @param ray 
+ * @returns 
+ */
 export const toString = (ray: PolarRay): string => {
-  return `PolarRay(angle: ${ ray.angleRadian } offset: ${ ray.offset } len: ${ ray.length })`
+  let basic = `PolarRay(angle: ${ ray.angleRadian } offset: ${ ray.offset } len: ${ ray.length }`;
+  if (ray.origin) {
+    basic += ` origin: ${ pointToString(ray.origin) }`;
+  }
+  basic += `)`;
+  return basic;
 }
 
 /**

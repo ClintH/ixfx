@@ -51,7 +51,7 @@ export type Reactive<V> = {
    */
   isDisposed(): boolean
   /**
-   * Optional 'set' to write a value. Use {@link ReactiveWritable} if you want this non-optional
+   * Optional 'set' to write a value.
    * @param value 
    */
   set?(value: V): void

@@ -54,7 +54,7 @@ export type CssVariableOption = CssVariable & (CssVariableByObjectOption | CssVa
  * { variable: `indicator-fill`, attribute: `fill`, id: `indicator`, defaultValue: `gray` }
  * ```
  * 
- * Once parsed, use {@link setFromVariables} to apply data.
+ * Once parsed, use {@link setFromCssVariables} to apply data.
  * 
  * ```js
  * // Array of arrays is treated as a set of key-value pairs
@@ -242,7 +242,7 @@ export function getCssVariable(cssVariable: string, fallbackValue: string): stri
  * // Or to a CSSStyleDeclaration
  * setCssVariables(vars, styles);
  * ```
- * @param vars 
+ * @param variables 
  * @param stylesOrEl 
  */
 export function setCssVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {

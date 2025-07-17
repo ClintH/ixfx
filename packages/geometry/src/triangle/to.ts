@@ -7,7 +7,7 @@ import type { Triangle } from "./triangle-type.js";
  * @param t
  * @returns
  */
-export const toFlatArray = (t: Triangle): ReadonlyArray<number> => {
+export const toFlatArray = (t: Triangle): readonly number[] => {
   guard(t);
   return [ t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y ];
 };

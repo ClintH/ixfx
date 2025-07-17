@@ -4,7 +4,7 @@ import type { RectPositioned } from "./rect-types.js";
 /**
  * Returns a rectangle based on provided four corners.
  *
- * To create a rectangle that contains an arbitary set of points, use {@link Geometry.Points.bbox | Geometry.Points.bbox}.
+ * To create a rectangle that contains an arbitary set of points, use {@link Points.bbox}.
  *
  * Does some sanity checking such as:
  *  - x will be smallest of topLeft/bottomLeft

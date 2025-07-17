@@ -56,7 +56,7 @@ export * as Arcs from './arc/index.js';
 export * as Shapes from './shape/index.js';
 
 /**
- * Helper functions for working with vectors, which can either be a {@link Point} or Polar {@link Polar.Coord}.
+ * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
  * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
  * interoperate between these two coordinates.
  */
@@ -114,7 +114,7 @@ export * as SurfacePoints from './surface-points.js';
  * - {@link rotate}, {@link rotateByVertex}
  * 
  * Conversions
- * - {@link edges}: Edges of triangle as {@link Line}
+ * - {@link edges}: Edges of triangle as {@link Lines.Line}
  * - {@link corners}: Corner positions
  * - {@link innerCircle}: Largest circle to fit within triangle
  * - {@link outerCircle}: Largest circle to enclose triangle
