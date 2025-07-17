@@ -24,9 +24,9 @@ export const throwIfFailed = (...results: Result<any, any>[]) => {
 
 
 /**
- * If `result` is an error, throws it, otherwise ignored.
- * @param result 
- * @returns 
+ * If any of `results` is an error, throws it, otherwise ignored.
+ * @param results 
+ * @returns _true_ or throws
  */
 export function resultThrow(...results: ResultOrFunction[]) {
   for (const r of results) {

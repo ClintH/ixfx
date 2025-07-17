@@ -45,7 +45,6 @@ export type FrameProcessorOpts = {
  * 
  * First, create:
  * ```js
- * import { FrameProcessor } from 'https://unpkg.com/ixfx/dist/io.js'
  * const fp = new FrameProcessor();
  * ```
  * 
@@ -56,7 +55,7 @@ export type FrameProcessorOpts = {
  * gp.useVideo(file);
  * ```
  * 
- * With `useCamera`, optionally specify {@link Io.Camera.Constraints} to pick which camera and resolution.
+ * With `useCamera`, optionally specify {@link Camera.Constraints} to pick which camera and resolution.
  * 
  * ```js
  * fp.getFrame(); // Gets the last frame
@@ -104,7 +103,6 @@ export class FrameProcessor {
    */
   showPreview(enabled: boolean) {
     if (this._state === `disposed`) throw new Error(`Disposed`);
-    //eslint-disable-next-line functional/no-let
     let el: HTMLElement | undefined;
 
     switch (this._source) {
@@ -124,7 +122,6 @@ export class FrameProcessor {
    */
   showCanvas(enabled: boolean) {
     if (this._state === `disposed`) throw new Error(`Disposed`);
-    //eslint-disable-next-line functional/no-let
     let el: HTMLElement | undefined;
 
     if (this._source === `camera` || this._source === `video`) {
@@ -161,7 +158,7 @@ export class FrameProcessor {
 
     this._source = `camera`;
     if (this._teardownNeeded) this.teardown();
-    if (constraints) this._cameraConstraints;
+    if (constraints) this._cameraConstraints = constraints;
 
     await this.init();
   }
@@ -181,7 +178,7 @@ export class FrameProcessor {
     const r = await Camera.start(this._cameraConstraints);
     if (r === undefined) throw new Error(`Could not start camera`);
     this._cameraStartResult = r;
-    this.postInit(r);
+    void this.postInit(r);
   }
 
   private async initVideo() {
@@ -189,7 +186,7 @@ export class FrameProcessor {
     const r = await VideoFile.start(this._videoFile);
     this._videoStartResult = r;
 
-    this.postInit(r);
+    void this.postInit(r);
   }
 
   private async postInit(r: Camera.StartResult | VideoFile.StartResult) {
@@ -204,6 +201,7 @@ export class FrameProcessor {
 
     this._teardownNeeded = true;
     this._cameraStartResult = r;
+    return Promise.resolve();
   }
 
   /**

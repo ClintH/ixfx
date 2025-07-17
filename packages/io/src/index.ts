@@ -21,7 +21,7 @@ export { Codec } from './codec.js';
  * See [demos](https://demos.ixfx.fun/io/)
  *
  * Overview:
- * * {@link puck}: Connects a {@link Io.Espruino.EspruinoBleDevice | Espruino BLE Device}.
+ * * {@link puck}: Connects a {@link Espruino.EspruinoBleDevice | Espruino BLE Device}.
  * * {@link Espruino.connectBle}: Connect to a generic Espruino via BLE
  */
 export * as Espruino from './espruino.js';
