@@ -1,5 +1,5 @@
-import { PrimitiveTracker, type TimestampedPrimitive, type TrackedValueOpts, type TrimReason } from "@ixfx/core/trackers";
-
+import { PrimitiveTracker } from "./primitive-tracker.js";
+import type { TimestampedPrimitive, TrackedValueOpts, TrimReason } from './types.js';
 import { minFast, maxFast, totalFast } from "@ixfx/numbers";
 
 export type NumberTrackerResults = {

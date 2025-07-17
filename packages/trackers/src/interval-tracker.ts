@@ -1,4 +1,4 @@
-import type { TrackedValueOpts } from '@ixfx/core/trackers';
+import type { TrackedValueOpts } from './types.js';
 import { NumberTracker } from './number-tracker.js';
 
 /**
