@@ -6,3 +6,4 @@
  */
 export type MergeReconcile<V> = (a: V, b: V) => V;
 
+export { type IsEqual } from "./util/is-equal.js";
