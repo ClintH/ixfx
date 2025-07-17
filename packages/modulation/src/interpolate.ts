@@ -120,8 +120,6 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * ```js
  * interpolate(0.1, 0, 100, { easing: `quadIn` });
  * ```
- * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Points.interpolate}.
- * 
  * There are a few variations when calling `interpolate`, depending on what parameters are fixed.
  * * `interpolate(amount)`: returns a function that needs a & b 
  * * `interpolate(a, b)`:  returns a function that needs the interpolation amount

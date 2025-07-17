@@ -91,7 +91,6 @@ export function initLazyStreamWithInitial<V>(options: InitLazyStreamInitedOption
  * Initialises a lazy stream
  * Consider also: {@link initLazyStreamWithInitial}
  * 
- * Uses {@link lazyStream} internally.
  * @param options 
  * @returns 
  */

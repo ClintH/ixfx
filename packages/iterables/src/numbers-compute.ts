@@ -12,13 +12,14 @@ import { isIterable } from "./guard.js";
  * // Yields: { min: 2, max: 99, total: 115.2, avg: 28.8 }
  * ```
  *
- * Use {@link Numbers.average}, {@link Numbers.max}, {@link Numbers.min} or {@link Numbers.total} if you only need one of these.
+ * Use {@link @ixfx/numbers.average}, {@link @ixfx/numbers.max}, {@link @ixfx/numbers.min} or {@link @ixfx/numers.total} if you only need one of these.
  *
  * A start and end range can be provided if the calculation should be restricted to a part
  * of the input array. By default the whole array is used.
  *
  * It's also possible to use an iterable as input.
  * ```js
+ * import { count } from '@ixfx/numbers';
  * numbersCompute(count(5,1)); // Averages 1,2,3,4,5
  * ```
  * 

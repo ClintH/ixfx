@@ -95,7 +95,7 @@ export function interpolate(a: number, b: number, options?: Partial<BasicInterpo
  * interpolate(0.5, 30, 60);
  * ```
  *
- * See also {@link interpolatorStepped} and {@link interpolatorInterval} for functions
+ * See also {@link interpolatorStepped} and {@link @ixfx/modulation.interpolatorInterval} for functions
  * which help to manage progression from A->B over steps or interval.
  * 
  * Usually interpolation amount is on a 0...1 scale, inclusive. What is the interpolation result
@@ -110,8 +110,6 @@ export function interpolate(a: number, b: number, options?: Partial<BasicInterpo
  * ```js
  * interpolate(0.1, 0, 100, { easing: `quadIn` });
  * ```
- * To interpolate certain types: {@link Visual.Colour.interpolator | Visual.Colour.interpolator }, {@link Geometry.Points.interpolate | Points.interpolate}.
- * 
  * There are a few variations when calling `interpolate`, depending on what parameters are fixed.
  * * `interpolate(amount)`: returns a function that needs a & b 
  * * `interpolate(a, b)`:  returns a function that needs the interpolation amount
@@ -187,7 +185,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<BasicInterpola
  * Returns a function that interpolates from A to B.
  * It steps through the interpolation with each call to the returned function.
  * This means that the `incrementAmount` will hinge on the rate
- * at which the function is called. Alternatively, consider {@link interpolatorInterval}
+ * at which the function is called. Alternatively, consider {@link @ixfx/numbers.interpolatorInterval}
  * which steps on the basis of clock time.
  * 
  * ```js

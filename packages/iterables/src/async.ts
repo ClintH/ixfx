@@ -92,8 +92,9 @@ export const until = async (it: AsyncIterable<any> | Iterable<any>, callback: ()
  * This generator will repeat another generator up until some condition. This is the version
  * that can handle async generators.
  * 
- * For example, {@link count} will count from 0..number and then finish:
+ * For example, {@link @ixfx/numbers.count} will count from 0..number and then finish:
  * ```js
+ * import { count } from '@ixfx/numbers'
  * for (const v of count(5)) {
  *  // v: 0, 1, 2, 3, 4
  * }

@@ -1,5 +1,5 @@
 import * as Flow from '@ixfx/flow';
-import type { ModulationFunction, SpringOptions } from './types.js';
+import type { ModFunction, SpringOptions } from './types.js';
 
 /**
  * Produces values according to rough spring physics.
@@ -120,7 +120,7 @@ export function springValue(opts: SpringOptions = {},
  * @param opts 
  * @returns 
  */
-export const springShape = (opts: SpringOptions = {}): ModulationFunction => {
+export const springShape = (opts: SpringOptions = {}): ModFunction => {
   /** MIT License github.com/pushkine/ */
   const from = 0;
   const to = 1;

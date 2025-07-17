@@ -25,7 +25,7 @@ export type ReactiveProxied<V> = V & {
  * Keep in mind that changing `target` directly won't affect the proxied object or Reactive. Thus,
  * only update the proxied object after calling `fromProxy`.
  * 
- * The benefit of `objectProxy` instead of {@link Rx.From.object} is because the proxied object can be passed to other code that doesn't need
+ * The benefit of `objectProxy` instead of {@link From.object} is because the proxied object can be passed to other code that doesn't need
  * to know anything about Reactive objects.
  * 
  * You can assign the return values to more meaningful names using
@@ -100,7 +100,7 @@ export const arrayProxy = <V, T extends V[]>(target: T): { proxy: T, rx: Reactiv
 }
 
 /**
- * Same as {@link proxy}, but the return value is the proxied object along with 
+ * Same as {@link objectProxy}, but the return value is the proxied object along with 
  * the Reactive wrapped as symbol property.
  * 
  * ```js

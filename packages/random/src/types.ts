@@ -1,10 +1,9 @@
 /**
  * A random source.
  *
- * Predefined sources: {@link defaultRandom}, {@link gaussianSource}, {@link weightedSource}
+ * Predefined sources: Math.random, {@link gaussianSource}, {@link weightedSource}
  */
 export type RandomSource = () => number;
-
 
 export type WeightedOptions = RandomOptions & Readonly<{
   easingFunction: (v: number) => number

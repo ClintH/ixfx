@@ -52,7 +52,7 @@ export const minScore = <V>(iterable: Iterable<V>, scorer: (v: V) => number): V 
  * ```js
  * const a = ['apples','oranges','pears'];
  * const b = ['pears','oranges','apples'];
- * hasEqualValues(a, b); // True
+ * hasEqualValuesShallow(a, b); // True
  * ```
  *
  * @example Custom equality checking
@@ -60,12 +60,13 @@ export const minScore = <V>(iterable: Iterable<V>, scorer: (v: V) => number): V 
  * const a = [ { name: 'John' }];
  * const b = [ { name: 'John' }];
  * // False, since object identies are different
- * hasEqualValues(a, b); 
+ * hasEqualValuesShallow(a, b); 
  * // True, since now we're comparing by value
- * hasEqualValues(a, b, (aa,bb) => aa.name === bb.name);
+ * hasEqualValuesShallow(a, b, (aa,bb) => aa.name === bb.name);
  * ```
- * @param arrays
- * @param eq
+ * @param iterableA First iterable to check
+ * @param iterableB Iterable to compare against
+ * @param eq Equality function, uses === by default
  */
 export const hasEqualValuesShallow = <V>(
   iterableA: Iterable<V>,

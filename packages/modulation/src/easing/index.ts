@@ -1,7 +1,7 @@
 import * as Named from './easings-named.js';
 import { stringTest, resultThrow } from '@ixfx/guards';
 import { type Interval } from '@ixfx/core';
-import type { ModulationFunction, ModulatorTimed } from '../types.js';
+import type { ModFunction, ModulatorTimed } from '../types.js';
 export * as Named from './easings-named.js';
 export * from './line.js';
 export type * from './types.js';
@@ -181,7 +181,7 @@ export const tickEasing = (
   // return Timer.timerWithFunction(fn, relativeTimer);
 };
 
-const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number)): ModulationFunction => {
+const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number)): ModFunction => {
   const fn = typeof nameOrFunction === `function` ? nameOrFunction : get(nameOrFunction);
   if (typeof fn === `undefined`) {
     const error = typeof nameOrFunction === `string` ? new Error(`Easing function not found: '${ nameOrFunction }'`) : new Error(`Easing function not found`);
@@ -265,7 +265,7 @@ let easingsMap: Map<string, ((v: number) => number)> | undefined;
  * @param easingName eg `sineIn`
  * @returns Easing function
  */
-export const get = function (easingName: EasingName): ModulationFunction {
+export const get = function (easingName: EasingName): ModFunction {
   resultThrow(stringTest(easingName, `non-empty`, `easingName`));
 
   const found = cacheEasings().get(easingName.toLowerCase());

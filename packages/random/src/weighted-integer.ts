@@ -25,7 +25,7 @@ import { clamp } from "./util/clamp.js";
  * Note: result from easing function will be clamped to
  * the min/max (by default 0-1);
  *
- * @param maxOrOptions Maximum (exclusive)
+ * @param options Options. By default { max:1, min: 0 }
  * @returns Function that produces a random weighted integer
  */
 export const weightedIntegerSource = (
@@ -65,7 +65,7 @@ export const weightedIntegerSource = (
  * Random.weightedInteger({ max: 100, easing: `quadIn` })
  * ```
  * @inheritDoc {@link weightedIntegerSource}
- * @param maxOrOptions
+ * @param options Options. Default: { max: 1, min: 0 }
  * @returns Random weighted integer
  */
 export const weightedInteger = (options: WeightedOptions): number =>

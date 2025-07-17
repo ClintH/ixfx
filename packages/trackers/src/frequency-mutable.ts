@@ -2,11 +2,48 @@ import { keyValueSorter, type KeyValue, type KeyValueSortSyles, type ToString } 
 import { SimpleEventEmitter } from '@ixfx/events';
 import { numberArrayCompute } from '@ixfx/numbers';
 
-
 export type FrequencyEventMap = {
   readonly change: { context: unknown };
 };
 
+/**
+ * Frequency keeps track of how many times a particular value is seen, but
+ * unlike a Map it does not store the data. By default compares
+ * items by value (via JSON.stringify).
+ *
+ * Fires `change` event when items are added or it is cleared.
+ *
+ * Overview
+ * ```
+ * const fh = new FrequencyTracker();
+ * fh.add(value); // adds a value
+ * fh.clear();    // clears all data
+ * fh.keys() / .values() // returns an iterator for keys and values
+ * fh.toArray();  //  returns an array of data in the shape [[key,freq],[key,freq]...]
+ * ```
+ *
+ * Usage
+ * ```
+ * const fh = new FrequencyTracker();
+ * fh.add(`apples`); // Count an occurence of `apples`
+ * fh.add(`oranges)`;
+ * fh.add(`apples`);
+ *
+ * const fhData = fh.toArray(); // Expect result [[`apples`, 2], [`oranges`, 1]]
+ * fhData.forEach((d) => {
+ *  const [key,freq] = d;
+ *  console.log(`Key '${key}' occurred ${freq} time(s).`);
+ * })
+ * ```
+ *
+ * Custom key string
+ * ```
+ * const fh = frequency( person => person.name);
+ * // All people with name `Samantha` will be counted in same group
+ * fh.add({name:`Samantha`, city:`Brisbane`});
+ * ```
+ * @typeParam V - Type of items
+ */
 export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   readonly #store: Map<string, number>;
   readonly #keyString: ToString<V>;
@@ -147,45 +184,6 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   }
 }
 
-/**
- * Frequency keeps track of how many times a particular value is seen, but
- * unlike a Map it does not store the data. By default compares
- * items by value (via JSON.stringify).
- *
- * Create with {@link Trackers.frequency}.
- *
- * Fires `change` event when items are added or it is cleared.
- *
- * Overview
- * ```
- * const fh = Trackers.frequency();
- * fh.add(value); // adds a value
- * fh.clear();    // clears all data
- * fh.keys() / .values() // returns an iterator for keys and values
- * fh.toArray();  //  returns an array of data in the shape [[key,freq],[key,freq]...]
- * ```
- *
- * Usage
- * ```
- * const fh = Trackers.frequency();
- * fh.add(`apples`); // Count an occurence of `apples`
- * fh.add(`oranges)`;
- * fh.add(`apples`);
- *
- * const fhData = fh.toArray(); // Expect result [[`apples`, 2], [`oranges`, 1]]
- * fhData.forEach((d) => {
- *  const [key,freq] = d;
- *  console.log(`Key '${key}' occurred ${freq} time(s).`);
- * })
- * ```
- *
- * Custom key string
- * ```
- * const fh = Trackers.frequency( person => person.name);
- * // All people with name `Samantha` will be counted in same group
- * fh.add({name:`Samantha`, city:`Brisbane`});
- * ```
- * @typeParam V - Type of items
- */
+
 export const frequency = <V>(keyString?: ToString<V>) =>
   new FrequencyTracker<V>(keyString);

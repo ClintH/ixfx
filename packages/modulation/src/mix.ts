@@ -1,5 +1,5 @@
 import { interpolate } from "@ixfx/numbers";
-import type { ModulationFunction } from "./types.js";
+import type { ModFunction } from "./types.js";
 
 /**
  * Mixes in modulation. This is used when you want to
@@ -50,9 +50,9 @@ export const mix = (amount: number, original: number, modulation: number) => {
  */
 export const mixModulators = (
   balance: number,
-  a: ModulationFunction,
-  b: ModulationFunction
-): ModulationFunction => (amt: number) => interpolate(balance, a(amt), b(amt));
+  a: ModFunction,
+  b: ModFunction
+): ModFunction => (amt: number) => interpolate(balance, a(amt), b(amt));
 
 /**
  * Returns a 'crossfader` function of two easing functions, synchronised with the progress through the easing.
@@ -74,7 +74,7 @@ export const mixModulators = (
  * @param b Easing B
  * @returns Numeric value
  */
-export const crossfade = (a: ModulationFunction, b: ModulationFunction): ModulationFunction => {
+export const crossfade = (a: ModFunction, b: ModFunction): ModFunction => {
   return (amt: number) => {
     const mixer = mixModulators(amt, a, b);
     return mixer(amt);

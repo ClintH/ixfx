@@ -124,7 +124,7 @@ export function isApprox(
  * ```js
  * c(0, 1, 11); // Would return true based on 11
  * ```
- * @param allowedRangePercentage 
+ * @param allowedRangeAbsolute 
  * @param targets 
  * @returns 
  */

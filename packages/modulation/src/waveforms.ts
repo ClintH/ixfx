@@ -1,13 +1,17 @@
 import { resultThrow, integerTest } from "@ixfx/guards";
-import type { ModSettable as ModuleSettable, ModSettableFeedback as ModuleSettableFeedback, ModSettableOptions as ModuleSettableOptions, ModulationFunction } from "./types.js";
+import type { ModSettable, ModSettableFeedback, ModSettableOptions, ModFunction } from "./types.js";
 import * as Sources from './source/index.js';
+
+/**
+ * Function that modulates a wave
+ */
 export type WaveModulator = (feedback?: Partial<WaveShaperFeedback>) => number;
 
 export type Waveforms = `sine` | `sine-bipolar` | `saw` | `triangle` | `square` | `arc`;
 /**
  * Options for the wave function. Defaults to a sine wave of one cycle per-second.
  */
-export type WaveOptions = ModuleSettableOptions & {
+export type WaveOptions = ModSettableOptions & {
   period: number
   /**
    * Clock source. Set this or ticks, hertz, secs or millis
@@ -52,7 +56,7 @@ export type WaveOptions = ModuleSettableOptions & {
  * @param period 
  * @returns 
  */
-export function triangleShape(period = 1): ModulationFunction {
+export function triangleShape(period = 1): ModFunction {
   period = 1 / period;
   const halfPeriod = period / 2;
   return (t: number) => {
@@ -70,7 +74,7 @@ export function triangleShape(period = 1): ModulationFunction {
  * @param period 
  * @returns 
  */
-export function squareShape(period = 1): ModulationFunction {
+export function squareShape(period = 1): ModFunction {
   period = 1 / period;
   const halfPeriod = period / 2;
   return (t: number) => {
@@ -82,6 +86,8 @@ export function squareShape(period = 1): ModulationFunction {
 
 /**
  * Returns a function that shapes a 0..1 value as a sine waveform.
+ * An input value of 0 will be the very beginning of the wave cycle, input of 1 will be the end,
+ * 0.5 will be them middle and so on.
  * ```js
  * const s = sineShape();
  * // Calculate value of sine wave at 50%
@@ -102,7 +108,7 @@ export function squareShape(period = 1): ModulationFunction {
  * @param period 
  * @returns 
  */
-export function sineShape(period = 1): ModulationFunction {
+export function sineShape(period = 1): ModFunction {
   period = period * (Math.PI * 2);
   return (t: number) => {
     const v = (Math.sin(t * period) + 1) / 2;
@@ -116,12 +122,12 @@ export function sineShape(period = 1): ModulationFunction {
  * @param period 
  * @returns 
  */
-export function arcShape(period = 1): ModulationFunction {
+export function arcShape(period = 1): ModFunction {
   period = period * (Math.PI * 2);
   return (t: number) => Math.abs(Math.sin(t * period));
 }
 
-export function sineBipolarShape(period = 1): ModulationFunction {
+export function sineBipolarShape(period = 1): ModFunction {
   period = period * (Math.PI * 2);
   return (t: number) => Math.sin(t * period);
 }
@@ -160,7 +166,7 @@ export function wave(options: Partial<WaveOptions>) {
   const shape = options.shape ?? `sine`;
   const invert = options.invert ?? false;
   const period = options.period ?? 1;
-  let sourceFunction;
+  let sourceFunction: ModSettable;
 
   resultThrow(integerTest(period, `aboveZero`, `period`));
 
@@ -180,7 +186,7 @@ export function wave(options: Partial<WaveOptions>) {
     sourceFunction = Sources.elapsed(secs * 1000, sourceOptions);
   }
 
-  let shaperFunction;
+  let shaperFunction: ModFunction | undefined;
   switch (shape) {
     case `saw`:
       shaperFunction = (v: number) => v;
@@ -214,19 +220,23 @@ export type WaveShaperFeedback = {
   /**
    * Data to feedback to clock source
    */
-  clock: ModuleSettableFeedback
+  clock: ModSettableFeedback
   /**
    * If set, source function is ignored and this value (0..1) is used instead
    */
   override: number
 }
 /**
- * Returns a wave-shaping modulator from a source and shaper
- * @param sourceFn 
- * @param shaperFn 
+ * Returns a wave-shaping modulator with a source and shaper as input.
+ * ```js
+ * // 1Hz sine wave source, 
+ * const wm = waveFromSource(Sources.hertz(1), sineShape(period));
+ * ```
+ * @param sourceFunction Signal source 
+ * @param shaperFunction Modulator
  * @returns 
  */
-export function waveFromSource(sourceFunction: ModuleSettable, shaperFunction: ModulationFunction, invert = false): WaveModulator {
+export function waveFromSource(sourceFunction: ModSettable, shaperFunction: ModFunction, invert = false): WaveModulator {
   return (feedback?: Partial<WaveShaperFeedback>) => {
     let v = sourceFunction(feedback?.clock);
     if (feedback?.override) v = feedback.override;

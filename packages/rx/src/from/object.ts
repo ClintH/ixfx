@@ -20,7 +20,7 @@ export function object<V extends Record<string, any>>(initialValue: undefined, o
  * * `set()`, 'resets' the whole object
  * * `update()` changes a particular field
  * 
- * Consider using {@link Rx.From.objectProxy} to return a object with properties that can be
+ * Consider using {@link From.objectProxy} to return a object with properties that can be
  * set in the usual way yet is also Reactive.
  * 
  * ```js

@@ -82,12 +82,10 @@ export const dotProduct = (
  * Calculates the average of all numbers in an array.
  * Array items which aren't a valid number are ignored and do not factor into averaging.
  *
- * Use {@link minMaxAvg} if you want min, max and total as well.
+ * Use {@link numberArrayCompute} if you want min, max and total as well.
  *
  * @example
  * ```js
- * import * as Numbers from 'https://unpkg.com/ixfx/dist/numbers.js';
- *
  * // Average of a list
  * const avg = Numbers.average([1, 1.4, 0.9, 0.1]);
  *
