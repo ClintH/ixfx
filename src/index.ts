@@ -298,7 +298,6 @@ export * as Iterables from './iterables/index.js';
  * Interpolate
  * * {@link interpolate}: Interpolate from A to B by a given amount
  * * {@link interpolateAngle}: Interpolate angle
- * * {@link interpolatorInterval}: Interpolate automatically over time
  * * {@link interpolatorStepped}: Interpolate automatically stepwise
  * 
  * Etc

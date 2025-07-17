@@ -1,5 +1,11 @@
 # @ixfxfun/process
 
+## 0.38.0
+
+### Minor Changes
+
+- asdf
+
 ## 0.37.0
 
 ### Minor Changes

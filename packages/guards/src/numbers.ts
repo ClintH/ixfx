@@ -65,7 +65,6 @@ export const integerParse = (
 /**
  * Checks if `t` is not a number or within specified range.
  * Returns `[false, reason:string]` if invalid or `[true]` if valid.
- * Use {@link throwNumberTest} to throw an error rather than return result.
  * 
  * Alternatives: {@link integerTest} for additional integer check, {@link percentTest} for percentage-range.
  *

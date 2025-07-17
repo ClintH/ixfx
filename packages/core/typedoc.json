@@ -1,0 +1,13 @@
+{
+    "extends": ["../../typedoc.base.jsonc"],
+    "outputs": [
+        {
+            "name": "json",
+            "path": "./docs.json"
+        },
+    ],
+    "entryPoints": ["src/index.ts"],
+     "compilerOptions": {
+        "rootDir": "."
+    }
+}

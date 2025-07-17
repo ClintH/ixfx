@@ -4,7 +4,7 @@ import { getPathsAndData, type PathData, type PathDataChange } from "@ixfx/core/
 import * as Rx from "@ixfx/rx";
 import * as RxFrom from "@ixfx/rx/from";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind, DomBindUnresolvedSource } from './dom-types.js';
-import { getFromKeys } from "@ixfx/core/maps";
+import { findBySomeKey as mapFindBySomeKey } from "@ixfx/core/maps";
 import { afterMatch, beforeMatch, stringSegmentsWholeToEnd, stringSegmentsWholeToFirst } from "@ixfx/core/text";
 import { QueueMutable } from "@ixfx/collections";
 
@@ -599,7 +599,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
   }
 
   const findBind = (path: string) => {
-    const bind = getFromKeys(binds, stringSegmentsWholeToEnd(path));
+    const bind = mapFindBySomeKey(binds, stringSegmentsWholeToEnd(path));
     if (bind !== undefined) return bind;
     if (!path.includes(`.`)) return binds.get(`_root`);
   }

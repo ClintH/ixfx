@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/visual",
-	"version": "0.37.0",
+	"version": "0.38.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -17,8 +17,8 @@
 			"import": "./src/colour/index.ts"
 		},
 		"./drawing": {
-			"types": "./src/drawing/index.ts",
-			"import": "./src/drawing/index.ts"
+			"types": "./src/drawing.ts",
+			"import": "./src/drawing.ts"
 		},
 		"./svg": {
 			"types": "./src/svg/index.ts",
@@ -50,8 +50,8 @@
 				"import": "./dist/src/colour/index.js"
 			},
 			"./drawing": {
-				"types": "./dist/src/drawing/index.d.ts",
-				"import": "./dist/src/drawing/index.js"
+				"types": "./dist/src/drawing.d.ts",
+				"import": "./dist/src/drawing.js"
 			},
 			"./svg": {
 				"types": "./dist/src/svg/index.d.ts",

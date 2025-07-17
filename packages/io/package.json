@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/io",
-	"version": "0.37.0",
+	"version": "0.38.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -29,8 +29,8 @@
 		"@ixfx/visual": "workspace:^"
 	},
 	"devDependencies": {
-		"@types/dom-serial":"latest",
-		"@types/web-bluetooth":"latest"
+		"@types/dom-serial": "latest",
+		"@types/web-bluetooth": "latest"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

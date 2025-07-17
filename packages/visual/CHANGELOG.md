@@ -1,5 +1,25 @@
 # @ixfxfun/visual
 
+## 0.38.0
+
+### Minor Changes
+
+- asf
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/arrays@0.38.0
+  - @ixfx/collections@0.38.0
+  - @ixfx/core@0.38.0
+  - @ixfx/dom@0.38.0
+  - @ixfx/events@0.38.0
+  - @ixfx/flow@0.38.0
+  - @ixfx/geometry@0.38.0
+  - @ixfx/guards@0.38.0
+  - @ixfx/numbers@0.38.0
+  - @ixfx/random@0.38.0
+
 ## 0.37.0
 
 ### Minor Changes
