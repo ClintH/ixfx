@@ -4,6 +4,7 @@ export * from './debounce.js';
 export * from './dispatch-list.js';
 export * from './every.js';
 export * from './execute.js';
+export * from './event-race.js';
 export * from '@ixfx/core/continuously';
 export * from './moving-average.js';
 export * from './pool.js';

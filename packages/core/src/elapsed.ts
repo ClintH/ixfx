@@ -5,6 +5,7 @@ export type Since = () => number;
 
 /**
  * Returns elapsed time since the initial call.
+ * 
  * ```js
  * // Record start
  * const elapsed = elapsedSince();

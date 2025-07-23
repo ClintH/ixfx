@@ -16,7 +16,7 @@
  * @param options Options
  * @returns 
  */
-export const eventRace = (target: EventTarget, eventNames: Array<string>, options: Partial<{ timeoutMs: number, signal: AbortSignal }> = {}) => {
+export const eventRace = (target: EventTarget, eventNames: string[], options: Partial<{ timeoutMs: number, signal: AbortSignal }> = {}) => {
   const intervalMs = options.timeoutMs ?? 60_1000; //intervalToMs(options.timeout, 60 * 1000);
   const signal = options.signal;
   let triggered = false;

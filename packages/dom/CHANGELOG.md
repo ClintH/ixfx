@@ -1,5 +1,21 @@
 # @ixfxfun/dom
 
+## 0.39.0
+
+### Minor Changes
+
+- Documentation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.39.0
+  - @ixfx/random@0.39.0
+  - @ixfx/debug@0.39.0
+  - @ixfx/core@0.39.0
+  - @ixfx/geometry@0.38.1
+  - @ixfx/numbers@0.38.1
+
 ## 0.38.0
 
 ### Minor Changes

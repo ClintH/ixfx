@@ -1,13 +1,28 @@
+/**
+ * A reactive that does not have an initial value
+ */
 export type ReactiveNonInitial<V> = Reactive<V> & {
   last(): V | undefined
 }
 
+/**
+ * A reactive with an initial value
+ */
 export type ReactiveInitial<V> = Reactive<V> & {
   last(): V
 }
 
+/**
+ * Unsubscribes from a reactive
+ */
 export type Unsubscriber = () => void;
+/**
+ * Signals
+ */
 export type SignalKinds = `done` | `warn`;
+/**
+ * A message
+ */
 export type Passed<V> = {
   value: V | undefined
   signal?: SignalKinds

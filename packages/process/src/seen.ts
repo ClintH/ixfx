@@ -3,11 +3,12 @@ import { isEqualDefault, toStringDefault } from "./util.js";
 
 /**
  * If a value is same as the previous value, _undefined_ is emitted instead.
+ * 
  * @param eq Equality function. If not specified, === semantics are used.
  * @returns 
  */
 export function seenLastToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Process<TIn, TIn | undefined> {
-  if (eq === undefined) eq = isEqualDefault;
+  if (typeof eq === `undefined`) eq = isEqualDefault;
   let lastValue: TIn | undefined;
   return (value: TIn) => {
     if (value !== lastValue) {
@@ -20,6 +21,7 @@ export function seenLastToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Proc
 
 /**
  * If a value is same as any previously-seen value, _undefined_ is emitted instead.
+ * 
  * It stores all previous values and compares against them for each new value. 
  * This would likely be not very efficient compared to {@link seenToUndefinedByKey} which uses a one-time computed
  * key and efficient storage of only the keys (using a Set).
@@ -28,8 +30,8 @@ export function seenLastToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Proc
  * @returns 
  */
 export function seenToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Process<TIn, TIn | undefined> {
-  let seen: TIn[] = [];
-  if (eq === undefined) eq = isEqualDefault;
+  const seen: TIn[] = [];
+  if (typeof eq === `undefined`) eq = isEqualDefault;
   return (value: TIn) => {
     if (value === undefined) return;
     for (const s of seen) {
@@ -42,6 +44,7 @@ export function seenToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Process<
 
 /**
  * If a value is the same as any previously-seen value, _undefined_ is emitted instead.
+ * 
  * This version uses a function to create a string key of the object, by default JSON.stringify.
  * Thus we don't need to store all previously seen objects, just their keys.
  * 
@@ -52,8 +55,8 @@ export function seenToUndefined<TIn>(eq?: (a: TIn, b: TIn) => boolean): Process<
  * @returns 
  */
 export function seenToUndefinedByKey<TIn>(toString?: (value: TIn) => string): Process<TIn, TIn | undefined> {
-  let seen = new Set<string>();
-  if (toString === undefined) toString = toStringDefault;
+  const seen = new Set<string>();
+  if (typeof toString === `undefined`) toString = toStringDefault;
   return (value: TIn) => {
     if (value === undefined) return;
     const key = toString(value);

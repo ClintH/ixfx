@@ -319,7 +319,7 @@ export const cycleCssClass = (
   el: Readonly<HTMLElement>,
   list: readonly string[]
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   if (el === null || !el) return;
   if (!Array.isArray(list)) {
     throw new TypeError(`List should be an array of strings`);
@@ -385,7 +385,7 @@ export const getTranslation = (
 
   // 3d Matrixes have 16 values
   // The 13th, 14th, and 15th values are X, Y, and Z
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   if (matrixType === `3d`) {
     return {
       x: Number.parseFloat(matrixValues[ 12 ]),
@@ -501,18 +501,39 @@ export const insertSorted = (parent: HTMLElement, element: HTMLElement) => {
   }
 }
 
+/**
+ * Creates or updates an element based on an input value.
+ * This function should not add the element to the DOM.
+ */
 export type CreateUpdateElement<V> = (
+  /**
+   * Value to create/update for
+   */
   item: V,
+  /**
+   * Element to update, or null if it needs to be created
+   */
   el: HTMLElement | null
 ) => HTMLElement;
 
+/**
+ * Creates a DOM tree, based on provided data.
+ * 
+ * This will create new DOM elements if needed, update
+ * existing ones or remove them if the value is no longer present.
+ * 
+ * 
+ * @param parentEl 
+ * @param list Values to create elements for
+ * @param createUpdate Function to create/update elements based on a value
+ */
 export const reconcileChildren = <V>(
   parentEl: HTMLElement,
   list: Map<string, V>,
   createUpdate: CreateUpdateElement<V>
 ) => {
   if (typeof parentEl === `undefined`) throw new Error(`Param 'parentEl' is undefined`);
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   if (parentEl === null) throw new Error(`Param 'parentEl' is null`);
 
   const seen = new Set<string>();
@@ -545,8 +566,6 @@ export const reconcileChildren = <V>(
 
   for (const p of prune) p.remove();
 };
-
-
 
 /**
  * Gets a HTML element by id, throwing an error if not found

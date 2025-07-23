@@ -1,5 +1,19 @@
 # @ixfxfun/collections
 
+## 0.39.0
+
+### Minor Changes
+
+- Documentation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/arrays@0.39.0
+  - @ixfx/events@0.39.0
+  - @ixfx/core@0.39.0
+  - @ixfx/iterables@0.38.1
+
 ## 0.38.0
 
 ### Minor Changes

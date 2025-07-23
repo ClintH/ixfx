@@ -1,8 +1,8 @@
-import { assert, describe, test,expect, it } from "vitest";
-import { circularArray } from '../src/circular-array.js';
+import { assert, describe, test, expect, it } from "vitest";
+import { CircularArray } from '../src/circular-array.js';
 
 test(`circularArray`, () => {
-  const ca1 = circularArray<string>(5);
+  const ca1 = new CircularArray<string>(5);
   const ca2 = ca1.add(`a`);
   const ca3 = ca2.add(`b`);
   const ca4 = ca3.add(`c`);
@@ -24,7 +24,7 @@ test(`circularArray`, () => {
 
   //t.like(ca6 as string[], [ `a`, `b`, `c`, `d`, `e` ]);
   expect(ca6 as string[]).toEqual([ `a`, `b`, `c`, `d`, `e` ]);
-  
+
   expect(ca1.isFull).toBe(false);
   expect(ca2.isFull).toBe(false);
   expect(ca3.isFull).toBe(false);
@@ -44,7 +44,7 @@ test(`circularArray`, () => {
   expect(ca7.length === 5).toBe(true);
   expect(ca7.pointer === 1).toBe(true);
 
-  expect(ca6 as string[]).toEqual( [ `a`, `b`, `c`, `d`, `e` ]);
+  expect(ca6 as string[]).toEqual([ `a`, `b`, `c`, `d`, `e` ]);
   expect(ca7 as string[]).toEqual([ `f`, `b`, `c`, `d`, `e` ]);
 
 });

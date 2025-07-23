@@ -1,5 +1,5 @@
 import { numberTest, resultThrow } from '@ixfx/guards';
-import { type RandomOptions, type RandomSource } from "./types.js";
+import { type RandomNumberOptions, type RandomSource } from "./types.js";
 
 /**
  * Source for random bipolar values
@@ -18,7 +18,7 @@ import { type RandomOptions, type RandomSource } from "./types.js";
  * @param maxOrOptions Maximum value (number) or options for random generation
  * @returns 
  */
-export const bipolarSource = (maxOrOptions?: number | RandomOptions): RandomSource => {
+export const bipolarSource = (maxOrOptions?: number | RandomNumberOptions): RandomSource => {
   const source = floatSource(maxOrOptions);
   return () => (source() * 2) - 1;
 }
@@ -39,7 +39,7 @@ export const bipolarSource = (maxOrOptions?: number | RandomOptions): RandomSour
  * @param maxOrOptions 
  * @returns 
  */
-export const bipolar = (maxOrOptions?: number | RandomOptions): number => {
+export const bipolar = (maxOrOptions?: number | RandomNumberOptions): number => {
   const source = bipolarSource(maxOrOptions);
   return source();
 }
@@ -69,7 +69,7 @@ export const bipolar = (maxOrOptions?: number | RandomOptions): number => {
  * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
-export const floatSource = (maxOrOptions: (number | RandomOptions) = 1): RandomSource => {
+export const floatSource = (maxOrOptions: (number | RandomNumberOptions) = 1): RandomSource => {
   const options = typeof maxOrOptions === `number` ? { max: maxOrOptions } : maxOrOptions;
   let max = options.max ?? 1;
   let min = options.min ?? 0;
@@ -92,7 +92,9 @@ export const floatSource = (maxOrOptions: (number | RandomOptions) = 1): RandomS
 };
 
 /**
- * Returns a random float between `max` (exclusive) and 0 (inclusive). Max is 1 if unspecified.
+ * Returns a random float between `max` (exclusive) and 0 (inclusive). 
+ * 
+ * Max is 1 if unspecified.
  * Use {@link floatSource} to get a function that produces values. This is used internally.
  *
  * ```js
@@ -111,5 +113,5 @@ export const floatSource = (maxOrOptions: (number | RandomOptions) = 1): RandomS
  * @param maxOrOptions Maximum value (exclusive) or options
  * @returns Random number
  */
-export const float = (maxOrOptions: (number | RandomOptions) = 1): number =>
+export const float = (maxOrOptions: (number | RandomNumberOptions) = 1): number =>
   floatSource(maxOrOptions)();

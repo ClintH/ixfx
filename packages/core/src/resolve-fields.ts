@@ -2,6 +2,10 @@ import { resolve, resolveSync, type ReactiveNonInitial, type ResolveToValue } fr
 import { zip } from "./util/zip.js";
 // import { zip } from "./arrays/Zip.js";
 
+/**
+ * An object that can be 'resolved'.
+ * @see {@link resolveFields}
+ */
 export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
   { [ K in keyof T ]:
     T[ K ] extends number ? number :
@@ -40,7 +44,8 @@ export type ResolvedObject<T extends Record<string, ResolveToValue<any>>> =
  * // { length: 10, random: 0.1235 }
  * ```
  * 
- * It also works with generators
+ * It also works with generators. Probably best with those that are infinite.
+ * 
  * ```js
  * import { count } from './numbers.js';
  * 
@@ -69,6 +74,12 @@ export async function resolveFields<T extends Record<string, ResolveToValue<any>
   return Object.fromEntries(entries) as ResolvedObject<T>;
 }
 
+/**
+ * 'Resolves' all the fields of `object` in a synchronous manner.
+ * Uses {@link resolveSync} under-the-hood
+ * @param object 
+ * @returns 
+ */
 export function resolveFieldsSync<T extends Record<string, ResolveToValue<any>>>(object: T): ResolvedObject<T> {
   const entries: [ key: string, value: any ][] = [];
   for (const entry of Object.entries(object)) {

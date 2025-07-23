@@ -1,4 +1,11 @@
+/**
+ * Kind of change
+ */
 export type ChangeKind = `mutate` | `add` | `del`
+
+/**
+ * Change record
+ */
 export type ChangeRecord<TKey extends string | number | symbol> = [ kind: ChangeKind, path: TKey, value: unknown ];
 
 /**
@@ -25,6 +32,9 @@ export type CompareChangeSet<TKey extends string | number> = {
    * Fields that have been removed
    */
   removed: TKey[]
+  /**
+   * _True_ if value is an array
+   */
   isArray: boolean
   /**
    * Summary of changes

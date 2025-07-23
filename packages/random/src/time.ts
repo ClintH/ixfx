@@ -1,8 +1,9 @@
 import { integer, integerSource } from "./integer.js";
-import type { RandomOptions, RandomSource } from "./types.js";
+import type { RandomNumberOptions, RandomSource } from "./types.js";
 
 /**
  * Returns a random number of minutes, with a unit of milliseconds.
+ * 
  * Max value is exclusive, defaulting to 5.
  * Use {@link minutesMs} to get a value directly, or {@link minutesMsSource} to return a function.
  *
@@ -33,7 +34,7 @@ import type { RandomOptions, RandomSource } from "./types.js";
  * @returns Function that produces a random value
  */
 export const minutesMsSource = (
-  maxMinutesOrOptions: number | RandomOptions
+  maxMinutesOrOptions: number | RandomNumberOptions
 ): RandomSource => {
   const options =
     typeof maxMinutesOrOptions === `number`
@@ -46,6 +47,8 @@ export const minutesMsSource = (
 
 
 /**
+ * Return a random time value in milliseconds, using minute values to set range.
+ * 
  * @example Random value from 0 to one milli less than 5 * 60 * 1000
  * ```js
  * // Random value from 0 to one milli less than 5*60*1000
@@ -63,12 +66,13 @@ export const minutesMsSource = (
  * @see {@link minutesMsSource}
  * @returns Milliseconds
  */
-export const minutesMs = (maxMinutesOrOptions: number | RandomOptions): number =>
+export const minutesMs = (maxMinutesOrOptions: number | RandomNumberOptions): number =>
   minutesMsSource(maxMinutesOrOptions)();
 
 
 /**
  * Returns function which produces a random number of seconds, with a unit of milliseconds.
+ * 
  * Maximum value is exclusive, defaulting to 5
  * Use {@link secondsMs} to return a random value directly, or {@link secondsMsSource} to return a function.
  *
@@ -98,7 +102,7 @@ export const minutesMs = (maxMinutesOrOptions: number | RandomOptions): number =
  * @returns Milliseconds
  */
 export const secondsMsSource = (
-  maxSecondsOrOptions: number | RandomOptions
+  maxSecondsOrOptions: number | RandomNumberOptions
 ): RandomSource => {
   const options =
     typeof maxSecondsOrOptions === `number`
@@ -110,6 +114,8 @@ export const secondsMsSource = (
 };
 
 /**
+ * Generate random time in milliseconds, using seconds to set the bounds
+ * 
  * @example Random milliseconds between 0..4999
  * ```js
  * secondsMs(5000);
@@ -124,5 +130,5 @@ export const secondsMsSource = (
  * @param maxSecondsOrOptions
  * @returns
  */
-export const secondsMs = (maxSecondsOrOptions: number | RandomOptions): number =>
+export const secondsMs = (maxSecondsOrOptions: number | RandomNumberOptions): number =>
   secondsMsSource(maxSecondsOrOptions)();

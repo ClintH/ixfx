@@ -1,7 +1,8 @@
-export {
-  circularArray,
-  type ICircularArray as CircularArray,
-} from './circular-array.js';
+export * from './circular-array.js';
+
+/**
+ * A tree-like structure of branches and leaves.
+ */
 export * as Trees from './tree/index.js';
 export * from './tree/types.js';
 
@@ -46,6 +47,9 @@ export * as Maps from './map/index.js';
 export { ExpiringMap } from './map/expiring-map.js';
 export { MapOfSimpleMutable } from './map/map-of-simple-mutable.js';
 
+/**
+ * Undirected and directed graphs and associated algorithms.
+ */
 export * as Graphs from './graph/index.js';
 
 export { Table } from './table.js';

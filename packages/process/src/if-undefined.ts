@@ -1,6 +1,6 @@
 import { CancelError } from "./cancel-error.js";
 
-/**
+
 /**
  * Calls a function if the input value is not undefined.
  * Return value from function is passed to next function in flow.

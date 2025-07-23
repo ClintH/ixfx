@@ -31,9 +31,7 @@ test(`adjacent`, () => {
     { id: `0` }, { id: `2` }
   ]);
 
-  expect(() => {
-    [ ...G.adjacentVertices(g, `5`) ]
-  }).toThrow();
+  expect(() => [ ...G.adjacentVertices(g, `5`) ]).toThrow();
 });
 
 

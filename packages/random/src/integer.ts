@@ -1,5 +1,5 @@
 import { numberTest, integerTest, resultThrow } from "@ixfx/guards";
-import type { GenerateRandomOptions, RandomOptions, RandomSource } from "./types.js";
+import type { GenerateRandomOptions, RandomNumberOptions, RandomSource } from "./types.js";
 import { count } from "./util/count.js";
 import { shuffle } from "./arrays.js";
 
@@ -35,7 +35,7 @@ import { shuffle } from "./arrays.js";
  * @param maxOrOptions Max value (exclusive), or set of options
  * @returns Random integer
  */
-export const integerSource = (maxOrOptions: number | RandomOptions): RandomSource => {
+export const integerSource = (maxOrOptions: number | RandomNumberOptions): RandomSource => {
   if (typeof maxOrOptions === `undefined`) {
     throw new TypeError(`maxOrOptions is undefined`);
   }
@@ -93,7 +93,7 @@ export const integerSource = (maxOrOptions: number | RandomOptions): RandomSourc
  * @param maxOrOptions Max value (exclusive), or set of options
  * @returns Random integer
  */
-export const integer = (maxOrOptions: number | RandomOptions): number =>
+export const integer = (maxOrOptions: number | RandomNumberOptions): number =>
   integerSource(maxOrOptions)();
 
 /**

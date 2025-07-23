@@ -17,6 +17,20 @@ export const resolveEl = <V extends Element>(domQueryOrEl: string | V | null | u
   throw resultToError(r);
 }
 
+/**
+ * Tries to resolve a query, returning a `Result`.
+ * 
+ * ```js
+ * const { success, value, error } = resolveElementTry(`#some-element`);
+ * if (success) {
+ *  // Do something with value
+ * } else {
+ *  console.error(error);
+ * }
+ * ```
+ * @param domQueryOrEl 
+ * @returns 
+ */
 export const resolveElementTry = <V extends Element>(domQueryOrEl: string | V | null | undefined): Result<V, string> => {
   if (typeof domQueryOrEl === `string`) {
     const d = document.querySelector(domQueryOrEl);
@@ -38,6 +52,14 @@ export const resolveElementTry = <V extends Element>(domQueryOrEl: string | V | 
 
 export type QueryOrElements = string | Element[] | HTMLElement[] | HTMLElement | Element
 
+/**
+ * Returns a set of elements.
+ * 
+ * Returns an empty list if `selectors` is undefined or null.
+ * 
+ * @param selectors 
+ * @returns 
+ */
 export const resolveEls = (selectors: QueryOrElements): HTMLElement[] => {
   if (selectors === undefined) return [];
   if (selectors === null) return [];

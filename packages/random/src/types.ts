@@ -5,7 +5,7 @@
  */
 export type RandomSource = () => number;
 
-export type WeightedOptions = RandomOptions & Readonly<{
+export type WeightedOptions = RandomNumberOptions & Readonly<{
   easingFunction: (v: number) => number
   easing?: string
 }>;
@@ -16,13 +16,29 @@ export type StringOptions = Readonly<{
 }>
 
 
+
 export type RandomOptions = Readonly<{
-  max?: number;
-  min?: number;
-  source?: RandomSource;
+  source?: RandomSource
 }>
 
-export type GenerateRandomOptions = RandomOptions & Readonly<{
+export type RandomNumberOptions = RandomOptions & Readonly<{
+  max?: number
+  min?: number
+}>
+
+/**
+ * Options for generating a random boolean
+ */
+export type RandomBooleanOptions = RandomOptions & Readonly<{
+  /**
+   * If a random value is above threshold, _true_ is returned,
+   * otherwise _false_.
+   * Defaults to 0.5
+   */
+  threshold?: number
+}>
+
+export type GenerateRandomOptions = RandomNumberOptions & Readonly<{
   /**
    * If true, number range is looped
    */

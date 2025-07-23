@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { immutable as immutableMap, type IMapImmutable } from "../map/map.js"
 import { Table } from "../table.js"
 
@@ -13,13 +13,13 @@ export type Edge = Readonly<{
 }>
 
 export type Graph = Readonly<{
-  edges: ReadonlyArray<Edge>,
+  edges: readonly Edge[],
   vertices: IMapImmutable<string, Vertex>
 }>
 
 export type ConnectOptions = Readonly<{
   a: string
-  b: string | Array<string>
+  b: string | string[]
   weight?: number
 }>
 
@@ -160,7 +160,7 @@ export function connect(graph: Graph, options: ConnectOptions): Graph {
 export function connectWithEdges(graph: Graph, options: ConnectOptions): { graph: Graph, edges: Edge[] } {
   const { a, weight, b } = options;
   const destinations = Array.isArray(b) ? b : [ b ];
-  let edges: Edge[] = [];
+  const edges: Edge[] = [];
   for (const destination of destinations) {
     const result = connectTo(graph, a, destination, weight);
     graph = result.graph;
@@ -170,7 +170,7 @@ export function connectWithEdges(graph: Graph, options: ConnectOptions): { graph
   return { graph, edges };
 }
 
-export const graph = (...initialConnections: Array<ConnectOptions>): Graph => {
+export const graph = (...initialConnections: ConnectOptions[]): Graph => {
   let g: Graph = {
     vertices: immutableMap(),
     edges: []
@@ -188,9 +188,9 @@ export function toAdjacencyMatrix(graph: Graph): Table<boolean> {
   table.labelColumns(...v.map(vv => vv.id));
   table.labelRows(...v.map(vv => vv.id));
 
-  // eslint-disable-next-line @typescript-eslint/prefer-for-of, unicorn/prevent-abbreviations
+  // eslint-disable-next-line unicorn/prevent-abbreviations
   for (let i = 0; i < v.length; i++) {
-    table.setRow(i, v.length, false);
+    table.setRow(i, false, v.length);
 
     const ii = v[ i ];
     // eslint-disable-next-line unicorn/prevent-abbreviations
@@ -219,11 +219,11 @@ export const dumpGraph = (graph: Graph): string => {
  * @param graph 
  * @returns 
  */
-const debugGraphToArray = (graph: Graph): Array<string> => {
-  const r: Array<string> = [];
+const debugGraphToArray = (graph: Graph): string[] => {
+  const r: string[] = [];
 
   r.push(`Vertices: ${ [ ...graph.vertices.values() ].map(v => v.id).join(`, `) }`);
-  // eslint-disable-next-line unicorn/no-array-push-push
+
   r.push(`Edges:`);
   for (const edge of graph.edges) {
     r.push(stringForEdge(edge));

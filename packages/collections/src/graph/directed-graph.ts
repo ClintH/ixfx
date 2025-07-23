@@ -150,7 +150,7 @@ export function toAdjacencyMatrix(graph: DirectedGraph): Table<boolean> {
   // eslint-disable-next-line unicorn/prevent-abbreviations
   for (let i = 0; i < v.length; i++) {
     //m[ i ] = [ ...row ];
-    table.setRow(i, v.length, false);
+    table.setRow(i, false, v.length);
     const ii = v[ i ];
     // eslint-disable-next-line unicorn/prevent-abbreviations
     for (const [ j, jj ] of v.entries()) {
@@ -192,6 +192,12 @@ const debugGraphToArray = (graph: DirectedGraph | Iterable<Vertex>): string[] =>
 }
 
 
+/**
+ * Returns the weight of an edge, or 1 if undefined.
+ * @param graph
+ * @param edge 
+ * @returns 
+ */
 export const distance = (graph: DirectedGraph, edge: Edge): number => {
   if (edge.weight !== undefined) return edge.weight;
   return 1;

@@ -32,6 +32,7 @@ export const getBoundingClientRectWithBorder = (elOrQuery: SVGElement | HTMLElem
 
 /**
  * Returns the computed measurements of CSS properties via [getComputedStyle](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle).
+ * 
  * ```js
  * const v = getComputedPixels(`#some-el`, `borderTopWidth`, `borderLeftWidth`);
  * v.borderTopWidth;  // number
@@ -63,10 +64,13 @@ export const getComputedPixels = <T extends readonly (keyof CSSStyleDeclaration)
 
 
 /**
- * Adds `cssClass` to element(s) if `value` is true.
+ * If `value` is _true_, the provided CSS class is added to element(s), otherwise it is removed.
+ * 
  * ```js
- * setClass(`#someId`, true, `activated`);
+ * setClass(`#someId`, true, `activated`); // Add 'activated'
+ * setClass(`#someId`, false, `activated`); // Removes 'activated'
  * ```
+ * 
  * @param selectors 
  * @param value 
  * @param cssClass 
@@ -83,7 +87,13 @@ export const setCssClass = (selectors: QueryOrElements, value: boolean, cssClass
 };
 
 /**
- * Toggles a CSS class on all elements that match selector
+ * Toggles a CSS class on all elements that match selector.
+ * 
+ * ```js
+ * setCssToggle(`span`, `activated`); // Toggles the 'activated' class on all SPAN elements
+ * ```
+ * 
+ * Uses `HTMLElement.classList.toggle`
  * @param selectors 
  * @param cssClass 
  * @returns 
@@ -96,6 +106,17 @@ export const setCssToggle = (selectors: QueryOrElements, cssClass: string) => {
   }
 }
 
+/**
+ * Sets the CSS 'display' property
+ * 
+ * ```js
+ * setCssDisplay(`span`, `block`); // Sets display:block for all spans
+ * ```
+ * 
+ * @param selectors 
+ * @param value 
+ * @returns 
+ */
 export const setCssDisplay = (selectors: QueryOrElements, value: string) => {
   const elements = resolveEls(selectors);
   if (elements.length === 0) return;

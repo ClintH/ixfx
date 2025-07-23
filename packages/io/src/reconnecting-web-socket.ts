@@ -1,6 +1,5 @@
-import { retryTask } from "@ixfx/flow"
+import { retryTask, eventRace } from "@ixfx/flow"
 import { intervalToMs, type Interval } from "@ixfx/core"
-import { eventRace } from "@ixfx/events"
 import * as StateMachine from "@ixfx/flow/state-machine"
 import { getErrorMessage } from "@ixfx/debug"
 

@@ -1,6 +1,8 @@
 import { resultThrow, integerTest } from '@ixfx/guards';
 /**
- * Samples values from an array. If `amount` is less or equal to 1, it's treated as a percentage to sample.
+ * Samples values from an array. 
+ * 
+ * If `amount` is less or equal to 1, it's treated as a percentage to sample.
  * Otherwise it's treated as every _n_th value to sample.
  *
  * @example 

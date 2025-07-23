@@ -1,5 +1,5 @@
 import { isEqualDefault } from '@ixfx/core';
-import { type ICircularArray, circularArray } from '../circular-array.js';
+import { CircularArray, type ICircularArray } from '../circular-array.js';
 import type { MapMultiOpts, MultiValue } from './map-multi.js';
 import { MapOfMutableImpl } from './map-of-multi-impl.js';
 import type { IMapOfMutableExtended } from './imap-of-mutable-extended.js';
@@ -37,7 +37,7 @@ export const ofCircularMutable = <V>(
       return `circular`;
     },
     add: (destination, values) => {
-      if (destination === undefined) destination = circularArray<V>(options.capacity);
+      destination ??= new CircularArray<V>(options.capacity);
       for (const v of values) {
         //values.forEach(v => dest = dest?.add(v));
         destination = destination.add(v);

@@ -1,5 +1,6 @@
 /**
  * Computes the frequency of values by a grouping function.
+ * 
  * ```js
  * const data = [1,2,3,4,5,6,7,8,9,10];
  * // Returns 'odd' or 'even' for an input value

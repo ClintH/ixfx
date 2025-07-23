@@ -1,9 +1,14 @@
 import type { RandomSource } from "./types.js";
 
+/**
+ * Keeps generating a random number until
+ * it's not 0
+ * @param source Random number generator 
+ * @returns Non-zero number
+ */
 export const calculateNonZero = (source: RandomSource = Math.random) => {
   let v = 0;
   while (v === 0) {
-    //eslint-disable-next-line functional/no-expression-statements
     v = source();
   }
   return v;

@@ -226,7 +226,8 @@ export function getCssVariable(cssVariable: string, fallbackValue: string): stri
 }
 
 /**
- * Sets CSS variables.
+ * Sets CSS variables using an object.
+ * 
  * ```js
  * const vars = {
  *  my_var: `red`,
@@ -242,6 +243,7 @@ export function getCssVariable(cssVariable: string, fallbackValue: string): stri
  * // Or to a CSSStyleDeclaration
  * setCssVariables(vars, styles);
  * ```
+ * 
  * @param variables 
  * @param stylesOrEl 
  */

@@ -1,4 +1,7 @@
-//eslint-disable-next-line functional/functional-parameters
+/**
+ * Returns _true_ if it seems like the code is running on iOS (iPad/iPhone)
+ * @returns 
+ */
 export const runningiOS = () =>
   [
     `iPad Simulator`,

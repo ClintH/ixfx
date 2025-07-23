@@ -49,6 +49,8 @@ export const weightedIntegerSource = (
 };
 
 /**
+ * Generate a weighted-random integer.
+ * 
  * @example 0..99
  * ```js
  * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';

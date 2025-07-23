@@ -16,7 +16,7 @@ export type IsEqual<T> = (a: T, b: T) => boolean;
 export const toStringOrdered = (itemToMakeStringFor: unknown) => {
   if (typeof itemToMakeStringFor === `string`) return itemToMakeStringFor;
   const allKeys = new Set<string>();
-   
+
   JSON.stringify(itemToMakeStringFor, (key: string, value: unknown) => (allKeys.add(key), value));
   return JSON.stringify(itemToMakeStringFor, [ ...allKeys ].sort());
 }
@@ -78,7 +78,7 @@ export const isEqualValueDefault = <T>(a: T, b: T): boolean => {
  * @param fieldComparer 
  * @returns 
  */
-export const isEqualValuePartial = (a: Record<string,unknown>, b: Record<string,unknown>, fieldComparer?: IsEqual<unknown>): boolean => {
+export const isEqualValuePartial = (a: Record<string, unknown>, b: Record<string, unknown>, fieldComparer?: IsEqual<unknown>): boolean => {
   if (typeof a !== `object`) throw new Error(`Param 'a' expected to be object`);
   if (typeof b !== `object`) throw new Error(`Param 'b' expected to be object`);
 
@@ -88,7 +88,7 @@ export const isEqualValuePartial = (a: Record<string,unknown>, b: Record<string,
     const valueOnAKeyFromB = a[ entryB[ 0 ] ];
     const valueB = entryB[ 1 ];
     if (typeof valueOnAKeyFromB === `object` && typeof valueB === `object`) {
-      if (!comparer(valueOnAKeyFromB as Record<string,unknown>, valueB as Record<string,unknown>)) {
+      if (!comparer(valueOnAKeyFromB as Record<string, unknown>, valueB as Record<string, unknown>)) {
         return false;
       }
     } else {
@@ -134,7 +134,7 @@ export const isEmptyEntries = (value: object) => [ ...Object.entries(value) ].le
 export type IsEqualContext<V> = (a: V, b: V | undefined, path: string) => boolean
 
 /**
- * Returns _true_ if `a` and `b are equal based on their JSON representations.
+ * Returns _true_ if `a` and `b` are equal based on their JSON representations.
  * `path` is ignored.
  * @param a 
  * @param b 

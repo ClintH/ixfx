@@ -53,7 +53,7 @@ export async function resolve<V extends BasicType>(r: ResolveToValue<V>, ...args
         throw new Error(`Object has 'next' prop, but does not have 'AsyncGenerator', 'Generator' or 'Array Iterator' string tag symbol. Got: '${ tag }'`);
       }
     } else if (isReactive<V>(r)) {
-      if (hasLast(r)) return r.last() as V;
+      if (hasLast(r)) return r.last()!;
       throw new Error(`Reactive does not have last value`);
     } else {
       // Some regular object
@@ -68,6 +68,12 @@ export async function resolve<V extends BasicType>(r: ResolveToValue<V>, ...args
   }
 }
 
+/**
+ * For a given input `r`, attempts to 'resolve' it. See {@link resolve} for details.
+ * @param r 
+ * @param args 
+ * @returns 
+ */
 export function resolveSync<V extends BasicType>(r: ResolveToValueSync<V>, ...args: any): V {
   if (typeof r === `object`) {
     if (`next` in r) {
@@ -82,7 +88,7 @@ export function resolveSync<V extends BasicType>(r: ResolveToValueSync<V>, ...ar
         throw new Error(`Object has 'next' prop, but does not have 'Generator' or 'Array Iterator' string tag symbol. Got: '${ tag }'`);
       }
     } else if (isReactive<V>(r)) {
-      if (hasLast(r)) return r.last() as V;
+      if (hasLast(r)) return r.last()!;
       throw new Error(`Reactive does not have last value`);
     } else {
       // Some regular object

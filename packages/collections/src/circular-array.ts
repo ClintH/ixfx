@@ -1,21 +1,5 @@
 import { integerTest, resultThrow } from "@ixfx/guards";
 
-/**
- * The circular array is immutable. It keeps up to `capacity` items.
- * Old items are overridden with new items.
- *
- * `CircularArray` extends the regular JS array. Only use `add` to change the array if you want
- * to keep the `CircularArray` behaviour.
- * @example
- * ```js
- * let a = circularArray(10);
- * a = a.add(`hello`); // Because it's immutable, capture the return result of `add`
- * a.isFull;  // True if circular array is full
- * a.pointer; // The current position in array it will write to
- * ```
- * @class CircularArray
- */
-
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface ICircularArray<V> extends Array<V> {
@@ -43,7 +27,31 @@ export interface ICircularArray<V> extends Array<V> {
   get pointer(): number;
 }
 
-class CircularArray<V> extends Array {
+/**
+ * A circular array keeps a maximum number of values, overwriting older values as needed. Immutable.
+ *
+ * `CircularArray` extends the regular JS array. Only use `add` to change the array if you want
+ * to keep the `CircularArray` behaviour.
+ *
+ * @example Basic functions
+ * ```js
+ * let a = new CircularArray(10);
+ * a = a.add(`hello`);  // Because it's immutable, capture the return result of `add`
+ * a.isFull;            // True if circular array is full
+ * a.pointer;           // The current position in array it will write to
+ * ```
+ *
+ * Since it extends the regular JS array, you can access items as usual:
+ * @example Accessing
+ * ```js
+ * let a = new CircularArray(10);
+ * ... add some stuff ..
+ * a.forEach(item => // do something with item);
+ * ```
+ * @param capacity Maximum capacity before recycling array entries
+ * @return Circular array
+ */
+export class CircularArray<V> extends Array {
   #capacity: number;
   #pointer: number;
 
@@ -84,31 +92,3 @@ class CircularArray<V> extends Array {
     return this.length === this.#capacity;
   }
 }
-
-/**
- * Returns a new circular array. Immutable. A circular array only keeps up to `capacity` items.
- * Old items are overridden with new items.
- *
- * `CircularArray` extends the regular JS array. Only use `add` to change the array if you want
- * to keep the `CircularArray` behaviour.
- *
- * @example Basic functions
- * ```js
- * let a = circularArray(10);
- * a = a.add(`hello`);  // Because it's immutable, capture the return result of `add`
- * a.isFull;            // True if circular array is full
- * a.pointer;           // The current position in array it will write to
- * ```
- *
- * Since it extends the regular JS array, you can access items as usual:
- * @example Accessing
- * ```js
- * let a = circularArray(10);
- * ... add some stuff ..
- * a.forEach(item => // do something with item);
- * ```
- * @param capacity Maximum capacity before recycling array entries
- * @return Circular array
- */
-export const circularArray = <V>(capacity: number): ICircularArray<V> =>
-  new CircularArray<V>(capacity);

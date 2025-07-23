@@ -4,8 +4,20 @@
 const objectToString = Object.prototype.toString
 const toTypeString = (value: unknown): string =>
   objectToString.call(value)
+
+/**
+ * Returns _true_ if `value` is a Map type
+ * @param value
+ * @returns 
+ */
 export const isMap = (value: unknown): value is Map<any, any> =>
   toTypeString(value) === `[object Map]`
+
+/**
+ * Returns _true_ if `value` is a Set type
+ * @param value 
+ * @returns 
+ */
 export const isSet = (value: unknown): value is Set<any> =>
   toTypeString(value) === `[object Set]`
 
@@ -17,15 +29,23 @@ export const toStringDefault = <V>(itemToMakeStringFor: V): string =>
     ? itemToMakeStringFor
     : JSON.stringify(itemToMakeStringFor);
 
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const defaultToString = (object: any): string => {
+
+/**
+ * Converts a value to string form.
+ * For simple objects, .toString() is used, other JSON.stringify is used.
+ * It is meant for creating debugging output or 'hash' versions of objects, and does
+ * not necessarily maintain full fidelity of the input
+ * @param value 
+ * @returns 
+ */
+export const defaultToString = (value: null | boolean | string | object): string => {
   //ECMA specification: http://www.ecma-international.org/ecma-262/6.0/#sec-tostring
-  if (object === null) return `null`;
-  if (typeof object === `boolean` || typeof object === `number`) {
-    return object.toString();
+  if (value === null) return `null`;
+  if (typeof value === `boolean` || typeof value === `number`) {
+    return value.toString();
   }
 
-  if (typeof object === `string`) return object;
-  if (typeof object === `symbol`) throw new TypeError(`Symbol cannot be converted to string`);
-  return JSON.stringify(object);
+  if (typeof value === `string`) return value;
+  if (typeof value === `symbol`) throw new TypeError(`Symbol cannot be converted to string`);
+  return JSON.stringify(value);
 };
