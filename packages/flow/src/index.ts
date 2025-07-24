@@ -24,3 +24,5 @@ export * from './update-outdated.js';
 export * from './wait-for-value.js';
 export * from './wait-for.js';
 export { sleep } from '@ixfx/core';
+
+export * as StateMachine from './state-machine/index.js';

@@ -7,6 +7,18 @@
 	"files": [
 		"dist/"
 	],
+	"devDependencies": {
+		"bezier-js": "latest"
+	},
+	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/numbers": "workspace:^",
+		"@ixfx/random": "workspace:^",
+		"@ixfx/collections": "workspace:^",
+		"@ixfx/trackers": "workspace:^"
+	},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
@@ -56,18 +68,6 @@
 			"types": "./src/triangle/index.ts",
 			"import": "./src/triangle/index.ts"
 		}
-	},
-	"devDependencies": {
-		"bezier-js": "latest"
-	},
-	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/numbers": "workspace:^",
-		"@ixfx/random": "workspace:^",
-		"@ixfx/collections": "workspace:^",
-		"@ixfx/trackers": "workspace:^"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",

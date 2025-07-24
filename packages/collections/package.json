@@ -7,6 +7,13 @@
 	"files": [
 		"dist/"
 	],
+	"dependencies": {
+		"@ixfx/arrays": "workspace:^",
+		"@ixfx/events": "workspace:^",
+		"@ixfx/core": "workspace:^",
+		"@ixfx/guards": "workspace:^",
+		"@ixfx/iterables": "workspace:^"
+	},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
@@ -33,15 +40,8 @@
 			"import": "./src/queue/index.ts"
 		}
 	},
-	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/events": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/iterables": "workspace:^"
-	},
 	"publishConfig": {
-		"main": "./dist/src/index.js",
+		"main": "dist/src/index.js",
 		"exports": {
 			".": {
 				"types": "./dist/src/index.d.ts",

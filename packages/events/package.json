@@ -10,15 +10,15 @@
 	"scripts": {
 		"build-test": "npx rimraf dist && tsc --build"
 	},
+	"dependencies": {},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
 			"import": "./src/index.ts"
 		}
 	},
-	"dependencies": {},
 	"publishConfig": {
-		"main": "./dist/src/index.js",
+		"main": "dist/src/index.js",
 		"exports": {
 			".": {
 				"types": "./dist/src/index.d.ts",

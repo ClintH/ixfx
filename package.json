@@ -8,7 +8,11 @@
 		"test": "vitest --api",
 		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint",
 		"docs": "typedoc",
-		"bundle": "tsdown -d ./bundle && del ../ixfxfun/demos/ixfx && copyfiles ./bundle ../ixfxfun/demos/ixfx"
+		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
+		"pkg-add": "node --experimental-strip-types package-rewrite.ts add",
+		"bundle-copy": "del --force ../ixfxfun/demos/ixfx && copyfiles -u 1 ./bundle/**/* ../ixfxfun/demos/ixfx",
+		"bundle-basic": "pnpm run pkg-strip && tsdown -d ./bundle && pnpm run pkg-add",
+		"bundle": "pnpm run bundle-basic && pnpm run bundle-copy"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.5",

@@ -14,7 +14,7 @@ espruino/__tests__/
 madge.txt
 .tsimp
 coverage
-bundle-tsdown
+bundle
 docs.json
 *.add.json
 *.strip.json

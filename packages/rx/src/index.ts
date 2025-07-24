@@ -11,6 +11,9 @@ import { resolveSource } from './resolve-source.js';
 import * as SinkFns from './sinks/index.js';
 import * as OpFns from './ops/index.js';
 
+export * as From from './from/index.js';
+export * as Collections from './collections/index.js';
+
 export * from './ops/index.js';
 export * from './sinks/index.js';
 export * from './graph.js';
@@ -21,7 +24,6 @@ export * from './util.js';
 export * from './wrap.js';
 export * from './resolve-source.js';
 export * from './cache.js';
-export * as From from './from/index.js';
 export * from './init-stream.js';
 
 export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: ReactiveOp<any, any>[]) {

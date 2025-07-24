@@ -22,6 +22,9 @@ export * from './resolve-fields.js';
 //export * from './results.js';
 export * from './sleep.js';
 
+export * as Records from './records/index.js';
+export * as Trackers from './trackers/index.js';
+
 // tsup doesn't like 'export type *'?
 export * from './ts-utility.js';
 export * from './types.js';
