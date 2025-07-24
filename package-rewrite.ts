@@ -2,10 +2,20 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+/**
+ * The package.json files use a hack to allow for type lookups without compiling in the 'exports' field.
+ * This is not legal, so the 'publishConfig' branch is used to override these when publishing.
+ * 
+ * tsdown doesn't use the 'publishConfig' and gets confused by the raw exports. So this script
+ * will either:
+ * * strip the 'publishConfig' part and make all exports point to JS files, or 
+ * * add the 'publishConfig' part and make all exports point to TS files
+ */
 const f = await readdir("./packages", { recursive: true, withFileTypes: true });
 
 const stripPublishConfig = process.argv[ 2 ] === 'strip';
 const addPublishConfig = process.argv[ 2 ] === 'add';
+const dryRun = false;
 
 if (!stripPublishConfig && !addPublishConfig) {
   console.error(`Needs 'strip' or 'add' parameter`);
@@ -21,6 +31,14 @@ const getFilename = (s: string) => {
   const slash = s.lastIndexOf("/");
   if (slash < 0) throw new Error(`Missing a /. Input: ${ s }`);
   return s.substring(slash + 1);
+}
+
+const destinationPackage = (relativePath: string) => {
+  if (!dryRun) {
+    return relativePath;
+  }
+  const mode = stripPublishConfig ? `strip` : `add`;
+  return `${ removeExtension(relativePath) }.${ mode }.json`;
 }
 
 const removeExtension = (s: string, andNext = false) => {
@@ -126,7 +144,7 @@ for (const file of f) {
         delete data.exports;
         const changed = { ...data, ...data.publishConfig };
         delete changed.publishConfig;
-        await writeFile(relativePath + '.strip', JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
+        await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
       } else {
         console.log(` - strip: no publishConfig`);
       }
@@ -155,7 +173,7 @@ for (const file of f) {
         }
 
         const changed = { ...data, publishConfig }
-        await writeFile(relativePath + '.add', JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
+        await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
       }
     }
   }

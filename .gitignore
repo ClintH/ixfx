@@ -16,5 +16,5 @@ madge.txt
 coverage
 bundle-tsdown
 docs.json
-*.add
-*.strip
+*.add.json
+*.strip.json
