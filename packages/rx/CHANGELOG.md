@@ -1,5 +1,25 @@
 # @ixfxfun/rx
 
+## 0.39.0
+
+### Minor Changes
+
+- 377d655: Bundling edits
+
+### Patch Changes
+
+- Updated dependencies [377d655]
+  - @ixfx/arrays@0.40.0
+  - @ixfx/collections@0.40.0
+  - @ixfx/core@0.40.0
+  - @ixfx/debug@0.40.0
+  - @ixfx/dom@0.40.0
+  - @ixfx/flow@0.40.0
+  - @ixfx/guards@0.39.0
+  - @ixfx/iterables@0.39.0
+  - @ixfx/modulation@0.39.0
+  - @ixfx/process@0.40.0
+
 ## 0.38.1
 
 ### Patch Changes

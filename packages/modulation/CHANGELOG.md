@@ -1,5 +1,23 @@
 # @ixfxfun/modulation
 
+## 0.39.0
+
+### Minor Changes
+
+- 377d655: Bundling edits
+
+### Patch Changes
+
+- Updated dependencies [377d655]
+  - @ixfx/arrays@0.40.0
+  - @ixfx/core@0.40.0
+  - @ixfx/events@0.40.0
+  - @ixfx/flow@0.40.0
+  - @ixfx/geometry@0.39.0
+  - @ixfx/guards@0.39.0
+  - @ixfx/numbers@0.39.0
+  - @ixfx/random@0.40.0
+
 ## 0.38.1
 
 ### Patch Changes

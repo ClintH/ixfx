@@ -1,5 +1,11 @@
 # @ixfxfun/process
 
+## 0.40.0
+
+### Minor Changes
+
+- 377d655: Bundling edits
+
 ## 0.39.0
 
 ### Minor Changes

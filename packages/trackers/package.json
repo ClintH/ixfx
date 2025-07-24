@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/trackers",
-	"version": "0.36.1",
+	"version": "0.37.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
