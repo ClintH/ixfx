@@ -15,6 +15,7 @@ export type * from './types.js';
 export * as Stacks from './stack/index.js';
 export { StackMutable } from './stack/StackMutable.js';
 export { StackImmutable } from './stack/StackImmutable.js';
+export type { IStackImmutable } from './stack/IStackImmutable.js';
 
 /**
  * Sets store unique items.

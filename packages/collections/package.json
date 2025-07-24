@@ -41,7 +41,7 @@
 		"@ixfx/iterables": "workspace:^"
 	},
 	"publishConfig": {
-		"main": "dist/src/index.js",
+		"main": "./dist/src/index.js",
 		"exports": {
 			".": {
 				"types": "./dist/src/index.d.ts",

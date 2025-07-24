@@ -24,7 +24,7 @@ export * from './placeholder.js';
 export * from './perimeter.js';
 export * from './normalise-by-rect.js';
 export * from './random.js';
-export type * from './rect-types.js';
 export * from './subtract.js';
 export * from './sum.js';
 export * from './to-array.js';
+export type * from './rect-types.js';

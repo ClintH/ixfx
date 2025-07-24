@@ -1,7 +1,14 @@
 {
 	"compilerOptions": {
 		"target": "ESNext",
-		"lib": ["ESNext", "DOM", "DOM.Iterable",  "ESNext.AsyncIterable", "ESNext.Iterator"],
+		"lib": [
+			"es2022",
+			"ESNext",
+			"DOM",
+			"DOM.Iterable",
+			"ESNext.AsyncIterable",
+			"ESNext.Iterator"
+		],
 		"module": "NodeNext",
 		"moduleResolution": "nodenext",
 		"skipLibCheck": true,
@@ -23,24 +30,62 @@
 	},
 	"files": [],
 	"references": [
-    { "path": "packages/arrays" },
-    { "path": "packages/collections" },
-    { "path": "packages/core" },
-    { "path": "packages/debug" },
-    { "path": "packages/dom" },
-    { "path": "packages/events" },
-    { "path": "packages/flow" },
-    { "path": "packages/geometry" },
-    { "path": "packages/guards" },
-    { "path": "packages/iterables" },
-    { "path": "packages/io" },
-    { "path": "packages/modulation" },
-    { "path": "packages/numbers" },
-    { "path": "packages/process" },
-    { "path": "packages/random" },
-    { "path": "packages/rx" },
-    { "path": "packages/trackers" },
-    { "path": "packages/ui" },
-    { "path": "packages/visual" }
+		{
+			"path": "packages/arrays"
+		},
+		{
+			"path": "packages/collections"
+		},
+		{
+			"path": "packages/core"
+		},
+		{
+			"path": "packages/debug"
+		},
+		{
+			"path": "packages/dom"
+		},
+		{
+			"path": "packages/events"
+		},
+		{
+			"path": "packages/flow"
+		},
+		{
+			"path": "packages/geometry"
+		},
+		{
+			"path": "packages/guards"
+		},
+		{
+			"path": "packages/iterables"
+		},
+		{
+			"path": "packages/io"
+		},
+		{
+			"path": "packages/modulation"
+		},
+		{
+			"path": "packages/numbers"
+		},
+		{
+			"path": "packages/process"
+		},
+		{
+			"path": "packages/random"
+		},
+		{
+			"path": "packages/rx"
+		},
+		{
+			"path": "packages/trackers"
+		},
+		{
+			"path": "packages/ui"
+		},
+		{
+			"path": "packages/visual"
+		}
 	]
 }

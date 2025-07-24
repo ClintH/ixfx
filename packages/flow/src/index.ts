@@ -19,7 +19,7 @@ export * from './task-queue-mutable.js';
 export * from './throttle.js';
 export * from './timeout.js';
 export * from './timer.js';
-export type * from './types.js';
+export * from './types.js';
 export * from './update-outdated.js';
 export * from './wait-for-value.js';
 export * from './wait-for.js';

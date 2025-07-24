@@ -22,4 +22,4 @@ export * from './round.js';
 export * from './scale.js';
 export * from './softmax.js';
 export * from './wrap.js';
-export type * from './types.js';
+export * from './types.js';

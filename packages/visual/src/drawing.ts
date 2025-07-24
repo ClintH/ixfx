@@ -1,8 +1,8 @@
 import { arrayTest, resultThrow } from '@ixfx/guards';
 import { Colour } from '@ixfx/visual';
 import { resolveEl } from '@ixfx/dom';
-import type { IStackImmutable } from '@ixfx/collections/stack';
-import { StackImmutable } from '@ixfx/collections/stack';
+//import type { IStackImmutable } from '@ixfx/collections';
+import { StackImmutable, type IStackImmutable } from '@ixfx/collections/stack';
 import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths } from '@ixfx/geometry';
 import { quantiseEvery } from '@ixfx/numbers';
 
@@ -205,7 +205,7 @@ export const arc = (
     ctx.stroke();
   };
 
-  const arcsArray = Array.isArray(arcs) ? arcs : [ arcs ];
+  const arcsArray: Arcs.ArcPositioned[] = Array.isArray(arcs) ? arcs : [ arcs ];
   for (const arc of arcsArray) {
     draw(arc);
   }
@@ -278,10 +278,10 @@ export const drawingStack = (
   ctx: CanvasRenderingContext2D,
   stk?: IStackImmutable<StackOp>
 ): DrawingStack => {
-  if (stk === undefined) stk = new StackImmutable<StackOp>();
+  stk ??= new StackImmutable<StackOp>();
 
   const push = (...ops: StackOp[]): DrawingStack => {
-    if (stk === undefined) stk = new StackImmutable<StackOp>();
+    stk ??= new StackImmutable<StackOp>();
     const s = stk.push(...ops);
     for (const o of ops) o(ctx);
     return drawingStack(ctx, s);
@@ -364,7 +364,7 @@ export const circle = (
   };
 
   if (Array.isArray(circlesToDraw)) {
-    for (const c of circlesToDraw) draw(c);
+    for (const c of circlesToDraw) draw(c as Circles.CirclePositioned);
   } else {
     draw(circlesToDraw as Circles.CirclePositioned);
   }
@@ -562,7 +562,7 @@ export const dot = (
   pos: Points.Point | (Points.Point | Circles.CirclePositioned)[] | Circles.CirclePositioned,
   opts?: DotOpts
 ) => {
-  if (opts === undefined) opts = {};
+  opts ??= {};
   const radius = opts.radius ?? 10;
   const positions = Array.isArray(pos) ? pos : [ pos ];
   const stroke = opts.stroke ? opts.stroke : opts.strokeStyle !== undefined;
@@ -760,7 +760,7 @@ export const line = (
   };
 
   if (Array.isArray(toDraw)) {
-    for (const t of toDraw) draw(t);
+    for (const t of toDraw) draw(t as Lines.Line);
   } else {
     draw(toDraw as Lines.Line);
   }

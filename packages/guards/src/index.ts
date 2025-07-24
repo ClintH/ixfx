@@ -7,5 +7,5 @@ export * from './object.js';
 export * from './range.js';
 export * from './result.js';
 export * from './string.js';
-export type * from './types.js';
+export * from './types.js';
 

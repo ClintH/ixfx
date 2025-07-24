@@ -1,7 +1,3 @@
-
-
-
-
 import * as Async from './async.js';
 import * as Sync from './sync.js';
 export * as Async from './async.js';
@@ -15,7 +11,9 @@ import { isAsyncIterable } from './guard.js';
 //import * as Chains from './chain/index.js';
 // import type { Interval } from '../flow/IntervalType.js';
 
-import { toStringDefault, type Interval } from '@ixfx/core';
+import { toStringDefault } from '@ixfx/core';
+import type { Interval } from '@ixfx/core';
+
 //import type { GenFactoryNoInput } from './chain/Types.js';
 import type { ForEachOptions, ToArrayOptions, IteratorControllerOptions, IteratorControllerState } from './types.js';
 

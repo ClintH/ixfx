@@ -24,7 +24,7 @@ export * as CurveSimplification from './curve-simplification.js';
 export * as QuadTree from './quad-tree.js';
 
 export * from './scaler.js';
-export type * from './scaler.js';
+export * from './scaler.js';
 /**
  * Work with arcs. Arcs are a angle-limited circle, describing a wedge.
  * 
