@@ -10,7 +10,7 @@
 		"docs": "typedoc",
 		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
 		"pkg-add": "node --experimental-strip-types package-rewrite.ts add",
-		"bundle-copy": "del --force ../ixfxfun/demos/ixfx && copyfiles -u 1 ./bundle/**/* ../ixfxfun/demos/ixfx",
+		"bundle-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./bundle/**/* ../demos/ixfx",
 		"bundle-basic": "pnpm run pkg-strip && tsdown -d ./bundle && pnpm run pkg-add",
 		"bundle": "pnpm run bundle-basic && pnpm run bundle-copy"
 	},
