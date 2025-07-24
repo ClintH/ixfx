@@ -16,6 +16,7 @@ const f = await readdir("./packages", { recursive: true, withFileTypes: true });
 const stripPublishConfig = process.argv[ 2 ] === 'strip';
 const addPublishConfig = process.argv[ 2 ] === 'add';
 const dryRun = false;
+const verbose = false;
 
 if (!stripPublishConfig && !addPublishConfig) {
   console.error(`Needs 'strip' or 'add' parameter`);
@@ -27,6 +28,10 @@ type ExportChunk = {
   import: string
 }
 
+const logVerbose = (s: string) => {
+  if (!verbose) return;
+  console.log(s);
+}
 const getFilename = (s: string) => {
   const slash = s.lastIndexOf("/");
   if (slash < 0) throw new Error(`Missing a /. Input: ${ s }`);
@@ -140,20 +145,20 @@ for (const file of f) {
     const hasPublishConfig = typeof data.publishConfig !== `undefined`;
     if (stripPublishConfig) {
       if (hasPublishConfig) {
-        console.log(` - strip: has publishConfig to remove`);
+        logVerbose(` - strip: has publishConfig to remove`);
         delete data.exports;
         const changed = { ...data, ...data.publishConfig };
         delete changed.publishConfig;
         await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
       } else {
-        console.log(` - strip: no publishConfig`);
+        logVerbose(` - strip: no publishConfig`);
       }
     }
     if (addPublishConfig) {
       if (hasPublishConfig) {
-        //console.log(` - add: already has publishConfig`);
+        //logVerbose(` - add: already has publishConfig`);
       } else {
-        console.log(` - add: has no publishConfig and needs adding`)
+        logVerbose(` - add: has no publishConfig and needs adding`)
         const publishConfig = {
           main: "dist/src/index.js",
           exports: {}
