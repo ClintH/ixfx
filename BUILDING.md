@@ -26,7 +26,12 @@ pnpm run test
 Run a single test:
 
 ```
-npx vitest run packages/flow/__tests__/retry.test.ts
+pnpx vitest run packages/flow/__tests__/retry.test.ts
+```
+
+Generate coverage report, outputs to ./coverage
+```
+pnpm run coverage
 ```
 
 ## Coding conventions
