@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect, assert } from 'vitest';
 import * as Arrays from '../src/index.js';
 import { mergeByKey } from '../src/merge-by-key.js';
@@ -20,6 +21,41 @@ test(`at-wrap`, () => {
 
 });
 
+test(`insert`, () => {
+  const v1 = [ 1, 2, 3 ]
+  expect(Arrays.insertAt(v1, 1, 20, 30, 40)).toEqual([
+    1, 20, 30, 40, 2, 3
+  ]);
+  expect(Arrays.insertAt(v1, 0, 20, 30, 40)).toEqual([
+    20, 30, 40, 1, 2, 3
+  ]);
+  expect(Arrays.insertAt(v1, 2, 20, 30, 40)).toEqual([
+    1, 2, 3, 20, 30, 40
+  ]);
+
+  // Verify immutability
+  expect(v1).toStrictEqual([ 1, 2, 3 ]);
+
+  // @ts-expect-error
+  expect(() => Arrays.insertAt({ blah: true }, 0, 1, 2, 3)).toThrow();
+  expect(() => Arrays.insertAt(v1, -1, 1, 2, 3)).toThrow();
+  expect(() => Arrays.insertAt(v1, 3, 1, 2, 3)).toThrow();
+});
+
+test(`intersection`, () => {
+  expect(Arrays.intersection([ 1, 2, 3 ], [ 2, 4, 6 ])).toEqual([ 2 ]);
+  expect(Arrays.intersection([ 1, 2, 3 ], [ 5 ])).toEqual([]);
+  expect(Arrays.intersection([ 1, 2, 3 ], [ 3, 2, 1 ])).toEqual([ 1, 2, 3 ]);
+
+
+});
+
+test(`interleave`, () => {
+  const a = [ `a`, `b`, `c` ];
+  const b = [ `1`, `2`, `3` ];
+  expect(Arrays.interleave(a, b)).toEqual([ `a`, `1`, `b`, `2`, `c`, `3` ]);
+});
+
 test('pairwise', () => {
   const r1 = [ ...Arrays.pairwise([ 1, 2, 3, 4 ]) ];
   expect(r1).toEqual([
@@ -33,6 +69,7 @@ test('pairwise', () => {
   expect(() => [ ...Arrays.pairwise([]) ]).toThrow();
   expect(() => [ ...Arrays.pairwise([ 1 ]) ]).toThrow();
   expect(() => [ ...Arrays.pairwise('hello' as any as []) ]).toThrow();
+
 
 });
 

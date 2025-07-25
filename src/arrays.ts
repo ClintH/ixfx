@@ -1,1 +1,0 @@
-export * from '../packages/arrays/src/index.ts';

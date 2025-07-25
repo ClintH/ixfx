@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect } from 'vitest';
-import { interpolate, interpolatorStepped } from '../src/interpolate.js';
+import { interpolate, interpolateAngle, interpolatorStepped } from '../src/interpolate.js';
 import { round } from '../src/round.js';
 
 test(`basic`, () => {
@@ -21,8 +22,17 @@ test(`basic`, () => {
   expect(f(0.5)).toBe(50);
   expect(f(1)).toBe(100);
 
+  // @ts-expect-error
+  expect(() => interpolate(false)).toThrow();
+
 });
 
+// test(`angle`, () => {
+//   expect(interpolateAngle(1, 0, Math.PI * 2)).toEqual(0);
+//   expect(interpolateAngle(0, 0, Math.PI * 2)).toEqual(0);
+//   expect(interpolateAngle(0.5, 0, Math.PI * 2)).toEqual(Math.PI);
+
+// })
 test(`limits`, () => {
   // Default is clamp
   expect(interpolate(1.1, 0, 100)).toBe(100);
@@ -49,7 +59,7 @@ test(`limits`, () => {
 
 test(`interpolatorStepped`, () => {
   const v = interpolatorStepped(0.1, 100, 200);
-  let values: number[] = [];
+  const values: number[] = [];
   while (true) {
     const value = v();
     values.push(value);

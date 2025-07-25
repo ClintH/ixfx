@@ -11,10 +11,17 @@
  * @returns
  */
 
+import { arrayTest, integerTest, throwIfFailed } from "@ixfx/guards";
+
 export function chunks<V>(
   array: readonly V[],
   size: number
 ) {
+  throwIfFailed(
+    integerTest(size, "aboveZero", `size`),
+    arrayTest(array, `array`)
+  );
+
   // https://surma.github.io/underdash/
   const output: V[][] = [];
   for (let index = 0; index < array.length; index += size) {

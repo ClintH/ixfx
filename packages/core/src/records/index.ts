@@ -5,7 +5,12 @@ export * from './traverse.js';
 export * from './merge.js';
 export * from './keys-to-numbers.js';
 export type * from '../types-compare.js';
-export * from './pathed.js';
+
+/**
+ * A set of functions to work with plain objects using string paths to traverse
+ * the structure of an object.
+ */
+export * as Pathed from './pathed.js';
 
 /**
  * Maps the keys of an object, returning a transformed object.

@@ -4,11 +4,9 @@ import { isValid } from './guard.js';
  * those that are valid numbers
  *
  * ```js
- * import * as Numbers from 'https://unpkg.com/ixfx/dist/numbers.js';
- *
  * const data = [true, 10, '5', { x: 5 }];
  * for (const n of Numbers.filterIterable(data)) {
- *  // 5
+ *  // 10
  * }
  * ```
  * @param it

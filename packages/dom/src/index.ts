@@ -1,5 +1,4 @@
 
-export * from './css-angle.js';
 export * from './css-variables.js';
 export * from './css.js';
 export * from './data-display.js';

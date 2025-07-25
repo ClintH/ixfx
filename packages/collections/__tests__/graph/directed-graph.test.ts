@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect, assert } from 'vitest';
 import * as Dg from '../../src/graph/directed-graph.js';
+import { join } from 'path';
 
 const linearGraph = () => {
   return Dg.graph(
@@ -9,6 +12,23 @@ const linearGraph = () => {
   )
 };
 
+test(`has-no-outs`, () => {
+  const g = linearGraph();
+  expect(Dg.hasNoOuts(g, `a`)).toBeFalsy();
+  expect(Dg.hasNoOuts(g, `d`)).toBeTruthy();
+});
+
+test(`has-only-outs`, () => {
+  const g1 = circularGraph();
+  expect(Dg.hasOnlyOuts(g1, `a`, `b`)).toBeTruthy();
+
+
+  const g2 = linearGraph();
+  expect(Dg.hasOnlyOuts(g2, `a`, `b`)).toBeTruthy();
+  expect(Dg.hasOnlyOuts(g2, `a`, `c`)).toBeFalsy();
+
+});
+
 const circularGraph = () => {
   return Dg.graph(
     { from: `a`, to: `b` },
@@ -17,6 +37,54 @@ const circularGraph = () => {
     { from: `d`, to: `a` }
   )
 }
+
+test(`has-key`, () => {
+  const g = linearGraph();
+  expect(Dg.hasKey(g, `a`)).toBeTruthy();
+  expect(Dg.hasKey(g, `b`)).toBeTruthy();
+  expect(Dg.hasKey(g, `c`)).toBeTruthy();
+  expect(Dg.hasKey(g, `d`)).toBeTruthy();
+  expect(Dg.hasKey(g, `e`)).toBeFalsy();
+});
+
+test(`get`, () => {
+  const g = linearGraph();
+  expect(Dg.get(g, `a`)).toEqual({
+    id: `a`,
+    out: [ {
+      id: `b`,
+      weight: undefined
+    } ]
+  });
+
+  expect(Dg.get(g, `e`)).toBeFalsy();
+});
+
+test(`dump-graph`, () => {
+  const g = linearGraph();
+  expect(Dg.dumpGraph(g)).toBe([
+    ` a`,
+    `  -> b`,
+    ` b`,
+    `  -> c`,
+    ` c`,
+    `  -> d`,
+    ` d (terminal)` ].join('\n'));
+});
+
+test(`distance`, () => {
+  const g = linearGraph();
+  expect(Dg.distance(g, { id: `a`, weight: 2 })).toEqual(2);
+  expect(Dg.distance(g, { id: `a` })).toEqual(1);
+
+});
+
+test(`vertex-has-out`, () => {
+  const g = linearGraph();
+  const v = Dg.get(g, `a`);
+  expect(Dg.vertexHasOut(v!, `b`)).toBeTruthy();
+  expect(Dg.vertexHasOut(v!, `c`)).toBeFalsy();
+});
 
 test(`errors`, () => {
   // @ts-expect-error

@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { clamp, clampIndex } from '../src/clamp.js';
+import { clamp, clampIndex, clamper } from '../src/clamp.js';
 
 test(`clamp-inclusivity`, () => {
   expect(clamp(0, 0, 1)).toBe(0);
@@ -35,3 +35,11 @@ test(`clamp-zero-bounds`, () => {
   expect(() => clampIndex(NaN, 5)).toThrow();
   expect(() => clampIndex(0, NaN)).toThrow();
 });
+
+test(`clamper`, () => {
+  const c = clamper(0, 100);
+  expect(c(50)).toBe(50);
+  expect(c(-50)).toBe(0);
+  expect(c(101)).toBe(100);
+
+})

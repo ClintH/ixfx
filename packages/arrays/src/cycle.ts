@@ -1,3 +1,4 @@
+import { arrayTest, throwIfFailed } from "@ixfx/guards";
 
 /**
  * Returns a function that cycles through the contents of an array. By default starts at index 0.
@@ -30,6 +31,7 @@
  * @returns 
  */
 export const cycle = <T>(options: readonly T[] | T[]) => {
+  throwIfFailed(arrayTest(options, `options`));
   const opts = [ ...options ];
   let index = 0;
   const next = () => {

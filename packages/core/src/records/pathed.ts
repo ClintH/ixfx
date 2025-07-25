@@ -5,16 +5,36 @@ import type { IsEqualContext } from '@ixfx/core';
 import { compareObjectKeys } from './compare.js';
 import type { Result } from '@ixfx/guards';
 
+/**
+ * Data at a particular path
+ */
 export type PathData<V> = {
+  /**
+   * Path
+   */
   path: string
+  /**
+   * Value
+   */
   value: V
 }
-
+/**
+ * A change to a value
+ */
 export type PathDataChange<V> = PathData<V> & {
+  /**
+   * Previous value, if any
+   */
   previous?: V
+  /**
+   * Nature of the change
+   */
   state: `change` | `added` | `removed`
 }
 
+/**
+ * Compare data
+ */
 export type CompareDataOptions<V> = {
   /**
    * If _true_, it treats the B value as a partial
@@ -61,6 +81,15 @@ export type CompareDataOptions<V> = {
   includeParents: boolean
 }
 
+/**
+ * Get the entries for `target`.
+ * 
+ * 'deep probe' uses alternative means to get entries of object, since `Object.entries`
+ * can fail for some objects.
+ * @param target Object to get entries from
+ * @param deepProbe If true
+ * @returns 
+ */
 const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean) => {
   if (target === undefined) throw new Error(`Param 'target' is undefined`);
   if (target === null) throw new Error(`Param 'target' is null`);
@@ -298,49 +327,51 @@ const updateByPathImpl = (o: any, split: string[], value: any, allowShapeChange:
 
 /**
  * Gets the data at `path` in `object`. Assumes '.' separates each segment of path.
+ * 
  * ```js
- * getField({ name: { first: `Thom`, last: `Yorke` }}, `name.first`); // 'Thom'
- * getField({ colours: [`red`, `green`, `blue` ]}, `colours.1`); // `green`
+ * getField({ name: { first: `Thom`, last: `Yorke` }}, `name.first`); // { value: `Thom`  success: true }
+ * getField({ colours: [`red`, `green`, `blue` ]}, `colours.1`);      // { value: `green` success: true }
  * ```
  * 
- * Returns _undefined_ if path could not be resolved.
+ * Returns an error result with more details, eg `{ success: false, error: 'Path could not be found' }`
  * 
  * Throws if:
  * * `path` is not a string or empty
  * * `object` is _undefined_ or null
- * @param object 
- * @param path 
+ * @param object Object to query
+ * @param path Path
+ * @param separator Separator of chunks of path. Defaults to '.'
  * @returns 
  */
-export const getField = <V>(object: Record<string, any>, path: string): Result<V, any> => {
+export const getField = <V>(object: Record<string, any>, path: string, separator = `.`): Result<V, any> => {
   if (typeof path !== `string`) throw new Error(`Param 'path' ought to be a string. Got: '${ typeof path }'`);
   if (path.length === 0) throw new Error(`Param string 'path' is empty`);
   if (object === undefined) throw new Error(`Param 'object' is undefined`);
   if (object === null) throw new Error(`Param 'object' is null`);
 
-  const split = path.split(`.`);
-  const v = getFieldImpl<V>(object, split);
+  const split = path.split(separator);
+  const v = getFieldImpl<V>(object, split, path);
   return v;
 }
 
-const getFieldImpl = <V>(object: Record<string, any>, split: string[]): Result<V, any> => {
-  if (object === undefined) throw new Error(`Param 'object' is undefined`);
-  if (split.length === 0) throw new Error(`Path has run out`);
+const getFieldImpl = <V>(object: Record<string, any>, split: string[], position: string): Result<V, any> => {
+  if (object === undefined) return { success: false, error: `Param 'object' is undefined. Position: ${ position }` };
+  if (split.length === 0) return { success: false, error: `Path has been exhausted. position: ${ position }` };
   const start = split.shift();
-  if (!start) throw new Error(`Unexpected empty split path`);
+  if (!start) return { success: false, error: `Unexpected empty split path. Position: ${ position }` };
 
   const isInt = isInteger(start);
   if (isInt && Array.isArray(object)) { //(arrayStart === 0 && arrayEnd === start.length - 1 && Array.isArray(o)) {
     const index = Number.parseInt(start); //start.slice(1, -1));
     //console.log(`getFieldImpl index: ${ index } value: ${ object[ index ] }`);
     if (typeof object[ index ] === `undefined`) {
-      return { success: false, error: `Index '${ index }' does not exist. Length: ${ object.length }` };
+      return { success: false, error: `Index '${ index }' does not exist. Length: ${ object.length }. Position: ${ position }` };
     }
 
     if (split.length === 0) {
       return { value: object[ index ] as V, success: true };
     } else {
-      return getFieldImpl(object[ index ], split);
+      return getFieldImpl(object[ index ], split, split.join(`.`));
     }
   } else if (typeof object === `object` && start in object) {
     //console.log(`start in object. Start: ${ start } Len: ${ split.length } Object`, object);
@@ -348,10 +379,10 @@ const getFieldImpl = <V>(object: Record<string, any>, split: string[]): Result<V
     if (split.length === 0) {
       return { value: object[ start ] as V, success: true };
     } else {
-      return getFieldImpl(object[ start ], split);
+      return getFieldImpl(object[ start ], split, split.join(`.`));
     }
   } else {
-    return { success: false, error: `Path '${ start }' not found` };
+    return { success: false, error: `Path '${ start }' not found. Position: ${ position }` };
   }
 }
 

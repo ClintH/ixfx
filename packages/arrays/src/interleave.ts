@@ -4,8 +4,6 @@ import { containsIdenticalValues } from "./equality.js";
  * Returns an interleaving of two or more arrays. All arrays must be the same length.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const a = [`a`, `b`, `c`];
  * const b = [`1`, `2`, `3`];
  * const c = Arrays.interleave(a, b);

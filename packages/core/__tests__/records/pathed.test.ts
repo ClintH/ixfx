@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect, assert, type TestContext } from 'vitest';
 import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../src/records/pathed.js';
 import { resultToValue, type Result } from '@ixfx/guards';
@@ -137,6 +138,10 @@ test('get-field', (t) => {
   expect(getField(d2, `profiles.2.animals.2`).success).toBe(false);
   expect(getField(d2, `profiles.1.animalz`).success).toBe(false);
   expect(getField(d2, `message.1`).success).toBe(false);
+
+  expect(getField(d2, `..`).success).toBeFalsy();
+  expect(getField(d2, `profiles.name.x`).success).toBeFalsy();
+
 
   expect(() => getField(d, ``)).toThrow()
   // @ts-expect-error
