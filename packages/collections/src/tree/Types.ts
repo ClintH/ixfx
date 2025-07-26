@@ -22,7 +22,9 @@ export type LabelledValues<TValue> = {
 }
 
 /**
- * Array-backed tree node
+ * Array-backed tree node.
+ * 
+ * Create using {@link root}
  */
 export type TreeNode<TValue> = {
   /**
@@ -77,3 +79,17 @@ export type TraversableTree<TValue> = {
   getIdentity(): any
 };
 
+export type TraverseObjectEntry = Readonly<{ name: string, sourceValue: any, leafValue: any, _kind: `entry` }>;
+export type TraverseObjectEntryWithAncestors = Readonly<{ name: string, sourceValue: any, leafValue: any, ancestors: string[], _kind: `entry-ancestors` }>;
+//export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
+export type TraverseObjectEntryStatic = Readonly<{ name: string, sourceValue: any, ancestors: string[], _kind: `entry-static` }>
+
+/**
+ * Options for parsing a path
+ */
+export type TraverseObjectPathOpts = {
+  /**
+   * Separator for path, eg '.'
+   */
+  readonly separator?: string;
+};
