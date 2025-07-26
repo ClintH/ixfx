@@ -1,7 +1,7 @@
 import type { RandomSource } from "./types.js";
 
 /**
- * Generates a short roughly unique id
+ * Generates a six-digit roughly unique id
  * ```js
  * const id = shortGuid();
  * ```
