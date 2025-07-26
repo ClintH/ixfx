@@ -1,5 +1,21 @@
 # @ixfxfun/debug
 
+## 0.40.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.41.0
+  - @ixfx/arrays@0.41.0
+  - @ixfx/random@0.41.0
+  - @ixfx/core@0.41.0
+  - @ixfx/dom@0.40.1
+  - @ixfx/flow@0.40.1
+  - @ixfx/geometry@0.39.1
+  - @ixfx/visual@0.39.1
+  - @ixfx/numbers@0.39.1
+  - @ixfx/trackers@0.37.1
+
 ## 0.40.0
 
 ### Minor Changes

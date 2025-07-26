@@ -1,5 +1,16 @@
 # @ixfxfun/ui
 
+## 0.39.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.41.0
+  - @ixfx/core@0.41.0
+  - @ixfx/dom@0.40.1
+  - @ixfx/rx@0.39.1
+  - @ixfx/visual@0.39.1
+
 ## 0.39.0
 
 ### Minor Changes

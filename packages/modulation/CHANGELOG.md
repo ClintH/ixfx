@@ -1,5 +1,21 @@
 # @ixfxfun/modulation
 
+## 0.40.0
+
+### Minor Changes
+
+- Documentation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/arrays@0.41.0
+  - @ixfx/random@0.41.0
+  - @ixfx/core@0.41.0
+  - @ixfx/flow@0.40.1
+  - @ixfx/geometry@0.39.1
+  - @ixfx/numbers@0.39.1
+
 ## 0.39.0
 
 ### Minor Changes
