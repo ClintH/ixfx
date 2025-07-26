@@ -9,6 +9,12 @@ export * as Traverse from './traversable-tree.js';
 export * from './compare.js';
 export type * from './types.js';
 
+/**
+ * Makes a 'traversable' to move around a {@link TreeNode}, an existing {@link TraversableTree} or a plain object.
+ * 
+ * @param node 
+ * @returns 
+ */
 export const toTraversable = <T>(node: TreeNode<T> | TraversableTree<T> | object) => {
   if (isTraversable(node)) return node;
   if (isTreeNode(node)) return TreeNodeToTraversable(node);
@@ -16,6 +22,13 @@ export const toTraversable = <T>(node: TreeNode<T> | TraversableTree<T> | object
   throw new Error(`Parameter 'node' not convertible`);
 }
 
+/**
+ * Checks whether `node` is of type {@link TreeNode}.
+ * 
+ * Checks for: parent, childrenStore and value defined on `node`.
+ * @param node 
+ * @returns 
+ */
 export const isTreeNode = (node: any): node is TreeNode<any> => {
   if (`parent` in node && `childrenStore` in node && `value` in node) {
     if (Array.isArray(node.childrenStore)) return true;
@@ -23,6 +36,13 @@ export const isTreeNode = (node: any): node is TreeNode<any> => {
   return false;
 }
 
+/**
+ * Checks if `node` is of type {@link TraversableTree}.
+ * 
+ * Checks by looking for: children, getParent, getValue and getIdentity defined on `node`.
+ * @param node 
+ * @returns 
+ */
 export const isTraversable = (node: any): node is TraversableTree<any> => {
   return (`children` in node && `getParent` in node && `getValue` in node && `getIdentity` in node);
 }
