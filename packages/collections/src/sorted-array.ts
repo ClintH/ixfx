@@ -9,6 +9,62 @@ import { defaultComparer, type Comparer } from "@ixfx/core";
  */
 export const wrapUnsorted = <T>(unsortedData: T[], comparer: Comparer<T> = defaultComparer) => wrapSorted(unsortedData.toSorted(comparer));
 
+export type WrapSortedArray<T> = {
+  /**
+   * Returns index of an item, or -1 if not found
+   * @param sought Item to find
+   * @param start 
+   * @param end 
+   * @returns 
+   */
+  indexOf: (sought: T, start?: number, end?: number) => number
+
+  /**
+   * Returns the index at which the value would be inserted
+   * @param toInsert 
+   * @returns 
+   */
+  insertionIndex: (toInsert: T) => number
+
+  /**
+  * Inserts an item, returning a new wrapper
+  * @param toInsert 
+  * @returns 
+  */
+  insert: (toInsert: T) => WrapSortedArray<T>
+
+  /**
+   * Removes an item, returning a new wrapper
+   * @param toRemove 
+   * @returns 
+   */
+  remove: (toRemove: T) => WrapSortedArray<T>
+
+  /**
+  * Gets item at a specified offset
+  * @param offset 
+  * @returns 
+  */
+  at: (offset: number) => T | undefined
+
+  /**
+   * Gets length
+   */
+  get length(): number
+
+  /**
+  * Gets underlying array.
+  * Be careful not to mutate. Use `toArray` to get a copy
+  * that can be modified.
+  */
+  get data(): T[]
+
+  /**
+  * Returns a copy of data which is safe to modify.
+  * @returns 
+  */
+  toArray: () => T[]
+}
 /**
  * Returns an immutable wrapper around a sorted array.
  * Use {@link wrapUnsorted} if not yet sorted.
@@ -38,64 +94,34 @@ export const wrapUnsorted = <T>(unsortedData: T[], comparer: Comparer<T> = defau
  * @param comparer 
  * @returns 
  */
-export const wrapSorted = <T>(sortedData: T[], comparer: Comparer<T> = defaultComparer) => {
+export const wrapSorted = <T>(sortedData: T[], comparer: Comparer<T> = defaultComparer): WrapSortedArray<T> => {
   const store = [ ...sortedData ];
   return {
-    /**
-     * Returns index of an item, or -1 if not found
-     * @param sought Item to find
-     * @param start 
-     * @param end 
-     * @returns 
-     */
+
     indexOf: (sought: T, start = 0, end = store.length) => {
       return indexOf(store, sought, start, end, comparer);
     },
     insertionIndex: (toInsert: T) => {
       return insertionIndex(store, toInsert, 0, store.length, comparer);
     },
-    /**
-     * Inserts an item, returning a new wrapper
-     * @param toInsert 
-     * @returns 
-     */
     insert: (toInsert: T) => {
       return wrapSorted(insert(store, toInsert, comparer), comparer);
     },
-    /**
-     * Removes an item, returning a new wrapper
-     * @param toRemove 
-     * @returns 
-     */
+
     remove: (toRemove: T) => {
       return wrapSorted(remove(store, toRemove, comparer));
     },
-    /**
-     * Gets item at a specified offset
-     * @param offset 
-     * @returns 
-     */
+
     at: (offset: number) => {
       return store.at(offset);
     },
-    /**
-     * Gets length
-     */
     get length() {
       return store.length;
     },
-    /**
-     * Gets underlying data.
-     * Be careful not to mutate. Use `toArray` to get a copy
-     * that can be modified.
-     */
     get data() {
       return store;
     },
-    /**
-     * Returns a copy of data which is safe to modify.
-     * @returns 
-     */
+
     toArray: () => {
       return [ ...store ]
     }
@@ -120,15 +146,22 @@ export const wrapSorted = <T>(sortedData: T[], comparer: Comparer<T> = defaultCo
  * @returns Index of sought item or -1 if not found.
  */
 export const indexOf = <T>(data: T[], sought: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
-  if (end <= start) return -1;
+  const debug = false; //(sought == 1);
+  if (debug) console.log(`indexOf: sought: ${ sought } start: ${ start } end: ${ end }`)
+  if (end < start) {
+    if (debug) console.log(`indexOf   end <= start ${ end } <= ${ start }`);
+    return -1;
+  }
   const mid = Math.floor((start + end) / 2);
   const result = comparer(data[ mid ], sought);
+
+  if (debug) console.log(`indexOf   mid: ${ mid } result: ${ result }`);
 
   // Result is at the middle
   if (result === 0) return mid;
 
   if (result > 0) {
-    // data[mid] is greater than sought, must be in left side
+    // data[mid] should come after sought. Must be in left side
     return indexOf(data, sought, start, mid - 1, comparer);
   }
 
@@ -207,6 +240,7 @@ export const insert = <T>(sortedArray: T[], toInsert: T, comparer: Comparer<T> =
  */
 export const remove = <T>(data: T[], toRemove: T, comparer: Comparer<T> = defaultComparer) => {
   const index = indexOf(data, toRemove, 0, data.length, comparer);
+
   if (index === -1) return data;
   const pre = data.slice(0, index);
   const post = data.slice(index + 1);
