@@ -29,6 +29,8 @@ export const hasAnyParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, 
   possibleParentValue: TV,
   eq?: IsEqual<TV>
 ): boolean => {
+  if (typeof child === `undefined`) throw new TypeError(`Param 'child' is undefined`);
+
   return hasParentValue<T, TV>(child, possibleParentValue, eq, Number.MAX_SAFE_INTEGER);
 };
 
@@ -62,9 +64,9 @@ export const hasParent = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   if (typeof p === `undefined`) return false;
   if (eq(p, possibleParent)) return true;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const pId = isChildTrav ? (p as TraversableTree<TV>).getIdentity() : (p as TreeNode<TV>).value;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const ppId = isParentTrav ? (possibleParent).getIdentity() : (possibleParent as any as TreeNode<TV>).value;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -73,16 +75,33 @@ export const hasParent = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   return hasParent(p, possibleParent, eq, maxDepth - 1);
 };
 
+/**
+ * Checks if a child node has a parent with a certain value
+ * Note: by default only checks immediate parent. Set maxDepth to a large value to recurse
+ * 
+ * Uses `getValue()` on the parent if that function exists.
+ * @param child Node to start looking from
+ * @param possibleParentValue Value to seek
+ * @param eq Equality checker
+ * @param maxDepth Defaults to 0, so it only checks immediate parent
+ * @returns 
+ */
 export const hasParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   child: T,
   possibleParentValue: TV,
   eq: IsEqual<TV> = isEqualDefault<TV>,
   maxDepth = 0
 ): boolean => {
-  if (maxDepth < 0) return false;
+  if (child === undefined) throw new Error(`Param 'child' is undefined`);
+  if (maxDepth < 0) {
+    return false;
+  }
   const p = `getParent` in child ? child.getParent() : child.parent;
-  if (p === undefined) return false;
+  if (p === undefined) {
+    return false;
+  }
   const value = `getValue` in p ? p.getValue() : p.value;
+
   if (eq(value!, possibleParentValue)) return true;
   return hasParentValue(p, possibleParentValue, eq, maxDepth - 1);
 };
@@ -199,9 +218,11 @@ export const hasChildValue = <T>(
 ): boolean => {
 
   if (maxDepth < 0) return false;
+
   if (eq(parent.getValue(), possibleValue)) return true;
   for (const c of breadthFirst(parent, maxDepth)) {
-    if (eq(c.getValue(), possibleValue)) return true;
+    const v = c.getValue();
+    if (eq(v, possibleValue)) return true;
   }
   return false;
 };
@@ -433,7 +454,7 @@ export function findByValue<T>(root: TraversableTree<T>, predicate: (nodeValue: 
  * 
  * If it can't find a child, it stops.
  * 
- * This is different to 'find' functions, which exhausively search all possible child nodes, regardless of position in tree.
+ * This is different to 'find' functions, which exhaustively search all possible child nodes, regardless of position in tree.
  * 
  * ```js
  * const path = 'a.aa.aaa'.split('.');

@@ -1,38 +1,22 @@
 import { toStringAbbreviate } from '@ixfx/core/text';
-
+import { nullUndefTest, resultThrow } from '@ixfx/guards' //'../../util/GuardEmpty.js';
 import { last } from '@ixfx/iterables/sync';
 import * as TreeArrayBacked from './tree-mutable.js';
 import { isPrimitive } from '@ixfx/core'; //'../../util/IsPrimitive.js';
-import type { TraversableTree, TreeNode, SimplifiedNode } from './types.js';
-import { nullUndefTest, resultThrow } from '@ixfx/guards' //'../../util/GuardEmpty.js';
-export type Entry = Readonly<{ name: string, sourceValue: any, nodeValue: any }>;
-export type EntryWithAncestors = Readonly<{ name: string, sourceValue: any, nodeValue: any, ancestors: string[] }>;
-//export type EntryStatic = Readonly<{ name: string, value: any, ancestors?: Array<string> }>
-export type EntryStatic = Readonly<{ name: string, value: any, ancestors: string[] }>
+import type { TraversableTree, TreeNode, SimplifiedNode, TraverseObjectEntry, TraverseObjectEntryStatic, TraverseObjectEntryWithAncestors, TraverseObjectPathOpts } from './types.js';
 
 
 /**
- * Options for parsing a path
- */
-export type PathOpts = {
-  /**
-   * Separator for path, eg '.'
-   */
-  readonly separator?: string;
-
-};
-
-/**
- * Helper function to get a 'friendly' string representation of an array of {@link Entry}.
+ * Helper function to get a 'friendly' string representation of an array of {@link TraverseObjectEntry}.
  * @param entries 
  * @returns 
  */
-export function prettyPrintEntries(entries: readonly Entry[]) {
+export function prettyPrintEntries(entries: readonly TraverseObjectEntry[]) {
   if (entries.length === 0) return `(empty)`;
   let t = ``;
   for (const [ index, entry ] of entries.entries()) {
     t += `  `.repeat(index);
-    t += entry.name + ` = ` + JSON.stringify(entry.nodeValue) + `\n`;
+    t += entry.name + ` = ` + JSON.stringify(entry.leafValue) + `\n`;
   }
   return t;
 }
@@ -55,12 +39,12 @@ export const prettyPrint = (
   resultThrow(nullUndefTest(node, `node`));
   const defaultName = options.name ?? `node`;
   const entry = getNamedEntry(node, defaultName);
-  const t = `${ `  `.repeat(indent) } + name: ${ entry.name } value: ${ JSON.stringify(entry.nodeValue) }`;
+  const t = `${ `  `.repeat(indent) } + name: ${ entry.name } value: ${ JSON.stringify(entry.leafValue) }`;
   const childrenAsArray = [ ...children(node, options) ];
   return childrenAsArray.length > 0 ? (
     t +
     `\n` +
-    childrenAsArray.map((d) => prettyPrint(d.nodeValue, indent + 1, { ...options, name: d.name })).join(`\n`)
+    childrenAsArray.map((d) => prettyPrint(d.leafValue, indent + 1, { ...options, name: d.name })).join(`\n`)
   ) : t;
 };
 
@@ -70,15 +54,15 @@ export const prettyPrint = (
  * @param indent 
  * @returns 
  */
-export const toStringDeep = (node: TreeNode<Entry | EntryStatic>, indent = 0) => {
+export const toStringDeep = (node: TreeNode<TraverseObjectEntry | TraverseObjectEntryStatic>, indent = 0) => {
   let t = ` `.repeat(indent) + ` ${ node.value?.name }`;
   if (node.value !== undefined) {
-    if (`sourceValue` in node.value && `nodeValue` in node.value) {
+    if (`sourceValue` in node.value && `leafValue` in node.value) {
       let sourceValue = toStringAbbreviate(node.value.sourceValue, 20);
-      const nodeValue = toStringAbbreviate(node.value.nodeValue, 20);
-      sourceValue = sourceValue === nodeValue ? `` : `source: ` + sourceValue;
-      t += ` = ${ nodeValue } ${ sourceValue }`
-    } else if (`value` in node.value && node.value.value !== undefined) t += ` = ${ node.value.value }`;
+      const leafValue = toStringAbbreviate(node.value.leafValue, 20);
+      sourceValue = sourceValue === leafValue ? `` : `source: ` + sourceValue;
+      t += ` = ${ leafValue } ${ sourceValue }`
+    } else if (`sourceValue` in node.value && node.value.sourceValue !== undefined) t += ` = ${ node.value.sourceValue }`;
 
     if (`ancestors` in node.value) {
 
@@ -104,27 +88,43 @@ export type ChildrenOptions = Readonly<{
 }>;
 
 /**
- * Returns the direct children of a tree-like object as a pairing
- * of node name and value. Supports basic objects, Maps and arrays. 
+ * Yields the direct (ie. non-recursive) children of a tree-like object as a pairing
+ * of node name and value. Supports basic objects, Maps and arrays.
  * 
- * Sub-children are included as an object blob.
+ * To iterate recursively, consider {@link depthFirst}
  * 
- * @example Simple object
- * ```js
- * const o = {
- *  colour: {
- *    r: 0.5, g: 0.5, b: 0.5
- *  }
- * };
- * 
- * const children = [ ...Trees.children(o) ];
- * // Children:
- * // [
- * //  { name: "colour", value: { b: 0.5, g: 0.5, r: 0.5 } }
- * // ]
- * const subChildren = [ ...Trees.children(o.colour) ];
- * // [ { name: "r", value: 0.5 }, { name: "g", value: 0.5 }, { name: "b", value: 0.5 } ]
+ * Each child is returned in an {@link TraverseObjectEntry} structure:
+ * ```typescript
+ * type Entry = Readonly<{
+ *  // Property name
+ *  name: string, 
+ *  // Value of property, as if you called `object[propertyName]`
+ *  sourceValue: any,
+ *  // Branch nodes will have _undefined_, leaf nodes will contain the value
+ *  leafValue: any 
+ * }>;
  * ```
+ * 
+ * For example, iterating over a flat object:
+ * ```js
+ * const verySimpleObject = { field: `hello`, flag: true }
+ * const kids = [ ...children(verySimpleObject) ];
+ * // Yields:
+ * // [ { name: "field", sourceValue: `hello`, leafValue: `hello` },
+ * //  { name: "flag", sourceValue: true, leafValue: true } ]
+ * ```
+ * 
+ * For objects containing objects:
+ * ```js
+ * const lessSimpleObject = { field: `hello`, flag: true, colour: { `red`, opacity: 0.5 } }
+ * const kids = [ ...children(verySimpleObject) ];
+ * // Yields as before, plus:
+ * //  { name: "colour", sourceValue: { name: 'red', opacity: 0.5 }, leafValue: undefined }
+ * ```
+ * 
+ * Note that 'sourceValue' always contains the property value, as if you 
+ * access it via `object[propName]`. 'leafValue' only contains the value if it's a leaf
+ * node.
  * 
  * Arrays are assigned a name based on index.
  * @example Arrays
@@ -146,15 +146,15 @@ export type ChildrenOptions = Readonly<{
 export function* children<T extends object>(
   node: T,
   options: Partial<ChildrenOptions> = {}
-): IterableIterator<Entry> {
+): IterableIterator<TraverseObjectEntry> {
   resultThrow(nullUndefTest(node, `node`));
 
-  const filter = options.filter ?? `none`;
+  const filteringOption = options.filter ?? `none`;
 
   const filterByValue = (v: any): [ filter: boolean, isPrimitive: boolean ] => {
-    if (filter === `none`) return [ true, isPrimitive(v) ];
-    else if (filter === `leaves` && isPrimitive(v)) return [ true, true ];
-    else if (filter === `branches` && !isPrimitive(v)) return [ true, false ];
+    if (filteringOption === `none`) return [ true, isPrimitive(v) ];
+    else if (filteringOption === `leaves` && isPrimitive(v)) return [ true, true ];
+    else if (filteringOption === `branches` && !isPrimitive(v)) return [ true, false ];
     return [ false, isPrimitive(v) ];
   }
 
@@ -163,26 +163,26 @@ export function* children<T extends object>(
     for (const [ index, element ] of node.entries()) {
       const f = filterByValue(element);
       if (f[ 0 ]) {
-        yield { name: index.toString(), sourceValue: element, nodeValue: f[ 1 ] ? element : undefined };
-        //yield { name: defaultName + `[` + index.toString() + `]`, sourceValue: element, nodeValue: f[ 1 ] ? element : undefined };
+        yield { name: index.toString(), _kind: `entry`, sourceValue: element, leafValue: f[ 1 ] ? element : undefined };
+        //yield { name: defaultName + `[` + index.toString() + `]`, sourceValue: element, leafValue: f[ 1 ] ? element : undefined };
       }
     }
   } else if (typeof node === `object`) {
     const entriesIter = (`entries` in node) ? (node as any as Map<any, any>).entries() : Object.entries(node);
     for (const [ name, value ] of entriesIter) {
-      //onsole.log(`children name: ${ name } type: ${ typeof value } isPrim: ${ isPrimitive(value) } filter: ${ filter }`);
-      const f = filterByValue(value);
-      if (f[ 0 ]) {
-        yield { name: name, sourceValue: value, nodeValue: f[ 1 ] ? value : undefined };
+      //console.log(`children name: ${ name } type: ${ typeof value } isPrim: ${ isPrimitive(value) } filter: ${ filter }`);
+      const [ filter, isPrimitive ] = filterByValue(value);
+      if (filter) {
+        yield { name: name, _kind: `entry`, sourceValue: value, leafValue: isPrimitive ? value : undefined };
       }
     }
   }
 }
 
-export function* depthFirst<T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: string[] = []): IterableIterator<EntryWithAncestors> {
+export function* depthFirst<T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: string[] = []): IterableIterator<TraverseObjectEntryWithAncestors> {
   for (const c of children(node, options)) {
-    //onsole.log(`depthFirst name: ${ c.name } nodeValue: ${ toStringAbbreviate(c.nodeValue) }`)
-    yield { ...c, ancestors: [ ...ancestors ] };
+    //onsole.log(`depthFirst name: ${ c.name } leafValue: ${ toStringAbbreviate(c.leafValue) }`)
+    yield { ...c, ancestors: [ ...ancestors ], _kind: `entry-ancestors` };
     yield* depthFirst(c.sourceValue, options, [ ...ancestors, c.name ]);
   }
 }
@@ -196,7 +196,7 @@ export function* depthFirst<T extends object>(node: T, options: Partial<Children
 function childByName<T extends object>(
   name: string,
   node: T
-): Entry | undefined {
+): TraverseObjectEntry | undefined {
   for (const d of children(node)) {
     if (d.name === name) return d;
   }
@@ -231,8 +231,8 @@ function childByName<T extends object>(
 export function getByPath<T extends object>(
   path: string,
   node: T,
-  options: PathOpts = {}
-): Entry {
+  options: TraverseObjectPathOpts = {}
+): TraverseObjectEntryWithAncestors {
   // ✔️ Unit tested
   const v = last(traceByPath(path, node, options));
   if (!v) throw new Error(`Could not trace path: ${ path } `);
@@ -274,8 +274,8 @@ export function getByPath<T extends object>(
 export function* traceByPath<T extends object>(
   path: string,
   node: T,
-  options: PathOpts = {}
-): Iterable<EntryWithAncestors> {
+  options: TraverseObjectPathOpts = {}
+): Iterable<TraverseObjectEntryWithAncestors> {
   resultThrow(
     nullUndefTest(path, `path`),
     nullUndefTest(node, `node`)
@@ -299,17 +299,17 @@ export function* traceByPath<T extends object>(
     //     //onsole.log(`  entry: ${ entry?.name }`);
     //     if (entry && Array.isArray(entry.sourceValue)) {
     //       // Result was array as expected
-    //       entry = { name: p, sourceValue: entry.sourceValue[ arrayIndex ], nodeValue: entry.sourceValue[ arrayIndex ] };
+    //       entry = { name: p, sourceValue: entry.sourceValue[ arrayIndex ], leafValue: entry.sourceValue[ arrayIndex ] };
     //     }
     //   }
     // }
 
     if (!entry) {
-      yield { name: p, sourceValue: undefined, nodeValue: undefined, ancestors };
+      yield { name: p, sourceValue: undefined, leafValue: undefined, ancestors, _kind: `entry-ancestors` };
       return;
     }
     node = entry.sourceValue;
-    yield { ...entry, ancestors: [ ...ancestors ] };
+    yield { ...entry, ancestors: [ ...ancestors ], _kind: `entry-ancestors` };
     ancestors.push(p);
   }
 }
@@ -317,6 +317,15 @@ export function* traceByPath<T extends object>(
 /**
  * Returns a projection of `node` as a dynamic traversable.
  * This means that the tree structure is dynamically created as last-minute as possible.
+ * 
+ * The type when calling `getValue()` is {@link TraverseObjectEntryStatic}:
+ * ```typescript
+ * type EntryStatic = Readonly<{ 
+ *  name: string,
+ *  value: any
+ *  ancestors: string[] 
+ * }>
+ * ```
  * 
  * Note that the object identity of TraversableTree return results is not stable.
  * This is because they are created on-the-fly by reading fields of `node`.
@@ -327,6 +336,7 @@ export function* traceByPath<T extends object>(
  * 
  * // Object identity is not the same
  * c1[ 0 ] === c1[ 0 ]; // false
+ * 
  * // ...even though its referring to the same value
  * c1[ 0 ].getValue() === c1[ 0 ].getValue(); // true
  * ```
@@ -341,19 +351,19 @@ export function* traceByPath<T extends object>(
  * @param parent Do not use
  * @returns 
  */
-export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: string[] = [], parent?: TraversableTree<EntryStatic>): TraversableTree<EntryStatic> => {
+export const asDynamicTraversable = <T extends object>(node: T, options: Partial<ChildrenOptions> = {}, ancestors: string[] = [], parent?: TraversableTree<TraverseObjectEntryStatic>): TraversableTree<TraverseObjectEntryStatic> => {
   const name = options.name ?? `object`;
-  const t: TraversableTree<EntryStatic> = {
+  const t: TraversableTree<TraverseObjectEntryStatic> = {
     *children() {
-      for (const c of children(node, options)) {
-        yield asDynamicTraversable(c.sourceValue, { ...options, name: c.name }, [ ...ancestors, name ], t);
+      for (const { name: childName, sourceValue, leafValue } of children(node, options)) {
+        yield asDynamicTraversable(sourceValue, { ...options, name: childName }, [ ...ancestors, name ], t);
       }
     },
     getParent() {
       return parent;
     },
     getValue() {
-      return { name, value: node, ancestors };
+      return { name, sourceValue: node, ancestors, _kind: `entry-static` };
     },
     getIdentity() {
       return node;
@@ -398,6 +408,7 @@ export type CreateOptions = {
    */
   valuesAtLeaves: boolean
 }
+
 /**
  * Reads all fields and sub-fields of `node`, returning as a basic tree structure.
  * The structure is a snapshot of the object. If the object changes afterwards, the tree will
@@ -408,20 +419,20 @@ export type CreateOptions = {
  * @param options 
  * @returns 
  */
-export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): TreeNode<EntryStatic> => {
+export const create = <T extends object>(node: T, options: Partial<CreateOptions> = {}): TreeNode<TraverseObjectEntryStatic> => {
   const valuesAtLeaves = options.valuesAtLeaves ?? false;
 
   const valueFor = valuesAtLeaves ? (v: any) => { if (isPrimitive(v)) return v; } : (v: any) => v;
   return createImpl(node, valueFor(node), options, []);
 }
 
-const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Partial<CreateOptions> = {}, ancestors: string[]): TreeNode<EntryStatic> => {
+const createImpl = <T extends object>(sourceValue: T, leafValue: T, options: Partial<CreateOptions> = {}, ancestors: string[]): TreeNode<TraverseObjectEntryStatic> => {
   const defaultName = options.name ?? `object_ci`;
-  //onsole.log(`createImpl name: ${ defaultName } nodeValue: ${ JSON.stringify(nodeValue) }`);
-  const r = TreeArrayBacked.root<EntryStatic>({ name: defaultName, value: nodeValue, ancestors: [ ...ancestors ] });
+  //onsole.log(`createImpl name: ${ defaultName } leafValue: ${ JSON.stringify(leafValue) }`);
+  const r = TreeArrayBacked.root<TraverseObjectEntryStatic>({ name: defaultName, sourceValue: leafValue, ancestors: [ ...ancestors ], _kind: `entry-static` });
   ancestors = [ ...ancestors, defaultName ];
   for (const c of children(sourceValue, options)) {
-    const v = options.valuesAtLeaves ? c.nodeValue : c.sourceValue;
+    const v = options.valuesAtLeaves ? c.leafValue : c.sourceValue;
     TreeArrayBacked.add(createImpl(c.sourceValue, v, { ...options, name: c.name }, ancestors), r);
   }
   return r;
@@ -433,7 +444,7 @@ const createImpl = <T extends object>(sourceValue: T, nodeValue: T, options: Par
  * @param options 
  * @returns 
  */
-export const createSimplified = <T extends object>(node: T, options: Partial<CreateOptions> = {}): SimplifiedNode<EntryStatic> => {
+export const createSimplified = <T extends object>(node: T, options: Partial<CreateOptions> = {}): SimplifiedNode<TraverseObjectEntryStatic> => {
   return TreeArrayBacked.stripParentage(create(node, options));
 }
 
@@ -444,12 +455,17 @@ export const createSimplified = <T extends object>(node: T, options: Partial<Cre
  * @param defaultName
  * @returns
  */
-function getNamedEntry<T extends object>(node: T, defaultName = ``): Entry {
-  if (`name` in node && `nodeValue` in node && `sourceValue` in node) return node as Entry;
+function getNamedEntry<T extends object>(node: T, defaultName = ``): TraverseObjectEntry {
+  if (`name` in node && `leafValue` in node && `sourceValue` in node) return {
+    name: node.name as string,
+    _kind: `entry`,
+    leafValue: node.leafValue,
+    sourceValue: node.sourceValue
+  };
   if (`name` in node) {
-    return { name: node.name as string, nodeValue: node, sourceValue: node };
+    return { name: node.name as string, leafValue: node, sourceValue: node, _kind: `entry` };
   }
-  return { name: defaultName, nodeValue: node, sourceValue: node };
+  return { name: defaultName, leafValue: node, sourceValue: node, _kind: `entry` };
 }
 
 // /**
