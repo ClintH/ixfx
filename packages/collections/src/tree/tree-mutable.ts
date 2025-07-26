@@ -414,6 +414,13 @@ export const rootWrapped = <T>(value: T | undefined) => {
   return wrap(createNode(value));
 }
 
+/**
+ * Creates a `TreeNode` instance with a given value and parent.
+ * Parent node, if specified, has its `childrenStore` property changed to include new child.
+ * @param value 
+ * @param parent 
+ * @returns 
+ */
 export const createNode = <T>(value: T | undefined, parent?: TreeNode<T>): TreeNode<T> => {
   const n: TreeNode<T> = {
     childrenStore: [],
