@@ -76,7 +76,6 @@ test(`gaussian`, () => {
     [ 8, 0 ]
   ]
   );
-  console.log(frequency);
 
   expect(shape1 || shape2 || shape3 || shape4 || shape5 || shape6 || shape7).toBeTruthy();
 });

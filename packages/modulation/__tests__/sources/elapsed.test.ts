@@ -71,9 +71,13 @@ test(`start-at-relative`, async () => {
     0.4, 0.6, 0.8, 0,
     0.2, 0.4
   ]);
-
+  const s4f = Arrays.isEqual(s4Results, [
+    0.7, 0.9, 0.1, 0.2,
+    0.4, 0.6, 0.8, 0,
+    0.1, 0.4
+  ]);
   //console.log(s4Results);
-  const s4Something = s4a || s4b || s4c || s4d || s4e;
+  const s4Something = s4a || s4b || s4c || s4d || s4e || s4f;
   if (!s4Something) {
     console.log(s4Results);
   }

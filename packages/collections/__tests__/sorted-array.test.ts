@@ -1,14 +1,38 @@
 import { test, expect } from 'vitest';
 import * as Sorted from '../src/sorted-array.js';
+import { defaultComparer } from '@ixfx/core';
 
-test(`indexOf`, () => {
-  const array1 = [ 1, 2, 3, 4, 5 ];
-  expect(Sorted.indexOf(array1, 3)).toBe(2);
-  expect(Sorted.indexOf(array1, 5)).toBe(4);
+test(`index-of`, () => {
+  const array1 = [ 1, 2, 2.5, 3, 4, 5 ];
   expect(Sorted.indexOf(array1, 1)).toBe(0);
+  expect(Sorted.indexOf(array1, 3)).toBe(3);
+  expect(Sorted.indexOf(array1, 5)).toBe(5);
   expect(Sorted.indexOf(array1, 0)).toBe(-1);
   expect(Sorted.indexOf(array1, 3.5)).toBe(-1);
   expect(Sorted.indexOf(array1, 6)).toBe(-1);
+  expect(Sorted.indexOf(array1, 4)).toEqual(4);
+
+});
+
+test(`wrap`, () => {
+  const w = Sorted.wrapSorted([ 1, 2, 3, 4, 5, 6 ]);
+  expect(w.at(0)).toEqual(1);
+  expect(w.at(-1)).toEqual(6);
+  expect(w.data).toEqual([ 1, 2, 3, 4, 5, 6 ]);
+  expect(w.toArray()).toEqual([ 1, 2, 3, 4, 5, 6 ]);
+  expect(w.indexOf(4)).toEqual(3);
+  expect(w.length).toEqual(6);
+  expect(w.insertionIndex(2.5)).toEqual(2);
+
+  const w2 = w.insert(2.5);
+  expect(w.toArray()).toEqual([ 1, 2, 3, 4, 5, 6 ]); // immutability
+  expect(w2.toArray()).toEqual([ 1, 2, 2.5, 3, 4, 5, 6 ]);
+
+  const w3 = w2.remove(4);
+  expect(w.toArray()).toEqual([ 1, 2, 3, 4, 5, 6 ]); // immutability
+  expect(w2.toArray()).toEqual([ 1, 2, 2.5, 3, 4, 5, 6 ]); // immutability
+  expect(w3.toArray()).toEqual([ 1, 2, 2.5, 3, 5, 6 ]);
+
 });
 
 test(`insertionIndex`, () => {
@@ -45,6 +69,12 @@ test(`remove`, () => {
   const array2 = [ 3 ];
   expect(Sorted.remove(array2, 0)).toEqual([ 3 ]);
   expect(Sorted.remove(array2, 3)).toEqual([]);
+
+  expect(defaultComparer(2.5, 2)).toEqual(1);
+  expect(defaultComparer(2, 2)).toEqual(0);
+  expect(defaultComparer(2, 2.5)).toEqual(-1);
+
+  expect(Sorted.remove([ 1, 2, 2.5, 3, 4, 5, 6 ], 4)).toEqual([ 1, 2, 2.5, 3, 5, 6 ])
 
 });
 

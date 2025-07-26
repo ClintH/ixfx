@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect } from 'vitest';
-import { type PathOpts, asDynamicTraversable, create, getByPath, traceByPath, children } from '../../src/tree/traverse-object.js';
+import { asDynamicTraversable, create, getByPath, traceByPath, children } from '../../src/tree/traverse-object.js';
 import * as TraversableTree from '../../src/tree/traversable-tree.js';
 import * as TreeMutable from '../../src/tree/tree-mutable.js';
 import { isEqualValueDefault, isEqualValuePartial } from '@ixfx/core';
+import { toTraversable, type TraverseObjectPathOpts } from '../../src/tree/index.js';
 
 
 function getTestMap() {
@@ -23,7 +25,7 @@ function getTestMap() {
 }
 
 function getTestObject() {
-  const testObject = {
+  return {
     name: 'Jill',
     address: {
       street: 'Blah St',
@@ -40,23 +42,27 @@ function getTestObject() {
       { name: 'Sam' }
     ]
   } as const;
-  return testObject;
 }
 
+function createTraversable() {
+  return toTraversable(getTestObject());
+}
 test(`as-tree`, () => {
   const r1 = create(getTestObject(), { name: `test` });
   //onsole.log(toStringDeep(r1));
-  expect(r1.value?.value).toEqual(getTestObject());
+  expect(r1.value?.sourceValue).toEqual(getTestObject());
   expect(r1.childrenStore.length).toBe(3);
-  expect(r1.childrenStore[ 0 ].value).toEqual({ name: `name`, value: `Jill`, ancestors: [ `test` ] });
+  expect(r1.childrenStore[ 0 ].value).toEqual({ _kind: `entry-static`, name: `name`, sourceValue: `Jill`, ancestors: [ `test` ] });
   expect(r1.childrenStore[ 1 ].value).toEqual({
-    name: `address`, value: {
+    _kind: `entry-static`,
+    name: `address`, sourceValue: {
       street: 'Blah St',
       number: 27
     }, ancestors: [ `test` ]
   });
   expect(r1.childrenStore[ 2 ].value).toEqual({
-    name: `kids`, value: [
+    _kind: `entry-static`,
+    name: `kids`, sourceValue: [
       {
         name: 'John',
         address: {
@@ -68,6 +74,109 @@ test(`as-tree`, () => {
     ], ancestors: [ `test` ]
   });
 
+});
+
+test(`has-any-parent-value`, () => {
+  const t = createTraversable();
+  // @ts-expect-error
+  expect(() => TraversableTree.hasAnyParentValue(undefined, `hello`)).toThrow();
+
+  //const street = TraversableTree.find(t, n => n.getValue().name === `street`);
+
+  let johnStreet;
+  let kids;
+  for (const tt of TraversableTree.depthFirst(t)) {
+    const v = tt.getValue();
+    if (v.name === `street` && v.sourceValue === `West St`) {
+      johnStreet = tt;
+    }
+    if (v.name === `kids`) {
+      kids = tt;
+    }
+  }
+  expect(TraversableTree.hasParentValue(johnStreet, `kids`, (a, b) => {
+    return a.name === b;
+  }, Number.MAX_SAFE_INTEGER)).toBeTruthy();
+
+});
+
+test(`to-traversable-object`, () => {
+  const o = getTestObject();
+  const t1 = toTraversable(o);
+  expect(t1.getIdentity()).toEqual(o);
+  expect(t1.getParent()).toBeFalsy();
+  const kidNames = [ ...t1.children() ].map(v => v.getValue().name);
+  expect(kidNames).toEqual([ `name`, `address`, `kids` ]);
+  // expect(TraversableTree.hasAnyParentValue())
+})
+
+test(`to-traversable-node`, () => {
+  const t = TreeMutable.root(`root`);
+  const tA = TreeMutable.addValue(`a`, t);
+  const tB = TreeMutable.addValue(`b`, t);
+  const tAA = TreeMutable.addValue(`a-a`, tA);
+  const tAB = TreeMutable.addValue(`a-b`, tA);
+
+  const tt = toTraversable(t);
+  const kidsRaw = [ ...tt.children() ]
+  const kids = [ ...tt.children() ].map(t => t.getValue());
+  expect(kids).toStrictEqual([ `a`, `b` ]);
+
+  expect(TraversableTree.hasAnyParentValue(tAB, `a`)).toBeTruthy();
+  expect(TraversableTree.hasAnyParentValue(tAB, `root`)).toBeTruthy();
+  expect(TraversableTree.hasAnyParentValue(tAB, `b`)).toBeFalsy();
+
+
+  const p = TraversableTree.findAnyParentByValue(kidsRaw[ 1 ], `root`);
+  expect(p).not.toBeUndefined();
+});
+
+test(`named-object`, () => {
+  const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
+  const r1Children = [ ...r1.children() ].map(v => v.getValue());
+  expect(r1Children).toEqual(
+    [
+      {
+        "ancestors": [
+          "obj",
+        ],
+        _kind: `entry-static`,
+        "name": "name",
+        "sourceValue": "Jill",
+      },
+      {
+        "ancestors": [
+          "obj",
+        ],
+        _kind: `entry-static`,
+
+        "name": "address",
+        "sourceValue": {
+          "number": 27,
+          "street": "Blah St",
+        },
+      },
+      {
+        "ancestors": [
+          "obj",
+        ],
+        _kind: `entry-static`,
+
+        "name": "kids",
+        "sourceValue": [
+          {
+            "address": {
+              "number": 35,
+              "street": "West St",
+            },
+            "name": "John",
+          },
+          {
+            "name": "Sam",
+          },
+        ],
+      } ]
+  );
 });
 
 test(`follow-value`, () => {
@@ -99,16 +208,15 @@ test(`follow-value`, () => {
     iterCount++;
     results.push(fv);
   }
-
   expect(results).toEqual([
     {
-      name: `kids`, ancestors: [ `obj` ], value: [
+      name: `kids`, _kind: `entry-static`, ancestors: [ `obj` ], sourceValue: [
         { address: { number: 35, street: "West St" }, name: "John" },
         { name: "Sam" }
       ]
     },
-    { name: `1`, value: { name: `Sam` }, ancestors: [ `obj`, `kids` ] },
-    { name: `name`, value: `Sam`, ancestors: [ `obj`, `kids`, `1` ] }
+    { name: `1`, _kind: `entry-static`, sourceValue: { name: `Sam` }, ancestors: [ `obj`, `kids` ] },
+    { name: `name`, _kind: `entry-static`, sourceValue: `Sam`, ancestors: [ `obj`, `kids`, `1` ] }
   ]);
   expect(iterCount).toBe(3);
   expect(callbackCount).toBe(6);
@@ -119,15 +227,17 @@ test(`as-traversable-object`, () => {
   const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
   //onsole.log(TraversableTree.toStringDeep(r1));
   expect(
-    TraversableTree.hasChildValue(r1, { name: `name`, value: `Jill`, ancestors: [ "obj" ] }, isEqualValueDefault)
+    TraversableTree.hasChildValue(r1, { name: `name`, sourceValue: `Jill`, ancestors: [ "obj" ], _kind: `entry-static`, }, isEqualValueDefault)
   ).toBe(true);
 
   expect(TraversableTree.hasChildValue(r1, {
-    name: `address`, value: {
+
+    name: `address`, sourceValue: {
       street: 'Blah St',
       number: 27
     },
-    ancestors: [ "obj" ]
+    ancestors: [ "obj" ],
+    _kind: `entry-static`
   }, isEqualValueDefault)).toBe(true);
   expect(TraversableTree.hasChildValue(r1, {
     // @ts-ignore
@@ -138,10 +248,10 @@ test(`as-traversable-object`, () => {
   }, isEqualValueDefault)).toBe(false);
 
   expect(
-    TraversableTree.hasAnyChildValue(r1, { name: `number`, value: 35, ancestors: [ "obj", "kids", "0", "address" ] }, isEqualValueDefault)
+    TraversableTree.hasAnyChildValue(r1, { name: `number`, sourceValue: 35, ancestors: [ "obj", "kids", "0", "address" ], _kind: `entry-static` }, isEqualValueDefault)
   ).toBe(true);
 
-  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', value: 'John' }, isEqualValuePartial);
+  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', sourceValue: 'John' }, isEqualValuePartial);
   expect(r1a).toBeTruthy();
   if (r1a !== undefined) {
     expect(TraversableTree.hasAnyChild(r1, r1a)).toBe(true);
@@ -155,21 +265,21 @@ test(`as-traversable-array`, () => {
   const breadthFirst = [ ...TraversableTree.breadthFirst(r1) ];
   expect(breadthFirst.length).toBe(5);
   expect(
-    TraversableTree.hasChildValue(r1, { name: `1`, value: 2, ancestors: [ `test` ] }, isEqualValuePartial)
+    TraversableTree.hasChildValue(r1, { name: `1`, sourceValue: 2, ancestors: [ `test` ] }, isEqualValuePartial)
   ).toBe(true);
   expect(
-    TraversableTree.hasChildValue(r1, { name: `0`, value: 10, ancestors: [ `test` ] }, isEqualValuePartial)
+    TraversableTree.hasChildValue(r1, { name: `0`, sourceValue: 10, ancestors: [ `test` ] }, isEqualValuePartial)
   ).toBe(false);
   expect(TraversableTree.childrenLength(r1)).toBe(5);
 })
 
 
-test('direct-children', () => {
+test('children', () => {
   expect([ ...children(getTestObject()) ]).toEqual([
-    { name: "name", nodeValue: "Jill", sourceValue: "Jill" },
-    { name: "address", nodeValue: undefined, sourceValue: { number: 27, street: "Blah St" } },
+    { name: "name", leafValue: "Jill", sourceValue: "Jill", _kind: `entry` },
+    { name: "address", leafValue: undefined, _kind: `entry`, sourceValue: { number: 27, street: "Blah St" } },
     {
-      name: "kids", nodeValue: undefined, sourceValue: [
+      name: "kids", leafValue: undefined, _kind: `entry`, sourceValue: [
         {
           address: {
             number: 35,
@@ -184,6 +294,26 @@ test('direct-children', () => {
     }
   ]);
 
+  const verySimpleObject = {
+    field: `hello`,
+    flag: true
+  }
+  expect([ ...children(verySimpleObject) ]).toEqual([
+    { name: "field", _kind: `entry`, sourceValue: `hello`, leafValue: `hello` },
+    { name: "flag", _kind: `entry`, sourceValue: true, leafValue: true },
+  ])
+
+  const lessSimpleObject = {
+    field: `hello`,
+    flag: true,
+    colour: { name: 'red', opacity: 0.5 }
+  }
+  expect([ ...children(lessSimpleObject) ]).toEqual([
+    { name: "field", _kind: `entry`, sourceValue: `hello`, leafValue: `hello` },
+    { name: "flag", _kind: `entry`, sourceValue: true, leafValue: true },
+    { name: "colour", _kind: `entry`, sourceValue: { name: 'red', opacity: 0.5 }, leafValue: undefined },
+  ])
+
   const simpleObject = {
     colour: {
       r: 0.5,
@@ -193,57 +323,60 @@ test('direct-children', () => {
   }
   expect([ ...children(simpleObject) ]).toEqual([
     {
-      name: "colour", sourceValue: {
+      name: "colour",
+      _kind: `entry`,
+      sourceValue: {
         b: 0.5,
         g: 0.5,
         r: 0.5
-      }
+      },
+      leafValue: undefined
     } ]);
 
   const colours = [ { r: 1, g: 0, b: 0 }, { r: 0, g: 1, b: 0 }, { r: 0, g: 0, b: 1 } ];
   expect([ ...children(colours, { name: 'colours' }) ]).toEqual([
-    { name: "0", sourceValue: { r: 1, g: 0, b: 0 } },
-    { name: "1", sourceValue: { r: 0, g: 1, b: 0 } },
-    { name: "2", sourceValue: { r: 0, g: 0, b: 1 } },
+    { name: "0", _kind: `entry`, sourceValue: { r: 1, g: 0, b: 0 }, leafValue: undefined },
+    { name: "1", _kind: `entry`, sourceValue: { r: 0, g: 1, b: 0 }, leafValue: undefined },
+    { name: "2", _kind: `entry`, sourceValue: { r: 0, g: 0, b: 1 }, leafValue: undefined },
   ]);
 });
 
 test('trace-by-path', () => {
   const o = getTestObject();
-  const opts: PathOpts = {
+  const opts: TraverseObjectPathOpts = {
     separator: '.'
   }
   expect([ ...traceByPath('kids.1', o, opts) ]).toEqual(
     [
       {
-        name: "kids", ancestors: [], nodeValue: undefined, sourceValue: [
+        name: "kids", ancestors: [], _kind: `entry-ancestors`, leafValue: undefined, sourceValue: [
           { address: { number: 35, street: "West St" }, name: "John" },
           { name: "Sam" }
         ]
       },
-      { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" } }
+      { name: "1", _kind: `entry-ancestors`, ancestors: [ `kids` ], sourceValue: { "name": "Sam" } }
     ]);
 
   expect([ ...traceByPath('kids.1.name', o, opts) ]).toEqual(
     [
       {
-        name: "kids", ancestors: [], nodeValue: undefined, sourceValue: [
+        name: "kids", ancestors: [], _kind: `entry-ancestors`, leafValue: undefined, sourceValue: [
           { address: { number: 35, street: "West St" }, name: "John" },
           { name: "Sam" }
         ]
       },
-      { name: "1", ancestors: [ `kids` ], sourceValue: { "name": "Sam" }, nodeValue: undefined },
-      { name: "name", ancestors: [ `kids`, `1` ], nodeValue: "Sam", sourceValue: "Sam" }
+      { name: "1", ancestors: [ `kids` ], _kind: `entry-ancestors`, sourceValue: { "name": "Sam" }, leafValue: undefined },
+      { name: "name", ancestors: [ `kids`, `1` ], _kind: `entry-ancestors`, leafValue: "Sam", sourceValue: "Sam" }
     ]);
 
   expect([ ...traceByPath('address.street', o, opts) ]).toEqual([
-    { name: "address", sourceValue: { "number": 27, "street": "Blah St" }, ancestors: [] },
-    { name: "street", nodeValue: "Blah St", sourceValue: "Blah St", ancestors: [ "address" ] }
+    { name: "address", _kind: `entry-ancestors`, sourceValue: { "number": 27, "street": "Blah St" }, ancestors: [] },
+    { name: "street", _kind: `entry-ancestors`, leafValue: "Blah St", sourceValue: "Blah St", ancestors: [ "address" ] }
   ]);
 
   expect([ ...traceByPath('kids.0.address.street', o, opts) ]).toEqual([
     {
-      name: "kids", sourceValue: [
+      name: "kids", _kind: `entry-ancestors`, sourceValue: [
         {
           name: 'John',
           address: {
@@ -255,7 +388,7 @@ test('trace-by-path', () => {
       ], ancestors: []
     },
     {
-      name: "0", sourceValue: {
+      name: "0", _kind: `entry-ancestors`, sourceValue: {
         name: 'John',
         address: {
           street: 'West St',
@@ -264,12 +397,12 @@ test('trace-by-path', () => {
       }, ancestors: [ `kids` ]
     },
     {
-      name: "address", sourceValue: {
+      name: "address", _kind: `entry-ancestors`, sourceValue: {
         street: 'West St',
         number: 35
       }, ancestors: [ `kids`, `0` ]
     },
-    { name: "street", nodeValue: "West St", sourceValue: "West St", ancestors: [ `kids`, `0`, `address` ] }
+    { name: "street", _kind: `entry-ancestors`, leafValue: "West St", sourceValue: "West St", ancestors: [ `kids`, `0`, `address` ] }
   ]);
 
 
@@ -277,7 +410,7 @@ test('trace-by-path', () => {
 
   expect([ ...traceByPath('jill.address.street', t2, opts) ]).toEqual([
     {
-      name: "jill", sourceValue: {
+      name: "jill", _kind: `entry-ancestors`, sourceValue: {
         address: {
           street: 'Blah St',
           number: 27
@@ -285,18 +418,18 @@ test('trace-by-path', () => {
       }, ancestors: []
     },
     {
-      name: "address", sourceValue: {
+      name: "address", _kind: `entry-ancestors`, sourceValue: {
         street: 'Blah St',
         number: 27
       }, ancestors: [ `jill` ]
     },
-    { name: "street", nodeValue: "Blah St", sourceValue: "Blah St", ancestors: [ `jill`, `address` ] }
+    { name: "street", _kind: `entry-ancestors`, leafValue: "Blah St", sourceValue: "Blah St", ancestors: [ `jill`, `address` ] }
   ]);
 
   // Unknown path
   expect([ ...traceByPath('jill.address.street2', t2, opts) ]).toEqual([
     {
-      name: "jill", sourceValue: {
+      name: "jill", _kind: `entry-ancestors`, sourceValue: {
         address: {
           street: 'Blah St',
           number: 27
@@ -304,12 +437,12 @@ test('trace-by-path', () => {
       }, ancestors: []
     },
     {
-      name: "address", sourceValue: {
+      name: "address", _kind: `entry-ancestors`, sourceValue: {
         street: 'Blah St',
         number: 27
       }, ancestors: [ `jill` ]
     },
-    { name: "street2", nodeValue: undefined, sourceValue: undefined, ancestors: [ `jill`, `address` ] }
+    { name: "street2", _kind: `entry-ancestors`, leafValue: undefined, sourceValue: undefined, ancestors: [ `jill`, `address` ] }
   ]);
 });
 
@@ -325,15 +458,15 @@ test('get-by-path', () => {
     }
   }
   const postcode = getByPath('jane.address.postcode', people);
-  expect(postcode).toEqual({ ancestors: [ "jane", "address" ], name: "postcode", nodeValue: 1000, sourceValue: 1000 });
-  expect(getByPath('jane.address.country', people)).toEqual({ ancestors: [ "jane", "address" ], name: 'country', nodeValue: undefined, sourceValue: undefined });
-  expect(getByPath('jane.address.country.state', people)).toEqual({ ancestors: [ "jane", "address" ], name: 'country', nodeValue: undefined, sourceValue: undefined });
+  expect(postcode).toEqual({ _kind: `entry-ancestors`, ancestors: [ "jane", "address" ], name: "postcode", leafValue: 1000, sourceValue: 1000 });
+  expect(getByPath('jane.address.country', people)).toEqual({ _kind: `entry-ancestors`, ancestors: [ "jane", "address" ], name: 'country', leafValue: undefined, sourceValue: undefined });
+  expect(getByPath('jane.address.country.state', people)).toEqual({ _kind: `entry-ancestors`, ancestors: [ "jane", "address" ], name: 'country', leafValue: undefined, sourceValue: undefined });
 
   expect([ ...traceByPath('jane.address.street.toofar', people) ]).toEqual([
-    { name: "jane", sourceValue: { address: { postcode: 1000, street: 'West St', city: 'Blahville' }, colour: 'red' }, ancestors: [], nodeValue: undefined },
-    { name: "address", sourceValue: { postcode: 1000, street: 'West St', city: 'Blahville' }, ancestors: [ "jane" ], nodeValue: undefined },
-    { name: "street", nodeValue: "West St", ancestors: [ "jane", "address" ], sourceValue: "West St" },
-    { name: "toofar", nodeValue: undefined, ancestors: [ "jane", "address", "street" ], sourceValue: undefined }
+    { _kind: `entry-ancestors`, name: "jane", sourceValue: { address: { postcode: 1000, street: 'West St', city: 'Blahville' }, colour: 'red' }, ancestors: [], leafValue: undefined },
+    { _kind: `entry-ancestors`, name: "address", sourceValue: { postcode: 1000, street: 'West St', city: 'Blahville' }, ancestors: [ "jane" ], leafValue: undefined },
+    { _kind: `entry-ancestors`, name: "street", leafValue: "West St", ancestors: [ "jane", "address" ], sourceValue: "West St" },
+    { _kind: `entry-ancestors`, name: "toofar", leafValue: undefined, ancestors: [ "jane", "address", "street" ], sourceValue: undefined }
   ]);
 
 });
@@ -386,16 +519,4 @@ test(`tree-object-compare`, () => {
 
   expect(valueChanged).toBe(0);
   expect(childChanged).toBe(1);
-
-  // if (changedNode) {
-  //   for (const diff2KidKid of changedNode?.childrenStore) {
-  //     console.log(diff2KidKid.toString());
-
-  //   }
-  // }
-  //console.log(diff2);
-  //console.log(toStringDeep(tree1));
-  //console.log(toStringDeep(tree2));
-
-
 })
