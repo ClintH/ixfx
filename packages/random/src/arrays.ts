@@ -23,51 +23,88 @@ export const randomIndex = <V>(
 
 
 /**
- * Removes a random item from an array, returning both the item and the new array as a result.
- * Does not modify the original array unless `mutate` parameter is true.
- *
- * @example Without changing source
+ * Returns a random value from `array`,
+ * and removes it from the array.
+ * 
  * ```js
- * const data = [100, 20, 40];
- * const {value, array} = randomPluck(data);
- * // value: 20, array: [100, 40], data: [100, 20, 40];
+ * const data = [100,20,50];
+ * const v = randomPluck(data, { mutate: true });
+ * // eg: v: 20, data is now [100,50]
  * ```
- *
- * @example Mutating source
+ * @param array 
+ * @param options 
+ */
+export function randomPluck<V>(
+  array: readonly V[] | V[],
+  options: { mutate: true, source?: RandomSource }
+): V | undefined;
+
+/**
+ * Returns a random element from an array
+ * along with the remaining elements. Does not
+ * modify the original array.
  * ```js
- * const data = [100, 20, 40];
- * const {value} = randomPluck(data, true);
- * // value: 20, data: [100, 40];
+ * const data = [100,20,50];
+ * const {value,remainder} = randomPluck(data);
+ * // eg: value: 20, remainder: [100,50], data remains [100,20,50]
  * ```
- *
+ * @param array 
+ * @param options 
+ */
+export function randomPluck<V>(
+  array: readonly V[] | V[],
+  options?: { mutate: false, source?: RandomSource }
+): { value: V, remainder: V[] };
+
+/**
+ * Plucks a random value from an array, optionally mutating
+ * the original array.
+ * 
+ * @example Get a random element without modifying array
+ * ```js
+ * const { value, remainder } = randomPluck(inputArray);
+ * ```
+ * 
+ * @example Get a random element, removing it from original array
+ * ```js
+ * const value = randomPluck(inputArray, { mutate: true });
+ * ```
+ * 
+ * If the input array is empty, _undefined_ is returned as the value.
  * @typeParam V - Type of items in array
  * @param array Array to pluck item from
- * @param mutate If _true_, changes input array. _False_ by default.
- * @param rand Random generatr. `Math.random` by default.
- * @return Returns an object `{value:V|undefined, array:V[]}`
+ * @param options Options. By default { mutate: false, source: Math.random }
+ * @param rand Random generator. `Math.random` by default.
  *
  */
-export const randomPluck = <V>(
+export function randomPluck<V>(
   array: readonly V[] | V[],
-  mutate = false,
-  rand: RandomSource = Math.random
-): { readonly value: V | undefined; readonly array: V[] } => {
+  options: Partial<{ mutate: boolean, source: RandomSource }> = {}
+): undefined | V | { readonly value: V | undefined; readonly remainder: V[] } {
   if (typeof array === `undefined`) throw new Error(`Param 'array' is undefined`);
   if (!Array.isArray(array)) throw new Error(`Param 'array' is not an array`);
-  if (array.length === 0) return { value: undefined, array: [] };
+
+  const mutate = options.mutate ?? false;
+  const rand = options.source ?? Math.random;
+
+  if (array.length === 0) {
+    if (mutate) return undefined;
+    return { value: undefined, remainder: [] };
+  }
+
   const index = randomIndex(array, rand);
   if (mutate) {
-    return {
-      value: array[ index ],
-      array: array.splice(index, 1),
-    };
+    // Return bare value
+    const v = array[ index ];
+    array.splice(index, 1)
+    return v;
   } else {
     // Copy array, remove item from that
-    const t = [ ...array ];
-    t.splice(index, 1);
+    const inputCopy = [ ...array ];
+    inputCopy.splice(index, 1);
     return {
       value: array[ index ],
-      array: t,
+      remainder: inputCopy,
     };
   }
 };
