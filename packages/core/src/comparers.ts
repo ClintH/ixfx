@@ -12,14 +12,19 @@ export type Comparer<V> = (a: V, b: V) => CompareResult;
  * [10, 4, 5, 0].sort(comparerInverse(numericComparer));
  * // Yields: [ 10, 5, 4, 0]
  * ```
- * @param x
- * @param y
+ * 
+ * Returns:
+ * * 0: values are equal
+ * * negative: `a` should be before `b`
+ * * positive: `a` should come after `b`
+ * @param a
+ * @param b
  * @returns
  */
-export const numericComparer = (x: number, y: number): CompareResult => {
+export const numericComparer = (a: number, b: number): CompareResult => {
   // ✔️ Unit tested
-  if (x === y) return 0;
-  if (x > y) return 1;
+  if (a === b) return 0;
+  if (a > b) return 1;
   return -1;
 };
 
