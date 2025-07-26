@@ -1,4 +1,4 @@
-import {  type StringOptions } from "./types.js";
+import { type StringOptions } from "./types.js";
 
 /**
  * Returns a string of random letters and numbers of a given `length`.
@@ -14,7 +14,12 @@ export const string = (lengthOrOptions: number | StringOptions = 5) => {
   const options =
     typeof lengthOrOptions === `number` ? { length: lengthOrOptions } : lengthOrOptions;
   const calculate = options.source ?? Math.random;
-  return calculate()
-    .toString(36)
-    .slice(2, length + 2);
+  const length = options.length ?? 5
+  let returnValue = ``;
+  while (returnValue.length < length) {
+    returnValue += calculate()
+      .toString(36)
+      .slice(2);
+  }
+  return returnValue.substring(0, length);
 };
