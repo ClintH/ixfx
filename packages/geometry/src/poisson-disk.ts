@@ -75,8 +75,8 @@ export const poissonDisk = (
   arUpdater(growthPoint, growthPoint);
 
   while (active.length > 0) {
-    if (!growthPoint) {
-      growthPoint = randomPluck(active, true).value;
+    if (typeof growthPoint !== `undefined`) {
+      growthPoint = randomPluck(active, { mutate: true });
     }
     if (growthPoint) {
       const reference = Grids.cellAtPoint(grid, growthPoint);
@@ -92,7 +92,6 @@ export const poissonDisk = (
         const r = randomPoint();
         if (isPointValid(radius, grid, r, reference, ar)) {
           arUpdater(r, r);
-          //eslint-disable-next-line functional/immutable-data
           active.push(r);
           added = true;
           break;
