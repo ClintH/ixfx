@@ -1,5 +1,20 @@
 # @ixfxfun/ui
 
+## 0.40.0
+
+### Minor Changes
+
+- Colour interpolation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.42.0
+  - @ixfx/visual@0.40.0
+  - @ixfx/core@0.42.0
+  - @ixfx/dom@0.41.0
+  - @ixfx/rx@0.40.0
+
 ## 0.39.1
 
 ### Patch Changes

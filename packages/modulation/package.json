@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/modulation",
-	"version": "0.40.0",
+	"version": "0.41.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -25,6 +25,10 @@
 		"./easing": {
 			"types": "./src/easing/index.ts",
 			"import": "./src/easing/index.ts"
+		},
+		"./envelope": {
+			"types": "./src/envelope/index.ts",
+			"import": "./src/envelope/index.ts"
 		}
 	},
 	"publishConfig": {
@@ -37,6 +41,10 @@
 			"./easing": {
 				"types": "./dist/src/easing/index.d.ts",
 				"import": "./dist/src/easing/index.js"
+			},
+			"./envelope": {
+				"types": "./dist/src/envelope/index.d.ts",
+				"import": "./dist/src/envelope/index.js"
 			}
 		}
 	}

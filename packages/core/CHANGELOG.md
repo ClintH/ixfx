@@ -1,5 +1,16 @@
 # @ixfxfun/core
 
+## 0.42.0
+
+### Minor Changes
+
+- Colour interpolation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/guards@0.40.0
+
 ## 0.41.0
 
 ### Minor Changes

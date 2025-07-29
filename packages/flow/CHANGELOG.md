@@ -1,5 +1,16 @@
 # @ixfxfun/flow
 
+## 0.40.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.42.0
+  - @ixfx/numbers@0.40.0
+  - @ixfx/guards@0.40.0
+  - @ixfx/core@0.42.0
+  - @ixfx/arrays@0.41.1
+
 ## 0.40.1
 
 ### Patch Changes

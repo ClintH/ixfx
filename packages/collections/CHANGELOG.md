@@ -1,5 +1,19 @@
 # @ixfxfun/collections
 
+## 0.42.0
+
+### Minor Changes
+
+- Colour interpolation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/guards@0.40.0
+  - @ixfx/core@0.42.0
+  - @ixfx/iterables@0.39.2
+  - @ixfx/arrays@0.41.1
+
 ## 0.41.0
 
 ### Minor Changes

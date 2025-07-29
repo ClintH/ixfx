@@ -153,7 +153,7 @@ export const setFromCssVariables = (context: HTMLElement | string, ...options: C
         if (isHtmlElement(el)) {
           el.setAttribute(opt.attribute, v);
         } else {
-          throw new Error(`Trying to set an attribute on something not a HTML element`, el);
+          throw new Error(`Trying to set an attribute on something not a HTML element`, { cause: el });
         }
       }
     } else if (opt.field) {
@@ -161,7 +161,7 @@ export const setFromCssVariables = (context: HTMLElement | string, ...options: C
         if (typeof el === `object`) {
           (el)[ opt.field ] = v;
         } else {
-          throw new Error(`Trying to set field on something that is not an object (${ typeof el })`, el);
+          throw new Error(`Trying to set field on something that is not an object (${ typeof el })`, { cause: el });
         }
       }
     } else {
@@ -247,6 +247,7 @@ export function getCssVariable(cssVariable: string, fallbackValue: string): stri
  * @param variables 
  * @param stylesOrEl 
  */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function setCssVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {
   const styles = stylesOrEl === undefined ? document.body.style :
     isHtmlElement(stylesOrEl) ? stylesOrEl.style : stylesOrEl;

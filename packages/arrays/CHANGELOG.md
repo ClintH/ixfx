@@ -1,5 +1,12 @@
 # @ixfx/arrays
 
+## 0.41.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/guards@0.40.0
+
 ## 0.41.0
 
 ### Minor Changes
