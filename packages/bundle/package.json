@@ -1,5 +1,5 @@
 {
-	"name": "@ixfx/io",
+	"name": "@ixfx/bundle",
 	"version": "0.40.3",
 	"license": "MIT",
 	"type": "module",
@@ -17,28 +17,24 @@
 		"@ixfx/flow": "workspace:^",
 		"@ixfx/geometry": "workspace:^",
 		"@ixfx/guards": "workspace:^",
+		"@ixfx/io": "workspace:^",
+		"@ixfx/iterables": "workspace:^",
+		"@ixfx/modulation": "workspace:^",
 		"@ixfx/numbers": "workspace:^",
+		"@ixfx/process": "workspace:^",
 		"@ixfx/random": "workspace:^",
+		"@ixfx/rx": "workspace:^",
 		"@ixfx/trackers": "workspace:^",
-		"@ixfx/visual": "workspace:^"
-	},
-	"devDependencies": {
-		"@types/dom-serial": "latest",
+		"@ixfx/ui": "workspace:^",
+		"@ixfx/visual": "workspace:^",
+		"@types/w3c-web-serial": "1.0.8",
 		"@types/web-bluetooth": "0.0.21"
 	},
+	"main": "dist/index.js",
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
-			"import": "./src/index.ts"
-		}
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": {
-				"types": "./dist/src/index.d.ts",
-				"import": "./dist/src/index.js"
-			}
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
 		}
 	}
 }

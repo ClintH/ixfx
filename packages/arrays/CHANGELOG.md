@@ -1,5 +1,11 @@
 # @ixfx/arrays
 
+## 0.42.0
+
+### Minor Changes
+
+- Exporting
+
 ## 0.41.1
 
 ### Patch Changes

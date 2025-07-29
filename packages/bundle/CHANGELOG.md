@@ -1,16 +1,21 @@
-# @ixfxfun/debug
+# @ixfx/bundle
 
 ## 0.40.3
 
 ### Patch Changes
 
 - Updated dependencies
+  - @ixfx/modulation@0.42.0
   - @ixfx/arrays@0.42.0
   - @ixfx/visual@0.41.0
+  - @ixfx/rx@0.40.1
   - @ixfx/collections@0.42.1
   - @ixfx/flow@0.40.3
   - @ixfx/geometry@0.39.3
+  - @ixfx/io@0.40.3
+  - @ixfx/iterables@0.39.3
   - @ixfx/numbers@0.40.1
+  - @ixfx/ui@0.40.1
 
 ## 0.40.2
 
@@ -18,13 +23,18 @@
 
 - Updated dependencies
   - @ixfx/collections@0.42.0
+  - @ixfx/modulation@0.41.0
   - @ixfx/numbers@0.40.0
   - @ixfx/guards@0.40.0
   - @ixfx/visual@0.40.0
   - @ixfx/core@0.42.0
   - @ixfx/dom@0.41.0
+  - @ixfx/rx@0.40.0
+  - @ixfx/ui@0.40.0
   - @ixfx/flow@0.40.2
   - @ixfx/geometry@0.39.2
+  - @ixfx/io@0.40.2
+  - @ixfx/iterables@0.39.2
   - @ixfx/trackers@0.37.2
   - @ixfx/arrays@0.41.1
   - @ixfx/random@0.41.1
@@ -35,13 +45,18 @@
 
 - Updated dependencies
   - @ixfx/collections@0.41.0
+  - @ixfx/modulation@0.40.0
   - @ixfx/arrays@0.41.0
   - @ixfx/random@0.41.0
   - @ixfx/core@0.41.0
   - @ixfx/dom@0.40.1
   - @ixfx/flow@0.40.1
   - @ixfx/geometry@0.39.1
+  - @ixfx/io@0.40.1
+  - @ixfx/rx@0.39.1
+  - @ixfx/ui@0.39.1
   - @ixfx/visual@0.39.1
+  - @ixfx/iterables@0.39.1
   - @ixfx/numbers@0.39.1
   - @ixfx/trackers@0.37.1
 
@@ -63,65 +78,13 @@
   - @ixfx/flow@0.40.0
   - @ixfx/geometry@0.39.0
   - @ixfx/guards@0.39.0
+  - @ixfx/io@0.40.0
+  - @ixfx/iterables@0.39.0
+  - @ixfx/modulation@0.39.0
   - @ixfx/numbers@0.39.0
+  - @ixfx/process@0.40.0
   - @ixfx/random@0.40.0
+  - @ixfx/rx@0.39.0
   - @ixfx/trackers@0.37.0
+  - @ixfx/ui@0.39.0
   - @ixfx/visual@0.39.0
-
-## 0.39.0
-
-### Minor Changes
-
-- Documentation
-
-### Patch Changes
-
-- Updated dependencies
-  - @ixfx/collections@0.39.0
-  - @ixfx/arrays@0.39.0
-  - @ixfx/events@0.39.0
-  - @ixfx/random@0.39.0
-  - @ixfx/debug@0.39.0
-  - @ixfx/core@0.39.0
-  - @ixfx/flow@0.39.0
-  - @ixfx/dom@0.39.0
-  - @ixfx/geometry@0.38.1
-  - @ixfx/visual@0.38.1
-  - @ixfx/numbers@0.38.1
-  - @ixfx/trackers@0.36.1
-
-## 0.38.0
-
-### Minor Changes
-
-- asdf
-
-### Patch Changes
-
-- Updated dependencies
-- Updated dependencies
-  - @ixfx/arrays@0.38.0
-  - @ixfx/collections@0.38.0
-  - @ixfx/core@0.38.0
-  - @ixfx/debug@0.38.0
-  - @ixfx/dom@0.38.0
-  - @ixfx/events@0.38.0
-  - @ixfx/flow@0.38.0
-  - @ixfx/geometry@0.38.0
-  - @ixfx/guards@0.38.0
-  - @ixfx/numbers@0.38.0
-  - @ixfx/random@0.38.0
-  - @ixfx/trackers@0.36.0
-  - @ixfx/visual@0.38.0
-
-## 0.37.0
-
-### Minor Changes
-
-- test2
-
-## 0.36.0
-
-### Minor Changes
-
-- test

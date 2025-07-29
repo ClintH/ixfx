@@ -11,9 +11,10 @@
     "readme": true,
     "document": true
   },
+  "githubPages": true,
   "cleanOutputDir": true,
   "useFirstParagraphOfCommentAsSummary": true,
-  "router": "structure",
+  "router": "structure-dir",
   "excludePrivate": true,
   "excludeInternal": true,
   "validation": {

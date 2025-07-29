@@ -37,6 +37,9 @@
 			"path": "packages/collections"
 		},
 		{
+			"path": "packages/bundle"
+		},
+		{
 			"path": "packages/core"
 		},
 		{

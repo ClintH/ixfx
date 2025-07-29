@@ -1,4 +1,3 @@
-export * as Modulation from './envelope/index.js';
 export * as Sources from './source/index.js';
 export * as Oscillators from './oscillator.js';
 export * as Easings from './easing/index.js'

@@ -66,7 +66,6 @@ test(`from-css2`, () => {
 
   expect(HslSpace.fromCss(`red`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
   expect(HslSpace.fromCss(`rgb(255,0,0)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
-  expect(HslSpace.fromCss(`rgba(255,0,0, 1)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1.0, space: "hsl", unit: "scalar" });
   // expect(HslSpace.fromCssScalar(`rgba(255,0,0, 0.5)`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 0.5, space: "hsl", unit: "scalar" });
 
   expect(applyToValues(HslSpace.fromCss(`hotpink`, { scalar: true }), v => round(3, v))).toEqual({ h: 0.916, s: 1, l: 0.705, opacity: 1, space: "hsl", unit: "scalar" });

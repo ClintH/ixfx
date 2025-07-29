@@ -13,6 +13,8 @@ import { join } from "node:path";
  */
 const f = await readdir("./packages", { recursive: true, withFileTypes: true });
 
+const skipPackages = [ `packages/bundle` ];
+
 const stripPublishConfig = process.argv[ 2 ] === 'strip';
 const addPublishConfig = process.argv[ 2 ] === 'add';
 const dryRun = false;
@@ -69,7 +71,7 @@ const checkChunk = (chunk: ExportChunk) => {
     if (!chunk.import.endsWith(`.js`)) throw new Error(`Import path starts with ./dist/src/ but does not end in '.js'. Input: ${ chunk.import }`);
     return `real`
   }
-  throw new Error(`Unknown format`)
+  throw new Error(`Unknown format: ${ JSON.stringify(chunk) }`);
 }
 
 /**
@@ -139,6 +141,10 @@ const makeChunkFake = (chunk: ExportChunk): ExportChunk => {
 for (const file of f) {
   if (file.name === `package.json`) {
     const relativePath = join(file.parentPath, file.name);
+    if (skipPackages.includes(file.parentPath)) {
+      console.log(`Path: ${ file.parentPath } (skipped)`);
+      continue;
+    }
     console.log(`Path: ${ file.parentPath }`);
     let data = JSON.parse(await readFile(relativePath, { encoding: "utf8" }));
 

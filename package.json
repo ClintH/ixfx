@@ -11,9 +11,10 @@
 		"docs": "typedoc",
 		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
 		"pkg-add": "node --experimental-strip-types package-rewrite.ts add",
-		"bundle-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./bundle/**/* ../demos/ixfx",
-		"bundle-basic": "pnpm run pkg-strip && tsdown -d ./bundle && pnpm run pkg-add",
-		"bundle": "pnpm run bundle-basic && pnpm run bundle-copy"
+		"offline-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./offline/**/* ../demos/ixfx",
+		"offline-basic": "pnpm run pkg-strip && tsdown --config tsdown.bundle.ts && tsdown --config tsdown.build.ts -d ./offline && pnpm run pkg-add",
+		"bundle-core-test": "pnpm run pkg-strip && tsdown --config tsdown.bundle.ts && pnpm run pkg-add",
+		"offline": "pnpm run offline-basic && pnpm run offline-copy"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.5",
