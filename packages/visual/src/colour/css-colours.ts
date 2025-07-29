@@ -1,5 +1,6 @@
 import * as SrgbSpace from "./srgb.js";
 import * as HslSpace from './hsl.js';
+import * as OklchSpace from './oklch.js';
 import type { Colour } from "./types.js";
 
 /**
@@ -19,11 +20,11 @@ import type { Colour } from "./types.js";
  */
 export const fromCssColour = (colour: string): Colour => {
   if (colour.startsWith(`#`)) {
-    return SrgbSpace.fromHexString(colour);
+    return SrgbSpace.fromHexString(colour, true);
   }
 
   if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
-    return SrgbSpace.fromHexString(cssDefinedHexColours[ colour ] as string);
+    return SrgbSpace.fromHexString(cssDefinedHexColours[ colour ] as string, true);
   }
   if (colour.startsWith(`--`)) {
     const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
@@ -31,14 +32,17 @@ export const fromCssColour = (colour: string): Colour => {
     return fromCssColour(fromCss);
   }
   colour = colour.toLowerCase();
-  if (colour.startsWith(`hsl(`) || colour.startsWith(`hsla(`)) {
-    return HslSpace.fromCssAbsolute(colour);
+  if (colour.startsWith(`hsl(`)) {
+    return HslSpace.fromCss(colour, { scalar: true });
   }
-  if (colour.startsWith(`rgb(`) || colour.startsWith(`rgba(`)) {
-    return SrgbSpace.fromCss8bit(colour);
+  if (colour.startsWith(`rgb(`)) {
+    return SrgbSpace.fromCss(colour, { scalar: true });
+  }
+  if (colour.startsWith(`oklch(`)) {
+    return OklchSpace.fromCss(colour, { scalar: true });
   }
 
-  throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour name: '${ colour }'`);
+  throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour. Input: '${ colour }'`);
 }
 
 export const cssDefinedHexColours = {

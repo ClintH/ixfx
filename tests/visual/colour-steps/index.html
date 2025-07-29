@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>colour-steps</title>
+</head>
+
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      display:flex;
+    }
+
+    canvas,#gradient {
+      border: 2px solid whitesmoke;
+    }
+
+    #gradient {
+      display: inline-block;
+      height: 100px;
+      width: 400px;
+    }
+    
+    div {
+      display:inline-block;
+    }
+  </style>
+  <div>
+    <h1>HSL</h1>
+    <div>
+      <h2>Steps</h2>
+      <h3>Longer</h3>
+      <canvas id="hsl-steps-longer" width="400" height="100"></canvas>
+      <h3>Shorter</h3>
+      <canvas id="hsl-steps-shorter" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>Scale</h2>
+      <h3>Longer</h3>
+      <canvas id="hsl-scale-longer" width="400" height="100"></canvas>
+      <h3>Shorter</h3>
+      <canvas id="hsl-scale-shorter" width="400" height="100"></canvas>
+    </div>
+  </div>
+    <div>
+    <h1>OkLch</h1>
+    <div>
+      <h2>Steps</h2>
+      <h3>Longer</h3>
+      <canvas id="oklch-steps-longer" width="400" height="100"></canvas>
+      <h3>Shorter</h3>
+      <canvas id="oklch-steps-shorter" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>Scale</h2>
+      <h3>Longer</h3>
+      <canvas id="oklch-scale-longer" width="400" height="100"></canvas>
+      <h3>Shorter</h3>
+      <canvas id="oklch-scale-shorter" width="400" height="100"></canvas>
+    </div>
+  </div>
+
+
+      <div>
+    <h1>Srgb</h1>
+    <div>
+      <h2>Steps</h2>
+      <h3>Longer</h3>
+      <canvas id="srgb-steps-longer" width="400" height="100"></canvas>
+      <h3>Shorter</h3>
+      <canvas id="srgb-steps-shorter" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>Scale</h2>
+      <h3>Longer</h3>
+      <canvas id="srgb-scale-longer" width="400" height="100"></canvas>
+      <h3>Shorter</h3>
+      <canvas id="srgb-scale-shorter" width="400" height="100"></canvas>
+    </div>
+  </div>
+  <script type="module"  src="script.js"></script>
+</body>
+
+</html>

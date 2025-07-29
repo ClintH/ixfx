@@ -17,6 +17,7 @@ import * as Video from './video.js';
 
 //export * from '../../dom/src/CanvasRegion.js';
 
+export * as Drawing from './drawing.js';
 
 /**
  * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link @ixfx/geometry.Grid} type.

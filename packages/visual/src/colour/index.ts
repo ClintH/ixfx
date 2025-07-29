@@ -4,9 +4,9 @@ export * from './generate.js';
 
 //export * from './interpolate.js';
 export * from './math.js';
-
+export * from './interpolate.js';
 export * as HslSpace from './hsl.js';
 export * as OklchSpace from './oklch.js';
 export * as SrgbSpace from './srgb.js';
 
-export type * from './types.js';
+export * from './types.js';

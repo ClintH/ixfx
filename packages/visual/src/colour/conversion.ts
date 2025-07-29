@@ -1,20 +1,79 @@
-import * as C from "colorizr";
-import { isColourish, isHsl, isRgb, tryParseObjectToHsl, tryParseObjectToRgb, type Colour, type Colourish } from "./types.js";
-import * as  SrgbSpace from "./srgb.js";
+import Colorizr, * as C from "colorizr";
+import { type Colour, type Colourish, type ColourSpaces, type Hsl, type HslAbsolute, type HslScalar, type OkLch, type OkLchAbsolute, type OkLchScalar, type Rgb, type Rgb8Bit, type RgbScalar } from "./types.js";
+import * as SrgbSpace from "./srgb.js";
 import * as HslSpace from './hsl.js';
+import * as OkLchSpace from './oklch.js';
 import { fromCssColour } from "./css-colours.js";
+import { isHsl, isRgb, tryParseObjectToRgb, tryParseObjectToHsl, isColourish, isLch } from "./guards.js";
+import { OklchSpace } from "./index.js";
 
+export type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;
 
-export const toCssColour = (colour: any): string => {
+export function convert<T extends ConvertDestinations>(colour: Colourish, destination: T):
+  T extends "oklch-absolute" ? OkLchAbsolute :
+  T extends "oklch-scalar" ? OkLchScalar :
+  T extends "srgb-8bit" ? Rgb8Bit :
+  T extends "srgb-scalar" ? RgbScalar :
+  T extends "hsl-scalar" ? HslScalar :
+  T extends "hsl-absolute" ? HslAbsolute : never
+
+export function convert(colour: Colourish, destination: ConvertDestinations): Hsl | OkLch | Rgb {
+  if (destination === `hsl-scalar`) {
+    if (typeof colour === `string` || isHsl(colour)) {
+      return HslSpace.toScalar(colour);
+    }
+  } else if (destination === `hsl-absolute`) {
+    if (typeof colour === `string` || isHsl(colour)) {
+      return HslSpace.toAbsolute(colour);
+    }
+  } else if (destination === `oklch-scalar`) {
+    if (typeof colour === `string` || isLch(colour)) {
+      return OkLchSpace.toScalar(colour);
+    }
+  } else if (destination === `oklch-absolute`) {
+    if (typeof colour === `string` || isLch(colour)) {
+      return OkLchSpace.toAbsolute(colour);
+    }
+  } else if (destination === `srgb-8bit`) {
+    if (typeof colour === `string` || isRgb(colour)) {
+      return SrgbSpace.to8bit(colour);
+    }
+  } else if (destination === `srgb-scalar`) {
+    if (typeof colour === `string` || isRgb(colour)) {
+      return SrgbSpace.toScalar(colour);
+    }
+  } else {
+    throw new Error(`Destination '${ destination }' not supported for input: ${ JSON.stringify(colour) }`);
+  }
+  return convert(toCssColour(colour), destination);
+}
+
+export function convertScalar<T extends ColourSpaces>(colour: Colourish, destination: T):
+  T extends "oklch" ? OkLchScalar :
+  T extends "hsl" ? HslScalar :
+  T extends "srgb" ? RgbScalar : never
+
+export function convertScalar(colour: Colourish, destination: ColourSpaces): HslScalar | OkLchScalar | RgbScalar {
+  if (destination === `oklch`) return convert(colour, `oklch-scalar`);
+  if (destination === `srgb`) return convert(colour, `srgb-scalar`);
+  if (destination === `hsl`) return convert(colour, `hsl-scalar`);
+  throw new Error(`Unknown destination: '${ destination }'`);
+}
+
+export const toCssColour = (colour: Colourish | object): string => {
   if (typeof colour === `string`) return colour;
 
   if (isHsl(colour)) {
     return HslSpace.toCssString(colour);
   }
+
   if (isRgb(colour)) {
     return SrgbSpace.toCssString(colour);
   }
 
+  if (isLch(colour)) {
+    return OklchSpace.toCssString(colour);
+  }
   const asRgb = tryParseObjectToRgb(colour);
   if (asRgb) return SrgbSpace.toCssString(asRgb);
 
@@ -22,12 +81,14 @@ export const toCssColour = (colour: any): string => {
   if (asHsl) return HslSpace.toCssString(asHsl);
 
   throw new Error(`Unknown colour format: '${ JSON.stringify(colour) }'`);
-
 }
 
+export const toLibraryColour = (colour: Colourish): Colorizr => {
+  const asCss = toCssColour(colour);
+  return new Colorizr(asCss);
+}
 
-
-export const convert = (colour: string, destination: 'hex' | 'hsl' | 'oklab' | 'oklch' | 'srgb' | `rgb`): string => {
+export const convertColourString = (colour: string, destination: 'hex' | 'hsl' | 'oklab' | 'oklch' | 'srgb' | `rgb`): string => {
   if (destination === `srgb`) destination = `rgb`;
   return C.convert(colour, destination);
 }
@@ -84,4 +145,59 @@ export const toStringFirst = (...colours: (Colourish | undefined)[]): string => 
     } catch { /* empty */ }
   }
   return `rebeccapurple`;
+}
+
+
+export function rgbToHsl(rgb: Rgb, scalarResult: true): HslScalar
+export function rgbToHsl(rgb: Rgb, scalarResult: false): HslAbsolute
+export function rgbToHsl(rgb: Rgb, scalarResult: boolean): Hsl {
+  // Needed because the Colorizr package has broken RGB to HSL
+  // Converts rgb { model: 'rgb', r: 40, g: 20, b: 60, alpha: undefined }
+  // to : { h: 270, s: 50, l: 0.06 }
+  // when it should be: { h: 270, s: 50, l: 40 }
+
+  // Source: https://www.jameslmilner.com/posts/converting-rgb-hex-hsl-colors/
+  let { r, g, b } = rgb;
+  const opacity = rgb.opacity ?? 1;
+  if (rgb.unit === `8bit`) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+  }
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+
+  let h = (max + min) / 2;
+  let s = h;
+  const l = h;
+
+  if (max === min) {
+    // Achromatic
+    if (scalarResult) {
+      return HslSpace.scalar(0, 0, 0, opacity);
+    } else {
+      return HslSpace.absolute(0, 0, 0, opacity);
+    }
+  }
+
+  const d = max - min;
+  s = l >= 0.5 ? d / (2 - (max + min)) : d / (max + min);
+  switch (max) {
+    case r:
+      h = ((g - b) / d + 0) * 60;
+      break;
+    case g:
+      h = ((b - r) / d + 2) * 60;
+      break;
+    case b:
+      h = ((r - g) / d + 4) * 60;
+      break;
+  }
+
+  if (scalarResult) {
+    return HslSpace.scalar(h / 360, s, l, opacity)
+  } else {
+    return HslSpace.absolute(h, s * 100, l * 100, opacity);
+  }
 }

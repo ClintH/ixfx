@@ -1,5 +1,24 @@
 # @ixfxfun/visual
 
+## 0.40.0
+
+### Minor Changes
+
+- Colour interpolation
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.42.0
+  - @ixfx/numbers@0.40.0
+  - @ixfx/guards@0.40.0
+  - @ixfx/core@0.42.0
+  - @ixfx/dom@0.41.0
+  - @ixfx/flow@0.40.2
+  - @ixfx/geometry@0.39.2
+  - @ixfx/arrays@0.41.1
+  - @ixfx/random@0.41.1
+
 ## 0.39.1
 
 ### Patch Changes

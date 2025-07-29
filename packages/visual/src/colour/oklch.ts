@@ -1,94 +1,107 @@
-//import type { ColorConstructor } from "./colorjs.types.js";
-import type { Colourish, OkLch, OkLchAbsolute, OkLchScalar, ParsingOptions } from "./types.js";
-import { numberInclusiveRangeTest, numberTest, resultThrow, throwIfFailed } from "@ixfx/guards";
-import * as C from "colorizr";
+import type { OkLch, OkLchAbsolute, OkLchScalar, ParsingOptions } from "./types.js";
+import { numberInclusiveRangeTest, percentTest, resultThrow } from "@ixfx/guards";
+import Colorizr, * as C from "colorizr";
 import { cssDefinedHexColours } from "./css-colours.js";
 import { angleConvert, angleParse, type Angle } from "@ixfx/geometry";
+import { calculateHueDistance, wrapScalarHue } from "./utility.js";
+import { clamp, interpolate } from "@ixfx/numbers";
+import { parseCssRgbFunction, to8bit as rgbTo8bit } from "./srgb.js";
 
-// const oklchGuard = (lch: OkLch) => {
-//   switch (lch.unit) {
-//     case `scalar`:
-//       throwIfFailed(
-//         numberTest(lch.l, `percentage`, `lch.l`),
-//         numberTest(lch.c, `percentage`, `lch.c`),
-//         numberTest(lch.h, `percentage`, `lch.h`),
-//         numberTest(lch.opacity, `percentage`, `lch.opacity`)
-//       );
-//       break;
-//     case `absolute`:
-//       throwIfFailed(
-//         numberTest(lch.l, `percentage`, `lch.l`),
-//         numberTest(lch.c, `percentage`, `lch.c`),
-//         numberTest(lch.opacity, `percentage`, `lch.opacity`)
-//       );
-//       break;
-//     default:
-//       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//       // @ts-expect-error
-//       throw new Error(`Unknown unit: ${ lch.unit }`);
-//   }
-// }
+export const OKLCH_CHROMA_MAX = 0.4;
 
 export const guard = (lch: OkLch) => {
   const { l, c, h, opacity, space, unit } = lch;
   if (space !== `oklch`) throw new Error(`Space is expected to be 'oklch'. Got: ${ space }`);
+
   if (unit === `absolute`) {
     resultThrow(
-      numberTest(l, `percentage`, `l`),
-      numberTest(c, `percentage`, `c`),
-      numberTest(h, `percentage`, `h`),
+      percentTest(l, `l`),
       () => {
-        if (typeof opacity === `number`) {
-          return numberInclusiveRangeTest(opacity, 0, 100, `opacity`);
+        if (typeof c === `number`) {
+          return numberInclusiveRangeTest(c, 0, OKLCH_CHROMA_MAX, `c`);
         }
-      });
+      },
+      () => {
+        if (typeof h === `number`) {
+          return numberInclusiveRangeTest(c, 0, 360, `h`);
+        }
+      },
+      percentTest((opacity ?? 1), `opacity`)
+    );
   } else if (unit === `scalar`) {
+    // Percentage values for L,C,H
     resultThrow(
-      numberTest(l, `percentage`, `l`),
-      numberTest(c, `percentage`, `c`),
-      numberTest(h, `percentage`, `h`),
-      () => {
-        if (typeof opacity === `number`) {
-          return numberTest(opacity, `percentage`, `opacity`);
-        }
-      });
+      percentTest(l, `l`),
+      percentTest(c, `c`),
+      percentTest(h, `h`),
+      percentTest((lch.opacity ?? 1), `opacity`)
+    );
   } else {
     throw new Error(`Unit is expected to be 'absolute' or 'scalar'. Got: ${ unit }`);
   }
 }
 
-const fromLibrary = (lch: C.LCH, parsingOptions: ParsingOptions<OkLchAbsolute> = {}): OkLchAbsolute => {
+export function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, options: T): T extends { scalar: true } ? OkLchScalar : OkLchAbsolute;
+
+/**
+ * Coverts from the Colorizr library
+ * Tests ranges:
+ * * l: 0..1
+ * * c: 0..1
+ * * h: 0..360
+ * * alpha: 0..1
+ * 
+ * Default option: { scalar: true }
+ * @param lch 
+ * @param parsingOptions 
+ * @returns 
+ */
+export function fromLibrary(lch: C.LCH, parsingOptions: ParsingOptions<OkLch> = {}): OkLch {
   if (typeof lch === `undefined` || lch === null) {
     if (parsingOptions.fallbackColour) return parsingOptions.fallbackColour;
   }
+
+  const scalarReturn = parsingOptions.scalar ?? true;
+
+  // Validate
   resultThrow(
-    numberInclusiveRangeTest(lch.l, 0, 360, `l`),
-    numberInclusiveRangeTest(lch.c, 0, 100, `c`),
-    numberInclusiveRangeTest(lch.h, 0, 100, `h`),
-    () => lch.alpha !== undefined ? numberInclusiveRangeTest(lch.alpha, 0, 100, `alpha`) : { success: true, value: lch },
+    percentTest(lch.l, `l`),
+    percentTest(lch.c, `c`),
+    numberInclusiveRangeTest(lch.h, 0, 360, `h`),
+    percentTest((lch.alpha ?? 1), `alpha`)
   );
-  return {
-    l: lch.l,
-    c: lch.c,
-    h: lch.h,
-    opacity: (lch.alpha ?? 1) * 100,
-    unit: `absolute`,
-    space: `oklch`
+
+  if (scalarReturn) {
+    return scalar(lch.l, lch.c / OKLCH_CHROMA_MAX, lch.h / 360, (lch.alpha ?? 1));
+  } else {
+    return absolute(lch.l, lch.c, lch.h, (lch.alpha ?? 1));
   }
+
 }
-export const fromHexString = (hexString: string): OkLchAbsolute => fromLibrary(C.hex2oklch(hexString))
+
+export const fromHexString = (hexString: string, options: ParsingOptions<OkLch> = {}): OkLch => {
+  return fromLibrary(C.hex2oklch(hexString), options);
+}
+
 const oklchTransparent: OkLchAbsolute = Object.freeze({
   l: 0, c: 0, h: 0, opacity: 0, unit: `absolute`, space: `oklch`
 });
 
-export const fromCssAbsolute = (value: string, options: ParsingOptions<OkLchAbsolute> = {}): OkLchAbsolute => {
+export function fromCss<T extends ParsingOptions<OkLch>>(value: string, options: T): T extends { scalar: true } ? OkLchScalar : OkLchAbsolute;
+export function fromCss(value: string, options: ParsingOptions<OkLch> = {}): OkLch {
   value = value.toLowerCase();
   if (value.startsWith(`#`)) {
-    return fromHexString(value);
+    return fromHexString(value, options);
   }
   if (value === `transparent`) return oklchTransparent;
   if (typeof cssDefinedHexColours[ value ] !== `undefined`) {
-    return fromHexString(cssDefinedHexColours[ value ] as string);
+    return fromHexString(cssDefinedHexColours[ value ] as string, options);
+  }
+
+  if (value.startsWith(`rgb(`)) {
+    const rgb = rgbTo8bit(parseCssRgbFunction(value));
+    const lch = C.rgb2oklch({ r: rgb.r, g: rgb.g, b: rgb.b });
+    return fromLibrary(lch, options);
   }
 
   if (!value.startsWith(`hsl(`) && !value.startsWith(`oklch(`)) {
@@ -103,24 +116,63 @@ export const fromCssAbsolute = (value: string, options: ParsingOptions<OkLchAbso
       }
     }
   }
-  const c = C.extractColorParts(value);
-  if (c.model !== `oklch`) {
-    if (options.fallbackColour) return options.fallbackColour;
-    throw new Error(`Expecting OKLCH colour space. Got: ${ c.model }`);
-  }
-  return fromLibrary(c as any as C.LCH, options);
+  const cc = new Colorizr(value);
+  const lch = cc.oklch;
+  return fromLibrary(lch, options);
+  // const c = C.extractColorParts(value);
+  // if (c.model !== `oklch`) {
+  //   if (options.fallbackColour) return options.fallbackColour;
+  //   throw new Error(`Expecting OKLCH colour space. Got: ${ c.model }`);
+  // }
+  // return fromLibrary(c as any as C.LCH, options);
 }
 
-export const fromCssScalar = (value: string, options: ParsingOptions<OkLchAbsolute> = {}): OkLchScalar => toScalar(fromCssAbsolute(value, options));
+//export const fromCssScalar = (value: string, options: ParsingOptions<OkLchAbsolute> = {}): OkLchScalar => toScalar(fromCssAbsolute(value, options));
 
-export const toScalar = (lch: OkLch): OkLchScalar => {
-  guard(lch);
-  if (lch.unit === `scalar`) return lch;
+/**
+ * Returns a string or {@link OkLch} value to absolute form.
+ * 
+ * This means ranges are:
+ * * lightness: 0..1
+ * * chroma: 0...CHROMA_MAX (0.4)
+ * * hue: 0..360
+ * @param lchOrString 
+ * @returns 
+ */
+export const toAbsolute = (lchOrString: OkLch | string): OkLchAbsolute => {
+  if (typeof lchOrString === `string`) {
+    return toAbsolute(fromCss(lchOrString, { scalar: true }));
+  }
+  guard(lchOrString);
+  if (lchOrString.unit === `absolute`) return lchOrString;
   return {
-    l: lch.l / 360,
-    c: lch.c / 100,
-    h: lch.h / 100,
-    opacity: (lch.opacity ?? 1) / 100,
+    space: `oklch`,
+    unit: `absolute`,
+    l: lchOrString.l,
+    c: lchOrString.c * OKLCH_CHROMA_MAX,
+    h: lchOrString.h * 360,
+    opacity: lchOrString.opacity
+  }
+}
+
+
+export const toScalar = (lchOrString: OkLch | string): OkLchScalar => {
+  if (typeof lchOrString === `string`) {
+    return toScalar(fromCss(lchOrString, { scalar: true }));
+  }
+  const lch = lchOrString;
+  guard(lch);
+
+  //console.log(`toScalar input: ${ JSON.stringify(lchOrString) } lch: `, lch);
+  // Already relative
+  if (lch.unit === `scalar`) return lch;
+
+  // Absolute values
+  return {
+    l: lch.l, // unchanged
+    c: lch.c / OKLCH_CHROMA_MAX,
+    h: lch.h / 360,
+    opacity: (lch.opacity ?? 1),
     unit: `scalar`,
     space: `oklch`
   }
@@ -146,28 +198,28 @@ const toLibrary = (lch: OkLch): C.LCH => {
 //   }
 // }
 
-export const toAbsolute = (lch: OkLch): OkLchAbsolute => {
-  if (lch.unit === `absolute`) return lch;
-  return {
-    space: `oklch`,
-    unit: `absolute`,
-    l: lch.l * 100,
-    c: lch.c * 100,
-    h: lch.h * 360,
-    opacity: lch.opacity
-  }
-}
 
-export const toCssString = (lch: OkLch): string => {
+/**
+ * Returns the colour as a CSS colour string: `oklch(l c h / opacity)`.
+ *
+ * @param lch Colour
+ * @param precision Set precision of numbers, defaults to 3 
+ * @returns CSS colour string
+ */
+export const toCssString = (lch: OkLch, precision = 3): string => {
   guard(lch);
   const { l, c, h, opacity } = lch;
   let css = ``;
   switch (lch.unit) {
     case `absolute`:
-      css = `lch(${ l }% ${ c }% ${ h })`
+      css = `oklch(${ (l * 100).toFixed(precision) }% ${ c.toFixed(precision) } ${ h.toFixed(precision) }`
+      break;
+    case `scalar`:
+      css = `oklch(${ l.toFixed(precision) } ${ (c * OKLCH_CHROMA_MAX).toFixed(precision) } ${ (h * 360).toFixed(precision) }`
+      break;
   }
-  if (typeof opacity !== `undefined`) {
-    css += ` / ${ opacity }`;
+  if (typeof opacity !== `undefined` && opacity !== 1) {
+    css += ` / ${ opacity.toFixed(precision) }`;
   }
   css += `)`;
   return css;
@@ -260,4 +312,89 @@ export const generateScalar = (absoluteHslOrVariable: string | number | Angle, c
     unit: `scalar`,
     space: `oklch`
   }
+}
+
+/**
+ * Scales the opacity value of an input Oklch value
+ * ```js
+ * withOpacity()
+ * ```
+ * @param value 
+ * @param fn 
+ * @returns 
+ */
+export const withOpacity = <T extends OkLch>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
+  switch (value.unit) {
+    case `absolute`:
+      return {
+        ...value,
+        opacity: fn((value.opacity ?? 100) / 100, value) * 100
+      }
+    case `scalar`:
+      return {
+        ...value,
+        opacity: fn((value.opacity ?? 1), value)
+      }
+  }
+}
+
+export const interpolator = (a: OkLch | string, b: OkLch | string, direction: `longer` | `shorter` = `shorter`) => {
+  a = toScalar(a);
+  b = toScalar(b);
+  //console.log(`a`, a);
+  //console.log(`b`, b);
+
+  const aOpacity = a.opacity ?? 1;
+  const distanceCalc = calculateHueDistance(a.h, b.h, 1);
+  const hueDistance = direction === `longer` ? distanceCalc.long : distanceCalc.short;
+  const chromaDistance = b.c - a.c;
+  const lightDistance = b.l - a.l;
+  const opacityDistance = (b.opacity ?? 1) - aOpacity;
+  //console.log(`distanceCalc`, distanceCalc);
+  //console.log(`interpolator distances: hue: ${ hueDistance } c: ${ chromaDistance } light: ${ lightDistance } opacity: ${ opacityDistance }`);
+
+  return (amount: number): OkLchScalar => {
+    amount = clamp(amount);
+    let h = interpolate(amount, 0, Math.abs(hueDistance));
+    if (hueDistance < 0) h = a.h - h;
+    else h = a.h + h;
+
+    const c = interpolate(amount, 0, chromaDistance);
+    const l = interpolate(amount, 0, lightDistance);
+    const o = interpolate(amount, 0, opacityDistance);
+    //console.log(`amount: ${ amount } h: ${ h } s: ${ s } l: ${ l } o: ${ o }`);
+    return scalar(l + a.l, c + a.c, wrapScalarHue(h), o + aOpacity);
+  }
+}
+
+export function scalar(lightness = 0.7, chroma = 0.1, hue = 0.5, opacity = 1): OkLchScalar {
+  const lch: OkLchScalar = {
+    unit: `scalar`,
+    space: `oklch`,
+    l: lightness,
+    c: chroma,
+    h: hue,
+    opacity: opacity
+  }
+  guard(lch);
+  return lch;
+}
+
+/**
+ * Create an LCH colour using absolute hue
+ * @param l Lightness 0..1
+ * @param c Chroma 0..4
+ * @param h Hue 0..360
+ * @param opacity 
+ * @returns 
+ */
+export const absolute = (l: number, c: number, h: number, opacity = 1): OkLchAbsolute => {
+  const lch: OkLchAbsolute = {
+    space: `oklch`,
+    unit: `absolute`,
+    opacity,
+    l, c, h
+  };
+  guard(lch);
+  return lch;
 }

@@ -1,27 +1,28 @@
+/* eslint-disable no-loss-of-precision */
 import { test, expect, describe } from 'vitest';
 import { applyToValues, round } from '@ixfx/numbers';
 import * as Colour from '../src/colour/index.js';
 
 describe(`colour`, () => {
   test(`opacity`, () => {
-    expect(Colour.multiplyOpacity(`red`, 0.5)).toBe(`rgb(255 0 0 / 0.5)`);
+    expect(Colour.multiplyOpacity(`red`, 0.5)).toBe(`rgb(100% 0% 0% / 50%)`);
     expect(Colour.multiplyOpacity(`hsl(0,100%,50%)`, 0.5)).toBe(`hsl(0deg 100% 50% / 50%)`);
   });
 
   test(`special`, () => {
     expect(Colour.toCssColour(`transparent`)).toBe(`transparent`);
-    const hsl1 = Colour.HslSpace.fromCssScalar(`transparent`);
+    const hsl1 = Colour.HslSpace.fromCss(`transparent`, { scalar: true });
 
     expect(hsl1.opacity).toBe(0);
 
     expect(Colour.toCssColour(`white`)).toBe(`white`);
-    const hsl2a = Colour.HslSpace.fromCssScalar(`white`);
+    const hsl2a = Colour.HslSpace.fromCss(`white`, { scalar: true });
     expect(hsl2a.l).toBe(1);
 
     //expect(() => Colour.HslSpace.fromCss(`white`, false)).toThrow(); // disable safe
 
     expect(Colour.toCssColour(`black`)).toBe(`black`);
-    const hsl3 = Colour.HslSpace.fromCssScalar(`black`);
+    const hsl3 = Colour.HslSpace.fromCss(`black`, { scalar: true });
     expect(hsl3.l).toBe(0);
 
   });
@@ -33,18 +34,18 @@ describe(`colour`, () => {
 
     expect(Colour.fromCssColour(`hsl(100, 100%, 50%)`)).toEqual({ h: 100, s: 100, l: 50, opacity: 100, space: "hsl", unit: "absolute" });
 
-    expect(Colour.HslSpace.fromCssScalar(`red`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCssScalar(`rgb(255,0,0)`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCssScalar(`rgba(255,0,0, 1)`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1.0, space: "hsl", unit: "scalar" });
+    expect(Colour.HslSpace.fromCss(`red`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
+    expect(Colour.HslSpace.fromCss(`rgb(255,0,0)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
+    expect(Colour.HslSpace.fromCss(`rgba(255,0,0, 1)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1.0, space: "hsl", unit: "scalar" });
     // expect(Colour.HslSpace.fromCssScalar(`rgba(255,0,0, 0.5)`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 0.5, space: "hsl", unit: "scalar" });
 
-    expect(applyToValues(Colour.HslSpace.fromCssScalar(`hotpink`), v => round(3, v))).toEqual({ h: 0.916, s: 1, l: 0.705, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCssScalar(`rgb(255,105,180)`)).toEqual({ h: 0.916666666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCssScalar(`rgba(255,105,180,0.5)`)).toEqual({ h: 0.9166666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
+    expect(applyToValues(Colour.HslSpace.fromCss(`hotpink`, { scalar: true }), v => round(3, v))).toEqual({ h: 0.916, s: 1, l: 0.705, opacity: 1, space: "hsl", unit: "scalar" });
+    expect(Colour.HslSpace.fromCss(`rgb(255,105,180)`, { scalar: true })).toEqual({ h: 0.916666666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
+    expect(Colour.HslSpace.fromCss(`rgba(255,105,180,0.5)`, { scalar: true })).toEqual({ h: 0.9166666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
 
-    expect(Colour.HslSpace.fromCssScalar(`hsla(100, 100%, 50%, 0.2)`)).toEqual({ h: 0.2777777777777778, s: 1, l: 0.5, opacity: 0.2, space: "hsl", unit: "scalar" });
+    expect(Colour.HslSpace.fromCss(`hsla(100, 100%, 50%, 0.2)`, { scalar: true })).toEqual({ h: 0.2777777777777778, s: 1, l: 0.5, opacity: 0.2, space: "hsl", unit: "scalar" });
 
-    expect(Colour.SrgbSpace.fromCss8bit(`hsl(100,100%,50%)`)).toEqual({ r: 85, g: 255, b: 0, opacity: 255, space: `srgb`, unit: `8bit` });
+    expect(Colour.SrgbSpace.fromCss(`hsl(100,100%,50%)`, { scalar: false })).toEqual({ r: 85, g: 255, b: 0, opacity: 255, space: `srgb`, unit: `8bit` });
   });
 
   test(`rgb-validate`, () => {
@@ -96,3 +97,4 @@ describe(`colour`, () => {
 
   });
 });
+

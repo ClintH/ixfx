@@ -16,8 +16,6 @@
     html,
     body {
       height: 100%;
-      margin: 0;
-      padding: 0;
     }
 
     canvas,#gradient {
@@ -29,12 +27,29 @@
       height: 100px;
       width: 400px;
     }
-    
+    display {
+      display:inline-block;
+    }
   </style>
-  <canvas id="interpolate" width="400" height="100"></canvas>
-    <canvas id="steps" width="400" height="100"></canvas>
-  <div id="gradient"></div>
-    <script type="module"  src="script.js"></script>
+  <div>
+    <h1>HSL</h1>
+    <h2>Shorter</h2>
+    <canvas id="hsl-shorter" width="400" height="100"></canvas>
+    <h2>Longer</h2>
+    <canvas id="hsl-longer" width="400" height="100"></canvas>
+  </div>
+  <div>
+    <h1>OkLch</h1>
+    <h2>Shorter</h2>
+    <canvas id="oklch-shorter" width="400" height="100"></canvas>
+    <h2>Longer</h2>
+    <canvas id="oklch-longer" width="400" height="100"></canvas>
+  </div>
+    <div>
+    <h1>Srgb</h1>
+    <canvas id="srgb" width="400" height="100"></canvas>
+  </div>
+  <script type="module"  src="script.js"></script>
 </body>
 
 </html>

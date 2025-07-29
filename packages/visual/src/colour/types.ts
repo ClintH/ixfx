@@ -18,16 +18,7 @@ export type HslBase = {
   space?: `hsl`
 }
 
-export const isHsl = (v: any): v is Hsl => {
-  if (typeof v === `object`) {
-    if (!(`h` in v && `s` in v && `l` in v)) return false;
-    if (!(`unit` in v)) return false;
-    if (`space` in v) {
-      if (v.space !== `hsl`) return false;
-    }
-  }
-  return false;
-}
+export type ColourSpaces = `srgb` | `hsl` | `oklch`;
 
 /**
  * Scalar values use 0..1 for each field
@@ -49,72 +40,22 @@ export type Hsl = HslScalar | HslAbsolute;
 /**
  * Rgb.
  * Units determine how to interperet rgb values.
- * * 'relative': 0..1 range for RGB & opacity
+ * * 'scalar': 0..1 range for RGB & opacity
  * * '8bit': 0..255 range for RGB & opacity
  */
 export type RgbBase = { r: number; g: number; b: number; opacity?: number, space?: `srgb` };
 export type RgbScalar = RgbBase & { unit: `scalar` };
-
-export const isRgb = (v: any): v is Rgb => {
-  if (typeof v === `object`) {
-    if (!(`r` in v && `g` in v && `b` in v)) return false;
-    if (!(`unit` in v)) return false;
-    if (`space` in v) {
-      if (v.space !== `srgb`) return false;
-    }
-  }
-  return false;
-}
-
-/**
- * If the input object has r,g&b properties, it will return a fully-
- * formed Rgb type with `unit` and `space` properties.
- * 
- * If it lacks these basic three properties or they are out of range,
- *  _undefined_ is returned.
- * 
- * If RGB values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
- * If RGB values exceed 255, _undefined_ returned.
- * @param v 
- * @returns 
- */
-export const tryParseObjectToRgb = (v: any): Rgb | undefined => {
-  if (!(`r` in v && `g` in v && `b` in v)) return;
-  if (!(`unit` in v)) {
-    if (v.r <= 1 && v.g <= 1 && v.b <= 1) {
-      v.unit = `scalar`;
-    } else if (v.r > 255 && v.g <= 255 && v.b <= 255) {
-      return; // out of range
-    } else {
-      v.unit = `8bit`;
-    }
-  }
-  if (!(`space` in v)) {
-    v.space = `srgb`;
-  }
-  return v as Rgb;
-}
-
-export const tryParseObjectToHsl = (v: any): Hsl | undefined => {
-  if (!(`h` in v && `s` in v && `l` in v)) return;
-  if (!(`unit` in v)) {
-    if (v.r <= 1 && v.g <= 1 && v.b <= 1) {
-      v.unit = `scalar`;
-    } else if (v.s > 100 && v.l <= 100) {
-      return; // out of range
-    } else {
-      v.unit = `absolute`;
-    }
-  }
-  if (!(`space` in v)) {
-    v.space = `hsl`;
-  }
-  return v as Hsl;
-}
 /**
  * RGB in 0...255 range, including opacity.
  */
 export type Rgb8Bit = RgbBase & { unit: `8bit` };
+
+/**
+ * Rgb.
+ * Units determine how to interperet rgb values.
+ * * 'scalar': 0..1 range for RGB & opacity
+ * * '8bit': 0..255 range for RGB & opacity
+ */
 export type Rgb = RgbScalar | Rgb8Bit;
 
 export type LchBase = {
@@ -137,26 +78,19 @@ export type LchBase = {
   space: `lch` | `oklch`
 }
 
-export const isLch = (v: any): v is OkLch => {
-  if (typeof v === `object`) {
-    if (!(`l` in v && `c` in v && `h` in v)) return false;
-    if (!(`unit` in v)) return false;
-    if (`space` in v) {
-      if (v.space !== `lch` && v.space !== `oklch`) return false;
-    }
-  }
-  return false;
-}
+
+export type ColourInterpolator<T extends Colour> = (amount: number) => T;
 
 export type OkLchBase = LchBase & { space: `oklch` }
 /**
  * Oklch colour expressed in 0..1 scalar values for LCH & opacity
  */
 export type OkLchScalar = OkLchBase & { unit: `scalar` }
+
 /**
  * Oklch colour expressed with:
- * l: 0..100
- * c: 0..100
+ * l: 0..1
+ * c: 0..4
  * h: 0..360 degrees 
  * opacity: 0..1
  */
@@ -170,35 +104,31 @@ export type Colour = { opacity?: number } & (Hsl | OkLch | Rgb);
  */
 export type Colourish = Colour | string;
 
-export const isColourish = (v: any): v is Colourish => {
-  if (typeof v === `string`) return true;
-  if (typeof v !== `object`) return false;
-  if (isHsl(v)) return true;
-  if (isLch(v)) return true;
-  if (isRgb(v)) return true;
-  return false;
-}
-
-// export type ColourRgb = {
-//   space:`rgb`
-//   coords: Rgba
-// }
-// export type ColourHsl = {
-//   space:`hsl`;
-//   coords: Hsla;
-// }
-
-// export type Colour = ColourHsl|ColourRgb;
-
 /**
  * Options for interpolation
  */
-// export type ColourInterpolationOpts = {
-//   space: Spaces,
-//   hue: `longer` | `shorter` | `increasing` | `decreasing` | `raw`
-// };
+export type ColourInterpolationOpts = {
+  direction: `longer` | `shorter`,
+  space: ColourSpaces,
+
+};
+
+export type ColourStepOpts = ColourInterpolationOpts & {
+
+  /**
+   * If set, determines total number of steps, including colour stops.
+   * Use this _or_ `stepsBetween`.
+   */
+  stepsTotal?: number,
+  /**
+   * If set, determines number of steps between colour stops.
+   * Use this _or_ `stepsTotal`.
+   */
+  stepsBetween?: number
+};
 
 export type ParsingOptions<T> = Partial<{
+  scalar: boolean
   ensureSafe: boolean
   /**
    * Value to use if input is invalid
