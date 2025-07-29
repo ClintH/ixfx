@@ -13,7 +13,7 @@ export * as Bipolar from './bipolar.js';
 export * from './interpolate.js';
 export * from './linear-space.js';
 export * from './moving-average.js';
-export * from './normalise.js';
+export * as Normalise from './normalise.js';
 export * from './number-array-compute.js';
 export * from './numeric-arrays.js';
 export * from './proportion.js';
