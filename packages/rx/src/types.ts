@@ -8,7 +8,8 @@ import type { Processors } from '@ixfx/process';
 import type { TallyOptions } from './ops/math.js';
 import type { ChangeRecord } from '@ixfx/core/records';
 import type { RecursivePartial } from '@ixfx/core';
-import type { PathDataChange } from '@ixfx/core/records';
+import { Pathed } from '@ixfx/core/records';
+
 
 export type CombineLatestOptions = {
   /**
@@ -409,7 +410,7 @@ export type ReactiveDiff<V> = Reactive<V> & ReactiveWritable<V> & {
    * Use the returned function to unsubscribe.
    * @param changes 
    */
-  onDiff(changes: (changes: PathDataChange<any>[]) => void): () => void
+  onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void
   /**
    * Updates the reactive with some partial key-value pairs.
    * Keys omitted are left the same as the current value.
