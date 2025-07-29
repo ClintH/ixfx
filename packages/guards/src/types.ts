@@ -25,11 +25,13 @@ export type NumberGuardRange =
 export type ResultOk<TValue> = {
   success: true
   value: TValue
+  info?: string
 }
 
 export type ResultError<TError> = {
   success: false
   error: TError
+  info?: string
 }
 export type ResultOrFunction = Result<any, any> | (() => undefined | Result<any, any>)
 

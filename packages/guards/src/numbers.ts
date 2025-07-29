@@ -86,39 +86,40 @@ export const numberTest = (
   value?: unknown,
   range: NumberGuardRange = ``,
   parameterName = `?`,
+  info?: string
 ): Result<number, string> => {
-  if (value === null) return { success: false, error: `Parameter '${ parameterName }' is null` };
+  if (value === null) return { success: false, error: `Parameter '${ parameterName }' is null`, info };
   if (typeof value === `undefined`) {
-    return { success: false, error: `Parameter '${ parameterName }' is undefined` };
+    return { success: false, error: `Parameter '${ parameterName }' is undefined`, info };
   }
   if (Number.isNaN(value)) {
-    return { success: false, error: `Parameter '${ parameterName }' is NaN` };
+    return { success: false, error: `Parameter '${ parameterName }' is NaN`, info };
   }
   if (typeof value !== `number`) {
-    return { success: false, error: `Parameter '${ parameterName }' is not a number (${ JSON.stringify(value) })` };
+    return { success: false, error: `Parameter '${ parameterName }' is not a number (${ JSON.stringify(value) })`, info };
   }
   switch (range) {
     case `finite`: {
       if (!Number.isFinite(value)) {
-        return { success: false, error: `Parameter '${ parameterName } must be finite (Got: ${ value })` };
+        return { success: false, error: `Parameter '${ parameterName } must be finite (Got: ${ value })`, info };
       }
       break;
     }
     case `positive`: {
       if (value < 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must be at least zero (${ value })` };
+        return { success: false, error: `Parameter '${ parameterName }' must be at least zero (${ value })`, info };
       }
       break;
     } case `negative`: {
       if (value > 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must be zero or lower (${ value })` };
+        return { success: false, error: `Parameter '${ parameterName }' must be zero or lower (${ value })`, info };
       }
       break;
     }
     case `aboveZero`: {
       if (value <= 0) {
         return {
-          success: false, error: `Parameter '${ parameterName }' must be above zero (${ value })`
+          success: false, error: `Parameter '${ parameterName }' must be above zero (${ value })`, info
         };
 
       }
@@ -126,32 +127,32 @@ export const numberTest = (
     }
     case `belowZero`: {
       if (value >= 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must be below zero (${ value })` };
+        return { success: false, error: `Parameter '${ parameterName }' must be below zero (${ value })`, info };
       }
       break;
     }
     case `percentage`: {
       if (value > 1 || value < 0) {
         return {
-          success: false, error: `Parameter '${ parameterName }' must be in percentage range (0 to 1). (${ value })`
+          success: false, error: `Parameter '${ parameterName }' must be in percentage range (0 to 1). (${ value })`, info
         };
       }
       break;
     }
     case `nonZero`: {
       if (value === 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must non-zero. (${ value })` };
+        return { success: false, error: `Parameter '${ parameterName }' must non-zero. (${ value })`, info };
       }
       break;
     }
     case `bipolar`: {
       if (value > 1 || value < -1) {
-        return { success: false, error: `Parameter '${ parameterName }' must be in bipolar percentage range (-1 to 1). (${ value })` };
+        return { success: false, error: `Parameter '${ parameterName }' must be in bipolar percentage range (-1 to 1). (${ value })`, info };
       }
       break;
     }
   }
-  return { success: true, value };
+  return { success: true, value, info };
 };
 
 /**
@@ -215,8 +216,8 @@ export const numberDecimalTest = (a: number, b: number, decimals = 3): Result<nu
  * @param parameterName Param name for customising exception message
  * @returns
  */
-export const percentTest = (value: number, parameterName = `?`): Result<number, string> =>
-  numberTest(value, `percentage`, parameterName);
+export const percentTest = (value: number, parameterName = `?`, info?: string): Result<number, string> =>
+  numberTest(value, `percentage`, parameterName, info);
 
 // export const throwPercentTest = (value: number, parameterName = `?`) => {
 //   throwFromResult(percentTest(value, parameterName));

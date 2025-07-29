@@ -36,17 +36,6 @@ export function resultThrow(...results: ResultOrFunction[]) {
     throw resultToError(rr);
   }
   return true;
-
-  // // if (result.success) return true;
-  // // if (typeof result.error === `string`) throw new Error(result.error);
-  // // throw result.error;
-  // if (resultIsError(result)) {
-  //   // if (typeof result.error === `string`) throw new Error(result.error);
-  //   // if (result.error instanceof Error) throw result.error;
-  //   // throw new Error(JSON.stringify(result.error));
-  //   throw resultToError(result);
-  // }
-  // return true;
 }
 
 export function resultThrowSingle<TValue>(result: Result<TValue, any>): result is ResultOk<TValue> {
@@ -93,9 +82,11 @@ export function resultIsOk<TValue, TError>(result: Result<TValue, TError>): resu
  * @returns 
  */
 export function resultToError(result: ResultError<any>): Error {
-  if (typeof result.error === `string`) throw new Error(result.error);
+  if (typeof result.error === `string`) {
+    throw new Error(result.error, { cause: result.info });
+  }
   if (result.error instanceof Error) throw result.error;
-  return new Error(JSON.stringify(result.error));
+  return new Error(JSON.stringify(result.error), { cause: result.info });
 
 }
 
