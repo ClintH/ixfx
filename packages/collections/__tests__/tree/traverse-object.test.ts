@@ -95,7 +95,7 @@ test(`has-any-parent-value`, () => {
     }
   }
   expect(TraversableTree.hasParentValue(johnStreet, `kids`, (a, b) => {
-    return a.name === b;
+    return (a as any).name === b;
   }, Number.MAX_SAFE_INTEGER)).toBeTruthy();
 
 });
