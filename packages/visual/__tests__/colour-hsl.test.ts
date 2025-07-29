@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import * as HslSpace from '../src/colour/hsl.js';
+import { applyToValues, round } from '@ixfx/numbers';
 
 
 test(`from-css`, () => {
@@ -61,3 +62,17 @@ test(`parse-css`, () => {
 
 });
 
+test(`from-css2`, () => {
+
+  expect(HslSpace.fromCss(`red`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
+  expect(HslSpace.fromCss(`rgb(255,0,0)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
+  expect(HslSpace.fromCss(`rgba(255,0,0, 1)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1.0, space: "hsl", unit: "scalar" });
+  // expect(HslSpace.fromCssScalar(`rgba(255,0,0, 0.5)`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 0.5, space: "hsl", unit: "scalar" });
+
+  expect(applyToValues(HslSpace.fromCss(`hotpink`, { scalar: true }), v => round(3, v))).toEqual({ h: 0.916, s: 1, l: 0.705, opacity: 1, space: "hsl", unit: "scalar" });
+  expect(HslSpace.fromCss(`rgb(255,105,180)`, { scalar: true })).toEqual({ h: 0.916666666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
+
+  expect(() => HslSpace.fromCss(`rgba(255,105,180,0.5)`, { scalar: true })).toThrow();
+  expect(() => HslSpace.fromCss(`hsla(100, 100%, 50%, 0.2)`, { scalar: true })).toThrow();
+
+})

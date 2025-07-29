@@ -1,4 +1,4 @@
-/* eslint-disable no-loss-of-precision */
+
 import { test, expect, describe } from 'vitest';
 import { applyToValues, round } from '@ixfx/numbers';
 import * as Colour from '../src/colour/index.js';
@@ -32,20 +32,8 @@ describe(`colour`, () => {
     //t.like(Colour.toHsl(`hsl(0,0%,0%)`), { h: 0, s: 0, l: 0 });
     //t.like(Colour.toHsl(`hsla(0,0%,0%,0)`), { h: 0, s: 0, l: 0 });
 
-    expect(Colour.fromCssColour(`hsl(100, 100%, 50%)`)).toEqual({ h: 100, s: 100, l: 50, opacity: 100, space: "hsl", unit: "absolute" });
+    expect(Colour.fromCssColour(`hsl(100, 100%, 50%)`)).toEqual({ h: 100 / 360, s: 1, l: 0.50, opacity: 1, space: "hsl", unit: "scalar" });
 
-    expect(Colour.HslSpace.fromCss(`red`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCss(`rgb(255,0,0)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCss(`rgba(255,0,0, 1)`, { scalar: true })).toEqual({ h: 0, s: 1, l: 0.5, opacity: 1.0, space: "hsl", unit: "scalar" });
-    // expect(Colour.HslSpace.fromCssScalar(`rgba(255,0,0, 0.5)`)).toEqual({ h: 0, s: 1, l: 0.5, opacity: 0.5, space: "hsl", unit: "scalar" });
-
-    expect(applyToValues(Colour.HslSpace.fromCss(`hotpink`, { scalar: true }), v => round(3, v))).toEqual({ h: 0.916, s: 1, l: 0.705, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCss(`rgb(255,105,180)`, { scalar: true })).toEqual({ h: 0.916666666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
-    expect(Colour.HslSpace.fromCss(`rgba(255,105,180,0.5)`, { scalar: true })).toEqual({ h: 0.9166666666666666, s: 1, l: 0.7059000000000001, opacity: 1, space: "hsl", unit: "scalar" });
-
-    expect(Colour.HslSpace.fromCss(`hsla(100, 100%, 50%, 0.2)`, { scalar: true })).toEqual({ h: 0.2777777777777778, s: 1, l: 0.5, opacity: 0.2, space: "hsl", unit: "scalar" });
-
-    expect(Colour.SrgbSpace.fromCss(`hsl(100,100%,50%)`, { scalar: false })).toEqual({ r: 85, g: 255, b: 0, opacity: 255, space: `srgb`, unit: `8bit` });
   });
 
   test(`rgb-validate`, () => {

@@ -45,4 +45,7 @@ test(`conversion`, () => {
     expect(Rgb.fromCss(p, { scalar: false })).toStrictEqual(purple8Bit);
     expect(Rgb.fromCss(p, { scalar: true })).toStrictEqual(purpleScalar);
   }
+
+  expect(Rgb.fromCss(`hsl(100,100%,50%)`, { scalar: false })).toEqual({ r: 85, g: 255, b: 0, opacity: 255, space: `srgb`, unit: `8bit` });
+
 });

@@ -1,5 +1,5 @@
 import Colorizr, * as C from "colorizr";
-import type { Colourish, Hsl, HslAbsolute, HslScalar, ParsingOptions } from "./types.js";
+import type { Colourish, Hsl, HslAbsolute, HslScalar, ParsingOptions, Rgb } from "./types.js";
 import { numberInclusiveRangeTest, numberTest, percentTest } from "@ixfx/guards";
 import { resultThrow } from "@ixfx/guards";
 import { cssDefinedHexColours } from "./css-colours.js";
@@ -99,6 +99,9 @@ export function fromHexString(hexString: string, options: ParsingOptions<Hsl> = 
 export function fromCss<T extends ParsingOptions<Hsl>>(value: string, options: T): T extends { scalar: true } ? HslScalar : HslAbsolute;
 export function fromCss(value: string, options: ParsingOptions<Hsl> = {}): Hsl {
   value = value.toLowerCase();
+  if (value.startsWith(`hsla(`)) throw new Error(`hsla() not supported`);
+  if (value.startsWith(`rgba(`)) throw new Error(`rgba() not supported`);
+
   if (value.startsWith(`#`)) {
     return fromHexString(value, options);
 
@@ -113,7 +116,7 @@ export function fromCss(value: string, options: ParsingOptions<Hsl> = {}): Hsl {
     return fromLibrary(hsl, options);
   }
 
-  if (!value.startsWith(`hsl(`) && !value.startsWith(`hsla(`)) {
+  if (!value.startsWith(`hsl(`)) {
     try {
       value = C.convert(value, `hsl`);
     } catch (error) {
@@ -179,7 +182,7 @@ function fromLibrary<T extends Hsl>(hsl: C.HSL, parsingOptions: ParsingOptions<T
   }
 }
 
-export const toAbsolute = (hslOrString: Hsl | string): HslAbsolute => {
+export const toAbsolute = (hslOrString: Hsl | Rgb | string): HslAbsolute => {
   // if (typeof hslOrString === `string`) {
   //   return toAbsolute(fromLibrary(C.parseCSS(hslOrString, `hsl`), { scalar: false }));
   // }
@@ -191,6 +194,9 @@ export const toAbsolute = (hslOrString: Hsl | string): HslAbsolute => {
     //   console.error(`Hsl.toScalar: ${ hslOrString }`);
     //   throw error;
     // }
+  }
+  if (isRgb(hslOrString)) {
+    return toAbsolute(fromLibrary(rgbToLibraryHsl(hslOrString), { scalar: false }));
   }
   const hsl = hslOrString;
   guard(hsl);
@@ -255,7 +261,7 @@ export const generateScalar = (absoluteHslOrVariable: string | number | Angle, s
  * @param hslOrString 
  * @returns 
  */
-export const toScalar = (hslOrString: Hsl | string): HslScalar => {
+export const toScalar = (hslOrString: Rgb | Hsl | string): HslScalar => {
   if (typeof hslOrString === `string`) {
     return fromCss(hslOrString, { scalar: true });
     // try {
@@ -265,6 +271,10 @@ export const toScalar = (hslOrString: Hsl | string): HslScalar => {
     //   throw error;
     // }
   }
+  if (isRgb(hslOrString)) {
+    return toScalar(fromLibrary(rgbToLibraryHsl(hslOrString), { scalar: true }));
+  }
+
   const hsl = hslOrString;
   guard(hsl);
   if (hsl.unit === `scalar`) return hsl;
@@ -445,9 +455,11 @@ export function parseCssHslFunction(value: string): Hsl {
 export function toLibraryRgb(hsl: Hsl | string): C.RGB {
   if (typeof hsl === `string`) {
     const parseResult = fromCss(hsl, { scalar: false });
+    //console.log(`parseResult hsl: ${ hsl } pr: `, parseResult);
     return toLibraryRgb(parseResult);
   }
   hsl = toAbsolute(hsl);
+  //console.log(`toLibraryRgb hsl`, hsl);
   const rgb = C.hsl2rgb({ h: hsl.h, s: hsl.s, l: hsl.l });
-  return { ...rgb, alpha: (hsl.opacity ?? 255) / 255 };
+  return { ...rgb, alpha: (hsl.opacity ?? 100) / 100 * 255 };
 }

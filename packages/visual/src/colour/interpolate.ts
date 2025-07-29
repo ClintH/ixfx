@@ -95,6 +95,39 @@ export const cssLinearGradient = (colours: Colourish[]) => {
 }
 
 /**
+ * Returns a function that interpolates between two colours. Returns string colour values.
+ * ```js
+ * const i = interpolator(`blue`, `red`);
+ * i(0.5); // Get the colour at 50%, as a string.
+ * ```
+ * 
+ * To work with structured colour values, use one of the space's `interpolate` functions.
+ * @param colourA 
+ * @param colourB 
+ * @param options 
+ * @returns 
+ */
+export const interpolator = (colourA: Colourish, colourB: Colourish, options: Partial<ColourInterpolationOpts> = {}) => {
+  const space = options.space ?? `oklch`;
+  const direction = options.direction ?? `shorter`;
+
+  let inter: ColourInterpolator<Colour> | undefined;
+  switch (space) {
+    case `hsl`:
+      inter = HslSpace.interpolator(convert(colourA, `hsl-scalar`), convert(colourB, `hsl-scalar`), direction);
+      break;
+    case `srgb`:
+      inter = SrgbSpace.interpolator(convert(colourA, `srgb-scalar`), convert(colourB, `srgb-scalar`));
+      break;
+    default:
+      inter = OklchSpace.interpolator(convert(colourA, `oklch-scalar`), convert(colourB, `oklch-scalar`), direction);
+  }
+
+  return (amount: number) => toCssColour(inter(amount));
+
+}
+
+/**
  * Produces a stepped scale of colours.
  * 
  * ```js

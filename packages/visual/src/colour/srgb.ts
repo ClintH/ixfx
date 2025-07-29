@@ -1,11 +1,12 @@
 import Colorizr, * as C from "colorizr";
 
-import type { ParsingOptions, Rgb, Rgb8Bit, RgbScalar } from "./types.js";
+import type { Hsl, ParsingOptions, Rgb, Rgb8Bit, RgbScalar } from "./types.js";
 import { numberInclusiveRangeTest, numberTest } from "@ixfx/guards";
 import { resultThrow } from "@ixfx/guards";
 import { cssDefinedHexColours } from "./css-colours.js";
 import { clamp, interpolate } from "@ixfx/numbers";
 import { toLibraryRgb as hslToLibraryRgb } from "./hsl.js";
+import { isHsl } from "./guards.js";
 
 export const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
   switch (value.unit) {
@@ -49,6 +50,10 @@ export function fromCss<T extends ParsingOptions<Rgb>>(value: string, options: T
  */
 export function fromCss(value: string, options: ParsingOptions<Rgb> = {}): Rgb {
   value = value.toLowerCase();
+  if (value.startsWith(`hsla(`)) throw new Error(`hsla() not supported`);
+  if (value.startsWith(`rgba(`)) throw new Error(`rgba() not supported`);
+
+
   const scalar = options.scalar ?? true;
 
   // Convert from hex
@@ -154,6 +159,9 @@ export const to8bit = (rgbOrString: Rgb | string): Rgb8Bit => {
   if (typeof rgbOrString === `string`) {
     return fromCss(rgbOrString, { scalar: false });
   }
+  if (isHsl(rgbOrString)) {
+    return to8bit(fromLibrary(hslToLibraryRgb(rgbOrString), { scalar: false }));
+  }
   guard(rgbOrString);
   if (rgbOrString.unit === `8bit`) return rgbOrString;
   return {
@@ -166,9 +174,12 @@ export const to8bit = (rgbOrString: Rgb | string): Rgb8Bit => {
   }
 }
 
-export const toScalar = (rgbOrString: Rgb | string): RgbScalar => {
+export const toScalar = (rgbOrString: Rgb | Hsl | string): RgbScalar => {
   if (typeof rgbOrString === `string`) {
     return fromCss(rgbOrString, { scalar: true });
+  }
+  if (isHsl(rgbOrString)) {
+    return toScalar(fromLibrary(hslToLibraryRgb(rgbOrString), { scalar: true }));
   }
   guard(rgbOrString);
   if (rgbOrString.unit === `scalar`) return rgbOrString;
@@ -210,8 +221,6 @@ export const guard = (rgb: Rgb) => {
     throw new Error(`Unit is expected to be '8bit' or 'scalar'. Got: ${ unit }`);
   }
 }
-
-//export const SrgbSpace = { withOpacity, toCssString, fromHexString, fromCss8bit, toLibrary, fromLibrary, guard, toScalar, to8bit };
 
 /**
  * Sets the lightness value.

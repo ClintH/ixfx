@@ -17,9 +17,17 @@ export function convert<T extends ConvertDestinations>(colour: Colourish, destin
   T extends "hsl-scalar" ? HslScalar :
   T extends "hsl-absolute" ? HslAbsolute : never
 
+/**
+ * Converts an object or string representation of colour to ixfx's
+ * structured colour.
+ * Use {@link convertToString} if you want a CSS colour string instead.
+ * @param colour 
+ * @param destination 
+ * @returns 
+ */
 export function convert(colour: Colourish, destination: ConvertDestinations): Hsl | OkLch | Rgb {
   if (destination === `hsl-scalar`) {
-    if (typeof colour === `string` || isHsl(colour)) {
+    if (typeof colour === `string` || isHsl(colour) || isRgb(colour)) {
       return HslSpace.toScalar(colour);
     }
   } else if (destination === `hsl-absolute`) {
@@ -46,6 +54,17 @@ export function convert(colour: Colourish, destination: ConvertDestinations): Hs
     throw new Error(`Destination '${ destination }' not supported for input: ${ JSON.stringify(colour) }`);
   }
   return convert(toCssColour(colour), destination);
+}
+
+/**
+ * Like {@link convert}, but result is a CSS colour string
+ * @param colour 
+ * @param destination 
+ * @returns 
+ */
+export function convertToString(colour: Colourish, destination: ConvertDestinations): string {
+  const c = convert(colour, destination);
+  return toCssColour(c);
 }
 
 export function convertScalar<T extends ColourSpaces>(colour: Colourish, destination: T):
@@ -88,10 +107,10 @@ export const toLibraryColour = (colour: Colourish): Colorizr => {
   return new Colorizr(asCss);
 }
 
-export const convertColourString = (colour: string, destination: 'hex' | 'hsl' | 'oklab' | 'oklch' | 'srgb' | `rgb`): string => {
-  if (destination === `srgb`) destination = `rgb`;
-  return C.convert(colour, destination);
-}
+// export const convertColourString = (colour: string, destination: 'hex' | 'hsl' | 'oklab' | 'oklch' | 'srgb' | `rgb`): string => {
+//   if (destination === `srgb`) destination = `rgb`;
+//   return C.convert(colour, destination);
+// }
 
 export const guard = (colour: Colour) => {
   switch (colour.space) {
