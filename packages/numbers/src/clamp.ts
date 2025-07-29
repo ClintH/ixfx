@@ -98,3 +98,27 @@ export const clampIndex = (
   if (v >= length) return length - 1;
   return v;
 };
+
+
+/**
+ * Returns the largest value, ignoring the sign of numbers
+ * 
+ * ```js
+ * maxAbs(1, 5);    // 5
+ * maxAbs(-10, 5);  // -10 (since sign is ignored)
+ * ```
+ * @param values 
+ * @returns 
+ */
+export const maxAbs = (...values: number[]) => {
+  let index = -1;
+  let maxA = Number.MIN_SAFE_INTEGER;
+  for (let index_ = 0; index_ < values.length; index_++) {
+    const vA = Math.abs(values[ index_ ]);
+    if (vA > maxA) {
+      maxA = vA;
+      index = index_;
+    }
+  }
+  return values[ index ];
+}
