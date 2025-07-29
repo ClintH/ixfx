@@ -1,6 +1,6 @@
 //import * as Immutable from "@ixfx/core/records";
 import { resolveEl } from "@ixfx/dom";
-import { getPathsAndData, type PathData, type PathDataChange } from "@ixfx/core/records";
+import { Pathed } from "@ixfx/core/records";
 import * as Rx from "@ixfx/rx";
 import * as RxFrom from "@ixfx/rx/from";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind, DomBindUnresolvedSource } from './dom-types.js';
@@ -279,7 +279,7 @@ const resolveBindUpdaterBase = (bind: DomBindValueTarget): (value: any, element:
   if (bind.attribName !== undefined) {
     const attrib = bind.attribName;
     return (v: any, element: HTMLElement) => {
-      element.setAttribute(attrib, v);
+      element.setAttribute(attrib, v as string);
     }
   }
   if (bind.textContent) {
@@ -296,7 +296,7 @@ const resolveBindUpdaterBase = (bind: DomBindValueTarget): (value: any, element:
     let css = bind.cssVariable;
     if (!css.startsWith(`--`)) css = `--` + css;
     return (v: any, element: HTMLElement) => {
-      element.style.setProperty(css, v);
+      element.style.setProperty(css, v as string);
     }
   }
   if (bind.cssProperty !== undefined) {
@@ -502,7 +502,7 @@ export const bindUpdate = <V>(source: Rx.Reactive<V>, elOrQuery: string | HTMLEl
 export const bindDiffUpdate = <V>(
   source: Rx.ReactiveDiff<V>,
   elOrQuery: string | HTMLElement | null,
-  updater: (diffs: PathDataChange<any>[], el: HTMLElement) => void,
+  updater: (diffs: Pathed.PathDataChange<any>[], el: HTMLElement) => void,
   opts: Partial<BindUpdateOpts<V>> = {}
 ): PipeDomBinding & { refresh: () => void } => {
   if (elOrQuery === null) throw new Error(`Param 'elOrQuery' is null`);
@@ -510,7 +510,7 @@ export const bindDiffUpdate = <V>(
 
   const el = resolveEl(elOrQuery);
   //const binds = opts.binds;
-  const update = (value: PathDataChange<any>[]) => {
+  const update = (value: Pathed.PathDataChange<any>[]) => {
     updater(value, el);
   }
 
@@ -669,7 +669,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
     }
   }
 
-  const changes = (changes: (PathDataChange<any> | PathData<any>)[]) => {
+  const changes = (changes: (Pathed.PathDataChange<any> | Pathed.PathData<any>)[]) => {
     const queue = new QueueMutable({}, changes);
     let d = queue.dequeue();
     const seenPaths = new Set<string>();
@@ -681,7 +681,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
         console.log(`Rx.Dom.elements.changes no previous. path: ${ path }`);
 
         create(path, d.value);
-        const subdata = [ ...getPathsAndData(d.value, false, Number.MAX_SAFE_INTEGER, path) ];
+        const subdata = [ ...Pathed.getPathsAndData(d.value, false, Number.MAX_SAFE_INTEGER, path) ];
         console.log(subdata);
         for (const dd of subdata) {
           if (!seenPaths.has(dd.path)) {
@@ -718,6 +718,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
    */
   source.onDiff(value => {
     //console.log(`Rx.Dom.elements diff ${ JSON.stringify(value) } `);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     changes(value);
   });
 
@@ -727,7 +728,7 @@ export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & R
     // Get data of value as a set of paths and data
     // but only at first level of depth, because changes() will probe
     // deeper itself
-    changes([ ...getPathsAndData(last as object, false, 1) ]);
+    changes([ ...Pathed.getPathsAndData(last as object, false, 1) ]);
   }
 };
 
