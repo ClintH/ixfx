@@ -56,6 +56,5 @@ npx publint
 ```
 # make a changeset
 pnpm changeset
-pnpm changeset version
-pnpm publish -r
+pnpm changeset version && pnpm publish -r
 ```
