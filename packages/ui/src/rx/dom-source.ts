@@ -67,12 +67,12 @@ export function domHslInputValue(targetOrQuery: HTMLInputElement | string, optio
     },
   });
   const rx = transform(input, v => {
-    return Colour.HslSpace.fromCssScalar(v, { ensureSafe: true });
+    return Colour.HslSpace.fromCss(v, { scalar: true, ensureSafe: true });
   });
   return {
     ...rx,
     last() {
-      return Colour.HslSpace.fromCssScalar(input.last(), { ensureSafe: true })
+      return Colour.HslSpace.fromCss(input.last(), { scalar: true, ensureSafe: true })
     },
     set(value) {
       input.set(Colour.HslSpace.toCssString(value));
@@ -279,7 +279,7 @@ export function domForm<T extends Record<string, any>>(formElOrQuery: HTMLFormEl
         entries.push([ k, vBool ]);
       } else if (typeHint === `colour`) {
         const vRgb = Colour.toCssColour(vString);
-        entries.push([ k, Colour.SrgbSpace.fromCss8bit(vRgb) ]);
+        entries.push([ k, Colour.SrgbSpace.fromCss(vRgb, { scalar: false }) ]);
       } else {
         entries.push([ k, v.toString() ]);
       }
