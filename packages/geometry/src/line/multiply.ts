@@ -4,7 +4,6 @@ import { multiply as PointsMultiply, type Point } from "../point/index.js";
  * Multiplies start and end of line by point.x, point.y.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * 
  * // Line 1,1 -> 10,10
  * const l = Lines.fromNumbers(1, 1, 10, 10);

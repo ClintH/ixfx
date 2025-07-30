@@ -9,8 +9,6 @@ import { interpolate } from "./interpolate.js";
  * If `origin` is a number, it's presumed to be a 0..1 percentage of the line.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
- * 
  * // Rotates line by 0.1 radians around point 10,10
  * const r = Lines.rotate(line, 0.1, {x:10,y:10});
  * 
@@ -29,8 +27,8 @@ import { interpolate } from "./interpolate.js";
  * @returns 
  */
 export const rotate = (line: Line, amountRadian?: number, origin?: Point | number): Line => {
-  if (amountRadian === undefined || amountRadian === 0) return line;
-  if (origin === undefined) origin = 0.5;
+  if (typeof amountRadian === `undefined` || amountRadian === 0) return line;
+  if (typeof origin === `undefined`) origin = 0.5;
   if (typeof origin === `number`) {
     origin = interpolate(origin, line.a, line.b);
   }

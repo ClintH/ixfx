@@ -8,7 +8,6 @@ import { nearest } from "./nearest.js";
  * Returns the distance of `point` to the nearest point on `line`
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const distance = Lines.distanceSingleLine(line, pt);
  * ```
  * @param line Line

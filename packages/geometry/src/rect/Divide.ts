@@ -7,8 +7,6 @@ const divideOp = (a: number, b: number) => a / b;
  * Divides positioned `rect` by width/height. Useful for normalising a value.
  * x & y value of second parameter are ignored
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * // Normalise based on window size
  * const r = { x: 10, y: 200, width: 100, height: 30 };
  * const rr = Rects.divide(r, window.innerWidth, window.innerHeight);
@@ -26,7 +24,6 @@ export function divide(
  * Divides `rect` by width/height. Useful for denormalising a value.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * // Normalise based on window size
  * const r = { width: 100, height: 30 };
  * const rr = Rects.divide(r, window.innerWidth, window.innerHeight);

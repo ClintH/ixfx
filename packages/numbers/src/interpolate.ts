@@ -234,7 +234,6 @@ export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, start
  * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
  *
  * ```js
- * import { interpolateAngle } from 'https://unpkg.com/ixfx/dist/data.js';
  * interpolateAngle(0.5, Math.PI, Math.PI/2);
  * ```
  * @param amount

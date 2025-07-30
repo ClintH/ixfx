@@ -6,7 +6,6 @@ const piPi = Math.PI * 2;
  * Computes relative position along circle perimeter
  * 
  * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
  * const circle = { radius: 100, x: 100, y: 100 };
  * 
  * // Get a point halfway around circle

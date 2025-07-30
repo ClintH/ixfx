@@ -7,8 +7,6 @@
  *
  * @example
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const data = [
  *  { age: 39, city: `London` },
  *  { age: 14, city: `Copenhagen` },

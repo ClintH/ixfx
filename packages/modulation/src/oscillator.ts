@@ -5,8 +5,8 @@ const piPi = Math.PI * 2;
  * Sine oscillator.
  *
  * ```js
- * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- * import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
+ * import { Oscillators } from "@ixfx/modulation.js"
+ * import { frequencyTimer } from "@ixfx/flow.js";
  * // Setup
  * const osc = Oscillators.sine(frequencyTimer(10));
  * const osc = Oscillators.sine(0.1);
@@ -74,7 +74,6 @@ export function* triangle(timerOrFreq: Flow.Timer | number) {
   }
   while (true) {
     // elapsed is repeatedly 0->1
-    //eslint-disable-next-line functional/no-let
     let v = timerOrFreq.elapsed;
     // /2 = 0->0.5
     if (v < 0.5) {
@@ -92,8 +91,8 @@ export function* triangle(timerOrFreq: Flow.Timer | number) {
  * Saw oscillator
  *
  * ```js
- * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
- * import { frequencyTimer } from "https://unpkg.com/ixfx/dist//flow.js";
+ * import { Oscillators } from "@ixfx/modulation.js"
+ * import { frequencyTimer } from "@ixfx/flow.js";
  * // Setup
  * const osc = Oscillators.saw(Timers.frequencyTimer(0.1));
  *
@@ -120,7 +119,7 @@ export function* saw(timerOrFreq: Flow.Timer | number) {
  * Square oscillator
  *
  * ```js
- * import { Oscillators } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { Oscillators } from "@ixfx/modulation.js"
  *
  * // Setup
  * const osc = Oscillators.square(Timers.frequencyTimer(0.1));

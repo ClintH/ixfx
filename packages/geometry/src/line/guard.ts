@@ -4,7 +4,6 @@ import type { Line, PolyLine } from "./line-type.js";
 /**
  * Returns true if `p` is a valid line, containing `a` and `b` Points.
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * Lines.isLine(l);
  * ```
  * @param p Value to check
@@ -25,7 +24,7 @@ export const isLine = (p: any): p is Line => {
  * @param p 
  * @returns
  */
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const isPolyLine = (p: any): p is PolyLine => {
   if (!Array.isArray(p)) return false;
 

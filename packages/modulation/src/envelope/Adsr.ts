@@ -44,7 +44,6 @@ export class AdsrIterator implements Iterator<number> {
  *
  * @example Setup
  * ```js
- * import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * const env = new Envelopes.Adsr({
  *  attackDuration: 1000,
  *  decayDuration: 200,

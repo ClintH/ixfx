@@ -9,7 +9,6 @@ import type { Line } from "../line/line-type.js";
  * Returns the point(s) of intersection between a circle and line.
  * 
  * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
  * const circle = { radius: 5, x: 5, y: 5 };
  * const line = { a: { x: 0, y: 0 }, b: { x: 10, y: 10 } };
  * const pts = Circles.intersectionLine(circle, line);
@@ -18,7 +17,7 @@ import type { Line } from "../line/line-type.js";
  * @param line 
  * @returns Point(s) of intersection, or empty array
  */
-export const intersectionLine = (circle: CirclePositioned, line: Line): ReadonlyArray<Point> => {
+export const intersectionLine = (circle: CirclePositioned, line: Line): readonly Point[] => {
   const v1 = {
     x: line.b.x - line.a.x,
     y: line.b.y - line.a.y
@@ -37,7 +36,7 @@ export const intersectionLine = (circle: CirclePositioned, line: Line): Readonly
   const u1 = (b - d) / c;  // these represent the unit distance of point one and two on the line
   const u2 = (b + d) / c;
 
-  const returnValue:Point[] = [];
+  const returnValue: Point[] = [];
   if (u1 <= 1 && u1 >= 0) {  // add point if on the line segment
     returnValue.push({
       x: line.a.x + v1.x * u1,
@@ -64,7 +63,7 @@ export const intersectionLine = (circle: CirclePositioned, line: Line): Readonly
  * @param b Circle
  * @returns Points of intersection, or an empty list if there are none
  */
-export const intersections = (a: CirclePositioned, b: CirclePositioned): ReadonlyArray<Point> => {
+export const intersections = (a: CirclePositioned, b: CirclePositioned): readonly Point[] => {
   const vector = PointsSubtract(b, a);
   const centerD = Math.hypot((vector.y), (vector.x));
 

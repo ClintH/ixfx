@@ -5,7 +5,6 @@ import { toString as PointsToString } from '../point/index.js';
 /**
  * Returns a string representation of two points
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * console.log(Lines.toString(a, b)));
  * ```
  * @param a 
@@ -17,7 +16,6 @@ export function toString(a: Point, b: Point): string;
 /**
  * Returns a string representation of a line 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * Lines.toString(line);
  * ```
  * @param line 
@@ -30,7 +28,7 @@ export function toString(line: Line): string;
  * @param b 
  * @returns 
  */
-//eslint-disable-next-line func-style
+
 export function toString(a: Point | Line, b?: Point): string {
   if (isLine(a)) {
     guard(a, `a`);

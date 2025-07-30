@@ -26,7 +26,6 @@ import { toString } from "./to-string.js";
  * wrapping the result of `sum`.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Create a path
  * const l = Lines.toPath(fromNumbers(0,0,10,10));
  * 

@@ -250,7 +250,7 @@ export function* fill<V>(it: Iterable<V>, v: V) {
  *
  * @example
  * ```js
- * import { Sync } from "https://unpkg.com/ixfx/dist/iterables.js"
+ * import { Sync } from "@ixfx/iterables.js"
  * Sync.forEach(count(5), () => console.log(`Hi`));  // Prints `Hi` 5x
  * Sync.forEach(count(5), i => console.log(i));      // Prints 0 1 2 3 4
  * Sync.forEach([0,1,2,3,4], i => console.log(i));   // Prints 0 1 2 3 4

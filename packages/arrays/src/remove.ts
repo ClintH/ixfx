@@ -4,8 +4,6 @@ import { arrayIndexTest, resultThrow } from "@ixfx/guards";
  * Removes an element at `index` index from `data`, returning the resulting array without modifying the original.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const v = [ 100, 20, 50 ];
  * const vv = Arrays.remove(2);
  *

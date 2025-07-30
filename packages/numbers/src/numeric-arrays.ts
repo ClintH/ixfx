@@ -111,7 +111,6 @@ export const average = (data: readonly number[]): number => {
  * Undefined and non-numbers are silently ignored.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
  * Numbers.min([10, 20, 0]); // Yields 0
  * ```
  * @param data
@@ -123,7 +122,6 @@ export const min = (data: readonly number[]): number =>
 /**
  * Returns the index of the largest value.
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
  * const v = [ 10, 40, 5 ];
  * Numbers.maxIndex(v); // Yields 1
  * ```
@@ -142,7 +140,6 @@ export const maxIndex = (data: readonly number[]): number =>
  * Returns the index of the smallest value.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/Numbers.js';
  * const v = [ 10, 40, 5 ];
  * Numbers.minIndex(v); // Yields 2
  * ```
@@ -162,7 +159,6 @@ export const minIndex = (...data: readonly number[]): number =>
  * Undefined and non-numbers are silently ignored.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * Numbers.max(100, 200, 50); // 200
  * ```
  * @param data List of numbers
@@ -176,7 +172,6 @@ export const max = (data: readonly number[]): number =>
  * Undefined and non-numbers are silently ignored.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * Numbers.total([1, 2, 3]); // 6
  * ```
  * @param data Array of numbers
@@ -196,7 +191,6 @@ export const total = (data: readonly number[]): number =>
  * For most uses, {@link max} should suffice.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * Numbers.maxFast([ 10, 0, 4 ]); // 10
  * ```
  * @param data
@@ -216,7 +210,6 @@ export const maxFast = (data: readonly number[] | Float32Array): number => {
  * For most uses, {@link total} should suffice.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * Numbers.totalFast([ 10, 0, 4 ]); // 14
  * ```
  * @param data
@@ -236,7 +229,6 @@ export const totalFast = (data: readonly number[] | Float32Array): number => {
  * For most uses, {@link max} should suffice.
  *
  * ```js
- * import { Numbers } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * Numbers.minFast([ 10, 0, 100 ]); // 0
  * ```
  * @param data

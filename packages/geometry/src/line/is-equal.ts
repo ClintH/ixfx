@@ -7,7 +7,6 @@ import { isEqual as PointsIsEqual } from '../point/is-equal.js';
  * true.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const a = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
  * const b = { a: {x:0,  y: 10 }, b: { x: 20, y: 20 }};
  * a === b; // false, because they are different objects

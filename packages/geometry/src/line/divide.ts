@@ -4,8 +4,6 @@ import { divide as PointDivide } from '../point/divider.js';
 /**
  * Divides both start and end points by given x,y
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
- * 
  * // Line 1,1 -> 10,10
  * const l = Lines.fromNumbers(1,1,10,10);
  * const ll = Lines.divide(l, {x:2, y:4});

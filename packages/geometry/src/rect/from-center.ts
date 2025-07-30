@@ -7,8 +7,6 @@ import { guardDim } from "./guard.js";
  * Initialises a rectangle based on its center, a width and height
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * // Rectangle with center at 50,50, width 100 height 200
  * Rects.fromCenter({x: 50, y:50}, 100, 200);
  * ```

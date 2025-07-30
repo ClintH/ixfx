@@ -8,7 +8,6 @@ const startTimeoutMs = 10_000;
  * Print available media devices to console
  * 
  * ```js
- * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
  * camera.dumpDevices(); // Will print results to console
  * ```
  * @param filterKind Defaults `videoinput`
@@ -78,9 +77,8 @@ export type StartResult = {
  *
  *
  * ```js
- * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
- * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
- * 
+ * import { Camera } from '@ixfx/io.js'
+ * import { Video } from '@ixfx/visual.js'
  * try {
  *  const { videoEl, dispose } = await Camera.start();
  *  for await (const frame of Video.frames(videoEl)) {
@@ -96,8 +94,8 @@ export type StartResult = {
  *
  * _Constraints_ can be specified to select a camera and resolution:
  * ```js
- * import { Camera } from 'https://unpkg.com/ixfx/dist/io.js'
- * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Camera } from '@ixfx/io.js'
+ * import { Video } from '@ixfx/visual.js'
  * 
  * try {
  *  const { videoEl, dispose } = await Camera.start({
@@ -122,18 +120,14 @@ export const start = async (
   constraints: Constraints = {}
 ): Promise<StartResult> => {
   const videoEl = document.createElement(`VIDEO`) as HTMLVideoElement;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.style.display = `none`;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.playsInline = true;
-  //eslint-disable-next-line functional/immutable-data
   videoEl.muted = true;
 
   videoEl.classList.add(`ixfx-camera`);
 
   document.body.append(videoEl);
 
-  //eslint-disable-next-line functional/no-let
   let stopVideo = () => {
     /* no-op */
   };

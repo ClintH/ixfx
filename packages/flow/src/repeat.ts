@@ -80,8 +80,8 @@ export type RepeatOpts = Partial<Readonly<{
  * @example
  * Return values from a generator every 500ms
  * ```js
- * import { repeat } from 'https://unpkg.com/ixfx/dist/flow.js'
- * import { count } from 'https://unpkg.com/ixfx/dist/numbers.js'
+ * import { repeat } from '@ixfx/flow.js'
+ * import { count } from '@ixfx/numbers.js'
  * for await (const v of repeat(count(10), { fixed: 1000 })) {
  *  // Do something with `v`
  * }

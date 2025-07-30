@@ -40,8 +40,6 @@ export const filterAB = <V>(
  * of slicing the array before using `filter`.
  *
  * ```js
- * import { filterBetween } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * // Return 'registered' people between and including array indexes 5-10
  * const filtered = [...filterBetween(people, person => person.registered, 5, 10)];
  * ```

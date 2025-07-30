@@ -66,8 +66,8 @@ export const movingAverageLight = (scaling = 3): (value?: number) => number => {
  * It uses `Arrays.averageWeighted` under the hood.
  *
  * ```js
- * import { movingAverage } from 'https://unpkg.com/ixfx/dist/data.js';
- * import { gaussian } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { movingAverage } from '@ixfx/numbers.js';
+ * import { gaussian } from '@ixfx/modulation.js';
  * 
  * // Give more weight to data in middle of sampling window
  * const ma = movingAverage(100, gaussian());

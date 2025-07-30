@@ -10,7 +10,6 @@ import type { Point } from '../point/point-type.js';
  * If `b` overlaps or is enclosed by `a`, distance is 0.
  * 
  * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
  * const circleA = { radius: 5, x: 5, y: 5 }
  * const circleB = { radius: 10, x: 20, y: 20 }
  * const distance = Circles.distanceCenter(circleA, circleB);

@@ -6,7 +6,6 @@ import type { Rect, RectPositioned } from "./RectTypes.js";
  * This can be useful for normalising based on camera frame.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  *
  * const frameSize = {width: 640, height: 320};
  * const object = { x: 320, y: 160, width: 64, height: 32};

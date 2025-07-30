@@ -8,8 +8,6 @@ import { resultThrow, integerTest } from '@ixfx/guards';
  * @example 
  * By percentage - get half of the items
  * ```
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const list = [1,2,3,4,5,6,7,8,9,10];
  * const sub = Arrays.sample(list, 0.5);
  * // Yields: [2, 4, 6, 8, 10]
@@ -18,8 +16,6 @@ import { resultThrow, integerTest } from '@ixfx/guards';
  * @example
  * By steps - every third value
  * ```
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const list = [1,2,3,4,5,6,7,8,9,10];
  * const sub = Arrays.sample(list, 3);
  * // Yields:

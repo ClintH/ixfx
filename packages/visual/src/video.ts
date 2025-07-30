@@ -74,7 +74,7 @@ export type FramesOpts = {
  * Generator that yields frames from a video element as [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
  *
  * ```js
- * import { Video } from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import { Video } from '@ixfx/visual.js'
  *
  * const ctx = canvasEl.getContext(`2d`);
  * for await (const frame of Video.frames(videoEl)) {
@@ -140,7 +140,7 @@ export async function* frames(
     if (w === 0 || h === 0) continue;
 
     // Draw current frame from video element to hidden canvas
-    if (c === null) c = canvasEl.getContext(`2d`);
+    c ??= canvasEl.getContext(`2d`);
     if (c === null) return;
     c.drawImage(sourceVideoEl, 0, 0, w, h);
 
@@ -155,8 +155,6 @@ export async function* frames(
  *
  * @example Using a function
  * ```js
- * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
- *
  * // Capture from a VIDEO element, handling frame data
  * // imageData is ImageData type: https://developer.mozilla.org/en-US/docs/Web/API/ImageData
  * Video.capture(sourceVideoEl, {
@@ -168,8 +166,6 @@ export async function* frames(
  *
  * @example Using a worker
  * ```js
- * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
- *
  * Video.capture(sourceVideoEl, {
  *  workerScript: `./frameProcessor.js`
  * });

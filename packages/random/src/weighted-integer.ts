@@ -6,7 +6,6 @@ import { clamp } from "./util/clamp.js";
  *
  * @example 0..99
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * const r = Random.weightedIntegerFn(100);
  * r(); // Produce value
  * ```
@@ -53,7 +52,6 @@ export const weightedIntegerSource = (
  * 
  * @example 0..99
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * Random.weightedInteger(100);
  * ```
  *

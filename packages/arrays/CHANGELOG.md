@@ -1,5 +1,11 @@
 # @ixfx/arrays
 
+## 0.43.0
+
+### Minor Changes
+
+- Comments
+
 ## 0.42.0
 
 ### Minor Changes

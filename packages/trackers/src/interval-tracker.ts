@@ -20,7 +20,7 @@ export class IntervalTracker extends NumberTracker {
  * records the interval between each call to `mark`.
  *
  * ```js
- * import { interval } from 'https://unpkg.com/ixfx/dist/trackers.js';
+ * import { interval } from '@ixfx/trackers.js';
  *
  * const t = interval();
  *

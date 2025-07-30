@@ -12,7 +12,6 @@ import type { EasingName, EasingOptions } from './types.js';
 /**
  * Creates an easing function
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const e = Easings.create({ duration: 1000, name: `quadIn` });
  * const e = Easings.create({ ticks: 100, name: `sineOut` });
  * const e = Easings.create({ 
@@ -50,7 +49,6 @@ export const create = (options: EasingOptions): () => number => {
  * 
  * @example Time based easing
  * ```
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const t = Easings.timeEasing(`quintIn`, 5*1000); // Will take 5 seconds to complete
  * ...
  * t.compute(); // Get current value of easing
@@ -88,7 +86,6 @@ export const timeEasing = (
  * If you need to check if an easing is done or reset it, consider {@link timeEasing}.
  * 
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * // Quad-in easing over one second
  * const e = Easings.time(`quadIn`, 1000);
  * 
@@ -122,7 +119,6 @@ export const time = (
  * If you need to check if an easing is done or reset it, consider {@link tickEasing}.
  * 
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * // Quad-in easing over 100 ticks
  * const e = Easings.ticks(`quadIn`, 100);
  * 
@@ -155,7 +151,6 @@ export const ticks = (
  *
  * @example Tick-based easing
  * ```
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const t = Easings.tickEasing(`sineIn`, 1000);   // Will take 1000 ticks to complete
  * t.compute(); // Each call to `compute` progresses the tick count
  * t.reset();   // Reset to 0
@@ -195,7 +190,6 @@ const resolveEasingName = (nameOrFunction: EasingName | ((v: number) => number))
  * Creates a new easing by name
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const e = Easings.create(`circInOut`, 1000, elapsedMillisecondsAbsolute);
  * ```
  * @param nameOrFunction Name of easing, or an easing function
@@ -257,7 +251,6 @@ let easingsMap: Map<string, ((v: number) => number)> | undefined;
  * easing is not found.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const fn = Easings.get(`sineIn`);
  * // Returns 'eased' transformation of 0.5
  * fn(0.5);

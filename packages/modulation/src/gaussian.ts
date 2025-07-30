@@ -7,7 +7,6 @@ const gaussianA = 1 / Math.sqrt(2 * Math.PI);
 /**
  * Returns a roughly gaussian easing function
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
  * const fn = Easings.gaussian();
  * ```
  *

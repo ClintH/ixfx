@@ -17,7 +17,6 @@ export function fromNumbers(width: number, height: number): Rect;
  * Returns a rectangle from x,y,width,height
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r = Rects.fromNumbers(10, 20, 100, 200);
  * // {x: 10, y: 20, width: 100, height: 200}
  * ```
@@ -45,7 +44,6 @@ export function fromNumbers(
  * Returns a rectangle from a series of numbers: x, y, width, height OR width, height
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r1 = Rects.fromNumbers(100, 200);
  * // {width: 100, height: 200}
  *
@@ -67,7 +65,7 @@ export function fromNumbers(
  * @param height
  * @returns
  */
-//eslint-disable-next-line func-style
+
 export function fromNumbers(
   xOrWidth: number,
   yOrHeight: number,

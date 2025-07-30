@@ -39,7 +39,7 @@ export type InterpolateOptions = BasicInterpolateOptions & {
  * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  * 
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  * 
  * // Create function
  * const fn = interpolate(0.1);
@@ -60,7 +60,7 @@ export function interpolate(amount: number, options?: Partial<InterpolateOptions
  * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  * 
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  * 
  * // Get the value at 10% of range between 50-100
  * const fn = interpolate(0.1, 50, 100);
@@ -80,7 +80,7 @@ export function interpolate(amount: number, a: number, b: number, options?: Part
  * The returned function requires an interpolation amount. This is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  * 
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  * 
  * // Create function to interpolate between 50..100
  * const fn = interpolate(50, 100);
@@ -101,7 +101,7 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  *
  * @example Get the halfway point between 30 and 60
  * ```js
- * import { interpolate } from 'https://unpkg.com/ixfx/dist/numbers.js';
+ * import { interpolate } from '@ixfx/numbers.js';
  * interpolate(0.5, 30, 60);
  * ```
  *
@@ -248,7 +248,7 @@ export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, start
  * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
  *
  * ```js
- * import { interpolateAngle } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { interpolateAngle } from '@ixfx/data.js';
  * interpolateAngle(0.5, Math.PI, Math.PI/2);
  * ```
  * @param amount

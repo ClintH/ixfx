@@ -66,7 +66,6 @@ export const isPlaceholder = (l: Line): boolean => PointIsPlaceholder(l.a) && Po
  * Applies `fn` to both start and end points.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Line 10,10 -> 20,20
  * const line = Lines.fromNumbers(10,10, 20,20);
  * 
@@ -95,7 +94,6 @@ export const apply = (line: Line, fn: (p: Point) => Point) => Object.freeze<Line
 /**
  * Returns the angle in radians of a line, or two points
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * Lines.angleRadian(line);
  * Lines.angleRadian(ptA, ptB);
  * ```
@@ -120,7 +118,6 @@ export const angleRadian = (lineOrPoint: Line | Point, b?: Point): number => {
  * for converting an absolutely-defined line to a relative one.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * 
  * // Line 1,1 -> 10,10
  * const l = Lines.fromNumbers(1,1,10,10);
@@ -143,7 +140,6 @@ export const normaliseByRect = (line: Line, width: number, height: number): Line
  * Returns true if `point` is within `maxRange` of `line`.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const line = Lines.fromNumbers(0,20,20,20);
  * Lines.withinRange(line, {x:0,y:21}, 1); // True
  * ```
@@ -163,7 +159,6 @@ export const withinRange = (line: Line, point: Point, maxRange: number): boolean
  * 
  * @example
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * Lines.slope(line);
  * Lines.slope(ptA, ptB)
  * ```
@@ -195,7 +190,6 @@ export const slope = (lineOrPoint: Line | Point, b?: Point): number => {
  * 
  * @example Shorten by 50%, anchored at the midpoint
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const l = {
  *  a: {x:50, y:50}, b: {x: 100, y: 90}
  * }
@@ -224,7 +218,6 @@ export const pointAtX = (line: Line, x: number): Point => {
  * Returns a line extended from its `a` point by a specified distance
  *
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const line = {a: {x: 0, y:0}, b: {x:10, y:10} }
  * const extended = Lines.extendFromA(line, 2);
  * ```
@@ -249,7 +242,6 @@ export const extendFromA = (line: Line, distance: number): Line => {
  * 
  * @example Basic usage
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const l = { a: {x: 0, y: 0}, b: {x: 100, y: 100} };
  * for (const p of Lines.pointsOf(l)) {
  *  // Do something with point `p`...
@@ -298,7 +290,6 @@ export function* pointsOf(line: Line): Generator<Point> {
  * nearest point on `line`.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const d = Lines.distance(line, {x:10,y:10});
  * ```
  * 
@@ -322,7 +313,6 @@ export const distance = (line: Line | readonly Line[], point: Point): number => 
  * See {@link fromFlatArray} to create a line _from_ this representation.
  *
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * Lines.toFlatArray(line);
  * Lines.toFlatArray(pointA, pointB);
  * ```
@@ -362,7 +352,6 @@ export function* asPoints(lines: Iterable<Line>) {
 /**
  * Returns an SVG description of line
  * ```
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js';
  * Lines.toSvgString(ptA, ptB);
  * ```
  * @param a 

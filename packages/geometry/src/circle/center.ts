@@ -8,7 +8,6 @@ import { isCirclePositioned } from "./guard.js";
  * If not, `radius` is used as the x and y.
  * 
  * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
  * const circle = { radius: 5, x: 10, y: 10};
  * 
  * // Yields: { x: 5, y: 10 }

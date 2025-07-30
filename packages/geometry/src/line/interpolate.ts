@@ -13,8 +13,6 @@ import { reverse } from "./reverse.js";
  * briefly go past the limits.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
- * 
  * // Get {x,y} at 50% along line
  * Lines.interpolate(0.5, line);
  * 
@@ -32,8 +30,6 @@ export function interpolate(amount: number, a: Point, pointB: Point, allowOverfl
  * Calculates a point in-between `line`'s start and end points.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
- * 
  * // Get {x, y } at 50% along line
  * Lines.interpolate(0.5, line);
  * ```

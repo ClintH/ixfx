@@ -21,7 +21,6 @@ export type WeightedOptions = Readonly<{
  * Use {@link weightedSource} to return a function instead.
  *
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * Random.weighted();          // quadIn easing by default, which skews toward low values
  * Random.weighted(`quadOut`); // quadOut favours high values
  * ```
@@ -39,7 +38,6 @@ export const weighted = (
  * Use {@link weighted} to get a value directly.
  *
  * ```js
- * import * as Random from 'https://unpkg.com/ixfx/dist/random.js';
  * const r1 = Random.weightedSource();          // quadIn easing by default, which skews toward low values
  * r1(); // Produce a value
  *

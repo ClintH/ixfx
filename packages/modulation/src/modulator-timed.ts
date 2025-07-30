@@ -43,7 +43,7 @@ export const time = (
  *
  * @example Time based easing
  * ```
- * import { timeModulator } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { timeModulator } from "@ixfx/modulation.js";
  * const fn = (t) => {
  *  // 't' will be a value 0..1 representing time elapsed. 1 being end of period.
  *  return t*Math.random();
@@ -116,7 +116,7 @@ export const ticks = (
  *
  * @example Tick-based modulator
  * ```
- * import { tickModulator } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { tickModulator } from "@ixfx/modulation.js";
  * const fn = (t) => {
  *  // 't' will be values 0..1 based on completion
  *  return Math.random() * t;

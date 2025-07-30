@@ -7,8 +7,6 @@ import { guard as PointsGuard } from '../point/guard.js';
  * Creates a rectangle from its top-left coordinate, a width and height.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * // Rectangle at 50,50 with width of 100, height of 200.
  * const rect = Rects.fromTopLeft({ x: 50, y:50 }, 100, 200);
  * ```

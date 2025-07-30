@@ -87,7 +87,7 @@ export type EspruinoBleOpts = {
  * If `opts.name` is specified, this will the the Bluetooth device sought.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const e = await Espruino.puck({ name:`Puck.js a123` });
  * ```
  *
@@ -96,7 +96,7 @@ export type EspruinoBleOpts = {
  * To get more control over filtering, pass in `opts.filter`. `opts.name` is not used as a filter in this scenario.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const filters = [
  *  { namePrefix: `Puck.js` },
  *  { namePrefix: `Pixl.js` },
@@ -144,14 +144,14 @@ export const bangle = async (opts: EspruinoBleOpts = {}) => {
  * Create a serial-connected Espruino device.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const e = await Espruio.serial();
  * e.connect();
  * ```
  *
  * Options:
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const e = await Espruino.serial({ debug: true, evalTimeoutMs: 1000, name: `My Pico` });
  * e.connect();
  * ```
@@ -239,7 +239,7 @@ const getFilters = (opts: EspruinoBleOpts, defaultNamePrefix: string) => {
  * `opts.filters` overrides and sets arbitary filters.
  *
  * ```js
- * import { Espruino } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Espruino } from '@ixfx/io.js'
  * const filters = [
  *  { namePrefix: `Puck.js` },
  *  { namePrefix: `Pixl.js` },

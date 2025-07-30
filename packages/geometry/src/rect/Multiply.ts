@@ -8,8 +8,6 @@ const multiplyOp = (a: number, b: number) => a * b;
  * Multiplies positioned `rect` by width/height. Useful for denormalising a value.
  * x/y value of second parameter are ignored.
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * // Normalised rectangle
  * const r = { x:0.5, y:0.5, width: 0.5, height: 0.5};
  *
@@ -29,8 +27,6 @@ export function multiply(
  * Multiplies `rect` by width/height. Useful for denormalising a value.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * // Normalised rectangle of width 50%, height 50%
  * const r = { width: 0.5, height: 0.5 };
  *

@@ -41,8 +41,8 @@ export const adsr = (opts: EnvelopeOpts = {}) => {
  *
  * @example Init
  * ```js
- * import { Envelopes } from 'https://unpkg.com/ixfx/dist/modulation.js';
- * import { IterableAsync } from  'https://unpkg.com/ixfx/dist/util.js';
+ * import { Envelopes } from '@ixfx/modulation.js';
+ * import { IterableAsync } from  '@ixfx/iterable.js';
  *
  * const opts = {
  *  attackDuration: 1000,

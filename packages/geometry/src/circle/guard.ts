@@ -44,8 +44,6 @@ export const isNaN = (a: Circle | CirclePositioned): boolean => {
  * Returns true if parameter has x,y. Does not verify if parameter is a circle or not
  * 
  * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
- * 
  * const circleA = { radius: 5 };
  * Circles.isPositioned(circle); // false
  * 
@@ -56,7 +54,7 @@ export const isNaN = (a: Circle | CirclePositioned): boolean => {
  * @returns 
  */
 export const isPositioned = (p: Circle | Point): p is Point => (p as Point).x !== undefined && (p as Point).y !== undefined;
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const isCircle = (p: any): p is Circle => (p as Circle).radius !== undefined;
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const isCirclePositioned = (p: any): p is CirclePositioned => isCircle(p) && isPositioned(p);

@@ -5,7 +5,6 @@ import { isEqual as PointsIsEqual } from '../point/is-equal.js';
  * Returns _true_ if the width & height of the two rectangles is the same.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 10, height: 10, x: 10, y: 10 };
  * const rectB = { width: 10, height: 10, x: 20, y: 20 };
  *
@@ -30,7 +29,6 @@ export const isEqualSize = (a: Rect, b: Rect): boolean => {
  * Both rectangles must be positioned or not.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 10, height: 10, x: 10, y: 10 };
  * const rectB = { width: 10, height: 10, x: 20, y: 20 };
  *

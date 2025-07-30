@@ -13,7 +13,6 @@ import { distance as PointsDistance } from '../point/distance.js';
  * If `rect` does not have an x,y it's assumed to be 0,0
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rect = { width: 100, height: 100, x: 0, y: 0 };
  * Rects.distanceFromExterior(rect, { x: 20, y: 20 });
  * ```
@@ -37,7 +36,6 @@ export const distanceFromExterior = (
  * Return the distance of `pt` to the center of `rect`.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rect = { width: 100, height: 100, x: 0, y: 0 };
  * Rects.distanceFromCenter(rect, { x: 20, y: 20 });
  * ```

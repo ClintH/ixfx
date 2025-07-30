@@ -79,7 +79,6 @@ export const jitterAbsolute = (options: JitterOpts): Jitterer => {
  * `jitter` returns a function that calculates jitter. If you only need a one-off
  * jitter, you can immediately execute the returned function:
  * ```js
- * import { jitter } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * // Compute 10% jitter of input 0.5
  * const value = jitter({ relative: 0.1 })(0.5);
  * ```
@@ -87,7 +86,6 @@ export const jitterAbsolute = (options: JitterOpts): Jitterer => {
  * However, if the returned jitter function is to be used again,
  * assign it to a variable:
  * ```js
- * import { jitter } from 'https://unpkg.com/ixfx/dist/modulation.js';
  * const myJitter = jitter({ absolute: 0.5 });
  *
  * // Jitter an input value 1.0
@@ -98,7 +96,7 @@ export const jitterAbsolute = (options: JitterOpts): Jitterer => {
  * random number generator:
  *
  * ```js
- * import { weighted } from 'https://unpkg.com/ixfx/dist/random.js';
+ * import { weighted } from '@ixfx/random.js';
  * jitter({ relative: 0.1, source: weighted });
  * ```
  *

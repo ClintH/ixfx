@@ -12,7 +12,6 @@ import type { Line } from "../line/line-type.js";
  * Lines are given in order: top, right, bottom, left
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rect = { width: 100, height: 100, x: 100, y: 100 };
  * // Yields: array of length four
  * const lines = Rects.lines(rect);
@@ -25,7 +24,7 @@ import type { Line } from "../line/line-type.js";
 export const edges = (
   rect: RectPositioned | Rect,
   origin?: Point
-): ReadonlyArray<Line> => {
+): readonly Line[] => {
   const c = corners(rect, origin);
 
   // Connect all the corners, back to first corner again
@@ -35,8 +34,6 @@ export const edges = (
 /**
  * Returns a point on the edge of rectangle
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * const r1 = {x: 10, y: 10, width: 100, height: 50};
  * Rects.getEdgeX(r1, `right`);  // Yields: 110
  * Rects.getEdgeX(r1, `bottom`); // Yields: 10
@@ -74,8 +71,6 @@ export const getEdgeX = (
  * Returns a point on the edge of rectangle
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * const r1 = {x: 10, y: 10, width: 100, height: 50};
  * Rects.getEdgeY(r1, `right`);  // Yields: 10
  * Rects.getEdgeY(r1, `bottom`); // Yields: 60

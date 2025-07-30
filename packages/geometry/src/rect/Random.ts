@@ -6,21 +6,20 @@ import type { Rect, RectPositioned } from './rect-types.js';
 /**
  * Returns a random positioned Rect on a 0..1 scale.
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r = Rects.random(); // eg {x: 0.2549012, y:0.859301, width: 0.5212, height: 0.1423 }
  * ```
  *
  * A custom source of randomness can be provided:
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- * import { weightedSource } from "https://unpkg.com/ixfx/dist/random.js"
+ * import { Rects } from "@ixfx/geometry.js";
+ * import { weightedSource } from "@ixfx/random.js"
  * const r = Rects.random(weightedSource(`quadIn`));
  * ```
  * @param rando
  * @returns
  */
 export const random = (rando?: RandomSource): RectPositioned => {
-  if (rando === undefined) rando = Math.random;
+  rando ??= Math.random;
 
   return Object.freeze({
     x: rando(),

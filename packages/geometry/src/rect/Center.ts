@@ -8,8 +8,6 @@ import type { Rect, RectPositioned } from "./rect-types.js";
  *  If the rectangle lacks a position and `origin` parameter is not provided, 0,0 is used instead.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * const p = Rects.center({x:10, y:20, width:100, height:50});
  * const p2 = Rects.center({width: 100, height: 50}); // Assumes 0,0 for rect x,y
  * ```

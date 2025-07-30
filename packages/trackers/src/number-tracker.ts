@@ -90,7 +90,7 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * Usage:
  *
  * ```js
- * import { number } from 'https://unpkg.com/ixfx/dist/trackers.js';
+ * import { number } from '@ixfx/trackers.js';
  *
  * const t = number();
  * t.seen(10);

@@ -58,7 +58,7 @@ export type ReconnectingOptions = {
  * 
  * The essential usage is:
  * ```js
- * import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { reconnectingWebsocket } from '@ixfx/io.js'
  * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
  *  onMessage: (msg) => {
  *    // Do something with received message...
@@ -74,7 +74,7 @@ export type ReconnectingOptions = {
  * 
  * More options can be provided to monitor state
  * ```js
- * import { reconnectingWebsocket } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { reconnectingWebsocket } from '@ixfx/io.js'
  * const ws = reconnectingWebsocket(`wss://somehost.com/ws`, {
  *  onError: (err) => {
  *    console.error(err)

@@ -7,7 +7,6 @@ import { toPath } from "./to-path.js";
  * Returns a {@link LinePath} from two points
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const path = Lines.fromPointsToPath(ptA, ptB);
  * ```
  * @param a 

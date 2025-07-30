@@ -8,7 +8,6 @@ const subtractOp = (a: number, b: number) => a - b;
  * Subtracts width/height of `b` from `a` (ie: a - b), returning result.
  * x,y of second parameter is ignored.
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 100, height: 100 };
  * const rectB = { width: 200, height: 200 };
  *
@@ -24,8 +23,6 @@ export function subtract(a: RectPositioned, b: Rect | RectPositioned): RectPosit
 /**
  * Subtracts a width/height from `a`, returning result.
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
- *
  * const rect = { width: 100, height: 100 };
  * Rects.subtract(rect, 200, 200);
  * // Yields: { width: -100, height: -100 }
@@ -41,7 +38,6 @@ export function subtract(a: RectPositioned, width: number, height: number): Rect
  * Subtracts width/height from `a`.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 100, height: 100 };
  * const rectB = { width: 200, height: 200 };
  *

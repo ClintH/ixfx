@@ -23,7 +23,6 @@ const directionVectorNormalised = (line: Line): Point => {
  * Returns a parallel line to `line` at `distance`.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const l = Lines.parallel(line, 10);
  * ```
  * @param line
@@ -49,7 +48,6 @@ export const parallel = (line: Line, distance: number): Line => {
  * Returns a point perpendicular to `line` at a specified `distance`. Use negative
  * distances for the other side of line.
  * ```
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Project a point 100 units away from line, at its midpoint.
  * const pt = Lines.perpendicularPoint(line, 100, 0.5);
  * ```

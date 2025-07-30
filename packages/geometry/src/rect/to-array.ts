@@ -5,7 +5,6 @@ import type { Rect, RectArray, RectPositioned, RectPositionedArray } from "./rec
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  *
  * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
  * // [10, 20, 100, 200]
@@ -21,7 +20,6 @@ export function toArray(rect: Rect): RectArray;
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  *
  * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
  * // [10, 20, 100, 200]
@@ -37,7 +35,6 @@ export function toArray(rect: RectPositioned): RectPositionedArray;
  * Converts a rectangle to an array of numbers. See {@link fromNumbers} for the opposite conversion.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const r1 = Rects.toArray({ x: 10, y:20, width: 100, height: 200 });
  * // [10, 20, 100, 200]
  * const r2 = Rects.toArray({ width: 100, height: 200 });
@@ -46,7 +43,7 @@ export function toArray(rect: RectPositioned): RectPositionedArray;
  * @param rect
  * @see fromNumbers
  */
-// eslint-disable-next-line func-style
+
 export function toArray(
   rect: Rect | RectPositioned
 ): RectArray | RectPositionedArray {

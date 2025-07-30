@@ -4,8 +4,8 @@ import type { ModFunction, SpringOptions } from './types.js';
 /**
  * Produces values according to rough spring physics.
  * ```js
- * import { continuously } from "https://unpkg.com/ixfx/dist/flow.js"
- * import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { continuously } from "@ixfx/flow.js"
+ * import { spring } from "@ixfx/modulation.js"
  * 
  * const s = spring();
  *
@@ -19,7 +19,7 @@ import type { ModFunction, SpringOptions } from './types.js';
  *
  * Parameters to the spring can be provided.
  * ```js
- * import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { spring } from "@ixfx/modulation.js"
  * const s = spring({
  *  mass: 5,
  *  damping: 10
@@ -65,14 +65,14 @@ export function* spring(
  * a value. When the spring is done, 1 is returned instead of undefined.
  * 
  * ```js
- * import { springValue } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { springValue } from "@ixfx/modulation.js"
  * const s = springValue();
  * s(); // 0..1 (roughly - exceeding 1 is possible)
  * ```
  * 
  * Options can be provided:
  * ```js
- * import { spring } from "https://unpkg.com/ixfx/dist/modulation.js"
+ * import { spring } from "@ixfx/modulation.js"
  * const s = springValue({
  *  stiffness: 100,
  *  damping: 10
@@ -80,7 +80,7 @@ export function* spring(
  * ```
  * @example Applied
  * ```js
- * import { Modulation, Data } from  "https://unpkg.com/ixfx/dist/bundle.js"
+ * import { Modulation, Data } from  "@ixfx/bundle.js"
  * let state = {
  *  spring: Modulation.springValue()
  * }

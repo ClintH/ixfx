@@ -135,7 +135,7 @@ export function sineBipolarShape(period = 1): ModFunction {
 /**
  * Creates a wave modulator. Defaults to 5-second sine wave. 
  * ```js
- * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
+ * import { wave } from '@ixfx/modulation.js';
  * // Triangle wave that has a single cycle over two seconds
  * const m = wave({ secs: 2, shape: `triangle`});
  * 
@@ -146,8 +146,8 @@ export function sineBipolarShape(period = 1): ModFunction {
  * 
  * @example
  * ```js
- * import { wave } from 'https://unpkg.com/ixfx/dist/modulation.js';
- * import { resolveFields } from 'https://unpkg.com/ixfx/dist/data.js';
+ * import { wave } from '@ixfx/modulation.js';
+ * import { resolveFields } from '@ixfx/data.js';
  * 
  * const state = {
  *  intensity: wave({secs: 2, shape: `sine` }),

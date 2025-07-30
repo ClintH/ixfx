@@ -4,8 +4,6 @@ import { containsIdenticalValues } from "./equality.js";
  * Zip combines the elements of two or more arrays based on their index.
  *
  * ```js
- * import { Arrays } from 'https://unpkg.com/ixfx/dist/data.js';
- *
  * const a = [1,2,3];
  * const b = [`red`, `blue`, `green`];
  *

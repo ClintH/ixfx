@@ -7,7 +7,7 @@ import type { ModFunction } from "./types.js";
  *  a:0, b: 1.33, c: 1, d: -1.25
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { Easings } from "@ixfx/modulation.js";
  * // Time-based easing using bezier
  * const e = Easings.time(fromCubicBezier(1.33, -1.25), 1000);
  * e.compute();

@@ -7,7 +7,7 @@ const sumOp = (a: number, b: number) => a + b;
  * Sums width/height of `b` with `a` (ie: a + b), returning result.
  * x/y of second parameter are ignored
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * import { Rects } from "@ixfx/geometry.js";
  * const rectA = { width: 100, height: 100 };
  * const rectB = { width: 200, height: 200 };
  *
@@ -37,7 +37,7 @@ export function sum(a: RectPositioned, b: Rect | RectPositioned): RectPositioned
 /**
  * Sums width/height of `rect` with given `width` and `height`
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
+ * import { Rects } from "@ixfx/geometry.js";
  * const rect = { width: 100, height: 100 };
  *
  * // Yields: { width: 300, height: 300 }
@@ -67,7 +67,6 @@ export function sum(rect: RectPositioned, width: number, height: number): RectPo
  * Sums width/height of `b` with `a` (ie: a + b), returning result.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * const rectA = { width: 100, height: 100 };
  * const rectB = { width: 200, height: 200 };
  *
@@ -80,7 +79,7 @@ export function sum(rect: RectPositioned, width: number, height: number): RectPo
  * @param c
  * @returns
  */
-//eslint-disable-next-line func-style
+
 export function sum(a: Rect, b: RectPositioned | Rect | number, c?: number): Rect {
   // @ts-ignore
   return applyMerge(sumOp, a, b, c);

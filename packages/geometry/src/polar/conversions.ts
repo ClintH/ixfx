@@ -12,7 +12,6 @@ import { radianToDegree } from "../angles.js";
  * Converts to Cartesian coordinate from polar.
  *
  * ```js
- * import { Polar } from 'https://unpkg.com/ixfx/dist/geometry.js';
  *
  * const origin = { x: 50, y: 50}; // Polar origin
  * // Yields: { x, y }
@@ -37,7 +36,7 @@ export const toCartesian: PolarToCartesian = (
   c?: Point
 ): Point => {
   if (isPolarCoord(a)) {
-    if (b === undefined) b = EmptyPoint;
+    if (typeof b === `undefined`) b = EmptyPoint;
     if (isPoint(b)) {
       return polarToCartesian(a.distance, a.angleRadian, b);
     }
@@ -71,7 +70,6 @@ export const toCartesian: PolarToCartesian = (
  * Converts a Cartesian coordinate to polar
  *
  * ```js
- * import { Polar } from 'https://unpkg.com/ixfx/dist/geometry.js';
  *
  * // Yields: { angleRadian, distance }
  * const polar = Polar.fromCartesian({x: 50, y: 50}, origin);

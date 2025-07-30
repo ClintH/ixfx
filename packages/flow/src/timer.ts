@@ -55,7 +55,6 @@ export type RelativeTimerOpts = TimerOpts & {
  * A function that returns _true_ when an interval has elapsed
  *
  * ```js
- * import { hasElapsed } from "https://unpkg.com/ixfx/dist/flow.js"
  * const oneSecond = hasElapsed(1000);
  * 
  * // Keep calling to check if time has elapsed.
@@ -81,7 +80,6 @@ export function hasElapsed(elapsed: Interval): () => boolean {
  * Starts when return function is first invoked.
  *
  * ```js
- * import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
  * const timer = Flow.ofTotal(1000);
  * 
  * // Call timer() to find out the completion
@@ -126,7 +124,6 @@ export function ofTotal(
  * Uses 'ticks' as a measure. Use {@link ofTotal} if you want time-based.
  *
  * ```js
- * import * as Flow from "https://unpkg.com/ixfx/dist/flow.js"
  * const timer = Flow.ofTotalTicks(1000);
  * timer(); // Returns 0..1
  * ```
@@ -294,7 +291,6 @@ export const relative = (
  *
  * @example Prints around 0/0.5 each second, as timer is half a cycle per second
  * ```js
- * import { frequencyTimer } from "https://unpkg.com/ixfx/dist/flow.js"
  * const t = frequencyTimer(0.5);
  * setInterval(() => {
  *  console.log(t.elapsed);

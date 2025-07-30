@@ -48,7 +48,7 @@ export * as ImageDataGrid from './image-data-grid.js';
  * // If library is stored two directories up under `ixfx/`
  * import {Video} from '../../ixfx/dist/visual.js';
  * // Import from web
- * import {Video} from 'https://unpkg.com/ixfx/dist/visual.js'
+ * import {Video} from '@ixfx/visual.js'
  * ```
  */
 export * as Video from './video.js';

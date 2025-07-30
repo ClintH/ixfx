@@ -9,7 +9,6 @@ export function round(decimalPlaces: number, roundUp?: boolean): (v: number) => 
  * If one parameter is given, it's the decimal places,
  * and a rounding function is returned:
  * ```js
- * import { round } from 'https://unpkg.com/ixfx/dist/numbers.js';
  * const r = round(2);
  * r(10.12355); // 10.12
  * ```

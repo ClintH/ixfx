@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/iterables",
-	"version": "0.39.3",
+	"version": "0.40.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,

@@ -5,7 +5,6 @@ import type { Line } from "./line-type.js";
  * Returns a line from a basis of coordinates (x1, y1, x2, y2)
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * // Line from 0,1 -> 10,15
  * Lines.fromNumbers(0, 1, 10, 15);
  * ```

@@ -6,7 +6,6 @@ import { minIndex } from "@ixfx/numbers";
  * Returns the nearest point on `line` closest to `point`.
  * 
  * ```js
- * import { Lines } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const pt = Lines.nearest(line, {x:10,y:10});
  * ```
  * 

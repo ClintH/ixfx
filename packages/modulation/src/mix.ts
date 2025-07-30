@@ -10,7 +10,6 @@ import type { ModFunction } from "./types.js";
  * to slowly ramp up to the fully modulated value.
  * 
  * ```js
- * import { mix } from 'https://unpkg.com/ixfx/dist/modulation.js'
  * // When 'amt' is 0, modulation doesn't affect value at all,
  * // original is returned
  * mix(0, 0.5, 0.9); // 0.5
@@ -36,7 +35,7 @@ export const mix = (amount: number, original: number, modulation: number) => {
  * Both modulators are given the same input value.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { Easings } from "@ixfx/modulation.js";
  * // Get a 50/50 mix of two easing functions
  * const mix = Easings.mix(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
  *
@@ -67,7 +66,7 @@ export const mixModulators = (
  * So easingB will only ever kick in at higher `amt` values and `easingA` will only be present in lower values.
  *
  * ```js
- * import { Easings } from "https://unpkg.com/ixfx/dist/modulation.js";
+ * import { Easings } from "@ixfx/modulation.js";
  * Easings.crossFade(0.5, Easings.Named.sineIn, Easings.Named.sineOut);
  * ```
  * @param a Easing A

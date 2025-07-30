@@ -235,7 +235,7 @@ export async function* flatten<V>(it: AsyncIterable<V>) {
  * interval between each loop. If the async `fn` returns _false_, iterator cancels.
  *
  * ```
- * import { forEach } from "https://unpkg.com/ixfx/dist/flow.js"
+ * import { forEach } from "@ixfx/flow.js"
  * // Prints items from array every second
  * await forEach([0,1,2,3], i => console.log(i), 1000);
  * ```

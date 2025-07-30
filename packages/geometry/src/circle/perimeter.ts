@@ -9,7 +9,6 @@ const piPi = Math.PI * 2;
  * Returns the nearest point on `circle`'s perimeter closest to `point`.
  * 
  * ```js
- * import { Circles } from 'https://unpkg.com/ixfx/dist/geometry.js'
  * const pt = Circles.nearest(circle, {x:10,y:10});
  * ```
  * 
@@ -39,8 +38,6 @@ export const nearest = (circle: CirclePositioned | readonly CirclePositioned[], 
  * Returns a point on a circle's perimeter at a specified angle in radians
  * 
  * ```js
- * import { Circles } from "https://unpkg.com/ixfx/dist/geometry.js" 
- * 
  * // Circle without position
  * const circleA = { radius: 5 };
  * 

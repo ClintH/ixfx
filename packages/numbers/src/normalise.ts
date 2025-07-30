@@ -11,7 +11,6 @@ import { numberArrayCompute } from './number-array-compute.js';
  *
  * @example
  * ```js
- * import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'
  * const s = Normalise.stream();
  * s(2);    // 1 (because 2 is highest seen)
  * s(1);    // 0 (because 1 is the lowest so far)
@@ -60,7 +59,6 @@ export const stream = (minDefault?: number, maxDefault?: number) => {
  * as the normalisation range. [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
  * ```js
- * import {Normalise} from 'https://unpkg.com/ixfx/dist/numbers.js'
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
  * Normalise.array([5,1,0,9,10]);
  * ```

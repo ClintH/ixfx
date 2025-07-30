@@ -7,14 +7,14 @@ import { type QueueOpts } from './queue-types.js';
 // -------------------------------
 export class QueueImmutable<V> implements IQueueImmutable<V> {
   readonly opts: QueueOpts<V>;
-  #data: ReadonlyArray<V>;
+  #data: readonly V[];
 
   /**
    * Creates an instance of Queue.
    * @param {QueueOpts} opts Options foor queue
    * @param {V[]} data Initial data. Index 0 is front of queue
    */
-  constructor(opts: QueueOpts<V> = {}, data: ReadonlyArray<V> = []) {
+  constructor(opts: QueueOpts<V> = {}, data: readonly V[] = []) {
     if (opts === undefined) throw new Error(`opts parameter undefined`);
 
     this.opts = opts;
@@ -30,11 +30,11 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
 
   forEachFromFront(fn: (v: V) => void) {
     // From front of queue
-    // eslint-disable-next-line unicorn/no-array-for-each
+
     this.#data.forEach(item => { fn(item) }); //(vv) => fn(vv));
   }
 
-  enqueue(...toAdd: ReadonlyArray<V> | Array<V>): QueueImmutable<V> {
+  enqueue(...toAdd: readonly V[] | V[]): QueueImmutable<V> {
     return new QueueImmutable<V>(
       this.opts,
       enqueue(this.opts, this.#data, ...toAdd)
@@ -72,7 +72,6 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  * _dequeing_ removes items from the front (ie. the oldest).
  *
  * ```js
- * import { Queues } from "https://unpkg.com/ixfx/dist/collections.js"
  * let q = Queues.immutable();           // Create
  * q = q.enqueue(`a`, `b`);   // Add two strings
  * const front = q.peek();    // `a` is at the front of queue (oldest)
@@ -90,7 +89,7 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  */
 export const immutable = <V>(
   options: QueueOpts<V> = {},
-  ...startingItems: ReadonlyArray<V>
+  ...startingItems: readonly V[]
 ): IQueueImmutable<V> => {
   options = { ...options }; // Make a copy of options
   return new QueueImmutable(options, [ ...startingItems ]); // Make a copy of array so it can't be modified

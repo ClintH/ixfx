@@ -10,7 +10,6 @@ import type { CirclePositioned } from "../circle/circle-type.js";
  * Returns _true_ if `point` is within, or on boundary of `rect`.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * Rects.intersectsPoint(rect, { x: 100, y: 100});
  * ```
  * @param rect
@@ -24,7 +23,6 @@ export function intersectsPoint(
 /**
  * Returns true if x,y coordinate is within, or on boundary of `rect`.
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * Rects.intersectsPoint(rect, 100, 100);
  * ```
  * @param rect
@@ -41,7 +39,6 @@ export function intersectsPoint(
  * Returns true if point is within or on boundary of `rect`.
  *
  * ```js
- * import { Rects } from "https://unpkg.com/ixfx/dist/geometry.js";
  * Rects.intersectsPoint(rect, { x: 100, y: 100});
  * Rects.intersectsPoint(rect, 100, 100);
  * ```
@@ -50,16 +47,14 @@ export function intersectsPoint(
  * @param b
  * @returns
  */
-//eslint-disable-next-line func-style
+
 export function intersectsPoint(
   rect: Rect | RectPositioned,
   a: Point | number,
   b?: number
 ): boolean {
   guard(rect, `rect`);
-  //eslint-disable-next-line functional/no-let
   let x = 0;
-  //eslint-disable-next-line functional/no-let
   let y = 0;
   if (typeof a === `number`) {
     if (b === undefined) throw new Error(`x and y coordinate needed`);
@@ -87,7 +82,7 @@ export function intersectsPoint(
  */
 export const isIntersecting = (
   a: RectPositioned,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
   b: CirclePositioned | Point
 ): boolean => {
   if (!isRectPositioned(a)) {

@@ -16,7 +16,7 @@ export type SerialOpts = JsonDeviceOpts & {
  * Serial device. Assumes data is sent with new line characters (\r\n) between messages.
  *
  * ```
- * import { Serial } from 'https://unpkg.com/ixfx/dist/io.js'
+ * import { Serial } from '@ixfx/io.js'
  * const s = new Serial.Device();
  * s.addEventListener(`change`, evt => {
  *  console.log(`State change ${evt.priorState} -> ${evt.newState}`);
