@@ -5,8 +5,12 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/"
+		"dist/",
+		"bundle/"
 	],
+	"scripts": {
+		"package-bundle": "tsdown"
+	},
 	"dependencies": {
 		"@ixfx/core": "workspace:^",
 		"@ixfx/events": "workspace:^",

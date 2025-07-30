@@ -1,6 +1,7 @@
-import { mapObjectKeys } from '@ixfx/core/records';
+
 import { compareIterableValuesShallow, isEqualDefault, type IsEqual } from '@ixfx/core';
 import type { ChangeRecord, CompareChangeSet } from '../types-compare.js';
+import { mapObjectKeys } from './map-object-keys.js';
 
 
 /**

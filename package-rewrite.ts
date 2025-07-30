@@ -1,4 +1,4 @@
-
+import { Dirent } from "node:fs";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -138,14 +138,14 @@ const makeChunkFake = (chunk: ExportChunk): ExportChunk => {
   }
 }
 
-for (const file of f) {
+const processFile = async (file: Dirent<string>) => {
   if (file.name === `package.json`) {
     const relativePath = join(file.parentPath, file.name);
     if (skipPackages.includes(file.parentPath)) {
-      console.log(`Path: ${ file.parentPath } (skipped)`);
-      continue;
+      logVerbose(`Path: ${ file.parentPath } (skipped)`);
+      return;
     }
-    console.log(`Path: ${ file.parentPath }`);
+    logVerbose(`Path: ${ file.parentPath }`);
     let data = JSON.parse(await readFile(relativePath, { encoding: "utf8" }));
 
     const hasPublishConfig = typeof data.publishConfig !== `undefined`;
@@ -187,5 +187,15 @@ for (const file of f) {
         await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
       }
     }
+  }
+}
+
+for (const file of f) {
+  try {
+    await processFile(file);
+  } catch (error) {
+    console.error(`Path: ${ file.parentPath }`);
+    console.error(error);
+    process.exit(-1);
   }
 }

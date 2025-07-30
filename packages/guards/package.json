@@ -5,8 +5,12 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/"
+		"dist/",
+		"bundle/"
 	],
+	"scripts": {
+		"package-bundle": "tsdown"
+	},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",

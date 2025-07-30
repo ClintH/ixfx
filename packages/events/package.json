@@ -5,10 +5,11 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/"
+		"dist/",
+		"bundle/"
 	],
 	"scripts": {
-		"build-test": "npx rimraf dist && tsc --build"
+		"package-bundle": "tsdown"
 	},
 	"dependencies": {},
 	"exports": {
