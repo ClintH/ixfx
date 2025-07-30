@@ -17,5 +17,8 @@ export type { MapArrayOpts } from './map-of-array-mutable.js';
 export { NumberMap } from './number-map.js';
 export * from './map-multi.js';
 
+// Re-export from core
+export * from '@ixfx/core/maps';
+
 //export type { IDictionary as IMappish, IWithEntries } from '../../data/maps/IMappish.js';
 

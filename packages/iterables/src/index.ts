@@ -4,6 +4,9 @@ export * as Async from './async.js';
 export * as Sync from './sync.js';
 export * as Chains from './chain/index.js';
 
+export { combineLatestToArray } from './chain/combine-latest-to-array.js';
+export { combineLatestToObject } from './chain/combine-latest-to-object.js';
+
 export * from './compare-values.js';
 export * from './from-event.js';
 export * from './guard.js';
@@ -115,8 +118,7 @@ export function until(it: AsyncIterable<any> | Iterable<any>, callback: () => Pr
   if (isAsyncIterable(it)) {
     return Async.until(it, callback);
   } else {
-    // @ts-expect-error
-    Sync.until(it, callback);
+    Sync.until(it, callback as (() => boolean));
   }
 }
 
@@ -443,7 +445,7 @@ export function uniqueByValue<T>(input: AsyncIterable<T>, toString: (v: T) => st
  * @param toString 
  */
 export function* uniqueByValue<T>(input: AsyncIterable<T> | Iterable<T> | T[], toString: (v: T) => string = toStringDefault, seen: Set<string> = new Set<string>()): Generator<T> | AsyncGenerator<T> {
-  return isAsyncIterable(input) ? Async.uniqueByValue(input, toString, seen) : Sync.uniqueByValue(input, toString, seen);
+  yield* isAsyncIterable(input) ? Async.uniqueByValue(input, toString, seen) : Sync.uniqueByValue(input, toString, seen);
 }
 
 export function toArray<V>(it: AsyncIterable<V>, options?: Partial<ToArrayOptions>): Promise<V[]>;
@@ -527,7 +529,7 @@ export function fromIterable<V>(iterable: AsyncIterable<V> | Iterable<V>, interv
  * Use `interval` to add time between each item.
  * The first item is yielded without delay.
  * @param iterable Iterable or AsyncIterable
- * @param [interval=1] Interval to wait between yield
+ * @param [interval=1] Interval to wait between yield 
  */
 export function fromIterable<V>(iterable: Iterable<V> | AsyncIterable<V>, interval?: Interval): AsyncGenerator<V> | Generator<V> {
   if (isAsyncIterable(iterable) || interval !== undefined) return Async.fromIterable(iterable, interval);

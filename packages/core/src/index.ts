@@ -1,3 +1,21 @@
+/**
+ * Functions for working with simple objects
+ */
+export * as Records from './records/index.js';
+/**
+ * Functions for working with map data structures
+ */
+export * as Maps from './maps.js';
+/**
+ * A set of functions to work with plain objects using string paths to traverse
+ * the structure of an object
+ */
+export * as Pathed from './pathed.js';
+/**
+ * Functions for tracking data over time
+ */
+export * as Trackers from './trackers/index.js';
+
 export * from './comparers.js';
 export * from './continuously.js';
 export * from './correlate.js';
@@ -22,15 +40,6 @@ export * from './resolve-fields.js';
 //export * from './results.js';
 export * from './sleep.js';
 
-export * as Records from './records/index.js';
-
-
-/**
- * A set of functions to work with plain objects using string paths to traverse
- * the structure of an object
- */
-export * as Pathed from './pathed.js';
-export * as Trackers from './trackers/index.js';
 
 // tsup doesn't like 'export type *'?
 export * from './ts-utility.js';

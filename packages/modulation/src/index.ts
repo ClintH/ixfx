@@ -19,3 +19,4 @@ export type * from './types.js';
 export * from './waveforms.js';
 export * from './weighted-average.js';
 export * from './weighted-random.js';
+export { interpolate } from '@ixfx/numbers'
