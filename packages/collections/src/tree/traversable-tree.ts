@@ -383,6 +383,19 @@ export function* depthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(ro
  * * {@link depthFirst}: Children, depth-first
  * * {@link parents}: Chain of parents, starting with immediate parent
  * * {@link siblings}: Nodes with same parent
+ * 
+ * @example Traversing over a simple object
+ * ```js
+ * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+ * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
+ * const root = Trees.FromObject.asDynamicTraversable(myObj);
+ * for (const v of Trees.Traverse.breadthFirst(root)) {
+ * // v.getValue() yields:
+ * // { name: 'name', sourceValue: 'Pedro' ...}, 
+ * // { name: 'size', sourceValue: 45 ... }
+ * // ...
+ * }
+ * ```
  * @param root Root node
  * @param depth How many levels to traverse 
  * @returns 

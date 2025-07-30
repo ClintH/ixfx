@@ -1,6 +1,6 @@
 
 import { DispatchList } from "@ixfx/flow";
-import { Pathed } from "@ixfx/core/records";
+import { Pathed } from "@ixfx/core";
 import { initStream } from "../init-stream.js";
 import type { ObjectFieldHandler, ReactiveDiff, ReactiveInitial, ReactiveNonInitial } from "../types.js";
 import type { ObjectOptions } from "./types.js";

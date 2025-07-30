@@ -71,7 +71,7 @@ export const ofArrayMutable = <V>(
     get name() {
       return `array`;
     },
-    add: (destination, values) => {
+    addKeyedValues: (destination, values) => {
       if (destination === undefined) return [ ...values ];
       return [ ...destination, ...values ];
     },

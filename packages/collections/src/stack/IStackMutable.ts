@@ -26,6 +26,7 @@ import type { IStack } from './IStack.js';
  * Stack can also be created from the basis of an existing array. First index of array will be the bottom of the stack.
  * @typeParam V - Type of stored items
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IStackMutable<V> extends IStack<V> {
   /**
    * Add items to the 'top' of the stack.
@@ -33,7 +34,7 @@ export interface IStackMutable<V> extends IStack<V> {
    * @param toAdd Items to add.
    * @returns How many items were added
    */
-  push(...toAdd: ReadonlyArray<V>): number;
+  push(...toAdd: readonly V[]): number;
 
   /**
    * Remove and return item from the top of the stack, or _undefined_ if empty.

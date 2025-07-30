@@ -1,5 +1,11 @@
 # @ixfxfun/core
 
+## 0.45.0
+
+### Minor Changes
+
+- Packaging
+
 ## 0.44.0
 
 ### Minor Changes

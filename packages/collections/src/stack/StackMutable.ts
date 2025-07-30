@@ -28,10 +28,9 @@ import type { StackOpts } from './Types.js';
  */
 export class StackMutable<V> implements IStackMutable<V> {
   readonly opts: StackOpts;
-  /* eslint-disable-next-line functional/prefer-readonly-type */
-  data: ReadonlyArray<V>;
+  data: readonly V[];
 
-  constructor(opts: StackOpts = {}, data: ReadonlyArray<V> = []) {
+  constructor(opts: StackOpts = {}, data: readonly V[] = []) {
     this.opts = opts;
     this.data = data;
   }
@@ -42,7 +41,7 @@ export class StackMutable<V> implements IStackMutable<V> {
    * @param toAdd Data to add
    * @returns Length of stack
    */
-  push(...toAdd: ReadonlyArray<V>): number {
+  push(...toAdd: readonly V[]): number {
     if (toAdd.length === 0) return this.data.length;
     this.data = push(this.opts, this.data, ...toAdd);
     return this.data.length;
@@ -101,5 +100,5 @@ export class StackMutable<V> implements IStackMutable<V> {
  */
 export const mutable = <V>(
   opts: StackOpts = {},
-  ...startingItems: ReadonlyArray<V>
+  ...startingItems: readonly V[]
 ): IStackMutable<V> => new StackMutable({ ...opts }, [ ...startingItems ]);

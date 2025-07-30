@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect, assert, type TestContext } from 'vitest';
-import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../src/records/pathed.js';
+import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../src/pathed.js';
 import { resultToValue, type Result } from '@ixfx/guards';
 
 

@@ -49,7 +49,7 @@ export const ofSetMutable = <V>(
       return `set`;
     },
     iterable: (source) => source.values(),
-    add: (dest, values) => mapAddValue(dest, hash, `skip`, ...values),
+    addKeyedValues: (dest, values) => mapAddValue(dest, hash, `skip`, ...values),
     count: (source) => source.size,
     find: (source, predicate) => mapFindValue(source, predicate),
     filter: (source, predicate) => mapFilterValues(source, predicate),

@@ -19,7 +19,7 @@ export * from './map-multi-fns.js';
 export type MultiValue<V, M> = {
   get name(): string;
   has(source: M, value: V, eq: IsEqual<V>): boolean;
-  add(destination: M | undefined, values: Iterable<V>): M;
+  addKeyedValues(destination: M | undefined, values: Iterable<V>): M;
   toArray(source: M): readonly V[];
   iterable(source: M): IterableIterator<V>;
   find(source: M, predicate: (v: V) => boolean): V | undefined;

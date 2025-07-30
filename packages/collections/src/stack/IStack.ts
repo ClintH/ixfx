@@ -26,6 +26,7 @@
  * @class Stack
  * @typeParam V - Type of stored items
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IStack<V> {
   /**
    * Enumerates stack from bottom-to-top

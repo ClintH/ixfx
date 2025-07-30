@@ -1,9 +1,14 @@
 import { defineConfig } from 'tsdown'
 
+/**
+ * Build a copy for ixfx demos
+ * 
+ */
 export default defineConfig({
   entry: {
     arrays: './packages/arrays/src/index.ts',
     bundle: './packages/bundle/src/index.ts',
+    core: './packages/core/src/index.ts',
     collections: './packages/collections/src/index.ts',
     index: './packages/core/src/index.ts',
     debug: './packages/debug/src/index.ts',
@@ -23,6 +28,7 @@ export default defineConfig({
     ui: './packages/ui/src/index.ts',
     visual: './packages/visual/src/index.ts'
   },
+  outDir: `bundle-for-demos`,
   platform: `browser`,
   dts: true,
   format: `esm`,

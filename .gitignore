@@ -13,7 +13,7 @@ madge.txt
 coverage
 bundle
 docs.json
-offline
+bundle-for-demos
 *.log
 npm-debug.log*
 *.add.json

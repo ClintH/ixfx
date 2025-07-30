@@ -5,7 +5,7 @@ import { QueueMutable } from "../queue/queue-mutable.js"
 import { StackMutable } from "../stack/StackMutable.js"
 import { compare as treeCompare } from './compare.js';
 import { toStringAbbreviate } from "@ixfx/core/text";
-import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree } from "./types.js"
+import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree, WrappedNode } from "./types.js"
 
 /**
  * Compares two nodes.
@@ -37,62 +37,6 @@ export const stripParentage = <T>(node: TreeNode<T>): SimplifiedNode<T> => {
   }
   return n;
 }
-/**
- * Wraps a {@link TreeNode} for a more object-oriented means of access.
- */
-export type WrappedNode<T> = TraversableTree<T> & {
-  /**
-   * Underlying Node
-   */
-  wraps: TreeNode<T>,
-  /**
-   * Gets value, if defined
-   * @returns Value of Node
-   */
-  getValue: () => T | undefined
-  /**
-   * Remove node and its children from tree
-   * @returns 
-   */
-  remove: () => void
-  /**
-   * Adds a child node
-   * @param child 
-   * @returns 
-   */
-  add: (child: WrappedNode<T> | TreeNode<T>) => WrappedNode<T>
-  /**
-   * Adds a new child node, with `value` as its value
-   * @param value 
-   * @returns 
-   */
-  addValue: (value: T) => WrappedNode<T>
-  /**
-   * Returns _true_ if `child` is an immediate child of this node
-   * @param child 
-   * @returns 
-   */
-  hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
-  queryValue: (value: T) => IterableIterator<WrappedNode<T>>
-  /**
-   * Returns _true_ if `child` is contained any any descendant
-   * @param child
-   * @returns 
-   */
-  hasAnyChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
-  /**
-   * Returns _true_ if `parent` is the immediate parent for this node
-   * @param parent 
-   * @returns 
-   */
-  hasParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean
-  /**
-   * Returns _true_ if `parent` is the immediate or ancestor parent for this node
-   * @param parent 
-   * @returns 
-   */
-  hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean
-}
 
 const unwrapped = <T>(node: TreeNode<T> | WrappedNode<T>) => (`wraps` in node) ? node.wraps : node;
 const wrapped = <T>(node: TreeNode<T> | WrappedNode<T>) => (`wraps` in node) ? node : wrap(node);
@@ -117,6 +61,18 @@ export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
       for (const v of queryByValue(value, unwrapped(n))) {
         yield wrap(v);
       }
+    },
+    *queryParentsValue<T>(child: TreeNode<T> | WrappedNode<T>, value: T, eq?: IsEqual<T>): IterableIterator<WrappedNode<T>> {
+      for (const v of queryParentsValue(unwrapped(child), value, eq)) {
+        yield wrap(v);
+      }
+    },
+    *parentsValues<T>(child: TreeNode<T> | WrappedNode<T>): IterableIterator<T> {
+      yield* parentsValues(unwrapped(child));
+    },
+    findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T>): WrappedNode<T> | undefined {
+      const n = findParentsValue(child, value, eq);
+      if (n !== undefined) return wrap(n);
     },
     getParent: () => n.parent === undefined ? undefined : wrap(n.parent),
     hasParent: (parent: WrappedNode<T> | TreeNode<T>): boolean => {
@@ -230,13 +186,26 @@ export function throwTreeTest<T>(root: TreeNode<T>) {
   if (v[ 0 ]) return;
   throw new Error(`${ v[ 1 ] } Node: ${ toStringAbbreviate(v[ 2 ].value, 30) }`, { cause: v[ 2 ] })
 }
+
 /**
- * Iterate over direct children of `root`
+ * Iterate over direct children of `root`, yielding {@link TreeNode} instances.
+ * Use {@link childrenValues} to iterate over child values
  * @param root 
  */
 export function* children<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
   for (const c of root.childrenStore) {
     yield c;
+  }
+}
+
+/**
+ * Iterate over the value ofdirect children of `root`.
+ * Use {@link children} if you want to iterate over {@link TreeNode} instances instead.
+ * @param root 
+ */
+export function* childrenValues<T>(root: TreeNode<T>): IterableIterator<T> {
+  for (const c of root.childrenStore) {
+    if (typeof c.value !== `undefined`) yield c.value;
   }
 }
 
@@ -269,12 +238,29 @@ export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
   return false;
 }
 
+/**
+ * Returns the first immediate child of `parent` that matches `value`.
+ * 
+ * Use {@link queryByValue} if you want all matching children.
+ * @param value 
+ * @param parent 
+ * @param eq 
+ * @returns 
+ */
 export const findChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined => {
   for (const c of parent.childrenStore) {
     if (eq(value, c.value as T)) return c;
   }
 }
 
+/**
+ * Yield all immediate children of `parent` that match `value`.
+ * 
+ * Use {@link findChildByValue} if you only want the first matching child.
+ * @param value 
+ * @param parent 
+ * @param eq 
+ */
 export function* queryByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): IterableIterator<TreeNode<T>> {
   for (const c of parent.childrenStore) {
     if (eq(value, c.value as T)) yield c;
@@ -325,6 +311,54 @@ export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<
 }
 
 /**
+ * Yields the node value of each parent of `child`.
+ * _undefined_ values are not returned.
+ * 
+ * Use {@link queryParentsValue} to search for a particular value
+ * @param child 
+ * @param value 
+ * @param eq 
+ * @returns 
+ */
+export function* parentsValues<T>(child: TreeNode<T>) {
+  for (const p of parents(child)) {
+    if (typeof p.value !== `undefined`) {
+      yield p.value;
+    }
+  }
+  return false;
+}
+
+/**
+ * Yields all parents of `child` that have a given value.
+ * Use {@link findParentsValue} to find the first match only.
+ * @param child 
+ * @param value 
+ * @param eq 
+ * @returns 
+ */
+export function* queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault) {
+  for (const p of parents(child)) {
+    if (typeof p.value !== `undefined`) {
+      if (eq(p.value, value)) yield p;
+    }
+  }
+  return false;
+}
+
+/**
+ * Returns the first parent that has a given value.
+ * @param child 
+ * @param value 
+ * @param eq 
+ * @returns 
+ */
+export function findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault) {
+  for (const p of queryParentsValue(child, value, eq)) {
+    return p;
+  }
+}
+/**
  * Returns _true_ if `prospectiveParent` is the immediate
  * parent of `child`.
  * 
@@ -336,6 +370,7 @@ export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<
 export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>) => {
   return child.parent === prospectiveParent;
 }
+
 
 /**
  * Computes the maximum depth of the tree.

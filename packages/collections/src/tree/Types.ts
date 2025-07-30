@@ -1,3 +1,5 @@
+import type { IsEqual } from "@ixfx/core";
+
 /**
  * A labelled single value or array of values
  */
@@ -93,3 +95,91 @@ export type TraverseObjectPathOpts = {
    */
   readonly separator?: string;
 };
+
+/**
+ * Wraps a {@link TreeNode} for a more object-oriented means of access.
+ */
+export type WrappedNode<T> = TraversableTree<T> & {
+  /**
+   * Underlying Node
+   */
+  wraps: TreeNode<T>,
+  /**
+   * Gets value of node, if defined
+   * @returns Value of Node
+   */
+  getValue: () => T | undefined
+  /**
+   * Remove node and its children from tree
+   * @returns 
+   */
+  remove: () => void
+  /**
+   * Adds a child node
+   * @param child 
+   * @returns 
+   */
+  add: (child: WrappedNode<T> | TreeNode<T>) => WrappedNode<T>
+  /**
+   * Adds a new child node, with `value` as its value
+   * @param value 
+   * @returns 
+   */
+  addValue: (value: T) => WrappedNode<T>
+  /**
+   * Returns _true_ if `child` is an immediate child of this node
+   * @param child 
+   * @returns 
+   */
+  hasChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
+  queryValue: (value: T) => IterableIterator<WrappedNode<T>>
+
+  /**
+ * Yields all parents of `child` that have a given value.
+ * Use {@link findParentsValue} to find the first match only.
+ * @param child 
+ * @param value 
+ * @param eq 
+ * @returns 
+ */
+  queryParentsValue<T>(child: TreeNode<T>, value: T, eq?: IsEqual<T>): IterableIterator<WrappedNode<T>>
+
+  /**
+ * Returns the first parent that has a given value.
+ * @param child 
+ * @param value 
+ * @param eq 
+ * @returns 
+ */
+  findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T>): WrappedNode<T> | undefined
+  /**
+   * Yields the node value of each parent of `child`.
+   * _undefined_ values are not returned.
+   * 
+   * Use {@link queryParentsValue} to search for a particular value
+   * @param child 
+   * @param value 
+   * @param eq 
+   * @returns 
+   */
+  parentsValues<T>(child: TreeNode<T>): IterableIterator<T>
+
+  /**
+   * Returns _true_ if `child` is contained any any descendant
+   * @param child
+   * @returns 
+   */
+  hasAnyChild: (child: WrappedNode<T> | TreeNode<T>) => boolean
+  /**
+   * Returns _true_ if `parent` is the immediate parent for this node
+   * @param parent 
+   * @returns 
+   */
+  hasParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean
+  /**
+   * Returns _true_ if `parent` is the immediate or ancestor parent for this node
+   * @param parent 
+   * @returns 
+   */
+  hasAnyParent: (parent: WrappedNode<T> | TreeNode<T>) => boolean
+}

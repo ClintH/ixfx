@@ -1,6 +1,5 @@
-//import * as Immutable from "@ixfx/core/records";
 import { resolveEl } from "@ixfx/dom";
-import { Pathed } from "@ixfx/core/records";
+import { Pathed } from "@ixfx/core";
 import * as Rx from "@ixfx/rx";
 import * as RxFrom from "@ixfx/rx/from";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind, DomBindUnresolvedSource } from './dom-types.js';

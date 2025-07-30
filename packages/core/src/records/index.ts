@@ -7,9 +7,3 @@ export * from './merge.js';
 export * from './keys-to-numbers.js';
 export type * from '../types-compare.js';
 
-/**
- * A set of functions to work with plain objects using string paths to traverse
- * the structure of an object
- */
-export * as Pathed from './pathed.js';
-

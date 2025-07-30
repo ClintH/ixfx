@@ -17,7 +17,6 @@ import { toStringDefault, type ToString } from '@ixfx/core';
 export class MapOfMutableImpl<V, M>
   extends SimpleEventEmitter<MapArrayEvents<V>>
   implements IMapOfMutableExtended<V, M> {
-  /* eslint-disable-next-line functional/prefer-readonly-type */
   readonly #map = new Map<string, M>();
   readonly groupBy: ToString<V>;
   readonly type: MultiValue<V, M>;
@@ -46,7 +45,6 @@ export class MapOfMutableImpl<V, M>
    * Returns the length of the longest child list
    */
   get lengthMax() {
-    //eslint-disable-next-line functional/no-let
     let m = 0;
     for (const v of this.#map.values()) {
       m = Math.max(m, this.type.count(v));
@@ -56,7 +54,6 @@ export class MapOfMutableImpl<V, M>
 
   debugString(): string {
     const keys = [ ...this.#map.keys() ];
-    // eslint-disable-next-line functional/no-let
     let r = `Keys: ${ keys.join(`, `) }\r\n`;
     for (const k of keys) {
       const v = this.#map.get(k);
@@ -83,20 +80,17 @@ export class MapOfMutableImpl<V, M>
     super.fireEvent(`clear`, true);
   }
 
-  //eslint-disable-next-line functional/prefer-immutable-types
   addKeyedValues(key: string, ...values: V[]) {
     const set = this.#map.get(key);
     if (set === undefined) {
-      this.#map.set(key, this.type.add(undefined, values));
+      this.#map.set(key, this.type.addKeyedValues(undefined, values));
       super.fireEvent(`addedKey`, { key: key });
       super.fireEvent(`addedValues`, { values: values });
     } else {
-      // eslint-disable-next-line functional/immutable-data
-      this.#map.set(key, this.type.add(set, values));
+      this.#map.set(key, this.type.addKeyedValues(set, values));
       super.fireEvent(`addedValues`, { values: values });
     }
   }
-  //eslint-disable-next-line functional/prefer-immutable-types
   set(key: string, values: V[]) {
     this.addKeyedValues(key, ...values);
     return this;
@@ -112,7 +106,6 @@ export class MapOfMutableImpl<V, M>
     return this.type.has(m, value, eq);
   }
 
-  //eslint-disable-next-line functional/prefer-tacit
   has(key: string): boolean {
     return this.#map.has(key);
   }
@@ -127,12 +120,11 @@ export class MapOfMutableImpl<V, M>
     const preCount = this.type.count(map);
     const filtered = this.type.without(map, value);
     const postCount = filtered.length;
-    this.#map.set(key, this.type.add(undefined, filtered));
+    this.#map.set(key, this.type.addKeyedValues(undefined, filtered));
     return preCount > postCount;
   }
 
   deleteByValue(value: V): boolean {
-    //eslint-disable-next-line functional/no-let
     let something = false;
     [ ...this.#map.keys() ].filter((key) => {
       const a = this.#map.get(key);
@@ -197,12 +189,10 @@ export class MapOfMutableImpl<V, M>
     yield* this.type.iterable(m);
   }
 
-  //eslint-disable-next-line functional/prefer-tacit
   getSource(key: string): M | undefined {
     return this.#map.get(key);
   }
 
-  /* eslint-disable-next-line functional/prefer-readonly-type */
   *keys(): IterableIterator<string> {
     yield* this.#map.keys();
     //return Array.from(this.#map.keys());
@@ -229,7 +219,6 @@ export class MapOfMutableImpl<V, M>
     }
   }
 
-  /* eslint-disable-next-line functional/prefer-readonly-type */
   *keysAndCounts(): IterableIterator<[ string, number ]> {
     for (const key of this.keys()) {
       yield [ key, this.count(key) ];

@@ -7,14 +7,14 @@ export interface IMapOfMutable<V> extends IMapOf<V> {
    * @param key
    * @param values
    */
-  addKeyedValues(key: string, ...values: ReadonlyArray<V>): void;
+  addKeyedValues(key: string, ...values: readonly V[]): void;
 
   /**
    * Adds a value, automatically extracting a key via the
    * `groupBy` function assigned in the constructor options.
    * @param values Adds several values
    */
-  addValue(...values: ReadonlyArray<V>): void;
+  addValue(...values: readonly V[]): void;
 
   /**
    * Clears the map

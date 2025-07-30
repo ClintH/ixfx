@@ -36,13 +36,12 @@ export const ofCircularMutable = <V>(
     get name() {
       return `circular`;
     },
-    add: (destination, values) => {
-      destination ??= new CircularArray<V>(options.capacity);
+    addKeyedValues: (destination, values) => {
+      let ca: ICircularArray<V> = destination ?? new CircularArray<V>(options.capacity);
       for (const v of values) {
-        //values.forEach(v => dest = dest?.add(v));
-        destination = destination.add(v);
+        ca = ca.add(v as V);
       }
-      return destination;
+      return ca;
     },
     count: (source) => source.length,
     find: (source, predicate) => source.find(predicate),

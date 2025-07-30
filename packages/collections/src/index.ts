@@ -2,6 +2,16 @@ export * from './circular-array.js';
 
 /**
  * A tree-like structure of branches and leaves.
+ * 
+ * ```js
+ * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
+ * const root = Trees.Mutable.rootWrapped(`root`);
+ * // Add 'a' as the child of the root node
+ * let a = root.addValue(`a`);
+ * // Add `aa` as the child of `a`
+ * let b = a.addValue(`aa`);
+ * b.hasParent(a); // True
+ * ```
  */
 export * as Trees from './tree/index.js';
 export * from './tree/types.js';
@@ -11,6 +21,18 @@ export type * from './types.js';
 
 /**
  * Stacks store items in order, like a stack of plates.
+ * 
+ * ```js
+ * import { Stacks } from "https://unpkg.com/@ixfx/collections/bundle"
+ * let s = Stacks.immutable();
+ * s = s.push(`a`, `b`);   // Add two strings
+ * // Peek looks at the top of the stack
+ * // (ie most recently added)
+ * s.peek; // `b`
+ * // Remove item from top of stack
+ * s = s.pop();
+ * s.peek // `a`
+ * ```
  */
 export * as Stacks from './stack/index.js';
 export { StackMutable } from './stack/StackMutable.js';
@@ -45,6 +67,18 @@ export { MapOfSimpleMutable } from './map/map-of-simple-mutable.js';
 
 /**
  * Undirected and directed graphs and associated algorithms.
+ * 
+ * @example
+ * ```js
+ * import { Graphs } from "https://unpkg.com/@ixfx/collections/bundle"
+ * const Dg = Graphs.Directed;
+ * let g = Dg.graph();
+ * g = Dg.connect(g, { from: `a`, to: `b` });
+ * g = Dg.connect(g, { from: `b`, to: `c` });
+ * g = Dg.connect(g, { from: `c`, to: `a` });
+ * Dg.dumpGraph(g);
+ * // A -> B, B -> C, C -> A
+ * ```
  */
 export * as Graphs from './graph/index.js';
 

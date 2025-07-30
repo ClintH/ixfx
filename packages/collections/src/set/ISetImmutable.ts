@@ -51,7 +51,8 @@ import type { ISet } from './ISet.js';
  *
  * @typeParam V - Type of data stored
  */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface ISetImmutable<V> extends ISet<V> {
-  add(...values: ReadonlyArray<V>): ISetImmutable<V>;
+  add(...values: readonly V[]): ISetImmutable<V>;
   delete(v: V): ISetImmutable<V>;
 }

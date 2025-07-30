@@ -8,8 +8,7 @@ import type { Processors } from '@ixfx/process';
 import type { TallyOptions } from './ops/math.js';
 import type { ChangeRecord } from '@ixfx/core/records';
 import type { RecursivePartial } from '@ixfx/core';
-import { Pathed } from '@ixfx/core/records';
-
+import { Pathed } from '@ixfx/core';
 
 export type CombineLatestOptions = {
   /**

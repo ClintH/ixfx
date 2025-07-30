@@ -11,11 +11,14 @@
 		"docs": "typedoc",
 		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
 		"pkg-add": "node --experimental-strip-types package-rewrite.ts add",
-		"offline-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./offline/**/* ../demos/ixfx",
-		"offline-basic": "pnpm run pkg-strip && tsdown --config tsdown.bundle.ts && tsdown --config tsdown.build.ts -d ./offline && pnpm run pkg-add",
-		"bundle-core-test": "pnpm run pkg-strip && tsdown --config tsdown.bundle.ts && pnpm run pkg-add",
-		"package-bundle-test": "pnpm run pkg-strip && pnpm run -r package-bundle && pnpm run pkg-add",
-		"offline": "pnpm run offline-basic && pnpm run offline-copy"
+		"demos-bundle-core": "tsdown --config tsdown.demos.ts",
+		"demos-bundle": "pnpm run pkg-strip && pnpm run demos-bundle-core && pnpm run pkg-add",
+		"demos-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./bundle-for-demos/**/* ../demos/ixfx",
+		"demos": "pnpm run demos-bundle && pnpm run demos-copy",
+		"packages-bundle-core": "pnpm run -r package-bundle",
+		"packages-bundle": "pnpm run pkg-strip && pnpm run bundle-core && pnpm run pkg-add",
+		"bundling": "pnpm run build && pnpm run pkg-strip && pnpm run demos-core && pnpm run bundle-core && pnpm run pkg-add",
+		"relase-prep": "pnpm run bundling && pnpm changeset"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.5",

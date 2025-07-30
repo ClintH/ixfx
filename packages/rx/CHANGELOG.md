@@ -1,5 +1,21 @@
 # @ixfxfun/rx
 
+## 0.42.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.45.0
+  - @ixfx/iterables@0.42.0
+  - @ixfx/core@0.45.0
+  - @ixfx/dom@0.42.1
+  - @ixfx/flow@0.42.1
+  - @ixfx/modulation@0.44.1
+
 ## 0.41.0
 
 ### Minor Changes

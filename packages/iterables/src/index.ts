@@ -2,6 +2,8 @@ import * as Async from './async.js';
 import * as Sync from './sync.js';
 export * as Async from './async.js';
 export * as Sync from './sync.js';
+export * as Chains from './chain/index.js';
+
 export * from './compare-values.js';
 export * from './from-event.js';
 export * from './guard.js';

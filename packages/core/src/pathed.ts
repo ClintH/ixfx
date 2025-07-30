@@ -2,7 +2,7 @@ import { recordEntriesDepthFirst } from "@ixfx/core/records";
 import { isPrimitive, isInteger, isEqualContextString } from '@ixfx/core';
 import { testPlainObjectOrPrimitive } from '@ixfx/guards';
 import type { IsEqualContext } from '@ixfx/core';
-import { compareObjectKeys } from './compare.js';
+import { compareObjectKeys } from './records/compare.js';
 import type { Result } from '@ixfx/guards';
 
 /**

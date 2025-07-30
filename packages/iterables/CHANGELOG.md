@@ -1,5 +1,16 @@
 # @ixfxfun/iterables
 
+## 0.42.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/core@0.45.0
+
 ## 0.41.0
 
 ### Minor Changes
