@@ -1,5 +1,14 @@
 # @ixfxfun/rx
 
+## 0.40.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.44.0
+  - @ixfx/dom@0.41.2
+  - @ixfx/flow@0.41.1
+
 ## 0.40.2
 
 ### Patch Changes

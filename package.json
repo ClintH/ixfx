@@ -14,6 +14,7 @@
 		"offline-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./offline/**/* ../demos/ixfx",
 		"offline-basic": "pnpm run pkg-strip && tsdown --config tsdown.bundle.ts && tsdown --config tsdown.build.ts -d ./offline && pnpm run pkg-add",
 		"bundle-core-test": "pnpm run pkg-strip && tsdown --config tsdown.bundle.ts && pnpm run pkg-add",
+		"package-bundle-test": "pnpm run pkg-strip && pnpm run -r package-bundle && pnpm run pkg-add",
 		"offline": "pnpm run offline-basic && pnpm run offline-copy"
 	},
 	"devDependencies": {

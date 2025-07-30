@@ -1,5 +1,11 @@
 # @ixfxfun/collections
 
+## 0.44.0
+
+### Minor Changes
+
+- Test bundling
+
 ## 0.43.0
 
 ### Minor Changes
