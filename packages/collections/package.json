@@ -1,12 +1,16 @@
 {
 	"name": "@ixfx/collections",
-	"version": "0.42.1",
+	"version": "0.43.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/"
+		"dist/",
+		"bundle/"
 	],
+	"scripts": {
+		"package-bundle": "tsdown"
+	},
 	"dependencies": {
 		"@ixfx/arrays": "workspace:^",
 		"@ixfx/events": "workspace:^",

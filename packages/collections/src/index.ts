@@ -38,11 +38,6 @@ export type * from './queue/queue-types.js';
 
 /**
  * Maps associate keys with values.
- *
- * Import example
- * ```js
- * import { Maps } from 'https://unpkg.com/ixfx/dist/collections.js';
- * ```
  */
 export * as Maps from './map/index.js';
 export { ExpiringMap } from './map/expiring-map.js';
