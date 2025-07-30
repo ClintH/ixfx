@@ -1,5 +1,16 @@
 # @ixfx/arrays
 
+## 0.44.0
+
+### Minor Changes
+
+- 68b7840: Packaging
+
+### Patch Changes
+
+- Updated dependencies [68b7840]
+  - @ixfx/guards@0.41.0
+
 ## 0.43.0
 
 ### Minor Changes

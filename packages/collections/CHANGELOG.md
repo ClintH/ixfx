@@ -1,5 +1,16 @@
 # @ixfxfun/collections
 
+## 0.44.1
+
+### Patch Changes
+
+- Updated dependencies [68b7840]
+  - @ixfx/iterables@0.41.0
+  - @ixfx/arrays@0.44.0
+  - @ixfx/events@0.41.0
+  - @ixfx/guards@0.41.0
+  - @ixfx/core@0.44.0
+
 ## 0.44.0
 
 ### Minor Changes

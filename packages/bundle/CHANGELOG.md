@@ -1,5 +1,30 @@
 # @ixfx/bundle
 
+## 0.40.6
+
+### Patch Changes
+
+- Updated dependencies [68b7840]
+  - @ixfx/modulation@0.44.0
+  - @ixfx/iterables@0.41.0
+  - @ixfx/geometry@0.41.0
+  - @ixfx/trackers@0.39.0
+  - @ixfx/numbers@0.42.0
+  - @ixfx/process@0.41.0
+  - @ixfx/arrays@0.44.0
+  - @ixfx/events@0.41.0
+  - @ixfx/guards@0.41.0
+  - @ixfx/random@0.43.0
+  - @ixfx/debug@0.41.0
+  - @ixfx/core@0.44.0
+  - @ixfx/flow@0.42.0
+  - @ixfx/dom@0.42.0
+  - @ixfx/io@0.42.0
+  - @ixfx/rx@0.41.0
+  - @ixfx/ui@0.41.0
+  - @ixfx/collections@0.44.1
+  - @ixfx/visual@0.42.2
+
 ## 0.40.5
 
 ### Patch Changes

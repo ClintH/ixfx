@@ -1,5 +1,25 @@
 # @ixfxfun/rx
 
+## 0.41.0
+
+### Minor Changes
+
+- 68b7840: Packaging
+
+### Patch Changes
+
+- Updated dependencies [68b7840]
+  - @ixfx/modulation@0.44.0
+  - @ixfx/iterables@0.41.0
+  - @ixfx/process@0.41.0
+  - @ixfx/arrays@0.44.0
+  - @ixfx/guards@0.41.0
+  - @ixfx/debug@0.41.0
+  - @ixfx/core@0.44.0
+  - @ixfx/flow@0.42.0
+  - @ixfx/dom@0.42.0
+  - @ixfx/collections@0.44.1
+
 ## 0.40.3
 
 ### Patch Changes

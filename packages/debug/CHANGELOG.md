@@ -1,5 +1,11 @@
 # @ixfxfun/debug
 
+## 0.41.0
+
+### Minor Changes
+
+- 68b7840: Packaging
+
 ## 0.40.0
 
 ### Minor Changes

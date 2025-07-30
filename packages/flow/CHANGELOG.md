@@ -1,5 +1,22 @@
 # @ixfxfun/flow
 
+## 0.42.0
+
+### Minor Changes
+
+- 68b7840: Packaging
+
+### Patch Changes
+
+- Updated dependencies [68b7840]
+  - @ixfx/numbers@0.42.0
+  - @ixfx/arrays@0.44.0
+  - @ixfx/events@0.41.0
+  - @ixfx/guards@0.41.0
+  - @ixfx/debug@0.41.0
+  - @ixfx/core@0.44.0
+  - @ixfx/collections@0.44.1
+
 ## 0.41.1
 
 ### Patch Changes
