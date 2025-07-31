@@ -316,8 +316,6 @@ export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<
  * 
  * Use {@link queryParentsValue} to search for a particular value
  * @param child 
- * @param value 
- * @param eq 
  * @returns 
  */
 export function* parentsValues<T>(child: TreeNode<T>) {

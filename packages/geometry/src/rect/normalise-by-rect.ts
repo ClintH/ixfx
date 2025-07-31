@@ -4,6 +4,7 @@ import type { Rect } from "./rect-types.js"
 
 /**
  * Returns a function that divides numbers or points by the largest dimension of `rect`.
+ * 
  * ```js
  * const d = dividerByLargestDimension({width:100,height:50});
  * d(50);                // 0.5 (50/100)

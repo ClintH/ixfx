@@ -52,8 +52,8 @@ export function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, options
  * * alpha: 0..1
  * 
  * Default option: { scalar: true }
- * @param lch 
- * @param parsingOptions 
+ * @param lch LCH value
+ * @param parsingOptions Options for parsing 
  * @returns 
  */
 export function fromLibrary(lch: C.LCH, parsingOptions: ParsingOptions<OkLch> = {}): OkLch {

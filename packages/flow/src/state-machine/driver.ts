@@ -32,6 +32,48 @@ import { init as machineInit, reset as machineReset, next as machineNext, to as 
 /**
  * Drives a state machine.
  *
+ * Uses a 'handlers' structure to determine when to change
+ * state and actions to take.
+ * 
+ * The structure is a set of logical conditions: if we're in
+ * this state, then move to this other state etc.
+ * 
+ * ```js
+ * const handlers = [
+ *  {
+ *    // If we're in the 'sleeping' state, move to next state
+ *    if: 'sleeping',
+ *    then: { next: true }
+ *  },
+ *  {
+ *    // If we're in the 'waking' state, randomly either go to 'resting' or 'sleeping' state
+ *    if: 'waking',
+ *    then: [
+ *      () => {
+ *        if (Math.random() > 0.5) {
+ *          return { next: 'resting' }
+ *        } else {
+ *          return { next: 'sleeping' }
+ *        }
+ *      }
+ *    ]
+ *   }
+ * ];
+ * ```
+ * 
+ * Set up the driver, and call `run()` when you want to get
+ * the machine to change state or take action:
+ * 
+ * ```js
+ * const driver = await StateMachine.driver(states, handlers);
+ * setInterval(async () => {
+ *  await driver.run(); // Note use of 'await' again
+ * }, 1000);
+ * ```
+ * 
+ * Essentially, the 'handlers' structure gets run through each time `run()`
+ * is called.
+ * 
  * Defaults to selecting the highest-ranked result to determine
  * what to do next.
  * @param machine
@@ -74,15 +116,6 @@ export async function driver<V extends Transitions>(
     }
   }
 
-  // const expressions: Expression<V>[] = [
-  //   (_machine) => {
-  //     const r: Result<V> = {
-  //       next: 'hello',
-  //     };
-  //     return r;
-  //   },
-  // ];
-
   const runOpts: Execute.RunOpts<DriverResult<V>> = {
     // Rank results by score
     rank: (a, b) => {
@@ -109,7 +142,6 @@ export async function driver<V extends Transitions>(
   const run = async (): Promise<MachineState<V> | undefined> => {
     debug(`Run. State: ${ sm.value }`);
     const state = sm.value;
-    //eslint-disable-next-line functional/no-let
     let handler = byState.get(state);
     if (handler === undefined) {
       debug(`  No handler for state '${ state }', trying __fallback`);

@@ -24,14 +24,17 @@ export const cloneState = <V extends Transitions>(
  *  shoes: 'shirt',
  *  shirt: null
  * }
+ * 
  * // Defaults to first key, 'pants'
  * let sm = StateMachine.init(descr);
+ * 
  * // Move to 'shoes' state
  * sm = StateMachine.to(sm, 'shoes');
  * sm.state; // 'shoes'
  * sm.visited; // [ 'pants' ]
- * StateMachineLight.isDdone(sm); // false
- * StateMachineLight.possible(sm); // [ 'shirt' ]
+ * 
+ * StateMachine.isDone(sm); // false
+ * StateMachine.possible(sm); // [ 'shirt' ]
  * ```
  * @param stateMachine Settings for state machine
  * @param initialState Initial state name
@@ -290,6 +293,13 @@ const validateMachineState = <V extends Transitions>(
  * Attempts to transition to a new state. Either a new
  * `MachineState` is returned reflecting the change, or
  * an exception is thrown.
+ * 
+ * @example Attempts to transition to 'name-of-state'
+ * ```js
+ * const newState = StateMachine.to(currentState, `name-of-state`);
+ * ```
+ * 
+ * Note that 'currentState' is not changed.
  * @param sm
  * @param toState
  * @returns

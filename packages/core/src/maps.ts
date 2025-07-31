@@ -154,7 +154,7 @@ export const findEntryByPredicate = <K, V>(
  * // Entry is: ['there', 'b']
  * ```
  *
- * Uses JS's === comparison by default. Consider using {@link isEqualValueDefault} to match by value.
+ * Uses JS's === comparison by default. Consider using `isEqualValueDefault` to match by value.
  * An alternative is {@link findEntryByValue} to search by predicate function.
  * @param map Map to search
  * @param value Value to seek
@@ -329,7 +329,7 @@ export const addValueMutator = <V>(
  * const sorted = Maps.sortByValue(m, comparer);
  * ```
  *
- * `sortByValue` takes a comparison function that should return -1, 0 or 1 to indicate order of `a` to `b`. If not provided, {@link Util.defaultComparer} is used.
+ * `sortByValue` takes a comparison function that should return -1, 0 or 1 to indicate order of `a` to `b`.
  * @param map
  * @param comparer
  * @returns
@@ -543,7 +543,7 @@ export const findValue = <K, V>(
 
 /**
  * Returns _true_ if `predicate` yields _true_ for any value in `map`.
- * Use {@link find} if you want the matched value.
+ * Use {@link findValue} if you want the matched value.
  * ```js
  * const map = new Map();
  * map.set(`fruit`, `apple`);
@@ -721,7 +721,7 @@ export type MergeReconcile<V> = (a: V, b: V) => V;
  * Merges maps left to right, using the provided
  * `reconcile` function to choose a winner when keys overlap.
  *
- * There's also {@link Data.Arrays.mergeByKey Arrays.mergeByKey} if you don't already have a map.
+ * There's also @ixfx/arrays/mergeByKey if you don't already have a map.
  *
  * For example, if we have the map A:
  * 1 => `A-1`, 2 => `A-2`, 3 => `A-3`

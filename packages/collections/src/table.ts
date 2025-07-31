@@ -109,7 +109,7 @@ export class Table<V> {
 
   /**
    * Iterates over each row, including the labels if available
-   * @see {@link rowsWithLabelObject} to get rows in object format
+   * @see {@link rowsWithLabelsObject} to get rows in object format
    */
   *rowsWithLabelsArray() {
     for (let index = 0; index < this.rows.length; index++) {
@@ -240,8 +240,8 @@ export class Table<V> {
    * Set the value of row,columm.
    * Row is created if it doesn't exist, with the other column values being _undefined_
    * @param row Index or label 
-   * @param columnIndex 
-   * @param value 
+   * @param column Column 
+   * @param value Value to set at row,column
    */
   set(row: number | string, column: number | string, value: V | undefined) {
     const result = this.#getOrCreateRawRow(row);

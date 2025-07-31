@@ -1,5 +1,9 @@
 export * as Waypoints from './waypoint.js';
 export * as Layouts from './layout.js';
+
+/**
+ * A circle is defined as having a radius
+ */
 export * as Circles from './circle/index.js';
 export * as Lines from './line/index.js';
 export * as Rects from './rect/index.js';
@@ -25,25 +29,9 @@ export * as QuadTree from './quad-tree.js';
 
 export * from './scaler.js';
 export * from './scaler.js';
+
 /**
- * Work with arcs. Arcs are a angle-limited circle, describing a wedge.
- * 
- * {@link ArcPositioned} has a origin x,y.
- * 
- * Conversions:
- * - {@link fromDegrees}
- * - {@link toLine}: A line from start/end position of arc
- * - {@link toSvg}: Returns an SVG representation of arc
- * 
- * Calculations:
- * - {@link bbox}: Bounding box
- * - {@link interpolate}: Interplate two arcs
- * - {@link point}: Find a point on the arc, given an angle
- * - {@link length}: Circumference of arc
- * 
- * Comparisons:
- * - {@link isArc}: Returns true if object is Arc-ish
- * - {@link isEqual}: Returns true if two objects have identical arc properties
+ * Arcs are a angle-limited circle. Essentially describing a wedge.
  */
 export * as Arcs from './arc/index.js';
 

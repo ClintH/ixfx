@@ -99,7 +99,6 @@ export const logSet = (prefix: string, verbose = true, colourKey?: string) => {
     };
   }
   return {
-
     log: (_: any) => {
       /** no-op */
     },

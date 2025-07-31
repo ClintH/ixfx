@@ -15,8 +15,8 @@ import * as C from 'colorizr';
  * 
  * For example, to half the opacity, use `amount: 0.5`.
  * Clamps the result to ensure it's between 0..1
- * @param colourish 
- * @param amount 
+ * @param colourish Colour
+ * @param amount Amount
  * @returns 
  */
 export function multiplyOpacity(colourish: string, amount: number): string {

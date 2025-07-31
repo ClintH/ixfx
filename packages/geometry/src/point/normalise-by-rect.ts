@@ -6,6 +6,10 @@ import type { Point } from "./point-type.js";
 
 /**
  * Normalises a point by a given width and height
+ * 
+ * ```js
+ * normaliseByRect({ x: 10, y: 10 }, 20, 40 }); // { x: 0.5, y: 0.2 }
+ * ```
  * @param point Point
  * @param width Width
  * @param height Height
@@ -18,6 +22,10 @@ export function normaliseByRect(
 
 /**
  * Normalises a point by a given rect's width and height
+ * 
+ * ```js
+ * normaliseByRect({ x: 10, y: 10, width: 20, height: 40 }); // { x: 0.5, y: 0.2 }
+ * ```
  * @param pt 
  * @param rect 
  */
@@ -25,6 +33,10 @@ export function normaliseByRect(pt: Point, rect: Rect): Point;
 
 /**
  * Normalises x,y by width and height so it is on a 0..1 scale
+ * 
+ * ```js
+ * normaliseByRect(10, 10, 20, 40); // { x: 0.5, y: 0.2 }
+ * ```
  * @param x
  * @param y
  * @param width
@@ -39,6 +51,12 @@ export function normaliseByRect(
 
 /**
  * Normalises a point so it is on a 0..1 scale
+ * 
+ * ```js
+ * normaliseByRect({ x: 10, y: 10, width: 20, height: 40 }); 
+ * normaliseByRect({ x: 10, y: 10 }, 20, 40); 
+ * normaliseByRect(10, 10, 20, 40);
+ * ```
  * @param a Point, or x
  * @param b y coord or width
  * @param c height or width
@@ -51,7 +69,6 @@ export function normaliseByRect(
   c?: number,
   d?: number
 ): Point {
-  // ✔️ Unit tested
   if (isPoint(a)) {
     if (typeof b === `number` && c !== undefined) {
       resultThrow(

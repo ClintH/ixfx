@@ -136,7 +136,7 @@ export type WrappedNode<T> = TraversableTree<T> & {
 
   /**
  * Yields all parents of `child` that have a given value.
- * Use {@link findParentsValue} to find the first match only.
+ * Use 'findParentsValue' to find the first match only.
  * @param child 
  * @param value 
  * @param eq 
@@ -156,10 +156,8 @@ export type WrappedNode<T> = TraversableTree<T> & {
    * Yields the node value of each parent of `child`.
    * _undefined_ values are not returned.
    * 
-   * Use {@link queryParentsValue} to search for a particular value
-   * @param child 
-   * @param value 
-   * @param eq 
+   * Use 'queryParentsValue' to search for a particular value
+   * @param child
    * @returns 
    */
   parentsValues<T>(child: TreeNode<T>): IterableIterator<T>

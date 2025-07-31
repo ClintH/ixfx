@@ -27,11 +27,17 @@ export type Arc = {
  */
 export type ArcPositioned = Point & Arc;
 
+/**
+ * Function which can interpolate along an {@link Arc} or {@link ArcPositioned}.
+ */
 export type ArcInterpolate = {
   (amount: number, arc: Arc, allowOverflow: boolean, origin: Point): Point;
   (amount: number, arc: ArcPositioned, allowOverflow?: boolean): Point;
 };
 
+/**
+ * Function to convert an arc to SVG segments
+ */
 export type ArcToSvg = {
   /**
    * SVG path for arc description

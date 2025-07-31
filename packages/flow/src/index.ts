@@ -1,3 +1,5 @@
+export * from '@ixfx/core/continuously';
+
 export * from './behaviour-tree.js';
 export * from './delay.js';
 export * from './debounce.js';
@@ -5,7 +7,6 @@ export * from './dispatch-list.js';
 export * from './every.js';
 export * from './execute.js';
 export * from './event-race.js';
-export * from '@ixfx/core/continuously';
 export * from './moving-average.js';
 export * from './pool.js';
 export * from './promise-with-resolvers.js';
@@ -25,4 +26,9 @@ export * from './wait-for-value.js';
 export * from './wait-for.js';
 export { sleep } from '@ixfx/core';
 
+/**
+ * Functions for creating and driving a state machine
+ * 
+ * See {@link StateMachine.init} to get started.
+ */
 export * as StateMachine from './state-machine/index.js';

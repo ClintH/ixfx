@@ -2,9 +2,10 @@ import type { Point } from "./point-type.js";
 import { interpolate as lineInterpolate } from '../line/interpolate.js';
 
 /**
- * Returns a relative point between two points
+ * Returns a relative point between two points.
+ * 
  * ```js
- * interpolate(0.5, a, b); // Halfway point between a and b
+ * interpolate(0.5, { x:0, y:0 }, { x:10, y:10 }); // Halfway { x, y }
  * ```
  *
  * Alias for Lines.interpolate(amount, a, b);

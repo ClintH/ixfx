@@ -2,7 +2,7 @@ import Colorizr, * as C from "colorizr";
 import type { Colourish, Hsl, HslAbsolute, HslScalar, ParsingOptions, Rgb } from "./types.js";
 import { numberInclusiveRangeTest, numberTest, percentTest } from "@ixfx/guards";
 import { resultThrow } from "@ixfx/guards";
-import { cssDefinedHexColours } from "./css-colours.js";
+import { cssDefinedHexColours, resolveCss } from "./css-colours.js";
 import { angleConvert, angleParse, type Angle } from "@ixfx/geometry";
 import { clamp, interpolate } from "@ixfx/numbers";
 import { isRgb } from "./guards.js";
@@ -14,8 +14,8 @@ import { parseCssRgbFunction, to8bit as rgbTo8bit, toLibraryHsl as rgbToLibraryH
  * ```js
  * withOpacity()
  * ```
- * @param value 
- * @param fn 
+ * @param value Colour
+ * @param fn Function that calcules opacity based on input scalar value
  * @returns 
  */
 export const withOpacity = <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
@@ -52,8 +52,8 @@ export const withOpacity = <T extends Hsl>(value: T, fn: (opacityScalar: number,
  * lightness is 0..1 scale, otherwise 0..100 scale.
  * 
  * Use negative values to decrease (does not apply to 'fixed')
- * @param value 
- * @param amount 
+ * @param value Hsl colour
+ * @param amount Amount to change
  */
 export const changeLightness = (value: Hsl, amount: Partial<{ pdelta: number, delta: number, fixed: number }>): Hsl => {
   let newL = 0;
@@ -96,15 +96,24 @@ export function fromHexString(hexString: string, options: ParsingOptions<Hsl> = 
   return fromLibrary(C.hex2hsl(hexString), options);
 }
 
-export function fromCss<T extends ParsingOptions<Hsl>>(value: string, options: T): T extends { scalar: true } ? HslScalar : HslAbsolute;
-export function fromCss(value: string, options: ParsingOptions<Hsl> = {}): Hsl {
+export function fromCss<T extends ParsingOptions<Hsl>>(value: string, options?: T): T extends { scalar: true } ? HslScalar : HslAbsolute;
+export function fromCss(value: string, options: Partial<ParsingOptions<Hsl>> = {}): Hsl {
   value = value.toLowerCase();
+
   if (value.startsWith(`hsla(`)) throw new Error(`hsla() not supported`);
   if (value.startsWith(`rgba(`)) throw new Error(`rgba() not supported`);
 
   if (value.startsWith(`#`)) {
     return fromHexString(value, options);
-
+  }
+  if (value.startsWith(`--`)) {
+    try {
+      resolveCss(value);
+    } catch (error) {
+      if (typeof options.fallbackString !== `undefined`) return fromCss(options.fallbackString);
+      if (typeof options.fallbackColour !== `undefined`) return options.fallbackColour;
+      throw error;
+    }
   }
   if (value === `transparent`) return hslTransparent;
   if (typeof cssDefinedHexColours[ value ] !== `undefined`) {
@@ -449,7 +458,7 @@ export function parseCssHslFunction(value: string): Hsl {
 
 /**
  * Converts a Hsl structure (or CSS string) to Colorizr's RGB format
- * @param rgb 
+ * @param hsl HSL colour
  * @returns 
  */
 export function toLibraryRgb(hsl: Hsl | string): C.RGB {
