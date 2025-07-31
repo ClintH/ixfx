@@ -31,13 +31,12 @@ export const compareObjectKeys = (a: object, b: object) => {
  * ```js
  * const a = { msg: `hi`, v: 10 };
  * 
- * changedDataFields(a, { msg: `hi`,   v: 10 }); // {}
- * changedDataFields(a, { msg: `hi!!`, v: 10 }); // { msg: `hi!!` }
- * changedDataFields(a, { msg: `hi!!` });       // { msg: `hi!!`, v: undefined }
+ * changedObjectDataFields(a, { msg: `hi`,   v: 10 }); // {}
+ * changedObjectDataFields(a, { msg: `hi!!`, v: 10 }); // { msg: `hi!!` }
+ * changedObjectDataFields(a, { msg: `hi!!` });       // { msg: `hi!!`, v: undefined }
  * ```
  * 
- * Under the hood, we use {@link compareResultToObject}(a, b, true). If B has additional or removed fields,
- * this is considered an error.
+ * If B has additional or removed fields, this is considered an error.
  * 
  * If a field is an array, the whole array is returned, rather than a diff.
  * @param a 
