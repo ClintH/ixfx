@@ -4,10 +4,9 @@ import { applyToValues, round } from '@ixfx/numbers';
 import * as Colour from '../src/colour/index.js';
 
 describe(`colour`, () => {
-  test(`opacity`, () => {
-    expect(Colour.multiplyOpacity(`red`, 0.5)).toBe(`rgb(100% 0% 0% / 50%)`);
-    expect(Colour.multiplyOpacity(`hsl(0,100%,50%)`, 0.5)).toBe(`hsl(0deg 100% 50% / 50%)`);
-  });
+
+
+
 
   test(`special`, () => {
     expect(Colour.toCssColour(`transparent`)).toBe(`transparent`);
@@ -26,6 +25,9 @@ describe(`colour`, () => {
     expect(hsl3.l).toBe(0);
 
   });
+
+
+
 
   test(`colour-parse`, () => {
     // Indeterminate input
@@ -86,3 +88,22 @@ describe(`colour`, () => {
   });
 });
 
+
+test(`set-opacity`, () => {
+  expect(Colour.setOpacity(`red`, 0.5)).toEqual(`rgb(100% 0% 0% / 50%)`);
+  expect(Colour.setOpacity(Colour.HslSpace.scalar(0.5, 0.1, 0.2, 0.4), 0.5)).toEqual(
+    Colour.HslSpace.scalar(0.5, 0.1, 0.2, 0.5)
+  );
+  expect(Colour.setOpacity(Colour.OklchSpace.scalar(0.5, 0.1, 0.2, 0.4), 0.5)).toEqual(
+    Colour.OklchSpace.scalar(0.5, 0.1, 0.2, 0.5)
+  );
+});
+
+test(`opacity`, () => {
+  expect(Colour.multiplyOpacity(`red`, 0.5)).toBe(`rgb(100% 0% 0% / 50%)`);
+  expect(Colour.multiplyOpacity(`hsl(0,100%,50%)`, 0.5)).toBe(`hsl(0deg 100% 50% / 50%)`);
+  expect(Colour.multiplyOpacity(Colour.HslSpace.scalar(0.5, 0.1, 0.2, 0.4), 0.5)).toEqual(
+    Colour.HslSpace.scalar(0.5, 0.1, 0.2, 0.4 * 0.5)
+  );
+
+});

@@ -1,7 +1,7 @@
 export * from './conversion.js';
 export * from './css-colours.js';
 export * from './generate.js';
-
+export * from './guards.js';
 //export * from './interpolate.js';
 export * from './math.js';
 export * from './interpolate.js';

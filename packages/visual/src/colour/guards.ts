@@ -1,24 +1,24 @@
 import type { Hsl, Rgb, OkLch, Colourish } from "./types.js";
 
 export const isHsl = (v: any): v is Hsl => {
-  if (typeof v === `object`) {
-    if (!(`h` in v && `s` in v && `l` in v)) return false;
-    if (!(`unit` in v)) return false;
-    if (`space` in v) {
-      if (v.space !== `hsl`) return false;
-    }
-  }
-  return false;
+  if (typeof v !== `object`) return false;
+  if (!(`h` in v)) return false;
+  if (!(`s` in v)) return false;
+  if (!(`l` in v)) return false;
+  if (!(`unit` in v)) return false;
+  if (!(`space` in v)) return false;
+  if (v.space !== `hsl`) return false;
+  return true;
 }
 
 export const isRgb = (v: any): v is Rgb => {
-  if (typeof v === `object`) {
-    if (!(`r` in v && `g` in v && `b` in v)) return false;
-    if (!(`unit` in v)) return false;
-    if (`space` in v) {
-      if (v.space !== `srgb`) return false;
-    }
-  }
+  if (typeof v !== `object`) return false;
+  if (!(`r` in v)) return false;
+  if (!(`g` in v)) return false;
+  if (!(`b` in v)) return false;
+  if (!(`space` in v)) return false;
+  if (!(`unit` in v)) return false;
+  if (v.space === `srgb`) return true;
   return false;
 }
 
@@ -69,15 +69,15 @@ export const tryParseObjectToHsl = (v: any): Hsl | undefined => {
   return v as Hsl;
 }
 
-export const isLch = (v: any): v is OkLch => {
-  if (typeof v === `object`) {
-    if (!(`l` in v && `c` in v && `h` in v)) return false;
-    if (!(`unit` in v)) return false;
-    if (`space` in v) {
-      if (v.space === `lch`) return true;
-      if (v.space == `oklch`) return true;
-    }
-  }
+export const isOkLch = (v: any): v is OkLch => {
+  if (typeof v !== `object`) return false;
+  if (!(`l` in v)) return false;
+  if (!(`c` in v)) return false;
+  if (!(`h` in v)) return false;
+  if (!(`unit` in v)) return false;
+  if (!(`space` in v)) return false;
+  if (v.space === `lch`) return true;
+  if (v.space === `oklch`) return true;
   return false;
 }
 
@@ -85,7 +85,7 @@ export const isColourish = (v: any): v is Colourish => {
   if (typeof v === `string`) return true;
   if (typeof v !== `object`) return false;
   if (isHsl(v)) return true;
-  if (isLch(v)) return true;
+  if (isOkLch(v)) return true;
   if (isRgb(v)) return true;
   return false;
 }

@@ -4,7 +4,7 @@ import * as SrgbSpace from "./srgb.js";
 import * as HslSpace from './hsl.js';
 import * as OkLchSpace from './oklch.js';
 import { fromCssColour } from "./css-colours.js";
-import { isHsl, isRgb, tryParseObjectToRgb, tryParseObjectToHsl, isColourish, isLch } from "./guards.js";
+import { isHsl, isRgb, tryParseObjectToRgb, tryParseObjectToHsl, isColourish, isOkLch } from "./guards.js";
 import { OklchSpace } from "./index.js";
 
 export type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;
@@ -35,11 +35,11 @@ export function convert(colour: Colourish, destination: ConvertDestinations): Hs
       return HslSpace.toAbsolute(colour);
     }
   } else if (destination === `oklch-scalar`) {
-    if (typeof colour === `string` || isLch(colour)) {
+    if (typeof colour === `string` || isOkLch(colour)) {
       return OkLchSpace.toScalar(colour);
     }
   } else if (destination === `oklch-absolute`) {
-    if (typeof colour === `string` || isLch(colour)) {
+    if (typeof colour === `string` || isOkLch(colour)) {
       return OkLchSpace.toAbsolute(colour);
     }
   } else if (destination === `srgb-8bit`) {
@@ -90,7 +90,7 @@ export const toCssColour = (colour: Colourish | object): string => {
     return SrgbSpace.toCssString(colour);
   }
 
-  if (isLch(colour)) {
+  if (isOkLch(colour)) {
     return OklchSpace.toCssString(colour);
   }
   const asRgb = tryParseObjectToRgb(colour);
@@ -120,13 +120,16 @@ export const guard = (colour: Colour) => {
     case `srgb`:
       SrgbSpace.guard(colour);
       break;
+    case `oklch`:
+      OkLchSpace.guard(colour);
+      break;
     default:
-      throw new Error(`Unknown colour space: '${ colour.space }'`);
+      throw new Error(`Unsupported colour space: '${ colour.space }'`);
   }
 }
 
 export const toColour = (colourish: any): Colour => {
-  if (!isColourish(colourish)) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc.`);
+  if (!isColourish(colourish)) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc. Got: ${ JSON.stringify(colourish) }`);
   let c: Colour | undefined;
   if (typeof colourish === `string`) c = fromCssColour(colourish);
   else c = colourish;

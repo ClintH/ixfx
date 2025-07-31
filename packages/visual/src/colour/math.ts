@@ -1,10 +1,16 @@
-import type { Colour, Colourish, Hsl, Rgb } from './types.js';
+import type { Colour, Colourish, Hsl, OkLch, Rgb } from './types.js';
 import { toColour, toCssColour } from './conversion.js';
 import * as HslSpace from './hsl.js';
 import * as SrgbSpace from './srgb.js';
 import { clamp } from '@ixfx/numbers';
 import { OklchSpace } from './index.js';
 import * as C from 'colorizr';
+
+export function multiplyOpacity<T extends Colourish>(colourish: T, amount: number):
+  T extends string ? string :
+  T extends Hsl ? Hsl :
+  T extends OkLch ? OkLch :
+  T extends Rgb ? Rgb : never
 
 /**
  * Multiplies the opacity of a colour by `amount`, returning a computed CSS colour.
@@ -19,7 +25,7 @@ import * as C from 'colorizr';
  * @param amount Amount
  * @returns 
  */
-export function multiplyOpacity(colourish: string, amount: number): string {
+export function multiplyOpacity(colourish: Colourish, amount: number): Colourish {
   return withOpacity(colourish, o => clamp(o * amount));
 }
 
@@ -28,14 +34,14 @@ export function multiplyOpacity(colourish: string, amount: number): string {
  * @param colourish Colour
  * @param fn Function that takes original opacity as input and returns output opacity
  */
-export function withOpacity(colourish: string, fn: (scalarOpacity: number) => number): string;
+//export function withOpacity(colourish: string, fn: (scalarOpacity: number) => number): string;
 
 /**
  * Does a computation with the opacity of a colour in a HSL structure
  * @param hsl Colour
  * @param fn Function that takes original opacity as input and returns output opacity
  */
-export function withOpacity(hsl: Hsl, fn: (scalarOpacity: number) => number): Hsl;
+//export function withOpacity(hsl: Hsl, fn: (scalarOpacity: number) => number): Hsl;
 
 /**
  * Does a computation with the opacity of a colour in a RGB structure
@@ -43,7 +49,12 @@ export function withOpacity(hsl: Hsl, fn: (scalarOpacity: number) => number): Hs
  * @param fn Function that takes original opacity as input and returns output opacity
  */
 
-export function withOpacity(rgb: Rgb, fn: (scalarOpacity: number) => number): Rgb;
+//export function withOpacity(rgb: Rgb, fn: (scalarOpacity: number) => number): Rgb;
+export function withOpacity<T extends Colourish>(colourish: T, fn: (scalarOpacity: number) => number):
+  T extends string ? string :
+  T extends Hsl ? Hsl :
+  T extends OkLch ? OkLch :
+  T extends Rgb ? Rgb : never
 
 /**
  * Does a computation with the opacity of a colour, returning colour.
@@ -77,7 +88,12 @@ export function withOpacity(colourish: Colourish, fn: (scalarOpacity: number) =>
   return result;
 };
 
-export function setOpacity<T extends Colourish>(colourish: T, opacity: number): T extends string ? string : Colour
+export function setOpacity<T extends Colourish>(colourish: T, amount: number):
+  T extends string ? string :
+  T extends Hsl ? Hsl :
+  T extends OkLch ? OkLch :
+  T extends Rgb ? Rgb : never
+
 export function setOpacity(colourish: Colourish, opacity: number): Colourish {
   const colour = toColour(colourish);
   colour.opacity = opacity;
