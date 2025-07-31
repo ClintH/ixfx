@@ -77,6 +77,16 @@ export function withOpacity(colourish: Colourish, fn: (scalarOpacity: number) =>
   return result;
 };
 
+export function setOpacity<T extends Colourish>(colourish: T, opacity: number): T extends string ? string : Colour
+export function setOpacity(colourish: Colourish, opacity: number): Colourish {
+  const colour = toColour(colourish);
+  colour.opacity = opacity;
+  if (typeof colourish === `string`) {
+    return toCssColour(colour);
+  }
+  return colour;
+}
+
 // export function lighten(colour: string, amount: number): string;
 // export function lighten(colour: Colour, amount: number): Colour;
 // export function lighten(colourish: Colourish, amount: number): Colourish {
