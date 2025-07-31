@@ -45,6 +45,33 @@ export const fromCssColour = (colour: string): Colour => {
   throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour. Input: '${ colour }'`);
 }
 
+/**
+ * Resolves a named colour or CSS variable to a colour string.
+ * Doesn't do conversion or parsing.
+ * 
+ * ```js
+ * resolveCss(`red`);
+ * resolveCss(`my-var`);
+ * ```
+ * @param colour Colour
+ * @param fallback Fallback if CSS variable is missing
+ * @returns 
+ */
+export const resolveCss = (colour: string, fallback?: string): string => {
+  if (colour.startsWith(`--`)) {
+    const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
+    if (fromCss.length === 0 || fromCss === null) {
+      if (typeof fallback !== `undefined`) return fallback;
+      throw new Error(`CSS variable missing: '${ colour }'`);
+    }
+    return resolveCss(fromCss); // Recurse, because value might be a named colour
+  }
+  if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
+    return cssDefinedHexColours[ colour ] as string;
+  }
+  return colour; // assume legit
+}
+
 export const cssDefinedHexColours = {
   "aliceblue": "#f0f8ff",
   "antiquewhite": "#faebd7",
