@@ -380,7 +380,6 @@ export const apply = (
  * It returns a function which can later be applied to a thing.
  *
  * ```js
- * import { Forces } from "@ixfx/dist/modulation.js"
  * // Acceleration vector of (0.1, 0), ie moving straight on horizontal axis
  * const f = Forces.accelerationForce({ x:0.1, y:0 }, `dampen`);
  *
