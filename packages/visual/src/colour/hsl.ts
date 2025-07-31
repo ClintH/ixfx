@@ -108,9 +108,9 @@ export function fromCss(value: string, options: Partial<ParsingOptions<Hsl>> = {
   }
   if (value.startsWith(`--`)) {
     try {
-      resolveCss(value);
+      value = resolveCss(value);
     } catch (error) {
-      if (typeof options.fallbackString !== `undefined`) return fromCss(options.fallbackString);
+      if (typeof options.fallbackString !== `undefined`) value = options.fallbackString;
       if (typeof options.fallbackColour !== `undefined`) return options.fallbackColour;
       throw error;
     }
