@@ -1,14 +1,22 @@
 {
 	"name": "@ixfx/bundle",
-	"version": "0.41.3",
+	"version": "0.41.4",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/"
+		"dist/",
+		"bundle/"
 	],
 	"scripts": {
 		"package-bundle": "tsdown"
+	},
+	"main": "bundle/index.js",
+	"exports": {
+		".": {
+			"types": "./bundle/index.d.ts",
+			"import": "./bundle/index.js"
+		}
 	},
 	"dependencies": {
 		"@ixfx/arrays": "workspace:^",
@@ -32,12 +40,5 @@
 		"@ixfx/visual": "workspace:^",
 		"@types/w3c-web-serial": "1.0.8",
 		"@types/web-bluetooth": "0.0.21"
-	},
-	"main": "dist/index.js",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
-		}
 	}
 }
