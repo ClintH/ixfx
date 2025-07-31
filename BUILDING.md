@@ -46,9 +46,9 @@ pnpm run publint
 ```
 
 ```
-npm run knip
-npx --yes @arethetypeswrong/cli --format ascii --profile esm-only --pack .
-npx publint
+pnpm run knip
+pnpx --yes @arethetypeswrong/cli --format ascii --profile esm-only --pack .
+pnpx publint
 ```
 
 # Publishing

@@ -1,15 +1,15 @@
 
 import { css, html, LitElement, type PropertyValues } from "lit";
-import { customElement } from "lit/decorators/custom-element.js";
-import { property } from "lit/decorators/property.js";
-import { createRef, type Ref, ref } from "lit/directives/ref.js";
-import { CanvasHelper } from "../dom/CanvasHelper.js";
-import type { Rect, RectPositioned } from "../geometry/Types.js";
-import * as Numbers from '../numbers/index.js';
-import type { Colourish } from "../visual/colour/index.js";
-import type { DrawingHelper } from "../visual/Drawing.js";
-import { Colour, Drawing } from "../visual/index.js";
-import { Pathed } from "../data/index.js";
+import { customElement, property } from "lit/decorators.js";
+import { createRef, ref, type Ref } from "lit/directives/ref.js";
+import { CanvasHelper } from "@ixfx/visual";
+import type { Rect, RectPositioned } from "@ixfx/geometry/rect";
+import * as Numbers from '@ixfx/numbers';
+import type { Colourish } from "@ixfx/visual/colour";
+import type { DrawingHelper } from "@ixfx/visual/drawing";
+import { Colour, Drawing } from "@ixfx/visual";
+import { Pathed } from "@ixfx/core";
+import { getCssVariable } from "@ixfx/dom";
 
 /**
  * Attributes
@@ -30,31 +30,31 @@ import { Pathed } from "../data/index.js";
 @customElement(`plot-element`)
 export class PlotElement extends LitElement {
   @property({ attribute: `streaming`, type: Boolean })
-  streaming = true;
+  accessor streaming = true;
 
   @property({ attribute: `hide-legend`, type: Boolean })
-  hideLegend = false;
+  accessor hideLegend = false;
 
   @property({ attribute: `max-length`, type: Number })
-  maxLength = 500;
+  accessor maxLength = 500;
 
   @property({ attribute: `data-width`, type: Number })
-  dataWidth = 5;
+  accessor dataWidth = 5;
 
   @property({ attribute: `fixed-max`, type: Number })
-  fixedMax = Number.NaN;
+  accessor fixedMax = Number.NaN;
 
   @property({ attribute: `fixed-min`, type: Number })
-  fixedMin = Number.NaN;
+  accessor fixedMin = Number.NaN;
 
   @property({ attribute: `line-width`, type: Number })
-  lineWidth = 2;
+  accessor lineWidth = 2;
 
   @property({ attribute: `render`, type: String })
-  renderStyle = `dot`
+  accessor renderStyle = `dot`
 
   @property({ attribute: `manual-draw`, type: Boolean })
-  manualDraw = false;
+  accessor manualDraw = false;
   padding = 5;
 
   paused = false;
@@ -142,6 +142,7 @@ export class PlotElement extends LitElement {
 
   #setupCanvas(): CanvasHelper {
     if (this.#canvas !== undefined) return this.#canvas;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const canvas = this.canvasEl.value!;// this.shadowRoot?.querySelector(`canvas`);
     if (!canvas) throw new Error(`canvas element not found`);
     const c = new CanvasHelper(canvas);
@@ -156,7 +157,7 @@ export class PlotElement extends LitElement {
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
-    const canvas = this.canvasEl.value!;
+    //const canvas = this.canvasEl.value!;
     const ro = new ResizeObserver((event) => {
       const c = this.#setupCanvas();
       if (!c) return;
@@ -168,7 +169,7 @@ export class PlotElement extends LitElement {
   }
 
   updateColours() {
-    this.#legendColour = Colour.getCssVariable(`legend-fg`, `black`);
+    this.#legendColour = getCssVariable(`legend-fg`, `black`);
   }
 
   plot(value: number, seriesName = ``, skipDrawing = false) {
@@ -190,13 +191,13 @@ export class PlotElement extends LitElement {
    */
   plotObject(value: object) {
     for (const p of Pathed.getPathsAndData(value, true)) {
-      this.plot(p.value, p.path, true);
+      this.plot(p.value as number, p.path, true);
     }
     this.draw();
   }
 
   colourGenerator(series: string): Colour.Colourish {
-    const c = Colour.hslFromRelativeValues(this.#hue, 0.9, 0.4);
+    const c = Colour.HslSpace.scalar(this.#hue, 0.9, 0.4);
     this.#hue = Numbers.wrap(this.#hue + 0.1);
     return c;
   }
@@ -242,11 +243,12 @@ export class PlotElement extends LitElement {
     // Draw data
     for (const series of this.#series.values()) {
       const seriesScale = this.seriesRanges.get(series.name);
-      const data = seriesScale === undefined ? (globalScaler === undefined ?
+      //const test = Numbers.scaler(seriesScale[ 0 ], seriesScale[ 1 ]);
+      const data: number[] = seriesScale === undefined ? (globalScaler === undefined ?
         series.getScaled() :
         series.getScaledBy(globalScaler)) :
         series.getScaledBy(Numbers.scaler(seriesScale[ 0 ], seriesScale[ 1 ]));
-      const colour = Colour.toString(series.colour);
+      const colour = Colour.toCssColour(series.colour);
       switch (this.renderStyle) {
         case `line`: {
           this.drawLineSeries(data, cp, d, colour);
@@ -270,7 +272,7 @@ export class PlotElement extends LitElement {
     const ctx = d.ctx;
 
     for (const series of this.#series.values()) {
-      ctx.fillStyle = Colour.toString(series.colour);
+      ctx.fillStyle = Colour.toCssColour(series.colour);
       ctx.fillRect(x, y, swatchSize, swatchSize);
       ctx.fillStyle = textColour;
       x += swatchSize + padding;
@@ -286,7 +288,7 @@ export class PlotElement extends LitElement {
     }
   }
 
-  drawLineSeries(data: Array<number>, cp: Rect, d: DrawingHelper, colour: string) {
+  drawLineSeries(data: number[], cp: Rect, d: DrawingHelper, colour: string) {
     const pointWidth = this.streaming ? this.dataWidth : (cp.width / data.length);
     let x = 0;
     if (this.streaming) x = cp.width - (pointWidth * data.length);
@@ -309,7 +311,7 @@ export class PlotElement extends LitElement {
     });
   }
 
-  drawDotSeries(data: Array<number>, cp: Rect, d: DrawingHelper, colour: string) {
+  drawDotSeries(data: number[], cp: Rect, d: DrawingHelper, colour: string) {
     const pointWidth = this.streaming ? this.dataWidth : cp.width / data.length;
     let x = 0;
     if (this.streaming) x = cp.width - (pointWidth * data.length);
@@ -365,7 +367,7 @@ export class PlotElement extends LitElement {
         height
       }
     });
-    const parts = [];
+    const parts: RectPositioned[] = [];
     let x = padding;
     let y = padding;
     let usedWidthMax = 0;
@@ -401,7 +403,7 @@ export class PlotElement extends LitElement {
 
 
 export class PlotSeries {
-  data: Array<number> = [];
+  data: number[] = [];
   minSeen = Number.MAX_SAFE_INTEGER;
   maxSeen = Number.MIN_SAFE_INTEGER;
 
@@ -424,11 +426,10 @@ export class PlotSeries {
     if (Number.isNaN(min)) min = 0;
     if (Number.isNaN(max)) max = 1;
 
-    const s = Numbers.scaler(min, max);
-    return this.getScaledBy(s);
+    return this.getScaledBy(Numbers.scaler(min, max));
   }
 
-  getScaledBy(scaler: (v: number) => number) {
+  getScaledBy(scaler: Numbers.NumberScaler) {
     return this.data.map(v => {
       if (typeof v !== `number`) throw new Error(`Data should just be numbers. Got: ${ typeof v }`);
       if (Number.isNaN(v)) throw new Error(`data contains NaN`);

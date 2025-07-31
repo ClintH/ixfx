@@ -2,7 +2,11 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "dist",
-		"rootDir": "."
+		"rootDir": ".",
+		"experimentalDecorators": false
 	},
-	"include": ["src/**/*", "__tests__/**/*"]
+	"include": [
+		"src/**/*",
+		"__tests__/**/*"
+	]
 }

@@ -1,5 +1,22 @@
 # @ixfxfun/ui
 
+## 0.43.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.46.0
+  - @ixfx/geometry@0.42.0
+  - @ixfx/visual@0.44.0
+  - @ixfx/core@0.46.0
+  - @ixfx/dom@0.42.2
+  - @ixfx/rx@0.42.1
+  - @ixfx/numbers@0.42.1
+
 ## 0.42.0
 
 ### Minor Changes

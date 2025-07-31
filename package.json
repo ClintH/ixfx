@@ -8,7 +8,7 @@
 		"test": "vitest --api",
 		"coverage": "vitest run --coverage --coverage.exclude=**/types.ts --coverage.exclude=**/node_modules/** --coverage.exclude=**/dist/** --coverage.exclude=bundle/** --coverage.exclude=node_modules/** --coverage.exclude=**/__tests__/** --coverage.exclude=tests/**  --coverage.reportsDirectory ./tests/coverage",
 		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint",
-		"docs": "typedoc",
+		"docs": "typedoc --out ../api-docs/docs",
 		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
 		"pkg-add": "node --experimental-strip-types package-rewrite.ts add",
 		"demos-bundle-core": "tsdown --config tsdown.demos.ts",
@@ -16,9 +16,9 @@
 		"demos-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./bundle-for-demos/**/* ../demos/ixfx",
 		"demos": "pnpm run demos-bundle && pnpm run demos-copy",
 		"packages-bundle-core": "pnpm run -r package-bundle",
-		"packages-bundle": "pnpm run pkg-strip && pnpm run bundle-core && pnpm run pkg-add",
-		"bundling": "pnpm run build && pnpm run pkg-strip && pnpm run demos-core && pnpm run bundle-core && pnpm run pkg-add",
-		"relase-prep": "pnpm run bundling && pnpm changeset"
+		"packages-bundle": "pnpm run pkg-strip && pnpm run packages-bundle-core && pnpm run pkg-add",
+		"bundling": "pnpm run rebuild && pnpm run pkg-strip && pnpm run demos-bundle-core && pnpm run packages-bundle-core && pnpm run pkg-add",
+		"release-prep": "pnpm run bundling && pnpm run docs && pnpm changeset"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.5",

@@ -1,5 +1,16 @@
 # @ixfxfun/core
 
+## 0.46.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/debug@0.42.0
+
 ## 0.45.0
 
 ### Minor Changes
