@@ -1,5 +1,5 @@
 import { recordEntriesDepthFirst } from "@ixfx/core/records";
-import { isPrimitive, isInteger, isEqualContextString } from '@ixfx/core';
+import { isPrimitive, isInteger, isEqualContextString, defaultToString } from '@ixfx/core';
 import { testPlainObjectOrPrimitive } from '@ixfx/guards';
 import type { IsEqualContext } from '@ixfx/core';
 import { compareObjectKeys } from './records/compare.js';
@@ -79,6 +79,8 @@ export type CompareDataOptions<V> = {
    * By default only 'colour.h' is emitted. If _true_ is set, 'colour' and 'colour.h' is emitted.
    */
   includeParents: boolean
+
+  skipInstances: WeakSet<any>
 }
 
 /**
@@ -90,7 +92,7 @@ export type CompareDataOptions<V> = {
  * @param deepProbe If true
  * @returns 
  */
-const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean) => {
+const getEntries = (target: object, deepProbe: boolean) => {
   if (target === undefined) throw new Error(`Param 'target' is undefined`);
   if (target === null) throw new Error(`Param 'target' is null`);
   if (typeof target !== `object`) throw new Error(`Param 'target' is not an object (got: ${ typeof target })`);
@@ -122,6 +124,7 @@ const getEntries = <V extends Record<string, any>>(target: V, deepProbe: boolean
  * @returns 
  */
 export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>, options: Partial<CompareDataOptions<V>> = {}): Generator<PathDataChange<any>> {
+  //console.log(`compareData a: ${ JSON.stringify(a) } b: ${ JSON.stringify(b) } opts: ${ options }`)
   if (typeof a === `undefined`) {
     yield {
       path: options.pathPrefix ?? ``,
@@ -135,6 +138,7 @@ export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>,
     return;
   }
   const asPartial = options.asPartial ?? false;
+  const skipInstances = options.skipInstances ?? new WeakSet();
   const undefinedValueMeansRemoved = options.undefinedValueMeansRemoved ?? false;
   const pathPrefix = options.pathPrefix ?? ``;
   const deepEntries = options.deepEntries ?? false;
@@ -159,16 +163,19 @@ export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>,
 
     const keyOfAInB = key in b;
     const valueOfKeyInB = b[ key ];
-    //console.log(`Pathed.compareData Pathed.compareDataA key: ${ key } valueA: ${ JSON.stringify(valueA) }`);
+    //console.log(`Pathed.compareData Pathed.compareDataA key: ${ key } valueA: ${ defaultToString(valueA) }  valueAType: ${ typeof valueA } entriesCount: ${ entriesA.length }`);
 
     if (typeof valueA === `object` && valueA !== null) {
+      if (skipInstances.has(valueA as object)) continue; // Already seen
+      skipInstances.add(valueA as object);
       if (keyOfAInB) {
-        //console.log(`Pathed.compareData key ${ key } exists in B. value:`, valueB);
+        //console.log(`Pathed.compareData key ${ key } exists in B. value:`, valueOfKeyInB);
         if (valueOfKeyInB === undefined) {
           throw new Error(`Pathed.compareData Value for key ${ key } is undefined`);
         } else {
-          const sub = [ ...compareData(valueA, valueOfKeyInB, {
+          const sub = [ ...compareData(valueA as V, valueOfKeyInB, {
             ...options,
+            skipInstances,
             pathPrefix: pathPrefix + key + `.`
           }) ];
           if (sub.length > 0) {
@@ -188,11 +195,11 @@ export function* compareData<V extends Record<string, any>>(a: V, b: Partial<V>,
       if (keyOfAInB) {
         // B contains key from A
         if (valueOfKeyInB === undefined && undefinedValueMeansRemoved) {
-          //console.error(`Pathed.compareData (2) value for B is undefined. key: ${ key }. B: ${ JSON.stringify(b) } A: ${ JSON.stringify(a) }`);
+          //console.error(`Pathed.compareData (2) value for B is undefined. key: ${ key }. B: ${ defaultToString(b) } A: ${ defaultToString(a) }`);
           yield { path: subPath, previous: valueA, value: undefined, state: `removed` };
         } else {
           if (!eq(valueA, valueOfKeyInB, subPath)) {
-            //console.log(`Pathed.compareData  value changed. A: ${ valueA } B: ${ valueB } subPath: ${ subPath }`)
+            //console.log(`Pathed.compareData  value changed. A: ${ valueA } B: ${ valueOfKeyInB } subPath: ${ subPath }`)
             yield { path: subPath, previous: valueA, value: valueOfKeyInB, state: `change` };
           }
         }

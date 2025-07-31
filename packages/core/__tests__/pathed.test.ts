@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect, assert, type TestContext } from 'vitest';
-import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../../src/pathed.js';
+import { compareData, getPathsAndData, updateByPath, applyChanges, getField, getPaths } from '../src/pathed.js';
 import { resultToValue, type Result } from '@ixfx/guards';
 
 
@@ -224,6 +224,22 @@ test(`compare - data - array`, () => {
     { path: `2`, previous: `a`, value: undefined, state: `removed` }
   ]);
 
+});
+
+test(`compare - cyclical`, () => {
+  const test = {
+    msg: `hello`,
+    position: { x: 10, y: 20 },
+    value: false,
+    oops: {}
+  };
+  test.oops = test;
+  expect([ ...compareData(test, {
+    msg: `hello`,
+    position: { x: 10, y: 20 },
+    value: false,
+    oops: {}
+  }) ]).toBeTruthy();
 });
 
 test(`compare - data`, () => {

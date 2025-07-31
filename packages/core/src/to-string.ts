@@ -1,5 +1,8 @@
 
 // Via Vuejs
+
+import { removeCircularReferences } from "./records/circular.js";
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const objectToString = Object.prototype.toString
 const toTypeString = (value: unknown): string =>
@@ -47,5 +50,15 @@ export const defaultToString = (value: null | boolean | string | object): string
 
   if (typeof value === `string`) return value;
   if (typeof value === `symbol`) throw new TypeError(`Symbol cannot be converted to string`);
-  return JSON.stringify(value);
+  try {
+    const s = JSON.stringify(value);
+    return s;
+  } catch (error) {
+    // Circular maybe
+    if (typeof value === `object`) {
+      return JSON.stringify(removeCircularReferences(value, `(circular)`));
+    } else {
+      throw error;
+    }
+  }
 };
