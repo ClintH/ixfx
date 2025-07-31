@@ -1,5 +1,12 @@
 # @ixfxfun/iterables
 
+## 0.42.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/core@0.47.0
+
 ## 0.42.1
 
 ### Patch Changes

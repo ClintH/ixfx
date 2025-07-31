@@ -1,5 +1,18 @@
 # @ixfxfun/modulation
 
+## 0.45.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/core@0.47.0
+  - @ixfx/flow@0.43.1
+  - @ixfx/geometry@0.42.1
+
 ## 0.44.2
 
 ### Patch Changes

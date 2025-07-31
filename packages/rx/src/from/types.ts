@@ -266,8 +266,15 @@ export type GeneratorOptions = {
 }
 
 export type EventSourceOptions = {
-  //initialValue?: V
-  //transform: (args?: Event | undefined) => V
+  /**
+   * If true, behaves like Source.object where event
+   * properties are compared and source only
+   * emits where there is a change.
+   * 
+   * Default: _false_
+   */
+  diff?: boolean
+
   lazy?: Lazy
   /**
    * If true, log messages are emitted

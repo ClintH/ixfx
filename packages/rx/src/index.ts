@@ -191,7 +191,7 @@ export const Ops = {
    * @param options 
    * @returns 
    */
-  field: <TSource extends object, TFieldType>(fieldName: keyof TSource, options: FieldOptions<TSource, TFieldType>) => {
+  field: <TSource extends object, TFieldType>(fieldName: keyof TSource, options: Partial<FieldOptions<TSource, TFieldType>> = {}) => {
     return (source: ReactiveOrSource<TSource>) => {
       return OpFns.field(source, fieldName, options);
     }

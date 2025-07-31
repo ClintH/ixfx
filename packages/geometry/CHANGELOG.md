@@ -1,5 +1,14 @@
 # @ixfxfun/geometry
 
+## 0.42.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/core@0.47.0
+  - @ixfx/collections@0.46.1
+  - @ixfx/trackers@0.39.3
+
 ## 0.42.0
 
 ### Minor Changes

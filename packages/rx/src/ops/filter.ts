@@ -7,6 +7,7 @@ import type { FilterPredicate } from "./types.js";
  * Passes all values where `predicate` function returns _true_.
  */
 export function filter<In>(input: ReactiveOrSource<In>, predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): Reactive<In> {
+  if (typeof predicate !== `function`) throw new TypeError(`Param 'predicate' should be a function`);
   const upstream = initUpstream<In, In>(input, {
     ...options,
     onValue(value) {
@@ -23,6 +24,8 @@ export function filter<In>(input: ReactiveOrSource<In>, predicate: FilterPredica
  * Drops all values where `predicate` function returns _true_.
  */
 export function drop<In>(input: ReactiveOrSource<In>, predicate: FilterPredicate<In>, options: Partial<InitStreamOptions>): Reactive<In> {
+  if (typeof predicate !== `function`) throw new TypeError(`Param 'predicate' should be a function`);
+
   const upstream = initUpstream<In, In>(input, {
     ...options,
     onValue(value) {
