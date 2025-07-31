@@ -1,5 +1,7 @@
 import { numberTest, resultThrow } from '@ixfx/guards';
 import { type RandomSource } from '@ixfx/random';
+import { scalar as hslScalar, toCssString } from './hsl.js';
+
 /**
  * Returns a full HSL colour string (eg `hsl(20,50%,75%)`) based on a index.
  * It's useful for generating perceptually different shades as the index increments.
@@ -28,15 +30,18 @@ export const goldenAngleColour = (
     numberTest(alpha, `percentage`, `alpha`)
   );
   // Via Stackoverflow
-  const hue = index * 137.508; // use golden angle approximation
-  return alpha === 1 ? `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%)` : `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%,${ alpha * 100 }%)`;
+  const hueDeg = index * 137.508; // use golden angle approximation
+  const hueRel = (hueDeg % 360) / 360
+  return toCssString(hslScalar(hueRel, saturation, lightness, alpha));
+  //return alpha === 1 ? `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%)` : `hsl(${ hue },${ saturation * 100 }%,${ lightness * 100 }%,${ alpha * 100 }%)`;
 };
 
 /**
  * Returns a random hue component (0..359)
+ * 
  * ```
  * // Generate hue
- * const h =randomHue(); // 0-359
+ * const h = randomHue(); // 0-359
  *
  * // Generate hue and assign as part of a HSL string
  * el.style.backgroundColor = `hsl(${randomHue(), 50%, 75%})`;
@@ -44,7 +49,4 @@ export const goldenAngleColour = (
  * @param rand
  * @returns
  */
-export const randomHue = (rand: RandomSource = Math.random): number => {
-  const r = rand();
-  return r * 360;
-};
+export const randomHue = (rand: RandomSource = Math.random): number => rand() * 360;
