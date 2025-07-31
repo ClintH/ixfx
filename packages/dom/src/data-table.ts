@@ -67,7 +67,6 @@ const toTableSimple = (v: object, options: FormattingOptions): string => {
  */
 export const fromList = (
   parentOrQuery: HTMLElement | string,
-  //eslint-disable-next-line functional/prefer-readonly-type
   data: Map<string, object>
 ): DataTable<Map<string, object>> => {
   const parent = resolveElement(parentOrQuery);
@@ -97,7 +96,6 @@ export const fromList = (
       if (t === null) {
         t = document.createElement(`table`);
         if (!t) throw new Error(`Could not create table element`);
-        //eslint-disable-next-line functional/immutable-data
         t.id = tKey;
         parent.append(t);
       }
@@ -139,7 +137,6 @@ export type DataFormatter = (data: object, path: string) => string | undefined;
  * @returns
  */
 const updateElement = (
-  //eslint-disable-next-line functional/prefer-immutable-types
   t: HTMLTableElement,
   data: object,
   options: DataTableOpts
@@ -150,7 +147,6 @@ const updateElement = (
   const objectsAsTables = options.objectsAsTables ?? false;
 
   if (data === undefined) {
-    //eslint-disable-next-line functional/immutable-data
     t.innerHTML = ``;
     return;
   }

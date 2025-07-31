@@ -29,7 +29,9 @@ export * as ImageDataGrid from './image-data-grid.js';
 
 //export * as Plot2 from './Plot2.js';
 
-//export * as Plot from './plot/index.js';
+export * as Plot from './plot/index.js';
+//export * as BipolarView from './plot/bipolar-view.js';
+
 //export * as SceneGraph from './SceneGraph.js';
 //export * from './ScaleCanvas.js';
 //export * from './plot/CartesianCanvasPlot.js';

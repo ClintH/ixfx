@@ -1,13 +1,13 @@
+export * as DataTable from './data-table.js';
+export * as DragDrop from './drag-drop.js';
+export * as Forms from './forms.js';
 
 export * from './css-variables.js';
 export * from './css.js';
 export * from './data-display.js';
-export * from './data-table.js';
-export * from './drag-drop.js';
 export * from './el.js';
 export * from './element-sizing.js';
 export * from './error-handler.js';
-export * as Forms from './forms.js';
 export * from './inline-console.js';
 export * from './log.js';
 export * from './query.js';

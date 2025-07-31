@@ -1,5 +1,18 @@
 # @ixfx/bundle
 
+## 0.41.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/iterables@0.43.0
+  - @ixfx/visual@0.46.0
+  - @ixfx/dom@0.43.0
+  - @ixfx/ui@0.44.0
+  - @ixfx/collections@0.46.2
+  - @ixfx/rx@0.43.1
+  - @ixfx/io@0.42.4
+
 ## 0.41.2
 
 ### Patch Changes

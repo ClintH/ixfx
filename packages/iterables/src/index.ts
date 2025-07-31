@@ -8,6 +8,7 @@ export { combineLatestToArray } from './chain/combine-latest-to-array.js';
 export { combineLatestToObject } from './chain/combine-latest-to-object.js';
 
 export * from './compare-values.js';
+export * from './controller.js';
 export * from './from-event.js';
 export * from './guard.js';
 export * from './types.js';

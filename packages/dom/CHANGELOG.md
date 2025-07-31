@@ -1,5 +1,15 @@
 # @ixfxfun/dom
 
+## 0.43.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- @ixfx/collections@0.46.2
+
 ## 0.42.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 import * as Drawing from "../drawing.js";
 import { Bipolar } from "@ixfx/numbers";
-import { Queues } from "@ixfx/collections/";
+import { type IQueueImmutable, QueueImmutable } from "@ixfx/collections/queue";
 import * as Colour from "../colour/index.js";
 import { type CirclePositioned } from "@ixfx/geometry/circle";
 
@@ -92,9 +92,9 @@ export const init = (elementQuery: string, options: BipolarViewOptions = {}): Bi
   const width = (options.width ?? getNumericAttribute(element, `width`, 200) * window.devicePixelRatio);
   const height = (options.height ?? getNumericAttribute(element, `height`, 200) * window.devicePixelRatio);
 
-  let lastValues: Queues.IQueueImmutable<CirclePositioned> | undefined;
+  let lastValues: IQueueImmutable<CirclePositioned> | undefined;
   if (displayLastValues > 0) {
-    lastValues = Queues.immutable<CirclePositioned>({
+    lastValues = new QueueImmutable<CirclePositioned>({
       capacity: displayLastValues,
       discardPolicy: `older`
     });

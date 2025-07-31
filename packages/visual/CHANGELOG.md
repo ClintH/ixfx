@@ -1,5 +1,17 @@
 # @ixfxfun/visual
 
+## 0.46.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/dom@0.43.0
+  - @ixfx/collections@0.46.2
+
 ## 0.45.0
 
 ### Minor Changes

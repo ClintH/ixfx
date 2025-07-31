@@ -1,1 +1,1 @@
-export * as Rx from './rx/index.js';
+export * as RxUi from './rx/index.js';
