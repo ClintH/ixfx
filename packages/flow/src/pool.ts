@@ -8,7 +8,7 @@ export type FullPolicy = `error` | `evictOldestUser`;
 /**
  * Pool options
  */
-export type Opts<V> = {
+export type PoolOptions<V> = {
   /**
    * Maximum number of resources for this pool
    */
@@ -79,7 +79,6 @@ export class PoolUser<V> extends SimpleEventEmitter<PoolUserEventMap<V>> {
    * @param key User key
    * @param resource Resource being used
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   constructor(readonly key: string, readonly resource: Resource<V>) {
     super();
     this._lastUpdate = performance.now();
@@ -187,7 +186,7 @@ export class Resource<V> {
   #data: V;
   #users: PoolUser<V>[];
   readonly #capacityPerResource;
-  readonly #resourcesWithoutUserExpireAfterMs;
+  readonly #resourcesWithoutUserExpireAfterMs: number;
   #lastUsersChange: number;
 
   /**
@@ -339,7 +338,7 @@ export class Pool<V> {
   private generateResource?: () => V;
   readonly freeResource?: (v: V) => void;
 
-  readonly log;
+  readonly log: Debug.LogSet = Debug.logSet(`Pool`);
 
   /**
    * Constructor.
@@ -347,7 +346,7 @@ export class Pool<V> {
    * By default, no capacity limit, one user per resource
    * @param options Pool options
    */
-  constructor(options: Opts<V> = {}) {
+  constructor(options: PoolOptions<V> = {}) {
     this.capacity = options.capacity ?? -1;
     this.fullPolicy = options.fullPolicy ?? `error`;
     this.capacityPerResource = options.capacityPerResource ?? 1;
@@ -381,7 +380,6 @@ export class Pool<V> {
    * @returns
    */
   dumpToString() {
-    //eslint-disable-next-line functional/no-let
     let r = `Pool
     capacity: ${ this.capacity } userExpireAfterMs: ${ this.userExpireAfterMs } capacityPerResource: ${ this.capacityPerResource }
     resources count: ${ this._resources.length }`;
@@ -451,7 +449,6 @@ export class Pool<V> {
    * This is called automatically when using a resource.
    */
   maintain() {
-    //eslint-disable-next-line functional/no-let
     let changed = false;
 
     // Find all disposed resources
@@ -539,7 +536,6 @@ export class Pool<V> {
    * @internal
    * @param user
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   _release(user: PoolUser<V>) {
     this._users.delete(user.key);
   }
@@ -549,7 +545,6 @@ export class Pool<V> {
    * @param resource
    * @param _
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   _releaseResource(resource: Resource<V>, _: string) {
     this._resources = this._resources.filter((v) => v !== resource);
   }
@@ -579,7 +574,6 @@ export class Pool<V> {
    * @param resource
    * @returns
    */
-  //eslint-disable-next-line functional/prefer-immutable-types
   private _assign(key: string, resource: Resource<V>) {
     const u = new PoolUser<V>(key, resource);
     this._users.set(key, u);
@@ -596,7 +590,6 @@ export class Pool<V> {
   #allocateResource(userKey: string): PoolUser<V> | undefined {
     // Sort items by number of users per pool item
     const sorted = this.getResourcesSortedByUse();
-    //eslint-disable-next-line functional/no-let
     // for (let i=0;i<sorted.length;i++) {
     //   console.log(i +`. users: ` + sorted[i].usersCount);
     // }
@@ -697,4 +690,4 @@ export class Pool<V> {
  * @param options
  * @returns
  */
-export const create = <V>(options: Opts<V> = {}): Pool<V> => new Pool<V>(options);
+export const create = <V>(options: PoolOptions<V> = {}): Pool<V> => new Pool<V>(options);
