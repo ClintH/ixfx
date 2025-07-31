@@ -3,6 +3,7 @@ import type { ModFunction, SpringOptions } from './types.js';
 
 /**
  * Produces values according to rough spring physics.
+ * å
  * ```js
  * import { continuously } from "@ixfx/flow.js"
  * import { spring } from "@ixfx/modulation.js"

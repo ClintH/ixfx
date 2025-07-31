@@ -68,6 +68,7 @@ export function triangleShape(period = 1): ModFunction {
 
 /**
  * Returns a function that shapes a 0..1 value as a square waveform.
+ * 
  * `period` sets the number of cycles in the 0..1 range.
  * No bounds checks are performed on input value.
  * Ensure it is 0..1 (inclusive).
@@ -133,7 +134,9 @@ export function sineBipolarShape(period = 1): ModFunction {
 }
 
 /**
- * Creates a wave modulator. Defaults to 5-second sine wave. 
+ * Creates a wave modulator by name.
+ * 
+ * Defaults to 5-second sine wave. 
  * ```js
  * import { wave } from '@ixfx/modulation.js';
  * // Triangle wave that has a single cycle over two seconds

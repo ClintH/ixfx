@@ -3,7 +3,7 @@ import { field } from "../ops/field.js";
 import { object } from "./object.js";
 import type { FieldOptions } from "../ops/types.js";
 import type { EventSourceOptions, EventSourceTriggerOptions } from "./types.js";
-import { initLazyStream } from "../init-stream.js";
+import { initLazyStream, initLazyStreamWithInitial, initStream } from "../init-stream.js";
 import { elapsedInterval } from "@ixfx/core/elapsed";
 /**
  * Fired when `eventName` fires on `target`. 
@@ -37,6 +37,8 @@ export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | st
 
 //export function event<V extends Record<string, any>>(target: EventTarget | null | string, name: string, options: EventOptions<V>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
 //export function event<V extends Record<string, any>>(target: EventTarget | null | string, name: string, options?: Optional<EventOptions<V>, `transform`>): ReactiveNonInitial<V> & ReactiveDisposable<V>;
+
+// export function event(targetOrQuery: EventTarget | null | string, name: `pointermove` | `pointerover` | `pointerup` | `pointerdown` | `pointerenter` | `pointercancel` | `pointerout` | `pointerleave` | `gotpointercapture` | `lostpointer`, initialValue: Partial<PointerEvent> | undefined, options: Partial<EventSourceOptions>): ReactiveInitial<PointerEvent> & Reactive<PointerEvent>;
 
 /**
  * Subscribes to an event, emitting data
@@ -73,9 +75,11 @@ export function event<TEventArgs extends Record<string, any>>(targetOrQuery: Eve
 
   const debugLifecycle = options.debugLifecycle ?? false;
   const debugFiring = options.debugFiring ?? false;
+  const diff = options.diff ?? false;
   const lazy = options.lazy ?? false;
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   if (initialValue === undefined) initialValue = {} as TEventArgs;
+
   const rxObject = object<TEventArgs>(initialValue, { deepEntries: true });
   let eventAdded = false;
   let disposed = false;

@@ -197,6 +197,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
 
 /**
  * Returns a function that interpolates from A to B.
+ * 
  * It steps through the interpolation with each call to the returned function.
  * This means that the `incrementAmount` will hinge on the rate
  * at which the function is called. Alternatively, consider {@link interpolatorInterval}
