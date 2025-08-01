@@ -1,10 +1,11 @@
-export { create as expiringMap } from './expiring-map.js';
+export { create as expiringMap, ExpiringMap } from './expiring-map.js';
 export type {
   ExpiringMapEvent,
   ExpiringMapEvents,
   Opts as ExpiringMapOpts,
 } from './expiring-map.js';
 
+export * from './map-of-simple-mutable.js';
 export type { IMapOf } from './imap-of.js';
 export { immutable, type IMapImmutable } from './map.js';
 export { mutable, type IMapMutable } from './map-mutable.js';
