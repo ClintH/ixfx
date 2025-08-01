@@ -1,5 +1,25 @@
 # @ixfxfun/visual
 
+## 0.47.0
+
+### Minor Changes
+
+- ce99c0a: Packaging
+
+### Patch Changes
+
+- Updated dependencies [ce99c0a]
+  - @ixfx/arrays@0.46.0
+  - @ixfx/collections@0.47.0
+  - @ixfx/core@0.48.0
+  - @ixfx/dom@0.44.0
+  - @ixfx/events@0.42.0
+  - @ixfx/flow@0.44.0
+  - @ixfx/geometry@0.43.0
+  - @ixfx/guards@0.42.0
+  - @ixfx/numbers@0.43.0
+  - @ixfx/random@0.44.0
+
 ## 0.46.0
 
 ### Minor Changes

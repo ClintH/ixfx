@@ -19,7 +19,7 @@
 		"packages-bundle": "pnpm run pkg-strip && pnpm run packages-bundle-core && pnpm run pkg-add",
 		"bundling": "pnpm run rebuild && pnpm run pkg-strip && pnpm run demos-bundle-core && pnpm run packages-bundle-core && pnpm run pkg-add",
 		"release-prep": "pnpm run bundling && pnpm changeset",
-		"release": "pnpm changeset version && pnpm publish -r"
+		"release": "pnpm changeset version && pnpm publish -r --no-git-checks"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.5",

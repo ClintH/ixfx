@@ -1,5 +1,16 @@
 # @ixfx/arrays
 
+## 0.46.0
+
+### Minor Changes
+
+- ce99c0a: Packaging
+
+### Patch Changes
+
+- Updated dependencies [ce99c0a]
+  - @ixfx/guards@0.42.0
+
 ## 0.45.0
 
 ### Minor Changes

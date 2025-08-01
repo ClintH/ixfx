@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/collections",
-	"version": "0.46.2",
+	"version": "0.47.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,

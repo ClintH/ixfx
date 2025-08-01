@@ -1,5 +1,22 @@
 # @ixfxfun/ui
 
+## 0.45.0
+
+### Minor Changes
+
+- ce99c0a: Packaging
+
+### Patch Changes
+
+- Updated dependencies [ce99c0a]
+  - @ixfx/collections@0.47.0
+  - @ixfx/core@0.48.0
+  - @ixfx/dom@0.44.0
+  - @ixfx/geometry@0.43.0
+  - @ixfx/numbers@0.43.0
+  - @ixfx/rx@0.44.0
+  - @ixfx/visual@0.47.0
+
 ## 0.44.0
 
 ### Minor Changes

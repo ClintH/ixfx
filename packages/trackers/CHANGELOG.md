@@ -1,5 +1,19 @@
 # @ixfxfun/trackers
 
+## 0.40.0
+
+### Minor Changes
+
+- ce99c0a: Packaging
+
+### Patch Changes
+
+- Updated dependencies [ce99c0a]
+  - @ixfx/core@0.48.0
+  - @ixfx/events@0.42.0
+  - @ixfx/flow@0.44.0
+  - @ixfx/numbers@0.43.0
+
 ## 0.39.3
 
 ### Patch Changes
