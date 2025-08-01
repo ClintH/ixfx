@@ -7,10 +7,10 @@ import { defineConfig } from 'tsdown'
 export default defineConfig({
   entry: {
     arrays: './packages/arrays/src/index.ts',
-    bundle: './packages/bundle/src/index.ts',
+    // bundle: './packages/bundle/src/index.ts',
     core: './packages/core/src/index.ts',
     collections: './packages/collections/src/index.ts',
-    index: './packages/core/src/index.ts',
+    index: './packages/bundle/src/index.ts',
     debug: './packages/debug/src/index.ts',
     dom: './packages/dom/src/index.ts',
     events: './packages/events/src/index.ts',
