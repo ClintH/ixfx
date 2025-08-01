@@ -1,5 +1,12 @@
 # @ixfxfun/flow
 
+## 0.44.1
+
+### Patch Changes
+
+- Updated dependencies [41d8d3b]
+  - @ixfx/collections@0.48.0
+
 ## 0.44.0
 
 ### Minor Changes

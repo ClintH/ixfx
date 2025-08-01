@@ -1,5 +1,11 @@
 # @ixfxfun/collections
 
+## 0.48.0
+
+### Minor Changes
+
+- 41d8d3b: Exports
+
 ## 0.47.0
 
 ### Minor Changes

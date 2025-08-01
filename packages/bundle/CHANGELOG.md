@@ -1,5 +1,19 @@
 # @ixfx/bundle
 
+## 0.42.1
+
+### Patch Changes
+
+- Updated dependencies [41d8d3b]
+  - @ixfx/collections@0.48.0
+  - @ixfx/dom@0.44.1
+  - @ixfx/flow@0.44.1
+  - @ixfx/geometry@0.43.1
+  - @ixfx/io@0.43.1
+  - @ixfx/rx@0.44.1
+  - @ixfx/ui@0.45.1
+  - @ixfx/visual@0.47.1
+
 ## 0.42.0
 
 ### Minor Changes
