@@ -1,0 +1,5 @@
+---
+"@ixfx/collections": minor
+---
+
+Exports
