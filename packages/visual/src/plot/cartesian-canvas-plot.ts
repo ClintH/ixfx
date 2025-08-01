@@ -43,7 +43,7 @@ export const insert = (insertOptions: InsertOptions, options: RecursivePartial<C
 
   if (insertOptions.canvasResizeTo === `viewport`) {
     ElementSizer.canvasViewport(canvasEl, {
-      onSetSize: (size, _el) => {
+      onSizeChanging: (size, _el) => {
         source.setLogicalSize(size);
         p.invalidateRange();
         p.draw();
@@ -52,7 +52,7 @@ export const insert = (insertOptions: InsertOptions, options: RecursivePartial<C
   } else {
     // Parent
     ElementSizer.canvasParent(canvasEl, {
-      onSetSize: (size, _el) => {
+      onSizeChanging: (size, _el) => {
         source.setLogicalSize(size);
         p.invalidateRange();
         p.draw();
