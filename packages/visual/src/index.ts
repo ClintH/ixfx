@@ -1,7 +1,6 @@
 export * from './canvas-helper.js';
 export * from './pointer-visualise.js';
-// import * as Svg from './svg/index.js';
-// export * as Svg from './svg/index.js';
+export * as Svg from './svg/index.js';
 
 import * as NamedColourPalette from './named-colour-palette.js';
 
@@ -10,12 +9,7 @@ import * as Colour from './colour/index.js';
 
 export * as Colour from './colour/index.js';
 
-//export type * from './types.js';
-
-//import * as SceneGraph from './SceneGraph.js';
 import * as Video from './video.js';
-
-//export * from '../../dom/src/CanvasRegion.js';
 
 export * as Drawing from './drawing.js';
 
@@ -24,19 +18,8 @@ export * as Drawing from './drawing.js';
  * This is useful because it's otherwise a one-dimensional array listing each rgba in turn.
  */
 export * as ImageDataGrid from './image-data-grid.js';
-//export * as BipolarView from '../../dom/src/plot/BipolarView.js';
-//export * as NamedColourPalette from './named-colour-palette.js';
-
-//export * as Plot2 from './Plot2.js';
 
 export * as Plot from './plot/index.js';
-//export * as BipolarView from './plot/bipolar-view.js';
-
-//export * as SceneGraph from './SceneGraph.js';
-//export * from './ScaleCanvas.js';
-//export * from './plot/CartesianCanvasPlot.js';
-
-
 
 /**
  * Working with video, either playback from a file or stream from a video camera.
