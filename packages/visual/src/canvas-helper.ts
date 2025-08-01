@@ -14,6 +14,7 @@ export type CanvasEvents = {
    */
   resize: { size: Rect, helper: CanvasHelper, ctx: CanvasRenderingContext2D }
 
+  resized: { size: Rect, helper: CanvasHelper, ctx: CanvasRenderingContext2D }
   /**
    * Pointerdown. 
    * 
@@ -67,7 +68,8 @@ export type CanvasHelperOptions = Readonly<{
    * @param size 
    * @returns 
    */
-  onResize?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void
+  onResizing?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void
+  onResized?: (ctx: CanvasRenderingContext2D, size: Rect, helper: CanvasHelper) => void
   /**
    * Logical width of canvas.
    * This is used for establishing the desired aspect ratio.
@@ -160,7 +162,8 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
       width: opts.width ?? size.width,
       zIndex: opts.zIndex ?? -1,
       coordinateScale: opts.coordinateScale ?? `both`,
-      onResize: opts.onResize,
+      onResizing: opts.onResizing,
+      onResized: opts.onResized,
       clearOnResize: opts.clearOnResize ?? true,
       draw: opts.draw,
       skipCss: opts.skipCss ?? false,
@@ -254,10 +257,14 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     this.#logicalSize = logicalSizeInteger;
 
     //console.log(`setting logical size to ${ this.#logicalSize.width }x${ this.#logicalSize.height }`);
+
     // Notify listeners of resize
-    const r = this.opts.onResize;
-    if (r) {
-      setTimeout(() => { r(this.ctx, this.size, this) }, 100);
+    // const r = this.opts.onResizing;
+    // if (r) {
+    //   setTimeout(() => { r(this.ctx, this.size, this) }, 100);
+    // }
+    if (this.opts.onResizing) {
+      this.opts.onResizing(this.ctx, this.size, this);
     }
     this.fireEvent(`resize`, { ctx: this.ctx, size: this.#logicalSize, helper: this });
   }
@@ -285,9 +292,12 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
       this.setLogicalSize({ width: this.opts.width, height: this.opts.height });
     } else {
       const resizerOptions: ElementSizerOptions<HTMLCanvasElement> = {
-        onSetSize: (size) => {
+        onSizeChanging: (size) => {
           if (Rects.isEqual(this.#logicalSize, size)) return;
           this.setLogicalSize(size);
+        },
+        onSizeDone: (size, el) => {
+          this.#onResizeDone(size);
         },
         naturalSize: { width: this.opts.width, height: this.opts.height },
         stretch: this.opts.resizeLogic ?? `none`
@@ -296,6 +306,11 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     }
 
     this.#getContext();
+  }
+
+  #onResizeDone(size: Rect) {
+    if (this.opts.onResized) this.opts.onResized(this.ctx, this.size, this);
+    this.fireEvent(`resized`, { ctx: this.ctx, size: this.#logicalSize, helper: this });
   }
 
   #handleEvents() {
@@ -503,7 +518,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   getImageData(): ImageData {
     const size = this.getPhysicalSize();
     const data = this.ctx.getImageData(0, 0, size.width, size.height, { colorSpace: this.opts.colourSpace });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     if (data === null || data === undefined) throw new Error(`Could not get image data from context`);
     return data;
   }

@@ -2,6 +2,8 @@ import { resolveEl } from "./resolve-el.js";
 import { getComputedPixels } from "./css.js";
 import { Rects } from "@ixfx/geometry";
 import type { Rect } from "@ixfx/geometry/rect";
+import { debounce } from "./internal/debounce.js";
+import { intervalToMs, type Interval } from "@ixfx/core";
 
 /**
  * * width: use width of parent, set height based on original aspect ratio of element. Assumes parent has a determined width.
@@ -25,7 +27,10 @@ export type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
    * If not specified, the element's parent is used
    */
   containerEl?: HTMLElement | string
-  onSetSize: (size: Rects.Rect, el: T) => void
+  onSizeChanging: (size: Rects.Rect, el: T) => void
+  onSizeDone?: (size: Rects.Rect, el: T) => void
+
+  debounceTimeout?: Interval
 }
 
 /**
@@ -48,24 +53,30 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   #naturalSize: Rects.Rect;
   #naturalRatio: number;
   #viewport: Rects.RectPositioned;
-  #onSetSize;
+  #onSizeChanging;
   #el: T;
   #containerEl: HTMLElement;
   #disposed = false;
   #resizeObservable: ResizeObserver | undefined;
+  #sizeDebounce: () => void = () => ({})
 
   constructor(elOrQuery: T | string, options: ElementSizerOptions<T>) {
     this.#el = resolveEl(elOrQuery);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement!;
 
     this.#stretch = options.stretch ?? `none`;
-    this.#onSetSize = options.onSetSize;
+    this.#onSizeChanging = options.onSizeChanging;
     this.#size = Rects.Empty;
 
-    let naturalSize = options.naturalSize;
-    if (naturalSize === undefined) {
-      naturalSize = this.#el.getBoundingClientRect();
+    const onSizeDone = options.onSizeDone;
+    if (typeof onSizeDone !== `undefined`) {
+      this.#sizeDebounce = debounce(() => {
+        onSizeDone(this.size, this.#el);
+      }, options.debounceTimeout);
     }
+    let naturalSize = options.naturalSize;
+    naturalSize ??= this.#el.getBoundingClientRect();
     this.#naturalRatio = 1;
     this.#naturalSize = naturalSize;
     this.setNaturalSize(naturalSize);
@@ -91,10 +102,10 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     const el = resolveEl<HTMLCanvasElement>(canvasElementOrQuery);
     const er = new ElementSizer<HTMLCanvasElement>(el, {
       ...options,
-      onSetSize(size, el) {
+      onSizeChanging(size, el) {
         el.width = size.width;
         el.height = size.height;
-        if (options.onSetSize) options.onSetSize(size, el);
+        if (options.onSizeChanging) options.onSizeChanging(size, el);
       },
     });
     return er;
@@ -119,7 +130,7 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     const er = new ElementSizer<SVGElement>(svg, {
       containerEl: document.body,
       stretch: `both`,
-      onSetSize(size) {
+      onSizeChanging(size) {
         svg.setAttribute(`width`, size.width.toString());
         svg.setAttribute(`height`, size.height.toString());
         if (onSizeSet) onSizeSet(size);
@@ -205,7 +216,6 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     return { width, height };
   }
 
-
   #onParentResize(args: ResizeObserverEntry[]) {
     const box = args[ 0 ].contentBoxSize[ 0 ];
     const parentSize = { width: box.inlineSize, height: box.blockSize };
@@ -220,7 +230,8 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   set size(size: Rects.Rect) {
     Rects.guard(size, `size`);
     this.#size = size;
-    this.#onSetSize(size, this.#el);
+    this.#onSizeChanging(size, this.#el);
+    this.#sizeDebounce();
   }
 
   get size() {
