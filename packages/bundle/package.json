@@ -16,6 +16,10 @@
 		".": {
 			"types": "./bundle/index.d.ts",
 			"import": "./bundle/index.js"
+		},
+		"./flow.js": {
+			"types": "./bundle/flow.d.ts",
+			"import": "./bundle/flow.js"
 		}
 	},
 	"dependencies": {
