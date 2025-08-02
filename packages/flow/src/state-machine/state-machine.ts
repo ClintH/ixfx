@@ -16,7 +16,8 @@ export const cloneState = <V extends Transitions>(
   });
 };
 /**
- * Initialises a state machine
+ * Initialises a state machine. [Read more in the ixfx Guide](https://ixfx.fun/flow/state-machine/overview/)
+ * 
  * ```js
  * const desc = {
  *  pants: ['shoes','socks'],

@@ -32,6 +32,8 @@ import { init as machineInit, reset as machineReset, next as machineNext, to as 
 /**
  * Drives a state machine.
  *
+ * [Read more on the ixfx Guide](https://ixfx.fun/flow/state-machine/driver/)
+ * 
  * Uses a 'handlers' structure to determine when to change
  * state and actions to take.
  * 

@@ -219,7 +219,7 @@ export type ContinuouslyOpts = Readonly<{
  */
 export const continuously = (
   callback: ContinuouslyAsyncCallback | ContinuouslySyncCallback,
-  interval?: Interval,
+  interval: Interval = 0,
   options: Partial<ContinuouslyOpts> = {}
 ): Continuously => {
   let intervalMs = intervalToMs(interval, 0);

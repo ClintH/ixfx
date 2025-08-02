@@ -20,6 +20,10 @@
 		"./flow.js": {
 			"types": "./bundle/flow.d.ts",
 			"import": "./bundle/flow.js"
+		},
+		"./numbers.js": {
+			"types": "./bundle/numbers.d.ts",
+			"import": "./bundle/numbers.js"
 		}
 	},
 	"dependencies": {

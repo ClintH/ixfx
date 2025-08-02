@@ -1,5 +1,4 @@
 export * from '@ixfx/core/continuously';
-
 export * from './behaviour-tree.js';
 export * from './delay.js';
 export * from './debounce.js';
@@ -29,6 +28,6 @@ export { sleep } from '@ixfx/core';
 /**
  * Functions for creating and driving a state machine
  * 
- * See {@link StateMachine.init} to get started.
+ * [Read more on the ixfx Guide](https://ixfx.fun/flow/state-machine/overview/)
  */
 export * as StateMachine from './state-machine/index.js';
