@@ -58,7 +58,7 @@ export const getContext = (
   return ctx;
 };
 
-export type DrawingHelper = ReturnType<typeof makeHelper>
+
 /**
  * Makes a helper object that wraps together a bunch of drawing functions that all use the same drawing context
  * @param ctxOrCanvasEl Drawing context or canvs element reference
