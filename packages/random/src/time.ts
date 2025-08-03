@@ -60,7 +60,6 @@ export const minutesMsSource = (
  * // Random time between one minute and 5 minutes
  * minuteMs({ max: 5, min: 1 });
  * ```
- * @inheritDoc minutesMsSource
  *
  * @param maxMinutesOrOptions
  * @see {@link minutesMsSource}
@@ -126,7 +125,6 @@ export const secondsMsSource = (
  * // Random milliseconds between 1000-4999
  * secondsMs({ max:5, min:1 });
  * ```
- * @inheritDoc secondsMsSource
  * @param maxSecondsOrOptions
  * @returns
  */

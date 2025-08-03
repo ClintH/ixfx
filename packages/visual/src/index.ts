@@ -1,4 +1,6 @@
 export * from './canvas-helper.js';
+export * from './canvas-region.js';
+
 export * from './pointer-visualise.js';
 export * as Svg from './svg/index.js';
 export type * from './types.js';
@@ -15,7 +17,7 @@ import * as Video from './video.js';
 export * as Drawing from './drawing.js';
 
 /**
- * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link @ixfx/geometry.Grid} type.
+ * Wraps [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData) as an ixfx {@link https://api.ixfx.fun/_ixfx/geometry/Grids/Grid/} type.
  * This is useful because it's otherwise a one-dimensional array listing each rgba in turn.
  */
 export * as ImageDataGrid from './image-data-grid.js';

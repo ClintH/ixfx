@@ -3,7 +3,7 @@ import * as SrgbSpace from './colour/srgb.js';
 import type { Rgb, Rgb8Bit } from './colour/types.js';
 
 /**
- * Returns a {@link @ixfx/geometry/Grids.Grid} based on the provided `image`
+ * Returns a {@link https://api.ixfx.fun/_ixfx/geometry/Grids/Grid/} based on the provided `image`
  * @param image ImageData
  * @returns Grid
  */

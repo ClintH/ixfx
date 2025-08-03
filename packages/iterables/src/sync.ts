@@ -259,7 +259,7 @@ export function* fill<V>(it: Iterable<V>, v: V) {
  * Use {@link forEach} if you want to use an async `iterator` and async `fn`.
  * 
  * Alternatives:
- * * {@link @ixfx/flow.repeat}/{@link @ixfx/flow.repeatSync}: if you want to call something a given number of times and get the result
+ * * {@link https://api.ixfx.fun/_ixfx/flow/repeat/ @ixfx/flow.repeat}/{@link https://api.ixfx.fun/_ixfx/flow/repeatSync/ @ixfx/flow.repeatSync}: if you want to call something a given number of times and get the result
  * @param iterator Iterable or array
  * @typeParam T Type of iterable's values
  * @param fn Function to call for each item. If function returns _false_, iteration cancels

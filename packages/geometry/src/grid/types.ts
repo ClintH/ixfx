@@ -109,8 +109,8 @@ export type GridNeighbour = readonly [ keyof GridNeighbours, GridCell ];
  * A function that returns a value (or _undefined_) based on a _cell_
  *
  * Implementations:
- * * {@link Array1d.access}: For accessing a single-dimension array as a grid
- * * {@link Array2d.access}: For accessing a two-dimension array as a grid
+ * * {@link Grids.Array1d.access}: For accessing a single-dimension array as a grid
+ * * {@link Grids.Array2d.access}: For accessing a two-dimension array as a grid
  * 
  */
 export type GridCellAccessor<TValue> = (cell: GridCell, wrap?: GridBoundsLogic) => TValue | undefined;

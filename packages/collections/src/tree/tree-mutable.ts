@@ -439,7 +439,7 @@ export const fromPlainObject = (value: Record<string, any>, label = ``, parent?:
 
 /**
  * Creates a tree, returning it as a {@link WrappedNode} for object-oriented access.
- * Use {@link root} alternatively.
+ * Use {@link Trees.Mutable.root} alternatively.
  * @param value 
  * @returns 
  */

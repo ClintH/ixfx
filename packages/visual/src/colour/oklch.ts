@@ -41,8 +41,6 @@ export const guard = (lch: OkLch) => {
   }
 }
 
-export function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, options: T): T extends { scalar: true } ? OkLchScalar : OkLchAbsolute;
-
 /**
  * Coverts from the Colorizr library
  * Tests ranges:
@@ -56,6 +54,8 @@ export function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, options
  * @param parsingOptions Options for parsing 
  * @returns 
  */
+export function fromLibrary<T extends ParsingOptions<OkLch>>(lch: C.LCH, parsingOptions: T): T extends { scalar: true } ? OkLchScalar : OkLchAbsolute;
+
 export function fromLibrary(lch: C.LCH, parsingOptions: ParsingOptions<OkLch> = {}): OkLch {
   if (typeof lch === `undefined` || lch === null) {
     if (parsingOptions.fallbackColour) return parsingOptions.fallbackColour;
@@ -76,9 +76,14 @@ export function fromLibrary(lch: C.LCH, parsingOptions: ParsingOptions<OkLch> = 
   } else {
     return absolute(lch.l, lch.c, lch.h, (lch.alpha ?? 1));
   }
-
 }
 
+/**
+ * Parse a HEX-formatted colour into OkLch structured format
+ * @param hexString 
+ * @param options 
+ * @returns 
+ */
 export const fromHexString = (hexString: string, options: ParsingOptions<OkLch> = {}): OkLch => {
   return fromLibrary(C.hex2oklch(hexString), options);
 }
@@ -87,7 +92,22 @@ const oklchTransparent: OkLchAbsolute = Object.freeze({
   l: 0, c: 0, h: 0, opacity: 0, unit: `absolute`, space: `oklch`
 });
 
+/**
+ * Converts from some CSS-representation of colour to a structured OkLch format.
+ * 
+ * ```js
+ * fromCss(`yellow`);
+ * fromCss(`rgb(100,200,90)`);
+ * fromCss(`#ff00ff`);
+ * ```
+ * 
+ * By default returns a {@link OkLchScalar} (relative) representation. Use the flag 'scalar:true' to get back
+ * {@link OkLchAbsolute}.
+ * @param value 
+ * @param options 
+ */
 export function fromCss<T extends ParsingOptions<OkLch>>(value: string, options: T): T extends { scalar: true } ? OkLchScalar : OkLchAbsolute;
+
 export function fromCss(value: string, options: ParsingOptions<OkLch> = {}): OkLch {
   value = value.toLowerCase();
   if (value.startsWith(`#`)) {
@@ -119,12 +139,6 @@ export function fromCss(value: string, options: ParsingOptions<OkLch> = {}): OkL
   const cc = new Colorizr(value);
   const lch = cc.oklch;
   return fromLibrary(lch, options);
-  // const c = C.extractColorParts(value);
-  // if (c.model !== `oklch`) {
-  //   if (options.fallbackColour) return options.fallbackColour;
-  //   throw new Error(`Expecting OKLCH colour space. Got: ${ c.model }`);
-  // }
-  // return fromLibrary(c as any as C.LCH, options);
 }
 
 //export const fromCssScalar = (value: string, options: ParsingOptions<OkLchAbsolute> = {}): OkLchScalar => toScalar(fromCssAbsolute(value, options));

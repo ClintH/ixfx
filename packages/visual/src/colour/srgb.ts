@@ -231,8 +231,8 @@ export const guard = (rgb: Rgb) => {
  * * 'pdelta': proportion of current value to change by ('percentage delta')
  * 
  * Use negative values to decrease
- * @param value 
- * @param amount 
+ * @param rgb Colour
+ * @param amount Amount to change
  */
 export const changeLightness = (rgb: Rgb, amount: Partial<{ pdelta: number, delta: number, fixed: number }>): Rgb => {
   let newL = 0;

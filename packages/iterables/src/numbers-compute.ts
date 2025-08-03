@@ -12,7 +12,7 @@ import { isIterable } from "./guard.js";
  * // Yields: { min: 2, max: 99, total: 115.2, avg: 28.8 }
  * ```
  *
- * Use {@link @ixfx/numbers.average}, {@link @ixfx/numbers.max}, {@link @ixfx/numbers.min} or {@link @ixfx/numers.total} if you only need one of these.
+ * Use {@link https://api.ixfx.fun/_ixfx/numbers/average/ @ixfx/numbers.average}, {@link https://api.ixfx.fun/_ixfx/numbers/max/ @ixfx/numbers.max}, {@link https://api.ixfx.fun/_ixfx/numbers/min/ @ixfx/numbers.min} or {@link https://api.ixfx.fun/_ixfx/numbers/total/ @ixfx/numers.total} if you only need one of these.
  *
  * A start and end range can be provided if the calculation should be restricted to a part
  * of the input array. By default the whole array is used.

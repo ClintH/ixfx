@@ -26,7 +26,7 @@ export type LabelledValues<TValue> = {
 /**
  * Array-backed tree node.
  * 
- * Create using {@link root}
+ * Create using {@link Trees.Mutable.root}
  */
 export type TreeNode<TValue> = {
   /**

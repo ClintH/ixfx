@@ -31,6 +31,9 @@ export type CanvasRegionSpecMatched = {
 
 export type CanvasRegionSpec = { marginPx?: number } & (CanvasRegionSpecAbsolutePositioned | CanvasRegionSpecRelativePositioned | CanvasRegionSpecRelativeSized | CanvasRegionSpecMatched);
 
+/**
+ * Manges the drawing for a region of a canvas
+ */
 export class CanvasSource {
   #canvasEl: HTMLCanvasElement;
   #ctx: undefined | CanvasRenderingContext2D;
@@ -50,6 +53,11 @@ export class CanvasSource {
   }
 
 
+  /**
+   * Set logical size for region
+   * @param size
+   * @returns 
+   */
   setLogicalSize(size: Rect) {
     this.#logicalSize = size;
     const el = this.#canvasEl;
@@ -62,6 +70,7 @@ export class CanvasSource {
     this.invalidateContext();
     return size;
   }
+
 
   #createSizeScaler() {
     let inMax = 1;
@@ -80,6 +89,9 @@ export class CanvasSource {
     }
   }
 
+  /**
+   * Causes drawing context to be re-created
+   */
   invalidateContext() {
     this.#ctx = undefined;
   }
@@ -92,6 +104,12 @@ export class CanvasSource {
   }
 
 
+  /**
+   * Convert relative to absolute
+   * @param pt 
+   * @param kind 
+   * @returns 
+   */
   toAbsPoint(pt: Point, kind: `independent` = `independent`) {
     let { x, y } = pt;
     switch (kind) {
@@ -103,11 +121,22 @@ export class CanvasSource {
     return { x, y };
   }
 
+  /**
+   * Gets the offset x,y
+   */
   get offset() {
     const b = this.#canvasEl.getBoundingClientRect();
     return { x: b.left, y: b.top };
   }
 
+  /**
+   * Converts an absolute point to relative
+   * @param pt 
+   * @param source 
+   * @param kind 
+   * @param clamped 
+   * @returns 
+   */
   toRelPoint(pt: Point, source: `screen` | `source`, kind: `independent` | `skip` = `independent`, clamped = true) {
     let { x, y } = pt;
     if (source === `screen`) {
@@ -130,6 +159,12 @@ export class CanvasSource {
     return { x, y };
   }
 
+  /**
+   * Converts a rectangle to absolute coordinates
+   * @param rect 
+   * @param kind 
+   * @returns 
+   */
   toAbsRect(rect: Rect | RectPositioned, kind: `independent` = `independent`) {
     let { width, height } = rect;
     switch (kind) {
@@ -255,11 +290,17 @@ export class CanvasSource {
     throw new Error(`Spec doesn't seem valid`);
   }
 
+  /**
+   * Clears the region of the canvas
+   */
   clear() {
     const c = this.context;
     c.clearRect(0, 0, this.width, this.height);
   }
 
+  /**
+   * Gets - or creates - the drawing context
+   */
   get context() {
     if (this.#ctx) return this.#ctx;
     const c = this.#canvasEl.getContext(`2d`);
@@ -275,14 +316,23 @@ export class CanvasSource {
     return this.#ctx;
   }
 
+  /**
+   * Gets a scaler for size
+   */
   get sizeScaler() {
     return this.#sizeScaler;
   }
 
+  /**
+   * Gets the logical width
+   */
   get width() {
     return this.#logicalSize.width;
   }
 
+  /**
+   * Gets the logical height
+   */
   get height() {
     return this.#logicalSize.height;
   }
@@ -450,17 +500,29 @@ export class CanvasRegion {
     c.restore();
   }
 
+  /**
+   * Clears the region
+   */
   clear() {
     const c = this.context;
     c.clearRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
   }
 
+  /**
+   * Fills the region
+   * @param fillStyle
+   */
   fill(fillStyle = `white`) {
     const c = this.context;
     c.fillStyle = fillStyle;
     c.fillRect(this.#r.x, this.#r.y, this.#r.width, this.#r.height);
   }
 
+  /**
+   * For debugging, draws an outline of the bounds
+   * @param strokeStyle 
+   * @param lineWidth 
+   */
   drawBounds(strokeStyle: string, lineWidth = 1) {
     this.drawConnectedPointsRelative([
       { x: 0, y: 0 },
@@ -504,6 +566,13 @@ export class CanvasRegion {
     return { x, y };
   }
 
+  /**
+   * Converts absolute to region point
+   * @param pt 
+   * @param source 
+   * @param clamped 
+   * @returns 
+   */
   absToRegionPoint(pt: Point, source: `screen`, clamped: boolean) {
     if (source === `screen`) {
       pt = Points.subtract(pt, this.source.offset);
@@ -522,38 +591,65 @@ export class CanvasRegion {
     return { x, y };
   }
 
+  /**
+   * Get center of region
+   */
   get center() {
     return Rects.center(this.#r);
   }
 
+  /**
+   * Gets the drawing context
+   */
   get context() {
     return this.source.context;
   }
 
+  /**
+   * SEts the region
+   */
   set region(value: RectPositioned) {
     this.#r = value;
   }
 
+  /**
+   * Gets the region
+   */
   get region() {
     return this.#r;
   }
 
+  /**
+   * Gets the width
+   */
   get width() {
     return this.#r.width;
   }
 
+  /**
+   * Gets the height
+   */
   get height() {
     return this.#r.height;
   }
 
+  /**
+   * Gets the x offset
+   */
   get x() {
     return this.#r.x;
   }
 
+  /**
+   * Gets they y offset
+   */
   get y() {
     return this.#r.y;
   }
 
+  /**
+   * Gets the width/height, whichever is smaller
+   */
   get dimensionMin() {
     return Math.min(this.#r.width, this.#r.height);
   }

@@ -64,7 +64,6 @@ export const weightedIntegerSource = (
  * ```js
  * Random.weightedInteger({ max: 100, easing: `quadIn` })
  * ```
- * @inheritDoc {@link weightedIntegerSource}
  * @param options Options. Default: { max: 1, min: 0 }
  * @returns Random weighted integer
  */

@@ -15,7 +15,7 @@
  * ```
  *
  * For clamping integer ranges, consider {@link clampIndex }
- * For clamping `{ x, y }` points, consider {@link @ixfx/geometry.Points.clamp}.
+ * For clamping `{ x, y }` points, consider {@link https://api.ixfx.fun/_ixfx/geometry/Points/clamp/ @ixfx/geometry/Points.clamp}.
  * For clamping bipolar values: {@link Bipolar.clamp}
  * @param value Value to clamp
  * @param min value (inclusive)
