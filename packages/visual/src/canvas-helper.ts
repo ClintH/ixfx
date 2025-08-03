@@ -7,6 +7,7 @@ import * as Drawing from './drawing.js';
 import * as ImageDataGrid from './image-data-grid.js';
 import { cloneFromFields } from '@ixfx/core/records';
 import type { Grid } from '@ixfx/geometry/grid';
+import type { DrawingHelper } from './types.js';
 
 export type CanvasEvents = {
   /**
@@ -141,7 +142,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   #viewport: RectPositioned = Rects.EmptyPositioned;
   #logicalSize: Rect = Rects.Empty;
   #ctx: CanvasRenderingContext2D | undefined;
-  #drawHelper: Drawing.DrawingHelper | undefined;
+  #drawHelper: DrawingHelper | undefined;
   #resizer: ElementSizer<HTMLCanvasElement> | undefined;
   #disposed = false;
 

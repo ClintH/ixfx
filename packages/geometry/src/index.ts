@@ -1,55 +1,31 @@
-export * as Waypoints from './waypoint.js';
-export * as Layouts from './layout.js';
+/**
+ * Arcs are a angle-limited circle. Essentially describing a wedge.
+ */
+export * as Arcs from './arc/index.js';
+export type * from './arc/arc-type.js';
+
+export * as Beziers from './bezier/index.js';
+export type * from './bezier/bezier-type.js';
 
 /**
  * A circle is defined as having a radius
  */
 export * as Circles from './circle/index.js';
+export type * from './circle/circle-type.js';
+
+export * as Grids from './grid/index.js';
+export type * from './grid/types.js';
+
 export * as Lines from './line/index.js';
-export * as Rects from './rect/index.js';
-export * as Points from './point/index.js';
-export * from './point/point-tracker.js';
+export type * from './line/line-path-type.js';
+export type * from './line/line-type.js';
 
 export * as Paths from './path/index.js';
-export * as Grids from './grid/index.js';
-export * as Beziers from './bezier/index.js';
-export * as Compound from './path/compound-path.js';
-export * as Ellipses from './ellipse.js';
-//export type * from './types.js';
+export type * from './path/path-type.js';
 
-export * from './angles.js';
-export * as CurveSimplification from './curve-simplification.js';
-
-/**
- * Quad tree is a datastructure for efficiently determining whether
- * a point/shape is at a location
- * - {@link quadTree}: Create a quad tree
- */
-export * as QuadTree from './quad-tree.js';
-
-export * from './scaler.js';
-export * from './scaler.js';
-
-/**
- * Arcs are a angle-limited circle. Essentially describing a wedge.
- */
-export * as Arcs from './arc/index.js';
-
-/**
- * Generate a few basic geometric shapes
- * Overview:
- * * {@link arrow}
- * * {@link starburst}
- */
-export * as Shapes from './shape/index.js';
-
-/**
- * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
- * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
- * interoperate between these two coordinates.
- */
-export * as Vectors from './vector.js';
-
+export * as Points from './point/index.js';
+export type * from './point/point-type.js';
+export type * from './point/point-relation-types.js';
 
 /**
  * Work with Polar coordinates.
@@ -68,6 +44,47 @@ export * as Vectors from './vector.js';
  * Comparisons: {@link isAntiParallel}, {@link isOpposite}, {@link isParallel}, {@link isPolarCoord}
  */
 export * as Polar from './polar/index.js';
+export type * from './polar/types.js';
+
+export * as Rects from './rect/index.js';
+export type * from './rect/rect-types.js';
+
+/**
+ * Generate a few basic geometric shapes
+ * Overview:
+ * * {@link arrow}
+ * * {@link starburst}
+ */
+export * as Shapes from './shape/index.js';
+export type * from './shape/shape-type.js';
+
+export * as Waypoints from './waypoint.js';
+export * as Layouts from './layout.js';
+
+
+export * from './point/point-tracker.js';
+export * as Compound from './path/compound-path.js';
+export * as Ellipses from './ellipse.js';
+//export type * from './types.js';
+
+export * from './angles.js';
+export * as CurveSimplification from './curve-simplification.js';
+
+/**
+ * Quad tree is a datastructure for efficiently determining whether
+ * a point/shape is at a location
+ * - {@link quadTree}: Create a quad tree
+ */
+export * as QuadTree from './quad-tree.js';
+
+export * from './scaler.js';
+
+/**
+ * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
+ * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
+ * interoperate between these two coordinates.
+ */
+export * as Vectors from './vector.js';
 
 /**
  * Functions for producing points within a shape.
@@ -115,6 +132,7 @@ export * as SurfacePoints from './surface-points.js';
  * - {@link isTriangle}: Returns true if object has expected properties of a triangle
  */
 export * as Triangles from './triangle/index.js';
+export type * from './triangle/triangle-type.js';
 
 // try {
 //   if (typeof window !== `undefined`) {

@@ -1,6 +1,7 @@
 export * from './canvas-helper.js';
 export * from './pointer-visualise.js';
 export * as Svg from './svg/index.js';
+export type * from './types.js';
 
 import * as NamedColourPalette from './named-colour-palette.js';
 
