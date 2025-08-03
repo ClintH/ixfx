@@ -3,7 +3,7 @@
 	"name": "ixfx",
 	"scripts": {
 		"build": "tsc --build",
-		"clean": "pnpm --recursive exec rm -rf dist",
+		"clean": "pnpm run --parallel clean",
 		"rebuild": "pnpm run clean && pnpm run build",
 		"test": "vitest --api",
 		"coverage": "vitest run --coverage --coverage.exclude=**/types.ts --coverage.exclude=**/node_modules/** --coverage.exclude=**/dist/** --coverage.exclude=bundle/** --coverage.exclude=node_modules/** --coverage.exclude=**/__tests__/** --coverage.exclude=tests/**  --coverage.reportsDirectory ./tests/coverage",
@@ -11,14 +11,13 @@
 		"docs": "typedoc --out ../api-docs/docs",
 		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
 		"pkg-add": "node --experimental-strip-types package-rewrite.ts add",
-		"demos-bundle-core": "tsdown --config tsdown.demos.ts",
+		"demos-bundle-core": "pnpm --filter \"./packages/bundle/\" run package-bundle",
 		"demos-bundle": "pnpm run pkg-strip && pnpm run demos-bundle-core && pnpm run pkg-add",
-		"demos-copy": "del --force ../demos/ixfx && copyfiles -u 1 ./bundle-for-demos/**/* ../demos/ixfx",
+		"demos-copy": "del --force ../demos/ixfx && copyfiles -u 3 ./packages/bundle/bundle/**/* ../demos/ixfx",
 		"demos": "pnpm run demos-bundle && pnpm run demos-copy",
-		"packages-bundle-core": "pnpm run -r package-bundle",
+		"packages-bundle-core": "pnpm run --parallel package-bundle",
 		"packages-bundle": "pnpm run pkg-strip && pnpm run packages-bundle-core && pnpm run pkg-add",
-		"bundling": "pnpm run rebuild && pnpm run pkg-strip && pnpm run demos-bundle-core && pnpm run packages-bundle-core && pnpm run pkg-add",
-		"release-prep": "pnpm run bundling && pnpm changeset",
+		"release-prep": "pnpm run rebuild && pnpm run packages-bundle && pnpm run demos-copy && pnpm changeset",
 		"release": "pnpm changeset version && pnpm publish -r --no-git-checks"
 	},
 	"devDependencies": {
@@ -41,12 +40,10 @@
 		"typedoc-plugin-markdown": "4.7.1",
 		"typescript": "5.8.3",
 		"typescript-eslint": "8.38.0",
-		"vitest": "3.2.4"
+		"vitest": "3.2.4",
+		"typedoc": "0.28.7"
 	},
 	"packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808",
 	"type": "module",
-	"dependencies": {
-		"typedoc": "0.28.7"
-	},
-	"module": "./src-bundle/src/index.js"
+	"dependencies": {}
 }

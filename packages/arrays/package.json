@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/arrays",
-	"version": "0.46.0",
+	"version": "0.47.0",
 	"homepage": "https://ixfx.fun",
 	"author": "Clint Heyer <clint@thestaticvoid.net>",
 	"license": "MIT",
@@ -11,7 +11,8 @@
 		"bundle/"
 	],
 	"scripts": {
-		"package-bundle": "tsdown"
+		"package-bundle": "tsdown",
+		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"dependencies": {
 		"@ixfx/guards": "workspace:^"

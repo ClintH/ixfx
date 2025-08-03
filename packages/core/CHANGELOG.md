@@ -1,5 +1,18 @@
 # @ixfxfun/core
 
+## 0.49.0
+
+### Minor Changes
+
+- 4870776: Packaging
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/guards@0.43.0
+  - @ixfx/debug@0.44.0
+
 ## 0.48.0
 
 ### Minor Changes

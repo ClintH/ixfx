@@ -1,5 +1,12 @@
 # @ixfx/bundle
 
+## 1.1.0
+
+### Minor Changes
+
+- 4870776: Packaging
+- Packaging
+
 ## 0.42.1
 
 ### Patch Changes

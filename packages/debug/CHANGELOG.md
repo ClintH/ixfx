@@ -1,5 +1,11 @@
 # @ixfxfun/debug
 
+## 0.44.0
+
+### Minor Changes
+
+- Packaging
+
 ## 0.43.0
 
 ### Minor Changes

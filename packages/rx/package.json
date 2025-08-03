@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/rx",
-	"version": "0.44.1",
+	"version": "0.45.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -9,7 +9,8 @@
 		"bundle/"
 	],
 	"scripts": {
-		"package-bundle": "tsdown"
+		"package-bundle": "tsdown",
+		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"dependencies": {
 		"@ixfx/arrays": "workspace:^",

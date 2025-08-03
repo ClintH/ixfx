@@ -1,5 +1,16 @@
 # @ixfxfun/random
 
+## 0.45.0
+
+### Minor Changes
+
+- Packaging
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/guards@0.43.0
+
 ## 0.44.0
 
 ### Minor Changes

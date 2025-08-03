@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/io",
-	"version": "0.43.1",
+	"version": "0.44.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -9,7 +9,8 @@
 		"bundle/"
 	],
 	"scripts": {
-		"package-bundle": "tsdown"
+		"package-bundle": "tsdown",
+		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"dependencies": {
 		"@ixfx/arrays": "workspace:^",
@@ -20,6 +21,7 @@
 		"@ixfx/events": "workspace:^",
 		"@ixfx/flow": "workspace:^",
 		"@ixfx/geometry": "workspace:^",
+		"@ixfx/modulation": "workspace:^",
 		"@ixfx/guards": "workspace:^",
 		"@ixfx/numbers": "workspace:^",
 		"@ixfx/random": "workspace:^",

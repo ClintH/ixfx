@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/core",
-	"version": "0.48.0",
+	"version": "0.49.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -9,7 +9,8 @@
 		"bundle/"
 	],
 	"scripts": {
-		"package-bundle": "tsdown"
+		"package-bundle": "tsdown",
+		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"dependencies": {
 		"@ixfx/debug": "workspace:^",

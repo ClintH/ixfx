@@ -1,6 +1,6 @@
 {
-	"name": "@ixfx/bundle",
-	"version": "0.42.1",
+	"name": "ixfx",
+	"version": "1.1.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -9,7 +9,8 @@
 		"bundle/"
 	],
 	"scripts": {
-		"package-bundle": "tsdown"
+		"package-bundle": "tsdown",
+		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"main": "bundle/index.js",
 	"exports": {
@@ -17,16 +18,12 @@
 			"types": "./bundle/index.d.ts",
 			"import": "./bundle/index.js"
 		},
-		"./flow.js": {
-			"types": "./bundle/flow.d.ts",
-			"import": "./bundle/flow.js"
-		},
-		"./numbers.js": {
-			"types": "./bundle/numbers.d.ts",
-			"import": "./bundle/numbers.js"
+		"./*.js": {
+			"types": "./bundle/*.d.ts",
+			"import": "./bundle/*.js"
 		}
 	},
-	"dependencies": {
+	"devDependencies": {
 		"@ixfx/arrays": "workspace:^",
 		"@ixfx/collections": "workspace:^",
 		"@ixfx/core": "workspace:^",

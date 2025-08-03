@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/guards",
-	"version": "0.42.0",
+	"version": "0.43.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
@@ -9,7 +9,8 @@
 		"bundle/"
 	],
 	"scripts": {
-		"package-bundle": "tsdown"
+		"package-bundle": "tsdown",
+		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"exports": {
 		".": {
