@@ -175,12 +175,6 @@ export const scale = (colours: Colourish[], opts: Partial<ColourStepOpts> = {}):
 }
 
 export type CreateStepsOptions = Partial<{ space: ColourSpaces, steps: number, direction: `longer` | `shorter`, exclusive: boolean }>
-export function createSteps<T extends CreateStepsOptions>(a: Colourish | string, b: Colourish, options: T):
-  T extends { space: `oklch` } ? OkLchScalar[] :
-  T extends { space: `srgb` } ? RgbScalar[] :
-  T extends { space: `hsl` } ? HslScalar[] : OkLchScalar[];
-
-
 
 /**
  * Creates discrete colour steps between two colours. 
@@ -198,6 +192,11 @@ export function createSteps<T extends CreateStepsOptions>(a: Colourish | string,
  * @param options
  * @returns 
  */
+export function createSteps<T extends CreateStepsOptions>(a: Colourish | string, b: Colourish, options: T):
+  T extends { space: `oklch` } ? OkLchScalar[] :
+  T extends { space: `srgb` } ? RgbScalar[] :
+  T extends { space: `hsl` } ? HslScalar[] : OkLchScalar[];
+
 export function createSteps(a: Colourish | string, b: Colourish, options: CreateStepsOptions = {}): Colour[] {
   const exclusive = options.exclusive ?? false;
   const steps = options.steps ?? 5;
