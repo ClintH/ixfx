@@ -9,7 +9,10 @@ import { toCartesian as polarToCartesian } from "./conversions.js";
 /**
  * Converts a ray to a Line in cartesian coordinates.
  * 
- * @param ray 
+ * By default, the ray's origin is taken to be 0,0.
+ * Passing in an origin will override this default, or whatever
+ * the ray's origin property is.
+ * @param ray Ray
  * @param origin Override or provide origin point
  * @returns 
  */
@@ -56,7 +59,11 @@ const getOrigin = (ray: PolarRay, origin?: Point): Point => {
 // }
 
 /**
- * Returns a string representation of the ray
+ * Returns a string representation of the ray, useful for debugging.
+ * 
+ * ```
+ * "PolarRay(angle: ... offset: ... len: ... origin: ...)"
+ * ```
  * @param ray 
  * @returns 
  */
@@ -71,7 +78,9 @@ export const toString = (ray: PolarRay): string => {
 
 /**
  * Returns a PolarRay based on a line and origin.
+ * 
  * If `origin` is omitted, the origin is taken to be the 'a' point of the line.
+ * Otherwise, the origin value is used to determine the 'offset' of the ray.
  * @param line 
  * @param origin 
  * @returns 

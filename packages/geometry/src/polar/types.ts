@@ -9,8 +9,14 @@ export type PolarToCartesian = {
 };
 
 /**
- * A polar ray is a line in polar coordinates
+ * A polar ray is allows you to express a line in polar coordinates
+ * 
  * It consists of an angle (in radians) with a given offset and length.
+ * 
+ * * angleRadian: Angle of line
+ * * Offset: distance from the polar origin (default: 0)
+ * * Length: length of ray
+ * * Origin: Start Cartesian coordinate of line
  */
 export type PolarRay = Readonly<{
   /**
@@ -26,6 +32,9 @@ export type PolarRay = Readonly<{
    * Length of ray
    */
   length: number
+  /**
+   * Optional origin point of ray (ie start)
+   */
   origin?: Point
 }>
 

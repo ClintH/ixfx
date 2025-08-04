@@ -1,4 +1,4 @@
-import {noiseFilter } from '../../../dist/data.js';
+import {noiseFilter } from '../../../dist/bundle.js';
 import {Oscillators, jitter} from '../../../dist/modulation.js';
 import {frequencyTimer} from '../../../dist/flow.js';
 

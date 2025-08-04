@@ -150,7 +150,7 @@ export function sineBipolarShape(period = 1): ModFunction {
  * @example
  * ```js
  * import { wave } from '@ixfx/modulation.js';
- * import { resolveFields } from '@ixfx/data.js';
+ * import { resolveFields } from '@ixfx/bundle.js';
  * 
  * const state = {
  *  intensity: wave({secs: 2, shape: `sine` }),
