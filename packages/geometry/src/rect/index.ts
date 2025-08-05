@@ -1,6 +1,7 @@
 export * from './area.js';
 export * from './apply.js';
 export * from './cardinal.js';
+export * from './center-origin.js';
 export * from './center.js';
 export * from './corners.js';
 export * from './distance.js';

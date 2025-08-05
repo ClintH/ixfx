@@ -3,6 +3,22 @@ import { test, expect, assert } from 'vitest';
 import * as Rects from '../src/rect/index.js';
 import { getRectPositionedParameter } from '../src/rect/get-rect-positionedparameter.js';
 
+test(`center-origin`, () => {
+  const r1 = { x: 5, y: 5, width: 20, height: 20 };
+  const co1 = Rects.centerOrigin(r1);
+  expect(co1.relativeToAbsolute({ x: 0, y: 0 })).toEqual({ x: 15, y: 15 });
+  expect(co1.relativeToAbsolute({ x: 1, y: 1 })).toEqual({ x: 25, y: 25 });
+  expect(co1.relativeToAbsolute({ x: -1, y: 0 })).toEqual({ x: 5, y: 15 });
+  expect(co1.relativeToAbsolute({ x: 0, y: -1 })).toEqual({ x: 15, y: 5 });
+  expect(co1.relativeToAbsolute({ x: -1, y: -1 })).toEqual({ x: 5, y: 5 });
+
+  expect(co1.absoluteToRelative({ x: 5, y: 5 })).toEqual({ x: -1, y: -1 });
+  expect(co1.absoluteToRelative({ x: 15, y: 15 })).toEqual({ x: 0, y: 0 });
+  expect(co1.absoluteToRelative({ x: 25, y: 25 })).toEqual({ x: 1, y: 1 });
+
+
+});
+
 test(`encompass`, () => {
   expect(Rects.encompass({ x: 0, y: 0, width: 0, height: 0 }, { x: 0, y: 0 })).toEqual({ x: 0, y: 0, width: 0, height: 0 });
 
