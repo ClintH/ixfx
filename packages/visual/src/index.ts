@@ -5,6 +5,8 @@ export * from './pointer-visualise.js';
 export * as Svg from './svg/index.js';
 export type * from './types.js';
 
+export * as Convolve2d from './convolve-2d.js';
+
 import * as NamedColourPalette from './named-colour-palette.js';
 
 
