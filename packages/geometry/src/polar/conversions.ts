@@ -7,6 +7,23 @@ import { Empty as EmptyPoint } from '../point/empty.js';
 import { isPoint } from "../point/guard.js";
 import { radianToDegree } from "../angles.js";
 
+/**
+ * Converts a polar coordinate to a Line.
+ * 
+ * ```js
+ * const line = toLine({ angleRadian: Math.Pi, distance: 0.5 }, { x: 0.2, y: 0.1 });
+ * // Yields { a: { x, y}, b: { x, y } }
+ * ```
+ * 
+ * The 'start' parameter is taken to be the origin of the Polar coordinate.
+ * @param c 
+ * @param start 
+ * @returns 
+ */
+export const toLine = (c: Coord, start: Point) => {
+  const b = toCartesian(c, start);
+  return { a: start, b }
+}
 
 /**
  * Converts to Cartesian coordinate from polar.
@@ -49,7 +66,7 @@ export const toCartesian: PolarToCartesian = (
     );
   } else {
     if (typeof a === `number` && typeof b === `number`) {
-      if (c === undefined) c = EmptyPoint;
+      if (typeof c === `undefined`) c = EmptyPoint;
       if (!isPoint(c)) {
         throw new Error(
           `Expecting (number, number, Point). Point param wrong type`
@@ -84,14 +101,22 @@ export const fromCartesian = (
   point: Point,
   origin: Point
 ): Coord => {
+  if (typeof point === `undefined`) throw new Error(`Param 'point' missing. Expecting a Point`);
+  if (typeof origin === `undefined`) throw new Error(`Param 'origin' missing. Expecting a Point`);
+
   point = subtractPoint(point, origin);
 
   const angle = Math.atan2(point.y, point.x);
-  return Object.freeze({
+  const distance = Math.hypot(point.x, point.y);
+
+  const polar = {
     ...point,
     angleRadian: angle,
-    distance: Math.hypot(point.x, point.y),
-  });
+    distance,
+  };
+  delete (polar as any).x;
+  delete (polar as any).y;
+  return Object.freeze(polar);
 };
 
 /**
