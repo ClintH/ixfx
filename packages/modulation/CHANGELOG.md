@@ -1,5 +1,12 @@
 # @ixfxfun/modulation
 
+## 0.47.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.45.0
+
 ## 0.47.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @ixfxfun/visual
 
+## 0.49.0
+
+### Minor Changes
+
+- Updates
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.45.0
+  - @ixfx/dom@0.45.1
+
 ## 0.48.0
 
 ### Minor Changes

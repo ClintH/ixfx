@@ -1,5 +1,11 @@
 # @ixfxfun/geometry
 
+## 0.45.0
+
+### Minor Changes
+
+- Updates
+
 ## 0.44.0
 
 ### Minor Changes
