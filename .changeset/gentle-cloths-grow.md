@@ -1,5 +1,0 @@
----
-"ixfx": minor
----
-
-Packaging

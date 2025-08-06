@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.2.0
+
+### Minor Changes
+
+- f7d1c17: Packaging
+
 ## 1.1.0
 
 ### Minor Changes
