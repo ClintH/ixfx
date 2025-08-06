@@ -160,9 +160,11 @@ export function ofTotalTicks(totalTicks: number, opts: { readonly clampValue?: b
 export const timerAlwaysDone = (): ModulationTimer => ({
   elapsed: 1,
   isDone: true,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   reset(): void {
 
   },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   mod(amt) {
 
   },
@@ -177,9 +179,11 @@ export const timerNeverDone = (): ModulationTimer => (
   {
     elapsed: 0,
     isDone: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     reset() {
 
     },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     mod() {
 
     }
