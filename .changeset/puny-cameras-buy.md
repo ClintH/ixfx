@@ -1,4 +1,5 @@
 ---
+"@ixfx/geometry": minor
 "@ixfx/visual": minor
 "@ixfx/dom": minor
 "@ixfx/io": minor

@@ -1,5 +1,16 @@
 # @ixfxfun/rx
 
+## 0.46.0
+
+### Minor Changes
+
+- 6a4abaa: Packaging
+
+### Patch Changes
+
+- Updated dependencies [6a4abaa]
+  - @ixfx/dom@0.47.0
+
 ## 0.45.1
 
 ### Patch Changes

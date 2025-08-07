@@ -1,5 +1,17 @@
 # @ixfxfun/debug
 
+## 0.45.0
+
+### Minor Changes
+
+- 6a4abaa: Packaging
+
+### Patch Changes
+
+- Updated dependencies [6a4abaa]
+  - @ixfx/visual@0.51.0
+  - @ixfx/dom@0.47.0
+
 ## 0.44.2
 
 ### Patch Changes

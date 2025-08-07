@@ -1,5 +1,11 @@
 # @ixfxfun/dom
 
+## 0.47.0
+
+### Minor Changes
+
+- 6a4abaa: Packaging
+
 ## 0.46.0
 
 ### Minor Changes

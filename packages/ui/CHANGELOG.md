@@ -1,5 +1,18 @@
 # @ixfxfun/ui
 
+## 0.47.0
+
+### Minor Changes
+
+- 6a4abaa: Packaging
+
+### Patch Changes
+
+- Updated dependencies [6a4abaa]
+  - @ixfx/visual@0.51.0
+  - @ixfx/dom@0.47.0
+  - @ixfx/rx@0.46.0
+
 ## 0.46.2
 
 ### Patch Changes
