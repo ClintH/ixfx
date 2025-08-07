@@ -1,5 +1,17 @@
 # @ixfxfun/rx
 
+## 0.47.0
+
+### Minor Changes
+
+- dce386e: Packaging
+
+### Patch Changes
+
+- Updated dependencies [dce386e]
+  - @ixfx/dom@0.48.0
+  - @ixfx/modulation@0.47.2
+
 ## 0.46.0
 
 ### Minor Changes

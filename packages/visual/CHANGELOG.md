@@ -1,5 +1,17 @@
 # @ixfxfun/visual
 
+## 0.52.0
+
+### Minor Changes
+
+- dce386e: Packaging
+
+### Patch Changes
+
+- Updated dependencies [dce386e]
+  - @ixfx/geometry@0.46.0
+  - @ixfx/dom@0.48.0
+
 ## 0.51.0
 
 ### Minor Changes

@@ -116,7 +116,11 @@ export const toHexColour = (colour: Colourish | object): string => {
     return OklchSpace.toHexString(colour);
   }
 
-  if (typeof colour === `string` && colour.startsWith(`#`)) return colour;
+  if (typeof colour === `string`) {
+    if (colour.startsWith(`#`)) return colour;
+    const c = convert(colour, `srgb-8bit`);
+    return SrgbSpace.toHexString(c);
+  }
 
   const asRgb = tryParseObjectToRgb(colour);
   if (asRgb) return SrgbSpace.toHexString(asRgb);

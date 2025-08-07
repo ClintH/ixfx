@@ -36,6 +36,7 @@ export const isRgb = (v: any): v is Rgb => {
  * @returns 
  */
 export const tryParseObjectToRgb = (v: any): Rgb | undefined => {
+  if (typeof v !== `object`) throw new TypeError(`Param 'v' is expected to be an object, got: ${ typeof v }`);
   if (!(`r` in v && `g` in v && `b` in v)) return;
   if (!(`unit` in v)) {
     if (v.r <= 1 && v.g <= 1 && v.b <= 1) {

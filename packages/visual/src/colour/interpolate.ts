@@ -96,6 +96,8 @@ export const cssLinearGradient = (colours: Colourish[]) => {
 
 /**
  * Returns a function that interpolates between two colours. Returns string colour values.
+ * 
+ * By default takes a shorter direction and uses the OkLCH colourspace.
  * ```js
  * const i = interpolator(`blue`, `red`);
  * i(0.5); // Get the colour at 50%, as a string.

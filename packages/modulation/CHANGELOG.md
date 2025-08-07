@@ -1,5 +1,12 @@
 # @ixfxfun/modulation
 
+## 0.47.2
+
+### Patch Changes
+
+- Updated dependencies [dce386e]
+  - @ixfx/geometry@0.46.0
+
 ## 0.47.1
 
 ### Patch Changes
