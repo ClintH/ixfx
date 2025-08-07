@@ -1,5 +1,12 @@
 # @ixfxfun/rx
 
+## 0.45.1
+
+### Patch Changes
+
+- Updated dependencies [5ceecb4]
+  - @ixfx/dom@0.46.0
+
 ## 0.45.0
 
 ### Minor Changes

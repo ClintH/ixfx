@@ -1,5 +1,11 @@
 # @ixfxfun/dom
 
+## 0.46.0
+
+### Minor Changes
+
+- 5ceecb4: Packaging
+
 ## 0.45.1
 
 ### Patch Changes

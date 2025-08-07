@@ -149,7 +149,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
 
   constructor(domQueryOrEl: Readonly<string | HTMLCanvasElement | undefined | null>, opts: Partial<CanvasHelperOptions> = {}) {
     super();
-    if (!domQueryOrEl) throw new Error(`Param 'domQueryOrEl' is null or undefined`);
+    if (!domQueryOrEl) throw new Error(`Param 'domQueryOrEl' is null or undefined. Expected canvas element.`);
     this.el = resolveEl<HTMLCanvasElement>(domQueryOrEl);
     if (this.el.nodeName !== `CANVAS`) {
       throw new Error(`Expected CANVAS HTML element. Got: ${ this.el.nodeName }`);
@@ -293,7 +293,6 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     if (resizeLogic === `none`) {
       this.setLogicalSize({ width: this.opts.width, height: this.opts.height });
     } else {
-      const containerEl = this.opts.containerEl ?? this.el.parentElement;
       const resizerOptions: ElementSizerOptions<HTMLCanvasElement> = {
         onSizeChanging: (size) => {
           if (Rects.isEqual(this.#logicalSize, size)) return;
@@ -302,7 +301,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
         onSizeDone: (size, el) => {
           this.#onResizeDone(size);
         },
-        containerEl,
+        containerEl: this.opts.containerEl,
         naturalSize: { width: this.opts.width, height: this.opts.height },
         stretch: this.opts.resizeLogic ?? `none`
       };

@@ -64,12 +64,15 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     this.#el = resolveEl(elOrQuery);
 
     const container = options.containerEl;
-    if (container === null && this.#el.parentElement) {
+    if (container === null || typeof container === `undefined`) {
       const pe = this.#el.parentElement;
-      if (pe !== null) this.#containerEl = pe;
-      const pn = this.#el.parentNode;
-      if (pn !== null) {
-        this.#containerEl = pn as HTMLElement;
+      if (pe !== null) {
+        this.#containerEl = pe;
+      } else {
+        const pn = this.#el.parentNode;
+        if (pn !== null) {
+          this.#containerEl = pn as HTMLElement;
+        }
       }
     } else if (typeof container === `string` || typeof container === `object`) {
       this.#containerEl = resolveEl(container);

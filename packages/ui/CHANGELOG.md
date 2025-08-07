@@ -1,5 +1,14 @@
 # @ixfxfun/ui
 
+## 0.46.2
+
+### Patch Changes
+
+- Updated dependencies [5ceecb4]
+  - @ixfx/visual@0.50.0
+  - @ixfx/dom@0.46.0
+  - @ixfx/rx@0.45.1
+
 ## 0.46.1
 
 ### Patch Changes

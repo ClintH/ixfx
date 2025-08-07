@@ -42,7 +42,7 @@ export const resolveElementTry = <V extends Element>(domQueryOrEl: string | V | 
     }
     domQueryOrEl = d as V;
   } else if (domQueryOrEl === null) {
-    return { success: false, error: `Param 'domQueryOrEl' is null` };
+    return { success: false, error: `Param 'domQueryOrEl' is null, cannot resolve.` };
   } else if (domQueryOrEl === undefined) {
     return { success: false, error: `Param 'domQueryOrEl' is undefined` };
   }

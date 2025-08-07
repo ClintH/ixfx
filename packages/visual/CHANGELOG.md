@@ -1,5 +1,16 @@
 # @ixfxfun/visual
 
+## 0.50.0
+
+### Minor Changes
+
+- 5ceecb4: Packaging
+
+### Patch Changes
+
+- Updated dependencies [5ceecb4]
+  - @ixfx/dom@0.46.0
+
 ## 0.49.0
 
 ### Minor Changes

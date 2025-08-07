@@ -1,5 +1,13 @@
 # @ixfxfun/debug
 
+## 0.44.2
+
+### Patch Changes
+
+- Updated dependencies [5ceecb4]
+  - @ixfx/visual@0.50.0
+  - @ixfx/dom@0.46.0
+
 ## 0.44.1
 
 ### Patch Changes
