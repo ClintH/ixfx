@@ -41,6 +41,7 @@ export type CanvasEvents = {
  * CanvasHelper options
  */
 export type CanvasHelperOptions = Readonly<{
+  containerEl?: HTMLElement
   /**
    * Automatic canvas resizing logic.
    */
@@ -292,6 +293,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     if (resizeLogic === `none`) {
       this.setLogicalSize({ width: this.opts.width, height: this.opts.height });
     } else {
+      const containerEl = this.opts.containerEl ?? this.el.parentElement;
       const resizerOptions: ElementSizerOptions<HTMLCanvasElement> = {
         onSizeChanging: (size) => {
           if (Rects.isEqual(this.#logicalSize, size)) return;
@@ -300,6 +302,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
         onSizeDone: (size, el) => {
           this.#onResizeDone(size);
         },
+        containerEl,
         naturalSize: { width: this.opts.width, height: this.opts.height },
         stretch: this.opts.resizeLogic ?? `none`
       };

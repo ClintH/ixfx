@@ -26,7 +26,7 @@ export type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
   /**
    * If not specified, the element's parent is used
    */
-  containerEl?: HTMLElement | string
+  containerEl?: HTMLElement | string | null
   onSizeChanging: (size: Rects.Rect, el: T) => void
   onSizeDone?: (size: Rects.Rect, el: T) => void
 
@@ -53,17 +53,28 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   #naturalSize: Rects.Rect;
   #naturalRatio: number;
   #viewport: Rects.RectPositioned;
-  #onSizeChanging;
+  #onSizeChanging = (size: Rects.Rect, el: T) => { /** no-op */ };
   #el: T;
-  #containerEl: HTMLElement;
+  #containerEl: HTMLElement | undefined;
   #disposed = false;
   #resizeObservable: ResizeObserver | undefined;
   #sizeDebounce: () => void = () => ({})
 
   constructor(elOrQuery: T | string, options: ElementSizerOptions<T>) {
     this.#el = resolveEl(elOrQuery);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement!;
+
+    const container = options.containerEl;
+    if (container === null && this.#el.parentElement) {
+      const pe = this.#el.parentElement;
+      if (pe !== null) this.#containerEl = pe;
+      const pn = this.#el.parentNode;
+      if (pn !== null) {
+        this.#containerEl = pn as HTMLElement;
+      }
+    } else if (typeof container === `string` || typeof container === `object`) {
+      this.#containerEl = resolveEl(container);
+    }
+    //this.#containerEl = options.containerEl ? resolveEl(options.containerEl) : this.#el.parentElement!;
 
     this.#stretch = options.stretch ?? `none`;
     this.#onSizeChanging = options.onSizeChanging;
@@ -142,8 +153,9 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
 
   #byContainer() {
     const c = this.#containerEl;
-    if (!c) throw new Error(`No container element`);
-
+    if (!c) {
+      throw new Error(`No container element`);
+    }
     // Listen for resize
     const r = new ResizeObserver((entries) => {
       this.#onParentResize(entries);
