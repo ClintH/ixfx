@@ -3,6 +3,12 @@ import * as HslSpace from '../src/colour/hsl.js';
 import { applyToValues, round } from '@ixfx/numbers';
 
 
+test(`to-hex`, () => {
+  expect(HslSpace.toHexString(HslSpace.absolute(180, 50, 50))).toEqual(`#40bfbf`);
+  expect(HslSpace.toHexString(HslSpace.absolute(180, 50, 50, 50))).toEqual(`#40bfbf7f`);
+  expect(HslSpace.toHexString(HslSpace.absolute(180, 50, 50, 0))).toEqual(`#40bfbf00`);
+});
+
 test(`from-css`, () => {
   // Same colours
   const purple = [

@@ -7,6 +7,12 @@ const purpleScalar = Rgb.scalar(0.4, 0.2, 0.6);
 const purpleScalarOpacity = Rgb.scalar(0.4, 0.2, 0.6, 0.5);
 
 
+test(`to-hex`, () => {
+  expect(Rgb.toHexString(Rgb.eightBit(64, 191, 191))).toEqual(`#40bfbf`);
+  expect(Rgb.toHexString(Rgb.eightBit(64, 191, 191, 128))).toEqual(`#40bfbf80`);
+  expect(Rgb.toHexString(Rgb.eightBit(64, 191, 191, 0))).toEqual(`#40bfbf00`);
+});
+
 test(`parse`, () => {
 
   // Scalar

@@ -6,7 +6,7 @@ import { cssDefinedHexColours, resolveCss } from "./css-colours.js";
 import { angleConvert, angleParse, type Angle } from "@ixfx/geometry";
 import { clamp, interpolate } from "@ixfx/numbers";
 import { isRgb } from "./guards.js";
-import { calculateHueDistance, wrapScalarHue } from "./utility.js";
+import { calculateHueDistance, libraryRgbToHexString, wrapScalarHue } from "./utility.js";
 import { parseCssRgbFunction, to8bit as rgbTo8bit, toLibraryHsl as rgbToLibraryHsl } from "./srgb.js";
 
 /**
@@ -157,6 +157,11 @@ export const toCssString = (hsl: Hsl): string => {
   }
   css += ')';
   return css;
+}
+
+export const toHexString = (hsl: Hsl): string => {
+  const rgb = toLibraryRgb(hsl);
+  return libraryRgbToHexString(rgb);
 }
 
 const toLibrary = (hsl: Hsl): C.HSL => {

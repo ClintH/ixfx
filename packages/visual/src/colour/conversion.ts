@@ -102,6 +102,33 @@ export const toCssColour = (colour: Colourish | object): string => {
   throw new Error(`Unknown colour format: '${ JSON.stringify(colour) }'`);
 }
 
+export const toHexColour = (colour: Colourish | object): string => {
+
+  if (isHsl(colour)) {
+    return HslSpace.toHexString(colour);
+  }
+
+  if (isRgb(colour)) {
+    return SrgbSpace.toHexString(colour);
+  }
+
+  if (isOkLch(colour)) {
+    return OklchSpace.toHexString(colour);
+  }
+
+  if (typeof colour === `string` && colour.startsWith(`#`)) return colour;
+
+  const asRgb = tryParseObjectToRgb(colour);
+  if (asRgb) return SrgbSpace.toHexString(asRgb);
+
+  const asHsl = tryParseObjectToHsl(colour);
+  if (asHsl) return HslSpace.toHexString(asHsl);
+
+  throw new Error(`Unknown colour format: '${ JSON.stringify(colour) }'`);
+}
+
+
+
 export const toLibraryColour = (colour: Colourish): Colorizr => {
   const asCss = toCssColour(colour);
   return new Colorizr(asCss);

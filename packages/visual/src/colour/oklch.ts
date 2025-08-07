@@ -3,7 +3,7 @@ import { numberInclusiveRangeTest, percentTest, resultThrow } from "@ixfx/guards
 import Colorizr, * as C from "colorizr";
 import { cssDefinedHexColours } from "./css-colours.js";
 import { angleConvert, angleParse, type Angle } from "@ixfx/geometry";
-import { calculateHueDistance, wrapScalarHue } from "./utility.js";
+import { calculateHueDistance, libraryRgbToHexString, wrapScalarHue } from "./utility.js";
 import { clamp, interpolate } from "@ixfx/numbers";
 import { parseCssRgbFunction, to8bit as rgbTo8bit } from "./srgb.js";
 
@@ -40,6 +40,8 @@ export const guard = (lch: OkLch) => {
     throw new Error(`Unit is expected to be 'absolute' or 'scalar'. Got: ${ unit }`);
   }
 }
+
+
 
 /**
  * Coverts from the Colorizr library
@@ -237,6 +239,12 @@ export const toCssString = (lch: OkLch, precision = 3): string => {
   }
   css += `)`;
   return css;
+}
+
+export const toHexString = (lch: OkLch): string => {
+  const lch1 = toLibrary(lch);
+  const rgb = C.oklch2rgb(lch1);
+  return libraryRgbToHexString(rgb);
 }
 
 // export const oklchFromCss = (css: string): OkLchScalar => {

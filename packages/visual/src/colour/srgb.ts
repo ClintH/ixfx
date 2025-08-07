@@ -7,6 +7,7 @@ import { cssDefinedHexColours } from "./css-colours.js";
 import { clamp, interpolate } from "@ixfx/numbers";
 import { toLibraryRgb as hslToLibraryRgb } from "./hsl.js";
 import { isHsl } from "./guards.js";
+import { libraryRgbToHexString } from "./utility.js";
 
 export const withOpacity = <T extends Rgb>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
   switch (value.unit) {
@@ -98,6 +99,11 @@ export function fromCss(value: string, options: ParsingOptions<Rgb> = {}): Rgb {
     if (options.fallbackColour) return options.fallbackColour;
     throw error;
   }
+}
+
+export const toHexString = (rgb: Rgb): string => {
+  const rgb1 = toLibrary(rgb);
+  return libraryRgbToHexString(rgb1);
 }
 
 export const toCssString = (rgb: Rgb): string => {
