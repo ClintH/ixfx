@@ -2,6 +2,7 @@ import type { Point } from "./point-type.js";
 
 /**
  * Runs a sequential series of functions on `pt`. The output from one feeding into the next.
+ * 
  * ```js
  * const p = Points.pipelineApply(somePoint, Points.normalise, Points.invert);
  * ```
@@ -13,7 +14,7 @@ import type { Point } from "./point-type.js";
  */
 export const pipelineApply = (
   point: Point,
-  ...pipelineFns: ReadonlyArray<(pt: Point) => Point>
+  ...pipelineFns: readonly ((pt: Point) => Point)[]
 ): Point => pipeline(...pipelineFns)(point); // pipeline.reduce((prev, curr) => curr(prev), pt);
 
 /**
@@ -32,7 +33,7 @@ export const pipelineApply = (
  * @returns
  */
 export const pipeline =
-  (...pipeline: ReadonlyArray<(pt: Point) => Point>) =>
+  (...pipeline: readonly ((pt: Point) => Point)[]) =>
     (pt: Point) =>
-      // eslint-disable-next-line unicorn/no-array-reduce
+
       pipeline.reduce((previous, current) => current(previous), pt);

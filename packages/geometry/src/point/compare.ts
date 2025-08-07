@@ -48,7 +48,8 @@ export const compareByX = (a: Point, b: Point): number => {
 
 /**
  * Compares points based on Y value. X value is ignored.
- * Returns values:
+ * 
+ * Return values:
  * * 0: If a.y === b.y
  * * 1: A is below B (ie. a.y > b.y)
  * * -1: A is above B (ie. a.y < b.y)
@@ -69,7 +70,8 @@ export const compareByY = (a: Point, b: Point): number => {
 
 /**
  * Compares points based on Z value. XY values are ignored.
- * Returns values:
+ * 
+ * Return values:
  * * 0: If a.z === b.z
  * * 1: A is below B (ie. a.z > b.z)
  * * -1: A is above B (ie. a.z < b.z)

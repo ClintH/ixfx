@@ -7,8 +7,12 @@ export type PointAverageKinds = `moving-average-light`;
 
 
 /**
- * Uses =@ixfx/numbers#movingAverageLight to keep track of 
- * average x, y and z values.
+ * Keeps track of average x, y and z values.
+ * 
+ * When calling, you have to specify the averaging technique. At the moment
+ * only 'moving-average-light' is supported. This uses @ixfx/numbers.movingAverageLight
+ * under-the-hood.
+ * 
  * ```js
  * // Create averager
  * const averager = Points.averager(`moving-average-light`);
@@ -17,22 +21,26 @@ export type PointAverageKinds = `moving-average-light`;
  * // and return the current average.
  * averager(somePoint); // Yields current average {x,y,z?}
  * ```
+ * 
+ * @param kind Averaging strategy
  * @param opts Scaling parameter. Higher means more smoothing, lower means less (minimum: 1). Default: 3
  * @returns 
  */
 export function averager(kind: `moving-average-light`, opts: Partial<{ scaling: number }>): PointAverager;
 
-export function averager(kind: PointAverageKinds, opts: any): PointAverager {
+export function averager(kind: PointAverageKinds, opts: Partial<{ scaling: number }> = {}): PointAverager {
   let x: (v: number) => number;
   let y: (v: number) => number;
   let z: (v: number) => number;
   switch (kind) {
     case `moving-average-light`:
-      const scaling = opts.scaling ?? 3;
-      x = mal(scaling);
-      y = mal(scaling);
-      z = mal(scaling);
-      break;
+      {
+        const scaling = opts.scaling ?? 3;
+        x = mal(scaling);
+        y = mal(scaling);
+        z = mal(scaling);
+        break;
+      }
     default:
       throw new Error(`Unknown averaging kind '${ kind }'. Expected: 'moving-average-light'`);
   }
