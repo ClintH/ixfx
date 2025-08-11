@@ -1,5 +1,5 @@
 import type { Point, Point3d } from "./point-type.js";
-import { numberTest, resultThrow } from '@ixfx/guards';
+import { errorResult, numberTest, resultThrow, type Result } from '@ixfx/guards';
 
 /**
  * Returns true if xy (and z, if present) are _null_.
@@ -23,50 +23,93 @@ export const isNaN = (p: Point) => {
   return Number.isNaN(p.x) || Number.isNaN(p.y)
 }
 
+export function test(p: Point, name = `Point`, extraInfo = ``): Result<Point, string> {
+  if (p === undefined) {
+    return errorResult(`'${ name }' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`, extraInfo);
+  }
+  if (p === null) {
+    return errorResult(
+      `'${ name }' is null. Expected {x,y} got ${ JSON.stringify(p) }`, extraInfo
+    );
+  }
+  if (typeof p !== `object`) return errorResult(
+    `'${ name }' is type '${ typeof p }'. Expected object.`, extraInfo
+  );
+  if (p.x === undefined) {
+    return errorResult(
+      `'${ name }.x' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`, extraInfo
+    );
+  }
+  if (p.y === undefined) {
+    return errorResult(
+      `'${ name }.y' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`, extraInfo
+    );
+  }
+  if (typeof p.x !== `number`) {
+    return errorResult(`'${ name }.x' must be a number. Got ${ typeof p.x }`, extraInfo);
+  }
+  if (typeof p.y !== `number`) {
+    return errorResult(`'${ name }.y' must be a number. Got ${ typeof p.y }`, extraInfo);
+  }
+  if (p.z !== undefined) {
+    if (typeof p.z !== `number`) return errorResult(`${ name }.z must be a number. Got: ${ typeof p.z }`, extraInfo)
+    if (Number.isNaN(p.z)) return errorResult(`'${ name }.z' is NaN. Got: ${ JSON.stringify(p) }`, extraInfo);
+  }
+
+  if (p.x === null) return errorResult(`'${ name }.x' is null`, extraInfo);
+  if (p.y === null) return errorResult(`'${ name }.y' is null`, extraInfo);
+
+  if (Number.isNaN(p.x)) return errorResult(`'${ name }.x' is NaN`, extraInfo);
+  if (Number.isNaN(p.y)) return errorResult(`'${ name }.y' is NaN`, extraInfo);
+
+  return { success: true, value: p }
+}
+
 /**
  * Throws an error if point is invalid
  * @param p
  * @param name
  */
-export function guard(p: Point, name = `Point`) {
-  if (p === undefined) {
-    throw new Error(
-      `'${ name }' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (p === null) {
-    throw new Error(
-      `'${ name }' is null. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (p.x === undefined) {
-    throw new Error(
-      `'${ name }.x' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (p.y === undefined) {
-    throw new Error(
-      `'${ name }.y' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
-    );
-  }
-  if (typeof p.x !== `number`) {
+export function guard(p: Point, name = `Point`, info?: string) {
+  resultThrow(test(p, name, info))
+  // if (p === undefined) {
+  //   throw new Error(
+  //     `'${ name }' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
+  //   );
+  // }
+  // if (p === null) {
+  //   throw new Error(
+  //     `'${ name }' is null. Expected {x,y} got ${ JSON.stringify(p) }`
+  //   );
+  // }
+  // if (p.x === undefined) {
+  //   throw new Error(
+  //     `'${ name }.x' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
+  //   );
+  // }
+  // if (p.y === undefined) {
+  //   throw new Error(
+  //     `'${ name }.y' is undefined. Expected {x,y} got ${ JSON.stringify(p) }`
+  //   );
+  // }
+  // if (typeof p.x !== `number`) {
 
-    throw new TypeError(`'${ name }.x' must be a number. Got ${ typeof p.x }`);
-  }
-  if (typeof p.y !== `number`) {
+  //   throw new TypeError(`'${ name }.x' must be a number. Got ${ typeof p.x }`);
+  // }
+  // if (typeof p.y !== `number`) {
 
-    throw new TypeError(`'${ name }.y' must be a number. Got ${ typeof p.y }`);
-  }
-  if (p.z !== undefined) {
-    if (typeof p.z !== `number`) throw new TypeError(`${ name }.z must be a number. Got: ${ typeof p.z }`)
-    if (Number.isNaN(p.z)) throw new Error(`'${ name }.z' is NaN. Got: ${ JSON.stringify(p) }`);
-  }
+  //   throw new TypeError(`'${ name }.y' must be a number. Got ${ typeof p.y }`);
+  // }
+  // if (p.z !== undefined) {
+  //   if (typeof p.z !== `number`) throw new TypeError(`${ name }.z must be a number. Got: ${ typeof p.z }`)
+  //   if (Number.isNaN(p.z)) throw new Error(`'${ name }.z' is NaN. Got: ${ JSON.stringify(p) }`);
+  // }
 
-  if (p.x === null) throw new Error(`'${ name }.x' is null`);
-  if (p.y === null) throw new Error(`'${ name }.y' is null`);
+  // if (p.x === null) throw new Error(`'${ name }.x' is null`);
+  // if (p.y === null) throw new Error(`'${ name }.y' is null`);
 
-  if (Number.isNaN(p.x)) throw new Error(`'${ name }.x' is NaN`);
-  if (Number.isNaN(p.y)) throw new Error(`'${ name }.y' is NaN`);
+  // if (Number.isNaN(p.x)) throw new Error(`'${ name }.x' is NaN`);
+  // if (Number.isNaN(p.y)) throw new Error(`'${ name }.y' is NaN`);
 }
 
 /**
