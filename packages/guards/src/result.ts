@@ -115,7 +115,19 @@ export function resultErrorToString(result: ResultError<any>): string {
 }
 
 
-
+/**
+ * Returns a {@link ResultError} using 'error' as the message.
+ * @param error 
+ * @param info 
+ * @returns 
+ */
+export function errorResult(error: string, info?: string): ResultError<string> {
+  return {
+    success: false,
+    error,
+    info
+  }
+}
 
 
 /**
