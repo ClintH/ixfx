@@ -104,6 +104,9 @@ export const cssLinearGradient = (colours: Colourish[]) => {
  * ```
  * 
  * To work with structured colour values, use one of the space's `interpolate` functions.
+ * 
+ * If you want to create discrete steps, consider {@link createSteps} or {@link scale}.
+ * 
  * @param colourA 
  * @param colourB 
  * @param options 
@@ -131,6 +134,8 @@ export const interpolator = (colourA: Colourish, colourB: Colourish, options: Pa
 
 /**
  * Produces a stepped scale of colours.
+ * 
+ * Builds off {@link createSteps} which can only step between two colours.
  * 
  * ```js
  * // A scale of from red to green, with three colours in-between
@@ -180,6 +185,8 @@ export type CreateStepsOptions = Partial<{ space: ColourSpaces, steps: number, d
 
 /**
  * Creates discrete colour steps between two colours. 
+ * 
+ * Use {@link scale} to create steps between any number of colours.
  * 
  * Start and end colours are included (and counted as a step) unless `exclusive` is set to _true_
  * 
