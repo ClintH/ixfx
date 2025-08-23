@@ -27,7 +27,7 @@ export type ElementSizerOptions<T extends HTMLElement | SVGElement> = {
    * If not specified, the element's parent is used
    */
   containerEl?: HTMLElement | string | null
-  onSizeChanging: (size: Rects.Rect, el: T) => void
+  onSizeChanging?: (size: Rects.Rect, el: T) => void
   onSizeDone?: (size: Rects.Rect, el: T) => void
 
   debounceTimeout?: Interval
@@ -53,7 +53,7 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   #naturalSize: Rects.Rect;
   #naturalRatio: number;
   #viewport: Rects.RectPositioned;
-  #onSizeChanging = (size: Rects.Rect, el: T) => { /** no-op */ };
+  #onSizeChanging? = (size: Rects.Rect, el: T) => { /** no-op */ };
   #el: T;
   #containerEl: HTMLElement | undefined;
   #disposed = false;
@@ -245,7 +245,9 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
   set size(size: Rects.Rect) {
     Rects.guard(size, `size`);
     this.#size = size;
-    this.#onSizeChanging(size, this.#el);
+    if (this.#onSizeChanging) {
+      this.#onSizeChanging(size, this.#el);
+    }
     this.#sizeDebounce();
   }
 
