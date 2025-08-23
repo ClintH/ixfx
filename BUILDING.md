@@ -59,3 +59,10 @@ pnpm changeset
 pnpm changeset version
 pnpm publish -r
 ```
+
+## Running a visual test
+
+For example:
+```
+pnpx vite serve ./tests/io/midi/
+```
