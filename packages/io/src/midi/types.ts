@@ -6,3 +6,9 @@ export type MidiMessage = {
   note: number
   velocity: number
 }
+
+export type NoteMidiMessage = MidiMessage & {
+  command: `noteon` | `noteoff`,
+  noteName: string
+  frequency: number
+}

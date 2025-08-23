@@ -1,5 +1,17 @@
 # @ixfx/bundle
 
+## 1.5.0
+
+### Minor Changes
+
+- MIDI notes
+
+## 1.4.0
+
+### Minor Changes
+
+- asdf
+
 ## 1.3.0
 
 ### Minor Changes

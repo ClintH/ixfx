@@ -2,6 +2,7 @@ import * as Colour from '../../../packages/visual/src/colour/index.js';
 import {Midi} from '../../../packages/io/src/index.js';
 
 const mm = new Midi.MidiManager();
+Midi.getParsedNotes();
 
 let encoder = 1;
 
