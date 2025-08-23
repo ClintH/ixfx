@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>midi</title>
+  </head>
+  <body>
+    <style>
+      * {
+      box-sizing: border-box;
+    }
+    </style>
+    <section>
+      <h1>midi</h1>
+      <button id="btnDump">Dump</button>
+      <label>Bank
+        <input type="number" min="1" max="4" value="1" id="selBank"></label>
+      <label>Encoder
+        <input type="number" min="1" max="17" value="1" id="selEncoder"></label>
+      <label>Ring
+        <input type="range" min="0" max="127" value="0" id="testVisual1"></label>
+      <label>Switch
+        <input type="color" value="#ff0000" id="inColour"></label>
+    </section>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

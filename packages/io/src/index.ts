@@ -7,6 +7,7 @@ export * as Audio from './audio/index.js';
 
 export * from './types.js';
 export * from './generic-state-transitions.js';
+export * as Midi from './midi/index.js';
 
 export { StringReceiveBuffer } from './string-receive-buffer.js';
 export {
