@@ -1,5 +1,17 @@
 # @ixfx/arrays
 
+## 0.49.0
+
+### Minor Changes
+
+- na
+
+## 0.48.0
+
+### Minor Changes
+
+- 7aabba3: Arrays.mapWithFallback, io.midi
+
 ## 0.47.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @ixfxfun/trackers
 
+## 0.41.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/numbers@0.45.0
+  - @ixfx/flow@0.46.0
+
 ## 0.41.0
 
 ### Minor Changes

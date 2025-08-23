@@ -1,5 +1,27 @@
 # @ixfxfun/flow
 
+## 0.46.0
+
+### Minor Changes
+
+- na
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.50.0
+  - @ixfx/numbers@0.45.0
+  - @ixfx/arrays@0.49.0
+
+## 0.45.1
+
+### Patch Changes
+
+- Updated dependencies [7aabba3]
+  - @ixfx/arrays@0.48.0
+  - @ixfx/collections@0.49.1
+  - @ixfx/numbers@0.44.1
+
 ## 0.45.0
 
 ### Minor Changes

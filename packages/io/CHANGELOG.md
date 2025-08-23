@@ -1,5 +1,41 @@
 # @ixfxfun/debug
 
+## 0.48.0
+
+### Minor Changes
+
+- na
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/collections@0.50.0
+  - @ixfx/modulation@0.48.0
+  - @ixfx/geometry@0.47.0
+  - @ixfx/numbers@0.45.0
+  - @ixfx/arrays@0.49.0
+  - @ixfx/visual@0.53.0
+  - @ixfx/flow@0.46.0
+  - @ixfx/dom@0.48.1
+  - @ixfx/trackers@0.41.1
+
+## 0.47.0
+
+### Minor Changes
+
+- 7aabba3: Arrays.mapWithFallback, io.midi
+
+### Patch Changes
+
+- Updated dependencies [7aabba3]
+  - @ixfx/arrays@0.48.0
+  - @ixfx/collections@0.49.1
+  - @ixfx/flow@0.45.1
+  - @ixfx/geometry@0.46.1
+  - @ixfx/modulation@0.47.3
+  - @ixfx/numbers@0.44.1
+  - @ixfx/visual@0.52.1
+
 ## 0.46.0
 
 ### Minor Changes
