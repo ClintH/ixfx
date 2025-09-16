@@ -4,14 +4,14 @@ import * as Arrays from '../src/index.js';
 import { mergeByKey } from '../src/merge-by-key.js';
 
 test(`mapWithEmptyFallback`, () => {
-  expect(Arrays.mapWithEmptyFallback([ 1, 2, 3 ], v => v + 2, 100)).toBe([ 3, 4, 5 ]);
+  expect(Arrays.mapWithEmptyFallback([ 1, 2, 3 ], v => v + 2, 100)).toStrictEqual([ 3, 4, 5 ]);
 
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  expect(Arrays.mapWithEmptyFallback([], v => v + 2, 100)).toBe([ 100 ]);
+  expect(Arrays.mapWithEmptyFallback([], v => v + 2, 100)).toStrictEqual([ 100 ]);
 
   // @ts-expect-error
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  expect(Arrays.mapWithEmptyFallback({}, v => v + 2, [ 100 ])).toBe([ 100 ]);
+  expect(Arrays.mapWithEmptyFallback({}, v => v + 2, [ 100 ])).toStrictEqual([ 100 ]);
 })
 
 test(`at-wrap`, () => {
