@@ -28,7 +28,7 @@ export * from './AdsrBase.js';
  * @param opts 
  * @returns 
  */
-export const adsr = (opts: EnvelopeOpts = {}) => {
+export const adsr = (opts: EnvelopeOpts = {}): () => number => {
   const envelope = new Adsr(opts);
   const finalValue = envelope.releaseLevel;
   const iterator = envelope[ Symbol.iterator ]();
