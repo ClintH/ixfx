@@ -1,3 +1,4 @@
+export * from './changes.js';
 export * from './frequency-mutable.js';
 export * from './interval-tracker.js';
 export * from './number-tracker.js';
