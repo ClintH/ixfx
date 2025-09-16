@@ -32,9 +32,7 @@ export class AdsrIterator implements Iterator<number> {
     }
   }
 
-  get [ Symbol.toStringTag ]() {
-    return `Generator`;
-  }
+  readonly [ Symbol.toStringTag ] = `Generator`;
 }
 /**
  * ADSR (Attack Decay Sustain Release) envelope. An envelope is a value that changes over time,
@@ -127,14 +125,14 @@ export class Adsr extends AdsrBase implements Iterable<number> {
   readonly decayPath: Paths.Path;
   readonly releasePath: Paths.Path;
 
-  readonly initialLevel;
-  readonly peakLevel;
-  readonly releaseLevel;
-  readonly sustainLevel;
+  readonly initialLevel: number;
+  readonly peakLevel: number;
+  readonly releaseLevel: number;
+  readonly sustainLevel: number;
 
-  readonly attackBend;
-  readonly decayBend;
-  readonly releaseBend;
+  readonly attackBend: number;
+  readonly decayBend: number;
+  readonly releaseBend: number;
 
   protected initialLevelOverride: number | undefined;
   readonly retrigger: boolean;
@@ -216,7 +214,7 @@ export class Adsr extends AdsrBase implements Iterable<number> {
     //console.log(`Adsr.compute: stage: ${ stage } amt: ${ amt }!`);
     // Stage is undefined when envelope is complete or underlying timer is undefined
     if (stage === undefined) return [ undefined, Number.NaN, Number.NaN ];
-    let v;
+    let v: number;
     switch (stage) {
       case `attack`: {
         v = this.attackPath.interpolate(amt).y;
