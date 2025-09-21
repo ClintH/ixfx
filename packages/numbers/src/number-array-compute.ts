@@ -9,7 +9,7 @@ import type { NumbersComputeOptions, NumbersComputeResult } from "./types.js";
  * @param opts 
  * @returns 
  */
-export const numberArrayCompute = (data: number[] | readonly number[], opts: NumbersComputeOptions = {}): NumbersComputeResult => {
+export const numberArrayCompute = (data: (number | undefined)[] | readonly (number | undefined)[], opts: NumbersComputeOptions = {}): NumbersComputeResult => {
   if (data.length === 0) {
     return {
       total: Number.NaN,
@@ -33,10 +33,12 @@ export const numberArrayCompute = (data: number[] | readonly number[], opts: Num
       if (nonNumbers === `nan`) value = Number.NaN;
     }
     if (Number.isNaN(value)) continue;
-    min = Math.min(min, value);
-    max = Math.max(max, value);
-    total += value;
-    count++;
+    if (value !== undefined) {
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+      total += value;
+      count++;
+    }
   }
   return {
     total, max, min, count,
