@@ -18,6 +18,7 @@ export * from './number-array-compute.js';
 export * from './numeric-arrays.js';
 export * from './proportion.js';
 export * from './quantise.js';
+export * from './range.js';
 export * from './round.js';
 export * from './scale.js';
 export * from './softmax.js';
