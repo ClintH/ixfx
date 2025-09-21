@@ -1,5 +1,14 @@
 # @ixfx/arrays
 
+## 0.50.0
+
+### Minor Changes
+
+- 214b296: + @ixfx/arrays.ensureLength: now takes truncation option to remove from start/end of array
+  - @ixfx/numbers.range\*: several functions for working with {min:number,max:number} type
+  - @ixfx/trackers: 'changes': track when boolean/number value changes
+  * @ixfx/modulation: Fixed typing for 'adsr'
+
 ## 0.49.0
 
 ### Minor Changes

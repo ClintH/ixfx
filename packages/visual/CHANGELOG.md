@@ -1,5 +1,17 @@
 # @ixfxfun/visual
 
+## 0.53.1
+
+### Patch Changes
+
+- Updated dependencies [214b296]
+  - @ixfx/arrays@0.50.0
+  - @ixfx/numbers@0.46.0
+  - @ixfx/collections@0.50.1
+  - @ixfx/flow@0.46.1
+  - @ixfx/geometry@0.47.1
+  - @ixfx/dom@0.48.2
+
 ## 0.53.0
 
 ### Minor Changes
