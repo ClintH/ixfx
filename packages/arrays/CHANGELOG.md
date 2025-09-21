@@ -1,5 +1,11 @@
 # @ixfx/arrays
 
+## 0.51.0
+
+### Minor Changes
+
+- Rebuild
+
 ## 0.50.0
 
 ### Minor Changes

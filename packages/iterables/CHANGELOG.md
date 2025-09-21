@@ -1,5 +1,13 @@
 # @ixfxfun/iterables
 
+## 0.46.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/arrays@0.51.0
+  - @ixfx/numbers@0.47.0
+
 ## 0.46.1
 
 ### Patch Changes
