@@ -89,5 +89,5 @@ export const array = (values: readonly number[],
   const min = minForced ?? mma.min;
   const max = maxForced ?? mma.max;
 
-  return values.map((v) => clamp(scale(v, min, max)));
+  return values.map((v: number) => clamp(scale(v, min, max)));
 };
