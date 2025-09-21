@@ -79,8 +79,52 @@ export function rangeMergeRange(newRange: NumericRange, existingRange: NumericRa
  */
 export const rangeInit = (): NumericRange => ({ min: Number.MAX_SAFE_INTEGER, max: Number.MIN_SAFE_INTEGER });
 
-export const rangeIsEqual = (a: NumericRange, b: NumericRange) => (a.max === b.max && a.min === b.min);
+/**
+ * Returns _true_ if ranges `a` and `b` have identical min/max values.
+ * Returns _false_ if not, or if either/both values are _undefined_
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const rangeIsEqual = (a: NumericRange | undefined, b: NumericRange | undefined) => {
+  if (typeof a === `undefined`) return false;
+  if (typeof b === `undefined`) return false;
+  return (a.max === b.max && a.min === b.min);
+}
 
+/**
+ * Returns _true_ if range 'a' is within or same as range 'b'.
+ * Returns _false_ if not or if either/both ranges are _undefined_
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | undefined) => {
+  if (typeof a === `undefined`) return false
+  if (typeof b === `undefined`) return false
+  if (a.min >= b.min && a.max <= b.max) return true;
+  return false;
+}
+
+/**
+ * Keeps track of min/max values.
+ * 
+ * ```js
+ * const s = rangeStream();
+ * s.seen(10);  // { min: 10, max: 10}
+ * s.seen(5);   // { min:5, max: 10}
+ * ```
+ * 
+ * When calling `seen`, non-numbers, or non-finite numbers are silently ignored.
+ * 
+ * ```js
+ * s.reset();   // Reset
+ * s.min/s.max; // Current min/max
+ * s.range;     // Current { min, max }
+ * ```
+ * @param initWith 
+ * @returns 
+ */
 export const rangeStream = (initWith: NumericRange = rangeInit()) => {
   let { min, max } = initWith;
   const seen = (v: any) => {
@@ -90,6 +134,7 @@ export const rangeStream = (initWith: NumericRange = rangeInit()) => {
         max = Math.max(max, v);
       }
     }
+    return { min, max }
   }
   const reset = () => {
     min = Number.MAX_SAFE_INTEGER;
