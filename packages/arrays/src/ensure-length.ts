@@ -2,13 +2,15 @@
 export function ensureLength<V>(
   data: readonly V[] | V[],
   length: number,
-  expand: `repeat` | `first` | `last`
+  expand: `repeat` | `first` | `last`,
+  truncate?: `from-end` | `from-start`
 ): (V)[];
 
 export function ensureLength<V>(
   data: readonly V[] | V[],
   length: number,
-  expand?: `undefined`
+  expand?: `undefined`,
+  truncate?: `from-end` | `from-start`
 ): (V | undefined)[];
 
 /**
@@ -34,25 +36,31 @@ export function ensureLength<V>(
  * ```
  * @param data Input array to expand
  * @param length Desired length
- * @param expand Expand strategy
+ * @param expandStrategy Expand strategy
+ * @param truncateStrategy Truncation strategy. By default removes from end ('from-end')
  * @typeParam V Type of array
  */
 export function ensureLength<V>(
   data: readonly V[] | V[],
   length: number,
-  expand: `undefined` | `repeat` | `first` | `last` = `undefined`
+  expandStrategy: `undefined` | `repeat` | `first` | `last` = `undefined`,
+  truncateStrategy: `from-end` | `from-start` = `from-end`
 ): (V | undefined)[] {
   if (data === undefined) throw new Error(`Data undefined`);
   if (!Array.isArray(data)) throw new Error(`data is not an array`);
   if (data.length === length) return [ ...data ];
   if (data.length > length) {
-    return data.slice(0, length);
+    if (truncateStrategy === `from-end`) {
+      return data.slice(0, length);
+    } else {
+      return data.slice(data.length - length);
+    }
   }
   const d = [ ...data ];
   const add = length - d.length;
 
   for (let index = 0; index < add; index++) {
-    switch (expand) {
+    switch (expandStrategy) {
       case `undefined`: {
         // @ts-expect-error all fine .....
         d.push(undefined);

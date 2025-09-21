@@ -296,6 +296,16 @@ test(`ensureLength`, () => {
 
   expect(Arrays.ensureLength([ 1, 2, 3 ], 5, `first`)).toEqual([ 1, 2, 3, 1, 1 ]);
   expect(Arrays.ensureLength([ 1, 2, 3 ], 5, `last`)).toEqual([ 1, 2, 3, 3, 3 ]);
+
+
+  expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 3, `undefined`, `from-start`)).toEqual([ 4, 5, 6 ]);
+  expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 3, `undefined`, `from-end`)).toEqual([ 1, 2, 3 ]);
+
+  expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 1, `undefined`, `from-start`)).toEqual([ 6 ]);
+  expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 1, `undefined`, `from-end`)).toEqual([ 1 ]);
+
+  expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 6, `undefined`, `from-start`)).toEqual([ 1, 2, 3, 4, 5, 6 ]);
+  expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 6, `undefined`, `from-end`)).toEqual([ 1, 2, 3, 4, 5, 6 ]);
 });
 
 test(`isContentsTheSame`, () => {
