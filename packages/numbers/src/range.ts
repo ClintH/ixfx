@@ -1,6 +1,6 @@
 import { scaler } from "./scale.js";
+import type { NumericRange } from "./types.js";
 
-export type NumericRange = Readonly<{ min: number, max: number }>
 
 /**
  * Computes min/max based on a new value and previous range.
