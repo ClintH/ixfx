@@ -54,6 +54,18 @@ export abstract class PrimitiveTracker<
     return Date.now() - this.timestamps[ 0 ];
   }
 
+  /**
+   * Returns the time, in milliseconds, covering the initial and last values.
+   * Returns NaN if either of these is missing.
+   */
+  get timespan(): number {
+    const oldest = this.timestamps.at(0);
+    const newest = this.timestamps.at(-1);
+    if (oldest === undefined) return Number.NaN;
+    if (newest === undefined) return Number.NaN;
+    return newest - oldest;
+  }
+
   onReset() {
     this.values = [];
     this.timestamps = [];

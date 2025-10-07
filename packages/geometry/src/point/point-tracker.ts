@@ -270,11 +270,11 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * Returns NaN if there's no initial point
    * @returns 
    */
-  elapsedFromStart(): number {
-    const initial = this.initial;
-    if (!initial) return Number.NaN;
-    return Date.now() - initial.at;
-  }
+  // elapsedFromStart(): number {
+  //   const initial = this.initial;
+  //   if (!initial) return Number.NaN;
+  //   return Date.now() - initial.at;
+  // }
 
   /**
    * Returns the speed (over milliseconds), calculated by distanceFromStart/elapsedFromStart.
@@ -284,7 +284,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    */
   speedFromStart(): number {
     const d = this.distanceFromStart();
-    const t = this.elapsedFromStart();
+    const t = this.timespan;
     if (Number.isNaN(t)) return 0;
     if (d === 0) return 0;
     return Math.abs(d) / t;

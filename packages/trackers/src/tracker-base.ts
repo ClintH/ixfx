@@ -93,6 +93,11 @@ export abstract class TrackerBase<V, SeenResultType> {
   abstract get elapsed(): number;
 
   /**
+   * Returns the millisecond period from the oldest and newest value.
+   * Returns NaN if there's no initial/last values
+   */
+  abstract get timespan(): number;
+  /**
    * @ignore
    */
 

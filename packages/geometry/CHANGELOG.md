@@ -1,5 +1,16 @@
 # @ixfxfun/geometry
 
+## 0.49.0
+
+### Minor Changes
+
+- Speed
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/trackers@0.44.0
+
 ## 0.48.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @ixfxfun/trackers
 
+## 0.44.0
+
+### Minor Changes
+
+- Speed
+
 ## 0.43.1
 
 ### Patch Changes

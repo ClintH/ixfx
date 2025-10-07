@@ -105,4 +105,15 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
     return Date.now() - this.values[ 0 ].at;
   }
 
+  /**
+   * Returns the time, in milliseconds, covering the initial and last values.
+   * Returns NaN if either of these is missing.
+   */
+  get timespan(): number {
+    const oldest = this.initial;
+    const newest = this.last;
+    if (!oldest) return Number.NaN;
+    if (!newest) return Number.NaN;
+    return newest.at - oldest.at;
+  }
 }
