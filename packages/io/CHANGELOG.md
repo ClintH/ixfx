@@ -1,5 +1,15 @@
 # @ixfxfun/debug
 
+## 0.49.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.50.0
+  - @ixfx/dom@0.48.6
+  - @ixfx/modulation@0.50.3
+  - @ixfx/visual@0.53.5
+
 ## 0.49.4
 
 ### Patch Changes

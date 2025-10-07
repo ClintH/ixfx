@@ -1,5 +1,11 @@
 # @ixfxfun/geometry
 
+## 0.50.0
+
+### Minor Changes
+
+- PointTracker.speed
+
 ## 0.49.0
 
 ### Minor Changes

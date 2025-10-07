@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.10.0
+
+### Minor Changes
+
+- PointTracker.speed
+
 ## 1.9.0
 
 ### Minor Changes
