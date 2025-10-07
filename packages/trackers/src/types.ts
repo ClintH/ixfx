@@ -1,4 +1,7 @@
 export type Timestamped = {
+  /**
+   * Timestamp (Date.now)
+   */
   readonly at: number
 }
 export type TimestampedObject<V> = V & Timestamped;
