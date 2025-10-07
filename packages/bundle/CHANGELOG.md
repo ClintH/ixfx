@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.9.0
+
+### Minor Changes
+
+- asf
+
 ## 1.8.0
 
 ### Minor Changes

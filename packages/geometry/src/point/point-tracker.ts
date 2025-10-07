@@ -257,7 +257,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
    * If there are less than two points, zero is returned.
    *
    * This is the direct distance from initial to last,
-   * not the accumulated length.
+   * not the accumulated length. Use {@link length} for that.
    * @returns Distance
    */
   distanceFromStart(): number {
@@ -266,24 +266,13 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   }
 
   /**
-   * Returns the elapsed time since current 'initial' point.
-   * Returns NaN if there's no initial point
-   * @returns 
-   */
-  // elapsedFromStart(): number {
-  //   const initial = this.initial;
-  //   if (!initial) return Number.NaN;
-  //   return Date.now() - initial.at;
-  // }
-
-  /**
-   * Returns the speed (over milliseconds), calculated by distanceFromStart/elapsedFromStart.
+   * Returns the speed (over milliseconds) based on accumulated travel distance.
    * 
    * If there's no initial point, 0 is returned.
    * @returns 
    */
   speedFromStart(): number {
-    const d = this.distanceFromStart();
+    const d = this.length;
     const t = this.timespan;
     if (Number.isNaN(t)) return 0;
     if (d === 0) return 0;
@@ -314,7 +303,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   }
 
   /**
-   * Returns the total length of accumulated points.
+   * Returns the total distance from accumulated points.
    * Returns 0 if points were not saved, or there's only one
    */
   get length(): number {
