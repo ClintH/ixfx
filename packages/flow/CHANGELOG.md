@@ -1,5 +1,12 @@
 # @ixfxfun/flow
 
+## 0.46.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/numbers@0.48.0
+
 ## 0.46.2
 
 ### Patch Changes
