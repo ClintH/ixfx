@@ -176,8 +176,6 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
     _p: TimestampedObject<Point>[]
   ): PointTrackerResults {
     const currentLast = this.last;
-
-
     const previousLast = this.values.at(-2);
 
     if (this.initialRelation === undefined && this.initial) {
@@ -268,6 +266,31 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
   }
 
   /**
+   * Returns the elapsed time since current 'initial' point.
+   * Returns NaN if there's no initial point
+   * @returns 
+   */
+  elapsedFromStart(): number {
+    const initial = this.initial;
+    if (!initial) return Number.NaN;
+    return Date.now() - initial.at;
+  }
+
+  /**
+   * Returns the speed (over milliseconds), calculated by distanceFromStart/elapsedFromStart.
+   * 
+   * If there's no initial point, 0 is returned.
+   * @returns 
+   */
+  speedFromStart(): number {
+    const d = this.distanceFromStart();
+    const t = this.elapsedFromStart();
+    if (Number.isNaN(t)) return 0;
+    if (d === 0) return 0;
+    return Math.abs(d) / t;
+  }
+
+  /**
    * Difference between last point and the initial point, calculated
    * as a simple subtraction of x,y & z.
    *
@@ -342,6 +365,11 @@ export class PointsTracker extends TrackedValueMap<
       p.seen(start);
       return p;
     });
+  }
+
+  get(id: string) {
+    const v = super.get(id);
+    return v as PointTracker | undefined
   }
 
   /**
