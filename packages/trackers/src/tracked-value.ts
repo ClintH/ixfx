@@ -1,4 +1,4 @@
-import { type GetOrGenerate, getOrGenerate } from '@ixfx/core/maps';
+import { type GetOrGenerate, getOrGenerate, getOrGenerateSync, type GetOrGenerateSync } from '@ixfx/core/maps';
 import { TrackerBase } from './tracker-base.js';
 
 
@@ -26,11 +26,11 @@ import { TrackerBase } from './tracker-base.js';
  */
 export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
   store: Map<string, T>;
-  gog: GetOrGenerate<string, T, V>;
+  gog: GetOrGenerateSync<string, T, V>;
 
   constructor(creator: (key: string, start: V | undefined) => T) {
     this.store = new Map();
-    this.gog = getOrGenerate<string, T, V>(this.store, creator);
+    this.gog = getOrGenerateSync<string, T, V>(this.store, creator);
   }
 
   /**
@@ -56,8 +56,8 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @returns Information about start to last value
    */
 
-  public async seen(id: string, ...values: V[]): Promise<TResult> {
-    const trackedValue = await this.getTrackedValue(id, ...values);
+  public seen(id: string, ...values: V[]): TResult {
+    const trackedValue = this.getTrackedValue(id, ...values);
 
     // Pass it over to the TrackedValue
     const result = trackedValue.seen(...values);
@@ -71,12 +71,12 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @param values
    * @returns
    */
-  protected async getTrackedValue(id: string, ...values: V[]) {
+  protected getTrackedValue(id: string, ...values: V[]) {
     if (id === null) throw new Error(`id parameter cannot be null`);
     if (id === undefined) throw new Error(`id parameter cannot be undefined`);
 
     // Create or recall TrackedValue by id
-    const trackedValue = await this.gog(id, values[ 0 ]);
+    const trackedValue = this.gog(id, values[ 0 ]);
     return trackedValue;
   }
 
