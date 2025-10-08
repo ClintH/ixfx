@@ -111,7 +111,7 @@ export type PointTrackerResults = Readonly<{
  * When using a buffer limited by `sampleLimit`, the 'initial' point will be the oldest in the
  * buffer, not actually the very first point seen.
  */
-export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
+export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TPoint, PointTrackerResults> {
   initialRelation: PointRelation | undefined;
   markRelation: PointRelation | undefined;
   lastResult: PointTrackerResults | undefined;
@@ -140,21 +140,7 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
     this.markRelation = undefined
   }
 
-  /**
-   * Adds a PointerEvent along with its
-   * coalesced events, if available.
-   * @param p 
-   * @returns 
-   */
-  seenEvent(p: PointerEvent | MouseEvent): PointTrackerResults {
-    if (`getCoalescedEvents` in p) {
-      const events = p.getCoalescedEvents();
-      const asPoints = events.map(event => ({ x: event.clientX, y: event.clientY }));
-      return this.seen(...asPoints);
-    } else {
-      return this.seen({ x: (p).clientX, y: (p).clientY });
-    }
-  }
+
 
   /**
    * Makes a 'mark' in the tracker, allowing you to compare values
@@ -338,16 +324,16 @@ export class PointTracker extends ObjectTracker<Point, PointTrackerResults> {
  * A {@link TrackedValueMap} for points. Uses {@link PointTracker} to
  * track added values.
  */
-export class PointsTracker extends TrackedValueMap<
-  Point,
-  PointTracker,
+export class PointsTracker<TPoint extends Point = Point> extends TrackedValueMap<
+  TPoint,
+  PointTracker<TPoint>,
   PointTrackerResults
 > {
 
   constructor(opts: TrackOpts = {}) {
     super((key, start) => {
       if (start === undefined) throw new Error(`Requires start point`);
-      const p = new PointTracker({
+      const p = new PointTracker<TPoint>({
         ...opts,
         id: key,
       });
@@ -358,20 +344,60 @@ export class PointsTracker extends TrackedValueMap<
 
   get(id: string) {
     const v = super.get(id);
-    return v as PointTracker | undefined
+    return v as PointTracker<TPoint> | undefined
+  }
+}
+
+export class UserPointerTracker extends PointTracker {
+  /**
+   * Adds a PointerEvent along with its
+   * coalesced events, if available.
+   * @param p 
+   * @returns 
+   */
+  seenEvent(p: PointerEvent | MouseEvent): PointTrackerResults {
+    if (`getCoalescedEvents` in p) {
+      const events = p.getCoalescedEvents();
+      const asPoints = events.map(event => ({ x: event.clientX, y: event.clientY }));
+      return this.seen(...asPoints);
+    } else {
+      return this.seen({ x: (p).clientX, y: (p).clientY });
+    }
+  }
+}
+
+export class UserPointersTracker extends TrackedValueMap<
+  Point,
+  PointTracker,
+  PointTrackerResults
+> {
+
+  constructor(opts: TrackOpts = {}) {
+    super((key, start) => {
+      if (start === undefined) throw new Error(`Requires start point`);
+      const p = new UserPointerTracker({
+        ...opts,
+        id: key,
+      });
+      p.seen(start);
+      return p;
+    });
   }
 
+  get(id: string) {
+    const v = super.get(id);
+    return v as UserPointerTracker | undefined
+  }
   /**
-   * Track a PointerEvent
-   * @param event
-   */
+ * Track a PointerEvent
+ * @param event
+ */
   seenEvent(event: PointerEvent): Promise<PointTrackerResults[]> {
     if (`getCoalescedEvents` in event) {
       const events = event.getCoalescedEvents();
       const seens = events.map(subEvent => super.seen(subEvent.pointerId.toString(), subEvent));
       return Promise.all(seens);
     } else {
-
       return Promise.all([ super.seen((event as PointerEvent).pointerId.toString(), event) ]);
     }
   }
