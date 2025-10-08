@@ -22,5 +22,6 @@ export * from './range.js';
 export * from './round.js';
 export * from './scale.js';
 export * from './softmax.js';
+export * from './track-simple.js';
 export * from './wrap.js';
 export * from './types.js';

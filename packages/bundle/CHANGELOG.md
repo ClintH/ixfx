@@ -1,5 +1,17 @@
 # @ixfx/bundle
 
+## 1.12.0
+
+### Minor Changes
+
+- Trackers
+
+## 1.11.0
+
+### Minor Changes
+
+- PointTracker generic
+
 ## 1.10.0
 
 ### Minor Changes

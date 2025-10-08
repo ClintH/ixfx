@@ -1,5 +1,19 @@
 # @ixfxfun/geometry
 
+## 0.51.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/trackers@0.45.0
+  - @ixfx/numbers@0.49.0
+
+## 0.51.0
+
+### Minor Changes
+
+- PointTracker generic
+
 ## 0.50.0
 
 ### Minor Changes
