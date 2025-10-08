@@ -768,6 +768,7 @@ export const mergeByKey = <K, V>(
 
 
 export type GetOrGenerate<K, V, Z> = (key: K, args?: Z) => Promise<V>;
+export type GetOrGenerateSync<K, V, Z> = (key: K, args?: Z) => V;
 
 /**
  * @inheritDoc getOrGenerate
