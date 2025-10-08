@@ -10,14 +10,11 @@ export type NumberTrackerResults = {
 };
 
 export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults> {
-  total = 0;
-  min = Number.MAX_SAFE_INTEGER;
-  max = Number.MIN_SAFE_INTEGER;
+  #total = 0;
+  #min = Number.MAX_SAFE_INTEGER;
+  #max = Number.MIN_SAFE_INTEGER;
 
 
-  get avg() {
-    return this.total / this.seenCount;
-  }
 
   /**
    * Difference between last value and initial.
@@ -41,9 +38,9 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
   }
 
   onReset() {
-    this.min = Number.MAX_SAFE_INTEGER;
-    this.max = Number.MIN_SAFE_INTEGER;
-    this.total = 0;
+    this.#min = Number.MAX_SAFE_INTEGER;
+    this.#max = Number.MIN_SAFE_INTEGER;
+    this.#total = 0;
     super.onReset();
   }
 
@@ -53,33 +50,48 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
    * @param reason 
    */
   onTrimmed(reason: TrimReason) {
-    this.min = minFast(this.values);
-    this.max = maxFast(this.values);
-    this.total = totalFast(this.values);
+    this.#min = minFast(this.values);
+    this.#max = maxFast(this.values);
+    this.#total = totalFast(this.values);
   }
 
   computeResults(values: TimestampedPrimitive<number>[]): NumberTrackerResults {
     if (values.some((v) => Number.isNaN(v))) throw new Error(`Cannot add NaN`);
     const numbers = values.map(value => value.value);
 
-    this.total = numbers.reduce((accumulator, v) => accumulator + v, this.total);
-    this.min = Math.min(...numbers, this.min);
-    this.max = Math.max(...numbers, this.max);
-    const r: NumberTrackerResults = {
-      max: this.max,
-      min: this.min,
-      total: this.total,
+    this.#total = numbers.reduce((accumulator, v) => accumulator + v, this.#total);
+    this.#min = Math.min(...numbers, this.#min);
+    this.#max = Math.max(...numbers, this.#max);
+    return {
+      max: this.#max,
+      min: this.#min,
+      total: this.#total,
       avg: this.avg
-    }
-    return r;
+    };
   }
 
   getMinMaxAvg() {
     return {
-      min: this.min,
-      max: this.max,
+      min: this.#min,
+      max: this.#max,
       avg: this.avg,
     };
+  }
+
+  get max() {
+    return this.#max;
+  }
+
+  get total() {
+    return this.#total;
+  }
+
+  get min() {
+    return this.#min;
+  }
+
+  get avg() {
+    return this.#total / this.seenCount;
   }
 }
 
