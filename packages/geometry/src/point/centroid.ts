@@ -3,7 +3,7 @@ import type { Point } from "./point-type.js";
 
 /**
  * Calculates the [centroid](https://en.wikipedia.org/wiki/Centroid#Of_a_finite_set_of_points) of a set of points
- * Undefined values are skipped over.
+ * Undefined values are skipped over. Calculation and return value is 2D.
  *
  * ```js
  * // Find centroid of a list of points
@@ -15,9 +15,9 @@ import type { Point } from "./point-type.js";
  * @param points
  * @returns A single point
  */
-export const centroid = (...points: ReadonlyArray<Point | undefined>): Point => {
+export const centroid = (...points: readonly (Point | undefined)[]): Point => {
   if (!Array.isArray(points)) throw new Error(`Expected list of points`);
-  // eslint-disable-next-line unicorn/no-array-reduce
+
   const sum = points.reduce<Point>(
     (previous, p) => {
       if (p === undefined) return previous; // Ignore undefined

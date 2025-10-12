@@ -1,5 +1,11 @@
 # @ixfxfun/geometry
 
+## 0.53.0
+
+### Minor Changes
+
+- distance2d
+
 ## 0.52.0
 
 ### Minor Changes

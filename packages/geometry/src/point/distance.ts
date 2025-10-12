@@ -8,7 +8,7 @@ export function distance(a: Point, x: number, y: number): number;
 /**
  * Calculate distance between two points.
  * If both points have a `z` property, the distance is 3D distance is calculated.
- * If only one point has a `z`, it is ignored.
+ * If only one point has a `z`, it is ignored. To force 2D distance, use {@link distance2d}
  *
  * ```js
  * // Distance between two points
@@ -39,4 +39,23 @@ export function distance(
   guard(pt, `b`);
   guard(a, `a`);
   return isPoint3d(pt) && isPoint3d(a) ? Math.hypot(pt.x - a.x, pt.y - a.y, pt.z - a.z) : Math.hypot(pt.x - a.x, pt.y - a.y);
+}
+
+/**
+ * As {@distance} but always compares by x,y only.
+ * @param a
+ * @param xOrB 
+ * @param y 
+ * @param z 
+ * @returns 
+ */
+export function distance2d(
+  a: Point,
+  xOrB?: Point | number,
+  y?: number
+): number {
+  const pt = getPointParameter(xOrB, y);
+  guard(pt, `b`);
+  guard(a, `a`);
+  return Math.hypot(pt.x - a.x, pt.y - a.y);
 }

@@ -1,5 +1,13 @@
 # @ixfxfun/visual
 
+## 0.53.9
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.53.0
+  - @ixfx/dom@0.48.10
+
 ## 0.53.8
 
 ### Patch Changes

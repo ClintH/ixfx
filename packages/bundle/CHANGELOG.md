@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.14.0
+
+### Minor Changes
+
+- distance2d
+
 ## 1.13.0
 
 ### Minor Changes
