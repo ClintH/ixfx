@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.13.0
+
+### Minor Changes
+
+- Angle calculation
+
 ## 1.12.0
 
 ### Minor Changes

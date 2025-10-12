@@ -1,5 +1,12 @@
 # @ixfxfun/dom
 
+## 0.48.9
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.52.0
+
 ## 0.48.8
 
 ### Patch Changes

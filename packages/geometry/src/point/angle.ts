@@ -55,3 +55,19 @@ export const angleRadianCircle = (a: Point, b?: Point, c?: Point) => {
   if (angle < 0) return angle + piPi
   return angle;
 }
+
+/**
+ * Return the angle of a wedge, defined by a, b and C points, where 'b'
+ * could be thought of as the origin or pivot.
+ * 
+ * @param a 
+ * @param b 
+ * @param c 
+ * @returns 
+ */
+export const angleRadianThreePoint = (a: Point, b: Point, c: Point) => {
+  const ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+  const bc = Math.sqrt(Math.pow(b.x - c.x, 2) + Math.pow(b.y - c.y, 2));
+  const ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));
+  return Math.acos((bc * bc + ab * ab - ac * ac) / (2 * bc * ab));
+}

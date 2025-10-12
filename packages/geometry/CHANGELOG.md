@@ -1,5 +1,11 @@
 # @ixfxfun/geometry
 
+## 0.52.0
+
+### Minor Changes
+
+- Angle calculation
+
 ## 0.51.1
 
 ### Patch Changes

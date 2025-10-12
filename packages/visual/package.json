@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/visual",
-	"version": "0.53.7",
+	"version": "0.53.8",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,
