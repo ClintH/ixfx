@@ -15,7 +15,7 @@ import { joinPointsToLines } from '../line/join-points-to-lines.js';
 import type { TrimReason } from '@ixfx/trackers';
 import type { PointRelationResult } from "./point-relation-types.js";
 import { relation } from './relation.js';
-import { distance } from './distance.js';
+import { distance, distance2d } from './distance.js';
 import { subtract } from './subtract.js';
 import { angleRadian } from './angle.js';
 import { Placeholder as PointsPlaceholder } from './point-type.js';
@@ -181,7 +181,7 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
 
     const markRel: PointTrack | undefined = (this.markRelation !== undefined) ? this.markRelation(currentLast) : undefined;
 
-    const speed = previousLast === undefined ? 0 : LineLength(previousLast, currentLast) / (currentLast.at - previousLast.at);
+    const speed = previousLast === undefined ? 0 : LineLength(previousLast, currentLast, true) / (currentLast.at - previousLast.at);
 
     // Compute relation from current point to the previous
     const lastRel: PointTrack = {
@@ -243,26 +243,36 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
    * If there are less than two points, zero is returned.
    *
    * This is the direct distance from initial to last,
-   * not the accumulated length. Use {@link length} for that.
+   * not the accumulated length. Use {@link lengthTotal} for that.
+   * @param force2d If _true_ distance is calculated only in 2d
    * @returns Distance
    */
-  distanceFromStart(): number {
+  distanceFromStart(force2d = false): number {
     const initial = this.initial;
-    return this.values.length >= 2 && initial !== undefined ? distance(initial, this.last) : 0;
+    return this.values.length >= 2 && initial !== undefined ?
+      force2d ? distance2d(initial, this.last) : distance(initial, this.last)
+      : 0;
   }
 
   /**
    * Returns the speed (over milliseconds) based on accumulated travel distance.
    * 
    * If there's no initial point, 0 is returned.
+   * @param force2d If _true_, speed is calculated with x,y only
    * @returns 
    */
-  speedFromStart(): number {
-    const d = this.length;
+  speedFromStart(force2d = false): number {
+    const d = this.lengthTotal(force2d);
     const t = this.timespan;
     if (Number.isNaN(t)) return 0;
     if (d === 0) return 0;
     return Math.abs(d) / t;
+  }
+
+  speedFromLast(force2d = false): number {
+    const l = this.lastResult;
+    if (!l) return 0;
+    return l.fromLast.speed;
   }
 
   /**
@@ -290,12 +300,25 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
 
   /**
    * Returns the total distance from accumulated points.
-   * Returns 0 if points were not saved, or there's only one
+   * Returns 0 if points were not saved, or there's only one.
+   * 
+   * Use {@link lengthAverage} to get the average length for all segments
+   * @param force2d If _true_ length is calculated using x&y only
    */
-  get length(): number {
+  lengthTotal(force2d = false): number {
     if (this.values.length === 1) return 0;
     const l = this.line;
-    return LineLength(l);
+    return LineLength(l, force2d);
+  }
+
+  /**
+   * Adds up the accumulated length of all points (using {@link lengthTotal})
+   * dividing by the total number of points.
+   * @param force2d 
+   * @returns 
+   */
+  lengthAverage(force2d = false): number {
+    return this.lengthTotal(force2d) / this.values.length;
   }
 
   /**
