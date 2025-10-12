@@ -1,5 +1,17 @@
 # @ixfxfun/geometry
 
+## 0.55.0
+
+### Minor Changes
+
+- lengthAverage
+
+## 0.54.0
+
+### Minor Changes
+
+- Distance
+
 ## 0.53.0
 
 ### Minor Changes

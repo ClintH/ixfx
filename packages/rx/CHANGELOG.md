@@ -1,5 +1,13 @@
 # @ixfxfun/rx
 
+## 0.48.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/modulation@0.51.0
+  - @ixfx/dom@0.49.0
+
 ## 0.48.2
 
 ### Patch Changes

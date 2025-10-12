@@ -1,5 +1,23 @@
 # @ixfxfun/modulation
 
+## 0.51.0
+
+### Minor Changes
+
+- lengthAverage
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.55.0
+
+## 0.50.8
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.54.0
+
 ## 0.50.7
 
 ### Patch Changes

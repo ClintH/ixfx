@@ -1,5 +1,25 @@
 # @ixfxfun/visual
 
+## 0.54.0
+
+### Minor Changes
+
+- lengthAverage
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.55.0
+  - @ixfx/dom@0.49.0
+
+## 0.53.10
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.54.0
+  - @ixfx/dom@0.48.11
+
 ## 0.53.9
 
 ### Patch Changes

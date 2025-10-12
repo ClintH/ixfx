@@ -1,5 +1,29 @@
 # @ixfxfun/debug
 
+## 0.50.0
+
+### Minor Changes
+
+- lengthAverage
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/modulation@0.51.0
+  - @ixfx/geometry@0.55.0
+  - @ixfx/visual@0.54.0
+  - @ixfx/dom@0.49.0
+
+## 0.49.10
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.54.0
+  - @ixfx/dom@0.48.11
+  - @ixfx/modulation@0.50.8
+  - @ixfx/visual@0.53.10
+
 ## 0.49.9
 
 ### Patch Changes

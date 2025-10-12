@@ -1,5 +1,17 @@
 # @ixfx/bundle
 
+## 1.16.0
+
+### Minor Changes
+
+- lengthAverage
+
+## 1.15.0
+
+### Minor Changes
+
+- Distance
+
 ## 1.14.0
 
 ### Minor Changes

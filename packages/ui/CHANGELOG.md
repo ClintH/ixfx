@@ -1,5 +1,28 @@
 # @ixfxfun/ui
 
+## 0.49.0
+
+### Minor Changes
+
+- lengthAverage
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.55.0
+  - @ixfx/visual@0.54.0
+  - @ixfx/dom@0.49.0
+  - @ixfx/rx@0.48.3
+
+## 0.48.11
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/geometry@0.54.0
+  - @ixfx/dom@0.48.11
+  - @ixfx/visual@0.53.10
+
 ## 0.48.10
 
 ### Patch Changes
