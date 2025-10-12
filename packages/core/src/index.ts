@@ -39,7 +39,7 @@ export * from './resolve-core.js';
 export * from './resolve-fields.js';
 //export * from './results.js';
 export * from './sleep.js';
-
+export * from './url-parameters.js';
 
 // tsup doesn't like 'export type *'?
 export * from './ts-utility.js';
