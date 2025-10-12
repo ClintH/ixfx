@@ -33,4 +33,5 @@ export type PointRelationResult = {
    * Speed. Distance/millisecond from one sample to the next.
    */
   readonly speed: number;
+
 };
