@@ -1,3 +1,23 @@
+/**
+ * Allows for access to URL parameters.
+ * 
+ * If `url` is not specified, `docment.location`'s .searchParams is used.
+ * 
+ * ```js
+ * const p = parseUrlParameters();
+ * 
+ * // eg. gets an integer param called 'size`, using NaN as a default
+ * p.int(`size`);
+ * 
+ * // As above, but will return 10 if 'size' is not specified in URL.
+ * p.int(`size`, 10);
+ * 
+ * // Returns _true_ if 'engage' parameter is present and value is 'true'
+ * p.bool(`engage`);
+ * ```
+ * @param url 
+ * @returns 
+ */
 export const parseUrlParameters = (url?: string) => {
   const parameters = new URL(url ?? document.location.toString()).searchParams;
 
