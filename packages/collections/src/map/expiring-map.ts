@@ -98,7 +98,7 @@ export const create = <K, V>(options: Opts = {}): ExpiringMap<K, V> =>
  *
  * Events:
  * * 'expired': when an item is automatically removed.
- * * 'removed': when an item is manually or automatically removed.
+ * * 'removed': when an item is manually or automatically removed due to expiry. Note: does not fire when .clear() is called
  * * 'newKey': when a new key is added
  *
  * ```js
@@ -140,6 +140,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
   private autoDeletePolicy;
   private autoDeleteTimer: ReturnType<typeof setInterval> | undefined;
   private disposed = false;
+
   constructor(opts: Opts = {}) {
     super();
     this.capacity = opts.capacity ?? -1;
@@ -274,9 +275,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
 
   /**
    * Updates the lastSet/lastGet time for a value
-   * under `k`.
+   * under `key`. If key was not found, nothing happens.
    *
-   * Returns false if key was not found
+   * Returns _false_ if key was not found
    * @param key
    * @returns
    */
