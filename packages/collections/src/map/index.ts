@@ -17,7 +17,7 @@ export type { IMapOfImmutable } from './imap-of-immutable.js';
 export type { MapArrayOpts } from './map-of-array-mutable.js';
 export { NumberMap } from './number-map.js';
 export * from './map-multi.js';
-
+export * from './map-mutable-events.js';
 // Re-export from core
 export * from '@ixfx/core/maps';
 
