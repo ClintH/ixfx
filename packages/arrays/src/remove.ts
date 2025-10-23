@@ -25,9 +25,31 @@ export const remove = <V>(
   index: number
 ): V[] => {
   if (!Array.isArray(data)) {
-    throw new TypeError(`'data' parameter should be an array`);
+    throw new TypeError(`Parameter 'data' should be an array`);
   }
   resultThrow(arrayIndexTest(data, index, `index`));
 
   return [ ...data.slice(0, index), ...data.slice(index + 1) ];
 };
+
+/**
+ * Removes items from `input` array that match `predicate`.
+ * A modified array is returned along with the number of items removed.
+ * 
+ * If `predicate` matches no items, a new array will still be returned, and the removed count will be 0.
+ * 
+ * @param input 
+ * @param predicate 
+ * @returns 
+ */
+export const removeByFilter = <T>(input: T[], predicate: (value: T) => boolean): [ changed: T[], removed: number ] => {
+  if (!Array.isArray(input)) {
+    throw new TypeError(`Parameter 'input' should be an array`);
+  }
+  if (typeof predicate !== `function`) throw new TypeError(`Parameter 'prediate' should be a function. Got type: ${ typeof predicate }`);
+
+  const count = input.length;
+  const changed = input.filter(v => !predicate(v));
+  const newCount = input.length;
+  return [ changed, newCount - count ];
+}
