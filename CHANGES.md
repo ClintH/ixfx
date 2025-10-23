@@ -1,5 +1,21 @@
 A rough changelog between NPM releases
 
++ Collections.MapWithEvents: wraps a regular Map, but fires events when values are changed
++ Trackers.GatedFrequencyTracker: wraps a FrequencyTracker, but only counts once per a source
++ Arrays.removeByFilter: removes items by a predicate
++ Core.parseUrParameters: access URL parameters with fallbacks
++ Geometry.angleRadianThreePoint
++ Numbers.trackSimple: Track min, max, total and average over a stream of values
++ Normalise.streamWithContext: normalises a stream of values, but allows acess to min, max, range and ability to reset
++ Numbers.Ranges: functions for working with {min,max}: rangeIsEqual, rangeIsWithin, rangeStream, rangeMergeValue, rangeMergeRange, rangeScalar
++ Trackers.Changes: functions for simply tracking if a value has changed
++ Io.Midi: Basic MIDI data parsing
++ Arrays.mapWithEmptyFallback: Map over an array like usual, but uses a fallback value if array is undefined
+* DispatchList: if a handler returns true, other handlers are not invoked
+* Trackers: added 'timespan' property
+* Geometry.PointTracker/Geometry.length/Point.distance: added options for working with points only as 2D coordinates, ignoring Z
+* Arrays.ensureLength: takes options for how to truncate array if needed
+
 # 0.34.0 2025 02.27
 
 * Refactored Visual.Svg, Visual.Colour, Geometry.Polar
