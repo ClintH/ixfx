@@ -1,10 +1,33 @@
 import { keyValueSorter, type KeyValue, type KeyValueSortSyles, type ToString } from '@ixfx/core';
 import { SimpleEventEmitter } from '@ixfx/events';
-import { numberArrayCompute } from '@ixfx/numbers';
+import { numberArrayCompute, type NumbersComputeResult } from '@ixfx/numbers';
 
 export type FrequencyEventMap = {
   readonly change: { context: unknown };
 };
+
+/**
+ * Wraps a {@link FrequencyTracker}, but ignores values that come from the same source.
+ */
+export class GatedFrequencyTracker<T> {
+  readonly ft: FrequencyTracker<T>;
+  readonly sources = new Set<string>();
+
+  constructor(keyString?: ToString<T>) {
+    this.ft = new FrequencyTracker<T>(keyString);
+  }
+
+  add(value: T, source: string) {
+    if (this.sources.has(source)) return;
+    this.sources.add(source);
+    this.ft.add(value);
+  }
+
+  clear() {
+    this.ft.clear();
+    this.sources.clear();
+  }
+}
 
 /**
  * Frequency keeps track of how many times a particular value is seen, but
@@ -47,6 +70,7 @@ export type FrequencyEventMap = {
 export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   readonly #store: Map<string, number>;
   readonly #keyString: ToString<V>;
+  #cachedResults: NumbersComputeResult | undefined;
 
   /**
    * Constructor
@@ -70,6 +94,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    */
   clear() {
     this.#store.clear();
+    this.#cachedResults = undefined;
     this.fireEvent(`change`, { context: this });
   }
 
@@ -120,7 +145,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   }
 
   /**
-   *
+   * Gets the relative frequency of `value`.
    * @param value Value to count
    * @returns Relative frequency of `value`, or _undefined_ if it does not exist
    */
@@ -141,8 +166,41 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * Returns copy of entries as an array
    * @returns Copy of entries as an array
    */
-  entries(): KeyValue[] {
-    return [ ...this.#store.entries() ];
+  *entries() {
+    //return [ ...this.#store.entries() ];
+    yield* this.#store.entries();
+  }
+
+  /**
+   * Yields key-value pairs, passing through the filter predicate
+   * @param predicate 
+   */
+  *filterByTally(predicate: (tally: number) => boolean) {
+    for (const kv of this.#store.entries()) {
+      if (predicate(kv[ 1 ])) {
+        yield kv;
+      }
+    }
+  }
+
+  /**
+  * Yields key-value pairs, passing through the filter predicate.
+  * 
+  * Passes a relative tally amount
+  * ```js
+  * // Get all key-value pairs where tally is 10% of total
+  * for (const kv of fm.filterByRelativeTally(t=>t>0.1)) {
+  * }
+  * ```
+  * @param predicate 
+  */
+  *filterByRelativeTally(predicate: (tally: number) => boolean) {
+    const total = this.computeValues().total;
+    for (const kv of this.#store.entries()) {
+      if (predicate(kv[ 1 ] / total)) {
+        yield kv;
+      }
+    }
   }
 
   /**
@@ -150,8 +208,11 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * @returns Returns `{min,max,avg,total}`
    */
   computeValues() {
-    const valuesAsNumbers = [ ...this.values() ];
-    return numberArrayCompute(valuesAsNumbers);
+    if (!this.#cachedResults) {
+      const valuesAsNumbers = [ ...this.values() ];
+      this.#cachedResults = numberArrayCompute(valuesAsNumbers);
+    }
+    return this.#cachedResults;
   }
 
   /**
@@ -161,9 +222,9 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    */
   entriesSorted(
     sortStyle: KeyValueSortSyles = `value`
-  ): readonly KeyValue[] {
+  ) {
     const s = keyValueSorter(sortStyle);
-    return s(this.entries());
+    return s([ ...this.entries() ]);
   }
 
   /**
@@ -172,6 +233,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    */
   add(...values: V[]) {
     if (typeof values === `undefined`) throw new Error(`Param 'values' undefined`);
+    this.#cachedResults = undefined;
 
     const keys = values.map(v => this.#keyString(v));
 
