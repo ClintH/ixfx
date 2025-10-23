@@ -53,8 +53,10 @@ export type RequestResponseMatchEvents<TRequest, TResp> = {
  *  // Runs on success or failure
  * })
  * ```
+ * 
  * It relies on creating an id of a request/response for them to be matched up. Use the `key`
- * option if the function can generate a key from either request or response. Or alternatively set both `keyRequest` and `keyResponse` for two functions that can generate a key for request and response respectively.
+ * option if the function can generate a key from either request or response. 
+ * Or alternatively set both `keyRequest` and `keyResponse` for two functions that can generate a key for request and response respectively.
  * 
  * 
  * The easy case is if req & resp both have the same field:
