@@ -1,5 +1,11 @@
 # @ixfxfun/events
 
+## 0.44.0
+
+### Minor Changes
+
+- 825751b: Changes
+
 ## 0.43.0
 
 ### Minor Changes

@@ -1,5 +1,22 @@
 # @ixfxfun/flow
 
+## 0.47.0
+
+### Minor Changes
+
+- 825751b: Changes
+
+### Patch Changes
+
+- Updated dependencies [825751b]
+  - @ixfx/arrays@0.52.0
+  - @ixfx/collections@0.51.0
+  - @ixfx/core@0.50.0
+  - @ixfx/debug@0.45.0
+  - @ixfx/events@0.44.0
+  - @ixfx/guards@0.44.0
+  - @ixfx/numbers@0.50.0
+
 ## 0.46.4
 
 ### Patch Changes

@@ -1,5 +1,7 @@
 A rough changelog between NPM releases
 
+# 1.17.0 2025.10.23
+
 + Collections.MapWithEvents: wraps a regular Map, but fires events when values are changed
 + Trackers.GatedFrequencyTracker: wraps a FrequencyTracker, but only counts once per a source
 + Arrays.removeByFilter: removes items by a predicate
@@ -16,7 +18,7 @@ A rough changelog between NPM releases
 * Geometry.PointTracker/Geometry.length/Point.distance: added options for working with points only as 2D coordinates, ignoring Z
 * Arrays.ensureLength: takes options for how to truncate array if needed
 
-# 0.34.0 2025 02.27
+# 0.34.0 2025.02.27
 
 * Refactored Visual.Svg, Visual.Colour, Geometry.Polar
 + Geometry.Polar.Ray: a line based in polar coordinates

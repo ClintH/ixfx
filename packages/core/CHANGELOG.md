@@ -1,5 +1,17 @@
 # @ixfxfun/core
 
+## 0.50.0
+
+### Minor Changes
+
+- 825751b: Changes
+
+### Patch Changes
+
+- Updated dependencies [825751b]
+  - @ixfx/debug@0.45.0
+  - @ixfx/guards@0.44.0
+
 ## 0.49.0
 
 ### Minor Changes

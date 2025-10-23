@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.17.0
+
+### Minor Changes
+
+- 825751b: Changes
+
 ## 1.16.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @ixfxfun/debug
 
+## 0.45.0
+
+### Minor Changes
+
+- 825751b: Changes
+
 ## 0.44.0
 
 ### Minor Changes

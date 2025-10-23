@@ -1,5 +1,20 @@
 # @ixfxfun/iterables
 
+## 0.47.0
+
+### Minor Changes
+
+- 825751b: Changes
+
+### Patch Changes
+
+- Updated dependencies [825751b]
+  - @ixfx/arrays@0.52.0
+  - @ixfx/core@0.50.0
+  - @ixfx/guards@0.44.0
+  - @ixfx/numbers@0.50.0
+  - @ixfx/process@0.44.0
+
 ## 0.46.4
 
 ### Patch Changes
