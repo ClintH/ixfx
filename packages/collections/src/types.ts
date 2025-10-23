@@ -13,6 +13,15 @@ export type ObjectKeys<K, V> = readonly {
   readonly value: V;
 }[];
 
+export function isObjectKeys<K, V>(kvs: EitherKey<K, V>): kvs is ObjectKeys<K, V> {
+  if (!Array.isArray(kvs)) return false;
+  for (const kv of kvs) {
+    if (Array.isArray(kv)) return false;
+    if (!(`key` in kv && `value` in kv)) return false;
+  }
+  return true;
+}
+
 /**
  * Type that represents key-values in object or array form
  */
