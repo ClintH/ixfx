@@ -8,5 +8,5 @@ export * from './interpolate.js';
 export * as HslSpace from './hsl.js';
 export * as OklchSpace from './oklch.js';
 export * as SrgbSpace from './srgb.js';
-
+export * from './to-integer.js';
 export * from './types.js';
