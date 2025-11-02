@@ -4,7 +4,7 @@ import * as Cart from './cartesian.js';
 import { round } from "@ixfx/numbers";
 import type { GridStyle, LineStyle, SeriesMeta, ShowOptions, TextStyle } from "./types.js";
 import type { RecursivePartial } from "@ixfx/core";
-import type { CanvasRegion, CanvasRegionSpec } from "../canvas-region.js";
+import { CanvasRegion, type CanvasRegionSpec } from "../canvas-region.js";
 import { CanvasSource } from "../canvas-region.js";
 import { resolveEl } from "@ixfx/dom";
 import { ElementSizer } from "@ixfx/dom";
@@ -14,6 +14,7 @@ import type { Line } from "@ixfx/geometry/line";
 import type { Point } from "@ixfx/geometry/point";
 import { goldenAngleColour } from "../colour/generate.js";
 import { toCssColour as ColourToString } from "../colour/conversion.js";
+import type { CartestianPlotRangeOption } from "./cartesian.js";
 export type InsertOptions = {
   region?: CanvasRegionSpec
   /**
@@ -106,7 +107,7 @@ export const insert = (insertOptions: InsertOptions, options: RecursivePartial<C
  * 
  */
 export class CartesianCanvasPlot {
-  #data;
+  #data: DataSet<Cart.PlotPoint, SeriesMeta>;
   #lastDataChange;
   #canvasRegion: CanvasRegion;
 
@@ -123,7 +124,7 @@ export class CartesianCanvasPlot {
    */
   overlayLines: (Line & LineStyle)[] = [];
   #grid: GridStyle
-  #rangeMode;
+  #rangeMode: CartestianPlotRangeOption;
 
   #currentRange?: Cart.CartesianDataRange;
 
@@ -175,6 +176,15 @@ export class CartesianCanvasPlot {
       width: 1,
       ...options.grid
     }
+  }
+
+  static fromCanvas(queryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) {
+    const source = new CanvasSource(queryOrEl, `min`);
+    const bounds = source.element.getBoundingClientRect();
+    const region = source.createRegion({
+      absPositioned: { x: 0, y: 0, width: bounds.width, height: bounds.height }, scale: `independent`
+    });
+    return new CartesianCanvasPlot(region, data, options);
   }
 
   getCurrentRange() {

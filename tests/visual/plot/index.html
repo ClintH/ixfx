@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>plot</title>
-  </head>
-  <body>
-    <style>
-      * {
-      box-sizing: border-box;
-    }
-
-    #container {
-      height: 10em;
-      border: 2px solid gray;
-      height:30vw;
-      width:90vw;
-      z-index: 0;
-    }
-    </style>
-    <canvas></canvas>
-    <section>
-      <h1>plot</h1>
-      <button id="btnToggle">Auto data</button>
-    </section>
-    <script type="module" src="script.js"></script>
-  </body>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>plot</title>
+	</head>
+	<body>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			
+			#container {
+				height: 10em;
+				border: 2px solid gray;
+				height:30vw;
+				width:90vw;
+				z-index: 0;
+			}
+			
+			canvas {
+				border: 1px solid red;
+				width: 400px;
+				height: 200px;
+			}
+		</style>
+		<section>
+			<h1>plot</h1>
+			<button id="btnToggle">Auto data</button>
+			<canvas></canvas>
+		</section>
+		<script type="module" src="script.js"></script>
+	</body>
 </html>

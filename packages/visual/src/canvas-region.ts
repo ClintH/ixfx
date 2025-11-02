@@ -1,4 +1,4 @@
-import { scalerTwoWay, clamp } from "@ixfx/numbers";
+import { scalerTwoWay, clamp, type NumberScaler } from "@ixfx/numbers";
 import { resolveEl, resolveElementTry } from "@ixfx/dom";
 import { resultErrorToString } from "@ixfx/guards";
 import type { Rect, RectPositioned } from "@ixfx/geometry/rect";
@@ -38,7 +38,7 @@ export class CanvasSource {
   #canvasEl: HTMLCanvasElement;
   #ctx: undefined | CanvasRenderingContext2D;
   #sizeBasis: `min` | `max`;
-  #sizeScaler;
+  #sizeScaler: { abs: NumberScaler, rel: NumberScaler };
   #logicalSize: Rect;
   #pixelScaling: number;
 
@@ -335,6 +335,10 @@ export class CanvasSource {
    */
   get height() {
     return this.#logicalSize.height;
+  }
+
+  get element() {
+    return this.#canvasEl;
   }
 }
 

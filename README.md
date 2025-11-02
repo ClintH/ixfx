@@ -44,3 +44,4 @@ Bundles
 * Easing functions by [Andrey Sitnik and Ivan Solovev](https://easings.net/)
 * [Bezier.js](https://github.com/Pomax/bezierjs)
 * [Underdash](https://surma.github.io/underdash/) by Surma
+* [Kalman.js](https://github.com/wouterbulten/kalmanjs) by Wouter Bulten

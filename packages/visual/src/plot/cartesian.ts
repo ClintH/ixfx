@@ -34,7 +34,7 @@ export type CartesianDataRange = {
   range: PointMinMax
 }
 
-
+export type CartestianPlotRangeOption = `auto` | { min: Point, max: Point }
 export type CartesianPlotOptions = {
   clear: `region` | `canvas`
   onInvalidated: () => void
@@ -54,7 +54,7 @@ export type CartesianPlotOptions = {
    * `{ min: {x:-1,y:-1}, {x:1,y:1}}`
    * 
    */
-  range: `auto` | { min: Point, max: Point }
+  range: CartestianPlotRangeOption
 
   /**
    * Gridline setting

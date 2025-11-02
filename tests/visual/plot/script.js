@@ -1,6 +1,7 @@
-import { Plot } from '../../../dist/visual.js';
+import { Plot } from '../../../packages/bundle/dist/src/visual.js';
 
-const p = Plot.CartesianCanvasPlot.create(`canvas`);
+const ds = new Plot.DataSet();
+const p = Plot.CartesianCanvasPlot.fromCanvas(`canvas`, ds) // Plot.CartesianCanvasPlot.create(`canvas`);
 
 const generate = () => {
   for (let i = 0; i < 100; i++) {
@@ -8,3 +9,4 @@ const generate = () => {
   }
   p.draw();
 }
+generate();

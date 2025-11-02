@@ -1,14 +1,13 @@
 import { MapOfSimpleMutable } from "@ixfx/collections";
 
 export class DataSet<TValue, TSeriesMeta> {
-  #data;
-  #meta;
+  #data: MapOfSimpleMutable<TValue>;
+  #meta: Map<string, TSeriesMeta>;
   lastChange;
 
   constructor() {
     this.lastChange = performance.now();
     this.#data = new MapOfSimpleMutable<TValue>();
-
     this.#meta = new Map<string, TSeriesMeta>();
   }
 
