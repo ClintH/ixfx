@@ -9,6 +9,7 @@ export * from './flip.js';
 export * from './generate.js';
 export * from './guard.js';
 export * from './is-approx.js';
+export * from './kalman.js';
 export * as Bipolar from './bipolar.js';
 export * from './interpolate.js';
 export * from './linear-space.js';
