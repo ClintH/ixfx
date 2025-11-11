@@ -1,5 +1,5 @@
 export * from './apply-to-values.js';
-export * from './average-weighted.js';
+export * from './average.js';
 export * from './clamp.js';
 
 export * from './count.js';
@@ -12,6 +12,7 @@ export * from './is-approx.js';
 export * from './kalman.js';
 export * as Bipolar from './bipolar.js';
 export * from './interpolate.js';
+export * from './iqr.js';
 export * from './linear-space.js';
 export * from './moving-average.js';
 export * as Normalise from './normalise.js';
@@ -23,6 +24,7 @@ export * from './range.js';
 export * from './round.js';
 export * from './scale.js';
 export * from './softmax.js';
+export * from './standard-deviation.js';
 export * from './track-simple.js';
 export * from './wrap.js';
 export * from './types.js';
