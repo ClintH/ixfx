@@ -1,7 +1,7 @@
 import { numberTest, resultThrow } from "@ixfx/guards";
-import { BasicQueueMutable } from "./util/queue-mutable.js";
-import { averageWeighted } from "./average.js";
+import { averageWeigher } from "./average.js";
 import { average } from "./numeric-arrays.js";
+import { movingWindowWithContext, type MovingWindowOptions } from "@ixfx/arrays";
 const PiPi = Math.PI * 2;
 
 /**
@@ -78,23 +78,56 @@ export const movingAverageLight = (scaling = 3): (value?: number) => number => {
  * @param weighter Optional weighting function
  * @returns
  */
-export const movingAverage = (
-  samples = 100,
-  weighter?: (v: number) => number
-): (value?: number) => number => {
-  const q = new BasicQueueMutable<number>();
-  return (v?: number) => {
-    const r = numberTest(v);
-    if (r.success && v !== undefined) {
-      q.enqueue(v);
-      while (q.size > samples) {
-        q.dequeue();
-      }
-    }
-    return weighter === undefined ? average(q.data) : averageWeighted(q.data, weighter);
-  }
-};
+export const movingAverage = (samplesOrOptions: number | MovingAverageOptions) => movingAverageWithContext(samplesOrOptions).seen;
 
+export const movingAverageWithContext = (samplesOrOptions: number | MovingAverageOptions) => {
+  const nanPolicy: MovingAverageNanOptions = (typeof samplesOrOptions === `number`) ? `ignore` : samplesOrOptions.nanPolicy ?? `ignore`;
+  const w = movingWindowWithContext(samplesOrOptions);
+  const averageFunction = typeof samplesOrOptions === `number` ? average : samplesOrOptions.weighter ? averageWeigher(samplesOrOptions.weighter) : average;
+
+  const seen = (value: number) => {
+    if (Number.isNaN(value)) {
+      if (nanPolicy === `throw`) throw new TypeError(`Value is NaN`);
+      if (nanPolicy === `ignore`) return w.data;
+    }
+    return averageFunction(w.seen(value));
+  }
+
+  return {
+    seen,
+    get data() { return [ ...w.data ] },
+    get average() { return averageFunction(w.data); }
+  }
+}
+
+// export const movingAverage = (
+//   samples = 100,
+//   weighter?: (v: number) => number
+// ): (value?: number) => number => {
+//   const q = new BasicQueueMutable<number>();
+//   return (v?: number) => {
+//     const r = numberTest(v);
+//     if (r.success && v !== undefined) {
+//       q.enqueue(v);
+//       while (q.size > samples) {
+//         q.dequeue();
+//       }
+//     }
+//     return weighter === undefined ? average(q.data) : averageWeighted(q.data, weighter);
+//   }
+// };
+
+export type MovingAverageNanOptions = `throw` | `ignore`
+export type MovingAverageOptions = MovingWindowOptions<number> & Partial<{
+  /**
+   * If set, a weighted average will be 
+   * calculated instead of a plain average.
+   * @param v 
+   * @returns 
+   */
+  weighter: (v: number) => number
+  nanPolicy: MovingAverageNanOptions
+}>
 
 // export const movingAverageTimed = (
 //   updateRateMs = 200,
