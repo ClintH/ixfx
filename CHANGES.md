@@ -1,5 +1,12 @@
 A rough changelog between NPM releases
 
+2025.11.11
+
++ Core.isDateObject
++ Core.Records.prefixProperties, .enumerateNumericalValues, .zipRecords
++ Numbers.equalWithPrecisionTest, .median, .mean, .interquartileRange, .filterOutliers, .getQuantile, .standardDeviation
++ Numbers.normalise: selectable normalisation techniques: minmax (previous default), standardise and robust
+
 # 1.17.0 2025.10.23
 
 + Collections.MapWithEvents: wraps a regular Map, but fires events when values are changed
