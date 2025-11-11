@@ -41,16 +41,21 @@ export const interquartileRange = (data: number[], n?: number) => {
 }
 
 /**
- * Return a copy of `data` with outliers removed.
+ * Returns a function which itself returns _true_ if a value is an outlier.
+ * 
+ * This can be used for example to get a copy of an array without outliers:
+ * ```js
+ * const p = computeIsOutlier(someData);
+ * const someDataWithoutOutliers = someData.filter(value => !p(value));
+ * ```
  * 
  * Outliers are defined as: "a point which falls more than 1.5 times the interquartile range above the third quartile or below the first quartile." [Wolfram](https://mathworld.wolfram.com/Outlier.html)
- * 
  * 
  * @param data Data to filter
  * @param multiplier Multiplier of Q3 Q1. Default: 1.5 
  * @returns 
  */
-export const filterOutliers = (data: number[], multiplier = 1.5) => {
+export const computeIsOutlier = (data: number[], multiplier = 1.5) => {
   //https://stackoverflow.com/questions/20811131/javascript-remove-outlier-from-an-array
   if (data.length < 4) return data;
 
@@ -63,7 +68,7 @@ export const filterOutliers = (data: number[], multiplier = 1.5) => {
   const maxValue = q3 + iqr * multiplier;
   const minValue = q1 - iqr * multiplier;
 
-  return values.filter((x) => (x >= minValue) && (x <= maxValue));
+  return (value) => (value < minValue) && (value > maxValue);
 }
 
 /**
