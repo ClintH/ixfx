@@ -14,6 +14,7 @@ export * from './insert-at.js';
 export * from './interleave.js';
 export * from './intersection.js';
 export * from './merge-by-key.js';
+export * from './moving-window.js';
 export * from './pairwise.js';
 export * from './random.js';
 export * from './remove.js';
