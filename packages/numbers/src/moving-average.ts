@@ -1,6 +1,6 @@
 import { numberTest, resultThrow } from "@ixfx/guards";
 import { BasicQueueMutable } from "./util/queue-mutable.js";
-import { averageWeighted } from "./average-weighted.js";
+import { averageWeighted } from "./average.js";
 import { average } from "./numeric-arrays.js";
 const PiPi = Math.PI * 2;
 

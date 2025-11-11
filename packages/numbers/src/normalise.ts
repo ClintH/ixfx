@@ -1,64 +1,32 @@
-
-import { scale } from './scale.js';
-import { numberTest, resultThrow } from "@ixfx/guards";
-import { clamp } from './clamp.js';
-import { numberArrayCompute } from './number-array-compute.js';
-import type { NormaliseStreamContext } from './types.js';
+import type { NormaliseStreamContext, MinMaxStreamOptions, NormalisationArrayOptions, NormalisationStrategy, NormalisationStreamOptions, NormalisationStreamStrategy, ZScoreArrayOptions, MinMaxArrayOptions, RobustArrayOptions } from './normalise-types.js';
+import * as MinMax from './normalise-minmax.js';
+import * as ZScore from './normalise-zscore.js';
+import * as Robust from './normalise-robust.js';
+export * as MinMax from './normalise-minmax.js';
+export * as ZScore from './normalise-zscore.js';
+export * as Robust from './normalise-robust.js';
 
 /**
- * A more advanced form of {@link stream}.
+ * Normalises numbers with additional context on the range.
  * 
- * With this version
- * @example
- * ```js
- * const s = Normalise.streamWithContext();
- * s.seen(2);    // 1 (because 2 is highest seen)
- * s.seen(1);    // 0 (because 1 is the lowest so far)
- * s.seen(1.5);  // 0.5 (50% of range 1-2)
- * s.seen(0.5);  // 0 (because it's the new lowest)
- * ```
+ * For more details, see:
+ * * {@link MinMax.streamWithContext}
  * 
- * And the more advanced features
- * ```js
- * s.min / s.max / s.range
- * s.reset();
- * s.reset(10, 100);
- * ```
- * @returns
+ * @param strategy 
+ * @param options 
+ * @returns 
  */
-export const streamWithContext = (minDefault?: number, maxDefault?: number): NormaliseStreamContext => {
-  let min = minDefault ?? Number.MAX_SAFE_INTEGER;
-  let max = maxDefault ?? Number.MIN_SAFE_INTEGER;
-
-  resultThrow(
-    numberTest(min),
-    numberTest(max)
-  );
-  return {
-    seen: (v: number): number => {
-      resultThrow(numberTest(v));
-      min = Math.min(min, v);
-      max = Math.max(max, v);
-      return scale(v, min, max);
-    },
-    reset: (minDefault?: number, maxDefault?: number) => {
-      min = minDefault ?? Number.MAX_SAFE_INTEGER;
-      max = maxDefault ?? Number.MIN_SAFE_INTEGER;
-    },
-    get min() {
-      return min;
-    },
-    get max() {
-      return max;
-    },
-    get range() {
-      return Math.abs(max - min);
-    }
+export const streamWithContext = (strategy: NormalisationStreamStrategy, options: Partial<NormalisationStreamOptions> = {}): NormaliseStreamContext => {
+  switch (strategy) {
+    case `minmax`:
+      return MinMax.streamWithContext(options as MinMaxStreamOptions);
+    default:
+      throw new Error(`Param 'strategy' has an unknown value: '${ strategy }'. Expected: minmax`);
   }
-};
+}
 
 /**
- * Normalises numbers, adjusting min/max as new values are processed. Return values will be in the range of 0-1 (inclusive).
+ * Normalises numbers. Return values will be in the range of 0-1 (inclusive).
  *
  * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
@@ -66,76 +34,67 @@ export const streamWithContext = (minDefault?: number, maxDefault?: number): Nor
  * 
  * @example
  * ```js
- * const s = Normalise.stream();
+ * const s = Normalise.stream(`minmax`);
  * s(2);    // 1 (because 2 is highest seen)
  * s(1);    // 0 (because 1 is the lowest so far)
  * s(1.5);  // 0.5 (50% of range 1-2)
  * s(0.5);  // 0 (because it's the new lowest)
  * ```
  *
- * Since normalisation is being adjusted as new min/max are encountered, it might
- * be that value normalised to 1 at one time is different to what normalises to 1
- * at a later time.
- *
- * If you already know what to expect of the number range, passing in `minDefault`
- * and `maxDefault` primes the normalisation.
- * ```js
- * const s = Normalise.stream();
- * s(5); // 1, because it's the highest seen
- *
- * // With priming:
- * const s = Normalise.stream(0, 10);
- * s(5); // 0.5, because we're expecting range 0-10
- * ```
- *
- * If a value exceeds the default range, normalisation adjusts.
- * Errors are thrown if min/max defaults are NaN or if one attempts to
- * normalise NaN.
+ * For more details, see:
+ * * {@link MinMax.stream}
  * @returns
  */
-export const stream = (minDefault?: number, maxDefault?: number): (value: number) => number => {
-  const c = streamWithContext(minDefault, maxDefault);
-  return c.seen;
+export const stream = (strategy: NormalisationStreamStrategy = `minmax`, options: Partial<NormalisationStreamOptions> = {}): (value: number) => number => {
+  switch (strategy) {
+    case `minmax`:
+      return MinMax.stream(options as MinMaxStreamOptions);
+    default:
+      throw new Error(`Param 'strategy' has an unknown value: '${ strategy }'. Expected: minmax`);
+  }
 }
 
 /**
- * Normalises an array.
+ * Normalise an array of values with added context, depending on strategy.
  * 
- * This version returns additional context of the normalisation, alternatively use {@link array}
+ * Strategies are available: minmax, zscore & robust
+ * 
+ * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
+ * Use {@link array} to get back the min/max/range and original values
+ * 
  * ```js
- * const c = arrayWithContext(someValues);
- * c.values;    // Array of normalised values
- * c.original;  // Original input array
- * c.min / c.max / c.range
+ * const { values, min, max, range } = Normalise.arrayWithContext(`minmax`, [5,1,0,9,10]);
+ * // values will be normalised output
  * ```
- * @param values Values
- * @param minForced If provided, this will be min value used
- * @param maxForced If provided, this will be the max value used
+ * 
+ * For more details, see:
+ * * {@link MinMax.array}
+ * * {@link ZScore.array}
+ * * {@link Robust.array}
+ * @param strategy 
+ * @param values 
+ * @param options 
+ * @returns 
  */
-export const arrayWithContext = (values: readonly number[],
-  minForced?: number,
-  maxForced?: number
+export const arrayWithContext = (strategy: NormalisationStrategy, values: readonly number[], options: Partial<NormalisationArrayOptions> = {}
 ) => {
-  if (!Array.isArray(values)) {
-    throw new TypeError(`Param 'values' should be an array. Got: ${ typeof values }`);
+  switch (strategy) {
+    case `minmax`:
+      return MinMax.arrayWithContext(values, options as MinMaxArrayOptions);
+    case `zscore`:
+      return ZScore.arrayWithContext(values, options as ZScoreArrayOptions);
+    case `robust`:
+      return Robust.arrayWithContext(values, options as RobustArrayOptions);
+    default:
+      throw new Error(`Param 'strategy' has an unknown value: '${ strategy }'. Expected: minmax|zscore`);
   }
-  const mma = numberArrayCompute(values);
-
-  const min = minForced ?? mma.min;
-  const max = maxForced ?? mma.max;
-
-  return {
-    values: values.map((v: number) => clamp(scale(v, min, max))),
-    original: values,
-    min, max,
-    range: Math.abs(max - min)
-  }
-};
+}
 
 /**
- * Normalises an array. By default uses the actual min/max of the array
- * as the normalisation range. 
+ * Normalise an array of values.
+ * 
+ * Strategies are available: minmax, zscore & robust
  * 
  * [ixfx Guide on Normalising](https://ixfx.fun/cleaning/normal/)
  *
@@ -143,27 +102,17 @@ export const arrayWithContext = (values: readonly number[],
  * 
  * ```js
  * // Yields: [0.5, 0.1, 0.0, 0.9, 1]
- * Normalise.array([5,1,0,9,10]);
+ * Normalise.array(`minmax`, [5,1,0,9,10]);
  * ```
- *
- * `minForced` and/or `maxForced` can
- * be provided to use an arbitrary range.
- * ```js
- * // Forced range 0-100
- * // Yields: [0.05, 0.01, 0.0, 0.09, 0.10]
- * Normalise.array([5,1,0,9,10], 0, 100);
- * ```
- *
- * Return values are clamped to always be 0-1, inclusive.
- *
- * @param values Values
- * @param minForced If provided, this will be min value used
- * @param maxForced If provided, this will be the max value used
+ * 
+ * For more details, see:
+ * * {@link MinMax.array}
+ * * {@link ZScore.array}
+ * * {@link Robust.array}
+ * @param strategy 
+ * @param values 
+ * @param options 
+ * @returns 
  */
-export const array = (values: readonly number[],
-  minForced?: number,
-  maxForced?: number
-) => {
-  const c = arrayWithContext(values, minForced, maxForced);
-  return c.values;
-}
+export const array = (strategy: NormalisationStrategy, values: readonly number[], options: Partial<NormalisationArrayOptions> = {}
+) => arrayWithContext(strategy, values, options).values;
