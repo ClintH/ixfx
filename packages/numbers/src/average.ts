@@ -58,7 +58,7 @@ export const mean = (array: number[] | readonly number[]) => array.reduce((accum
  * This is the same as:
  *
  * ```js
- * const data = [1,2,3];
+ * const data = [ 1, 2, 3 ];
  * const w = weight(data, Random.gaussian());
  * const avg = averageWeighted(data, w); // 2.0
  * ```
@@ -68,7 +68,7 @@ export const mean = (array: number[] | readonly number[]) => array.reduce((accum
  */
 export const averageWeighted = (
   data: number[] | readonly number[],
-  weightings: number[] | readonly number[] | ((value: number) => number)
+  weightings: number[] | readonly number[] | ((arrayIndex: number) => number)
 ): number => {
   if (typeof weightings === `function`) weightings = weight(data, weightings);
   const ww = zip(data, weightings);
@@ -78,3 +78,19 @@ export const averageWeighted = (
   );
   return totalV / totalW;
 };
+
+/**
+ * Returns a function that computes a weighted average of an array
+ * 
+ * ```js
+ * const w = averageWeigher(v => Math.random() * v);
+ * 
+ * // Give each array index a random
+ * w([1,2,3,4]);
+ * ```
+ * @param weigher 
+ * @returns 
+ */
+export const averageWeigher = (weigher: (arrayIndex: number) => number) => {
+  return (data: number[]): number => averageWeighted(data, weigher);
+}
