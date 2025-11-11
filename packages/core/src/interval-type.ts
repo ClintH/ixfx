@@ -8,6 +8,16 @@ import type { Interval } from './types.js';
 //   defaultNumber: number
 // ): number;
 
+/**
+ * Returns _true_ if `date` is an instance of Date
+ * @param date
+ * @returns 
+ */
+export function isDateObject(date: unknown): date is Date {
+  if (typeof date !== `object`) return false;
+  if (date instanceof Date) return true;
+  return false;
+}
 
 /**
  * Return the millisecond value of an Interval.
