@@ -106,9 +106,10 @@ export const arrayWithContext = (strategy: NormalisationStrategy, values: readon
  * ```
  * 
  * For more details, see:
- * * {@link MinMax.array}
- * * {@link ZScore.array}
- * * {@link Robust.array}
+ * * {@link MinMax.array} [Wikipedia](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization))
+ * * {@link ZScore.array} [Wikipedia](https://en.wikipedia.org/wiki/Feature_scaling#Standardization_(Z-score_Normalization))
+ * * {@link Robust.array} [Wikipedia](https://en.wikipedia.org/wiki/Feature_scaling#Robust_Scaling)
+ * 
  * @param strategy 
  * @param values 
  * @param options 
