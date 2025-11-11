@@ -282,11 +282,11 @@ test(`remove`, () => {
 });
 
 test(`remove-by-filter`, () => {
-  const index1 = [ 1, 2, 3 ];
-  expect(Arrays.removeByFilter(index1, v => v === 2)).toEqual([ [ 1, 3 ], 1 ]);
-  expect(Arrays.removeByFilter(index1, v => v > 1)).toEqual([ [ 3 ], 2 ]);
-  expect(Arrays.removeByFilter(index1, v => v > 10)).toEqual([ [ 1, 2, 3 ], 0 ]);
-  expect(index1).toEqual([ 1, 2, 3 ]);
+  const testData = [ 1, 2, 3 ];
+  expect(Arrays.removeByFilter(testData, v => v === 2)).toEqual([ [ 1, 3 ], 1 ]);
+  expect(Arrays.removeByFilter(testData, v => v > 1)).toEqual([ [ 1 ], 2 ]);
+  expect(Arrays.removeByFilter(testData, v => v > 10)).toEqual([ [ 1, 2, 3 ], 0 ]);
+  expect(testData).toEqual([ 1, 2, 3 ]);
 });
 
 test(`ensureLength`, () => {
