@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.19.0
+
+### Minor Changes
+
+- Normalising
+
 ## 1.18.0
 
 ### Minor Changes

@@ -55,18 +55,14 @@ test(`minmax-array`, () => {
 });
 
 test(`zscore-single`, () => {
-
   const raw = [ 0, 0, 2.49, 0, 1.83, 2.08, 1.15, 1.55, 2.64, 0, 1.3, 0, 1.12, 0, 1.66, 1.92, 0, 1.22, 1.9, 0, 1.45, 0, 1.6, 1.3, 1.58, 0, 3.33, 1.2, 1.66, 0, 2.03 ];
-  const expectedMean = 1.129354839;
-  const expectedStdDevelopment = 0.96212243;
-
   const expectedStandardize = [ -1.173816142, -1.173816142, 1.414212079, -1.173816142, 0.728228695, 0.988070886, 0.021457936, 0.437205441, 1.570117393, -1.173816142, 0.17736325, -1.173816142, -0.009723127, -1.173816142, 0.551536005, 0.821771884, -1.173816142, 0.094213749, 0.800984508, -1.173816142, 0.333268565, -1.173816142, 0.489173879, 0.17736325, 0.468386504, -1.173816142, 2.28728184, 0.073426374, 0.551536005, -1.173816142, 0.936102447 ];
 
   const calcMean = mean(raw);
   const calcStdDevelopment = standardDeviation(raw);
-
+  const fn = N.ZScore.compute(calcMean, calcStdDevelopment);
   for (let index = 0; index < raw.length; index++) {
-    const c = N.ZScore.single(raw[ index ], calcMean, calcStdDevelopment);
+    const c = fn(raw[ index ]);
     expect(c.toPrecision(7)).toEqual(expectedStandardize[ index ].toPrecision(7));
   }
 })

@@ -1,5 +1,14 @@
 # @ixfxfun/modulation
 
+## 0.52.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/numbers@0.52.0
+  - @ixfx/flow@0.47.2
+  - @ixfx/geometry@0.56.2
+
 ## 0.52.1
 
 ### Patch Changes

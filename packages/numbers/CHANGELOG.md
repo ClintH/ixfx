@@ -1,5 +1,11 @@
 # @ixfxfun/numbers
 
+## 0.52.0
+
+### Minor Changes
+
+- Normalising
+
 ## 0.51.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
 	"name": "@ixfx/ui",
-	"version": "0.50.1",
+	"version": "0.50.2",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,

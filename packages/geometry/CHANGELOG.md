@@ -1,5 +1,13 @@
 # @ixfxfun/geometry
 
+## 0.56.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/numbers@0.52.0
+  - @ixfx/trackers@0.46.2
+
 ## 0.56.1
 
 ### Patch Changes
