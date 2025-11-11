@@ -1,5 +1,11 @@
 # @ixfxfun/guards
 
+## 0.45.0
+
+### Minor Changes
+
+- 4fc03ce: Numbers statistics
+
 ## 0.44.0
 
 ### Minor Changes

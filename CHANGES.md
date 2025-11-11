@@ -1,5 +1,7 @@
 A rough changelog between NPM releases
 
+# 1.18.0
+
 2025.11.11
 
 + Core.isDateObject

@@ -1,5 +1,16 @@
 # @ixfx/arrays
 
+## 0.53.0
+
+### Minor Changes
+
+- 4fc03ce: Numbers statistics
+
+### Patch Changes
+
+- Updated dependencies [4fc03ce]
+  - @ixfx/guards@0.45.0
+
 ## 0.52.0
 
 ### Minor Changes

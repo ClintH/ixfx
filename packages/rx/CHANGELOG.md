@@ -1,5 +1,19 @@
 # @ixfxfun/rx
 
+## 0.49.1
+
+### Patch Changes
+
+- Updated dependencies [4fc03ce]
+  - @ixfx/arrays@0.53.0
+  - @ixfx/guards@0.45.0
+  - @ixfx/core@0.51.0
+  - @ixfx/dom@0.50.1
+  - @ixfx/flow@0.47.1
+  - @ixfx/iterables@0.47.1
+  - @ixfx/modulation@0.52.1
+  - @ixfx/collections@0.51.1
+
 ## 0.49.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.18.0
+
+### Minor Changes
+
+- 4fc03ce: Numbers statistics
+
 ## 1.17.0
 
 ### Minor Changes

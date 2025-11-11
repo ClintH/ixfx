@@ -1,6 +1,6 @@
 {
 	"name": "ixfx",
-	"version": "1.17.0",
+	"version": "1.18.0",
 	"license": "MIT",
 	"type": "module",
 	"sideEffects": false,

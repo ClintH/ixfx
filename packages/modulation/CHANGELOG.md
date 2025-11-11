@@ -1,5 +1,18 @@
 # @ixfxfun/modulation
 
+## 0.52.1
+
+### Patch Changes
+
+- Updated dependencies [4fc03ce]
+  - @ixfx/numbers@0.51.0
+  - @ixfx/arrays@0.53.0
+  - @ixfx/guards@0.45.0
+  - @ixfx/core@0.51.0
+  - @ixfx/flow@0.47.1
+  - @ixfx/geometry@0.56.1
+  - @ixfx/random@0.46.1
+
 ## 0.52.0
 
 ### Minor Changes
