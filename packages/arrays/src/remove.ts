@@ -50,6 +50,5 @@ export const removeByFilter = <T>(input: T[], predicate: (value: T) => boolean):
 
   const count = input.length;
   const changed = input.filter(v => !predicate(v));
-  const newCount = input.length;
-  return [ changed, newCount - count ];
+  return [ changed, count - changed.length ];
 }
