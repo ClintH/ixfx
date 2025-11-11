@@ -7,13 +7,21 @@ import { interquartileRange } from "./iqr.js";
 /**
  * Calculates 'robus scaling' of a single value, `x`, based on provided mean and standard deviation.
  * 
+ * ```js
+ * const m = median(someData);
+ * const i = interquartileRange(someData);
+ * const fn = compute(m, i);
+ * 
+ * // Use normaliser function
+ * fn(10);
+ * ```
  * If you want to calculate for a whole array, use {@link array}.
  * @param x Value to normalise
  * @param mean Mean of data
  * @param standardDeviation Standard deviation of data
  * @returns 
  */
-export const single = (value: number, median: number, iqr: number) => (value - median) / iqr;
+export const compute = (median: number, iqr: number) => (value: number) => (value - median) / iqr;
 
 /**
  * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
@@ -27,10 +35,12 @@ export const single = (value: number, median: number, iqr: number) => (value - m
 export const arrayWithContext = (array: readonly number[] | number[], options: Partial<RobustArrayOptions> = {}) => {
   const m = options.medianForced ?? median(array);
   const iqr = options.iqrForced ?? interquartileRange(array as number[]);
-  const values = array.map(value => single(value as number, m, iqr));
+  const fn = compute(m, iqr);
+  const values = array.map(fn);
   return {
     median: m,
-    iqr, values
+    iqr, values,
+    original: array
   }
 };
 

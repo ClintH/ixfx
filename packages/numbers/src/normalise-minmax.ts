@@ -48,6 +48,16 @@ export const stream = (options: MinMaxStreamOptions): (value: number) => number 
   return c.seen;
 }
 
+export const compute = (min: number, max: number, clamp: boolean) => {
+  const range = max - min;
+  return (value: number) => {
+    const v = (value - min) / range;
+    if (clamp && v < min) return min;
+    if (clamp && v > max) return max;
+    return v;
+  }
+}
+
 /**
  * Normalises an array.
  * 
@@ -71,9 +81,10 @@ export const arrayWithContext = (values: readonly number[], options: Partial<Min
 
   const minForced = options.minForced ?? c.min;
   const maxForced = options.maxForced ?? c.max;
+  const fn = compute(minForced, maxForced - minForced, true);
 
   return {
-    values: values.map((v: number) => clamp(scale(v, minForced, maxForced))),
+    values: values.map(fn),
     original: values,
     min: minForced, max: maxForced,
     range: Math.abs(maxForced - minForced)

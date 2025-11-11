@@ -4,7 +4,24 @@ import type { NormaliseStreamContext, ZScoreArrayOptions } from "./normalise-typ
 import { standardDeviation } from "./standard-deviation.js";
 
 /**
- * Calculates 'z score' of a single value, `x`, based on provided mean and standard deviation.
+ * Returns a function that computes zscore-based normalisation.
+ * 
+ * ```js
+ * // Calculate necessary components
+ * const m = mean(data);
+ * const s = standardDeviation(data);
+ * 
+ * // Get the function
+ * const fn = compute(m, s);
+ * 
+ * // Use it
+ * fn(10); // Yields the normalised value
+ * ```
+ * 
+ * It can be used to normalise a whole array
+ * ```js
+ * const normalised = someData.map(fn);
+ * ```
  * 
  * If you want to calculate for a whole array, use {@link array}.
  * @param x Value to normalise
@@ -12,7 +29,7 @@ import { standardDeviation } from "./standard-deviation.js";
  * @param standardDeviation Standard deviation of data
  * @returns 
  */
-export const single = (x: number, mean: number, standardDeviation: number) => (x - mean) / standardDeviation;
+export const compute = (mean: number, standardDeviation: number) => (value: number) => (value - mean) / standardDeviation;
 
 /**
  * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
@@ -26,11 +43,13 @@ export const single = (x: number, mean: number, standardDeviation: number) => (x
 export const arrayWithContext = (array: readonly number[] | number[], options: Partial<ZScoreArrayOptions> = {}) => {
   const m = options.meanForced ?? mean(array);
   const s = options.standardDeviationForced ?? standardDeviation(array as number[]);
-  const results = array.map(x => single(x as number, m, s));
+  const fn = compute(m, s);
+  const results = array.map(fn);
   return {
     mean: m,
     standardDeviation: s,
-    values: results
+    values: results,
+    original: array
   }
 };
 
