@@ -4,8 +4,17 @@ import type { NumericRange } from "./types.js";
  * Normalisation strategies
  * 
  * In brief,
- * * minmax: Produces values on 0..1 scale. Sensitive to outliers
- * * zscore: Mean value will be normalised to 0, those on standard deviation 1. Less sensitive to outliers
+ * * `minmax`: Produces values on 0..1 scale. Sensitive to outliers.
+ * * ``score`: Mean value will be normalised to 0, those on standard deviation 1. Less sensitive to outliers.
+ * * `robust`: Does the best job if outliers are expected
+ * 
+ * Keep in mind you could also remove outliers from the dataset before using a
+ * basic min-max normalisation.
+ * 
+ * For more details, see Wikipedia:
+ * * [Min-Max normalisation](https://en.wikipedia.org/wiki/Feature_scaling#Rescaling_(min-max_normalization))
+ * * [Z-score normalisation](https://en.wikipedia.org/wiki/Feature_scaling#Standardization_(Z-score_Normalization))
+ * * [Robust scaling]](https://en.wikipedia.org/wiki/Feature_scaling#Robust_Scaling)
  */
 export type NormalisationStrategy = `minmax` | `zscore` | `robust`;
 export type NormalisationStreamStrategy = `minmax`;
@@ -15,9 +24,22 @@ export type MinMaxStreamOptions = {
   maxDefault: number
 }
 
+/**
+ * Options for computing min-max normalisation
+ */
 export type MinMaxArrayOptions = {
+  /**
+   * Minimum value of range
+   */
   minForced: number
+  /**
+   * Maximum value of range
+   */
   maxForced: number
+  /**
+   * Clamp input value to min/max
+   */
+  clamp: boolean
 }
 
 export type ZScoreArrayOptions = {
