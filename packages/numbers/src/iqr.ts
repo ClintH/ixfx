@@ -51,15 +51,16 @@ export const interquartileRange = (data: number[], n?: number) => {
  * 
  * Outliers are defined as: "a point which falls more than 1.5 times the interquartile range above the third quartile or below the first quartile." [Wolfram](https://mathworld.wolfram.com/Outlier.html)
  * 
+ * If array length is less than 4, no value will be considered an outlier.
  * @param data Data to filter
  * @param multiplier Multiplier of Q3 Q1. Default: 1.5 
  * @returns 
  */
 export const computeIsOutlier = (data: number[], multiplier = 1.5) => {
   //https://stackoverflow.com/questions/20811131/javascript-remove-outlier-from-an-array
-  if (data.length < 4) return data;
+  if (data.length < 4) return (value: number) => false //data;
 
-  const values = data.slice().sort((a, b) => a - b); // copy array fast and sort
+  const values = data.toSorted((a, b) => a - b); // copy array fast and sort
 
   const q1 = getQuantile(values, 0.25, true);
   const q3 = getQuantile(values, 0.75, true);
@@ -68,7 +69,7 @@ export const computeIsOutlier = (data: number[], multiplier = 1.5) => {
   const maxValue = q3 + iqr * multiplier;
   const minValue = q1 - iqr * multiplier;
 
-  return (value) => (value < minValue) && (value > maxValue);
+  return (value: number) => (value < minValue) || (value > maxValue);
 }
 
 /**
