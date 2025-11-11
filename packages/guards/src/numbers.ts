@@ -302,3 +302,25 @@ export const numberInclusiveRangeTest = (value: number | undefined, min: number,
 //   if (r[ 0 ]) return;
 //   throw new Error(r[ 1 ]);
 // }
+
+/**
+ * Returns a success if values are equal, considering the set digits of precision (1..21)
+ * 
+ * @param expected Expected value
+ * @param got Received value
+ * @param precision Precision in terms of decimal digits. 1...21, default 21
+ * @param parameterName 
+ * @returns 
+ */
+export const equalWithPrecisionTest = (expected: number, got: number, precision = 21, parameterName = `?`): Result<number, string> => {
+  const expectedString = expected.toPrecision(precision);
+  const gotString = got.toPrecision(precision);
+  const v = expectedString === gotString;
+  if (v) {
+    return { success: true, value: got }
+  } else {
+    return {
+      success: false, error: `Param '${ parameterName }' is '${ got }', expected '${ expected }' (using precision: ${ precision })`
+    }
+  }
+}
