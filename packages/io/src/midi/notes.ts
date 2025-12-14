@@ -127,7 +127,7 @@ const notesRaw = `0	C-1	8.176
 126	F#9	11839.820
 127	G9	12543.850`
 
-type ParsedNote = [ noteNumber: number, name: string, frequency: number ]
+export type ParsedNote = [ noteNumber: number, name: string, frequency: number ]
 const notesParsed: ParsedNote[] = []
 
 export const getParsedNotes = () => {
