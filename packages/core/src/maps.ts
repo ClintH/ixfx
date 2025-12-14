@@ -526,7 +526,7 @@ export const addObjectEntriesMutate = <V>(map: Map<string, V>, data: object) => 
  * To get an entry see {@link findEntryByPredicate}
  *
  * Use {@link some} if you don't care about the value, just whether it appears.
- * Use {@link filterValue} to get all value(s) that match `predicate`.
+ * Use {@link filterValues} to get all value(s) that match `predicate`.
  *
  * @example First person over thirty
  * ```js
