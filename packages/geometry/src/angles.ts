@@ -1,5 +1,6 @@
 import { piPi } from './pi.js';
 import type { Point } from './point/point-type.js';
+import { average as pointAverage, type PointAverageKinds } from './point/averager.js'
 /**
  * Convert angle in degrees to angle in radians.
  * @param angleInDegrees 
@@ -217,19 +218,18 @@ export const radianArc = (start: number, end: number, clockwise = true) => {
  */
 export const degreeArc = (start: number, end: number, clockwise = true) => radianToDegree(radianArc(degreeToRadian(start), degreeToRadian(end), clockwise));
 
-
 export type Angle = {
   value: number
   unit: `deg` | `rad` | `turn` | `grad`
 }
 
 /**
- * Parses CSS-style angle strings. By default assumes degrees.
+ * Parses CSS-style angle strings into an 'Angle' type. By default assumes degrees.
  * 
  * ```js
  * angleParse(`100`);     // { value: 100, unit: `deg` }
  * angleParse(100);       // { value: 100, unit: `deg` }
- * angleParse(`100deg`);   // { value: 100, unit: `deg` }
+ * angleParse(`100deg`);  // { value: 100, unit: `deg` }
  * 
  * // More exotic units:
  * angleParse(`100rad`);  // { value: 100, unit: `rad` }
@@ -243,7 +243,7 @@ export type Angle = {
  * @returns 
  */
 export const angleParse = (value: string | number | Angle): Angle => {
-  if (isAngle(value)) return value;
+  if (isAngleType(value)) return value;
 
   if (typeof value === `number`) {
     return {
@@ -277,7 +277,7 @@ export const angleParse = (value: string | number | Angle): Angle => {
   }
 }
 
-const isAngle = (v: any): v is Angle => {
+export const isAngleType = (v: any): v is Angle => {
   if (typeof v !== `object`) return false;
   if (`unit` in v && `value` in v) {
     if (typeof v.unit !== `string`) return false;
@@ -285,6 +285,25 @@ const isAngle = (v: any): v is Angle => {
     return true;
   }
   return false;
+}
+
+/**
+ * Converts some angle representation to a simple numeric radian angle.
+ * 
+ * ```js
+ * toRadian(90); // 90deg
+ * toRadian(`90`); // 90deg
+ * toRadian(`1.2rad`)
+ * toRadian(`90deg`)
+ * ```
+ * 
+ * Unitless values provided as a number or string are assumed to be degrees.
+ * @param angleOrDegrees 
+ * @returns 
+ */
+export const toRadian = (angleOrDegrees: Angle | number | string): number => {
+  if (typeof angleOrDegrees === `number`) return angleOrDegrees;
+  return angleConvert(angleOrDegrees, `rad`).value
 }
 
 /**
@@ -342,6 +361,56 @@ export const angleConvert = (angleOrDegrees: Angle | number | string, destinatio
 }
 
 /**
+ * Compute [unit vector](https://en.wikipedia.org/wiki/Unit_vector) of an angle. The unit vector is essentially the direction of an angle.
+ * 
+ * ```js
+ * unitVector(90); // 90 deg
+ * unitVector(`1.2rad`); // 1.2 in radians
+ * ```
+ * 
+ * The coordinate space is -1..1:
+ * ```
+ *    y 1
+ *      |
+ *      |
+ * -1 --+--- 1 x
+ *      |
+ *      |
+ *     -1
+ * ```
+ * 
+ * See {@link fromUnitVector} to convert back to an angle
+ * @param angle Angle specified in degrees, or an angle with units 
+ */
+export const toUnitVector = (angleOrDegrees: Angle | string | number) => {
+  const radians = toRadian(angleOrDegrees);
+  return {
+    x: Math.cos(radians),
+    y: Math.sin(radians)
+  }
+}
+
+/**
+ * Convert from a [unit vector](https://en.wikipedia.org/wiki/Unit_vector) to an angle,
+ * by default radians.
+ * 
+ * ```js
+ * fromUnitVector({ x: 1, y: 0.5 });          // { unit: `rad`, value: ... }
+ * fromUnitVector({ x: -0.2, y: 0.4 }, `deg`) // { unit: `deg`, value ... } 
+ * ```
+ * @param vector 
+ * @param unit 
+ * @returns 
+ */
+export const fromUnitVector = (vector: Point, unit: Angle[ `unit` ] = `rad`): Angle => {
+  const r = Math.atan2(vector.x, vector.y);
+  if (unit === `rad`) return {
+    unit: `rad`, value: r
+  }
+  return angleConvert(r, unit);
+}
+
+/**
  * Converts 'turns' to degrees. By defaults wraps the value, so 
  * turn value of 1 or 2 equal 0deg instead of 360 or 720deg.
  * @param turns 
@@ -351,6 +420,18 @@ export const angleConvert = (angleOrDegrees: Angle | number | string, destinatio
 export const turnToDegree = (turns: number, wrap = true) => {
   if (wrap) return (turns * 360) % 360;
   return turns * 360;
+}
+
+/**
+ * Calculates the average of angles
+ * @param angles 
+ * @returns 
+ */
+export const average = (angles: (Angle | string | number)[], kind: PointAverageKinds = `mean`): Angle => {
+  const anglesProper = angles.map(a => angleParse(a));
+  const vectors = anglesProper.map(a => toUnitVector(a));
+  const avg = pointAverage(vectors);
+  return fromUnitVector(avg, anglesProper[ 0 ].unit);
 }
 
 export const turnToRadian = (turns: number) => turns * piPi;
