@@ -24,7 +24,6 @@ import { standardDeviation } from "./standard-deviation.js";
  * ```
  * 
  * If you want to calculate for a whole array, use {@link array}.
- * @param x Value to normalise
  * @param mean Mean of data
  * @param standardDeviation Standard deviation of data
  * @returns 
@@ -33,7 +32,7 @@ export const compute = (mean: number, standardDeviation: number) => (value: numb
 
 /**
  * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
- * If you just want the computed results, use {@link array}.
+ * If you just want the computed results, use {@link Normalise.ZScore.array}.
  * 
  * By default it will compute mean and std.dev based on `array`. If you have these already, they
  * can be passed as options.

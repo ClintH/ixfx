@@ -74,8 +74,7 @@ export const movingAverageLight = (scaling = 3): (value?: number) => number => {
  * ```
  *
  * Because it keeps track of `samples` previous data, there is a memory impact. A lighter version is {@link movingAverageLight} which does not keep a buffer of prior data, but can't be as easily fine-tuned.
- * @param samples Number of samples to compute average from
- * @param weighter Optional weighting function
+ * @param samplesOrOptions Number of samples to compute average from, or object of options
  * @returns
  */
 export const movingAverage = (samplesOrOptions: number | MovingAverageOptions) => movingAverageWithContext(samplesOrOptions).seen;

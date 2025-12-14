@@ -17,6 +17,7 @@ import type { NumericRange } from "./types.js";
  * * [Robust scaling]](https://en.wikipedia.org/wiki/Feature_scaling#Robust_Scaling)
  */
 export type NormalisationStrategy = `minmax` | `zscore` | `robust`;
+
 export type NormalisationStreamStrategy = `minmax`;
 
 export type MinMaxStreamOptions = {
@@ -56,6 +57,9 @@ export type RobustArrayOptions = {
 export type NormalisationStreamOptions = MinMaxStreamOptions;
 export type NormalisationArrayOptions = MinMaxArrayOptions | ZScoreArrayOptions | RobustArrayOptions;
 
+/**
+ * Context for stream normalisation
+ */
 export type NormaliseStreamContext = NumericRange & {
   /**
    * Passes a value to the normaliser, getting

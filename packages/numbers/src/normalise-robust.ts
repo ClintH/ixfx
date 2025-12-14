@@ -1,11 +1,9 @@
-import { numberTest, resultThrow } from "@ixfx/guards";
-import { mean, median } from "./average.js";
-import type { NormaliseStreamContext, RobustArrayOptions, ZScoreArrayOptions } from "./normalise-types.js";
-import { standardDeviation } from "./standard-deviation.js";
+import { median } from "./average.js";
+import type { RobustArrayOptions } from "./normalise-types.js";
 import { interquartileRange } from "./iqr.js";
 
 /**
- * Calculates 'robus scaling' of a single value, `x`, based on provided mean and standard deviation.
+ * Calculates 'robust scaling' of a single value, `x`, based on provided mean and standard deviation.
  * 
  * ```js
  * const m = median(someData);
@@ -16,16 +14,15 @@ import { interquartileRange } from "./iqr.js";
  * fn(10);
  * ```
  * If you want to calculate for a whole array, use {@link array}.
- * @param x Value to normalise
- * @param mean Mean of data
- * @param standardDeviation Standard deviation of data
+ * @param median Median of data
+ * @param iqr Interquartile range of data
  * @returns 
  */
 export const compute = (median: number, iqr: number) => (value: number) => (value - median) / iqr;
 
 /**
  * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
- * If you just want the computed results, use {@link array}.
+ * If you just want the computed results, use {@link Normalise.Robust.array}.
  * 
  * By default it will compute mean and std.dev based on `array`. If you have these already, they
  * can be passed as options.
@@ -33,8 +30,9 @@ export const compute = (median: number, iqr: number) => (value: number) => (valu
  * @returns 
  */
 export const arrayWithContext = (array: readonly number[] | number[], options: Partial<RobustArrayOptions> = {}) => {
+  if (!Array.isArray(array)) throw new TypeError(`Param 'array' is expected to be an array. Got: ${ typeof array }`);
   const m = options.medianForced ?? median(array);
-  const iqr = options.iqrForced ?? interquartileRange(array as number[]);
+  const iqr = options.iqrForced ?? interquartileRange(array);
   const fn = compute(m, iqr);
   const values = array.map(fn);
   return {

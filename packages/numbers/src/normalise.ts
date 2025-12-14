@@ -5,7 +5,7 @@ import * as Robust from './normalise-robust.js';
 export * as MinMax from './normalise-minmax.js';
 export * as ZScore from './normalise-zscore.js';
 export * as Robust from './normalise-robust.js';
-
+export type * from './normalise-types.js';
 /**
  * Normalises numbers with additional context on the range.
  * 
