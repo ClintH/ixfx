@@ -1,5 +1,13 @@
 # @ixfxfun/collections
 
+## 0.51.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/arrays@0.54.0
+  - @ixfx/iterables@0.47.3
+
 ## 0.51.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @ixfxfun/numbers
 
+## 0.53.0
+
+### Minor Changes
+
+- Numbers
+
+### Patch Changes
+
+- Updated dependencies
+  - @ixfx/arrays@0.54.0
+
 ## 0.52.0
 
 ### Minor Changes

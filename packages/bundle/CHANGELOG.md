@@ -1,5 +1,11 @@
 # @ixfx/bundle
 
+## 1.20.0
+
+### Minor Changes
+
+- Numbers
+
 ## 1.19.0
 
 ### Minor Changes
