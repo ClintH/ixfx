@@ -3,8 +3,41 @@ import { isPoint3d } from "./guard.js";
 import type { Point } from "./point-type.js";
 
 export type PointAverager = (point: Point) => Point;
-export type PointAverageKinds = `moving-average-light`;
+export type PointAveragerKinds = `moving-average-light`;
+export type PointAverageKinds = `mean`
 
+/**
+ * Averages a set of points, by default as a 'mean'.
+ * 
+ * List of points has to all have Z property or none of them -- it's not
+ * possible to mix 2D and 3D points.
+ * @param points 
+ * @returns 
+ */
+export const average = (points: Iterable<Point>, kind: PointAverageKinds = `mean`): Point => {
+  let xSum = 0;
+  let ySum = 0;
+  let zSum = Number.NaN;
+  let total = 0;
+  if (kind !== `mean`) throw new Error(`Unknown averaging kind: '${ kind }' expected: 'mean'`)
+  for (const p of points) {
+    xSum += p.x;
+    ySum += p.y;
+    if (`z` in p && p.z !== undefined) {
+      zSum += p.z
+    } else if (Number.isNaN(zSum)) {
+      throw new Error(`List of points should all have Z property, or none`);
+    }
+    total++
+  }
+  xSum /= total
+  ySum /= total
+  if (Number.isNaN(zSum)) {
+    return { x: xSum, y: ySum }
+  } else {
+    return { x: xSum, y: ySum, z: zSum / total }
+  }
+}
 
 /**
  * Keeps track of average x, y and z values.
@@ -28,7 +61,7 @@ export type PointAverageKinds = `moving-average-light`;
  */
 export function averager(kind: `moving-average-light`, opts: Partial<{ scaling: number }>): PointAverager;
 
-export function averager(kind: PointAverageKinds, opts: Partial<{ scaling: number }> = {}): PointAverager {
+export function averager(kind: PointAveragerKinds, opts: Partial<{ scaling: number }> = {}): PointAverager {
   let x: (v: number) => number;
   let y: (v: number) => number;
   let z: (v: number) => number;
