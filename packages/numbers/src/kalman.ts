@@ -30,15 +30,14 @@ export type Kalman1dFilterOptions = {
 
 /**
 * KalmanFilter
-* @class
-* @author Wouter Bulten
-* @see {@link http://github.com/wouterbulten/kalmanjs}
-* @version Version: 1.0.0-beta
-* @copyright Copyright 2015-2018 Wouter Bulten
-* @license MIT License
-* @preserve
+* 
+* author: Wouter Bulten
+* see {@link http://github.com/wouterbulten/kalmanjs}
+* version Version: 1.0.0-beta
+* copyright Copyright 2015-2018 Wouter Bulten
+* license MIT License
 */
-export default class Kalman1dFilter {
+export class Kalman1dFilter {
   R: number
   Q: number
   A: number
