@@ -42,11 +42,10 @@ export function distance(
 }
 
 /**
- * As {@distance} but always compares by x,y only.
+ * As {@link distance} but always compares by x,y only.
  * @param a
  * @param xOrB 
- * @param y 
- * @param z 
+ * @param y
  * @returns 
  */
 export function distance2d(

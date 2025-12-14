@@ -154,8 +154,6 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
    * Tracks a point, returning data on its relation to the
    * initial point and the last received point.
    * 
-   * Use {@link seenEvent} to track a raw `PointerEvent`.
-   * 
    * @param _p Point
    */
   computeResults(
