@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect } from 'vitest';
-import { immutable, fromScalar, clamp, towardZero, scale, toScalar } from '../src/bipolar.js';
+import { immutable, fromScalar, clamp, towardZero, scale, toScalar, scaleUnclamped } from '../src/bipolar.js';
 
-test('bipolar', () => {
+test('immutable', () => {
   const b = immutable(1);
 
   expect(+b + 10).toBe(11);
@@ -14,9 +14,31 @@ test('bipolar', () => {
   expect(immutable(0).asScalar()).toBe(0.5);
   expect(immutable(1).asScalar()).toBe(1);
 
+  expect(immutable(0).interpolate(0.5, 1).value).toBe(0.5);
+  expect(immutable(0.5).towardZero(0.1).value).toBe(0.4);
+  expect(() => immutable(1.1)).toThrow();
+  expect(() => immutable(-1.1)).toThrow();
+  expect(() => immutable(Number.NaN)).toThrow();
+  // @ts-expect-error
+  expect(() => immutable(null)).toThrow();
+
+
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-base-to-string
+  expect('' + immutable(1)).toBe(`1`);
+  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+  expect(1 + immutable(1)).toBe(2);
+
 });
 
-test(`bipolarToScalar`, () => {
+test('scaleUnclamped', () => {
+  expect(scaleUnclamped(100, 0, 100)).toBe(1);
+  expect(scaleUnclamped(50, 0, 100)).toBe(0);
+  expect(scaleUnclamped(0, 0, 100)).toBe(-1);
+
+});
+
+test(`toScalar`, () => {
   expect(toScalar(-1)).toBe(0);
   expect(toScalar(0)).toBe(0.5);
   expect(toScalar(1)).toBe(1);
@@ -29,14 +51,25 @@ test(`bipolarToScalar`, () => {
   expect(toScalar(0, 100, 50)).toBe(75);
   expect(toScalar(1, 100, 50)).toBe(100);
 
+  // @ts-expect-error
+  expect(() => toScalar(null)).toThrow();
+  expect(() => toScalar(Number.NaN)).toThrow();
+
 });
 
-test(`bipolarTowardsZero`, () => {
+test(`towardZero`, () => {
   expect(towardZero(-1, 0.1)).toBe(-0.9);
   expect(towardZero(1, 0.1)).toBe(0.9);
   expect(towardZero(0, 0.1)).toBe(0);
   expect(towardZero(0.9, 10)).toBe(0);
   expect(towardZero(-0.9, 10)).toBe(0);
+
+  // @ts-expect-error
+  expect(() => towardZero(null)).toThrow();
+  // @ts-expect-error
+  expect(() => towardZero(-1, null)).toThrow();
+  expect(() => towardZero(-1, -0.1)).toThrow();
+
 });
 
 test(`clamp`, () => {
@@ -54,7 +87,7 @@ test(`clamp`, () => {
 
 });
 
-test(`scalarToBipolar`, () => {
+test(`fromScalar`, () => {
   expect(fromScalar(1)).toBe(1);
   expect(fromScalar(0)).toBe(-1);
   expect(fromScalar(0.5)).toBe(0);

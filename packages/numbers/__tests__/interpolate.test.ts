@@ -25,6 +25,9 @@ test(`basic`, () => {
   // @ts-expect-error
   expect(() => interpolate(false)).toThrow();
 
+  // @ts-expect-error
+  expect(() => interpolate(10, { transform: null })(10, 20)).toThrow();
+
 });
 
 // test(`angle`, () => {

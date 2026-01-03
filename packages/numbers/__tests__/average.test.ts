@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expect, describe, test } from 'vitest';
 import * as N from '../src/index.js';
 
@@ -12,9 +13,16 @@ test(`average`, () => {
   expect(N.average(c)).toBe(0);
 
   const d = [ 1, 0, null, undefined, NaN ];
-  // @ts-ignore
+  // @ts-expect-error
   expect(N.average(d)).toBe(0.5);
 
-  const e = [ 1, 1.4, 0.9, 0.1 ];
-  expect(N.average(e)).toBe(0.85);
+  expect(N.average([ 1, 1.4, 0.9, 0.1 ])).toBe(0.85);
+
+  // @ts-expect-error
+  expect(() => N.average(false)).toThrow();
+  // @ts-expect-error
+  expect(() => N.average(2)).toThrow();
+  // @ts-expect-error
+  expect(() => N.average({})).toThrow();
+
 });

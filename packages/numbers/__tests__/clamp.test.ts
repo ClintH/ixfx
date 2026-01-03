@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { clamp, clampIndex, clamper } from '../src/clamp.js';
+import { clamp, clampIndex, clamper, maxAbs } from '../src/clamp.js';
 
 test(`clamp-inclusivity`, () => {
   expect(clamp(0, 0, 1)).toBe(0);
@@ -23,11 +23,13 @@ test(`clamp-range`, () => {
   expect(() => clamp(10, 0, NaN)).toThrow();
 });
 
-test(`clamp-zero-bounds`, () => {
+test(`clampIndex`, () => {
   expect(clampIndex(0, 5)).toBe(0);
   expect(clampIndex(4, 5)).toBe(4);
   expect(clampIndex(5, 5)).toBe(4);
   expect(clampIndex(-5, 5)).toBe(0);
+
+  expect(clampIndex(3, [ 1, 2, 3, 4, 5 ])).toBe(3);
 
   // test throwing for non-ints
   expect(() => clampIndex(0, 5.5)).toThrow();
@@ -41,5 +43,15 @@ test(`clamper`, () => {
   expect(c(50)).toBe(50);
   expect(c(-50)).toBe(0);
   expect(c(101)).toBe(100);
+
+  expect(() => clamper(Number.NaN, 1)).toThrow();
+  expect(() => clamper(1, Number.NaN)).toThrow();
+
+});
+
+test(`maxAbs`, () => {
+  expect(maxAbs(1, 5)).toBe(5);
+  expect(maxAbs(-10, 5)).toBe(-10);
+  expect(maxAbs([ -10, 5 ])).toBe(-10);
 
 })

@@ -33,7 +33,12 @@ test(`start-at`, async () => {
   const s3Results = await Array.fromAsync(s3x);
   const s3a = Arrays.isEqual(s3Results, [ 0.7, 0.9, 0.1, 0.3, 0.5, 0.7, 0.9, 0.1, 0.3, 0.5 ]);
   const s3b = Arrays.isEqual(s3Results, [ 0.7, 0.9, 0.1, 0.2, 0.4, 0.6, 0.8, 0, 0.2, 0.4 ]);
-  const s3Something = s3a || s3b;
+  const s3c = Arrays.isEqual(s3Results, [
+    0.6, 0.9, 0.1, 0.2,
+    0.4, 0.6, 0.8, 0,
+    0.2, 0.4
+  ]);
+  const s3Something = s3a || s3b || s3c;
   if (!s3Something) {
     console.log(`s3`, s3Results);
   }
