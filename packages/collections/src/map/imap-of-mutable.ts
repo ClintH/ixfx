@@ -4,6 +4,9 @@ import { type IMapOf } from './imap-of.js';
 export interface IMapOfMutable<V> extends IMapOf<V> {
   /**
    * Adds several `values` under the same `key`. Duplicate values are permitted, depending on implementation.
+   * ```js
+   * addKeyedValues('colours', 'red', 'green', 'blue')
+   * ```
    * @param key
    * @param values
    */
