@@ -429,7 +429,7 @@ export function* filterValues<V>(
  * @param map
  * @returns
  */
-export const toArray = <V>(map: ReadonlyMap<string, V>): readonly V[] =>
+export const toArray = <V>(map: ReadonlyMap<string, V>): V[] =>
   [ ...map.values() ];
 
 
