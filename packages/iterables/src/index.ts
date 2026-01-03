@@ -18,7 +18,7 @@ import { isAsyncIterable } from './guard.js';
 // import type { Interval } from '../flow/IntervalType.js';
 
 import { toStringDefault } from '@ixfx/core';
-import type { Interval } from '@ixfx/core';
+import type { Interval, IsEqual } from '@ixfx/core';
 
 //import type { GenFactoryNoInput } from './chain/Types.js';
 import type { ForEachOptions, ToArrayOptions, IteratorControllerOptions, IteratorControllerState } from './types.js';
@@ -487,21 +487,22 @@ export function every<V>(it: Iterable<V> | V[] | AsyncIterable<V>, f: (v: V) => 
   return isAsyncIterable(it) ? Async.every(it, f) : Sync.every(it, f as (v: V) => boolean);
 }
 
-export function equals<V>(it1: AsyncIterable<V>, it2: AsyncIterable<V>, equality?: (a: V, b: V) => boolean): Promise<boolean>
-export function equals<V>(it1: IterableIterator<V>, it2: IterableIterator<V>, equality?: (a: V, b: V) => boolean): boolean
+export function equals<V>(it1: AsyncIterable<V>, it2: AsyncIterable<V>, comparerOrKey: IsEqual<V> | ((value: V) => string)): Promise<boolean>
+
+export function equals<V>(it1: IterableIterator<V>, it2: IterableIterator<V>, comparerOrKey: IsEqual<V> | ((value: V) => string)): boolean
 
 /**
- * Returns _true_ if items in two iterables are equal, as
- * determined by the `equality` function.
- * Order matters. It compares items at the same 'step' of each iterable.
+ * Returns _true_ if items in two iterables are equal, and in same order.
+ * 
+ * By default uses === semantics
  * @param it1
  * @param it2
- * @param equality
+ * @param comparerOrKey
  * @returns
  */
-export function equals<V>(it1: AsyncIterable<V> | IterableIterator<V>, it2: AsyncIterable<V> | IterableIterator<V>, equality?: (a: V, b: V) => boolean) {
+export function equals<V>(it1: AsyncIterable<V> | IterableIterator<V>, it2: AsyncIterable<V> | IterableIterator<V>, comparerOrKey: IsEqual<V> | ((value: V) => string)) {
   const as = isAsyncIterable(it1) && isAsyncIterable(it2);
-  return as ? Async.equals(it1, it2, equality) : Sync.equals(it1 as IterableIterator<V>, it2 as IterableIterator<V>, equality);
+  return as ? Async.equals(it1, it2, comparerOrKey) : Sync.equals(it1 as IterableIterator<V>, it2 as IterableIterator<V>, comparerOrKey);
 }
 
 export function zip<V>(...its: readonly AsyncIterable<V>[]): Generator<V[]>;
