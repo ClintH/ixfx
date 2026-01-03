@@ -100,25 +100,53 @@ export const clampIndex = (
 };
 
 
+export function maxAbs(values: Iterable<number>): number;
+export function maxAbs(...values: number[]): number;
+
 /**
  * Returns the largest value, ignoring the sign of numbers
  * 
  * ```js
  * maxAbs(1, 5);    // 5
  * maxAbs(-10, 5);  // -10 (since sign is ignored)
+ * maxAbs(arrayOfNumbers);
  * ```
+ * 
+ * Non-valid numbers are silently ignored.
  * @param values 
  * @returns 
  */
-export const maxAbs = (...values: number[]) => {
-  let index = -1;
+export function maxAbs(...values: (number | Iterable<number>)[]) {
+  //let index = -1;
   let maxA = Number.MIN_SAFE_INTEGER;
-  for (let index_ = 0; index_ < values.length; index_++) {
-    const vA = Math.abs(values[ index_ ]);
-    if (vA > maxA) {
-      maxA = vA;
-      index = index_;
+  let max = Number.MIN_SAFE_INTEGER;
+  const checkV = (v: number) => {
+    if (!Number.isNaN(v) && Number.isFinite(v)) {
+      const va = Math.abs(v);
+      if (va > maxA) {
+        maxA = va;
+        max = v;
+      }
+    } // else: ignored
+  }
+
+  for (const v of values) {
+    if (typeof v === `number`) {
+      checkV(v);
+    } else {
+      for (const subV of v) {
+        checkV(subV);
+      }
     }
   }
-  return values[ index ];
+  return max;
+
+  // for (let index_ = 0; index_ < values.length; index_++) {
+  //   const vA = Math.abs(values[ index_ ]);
+  //   if (vA > maxA) {
+  //     maxA = vA;
+  //     index = index_;
+  //   }
+  // }
+  // return values[ index ];
 }
