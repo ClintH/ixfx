@@ -16,6 +16,7 @@ import { arrayTest, resultThrow } from '@ixfx/guards';
  * ```
  * @param data
  * @param propertyName
+ * @throws {TypeError} If data is not an array
  */
 export const sortByNumericProperty = <V, K extends keyof V>(
   data: readonly V[] | V[],
@@ -51,6 +52,7 @@ export const sortByNumericProperty = <V, K extends keyof V>(
  * This function should return 0 if values are equal, 1 if `a > b` and -1 if `a < b`.
  * @param data 
  * @param propertyName 
+ * @throws {TypeError} If data is not an array
  * @returns 
  */
 export const sortByProperty = <V, K extends keyof V>(
