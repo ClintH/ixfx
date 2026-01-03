@@ -57,10 +57,12 @@ export const validNumbers = (data: readonly number[]) =>
 /**
  * Returns the dot product of arbitrary-sized arrays. Assumed they are of the same length.
  * @param values
+ * @param nonNumber What to do if array contains an invalid number. Error: throw an exception, 'treat-as-zero' use as 0 instead, 'ignore', let math run with invalid number
  * @returns
  */
 export const dotProduct = (
-  values: readonly (readonly number[])[]
+  values: readonly (readonly number[])[],
+  nonNumber: `error` | `treat-as-zero` | `ignore` = `ignore`
 ): number => {
   let r = 0;
   const length = values[ 0 ].length;
@@ -68,9 +70,17 @@ export const dotProduct = (
   for (let index = 0; index < length; index++) {
     let t = 0;
     for (const [ p, value ] of values.entries()) {
-      if (p === 0) t = value[ index ];
+      let v = value[ index ];
+      if (Number.isNaN(v) || !Number.isFinite(v)) {
+        if (nonNumber === `treat-as-zero`) {
+          v = 0;
+        } else if (nonNumber === `error`) {
+          throw new TypeError(`Invalid number at index ${ index },${ p }`)
+        }
+      }
+      if (p === 0) t = v;
       else {
-        t *= value[ index ];
+        t *= v;
       }
     }
     r += t;
@@ -99,8 +109,8 @@ export const dotProduct = (
  * @returns Average of array
  */
 export const average = (data: readonly number[]): number => {
-  // ✔ UNIT TESTED
-  if (data === undefined) throw new Error(`data parameter is undefined`);
+  if (typeof data !== `object`) throw new Error(`Param 'data' should be an array. Got: ${ typeof data }`);
+  if (!Array.isArray(data)) throw new TypeError(`Param 'data' is not an array`);
   const valid = validNumbers(data);
   const total = valid.reduce((accumulator, v) => accumulator + v, 0);
   return total / valid.length;
@@ -146,7 +156,7 @@ export const maxIndex = (data: readonly number[]): number =>
  * @param data Array of numbers
  * @returns Index of smallest value
  */
-export const minIndex = (...data: readonly number[]): number =>
+export const minIndex = (data: readonly number[]): number =>
 
   data.reduce(
     (bestIndex, value, index, array) =>
@@ -235,7 +245,7 @@ export const totalFast = (data: readonly number[] | Float32Array): number => {
  * @returns Maximum
  */
 export const minFast = (data: readonly number[] | Float32Array): number => {
-  let m = Number.MIN_SAFE_INTEGER;
+  let m = Number.MAX_SAFE_INTEGER;
   for (const datum of data) {
     m = Math.min(m, datum);
   }
