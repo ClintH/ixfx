@@ -2,7 +2,7 @@ import { numberTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Generates a range of numbers, starting from `start` and counting by `interval`.
- * If `end` is provided, generator stops when reached.
+ * If `end` is provided, generator stops when reached
  *
  * Unlike {@link numericRange}, numbers might contain rounding errors
  *
@@ -11,9 +11,14 @@ import { numberTest, resultThrow } from "@ixfx/guards";
  *  // 100, 110, 120 ...
  * }
  * ```
+ * 
+ * Get results as an array
+ * ```js
+ * const c = [...numericRangeRaw(1,0,5)]; // [0,1,2,3,4]
+ * ```
  * @param interval Interval between numbers
  * @param start Start
- * @param end End (if undefined, range never ends)
+ * @param end End (if undefined, range never ends). Inclusive.
  */
 export const numericRangeRaw = function* (
   interval: number,
@@ -25,7 +30,7 @@ export const numericRangeRaw = function* (
   if (typeof end === `undefined`) end = Number.MAX_SAFE_INTEGER;
   let v = start;
   do {
-    while (v < end) {
+    while (v <= end) {
       yield v;
       v += interval;
     }
@@ -55,7 +60,7 @@ export const numericRangeRaw = function* (
  *
  * @param interval Interval between numbers
  * @param start Start. Defaults to 0
- * @param end End (if undefined, range never ends)
+ * @param end End (if undefined, range never ends). Inclusive.
  * @param repeating Range loops from start indefinately. Default _false_
  * @param rounding A rounding that matches the interval avoids floating-point math hikinks. Eg if the interval is 0.1, use a rounding of 10
  */
