@@ -1,3 +1,4 @@
+import { arrayTest, functionTest, resultThrow } from "@ixfx/guards";
 import { isEqualDefault, type IsEqual } from "./util/is-equal.js";
 
 /**
@@ -6,6 +7,9 @@ import { isEqualDefault, type IsEqual } from "./util/is-equal.js";
  * @returns 
  */
 export const withoutUndefined = <V>(data: readonly V[] | V[]): V[] => {
+  resultThrow(
+    arrayTest(data, `sourceArray`)
+  );
   return data.filter(v => v !== undefined);
 }
 
@@ -48,6 +52,7 @@ export const withoutUndefined = <V>(data: readonly V[] | V[]): V[] => {
  * @param sourceArray Source array
  * @param toRemove Value(s) to remove
  * @param comparer Comparison function. If not provided `isEqualDefault` is used, which compares using `===`
+ * @throws {TypeError} If `sourceArray` is not an array, or compare function is not a function
  * @return Copy of array without value.
  */
 export const without = <V>(
@@ -55,6 +60,10 @@ export const without = <V>(
   toRemove: V | V[],
   comparer: IsEqual<V> = isEqualDefault
 ): V[] => {
+  resultThrow(
+    arrayTest(sourceArray, `sourceArray`),
+    functionTest(comparer, `comparer`)
+  );
   if (Array.isArray(toRemove)) {
     const returnArray: V[] = []
     for (const source of sourceArray) {
