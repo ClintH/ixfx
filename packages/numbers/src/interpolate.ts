@@ -143,7 +143,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<BasicInterpola
 
 
   const readOpts = (o: Partial<BasicInterpolateOptions> = {}) => {
-    if (o.transform) {
+    if (o.transform !== undefined) {
       if (typeof o.transform !== `function`) throw new Error(`Param 'transform' is expected to be a function. Got: ${ typeof o.transform }`);
       amountProcess = o.transform;
     }
