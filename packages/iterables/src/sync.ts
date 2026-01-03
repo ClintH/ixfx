@@ -1,4 +1,4 @@
-import { type ToString, toStringDefault } from '@ixfx/core';
+import { isEqualDefault, type ToString, toStringDefault } from '@ixfx/core';
 import { type IsEqual, intervalToMs } from '@ixfx/core';
 import { isIterable } from './guard.js';
 //import { intervalToMs } from '../flow/IntervalType.js';
@@ -200,27 +200,52 @@ export const next = <T>(it: Generator<T>) => {
 }
 
 /**
- * Returns true if items in two iterables are equal, as
- * determined by the `equality` function.
+ * Returns true if items in two iterables are equal, by value and order
+ * 
+ * By default uses === comparison
  * @param it1
  * @param it2
- * @param equality
+ * @param comparerOrKey Function to produce a key for value or compare two values
  * @returns
  */
 export function equals<V>(
   it1: IterableIterator<V>,
   it2: IterableIterator<V>,
-  equality?: IsEqual<V>
+  comparerOrKey: IsEqual<V> | ((value: V) => string) = isEqualDefault
 ) {
   //it1 = it1[Symbol.iterator]();
   //it2 = it2[Symbol.iterator]();
 
+  let isUnknownFunction = true;
+  let eqFunction: IsEqual<V> | undefined;
+  let keyFunction: undefined | ((value: V) => string);
+
   while (true) {
-    const index1 = it1.next(),
-      index2 = it2.next();
-    if (equality !== undefined) {
-      if (!equality(index1.value, index2.value)) return false;
-    } else if (index1.value !== index2.value) return false;
+    const index1 = it1.next();
+    const index2 = it2.next();
+    const v1 = index1.value as V;
+    const v2 = index2.value as V;
+
+    if (isUnknownFunction) {
+      const testResult = comparerOrKey(v1, v2);
+      if (typeof testResult === `string`) {
+        keyFunction = comparerOrKey as (value: V) => string
+      } else {
+        eqFunction = comparerOrKey as IsEqual<V>;
+      }
+      isUnknownFunction = false;
+    }
+
+    if (keyFunction) {
+      const key1 = keyFunction(v1);
+      const key2 = keyFunction(v2);
+      if (key1 !== key2) return false;
+    } else if (eqFunction) {
+      if (!eqFunction(v1, v2)) return false;
+    } else {
+      throw new Error(`Something wrong with comparer function?`)
+    }
+
     if (index1.done ?? index2.done) return index1.done && index2.done;
   }
 }

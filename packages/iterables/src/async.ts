@@ -1,4 +1,4 @@
-import { intervalToMs, type Interval, type IsEqual, toStringDefault } from '@ixfx/core';
+import { intervalToMs, type Interval, type IsEqual, toStringDefault, isEqualDefault } from '@ixfx/core';
 import { sleep, type SleepOpts } from '@ixfx/core';
 import type { ForEachOptions, ToArrayOptions } from './types.js';
 import { isAsyncIterable, isIterable } from './guard.js';
@@ -142,9 +142,9 @@ export const repeat = async function*<T>(genCreator: () => Iterable<T> | AsyncIt
 }
 
 /**
- * Returns true if items in two iterables are equal, as
- * determined by the `equality` function.
- * Order matters. It compares items at the same 'step' of each iterable.
+ * Returns true if items in two iterables are equal, and in the same order.
+ * 
+ * Uses === semantics by default.
  * @param it1
  * @param it2
  * @param equality
@@ -153,17 +153,42 @@ export const repeat = async function*<T>(genCreator: () => Iterable<T> | AsyncIt
 export async function equals<V>(
   it1: AsyncIterable<V>,
   it2: AsyncIterable<V>,
-  equality?: IsEqual<V>
+  comparerOrKey: IsEqual<V> | ((item: V) => string) = isEqualDefault
 ) {
   // https://surma.github.io/underdash/
   const iit1 = it1[ Symbol.asyncIterator ]();// it1[ Symbol.iterator ]();
   const iit2 = it2[ Symbol.asyncIterator ]();
+
+  let isUnknownFunction = true;
+  let eqFunction: IsEqual<V> | undefined;
+  let keyFunction: undefined | ((value: V) => string);
+
   while (true) {
     const index1 = await iit1.next();
     const index2 = await iit2.next();
-    if (equality !== undefined) {
-      if (!equality(index1.value, index2.value)) return false;
-    } else if (index1.value !== index2.value) return false;
+    const v1 = index1.value as V;
+    const v2 = index2.value as V;
+    if (isUnknownFunction) {
+      const testResult = comparerOrKey(v1, v2);
+      if (typeof testResult === `string`) {
+        keyFunction = comparerOrKey as (value: V) => string
+      } else {
+        eqFunction = comparerOrKey as IsEqual<V>;
+      }
+      isUnknownFunction = false;
+    }
+    if (keyFunction) {
+      const key1 = keyFunction(v1);
+      const key2 = keyFunction(v2);
+      if (key1 !== key2) return false;
+    } else if (eqFunction) {
+      if (!eqFunction(v1, v2)) return false;
+    } else {
+      throw new Error(`Something wrong with comparer function?`)
+    }
+    // if (equality !== undefined) {
+    //   if (!equality(index1.value, index2.value)) return false;
+    // } else if (index1.value !== index2.value) return false;
     if (index1.done ?? index2.done) return index1.done && index2.done;
   }
 }
