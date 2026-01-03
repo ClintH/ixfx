@@ -33,7 +33,14 @@ export function isApprox(
  * Returns _true/false_ if `value` is within `rangePercent` of `baseValue`.
  * 
  * ```js
+ * // True
  * isApprox(0.1, 100, 101);
+ * isApprox(0.1, 100, 99);
+ * isApprox(0.1, 100, 100);
+ * 
+ * // False
+ * isApprox(0.1, 100, 98);
+ * isApprox(0.1, 100, 102);
  * ```
  * @param rangePercent 
  * @param baseValue 
