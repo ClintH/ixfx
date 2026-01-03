@@ -115,7 +115,7 @@ export const immutable = <K, V>(
     },
     get: (key: K) => data.get(key),
     delete: (key: K) => immutable(del(data, key)),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     clear: () => immutable(),
     has: (key: K) => data.has(key),
     entries: () => data.entries(),
