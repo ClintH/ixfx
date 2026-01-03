@@ -1,3 +1,13 @@
+/**
+ * Track values
+ * 
+ * When not yet used:
+ *  total: 0
+ *  count: 0
+ *  min: MAX_SAFE_INTEGER,
+ *  max: MIN_SAFE_INTEGER
+ * @returns 
+ */
 export const trackSimple = () => {
   let count = 0;
   let min = Number.MAX_SAFE_INTEGER;
