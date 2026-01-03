@@ -11,7 +11,13 @@ export interface IMapOf<V> {
    * Iterates over all values stored under `key`
    * @param key
    */
-  get(key: string): IterableIterator<V>;
+  valuesFor(key: string): IterableIterator<V>;
+
+  /**
+   * Returns a copy of all values under key as an arry
+   * @param key 
+   */
+  valuesForAsArray(key: string): V[]
 
   /**
    * Iterates over all values, regardless of key.
