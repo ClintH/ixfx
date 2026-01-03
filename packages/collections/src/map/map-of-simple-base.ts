@@ -3,8 +3,8 @@ import { firstEntryByValue } from './map-multi-fns.js';
 
 export class MapOfSimpleBase<V> {
   protected map: Map<string, readonly V[]>;
-  protected readonly groupBy;
-  protected valueEq;
+  protected readonly groupBy: (value: V) => string;
+  protected valueEq: IsEqual<V>;
 
   /**
    * Constructor
@@ -14,11 +14,22 @@ export class MapOfSimpleBase<V> {
   constructor(
     groupBy: (value: V) => string = defaultKeyer,
     valueEq: IsEqual<V> = isEqualDefault<V>,
-    initial: [ string, readonly V[] ][] = []
+    initial: Map<string, readonly V[]> | [ string, readonly V[] ][] = []
   ) {
     this.groupBy = groupBy;
     this.valueEq = valueEq;
-    this.map = new Map(initial);
+    if (Array.isArray(initial)) {
+      this.map = new Map(initial);
+    } else {
+      this.map = new Map(initial.entries());
+    }
+  }
+
+  /**
+   * Returns the underlying map storage. Do not manipulate.
+   */
+  get getRawMapUnsafe() {
+    return this.map;
   }
 
   /**
@@ -84,15 +95,22 @@ export class MapOfSimpleBase<V> {
     if (entry) return entry[ 0 ];
   }
 
+
   /**
    * Iterate over all entries
    */
   *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
-    for (const key of this.map.keys()) {
-      for (const value of this.map.get(key)!) {
-        yield [ key, value ];
+    for (const entries of this.map.entries()) {
+      for (const value of entries[ 1 ]) {
+        yield [ entries[ 0 ], value ]
       }
     }
+
+    // for (const key of this.map.keys()) {
+    //   for (const value of this.map.get(key)!) {
+    //     yield [ key, value ];
+    //   }
+    // }
   }
 
   /**
@@ -110,11 +128,12 @@ export class MapOfSimpleBase<V> {
    * @param key
    * @returns
    */
-  *get(key: string): IterableIterator<V> {
+  *valuesFor(key: string): IterableIterator<V> {
     const m = this.map.get(key);
     if (!m) return;
     yield* m.values();
   }
+
 
   /**
    * Iterate over all keys
@@ -131,6 +150,35 @@ export class MapOfSimpleBase<V> {
     for (const entries of this.map) {
       yield* entries[ 1 ];
     }
+  }
+
+  /**
+   * Returns all values under 'key', or
+   * an empty array if key is not found.
+   * 
+   * Array is a copy of stored array.
+   * @param key 
+   * @returns 
+   */
+  valuesForAsArray(key: string): V[] {
+    const v = this.map.get(key);
+    if (!v) return []
+    return [ ...v ];
+  }
+
+  /**
+   * Returns the underlying array that stores values for `key`.
+   * 
+   * Returns _undefined_ if key does not exist.
+   * 
+   * Be careful about modifying array.
+   * @param key 
+   * @returns 
+   */
+  getRawArray(key: string): readonly V[] | undefined {
+    const v = this.map.get(key);
+    if (!v) return;
+    return v
   }
 
   /**
