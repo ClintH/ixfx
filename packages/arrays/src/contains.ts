@@ -1,9 +1,11 @@
+import { arrayTest, functionTest, resultThrow } from "@ixfx/guards";
 import { isEqualDefault } from "./util/is-equal.js";
 import { toStringDefault } from "./util/to-string.js";
 
 
 /**
- * Returns _true_ if all value in `needles` is contained in `haystack`.
+ * Returns _true_ if all value in `needles` is contained in `haystack`, 
+ * by default using === semantics. 
  * 
  * ```js
  * const a = ['apples','oranges','pears','mandarins'];
@@ -15,26 +17,33 @@ import { toStringDefault } from "./util/to-string.js";
  * ```
  * 
  * If `needles` is empty, `contains` will return true.
+ * 
+ * Compare by value using ixfx's {@link isEqualValueDefault}, or a custom function of your own
+ * ```js
+ * contains(a, b, isEqualValueDefault);
+ * contains(a, b, (valueA, valueV) => {
+ *  return valueA.name === valueB.name
+ * })
+ * ```
+ * @throws {TypeError} If parameters are not valid
  * @param haystack Array to search
  * @param needles Things to look for
- * @param eq
+ * @param eq Optional function to compare equality. By default uses === semantics
  */
 export const contains = <V>(
-  haystack: ArrayLike<V>,
-  needles: ArrayLike<V>,
+  haystack: V[],
+  needles: V[],
   eq = isEqualDefault<V>
 ) => {
-  if (!Array.isArray(haystack)) {
-    throw new TypeError(`Expects haystack parameter to be an array`);
-  }
-  if (!Array.isArray(needles)) {
-    throw new TypeError(`Expects needles parameter to be an array. Got: ${ typeof needles }`);
-  }
+  resultThrow(
+    arrayTest(haystack, `haystack`),
+    arrayTest(needles, `needles`),
+    functionTest(eq, `eq`)
+  );
 
   for (const needle of needles) {
     let found = false;
     for (const element of haystack) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       if (eq(needle, element)) {
         found = true;
         break;
@@ -83,13 +92,30 @@ export const containsDuplicateValues = <V>(
 };
 
 /**
- * Returns _true_ if array contains duplicate instances based on `===` equality checking
+ * Returns _true_ if array contains duplicate instances based on `===` equality checking.
+ * 
+ * ```js
+ * const o1 = { hello: `there` };
+ * const o2 = { hello: `there` };
+ * containsDuplicateInstances([ o1, o2 ]); // False
+ * containsDuplicateInstances([ o1, o1 ]); // True
+ * ```
+ * 
+ * Primitive values are compared by value:
+ * ```js
+ * containsDuplicateInstances([ 1, 2, 1 ]); // True
+ * containsDuplicateInstances([ `a`, `b`, `a` ]); // True
+ * ```
+ * 
  * Use {@link containsDuplicateValues} if you'd rather compare by value.
  * @param array 
+ * @throws {TypeError} If `array` parameter is not an array
  * @returns 
  */
 export const containsDuplicateInstances = <V>(array: V[] | readonly V[]): boolean => {
-  if (!Array.isArray(array)) throw new Error(`Parameter needs to be an array`);
+  resultThrow(
+    arrayTest(array, `array`),
+  );
   for (let index = 0; index < array.length; index++) {
     for (let x = 0; x < array.length; x++) {
       if (index === x) continue;
