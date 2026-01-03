@@ -60,7 +60,7 @@ export class MapOfMutableImpl<V, M>
       if (v === undefined) {
         r += ` - ${ k } (undefined)\r\n`
       } else {
-        const asArray = this.type.toArray(v);
+        const asArray = this.type.toArrayCopy(v);
         if (asArray !== undefined) {
           r += ` - ${ k } (${ this.type.count(v) }) = ${ JSON.stringify(
             asArray
@@ -169,17 +169,22 @@ export class MapOfMutableImpl<V, M>
 
   /**
    * Iterates over values stored under `key`
-   * An empty array is returned if there are no values
+   * If `key` is not found, no error is thrown - the iterator returns no values
+   * 
+   * Alternatively use {@link valuesFor}
    */
-  *get(key: string): IterableIterator<V> {
+  valuesForAsArray(key: string): V[] {
     const m = this.#map.get(key);
-    if (m === undefined) return;
-    yield* this.type.iterable(m);
+    if (m === undefined) return [];
+    return this.type.toArrayCopy(m);
+    //yield* this.type.iterable(m);
   }
 
   /**
    * Iterate over the values stored under `key`.
-   * If key does not exist, iteration is essentially a no-op
+   * If key does not exist, iteration is essentially a no-op.
+   * 
+   * Alternatively, use {@valuesForAsArray} to get values as an array.
    * @param key
    * @returns
    */
@@ -227,8 +232,7 @@ export class MapOfMutableImpl<V, M>
 
   merge(other: IMapOf<V>) {
     for (const key of other.keys()) {
-      const data = other.get(key);
-      this.addKeyedValues(key, ...data);
+      this.addKeyedValues(key, ...other.valuesForAsArray(key));
     }
   }
 
