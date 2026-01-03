@@ -25,38 +25,38 @@ import type { BipolarWrapper } from './types.js';
  * // x = 11
  * ```
  * @param startingValueOrBipolar Initial numeric value or BipolarWrapper instance
+ * @throws {TypeError} If start value is out of bipolar range or invalid
  * @returns 
  */
 export const immutable = (startingValueOrBipolar: number | BipolarWrapper = 0): BipolarWrapper => {
-  if (typeof startingValueOrBipolar === `undefined`) throw new Error(`Start value is undefined`)
   const startingValue = (typeof startingValueOrBipolar === `number`) ? startingValueOrBipolar : startingValueOrBipolar.value;
 
-  if (startingValue > 1) throw new Error(`Start value cannot be larger than 1`);
-  if (startingValue < -1) throw new Error(`Start value cannot be smaller than -1`);
-  if (Number.isNaN(startingValue)) throw new Error(`Start value is NaN`);
+  if (startingValue > 1) throw new TypeError(`Start value cannot be larger than 1`);
+  if (startingValue < -1) throw new TypeError(`Start value cannot be smaller than -1`);
+  if (Number.isNaN(startingValue)) throw new TypeError(`Start value is NaN`);
 
   const v = startingValue;
   return {
     [ Symbol.toPrimitive ](hint: string) {
-      if (hint === `number`) return v;
+      if (hint === `number` || hint === `default`) return v;
       else if (hint === `string`) return v.toString();
       return true;
     },
     value: v,
-    towardZero: (amt: number) => {
-      return immutable(towardZero(v, amt));
+    towardZero: (amount: number) => {
+      return immutable(towardZero(v, amount));
     },
-    add: (amt: number) => {
-      return immutable(clamp(v + amt));
+    add: (amount: number) => {
+      return immutable(clamp(v + amount));
     },
-    multiply: (amt: number) => {
-      return immutable(clamp(v * amt));
+    multiply: (amount: number) => {
+      return immutable(clamp(v * amount));
     },
     inverse: () => {
       return immutable(-v);
     },
-    interpolate: (amt: number, b: number) => {
-      return immutable(clamp(interpolate(amt, v, b)));
+    interpolate: (amount: number, target: number) => {
+      return immutable(clamp(interpolate(amount, v, target)));
     },
     asScalar: (max = 1, min = 0) => {
       return toScalar(v, max, min);
@@ -85,8 +85,8 @@ export const immutable = (startingValueOrBipolar: number | BipolarWrapper = 0): 
  * @returns Scalar value on 0..1 range.
  */
 export const toScalar = (bipolarValue: number, max = 1, min = 0) => {
-  if (typeof bipolarValue !== `number`) throw new Error(`Expected v to be a number. Got: ${ typeof bipolarValue }`);
-  if (Number.isNaN(bipolarValue)) throw new Error(`Parameter is NaN`);
+  if (typeof bipolarValue !== `number`) throw new Error(`Param 'bipolarValue' to be a number. Got: ${ typeof bipolarValue }`);
+  if (Number.isNaN(bipolarValue)) throw new Error(`Param 'bipolarValue' is NaN`);
   return numberScale(bipolarValue, -1, 1, min, max);
 }
 
@@ -187,9 +187,9 @@ export const clamp = (bipolarValue: number): number => {
  * @returns Bipolar value -1...1
  */
 export const towardZero = (bipolarValue: number, amount: number): number => {
-  if (typeof bipolarValue !== `number`) throw new Error(`Parameter 'v' must be a number. Got: ${ typeof bipolarValue }`);
-  if (typeof amount !== `number`) throw new Error(`Parameter 'amt' must be a number. Got: ${ typeof amount }`);
-  if (amount < 0) throw new Error(`Parameter 'amt' must be positive`);
+  if (typeof bipolarValue !== `number`) throw new Error(`Parameter 'bipolarValue' must be a number. Got: ${ typeof bipolarValue }`);
+  if (typeof amount !== `number`) throw new Error(`Parameter 'amount' must be a number. Got: ${ typeof amount }`);
+  if (amount < 0) throw new Error(`Parameter 'amount' must be positive`);
   if (bipolarValue < 0) {
     bipolarValue += amount;
     if (bipolarValue > 0) bipolarValue = 0;
