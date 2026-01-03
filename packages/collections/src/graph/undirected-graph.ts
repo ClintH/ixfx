@@ -47,8 +47,8 @@ export const getOrCreate = (graph: Graph, id: string): Readonly<{ graph: Graph, 
 }
 
 function resolveVertex(graph: Graph, idOrVertex: string | Vertex): Vertex {
-  if (idOrVertex === undefined) throw new Error(`Param 'idOrVertex' is undefined. Expected string or Vertex`);
-  if (graph === undefined) throw new Error(`Param 'graph' is undefined. Expected Graph`);
+  if (typeof idOrVertex !== `string` && typeof idOrVertex !== `object`) throw new TypeError(`Param 'idOrVertex' is undefined. Expected string or Vertex. Got: ${ typeof idOrVertex }`);
+  if (typeof graph !== `object`) throw new TypeError(`Param 'graph' is expected to be object. Got: ${ typeof graph }`);
   const v = typeof idOrVertex === `string` ? graph.vertices.get(idOrVertex) : idOrVertex;
   if (v === undefined) throw new Error(`Id not found ${ idOrVertex as string }`);
   return v;
@@ -77,10 +77,6 @@ export const hasConnection = (graph: Graph, a: string | Vertex, b: string | Vert
  * @returns 
  */
 export const getConnection = (graph: Graph, a: string | Vertex, b: string | Vertex): Edge | undefined => {
-  if (a === undefined) throw new Error(`Param 'a' is undefined. Expected string or Vertex`);
-  if (b === undefined) throw new Error(`Param 'b' is undefined. Expected string or Vertex`);
-  if (graph === undefined) throw new Error(`Param 'graph' is undefined. Expected Graph`);
-
   const aa = resolveVertex(graph, a);
   const bb = resolveVertex(graph, b);
   for (const edge of graph.edges) {
@@ -238,14 +234,16 @@ const stringForEdge = (edge: Edge) => {
 
 /**
  * Iterate over all the vertices connectd to `context` vertex
+ * 
+ * If `context` is _undefined_, returns nothing
  * @param graph Graph
  * @param context id or Vertex
  * @returns 
  */
 export function* adjacentVertices(graph: Graph, context: Vertex | string | undefined) {
-  if (context === undefined) return;
+  if (typeof context === `undefined`) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
-  if (vertex === undefined) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
+  if (typeof vertex === `undefined`) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
 
   for (const edge of graph.edges) {
     if (edge.a === context) yield resolveVertex(graph, edge.b);
@@ -253,10 +251,26 @@ export function* adjacentVertices(graph: Graph, context: Vertex | string | undef
   }
 }
 
+/**
+ * Get all the edges for a vertex.
+ * 
+ * ```js
+ * // Iterate all edges for vertex with id '0'
+ * for (const edge of edgesForVertex(graph, '0')) {
+ * }
+ * ```
+ * 
+ * If the vertex has no edges, no values are returned. If the vertex was not found in the graph, an error is thrown.
+ * @throws Throws an error if `context` was not found, if it's _undefined_ or `graph` is invalid.
+ * @param graph 
+ * @param context 
+ * @returns 
+ */
 export function* edgesForVertex(graph: Graph, context: Vertex | string | undefined) {
-  if (context === undefined) return;
+  if (typeof graph !== `object`) throw new TypeError(`Param 'graph' is expected to be an object. Got: ${ typeof graph }`);
+  if (typeof context === `undefined`) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
-  if (vertex === undefined) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
+  if (typeof vertex === `undefined`) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
 
   for (const edge of graph.edges) {
     if (edge.a === context) yield edge;
