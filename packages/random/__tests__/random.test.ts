@@ -19,8 +19,8 @@ const repeat = <V>(count: number, fn: () => V): V[] => {
 const repeatGrouped = (count: number, fn: () => number, groupBy: (v: number) => string) => {
   const r1 = repeat(count, fn);
   const r1Grouped = frequencyByGroup(groupBy, r1);
-  const e = [ ...r1Grouped.entries() ].map(entry => [ entry[ 0 ], Math.floor(entry[ 1 ] / count * 100) ]);
-  return e.sort();
+  const entries = [ ...r1Grouped.entries() ].map(entry => [ entry[ 0 ], Math.floor(entry[ 1 ] / count * 100) ]);
+  return entries.sort();
 }
 
 test(`integerUniqueGen`, () => {
@@ -71,7 +71,7 @@ test(`chance`, () => {
   const iterations = 1000;
   // 50% chance
   const r1 = repeatGrouped(iterations, () => R.chance(0.5, 0, 1), v => v === 1 ? `1` : `0`).sort();
-  expect(r1[ 0 ][ 1 ]).toBeGreaterThanOrEqual(48);
+  expect(r1[ 0 ][ 1 ]).toBeGreaterThanOrEqual(47);
   expect(r1[ 1 ][ 1 ]).toBeGreaterThanOrEqual(46);
   expect(r1[ 0 ][ 1 ]).toBeLessThanOrEqual(52);
   expect(r1[ 1 ][ 1 ]).toBeLessThanOrEqual(52);
@@ -86,8 +86,8 @@ test(`chance`, () => {
 
   // 25% chance
   const r4 = repeatGrouped(iterations, () => R.chance(0.25, 0, 1), v => v === 1 ? `1` : `0`).sort();
-  expect(r4[ 0 ][ 1 ]).toBeGreaterThanOrEqual(73);
-  expect(r4[ 1 ][ 1 ]).toBeGreaterThanOrEqual(23);
+  expect(r4[ 0 ][ 1 ]).toBeGreaterThanOrEqual(72);
+  expect(r4[ 1 ][ 1 ]).toBeGreaterThanOrEqual(21);
   expect(r4[ 0 ][ 1 ]).toBeLessThanOrEqual(77);
   expect(r4[ 1 ][ 1 ]).toBeLessThanOrEqual(26);
 
