@@ -79,7 +79,7 @@ export const ofArrayMutable = <V>(
     count: (source) => source.length,
     find: (source, predicate) => source.find(f => predicate(f)),
     filter: (source, predicate) => source.filter(f => predicate(f)),
-    toArray: (source) => source,
+    toArrayCopy: (source) => [ ...source ],
     has: (source, value) => source.some((v) => comparer(v, value)),
     without: (source, value) => source.filter((v) => !comparer(v, value)),
     //[Symbol.iterator]: (source) => source[Symbol.iterator]()
