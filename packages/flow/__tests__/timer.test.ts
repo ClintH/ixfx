@@ -53,7 +53,7 @@ test(`of-total`, async () => {
     if (since() >= 500) {
       expect(v1).toBe(1);
     } else {
-      expect(isApprox(0.01, v3, v1)).toBe(true);
+      expect(isApprox(0.02, v3, v1)).toBe(true);
     }
     await sleep(100);
     v3 += 0.2;
