@@ -33,7 +33,7 @@ test(`with-opts`, () => {
   expect([ ...m.entriesFlat() ].length).eq(6);
 
   // Check for key recall
-  expect([ ...m.get(`Bristol`) ].length).toBe(2);
+  expect([ ...m.valuesForAsArray(`Bristol`) ].length).toBe(2);
   expect(m.count(`London`)).toBe(2);
   expect(m.count(`Notfound`)).toBe(0);
   expect(m.hasKeyValue(`Bristol`, { name: `Sally`, city: `Bristol` })).toBe(true);
@@ -42,7 +42,7 @@ test(`with-opts`, () => {
 
   // Check for non-existent keys
   expect(m.has(`notfound`)).toBe(false);
-  expect([ ...m.get('notfound') ].length).toBe(0);
+  expect([ ...m.valuesForAsArray('notfound') ].length).toBe(0);
 
   // Key equality
   expect(m.has(`LONDON`)).toBe(false);
@@ -85,8 +85,8 @@ test('events-added-values', () => {
 test('events-delete-key', () => {
   const m = ofArrayMutable<string>();
   expect.assertions(1);
-  m.addEventListener(`deleteKey`, (evt) => {
-    if (evt.key === `a`) expect(true).toBeTruthy();
+  m.addEventListener(`deleteKey`, (event) => {
+    if (event.key === `a`) expect(true).toBeTruthy();
   });
   doStuff(m);
 });

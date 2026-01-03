@@ -43,4 +43,5 @@ test(`immutableMap`, () => {
   const m6Entries = Array.from(m6.entries());
   const m3Entries = Array.from(m3.entries());
   expect(m6Entries).toEqual(m3Entries);
+
 });
