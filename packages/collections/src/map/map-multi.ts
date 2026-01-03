@@ -20,7 +20,7 @@ export type MultiValue<V, M> = {
   get name(): string;
   has(source: M, value: V, eq: IsEqual<V>): boolean;
   addKeyedValues(destination: M | undefined, values: Iterable<V>): M;
-  toArray(source: M): readonly V[];
+  toArrayCopy(source: M): V[];
   iterable(source: M): IterableIterator<V>;
   find(source: M, predicate: (v: V) => boolean): V | undefined;
   filter(source: M, predicate: (v: V) => boolean): Iterable<V>; // ReadonlyArray<V>
