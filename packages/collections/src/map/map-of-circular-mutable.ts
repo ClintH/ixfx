@@ -19,11 +19,9 @@ export type MapCircularOpts<V> = MapMultiOpts<V> & {
  * @example Only store the most recent three items per key
  * ```js
  * const map = ofCircularMutable({capacity: 3});
- * map.add(`hello`, [1, 2, 3, 4, 5]);
- * const hello = map.get(`hello`); // [3, 4, 5]
+ * map.add(`hello`, 1, 2, 3, 4, 5);
+ * const hello = [...map.get(`hello`)]; // [3, 4, 5]
  * ```
- *
- *
  * @param options
  * @returns
  */
@@ -39,14 +37,14 @@ export const ofCircularMutable = <V>(
     addKeyedValues: (destination, values) => {
       let ca: ICircularArray<V> = destination ?? new CircularArray<V>(options.capacity);
       for (const v of values) {
-        ca = ca.add(v as V);
+        ca = ca.add(v);
       }
       return ca;
     },
     count: (source) => source.length,
     find: (source, predicate) => source.find(predicate),
     filter: (source, predicate) => source.filter(predicate),
-    toArray: (source) => source,
+    toArrayCopy: (source) => [ ...source ],
     iterable: (source) => source.values(),
     has: (source, value) =>
       source.find((v) => comparer(v, value)) !== undefined,
