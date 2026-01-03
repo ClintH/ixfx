@@ -52,13 +52,67 @@ export type NumberScalerTwoWay = {
  * ```
  */
 export type BipolarWrapper = {
+  /**
+   * Current value
+   */
   value: number
-  towardZero: (amt: number) => BipolarWrapper
-  add: (amt: number) => BipolarWrapper
-  multiply: (amt: number) => BipolarWrapper
+  /**
+   * Nudge toward zero by amount
+   * ```js
+   * let b = immutable(1);
+   * b = b.towardZero(0.1); // 0.9
+   * ```
+   * @param amount Amount to nudge by
+   * @returns Modified copy
+   */
+  towardZero: (amount: number) => BipolarWrapper
+  /**
+   * Add some amount to the bipolar value, clipping it
+   * to the -1...1 range
+   * ```js
+   * let b = immutable(0);
+   * b = b.add(0.5); // 0.5
+   * ```
+   * @param amount 
+   * @returns 
+   */
+  add: (amount: number) => BipolarWrapper
+  /**
+   * Multiple the value by `amount`, clipping result
+   * to the -1...1 range.
+   * ```js
+   * let b = immutable(1);
+   * b = b.multiply(0.1); // 0.9
+   * ````
+   * @param amount 
+   * @returns 
+   */
+  multiply: (amount: number) => BipolarWrapper
+  /**
+   * Inverse value
+   * ```js
+   * let b = immutable(1);
+   * b = b.inverse(); // -1
+   * ```
+   * @returns 
+   */
   inverse: () => BipolarWrapper
+  /**
+   * Convert to 0..1 scale
+   * ```js
+   * let b = immutable(-1);
+   * b.asScalar(); // 0
+   * ```
+   * @returns 
+   */
   asScalar: () => number
-  interpolate: (amt: number, b: number) => BipolarWrapper
+  /**
+   * Interpolate toward `target` by `amount`
+   * @param amount 
+   * @param target 
+   * @returns 
+   */
+  interpolate: (amount: number, target: number) => BipolarWrapper
   [ Symbol.toPrimitive ]: (hint: string) => number | string | boolean
 }
 
