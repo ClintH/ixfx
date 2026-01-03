@@ -53,7 +53,7 @@ export const ofSetMutable = <V>(
     count: (source) => source.size,
     find: (source, predicate) => mapFindValue(source, predicate),
     filter: (source, predicate) => mapFilterValues(source, predicate),
-    toArray: (source) => mapToArray(source),
+    toArrayCopy: (source) => mapToArray(source),
     has: (source, value) => mapHasAnyValue(source, value, comparer),
     without: (source, value) => without(mapToArray(source), value, comparer),
   };
