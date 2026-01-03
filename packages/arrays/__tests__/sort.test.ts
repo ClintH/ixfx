@@ -1,4 +1,5 @@
-import { expect, test } from "vitest";
+
+import { expect, test, vi } from "vitest";
 import * as Arrays from '../src/index.js';
 test(`sortByNumericProperty`, () => {
   const data = [
@@ -16,10 +17,13 @@ test(`sortByNumericProperty`, () => {
   ]);
 });
 
+
+
 test(`sortByProperty`, () => {
   const data = [
     { size: 11, colour: `red` },
     { size: 20, colour: `blue` },
+    { size: 20, colour: `blue-green` },
     { size: 5, colour: `pink` },
     { size: 10, colour: `orange` },
   ];
@@ -29,10 +33,12 @@ test(`sortByProperty`, () => {
     { size: 10, colour: `orange` },
     { size: 11, colour: `red` },
     { size: 20, colour: `blue` },
+    { size: 20, colour: `blue-green` },
   ]);
 
   expect(Arrays.sortByProperty(data, `colour`)).toEqual([
     { size: 20, colour: `blue` },
+    { size: 20, colour: `blue-green` },
     { size: 10, colour: `orange` },
     { size: 5, colour: `pink` },
     { size: 11, colour: `red` },
@@ -46,6 +52,7 @@ test(`sortByProperty`, () => {
 
   expect(Arrays.sortByProperty(data, `size`, comparer)).toEqual([
     { size: 20, colour: `blue` },
+    { size: 20, colour: `blue-green` },
     { size: 11, colour: `red` },
     { size: 10, colour: `orange` },
     { size: 5, colour: `pink` },

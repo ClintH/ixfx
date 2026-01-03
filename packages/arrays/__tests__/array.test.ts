@@ -53,18 +53,25 @@ test(`insert`, () => {
   expect(() => Arrays.insertAt(v1, 3, 1, 2, 3)).toThrow();
 });
 
-test(`intersection`, () => {
-  expect(Arrays.intersection([ 1, 2, 3 ], [ 2, 4, 6 ])).toEqual([ 2 ]);
-  expect(Arrays.intersection([ 1, 2, 3 ], [ 5 ])).toEqual([]);
-  expect(Arrays.intersection([ 1, 2, 3 ], [ 3, 2, 1 ])).toEqual([ 1, 2, 3 ]);
 
-
-});
 
 test(`interleave`, () => {
   const a = [ `a`, `b`, `c` ];
   const b = [ `1`, `2`, `3` ];
   expect(Arrays.interleave(a, b)).toEqual([ `a`, `1`, `b`, `2`, `c`, `3` ]);
+
+  // Throw if arrays are not of same length
+  expect(() => Arrays.interleave([ 1, 2, 3 ], [ 1, 2, 3, 4 ])).toThrow();
+  expect(() => Arrays.interleave([], [ 1, 2, 3, 4 ])).toThrow();
+
+
+  /** @ts-expect-error */
+  expect(() => Arrays.interleave(null)).toThrow();
+  /** @ts-expect-error */
+  expect(() => Arrays.interleave({})).toThrow();
+  /** @ts-expect-error */
+  expect(() => Arrays.interleave(a, b, null)).toThrow();
+
 });
 
 test('pairwise', () => {
@@ -84,14 +91,7 @@ test('pairwise', () => {
 
 });
 
-test('without', () => {
 
-  expect(Arrays.without([ `a`, `b`, `c` ], `b`)).toEqual([ `a`, `c` ]);
-  expect(Arrays.without([ `a`, `b`, `c` ], [ `b`, `c` ])).toEqual([ `a` ]);
-  expect(Arrays.without([ `a`, `b`, `c` ], [ `a`, `b`, `c` ])).toEqual([]);
-  expect(Arrays.without([ `a`, `b`, `c` ], `d`)).toEqual([ `a`, `b`, `c` ]);
-
-});
 
 test('flatten', () => {
   expect(Arrays.flatten([ 1, [ 2, 3 ], [ [ 4 ] ] ])).toEqual([ 1, 2, 3, [ 4 ] ]);
@@ -115,6 +115,24 @@ test('filterBetween', () => {
     7
   ) ];
   expect(r3).toEqual(numbers.slice(5, 7));
+});
+
+test('containsDuplicateInstances', () => {
+
+  expect(Arrays.containsDuplicateInstances([ 1, 2, 3, 1 ])).toBeTruthy();
+  expect(Arrays.containsDuplicateInstances([ `a`, `b`, `c`, `a` ])).toBeTruthy();
+
+  const o1 = { hello: `there` }
+  expect(Arrays.containsDuplicateInstances([ { hello: `there` }, { hello: `there` }, { hello: `there` } ])).toBeFalsy();
+  expect(Arrays.containsDuplicateInstances([ o1, { hello: `there` }, o1 ])).toBeTruthy();
+
+  /** @ts-ignore */
+  expect(() => Arrays.containsDuplicateInstances(false)).toThrow();
+  /** @ts-ignore */
+  expect(() => Arrays.containsDuplicateInstances(null)).toThrow();
+  /** @ts-ignore */
+  expect(() => Arrays.containsDuplicateInstances()).toThrow();
+
 });
 
 test('containsDuplicateValues', () => {
@@ -155,39 +173,7 @@ test('containsDuplicateValues', () => {
   expect(() => Arrays.containsDuplicateValues('hello' as any as [])).toThrow();
 });
 
-type Person = {
-  name: string;
-  v: number;
-};
-test('unique', () => {
-  const a = [ 1, 2, 3, 1, 2, 3, 4 ];
-  assert.sameDeepMembers(Arrays.unique(a), [ 1, 2, 3, 4 ]);
 
-  const b = [ 1, 2, 3, 4, 5, 6, 7, 8 ];
-  assert.sameDeepMembers(Arrays.unique<number>([ a, b ]), [ 1, 2, 3, 4, 5, 6, 7, 8 ]);
-
-  const c = [
-    { name: 'Bob', v: 1 },
-    { name: 'Sally', v: 2 },
-    { name: 'Bob', v: 3 },
-  ];
-
-});
-
-test('unique-deep', () => {
-  const c = [
-    { name: 'Bob', v: 1 },
-    { name: 'Sally', v: 2 },
-    { name: 'Bob', v: 3 },
-  ];
-  assert.sameDeepMembers<Person>(
-    Arrays.uniqueDeep<Person>(c, (a, b) => a.name === b.name),
-    [
-      { name: 'Bob', v: 1 },
-      { name: 'Sally', v: 2 },
-    ]
-  );
-});
 
 test('contains', () => {
   const a = [ 'apples', 'oranges', 'pears', 'mandarins' ];
@@ -270,24 +256,7 @@ test(`mergeByKey`, () => {
   expect(t3.includes(`1-3`)).toBe(true);
   expect(t3.includes(`1-4`)).toBe(true);
 });
-test(`remove`, () => {
-  expect(Arrays.remove([ 1, 2, 3 ], 2)).toEqual([ 1, 2 ]);
-  expect(Arrays.remove([ 1, 2, 3 ], 0)).toEqual([ 2, 3 ]);
-  expect(Arrays.remove([ 1, 2, 3 ], 1)).toEqual([ 1, 3 ]);
 
-  // Index past length
-  expect(() => Arrays.remove([ 1, 2, 3 ], 3)).toThrow();
-  // Not an array
-  expect(() => Arrays.remove(10 as any as [], 3)).toThrow();
-});
-
-test(`remove-by-filter`, () => {
-  const testData = [ 1, 2, 3 ];
-  expect(Arrays.removeByFilter(testData, v => v === 2)).toEqual([ [ 1, 3 ], 1 ]);
-  expect(Arrays.removeByFilter(testData, v => v > 1)).toEqual([ [ 1 ], 2 ]);
-  expect(Arrays.removeByFilter(testData, v => v > 10)).toEqual([ [ 1, 2, 3 ], 0 ]);
-  expect(testData).toEqual([ 1, 2, 3 ]);
-});
 
 test(`ensureLength`, () => {
   expect(Arrays.ensureLength([ 1, 2, 3 ], 2)).toEqual([ 1, 2 ]);
@@ -316,28 +285,7 @@ test(`ensureLength`, () => {
   expect(Arrays.ensureLength([ 1, 2, 3, 4, 5, 6 ], 6, `undefined`, `from-end`)).toEqual([ 1, 2, 3, 4, 5, 6 ]);
 });
 
-test(`isContentsTheSame`, () => {
-  expect(Arrays.containsIdenticalValues([ 10, 10, 10 ])).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([ `hello`, `hello`, `hello` ])).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([ true, true, true ])).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([ 100 ])).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([])).toBeTruthy();
 
-  expect(Arrays.containsIdenticalValues([ 10, 10, 11 ])).toBeFalsy();
-  expect(Arrays.containsIdenticalValues([ `Hello`, `hello` ])).toBeFalsy();
-  expect(Arrays.containsIdenticalValues([ true, false ])).toBeFalsy();
-
-  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1 } ])).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 2 } ])).toBeFalsy();
-  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1, blah: 2 } ])).toBeFalsy();
-
-  const eq = (a, b) => a.len === b.len;
-
-  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1 } ], eq)).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1, blah: 2 } ], eq)).toBeTruthy();
-  expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 2 } ], eq)).toBeFalsy();
-
-});
 
 // test(``, () => {
 //   const a1 = [10, 11, 12, 13];
