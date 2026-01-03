@@ -1,4 +1,4 @@
-import { arrayTest, resultThrow } from "@ixfx/guards";
+import { arrayTest, functionTest, resultThrow } from "@ixfx/guards";
 
 /**
  * Returns a shuffled copy of the input array.
@@ -15,6 +15,8 @@ import { arrayTest, resultThrow } from "@ixfx/guards";
  *  // Do something with the value...
  * }
  * ```
+ * 
+ * @throws {TypeError} If `array` is not an array and `rand` is not a function
  * @param dataToShuffle Input array
  * @param rand Random generator. `Math.random` by default.
  * @returns Copy with items moved around randomly
@@ -24,12 +26,14 @@ export const shuffle = <V>(
   dataToShuffle: readonly V[],
   rand: () => number = Math.random
 ): V[] => {
-  resultThrow(arrayTest(dataToShuffle, `dataToShuffle`));
-
+  resultThrow(
+    arrayTest(dataToShuffle, `dataToShuffle`),
+    functionTest(rand, `rand`)
+  );
   const array = [ ...dataToShuffle ];
   for (let index = array.length - 1; index > 0; index--) {
-    const index_ = Math.floor(rand() * (index + 1));
-    [ array[ index ], array[ index_ ] ] = [ array[ index_ ], array[ index ] ];
+    const randomIndex = Math.floor(rand() * (index + 1));
+    [ array[ index ], array[ randomIndex ] ] = [ array[ randomIndex ], array[ index ] ];
   }
   return array;
 };
@@ -48,6 +52,7 @@ export const shuffle = <V>(
  * See also:
  * * {@link randomIndex} if you want a random index rather than value.
  * 
+ * @throws {TypeError} If `array` is not an array and `rand` is not a function
  * @param array
  * @param rand Random generator. `Math.random` by default.
  * @returns
@@ -56,7 +61,10 @@ export const randomElement = <V>(
   array: ArrayLike<V>,
   rand: () => number = Math.random
 ): V => {
-  resultThrow(arrayTest(array, `array`));
+  resultThrow(
+    arrayTest(array, `array`),
+    functionTest(rand, `rand`)
+  );
   return array[ Math.floor(rand() * array.length) ];
 };
 
@@ -70,6 +78,7 @@ export const randomElement = <V>(
  *
  * Use {@link randomElement} if you want a value from `array`, not index.
  *
+ * @throws {TypeError} If `array` is not an array and `rand` is not a function
  * @param array Array
  * @param rand Random generator. `Math.random` by default.
  * @returns
@@ -77,4 +86,10 @@ export const randomElement = <V>(
 export const randomIndex = <V>(
   array: ArrayLike<V>,
   rand: () => number = Math.random
-): number => Math.floor(rand() * array.length);
+): number => {
+  resultThrow(
+    arrayTest(array, `array`),
+    functionTest(rand, `rand`)
+  );
+  return Math.floor(rand() * array.length);
+}
