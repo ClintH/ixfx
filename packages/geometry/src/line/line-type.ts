@@ -11,4 +11,4 @@ export type Line = {
 /**
  * A PolyLine, consisting of more than one line.
  */
-export type PolyLine = ReadonlyArray<Line>;
+export type PolyLine = readonly Line[];
