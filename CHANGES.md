@@ -1,5 +1,38 @@
 A rough changelog between NPM releases
 
+# 
+2026.01.08
+
+@ixfx/arrays
+* isEquals/isEqualIgnoreOrder/intersection/unique: supports (a,b) or string-based comparison
+
+@ixfx/collections
++ Multi-value maps: cloneShallow, equals, longestEntry
+* IMapOf interface has `get` renamed to `valuesFor` to make semantics more explicit. Likewise renamed `toArray` to `toArray` copy as well.
+
+@ixfx/iterables
+* equals: supports (a,b) or string-based comparison
+
+@ixfx/numbers
++ Kalman1dFilter
+* minFast: bug fix
+
+@ixfx/geometry
++ Additional functions for working with polar rays
++ Rays.raycast2d,.intersections: Get the intersecton points of a line with a set of other lines
++ Points.average: average a set of points
++ Angles.to/fromUnitVector/toRadian,.average,.radiansNormalise,.radiansBetweenCircular,.radianRange
++ Surface.ring: arrange items on a circle
++ Line.polyLineToPoints: Convert a polyline to an array of points
++ Point.crossProduct/.crossProductRaw
++ Polar.toPolarLine,.lineToCartesian,.between,.toCartesian,.fromLine
+  
+@ixfx/random
++ lfsr/mulberry32 deterministic pseudo-random generators
+
+@ixfx/visual
++ DrawingHelper.polarRay
+  
 # 1.20.0
 
 2025.11.11
@@ -10,7 +43,7 @@ A rough changelog between NPM releases
 + Numbers.equalWithPrecisionTest, .median, .mean, .interquartileRange, .filterOutliers, .getQuantile, .standardDeviation
 + Numbers.normalise: selectable normalisation techniques: minmax (previous default), standardise and robust
 + Numbers.averageWeigher
-+ 
+  
 # 1.17.0 2025.10.23
 
 + Collections.MapWithEvents: wraps a regular Map, but fires events when values are changed
