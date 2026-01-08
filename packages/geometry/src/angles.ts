@@ -1,6 +1,7 @@
 import { piPi } from './pi.js';
 import type { Point } from './point/point-type.js';
 import { average as pointAverage, type PointAverageKinds } from './point/averager.js'
+
 /**
  * Convert angle in degrees to angle in radians.
  * @param angleInDegrees 
@@ -437,3 +438,88 @@ export const average = (angles: (Angle | string | number)[], kind: PointAverageK
 export const turnToRadian = (turns: number) => turns * piPi;
 export const degreeToTurn = (degrees: number) => degrees / 360;
 export const radianToTurn = (radians: number) => radians / piPi
+
+/**
+ * Normalise a radian angle to 0..2*PI range
+ * @param angleRadian 
+ * @returns 
+ */
+export const radiansNormalise = (angleRadian: number): number => {
+  angleRadian %= piPi;
+  return angleRadian < 0 ? angleRadian + piPi : angleRadian;
+}
+
+/**
+ * Returns _true_ if `check` is between `start` and `end` angles, using 0...2PI range.
+ * 
+ * Assumes a clockwise order. Ie. the checked angle is a wedge from `start`,
+ * clockwise to `end`.
+ * 
+ * Tip: use {@link radiansNormalise} on all angles first if uncertain if they are on 0...2PI range.
+ * @param check 
+ * @param start 
+ * @param end 
+ * @returns 
+ */
+export const radiansBetweenCircular = (check: number, start: number, end: number) => {
+  if (start < 0 || start > piPi) throw new TypeError(`Param 'start' out of range. Expecting 0..2PI. Got: ${ start }`);
+  if (end < 0 || end > piPi) throw new TypeError(`Param 'end' out of range. Expecting 0..2PI. Got: ${ end }`);
+
+  if (start > Math.PI && end <= Math.PI) {
+    // Start of line in upper part
+    if (check > Math.PI) {
+      return check >= start
+    } else {
+      return check <= end
+    }
+  }
+  return check >= start && check <= end;
+}
+
+/**
+ * Given two radian (0..2PI) angles, it returns the sweep angles
+ * between them that is either minimised or maximised.
+ * @param a 
+ * @param b 
+ * @param strategy 
+ */
+export const radianRange = (a: number, b: number) => {
+  if (a < 0 || a > piPi) throw new TypeError(`Param 'a' out of range. Expecting 0..2PI. Got: ${ a }`);
+  if (b < 0 || b > piPi) throw new TypeError(`Param 'b' out of range. Expecting 0..2PI. Got: ${ b }`);
+
+  const aa = Math.min(a, b);
+  const bb = Math.max(a, b);
+
+  if (aa < Math.PI && bb > Math.PI) {
+    // A in bottom half, B in top
+    const dCw = (piPi - bb) + aa;
+    const dCcw = bb - aa;
+    if (dCw < dCcw) {
+      return {
+        min: {
+          start: bb,
+          end: aa,
+          sweep: dCw
+        },
+        max: {
+          start: aa,
+          end: bb,
+          sweep: dCcw
+        }
+      }
+    }
+  }
+
+  return {
+    min: {
+      start: aa,
+      end: bb,
+      sweep: bb - aa
+    },
+    max: {
+      start: bb,
+      end: aa,
+      sweep: piPi - (bb - aa)
+    }
+  }
+}
