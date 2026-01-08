@@ -14,6 +14,20 @@ import type { Point } from "./point-type.js";
  * 
  * See also {@link angleRadianCircle} which returns coordinates on 0..Math.Pi*2
  * range. This avoids negative numbers.
+ * 
+ * @example Calculate angle between a middle of canvas and the cursor
+ * ```js
+ * const canvasEl = document.querySelector('canvas');
+ * const middle = { x: canvasEl.width/2, y: canvasEl.height /2 }
+ * 
+ * canvasEl.addEventListener(`pointermove`, event => { 
+ *  const cursor = {
+ *    x: event.offsetX,
+ *    y: event.offsetY
+ *  }
+ *  const a = G.Points.angleRadian(middle, cursor);
+ *});
+ * ```
  * @param a
  * @param b
  * @param c
