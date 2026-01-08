@@ -5,8 +5,6 @@
 		"rootDir": "."
 	},
 	"include": [
-		"src/**/*",
-		"__tests__/**/*",
-		"__demos__/**/*"
+		"src/**/*"
 	]
 }
