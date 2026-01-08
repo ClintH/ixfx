@@ -1,5 +1,7 @@
+import { radiansBetweenCircular, radiansNormalise } from "../angles.js";
+import { polarLineToString } from "./conversions.js";
 import { guard } from "./guard.js";
-import type { Coord } from "./types.js";
+import type { Coord, PolarLine } from "./types.js";
 import { numberTest, resultThrow } from "@ixfx/guards"
 
 export const normalise = (c: Coord): Coord => {
@@ -79,3 +81,17 @@ export const divide = (v: Coord, amt: number): Coord => {
     distance: v.distance / amt,
   });
 };
+
+
+
+/**
+ * Returns _true_ if `check` is between `start` and `end` angles.
+ * @param start 
+ * @param end 
+ * @param check 
+ * @returns 
+ */
+export const between = (check: { angleRadian: number }, start: { angleRadian: number }, end: { angleRadian: number }): boolean => {
+  return radiansBetweenCircular(check.angleRadian, start.angleRadian, end.angleRadian,)
+}
+
