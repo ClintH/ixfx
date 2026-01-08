@@ -17,7 +17,7 @@ const piPi = Math.PI * 2;
  * @param point
  * @returns Point `{ x, y }`
  */
-export const nearest = (circle: CirclePositioned | readonly CirclePositioned[], point: Point): Point => {
+export const nearest = (circle: CirclePositioned | CirclePositioned[], point: Point): Point => {
   const n = (a: CirclePositioned): Point => {
     const l = Math.sqrt(Math.pow(point.x - a.x, 2) + Math.pow(point.y - a.y, 2));
     const x = a.x + (a.radius * ((point.x - a.x) / l));
@@ -26,11 +26,11 @@ export const nearest = (circle: CirclePositioned | readonly CirclePositioned[], 
   };
 
   if (Array.isArray(circle)) {
-    const pts = circle.map(l => n(l));
+    const pts = (circle).map(l => n(l));
     const dists = pts.map(p => PointsDistance(p, point));
-    return Object.freeze<Point>(pts[ minIndex(...dists) ]);
+    return Object.freeze<Point>(pts[ minIndex(dists) ]);
   } else {
-    return Object.freeze<Point>(n(circle as CirclePositioned));
+    return Object.freeze<Point>(n(circle));
   }
 };
 
@@ -54,9 +54,7 @@ export const nearest = (circle: CirclePositioned | readonly CirclePositioned[], 
  * @returns Point oo circle
  */
 export const pointOnPerimeter = (circle: Circle | CirclePositioned, angleRadian: number, origin?: Point): Point => {
-  if (origin === undefined) {
-    origin = isCirclePositioned(circle) ? circle : { x: 0, y: 0 };
-  }
+  origin ??= isCirclePositioned(circle) ? circle : { x: 0, y: 0 };
   return {
     x: (Math.cos(-angleRadian) * circle.radius) + origin.x,
     y: (Math.sin(-angleRadian) * circle.radius) + origin.y
