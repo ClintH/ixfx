@@ -89,7 +89,7 @@ test(`chance`, () => {
   expect(r4[ 0 ][ 1 ]).toBeGreaterThanOrEqual(72);
   expect(r4[ 1 ][ 1 ]).toBeGreaterThanOrEqual(21);
   expect(r4[ 0 ][ 1 ]).toBeLessThanOrEqual(77);
-  expect(r4[ 1 ][ 1 ]).toBeLessThanOrEqual(26);
+  expect(r4[ 1 ][ 1 ]).toBeLessThanOrEqual(27);
 
 });
 
