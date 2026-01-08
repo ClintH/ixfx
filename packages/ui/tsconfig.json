@@ -6,7 +6,6 @@
 		"experimentalDecorators": false
 	},
 	"include": [
-		"src/**/*",
-		"__tests__/**/*"
+		"src/**/*"
 	]
 }

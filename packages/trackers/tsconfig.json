@@ -4,5 +4,7 @@
 		"outDir": "dist",
 		"rootDir": "."
 	},
-	"include": ["src/**/*", "__tests__/**/*"]
+	"include": [
+		"src/**/*"
+	]
 }
