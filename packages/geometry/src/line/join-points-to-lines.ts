@@ -1,3 +1,4 @@
+import { toString as PointToString } from "../point/To.js";
 import type { Point } from "../point/point-type.js";
 import { fromPoints } from "./from-points.js";
 import type { Line, PolyLine } from "./line-type.js";
@@ -25,3 +26,35 @@ export const joinPointsToLines = (...points: readonly Point[]): PolyLine => {
   }
   return lines;
 };
+
+/**
+ * Converts a {@link PolyLine} to an array of points.
+ * Duplicate points are optionally excluded
+ * @param line 
+ * @returns 
+ */
+export const polyLineToPoints = (line: PolyLine, skipDuplicates = false) => {
+  if (skipDuplicates) {
+    const pt: Point[] = [];
+    const seen = new Set<string>();
+    for (const l of line) {
+      const aa = PointToString(l.a);
+      const bb = PointToString(l.b);
+      if (!seen.has(aa)) {
+        seen.add(aa);
+        pt.push(l.a);
+      }
+      if (seen.has(bb)) {
+        seen.add(bb);
+        pt.push(l.b);
+      }
+    }
+    return pt;
+  } else {
+    const pt: Point[] = [];
+    for (const l of line) {
+      pt.push(l.a, l.b);
+    }
+    return pt;
+  }
+}
