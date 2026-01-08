@@ -38,17 +38,17 @@ test(`MapOfSimple`, () => {
     [ 'name', [ 'apple', 'carrot', 'pear' ] ],
     [ 'colours', [ 'red', 'green', 'blue' ] ]
   ]);
-  expect(m3.valuesFor('name')).toStrictEqual([ 'apple', 'carrot', 'pear' ])
-  expect(m3.valuesFor('colours')).toStrictEqual([ 'red', 'green', 'blue' ]);
+  expect([ ...m3.valuesFor('name') ]).toStrictEqual([ 'apple', 'carrot', 'pear' ])
+  expect([ ...m3.valuesFor('colours') ]).toStrictEqual([ 'red', 'green', 'blue' ]);
 
   type Person = { name: string, size: number }
   let m4 = new MapOfSimple<Person>((v) => v.name, isEqualValueDefault);
   m4 = m4.addValue({ name: 'jill', size: 10 }, { name: 'jill', size: 1 });
   m4 = m4.addValue({ name: 'jane', size: 10 });
-  expect(m4.valuesFor('jill')).toStrictEqual([ { name: 'jill', size: 10 }, { name: 'jill', size: 1 } ])
+  expect([ ...m4.valuesFor('jill') ]).toStrictEqual([ { name: 'jill', size: 10 }, { name: 'jill', size: 1 } ])
 
   m4 = m4.deleteByValue({ name: 'jill', size: 1 });
-  expect(m4.valuesFor('jill')).toStrictEqual([ { name: 'jill', size: 10 } ])
+  expect([ ...m4.valuesFor('jill') ]).toStrictEqual([ { name: 'jill', size: 10 } ])
 
   // Delete a value that doesn't exist
   m4 = m4.deleteKeyValue('jill', { name: 'jill', size: 100 });
@@ -57,7 +57,7 @@ test(`MapOfSimple`, () => {
   // Delete a value that does exist but different key
   m4 = m4.deleteKeyValue('jill', { name: 'jane', size: 10 });
   expect(m4.has('jill')).toBeTruthy()
-  expect(m4.valuesFor('jane')).toStrictEqual([ { name: 'jane', size: 10 } ])
+  expect([ ...m4.valuesFor('jane') ]).toStrictEqual([ { name: 'jane', size: 10 } ])
 
   // Delete a value that does exist under key
   m4 = m4.deleteKeyValue('jill', { name: 'jill', size: 10 });

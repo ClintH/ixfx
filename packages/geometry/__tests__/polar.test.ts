@@ -17,14 +17,22 @@ const closeEnough = (a: Point, b: Point): boolean => {
   return v;
 };
 
-// https://www.omnicalculator.com/math/cartesian-to-polar
 test(`fromCartesian`, () => {
-  expect(Polar.fromCartesian({ x: 10, y: 20 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 22.361, angleRadian: 1.107 });
-  expect(Polar.fromCartesian({ x: -10, y: -15 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 18.028, angleRadian: -2.159 });
-  expect(Polar.fromCartesian({ x: 12, y: -15 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 19.209, angleRadian: -0.896 });
-  expect(Polar.fromCartesian({ x: -16, y: 15 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 21.932, angleRadian: 2.388 });
-  expect(Polar.fromCartesian({ x: 0, y: 0 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 0, angleRadian: 0 });
+  // https://www.omnicalculator.com/math/cartesian-to-polar
 
+  // fullCircle: false
+  expect(Polar.fromCartesian({ x: 10, y: 20 }, { x: 0, y: 0 }, { digits: 3, fullCircle: false })).toStrictEqual({ distance: 22.361, angleRadian: 1.107 });
+  expect(Polar.fromCartesian({ x: -10, y: -15 }, { x: 0, y: 0 }, { digits: 3, fullCircle: false })).toStrictEqual({ distance: 18.028, angleRadian: -2.159 });
+  expect(Polar.fromCartesian({ x: 12, y: -15 }, { x: 0, y: 0 }, { digits: 3, fullCircle: false })).toStrictEqual({ distance: 19.209, angleRadian: -0.896 });
+  expect(Polar.fromCartesian({ x: -16, y: 15 }, { x: 0, y: 0 }, { digits: 3, fullCircle: false })).toStrictEqual({ distance: 21.932, angleRadian: 2.388 });
+  expect(Polar.fromCartesian({ x: 0, y: 0 }, { x: 0, y: 0 }, { digits: 3, fullCircle: false })).toStrictEqual({ distance: 0, angleRadian: 0 });
+
+  // Verified with: https://unitscalculator.com/polar-coordinates/
+  expect(Polar.fromCartesian({ x: 10, y: 20 }, { x: 0, y: 0 }, { digits: 3, fullCircle: true })).toStrictEqual({ distance: 22.361, angleRadian: 1.107 });
+  expect(Polar.fromCartesian({ x: -10, y: -15 }, { x: 0, y: 0 }, { digits: 3, fullCircle: true })).toStrictEqual({ distance: 18.028, angleRadian: 4.124 });
+  expect(Polar.fromCartesian({ x: 12, y: -15 }, { x: 0, y: 0 }, { digits: 3, fullCircle: true })).toStrictEqual({ distance: 19.209, angleRadian: 5.387 });
+  expect(Polar.fromCartesian({ x: -16, y: 15 }, { x: 0, y: 0 }, { digits: 3, fullCircle: true })).toStrictEqual({ distance: 21.932, angleRadian: 2.388 });
+  expect(Polar.fromCartesian({ x: 0, y: 0 }, { x: 0, y: 0 }, { digits: 3, fullCircle: true })).toStrictEqual({ distance: 0, angleRadian: 0 });
 });
 
 test(`conversion`, () => {
