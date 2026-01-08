@@ -27,7 +27,7 @@ test(`ofCircular`, () => {
   const c = ofCircularMutable({ capacity: 3 });
   c.addKeyedValues(`hello`, 1, 2, 3, 4, 5);
   console.log(c.debugString());
-  expect(c.valuesForAsArray('hello')).toStrictEqual([ 4, 5, 3 ]);
+  expect(c.valuesFor('hello')).toStrictEqual([ 4, 5, 3 ]);
   expect(c.typeName).toBe(`circular`);
   expect(c.count('hello')).toBe(3);
   expect(c.count('goodbye')).toBe(0);

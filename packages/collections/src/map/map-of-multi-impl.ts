@@ -173,12 +173,11 @@ export class MapOfMutableImpl<V, M>
    * 
    * Alternatively use {@link valuesFor}
    */
-  valuesForAsArray(key: string): V[] {
-    const m = this.#map.get(key);
-    if (m === undefined) return [];
-    return this.type.toArrayCopy(m);
-    //yield* this.type.iterable(m);
-  }
+  // valuesForAsArray(key: string): V[] {
+  //   const m = this.#map.get(key);
+  //   if (m === undefined) return [];
+  //   return this.type.toArrayCopy(m);
+  // }
 
   /**
    * Iterate over the values stored under `key`.
@@ -232,7 +231,7 @@ export class MapOfMutableImpl<V, M>
 
   merge(other: IMapOf<V>) {
     for (const key of other.keys()) {
-      this.addKeyedValues(key, ...other.valuesForAsArray(key));
+      this.addKeyedValues(key, ...other.valuesFor(key));
     }
   }
 

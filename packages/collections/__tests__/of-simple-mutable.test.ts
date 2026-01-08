@@ -37,20 +37,20 @@ test('basic', () => {
   // @ts-expect-error
   expect(m.hasKeyValue(`key-a`, undefined)).toBe(false);
 
-  const valuesA = [ ...m.valuesForAsArray(`key-a`) ];
-  const valuesB = [ ...m.valuesForAsArray(`key-b`) ];
-  const valuesC = [ ...m.valuesForAsArray(`key-c`) ];
+  const valuesA = [ ...m.valuesFor(`key-a`) ];
+  const valuesB = [ ...m.valuesFor(`key-b`) ];
+  const valuesC = [ ...m.valuesFor(`key-c`) ];
   expect(valuesA).toEqual([ `a`, `aa`, `aaa` ]);
   expect(valuesB).toEqual([ `b`, `bb`, `bbb` ]);
   expect(valuesC).toEqual([ `c`, `cc`, `ccc` ]);
-  expect([ ...m.valuesForAsArray(`keys-z`) ].length === 0).toBe(true);
+  expect([ ...m.valuesFor(`keys-z`) ].length === 0).toBe(true);
 
   expect(m.delete(`key-b`)).toBe(true);
   expect(m.has(`key-a`)).toBe(true);
   expect(m.has(`key-b`)).toBe(false);
   expect(m.has(`key-c`)).toBe(true);
   expect(m.count(`key-b`) === 0).toBe(true);
-  expect([ ...m.valuesForAsArray(`key-b`) ].length === 0).toBe(true);
+  expect([ ...m.valuesFor(`key-b`) ].length === 0).toBe(true);
 
   m.clear();
   expect([ ...m.keysAndCounts() ].length === 0).toBe(true);

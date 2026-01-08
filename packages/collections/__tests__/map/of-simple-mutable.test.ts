@@ -12,8 +12,8 @@ test(`mapOfSimpleMutable`, () => {
   m2.addKeyedValues(`colours`, `red`, `blue`, `yellow`);
 
   expect([ ...m2.keys() ].length === 2).toBe(true);
-  expect([ ...m2.valuesForAsArray(`name`) ]).toEqual([ `jane`, `jill`, `joe`, `jack` ]);
-  expect([ ...m2.valuesForAsArray(`colours`) ]).toEqual([ `red`, `blue`, `yellow` ]);
+  expect([ ...m2.valuesFor(`name`) ]).toEqual([ `jane`, `jill`, `joe`, `jack` ]);
+  expect([ ...m2.valuesFor(`colours`) ]).toEqual([ `red`, `blue`, `yellow` ]);
   assert.sameDeepMembers(
 
     [ ...m2.entriesFlat() ],
@@ -28,5 +28,5 @@ test(`mapOfSimpleMutable`, () => {
     ]
   );
 
-  expect([ ...m2.valuesForAsArray(`notfound`) ].length === 0).toBe(true);
+  expect([ ...m2.valuesFor(`notfound`) ].length === 0).toBe(true);
 });

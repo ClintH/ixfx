@@ -17,7 +17,7 @@ export interface IMapOf<V> {
    * Returns a copy of all values under key as an arry
    * @param key 
    */
-  valuesForAsArray(key: string): V[]
+  //valuesForAsArray(key: string): V[]
 
   /**
    * Iterates over all values, regardless of key.

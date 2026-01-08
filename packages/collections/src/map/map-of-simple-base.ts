@@ -160,11 +160,11 @@ export class MapOfSimpleBase<V> {
    * @param key 
    * @returns 
    */
-  valuesForAsArray(key: string): V[] {
-    const v = this.map.get(key);
-    if (!v) return []
-    return [ ...v ];
-  }
+  // valuesForAsArray(key: string): V[] {
+  //   const v = this.map.get(key);
+  //   if (!v) return []
+  //   return [ ...v ];
+  // }
 
   /**
    * Returns the underlying array that stores values for `key`.

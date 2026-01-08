@@ -33,7 +33,7 @@ test(`with-opts`, () => {
   expect([ ...m.entriesFlat() ].length).eq(6);
 
   // Check for key recall
-  expect([ ...m.valuesForAsArray(`Bristol`) ].length).toBe(2);
+  expect([ ...m.valuesFor(`Bristol`) ].length).toBe(2);
   expect(m.count(`London`)).toBe(2);
   expect(m.count(`Notfound`)).toBe(0);
   expect(m.hasKeyValue(`Bristol`, { name: `Sally`, city: `Bristol` })).toBe(true);
@@ -42,7 +42,7 @@ test(`with-opts`, () => {
 
   // Check for non-existent keys
   expect(m.has(`notfound`)).toBe(false);
-  expect([ ...m.valuesForAsArray('notfound') ].length).toBe(0);
+  expect([ ...m.valuesFor('notfound') ].length).toBe(0);
 
   // Key equality
   expect(m.has(`LONDON`)).toBe(false);
