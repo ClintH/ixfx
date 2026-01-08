@@ -3,8 +3,8 @@ import type { Point } from "../point/point-type.js"
 import type { Line } from "./line-type.js"
 
 export type LinePath = Line & Path & {
-  toFlatArray(): ReadonlyArray<number>
-  toPoints(): ReadonlyArray<Point>
+  toFlatArray(): readonly number[]
+  toPoints(): readonly Point[]
   rotate(amountRadian: number, origin: Point): LinePath
   sum(point: Point): LinePath
   divide(point: Point): LinePath
