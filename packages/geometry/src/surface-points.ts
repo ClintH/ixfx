@@ -4,6 +4,8 @@ import type { Sphere } from './shape/index.js';
 
 import { toPositioned as circleToPositioned } from './circle/to-positioned.js';
 import { scale, linearSpace } from '@ixfx/numbers';
+import { toCartesian } from './polar/conversions.js';
+import { degreeToRadian } from './angles.js';
 const cos = Math.cos;
 const sin = Math.sin;
 const asin = Math.asin;
@@ -80,15 +82,11 @@ export function* circleVogelSpiral(
 
   const c = circleToPositioned(circle ?? { radius: 1, x: 0, y: 0 });
   const max = c.radius;
-  //eslint-disable-next-line functional/no-let
   let spacing = c.radius * scale(density, 0, 1, 0.3, 0.01);
   if (opts.spacing) spacing = opts.spacing;
 
-  //eslint-disable-next-line functional/no-let
   let radius = 0;
-  //eslint-disable-next-line functional/no-let
   let count = 0;
-  //eslint-disable-next-line functional/no-let
   let angle = 0;
   while (count < maxPoints && radius < max) {
     radius = spacing * count ** 0.5;
@@ -135,13 +133,11 @@ export function* circleRings(
   const ringR = 1 / rings;
   const rotationOffset = opts.rotation ?? 0;
 
-  //eslint-disable-next-line functional/no-let
   let ringCount = 1;
 
   // Origin
   yield Object.freeze({ x: c.x, y: c.y });
 
-  //eslint-disable-next-line functional/no-let
   for (let r = ringR; r <= 1; r += ringR) {
     const n = Math.round(pi / asin(1 / (2 * ringCount)));
     for (const theta of linearSpace(0, piPi, n + 1)) {
@@ -189,11 +185,54 @@ export function* sphereFibonacci(
     const a = ((index + 1) % samples) * goldenAngle + rotationRadians;
     const x = cos(a) * r;
     const z = sin(a) * r;
-    //eslint-disable-next-line functional/immutable-data
     yield Object.freeze({
       x: s.x + x * s.radius,
       y: s.y + y * s.radius,
       z: s.z + z * s.radius,
     });
+  }
+}
+
+export type RingOptionsCount = {
+  count: number
+}
+export type RingOptionsRadianInterval = {
+  radians: number
+}
+export type RingOptionsDegreeInterval = {
+  degrees: number
+}
+
+/**
+ * Yields points distributed around a ring.
+ * ```js
+ * // 5 points evenly distributed
+ * for (const point of ring(circle, { count: 5})) {
+ *   // { x, y }
+ * }
+ * 
+ * // Get a list of points, spaced by 10 degrees
+ * const points = [...ring(circle, { degrees: 0.1 })]
+ * ```
+ * @param circle 
+ * @param opts 
+ */
+export function* ring(circle: CirclePositioned, opts: { offset?: number } & (RingOptionsCount | RingOptionsRadianInterval | RingOptionsDegreeInterval)) {
+  let intervalRad = pi;
+  let angleRadian = opts.offset ?? 0;
+  if (`count` in opts) {
+    intervalRad = (piPi - angleRadian) / opts.count;
+  } else if (`radians` in opts) {
+    intervalRad = opts.radians;
+  } else if (`degrees` in opts) {
+    intervalRad = degreeToRadian(opts.degrees);
+  }
+  if (angleRadian < 0) throw new Error(`Offset should be at least 0`);
+  if (angleRadian > piPi) throw new Error(`Offset should be less than 2*PI`);
+  if (intervalRad === 0) throw new Error(`Interval cannot be 0`);
+  while (angleRadian < piPi) {
+    const pt = toCartesian({ angleRadian, distance: circle.radius }, circle);
+    yield pt;
+    angleRadian += intervalRad;
   }
 }
