@@ -134,6 +134,8 @@ export * as SurfacePoints from './surface-points.js';
 export * as Triangles from './triangle/index.js';
 export type * from './triangle/triangle-type.js';
 
+export * as Rays from './raycast.js';
+
 // try {
 //   if (typeof window !== `undefined`) {
 //     //eslint-disable-next-line functional/immutable-data,@typescript-eslint/no-explicit-any
