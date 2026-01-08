@@ -3,8 +3,9 @@ import { Colour } from '@ixfx/visual';
 import { resolveEl } from '@ixfx/dom';
 //import type { IStackImmutable } from '@ixfx/collections';
 import { StackImmutable, type IStackImmutable } from '@ixfx/collections/stack';
-import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths } from '@ixfx/geometry';
+import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths, type PolarRay } from '@ixfx/geometry';
 import { quantiseEvery } from '@ixfx/numbers';
+import * as Polar from '@ixfx/geometry/polar'
 
 // import type { Point } from '../geometry/point/PointType.js';
 // import type { Line } from '../geometry/line/LineType.js';
@@ -75,7 +76,10 @@ export const makeHelper = (
     paths(pathsToDraw: Paths.Path[] | readonly Paths.Path[], opts?: DrawingOpts): void {
       paths(ctx, pathsToDraw, opts);
     },
-    line(lineToDraw: Lines.Line | Lines.Line[], opts?: DrawingOpts): void {
+    polarRay(rayToDraw: PolarRay | PolarRay[] | readonly PolarRay[], opts?: DrawingOpts): void {
+      polarRay(ctx, rayToDraw, opts);
+    },
+    line(lineToDraw: Lines.Line | Lines.Line[] | readonly Lines.Line[], opts?: DrawingOpts): void {
       line(ctx, lineToDraw, opts);
     },
     rect(
@@ -91,7 +95,7 @@ export const makeHelper = (
       bezier(ctx, bezierToDraw, opts);
     },
     connectedPoints(
-      pointsToDraw: Points.Point[],
+      pointsToDraw: Points.Point[] | readonly Points.Point[],
       opts?: DrawingOpts & Partial<ConnectedPointsOptions>
     ): void {
       connectedPoints(ctx, pointsToDraw, opts);
@@ -381,6 +385,7 @@ export const ellipse = (
   ctx: CanvasRenderingContext2D,
   ellipsesToDraw:
     | Ellipses.EllipsePositioned
+    | Ellipses.EllipsePositioned[]
     | readonly Ellipses.EllipsePositioned[],
   opts: DrawingOpts = {}
 ) => {
@@ -396,7 +401,7 @@ export const ellipse = (
     if (opts.fillStyle) ctx.fill();
   };
 
-  const ellipsesArray = Array.isArray(ellipsesToDraw) ? ellipsesToDraw : [ ellipsesToDraw ];
+  const ellipsesArray = Array.isArray(ellipsesToDraw) ? ellipsesToDraw : [ ellipsesToDraw as Ellipses.EllipsePositioned ];
   for (const ellipse of ellipsesArray) {
     draw(ellipse);
   }
@@ -411,7 +416,7 @@ export const ellipse = (
  */
 export const paths = (
   ctx: CanvasRenderingContext2D,
-  pathsToDraw: readonly Paths.Path[] | Paths.Path,
+  pathsToDraw: readonly Paths.Path[] | Paths.Path | Paths.Path[],
   opts: { readonly strokeStyle?: string; readonly debug?: boolean } = {}
 ) => {
   applyOpts(ctx, opts);
@@ -565,8 +570,8 @@ export const dot = (
   opts ??= {};
   const radius = opts.radius ?? 10;
   const positions = Array.isArray(pos) ? pos : [ pos ];
-  const stroke = opts.stroke ? opts.stroke : opts.strokeStyle !== undefined;
-  let filled = opts.filled ? opts.filled : opts.fillStyle !== undefined;
+  const stroke = opts.stroke ?? opts.strokeStyle !== undefined;
+  let filled = opts.filled ?? opts.fillStyle !== undefined;
   if (!stroke && !filled) filled = true;
 
   applyOpts(ctx, opts);
@@ -726,6 +731,27 @@ const quadraticBezier = (
 };
 
 /**
+ * Draws one or more polar rays.
+ *
+ * Each ray is drawn independently, ie it's not assumed rays are connected.
+ *
+ * See also:
+ * * {@link connectedPoints}: Draw a series of connected points
+ * @param ctx
+ * @param toDraw
+ * @param opts
+ */
+export const polarRay = (
+  ctx: CanvasRenderingContext2D,
+  toDraw: PolarRay | readonly PolarRay[] | PolarRay[],
+  opts: LineOpts & DrawingOpts = {}
+) => {
+  const rays = Array.isArray(toDraw) ? toDraw : [ toDraw as PolarRay ];
+  const toLines = Polar.Ray.toCartesian(rays);
+  line(ctx, toLines, opts);
+}
+
+/**
  * Draws one or more lines.
  *
  * Each line is drawn independently, ie it's not assumed lines are connected.
@@ -738,7 +764,7 @@ const quadraticBezier = (
  */
 export const line = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Lines.Line | readonly Lines.Line[],
+  toDraw: Lines.Line | readonly Lines.Line[] | Lines.Line[],
   opts: LineOpts & DrawingOpts = {}
 ) => {
   const isDebug = opts.debug ?? false;
@@ -760,7 +786,7 @@ export const line = (
   };
 
   if (Array.isArray(toDraw)) {
-    for (const t of toDraw) draw(t as Lines.Line);
+    for (const t of toDraw) draw(t);
   } else {
     draw(toDraw as Lines.Line);
   }
@@ -774,7 +800,7 @@ export const line = (
  */
 export const triangle = (
   ctx: CanvasRenderingContext2D,
-  toDraw: Triangles.Triangle | readonly Triangles.Triangle[],
+  toDraw: Triangles.Triangle | readonly Triangles.Triangle[] | Triangles.Triangle[],
   opts: DrawingOpts & { readonly filled?: boolean } = {}
 ) => {
   applyOpts(ctx, opts);

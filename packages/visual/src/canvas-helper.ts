@@ -227,6 +227,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
         width: this.width, height: this.height
       });
     }
+    return this.#drawHelper;
   }
 
   setLogicalSize(logicalSize: Rect) {
