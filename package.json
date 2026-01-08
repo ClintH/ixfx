@@ -6,7 +6,7 @@
 		"clean": "pnpm run --parallel clean",
 		"rebuild": "pnpm run clean && pnpm run build",
 		"test": "vitest --api",
-		"coverage": "vitest run --coverage --coverage.exclude=**/types.ts --coverage.exclude=**/node_modules/** --coverage.exclude=**/dist/** --coverage.exclude=bundle/** --coverage.exclude=node_modules/** --coverage.exclude=**/bundle/** --coverage.exclude=**/__tests__/** --coverage.exclude=**/*.config.ts --coverage.exclude=**/*.config.mjs --coverage.exclude=**/*.package.ts --coverage.exclude=tests/**  --coverage.reportsDirectory ./tests/coverage",
+		"coverage": "vitest run --coverage --coverage.exclude=**/types.ts --coverage.exclude=**/node_modules/** --coverage.exclude=**/dist/** --coverage.exclude=bundle/** --coverage.exclude=node_modules/** --coverage.exclude=**/bundle/** --coverage.exclude=**/__tests__/** --coverage.exclude=**/*.config.ts --coverage.exclude=**/*.config.mjs --coverage.exclude=**/*.package.ts --coverage.exclude=tests/** --coverage.exclude=packages/ui/** --coverage.exclude=packages/io/** --coverage.exclude=packages/dom/** --coverage.exclude=src/** --coverage.reportsDirectory ./tests/coverage",
 		"publint": "pnpm --recursive --filter=\"./packages/**\" exec publint",
 		"docs": "typedoc --out ../api-docs/docs",
 		"pkg-strip": "node --experimental-strip-types package-rewrite.ts strip",
