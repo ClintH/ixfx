@@ -31,7 +31,6 @@ export * from './key-value.js';
 
 export * from './interval-type.js';
 export * from './to-string.js';
-export * from './track-unique.js';
 export * from './platform.js';
 export * from './promise-from-event.js';
 export * from './reactive-core.js';
