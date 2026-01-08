@@ -1,4 +1,5 @@
-import { uniqueInstances } from "@ixfx/core";
+import { Trackers } from "@ixfx/core";
+
 export type ElementQueryOptions = {
   /**
    * If true, elements are only returned once, even if that match several queries
@@ -24,7 +25,7 @@ export async function* query(queryOrElement: string | HTMLElement | (string | HT
   }
 
   const ensureUnique = options ?? false;
-  const isUnique = ensureUnique ? uniqueInstances<HTMLElement>() : (_: HTMLElement) => true;
+  const isUnique = ensureUnique ? Trackers.uniqueInstances<HTMLElement>() : (_: HTMLElement) => true;
 
   if (Array.isArray(queryOrElement)) {
     for (const item of queryOrElement) {
