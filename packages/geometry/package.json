@@ -6,11 +6,14 @@
 	"sideEffects": false,
 	"files": [
 		"dist/",
+		"!dist/__demos__/**/*",
+		"!dist/__tests__/**/*",
 		"bundle/"
 	],
 	"scripts": {
 		"package-bundle": "tsdown",
-		"clean": "rm -rf dist && rm -rf bundle"
+		"clean": "rm -rf dist && rm -rf bundle",
+		"demos": ""
 	},
 	"devDependencies": {
 		"bezier-js": "latest"
