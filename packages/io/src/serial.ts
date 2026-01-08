@@ -67,13 +67,13 @@ export class Device extends JsonDevice {
   }
 
   /**
-   * Writes text collected in buffer
+   * Writes text to the underlying output
    * @param txt
    */
   protected async writeInternal(txt: string) {
-    if (this.tx === undefined) throw new Error(`tx not ready`);
+    if (typeof this.tx === `undefined`) throw new Error(`this.tx not ready`);
     try {
-      this.tx.write(txt);
+      await this.tx.write(txt);
     } catch (error: unknown) {
       this.warn(error);
     }
@@ -107,17 +107,17 @@ export class Device extends JsonDevice {
     this.port = await navigator.serial.requestPort(reqOpts);
 
     this.port.addEventListener(`disconnect`, (_) => {
-      this.close();
+      void this.close();
     });
 
     await this.port.open(openOpts);
 
-    const txW = this.port.writable;
+    const txW = this.port.writable as WritableStream<Uint8Array>;
     const txText = new TextEncoderStream();
     if (txW !== null) {
       txText.readable
         .pipeTo(txW, { signal: this.abort.signal })
-        .catch((error) => {
+        .catch((error: unknown) => {
           console.log(`Serial.onConnectAttempt txText pipe:`);
           console.log(error);
         });
@@ -128,18 +128,18 @@ export class Device extends JsonDevice {
     const rxText = new TextDecoderStream();
     if (rxR !== null) {
       rxR
-        .pipeTo(rxText.writable, { signal: this.abort.signal })
-        .catch((error) => {
+        .pipeTo(rxText.writable as WritableStream, { signal: this.abort.signal })
+        .catch((error: unknown) => {
           console.log(`Serial.onConnectAttempt rxR pipe:`);
           console.log(error);
         });
       rxText.readable
         .pipeTo(this.rxBuffer.writable(), { signal: this.abort.signal })
-        .catch((error) => {
+        .catch((error: unknown) => {
           console.log(`Serial.onConnectAttempt rxText pipe:`);
           console.log(error);
           try {
-            this.port?.close();
+            void this.port?.close();
           } catch (error) {
             console.log(error);
           }

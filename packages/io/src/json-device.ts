@@ -82,7 +82,6 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.txBuffer = new StringWriteBuffer(async (data) => {
       // When we have data to actually write to device
 
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       await this.writeInternal(data);
     }, config);
 
@@ -126,7 +125,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
    * Writes text to output device
    * @param txt
    */
-  protected abstract writeInternal(txt: string): void;
+  protected abstract writeInternal(txt: string): Promise<void>;
 
 
   // eslint-disable-next-line @typescript-eslint/require-await
