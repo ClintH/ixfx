@@ -15,5 +15,4 @@ export * from './guard.js';
 export * from './math.js';
 export * as Ray from './ray.js';
 export * from './spiral.js'
-
-
+export * from './intersects.js';

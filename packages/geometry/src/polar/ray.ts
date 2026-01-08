@@ -45,34 +45,6 @@ const getOrigin = (ray: PolarRay, origin?: Point): Point => {
   return { x: 0, y: 0 };
 }
 
-/**
- * Returns a copy of `ray` ensuring it has an origin.
- * If the `origin` parameter is provided, it will override the existing origin.
- * If no origin information is available, 0,0 is used.
- * @param ray 
- * @param origin 
- * @returns 
- */
-// const withOrigin = (ray: PolarRay, origin?: Point): PolarRayWithOrigin => {
-//   if (origin) {
-//     return {
-//       ...ray,
-//       origin
-//     };
-//   }
-//   if (ray.origin !== undefined) return { ...ray } as PolarRayWithOrigin;
-//   return {
-//     ...ray,
-//     origin: { x: 0, y: 0 }
-//   }
-// }
-
-
-
-// function getAngle(a: Point, b: Point) {
-//   const angle = Math.atan2(b.y - a.y, b.x - a.x);// * (180 / Math.PI) + 90;
-//   return angle;//return (angle < 0) ? scale(angle, -90, 0, 0, piPi) : angle;
-// }
 
 /**
  * Returns a string representation of the ray, useful for debugging.

@@ -5,7 +5,7 @@ import { subtract as subtractPoint } from "../point/subtract.js";
 import { guard as guardPoint } from "../point/guard.js";
 import { Empty as EmptyPoint } from '../point/empty.js';
 import { isPoint } from "../point/guard.js";
-import { radianRange, radianToDegree } from "../angles.js";
+import { radianRange, radiansNormalise, radianToDegree } from "../angles.js";
 import type { Line } from "../line/line-type.js";
 import { piPi } from "../pi.js";
 
@@ -107,9 +107,13 @@ export type FromCartesianOptions = {
  * ```
  *
  * Any additional properties of `point` are copied to object.
+ * 
+ * Options:
+ * * fullCircle: If _true_ (default) returns values on 0..2PI range. If _false_, 0....PI..-PI range.
+ * * digits: Rounding to apply
  * @param point Point
  * @param origin Origin. If unspecified, {x:0,y:0} is used
- * @param digits Number of significant digits to round to
+ * @param options Options
  * @returns
  */
 export const fromCartesian = (
@@ -125,7 +129,9 @@ export const fromCartesian = (
   }
 
   let angle = Math.atan2(point.y, point.x);
-  if (angle < 0 && fullCircle) angle += piPi
+  if (fullCircle) angle = radiansNormalise(angle);
+
+  //if (angle < 0 && fullCircle) angle += piPi
   let distance = Math.hypot(point.x, point.y);
 
   if (typeof options.digits === `number`) {
@@ -234,10 +240,10 @@ export function polarLineToString(line: PolarLine, digits = 2): string {
   return `angle: ${ line.a.angleRadian.toFixed(digits) }-${ line.b.angleRadian.toFixed(digits) } dist: ${ line.a.distance.toFixed(digits) }-${ line.b.distance.toFixed(digits) }`
 }
 
-export function lineToCartestian(line: PolarLine, origin: Point): Line;
-export function lineToCartestian(lines: PolarLine[] | readonly PolarLine[], origin: Point): Line[];
-export function lineToCartestian(lineOrLines: PolarLine | PolarLine[] | readonly PolarLine[], origin: Point): Line | Line[] {
-  const lines = Array.isArray(lineOrLines) ? lineOrLines : [ lineOrLines as PolarLine ];
+export function lineToCartesian(line: PolarLine, origin: Point): Line;
+export function lineToCartesian(lines: PolarLine[], origin: Point): Line[];
+export function lineToCartesian(lineOrLines: PolarLine | PolarLine[], origin: Point): Line | Line[] {
+  const lines = Array.isArray(lineOrLines) ? lineOrLines : [ lineOrLines ];
   if (lines.length === 0) return [];
   const cart = lines.map(line => Object.freeze({
     a: toCartesian(line.a, origin),
