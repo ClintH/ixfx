@@ -1,11 +1,13 @@
 import type { Point } from "../point/point-type.js";
 import { guard, isPolarCoord } from "./guard.js";
-import type { Coord, PolarToCartesian } from "./types.js";
+import type { Coord, PolarLine, PolarToCartesian } from "./types.js";
 import { subtract as subtractPoint } from "../point/subtract.js";
 import { guard as guardPoint } from "../point/guard.js";
 import { Empty as EmptyPoint } from '../point/empty.js';
 import { isPoint } from "../point/guard.js";
-import { radianToDegree } from "../angles.js";
+import { radianRange, radianToDegree } from "../angles.js";
+import type { Line } from "../line/line-type.js";
+import { piPi } from "../pi.js";
 
 /**
  * Converts a polar coordinate to a Line.
@@ -83,6 +85,18 @@ export const toCartesian: PolarToCartesian = (
   }
 };
 
+export type FromCartesianOptions = {
+  /**
+   * Rounding to apply to distance and angle calculations
+   */
+  digits: number
+  /**
+   * If false, returns angle on half-circle basis 
+   * such that negative angles are possible (0..PI..-PI).
+   * By default uses (0..2*PI) range.
+   */
+  fullCircle: boolean
+}
 /**
  * Converts a Cartesian coordinate to polar
  *
@@ -94,20 +108,30 @@ export const toCartesian: PolarToCartesian = (
  *
  * Any additional properties of `point` are copied to object.
  * @param point Point
- * @param origin Origin
+ * @param origin Origin. If unspecified, {x:0,y:0} is used
+ * @param digits Number of significant digits to round to
  * @returns
  */
 export const fromCartesian = (
   point: Point,
-  origin: Point
+  origin?: Point,
+  options: Partial<FromCartesianOptions> = {}
 ): Coord => {
-  if (typeof point === `undefined`) throw new Error(`Param 'point' missing. Expecting a Point`);
-  if (typeof origin === `undefined`) throw new Error(`Param 'origin' missing. Expecting a Point`);
+  if (typeof point !== `object`) throw new TypeError(`Param 'point' wrong. Expecting a Point, got: ${ typeof point }`);
+  const fullCircle = options.fullCircle ?? true;
+  // If a non-zero origin is provided, adjust point
+  if (typeof origin === `object`) {
+    point = subtractPoint(point, origin);
+  }
 
-  point = subtractPoint(point, origin);
+  let angle = Math.atan2(point.y, point.x);
+  if (angle < 0 && fullCircle) angle += piPi
+  let distance = Math.hypot(point.x, point.y);
 
-  const angle = Math.atan2(point.y, point.x);
-  const distance = Math.hypot(point.x, point.y);
+  if (typeof options.digits === `number`) {
+    angle = parseFloat(angle.toFixed(options.digits));
+    distance = parseFloat(distance.toFixed(options.digits));
+  }
 
   const polar = {
     ...point,
@@ -161,3 +185,66 @@ export const toPoint = (v: Coord, origin = EmptyPoint): Point => {
     y: origin.y + v.distance * Math.sin(v.angleRadian),
   });
 };
+
+
+export type ToPolarLineOptions = FromCartesianOptions & {
+  orderBy: `none` | `angle-min` | `angle-max` | `distance`
+}
+export function toPolarLine(line: Line, origin: Point, opts?: Partial<ToPolarLineOptions>): PolarLine;
+export function toPolarLine(lines: Line[] | readonly Line[], origin: Point, opts?: Partial<ToPolarLineOptions>): PolarLine[]
+
+
+/**
+ * Converts a line to a PolarLine
+ * 
+ * A/B points of the line can optionally be reordered based on angle or distance.
+ * @param lineOrLines 
+ * @param origin 
+ * @param orderBy Whether a/b points are reordered based on `angle` or `distance`. Default: `none`
+ * @returns 
+ */
+export function toPolarLine(lineOrLines: Line | Line[] | readonly Line[], origin: Point, opts: Partial<ToPolarLineOptions> = {}): PolarLine | PolarLine[] {
+  const lines = Array.isArray(lineOrLines) ? lineOrLines : [ lineOrLines as Line ];
+  if (lines.length === 0) return [];
+  const orderBy = opts.orderBy ?? `none`;
+  const pl = lines.map(line => {
+    let a = fromCartesian(line.a, origin, opts);
+    let b = fromCartesian(line.b, origin, opts);
+    const ranges = radianRange(a.angleRadian, b.angleRadian);
+    if (orderBy === `angle-min` && ranges.min.start !== a.angleRadian) {
+      [ a, b ] = [ b, a ];
+    } else if (orderBy === `angle-max` && ranges.max.start < a.angleRadian) {
+      [ a, b ] = [ b, a ];
+    } else if (orderBy === `distance` && b.distance < a.distance) {
+      [ a, b ] = [ b, a ];
+    }
+    return Object.freeze({ a, b, origin });
+  });
+  if (Array.isArray(lineOrLines)) return pl;
+  return pl[ 0 ];
+}
+
+/**
+ * Returns a string representation of a PolarLine
+ * @param line 
+ * @param digits 
+ * @returns 
+ */
+export function polarLineToString(line: PolarLine, digits = 2): string {
+  return `angle: ${ line.a.angleRadian.toFixed(digits) }-${ line.b.angleRadian.toFixed(digits) } dist: ${ line.a.distance.toFixed(digits) }-${ line.b.distance.toFixed(digits) }`
+}
+
+export function lineToCartestian(line: PolarLine, origin: Point): Line;
+export function lineToCartestian(lines: PolarLine[] | readonly PolarLine[], origin: Point): Line[];
+export function lineToCartestian(lineOrLines: PolarLine | PolarLine[] | readonly PolarLine[], origin: Point): Line | Line[] {
+  const lines = Array.isArray(lineOrLines) ? lineOrLines : [ lineOrLines as PolarLine ];
+  if (lines.length === 0) return [];
+  const cart = lines.map(line => Object.freeze({
+    a: toCartesian(line.a, origin),
+    b: toCartesian(line.b, origin)
+  }));
+  if (Array.isArray(lineOrLines)) return cart;
+  return cart[ 0 ];
+}
+
+
