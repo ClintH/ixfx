@@ -139,59 +139,63 @@ const makeChunkFake = (chunk: ExportChunk): ExportChunk => {
 }
 
 const processFile = async (file: Dirent<string>) => {
-  if (file.name === `package.json`) {
-    const relativePath = join(file.parentPath, file.name);
-    if (skipPackages.includes(file.parentPath)) {
-      logVerbose(`Path: ${ file.parentPath } (skipped)`);
-      return;
+  if (file.name !== `package.json`) return;
+  const parentPath = file.parentPath;
+  if (parentPath.includes("node_modules")) return;
+
+  const relativePath = join(file.parentPath, file.name);
+  if (skipPackages.includes(file.parentPath)) {
+    logVerbose(`Path: ${ file.parentPath } (skipped)`);
+    return;
+  }
+  logVerbose(`Path: ${ file.parentPath }`);
+  let data = JSON.parse(await readFile(relativePath, { encoding: "utf8" }));
+
+  const hasPublishConfig = typeof data.publishConfig !== `undefined`;
+  if (stripPublishConfig) {
+    if (hasPublishConfig) {
+      logVerbose(` - strip: has publishConfig to remove`);
+      delete data.exports;
+      const changed = { ...data, ...data.publishConfig };
+      delete changed.publishConfig;
+      await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
+    } else {
+      logVerbose(` - strip: no publishConfig`);
     }
-    logVerbose(`Path: ${ file.parentPath }`);
-    let data = JSON.parse(await readFile(relativePath, { encoding: "utf8" }));
-
-    const hasPublishConfig = typeof data.publishConfig !== `undefined`;
-    if (stripPublishConfig) {
-      if (hasPublishConfig) {
-        logVerbose(` - strip: has publishConfig to remove`);
-        delete data.exports;
-        const changed = { ...data, ...data.publishConfig };
-        delete changed.publishConfig;
-        await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
-      } else {
-        logVerbose(` - strip: no publishConfig`);
+  }
+  if (addPublishConfig) {
+    if (hasPublishConfig) {
+      //logVerbose(` - add: already has publishConfig`);
+    } else {
+      logVerbose(` - add: has no publishConfig and needs adding`)
+      const publishConfig = {
+        main: "dist/src/index.js",
+        exports: {}
       }
-    }
-    if (addPublishConfig) {
-      if (hasPublishConfig) {
-        //logVerbose(` - add: already has publishConfig`);
-      } else {
-        logVerbose(` - add: has no publishConfig and needs adding`)
-        const publishConfig = {
-          main: "dist/src/index.js",
-          exports: {}
-        }
 
-        // Make ./dist/src versions for publishConfig.exports
-        for (const [ key, value ] of Object.entries(data.exports)) {
-          const chunk = value as ExportChunk;
-          publishConfig.exports[ key ] = makeChunkReal(chunk);
-        }
-
-        // Change existing exports
-        delete data.main;
-        for (const [ key, value ] of Object.entries(data.exports)) {
-          const chunk = value as ExportChunk;
-          data.exports[ key ] = makeChunkFake(chunk);
-        }
-
-        const changed = { ...data, publishConfig }
-        await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
+      // Make ./dist/src versions for publishConfig.exports
+      for (const [ key, value ] of Object.entries(data.exports)) {
+        const chunk = value as ExportChunk;
+        publishConfig.exports[ key ] = makeChunkReal(chunk);
       }
+
+      // Change existing exports
+      delete data.main;
+      for (const [ key, value ] of Object.entries(data.exports)) {
+        const chunk = value as ExportChunk;
+        data.exports[ key ] = makeChunkFake(chunk);
+      }
+
+      const changed = { ...data, publishConfig }
+      await writeFile(destinationPackage(relativePath), JSON.stringify(changed, null, "\t"), { encoding: "utf8" })
     }
   }
 }
 
+
 for (const file of f) {
   try {
+    //console.log(file);
     await processFile(file);
   } catch (error) {
     console.error(`Path: ${ file.parentPath }`);
