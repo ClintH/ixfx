@@ -3,6 +3,8 @@ import { Points } from '../src/index.js';
 import * as Polar from '../src/polar/index.js';
 import { degreeToRadian } from '../src/angles.js';
 import type { Point } from '../src/point/point-type.js';
+import { distance } from '../src/point/distance.js';
+import type { angleRadian } from '../src/point/angle.js';
 
 const closeEnough = (a: Point, b: Point): boolean => {
   a = Points.apply(a, Math.round);
@@ -14,6 +16,16 @@ const closeEnough = (a: Point, b: Point): boolean => {
   }
   return v;
 };
+
+// https://www.omnicalculator.com/math/cartesian-to-polar
+test(`fromCartesian`, () => {
+  expect(Polar.fromCartesian({ x: 10, y: 20 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 22.361, angleRadian: 1.107 });
+  expect(Polar.fromCartesian({ x: -10, y: -15 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 18.028, angleRadian: -2.159 });
+  expect(Polar.fromCartesian({ x: 12, y: -15 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 19.209, angleRadian: -0.896 });
+  expect(Polar.fromCartesian({ x: -16, y: 15 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 21.932, angleRadian: 2.388 });
+  expect(Polar.fromCartesian({ x: 0, y: 0 }, { x: 0, y: 0 }, { digits: 3 })).toStrictEqual({ distance: 0, angleRadian: 0 });
+
+});
 
 test(`conversion`, () => {
 
