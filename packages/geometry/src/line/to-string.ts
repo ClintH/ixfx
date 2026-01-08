@@ -28,7 +28,6 @@ export function toString(line: Line): string;
  * @param b 
  * @returns 
  */
-
 export function toString(a: Point | Line, b?: Point): string {
   if (isLine(a)) {
     guard(a, `a`);
