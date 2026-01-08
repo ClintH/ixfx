@@ -7,8 +7,17 @@ export default defineConfig({
   noExternal: [ /(.*)/ ],
   outDir: './bundle',
   platform: `browser`,
-  dts: true,
-  silent: false,
+  dts: {
+    eager: false,
+    enabled: false,
+    compilerOptions: {
+      paths: {
+        "@ixfx/visual": [ "../packages/visual" ],
+        "@ixfx/geometry": [ "../packages/geometry" ],
+        "@ixfx/random": [ "../packages/random" ]
+      }
+    }
+  },
   target: 'esnext',
   sourcemap: true,
   format: `esm`,

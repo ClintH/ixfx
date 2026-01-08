@@ -134,7 +134,7 @@ export const point = (arc: Arc | ArcPositioned, angleRadian: number, origin?: Po
  * Throws an error if arc instance is invalid
  * @param arc 
  */
-export const guard = (arc: Arc | ArcPositioned) => {
+export const guard = (arc: Arc | ArcPositioned): void => {
   if (typeof arc === `undefined`) throw new TypeError(`Arc is undefined`);
   if (isPositioned(arc)) {
     guardPoint(arc, `arc`);

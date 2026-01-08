@@ -1,23 +1,10 @@
 import { arrayTest, resultThrow } from '@ixfx/guards';
 import { Colour } from '@ixfx/visual';
 import { resolveEl } from '@ixfx/dom';
-//import type { IStackImmutable } from '@ixfx/collections';
 import { StackImmutable, type IStackImmutable } from '@ixfx/collections/stack';
-import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths, type PolarRay } from '@ixfx/geometry';
+import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths } from '@ixfx/geometry';
 import { quantiseEvery } from '@ixfx/numbers';
-import * as Polar from '@ixfx/geometry/polar'
-
-// import type { Point } from '../geometry/point/PointType.js';
-// import type { Line } from '../geometry/line/LineType.js';
-// import type { CirclePositioned } from '../geometry/circle/CircleType.js';
-// import type { Rect, RectPositioned } from '../geometry/rect/index.js';
-// import type { Path } from '../geometry/path/PathType.js';
-// import type { Triangle } from '../geometry/triangle/TriangleType.js';
-
-// import { Empty as RectsEmpty } from '../geometry/rect/Empty.js';
-// import { corners as RectsCorners } from '../geometry/rect/Corners.js';
-// import { isLine } from '../geometry/line/Guard.js';
-// import { quantiseEvery } from '../numbers/Quantise.js';
+import { Ray, type PolarRay } from '@ixfx/geometry/polar';
 
 const PIPI = Math.PI * 2;
 
@@ -747,7 +734,7 @@ export const polarRay = (
   opts: LineOpts & DrawingOpts = {}
 ) => {
   const rays = Array.isArray(toDraw) ? toDraw : [ toDraw as PolarRay ];
-  const toLines = Polar.Ray.toCartesian(rays);
+  const toLines = Ray.toCartesian(rays);
   line(ctx, toLines, opts);
 }
 

@@ -86,7 +86,7 @@ function intersectDistanceRay(
  * @param lines 
  * @returns 
  */
-export function raycast2d(lines: Line[]) {
+export function raycast2d(lines: Line[]): (light: Point) => RaycastHit[] {
   const segments = lines.map(l => [ l.a.x, l.a.y, l.b.x, l.b.y ] as LineAsPoints);
   return (light: Point) => raycast2dImpl(light, segments);
 }

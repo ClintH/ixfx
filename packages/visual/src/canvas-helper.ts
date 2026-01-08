@@ -6,7 +6,6 @@ import { Rects, scaler } from '@ixfx/geometry';
 import * as Drawing from './drawing.js';
 import * as ImageDataGrid from './image-data-grid.js';
 import { cloneFromFields } from '@ixfx/core/records';
-import type { Grid } from '@ixfx/geometry/grid';
 import type { DrawingHelper } from './types.js';
 
 export type CanvasEvents = {

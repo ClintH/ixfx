@@ -146,7 +146,7 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
    * Makes a 'mark' in the tracker, allowing you to compare values
    * to this point.
    */
-  mark() {
+  mark(): void {
     this.markRelation = relation(this.last);
   }
 
