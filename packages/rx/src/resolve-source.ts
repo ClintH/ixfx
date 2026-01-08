@@ -22,7 +22,8 @@ export type ResolveSourceOptions = {
  * If `source` is an iterable/generator, it gets wrapped via `generator()`.
  * 
  * Default options:
- * * generator: `{ lazy: true, interval: 5 }`
+ * * generator: `{ lazy: 'initial', interval: 5 }`
+ * * function: `{ lazy: 'very' }`
  * @param source 
  * @returns 
  */
