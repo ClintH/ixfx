@@ -63,7 +63,6 @@ test(`remove-circular`, () => {
   // @ts-expect-error as fasd fasd f
   t5.level1.level2 = t5.level1;
   const t5R = removeCircularReferences(t5);
-  console.log(t5R);
   expect(t5R).toEqual({
     ok: `sure`,
     level1: {

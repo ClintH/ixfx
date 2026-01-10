@@ -1,5 +1,5 @@
 import { test, expect, assert } from 'vitest';
-import { fromListBidirectional, fromList, StateMachineWithEvents } from '../src/state-machine/index.js';
+import { fromListBidirectional, fromList, StateMachineWithEvents } from '../src/state-machine.js';
 
 const createAdsr = () => fromList(`attack`, `decay`, `sustain`, `release`);
 

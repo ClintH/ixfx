@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { test, expect } from 'vitest';
-import * as Easings from '../src/easing/index.js';
+import * as Easings from '../src/easing.js';
 import { repeatSync } from '@ixfx/flow';
 
 test(`tick`, async () => {

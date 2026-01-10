@@ -18,7 +18,7 @@ test(`isContentsTheSame`, () => {
   expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 2 } ])).toBeFalsy();
   expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1, blah: 2 } ])).toBeFalsy();
 
-  const eq = (a, b) => a.len === b.len;
+  const eq = (a: any, b: any) => a.len === b.len;
 
   expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1 } ], eq)).toBeTruthy();
   expect(Arrays.containsIdenticalValues([ { len: 1 }, { len: 1 }, { len: 1, blah: 2 } ], eq)).toBeTruthy();
@@ -53,7 +53,7 @@ test(`isEqualIgnoreOrder`, () => {
   expect(Arrays.isEqualIgnoreOrder([ p1, p2, p3, p4 ], [ p1, p2, p3 ])).toBeFalsy();
 
   // Check based on string representation
-  const key = (v) => JSON.stringify(v);
+  const key = (v: any) => JSON.stringify(v);
   expect(Arrays.isEqualIgnoreOrder([ p1, p2, p3 ], [ p1, p2, p3 ], key)).toBeTruthy();
   expect(Arrays.isEqualIgnoreOrder([ p1, p2, p3 ], [ p3, p1, p2 ], key)).toBeTruthy();
   expect(Arrays.isEqualIgnoreOrder([ p1, p2, p3 ], [ pp1, pp2, pp3 ], key)).toBeTruthy();
@@ -96,7 +96,7 @@ test(`isEqual`, () => {
   expect(Arrays.isEqual([ p1, p2, p3, p4 ], [ p1, p2, p3 ])).toBeFalsy();
 
   // Check based on string representation
-  const key = (v) => JSON.stringify(v);
+  const key = (v: any) => JSON.stringify(v);
   expect(Arrays.isEqual([ p1, p2, p3 ], [ p1, p2, p3 ], key)).toBeTruthy();
   expect(Arrays.isEqual([ p1, p2, p3 ], [ p3, p1, p2 ], key)).toBeFalsy();
   expect(Arrays.isEqual([ p1, p2, p3 ], [ pp1, pp2, pp3 ], key)).toBeTruthy();

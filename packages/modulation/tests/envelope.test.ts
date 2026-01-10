@@ -2,7 +2,7 @@
 import { test, expect, assert } from 'vitest';
 import { isApprox } from '@ixfx/numbers';
 import { sleep, elapsedSince } from '@ixfx/core';
-import * as Envelopes from '../src/envelope/index.js';
+import * as Envelopes from '../src/envelope.js';
 
 test(`as-iterator`, async done => {
   const e = new Envelopes.Adsr({

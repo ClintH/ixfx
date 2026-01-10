@@ -44,7 +44,7 @@ test(`sortByProperty`, () => {
     { size: 11, colour: `red` },
   ]);
 
-  const comparer = (a, b) => {
+  const comparer = (a: any, b: any) => {
     if (a === b) return 0;
     if (a > b) return -1;
     return 1;

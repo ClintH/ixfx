@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import * as StateMachine from '../src/state-machine/index.js';
+import * as StateMachine from '../src/state-machine.js';
 function createBasic() {
   // Simple state machine
   const states: StateMachine.Transitions = {

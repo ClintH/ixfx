@@ -6,7 +6,7 @@ import * as Arrays from '../src/index.js';
 describe(`frequency`, () => {
   test(`string-key`, () => {
     const list = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-    const groupBy = v => v % 2 === 0 ? `even` : `odd`;
+    const groupBy = (v: number) => v % 2 === 0 ? `even` : `odd`;
     const sub = Arrays.frequencyByGroup(groupBy, list);
 
     expect(sub.get(`even`)).toEqual(5);
@@ -16,7 +16,7 @@ describe(`frequency`, () => {
 
   test(`number-key`, () => {
     const list = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-    const groupBy = v => v % 2 === 0 ? 1 : 2;
+    const groupBy = (v: number) => v % 2 === 0 ? 1 : 2;
     const sub = Arrays.frequencyByGroup(groupBy, list);
 
     expect(sub.get(1)).toEqual(5);
@@ -25,11 +25,11 @@ describe(`frequency`, () => {
   });
 
   test(`params`, () => {
-    const groupByString = v => v % 2 === 0 ? `even` : `odd`;
+    const groupByString = (v: number) => v % 2 === 0 ? `even` : `odd`;
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const groupByBadVoid = v => {};
-    const groupByBadNonString = v => null;
+    const groupByBadVoid = (v: number) => {};
+    const groupByBadNonString = (v: number) => null;
 
     const data = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 

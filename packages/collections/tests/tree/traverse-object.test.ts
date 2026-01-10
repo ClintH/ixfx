@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { test, expect } from 'vitest';
 import { asDynamicTraversable, create, getByPath, traceByPath, children } from '../../src/tree/traverse-object.js';
-import * as TraversableTree from '../../src/tree/traversable-tree.js';
+import * as TT from '../../src/tree/traversable-tree.js';
 import * as TreeMutable from '../../src/tree/tree-mutable.js';
 import { isEqualValueDefault, isEqualValuePartial } from '@ixfx/core';
-import { toTraversable, type TraverseObjectPathOpts } from '../../src/tree/index.js';
+import { toTraversable, type TraversableTree, type TraverseObjectPathOpts } from '../../src/tree/index.js';
 
 
 function getTestMap() {
@@ -83,9 +83,9 @@ test(`has-any-parent-value`, () => {
 
   //const street = TraversableTree.find(t, n => n.getValue().name === `street`);
 
-  let johnStreet;
+  let johnStreet: TraversableTree<any> | undefined;
   let kids;
-  for (const tt of TraversableTree.depthFirst(t)) {
+  for (const tt of TT.depthFirst(t)) {
     const v = tt.getValue();
     if (v.name === `street` && v.sourceValue === `West St`) {
       johnStreet = tt;
@@ -94,7 +94,7 @@ test(`has-any-parent-value`, () => {
       kids = tt;
     }
   }
-  expect(TraversableTree.hasParentValue(johnStreet, `kids`, (a, b) => {
+  expect(TT.hasParentValue(johnStreet!, `kids`, (a, b) => {
     return (a as any).name === b;
   }, Number.MAX_SAFE_INTEGER)).toBeTruthy();
 
@@ -122,12 +122,12 @@ test(`to-traversable-node`, () => {
   const kids = [ ...tt.children() ].map(t => t.getValue());
   expect(kids).toStrictEqual([ `a`, `b` ]);
 
-  expect(TraversableTree.hasAnyParentValue(tAB, `a`)).toBeTruthy();
-  expect(TraversableTree.hasAnyParentValue(tAB, `root`)).toBeTruthy();
-  expect(TraversableTree.hasAnyParentValue(tAB, `b`)).toBeFalsy();
+  expect(TT.hasAnyParentValue(tAB, `a`)).toBeTruthy();
+  expect(TT.hasAnyParentValue(tAB, `root`)).toBeTruthy();
+  expect(TT.hasAnyParentValue(tAB, `b`)).toBeFalsy();
 
 
-  const p = TraversableTree.findAnyParentByValue(kidsRaw[ 1 ], `root`);
+  const p = TT.findAnyParentByValue(kidsRaw[ 1 ], `root`);
   expect(p).not.toBeUndefined();
 });
 
@@ -184,7 +184,7 @@ test(`follow-value`, () => {
 
   let callbackCount = 0;
   let iterCount = 0;
-  for (const _fv of TraversableTree.followValue(r1, (_node) => {
+  for (const _fv of TT.followValue(r1, (_node) => {
     callbackCount++;
     return false;
   })) {
@@ -197,7 +197,7 @@ test(`follow-value`, () => {
   iterCount = 0;
   const pathSplit = `kids.1.name`.split('.');
   const results: any[] = [];
-  for (const fv of TraversableTree.followValue(r1, (node) => {
+  for (const fv of TT.followValue(r1, (node) => {
     callbackCount++;
     if (node.name === pathSplit[ 0 ]) {
       pathSplit.shift();
@@ -227,10 +227,10 @@ test(`as-traversable-object`, () => {
   const r1 = asDynamicTraversable(getTestObject(), { name: `obj` });
   //onsole.log(TraversableTree.toStringDeep(r1));
   expect(
-    TraversableTree.hasChildValue(r1, { name: `name`, sourceValue: `Jill`, ancestors: [ "obj" ], _kind: `entry-static`, }, isEqualValueDefault)
+    TT.hasChildValue(r1, { name: `name`, sourceValue: `Jill`, ancestors: [ "obj" ], _kind: `entry-static`, }, isEqualValueDefault)
   ).toBe(true);
 
-  expect(TraversableTree.hasChildValue(r1, {
+  expect(TT.hasChildValue(r1, {
 
     name: `address`, sourceValue: {
       street: 'Blah St',
@@ -239,7 +239,7 @@ test(`as-traversable-object`, () => {
     ancestors: [ "obj" ],
     _kind: `entry-static`
   }, isEqualValueDefault)).toBe(true);
-  expect(TraversableTree.hasChildValue(r1, {
+  expect(TT.hasChildValue(r1, {
     // @ts-ignore
     name: `address`, address: {
       street: 'West St',
@@ -248,29 +248,29 @@ test(`as-traversable-object`, () => {
   }, isEqualValueDefault)).toBe(false);
 
   expect(
-    TraversableTree.hasAnyChildValue(r1, { name: `number`, sourceValue: 35, ancestors: [ "obj", "kids", "0", "address" ], _kind: `entry-static` }, isEqualValueDefault)
+    TT.hasAnyChildValue(r1, { name: `number`, sourceValue: 35, ancestors: [ "obj", "kids", "0", "address" ], _kind: `entry-static` }, isEqualValueDefault)
   ).toBe(true);
 
-  const r1a = TraversableTree.findAnyChildByValue(r1, { name: 'name', sourceValue: 'John' }, isEqualValuePartial);
+  const r1a = TT.findAnyChildByValue(r1, { name: 'name', sourceValue: 'John' }, isEqualValuePartial);
   expect(r1a).toBeTruthy();
   if (r1a !== undefined) {
-    expect(TraversableTree.hasAnyChild(r1, r1a)).toBe(true);
+    expect(TT.hasAnyChild(r1, r1a)).toBe(true);
     // const parents = [ ...TraversableTree.parents(r1a) ];
-    expect(TraversableTree.hasAnyParent(r1a, r1)).toBe(true);
+    expect(TT.hasAnyParent(r1a, r1)).toBe(true);
   }
 });
 
 test(`as-traversable-array`, () => {
   const r1 = asDynamicTraversable([ 1, 2, 3, 4, 5 ], { name: `test` });
-  const breadthFirst = [ ...TraversableTree.breadthFirst(r1) ];
+  const breadthFirst = [ ...TT.breadthFirst(r1) ];
   expect(breadthFirst.length).toBe(5);
   expect(
-    TraversableTree.hasChildValue(r1, { name: `1`, sourceValue: 2, ancestors: [ `test` ] }, isEqualValuePartial)
+    TT.hasChildValue(r1, { name: `1`, sourceValue: 2, ancestors: [ `test` ] }, isEqualValuePartial)
   ).toBe(true);
   expect(
-    TraversableTree.hasChildValue(r1, { name: `0`, sourceValue: 10, ancestors: [ `test` ] }, isEqualValuePartial)
+    TT.hasChildValue(r1, { name: `0`, sourceValue: 10, ancestors: [ `test` ] }, isEqualValuePartial)
   ).toBe(false);
-  expect(TraversableTree.childrenLength(r1)).toBe(5);
+  expect(TT.childrenLength(r1)).toBe(5);
 })
 
 

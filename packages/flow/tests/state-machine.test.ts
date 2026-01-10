@@ -1,5 +1,5 @@
 import { test, expect, assert } from 'vitest';
-import * as StateMachine from '../src/state-machine/index.js';
+import * as StateMachine from '../src/state-machine.js';
 
 test('normaliseTargets', () => {
   let a = StateMachine.normaliseTargets('hello');
