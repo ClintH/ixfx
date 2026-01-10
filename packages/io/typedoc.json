@@ -1,10 +1,20 @@
 {
-    "extends": ["../../typedoc.base.jsonc"],
-    "entryPoints": ["src/index.ts"],
-        "outputs": [
+    "extends": [
+        "../../typedoc.base.jsonc"
+    ],
+    "entryPoints": [
+        "src/index.ts"
+    ],
+    "outputs": [
         {
             "name": "json",
             "path": "./docs.json"
         },
     ],
+    "compilerOptions": {
+        "types": [
+            "web-bluetooth",
+            "@types/w3c-web-serial"
+        ]
+    }
 }

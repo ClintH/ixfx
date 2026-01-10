@@ -31,6 +31,7 @@ catalog:
   rimraf: 6.1.2
   typescript-eslint: 8.52.0
   typescript: ^5.9.2
+  typedoc: 0.28.9
   unplugin-macros: ^0.18.2
   unplugin-unused: ^0.5.3
   unplugin: ^2.3.10

@@ -381,7 +381,7 @@ export const angleConvert = (angleOrDegrees: Angle | number | string, destinatio
  * ```
  * 
  * See {@link fromUnitVector} to convert back to an angle
- * @param angle Angle specified in degrees, or an angle with units 
+ * @param angleOrDegrees Angle specified in degrees, or an angle with units 
  */
 export const toUnitVector = (angleOrDegrees: Angle | string | number): {
   x: number;
@@ -484,7 +484,6 @@ export const radiansBetweenCircular = (check: number, start: number, end: number
  * between them that is either minimised or maximised.
  * @param a 
  * @param b 
- * @param strategy 
  */
 export const radianRange = (a: number, b: number): {
   min: {
@@ -535,5 +534,5 @@ export const radianRange = (a: number, b: number): {
       end: aa,
       sweep: piPi - (bb - aa)
     }
-  }
+  } as const
 }

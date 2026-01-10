@@ -4,7 +4,8 @@
     "lib": [
       "DOM",
       "DOM.Iterable",
-      "DOM.AsyncIterable"
+      "DOM.AsyncIterable",
+      "ESNext"
     ],
     "types": [
       "web-bluetooth",

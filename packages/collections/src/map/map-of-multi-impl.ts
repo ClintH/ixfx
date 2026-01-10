@@ -183,7 +183,7 @@ export class MapOfMutableImpl<V, M>
    * Iterate over the values stored under `key`.
    * If key does not exist, iteration is essentially a no-op.
    * 
-   * Alternatively, use {@valuesForAsArray} to get values as an array.
+   * Alternatively, use {@link valuesForAsArray} to get values as an array.
    * @param key
    * @returns
    */

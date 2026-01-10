@@ -116,7 +116,7 @@ export const cloneShallow = <K, V>(map: IWithEntries<K, Iterable<V>>): Map<K, V[
  * By default uses === comparison semantics.
  * @param a 
  * @param b 
- * @param eq 
+ * @param comparerOrKey 
  * @returns 
  */
 export const equals = <K, V>(

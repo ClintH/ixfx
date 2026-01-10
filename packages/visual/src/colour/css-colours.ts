@@ -45,6 +45,15 @@ export const fromCssColour = (colour: string): Colour => {
   throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour. Input: '${ colour }'`);
 }
 
+/**
+ * Resolves a named colour to a colour string.
+ * 
+ * ```js
+ * resolveCss(`red`);
+ * ```
+ * @param colour CSS named colour
+ * @returns 
+ */
 export function resolveCss(colour: CssColourNames): string;
 
 /**

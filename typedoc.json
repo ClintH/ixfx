@@ -1,6 +1,24 @@
 {
   "entryPoints": [
-    "packages/*"
+    "packages/arrays",
+    "packages/collections",
+    "packages/core",
+    "packages/debug",
+    "packages/dom",
+    "packages/events",
+    "packages/flow",
+    "packages/geometry",
+    "packages/guards",
+    "packages/io",
+    "packages/iterables",
+    "packages/modulation",
+    "packages/numbers",
+    "packages/process",
+    "packages/random",
+    "packages/rx",
+    "packages/trackers",
+    "packages/ui",
+    "packages/visual",
   ],
   "name": "ixfx",
   "entryPointStrategy": "packages",
@@ -11,6 +29,25 @@
     "readme": true,
     "document": true
   },
+  // "compilerOptions": {
+  //   "target": "es2024",
+  //   "declaration": true,
+  //   "declarationMap": true,
+  //   "lib": [
+  //     "DOM",
+  //     "DOM.Iterable",
+  //     "ESNext",
+  //     "ESNext.AsyncIterable",
+  //     "ESNext.Collection",
+  //     "ESNext.Iterator",
+  //     "ESNext.Array"
+  //   ],
+  //   "types": [
+  //     "node",
+  //     "web-bluetooth",
+  //     "@types/w3c-web-serial"
+  //   ],
+  // },
   "githubPages": true,
   "cleanOutputDir": true,
   "useFirstParagraphOfCommentAsSummary": true,
@@ -20,7 +57,7 @@
   "validation": {
     "invalidLink": true,
     "notExported": true
-  },
+  }
   // In TypeDoc 0.26 it is possible to specify options which should be inherited
   // by packages here, instead of in a separate file which is extended by each
   // package. We don't use this here as relying on it would prevent us from running
@@ -31,5 +68,5 @@
   //   "entryPoints": ["src/index.ts"]
   // }
   // Potentially useful for debugging
-  // "logLevel": "Verbose"
+  //"logLevel": "Verbose"
 }

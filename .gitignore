@@ -18,3 +18,4 @@ bundle-for-demos
 npm-debug.log*
 *.add.json
 *.strip.json
+docs.json

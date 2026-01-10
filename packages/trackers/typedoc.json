@@ -1,7 +1,22 @@
 {
-    "extends": ["../../typedoc.base.jsonc"],
-    "entryPoints": ["src/index.ts"],
-        "outputs": [
+    "extends": [
+        "../../typedoc.base.jsonc"
+    ],
+    "entryPoints": [
+        "src/index.ts"
+    ],
+    // "compilerOptions": {
+    //     "target": "ESNext",
+    //     "lib": [
+    //         "DOM",
+    //         "ES2019.Array",
+    //         "ESNext.Array",
+    //         "DOM.Iterable",
+    //         "ES2022.Array",
+    //         "ESNext"
+    //     ],
+    // },
+    "outputs": [
         {
             "name": "json",
             "path": "./docs.json"
