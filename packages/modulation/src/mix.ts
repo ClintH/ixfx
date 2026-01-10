@@ -23,7 +23,7 @@ import type { ModFunction } from "./types.js";
  * @param modulation Modulation amount (0..1)
  * @returns 
  */
-export const mix = (amount: number, original: number, modulation: number) => {
+export const mix = (amount: number, original: number, modulation: number): number => {
   const m = modulation * amount;
   const base = (1 - amount) * original;
   return base + (original * m);

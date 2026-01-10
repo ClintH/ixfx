@@ -37,7 +37,7 @@ export function* uniqueByValue<T>(input: Iterable<T>, toString: ToString<T> = to
  * @param input 
  * @param callback 
  */
-export function asCallback<V>(input: Iterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
+export function asCallback<V>(input: Iterable<V>, callback: (v: V) => unknown, onDone?: () => void): void {
   for (const value of input) {
     callback(value);
   }
@@ -117,7 +117,7 @@ export function last<V>(it: Iterable<V>): V | undefined {
  * @param size
  * @returns
  */
-export function* chunksOverlapping<V>(it: Iterable<V>, size: number) {
+export function* chunksOverlapping<V>(it: Iterable<V>, size: number): Generator<V[], void, unknown> {
   if (size <= 1) throw new Error(`Size should be at least 2`);
 
   //eslint-disable-next-line functional/no-let
@@ -138,7 +138,7 @@ export function* chunksOverlapping<V>(it: Iterable<V>, size: number) {
 }
 
 
-export function* chunks<V>(it: Iterable<V>, size: number) {
+export function* chunks<V>(it: Iterable<V>, size: number): Generator<V[], void, unknown> {
   //eslint-disable-next-line functional/no-let
   let buffer: V[] = [];
 
@@ -153,14 +153,14 @@ export function* chunks<V>(it: Iterable<V>, size: number) {
   if (buffer.length > 0) yield buffer;
 }
 
-export function* concat<V>(...its: readonly Iterable<V>[]) {
+export function* concat<V>(...its: readonly Iterable<V>[]): Generator<V, void> {
   for (const it of its) yield* it;
 }
 
 export function* dropWhile<V>(
   it: Iterable<V>,
   f: (v: V) => boolean
-) {
+): Generator<V, void, unknown> {
   for (const v of it) {
     if (!f(v)) {
       yield v;
@@ -184,7 +184,7 @@ export function* dropWhile<V>(
 * @param callback Code to call for each iteration
 */
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export const until = (it: Iterable<any>, callback: () => (void | boolean | never)) => {
+export const until = (it: Iterable<any>, callback: () => (void | boolean | never)): void => {
   for (const _ of it) {
     const value = callback();
     if (typeof value === `boolean` && !value) break;
@@ -192,7 +192,7 @@ export const until = (it: Iterable<any>, callback: () => (void | boolean | never
 }
 
 export const next = <T>(it: Generator<T>) => {
-  return () => {
+  return (): T | undefined => {
     const r = it.next();
     if (r.done) return;
     return r.value;
@@ -212,7 +212,7 @@ export function equals<V>(
   it1: IterableIterator<V>,
   it2: IterableIterator<V>,
   comparerOrKey: IsEqual<V> | ((value: V) => string) = isEqualDefault
-) {
+): boolean | undefined {
   //it1 = it1[Symbol.iterator]();
   //it2 = it2[Symbol.iterator]();
 
@@ -250,7 +250,7 @@ export function equals<V>(
   }
 }
 
-export function every<V>(it: Iterable<V>, f: (v: V) => boolean) {
+export function every<V>(it: Iterable<V>, f: (v: V) => boolean): boolean {
   for (const v of it) {
     const result = f(v);
     if (!result) return false;
@@ -259,7 +259,7 @@ export function every<V>(it: Iterable<V>, f: (v: V) => boolean) {
 }
 
 
-export function* fill<V>(it: Iterable<V>, v: V) {
+export function* fill<V>(it: Iterable<V>, v: V): Generator<V, void, unknown> {
   // https://surma.github.io/underdash/
 
 
@@ -289,7 +289,7 @@ export function* fill<V>(it: Iterable<V>, v: V) {
  * @typeParam T Type of iterable's values
  * @param fn Function to call for each item. If function returns _false_, iteration cancels
  */
-export function forEach<T>(iterator: Iterable<T> | T[], fn: (v: T) => boolean | void) {
+export function forEach<T>(iterator: Iterable<T> | T[], fn: (v: T) => boolean | void): void {
   for (const v of iterator) {
     const result = fn(v);
     if (typeof result === `boolean` && !result) break;
@@ -304,7 +304,7 @@ export function forEach<T>(iterator: Iterable<T> | T[], fn: (v: T) => boolean | 
  * @param it
  * @param f
  */
-export function* filter<V>(it: Iterable<V>, f: (v: V) => boolean) {
+export function* filter<V>(it: Iterable<V>, f: (v: V) => boolean): Generator<V, void, unknown> {
   // https://surma.github.io/underdash/
 
   for (const v of it) {
@@ -313,7 +313,7 @@ export function* filter<V>(it: Iterable<V>, f: (v: V) => boolean) {
   }
 }
 
-export function find<V>(it: Iterable<V>, f: (v: V) => boolean) {
+export function find<V>(it: Iterable<V>, f: (v: V) => boolean): V | undefined {
   // https://surma.github.io/underdash/
 
   for (const v of it) {
@@ -321,7 +321,7 @@ export function find<V>(it: Iterable<V>, f: (v: V) => boolean) {
   }
 }
 
-export function* flatten<V>(it: Iterable<V>) {
+export function* flatten<V>(it: Iterable<V>): Generator<any, void, unknown> {
   // https://surma.github.io/underdash/
   for (const v of it) {
     if (typeof v === `object`) {
@@ -350,7 +350,7 @@ export function* flatten<V>(it: Iterable<V>) {
  * @param f
  */
 
-export function* map<V, X>(it: Iterable<V>, f: (v: V) => X) {
+export function* map<V, X>(it: Iterable<V>, f: (v: V) => X): Generator<X, void, unknown> {
   // https://surma.github.io/underdash/
 
   for (const v of it) {
@@ -358,7 +358,7 @@ export function* map<V, X>(it: Iterable<V>, f: (v: V) => X) {
   }
 }
 
-export function* max<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b): Generator<V> {
+export function* max<V>(it: Iterable<V>, gt = (a: V, b: V): boolean => a > b): Generator<V> {
   let max: V | undefined;
   for (const v of it) {
     if (max === undefined) {
@@ -374,7 +374,7 @@ export function* max<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b): Generator<
   return max;
 }
 
-export function* min<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b) {
+export function* min<V>(it: Iterable<V>, gt = (a: V, b: V): boolean => a > b): Generator<V, void, unknown> {
   let min: V | undefined;
   for (const v of it) {
     if (min === undefined) {
@@ -390,7 +390,7 @@ export function* min<V>(it: Iterable<V>, gt = (a: V, b: V) => a > b) {
 
 
 
-export function some<V>(it: Iterable<V>, f: (v: V) => boolean) {
+export function some<V>(it: Iterable<V>, f: (v: V) => boolean): boolean {
   // https://surma.github.io/underdash/
 
   for (const v of it) {
@@ -428,7 +428,7 @@ export function* repeat<T>(genCreator: () => Iterable<T>, repeatsOrSignal: numbe
 
 export function* unique<V>(
   iterable: Iterable<V> | Iterable<V>[]
-) {
+): Generator<V, void, unknown> {
   // Adapted from https://surma.github.io/underdash/
   const buffer: any[] = [];
   let itera: Iterable<V>[] = [];
@@ -452,7 +452,7 @@ export function* unique<V>(
  * @returns
  */
 
-export function* zip<V>(...its: readonly Iterable<V>[]) {
+export function* zip<V>(...its: readonly Iterable<V>[]): Generator<V[], void, unknown> {
   // https://surma.github.io/underdash/
   const iits = its.map((it) => it[ Symbol.iterator ]());
 
@@ -463,7 +463,7 @@ export function* zip<V>(...its: readonly Iterable<V>[]) {
   }
 }
 
-export function* fromIterable<T>(iterable: Iterable<T>) {
+export function* fromIterable<T>(iterable: Iterable<T>): Generator<T, void, unknown> {
   for (const v of iterable) {
     yield v;
   }

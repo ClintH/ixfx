@@ -21,14 +21,14 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
     this.#data = data;
   }
 
-  forEach(fn: (v: V) => void) {
+  forEach(fn: (v: V) => void): void {
     //eslint-disable-next-line functional/no-let
     for (let index = this.#data.length - 1; index >= 0; index--) {
       fn(this.#data[ index ]);
     }
   }
 
-  forEachFromFront(fn: (v: V) => void) {
+  forEachFromFront(fn: (v: V) => void): void {
     // From front of queue
 
     this.#data.forEach(item => { fn(item) }); //(vv) => fn(vv));
@@ -61,7 +61,7 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
     return peek(this.opts, this.#data);
   }
 
-  toArray() {
+  toArray(): V[] {
     return [ ...this.#data ];
   }
 }

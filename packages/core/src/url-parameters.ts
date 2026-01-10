@@ -19,14 +19,14 @@
  * @returns 
  */
 export const parseUrlParameters = (url?: string) => {
-  const parameters = new URL(url ?? document.location.toString()).searchParams;
+  const parameters: URLSearchParams = new URL(url ?? document.location.toString()).searchParams;
 
   return {
-    params: parameters,
-    int: (name: string, defaultValue: number = Number.NaN) => intParamOrDefault(parameters, name, defaultValue),
-    float: (name: string, defaultValue: number = Number.NaN) => floatParamOrDefault(parameters, name, defaultValue),
-    string: (name: string, defaultValue = ``) => stringParamOrDefault(parameters, name, defaultValue),
-    bool: (name: string) => boolParamOrDefault(parameters, name)
+    params: parameters as URLSearchParams,
+    int: (name: string, defaultValue: number = Number.NaN): number => intParamOrDefault(parameters, name, defaultValue),
+    float: (name: string, defaultValue: number = Number.NaN): number => floatParamOrDefault(parameters, name, defaultValue),
+    string: (name: string, defaultValue = ``): string => stringParamOrDefault(parameters, name, defaultValue),
+    bool: (name: string): boolean => boolParamOrDefault(parameters, name)
   }
 }
 
@@ -35,7 +35,7 @@ export const parseUrlParameters = (url?: string) => {
  * Value is considered _false_ if it's not present, or it is explicitly 'false'
  * @returns 
  */
-function boolParamOrDefault(parameters: URLSearchParams, name: string) {
+function boolParamOrDefault(parameters: URLSearchParams, name: string): boolean {
   const p = parameters.get(name);
   if (p === null) return false;
 
@@ -47,7 +47,7 @@ function boolParamOrDefault(parameters: URLSearchParams, name: string) {
  * Return an integer value from URL parameter or use a default value
  * @returns 
  */
-function intParamOrDefault(parameters: URLSearchParams, name: string, defaultValue: number) {
+function intParamOrDefault(parameters: URLSearchParams, name: string, defaultValue: number): number {
   const p = parameters.get(name);
   if (p !== null) {
     const v = Number.parseInt(p);
@@ -60,7 +60,7 @@ function intParamOrDefault(parameters: URLSearchParams, name: string, defaultVal
  * Return a float value from URL parameter or use a default value
  * @returns 
  */
-function floatParamOrDefault(parameters: URLSearchParams, name: string, defaultValue: number) {
+function floatParamOrDefault(parameters: URLSearchParams, name: string, defaultValue: number): number {
   const p = parameters.get(name);
   if (p !== null) {
     const v = Number.parseFloat(p);
@@ -73,7 +73,7 @@ function floatParamOrDefault(parameters: URLSearchParams, name: string, defaultV
  * Return a string value from URL parameter or use a default value
  * @returns 
  */
-function stringParamOrDefault(parameters: URLSearchParams, name: string, defaultValue: string) {
+function stringParamOrDefault(parameters: URLSearchParams, name: string, defaultValue: string): string {
   const p = parameters.get(name);
   if (p !== null) {
     return p;

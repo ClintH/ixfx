@@ -84,7 +84,7 @@ export const immutable = (startingValueOrBipolar: number | BipolarWrapper = 0): 
  * @param bipolarValue Value to convert to scalar
  * @returns Scalar value on 0..1 range.
  */
-export const toScalar = (bipolarValue: number, max = 1, min = 0) => {
+export const toScalar = (bipolarValue: number, max = 1, min = 0): number => {
   if (typeof bipolarValue !== `number`) throw new Error(`Param 'bipolarValue' to be a number. Got: ${ typeof bipolarValue }`);
   if (Number.isNaN(bipolarValue)) throw new Error(`Param 'bipolarValue' is NaN`);
   return numberScale(bipolarValue, -1, 1, min, max);
@@ -105,7 +105,7 @@ export const toScalar = (bipolarValue: number, max = 1, min = 0) => {
  * @param scalarValue Scalar value to convert
  * @returns Bipolar value on -1..1 scale
  */
-export const fromScalar = (scalarValue: number) => {
+export const fromScalar = (scalarValue: number): number => {
   resultThrow(numberTest(scalarValue, `percentage`, `v`));
   return (scalarValue * 2) - 1;
 };
@@ -125,7 +125,7 @@ export const fromScalar = (scalarValue: number) => {
  * @param inMax Maximum of scale
  * @returns Bipolar value on -1..1 scale
  */
-export const scale = (inputValue: number, inMin: number, inMax: number) => {
+export const scale = (inputValue: number, inMin: number, inMax: number): number => {
   return clamp(numberScaler(inMin, inMax, -1, 1)(inputValue));
 }
 
@@ -144,7 +144,7 @@ export const scale = (inputValue: number, inMin: number, inMax: number) => {
  * @param inMax Maximum of scale
  * @returns Bipolar value on -1..1 scale
  */
-export const scaleUnclamped = (inputValue: number, inMin: number, inMax: number) => {
+export const scaleUnclamped = (inputValue: number, inMin: number, inMax: number): number => {
   return numberScaler(inMin, inMax, -1, 1)(inputValue);
 }
 

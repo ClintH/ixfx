@@ -54,7 +54,7 @@ const isPointValid = (
 export const poissonDisk = (
   rect: RectPositioned,
   opts: PoissonDiskOpts
-) => {
+): Point[] => {
   // https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm
   // http://extremelearning.com.au/an-improved-version-of-bridsons-algorithm-n-for-poisson-disc-sampling/
   const radius = opts.radius ?? 1;

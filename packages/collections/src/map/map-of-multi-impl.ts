@@ -30,7 +30,7 @@ export class MapOfMutableImpl<V, M>
   /**
    * Returns the type name. For in-built implementations, it will be one of: array, set or circular
    */
-  get typeName() {
+  get typeName(): string {
     return this.type.name;
   }
 
@@ -44,7 +44,7 @@ export class MapOfMutableImpl<V, M>
   /**
    * Returns the length of the longest child list
    */
-  get lengthMax() {
+  get lengthMax(): number {
     let m = 0;
     for (const v of this.#map.values()) {
       m = Math.max(m, this.type.count(v));
@@ -75,12 +75,12 @@ export class MapOfMutableImpl<V, M>
     return this.#map.size === 0;
   }
 
-  clear() {
+  clear(): void {
     this.#map.clear();
     super.fireEvent(`clear`, true);
   }
 
-  addKeyedValues(key: string, ...values: V[]) {
+  addKeyedValues(key: string, ...values: V[]): void {
     const set = this.#map.get(key);
     if (set === undefined) {
       this.#map.set(key, this.type.addKeyedValues(undefined, values));
@@ -91,12 +91,12 @@ export class MapOfMutableImpl<V, M>
       super.fireEvent(`addedValues`, { values: values });
     }
   }
-  set(key: string, values: V[]) {
+  set(key: string, values: V[]): this {
     this.addKeyedValues(key, ...values);
     return this;
   }
 
-  addValue(...values: readonly V[]) {
+  addValue(...values: readonly V[]): void {
     for (const v of values) this.addKeyedValues(this.groupBy(v), v);
   }
 
@@ -187,7 +187,7 @@ export class MapOfMutableImpl<V, M>
    * @param key
    * @returns
    */
-  *valuesFor(key: string) {
+  *valuesFor(key: string): Generator<V, void> {
     const m = this.#map.get(key);
     if (m === undefined) return;
     yield* this.type.iterable(m);
@@ -229,18 +229,18 @@ export class MapOfMutableImpl<V, M>
     }
   }
 
-  merge(other: IMapOf<V>) {
+  merge(other: IMapOf<V>): void {
     for (const key of other.keys()) {
       this.addKeyedValues(key, ...other.valuesFor(key));
     }
   }
 
-  get size() {
+  get size(): number {
     return this.#map.size;
   }
 
 
-  get [ Symbol.toStringTag ]() {
+  get [ Symbol.toStringTag ](): string {
     return this.#map[ Symbol.toStringTag ];
   }
 }

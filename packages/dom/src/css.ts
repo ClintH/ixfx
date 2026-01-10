@@ -76,7 +76,7 @@ export const getComputedPixels = <T extends readonly (keyof CSSStyleDeclaration)
  * @param cssClass 
  * @returns 
  */
-export const setCssClass = (selectors: QueryOrElements, value: boolean, cssClass: string) => {
+export const setCssClass = (selectors: QueryOrElements, value: boolean, cssClass: string): void => {
   const elements = resolveEls(selectors);
   if (elements.length === 0) return;
 
@@ -98,7 +98,7 @@ export const setCssClass = (selectors: QueryOrElements, value: boolean, cssClass
  * @param cssClass 
  * @returns 
  */
-export const setCssToggle = (selectors: QueryOrElements, cssClass: string) => {
+export const setCssToggle = (selectors: QueryOrElements, cssClass: string): void => {
   const elements = resolveEls(selectors);
   if (elements.length === 0) return;
   for (const element of elements) {
@@ -117,7 +117,7 @@ export const setCssToggle = (selectors: QueryOrElements, cssClass: string) => {
  * @param value 
  * @returns 
  */
-export const setCssDisplay = (selectors: QueryOrElements, value: string) => {
+export const setCssDisplay = (selectors: QueryOrElements, value: string): void => {
   const elements = resolveEls(selectors);
   if (elements.length === 0) return;
   for (const element of elements) {

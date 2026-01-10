@@ -25,11 +25,11 @@ export function degreeToRadian(angleInDegrees: number | readonly number[]): numb
  * @param angleInRadians 
  * @returns 
  */
-export function radianInvert(angleInRadians: number) {
+export function radianInvert(angleInRadians: number): number {
   return (angleInRadians + Math.PI) % (2 * Math.PI);
 }
 
-export function degreeToGradian(angleInDegrees: number) {
+export function degreeToGradian(angleInDegrees: number): number {
   return angleInDegrees * 1.111111
 }
 
@@ -40,17 +40,17 @@ export function degreeToGradian(angleInDegrees: number) {
  * @param wrap 
  * @returns 
  */
-export function gradianToDegree(angleInGradians: number, wrap = true) {
+export function gradianToDegree(angleInGradians: number, wrap = true): number {
   if (wrap) return (angleInGradians * 0.9) % 360;
   return angleInGradians * 0.9;
 }
 
 
-export function radianToGradian(angleInRadians: number) {
+export function radianToGradian(angleInRadians: number): number {
   return angleInRadians * 63.6619772368; // 200/pi
 }
 
-export function gradianToRadian(angleInGradian: number) {
+export function gradianToRadian(angleInGradian: number): number {
   return angleInGradian * 0.0157079633; // pi/200
 }
 
@@ -106,7 +106,7 @@ export const radiansFromAxisX = (point: Point): number => Math.atan2(point.x, po
  * @param clockwise Add in clockwise direction (default: _true_)
  * @returns Sum result, in radians
  */
-export const radiansSum = (start: number, amount: number, clockwise = true) => {
+export const radiansSum = (start: number, amount: number, clockwise = true): number => {
   if (clockwise) {
     let x = start + amount;
     if (x >= piPi) x = x % piPi;
@@ -145,7 +145,7 @@ export const radiansSum = (start: number, amount: number, clockwise = true) => {
  * @param clockwise Add in clockwise direction (default: _true_)
  * @returns Sum result, in degrees
  */
-export const degreesSum = (start: number, amount: number, clockwise = true) => radianToDegree(radiansSum(degreeToRadian(start), degreeToRadian(amount), clockwise));
+export const degreesSum = (start: number, amount: number, clockwise = true): number => radianToDegree(radiansSum(degreeToRadian(start), degreeToRadian(amount), clockwise));
 
 /**
  * Computes the angle arc between a start and end angle,
@@ -177,7 +177,7 @@ export const degreesSum = (start: number, amount: number, clockwise = true) => r
  * @param clockwise Calculate in clockwise direction (default: _true_)
  * @returns Angle of arc, in radians.
  */
-export const radianArc = (start: number, end: number, clockwise = true) => {
+export const radianArc = (start: number, end: number, clockwise = true): number => {
   let s = start;
   if (end < s) {
     s = 0;
@@ -217,7 +217,7 @@ export const radianArc = (start: number, end: number, clockwise = true) => {
  * @param clockwise Calculate in clockwise direction (default: _true_)
  * @returns Angle of arc, in degrees.
  */
-export const degreeArc = (start: number, end: number, clockwise = true) => radianToDegree(radianArc(degreeToRadian(start), degreeToRadian(end), clockwise));
+export const degreeArc = (start: number, end: number, clockwise = true): number => radianToDegree(radianArc(degreeToRadian(start), degreeToRadian(end), clockwise));
 
 export type Angle = {
   value: number
@@ -383,7 +383,10 @@ export const angleConvert = (angleOrDegrees: Angle | number | string, destinatio
  * See {@link fromUnitVector} to convert back to an angle
  * @param angle Angle specified in degrees, or an angle with units 
  */
-export const toUnitVector = (angleOrDegrees: Angle | string | number) => {
+export const toUnitVector = (angleOrDegrees: Angle | string | number): {
+  x: number;
+  y: number;
+} => {
   const radians = toRadian(angleOrDegrees);
   return {
     x: Math.cos(radians),
@@ -418,7 +421,7 @@ export const fromUnitVector = (vector: Point, unit: Angle[ `unit` ] = `rad`): An
  * @param wrap 
  * @returns 
  */
-export const turnToDegree = (turns: number, wrap = true) => {
+export const turnToDegree = (turns: number, wrap = true): number => {
   if (wrap) return (turns * 360) % 360;
   return turns * 360;
 }
@@ -435,9 +438,9 @@ export const average = (angles: (Angle | string | number)[], kind: PointAverageK
   return fromUnitVector(avg, anglesProper[ 0 ].unit);
 }
 
-export const turnToRadian = (turns: number) => turns * piPi;
-export const degreeToTurn = (degrees: number) => degrees / 360;
-export const radianToTurn = (radians: number) => radians / piPi
+export const turnToRadian = (turns: number): number => turns * piPi;
+export const degreeToTurn = (degrees: number): number => degrees / 360;
+export const radianToTurn = (radians: number): number => radians / piPi
 
 /**
  * Normalise a radian angle to 0..2*PI range
@@ -461,7 +464,7 @@ export const radiansNormalise = (angleRadian: number): number => {
  * @param end 
  * @returns 
  */
-export const radiansBetweenCircular = (check: number, start: number, end: number) => {
+export const radiansBetweenCircular = (check: number, start: number, end: number): boolean => {
   if (start < 0 || start > piPi) throw new TypeError(`Param 'start' out of range. Expecting 0..2PI. Got: ${ start }`);
   if (end < 0 || end > piPi) throw new TypeError(`Param 'end' out of range. Expecting 0..2PI. Got: ${ end }`);
 
@@ -483,7 +486,18 @@ export const radiansBetweenCircular = (check: number, start: number, end: number
  * @param b 
  * @param strategy 
  */
-export const radianRange = (a: number, b: number) => {
+export const radianRange = (a: number, b: number): {
+  min: {
+    start: number;
+    end: number;
+    sweep: number;
+  };
+  max: {
+    start: number;
+    end: number;
+    sweep: number;
+  };
+} => {
   if (a < 0 || a > piPi) throw new TypeError(`Param 'a' out of range. Expecting 0..2PI. Got: ${ a }`);
   if (b < 0 || b > piPi) throw new TypeError(`Param 'b' out of range. Expecting 0..2PI. Got: ${ b }`);
 

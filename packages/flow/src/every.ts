@@ -25,7 +25,7 @@ import { integerTest, resultThrow } from "@ixfx/guards";
  * @param callback
  * @returns Function which in turn returns true if nth call has been hit, false otherwise
  */
-export const everyNth = <T>(nth: number, callback?: (data: T) => void) => {
+export const everyNth = <T>(nth: number, callback?: (data: T) => void): (data: T) => boolean => {
   resultThrow(integerTest(nth, `positive`, `nth`));
 
   let counter = 0;

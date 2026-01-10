@@ -3,7 +3,7 @@
  * @param possibleNumber
  * @returns
  */
-export const isValid = (possibleNumber: unknown) => {
+export const isValid = (possibleNumber: unknown): boolean => {
   if (typeof possibleNumber !== `number`) return false;
   if (Number.isNaN(possibleNumber)) return false;
   return true;

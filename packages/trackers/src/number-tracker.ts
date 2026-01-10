@@ -37,7 +37,7 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
     return this.last / this.initial;
   }
 
-  onReset() {
+  onReset(): void {
     this.#min = Number.MAX_SAFE_INTEGER;
     this.#max = Number.MIN_SAFE_INTEGER;
     this.#total = 0;
@@ -49,7 +49,7 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
    * current values.
    * @param reason 
    */
-  onTrimmed(reason: TrimReason) {
+  onTrimmed(reason: TrimReason): void {
     this.#min = minFast(this.values);
     this.#max = maxFast(this.values);
     this.#total = totalFast(this.values);
@@ -70,7 +70,11 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
     };
   }
 
-  getMinMaxAvg() {
+  getMinMaxAvg(): {
+    min: number;
+    max: number;
+    avg: number;
+  } {
     return {
       min: this.#min,
       max: this.#max,
@@ -78,19 +82,19 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
     };
   }
 
-  get max() {
+  get max(): number {
     return this.#max;
   }
 
-  get total() {
+  get total(): number {
     return this.#total;
   }
 
-  get min() {
+  get min(): number {
     return this.#min;
   }
 
-  get avg() {
+  get avg(): number {
     return this.#total / this.seenCount;
   }
 }
@@ -144,4 +148,4 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
  * t.timestampes; // array of millisecond times, indexes correspond to t.values
  * ```
  */
-export const number = (opts: TrackedValueOpts = {}) => new NumberTracker(opts);
+export const number = (opts: TrackedValueOpts = {}): NumberTracker => new NumberTracker(opts);

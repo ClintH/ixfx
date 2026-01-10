@@ -26,7 +26,7 @@ import { values } from "../values.js";
  * @param start Starting cell position (default: {x:0,y:0})
  * @param wrap If true (default), iteration will wrap around through (0,0) when end of grid is reached.
  */
-export function* cells(grid: Grid, start?: GridCell, wrap = true) {
+export function* cells(grid: Grid, start?: GridCell, wrap = true): Generator<GridCell, void, unknown> {
   if (!start) start = { x: 0, y: 0 }
 
   guardGrid(grid, `grid`);
@@ -68,7 +68,7 @@ export function* cells(grid: Grid, start?: GridCell, wrap = true) {
  * @param start 
  * @param wrap 
  */
-export function* cellValues<T>(grid: GridReadable<T>, start?: GridCell, wrap = true) {
+export function* cellValues<T>(grid: GridReadable<T>, start?: GridCell, wrap = true): Generator<T, void> {
   yield* values(grid, cells(grid, start, wrap));
 }
 

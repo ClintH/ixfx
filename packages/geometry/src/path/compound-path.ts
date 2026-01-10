@@ -31,7 +31,7 @@ export const setSegment = (compoundPath: CompoundPath, index: number, path: Path
  * @param dimensions Precalculated dimensions of paths, will be computed if omitted
  * @returns
  */
-export const interpolate = (paths: readonly Path[], t: number, useWidth?: boolean, dimensions?: Dimensions) => {
+export const interpolate = (paths: readonly Path[], t: number, useWidth?: boolean, dimensions?: Dimensions): Point => {
   if (dimensions === undefined) {
     dimensions = computeDimensions(paths);
   }
@@ -148,7 +148,7 @@ export const toString = (paths: readonly Path[]): string => paths.map(p => p.toS
  *
  * @param paths
  */
-export const guardContinuous = (paths: readonly Path[]) => {
+export const guardContinuous = (paths: readonly Path[]): void => {
   let lastPos = getEnd(paths[ 0 ]);
   for (let index = 1; index < paths.length; index++) {
     const start = getStart(paths[ index ]);

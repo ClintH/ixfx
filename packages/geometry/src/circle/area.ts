@@ -6,7 +6,7 @@ import { guard } from "./guard.js";
  * @param circle 
  * @returns 
  */
-export const area = (circle: Circle) => {
+export const area = (circle: Circle): number => {
   guard(circle);
   return Math.PI * circle.radius * circle.radius;
 };

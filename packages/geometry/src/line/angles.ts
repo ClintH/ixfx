@@ -55,7 +55,7 @@ export const parallel = (line: Line, distance: number): Line => {
  * @param distance Distance from line. Use negatives to flip side
  * @param amount Relative place on line to project point from. 0 projects from A, 0.5 from the middle, 1 from B.
  */
-export const perpendicularPoint = (line: Line, distance: number, amount = 0) => {
+export const perpendicularPoint = (line: Line, distance: number, amount = 0): Point => {
   const origin = interpolate(amount, line);
   const dvn = directionVectorNormalised(line);
   return {

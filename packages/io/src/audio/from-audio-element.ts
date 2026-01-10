@@ -21,7 +21,7 @@ export class AudioElements {
 
   constructor() {}
 
-  init() {
+  init(): void {
     if (this.#initialised) return;
     this.#initialised = true;
 

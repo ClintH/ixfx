@@ -3,7 +3,6 @@ import type { IMapOf } from './imap-of.js';
 import type { IMapOfImmutable } from './imap-of-immutable.js';
 import { defaultKeyer, isEqualDefault } from '@ixfx/core';
 import { MapOfSimpleBase } from './map-of-simple-base.js';
-import { groupBy } from '@ixfx/arrays';
 import { MapOfSimpleMutable } from './map-of-simple-mutable.js';
 
 /**

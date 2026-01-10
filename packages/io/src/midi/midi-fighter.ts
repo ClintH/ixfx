@@ -163,7 +163,7 @@ export class MidiFighter extends SimpleEventEmitter<MidiFighterEvents> {
    * This will need to be called separately for the input and output ports
    * @param port 
    */
-  setPort(port: MIDIPort) {
+  setPort(port: MIDIPort): void {
     if (port.name === `Midi Fighter Twister`) {
       if (port.type === `output`) {
         this.#outputPortUnbind();
@@ -333,7 +333,7 @@ export class MidiFighter extends SimpleEventEmitter<MidiFighterEvents> {
    * If no bank number is given, current bank is used
    * @param bank 
    */
-  *getBank(bank?: number) {
+  *getBank(bank?: number): Generator<MidiFighterEncoder, void, unknown> {
     if (typeof bank === `undefined`) bank = this.#currentBank;
     if (bank < 1 || bank > 4) throw new Error(`Bank out of range, expected 1-4`);
     for (const enc of this.encoders) {
@@ -353,7 +353,7 @@ export class MidiFighter extends SimpleEventEmitter<MidiFighterEvents> {
    * @param bank Bank number (1..4)
    * @returns Encoder
    */
-  getEncoder(encoder: number, bank?: number) {
+  getEncoder(encoder: number, bank?: number): MidiFighterEncoder | undefined {
     if (typeof bank === `undefined`) bank = this.#currentBank;
     if (bank < 1 || bank > 4) throw new Error(`Bank out of range, expected 1-4. Got: ${ bank }`);
     if (encoder < 1 || encoder > 16) throw new Error(`Encoder out of range, expected 1-16`);
@@ -380,21 +380,21 @@ export class MidiFighter extends SimpleEventEmitter<MidiFighterEvents> {
   /**
    * Gets the current output port
    */
-  get outputPort() {
+  get outputPort(): MIDIOutput | undefined {
     return this.#outputPort;
   }
 
   /**
    * Gets the current input port
    */
-  get inputPort() {
+  get inputPort(): MIDIInput | undefined {
     return this.#inputPort;
   }
 
   /**
  * Returns the current state
  */
-  get state() {
+  get state(): MidiFighterState {
     return this.#state;
   }
 }
@@ -489,7 +489,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * @private
    * @param value 
    */
-  onValueSet(value: number) {
+  onValueSet(value: number): void {
     const lastValue = this.lastEncoderValue;
     this.lastEncoderValue = value;
     this.fireEvent(`encoder`, { previous: lastValue, value: value, encoder: this });
@@ -500,7 +500,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * @private
    * @param value 
    */
-  onSwitchSet(value: number) {
+  onSwitchSet(value: number): void {
     const lastValue = this.lastSwitchValue;
     this.lastSwitchValue = value;
     this.fireEvent(`switch`, { previous: lastValue, value: value, encoder: this });
@@ -515,7 +515,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * Use {@link setLedRingRaw} to set 0..127 integer value
    * @param v Scalar (0..1)
    */
-  setLedRing(v: number) {
+  setLedRing(v: number): void {
     this.setLedRingRaw(clamp(Math.floor(v * 127)));
   }
 
@@ -528,7 +528,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * 
    * @param v Raw value (0..127)
    */
-  setLedRingRaw(v: number) {
+  setLedRingRaw(v: number): void {
     if (v < 0 || v > 127) throw new Error(`Param 'v' should be between 0-127`);
 
     const message: MidiMessage = {
@@ -548,7 +548,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * ```
    * @param v Hue degree (0..1) range
    */
-  setSwitchColourHue(v: number) {
+  setSwitchColourHue(v: number): void {
     if (v < 0 || v > 1) throw new Error(`Param 'v' should be in 0-1 range`);
     let vv = (1 - v) + 0.70;
     if (vv > 1) vv = vv - 1;
@@ -564,7 +564,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * @param v 
    * @returns 
    */
-  setSwitchColourRaw(v: number) {
+  setSwitchColourRaw(v: number): void {
     if (v < 0 || v > 127) throw new Error(`Param 'v' should be between 0-127`);
     const message: MidiMessage = {
       channel: this.ledColourChannel,
@@ -583,7 +583,7 @@ export class MidiFighterEncoder extends SimpleEventEmitter<MidiFighterEncoderEve
    * @param kind 
    * @param value 
    */
-  setSwitchEffect(kind: `none` | `strobe` | `pulse` | `rainbow`, value = 1) {
+  setSwitchEffect(kind: `none` | `strobe` | `pulse` | `rainbow`, value = 1): void {
     let velocity = 0;
     if (kind === `rainbow`) {
       velocity = 127;

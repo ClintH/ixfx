@@ -30,7 +30,7 @@ export const throttle = (
     ...args: readonly unknown[]
   ) => void | Promise<unknown>,
   intervalMinMs: number
-) => {
+): (...args: unknown[]) => Promise<void> => {
   let trigger = 0;
   return async (...args: unknown[]) => {
     const elapsed = performance.now() - trigger;

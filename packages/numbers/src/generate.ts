@@ -25,7 +25,7 @@ export const numericRangeRaw = function* (
   start = 0,
   end?: number,
   repeating = false
-) {
+): Generator<number, void, unknown> {
   if (interval <= 0) throw new Error(`Interval is expected to be above zero`);
   if (typeof end === `undefined`) end = Number.MAX_SAFE_INTEGER;
   let v = start;
@@ -70,7 +70,7 @@ export const numericRange = function* (
   end?: number,
   repeating = false,
   rounding?: number
-) {
+): Generator<number, void, unknown> {
   resultThrow(numberTest(interval, `nonZero`));
 
   const negativeInterval = interval < 0;
@@ -130,7 +130,7 @@ export const numericPercent = function (
   repeating = false,
   start = 0,
   end = 1
-) {
+): Generator<number, void, unknown> {
   resultThrow(
     numberTest(interval, `percentage`, `interval`),
     numberTest(start, `percentage`, `start`),

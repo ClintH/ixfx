@@ -56,7 +56,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
     this.eq = opts.eq ?? isEqualDefault;
   }
 
-  clear() {
+  clear(): void {
     const copy = [ ...this.data ];
     this.data = [];
     this.fireEvent(`removed`, { finalData: this.data, removed: copy });
@@ -66,7 +66,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
   /**
    * Called when all data is cleared
    */
-  protected onClear() { /** no-op */
+  protected onClear(): void { /** no-op */
   }
 
   at(index: number): V {
@@ -83,7 +83,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
     return length;
   }
 
-  protected onEnqueue(result: readonly V[], attemptedToAdd: readonly V[]) {
+  protected onEnqueue(result: readonly V[], attemptedToAdd: readonly V[]): void {
     this.fireEvent(`enqueue`, { added: attemptedToAdd, finalData: result });
   }
 
@@ -97,7 +97,7 @@ export class QueueMutable<V> extends SimpleEventEmitter<QueueMutableEvents<V>> i
     return v;
   }
 
-  protected onRemoved(removed: readonly V[], finalData: readonly V[]) {
+  protected onRemoved(removed: readonly V[], finalData: readonly V[]): void {
     this.fireEvent(`removed`, { removed, finalData });
   }
 

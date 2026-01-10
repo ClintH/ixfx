@@ -5,35 +5,28 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/",
-		"bundle/"
+		"dist"
 	],
-	"scripts": {
-		"package-bundle": "tsdown",
-		"clean": "rm -rf dist && rm -rf bundle"
-	},
+	"scripts": {},
 	"dependencies": {
-		"@ixfx/core": "workspace:^",
-		"@ixfx/collections": "workspace:^",
-		"@ixfx/dom": "workspace:^",
-		"@ixfx/geometry": "workspace:^",
-		"@ixfx/numbers": "workspace:^",
-		"@ixfx/visual": "workspace:^",
-		"@ixfx/rx": "workspace:^"
+		"@ixfx/core": "workspace:*",
+		"@ixfx/collections": "workspace:*",
+		"@ixfx/dom": "workspace:*",
+		"@ixfx/visual": "workspace:*",
+		"@ixfx/rx": "workspace:*"
 	},
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
-			"import": "./src/index.ts"
-		}
+			"dev": "./src/index.ts",
+			"default": "./dist/index.js"
+		},
+		"./package.json": "./package.json"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",
 		"exports": {
-			".": {
-				"types": "./dist/src/index.d.ts",
-				"import": "./dist/src/index.js"
-			}
+			".": "./dist/index.js",
+			"./package.json": "./package.json"
 		}
 	}
 }

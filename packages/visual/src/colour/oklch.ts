@@ -9,7 +9,7 @@ import { parseCssRgbFunction, to8bit as rgbTo8bit } from "./srgb.js";
 
 export const OKLCH_CHROMA_MAX = 0.4;
 
-export const guard = (lch: OkLch) => {
+export const guard = (lch: OkLch): void => {
   const { l, c, h, opacity, space, unit } = lch;
   if (space !== `oklch`) throw new Error(`Space is expected to be 'oklch'. Got: ${ space }`);
 

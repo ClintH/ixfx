@@ -7,7 +7,7 @@ import { NumberTracker } from './number-tracker.js';
 export class IntervalTracker extends NumberTracker {
   lastMark = 0;
 
-  mark() {
+  mark(): void {
     if (this.lastMark > 0) {
       this.seen(performance.now() - this.lastMark);
     }
@@ -45,4 +45,4 @@ export class IntervalTracker extends NumberTracker {
  * @param options Options for tracker
  * @returns New interval tracker
  */
-export const interval = (options?: TrackedValueOpts) => new IntervalTracker(options);
+export const interval = (options?: TrackedValueOpts): IntervalTracker => new IntervalTracker(options);

@@ -5,45 +5,41 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/",
-		"bundle/"
+		"dist/"
 	],
-	"scripts": {
-		"package-bundle": "tsdown",
-		"clean": "rm -rf dist && rm -rf bundle"
-	},
-	"main": "bundle/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./bundle/index.d.ts",
-			"import": "./bundle/index.js"
+			"dev": "./src/index.ts",
+			"default": "./dist/index.js"
 		},
-		"./*.js": {
-			"types": "./bundle/*.d.ts",
-			"import": "./bundle/*.js"
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public",
+		"exports": {
+			".": "./dist/index.js",
+			"./package.json": "./package.json"
 		}
 	},
 	"devDependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/collections": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/debug": "workspace:^",
-		"@ixfx/dom": "workspace:^",
-		"@ixfx/events": "workspace:^",
-		"@ixfx/flow": "workspace:^",
-		"@ixfx/geometry": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/io": "workspace:^",
-		"@ixfx/iterables": "workspace:^",
-		"@ixfx/modulation": "workspace:^",
-		"@ixfx/numbers": "workspace:^",
-		"@ixfx/process": "workspace:^",
-		"@ixfx/random": "workspace:^",
-		"@ixfx/rx": "workspace:^",
-		"@ixfx/trackers": "workspace:^",
-		"@ixfx/ui": "workspace:^",
-		"@ixfx/visual": "workspace:^",
-		"@types/w3c-web-serial": "1.0.8",
-		"@types/web-bluetooth": "0.0.21"
+		"@ixfx/arrays": "workspace:*",
+		"@ixfx/collections": "workspace:*",
+		"@ixfx/core": "workspace:*",
+		"@ixfx/debug": "workspace:*",
+		"@ixfx/events": "workspace:*",
+		"@ixfx/flow": "workspace:*",
+		"@ixfx/geometry": "workspace:*",
+		"@ixfx/guards": "workspace:*",
+		"@ixfx/iterables": "workspace:*",
+		"@ixfx/io": "workspace:*",
+		"@ixfx/modulation": "workspace:*",
+		"@ixfx/numbers": "workspace:*",
+		"@ixfx/process": "workspace:*",
+		"@ixfx/random": "workspace:*",
+		"@ixfx/rx": "workspace:*",
+		"@ixfx/trackers": "workspace:*",
+		"@ixfx/ui": "workspace:*",
+		"@ixfx/visual": "workspace:*"
 	}
 }

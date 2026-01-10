@@ -1,3 +1,4 @@
+import { Point } from "../point/point-type.js";
 import type { CirclePositioned, Circle } from "./circle-type.js";
 import { isCirclePositioned } from "./guard.js";
 
@@ -18,6 +19,6 @@ import { isCirclePositioned } from "./guard.js";
  * @param circle 
  * @returns Center of circle
  */
-export const center = (circle: CirclePositioned | Circle) => {
+export const center = (circle: CirclePositioned | Circle): Point => {
   return isCirclePositioned(circle) ? Object.freeze({ x: circle.x, y: circle.y }) : Object.freeze({ x: circle.radius, y: circle.radius });
 };

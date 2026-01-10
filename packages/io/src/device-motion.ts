@@ -75,7 +75,7 @@ const startFake = (handler: MotionHandler) => {
  * @param useFakeDataAsFallback If true, fake data will be generated and returned if the event could not be subscribed to.
  * @returns 
  */
-export const listen = async (handler: MotionHandler, useFakeDataAsFallback = false) => {
+export const listen = async (handler: MotionHandler, useFakeDataAsFallback = false): Promise<void> => {
   if (typeof DeviceMotionEvent === `undefined`) {
     console.log(`DeviceMotionEvent unavailable`);
     if (useFakeDataAsFallback) startFake(handler);

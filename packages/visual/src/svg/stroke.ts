@@ -6,7 +6,7 @@ import type { StrokeOpts } from "./types.js";
  * @param elem Element
  * @param opts
  */
-export const applyStrokeOpts = (elem: SVGElement, opts: StrokeOpts) => {
+export const applyStrokeOpts = (elem: SVGElement, opts: StrokeOpts): void => {
   if (opts.strokeStyle) elem.setAttributeNS(null, `stroke`, opts.strokeStyle);
   if (opts.strokeWidth) {
     elem.setAttributeNS(null, `stroke-width`, opts.strokeWidth.toString());

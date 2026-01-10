@@ -41,7 +41,7 @@ export const isPolyLine = (p: any): p is PolyLine => {
  * @param line 
  * @param name 
  */
-export const guard = (line: Line, name = `line`) => {
+export const guard = (line: Line, name = `line`): void => {
   if (line === undefined) throw new Error(`${ name } undefined`);
   if (line.a === undefined) throw new Error(`${ name }.a undefined. Expected {a:Point, b:Point}. Got: ${ JSON.stringify(line) }`);
   if (line.b === undefined) throw new Error(`${ name }.b undefined. Expected {a:Point, b:Point} Got: ${ JSON.stringify(line) }`);

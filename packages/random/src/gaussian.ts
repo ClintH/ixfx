@@ -18,7 +18,7 @@ import type { RandomSource } from "./types.js";
  * @param skew Skew factor. Defaults to 1, no skewing. Above 1 will skew to left, below 1 will skew to right
  * @returns 
  */
-export const gaussian = (skew = 1) => gaussianSource(skew)();
+export const gaussian = (skew = 1): number => gaussianSource(skew)();
 
 /**
  * Returns a function that generates a gaussian-distributed random number

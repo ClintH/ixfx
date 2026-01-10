@@ -7,7 +7,7 @@ import type { Rgb8Bit, RgbBase } from "./types.js";
  * @param rgb 
  * @returns 
  */
-export function encodeRgbTo24Bit(rgb: Rgb8Bit | RgbBase) {
+export function encodeRgbTo24Bit(rgb: Rgb8Bit | RgbBase): number {
   return (rgb.r << 16) | (rgb.g << 8) | rgb.b;
 }
 
@@ -35,7 +35,7 @@ export function decodeRgbFrom24Bit(colour: number): Rgb8Bit {
  * @param rgb 
  * @returns 
  */
-export function encodeRgbTo16Bit565(rgb: Rgb8Bit | RgbBase) {
+export function encodeRgbTo16Bit565(rgb: Rgb8Bit | RgbBase): number {
   const r = (rgb.r >> 3) & 0x1F;   // 5 bits
   const g = (rgb.g >> 2) & 0x3F; // 6 bits
   const b = (rgb.b >> 3) & 0x1F;  // 5 bits

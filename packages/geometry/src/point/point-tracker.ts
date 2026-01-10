@@ -322,21 +322,21 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
   /**
  * Returns the last x coord
  */
-  get x() {
+  get x(): number {
     return this.last.x;
   }
 
   /**
    * Returns the last y coord
    */
-  get y() {
+  get y(): number {
     return this.last.y;
   }
 
   /**
    * Returns the last z coord (or _undefined_ if not available)
    */
-  get z() {
+  get z(): number | undefined {
     return this.last.z;
   }
 }

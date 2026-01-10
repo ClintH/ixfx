@@ -1,5 +1,5 @@
 import type { RandomSource } from "@ixfx/random";
-import { get, type EasingName } from "./easing/index.js";
+import { get, type EasingName } from "./easing.js";
 
 /**
  * Options for producing weighted distribution

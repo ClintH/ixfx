@@ -1,7 +1,7 @@
-export * as Sources from './source/index.js';
+export * as Sources from './source.js';
 export * as Oscillators from './oscillator.js';
-export * as Easings from './easing/index.js'
-export * as Envelopes from './envelope/index.js';
+export * as Easings from './easing.js'
+export * as Envelopes from './envelope.js';
 export * as Forces from './forces.js';
 export * from './cubic-bezier.js'
 export * from './drift.js';

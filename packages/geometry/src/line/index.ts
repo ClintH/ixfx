@@ -38,13 +38,13 @@ export * from './to-path.js';
 export * from './to-string.js';
 
 
-export const Empty = Object.freeze({
+export const Empty: Line = Object.freeze({
   a: Object.freeze({ x: 0, y: 0 }),
   b: Object.freeze({ x: 0, y: 0 })
 });
 
 
-export const Placeholder = Object.freeze({
+export const Placeholder: Line = Object.freeze({
   a: Object.freeze({ x: Number.NaN, y: Number.NaN }),
   b: Object.freeze({ x: Number.NaN, y: Number.NaN })
 });
@@ -82,7 +82,7 @@ export const isPlaceholder = (l: Line): boolean => PointIsPlaceholder(l.a) && Po
  * @param fn Function that takes a point and returns a point
  * @returns 
  */
-export const apply = (line: Line, fn: (p: Point) => Point) => Object.freeze<Line>(
+export const apply = (line: Line, fn: (p: Point) => Point): Readonly<Line> => Object.freeze<Line>(
   {
     ...line,
     a: fn(line.a),
@@ -342,7 +342,7 @@ export const toFlatArray = (a: Point | Line, b: Point): readonly number[] => {
  * @param lines 
  */
 
-export function* asPoints(lines: Iterable<Line>) {
+export function* asPoints(lines: Iterable<Line>): Generator<Point, void, unknown> {
   for (const l of lines) {
     yield l.a;
     yield l.b;

@@ -47,7 +47,7 @@ export abstract class TrackerBase<V, SeenResultType> {
   /**
    * Reset tracker
    */
-  reset() {
+  reset(): void {
     this.seenCount = 0;
     this.onReset();
   }

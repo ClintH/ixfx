@@ -11,7 +11,7 @@ import { isValid } from './guard.js';
  * ```
  * @param it
  */
-export function* filterIterable(it: Iterable<unknown>) {
+export function* filterIterable(it: Iterable<unknown>): Generator<unknown, void, unknown> {
   for (const v of it) {
     if (isValid(v)) yield v;
   }
@@ -30,7 +30,7 @@ export function* filterIterable(it: Iterable<unknown>) {
  * @returns 
  */
 export const thresholdAtLeast = (threshold: number) => {
-  return (v: number) => {
+  return (v: number): boolean => {
     return v >= threshold;
   };
 };
@@ -52,7 +52,7 @@ export const thresholdAtLeast = (threshold: number) => {
  * @returns 
  */
 export const rangeInclusive = (min: number, max: number) => {
-  return (v: number) => {
+  return (v: number): boolean => {
     return v >= min && v <= max;
   };
 };

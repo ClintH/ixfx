@@ -1,4 +1,4 @@
-import { toString as PointToString } from "../point/To.js";
+import { toString as PointToString } from "../point/to.js";
 import type { Point } from "../point/point-type.js";
 import { fromPoints } from "./from-points.js";
 import type { Line, PolyLine } from "./line-type.js";
@@ -33,7 +33,7 @@ export const joinPointsToLines = (...points: readonly Point[]): PolyLine => {
  * @param line 
  * @returns 
  */
-export const polyLineToPoints = (line: PolyLine, skipDuplicates = false) => {
+export const polyLineToPoints = (line: PolyLine, skipDuplicates = false): Point[] => {
   if (skipDuplicates) {
     const pt: Point[] = [];
     const seen = new Set<string>();

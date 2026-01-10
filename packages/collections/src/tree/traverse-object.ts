@@ -11,7 +11,7 @@ import type { TraversableTree, TreeNode, SimplifiedNode, TraverseObjectEntry, Tr
  * @param entries 
  * @returns 
  */
-export function prettyPrintEntries(entries: readonly TraverseObjectEntry[]) {
+export function prettyPrintEntries(entries: readonly TraverseObjectEntry[]): string {
   if (entries.length === 0) return `(empty)`;
   let t = ``;
   for (const [ index, entry ] of entries.entries()) {
@@ -54,7 +54,7 @@ export const prettyPrint = (
  * @param indent 
  * @returns 
  */
-export const toStringDeep = (node: TreeNode<TraverseObjectEntry | TraverseObjectEntryStatic>, indent = 0) => {
+export const toStringDeep = (node: TreeNode<TraverseObjectEntry | TraverseObjectEntryStatic>, indent = 0): string => {
   let t = ` `.repeat(indent) + ` ${ node.value?.name }`;
   if (node.value !== undefined) {
     if (`sourceValue` in node.value && `leafValue` in node.value) {

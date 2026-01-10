@@ -31,7 +31,7 @@ export type RecordChildrenOptions = Readonly<{
  * @param entries 
  * @returns 
  */
-export function prettyPrintEntries(entries: readonly RecordEntry[]) {
+export function prettyPrintEntries(entries: readonly RecordEntry[]): string {
   if (entries.length === 0) return `(empty)`;
   let t = ``;
   for (const [ index, entry ] of entries.entries()) {

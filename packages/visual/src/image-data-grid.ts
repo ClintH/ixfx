@@ -100,7 +100,7 @@ export const setter = (image: ImageData): Grids.GridCellSetter<Rgb> => {
  * Yields pixels of an image row by row
  * @param image 
  */
-export function* byRow(image: ImageData) {
+export function* byRow(image: ImageData): Generator<(Rgb8Bit | undefined)[], void, unknown> {
   const a = accessor(image);
   const g = grid(image);
 
@@ -115,7 +115,7 @@ export function* byRow(image: ImageData) {
  * Yields pixels of an image column by column
  * @param image 
  */
-export function* byColumn(image: ImageData) {
+export function* byColumn(image: ImageData): Generator<Rgb8Bit[], void, unknown> {
   const a = accessor(image);
   const g = grid(image);
 

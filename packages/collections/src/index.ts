@@ -43,7 +43,7 @@ export type { IStackImmutable } from './stack/IStackImmutable.js';
  * Sets store unique items.
  */
 export * as Sets from './set/index.js';
-export * from './set/Types.js';
+export * from './set/types.js';
 export { SetStringMutable } from './set/set-mutable.js';
 export { SetStringImmutable } from './set/SetImmutable.js';
 export type { ISetImmutable } from './set/ISetImmutable.js';

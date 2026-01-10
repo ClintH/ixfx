@@ -1,1 +1,1 @@
-export const piPi = Math.PI * 2;
+export const piPi: number = Math.PI * 2;

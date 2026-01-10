@@ -15,7 +15,7 @@ import type { Rect } from "./rect-types.js"
  */
 export const dividerByLargestDimension = (rect: Rect) => {
   const largest = Math.max(rect.width, rect.height);
-  return (value: number | Point) => {
+  return (value: number | Point): number | Point => {
     if (typeof value === `number`) {
       return value / largest;
     } else if (isPoint3d(value)) {

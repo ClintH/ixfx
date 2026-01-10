@@ -3,7 +3,7 @@ import { scale } from '@ixfx/numbers';
 import { AdsrBase } from './AdsrBase.js';
 import type { EnvelopeOpts } from './Types.js';
 
-export const defaultAdsrOpts = Object.freeze({
+export const defaultAdsrOpts = {
   attackBend: -1,
   decayBend: -0.3,
   releaseBend: -0.3,
@@ -12,7 +12,7 @@ export const defaultAdsrOpts = Object.freeze({
   sustainLevel: 0.6,
   releaseLevel: 0,
   retrigger: false
-})
+} as const
 
 export class AdsrIterator implements Iterator<number> {
 
@@ -176,7 +176,7 @@ export class Adsr extends AdsrBase implements Iterable<number> {
     );
   }
 
-  protected onTrigger() {
+  protected onTrigger(): void {
     this.initialLevelOverride = undefined;
     if (!this.retrigger) {
       const [ _stage, scaled, _raw ] = this.compute(true, false);

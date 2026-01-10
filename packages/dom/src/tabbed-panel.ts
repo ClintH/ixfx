@@ -21,7 +21,13 @@ export const tabSet = <TNotifyArgs>(options: {
   preselectId?: string,
   onPanelChanging?: (priorPanel: Panel<TNotifyArgs> | undefined, newPanel: Panel<TNotifyArgs> | undefined) => boolean | void,
   onPanelChange?: (priorPanel: Panel<TNotifyArgs> | undefined, newPanel: Panel<TNotifyArgs> | undefined) => void
-}) => {
+}): {
+  select: (id: string) => void
+  panels: Panel<TNotifyArgs>[]
+  hostEl: HTMLElement
+  tabSetEl: HTMLElement
+  notify: (name: string, args: TNotifyArgs) => void
+} => {
 
   const panels = options.panels;
   const preselectId = options.preselectId ?? panels[ 0 ].id;
@@ -53,7 +59,7 @@ export const tabSet = <TNotifyArgs>(options: {
 
   let currentPanel: Panel<any> | undefined;
 
-  const select = (id: string) => {
+  const select = (id: string): void => {
     const newPanel = panels.find(p => p.id === id);
     const priorPanel = currentPanel;
 
@@ -80,7 +86,7 @@ export const tabSet = <TNotifyArgs>(options: {
 
   select(preselectId);
   let warned = false;
-  const notify = (name: string, args: TNotifyArgs) => {
+  const notify = (name: string, args: TNotifyArgs): void => {
     if (!currentPanel) return;
     if (currentPanel.notify) {
       currentPanel.notify(name, args);

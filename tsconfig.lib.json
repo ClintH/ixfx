@@ -1,0 +1,118 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "dist/lib.tsbuildinfo",
+    "customConditions": [
+      "dev"
+    ],
+    "types": [
+      "node"
+    ],
+    "allowJs": false,
+    "declaration": true,
+    "isolatedDeclarations": true,
+    "paths": {
+      "#macros": [
+        "./macros/index.ts"
+      ],
+      "@ixfx/guards": [
+        "./packages/guards/src"
+      ],
+      "@ixfx/random": [
+        "./packages/random/src"
+      ],
+      "@ixfx/process": [
+        "./packages/process/src"
+      ],
+      "@ixfx/process/*": [
+        "./packages/process/src/*"
+      ],
+      "@ixfx/arrays": [
+        "./packages/arrays/src"
+      ],
+      "@ixfx/events": [
+        "./packages/events/src"
+      ],
+      "@ixfx/debug": [
+        "./packages/debug/src"
+      ],
+      "@ixfx/dom": [
+        "./packages/dom/src"
+      ],
+      "@ixfx/core": [
+        "./packages/core/src"
+      ],
+      "@ixfx/core/*": [
+        "./packages/core/src/*"
+      ],
+      "@ixfx/numbers": [
+        "./packages/numbers/src"
+      ],
+      "@ixfx/collections": [
+        "./packages/collections/src"
+      ],
+      "@ixfx/collections/*": [
+        "./packages/collections/src/*"
+      ],
+      "@ixfx/iterables": [
+        "./packages/iterables/src"
+      ],
+      "@ixfx/iterables/*": [
+        "./packages/iterables/src/*"
+      ],
+      "@ixfx/flow": [
+        "./packages/flow/src"
+      ],
+      "@ixfx/flow/*": [
+        "./packages/flow/src/*"
+      ],
+      "@ixfx/modulation": [
+        "./packages/modulation/src"
+      ],
+      "@ixfx/modulation/*": [
+        "./packages/modulation/src/*"
+      ],
+      "@ixfx/geometry": [
+        "./packages/geometry/src"
+      ],
+      "@ixfx/geometry/*": [
+        "./packages/geometry/src/*"
+      ],
+      "@ixfx/trackers": [
+        "./packages/trackers/src"
+      ],
+      "@ixfx/ui": [
+        "./packages/ui/src"
+      ],
+      "@ixfx/visual": [
+        "./packages/visual/src"
+      ],
+      "@ixfx/visual/*": [
+        "./packages/visual/src/*"
+      ],
+      "@ixfx/rx": [
+        "./packages/rx/src"
+      ],
+      "@ixfx/rx/*": [
+        "./packages/rx/src/*"
+      ],
+      "@ixfx/io": [
+        "./packages/io/src"
+      ],
+      "@ixfx/io/*": [
+        "./packages/io/src/*"
+      ],
+    }
+  },
+  "include": [
+    "packages",
+    "macros"
+  ],
+  "exclude": [
+    "**/*.config.*",
+    "**/demos",
+    "**/dist",
+    "**/tests"
+  ]
+}

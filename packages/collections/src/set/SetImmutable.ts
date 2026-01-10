@@ -40,7 +40,7 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
     return [ ...this.store.values() ];
   }
 
-  *values() {
+  *values(): Generator<V, void, unknown> {
     yield* this.store.values();
   }
 }

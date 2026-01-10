@@ -93,7 +93,7 @@ export const add = <K, V>(
  * @param value Value to  set
  * @returns New map with data set
  */
-export const set = <K, V>(map: ReadonlyMap<K, V>, key: K, value: V) => {
+export const set = <K, V>(map: ReadonlyMap<K, V>, key: K, value: V): Map<K, V> => {
   const x = new Map<K, V>(map.entries());
   x.set(key, value);
   return x;

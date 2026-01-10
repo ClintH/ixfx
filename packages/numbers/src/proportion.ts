@@ -15,7 +15,7 @@ import { numberTest, resultThrow } from "@ixfx/guards";
 export const proportion = (
   v: number | (() => number),
   t: number | (() => number)
-) => {
+): number => {
   if (typeof v === `function`) v = v();
   if (typeof t === `function`) t = t();
 

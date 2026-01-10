@@ -1,4 +1,6 @@
-export const removeCircularReferences = (value: object, replaceWith: any = null, seen = new WeakSet(), path = ``) => {
+export const removeCircularReferences = (value: object, replaceWith: any = null, seen: WeakSet<WeakKey> = new WeakSet(), path = ``): {
+  [ k: string ]: any;
+} => {
   if (value === null) return value;
   if (typeof value !== `object`) throw new TypeError(`Param 'value' must be an object. Got type: ${ typeof value }`);
 

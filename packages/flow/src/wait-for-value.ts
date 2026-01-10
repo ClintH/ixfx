@@ -52,7 +52,7 @@ export class WaitForValue<T> {
    * Throws an exception if queue has already been used. Use {@link isUsed} to check.
    * @param value 
    */
-  add(value: T) {
+  add(value: T): void {
     if (this.#written) throw new Error(`QueueSingleUse has already been used`);
     this.#written = true;
     this.#resolve(value);
@@ -62,7 +62,7 @@ export class WaitForValue<T> {
    * Returns _true_ if a value has been added
    * and therefore no more values can be written
    */
-  get isUsed() {
+  get isUsed(): boolean {
     return this.#written;
   }
 }
@@ -70,4 +70,4 @@ export class WaitForValue<T> {
 /**
  * {@inheritDoc WaitForValue}
  */
-export const singleItem = <T>() => new WaitForValue<T>();
+export const singleItem = <T>(): WaitForValue<T> => new WaitForValue<T>();

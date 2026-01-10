@@ -12,7 +12,7 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
     this.values = [];
   }
 
-  onTrimmed(reason: TrimReason) {
+  onTrimmed(reason: TrimReason): void {
     // no-op
   }
 
@@ -32,7 +32,7 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
    * Allows sub-classes to be notified when a reset happens
    * @ignore
    */
-  onReset() {
+  onReset(): void {
     this.values = [];
   }
 
@@ -78,7 +78,7 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
   /**
    * Last seen value. If no values have been added, it will return the initial value
    */
-  get last() {
+  get last(): TimestampedObject<V> {
     if (this.values.length === 1) return this.values[ 0 ];
     //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.values.at(-1)!;
@@ -87,14 +87,14 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
   /**
    * Returns the oldest value in the buffer
    */
-  get initial() {
+  get initial(): TimestampedObject<V> | undefined {
     return this.values.at(0);
   }
 
   /**
    * Returns number of recorded values (includes the initial value in the count)
    */
-  get size() {
+  get size(): number {
     return this.values.length;
   }
 

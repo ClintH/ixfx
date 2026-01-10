@@ -24,7 +24,7 @@ export class SyncWait {
   #reject?: (reason?: string) => void;
   #promise?: Promise<any>;
 
-  signal() {
+  signal(): void {
     if (this.#resolve) {
       this.#resolve();
       this.#resolve = undefined;
@@ -36,7 +36,7 @@ export class SyncWait {
    * Throw away any previous signalled state.
    * This will cause any currently waiters to throw
    */
-  flush() {
+  flush(): void {
     if (this.#reject) {
       this.#reject(`Flushed`);
       this.#reject = undefined;
@@ -59,7 +59,7 @@ export class SyncWait {
    * If a wait period is specified, an exception is thrown if signal does not happen within this time.
    * @param maximumWaitMs 
    */
-  async forSignal(maximumWaitMs?: number) {
+  async forSignal(maximumWaitMs?: number): Promise<void> {
     let p = this.#promise;
     p ??= this.#initPromise();
     if (maximumWaitMs) {

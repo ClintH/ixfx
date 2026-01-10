@@ -29,7 +29,7 @@ export type InlineConsoleOptions = LogOpts & Partial<{
  * ```
  * @param options 
  */
-export const inlineConsole = (options: InlineConsoleOptions = {}) => {
+export const inlineConsole = (options: InlineConsoleOptions = {}): void => {
   const original = {
     log: console.log,
     error: console.error,

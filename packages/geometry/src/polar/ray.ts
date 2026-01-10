@@ -2,7 +2,7 @@ import { type Line, type PolyLine } from "../line/line-type.js";
 import { type Point } from '../point/point-type.js';
 import { distance } from '../point/distance.js';
 import { angleRadian } from '../point/angle.js';
-import { toString as pointToString } from '../point/To.js';
+import { toString as pointToString } from '../point/to.js';
 import { type PolarRay } from "./types.js";
 import { toCartesian as polarToCartesian } from "./conversions.js";
 

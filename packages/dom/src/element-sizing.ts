@@ -103,7 +103,7 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
     }
   }
 
-  dispose(reason?: string) {
+  dispose(reason?: string): void {
     if (this.#disposed) return;
     this.#disposed = true;
     if (this.#resizeObservable) {
@@ -192,16 +192,16 @@ export class ElementSizer<T extends HTMLElement | SVGElement> {
    * This can also be specified when creating ElementSizer.
    * @param size 
    */
-  setNaturalSize(size: Rect) {
+  setNaturalSize(size: Rect): void {
     this.#naturalSize = size;
     this.#naturalRatio = size.width / size.height;
   }
 
-  get naturalSize() {
+  get naturalSize(): Rects.Rect {
     return this.#naturalSize;
   }
 
-  get viewport() {
+  get viewport(): Rects.RectPositioned {
     return this.#viewport;
   }
 

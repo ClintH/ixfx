@@ -32,7 +32,7 @@ export type CombineLatestOptions = {
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
-export const symbol = Symbol(`Rx`);
+export const symbol: unique symbol = Symbol(`Rx`);
 
 export type SignalKinds = `done` | `warn`;
 export type Passed<V> = {

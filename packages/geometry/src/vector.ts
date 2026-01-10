@@ -9,7 +9,7 @@ import { sum as PointsSum } from './point/sum.js';
 import { subtract as PointsSubtract } from './point/index.js';
 import { multiply as PointsMultiply } from './point/multiply.js';
 import { dotProduct as PointsDotProduct } from './point/dot-product.js';
-import { toString as PointsToString } from './point/To.js';
+import { toString as PointsToString } from './point/to.js';
 import { clampMagnitude as PointsClampMagnitude } from './point/magnitude.js';
 import { distance as PointsDistance } from './point/distance.js';
 import { Empty as PointEmpty } from './point/empty.js';
@@ -26,14 +26,14 @@ const pi = Math.PI;
 // const Q3 = Q1 + Q2;
 // const Q4 = Math.PI * 2;
 
-export const fromRadians = (radians: number) => {
+export const fromRadians = (radians: number): Point => {
   return Object.freeze({
     x: Math.cos(radians),
     y: Math.sin(radians)
   });
 }
 
-export const toRadians = (point: Point) => {
+export const toRadians = (point: Point): number => {
   return Math.atan2(point.y, point.x);
 }
 /**
@@ -126,7 +126,7 @@ export const quadrantOffsetAngle = (p: Point): number => {
  * @param origin
  * @returns Polar vector
  */
-export const toPolar = (v: Vector, origin = PointEmpty): Polar.Coord => {
+export const toPolar = (v: Vector, origin: Point = PointEmpty): Polar.Coord => {
   if (isPolar(v)) {
     return v;
   } else if (isCartesian(v)) {
@@ -158,7 +158,7 @@ export const toCartesian = (v: Vector): Point => {
  * @param digits
  * @returns
  */
-export const toString = (v: Vector, digits?: number) => {
+export const toString = (v: Vector, digits?: number): string => {
   if (isPolar(v)) {
     return Polar.toString(v, digits);
   } else if (isCartesian(v)) {
@@ -174,7 +174,7 @@ export const toString = (v: Vector, digits?: number) => {
  * @param b
  * @returns
  */
-export const dotProduct = (a: Vector, b: Vector) => {
+export const dotProduct = (a: Vector, b: Vector): number => {
   if (isPolar(a) && isPolar(b)) {
     return Polar.dotProduct(a, b);
   } else if (isCartesian(a) && isCartesian(b)) {
@@ -190,7 +190,10 @@ export const dotProduct = (a: Vector, b: Vector) => {
  * @param min Minium magnitude
  * @returns
  */
-export const clampMagnitude = (v: Vector, max = 1, min = 0) => {
+export const clampMagnitude = (v: Vector, max = 1, min = 0): Point | Readonly<{
+  distance: number;
+  angleRadian: number;
+}> => {
   if (isPolar(v)) {
     return Polar.clampMagnitude(v, max, min);
   } else if (isCartesian(v)) {
@@ -207,7 +210,10 @@ export const clampMagnitude = (v: Vector, max = 1, min = 0) => {
  * @param b
  * @returns
  */
-export const sum = (a: Vector, b: Vector) => {
+export const sum = (a: Vector, b: Vector): Point | Readonly<{
+  distance: number;
+  angleRadian: number;
+}> => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);
@@ -222,7 +228,10 @@ export const sum = (a: Vector, b: Vector) => {
  * @param a
  * @param b
  */
-export const subtract = (a: Vector, b: Vector) => {
+export const subtract = (a: Vector, b: Vector): Point | Readonly<{
+  distance: number;
+  angleRadian: number;
+}> => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);
@@ -237,7 +246,10 @@ export const subtract = (a: Vector, b: Vector) => {
  * @param a
  * @param b
  */
-export const multiply = (a: Vector, b: Vector) => {
+export const multiply = (a: Vector, b: Vector): Point | Readonly<{
+  distance: number;
+  angleRadian: number;
+}> => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);
@@ -252,7 +264,10 @@ export const multiply = (a: Vector, b: Vector) => {
  * @param a
  * @param b
  */
-export const divide = (a: Vector, b: Vector) => {
+export const divide = (a: Vector, b: Vector): Point | Readonly<{
+  distance: number;
+  angleRadian: number;
+}> => {
   const polar = isPolar(a);
   a = toCartesian(a);
   b = toCartesian(b);

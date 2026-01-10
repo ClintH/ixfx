@@ -12,7 +12,7 @@ import { resultThrow, arrayTest } from "@ixfx/guards";
  * ```
  * @param values 
  */
-export function* pairwise<T>(values: T[]) {
+export function* pairwise<T>(values: T[]): Generator<T[], void, unknown> {
   resultThrow(arrayTest(values, `values`));
 
   if (values.length < 2) throw new Error(`Array needs to have at least two entries. Length: ${ values.length }`);
@@ -50,7 +50,7 @@ export const pairwiseReduce = <V, X>(
   array: readonly V[],
   reducer: (accumulator: X, a: V, b: V) => X,
   initial: X
-) => {
+): X => {
   resultThrow(arrayTest(array, `arr`));
   if (array.length < 2) return initial;
   for (let index = 0; index < array.length - 1; index++) {

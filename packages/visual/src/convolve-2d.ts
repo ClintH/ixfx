@@ -54,7 +54,7 @@ export function convolveCell<TCell, TKernel>(cell: Grids.GridCell, kernel: Kerne
  * @param kernel 
  * @param image 
  */
-export function* convolveImage(kernel: Kernel<number>, image: ImageData) {
+export function* convolveImage(kernel: Kernel<number>, image: ImageData): Generator<Grids.GridCellAndValue<Rgb8Bit>, void, any> {
   //const grid = { rows: image.width, cols: image.height };
   const imageDataAsGrid = ImageDataGrid.wrap(image);
   yield* convolve(kernel, imageDataAsGrid, Grids.By.cells(imageDataAsGrid), rgbReducer);
@@ -136,37 +136,37 @@ export const rgbReducer: KernelReduce<Rgb8Bit, number> = (values: CellValueScala
   };
   return result;
 };
-export const identityKernel = [
+export const identityKernel: number[][] = [
   [ 0, 0, 0 ],
   [ 0, 1, 0 ],
   [ 0, 0, 0 ]
 ];
 
-export const edgeDetectionKernel = [
+export const edgeDetectionKernel: number[][] = [
   [ 0, -1, 0 ],
   [ -1, 4, -1 ],
   [ 0, -1, 0 ]
 ];
 
-export const sharpenKernel = [
+export const sharpenKernel: number[][] = [
   [ 0, -1, 0 ],
   [ -1, 5, -1 ],
   [ 0, -1, 0 ]
 ];
 
-export const boxBlurKernel = multiply([
+export const boxBlurKernel: Kernel<number> = multiply([
   [ 1, 1, 1 ],
   [ 1, 1, 1 ],
   [ 1, 1, 1 ]
 ], 1 / 9);
 
-export const gaussianBlur3Kernel = multiply([
+export const gaussianBlur3Kernel: Kernel<number> = multiply([
   [ 1, 2, 1 ],
   [ 2, 4, 2 ],
   [ 1, 2, 1 ]
 ], 1 / 16);
 
-export const gaussianBlur5Kernel = multiply([
+export const gaussianBlur5Kernel: Kernel<number> = multiply([
   [ 1, 4, 6, 4, 1 ],
   [ 4, 16, 24, 16, 4 ],
   [ 6, 24, 36, 24, 6 ],
@@ -174,7 +174,7 @@ export const gaussianBlur5Kernel = multiply([
   [ 1, 4, 6, 4, 1 ],
 ], 1 / 256);
 
-export const unsharpMasking5Kernel = multiply([
+export const unsharpMasking5Kernel: Kernel<number> = multiply([
   [ 1, 4, 6, 4, 1 ],
   [ 4, 16, 24, 16, 4 ],
   [ 6, 24, -476, 24, 6 ],

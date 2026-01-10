@@ -130,7 +130,7 @@ const notesRaw = `0	C-1	8.176
 export type ParsedNote = [ noteNumber: number, name: string, frequency: number ]
 const notesParsed: ParsedNote[] = []
 
-export const getParsedNotes = () => {
+export const getParsedNotes = (): ParsedNote[] => {
 	if (notesParsed.length > 0) return notesParsed;
 	const lines = notesRaw.split('\n');
 	for (const line of lines) {

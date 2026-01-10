@@ -106,7 +106,7 @@ export class BleDevice extends SimpleEventEmitter<
     return this.states.state === `closed`;
   }
 
-  write(txt: string) {
+  write(txt: string): void {
     if (this.states.state !== `connected`) {
       throw new Error(`Cannot write while state is ${ this.states.state }`);
     }
@@ -126,12 +126,12 @@ export class BleDevice extends SimpleEventEmitter<
     }
   }
 
-  disconnect() {
+  disconnect(): void {
     if (this.states.state !== `connected`) return;
     this.gatt?.disconnect();
   }
 
-  async connect() {
+  async connect(): Promise<void> {
     const attempts = this.config.connectAttempts ?? 3;
 
     this.states.state = `connecting`;
@@ -199,15 +199,15 @@ export class BleDevice extends SimpleEventEmitter<
     this.rxBuffer.add(text);
   }
 
-  protected verbose(m: string) {
+  protected verbose(m: string): void {
     if (this.verboseLogging) console.info(this.config.name, m);
   }
 
-  protected log(m: string) {
+  protected log(m: string): void {
     console.log(this.config.name, m);
   }
 
-  protected warn(m: unknown) {
+  protected warn(m: unknown): void {
     console.warn(this.config.name, m);
   }
 }

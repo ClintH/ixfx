@@ -36,7 +36,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
   /**
    * Number of named values being tracked
    */
-  get size() {
+  get size(): number {
     return this.store.size;
   }
 
@@ -45,7 +45,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @param id
    * @returns
    */
-  has(id: string) {
+  has(id: string): boolean {
     return this.store.has(id);
   }
 
@@ -71,7 +71,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * @param values
    * @returns
    */
-  protected getTrackedValue(id: string, ...values: V[]) {
+  protected getTrackedValue(id: string, ...values: V[]): T {
     if (id === null) throw new Error(`id parameter cannot be null`);
     if (id === undefined) throw new Error(`id parameter cannot be undefined`);
 
@@ -85,7 +85,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * Use {@link reset} to clear them all.
    * @param id
    */
-  delete(id: string) {
+  delete(id: string): void {
     this.store.delete(id);
   }
 
@@ -93,21 +93,21 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * Remove all tracked values.
    * Use {@link delete} to remove a single value by id.
    */
-  reset() {
+  reset(): void {
     this.store = new Map();
   }
 
   /**
    * Enumerate ids
    */
-  *ids() {
+  *ids(): Generator<string, void, unknown> {
     yield* this.store.keys();
   }
 
   /**
    * Enumerate tracked values
    */
-  *tracked() {
+  *tracked(): Generator<T, void, unknown> {
     yield* this.store.values();
   }
 
@@ -115,7 +115,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * Iterates TrackedValues ordered with oldest first
    * @returns
    */
-  *trackedByAge() {
+  *trackedByAge(): Generator<T, void, unknown> {
     const tp = [ ...this.store.values() ];
     tp.sort((a, b) => {
       const aa = a.elapsed;
@@ -135,7 +135,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * First the named values are sorted by their `elapsed` value, and then
    * we return the last value for that group.
    */
-  *valuesByAge() {
+  *valuesByAge(): Generator<V | undefined, void, unknown> {
     for (const tb of this.trackedByAge()) {
       yield tb.last;
     }
@@ -150,7 +150,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
    * const c = Points.centroid(...Array.from(pointers.lastPoints()));
    * ```
    */
-  *last() {
+  *last(): Generator<V | undefined, void, unknown> {
     for (const p of this.store.values()) {
       yield p.last;
     }
@@ -159,7 +159,7 @@ export class TrackedValueMap<V, T extends TrackerBase<V, TResult>, TResult> {
   /**
    * Enumerate starting values
    */
-  *initialValues() {
+  *initialValues(): Generator<V | undefined, void, unknown> {
     for (const p of this.store.values()) {
       yield p.initial;
     }

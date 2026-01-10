@@ -9,7 +9,7 @@ import { project as PointsProject } from "../point/project.js";
  * A triangle consisting of three empty points (Points.Empty)
  */
 
-export const Empty = Object.freeze({
+export const Empty: Triangle = Object.freeze({
   a: { x: 0, y: 0 },
   b: { x: 0, y: 0 },
   c: { x: 0, y: 0 },
@@ -19,7 +19,7 @@ export const Empty = Object.freeze({
  * A triangle consisting of three placeholder points (Points.Placeholder)
  */
 
-export const Placeholder = Object.freeze({
+export const Placeholder: Triangle = Object.freeze({
   a: { x: Number.NaN, y: Number.NaN },
   b: { x: Number.NaN, y: Number.NaN },
   c: { x: Number.NaN, y: Number.NaN },

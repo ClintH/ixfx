@@ -98,7 +98,7 @@ export const tally = (countArrayItems: boolean): Process<any, number> => {
  * @param options 
  * @returns 
  */
-export function rank<In>(r: RankFunction<In>, options: Partial<RankOptions> = {}) {
+export function rank<In>(r: RankFunction<In>, options: Partial<RankOptions> = {}): (value: In) => In | undefined {
   const includeType = options.includeType;
   const emitEqualRanked = options.emitEqualRanked ?? false;
   const emitRepeatHighest = options.emitRepeatHighest ?? false;

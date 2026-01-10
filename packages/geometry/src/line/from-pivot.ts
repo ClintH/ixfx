@@ -1,6 +1,7 @@
 import type { Point } from "../point/point-type.js"
 import * as Polar from "../polar/index.js";
 import { radianInvert } from "../angles.js";
+import { Line } from "./line-type.js";
 
 /**
  * Creates a line from an origin point.
@@ -24,7 +25,7 @@ import { radianInvert } from "../angles.js";
  * @param angleRadian Angle of line, in radians
  * @param balance Percentage of where origin ought to be on line. Default: 0.5, meaning the middle of line
  */
-export const fromPivot = (origin: Point = { x: 0.5, y: 0.5 }, length: number = 1, angleRadian: number = 0, balance: number = 0.5) => {
+export const fromPivot = (origin: Point = { x: 0.5, y: 0.5 }, length: number = 1, angleRadian: number = 0, balance: number = 0.5): Line => {
   const left = length * balance;
   const right = length * (1 - balance);
   const a = Polar.toCartesian(left, radianInvert(angleRadian), origin);

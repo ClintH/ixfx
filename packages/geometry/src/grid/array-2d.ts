@@ -109,7 +109,7 @@ export const set = <V>(
   array: readonly V[][]
 ) => {
   const grid = create(array);
-  return (value: V, cell: GridCell, wrap: GridBoundsLogic) => setWithGrid(grid, array, value, cell, wrap);
+  return (value: V, cell: GridCell, wrap: GridBoundsLogic): V[][] => setWithGrid(grid, array, value, cell, wrap);
 }
 
 const setWithGrid = <V>(

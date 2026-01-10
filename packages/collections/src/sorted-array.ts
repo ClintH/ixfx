@@ -7,7 +7,7 @@ import { defaultComparer, type Comparer } from "@ixfx/core";
  * @param comparer 
  * @returns 
  */
-export const wrapUnsorted = <T>(unsortedData: T[], comparer: Comparer<T> = defaultComparer) => wrapSorted(unsortedData.toSorted(comparer));
+export const wrapUnsorted = <T>(unsortedData: T[], comparer: Comparer<T> = defaultComparer): WrapSortedArray<T> => wrapSorted(unsortedData.toSorted(comparer));
 
 export type WrapSortedArray<T> = {
   /**
@@ -145,7 +145,7 @@ export const wrapSorted = <T>(sortedData: T[], comparer: Comparer<T> = defaultCo
  * @param comparer Comparer (by default uses JS semantics)
  * @returns Index of sought item or -1 if not found.
  */
-export const indexOf = <T>(data: T[], sought: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
+export const indexOf = <T>(data: T[], sought: T, start = 0, end: number = data.length, comparer: Comparer<T> = defaultComparer): number => {
   const debug = false; //(sought == 1);
   if (debug) console.log(`indexOf: sought: ${ sought } start: ${ start } end: ${ end }`)
   if (end < start) {
@@ -181,7 +181,7 @@ export const indexOf = <T>(data: T[], sought: T, start = 0, end = data.length, c
  * @param end 
  * @param comparer 
  */
-export const insertionIndex = <T>(data: T[], toInsert: T, start = 0, end = data.length, comparer: Comparer<T> = defaultComparer): number => {
+export const insertionIndex = <T>(data: T[], toInsert: T, start = 0, end: number = data.length, comparer: Comparer<T> = defaultComparer): number => {
   const mid = Math.floor((start + end) / 2);
 
   const result = comparer(data[ mid ], toInsert);
@@ -216,7 +216,7 @@ export const insertionIndex = <T>(data: T[], toInsert: T, start = 0, end = data.
  * @param comparer Comparer, uses JS default semantics if not specified.
  * @returns 
  */
-export const insert = <T>(sortedArray: T[], toInsert: T, comparer: Comparer<T> = defaultComparer) => {
+export const insert = <T>(sortedArray: T[], toInsert: T, comparer: Comparer<T> = defaultComparer): T[] => {
   const index = insertionIndex(sortedArray, toInsert, 0, sortedArray.length, comparer);
   const pre = sortedArray.slice(0, index);
   const post = sortedArray.slice(index);
@@ -238,7 +238,7 @@ export const insert = <T>(sortedArray: T[], toInsert: T, comparer: Comparer<T> =
  * @param comparer 
  * @returns 
  */
-export const remove = <T>(data: T[], toRemove: T, comparer: Comparer<T> = defaultComparer) => {
+export const remove = <T>(data: T[], toRemove: T, comparer: Comparer<T> = defaultComparer): T[] => {
   const index = indexOf(data, toRemove, 0, data.length, comparer);
 
   if (index === -1) return data;

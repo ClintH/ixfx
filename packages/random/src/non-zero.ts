@@ -6,7 +6,7 @@ import type { RandomSource } from "./types.js";
  * @param source Random number generator 
  * @returns Non-zero number
  */
-export const calculateNonZero = (source: RandomSource = Math.random) => {
+export const calculateNonZero = (source: RandomSource = Math.random): number => {
   let v = 0;
   while (v === 0) {
     v = source();

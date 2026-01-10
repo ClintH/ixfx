@@ -1,1 +1,2 @@
-export * as CirclePacking from './circle-packing.js';
+export * as CirclePacking from './layout/circle-packing.js';
+export * from './layout/ring.js';

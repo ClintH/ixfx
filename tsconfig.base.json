@@ -1,0 +1,93 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "lib": [
+      "ES2024",
+      "DOM",
+      "DOM.AsyncIterable",
+      "DOM.Iterable",
+      "ESNext.Array"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "#macros": [
+        "./macros/index.ts"
+      ],
+      // "@ixfx/guards": [
+      //   "./packages/guards/src"
+      // ],
+      // "@ixfx/random": [
+      //   "./packages/random/src"
+      // ],
+      // "@ixfx/process": [
+      //   "./packages/process/src"
+      // ],
+      // "@ixfx/process/*": [
+      //   "./packages/process/src/*"
+      // ],
+      // "@ixfx/arrays": [
+      //   "./packages/arrays/src"
+      // ],
+      // "@ixfx/events": [
+      //   "./packages/events/src"
+      // ],
+      // "@ixfx/debug": [
+      //   "./packages/debug/src"
+      // ],
+      // "@ixfx/dom": [
+      //   "./packages/dom/src"
+      // ],
+      // "@ixfx/core": [
+      //   "./packages/core/src"
+      // ],
+      // "@ixfx/core/*": [
+      //   "./packages/core/src/*"
+      // ],
+      // "@ixfx/numbers": [
+      //   "./packages/numbers/src"
+      // ],
+      // "@ixfx/collections": [
+      //   "./packages/collections/src"
+      // ],
+      // "@ixfx/collections/*": [
+      //   "./packages/collections/src/*"
+      // ],
+      // "@ixfx/iterables": [
+      //   "./packages/iterables/src"
+      // ],
+      // "@ixfx/iterables/*": [
+      //   "./packages/iterables/src/*"
+      // ],
+      // "@ixfx/flow": [
+      //   "./packages/flow/src"
+      // ],
+      // "@ixfx/flow/*": [
+      //   "./packages/flow/src/*"
+      // ],
+      // "@ixfx/modulation": [
+      //   "./packages/modulation/src"
+      // ],
+      // "@ixfx/modulation/*": [
+      //   "./packages/modulation/src/*"
+      // ],
+      // "@ixfx/geometry": [
+      //   "./packages/geometry/src"
+      // ],
+      // "@ixfx/geometry/*": [
+      //   "./packages/geometry/src/*"
+      // ],
+      // "@ixfx/trackers": [
+      //   "./packages/trackers/src"
+      // ],
+    },
+    "allowJs": true,
+    "strict": true,
+    "outDir": "temp/dist",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  }
+}

@@ -231,7 +231,7 @@ async function* delayAnimationLoop() {
  *
  * @param timeout Delay. If 0 is given, `requestAnimationFrame` is used over `setTimeout`.
  */
-export async function* delayLoop(timeout: Interval) {
+export async function* delayLoop(timeout: Interval): AsyncGenerator<undefined, void, unknown> {
   const timeoutMs = intervalToMs(timeout);
   if (typeof timeoutMs === `undefined`) throw new Error(`timeout is undefined`);
   if (timeoutMs < 0) throw new Error(`Timeout is less than zero`);

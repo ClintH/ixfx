@@ -1,13 +1,13 @@
 import type { Triangle } from "./triangle-type.js";
 import { isPoint, guard as PointsGuard, isPlaceholder as PointsIsPlaceholder, isEmpty as PointsIsEmpty } from '../point/guard.js'
-import { isEqual as PointsIsEqual} from "../point/is-equal.js";
+import { isEqual as PointsIsEqual } from "../point/is-equal.js";
 
 /**
  * Throws an exception if the triangle is invalid
  * @param t
  * @param name
  */
-export const guard = (t: Triangle, name = `t`) => {
+export const guard = (t: Triangle, name = `t`): void => {
   if (t === undefined) throw new Error(`{$name} undefined`);
   PointsGuard(t.a, name + `.a`);
   PointsGuard(t.b, name + `.b`);

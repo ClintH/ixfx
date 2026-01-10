@@ -45,6 +45,8 @@ export const fromCssColour = (colour: string): Colour => {
   throw new Error(`String colour is not a hex colour, CSS variable nor well-defined colour. Input: '${ colour }'`);
 }
 
+export function resolveCss(colour: CssColourNames): string;
+
 /**
  * Resolves a named colour or CSS variable to a colour string.
  * Doesn't do conversion or parsing.
@@ -57,7 +59,7 @@ export const fromCssColour = (colour: string): Colour => {
  * @param fallback Fallback if CSS variable is missing
  * @returns 
  */
-export const resolveCss = (colour: string, fallback?: string): string => {
+export function resolveCss(colour: string | CssColourNames, fallback?: string): string {
   if (colour.startsWith(`--`)) {
     const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
     if (fromCss.length === 0 || fromCss === null) {
@@ -66,13 +68,14 @@ export const resolveCss = (colour: string, fallback?: string): string => {
     }
     return resolveCss(fromCss); // Recurse, because value might be a named colour
   }
-  if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
-    return cssDefinedHexColours[ colour ] as string;
+  if (typeof (cssDefinedHexColours as any)[ colour ] !== `undefined`) {
+    return (cssDefinedHexColours as any)[ colour ] as string;
   }
   return colour; // assume legit
 }
+export type CssColourNames = keyof typeof cssDefinedHexColours;
 
-export const cssDefinedHexColours = {
+export const cssDefinedHexColours: Record<string, string> = Object.freeze({
   "aliceblue": "#f0f8ff",
   "antiquewhite": "#faebd7",
   "aqua": "#00ffff",
@@ -215,4 +218,4 @@ export const cssDefinedHexColours = {
   "yellow": "#ffff00",
   "yellowgreen": "#9acd32",
   "transparent": "#00000000"
-}
+})

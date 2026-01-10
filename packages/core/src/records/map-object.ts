@@ -97,7 +97,9 @@ export type MapObjectArgs = {
  * @param mapper 
  * @returns 
  */
-export function mapObjectByObject(data: object, mapper: Record<string, (value: any, context: any) => any>) {
+export function mapObjectByObject(data: object, mapper: Record<string, (value: any, context: any) => any>): {
+  [ k: string ]: any;
+} {
   const entries = Object.entries(data);
   for (const entry of entries) {
     if (entry[ 0 ] in mapper) {

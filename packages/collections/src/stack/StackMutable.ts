@@ -4,7 +4,7 @@
 
 import type { IStackMutable } from './IStackMutable.js';
 import { push, peek, pop, isEmpty, isFull } from './StackFns.js';
-import type { StackOpts } from './Types.js';
+import type { StackOpts } from './types.js';
 
 /**
  * Creates a stack. Mutable. Use {@link StackImmutable} for an immutable alternative.

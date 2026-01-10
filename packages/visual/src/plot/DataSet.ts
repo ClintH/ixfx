@@ -3,7 +3,7 @@ import { MapOfSimpleMutable } from "@ixfx/collections";
 export class DataSet<TValue, TSeriesMeta> {
   #data: MapOfSimpleMutable<TValue>;
   #meta: Map<string, TSeriesMeta>;
-  lastChange;
+  lastChange: number;
 
   constructor() {
     this.lastChange = performance.now();
@@ -11,20 +11,20 @@ export class DataSet<TValue, TSeriesMeta> {
     this.#meta = new Map<string, TSeriesMeta>();
   }
 
-  get metaCount() {
+  get metaCount(): number {
     return this.#meta.size;
   }
 
-  clear() {
+  clear(): void {
     this.#data.clear();
     this.lastChange = performance.now();
   }
 
-  set(series: string, data: TValue[]) {
+  set(series: string, data: TValue[]): void {
     this.#data.setValues(series, data);
   }
 
-  deleteBySeries(series: string) {
+  deleteBySeries(series: string): boolean {
     const changed = this.#data.delete(series);
     if (changed) {
       this.lastChange = performance.now();
@@ -32,31 +32,31 @@ export class DataSet<TValue, TSeriesMeta> {
     return changed;
   }
 
-  setMeta(series: string, meta: TSeriesMeta) {
+  setMeta(series: string, meta: TSeriesMeta): void {
     this.#meta.set(series, meta);
   }
 
-  hasMeta(series: string) {
+  hasMeta(series: string): boolean {
     return this.#meta.has(series);
   }
 
-  getMeta(series: string) {
+  getMeta(series: string): TSeriesMeta | undefined {
     return this.#meta.get(series);
   }
 
-  *getValues() {
+  *getValues(): Generator<TValue, void, any> {
     yield* this.#data.valuesFlat();
   }
 
-  *getEntries() {
+  *getEntries(): Generator<[ key: string, value: TValue[] ], void, any> {
     yield* this.#data.entries();
   }
 
-  *getSeries() {
+  *getSeries(): Generator<readonly TValue[], void, any> {
     yield* this.#data.values();
   }
 
-  add(value: TValue, series = `default`) {
+  add(value: TValue, series = `default`): void {
     this.#data.addKeyedValues(series, value);
     this.lastChange = performance.now();
   }

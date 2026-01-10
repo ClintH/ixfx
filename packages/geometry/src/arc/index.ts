@@ -188,7 +188,7 @@ export const interpolate: ArcInterpolate = (amount: number, arc: ArcPositioned |
  * Eg if arc runs from 45-315deg in clockwise direction, size will be 90deg.
  * @param arc 
  */
-export const angularSize = (arc: Arc) => radianArc(arc.startRadian, arc.endRadian, arc.clockwise)
+export const angularSize = (arc: Arc): number => radianArc(arc.startRadian, arc.endRadian, arc.clockwise)
 
 /**
  * Creates a {@link Path} instance from the arc. This wraps up some functions for convienence.

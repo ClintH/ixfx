@@ -4,6 +4,6 @@
  * @param a
  * @returns
  */
-export const defaultKeyer = <V>(a: V) => {
+export const defaultKeyer = <V>(a: V): string => {
   return typeof a === `string` ? a : JSON.stringify(a);
 };

@@ -77,14 +77,18 @@ export const movingAverageLight = (scaling = 3): (value?: number) => number => {
  * @param samplesOrOptions Number of samples to compute average from, or object of options
  * @returns
  */
-export const movingAverage = (samplesOrOptions: number | MovingAverageOptions) => movingAverageWithContext(samplesOrOptions).seen;
+export const movingAverage = (samplesOrOptions: number | MovingAverageOptions): (value: number) => any => movingAverageWithContext(samplesOrOptions).seen;
 
-export const movingAverageWithContext = (samplesOrOptions: number | MovingAverageOptions) => {
+export const movingAverageWithContext = (samplesOrOptions: number | MovingAverageOptions): {
+  seen: (value: number) => any;
+  readonly data: any[];
+  readonly average: number;
+} => {
   const nanPolicy: MovingAverageNanOptions = (typeof samplesOrOptions === `number`) ? `ignore` : samplesOrOptions.nanPolicy ?? `ignore`;
   const w = movingWindowWithContext(samplesOrOptions);
   const averageFunction = typeof samplesOrOptions === `number` ? average : samplesOrOptions.weighter ? averageWeigher(samplesOrOptions.weighter) : average;
 
-  const seen = (value: number) => {
+  const seen = (value: number): any => {
     if (Number.isNaN(value)) {
       if (nanPolicy === `throw`) throw new TypeError(`Value is NaN`);
       if (nanPolicy === `ignore`) return w.data;
@@ -94,8 +98,8 @@ export const movingAverageWithContext = (samplesOrOptions: number | MovingAverag
 
   return {
     seen,
-    get data() { return [ ...w.data ] },
-    get average() { return averageFunction(w.data); }
+    get data(): any[] { return [ ...w.data ] },
+    get average(): number { return averageFunction(w.data); }
   }
 }
 
@@ -195,7 +199,7 @@ const exponentialSmoothing = (smoothingFactor: number, value: number, previous: 
  * @param speedCoefficient Default: 0
  * @param cutoffDefault Default: 1
  */
-export const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault = 1) => {
+export const noiseFilter = (cutoffMin = 1, speedCoefficient = 0, cutoffDefault = 1): (value: number, timestamp?: number) => number => {
   let previousValue = 0;
   let derivativeLast = 0;
   let timestampLast = 0;

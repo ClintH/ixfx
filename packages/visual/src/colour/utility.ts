@@ -1,6 +1,6 @@
 import type { RGB } from "colorizr";
 
-export function calculateHueDistance(a: number, b: number, limit = 1) {
+export function calculateHueDistance(a: number, b: number, limit = 1): { long: number; short: number; forward: number; backward: number; } {
   let long = -1;
   let short = -1;
   if (b < a) {
@@ -33,7 +33,7 @@ export const libraryRgbToHexString = (rgb: RGB): string => {
   return part;
 }
 
-export function wrapScalarHue(value: number) {
+export function wrapScalarHue(value: number): number {
   value = value % 1;
   if (value < 0) return (1 - Math.abs(value)) % 1;
   return value;

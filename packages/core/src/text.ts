@@ -21,7 +21,7 @@ import { integerTest, resultThrow } from '@ixfx/guards';
  * @param source 
  * @param delimiter 
  */
-export function* stringSegmentsWholeToEnd(source: string, delimiter = `.`) {
+export function* stringSegmentsWholeToEnd(source: string, delimiter = `.`): Generator<string, void, unknown> {
   while (source.length > 0) {
     yield source;
     const trimmed = afterMatch(source, delimiter);
@@ -51,7 +51,7 @@ export function* stringSegmentsWholeToEnd(source: string, delimiter = `.`) {
  * @param source 
  * @param delimiter 
  */
-export function* stringSegmentsLastToWhole(source: string, delimiter = `.`) {
+export function* stringSegmentsLastToWhole(source: string, delimiter = `.`): Generator<string, void, unknown> {
   let accumulator = ``;
   const orig = source;
   while (source.length > 0) {
@@ -86,7 +86,7 @@ export function* stringSegmentsLastToWhole(source: string, delimiter = `.`) {
  * @param source 
  * @param delimiter 
  */
-export function* stringSegmentsFirstToWhole(source: string, delimiter = `.`) {
+export function* stringSegmentsFirstToWhole(source: string, delimiter = `.`): Generator<string, void, unknown> {
   let accumulator = ``;
   const orig = source;
   while (source.length > 0) {
@@ -118,7 +118,7 @@ export function* stringSegmentsFirstToWhole(source: string, delimiter = `.`) {
  * @param source 
  * @param delimiter 
  */
-export function* stringSegmentsWholeToFirst(source: string, delimiter = `.`) {
+export function* stringSegmentsWholeToFirst(source: string, delimiter = `.`): Generator<string, void, unknown> {
   while (source.length > 0) {
     yield source;
 
@@ -142,7 +142,7 @@ export function* stringSegmentsWholeToFirst(source: string, delimiter = `.`) {
  * @param maxLength Maximum length. Defaults to 20
  * @returns 
  */
-export const abbreviate = (source: string, maxLength = 15) => {
+export const abbreviate = (source: string, maxLength = 15): string => {
   resultThrow(integerTest(maxLength, `aboveZero`, `maxLength`));
   if (typeof source !== `string`) throw new Error(`Parameter 'source' is not a string`);
 
@@ -162,7 +162,7 @@ export const abbreviate = (source: string, maxLength = 15) => {
  * @param maxLength Default 20
  * @returns 
  */
-export const toStringAbbreviate = (source: any, maxLength = 20) => {
+export const toStringAbbreviate = (source: any, maxLength = 20): string => {
   if (source === undefined) return `(undefined)`;
   if (source === null) return `(null)`;
   return abbreviate(JSON.stringify(source), maxLength);
@@ -251,7 +251,7 @@ export const indexOfCharCode = (
   source: string,
   code: number,
   start = 0,
-  end = source.length - 1
+  end: number = source.length - 1
 ): number => {
   for (let index = start; index <= end; index++) {
     if (source.codePointAt(index) === code) return index;
@@ -276,7 +276,7 @@ export const omitChars = (
   source: string,
   removeStart: number,
   removeLength: number
-) =>
+): string =>
   source.slice(0, removeStart) +
   source.slice(removeStart + removeLength);
 
@@ -717,7 +717,7 @@ export const wildcard = (pattern: string) => {
   // Create a regular expression object for matching string
   const regex = new RegExp(pattern);
 
-  return (value: string) => {
+  return (value: string): boolean => {
     // Returns true if it finds a match, otherwse it returns false
     return regex.test(value);
   }

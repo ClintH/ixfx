@@ -232,7 +232,7 @@ export function find<V>(it: V[] | Iterable<V> | AsyncIterable<V>, f: (v: V) => b
  * @param fn Function to execute
  */
 // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export function forEach<T>(it: T[] | AsyncIterable<T> | Iterable<T>, fn: (v: T | undefined) => boolean | Promise<boolean> | void | Promise<void>, options: Partial<ForEachOptions> = {}) {
+export function forEach<T>(it: T[] | AsyncIterable<T> | Iterable<T>, fn: (v: T | undefined) => boolean | Promise<boolean> | void | Promise<void>, options: Partial<ForEachOptions> = {}): Promise<void> | undefined {
   if (isAsyncIterable(it)) {
     return Async.forEach(it, fn, options);
   } else {
@@ -550,7 +550,7 @@ export function fromIterable<V>(iterable: Iterable<V> | AsyncIterable<V>, interv
  * Use {@link fromFunctionAwaited} to await `callback`.
  * @param callback Function that generates a value
  */
-export function* fromFunction<T>(callback: () => T) {
+export function* fromFunction<T>(callback: () => T): Generator<T, void, unknown> {
   while (true) {
     const v = callback();
     yield v;
@@ -571,7 +571,7 @@ export function* fromFunction<T>(callback: () => T) {
  * Use {@link fromFunction} otherwise;
  * @param callback 
  */
-export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
+export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T): AsyncGenerator<Awaited<T>, void, unknown> {
   while (true) {
     const v = await callback();
     yield v;
@@ -601,7 +601,7 @@ export async function* fromFunctionAwaited<T>(callback: () => Promise<T> | T) {
  * @param input 
  * @param callback 
  */
-export function asCallback<V>(input: AsyncIterable<V> | Iterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
+export function asCallback<V>(input: AsyncIterable<V> | Iterable<V>, callback: (v: V) => unknown, onDone?: () => void): Promise<void> | undefined {
   if (isAsyncIterable(input)) {
     return Async.asCallback(input, callback);
   } else {

@@ -16,7 +16,7 @@ import { arrayTest, integerTest, throwIfFailed } from "@ixfx/guards";
 export function chunks<V>(
   array: readonly V[],
   size: number
-) {
+): V[][] {
   throwIfFailed(
     integerTest(size, "aboveZero", `size`),
     arrayTest(array, `array`)

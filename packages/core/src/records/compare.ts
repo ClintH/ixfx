@@ -19,7 +19,12 @@ import { mapObjectKeys } from './map-object-keys.js';
  * @param b 
  * @returns 
  */
-export const compareObjectKeys = (a: object, b: object) => {
+export const compareObjectKeys = (a: object, b: object): {
+  shared: string[];
+  isSame: boolean;
+  a: string[];
+  b: string[];
+} => {
   const c = compareIterableValuesShallow(Object.keys(a), Object.keys(b));
   return c;
 }
@@ -42,7 +47,7 @@ export const compareObjectKeys = (a: object, b: object) => {
  * @param a 
  * @param b 
  */
-export const changedObjectDataFields = (a: object, b: object) => {
+export const changedObjectDataFields = (a: object, b: object): object[] | Record<string, unknown> => {
   const r = compareObjectData(a, b, true);
   if (Object.entries(r.added).length > 0) throw new Error(`Shape of data has changed`);
   if (Object.entries(r.removed).length > 0) throw new Error(`Shape of data has changed`);
@@ -59,11 +64,11 @@ const compareResultToObject = <TKey extends string | number>(r: CompareChangeSet
   }
 
   for (const entry of Object.entries(r.changed)) {
-    (output as object)[ entry[ 0 ] ] = entry[ 1 ];
+    (output as any)[ entry[ 0 ] ] = entry[ 1 ];
   }
 
   for (const entry of Object.entries(r.added)) {
-    (output as object)[ entry[ 0 ] ] = entry[ 1 ];
+    (output as any)[ entry[ 0 ] ] = entry[ 1 ];
   }
 
 
@@ -71,7 +76,7 @@ const compareResultToObject = <TKey extends string | number>(r: CompareChangeSet
     const childResult = childEntry[ 1 ] as CompareChangeSet<TKey>;
     if (childResult.hasChanged) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      (output as object)[ childEntry[ 0 ] ] = compareResultToObject(childResult, b[ childEntry[ 0 ] ]);
+      (output as any)[ childEntry[ 0 ] ] = compareResultToObject(childResult, (b as any)[ childEntry[ 0 ] ]);
     }
   }
   return output;
@@ -136,7 +141,7 @@ export const compareObjectData = <T>(a: object | null, b: object | null, assumeS
   for (const entry of entriesA) {
     const outputKey = isArray ? `_${ entry[ 0 ] }` : entry[ 0 ]
     const aValue = entry[ 1 ] as unknown;
-    const bValue = b[ entry[ 0 ] ] as unknown;
+    const bValue = (b as any)[ entry[ 0 ] ] as unknown;
     scannedKeys.add(entry[ 0 ]);
 
     if (bValue === undefined) {
@@ -144,7 +149,7 @@ export const compareObjectData = <T>(a: object | null, b: object | null, assumeS
       hasChanged = true;
       if (assumeSameShape && !isArray) {
         // If we're assuming it's the same shape, then _undefined_ is actually the value
-        changed[ outputKey ] = bValue;
+        (changed as any)[ outputKey ] = bValue;
         summary.push([ `mutate`, outputKey, bValue ]);
       } else {
         // Key removed
@@ -157,12 +162,12 @@ export const compareObjectData = <T>(a: object | null, b: object | null, assumeS
     if (typeof aValue === `object`) {
       const r = compareObjectData(aValue, bValue as object, assumeSameShape, eq);
       if (r.hasChanged) hasChanged = true;
-      children[ outputKey ] = r;
+      (children as any)[ outputKey ] = r;
       const childSummary = r.summary.map(sum => { return [ sum[ 0 ], outputKey + `.` + sum[ 1 ], sum[ 2 ] ] }) as ChangeRecord<string>[];
       summary.push(...childSummary);
     } else {
       if (!eq(aValue as T, bValue as T)) {
-        changed[ outputKey ] = bValue;
+        (changed as any)[ outputKey ] = bValue;
         hasChanged = true;
         summary.push([ `mutate`, outputKey, bValue ]);
       }
@@ -175,7 +180,7 @@ export const compareObjectData = <T>(a: object | null, b: object | null, assumeS
       const key = isArray ? `_${ entry[ 0 ] }` : entry[ 0 ]
 
       if (scannedKeys.has(entry[ 0 ])) continue;
-      added[ key ] = entry[ 1 ] as unknown;
+      (added as any)[ key ] = entry[ 1 ] as unknown;
       hasChanged = true;
       summary.push([ `add`, key, entry[ 1 ] ])
     }

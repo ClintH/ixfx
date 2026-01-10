@@ -4,7 +4,7 @@ import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import type { Point } from '../point/point-type.js';
 import type { CubicBezier, CubicBezierPath, QuadraticBezier, QuadraticBezierPath } from './bezier-type.js';
 import { isCubicBezier, isQuadraticBezier } from './guard.js';
-import { to2d } from '../point/To.js';
+import { to2d } from '../point/to.js';
 export * from './bezier-type.js';
 export * from './guard.js';
 /**

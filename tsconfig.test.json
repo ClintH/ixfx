@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "dist/test.tsbuildinfo",
+    "lib": [
+      "ES2023",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ],
+    "allowImportingTsExtensions": true,
+    "isolatedDeclarations": false,
+    "noEmit": true
+  },
+  "include": [
+    "packages/*/tests",
+    "packages/*/src",
+    "**/shim.d.ts",
+    "**/tsdown.config.ts",
+  ],
+  "exclude": [
+    "**/dist",
+    "**/demos",
+    "**/tests/fixtures"
+  ]
+}

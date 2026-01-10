@@ -5,12 +5,12 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   readonly #listeners = new MapOfSimple<Listener<Events>>();
   #disposed = false;
 
-  dispose() {
+  dispose(): void {
     if (this.#disposed) return;
     this.clearEventListeners();
   }
 
-  get isDisposed() {
+  get isDisposed(): boolean {
     return this.#disposed;
   }
 
@@ -20,7 +20,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * @param args Arguments for event
    * @returns
    */
-  protected fireEvent<K extends keyof Events>(type: K, args: Events[ K ]) {
+  protected fireEvent<K extends keyof Events>(type: K, args: Events[ K ]): void {
     if (this.#disposed) throw new Error(`Disposed`);
     //console.log(`Firing ${ type as string }. Listeners: ${ this.#listeners.size(type as string) }`);
     for (const l of this.#listeners.iterateKey(type as string)) {
@@ -55,7 +55,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
   removeEventListener<K extends keyof Events>(
     type: K,
     listener: (event: Events[ K ], sender: SimpleEventEmitter<Events>) => void
-  ) {
+  ): void {
     if (this.#disposed) return;
 
     // listener: Listener<Events>): void {
@@ -69,7 +69,7 @@ export class SimpleEventEmitter<Events> implements ISimpleEventEmitter<Events> {
    * Clear all event listeners
    * @private
    */
-  clearEventListeners() {
+  clearEventListeners(): void {
     if (this.#disposed) return;
     this.#listeners.clear();
   }

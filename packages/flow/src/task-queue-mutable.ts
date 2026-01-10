@@ -49,7 +49,7 @@ export type TaskQueueEvents = {
  * ```
  */
 export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
-  static readonly shared = new TaskQueueMutable();
+  static readonly shared: TaskQueueMutable = new TaskQueueMutable();
   private _loop;
   private _queue;
 
@@ -71,7 +71,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
    * ```
    * @param task Task to run
    */
-  enqueue(task: () => Promise<void>) {
+  enqueue(task: () => Promise<void>): number {
     const length = this._queue.enqueue(task);
     if (this._loop.runState === `idle`) {
       this.fireEvent(`started`, {});
@@ -80,7 +80,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
     return length;
   }
 
-  dequeue() {
+  dequeue(): AsyncTask | undefined {
     return this._queue.dequeue();
   }
 
@@ -105,7 +105,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
    * Currently running tasks will continue.
    * @returns 
    */
-  clear() {
+  clear(): void {
     if (this._queue.length === 0) return;
     this._queue.clear();
     this._loop.cancel();
@@ -115,7 +115,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
   /**
   * Returns true if queue is empty
   */
-  get isEmpty() {
+  get isEmpty(): boolean {
     return this._queue.isEmpty;
   }
 
@@ -123,7 +123,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
   /**
    * Number of items in queue
    */
-  get length() {
+  get length(): number {
     return this._queue.length
   }
 }

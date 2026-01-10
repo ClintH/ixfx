@@ -2,7 +2,7 @@
  * Returns _true_ if it seems like the code is running on iOS (iPad/iPhone)
  * @returns 
  */
-export const runningiOS = () =>
+export const runningiOS = (): boolean =>
   [
     `iPad Simulator`,
     `iPhone Simulator`,

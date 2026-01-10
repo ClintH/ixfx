@@ -12,7 +12,7 @@
  * @param prefix 
  * @returns 
  */
-export function prefixProperties(data: Record<string | number, any>[], prefix: string) {
+export function prefixProperties(data: Record<string | number, any>[], prefix: string): Record<string, unknown>[] {
   const changed: Record<string, unknown>[] = [];
   for (const d of data) {
     const entries = Object.entries(d);

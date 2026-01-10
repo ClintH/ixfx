@@ -22,7 +22,7 @@ import type { GenFactoryNoInput, GenOrData } from "./types.js";
  * @param valueToWrap 
  * @param callback 
  */
-export async function asCallback<V>(valueToWrap: GenOrData<V> | GenFactoryNoInput<V>, callback: (v: V) => unknown, onDone?: () => void) {
+export async function asCallback<V>(valueToWrap: GenOrData<V> | GenFactoryNoInput<V>, callback: (v: V) => unknown, onDone?: () => void): Promise<void> {
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;
   for await (const value of outputType) {
     callback(value);

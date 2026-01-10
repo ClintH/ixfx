@@ -16,7 +16,7 @@
  * and you're free to call `resolve` or `reject` when needed.
  * @returns 
  */
-export function promiseWithResolvers<T>() {
+export function promiseWithResolvers<T>(): { promise: Promise<T>; resolve: (value: T) => void; reject: (reason: any) => void; } {
   let resolve: undefined | ((value: T) => void);
   let reject: undefined | ((reason: any) => void);
   const promise = new Promise<T>(

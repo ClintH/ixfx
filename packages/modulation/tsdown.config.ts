@@ -1,6 +1,11 @@
-import { defineConfig } from 'tsdown'
-import basePackageConfig from '../../tsdown.package.ts';
+import { defineConfig } from 'tsdown/config'
 
 export default defineConfig({
-  ...basePackageConfig
-});
+  entry: [
+    './src/index.ts',
+    './src/easing.ts',
+    './src/source.ts',
+    './src/envelope.ts'
+  ],
+  external: [ 'node:module' ],
+})

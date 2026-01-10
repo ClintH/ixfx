@@ -78,7 +78,23 @@ export const stream = (strategy: NormalisationStreamStrategy = `minmax`, options
  * @returns 
  */
 export const arrayWithContext = (strategy: NormalisationStrategy, values: readonly number[], options: Partial<NormalisationArrayOptions> = {}
-) => {
+): {
+  mean: number;
+  standardDeviation: number;
+  values: number[];
+  original: readonly number[] | number[];
+} | {
+  values: number[];
+  original: any[];
+  min: number;
+  max: number;
+  range: number;
+} | {
+  median: number;
+  iqr: number;
+  values: number[];
+  original: number[];
+} => {
   switch (strategy) {
     case `minmax`:
       return MinMax.arrayWithContext(values, options as MinMaxArrayOptions);
@@ -116,4 +132,4 @@ export const arrayWithContext = (strategy: NormalisationStrategy, values: readon
  * @returns 
  */
 export const array = (strategy: NormalisationStrategy, values: readonly number[], options: Partial<NormalisationArrayOptions> = {}
-) => arrayWithContext(strategy, values, options).values;
+): number[] => arrayWithContext(strategy, values, options).values;

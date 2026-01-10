@@ -33,8 +33,8 @@ import { toStringDefault } from "./util/to-string.js";
 export const contains = <V>(
   haystack: V[],
   needles: V[],
-  eq = isEqualDefault<V>
-) => {
+  eq: (a: V, b: V) => boolean = isEqualDefault<V>
+): boolean => {
   resultThrow(
     arrayTest(haystack, `haystack`),
     arrayTest(needles, `needles`),
@@ -79,7 +79,7 @@ export const contains = <V>(
  */
 export const containsDuplicateValues = <V>(
   data: Iterable<V>,
-  keyFunction = toStringDefault<V>
+  keyFunction: (itemToMakeStringFor: V) => string = toStringDefault<V>
 ): boolean => {
   if (typeof data !== `object`) throw new Error(`Param 'data' is expected to be an Iterable. Got type: ${ typeof data }`);
   const set = new Set<string>();

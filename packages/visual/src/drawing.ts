@@ -1,5 +1,5 @@
 import { arrayTest, resultThrow } from '@ixfx/guards';
-import { Colour } from '@ixfx/visual';
+import * as Colour from './colour/index.js';
 import { resolveEl } from '@ixfx/dom';
 import { StackImmutable, type IStackImmutable } from '@ixfx/collections/stack';
 import { Beziers, Lines, Points, Rects, Triangles, type Arcs, type Circles, type Ellipses, type Paths } from '@ixfx/geometry';
@@ -56,7 +56,13 @@ export const getContext = (
 export const makeHelper = (
   ctxOrCanvasEl: CanvasContextQuery,
   canvasBounds?: Rects.Rect
-) => {
+): {
+  ctx: CanvasRenderingContext2D; paths(pathsToDraw: Paths.Path[] | readonly Paths.Path[], opts?: DrawingOpts): void; polarRay(rayToDraw: PolarRay | PolarRay[] | readonly PolarRay[], opts?: DrawingOpts): void; line(lineToDraw: Lines.Line | Lines.Line[] | readonly Lines.Line[], opts?: DrawingOpts): void; rect(rectsToDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[], opts?: RectOpts): void; bezier(bezierToDraw: Beziers.QuadraticBezier | Beziers.CubicBezier, opts?: DrawingOpts): void; connectedPoints(pointsToDraw: Points.Point[] | readonly Points.Point[], opts?: DrawingOpts & Partial<ConnectedPointsOptions>): void; pointLabels(pointsToDraw: Points.Point[], opts?: DrawingOpts): void; dot(dotPosition: Points.Point | Points.Point[], opts?: DotOpts): void; circle(circlesToDraw: Circles.CirclePositioned | Circles.CirclePositioned[], opts: DrawingOpts): void; arc(arcsToDraw: Arcs.ArcPositioned | Arcs.ArcPositioned[], opts: DrawingOpts): void; textBlock(lines: string[], opts: DrawingOpts & {
+    anchor: Points.Point;
+    anchorPadding?: number;
+    bounds?: Rects.RectPositioned;
+  }): void;
+} => {
   const ctx = getContext(ctxOrCanvasEl);
   return {
     ctx,
@@ -187,7 +193,7 @@ export const arc = (
   ctx: CanvasRenderingContext2D,
   arcs: Arcs.ArcPositioned | readonly Arcs.ArcPositioned[],
   opts: DrawingOpts = {}
-) => {
+): void => {
   applyOpts(ctx, opts);
 
   const draw = (arc: Arcs.ArcPositioned) => {
@@ -344,7 +350,7 @@ export const circle = (
   ctx: CanvasRenderingContext2D,
   circlesToDraw: Circles.CirclePositioned | readonly Circles.CirclePositioned[],
   opts: DrawingOpts = {}
-) => {
+): void => {
   applyOpts(ctx, opts);
 
   const draw = (c: Circles.CirclePositioned) => {
@@ -375,7 +381,7 @@ export const ellipse = (
     | Ellipses.EllipsePositioned[]
     | readonly Ellipses.EllipsePositioned[],
   opts: DrawingOpts = {}
-) => {
+): void => {
   applyOpts(ctx, opts);
 
   const draw = (ellipse: Ellipses.EllipsePositioned) => {
@@ -405,7 +411,7 @@ export const paths = (
   ctx: CanvasRenderingContext2D,
   pathsToDraw: readonly Paths.Path[] | Paths.Path | Paths.Path[],
   opts: { readonly strokeStyle?: string; readonly debug?: boolean } = {}
-) => {
+): void => {
   applyOpts(ctx, opts);
 
   const draw = (path: Paths.Path) => {
@@ -442,7 +448,7 @@ export const connectedPoints = (
   ctx: CanvasRenderingContext2D,
   pts: readonly Points.Point[],
   opts: Partial<ConnectedPointsOptions> = {}
-) => {
+): void => {
   const shouldLoop = opts.loop ?? false;
 
   resultThrow(arrayTest(pts, `pts`));
@@ -486,7 +492,7 @@ export const pointLabels = (
   pts: readonly Points.Point[],
   opts: { readonly fillStyle?: string } = {},
   labels?: readonly string[]
-) => {
+): void => {
   if (pts.length === 0) return;
 
   // Throw an error if any point is invalid
@@ -553,7 +559,7 @@ export const dot = (
   ctx: CanvasRenderingContext2D,
   pos: Points.Point | (Points.Point | Circles.CirclePositioned)[] | Circles.CirclePositioned,
   opts?: DotOpts
-) => {
+): void => {
   opts ??= {};
   const radius = opts.radius ?? 10;
   const positions = Array.isArray(pos) ? pos : [ pos ];
@@ -612,7 +618,7 @@ export const bezier = (
   ctx: CanvasRenderingContext2D,
   bezierToDraw: Beziers.QuadraticBezier | Beziers.CubicBezier,
   opts?: DrawingOpts
-) => {
+): void => {
   if (Beziers.isQuadraticBezier(bezierToDraw)) {
     quadraticBezier(ctx, bezierToDraw, opts);
   } else if (Beziers.isCubicBezier(bezierToDraw)) {
@@ -732,7 +738,7 @@ export const polarRay = (
   ctx: CanvasRenderingContext2D,
   toDraw: PolarRay | readonly PolarRay[] | PolarRay[],
   opts: LineOpts & DrawingOpts = {}
-) => {
+): void => {
   const rays = Array.isArray(toDraw) ? toDraw : [ toDraw as PolarRay ];
   const toLines = Ray.toCartesian(rays);
   line(ctx, toLines, opts);
@@ -753,7 +759,7 @@ export const line = (
   ctx: CanvasRenderingContext2D,
   toDraw: Lines.Line | readonly Lines.Line[] | Lines.Line[],
   opts: LineOpts & DrawingOpts = {}
-) => {
+): void => {
   const isDebug = opts.debug ?? false;
   const o = lineOp(opts.lineWidth, opts.lineJoin, opts.lineCap);
   applyOpts(ctx, opts, o);
@@ -789,7 +795,7 @@ export const triangle = (
   ctx: CanvasRenderingContext2D,
   toDraw: Triangles.Triangle | readonly Triangles.Triangle[] | Triangles.Triangle[],
   opts: DrawingOpts & { readonly filled?: boolean } = {}
-) => {
+): void => {
   applyOpts(ctx, opts);
 
   const draw = (t: Triangles.Triangle) => {
@@ -840,7 +846,7 @@ export const rect = (
   ctx: CanvasRenderingContext2D,
   toDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[],
   opts: RectOpts = {}
-) => {
+): void => {
   applyOpts(ctx, opts);
 
   const filled = opts.filled ?? (opts.fillStyle === undefined ? false : true);
@@ -936,7 +942,7 @@ export const textBlock = (
     readonly anchorPadding?: number;
     readonly bounds?: Rects.RectPositioned;
   }
-) => {
+): void => {
   applyOpts(ctx, opts);
   const anchorPadding = opts.anchorPadding ?? 0;
   const align = opts.align ?? `top`;
@@ -995,7 +1001,7 @@ export const textBlockAligned = (
     readonly horiz?: HorizAlign;
     readonly vert?: VertAlign;
   }
-) => {
+): void => {
   const { bounds } = opts;
   const { horiz = `left`, vert = `top` } = opts;
 

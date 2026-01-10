@@ -1,5 +1,5 @@
 import { SimpleEventEmitter } from '@ixfx/events';
-import type { ValueSetEventMap } from './Types.js';
+import type { ValueSetEventMap } from './types.js';
 
 /**
  * A Set which stores unique items determined by their value, rather

@@ -32,7 +32,7 @@ export async function* fromIterable<V>(iterable: Iterable<V> | AsyncIterable<V>,
   }
 }
 
-export async function* chunks<V>(it: AsyncIterable<V>, size: number) {
+export async function* chunks<V>(it: AsyncIterable<V>, size: number): AsyncGenerator<V[], void, unknown> {
   // Source: https://surma.github.io/underdash/
   let buffer: V[] = [];
   for await (const v of it) {
@@ -46,7 +46,7 @@ export async function* chunks<V>(it: AsyncIterable<V>, size: number) {
 }
 
 
-export async function* concat<V>(...its: readonly AsyncIterable<V>[]) {
+export async function* concat<V>(...its: readonly AsyncIterable<V>[]): AsyncGenerator<Awaited<V>, void> {
   // Source: https://surma.github.io/underdash/
   for await (const it of its) yield* it;
 }
@@ -54,7 +54,7 @@ export async function* concat<V>(...its: readonly AsyncIterable<V>[]) {
 export async function* dropWhile<V>(
   it: AsyncIterable<V>,
   f: (v: V) => boolean
-) {
+): AsyncGenerator<Awaited<V>, void, unknown> {
   for await (const v of it) {
     if (!f(v)) {
       yield v;
@@ -154,7 +154,7 @@ export async function equals<V>(
   it1: AsyncIterable<V>,
   it2: AsyncIterable<V>,
   comparerOrKey: IsEqual<V> | ((item: V) => string) = isEqualDefault
-) {
+): Promise<boolean | undefined> {
   // https://surma.github.io/underdash/
   const iit1 = it1[ Symbol.asyncIterator ]();// it1[ Symbol.iterator ]();
   const iit2 = it2[ Symbol.asyncIterator ]();
@@ -193,7 +193,7 @@ export async function equals<V>(
   }
 }
 
-export async function every<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>) {
+export async function every<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>): Promise<boolean> {
   for await (const v of it) {
     const result = await f(v);
     if (!result) return false;
@@ -201,7 +201,7 @@ export async function every<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Prom
   return true;
 }
 
-export async function* fill<V>(it: AsyncIterable<V>, v: V) {
+export async function* fill<V>(it: AsyncIterable<V>, v: V): AsyncGenerator<Awaited<V>, void, unknown> {
   // https://surma.github.io/underdash/
   for await (const _ of it) yield v;
 }
@@ -216,7 +216,7 @@ export async function* fill<V>(it: AsyncIterable<V>, v: V) {
  * @param it
  * @param f
  */
-export async function* filter<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>) {
+export async function* filter<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>): AsyncGenerator<Awaited<V>, void, unknown> {
   // https://surma.github.io/underdash/
   for await (const v of it) {
     if (!await f(v)) continue;
@@ -225,7 +225,7 @@ export async function* filter<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Pr
 }
 
 
-export async function find<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>) {
+export async function find<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>): Promise<V | undefined> {
   // https://surma.github.io/underdash/
   for await (const v of it) {
     if (await f(v)) return v;
@@ -233,7 +233,7 @@ export async function find<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promi
 }
 
 
-export async function* flatten<V>(it: AsyncIterable<V>) {
+export async function* flatten<V>(it: AsyncIterable<V>): AsyncGenerator<any, void, unknown> {
   // https://surma.github.io/underdash/
   for await (const v of it) {
     if (typeof v === `object`) {
@@ -286,7 +286,7 @@ export const forEach = async function <T>(
   iterator: AsyncIterable<T> | T[],
   fn: (v?: T) => Promise<boolean> | Promise<void> | boolean | void,
   options: Partial<ForEachOptions> = {}
-) {
+): Promise<void> {
   const interval = options.interval;
   if (Array.isArray(iterator)) {
     // Handle array
@@ -346,7 +346,7 @@ export async function last<V>(it: AsyncIterable<V>, opts: Partial<{ abort: Abort
  * @param f
  */
 
-export async function* map<V, X>(it: AsyncIterable<V>, f: (v: V) => X) {
+export async function* map<V, X>(it: AsyncIterable<V>, f: (v: V) => X): AsyncGenerator<Awaited<X>, void, unknown> {
   // https://surma.github.io/underdash/
 
   for await (const v of it) {
@@ -355,7 +355,7 @@ export async function* map<V, X>(it: AsyncIterable<V>, f: (v: V) => X) {
 }
 
 
-export async function* max<V>(it: AsyncIterable<V>, gt = ((a: V, b: V) => a > b)) {
+export async function* max<V>(it: AsyncIterable<V>, gt = ((a: V, b: V): boolean => a > b)): AsyncGenerator<Awaited<V>, void, unknown> {
   let max: V | undefined;
   for await (const v of it) {
     if (max === undefined) {
@@ -392,7 +392,7 @@ export async function* max<V>(it: AsyncIterable<V>, gt = ((a: V, b: V) => a > b)
  * @param gt Should return _true_ if `a` is greater than `b`.
  * @returns
  */
-export async function* min<V>(it: AsyncIterable<V>, gt = (a: V, b: V) => a > b) {
+export async function* min<V>(it: AsyncIterable<V>, gt = (a: V, b: V): boolean => a > b): AsyncGenerator<Awaited<V>, Awaited<V> | undefined, unknown> {
   let min: V | undefined;
   for await (const v of it) {
     if (min === undefined) {
@@ -413,7 +413,7 @@ export async function reduce<V>(
   it: AsyncIterable<V>,
   f: (accumulator: V, current: V) => V,
   start: V
-) {
+): Promise<V> {
   // https://surma.github.io/underdash/
 
   for await (const v of it) start = f(start, v);
@@ -442,7 +442,7 @@ export async function reduce<V>(
  * @param input 
  * @param callback 
  */
-export async function asCallback<V>(input: AsyncIterable<V>, callback: (v: V) => unknown, onDone?: () => void) {
+export async function asCallback<V>(input: AsyncIterable<V>, callback: (v: V) => unknown, onDone?: () => void): Promise<void> {
   for await (const value of input) {
     callback(value);
   }
@@ -452,8 +452,8 @@ export async function asCallback<V>(input: AsyncIterable<V>, callback: (v: V) =>
 export async function* slice<V>(
   it: AsyncIterable<V>,
   start = 0,
-  end = Number.POSITIVE_INFINITY
-) {
+  end: number = Number.POSITIVE_INFINITY
+): AsyncGenerator<Awaited<V>, void, unknown> {
   console.log(`Async slice start: ${ start }`);
 
   // https://surma.github.io/underdash/
@@ -476,7 +476,7 @@ export async function* slice<V>(
  * @param it 
  * @param delay 
  */
-export async function* withDelay<V>(it: Iterable<V>, delay: Interval) {
+export async function* withDelay<V>(it: Iterable<V>, delay: Interval): AsyncGenerator<any, void, unknown> {
   for (const v of it) {
     await sleep(delay);
     yield v;
@@ -488,7 +488,7 @@ export async function* withDelay<V>(it: Iterable<V>, delay: Interval) {
  * throwing an error if it does not happen
  * within `interval` (default: 1s)
  */
-export async function nextWithTimeout<V>(it: AsyncIterableIterator<V> | IterableIterator<V>, options: SleepOpts<any>) {
+export async function nextWithTimeout<V>(it: AsyncIterableIterator<V> | IterableIterator<V>, options: SleepOpts<any>): Promise<IteratorResult<V, any>> {
   const ms = intervalToMs(options, 1000);
 
   const value: IteratorResult<V> | undefined = await Promise.race([
@@ -505,7 +505,7 @@ export async function nextWithTimeout<V>(it: AsyncIterableIterator<V> | Iterable
   return value;
 }
 
-export async function some<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>) {
+export async function some<V>(it: AsyncIterable<V>, f: (v: V) => boolean | Promise<boolean>): Promise<boolean> {
   // https://surma.github.io/underdash/
   for await (const v of it) {
     if (await f(v)) return true;
@@ -569,7 +569,7 @@ export async function toArray<V>(it: AsyncIterable<V>, options: Partial<ToArrayO
 
 export async function* unique<V>(
   iterable: AsyncIterable<V> | AsyncIterable<V>[]
-) {
+): AsyncGenerator<Awaited<V>, void, unknown> {
   const buffer: any[] = [];
   const itera: AsyncIterable<V>[] = Array.isArray(iterable) ? iterable : [ iterable ];
   for await (const it of itera) {
@@ -623,7 +623,7 @@ export async function* uniqueByValue<T>(input: AsyncIterable<T>, toString: (valu
  * @param its
  * @returns
  */
-export async function* zip<V>(...its: readonly AsyncIterable<V>[]) {
+export async function* zip<V>(...its: readonly AsyncIterable<V>[]): AsyncGenerator<V[], void, unknown> {
   // https://surma.github.io/underdash/
   const iits = its.map((it) => it[ Symbol.asyncIterator ]());
 

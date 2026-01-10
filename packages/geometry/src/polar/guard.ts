@@ -16,7 +16,7 @@ export const isPolarCoord = (p: unknown): p is Coord => {
  * @param p
  * @param name
  */
-export const guard = (p: Coord, name = `Point`) => {
+export const guard = (p: Coord, name = `Point`): void => {
   if (p === undefined) {
     throw new Error(
       `'${ name }' is undefined. Expected {distance, angleRadian} got ${ JSON.stringify(

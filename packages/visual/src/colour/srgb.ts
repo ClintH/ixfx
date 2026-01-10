@@ -199,7 +199,7 @@ export const toScalar = (rgbOrString: Rgb | Hsl | string): RgbScalar => {
   }
 }
 
-export const guard = (rgb: Rgb) => {
+export const guard = (rgb: Rgb): void => {
   const { r, g, b, opacity, space, unit } = rgb;
   if (space !== `srgb`) throw new Error(`Space is expected to be 'srgb'. Got: ${ space }`);
   if (unit === `8bit`) {
@@ -269,7 +269,7 @@ export const changeLightness = (rgb: Rgb, amount: Partial<{ pdelta: number, delt
  * @param rgb 
  * @returns 
  */
-export function lightness(rgb: Rgb) {
+export function lightness(rgb: Rgb): number {
   const co = new Colorizr(toCssString(rgb));
   return co.oklab.l;
 }

@@ -61,7 +61,6 @@ export type * from './shape/shape-type.js';
 export * as Waypoints from './waypoint.js';
 export * as Layouts from './layout.js';
 
-
 export * from './point/point-tracker.js';
 export * as Compound from './path/compound-path.js';
 export * as Ellipses from './ellipse.js';

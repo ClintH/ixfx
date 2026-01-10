@@ -41,7 +41,7 @@ export type TrackNumberChangeOptions = TrackChangeOptions<number> & {
  * @returns 
  */
 export function handleChangeResult<T>(monitor: (v: T) => TrackChangeResult, onChanged: (v: T, countChanges: number, countTotal: number) => void, onNotChanged?: (v: T, countIdentical: number, countTotal: number) => void) {
-  return (v: T) => {
+  return (v: T): void => {
     const r = monitor(v);
     if (r.changed) {
       onChanged(v, r.changes, r.total);

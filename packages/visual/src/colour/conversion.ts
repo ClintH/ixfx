@@ -143,7 +143,7 @@ export const toLibraryColour = (colour: Colourish): Colorizr => {
 //   return C.convert(colour, destination);
 // }
 
-export const guard = (colour: Colour) => {
+export const guard = (colour: Colour): void => {
   switch (colour.space) {
     case `hsl`:
       HslSpace.guard(colour);

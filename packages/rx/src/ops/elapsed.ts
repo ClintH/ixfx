@@ -1,4 +1,4 @@
-import type { ReactiveOrSource } from "../types.js";
+import type { Reactive, ReactiveOrSource } from "../types.js";
 import { transform } from "./transform.js";
 
 /**
@@ -7,7 +7,7 @@ import { transform } from "./transform.js";
  * @param input 
  * @returns 
  */
-export const elapsed = <In>(input: ReactiveOrSource<In>) => {
+export const elapsed = <In>(input: ReactiveOrSource<In>): Reactive<number> => {
   let last = 0;
   return transform<In, number>(input, (_ignored) => {
     const elapsed = last === 0 ? 0 : Date.now() - last;

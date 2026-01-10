@@ -22,7 +22,7 @@ import { manual } from "../index.js";
  * @param queue 
  * @returns 
  */
-export function asResponsive<T>(queue: IQueueMutableWithEvents<T>) {
+export function asResponsive<T>(queue: IQueueMutableWithEvents<T>): { set: (data: T[]) => void; on(handler: (value: import("/Users/af4766/repos/ixfxfun/ixfx-alt/packages/rx/src/types").Passed<readonly T[]>) => void): import("/Users/af4766/repos/ixfxfun/ixfx-alt/packages/rx/src/types").Unsubscriber; onValue(handler: (value: readonly T[]) => void): import("/Users/af4766/repos/ixfxfun/ixfx-alt/packages/rx/src/types").Unsubscriber; dispose(reason: string): void; isDisposed(): boolean; } {
   const events = manual<readonly T[]>({
     onNoSubscribers() {
       queue.removeEventListener(`removed`, onRemoved);
@@ -42,7 +42,7 @@ export function asResponsive<T>(queue: IQueueMutableWithEvents<T>) {
     events.set(event.finalData);
   }
 
-  const set = (data: T[]) => {
+  const set = (data: T[]): void => {
     queue.enqueue(...data);
   }
 

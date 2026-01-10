@@ -80,7 +80,7 @@ export const waitFor = (
   timeoutMs: number,
   onAborted: (reason: string) => void,
   onComplete?: (success: boolean) => void
-) => {
+): (error?: string) => void => {
   let t: ReturnType<typeof globalThis.setTimeout> | undefined;
 
   let success = false;

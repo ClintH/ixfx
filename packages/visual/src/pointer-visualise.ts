@@ -34,7 +34,7 @@ export type Opts = {
 export const pointerVisualise = (
   elOrQuery: HTMLElement | string,
   options: Opts = {}
-) => {
+): void => {
   const touchRadius = options.touchRadius ?? 45;
   const mouseRadius = options.touchRadius ?? 20;
   const trace = options.trace ?? false;

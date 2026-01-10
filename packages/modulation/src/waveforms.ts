@@ -1,6 +1,6 @@
 import { resultThrow, integerTest } from "@ixfx/guards";
 import type { ModSettable, ModSettableFeedback, ModSettableOptions, ModFunction } from "./types.js";
-import * as Sources from './source/index.js';
+import * as Sources from './source.js';
 
 /**
  * Function that modulates a wave
@@ -165,7 +165,7 @@ export function sineBipolarShape(period = 1): ModFunction {
  * @param options 
  * @returns 
  */
-export function wave(options: Partial<WaveOptions>) {
+export function wave(options: Partial<WaveOptions>): WaveModulator {
   const shape = options.shape ?? `sine`;
   const invert = options.invert ?? false;
   const period = options.period ?? 1;

@@ -45,7 +45,7 @@ export const trimQueue = <V>(
         if (queue.length === 0) {
           // Special case when queue starts off empty
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return [ ...toAdd.slice(0, capacity - 1), toAdd.at(-1)! ];
+          return [ ...toAdd.slice(0, capacity - 1), (toAdd as V[]).at(-1)! ];
         }
         return toAdd.slice(
           Math.max(0, toAdd.length - capacity),

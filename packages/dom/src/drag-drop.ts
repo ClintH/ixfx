@@ -74,7 +74,7 @@ export type DragOptions = {
   fenceViewport: RectPositioned
 }
 
-export const draggable = (elemOrQuery: SVGElement | HTMLElement | string, listener: DragListener, options: Partial<DragOptions> = {}) => {
+export const draggable = (elemOrQuery: SVGElement | HTMLElement | string, listener: DragListener, options: Partial<DragOptions> = {}): () => void => {
   const elem = resolveEl(elemOrQuery);
 
   /**

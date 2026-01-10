@@ -128,7 +128,7 @@ export const interpolator = (colourA: Colourish, colourB: Colourish, options: Pa
       inter = OklchSpace.interpolator(convert(colourA, `oklch-scalar`), convert(colourB, `oklch-scalar`), direction);
   }
 
-  return (amount: number) => toCssColour(inter(amount));
+  return (amount: number): string => toCssColour(inter(amount));
 
 }
 

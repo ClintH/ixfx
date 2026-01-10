@@ -24,6 +24,7 @@ export default tseslint.config(
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
+      "@typescript-eslint/explicit-function-return-type": "error",
       // "@typescript-eslint/ban-ts-comment": "off",
       // "@typescript-eslint/array-type": ["error", { "default": "generic" }],
       "@typescript-eslint/no-unsafe-member-access": "off",

@@ -17,7 +17,7 @@
  * @param computeAfterFrames Calculates after this many frames. Higher numbers smoothes the value somewhat
  * @returns 
  */
-export const fpsCounter = (autoDisplay = true, computeAfterFrames = 500) => {
+export const fpsCounter = (autoDisplay = true, computeAfterFrames = 500): () => number => {
   let count = 0;
   let lastFps = 0;
   let countStart = performance.now();

@@ -12,7 +12,7 @@ import type { SplitOptions } from "./types.js";
  * @param options 
  * @returns 
  */
-export const split = <T>(rxOrSource: ReactiveOrSource<T>, options: Partial<SplitOptions> = {}) => {
+export const split = <T>(rxOrSource: ReactiveOrSource<T>, options: Partial<SplitOptions> = {}): ReactiveStream<T>[] => {
   const quantity = options.quantity ?? 2;
   const outputs: ReactiveStream<T>[] = [];
   const source = resolveSource(rxOrSource);

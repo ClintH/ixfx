@@ -7,7 +7,7 @@ export class MapOfSimple<T> {
    * @param key 
    * @returns 
    */
-  get(key: string) {
+  get(key: string): T[] {
     const arr = this.#store.get(key);
     if (!arr) return [];
     return [ ...arr ];
@@ -18,7 +18,7 @@ export class MapOfSimple<T> {
    * @param key 
    * @returns 
    */
-  size(key: string) {
+  size(key: string): number {
     const arr = this.#store.get(key);
     if (!arr) return 0;
     return arr.length;
@@ -51,7 +51,7 @@ export class MapOfSimple<T> {
     yield* this.#store.keys();
   }
 
-  addKeyedValues(key: string, ...values: T[]) {
+  addKeyedValues(key: string, ...values: T[]): void {
     let arr = this.#store.get(key);
     if (!arr) {
       arr = [];
@@ -60,7 +60,7 @@ export class MapOfSimple<T> {
     arr.push(...values);
   }
 
-  deleteKeyValue(key: string, value: T) {
+  deleteKeyValue(key: string, value: T): boolean {
     const arr = this.#store.get(key);
     if (!arr) return false;
     const arrCopy = arr.filter(v => v !== value);
@@ -69,7 +69,7 @@ export class MapOfSimple<T> {
     return true;
   }
 
-  clear() {
+  clear(): void {
     this.#store.clear();
   }
 }

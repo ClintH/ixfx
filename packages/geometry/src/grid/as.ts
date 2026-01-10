@@ -20,7 +20,7 @@ import { cells } from "./enumerators/cells.js";
  * @param grid
  * @param start
  */
-export const rows = function* (grid: Grid, start?: GridCell) {
+export const rows = function* (grid: Grid, start?: GridCell): Generator<GridCell[], void, unknown> {
   if (!start) start = { x: 0, y: 0 }
   let row = start.y;
   let rowCells: Array<GridCell> = [];
@@ -54,7 +54,7 @@ export const rows = function* (grid: Grid, start?: GridCell) {
  * @param grid 
  * @param start 
  */
-export function* columns(grid: Grid, start?: GridCell) {
+export function* columns(grid: Grid, start?: GridCell): Generator<GridCell[], void, unknown> {
   if (!start) start = { x: 0, y: 0 };
   for (let x = start.x; x < grid.cols; x++) {
     let colCells: Array<GridCell> = [];

@@ -10,7 +10,7 @@ import { type StringOptions } from "./types.js";
  * @param lengthOrOptions Length of random string, or options.
  * @returns Random string
  */
-export const string = (lengthOrOptions: number | StringOptions = 5) => {
+export const string = (lengthOrOptions: number | StringOptions = 5): string => {
   const options =
     typeof lengthOrOptions === `number` ? { length: lengthOrOptions } : lengthOrOptions;
   const calculate = options.source ?? Math.random;

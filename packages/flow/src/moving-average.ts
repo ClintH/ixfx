@@ -30,7 +30,7 @@ export type MovingAverageTimedOptions = Readonly<{
  * @param options
  * @returns
  */
-export const movingAverageTimed = (options: MovingAverageTimedOptions) => {
+export const movingAverageTimed = (options: MovingAverageTimedOptions): (v: number) => number => {
   const average = movingAverageLight();
   const rm = rateMinimum({
     ...options,

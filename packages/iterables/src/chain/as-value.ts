@@ -18,7 +18,7 @@ import type { GenFactoryNoInput } from "./types.js";
  * @param initialValue Initial value
  * @returns 
  */
-export function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>, initialValue?: V) {
+export function asValue<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>, initialValue?: V): () => V | undefined {
   let lastValue: V | undefined = initialValue;
   let awaiting = false;
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;

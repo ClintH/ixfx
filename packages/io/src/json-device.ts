@@ -114,7 +114,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     return this.states.state === `closed`;
   }
 
-  write(txt: string) {
+  write(txt: string): void {
     if (this.states.state !== `connected`) {
       throw new Error(`Cannot write while state is ${ this.states.state }`);
     }
@@ -129,7 +129,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
 
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  async close() {
+  async close(): Promise<void> {
     if (this.states.state !== `connected`) return;
 
     // console.log(`rxBuffer closing`);
@@ -158,7 +158,7 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
 
   abstract onPreConnect(): Promise<void>;
 
-  async connect() {
+  async connect(): Promise<void> {
     const attempts = this.connectAttempts;
 
     this.states.state = `connecting`;
@@ -211,15 +211,15 @@ export abstract class JsonDevice extends SimpleEventEmitter<JsonDeviceEvents> {
     this.rxBuffer.add(string_);
   }
 
-  protected verbose(m: string) {
+  protected verbose(m: string): void {
     if (this.verboseLogging) console.info(this.name, m);
   }
 
-  protected log(m: string) {
+  protected log(m: string): void {
     console.log(this.name, m);
   }
 
-  protected warn(m: unknown) {
+  protected warn(m: unknown): void {
     console.warn(this.name, m);
   }
 }

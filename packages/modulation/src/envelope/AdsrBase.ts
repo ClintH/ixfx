@@ -3,12 +3,13 @@ import { elapsedMillisecondsAbsolute, type Timer, type TimerSource } from '@ixfx
 import { adsrStateTransitions, type AdsrEvents, type AdsrStateTransitions, type AdsrTimingOpts } from './Types.js';
 import { StateMachineWithEvents } from '@ixfx/flow/state-machine';
 
-export const defaultAdsrTimingOpts = Object.freeze({
+export const defaultAdsrTimingOpts = {
   attackDuration: 600,
   decayDuration: 200,
   releaseDuration: 800,
   shouldLoop: false
-})
+} as const
+
 /**
  * Base class for an ADSR envelope.
  * 
@@ -62,12 +63,12 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
     this.decayDurationTotal = this.attackDuration + this.decayDuration;
   }
 
-  dispose() {
+  dispose(): void {
     if (this.#disposed) return;
     this.#sm.dispose();
   }
 
-  get isDisposed() {
+  get isDisposed(): boolean {
     return this.#disposed;
   }
 
@@ -203,7 +204,7 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
    *
    * @param hold If _true_ envelope will hold at sustain stage
    */
-  trigger(hold = false) {
+  trigger(hold = false): void {
     this.onTrigger();
     this.#triggered = true;
     this.#sm.reset();
@@ -212,7 +213,7 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
     this.#holdingInitial = hold;
   }
 
-  get hasTriggered() {
+  get hasTriggered(): boolean {
     return this.#triggered;
   }
 
@@ -225,7 +226,7 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
    * Has no effect if not triggered or held.
    * @returns 
    */
-  release() {
+  release(): void {
     if (this.isDone || !this.#holdingInitial) return; // Was never holding or done
 
     // Setting holding flag to false, computeRaw will change state

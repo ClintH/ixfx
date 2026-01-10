@@ -1,6 +1,7 @@
-import { defineConfig } from 'tsdown'
-import basePackageConfig from '../../tsdown.package.ts';
+import { defineConfig } from 'tsdown/config'
 
 export default defineConfig({
-  ...basePackageConfig
-});
+  entry: [
+    './src/index.ts', './src/midi/index.ts', './src/audio/index.ts'
+  ]
+})

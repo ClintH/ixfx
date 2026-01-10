@@ -40,7 +40,7 @@ export const stepper = (
     steps.push(c);
   }
 
-  return (step: number, fromStart = false) => {
+  return (step: number, fromStart = false): GridCell | undefined => {
     resultThrow(integerTest(step, ``, `step`));
     if (fromStart) position = step;
     else position += step;

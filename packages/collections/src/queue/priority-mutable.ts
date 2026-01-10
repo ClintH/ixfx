@@ -36,12 +36,12 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
    * @param item Item
    * @param priority Priority (higher numeric value means higher priority)
    */
-  enqueueWithPriority(item: V, priority: number) {
+  enqueueWithPriority(item: V, priority: number): void {
     resultThrow(numberTest(priority, `positive`));
     super.enqueue({ item, priority });
   }
 
-  changePriority(item: V, priority: number, addIfMissing = false, eq?: IsEqual<V>) {
+  changePriority(item: V, priority: number, addIfMissing = false, eq?: IsEqual<V>): void {
     if (item === undefined) throw new Error(`Item cannot be undefined`);
     let toDelete: PriorityItem<V> | undefined;
     for (const d of this.data) {

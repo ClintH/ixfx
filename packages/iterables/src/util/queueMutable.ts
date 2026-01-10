@@ -1,7 +1,7 @@
 export class QueueMutable<V> {
   #store: V[] = [];
 
-  enqueue(data: V) {
+  enqueue(data: V): void {
     this.#store.push(data);
   }
 

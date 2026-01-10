@@ -3,7 +3,7 @@ import { without } from '@ixfx/arrays';
 import { containsDuplicateInstances } from "@ixfx/arrays";
 import { QueueMutable } from "../queue/queue-mutable.js"
 import { StackMutable } from "../stack/StackMutable.js"
-import { compare as treeCompare } from './compare.js';
+import { DiffNode, compare as treeCompare } from './compare.js';
 import { toStringAbbreviate } from "@ixfx/core/text";
 import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree, WrappedNode } from "./types.js"
 
@@ -17,7 +17,7 @@ import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree, Wr
  * @param eq Comparison function. Uses `isEqualValueIgnoreOrder` by default.
  * @returns Compare results
  */
-export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>) => {
+export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>): DiffNode<T> => {
   return treeCompare(asDynamicTraversable(a), asDynamicTraversable(b), eq);
 }
 
@@ -108,7 +108,7 @@ export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
  * @param child 
  * @returns 
  */
-export const remove = <T>(child: TreeNode<T>) => {
+export const remove = <T>(child: TreeNode<T>): void => {
   const p = child.parent;
   if (p === undefined) return;
   child.parent = undefined;
@@ -181,7 +181,7 @@ export function treeTest<T>(root: TreeNode<T>, seen: TreeNode<T>[] = []): [ ok: 
  * @param root 
  * @returns 
  */
-export function throwTreeTest<T>(root: TreeNode<T>) {
+export function throwTreeTest<T>(root: TreeNode<T>): void {
   const v = treeTest(root);
   if (v[ 0 ]) return;
   throw new Error(`${ v[ 1 ] } Node: ${ toStringAbbreviate(v[ 2 ].value, 30) }`, { cause: v[ 2 ] })
@@ -231,7 +231,7 @@ export function nodeDepth(node: TreeNode<any>): number {
   return p.length;
 }
 
-export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
+export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>): boolean => {
   for (const c of parent.childrenStore) {
     if (c === child) return true;
   }
@@ -276,14 +276,14 @@ export function* queryByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> =
  * @param parent 
  * @returns 
  */
-export const hasAnyChild = <T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T>) => {
+export const hasAnyChild = <T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T>): boolean => {
   for (const c of breadthFirst(parent)) {
     if (c === prospectiveChild) return true;
   }
   return false;
 }
 
-export const findAnyChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault) => {
+export const findAnyChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined => {
   for (const c of breadthFirst(parent)) {
     if (eq(c.value as T, value)) return c;
   }
@@ -303,7 +303,7 @@ export const getRoot = <T>(node: TreeNode<T>): TreeNode<T> => {
  * @param prospectiveParent 
  * @returns 
  */
-export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>) => {
+export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>): boolean => {
   for (const p of parents(child)) {
     if (p === prospectiveParent) return true;
   }
@@ -318,7 +318,7 @@ export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<
  * @param child 
  * @returns 
  */
-export function* parentsValues<T>(child: TreeNode<T>) {
+export function* parentsValues<T>(child: TreeNode<T>): Generator<T & ({} | null), boolean, unknown> {
   for (const p of parents(child)) {
     if (typeof p.value !== `undefined`) {
       yield p.value;
@@ -335,7 +335,7 @@ export function* parentsValues<T>(child: TreeNode<T>) {
  * @param eq 
  * @returns 
  */
-export function* queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault) {
+export function* queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault): Generator<TreeNode<T>, boolean, unknown> {
   for (const p of parents(child)) {
     if (typeof p.value !== `undefined`) {
       if (eq(p.value, value)) yield p;
@@ -351,7 +351,7 @@ export function* queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<
  * @param eq 
  * @returns 
  */
-export function findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault) {
+export function findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined {
   for (const p of queryParentsValue(child, value, eq)) {
     return p;
   }
@@ -365,7 +365,7 @@ export function findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T>
  * @param prospectiveParent 
  * @returns 
  */
-export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>) => {
+export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>): boolean => {
   return child.parent === prospectiveParent;
 }
 
@@ -381,7 +381,7 @@ export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>)
  * @param node 
  * @returns 
  */
-export const computeMaxDepth = <T>(node: TreeNode<T>) => {
+export const computeMaxDepth = <T>(node: TreeNode<T>): number => {
   return computeMaxDepthImpl(node, 0);
 }
 
@@ -393,7 +393,7 @@ const computeMaxDepthImpl = <T>(node: TreeNode<T>, startingDepth = 0) => {
   return depth;
 }
 
-export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
+export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>): void => {
   throwAttemptedChild(child, parent);
   //if (hasAnyChild(parent, child)) throw new Error(`Parent already contains child`);
   //if (hasAnyParent(child, parent)) throw new Error(`Child already has parent`);
@@ -405,7 +405,7 @@ export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>) => {
   }
 }
 
-export const addValue = <T>(value: T | undefined, parent: TreeNode<T>) => {
+export const addValue = <T>(value: T | undefined, parent: TreeNode<T>): TreeNode<T> => {
   return createNode(value, parent);
 }
 
@@ -415,7 +415,7 @@ export const addValue = <T>(value: T | undefined, parent: TreeNode<T>) => {
  * @param value 
  * @returns 
  */
-export const root = <T>(value?: T) => {
+export const root = <T>(value?: T): TreeNode<T> => {
   return createNode(value);
 }
 
@@ -443,7 +443,7 @@ export const fromPlainObject = (value: Record<string, any>, label = ``, parent?:
  * @param value 
  * @returns 
  */
-export const rootWrapped = <T>(value: T | undefined) => {
+export const rootWrapped = <T>(value: T | undefined): WrappedNode<T> => {
   return wrap(createNode(value));
 }
 
@@ -510,7 +510,7 @@ const throwAttemptedChild = <T>(c: TreeNode<T>, parent: TreeNode<T>) => {
   if (hasAnyChild(parent, c)) throw new Error(`Child contains parent (2)`, { cause: c });
 }
 
-export const setChildren = <T>(parent: TreeNode<T>, children: TreeNode<T>[]) => {
+export const setChildren = <T>(parent: TreeNode<T>, children: TreeNode<T>[]): void => {
   // Verify children are legit
   for (const c of children) {
     throwAttemptedChild(c, parent);

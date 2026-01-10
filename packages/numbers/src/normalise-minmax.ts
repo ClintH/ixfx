@@ -21,7 +21,7 @@ import type { NormaliseStreamContext } from "./normalise-types.js";
  * @param clamp Whether to clamp input value to min/max range. Default: _false_
  * @returns 
  */
-export const compute = (min: number, max: number, clamp = false) => {
+export const compute = (min: number, max: number, clamp = false): (value: number) => number => {
   const range = max - min;
   return (value: number) => {
     if (clamp && value < min) value = min;
@@ -49,7 +49,7 @@ export const compute = (min: number, max: number, clamp = false) => {
  * @param options Optionally uses 'minForced' and 'maxForced' properties to scale values instead of actual min/max values of data.
  */
 export const arrayWithContext = (values: readonly number[], options: Partial<MinMaxArrayOptions> = {}
-) => {
+): { values: number[]; original: any[]; min: number; max: number; range: number; } => {
   if (!Array.isArray(values)) throw new TypeError(`Param 'values' should be an array. Got: ${ typeof values }`);
 
   let clamp = false;
@@ -111,7 +111,7 @@ export const arrayWithContext = (values: readonly number[], options: Partial<Min
  * @param options Options to override or min/max values.
  */
 export const array = (values: readonly number[], options: Partial<MinMaxArrayOptions> = {}
-) => {
+): number[] => {
   const c = arrayWithContext(values, options);
   return c.values;
 }

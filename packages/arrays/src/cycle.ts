@@ -30,7 +30,7 @@ import { arrayTest, throwIfFailed } from "@ixfx/guards";
  * @param options Array to cycle over 
  * @returns 
  */
-export const cycle = <T>(options: readonly T[] | T[]) => {
+export const cycle = <T>(options: readonly T[] | T[]): { toArray: () => T[]; next: () => T; prev: () => T; readonly current: T; select: (indexOrValue: number | T) => void; } => {
   throwIfFailed(arrayTest(options, `options`));
   const opts = [ ...options ];
   let index = 0;

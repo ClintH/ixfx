@@ -11,7 +11,7 @@
  * Draws on https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
  */
 
-import { number as numberTracker } from '@ixfx/trackers';
+import { NumberTracker, number as numberTracker } from '@ixfx/trackers';
 import { AudioAnalyser } from './analyser.js';
 import type { Point } from '@ixfx/geometry/point';
 import { numberArrayCompute } from '@ixfx/numbers';
@@ -28,8 +28,8 @@ export class AudioVisualiser {
   pointerClickDelayMs = 100;
   pointerDelaying = false;
 
-  waveTracker;
-  freqTracker;
+  waveTracker: NumberTracker;
+  freqTracker: NumberTracker;
   el: HTMLElement;
 
   constructor(parentElement: HTMLElement, audio: AudioAnalyser) {
@@ -97,7 +97,7 @@ export class AudioVisualiser {
       });
   }
 
-  renderFreq(freq: readonly number[]) {
+  renderFreq(freq: readonly number[]): void {
     if (!this.isExpanded()) return; // Don't render if collapsed
     if (!freq) return; // Data is undefined/null
 
@@ -166,13 +166,13 @@ export class AudioVisualiser {
     }
   }
 
-  isExpanded() {
+  isExpanded(): boolean {
     const contentsElement = this.el.querySelector(`div`);
     if (contentsElement === null) throw new Error(`contents div not found`);
     return contentsElement.style.display === ``;
   }
 
-  setExpanded(value: boolean) {
+  setExpanded(value: boolean): void {
     const contentsElement = this.el.querySelector(`div`);
     const button = this.el.querySelector(`button`);
 
@@ -187,7 +187,7 @@ export class AudioVisualiser {
     }
   }
 
-  clear() {
+  clear(): void {
     this.clearCanvas(
       document.getElementById(`rendererComponentFreqData`) as HTMLCanvasElement
     );
@@ -197,7 +197,7 @@ export class AudioVisualiser {
   }
 
   // Clears a canvas to white
-  clearCanvas(canvas: HTMLCanvasElement | null) {
+  clearCanvas(canvas: HTMLCanvasElement | null): void {
     if (canvas === null) throw new Error(`Canvas is null`);
     const g = canvas.getContext(`2d`);
     if (g === null) throw new Error(`Cannot create drawing context`);
@@ -207,7 +207,7 @@ export class AudioVisualiser {
 
   // Renders waveform data.
   // Adapted from MDN's AnalyserNode.getFloatTimeDomainData() example
-  renderWave(wave: readonly number[], bipolar = true) {
+  renderWave(wave: readonly number[], bipolar = true): void {
     if (!this.isExpanded()) return; // Don't render if collapsed
     if (!wave) return; // Undefined or null data
     const canvas = document.getElementById(
@@ -295,7 +295,10 @@ export class AudioVisualiser {
   }
 
   // Yields pointer position relative to given element
-  getPointerRelativeTo(elem: HTMLElement) {
+  getPointerRelativeTo(elem: HTMLElement): {
+    x: number;
+    y: number;
+  } {
     const rect = elem.getBoundingClientRect();
     return {
       x: this.lastPointer.x - rect.left - window.scrollX, //elem.offsetLeft + window.scrollX,
@@ -304,7 +307,7 @@ export class AudioVisualiser {
   }
 
   // Keeps track of last pointer position in page coordinate space
-  onPointer(event: MouseEvent | PointerEvent) {
+  onPointer(event: MouseEvent | PointerEvent): void {
     this.lastPointer = {
       x: event.pageX,
       y: event.pageY,

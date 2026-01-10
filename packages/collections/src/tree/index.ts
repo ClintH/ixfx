@@ -15,7 +15,7 @@ export type * from './types.js';
  * @param node 
  * @returns 
  */
-export const toTraversable = <T>(node: TreeNode<T> | TraversableTree<T> | object) => {
+export const toTraversable = <T>(node: TreeNode<T> | TraversableTree<T> | object): TraversableTree<any> => {
   if (isTraversable(node)) return node;
   if (isTreeNode(node)) return TreeNodeToTraversable(node);
   if (typeof node === `object`) return ObjectToTraversable(node);

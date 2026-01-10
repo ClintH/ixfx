@@ -8,14 +8,14 @@ enum Side {
  * License: MIT
  */
 export class BinaryTreeNode<V> {
-  value:V;
-  left?:BinaryTreeNode<V>;
-  right?:BinaryTreeNode<V>;
-  parent?:BinaryTreeNode<V>;
-  parentSide:Side;
-  multiplicity:number = 0;
+  value: V;
+  left?: BinaryTreeNode<V>;
+  right?: BinaryTreeNode<V>;
+  parent?: BinaryTreeNode<V>;
+  parentSide: Side;
+  multiplicity: number = 0;
 
-  constructor(value:V) {
+  constructor(value: V) {
     this.value = value;
     //this.meta = {};
     this.parentSide = Side.Neutral;
@@ -25,7 +25,7 @@ export class BinaryTreeNode<V> {
    * Set a left node descendants.
    * Also, children get associated to parent.
    */
-  setLeftAndUpdateParent(node?:BinaryTreeNode<V>) {
+  setLeftAndUpdateParent(node?: BinaryTreeNode<V>): void {
     if (node === this) throw new Error(`Cannot set left to be same as self`);
 
     this.left = node;
@@ -39,7 +39,7 @@ export class BinaryTreeNode<V> {
    * Set a right node descendants.
    * Also, children get associated to parent.
    */
-  setRightAndUpdateParent(node?:BinaryTreeNode<V>) {
+  setRightAndUpdateParent(node?: BinaryTreeNode<V>): void {
     if (node === this) throw new Error(`Cannot set right to be same as self`);
     this.right = node;
     if (node) {
@@ -54,7 +54,7 @@ export class BinaryTreeNode<V> {
    *
    * @returns {string} side (left or right) this node is of its parent
    */
-  get parentChildSide() {
+  get parentChildSide(): "left" | "right" | "root" {
     if (this.parent) {
       return this.isParentLeftChild ? `left` : `right`;
     }
@@ -65,28 +65,28 @@ export class BinaryTreeNode<V> {
   /**
    * Return true if this node is its parent left child
    */
-  get isParentLeftChild() {
+  get isParentLeftChild(): boolean {
     return this.parentSide === Side.Left;
   }
 
   /**
    * Return true if this node is its parent right child
    */
-  get isParentRightChild() {
+  get isParentRightChild(): boolean {
     return this.parentSide === Side.Right;
   }
 
   /**
    * Node is leaf is it has no descendants
    */
-  get isLeaf() {
+  get isLeaf(): boolean {
     return !this.left && !this.right;
   }
 
   /**
    * Get sibling of current node
    */
-  get sibling():BinaryTreeNode<V>|undefined {
+  get sibling(): BinaryTreeNode<V> | undefined {
     const { parent } = this;
     if (!parent) return undefined;
     return parent.right === this ? parent.left : parent.right;
@@ -95,13 +95,13 @@ export class BinaryTreeNode<V> {
   /**
    * Get parent sibling = uncle (duh)
    */
-  get uncle():BinaryTreeNode<V>|undefined {
+  get uncle(): BinaryTreeNode<V> | undefined {
     const { parent } = this;
     if (!parent) return;
     return parent.sibling;
   }
 
-  get grandparent() {
+  get grandparent(): BinaryTreeNode<V> | undefined {
     const { parent } = this;
     return parent && parent.parent;
   }
@@ -123,14 +123,14 @@ export class BinaryTreeNode<V> {
   /**
    * @returns {Number} left subtree height or 0 if no left child
    */
-  get leftSubtreeHeight():number {
+  get leftSubtreeHeight(): number {
     return this.left ? this.left.height + 1 : 0;
   }
 
   /**
    * @returns {Number} right subtree height or 0 if no right child
    */
-  get rightSubtreeHeight():number {
+  get rightSubtreeHeight(): number {
     return this.right ? this.right.height + 1 : 0;
   }
 
@@ -141,14 +141,14 @@ export class BinaryTreeNode<V> {
    *
    * Height: distance from the deepest leaf to this node
    */
-  get height() {
+  get height(): number {
     return Math.max(this.leftSubtreeHeight, this.rightSubtreeHeight);
   }
 
   /**
    * Returns the difference the heights on the left and right subtrees
    */
-  get balanceFactor() {
+  get balanceFactor(): number {
     return this.leftSubtreeHeight - this.rightSubtreeHeight;
   }
   // end::avl[]
@@ -156,7 +156,13 @@ export class BinaryTreeNode<V> {
   /**
    * Serialize node's values
    */
-  toValues() {
+  toValues(): {
+    value: V;
+    left: V | undefined;
+    right: V | undefined;
+    parent: V | undefined;
+    parentSide: Side;
+  } {
     return {
       value: this.value,
       left: this.left && this.left.value,
@@ -179,10 +185,10 @@ export class BinaryTreeNode<V> {
    * Convert Binary tree from an iterable (e.g. array)
    * @param {array|string} iterable - The iterable
    */
-  static from<V>(iterable:IterableIterator<V>) {
-    const toBinaryTree = (array:V[], index = 0) => {
+  static from<V>(iterable: IterableIterator<V>): BinaryTreeNode<V> | undefined {
+    const toBinaryTree = (array: V[], index = 0) => {
       if (index >= array.length) return undefined;
-      const node = new BinaryTreeNode(array[index]);
+      const node = new BinaryTreeNode(array[ index ]);
       node.setLeftAndUpdateParent(toBinaryTree(array, index * 2 + 1));
       node.setRightAndUpdateParent(toBinaryTree(array, index * 2 + 2));
       return node;

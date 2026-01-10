@@ -135,7 +135,7 @@ export function isApprox(
  * @param targets 
  * @returns 
  */
-export const isCloseToAny = (allowedRangeAbsolute: number, ...targets: number[]) => {
+export const isCloseToAny = (allowedRangeAbsolute: number, ...targets: number[]): (...values: number[]) => boolean => {
   const targetsMin = targets.map(t => t - allowedRangeAbsolute);
   const targetsMax = targets.map(t => t + allowedRangeAbsolute);
 

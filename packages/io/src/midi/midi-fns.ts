@@ -10,14 +10,14 @@ import type { MidiCommands, MidiMessage } from "./types.js";
  * @param duration 
  * @param delay 
  */
-export const sendNote = (port: MIDIOutput, channel: number, note: number, velocity: number, duration = 200, delay?: DOMHighResTimeStamp) => {
+export const sendNote = (port: MIDIOutput, channel: number, note: number, velocity: number, duration = 200, delay?: DOMHighResTimeStamp): void => {
   const noteOn: MidiMessage = {
     channel, note, velocity, command: `noteon`
   }
   const noteOff: MidiMessage = {
     channel, note, velocity: 0, command: `noteoff`
   }
-  port.send(pack(noteOn), delay);
+  port.send(pack(noteOn) as number[], delay);
   port.send(pack(noteOff), window.performance.now() + duration)
 }
 
@@ -91,7 +91,7 @@ export const unpack = (data: Uint8Array): MidiMessage => {
  * @param message 
  * @returns 
  */
-export const pack = (message: MidiMessage): Uint8Array => {
+export const pack = (message: MidiMessage): number[] => {
   const data = new Uint8Array(3);
   data[ 1 ] = message.note;
   data[ 2 ] = message.velocity;
@@ -120,5 +120,5 @@ export const pack = (message: MidiMessage): Uint8Array => {
     default:
       throw new Error(`Command not supported '${ message.command }'`);
   }
-  return data;
+  return Array.from(data);
 }

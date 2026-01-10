@@ -88,7 +88,7 @@ export const isWrapped = <T>(v: any): v is Wrapped<T> => {
 //   }
 // }
 
-export const opify = <TIn, TRxOut = Reactive<TIn>>(fn: (source: ReactiveOrSource<TIn>, ...args: any[]) => TRxOut, ...args: any[]) => {
+export const opify = <TIn, TRxOut = Reactive<TIn>>(fn: (source: ReactiveOrSource<TIn>, ...args: any[]) => TRxOut, ...args: any[]): (source: ReactiveOrSource<TIn>) => TRxOut => {
   return (source: ReactiveOrSource<TIn>) => {
     return fn(source, ...args);
   }

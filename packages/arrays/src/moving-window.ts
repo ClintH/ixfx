@@ -30,7 +30,7 @@ import type { MovingWindowOptions } from "./types.js";
  */
 export const movingWindow = <T>(
   samplesOrOptions: number | MovingWindowOptions<T>
-) => movingWindowWithContext(samplesOrOptions).seen;
+): (value: T) => T[] => movingWindowWithContext(samplesOrOptions).seen;
 
 /**
  * As {@link movingWindow} but also allows access to context, namely you 
@@ -46,7 +46,7 @@ export const movingWindow = <T>(
  */
 export const movingWindowWithContext = <T>(
   samplesOrOptions: number | MovingWindowOptions<T>
-) => {
+): { seen: (value: T) => T[]; readonly data: T[]; } => {
   const q: T[] = [];
   const reject = typeof samplesOrOptions === `object` ? samplesOrOptions.reject : undefined;
   const allow = typeof samplesOrOptions === `object` ? samplesOrOptions.allow : undefined;

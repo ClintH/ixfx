@@ -17,7 +17,7 @@ import type { GenFactoryNoInput, GenOrData, Links } from "./types.js";
  * @param functions
  * @returns
  */
-export function prepare<In, Out>(...functions: Links<In, Out>) {
+export function prepare<In, Out>(...functions: Links<In, Out>): (source: GenOrData<In> | GenFactoryNoInput<In>) => AsyncGenerator<Out, any, any> {
   const r = (source: GenOrData<In> | GenFactoryNoInput<In>) => {
     return runN<In, Out>(source, ...functions);
   }

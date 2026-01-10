@@ -1,4 +1,4 @@
-import type { StackOpts } from './Types.js';
+import type { StackOpts } from './types.js';
 
 export const trimStack = <V>(
   opts: StackOpts,

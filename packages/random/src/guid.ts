@@ -8,7 +8,7 @@ import type { RandomSource } from "./types.js";
  * @param options Options.
  * @returns
  */
-export const shortGuid = (options: Readonly<{ source?: RandomSource }> = {}) => {
+export const shortGuid = (options: Readonly<{ source?: RandomSource }> = {}): string => {
   const source = options.source ?? Math.random;
   // Via Stackoverflow...
   const firstPart = Math.trunc(source() * 46_656);

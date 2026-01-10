@@ -44,7 +44,7 @@ export class Table<V> {
   /**
    * Dumps the values of the table to the console
    */
-  print() {
+  print(): void {
     console.table([ ...this.rowsWithLabelsObject() ]);
   }
 
@@ -83,14 +83,14 @@ export class Table<V> {
   /**
    * Return the number of rows
    */
-  get rowCount() {
+  get rowCount(): number {
     return this.rows.length;
   }
 
   /**
    * Return the maximum number of columns in any row
    */
-  get columnCount() {
+  get columnCount(): number {
     return this.columnMaxLength;
     // const lengths = this.rows.map(row => row.length);
     // return Math.max(...lengths);
@@ -100,7 +100,7 @@ export class Table<V> {
    * Iterates over the table row-wise, in object format.
    * @see {@link rowsWithLabelsArray} to get rows in array format
    */
-  *rowsWithLabelsObject() {
+  *rowsWithLabelsObject(): Generator<object | undefined, void, unknown> {
     for (let index = 0; index < this.rows.length; index++) {
       const labelledRow = this.getRowWithLabelsObject(index);
       yield labelledRow;
@@ -111,7 +111,7 @@ export class Table<V> {
    * Iterates over each row, including the labels if available
    * @see {@link rowsWithLabelsObject} to get rows in object format
    */
-  *rowsWithLabelsArray() {
+  *rowsWithLabelsArray(): Generator<[ label: string | undefined, value: V | undefined ][] | undefined, void, unknown> {
     for (let index = 0; index < this.rows.length; index++) {
       const labelledRow = this.getRowWithLabelsArray(index);
       yield labelledRow;
@@ -122,7 +122,7 @@ export class Table<V> {
    * Assign labels to columns
    * @param labels 
    */
-  labelColumns(...labels: string[]) {
+  labelColumns(...labels: string[]): void {
     this.colLabels = labels;
   }
 
@@ -132,7 +132,7 @@ export class Table<V> {
    * @param columnIndex 
    * @param label 
    */
-  labelColumn(columnIndex: number, label: string) {
+  labelColumn(columnIndex: number, label: string): void {
     this.colLabels[ columnIndex ] = label;
   }
 
@@ -140,7 +140,7 @@ export class Table<V> {
    * Label rows
    * @param labels Labels 
    */
-  labelRows(...labels: string[]) {
+  labelRows(...labels: string[]): void {
     this.rowLabels = labels;
   }
 
@@ -150,7 +150,7 @@ export class Table<V> {
    * @param rowIndex 
    * @param label 
    */
-  labelRow(rowIndex: number, label: string) {
+  labelRow(rowIndex: number, label: string): void {
     this.rowLabels[ rowIndex ] = label;
   }
 
@@ -192,7 +192,7 @@ export class Table<V> {
     const object = {};
     for (let index = 0; index < this.colLabels.length; index++) {
       const label = this.colLabels.at(index) ?? index.toString();
-      object[ label ] = row[ index ];
+      (object as Record<string, any>)[ label ] = row[ index ];
     }
     return object;
   }
@@ -217,7 +217,7 @@ export class Table<V> {
       return { success: true, value: this.rows[ index ] };
     }
 
-    const newRow = [];
+    const newRow: TableRow<V> = [];
     this.rows[ index ] = newRow;
 
     return { success: true, value: newRow };
@@ -243,7 +243,7 @@ export class Table<V> {
    * @param column Column 
    * @param value Value to set at row,column
    */
-  set(row: number | string, column: number | string, value: V | undefined) {
+  set(row: number | string, column: number | string, value: V | undefined): void {
     const result = this.#getOrCreateRawRow(row);
     if (resultIsError(result)) throw new Error(result.error);
 

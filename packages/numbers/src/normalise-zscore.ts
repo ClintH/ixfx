@@ -28,7 +28,7 @@ import { standardDeviation } from "./standard-deviation.js";
  * @param standardDeviation Standard deviation of data
  * @returns 
  */
-export const compute = (mean: number, standardDeviation: number) => (value: number) => (value - mean) / standardDeviation;
+export const compute = (mean: number, standardDeviation: number) => (value: number): number => (value - mean) / standardDeviation;
 
 /**
  * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
@@ -39,7 +39,12 @@ export const compute = (mean: number, standardDeviation: number) => (value: numb
  * @param array 
  * @returns 
  */
-export const arrayWithContext = (array: readonly number[] | number[], options: Partial<ZScoreArrayOptions> = {}) => {
+export const arrayWithContext = (array: readonly number[] | number[], options: Partial<ZScoreArrayOptions> = {}): {
+  mean: number;
+  standardDeviation: number;
+  values: number[];
+  original: readonly number[] | number[];
+} => {
   const m = options.meanForced ?? mean(array);
   const s = options.standardDeviationForced ?? standardDeviation(array as number[]);
   const fn = compute(m, s);
@@ -61,5 +66,5 @@ export const arrayWithContext = (array: readonly number[] | number[], options: P
  * @param options 
  * @returns 
  */
-export const array = (values: readonly number[] | number[], options: Partial<ZScoreArrayOptions> = {}) => arrayWithContext(values, options).values;
+export const array = (values: readonly number[] | number[], options: Partial<ZScoreArrayOptions> = {}): number[] => arrayWithContext(values, options).values;
 

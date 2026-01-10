@@ -23,7 +23,7 @@
 export class MassiveSet {
   #depth
   #maxDepth;
-  children = new Map<string, MassiveSet>();
+  children: Map<string, MassiveSet> = new Map<string, MassiveSet>();
   values: Array<string> = [];
 
   constructor(maxDepth = 1, depth = 0) {
@@ -35,7 +35,7 @@ export class MassiveSet {
    * Returns the number of values stored in just this level of the set
    * @returns 
    */
-  sizeLocal() {
+  sizeLocal(): number {
     return this.values.length;
   }
 
@@ -44,11 +44,11 @@ export class MassiveSet {
    * Use {@link sizeChildrenDeep} to count all branches recursively
    * @returns 
    */
-  sizeChildren() {
+  sizeChildren(): number {
     return [ ...this.children.values() ].length;
   }
 
-  sizeChildrenDeep() {
+  sizeChildrenDeep(): number {
     let t = this.sizeChildren();
     for (const c of this.children.values()) {
       t += c.sizeChildrenDeep();
@@ -59,7 +59,7 @@ export class MassiveSet {
   /**
    * Returns the total number of values stored in the set
    */
-  size() {
+  size(): number {
     let x = this.values.length;
     for (const set of this.children.values()) {
       x += set.size();
@@ -67,7 +67,7 @@ export class MassiveSet {
     return x;
   }
 
-  add(value: string) {
+  add(value: string): void {
     if (typeof value !== `string`) throw new Error(`Param 'value' must be a string. Got: ${ typeof value }`);
 
     if (value.length === 0) throw new Error(`Param 'value' is empty`);
@@ -100,7 +100,7 @@ export class MassiveSet {
     return destination.remove(value);
   }
 
-  debugDump() {
+  debugDump(): void {
     const r = this.#dumpToArray();
     for (const rr of r) {
       console.log(rr);
@@ -144,7 +144,7 @@ export class MassiveSet {
    * @param value 
    * @returns 
    */
-  hasLocal(value: string) {
+  hasLocal(value: string): boolean {
     for (const v of this.values) {
       if (v === value) return true;
     }

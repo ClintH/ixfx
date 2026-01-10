@@ -14,7 +14,7 @@ import { numberTest, resultThrow } from "@ixfx/guards";
  * @param v
  * @returns
  */
-export const flip = (v: number | (() => number)) => {
+export const flip = (v: number | (() => number)): number => {
   if (typeof v === `function`) v = v();
   resultThrow(numberTest(v, `percentage`, `v`));
   return 1 - v;

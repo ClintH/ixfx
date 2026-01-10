@@ -5,13 +5,9 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/",
-		"bundle/"
+		"dist"
 	],
-	"scripts": {
-		"package-bundle": "tsdown",
-		"clean": "rm -rf dist && rm -rf bundle"
-	},
+	"scripts": {},
 	"dependencies": {
 		"@ixfx/arrays": "workspace:^",
 		"@ixfx/guards": "workspace:^",
@@ -21,33 +17,27 @@
 	},
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
-			"import": "./src/index.ts"
-		},
-		"./sync": {
-			"types": "./src/sync.ts",
-			"import": "./src/sync.ts"
+			"dev": "./src/index.ts",
+			"default": "./dist/index.js"
 		},
 		"./async": {
-			"types": "./src/async.ts",
-			"import": "./src/async.ts"
-		}
+			"dev": "./src/async.ts",
+			"default": "./dist/async.js"
+		},
+		"./sync": {
+			"dev": "./src/sync.ts",
+			"default": "./dist/sync.js"
+		},
+		"./package.json": "./package.json"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",
 		"exports": {
-			".": {
-				"types": "./dist/src/index.d.ts",
-				"import": "./dist/src/index.js"
-			},
-			"./sync": {
-				"types": "./dist/src/sync.d.ts",
-				"import": "./dist/src/sync.js"
-			},
-			"./async": {
-				"types": "./dist/src/async.d.ts",
-				"import": "./dist/src/async.js"
-			}
+			".": "./dist/index.js",
+			"./async": "./dist/async.js",
+			"./sync": "./dist/sync.js",
+			"./package.json": "./package.json"
 		}
-	}
+	},
+	"types": "./dist/index.d.ts"
 }

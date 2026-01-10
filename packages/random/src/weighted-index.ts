@@ -11,10 +11,10 @@ import { type RandomSource } from "./types.js";
 * @param rand 
 * @returns 
 */
-export const weightedIndex = (weightings: Array<number>, rand: RandomSource = Math.random): () => number => {
-  const precompute: Array<number> = [];
+export const weightedIndex = (weightings: number[], rand: RandomSource = Math.random): () => number => {
+  const precompute: number[] = [];
   let total = 0;
-  // eslint-disable-next-line unicorn/no-for-loop
+
   for (let index = 0; index < weightings.length; index++) {
     total += weightings[ index ];
     precompute[ index ] = total;
@@ -23,7 +23,7 @@ export const weightedIndex = (weightings: Array<number>, rand: RandomSource = Ma
 
   return (): number => {
     const v = rand();
-    // eslint-disable-next-line unicorn/no-for-loop
+
     for (let index = 0; index < precompute.length; index++) {
       if (v <= precompute[ index ]) return index;
     }

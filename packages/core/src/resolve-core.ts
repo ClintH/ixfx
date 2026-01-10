@@ -132,7 +132,7 @@ export function resolveSync<V extends BasicType>(resolvable: ResolveToValueSync<
  * @param args 
  * @returns 
  */
-export async function resolveWithFallback<T extends BasicType>(p: ResolveToValue<T>, options: ResolveFallbackOptions<T>, ...args: unknown[]) {
+export async function resolveWithFallback<T extends BasicType>(p: ResolveToValue<T>, options: ResolveFallbackOptions<T>, ...args: unknown[]): Promise<T> {
   let errored = false;
   let fallbackValue = options.value;
   const overrideWithLast = options.overrideWithLast ?? false;
@@ -166,7 +166,7 @@ export async function resolveWithFallback<T extends BasicType>(p: ResolveToValue
  * @param args 
  * @returns 
  */
-export function resolveWithFallbackSync<T extends BasicType>(p: ResolveToValueSync<T>, options: ResolveFallbackOptions<T>, ...args: unknown[]) {
+export function resolveWithFallbackSync<T extends BasicType>(p: ResolveToValueSync<T>, options: ResolveFallbackOptions<T>, ...args: unknown[]): T {
   let errored = false;
   let fallbackValue = options.value;
   const overrideWithLast = options.overrideWithLast ?? false;

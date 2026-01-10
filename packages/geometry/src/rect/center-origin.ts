@@ -12,12 +12,12 @@ import type { RectPositioned } from "./rect-types.js";
  * @param rectAbsolute 
  * @returns 
  */
-export const centerOrigin = (rectAbsolute: RectPositioned) => {
+export const centerOrigin = (rectAbsolute: RectPositioned): { relativeToAbsolute: (point: Point) => Point; absoluteToRelative: (point: Point) => Point; } => {
   const c = center(rectAbsolute);
   const w = rectAbsolute.width / 2;
   const h = rectAbsolute.height / 2;
 
-  const relativeToAbsolute = (point: Point) => {
+  const relativeToAbsolute = (point: Point): Point => {
     return {
       ...point,
       x: point.x * w + c.x,
@@ -25,7 +25,7 @@ export const centerOrigin = (rectAbsolute: RectPositioned) => {
     }
   }
 
-  const absoluteToRelative = (point: Point) => {
+  const absoluteToRelative = (point: Point): Point => {
     return {
       ...point,
       x: ((point.x - rectAbsolute.x) / w) - 1,

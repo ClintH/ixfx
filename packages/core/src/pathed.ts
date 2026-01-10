@@ -1,5 +1,5 @@
-import { recordEntriesDepthFirst } from "@ixfx/core/records";
-import { isPrimitive, isInteger, isEqualContextString, defaultToString } from '@ixfx/core';
+import { recordEntriesDepthFirst } from "./records.js";
+import { isPrimitive, isInteger, isEqualContextString } from '@ixfx/core';
 import { testPlainObjectOrPrimitive } from '@ixfx/guards';
 import type { IsEqualContext } from '@ixfx/core';
 import { compareObjectKeys } from './records/compare.js';
@@ -450,7 +450,7 @@ export function* getPaths(object: object | null, onlyLeaves = false): Generator<
  * @param prefix Manually set a path prefix if it's necessary
  * @returns 
  */
-export function* getPathsAndData(o: object, onlyLeaves = false, maxDepth = Number.MAX_SAFE_INTEGER, prefix = ``): Generator<PathData<any>> {
+export function* getPathsAndData(o: object, onlyLeaves = false, maxDepth: number = Number.MAX_SAFE_INTEGER, prefix = ``): Generator<PathData<any>> {
   if (o === null) return;
   if (o === undefined) return;
   yield* getPathsAndDataImpl(o, prefix, onlyLeaves, maxDepth);

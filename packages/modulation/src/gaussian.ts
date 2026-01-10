@@ -19,7 +19,7 @@ export const gaussian = (standardDeviation = 0.4) => {
   //const a = 1 / sqrt(2 * pi);
   const mean = 0.5;
 
-  return (t: number) => {
+  return (t: number): number => {
     const f = gaussianA / standardDeviation;
     // p:-8 pinched
     let p = -2.5; // -1/1.25;

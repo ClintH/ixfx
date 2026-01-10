@@ -1,4 +1,4 @@
-import { fromObject, type FormattingOptions } from "./data-table.js";
+import { DataTable, fromObject, type FormattingOptions } from "./data-table.js";
 
 export type DataDisplayOptions = FormattingOptions & {
   theme?: `dark` | `light`
@@ -20,7 +20,7 @@ export type DataDisplayOptions = FormattingOptions & {
  */
 export class DataDisplay {
 
-  dataTable;
+  dataTable: DataTable<object>;
 
   /**
    * Constructor
@@ -92,7 +92,7 @@ export class DataDisplay {
     });
   }
 
-  update(data: object) {
+  update(data: object): void {
     this.dataTable.update(data);
   }
 }

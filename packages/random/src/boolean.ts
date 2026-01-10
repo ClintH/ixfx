@@ -16,10 +16,10 @@ import type { RandomBooleanOptions, RandomSource } from "./types.js";
  * @param options 
  * @returns Function that produces a random boolean
  */
-export const booleanSource = (options: RandomBooleanOptions = {}) => {
+export const booleanSource = (options: RandomBooleanOptions = {}): () => boolean => {
   const source = options.source ?? Math.random;
   const threshold = options.threshold ?? 0.5;
-  return () => {
+  return (): boolean => {
     if (source() > threshold) return true;
     return false;
   }
@@ -34,4 +34,4 @@ export const booleanSource = (options: RandomBooleanOptions = {}) => {
  * @param options By default uses a threshold of 0.5
  * @returns Random boolean value (true/false) 
  */
-export const boolean = (options: RandomBooleanOptions = {}) => booleanSource(options)();
+export const boolean = (options: RandomBooleanOptions = {}): boolean => booleanSource(options)();

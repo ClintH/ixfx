@@ -12,7 +12,7 @@ import type { GenFactoryNoInput } from "./types.js";
  * @param valueToWrap 
  * @param array 
  */
-export async function addToArray<Out>(array: Out[], valueToWrap: AsyncGenerator<Out> | GenFactoryNoInput<Out>) {
+export async function addToArray<Out>(array: Out[], valueToWrap: AsyncGenerator<Out> | GenFactoryNoInput<Out>): Promise<void> {
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;
   for await (const value of outputType) {
     array.push(value);

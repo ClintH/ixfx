@@ -34,6 +34,6 @@ export const pipelineApply = (
  */
 export const pipeline =
   (...pipeline: readonly ((pt: Point) => Point)[]) =>
-    (pt: Point) =>
+    (pt: Point): Point =>
 
       pipeline.reduce((previous, current) => current(previous), pt);

@@ -22,7 +22,7 @@ export type WaypointOpts = {
 export const fromPoints = (
   waypoints: readonly Point[],
   opts: Partial<WaypointOpts> = {}
-) => {
+): Waypoints => {
   const lines = joinPointsToLines(...waypoints);
   return init(
     lines.map((l) => toPath(l)),

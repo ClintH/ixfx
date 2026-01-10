@@ -8,7 +8,7 @@ import type { PathDrawingOpts } from "./types.js";
  * @param elem Element (presumed path)
  * @param opts Options
  */
-export const applyPathOpts = (elem: SVGElement, opts: PathDrawingOpts) => {
+export const applyPathOpts = (elem: SVGElement, opts: PathDrawingOpts): void => {
   if (opts.markerEnd) {
     elem.setAttribute(
       `marker-end`,

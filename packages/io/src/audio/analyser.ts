@@ -209,7 +209,7 @@ export class AudioAnalyser {
     }
   }
 
-  init() {
+  init(): void {
     if (this.#initInProgress) {
       if (this.debug) console.debug(`Init already in progress`);
       return;
@@ -335,7 +335,7 @@ export class AudioAnalyser {
     lowFreq: number,
     highFreq: number,
     freqData: readonly number[]
-  ) {
+  ): number[] {
     const lowIndex = this.getIndexForFrequency(lowFreq);
     const highIndex = this.getIndexForFrequency(highFreq);
 

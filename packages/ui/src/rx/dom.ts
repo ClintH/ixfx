@@ -1,5 +1,5 @@
 import { resolveEl } from "@ixfx/dom";
-import { Pathed } from "@ixfx/core";
+import { Pathed, RecursivePartial } from "@ixfx/core";
 import * as Rx from "@ixfx/rx";
 import * as RxFrom from "@ixfx/rx/from";
 import type { ElementsOptions, PipeDomBinding, BindUpdateOpts, DomBindResolvedSource, DomBindSourceValue, DomBindValueTarget, ElementBind, DomBindUnresolvedSource } from './dom-types.js';
@@ -12,7 +12,16 @@ import { QueueMutable } from "@ixfx/collections";
  * @param query 
  * @returns 
  */
-export function fromDomQuery(query: string) {
+export function fromDomQuery(query: string): Rx.Reactive<HTMLElement[]> & {
+  set(value: HTMLElement[]): void;
+} & {
+  onField(fieldName: string, handler: (result: Rx.ObjectFieldHandler) => void): () => void;
+  onDiff(changes: (changes: Pathed.PathDataChange<any>[]) => void): () => void;
+  update(changedPart: (RecursivePartial<HTMLElement> | undefined)[]): HTMLElement[];
+  updateField(field: string, value: any): void;
+} & {
+  last(): HTMLElement[];
+} {
   const elements = [ ...document.querySelectorAll(query) ] as HTMLElement[];
 
   return Rx.From.object(elements);
@@ -28,7 +37,7 @@ export function fromDomQuery(query: string) {
  * @param source 
  * @param bindOpts 
  */
-export const bindText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts: Partial<DomBindSourceValue<TSource, string>> = {}) => {
+export const bindText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts: Partial<DomBindSourceValue<TSource, string>> = {}): PipeDomBinding => {
   return bindElement(source, elOrQuery, { ...bindOpts, elField: `textContent` });
 }
 
@@ -39,7 +48,7 @@ export const bindText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: strin
  * @param bindOpts 
  * @returns 
  */
-export const bindValueText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts: Partial<DomBindSourceValue<TSource, string>> = {}) => {
+export const bindValueText = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLInputElement | null, bindOpts: Partial<DomBindSourceValue<TSource, string>> = {}): PipeDomBinding => {
   return bindElement(source, elOrQuery, { ...bindOpts, elField: `value`, attribName: `value` });
 }
 
@@ -136,7 +145,7 @@ const validateElement = (elOrQuery: string | HTMLInputElement | null, type?: str
  * @param bindOpts 
  * @returns 
  */
-export const bindHtml = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts: DomBindSourceValue<TSource, string> = {}) => {
+export const bindHtml = <TSource>(source: Rx.Reactive<TSource>, elOrQuery: string | HTMLElement | null, bindOpts: DomBindSourceValue<TSource, string> = {}): PipeDomBinding => {
   return bindElement(source, elOrQuery, { ...bindOpts, elField: `innerHTML` });
 }
 
@@ -576,7 +585,7 @@ export const bindDiffUpdate = <V>(
  * @param source 
  * @param options 
  */
-export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & Rx.ReactiveInitial<T>), options: Partial<ElementsOptions>) => {
+export const elements = <T>(source: Rx.ReactiveDiff<T> | (Rx.ReactiveDiff<T> & Rx.ReactiveInitial<T>), options: Partial<ElementsOptions>): void => {
   const containerEl = options.container ? resolveEl(options.container) : document.body;
   const defaultTag = options.defaultTag ?? `div`
   const elByField = new Map<string, HTMLElement>();
@@ -741,22 +750,58 @@ const getRootedPath = (path: string) => {
   return after === path ? `_root` : `_root.` + after;
 }
 
-export function win() {
+export function win(): {
+  dispose: (reason?: string) => void; size: Rx.Reactive<{
+    lazy: string;
+    transform: () => {
+      width: number;
+      height: number;
+    };
+  }> & {
+    last(): {
+      lazy: string;
+      transform: () => {
+        width: number;
+        height: number;
+      };
+    };
+  }; pointer: Rx.Reactive<{
+    lazy: string;
+    transform: (args: Event | undefined) => {
+      x: number;
+      y: number;
+    };
+  }> & {
+    last(): {
+      lazy: string;
+      transform: (args: Event | undefined) => {
+        x: number;
+        y: number;
+      };
+    };
+  };
+} {
   const generateRect = () => ({ width: window.innerWidth, height: window.innerHeight });
 
   const size = RxFrom.event(window, `resize`, {
     lazy: `very`,
-    transform: () => generateRect(),
+    transform: (): {
+      width: number;
+      height: number;
+    } => generateRect(),
   });
   const pointer = RxFrom.event(window, `pointermove`, {
     lazy: `very`,
-    transform: (args: Event | undefined) => {
+    transform: (args: Event | undefined): {
+      x: number;
+      y: number;
+    } => {
       if (args === undefined) return { x: 0, y: 0 };
       const pe = args as PointerEvent;
       return { x: pe.x, y: pe.y }
     }
   });
-  const dispose = (reason = `Reactive.win.dispose`) => {
+  const dispose = (reason = `Reactive.win.dispose`): void => {
     size.dispose(reason);
     pointer.dispose(reason);
   }

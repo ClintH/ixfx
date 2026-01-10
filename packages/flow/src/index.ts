@@ -30,4 +30,4 @@ export { sleep } from '@ixfx/core';
  * 
  * [Read more on the ixfx Guide](https://ixfx.fun/flow/state-machine/overview/)
  */
-export * as StateMachine from './state-machine/index.js';
+export * as StateMachine from './state-machine.js';

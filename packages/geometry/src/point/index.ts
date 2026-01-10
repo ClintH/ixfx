@@ -40,7 +40,7 @@ export * from './rotate-point-array.js';
 export * from './round.js';
 export * from './subtract.js';
 export * from './sum.js';
-export * from './To.js';
+export * from './to.js';
 export * from './to-array.js';
 export * from './within-range.js';
 export * from './wrap.js';

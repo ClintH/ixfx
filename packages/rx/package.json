@@ -5,62 +5,43 @@
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist/",
-		"bundle/"
+		"dist"
 	],
-	"scripts": {
-		"package-bundle": "tsdown",
-		"clean": "rm -rf dist && rm -rf bundle"
-	},
+	"scripts": {},
 	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/collections": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/debug": "workspace:^",
-		"@ixfx/dom": "workspace:^",
-		"@ixfx/flow": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/iterables": "workspace:^",
-		"@ixfx/modulation": "workspace:^",
-		"@ixfx/process": "workspace:^"
+		"@ixfx/arrays": "workspace:*",
+		"@ixfx/collections": "workspace:*",
+		"@ixfx/core": "workspace:*",
+		"@ixfx/debug": "workspace:*",
+		"@ixfx/dom": "workspace:*",
+		"@ixfx/flow": "workspace:*",
+		"@ixfx/guards": "workspace:*",
+		"@ixfx/iterables": "workspace:*",
+		"@ixfx/modulation": "workspace:*",
+		"@ixfx/process": "workspace:*"
 	},
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
-			"import": "./src/index.ts"
+			"dev": "./src/index.ts",
+			"default": "./dist/index.js"
 		},
 		"./from": {
-			"types": "./src/from/index.ts",
-			"import": "./src/from/index.ts"
+			"dev": "./src/from/index.ts",
+			"default": "./dist/from/index.js"
 		},
-		"./from/*": {
-			"types": "./src/from/*.ts",
-			"import": "./src/from/*.ts"
+		"./ops": {
+			"dev": "./src/ops/index.ts",
+			"default": "./dist/ops/index.js"
 		},
-		"./op/*": {
-			"types": "./src/ops/*.ts",
-			"import": "./src/ops/*.ts"
-		}
+		"./package.json": "./package.json"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",
 		"exports": {
-			".": {
-				"types": "./dist/src/index.d.ts",
-				"import": "./dist/src/index.js"
-			},
-			"./from": {
-				"types": "./dist/src/from/index.d.ts",
-				"import": "./dist/src/from/index.js"
-			},
-			"./from/*": {
-				"types": "./dist/src/from/*.d.ts",
-				"import": "./dist/src/from/*.js"
-			},
-			"./op/*": {
-				"types": "./dist/src/ops/*.d.ts",
-				"import": "./dist/src/ops/*.js"
-			}
+			".": "./dist/index.js",
+			"./from": "./dist/from/index.js",
+			"./ops": "./dist/ops/index.js",
+			"./package.json": "./package.json"
 		}
 	}
 }

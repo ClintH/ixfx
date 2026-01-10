@@ -3,7 +3,7 @@ import type { Point } from './point/point-type.js';
 import type { Rect } from './rect/index.js';
 import { isPoint } from './point/index.js';
 import { isRect } from './rect/guard.js';
-import { Placeholder as PlaceholderRect } from './rect/placeholder.js';
+import { Placeholder as PlaceholderRect } from './rect/initialisers.js';
 
 /**
  * A scale function that takes an input value to scale.

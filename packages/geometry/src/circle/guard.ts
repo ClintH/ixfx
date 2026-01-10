@@ -7,7 +7,7 @@ import type { Circle, CirclePositioned } from './circle-type.js';
  * @param circle 
  * @param parameterName 
  */
-export const guard = (circle: CirclePositioned | Circle, parameterName = `circle`) => {
+export const guard = (circle: CirclePositioned | Circle, parameterName = `circle`): void => {
   if (isCirclePositioned(circle)) {
     guardPoint(circle, `circle`);
   }
@@ -22,7 +22,7 @@ export const guard = (circle: CirclePositioned | Circle, parameterName = `circle
  * @param parameterName 
  * @returns 
  */
-export const guardPositioned = (circle: CirclePositioned, parameterName = `circle`) => {
+export const guardPositioned = (circle: CirclePositioned, parameterName = `circle`): void => {
   if (!isCirclePositioned(circle)) throw new Error(`Expected a positioned circle with x,y`);
   guard(circle, parameterName);
 };

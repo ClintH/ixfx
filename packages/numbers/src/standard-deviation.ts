@@ -14,7 +14,7 @@ import { mean } from "./average.js";
  * @param usePopulation If _true_ result is similar to Excel's STDEV.P. Otherwise like STDEV.S
  * @returns 
  */
-export const standardDeviation = (array: number[], usePopulation = false, meanValue?: number) => {
+export const standardDeviation = (array: number[], usePopulation = false, meanValue?: number): number => {
   const meanV = typeof meanValue === `undefined` ? mean(array) : meanValue;
   return Math.sqrt(
     array

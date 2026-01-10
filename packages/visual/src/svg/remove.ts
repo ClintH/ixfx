@@ -7,7 +7,7 @@
 export const remove = <V extends SVGElement>(
   parent: SVGElement,
   queryOrExisting: string | V
-) => {
+): void => {
   if (typeof queryOrExisting === `string`) {
     const elem = parent.querySelector(queryOrExisting);
     if (elem === null) return;
@@ -21,7 +21,7 @@ export const remove = <V extends SVGElement>(
  * Removes all children of `parent`, but not `parent` itself.
  * @param parent 
  */
-export const clear = (parent: SVGElement) => {
+export const clear = (parent: SVGElement): void => {
   let c = parent.lastElementChild;
   while (c) {
     c.remove();

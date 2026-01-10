@@ -3,7 +3,7 @@
 // -------------------------
 import type { IStackImmutable } from './IStackImmutable.js';
 import { push, pop, isEmpty, isFull, peek } from './StackFns.js';
-import type { StackOpts } from './Types.js';
+import type { StackOpts } from './types.js';
 
 export class StackImmutable<V> implements IStackImmutable<V> {
   private readonly opts: StackOpts;

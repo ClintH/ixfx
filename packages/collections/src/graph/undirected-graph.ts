@@ -240,7 +240,9 @@ const stringForEdge = (edge: Edge) => {
  * @param context id or Vertex
  * @returns 
  */
-export function* adjacentVertices(graph: Graph, context: Vertex | string | undefined) {
+export function* adjacentVertices(graph: Graph, context: Vertex | string | undefined): Generator<Readonly<{
+  id: string
+}>, void, unknown> {
   if (typeof context === `undefined`) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
   if (typeof vertex === `undefined`) throw new Error(`Vertex not found ${ JSON.stringify(context) }`);
@@ -266,7 +268,11 @@ export function* adjacentVertices(graph: Graph, context: Vertex | string | undef
  * @param context 
  * @returns 
  */
-export function* edgesForVertex(graph: Graph, context: Vertex | string | undefined) {
+export function* edgesForVertex(graph: Graph, context: Vertex | string | undefined): Generator<Readonly<{
+  a: string
+  b: string
+  weight?: number
+}>, void, unknown> {
   if (typeof graph !== `object`) throw new TypeError(`Param 'graph' is expected to be an object. Got: ${ typeof graph }`);
   if (typeof context === `undefined`) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;

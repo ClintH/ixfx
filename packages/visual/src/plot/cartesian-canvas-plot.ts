@@ -29,7 +29,7 @@ export type InsertOptions = {
 };
 
 
-export const insert = (insertOptions: InsertOptions, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) => {
+export const insert = (insertOptions: InsertOptions, options: RecursivePartial<Cart.CartesianPlotOptions> = {}): CartesianCanvasPlot => {
 
   const parentEl = (insertOptions.parent === undefined) ? document.body : resolveEl(insertOptions.parent);
   const canvasEl = document.createElement(`canvas`);
@@ -115,7 +115,7 @@ export class CartesianCanvasPlot {
   visibleRange: RectPositioned = Rects.PlaceholderPositioned;
   show: ShowOptions;
   whiskerLength: number;
-  axisRounder = round(1, true);
+  axisRounder: (v: number) => number = round(1, true);
   onInvalidated: undefined | (() => void);
 
   /**
@@ -178,7 +178,7 @@ export class CartesianCanvasPlot {
     }
   }
 
-  static fromCanvas(queryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: RecursivePartial<Cart.CartesianPlotOptions> = {}) {
+  static fromCanvas(queryOrEl: HTMLCanvasElement | string, data: DataSet<Cart.PlotPoint, SeriesMeta>, options: RecursivePartial<Cart.CartesianPlotOptions> = {}): CartesianCanvasPlot {
     const source = new CanvasSource(queryOrEl, `min`);
     const bounds = source.element.getBoundingClientRect();
     const region = source.createRegion({
@@ -187,7 +187,7 @@ export class CartesianCanvasPlot {
     return new CartesianCanvasPlot(region, data, options);
   }
 
-  getCurrentRange() {
+  getCurrentRange(): Cart.CartesianDataRange {
     if (this.#data.lastChange === this.#lastDataChange && this.#currentRange) return this.#currentRange;
     this.#lastDataChange = this.#data.lastChange;
     const r = this.#createRange();
@@ -196,7 +196,7 @@ export class CartesianCanvasPlot {
     return r;
   }
 
-  invalidateRange() {
+  invalidateRange(): void {
     this.#currentRange = undefined;
   }
 
@@ -273,7 +273,7 @@ export class CartesianCanvasPlot {
    * @param elementToPosition 
    * @param by 
    */
-  positionElementAt(data: Point, elementToPosition: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery?: HTMLElement | string) {
+  positionElementAt(data: Point, elementToPosition: HTMLElement | string, by: `middle` | `top-left` = `middle`, relativeToQuery?: HTMLElement | string): void {
     const el = resolveEl(elementToPosition);
     let { x, y } = this.valueToScreenSpace(data);
     // x -= this.canvasSource.offset.x;
@@ -313,7 +313,10 @@ export class CartesianCanvasPlot {
     }
   }
 
-  valueToScreenSpace(dataPoint: Point) {
+  valueToScreenSpace(dataPoint: Point): {
+    x: number;
+    y: number;
+  } {
     const region = this.valueToRegionSpace(dataPoint);
     const offset = this.canvasSource.offset;
     const scr = {
@@ -323,7 +326,11 @@ export class CartesianCanvasPlot {
     return scr;
   }
 
-  valueToRegionSpace(dataValue: Point, debug = false) {
+  valueToRegionSpace(dataValue: Point, debug = false): {
+    x: number;
+    y: number;
+    z?: number;
+  } {
     const ds = this.getCurrentRange();
 
     // Scale absolute value relative to total dimensions of data
@@ -364,7 +371,7 @@ export class CartesianCanvasPlot {
    * @param point 
    * @returns 
    */
-  pointToValue(point: Point, _source: `screen`) {
+  pointToValue(point: Point, _source: `screen`): Points.Point {
     const ds = this.getCurrentRange();
 
     // Apply offset
@@ -415,7 +422,7 @@ export class CartesianCanvasPlot {
     }
   }
 
-  draw() {
+  draw(): void {
     if (this.#visualClear === `region`) {
       this.#canvasRegion.clear();
     } else {
@@ -451,12 +458,12 @@ export class CartesianCanvasPlot {
    * @param colour 
    * @param width 
    */
-  drawLine(line: Line, colour: string, width: number) {
+  drawLine(line: Line, colour: string, width: number): void {
     const l = this.#valueLineToCanvasSpace(line.a, line.b);
     this.#drawLineCanvasSpace(l, colour, width);
   }
 
-  setMeta(series: string, meta: Partial<SeriesMeta>) {
+  setMeta(series: string, meta: Partial<SeriesMeta>): void {
     this.#data.setMeta(series, {
       ...this.getDefaultMeta(),
       ...meta
@@ -627,15 +634,15 @@ export class CartesianCanvasPlot {
     ctx.closePath();
   }
 
-  get dataSet() {
+  get dataSet(): DataSet<Cart.PlotPoint, SeriesMeta> {
     return this.#data;
   }
 
-  get canvasRegion() {
+  get canvasRegion(): CanvasRegion {
     return this.#canvasRegion;
   }
 
-  get canvasSource() {
+  get canvasSource(): CanvasSource {
     return this.#canvasRegion.source;
   }
 }

@@ -27,7 +27,7 @@ export abstract class PrimitiveTracker<
     return this.values.length;
   }
 
-  onTrimmed(reason: TrimReason) {
+  onTrimmed(reason: TrimReason): void {
     // no-op
   }
 
@@ -42,7 +42,7 @@ export abstract class PrimitiveTracker<
   /**
    * Returns number of recorded values (this can include the initial value)
    */
-  get size() {
+  get size(): number {
     return this.values.length;
   }
 
@@ -66,7 +66,7 @@ export abstract class PrimitiveTracker<
     return newest - oldest;
   }
 
-  onReset() {
+  onReset(): void {
     this.values = [];
     this.timestamps = [];
   }

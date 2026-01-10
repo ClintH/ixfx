@@ -3,7 +3,7 @@
  * @param logits 
  * @returns 
  */
-export const softmax = (logits: number[]) => {
+export const softmax = (logits: number[]): number[] => {
 
   const maxLogit = logits.reduce((a, b) => Math.max(a, b), Number.NEGATIVE_INFINITY);
   const scores = logits.map((l) => Math.exp(l - maxLogit));

@@ -106,7 +106,7 @@ export const deleteByValueCompareMutate = <K, V>(
   map: Map<K, V>,
   value: V,
   comparer: IsEqual<V> = isEqualDefault
-) => {
+): void => {
   for (const entry of map.entries()) {
     if (comparer(entry[ 1 ], value)) {
       map.delete(entry[ 0 ]);
@@ -228,7 +228,7 @@ export const addValueMutate = <V>(
   hasher: ToString<V>,
   collisionPolicy: `overwrite` | `skip` | `throw`,
   ...values: readonly V[]
-) => {
+): Map<string, V> => {
   const m = map ?? new Map<string, V>();
   const f = addValueMutator(m, hasher, collisionPolicy);
   f(...values);
@@ -251,7 +251,7 @@ export const addValue = <V>(
   hasher: ToString<V>,
   collisionPolicy: `overwrite` | `skip` | `throw`,
   ...values: readonly V[]
-) => {
+): Map<string, V> => {
   const m = map === undefined ? new Map<string, V>() : new Map<string, V>(map);
   for (const v of values) {
     const hashResult = hasher(v);
@@ -298,7 +298,7 @@ export const addValueMutator = <V>(
   hasher: ToString<V>,
   collisionPolicy: `overwrite` | `skip` | `throw` = `overwrite`
 ) => {
-  return (...values: readonly V[]) => {
+  return (...values: readonly V[]): Map<string, V> => {
     for (const v of values) {
       const hashResult = hasher(v);
       if (collisionPolicy !== `overwrite`) {
@@ -337,7 +337,7 @@ export const addValueMutator = <V>(
 export const sortByValue = <K, V>(
   map: ReadonlyMap<K, V>,
   comparer?: (a: V, b: V) => number
-) => {
+): [ K, V ][] => {
   const f = comparer ?? defaultComparer;
   return [ ...map.entries() ].sort((a, b) => f(a[ 1 ], b[ 1 ]));
 };
@@ -360,12 +360,12 @@ export const sortByValueProperty = <K, V, Z>(
   map: ReadonlyMap<K, V>,
   property: string,
   compareFunction?: (a: Z, b: Z) => number
-) => {
+): [ K, V ][] => {
   const cfn = typeof compareFunction === `undefined` ? defaultComparer : compareFunction;
   return [ ...map.entries() ].sort((aE, bE) => {
     const a = aE[ 1 ];
     const b = bE[ 1 ];
-    return cfn(a[ property ] as Z, b[ property ] as Z);
+    return cfn((a as any)[ property ] as Z, (b as any)[ property ] as Z);
   });
 };
 /**
@@ -416,7 +416,7 @@ export const hasAnyValue = <K, V>(
 export function* filterValues<V>(
   map: ReadonlyMap<string, V>,
   predicate: (v: V) => boolean
-) {
+): Generator<V, void, unknown> {
   for (const v of map.values()) {
     if (predicate(v)) yield v;
   }
@@ -452,7 +452,7 @@ export const toArray = <V>(map: ReadonlyMap<string, V>): V[] =>
  */
 export const fromIterable = <V>(
   data: Iterable<V>,
-  keyFunction = toStringDefault<V>,
+  keyFunction: (itemToMakeStringFor: V) => string = toStringDefault<V>,
   collisionPolicy: `overwrite` | `skip` | `throw` = `overwrite`
 ): ReadonlyMap<string, V> => {
   const m = new Map<string, V>();
@@ -515,7 +515,7 @@ export const fromObject = <V>(data: object | object[]): ReadonlyMap<string, V> =
  * @param map
  * @param data
  */
-export const addObjectEntriesMutate = <V>(map: Map<string, V>, data: object) => {
+export const addObjectEntriesMutate = <V>(map: Map<string, V>, data: object): void => {
   const entries = Object.entries(data);
   for (const [ key, value ] of entries) {
     map.set(key, value as V);
@@ -586,7 +586,7 @@ export const mapToObjectTransform = <T, K>(
 ): Readonly<Record<string, K>> =>
   [ ...m ].reduce((object: object, [ key, value ]) => {
     const t = valueTransform(value);
-    object[ key ] = t;
+    (object as any)[ key ] = t;
     return object;
   }, {});
 
@@ -607,7 +607,9 @@ export const mapToObjectTransform = <T, K>(
 export const zipKeyValue = <V>(
   keys: readonly string[],
   values: ArrayLike<V | undefined>
-) => {
+): {
+  [ k: string ]: V | undefined;
+} => {
   if (keys.length !== values.length) {
     throw new Error(`Keys and values arrays should be same length`);
   }
@@ -644,7 +646,7 @@ export const zipKeyValue = <V>(
 export const transformMap = <K, V, R>(
   source: ReadonlyMap<K, V>,
   transformer: (value: V, key: K) => R
-) => new Map(Array.from(source, (v) => [ v[ 0 ], transformer(v[ 1 ], v[ 0 ]) ]));
+): Map<K, R> => new Map(Array.from(source, (v) => [ v[ 0 ], transformer(v[ 1 ], v[ 0 ]) ]));
 
 /**
  * Converts a `Map` to a plain object, useful for serializing to JSON.
@@ -669,7 +671,7 @@ export const toObject = <T>(
   m: ReadonlyMap<string, T>
 ): Readonly<Record<string, T>> =>
   [ ...m ].reduce((object: object, [ key, value ]) => {
-    object[ key ] = value;
+    (object as any)[ key ] = value;
     return object;
   }, {});
 

@@ -1,3 +1,4 @@
+
 import { type StateChangeEvent } from '@ixfx/flow/state-machine';
 import { type ISimpleEventEmitter } from '@ixfx/events';
 import { string as randomString } from '@ixfx/random';
@@ -107,7 +108,7 @@ export type EspruinoBleOpts = {
  *
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
-export const puck = async (opts: EspruinoBleOpts = {}) => {
+export const puck = async (opts: EspruinoBleOpts = {}): Promise<EspruinoBleDevice> => {
   const name = opts.name ?? `Puck`;
   const debug = opts.debug ?? false;
 
@@ -124,7 +125,7 @@ export const puck = async (opts: EspruinoBleOpts = {}) => {
   return d;
 };
 
-export const bangle = async (opts: EspruinoBleOpts = {}) => {
+export const bangle = async (opts: EspruinoBleOpts = {}): Promise<EspruinoBleDevice> => {
   const name = opts.name ?? `Bangle`;
   const debug = opts.debug ?? false;
 
@@ -191,7 +192,7 @@ export const serial = async (
     readonly debug?: boolean;
     readonly evalTimeoutMs?: number;
   } = {}
-) => {
+): Promise<EspruinoSerialDevice> => {
   const d = new EspruinoSerialDevice(opts);
   await d.connect();
   return d;
@@ -250,7 +251,7 @@ const getFilters = (opts: EspruinoBleOpts, defaultNamePrefix: string) => {
  *
  * @returns Returns a connected instance, or throws exception if user cancelled or could not connect.
  */
-export const connectBle = async (opts: EspruinoBleOpts = {}) => {
+export const connectBle = async (opts: EspruinoBleOpts = {}): Promise<EspruinoBleDevice> => {
   const device = await navigator.bluetooth.requestDevice({
     filters: getFilters(opts, `Puck.js`),
     optionalServices: [ NordicDefaults.service ],
@@ -365,7 +366,7 @@ export type EspruinoDevice = {
  */
 export const deviceEval = async (
   code: string,
-  opts: EvalOpts = {},
+  opts: EvalOpts | undefined = {},
   device: EspruinoDevice,
   evalReplyPrefix: string,
   debug: boolean,

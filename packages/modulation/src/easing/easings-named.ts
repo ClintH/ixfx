@@ -8,7 +8,7 @@ const pi = Math.PI;
 const sin = Math.sin;
 
 
-export const bounceOut = (x: number) => {
+export const bounceOut = (x: number): number => {
   const n1 = 7.5625;
   const d1 = 2.75;
 
@@ -23,27 +23,27 @@ export const bounceOut = (x: number) => {
   }
 };
 
-export const quintIn = (x: number) => x * x * x * x * x;
-export const quintOut = (x: number) => 1 - pow(1 - x, 5);
-export const arch = (x: number) => x * (1 - x) * 4;
+export const quintIn = (x: number): number => x * x * x * x * x;
+export const quintOut = (x: number): number => 1 - pow(1 - x, 5);
+export const arch = (x: number): number => x * (1 - x) * 4;
 
-export const smoothstep = (x: number) => x * x * (3 - 2 * x);
-export const smootherstep = (x: number) => (x * (x * 6 - 15) + 10) * x * x * x;
-export const sineIn = (x: number) => 1 - cos((x * pi) / 2);
-export const sineOut = (x: number) => sin((x * pi) / 2);
-export const quadIn = (x: number) => x * x;
-export const quadOut = (x: number) => 1 - (1 - x) * (1 - x);
-export const sineInOut = (x: number) => -(cos(pi * x) - 1) / 2;
-export const quadInOut = (x: number) => x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2;
-export const cubicIn = (x: number) => x * x * x;
-export const cubicOut = (x: number) => 1 - pow(1 - x, 3);
-export const quartIn = (x: number) => x * x * x * x;
-export const quartOut = (x: number) => 1 - pow(1 - x, 4);
-export const expoIn = (x: number) => (x === 0 ? 0 : pow(2, 10 * x - 10));
-export const expoOut = (x: number) => (x === 1 ? 1 : 1 - pow(2, -10 * x));
-export const quintInOut = (x: number) =>
+export const smoothstep = (x: number): number => x * x * (3 - 2 * x);
+export const smootherstep = (x: number): number => (x * (x * 6 - 15) + 10) * x * x * x;
+export const sineIn = (x: number): number => 1 - cos((x * pi) / 2);
+export const sineOut = (x: number): number => sin((x * pi) / 2);
+export const quadIn = (x: number): number => x * x;
+export const quadOut = (x: number): number => 1 - (1 - x) * (1 - x);
+export const sineInOut = (x: number): number => -(cos(pi * x) - 1) / 2;
+export const quadInOut = (x: number): number => x < 0.5 ? 2 * x * x : 1 - pow(-2 * x + 2, 2) / 2;
+export const cubicIn = (x: number): number => x * x * x;
+export const cubicOut = (x: number): number => 1 - pow(1 - x, 3);
+export const quartIn = (x: number): number => x * x * x * x;
+export const quartOut = (x: number): number => 1 - pow(1 - x, 4);
+export const expoIn = (x: number): number => (x === 0 ? 0 : pow(2, 10 * x - 10));
+export const expoOut = (x: number): number => (x === 1 ? 1 : 1 - pow(2, -10 * x));
+export const quintInOut = (x: number): number =>
   x < 0.5 ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2;
-export const expoInOut = (x: number) =>
+export const expoInOut = (x: number): number =>
   x === 0
     ? 0
     : x === 1
@@ -52,26 +52,26 @@ export const expoInOut = (x: number) =>
       : x < 0.5
         ? pow(2, 20 * x - 10) / 2
         : (2 - pow(2, -20 * x + 10)) / 2;
-export const circIn = (x: number) => 1 - sqrt(1 - pow(x, 2));
-export const circOut = (x: number) => sqrt(1 - pow(x - 1, 2));
-export const backIn = (x: number) => {
+export const circIn = (x: number): number => 1 - sqrt(1 - pow(x, 2));
+export const circOut = (x: number): number => sqrt(1 - pow(x - 1, 2));
+export const backIn = (x: number): number => {
   const c1 = 1.701_58;
   const c3 = c1 + 1;
 
   return c3 * x * x * x - c1 * x * x;
 };
-export const backOut = (x: number) => {
+export const backOut = (x: number): number => {
   const c1 = 1.701_58;
   const c3 = c1 + 1;
 
   return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2);
 };
-export const circInOut = (x: number) =>
+export const circInOut = (x: number): number =>
   x < 0.5
     ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
     : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
 
-export const backInOut = (x: number) => {
+export const backInOut = (x: number): number => {
   const c1 = 1.701_58;
   const c2 = c1 * 1.525;
 
@@ -79,7 +79,7 @@ export const backInOut = (x: number) => {
     ? (pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
     : (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
 };
-export const elasticIn = (x: number) => {
+export const elasticIn = (x: number): number => {
   const c4 = (2 * pi) / 3;
 
   return x === 0
@@ -88,7 +88,7 @@ export const elasticIn = (x: number) => {
       ? 1
       : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4));
 };
-export const elasticOut = (x: number) => {
+export const elasticOut = (x: number): number => {
   const c4 = (2 * pi) / 3;
 
   return x === 0
@@ -98,11 +98,11 @@ export const elasticOut = (x: number) => {
       : pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1);
 };
 
-export const bounceIn = (x: number) => 1 - bounceOut(1 - x);
+export const bounceIn = (x: number): number => 1 - bounceOut(1 - x);
 
-export const bell = gaussian();
+export const bell: (t: number) => number = gaussian();
 
-export const elasticInOut = (x: number) => {
+export const elasticInOut = (x: number): number => {
   const c5 = (2 * pi) / 4.5;
 
   return x === 0
@@ -114,4 +114,4 @@ export const elasticInOut = (x: number) => {
         ? -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2
         : (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1;
 };
-export const bounceInOut = (x: number) => x < 0.5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2;
+export const bounceInOut = (x: number): number => x < 0.5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2;

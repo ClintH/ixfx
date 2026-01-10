@@ -1,6 +1,6 @@
 import { setProperty } from "@ixfx/dom";
 import { resolveSource } from "../resolve-source.js";
-import type { ReactiveOrSource } from "../types.js";
+import type { ReactiveOrSource, Unsubscriber } from "../types.js";
 
 export type SetHtmlOptionsQuery = {
   query: string
@@ -27,7 +27,7 @@ export type SetHtmlOptions = (SetHtmlOptionsQuery | SetHtmlOptionsElement) & {
  * @param rxOrSource 
  * @param optionsOrElementOrQuery 
  */
-export const setHtmlText = (rxOrSource: ReactiveOrSource<any>, optionsOrElementOrQuery: SetHtmlOptions | string | HTMLElement) => {
+export const setHtmlText = (rxOrSource: ReactiveOrSource<any>, optionsOrElementOrQuery: SetHtmlOptions | string | HTMLElement): Unsubscriber => {
   let el: HTMLElement | null | undefined;
   let options: SetHtmlOptions | undefined;
   if (typeof optionsOrElementOrQuery === `string`) {

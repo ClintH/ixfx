@@ -111,7 +111,7 @@ export const sleep = <V>(
  * @param predicate 
  * @param checkInterval 
  */
-export const sleepWhile = async (predicate: () => boolean, checkInterval: Interval = 100) => {
+export const sleepWhile = async (predicate: () => boolean, checkInterval: Interval = 100): Promise<void> => {
   while (predicate()) {
     await sleep(checkInterval);
   }

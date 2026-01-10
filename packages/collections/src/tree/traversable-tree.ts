@@ -137,7 +137,7 @@ export const couldAddChild = <T>(
   parent: TraversableTree<T>,
   prospectiveChild: TraversableTree<T>,
   eq: IsEqual<TraversableTree<T>> = isEqualDefault
-) => {
+): void => {
 
   if (eq(parent, prospectiveChild)) throw new Error(`Child equals parent`);
   if (hasAnyChild(parent, prospectiveChild, eq)) {
@@ -400,7 +400,7 @@ export function* depthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(ro
  * @param depth How many levels to traverse 
  * @returns 
  */
-export function* breadthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(root: T, depth = Number.MAX_SAFE_INTEGER): IterableIterator<T> {
+export function* breadthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(root: T, depth: number = Number.MAX_SAFE_INTEGER): IterableIterator<T> {
   if (!root) return;
   const isTrav = isTraversable(root);
   const queue = isTrav ? new QueueMutable<TraversableTree<T>>() : new QueueMutable<TreeNode<T>>();
@@ -503,7 +503,7 @@ export function* followValue<T>(root: TraversableTree<T>, continuePredicate: (no
   }
 }
 
-export function toStringDeep<T>(node: TraversableTree<T>, depth = 0) {
+export function toStringDeep<T>(node: TraversableTree<T>, depth = 0): string {
   if (node === undefined) return `(undefined)`;
   if (node === null) return `(null)`;
   const v = node.getValue();
@@ -516,7 +516,7 @@ export function toStringDeep<T>(node: TraversableTree<T>, depth = 0) {
   return t;
 }
 
-export function toString(...nodes: TraversableTree<any>[]) {
+export function toString(...nodes: TraversableTree<any>[]): string {
   let t = ``;
   for (const node of nodes) {
     const v = node.getValue();

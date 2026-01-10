@@ -1,5 +1,5 @@
 import { SimpleEventEmitter } from '@ixfx/events';
-import * as StateMachine from './state-machine.js';
+import * as StateMachine from './state-machine-fns.js';
 import type { StateNames, Transitions, MachineState } from './types.js';
 import { elapsedInfinity, elapsedSince } from '@ixfx/core/elapsed';
 
@@ -120,7 +120,7 @@ export class StateMachineWithEvents<
   /**
    * Resets machine to initial state
    */
-  reset() {
+  reset(): void {
     this.#setIsDone(false);
     this.#sm = StateMachine.cloneState(this.#smInitial);
     this.#changedAt = elapsedSince();

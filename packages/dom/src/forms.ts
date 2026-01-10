@@ -5,7 +5,7 @@ import { resolveEl } from './resolve-el.js';
  * Adds tab and shift+tab to TEXTAREA
  * @param el
  */
-export const textAreaKeyboard = (el: HTMLTextAreaElement) => {
+export const textAreaKeyboard = (el: HTMLTextAreaElement): void => {
   el.addEventListener(`keydown`, (event) => {
     const elementValue = el.value;
     const start = el.selectionStart;
@@ -179,7 +179,7 @@ export const button = (
      * Removes event handler and optionally removes from document
      * @param deleteElement 
      */
-    dispose(deleteElement = false) {
+    dispose(deleteElement = false): void {
       removeEvent();
       if (deleteElement) el.remove();
     },
@@ -187,7 +187,7 @@ export const button = (
      * Sets the click handler, overwriting existing.
      * @param handler 
      */
-    onClick(handler?: () => void) {
+    onClick(handler?: () => void): void {
       removeEvent();
       onClickHandler = handler;
       addEvent();
@@ -195,7 +195,7 @@ export const button = (
     /**
      * Trigger onClick handler
      */
-    click() {
+    click(): void {
       if (onClickHandler) onClickHandler();
     },
     /**
@@ -223,7 +223,39 @@ export const button = (
  * @param onClick 
  * @returns 
  */
-export const buttonCreate = (title: string, onClick?: () => void) => {
+export const buttonCreate = (title: string, onClick?: () => void): {
+  /**
+   * Gets text content of button
+   */
+  get title(): string | null;
+  /**
+   * Sets text content of button
+   */
+  set title(value: string);
+  /**
+   * Disposes the button.
+   * Removes event handler and optionally removes from document
+   * @param deleteElement
+   */
+  dispose(deleteElement?: boolean): void;
+  /**
+   * Sets the click handler, overwriting existing.
+   * @param handler
+   */
+  onClick(handler?: () => void): void;
+  /**
+   * Trigger onClick handler
+   */
+  click(): void;
+  /**
+   * Sets disabled state of button
+   */
+  disabled: boolean;
+  /**
+   * Gets the button element
+   */
+  readonly el: HTMLButtonElement;
+} => {
   const el = document.createElement(`button`);
   const w = button(el, onClick);
   w.title = title;

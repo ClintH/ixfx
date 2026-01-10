@@ -35,7 +35,7 @@
 export const groupBy = <K, V>(
   array: Iterable<V>,
   grouper: (item: V) => K
-) => {
+): Map<K, V[]> => {
   const map = new Map<K, V[]>();
 
   for (const a of array) {

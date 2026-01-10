@@ -6,7 +6,7 @@ import { errorResult, numberTest, resultThrow, type Result } from '@ixfx/guards'
  * @param p
  * @returns
  */
-export const isNull = (p: Point) => {
+export const isNull = (p: Point): boolean => {
   if (isPoint3d(p)) {
     if (p.z !== null) return false;
   }
@@ -16,7 +16,7 @@ export const isNull = (p: Point) => {
 /***
  * Returns true if either x, y, z isNaN.
  */
-export const isNaN = (p: Point) => {
+export const isNaN = (p: Point): boolean => {
   if (isPoint3d(p)) {
     if (!Number.isNaN(p.z)) return false;
   }
@@ -70,7 +70,7 @@ export function test(p: Point, name = `Point`, extraInfo = ``): Result<Point, st
  * @param p
  * @param name
  */
-export function guard(p: Point, name = `Point`, info?: string) {
+export function guard(p: Point, name = `Point`, info?: string): void {
   resultThrow(test(p, name, info))
   // if (p === undefined) {
   //   throw new Error(
@@ -169,7 +169,7 @@ export const isPoint3d = (p: Point | unknown): p is Point3d => {
  * @param p
  * @returns
  */
-export const isEmpty = (p: Point) => {
+export const isEmpty = (p: Point): boolean => {
   if (isPoint3d(p)) {
     if (p.z !== 0) return false;
   }
@@ -185,7 +185,7 @@ export const isEmpty = (p: Point) => {
  * @param p
  * @returns
  */
-export const isPlaceholder = (p: Point) => {
+export const isPlaceholder = (p: Point): boolean => {
   if (isPoint3d(p)) {
     if (!Number.isNaN(p.z)) return false;
   }

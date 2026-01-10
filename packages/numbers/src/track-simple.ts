@@ -8,7 +8,7 @@
  *  max: MIN_SAFE_INTEGER
  * @returns 
  */
-export const trackSimple = () => {
+export const trackSimple = (): { seen: (v: number) => void; reset: () => void; rangeToString: (digits?: number) => string; readonly avg: number; readonly min: number; readonly max: number; readonly total: number; readonly count: number; } => {
   let count = 0;
   let min = Number.MAX_SAFE_INTEGER;
   let max = Number.MIN_SAFE_INTEGER;

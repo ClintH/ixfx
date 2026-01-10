@@ -31,5 +31,5 @@ export const line = (bend = 0, warp = 0) => {
   );
 
   const inter = Beziers.interpolator(bzr);
-  return (value: number) => inter(value);
+  return (value: number): Points.Point => inter(value);
 }

@@ -11,19 +11,19 @@ export type FrequencyEventMap = {
  */
 export class GatedFrequencyTracker<T> {
   readonly ft: FrequencyTracker<T>;
-  readonly sources = new Set<string>();
+  readonly sources: Set<string> = new Set<string>();
 
   constructor(keyString?: ToString<T>) {
     this.ft = new FrequencyTracker<T>(keyString);
   }
 
-  add(value: T, source: string) {
+  add(value: T, source: string): void {
     if (this.sources.has(source)) return;
     this.sources.add(source);
     this.ft.add(value);
   }
 
-  clear() {
+  clear(): void {
     this.ft.clear();
     this.sources.clear();
   }
@@ -92,7 +92,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   /**
    * Clear data. Fires `change` event
    */
-  clear() {
+  clear(): void {
     this.#store.clear();
     this.#cachedResults = undefined;
     this.fireEvent(`change`, { context: this });
@@ -166,7 +166,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * Returns copy of entries as an array
    * @returns Copy of entries as an array
    */
-  *entries() {
+  *entries(): Generator<[ string, number ], void, unknown> {
     //return [ ...this.#store.entries() ];
     yield* this.#store.entries();
   }
@@ -175,7 +175,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * Yields key-value pairs, passing through the filter predicate
    * @param predicate 
    */
-  *filterByTally(predicate: (tally: number) => boolean) {
+  *filterByTally(predicate: (tally: number) => boolean): Generator<[ string, number ], void, unknown> {
     for (const kv of this.#store.entries()) {
       if (predicate(kv[ 1 ])) {
         yield kv;
@@ -194,7 +194,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
   * ```
   * @param predicate 
   */
-  *filterByRelativeTally(predicate: (tally: number) => boolean) {
+  *filterByRelativeTally(predicate: (tally: number) => boolean): Generator<[ string, number ], void, unknown> {
     const total = this.computeValues().total;
     for (const kv of this.#store.entries()) {
       if (predicate(kv[ 1 ] / total)) {
@@ -207,7 +207,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * Calculate min,max,avg,total & count from values
    * @returns Returns `{min,max,avg,total}`
    */
-  computeValues() {
+  computeValues(): NumbersComputeResult {
     if (!this.#cachedResults) {
       const valuesAsNumbers = [ ...this.values() ];
       this.#cachedResults = numberArrayCompute(valuesAsNumbers);
@@ -222,7 +222,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    */
   entriesSorted(
     sortStyle: KeyValueSortSyles = `value`
-  ) {
+  ): KeyValue[] {
     const s = keyValueSorter(sortStyle);
     return s([ ...this.entries() ]);
   }
@@ -231,7 +231,7 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
    * Add one or more values, firing _change_ event.
    * @param values Values to add. Fires _change_ event after adding item(s)
    */
-  add(...values: V[]) {
+  add(...values: V[]): void {
     if (typeof values === `undefined`) throw new Error(`Param 'values' undefined`);
     this.#cachedResults = undefined;
 
@@ -247,5 +247,5 @@ export class FrequencyTracker<V> extends SimpleEventEmitter<FrequencyEventMap> {
 }
 
 
-export const frequency = <V>(keyString?: ToString<V>) =>
+export const frequency = <V>(keyString?: ToString<V>): FrequencyTracker<V> =>
   new FrequencyTracker<V>(keyString);

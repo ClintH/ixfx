@@ -3,7 +3,7 @@ import { type DriverOptions, type DriverResult, type DriverRunner, type DriverSt
 import { defaultComparer } from '@ixfx/core';
 import { randomElement } from '@ixfx/arrays';
 import * as Debug from '@ixfx/debug';
-import { init as machineInit, reset as machineReset, next as machineNext, to as machineTo } from './state-machine.js';
+import { init as machineInit, reset as machineReset, next as machineNext, to as machineTo } from './state-machine-fns.js';
 
 
 

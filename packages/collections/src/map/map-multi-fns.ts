@@ -104,7 +104,7 @@ export const firstEntryByValue = <K, V>(
  * @param map 
  * @returns 
  */
-export const cloneShallow = <K, V>(map: IWithEntries<K, Iterable<V>>) => {
+export const cloneShallow = <K, V>(map: IWithEntries<K, Iterable<V>>): Map<K, V[]> => {
   const entries = [ ...map.entries() ];
   const copied: [ K, V[] ][] = entries.map((entry) => [ entry[ 0 ], [ ...entry[ 1 ] ] ])
 
@@ -122,7 +122,7 @@ export const cloneShallow = <K, V>(map: IWithEntries<K, Iterable<V>>) => {
 export const equals = <K, V>(
   a: IWithEntries<K, Iterable<V>>,
   b: IWithEntries<K, Iterable<V>>,
-  comparerOrKey: IsEqual<V> | ((v: V) => string) = isEqualDefault<V>) => {
+  comparerOrKey: IsEqual<V> | ((v: V) => string) = isEqualDefault<V>): boolean => {
   const aa = [ ...a.entries() ]
   const bb = [ ...b.entries() ]
   if (aa.length !== bb.length) return false;

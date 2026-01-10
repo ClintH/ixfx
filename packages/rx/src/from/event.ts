@@ -22,7 +22,7 @@ import { elapsedInterval } from "@ixfx/core/elapsed";
  * @param initialValue Initial data
  * @param options Options for source
  */
-export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, initialValue: TFieldValue, options: Partial<EventSourceOptions & FieldOptions<any, TFieldValue>> = {}) {
+export function eventField<TFieldValue = string>(targetOrQuery: EventTarget | string | null, eventName: string, fieldName: string, initialValue: TFieldValue, options: Partial<EventSourceOptions & FieldOptions<any, TFieldValue>> = {}): Reactive<TFieldValue> {
 
   const initial: Record<string, any> = {};
   initial[ fieldName ] = initialValue;

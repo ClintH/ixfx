@@ -33,7 +33,7 @@ export type DifferenceKind = `numerical` | `relative` | `relativeSigned` | `abso
  * @param {number} initial Value to compare against
  * @returns Difference from initial value
  */
-export const differenceFromFixed = (initial: number, kind: DifferenceKind = `absolute`) => (value: number) => differenceFrom(kind, value, initial);
+export const differenceFromFixed = (initial: number, kind: DifferenceKind = `absolute`) => (value: number): number => differenceFrom(kind, value, initial);
 
 
 /**
@@ -85,7 +85,7 @@ export const differenceFromFixed = (initial: number, kind: DifferenceKind = `abs
  * @param initialValue Optional initial value 
  * @returns 
  */
-export const differenceFromLast = (kind: DifferenceKind = `absolute`, initialValue = Number.NaN): (v: number) => number => {
+export const differenceFromLast = (kind: DifferenceKind = `absolute`, initialValue: number = Number.NaN): (v: number) => number => {
   let lastValue = initialValue;
   return (value: number) => {
     const x = differenceFrom(kind, value, lastValue);

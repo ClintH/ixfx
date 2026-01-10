@@ -18,7 +18,7 @@ import { interquartileRange } from "./iqr.js";
  * @param iqr Interquartile range of data
  * @returns 
  */
-export const compute = (median: number, iqr: number) => (value: number) => (value - median) / iqr;
+export const compute = (median: number, iqr: number) => (value: number): number => (value - median) / iqr;
 
 /**
  * Returns the an array of normalised values, along with the mean and standard deviation of `array`.
@@ -29,7 +29,12 @@ export const compute = (median: number, iqr: number) => (value: number) => (valu
  * @param array 
  * @returns 
  */
-export const arrayWithContext = (array: readonly number[] | number[], options: Partial<RobustArrayOptions> = {}) => {
+export const arrayWithContext = (array: readonly number[] | number[], options: Partial<RobustArrayOptions> = {}): {
+  median: number;
+  iqr: number;
+  values: number[];
+  original: number[];
+} => {
   if (!Array.isArray(array)) throw new TypeError(`Param 'array' is expected to be an array. Got: ${ typeof array }`);
   const m = options.medianForced ?? median(array);
   const iqr = options.iqrForced ?? interquartileRange(array);
@@ -51,5 +56,5 @@ export const arrayWithContext = (array: readonly number[] | number[], options: P
  * @param options 
  * @returns 
  */
-export const array = (values: readonly number[] | number[], options: Partial<RobustArrayOptions> = {}) => arrayWithContext(values, options).values;
+export const array = (values: readonly number[] | number[], options: Partial<RobustArrayOptions> = {}): number[] => arrayWithContext(values, options).values;
 

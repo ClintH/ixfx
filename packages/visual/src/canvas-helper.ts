@@ -1,12 +1,13 @@
 import { ElementSizer, resolveEl, type ElementResizeLogic, type ElementSizerOptions } from '@ixfx/dom';
 import { SimpleEventEmitter } from '@ixfx/events';
-import type { ScaleBy, ScalerCombined } from '@ixfx/geometry';
+import type { ArcPositioned, CirclePositioned, CubicBezier, Grid, GridCellAccessor, GridCellSetter, Line, Path, Point, PolarRay, QuadraticBezier, ScaleBy, Scaler, ScalerCombined } from '@ixfx/geometry';
 import type { Rect, RectPositioned } from '@ixfx/geometry/rect';
 import { Rects, scaler } from '@ixfx/geometry';
 import * as Drawing from './drawing.js';
 import * as ImageDataGrid from './image-data-grid.js';
 import { cloneFromFields } from '@ixfx/core/records';
 import type { DrawingHelper } from './types.js';
+import { Rgb8Bit, Rgb } from './colour/types.js';
 
 export type CanvasEvents = {
   /**
@@ -182,7 +183,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
       ...this.#logicalSize
     }
   }
-  dispose(reason?: string) {
+  dispose(reason?: string): void {
     if (this.#disposed) return;
     this.#disposed = true;
     if (this.#resizer) {
@@ -209,7 +210,10 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * This accounts for scaling due to high-DPI displays etc.
    * @returns 
    */
-  getPhysicalSize() {
+  getPhysicalSize(): {
+    width: number;
+    height: number;
+  } {
     return {
       width: this.width * this.ratio,
       height: this.height * this.ratio
@@ -220,7 +224,13 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * Creates a drawing helper for the canvas.
    * If one is already created it is reused.
    */
-  getDrawHelper() {
+  getDrawHelper(): {
+    ctx: CanvasRenderingContext2D; paths(pathsToDraw: Path[] | readonly Path[], opts?: Drawing.DrawingOpts): void; polarRay(rayToDraw: PolarRay | PolarRay[] | readonly PolarRay[], opts?: Drawing.DrawingOpts): void; line(lineToDraw: Line | Line[] | readonly Line[], opts?: Drawing.DrawingOpts): void; rect(rectsToDraw: Rects.Rect | Rects.Rect[] | Rects.RectPositioned | Rects.RectPositioned[], opts?: Drawing.RectOpts): void; bezier(bezierToDraw: QuadraticBezier | CubicBezier, opts?: Drawing.DrawingOpts): void; connectedPoints(pointsToDraw: Point[] | readonly Point[], opts?: Drawing.DrawingOpts & Partial<Drawing.ConnectedPointsOptions>): void; pointLabels(pointsToDraw: Point[], opts?: Drawing.DrawingOpts): void; dot(dotPosition: Point | Point[], opts?: Drawing.DotOpts): void; circle(circlesToDraw: CirclePositioned | CirclePositioned[], opts: Drawing.DrawingOpts): void; arc(arcsToDraw: ArcPositioned | ArcPositioned[], opts: Drawing.DrawingOpts): void; textBlock(lines: string[], opts: Drawing.DrawingOpts & {
+      anchor: Point;
+      anchorPadding?: number;
+      bounds?: Rects.RectPositioned;
+    }): void;
+  } {
     if (!this.#drawHelper) {
       this.#drawHelper = Drawing.makeHelper(this.#getContext(), {
         width: this.width, height: this.height
@@ -229,7 +239,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
     return this.#drawHelper;
   }
 
-  setLogicalSize(logicalSize: Rect) {
+  setLogicalSize(logicalSize: Rect): void {
     Rects.guard(logicalSize, `logicalSize`);
     const logicalSizeInteger = Rects.applyFields(v => Math.floor(v), logicalSize);
     const ratio = this.opts.pixelZoom;
@@ -361,7 +371,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * Shortcut for:
    * `ctx.clearRect(0, 0, this.width, this.height)`
    */
-  clear() {
+  clear(): void {
     if (!this.#ctx) return;
     this.#ctx.clearRect(0, 0, this.width, this.height);
 
@@ -377,7 +387,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * ```
    * @param colour Colour
    */
-  fill(colour?: string) {
+  fill(colour?: string): void {
     if (!this.#ctx) return;
     if (colour) this.#ctx.fillStyle = colour;
     this.#ctx.fillRect(0, 0, this.width, this.height);
@@ -386,12 +396,12 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
   /**
    * Gets the drawing context
    */
-  get ctx() {
+  get ctx(): CanvasRenderingContext2D {
     if (this.#ctx === undefined) throw new Error(`Context not available`);
     return this.#getContext();
   }
 
-  get viewport() {
+  get viewport(): RectPositioned {
     return this.#viewport;
   }
 
@@ -399,7 +409,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * Gets the logical width of the canvas
    * See also: {@link height}, {@link size}
    */
-  get width() {
+  get width(): number {
     return this.#logicalSize.width;
   }
 
@@ -407,7 +417,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * Gets the logical height of the canvas
    * See also: {@link width}, {@link size}
    */
-  get height() {
+  get height(): number {
     return this.#logicalSize.height;
   }
 
@@ -415,7 +425,7 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * Gets the logical size of the canvas
    * See also: {@link width}, {@link height}
    */
-  get size() {
+  get size(): Rect {
     return this.#logicalSize;
   }
 
@@ -423,27 +433,27 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * Gets the current scaling ratio being used
    * to compensate for high-DPI display
    */
-  get ratio() {
+  get ratio(): number {
     return window.devicePixelRatio || 1;
   }
 
   /**
    * Returns the width or height, whichever is smallest
    */
-  get dimensionMin() {
+  get dimensionMin(): number {
     return Math.min(this.width, this.height);
   }
 
   /**
    * Returns the width or height, whichever is largest
    */
-  get dimensionMax() {
+  get dimensionMax(): number {
     return Math.max(this.width, this.height);
   }
 
 
 
-  drawBounds(strokeStyle = `green`) {
+  drawBounds(strokeStyle = `green`): void {
     const ctx = this.#getContext();
     Drawing.rect(ctx,
       { x: 0, y: 0, width: this.width, height: this.height },
@@ -464,25 +474,28 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * toRelative({ x: 400, y: 300 }); // { x: 0.5, y: 0.5 }
    * ```
    */
-  get toRelative() {
+  get toRelative(): Scaler {
     return this.#scaler.rel;
   }
 
   /**
    * Returns a scaler for points based on width & height
    */
-  get toAbsoluteFixed() {
+  get toAbsoluteFixed(): Scaler {
     return this.#scalerSize.abs
   }
 
   /**
    * Returns a scaler for points based on width & height
    */
-  get toRelativeFixed() {
+  get toRelativeFixed(): Scaler {
     return this.#scalerSize.rel;
   }
 
-  get logicalCenter() {
+  get logicalCenter(): {
+    x: number;
+    y: number;
+  } {
     return {
       x: this.#logicalSize.width / 2,
       y: this.#logicalSize.height / 2
@@ -501,14 +514,17 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
  * toAbsolute({ x: 0.5, y: 0.5 });  // { x: 400, y: 300}
  * ```
  */
-  get toAbsolute() {
+  get toAbsolute(): Scaler {
     return this.#scaler.abs;
   }
 
   /**
    * Gets the center coordinate of the canvas
    */
-  get center() {
+  get center(): {
+    x: number;
+    y: number;
+  } {
     return { x: this.width / 2, y: this.height / 2 }
   }
 
@@ -546,14 +562,19 @@ export class CanvasHelper extends SimpleEventEmitter<CanvasEvents> {
    * mean a higher number of rows and columns compared to the logical size.
    * @returns
    */
-  getWritableBuffer() {
+  getWritableBuffer(): {
+    grid: Grid;
+    get: GridCellAccessor<Rgb8Bit>;
+    set: GridCellSetter<Rgb>;
+    flip: () => void;
+  } {
     const ctx = this.ctx;
     const data = this.getImageData();
     const grid = ImageDataGrid.grid(data);
     const get = ImageDataGrid.accessor(data);
     const set = ImageDataGrid.setter(data);
 
-    const flip = () => {
+    const flip = (): void => {
       ctx.putImageData(data, 0, 0);
     }
 

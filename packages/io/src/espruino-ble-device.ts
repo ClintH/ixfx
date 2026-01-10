@@ -72,7 +72,7 @@ export class EspruinoBleDevice extends NordicBleDevice {
    * @param code Code to send. A new line is added automatically.
    */
   // eslint-disable-next-line @typescript-eslint/require-await
-  async writeScript(code: string) {
+  async writeScript(code: string): Promise<void> {
     this.write(`\u0003\u0010reset();\n`);
     this.write(`\u0010${ code }\n`);
   }

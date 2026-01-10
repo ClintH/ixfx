@@ -63,7 +63,7 @@ export class Control extends SimpleEventEmitter<ControlEvents> {
   inputChannel = 1;
   inputCommand?: MidiCommands = `cc`;
   inputNote = -1;
-  inputVelocityScale = [ 0, 127 ]
+  inputVelocityScale = [ 0, 127 ] as const
 
   feedbackChannel = 1;
   feedbackCommand?: MidiCommands = `cc`;
@@ -94,7 +94,7 @@ export class Control extends SimpleEventEmitter<ControlEvents> {
     return scale(v, this.inputVelocityScale[ 0 ], this.inputVelocityScale[ 1 ]);
   }
 
-  get scaledVelocity() {
+  get scaledVelocity(): number {
     if (this.lastMessage) {
       return this.#scaleVelocity(this.lastMessage.velocity);
     }

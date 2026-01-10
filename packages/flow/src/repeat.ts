@@ -176,7 +176,7 @@ export async function* repeat<T extends BasicType>(
 export function* repeatSync<T extends BasicType>(
   produce: ResolveToValueSync<T> | ArrayLike<T>,
   opts: RepeatOpts
-) {
+): Generator<T, void, unknown> {
   const signal = opts.signal ?? undefined;
   const count = opts.count ?? undefined;
   const allowUndefined = opts.allowUndefined ?? false;

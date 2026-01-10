@@ -33,7 +33,7 @@ export type VisitorTypes = `row` | `column` | `neighbours` | `breadth` | `depth`
  * @param opts 
  * @returns 
  */
-export const create = (type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}) => {
+export const create = (type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}): (grid: Grid, optionsOverride?: Partial<GridVisitorOpts>) => Generator<GridCell> => {
   switch (type) {
     case `random-contiguous`:
       return withLogic(randomContiguousLogic(), opts);
@@ -55,7 +55,7 @@ export const create = (type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}) 
 }
 
 export const withLogic = (logic: GridNeighbourSelectionLogic, options: Partial<GridVisitorOpts> = {}) => {
-  return (grid: Grid, optionsOverride: Partial<GridVisitorOpts> = {}) => {
+  return (grid: Grid, optionsOverride: Partial<GridVisitorOpts> = {}): Generator<GridCell> => {
     return visitByNeighbours(logic, grid, { ...options, ...optionsOverride });
   }
 }

@@ -22,7 +22,7 @@ import { piPi } from "../pi.js";
  * @param start 
  * @returns 
  */
-export const toLine = (c: Coord, start: Point) => {
+export const toLine = (c: Coord, start: Point): Line => {
   const b = toCartesian(c, start);
   return { a: start, b }
 }
@@ -184,7 +184,7 @@ export const toString = (p: Coord, digits?: number): string => {
   return `(${ d },${ a })`;
 };
 
-export const toPoint = (v: Coord, origin = EmptyPoint): Point => {
+export const toPoint = (v: Coord, origin: Point = EmptyPoint): Point => {
   guard(v, `v`);
   return Object.freeze({
     x: origin.x + v.distance * Math.cos(v.angleRadian),

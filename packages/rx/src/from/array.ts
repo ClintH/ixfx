@@ -5,7 +5,9 @@ import { initLazyStream } from "../init-stream.js";
 import type { Reactive, ReactiveFinite, ReactiveInitial } from "../types.js";
 import type { ArrayOptions } from "./types.js";
 
-export const of = <V>(source: V[] | Iterable<V>, options: Partial<ArrayOptions> = {}) => {
+export const of = <V>(source: V[] | Iterable<V>, options: Partial<ArrayOptions> = {}): (Reactive<V> & ReactiveFinite & {
+  last(): V;
+}) | undefined => {
   if (Array.isArray(source)) {
     return array(source, options);
   } else {}

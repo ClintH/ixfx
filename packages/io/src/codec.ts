@@ -2,15 +2,15 @@
  * Handles utf-8 text encoding/decoding
  */
 export class Codec {
-  enc = new TextEncoder();
-  dec = new TextDecoder(`utf-8`);
+  enc: TextEncoder = new TextEncoder();
+  dec: TextDecoder = new TextDecoder(`utf-8`);
 
   /**
    * Convert string to Uint8Array buffer
    * @param text
    * @returns
    */
-  toBuffer(text: string) {
+  toBuffer(text: string): Uint8Array<ArrayBuffer> {
     return this.enc.encode(text);
   }
 
@@ -19,7 +19,7 @@ export class Codec {
    * @param buffer
    * @returns
    */
-  fromBuffer(buffer: AllowSharedBufferSource) {
+  fromBuffer(buffer: AllowSharedBufferSource): string {
     return this.dec.decode(buffer);
   }
 }

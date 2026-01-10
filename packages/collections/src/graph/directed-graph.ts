@@ -207,7 +207,16 @@ export const distance = (graph: DirectedGraph, edge: Edge): number => {
  * Iterate over all the edges in the graph
  * @param graph 
  */
-export function* edges(graph: DirectedGraph) {
+export function* edges(graph: DirectedGraph): Generator<Readonly<{
+  /**
+   * Vertex id edge connects to (ie. destination)
+   */
+  id: string
+  /**
+   * Optional weight of edge
+   */
+  weight?: number
+}>, void, unknown> {
   resultThrow(graphTest(graph));
 
   const vertices = [ ...graph.vertices.values() ];
@@ -222,7 +231,10 @@ export function* edges(graph: DirectedGraph) {
  * Iterate over all the vertices of the graph
  * @param graph 
  */
-export function* vertices(graph: DirectedGraph) {
+export function* vertices(graph: DirectedGraph): Generator<Readonly<{
+  out: readonly Edge[]
+  id: string
+}>, void, unknown> {
   resultThrow(graphTest(graph));
 
   const vertices = [ ...graph.vertices.values() ];
@@ -256,7 +268,10 @@ function graphTest(g: DirectedGraph, parameterName = `graph`): Result<DirectedGr
  * @param context id or Vertex.
  * @returns 
  */
-export function* adjacentVertices(graph: DirectedGraph, context: Vertex | string | undefined) {
+export function* adjacentVertices(graph: DirectedGraph, context: Vertex | string | undefined): Generator<Readonly<{
+  out: readonly Edge[]
+  id: string
+}>, void, unknown> {
   resultThrow(graphTest(graph));
   if (context === undefined) return;
   const vertex = typeof context === `string` ? graph.vertices.get(context) : context;
@@ -545,7 +560,7 @@ const debugDumpVertex = (v: Vertex): string[] => {
  * @param b 
  * @returns 
  */
-export function areAdjacent(graph: DirectedGraph, a: Vertex, b: Vertex) {
+export function areAdjacent(graph: DirectedGraph, a: Vertex, b: Vertex): true | undefined {
   resultThrow(graphTest(graph));
 
   if (hasOut(graph, a, b.id)) return true;
@@ -576,7 +591,10 @@ function resolveVertex(graph: DirectedGraph, idOrVertex: string | Vertex): Verte
  * @param targetIdOrVertex 
  * @returns 
  */
-export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, targetIdOrVertex?: string | Vertex) {
+export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, targetIdOrVertex?: string | Vertex): Generator<Readonly<{
+  out: readonly Edge[]
+  id: string
+}>, void, unknown> {
   resultThrow(graphTest(graph));
 
   const start = resolveVertex(graph, startIdOrVertex);
@@ -603,7 +621,10 @@ export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, tar
  * @param graph 
  * @param startIdOrVertex 
  */
-export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex) {
+export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex): Generator<Readonly<{
+  out: readonly Edge[]
+  id: string
+}>, void, unknown> {
   resultThrow(graphTest(graph));
 
   const source = resolveVertex(graph, startIdOrVertex);
@@ -633,7 +654,14 @@ export function* dfs(graph: DirectedGraph, startIdOrVertex: string | Vertex) {
  * @param sourceOrId 
  * @returns 
  */
-export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string) => {
+export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string): {
+  distances: Map<string, number>
+  previous: Map<string, Readonly<{
+    out: readonly Edge[]
+    id: string
+  }> | null>
+  pathTo: (id: string) => Edge[]
+} => {
   resultThrow(graphTest(graph));
 
   const source = typeof sourceOrId === `string` ? graph.vertices.get(sourceOrId) : sourceOrId;
@@ -877,7 +905,9 @@ export function getCycles(graph: DirectedGraph): Vertex[][] {
  * @param graph 
  * @returns 
  */
-export function transitiveReduction(graph: DirectedGraph) {
+export function transitiveReduction(graph: DirectedGraph): Readonly<{
+  vertices: IMapImmutable<string, Vertex>
+}> {
   resultThrow(graphTest(graph));
 
   for (const u of vertices(graph)) {

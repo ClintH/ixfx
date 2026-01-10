@@ -21,7 +21,7 @@ import { arrayTest, resultThrow } from '@ixfx/guards';
 export const sortByNumericProperty = <V, K extends keyof V>(
   data: readonly V[] | V[],
   propertyName: K
-) => [ ...data ].sort((a, b) => {
+): V[] => [ ...data ].sort((a, b) => {
   resultThrow(arrayTest(data, `data`));
   const av = a[ propertyName ];
   const bv = b[ propertyName ];
@@ -59,7 +59,7 @@ export const sortByProperty = <V, K extends keyof V>(
   data: readonly V[] | V[],
   propertyName: K,
   comparer?: (a: any, b: any) => number
-) => [ ...data ].sort((a, b) => {
+): V[] => [ ...data ].sort((a, b) => {
   resultThrow(arrayTest(data, `data`));
 
   const av = a[ propertyName ];

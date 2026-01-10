@@ -8,7 +8,7 @@ import { median } from "./average.js";
  * @param n 
  * @returns 
  */
-export const interquartileRange = (data: number[], n?: number) => {
+export const interquartileRange = (data: number[], n?: number): number => {
   const q3 = getQuantile(data, 0.75);
   const q1 = getQuantile(data, 0.25);
   return q3 - q1;
@@ -56,7 +56,7 @@ export const interquartileRange = (data: number[], n?: number) => {
  * @param multiplier Multiplier of Q3 Q1. Default: 1.5 
  * @returns 
  */
-export const computeIsOutlier = (data: number[], multiplier = 1.5) => {
+export const computeIsOutlier = (data: number[], multiplier = 1.5): (value: number) => boolean => {
   //https://stackoverflow.com/questions/20811131/javascript-remove-outlier-from-an-array
   if (data.length < 4) return (value: number) => false //data;
 

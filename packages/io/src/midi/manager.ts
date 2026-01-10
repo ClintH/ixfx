@@ -61,27 +61,27 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     this.#throwIfNotSupported();
   }
 
-  *getInUse() {
+  *getInUse(): Generator<MIDIPort, void, unknown> {
     for (const p of this.#inUse) yield p;
   }
 
-  *getInUseInput() {
+  *getInUseInput(): Generator<MIDIInput, void, unknown> {
     for (const p of this.#inUse) {
       if (p.type === `input`) yield p as MIDIInput;
     }
   }
 
-  *getInUseOutput() {
+  *getInUseOutput(): Generator<MIDIOutput, void, unknown> {
     for (const p of this.#inUse) {
       if (p.type === `output`) yield p as MIDIOutput;
     }
   }
 
-  *known() {
+  *known(): Generator<MIDIPort, void, unknown> {
     for (const p of this.#known) yield p;
   }
 
-  *knownInput() {
+  *knownInput(): Generator<MIDIInput, void, unknown> {
     for (const p of this.#known) {
       if (p.type === `input`) {
         yield p as MIDIInput;
@@ -89,7 +89,7 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     }
   }
 
-  *knownOutput() {
+  *knownOutput(): Generator<MIDIOutput, void, unknown> {
     for (const p of this.#known) {
       if (p.type === `output`) {
         yield p as MIDIOutput;
@@ -97,17 +97,17 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     }
   }
 
-  async scan() {
+  async scan(): Promise<void> {
     await this.#init();
     const a = this.#access;
     if (!a) return;
 
-    for (const [ _name, port ] of a.inputs) {
+    a.inputs.forEach(port => {
       this.#updatePort(port);
-    }
-    for (const [ _name, port ] of a.outputs) {
+    })
+    a.outputs.forEach(port => {
       this.#updatePort(port);
-    }
+    })
     if (this.#omniInput) this.#connectAllInputsDebounced();
     if (this.#omniOutput) this.#connectAllOutputsDebounced();
   }
@@ -120,7 +120,7 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
    * @param port 
    * @param timestamp 
    */
-  send(message: MidiMessage, port?: MIDIOutput, timestamp?: DOMHighResTimeStamp) {
+  send(message: MidiMessage, port?: MIDIOutput, timestamp?: DOMHighResTimeStamp): void {
     const packed = MidiFns.pack(message);
     if (typeof port === `undefined`) {
       // Send to all
@@ -135,7 +135,7 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
   }
 
 
-  sendNote(channel: number, note: number, velocity: number, duration: number, delay?: DOMHighResTimeStamp, port?: MIDIOutput) {
+  sendNote(channel: number, note: number, velocity: number, duration: number, delay?: DOMHighResTimeStamp, port?: MIDIOutput): void {
     if (port === undefined) {
       for (const port of this.getInUseOutput()) {
         this.sendNote(channel, note, velocity, duration, delay, port);
@@ -235,7 +235,7 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     return this.#inUse.find(p => p.id === port.id) !== undefined;
   }
 
-  async closeAll(what: `input` | `output` | `both` = `both`) {
+  async closeAll(what: `input` | `output` | `both` = `both`): Promise<void> {
     for (const p of this.#inUse) {
       if (p.type == `input` && (what === `both` || what === `input`)) {
         await p.close();
@@ -247,7 +247,7 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     }
   }
 
-  async setOmniInput(value: boolean) {
+  async setOmniInput(value: boolean): Promise<void> {
     this.#omniInput = value;
     await this.closeAll(`input`);
     if (value) {
@@ -255,11 +255,11 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     }
   }
 
-  get omniInput() {
+  get omniInput(): boolean {
     return this.#omniInput;
   }
 
-  async setOmniOutput(value: boolean) {
+  async setOmniOutput(value: boolean): Promise<void> {
     this.#omniOutput = value;
 
     await this.closeAll(`output`);
@@ -268,33 +268,34 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
     }
   }
 
-  get omniOutput() {
+  get omniOutput(): boolean {
     return this.#omniOutput;
   }
   async #connectAllInputs() {
     const a = this.#access;
     if (!a) return;
-    for (const [ _name, input ] of a.inputs) {
+    a.inputs.forEach(async (input) => {
       if (input.connection === `closed`) {
         if (this.#isPortInUse(input)) throw new Error(`Bug: Input closed, but inUse?`);
         await input.open();
       }
-    }
+    })
   }
 
   async #connectAllOutputs() {
     const a = this.#access;
     if (!a) return;
-    for (const [ _name, output ] of a.outputs) {
+    a.outputs.forEach(async (output) => {
       if (output.connection === `closed`) {
         if (this.#isPortInUse(output)) throw new Error(`Bug: Output closed, but inUse?`);
         await output.open();
       }
-    }
+    })
+
   }
 
 
-  dumpToStringLines() {
+  dumpToStringLines(): string[] {
     const returnValue: string[] = [];
     const portToString = (p: MIDIPort) => ` -  ${ p.name } (${ p.type }) state: ${ p.state } conn: ${ p.connection } id: ${ p.id }`
     returnValue.push(`MidiManager`);
@@ -341,7 +342,7 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
    * @param port 
    * @param exclusive 
    */
-  async open(port: MIDIPort, exclusive = false) {
+  async open(port: MIDIPort, exclusive = false): Promise<void> {
     if (exclusive) {
       if (port.type === `input`) {
         await this.closeAll(`input`);
@@ -398,13 +399,13 @@ export class MidiManager extends SimpleEventEmitter<MidiManagerEvents> {
   findKnownPort(fn: (p: MIDIPort) => boolean): MIDIPort | undefined {
     return this.#known.find(fn);
   }
-  *filterKnownPort(fn: (p: MIDIPort) => boolean) {
+  *filterKnownPort(fn: (p: MIDIPort) => boolean): Generator<MIDIPort, void, unknown> {
     yield* this.#known.filter(fn);
   }
   findInUsePort(fn: (p: MIDIPort) => boolean): MIDIPort | undefined {
     return this.#inUse.find(fn);
   }
-  *filterInUsePort(fn: (p: MIDIPort) => boolean) {
+  *filterInUsePort(fn: (p: MIDIPort) => boolean): Generator<MIDIPort, void, unknown> {
     yield* this.#inUse.filter(fn);
   }
 }

@@ -18,7 +18,7 @@ import type { Point } from "./point-type.js";
  * @param angle
  * @returns
  */
-export const project = (origin: Point, distance: number, angle: number) => {
+export const project = (origin: Point, distance: number, angle: number): Point => {
   const x = Math.cos(angle) * distance + origin.x;
   const y = Math.sin(angle) * distance + origin.y;
   return { x, y };

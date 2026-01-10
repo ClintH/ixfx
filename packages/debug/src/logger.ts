@@ -90,7 +90,11 @@ export const logger =
 * @param colourKey If specified, log messages will be coloured by this key instead of prefix (default)
 * @returns
 */
-export const logSet = (prefix: string, verbose = true, colourKey?: string) => {
+export const logSet = (prefix: string, verbose = true, colourKey?: string): {
+  log: MessageLogger;
+  warn: MessageLogger;
+  error: MessageLogger;
+} => {
   if (verbose) {
     return {
       log: logger(prefix, `log`, colourKey),
@@ -161,7 +165,7 @@ export const resolveLogOption = (
 
 
 let logColourCount = 0;
-export const logColours = getOrGenerateSync(new Map<string, string>(), () => {
+export const logColours: (key: string, args?: unknown) => string = getOrGenerateSync(new Map<string, string>(), () => {
   const hue = ++logColourCount * 137.508; // use golden angle approximation
   return `hsl(${ hue },50%,75%)`;
 });

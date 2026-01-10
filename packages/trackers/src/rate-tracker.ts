@@ -76,7 +76,7 @@ export class RateTracker {
   /**
    * Mark that an event has happened
    */
-  mark() {
+  mark(): void {
     if (this.#events.length >= this.#resetAfterSamples) {
       this.reset();
     } else if (this.#events.length >= this.#sampleLimit) {
@@ -93,7 +93,11 @@ export class RateTracker {
    * Compute {min,max,avg} for the interval _between_ events.
    * @returns 
    */
-  computeIntervals() {
+  computeIntervals(): {
+    min: number;
+    max: number;
+    avg: number;
+  } {
     const intervals: number[] = [];
     let min = Number.MAX_SAFE_INTEGER;
     let max = Number.MIN_SAFE_INTEGER;
@@ -122,14 +126,14 @@ export class RateTracker {
    * the data set. Eg, a result of 1000 means there's data that
    * covers a one second period.
    */
-  get elapsed() {
+  get elapsed(): number {
     return performance.now() - this.#fromTime;
   }
 
   /**
    * Resets the tracker.
    */
-  reset() {
+  reset(): void {
     this.#events = [];
     this.#fromTime = performance.now();
   }
@@ -137,14 +141,14 @@ export class RateTracker {
   /**
    * Get the number of events per second
    */
-  get perSecond() {
+  get perSecond(): number {
     return this.#events.length / (this.elapsed / 1000)
   }
 
   /**
    * Get the number of events per minute
    */
-  get perMinute() {
+  get perMinute(): number {
     return this.#events.length / (this.elapsed / 1000 / 60)
   }
 }
@@ -154,4 +158,4 @@ export class RateTracker {
  * @param opts 
  * @returns 
  */
-export const rate = (opts: Partial<RateTrackerOpts> = {}) => new RateTracker(opts);
+export const rate = (opts: Partial<RateTrackerOpts> = {}): RateTracker => new RateTracker(opts);

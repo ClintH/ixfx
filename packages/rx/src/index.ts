@@ -1,6 +1,6 @@
 
 
-import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable } from "./types.js";
+import type { Reactive, ReactiveOrSource, ReactiveWritable, ReactiveOp, InitStreamOptions, WithValueOptions, CombineLatestOptions, RxValueTypes, RxValueTypeObject, PipeSet, ReactivePingable, Unsubscriber, ReactiveStream } from "./types.js";
 import type { ChunkOptions, DebounceOptions, FieldOptions, SingleFromArrayOptions, SplitOptions, FilterPredicate, SwitcherOptions, SyncOptions, ThrottleOptions } from "./ops/types.js";
 import type { RankFunction, RankOptions } from "@ixfx/core";
 import type { TimeoutPingOptions, TimeoutValueOptions } from "./from/types.js";
@@ -26,7 +26,7 @@ export * from './resolve-source.js';
 export * from './cache.js';
 export * from './init-stream.js';
 
-export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: ReactiveOp<any, any>[]) {
+export function run<TIn, TOut>(source: ReactiveOrSource<any>, ...ops: ReactiveOp<any, any>[]): Reactive<any> {
   let s = resolveSource(source);
   for (const op of ops) {
     // @ts-ignore
@@ -74,7 +74,7 @@ export function manual<V>(options: Partial<InitStreamOptions> = {}): Reactive<V>
 }
 
 export const Sinks = {
-  setHtmlText: (options: SinkFns.SetHtmlOptions) => {
+  setHtmlText: (options: SinkFns.SetHtmlOptions): (source: ReactiveOrSource<string>) => void => {
     return (source: ReactiveOrSource<string>) => {
       SinkFns.setHtmlText(source, options);
     }
@@ -94,7 +94,15 @@ export const Ops = {
  * @param annotator 
  * @returns 
  */
-  annotate: <V, TAnnotation>(annotator: (input: V) => V & TAnnotation) => opify(OpFns.annotate, annotator),
+  annotate: <V, TAnnotation>(annotator: (input: V) => V & TAnnotation): (source: ReactiveOrSource<V>) => Reactive<{
+    value: V;
+    annotation: V & TAnnotation;
+  }> => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.annotate(source, annotator);
+    }
+  },
+  //annotate: <V, TAnnotation>(annotator: (input: V) => V & TAnnotation): (source: ReactiveOrSource<V>) => Reactive<{ value: V, annotation: TAnnotation }> => opify(OpFns.annotate, annotator),
   /**
    * Annotates the input stream using {@link ReactiveOp} as the source of annotations.
    * The output values will have the shape of `{ value: TIn, annotation: TAnnotation }`.
@@ -115,7 +123,15 @@ export const Ops = {
    * @param annotatorOp 
    * @returns 
    */
-  annotateWithOp: <TIn, TAnnotation>(annotatorOp: ReactiveOp<TIn, TAnnotation>) => opify(OpFns.annotateWithOp, annotatorOp),
+  annotateWithOp: <TIn, TAnnotation>(annotatorOp: ReactiveOp<TIn, TAnnotation>): (source: ReactiveOrSource<TIn>) => Reactive<{
+    value: TIn;
+    annotation: TAnnotation;
+  }> => {
+    return (source: ReactiveOrSource<TIn>) => {
+      return OpFns.annotateWithOp(source, annotatorOp);
+    }
+  },
+  //annotateWithOp: <TIn, TAnnotation>(annotatorOp: ReactiveOp<TIn, TAnnotation>) => opify(OpFns.annotateWithOp, annotatorOp),
   /**
    * Takes a stream of values and chunks them up (by quantity or time elapsed),
    * emitting them as an array.
@@ -138,7 +154,7 @@ export const Ops = {
  * @param options 
  * @returns 
  */
-  combineLatestToArray: <const T extends readonly ReactiveOrSource<any>[]>(options: Partial<CombineLatestOptions> = {}) => {
+  combineLatestToArray: <const T extends readonly ReactiveOrSource<any>[]>(options: Partial<CombineLatestOptions> = {}): (sources: T) => Reactive<RxValueTypes<T>> => {
     return (sources: T) => {
       return OpFns.combineLatestToArray(sources, options);
     }
@@ -148,7 +164,7 @@ export const Ops = {
    * @param options
    * @returns 
    */
-  combineLatestToObject: <const T extends Record<string, ReactiveOrSource<any>>>(options: Partial<CombineLatestOptions> = {}) => {
+  combineLatestToObject: <const T extends Record<string, ReactiveOrSource<any>>>(options: Partial<CombineLatestOptions> = {}): (reactiveSources: T) => OpFns.CombineLatestToObject<T> => {
     return (reactiveSources: T) => {
       return OpFns.combineLatestToObject(reactiveSources, options);
     }
@@ -175,12 +191,17 @@ export const Ops = {
    * @param predicate If it returns _true_ value is ignored
    * @returns 
    */
-  drop: <V>(predicate: (value: V) => boolean) => opify(OpFns.drop, predicate),
+  drop: <V>(predicate: ((value: V) => boolean), options: Partial<InitStreamOptions> = {}): (source: ReactiveOrSource<V>) => Reactive<V> => {
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.drop(source, predicate, options);
+    }
+    //opify(OpFns.drop, predicate),
+  },
   /**
-   * Every upstream value is considered the target for interpolation.
-   * Output value interpolates by a given amount toward the target.
-   * @returns 
-   */
+  * Every upstream value is considered the target for interpolation.
+  * Output value interpolates by a given amount toward the target.
+  * @returns 
+  */
   elapsed: <V>(): ReactiveOp<V, number> => opify(OpFns.elapsed),
   /**
    * Yields the value of a field from an input stream of values.
@@ -191,7 +212,7 @@ export const Ops = {
    * @param options 
    * @returns 
    */
-  field: <TSource extends object, TFieldType>(fieldName: keyof TSource, options: Partial<FieldOptions<TSource, TFieldType>> = {}) => {
+  field: <TSource extends object, TFieldType>(fieldName: keyof TSource, options: Partial<FieldOptions<TSource, TFieldType>> = {}): (source: ReactiveOrSource<TSource>) => Reactive<TFieldType> => {
     return (source: ReactiveOrSource<TSource>) => {
       return OpFns.field(source, fieldName, options);
     }
@@ -201,32 +222,41 @@ export const Ops = {
    * @param predicate If it returns _true_ value is allowed through
    * @returns 
    */
-  filter: <V>(predicate: (value: V) => boolean) => opify(OpFns.filter, predicate),
+  filter: <V>(predicate: ((value: V) => boolean), options: Partial<InitStreamOptions> = {}): (source: ReactiveOrSource<V>) => Reactive<V> => {//opify(OpFns.filter, predicate),
+    return (source: ReactiveOrSource<V>) => {
+      return OpFns.filter(source, predicate, options);
+    }
+  },
   /**
    * Every upstream value is considered the target for interpolation.
    * Output value interpolates by a given amount toward the target.
    * @param options 
    * @returns 
    */
-  interpolate: <TIn = number>(options?: Partial<OpFns.OpInterpolateOptions>) => opify<TIn, ReactivePingable<number>>(OpFns.interpolate as any, options),
+  interpolate: <TIn extends number>(options?: Partial<OpFns.OpInterpolateOptions>): (source: ReactiveOrSource<number>) => ReactivePingable<number> => {
+    return (source: ReactiveOrSource<number>): ReactivePingable<number> => {
+      return OpFns.interpolate(source, options);
+    }
+    //opify<TIn, ReactivePingable<number>>(OpFns.interpolate as any, options),
+  },
   /**
  * Outputs the minimum numerical value of the stream.
  * A value is only emitted when minimum decreases.
  * @returns 
  */
-  min: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.min, options),
+  min: <TIn = number>(options?: OpFns.OpMathOptions): (source: ReactiveOrSource<TIn>) => Reactive<number> => opify<TIn, Reactive<number>>(OpFns.min, options),
   /**
    * Outputs the maxium numerical value of the stream.
    * A value is only emitted when maximum increases.
    * @returns 
    */
-  max: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.max, options),
-  sum: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.sum, options),
-  average: <TIn = number>(options?: OpFns.OpMathOptions) => opify<TIn, Reactive<number>>(OpFns.average, options),
-  tally: <TIn>(options?: OpFns.TallyOptions) => opify<TIn, Reactive<number>>(OpFns.tally, options),
-  rank: <TIn>(rank: RankFunction<TIn>, options?: RankOptions & OpFns.OpMathOptions) => opify<TIn>(OpFns.rank, rank, options),
+  max: <TIn = number>(options?: OpFns.OpMathOptions): (source: ReactiveOrSource<TIn>) => Reactive<number> => opify<TIn, Reactive<number>>(OpFns.max, options),
+  sum: <TIn = number>(options?: OpFns.OpMathOptions): (source: ReactiveOrSource<TIn>) => Reactive<number> => opify<TIn, Reactive<number>>(OpFns.sum, options),
+  average: <TIn = number>(options?: OpFns.OpMathOptions): (source: ReactiveOrSource<TIn>) => Reactive<number> => opify<TIn, Reactive<number>>(OpFns.average, options),
+  tally: <TIn>(options?: OpFns.TallyOptions): (source: ReactiveOrSource<TIn>) => Reactive<number> => opify<TIn, Reactive<number>>(OpFns.tally, options),
+  rank: <TIn>(rank: RankFunction<TIn>, options?: RankOptions & OpFns.OpMathOptions): (source: ReactiveOrSource<TIn>) => Reactive<TIn> => opify<TIn>(OpFns.rank, rank, options),
 
-  pipe: <TInput, TOutput>(...streams: (Reactive<any> & ReactiveWritable<any>)[]) => {
+  pipe: <TInput, TOutput>(...streams: (Reactive<any> & ReactiveWritable<any>)[]): (source: ReactiveOrSource<TInput>) => Reactive<unknown> => {
     return (source: ReactiveOrSource<TInput>) => {
       const resolved = resolveSource(source);
       const s = [ resolved, ...streams ] as PipeSet<TInput, TOutput>;
@@ -234,33 +264,33 @@ export const Ops = {
     }
   },
 
-  singleFromArray: <V>(options: Partial<SingleFromArrayOptions<V>> = {}) => {
+  singleFromArray: <V>(options: Partial<SingleFromArrayOptions<V>> = {}): (source: ReactiveOrSource<V[]>) => Reactive<V> => {
     return (source: ReactiveOrSource<V[]>) => {
       return OpFns.singleFromArray(source, options)
     }
   },
 
-  split: <V>(options: Partial<SplitOptions> = {}) => {
+  split: <V>(options: Partial<SplitOptions> = {}): (source: ReactiveOrSource<V>) => ReactiveStream<V>[] => {
     return (source: ReactiveOrSource<V>) => {
       return OpFns.split(source, options);
     }
   },
-  splitLabelled: <V>(labels: string[]) => {
+  splitLabelled: <V>(labels: string[]): (source: ReactiveOrSource<V>) => Record<string, Reactive<V>> => {
     return (source: ReactiveOrSource<V>) => {
       return OpFns.splitLabelled(source, labels);
     }
   },
-  switcher: <TValue, TRec extends Record<string, FilterPredicate<TValue>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}) => {
+  switcher: <TValue, TRec extends Record<string, FilterPredicate<TValue>>, TLabel extends keyof TRec>(cases: TRec, options: Partial<SwitcherOptions> = {}): (source: ReactiveOrSource<TValue>) => Record<TLabel, Reactive<TValue>> => {
     return (source: ReactiveOrSource<TValue>): Record<TLabel, Reactive<TValue>> => {
       return OpFns.switcher(source, cases, options);
     }
   },
-  syncToArray: <const T extends readonly ReactiveOrSource<any>[]>(options: Partial<SyncOptions> = {}) => {
+  syncToArray: <const T extends readonly ReactiveOrSource<any>[]>(options: Partial<SyncOptions> = {}): (reactiveSources: T) => Reactive<RxValueTypes<T>> => {
     return (reactiveSources: T): Reactive<RxValueTypes<T>> => {
       return OpFns.syncToArray(reactiveSources, options);
     }
   },
-  syncToObject: <const T extends Record<string, ReactiveOrSource<any>>>(options: Partial<SyncOptions> = {}) => {
+  syncToObject: <const T extends Record<string, ReactiveOrSource<any>>>(options: Partial<SyncOptions> = {}): (reactiveSources: T) => Reactive<RxValueTypeObject<T>> => {
     return (reactiveSources: T): Reactive<RxValueTypeObject<T>> => {
       return OpFns.syncToObject(reactiveSources, options);
     }
@@ -275,7 +305,7 @@ export const Ops = {
       return OpFns.tapStream(source, divergedStream);
     }
   },
-  tapOps: <In, Out>(...ops: ReactiveOp<In, Out>[]) => {
+  tapOps: <In, Out>(...ops: ReactiveOp<In, Out>[]): (source: ReactiveOrSource<In>) => Reactive<Out> => {
     return (source: ReactiveOrSource<In>) => {
       return OpFns.tapOps(source, ...ops);
     }
@@ -287,20 +317,20 @@ export const Ops = {
  * @param options 
  * @returns 
  */
-  throttle: <V>(options: Partial<ThrottleOptions>) => opify<V>(OpFns.throttle, options),
+  throttle: <V>(options: Partial<ThrottleOptions>): (source: ReactiveOrSource<V>) => Reactive<V> => opify<V>(OpFns.throttle, options),
   /**
    * Trigger a value if 'source' does not emit a value within an interval.
    * Trigger value can be a fixed value, result of function, or step through an iterator.
    * @param options 
    * @returns 
    */
-  timeoutValue: <V, TTriggerValue>(options: TimeoutValueOptions<TTriggerValue>) => {
+  timeoutValue: <V, TTriggerValue>(options: TimeoutValueOptions<TTriggerValue>): (source: ReactiveOrSource<V>) => Reactive<V | TTriggerValue> => {
     return (source: ReactiveOrSource<V>) => {
       return OpFns.timeoutValue<V, TTriggerValue>(source, options);
     }
   },
 
-  timeoutPing: <V>(options: TimeoutPingOptions) => {
+  timeoutPing: <V>(options: TimeoutPingOptions): (source: ReactiveOrSource<V>) => Reactive<V> => {
     return (source: ReactiveOrSource<V>) => {
       return OpFns.timeoutPing(source, options);
     }
@@ -433,7 +463,7 @@ export async function takeNextValue<V>(source: ReactiveOrSource<V>, maximumWait:
  * @param b 
  * @param transform 
  */
-export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform?: (valueA: TA) => TB, closeBonA = false) => {
+export const to = <TA, TB>(a: Reactive<TA>, b: ReactiveWritable<TB>, transform?: (valueA: TA) => TB, closeBonA = false): Unsubscriber => {
   const unsub = a.on(message => {
     if (messageHasValue(message)) {
       const value = transform ? transform(message.value) : message.value as TB;

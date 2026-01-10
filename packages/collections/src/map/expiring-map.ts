@@ -164,7 +164,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     }
   }
 
-  dispose() {
+  dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
     if (this.autoDeleteTimer) {
@@ -175,7 +175,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
   /**
    * Returns the number of keys being stored.
    */
-  get keyLength() {
+  get keyLength(): number {
     return this.store.size;// keyCount;
   }
 
@@ -269,7 +269,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    * Clears the contents of the map.
    * Note: does not fire `removed` event
    */
-  clear() {
+  clear(): void {
     this.store.clear();
   }
 
@@ -367,7 +367,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    * @param value
    * @returns
    */
-  set(key: K, value: V) {
+  set(key: K, value: V): void {
     const existing = this.store.get(key);
 
     if (existing) {

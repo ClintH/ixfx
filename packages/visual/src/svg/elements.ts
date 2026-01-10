@@ -61,7 +61,7 @@ export const path = (
 export const pathUpdate = (
   elem: SVGPathElement,
   opts?: PathDrawingOpts
-) => {
+): SVGPathElement => {
   if (opts) applyOpts(elem, opts);
   if (opts) applyStrokeOpts(elem, opts);
   return elem;
@@ -78,7 +78,7 @@ export const circleUpdate = (
   elem: SVGCircleElement,
   circle: CirclePositioned,
   opts?: CircleDrawingOpts
-) => {
+): SVGCircleElement => {
   elem.setAttributeNS(null, `cx`, circle.x.toString());
   elem.setAttributeNS(null, `cy`, circle.y.toString());
   elem.setAttributeNS(null, `r`, circle.radius.toString());
@@ -133,7 +133,7 @@ export const group = (
 export const groupUpdate = (
   elem: SVGGElement,
   children: readonly SVGElement[]
-) => {
+): SVGGElement => {
   for (const c of children) {
     if (c.parentNode !== elem) {
       elem.append(c);
@@ -177,7 +177,7 @@ export const lineUpdate = (
   lineEl: SVGLineElement,
   line: Line,
   opts?: LineDrawingOpts
-) => {
+): SVGLineElement => {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, line.a.y.toString());
   lineEl.setAttributeNS(null, `x2`, line.b.x.toString());
@@ -188,7 +188,7 @@ export const lineUpdate = (
   return lineEl;
 };
 
-export const polarRayUpdate = (lineEl: SVGLineElement, ray: Polar.PolarRay, opts?: LineDrawingOpts) => {
+export const polarRayUpdate = (lineEl: SVGLineElement, ray: Polar.PolarRay, opts?: LineDrawingOpts): SVGLineElement => {
   const l = Polar.Ray.toCartesian(ray);
   lineEl.setAttributeNS(null, `x1`, l.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, l.a.y.toString());
@@ -211,7 +211,7 @@ export const textPathUpdate = (
   el: SVGTextPathElement,
   text?: string,
   opts?: TextPathDrawingOpts
-) => {
+): SVGTextPathElement => {
   if (opts?.method) el.setAttributeNS(null, `method`, opts.method);
   if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
   if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
@@ -278,7 +278,7 @@ export const textUpdate = (
   pos?: Point,
   text?: string,
   opts?: TextDrawingOpts
-) => {
+): SVGTextElement => {
   if (pos) {
     el.setAttributeNS(null, `x`, pos.x.toString());
     el.setAttributeNS(null, `y`, pos.y.toString());
@@ -347,7 +347,7 @@ export const grid = (
   width: number,
   height: number,
   opts: LineDrawingOpts = {}
-) => {
+): SVGGElement => {
   if (!opts.strokeStyle) {
     opts = { ...opts, strokeStyle: ColourStringFirst(`bg-dim`, `silver`) };
   }

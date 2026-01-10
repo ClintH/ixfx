@@ -12,7 +12,7 @@ const startTimeoutMs = 10_000;
  * ```
  * @param filterKind Defaults `videoinput`
  */
-export const dumpDevices = async (filterKind = `videoinput`) => {
+export const dumpDevices = async (filterKind = `videoinput`): Promise<void> => {
   const devices = await navigator.mediaDevices.enumerateDevices();
 
   for (const d of devices) {

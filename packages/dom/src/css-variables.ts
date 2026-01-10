@@ -114,7 +114,7 @@ export const parseCssVariablesAsAttributes = (options: (string | string[])[]): (
  * @param context Context element which is needed for relative querying. Otherwise use document.body
  * @param options Details of what to do
  */
-export const setFromCssVariables = (context: HTMLElement | string, ...options: CssVariableOption[]) => {
+export const setFromCssVariables = (context: HTMLElement | string, ...options: CssVariableOption[]): void => {
   const contextEl = resolveEl(context);
   const style = window.getComputedStyle(contextEl);
 
@@ -248,7 +248,7 @@ export function getCssVariable(cssVariable: string, fallbackValue: string): stri
  * @param stylesOrEl 
  */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-export function setCssVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement) {
+export function setCssVariables<T extends Record<string, string | number>>(variables: T, stylesOrEl?: CSSStyleDeclaration | HTMLElement): void {
   const styles = stylesOrEl === undefined ? document.body.style :
     isHtmlElement(stylesOrEl) ? stylesOrEl.style : stylesOrEl;
 

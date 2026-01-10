@@ -44,9 +44,9 @@ export async function* combineLatestToObject<const T extends Record<string, GenO
   }
 
 
-  const isDone = () => !MapFns.some(states, v => !v.done);
+  const isDone = () => !MapFns.some(states, (v: { done: boolean; }) => !v.done);
 
-  const isWaiting = () => MapFns.some(states, v => v.waiting !== undefined);
+  const isWaiting = () => MapFns.some(states, (v: { waiting: any; }) => v.waiting !== undefined);
   const allEmpty = (d: object) => {
     for (const v of Object.values(d)) {
       if (v !== undefined) return false;

@@ -51,7 +51,7 @@ export const weight = (
  * @param data
  * @returns
  */
-export const validNumbers = (data: readonly number[]) =>
+export const validNumbers = (data: readonly number[]): number[] =>
   data.filter((d) => typeof d === `number` && !Number.isNaN(d));
 
 /**

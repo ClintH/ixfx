@@ -13,7 +13,7 @@
  * @param propertyName 
  * @returns 
  */
-export function* enumerateNumericalValues(records: Record<string, unknown>[], propertyName: string) {
+export function* enumerateNumericalValues(records: Record<string, unknown>[], propertyName: string): Generator<number, void, unknown> {
   for (const rec of records) {
     const fieldValue = rec[ propertyName ];
     if (typeof fieldValue !== `number`) {

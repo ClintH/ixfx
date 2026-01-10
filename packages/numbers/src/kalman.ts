@@ -67,7 +67,7 @@ export class Kalman1dFilter {
   * @param  {Number} u Control
   * @return {Number}
   */
-  filter(z: number, u = 0) {
+  filter(z: number, u = 0): number {
 
     if (isNaN(this.x)) {
       this.x = (1 / this.C) * z;
@@ -95,7 +95,7 @@ export class Kalman1dFilter {
   * @param  {Number} [u] Control
   * @return {Number}
   */
-  predict(u = 0) {
+  predict(u = 0): number {
     return (this.A * this.x) + (this.B * u);
   }
 
@@ -103,7 +103,7 @@ export class Kalman1dFilter {
   * Return uncertainty of filter
   * @return {Number}
   */
-  uncertainty() {
+  uncertainty(): number {
     return ((this.A * this.cov) * this.A) + this.R;
   }
 
@@ -111,7 +111,7 @@ export class Kalman1dFilter {
   * Return the last filtered measurement
   * @return {Number}
   */
-  lastMeasurement() {
+  lastMeasurement(): number {
     return this.x;
   }
 
@@ -119,7 +119,7 @@ export class Kalman1dFilter {
   * Set measurement noise Q
   * @param {Number} noise
   */
-  setMeasurementNoise(noise: number) {
+  setMeasurementNoise(noise: number): void {
     this.Q = noise;
   }
 
@@ -127,7 +127,7 @@ export class Kalman1dFilter {
   * Set the process noise R
   * @param {Number} noise
   */
-  setProcessNoise(noise: number) {
+  setProcessNoise(noise: number): void {
     this.R = noise;
   }
 }
@@ -144,7 +144,7 @@ export class Kalman1dFilter {
  * @param options 
  * @returns 
  */
-export const kalman1dFilter = (options: Partial<Kalman1dFilterOptions> = {}) => {
+export const kalman1dFilter = (options: Partial<Kalman1dFilterOptions> = {}): (z: number, u?: number) => number => {
   const f = new Kalman1dFilter(options);
   return f.filter.bind(f);
 }

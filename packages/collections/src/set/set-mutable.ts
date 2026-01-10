@@ -2,7 +2,7 @@
 import { defaultKeyer, type ToString } from '@ixfx/core';
 import { SimpleEventEmitter } from '@ixfx/events';//'../../Events.js';
 import { type ISetMutable } from './ISetMutable.js';
-import { type ValueSetEventMap } from './Types.js';
+import { type ValueSetEventMap } from './types.js';
 
 /**
  * Creates a {@link ISetMutable}.
@@ -20,8 +20,7 @@ export class SetStringMutable<V>
   extends SimpleEventEmitter<ValueSetEventMap<V>>
   implements ISetMutable<V> {
   // ✔ UNIT TESTED
-  /* eslint-disable functional/prefer-readonly-type */
-  store = new Map<string, V>();
+  store: Map<string, V> = new Map<string, V>();
   keyString: ToString<V>;
 
   /**
@@ -36,7 +35,7 @@ export class SetStringMutable<V>
   /**
    * Number of items stored in set
    */
-  get size() {
+  get size(): number {
     return this.store.size;
   }
 
@@ -60,15 +59,14 @@ export class SetStringMutable<V>
    * Returns values from set as an iterable
    * @returns
    */
-  //eslint-disable-next-line functional/prefer-tacit
-  values() {
+  values(): MapIterator<V> {
     return this.store.values();
   }
 
   /**
    * Clear items from set
    */
-  clear() {
+  clear(): void {
     this.store.clear();
     super.fireEvent(`clear`, true);
   }

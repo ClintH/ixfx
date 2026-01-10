@@ -6,7 +6,7 @@ import type { NumberGuardRange, Result } from "./types.js";
  * @param x
  * @returns True if `x` is a power of two
  */
-export const isPowerOfTwo = (x: number) => Math.log2(x) % 1 === 0;
+export const isPowerOfTwo = (x: number): boolean => Math.log2(x) % 1 === 0;
 
 
 /**

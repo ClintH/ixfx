@@ -6,6 +6,6 @@
  * @param slowDownFactor 
  * @returns 
  */
-export const weightedAverage = (currentValue: number, targetValue: number, slowDownFactor: number) => {
+export const weightedAverage = (currentValue: number, targetValue: number, slowDownFactor: number): number => {
   return ((currentValue * (slowDownFactor - 1)) + targetValue) / slowDownFactor
 }

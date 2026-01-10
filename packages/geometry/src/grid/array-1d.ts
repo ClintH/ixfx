@@ -84,7 +84,7 @@ export const set = <V>(
   cols: number
 ) => {
   const grid = gridFromArrayDimensions(array, cols);
-  return (value: V, cell: GridCell, wrap: GridBoundsLogic) => setWithGrid(grid, array, value, cell, wrap);
+  return (value: V, cell: GridCell, wrap: GridBoundsLogic): V[] => setWithGrid(grid, array, value, cell, wrap);
 }
 
 const setWithGrid = <V>(

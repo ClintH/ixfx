@@ -125,7 +125,7 @@ export const isEqualValuePartial = (a: Record<string, unknown>, b: Record<string
  * @param value 
  * @returns 
  */
-export const isEmptyEntries = (value: object) => [ ...Object.entries(value) ].length === 0;
+export const isEmptyEntries = (value: object): boolean => [ ...Object.entries(value) ].length === 0;
 
 /**
  * Return _true_ if `a` and `b` ought to be considered equal

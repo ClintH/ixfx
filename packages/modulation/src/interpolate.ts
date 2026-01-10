@@ -1,7 +1,7 @@
 import { clamp, wrap, type BasicInterpolateOptions } from "@ixfx/numbers";
 import { ofTotal } from "@ixfx/flow";
 import { numberTest, resultThrow } from '@ixfx/guards';
-import { get as getEasing, type EasingName } from './easing/index.js';
+import { get as getEasing, type EasingName } from './easing.js';
 import type { Interval } from "@ixfx/core";
 import { piPi } from "./util/pi-pi.js";
 
@@ -233,7 +233,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
  */
 export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<InterpolateOptions>) => {
   let amount = startInterpolationAt;
-  return (retargetB?: number, retargetA?: number) => {
+  return (retargetB?: number, retargetA?: number): number => {
     if (retargetB !== undefined) b = retargetB;
     if (retargetA !== undefined) a = retargetA;
     if (amount >= 1) return b;
@@ -297,7 +297,7 @@ export const interpolateAngle = (
  */
 export const interpolatorInterval = (duration: Interval, a = 0, b = 1, options?: Partial<InterpolateOptions>) => {
   const durationProgression = ofTotal(duration, { clampValue: true });
-  return (retargetB?: number, retargetA?: number) => {
+  return (retargetB?: number, retargetA?: number): number => {
     const amount = durationProgression();
     if (retargetB !== undefined) b = retargetB;
     if (retargetA !== undefined) a = retargetA;

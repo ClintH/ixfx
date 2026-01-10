@@ -93,7 +93,7 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
     }
   }
 
-  getParent() {
+  getParent(): QuadTreeNode | undefined {
     return this.#parent;
   }
 
@@ -110,11 +110,11 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
    * Array of QuadTreeItem
    * @returns
    */
-  getValue() {
+  getValue(): QuadTreeItem[] {
     return this.#items;
   }
 
-  getIdentity() {
+  getIdentity(): this {
     return this;
   }
   /**
@@ -164,7 +164,7 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
    * @param p
    * @returns
    */
-  couldHold(p: Point) {
+  couldHold(p: Point): boolean {
     return RectsIntersectsPoint(this.boundary, p);
   }
 

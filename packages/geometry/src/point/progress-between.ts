@@ -16,7 +16,7 @@ export const progressBetween = (
   position: Point | Point3d,
   waypointA: Point | Point3d,
   waypointB: Point | Point3d
-) => {
+): number => {
   // Via: https://www.habrador.com/tutorials/math/2-passed-waypoint/?s=09
   // from -> current
   const a = subtract(position, waypointA);

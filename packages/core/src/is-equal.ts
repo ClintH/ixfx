@@ -13,7 +13,7 @@ export type IsEqual<T> = (a: T, b: T) => boolean;
  * @param itemToMakeStringFor 
  * @returns 
  */
-export const toStringOrdered = (itemToMakeStringFor: unknown) => {
+export const toStringOrdered = (itemToMakeStringFor: unknown): string => {
   if (typeof itemToMakeStringFor === `string`) return itemToMakeStringFor;
   const allKeys = new Set<string>();
 
@@ -125,7 +125,7 @@ export const isEqualValueIgnoreOrder = <T>(a: T, b: T): boolean => {
  * @param value 
  * @returns 
  */
-export const isEmptyEntries = (value: object) => [ ...Object.entries(value) ].length === 0;
+export const isEmptyEntries = (value: object): boolean => [ ...Object.entries(value) ].length === 0;
 
 /**
  * Return _true_ if `a` and `b` ought to be considered equal

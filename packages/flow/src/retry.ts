@@ -87,7 +87,7 @@ export type BackoffOptions = {
  * @param options 
  * @returns 
  */
-export function* backoffGenerator(options: Partial<BackoffOptions> = {}) {
+export function* backoffGenerator(options: Partial<BackoffOptions> = {}): Generator<number, void, unknown> {
   const startAt = options.startAt ?? 1;
   let limitAttempts = options.limitAttempts ?? Number.MAX_SAFE_INTEGER;
   const limitValue = options.limitValue;
@@ -184,7 +184,7 @@ export type RetryTask<T> = {
  * @param options Options
  * @returns
  */
-export const retryFunction = <T>(callback: () => Promise<T | undefined>, options: Partial<RetryOpts<T>> = {}) => {
+export const retryFunction = <T>(callback: () => Promise<T | undefined>, options: Partial<RetryOpts<T>> = {}): Promise<RetryResult<T>> => {
   const task: RetryTask<T> = {
     async probe() {
       try {

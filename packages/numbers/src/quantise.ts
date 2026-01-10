@@ -26,7 +26,7 @@ export const quantiseEvery = (
   v: number,
   every: number,
   middleRoundsUp = true
-) => {
+): number => {
 
   const everyString = every.toString();
   const decimal = everyString.indexOf(`.`);

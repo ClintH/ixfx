@@ -1,8 +1,42 @@
 packages:
   - packages/**
-ignoredBuiltDependencies:
-  - esbuild
-onlyBuiltDependencies:
-  - '@swc/core'
-  - core-js
-  - rolldown
+
+defines:
+  - &eslint ^9.39.2
+  - &vitest 4.0.16
+  - &vite 7.3.1
+  - &oxc ^0.92.0
+
+overrides:
+  oxc-parser: 'catalog:'
+  oxc-minify: 'catalog:'
+  oxc-transform: 'catalog:'
+ 
+catalog:
+  '@eslint/js': *eslint
+  '@rspack/core': ^1.5.7
+  '@types/node': ^25.0.5
+  '@vitest/coverage-v8': *vitest
+  '@arethetypeswrong/cli': 0.18.2
+  'eslint-plugin-unicorn': 62.0.0
+  bumpp: ^10.2.3
+  change-case: ^5.4.4
+  esbuild: ^0.25.10
+  eslint: ^9.36.0
+  monoman: ^0.8.0
+  pkg-types: ^2.3.0
+  publint: ^0.3.13
+  tsdown: 0.19.0
+  tsx: ^4.20.5
+  rimraf: 6.1.2
+  typescript-eslint: 8.52.0
+  typescript: ^5.9.2
+  unplugin-macros: ^0.18.2
+  unplugin-unused: ^0.5.3
+  unplugin: ^2.3.10
+  vite: *vite
+  vitest: *vitest
+  oxc-minify: *oxc
+  oxc-parser: *oxc
+  oxc-resolver: ^11.8.3
+  oxc-transform: *oxc

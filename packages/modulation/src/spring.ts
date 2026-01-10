@@ -39,7 +39,7 @@ import type { ModFunction, SpringOptions } from './types.js';
 export function* spring(
   opts: SpringOptions = {},
   timerOrFreq?: Flow.Timer | number
-) {
+): Generator<number, void, unknown> {
   if (timerOrFreq === undefined) timerOrFreq = Flow.elapsedMillisecondsAbsolute();
   else if (typeof timerOrFreq === `number`) {
     timerOrFreq = Flow.frequencyTimer(timerOrFreq);
@@ -107,7 +107,7 @@ export function* spring(
 export function springValue(opts: SpringOptions = {},
   timerOrFreq?: Flow.Timer | number) {
   const s = spring(opts, timerOrFreq);
-  return () => {
+  return (): number => {
     const v = s.next();
     if (v.done) return 1;
     return v.value;

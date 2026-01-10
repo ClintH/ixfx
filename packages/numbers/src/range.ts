@@ -1,5 +1,5 @@
 import { scaler } from "./scale.js";
-import type { NumericRange } from "./types.js";
+import type { NumberScaler, NumericRange } from "./types.js";
 
 
 /**
@@ -48,7 +48,7 @@ export function rangeMergeValue(value: number | undefined, previous: NumericRang
  * @param clamped Whether input values should be clamped if they exceed range. Default: true
  * @returns 
  */
-export function rangeScaler(range: NumericRange, outMax = 1, outMin = 0, easing?: (v: number) => number, clamped = true) {
+export function rangeScaler(range: NumericRange, outMax = 1, outMin = 0, easing?: (v: number) => number, clamped = true): NumberScaler {
   return scaler(range.min, range.max, outMin, outMax, easing, clamped)
 }
 
@@ -86,7 +86,7 @@ export const rangeInit = (): NumericRange => ({ min: Number.MAX_SAFE_INTEGER, ma
  * @param b 
  * @returns 
  */
-export const rangeIsEqual = (a: NumericRange | undefined, b: NumericRange | undefined) => {
+export const rangeIsEqual = (a: NumericRange | undefined, b: NumericRange | undefined): boolean => {
   if (typeof a === `undefined`) return false;
   if (typeof b === `undefined`) return false;
   return (a.max === b.max && a.min === b.min);
@@ -99,7 +99,7 @@ export const rangeIsEqual = (a: NumericRange | undefined, b: NumericRange | unde
  * @param b 
  * @returns 
  */
-export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | undefined) => {
+export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | undefined): boolean => {
   if (typeof a === `undefined`) return false
   if (typeof b === `undefined`) return false
   if (a.min >= b.min && a.max <= b.max) return true;
@@ -125,9 +125,20 @@ export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | und
  * @param initWith 
  * @returns 
  */
-export const rangeStream = (initWith: NumericRange = rangeInit()) => {
+export const rangeStream = (initWith: NumericRange = rangeInit()): {
+  seen: (v: any) => {
+    min: number;
+    max: number;
+  }; reset: () => void; readonly range: {
+    min: number;
+    max: number;
+  }; readonly min: number; readonly max: number;
+} => {
   let { min, max } = initWith;
-  const seen = (v: any) => {
+  const seen = (v: any): {
+    min: number;
+    max: number;
+  } => {
     if (typeof v === `number`) {
       if (!Number.isNaN(v) && Number.isFinite(v)) {
         min = Math.min(min, v);
@@ -136,20 +147,23 @@ export const rangeStream = (initWith: NumericRange = rangeInit()) => {
     }
     return { min, max }
   }
-  const reset = () => {
+  const reset = (): void => {
     min = Number.MAX_SAFE_INTEGER;
     max = Number.MIN_SAFE_INTEGER;
   }
 
   return {
     seen, reset,
-    get range() {
+    get range(): {
+      min: number;
+      max: number;
+    } {
       return { min, max }
     },
-    get min() {
+    get min(): number {
       return min;
     },
-    get max() {
+    get max(): number {
       return max;
     }
   }

@@ -22,7 +22,7 @@
  * @param max value (inclusive)
  * @returns Clamped value
  */
-export const clamp = (value: number, min = 0, max = 1) => {
+export const clamp = (value: number, min = 0, max = 1): number => {
   // ✔ UNIT TESTED
   if (Number.isNaN(value)) throw new Error(`Param 'value' is NaN`);
   if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
@@ -48,7 +48,7 @@ export const clamp = (value: number, min = 0, max = 1) => {
 export const clamper = (min = 0, max = 1) => {
   if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
   if (Number.isNaN(max)) throw new Error(`Param 'max' is NaN`);
-  return (v: number) => {
+  return (v: number): number => {
     if (v > max) return max;
     if (v < min) return min;
     return v;

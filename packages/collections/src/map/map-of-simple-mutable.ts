@@ -28,7 +28,7 @@ export class MapOfSimpleMutable<V>
   extends MapOfSimpleBase<V>
   implements IMapOfMutable<V> {
 
-  addKeyedValues(key: string, ...values: readonly V[]) {
+  addKeyedValues(key: string, ...values: readonly V[]): void {
     const existing = this.map.get(key);
     if (existing === undefined) {
       this.map.set(key, values);
@@ -43,7 +43,7 @@ export class MapOfSimpleMutable<V>
    * @param key 
    * @param values 
    */
-  setValues(key: string, values: readonly V[]) {
+  setValues(key: string, values: readonly V[]): void {
     this.map.set(key, values);
   }
 
@@ -52,7 +52,7 @@ export class MapOfSimpleMutable<V>
    * `groupBy` function assigned in the constructor options.
    * @param values Adds several values
    */
-  addValue(...values: readonly V[]) {
+  addValue(...values: readonly V[]): void {
     for (const v of values) {
       const key = this.groupBy(v);
       this.addKeyedValues(key, v);
@@ -110,7 +110,7 @@ export class MapOfSimpleMutable<V>
   /**
    * Clear contents
    */
-  clear() {
+  clear(): void {
     this.map.clear();
   }
 }

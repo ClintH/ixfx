@@ -1,7 +1,7 @@
 export class BasicQueueMutable<V> {
   #store: V[] = [];
 
-  enqueue(data: V) {
+  enqueue(data: V): void {
     this.#store.push(data);
   }
 
@@ -9,10 +9,10 @@ export class BasicQueueMutable<V> {
     return this.#store.shift();
   }
 
-  get data() {
+  get data(): V[] {
     return this.#store;
   }
-  get size() {
+  get size(): number {
     return this.#store.length;
   }
 }

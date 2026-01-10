@@ -101,7 +101,7 @@ export class FrameProcessor {
    * Hides or shows the raw source in the DOM
    * @param enabled Preview enabled
    */
-  showPreview(enabled: boolean) {
+  showPreview(enabled: boolean): void {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     let el: HTMLElement | undefined;
 
@@ -120,7 +120,7 @@ export class FrameProcessor {
    * Shows or hides the Canvas we're capturing to
    * @param enabled
    */
-  showCanvas(enabled: boolean) {
+  showCanvas(enabled: boolean): void {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     let el: HTMLElement | undefined;
 
@@ -153,7 +153,7 @@ export class FrameProcessor {
    *
    * @param constraints Override of constraints when requesting camera access
    */
-  async useCamera(constraints?: Camera.Constraints) {
+  async useCamera(constraints?: Camera.Constraints): Promise<void> {
     if (this._state === `disposed`) throw new Error(`Disposed`);
 
     this._source = `camera`;
@@ -163,7 +163,7 @@ export class FrameProcessor {
     await this.init();
   }
 
-  async useVideo(file: File) {
+  async useVideo(file: File): Promise<void> {
     if (this._state === `disposed`) throw new Error(`Disposed`);
     this._source = `video`;
     if (this._teardownNeeded) this.teardown();
@@ -209,7 +209,7 @@ export class FrameProcessor {
    * Once disposed, the frame processor cannot be used
    * @returns
    */
-  dispose() {
+  dispose(): void {
     if (this._state === `disposed`) return;
     this.teardown();
     this._state = `disposed`;

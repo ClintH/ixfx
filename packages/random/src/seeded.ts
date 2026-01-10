@@ -23,11 +23,11 @@
  * https://github.com/jawj/mtwist/
  * @param seed Seed value 0..4294967295. Default: random seed.
  */
-export function mersenneTwister(seed?: number | undefined) {
-  if (!seed) seed = Math.random() * 4294967295;
+export function mersenneTwister(seed?: number): { integer: (maxInclusive: number, minInclusive?: number) => number, float: () => number } {
+  if (typeof seed === `undefined`) seed = Math.random() * 4294967295;
 
   // Initialisation
-  let mt = new Array(624);
+  const mt = new Array(624);
   mt[ 0 ] = seed >>> 0;
   const n1 = 1812433253;
   for (let mti = 1; mti < 624; mti++) {
@@ -40,13 +40,13 @@ export function mersenneTwister(seed?: number | undefined) {
   const randomUint32 = () => {
     let y;
     if (mti >= 624) {
-      for (let i = 0; i < 227; i++) {
-        y = ((mt[ i ] & 0x80000000) | (mt[ i + 1 ] & 0x7fffffff)) >>> 0;
-        mt[ i ] = (mt[ i + 397 ] ^ (y >>> 1) ^ (y & 1 ? 0x9908b0df : 0)) >>> 0;
+      for (let index = 0; index < 227; index++) {
+        y = ((mt[ index ] & 0x80000000) | (mt[ index + 1 ] & 0x7fffffff)) >>> 0;
+        mt[ index ] = (mt[ index + 397 ] ^ (y >>> 1) ^ (y & 1 ? 0x9908b0df : 0)) >>> 0;
       }
-      for (let i = 227; i < 623; i++) {
-        y = ((mt[ i ] & 0x80000000) | (mt[ i + 1 ] & 0x7fffffff)) >>> 0;
-        mt[ i ] = (mt[ i - 227 ] ^ (y >>> 1) ^ (y & 1 ? 0x9908b0df : 0)) >>> 0;
+      for (let index = 227; index < 623; index++) {
+        y = ((mt[ index ] & 0x80000000) | (mt[ index + 1 ] & 0x7fffffff)) >>> 0;
+        mt[ index ] = (mt[ index - 227 ] ^ (y >>> 1) ^ (y & 1 ? 0x9908b0df : 0)) >>> 0;
       }
       y = ((mt[ 623 ] & 0x80000000) | (mt[ 0 ] & 0x7fffffff)) >>> 0;
       mt[ 623 ] = (mt[ 396 ] ^ (y >>> 1) ^ (y & 1 ? 0x9908b0df : 0)) >>> 0;
@@ -63,11 +63,11 @@ export function mersenneTwister(seed?: number | undefined) {
   const float = () => randomUint32() / 4294967296;// 2^32
 
   // Max is exclusive
-  const integer = (maxExclusive: number, minInclusive: number = 0) => {
+  const integer = (maxExclusive: number, minInclusive = 0) => {
     if (maxExclusive < 1) throw new Error("Upper bound must be greater than or equal to 1");
     if (maxExclusive > 4294967296) throw new Error("Upper bound must not be greater than 4294967296");
     if (maxExclusive === 1) return 0;
-    let range = maxExclusive - minInclusive;
+    const range = maxExclusive - minInclusive;
     const
       bitsNeeded = Math.ceil(Math.log2(range)),
       bitMask = (1 << bitsNeeded) - 1;

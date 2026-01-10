@@ -8,7 +8,7 @@ import { weight } from './numeric-arrays.js';
  * @param data 
  * @returns 
  */
-export const median = (data: number[] | readonly number[]) => {
+export const median = (data: number[] | readonly number[]): number => {
   // https://www.geeksforgeeks.org/dsa/mean-and-median-of-an-unsorted-array/
   if (!Array.isArray(data)) throw new TypeError(`Param 'data' is expected to be an array`);
   const n = data.length;
@@ -31,7 +31,7 @@ export const median = (data: number[] | readonly number[]) => {
  * @param array 
  * @returns 
  */
-export const mean = (array: number[] | readonly number[]) => array.reduce((accumulator, value) => accumulator + value, 0) / array.length;
+export const mean = (array: number[] | readonly number[]): number => array.reduce((accumulator, value) => accumulator + value, 0) / array.length;
 
 /**
  * Computes an average of an array with a set of weights applied.

@@ -1,94 +1,14 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"lib": [
-			"es2022",
-			"ESNext",
-			"DOM",
-			"DOM.Iterable",
-			"ESNext.AsyncIterable",
-			"ESNext.Iterator"
-		],
-		"module": "NodeNext",
-		"moduleResolution": "nodenext",
-		"skipLibCheck": true,
-		"allowSyntheticDefaultImports": true,
-		"verbatimModuleSyntax": true,
-		"isolatedModules": true,
-		"removeComments": false,
-		"declaration": true,
-		"declarationMap": true,
-		"allowJs": true,
-		"checkJs": false,
-		"incremental": false,
-		/* Linting */
-		"strict": true,
-		"noUnusedLocals": false,
-		"noImplicitAny": false,
-		"noUnusedParameters": false,
-		"noFallthroughCasesInSwitch": true
-	},
-	"files": [],
 	"references": [
 		{
-			"path": "packages/arrays"
+			"path": "./tsconfig.dts.json"
 		},
 		{
-			"path": "packages/collections"
+			"path": "./tsconfig.lib.json"
 		},
 		{
-			"path": "packages/bundle"
-		},
-		{
-			"path": "packages/core"
-		},
-		{
-			"path": "packages/debug"
-		},
-		{
-			"path": "packages/dom"
-		},
-		{
-			"path": "packages/events"
-		},
-		{
-			"path": "packages/flow"
-		},
-		{
-			"path": "packages/geometry"
-		},
-		{
-			"path": "packages/guards"
-		},
-		{
-			"path": "packages/iterables"
-		},
-		{
-			"path": "packages/io"
-		},
-		{
-			"path": "packages/modulation"
-		},
-		{
-			"path": "packages/numbers"
-		},
-		{
-			"path": "packages/process"
-		},
-		{
-			"path": "packages/random"
-		},
-		{
-			"path": "packages/rx"
-		},
-		{
-			"path": "packages/trackers"
-		},
-		{
-			"path": "packages/ui"
-		},
-		{
-			"path": "packages/visual"
+			"path": "./tsconfig.test.json"
 		}
-	]
+	],
+	"files": []
 }

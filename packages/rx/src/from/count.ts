@@ -2,6 +2,7 @@ import { intervalToMs } from "@ixfx/core";
 import { continuously } from "@ixfx/core";
 import type { CountOptions } from "./types.js";
 import { initLazyStream } from "../init-stream.js";
+import { ReactiveStream } from "../types.js";
 
 /**
  * Produces an incrementing value. By default starts at 0 and counts
@@ -40,7 +41,7 @@ import { initLazyStream } from "../init-stream.js";
  * ```
  * @param options 
  */
-export function count(options: Partial<CountOptions> = {}) {
+export function count(options: Partial<CountOptions> = {}): ReactiveStream<number> {
 
   const lazy = options.lazy ?? `initial`;
   const interval = intervalToMs(options.interval, 1000);

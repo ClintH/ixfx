@@ -20,7 +20,7 @@ import { CancelError } from "./cancel-error.js";
  * @param fn 
  * @returns 
  */
-export function ifNotUndefined<TIn, TOut>(fn: (value: Exclude<TIn, undefined>) => TOut) {
+export function ifNotUndefined<TIn, TOut>(fn: (value: Exclude<TIn, undefined>) => TOut): (value: TIn) => TIn | TOut {
   return (value: TIn) => {
     if (value === undefined) return value;
     const v = fn(value as Exclude<TIn, undefined>);
@@ -49,7 +49,7 @@ export function ifNotUndefined<TIn, TOut>(fn: (value: Exclude<TIn, undefined>) =
  * ```
  * @returns 
  */
-export function cancelIfUndefined<TIn>() {
+export function cancelIfUndefined<TIn>(): (value: TIn | undefined) => TIn {
   return (value: TIn | undefined) => {
     if (value === undefined) throw new CancelError(`cancel`);
     return value as TIn;
@@ -61,7 +61,7 @@ export function cancelIfUndefined<TIn>() {
  * @param fn 
  * @returns 
  */
-export function ifUndefined<TIn, TOut>(fn: () => TOut) {
+export function ifUndefined<TIn, TOut>(fn: () => TOut): (value: TIn) => TOut | (TIn & ({} | null)) {
   return (value: TIn) => {
     if (value === undefined) return fn();
     else return value;

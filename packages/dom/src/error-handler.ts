@@ -16,7 +16,10 @@ import { getErrorMessage } from "@ixfx/debug";
  * ```
  * @returns
  */
-export const defaultErrorHandler = () => {
+export const defaultErrorHandler = (): {
+  show: (ex: Error | string | Event) => void;
+  hide: () => void;
+} => {
   let enabled = true;
   const container = document.createElement(`div`);
   container.style.color = `black`;
@@ -63,12 +66,12 @@ export const defaultErrorHandler = () => {
   container.append(buttonStop);
   document.body.append(container);
 
-  const show = (ex: Error | string | Event) => {
+  const show = (ex: Error | string | Event): void => {
     container.style.display = `inline`;
     messageElement.innerHTML += (ex as any).stack ? `<pre>${ (ex as any).stack }</pre>` : `<p>${ getErrorMessage(ex) }</p>`;
   };
 
-  const hide = () => {
+  const hide = (): void => {
     container.style.display = `none`;
   };
 

@@ -1,3 +1,4 @@
+import { Reactive } from "@ixfx/rx";
 import { observable } from "@ixfx/rx/from/observable";
 
 /**
@@ -11,7 +12,7 @@ import { observable } from "@ixfx/rx/from/observable";
  * });
  * ```
  */
-export const cssClassChange = (target = document.documentElement) => {
+export const cssClassChange = (target: HTMLElement = document.documentElement): Reactive<MutationRecord[]> => {
   const m = observable<MutationRecord[]>(stream => {
     const ro = new MutationObserver((entries) => {
       stream.set(entries);

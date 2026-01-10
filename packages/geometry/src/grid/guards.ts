@@ -24,7 +24,7 @@ export const guardCell = (
   cell: GridCell,
   parameterName = `Param`,
   grid?: Grid
-) => {
+): void => {
   if (cell === undefined) {
     throw new Error(parameterName + ` is undefined. Expecting {x,y}`);
   }
@@ -50,7 +50,7 @@ export const guardCell = (
  * @param grid
  * @param parameterName
  */
-export const guardGrid = (grid: Grid, parameterName = `Param`) => {
+export const guardGrid = (grid: Grid, parameterName = `Param`): void => {
   if (grid === undefined) {
     throw new Error(`${ parameterName } is undefined. Expecting grid.`);
   }

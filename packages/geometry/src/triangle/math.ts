@@ -21,7 +21,7 @@ import type { Triangle } from "./triangle-type.js";
 export const apply = (
   t: Triangle,
   fn: (p: Point, label?: string) => Point
-) =>
+): Triangle =>
   Object.freeze<Triangle>({
     ...t,
     a: fn(t.a, `a`),

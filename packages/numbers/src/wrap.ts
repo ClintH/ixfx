@@ -44,7 +44,7 @@ import { numberTest, integerTest, resultThrow } from '@ixfx/guards';
  * @param max Integer maximum of range (default: 360). Exlusive
  * @returns
  */
-export const wrapInteger = (v: number, min = 0, max = 360) => {
+export const wrapInteger = (v: number, min = 0, max = 360): number => {
   resultThrow(
     integerTest(v, undefined, `v`),
     integerTest(min, undefined, `min`),
@@ -86,7 +86,7 @@ export const wrapInteger = (v: number, min = 0, max = 360) => {
  * @param max
  * @returns
  */
-export const wrap = (v: number, min = 0, max = 1) => {
+export const wrap = (v: number, min = 0, max = 1): number => {
   resultThrow(
     numberTest(v, ``, `min`),
     numberTest(min, ``, `min`),
@@ -138,7 +138,7 @@ export const wrapRange = (
   fn: (distance: number) => number,
   a: number,
   b: number
-) => {
+): number => {
   let r = 0;
   const distF = Math.abs(b - a);
   // When b is wrapped forwards

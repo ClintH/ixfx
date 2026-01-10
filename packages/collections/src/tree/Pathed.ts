@@ -50,17 +50,17 @@ export type PathOpts = Readonly<{
  * @param pathOpts 
  * @returns 
  */
-export const create = <T>(pathOpts: Partial<PathOpts> = {}) => {
+export const create = <T>(pathOpts: Partial<PathOpts> = {}): { getRoot: () => TreeNode<LabelledValue<T>> | undefined; add: (value: T, path: string) => void; prettyPrint: () => string; remove: (path: string) => boolean; getValue: (path: string) => T | undefined; getValues: (path: string) => T[]; hasPath: (path: string) => boolean; childrenLength: (path: string) => number; getNode: (path: string) => LabelledNode<T> | undefined; clearValues: (path: string) => boolean; } => {
   let root: TreeNode<LabelledValue<T>> | undefined;
 
-  const add = (value: T, path: string) => {
+  const add = (value: T, path: string): void => {
     const n = addValueByPath(value, path, root, pathOpts);
     if (root === undefined) {
       root = TreeArrayBacked.getRoot(n);
     }
   }
 
-  const prettyPrint = () => {
+  const prettyPrint = (): string => {
     if (root === undefined) return `(empty)`;
     return TreeArrayBacked.toStringDeep(root);
   }
@@ -99,7 +99,7 @@ export const create = <T>(pathOpts: Partial<PathOpts> = {}) => {
     return valuesByPath(path, root, pathOpts);
   }
 
-  const getRoot = () => {
+  const getRoot = (): TreeNode<LabelledValue<T>> | undefined => {
     return root;
   }
   const clearValues = (path: string): boolean => {

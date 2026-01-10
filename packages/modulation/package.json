@@ -13,44 +13,42 @@
 		"clean": "rm -rf dist && rm -rf bundle"
 	},
 	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/events": "workspace:^",
-		"@ixfx/geometry": "workspace:^",
-		"@ixfx/numbers": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/random": "workspace:^",
-		"@ixfx/flow": "workspace:^"
+		"@ixfx/core": "workspace:*",
+		"@ixfx/events": "workspace:*",
+		"@ixfx/geometry": "workspace:*",
+		"@ixfx/numbers": "workspace:*",
+		"@ixfx/guards": "workspace:*",
+		"@ixfx/random": "workspace:*",
+		"@ixfx/flow": "workspace:*"
 	},
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
-			"import": "./src/index.ts"
+			"dev": "./src/index.ts",
+			"default": "./dist/index.js"
 		},
 		"./easing": {
-			"types": "./src/easing/index.ts",
-			"import": "./src/easing/index.ts"
+			"dev": "./src/easing.ts",
+			"default": "./dist/easing.js"
 		},
 		"./envelope": {
-			"types": "./src/envelope/index.ts",
-			"import": "./src/envelope/index.ts"
-		}
+			"dev": "./src/envelope.ts",
+			"default": "./dist/envelope.js"
+		},
+		"./source": {
+			"dev": "./src/source.ts",
+			"default": "./dist/source.js"
+		},
+		"./package.json": "./package.json"
 	},
 	"publishConfig": {
 		"main": "dist/src/index.js",
 		"exports": {
-			".": {
-				"types": "./dist/src/index.d.ts",
-				"import": "./dist/src/index.js"
-			},
-			"./easing": {
-				"types": "./dist/src/easing/index.d.ts",
-				"import": "./dist/src/easing/index.js"
-			},
-			"./envelope": {
-				"types": "./dist/src/envelope/index.d.ts",
-				"import": "./dist/src/envelope/index.js"
-			}
+			".": "./dist/index.js",
+			"./easing": "./dist/easing.js",
+			"./envelope": "./dist/envelope.js",
+			"./source": "./dist/source.js",
+			"./package.json": "./package.json"
 		}
-	}
+	},
+	"types": "./dist/index.d.ts"
 }

@@ -87,10 +87,10 @@ export type RequestResponseMatchEvents<TRequest, TResp> = {
  * By default, error will be thrown if a response is received that doesn't match up to any request.
  */
 export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<RequestResponseMatchEvents<TRequest, TResp>> {
-  timeoutMs;
-  whenUnmatchedResponse;
-  keyRequest;
-  keyResponse;
+  timeoutMs: number;
+  whenUnmatchedResponse: "ignore" | "throw";
+  keyRequest: (request: TRequest) => string;
+  keyResponse: (resp: TResp) => string;
 
   #outgoing = new Map<string, SeenRequest<TRequest, TResp>>();
   #maintainLoop;
@@ -144,7 +144,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
     return this.#outgoing.size > 0;
   }
 
-  debugDump() {
+  debugDump(): void {
     const values = [ ...this.#outgoing.values() ];
     const now = Date.now();
     for (const v of values) {
@@ -184,7 +184,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
    * Make a request and don't wait for the outcome.
    * @param request 
    */
-  requestAndForget(request: TRequest) {
+  requestAndForget(request: TRequest): void {
     const id = this.keyRequest(request);
     if (this.#outgoing.has(id)) throw new Error(`Already a request pending with id '${ id }'`);
 

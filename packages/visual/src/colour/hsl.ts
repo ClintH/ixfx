@@ -302,7 +302,7 @@ export const toScalar = (hslOrString: Rgb | Hsl | string): HslScalar => {
   }
 }
 
-export const guard = (hsl: Hsl) => {
+export const guard = (hsl: Hsl): void => {
   const { h, s, l, opacity, space, unit } = hsl;
   if (space !== `hsl`) throw new Error(`Space is expected to be 'hsl'. Got: ${ space }`);
   if (unit === `absolute`) {

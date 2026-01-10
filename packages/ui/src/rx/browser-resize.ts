@@ -1,7 +1,8 @@
 import type { Interval } from "@ixfx/core";
 import { observable } from "@ixfx/rx/from";
-import { debounce } from "@ixfx/rx/op/debounce";
+import { debounce } from "@ixfx/rx/ops";
 import * as Rx from "@ixfx/rx";
+
 /**
  * Observe when element resizes. Specify `interval` to debounce, uses 100ms by default.
  *
@@ -18,7 +19,7 @@ import * as Rx from "@ixfx/rx";
 export const browserResizeObservable = (
   elem: Readonly<Element>,
   interval?: Interval
-) => {
+): any => {
   if (elem === null) {
     throw new Error(`Param 'elem' is null. Expected element to observe`);
   }
@@ -45,4 +46,4 @@ export const browserResizeObservable = (
  * @param elapsed
  * @returns
  */
-export const windowResize = (elapsed?: Interval) => debounce<{ innerWidth: number, innerHeight: number }>({ elapsed: elapsed ?? 100 })(Rx.From.event(window, `resize`, { innerWidth: 0, innerHeight: 0 }));
+export const windowResize = (elapsed?: Interval): any => debounce<{ innerWidth: number, innerHeight: number }>({ elapsed: elapsed ?? 100 })(Rx.From.event(window, `resize`, { innerWidth: 0, innerHeight: 0 }));

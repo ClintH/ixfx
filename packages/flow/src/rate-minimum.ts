@@ -55,7 +55,7 @@ export type RateMinimumOptions<TInput> = Readonly<{
  * @param options 
  * @returns 
  */
-export const rateMinimum = <TInput>(options: RateMinimumOptions<TInput>) => {
+export const rateMinimum = <TInput>(options: RateMinimumOptions<TInput>): (args: TInput) => void => {
   let disposed = false;
 
   const t = timeout(() => {

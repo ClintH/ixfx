@@ -15,7 +15,7 @@
  * @param value 
  * @returns 
  */
-export const isInteger = (value: string | number) => {
+export const isInteger = (value: string | number): boolean => {
   if (value === undefined) return false;
   if (typeof value === `string`) {
     const v = Number.parseInt(value);

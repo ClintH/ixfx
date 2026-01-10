@@ -45,7 +45,7 @@ export type Opts = {
  */
 export class StringWriteBuffer {
   paused = false;
-  queue = new QueueMutable<string>();
+  queue: QueueMutable<string> = new QueueMutable<string>();
   writer: Continuously;
   stream: WritableStream<string> | undefined;
   closed = false;
@@ -69,7 +69,7 @@ export class StringWriteBuffer {
   /**
    * Close writer (async)
    */
-  async close() {
+  async close(): Promise<void> {
     if (this.closed) return;
     const w = this.stream?.getWriter();
     w?.releaseLock();
@@ -82,7 +82,7 @@ export class StringWriteBuffer {
    *
    * Throws an error if {@link close} has been called.
    */
-  clear() {
+  clear(): void {
     if (this.closed) throw new Error(`Buffer closed`);
     this.queue = new QueueMutable<string>();
   }
@@ -95,7 +95,7 @@ export class StringWriteBuffer {
    * Throws an error if .close() has been called.
    * @returns Underlying stream
    */
-  writable() {
+  writable(): WritableStream<string> {
     if (this.closed) throw new Error(`Buffer closed`);
     if (this.stream === undefined) this.stream = this.createWritable();
     return this.stream;
@@ -140,7 +140,7 @@ export class StringWriteBuffer {
   /**
    * Returns _true_ if {@link close} has been called.
    */
-  get isClosed() {
+  get isClosed(): boolean {
     return this.closed;
   }
 
@@ -151,7 +151,7 @@ export class StringWriteBuffer {
    * Throws an error if {@link close} has been called.
    * @param stringToQueue
    */
-  add(stringToQueue: string) {
+  add(stringToQueue: string): void {
     if (this.closed) throw new Error(`Buffer closed`);
     // Add whole string or chunked string
     if (this.chunkSize > 0) {

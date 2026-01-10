@@ -10,7 +10,7 @@ export class StringReceiveBuffer {
     public separator = `\n`
   ) {}
 
-  async close() {
+  async close(): Promise<void> {
     const s = this.stream;
     if (!s) return;
     await s.abort();
@@ -18,11 +18,11 @@ export class StringReceiveBuffer {
     await s.close();
   }
 
-  clear() {
+  clear(): void {
     this.buffer = ``;
   }
 
-  writable() {
+  writable(): WritableStream<string> {
     if (this.stream === undefined) this.stream = this.createWritable();
     return this.stream;
   }
@@ -63,7 +63,7 @@ export class StringReceiveBuffer {
     return string_;
   }
 
-  add(string_: string) {
+  add(string_: string): void {
     while (string_.length > 0) {
       string_ = this.addImpl(string_);
     }

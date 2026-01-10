@@ -59,7 +59,7 @@ export type ForceKind = Points.Point | ForceFn | null;
  * @param t
  * @param name
  */
-export const guard = (t: ForceAffected, name = `t`) => {
+export const guard = (t: ForceAffected, name = `t`): void => {
   if (t === undefined) {
     throw new Error(`Parameter ${ name } is undefined. Expected ForceAffected`);
   }
@@ -280,7 +280,7 @@ export type TargetOpts = {
  * @param opts
  * @returns
  */
-export const targetForce = (targetPos: Points.Point, opts: TargetOpts = {}) => {
+export const targetForce = (targetPos: Points.Point, opts: TargetOpts = {}): (t: ForceAffected) => ForceAffected => {
   const fn = (t: ForceAffected): ForceAffected => {
     const accel = computeAccelerationToTarget(
       targetPos,
@@ -546,7 +546,15 @@ export const velocityForce = (
  *  angularAcceleration, angularVelocity, angle
  * @returns
  */
-export const angularForce = () => (t: ForceAffected) => {
+export const angularForce = () => (t: ForceAffected): Readonly<{
+  angle: number;
+  angularVelocity: number;
+  angularAcceleration: 0;
+  position?: Points.Point;
+  velocity?: Points.Point;
+  acceleration?: Points.Point;
+  mass?: number;
+}> => {
   const accumulator = t.angularAcceleration ?? 0;
   const vel = t.angularVelocity ?? 0;
   const angle = t.angle ?? 0;
@@ -576,7 +584,15 @@ export const angularForce = () => (t: ForceAffected) => {
  */
 export const angleFromAccelerationForce =
   (scaling = 20) =>
-    (t: ForceAffected) => {
+    (t: ForceAffected): Readonly<{
+      angularAcceleration: number;
+      position?: Points.Point;
+      velocity?: Points.Point;
+      acceleration?: Points.Point;
+      mass?: number;
+      angularVelocity?: number;
+      angle?: number;
+    }> => {
       const accel = t.acceleration ?? Points.Empty;
       return Object.freeze({
         ...t,
@@ -592,7 +608,15 @@ export const angleFromAccelerationForce =
  */
 export const angleFromVelocityForce =
   (interpolateAmt = 1) =>
-    (t: ForceAffected) => {
+    (t: ForceAffected): Readonly<{
+      angle: number;
+      position?: Points.Point;
+      velocity?: Points.Point;
+      acceleration?: Points.Point;
+      mass?: number;
+      angularAcceleration?: number;
+      angularVelocity?: number;
+    }> => {
       const a = Points.angleRadian(t.velocity ?? Points.Empty);
       return Object.freeze({
         ...t,
@@ -782,7 +806,10 @@ export const computeAccelerationToTarget = (
   targetPos: Points.Point,
   currentPos: Points.Point,
   opts: TargetOpts = {}
-) => {
+): Points.Point | {
+  readonly x: 0;
+  readonly y: 0;
+} => {
   const diminishBy = opts.diminishBy ?? 0.001;
 
   // Compare to current position of thing to get vector direction
@@ -819,7 +846,7 @@ export const computePositionFromAngle = (
   distance: number,
   angleRadians: number,
   origin: Points.Point
-) => Polar.toCartesian(distance, angleRadians, origin);
+): Points.Point => Polar.toCartesian(distance, angleRadians, origin);
 
 const _angularForce = angularForce();
 const _angleFromAccelerationForce = angleFromAccelerationForce();

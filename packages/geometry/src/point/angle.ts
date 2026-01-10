@@ -33,7 +33,7 @@ import type { Point } from "./point-type.js";
  * @param c
  * @returns
  */
-export const angleRadian = (a: Point, b?: Point, c?: Point) => {
+export const angleRadian = (a: Point, b?: Point, c?: Point): number => {
   guard(a, `a`);
 
   if (b === undefined) {
@@ -64,7 +64,7 @@ export const angleRadian = (a: Point, b?: Point, c?: Point) => {
  * @param c 
  * @returns 
  */
-export const angleRadianCircle = (a: Point, b?: Point, c?: Point) => {
+export const angleRadianCircle = (a: Point, b?: Point, c?: Point): number => {
   const angle = angleRadian(a, b, c);
   if (angle < 0) return angle + piPi
   return angle;
@@ -79,7 +79,7 @@ export const angleRadianCircle = (a: Point, b?: Point, c?: Point) => {
  * @param c 
  * @returns 
  */
-export const angleRadianThreePoint = (a: Point, b: Point, c: Point) => {
+export const angleRadianThreePoint = (a: Point, b: Point, c: Point): number => {
   const ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
   const bc = Math.sqrt(Math.pow(b.x - c.x, 2) + Math.pow(b.y - c.y, 2));
   const ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));

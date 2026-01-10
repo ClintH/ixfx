@@ -16,7 +16,7 @@ export class EspruinoSerialDevice extends SerialDevice {
     this.evalTimeoutMs = opts.evalTimeoutMs ?? 5 * 1000;
   }
 
-  async disconnect() {
+  async disconnect(): Promise<void> {
     return super.close();
   }
 
@@ -38,7 +38,7 @@ export class EspruinoSerialDevice extends SerialDevice {
    *
    * @param code Code to send. A new line is added automatically.
    */
-  writeScript(code: string) {
+  writeScript(code: string): void {
     this.write(`\u0003\u0010reset();\n`);
     this.write(`\u0010${ code }\n`);
   }

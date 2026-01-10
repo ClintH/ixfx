@@ -27,7 +27,7 @@ const piPi = Math.PI * 2;
  *
  */
 
-export function* sine(timerOrFreq: Flow.Timer | number) {
+export function* sine(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown> {
   if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Flow.frequencyTimer(timerOrFreq);
@@ -44,7 +44,7 @@ export function* sine(timerOrFreq: Flow.Timer | number) {
  * @param timerOrFreq
  */
 
-export function* sineBipolar(timerOrFreq: Flow.Timer | number) {
+export function* sineBipolar(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown> {
   if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
 
   if (typeof timerOrFreq === `number`) {
@@ -68,7 +68,7 @@ export function* sineBipolar(timerOrFreq: Flow.Timer | number) {
  * ```
  */
 
-export function* triangle(timerOrFreq: Flow.Timer | number) {
+export function* triangle(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown> {
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Flow.frequencyTimer(timerOrFreq);
   }
@@ -104,7 +104,7 @@ export function* triangle(timerOrFreq: Flow.Timer | number) {
  * ```
  */
 
-export function* saw(timerOrFreq: Flow.Timer | number) {
+export function* saw(timerOrFreq: Flow.Timer | number): Generator<number, void, unknown> {
   if (timerOrFreq === undefined) throw new TypeError(`Parameter 'timerOrFreq' is undefined`);
 
   if (typeof timerOrFreq === `number`) {
@@ -130,7 +130,7 @@ export function* saw(timerOrFreq: Flow.Timer | number) {
  * ```
  */
 
-export function* square(timerOrFreq: Flow.Timer | number) {
+export function* square(timerOrFreq: Flow.Timer | number): Generator<1 | 0, void, unknown> {
   if (typeof timerOrFreq === `number`) {
     timerOrFreq = Flow.frequencyTimer(timerOrFreq);
   }

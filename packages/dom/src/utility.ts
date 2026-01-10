@@ -1,4 +1,4 @@
-import JSON5 from 'json5';
+import { stringify } from 'json5';
 
 import { resolveEl } from './resolve-el.js';
 import { getPointParameter, type Point } from '@ixfx/geometry/point';
@@ -46,7 +46,10 @@ export type PointSpaces = `viewport` | `screen` | `document`;
  * @param reference
  * @returns
  */
-export const pointScaler = (reference: PointSpaces = `viewport`) => {
+export const pointScaler = (reference: PointSpaces = `viewport`): (a: Readonly<Point | number | number[]>, b?: number) => Readonly<{
+  x: number;
+  y: number;
+}> => {
   switch (reference) {
     case `viewport`: {
       return (a: Readonly<Point | number | number[]>, b?: number) => {
@@ -226,7 +229,10 @@ export const positionRelative = (
  * @param targetSpace
  * @returns
  */
-export const viewportToSpace = (targetSpace: PointSpaces = `viewport`) => {
+export const viewportToSpace = (targetSpace: PointSpaces = `viewport`): (a: Readonly<Point | number[] | number>, b?: number) => Readonly<{
+  x: number;
+  y: number;
+}> => {
   switch (targetSpace) {
     case `screen`: {
       return (a: Readonly<Point | number[] | number>, b?: number) => {
@@ -272,7 +278,7 @@ export const positionFromMiddle = (
   domQueryOrEl: string | HTMLElement,
   relativePos: Point,
   relativeTo: `window` | `screen` = `window`
-) => {
+): void => {
   if (!domQueryOrEl) throw new Error(`domQueryOrEl is null or undefined`);
   const el = resolveEl<HTMLElement>(domQueryOrEl);
 
@@ -318,7 +324,7 @@ export const positionFromMiddle = (
 export const cycleCssClass = (
   el: Readonly<HTMLElement>,
   list: readonly string[]
-) => {
+): void => {
 
   if (el === null || !el) return;
   if (!Array.isArray(list)) {
@@ -438,7 +444,7 @@ export const createIn = (
  * Remove all child nodes from `parent`
  * @param parent
  */
-export const clear = (parent: Readonly<HTMLElement>) => {
+export const clear = (parent: Readonly<HTMLElement>): void => {
   let c = parent.lastElementChild;
 
   while (c) {
@@ -453,11 +459,11 @@ export const clear = (parent: Readonly<HTMLElement>) => {
  * @param object
  * @returns Promise
  */
-export const copyToClipboard = (object: object) => {
+export const copyToClipboard = (object: object): Promise<unknown> => {
   const p = new Promise((resolve, reject) => {
     //const json = JSON.stringify(obj, null, 2);
 
-    const string_ = JSON5.stringify(object);
+    const string_ = stringify(object);
     navigator.clipboard.writeText(JSON.stringify(string_)).then(
       () => {
         resolve(true);
@@ -482,7 +488,7 @@ export const copyToClipboard = (object: object) => {
  * @param parent Parent to insert into
  * @param element Element to insert
  */
-export const insertSorted = (parent: HTMLElement, element: HTMLElement) => {
+export const insertSorted = (parent: HTMLElement, element: HTMLElement): void => {
   const elSort = element.getAttribute(`data-sort`) ?? ``;
   let elAfter: HTMLElement | undefined;
   let elBefore: HTMLElement | undefined;
@@ -531,7 +537,7 @@ export const reconcileChildren = <V>(
   parentEl: HTMLElement,
   list: Map<string, V>,
   createUpdate: CreateUpdateElement<V>
-) => {
+): void => {
   if (typeof parentEl === `undefined`) throw new Error(`Param 'parentEl' is undefined`);
 
   if (parentEl === null) throw new Error(`Param 'parentEl' is null`);

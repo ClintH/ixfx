@@ -170,7 +170,7 @@ export const align = <V>(
  * @param options Options
  * @returns
  */
-export const alignById = <V>(fn: Similarity<V>, options: AlignOpts = {}) => {
+export const alignById = <V>(fn: Similarity<V>, options: AlignOpts = {}): (newData: DataWithId<V>[]) => DataWithId<V>[] => {
   let lastData: readonly DataWithId<V>[] = [];
 
   const compute = (newData: DataWithId<V>[]) => {

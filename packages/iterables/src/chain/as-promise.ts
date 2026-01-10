@@ -13,7 +13,7 @@ import type { GenFactoryNoInput } from "./types.js";
  * @param valueToWrap 
  * @returns 
  */
-export function asPromise<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>) {
+export function asPromise<V>(valueToWrap: AsyncGenerator<V> | GenFactoryNoInput<V>): () => Promise<V | undefined> {
   let lastValue: V | undefined;
 
   const outputType = (typeof valueToWrap === `function`) ? valueToWrap() : valueToWrap;

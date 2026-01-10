@@ -51,7 +51,7 @@ export class DispatchList<V> {
    * Returns _true_ if list is empty
    * @returns 
    */
-  isEmpty() {
+  isEmpty(): boolean {
     return this.#handlers.length === 0;
   }
 
@@ -121,7 +121,7 @@ export class DispatchList<V> {
   /**
    * Remove all handlers
    */
-  clear() {
+  clear(): void {
     this.#handlers = [];
   }
 }

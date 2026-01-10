@@ -5,7 +5,7 @@
  * @param a 
  * @param b 
  */
-export function* zipRecords<TKey extends string | symbol | number, TValue>(a: Record<TKey, TValue>[], b: Record<TKey, TValue>[]) {
+export function* zipRecords<TKey extends string | symbol | number, TValue>(a: Record<TKey, TValue>[], b: Record<TKey, TValue>[]): Generator<Record<TKey, TValue>, void, unknown> {
   if (!Array.isArray(a)) throw new TypeError(`Param 'a' is expected to be an array`);
   if (!Array.isArray(b)) throw new TypeError(`Param 'b' is expected to be an array`);
 

@@ -4,7 +4,7 @@ import type { GridBoundsLogic, GridCardinalDirection, GridCell, Grid, GridNeighb
 import { randomElement } from "@ixfx/random";
 import { offset } from "./offset.js";
 
-export const randomNeighbour = (nbos: readonly GridNeighbour[]) => randomElement(nbos); // .filter(isNeighbour));
+export const randomNeighbour = (nbos: readonly GridNeighbour[]): GridNeighbour => randomElement(nbos); // .filter(isNeighbour));
 
 /**
  * Returns _true_ if `n` is a Neighbour type, eliminating NeighbourMaybe possibility

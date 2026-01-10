@@ -7,7 +7,7 @@ import type { Point } from '../point/point-type.js';
  * @param d 
  * @param name 
  */
-export const guardDim = (d: number, name = `Dimension`) => {
+export const guardDim = (d: number, name = `Dimension`): void => {
   if (d === undefined) throw new Error(`${ name } is undefined`);
   if (Number.isNaN(d)) throw new Error(`${ name } is NaN`);
   if (d < 0) throw new Error(`${ name } cannot be negative`);
@@ -26,7 +26,7 @@ export const guardDim = (d: number, name = `Dimension`) => {
  * @param rect
  * @param name
  */
-export const guard = (rect: Rect, name = `rect`) => {
+export const guard = (rect: Rect, name = `rect`): void => {
   if (rect === undefined) throw new Error(`{$name} undefined`);
   if (isPositioned(rect)) PointsGuard(rect, name);
   guardDim(rect.width, name + `.width`);
@@ -68,7 +68,7 @@ export const getRectPositioned = (rect: Rect | RectPositioned, origin?: Point): 
  * @param rect 
  * @param name 
  */
-export const guardPositioned = (rect: RectPositioned, name = `rect`) => {
+export const guardPositioned = (rect: RectPositioned, name = `rect`): void => {
   if (!isPositioned(rect)) throw new Error(`Expected ${ name } to have x,y`);
   guard(rect, name);
 };

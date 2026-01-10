@@ -70,7 +70,7 @@ export class Device extends JsonDevice {
    * Writes text to the underlying output
    * @param txt
    */
-  protected async writeInternal(txt: string) {
+  protected async writeInternal(txt: string): Promise<void> {
     if (typeof this.tx === `undefined`) throw new Error(`this.tx not ready`);
     try {
       await this.tx.write(txt);

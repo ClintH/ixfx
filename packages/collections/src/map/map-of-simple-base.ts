@@ -28,7 +28,7 @@ export class MapOfSimpleBase<V> {
   /**
    * Returns the underlying map storage. Do not manipulate.
    */
-  get getRawMapUnsafe() {
+  get getRawMapUnsafe(): Map<string, readonly V[]> {
     return this.map;
   }
 
@@ -90,7 +90,7 @@ export class MapOfSimpleBase<V> {
  * @param eq 
  * @returns 
  */
-  firstKeyByValue(value: V, eq: IsEqual<V> = isEqualDefault) {
+  firstKeyByValue(value: V, eq: IsEqual<V> = isEqualDefault): string | undefined {
     const entry = firstEntryByValue(this, value, eq);
     if (entry) return entry[ 0 ];
   }
@@ -202,7 +202,7 @@ export class MapOfSimpleBase<V> {
   /**
    * Returns the count of keys.
    */
-  get lengthKeys() {
+  get lengthKeys(): number {
     return this.map.size;
   }
 

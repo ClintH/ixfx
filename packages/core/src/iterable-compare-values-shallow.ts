@@ -24,11 +24,11 @@ import { isEqualDefault } from "./is-equal.js";
 export const compareIterableValuesShallow = <V>(
   a: Iterable<V>,
   b: Iterable<V>,
-  eq = isEqualDefault<V>
-) => {
-  const shared:V[] = [];
-  const aUnique:V[] = [];
-  const bUnique:V[] = [];
+  eq: (a: V, b: V) => boolean = isEqualDefault<V>
+): { shared: V[]; isSame: boolean; a: V[]; b: V[]; } => {
+  const shared: V[] = [];
+  const aUnique: V[] = [];
+  const bUnique: V[] = [];
 
   for (const elementOfA of a) {
     let seenInB = false;

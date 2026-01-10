@@ -1,6 +1,6 @@
 
 import { testPlainObjectOrPrimitive } from "@ixfx/guards";
-import type { ReactiveOrSource } from "../types.js";
+import type { Reactive, ReactiveOrSource } from "../types.js";
 import { transform } from "./transform.js";
 
 /**
@@ -9,7 +9,7 @@ import { transform } from "./transform.js";
  * @param source 
  * @returns 
  */
-export const cloneFromFields = <In>(source: ReactiveOrSource<In>) => {
+export const cloneFromFields = <In>(source: ReactiveOrSource<In>): Reactive<In> => {
   return transform<In, In>(source, (v): In => {
     const entries: [ key: string, value: any ][] = [];
     for (const field in v) {

@@ -33,7 +33,7 @@ export const pingPongPercent = function (
   upper?: number,
   start?: number,
   rounding?: number
-) {
+): Generator<number, never, unknown> {
   if (typeof lower === `undefined`) lower = 0;
   if (typeof upper === `undefined`) upper = 1;
   if (typeof start === `undefined`) start = lower;
@@ -74,7 +74,7 @@ export const pingPong = function* (
   upper: number,
   start?: number,
   rounding?: number
-) {
+): Generator<number, never, unknown> {
   if (lower === undefined) throw new Error(`Parameter 'lower' is undefined`);
   if (interval === undefined) {
     throw new Error(`Parameter 'interval' is undefined`);

@@ -14,7 +14,7 @@ export const getErrorMessage = (ex: unknown): string => {
  * @param results 
  * @returns 
  */
-export const throwIfFailed = (...results: Result<any, any>[]) => {
+export const throwIfFailed = (...results: Result<any, any>[]): void => {
   const failed = results.filter(r => resultIsError(r));// as ResultError<any>[];
   if (failed.length === 0) return;
 
@@ -28,19 +28,19 @@ export const throwIfFailed = (...results: Result<any, any>[]) => {
  * @param results 
  * @returns _true_ or throws
  */
-export function resultThrow(...results: ResultOrFunction[]) {
+export function resultThrow(...results: ResultOrFunction[]): boolean {
   for (const r of results) {
     const rr = typeof r === `object` ? r : r();
     if (rr === undefined) continue;
     if (rr.success) continue;
-    throw resultToError(rr);
+    throw resultToError(rr as any as ResultError<any>);
   }
   return true;
 }
 
 export function resultThrowSingle<TValue>(result: Result<TValue, any>): result is ResultOk<TValue> {
   if (result.success) return true;
-  throw resultToError(result);
+  throw resultToError(result as any as ResultError<any>);
 }
 
 /**
@@ -50,7 +50,7 @@ export function resultThrowSingle<TValue>(result: Result<TValue, any>): result i
  */
 export const resultFirstFail_ = <TError>(...results: ResultOrFunction[]): ResultError<TError> | undefined => {
   for (const r of results) {
-    const rr = typeof r === `object` ? r : r();
+    const rr = (typeof r === `object` ? r : r()) as ResultError<TError> | undefined;
     if (rr === undefined) continue;
     if (!rr.success) return rr;
   }
@@ -76,6 +76,29 @@ export function resultIsOk<TValue, TError>(result: Result<TValue, TError>): resu
   return result.success;
 }
 
+export class IxfxError extends Error {
+  cause: string | undefined
+  constructor(message: string, cause?: string) {
+    super(message);
+    this.cause = cause;
+  }
+
+  static fromError(error: Error, cause?: string): IxfxError {
+    const message = error.message;
+    const stack = error.stack;
+    const name = error.name;
+    const newError = new IxfxError(message, cause);
+    newError.stack = stack;
+    newError.name = `IxfxError(${ name })`;
+    return newError;
+  }
+
+  static fromString(message: string, cause?: string): IxfxError {
+    const newError = new IxfxError(message, cause);
+    newError.name = `IxfxError`;
+    return newError;
+  }
+}
 /**
  * Gets the result as an Error
  * @param result 
@@ -83,10 +106,10 @@ export function resultIsOk<TValue, TError>(result: Result<TValue, TError>): resu
  */
 export function resultToError(result: ResultError<any>): Error {
   if (typeof result.error === `string`) {
-    throw new Error(result.error, { cause: result.info });
+    return IxfxError.fromString(result.error, result.info);
   }
-  if (result.error instanceof Error) throw result.error;
-  return new Error(JSON.stringify(result.error), { cause: result.info });
+  if (result.error instanceof Error) return IxfxError.fromError(result.error, result.info);
+  return IxfxError.fromString(JSON.stringify(result.error), result.info);
 
 }
 
@@ -153,7 +176,7 @@ export const resultsCollate = <TValue, TError>(...results: ResultOrFunction[]): 
  * @param result 
  * @param callback 
  */
-export const resultWithFail = <TError>(result: Result<any, TError>, callback: (r: ResultError<TError>) => void) => {
+export const resultWithFail = <TError>(result: Result<any, TError>, callback: (r: ResultError<TError>) => void): void => {
   if (resultIsError(result)) {
     callback(result);
   }

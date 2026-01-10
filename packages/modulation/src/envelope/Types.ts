@@ -95,7 +95,13 @@ export type AdsrEvents = {
   readonly complete: CompleteEvent;
 };
 
-export const adsrStateTransitions = Object.freeze({
+export const adsrStateTransitions: Readonly<{
+  attack: string[];
+  decay: string[];
+  sustain: string[];
+  release: string[];
+  complete: null;
+}> = Object.freeze({
   attack: [ `decay`, `release` ],
   decay: [ `sustain`, `release` ],
   sustain: [ `release` ],

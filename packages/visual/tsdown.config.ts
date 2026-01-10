@@ -1,6 +1,7 @@
-import { defineConfig } from 'tsdown'
-import basePackageConfig from '../../tsdown.package.ts';
+import { defineConfig } from 'tsdown/config'
 
 export default defineConfig({
-  ...basePackageConfig
-});
+  entry: [ './src/index.ts', './src/colour/index.ts', "./src/drawing.ts", "./src/svg/index.ts" ],
+  //external: [ 'node:module' ],
+  noExternal: [ "colorizr" ]
+})

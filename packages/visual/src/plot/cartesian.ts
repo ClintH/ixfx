@@ -96,7 +96,10 @@ export const computeMinMax = (mm: Point[]): PointMinMax => {
   }
 }
 
-export const relativeCompute = (minMax: PointMinMax) => {
+export const relativeCompute = (minMax: PointMinMax): ((point: Point) => Point) | ((point: Point) => {
+  x: number;
+  y: number;
+}) => {
   if (!Number.isFinite(minMax.height)) {
     return (point: Point) => point;
   }
@@ -111,7 +114,7 @@ export const relativeCompute = (minMax: PointMinMax) => {
 export const absoluteCompute = (minMax: PointMinMax) => {
   const xScale = scaler(0, 1, minMax.min.x, minMax.max.x);
   const yScale = scaler(0, 1, minMax.min.y, minMax.max.y);
-  return (point: Point) => ({
+  return (point: Point): Point => ({
     x: xScale(point.x),
     y: yScale(point.y)
   });

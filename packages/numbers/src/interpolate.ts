@@ -216,7 +216,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<BasicInterpola
  * @param options Options for interpolation
  * @returns 
  */
-export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<BasicInterpolateOptions>) => {
+export const interpolatorStepped = (incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<BasicInterpolateOptions>): (retargetB?: number, retargetA?: number) => number => {
   let amount = startInterpolationAt;
   return (retargetB?: number, retargetA?: number) => {
     if (retargetB !== undefined) b = retargetB;

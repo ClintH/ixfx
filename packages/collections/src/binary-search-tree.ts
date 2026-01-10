@@ -23,7 +23,7 @@ export class BinarySearchTree<V> {
    * @param {any} value node's value to insert in the tree
    * @returns {BinaryTreeNode} newly added node
    */
-  add(value: V) {
+  add(value: V): BinaryTreeNode<V> {
     const node = new BinaryTreeNode(value);
 
     if (this.root) {
@@ -103,7 +103,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node subtree's root
    * @returns {BinaryTreeNode} right-most node (max value)
    */
-  getRightmost(node = this.root): BinaryTreeNode<V> | undefined {
+  getRightmost(node: BinaryTreeNode<V> | undefined = this.root): BinaryTreeNode<V> | undefined {
     if (!node?.right) {
       return node;
     }
@@ -115,7 +115,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node subtree's root
    * @returns {BinaryTreeNode} left-most node (min value)
    */
-  getLeftmost(node = this.root): BinaryTreeNode<V> | undefined {
+  getLeftmost(node: BinaryTreeNode<V> | undefined = this.root): BinaryTreeNode<V> | undefined {
     if (!node?.left) {
       return node;
     }
@@ -181,7 +181,7 @@ export class BinarySearchTree<V> {
    * @returns {BinaryTreeNode} combined subtree
    */
   //eslint-disable-next-line functional/prefer-immutable-types
-  combineLeftIntoRightSubtree(node: BinaryTreeNode<V>) {
+  combineLeftIntoRightSubtree(node: BinaryTreeNode<V>): BinaryTreeNode<V> | undefined {
     if (node.right) {
       const leftmost = this.getLeftmost(node.right);
       leftmost?.setLeftAndUpdateParent(node.left);
@@ -194,7 +194,7 @@ export class BinarySearchTree<V> {
    * Breath-first search for a tree (always starting from the root element).
    * @yields {BinaryTreeNode}
    */
-  *bfs() {
+  *bfs(): Generator<BinaryTreeNode<V> | undefined, void, unknown> {
     const queue = mutable<BinaryTreeNode<V>>();
     if (!this.root) return;
     queue.enqueue(this.root);
@@ -218,7 +218,7 @@ export class BinarySearchTree<V> {
    * @see preOrderTraversal Similar results to the pre-order transversal.
    * @yields {BinaryTreeNode}
    */
-  *dfs() {
+  *dfs(): Generator<BinaryTreeNode<V> | undefined, void, unknown> {
     const stack = new StackMutable<BinaryTreeNode<V>>();
     if (!this.root) return;
 
@@ -244,7 +244,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node first node to start the traversal
    * @yields {BinaryTreeNode}
    */
-  *inOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
+  *inOrderTraversal(node: BinaryTreeNode<V> | undefined = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (!node) return;
     if (node.left) {
       yield* this.inOrderTraversal(node.left);
@@ -261,7 +261,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node first node to start the traversal
    * @yields {BinaryTreeNode}
    */
-  *preOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
+  *preOrderTraversal(node: BinaryTreeNode<V> | undefined = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (!node) return;
     yield node;
     if (node) {
@@ -279,7 +279,7 @@ export class BinarySearchTree<V> {
    * @param {BinaryTreeNode} node first node to start the traversal
    * @yields {BinaryTreeNode}
    */
-  *postOrderTraversal(node = this.root): IterableIterator<BinaryTreeNode<V>> {
+  *postOrderTraversal(node: BinaryTreeNode<V> | undefined = this.root): IterableIterator<BinaryTreeNode<V>> {
     if (node) {
       if (node.left) {
         yield* this.postOrderTraversal(node.left);
@@ -318,7 +318,7 @@ export class BinarySearchTree<V> {
    *
    * parent = (index) => Math.floor((index-1)/2)
    */
-  toArray() {
+  toArray(): V[] {
     const array: V[] = [];
     const queue = mutable<BinaryTreeNode<V>>();
     const visited = new Map();

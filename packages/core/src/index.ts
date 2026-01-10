@@ -1,7 +1,7 @@
 /**
  * Functions for working with simple objects
  */
-export * as Records from './records/index.js';
+export * as Records from './records.js';
 /**
  * Functions for working with map data structures
  */
@@ -14,7 +14,7 @@ export * as Pathed from './pathed.js';
 /**
  * Functions for tracking data over time
  */
-export * as Trackers from './trackers/index.js';
+export * as Trackers from './trackers.js';
 
 export * from './comparers.js';
 export * from './continuously.js';

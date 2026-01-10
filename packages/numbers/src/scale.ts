@@ -182,7 +182,7 @@ export const scalePercent = (
  * @param outMax
  * @returns Function that takes a single argument
  */
-export const scalerPercent = (outMin: number, outMax: number) => {
+export const scalerPercent = (outMin: number, outMax: number): (v: number) => number => {
   return (v: number) => {
     resultThrow(numberTest(v, `percentage`, `v`));
     return scale(v, 0, 1, outMin, outMax);

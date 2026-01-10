@@ -22,7 +22,7 @@ export const goldenAngleColour = (
   saturation = 0.5,
   lightness = 0.75,
   alpha = 1
-) => {
+): string => {
   resultThrow(
     numberTest(index, `positive`, `index`),
     numberTest(saturation, `percentage`, `saturation`),
