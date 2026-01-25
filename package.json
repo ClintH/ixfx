@@ -16,6 +16,7 @@
     "mono:check": "monoman --check",
     "publint": "tsx publint.ts",
     "release": "bumpp -r",
+    "publish": "pnpm publish --recursive --no-git-checks --access public",
     "typecheck": "pnpm run /^typecheck:/",
     "typecheck:lib": "tsc --noEmit -p tsconfig.lib.json",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json"

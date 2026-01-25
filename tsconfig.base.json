@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
     "jsx": "preserve",
     "jsxImportSource": "vue",
+    "target": "ESNext",
     "lib": [
       "ESNext",
       "DOM",
       "DOM.AsyncIterable",
       "DOM.Iterable",
+      "ESNext.Array"
     ],
     "module": "ESNext",
     "moduleResolution": "bundler",

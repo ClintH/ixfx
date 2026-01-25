@@ -3,7 +3,7 @@ packages:
 
 defines:
   - &eslint ^9.39.2
-  - &vitest 4.0.16
+  - &vitest 4.0.18
   - &vite 7.3.1
   - &oxc ^0.92.0
 
@@ -15,26 +15,26 @@ overrides:
 catalog:
   '@eslint/js': *eslint
   '@rspack/core': ^1.5.7
-  '@types/node': ^25.0.5
+  '@types/node': ^25.0.10
   '@vitest/coverage-v8': *vitest
   '@arethetypeswrong/cli': 0.18.2
   'eslint-plugin-unicorn': 62.0.0
-  bumpp: ^10.2.3
+  bumpp: ^10.4.0
   change-case: ^5.4.4
   esbuild: ^0.25.10
   eslint: ^9.36.0
   monoman: ^0.8.0
   pkg-types: ^2.3.0
-  publint: ^0.3.13
-  tsdown: 0.19.0
+  publint: ^0.3.17
+  tsdown: 0.20.1
   tsx: ^4.20.5
   rimraf: 6.1.2
   typescript-eslint: 8.52.0
   typescript: ^5.9.2
-  typedoc: 0.28.9
-  unplugin-macros: ^0.18.2
-  unplugin-unused: ^0.5.3
-  unplugin: ^2.3.10
+  typedoc: 0.28.16
+  unplugin-macros: ^0.18.7
+  unplugin-unused: ^0.5.7
+  unplugin: ^3.0.0
   vite: *vite
   vitest: *vitest
   oxc-minify: *oxc

@@ -3,7 +3,6 @@ import { test, expect } from 'vitest';
 import * as Modulation from '../../src/index.js';
 import * as Flow from '@ixfx/flow';
 import { round } from "@ixfx/numbers";
-import * as Arrays from '@ixfx/arrays';
 
 test(`one-shot`, async () => {
   // oneShot
@@ -13,8 +12,8 @@ test(`one-shot`, async () => {
     return round(1, s2())
   }, { count: 10 }));
 
-  const s2Ra = Arrays.isEqual(s2Results, [ 0.2, 0.4, 0.6, 0.8, 1, 1, 1, 1, 1, 1 ]);
-  const s2Rb = Arrays.isEqual(s2Results, [ 0.1, 0.4, 0.6, 0.8, 1, 1, 1, 1, 1, 1 ]);
+  const s2Ra = ArrayIsEqual(s2Results, [ 0.2, 0.4, 0.6, 0.8, 1, 1, 1, 1, 1, 1 ]);
+  const s2Rb = ArrayIsEqual(s2Results, [ 0.1, 0.4, 0.6, 0.8, 1, 1, 1, 1, 1, 1 ]);
   const s2Somethng = s2Ra || s2Rb;
   if (!s2Somethng) {
     console.log(`s2`, s2Results);
@@ -31,9 +30,9 @@ test(`start-at`, async () => {
     return round(1, s3())
   }, { count: 10 });
   const s3Results = await Array.fromAsync(s3x);
-  const s3a = Arrays.isEqual(s3Results, [ 0.7, 0.9, 0.1, 0.3, 0.5, 0.7, 0.9, 0.1, 0.3, 0.5 ]);
-  const s3b = Arrays.isEqual(s3Results, [ 0.7, 0.9, 0.1, 0.2, 0.4, 0.6, 0.8, 0, 0.2, 0.4 ]);
-  const s3c = Arrays.isEqual(s3Results, [
+  const s3a = ArrayIsEqual(s3Results, [ 0.7, 0.9, 0.1, 0.3, 0.5, 0.7, 0.9, 0.1, 0.3, 0.5 ]);
+  const s3b = ArrayIsEqual(s3Results, [ 0.7, 0.9, 0.1, 0.2, 0.4, 0.6, 0.8, 0, 0.2, 0.4 ]);
+  const s3c = ArrayIsEqual(s3Results, [
     0.6, 0.9, 0.1, 0.2,
     0.4, 0.6, 0.8, 0,
     0.2, 0.4
@@ -59,24 +58,24 @@ test(`start-at-relative`, async () => {
 
   const s4Results = await Array.fromAsync(s4x);
 
-  const s4a = Arrays.isEqual(s4Results, [ 0.7, 0.9, 0.1, 0.3, 0.5, 0.7, 0.9, 0.1, 0.3, 0.5 ]);
-  const s4b = Arrays.isEqual(s4Results, [ 0.7, 0.9, 0.1, 0.2, 0.4, 0.6, 0.8, 0, 0.2, 0.4 ]);
-  const s4c = Arrays.isEqual(s4Results, [
+  const s4a = ArrayIsEqual(s4Results, [ 0.7, 0.9, 0.1, 0.3, 0.5, 0.7, 0.9, 0.1, 0.3, 0.5 ]);
+  const s4b = ArrayIsEqual(s4Results, [ 0.7, 0.9, 0.1, 0.2, 0.4, 0.6, 0.8, 0, 0.2, 0.4 ]);
+  const s4c = ArrayIsEqual(s4Results, [
     0.6, 0.9, 0.1, 0.2,
     0.4, 0.6, 0.8, 0,
     0.2, 0.4
   ]);
-  const s4d = Arrays.isEqual(s4Results, [
+  const s4d = ArrayIsEqual(s4Results, [
     0.7, 0.8, 0.1, 0.2,
     0.4, 0.6, 0.8, 0,
     0.2, 0.4
   ]);
-  const s4e = Arrays.isEqual(s4Results, [
+  const s4e = ArrayIsEqual(s4Results, [
     0.7, 0.9, 0.1, 0.1,
     0.4, 0.6, 0.8, 0,
     0.2, 0.4
   ]);
-  const s4f = Arrays.isEqual(s4Results, [
+  const s4f = ArrayIsEqual(s4Results, [
     0.7, 0.9, 0.1, 0.2,
     0.4, 0.6, 0.8, 0,
     0.1, 0.4
@@ -99,3 +98,18 @@ test(`basic`, async () => {
   const s1R2 = JSON.stringify(s1Results) === JSON.stringify([ 0.1, 0.4, 0.6, 0.8, 0, 0.2, 0.4, 0.6, 0.8, 0 ]);
   expect(s1R1 || s1R2).toBeTruthy();
 });
+
+export function ArrayIsEqual<T>(arrayA: T[], arrayB: T[], comparerOrKey?: ((value: T) => string)): boolean {
+  if (typeof comparerOrKey === `undefined`) comparerOrKey = (v: T) => JSON.stringify(v);
+
+  if (arrayA.length !== arrayB.length) return false;
+
+  // Key based
+  const c = comparerOrKey as (v: T) => string
+  for (let indexA = 0; indexA < arrayA.length; indexA++) {
+    const keyA = c(arrayA[ indexA ]);
+    const keyB = c(arrayB[ indexA ]);
+    if (keyA !== keyB) return false;
+  }
+  return true;
+}
