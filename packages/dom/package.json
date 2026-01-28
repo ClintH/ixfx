@@ -9,7 +9,7 @@
   ],
   "scripts": {},
   "devDependencies": {
-    "json5": "1.0.2"
+    "json5": "catalog:"
   },
   "dependencies": {
     "@ixfx/core": "workspace:^",

@@ -36,12 +36,3 @@ ixfx offers:
 ## Building
 
 If you want to contribute to ixfx or build it yourself, please see [BUILDING.md](BUILDING.md).
-
-## Credits
-
-Bundles
-* [Colorjs](https://colorjs.io/) by Lea Verou, Chris Lilley et al.
-* Easing functions by [Andrey Sitnik and Ivan Solovev](https://easings.net/)
-* [Bezier.js](https://github.com/Pomax/bezierjs)
-* [Underdash](https://surma.github.io/underdash/) by Surma
-* [Kalman.js](https://github.com/wouterbulten/kalmanjs) by Wouter Bulten

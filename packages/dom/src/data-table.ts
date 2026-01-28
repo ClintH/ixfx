@@ -206,7 +206,7 @@ const updateElement = (
     }
 
     // Set the cell value
-    (valEl as HTMLElement).innerHTML = valueHTML;
+    (valEl as HTMLElement).innerHTML = valueHTML!;
   }
 
   // Remove rows that aren't present in data

@@ -15,12 +15,13 @@ overrides:
 catalog:
   '@eslint/js': *eslint
   '@rspack/core': ^1.5.7
-  '@types/node': ^25.0.10
+  '@types/node': ^25.1.0
   '@vitest/coverage-v8': *vitest
   '@arethetypeswrong/cli': 0.18.2
   'eslint-plugin-unicorn': 62.0.0
   bumpp: ^10.4.0
   change-case: ^5.4.4
+  colorizr: 4.0.1
   esbuild: ^0.25.10
   eslint: ^9.36.0
   monoman: ^0.8.0
@@ -32,6 +33,7 @@ catalog:
   typescript-eslint: 8.52.0
   typescript: ^5.9.2
   typedoc: 0.28.16
+  json5: 2.2.3
   unplugin-macros: ^0.18.7
   unplugin-unused: ^0.5.7
   unplugin: ^3.0.0

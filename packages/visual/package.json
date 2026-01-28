@@ -21,7 +21,7 @@
     "@ixfx/random": "workspace:*"
   },
   "devDependencies": {
-    "colorizr": "3.0.7"
+    "colorizr": "catalog:"
   },
   "exports": {
     ".": {
