@@ -1,32 +1,51 @@
 {
-	"name": "@ixfx/ui",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"sideEffects": false,
-	"files": [
-		"dist"
-	],
-	"scripts": {},
-	"dependencies": {
-		"@ixfx/core": "workspace:*",
-		"@ixfx/collections": "workspace:*",
-		"@ixfx/dom": "workspace:*",
-		"@ixfx/visual": "workspace:*",
-		"@ixfx/rx": "workspace:*"
-	},
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": "./dist/index.js",
-			"./package.json": "./package.json"
-		}
-	}
+  "name": "@ixfx/ui",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@ixfx/core": "workspace:*",
+    "@ixfx/collections": "workspace:*",
+    "@ixfx/dom": "workspace:*",
+    "@ixfx/visual": "workspace:*",
+    "@ixfx/rx": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "description": "ixfx ui",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "ui"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/ui"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

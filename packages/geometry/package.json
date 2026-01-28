@@ -1,99 +1,118 @@
 {
-	"name": "@ixfx/geometry",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"sideEffects": false,
-	"files": [
-		"dist"
-	],
-	"scripts": {},
-	"devDependencies": {
-		"bezier-js": "latest",
-		"@types/bezier-js": "latest"
-	},
-	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/numbers": "workspace:^",
-		"@ixfx/random": "workspace:^",
-		"@ixfx/collections": "workspace:^",
-		"@ixfx/trackers": "workspace:^"
-	},
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./arc": {
-			"dev": "./src/arc/index.ts",
-			"default": "./dist/arc/index.js"
-		},
-		"./bezier": {
-			"dev": "./src/bezier/index.ts",
-			"default": "./dist/bezier/index.js"
-		},
-		"./circle": {
-			"dev": "./src/circle/index.ts",
-			"default": "./dist/circle/index.js"
-		},
-		"./grid": {
-			"dev": "./src/grid/index.ts",
-			"default": "./dist/grid/index.js"
-		},
-		"./layout": {
-			"dev": "./src/layout.ts",
-			"default": "./dist/layout.js"
-		},
-		"./line": {
-			"dev": "./src/line/index.ts",
-			"default": "./dist/line/index.js"
-		},
-		"./path": {
-			"dev": "./src/path/index.ts",
-			"default": "./dist/path/index.js"
-		},
-		"./point": {
-			"dev": "./src/point/index.ts",
-			"default": "./dist/point/index.js"
-		},
-		"./polar": {
-			"dev": "./src/polar/index.ts",
-			"default": "./dist/polar/index.js"
-		},
-		"./rect": {
-			"dev": "./src/rect/index.ts",
-			"default": "./dist/rect/index.js"
-		},
-		"./shape": {
-			"dev": "./src/shape/index.ts",
-			"default": "./dist/shape/index.js"
-		},
-		"./triangle": {
-			"dev": "./src/triangle/index.ts",
-			"default": "./dist/triangle/index.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": "./dist/index.js",
-			"./arc": "./dist/arc/index.js",
-			"./bezier": "./dist/bezier/index.js",
-			"./circle": "./dist/circle/index.js",
-			"./grid": "./dist/grid/index.js",
-			"./layout": "./dist/layout.js",
-			"./line": "./dist/line/index.js",
-			"./path": "./dist/path/index.js",
-			"./point": "./dist/point/index.js",
-			"./polar": "./dist/polar/index.js",
-			"./rect": "./dist/rect/index.js",
-			"./shape": "./dist/shape/index.js",
-			"./triangle": "./dist/triangle/index.js",
-			"./package.json": "./package.json"
-		}
-	},
-	"types": "./dist/index.d.ts"
+  "name": "@ixfx/geometry",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "bezier-js": "latest",
+    "@types/bezier-js": "latest"
+  },
+  "dependencies": {
+    "@ixfx/arrays": "workspace:^",
+    "@ixfx/core": "workspace:^",
+    "@ixfx/guards": "workspace:^",
+    "@ixfx/numbers": "workspace:^",
+    "@ixfx/random": "workspace:^",
+    "@ixfx/collections": "workspace:^",
+    "@ixfx/trackers": "workspace:^"
+  },
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./arc": {
+      "dev": "./src/arc/index.ts",
+      "default": "./dist/arc/index.js"
+    },
+    "./bezier": {
+      "dev": "./src/bezier/index.ts",
+      "default": "./dist/bezier/index.js"
+    },
+    "./circle": {
+      "dev": "./src/circle/index.ts",
+      "default": "./dist/circle/index.js"
+    },
+    "./grid": {
+      "dev": "./src/grid/index.ts",
+      "default": "./dist/grid/index.js"
+    },
+    "./layout": {
+      "dev": "./src/layout.ts",
+      "default": "./dist/layout.js"
+    },
+    "./line": {
+      "dev": "./src/line/index.ts",
+      "default": "./dist/line/index.js"
+    },
+    "./path": {
+      "dev": "./src/path/index.ts",
+      "default": "./dist/path/index.js"
+    },
+    "./point": {
+      "dev": "./src/point/index.ts",
+      "default": "./dist/point/index.js"
+    },
+    "./polar": {
+      "dev": "./src/polar/index.ts",
+      "default": "./dist/polar/index.js"
+    },
+    "./rect": {
+      "dev": "./src/rect/index.ts",
+      "default": "./dist/rect/index.js"
+    },
+    "./shape": {
+      "dev": "./src/shape/index.ts",
+      "default": "./dist/shape/index.js"
+    },
+    "./triangle": {
+      "dev": "./src/triangle/index.ts",
+      "default": "./dist/triangle/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./arc": "./dist/arc/index.js",
+      "./bezier": "./dist/bezier/index.js",
+      "./circle": "./dist/circle/index.js",
+      "./grid": "./dist/grid/index.js",
+      "./layout": "./dist/layout.js",
+      "./line": "./dist/line/index.js",
+      "./path": "./dist/path/index.js",
+      "./point": "./dist/point/index.js",
+      "./polar": "./dist/polar/index.js",
+      "./rect": "./dist/rect/index.js",
+      "./shape": "./dist/shape/index.js",
+      "./triangle": "./dist/triangle/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "description": "ixfx geometry",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "geometry"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/geometry"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

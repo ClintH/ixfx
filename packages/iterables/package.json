@@ -1,43 +1,62 @@
 {
-	"name": "@ixfx/iterables",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"sideEffects": false,
-	"files": [
-		"dist"
-	],
-	"scripts": {},
-	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/numbers": "workspace:^",
-		"@ixfx/process": "workspace:^",
-		"@ixfx/core": "workspace:^"
-	},
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./async": {
-			"dev": "./src/async.ts",
-			"default": "./dist/async.js"
-		},
-		"./sync": {
-			"dev": "./src/sync.ts",
-			"default": "./dist/sync.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": "./dist/index.js",
-			"./async": "./dist/async.js",
-			"./sync": "./dist/sync.js",
-			"./package.json": "./package.json"
-		}
-	},
-	"types": "./dist/index.d.ts"
+  "name": "@ixfx/iterables",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@ixfx/arrays": "workspace:^",
+    "@ixfx/guards": "workspace:^",
+    "@ixfx/numbers": "workspace:^",
+    "@ixfx/process": "workspace:^",
+    "@ixfx/core": "workspace:^"
+  },
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./async": {
+      "dev": "./src/async.ts",
+      "default": "./dist/async.js"
+    },
+    "./sync": {
+      "dev": "./src/sync.ts",
+      "default": "./dist/sync.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./async": "./dist/async.js",
+      "./sync": "./dist/sync.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "description": "ixfx iterables",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "iterables"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/iterables"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

@@ -1,12 +1,3 @@
-Functions for modulating values.
+# @ixfx/modulation [![npm](https://img.shields.io/npm/v/@ixfx/modulation.svg)](https://npmjs.com/package/@ixfx/modulation)
 
-
-Examples for importing:
-
-```js
-import { Modulation } from "https://unpkg.com/@ixfx/bundle"
-import { jitter } from "https://unpkg.com/@ixfx/modulation/bundle"
-
-import * as Modulation from "@ixfx/modulation.js"
-import { jitter } from "@ixfx/modulation.js"
-```
+Please refer to [README.md](https://github.com/clinth/ixfx#readme)

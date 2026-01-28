@@ -1,3 +1,3 @@
-Tracking data over time.
+# @ixfx/trackers [![npm](https://img.shields.io/npm/v/@ixfx/trackers.svg)](https://npmjs.com/package/@ixfx/trackers)
 
-See also @ixfx/geometry for a Point/Points tracker.
+Please refer to [README.md](https://github.com/clinth/ixfx#readme)

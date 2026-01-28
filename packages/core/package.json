@@ -1,67 +1,86 @@
 {
-	"name": "@ixfx/core",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"files": [
-		"dist"
-	],
-	"dependencies": {
-		"@ixfx/debug": "workspace:*",
-		"@ixfx/guards": "workspace:*"
-	},
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./continuously": {
-			"dev": "./src/continuously.ts",
-			"default": "./dist/continuously.js"
-		},
-		"./elapsed": {
-			"dev": "./src/elapsed.ts",
-			"default": "./dist/elapsed.js"
-		},
-		"./maps": {
-			"dev": "./src/maps.ts",
-			"default": "./dist/maps.js"
-		},
-		"./records": {
-			"dev": "./src/records.ts",
-			"default": "./dist/records.js"
-		},
-		"./text": {
-			"dev": "./src/text.ts",
-			"default": "./dist/text.js"
-		},
-		"./trackers": {
-			"dev": "./src/trackers.ts",
-			"default": "./dist/trackers.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"typesVersions": {
-		"*": {
-			"*": [
-				"./dist/*",
-				"./*"
-			]
-		}
-	},
-	"publishConfig": {
-		"access": "public",
-		"exports": {
-			".": "./dist/index.js",
-			"./continuously": "./dist/continuously.js",
-			"./elapsed": "./dist/elapsed.js",
-			"./maps": "./dist/maps.js",
-			"./records": "./dist/records.js",
-			"./text": "./dist/text.js",
-			"./trackers": "./dist/trackers.js",
-			"./package.json": "./package.json"
-		}
-	},
-	"scripts": {}
+  "name": "@ixfx/core",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@ixfx/debug": "workspace:*",
+    "@ixfx/guards": "workspace:*"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./continuously": {
+      "dev": "./src/continuously.ts",
+      "default": "./dist/continuously.js"
+    },
+    "./elapsed": {
+      "dev": "./src/elapsed.ts",
+      "default": "./dist/elapsed.js"
+    },
+    "./maps": {
+      "dev": "./src/maps.ts",
+      "default": "./dist/maps.js"
+    },
+    "./records": {
+      "dev": "./src/records.ts",
+      "default": "./dist/records.js"
+    },
+    "./text": {
+      "dev": "./src/text.ts",
+      "default": "./dist/text.js"
+    },
+    "./trackers": {
+      "dev": "./src/trackers.ts",
+      "default": "./dist/trackers.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./*"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./continuously": "./dist/continuously.js",
+      "./elapsed": "./dist/elapsed.js",
+      "./maps": "./dist/maps.js",
+      "./records": "./dist/records.js",
+      "./text": "./dist/text.js",
+      "./trackers": "./dist/trackers.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {},
+  "description": "ixfx core",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "core"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/core"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

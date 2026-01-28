@@ -1,64 +1,82 @@
 {
-	"name": "@ixfx/collections",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"sideEffects": false,
-	"files": [
-		"dist/",
-		"bundle/"
-	],
-	"scripts": {},
-	"dependencies": {
-		"@ixfx/arrays": "workspace:^",
-		"@ixfx/events": "workspace:^",
-		"@ixfx/core": "workspace:^",
-		"@ixfx/guards": "workspace:^",
-		"@ixfx/iterables": "workspace:^"
-	},
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./graph": {
-			"dev": "./src/graph/index.ts",
-			"default": "./dist/graph/index.js"
-		},
-		"./map": {
-			"dev": "./src/map/index.ts",
-			"default": "./dist/map/index.js"
-		},
-		"./queue": {
-			"dev": "./src/queue/index.ts",
-			"default": "./dist/queue/index.js"
-		},
-		"./set": {
-			"dev": "./src/set/index.ts",
-			"default": "./dist/set/index.js"
-		},
-		"./stack": {
-			"dev": "./src/stack/index.ts",
-			"default": "./dist/stack/index.js"
-		},
-		"./tree": {
-			"dev": "./src/tree/index.ts",
-			"default": "./dist/tree/index.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": "./dist/index.js",
-			"./graph": "./dist/graph/index.js",
-			"./map": "./dist/map/index.js",
-			"./queue": "./dist/queue/index.js",
-			"./set": "./dist/set/index.js",
-			"./stack": "./dist/stack/index.js",
-			"./tree": "./dist/tree/index.js",
-			"./package.json": "./package.json"
-		}
-	}
+  "name": "@ixfx/collections",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@ixfx/arrays": "workspace:^",
+    "@ixfx/events": "workspace:^",
+    "@ixfx/core": "workspace:^",
+    "@ixfx/guards": "workspace:^",
+    "@ixfx/iterables": "workspace:^"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./graph": {
+      "dev": "./src/graph/index.ts",
+      "default": "./dist/graph/index.js"
+    },
+    "./map": {
+      "dev": "./src/map/index.ts",
+      "default": "./dist/map/index.js"
+    },
+    "./queue": {
+      "dev": "./src/queue/index.ts",
+      "default": "./dist/queue/index.js"
+    },
+    "./set": {
+      "dev": "./src/set/index.ts",
+      "default": "./dist/set/index.js"
+    },
+    "./stack": {
+      "dev": "./src/stack/index.ts",
+      "default": "./dist/stack/index.js"
+    },
+    "./tree": {
+      "dev": "./src/tree/index.ts",
+      "default": "./dist/tree/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./graph": "./dist/graph/index.js",
+      "./map": "./dist/map/index.js",
+      "./queue": "./dist/queue/index.js",
+      "./set": "./dist/set/index.js",
+      "./stack": "./dist/stack/index.js",
+      "./tree": "./dist/tree/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "description": "ixfx collections",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "collections"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/collections"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

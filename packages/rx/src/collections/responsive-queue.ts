@@ -1,5 +1,5 @@
 import type { IQueueMutableWithEvents, QueueMutableEvents } from "@ixfx/collections/queue";
-import { manual } from "../index.js";
+import { manual, Passed, Unsubscriber } from "../index.js";
 
 
 /**
@@ -22,7 +22,7 @@ import { manual } from "../index.js";
  * @param queue 
  * @returns 
  */
-export function asResponsive<T>(queue: IQueueMutableWithEvents<T>): { set: (data: T[]) => void; on(handler: (value: import("/Users/af4766/repos/ixfxfun/ixfx-alt/packages/rx/src/types").Passed<readonly T[]>) => void): import("/Users/af4766/repos/ixfxfun/ixfx-alt/packages/rx/src/types").Unsubscriber; onValue(handler: (value: readonly T[]) => void): import("/Users/af4766/repos/ixfxfun/ixfx-alt/packages/rx/src/types").Unsubscriber; dispose(reason: string): void; isDisposed(): boolean; } {
+export function asResponsive<T>(queue: IQueueMutableWithEvents<T>): { set: (data: T[]) => void; on(handler: (value: Passed<readonly T[]>) => void): Unsubscriber; onValue(handler: (value: readonly T[]) => void): Unsubscriber; dispose(reason: string): void; isDisposed(): boolean; } {
   const events = manual<readonly T[]>({
     onNoSubscribers() {
       queue.removeEventListener(`removed`, onRemoved);

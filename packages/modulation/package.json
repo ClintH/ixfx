@@ -1,54 +1,72 @@
 {
-	"name": "@ixfx/modulation",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"sideEffects": false,
-	"files": [
-		"dist/",
-		"bundle/"
-	],
-	"scripts": {
-		"package-bundle": "tsdown",
-		"clean": "rm -rf dist && rm -rf bundle"
-	},
-	"dependencies": {
-		"@ixfx/core": "workspace:*",
-		"@ixfx/events": "workspace:*",
-		"@ixfx/geometry": "workspace:*",
-		"@ixfx/numbers": "workspace:*",
-		"@ixfx/guards": "workspace:*",
-		"@ixfx/random": "workspace:*",
-		"@ixfx/flow": "workspace:*"
-	},
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./easing": {
-			"dev": "./src/easing.ts",
-			"default": "./dist/easing.js"
-		},
-		"./envelope": {
-			"dev": "./src/envelope.ts",
-			"default": "./dist/envelope.js"
-		},
-		"./source": {
-			"dev": "./src/source.ts",
-			"default": "./dist/source.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": "./dist/index.js",
-			"./easing": "./dist/easing.js",
-			"./envelope": "./dist/envelope.js",
-			"./source": "./dist/source.js",
-			"./package.json": "./package.json"
-		}
-	},
-	"types": "./dist/index.d.ts"
+  "name": "@ixfx/modulation",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "package-bundle": "tsdown",
+    "clean": "rm -rf dist && rm -rf bundle"
+  },
+  "dependencies": {
+    "@ixfx/core": "workspace:*",
+    "@ixfx/events": "workspace:*",
+    "@ixfx/geometry": "workspace:*",
+    "@ixfx/numbers": "workspace:*",
+    "@ixfx/guards": "workspace:*",
+    "@ixfx/random": "workspace:*",
+    "@ixfx/flow": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./easing": {
+      "dev": "./src/easing.ts",
+      "default": "./dist/easing.js"
+    },
+    "./envelope": {
+      "dev": "./src/envelope.ts",
+      "default": "./dist/envelope.js"
+    },
+    "./source": {
+      "dev": "./src/source.ts",
+      "default": "./dist/source.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./easing": "./dist/easing.js",
+      "./envelope": "./dist/envelope.js",
+      "./source": "./dist/source.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "description": "ixfx modulation",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "modulation"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/modulation"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

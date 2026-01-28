@@ -42,7 +42,7 @@ ESLint rules enforce most conventions.
 
 Verify packages
 ```
-pnpm run publint
+pnpm run verify
 ```
 
 ```
@@ -54,10 +54,8 @@ pnpx publint
 # Publishing
 
 ```
-# make a changeset
-pnpm changeset
-pnpm changeset version
-pnpm publish -r
+pnpm run release
+pnpm run publish 
 ```
 
 ## Running a visual test

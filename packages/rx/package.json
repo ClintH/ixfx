@@ -1,47 +1,66 @@
 {
-	"name": "@ixfx/rx",
-	"version": "0.56.0",
-	"license": "MIT",
-	"type": "module",
-	"sideEffects": false,
-	"files": [
-		"dist"
-	],
-	"scripts": {},
-	"dependencies": {
-		"@ixfx/arrays": "workspace:*",
-		"@ixfx/collections": "workspace:*",
-		"@ixfx/core": "workspace:*",
-		"@ixfx/debug": "workspace:*",
-		"@ixfx/dom": "workspace:*",
-		"@ixfx/flow": "workspace:*",
-		"@ixfx/guards": "workspace:*",
-		"@ixfx/iterables": "workspace:*",
-		"@ixfx/modulation": "workspace:*",
-		"@ixfx/process": "workspace:*"
-	},
-	"exports": {
-		".": {
-			"dev": "./src/index.ts",
-			"default": "./dist/index.js"
-		},
-		"./from": {
-			"dev": "./src/from/index.ts",
-			"default": "./dist/from/index.js"
-		},
-		"./ops": {
-			"dev": "./src/ops/index.ts",
-			"default": "./dist/ops/index.js"
-		},
-		"./package.json": "./package.json"
-	},
-	"publishConfig": {
-		"main": "dist/src/index.js",
-		"exports": {
-			".": "./dist/index.js",
-			"./from": "./dist/from/index.js",
-			"./ops": "./dist/ops/index.js",
-			"./package.json": "./package.json"
-		}
-	}
+  "name": "@ixfx/rx",
+  "version": "0.56.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@ixfx/arrays": "workspace:*",
+    "@ixfx/collections": "workspace:*",
+    "@ixfx/core": "workspace:*",
+    "@ixfx/debug": "workspace:*",
+    "@ixfx/dom": "workspace:*",
+    "@ixfx/flow": "workspace:*",
+    "@ixfx/guards": "workspace:*",
+    "@ixfx/iterables": "workspace:*",
+    "@ixfx/modulation": "workspace:*",
+    "@ixfx/process": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "dev": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./from": {
+      "dev": "./src/from/index.ts",
+      "default": "./dist/from/index.js"
+    },
+    "./ops": {
+      "dev": "./src/ops/index.ts",
+      "default": "./dist/ops/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./from": "./dist/from/index.js",
+      "./ops": "./dist/ops/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "description": "ixfx rx",
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "rx"
+  ],
+  "homepage": "https://ixfxfun.dev",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/rx"
+  },
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

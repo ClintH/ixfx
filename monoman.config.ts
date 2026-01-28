@@ -1,11 +1,11 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { camelCase } from 'change-case'
+import { defineConfig } from 'monoman';
 import {
-  defineConfig,
-  noDuplicatedDeps,
+  // noDuplicatedDeps,
   noDuplicatedPnpmLockfile,
-} from 'monoman'
+} from 'monoman/presets'
 import { docsLink, githubLink } from './macros/repo'
 import type { PackageJson } from 'pkg-types'
 
@@ -52,7 +52,7 @@ export default defineConfig([
           pkgName,
         ]
       }
-      data.main = 'hello'
+      data.main = './dist/index.js'
       data.license = 'MIT'
       data.homepage = docsLink
       data.bugs = { url: `${ githubLink }/issues` }
@@ -62,38 +62,38 @@ export default defineConfig([
         directory: `packages/${ pkgName }`,
       }
       data.author = 'Clint Heyer <clint@thestaticvoid.net>'
-      data.engines = { node: '>=20.19.0' }
+      data.engines = { node: '>=24.0.0' }
 
       data.files = [ 'dist' ]
       if (hasRootDts) data.files.push('*.d.ts')
       data.files.sort()
 
-      if (
-        Object.keys(data.dependencies || {}).includes('unplugin') ||
-        data?.meta?.plugin
-      ) {
-        data.keywords!.push('unplugin')
+      //       if (
+      //         Object.keys(data.dependencies || {}).includes('unplugin') ||
+      //         data?.meta?.plugin
+      //       ) {
+      //         data.keywords!.push('unplugin')
 
-        // write unplugin entries
-        const entries = [
-          'vite',
-          'webpack',
-          'rollup',
-          'esbuild',
-          'rspack',
-          'rolldown',
-        ]
-        Promise.all(
-          entries.map((entry) =>
-            writeFile(
-              path.resolve(pkgSrc, `${ entry }.ts`),
-              `import unplugin from '.'\n
-export default unplugin.${ entry } as typeof unplugin.${ entry }\n`,
-              'utf8',
-            ),
-          ),
-        )
-      }
+      //         // write unplugin entries
+      //         const entries = [
+      //           'vite',
+      //           'webpack',
+      //           'rollup',
+      //           'esbuild',
+      //           'rspack',
+      //           'rolldown',
+      //         ]
+      //         Promise.all(
+      //           entries.map((entry) =>
+      //             writeFile(
+      //               path.resolve(pkgSrc, `${ entry }.ts`),
+      //               `import unplugin from '.'\n
+      // export default unplugin.${ entry } as typeof unplugin.${ entry }\n`,
+      //               'utf8',
+      //             ),
+      //           ),
+      //         )
+      //       }
 
       data.publishConfig ||= {}
       data.publishConfig.access = 'public'
@@ -115,38 +115,35 @@ export default unplugin.${ entry } as typeof unplugin.${ entry }\n`,
 Please refer to [README.md](${ githubLink }#readme)\n`
     },
   },
-  ...noDuplicatedDeps({
-    include: [
-      'package.json',
-      'packages/*/package.json',
-      'docs/package.json',
-      'playground/*/package.json',
-    ],
-  }),
-  ...noDuplicatedDeps({
-    include: [
-      'package.json',
-      'packages/*/package.json',
-      'playground/*/package.json',
-    ],
-    ignores: [ 'vue' ],
-  }),
-  ...noDuplicatedPnpmLockfile({
-    deps: [
-      'typescript',
-      /vite(?!-(plugin-(vue-devtools|inspect)|hot-client))/,
-      /vue\b(?!([/-]devtools))/,
-      /twoslash/,
-      /shiki/,
-      /babel/,
-      /esbuild/,
-      /unocss/,
-      /rolldown/,
-      /oxc(?!-project\/types)/,
-    ],
-  }),
-  ...noDuplicatedPnpmLockfile({
-    deps: [ 'lru-cache', 'minimatch', 'debug', 'vite-plugin-vue-devtools' ],
-    allowMajor: true,
-  }),
+  // ...noDuplicatedDeps({
+  //   include: [
+  //     'package.json',
+  //     'packages/*/package.json'
+  //   ],
+  // }),
+  // ...noDuplicatedDeps({
+  //   include: [
+  //     'package.json',
+  //     'packages/*/package.json'
+  //   ],
+  //   ignores: [ 'vue' ],
+  // }),
+  // ...noDuplicatedPnpmLockfile({
+  //   deps: [
+  //     'typescript',
+  //     /vite(?!-(plugin-(vue-devtools|inspect)|hot-client))/,
+  //     /vue\b(?!([/-]devtools))/,
+  //     /twoslash/,
+  //     /shiki/,
+  //     /babel/,
+  //     /esbuild/,
+  //     /unocss/,
+  //     /rolldown/,
+  //     /oxc(?!-project\/types)/,
+  //   ],
+  // }),
+  // ...noDuplicatedPnpmLockfile({
+  //   deps: [ 'lru-cache', 'minimatch', 'debug', 'vite-plugin-vue-devtools' ],
+  //   allowMajor: true,
+  // }),
 ])
