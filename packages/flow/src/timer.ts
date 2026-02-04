@@ -104,13 +104,14 @@ export function hasElapsed(elapsed: Interval): () => boolean {
  */
 export function ofTotal(
   duration: Interval,
-  opts: { readonly clampValue?: boolean, readonly wrapValue?: boolean } = {}
+  opts: { readonly clampValue?: boolean, readonly wrapValue?: boolean, readonly timer?: Timer } = {}
 ): () => number {
   const totalMs = intervalToMs(duration);
   if (!totalMs) throw new Error(`Param 'duration' not valid`);
   const timerOpts = {
-    ...opts,
-    timer: elapsedMillisecondsAbsolute(),
+    clampValue: opts.clampValue,
+    wrapValue: opts.wrapValue,
+    timer: opts.timer ?? elapsedMillisecondsAbsolute(),
   };
   let t: ModulationTimer | undefined;
   return () => {

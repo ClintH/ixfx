@@ -15,6 +15,11 @@ export type ModSettableOptions = {
    * Use 1 for example for a one-shot wave.
    */
   cycleLimit: number
+  /**
+   * Function that returns current time in milliseconds.
+   * Defaults to `performance.now`. Useful for testing.
+   */
+  timeSource: () => number
 }
 
 export type ModSettableFeedback = {

@@ -1,63 +1,91 @@
-import { test, expect } from 'vitest';
+import { test, expect, describe } from 'vitest';
 import * as Timer from '../src/timer.js';
+import type { Timer as TimerType } from '../src/timer.js';
 import * as Elapsed from '@ixfx/core/elapsed';
 import { sleep } from '@ixfx/core';
 import { isApprox, round } from '@ixfx/numbers';
 
-test(`of-total`, async () => {
-  const r1 = Timer.ofTotal(500, { clampValue: false });
-  let since = Elapsed.elapsedSince();
-  for (let index = 0; index < 10; index++) {
-    const v = r1();
-    if (since() >= 500) {
-      // if total time has elapsed, expect r1() to be above 1
-      expect(v > 1).toBe(true);
-    } else {
-      // if total time hasn't elapsed, expect it to be below
-      expect(v < 1).toBe(true);
+// Helper to create a mock timer with controlled elapsed values
+const createMockTimer = (elapsedValues: number[]): TimerType => {
+  let index = 0;
+  return {
+    reset: () => { index = 0; },
+    get elapsed() {
+      const value = elapsedValues[index] ?? elapsedValues[elapsedValues.length - 1] ?? 0;
+      index++;
+      return value;
     }
-    await sleep(100);
-  }
+  };
+};
 
-  const r2 = Timer.ofTotal(500, { clampValue: true });
-  since = Elapsed.elapsedSince();
-  for (let index = 0; index < 10; index++) {
-    const v = r2();
-    if (since() >= 500) {
-      // if total time has elapsed, expect r2() to be above 1
-      expect(v).toBe(1);
-    } else {
-      // if total time hasn't elapsed, expect it to be below
-      expect(v < 1).toBe(true);
-    }
-    await sleep(100);
-  }
+describe('of-total', () => {
+  test('without clamping - values can exceed 1', () => {
+    const mockTimer = createMockTimer([0, 250, 500, 750, 1000]);
+    const timer = Timer.ofTotal(500, { clampValue: false, timer: mockTimer });
+    
+    expect(timer()).toBe(0);      // 0/500 = 0
+    expect(timer()).toBe(0.5);    // 250/500 = 0.5
+    expect(timer()).toBe(1);      // 500/500 = 1
+    expect(timer()).toBe(1.5);    // 750/500 = 1.5 (exceeds 1)
+    expect(timer()).toBe(2);      // 1000/500 = 2
+  });
 
-  const r3 = Timer.ofTotal(500, { wrapValue: true });
-  since = Elapsed.elapsedSince();
-  let v2 = 0;
-  for (let index = 1; index < 7; index++) {
-    const v1 = round(4, r3());
-    expect(isApprox(0.15, v2, v1)).toBe(true);
-    await sleep(100);
-    v2 += 0.2;
-    // Wrapping point
-    if (index === 5) v2 = 0;
-  }
+  test('with clamping - values capped at 1', () => {
+    const mockTimer = createMockTimer([0, 250, 500, 750, 1000]);
+    const timer = Timer.ofTotal(500, { clampValue: true, timer: mockTimer });
+    
+    expect(timer()).toBe(0);      // 0/500 = 0
+    expect(timer()).toBe(0.5);    // 250/500 = 0.5
+    expect(timer()).toBe(1);      // 500/500 = 1
+    expect(timer()).toBe(1);      // 750/500 = 1.5 → clamped to 1
+    expect(timer()).toBe(1);      // 1000/500 = 2 → clamped to 1
+  });
 
-  const r4 = Timer.ofTotal(500, { wrapValue: false, clampValue: true });
-  since = Elapsed.elapsedSince();
-  let v3 = 0;
-  for (let index = 1; index < 15; index++) {
-    const v1 = round(2, r4());
-    if (since() >= 500) {
-      expect(v1).toBe(1);
-    } else {
-      expect(isApprox(0.02, v3, v1)).toBe(true);
-    }
+  test('with wrapping - values wrap around at 1', () => {
+    const mockTimer = createMockTimer([0, 250, 500, 750, 1000, 1250, 1500]);
+    const timer = Timer.ofTotal(500, { wrapValue: true, timer: mockTimer });
+    
+    expect(timer()).toBe(0);      // 0/500 = 0
+    expect(timer()).toBe(0.5);    // 250/500 = 0.5
+    expect(timer()).toBe(0);      // 500/500 = 1 → wraps to 0
+    expect(timer()).toBe(0.5);    // 750/500 = 1.5 → wraps to 0.5
+    expect(timer()).toBe(0);      // 1000/500 = 2 → wraps to 0
+    expect(timer()).toBe(0.5);    // 1250/500 = 2.5 → wraps to 0.5
+    expect(timer()).toBe(0);      // 1500/500 = 3 → wraps to 0
+  });
+
+  test('progression through multiple intervals', () => {
+    const mockTimer = createMockTimer([0, 100, 200, 300, 400, 500]);
+    const timer = Timer.ofTotal(500, { timer: mockTimer });
+    
+    expect(timer()).toBe(0);      // 0%
+    expect(timer()).toBe(0.2);    // 20%
+    expect(timer()).toBe(0.4);    // 40%
+    expect(timer()).toBe(0.6);    // 60%
+    expect(timer()).toBe(0.8);    // 80%
+    expect(timer()).toBe(1);      // 100%
+  });
+
+  test('integration with real timer - loose tolerance', async () => {
+    // This test uses actual time but with relaxed expectations
+    const timer = Timer.ofTotal(200, { clampValue: true });
+    
+    // Initial value should be near 0
+    const v1 = timer();
+    expect(v1).toBeGreaterThanOrEqual(0);
+    expect(v1).toBeLessThan(0.1);
+    
+    // Wait for half the duration
     await sleep(100);
-    v3 += 0.2;
-  }
+    const v2 = timer();
+    expect(v2).toBeGreaterThan(0.3);  // Allow 20% variance
+    expect(v2).toBeLessThan(0.7);
+    
+    // Wait for full duration
+    await sleep(150);
+    const v3 = timer();
+    expect(v3).toBe(1);  // Should be clamped at 1
+  });
 });
 
 test('of-total-ticks', async () => {

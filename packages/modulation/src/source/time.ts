@@ -23,27 +23,28 @@ import type { ModSettableOptions as ModuleSettableOptions, ModSettable as Module
 export function elapsed(interval: Interval, options: Partial<ModuleSettableOptions> = {}): ModuleSettable {
   const cycleLimit = options.cycleLimit ?? Number.MAX_SAFE_INTEGER;
   const limitValue = 1;
-  let start = options.startAt ?? performance.now();
+  const timeSource = options.timeSource ?? performance.now.bind(performance);
+  let start = options.startAt ?? timeSource();
   let cycleCount = 0;
   const intervalMs = intervalToMs(interval, 1000);
   if (options.startAtRelative) {
     resultThrow(numberTest(options.startAtRelative, `percentage`, `startAtRelative`));
-    start = performance.now() - (intervalMs * options.startAtRelative);
+    start = timeSource() - (intervalMs * options.startAtRelative);
   }
   //let stopAt = cycleLimit > 0 ? (intervalMs + start) : Number.MAX_SAFE_INTEGER;
   return (feedback?: Partial<ModuleSettableFeedback>) => {
     if (feedback) {
       if (feedback.resetAt !== undefined) {
         start = feedback.resetAt;
-        if (start === 0) start = performance.now();
+        if (start === 0) start = timeSource();
       }
       if (feedback.resetAtRelative !== undefined) {
         resultThrow(numberTest(feedback.resetAtRelative, `percentage`, `resetAtRelative`));
-        start = performance.now() - (intervalMs * feedback.resetAtRelative);
+        start = timeSource() - (intervalMs * feedback.resetAtRelative);
       }
     }
     if (cycleCount >= cycleLimit) return limitValue;
-    const now = performance.now();
+    const now = timeSource();
     const elapsedCycle = now - start;
     if (elapsedCycle >= intervalMs) {
       cycleCount += Math.floor(elapsedCycle / intervalMs);
