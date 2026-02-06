@@ -107,7 +107,7 @@ export const elapsedToHumanString = (millisOrFunction: number | (() => number) |
   } else if (typeof millisOrFunction === `number`) {
     interval = millisOrFunction;
   } else if (typeof millisOrFunction === `object`) {
-    interval = intervalToMs(interval);
+    interval = intervalToMs(millisOrFunction);
   }
 
   let ms = intervalToMs(interval);

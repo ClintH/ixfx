@@ -4,6 +4,7 @@ import { isAsyncIterable } from "../index.js";
 import { sleep } from "@ixfx/core";
 
 export function isGenFactoryNoInput<Out>(c: any): c is GenFactoryNoInput<Out> {
+  if (typeof c !== `object` || c === null) return false;
   if (!(`_type` in c)) return false;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (c._type === `GenFactoryNoInput`) return true;

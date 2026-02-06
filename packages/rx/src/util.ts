@@ -51,7 +51,8 @@ export const hasLast = <V>(rx: Reactive<V> | ReactiveDiff<V> | object): rx is Re
 export const isReactive = <V>(rx: object): rx is Reactive<V> => {
   if (typeof rx !== `object`) return false;
   if (rx === null) return false;
-  return (`on` in rx && `onValue` in rx)
+  if (!(`on` in rx) || !(`onValue` in rx)) return false;
+  return (typeof (rx as any).on === 'function' && typeof (rx as any).onValue === 'function');
 }
 
 /**
@@ -77,6 +78,7 @@ export const isWritable = <V>(rx: Reactive<V> | ReactiveWritable<V>): rx is Reac
 
 export const isWrapped = <T>(v: any): v is Wrapped<T> => {
   if (typeof v !== `object`) return false;
+  if (v === null) return false;
   if (!(`source` in v)) return false;
   if (!(`annotate` in v)) return false;
   return true;

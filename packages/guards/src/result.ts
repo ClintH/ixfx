@@ -5,7 +5,7 @@ export const getErrorMessage = (ex: unknown): string => {
   if (ex instanceof Error) {
     return ex.message;
   }
-  return ex as string;
+  return String(ex);
 };
 
 /**
@@ -30,6 +30,7 @@ export const throwIfFailed = (...results: Result<any, any>[]): void => {
  */
 export function resultThrow(...results: ResultOrFunction[]): boolean {
   for (const r of results) {
+    if (r === undefined) continue;
     const rr = typeof r === `object` ? r : r();
     if (rr === undefined) continue;
     if (rr.success) continue;
@@ -62,7 +63,7 @@ export const resultFirstFail_ = <TError>(...results: ResultOrFunction[]): Result
  * @returns 
  */
 export function resultIsError<TValue, TError>(result: Result<TValue, TError>): result is ResultError<TError> {
-  if (typeof result !== `object`) return false;
+  if (typeof result !== `object` || result === null) return false;
   return !result.success;
 }
 
@@ -72,7 +73,7 @@ export function resultIsError<TValue, TError>(result: Result<TValue, TError>): r
  * @returns 
  */
 export function resultIsOk<TValue, TError>(result: Result<TValue, TError>): result is ResultOk<TValue> {
-  if (typeof result !== `object`) return false;
+  if (typeof result !== `object` || result === null) return false;
   return result.success;
 }
 
