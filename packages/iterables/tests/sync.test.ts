@@ -300,5 +300,63 @@ describe('sync', () => {
       const result = Sync.toArray([1, 2, 3, 4, 5], { limit: 3 });
       expect(result).toEqual([1, 2, 3]);
     });
+
+    test('respects while option', () => {
+      const result = Sync.toArray([1, 2, 3, 4, 5], { while: (count) => count < 3 });
+      expect(result).toEqual([1, 2, 3]);
+    });
+  });
+
+  describe('fromArray', () => {
+    test('yields values from array', () => {
+      const gen = Sync.fromArray([1, 2, 3]);
+      expect([...gen]).toEqual([1, 2, 3]);
+    });
+
+    test('handles empty array', () => {
+      const gen = Sync.fromArray([]);
+      expect([...gen]).toEqual([]);
+    });
+  });
+
+  describe('until', () => {
+    test('calls callback for each item', () => {
+      const values: number[] = [];
+      Sync.until([1, 2, 3], () => {
+        values.push(1);
+        return true;
+      });
+      expect(values).toEqual([1, 1, 1]);
+    });
+
+    test('stops when callback returns false', () => {
+      const values: number[] = [];
+      let count = 0;
+      Sync.until([1, 2, 3, 4, 5], () => {
+        count++;
+        return count < 3;
+      });
+      expect(count).toBe(3);
+    });
+  });
+
+  describe('equals', () => {
+    test('returns true for equal iterables', () => {
+      function* gen1() { yield 1; yield 2; yield 3; }
+      function* gen2() { yield 1; yield 2; yield 3; }
+      expect(Sync.equals(gen1(), gen2())).toBe(true);
+    });
+
+    test('returns false for different iterables', () => {
+      function* gen1() { yield 1; yield 2; yield 3; }
+      function* gen2() { yield 1; yield 2; yield 4; }
+      expect(Sync.equals(gen1(), gen2())).toBe(false);
+    });
+
+    test('returns false for different lengths', () => {
+      function* gen1() { yield 1; yield 2; }
+      function* gen2() { yield 1; yield 2; yield 3; }
+      expect(Sync.equals(gen1(), gen2())).toBe(false);
+    });
   });
 });
