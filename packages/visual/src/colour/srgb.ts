@@ -62,7 +62,7 @@ export function fromCss(value: string, options: ParsingOptions<Rgb> = {}): Rgb {
   // Special-case transparent
   if (value === `transparent`) return srgbTansparent;
   // Convert from named colour
-  if (typeof cssDefinedHexColours[ value ] !== `undefined`) fromHexString(cssDefinedHexColours[ value ] as string, scalar);
+    if (typeof cssDefinedHexColours[ value ] !== `undefined`) return fromHexString(cssDefinedHexColours[ value ] as string, scalar);
 
   if (value.startsWith(`hsl(`)) {
     const rgb = hslToLibraryRgb(value);

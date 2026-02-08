@@ -50,7 +50,7 @@ export abstract class PrimitiveTracker<
    * Returns the elapsed time, in milliseconds since the instance was created
    */
   get elapsed(): number {
-    if (this.values.length < 0) throw new Error(`No values seen yet`);
+    if (this.values.length === 0) throw new Error(`No values seen yet`);
     return Date.now() - this.timestamps[ 0 ];
   }
 

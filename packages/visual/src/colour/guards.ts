@@ -56,9 +56,9 @@ export const tryParseObjectToRgb = (v: any): Rgb | undefined => {
 export const tryParseObjectToHsl = (v: any): Hsl | undefined => {
   if (!(`h` in v && `s` in v && `l` in v)) return;
   if (!(`unit` in v)) {
-    if (v.r <= 1 && v.g <= 1 && v.b <= 1) {
+    if (v.s <= 1 && v.l <= 1) {
       v.unit = `scalar`;
-    } else if (v.s > 100 && v.l <= 100) {
+    } else if (v.s > 100 || v.l > 100) {
       return; // out of range
     } else {
       v.unit = `absolute`;

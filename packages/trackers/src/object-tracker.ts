@@ -102,6 +102,7 @@ export abstract class ObjectTracker<V extends object, SeenResultType> extends Tr
    * Returns the elapsed time, in milliseconds since the initial value
    */
   get elapsed(): number {
+    if (this.values.length === 0) throw new Error(`No values seen yet`);
     return Date.now() - this.values[ 0 ].at;
   }
 

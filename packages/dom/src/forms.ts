@@ -90,7 +90,7 @@ export const numeric = (
   live?: boolean
 ) => {
   const el = resolveEl<HTMLInputElement>(domIdOrEl);
-  const eventName = live ? `change` : `input`;
+  const eventName = live ? `input` : `change`;
   if (onChanged) {
     el.addEventListener(eventName, () => {
       onChanged(Number.parseInt(el.value));

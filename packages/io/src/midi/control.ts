@@ -26,7 +26,7 @@ export class Feedback {
   setOutputPort(port: MIDIPort): boolean {
     if (port.type === `input`) return false;
     if (this.portName !== undefined) {
-      if (port.name !== port.name) {
+      if (port.name !== this.portName) {
         return false;
       }
     }

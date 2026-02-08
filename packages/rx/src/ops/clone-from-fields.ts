@@ -14,7 +14,7 @@ export const cloneFromFields = <In>(source: ReactiveOrSource<In>): Reactive<In> 
     const entries: [ key: string, value: any ][] = [];
     for (const field in v) {
       const value = (v)[ field ];
-      if (testPlainObjectOrPrimitive(value as unknown)) {
+      if (value === null || Array.isArray(value) || testPlainObjectOrPrimitive(value as unknown).success) {
         entries.push([ field, value ]);
       }
     }

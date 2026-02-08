@@ -56,7 +56,7 @@ export class NumberTracker extends PrimitiveTracker<number, NumberTrackerResults
   }
 
   computeResults(values: TimestampedPrimitive<number>[]): NumberTrackerResults {
-    if (values.some((v) => Number.isNaN(v))) throw new Error(`Cannot add NaN`);
+    if (values.some((v) => Number.isNaN(v.value))) throw new Error(`Cannot add NaN`);
     const numbers = values.map(value => value.value);
 
     this.#total = numbers.reduce((accumulator, v) => accumulator + v, this.#total);

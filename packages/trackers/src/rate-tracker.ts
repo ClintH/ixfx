@@ -115,7 +115,7 @@ export class RateTracker {
       start = event;
       count++;
     }
-    const avg = total / count;
+    const avg = intervals.length > 0 ? total / intervals.length : 0;
     return {
       min, max, avg
     }

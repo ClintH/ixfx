@@ -23,7 +23,7 @@ export const guard = (lch: OkLch): void => {
       },
       () => {
         if (typeof h === `number`) {
-          return numberInclusiveRangeTest(c, 0, 360, `h`);
+          return numberInclusiveRangeTest(h, 0, 360, `h`);
         }
       },
       percentTest((opacity ?? 1), `opacity`)
