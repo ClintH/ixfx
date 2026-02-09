@@ -17,6 +17,21 @@ export default defineConfig({
   },
   test: {
     reporters: process.env.GITHUB_ACTIONS ? [ 'dot', 'github-actions' ] : [ 'dot' ],
+    projects: [
+      {
+        test: {
+          name: 'default',
+          exclude: ['packages/dom/tests/**/*.test.ts'],
+        },
+      },
+      {
+        test: {
+          name: 'dom',
+          include: ['packages/dom/tests/**/*.test.ts'],
+          environment: 'happy-dom',
+        },
+      },
+    ],
   },
   plugins: [],
 })

@@ -24,6 +24,7 @@ catalog:
   colorizr: 4.0.1
   esbuild: ^0.25.10
   eslint: ^9.36.0
+  happy-dom: ^17.0.0
   monoman: ^0.8.0
   pkg-types: ^2.3.0
   publint: ^0.3.17
