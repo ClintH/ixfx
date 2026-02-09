@@ -26,7 +26,7 @@ export const isEqual = (a: CirclePositioned | Circle, b: CirclePositioned | Circ
     if (a.z !== b.z) return false;
     return true;
   } else if (!isCirclePositioned(a) && !isCirclePositioned(b)) {
-    // no-op
+    return true; // both non-positioned, radii matched
   } else return false; // one is positioned one not
 
   return false;
