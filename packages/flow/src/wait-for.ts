@@ -86,7 +86,7 @@ export const waitFor = (
   let success = false;
   const done = (error?: string) => {
     if (t !== undefined) {
-      window.clearTimeout(t);
+      globalThis.clearTimeout(t);
       t = undefined;
     }
     if (error) {
