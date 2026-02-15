@@ -15,23 +15,29 @@ export default defineConfig({
       resolve: { conditions: [ 'dev' ] },
     },
   },
-  test: {
-    reporters: process.env.GITHUB_ACTIONS ? [ 'dot', 'github-actions' ] : [ 'dot' ],
-    projects: [
-      {
-        test: {
-          name: 'default',
-          exclude: ['packages/dom/tests/**/*.test.ts'],
-        },
-      },
-      {
-        test: {
-          name: 'dom',
-          include: ['packages/dom/tests/**/*.test.ts'],
-          environment: 'happy-dom',
-        },
-      },
+   test: {
+    include: [
+      './packages/**/tests/*.test.ts'
     ],
+    environment: 'happy-dom'
   },
-  plugins: [],
+  // test: {
+  //   reporters: process.env.GITHUB_ACTIONS ? [ 'dot', 'github-actions' ] : [ 'dot' ],
+  //   projects: [
+  //     {
+  //       test: {
+  //         name: 'default',
+  //         exclude: ['packages/dom/tests/**/*.test.ts'],
+  //       },
+  //     },
+  //     {
+  //       test: {
+  //         name: 'dom',
+  //         include: ['packages/dom/tests/**/*.test.ts'],
+  //         environment: 'happy-dom',
+  //       },
+  //     },
+  //   ],
+  // },
+  // plugins: [],
 })
