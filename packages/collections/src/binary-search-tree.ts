@@ -361,9 +361,9 @@ const test = [ 30, 40, 10, 15, 12, 50 ];
 const testTree = new BinarySearchTree<number>(defaultComparer);
 
 test.forEach((t, index) => {
-  console.log(index + `. ` + t);
+  //console.log(index + `. ` + t);
   testTree.add(t);
-  console.log(stringBst(testTree.root));
+  //console.log(stringBst(testTree.root));
 });
 
 // console.log(testTree.find(15));
