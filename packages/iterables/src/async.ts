@@ -454,7 +454,6 @@ export async function* slice<V>(
   start = 0,
   end: number = Number.POSITIVE_INFINITY
 ): AsyncGenerator<Awaited<V>, void, unknown> {
-  console.log(`Async slice start: ${ start }`);
 
   // https://surma.github.io/underdash/
   const iit = it[ Symbol.asyncIterator ]();
