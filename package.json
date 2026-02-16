@@ -11,7 +11,7 @@
     "bundle:build": "cd bundle && npm publish",
     "demos:copy": "rm -rf ../demos/ixfx && copyfiles -u 3 ./bundle/dist/min/**/* ../demos/ixfx",
     "clean": "rimraf -g dist coverage \"packages/*/dist\" && pnpm run -r --parallel clean",
-    "test": "vitest",
+    "test": "vitest -- -- --trace-warnings",
     "test:coverage": "vitest run --coverage",
     "test:ecosystem": "pnpm test run && pnpm typecheck",
     "mono:check": "monoman --check",

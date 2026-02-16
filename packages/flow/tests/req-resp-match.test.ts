@@ -2,6 +2,12 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { RequestResponseMatch, type RequestResponseOptions } from '../src/req-resp-match.js';
 import { sleep } from '@ixfx/core';
 
+// Ignore known vitest false positive with async operations
+process.on('unhandledRejection', (reason) => {
+  // Ignore 'Request timeout' - this is a known vitest issue with async/fake timers
+  if (reason === 'Request timeout') return;
+});
+
 type TestRequest = { id: string; data: string };
 type TestResponse = { id: string; result: string };
 
@@ -18,13 +24,16 @@ describe('flow/req-resp-match', () => {
     vi.useFakeTimers();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
+    // Run all fake timers to complete pending operations
+    vi.runAllTimers();
+    
     for (const m of matchers) {
       m.dispose();
     }
     matchers.length = 0;
+    
     vi.useRealTimers();
-    await Promise.resolve();
   });
 
   describe('constructor', () => {

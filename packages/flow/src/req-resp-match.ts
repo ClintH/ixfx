@@ -94,7 +94,6 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
 
   #outgoing = new Map<string, SeenRequest<TRequest, TResp>>();
   #maintainLoop;
-  #timerIds: ReturnType<typeof setTimeout>[] = [];
 
   constructor(options: Partial<RequestResponseOptions<TRequest, TResp>> = {}) {
     super();
@@ -128,10 +127,13 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
    */
   dispose(): void {
     this.#maintainLoop.cancel();
-    for (const timerId of this.#timerIds) {
-      clearTimeout(timerId);
+
+    // Reject all pending promises before clearing
+    for (const v of this.#outgoing.values()) {
+      if (v.promiseReject) {
+        v.promiseReject(`Request timeout`);
+      }
     }
-    this.#timerIds = [];
     this.#outgoing.clear();
   }
 
@@ -146,13 +148,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
         }
         const callback = v.callback;
         if (callback) {
-          const cb = callback;
-          const timer = setTimeout(() => {
-            cb(true, `Request timeout`);
-          }, 0);
-          if (this.#timerIds) {
-            this.#timerIds.push(timer);
-          }
+          callback(true, `Request timeout`);
         }
         this.fireEvent(`completed`, { request: v.req, response: `Request timeout`, success: false });
         this.#outgoing.delete(v.id);
