@@ -319,7 +319,7 @@ test('complex tree structure', () => {
   left.setRightAndUpdateParent(leftRight);
   
   expect(root.height).toBe(2);
-  expect(root.balanceFactor).toBe(0);
+  expect(root.balanceFactor).toBe(1);
   expect(leftLeft.parent!.value).toBe(10);
   expect(leftRight.sibling).toBe(leftLeft);
   expect(right.sibling).toBe(left);

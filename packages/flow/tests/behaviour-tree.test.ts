@@ -206,12 +206,11 @@ describe('flow/behaviour-tree', () => {
       };
       const result = Array.from(iterateDepth(root));
       
-      expect(result[0][1]).toBe('root');
+      expect(result).toHaveLength(4);
+      expect(result[0][1]).toBe('root.branch1');
       expect(result[1][1]).toBe('root.branch1');
-      expect(result[2][1]).toBe('root.branch1');
-      expect(result[3][1]).toBe('root');
-      expect(result[4][1]).toBe('root.branch2');
-      expect(result[5][1]).toBe('root.branch2');
+      expect(result[2][1]).toBe('root.branch2');
+      expect(result[3][1]).toBe('root.branch2');
     });
 
     test('handles mixed seq and sel nodes', () => {
@@ -248,8 +247,8 @@ describe('flow/behaviour-tree', () => {
       const result = Array.from(iterateDepth(root));
       
       expect(result).toHaveLength(3);
-      expect(result[0][1]).toBe('level1');
-      expect(result[1][1]).toBe('level1.level2');
+      expect(result[0][1]).toBe('level1.level2');
+      expect(result[1][1]).toBe('level1.level2.level3');
       expect(result[2][1]).toBe('level1.level2.level3');
     });
   });

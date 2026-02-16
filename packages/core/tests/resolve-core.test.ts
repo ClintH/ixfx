@@ -210,9 +210,11 @@ describe('resolveWithFallback', () => {
   });
 
   test('uses fallback when function throws', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const options: ResolveFallbackOptions<number> = { value: 999 };
     const fn = () => { throw new Error('test error'); };
     expect(await resolveWithFallback(fn, options)).toBe(999);
+    consoleSpy.mockRestore();
   });
 
   test('throws when fallback value is undefined', async () => {
@@ -268,9 +270,11 @@ describe('resolveWithFallbackSync', () => {
   });
 
   test('uses fallback when function throws', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const options: ResolveFallbackOptions<number> = { value: 999 };
     const fn = () => { throw new Error('test error'); };
     expect(resolveWithFallbackSync(fn, options)).toBe(999);
+    consoleSpy.mockRestore();
   });
 
   test('throws when fallback value is undefined', () => {
@@ -306,11 +310,13 @@ describe('resolveWithFallbackSync', () => {
   });
 
   test('cannot handle async generators', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const options: ResolveFallbackOptions<number> = { value: 999 };
     async function* asyncGen() {
       yield 1;
     }
     // Should use fallback since resolveSync throws for async generators
     expect(resolveWithFallbackSync(asyncGen() as any, options)).toBe(999);
+    consoleSpy.mockRestore();
   });
 });

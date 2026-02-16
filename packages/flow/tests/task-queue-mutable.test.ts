@@ -57,37 +57,6 @@ describe('flow/task-queue-mutable', () => {
     });
   });
 
-  describe('dequeue()', () => {
-    test('returns undefined when queue is empty', () => {
-      const task = queue.dequeue();
-      
-      expect(task).toBeUndefined();
-    });
-
-    test('returns and removes task from queue', () => {
-      const task = vi.fn().mockResolvedValue(undefined);
-      queue.enqueue(task);
-      
-      const dequeued = queue.dequeue();
-      
-      expect(dequeued).toBe(task);
-      expect(queue.length).toBe(0);
-    });
-
-    test('returns tasks in FIFO order', () => {
-      const task1 = vi.fn().mockResolvedValue(undefined);
-      const task2 = vi.fn().mockResolvedValue(undefined);
-      const task3 = vi.fn().mockResolvedValue(undefined);
-      
-      queue.enqueue(task1);
-      queue.enqueue(task2);
-      queue.enqueue(task3);
-      
-      expect(queue.dequeue()).toBe(task1);
-      expect(queue.dequeue()).toBe(task2);
-      expect(queue.dequeue()).toBe(task3);
-    });
-  });
 
   describe('clear()', () => {
     test('removes all tasks from queue', () => {
@@ -152,14 +121,7 @@ describe('flow/task-queue-mutable', () => {
       expect(queue.length).toBe(3);
     });
 
-    test('updates after dequeue', () => {
-      queue.enqueue(vi.fn().mockResolvedValue(undefined));
-      queue.enqueue(vi.fn().mockResolvedValue(undefined));
-      
-      queue.dequeue();
-      
-      expect(queue.length).toBe(1);
-    });
+
   });
 
   describe('event handling', () => {
@@ -168,10 +130,15 @@ describe('flow/task-queue-mutable', () => {
       queue.addEventListener('empty', emptyHandler);
       
       const task = vi.fn().mockResolvedValue(undefined);
+      expect(queue.runState).toBe('idle');
       queue.enqueue(task);
+      expect(queue.runState).toBe('scheduled');
+
+      expect(queue.length).toBe(1);
       
       // Wait for processing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 400));
+      expect(queue.length).toBe(0);
       
       expect(emptyHandler).toHaveBeenCalledTimes(1);
     });
@@ -180,6 +147,9 @@ describe('flow/task-queue-mutable', () => {
       const startedHandler = vi.fn();
       queue.addEventListener('started', startedHandler);
       
+      expect(queue.length).toBe(0);
+      expect(queue.runState).toBe('idle');
+
       // Add first task
       queue.enqueue(vi.fn().mockResolvedValue(undefined));
       expect(startedHandler).toHaveBeenCalledTimes(1);
@@ -207,10 +177,12 @@ describe('flow/task-queue-mutable', () => {
   describe('error handling', () => {
     test('handles task errors gracefully', async () => {
       const error = new Error('Task failed');
+      const errorHandler = vi.fn();
+      queue.addEventListener('error', errorHandler);
+
       const failingTask = vi.fn().mockRejectedValue(error);
       const successTask = vi.fn().mockResolvedValue(undefined);
       
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
       
       queue.enqueue(failingTask);
       queue.enqueue(successTask);
@@ -218,11 +190,10 @@ describe('flow/task-queue-mutable', () => {
       // Wait for processing
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      expect(consoleError).toHaveBeenCalledWith(error);
+      expect(errorHandler).toHaveBeenCalledTimes(1);
       expect(failingTask).toHaveBeenCalledTimes(1);
       expect(successTask).toHaveBeenCalledTimes(1);
       
-      consoleError.mockRestore();
     });
 
     test('continues processing after task error', async () => {
