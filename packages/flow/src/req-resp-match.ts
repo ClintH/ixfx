@@ -94,6 +94,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
 
   #outgoing = new Map<string, SeenRequest<TRequest, TResp>>();
   #maintainLoop;
+  #timerIds: ReturnType<typeof setTimeout>[] = [];
 
   constructor(options: Partial<RequestResponseOptions<TRequest, TResp>> = {}) {
     super();
@@ -105,7 +106,7 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
     }
     this.timeoutMs = options.timeoutMs ?? 1000;
     this.whenUnmatchedResponse = options.whenUnmatchedResponse ?? `throw`;
-    this.#maintainLoop = continuously(() => this.#maintain(), this.timeoutMs * 2);
+    this.#maintainLoop = continuously(() => this.#maintain(), Math.floor(this.timeoutMs * 1.2));
     if (options.key) {
       if (options.keyRequest) throw new Error(`Cannot set 'keyRequest' when 'key' is set `);
       if (options.keyResponse) throw new Error(`Cannot set 'keyResponse' when 'key' is set `);
@@ -121,6 +122,19 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
     }
   }
 
+  /**
+   * Stops the maintenance loop and cleans up resources.
+   * Should be called when done using the matcher.
+   */
+  dispose(): void {
+    this.#maintainLoop.cancel();
+    for (const timerId of this.#timerIds) {
+      clearTimeout(timerId);
+    }
+    this.#timerIds = [];
+    this.#outgoing.clear();
+  }
+
   #maintain() {
     const values = [ ...this.#outgoing.values() ];
     const now = Date.now();
@@ -132,18 +146,24 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
         }
         const callback = v.callback;
         if (callback) {
-          setTimeout(() => {
-            callback(true, `Request timeout`);
-          }, 1);
+          const cb = callback;
+          const timer = setTimeout(() => {
+            cb(true, `Request timeout`);
+          }, 0);
+          if (this.#timerIds) {
+            this.#timerIds.push(timer);
+          }
         }
         this.fireEvent(`completed`, { request: v.req, response: `Request timeout`, success: false });
         this.#outgoing.delete(v.id);
       }
     }
-    this.debugDump();
     return this.#outgoing.size > 0;
   }
 
+  /**
+   * For debugging, logs all pending requests and their time to expiry
+   */
   debugDump(): void {
     const values = [ ...this.#outgoing.values() ];
     const now = Date.now();
@@ -177,7 +197,10 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
 
   request(request: TRequest, callback?: (error: boolean, response: TResp | string) => void): void | Promise<TResp> {
     if (callback !== undefined) { this.#requestCallback(request, callback); return; }
-    return this.#requestAwait(request);
+     const id = this.keyRequest(request);
+    if (this.#outgoing.has(id)) throw new Error(`Already a request pending with id '${ id }'`);
+
+    return this.#requestAwait(id, request);
   }
 
   /**
@@ -200,11 +223,11 @@ export class RequestResponseMatch<TRequest, TResp> extends SimpleEventEmitter<Re
   /**
    * Make a request, returning a Promise for the outcome.
    * Errors will throw an exception.
+   * 
    * @param request 
    * @returns 
    */
-  #requestAwait(request: TRequest) {
-    const id = this.keyRequest(request);
+  #requestAwait(id:string, request: TRequest) {
     if (this.#outgoing.has(id)) throw new Error(`Already a request pending with id '${ id }'`);
 
     const p = new Promise<TResp>((resolve, reject) => {
