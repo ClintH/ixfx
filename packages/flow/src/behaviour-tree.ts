@@ -77,10 +77,15 @@ export function* iterateDepth(t: BtNode, pathPrefix?: string): Generator<Travers
     pathPrefix = getName(t);
   }
   for (const [ index, n ] of entries(t)) {
-    yield [ n, pathPrefix ];
-    const name = getName(n, `?`);
-    const prefix = pathPrefix.length > 0 ? pathPrefix + `.` + name : name;
-    yield* iterateBreadth(n, prefix);
+    let prefix: string;
+    if (typeof n === `string`) {
+      prefix = pathPrefix;
+    } else {
+      const name = getName(n, `?`);
+      prefix = pathPrefix.length > 0 ? pathPrefix + `.` + name : name;
+    }
+    yield [ n, prefix ];
+    yield* iterateDepth(n, prefix);
   }
 }
 
