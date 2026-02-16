@@ -1,20 +1,34 @@
 import { SimpleEventEmitter } from '@ixfx/events';
 import { Queues } from '@ixfx/collections';
-import { continuously } from '@ixfx/core';
+import { continuously, HasCompletionRunStates } from '@ixfx/core';
 
-export type AsyncTask = () => Promise<void>;
+export type AsyncTaskVoid = () => Promise<void>;
+export type AsyncTaskResult<T> = () => Promise<T>;
+export type AsyncTask = AsyncTaskVoid | AsyncTaskResult<any>;
 
 export type TaskQueueEvents = {
   /**
-   * Task queue has emptied.
+   * Task queue has emptied: it has nothing left to do.
    * @returns
    */
   empty: any
   /**
-   * Task queue was empty and now processing
+   * Task queue was empty and now processing. This does not fire for each task, only when the queue transitions from empty to non-empty.
    * @returns 
    */
   started: any
+
+  /**
+   * An error occurred when running a task
+   * @param error 
+   * @returns 
+   */
+  error: {error:unknown, task:AsyncTask}
+
+  /**
+   * Event fired when a task completes
+   */
+  progress: {task:AsyncTask, result?:any,remaining:number}
 }
 
 /**
@@ -46,6 +60,11 @@ export type TaskQueueEvents = {
  * TaskQueueMutable.shared.addEventListener(`empty`, () => {
  *  // Queue has finished processing all items
  * });
+ * 
+ * TaskQueueMutable.shared.addEventListener(`error`, ({error,task}) => {
+ *  // Reports if a task threw an exception
+ * });
+ * 
  * ```
  */
 export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
@@ -80,29 +99,27 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
     return length;
   }
 
-  dequeue(): AsyncTask | undefined {
-    return this._queue.dequeue();
-  }
 
   private async processQueue() {
     const task = this._queue.dequeue();
-    if (task === undefined) {
+    if (typeof task === `undefined`) {
       this.fireEvent(`empty`, {});
       return false;
-
     }
 
     try {
-      await task();
+      const result = await task();
+      this.fireEvent(`progress`, {task, remaining:this._queue.length,result});
     } catch (error) {
-      console.error(error);
+      this.fireEvent(`error`, {error,task});
     }
-
+    return true;
   }
 
   /**
    * Clears all tasks, and stops any scheduled processing.
    * Currently running tasks will continue.
+   * @fires empty event if queue was not already empty
    * @returns 
    */
   clear(): void {
@@ -113,7 +130,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
   }
 
   /**
-  * Returns true if queue is empty
+  * Returns _true_ if queue is empty
   */
   get isEmpty(): boolean {
     return this._queue.isEmpty;
@@ -125,5 +142,12 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
    */
   get length(): number {
     return this._queue.length
+  }
+
+  /**
+   * Returns the run state of the procesing loop. This is `idle` when no processing is scheduled, `scheduled` when processing is scheduled, and `running` when actively running a task.
+   */
+  get runState():HasCompletionRunStates {
+    return this._loop.runState;
   }
 }
