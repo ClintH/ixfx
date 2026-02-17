@@ -17,7 +17,7 @@ export default defineConfig({
   },
    test: {
     include: [
-      './packages/**/tests/*.test.ts'
+      './packages/**/tests/**/*.test.ts'
     ],
     dangerouslyIgnoreUnhandledErrors:true,
     environment: 'happy-dom'
