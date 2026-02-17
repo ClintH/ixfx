@@ -32,23 +32,14 @@ export const trimStack = <V>(
       }
     }
     case `newer`: {
-      if (toRemove >= stack.length) {
-        // New items will completely flush out old
-        return toAdd.slice(
-          Math.max(0, toAdd.length - capacity),
-          Math.min(toAdd.length, capacity) + 1
-        );
-      } else {
-        // Keep some of the old (from 0)
-        //if (opts.debug) console.log(` orig: ${JSON.stringify(stack)}`);
-        if (opts.debug) {
-          console.log(` from orig: ${ JSON.stringify(stack.slice(0, stack.length - toRemove)) }`);
-        }
-        return [
-          ...stack.slice(0, stack.length - toRemove),
-          ...toAdd.slice(0, Math.min(toAdd.length, capacity - toRemove + 1)),
-        ];
+      if (toAdd.length >= capacity) {
+        return toAdd.slice(toAdd.length - capacity);
       }
+      const keepFromOld = capacity - toAdd.length;
+      return [
+        ...stack.slice(0, keepFromOld),
+        ...toAdd,
+      ];
     }
     case `older`: {
       // Oldest item in stack is position 0
