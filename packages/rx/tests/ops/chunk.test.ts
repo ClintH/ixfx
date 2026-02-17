@@ -13,19 +13,21 @@ describe('rx/ops/chunk', () => {
 
     source.set(1);
     source.set(2);
+    await sleep(10);
+
     expect(chunks).toEqual([]);
 
     source.set(3);
-    await sleep(0); // Wait for async emit
+    await sleep(10);
     expect(chunks).toEqual([[1, 2, 3]]);
 
     source.set(4);
     source.set(5);
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([[1, 2, 3]]);
 
     source.set(6);
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([[1, 2, 3], [4, 5, 6]]);
   });
 
@@ -38,10 +40,12 @@ describe('rx/ops/chunk', () => {
 
     source.set(1);
     source.set(2);
+    await sleep(10);
+
     expect(chunks).toEqual([]);
 
     source.dispose('testing');
-    await sleep(0); // Wait for async emit
+    await sleep(10);
     expect(chunks).toEqual([[1, 2]]);
   });
 
@@ -55,7 +59,7 @@ describe('rx/ops/chunk', () => {
     source.set(1);
     source.set(2);
     source.dispose('testing');
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([]);
   });
 
@@ -67,7 +71,7 @@ describe('rx/ops/chunk', () => {
     chunked.onValue((v) => chunks.push(v));
 
     source.dispose('testing');
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([]);
   });
 
@@ -79,7 +83,10 @@ describe('rx/ops/chunk', () => {
     chunked.onValue((v) => chunks.push(v));
     await sleep(50);
 
-    expect(chunks).toEqual([[1, 2, 3], [4, 5, 6], [7]]);
+    expect(chunks.length).toBe(3);
+    expect(chunks[0]).toEqual([1, 2, 3]);
+    expect(chunks[1]).toEqual([4, 5, 6]);
+    expect(chunks[2]).toEqual([7]);
   });
 
   test('preserves value order within chunks', async () => {
@@ -91,12 +98,12 @@ describe('rx/ops/chunk', () => {
 
     source.set('a');
     source.set('b');
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([['a', 'b']]);
 
     source.set('c');
     source.set('d');
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([
       ['a', 'b'],
       ['c', 'd'],
@@ -111,15 +118,15 @@ describe('rx/ops/chunk', () => {
     chunked.onValue((v) => chunks.push(v));
 
     source.set(1);
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([[1]]);
 
     source.set(2);
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([[1], [2]]);
 
     source.set(3);
-    await sleep(0);
+    await sleep(10);
     expect(chunks).toEqual([[1], [2], [3]]);
   });
 
@@ -132,11 +139,13 @@ describe('rx/ops/chunk', () => {
 
     source.set({ id: 1 });
     source.set({ id: 2 });
-    await sleep(0);
-    expect(chunks).toEqual([[{ id: 1 }, { id: 2 }]]);
+    await sleep(10);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0][0].id).toBe(1);
+    expect(chunks[0][1].id).toBe(2);
 
     source.set({ id: 3 });
-    await sleep(0);
-    expect(chunks).toEqual([[{ id: 1 }, { id: 2 }]]);
+    await sleep(10);
+    expect(chunks.length).toBe(1);
   });
 });

@@ -175,5 +175,5 @@ test('multiple push and pop operations', () => {
   stack.push(3);
   expect(stack.pop()).toBe(3);
   expect(stack.pop()).toBe(1);
-  expect(stack.pop()).toBeUndefined();
+  expect(() => stack.pop()).toThrow('Stack is empty');
 });
