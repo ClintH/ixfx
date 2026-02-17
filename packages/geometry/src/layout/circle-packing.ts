@@ -27,7 +27,7 @@ export const random = (circles: readonly Circle[], container: ShapePositioned, o
     const circle = sorted.pop();
     if (!circle) break;
 
-    const randomPointOpts = { ...opts, margin: { x: circle.radius, y: circle.radius } };
+    const randomPointOpts = { ...opts, margin: circle.radius };
 
     //eslint-disable-next-line functional/no-let
     for (let index = 0; index < attempts; index++) {

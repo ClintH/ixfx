@@ -23,22 +23,24 @@ export const fromCssColour = (colour: string): Colour => {
     return SrgbSpace.fromHexString(colour, true);
   }
 
-  if (typeof cssDefinedHexColours[ colour ] !== `undefined`) {
-    return SrgbSpace.fromHexString(cssDefinedHexColours[ colour ] as string, true);
-  }
   if (colour.startsWith(`--`)) {
     const fromCss = getComputedStyle(document.body).getPropertyValue(colour).trim();
     if (fromCss.length === 0 || fromCss === null) throw new Error(`Variable missing: ${ colour }`);
     return fromCssColour(fromCss);
   }
-  colour = colour.toLowerCase();
-  if (colour.startsWith(`hsl(`)) {
+  
+  const colourLower = colour.toLowerCase();
+  if (typeof cssDefinedHexColours[ colourLower ] !== `undefined`) {
+    return SrgbSpace.fromHexString(cssDefinedHexColours[ colourLower ] as string, true);
+  }
+
+  if (colourLower.startsWith(`hsl(`)) {
     return HslSpace.fromCss(colour, { scalar: true });
   }
-  if (colour.startsWith(`rgb(`)) {
+  if (colourLower.startsWith(`rgb(`)) {
     return SrgbSpace.fromCss(colour, { scalar: true });
   }
-  if (colour.startsWith(`oklch(`)) {
+  if (colourLower.startsWith(`oklch(`)) {
     return OklchSpace.fromCss(colour, { scalar: true });
   }
 
