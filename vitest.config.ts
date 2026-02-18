@@ -20,7 +20,10 @@ export default defineConfig({
       './packages/**/tests/**/*.test.ts'
     ],
     dangerouslyIgnoreUnhandledErrors:true,
-    environment: 'happy-dom'
+    environment: 'happy-dom',
+    coverage: {
+      exclude:['**/tests/**', '**/node_modules/**'],
+    }
   },
   // test: {
   //   reporters: process.env.GITHUB_ACTIONS ? [ 'dot', 'github-actions' ] : [ 'dot' ],
