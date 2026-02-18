@@ -13,6 +13,11 @@ export class IntervalTracker extends NumberTracker {
     }
     this.lastMark = performance.now();
   }
+
+  onReset(): void {
+    super.onReset();
+    this.lastMark = 0;
+  }
 }
 
 /**
