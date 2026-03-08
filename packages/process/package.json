@@ -1,6 +1,6 @@
 {
   "name": "@ixfx/process",
-  "version": "0.56.3",
+  "version": "0.56.4",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -54,6 +54,5 @@
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "engines": {
     "node": ">=24.0.0"
-  },
-  "main": "./dist/index.js"
+  }
 }
