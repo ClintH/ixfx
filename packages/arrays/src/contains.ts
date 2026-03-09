@@ -18,7 +18,7 @@ import { toStringDefault } from "./util/to-string.js";
  * 
  * If `needles` is empty, `contains` will return true.
  * 
- * Compare by value using ixfx's {@link isEqualValueDefault}, or a custom function of your own
+ * Compare by value using ixfx's `isEqualValueDefault`, or a custom function of your own
  * ```js
  * contains(a, b, isEqualValueDefault);
  * contains(a, b, (valueA, valueV) => {

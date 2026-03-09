@@ -16,5 +16,6 @@ export * from './run.js';
 export * from './single.js';
 export * from './sync.js';
 export * from './types.js';
+export type * from './types.js';
 export * from './utility.js';
 

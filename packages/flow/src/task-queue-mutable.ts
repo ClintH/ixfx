@@ -119,7 +119,7 @@ export class TaskQueueMutable extends SimpleEventEmitter<TaskQueueEvents> {
   /**
    * Clears all tasks, and stops any scheduled processing.
    * Currently running tasks will continue.
-   * @fires empty event if queue was not already empty
+   * Fires: `empty` event if queue was not already empty
    * @returns 
    */
   clear(): void {

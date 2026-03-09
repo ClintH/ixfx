@@ -92,7 +92,6 @@ export function unique<V>(
  * By default compares values based on a JSON string representation.
  * 
  * @param arrays Array (or array of arrays) to examine
- * @param toString Function to convert values to a string for comparison purposes. By default uses JSON formatting.
  * @returns
  */
 export function unique<V>(

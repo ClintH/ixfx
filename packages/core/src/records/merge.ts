@@ -1,16 +1,16 @@
 // Source: https://stackoverflow.com/questions/49682569/typescript-merge-object-types
 // jcalz 2021-09-09
 
-type OptionalPropertyNames<T> =
+export type OptionalPropertyNames<T> =
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   { [ K in keyof T ]-?: ({} extends Record<K, T[ K ]> ? K : never) }[ keyof T ];
 
-type SpreadProperties<L, R, K extends keyof L & keyof R> =
+export type SpreadProperties<L, R, K extends keyof L & keyof R> =
   { [ P in K ]: L[ P ] | Exclude<R[ P ], undefined> };
 
-type Id<T> = T extends infer U ? { [ K in keyof U ]: U[ K ] } : never
+export type Id<T> = T extends infer U ? { [ K in keyof U ]: U[ K ] } : never
 
-type SpreadTwo<L, R> = Id<
+export type SpreadTwo<L, R> = Id<
   & Pick<L, Exclude<keyof L, keyof R>>
   & Pick<R, Exclude<keyof R, OptionalPropertyNames<R>>>
   & Pick<R, Exclude<OptionalPropertyNames<R>, keyof L>>
@@ -52,14 +52,13 @@ export function mergeObjects<A extends object[]>(...a: [ ...A ]): Spread<A> {
  * If a single object is passed in, a copy is returned.
  * 
  * Use {@link mergeObjects} for object shape to be a union
- * @param aa 
- * @param bb 
+ * @param a Object arrays to merge
  * @returns 
  */
 export function mergeObjectsSameShape<T extends object>(...a: [T, ...Partial<T>[]]):T {
   const aEntries = Object.entries(a[0]);
 
-  // For each subsequen object
+  // For each subsequent object
   for (let index = 1; index < a.length; index++) {
     // Get its entries
     const bEntries = Object.entries(a[ index ]);

@@ -27,9 +27,9 @@ export function intersection<V>(
  * ```js
  * intersection(arrayA, arrayB, (v) => v.name)
  * ```
- * @param arrayA 
- * @param arrayB 
- * @param toString 
+ * @param arrayA First array
+ * @param arrayB Second array
+ * @param toString Custom function to compare items by value
  */
 export function intersection<V>(
   arrayA: V[], arrayB: V[],
@@ -37,9 +37,14 @@ export function intersection<V>(
   toString: (value: V) => string
 ): V[];
 
+/**
+ * Returns the _intersection_ of two arrays: the elements that are in common. Duplicates are removed in the process.
+ * @param arrayA First array
+ * @param arrayB Second array
+ * @param comparerOrKey Comparer/stringify function
+ */
 export function intersection<V>(
   arrayA: V[], arrayB: V[],
-
   comparerOrKey?: IsEqual<V> | ((value: V) => string)
 ): V[];
 
@@ -63,9 +68,9 @@ export function intersection<V>(
  * ```
  * 
  * See also: 
- * * {@link uniqueByKey}/{@link uniqueByComparer}: Get unique items across one or more arrays, including within the array
- * @param arrayA 
- * @param arrayB 
+ * * `uniqueByKey`/`uniqueByComparer`: Get unique items across one or more arrays, including within the array
+ * @param arrayA First array
+ * @param arrayB Second array
  * @param comparerOrKey Comparer or key-generating function 
  * @returns 
  */

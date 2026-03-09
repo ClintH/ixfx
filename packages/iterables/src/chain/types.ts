@@ -171,12 +171,6 @@ export type TickOptions = {
   asClockTime?: boolean
 }
 
-
-
-
-
-
-
 /**
  * Lazy execution of a chain
  */

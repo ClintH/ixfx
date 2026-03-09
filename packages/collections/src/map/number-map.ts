@@ -185,7 +185,7 @@ export class NumberMap<K> extends Map<K, number> {
    * for (const key of map.filterKeysByValue(greaterThanOne)) {
    * }
    * ```
-   * @param v 
+   * @param fn Predicate to test values 
    */
   *filterKeysByValue(fn:(value:number)=>boolean): Generator<K, void, unknown> {
     for (const [key, value] of this.entries()) {
