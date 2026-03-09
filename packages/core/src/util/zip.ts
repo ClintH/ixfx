@@ -1,6 +1,10 @@
-export const zip = (
-  ...arrays: any[][] | readonly any[][] | readonly (readonly any[])[]
-): any[] => {
+export type ZippedTuple<T extends readonly (readonly unknown[])[]> = {
+  [K in keyof T]: T[K] extends readonly (infer U)[] ? U : never;
+};
+
+export const zip = <T extends readonly (readonly unknown[])[]>(
+  ...arrays: T
+): Array<ZippedTuple<T>> => {
   if (arrays.some((a) => !Array.isArray(a))) {
     throw new Error(`All parameters must be an array`);
   }
