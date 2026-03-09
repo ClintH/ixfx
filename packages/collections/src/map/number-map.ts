@@ -29,7 +29,7 @@
  * map.get(`hello`); // 10
  * ```
  * 
- * Regular `set` works as well:
+ * Regular `set` works, overriding the value to whatever is given:
  * ```js
  * map.set(`hello`, 5);
  * map.add(`hello`, 2); // 7
@@ -38,6 +38,9 @@
 export class NumberMap<K> extends Map<K, number> {
   readonly defaultValue: number;
 
+  /**
+   * Creates a NumberMap with default value of 0
+   */
   constructor(defaultValue = 0) {
     super();
     this.defaultValue = defaultValue;
@@ -106,6 +109,99 @@ export class NumberMap<K> extends Map<K, number> {
       const newValue = fn(value, key);
       super.set(key, newValue);
     }
+  }
+
+  /**
+   * Returns the largest value in the map. If the map is empty, returns `NaN`.
+  * ```js
+   * // Eg find all the keys corresponding to the maximum value
+   * const largestKeys = [...map.keysByValue(map.findValueMax())];
+   * ```
+   * @returns 
+   */
+  findValueMax():number {
+    if (this.size === 0) return Number.NaN;
+    let maxValue = Number.MIN_VALUE;
+    for (const value of this.values()) {
+      if (value > maxValue) {
+        maxValue = value;
+      }
+    }
+    return maxValue;
+  }
+
+  /**
+   * Returns the smallest value in the map. If the map is empty, returns `NaN`.
+   * 
+   * ```js
+   * // Eg find all the keys corresponding to the minimum value
+   * const smallestKeys = [...map.keysByValue(map.findValueMin())];
+   * ```
+   * @returns 
+   */
+  findValueMin():number {
+    if (this.size === 0) return Number.NaN;
+    let minValue = Number.MAX_SAFE_INTEGER;
+    for (const value of this.values()) {
+      if (value < minValue) {
+        minValue = value;
+      }
+    }
+    return minValue;
+  }
+
+  /**
+   * Iterates over all keys that have a corresponding value
+   * @param v 
+   */
+  *keysByValue(v:number): Generator<K, void, unknown> {
+    for (const [key, value] of this.entries()) {
+      if (value === v) yield key;
+    }
+  }
+
+
+  /**
+   * Iterates over entries, sorted by value. By default ascending order.
+   */
+  *entriesSorted(sorter?:(a:[K,number], b:[K,number]) => number):Generator<[key:K,value:number]> {
+    const entries = [...this.entries()];
+    if (sorter) {
+      entries.sort(sorter);
+    } else {
+      entries.sort((a, b) => a[1] - b[1]);
+    }
+    for (const entry of entries) {
+      yield entry;
+    }
+  }
+
+
+  /**
+   * Iterates over all keys that have a value matching `fn`.
+   * ```js
+   * // Iterate over all keys that store a value greater than 1
+   * const greaterThanOne = (v) => v > 1;
+   * for (const key of map.filterKeysByValue(greaterThanOne)) {
+   * }
+   * ```
+   * @param v 
+   */
+  *filterKeysByValue(fn:(value:number)=>boolean): Generator<K, void, unknown> {
+    for (const [key, value] of this.entries()) {
+      if (fn(value)) yield key;
+    }
+  }
+
+  /**
+   * Deletes a set of keys
+   */
+  deleteKeys(keys: Iterable<K>): number {
+    let deleted = 0;
+    for (const key of keys) {
+      if (super.delete(key)) deleted++;
+    }
+    return deleted;
   }
 
   /**
