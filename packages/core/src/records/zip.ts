@@ -1,24 +1,41 @@
+import { type Spread, mergeObjects } from "./merge.js";
+
 /**
- * Merge corresponding objects from arrays `a` and `b`.
+ * Merge corresponding objects from arrays. This is assuming objects at the same array indices are connected.
  * 
- * Arrays must be the same length. When merging objects, the key-values of 'b' override those of 'a'.
- * @param a 
- * @param b 
+ * Arrays must be the same length. When merging objects, the properties of later objects override those of earlier objects.
+ * 
+ * ```js
+ * const a = [ { name: `jane`, age: 30 }, { name: `bob`, age: 40 } ];
+ * const b = [ { name: `fred`, colour: `red` }, { name: `johanne` } ];
+ * const c = [...zipObjects(a, b)];
+ * // Yields:
+ * // [
+ * //   { name: `fred`, age: 30, colour: `red` },
+ * //   { name: `johanne`, age: 40 }
+ * // ]
+ * ```
+ * @param toMerge Arrays to merge
+ * @throws {TypeError} If either parameter is not an array
+ * @throws {TypeError} If the arrays are not of the same length
+ * @returns Generator of merged records 
  */
-export function* zipRecords<TKey extends string | symbol | number, TValue>(a: Record<TKey, TValue>[], b: Record<TKey, TValue>[]): Generator<Record<TKey, TValue>, void, unknown> {
-  if (!Array.isArray(a)) throw new TypeError(`Param 'a' is expected to be an array`);
-  if (!Array.isArray(b)) throw new TypeError(`Param 'b' is expected to be an array`);
+export function* zipObjects<T extends object[]>(
+  ...toMerge: { [K in keyof T]: Array<T[K]> }
+): Generator<Spread<T>, void, unknown> {
 
-  if (a.length !== b.length) throw new TypeError(`Array length mismatch. A: ${ a.length } B: ${ b.length }`);
+  let len = -1;
+  for (let index = 0; index < toMerge.length; index++) {
+    if (!Array.isArray(toMerge[index])) throw new TypeError(`Value at index ${index} is not an array as expected`);
+    if (len === -1) {
+      len = toMerge[index].length;
+    } else {
+      if (toMerge[index].length !== len) throw new TypeError(`Array length mismatch. Expected: ${ len } Actual: ${ toMerge[index].length } Array: ${index}`);
+    }
+  }
 
-  const zipSingle = (aa: Record<TKey, TValue>, bb: Record<TKey, TValue>) => {
-    return {
-      ...aa,
-      ...bb,
-    };
-  };
-
-  for (let index = 0; index < a.length; index++) {
-    yield zipSingle(a[ index ], b[ index ]);
+  for (let index = 0; index < len; index++) {
+    const row = toMerge.map((arr) => arr[index]) as T;
+    yield mergeObjects<T>(...row);
   }
 }
