@@ -20,6 +20,54 @@ type SpreadTwo<L, R> = Id<
 export type Spread<A extends readonly [ ...any ]> = A extends [ infer L, ...infer R ] ?
   SpreadTwo<L, Spread<R>> : unknown
 
-export function mergeObjects<A extends object[]>(...a: [ ...A ]) {
+/**
+ * Merges objects together, the rightmost objects overriding properties of earlier objects.
+ * 
+ * The return type is the intersection of all properties
+ * ```js
+ * const a = { name: `jane`, age: 30 };
+ * const b = { name: `fred`, age: 31, colour: `blue` };
+ * const c = mergeObjects(a, b);
+ * // Yields:
+ * // { name: `fred`, age: 31, colour: `blue` } 
+ * ```
+ * 
+ * Alternatively, use {@link mergeObjectsSameShape} if the return shape
+ * should be based on the first object.
+ * @param a 
+ * @returns Merged object
+ */
+export function mergeObjects<A extends object[]>(...a: [ ...A ]): Spread<A> {
   return Object.assign({}, ...a) as Spread<A>;
+}
+// const a = { name: `jane`, age: 30 };
+// const b = { name: `fred`,  colour: `blue` };
+// const c = mergeObjects(a, b);
+
+
+/**
+ * Merges objects together, conforming to the shape of the first object.
+ * Properties contained on later objects are ignored if they aren't part of the first.
+ * 
+ * If a single object is passed in, a copy is returned.
+ * 
+ * Use {@link mergeObjects} for object shape to be a union
+ * @param aa 
+ * @param bb 
+ * @returns 
+ */
+export function mergeObjectsSameShape<T extends object>(...a: [T, ...Partial<T>[]]):T {
+  const aEntries = Object.entries(a[0]);
+
+  // For each subsequen object
+  for (let index = 1; index < a.length; index++) {
+    // Get its entries
+    const bEntries = Object.entries(a[ index ]);
+    for (const [ key, value ] of bEntries) {
+      // Copy the value if it was in the first
+      const aEntry = aEntries.find(([ aKey ]) => aKey === key);
+      if (aEntry) aEntry[ 1 ] = value;
+    }
+  }
+  return Object.fromEntries(aEntries) as T; 
 }
