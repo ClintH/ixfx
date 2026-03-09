@@ -53,12 +53,9 @@ pnpx publint
 
 # Publishing
 
-
-
 ```
 pnpm run verify
 pnpm run release
-pnpm run publish 
 pnpm run bundle:publish
 ```
 
