@@ -348,7 +348,6 @@ export function* traceByPath(
  * 
  * @example
  * ```js
- * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
  * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
  * const root = Trees.FromObject.asDynamicTraversable(myObj);
  * for (const v of Trees.Traverse.breadthFirst(root)) {
@@ -387,6 +386,7 @@ export const asDynamicTraversable = (node: object, options: Partial<ChildrenOpti
 
 /**
  * Reads all fields and sub-fields of `node`, returning as a 'wrapped' tree structure.
+ * Is a snapshot of `node`, and won't update if it mutates.
  * @param node 
  * @param options 
  * @returns 
@@ -430,7 +430,6 @@ export type CreateOptions = {
  * Alternatively, consider {@link asDynamicTraversable} which reads the object dynamically.
  * @example
  * ```js
- * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
  * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
  * const root = Trees.FromObject.create(myObj);
  * for (const v of Trees.Traverse.breadthFirst(root)) {
@@ -464,7 +463,12 @@ const createImpl = <T extends object>(sourceValue: T, leafValue: T, options: Par
 }
 
 /**
- * Returns a copy of `node` with its (and all its children's) parent information removed.
+ * Returns a copy of `node` with its (and all its childrens') parent information removed.
+ * 
+ * Under the hood:
+ * ```js
+ * TreeArrayBacked.stripParentage(create(node, options));
+ * ```
  * @param node 
  * @param options 
  * @returns 

@@ -22,7 +22,7 @@ export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>): Dif
 }
 
 /**
- * Converts `TreeNode` to `SimplifiedNode`, removing the 'parent' fields.
+ * Converts {@link Trees.TreeNode} to {@link Trees.SimplifiedNode}, removing the 'parent' fields.
  * This can be useful because if you have the whole tree, the parent field
  * is redundant and because it makes circular references can make dumping to console etc more troublesome.
  * 
@@ -231,9 +231,16 @@ export function nodeDepth(node: TreeNode<any>): number {
   return p.length;
 }
 
-export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>): boolean => {
+/**
+ * Returns _true_ if `child` is an immediate child of `parent`.
+ * @param child 
+ * @param parent 
+ * @param eq Equality function to compare nodes. Uses `isEqualDefault` by default, which compares by reference.
+ * @returns 
+ */
+export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>, eq: IsEqual<TreeNode<T>> = isEqualDefault): boolean => {
   for (const c of parent.childrenStore) {
-    if (c === child) return true;
+    if (eq(c, child)) return true;
   }
   return false;
 }
@@ -283,12 +290,24 @@ export const hasAnyChild = <T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T
   return false;
 }
 
+/**
+ * Using a breadth-first search, return the first child of `parent` that has `value`.
+ * @param value Value being sought
+ * @param parent Parent node
+ * @param eq Equality function to compare values. Uses `isEqualDefault` by default, which compares by reference.
+ * @returns 
+ */
 export const findAnyChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined => {
   for (const c of breadthFirst(parent)) {
     if (eq(c.value as T, value)) return c;
   }
 }
 
+/**
+ * Traverses up a node to find the root.
+ * @param node 
+ * @returns 
+ */
 export const getRoot = <T>(node: TreeNode<T>): TreeNode<T> => {
   if (node.parent) return getRoot(node.parent);
   return node;
@@ -393,10 +412,15 @@ const computeMaxDepthImpl = <T>(node: TreeNode<T>, startingDepth = 0) => {
   return depth;
 }
 
+/**
+ * Adds a child node to `parent`. 
+ * If `child` already has a parent, it is removed from that parent. 
+ * @param child 
+ * @param parent 
+ * @throws Error if adding a child would break tree structure
+ */
 export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>): void => {
   throwAttemptedChild(child, parent);
-  //if (hasAnyChild(parent, child)) throw new Error(`Parent already contains child`);
-  //if (hasAnyParent(child, parent)) throw new Error(`Child already has parent`);
   const p = child.parent;
   parent.childrenStore = [ ...parent.childrenStore, child ];
   child.parent = parent;
@@ -405,6 +429,9 @@ export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>): void => {
   }
 }
 
+/**
+ * Adds a new child node based on a value
+ */
 export const addValue = <T>(value: T | undefined, parent: TreeNode<T>): TreeNode<T> => {
   return createNode(value, parent);
 }
@@ -502,6 +529,15 @@ export const asDynamicTraversable = <T>(node: TreeNode<T>): TraversableTree<T> =
   return t;
 }
 
+/**
+ * Throws an error if:
+ * 1. `child` is the same node as `parent`
+ * 2. `child` is already an immediate child of `parent`
+ * 3. `child` is an ancestor parent of `parent`
+ * 4. `child` has `parent` as its own child
+ * @param c 
+ * @param parent 
+ */
 const throwAttemptedChild = <T>(c: TreeNode<T>, parent: TreeNode<T>) => {
   if (parent === c) throw new Error(`Cannot add self as child`);
   if (c.parent === parent) return; // skip if it's already a child
@@ -510,6 +546,14 @@ const throwAttemptedChild = <T>(c: TreeNode<T>, parent: TreeNode<T>) => {
   if (hasAnyChild(parent, c)) throw new Error(`Child contains parent (2)`, { cause: c });
 }
 
+/**
+ * Sets the children of `parent` to a list of `children`.
+ * 
+ * Any previous children are disconnected from this parent.
+ * All new children have their parent set to `parent`.
+ * 
+ * There is some validation to ensure that adding the children doesn't break the tree.
+ */
 export const setChildren = <T>(parent: TreeNode<T>, children: TreeNode<T>[]): void => {
   // Verify children are legit
   for (const c of children) {

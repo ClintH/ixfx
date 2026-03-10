@@ -26,7 +26,15 @@ export type LabelledValues<TValue> = {
 /**
  * Array-backed tree node.
  * 
- * Create using {@link Trees.Mutable.root}
+ * Create using:
+ * * {@link Trees.Mutable.root}: Imperative building of a tree
+ * * {@link Trees.FromObject.create}: Create based on a snapshot of an object
+ * 
+ * Use {@link Trees.isTreeNode} to check if an object is this type.
+ * 
+ * Convert:
+ * * {@link Trees.Mutable.stripParentage}: Create a {@link Trees.SimplifiedNode}, with parentage removed.
+ * * {@link Trees.Mutable.wrap}: Create an object-oriented {@link Trees.WrappedNode} based on a node.
  */
 export type TreeNode<TValue> = {
   /**
@@ -43,6 +51,13 @@ export type TreeNode<TValue> = {
   childrenStore: readonly TreeNode<TValue>[]
 }
 
+/**
+ * A simplified node has its parentage stripped.
+ * 
+ * To create:
+ * * {@link Trees.Mutable.stripParentage}: Create based on a {@link Trees.TreeNode} instance
+ * * {@link Trees.FromObject.createSimplified}: Create based on an object
+ */
 export type SimplifiedNode<TValue> = {
   /**
    * Value of node, or _undefined_ if it has no value
@@ -60,7 +75,12 @@ export type SimplifiedNode<TValue> = {
 export type LabelledNode<TValue> = TreeNode<LabelledValue<TValue>>;
 
 /**
- * Traversable Tree
+ * Traversable Tree.
+ * 
+ * Creatable from:
+ * * {@link Trees.FromObject.asDynamicTraversable}: Create based on dynamic reading of an object
+ * * {@link Trees.TraversableTree}: Create based on an {@link Trees.TreeNode}, a {@link Trees.TraversableTree} or an object (same as calling asDynamicTraversable).
+ * Use {@link Trees.isTraversable} to check if an object is this type.
  */
 export type TraversableTree<TValue> = {
   /**
@@ -98,6 +118,10 @@ export type TraverseObjectPathOpts = {
 
 /**
  * Wraps a {@link TreeNode} for a more object-oriented means of access.
+ * 
+ * Create:
+ * * {@link Trees.FromObject.createWrapped}: Create based on an object
+ * * {@link Trees.Mutable.wrap}: Create based on a {@link Trees.TreeNode} instance
  */
 export type WrappedNode<T> = TraversableTree<T> & {
   /**

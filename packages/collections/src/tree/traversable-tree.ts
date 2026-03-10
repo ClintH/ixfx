@@ -5,6 +5,12 @@ import { StackMutable } from "../stack/StackMutable.js";
 import { isTraversable } from "./index.js";
 import type { TraversableTree, TreeNode } from "./types.js";
 
+/**
+ * Returns the number of children of `tree`.
+ * Under the hood is just `[ ...tree.children() ].length`
+ * @param tree 
+ * @returns 
+ */
 export const childrenLength = <T>(tree: TraversableTree<T>): number => {
   return [ ...tree.children() ].length;
 }
@@ -24,6 +30,14 @@ export const hasAnyParent = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   return hasParent(child, possibleParent, eq, Number.MAX_SAFE_INTEGER);
 };
 
+/**
+ * Returns _true_ if `child` is parented at any level (grand-parented etc) by a parent with value `possibleParentValue`
+ * @param child Child being sought
+ * @param possibleParentValue Value of possible parent of child
+ * @param eq Equality comparison function {@link isEqualDefault} used by default
+ * @throws TypeError if `child` is undefined
+ * @returns
+ */
 export const hasAnyParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   child: T,
   possibleParentValue: TV,
@@ -34,6 +48,13 @@ export const hasAnyParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, 
   return hasParentValue<T, TV>(child, possibleParentValue, eq, Number.MAX_SAFE_INTEGER);
 };
 
+/**
+ * Returns any parent of `child` that has value `possibleParentValue`. Returns _undefined_ if not found.
+ * @param child Child being sought
+ * @param possibleParentValue Value of possible parent of child
+ * @param eq Equality comparison function {@link isEqualDefault} used by default
+ * @returns
+ */
 export const findAnyParentByValue = <TValue>(
   child: TraversableTree<TValue>,
   possibleParentValue: TValue,
@@ -106,6 +127,14 @@ export const hasParentValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>
   return hasParentValue(p, possibleParentValue, eq, maxDepth - 1);
 };
 
+/**
+ * Returns any parent of `child` that has value `possibleParentValue`. Returns _undefined_ if not found.
+ * @param child Child being sought
+ * @param possibleParentValue Value of possible parent of child
+ * @param eq Equality comparison function {@link isEqualDefault} used by default
+ * @param maxDepth Maximum depth of traversal. Default of 0 only looks for immediate parent.
+ * @returns 
+ */
 export const findParentByValue = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   child: T,
   possibleParentValue: TV,
@@ -164,6 +193,14 @@ export const hasAnyChild = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   return hasChild(parent, possibleChild, eq, Number.MAX_SAFE_INTEGER);
 };
 
+/**
+ * Returns _true_ if `parent` has any child with value `possibleChildValue`. It explores
+ * at children at any depth from `parent`.
+ * @param parent 
+ * @param possibleChildValue 
+ * @param eq 
+ * @returns 
+ */
 export const hasAnyChildValue = <T>(
   parent: TraversableTree<T>,
   possibleChildValue: T,
@@ -210,6 +247,15 @@ export const hasChild = <T extends TraversableTree<TV> | TreeNode<TV>, TV>(
   return false;
 };
 
+/**
+ * Returns _true_ if `parent` has any child with value `possibleChildValue`. It explores
+ * at children up to `maxDepth` from `parent`. By default only looks at immediate children (maxDepth = 0).
+ * @param parent 
+ * @param possibleValue 
+ * @param eq 
+ * @param maxDepth 
+ * @returns 
+ */
 export const hasChildValue = <T>(
   parent: TraversableTree<T>,
   possibleValue: T,
@@ -386,7 +432,6 @@ export function* depthFirst<T extends TraversableTree<TV> | TreeNode<TV>, TV>(ro
  * 
  * @example Traversing over a simple object
  * ```js
- * import { Trees } from "https://unpkg.com/@ixfx/collections/bundle"
  * const myObj = { name: `Pedro`, size: 45, colour: `orange` };
  * const root = Trees.FromObject.asDynamicTraversable(myObj);
  * for (const v of Trees.Traverse.breadthFirst(root)) {

@@ -6,11 +6,14 @@ export * as Mutable from './tree-mutable.js';
 export * as Pathed from './pathed.js'
 export * as FromObject from './traverse-object.js';
 export * as Traverse from './traversable-tree.js';
+export * as BinaryTree from './binary-tree.js';
+export * as BinarySearchTree from './binary-search-tree.js';
 export * from './compare.js';
 export type * from './types.js';
 
 /**
- * Makes a 'traversable' to move around a {@link TreeNode}, an existing {@link TraversableTree} or a plain object.
+ * Makes a 'traversable' to move around a {@link TreeNode}, 
+ * an existing {@link TraversableTree} or a plain object.
  * 
  * @param node 
  * @returns 
