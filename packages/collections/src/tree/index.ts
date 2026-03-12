@@ -10,6 +10,7 @@ export * as BinaryTree from './binary-tree.js';
 export * as BinarySearchTree from './binary-search-tree.js';
 export * from './compare.js';
 export type * from './types.js';
+export * from './labelled.js';
 
 /**
  * Makes a 'traversable' to move around a {@link TreeNode}, 
@@ -49,3 +50,5 @@ export const isTreeNode = (node: any): node is TreeNode<any> => {
 export const isTraversable = (node: any): node is TraversableTree<any> => {
   return (`children` in node && `getParent` in node && `getValue` in node && `getIdentity` in node);
 }
+
+
