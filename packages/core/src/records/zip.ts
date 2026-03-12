@@ -1,4 +1,4 @@
-import { type Spread, mergeObjects } from "./merge.js";
+import { type Spread, merge } from "./merge.js";
 
 /**
  * Merge corresponding objects from arrays. This is assuming objects at the same array indices are connected.
@@ -8,7 +8,7 @@ import { type Spread, mergeObjects } from "./merge.js";
  * ```js
  * const a = [ { name: `jane`, age: 30 }, { name: `bob`, age: 40 } ];
  * const b = [ { name: `fred`, colour: `red` }, { name: `johanne` } ];
- * const c = [...zipObjects(a, b)];
+ * const c = [...zip(a, b)];
  * // Yields:
  * // [
  * //   { name: `fred`, age: 30, colour: `red` },
@@ -20,7 +20,7 @@ import { type Spread, mergeObjects } from "./merge.js";
  * @throws {TypeError} If the arrays are not of the same length
  * @returns Generator of merged records 
  */
-export function* zipObjects<T extends object[]>(
+export function* zip<T extends object[]>(
   ...toMerge: { [K in keyof T]: Array<T[K]> }
 ): Generator<Spread<T>, void, unknown> {
 
@@ -36,6 +36,6 @@ export function* zipObjects<T extends object[]>(
 
   for (let index = 0; index < len; index++) {
     const row = toMerge.map((arr) => arr[index]) as T;
-    yield mergeObjects<T>(...row);
+    yield merge<T>(...row);
   }
 }
