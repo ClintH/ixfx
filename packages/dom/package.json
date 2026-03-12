@@ -52,5 +52,8 @@
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "engines": {
     "node": ">=24.0.0"
+  },
+  "inlinedDependencies": {
+    "json5": "2.2.3"
   }
 }

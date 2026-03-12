@@ -1,7 +1,23 @@
 A rough changelog between NPM releases
 
-# 
-2026.01.08
+# 2026.03.12
+
+@ixfx/visual
++ interpolator: for calculating interpolation between any number of colours
+
+@ixfx/numbers
+* rangeIsWithin: Added 'exclusive' flag to check if a range is entirely enclosed and not at min/max
+
+@ixfx/core
+* Records: zipObject -> zip, mergeObjects -> merge etc
+
+@ixfx/collections
++ TreeMutable: Added `removeValuelessNodesFromChild`, `siblings` iterator
+* Refactored `Pathed` as a class, added additional methods for working with tree structures described by string paths, eg a file system
+
+Lots of additional test coverage via LLMs.
+
+# 2026.01.08
 
 @ixfx/arrays
 * isEquals/isEqualIgnoreOrder/intersection/unique: supports (a,b) or string-based comparison
