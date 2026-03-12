@@ -1,12 +1,22 @@
 import type { IsEqual } from "@ixfx/core";
+import type { Result } from "@ixfx/guards";
 import type { LabelledNode, LabelledValue, TreeNode } from "./types.js";
 import { isEqualDefault, isEqualValueDefault } from "@ixfx/core";
+import { throwIfFailed } from "@ixfx/guards";
 import { isMultiValue, isSingleValue } from "./labelled.js";
 import * as TreeArrayBacked from "./tree-mutable.js";
 /**
  * Options for parsing a path
  */
 export type PathOpts = Readonly<{
+  /**
+   * If _true_, paths are expeced to start with the separator char.
+   * Default: _false_
+   *
+   * For a *nix file system, this would be _true_
+   */
+  startsWithSeparator: boolean;
+
   /**
    * Separator for path, eg '.'
    */
@@ -62,6 +72,7 @@ export class Pathed<T> {
   constructor(pathOpts: Partial<PathOpts> = {}) {
     this.#pathOpts = {
       separator: `.`,
+      startsWithSeparator: false,
       duplicates: `overwrite`,
       ...pathOpts,
     };
@@ -74,10 +85,19 @@ export class Pathed<T> {
    * @param path Path
    */
   add(value: T, path: string): void {
-    const n = addValueByPath(value, path, this.#root, this.#pathOpts);
+    throwIfFailed(this.validate(path));
+
+    const n = addValueByPath(value, path, this.#pathOpts, this.#root);
     if (this.#root === undefined) {
       this.#root = TreeArrayBacked.getRoot(n);
     }
+  }
+
+  validate(path: string): Result<string, string> {
+    if (this.#pathOpts.startsWithSeparator && !path.startsWith(this.#pathOpts.separator)) {
+      return { success: false, error: `Path must start with separator when 'startsWithSeparator' is enabled. Got: ${path}` };
+    }
+    return { success: true, value: path };
   }
 
   /**
@@ -97,6 +117,8 @@ export class Pathed<T> {
    * @returns _true_ if value was removed
    */
   remove(path: string): boolean {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return false;
     return removeValueByPath(path, this.#root, this.#pathOpts);
@@ -108,6 +130,8 @@ export class Pathed<T> {
    * @returns _true_ if value exists at path
    */
   hasPath(path: string): boolean {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return false;
     const c = findChildByPath(path, this.#root, this.#pathOpts);
@@ -123,6 +147,8 @@ export class Pathed<T> {
    * @returns The tree node for the given path, or _undefined_ if not found
    */
   getNode(path: string): LabelledNode<T> | undefined {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return;
     const c = findChildByPath(path, this.#root, this.#pathOpts);
@@ -136,9 +162,37 @@ export class Pathed<T> {
    * @returns The value at the path, or _undefined_ if path is not found
    */
   getValue(path: string): T | undefined {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return;
     return valueByPath(path, this.#root, this.#pathOpts);
+  }
+
+  /**
+   * Gets the containing path to `node`. If _includeNode_ is true, we also include the
+   * node's own label.
+   */
+  getPath(node: LabelledNode<T>, includeNode: boolean): string {
+    if (this.#root === undefined)
+      return ``;
+    const segments: string[] = [];
+    if (includeNode && node.value) {
+      segments.push(node.value?.label);
+    }
+    for (const p of parentValues(node)) {
+      segments.unshift(p.label);
+    }
+    let path = segments.join(this.#pathOpts.separator);
+    if (this.#pathOpts.startsWithSeparator) {
+      if (!path.startsWith(this.#pathOpts.separator)) {
+        path = this.#pathOpts.separator + path;
+      }
+      if (!path.endsWith(this.#pathOpts.separator) && (node.childrenStore.length > 0 || !includeNode)) {
+        path += this.#pathOpts.separator;
+      }
+    }
+    return path;
   }
 
   /**
@@ -148,6 +202,8 @@ export class Pathed<T> {
    * @returns The number of children at the path, or NaN if path is not found
    */
   childrenLength(path: string): number {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return Number.NaN;
     const c = findChildByPath(path, this.#root, this.#pathOpts);
@@ -162,6 +218,8 @@ export class Pathed<T> {
    * @returns An array of values at the path, or an empty array if path is not found
    */
   getValues(path: string): T[] | undefined {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return undefined;
     return valuesByPath(path, this.#root, this.#pathOpts);
@@ -173,6 +231,8 @@ export class Pathed<T> {
    * @returns _true_ if there was a value to clear at the path
    */
   clearValues(path: string): boolean {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return false;
     return clearValuesByPath(path, this.#root, this.#pathOpts);
@@ -182,6 +242,8 @@ export class Pathed<T> {
    * Iterate all children of this path
    */
   *children(path: string): IterableIterator<LabelledNode<T>> {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return;
     yield* children(path, this.#root, this.#pathOpts);
@@ -191,6 +253,8 @@ export class Pathed<T> {
    * Iterate all siblings of this path
    */
   *siblings(path: string): IterableIterator<LabelledNode<T>> {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return;
     yield* siblings(path, this.#root, this.#pathOpts);
@@ -200,6 +264,8 @@ export class Pathed<T> {
    * Iterate all siblings of this path
    */
   *siblingsValues(path: string): IterableIterator<LabelledValue<T>> {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return;
     yield* siblingsValues(path, this.#root, this.#pathOpts);
@@ -209,6 +275,8 @@ export class Pathed<T> {
    * Returns the parent node of `path`, or _undefined_ if not found or at root.
    */
   parent(path: string): LabelledNode<T> | undefined {
+    throwIfFailed(this.validate(path));
+
     if (this.#root === undefined)
       return;
     return parent(path, this.#root, this.#pathOpts);
@@ -249,9 +317,9 @@ export class Pathed<T> {
  * @param node Node to insert
  * @param pathOpts Options
  */
-export function addValueByPath<T>(value: T, path: string, node?: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): LabelledNode<T> {
-  const separator = pathOpts.separator ?? `.`;
-  const duplicatePath = pathOpts.duplicates ?? `overwrite`;
+export function addValueByPath<T>(value: T, path: string, pathOpts: PathOpts, node?: LabelledNode<T>): LabelledNode<T> {
+  const separator = pathOpts.separator;
+  const duplicatePath = pathOpts.duplicates;
   const split = path.split(separator);
   let count = 0;
   for (const p of split) {
@@ -327,7 +395,7 @@ function pruneLabelledBranch<T>(node: LabelledNode<T>): void {
   pruneLabelledBranch(parent);
 }
 
-export function removeValueByPath<T>(path: string, root: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): boolean {
+export function removeValueByPath<T>(path: string, root: LabelledNode<T>, pathOpts: PathOpts): boolean {
   if (root === undefined)
     return false;
   const c = findChildByPath(path, root, pathOpts);
@@ -339,7 +407,7 @@ export function removeValueByPath<T>(path: string, root: LabelledNode<T>, pathOp
   return true;
 }
 
-export function clearValuesByPath<T>(path: string, root: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): boolean {
+export function clearValuesByPath<T>(path: string, root: LabelledNode<T>, pathOpts: PathOpts): boolean {
   if (root === undefined)
     return false;
   const c = findChildByPath(path, root, pathOpts);
@@ -355,7 +423,7 @@ export function clearValuesByPath<T>(path: string, root: LabelledNode<T>, pathOp
 /**
  * Return the length of children of `path`, or NaN if path not found.
  */
-export function childrenLengthByPath<T>(path: string, searchStart: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): number {
+export function childrenLengthByPath<T>(path: string, searchStart: LabelledNode<T>, pathOpts: PathOpts): number {
   if (searchStart === undefined)
     return Number.NaN;
   const c = findChildByPath(path, searchStart, pathOpts);
@@ -367,7 +435,7 @@ export function childrenLengthByPath<T>(path: string, searchStart: LabelledNode<
 /**
  * Iterate over all the children of `path`
  */
-export function *children<T>(path: string, searchStart: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): IterableIterator<LabelledNode<T>> {
+export function *children<T>(path: string, searchStart: LabelledNode<T>, pathOpts: PathOpts): IterableIterator<LabelledNode<T>> {
   if (searchStart === undefined)
     return;
   const c = findChildByPath(path, searchStart, pathOpts);
@@ -382,7 +450,7 @@ export function *children<T>(path: string, searchStart: LabelledNode<T>, pathOpt
  * Iterate over all the siblings of `path`, excluding the node at `path` itself.
  * Yields LabelledNode instances, which allow you to traverse tree. If all you care about is the values, use {@link siblingsValues} instead.
  */
-export function *siblings<T>(path: string, searchStart: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): IterableIterator<LabelledNode<T>> {
+export function *siblings<T>(path: string, searchStart: LabelledNode<T>, pathOpts: PathOpts): IterableIterator<LabelledNode<T>> {
   if (searchStart === undefined)
     return;
   const c = findChildByPath(path, searchStart, pathOpts);
@@ -407,7 +475,7 @@ export function *siblings<T>(path: string, searchStart: LabelledNode<T>, pathOpt
  * @param searchStart
  * @param pathOpts
  */
-export function *siblingsValues<T>(path: string, searchStart: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): IterableIterator<LabelledValue<T>> {
+export function *siblingsValues<T>(path: string, searchStart: LabelledNode<T>, pathOpts: PathOpts): IterableIterator<LabelledValue<T>> {
   for (const s of siblings(path, searchStart, pathOpts)) {
     if (s.value === undefined)
       continue;
@@ -418,7 +486,7 @@ export function *siblingsValues<T>(path: string, searchStart: LabelledNode<T>, p
 /**
  * Return the parent node of `path`, or undefined if not found or at root.
  */
-export function parent<T>(path: string, searchStart: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}): LabelledNode<T> | undefined {
+export function parent<T>(path: string, searchStart: LabelledNode<T>, pathOpts: PathOpts): LabelledNode<T> | undefined {
   if (searchStart === undefined)
     return;
   const c = findChildByPath(path, searchStart, pathOpts);
@@ -426,6 +494,15 @@ export function parent<T>(path: string, searchStart: LabelledNode<T>, pathOpts: 
     return;
   return c.parent;
 }
+
+export function *parentValues<T>(start: LabelledNode<T>): IterableIterator<LabelledValue<T>> {
+  for (const p of TreeArrayBacked.parents(start)) {
+    if (p.value === undefined)
+      continue;
+    yield p.value;
+  }
+}
+
 /**
  * Searches direct children, returning the node that has the given `label`
  * @param label
@@ -514,9 +591,12 @@ function getValuesFromNode<T>(node: LabelledNode<T>): T[] {
   return [];
 }
 
-function findChildByPath<T>(path: string, searchStart: LabelledNode<T>, pathOpts: Partial<PathOpts> = {}) {
-  const separator = pathOpts.separator ?? `.`;
-  const split = path.split(separator);
+function findChildByPath<T>(path: string, searchStart: LabelledNode<T>, pathOpts: PathOpts) {
+  // Chop off separator at end if we also start with seperator
+  if (path.endsWith(pathOpts.separator) && pathOpts.startsWithSeparator) {
+    path = path.slice(0, -pathOpts.separator.length);
+  }
+  const split = path.split(pathOpts.separator);
   let c: LabelledNode<T> | undefined = searchStart;
   for (const p of split) {
     c = findChildByLabel(p, c);
