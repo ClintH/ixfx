@@ -116,6 +116,47 @@ export const remove = <T>(child: TreeNode<T>): void => {
 };
 
 /**
+ * Starting from a child node, work backwards, removing it and ancestors that have no value
+ * 
+ * If `child` is an only child, it will recursively call the same function on the parent.
+ * @param child Child to start from
+ * @param siblingsPolicy What to do if we encounter siblings.
+ */
+export const removeValuelessNodesFromChild = <T>(child:TreeNode<T>):boolean => {
+  // If there is a value, don't do anything
+  if (typeof child.value !== `undefined`) return false;
+
+  // If there's no parent, can't do anything either
+  let parent = child.parent;
+  if (!parent) return false;
+
+  // Take a snapshot of siblings
+  const sibs = [...siblings(child)];
+
+  // Remove from tree
+  remove(child);
+  
+  // If we were an only child, recurse upwards
+  if (sibs.length === 0) {
+    return removeValuelessNodesFromChild(parent);
+  }
+  return true;
+}
+
+/**
+ * Enumeate all siblings of `child`. This won't include `child` itself.
+ * If `child` is not part of a tree (ie has no parent) no values are yielded.
+ */
+export function* siblings<T>(child: TreeNode<T>, eq: IsEqual<TreeNode<T>> = isEqualDefault): IterableIterator<TreeNode<T>> {
+  let parent = child.parent;
+  if (typeof parent === `undefined`) return;
+  for (const c of parent.childrenStore) {
+    if (eq(c, child)) continue;
+    yield c;
+  }
+}
+
+/**
  * Depth-first iteration of the children of `node`
  * @param node 
  * @returns 
@@ -199,7 +240,7 @@ export function* children<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
 }
 
 /**
- * Iterate over the value ofdirect children of `root`.
+ * Iterate over the value of direct children of `root`.
  * Use {@link children} if you want to iterate over {@link TreeNode} instances instead.
  * @param root 
  */
@@ -210,11 +251,11 @@ export function* childrenValues<T>(root: TreeNode<T>): IterableIterator<T> {
 }
 
 /**
- * Iterate over all parents of `root`. First result is the immediate parent.
- * @param root 
+ * Iterate over all parents of `child`. First result is the immediate parent.
+ * @param child 
  */
-export function* parents<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
-  let p = root.parent;
+export function* parents<T>(child: TreeNode<T>): IterableIterator<TreeNode<T>> {
+  let p = child.parent;
   while (p) {
     yield p;
     p = p.parent;
