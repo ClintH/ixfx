@@ -36,9 +36,9 @@ export const compareObjectKeys = (a: object, b: object): {
  * ```js
  * const a = { msg: `hi`, v: 10 };
  * 
- * changedObjectDataFields(a, { msg: `hi`,   v: 10 }); // {}
- * changedObjectDataFields(a, { msg: `hi!!`, v: 10 }); // { msg: `hi!!` }
- * changedObjectDataFields(a, { msg: `hi!!` });       // { msg: `hi!!`, v: undefined }
+ * changedProperties(a, { msg: `hi`,   v: 10 }); // {}
+ * changedProperties(a, { msg: `hi!!`, v: 10 }); // { msg: `hi!!` }
+ * changedProperties(a, { msg: `hi!!` });       // { msg: `hi!!`, v: undefined }
  * ```
  * 
  * If B has additional or removed fields, this is considered an error.
@@ -47,7 +47,7 @@ export const compareObjectKeys = (a: object, b: object): {
  * @param a 
  * @param b 
  */
-export const changedObjectDataFields = (a: object, b: object): object[] | Record<string, unknown> => {
+export const changedProperties = (a: object, b: object): object[] | Record<string, unknown> => {
   const r = compareObjectData(a, b, true);
   if (Object.entries(r.added).length > 0) throw new Error(`Shape of data has changed`);
   if (Object.entries(r.removed).length > 0) throw new Error(`Shape of data has changed`);
