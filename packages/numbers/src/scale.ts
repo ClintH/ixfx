@@ -92,9 +92,10 @@ export const scalerNull = (): NumberScaler => (v: number) => v;
 
 /**
  * As {@link scale}, but result is clamped to be
- * within `outMin` and `outMax`.
+ * within `outMin` and `outMax`. Useful if you can't be sure
+ * that `v` is in 0..1 range.
  *
- * @param v
+ * @param value
  * @param inMin
  * @param inMax
  * @param outMin 1 by default
@@ -103,18 +104,18 @@ export const scalerNull = (): NumberScaler => (v: number) => v;
  * @returns
  */
 export const scaleClamped = (
-  v: number,
+  value: number,
   inMin: number,
   inMax: number,
   outMin?: number,
   outMax?: number,
-  easing?: (v: number) => number
+  easing?: (value: number) => number
 ): number => {
   if (typeof outMax === `undefined`) outMax = 1;
   if (typeof outMin === `undefined`) outMin = 0;
   if (inMin === inMax) return outMax;
 
-  const x = scale(v, inMin, inMax, outMin, outMax, easing);
+  const x = scale(value, inMin, inMax, outMin, outMax, easing);
   return clamp(x, outMin, outMax);
 };
 
