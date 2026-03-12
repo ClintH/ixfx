@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "target": "ESNext",
     "lib": [
       "ESNext",
       "DOM",
@@ -15,7 +15,7 @@
     "paths": {
       "#macros": [
         "./macros/index.ts"
-      ],
+      ]
       // "@ixfx/guards": [
       //   "./packages/guards/src"
       // ],

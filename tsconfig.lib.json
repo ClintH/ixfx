@@ -6,14 +6,6 @@
     "customConditions": [
       "dev"
     ],
-    "types": [
-      "node",
-      "web-bluetooth",
-      "@types/w3c-web-serial"
-    ],
-    "allowJs": false,
-    "declaration": true,
-    "isolatedDeclarations": true,
     "paths": {
       "#macros": [
         "./macros/index.ts"
@@ -104,8 +96,16 @@
       ],
       "@ixfx/io/*": [
         "./packages/io/src/*"
-      ],
-    }
+      ]
+    },
+    "types": [
+      "node",
+      "web-bluetooth",
+      "@types/w3c-web-serial"
+    ],
+    "allowJs": false,
+    "declaration": true,
+    "isolatedDeclarations": true
   },
   "include": [
     "packages",

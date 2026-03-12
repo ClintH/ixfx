@@ -1,11 +1,12 @@
 {
-	"references": [
-		{
-			"path": "./tsconfig.dts.json"
-		},
-		{
-			"path": "./tsconfig.lib.json"
-		}
-	],
-	"files": []
+  "extends": "./tsconfig.base.json",
+  "references": [
+    {
+      "path": "./tsconfig.dts.json"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    }
+  ],
+  "files": []
 }

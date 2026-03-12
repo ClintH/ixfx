@@ -16,23 +16,57 @@
     "**/dist": true
   },
   "[typescript]": {
-    "typescript.preferences.importModuleSpecifierEnding": "js"
+    "js/ts.preferences.importModuleSpecifierEnding": "js"
   },
   "eslint.workingDirectories": [
     {
       "mode": "auto"
     }
   ],
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
-  "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-  "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
-  "typescript.format.insertSpaceAfterCommaDelimiter": true,
-  "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
-  "typescript.format.insertSpaceAfterTypeAssertion": true,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
-  "typescript.tsdk": "./node_modules/typescript/lib",
+  // Disable the default formatter, use eslint instead.
+  "prettier.enable": false,
+  "editor.formatOnSave": false,
+  // Auto fix
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  // Silent the stylistic rules in your IDE, but still auto fix them
+  "eslint.rules.customizations": [
+    { "rule": "style/*", "severity": "off", "fixable": true },
+    { "rule": "format/*", "severity": "off", "fixable": true },
+    { "rule": "*-indent", "severity": "off", "fixable": true },
+    { "rule": "*-spacing", "severity": "off", "fixable": true },
+    { "rule": "*-spaces", "severity": "off", "fixable": true },
+    { "rule": "*-order", "severity": "off", "fixable": true },
+    { "rule": "*-dangle", "severity": "off", "fixable": true },
+    { "rule": "*-newline", "severity": "off", "fixable": true },
+    { "rule": "*quotes", "severity": "off", "fixable": true },
+    { "rule": "*semi", "severity": "off", "fixable": true }
+  ],
+  // Enable eslint for all supported languages
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml",
+    "toml",
+    "xml",
+    "gql",
+    "graphql",
+    "astro",
+    "svelte",
+    "css",
+    "less",
+    "scss",
+    "pcss",
+    "postcss"
+  ],
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }

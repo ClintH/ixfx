@@ -1,23 +1,24 @@
-import { isEqualDefault, type IsEqual } from "@ixfx/core"
-import { without } from '@ixfx/arrays';
-import { containsDuplicateInstances } from "@ixfx/arrays";
-import { QueueMutable } from "../queue/queue-mutable.js"
-import { StackMutable } from "../stack/StackMutable.js"
-import { DiffNode, compare as treeCompare } from './compare.js';
+import type { IsEqual } from "@ixfx/core";
+import type { DiffNode } from './compare.js';
+import type { LabelledSingleValue, SimplifiedNode, TraversableTree, TreeNode, WrappedNode } from "./types.js";
+import { containsDuplicateInstances, without } from '@ixfx/arrays';
+import { isEqualDefault } from "@ixfx/core";
 import { toStringAbbreviate } from "@ixfx/core/text";
-import type { LabelledSingleValue, TreeNode, SimplifiedNode, TraversableTree, WrappedNode } from "./types.js"
+import { QueueMutable } from "../queue/queue-mutable.js";
+import { StackMutable } from "../stack/StackMutable.js";
+import { compare as treeCompare } from './compare.js';
 
 /**
  * Compares two nodes.
- * 
+ *
  * By default uses `isEqualValueIgnoreOrder` to compare nodes. This means
  * values of nodes will be compared, ignoring the order of fields.
- * @param a 
- * @param b 
+ * @param a
+ * @param b
  * @param eq Comparison function. Uses `isEqualValueIgnoreOrder` by default.
  * @returns Compare results
  */
-export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>): DiffNode<T> => {
+export function compare<T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>): DiffNode<T> {
   return treeCompare(asDynamicTraversable(a), asDynamicTraversable(b), eq);
 }
 
@@ -25,16 +26,15 @@ export const compare = <T>(a: TreeNode<T>, b: TreeNode<T>, eq?: IsEqual<T>): Dif
  * Converts {@link Trees.TreeNode} to {@link Trees.SimplifiedNode}, removing the 'parent' fields.
  * This can be useful because if you have the whole tree, the parent field
  * is redundant and because it makes circular references can make dumping to console etc more troublesome.
- * 
+ *
  * Recursive: strips parentage of all children and so on too.
- * @param node 
- * @returns 
+ * @param node
  */
-export const stripParentage = <T>(node: TreeNode<T>): SimplifiedNode<T> => {
+export function stripParentage<T>(node: TreeNode<T>): SimplifiedNode<T> {
   const n: SimplifiedNode<T> = {
     value: node.value,
-    childrenStore: node.childrenStore.map(c => stripParentage(c))
-  }
+    childrenStore: node.childrenStore.map(c => stripParentage(c)),
+  };
   return n;
 }
 
@@ -46,13 +46,12 @@ const wrapped = <T>(node: TreeNode<T> | WrappedNode<T>) => (`wraps` in node) ? n
  * It will wrap child nodes on demand. For this reason, WrappedNode object
  * identity is not stable
  * @param n Node to wrap
- * @returns 
  */
-export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
+export function wrap<T>(n: TreeNode<T>): WrappedNode<T> {
   return {
     *children() {
       for (const c of n.childrenStore) {
-        yield wrap(c)
+        yield wrap(c);
       }
     },
     getValue: () => n.value as T,
@@ -72,7 +71,8 @@ export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
     },
     findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T>): WrappedNode<T> | undefined {
       const n = findParentsValue(child, value, eq);
-      if (n !== undefined) return wrap(n);
+      if (n !== undefined)
+        return wrap(n);
     },
     getParent: () => n.parent === undefined ? undefined : wrap(n.parent),
     hasParent: (parent: WrappedNode<T> | TreeNode<T>): boolean => {
@@ -98,44 +98,47 @@ export const wrap = <T>(n: TreeNode<T>): WrappedNode<T> => {
       add(unwrapped(child), n);
       return wrapped(child);
     },
-    wraps: n
-  }
+    wraps: n,
+  };
 }
 
 /**
  * Removes `child` from the tree structure it is in.
  * It removes `child` from its parent. Any sub-children of `child` still remain connected.
- * @param child 
- * @returns 
+ * @param child
  */
-export const remove = <T>(child: TreeNode<T>): void => {
+export function remove<T>(child: TreeNode<T>): boolean {
   const p = child.parent;
-  if (p === undefined) return;
+  if (p === undefined)
+    return false;
   child.parent = undefined;
+  const count = p.childrenStore.length;
   p.childrenStore = without(p.childrenStore, child);
-};
+  return count !== p.childrenStore.length;
+}
 
 /**
  * Starting from a child node, work backwards, removing it and ancestors that have no value
- * 
+ *
  * If `child` is an only child, it will recursively call the same function on the parent.
  * @param child Child to start from
- * @param siblingsPolicy What to do if we encounter siblings.
  */
-export const removeValuelessNodesFromChild = <T>(child:TreeNode<T>):boolean => {
+export function removeValuelessNodesFromChild<T>(child: TreeNode<T>): boolean {
   // If there is a value, don't do anything
-  if (typeof child.value !== `undefined`) return false;
+  if (typeof child.value !== `undefined`)
+    return false;
 
   // If there's no parent, can't do anything either
-  let parent = child.parent;
-  if (!parent) return false;
+  const parent = child.parent;
+  if (!parent)
+    return false;
 
   // Take a snapshot of siblings
   const sibs = [...siblings(child)];
 
   // Remove from tree
   remove(child);
-  
+
   // If we were an only child, recurse upwards
   if (sibs.length === 0) {
     return removeValuelessNodesFromChild(parent);
@@ -147,22 +150,24 @@ export const removeValuelessNodesFromChild = <T>(child:TreeNode<T>):boolean => {
  * Enumeate all siblings of `child`. This won't include `child` itself.
  * If `child` is not part of a tree (ie has no parent) no values are yielded.
  */
-export function* siblings<T>(child: TreeNode<T>, eq: IsEqual<TreeNode<T>> = isEqualDefault): IterableIterator<TreeNode<T>> {
-  let parent = child.parent;
-  if (typeof parent === `undefined`) return;
+export function *siblings<T>(child: TreeNode<T>, eq: IsEqual<TreeNode<T>> = isEqualDefault): IterableIterator<TreeNode<T>> {
+  const parent = child.parent;
+  if (typeof parent === `undefined`)
+    return;
   for (const c of parent.childrenStore) {
-    if (eq(c, child)) continue;
+    if (eq(c, child))
+      continue;
     yield c;
   }
 }
 
 /**
  * Depth-first iteration of the children of `node`
- * @param node 
- * @returns 
+ * @param node
  */
-export function* depthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>> {
-  if (!root) return;
+export function *depthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>> {
+  if (!root)
+    return;
   const stack = new StackMutable<TreeNode<T>>();
   stack.push(...node.childrenStore);
   let entry: TreeNode<T> | undefined = stack.pop();
@@ -171,18 +176,19 @@ export function* depthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>>
     if (entry) {
       stack.push(...entry.childrenStore);
     }
-    if (stack.isEmpty) break;
+    if (stack.isEmpty)
+      break;
     entry = stack.pop();
   }
 }
 
 /**
  * Breadth-first iteration of the children of `node`
- * @param node 
- * @returns 
+ * @param node
  */
-export function* breadthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>> {
-  if (!node) return;
+export function *breadthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T>> {
+  if (!node)
+    return;
   const queue = new QueueMutable<TreeNode<T>>();
   queue.enqueue(...node.childrenStore);
   let entry: TreeNode<T> | undefined = queue.dequeue();
@@ -191,49 +197,55 @@ export function* breadthFirst<T>(node: TreeNode<T>): IterableIterator<TreeNode<T
     if (entry) {
       queue.enqueue(...entry.childrenStore);
     }
-    if (queue.isEmpty) break;
+    if (queue.isEmpty)
+      break;
     entry = queue.dequeue();
   }
 }
 
 /**
  * Validates the tree from `root` downwards.
- * @param root 
- * @param seen 
- * @returns 
+ * @param root
+ * @param seen
  */
-export function treeTest<T>(root: TreeNode<T>, seen: TreeNode<T>[] = []): [ ok: boolean, msg: string, node: TreeNode<T> ] {
-  if (root.parent === root) return [ false, `Root has itself as parent`, root ];
-  if (seen.includes(root)) return [ false, `Same node instance is appearing further in tree`, root ];
+export function treeTest<T>(root: TreeNode<T>, seen: Array<TreeNode<T>> = []): [ ok: boolean, msg: string, node: TreeNode<T> ] {
+  if (root.parent === root)
+    return [false, `Root has itself as parent`, root];
+  if (seen.includes(root))
+    return [false, `Same node instance is appearing further in tree`, root];
   seen.push(root);
-  if (containsDuplicateInstances(root.childrenStore)) return [ false, `Children list contains duplicates`, root ];
+  if (containsDuplicateInstances(root.childrenStore))
+    return [false, `Children list contains duplicates`, root];
 
   for (const c of root.childrenStore) {
-    if (c.parent !== root) return [ false, `Member of childrenStore does not have .parent set`, c ];
-    if (hasAnyChild(root, c)) return [ false, `Child has parent as its own child`, c ];
+    if (c.parent !== root)
+      return [false, `Member of childrenStore does not have .parent set`, c];
+    if (hasAnyChild(root, c))
+      return [false, `Child has parent as its own child`, c];
     const v = treeTest(c, seen);
-    if (!v[ 0 ]) return v;
+    if (!v[0])
+      return v;
   }
-  return [ true, ``, root ];
+  return [true, ``, root];
 }
 
 /**
  * Throws an exception if `root` fails tree validation
- * @param root 
- * @returns 
+ * @param root
  */
 export function throwTreeTest<T>(root: TreeNode<T>): void {
   const v = treeTest(root);
-  if (v[ 0 ]) return;
-  throw new Error(`${ v[ 1 ] } Node: ${ toStringAbbreviate(v[ 2 ].value, 30) }`, { cause: v[ 2 ] })
+  if (v[0])
+    return;
+  throw new Error(`${v[1]} Node: ${toStringAbbreviate(v[2].value, 30)}`, { cause: v[2] });
 }
 
 /**
  * Iterate over direct children of `root`, yielding {@link TreeNode} instances.
  * Use {@link childrenValues} to iterate over child values
- * @param root 
+ * @param root
  */
-export function* children<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
+export function *children<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
   for (const c of root.childrenStore) {
     yield c;
   }
@@ -242,19 +254,20 @@ export function* children<T>(root: TreeNode<T>): IterableIterator<TreeNode<T>> {
 /**
  * Iterate over the value of direct children of `root`.
  * Use {@link children} if you want to iterate over {@link TreeNode} instances instead.
- * @param root 
+ * @param root
  */
-export function* childrenValues<T>(root: TreeNode<T>): IterableIterator<T> {
+export function *childrenValues<T>(root: TreeNode<T>): IterableIterator<T> {
   for (const c of root.childrenStore) {
-    if (typeof c.value !== `undefined`) yield c.value;
+    if (typeof c.value !== `undefined`)
+      yield c.value;
   }
 }
 
 /**
  * Iterate over all parents of `child`. First result is the immediate parent.
- * @param child 
+ * @param child
  */
-export function* parents<T>(child: TreeNode<T>): IterableIterator<TreeNode<T>> {
+export function *parents<T>(child: TreeNode<T>): IterableIterator<TreeNode<T>> {
   let p = child.parent;
   while (p) {
     yield p;
@@ -264,69 +277,69 @@ export function* parents<T>(child: TreeNode<T>): IterableIterator<TreeNode<T>> {
 
 /**
  * Returns the depth of `node`. A root node (ie. with no parents) has a depth of 0.
- * @param node 
- * @returns 
+ * @param node
  */
 export function nodeDepth(node: TreeNode<any>): number {
-  const p = [ ...parents(node) ];
+  const p = [...parents(node)];
   return p.length;
 }
 
 /**
  * Returns _true_ if `child` is an immediate child of `parent`.
- * @param child 
- * @param parent 
+ * @param child
+ * @param parent
  * @param eq Equality function to compare nodes. Uses `isEqualDefault` by default, which compares by reference.
- * @returns 
  */
-export const hasChild = <T>(child: TreeNode<T>, parent: TreeNode<T>, eq: IsEqual<TreeNode<T>> = isEqualDefault): boolean => {
+export function hasChild<T>(child: TreeNode<T>, parent: TreeNode<T>, eq: IsEqual<TreeNode<T>> = isEqualDefault): boolean {
   for (const c of parent.childrenStore) {
-    if (eq(c, child)) return true;
+    if (eq(c, child))
+      return true;
   }
   return false;
 }
 
 /**
  * Returns the first immediate child of `parent` that matches `value`.
- * 
+ *
  * Use {@link queryByValue} if you want all matching children.
- * @param value 
- * @param parent 
- * @param eq 
- * @returns 
+ * @param value
+ * @param parent
+ * @param eq
  */
-export const findChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined => {
+export function findChildByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined {
   for (const c of parent.childrenStore) {
-    if (eq(value, c.value as T)) return c;
+    if (eq(value, c.value as T))
+      return c;
   }
 }
 
 /**
  * Yield all immediate children of `parent` that match `value`.
- * 
+ *
  * Use {@link findChildByValue} if you only want the first matching child.
- * @param value 
- * @param parent 
- * @param eq 
+ * @param value
+ * @param parent
+ * @param eq
  */
-export function* queryByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): IterableIterator<TreeNode<T>> {
+export function *queryByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): IterableIterator<TreeNode<T>> {
   for (const c of parent.childrenStore) {
-    if (eq(value, c.value as T)) yield c;
+    if (eq(value, c.value as T))
+      yield c;
   }
 }
 
 /**
  * Returns _true_ if `prospectiveChild` is some child node of `parent`,
  * anywhere in the tree structure.
- * 
+ *
  * Use {@link hasChild} to only check immediate children.
- * @param prospectiveChild 
- * @param parent 
- * @returns 
+ * @param prospectiveChild
+ * @param parent
  */
-export const hasAnyChild = <T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T>): boolean => {
+export function hasAnyChild<T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T>): boolean {
   for (const c of breadthFirst(parent)) {
-    if (c === prospectiveChild) return true;
+    if (c === prospectiveChild)
+      return true;
   }
   return false;
 }
@@ -336,36 +349,36 @@ export const hasAnyChild = <T>(prospectiveChild: TreeNode<T>, parent: TreeNode<T
  * @param value Value being sought
  * @param parent Parent node
  * @param eq Equality function to compare values. Uses `isEqualDefault` by default, which compares by reference.
- * @returns 
  */
-export const findAnyChildByValue = <T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined => {
+export function findAnyChildByValue<T>(value: T, parent: TreeNode<T>, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined {
   for (const c of breadthFirst(parent)) {
-    if (eq(c.value as T, value)) return c;
+    if (eq(c.value as T, value))
+      return c;
   }
 }
 
 /**
  * Traverses up a node to find the root.
- * @param node 
- * @returns 
+ * @param node
  */
-export const getRoot = <T>(node: TreeNode<T>): TreeNode<T> => {
-  if (node.parent) return getRoot(node.parent);
+export function getRoot<T>(node: TreeNode<T>): TreeNode<T> {
+  if (node.parent)
+    return getRoot(node.parent);
   return node;
 }
 
 /**
  * Returns _true_ if `prospectiveParent` is any ancestor
  * parent of `child`.
- * 
+ *
  * Use {@link hasParent} to only check immediate parent.
- * @param child 
- * @param prospectiveParent 
- * @returns 
+ * @param child
+ * @param prospectiveParent
  */
-export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>): boolean => {
+export function hasAnyParent<T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>): boolean {
   for (const p of parents(child)) {
-    if (p === prospectiveParent) return true;
+    if (p === prospectiveParent)
+      return true;
   }
   return false;
 }
@@ -373,15 +386,14 @@ export const hasAnyParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<
 /**
  * Yields the node value of each parent of `child`.
  * _undefined_ values are not returned.
- * 
+ *
  * Use {@link queryParentsValue} to search for a particular value
- * @param child 
- * @returns 
+ * @param child
  */
-export function* parentsValues<T>(child: TreeNode<T>): Generator<T & ({} | null), boolean, unknown> {
+export function *parentsValues<T>(child: TreeNode<T>): Generator<T> {
   for (const p of parents(child)) {
     if (typeof p.value !== `undefined`) {
-      yield p.value;
+      yield p.value as T;
     }
   }
   return false;
@@ -390,15 +402,15 @@ export function* parentsValues<T>(child: TreeNode<T>): Generator<T & ({} | null)
 /**
  * Yields all parents of `child` that have a given value.
  * Use {@link findParentsValue} to find the first match only.
- * @param child 
- * @param value 
- * @param eq 
- * @returns 
+ * @param child
+ * @param value
+ * @param eq
  */
-export function* queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault): Generator<TreeNode<T>, boolean, unknown> {
+export function *queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault): Generator<TreeNode<T>, boolean, unknown> {
   for (const p of parents(child)) {
     if (typeof p.value !== `undefined`) {
-      if (eq(p.value, value)) yield p;
+      if (eq(p.value, value))
+        yield p;
     }
   }
   return false;
@@ -406,29 +418,25 @@ export function* queryParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<
 
 /**
  * Returns the first parent that has a given value.
- * @param child 
- * @param value 
- * @param eq 
- * @returns 
+ * @param child
+ * @param value
+ * @param eq
  */
 export function findParentsValue<T>(child: TreeNode<T>, value: T, eq: IsEqual<T> = isEqualDefault): TreeNode<T> | undefined {
-  for (const p of queryParentsValue(child, value, eq)) {
-    return p;
-  }
+  const v = [...queryParentsValue(child, value, eq)];
+  return v[0];
 }
 /**
  * Returns _true_ if `prospectiveParent` is the immediate
  * parent of `child`.
- * 
+ *
  * Use {@link hasAnyParent} to check for any ancestor parent.
- * @param child 
- * @param prospectiveParent 
- * @returns 
+ * @param child
+ * @param prospectiveParent
  */
-export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>): boolean => {
+export function hasParent<T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>): boolean {
   return child.parent === prospectiveParent;
 }
-
 
 /**
  * Computes the maximum depth of the tree.
@@ -436,16 +444,15 @@ export const hasParent = <T>(child: TreeNode<T>, prospectiveParent: TreeNode<T>)
  * If a tree is: root -> childA -> subChildB
  * ```js
  * // Yields 2, since there are at max two steps down from root
- * computeMaxDepth(root); 
+ * computeMaxDepth(root);
  * ```
- * @param node 
- * @returns 
+ * @param node
  */
-export const computeMaxDepth = <T>(node: TreeNode<T>): number => {
+export function computeMaxDepth<T>(node: TreeNode<T>): number {
   return computeMaxDepthImpl(node, 0);
 }
 
-const computeMaxDepthImpl = <T>(node: TreeNode<T>, startingDepth = 0) => {
+function computeMaxDepthImpl<T>(node: TreeNode<T>, startingDepth = 0) {
   let depth = startingDepth;
   for (const c of node.childrenStore) {
     depth = Math.max(depth, computeMaxDepthImpl(c, startingDepth + 1));
@@ -454,16 +461,16 @@ const computeMaxDepthImpl = <T>(node: TreeNode<T>, startingDepth = 0) => {
 }
 
 /**
- * Adds a child node to `parent`. 
- * If `child` already has a parent, it is removed from that parent. 
- * @param child 
- * @param parent 
+ * Adds a child node to `parent`.
+ * If `child` already has a parent, it is removed from that parent.
+ * @param child
+ * @param parent
  * @throws Error if adding a child would break tree structure
  */
-export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>): void => {
+export function add<T>(child: TreeNode<T>, parent: TreeNode<T>): void {
   throwAttemptedChild(child, parent);
   const p = child.parent;
-  parent.childrenStore = [ ...parent.childrenStore, child ];
+  parent.childrenStore = [...parent.childrenStore, child];
   child.parent = parent;
   if (p) {
     p.childrenStore = without(p.childrenStore, child);
@@ -473,33 +480,33 @@ export const add = <T>(child: TreeNode<T>, parent: TreeNode<T>): void => {
 /**
  * Adds a new child node based on a value
  */
-export const addValue = <T>(value: T | undefined, parent: TreeNode<T>): TreeNode<T> => {
+export function addValue<T>(value: T | undefined, parent: TreeNode<T>): TreeNode<T> {
   return createNode(value, parent);
 }
 
 /**
  * Creates the root for a tree, with an optional `value`.
  * Use {@link rootWrapped} if you want a more object-oriented mode of access.
- * @param value 
- * @returns 
+ * @param value
  */
-export const root = <T>(value?: T): TreeNode<T> => {
+export function root<T>(value?: T): TreeNode<T> {
   return createNode(value);
 }
 
-export const fromPlainObject = (value: Record<string, any>, label = ``, parent?: TreeNode<any>, seen: any[] = []): TreeNode<LabelledSingleValue<any>> => {
+export function fromPlainObject(value: Record<string, any>, label = ``, parent?: TreeNode<any>, seen: any[] = []): TreeNode<LabelledSingleValue<any>> {
   const entries = Object.entries(value);
   parent = parent === undefined ? root() : addValue<LabelledSingleValue<any>>({ label, value }, parent);
   for (const entry of entries) {
-    const value = entry[ 1 ];
+    const value = entry[1];
     // Avoid circular references
-    if (seen.includes(value)) continue;
+    if (seen.includes(value))
+      continue;
     seen.push(value);
 
-    if (typeof entry[ 1 ] === `object`) {
-      fromPlainObject(value, entry[ 0 ], parent, seen);
+    if (typeof entry[1] === `object`) {
+      fromPlainObject(value, entry[0], parent, seen);
     } else {
-      addValue<LabelledSingleValue<any>>({ label: entry[ 0 ], value: value }, parent);
+      addValue<LabelledSingleValue<any>>({ label: entry[0], value }, parent);
     }
   }
   return parent;
@@ -508,37 +515,35 @@ export const fromPlainObject = (value: Record<string, any>, label = ``, parent?:
 /**
  * Creates a tree, returning it as a {@link WrappedNode} for object-oriented access.
  * Use {@link Trees.Mutable.root} alternatively.
- * @param value 
- * @returns 
+ * @param value
  */
-export const rootWrapped = <T>(value: T | undefined): WrappedNode<T> => {
+export function rootWrapped<T>(value: T | undefined): WrappedNode<T> {
   return wrap(createNode(value));
 }
 
 /**
  * Creates a `TreeNode` instance with a given value and parent.
  * Parent node, if specified, has its `childrenStore` property changed to include new child.
- * @param value 
- * @param parent 
- * @returns 
+ * @param value
+ * @param parent
  */
-export const createNode = <T>(value: T | undefined, parent?: TreeNode<T>): TreeNode<T> => {
+export function createNode<T>(value: T | undefined, parent?: TreeNode<T>): TreeNode<T> {
   const n: TreeNode<T> = {
     childrenStore: [],
-    parent: parent,
-    value: value
-  }
+    parent,
+    value,
+  };
   if (parent !== undefined) {
-    parent.childrenStore = [ ...parent.childrenStore, n ];
+    parent.childrenStore = [...parent.childrenStore, n];
   }
   return n;
 }
 
-export const childrenLength = <T>(node: TreeNode<T>): number => {
+export function childrenLength<T>(node: TreeNode<T>): number {
   return node.childrenStore.length;
 }
 
-export const value = <T>(node: TreeNode<T>): T | undefined => {
+export function value<T>(node: TreeNode<T>): T | undefined {
   return node.value;
 }
 
@@ -546,10 +551,9 @@ export const value = <T>(node: TreeNode<T>): T | undefined => {
  * Projects `node` as a dynamic traversable.
  * Dynamic in the sense that it creates the traversable project for nodes on demand.
  * A consequence is that node identities are not stable.
- * @param node 
- * @returns 
+ * @param node
  */
-export const asDynamicTraversable = <T>(node: TreeNode<T>): TraversableTree<T> => {
+export function asDynamicTraversable<T>(node: TreeNode<T>): TraversableTree<T> {
   const t: TraversableTree<T> = {
     *children() {
       for (const c of node.childrenStore) {
@@ -557,7 +561,8 @@ export const asDynamicTraversable = <T>(node: TreeNode<T>): TraversableTree<T> =
       }
     },
     getParent() {
-      if (node.parent === undefined) return;
+      if (node.parent === undefined)
+        return;
       return asDynamicTraversable(node.parent);
     },
     getValue(): any {
@@ -566,7 +571,7 @@ export const asDynamicTraversable = <T>(node: TreeNode<T>): TraversableTree<T> =
     getIdentity() {
       return node;
     },
-  }
+  };
   return t;
 }
 
@@ -576,50 +581,58 @@ export const asDynamicTraversable = <T>(node: TreeNode<T>): TraversableTree<T> =
  * 2. `child` is already an immediate child of `parent`
  * 3. `child` is an ancestor parent of `parent`
  * 4. `child` has `parent` as its own child
- * @param c 
- * @param parent 
+ * @param c
+ * @param parent
  */
-const throwAttemptedChild = <T>(c: TreeNode<T>, parent: TreeNode<T>) => {
-  if (parent === c) throw new Error(`Cannot add self as child`);
-  if (c.parent === parent) return; // skip if it's already a child
-  if (hasAnyParent(parent, c)) throw new Error(`Child contains parent (1)`, { cause: c });
-  if (hasAnyParent(c, parent)) throw new Error(`Parent already contains child`, { cause: c });
-  if (hasAnyChild(parent, c)) throw new Error(`Child contains parent (2)`, { cause: c });
+function throwAttemptedChild<T>(c: TreeNode<T>, parent: TreeNode<T>) {
+  if (parent === c)
+    throw new Error(`Cannot add self as child`);
+  if (c.parent === parent)
+    return; // skip if it's already a child
+  if (hasAnyParent(parent, c))
+    throw new Error(`Child contains parent (1)`, { cause: c });
+  if (hasAnyParent(c, parent))
+    throw new Error(`Parent already contains child`, { cause: c });
+  if (hasAnyChild(parent, c))
+    throw new Error(`Child contains parent (2)`, { cause: c });
 }
 
 /**
  * Sets the children of `parent` to a list of `children`.
- * 
+ *
  * Any previous children are disconnected from this parent.
  * All new children have their parent set to `parent`.
- * 
+ *
  * There is some validation to ensure that adding the children doesn't break the tree.
  */
-export const setChildren = <T>(parent: TreeNode<T>, children: TreeNode<T>[]): void => {
+export function setChildren<T>(parent: TreeNode<T>, children: Array<TreeNode<T>>): void {
   // Verify children are legit
   for (const c of children) {
     throwAttemptedChild(c, parent);
   }
 
-  parent.childrenStore = [ ...children ];
+  parent.childrenStore = [...children];
   for (const c of children) {
     c.parent = parent;
   }
 }
 
-export const toStringDeep = <T>(node: TreeNode<T>, indent = 0): string => {
-  const t = `${ `  `.repeat(indent) } + ${ node.value ? JSON.stringify(node.value) : `-` }`;
-  return node.childrenStore.length > 0 ? (
-    t +
-    `\n` +
-    node.childrenStore.map((d) => toStringDeep(d, indent + 1)).join(`\n`)
-  ) : t;
+export function toStringDeep<T>(node: TreeNode<T>, indent = 0): string {
+  const t = `${`  `.repeat(indent)} + ${node.value ? JSON.stringify(node.value) : `-`}`;
+  return node.childrenStore.length > 0
+    ? (
+        `${t
+        }\n${
+          node.childrenStore.map(d => toStringDeep(d, indent + 1)).join(`\n`)}`
+      )
+    : t;
 }
 
-export function* followValue<T>(root: TreeNode<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth = 1): IterableIterator<T | undefined> {
+export function *followValue<T>(root: TreeNode<T>, continuePredicate: (nodeValue: T, depth: number) => boolean, depth = 1): IterableIterator<T | undefined> {
   for (const c of root.childrenStore) {
     const value = c.value;
-    if (value === undefined) continue;
+    if (value === undefined)
+      continue;
     if (continuePredicate(value, depth)) {
       yield c.value;
       yield* followValue(c, continuePredicate, depth + 1);
