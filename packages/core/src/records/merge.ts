@@ -27,22 +27,22 @@ export type Spread<A extends readonly [ ...any ]> = A extends [ infer L, ...infe
  * ```js
  * const a = { name: `jane`, age: 30 };
  * const b = { name: `fred`, age: 31, colour: `blue` };
- * const c = mergeObjects(a, b);
+ * const c = merge(a, b);
  * // Yields:
  * // { name: `fred`, age: 31, colour: `blue` } 
  * ```
  * 
- * Alternatively, use {@link mergeObjectsSameShape} if the return shape
+ * Alternatively, use {@link mergeSameShape} if the return shape
  * should be based on the first object.
  * @param a 
  * @returns Merged object
  */
-export function mergeObjects<A extends object[]>(...a: [ ...A ]): Spread<A> {
+export function merge<A extends object[]>(...a: [ ...A ]): Spread<A> {
   return Object.assign({}, ...a) as Spread<A>;
 }
 // const a = { name: `jane`, age: 30 };
 // const b = { name: `fred`,  colour: `blue` };
-// const c = mergeObjects(a, b);
+// const c = merge(a, b);
 
 
 /**
@@ -51,11 +51,11 @@ export function mergeObjects<A extends object[]>(...a: [ ...A ]): Spread<A> {
  * 
  * If a single object is passed in, a copy is returned.
  * 
- * Use {@link mergeObjects} for object shape to be a union
+ * Use {@link merge} for object shape to be a union
  * @param a Object arrays to merge
  * @returns 
  */
-export function mergeObjectsSameShape<T extends object>(...a: [T, ...Partial<T>[]]):T {
+export function mergeSameShape<T extends object>(...a: [T, ...Partial<T>[]]):T {
   const aEntries = Object.entries(a[0]);
 
   // For each subsequent object
