@@ -151,3 +151,42 @@ test('array-backed-tree', () => {
 
 });
 
+test('remove-valueless-nodes-noop-when-valued', () => {
+  const root = TreeMutable.root<string | undefined>();
+  const parent = TreeMutable.addValue(undefined, root);
+  const child = TreeMutable.addValue('has-value', parent);
+
+  TreeMutable.removeValuelessNodesFromChild(child);
+
+  expect(TreeMutable.hasChild(child, parent)).toBe(true);
+  expect(TreeMutable.hasChild(parent, root)).toBe(true);
+});
+
+test('remove-valueless-nodes-remove-multi-level', () => {
+  const root = TreeMutable.root<string | undefined>();
+  const level1 = TreeMutable.addValue(undefined, root);
+  const level2 = TreeMutable.addValue(undefined, level1);
+  const level3 = TreeMutable.addValue(undefined, level2);
+
+  TreeMutable.removeValuelessNodesFromChild(level3);
+
+  expect(TreeMutable.childrenLength(root)).toBe(0);
+  expect(TreeMutable.hasChild(level3, level2)).toBe(false);
+  expect(TreeMutable.hasChild(level2, level1)).toBe(false);
+  expect(TreeMutable.hasChild(level1, root)).toBe(false);
+});
+
+test('remove-valueless-nodes-keep-parent-with-non-empty-sibling', () => {
+  const root = TreeMutable.root<string | undefined>();
+  const parent = TreeMutable.addValue(undefined, root);
+  const toRemove = TreeMutable.addValue(undefined, parent);
+  const keep = TreeMutable.addValue('keep', parent);
+
+  TreeMutable.removeValuelessNodesFromChild(toRemove);
+
+  expect(TreeMutable.hasChild(parent, root)).toBe(true);
+  expect(TreeMutable.hasChild(keep, parent)).toBe(true);
+  expect(TreeMutable.hasChild(toRemove, parent)).toBe(false);
+  expect(TreeMutable.childrenLength(parent)).toBe(1);
+});
+

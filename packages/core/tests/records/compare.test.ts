@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest';
-import { compareArrays, changedObjectDataFields, compareObjectKeys } from '../../src/records/compare.js';
+import { compareArrays,  changedProperties, compareObjectKeys } from '../../src/records/compare.js';
 import { isEmptyEntries } from '../../src/is-equal.js';
 import { compareIterableValuesShallow } from '../../src/iterable-compare-values-shallow.js';
 
@@ -53,7 +53,7 @@ describe(`compare`, () => {
 
   });
 
-  test('changedObjectDataFields', () => {
+  test('changedProperties', () => {
     const a = {
       position: { x: 1, y: 1 },
       message: `hello`,
@@ -61,17 +61,17 @@ describe(`compare`, () => {
       flag: true
     };
 
-    const r1 = changedObjectDataFields(a, { ...a });
+    const r1 = changedProperties(a, { ...a });
     expect(objectEmpty(r1)).toBe(true);
 
-    const r2 = changedObjectDataFields(a, {
+    const r2 = changedProperties(a, {
       ...a,
       message: `hello!`,
     });
     expect(Object.entries(r2).length).toBe(1);
     expect((r2 as any).message).toBe(`hello!`);
 
-    const r3 = changedObjectDataFields(a, {
+    const r3 = changedProperties(a, {
       ...a,
       position: { x: 10, y: 1 },
       message: `hello!`,
@@ -79,48 +79,48 @@ describe(`compare`, () => {
     expect(Object.entries(r3).length).toBe(2);
     expect((r3 as any).message).toBe(`hello!`);
     expect((r3 as any).position).toEqual({ x: 10 });
-    //console.log(`changedObjectDataFields done`);
+    //console.log(`changedProperties done`);
   });
 
-  test(`changedObjectDataFields-array`, () => {
+  test(`changedProperties-array`, () => {
     // Arrays
     const a = {
       value: 10,
       colours: [ `red`, `blue`, `green` ]
     };
-    const rr1 = changedObjectDataFields(a, structuredClone(a));
+    const rr1 = changedProperties(a, structuredClone(a));
     expect(objectEmpty(rr1)).toBe(true);
 
     // Additional value
-    const r2 = changedObjectDataFields(a, {
+    const r2 = changedProperties(a, {
       ...a,
       colours: [ `red`, `blue`, `green`, `yellow` ]
     });
     expect(r2).toEqual({ colours: [ `red`, `blue`, `green`, `yellow` ] });
 
     // Changed order
-    const r3 = changedObjectDataFields(a, {
+    const r3 = changedProperties(a, {
       ...a,
       colours: [ `green`, `red`, `blue` ]
     });
     expect(r3).toEqual({ colours: [ `green`, `red`, `blue` ] });
 
     // Removed from end
-    const r4a = changedObjectDataFields(a, {
+    const r4a = changedProperties(a, {
       ...a,
       colours: [ `red`, `blue` ]
     });
     expect(r4a).toEqual({ colours: [ `red`, `blue` ] });
 
     // Remove from beginning
-    const r4b = changedObjectDataFields(a, {
+    const r4b = changedProperties(a, {
       ...a,
       colours: [ `blue`, `green` ]
     });
     expect(r4b).toEqual({ colours: [ `blue`, `green` ] });
 
     // Remove from middle
-    const r4c = changedObjectDataFields(a, {
+    const r4c = changedProperties(a, {
       ...a,
       colours: [ `red`, `green` ]
     });
