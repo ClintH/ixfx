@@ -1,3 +1,4 @@
+
 export type HslBase = {
   /**
    * Hue
@@ -109,8 +110,14 @@ export type Colourish = Colour | string;
  */
 export type ColourInterpolationOpts = {
   direction: `longer` | `shorter`,
+  /**
+   * Space to do calculations in
+   */
   space: ColourSpaces,
-
+  /**
+   * Destination of calculated colour
+   */
+  destination:ConvertDestinations
 };
 
 export type ColourStepOpts = ColourInterpolationOpts & {
@@ -139,3 +146,5 @@ export type ParsingOptions<T> = Partial<{
    */
   fallbackColour: T
 }>
+
+export type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;

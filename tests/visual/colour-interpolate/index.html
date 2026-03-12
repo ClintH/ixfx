@@ -13,12 +13,14 @@
       box-sizing: border-box;
     }
 
-    html,
+    
     body {
-      height: 100%;
+      display:flex;
+      align-content:stretch;
+      justify-content: space-evenly;
     }
-
-    canvas,#gradient {
+    canvas,
+    #gradient {
       border: 2px solid whitesmoke;
     }
 
@@ -27,29 +29,66 @@
       height: 100px;
       width: 400px;
     }
+
     display {
-      display:inline-block;
+      display: inline-block;
+    }
+
+    section {
+      border: 2px solid silver;
+      padding: 1rem;
     }
   </style>
-  <div>
-    <h1>HSL</h1>
-    <h2>Shorter</h2>
-    <canvas id="hsl-shorter" width="400" height="100"></canvas>
-    <h2>Longer</h2>
-    <canvas id="hsl-longer" width="400" height="100"></canvas>
-  </div>
-  <div>
-    <h1>OkLch</h1>
-    <h2>Shorter</h2>
-    <canvas id="oklch-shorter" width="400" height="100"></canvas>
-    <h2>Longer</h2>
-    <canvas id="oklch-longer" width="400" height="100"></canvas>
-  </div>
+  <section>
+    <h1>Continuous</h1>
     <div>
-    <h1>Srgb</h1>
-    <canvas id="srgb" width="400" height="100"></canvas>
-  </div>
-  <script type="module"  src="script.js"></script>
+      <h3>Default</h3>
+      <canvas id="continuous-default" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>HSL</h2>
+      <h3>Shorter</h3>
+      <canvas id="continuous-hsl-shorter" width="400" height="100"></canvas>
+      <h3>Longer</h3>
+      <canvas id="continuous-hsl-longer" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>SRGB</h2>
+      <h3>Shorter</h3>
+      <canvas id="continuous-srgb-shorter" width="400" height="100"></canvas>
+      <h3>Longer</h3>
+      <canvas id="continuous-srgb-longer" width="400" height="100"></canvas>
+    </div>
+        <div>
+      <h2>OKLCH</h2>
+      <h3>Shorter</h3>
+      <canvas id="continuous-oklch-shorter" width="400" height="100"></canvas>
+      <h3>Longer</h3>
+      <canvas id="continuous-oklch-longer" width="400" height="100"></canvas>
+    </div>
+  </section>
+  <section>
+    <h1>Stepped</h1>
+    <div>
+      <h2>HSL</h2>
+      <h3>Shorter</h3>
+      <canvas id="hsl-shorter" width="400" height="100"></canvas>
+      <h3>Longer</h3>
+      <canvas id="hsl-longer" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>OkLch</h2>
+      <h3>Shorter</h3>
+      <canvas id="oklch-shorter" width="400" height="100"></canvas>
+      <h3>Longer</h3>
+      <canvas id="oklch-longer" width="400" height="100"></canvas>
+    </div>
+    <div>
+      <h2>Srgb</h2>
+      <canvas id="srgb" width="400" height="100"></canvas>
+    </div>
+  </section>
+  <script type="module" src="script.js"></script>
 </body>
 
 </html>

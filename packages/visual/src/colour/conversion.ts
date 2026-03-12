@@ -1,5 +1,5 @@
 import Colorizr, * as C from "colorizr";
-import { type Colour, type Colourish, type ColourSpaces, type Hsl, type HslAbsolute, type HslScalar, type OkLch, type OkLchAbsolute, type OkLchScalar, type Rgb, type Rgb8Bit, type RgbScalar } from "./types.js";
+import { ConvertDestinations, type Colour, type Colourish, type ColourSpaces, type Hsl, type HslAbsolute, type HslScalar, type OkLch, type OkLchAbsolute, type OkLchScalar, type Rgb, type Rgb8Bit, type RgbScalar } from "./types.js";
 import * as SrgbSpace from "./srgb.js";
 import * as HslSpace from './hsl.js';
 import * as OkLchSpace from './oklch.js';
@@ -7,7 +7,6 @@ import { fromCssColour } from "./css-colours.js";
 import { isHsl, isRgb, tryParseObjectToRgb, tryParseObjectToHsl, isColourish, isOkLch } from "./guards.js";
 import { OklchSpace } from "./index.js";
 
-export type ConvertDestinations = `hsl-scalar` | `hsl-absolute` | `oklch-scalar` | `oklch-absolute` | `srgb-8bit` | `srgb-scalar`;
 
 export function convert<T extends ConvertDestinations>(colour: Colourish, destination: T):
   T extends "oklch-absolute" ? OkLchAbsolute :
@@ -67,11 +66,21 @@ export function convertToString(colour: Colourish, destination: ConvertDestinati
   return toCssColour(c);
 }
 
+/**
+ * Converts some kind of colour into a scalar representation. Supports oklch, hsl and srgb.
+ * @param colour Colour to convert
+ * @param destination Destination colour format
+ */
 export function convertScalar<T extends ColourSpaces>(colour: Colourish, destination: T):
   T extends "oklch" ? OkLchScalar :
   T extends "hsl" ? HslScalar :
   T extends "srgb" ? RgbScalar : never
 
+  /**
+ * Converts some kind of colour into a scalar representation. Supports oklch, hsl and srgb.
+ * @param colour Colour to convert
+ * @param destination Destination colour format
+ */
 export function convertScalar(colour: Colourish, destination: ColourSpaces): HslScalar | OkLchScalar | RgbScalar {
   if (destination === `oklch`) return convert(colour, `oklch-scalar`);
   if (destination === `srgb`) return convert(colour, `srgb-scalar`);

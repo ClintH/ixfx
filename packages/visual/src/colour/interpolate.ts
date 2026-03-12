@@ -1,11 +1,12 @@
-import type { Colour, ColourInterpolationOpts, ColourInterpolator, Colourish, ColourSpaces, ColourStepOpts, Hsl, HslScalar, OkLch, OkLchScalar, RgbScalar } from "./types.js";
+import type { Colour, ColourInterpolationOpts, ColourInterpolator, Colourish, ColourSpaces, ColourStepOpts, Hsl, HslScalar, OkLch, OkLchScalar, RgbScalar,ConvertDestinations } from "./types.js";
 import { pairwise } from '@ixfx/arrays';
 import * as HslSpace from './hsl.js';
-import { convert, toCssColour, type ConvertDestinations } from "./conversion.js";
+import { convert, toCssColour,  } from "./conversion.js";
 import { convertScalar, OklchSpace, SrgbSpace } from "./index.js";
+import { clamp, scaleClamped } from "@ixfx/numbers";
 
 /**
- * Returns a function to interpolate between colours
+ * Returns a function to interpolate between colours, with results as a structured {@link Colour} object.
  * ```js
  * const i = interpolator([`orange`, `yellow`, `red`]);
  * 
@@ -19,60 +20,62 @@ import { convertScalar, OklchSpace, SrgbSpace } from "./index.js";
  * ```js
  * interpolator([`orange`, `yellow`, `red`], { space: `hsl`, hue: `longer })
  * ```
+ * 
+ * Example: Draw the interpolation as a spectrum on a canvas, where each pixel is one step
+ * ```js
+ * let v = 0;
+ * let incrementBy = 0.01;
+ * while (v <= 1) {
+ *  // Get colour at this interpolation point 0..1
+ *  const colour = fn(v);                       
+ *  // Convert to a CSS string
+ *  ctx.fillStyle = Colour.toCssColour(colour); 
+ *  // Draw a 1px wide rect, and shuffle along to the next x position
+ *  ctx.fillRect(x, y, 1, h);
+ *  x += 1;
+ *  v += incrementBy;
+ * }
+ * ```
  * @param colours Colours to interpolate between
  * @param opts Options for interpolation
  * @returns 
  */
-// export const interpolator = (colours: Colourish[], opts: Partial<ColourInterpolationOpts> = {}) => {
-//   const spaceDestination: ConvertDestinations = `oklch-scalar`;
-//   let ranges: Colour[] = [];
-//   const direction = opts.direction ?? `shorter`;
+export const interpolator = (colours: Colourish[], opts: Partial<ColourInterpolationOpts> = {}) => {
+  const direction = opts.direction ?? `shorter`;
+  const destination: ConvertDestinations = opts.destination ?? `oklch-scalar`;
+  const space: ColourSpaces = opts.space ?? `oklch`;
+  const ranges = interpolateInit(colours, space);
+  const rangeInterpolators = ranges.map(range => interpolatorDual(range[0], range[1], { space, direction, destination }));
+  const asTargetDestination = colours.map(c => convert(c, destination));
 
-//   switch (opts.space) {
-//     case `hsl`:
-//       ranges = interpolateInit(colours, `hsl-scalar`)
-//         .map(piece => HslSpace.interpolator(piece[ 0 ], piece[ 1 ], direction));
-//       break;
-//     default:
-//       ranges = interpolateInit(colours, `oklch-scalar`)
-//         .map(piece => OklchSpace.interpolator(piece[ 0 ], piece[ 1 ], direction));
-//       break;
-//   }
+  return (amt: number): Colour => {
+    // If we're at the end, return the last colour
+    if (amt >= 1) return asTargetDestination.at(-1)!;
+    // If we're at the beginning, return the first colour
+    if (amt <= 0) return asTargetDestination.at(0)!;
+   
+    // Scale to 0..1 to 0...ranges.length
+    const s = scaleClamped(amt, 0, 1, 0, ranges.length);
+    const index = Math.floor(s);
+    
+    
+    const amtAdjusted = s - index;
+    const ri = rangeInterpolators[ index ];
+    return ri(amtAdjusted);
+  }
+}
 
-
-//   return (amt: number): string => {
-//     amt = clamp(amt);
-
-//     // Scale to 0..1 to 0...ranges.length
-//     const s = scaleNumber(amt, 0, 1, 0, ranges.length);
-//     const index = Math.floor(s);
-//     const amtAdjusted = s - index;
-//     const range = ranges[ index ];
-
-//     // If we're at the end, return the last colour
-
-//     if (index === 1) return toHex(colours.at(-1)!);
-
-//     const colour = range(amtAdjusted);
-//     return colour.display();
-
-//   }
-// }
-
-// const interpolatorInit = (colours: Colourish[]) => {
-//   if (!Array.isArray(colours)) throw new Error(`Param 'colours' is not an array as expected. Got: ${ typeof colours }`);
-//   if (colours.length < 2) throw new Error(`Param 'colours' should be at least two in length. Got: ${ colours.length }`);
-//   const c = colours.map(colour => toLibraryColour(colour));
-//   return [ ...pairwise(c) ];
-// }
-
-// function interpolateInit(colours: Colourish[], destination: `oklch-scalar`): OkLchScalar[][];
-// function interpolateInit(colours: Colourish[], destination: `hsl-scalar`): HslScalar[][];
 function interpolateInit<T extends ColourSpaces>(colours: Colourish[], destination: T):
   T extends `oklch` ? OkLchScalar[][] :
   T extends `hsl` ? HslScalar[][] :
   T extends `srgb` ? RgbScalar[][] : HslScalar[][]
 
+/**
+ * Returns a set of pairwise colours, convert to the destination colour space in scalar form
+ * @param colours 
+ * @param destination 
+ * @returns 
+ */
 function interpolateInit(colours: Colourish[], destination: ColourSpaces = `hsl`): (OkLchScalar | HslScalar | RgbScalar)[][] {
   if (!Array.isArray(colours)) throw new Error(`Param 'colours' is not an array as expected. Got: ${ typeof colours }`);
   if (colours.length < 2) throw new Error(`Param 'colours' should be at least two in length. Got: ${ colours.length }`);
@@ -96,6 +99,7 @@ export const cssLinearGradient = (colours: Colourish[]) => {
 
 /**
  * Returns a function that interpolates between two colours. Returns string colour values.
+ * If you want the result as a structured colour, use {@link interpolatorDual} instead.
  * 
  * By default takes a shorter direction and uses the OkLCH colourspace.
  * ```js
@@ -107,12 +111,50 @@ export const cssLinearGradient = (colours: Colourish[]) => {
  * 
  * If you want to create discrete steps, consider {@link createSteps} or {@link scale}.
  * 
- * @param colourA 
- * @param colourB 
- * @param options 
+ * @param colourA First colour
+ * @param colourB Second colour
+ * @param options Interpolation options. By default uses shorter direction and OkLCH colour space.
  * @returns 
  */
-export const interpolator = (colourA: Colourish, colourB: Colourish, options: Partial<ColourInterpolationOpts> = {}) => {
+export const interpolatorDualToString = (colourA: Colourish, colourB: Colourish, options: Partial<ColourInterpolationOpts> = {}): ((amount: number) => string) => {
+  const f = interpolatorDual(colourA, colourB, options);
+  return (amount: number): string => toCssColour(f(amount));
+
+  // const space = options.space ?? `oklch`;
+  // const direction = options.direction ?? `shorter`;
+
+  // let inter: ColourInterpolator<Colour> | undefined;
+  // switch (space) {
+  //   case `hsl`:
+  //     inter = HslSpace.interpolator(convert(colourA, `hsl-scalar`), convert(colourB, `hsl-scalar`), direction);
+  //     break;
+  //   case `srgb`:
+  //     inter = SrgbSpace.interpolator(convert(colourA, `srgb-scalar`), convert(colourB, `srgb-scalar`));
+  //     break;
+  //   default:
+  //     inter = OklchSpace.interpolator(convert(colourA, `oklch-scalar`), convert(colourB, `oklch-scalar`), direction);
+  // }
+
+  // return (amount: number): string => toCssColour(inter(amount));
+}
+
+/**
+ * Returns a function that interpolates between two colours. Returns structured colour values.
+ * If you want the result as a ready-to-use CSS string, use {@link interpolatorDualToString} instead.
+ * 
+ * By default takes a shorter direction and uses the OkLCH colourspace.
+ * ```js
+ * const i = interpolator(`blue`, `red`);
+ * i(0.5); // Get the colour at 50%, as a Colour structure.
+ * ```
+ * 
+ * If you want to create discrete steps, consider {@link createSteps} or {@link scale}.
+ * @param colourA First colour
+ * @param colourB Second colour
+ * @param options Interpolation options. By default uses shorter direction and OkLCH colour space.
+ * @returns 
+ */
+export const interpolatorDual = (colourA: Colourish, colourB: Colourish, options: Partial<ColourInterpolationOpts> = {}):(amount:number)=>Colour => {
   const space = options.space ?? `oklch`;
   const direction = options.direction ?? `shorter`;
 
@@ -128,8 +170,8 @@ export const interpolator = (colourA: Colourish, colourB: Colourish, options: Pa
       inter = OklchSpace.interpolator(convert(colourA, `oklch-scalar`), convert(colourB, `oklch-scalar`), direction);
   }
 
-  return (amount: number): string => toCssColour(inter(amount));
-
+  return (amount: number): Colour => inter(amount);
+  //return (amount: number): string => toCssColour(inter(amount));
 }
 
 /**
