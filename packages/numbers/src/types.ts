@@ -118,3 +118,10 @@ export type BipolarWrapper = {
 
 export type NumericRange = Readonly<{ min: number, max: number }>
 
+export type RangeStream = {
+  seen: (v: any) => NumericRange
+  reset: () => NumericRange
+  min:number
+  max:number
+  range:NumericRange
+}
