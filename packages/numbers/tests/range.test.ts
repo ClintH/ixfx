@@ -59,9 +59,17 @@ test(`isWithin`, () => {
   expect(R.rangeIsWithin({ min: 40, max: 60 }, { min: 50, max: 60 })).toBeFalsy();
   expect(R.rangeIsWithin({ min: 50, max: 65 }, { min: 50, max: 60 })).toBeFalsy();
 
+  // Exclusive mode
+  expect(R.rangeIsWithin({ min: 40, max: 60 }, { min: 40, max: 60 }, true)).toBeFalsy();
+  expect(R.rangeIsWithin({ min: 40, max: 59 }, { min: 40, max: 60 }, true)).toBeFalsy();
+  expect(R.rangeIsWithin({ min: 41, max: 60 }, { min: 40, max: 60 }, true)).toBeFalsy();
+  expect(R.rangeIsWithin({ min: 41, max: 59 }, { min: 40, max: 60 }, true)).toBeTruthy();
+
 
   expect(R.rangeIsWithin(undefined, { min: 50, max: 60 })).toBeFalsy();
   expect(R.rangeIsWithin({ min: 50, max: 60 }, undefined)).toBeFalsy();
+
+
 
 });
 
