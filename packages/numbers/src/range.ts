@@ -1,5 +1,5 @@
 import { scaler } from "./scale.js";
-import type { NumberScaler, NumericRange } from "./types.js";
+import type { NumberScaler, NumericRange, RangeStream } from "./types.js";
 
 
 /**
@@ -95,27 +95,47 @@ export const rangeIsEqual = (a: NumericRange | undefined, b: NumericRange | unde
 /**
  * Returns _true_ if range 'a' is within or same as range 'b'.
  * Returns _false_ if not or if either/both ranges are _undefined_
- * @param a 
- * @param b 
+ * 
+ * ```js
+ * rangeIsWithin({ min: 5, max: 10 }, { min: 0, max: 10 }); // true
+ * rangeIsWithin({ min: 5, max: 10 }, { min: 6, max: 20 }); // false
+ * ```
+ * 
+ * By default the matching is inclusive, in that `a` could share a min/max with `b`.
+ * If you want to check whether `a` is strictly within `b`, with a higher min and lower max, set `exclusive` to _true_.
+ * 
+ * ```js
+ * rangeIsWithin({ min: 5, max: 10 }, { min: 0, max: 10 }, true); // false
+ * rangeIsWithin({ min: 5, max: 9 }, { min: 0, max: 10 }, true); // true
+ * ```
+ * 
+ * If either `a` or `b` is _undefined_, the function returns _false_.
+ * @param a Range
+ * @param b Parent
+ * @param exclusive If _true_, 
  * @returns 
  */
-export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | undefined): boolean => {
+export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | undefined, exclusive:boolean = false): boolean => {
   if (typeof a === `undefined`) return false
   if (typeof b === `undefined`) return false
-  if (a.min >= b.min && a.max <= b.max) return true;
-  return false;
+  if (exclusive) {
+    return (a.min > b.min && a.max < b.max)
+  }
+  return (a.min >= b.min && a.max <= b.max)
 }
+
+
 
 /**
  * Keeps track of min/max values.
  * 
  * ```js
  * const s = rangeStream();
- * s.seen(10);  // { min: 10, max: 10}
- * s.seen(5);   // { min:5, max: 10}
+ * s.seen(10);  // { min: 10, max: 10 }
+ * s.seen(5);   // { min: 5,  max: 10 }
  * ```
  * 
- * When calling `seen`, non-numbers, or non-finite numbers are silently ignored.
+ * When calling `seen()`, non-numbers, or non-finite numbers are silently ignored.
  * 
  * ```js
  * s.reset();   // Reset
@@ -125,20 +145,9 @@ export const rangeIsWithin = (a: NumericRange | undefined, b: NumericRange | und
  * @param initWith 
  * @returns 
  */
-export const rangeStream = (initWith: NumericRange = rangeInit()): {
-  seen: (v: any) => {
-    min: number;
-    max: number;
-  }; reset: () => void; readonly range: {
-    min: number;
-    max: number;
-  }; readonly min: number; readonly max: number;
-} => {
+export const rangeStream = (initWith: NumericRange = rangeInit()): RangeStream => {
   let { min, max } = initWith;
-  const seen = (v: any): {
-    min: number;
-    max: number;
-  } => {
+  const seen = (v: any): NumericRange => {
     if (typeof v === `number`) {
       if (!Number.isNaN(v) && Number.isFinite(v)) {
         min = Math.min(min, v);
@@ -147,17 +156,15 @@ export const rangeStream = (initWith: NumericRange = rangeInit()): {
     }
     return { min, max }
   }
-  const reset = (): void => {
+  const reset = (): NumericRange => {
     min = Number.MAX_SAFE_INTEGER;
     max = Number.MIN_SAFE_INTEGER;
+    return { min, max };
   }
 
   return {
     seen, reset,
-    get range(): {
-      min: number;
-      max: number;
-    } {
+    get range(): NumericRange {
       return { min, max }
     },
     get min(): number {
