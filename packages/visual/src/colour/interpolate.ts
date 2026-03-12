@@ -157,21 +157,33 @@ export const interpolatorDualToString = (colourA: Colourish, colourB: Colourish,
 export const interpolatorDual = (colourA: Colourish, colourB: Colourish, options: Partial<ColourInterpolationOpts> = {}):(amount:number)=>Colour => {
   const space = options.space ?? `oklch`;
   const direction = options.direction ?? `shorter`;
+  const destination: ConvertDestinations = options.destination ?? `oklch-scalar`;
 
   let inter: ColourInterpolator<Colour> | undefined;
   switch (space) {
     case `hsl`:
-      inter = HslSpace.interpolator(convert(colourA, `hsl-scalar`), convert(colourB, `hsl-scalar`), direction);
+      const hslInter = HslSpace.interpolator(convert(colourA, `hsl-scalar`), convert(colourB, `hsl-scalar`), direction);
+      inter = (amount: number): Colour => {
+        const c = hslInter(amount);
+        return convert( c ,destination);
+      }
       break;
     case `srgb`:
-      inter = SrgbSpace.interpolator(convert(colourA, `srgb-scalar`), convert(colourB, `srgb-scalar`));
+      const srgbInter = SrgbSpace.interpolator(convert(colourA, `srgb-scalar`), convert(colourB, `srgb-scalar`));
+      inter = (amount: number): Colour => {
+        const c = srgbInter(amount);
+        return convert( c ,destination);
+      }
       break;
     default:
-      inter = OklchSpace.interpolator(convert(colourA, `oklch-scalar`), convert(colourB, `oklch-scalar`), direction);
+      const oklchInter = OklchSpace.interpolator(convert(colourA, `oklch-scalar`), convert(colourB, `oklch-scalar`), direction);
+      inter = (amount: number): Colour => {
+        const c = oklchInter(amount);
+        return convert( c ,destination);
+      }
   }
 
   return (amount: number): Colour => inter(amount);
-  //return (amount: number): string => toCssColour(inter(amount));
 }
 
 /**
