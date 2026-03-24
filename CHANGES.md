@@ -1,5 +1,16 @@
 A rough changelog between NPM releases
 
+# 2026.03.24
+
+@ixfx/arrays
++ arrayIndexStepper: A generator function for cycling through array indexes with support (via indexWrap) for looping, 'drunken walk' etc.
++ clampIndex: Clamp a potential array index to valid range
++ indexWrap: Wrap a value between an inclusive min and max with selectable logic for how to handle when the min/max bounds are hit.
++ compareTo: Run a function over array values, comparing to some offset sibling
++ takeFromGenerator: Return an array of values from a generator up to some max count
++ randomChanceInteger: Utility function to sometimes calculate a random integer
+* FrequencyByGroup: expanded frequency tracker
+  
 # 2026.03.12
 
 @ixfx/visual
