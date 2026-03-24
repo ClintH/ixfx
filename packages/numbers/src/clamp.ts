@@ -22,20 +22,25 @@
  * @param max value (inclusive)
  * @returns Clamped value
  */
-export const clamp = (value: number, min = 0, max = 1): number => {
+export function clamp(value: number, min = 0, max = 1): number {
   // ✔ UNIT TESTED
-  if (Number.isNaN(value)) throw new Error(`Param 'value' is NaN`);
-  if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
-  if (Number.isNaN(max)) throw new Error(`Param 'max' is NaN`);
+  if (Number.isNaN(value))
+    throw new Error(`Param 'value' is NaN`);
+  if (Number.isNaN(min))
+    throw new Error(`Param 'min' is NaN`);
+  if (Number.isNaN(max))
+    throw new Error(`Param 'max' is NaN`);
 
-  if (value < min) return min;
-  if (value > max) return max;
+  if (value < min)
+    return min;
+  if (value > max)
+    return max;
   return value;
-};
+}
 
 /**
  * Returns a function that clamps values.
- * 
+ *
  * ```js
  * const c = clamper(0,100);
  * c(50);   // 50
@@ -45,14 +50,18 @@ export const clamp = (value: number, min = 0, max = 1): number => {
  * @param min Minimum value. Default: 0
  * @param max Maximum value. Default: 1
  */
-export const clamper = (min = 0, max = 1) => {
-  if (Number.isNaN(min)) throw new Error(`Param 'min' is NaN`);
-  if (Number.isNaN(max)) throw new Error(`Param 'max' is NaN`);
+export function clamper(min = 0, max = 1) {
+  if (Number.isNaN(min))
+    throw new Error(`Param 'min' is NaN`);
+  if (Number.isNaN(max))
+    throw new Error(`Param 'max' is NaN`);
   return (v: number): number => {
-    if (v > max) return max;
-    if (v < min) return min;
+    if (v > max)
+      return max;
+    if (v < min)
+      return min;
     return v;
-  }
+  };
 }
 
 /**
@@ -76,13 +85,9 @@ export const clamper = (min = 0, max = 1) => {
  * @param arrayOrLength Array, or length of bounds (must be an integer)
  * @returns Clamped value, minimum will be 0, maximum will be one less than `length`.
  */
-export const clampIndex = (
-  v: number,
-  arrayOrLength: number | readonly any[]
-): number => {
-  // ✔ UNIT TESTED
+export function clampIndex(v: number, arrayOrLength: number | readonly any[]): number {
   if (!Number.isInteger(v)) {
-    throw new TypeError(`v parameter must be an integer (${ v })`);
+    throw new TypeError(`v parameter must be an integer (${v})`);
   }
   const length = Array.isArray(arrayOrLength)
     ? arrayOrLength.length
@@ -90,34 +95,35 @@ export const clampIndex = (
 
   if (!Number.isInteger(length)) {
     throw new TypeError(
-      `length parameter must be an integer (${ length }, ${ typeof length })`
+      `length parameter must be an integer (${length}, ${typeof length})`,
     );
   }
   v = Math.round(v);
-  if (v < 0) return 0;
-  if (v >= length) return length - 1;
+  if (v < 0)
+    return 0;
+  if (v >= length)
+    return length - 1;
   return v;
-};
-
+}
 
 export function maxAbs(values: Iterable<number>): number;
 export function maxAbs(...values: number[]): number;
 
 /**
  * Returns the largest value, ignoring the sign of numbers
- * 
+ *
  * ```js
  * maxAbs(1, 5);    // 5
  * maxAbs(-10, 5);  // -10 (since sign is ignored)
  * maxAbs(arrayOfNumbers);
  * ```
- * 
+ *
  * Non-valid numbers are silently ignored.
- * @param values 
- * @returns 
+ * @param values
+ * @returns
  */
-export function maxAbs(...values: (number | Iterable<number>)[]) {
-  //let index = -1;
+export function maxAbs(...values: Array<number | Iterable<number>>) {
+  // let index = -1;
   let maxA = Number.MIN_SAFE_INTEGER;
   let max = Number.MIN_SAFE_INTEGER;
   const checkV = (v: number) => {
@@ -128,7 +134,7 @@ export function maxAbs(...values: (number | Iterable<number>)[]) {
         max = v;
       }
     } // else: ignored
-  }
+  };
 
   for (const v of values) {
     if (typeof v === `number`) {
