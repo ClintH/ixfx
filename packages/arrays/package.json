@@ -1,13 +1,25 @@
 {
   "name": "@ixfx/arrays",
-  "version": "0.56.7",
-  "license": "MIT",
   "type": "module",
-  "sideEffects": false,
-  "files": [
-    "dist"
+  "version": "0.56.7",
+  "description": "ixfx arrays",
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "license": "MIT",
+  "homepage": "https://ixfxfun.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/arrays"
+  },
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "arrays"
   ],
-  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "dev": "./src/index.ts",
@@ -15,6 +27,7 @@
     },
     "./package.json": "./package.json"
   },
+  "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
       "*": [
@@ -23,6 +36,9 @@
       ]
     }
   },
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -30,24 +46,8 @@
       "./package.json": "./package.json"
     }
   },
-  "scripts": {},
-  "description": "ixfx arrays",
-  "keywords": [
-    "ixfx",
-    "interactivity",
-    "arrays"
-  ],
-  "homepage": "https://ixfxfun.dev",
-  "bugs": {
-    "url": "https://github.com/clinth/ixfx/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clinth/ixfx.git",
-    "directory": "packages/arrays"
-  },
-  "author": "Clint Heyer <clint@thestaticvoid.net>",
   "engines": {
     "node": ">=24.0.0"
-  }
+  },
+  "scripts": {}
 }
