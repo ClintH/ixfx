@@ -11,9 +11,8 @@ node_modules/
 espruino/__tests__/
 madge.txt
 coverage
-bundle
+packages/**/bundle
 docs.json
-bundle-for-demos
 *.log
 npm-debug.log*
 *.add.json

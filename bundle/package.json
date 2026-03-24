@@ -1,0 +1,72 @@
+{
+	"name": "ixfx",
+	"version": "1.35.0",
+	"description": "Bundle of ixfx libraries",
+	"author": "Clint Heyer <clint@thestaticvoid.net>",
+	"homepage": "https://ixfx.fun/",
+	"repository": {
+		"url": "git+https://github.com/clinth/ixfx.git"
+	},
+	"keywords": [
+		"interactivity"
+	],
+	"bugs": {
+		"url": "https://github.com/clinth/ixfx/issues"
+	},
+	"license": "MIT",
+	"type": "module",
+	"files": [
+		"dist/"
+	],
+	"scripts": {
+		"build": "tsdown --config tsdown.max.config.js && tsdown --config tsdown.min.config.js",
+		"clean": "rm -rf ./dist",
+		"prepare": "pnpm run clean && pnpm run build",
+		"attw": "attw --pack . --format ascii --profile esm-only",
+		"verify_": "publint",
+		"full": "pnpm run clean && pnpm run build && pnpm run publish"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./*": {
+			"types": "./dist/*.d.ts",
+			"import": "./dist/*.js"
+		},
+		"./min": {
+			"types": "./dist/min/index.d.ts",
+			"import": "./dist/min/index.js"
+		},
+		"./min/*": {
+			"types": "./dist/min/*.d.ts",
+			"import": "./dist/min/*.js"
+		}
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "catalog:",
+		"@ixfx/arrays": "workspace:*",
+		"@ixfx/collections": "workspace:*",
+		"@ixfx/core": "workspace:*",
+		"@ixfx/debug": "workspace:*",
+		"@ixfx/events": "workspace:*",
+		"@ixfx/flow": "workspace:*",
+		"@ixfx/geometry": "workspace:*",
+		"@ixfx/guards": "workspace:*",
+		"@ixfx/io": "workspace:*",
+		"@ixfx/iterables": "workspace:*",
+		"@ixfx/modulation": "workspace:*",
+		"@ixfx/numbers": "workspace:*",
+		"@ixfx/process": "workspace:*",
+		"@ixfx/random": "workspace:*",
+		"@ixfx/rx": "workspace:*",
+		"@ixfx/trackers": "workspace:*",
+		"@ixfx/ui": "workspace:*",
+		"@ixfx/visual": "workspace:*",
+		"tsdown": "catalog:"
+	},
+	"dependencies": {}
+}
