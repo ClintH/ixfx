@@ -1,6 +1,6 @@
 /**
  * Yields all items in the input array, stopping when `predicate` returns _true_.
- * 
+ *
  * @example Yield values until we hit 3
  * ```js
  * const data = [ 1, 2, 3, 4, 5 ];
@@ -10,13 +10,13 @@
  */
 export function until<V>(
   data: readonly V[] | V[],
-  predicate: (v: V) => boolean
+  predicate: (v: V) => boolean,
 ): Generator<V>;
 
 /**
  * Yields all items in the input array, stopping when `predicate` returns _true_.
  * This version allows a value to be 'accumulated' somehow
- * 
+ *
  * @example Yield values until a total of 4
  * ```js
  * const data = [ 1, 2, 3, 4, 5 ];
@@ -27,7 +27,7 @@ export function until<V>(
 export function until<V, A>(
   data: readonly V[] | V[],
   predicate: (v: V, accumulator: A) => readonly [ stop: boolean, acc: A ],
-  initial: A
+  initial: A,
 ): Generator<V>;
 
 /**
@@ -51,23 +51,42 @@ export function until<V, A>(
  * ```
  * @param data
  * @param predicate
- * @returns
  */
-export function* until<V, A>(
+export function *until<V, A>(
   data: readonly V[] | V[],
   predicate: (v: V, accumulator?: A) => boolean | (readonly [ stop: boolean, acc: A ]),
-  initial?: A
+  initial?: A,
 ): Generator<V> {
   let total = initial;
   for (const datum of data) {
     const r = predicate(datum, total);
     if (typeof r === `boolean`) {
-      if (r) break;
+      if (r)
+        break;
     } else {
-      const [ stop, accumulator ] = r;
-      if (stop) break;
+      const [stop, accumulator] = r;
+      if (stop)
+        break;
       total = accumulator;
     }
     yield datum;
   }
 };
+
+/**
+ * Returns up to `count` items from the generator. If the generator finishes before `count` items are returned, then only the available items are returned.
+ * @param generator
+ * @param count
+ */
+export function takeFromGenerator<V>(generator: Generator<V>, count: number): V[] {
+  const result: V[] = [];
+  for (let i = 0; i < count; i++) {
+    const { value, done } = generator.next();
+    if (done)
+      break;
+    result.push(value);
+  }
+  if (result.length > count)
+    throw new Error(`Bug: takeFromGenerator returned more items than requested.`);
+  return result;
+}
