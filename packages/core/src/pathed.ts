@@ -1,4 +1,4 @@
-import { recordEntriesDepthFirst } from "./records.js";
+import { RecordChildrenOptions, recordEntriesDepthFirst } from "./records.js";
 import { isPrimitive, isInteger, isEqualContextString } from '@ixfx/core';
 import { testPlainObjectOrPrimitive } from '@ixfx/guards';
 import type { IsEqualContext } from '@ixfx/core';
@@ -394,6 +394,15 @@ const getFieldImpl = <V>(object: Record<string, any>, split: string[], position:
 }
 
 
+export type GetPathsOptions = Readonly<{
+  onlyLeaves:boolean
+  withPrototype:boolean
+  /**
+   * If specified, this name is used as a prefix for all paths
+   */
+  rootName:string
+}>
+
 /**
  * Iterates 'paths' for all the fields on `o`
  * ```
@@ -416,16 +425,29 @@ const getFieldImpl = <V>(object: Record<string, any>, split: string[], position:
  * // Yields [ `accel.x`, `accel.y`,`accel.z`,`gyro.x`,`gyro.y`,`gyro.z` ]
  * ```
  *
+ * Options:
+ * * onlyLeaves: If _true_, only paths to 'leaf' nodes are included. Leaf nodes are those that contain a primitive value. Default: _false_
+ * * withPrototype: If _true_, includes prototype chain. Default: _false_
  * @param object Object to get paths for.
- * @param onlyLeaves If true, only paths with a primitive value are returned.
+ * @param options Options
  * @returns
  */
-export function* getPaths(object: object | null, onlyLeaves = false): Generator<string> {
+export function* getPaths(object: object | null, options:Partial<GetPathsOptions> = {}): Generator<string> {
+  const onlyLeaves = options.onlyLeaves ?? false;
   if (object === undefined || object === null) return;
-  const iter = recordEntriesDepthFirst(object);
+  const pathOptions:RecordChildrenOptions = {
+    seen: new WeakSet(),
+    withPrototype: false,
+    onlyLeaves:false,
+    filter:`none`,
+    name:``,
+    ...options
+  }
+  const iter = recordEntriesDepthFirst(object, pathOptions);
+  const rootName = options.rootName ? options.rootName + `.` : ``;
   for (const c of iter) {
     if (c.nodeValue === undefined && onlyLeaves) continue;
-    let path = c.name;
+    let path = rootName + c.name;
     if (c.ancestors.length > 0) path = c.ancestors.join(`.`) + `.` + path;
     yield path;
   }

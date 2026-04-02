@@ -1,4 +1,8 @@
-import { Chains } from '../../../dist/iterables.js';
+import { Chains } from '../../../packages/iterables/src/index.js';
+import { Pathed } from '../../../packages/core/src/index.js';
+
+const p = [...Pathed.getPaths(navigator, { withPrototype:true, rootName:`navigator` })];
+console.log(p);
 
 async function move() {
   const c = Chains.run(

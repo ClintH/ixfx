@@ -124,7 +124,7 @@ export function step(state: PartialBy<StepState, `done`>, options: StepOptions, 
  * ```
  * @param optionsP
  * @param context
- * @returns
+ * @returns Iterator over array indicies
  */
 export function arrayIndexStepper<T>(optionsP: Partial<StepOptions>, context: Partial<StepArrayContext<T>> & { data: T[] | readonly T[] }): () => Generator<number> {
   const options: StepOptions = {

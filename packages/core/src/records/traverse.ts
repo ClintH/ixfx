@@ -24,6 +24,14 @@ export type RecordChildrenOptions = Readonly<{
    * Default name to use. This is necessary in some cases, eg a root object.
    */
   name: string;
+
+  /**
+   * If _true_, includes prototype chain. This is particularly needed when working with instances of classes.
+   * Default is _false_, where we only look for immediate properties.
+   */
+  withPrototype: boolean;
+
+  seen:WeakSet<any>
 }>;
 
 /**
@@ -135,22 +143,43 @@ export function *recordChildren<T extends object>(
       }
     }
   } else if (typeof node === `object`) {
-    const entriesIter = (`entries` in node) ? (node as any as Map<any, any>).entries() : Object.entries(node);
-    for (const [name, value] of entriesIter) {
+    if (options.withPrototype) {
+      for (const name in node) {
+        const value = node[name];
+        const f = filterByValue(value);
+        if (f[0]) {
+          yield { name, sourceValue: value, nodeValue: f[1] ? value : undefined };
+        }
+      }
+    } else {
+      const entriesIter = (`entries` in node) ? (node as any as Map<any, any>).entries() : Object.entries(node);
+      for (const [name, value] of entriesIter) {
       // onsole.log(`children name: ${ name } type: ${ typeof value } isPrim: ${ isPrimitive(value) } filter: ${ filter }`);
-      const f = filterByValue(value);
-      if (f[0]) {
-        yield { name, sourceValue: value, nodeValue: f[1] ? value : undefined };
+        const f = filterByValue(value);
+        if (f[0]) {
+          yield { name, sourceValue: value, nodeValue: f[1] ? value : undefined };
+        }
       }
     }
   }
 }
 
-export function *recordEntriesDepthFirst<T extends object>(node: T, options: Partial<RecordChildrenOptions> = {}, ancestors: string[] = []): IterableIterator<RecordEntryWithAncestors> {
-  for (const c of recordChildren(node, options)) {
+export function *recordEntriesDepthFirst<T extends object>(node: T, options:Partial<RecordChildrenOptions> = {}, ancestors: string[] = []): IterableIterator<RecordEntryWithAncestors> {
+  if (node === null || node === undefined) return;
+  const opts:RecordChildrenOptions={
+    filter: options.filter ?? `none`,
+    name: options.name ?? ``,
+    withPrototype: options.withPrototype ?? false,
+    seen: options.seen ?? new WeakSet(),
+  }
+  if (typeof node === `object`) {
+    if (opts.seen.has(node)) return;
+    opts.seen.add(node);
+  }
+  for (const c of recordChildren(node, opts)) {
     // onsole.log(`depthFirst name: ${ c.name } nodeValue: ${ toStringAbbreviate(c.nodeValue) }`)
     yield { ...c, ancestors: [...ancestors] };
-    yield* recordEntriesDepthFirst(c.sourceValue, options, [...ancestors, c.name]);
+    yield* recordEntriesDepthFirst(c.sourceValue, opts, [...ancestors, c.name]);
   }
 }
 
