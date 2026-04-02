@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/arrays",
   "type": "module",
-  "version": "0.56.8",
+  "version": "0.56.9",
   "description": "ixfx arrays",
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "license": "MIT",
