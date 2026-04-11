@@ -1,5 +1,11 @@
 A rough changelog between NPM releases
 
+# 2026.04.11
+
+@ixfx/collections
++ Events: Immutable functions for working with arrays of 'events', some arbitrary data that has a start and end point. For example, MIDI note event.
+* Sorted: Many new & improved immutable functions for working with sorted arrays using a binary search algorithm
+
 # 2026.03.24
 
 @ixfx/arrays
