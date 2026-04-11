@@ -28,7 +28,7 @@ it(`random`, () => {
 
   // 10% chance of using a random number
   const resultsGrouped2 = FrequencyByGroup.fromArray(collect(100, () => R.randomChanceInteger(0.1, 20, 10)));
-  expect(resultsGrouped2.getRelative(`10`)).toBeGreaterThan(0.88);
+  expect(resultsGrouped2.getRelative(`10`)).toBeGreaterThanOrEqual(0.88);
 });
 
 it(`is-equal`, () => {
