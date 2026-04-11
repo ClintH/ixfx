@@ -1,21 +1,25 @@
 {
   "name": "@ixfx/collections",
-  "version": "0.56.9",
-  "license": "MIT",
   "type": "module",
-  "sideEffects": false,
-  "files": [
-    "dist"
-  ],
-  "scripts": {},
-  "dependencies": {
-    "@ixfx/arrays": "workspace:^",
-    "@ixfx/events": "workspace:^",
-    "@ixfx/core": "workspace:^",
-    "@ixfx/guards": "workspace:^",
-    "@ixfx/iterables": "workspace:^"
+  "version": "0.56.10",
+  "description": "ixfx collections",
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "license": "MIT",
+  "homepage": "https://ixfxfun.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/collections"
   },
-  "types": "./dist/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "collections"
+  ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "dev": "./src/index.ts",
@@ -47,6 +51,21 @@
     },
     "./package.json": "./package.json"
   },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {},
+  "dependencies": {
+    "@ixfx/arrays": "workspace:^",
+    "@ixfx/core": "workspace:^",
+    "@ixfx/events": "workspace:^",
+    "@ixfx/guards": "workspace:^",
+    "@ixfx/iterables": "workspace:^"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -59,24 +78,5 @@
       "./tree": "./dist/tree/index.js",
       "./package.json": "./package.json"
     }
-  },
-  "description": "ixfx collections",
-  "keywords": [
-    "ixfx",
-    "interactivity",
-    "collections"
-  ],
-  "homepage": "https://ixfxfun.dev",
-  "bugs": {
-    "url": "https://github.com/clinth/ixfx/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clinth/ixfx.git",
-    "directory": "packages/collections"
-  },
-  "author": "Clint Heyer <clint@thestaticvoid.net>",
-  "engines": {
-    "node": ">=24.0.0"
   }
 }
