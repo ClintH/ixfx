@@ -1,38 +1,38 @@
-export type NumberGuardRange =
+export type NumberGuardRange
   /**
    * No range checking
    */
-  | ``
-  | `finite`
+  = | ``
+    | `finite`
   /**
    * Can be any number, except zero
    */
-  | `nonZero`
-  | `positive`
-  | `negative`
+    | `nonZero`
+    | `positive`
+    | `negative`
   /**
    * Must be above zero
    */
-  | `aboveZero`
-  | `belowZero`
-  | `percentage`
-  | `bipolar`;
+    | `aboveZero`
+    | `belowZero`
+    | `percentage`
+    | `bipolar`;
 
 // export type GuardResultOk = Readonly<readonly [ true: boolean ]>;
 // export type GuardResultFail = Readonly<readonly [ false: boolean, reason: string ]>;
 // export type GuardResult = GuardResultFail | GuardResultOk;
 
 export type ResultOk<TValue> = {
-  success: true
-  value: TValue
-  info?: string
-}
+  success: true;
+  value: TValue;
+  info?: string;
+};
 
 export type ResultError<TError> = {
-  success: false
-  error: TError
-  info?: string
-}
-export type ResultOrFunction = Result<any, any> | (() => undefined | Result<any, any>)
+  success: false;
+  error: TError;
+  info?: string;
+};
+export type ResultOrFunction = boolean | Result<any, any> | (() => undefined | Result<any, any>);
 
 export type Result<TValue, TError> = ResultOk<TValue> | ResultError<TError>;
