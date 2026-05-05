@@ -8,7 +8,10 @@ import { neighbourList } from '../neighbour.js';
 import { cellKeyString } from "../to-string.js";
 
 /**
- * Visits every cell in grid using supplied selection function
+ * Visits every cell in grid using supplied selection function.
+ *
+ * If you want a reusable 'visitor' function to use with different grids, use {@link create} instead.
+ *
  * In-built functions to use: visitorDepth, visitorBreadth, visitorRandom,
  * visitorColumn, visitorRow.
  *
