@@ -1,6 +1,7 @@
-//import type { Cell, GridReadable } from '../Types.js';
+// import type { Cell, GridReadable } from '../Types.js';
 
 export * from './cells.js';
+export * from './rows.js';
 
 // export function* withValues<T>(grid: GridReadable<T>, iter: IterableIterator<Cell>) {
 //   for (const cell of iter) {
