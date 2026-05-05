@@ -19,7 +19,7 @@
     "test:ecosystem": "pnpm test run && pnpm typecheck",
     "mono:check": "monoman --check",
     "mono:update": "monoman --write",
-    "verify": "vitest run && pnpm run mono:check && tsx publint.ts",
+    "verify": "pnpm run typecheck:lib && vitest run && pnpm run mono:check && tsx publint.ts",
     "release": "pnpm run build && bumpp -r && pnpm run publish",
     "publish": "pnpm publish --recursive --no-git-checks --access public",
     "typecheck": "pnpm run /^typecheck:/",

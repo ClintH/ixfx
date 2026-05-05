@@ -56,10 +56,14 @@ export function resultThrowSingle<TValue>(result: Result<TValue, any>): result i
 /**
  * Returns the first failed result, or _undefined_ if there are no fails
  * @param results
- * @returns
  */
 export function resultFirstFail_<TError>(...results: ResultOrFunction[]): ResultError<TError> | undefined {
   for (const r of results) {
+    if (typeof r === `boolean`) {
+      if (r)
+        continue;
+      return { success: false, error: `Guard failed: false result` as TError };
+    }
     const rr = (typeof r === `object` ? r : r()) as ResultError<TError> | undefined;
     if (rr === undefined)
       continue;
@@ -71,7 +75,6 @@ export function resultFirstFail_<TError>(...results: ResultOrFunction[]): Result
 /**
  * Returns _true_ if `result` is an error
  * @param result
- * @returns
  */
 export function resultIsError<TValue, TError>(result: Result<TValue, TError>): result is ResultError<TError> {
   if (typeof result !== `object` || result === null)
@@ -82,7 +85,6 @@ export function resultIsError<TValue, TError>(result: Result<TValue, TError>): r
 /**
  * Returns _true_ if `result` is OK and has a value
  * @param result
- * @returns
  */
 export function resultIsOk<TValue, TError>(result: Result<TValue, TError>): result is ResultOk<TValue> {
   if (typeof result !== `object` || result === null)
@@ -116,7 +118,6 @@ export class IxfxError extends Error {
 /**
  * Gets the result as an Error
  * @param result
- * @returns
  */
 export function resultToError(result: ResultError<any>): Error {
   if (typeof result.error === `string`) {
@@ -131,7 +132,6 @@ export function resultToError(result: ResultError<any>): Error {
  * Unwraps the result, returning its value if OK.
  * If not, an exception is thrown.
  * @param result
- * @returns
  */
 export function resultToValue<TValue, TError>(result: Result<TValue, TError>): TValue {
   if (resultIsOk(result)) {
@@ -143,7 +143,6 @@ export function resultToValue<TValue, TError>(result: Result<TValue, TError>): T
 /**
  * Returns the error as a string.
  * @param result
- * @returns
  */
 export function resultErrorToString(result: ResultError<any>): string {
   if (result.error instanceof Error)
@@ -157,7 +156,6 @@ export function resultErrorToString(result: ResultError<any>): string {
  * Returns a {@link ResultError} using 'error' as the message.
  * @param error
  * @param info
- * @returns
  */
 export function errorResult(error: string, info?: string): ResultError<string> {
   return {
@@ -170,11 +168,15 @@ export function errorResult(error: string, info?: string): ResultError<string> {
 /**
  * Returns first failed result or final value.
  * @param results
- * @returns
  */
 export function resultsCollate<TValue, TError>(...results: ResultOrFunction[]): Result<TValue, TError> {
   let rr: Result<TValue, TError> | undefined;
   for (const r of results) {
+    if (typeof r === `boolean`) {
+      if (r)
+        continue;
+      return { success: false, error: `Guard failed: false result` as TError };
+    }
     rr = typeof r === `object` ? r : r();
     if (rr === undefined)
       continue;

@@ -113,7 +113,7 @@ function gridFromArrayDimensions<T>(array: readonly T[] | T[], cols: number): Un
  * @param array Array to wrap
  * @param grid Grid shape
  */
-export function wrapMutable<T>(array: T[], grid: Grid): GridArray1d<T> {
+export function wrapMutable<T>(array: T[], grid: UniformGrid): GridArray1d<T> {
   return {
     ...grid,
     get: access(array, grid),
@@ -146,7 +146,7 @@ export function wrapMutable<T>(array: T[], grid: Grid): GridArray1d<T> {
  * @param array Array to wrap
  * @param grid Grid shape
  */
-export function wrap<T>(array: T[], grid: Grid): GridArray1d<T> {
+export function wrap<T>(array: T[], grid: UniformGrid): GridArray1d<T> {
   return {
     ...grid,
     get: (cell: GridCell, boundsLogic: GridBoundsLogic = `undefined`) => accessWithGrid(grid, array, cell, boundsLogic),
@@ -197,7 +197,7 @@ export function createArray<T>(initialValue: T, grid: Grid): T[] {
  * @param initialValue
  * @param grid
  */
-export function createMutable<T>(initialValue: T, grid: Grid): GridArray1d<T> {
+export function createMutable<T>(initialValue: T, grid: UniformGrid): GridArray1d<T> {
   resultThrow(testGrid(grid));
   const array = createArray(initialValue, grid);
   return wrapMutable(array, grid);
