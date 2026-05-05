@@ -21,39 +21,58 @@ export * from './visitor.js';
 export type VisitorTypes = `row` | `column` | `neighbours` | `breadth` | `depth` | `random` | `random-contiguous`;
 
 /**
+ * Returns a generator that iterates over cells with a given logic.
+ * Once created, the same logic can be used on different grids - it is a pure function.
+ *
+ * ```js
+ * const v = create(`random`); // Randomly visit cells
+ * for (const cell of v(grid)) {
+ *  // do something with cell
+ * }
+ * ```
+ *
  * Logic types:
  * 'row': left-to-right, top-to-bottom
  * 'column': top-to-bottom, left-to-right
  * 'neighbours': neighbours surrounding cell (eight)
- * 'breadth`: breadth-first
+ * 'breadth': breadth-first
  * 'depth': depth-first
  * 'random': any random cell in grid
  * 'random-contiguous': any random cell neighbouring an already visited cell
+ *
+ * Under the hood it uses {@link createWithLogic}, but lets you specify the logic with a simple string.
  * @param type
  * @param opts
  */
 export function create(type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}): (grid: Grid, optionsOverride?: Partial<GridVisitorOpts>) => Generator<GridCell> {
   switch (type) {
     case `random-contiguous`:
-      return withLogic(randomContiguousLogic(), opts);
+      return createWithLogic(randomContiguousLogic(), opts);
     case `random`:
-      return withLogic(randomLogic(), opts);
+      return createWithLogic(randomLogic(), opts);
     case `depth`:
-      return withLogic(depthLogic(), opts);
+      return createWithLogic(depthLogic(), opts);
     case `breadth`:
-      return withLogic(breadthLogic(), opts);
+      return createWithLogic(breadthLogic(), opts);
     case `neighbours`:
-      return withLogic(neighboursLogic(), opts);
+      return createWithLogic(neighboursLogic(), opts);
     case `row`:
-      return withLogic(rowLogic(opts), opts);
+      return createWithLogic(rowLogic(opts), opts);
     case `column`:
-      return withLogic(columnLogic(opts), opts);
+      return createWithLogic(columnLogic(opts), opts);
     default:
       throw new TypeError(`Param 'type' unknown. Value: ${type}`);
   }
 }
 
-export function withLogic(logic: GridNeighbourSelectionLogic, options: Partial<GridVisitorOpts> = {}) {
+/**
+ * Returns a function which creates a generator to iterate over cells with a given logic. Use {@link create} to specify this logic with a string.
+ *
+ * This lower-level function is used if you have a custom {@link GridNeighbourSelectionLogic} implementation.
+ * @param logic
+ * @param options
+ */
+export function createWithLogic(logic: GridNeighbourSelectionLogic, options: Partial<GridVisitorOpts> = {}) {
   return (grid: Grid, optionsOverride: Partial<GridVisitorOpts> = {}): Generator<GridCell> => {
     return visitByNeighbours(logic, grid, { ...options, ...optionsOverride });
   };
