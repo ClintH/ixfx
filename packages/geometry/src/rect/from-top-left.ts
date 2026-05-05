@@ -1,7 +1,7 @@
 import type { Point } from "../point/point-type.js";
-import { guardDim } from "./guard.js";
 import type { RectPositioned } from "./rect-types.js";
 import { guard as PointsGuard } from '../point/guard.js';
+import { guardDim } from "./guard.js";
 
 /**
  * Creates a rectangle from its top-left coordinate, a width and height.
@@ -13,16 +13,11 @@ import { guard as PointsGuard } from '../point/guard.js';
  * @param origin
  * @param width
  * @param height
- * @returns
  */
-export const fromTopLeft = (
-  origin: Point,
-  width: number,
-  height: number
-): RectPositioned => {
+export function fromTopLeft(origin: Point, width: number, height: number): RectPositioned {
   guardDim(width, `width`);
   guardDim(height, `height`);
   PointsGuard(origin, `origin`);
 
-  return { x: origin.x, y: origin.y, width: width, height: height };
-};
+  return { x: origin.x, y: origin.y, width, height };
+}

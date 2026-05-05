@@ -1,11 +1,11 @@
-import { type TraversableTree } from '@ixfx/collections';
-import * as Shapes from './shape/index.js';
+import type { TraversableTree } from '@ixfx/collections';
 import type { Point } from './point/point-type.js';
-import { fromTopLeft as RectsFromTopLeft } from './rect/from-top-left.js';
-import { intersectsPoint as RectsIntersectsPoint } from './rect/Intersects.js';
-import { fromNumbers as PointsFromNumbers } from './point/from.js';
-import type { ShapePositioned } from './shape/index.js';
 import type { RectPositioned } from './rect/rect-types.js';
+import type { ShapePositioned } from './shape/index.js';
+import { fromNumbers as PointsFromNumbers } from './point/from.js';
+import { fromTopLeft as RectsFromTopLeft } from './rect/from-top-left.js';
+import { intersectsPoint as RectsIntersectsPoint } from './rect/intersects.js';
+import * as Shapes from './shape/index.js';
 /**
  * Options for quad tree
  */
@@ -42,10 +42,10 @@ export type QuadTreeItem = Point | ShapePositioned;
  * @param opts Options
  * @returns New quad tree
  */
-export const quadTree = (bounds: RectPositioned, initialData: readonly QuadTreeItem[] = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode => {
+export function quadTree(bounds: RectPositioned, initialData: readonly QuadTreeItem[] = [], opts: Partial<QuadTreeOpts> = {}): QuadTreeNode {
   const o: QuadTreeOpts = {
     maxItems: opts.maxItems ?? 4,
-    maxLevels: opts.maxLevels ?? 4
+    maxLevels: opts.maxLevels ?? 4,
   };
 
   const n = new QuadTreeNode(undefined, bounds, 0, o);
@@ -53,13 +53,13 @@ export const quadTree = (bounds: RectPositioned, initialData: readonly QuadTreeI
     n.add(d);
   }
   return n;
-};
+}
 
 /**
  * QuadTreeNode. The values of the node is an array of {@link QuadTreeItem}.
  *
  * To create, you probably want the {@link quadTree} function.
- * 
+ *
  */
 export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
   #items: QuadTreeItem[] = [];
@@ -75,7 +75,7 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
     parent: QuadTreeNode | undefined,
     readonly boundary: RectPositioned,
     readonly level: number,
-    readonly opts: QuadTreeOpts
+    readonly opts: QuadTreeOpts,
   ) {
     this.#parent = parent;
   }
@@ -85,7 +85,7 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
   }
 
   *parents(): IterableIterator<QuadTreeNode> {
-    //eslint-disable-next-line functional/no-let,@typescript-eslint/no-this-alias
+    // eslint-disable-next-line functional/no-let,@typescript-eslint/no-this-alias
     let n: QuadTreeNode | undefined = this;
     while (n.#parent !== undefined) {
       yield n.#parent;
@@ -117,13 +117,14 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
   getIdentity(): this {
     return this;
   }
+
   /**
    * Get a descendant node in a given direction
    * @param d
    * @returns
    */
   direction(d: Direction): QuadTreeNode | undefined {
-    return this.#children[ d ] as QuadTreeNode | undefined;
+    return this.#children[d] as QuadTreeNode | undefined;
   }
 
   /**
@@ -132,7 +133,8 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
    * @returns False if item is outside of boundary, True if item was added
    */
   add(p: QuadTreeItem): boolean {
-    if (!Shapes.isIntersecting(this.boundary, p)) return false;
+    if (!Shapes.isIntersecting(this.boundary, p))
+      return false;
 
     if (this.#children.length > 0) {
       for (const d of this.#children) (d).add(p);
@@ -142,8 +144,8 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
     this.#items.push(p);
 
     if (
-      this.#items.length > this.opts.maxItems &&
-      this.level < this.opts.maxLevels
+      this.#items.length > this.opts.maxItems
+      && this.level < this.opts.maxLevels
     ) {
       if (this.#children.length === 0) {
         this.#subdivide();
@@ -153,7 +155,7 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
       for (const item of this.#items) {
         for (const d of this.#children) (d).add(item);
       }
-      //this.descendants.forEach(d => (d as QuadTreeNode).add(p));
+      // this.descendants.forEach(d => (d as QuadTreeNode).add(p));
       this.#items = [];
     }
     return true;
@@ -176,12 +178,12 @@ export class QuadTreeNode implements TraversableTree<QuadTreeItem[]> {
 
     // top-left corners of each of the four new sections
     const coords = PointsFromNumbers(x + w, y, x, y, x, y + h, x + w, y + h);
-    const rects = coords.map((p) => RectsFromTopLeft(p, w, h));
+    const rects = coords.map(p => RectsFromTopLeft(p, w, h));
     // rects.forEach((r, index) => {
     //   this.descendants[index] = new QuadTreeNode(r, this.level + 1, this.opts);
     // });
     this.#children = rects.map(
-      (r) => new QuadTreeNode(this, r, this.level + 1, this.opts)
+      r => new QuadTreeNode(this, r, this.level + 1, this.opts),
     );
   }
 }

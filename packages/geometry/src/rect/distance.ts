@@ -1,10 +1,10 @@
-import { guardPositioned } from "./guard.js";
-import { intersectsPoint } from "./Intersects.js";
-import { center } from "./center.js";
+import type { Point } from '../point/point-type.js';
 import type { RectPositioned } from "./rect-types.js";
-import { type Point } from '../point/point-type.js';
-import { guard as PointsGuard } from '../point/guard.js';
 import { distance as PointsDistance } from '../point/distance.js';
+import { guard as PointsGuard } from '../point/guard.js';
+import { center } from "./center.js";
+import { guardPositioned } from "./guard.js";
+import { intersectsPoint } from "./intersects.js";
 
 /**
  * Returns the distance from the perimeter of `rect` to `pt`.
@@ -20,17 +20,15 @@ import { distance as PointsDistance } from '../point/distance.js';
  * @param pt Point
  * @returns Distance
  */
-export const distanceFromExterior = (
-  rect: RectPositioned,
-  pt: Point
-): number => {
+export function distanceFromExterior(rect: RectPositioned, pt: Point): number {
   guardPositioned(rect, `rect`);
   PointsGuard(pt, `pt`);
-  if (intersectsPoint(rect, pt)) return 0;
+  if (intersectsPoint(rect, pt))
+    return 0;
   const dx = Math.max(rect.x - pt.x, 0, pt.x - rect.x + rect.width);
   const dy = Math.max(rect.y - pt.y, 0, pt.y - rect.y + rect.height);
   return Math.hypot(dx, dy);
-};
+}
 
 /**
  * Return the distance of `pt` to the center of `rect`.
@@ -43,7 +41,6 @@ export const distanceFromExterior = (
  * @param pt
  * @returns
  */
-export const distanceFromCenter = (
-  rect: RectPositioned,
-  pt: Point
-): number => PointsDistance(center(rect), pt);
+export function distanceFromCenter(rect: RectPositioned, pt: Point): number {
+  return PointsDistance(center(rect), pt);
+}
