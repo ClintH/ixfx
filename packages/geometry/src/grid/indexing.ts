@@ -1,6 +1,6 @@
 import type { Grid, GridBoundsLogic, GridCell, JaggedGrid, UniformGrid } from "./types.js";
 import { integerTest, resultThrow } from "@ixfx/guards";
-import { applyBounds, applyBoundsJagged } from "./apply-bounds.js";
+import { applyBounds } from "./apply-bounds.js";
 import { isJaggedGrid, testCell, testGrid, testJaggedGrid } from "./guards.js";
 
 export function indexFromCell(grid: Grid, cell: GridCell, wrap: `undefined`): number | undefined;
@@ -149,7 +149,7 @@ export function cellFromIndexUniform(colsOrGrid: number | UniformGrid, index: nu
  */
 export function indexFromCellJagged(grid: JaggedGrid, cell: GridCell, wrap: GridBoundsLogic): number | undefined {
   resultThrow(testJaggedGrid(grid), testCell(cell));
-  const cellBounded = applyBoundsJagged(grid, cell, wrap);
+  const cellBounded = applyBounds(grid, cell, wrap);
   if (cellBounded === undefined)
     return;
 
