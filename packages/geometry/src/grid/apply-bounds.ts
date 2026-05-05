@@ -25,7 +25,7 @@ export function applyBounds<T extends GridBoundsLogic>(grid: Grid, cell: GridCel
   }
 }
 
-export function applyBoundsUniform<T extends GridBoundsLogic>(grid: UniformGrid, cell: GridCell, wrap?: T): GridCell | undefined {
+function applyBoundsUniform<T extends GridBoundsLogic>(grid: UniformGrid, cell: GridCell, wrap?: T): GridCell | undefined {
   resultThrow(
     testGrid(grid, `grid`),
     testCell(cell, `cell`),
@@ -81,7 +81,7 @@ export function applyBoundsUniform<T extends GridBoundsLogic>(grid: UniformGrid,
  * @param cell
  * @param wrap
  */
-export function applyBoundsJagged<T extends GridBoundsLogic>(grid: JaggedGrid, cell: GridCell, wrap?: T): GridCell | undefined {
+function applyBoundsJagged<T extends GridBoundsLogic>(grid: JaggedGrid, cell: GridCell, wrap?: T): GridCell | undefined {
   throwIfFailed(
     testJaggedGrid(grid, `grid`),
     testCell(cell, `cell, grid`),
