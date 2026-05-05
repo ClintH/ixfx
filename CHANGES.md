@@ -1,5 +1,17 @@
 A rough changelog between NPM releases
 
+# 2026.05.05
+
+@ixfx/arrays
++ findIndex/findIndexReverse: Like in-built findIndex, but can specify a range of the array to search
++ filterWithIndex: Generator over array indices that match predicate
+
+@ixfx/geometry
++ The Grids module has always assumed a uniform grid (all rows have same number of columns). We now distinguish between UniformGrid and JaggedGrid, which can have arbitrary column length per row. Most of the fundamental functions have added support for JaggedGrid
+
+@ixfx/visual
++ Colour.YCrBrSpace: beginnings of YCrBy colourspace support
+
 # 2026.04.11
 
 @ixfx/collections
