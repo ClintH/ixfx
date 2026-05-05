@@ -1,13 +1,13 @@
-import Colorizr, * as C from "colorizr";
-import type { Colourish, Hsl, HslAbsolute, HslScalar, ParsingOptions, Rgb } from "./types.js";
-import { numberInclusiveRangeTest, numberTest, percentTest } from "@ixfx/guards";
-import { resultThrow } from "@ixfx/guards";
-import { cssDefinedHexColours, resolveCss } from "./css-colours.js";
-import { angleConvert, angleParse, type Angle } from "@ixfx/geometry";
+import type { Angle } from "@ixfx/geometry";
+import type { Hsl, HslAbsolute, HslScalar, ParsingOptions, Rgb } from "./types.js";
+import { angleConvert, angleParse } from "@ixfx/geometry";
+import { numberInclusiveRangeTest, numberTest, percentTest, resultThrow } from "@ixfx/guards";
 import { clamp, interpolate } from "@ixfx/numbers";
+import * as C from "colorizr";
+import { cssDefinedHexColours, resolveCss } from "./css-colours.js";
 import { isRgb } from "./guards.js";
+import { toLibraryHsl as rgbToLibraryHsl } from "./srgb.js";
 import { calculateHueDistance, libraryRgbToHexString, wrapScalarHue } from "./utility.js";
-import { parseCssRgbFunction, to8bit as rgbTo8bit, toLibraryHsl as rgbToLibraryHsl } from "./srgb.js";
 
 /**
  * Scales the opacity value of an input HSL value
@@ -16,78 +16,87 @@ import { parseCssRgbFunction, to8bit as rgbTo8bit, toLibraryHsl as rgbToLibraryH
  * ```
  * @param value Colour
  * @param fn Function that calcules opacity based on input scalar value
- * @returns 
  */
-export const withOpacity = <T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number): T => {
+export function withOpacity<T extends Hsl>(value: T, fn: (opacityScalar: number, value: T) => number): T {
   switch (value.unit) {
     case `absolute`:
       return {
         ...value,
-        opacity: fn((value.opacity ?? 100) / 100, value) * 100
-      }
+        opacity: fn((value.opacity ?? 100) / 100, value) * 100,
+      };
     case `scalar`:
       return {
         ...value,
-        opacity: fn((value.opacity ?? 1), value)
-      }
+        opacity: fn((value.opacity ?? 1), value),
+      };
   }
 }
 
 /**
  * Increases or decreases lightness by this percentage, returning new colour
- * 
+ *
  * Amount to change:
- * * 'fixed': a fixed amount
- * * 'delta': increase/decrease by this amount
- * * 'pdelta': proportion of current value to change by ('percentage delta')
- * 
+ * 'fixed': a fixed amount
+ * 'delta': increase/decrease by this amount
+ * 'pdelta': proportion of current value to change by ('percentage delta')
+ *
  * ```
  * const colour = { h: 0.5, s: 0.5, l: 0.5, space: `hsl`, unit: `scalar` };
  * changeLightness(colour, { pdelta: 0.1 }); // l: 0.55
  * changeLightness(colour, { delta: 0.1 });  // l: 0.6
  * changeLightness(colour, { fixed: 0.5 });  // l: 0.5
  * ```
- * 
+ *
  * Keep in mind the numerical value will depend on the unit of `value`. If it's scalar,
  * lightness is 0..1 scale, otherwise 0..100 scale.
- * 
+ *
  * Use negative values to decrease (does not apply to 'fixed')
  * @param value Hsl colour
  * @param amount Amount to change
  */
-export const changeLightness = (value: Hsl, amount: Partial<{ pdelta: number, delta: number, fixed: number }>): Hsl => {
+export function changeLightness(value: Hsl, amount: Partial<{ pdelta: number; delta: number; fixed: number }>): Hsl {
   let newL = 0;
   if (typeof amount.pdelta !== `undefined`) {
     newL = value.l + (value.l * amount.pdelta);
   } else if (typeof amount.delta !== `undefined`) {
     newL = amount.delta + value.l;
   } else if (typeof amount.fixed !== `undefined`) {
-    if (amount.fixed < 0) throw new TypeError(`Cannot use negative value with 'fixed'`);
+    if (amount.fixed < 0)
+      throw new TypeError(`Cannot use negative value with 'fixed'`);
     newL = amount.fixed;
   } else {
     throw new TypeError(`Parameter 'amount' is missing 'delta/pdelta/fixed' properties`);
   }
   return {
     ...value,
-    l: scaleProperty(value, newL, `l`)
-  }
+    l: scaleProperty(value, newL, `l`),
+  };
 }
 
-const scaleProperty = (hsl: Hsl, value: number, property: `l` | `h` | `s`) => {
+function scaleProperty(hsl: Hsl, value: number, property: `l` | `h` | `s`) {
   if (hsl.unit === `scalar`) {
     // 0..1 scale
-    if (value > 1) value = 1;
-    else if (value < 0) value = 0;
+    if (value > 1)
+      value = 1;
+    else if (value < 0)
+      value = 0;
   } else {
     // 0..100 scale
-    if (value > 100) value = 100;
-    else if (value < 0) value = 0;
+    if (value > 100)
+      value = 100;
+    else if (value < 0)
+      value = 0;
   }
   return value;
 }
 
 const hslTransparent = Object.freeze({
-  h: 0, s: 0, l: 0, opacity: 0, unit: `absolute`, space: `hsl`
+  h: 0,
+  s: 0,
+  l: 0,
+  opacity: 0,
+  unit: `absolute`,
+  space: `hsl`,
 });
 
 export function fromHexString<T extends ParsingOptions<Hsl>>(hexString: string, scalar: T): T extends { scalar: true } ? HslScalar : HslAbsolute;
@@ -100,8 +109,10 @@ export function fromCss<T extends ParsingOptions<Hsl>>(value: string, options?: 
 export function fromCss(value: string, options: Partial<ParsingOptions<Hsl>> = {}): Hsl {
   value = value.toLowerCase();
 
-  if (value.startsWith(`hsla(`)) throw new Error(`hsla() not supported`);
-  if (value.startsWith(`rgba(`)) throw new Error(`rgba() not supported`);
+  if (value.startsWith(`hsla(`))
+    throw new Error(`hsla() not supported`);
+  if (value.startsWith(`rgba(`))
+    throw new Error(`rgba() not supported`);
 
   if (value.startsWith(`#`)) {
     return fromHexString(value, options);
@@ -110,14 +121,17 @@ export function fromCss(value: string, options: Partial<ParsingOptions<Hsl>> = {
     try {
       value = resolveCss(value);
     } catch (error) {
-      if (typeof options.fallbackString !== `undefined`) value = options.fallbackString;
-      if (typeof options.fallbackColour !== `undefined`) return options.fallbackColour;
+      if (typeof options.fallbackString !== `undefined`)
+        value = options.fallbackString;
+      if (typeof options.fallbackColour !== `undefined`)
+        return options.fallbackColour;
       throw error;
     }
   }
-  if (value === `transparent`) return hslTransparent;
-  if (typeof cssDefinedHexColours[ value ] !== `undefined`) {
-    return fromHexString(cssDefinedHexColours[ value ] as string, options);
+  if (value === `transparent`)
+    return hslTransparent;
+  if (typeof cssDefinedHexColours[value] !== `undefined`) {
+    return fromHexString(cssDefinedHexColours[value] as string, options);
   }
 
   if (value.startsWith(`rgb(`)) {
@@ -140,44 +154,47 @@ export function fromCss(value: string, options: Partial<ParsingOptions<Hsl>> = {
   try {
     // Hand-rolled hsl() parse because the package is broken
     const hsl = parseCssHslFunction(value);
-    if (options.scalar) return toScalar(hsl);
+    if (options.scalar)
+      return toScalar(hsl);
     return toAbsolute(hsl);
   } catch (error) {
-    if (options.fallbackColour) return options.fallbackColour;
+    if (options.fallbackColour)
+      return options.fallbackColour;
     throw error;
   }
-
 }
 
-export const toCssString = (hsl: Hsl): string => {
+export function toCssString(hsl: Hsl): string {
   const abs = toAbsolute(hsl);
-  let css = `hsl(${ abs.h }deg ${ abs.s }% ${ abs.l }%`;
+  let css = `hsl(${abs.h}deg ${abs.s}% ${abs.l}%`;
   if (`opacity` in abs && abs.opacity !== undefined && abs.opacity < 100) {
-    css += ` / ${ abs.opacity }%`;
+    css += ` / ${abs.opacity}%`;
   }
-  css += ')';
+  css += `)`;
   return css;
 }
 
-export const toHexString = (hsl: Hsl): string => {
+export function toHexString(hsl: Hsl): string {
   const rgb = toLibraryRgb(hsl);
   return libraryRgbToHexString(rgb);
 }
 
-const toLibrary = (hsl: Hsl): C.HSL => {
+function toLibrary(hsl: Hsl): C.HSL {
   const abs = toAbsolute(hsl);
   return {
     h: abs.h,
     s: abs.s,
     l: abs.l,
     alpha: abs.opacity,
-  }
+  };
 }
+
 function fromLibrary<T extends ParsingOptions<Hsl>>(hsl: C.HSL, parsingOptions: T): T extends { scalar: true } ? HslScalar : HslAbsolute;
 
 function fromLibrary<T extends Hsl>(hsl: C.HSL, parsingOptions: ParsingOptions<T> = {}): T {
   if (typeof hsl === `undefined` || hsl === null) {
-    if (parsingOptions.fallbackColour) return parsingOptions.fallbackColour;
+    if (parsingOptions.fallbackColour)
+      return parsingOptions.fallbackColour;
   }
   const scalarOpt = parsingOptions.scalar ?? true;
 
@@ -186,7 +203,7 @@ function fromLibrary<T extends Hsl>(hsl: C.HSL, parsingOptions: ParsingOptions<T
     numberInclusiveRangeTest(hsl.h, 0, 360, `h`),
     numberInclusiveRangeTest(hsl.s, 0, 100, `s`),
     numberInclusiveRangeTest(hsl.l, 0, 100, `l`),
-    percentTest((hsl.alpha ?? 1), `alpha`)
+    percentTest((hsl.alpha ?? 1), `alpha`),
     // () => hsl.alpha !== undefined ? numberInclusiveRangeTest(hsl.alpha, 0, 100, `alpha`) : { success: true, value: hsl },
   );
   if (scalarOpt) {
@@ -196,7 +213,7 @@ function fromLibrary<T extends Hsl>(hsl: C.HSL, parsingOptions: ParsingOptions<T
   }
 }
 
-export const toAbsolute = (hslOrString: Hsl | Rgb | string): HslAbsolute => {
+export function toAbsolute(hslOrString: Hsl | Rgb | string): HslAbsolute {
   // if (typeof hslOrString === `string`) {
   //   return toAbsolute(fromLibrary(C.parseCSS(hslOrString, `hsl`), { scalar: false }));
   // }
@@ -214,70 +231,72 @@ export const toAbsolute = (hslOrString: Hsl | Rgb | string): HslAbsolute => {
   }
   const hsl = hslOrString;
   guard(hsl);
-  if (hsl.unit === `absolute`) return hsl;
+  if (hsl.unit === `absolute`)
+    return hsl;
   return {
     h: hsl.h * 360,
     s: hsl.s * 100,
     l: hsl.l * 100,
     opacity: (hsl.opacity ?? 1) * 100,
     unit: `absolute`,
-    space: `hsl`
-  }
+    space: `hsl`,
+  };
 }
 
 /**
  * Generates a {@link HslScalar} value.
- * 
+ *
  * ```js
  * generateScaler(10); // 10deg, default to full saturation, half lightness and full opacity
- * 
+ *
  * // Generate HSL value from radian angle and 50% saturation
- * generateScalar(`10rad`, 0.5); 
- * 
+ * generateScalar(`10rad`, 0.5);
+ *
  * // Generate from numeric CSS variable
  * generateScalar(`--hue`);
  * ```
  * @param absoluteHslOrVariable Hue angle or CSS variable
- * @param saturation 
- * @param lightness 
- * @param opacity 
+ * @param saturation
+ * @param lightness
+ * @param opacity
  */
-export const generateScalar = (absoluteHslOrVariable: string | number | Angle, saturation = 1, lightness = 0.5, opacity = 1): HslScalar => {
-
+export function generateScalar(absoluteHslOrVariable: string | number | Angle, saturation = 1, lightness = 0.5, opacity = 1): HslScalar {
   if (typeof absoluteHslOrVariable === `string`) {
     if (absoluteHslOrVariable.startsWith(`--`)) {
-      absoluteHslOrVariable = getComputedStyle(document.body).getPropertyValue(absoluteHslOrVariable).trim()
+      absoluteHslOrVariable = getComputedStyle(document.body).getPropertyValue(absoluteHslOrVariable).trim();
     }
   }
   const hue = angleParse(absoluteHslOrVariable);
-  if (saturation > 1) throw new TypeError(`Param 'saturation' must be between 0..1`);
-  if (lightness > 1) throw new TypeError(`Param 'lightness' must be between 0..1`);
-  if (opacity > 1) throw new TypeError(`Param 'opacity' must be between 0..1`);
+  if (saturation > 1)
+    throw new TypeError(`Param 'saturation' must be between 0..1`);
+  if (lightness > 1)
+    throw new TypeError(`Param 'lightness' must be between 0..1`);
+  if (opacity > 1)
+    throw new TypeError(`Param 'opacity' must be between 0..1`);
   const hueDeg = angleConvert(hue, `deg`).value / 360;
   return {
     h: hueDeg,
     s: saturation,
     l: lightness,
-    opacity: opacity,
+    opacity,
     unit: `scalar`,
-    space: `hsl`
-  }
+    space: `hsl`,
+  };
 }
 
 /**
  * Converts a {@link Hsl} value to scalar units, or parses a colour string
  * and converts it.
- * 
+ *
  * ```js
  * toScalar({ h: 100, s: 50, l: 100, unit: `absolute` });
  * toScalar(`red`);
  * ```
- * @param hslOrString 
- * @returns 
+ * @param colour
  */
-export const toScalar = (hslOrString: Rgb | Hsl | string): HslScalar => {
-  if (typeof hslOrString === `string`) {
-    return fromCss(hslOrString, { scalar: true });
+export function toScalar(colour: Rgb | Hsl | string): HslScalar {
+  if (typeof colour === `string`) {
+    return fromCss(colour, { scalar: true });
     // try {
     //   return toScalar(fromLibrary(C.parseCSS(hslOrString, `hsl`), { scalar: true }));
     // } catch (error) {
@@ -285,26 +304,28 @@ export const toScalar = (hslOrString: Rgb | Hsl | string): HslScalar => {
     //   throw error;
     // }
   }
-  if (isRgb(hslOrString)) {
-    return toScalar(fromLibrary(rgbToLibraryHsl(hslOrString), { scalar: true }));
+  if (isRgb(colour)) {
+    return toScalar(fromLibrary(rgbToLibraryHsl(colour), { scalar: true }));
   }
 
-  const hsl = hslOrString;
+  const hsl = colour;
   guard(hsl);
-  if (hsl.unit === `scalar`) return hsl;
+  if (hsl.unit === `scalar`)
+    return hsl;
   return {
     h: hsl.h / 360,
     s: hsl.s / 100,
     l: hsl.l / 100,
     opacity: (hsl.opacity ?? 1) / 100,
     unit: `scalar`,
-    space: `hsl`
-  }
+    space: `hsl`,
+  };
 }
 
-export const guard = (hsl: Hsl): void => {
+export function guard(hsl: Hsl): void {
   const { h, s, l, opacity, space, unit } = hsl;
-  if (space !== `hsl`) throw new Error(`Space is expected to be 'hsl'. Got: ${ space }`);
+  if (space !== `hsl`)
+    throw new Error(`Space is expected to be 'hsl'. Got: ${space}`);
   if (unit === `absolute`) {
     resultThrow(
       numberTest(h, `finite`, `h`),
@@ -314,7 +335,8 @@ export const guard = (hsl: Hsl): void => {
         if (typeof opacity === `number`) {
           return numberInclusiveRangeTest(opacity, 0, 100, `opacity`);
         }
-      });
+      },
+    );
   } else if (unit === `scalar`) {
     resultThrow(
       numberTest(h, `percentage`, `h`),
@@ -324,13 +346,14 @@ export const guard = (hsl: Hsl): void => {
         if (typeof opacity === `number`) {
           return numberTest(opacity, `percentage`, `opacity`);
         }
-      });
+      },
+    );
   } else {
-    throw new Error(`Unit is expected to be 'absolute' or 'scalar'. Got: ${ unit }`);
+    throw new Error(`Unit is expected to be 'absolute' or 'scalar'. Got: ${unit}`);
   }
 }
 
-export const interpolator = (a: Hsl | string, b: Hsl | string, direction: `longer` | `shorter` = `shorter`) => {
+export function interpolator(a: Hsl | string, b: Hsl | string, direction: `longer` | `shorter` = `shorter`) {
   a = toScalar(a);
   b = toScalar(b);
   const aOpacity = a.opacity ?? 1;
@@ -343,23 +366,23 @@ export const interpolator = (a: Hsl | string, b: Hsl | string, direction: `longe
   return (amount: number): HslScalar => {
     amount = clamp(amount);
     let h = interpolate(amount, 0, Math.abs(hueDistance));
-    if (hueDistance < 0) h = a.h - h;
+    if (hueDistance < 0)
+      h = a.h - h;
     else h = a.h + h;
 
     const s = interpolate(amount, 0, satDistance);
     const l = interpolate(amount, 0, lightDistance);
     const o = interpolate(amount, 0, opacityDistance);
     return scalar(wrapScalarHue(h), s + a.s, l + a.l, o + aOpacity);
-  }
+  };
 }
 
 /**
  * Creates a HslScalar value from scalar (0..1) values
- * @param hue 
- * @param sat 
- * @param lightness 
- * @param opacity 
- * @returns 
+ * @param hue
+ * @param sat
+ * @param lightness
+ * @param opacity
  */
 export function scalar(hue = 0.5, sat = 1, lightness = 0.5, opacity = 1): HslScalar {
   const hsl: HslScalar = {
@@ -368,8 +391,8 @@ export function scalar(hue = 0.5, sat = 1, lightness = 0.5, opacity = 1): HslSca
     h: hue,
     s: sat,
     l: lightness,
-    opacity: opacity
-  }
+    opacity,
+  };
   guard(hsl);
   return hsl;
 }
@@ -381,34 +404,41 @@ export function absolute(hue = 200, sat = 100, lightness = 50, opacity = 100): H
     h: hue,
     s: sat,
     l: lightness,
-    opacity: opacity
-  }
+    opacity,
+  };
   guard(hsl);
   return hsl;
 }
 
 /**
  * It seems Colorizr can't handle 'deg' units
- * @param value 
+ * @param value
  */
 export function parseCssHslFunction(value: string): Hsl {
-  if (value.startsWith(`hsla`)) throw new Error(`hsla() is not supported`);
-  if (!value.startsWith(`hsl(`)) throw new Error(`Expected hsl(..) CSS colour`);
+  if (value.startsWith(`hsla`))
+    throw new Error(`hsla() is not supported`);
+  if (!value.startsWith(`hsl(`))
+    throw new Error(`Expected hsl(..) CSS colour`);
 
-  const start = value.indexOf('(');
-  const end = value.indexOf(')');
-  if (end < start) throw new Error(`Is hsl() not terminated? Missing ')'`);
+  const start = value.indexOf(`(`);
+  const end = value.indexOf(`)`);
+  if (end < start)
+    throw new Error(`Is hsl() not terminated? Missing ')'`);
 
   const part = value.substring(start + 1, end);
   let split = part.split(/[\s,]+/);
-  if (split.length < 3) throw new Error(`Expected three tokens. Got: ${ split.length } length`);
+  if (split.length < 3)
+    throw new Error(`Expected three tokens. Got: ${split.length} length`);
 
   let returnRelative = false;
-  if (split[ 0 ].endsWith(`%`)) returnRelative = true;
-  if (split[ 1 ].endsWith(`%`) && split[ 2 ].endsWith(`%`)) returnRelative = true;
+  if (split[0].endsWith(`%`))
+    returnRelative = true;
+  if (split[1].endsWith(`%`) && split[2].endsWith(`%`))
+    returnRelative = true;
 
   const valueAsScalar = (v: string, pos: number) => {
-    if (v === `none`) return 0;
+    if (v === `none`)
+      return 0;
     if (v.endsWith(`%`)) {
       return Number.parseFloat(v.substring(0, v.length - 1)) / 100;
     }
@@ -417,16 +447,20 @@ export function parseCssHslFunction(value: string): Hsl {
     }
 
     const vf = Number.parseFloat(v);
-    if (pos === 0) return vf / 360;
-    if (pos === 3) return vf; // opacity
+    if (pos === 0)
+      return vf / 360;
+    if (pos === 3)
+      return vf; // opacity
     return vf / 100;
-  }
+  };
 
   const valueAsAbs = (v: string, pos: number) => {
-    if (v === `none`) return 0;
+    if (v === `none`)
+      return 0;
     if (v.endsWith(`%`)) {
       const vf = Number.parseFloat(v.substring(0, v.length - 1));
-      if (pos === 0) return vf * 360;
+      if (pos === 0)
+        return vf * 360;
       return vf;
     }
     if (v.endsWith(`deg`) && pos === 0) {
@@ -434,46 +468,45 @@ export function parseCssHslFunction(value: string): Hsl {
     }
     const vf = Number.parseFloat(v);
     return vf;
-  }
+  };
 
   // Is there opacity?
   if (split.length > 3) {
-    if (split[ 3 ] === '/') {
+    if (split[3] === `/`) {
       // Remove / part
-      split = [ split[ 0 ], split[ 1 ], split[ 2 ], split[ 4 ] ];
+      split = [split[0], split[1], split[2], split[4]];
     }
   }
   if (returnRelative) {
     return scalar(
-      valueAsScalar(split[ 0 ], 0),
-      valueAsScalar(split[ 1 ], 1),
-      valueAsScalar(split[ 2 ], 2),
-      valueAsScalar(split[ 3 ] ?? `100%`, 3)
-    )
+      valueAsScalar(split[0], 0),
+      valueAsScalar(split[1], 1),
+      valueAsScalar(split[2], 2),
+      valueAsScalar(split[3] ?? `100%`, 3),
+    );
   } else {
     // Return as absolute
     return absolute(
-      valueAsAbs(split[ 0 ], 0),
-      valueAsAbs(split[ 1 ], 1),
-      valueAsAbs(split[ 2 ], 2),
-      valueAsAbs(split[ 3 ] ?? `100%`, 3)
-    )
+      valueAsAbs(split[0], 0),
+      valueAsAbs(split[1], 1),
+      valueAsAbs(split[2], 2),
+      valueAsAbs(split[3] ?? `100%`, 3),
+    );
   }
 }
 
 /**
  * Converts a Hsl structure (or CSS string) to Colorizr's RGB format
  * @param hsl HSL colour
- * @returns 
  */
 export function toLibraryRgb(hsl: Hsl | string): C.RGB {
   if (typeof hsl === `string`) {
     const parseResult = fromCss(hsl, { scalar: false });
-    //console.log(`parseResult hsl: ${ hsl } pr: `, parseResult);
+    // console.log(`parseResult hsl: ${ hsl } pr: `, parseResult);
     return toLibraryRgb(parseResult);
   }
   hsl = toAbsolute(hsl);
-  //console.log(`toLibraryRgb hsl`, hsl);
+  // console.log(`toLibraryRgb hsl`, hsl);
   const rgb = C.hsl2rgb({ h: hsl.h, s: hsl.s, l: hsl.l });
   return { ...rgb, alpha: (hsl.opacity ?? 100) / 100 * 255 };
 }

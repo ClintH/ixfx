@@ -117,7 +117,6 @@ export function cssLinearGradient(colours: Colourish[]) {
  * @param colourA First colour
  * @param colourB Second colour
  * @param options Interpolation options. By default uses shorter direction and OkLCH colour space.
- * @returns
  */
 export function interpolatorDualToString(colourA: Colourish, colourB: Colourish, options: Partial<ColourInterpolationOpts> = {}): ((amount: number) => string) {
   const f = interpolatorDual(colourA, colourB, options);

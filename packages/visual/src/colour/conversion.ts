@@ -1,28 +1,26 @@
-import Colorizr, * as C from "colorizr";
-import { ConvertDestinations, type Colour, type Colourish, type ColourSpaces, type Hsl, type HslAbsolute, type HslScalar, type OkLch, type OkLchAbsolute, type OkLchScalar, type Rgb, type Rgb8Bit, type RgbScalar } from "./types.js";
-import * as SrgbSpace from "./srgb.js";
-import * as HslSpace from './hsl.js';
-import * as OkLchSpace from './oklch.js';
+import type { Colour, Colourish, ColourSpaces, ConvertDestinations, Hsl, HslAbsolute, HslScalar, OkLch, OkLchAbsolute, OkLchScalar, Rgb, Rgb8Bit, RgbScalar } from "./types.js";
+import Colorizr from "colorizr";
 import { fromCssColour } from "./css-colours.js";
-import { isHsl, isRgb, tryParseObjectToRgb, tryParseObjectToHsl, isColourish, isOkLch } from "./guards.js";
+import { isColourish, isHsl, isOkLch, isRgb, tryParseObjectToHsl, tryParseObjectToRgb } from "./guards.js";
+import * as HslSpace from './hsl.js';
 import { OklchSpace } from "./index.js";
-
+import * as OkLchSpace from './oklch.js';
+import * as SrgbSpace from "./srgb.js";
 
 export function convert<T extends ConvertDestinations>(colour: Colourish, destination: T):
-  T extends "oklch-absolute" ? OkLchAbsolute :
-  T extends "oklch-scalar" ? OkLchScalar :
-  T extends "srgb-8bit" ? Rgb8Bit :
-  T extends "srgb-scalar" ? RgbScalar :
-  T extends "hsl-scalar" ? HslScalar :
-  T extends "hsl-absolute" ? HslAbsolute : never
+T extends `oklch-absolute` ? OkLchAbsolute
+  : T extends `oklch-scalar` ? OkLchScalar
+    : T extends `srgb-8bit` ? Rgb8Bit
+      : T extends `srgb-scalar` ? RgbScalar
+        : T extends `hsl-scalar` ? HslScalar
+          : T extends `hsl-absolute` ? HslAbsolute : never;
 
 /**
  * Converts an object or string representation of colour to ixfx's
  * structured colour.
  * Use {@link convertToString} if you want a CSS colour string instead.
- * @param colour 
- * @param destination 
- * @returns 
+ * @param colour
+ * @param destination
  */
 export function convert(colour: Colourish, destination: ConvertDestinations): Hsl | OkLch | Rgb {
   if (destination === `hsl-scalar`) {
@@ -50,16 +48,15 @@ export function convert(colour: Colourish, destination: ConvertDestinations): Hs
       return SrgbSpace.toScalar(colour);
     }
   } else {
-    throw new Error(`Destination '${ destination }' not supported for input: ${ JSON.stringify(colour) }`);
+    throw new Error(`Destination '${destination}' not supported for input: ${JSON.stringify(colour)}`);
   }
   return convert(toCssColour(colour), destination);
 }
 
 /**
  * Like {@link convert}, but result is a CSS colour string
- * @param colour 
- * @param destination 
- * @returns 
+ * @param colour
+ * @param destination
  */
 export function convertToString(colour: Colourish, destination: ConvertDestinations): string {
   const c = convert(colour, destination);
@@ -72,24 +69,28 @@ export function convertToString(colour: Colourish, destination: ConvertDestinati
  * @param destination Destination colour format
  */
 export function convertScalar<T extends ColourSpaces>(colour: Colourish, destination: T):
-  T extends "oklch" ? OkLchScalar :
-  T extends "hsl" ? HslScalar :
-  T extends "srgb" ? RgbScalar : never
+T extends `oklch` ? OkLchScalar
+  : T extends `hsl` ? HslScalar
+    : T extends `srgb` ? RgbScalar : never;
 
-  /**
+/**
  * Converts some kind of colour into a scalar representation. Supports oklch, hsl and srgb.
  * @param colour Colour to convert
  * @param destination Destination colour format
  */
 export function convertScalar(colour: Colourish, destination: ColourSpaces): HslScalar | OkLchScalar | RgbScalar {
-  if (destination === `oklch`) return convert(colour, `oklch-scalar`);
-  if (destination === `srgb`) return convert(colour, `srgb-scalar`);
-  if (destination === `hsl`) return convert(colour, `hsl-scalar`);
-  throw new Error(`Unknown destination: '${ destination }'`);
+  if (destination === `oklch`)
+    return convert(colour, `oklch-scalar`);
+  if (destination === `srgb`)
+    return convert(colour, `srgb-scalar`);
+  if (destination === `hsl`)
+    return convert(colour, `hsl-scalar`);
+  throw new Error(`Unknown destination: '${destination}'`);
 }
 
-export const toCssColour = (colour: Colourish | object): string => {
-  if (typeof colour === `string`) return colour;
+export function toCssColour(colour: Colourish | object): string {
+  if (typeof colour === `string`)
+    return colour;
 
   if (isHsl(colour)) {
     return HslSpace.toCssString(colour);
@@ -103,16 +104,17 @@ export const toCssColour = (colour: Colourish | object): string => {
     return OklchSpace.toCssString(colour);
   }
   const asRgb = tryParseObjectToRgb(colour);
-  if (asRgb) return SrgbSpace.toCssString(asRgb);
+  if (asRgb)
+    return SrgbSpace.toCssString(asRgb);
 
   const asHsl = tryParseObjectToHsl(colour);
-  if (asHsl) return HslSpace.toCssString(asHsl);
+  if (asHsl)
+    return HslSpace.toCssString(asHsl);
 
-  throw new Error(`Unknown colour format: '${ JSON.stringify(colour) }'`);
+  throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
 }
 
-export const toHexColour = (colour: Colourish | object): string => {
-
+export function toHexColour(colour: Colourish | object): string {
   if (isHsl(colour)) {
     return HslSpace.toHexString(colour);
   }
@@ -126,23 +128,24 @@ export const toHexColour = (colour: Colourish | object): string => {
   }
 
   if (typeof colour === `string`) {
-    if (colour.startsWith(`#`)) return colour;
+    if (colour.startsWith(`#`))
+      return colour;
     const c = convert(colour, `srgb-8bit`);
     return SrgbSpace.toHexString(c);
   }
 
   const asRgb = tryParseObjectToRgb(colour);
-  if (asRgb) return SrgbSpace.toHexString(asRgb);
+  if (asRgb)
+    return SrgbSpace.toHexString(asRgb);
 
   const asHsl = tryParseObjectToHsl(colour);
-  if (asHsl) return HslSpace.toHexString(asHsl);
+  if (asHsl)
+    return HslSpace.toHexString(asHsl);
 
-  throw new Error(`Unknown colour format: '${ JSON.stringify(colour) }'`);
+  throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
 }
 
-
-
-export const toLibraryColour = (colour: Colourish): Colorizr => {
+export function toLibraryColour(colour: Colourish): Colorizr {
   const asCss = toCssColour(colour);
   return new Colorizr(asCss);
 }
@@ -152,7 +155,7 @@ export const toLibraryColour = (colour: Colourish): Colorizr => {
 //   return C.convert(colour, destination);
 // }
 
-export const guard = (colour: Colour): void => {
+export function guard(colour: Colour): void {
   switch (colour.space) {
     case `hsl`:
       HslSpace.guard(colour);
@@ -164,16 +167,19 @@ export const guard = (colour: Colour): void => {
       OkLchSpace.guard(colour);
       break;
     default:
-      throw new Error(`Unsupported colour space: '${ colour.space }'`);
+      throw new Error(`Unsupported colour space: '${colour.space}'`);
   }
 }
 
-export const toColour = (colourish: any): Colour => {
-  if (!isColourish(colourish)) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc. Got: ${ JSON.stringify(colourish) }`);
+export function toColour(colourish: any): Colour {
+  if (!isColourish(colourish))
+    throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc. Got: ${JSON.stringify(colourish)}`);
   let c: Colour | undefined;
-  if (typeof colourish === `string`) c = fromCssColour(colourish);
+  if (typeof colourish === `string`)
+    c = fromCssColour(colourish);
   else c = colourish;
-  if (c === undefined) throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc.`);
+  if (c === undefined)
+    throw new Error(`Could not parse input. Expected CSS colour string or structured colour {r,g,b}, {h,s,l} etc.`);
 
   guard(c);
   return c;
@@ -185,22 +191,23 @@ export const toColour = (colourish: any): Colour => {
  * ```js
  * element.style.backgroundColor = resolveToString(`red`);
  * ```
- * 
+ *
  * Tries each parameter in turn, returning the value
  * for the first that resolves. This can be useful for
  * having fallback values.
- * 
+ *
  * ```js
  * // Try a CSS variable, a object property or finally fallback to red.
  * element.style.backgroundColor = toStringFirst('--some-var', opts.background, `red`);
  * ```
  * @param colours Array of colours to resolve
- * @returns 
  */
-export const toStringFirst = (...colours: (Colourish | undefined)[]): string => {
+export function toStringFirst(...colours: Array<Colourish | undefined>): string {
   for (const colour of colours) {
-    if (colour === undefined) continue;
-    if (colour === null) continue;
+    if (colour === undefined)
+      continue;
+    if (colour === null)
+      continue;
     try {
       const c = toColour(colour);
       return toCssColour(c);
@@ -209,9 +216,8 @@ export const toStringFirst = (...colours: (Colourish | undefined)[]): string => 
   return `rebeccapurple`;
 }
 
-
-export function rgbToHsl(rgb: Rgb, scalarResult: true): HslScalar
-export function rgbToHsl(rgb: Rgb, scalarResult: false): HslAbsolute
+export function rgbToHsl(rgb: Rgb, scalarResult: true): HslScalar;
+export function rgbToHsl(rgb: Rgb, scalarResult: false): HslAbsolute;
 export function rgbToHsl(rgb: Rgb, scalarResult: boolean): Hsl {
   // Needed because the Colorizr package has broken RGB to HSL
   // Converts rgb { model: 'rgb', r: 40, g: 20, b: 60, alpha: undefined }
@@ -258,7 +264,7 @@ export function rgbToHsl(rgb: Rgb, scalarResult: boolean): Hsl {
   }
 
   if (scalarResult) {
-    return HslSpace.scalar(h / 360, s, l, opacity)
+    return HslSpace.scalar(h / 360, s, l, opacity);
   } else {
     return HslSpace.absolute(h, s * 100, l * 100, opacity);
   }
