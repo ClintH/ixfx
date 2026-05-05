@@ -3,7 +3,7 @@ import { integerTest, resultThrow } from "@ixfx/guards";
 import { testCell, testGrid } from "../guards.js";
 
 /**
- * Runs the provided `visitor` for `steps`, returning the cell we end at
+ * Runs the provided `visitor` for a number of steps, returning the cell we end at
  * ```js
  * // Create visitor & stepper
  * const visitor = Grids.Visit.create(`row`);
@@ -18,7 +18,6 @@ import { testCell, testGrid } from "../guards.js";
  * @param grid Grid to traverse
  * @param start Start point
  * @param createVisitor Visitor function
- * @returns
  */
 export function stepper(grid: Grid, createVisitor: GridCreateVisitor, start: GridCell = { x: 0, y: 0 }, resolution = 1) {
   resultThrow(
