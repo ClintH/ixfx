@@ -1,7 +1,7 @@
+import type { Grid, GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, GridNeighbours } from "./types.js";
 import { zipKeyValue } from "@ixfx/core/maps";
 import { integerTest, resultThrow } from "@ixfx/guards";
-import { guardCell, guardGrid } from "./guards.js";
-import type { GridBoundsLogic, GridCardinalDirection, GridCardinalDirectionOptional, GridCell, Grid, GridNeighbours } from "./types.js";
+import { testCell, testGrid } from "./guards.js";
 import { offset } from "./offset.js";
 
 /**
@@ -32,29 +32,26 @@ export const crossDirections = Object.freeze([
  * Returns cells that correspond to the cardinal directions at a specified distance
  * i.e. it projects a line from `start` cell in all cardinal directions and returns the cells at `steps` distance.
  * @param grid Grid
+ * @param start Start point
  * @param steps Distance
- * @param start Start poiint
  * @param bounds Logic for if bounds of grid are exceeded
  * @returns Cells corresponding to cardinals
  */
-export const offsetCardinals = (
-  grid: Grid,
-  start: GridCell,
-  steps: number,
-  bounds: GridBoundsLogic = `stop`
-): GridNeighbours => {
-  guardGrid(grid, `grid`);
-  guardCell(start, `start`);
-  resultThrow(integerTest(steps, `aboveZero`, `steps`));
+export function offsetCardinals(grid: Grid, start: GridCell, steps: number, bounds: GridBoundsLogic = `stop`): GridNeighbours {
+  resultThrow(
+    testGrid(grid, `grid`),
+    testCell(start, `start`),
+    integerTest(steps, `aboveZero`, `steps`),
+  );
 
   const directions = allDirections;
-  const vectors = directions.map((d) => getVectorFromCardinal(d, steps));
+  const vectors = directions.map(d => getVectorFromCardinal(d, steps));
   const cells = directions.map((d, index) =>
-    offset(grid, start, vectors[ index ], bounds)
+    offset(grid, start, vectors[index], bounds),
   );
 
   return zipKeyValue(directions, cells) as GridNeighbours;
-};
+}
 
 /**
  * Returns an `{ x, y }` signed vector corresponding to the provided cardinal direction.
@@ -72,10 +69,7 @@ export const offsetCardinals = (
  * @param multiplier Multipler
  * @returns Signed vector in the form of `{ x, y }`
  */
-export const getVectorFromCardinal = (
-  cardinal: GridCardinalDirectionOptional,
-  multiplier = 1
-): GridCell => {
+export function getVectorFromCardinal(cardinal: GridCardinalDirectionOptional, multiplier = 1): GridCell {
   let v;
   switch (cardinal) {
     case `n`: {
@@ -115,4 +109,4 @@ export const getVectorFromCardinal = (
     }
   }
   return Object.freeze(v);
-};
+}

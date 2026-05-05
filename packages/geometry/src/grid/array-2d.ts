@@ -1,12 +1,13 @@
+import type { Grid, GridBoundsLogic, GridCell, GridCellAccessor, GridCellSetter, GridReadable, GridWritable, UniformGrid } from "./types.js";
 import { applyBounds } from "./apply-bounds.js";
-import type { GridBoundsLogic, GridCell, GridCellAccessor, GridCellSetter, Grid, GridReadable, GridWritable } from "./types.js";
+import { gridString } from "./to-string.js";
 
 export type ArrayGrid<T> = GridReadable<T> & GridWritable<T> & {
-  array: T[][]
-}
+  array: T[][];
+};
 
 /**
- * Create a grid from a 2-dimensional array.
+ * Create a uniform grid from a 2-dimensional array.
  * ```js
  * const data = [
  *  [1,2,3],
@@ -15,26 +16,25 @@ export type ArrayGrid<T> = GridReadable<T> & GridWritable<T> & {
  * const g = create(data);
  * // { rows: 2, cols: 3 }
  * ```
- * @param array 
- * @returns 
+ * @param array
+ * @returns New grid
  */
-export const create = <T>(array: ReadonlyArray<T[]> | Array<T[]>): Grid => {
-  let colLen = NaN;
+export function createUniformGrid<T>(array: readonly T[][] | T[][]): UniformGrid {
+  let colLen = Number.NaN;
   for (const row of array) {
     if (Number.isNaN(colLen)) {
       colLen = row.length;
     } else {
-      if (colLen !== row.length) throw new Error(`Array does not have uniform column length`);
+      if (colLen !== row.length)
+        throw new Error(`Array does not have uniform column length`);
     }
   }
 
   return { rows: array.length, cols: colLen };
 }
 
-export const setMutate = <V>(
-  array: V[][]
-): GridCellSetter<V> => {
-  const grid = create(array);
+export function setMutate<V>(array: V[][]): GridCellSetter<V> {
+  const grid = createUniformGrid(array);
   return (value: V, cell: GridCell, wrap: GridBoundsLogic = `undefined`) => setMutateWithGrid(grid, array, value, cell, wrap);
 }
 
@@ -48,16 +48,12 @@ export const setMutate = <V>(
  * ```
  * @param grid
  * @param array
- * @returns
  */
-const setMutateWithGrid = <V>(
-  grid: Grid,
-  array: V[][],
-  value: V, cell: GridCell, bounds: GridBoundsLogic
-) => {
-  let boundCell = applyBounds(grid, cell, bounds);
-  if (boundCell === undefined) throw new RangeError(`Cell (${ cell.x },${ cell.y }) is out of range of grid cols: ${ grid.cols } rows: ${ grid.rows }`);
-  array[ boundCell.y ][ boundCell.x ] = value;
+function setMutateWithGrid<V>(grid: Grid, array: V[][], value: V, cell: GridCell, bounds: GridBoundsLogic) {
+  const boundCell = applyBounds(grid, cell, bounds);
+  if (boundCell === undefined)
+    throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid: ${gridString(grid)}`);
+  array[boundCell.y][boundCell.x] = value;
   return array;
 }
 // export const array2dUpdater = <V>(grid: GridVisual, array: Array<Array<V>>) => {
@@ -75,54 +71,48 @@ const setMutateWithGrid = <V>(
 //   return fn;
 // };
 
-export const access = <T>(
-  array: ReadonlyArray<T[]>
-): GridCellAccessor<T> => {
-  const grid = create(array);
+export function access<T>(array: readonly T[][]): GridCellAccessor<T> {
+  const grid = createUniformGrid(array);
 
   const fn: GridCellAccessor<T> = (
     cell: GridCell,
-    wrap: GridBoundsLogic = `undefined`
+    wrap: GridBoundsLogic = `undefined`,
   ): T | undefined => accessWithGrid(grid, array, cell, wrap);
   return fn;
-};
-
-const accessWithGrid = <T>(grid: Grid, array: ReadonlyArray<T[]> | Array<T[]>, cell: GridCell, wrap: GridBoundsLogic) => {
-  let boundCell = applyBounds(grid, cell, wrap);
-  if (boundCell === undefined) return undefined;
-  return array[ boundCell.y ][ boundCell.x ];
 }
 
-export const wrapMutable = <T>(array: T[][]): ArrayGrid<T> => {
-  const grid = create(array);
+function accessWithGrid<T>(grid: Grid, array: readonly T[][] | T[][], cell: GridCell, wrap: GridBoundsLogic) {
+  const boundCell = applyBounds(grid, cell, wrap);
+  if (boundCell === undefined)
+    return undefined;
+  return array[boundCell.y][boundCell.x];
+}
+
+export function wrapMutable<T>(array: T[][]): ArrayGrid<T> {
+  const grid = createUniformGrid(array);
   return {
     ...grid,
     get: access(array),
     set: setMutate(array),
     get array() {
       return array;
-    }
-  }
+    },
+  };
 }
 
-export const set = <V>(
-  array: readonly V[][]
-) => {
-  const grid = create(array);
+export function set<V>(array: readonly V[][]) {
+  const grid = createUniformGrid(array);
   return (value: V, cell: GridCell, wrap: GridBoundsLogic): V[][] => setWithGrid(grid, array, value, cell, wrap);
 }
 
-const setWithGrid = <V>(
-  grid: Grid,
-  array: readonly V[][],
-  value: V, cell: GridCell, wrap: GridBoundsLogic
-) => {
-  let boundCell = applyBounds(grid, cell, wrap);
-  if (boundCell === undefined) throw new RangeError(`Cell (${ cell.x },${ cell.y }) is out of range of grid cols: ${ grid.cols } rows: ${ grid.rows }`);
-  let copyWhole = [ ...array ];
-  let copyRow = [ ...copyWhole[ boundCell.y ] ];
-  copyRow[ boundCell.x ] = value;
-  copyWhole[ boundCell.y ] = copyRow;
+function setWithGrid<V>(grid: Grid, array: readonly V[][], value: V, cell: GridCell, wrap: GridBoundsLogic) {
+  const boundCell = applyBounds(grid, cell, wrap);
+  if (boundCell === undefined)
+    throw new RangeError(`Cell (${cell.x},${cell.y}) is out of range of grid: ${gridString(grid)}`);
+  const copyWhole = [...array];
+  const copyRow = [...copyWhole[boundCell.y]];
+  copyRow[boundCell.x] = value;
+  copyWhole[boundCell.y] = copyRow;
   array = copyWhole;
   return copyWhole;
 }
@@ -131,7 +121,7 @@ const setWithGrid = <V>(
  * Wraps `array` with two dimensions for grid access.
  * Immutable, such that underlying array is not modified and a
  * call to `set` returns a new `GridArray1d`.
- * 
+ *
  * ```js
  * // Grid of rows: 2, cols: 3
  * const myArray = [
@@ -143,13 +133,12 @@ const setWithGrid = <V>(
  * g = g.set(10, {x:1,y:2}); // Set value at cell position
  * g.array;                  // Get reference to current array
  * ```
- * 
+ *
  * Use {@link wrapMutable} to modify an array in-place
  * @param array Array to wrap
- * @returns 
  */
-export const wrap = <T>(array: T[][]): ArrayGrid<T> => {
-  const grid = create(array);
+export function wrap<T>(array: T[][]): ArrayGrid<T> {
+  const grid = createUniformGrid(array);
   return {
     ...grid,
     get: (cell: GridCell, boundsLogic: GridBoundsLogic = `undefined`) => accessWithGrid(grid, array, cell, boundsLogic),
@@ -159,6 +148,6 @@ export const wrap = <T>(array: T[][]): ArrayGrid<T> => {
     },
     get array() {
       return array;
-    }
-  }
+    },
+  };
 }

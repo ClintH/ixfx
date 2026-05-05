@@ -1,5 +1,5 @@
-import type { Grid, GridCell, GridVisitorOpts, GridNeighbourSelectionLogic } from "../types.js";
-//import { visitor } from "./Visitor.js";
+import type { Grid, GridCell, GridNeighbourSelectionLogic, GridVisitorOpts } from "../types.js";
+// import { visitor } from "./Visitor.js";
 
 // export const visitorBreadth = (
 //   grid: Grid,
@@ -15,8 +15,8 @@ import type { Grid, GridCell, GridVisitorOpts, GridNeighbourSelectionLogic } fro
 //     opts
 //   );
 
-export const breadthLogic = (): GridNeighbourSelectionLogic => {
+export function breadthLogic(): GridNeighbourSelectionLogic {
   return {
-    select: (nbos) => nbos[ 0 ],
-  }
+    select: nbos => nbos[0],
+  };
 }

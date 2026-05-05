@@ -1,6 +1,6 @@
-import { integerTest, resultThrow } from "@ixfx/guards";
-import { guardCell, guardGrid } from "../guards.js";
 import type { Grid, GridCell, GridCreateVisitor } from "../types.js";
+import { integerTest, resultThrow } from "@ixfx/guards";
+import { testCell, testGrid } from "../guards.js";
 
 /**
  * Runs the provided `visitor` for `steps`, returning the cell we end at
@@ -8,10 +8,10 @@ import type { Grid, GridCell, GridCreateVisitor } from "../types.js";
  * // Create visitor & stepper
  * const visitor = Grids.Visit.create(`row`);
  * const stepper = Grids.Visit.stepper(grid, visitor);
- * 
+ *
  * // Step by 10
  * stepper(10); // GridCell {x,y}
- * 
+ *
  * // Step by another 2
  * stepper(2);
  * ```
@@ -20,15 +20,12 @@ import type { Grid, GridCell, GridCreateVisitor } from "../types.js";
  * @param createVisitor Visitor function
  * @returns
  */
-export const stepper = (
-  grid: Grid,
-  createVisitor: GridCreateVisitor,
-  start: GridCell = { x: 0, y: 0 },
-  resolution = 1
-) => {
-  guardGrid(grid, `grid`);
-  guardCell(start, `start`);
-  resultThrow(integerTest(resolution, ``, `resolution`));
+export function stepper(grid: Grid, createVisitor: GridCreateVisitor, start: GridCell = { x: 0, y: 0 }, resolution = 1) {
+  resultThrow(
+    testGrid(grid, `grid`),
+    testCell(start, `start`),
+    integerTest(resolution, ``, `resolution`),
+  );
 
   // Create a list of steps
   const steps: GridCell[] = [];
@@ -36,18 +33,19 @@ export const stepper = (
   let position = 0;
   for (const c of createVisitor(grid, { start, boundsWrap: `undefined` })) {
     count++;
-    if ((count % resolution) !== 0) continue;
+    if ((count % resolution) !== 0)
+      continue;
     steps.push(c);
   }
 
   return (step: number, fromStart = false): GridCell | undefined => {
     resultThrow(integerTest(step, ``, `step`));
-    if (fromStart) position = step;
+    if (fromStart)
+      position = step;
     else position += step;
-    //position = position % steps.length;
+    // position = position % steps.length;
     return steps.at(position % steps.length);
-
-  }
+  };
 }
 
 // export const step = (

@@ -1,65 +1,54 @@
-import { test, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import * as Grids from '../../src/grid/index.js';
 
-test(`values`, () => {
+describe(`inside`, () => {
+  const grid = { rows: 5, cols: 5 };
+
+  it(`returns true for cell inside grid`, () => {
+    expect(Grids.inside(grid, { x: 0, y: 0 })).toBe(true);
+    expect(Grids.inside(grid, { x: 4, y: 4 })).toBe(true);
+    expect(Grids.inside(grid, { x: 2, y: 2 })).toBe(true);
+  });
+
+  it(`returns false for cell outside grid`, () => {
+    expect(Grids.inside(grid, { x: 5, y: 0 })).toBe(false);
+    expect(Grids.inside(grid, { x: 0, y: 5 })).toBe(false);
+    expect(Grids.inside(grid, { x: -1, y: 0 })).toBe(false);
+  });
+});
+
+describe(`isEqual`, () => {
+  it(`returns true for same grids`, () => {
+    const a = { rows: 5, cols: 10 };
+    const b = { rows: 5, cols: 10 };
+    expect(Grids.isEqual(a, b)).toBe(true);
+  });
+
+  it(`returns false for different grids`, () => {
+    const a = { rows: 5, cols: 10 };
+    const b = { rows: 5, cols: 5 };
+    expect(Grids.isEqual(a, b)).toBe(false);
+  });
+});
+
+it(`values`, () => {
   const readable: Grids.GridReadable<string> = {
-    get: (cell, wrap) => {
-      return `${ cell.x }-${ cell.y }`
+    get: (cell, _) => {
+      return `${cell.x}-${cell.y}`;
     },
     cols: 3,
-    rows: 3
-  }
+    rows: 3,
+  };
 
-  const r1 = [ ...Grids.values(readable, Grids.As.rows(readable)) ];
+  const r1 = [...Grids.values(readable, Grids.As.rows(readable))];
   expect(r1).toEqual([
-    [ `0-0`, `1-0`, `2-0` ],
-    [ `0-1`, `1-1`, `2-1` ],
-    [ `0-2`, `1-2`, `2-2` ]
-  ])
-
-})
-
-test(`index-from-cell`, () => {
-  const wrap = `undefined`;
-  const grid = { cols: 2, rows: 2 };
-  expect(Grids.indexFromCell(grid, { x: 1, y: 1 }, wrap)).toBe(3);
-  expect(Grids.indexFromCell(grid, { x: 0, y: 0 }, wrap)).toBe(0);
-  expect(Grids.indexFromCell(grid, { x: 0, y: 1 }, wrap)).toBe(2);
-
-  // Wrapping: undefined
-  expect(Grids.indexFromCell(grid, { x: -1, y: 1 }, `undefined`)).toBeFalsy();
-  expect(Grids.indexFromCell(grid, { x: 1, y: -1 }, `undefined`)).toBeFalsy();
-  expect(Grids.indexFromCell(grid, { x: 2, y: 1 }, `undefined`)).toBeFalsy();
-  expect(Grids.indexFromCell(grid, { x: 1, y: 2 }, `undefined`)).toBeFalsy();
-
-  // Wrapping: stop
-  expect(Grids.indexFromCell(grid, { x: -1, y: 1 }, `stop`)).toBe(2);
-  expect(Grids.indexFromCell(grid, { x: 1, y: -1 }, `stop`)).toBe(1);
-  expect(Grids.indexFromCell(grid, { x: 2, y: 1 }, `stop`)).toBe(3);
-  expect(Grids.indexFromCell(grid, { x: 1, y: 2 }, `stop`)).toBe(3);
-
-  // Wrapping: unbounded
-  expect(() => Grids.indexFromCell(grid, { x: -1, y: 1 }, `unbounded`)).toThrow();
-  expect(() => Grids.indexFromCell(grid, { x: 1, y: -1 }, `unbounded`)).toThrow();
-  expect(() => Grids.indexFromCell(grid, { x: 2, y: 1 }, `unbounded`)).toThrow();
-  expect(() => Grids.indexFromCell(grid, { x: 1, y: 2 }, `unbounded`)).toThrow();
-
-
-  // Wrapping: wrap
-  const grid2 = { cols: 3, rows: 3 };
-  expect(Grids.indexFromCell(grid2, { x: -1, y: 1 }, `wrap`)).toBe(5);
-  expect(Grids.indexFromCell(grid2, { x: 1, y: -1 }, `wrap`)).toBe(7);
-  expect(Grids.indexFromCell(grid2, { x: 3, y: 1 }, `wrap`)).toBe(3);
-  expect(Grids.indexFromCell(grid2, { x: 1, y: 3 }, `wrap`)).toBe(1);
+    [`0-0`, `1-0`, `2-0`],
+    [`0-1`, `1-1`, `2-1`],
+    [`0-2`, `1-2`, `2-2`],
+  ]);
 });
 
-test(`cell-from-index`, () => {
-  expect(Grids.cellFromIndex(2, 3)).toEqual({ x: 1, y: 1 });
-  expect(Grids.cellFromIndex(2, 0)).toEqual({ x: 0, y: 0 });
-  expect(Grids.cellFromIndex(2, 2)).toEqual({ x: 0, y: 1 });
-});
-
-test(`get-vector-from-cardinal`, () => {
+it(`get-vector-from-cardinal`, () => {
   expect(Grids.getVectorFromCardinal(`e`)).toEqual({ x: 1, y: 0 });
   expect(Grids.getVectorFromCardinal(``)).toEqual({ x: 0, y: 0 });
   expect(Grids.getVectorFromCardinal(`ne`)).toEqual({ x: 1, y: -1 });
@@ -80,10 +69,3 @@ test(`get-vector-from-cardinal`, () => {
 //     sw:{x: 0, y: 9}
 //   });
 // });
-
-
-
-
-
-
-

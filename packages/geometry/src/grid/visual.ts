@@ -1,10 +1,10 @@
-import type { RectPositioned } from "../rect/rect-types.js";
-import { guardCell } from "./guards.js";
-import type { GridCell, GridVisual } from "./types.js";
-import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import type { Point } from "../point/point-type.js";
-import { integerTest, numberTest, resultThrow } from '@ixfx/guards';
+import type { RectPositioned } from "../rect/rect-types.js";
+import type { GridCell, GridVisual } from "./types.js";
+import { numberTest, resultThrow } from '@ixfx/guards';
+import { fromTopLeft as RectsFromTopLeft } from '../rect/from-top-left.js';
 import { cells } from "./enumerators/cells.js";
+import { testCell } from "./guards.js";
 
 /**
  * Generator that returns rectangles for each cell in a grid
@@ -17,8 +17,8 @@ import { cells } from "./enumerators/cells.js";
  * ```
  * @param grid
  */
-export function* asRectangles(
-  grid: GridVisual
+export function *asRectangles(
+  grid: GridVisual,
 ): IterableIterator<RectPositioned> {
   for (const c of cells(grid)) {
     yield rectangleForCell(grid, c);
@@ -31,23 +31,23 @@ export function* asRectangles(
  *
  * `position` must be in same coordinate/scale as the grid.
  *
- * @param position Position, eg in pixels
  * @param grid Grid
+ * @param position Position, eg in pixels
  * @return Cell at position or undefined if outside of the grid
  */
-export const cellAtPoint = (
-  grid: GridVisual,
-  position: Point
-): GridCell | undefined => {
+export function cellAtPoint(grid: GridVisual, position: Point): GridCell | undefined {
   const size = grid.size;
   resultThrow(numberTest(size, `positive`, `grid.size`));
-  if (position.x < 0 || position.y < 0) return;
+  if (position.x < 0 || position.y < 0)
+    return;
   const x = Math.floor(position.x / size);
   const y = Math.floor(position.y / size);
-  if (x >= grid.cols) return;
-  if (y >= grid.rows) return;
+  if (x >= grid.cols)
+    return;
+  if (y >= grid.rows)
+    return;
   return { x, y };
-};
+}
 
 /**
  * Returns a visual rectangle of the cell, positioned from the top-left corner
@@ -62,34 +62,29 @@ export const cellAtPoint = (
  *
  * // Yields: { x: 5, y: 0, width: 5, height: 5 }
  * ```
- * @param cell
  * @param grid
- * @return
+ * @param cell
  */
-export const rectangleForCell = (
-  grid: GridVisual,
-  cell: GridCell
-): RectPositioned => {
-  guardCell(cell);
+export function rectangleForCell(grid: GridVisual, cell: GridCell): RectPositioned {
+  resultThrow(testCell(cell));
   const size = grid.size;
   const x = cell.x * size;
   const y = cell.y * size;
-  const r = RectsFromTopLeft({ x: x, y: y }, size, size);
+  const r = RectsFromTopLeft({ x, y }, size, size);
   return r;
-};
+}
 
 /**
  * Returns the visual midpoint of a cell (eg. pixel coordinate)
  *
- * @param cell
  * @param grid
- * @return
+ * @param cell
  */
-export const cellMiddle = (grid: GridVisual, cell: GridCell): Point => {
-  guardCell(cell);
+export function cellMiddle(grid: GridVisual, cell: GridCell): Point {
+  resultThrow(testCell(cell));
 
   const size = grid.size;
   const x = cell.x * size; // + (grid.spacing ? cell.x * grid.spacing : 0);
   const y = cell.y * size; // + (grid.spacing ? cell.y * grid.spacing : 0);
   return Object.freeze({ x: x + size / 2, y: y + size / 2 });
-};
+}

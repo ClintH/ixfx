@@ -1,6 +1,27 @@
-import { test, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import * as Grids from '../../src/grid/index.js';
-test(`offset`, () => {
+
+describe(`offset`, () => {
+  const grid = { rows: 5, cols: 5 };
+
+  it(`returns offset cell`, () => {
+    expect(Grids.offset(grid, { x: 0, y: 0 }, { x: 1, y: 1 })).toEqual({ x: 1, y: 1 });
+  });
+
+  it(`returns undefined with undefined bounds`, () => {
+    expect(Grids.offset(grid, { x: 0, y: 0 }, { x: 10, y: 0 }, `undefined`)).toBeUndefined();
+  });
+
+  it(`stops at edge with stop bounds`, () => {
+    expect(Grids.offset(grid, { x: 0, y: 0 }, { x: -1, y: 0 }, `stop`)).toEqual({ x: 0, y: 0 });
+  });
+
+  it(`wraps with wrap bounds`, () => {
+    expect(Grids.offset(grid, { x: 0, y: 0 }, { x: -1, y: 0 }, `wrap`)).toEqual({ x: 4, y: 0 });
+  });
+});
+
+it(`offset`, () => {
   const grid: Grids.Grid = { cols: 5, rows: 5 };
   const start = { x: 2, y: 2 };
 
@@ -24,7 +45,6 @@ test(`offset`, () => {
   expect(Grids.offset(grid, start, { x: -5, y: 0 }, `stop`)).toEqual({ x: 0, y: 2 });
   expect(Grids.offset(grid, start, { x: 0, y: 5 }, `stop`)).toEqual({ x: 2, y: 4 });
   expect(Grids.offset(grid, start, { x: -5, y: -5 }, `stop`)).toEqual({ x: 0, y: 0 });
-
 
   // Undefined
   expect(Grids.offset(grid, start, { x: -5, y: 0 }, `undefined`)).toBeFalsy();

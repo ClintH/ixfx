@@ -1,10 +1,10 @@
-import type { GridCell, GridCreateVisitor, Grid, GridReadable, GridNeighbourSelectionLogic, GridVisitorOpts } from '../types.js';
+import type { Grid, GridCell, GridNeighbourSelectionLogic, GridVisitorOpts } from '../types.js';
 import { breadthLogic } from './breadth.js';
 import { neighboursLogic } from './cell-neighbours.js';
 import { columnLogic } from './columns.js';
 import { depthLogic } from './depth.js';
-import { randomLogic } from './random.js';
 import { randomContiguousLogic } from './random-contiguous.js';
+import { randomLogic } from './random.js';
 import { rowLogic } from './rows.js';
 import { visitByNeighbours } from './visitor.js';
 
@@ -12,28 +12,27 @@ export * from './breadth.js';
 export * from './cell-neighbours.js';
 export * from './columns.js';
 export * from './depth.js';
-export * from './step.js';
-export * from './random.js';
 export * from './random-contiguous.js';
+export * from './random.js';
 export * from './rows.js';
+export * from './step.js';
 export * from './visitor.js';
 
-export type VisitorTypes = `row` | `column` | `neighbours` | `breadth` | `depth` | `random` | `random-contiguous`
+export type VisitorTypes = `row` | `column` | `neighbours` | `breadth` | `depth` | `random` | `random-contiguous`;
 
 /**
  * Logic types:
- * * 'row': left-to-right, top-to-bottom
- * * 'column': top-to-bottom, left-to-right
- * * 'neighbours': neighbours surrounding cell (eight)
- * * 'breadth`: breadth-first
- * * 'depth': depth-first
- * * 'random': any random cell in grid
- * * 'random-contiguous': any random cell neighbouring an already visited cell
- * @param type 
- * @param opts 
- * @returns 
+ * 'row': left-to-right, top-to-bottom
+ * 'column': top-to-bottom, left-to-right
+ * 'neighbours': neighbours surrounding cell (eight)
+ * 'breadth`: breadth-first
+ * 'depth': depth-first
+ * 'random': any random cell in grid
+ * 'random-contiguous': any random cell neighbouring an already visited cell
+ * @param type
+ * @param opts
  */
-export const create = (type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}): (grid: Grid, optionsOverride?: Partial<GridVisitorOpts>) => Generator<GridCell> => {
+export function create(type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}): (grid: Grid, optionsOverride?: Partial<GridVisitorOpts>) => Generator<GridCell> {
   switch (type) {
     case `random-contiguous`:
       return withLogic(randomContiguousLogic(), opts);
@@ -50,25 +49,27 @@ export const create = (type: VisitorTypes, opts: Partial<GridVisitorOpts> = {}):
     case `column`:
       return withLogic(columnLogic(opts), opts);
     default:
-      throw new TypeError(`Param 'type' unknown. Value: ${ type }`);
+      throw new TypeError(`Param 'type' unknown. Value: ${type}`);
   }
 }
 
-export const withLogic = (logic: GridNeighbourSelectionLogic, options: Partial<GridVisitorOpts> = {}) => {
+export function withLogic(logic: GridNeighbourSelectionLogic, options: Partial<GridVisitorOpts> = {}) {
   return (grid: Grid, optionsOverride: Partial<GridVisitorOpts> = {}): Generator<GridCell> => {
     return visitByNeighbours(logic, grid, { ...options, ...optionsOverride });
-  }
+  };
 }
 
-function isIterator<T>(v: any): v is Generator<T> {
-  if (typeof v !== `object`) return false;
-  if (!(`next` in v)) return false;
-  if (!(`throw` in v)) return false;
-  if (!(`return` in v)) return false;
-  return true;
-
-}
-
+// function isIterator<T>(v: any): v is Generator<T> {
+//   if (typeof v !== `object`)
+//     return false;
+//   if (!(`next` in v))
+//     return false;
+//   if (!(`throw` in v))
+//     return false;
+//   if (!(`return` in v))
+//     return false;
+//   return true;
+// }
 
 // export function* withValues<T>(createOrIter: CreateVisitor | Generator<Cell>, grid: GridReadable<T>, opts: Partial<VisitorOpts>) {
 //   const iter = isIterator(createOrIter) ? createOrIter : createOrIter(grid, opts)();
