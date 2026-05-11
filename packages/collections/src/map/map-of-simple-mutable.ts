@@ -1,5 +1,6 @@
-import { defaultKeyer, type IsEqual, isEqualDefault } from '@ixfx/core';
+import type { IsEqual } from '@ixfx/core';
 import type { IMapOfMutable } from './imap-of-mutable.js';
+import { defaultKeyer, isEqualDefault } from '@ixfx/core';
 import { MapOfSimpleBase } from './map-of-simple-base.js';
 
 /**
@@ -27,21 +28,20 @@ import { MapOfSimpleBase } from './map-of-simple-base.js';
 export class MapOfSimpleMutable<V>
   extends MapOfSimpleBase<V>
   implements IMapOfMutable<V> {
-
   addKeyedValues(key: string, ...values: readonly V[]): void {
     const existing = this.map.get(key);
     if (existing === undefined) {
       this.map.set(key, values);
     } else {
-      this.map.set(key, [ ...existing, ...values ]);
+      this.map.set(key, [...existing, ...values]);
     }
   }
 
   /**
    * Set `values` to `key`.
    * Previous data stored under `key` is thrown away.
-   * @param key 
-   * @param values 
+   * @param key
+   * @param values
    */
   setValues(key: string, values: readonly V[]): void {
     this.map.set(key, values);
@@ -67,8 +67,9 @@ export class MapOfSimpleMutable<V>
    */
   deleteKeyValue(key: string, value: V): boolean {
     const existing = this.map.get(key);
-    if (existing === undefined) return false;
-    const without = existing.filter((existingValue) => !this.valueEq(existingValue, value));
+    if (existing === undefined)
+      return false;
+    const without = existing.filter(existingValue => !this.valueEq(existingValue, value));
     this.map.set(key, without);
     return without.length < existing.length;
   }
@@ -82,12 +83,12 @@ export class MapOfSimpleMutable<V>
    */
   deleteByValue(value: V): boolean {
     let del = false;
-    const entries = [ ...this.map.entries() ];
+    const entries = [...this.map.entries()];
     for (const keyEntries of entries) {
-      for (const values of keyEntries[ 1 ]) {
+      for (const values of keyEntries[1]) {
         if (this.valueEq(values, value)) {
           del = true;
-          this.deleteKeyValue(keyEntries[ 0 ], value);
+          this.deleteKeyValue(keyEntries[0], value);
         }
       }
     }
@@ -101,8 +102,10 @@ export class MapOfSimpleMutable<V>
    */
   delete(key: string): boolean {
     const values = this.map.get(key);
-    if (!values) return false;
-    if (values.length === 0) return false;
+    if (!values)
+      return false;
+    if (values.length === 0)
+      return false;
     this.map.delete(key);
     return true;
   }
@@ -133,7 +136,6 @@ export class MapOfSimpleMutable<V>
  * @typeParam V - Type of items
  * @returns New instance
  */
-export const ofSimpleMutable = <V>(
-  groupBy: (value: V) => string = defaultKeyer,
-  valueEq: IsEqual<V> = isEqualDefault<V>
-): IMapOfMutable<V> => new MapOfSimpleMutable<V>(groupBy, valueEq);
+export function ofSimpleMutable<V>(groupBy: (value: V) => string = defaultKeyer, valueEq: IsEqual<V> = isEqualDefault<V>): IMapOfMutable<V> {
+  return new MapOfSimpleMutable<V>(groupBy, valueEq);
+}

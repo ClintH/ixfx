@@ -1,4 +1,5 @@
-import { defaultKeyer, type IsEqual, isEqualDefault } from '@ixfx/core';
+import type { IsEqual } from '@ixfx/core';
+import { defaultKeyer, isEqualDefault } from '@ixfx/core';
 import { firstEntryByValue } from './map-multi-fns.js';
 
 export class MapOfSimpleBase<V> {
@@ -14,7 +15,7 @@ export class MapOfSimpleBase<V> {
   constructor(
     groupBy: (value: V) => string = defaultKeyer,
     valueEq: IsEqual<V> = isEqualDefault<V>,
-    initial: Map<string, readonly V[]> | [ string, readonly V[] ][] = []
+    initial: Map<string, readonly V[]> | Array<[ string, readonly V[] ]> = [],
   ) {
     this.groupBy = groupBy;
     this.valueEq = valueEq;
@@ -49,24 +50,26 @@ export class MapOfSimpleBase<V> {
    */
   hasKeyValue(key: string, value: V): boolean {
     const values = this.map.get(key);
-    if (!values) return false;
+    if (!values)
+      return false;
     for (const v of values) {
-      if (this.valueEq(v, value)) return true;
+      if (this.valueEq(v, value))
+        return true;
     }
     return false;
   }
 
   /**
    * Debug dump of contents
-   * @returns
    */
   debugString(): string {
     let r = ``;
-    const keys = [ ...this.map.keys() ];
+    const keys = [...this.map.keys()];
     keys.every((k) => {
       const v = this.map.get(k);
-      if (v === undefined) return;
-      r += k + ` (${ v.length }) = ${ JSON.stringify(v) }\r\n`;
+      if (v === undefined)
+        return;
+      r += `${k} (${v.length}) = ${JSON.stringify(v)}\r\n`;
     });
     return r;
   }
@@ -79,30 +82,30 @@ export class MapOfSimpleBase<V> {
    */
   count(key: string): number {
     const values = this.map.get(key);
-    if (!values) return 0;
+    if (!values)
+      return 0;
     return values.length;
   }
 
-
   /**
- * Returns first key that contains `value`
- * @param value 
- * @param eq 
- * @returns 
- */
+   * Returns first key that contains `value`
+   * @param value
+   * @param eq
+   * @returns
+   */
   firstKeyByValue(value: V, eq: IsEqual<V> = isEqualDefault): string | undefined {
     const entry = firstEntryByValue(this, value, eq);
-    if (entry) return entry[ 0 ];
+    if (entry)
+      return entry[0];
   }
-
 
   /**
    * Iterate over all entries
    */
   *entriesFlat(): IterableIterator<[ key: string, value: V ]> {
     for (const entries of this.map.entries()) {
-      for (const value of entries[ 1 ]) {
-        yield [ entries[ 0 ], value ]
+      for (const value of entries[1]) {
+        yield [entries[0], value];
       }
     }
 
@@ -117,11 +120,10 @@ export class MapOfSimpleBase<V> {
    * Iterate over keys and array of values for that key
    */
   *entries(): IterableIterator<[ key: string, value: V[] ]> {
-    for (const [ k, v ] of this.map.entries()) {
-      yield [ k, [ ...v ] ];
+    for (const [k, v] of this.map.entries()) {
+      yield [k, [...v]];
     }
   }
-
 
   /**
    * Get all values under `key`
@@ -130,10 +132,10 @@ export class MapOfSimpleBase<V> {
    */
   *valuesFor(key: string): IterableIterator<V> {
     const m = this.map.get(key);
-    if (!m) return;
+    if (!m)
+      return;
     yield* m.values();
   }
-
 
   /**
    * Iterate over all keys
@@ -148,17 +150,17 @@ export class MapOfSimpleBase<V> {
    */
   *valuesFlat(): IterableIterator<V> {
     for (const entries of this.map) {
-      yield* entries[ 1 ];
+      yield* entries[1];
     }
   }
 
   /**
    * Returns all values under 'key', or
    * an empty array if key is not found.
-   * 
+   *
    * Array is a copy of stored array.
-   * @param key 
-   * @returns 
+   * @param key
+   * @returns
    */
   // valuesForAsArray(key: string): V[] {
   //   const v = this.map.get(key);
@@ -168,17 +170,18 @@ export class MapOfSimpleBase<V> {
 
   /**
    * Returns the underlying array that stores values for `key`.
-   * 
+   *
    * Returns _undefined_ if key does not exist.
-   * 
+   *
    * Be careful about modifying array.
-   * @param key 
-   * @returns 
+   * @param key
+   * @returns
    */
   getRawArray(key: string): readonly V[] | undefined {
     const v = this.map.get(key);
-    if (!v) return;
-    return v
+    if (!v)
+      return;
+    return v;
   }
 
   /**
@@ -187,15 +190,16 @@ export class MapOfSimpleBase<V> {
    */
   *values(): IterableIterator<readonly V[]> {
     for (const entries of this.map) {
-      yield entries[ 1 ];
+      yield entries[1];
     }
   }
+
   /**
    * Iterate over keys and length of values stored under keys
    */
   *keysAndCounts(): IterableIterator<[ string, number ]> {
     for (const entries of this.map) {
-      yield [ entries[ 0 ], entries[ 1 ].length ];
+      yield [entries[0], entries[1].length];
     }
   }
 
@@ -207,10 +211,9 @@ export class MapOfSimpleBase<V> {
   }
 
   /**
-  * _True_ if empty
-  */
+   * _True_ if empty
+   */
   get isEmpty(): boolean {
     return this.map.size === 0;
   }
-
 }

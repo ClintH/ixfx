@@ -1,9 +1,7 @@
-import { elapsedSince, sleep } from '@ixfx/core';
-import { resolveLogOption } from '@ixfx/debug';
-import { integerTest, numberTest, resultThrow } from '@ixfx/guards';
-import { getErrorMessage } from '@ixfx/debug';
 import type { Result } from '@ixfx/guards';
-import { elapsedToHumanString } from '@ixfx/core';
+import { elapsedSince, elapsedToHumanString, sleep } from '@ixfx/core';
+import { getErrorMessage, resolveLogOption } from '@ixfx/debug';
+import { integerTest, numberTest, resultThrow } from '@ixfx/guards';
 /**
  * Result of backoff
  */
@@ -39,22 +37,22 @@ export type BackoffOptions = {
    * Initial value.
    * Default: 1
    */
-  startAt: number,
+  startAt: number;
   /**
    * Maximum times to run.
    * Default: continues forever
    */
-  limitAttempts: number,
+  limitAttempts: number;
   /**
    * Stop retrying if this maximum is reached
    * Default: no limit
    */
-  limitValue: number
+  limitValue: number;
   /**
-   * Math power. 
+   * Math power.
    * Default: 1.1
    */
-  power: number
+  power: number;
 };
 
 /**
@@ -65,11 +63,11 @@ export type BackoffOptions = {
  *  // v: numeric value
  * }
  * ```
- * 
+ *
  * By default the generator runs forever. Use either
  * `limitAttempts` or `limitValue` to stop it when it produces a
  * given quantity of values, or when the value itself reaches a threshold.
- * 
+ *
  * For example:
  * ```js
  * // `values` will have five values in it
@@ -77,17 +75,17 @@ export type BackoffOptions = {
  * // Keep generating values until max is reached
  * const values = [...backoffGenerator({ limitValue: 1000 })];
  * ```
- * 
+ *
  * Options:
- * * startAt: start value
- * * limitAttempts: cap the number of values to generate
- * * limitValue: cap the maximum calculated value
- * * power: power value (default 1.1)
- * 
- * @param options 
- * @returns 
+ * startAt: start value
+ * limitAttempts: cap the number of values to generate
+ * limitValue: cap the maximum calculated value
+ * power: power value (default 1.1)
+ *
+ * @param options
+ * @returns
  */
-export function* backoffGenerator(options: Partial<BackoffOptions> = {}): Generator<number, void, unknown> {
+export function *backoffGenerator(options: Partial<BackoffOptions> = {}): Generator<number, void, unknown> {
   const startAt = options.startAt ?? 1;
   let limitAttempts = options.limitAttempts ?? Number.MAX_SAFE_INTEGER;
   const limitValue = options.limitValue;
@@ -98,17 +96,18 @@ export function* backoffGenerator(options: Partial<BackoffOptions> = {}): Genera
     numberTest(startAt, ``, `startAt`),
     numberTest(limitAttempts, ``, `limitAttempts`),
     () => (limitValue !== undefined) ? numberTest(limitValue, ``, `limitValue`) : undefined,
-    numberTest(power, ``, `power`)
+    numberTest(power, ``, `power`),
   );
 
   while (limitAttempts > 0) {
     // Value has climbed to the limit
-    if (limitValue && value >= limitValue) return;
+    if (limitValue && value >= limitValue)
+      return;
     limitAttempts--;
     yield value;
 
     // Increase value for next iteration
-    value += Math.pow(value, power);
+    value += value ** power;
   }
 }
 
@@ -139,15 +138,15 @@ export type RetryTask<T> = {
   /**
    * If `probe` returns {success:true} task is considered
    * complete and retrying stops
-   * @returns 
+   * @returns
    */
-  probe: (attempts: number) => Promise<Result<T, any>>
-}
+  probe: (attempts: number) => Promise<Result<T, any>>;
+};
 
 /**
- * Keeps calling `callback` until it returns something other than _undefined_. 
+ * Keeps calling `callback` until it returns something other than _undefined_.
  * There is an exponentially-increasing delay between each retry attempt.
- * 
+ *
  * If `callback` throws an exception, the retry is cancelled, bubbling the exception.
  *
  * ```js
@@ -182,47 +181,62 @@ export type RetryTask<T> = {
  * ```
  * @param callback Function to run
  * @param options Options
- * @returns
  */
-export const retryFunction = <T>(callback: () => Promise<T | undefined>, options: Partial<RetryOpts<T>> = {}): Promise<RetryResult<T>> => {
+export function retryFunction<T>(callback: () => Promise<T | undefined>, options: Partial<RetryOpts<T>> = {}): Promise<RetryResult<T>> {
   const task: RetryTask<T> = {
     async probe() {
       try {
         const v = await callback();
-        if (v === undefined) return { value: options.taskValueFallback, error: `Fallback`, success: false };
+        if (v === undefined)
+          return { value: options.taskValueFallback, error: `Fallback`, success: false };
         return { value: v, success: true };
       } catch (error) {
         return { success: false, error: error as Error };
       }
     },
-  }
+  };
   return retryTask(task, options);
 }
 
 /**
- * Keeps trying to run `task`.
- * 
+ * Keeps calling a 'probe' function until it returns success.
+ * If you just want to call a function until it returns a value, use {@link retryFunction} instead.
+ *
  * ```js
- * const task = (attempts) => {
- *  // attempts is number of times it has been retried
- *  
- *  if (Math.random() > 0.5) {
- *    // Return a succesful result
- *    return { success: true }
- *  } else {
+ * const task = {
+ *  probe:(attempts) => {
+ *    // attempts is number of times it has been retried
+ *    if (Math.random() > 0.5) {
+ *      // Return a succesful result
+ *      return { success: true }
+ *    } else {
+ *      return { success: false }
  *  }
- * 
  * }
+ *
+ * // Run with retry
  * const t = await retryTask(task, opts);
+ *
+ * // Handle result
+ * if (t.success) {
+ *  // Use the value:
+ *  console.log(t.value);
+ * } else {
+ *  // Handle failure case
+ *  console.log(t.message);
+ * }
  * ```
- * @param task 
- * @param opts 
- * @returns 
+ *
+ * What you get back is a {@link RetryResult} object, which includes:
+ * `success`: _true_ if task succeeded, _false_ if it failed or was aborted
+ * `attempts`: number of times task was attempted
+ * `elapsed`: milliseconds elapsed since initial call to `retryTask`
+ * `value`: value returned by task, fallback value if it failed, or _undefined_.
+ * `message`: message describing outcome. If retry was aborted, message will be abort reason.
+ * @param task
+ * @param opts
  */
-export const retryTask = async <V>(
-  task: RetryTask<V>,
-  opts: Partial<RetryOpts<V>> = {}
-): Promise<RetryResult<V>> => {
+export async function retryTask<V>(task: RetryTask<V>, opts: Partial<RetryOpts<V>> = {}): Promise<RetryResult<V>> {
   const signal = opts.abort;
   const log = resolveLogOption(opts.log);
   const predelayMs = opts.predelayMs ?? 0;
@@ -233,11 +247,12 @@ export const retryTask = async <V>(
   const limitAttempts = opts.limitAttempts ?? Number.MAX_SAFE_INTEGER;
   const backoffGen = backoffGenerator({ ...opts, startAt: initialValue, limitAttempts });
 
-  if (initialValue <= 0) throw new Error(`Param 'initialValue' must be above zero`);
+  if (initialValue <= 0)
+    throw new Error(`Param 'initialValue' must be above zero`);
 
   if (predelayMs > 0) {
     try {
-      await sleep({ millis: predelayMs, signal: signal });
+      await sleep({ millis: predelayMs, signal });
     } catch (error) {
       // Could happen due to abort signal
       return {
@@ -259,7 +274,7 @@ export const retryTask = async <V>(
       return { success: result.success, value: result.value, attempts, elapsed: startedAt() };
     }
     log({
-      msg: `retry attempts: ${ attempts.toString() } t: ${ elapsedToHumanString(t) }`,
+      msg: `retry attempts: ${attempts.toString()} t: ${elapsedToHumanString(t)}`,
     });
 
     // Did not succeed.
@@ -282,10 +297,10 @@ export const retryTask = async <V>(
   }
 
   return {
-    message: `Giving up after ${ attempts.toString() } attempts.`,
+    message: `Giving up after ${attempts.toString()} attempts.`,
     success: false,
     attempts,
     value: opts.taskValueFallback,
     elapsed: startedAt(),
   };
-};
+}
