@@ -1,10 +1,7 @@
-import type { Interval } from '@ixfx/core';
+import type { Continuously, Interval } from '@ixfx/core';
 import { QueueMutable } from '@ixfx/collections/queue';
-import {
-  type Continuously,
-  continuously
-} from '@ixfx/core';
-import { splitByLength } from '@ixfx/core/text';
+import { continuously } from '@ixfx/core';
+import { chunkByLength } from '@ixfx/core/text';
 
 export type Opts = {
   readonly chunkSize?: number;
@@ -58,11 +55,11 @@ export class StringWriteBuffer {
    */
   constructor(
     private dataHandler: (data: string) => Promise<void>,
-    opts: Opts = {}
+    opts: Opts = {},
   ) {
     this.chunkSize = opts.chunkSize ?? -1;
     this.writer = continuously(async () => {
-      await this.onWrite()
+      await this.onWrite();
     }, opts.interval ?? 10);
   }
 
@@ -70,7 +67,8 @@ export class StringWriteBuffer {
    * Close writer (async)
    */
   async close(): Promise<void> {
-    if (this.closed) return;
+    if (this.closed)
+      return;
     const w = this.stream?.getWriter();
     w?.releaseLock();
     await w?.close();
@@ -83,7 +81,8 @@ export class StringWriteBuffer {
    * Throws an error if {@link close} has been called.
    */
   clear(): void {
-    if (this.closed) throw new Error(`Buffer closed`);
+    if (this.closed)
+      throw new Error(`Buffer closed`);
     this.queue = new QueueMutable<string>();
   }
 
@@ -96,13 +95,15 @@ export class StringWriteBuffer {
    * @returns Underlying stream
    */
   writable(): WritableStream<string> {
-    if (this.closed) throw new Error(`Buffer closed`);
-    if (this.stream === undefined) this.stream = this.createWritable();
+    if (this.closed)
+      throw new Error(`Buffer closed`);
+    if (this.stream === undefined)
+      this.stream = this.createWritable();
     return this.stream;
   }
 
   private createWritable() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    // eslint-disable-next-line ts/no-this-alias
     const b = this;
     return new WritableStream<string>({
       write(chunk) {
@@ -120,7 +121,7 @@ export class StringWriteBuffer {
    */
   async onWrite(): Promise<boolean> {
     if (this.queue.isEmpty) {
-      //console.warn(`WriteBuffer.onWrite: queue empty`);
+      // console.warn(`WriteBuffer.onWrite: queue empty`);
       return false; // Stop continuously
     }
 
@@ -131,7 +132,8 @@ export class StringWriteBuffer {
 
     // Dequeue and send
     const s = this.queue.dequeue();
-    if (s === undefined) return false;
+    if (s === undefined)
+      return false;
     await this.dataHandler(s);
 
     return true;
@@ -152,10 +154,11 @@ export class StringWriteBuffer {
    * @param stringToQueue
    */
   add(stringToQueue: string): void {
-    if (this.closed) throw new Error(`Buffer closed`);
+    if (this.closed)
+      throw new Error(`Buffer closed`);
     // Add whole string or chunked string
     if (this.chunkSize > 0) {
-      this.queue.enqueue(...splitByLength(stringToQueue, this.chunkSize));
+      this.queue.enqueue(...chunkByLength(stringToQueue, this.chunkSize));
     } else {
       this.queue.enqueue(stringToQueue);
     }

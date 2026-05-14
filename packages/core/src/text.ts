@@ -1,15 +1,15 @@
 import { integerTest, resultThrow } from '@ixfx/guards';
-//export { string as random } from './random/String.js';
+// export { string as random } from './random/String.js';
 
-//import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
+// import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
 
 /**
  * Returns chunks of `source`, broken up by `delimiter` (default '.').
- * 
+ *
  * Whittles down from whole string to last token.
- * 
+ *
  * If `delimiter` is not found, no results are yielded.
- * 
+ *
  * ```js
  * stringSegmentsWholeToEnd(`a.b.c.d`);
  * // Yields:
@@ -18,10 +18,10 @@ import { integerTest, resultThrow } from '@ixfx/guards';
  * // `c.d`
  * // `d`
  * ```
- * @param source 
- * @param delimiter 
+ * @param source
+ * @param delimiter
  */
-export function* stringSegmentsWholeToEnd(source: string, delimiter = `.`): Generator<string, void, unknown> {
+export function *stringSegmentsWholeToEnd(source: string, delimiter = `.`): Generator<string, void, unknown> {
   while (source.length > 0) {
     yield source;
     const trimmed = afterMatch(source, delimiter);
@@ -35,11 +35,11 @@ export function* stringSegmentsWholeToEnd(source: string, delimiter = `.`): Gene
 
 /**
  * Returns chunks of `source`, broken up by `delimiter` (default '.').
- * 
+ *
  * Starts with last token, builds to whole.
- * 
+ *
  * If `delimiter` is not found, no results are yielded.
- * 
+ *
  * ````js
  * stringSegmentsLastToWhole(`a.b.c.d`);
  * // Yields:
@@ -48,33 +48,33 @@ export function* stringSegmentsWholeToEnd(source: string, delimiter = `.`): Gene
  * // `b.c.d`
  * // `a.b.c.d`
  * ```
- * @param source 
- * @param delimiter 
+ * @param source
+ * @param delimiter
  */
-export function* stringSegmentsLastToWhole(source: string, delimiter = `.`): Generator<string, void, unknown> {
+export function *stringSegmentsLastToWhole(source: string, delimiter = `.`): Generator<string, void, unknown> {
   let accumulator = ``;
   const orig = source;
   while (source.length > 0) {
     const ba = beforeAfterMatch(source, delimiter, { fromEnd: true, ifNoMatch: `original` });
-    if (ba[ 0 ] === ba[ 1 ] && ba[ 1 ] === source) {
+    if (ba[0] === ba[1] && ba[1] === source) {
       // Delimiter not found
       break;
     }
-    const v = ba[ 1 ] + accumulator;
+    const v = ba[1] + accumulator;
     yield v;
     accumulator = delimiter + v;
-    source = ba[ 0 ];
+    source = ba[0];
   }
   yield orig;
 }
 
 /**
  * Returns chunks of `source`, broken up by `delimiter` (default '.').
- * 
+ *
  * We start with the first token and build up until end.
- * 
+ *
  * If `delimiter` is not found, no results are yielded.
- * 
+ *
  * ```js
  * stringSegmentsFirstToWhole(`a.b.c.d`);
  * // Yields:
@@ -83,30 +83,31 @@ export function* stringSegmentsLastToWhole(source: string, delimiter = `.`): Gen
  * // `a.b.c`
  * // `a.b.c.d`
  * ```
- * @param source 
- * @param delimiter 
+ * @param source
+ * @param delimiter
  */
-export function* stringSegmentsFirstToWhole(source: string, delimiter = `.`): Generator<string, void, unknown> {
+export function *stringSegmentsFirstToWhole(source: string, delimiter = `.`): Generator<string, void, unknown> {
   let accumulator = ``;
   const orig = source;
   while (source.length > 0) {
     const ba = beforeAfterMatch(source, delimiter, { ifNoMatch: `original` });
-    if (ba[ 0 ] === source && ba[ 1 ] === source) break;
-    accumulator += ba[ 0 ];
+    if (ba[0] === source && ba[1] === source)
+      break;
+    accumulator += ba[0];
     yield accumulator;
     accumulator += delimiter;
-    source = ba[ 1 ];
+    source = ba[1];
   }
   yield orig;
 }
 
 /**
  * Returns chunks of `source`, broken up by `delimiter` (default '.').
- * 
+ *
  * We start with whole string and whittle down to starting token.
- * 
+ *
  * If `delimiter` is not found, no results are yielded.
- * 
+ *
  * ```js
  * stringSegmentsWholeToFirst(`a.b.c.d`);
  * // Yields:
@@ -115,43 +116,42 @@ export function* stringSegmentsFirstToWhole(source: string, delimiter = `.`): Ge
  * // `a.b`,
  * // `a`,
  * ```
- * @param source 
- * @param delimiter 
+ * @param source
+ * @param delimiter
  */
-export function* stringSegmentsWholeToFirst(source: string, delimiter = `.`): Generator<string, void, unknown> {
+export function *stringSegmentsWholeToFirst(source: string, delimiter = `.`): Generator<string, void, unknown> {
   while (source.length > 0) {
     yield source;
 
     const b = beforeMatch(source, delimiter, { ifNoMatch: `original`, fromEnd: true });
-    if (b === source) break;
+    if (b === source)
+      break;
     source = b;
   }
 }
-
-
-
 
 /**
  * Given a long string, abbreviates it with ...
  * ```js
  * abbreviate(`This is something`, 7); // `This is...`
  * ```
- * 
+ *
  * If `source` is under `maxLength` the original is returned.
- * @param source 
+ * @param source
  * @param maxLength Maximum length. Defaults to 20
- * @returns 
+ * @returns
  */
-export const abbreviate = (source: string, maxLength = 15): string => {
+export function abbreviate(source: string, maxLength = 15): string {
   resultThrow(integerTest(maxLength, `aboveZero`, `maxLength`));
-  if (typeof source !== `string`) throw new Error(`Parameter 'source' is not a string`);
+  if (typeof source !== `string`)
+    throw new Error(`Parameter 'source' is not a string`);
 
   if (source.length > maxLength && source.length > 3) {
     if (maxLength > 15) {
       const chunk = Math.round((maxLength - 2) / 2);
-      return source.slice(0, chunk) + `...` + source.slice(-chunk);
+      return `${source.slice(0, chunk)}...${source.slice(-chunk)}`;
     }
-    return source.slice(0, maxLength) + `...`;
+    return `${source.slice(0, maxLength)}...`;
   }
   return source;
 }
@@ -160,11 +160,13 @@ export const abbreviate = (source: string, maxLength = 15): string => {
  * Uses JSON.toString() on `source`, but abbreviates result.
  * @param source Object to stringify
  * @param maxLength Default 20
- * @returns 
+ * @returns
  */
-export const toStringAbbreviate = (source: any, maxLength = 20): string => {
-  if (source === undefined) return `(undefined)`;
-  if (source === null) return `(null)`;
+export function toStringAbbreviate(source: any, maxLength = 20): string {
+  if (source === undefined)
+    return `(undefined)`;
+  if (source === null)
+    return `(null)`;
   return abbreviate(JSON.stringify(source), maxLength);
 }
 
@@ -181,26 +183,24 @@ export const toStringAbbreviate = (source: any, maxLength = 20): string => {
  * @param lastEndMatch If true, looks for the last match of `end` (default). If false, looks for the first match.
  * @returns
  */
-export const between = (
-  source: string,
-  start: string,
-  end?: string,
-  lastEndMatch = true
-): string | undefined => {
+export function between(source: string, start: string, end?: string, lastEndMatch = true): string | undefined {
   // ✔ Unit tested
 
   const startPos = source.indexOf(start);
-  if (startPos < 0) return;
+  if (startPos < 0)
+    return;
 
-  if (typeof end === `undefined`) end = start;
+  if (typeof end === `undefined`)
+    end = start;
 
   const endPos = lastEndMatch
     ? source.lastIndexOf(end)
     : source.indexOf(end, startPos + 1);
-  if (endPos < 0) return;
+  if (endPos < 0)
+    return;
 
   return source.slice(startPos + 1, endPos);
-};
+}
 
 /**
  * Like {@link between}, but also returns the source string without the start/end match and what's between.
@@ -215,30 +215,31 @@ export const between = (
  * @param lastEndMatch
  * @returns
  */
-export const betweenChomp = (
-  source: string,
-  start: string,
-  end?: string,
-  lastEndMatch = true
-): [ source: string, between: string | undefined ] => {
+export function betweenChomp(source: string, start: string, end?: string, lastEndMatch = true): [ source: string, between: string | undefined ] {
   // ✔ Unit tested
-  if (typeof source !== `string`) throw new Error(`Parameter 'source' is not a string`);
-  if (typeof start !== `string`) throw new Error(`Parameter 'start' is not a string`);
-  if (end !== undefined && typeof end !== `string`) throw new Error(`Parameter 'end' is not a string`);
+  if (typeof source !== `string`)
+    throw new Error(`Parameter 'source' is not a string`);
+  if (typeof start !== `string`)
+    throw new Error(`Parameter 'start' is not a string`);
+  if (end !== undefined && typeof end !== `string`)
+    throw new Error(`Parameter 'end' is not a string`);
   const startPos = source.indexOf(start);
-  if (startPos < 0) return [ source, undefined ];
+  if (startPos < 0)
+    return [source, undefined];
 
-  if (typeof end === `undefined`) end = start;
+  if (typeof end === `undefined`)
+    end = start;
 
   const endPos = lastEndMatch
     ? source.lastIndexOf(end)
     : source.indexOf(end, startPos + 1);
-  if (endPos < 0) return [ source, undefined ];
+  if (endPos < 0)
+    return [source, undefined];
 
   const between = source.slice(startPos + 1, endPos);
   const sourceResult = source.slice(0, startPos) + source.slice(endPos + 1);
-  return [ sourceResult, between ];
-};
+  return [sourceResult, between];
+}
 /**
  * Returns first position of the given character code, or -1 if not found.
  * @param source Source string
@@ -247,17 +248,13 @@ export const betweenChomp = (
  * @param end End index (inclusive), source.length-1 by default
  * @returns Found position, or -1 if not found
  */
-export const indexOfCharCode = (
-  source: string,
-  code: number,
-  start = 0,
-  end: number = source.length - 1
-): number => {
+export function indexOfCharCode(source: string, code: number, start = 0, end: number = source.length - 1): number {
   for (let index = start; index <= end; index++) {
-    if (source.codePointAt(index) === code) return index;
+    if (source.codePointAt(index) === code)
+      return index;
   }
   return -1;
-};
+}
 
 /**
  * Returns `source` with a given number of characters removed from start position.
@@ -272,69 +269,84 @@ export const indexOfCharCode = (
  * @param removeLength Number of characters to remove
  * @returns
  */
-export const omitChars = (
-  source: string,
-  removeStart: number,
-  removeLength: number
-): string =>
-  source.slice(0, removeStart) +
-  source.slice(removeStart + removeLength);
+export function omitChars(source: string, removeStart: number, removeLength: number): string {
+  return source.slice(0, removeStart)
+    + source.slice(removeStart + removeLength);
+}
 
 /**
  * Splits a string into `length`-size chunks.
  *
- * If `length` is greater than the length of `source`, a single element array is returned with source.
- * The final array element may be smaller if we ran out of characters.
+ * If `length` is less than or equal to 0 or greater than the length of `source`, the whole text is yielded.
+ * The final yielded text may be smaller if we ran out of characters.
  *
  * ```js
- * splitByLength(`hello there`, 2);
+ * for (const c of chunkByLength(`hello there`, 2)) {
  * // Yields:
- * // [`he`, `ll`, `o `, `th`, `er`, `e`]
+ * // `he`, `ll`, `o `, `th`, `er`, `e`
+ * }
  * ```
  * @param source Source string
  * @param length Length of each chunk
- * @returns
+ * @returns Generator that yields each chunk
  */
-export const splitByLength = (
-  source: string | null,
-  length: number
-): readonly string[] => {
+export function *chunkByLength(source: string | null, size: number): Generator<string> {
+  if (source === null)
+    throw new Error(`source parameter null`);
+  if (size <= 0) {
+    yield source;
+    return;
+  }
   resultThrow(integerTest(length, `aboveZero`, `length`));
-  if (source === null) throw new Error(`source parameter null`);
   if (typeof source !== `string`) {
     throw new TypeError(`source parameter not a string`);
   }
-
-  // ✔ Unit tested
-  const chunks = Math.ceil(source.length / length);
-  const returnValue: string[] = [];
-  let start = 0;
-
-  for (let c = 0; c < chunks; c++) {
-    returnValue.push(source.slice(start, start + length));
-    start += length;
+  let pos = 0;
+  while (pos + size < source.length) {
+    yield source.slice(pos, pos + size);
+    pos += size;
   }
-  return returnValue;
-};
+  if (pos < source.length) {
+    yield source.slice(pos);
+  }
+}
 
+// export function splitByLength2(source: string | null, length: number): readonly string[] {
+//   resultThrow(integerTest(length, `aboveZero`, `length`));
+//   if (source === null)
+//     throw new Error(`source parameter null`);
+//   if (typeof source !== `string`) {
+//     throw new TypeError(`source parameter not a string`);
+//   }
 
+//   // ✔ Unit tested
+//   const chunks = Math.ceil(source.length / length);
+//   const returnValue: string[] = [];
+//   let start = 0;
+
+//   for (let c = 0; c < chunks; c++) {
+//     returnValue.push(source.slice(start, start + length));
+//     start += length;
+//   }
+//   return returnValue;
+// }
 
 /**
- * Returns the `source` string up until (and excluding) `match`. 
- * 
+ * Returns the `source` string up until (and excluding) `match`.
+ *
  * By default, if match is not found, all of `source` is returned.
  *
  * ```js
  * // Yields `apple `
  * untilMarch(`apple orange melon`, `orange`);
  * ```
- * 
+ *
  * If match is not found, fallback can be returned instead:
  * ```js
  * // Yields 'lemon'
  * untilMatch(`apple orange mellon`, `kiwi`, { fallback: `lemon` });
  * ```
- * 
+ *
  * Or an exception thrown
  * ```js
  * // Throws
@@ -368,7 +380,6 @@ export const splitByLength = (
 //   return source.slice(startPos ?? 0, m);
 // };
 
-
 // export type UntilMatchOptions = MatchOptions & {
 //   ifNoMatch: `throw` | `original` | `fallback`,
 //   fallback?: string
@@ -377,9 +388,9 @@ export const splitByLength = (
 export type MatchOptions = {
   startPos: number;
   fromEnd: boolean;
-  ifNoMatch: `throw` | `original` | `fallback`,
-  fallback: string
-}
+  ifNoMatch: `throw` | `original` | `fallback`;
+  fallback: string;
+};
 
 // export const afterMatch = (
 //   source: string,
@@ -402,72 +413,67 @@ export type MatchOptions = {
 
 /**
  * Returns all the text in `source` that precedes (and does not include) `match`. If not found, `source` is returned.
- * 
+ *
  * See also: {@link beforeMatch}, {@link beforeAfterMatch}.
- * 
+ *
  * ```js
  * afterMatch(`Hello. There`, `.`); // ' There'
  * afterMatch(`Hello, there', `,`); // 'Hello, there'
  * ```
- * 
+ *
  * If `source` is _undefined_, an error is thrown.
  * @param source
  * @param match
  * @param options
  * @returns
  */
-export const beforeMatch = (
-  source: string,
-  match: string,
-  options: Partial<MatchOptions> = {}
-): string => {
+export function beforeMatch(source: string, match: string, options: Partial<MatchOptions> = {}): string {
   const ba = beforeAfterMatch(source, match, options);
-  return ba[ 0 ];
+  return ba[0];
 }
 
 /**
  * Returns all the text in `source` that follows `match`. If not found, `source` is returned.
- * 
+ *
  * See also: {@link beforeMatch}, {@link beforeAfterMatch}.
- * 
+ *
  * ```js
  * afterMatch(`Hello. There`, `.`); // ' There'
  * afterMatch(`Hello, there', `,`); // 'Hello, there'
  * ```
- * 
+ *
  * If `source` is _undefined_, an error is thrown.
  * @param source
  * @param match
  * @param options
  * @returns
  */
-export const afterMatch = (
-  source: string,
-  match: string,
-  options: Partial<MatchOptions> = {}
-): string => {
+export function afterMatch(source: string, match: string, options: Partial<MatchOptions> = {}): string {
   const ba = beforeAfterMatch(source, match, options);
-  return ba[ 1 ];
+  return ba[1];
 }
 
 /**
  * Returns the text that is before and after `match`.
- * 
+ *
  * See also: {@link beforeMatch}, {@link afterMatch}.
- * 
+ *
  * If `match` is at the end of start of `source`, after or before might be an empty string.
- * @param source 
- * @param match 
- * @param options 
- * @returns 
+ * @param source
+ * @param match
+ * @param options
+ * @returns
  */
-export const beforeAfterMatch = (source: string, match: string, options: Partial<MatchOptions> = {}): [ before: string, after: string ] => {
-  if (source === undefined) throw new Error(`Param 'source' is undefined`);
+export function beforeAfterMatch(source: string, match: string, options: Partial<MatchOptions> = {}): [ before: string, after: string ] {
+  if (source === undefined)
+    throw new Error(`Param 'source' is undefined`);
 
   let fallback = options.fallback;
   const ifNoMatch = options.ifNoMatch ?? (fallback ? `fallback` : `original`);
-  if (ifNoMatch === `original`) fallback = source;
-  if (ifNoMatch === `fallback` && fallback === undefined) throw new Error(`Fallback must be provided`);
+  if (ifNoMatch === `original`)
+    fallback = source;
+  if (ifNoMatch === `fallback` && fallback === undefined)
+    throw new Error(`Fallback must be provided`);
 
   const startPos = options.startPos ?? undefined;
   const fromEnd = options.fromEnd ?? false;
@@ -476,16 +482,17 @@ export const beforeAfterMatch = (source: string, match: string, options: Partial
     ? source.lastIndexOf(match, startPos)
     : source.indexOf(match, startPos);
 
-  if (m < 0 && ifNoMatch === `throw`) throw new Error(`Match '${ match }' not found in source.`);
-  if (m < 0 && ifNoMatch === `original`) return [ source, source ];
+  if (m < 0 && ifNoMatch === `throw`)
+    throw new Error(`Match '${match}' not found in source.`);
+  if (m < 0 && ifNoMatch === `original`)
+    return [source, source];
   if (m < 0 && ifNoMatch === `fallback`) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return [ fallback!, fallback! ];
+    return [fallback!, fallback!];
   }
   return [
     source.slice(0, m),
-    source.slice(Math.max(0, m + match.length))
-  ]
+    source.slice(Math.max(0, m + match.length)),
+  ];
 }
 /**
  * 'Unwraps' a string, removing one or more 'wrapper' strings that it starts and ends with.
@@ -501,10 +508,7 @@ export const beforeAfterMatch = (source: string, match: string, options: Partial
  * @param wrappers
  * @returns
  */
-export const unwrap = (
-  source: string,
-  ...wrappers: readonly string[]
-): string => {
+export function unwrap(source: string, ...wrappers: readonly string[]): string {
   let matched = false;
   do {
     matched = false;
@@ -517,7 +521,7 @@ export const unwrap = (
   } while (matched);
 
   return source;
-};
+}
 
 /**
  * A range
@@ -539,13 +543,13 @@ export type Range = {
    * Index of range. First range is 0
    */
   readonly index: number;
-}
+};
 
 export type LineSpan = {
   readonly start: number;
   readonly end: number;
   readonly length: number;
-}
+};
 
 /**
  * Calculates the span, defined in {@link Range} indexes, that includes `start` through to `end` character positions.
@@ -557,23 +561,20 @@ export type LineSpan = {
  * @param end End character position, in source text reference
  * @returns Span
  */
-export const lineSpan = (
-  ranges: readonly Range[],
-  start: number,
-  end: number
-): LineSpan => {
+export function lineSpan(ranges: readonly Range[], start: number, end: number): LineSpan {
   let s = -1;
   let endPos = -1;
-  for (const [ index, r ] of ranges.entries()) {
+  for (const [index, r] of ranges.entries()) {
     s = index;
-    if (r.text.length === 0) continue;
+    if (r.text.length === 0)
+      continue;
     if (start < r.end) {
       break;
     }
   }
 
   for (let index = s; index < ranges.length; index++) {
-    const r = ranges[ index ];
+    const r = ranges[index];
     endPos = index;
     if (end === r.end) {
       endPos = index + 1;
@@ -584,7 +585,7 @@ export const lineSpan = (
     }
   }
   return { length: endPos - s, start: s, end: endPos };
-};
+}
 
 /**
  * Splits a source string into ranges:
@@ -605,10 +606,7 @@ export const lineSpan = (
  * @param split
  * @returns
  */
-export const splitRanges = (
-  source: string,
-  split: string
-): readonly Range[] => {
+export function splitRanges(source: string, split: string): readonly Range[] {
   let start = 0;
   let text = ``;
   const ranges: Range[] = [];
@@ -633,7 +631,7 @@ export const splitRanges = (
     ranges.push({ text, start, index, end: source.length });
   }
   return ranges;
-};
+}
 
 /**
  * Counts the number of times one of `chars` appears at the front of
@@ -648,10 +646,7 @@ export const splitRanges = (
  * @param chars
  * @returns
  */
-export const countCharsFromStart = (
-  source: string,
-  ...chars: readonly string[]
-): number => {
+export function countCharsFromStart(source: string, ...chars: readonly string[]): number {
   let counted = 0;
   for (let index = 0; index < source.length; index++) {
     if (chars.includes(source.charAt(index))) {
@@ -661,7 +656,7 @@ export const countCharsFromStart = (
     }
   }
   return counted;
-};
+}
 
 /**
  * Returns _true_ if `source` starts and ends with `start` and `end`. Case-sensitive.
@@ -677,16 +672,13 @@ export const countCharsFromStart = (
  * @param end End (if omitted, start will be looked for at end as well)
  * @returns True if source starts and ends with provided values.
  */
-export const startsEnds = (
-  source: string,
-  start: string,
-  end: string = start
-): boolean => source.startsWith(start) && source.endsWith(end);
+export function startsEnds(source: string, start: string, end: string = start): boolean {
+  return source.startsWith(start) && source.endsWith(end);
+}
 
-
-export const htmlEntities = (source: string): string =>
-  source.replaceAll(/[&<>\u00A0-\u9999]/g, (index) => `&#${ index.codePointAt(0) };`);
-
+export function htmlEntities(source: string): string {
+  return source.replaceAll(/[&<>\u00A0-\u9999]/g, index => `&#${index.codePointAt(0)};`);
+}
 
 /**
  * Simple wilcard matching. Use '*' in `pattern` to denote any number of characters.
@@ -698,10 +690,10 @@ export const htmlEntities = (source: string): string =>
  * // 'cat' anywhere in string
  * wildcard(`*cat*`, `see cat run`); // true
  * ```
- * @param pattern 
- * @returns 
+ * @param pattern
+ * @returns
  */
-export const wildcard = (pattern: string) => {
+export function wildcard(pattern: string) {
   // Based on source: https://stackoverflow.com/questions/26246601/wildcard-string-comparison-in-javascript
   // for this solution to work on any string, no matter what characters it has
   const escapeRegex = (value: string) => value.replaceAll(/([!$()*+./:=?[\\\]^{|}])/g, `\\$1`);
@@ -712,7 +704,7 @@ export const wildcard = (pattern: string) => {
 
   // "^"  => Matches any string with the following at the beginning of it
   // "$"  => Matches any string with that in front at the end of it
-  pattern = `^` + pattern + `$`
+  pattern = `^${pattern}$`;
 
   // Create a regular expression object for matching string
   const regex = new RegExp(pattern);
@@ -720,5 +712,5 @@ export const wildcard = (pattern: string) => {
   return (value: string): boolean => {
     // Returns true if it finds a match, otherwse it returns false
     return regex.test(value);
-  }
+  };
 }
