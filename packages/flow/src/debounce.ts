@@ -1,9 +1,11 @@
 import type { Interval } from '@ixfx/core';
 
+import type { Result } from '@ixfx/guards';
+import type { TimeoutAsyncCallback, TimeoutSyncCallback } from './timeout.js';
+import { intervalToMs } from '@ixfx/core';
 import {
   timeout,
-  type TimeoutSyncCallback,
-  type TimeoutAsyncCallback,
+
 } from './timeout.js';
 
 /**
@@ -41,7 +43,7 @@ import {
  * @example Handle most recent pointermove event after 1000ms
  * ```js
  * // Set up debounced handler
- * const moveDebounced = debounce((elapsedMs, evt) => {
+ * const moveDebounced = debounce((evt) => {
  *    // Handle event
  * }, 500);
  *
@@ -60,23 +62,65 @@ import {
  * If the provided function is asynchronous, it's possible to await the debounced
  * version as well. If the invocation was filtered, it returns instantly.
  *
+ * If you want the result of a debounced function when it finally executes, pass
+ * in the `onResult` parameter:
  * ```js
- * const d = debounce(fn, 1000);
- * await d();
+ * const isRed = (colour) => colour === `red`;
+ * const onResult = (result) => {
+ *  if (result.success) {
+ *    console.log(`Value: ${result.value}`);
+ *  }
+ * }
+ * const d = debounce(fn, 1000, onResult);
+ * ```
+ *
+ * If the debounced function throws an error, this will be reported as well:
+ * ```js
+ * if (!result.success) {
+ *  console.error(result.error);
+ * }
  * ```
  * @param callback Function to filter access to
  * @param interval Minimum time between invocations
+ * @param onResult Callback when the result from the wrapped function is available
  * @returns Debounce function
  */
-export const debounce = (
-  callback: TimeoutSyncCallback | TimeoutAsyncCallback,
-  interval: Interval
-): DebouncedFunction => {
-  const t = timeout(callback, interval);
-  return (...args: unknown[]) => { t.start(undefined, args); };
-};
+export function debounce<T extends AnyFn>(
+  callback: T,
+  interval: Interval,
+  onResult?: (result: Result<ReturnType<T>, any>) => void,
+): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
-/**
- * Debounced function
- */
-export type DebouncedFunction = (...args: readonly unknown[]) => void;
+  return (...args: Parameters<T>) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+
+    timer = setTimeout(() => {
+      try {
+        const result = callback(...args);
+        if (onResult) {
+          onResult({ success: true, value: result });
+        }
+      } catch (error) {
+        if (onResult) {
+          onResult({ success: false, error });
+        }
+      }
+    }, intervalToMs(interval));
+  };
+}
+
+type AnyFn = (...args: any[]) => any;
+// export function debounce(callback: TimeoutSyncCallback | TimeoutAsyncCallback, interval: Interval): DebouncedFunction {
+//   const t = timeout(callback, interval);
+//   return (...args: unknown[]) => {
+//     t.start(undefined, args);
+//   };
+// }
+
+// /**
+//  * Debounced function
+//  */
+// export type DebouncedFunction = (...args: readonly unknown[]) => void;
