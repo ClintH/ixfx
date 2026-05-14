@@ -14,8 +14,8 @@ import { MapOfSimpleBase } from './map-of-simple-base.js';
  * const m = mapOfSimpleMutable();
  * m.add(`hello`, 1, 2, 3); // Adds numbers under key `hello`
  * m.delete(`hello`);       // Deletes everything under `hello`
- *
- * const hellos = m.get(`hello`); // Get list of items under `hello`
+
+ * const hellos = m.valuesFor(`hello`); // Enumerate items stored under key `hello`
  * ```
  *
  * Constructor takes a `groupBy` parameter, which yields a string key for a value. This is the

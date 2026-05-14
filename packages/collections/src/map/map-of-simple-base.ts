@@ -9,6 +9,11 @@ export class MapOfSimpleBase<V> {
 
   /**
    * Constructor
+   *
+   * ```js
+   * const m = new MapOfSimpleBase();
+   * m.valuesFor(`apple`); // Iterator over all values stored under key `apple`
+   * ```
    * @param groupBy Creates keys for values when using `addValue`. By default uses JSON.stringify
    * @param valueEq Compare values. By default uses JS logic for equality
    */
