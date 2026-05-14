@@ -1,5 +1,12 @@
 A rough changelog between NPM releases
 
+
+@ixfx/flow
+* Improved typing of 'debounce'. New callback-based pattern to get result of wrapped function.
+
+@ixfx/core
+* Changed 'splitByLength' to be 'chunkByLength', a generator instead of returning an array
+  
 # 2026.05.05
 
 @ixfx/arrays
