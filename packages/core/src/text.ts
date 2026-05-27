@@ -1,7 +1,10 @@
 import { integerTest, resultThrow } from '@ixfx/guards';
-// export { string as random } from './random/String.js';
 
-// import { afterMatch, beforeAfterMatch, beforeMatch } from '../Text.js';
+export * as Compare from './text-edit-distance.js';
+export * as Tokenise from './text-tokenise.js';
+
+const htmlEntitiesRegexPattern = /[&<>\u00A0-\u9999]/g;
+const escapeRegexPattern = /([!$()*+./:=?[\\\]^{|}])/g;
 
 /**
  * Returns chunks of `source`, broken up by `delimiter` (default '.').
@@ -287,7 +290,7 @@ export function omitChars(source: string, removeStart: number, removeLength: num
  * }
  * ```
  * @param source Source string
- * @param length Length of each chunk
+ * @param size Length of each chunk
  * @returns Generator that yields each chunk
  */
 export function *chunkByLength(source: string | null, size: number): Generator<string> {
@@ -297,7 +300,7 @@ export function *chunkByLength(source: string | null, size: number): Generator<s
     yield source;
     return;
   }
-  resultThrow(integerTest(length, `aboveZero`, `length`));
+  resultThrow(integerTest(size, `aboveZero`, `length`));
   if (typeof source !== `string`) {
     throw new TypeError(`source parameter not a string`);
   }
@@ -677,7 +680,7 @@ export function startsEnds(source: string, start: string, end: string = start): 
 }
 
 export function htmlEntities(source: string): string {
-  return source.replaceAll(/[&<>\u00A0-\u9999]/g, index => `&#${index.codePointAt(0)};`);
+  return source.replaceAll(htmlEntitiesRegexPattern, index => `&#${index.codePointAt(0)};`);
 }
 
 /**
@@ -696,7 +699,7 @@ export function htmlEntities(source: string): string {
 export function wildcard(pattern: string) {
   // Based on source: https://stackoverflow.com/questions/26246601/wildcard-string-comparison-in-javascript
   // for this solution to work on any string, no matter what characters it has
-  const escapeRegex = (value: string) => value.replaceAll(/([!$()*+./:=?[\\\]^{|}])/g, `\\$1`);
+  const escapeRegex = (value: string) => value.replaceAll(escapeRegexPattern, `\\$1`);
 
   // "."  => Find a single character, except newline or line terminator
   // ".*" => Matches any string that contains zero or more characters
@@ -713,4 +716,23 @@ export function wildcard(pattern: string) {
     // Returns true if it finds a match, otherwse it returns false
     return regex.test(value);
   };
+}
+
+/**
+ * Deterministic string hash. Converts string to number of 0..1 scale.
+ */
+export function hash(input: string): number {
+  if (typeof input !== `string`)
+    throw new TypeError(`Param 'input' is not a string. Got: ${typeof input}`);
+  let h = 2166136261;
+
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+
+  // Convert to unsigned 32-bit
+  h >>>= 0;
+
+  return h / 4294967296;
 }
