@@ -7,6 +7,7 @@ export * as Array2d from './array-2d.js';
 export * as As from './as.js';
 export * as Cursor from './cursor.js';
 export * from './directions.js';
+export * from './distance.js';
 export * as By from './enumerators/index.js';
 export * from './geometry.js';
 export * from './guards.js';

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>grid cursor</title>
+	</head>
+
+	<body>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+			}
+			#grid {
+				margin: 2em;
+				display:inline-flex;
+				flex-direction: column;
+				border: 2px solid black;
+			}
+			
+			.row {
+				display:flex;
+			}
+			.cell {
+				border:1px solid silver;
+				width: 5em;
+				height: 5em;
+			}
+			.cursor {
+				border:1px solid blue;
+			}
+			.selected {
+				background-color: lightgoldenrodyellow;
+			}
+		</style>
+		<div id="grid"></div>
+		<script type="module" src="script.ts"></script>
+	</body>
+</html>

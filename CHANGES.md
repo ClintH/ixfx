@@ -11,7 +11,10 @@ A rough changelog between NPM releases
 
 @ixfx/core
 * Changed 'splitByLength' to be 'chunkByLength', a generator instead of returning an array
-  
+
+@ixfx/geometry
++ Grids.GridSelection: logic for cursor and selection in a logical grid
+
 # 2026.05.05
 
 @ixfx/arrays

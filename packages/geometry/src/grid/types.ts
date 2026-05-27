@@ -185,3 +185,11 @@ export type GridIdentifyNeighbours = (
   grid: Grid,
   origin: GridCell,
 ) => readonly GridNeighbour[];
+
+/**
+ * Defines a position between two contiguous cells
+ */
+export type GridPositionBetween = Readonly<{
+  a: GridCell;
+  b: GridCell;
+}>;
