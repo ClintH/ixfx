@@ -1,6 +1,5 @@
 import type { Interval } from "@ixfx/core";
-
-import type { InterpolateOptions } from "./types.js";
+import type { BooleanInterpolateOptions, InterpolateOptions } from "./types.js";
 import { ofTotal } from "@ixfx/flow";
 import { numberTest, resultThrow } from '@ixfx/guards';
 import { clamp, wrap } from "@ixfx/numbers";
@@ -307,7 +306,7 @@ export function interpolatorInterval(duration: Interval, a = 0, b = 1, options?:
  * @param options
  * @returns Interpolator function
  */
-export function interpolatorBoolean(a: boolean, b: boolean, options?: Partial<InterpolateOptions> & Partial<{ threshold: number }>): (amount: number) => boolean {
+export function interpolatorBoolean(a: boolean, b: boolean, options?: BooleanInterpolateOptions): (amount: number) => boolean {
   const threshold = options?.threshold ?? 0.5;
   return (amount: number) => {
     const processedAmount = options?.easing ? getEasing(options.easing)?.(amount) ?? amount : amount;
